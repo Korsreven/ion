@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{034F8D98-6E22-404C-961E-76CAEC0A896D}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>ion</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\binaries\$(Configuration)\</OutDir>
+    <IntDir>..\objects\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\binaries\$(Configuration)\</OutDir>
+    <IntDir>..\objects\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;_WINDOW;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\source\engine</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>..\libraries</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;_WINDOW;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\source\engine</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>..\libraries</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\engine\events\IonInputController.cpp" />
+    <ClCompile Include="..\source\engine\events\IonRecurringCallback.cpp" />
+    <ClCompile Include="..\source\engine\graphics\utilities\IonAabb.cpp" />
+    <ClCompile Include="..\source\engine\graphics\utilities\IonColor.cpp" />
+    <ClCompile Include="..\source\engine\graphics\utilities\IonMatrix3.cpp" />
+    <ClCompile Include="..\source\engine\graphics\utilities\IonObb.cpp" />
+    <ClCompile Include="..\source\engine\graphics\utilities\IonSphere.cpp" />
+    <ClCompile Include="..\source\engine\graphics\utilities\IonVector2.cpp" />
+    <ClCompile Include="..\source\engine\resources\files\IonFileResourceLoader.cpp" />
+    <ClCompile Include="..\source\engine\resources\files\repositories\IonAudioRepository.cpp" />
+    <ClCompile Include="..\source\engine\resources\files\repositories\IonFileRepository.cpp" />
+    <ClCompile Include="..\source\engine\resources\files\repositories\IonFontRepository.cpp" />
+    <ClCompile Include="..\source\engine\resources\files\repositories\IonImageRepository.cpp" />
+    <ClCompile Include="..\source\engine\resources\files\repositories\IonShaderRepository.cpp" />
+    <ClCompile Include="..\source\engine\resources\files\repositories\IonVideoRepository.cpp" />
+    <ClCompile Include="..\source\engine\script\IonScriptCompiler.cpp" />
+    <ClCompile Include="..\source\engine\script\IonScriptError.cpp" />
+    <ClCompile Include="..\source\engine\script\IonScriptTree.cpp" />
+    <ClCompile Include="..\source\engine\script\IonScriptValidator.cpp" />
+    <ClCompile Include="..\source\engine\script\utilities\IonParseUtility.cpp" />
+    <ClCompile Include="..\source\engine\system\events\listeners\IonSystemInputListener.cpp" />
+    <ClCompile Include="..\source\engine\system\IonSystemUtility.cpp" />
+    <ClCompile Include="..\source\engine\system\IonSystemWindow.cpp" />
+    <ClCompile Include="..\source\engine\timers\IonAsyncTimerManager.cpp" />
+    <ClCompile Include="..\source\engine\timers\IonStopwatch.cpp" />
+    <ClCompile Include="..\source\engine\timers\IonTimer.cpp" />
+    <ClCompile Include="..\source\engine\timers\IonTimerManager.cpp" />
+    <ClCompile Include="..\source\engine\utilities\IonCodec.cpp" />
+    <ClCompile Include="..\source\engine\utilities\IonCrypto.cpp" />
+    <ClCompile Include="..\source\engine\utilities\IonFileUtility.cpp" />
+    <ClCompile Include="..\source\engine\utilities\IonMath.cpp" />
+    <ClCompile Include="..\source\engine\utilities\IonRandom.cpp" />
+    <ClCompile Include="..\source\engine\utilities\IonStringUtility.cpp" />
+    <ClCompile Include="..\source\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\engine\adaptors\IonBasicContainerHolder.h" />
+    <ClInclude Include="..\source\engine\adaptors\IonContainerHolder.h" />
+    <ClInclude Include="..\source\engine\adaptors\IonFlatAssociativeAdaptor.h" />
+    <ClInclude Include="..\source\engine\adaptors\IonFlatMap.h" />
+    <ClInclude Include="..\source\engine\adaptors\IonFlatSet.h" />
+    <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h" />
+    <ClInclude Include="..\source\engine\adaptors\iterators\IonFlatMapIterator.h" />
+    <ClInclude Include="..\source\engine\adaptors\iterators\IonFlatSetIterator.h" />
+    <ClInclude Include="..\source\engine\adaptors\ranges\IonBasicIterable.h" />
+    <ClInclude Include="..\source\engine\adaptors\ranges\IonBasicReverseIterable.h" />
+    <ClInclude Include="..\source\engine\adaptors\ranges\IonDereferenceIterable.h" />
+    <ClInclude Include="..\source\engine\adaptors\ranges\IonIterable.h" />
+    <ClInclude Include="..\source\engine\events\IonCallback.h" />
+    <ClInclude Include="..\source\engine\events\IonInputController.h" />
+    <ClInclude Include="..\source\engine\events\IonRecurringCallback.h" />
+    <ClInclude Include="..\source\engine\events\listeners\IonFrameListener.h" />
+    <ClInclude Include="..\source\engine\events\listeners\IonKeyListener.h" />
+    <ClInclude Include="..\source\engine\events\listeners\IonListener.h" />
+    <ClInclude Include="..\source\engine\events\listeners\IonListenerInterface.h" />
+    <ClInclude Include="..\source\engine\events\listeners\IonMouseListener.h" />
+    <ClInclude Include="..\source\engine\events\listeners\IonResourceListener.h" />
+    <ClInclude Include="..\source\engine\events\listeners\IonWindowListener.h" />
+    <ClInclude Include="..\source\engine\graphics\utilities\IonAabb.h" />
+    <ClInclude Include="..\source\engine\graphics\utilities\IonColor.h" />
+    <ClInclude Include="..\source\engine\graphics\utilities\IonMatrix3.h" />
+    <ClInclude Include="..\source\engine\graphics\utilities\IonObb.h" />
+    <ClInclude Include="..\source\engine\graphics\utilities\IonSphere.h" />
+    <ClInclude Include="..\source\engine\graphics\utilities\IonVector2.h" />
+    <ClInclude Include="..\source\engine\IonSingleton.h" />
+    <ClInclude Include="..\source\engine\resources\files\IonFileResource.h" />
+    <ClInclude Include="..\source\engine\resources\files\IonFileResourceLoader.h" />
+    <ClInclude Include="..\source\engine\resources\files\repositories\IonAudioRepository.h" />
+    <ClInclude Include="..\source\engine\resources\files\repositories\IonFileRepository.h" />
+    <ClInclude Include="..\source\engine\resources\files\repositories\IonFontRepository.h" />
+    <ClInclude Include="..\source\engine\resources\files\repositories\IonImageRepository.h" />
+    <ClInclude Include="..\source\engine\resources\files\repositories\IonShaderRepository.h" />
+    <ClInclude Include="..\source\engine\resources\files\repositories\IonVideoRepository.h" />
+    <ClInclude Include="..\source\engine\resources\IonResource.h" />
+    <ClInclude Include="..\source\engine\resources\IonResourceManager.h" />
+    <ClInclude Include="..\source\engine\script\IonScriptCompiler.h" />
+    <ClInclude Include="..\source\engine\script\IonScriptError.h" />
+    <ClInclude Include="..\source\engine\script\IonScriptTree.h" />
+    <ClInclude Include="..\source\engine\script\IonScriptValidator.h" />
+    <ClInclude Include="..\source\engine\script\utilities\IonParseUtility.h" />
+    <ClInclude Include="..\source\engine\system\events\IonSystemInput.h" />
+    <ClInclude Include="..\source\engine\system\events\listeners\IonSystemInputListener.h" />
+    <ClInclude Include="..\source\engine\system\events\listeners\IonSystemMessageListener.h" />
+    <ClInclude Include="..\source\engine\system\IonSystemUtility.h" />
+    <ClInclude Include="..\source\engine\system\IonSystemWindow.h" />
+    <ClInclude Include="..\source\engine\timers\IonAsyncTimerManager.h" />
+    <ClInclude Include="..\source\engine\timers\IonStopwatch.h" />
+    <ClInclude Include="..\source\engine\timers\IonTimer.h" />
+    <ClInclude Include="..\source\engine\timers\IonTimerManager.h" />
+    <ClInclude Include="..\source\engine\types\IonTypeCasts.h" />
+    <ClInclude Include="..\source\engine\types\IonTypes.h" />
+    <ClInclude Include="..\source\engine\types\IonTypeTraits.h" />
+    <ClInclude Include="..\source\engine\utilities\IonCodec.h" />
+    <ClInclude Include="..\source\engine\utilities\IonConvert.h" />
+    <ClInclude Include="..\source\engine\utilities\IonConvertV2.h" />
+    <ClInclude Include="..\source\engine\utilities\IonCrypto.h" />
+    <ClInclude Include="..\source\engine\utilities\IonFileUtility.h" />
+    <ClInclude Include="..\source\engine\utilities\IonMath.h" />
+    <ClInclude Include="..\source\engine\utilities\IonRandom.h" />
+    <ClInclude Include="..\source\engine\utilities\IonStringUtility.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

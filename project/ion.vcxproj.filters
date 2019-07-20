@@ -1,0 +1,420 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\system">
+      <UniqueIdentifier>{ed1ed2e9-1c13-4589-bffd-6ff8cc7d6a3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\system">
+      <UniqueIdentifier>{8107374c-92ca-4383-bd15-9a3778eea522}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\script">
+      <UniqueIdentifier>{b5111ce7-dd4c-4d09-8532-0508e19bc91a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\script">
+      <UniqueIdentifier>{8e312242-0c35-499a-9cbd-5c3c84714dd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\events">
+      <UniqueIdentifier>{cce42ea0-279f-4e56-8409-8d868776758c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\graphics">
+      <UniqueIdentifier>{e5010a37-d4bf-405b-be1b-8012c51b10be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\graphics\utilities">
+      <UniqueIdentifier>{f2ec2df6-1577-4b49-9a50-9e1b7bee54b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\resources">
+      <UniqueIdentifier>{24bdcd13-1c20-4f40-b93a-b50aa7b0a12b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\resources\files">
+      <UniqueIdentifier>{f600f0ee-4d74-4f96-a6ea-be41667cd70e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\resources\files\repositories">
+      <UniqueIdentifier>{d0fbd429-a72e-4d2e-a3be-229cfa06fbce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\script\utilities">
+      <UniqueIdentifier>{fc9266b3-f5a8-4007-a1d3-6f5471ab4205}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\system\events">
+      <UniqueIdentifier>{62752ee9-2428-4dd0-8a4e-3fe3d66ce6d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\timers">
+      <UniqueIdentifier>{dc5539be-143e-4728-a040-e67ad3d25105}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\utilities">
+      <UniqueIdentifier>{3f834c6c-570a-4ed8-83b3-f6d89f40463c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\events">
+      <UniqueIdentifier>{938a102f-5231-4b83-88fc-5cccd987a135}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics">
+      <UniqueIdentifier>{f1925e6e-2398-4d51-9a85-fe0aa9e80184}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics\utilities">
+      <UniqueIdentifier>{15b78216-defa-459e-a73f-ad861f3905ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\resources">
+      <UniqueIdentifier>{270ccc42-df7c-44bd-bd49-7d6955ae45e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\resources\files">
+      <UniqueIdentifier>{915cec4c-68d7-47c4-8c3e-33a4cf422316}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\resources\files\repositories">
+      <UniqueIdentifier>{ac6ce5d7-b3f6-491a-b925-944460ad79f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\script\utilities">
+      <UniqueIdentifier>{a1528e3a-84de-455d-8a05-77197336a963}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\system\events">
+      <UniqueIdentifier>{f4fb04bc-e235-4244-b195-875c02db21b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\timers">
+      <UniqueIdentifier>{b53bc3d5-5a2f-44aa-abc2-13288c6dd170}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utilities">
+      <UniqueIdentifier>{a00eb1c2-7fed-47c6-b44e-b7905c1499d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\adaptors">
+      <UniqueIdentifier>{a8ba94d4-873d-4cb1-b559-eb406ecaf53e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\adaptors\iterators">
+      <UniqueIdentifier>{7a02defc-71c6-470f-be2f-6b1dbde9fe33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\events\listeners">
+      <UniqueIdentifier>{1aae5aa0-93a7-4174-9f3d-55683ac437ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\system\events\listeners">
+      <UniqueIdentifier>{d653c0be-6012-493e-a050-9073aa5fb724}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\adaptors\ranges">
+      <UniqueIdentifier>{b3bea1a4-b1a9-4b78-8357-b021ab46ba0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\system\events\listeners">
+      <UniqueIdentifier>{01617222-ba17-4dab-8337-9484dc896984}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\types">
+      <UniqueIdentifier>{37326e59-b81a-46b9-bf3c-b1411e513f23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\graphics\shaders">
+      <UniqueIdentifier>{08665f5d-b942-437b-8915-80864ef740d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\graphics\particles">
+      <UniqueIdentifier>{ddb139ee-7c88-4623-b29c-c8416f5fdb5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics\particles">
+      <UniqueIdentifier>{5f77cc7c-28cf-45a9-be07-eacef0e0696f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics\shaders">
+      <UniqueIdentifier>{a0cc1cec-d1e6-47c2-b40b-a467bfe38380}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\utilities\IonAabb.cpp">
+      <Filter>Source Files\graphics\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\utilities\IonColor.cpp">
+      <Filter>Source Files\graphics\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\utilities\IonMatrix3.cpp">
+      <Filter>Source Files\graphics\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\utilities\IonObb.cpp">
+      <Filter>Source Files\graphics\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\utilities\IonSphere.cpp">
+      <Filter>Source Files\graphics\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\utilities\IonVector2.cpp">
+      <Filter>Source Files\graphics\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\events\IonRecurringCallback.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\resources\files\IonFileResourceLoader.cpp">
+      <Filter>Source Files\resources\files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\resources\files\repositories\IonAudioRepository.cpp">
+      <Filter>Source Files\resources\files\repositories</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\resources\files\repositories\IonFileRepository.cpp">
+      <Filter>Source Files\resources\files\repositories</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\resources\files\repositories\IonFontRepository.cpp">
+      <Filter>Source Files\resources\files\repositories</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\resources\files\repositories\IonImageRepository.cpp">
+      <Filter>Source Files\resources\files\repositories</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\resources\files\repositories\IonShaderRepository.cpp">
+      <Filter>Source Files\resources\files\repositories</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\resources\files\repositories\IonVideoRepository.cpp">
+      <Filter>Source Files\resources\files\repositories</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\script\utilities\IonParseUtility.cpp">
+      <Filter>Source Files\script\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\timers\IonAsyncTimerManager.cpp">
+      <Filter>Source Files\timers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\timers\IonStopwatch.cpp">
+      <Filter>Source Files\timers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\timers\IonTimer.cpp">
+      <Filter>Source Files\timers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\timers\IonTimerManager.cpp">
+      <Filter>Source Files\timers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\utilities\IonCodec.cpp">
+      <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\utilities\IonCrypto.cpp">
+      <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\utilities\IonFileUtility.cpp">
+      <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\utilities\IonMath.cpp">
+      <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\utilities\IonRandom.cpp">
+      <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\utilities\IonStringUtility.cpp">
+      <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\system\IonSystemUtility.cpp">
+      <Filter>Source Files\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\system\IonSystemWindow.cpp">
+      <Filter>Source Files\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\system\events\listeners\IonSystemInputListener.cpp">
+      <Filter>Source Files\system\events\listeners</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\events\IonInputController.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\script\IonScriptTree.cpp">
+      <Filter>Source Files\script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\script\IonScriptCompiler.cpp">
+      <Filter>Source Files\script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\script\IonScriptError.cpp">
+      <Filter>Source Files\script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\script\IonScriptValidator.cpp">
+      <Filter>Source Files\script</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\engine\IonSingleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
+      <Filter>Header Files\adaptors\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\adaptors\iterators\IonFlatMapIterator.h">
+      <Filter>Header Files\adaptors\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\adaptors\iterators\IonFlatSetIterator.h">
+      <Filter>Header Files\adaptors\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\adaptors\ranges\IonBasicIterable.h">
+      <Filter>Header Files\adaptors\ranges</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\adaptors\ranges\IonDereferenceIterable.h">
+      <Filter>Header Files\adaptors\ranges</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\adaptors\ranges\IonIterable.h">
+      <Filter>Header Files\adaptors\ranges</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\adaptors\IonBasicContainerHolder.h">
+      <Filter>Header Files\adaptors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\adaptors\IonContainerHolder.h">
+      <Filter>Header Files\adaptors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\adaptors\IonFlatAssociativeAdaptor.h">
+      <Filter>Header Files\adaptors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\adaptors\IonFlatMap.h">
+      <Filter>Header Files\adaptors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\adaptors\IonFlatSet.h">
+      <Filter>Header Files\adaptors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\IonCallback.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\IonRecurringCallback.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonFrameListener.h">
+      <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonKeyListener.h">
+      <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonListener.h">
+      <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonListenerInterface.h">
+      <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonMouseListener.h">
+      <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonResourceListener.h">
+      <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonWindowListener.h">
+      <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\utilities\IonAabb.h">
+      <Filter>Header Files\graphics\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\utilities\IonColor.h">
+      <Filter>Header Files\graphics\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\utilities\IonMatrix3.h">
+      <Filter>Header Files\graphics\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\utilities\IonObb.h">
+      <Filter>Header Files\graphics\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\utilities\IonSphere.h">
+      <Filter>Header Files\graphics\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\utilities\IonVector2.h">
+      <Filter>Header Files\graphics\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\resources\IonResourceManager.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\resources\files\IonFileResourceLoader.h">
+      <Filter>Header Files\resources\files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\resources\files\repositories\IonAudioRepository.h">
+      <Filter>Header Files\resources\files\repositories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\resources\files\repositories\IonFileRepository.h">
+      <Filter>Header Files\resources\files\repositories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\resources\files\repositories\IonFontRepository.h">
+      <Filter>Header Files\resources\files\repositories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\resources\files\repositories\IonImageRepository.h">
+      <Filter>Header Files\resources\files\repositories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\resources\files\repositories\IonShaderRepository.h">
+      <Filter>Header Files\resources\files\repositories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\resources\files\repositories\IonVideoRepository.h">
+      <Filter>Header Files\resources\files\repositories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\script\utilities\IonParseUtility.h">
+      <Filter>Header Files\script\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\timers\IonAsyncTimerManager.h">
+      <Filter>Header Files\timers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\timers\IonStopwatch.h">
+      <Filter>Header Files\timers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\timers\IonTimer.h">
+      <Filter>Header Files\timers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\timers\IonTimerManager.h">
+      <Filter>Header Files\timers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\utilities\IonCodec.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\utilities\IonConvert.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\utilities\IonCrypto.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\utilities\IonFileUtility.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\utilities\IonMath.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\utilities\IonRandom.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\utilities\IonStringUtility.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\system\IonSystemUtility.h">
+      <Filter>Header Files\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\system\IonSystemWindow.h">
+      <Filter>Header Files\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\system\events\listeners\IonSystemInputListener.h">
+      <Filter>Header Files\system\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\system\events\listeners\IonSystemMessageListener.h">
+      <Filter>Header Files\system\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\IonInputController.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\system\events\IonSystemInput.h">
+      <Filter>Header Files\system\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\types\IonTypeCasts.h">
+      <Filter>Header Files\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\types\IonTypes.h">
+      <Filter>Header Files\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\types\IonTypeTraits.h">
+      <Filter>Header Files\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\resources\IonResource.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\resources\files\IonFileResource.h">
+      <Filter>Header Files\resources\files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\utilities\IonConvertV2.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\script\IonScriptCompiler.h">
+      <Filter>Header Files\script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\script\IonScriptTree.h">
+      <Filter>Header Files\script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\script\IonScriptError.h">
+      <Filter>Header Files\script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\script\IonScriptValidator.h">
+      <Filter>Header Files\script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\adaptors\ranges\IonBasicReverseIterable.h">
+      <Filter>Header Files\adaptors\ranges</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
