@@ -118,6 +118,9 @@
     <Filter Include="Source Files\graphics\shaders">
       <UniqueIdentifier>{a0cc1cec-d1e6-47c2-b40b-a467bfe38380}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\parallel">
+      <UniqueIdentifier>{58fda629-bd76-4e0e-ab68-cc0db6eab972}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -415,6 +418,12 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\adaptors\ranges\IonBasicReverseIterable.h">
       <Filter>Header Files\adaptors\ranges</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\parallel\IonWorker.h">
+      <Filter>Header Files\parallel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\parallel\IonWorkerPool.h">
+      <Filter>Header Files\parallel</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

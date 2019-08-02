@@ -38,6 +38,9 @@ File:	main.cpp
 #include "graphics/utilities/IonSphere.h"
 #include "graphics/utilities/IonVector2.h"
 
+#include "parallel/IonWorker.h"
+#include "parallel/IonWorkerPool.h"
+
 #include "resources/IonResource.h"
 #include "resources/IonResourceManager.h"
 #include "resources/files/IonFileResource.h"
@@ -140,6 +143,11 @@ void OnTick(ion::timers::Timer &ticked_timer)
 	ticked_timer;
 }
 
+auto Concat(std::string x, std::string y)
+{
+	return x + y;
+}
+
 //Entry point for windows 32/64 bit
 int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 				   [[maybe_unused]] _In_opt_ HINSTANCE prev_instance,
@@ -166,7 +174,20 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 		Test code
 	*/
 
-	auto args = ion::system::utilities::CommandLineArguments();
+	ion::parallel::WorkerPool<std::string> worker_pool;
+	worker_pool.MaxWorkerThreads(5);
+
+	for (auto i = 0; i < 10; ++i)
+		worker_pool.RunTask(Concat, "Hello", "World!");
+
+	worker_pool.Wait();
+
+	for (auto i = 0; i < 10; ++i)
+		worker_pool.RunTask(Concat, "World", "Hello!");
+
+	auto results = worker_pool.Get();
+
+
 	auto repetitions = 1;
 
 	//Compile script
@@ -269,11 +290,11 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 		//Output
 
 		auto message = compile_error ?
-			ion::utilities::string::Concat(compile_error.Condition.message(), " (line number ", compile_error.LineNumber, ")") :
+			ion::utilities::string::Concat(compile_error.Condition.message(), " (", compile_error.FilePath.string(), ", line ", compile_error.LineNumber, ")") :
 			"Script has been compiled successfully!";
 
 		auto output = ion::utilities::string::Concat(
-			"- ION script compiler output -\n\n",
+			"- Ion script compiler output -\n\n",
 			"Compile time: \t\t", compile_elapsed.count(), "mu\n"
 			"Deserialize time: \t", deserialize_elapsed.count() > 0 ?
 				ion::utilities::convert::ToString(deserialize_elapsed.count()) + "mu" : "-", "\n"
@@ -283,7 +304,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 		{
 			output += "\n\n\n- Tree printed using DFS pre-traversal -\n";
 
-			for (auto [object, parent, depth] : compiled_tree->DepthFirst())
+			for (auto& [object, parent, depth] : compiled_tree->DepthFirst())
 			{
 				output += "\n" + std::string(depth, '\t') + "[object : " + object.Name() + "]";
 

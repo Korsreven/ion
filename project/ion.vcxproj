@@ -214,6 +214,8 @@
     <ClInclude Include="..\source\engine\graphics\utilities\IonSphere.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonVector2.h" />
     <ClInclude Include="..\source\engine\IonSingleton.h" />
+    <ClInclude Include="..\source\engine\parallel\IonWorker.h" />
+    <ClInclude Include="..\source\engine\parallel\IonWorkerPool.h" />
     <ClInclude Include="..\source\engine\resources\files\IonFileResource.h" />
     <ClInclude Include="..\source\engine\resources\files\IonFileResourceLoader.h" />
     <ClInclude Include="..\source\engine\resources\files\repositories\IonAudioRepository.h" />
