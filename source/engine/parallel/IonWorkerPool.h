@@ -98,7 +98,7 @@ namespace ion::parallel
 						lock.unlock();
 						worker_pool.cv_.notify_one();
 					}
-                    else
+					else
 						worker_pool.RunQueuedTasks(); //Mutex is still locked
 					
 					return ret;
