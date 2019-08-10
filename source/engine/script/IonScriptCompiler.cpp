@@ -13,8 +13,6 @@ File:	IonScriptCompiler.cpp
 #include "IonScriptCompiler.h"
 
 #include <algorithm>
-#include <functional>
-#include <set>
 
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
@@ -22,6 +20,7 @@ File:	IonScriptCompiler.cpp
 #include "utilities/IonConvert.h"
 #include "utilities/IonFileUtility.h"
 #include "utilities/IonParseUtility.h"
+#include "utilities/IonStringUtility.h"
 
 namespace ion::script
 {
@@ -36,60 +35,53 @@ namespace script_compiler::detail
 using namespace std::string_view_literals;
 
 
-//compile_worker
-
-compile_worker::compile_worker(std::string str, build_context context, compile_worker_pool &worker_pool) :
-	process{std::async(std::launch::async, partial_compile, std::move(str), std::move(context), std::ref(worker_pool))}
+void build_system::start_process(std::string str, translation_unit unit, build_system &build)
 {
-	//Empty
-}
+	auto first = reinterpret_cast<size_t>(&str);
+	auto last = first + sizeof(str);
 
-//compile_worker_pool
-
-void compile_worker_pool::start(std::string str, build_context context, compile_worker_pool &worker_pool)
-{
-	std::filesystem::path file_path = context.current_file_path();
-	std::lock_guard lock{m};
-
-	if (auto iter = workers.find(file_path); iter == std::end(workers))
+	//Make sure the internal data of 'str' is allocated on the heap (no SSO)
+	while (reinterpret_cast<size_t>(std::data(str)) <= last &&
+		   reinterpret_cast<size_t>(std::data(str)) >= first)
+		str.push_back(' '); //Add trailing white space
+	
 	{
-		++worker_pool.processes;
-		workers.emplace_hint(iter, std::move(file_path), compile_worker{std::move(str), std::move(context), std::ref(worker_pool)});
+		std::lock_guard lock{m};
+		inputs.push_back(std::move(str)); 
 	}
+
+	auto id = unit.current_file_path().lexically_normal().string();
+	ion::utilities::string::ToLowerCase(id);
+	processes.RunTask(std::move(id), partial_compile, std::string_view{inputs.back()}, std::move(unit), std::ref(build));
 }
 
-//build_context
-
-/*
-	Stack operations
-*/
-
-bool build_context::push_file(std::filesystem::path file_path)
+bool translation_unit::push_file(std::filesystem::path file_path)
 {
-	auto iter = std::find_if(std::cbegin(file_hierarchy), std::cend(file_hierarchy),
+	auto iter = std::find_if(std::cbegin(hierarchy), std::cend(hierarchy),
 		[&](const auto &x) noexcept
 		{
 			std::error_code error;
 			return std::filesystem::equivalent(file_path, x, error);
 		});
 	
-	if (iter == std::cend(file_hierarchy))
+	if (iter == std::cend(hierarchy))
 	{
-		file_hierarchy.push_back(std::move(file_path));
+		hierarchy.push_back(std::move(file_path));
 		return true;
 	}
 	else
-		return false; //Cyclic inclusion
+		return false; //Cyclic import
 }
 
-void build_context::pop_file()
+void translation_unit::pop_file()
 {
-	if (std::size(file_hierarchy) > 1)
-		file_hierarchy.pop_back();
+	if (std::size(hierarchy) > 1)
+		hierarchy.pop_back();
 }
 
 
-std::optional<std::filesystem::path> full_import_path(std::filesystem::path file_path, const build_context &context)
+std::optional<std::filesystem::path> full_file_path(std::filesystem::path file_path,
+	const std::filesystem::path &root_path, const std::filesystem::path &current_path)
 {
 	std::error_code error;
 
@@ -97,14 +89,14 @@ std::optional<std::filesystem::path> full_import_path(std::filesystem::path file
 	if (file_path.is_relative())
 	{
 		//root path
-		if (std::empty(context.file_hierarchy))
-			file_path = context.root_path / std::filesystem::relative(file_path, context.root_path);
+ 		if (std::empty(current_path))
+			file_path = root_path / std::filesystem::relative(file_path, root_path);
 		//root path
 		else if (auto str = file_path.string(); str.front() == '/' || str.front() == '\\')
-			file_path = context.root_path / file_path;
+			file_path = root_path / file_path;
 		//current path
 		else
-			file_path = context.current_file_path().parent_path() / file_path;
+			file_path = current_path / file_path;
 	}
 
 	return !error && ion::utilities::file::IsFile(file_path) ?
@@ -112,12 +104,13 @@ std::optional<std::filesystem::path> full_import_path(std::filesystem::path file
 		std::nullopt;
 }
 
-bool import_file(std::filesystem::path file_path, build_context &context, std::string &str, CompileError &error)
+bool open_file(std::filesystem::path file_path, translation_unit &unit, std::string &str, CompileError &error)
 {
-	if (auto import_path = full_import_path(std::move(file_path), context); import_path)
+	if (auto import_path = full_file_path(std::move(file_path), unit.root_path,
+		!std::empty(unit.hierarchy) ? unit.current_file_path().parent_path() : ""); import_path)
 	{
 		if (ion::utilities::file::Load(*import_path, str, ion::utilities::file::FileLoadMode::Binary) &&
-			context.push_file(std::move(*import_path)))
+			unit.push_file(std::move(*import_path)))
 			return true;
 		else
 		{
@@ -291,7 +284,7 @@ std::pair<std::string_view, int> get_white_space_lexeme(std::string_view str) no
 	return {str, std::count(std::begin(str), std::end(str), '\n')};
 }
 
-std::optional<lexical_tokens> lex(std::string_view str, build_context context, compile_worker_pool &worker_pool, CompileError &error)
+std::optional<lexical_tokens> lex(std::string_view str, translation_unit unit, build_system &build, CompileError &error)
 {
 	lexical_tokens tokens;
 	lexical_token token;
@@ -393,9 +386,11 @@ std::optional<lexical_tokens> lex(std::string_view str, build_context context, c
 				{
 					if (auto result = utilities::parse::AsString(import_argument); result)
 					{
-						auto imported_context = context;
-						if (std::string imported_str; import_file(std::move(*result), imported_context, imported_str, error))
-							worker_pool.start(std::move(imported_str), std::move(imported_context), worker_pool);
+						if (std::string imported_str; open_file(std::move(*result), unit, imported_str, error))
+						{
+							build.start_process(std::move(imported_str), unit, std::ref(build));
+							unit.pop_file();
+						}
 						else
 						{
 							error.LineNumber = token.line_number; //Imbue generated error with line number
@@ -477,7 +472,14 @@ bool check_literal_syntax(lexical_token &token, syntax_context &context, Compile
 {
 	if (token.name == token_name::StringLiteral)
 	{
-		if (!context.inside_import && !context.inside_object_signature && !context.inside_property)
+		//"" or ''
+		//A full string correctness check is done later in parse_literal
+		if (token.value.back() != token.value.front())
+		{
+			error = {CompileErrorCode::InvalidStringLiteral, token.line_number};
+			return false;
+		}
+		else if (!context.inside_import && !context.inside_object_signature && !context.inside_property)
 		{
 			error = {CompileErrorCode::UnexpectedLiteral, token.line_number};
 			return false;
@@ -878,6 +880,56 @@ bool check_syntax(lexical_tokens &tokens, CompileError &error) noexcept
 	}
 
 	return true;
+}
+
+
+adaptors::FlatMap<int, std::filesystem::path> link(lexical_tokens &tokens, adaptors::FlatMap<std::string, compile_result> imported_results, build_system &build)
+{
+	std::vector units{std::pair{build.root_path / ".", static_cast<int>(std::size(tokens))}};
+	adaptors::FlatMap<int, std::filesystem::path> file_path_map;
+	auto off = 0;
+
+	for (auto iter = std::begin(tokens); iter != std::end(tokens);)
+	{
+		auto &token = *iter;
+		auto &[file_path, tokens_left] = units.back();
+
+		//Link in imported tokens from another file
+		if (token.name == token_name::Rule &&
+			is_import_rule(token.value))
+		{
+			auto result = utilities::parse::AsString((iter + 1)->value);
+			auto path = *full_file_path(*result, build.root_path, file_path.parent_path());
+			auto id = path.lexically_normal().string();
+			ion::utilities::string::ToLowerCase(id);
+
+			if (auto it = imported_results.find(id); it != std::end(imported_results))
+			{
+				auto &[key, value] = *it;
+
+				iter = tokens.erase(iter, iter + 3);
+				iter = tokens.insert(iter, std::begin(*value.tokens), std::end(*value.tokens));
+				tokens_left -= 3;
+
+				if (off > 0)
+					file_path_map.emplace(off - 1, file_path);
+				
+				units.push_back({value.file_path, static_cast<int>(std::size(*value.tokens))});			
+				continue;
+			}
+		}
+
+		for (--tokens_left; !std::empty(units) && units.back().second <= 0;)
+		{		
+			file_path_map.emplace(off, units.back().first);
+			units.pop_back();	
+		}
+
+		++iter;
+		++off;
+	}
+
+	return file_path_map;
 }
 
 
@@ -1425,34 +1477,37 @@ void pre_parse(lexical_tokens &tokens) noexcept
 			}), std::end(tokens));
 }
 
-std::optional<ScriptTree> parse(lexical_tokens tokens, compile_worker_pool &worker_pool, CompileError &error)
+std::optional<ScriptTree> parse(lexical_tokens tokens, build_system &build, CompileError &error)
 {
 	//Discard unnecessary tokens
 	pre_parse(tokens);
 
 	//Syntax error checking
-	if (!check_syntax(tokens, error))
+	check_syntax(tokens, error);
+
+	if (error)
 		return {};
 
-	//Wait for all workers
-    {
-        std::unique_lock lock{worker_pool.m};
-        worker_pool.cv.wait(lock,
-			[&]() noexcept
-			{
-				return worker_pool.processes == 0;
-			});
-    }
-	
-	for (auto& [key, value] : worker_pool.workers)
+
+	//Wait for all external processes to complete
+	auto imported_results = build.processes.Get();
+
+	for (auto &[key, value] : imported_results)
 	{
-		auto result = value.process.get(); //TODO
+		if (value.error)
+		{
+			error = value.error;
+			return {};
+		}
 	}
 
-	
-	parse_context context;
+	//Link together tokens (main process) with the imported tokens (external processes)
+	auto file_path_map = link(tokens, std::move(imported_results), build);
 
 	//Parse and build tree
+	parse_context context;
+	auto off = 0;
+	
 	for (auto &token : tokens)
 	{
 		switch (token.name)
@@ -1505,7 +1560,19 @@ std::optional<ScriptTree> parse(lexical_tokens tokens, compile_worker_pool &work
 
 		//An error has occurred
 		if (error)
+		{
+			if (auto iter = file_path_map.lower_bound(off); iter != std::end(file_path_map))
+			{
+				auto &[key, value] = *iter;
+				
+				if (value.filename() != ".")
+					error.FilePath = value.lexically_normal();
+			}
+			
 			return {};
+		}
+		else
+			++off;
 	}
 
 	return !std::empty(context.scopes) ?
@@ -1519,23 +1586,22 @@ std::optional<ScriptTree> parse(lexical_tokens tokens, compile_worker_pool &work
 	Compiling
 */
 
-std::optional<ScriptTree> compile(std::string str, build_context context, CompileError &error)
+std::optional<ScriptTree> compile(std::string_view str, translation_unit unit, build_system &build, CompileError &error)
 {
-	compile_worker_pool worker_pool;
-	auto tokens = script_compiler::detail::lex(std::move(str), context, worker_pool, error);
-	auto tree = tokens ? script_compiler::detail::parse(*tokens, worker_pool, error) : std::nullopt;
+	auto tokens = script_compiler::detail::lex(str, unit, build, error);
+	auto tree = tokens ? script_compiler::detail::parse(*tokens, build, error) : std::nullopt;
 
 	//An error has occurred
-	if (error)
-		error.FilePath = context.current_file_path(); //Imbue generated error with file path
+	if (error && std::empty(error.FilePath))
+		error.FilePath = unit.current_file_path().lexically_normal(); //Imbue generated error with file path
 
 	return tree;
 }
 
-std::optional<lexical_tokens> partial_compile(std::string str, build_context context, compile_worker_pool &worker_pool)
+compile_result partial_compile(std::string_view str, translation_unit unit, build_system &build)
 {
 	CompileError error;
-	auto tokens = script_compiler::detail::lex(std::move(str), context, worker_pool, error);
+	auto tokens = script_compiler::detail::lex(str, unit, build, error);
 
 	if (tokens)
 	{
@@ -1546,20 +1612,13 @@ std::optional<lexical_tokens> partial_compile(std::string str, build_context con
 		check_syntax(*tokens, error);
 	}
 
+	auto file_path = unit.current_file_path();
+
 	//An error has occurred
-	if (error)
-		error.FilePath = context.current_file_path(); //Imbue generated error with file path
+	if (error && std::empty(error.FilePath))
+		error.FilePath = file_path.lexically_normal(); //Imbue generated error with file path
 
-	{
-		std::unique_lock lock{worker_pool.m};
-		if (--worker_pool.processes == 0)
-		{
-			lock.unlock();
-			worker_pool.cv.notify_one();
-		}
-	}
-
-	return tokens;
+	return {file_path, error ? std::nullopt : std::move(tokens), error};
 }
 
 } //script_compiler::detail
@@ -1582,10 +1641,17 @@ std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_pat
 {
 	if (ion::utilities::file::IsDirectory(root_path))
 	{
-		script_compiler::detail::build_context context{std::move(root_path)};
+		script_compiler::detail::translation_unit unit{std::move(root_path)};
 		
-		if (std::string str; script_compiler::detail::import_file(std::move(file_path), context, str, error))
-			return script_compiler::detail::compile(std::move(str), std::move(context), error);
+		if (std::string str; script_compiler::detail::open_file(std::move(file_path), unit, str, error))
+		{
+			script_compiler::detail::build_system build{unit.root_path};
+
+			if (max_build_processes_)
+				build.processes.MaxWorkerThreads(*max_build_processes_);
+
+			return script_compiler::detail::compile(str, std::move(unit), build, error);
+		}
 	}
 
 	return {};

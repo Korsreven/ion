@@ -33,10 +33,10 @@ std::string compile_error_category_impl::message(int error_value) const
 	{
 		//File
 		case CompileErrorCode::CircularImport:
-		return "A circular (cyclic) import detected";
+		return "A circular import detected";
 
 		case CompileErrorCode::MissingImportFile:
-		return "Missing (cannot open) import file";
+		return "A missing import file detected";
 
 		
 		//Function

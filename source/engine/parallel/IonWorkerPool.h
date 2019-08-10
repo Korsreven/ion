@@ -25,44 +25,54 @@ File:	IonWorkerPool.h
 
 namespace ion::parallel
 {
-	namespace worker_pool::detail
+	namespace worker_pool
 	{
-		template <typename Ret, typename Id>
-		using container_type = std::conditional_t<std::is_same_v<Id, void>,
-			std::vector<Worker<Ret>>,
-			adaptors::FlatMap<Id, Worker<Ret>>>;
-
-		template <typename Ret, typename Id>
-		using queue_type = std::conditional_t<std::is_same_v<Id, void>,
-			std::vector<std::function<Ret()>>,
-			adaptors::FlatMap<Id, std::function<Ret()>>>;
-
-		template <typename Ret, typename Id>
-		using result_type = std::conditional_t<std::is_same_v<Id, void>,
-			std::vector<Ret>,
-			adaptors::FlatMap<Id, Ret>>;
-
-
-		constexpr auto threads_per_core = 2;
-
-		inline auto number_of_cores() noexcept
+		enum class RunningState : bool
 		{
-			if (auto count = static_cast<int>(std::thread::hardware_concurrency()); count > 0)
-				return count;
-			else
-				return 1;
-		}
+			NonSuspended,
+			Suspended
+		};
 
-		template <typename Function, typename... Args>
-		inline auto deferred_call(Function &&function, Args &&...args)
+
+		namespace detail
 		{
-			return
-				[&function, &args...]()
-				{
-					return std::invoke(std::forward<Function>(function), std::forward<Args>(args)...);
-				};
-		}
-	} //worker_pool::detail
+			template <typename Ret, typename Id>
+			using container_type = std::conditional_t<std::is_same_v<Id, void>,
+				std::vector<Worker<Ret>>,
+				adaptors::FlatMap<Id, Worker<Ret>>>;
+
+			template <typename Ret, typename Id>
+			using queue_type = std::conditional_t<std::is_same_v<Id, void>,
+				std::vector<std::function<Ret()>>,
+				adaptors::FlatMap<Id, std::function<Ret()>>>;
+
+			template <typename Ret, typename Id>
+			using result_type = std::conditional_t<std::is_same_v<Id, void>,
+				std::vector<Ret>,
+				adaptors::FlatMap<Id, Ret>>;
+
+
+			constexpr auto threads_per_core = 2;
+
+			inline auto number_of_cores() noexcept
+			{
+				if (auto count = static_cast<int>(std::thread::hardware_concurrency()); count > 0)
+					return count;
+				else
+					return 1;
+			}
+
+			template <typename Function, typename... Args>
+			inline auto deferred_call(Function &&function, Args &&...args)
+			{
+				return
+					[&function, &args...]()
+					{
+						return std::invoke(std::forward<Function>(function), std::forward<Args>(args)...);
+					};
+			}
+		} //detail
+	} //worker_pool
 
 
 	//This is the master class defined by the master/slave model
@@ -73,7 +83,7 @@ namespace ion::parallel
 		
 			worker_pool::detail::container_type<Ret, Id> workers_;
 			worker_pool::detail::queue_type<Ret, Id> queue_;
-			bool running_ = true;
+			worker_pool::RunningState running_state_ = worker_pool::RunningState::NonSuspended;
 			int worker_threads_ = 0;
 			int max_worker_threads_ = 0;
 
@@ -110,7 +120,7 @@ namespace ion::parallel
 			{
 				//Start next task (dequeue from the back)
 				while (!std::empty(queue_) &&
-					running_ && worker_threads_ < max_worker_threads_)
+					IsRunning() && worker_threads_ < max_worker_threads_)
 				{
 					++worker_threads_;
 
@@ -132,16 +142,16 @@ namespace ion::parallel
 		public:
 
 			//Create a worker pool, either running (default) or not
-			WorkerPool(bool running = true) noexcept :
-				running_{running},
+			WorkerPool(worker_pool::RunningState running_state = worker_pool::RunningState::NonSuspended) noexcept :
+				running_state_{running_state},
 				max_worker_threads_{worker_pool::detail::number_of_cores() * worker_pool::detail::threads_per_core}
 			{
 				//Empty
 			}
 
 			//Create a worker pool with the given max number of worker threads, and either running (default) or not
-			WorkerPool(int max_worker_threads, bool running = true) noexcept :
-				running_{running},
+			WorkerPool(int max_worker_threads, worker_pool::RunningState running_state = worker_pool::RunningState::NonSuspended) noexcept :
+				running_state_{running_state},
 				max_worker_threads_{max_worker_threads < 1 ? 1 : max_worker_threads}
 			{
 				//Empty
@@ -180,7 +190,7 @@ namespace ion::parallel
 				}
 				else
 				{
-					for (auto& [id, worker] : workers_)
+					for (auto &[id, worker] : workers_)
 						result.emplace(id, worker.Get());
 				}
 
@@ -207,7 +217,7 @@ namespace ion::parallel
 			//Returns true if this is running
 			[[nodiscard]] inline auto IsRunning() const noexcept
 			{
-				return running_;
+				return running_state_ == worker_pool::RunningState::NonSuspended;
 			}
 
 			//Returns the max number of worker threads allowed simultaneously
@@ -251,7 +261,7 @@ namespace ion::parallel
 				std::lock_guard lock{m_};
 
 				//Run now
-				if (running_ && worker_threads_ < max_worker_threads_)
+				if (IsRunning() && worker_threads_ < max_worker_threads_)
 				{
 					++worker_threads_;
 					workers_.emplace_back(worker_entry_point{*this}, std::forward<Function>(function), std::forward<Args>(args)...);
@@ -279,7 +289,7 @@ namespace ion::parallel
 					queue_.find(id) == std::end(queue_))
 				{
 					//Run now
-					if (running_ && worker_threads_ < max_worker_threads_)
+					if (IsRunning() && worker_threads_ < max_worker_threads_)
 					{
 						++worker_threads_;
 						workers_.emplace(std::move(id), Worker<Ret>{worker_entry_point{*this}, std::forward<Function>(function), std::forward<Args>(args)...});
@@ -297,10 +307,10 @@ namespace ion::parallel
 			//Resume all queued work
 			void Resume() noexcept
 			{
-				if (!running_)
+				if (!IsRunning())
 				{
 					std::lock_guard lock{m_};
-					running_ = true;
+					running_state_ = worker_pool::RunningState::NonSuspended;
 					RunQueuedTasks();
 				}
 			}
@@ -308,10 +318,10 @@ namespace ion::parallel
 			//Suspend all queued work
 			void Suspend() noexcept
 			{
-				if (running_)
+				if (IsRunning())
 				{
 					std::lock_guard lock{m_};
-					running_ = false;
+					running_state_ = worker_pool::RunningState::Suspended;
 				}
 			}
 	};

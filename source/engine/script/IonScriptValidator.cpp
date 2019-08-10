@@ -534,7 +534,7 @@ bool validate(const ScriptTree &tree, const ClassDefinition &root, ValidateError
 	std::vector<scope> scopes{{nullptr, root, get_required_classes(root_classes)}};
 	auto next_search_depth = -1;
 
-	for (auto [object, parent, depth] : tree.DepthFirst())
+	for (auto &[object, parent, depth] : tree.DepthFirst())
 	{
 		if (next_search_depth >= 0)
 		{

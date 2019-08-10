@@ -253,7 +253,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 			ion::script::ValidateError validate_error;
 			auto okay = validator.Validate(*compiled_tree, validate_error);
 
-			if (validate_error)
+			if (!okay && validate_error)
 			{
 				//What?
 			}
@@ -304,7 +304,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 		{
 			output += "\n\n\n- Tree printed using DFS pre-traversal -\n";
 
-			for (auto& [object, parent, depth] : compiled_tree->DepthFirst())
+			for (auto &[object, parent, depth] : compiled_tree->DepthFirst())
 			{
 				output += "\n" + std::string(depth, '\t') + "[object : " + object.Name() + "]";
 

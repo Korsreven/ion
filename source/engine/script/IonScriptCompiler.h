@@ -13,9 +13,7 @@ File:	IonScriptCompiler.h
 #ifndef _ION_SCRIPT_COMPILER_
 #define _ION_SCRIPT_COMPILER_
 
-#include <condition_variable>
 #include <filesystem>
-#include <future>
 #include <mutex>
 #include <optional>
 #include <string>
@@ -25,6 +23,7 @@ File:	IonScriptCompiler.h
 #include "IonScriptError.h"
 #include "IonScriptTree.h"
 #include "adaptors/IonFlatMap.h"
+#include "parallel/IonWorkerPool.h"
 #include "utilities/IonConvert.h"
 
 namespace ion::script
@@ -66,32 +65,12 @@ namespace ion::script
 		using lexical_tokens = std::vector<lexical_token>;
 
 
-		struct build_context;
-		struct compile_worker_pool;
-
-		struct compile_worker
-		{
-			std::future<std::optional<lexical_tokens>> process;
-			compile_worker(std::string str, build_context context, compile_worker_pool &worker_pool);
-		};
-
-		struct compile_worker_pool
-		{
-			adaptors::FlatMap<std::filesystem::path, compile_worker> workers;
-			int processes = 0;
-			std::condition_variable cv;
-			std::mutex m;
-
-			void start(std::string str, build_context context, compile_worker_pool &worker_pool);
-		};
-
-
-		struct build_context
+		struct translation_unit
 		{
 			std::filesystem::path root_path;
-			std::vector<std::filesystem::path> file_hierarchy;
-				//File hierarchy is an unique stack of files (direct-line inclusion)
-				//front() returns the root file path and back returns the current file path
+			std::vector<std::filesystem::path> hierarchy;
+				//Hierarchy is an unique stack of files (direct-line inclusion)
+				//front() returns the root file path and back() returns the current file path
 
 
 			/*
@@ -100,22 +79,40 @@ namespace ion::script
 
 			inline auto& current_file_path() const noexcept
 			{
-				return file_hierarchy.back();
+				return hierarchy.back();
 			}
 
 			inline auto& root_file_path() const noexcept
 			{
-				return file_hierarchy.front();
+				return hierarchy.front();
 			}
 
 			
 			/*
-				Stack operations
+				Files
 			*/
 
 			bool push_file(std::filesystem::path file_path);
 			void pop_file();
 		};
+
+		struct compile_result
+		{
+			std::filesystem::path file_path;
+			std::optional<lexical_tokens> tokens;
+			CompileError error;
+		};
+
+		struct build_system
+		{
+			std::filesystem::path root_path;	
+			std::vector<std::string> inputs;
+			std::mutex m; //Protects inputs
+			parallel::WorkerPool<compile_result, std::string> processes;	
+
+			void start_process(std::string str, translation_unit unit, build_system &build);
+		};
+
 
 		struct syntax_context
 		{
@@ -366,8 +363,10 @@ namespace ion::script
 			}
 		}
 
-		std::optional<std::filesystem::path> full_import_path(std::filesystem::path file_path, const build_context &context);
-		bool import_file(std::filesystem::path file_path, build_context &context, std::string &str, CompileError &error);
+		std::optional<std::filesystem::path> full_file_path(std::filesystem::path file_path,
+			const std::filesystem::path &root_path, const std::filesystem::path &current_path);
+		bool open_file(std::filesystem::path file_path, translation_unit &unit, std::string &str, CompileError &error);
+
 
 		/*
 			Lexing
@@ -380,7 +379,7 @@ namespace ion::script
 		std::pair<std::string_view, int> get_string_literal_lexeme(std::string_view str) noexcept;
 		std::pair<std::string_view, int> get_white_space_lexeme(std::string_view str) noexcept;
 
-		std::optional<lexical_tokens> lex(std::string_view str, build_context context, compile_worker_pool &worker_pool, CompileError &error);
+		std::optional<lexical_tokens> lex(std::string_view str, translation_unit unit, build_system &build, CompileError &error);
 
 		
 		/*
@@ -398,6 +397,10 @@ namespace ion::script
 		bool check_unit_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept;
 
 		bool check_syntax(lexical_tokens &tokens, CompileError &error) noexcept;
+
+		//Linking
+
+		adaptors::FlatMap<int, std::filesystem::path> link(lexical_tokens &tokens, adaptors::FlatMap<std::string, compile_result> imported_results, build_system &build);
 
 		//Calling
 		
@@ -419,15 +422,15 @@ namespace ion::script
 		bool parse_unit(lexical_token &token, parse_context &context, CompileError &error) noexcept;
 
 		void pre_parse(lexical_tokens &tokens) noexcept;
-		std::optional<ScriptTree> parse(lexical_tokens tokens, compile_worker_pool &worker_pool, CompileError &error);
+		std::optional<ScriptTree> parse(lexical_tokens tokens, build_system &build, CompileError &error);
 
 
 		/*
 			Compiling
 		*/
 	
-		std::optional<ScriptTree> compile(std::string str, build_context context, CompileError &error);
-		std::optional<lexical_tokens> partial_compile(std::string str, build_context context, compile_worker_pool &worker_pool);
+		std::optional<ScriptTree> compile(std::string_view str, translation_unit unit, build_system &build, CompileError &error);
+		compile_result partial_compile(std::string_view str, translation_unit unit, build_system &build);
 	} //script_compiler::detail
 
 
@@ -435,8 +438,7 @@ namespace ion::script
 	{
 		private:
 
-			bool use_multi_core_ = true;
-			bool stop_on_cyclic_import_ = true;
+			std::optional<int> max_build_processes_;
 
 		public:
 
@@ -449,11 +451,35 @@ namespace ion::script
 
 			//Compile the given script file by lexing, parsing and linking it.
 			//Returns a ScriptTree that contains objects and object properties
-			[[nodiscard]] std::optional<ScriptTree> Compile(std::filesystem::path file_path, CompileError &error);	
+			[[nodiscard]] std::optional<ScriptTree> Compile(std::filesystem::path file_path, CompileError &error);
 
 			//Compile the given script file and root path by lexing, parsing and linking it.
 			//Returns a ScriptTree that contains objects and object properties
-			[[nodiscard]] std::optional<ScriptTree> Compile(std::filesystem::path file_path, std::filesystem::path root_path, CompileError &error);			
+			[[nodiscard]] std::optional<ScriptTree> Compile(std::filesystem::path file_path, std::filesystem::path root_path, CompileError &error);
+
+
+			/*
+				Modifiers
+			*/
+
+			//Set the max number of build processes the compiler is allowed to use
+			//If nullopt is passed, a default number of build processes will be used (based on your system)
+			inline void MaxBuildProcesses(std::optional<int> max_build_processes) noexcept
+			{
+				max_build_processes_ = max_build_processes;
+			}
+
+
+			/*
+				Observers
+			*/
+
+			//Returns the max number of build processes the compiler is allowed to use
+			//If nullopt is returned, a default number of build processes is being used (based on your system)
+			[[nodiscard]] inline auto MaxBuildProcesses() const noexcept
+			{
+				return max_build_processes_;
+			}
 	};
 } //ion::script
 
