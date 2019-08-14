@@ -290,7 +290,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 		//Output
 
 		auto message = compile_error ?
-			ion::utilities::string::Concat(compile_error.Condition.message(), " (", compile_error.FilePath.string(), ", line ", compile_error.LineNumber, ")") :
+			ion::utilities::string::Concat(compile_error.Condition.message(), " ('", compile_error.FilePath.string(), "', line ", compile_error.LineNumber, ")") :
 			"Script has been compiled successfully!";
 
 		auto output = ion::utilities::string::Concat(

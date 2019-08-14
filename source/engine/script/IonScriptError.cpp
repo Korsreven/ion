@@ -35,8 +35,8 @@ std::string compile_error_category_impl::message(int error_value) const
 		case CompileErrorCode::CircularImport:
 		return "A circular import detected";
 
-		case CompileErrorCode::MissingImportFile:
-		return "A missing import file detected";
+		case CompileErrorCode::InvalidFilePath:
+		return "An invalid file path found";
 
 		
 		//Function

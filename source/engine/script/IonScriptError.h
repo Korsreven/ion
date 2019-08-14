@@ -27,7 +27,7 @@ namespace ion::script
 		{
 			//File
 			CircularImport = 1,
-			MissingImportFile,
+			InvalidFilePath,
 
 			//Function
 			EmptyFunctionArgument,
@@ -130,9 +130,9 @@ namespace ion::script
 	};
 	
 	struct CompileError final : ScriptError
-	{	
-		int LineNumber = 0;
+	{
 		std::filesystem::path FilePath;
+		int LineNumber = 0;
 	};
 
 	struct ValidateError final : ScriptError

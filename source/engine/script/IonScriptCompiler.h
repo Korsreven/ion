@@ -59,19 +59,24 @@ namespace ion::script
 		{
 			token_name name = token_name::UnknownSymbol;
 			std::string_view value;
+			std::string_view file_path;
 			int line_number = 0;
 		};
 
 		using lexical_tokens = std::vector<lexical_token>;
 
-
-		struct translation_unit
+		struct compile_result
 		{
-			std::filesystem::path root_path;
-			std::vector<std::filesystem::path> hierarchy;
-				//Hierarchy is an unique stack of files (direct-line inclusion)
-				//front() returns the root file path and back() returns the current file path
+			std::optional<lexical_tokens> tokens;
+			CompileError error;
+		};
 
+
+		struct file_trace
+		{
+			std::vector<std::filesystem::path> stack;
+				//Contains unique files (direct-line inclusion)
+				//front() returns the entry file path, and back() returns the current file path
 
 			/*
 				Observers
@@ -79,12 +84,12 @@ namespace ion::script
 
 			inline auto& current_file_path() const noexcept
 			{
-				return hierarchy.back();
+				return stack.back();
 			}
 
-			inline auto& root_file_path() const noexcept
+			inline auto& entry_file_path() const noexcept
 			{
-				return hierarchy.front();
+				return stack.front();
 			}
 
 			
@@ -96,21 +101,20 @@ namespace ion::script
 			void pop_file();
 		};
 
-		struct compile_result
+		struct translation_unit
 		{
-			std::filesystem::path file_path;
-			std::optional<lexical_tokens> tokens;
-			CompileError error;
+			std::string file_path; //Normalized, non-SSO (viewed)
+			std::string source; //Non-SSO (viewed)
 		};
 
 		struct build_system
 		{
 			std::filesystem::path root_path;	
-			std::vector<std::string> inputs;
-			std::mutex m; //Protects inputs
-			parallel::WorkerPool<compile_result, std::string> processes;	
+			std::vector<translation_unit> translation_units;
+			std::mutex m; //Protects 'translation_units'
+			parallel::WorkerPool<compile_result, std::string> compilations;	
 
-			void start_process(std::string str, translation_unit unit, build_system &build);
+			void start_process(std::string str, file_trace trace);
 		};
 
 
@@ -363,9 +367,12 @@ namespace ion::script
 			}
 		}
 
+		void heapify(std::string &str, char padding_character = '\0');
+
 		std::optional<std::filesystem::path> full_file_path(std::filesystem::path file_path,
 			const std::filesystem::path &root_path, const std::filesystem::path &current_path);
-		bool open_file(std::filesystem::path file_path, translation_unit &unit, std::string &str, CompileError &error);
+		bool open_file(const std::filesystem::path &file_path, const std::filesystem::path &root_path,
+			file_trace &trace, std::string &str, CompileError &error);
 
 
 		/*
@@ -379,7 +386,7 @@ namespace ion::script
 		std::pair<std::string_view, int> get_string_literal_lexeme(std::string_view str) noexcept;
 		std::pair<std::string_view, int> get_white_space_lexeme(std::string_view str) noexcept;
 
-		std::optional<lexical_tokens> lex(std::string_view str, translation_unit unit, build_system &build, CompileError &error);
+		std::optional<lexical_tokens> lex(std::string_view str, std::string_view file_path, file_trace trace, build_system &system, CompileError &error);
 
 		
 		/*
@@ -400,7 +407,7 @@ namespace ion::script
 
 		//Linking
 
-		adaptors::FlatMap<int, std::filesystem::path> link(lexical_tokens &tokens, adaptors::FlatMap<std::string, compile_result> imported_results, build_system &build);
+		void link(lexical_tokens &tokens, adaptors::FlatMap<std::string, compile_result> imported_results, build_system &system);
 
 		//Calling
 		
@@ -422,15 +429,15 @@ namespace ion::script
 		bool parse_unit(lexical_token &token, parse_context &context, CompileError &error) noexcept;
 
 		void pre_parse(lexical_tokens &tokens) noexcept;
-		std::optional<ScriptTree> parse(lexical_tokens tokens, build_system &build, CompileError &error);
+		std::optional<ScriptTree> parse(lexical_tokens tokens, build_system &system, CompileError &error);
 
 
 		/*
 			Compiling
 		*/
 	
-		std::optional<ScriptTree> compile(std::string_view str, translation_unit unit, build_system &build, CompileError &error);
-		compile_result partial_compile(std::string_view str, translation_unit unit, build_system &build);
+		std::optional<ScriptTree> compile(std::string_view str, std::string_view file_path, file_trace trace, build_system &system, CompileError &error);
+		compile_result partial_compile(std::string_view str, std::string_view file_path, file_trace trace, build_system &system);
 	} //script_compiler::detail
 
 
