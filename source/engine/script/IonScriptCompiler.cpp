@@ -13,10 +13,12 @@ File:	IonScriptCompiler.cpp
 #include "IonScriptCompiler.h"
 
 #include <algorithm>
+#include <chrono>
 
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "types/IonTypes.h"
+#include "timers/IonStopwatch.h"
 #include "utilities/IonConvert.h"
 #include "utilities/IonFileUtility.h"
 #include "utilities/IonParseUtility.h"
@@ -27,34 +29,28 @@ namespace ion::script
 
 using namespace script_compiler;
 using namespace script_error;
+
+using namespace std::string_view_literals;
 using namespace types::type_literals;
 
 namespace script_compiler::detail
 {
 
-using namespace std::string_view_literals;
-
-
 void build_system::start_process(std::string str, file_trace trace)
 {
 	auto file_path = trace.current_file_path().string();
-	auto file_path_size = std::size(file_path);
-	heapify(file_path);
+	translation_unit *unit = nullptr;
 
-	auto str_size = std::size(str);
-	heapify(str);
-
-	std::string_view file_path_view;	
-	std::string_view str_view;	
 	{
 		std::lock_guard lock{m};
-		translation_units.push_back({std::move(file_path), std::move(str)});
-		file_path_view = {std::data(translation_units.back().file_path), file_path_size};
-		str_view = {std::data(translation_units.back().source), str_size};	
+
+		units.push_back(std::make_unique<translation_unit>(
+			translation_unit{std::move(file_path), std::move(str)}));
+		unit = units.back().get();
 	}
 
-	auto id = ion::utilities::string::ToLowerCaseCopy(std::string{file_path_view});
-	compilations.RunTask(std::move(id), partial_compile, str_view, file_path_view, std::move(trace), std::ref(*this));
+	auto id = ion::utilities::string::ToLowerCaseCopy(unit->file_path);
+	processes.RunTask(std::move(id), partial_compile, std::ref(*unit), std::move(trace), std::ref(*this));
 }
 
 bool file_trace::push_file(std::filesystem::path file_path)
@@ -77,21 +73,18 @@ bool file_trace::push_file(std::filesystem::path file_path)
 
 void file_trace::pop_file()
 {
-	//Don't pop back first file (entry)
+	//Don't pop back first file (entry point)
 	if (std::size(stack) > 1)
 		stack.pop_back();
 }
 
 
-void heapify(std::string &str, char padding_character)
+std::string current_date_time() noexcept
 {
-	auto first = reinterpret_cast<size_t>(&str);
-	auto last = first + sizeof(str);
-
-	//Make sure the internal data of 'str' is allocated on the heap (non-SSO)
-	while (reinterpret_cast<size_t>(std::data(str)) <= last &&
-		   reinterpret_cast<size_t>(std::data(str)) >= first)
-		str.push_back(padding_character); //Pad
+	std::array<char, 32> data;
+	auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());	
+	return std::strftime(std::data(data), std::size(data), "%F %T", std::localtime(&now)) != 0 ?
+		std::data(data) : "";
 }
 
 std::optional<std::filesystem::path> full_file_path(std::filesystem::path file_path,
@@ -300,8 +293,9 @@ std::pair<std::string_view, int> get_white_space_lexeme(std::string_view str) no
 	return {str, std::count(std::begin(str), std::end(str), '\n')};
 }
 
-std::optional<lexical_tokens> lex(std::string_view str, std::string_view file_path, file_trace trace, build_system &system, CompileError &error)
+std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, build_system &system)
 {
+	std::string_view str = unit.source;
 	lexical_tokens tokens;
 	lexical_token token;
 	auto line_number = 1;
@@ -319,22 +313,22 @@ std::optional<lexical_tokens> lex(std::string_view str, std::string_view file_pa
 		if (is_white_space(c))
 		{
 			auto [lexeme, line_breaks] = get_white_space_lexeme(str.substr(off));
-			token = {token_name::WhiteSpace, lexeme, file_path, line_number += line_breaks};
+			token = {token_name::WhiteSpace, lexeme, &unit, line_number += line_breaks};
 		}
 		//Separator
 		else if (is_separator(c))
-			token = {token_name::Separator, str.substr(off, 1), file_path, line_number};
+			token = {token_name::Separator, str.substr(off, 1), &unit, line_number};
 		//String literal
 		else if (is_start_of_string_literal(c))
 		{
 			auto [lexeme, line_breaks] = get_string_literal_lexeme(str.substr(off));
-			token = {token_name::StringLiteral, lexeme, file_path, line_number += line_breaks};
+			token = {token_name::StringLiteral, lexeme, &unit, line_number += line_breaks};
 		}
 		//Comment
 		else if (is_start_of_comment(c, next_c)) //Must be checked before operator, because of slash (/)
 		{
 			auto [lexeme, line_breaks] = get_comment_lexeme(str.substr(off));
-			token = {token_name::Comment, lexeme, file_path, line_number += line_breaks};
+			token = {token_name::Comment, lexeme, &unit, line_number += line_breaks};
 		}
 		//Identifier
 		else if (is_start_of_identifier(c, next_c) || //Must be checked before operator, because of hyphen (-)
@@ -357,23 +351,23 @@ std::optional<lexical_tokens> lex(std::string_view str, std::string_view file_pa
 					//Identifier
 					else
 						return token_name::Identifier;
-				}(), lexeme, file_path, line_number};
+				}(), lexeme, &unit, line_number};
 		}
 		//Operator
 		else if (is_operator(c)) //Must be checked after comment and identifier, because of division (/) and minus (-)
-			token = {token_name::Operator, str.substr(off, 1), file_path, line_number};
+			token = {token_name::Operator, str.substr(off, 1), &unit, line_number};
 		//Numeric literal
 		else if (is_start_of_numeric_literal(c, next_c))
-			token = {token_name::NumericLiteral, get_numeric_literal_lexeme(str.substr(off)), file_path, line_number};
+			token = {token_name::NumericLiteral, get_numeric_literal_lexeme(str.substr(off)), &unit, line_number};
 		//Hex literal
 		else if (is_start_of_hex_literal(c, next_c))
-			token = {token_name::HexLiteral, get_hex_literal_lexeme(str.substr(off)), file_path, line_number};
+			token = {token_name::HexLiteral, get_hex_literal_lexeme(str.substr(off)), &unit, line_number};
 		//Rule
 		else if (is_start_of_rule(c))
-			token = {token_name::Rule, get_identifer_lexeme(str.substr(off)), file_path, line_number};
+			token = {token_name::Rule, get_identifer_lexeme(str.substr(off)), &unit, line_number};
 		//Unknown symbol
 		else
-			token = {token_name::UnknownSymbol, str.substr(off, 1), file_path, line_number};
+			token = {token_name::UnknownSymbol, str.substr(off, 1), &unit, line_number};
 		
 		iter += std::size(token.value);
 		tokens.push_back(token);
@@ -402,7 +396,7 @@ std::optional<lexical_tokens> lex(std::string_view str, std::string_view file_pa
 				{
 					if (auto result = utilities::parse::AsString(import_argument); result)
 					{
-						if (std::string imported_str; open_file(std::move(*result), system.root_path, trace, imported_str, error))
+						if (std::string imported_str; open_file(std::move(*result), system.root_path, trace, imported_str, unit.error))
 						{
 							system.start_process(std::move(imported_str), trace);
 							trace.pop_file();
@@ -410,7 +404,7 @@ std::optional<lexical_tokens> lex(std::string_view str, std::string_view file_pa
 						else
 						{
 							//Imbue generated error with line number
-							error.LineNumber = token.line_number;
+							unit.error.LineNumber = token.line_number;
 							return {};
 						}
 					}
@@ -434,19 +428,19 @@ bool check_function_syntax(lexical_token &token, syntax_context &context, Compil
 {
 	if (!context.inside_property)
 	{
-		error = {CompileErrorCode::UnexpectedFunction, token.file_path, token.line_number};
+		error = {CompileErrorCode::UnexpectedFunction, token.unit->file_path, token.line_number};
 		return false;
 	}
 	else if (context.inside_function)
 	{
-		error = {CompileErrorCode::UnexpectedFunction, token.file_path, token.line_number};
+		error = {CompileErrorCode::UnexpectedFunction, token.unit->file_path, token.line_number};
 		return false;
 	}
 	else if (!context.next_token ||
 			context.next_token->name != token_name::Separator ||
 			context.next_token->value.front() != '(')
 	{
-		error = {CompileErrorCode::MissingOpenParenthesis, token.file_path, token.line_number};
+		error = {CompileErrorCode::MissingOpenParenthesis, token.unit->file_path, token.line_number};
 		return false;
 	}
 
@@ -459,7 +453,7 @@ bool check_identifier_syntax(lexical_token &token, syntax_context &context, Comp
 {
 	if (context.inside_object_signature)
 	{
-		error = {CompileErrorCode::UnexpectedIdentifier, token.file_path, token.line_number};
+		error = {CompileErrorCode::UnexpectedIdentifier, token.unit->file_path, token.line_number};
 		return false;
 	}
 	else if (!context.inside_property &&
@@ -473,7 +467,7 @@ bool check_identifier_syntax(lexical_token &token, syntax_context &context, Comp
 			(context.next_token->name != token_name::Separator ||
 				(context.next_token->value.front() != '{' && context.next_token->value.front() != ':')))))
 	{
-		error = {CompileErrorCode::UnexpectedIdentifier, token.file_path, token.line_number};
+		error = {CompileErrorCode::UnexpectedIdentifier, token.unit->file_path, token.line_number};
 		return false;
 	}
 
@@ -493,12 +487,12 @@ bool check_literal_syntax(lexical_token &token, syntax_context &context, Compile
 		//A full string correctness check is done later in parse_literal
 		if (token.value.back() != token.value.front())
 		{
-			error = {CompileErrorCode::InvalidStringLiteral, token.file_path, token.line_number};
+			error = {CompileErrorCode::InvalidStringLiteral, token.unit->file_path, token.line_number};
 			return false;
 		}
 		else if (!context.inside_import && !context.inside_object_signature && !context.inside_property)
 		{
-			error = {CompileErrorCode::UnexpectedLiteral, token.file_path, token.line_number};
+			error = {CompileErrorCode::UnexpectedLiteral, token.unit->file_path, token.line_number};
 			return false;
 		}
 		//"argument";
@@ -507,7 +501,7 @@ bool check_literal_syntax(lexical_token &token, syntax_context &context, Compile
 				context.next_token->name != token_name::Separator ||
 				context.next_token->value.front() != ';'))
 		{
-			error = {CompileErrorCode::InvalidImportStatement, token.file_path, token.line_number};
+			error = {CompileErrorCode::InvalidImportStatement, token.unit->file_path, token.line_number};
 			return false;
 		}
 		//"classes/selectors" {
@@ -516,7 +510,7 @@ bool check_literal_syntax(lexical_token &token, syntax_context &context, Compile
 				context.next_token->name != token_name::Separator ||
 				context.next_token->value.front() != '{'))
 		{
-			error = {CompileErrorCode::MissingOpenCurlyBrace, token.file_path, token.line_number};
+			error = {CompileErrorCode::MissingOpenCurlyBrace, token.unit->file_path, token.line_number};
 			return false;
 		}
 	}
@@ -524,7 +518,7 @@ bool check_literal_syntax(lexical_token &token, syntax_context &context, Compile
 	{
 		if (!context.inside_property)
 		{
-			error = {CompileErrorCode::UnexpectedLiteral, token.file_path, token.line_number};
+			error = {CompileErrorCode::UnexpectedLiteral, token.unit->file_path, token.line_number};
 			return false;
 		}
 
@@ -536,7 +530,7 @@ bool check_literal_syntax(lexical_token &token, syntax_context &context, Compile
 				//Shorthand: #rgb #rgba
 				length != 4 && length != 5)
 			{
-				error = {CompileErrorCode::InvalidHexLiteral, token.file_path, token.line_number};
+				error = {CompileErrorCode::InvalidHexLiteral, token.unit->file_path, token.line_number};
 				return false;
 			}
 		}
@@ -549,7 +543,7 @@ bool check_operator_syntax(lexical_token &token, syntax_context &context, Compil
 {
 	if (!context.inside_property)
 	{
-		error = {CompileErrorCode::UnexpectedOperator, token.file_path, token.line_number};
+		error = {CompileErrorCode::UnexpectedOperator, token.unit->file_path, token.line_number};
 		return false;
 	}
 
@@ -597,7 +591,7 @@ bool check_operator_syntax(lexical_token &token, syntax_context &context, Compil
 						context.next_token->value.front() == '('))
 				))
 			{
-				error = {CompileErrorCode::InvalidRightOperand, token.file_path, token.line_number};
+				error = {CompileErrorCode::InvalidRightOperand, token.unit->file_path, token.line_number};
 				return false;
 			}
 		}
@@ -613,7 +607,7 @@ bool check_operator_syntax(lexical_token &token, syntax_context &context, Compil
 						context.previous_token->value.front() == ')'))
 				))
 			{
-				error = {CompileErrorCode::InvalidLeftOperand, token.file_path, token.line_number};
+				error = {CompileErrorCode::InvalidLeftOperand, token.unit->file_path, token.line_number};
 				return false;
 			}
 		}
@@ -624,13 +618,13 @@ bool check_operator_syntax(lexical_token &token, syntax_context &context, Compil
 	{
 		if (token.name == token_name::BinaryOperator)
 		{
-			error = {CompileErrorCode::UnexpectedBinaryOperator, token.file_path, token.line_number};
+			error = {CompileErrorCode::UnexpectedBinaryOperator, token.unit->file_path, token.line_number};
 			return false;
 		}
 		else if (!context.next_token ||
 				context.next_token->name != token_name::NumericLiteral)
 		{
-			error = {CompileErrorCode::UnexpectedUnaryOperator, token.file_path, token.line_number};
+			error = {CompileErrorCode::UnexpectedUnaryOperator, token.unit->file_path, token.line_number};
 			return false;
 		}
 	}
@@ -644,13 +638,13 @@ bool check_rule_syntax(lexical_token &token, syntax_context &context, CompileErr
 	{
 		if (context.curly_brace_depth > 0)
 		{
-			error = {CompileErrorCode::UnexpectedImportStatement, token.file_path, token.line_number};
+			error = {CompileErrorCode::UnexpectedImportStatement, token.unit->file_path, token.line_number};
 			return false;
 		}
 		//@import "argument"
 		else if (context.next_token->name != token_name::StringLiteral)
 		{
-			error = {CompileErrorCode::InvalidImportStatement, token.file_path, token.line_number};
+			error = {CompileErrorCode::InvalidImportStatement, token.unit->file_path, token.line_number};
 			return false;
 		}
 
@@ -668,12 +662,12 @@ bool check_separator_syntax(lexical_token &token, syntax_context &context, Compi
 		{
 			if (context.curly_brace_depth == 0)
 			{
-				error = {CompileErrorCode::UnexpectedColon, token.file_path, token.line_number};
+				error = {CompileErrorCode::UnexpectedColon, token.unit->file_path, token.line_number};
 				return false;
 			}
 			else if (context.inside_property)
 			{
-				error = {CompileErrorCode::UnexpectedColon, token.file_path, token.line_number};
+				error = {CompileErrorCode::UnexpectedColon, token.unit->file_path, token.line_number};
 				return false;
 			}
 
@@ -685,12 +679,12 @@ bool check_separator_syntax(lexical_token &token, syntax_context &context, Compi
 		{
 			if (!context.inside_property && !context.inside_import)
 			{
-				error = {CompileErrorCode::UnexpectedSemicolon, token.file_path, token.line_number};
+				error = {CompileErrorCode::UnexpectedSemicolon, token.unit->file_path, token.line_number};
 				return false;
 			}
 			else if (context.parenthesis_depth > 0)
 			{
-				error = {CompileErrorCode::MissingCloseParenthesis, token.file_path, token.line_number};
+				error = {CompileErrorCode::MissingCloseParenthesis, token.unit->file_path, token.line_number};
 				return false;
 			}
 
@@ -703,7 +697,7 @@ bool check_separator_syntax(lexical_token &token, syntax_context &context, Compi
 		{
 			if (!context.inside_object_signature)
 			{
-				error = {CompileErrorCode::UnexpectedOpenCurlyBrace, token.file_path, token.line_number};
+				error = {CompileErrorCode::UnexpectedOpenCurlyBrace, token.unit->file_path, token.line_number};
 				return false;
 			}
 
@@ -716,12 +710,12 @@ bool check_separator_syntax(lexical_token &token, syntax_context &context, Compi
 		{
 			if (context.inside_property)
 			{
-				error = {CompileErrorCode::UnexpectedCloseCurlyBrace, token.file_path, token.line_number};
+				error = {CompileErrorCode::UnexpectedCloseCurlyBrace, token.unit->file_path, token.line_number};
 				return false;
 			}
 			else if (context.curly_brace_depth == 0)
 			{
-				error = {CompileErrorCode::UnmatchedCloseCurlyBrace, token.file_path, token.line_number};
+				error = {CompileErrorCode::UnmatchedCloseCurlyBrace, token.unit->file_path, token.line_number};
 				return false;
 			}
 
@@ -733,18 +727,18 @@ bool check_separator_syntax(lexical_token &token, syntax_context &context, Compi
 		{
 			if (!context.inside_function) 
 			{
-				error = {CompileErrorCode::UnexpectedOpenParenthesis, token.file_path, token.line_number};
+				error = {CompileErrorCode::UnexpectedOpenParenthesis, token.unit->file_path, token.line_number};
 				return false;
 			}
 			else if (!context.inside_calc_function && context.parenthesis_depth > 0)
 			{
-				error = {CompileErrorCode::UnexpectedOpenParenthesis, token.file_path, token.line_number};
+				error = {CompileErrorCode::UnexpectedOpenParenthesis, token.unit->file_path, token.line_number};
 				return false;
 			}
 			else if (context.next_token && context.next_token->name == token_name::Separator &&
 					 context.next_token->value.front() == ')')
 			{
-				error = {CompileErrorCode::EmptyParentheses, token.file_path, token.line_number};
+				error = {CompileErrorCode::EmptyParentheses, token.unit->file_path, token.line_number};
 				return false;
 			}
 
@@ -756,12 +750,12 @@ bool check_separator_syntax(lexical_token &token, syntax_context &context, Compi
 		{
 			if (!context.inside_function) 
 			{
-				error = {CompileErrorCode::UnexpectedCloseParenthesis, token.file_path, token.line_number};
+				error = {CompileErrorCode::UnexpectedCloseParenthesis, token.unit->file_path, token.line_number};
 				return false;
 			}
 			else if (context.parenthesis_depth == 0)
 			{
-				error = {CompileErrorCode::UnmatchedCloseParenthesis, token.file_path, token.line_number};
+				error = {CompileErrorCode::UnmatchedCloseParenthesis, token.unit->file_path, token.line_number};
 				return false;
 			}
 
@@ -778,13 +772,15 @@ bool check_separator_syntax(lexical_token &token, syntax_context &context, Compi
 		{
 			if (!context.inside_function)
 			{
-				error = {CompileErrorCode::UnexpectedComma, token.file_path, token.line_number};
+				error = {CompileErrorCode::UnexpectedComma, token.unit->file_path, token.line_number};
 				return false;
 			}
-			else if (context.next_token && context.next_token->name == token_name::Separator &&
-					 context.next_token->value.front() == ',')
+			else if ((context.next_token && context.next_token->name == token_name::Separator &&
+					 (context.next_token->value.front() == ',' || context.next_token->value.front() == ')')) ||
+					 (context.previous_token && context.previous_token->name == token_name::Separator &&
+					 context.previous_token->value.front() == '('))
 			{
-				error = {CompileErrorCode::EmptyFunctionArgument, token.file_path, token.line_number};
+				error = {CompileErrorCode::EmptyFunctionArgument, token.unit->file_path, token.line_number};
 				return false;
 			}
 
@@ -799,7 +795,7 @@ bool check_unit_syntax(lexical_token &token, syntax_context&, CompileError &erro
 {
 	if (!is_unit(token.value))
 	{
-		error = {CompileErrorCode::InvalidUnit, token.file_path, token.line_number};
+		error = {CompileErrorCode::InvalidUnit, token.unit->file_path, token.line_number};
 		return false;
 	}
 
@@ -877,7 +873,7 @@ bool check_syntax(lexical_tokens &tokens, CompileError &error) noexcept
 			//Unknown symbol
 			case token_name::UnknownSymbol:
 			{
-				error = {CompileErrorCode::UnknownSymbol, token.file_path, token.line_number};
+				error = {CompileErrorCode::UnknownSymbol, token.unit->file_path, token.line_number};
 				return false;
 			}
 
@@ -892,7 +888,7 @@ bool check_syntax(lexical_tokens &tokens, CompileError &error) noexcept
 
 	if (context.curly_brace_depth > 0)
 	{
-		error = {CompileErrorCode::MissingCloseCurlyBrace, tokens.back().file_path, tokens.back().line_number};
+		error = {CompileErrorCode::MissingCloseCurlyBrace, tokens.back().unit->file_path, tokens.back().line_number};
 		return false;
 	}
 
@@ -900,7 +896,7 @@ bool check_syntax(lexical_tokens &tokens, CompileError &error) noexcept
 }
 
 
-void link(lexical_tokens &tokens, adaptors::FlatMap<std::string, compile_result> results, build_system &system)
+void link(lexical_tokens &tokens, const adaptors::FlatMap<std::string, std::optional<lexical_tokens>> &results, const build_system &system)
 {
 	for (auto iter = std::begin(tokens); iter != std::end(tokens);)
 	{
@@ -911,15 +907,15 @@ void link(lexical_tokens &tokens, adaptors::FlatMap<std::string, compile_result>
 			is_import_rule(token.value))
 		{
 			auto file_path = utilities::parse::AsString((iter + 1)->value);
-			auto full_path = *full_file_path(*file_path, system.root_path, std::filesystem::path{token.file_path}.parent_path());
-			auto id = ion::utilities::string::ToLowerCaseCopy(full_path.string());
+			auto full_path = *full_file_path(*file_path, system.root_path, std::filesystem::path{token.unit->file_path}.parent_path());
+			auto id = ion::utilities::string::ToLowerCaseCopy(full_path.lexically_normal().string());
 
 			if (auto it = results.find(id); it != std::end(results))
 			{
 				auto &[key, value] = *it;
 
 				iter = tokens.erase(iter, iter + 3);
-				iter = tokens.insert(iter, std::begin(*value.tokens), std::end(*value.tokens));	
+				iter = tokens.insert(iter, std::begin(*value), std::end(*value));	
 				continue;
 			}
 		}
@@ -935,7 +931,7 @@ std::optional<script_tree::ArgumentType> call_cmyk(lexical_token &token, script_
 	if ((token.value == "cmyk" && std::size(arguments) != 4) ||
 		(token.value == "cmyka" && std::size(arguments) != 5))
 	{
-		error = {CompileErrorCode::InvalidNumberOfFunctionArguments, token.file_path, token.line_number};
+		error = {CompileErrorCode::InvalidNumberOfFunctionArguments, token.unit->file_path, token.line_number};
 		return {};
 	}
 
@@ -958,7 +954,7 @@ std::optional<script_tree::ArgumentType> call_cmyk(lexical_token &token, script_
 			//Default
 			[&](auto&&) noexcept
 			{
-				error = {CompileErrorCode::InvalidFunctionArgument, token.file_path, token.line_number};
+				error = {CompileErrorCode::InvalidFunctionArgument, token.unit->file_path, token.line_number};
 			});
 
 		if (error)
@@ -984,7 +980,7 @@ std::optional<script_tree::ArgumentType> call_hsl(lexical_token &token, script_t
 	if ((token.value == "hsl" && std::size(arguments) != 3) ||
 		(token.value == "hsla" && std::size(arguments) != 4))
 	{
-		error = {CompileErrorCode::InvalidNumberOfFunctionArguments, token.file_path, token.line_number};
+		error = {CompileErrorCode::InvalidNumberOfFunctionArguments, token.unit->file_path, token.line_number};
 		return {};
 	}
 
@@ -1012,7 +1008,7 @@ std::optional<script_tree::ArgumentType> call_hsl(lexical_token &token, script_t
 			//Default
 			[&](auto&&) noexcept
 			{
-				error = {CompileErrorCode::InvalidFunctionArgument, token.file_path, token.line_number};
+				error = {CompileErrorCode::InvalidFunctionArgument, token.unit->file_path, token.line_number};
 			});
 
 		if (error)
@@ -1037,7 +1033,7 @@ std::optional<script_tree::ArgumentType> call_hwb(lexical_token &token, script_t
 	if ((token.value == "hwb" && std::size(arguments) != 3) ||
 		(token.value == "hwba" && std::size(arguments) != 4))
 	{
-		error = {CompileErrorCode::InvalidNumberOfFunctionArguments, token.file_path, token.line_number};
+		error = {CompileErrorCode::InvalidNumberOfFunctionArguments, token.unit->file_path, token.line_number};
 		return {};
 	}
 
@@ -1065,7 +1061,7 @@ std::optional<script_tree::ArgumentType> call_hwb(lexical_token &token, script_t
 			//Default
 			[&](auto&&) noexcept
 			{
-				error = {CompileErrorCode::InvalidFunctionArgument, token.file_path, token.line_number};
+				error = {CompileErrorCode::InvalidFunctionArgument, token.unit->file_path, token.line_number};
 			});
 
 		if (error)
@@ -1090,7 +1086,7 @@ std::optional<script_tree::ArgumentType> call_rgb(lexical_token &token, script_t
 	if ((token.value == "rgb" && std::size(arguments) != 3) ||
 		(token.value == "rgba" && std::size(arguments) != 4))
 	{
-		error = {CompileErrorCode::InvalidNumberOfFunctionArguments, token.file_path, token.line_number};
+		error = {CompileErrorCode::InvalidNumberOfFunctionArguments, token.unit->file_path, token.line_number};
 		return {};
 	}
 
@@ -1118,7 +1114,7 @@ std::optional<script_tree::ArgumentType> call_rgb(lexical_token &token, script_t
 			//Default
 			[&](auto&&) noexcept
 			{
-				error = {CompileErrorCode::InvalidFunctionArgument, token.file_path, token.line_number};
+				error = {CompileErrorCode::InvalidFunctionArgument, token.unit->file_path, token.line_number};
 			});
 
 		if (error)
@@ -1142,7 +1138,7 @@ std::optional<script_tree::ArgumentType> call_vec2(lexical_token &token, script_
 	if (std::size(arguments) != 1 &&
 		std::size(arguments) != 2)
 	{
-		error = {CompileErrorCode::InvalidNumberOfFunctionArguments, token.file_path, token.line_number};
+		error = {CompileErrorCode::InvalidNumberOfFunctionArguments, token.unit->file_path, token.line_number};
 		return {};
 	}
 
@@ -1164,7 +1160,7 @@ std::optional<script_tree::ArgumentType> call_vec2(lexical_token &token, script_
 			//Default
 			[&](auto&&) noexcept
 			{
-				error = {CompileErrorCode::InvalidFunctionArgument, token.file_path, token.line_number};
+				error = {CompileErrorCode::InvalidFunctionArgument, token.unit->file_path, token.line_number};
 			});
 
 		if (error)
@@ -1256,7 +1252,7 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 			}
 			else
 			{
-				error = {CompileErrorCode::InvalidBooleanLiteral, token.file_path, token.line_number};
+				error = {CompileErrorCode::InvalidBooleanLiteral, token.unit->file_path, token.line_number};
 				return false;
 			}
 
@@ -1279,7 +1275,7 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 			}
 			else
 			{
-				error = {CompileErrorCode::InvalidHexLiteral, token.file_path, token.line_number};
+				error = {CompileErrorCode::InvalidHexLiteral, token.unit->file_path, token.line_number};
 				return false;
 			}
 
@@ -1305,7 +1301,7 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 				}
 				else
 				{
-					error = {CompileErrorCode::InvalidNumericLiteral, token.file_path, token.line_number};
+					error = {CompileErrorCode::InvalidNumericLiteral, token.unit->file_path, token.line_number};
 					return false;
 				}
 			}
@@ -1325,7 +1321,7 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 				}
 				else
 				{
-					error = {CompileErrorCode::InvalidNumericLiteral, token.file_path, token.line_number};
+					error = {CompileErrorCode::InvalidNumericLiteral, token.unit->file_path, token.line_number};
 					return false;
 				}
 			}
@@ -1350,7 +1346,7 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 			}
 			else
 			{
-				error = {CompileErrorCode::InvalidStringLiteral, token.file_path, token.line_number};
+				error = {CompileErrorCode::InvalidStringLiteral, token.unit->file_path, token.line_number};
 				return false;
 			}
 
@@ -1486,20 +1482,17 @@ std::optional<ScriptTree> parse(lexical_tokens tokens, build_system &system, Com
 
 
 	//Wait for all external compilations to complete
-	auto results = system.compilations.Get();
+	auto results = system.processes.Get();
 
-	for (auto &[key, value] : results)
+	for (const auto &unit : system.units)
 	{
-		if (value.error)
-		{
-			//Inherit error from the failed external compilation
-			error = value.error;
+		if (unit->error)
 			return {};
-		}
 	}
 
 	//Link together tokens (main compilation) with the external tokens (external compilations)
-	link(tokens, std::move(results), system);
+	link(tokens, results, system);
+
 
 	//Parse and build tree
 	parse_context context;
@@ -1511,35 +1504,35 @@ std::optional<ScriptTree> parse(lexical_tokens tokens, build_system &system, Com
 			//Function
 			case token_name::Function:
 			{
-				parse_function(token, context, error);
+				parse_function(token, context, token.unit->error);
 				break;
 			}
 
 			//Identifier
 			case token_name::Identifier:
 			{
-				parse_identifier(token, context, error);
+				parse_identifier(token, context, token.unit->error);
 				break;
 			}
 
 			//Separator
 			case token_name::Separator:
 			{
-				parse_separator(token, context, error);
+				parse_separator(token, context, token.unit->error);
 				break;
 			}
 			
 			//Unary operator
 			case token_name::UnaryOperator:
 			{
-				parse_unary_operator(token, context, error);
+				parse_unary_operator(token, context, token.unit->error);
 				break;
 			}
 
 			//Unit
 			case token_name::Unit:
 			{
-				parse_unit(token, context, error);
+				parse_unit(token, context, token.unit->error);
 				break;
 			}
 
@@ -1549,13 +1542,13 @@ std::optional<ScriptTree> parse(lexical_tokens tokens, build_system &system, Com
 			case token_name::NumericLiteral:
 			case token_name::StringLiteral:
 			{
-				parse_literal(token, context, error);
+				parse_literal(token, context, token.unit->error);
 				break;
 			}
 		}
 
 		//An error has occurred
-		if (error)
+		if (token.unit->error)
 			return {};
 	}
 
@@ -1570,16 +1563,17 @@ std::optional<ScriptTree> parse(lexical_tokens tokens, build_system &system, Com
 	Compiling
 */
 
-std::optional<ScriptTree> compile(std::string_view str, std::string_view file_path, file_trace trace, build_system &system, CompileError &error)
+std::optional<ScriptTree> compile(translation_unit &unit, file_trace trace, build_system &system)
 {
-	auto tokens = script_compiler::detail::lex(str, file_path, std::move(trace), system, error);
-	return tokens ? script_compiler::detail::parse(std::move(*tokens), system, error) : std::nullopt;
+	auto tokens = lex(unit, std::move(trace), system);
+	auto result = tokens ? parse(std::move(*tokens), system, unit.error) : std::nullopt;
+	system.processes.Wait(); //Make sure all external compilations are completed
+	return result;
 }
 
-compile_result partial_compile(std::string_view str, std::string_view file_path, file_trace trace, build_system &system)
+std::optional<lexical_tokens> partial_compile(translation_unit &unit, file_trace trace, build_system &system)
 {
-	CompileError error;
-	auto tokens = script_compiler::detail::lex(str, file_path, std::move(trace), system, error);
+	auto tokens = lex(unit, std::move(trace), system);
 
 	if (tokens)
 	{
@@ -1587,10 +1581,10 @@ compile_result partial_compile(std::string_view str, std::string_view file_path,
 		pre_parse(*tokens);
 
 		//Syntax error checking
-		check_syntax(*tokens, error);
+		check_syntax(*tokens, unit.error);
 	}
 
-	return {error ? std::nullopt : std::move(tokens), error};
+	return {unit.error ? std::nullopt : std::move(tokens)};
 }
 
 } //script_compiler::detail
@@ -1611,18 +1605,83 @@ std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_pat
 
 std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_path, std::filesystem::path root_path, CompileError &error)
 {
+	//Root path needs to be a valid directory
 	if (ion::utilities::file::IsDirectory(root_path))
 	{
 		script_compiler::detail::file_trace trace;
 		
+		//File path needs to be a valid file
 		if (std::string str; script_compiler::detail::open_file(file_path, root_path, trace, str, error))
 		{
 			script_compiler::detail::build_system system{std::move(root_path)};
+			system.units.push_back(std::make_unique<script_compiler::detail::translation_unit>(
+				script_compiler::detail::translation_unit{trace.current_file_path().string(), std::move(str)}));
 
 			if (max_build_processes_)
-				system.compilations.MaxWorkerThreads(*max_build_processes_);
+				system.processes.MaxWorkerThreads(*max_build_processes_);
 
-			return script_compiler::detail::compile(str, trace.current_file_path().string(), trace, system, error);
+			//Start by compiling the given file (entry point)
+			auto stopwatch = timers::Stopwatch::StartNew();
+			auto tree = script_compiler::detail::compile(*system.units.back(), trace, system);
+			auto elapsed = stopwatch.Elapsed();
+
+			//Inherit error from the first unit that failed to build
+			for (const auto &unit : system.units)
+			{
+				if (unit->error)
+				{
+					error = unit->error;
+					break;
+				}
+			}
+
+			//Output
+			switch (output_options_)
+			{
+				case script_compiler::OutputOptions::Summary:
+				case script_compiler::OutputOptions::SummaryWithFiles:
+				case script_compiler::OutputOptions::SummaryWithAST:
+				case script_compiler::OutputOptions::SummaryWithFilesAndAST:
+				{
+					auto output = ion::utilities::string::Concat(
+						file_path.filename().string(), "\n",
+						script_compiler::detail::current_date_time(), "\n\n",
+
+						"<Summary>\n",
+						"Messages - ",
+							!error ?
+							"Build succeeded!" :
+							ion::utilities::string::Concat("Build failed. ", error.Condition.message(), " ('", error.FilePath.string(), "', line ", error.LineNumber, ")"),
+						"\n",
+						"Build time - ", ion::utilities::string::Format(elapsed.count(), "0.0000"sv), " seconds\n",
+						"Files built - ", std::size(system.units));
+
+					if (output_options_ == script_compiler::OutputOptions::SummaryWithFiles ||
+						output_options_ == script_compiler::OutputOptions::SummaryWithFilesAndAST)
+					{
+						output += "\n\n<Files>";
+
+						for (const auto &unit : system.units)
+							output += ion::utilities::string::Concat(
+								"\n'", unit->file_path, "' - ",
+									!unit->error ?
+									"OK" :
+									ion::utilities::string::Concat("Error. ", unit->error.Condition.message(), " (line ", unit->error.LineNumber, ")"));
+					}
+
+					if (output_options_ == script_compiler::OutputOptions::SummaryWithAST ||
+						output_options_ == script_compiler::OutputOptions::SummaryWithFilesAndAST)
+					{
+						output += "\n\n<AST>";
+						output += tree->Print(print_options_);
+					}
+
+					ion::utilities::file::Save(file_path.replace_filename(file_path.filename().string() + ".output.txt"), output);
+					break;
+				}
+			}
+
+			return tree;
 		}
 	}
 

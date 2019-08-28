@@ -466,14 +466,14 @@ namespace ion::utilities::convert
 		inline auto floating_to_string(T x)
 		{
 			std::array<char, max_digits_v<T> + 1> str;
-			auto n = std::sprintf(std::data(str), g_format_specifier_v<T>, x);
+			std::sprintf(std::data(str), g_format_specifier_v<T>, x);
 			auto iter = std::find_if_not(std::cbegin(str), std::cend(str),
 				[](auto c) noexcept
 				{
 					return c == ' ';
 				});
 
-			return std::string(iter, iter + n);
+			return std::string(&*iter);
 		}
 
 		template <typename T>

@@ -32,7 +32,6 @@ namespace ion::script
 		using graphics::utilities::Color;
 		using graphics::utilities::Vector2;
 
-
 		class ObjectNode;
 		class PropertyNode;
 		class ArgumentNode;
@@ -63,6 +62,13 @@ namespace ion::script
 		{
 			PreOrder,
 			PostOrder
+		};
+
+		enum class PrintOptions
+		{
+			Objects,
+			ObjectsWithProperties,
+			ObjectsWithPropertiesAndArguments
 		};
 
 
@@ -232,6 +238,13 @@ namespace ion::script
 			int deserialize_property(std::string_view bytes, PropertyNodes &properties, ArgumentNodes &arguments);
 			int deserialize_object(std::string_view bytes, std::vector<ObjectNodes> &object_stack, PropertyNodes &properties);
 			std::optional<ObjectNodes> deserialize(std::string_view bytes);
+
+
+			/*
+				Printing
+			*/
+
+			std::string print(const ObjectNodes &objects, PrintOptions print_options);
 
 
 			/*
@@ -441,6 +454,15 @@ namespace ion::script
 			//Returns the fully qualified name to the given property
 			//Returns nullopt if the given object or property is not found in this tree
 			[[nodiscard]] std::optional<std::string> GetFullyQualifiedName(const script_tree::ObjectNode &object, const script_tree::PropertyNode &property) const;
+
+
+			/*
+				Printing
+			*/
+
+			//Print out this script tree as an hierarchical list with objects, properties and arguments.
+			//Choose what to print based on the given print options (optionally)
+			[[nodiscard]] std::string Print(script_tree::PrintOptions print_options = script_tree::PrintOptions::ObjectsWithProperties) const;
 
 
 			/*

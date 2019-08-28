@@ -193,6 +193,9 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 	//Compile script
 	{
 		ion::script::ScriptCompiler script;
+		script.Output(ion::script::script_compiler::OutputOptions::SummaryWithFilesAndAST,
+					  ion::script::script_tree::PrintOptions::ObjectsWithPropertiesAndArguments);
+
 		ion::script::CompileError compile_error;
 
 		ion::timers::Stopwatch stopwatch;
@@ -255,7 +258,8 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 
 			if (!okay && validate_error)
 			{
-				//What?
+				auto what = validate_error.Condition.message();
+				auto fully_qualified_name = validate_error.FullyQualifiedName;
 			}
 
 
@@ -286,34 +290,6 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 					break;
 			}
 		}
-
-		//Output
-
-		auto message = compile_error ?
-			ion::utilities::string::Concat(compile_error.Condition.message(), " ('", compile_error.FilePath.string(), "', line ", compile_error.LineNumber, ")") :
-			"Script has been compiled successfully!";
-
-		auto output = ion::utilities::string::Concat(
-			"- Ion script compiler output -\n\n",
-			"Compile time: \t\t", compile_elapsed.count(), "mu\n"
-			"Deserialize time: \t", deserialize_elapsed.count() > 0 ?
-				ion::utilities::convert::ToString(deserialize_elapsed.count()) + "mu" : "-", "\n"
-			"Compile output: \t", message);
-
-		if (compiled_tree)
-		{
-			output += "\n\n\n- Tree printed using DFS pre-traversal -\n";
-
-			for (auto &[object, parent, depth] : compiled_tree->DepthFirst())
-			{
-				output += "\n" + std::string(depth, '\t') + "[object : " + object.Name() + "]";
-
-				for (auto &property : object.Properties())
-					output += "\n" + std::string(depth + 1, '\t') + "property : " + property.Name();
-			}
-		}
-
-		ion::utilities::file::Save("bin/output.txt", output);
 	}
 
 	/*{

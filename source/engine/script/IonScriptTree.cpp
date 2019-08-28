@@ -23,6 +23,9 @@ namespace script_tree
 namespace detail
 {
 
+using namespace std::string_literals;
+using namespace types::type_literals;
+
 tree_node::tree_node(const ObjectNode &object) :
 	Object{object}
 {
@@ -242,6 +245,81 @@ std::optional<ObjectNodes> deserialize(std::string_view bytes)
 
 
 /*
+	Printing
+*/
+
+std::string print(const ObjectNodes &objects, PrintOptions print_options)
+{
+	std::string output;
+
+	//Print objects
+	for (auto &[object, parent, depth] : depth_first_search(objects, DepthFirstSearchTraversal::PreOrder))
+	{
+		output += "\n" + std::string(depth * 4, ' ') + "[-] " + object.Name();
+
+		if (print_options == PrintOptions::ObjectsWithProperties ||
+			print_options == PrintOptions::ObjectsWithPropertiesAndArguments)
+		{
+			//Print properties
+			for (auto &property : object.Properties())
+			{
+				output += "\n" + std::string(depth * 4 + 1, ' ') + "|-- " + property.Name();
+
+				if (print_options == PrintOptions::ObjectsWithPropertiesAndArguments)
+				{
+					if (auto remaining_args = static_cast<int>(property.Arguments().size());
+						remaining_args > 0)
+					{
+						output += ": ";
+
+						//Print arguments
+						for (auto &argument : property.Arguments())
+						{
+							output += argument.Visit(
+								[](const BooleanArgument &arg)
+								{
+									return arg.Value() ? "true"s : "false"s;
+								},
+								[](const ColorArgument &arg)
+								{
+									auto [r, g, b] = arg.Value().ToRGB();
+									auto a = arg.Value().A();
+									return "(" + utilities::convert::ToString(r) + ", " + utilities::convert::ToString(g) + ", " + utilities::convert::ToString(b) +
+										(a < 1.0_r ? ", " + utilities::convert::ToString(a, 2) : "") + ")";
+								},
+								[](const EnumerableArgument &arg)
+								{
+									return arg.Value();
+								},
+								[](const StringArgument &arg)
+								{
+									return "\"" + arg.Value() + "\"";
+								},
+								[](const Vector2Argument &arg)
+								{
+									auto [x, y] = arg.Value().XY();
+									return "{" + utilities::convert::ToString(x) + ", " + utilities::convert::ToString(y) + "}";
+								},
+								//Default
+								[](auto &&arg)
+								{
+									return utilities::convert::ToString(arg.Value());
+								});
+
+							if (--remaining_args > 0)
+								output += " ";
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return output;
+}
+
+
+/*
 	Searching
 */
 
@@ -420,6 +498,16 @@ std::optional<std::string> ScriptTree::GetFullyQualifiedName(const script_tree::
 	}
 	else
 		return {};
+}
+
+
+/*
+	Printing
+*/
+
+std::string ScriptTree::Print(PrintOptions print_options) const
+{
+	return detail::print(objects_, print_options);
 }
 
 
