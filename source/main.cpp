@@ -74,7 +74,6 @@ File:	main.cpp
 
 #include "utilities/IonCodec.h"
 #include "utilities/IonConvert.h"
-#include "utilities/IonConvertV2.h"
 #include "utilities/IonCrypto.h"
 #include "utilities/IonFileUtility.h"
 #include "utilities/IonMath.h"
@@ -291,39 +290,6 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 			}
 		}
 	}
-
-	/*{
-		std::string result_str;
-		std::string result_str_v2;
-		std::optional<real> result;
-		std::optional<real> result_v2;
-
-		auto stopwatch = ion::timers::Stopwatch::StartNew();
-		for (auto i = 0; i < 1'000'000; ++i)
-			result_str = ion::utilities::convert::ToString(3.14);
-		stopwatch.Stop();
-		auto elapsed_str = stopwatch.Elapsed();
-
-		stopwatch.Start();
-		for (auto i = 0; i < 1'000'000; ++i)
-			result_str_v2 = ion::utilities::experimental::convert::ToString(3.14);
-		stopwatch.Stop();
-		auto elapsed_str_v2 = stopwatch.Elapsed();
-
-		
-
- 		stopwatch.Start();
-		for (auto i = 0; i < 1'000'000; ++i)
-			result = ion::utilities::convert::To<real>("3.14");
-		stopwatch.Stop();
-		auto elapsed = stopwatch.Elapsed();
-
-		stopwatch.Start();
-		for (auto i = 0; i < 1'000'000; ++i)
-			result_v2 = ion::utilities::experimental::convert::To<real>("3.14");
-		stopwatch.Stop();
-		auto elapsed_v2 = stopwatch.Elapsed();
-	}*/
 
 	/*ion::timers::TimerManager timer_manager;
 	auto &timer = timer_manager.CreateTimer(std::chrono::seconds{1});

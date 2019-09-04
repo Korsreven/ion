@@ -1288,7 +1288,7 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 			//Real
 			if (utilities::parse::detail::parse_as_floating_point(token.value))
 			{
-				auto result = ion::utilities::convert::To<script_tree::FloatingPointArgument::value_type>(std::string{token.value});
+				auto result = ion::utilities::convert::To<script_tree::FloatingPointArgument::value_type>(token.value);
 
 				if (result)
 				{
@@ -1308,7 +1308,7 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 			//Integer
 			else
 			{
-				auto result = ion::utilities::convert::To<script_tree::IntegerArgument::value_type>(std::string{token.value});
+				auto result = ion::utilities::convert::To<script_tree::IntegerArgument::value_type>(token.value);
 
 				if (result)
 				{

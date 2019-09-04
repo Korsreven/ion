@@ -112,7 +112,7 @@ namespace ion::utilities::string
 			static_assert(types::is_string_v<T> || types::is_number_v<T>);
 
 			if constexpr (types::is_string_v<T>)
-				return convert::FirstPartTo<real>(std::data(value)).value_or(0);
+				return convert::FirstPartTo<real>(value).value_or(0);
 			else
 				return static_cast<real>(value);
 		}
@@ -206,8 +206,8 @@ namespace ion::utilities::string
 		{
 			if (length > 2)
 			{
-				auto item = std::string_view(std::data(str) + off + 1, length - 2);
-				auto index = convert::FirstPartTo<int>(std::data(item));
+				auto item = std::string_view{std::data(str) + off + 1, length - 2};
+				auto index = convert::FirstPartTo<int>(item);
 
 				if (index && *index < std::tuple_size_v<T>)
 				{

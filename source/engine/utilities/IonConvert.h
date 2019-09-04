@@ -13,16 +13,13 @@ File:	IonConvert.h
 #ifndef _ION_CONVERT_
 #define _ION_CONVERT_
 
-#include <algorithm>
 #include <array>
 #include <cassert>
-#include <cstdio>
-#include <cstdlib>
-#include <limits>
+#include <charconv>
+#include <climits>
 #include <optional>
 #include <string>
 #include <string_view>
-#include <type_traits>
 
 #undef min
 #undef max
@@ -31,264 +28,148 @@ namespace ion::utilities::convert
 {
 	namespace detail
 	{
-		//String to number conversions
-		//Tries to convert the entire string
+		//Max digits for a given numeric type
+		//Used to preallocate a buffer of certain size to std::to_chars
 
 		template <typename T>
-		struct string_to_number_impl
-		{	
-			//For char, char16_t, char32_t and wchar_t
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				if constexpr (std::numeric_limits<T>::is_signed)
-					return std::strtol(std::data(str), end, 10);
-				else
-					return std::strtoul(std::data(str), end, 10);
-			}
+		struct max_digits_impl
+		{
+			static constexpr auto value = 0;
 		};
 
 		template <>
-		struct string_to_number_impl<bool>
+		struct max_digits_impl<bool>
 		{
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				return !!std::strtol(std::data(str), end, 10);
-			}
+			static constexpr auto value = 1;
 		};
 
 		template <>
-		struct string_to_number_impl<signed char>
+		struct max_digits_impl<char>
 		{
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				return static_cast<signed char>(std::strtol(std::data(str), end, 10));
-			}
+			static constexpr auto value = 4;
 		};
 
 		template <>
-		struct string_to_number_impl<unsigned char>
+		struct max_digits_impl<unsigned char>
 		{
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				return static_cast<unsigned char>(std::strtoul(std::data(str), end, 10));
-			}
+			static constexpr auto value = 3;
 		};
 
 		template <>
-		struct string_to_number_impl<short>
+		struct max_digits_impl<signed char>
 		{
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				return static_cast<short>(std::strtol(std::data(str), end, 10));
-			}
+			static constexpr auto value = 4;
 		};
 
 		template <>
-		struct string_to_number_impl<unsigned short>
+		struct max_digits_impl<short>
 		{
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				return static_cast<unsigned short>(std::strtoul(std::data(str), end, 10));
-			}
+			static constexpr auto value = 6;
 		};
 
 		template <>
-		struct string_to_number_impl<int>
+		struct max_digits_impl<unsigned short>
 		{
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				return static_cast<int>(std::strtol(std::data(str), end, 10));
-			}
+			static constexpr auto value = 5;
 		};
 
 		template <>
-		struct string_to_number_impl<unsigned int>
+		struct max_digits_impl<int>
 		{
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				return static_cast<unsigned int>(std::strtoul(std::data(str), end, 10));
-			}
+			static constexpr auto value = 11;
 		};
 
 		template <>
-		struct string_to_number_impl<long>
+		struct max_digits_impl<unsigned int>
 		{
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				return std::strtol(std::data(str), end, 10);
-			}
+			static constexpr auto value = 10;
 		};
 
 		template <>
-		struct string_to_number_impl<unsigned long>
+		struct max_digits_impl<long>
 		{
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				return std::strtoul(std::data(str), end, 10);
-			}
+			static constexpr auto value = 11;
 		};
 
 		template <>
-		struct string_to_number_impl<long long>
+		struct max_digits_impl<unsigned long>
 		{
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				return std::strtoll(std::data(str), end, 10);
-			}
+			static constexpr auto value = 10;
 		};
 
 		template <>
-		struct string_to_number_impl<unsigned long long>
+		struct max_digits_impl<long long>
 		{
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				return std::strtoull(std::data(str), end, 10);
-			}
+			static constexpr auto value = 20;
 		};
 
 		template <>
-		struct string_to_number_impl<float>
+		struct max_digits_impl<unsigned long long>
 		{
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				return std::strtof(std::data(str), end);
-			}
+			static constexpr auto value = 20;
 		};
 
 		template <>
-		struct string_to_number_impl<double>
+		struct max_digits_impl<float>
 		{
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				return std::strtod(std::data(str), end);
-			}
+			static constexpr auto value = 14;
 		};
 
 		template <>
-		struct string_to_number_impl<long double>
+		struct max_digits_impl<double>
 		{
-			inline auto operator()(std::string_view str, char **end = nullptr) const noexcept
-			{
-				return std::strtold(std::data(str), end);
-			}
+			static constexpr auto value = 24;
+		};
+
+		template <>
+		struct max_digits_impl<long double>
+		{
+			static constexpr auto value = 29;
 		};
 
 		template <typename T>
-		struct string_to_number :
-			string_to_number_impl<std::remove_cv_t<T>>
+		struct max_digits :
+			max_digits_impl<std::remove_cv_t<T>>
 		{
 		};
 
 		template <typename T>
-		inline auto entire_string_to_number(std::string_view str) noexcept
-		{
-			char *end;
-			auto value = string_to_number<T>()(str, &end);
-			return (end != std::data(str) && !*end ?
-					std::make_optional<T>(value) :
-					std::nullopt);
-		}
+		constexpr auto max_digits_v = max_digits<T>::value;
 
-
-		//String to number conversions
-		//Tries to convert the first part of the string
 
 		template <typename T>
-		struct first_part_of_string_to_number_impl
+		struct max_fixed_digits_impl
 		{
-			//For more narrow types than int
-			inline auto operator()(std::string_view str) const noexcept
-			{
-				return static_cast<T>(std::atoi(std::data(str)));
-			}
+			static constexpr auto value = 0;
 		};
 
 		template <>
-		struct first_part_of_string_to_number_impl<int>
+		struct max_fixed_digits_impl<float>
 		{
-			inline auto operator()(std::string_view str) const noexcept
-			{
-				return std::atoi(std::data(str));
-			}
+			static constexpr auto value = 45 /*min denorm exp*/ + 1 /*digit*/ + 1 /*decimal point*/ + 1 /*sign*/;
 		};
 
 		template <>
-		struct first_part_of_string_to_number_impl<unsigned int>
+		struct max_fixed_digits_impl<double>
 		{
-			inline auto operator()(std::string_view str) const noexcept
-			{
-				return static_cast<unsigned int>(std::atoll(std::data(str)));
-			}
+			static constexpr auto value = 324 /*min denorm exp*/ + 1 /*digit*/ + 1 /*decimal point*/ + 1 /*sign*/;
 		};
 
 		template <>
-		struct first_part_of_string_to_number_impl<long>
+		struct max_fixed_digits_impl<long double>
 		{
-			inline auto operator()(std::string_view str) const noexcept
-			{
-				return std::atol(std::data(str));
-			}
-		};
-
-		template <>
-		struct first_part_of_string_to_number_impl<unsigned long>
-		{
-			inline auto operator()(std::string_view str) const noexcept
-			{
-				return static_cast<unsigned long>(std::atoll(std::data(str)));
-			}
-		};
-
-		template <>
-		struct first_part_of_string_to_number_impl<long long>
-		{
-			inline auto operator()(std::string_view str) const noexcept
-			{
-				return std::atoll(std::data(str));
-			}
-		};
-
-		template <>
-		struct first_part_of_string_to_number_impl<unsigned long long>
-		{
-			inline auto operator()(std::string_view str) const noexcept
-			{
-				return std::strtoull(std::data(str), nullptr, 10);
-			}
-		};
-
-		template <>
-		struct first_part_of_string_to_number_impl<float>
-		{
-			inline auto operator()(std::string_view str) const noexcept
-			{
-				return static_cast<float>(std::atof(std::data(str)));
-			}
-		};
-
-		template <>
-		struct first_part_of_string_to_number_impl<double>
-		{
-			inline auto operator()(std::string_view str) const noexcept
-			{
-				return std::atof(std::data(str));
-			}
-		};
-
-		template <>
-		struct first_part_of_string_to_number_impl<long double>
-		{
-			inline auto operator()(std::string_view str) const noexcept
-			{
-				return std::strtold(std::data(str), nullptr);
-			}
+			static constexpr auto value = 4951 /*min denorm exp*/ + 1 /*digit*/ + 1 /*decimal point*/ + 1 /*sign*/;
 		};
 
 		template <typename T>
-		struct first_part_of_string_to_number :
-			first_part_of_string_to_number_impl<std::remove_cv_t<T>>
+		struct max_fixed_digits :
+			max_fixed_digits_impl<std::remove_cv_t<T>>
 		{
 		};
+
+		template <typename T>
+		constexpr auto max_fixed_digits_v = max_fixed_digits_impl<T>::value;
+
 
 		constexpr auto is_digit(char c) noexcept
 		{
@@ -313,34 +194,40 @@ namespace ion::utilities::convert
 			}
 		}
 
+
+		//String to number conversions
+		//Tries to convert the entire string
+
 		template <typename T>
-		inline auto first_part_to_number(std::string_view str) noexcept
+		inline auto entire_string_to_number(std::string_view str) noexcept
 		{
-			auto iter = std::cbegin(str);
+			T value;
+			auto end = std::data(str) + std::size(str);
+			auto [ptr, error] = std::from_chars(std::data(str), end, value);
 
-			//Check for sign
-			if (iter != std::cend(str))
-			{
-				switch (*iter)
-				{
-					case '-':
-					case '+':
-					++iter;
-					break;
-				}
-			}
-
-			if constexpr (std::is_floating_point_v<T>)
-			{
-				//Check for decimal point
-				if (iter != std::cend(str) && *iter == '.')
-					++iter;
-			}
-
-			return iter != std::cend(str) && is_digit(*iter) ?
-				std::make_optional<T>(first_part_of_string_to_number<T>()(str)) :
+			return ptr == end ?
+				std::make_optional<T>(value) :
 				std::nullopt;
 		}
+
+
+		//String to number conversions
+		//Tries to convert the first part of the string
+
+		template <typename T>
+		inline auto first_part_of_string_to_number(std::string_view str) noexcept
+		{
+			T value;
+			auto [ptr, error] = std::from_chars(std::data(str), std::data(str) + std::size(str), value);
+
+			return error != std::errc::invalid_argument ?
+				std::make_optional<T>(value) :
+				std::nullopt;
+		}
+
+
+		//String to number conversions
+		//Tries to convert the first numeric part of the string
 
 		template <typename T>
 		inline auto first_numeric_part_to_number(std::string_view str) noexcept
@@ -362,130 +249,32 @@ namespace ion::utilities::convert
 				--iter;
 
 			str.remove_prefix(iter - std::cbegin(str));
-			return std::make_optional<T>(first_part_of_string_to_number<T>()(str));
+			return first_part_of_string_to_number<T>(str);
 		}
 
 
-		//Max digits for a given floating point
-		//Used to preallocate a buffer of certain size to sprintf
+		//Number to string conversions (general)
 
 		template <typename T>
-		struct max_digits_impl
+		inline auto number_to_string(T x)
 		{
-			static constexpr auto value = 15;
-		};
-
-		template <>
-		struct max_digits_impl<double>
-		{
-			static constexpr auto value = 24;
-		};
-
-		template <>
-		struct max_digits_impl<long double>
-		{
-			static constexpr auto value = 28;
-		};
-
-		template <typename T>
-		struct max_digits :
-			max_digits_impl<std::remove_cv_t<T>>
-		{
-		};
-
-		template <typename T>
-		constexpr auto max_digits_v = max_digits<T>::value;
-
-
-		//Format specifier for a given floating point
-		//Used as format to sprintf
-
-		template <typename T>
-		struct format_specifier_impl
-		{
-			static constexpr auto value = "f";
-		};
-
-		template <>
-		struct format_specifier_impl<double>
-		{
-			static constexpr auto value = "lf";
-		};
-
-		template <>
-		struct format_specifier_impl<long double>
-		{
-			static constexpr auto value = "Lf";
-		};
-
-		template <typename T>
-		struct format_specifier :
-			format_specifier_impl<std::remove_cv_t<T>>
-		{
-		};
-
-		template <typename T>
-		constexpr auto format_specifier_v = format_specifier<T>::value;
-
-
-		//Format specifier (g) for a given floating point
-		//Used as format to sprintf
-
-		template <typename T>
-		struct g_format_specifier_impl
-		{
-			static constexpr auto value = "%6.9g";
-		};
-
-		template <>
-		struct g_format_specifier_impl<double>
-		{
-			static constexpr auto value = "%10.17lg";
-		};
-
-		template <>
-		struct g_format_specifier_impl<long double>
-		{
-			static constexpr auto value = "%10.17Lg";
-		};
-
-		template <typename T>
-		struct g_format_specifier :
-			g_format_specifier_impl<std::remove_cv_t<T>>
-		{
-		};
-
-		template <typename T>
-		constexpr auto g_format_specifier_v = g_format_specifier<T>::value;
-
-
-		//Number to string conversions
-		//Uses sprintf directly instead of to_string
-
-		template <typename T>
-		inline auto floating_to_string(T x)
-		{
-			std::array<char, max_digits_v<T> + 1> str;
-			std::sprintf(std::data(str), g_format_specifier_v<T>, x);
-			auto iter = std::find_if_not(std::cbegin(str), std::cend(str),
-				[](auto c) noexcept
-				{
-					return c == ' ';
-				});
-
-			return std::string(&*iter);
+			std::array<char, max_digits_v<T>> chars;
+			auto [ptr, error] = std::to_chars(std::data(chars), std::data(chars) + std::size(chars), x);
+			assert(error != std::errc::value_too_large);
+			return std::string(std::data(chars), ptr);
 		}
 
+		//Floating point to string conversions (fixed)
+
 		template <typename T>
-		inline auto floating_to_string(T x, std::optional<int> precision)
+		inline auto floating_point_to_string(T x, std::optional<int> precision)
 		{
-			auto format = (precision ? "%." + std::to_string(*precision) : "%") + format_specifier_v<T>;
-			auto size = std::snprintf(nullptr, 0, std::data(format), x);
-
-			std::string str(size, '\0');
-			std::sprintf(&str[0], std::data(format), x);
-
-			return str;
+			std::array<char, max_fixed_digits_v<T>> chars;
+			auto [ptr, error] = precision ?
+				std::to_chars(std::data(chars), std::data(chars) + std::size(chars), x, std::chars_format::fixed, *precision) :
+				std::to_chars(std::data(chars), std::data(chars) + std::size(chars), x, std::chars_format::fixed);
+			assert(error != std::errc::value_too_large);
+			return std::string(std::data(chars), ptr);
 		}
 	} //detail
 
@@ -498,18 +287,7 @@ namespace ion::utilities::convert
 	//Converts the entire given string to a number
 	//Returns an empty optional if the conversion fails
 	template <typename T>
-	[[nodiscard]] inline auto To(const std::string &str) noexcept
-		//Make sure that str is null-terminated
-	{
-		static_assert(std::is_arithmetic_v<T>);
-		return detail::entire_string_to_number<T>(str);
-	}
-
-	//Converts the entire given NTCS to a number
-	//Returns an empty optional if the conversion fails
-	template <typename T>
-	[[nodiscard]] inline auto To(const char *str) noexcept
-		//Make sure that str is null-terminated
+	[[nodiscard]] inline auto To(std::string_view str) noexcept
 	{
 		static_assert(std::is_arithmetic_v<T>);
 		return detail::entire_string_to_number<T>(str);
@@ -524,44 +302,22 @@ namespace ion::utilities::convert
 	//Converts the first part of the given string to a number
 	//Returns an empty optional if the conversion fails
 	template <typename T>
-	[[nodiscard]] inline auto FirstPartTo(const std::string &str) noexcept
-		//Make sure that str is null-terminated
+	[[nodiscard]] inline auto FirstPartTo(std::string_view str) noexcept
 	{
 		static_assert(std::is_arithmetic_v<T>);
-		return detail::first_part_to_number<T>(str);
-	}
-
-	//Converts the first part of the given NTCS to a number
-	//Returns an empty optional if the conversion fails
-	template <typename T>
-	[[nodiscard]] inline auto FirstPartTo(const char *str) noexcept
-		//Make sure that str is null-terminated
-	{
-		static_assert(std::is_arithmetic_v<T>);
-		return detail::first_part_to_number<T>(str);
+		return detail::first_part_of_string_to_number<T>(str);
 	}
 
 
 	/*
 		String to number
-		First numeric part of the string
+		Some part of the string must be numeric
 	*/
 
 	//Converts the first numeric part of the given string to a number
 	//Returns an empty optional if no numeric part is found
 	template <typename T>
-	[[nodiscard]] inline auto FirstNumericPartTo(const std::string &str) noexcept
-		//Make sure that str is null-terminated
-	{
-		static_assert(std::is_arithmetic_v<T>);
-		return detail::first_numeric_part_to_number<T>(str);
-	}
-
-	//Converts the first numeric part of the given NTCS to a number
-	//Returns an empty optional if no numeric part is found
-	template <typename T>
-	[[nodiscard]] inline auto FirstNumericPartTo(const char *str) noexcept
-		//Make sure that str is null-terminated
+	[[nodiscard]] inline auto FirstNumericPartTo(std::string_view str) noexcept
 	{
 		static_assert(std::is_arithmetic_v<T>);
 		return detail::first_numeric_part_to_number<T>(str);
@@ -578,11 +334,7 @@ namespace ion::utilities::convert
 	[[nodiscard]] inline auto ToString(T value)
 	{
 		static_assert(std::is_arithmetic_v<T>);
-
-		if constexpr (std::is_integral_v<T>)
-			return std::to_string(value);
-		else
-			return detail::floating_to_string(value);
+		return detail::number_to_string(value);
 	}
 
 	//Converts the given floating point number, with custom precision, to a string
@@ -590,8 +342,8 @@ namespace ion::utilities::convert
 	[[nodiscard]] inline auto ToString(T value, std::optional<int> precision)
 	{
 		static_assert(std::is_floating_point_v<T>);
-		assert(precision.value_or(0) >= 0);
-		return detail::floating_to_string(value, precision);
+		assert(precision.value_or(0) >= 0 && precision.value_or(0) <= std::numeric_limits<T>::digits10);
+		return detail::floating_point_to_string(value, precision);
 	}
 } //ion::utilities::convert
 

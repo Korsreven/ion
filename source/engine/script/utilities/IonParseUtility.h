@@ -221,12 +221,12 @@ namespace ion::script::utilities::parse
 
 
 		std::optional<graphics::utilities::Color> hex_as_color(std::string_view str) noexcept;
-		std::optional<graphics::utilities::Color> rgb_as_color(std::string str) noexcept;
+		std::optional<graphics::utilities::Color> rgb_as_color(std::string_view str) noexcept;
 		std::optional<graphics::utilities::Color> color_name_as_color(std::string_view str) noexcept;
 
 		std::optional<bool> string_as_boolean(std::string_view str) noexcept;
-		std::optional<graphics::utilities::Color> string_as_color(std::string str) noexcept;
-		std::optional<graphics::utilities::Vector2> string_as_vector2(std::string str) noexcept;
+		std::optional<graphics::utilities::Color> string_as_color(std::string_view str) noexcept;
+		std::optional<graphics::utilities::Vector2> string_as_vector2(std::string_view str) noexcept;
 		std::optional<std::string> string_literal_as_string(std::string_view str);
 	} //detail
 
@@ -248,7 +248,7 @@ namespace ion::script::utilities::parse
 	//Supports r,g,b,(a) values in range [0, 255] or percentages in range [0.0, 1.0]
 	//Supports hexadecimal values (with alpha) prefixed with # or 0x (both short and long notation)
 	//Supports X11 color names such as AliceBlue, Crimson etc.
-	[[nodiscard]] std::optional<graphics::utilities::Color> AsColor(std::string str) noexcept;
+	[[nodiscard]] std::optional<graphics::utilities::Color> AsColor(std::string_view str) noexcept;
 
 
 	/*
@@ -267,7 +267,7 @@ namespace ion::script::utilities::parse
 
 	//Parses the given string as a vector2 value
 	//Supports both scalar and x,y values
-	[[nodiscard]] std::optional<graphics::utilities::Vector2> AsVector2(std::string str) noexcept;
+	[[nodiscard]] std::optional<graphics::utilities::Vector2> AsVector2(std::string_view str) noexcept;
 
 } //ion::script::utilities::parse
 

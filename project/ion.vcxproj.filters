@@ -401,9 +401,6 @@
     <ClInclude Include="..\source\engine\resources\files\IonFileResource.h">
       <Filter>Header Files\resources\files</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\utilities\IonConvertV2.h">
-      <Filter>Header Files\utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\engine\script\IonScriptCompiler.h">
       <Filter>Header Files\script</Filter>
     </ClInclude>

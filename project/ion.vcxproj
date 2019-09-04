@@ -245,7 +245,6 @@
     <ClInclude Include="..\source\engine\types\IonTypeTraits.h" />
     <ClInclude Include="..\source\engine\utilities\IonCodec.h" />
     <ClInclude Include="..\source\engine\utilities\IonConvert.h" />
-    <ClInclude Include="..\source\engine\utilities\IonConvertV2.h" />
     <ClInclude Include="..\source\engine\utilities\IonCrypto.h" />
     <ClInclude Include="..\source\engine\utilities\IonFileUtility.h" />
     <ClInclude Include="..\source\engine\utilities\IonMath.h" />

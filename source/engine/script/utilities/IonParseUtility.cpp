@@ -34,11 +34,11 @@ std::optional<graphics::utilities::Color> hex_as_color(std::string_view str) noe
 		{
 			//HTML hexadecimal prefix (#)
 			if (!std::empty(str) && str.front() == '#')
-				return codec::DecodeFrom<uint32>({std::data(str) + 1, std::size(str) - 1}, 16);
+				return codec::DecodeFrom<uint32>(str.substr(1, std::size(str) - 1), 16);
 
 			//Numeric value
 			else
-				return convert::To<uint32>(std::data(str));
+				return convert::To<uint32>(str);
 		}();
 
 	return value ?
@@ -46,63 +46,57 @@ std::optional<graphics::utilities::Color> hex_as_color(std::string_view str) noe
 		std::nullopt;
 }
 
-std::optional<graphics::utilities::Color> rgb_as_color(std::string str) noexcept
+std::optional<graphics::utilities::Color> rgb_as_color(std::string_view str) noexcept
 {
 	if (auto first = str.find(',');
-		first != std::string::npos)
+		first != std::string_view::npos)
 	{
 		if (auto second = str.find(',', first + 1);
-			second != std::string::npos)
+			second != std::string_view::npos)
 		{
 			//Found r,g,b (required)
 			//Search for alpha (optional)
 			auto third = str.find(',', second + 1);
 
-			str[first] = '\0';
-			str[second] = '\0';
-
-			if (third != std::string::npos)
-				str[third] = '\0';
-
 			auto rgb_8 =
-				parse_as_integer({std::data(str), first}) &&
-				parse_as_integer({std::data(str) + first + 1, second - first - 1}) &&
-				parse_as_integer(std::data(str) + second + 1);
+				parse_as_integer(str.substr(0, first)) &&
+				parse_as_integer(str.substr(first + 1, second - first - 1)) &&
+				parse_as_integer(str.substr(second + 1, third - second - 1));
 
 			//Alpha [0.0, 1.0]
-			auto a = (third != std::string::npos) ?
-				convert::To<real>(std::data(str) + third + 1) :
+			auto a = (third != std::string_view::npos) ?
+				convert::To<real>(str.substr(third + 1)) :
 				std::nullopt;
 
 			//RGB [0, 255]
 			if (rgb_8)
 			{
-				auto r = convert::To<uint8>(std::data(str));
-				auto g = convert::To<uint8>(std::data(str) + first + 1);
-				auto b = convert::To<uint8>(std::data(str) + second + 1);
+				auto r = convert::To<uint8>(str.substr(0, first));
+				auto g = convert::To<uint8>(str.substr(first + 1, second - first - 1));
+				auto b = convert::To<uint8>(str.substr(second + 1, third - second - 1));
 
 				if (r && g && b)
 				{
 					if (a)
 						return Color::RGB(*r, *g, *b, *a);
 					//No alpha expected
-					else if (third == std::string::npos)
+					else if (third == std::string_view::npos)
 						return Color::RGB(*r, *g, *b);
 				}
 			}
 			//RGB percentages [0.0, 1.0]
 			else
 			{
-				auto r = convert::To<real>(std::data(str));
-				auto g = convert::To<real>(std::data(str) + first + 1);
-				auto b = convert::To<real>(std::data(str) + second + 1);
+				auto r = convert::To<real>(str.substr(0, first));
+				auto g = convert::To<real>(str.substr(first + 1, second - first - 1));
+				auto b = convert::To<real>(str.substr(second + 1, third - second - 1));
 
 				if (r && g && b)
 				{
 					if (a)
 						return Color{*r, *g, *b, *a};
 					//No alpha expected
-					else if (third == std::string::npos)
+					else if (third == std::string_view::npos)
 						return Color{*r, *g, *b};
 				}
 			}
@@ -149,13 +143,13 @@ std::optional<bool> string_as_boolean(std::string_view str) noexcept
 	return {};
 }
 
-std::optional<Color> string_as_color(std::string str) noexcept
+std::optional<Color> string_as_color(std::string_view str) noexcept
 {
 	if (std::empty(str))
 		return {};
 
 	//Components (r,g,b,a)
-	else if (str.find(',') != std::string::npos)
+	else if (str.find(',') != std::string_view::npos)
 		return rgb_as_color(std::move(str));
 
 	//Hexadecimal or numeric value
@@ -167,16 +161,14 @@ std::optional<Color> string_as_color(std::string str) noexcept
 		return color_name_as_color(str);
 }
 
-std::optional<Vector2> string_as_vector2(std::string str) noexcept
+std::optional<Vector2> string_as_vector2(std::string_view str) noexcept
 {
 	//Components (x,y)
 	if (auto off = str.find(',');
-		off != std::string::npos)
+		off != std::string_view::npos)
 	{
-		str[off] = '\0';
-
-		auto x = convert::To<real>(std::data(str));
-		auto y = convert::To<real>(std::data(str) + off + 1);
+		auto x = convert::To<real>(str.substr(0, off));
+		auto y = convert::To<real>(str.substr(off + 1));
 
 		if (x && y)
 			return Vector2{*x, *y};
@@ -305,9 +297,9 @@ std::optional<bool> AsBoolean(std::string_view str) noexcept
 	String as color
 */
 
-std::optional<Color> AsColor(std::string str) noexcept
+std::optional<Color> AsColor(std::string_view str) noexcept
 {
-	return detail::string_as_color(std::move(str));
+	return detail::string_as_color(str);
 }
 
 
@@ -325,9 +317,9 @@ std::optional<std::string> AsString(std::string_view str)
 	String as vector2
 */
 
-std::optional<Vector2> AsVector2(std::string str) noexcept
+std::optional<Vector2> AsVector2(std::string_view str) noexcept
 {
-	return detail::string_as_vector2(std::move(str));
+	return detail::string_as_vector2(str);
 }
 
 } //ion::script::utilities::parse
