@@ -211,6 +211,13 @@ namespace ion::graphics::utilities
 				return !(*this == rhs);
 			}
 
+			//Checks if one color is less than another one (channel wise)
+			//Needed for sorting two colors (strict weak ordering)
+			[[nodiscard]] inline auto operator<(const Color &rhs) const noexcept
+			{
+				return std::tuple{red_, green_, blue_, alpha_} < std::tuple{rhs.red_, rhs.green_, rhs.blue_, rhs.alpha_};
+			}
+
 
 			/*
 				Adding

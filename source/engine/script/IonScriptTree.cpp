@@ -12,6 +12,9 @@ File:	IonScriptTree.cpp
 
 #include "IonScriptTree.h"
 
+#include <utility>
+#include "utilities/IonParseUtility.h"
+
 namespace ion::script
 {
 
@@ -59,7 +62,6 @@ void serialize_property(const PropertyNode &property, std::vector<std::byte> &by
 	for (auto &argument : property.Arguments())
 		serialize_argument(argument, bytes);
 
-	auto name_size = utilities::string::Serialize(std::size(property.Name()));
 	bytes.push_back(static_cast<std::byte>(serialization_section_token::Property));
 	serialize_value(property.Name(), bytes);
 }
@@ -69,10 +71,10 @@ void serialize_object(const tree_node &node, std::vector<std::byte> &bytes)
 	for (auto &property : node.Object.Properties())
 		serialize_property(property, bytes);
 
-	auto name_size = utilities::string::Serialize(std::size(node.Object.Name()));
 	bytes.push_back(static_cast<std::byte>(serialization_section_token::Object));
 	serialize_value(node.Depth, bytes);
 	serialize_value(node.Object.Name(), bytes);
+	serialize_value(node.Object.Classes(), bytes);
 }
 
 std::vector<std::byte> serialize(const ObjectNodes &objects)
@@ -160,29 +162,30 @@ int deserialize_object(std::string_view bytes, std::vector<ObjectNodes> &object_
 	int depth;
 	auto depth_bytes_deserialized = deserialize_value(bytes, depth);
 
-	//Node depth serialized
-	if (depth_bytes_deserialized > 0)
+	std::string name;
+	auto name_bytes_deserialized = depth_bytes_deserialized > 0 ?
+		deserialize_value(bytes.substr(depth_bytes_deserialized), name) : 0;
+
+	std::string classes;
+	auto classes_bytes_deserialized = name_bytes_deserialized > 0 ?
+		deserialize_value(bytes.substr(depth_bytes_deserialized + name_bytes_deserialized), classes) : 0;
+
+	//Node depth, object name and classes serialized
+	if (classes_bytes_deserialized > 0)
 	{
-		std::string name;
-		auto name_bytes_deserialized = deserialize_value(bytes.substr(depth_bytes_deserialized), name);
+		if (depth >= static_cast<int>(std::size(object_stack)))
+			object_stack.insert(std::end(object_stack), depth - std::size(object_stack) + 1, {});
 
-		//Object name serialized
-		if (name_bytes_deserialized > 0)
-		{
-			if (depth >= static_cast<int>(std::size(object_stack)))
-				object_stack.insert(std::end(object_stack), depth - std::size(object_stack) + 1, {});
+		//Leaf object, no childrens
+		if (auto &object = object_stack[depth];
+			&object == &object_stack.back())
+			object.emplace_back(std::move(name), std::move(classes), std::move(properties));
+		//Take childrens (if any) from one depth deeper
+		else
+			object.emplace_back(std::move(name), std::move(classes), std::move(properties),
+								std::move(object_stack[depth + 1]));
 
-			//Leaf object, no childrens
-			if (auto &object = object_stack[depth];
-				&object == &object_stack.back())
-				object.emplace_back(std::move(name), std::move(properties));
-			//Take childrens (if any) from one depth deeper
-			else
-				object.emplace_back(std::move(name), std::move(properties),
-									std::move(object_stack[depth + 1]));
-
-			return depth_bytes_deserialized + name_bytes_deserialized;
-		}
+		return depth_bytes_deserialized + name_bytes_deserialized + classes_bytes_deserialized;
 	}
 	
 	return 0;
@@ -257,6 +260,9 @@ std::string print(const ObjectNodes &objects, PrintOptions print_options)
 	{
 		output += "\n" + std::string(depth * 4, ' ') + "[-] " + object.Name();
 
+		if (auto &classes = object.Classes(); !std::empty(classes))
+			output += " \"" + classes + "\"";
+
 		if (print_options == PrintOptions::ObjectsWithProperties ||
 			print_options == PrintOptions::ObjectsWithPropertiesAndArguments)
 		{
@@ -282,10 +288,14 @@ std::string print(const ObjectNodes &objects, PrintOptions print_options)
 								},
 								[](const ColorArgument &arg)
 								{
+									auto name = std::string{utilities::parse::AsString(arg.Value()).value_or("")};
 									auto [r, g, b] = arg.Value().ToRGB();
 									auto a = arg.Value().A();
-									return "(" + utilities::convert::ToString(r) + ", " + utilities::convert::ToString(g) + ", " + utilities::convert::ToString(b) +
-										(a < 1.0_r ? ", " + utilities::convert::ToString(a, 2) : "") + ")";
+
+									if (a < 1.0_r)
+										return ion::utilities::string::Format(name + "({0}, {1}, {2}, {3:0.##})", r, g, b, a);
+									else
+										return ion::utilities::string::Format(name + "({0}, {1}, {2})", r, g, b);
 								},
 								[](const EnumerableArgument &arg)
 								{
@@ -293,17 +303,17 @@ std::string print(const ObjectNodes &objects, PrintOptions print_options)
 								},
 								[](const StringArgument &arg)
 								{
-									return "\"" + arg.Value() + "\"";
+									return ion::utilities::string::Concat('"', arg.Value(), '"');
 								},
 								[](const Vector2Argument &arg)
 								{
 									auto [x, y] = arg.Value().XY();
-									return "{" + utilities::convert::ToString(x) + ", " + utilities::convert::ToString(y) + "}";
+									return ion::utilities::string::Concat('{', x, ", ", y, '}');
 								},
 								//Default
 								[](auto &&arg)
 								{
-									return utilities::convert::ToString(arg.Value());
+									return ion::utilities::convert::ToString(arg.Value());
 								});
 
 							if (--remaining_args > 0)
@@ -422,22 +432,92 @@ std::string fully_qualified_name(const ObjectNodes &objects, const ObjectNode &w
 	return name;
 }
 
+
+void generational_depth_first_search_impl(generations &chart, generation gen, ObjectNode &object)
+{
+	chart.push_back(gen);
+
+	if (!std::empty(object.Objects()))
+	{
+		auto siblings = std::move(gen.siblings);
+        gen.ancestors.emplace_back(gen).siblings = std::move(siblings); //Add previous generation as next ancestor
+
+		for (auto &sibling : object.Objects())
+        {
+            gen.siblings.push_back(&sibling);
+			generational_depth_first_search_impl(chart, gen, sibling);
+        }
+	}
+}
+
+generations generational_depth_first_search(ObjectNodes &objects)
+{
+	generations chart;
+	generation gen;
+
+	for (auto &sibling : objects)
+	{
+		gen.siblings.push_back(&sibling);
+		generational_depth_first_search_impl(chart, gen, sibling);
+	}
+
+	return chart;
+}
+
 } //detail
 
 
-ObjectNode::ObjectNode(std::string name, PropertyNodes properties) noexcept :
-	ObjectNode(std::move(name), std::move(properties), {})
+ObjectNode::ObjectNode(std::string name, std::string classes, PropertyNodes properties) noexcept :
+	ObjectNode{std::move(name), std::move(classes), std::move(properties), {}}
 {
 	//Empty
 }
 
-ObjectNode::ObjectNode(std::string name, PropertyNodes properties, ObjectNodes objects) noexcept :
+ObjectNode::ObjectNode(std::string name, std::string classes, PropertyNodes properties, ObjectNodes objects) noexcept :
 	name_{std::move(name)},
+	classes_{std::move(classes)},
 	properties_{std::move(properties)},
 	objects_{std::move(objects)}
 {
 	//Empty
 }
+
+
+/*
+	Appending
+*/
+
+void ObjectNode::Append(const ObjectNodes &objects, AppendCondition append_condition)
+{
+	detail::append_nodes(objects_, objects, append_condition);
+}
+
+void ObjectNode::Append(const adaptors::ranges::Iterable<ObjectNodes&> &objects, AppendCondition append_condition)
+{
+	detail::append_nodes(objects_, objects, append_condition);
+}
+
+void ObjectNode::Append(const adaptors::ranges::Iterable<const ObjectNodes&> &objects, AppendCondition append_condition)
+{
+	detail::append_nodes(objects_, objects, append_condition);
+}
+
+
+void ObjectNode::Append(const PropertyNodes &properties, AppendCondition append_condition)
+{
+	detail::append_nodes(properties_, properties, append_condition);
+}
+
+void ObjectNode::Append(const adaptors::ranges::Iterable<PropertyNodes&> &properties, AppendCondition append_condition)
+{
+	detail::append_nodes(properties_, properties, append_condition);
+}
+
+void ObjectNode::Append(const adaptors::ranges::Iterable<const PropertyNodes&> &properties, AppendCondition append_condition)
+{
+	detail::append_nodes(properties_, properties, append_condition);
+}
+
 
 PropertyNode::PropertyNode(std::string name, ArgumentNodes arguments) noexcept :
 	name_{std::move(name)},
@@ -461,6 +541,26 @@ ScriptTree::ScriptTree(ObjectNodes objects) noexcept :
 	objects_{std::move(objects)}
 {
 	//Empty
+}
+
+
+/*
+	Appending
+*/
+
+void ScriptTree::Append(const script_tree::ObjectNodes &objects, script_tree::AppendCondition append_condition)
+{
+	detail::append_nodes(objects_, objects, append_condition);
+}
+
+void ScriptTree::Append(const adaptors::ranges::Iterable<script_tree::ObjectNodes&> &objects, script_tree::AppendCondition append_condition)
+{
+	detail::append_nodes(objects_, objects, append_condition);
+}
+
+void ScriptTree::Append(const adaptors::ranges::Iterable<const script_tree::ObjectNodes&> &objects, script_tree::AppendCondition append_condition)
+{
+	detail::append_nodes(objects_, objects, append_condition);
 }
 
 

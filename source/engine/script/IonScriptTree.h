@@ -58,10 +58,17 @@ namespace ion::script
 				StringArgument,
 				Vector2Argument>;
 
-		enum class DepthFirstSearchTraversal
+		enum class DepthFirstSearchTraversal : bool
 		{
 			PreOrder,
 			PostOrder
+		};
+
+		enum class AppendCondition
+		{
+			Unconditionally,
+			NoDuplicateNames,
+			NoDuplicateClasses //Same as above for properties
 		};
 
 		enum class PrintOptions
@@ -89,13 +96,22 @@ namespace ion::script
 			{
 				const ObjectNode &Object;
 				const ObjectNode *const Parent = nullptr;
-				int Depth = 0;
+				const int Depth = 0;
 
 				tree_node(const ObjectNode &object);
 				tree_node(const ObjectNode &object, const ObjectNode &parent, int depth);
 			};
 
 			using search_result = std::vector<tree_node>;
+
+			struct generation;
+			using generations = std::vector<generation>;
+
+			struct generation
+			{
+				std::vector<ObjectNode*> siblings;
+				generations ancestors;
+			};
 
 
 			template <typename T>
@@ -241,6 +257,61 @@ namespace ion::script
 
 
 			/*
+				Appending
+			*/
+
+			template <typename DestNodes, typename SrcNodes>
+			void append_nodes(DestNodes &destination, const SrcNodes &source, AppendCondition append_condition)
+			{
+				auto count = std::size(destination); //Count, before appending
+
+				switch (append_condition)
+				{
+					case AppendCondition::Unconditionally:
+					{
+						destination.insert(std::end(destination), std::begin(source), std::end(source));
+						break;
+					}
+
+					case AppendCondition::NoDuplicateClasses:
+					{
+						if constexpr (std::is_same_v<std::remove_cvref_t<decltype(*std::begin(source))>, ObjectNode>)
+						{
+							for (auto &candidate : source)
+							{
+								if (auto iter = std::find_if(std::cbegin(destination), std::cbegin(destination) + count,
+									[&](auto &node) noexcept
+									{
+										return node.Name() == candidate.Name() && node.Classes() == candidate.Classes();
+									}); iter == std::cbegin(destination) + count)
+									//Candidate is approved
+									destination.push_back(candidate);
+							}
+							break;
+						}
+						else
+							[[fallthrough]];
+					}
+
+					case AppendCondition::NoDuplicateNames:
+					{
+						for (auto &candidate : source)
+						{
+							if (auto iter = std::find_if(std::cbegin(destination), std::cbegin(destination) + count,
+								[&](auto &node) noexcept
+								{
+									return node.Name() == candidate.Name();
+								}); iter == std::cbegin(destination) + count)
+								//Candidate is approved
+								destination.push_back(candidate);
+						}
+						break;
+					}
+				}
+			}
+
+
+			/*
 				Printing
 			*/
 
@@ -259,6 +330,9 @@ namespace ion::script
 			search_result breadth_first_search(const ObjectNodes &objects);
 			search_result depth_first_search(const ObjectNodes &objects, DepthFirstSearchTraversal traversal);
 			std::string fully_qualified_name(const ObjectNodes &objects, const ObjectNode &what_object);
+
+			void generational_depth_first_search_impl(generations &chart, generation gen, ObjectNode &object);
+			generations generational_depth_first_search(ObjectNodes &objects);
 		} //detail
 
 
@@ -302,16 +376,17 @@ namespace ion::script
 			private:
 
 				std::string name_;
+				std::string classes_;
 				PropertyNodes properties_;
 				ObjectNodes objects_;
 
 			public:
 
 				//Constructs a new object node with the given name and properties
-				ObjectNode(std::string name, PropertyNodes properties) noexcept;
+				ObjectNode(std::string name, std::string classes, PropertyNodes properties) noexcept;
 
 				//Constructs a new object node with the given name, properties and child objects
-				ObjectNode(std::string name, PropertyNodes properties, ObjectNodes objects) noexcept;
+				ObjectNode(std::string name, std::string classes, PropertyNodes properties, ObjectNodes objects) noexcept;
 
 
 				/*
@@ -323,6 +398,36 @@ namespace ion::script
 				{
 					return name_;
 				}
+
+				//Returns the classes of this object
+				[[nodiscard]] inline const auto& Classes() const noexcept
+				{
+					return classes_;
+				}
+
+
+				/*
+					Appending
+				*/
+
+				//Append all of the given objects that satisfy the given append condition
+				void Append(const ObjectNodes &objects, AppendCondition append_condition = AppendCondition::Unconditionally);
+
+				//Append all of the given mutable iterable objects that satisfy the given append condition
+				void Append(const adaptors::ranges::Iterable<ObjectNodes&> &objects, AppendCondition append_condition = AppendCondition::Unconditionally);
+
+				//Append all of the given immutable iterable objects that satisfy the given append condition
+				void Append(const adaptors::ranges::Iterable<const ObjectNodes&> &objects, AppendCondition append_condition = AppendCondition::Unconditionally);
+
+
+				//Append all of the given properties that satisfy the given append condition
+				void Append(const PropertyNodes &properties, AppendCondition append_condition = AppendCondition::Unconditionally);
+
+				//Append all of the given mutable iterable properties that satisfy the given append condition
+				void Append(const adaptors::ranges::Iterable<PropertyNodes&> &properties, AppendCondition append_condition = AppendCondition::Unconditionally);
+
+				//Append all of the given immutable iterable properties that satisfy the given append condition
+				void Append(const adaptors::ranges::Iterable<const PropertyNodes&> &properties, AppendCondition append_condition = AppendCondition::Unconditionally);
 
 
 				/*
@@ -344,11 +449,25 @@ namespace ion::script
 				}
 
 
+				//Returns a mutable range of all top-level child objects in this object
+				//This can be used directly with a range-based for loop
+				[[nodiscard]] inline auto Objects() noexcept
+				{
+					return adaptors::ranges::Iterable<ObjectNodes&>{objects_};
+				}
+
 				//Returns an immutable range of all top-level child objects in this object
 				//This can be used directly with a range-based for loop
 				[[nodiscard]] inline const auto Objects() const noexcept
 				{
 					return adaptors::ranges::Iterable<const ObjectNodes&>{objects_};
+				}
+
+				//Returns a mutable range of all properties in this object
+				//This can be used directly with a range-based for loop
+				[[nodiscard]] inline auto Properties() noexcept
+				{
+					return adaptors::ranges::Iterable<PropertyNodes&>{properties_};
 				}
 
 				//Returns an immutable range of all properties in this object
@@ -386,6 +505,13 @@ namespace ion::script
 				/*
 					Ranges
 				*/
+
+				//Returns an mutable range of all arguments in this property
+				//This can be used directly with a range-based for loop
+				[[nodiscard]] inline auto Arguments() noexcept
+				{
+					return adaptors::ranges::Iterable<ArgumentNodes&>{arguments_};
+				}
 
 				//Returns an immutable range of all arguments in this property
 				//This can be used directly with a range-based for loop
@@ -444,6 +570,20 @@ namespace ion::script
 
 
 			/*
+				Appending
+			*/
+
+			//Append all of the given objects that satisfy the given append condition
+			void Append(const script_tree::ObjectNodes &objects, script_tree::AppendCondition append_condition = script_tree::AppendCondition::Unconditionally);
+
+			//Append all of the given mutable iterable objects that satisfy the given append condition
+			void Append(const adaptors::ranges::Iterable<script_tree::ObjectNodes&> &objects, script_tree::AppendCondition append_condition = script_tree::AppendCondition::Unconditionally);
+
+			//Append all of the given immutable iterable objects that satisfy the given append condition
+			void Append(const adaptors::ranges::Iterable<const script_tree::ObjectNodes&> &objects, script_tree::AppendCondition append_condition = script_tree::AppendCondition::Unconditionally);
+
+
+			/*
 				Fully qualified names
 			*/
 
@@ -483,6 +623,13 @@ namespace ion::script
 				return adaptors::ranges::Iterable<const script_tree::detail::search_result>{script_tree::detail::depth_first_search(objects_, traversal)};
 			}
 
+
+			//Returns an mutable range of all top-level objects in this script tree
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Objects() noexcept
+			{
+				return adaptors::ranges::Iterable<script_tree::ObjectNodes>{objects_};
+			}
 
 			//Returns an immutable range of all top-level objects in this script tree
 			//This can be used directly with a range-based for loop

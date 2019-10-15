@@ -12,8 +12,6 @@ File:	IonParseUtility.cpp
 
 #include "IonParseUtility.h"
 
-#include <algorithm>
-
 #include "utilities/IonCodec.h"
 #include "utilities/IonConvert.h"
 #include "utilities/IonStringUtility.h"
@@ -110,8 +108,8 @@ std::optional<graphics::utilities::Color> color_name_as_color(std::string_view s
 {
 	//Look up in color map
 	auto iter =
-		std::lower_bound(std::begin(detail::color_map), std::end(detail::color_map), str,
-			[](const color_pair_type &x, std::string_view y) noexcept
+		std::lower_bound(std::begin(color_map), std::end(color_map), str,
+			[](const auto &x, const auto &y) noexcept
 			{
 				return std::lexicographical_compare(
 					std::begin(x.first), std::end(x.first),
@@ -119,10 +117,27 @@ std::optional<graphics::utilities::Color> color_name_as_color(std::string_view s
 					string::detail::case_insensitive_less);
 			});
 
-	return iter != std::end(detail::color_map) &&
+	return iter != std::end(color_map) &&
 		string::Compare(iter->first, str, string::StringCase::Insensitive) ?
 
-		std::make_optional(iter->second) :
+		std::make_optional(*iter->second) :
+		std::nullopt;
+}
+
+std::optional<std::string_view> color_as_color_name(const graphics::utilities::Color &color) noexcept
+{
+	static auto color_name_map = make_color_name_map();
+
+	//Look up in color name map
+	auto iter =
+		std::lower_bound(std::begin(color_name_map), std::end(color_name_map), color,
+			[](const auto &x, const auto &y) noexcept
+			{
+				return *x.second < y;
+			});
+
+	return iter != std::end(color_name_map) && *iter->second == color ?
+		std::make_optional(iter->first) :
 		std::nullopt;
 }
 
@@ -305,11 +320,17 @@ std::optional<Color> AsColor(std::string_view str) noexcept
 
 /*
 	String literal as string
+	Color value as string
 */
 
 std::optional<std::string> AsString(std::string_view str)
 {
 	return detail::string_literal_as_string(str);
+}
+
+std::optional<std::string_view> AsString(const graphics::utilities::Color &color)
+{
+	return detail::color_as_color_name(color);
 }
 
 

@@ -112,7 +112,7 @@ namespace ion::utilities::convert
 		template <>
 		struct max_digits_impl<float>
 		{
-			static constexpr auto value = 14;
+			static constexpr auto value = 15;
 		};
 
 		template <>

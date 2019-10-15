@@ -26,10 +26,10 @@ namespace ion::adaptors
 	template <typename Key, typename Compare = std::less<>, //Transparent as default
 		template <typename...> typename Container = std::vector, typename... Types>
 	struct FlatSet final :
-		FlatAssociativeAdaptor<Container<Key, Types...>, Compare,
+		FlatAssociativeAdaptor<Container<Key, Types...>, Key, Compare,
 			iterators::flat_set_iterator::detail::get_flat_set_iterator>
 	{
-		using my_base = FlatAssociativeAdaptor<Container<Key, Types...>, Compare,
+		using my_base = FlatAssociativeAdaptor<Container<Key, Types...>, Key, Compare,
 			iterators::flat_set_iterator::detail::get_flat_set_iterator>;
 		using my_base::my_base;
 	};

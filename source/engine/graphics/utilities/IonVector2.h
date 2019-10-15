@@ -78,6 +78,13 @@ namespace ion::graphics::utilities
 				return !(*this == rhs);
 			}
 
+			//Checks if one vector is less than another one (component wise)
+			//Needed for sorting two vectors (strict weak ordering)
+			[[nodiscard]] inline auto operator<(const Vector2 &rhs) const noexcept
+			{
+				return std::pair{x_, y_} < std::pair{rhs.x_, rhs.y_};
+			}
+
 
 			//Negate vector (negating each component)
 			[[nodiscard]] inline auto operator-() const noexcept

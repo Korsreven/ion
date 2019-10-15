@@ -36,6 +36,7 @@ namespace ion::script
 			UnexpectedFunction,
 
 			//Identifier
+			MissingIdentifier,
 			UnexpectedIdentifier,
 
 			//Literal	

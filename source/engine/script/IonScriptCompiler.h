@@ -24,6 +24,7 @@ File:	IonScriptCompiler.h
 #include "IonScriptError.h"
 #include "IonScriptTree.h"
 #include "adaptors/IonFlatMap.h"
+#include "adaptors/IonFlatSet.h"
 #include "parallel/IonWorkerPool.h"
 #include "utilities/IonConvert.h"
 
@@ -46,24 +47,25 @@ namespace ion::script
 			enum class token_name
 			{	
 				Comment,
-				Identifier,
 				Function,
+				Identifier,
 				Operator,
 				Rule,
+				Selector,
 				Separator,
 				Unit,
 				UnknownSymbol,
 				WhiteSpace,
 
-				//Operator types
-				BinaryOperator,
-				UnaryOperator,
-
 				//Literal types
 				BooleanLiteral,
 				HexLiteral,
 				NumericLiteral,
-				StringLiteral
+				StringLiteral,
+
+				//Operator types
+				BinaryOperator,
+				UnaryOperator
 			};
 
 			struct translation_unit
@@ -84,6 +86,23 @@ namespace ion::script
 			};
 
 			using lexical_tokens = std::vector<lexical_token>;
+			using string_views = std::vector<std::string_view>;
+
+			struct selector_group
+			{
+				string_views classes;
+				std::vector<int> combinators;
+			};
+
+			using selector_groups = std::vector<selector_group>;
+
+			struct template_rule
+			{
+				selector_groups selectors;
+				script_tree::ObjectNode *object = nullptr;
+			};
+
+			using template_rules = std::vector<template_rule>;
 
 
 			struct file_trace
@@ -126,6 +145,13 @@ namespace ion::script
 				void start_process(std::string str, file_trace trace);
 			};
 
+			struct scope
+			{				
+				script_tree::ObjectNodes objects;
+				script_tree::PropertyNodes properties;
+				std::string classes;
+			};
+
 
 			struct syntax_context
 			{
@@ -137,6 +163,7 @@ namespace ion::script
 
 				bool inside_import = false;
 				bool inside_object_signature = false;
+				bool inside_template_signature = false;
 				bool inside_property = false;
 				bool inside_function = false;
 				bool inside_calc_function = false;
@@ -144,21 +171,20 @@ namespace ion::script
 
 			struct parse_context
 			{
-				struct scope
-				{
-					script_tree::ObjectNodes objects;
-					script_tree::PropertyNodes properties;
-				};
-
-				std::vector<scope> scopes;	
+				std::vector<scope> scopes;
 				script_tree::ArgumentNodes property_arguments;
 				script_tree::ArgumentNodes function_arguments;
-			
-				std::vector<lexical_token*> object_tokens;
-				lexical_token *identifier_token = nullptr;	
+
+				std::vector<lexical_token*> object_tokens;		
+				lexical_token *identifier_token = nullptr;
 				lexical_token *property_token = nullptr;
 				lexical_token *function_token = nullptr;
-
+				
+				template_rules templates;	
+				selector_groups selectors;
+				adaptors::FlatSet<std::string_view> selector_classes;
+				std::string classes;
+				
 				int scope_depth = 0;
 				bool unary_minus = false;
 			};
@@ -204,6 +230,26 @@ namespace ion::script
 				}
 
 				return true;
+			}
+
+			constexpr auto is_class_selector(char c) noexcept
+			{
+				//Unroll all true cases
+				switch (c)
+				{
+					case '.':
+					case '#':
+					case '*':
+					return true;
+
+					default:
+					return false;
+				}
+			}
+
+			constexpr auto is_selector_identifier(std::string_view str) noexcept
+			{
+				return is_class_selector(str.front());
 			}
 
 
@@ -269,6 +315,25 @@ namespace ion::script
 					case '+':
 					case '*':
 					case '/':
+					return true;
+
+					default:
+					return false;
+				}
+			}
+
+			constexpr auto is_selector(char c) noexcept
+			{
+				//Unroll all true cases
+				switch (c)
+				{
+					case '.': //Class
+					case '#': //Id		
+					case ',': //Both
+					case '>': //Child
+					case '+': //Adjacent sibling
+					case '~': //General sibling
+					case '*': //All
 					return true;
 
 					default:
@@ -408,6 +473,7 @@ namespace ion::script
 			bool check_literal_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept;
 			bool check_operator_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept;
 			bool check_rule_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept;
+			bool check_selector_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept;
 			bool check_separator_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept;
 			bool check_unit_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept;
 
@@ -428,16 +494,30 @@ namespace ion::script
 			std::optional<script_tree::ArgumentType> call_function(lexical_token &token, script_tree::ArgumentNodes arguments, CompileError &error) noexcept;
 
 			//Parsing
-		
+
 			bool parse_function(lexical_token &token, parse_context &context, CompileError &error) noexcept;
 			bool parse_identifier(lexical_token &token, parse_context &context, CompileError &error);
 			bool parse_literal(lexical_token &token, parse_context &context, CompileError &error);
 			bool parse_unary_operator(lexical_token &token, parse_context &context, CompileError &error) noexcept;
+			bool parse_selector(lexical_token &token, parse_context &context, CompileError &error) noexcept;
 			bool parse_separator(lexical_token &token, parse_context &context, CompileError &error);
 			bool parse_unit(lexical_token &token, parse_context &context, CompileError &error) noexcept;
 
 			void pre_parse(lexical_tokens &tokens) noexcept;
 			std::optional<ScriptTree> parse(lexical_tokens tokens, build_system &system, CompileError &error);
+
+			//Inheriting
+
+			adaptors::FlatSet<std::string_view> split_classes(std::string_view str);
+			std::string join_classes(const adaptors::FlatSet<std::string_view> &classes);
+			string_views get_classes(script_tree::ObjectNode &object);
+
+			std::pair<bool, int> is_matching(string_views::const_iterator first_selector_class,
+				string_views::const_iterator last_selector_class, const string_views &classes) noexcept;
+			void append_matching_templates(const script_tree::detail::generation &chart,
+				template_rules::const_iterator first, template_rules::const_iterator last);
+
+			void inherit(script_tree::ObjectNodes &objects, template_rules &templates);
 
 
 			/*

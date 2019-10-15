@@ -173,22 +173,6 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 		Test code
 	*/
 
-	ion::parallel::WorkerPool<std::string> worker_pool;
-	worker_pool.MaxWorkerThreads(5);
-
-	for (auto i = 0; i < 10; ++i)
-		worker_pool.RunTask(Concat, "Hello", "World!");
-
-	worker_pool.Wait();
-
-	for (auto i = 0; i < 10; ++i)
-		worker_pool.RunTask(Concat, "World", "Hello!");
-
-	auto results = worker_pool.Get();
-
-
-	auto repetitions = 1;
-
 	//Compile script
 	{
 		ion::script::ScriptCompiler script;
@@ -196,32 +180,12 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 					  ion::script::script_tree::PrintOptions::ObjectsWithPropertiesAndArguments);
 
 		ion::script::CompileError compile_error;
-
-		ion::timers::Stopwatch stopwatch;
-		auto compile_elapsed = std::chrono::microseconds{0};
-		std::optional<ion::script::ScriptTree> compiled_tree;
-
-		for (auto i = 0; i < repetitions; ++i)
-		{
-			stopwatch.Start();
-			compiled_tree = script.Compile("bin/script.ion", compile_error);
-			stopwatch.Stop();
-
-			if (compile_elapsed.count() == 0 ||
-				stopwatch.ElapsedMicroseconds() < compile_elapsed)
-					compile_elapsed = stopwatch.ElapsedMicroseconds();
-
-			if (compile_error)
-				break;
-		}
-
-		auto deserialize_elapsed = std::chrono::microseconds{0};
-		std::optional<ion::script::ScriptTree> deserialized_tree;
+		auto compiled_tree = script.Compile("bin/main.ion", compile_error);
 
 		//Serialize tree
 		if (compiled_tree)
 		{
-			auto component = ion::script::script_validator::ClassDefinition::Create("component")
+			/*auto component = ion::script::script_validator::ClassDefinition::Create("component")
 				.AddRequiredProperty("name", ion::script::script_validator::ParameterType::String);
 
 			auto container = ion::script::script_validator::ClassDefinition::Create("container", "component")
@@ -259,85 +223,26 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 			{
 				auto what = validate_error.Condition.message();
 				auto fully_qualified_name = validate_error.FullyQualifiedName;
-			}
+			}*/
 
 
 			auto tree_bytes = compiled_tree->Serialize();
-			ion::utilities::file::Save("bin/script.obj",
+			ion::utilities::file::Save("bin/main.obj",
 				{reinterpret_cast<char*>(std::data(tree_bytes)), std::size(tree_bytes)},
 				ion::utilities::file::FileSaveMode::Binary);
 
 			//Load object file
 
 			std::string bytes;
-			ion::utilities::file::Load("bin/script.obj", bytes,
+			ion::utilities::file::Load("bin/main.obj", bytes,
 				ion::utilities::file::FileLoadMode::Binary);
 
 			//Deserialize
-
-			for (auto i = 0; i < repetitions; ++i)
-			{
-				stopwatch.Start();
-				deserialized_tree = ion::script::ScriptTree::Deserialize(bytes);
-				stopwatch.Stop();
-
-				if (deserialize_elapsed.count() == 0 ||
-					stopwatch.ElapsedMicroseconds() < deserialize_elapsed)
-						deserialize_elapsed = stopwatch.ElapsedMicroseconds();
-
-				if (!deserialized_tree)
-					break;
-			}
+			auto deserialized_tree = ion::script::ScriptTree::Deserialize(bytes);
 		}
 	}
 
-	/*ion::timers::TimerManager timer_manager;
-	auto &timer = timer_manager.CreateTimer(std::chrono::seconds{1});
-
-	auto timer_handle = std::make_unique<ion::timers::Timer>(std::chrono::seconds{2});
-	auto &timer2 = timer_manager.Adopt(std::move(timer_handle));
-
-	ion::timers::AsyncTimerManager async_timer_manager;
-	auto &async_timer = async_timer_manager.CreateTimer(std::chrono::seconds{4}, OnTick);
-	async_timer.Start();*/
-
-	/*{
-		std::vector<real> empty;
-		std::vector samples{1.0_r, 4.0_r, 6.0_r, 7.0_r, 4.0_r, 2.0_r};
-
-		auto empty_sum = ion::utilities::math::Sum(empty);
-		auto sum = ion::utilities::math::Sum(samples);
-
-		auto empty_mean = ion::utilities::math::Mean(empty);
-		auto mean = ion::utilities::math::Mean(samples);
-
-		auto empty_median = ion::utilities::math::Median(empty);
-		auto median = ion::utilities::math::Median(samples);
-
-		auto empty_mode = ion::utilities::math::Mode(empty);
-		auto mode = ion::utilities::math::Mode(samples);
-
-		auto empty_range = ion::utilities::math::Range(empty);
-		auto range = ion::utilities::math::Range(samples);
-	}*/
-
-	/*ion::adaptors::FlatMap<std::string, int> flat_map;
-	flat_map.insert({{"d", 3}, {"a", 1}});
-	flat_map.insert({"b", 2});
-	flat_map.erase("d");
-	flat_map["d"] = 10;
-	flat_map.emplace_hint(std::end(flat_map), "e", 3);
-
-	for (auto &value : flat_map)
-	{
-		value.second = 0;
-	}
-
-	ion::adaptors::FlatSet<int> flat_set;
-	flat_set.insert({1, 2, 4, 5});
-	flat_set.insert(std::begin(flat_set) + 2, 5);
-
-	ion::resources::files::repositories::AudioRepository audio_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
+	/*ion::resources::files::repositories::AudioRepository audio_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
 	ion::resources::files::repositories::FontRepository font_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
 	ion::resources::files::repositories::ImageRepository image_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
 	ion::resources::files::repositories::ShaderRepository shader_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
@@ -353,7 +258,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 	file_resource_loader.LoadDirectory("bin", ion::utilities::file::DirectoryIteration::Recursive);
 	//file_resource_loader.CompileDataFile("bin/resources.dat");*/
 
-	{
+	/*{
 		auto encoded = ion::utilities::codec::EncodeTo(5050, 16);
 		auto decoded = ion::utilities::codec::DecodeFrom<int>(*encoded, 16);
 	}
@@ -444,14 +349,14 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 
 		auto checksum = ion::utilities::codec::EncodeToHex(ion::utilities::crypto::SHAKE_256("The quick brown fox jumps over the lazy dog", 64));
 		assert(checksum == "2f671343d9b2e1604dc9dcf0753e5fe15c7c64a0d283cbbf722d411a0e36f6ca1d01d1369a23539cd80f7c054b6e5daf9c962cad5b8ed5bd11998b40d5734442");
-	}
+	}*/
 	
 	
-	{
+	/*{
 		auto concat_result = ion::utilities::string::Concat(10, ","sv, 'A', ","s, 3.14, ",");
 		auto join_result = ion::utilities::string::Join(","sv, 10, 'A', 3.14, "string"s, "char[]");
 		auto format_result = ion::utilities::string::Format("{0}, {1} and {2 : 00.0000} + {3}, {4} and {5}", 10, 'A', 3.14, "string_view"sv, "string"s, "char[]");
-	}
+	}*/
 
 	return 0;
 }

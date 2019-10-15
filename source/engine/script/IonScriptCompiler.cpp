@@ -302,6 +302,7 @@ std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, buil
 	
 	auto inside_import = false;
 	auto import_argument = ""sv;
+	auto scope_depth = 0;
 
 	for (auto iter = std::begin(str), end = std::end(str); iter != end;)
 	{
@@ -314,6 +315,21 @@ std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, buil
 		{
 			auto [lexeme, line_breaks] = get_white_space_lexeme(str.substr(off));
 			token = {token_name::WhiteSpace, lexeme, &unit, line_number += line_breaks};
+
+			//For global scope only
+			if (scope_depth == 0 && !std::empty(tokens) &&		
+				tokens.back().name == token_name::Identifier &&
+				is_selector_identifier(tokens.back().value) &&
+				is_class_selector(next_c))
+					token.name = token_name::Selector; //Descendant selector
+		}
+		//Selector
+		else if (is_selector(c) && scope_depth == 0) //For global scope only
+		{
+			token = {token_name::Selector, str.substr(off, 1), &unit, line_number};
+
+			if (token.value.front() == '*')
+				token.name = token_name::Identifier; //Change to selector identifier
 		}
 		//Separator
 		else if (is_separator(c))
@@ -352,6 +368,16 @@ std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, buil
 					else
 						return token_name::Identifier;
 				}(), lexeme, &unit, line_number};
+
+			//Expand token to engulf class selector
+			if (token.name == token_name::Identifier &&
+				!std::empty(tokens) && tokens.back().name == token_name::Selector &&
+				is_class_selector(tokens.back().value.front()))
+			{			
+				token.value = str.substr(off - 1, std::size(lexeme) + 1); //Append class selector to identifier token
+				tokens.pop_back(); //Remove class selector
+				--iter;
+			}
 		}
 		//Operator
 		else if (is_operator(c)) //Must be checked after comment and identifier, because of division (/) and minus (-)
@@ -368,9 +394,18 @@ std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, buil
 		//Unknown symbol
 		else
 			token = {token_name::UnknownSymbol, str.substr(off, 1), &unit, line_number};
-		
+
 		iter += std::size(token.value);
 		tokens.push_back(token);
+
+		//For selectors (scope aware)
+		if (token.name == token_name::Separator)
+		{
+			if (token.value.front() == '{')
+				++scope_depth;
+			else if (token.value.front() == '}' && scope_depth > 0)
+				--scope_depth;
+		}
 
 
 		//@import "argument";
@@ -456,26 +491,50 @@ bool check_identifier_syntax(lexical_token &token, syntax_context &context, Comp
 		error = {CompileErrorCode::UnexpectedIdentifier, token.unit->file_path, token.line_number};
 		return false;
 	}
-	else if (!context.inside_property &&
+	else if (!is_selector_identifier(token.value) && //Object/property
+			!context.inside_property && //Not enum
 
-			(!context.next_token ||
-			//object "argument"
-			(context.next_token->name != token_name::StringLiteral &&
+			//Not
+			!(context.next_token &&
 
-			//object {
 			//property :
-			(context.next_token->name != token_name::Separator ||
-				(context.next_token->value.front() != '{' && context.next_token->value.front() != ':')))))
+			//object {	
+			((context.next_token->name == token_name::Separator &&
+				(context.next_token->value.front() == ':' || context.next_token->value.front() == '{')) ||
+			//object "classes"
+			context.next_token->name == token_name::StringLiteral)))
+	{
+		error = {CompileErrorCode::UnexpectedIdentifier, token.unit->file_path, token.line_number};
+		return false;
+	}
+	else if (is_selector_identifier(token.value) && //Template
+
+			//Not
+			!(context.next_token &&
+
+			//template {	
+			((context.next_token->name == token_name::Separator &&
+				(context.next_token->value.front() == ':' || context.next_token->value.front() == '{')) ||
+			//template "classes"
+			context.next_token->name == token_name::StringLiteral ||		
+			//template <selector>
+			context.next_token->name == token_name::Selector ||
+			//template <template>
+			(context.next_token->name == token_name::Identifier && is_selector_identifier(context.next_token->value)))))
 	{
 		error = {CompileErrorCode::UnexpectedIdentifier, token.unit->file_path, token.line_number};
 		return false;
 	}
 
+	context.inside_template_signature =
+		is_selector_identifier(token.value);
+
 	context.inside_object_signature =
+		!context.inside_template_signature &&
 		!context.inside_property &&
 		!(context.next_token &&
-		context.next_token->name == token_name::Separator &&
-		context.next_token->value.front() == ':');
+			context.next_token->name == token_name::Separator &&
+			context.next_token->value.front() == ':');
 	return true;
 }
 
@@ -490,7 +549,8 @@ bool check_literal_syntax(lexical_token &token, syntax_context &context, Compile
 			error = {CompileErrorCode::InvalidStringLiteral, token.unit->file_path, token.line_number};
 			return false;
 		}
-		else if (!context.inside_import && !context.inside_object_signature && !context.inside_property)
+		else if (!context.inside_import && !context.inside_object_signature &&
+				 !context.inside_template_signature && !context.inside_property)
 		{
 			error = {CompileErrorCode::UnexpectedLiteral, token.unit->file_path, token.line_number};
 			return false;
@@ -504,8 +564,8 @@ bool check_literal_syntax(lexical_token &token, syntax_context &context, Compile
 			error = {CompileErrorCode::InvalidImportStatement, token.unit->file_path, token.line_number};
 			return false;
 		}
-		//"classes/selectors" {
-		else if (context.inside_object_signature &&
+		//"classes" {
+		else if ((context.inside_object_signature || context.inside_template_signature) &&
 				(!context.next_token ||
 				context.next_token->name != token_name::Separator ||
 				context.next_token->value.front() != '{'))
@@ -654,6 +714,51 @@ bool check_rule_syntax(lexical_token &token, syntax_context &context, CompileErr
 	return true;
 }
 
+bool check_selector_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept
+{
+	switch (token.value.front())
+	{
+		//Class and id selectors, isolated (not appended to an identifier)
+		case '.':
+		case '#':
+		case '*':
+		{
+			error = {CompileErrorCode::MissingIdentifier, token.unit->file_path, token.line_number};
+			return false;
+		}
+
+		//Combinator selectors
+		case ',':
+		case '>':
+		case '+':
+		case '~':
+		default: //Descendant selector (white space)
+		{
+			if (!( //Not
+				//Left hand operand
+				context.previous_token &&
+				context.previous_token->name == token_name::Identifier &&
+				is_selector_identifier(context.previous_token->value)))
+			{
+				error = {CompileErrorCode::InvalidLeftOperand, token.unit->file_path, token.line_number};
+				return false;
+			}
+			
+			else if (!( //Not
+					//Right hand operand
+					context.next_token &&
+					context.next_token->name == token_name::Identifier &&
+					is_selector_identifier(context.next_token->value)))
+			{
+				error = {CompileErrorCode::InvalidRightOperand, token.unit->file_path, token.line_number};
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
 bool check_separator_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept
 {
 	switch (token.value.front())
@@ -695,7 +800,7 @@ bool check_separator_syntax(lexical_token &token, syntax_context &context, Compi
 
 		case '{':
 		{
-			if (!context.inside_object_signature)
+			if (!context.inside_object_signature && !context.inside_template_signature)
 			{
 				error = {CompileErrorCode::UnexpectedOpenCurlyBrace, token.unit->file_path, token.line_number};
 				return false;
@@ -703,6 +808,7 @@ bool check_separator_syntax(lexical_token &token, syntax_context &context, Compi
 
 			++context.curly_brace_depth;
 			context.inside_object_signature = false;
+			context.inside_template_signature = false;
 			break;
 		}
 
@@ -847,6 +953,15 @@ bool check_syntax(lexical_tokens &tokens, CompileError &error) noexcept
 			case token_name::Rule:
 			{
 				if (!check_rule_syntax(token, context, error))
+					return false;
+
+				break;
+			}
+
+			//Selector
+			case token_name::Selector:
+			{
+				if (!check_selector_syntax(token, context, error))
 					return false;
 
 				break;
@@ -1227,7 +1342,18 @@ bool parse_identifier(lexical_token &token, parse_context &context, CompileError
 			context.property_arguments.push_back(std::move(argument));
 	}
 	else
+	{
 		context.identifier_token = &token;
+
+		if (is_selector_identifier(token.value))
+		{
+			//First identifier in selector group
+			if (std::empty(context.selectors))
+				context.selectors.emplace_back();
+
+			context.selector_classes.insert(token.value.substr(std::size(token.value) > 1));
+		}
+	}
 
 	return true;
 }
@@ -1343,6 +1469,9 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 				//Property argument
 				else if (context.property_token)
 					context.property_arguments.emplace_back(script_tree::StringArgument{*result});
+				//Objects/Templates
+				else
+					context.classes = std::move(*result);
 			}
 			else
 			{
@@ -1360,6 +1489,25 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 bool parse_unary_operator(lexical_token &token, parse_context &context, CompileError&) noexcept
 {
 	context.unary_minus = token.value.front() == '-';
+	return true;
+}
+
+bool parse_selector(lexical_token &token, parse_context &context, CompileError&) noexcept
+{
+	for (auto &selector_class : context.selector_classes)
+		context.selectors.back().classes.push_back(selector_class);
+	context.selector_classes.clear();
+
+	//New selector group
+	if (token.value.front() == ',')
+		context.selectors.emplace_back();
+	else
+	{
+		context.selectors.back().combinators.push_back(
+			static_cast<int>(std::size(context.selectors.back().classes)));
+		context.selectors.back().classes.push_back(token.value);
+	}
+
 	return true;
 }
 
@@ -1389,6 +1537,27 @@ bool parse_separator(lexical_token &token, parse_context &context, CompileError 
 			if (context.scope_depth == static_cast<int>(std::size(context.scopes)))
 				context.scopes.emplace_back();
 
+			//Classes
+			if (!std::empty(context.classes))
+			{
+				auto classes = split_classes(context.classes);
+
+				//Erase explicit object name (if any) in classes (is implicit)
+				if (!is_selector_identifier(context.identifier_token->value))
+					classes.erase(context.identifier_token->value);
+
+				context.scopes[context.scope_depth].classes = join_classes(classes);
+				context.classes.clear();
+			}
+
+			//Template
+			if (is_selector_identifier(context.identifier_token->value))
+			{
+				for (auto &selector_class : context.selector_classes)
+					context.selectors.back().classes.push_back(selector_class);
+				context.selector_classes.clear();
+			}
+
 			context.object_tokens.push_back(context.identifier_token);
 			++context.scope_depth;
 			break;
@@ -1399,14 +1568,19 @@ bool parse_separator(lexical_token &token, parse_context &context, CompileError 
 			//Leaf object, no childrens
 			if (auto &scope = context.scopes[context.scope_depth - 1];
 				&scope == &context.scopes.back())
-				scope.objects.emplace_back(std::string{context.object_tokens.back()->value}, std::move(scope.properties));
+				scope.objects.emplace_back(std::string{context.object_tokens.back()->value}, std::move(scope.classes), std::move(scope.properties));
 			//Take childrens (if any) from one depth deeper
 			else
-				scope.objects.emplace_back(std::string{context.object_tokens.back()->value}, std::move(scope.properties),
+				scope.objects.emplace_back(std::string{context.object_tokens.back()->value}, std::move(scope.classes), std::move(scope.properties),
 										   std::move(context.scopes[context.scope_depth].objects));
 
 			context.object_tokens.pop_back();
 			--context.scope_depth;
+
+			//Template, store selectors
+			if (context.scope_depth == 0 && !std::empty(context.selectors))
+				context.templates.push_back({std::move(context.selectors)});
+
 			break;
 		}
 
@@ -1515,6 +1689,13 @@ std::optional<ScriptTree> parse(lexical_tokens tokens, build_system &system, Com
 				break;
 			}
 
+			//Selector
+			case token_name::Selector:
+			{
+				parse_selector(token, context, token.unit->error);
+				break;
+			}
+
 			//Separator
 			case token_name::Separator:
 			{
@@ -1552,10 +1733,307 @@ std::optional<ScriptTree> parse(lexical_tokens tokens, build_system &system, Com
 			return {};
 	}
 
-	return !std::empty(context.scopes) ?
-		//Top-level objects
-		std::make_optional<ScriptTree>(std::move(context.scopes.front().objects)) :
+	if (std::empty(context.scopes))
+		return {};
+	
+	
+	auto &top_level_objects = context.scopes.front().objects;
+
+	//Inherit from templates using pattern matching rules (selectors)
+	inherit(top_level_objects, context.templates);
+
+	return !std::empty(top_level_objects) ?
+		std::make_optional<ScriptTree>(std::move(top_level_objects)) :
 		std::nullopt;
+}
+
+
+adaptors::FlatSet<std::string_view> split_classes(std::string_view str)
+{
+	adaptors::FlatSet<std::string_view> result;
+
+	for (auto iter = std::begin(str);
+		(iter = std::find_if(iter, std::end(str), std::not_fn(is_white_space))) != std::end(str);)
+	{
+		auto iter2 = std::find_if(iter + 1, std::end(str), is_white_space);
+		result.insert(str.substr(iter - std::begin(str), iter2 - iter));
+		iter = iter2 + (iter2 != std::end(str));
+	}
+
+	return result;
+}
+
+std::string join_classes(const adaptors::FlatSet<std::string_view> &classes)
+{
+	std::string str;
+
+	if (!std::empty(classes))
+	{
+		auto iter = std::begin(classes);
+		str += *iter;
+
+		for (++iter; iter != std::end(classes); ++iter)
+		{
+			str += " ";
+			str += *iter;
+		}
+	}
+
+	return str;
+}
+
+string_views get_classes(script_tree::ObjectNode &object)
+{
+	string_views result;
+	auto name = std::string_view{object.Name()};
+	auto classes = std::string_view{object.Classes()};
+
+	//Split classes
+	if (!std::empty(classes))
+	{
+		//Each class is sorted, unique and with exactly one space in between
+		for (size_t from = 0, to = 0; to != std::string_view::npos; from = to + 1)
+			result.push_back(classes.substr(from, (to = classes.find(' ', from)) - from));
+	}
+
+	//Add object name as class
+	if (!is_selector_identifier(name))
+		result.insert( //Result should be small, use linear search to find insertion point
+			std::find_if(std::begin(result), std::end(result),
+				[&](const auto &str) noexcept
+				{
+					return name < str;
+				}), name);
+
+	return result;
+}
+
+
+std::pair<bool, int> is_matching(string_views::const_iterator first_selector_class,
+	string_views::const_iterator last_selector_class, const string_views &classes) noexcept
+{
+	//* is always in front in a sorted range (if existing)
+	auto select_all = first_selector_class->front() == '*';
+
+	string_views result;
+	std::set_intersection(std::begin(classes), std::end(classes),
+						  first_selector_class + select_all, //Skip *
+						  last_selector_class, std::back_inserter(result));
+
+	auto count = static_cast<int>(std::size(result));
+	return {count == last_selector_class - first_selector_class - select_all, count};
+}
+
+void append_matching_templates(const script_tree::detail::generation &chart,
+	template_rules::const_iterator first, template_rules::const_iterator last)
+{
+	auto &object = *chart.siblings.back();
+	auto is_template = is_selector_identifier(object.Name());
+	auto classes = get_classes(object);
+
+	if (std::empty(classes))
+		return;
+
+	adaptors::FlatMap<std::pair<int,int>, script_tree::ObjectNode*, std::greater<>> matching_templates;
+	
+	for (auto off = 0; first != last; ++first, ++off)
+	{
+		auto &[selectors, template_object] = *first;	
+		auto max_specificity = -1;
+
+		for (auto &group : selectors)
+		{		
+			auto group_matching = true;
+			auto group_specificity = 0;
+			auto position = std::pair{&chart, std::size(chart.siblings) - 1};
+			
+			auto iter = std::rbegin(group.combinators); //Right to left
+			auto end = std::rend(group.combinators);
+			auto combinator = end;
+
+			struct snapshot
+			{
+				int group_specificity;
+				decltype(position) position;
+				decltype(iter) iter;
+				int from;
+			};
+
+			std::optional<snapshot> restore_point;
+
+			for (auto to = static_cast<int>(std::size(group.classes)); to > 0 && group_matching;)
+			{
+				auto from = iter != end ? *iter + 1 : 0;
+				auto first_selector_class = std::begin(group.classes) + from;
+				auto last_selector_class = std::begin(group.classes) + to;
+
+				auto [matching, specificity] =
+					[&]() noexcept
+					{
+						//Has combinator
+						if (combinator != end)
+						{
+							switch (group.classes[*combinator].front())
+							{
+								case '>':
+								{
+									//Has ancestor
+									if (!std::empty(position.first->ancestors))
+									{
+										position.first = &position.first->ancestors.back();
+										position.second = std::size(position.first->siblings) - 1;
+										return is_matching(first_selector_class, last_selector_class, get_classes(*position.first->siblings[position.second]));
+									}
+									else
+										break;
+								}
+
+								case '+':
+								{
+									//Has preceding sibling
+									if (position.second > 0)
+									{
+										--position.second;
+
+										//Break if preceding sibling is not the same identifier category
+										if (is_template != is_selector_identifier(position.first->siblings[position.second]->Name()))
+											break;
+
+										return is_matching(first_selector_class, last_selector_class, get_classes(*position.first->siblings[position.second]));
+									}
+									else
+										break;
+								}
+
+								case '~':
+								{
+									//Has preceding sibling
+									while (position.second > 0)
+									{
+										--position.second;
+										
+										//Break if preceding sibling is not the same identifier category
+										if (is_template != is_selector_identifier(position.first->siblings[position.second]->Name()))
+											break;
+
+										if (auto result = is_matching(first_selector_class, last_selector_class, get_classes(*position.first->siblings[position.second])); result.first)
+											return result;
+									}
+
+									break;
+								}
+
+								default: //' '
+								{
+									//Has ancestor
+									while (!std::empty(position.first->ancestors))
+									{
+										position.first = &position.first->ancestors.back();
+										position.second = std::size(position.first->siblings) - 1;
+
+										if (auto result = is_matching(first_selector_class, last_selector_class, get_classes(*position.first->siblings[position.second])); result.first)
+										{
+											//Make restore point
+											restore_point = snapshot{
+												group_specificity,
+												position,
+												iter - 1,
+												to + 1
+											};
+											return result;
+										}
+									}
+
+									break;
+								}
+							}
+
+							return std::pair{false, 0};
+						}
+						else
+							return is_matching(first_selector_class, last_selector_class, classes);
+					}();
+
+				//Accumulate specificity if matching
+				if (matching && (!is_template || specificity > 0))
+					group_specificity += specificity;
+				else
+				{
+					//Has restore point - rollback
+					if (restore_point)
+					{
+						group_specificity = restore_point->group_specificity;
+						position = restore_point->position;
+						iter = restore_point->iter;
+						from = restore_point->from;
+
+						restore_point.reset();
+					}
+					else
+					{
+						group_matching = false;
+						break;
+					}
+				}
+
+				//Next combinator
+				if (from > 0)
+				{
+					combinator = iter++;
+					--from;
+				}
+
+				to = from;
+			}
+
+			if (group_matching)
+				max_specificity = std::max(group_specificity, max_specificity);
+		}
+
+		if (max_specificity >= 0)
+			matching_templates.emplace(std::pair{max_specificity, off}, template_object);
+	}
+
+	//Inherit in order most to least matched pattern
+	for (auto &[key, template_object] : matching_templates)
+	{
+		object.Append(template_object->Properties(), script_tree::AppendCondition::NoDuplicateNames);
+		object.Append(template_object->Objects(), script_tree::AppendCondition::NoDuplicateClasses);
+	}
+}
+
+void inherit(script_tree::ObjectNodes &objects, template_rules &templates)
+{
+	//Templates available
+	if (!std::empty(templates))
+	{
+		auto available_templates = 0;
+
+		for (auto &chart : script_tree::detail::generational_depth_first_search(objects))
+		{
+			//Global scope
+			if (std::empty(chart.ancestors) && //Make template previously added visible
+				available_templates < static_cast<int>(std::size(templates)) &&
+				templates[available_templates].object)
+				++available_templates;
+
+			//Do pattern matching against visible templates
+			if (available_templates > 0)
+				append_matching_templates(chart, std::begin(templates), std::begin(templates) + available_templates);
+
+			//Add template (invisible for now)
+			if (auto object = chart.siblings.back(); is_selector_identifier(object->Name()))
+				templates[available_templates].object = object;
+		}
+
+		//Erase all templates
+		objects.erase(
+			std::remove_if(std::begin(objects), std::end(objects),
+				[](auto &object) noexcept
+				{
+					return is_selector_identifier(object.Name());
+				}), std::end(objects));
+	}
 }
 
 
@@ -1669,8 +2147,9 @@ std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_pat
 									ion::utilities::string::Concat("Error. ", unit->error.Condition.message(), " (line ", unit->error.LineNumber, ")"));
 					}
 
-					if (output_options_ == script_compiler::OutputOptions::SummaryWithAST ||
-						output_options_ == script_compiler::OutputOptions::SummaryWithFilesAndAST)
+					if (tree &&
+						(output_options_ == script_compiler::OutputOptions::SummaryWithAST ||
+						output_options_ == script_compiler::OutputOptions::SummaryWithFilesAndAST))
 					{
 						output += "\n\n<AST>";
 						output += tree->Print(print_options_);

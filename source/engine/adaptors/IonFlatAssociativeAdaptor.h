@@ -24,109 +24,59 @@ namespace ion::adaptors
 {
 	namespace flat_associative_adaptor::detail
 	{
-		template <typename Compare>
-		struct compare_equal
-		{
-			Compare compare;
-
-			template <typename T1, typename T2>
-			constexpr auto operator()(const T1 &x, const T2 &y) const noexcept
-			{
-				return !compare(x, y) && !compare(y, x);
-			}
-		};
-
-		template <typename Compare>
+		template <typename KeyType, typename ValueType, typename Compare>
 		struct value_compare
 		{
 			Compare compare;
-			
-			template <typename T1, typename T2>
-			constexpr auto operator()(const std::pair<T1, T2> &x,
-									  const std::pair<T1, T2> &y) const noexcept
-			{
-				return compare(x.first, y.first);
-			}
-
-			template <typename T, typename T1, typename T2>
-			constexpr auto operator()(const T &x,
-									  const std::pair<T1, T2> &y) const noexcept
-			{
-				return compare(x, y.first);
-			}
-
-			template <typename T, typename T1, typename T2>
-			constexpr auto operator()(const std::pair<T1, T2> &x,
-									  const T &y) const noexcept
-			{
-				return compare(x.first, y);
-			}
 
 			template <typename T1, typename T2>
 			constexpr auto operator()(const T1 &x, const T2 &y) const noexcept
 			{
-				return compare(x, y);
+				if constexpr (std::is_same_v<KeyType, ValueType>) //Set
+				{
+					return compare(x, y);
+				}
+				else //Map
+				{
+					if constexpr (std::is_same_v<ValueType, T1> && std::is_same_v<ValueType, T2>)
+						return compare(x.first, y.first);
+					else if constexpr (std::is_same_v<ValueType, T1>)
+						return compare(x.first, y);
+					else if constexpr (std::is_same_v<ValueType, T2>)
+						return compare(x, y.first);
+					else
+						return compare(x, y);
+				}
 			}
 		};
 
-
-		template <typename T>
-		struct key_type
+		template <typename KeyType, typename ValueType>
+		const auto& extract_key(const ValueType &value) noexcept
 		{
-			using type = T;
-		};
-
-		template <typename T1, typename T2>
-		struct key_type<std::pair<T1, T2>>
-		{
-			using type = T1;
-		};
-
-		template <typename T>
-		using key_type_t = typename key_type<T>::type;
-
-		template <typename T>
-		auto& extract_key(T &value) noexcept
-		{
-			return value;
-		}
-
-		template <typename T1, typename T2>
-		auto& extract_key(std::pair<T1, T2> &value) noexcept
-		{
-			return value.first;
-		}
-
-		template <typename T>
-		auto& extract_value(T &value) noexcept
-		{
-			return value;
-		}
-
-		template <typename T1, typename T2>
-		auto& extract_value(std::pair<T1, T2> &value) noexcept
-		{
-			return value.second;
+			if constexpr (std::is_same_v<KeyType, ValueType>)
+				return value; //Set
+			else
+				return value.first; //Map
 		}
 
 
 		template <typename Iterator, typename T, typename Compare>
 		inline auto lower_bound(Iterator first, Iterator last, const T &value, Compare compare) noexcept
 		{
-			return std::lower_bound(first, last, value, value_compare<Compare>{compare});
+			return std::lower_bound(first, last, value, compare);
 		}
 
 		template <typename Iterator, typename T, typename Compare>
 		inline auto upper_bound(Iterator first, Iterator last, const T &value, Compare compare) noexcept
 		{
-			return std::upper_bound(first, last, value, value_compare<Compare>{compare});
+			return std::upper_bound(first, last, value, compare);
 		}
 
 		template <typename Iterator, typename T, typename Compare>
 		inline auto find(Iterator first, Iterator last, const T &value, Compare compare) noexcept
 		{
-			first = std::lower_bound(first, last, value, value_compare<Compare>{compare});
-			return std::pair{first, first != last && value_compare<compare_equal<Compare>>{}(*first, value)};
+			first = std::lower_bound(first, last, value, compare);
+			return std::pair{first, first != last && !compare(value, *first)};
 		}
 
 		template <typename Iterator, typename T, typename Compare>
@@ -143,7 +93,7 @@ namespace ion::adaptors
 					if (hint == first)
 					{
 						//Value is not greater than hint
-						if (!value_compare<Compare>{compare}(*hint, value))
+						if (!compare(*hint, value))
 							return hint;
 					}
 
@@ -151,7 +101,7 @@ namespace ion::adaptors
 					else if (hint == last)
 					{
 						//Value is not less than hint - 1
-						if (!value_compare<Compare>{compare}(value, *(hint - 1)))
+						if (!compare(value, *(hint - 1)))
 							return hint;
 					}
 
@@ -160,28 +110,28 @@ namespace ion::adaptors
 					//Value is not less than hint - 1
 					else
 					{
-						auto left_of = !value_compare<Compare>{compare}(*hint, value);
-						auto right_of = !value_compare<Compare>{compare}(value, *(hint - 1));
+						auto left_of = !compare(*hint, value);
+						auto right_of = !compare(value, *(hint - 1));
 
 						if (left_of && right_of)
 							return hint;
 						else if (left_of)
-							return std::lower_bound(first, hint, value, value_compare<Compare>{compare});
+							return std::lower_bound(first, hint, value, compare);
 						else if (right_of)
-							return std::lower_bound(hint, last, value, value_compare<Compare>{compare});
+							return std::lower_bound(hint, last, value, compare);
 					}
 
-					return std::lower_bound(first, last, value, value_compare<Compare>{compare});
+					return std::lower_bound(first, last, value, compare);
 				}();
 
-			return std::pair{first, first != last && value_compare<compare_equal<Compare>>{}(*first, value)};
+			return std::pair{first, first != last && !compare(value, *first)};
 		}
 
 
 		template <typename Iterator, typename Compare>
 		inline void sort_keys(Iterator first, Iterator last, Compare compare) noexcept
 		{
-			std::sort(first, last, value_compare<Compare>{compare});
+			std::sort(first, last, compare);
 		}
 
 		template <typename Container, typename Iterator, typename Compare>
@@ -190,8 +140,10 @@ namespace ion::adaptors
 			//Container must be sorted!
 			container.erase(
 				std::unique(first, last,
-				value_compare<compare_equal<Compare>>{compare}),
-				std::end(container));
+					[&](const auto &x, const auto &y) noexcept
+					{
+						return !compare(x, y) && !compare(y, x);
+					}), std::end(container));			
 		}
 
 		template <typename Container, typename Compare>
@@ -214,7 +166,7 @@ namespace ion::adaptors
 				//Merge newly added entries with previous added entries
 				std::inplace_merge(
 					std::begin(container), first,
-					std::end(container), value_compare<Compare>{compare});
+					std::end(container), compare);
 			}
 
 			//Make sure there are no duplicate keys
@@ -223,7 +175,7 @@ namespace ion::adaptors
 	} //flat_associative_adaptor::detail
 
 
-	template <typename Container, typename Compare,
+	template <typename Container, typename Key, typename Compare,
 		template <typename...> typename IteratorAdaptor = types::identity>
 	struct FlatAssociativeAdaptor : ranges::BasicIterable<Container, IteratorAdaptor>
 	{
@@ -232,9 +184,9 @@ namespace ion::adaptors
 		static_assert(std::is_base_of_v<std::random_access_iterator_tag,
 					  typename std::iterator_traits<typename my_base::container_type::iterator>::iterator_category>);
 
-		using key_type = flat_associative_adaptor::detail::key_type_t<typename my_base::value_type>;	
+		using key_type = Key;	
 		using key_compare = Compare;
-		using value_compare = flat_associative_adaptor::detail::value_compare<Compare>;
+		using value_compare = flat_associative_adaptor::detail::value_compare<Key, typename my_base::value_type, Compare>;
 
 
 		//Default constructor
@@ -242,14 +194,14 @@ namespace ion::adaptors
 
 		//Construct a flat associative adaptor by the given container
 		explicit FlatAssociativeAdaptor(typename my_base::container_type container) noexcept :
-			my_base{flat_associative_adaptor::detail::make_ordered_associative(std::move(container), key_compare{})}
+			my_base{flat_associative_adaptor::detail::make_ordered_associative(std::move(container), value_compare{})}
 		{
 			//Empty
 		}
 
 		//Construct a flat associative adaptor by the given initializer list
 		explicit FlatAssociativeAdaptor(std::initializer_list<typename my_base::value_type> list) noexcept :
-			my_base{flat_associative_adaptor::detail::make_ordered_associative(typename my_base::container_type{list}, key_compare{})}
+			my_base{flat_associative_adaptor::detail::make_ordered_associative(typename my_base::container_type{list}, value_compare{})}
 		{
 			//Empty
 		}
@@ -354,19 +306,20 @@ namespace ion::adaptors
 			typename = std::enable_if_t<std::is_same_v<T, key_type> || types::is_transparent_comparator_v<Compare>>>
 		[[nodiscard]] inline auto count(const T &key) const noexcept
 		{
-			auto iter = find(key);
+			auto [iter, found] =
+				flat_associative_adaptor::detail::find(
+					std::begin(this->container_), std::end(this->container_),
+					key, value_compare{});
 			auto key_count = 0;
 
-			if (iter != std::end(this->container_))
+			if (found)
 			{
-				key_count = 1;
+				++key_count;
 
 				for (; ++iter != std::end(this->container_);)
 				{
-					if (flat_associative_adaptor::detail::value_compare<
-						flat_associative_adaptor::detail::compare_equal<key_compare>>{}(
-							flat_associative_adaptor::detail::extract_key(*iter), key))
-								++key_count;
+					if (!value_compare{}(*iter, key) && !value_compare{}(key, *iter))
+						++key_count;
 					else
 						break;
 				}
@@ -392,7 +345,7 @@ namespace ion::adaptors
 			auto [iter, found] =
 				flat_associative_adaptor::detail::find(
 					std::begin(this->container_), std::end(this->container_),
-					key, key_compare{});
+					key, value_compare{});
 
 			return found ?
 				typename my_base::iterator{iter} :
@@ -415,7 +368,7 @@ namespace ion::adaptors
 			auto [iter, found] =
 				flat_associative_adaptor::detail::find(
 					std::begin(this->container_), std::end(this->container_),
-					key, key_compare{});
+					key, value_compare{});
 
 			return found ?
 				typename my_base::const_iterator{iter} :
@@ -490,7 +443,7 @@ namespace ion::adaptors
 			return typename my_base::iterator{
 				flat_associative_adaptor::detail::lower_bound(
 					std::begin(this->container_), std::end(this->container_),
-					key, key_compare{})};
+					key, value_compare{})};
 		}
 
 		//Returns the lower bound of the given key
@@ -509,7 +462,7 @@ namespace ion::adaptors
 			return typename my_base::const_iterator{
 				flat_associative_adaptor::detail::lower_bound(
 					std::begin(this->container_), std::end(this->container_),
-					key, key_compare{})};
+					key, value_compare{})};
 		}
 
 
@@ -529,7 +482,7 @@ namespace ion::adaptors
 			return typename my_base::iterator{
 				flat_associative_adaptor::detail::upper_bound(
 					std::begin(this->container_), std::end(this->container_),
-					key, key_compare{})};
+					key, value_compare{})};
 		}
 
 		//Returns the upper bound of the given key
@@ -548,7 +501,7 @@ namespace ion::adaptors
 			return typename my_base::const_iterator{
 				flat_associative_adaptor::detail::upper_bound(
 					std::begin(this->container_), std::end(this->container_),
-					key, key_compare{})};
+					key, value_compare{})};
 		}
 
 
@@ -577,7 +530,7 @@ namespace ion::adaptors
 			auto [iter, found] =
 				flat_associative_adaptor::detail::find(
 					std::begin(this->container_), std::end(this->container_),
-					flat_associative_adaptor::detail::extract_key(value), key_compare{});
+					flat_associative_adaptor::detail::extract_key<key_type>(value), value_compare{});
 
 			//Not found, insert
 			if (!found)
@@ -592,7 +545,7 @@ namespace ion::adaptors
 			auto [iter, found] =
 				flat_associative_adaptor::detail::find(
 					std::begin(this->container_), std::end(this->container_),
-					flat_associative_adaptor::detail::extract_key(value), key_compare{});
+					flat_associative_adaptor::detail::extract_key<key_type>(value), value_compare{});
 
 			//Not found, insert
 			if (!found)
@@ -608,7 +561,7 @@ namespace ion::adaptors
 				flat_associative_adaptor::detail::find_with_hint(
 					typename my_base::container_type::iterator{hint},
 					std::begin(this->container_), std::end(this->container_),
-					flat_associative_adaptor::detail::extract_key(value), key_compare{});
+					flat_associative_adaptor::detail::extract_key<key_type>(value), value_compare{});
 
 			//Not found, insert
 			if (!found)
@@ -624,7 +577,7 @@ namespace ion::adaptors
 				flat_associative_adaptor::detail::find_with_hint(
 					typename my_base::container_type::iterator{hint},
 					std::begin(this->container_), std::end(this->container_),
-					flat_associative_adaptor::detail::extract_key(value), key_compare{});
+					flat_associative_adaptor::detail::extract_key<key_type>(value), value_compare{});
 
 			//Not found, insert
 			if (!found)
@@ -654,7 +607,7 @@ namespace ion::adaptors
 				std::end(this->container_),
 				std::begin(container), std::end(container));
 			flat_associative_adaptor::detail::merge_added(
-				this->container_, std::begin(this->container_) + size, key_compare{});
+				this->container_, std::begin(this->container_) + size, value_compare{});
 
 			return size < std::size(this->container_);
 		}
@@ -670,7 +623,7 @@ namespace ion::adaptors
 				std::make_move_iterator(std::begin(container)),
 				std::make_move_iterator(std::end(container)));
 			flat_associative_adaptor::detail::merge_added(
-				this->container_, std::begin(this->container_) + size, key_compare{});
+				this->container_, std::begin(this->container_) + size, value_compare{});
 
 			return size < std::size(this->container_);
 		}
@@ -699,7 +652,7 @@ namespace ion::adaptors
 		{
 			auto [iter, found] =
 				flat_associative_adaptor::detail::find(std::begin(this->container_), std::end(this->container_),
-													   key, key_compare{});
+													   key, value_compare{});
 
 			//Found, erase
 			if (found)

@@ -54,6 +54,9 @@ std::string compile_error_category_impl::message(int error_value) const
 
 
 		//Identifier
+		case CompileErrorCode::MissingIdentifier:
+		return "A missing identifier detected";
+
 		case CompileErrorCode::UnexpectedIdentifier:
 		return "An unexpected identifier found";
 
