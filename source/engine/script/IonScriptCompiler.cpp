@@ -1824,10 +1824,10 @@ std::pair<bool, int> is_matching(string_views::const_iterator first_selector_cla
 	return {count == last_selector_class - first_selector_class - select_all, count};
 }
 
-void append_matching_templates(const script_tree::detail::generation &chart,
+void append_matching_templates(const script_tree::detail::generations &descendants,
 	template_rules::const_iterator first, template_rules::const_iterator last)
 {
-	auto &object = *chart.siblings.back();
+	auto &object = *descendants.back().back();
 	auto is_template = is_selector_identifier(object.Name());
 	auto classes = get_classes(object);
 
@@ -1845,7 +1845,8 @@ void append_matching_templates(const script_tree::detail::generation &chart,
 		{		
 			auto group_matching = true;
 			auto group_specificity = 0;
-			auto position = std::pair{&chart, std::size(chart.siblings) - 1};
+			auto position = std::pair{std::size(descendants) - 1,
+									  std::size(descendants.back()) - 1};
 			
 			auto iter = std::rbegin(group.combinators); //Right to left
 			auto end = std::rend(group.combinators);
@@ -1878,11 +1879,12 @@ void append_matching_templates(const script_tree::detail::generation &chart,
 								case '>':
 								{
 									//Has ancestor
-									if (!std::empty(position.first->ancestors))
+									if (position.first > 0)
 									{
-										position.first = &position.first->ancestors.back();
-										position.second = std::size(position.first->siblings) - 1;
-										return is_matching(first_selector_class, last_selector_class, get_classes(*position.first->siblings[position.second]));
+										--position.first;
+										position.second = std::size(descendants[position.first]) - 1;
+										return is_matching(first_selector_class, last_selector_class,
+											get_classes(*descendants[position.first][position.second]));
 									}
 									else
 										break;
@@ -1896,10 +1898,11 @@ void append_matching_templates(const script_tree::detail::generation &chart,
 										--position.second;
 
 										//Break if preceding sibling is not the same identifier category
-										if (is_template != is_selector_identifier(position.first->siblings[position.second]->Name()))
+										if (is_template != is_selector_identifier(descendants[position.first][position.second]->Name()))
 											break;
 
-										return is_matching(first_selector_class, last_selector_class, get_classes(*position.first->siblings[position.second]));
+										return is_matching(first_selector_class, last_selector_class,
+											get_classes(*descendants[position.first][position.second]));
 									}
 									else
 										break;
@@ -1913,10 +1916,11 @@ void append_matching_templates(const script_tree::detail::generation &chart,
 										--position.second;
 										
 										//Break if preceding sibling is not the same identifier category
-										if (is_template != is_selector_identifier(position.first->siblings[position.second]->Name()))
+										if (is_template != is_selector_identifier(descendants[position.first][position.second]->Name()))
 											break;
 
-										if (auto result = is_matching(first_selector_class, last_selector_class, get_classes(*position.first->siblings[position.second])); result.first)
+										if (auto result = is_matching(first_selector_class, last_selector_class,
+											get_classes(*descendants[position.first][position.second])); result.first)
 											return result;
 									}
 
@@ -1926,12 +1930,13 @@ void append_matching_templates(const script_tree::detail::generation &chart,
 								default: //' '
 								{
 									//Has ancestor
-									while (!std::empty(position.first->ancestors))
+									while (position.first > 0)
 									{
-										position.first = &position.first->ancestors.back();
-										position.second = std::size(position.first->siblings) - 1;
+										--position.first;
+										position.second = std::size(descendants[position.first]) - 1;
 
-										if (auto result = is_matching(first_selector_class, last_selector_class, get_classes(*position.first->siblings[position.second])); result.first)
+										if (auto result = is_matching(first_selector_class, last_selector_class,
+											get_classes(*descendants[position.first][position.second])); result.first)
 										{
 											//Make restore point
 											restore_point = snapshot{
@@ -2009,20 +2014,20 @@ void inherit(script_tree::ObjectNodes &objects, template_rules &templates)
 	{
 		auto available_templates = 0;
 
-		for (auto &chart : script_tree::detail::generational_depth_first_search(objects))
+		for (auto &descendants : script_tree::detail::lineage_depth_first_search(objects))
 		{
 			//Global scope
-			if (std::empty(chart.ancestors) && //Make template previously added visible
+			if (std::size(descendants) == 1 && //Make template previously added visible
 				available_templates < static_cast<int>(std::size(templates)) &&
 				templates[available_templates].object)
 				++available_templates;
 
 			//Do pattern matching against visible templates
 			if (available_templates > 0)
-				append_matching_templates(chart, std::begin(templates), std::begin(templates) + available_templates);
+				append_matching_templates(descendants, std::begin(templates), std::begin(templates) + available_templates);
 
 			//Add template (invisible for now)
-			if (auto object = chart.siblings.back(); is_selector_identifier(object->Name()))
+			if (auto object = descendants.back().back(); is_selector_identifier(object->Name()))
 				templates[available_templates].object = object;
 		}
 

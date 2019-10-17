@@ -433,35 +433,37 @@ std::string fully_qualified_name(const ObjectNodes &objects, const ObjectNode &w
 }
 
 
-void generational_depth_first_search_impl(generations &chart, generation gen, ObjectNode &object)
+void lineage_depth_first_search_impl(lineage_search_result &result, generations &descendants, ObjectNode &object)
 {
-	chart.push_back(gen);
+	result.push_back(descendants);
 
 	if (!std::empty(object.Objects()))
 	{
-		auto siblings = std::move(gen.siblings);
-        gen.ancestors.emplace_back(gen).siblings = std::move(siblings); //Add previous generation as next ancestor
+		descendants.emplace_back(); //Add next generation
 
 		for (auto &sibling : object.Objects())
-        {
-            gen.siblings.push_back(&sibling);
-			generational_depth_first_search_impl(chart, gen, sibling);
-        }
+		{
+			descendants.back().push_back(&sibling);
+			lineage_depth_first_search_impl(result, descendants, sibling);
+		}
+
+		descendants.pop_back();
 	}
 }
 
-generations generational_depth_first_search(ObjectNodes &objects)
+lineage_search_result lineage_depth_first_search(ObjectNodes &objects)
 {
-	generations chart;
-	generation gen;
+	lineage_search_result result;
+	generations descendants;
+	descendants.emplace_back(); //Add next generation
 
 	for (auto &sibling : objects)
 	{
-		gen.siblings.push_back(&sibling);
-		generational_depth_first_search_impl(chart, gen, sibling);
+		descendants.back().push_back(&sibling);
+		lineage_depth_first_search_impl(result, descendants, sibling);
 	}
 
-	return chart;
+	return result;
 }
 
 } //detail

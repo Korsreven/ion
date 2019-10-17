@@ -104,14 +104,9 @@ namespace ion::script
 
 			using search_result = std::vector<tree_node>;
 
-			struct generation;
+			using generation = std::vector<ObjectNode*>;
 			using generations = std::vector<generation>;
-
-			struct generation
-			{
-				std::vector<ObjectNode*> siblings;
-				generations ancestors;
-			};
+			using lineage_search_result = std::vector<generations>;
 
 
 			template <typename T>
@@ -331,8 +326,8 @@ namespace ion::script
 			search_result depth_first_search(const ObjectNodes &objects, DepthFirstSearchTraversal traversal);
 			std::string fully_qualified_name(const ObjectNodes &objects, const ObjectNode &what_object);
 
-			void generational_depth_first_search_impl(generations &chart, generation gen, ObjectNode &object);
-			generations generational_depth_first_search(ObjectNodes &objects);
+			void lineage_depth_first_search_impl(lineage_search_result &result, generations &descendants, ObjectNode &object);
+			lineage_search_result lineage_depth_first_search(ObjectNodes &objects);
 		} //detail
 
 

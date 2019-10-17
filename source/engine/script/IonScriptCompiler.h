@@ -514,7 +514,7 @@ namespace ion::script
 
 			std::pair<bool, int> is_matching(string_views::const_iterator first_selector_class,
 				string_views::const_iterator last_selector_class, const string_views &classes) noexcept;
-			void append_matching_templates(const script_tree::detail::generation &chart,
+			void append_matching_templates(const script_tree::detail::generations &descendants,
 				template_rules::const_iterator first, template_rules::const_iterator last);
 
 			void inherit(script_tree::ObjectNodes &objects, template_rules &templates);
