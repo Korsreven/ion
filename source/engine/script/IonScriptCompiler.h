@@ -237,9 +237,9 @@ namespace ion::script
 				//Unroll all true cases
 				switch (c)
 				{
-					case '.':
-					case '#':
-					case '*':
+					case '.': //Class
+					case '#': //Id
+					case '*': //Both
 					return true;
 
 					default:
@@ -247,7 +247,23 @@ namespace ion::script
 				}
 			}
 
-			constexpr auto is_selector_identifier(std::string_view str) noexcept
+			constexpr auto is_combinator_selector(char c) noexcept
+			{
+				//Unroll all true cases
+				switch (c)
+				{
+					case ',': //Both
+					case '>': //Child
+					case '+': //Adjacent sibling
+					case '~': //General sibling
+					return true;
+
+					default:
+					return false;
+				}
+			}
+
+			constexpr auto is_class_identifier(std::string_view str) noexcept
 			{
 				return is_class_selector(str.front());
 			}
@@ -324,21 +340,7 @@ namespace ion::script
 
 			constexpr auto is_selector(char c) noexcept
 			{
-				//Unroll all true cases
-				switch (c)
-				{
-					case '.': //Class
-					case '#': //Id		
-					case ',': //Both
-					case '>': //Child
-					case '+': //Adjacent sibling
-					case '~': //General sibling
-					case '*': //All
-					return true;
-
-					default:
-					return false;
-				}
+				return is_class_selector(c) || is_combinator_selector(c);
 			}
 
 			constexpr auto is_separator(char c) noexcept

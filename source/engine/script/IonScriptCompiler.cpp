@@ -319,7 +319,7 @@ std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, buil
 			//For global scope only
 			if (scope_depth == 0 && !std::empty(tokens) &&		
 				tokens.back().name == token_name::Identifier &&
-				is_selector_identifier(tokens.back().value) &&
+				is_class_identifier(tokens.back().value) &&
 				is_class_selector(next_c))
 					token.name = token_name::Selector; //Descendant selector
 		}
@@ -329,7 +329,7 @@ std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, buil
 			token = {token_name::Selector, str.substr(off, 1), &unit, line_number};
 
 			if (token.value.front() == '*')
-				token.name = token_name::Identifier; //Change to selector identifier
+				token.name = token_name::Identifier; //Change to class identifier
 		}
 		//Separator
 		else if (is_separator(c))
@@ -491,7 +491,7 @@ bool check_identifier_syntax(lexical_token &token, syntax_context &context, Comp
 		error = {CompileErrorCode::UnexpectedIdentifier, token.unit->file_path, token.line_number};
 		return false;
 	}
-	else if (!is_selector_identifier(token.value) && //Object/property
+	else if (!is_class_identifier(token.value) && //Object/property
 			!context.inside_property && //Not enum
 
 			//Not
@@ -507,27 +507,27 @@ bool check_identifier_syntax(lexical_token &token, syntax_context &context, Comp
 		error = {CompileErrorCode::UnexpectedIdentifier, token.unit->file_path, token.line_number};
 		return false;
 	}
-	else if (is_selector_identifier(token.value) && //Template
-
+	else if (is_class_identifier(token.value) && //Class
+				
 			//Not
 			!(context.next_token &&
 
-			//template {	
+			//class {	
 			((context.next_token->name == token_name::Separator &&
 				(context.next_token->value.front() == ':' || context.next_token->value.front() == '{')) ||
-			//template "classes"
+			//class "classes"
 			context.next_token->name == token_name::StringLiteral ||		
-			//template <selector>
+			//class <combinator>
 			context.next_token->name == token_name::Selector ||
-			//template <template>
-			(context.next_token->name == token_name::Identifier && is_selector_identifier(context.next_token->value)))))
+			//class <class>
+			(context.next_token->name == token_name::Identifier && is_class_identifier(context.next_token->value)))))
 	{
 		error = {CompileErrorCode::UnexpectedIdentifier, token.unit->file_path, token.line_number};
 		return false;
 	}
 
 	context.inside_template_signature =
-		is_selector_identifier(token.value);
+		is_class_identifier(token.value);
 
 	context.inside_object_signature =
 		!context.inside_template_signature &&
@@ -716,43 +716,32 @@ bool check_rule_syntax(lexical_token &token, syntax_context &context, CompileErr
 
 bool check_selector_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept
 {
-	switch (token.value.front())
+	//Class selectors, isolated (not appended to an identifier)
+	if (is_class_selector(token.value.front()))
 	{
-		//Class and id selectors, isolated (not appended to an identifier)
-		case '.':
-		case '#':
-		case '*':
+		error = {CompileErrorCode::MissingIdentifier, token.unit->file_path, token.line_number};
+		return false;
+	}
+	else //Combinator selectors including descendant (whitespace)
+	{
+		if (!( //Not
+			//Left hand operand
+			context.previous_token &&
+			context.previous_token->name == token_name::Identifier &&
+			is_class_identifier(context.previous_token->value)))
 		{
-			error = {CompileErrorCode::MissingIdentifier, token.unit->file_path, token.line_number};
+			error = {CompileErrorCode::InvalidLeftOperand, token.unit->file_path, token.line_number};
 			return false;
 		}
-
-		//Combinator selectors
-		case ',':
-		case '>':
-		case '+':
-		case '~':
-		default: //Descendant selector (white space)
+		
+		else if (!( //Not
+				//Right hand operand
+				context.next_token &&
+				context.next_token->name == token_name::Identifier &&
+				is_class_identifier(context.next_token->value)))
 		{
-			if (!( //Not
-				//Left hand operand
-				context.previous_token &&
-				context.previous_token->name == token_name::Identifier &&
-				is_selector_identifier(context.previous_token->value)))
-			{
-				error = {CompileErrorCode::InvalidLeftOperand, token.unit->file_path, token.line_number};
-				return false;
-			}
-			
-			else if (!( //Not
-					//Right hand operand
-					context.next_token &&
-					context.next_token->name == token_name::Identifier &&
-					is_selector_identifier(context.next_token->value)))
-			{
-				error = {CompileErrorCode::InvalidRightOperand, token.unit->file_path, token.line_number};
-				return false;
-			}
+			error = {CompileErrorCode::InvalidRightOperand, token.unit->file_path, token.line_number};
+			return false;
 		}
 	}
 
@@ -1345,7 +1334,7 @@ bool parse_identifier(lexical_token &token, parse_context &context, CompileError
 	{
 		context.identifier_token = &token;
 
-		if (is_selector_identifier(token.value))
+		if (is_class_identifier(token.value))
 		{
 			//First identifier in selector group
 			if (std::empty(context.selectors))
@@ -1543,7 +1532,7 @@ bool parse_separator(lexical_token &token, parse_context &context, CompileError 
 				auto classes = split_classes(context.classes);
 
 				//Erase explicit object name (if any) in classes (is implicit)
-				if (!is_selector_identifier(context.identifier_token->value))
+				if (!is_class_identifier(context.identifier_token->value))
 					classes.erase(context.identifier_token->value);
 
 				context.scopes[context.scope_depth].classes = join_classes(classes);
@@ -1551,7 +1540,7 @@ bool parse_separator(lexical_token &token, parse_context &context, CompileError 
 			}
 
 			//Template
-			if (is_selector_identifier(context.identifier_token->value))
+			if (is_class_identifier(context.identifier_token->value))
 			{
 				for (auto &selector_class : context.selector_classes)
 					context.selectors.back().classes.push_back(selector_class);
@@ -1797,7 +1786,7 @@ string_views get_classes(script_tree::ObjectNode &object)
 	}
 
 	//Add object name as class
-	if (!is_selector_identifier(name))
+	if (!is_class_identifier(name))
 		result.insert( //Result should be small, use linear search to find insertion point
 			std::find_if(std::begin(result), std::end(result),
 				[&](const auto &str) noexcept
@@ -1828,7 +1817,7 @@ void append_matching_templates(const script_tree::detail::generations &descendan
 	template_rules::const_iterator first, template_rules::const_iterator last)
 {
 	auto &object = *descendants.back().back();
-	auto is_template = is_selector_identifier(object.Name());
+	auto is_template = is_class_identifier(object.Name());
 	auto classes = get_classes(object);
 
 	if (std::empty(classes))
@@ -1898,7 +1887,7 @@ void append_matching_templates(const script_tree::detail::generations &descendan
 										--position.second;
 
 										//Break if preceding sibling is not the same identifier category
-										if (is_template != is_selector_identifier(descendants[position.first][position.second]->Name()))
+										if (is_template != is_class_identifier(descendants[position.first][position.second]->Name()))
 											break;
 
 										return is_matching(first_selector_class, last_selector_class,
@@ -1916,7 +1905,7 @@ void append_matching_templates(const script_tree::detail::generations &descendan
 										--position.second;
 										
 										//Break if preceding sibling is not the same identifier category
-										if (is_template != is_selector_identifier(descendants[position.first][position.second]->Name()))
+										if (is_template != is_class_identifier(descendants[position.first][position.second]->Name()))
 											break;
 
 										if (auto result = is_matching(first_selector_class, last_selector_class,
@@ -2027,7 +2016,7 @@ void inherit(script_tree::ObjectNodes &objects, template_rules &templates)
 				append_matching_templates(descendants, std::begin(templates), std::begin(templates) + available_templates);
 
 			//Add template (invisible for now)
-			if (auto object = descendants.back().back(); is_selector_identifier(object->Name()))
+			if (auto object = descendants.back().back(); is_class_identifier(object->Name()))
 				templates[available_templates].object = object;
 		}
 
@@ -2036,7 +2025,7 @@ void inherit(script_tree::ObjectNodes &objects, template_rules &templates)
 			std::remove_if(std::begin(objects), std::end(objects),
 				[](auto &object) noexcept
 				{
-					return is_selector_identifier(object.Name());
+					return is_class_identifier(object.Name());
 				}), std::end(objects));
 	}
 }
