@@ -301,6 +301,7 @@ std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, buil
 	auto line_number = 1;
 	
 	auto inside_import = false;
+	auto inside_declaration = false;
 	auto import_argument = ""sv;
 	auto scope_depth = 0;
 
@@ -324,7 +325,7 @@ std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, buil
 					token.name = token_name::Selector; //Descendant selector
 		}
 		//Selector
-		else if (is_selector(c) && scope_depth == 0) //For global scope only
+		else if (is_selector(c) && scope_depth == 0 && !inside_declaration) //For global scope only
 		{
 			token = {token_name::Selector, str.substr(off, 1), &unit, line_number};
 
@@ -369,10 +370,10 @@ std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, buil
 						return token_name::Identifier;
 				}(), lexeme, &unit, line_number};
 
-			//Expand token to engulf class selector
-			if (token.name == token_name::Identifier &&
-				!std::empty(tokens) && tokens.back().name == token_name::Selector &&
-				is_class_selector(tokens.back().value.front()))
+			//Expand token to engulf class selector/variable prefix
+			if (token.name == token_name::Identifier && !std::empty(tokens) &&
+				((tokens.back().name == token_name::Selector && is_class_selector(tokens.back().value.front())) ||
+				(tokens.back().name == token_name::UnknownSymbol && is_variable_prefix(tokens.back().value.front()))))
 			{			
 				token.value = str.substr(off - 1, std::size(lexeme) + 1); //Append class selector to identifier token
 				tokens.pop_back(); //Remove class selector
@@ -401,10 +402,29 @@ std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, buil
 		//For selectors (scope aware)
 		if (token.name == token_name::Separator)
 		{
-			if (token.value.front() == '{')
+			switch (token.value.front())
+			{
+				case '{':
+				case '(':
 				++scope_depth;
-			else if (token.value.front() == '}' && scope_depth > 0)
-				--scope_depth;
+				break;
+
+				case '}':
+				case ')':
+				{
+					if (scope_depth > 0)
+						--scope_depth;
+					break;
+				}
+
+				case ':':
+				inside_declaration = true;
+				break;
+
+				case ';':
+				inside_declaration = false;
+				break;
+			}
 		}
 
 
@@ -461,7 +481,7 @@ std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, buil
 
 bool check_function_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept
 {
-	if (!context.inside_property)
+	if (!context.inside_property && !context.inside_variable)
 	{
 		error = {CompileErrorCode::UnexpectedFunction, token.unit->file_path, token.line_number};
 		return false;
@@ -491,13 +511,32 @@ bool check_identifier_syntax(lexical_token &token, syntax_context &context, Comp
 		error = {CompileErrorCode::UnexpectedIdentifier, token.unit->file_path, token.line_number};
 		return false;
 	}
+	else if (is_variable_identifier(token.value)) //Variable
+	{
+		//Declaration
+		//$var:
+		if (context.next_token && context.next_token->name == token_name::Separator && context.next_token->value.front() == ':')
+		{
+			if (context.inside_property || context.inside_variable)
+			{
+				error = {CompileErrorCode::UnexpectedVariableDeclaration, token.unit->file_path, token.line_number};
+				return false;
+			}
+		}
+		//$var
+		else if (!context.inside_property && !context.inside_variable)
+		{
+			error = {CompileErrorCode::UnexpectedIdentifier, token.unit->file_path, token.line_number};
+			return false;
+		}
+	}
 	else if (!is_class_identifier(token.value) && //Object/property
-			!context.inside_property && //Not enum
+			!context.inside_property && !context.inside_variable && //Not enumerable
 
 			//Not
 			!(context.next_token &&
 
-			//property :
+			//property:
 			//object {	
 			((context.next_token->name == token_name::Separator &&
 				(context.next_token->value.front() == ':' || context.next_token->value.front() == '{')) ||
@@ -508,13 +547,12 @@ bool check_identifier_syntax(lexical_token &token, syntax_context &context, Comp
 		return false;
 	}
 	else if (is_class_identifier(token.value) && //Class
-				
+			
 			//Not
 			!(context.next_token &&
 
 			//class {	
-			((context.next_token->name == token_name::Separator &&
-				(context.next_token->value.front() == ':' || context.next_token->value.front() == '{')) ||
+			((context.next_token->name == token_name::Separator && context.next_token->value.front() == '{') ||
 			//class "classes"
 			context.next_token->name == token_name::StringLiteral ||		
 			//class <combinator>
@@ -532,6 +570,7 @@ bool check_identifier_syntax(lexical_token &token, syntax_context &context, Comp
 	context.inside_object_signature =
 		!context.inside_template_signature &&
 		!context.inside_property &&
+		!context.inside_variable &&
 		!(context.next_token &&
 			context.next_token->name == token_name::Separator &&
 			context.next_token->value.front() == ':');
@@ -550,7 +589,8 @@ bool check_literal_syntax(lexical_token &token, syntax_context &context, Compile
 			return false;
 		}
 		else if (!context.inside_import && !context.inside_object_signature &&
-				 !context.inside_template_signature && !context.inside_property)
+				 !context.inside_template_signature && !context.inside_property &&
+				 !context.inside_variable)
 		{
 			error = {CompileErrorCode::UnexpectedLiteral, token.unit->file_path, token.line_number};
 			return false;
@@ -561,7 +601,7 @@ bool check_literal_syntax(lexical_token &token, syntax_context &context, Compile
 				context.next_token->name != token_name::Separator ||
 				context.next_token->value.front() != ';'))
 		{
-			error = {CompileErrorCode::InvalidImportStatement, token.unit->file_path, token.line_number};
+			error = {CompileErrorCode::MissingSemicolon, token.unit->file_path, token.line_number};
 			return false;
 		}
 		//"classes" {
@@ -576,7 +616,7 @@ bool check_literal_syntax(lexical_token &token, syntax_context &context, Compile
 	}
 	else
 	{
-		if (!context.inside_property)
+		if (!context.inside_property && !context.inside_variable)
 		{
 			error = {CompileErrorCode::UnexpectedLiteral, token.unit->file_path, token.line_number};
 			return false;
@@ -601,7 +641,7 @@ bool check_literal_syntax(lexical_token &token, syntax_context &context, Compile
 
 bool check_operator_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept
 {
-	if (!context.inside_property)
+	if (!context.inside_property && !context.inside_variable)
 	{
 		error = {CompileErrorCode::UnexpectedOperator, token.unit->file_path, token.line_number};
 		return false;
@@ -702,13 +742,19 @@ bool check_rule_syntax(lexical_token &token, syntax_context &context, CompileErr
 			return false;
 		}
 		//@import "argument"
-		else if (context.next_token->name != token_name::StringLiteral)
+		else if (!context.next_token ||
+				context.next_token->name != token_name::StringLiteral)
 		{
 			error = {CompileErrorCode::InvalidImportStatement, token.unit->file_path, token.line_number};
 			return false;
 		}
 
 		context.inside_import = true;
+	}
+	else
+	{
+		error = {CompileErrorCode::InvalidRule, token.unit->file_path, token.line_number};
+		return false;
 	}
 
 	return true;
@@ -754,24 +800,26 @@ bool check_separator_syntax(lexical_token &token, syntax_context &context, Compi
 	{
 		case ':':
 		{
-			if (context.curly_brace_depth == 0)
+			if (context.curly_brace_depth == 0 &&
+				(!context.previous_token || !is_variable_identifier(context.previous_token->value)))
 			{
 				error = {CompileErrorCode::UnexpectedColon, token.unit->file_path, token.line_number};
 				return false;
 			}
-			else if (context.inside_property)
+			else if (context.inside_property || context.inside_variable)
 			{
 				error = {CompileErrorCode::UnexpectedColon, token.unit->file_path, token.line_number};
 				return false;
 			}
 
-			context.inside_property = true;
+			context.inside_variable = is_variable_identifier(context.previous_token->value);
+			context.inside_property = !context.inside_variable;
 			break;
 		}
 
 		case ';':
 		{
-			if (!context.inside_property && !context.inside_import)
+			if (!context.inside_import && !context.inside_property && !context.inside_variable)
 			{
 				error = {CompileErrorCode::UnexpectedSemicolon, token.unit->file_path, token.line_number};
 				return false;
@@ -781,9 +829,17 @@ bool check_separator_syntax(lexical_token &token, syntax_context &context, Compi
 				error = {CompileErrorCode::MissingCloseParenthesis, token.unit->file_path, token.line_number};
 				return false;
 			}
+			else if (context.previous_token &&
+					 context.previous_token->name == token_name::Separator &&
+					 context.previous_token->value.front() == ':')
+			{
+				error = {CompileErrorCode::UnexpectedSemicolon, token.unit->file_path, token.line_number};
+				return false;
+			}
 
 			context.inside_import = false;
 			context.inside_property = false;
+			context.inside_variable = false;
 			break;
 		}
 
@@ -803,7 +859,7 @@ bool check_separator_syntax(lexical_token &token, syntax_context &context, Compi
 
 		case '}':
 		{
-			if (context.inside_property)
+			if (context.inside_property || context.inside_variable)
 			{
 				error = {CompileErrorCode::UnexpectedCloseCurlyBrace, token.unit->file_path, token.line_number};
 				return false;
@@ -897,6 +953,25 @@ bool check_unit_syntax(lexical_token &token, syntax_context&, CompileError &erro
 	return true;
 }
 
+bool check_unknown_symbol_syntax(lexical_token &token, syntax_context&, CompileError &error) noexcept
+{
+	//More specialized message
+	if (is_selector(token.value.front()))
+	{
+		error = {CompileErrorCode::UnexpectedSelector, token.unit->file_path, token.line_number};
+		return false;
+	}
+	else if (is_variable_prefix(token.value.front()))
+	{
+		error = {CompileErrorCode::MissingIdentifier, token.unit->file_path, token.line_number};
+		return false;
+	}
+
+	//Default message
+	error = {CompileErrorCode::UnknownSymbol, token.unit->file_path, token.line_number};
+	return false;
+}
+
 bool check_syntax(lexical_tokens &tokens, CompileError &error) noexcept
 {
 	syntax_context context;
@@ -977,8 +1052,10 @@ bool check_syntax(lexical_tokens &tokens, CompileError &error) noexcept
 			//Unknown symbol
 			case token_name::UnknownSymbol:
 			{
-				error = {CompileErrorCode::UnknownSymbol, token.unit->file_path, token.line_number};
-				return false;
+				if (!check_unknown_symbol_syntax(token, context, error))
+					return false;
+
+				break;
 			}
 
 			//Literal
@@ -989,8 +1066,13 @@ bool check_syntax(lexical_tokens &tokens, CompileError &error) noexcept
 			}
 		}
 	}
-
-	if (context.curly_brace_depth > 0)
+	
+	if (context.inside_property || context.inside_variable)
+	{
+		error = {CompileErrorCode::MissingSemicolon, tokens.back().unit->file_path, tokens.back().line_number};
+		return false;
+	}
+	else if (context.curly_brace_depth > 0)
 	{
 		error = {CompileErrorCode::MissingCloseCurlyBrace, tokens.back().unit->file_path, tokens.back().line_number};
 		return false;
@@ -1309,26 +1391,69 @@ bool parse_function(lexical_token &token, parse_context &context, CompileError&)
 	return true;
 }
 
-bool parse_identifier(lexical_token &token, parse_context &context, CompileError&)
+bool parse_identifier(lexical_token &token, parse_context &context, CompileError &error)
 {
-	//Function or property argument
-	if (context.function_token || context.property_token)
+	//Function, property or variable argument
+	if (context.function_token || context.property_token || context.variable_token)
 	{
-		auto argument =
-			[&]() noexcept -> script_tree::ArgumentType
-			{
-				if (auto color = utilities::parse::detail::color_name_as_color(token.value); color)
-					return script_tree::ColorArgument{*color};
-				else
-					return script_tree::EnumerableArgument{std::string{token.value}};
-			}();
+		//Variable
+		if (is_variable_identifier(token.value))
+		{
+			auto found = false;
 
-		//Function argument
-		if (context.function_token)
-			context.function_arguments.push_back(std::move(argument));
-		//Property argument
+			//Find variable from inner to outermost scope
+			for (auto scope_depth = std::min(context.scope_depth, static_cast<int>(std::size(context.scopes)) - 1);
+				scope_depth >= 0; --scope_depth)
+			{
+				if (auto iter = context.scopes[scope_depth].variables.find(token.value);
+					iter != std::end(context.scopes[scope_depth].variables))
+				{
+					//Function arguments
+					if (context.function_token)
+						context.function_arguments.insert(std::end(context.function_arguments),
+						std::begin(iter->second), std::end(iter->second));
+					//Property arguments
+					else if (context.property_token)
+						context.property_arguments.insert(std::end(context.property_arguments),
+						std::begin(iter->second), std::end(iter->second));
+					//Variable arguments
+					else if (context.variable_token)
+						context.variable_arguments.insert(std::end(context.variable_arguments),
+						std::begin(iter->second), std::end(iter->second));
+
+					found = true;
+					break;
+				}
+			}
+
+			if (!found)
+			{
+				error = {CompileErrorCode::UndeclaredVariable, token.unit->file_path, token.line_number};
+				return false;
+			}
+		}
+		//Enumerable
 		else
-			context.property_arguments.push_back(std::move(argument));
+		{
+			auto argument =
+				[&]() noexcept -> script_tree::ArgumentType
+				{
+					if (auto color = utilities::parse::detail::color_name_as_color(token.value); color)
+						return script_tree::ColorArgument{*color};
+					else
+						return script_tree::EnumerableArgument{std::string{token.value}};
+				}();
+
+			//Function argument
+			if (context.function_token)
+				context.function_arguments.push_back(std::move(argument));
+			//Property argument
+			else if (context.property_token)
+				context.property_arguments.push_back(std::move(argument));
+			//Variable argument
+			else if (context.variable_token)
+				context.variable_arguments.push_back(std::move(argument));
+		}
 	}
 	else
 	{
@@ -1364,6 +1489,9 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 				//Property argument
 				else if (context.property_token)
 					context.property_arguments.emplace_back(script_tree::BooleanArgument{*result});
+				//Variable argument
+				else if (context.variable_token)
+					context.variable_arguments.emplace_back(script_tree::BooleanArgument{*result});
 			}
 			else
 			{
@@ -1387,6 +1515,9 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 				//Property argument
 				else if (context.property_token)
 					context.property_arguments.emplace_back(script_tree::ColorArgument{*result});
+				//Variable argument
+				else if (context.variable_token)
+					context.variable_arguments.emplace_back(script_tree::ColorArgument{*result});
 			}
 			else
 			{
@@ -1413,6 +1544,9 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 					//Property argument
 					else if (context.property_token)
 						context.property_arguments.emplace_back(script_tree::FloatingPointArgument{context.unary_minus ? -*result : *result});
+					//Variable argument
+					else if (context.variable_token)
+						context.variable_arguments.emplace_back(script_tree::FloatingPointArgument{context.unary_minus ? -*result : *result});
 				}
 				else
 				{
@@ -1433,6 +1567,9 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 					//Property argument
 					else if (context.property_token)
 						context.property_arguments.emplace_back(script_tree::IntegerArgument{context.unary_minus ? -*result : *result});
+					//Variable argument
+					else if (context.variable_token)
+						context.variable_arguments.emplace_back(script_tree::IntegerArgument{context.unary_minus ? -*result : *result});
 				}
 				else
 				{
@@ -1458,6 +1595,9 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 				//Property argument
 				else if (context.property_token)
 					context.property_arguments.emplace_back(script_tree::StringArgument{*result});
+				//Variable argument
+				else if (context.variable_token)
+					context.variable_arguments.emplace_back(script_tree::StringArgument{*result});
 				//Objects/Templates
 				else
 					context.classes = std::move(*result);
@@ -1505,17 +1645,35 @@ bool parse_separator(lexical_token &token, parse_context &context, CompileError 
 	switch (token.value.front())
 	{
 		case ':':
-		context.property_token = context.identifier_token;
-		break;
+		{
+			//Variable
+			if (is_variable_identifier(context.identifier_token->value))
+				context.variable_token = context.identifier_token;
+			//Property
+			else
+				context.property_token = context.identifier_token;
+
+			break;
+		}
 
 		case ';':
 		{
-			//End of property
+			//Property
 			if (context.property_token)
 			{
 				context.scopes[context.scope_depth - 1].properties.emplace_back(
 					std::string{context.property_token->value}, std::move(context.property_arguments));
 				context.property_token = nullptr;
+			}
+			//Variable
+			else if (context.variable_token)
+			{
+				if (context.scope_depth == static_cast<int>(std::size(context.scopes)))
+					context.scopes.emplace_back();
+
+				context.scopes[context.scope_depth].variables[context.variable_token->value] =
+					std::move(context.variable_arguments);
+				context.variable_token = nullptr;
 			}
 
 			break;
@@ -1563,6 +1721,10 @@ bool parse_separator(lexical_token &token, parse_context &context, CompileError 
 				scope.objects.emplace_back(std::string{context.object_tokens.back()->value}, std::move(scope.classes), std::move(scope.properties),
 										   std::move(context.scopes[context.scope_depth].objects));
 
+			//Clear local variable stack
+			if (context.scope_depth < static_cast<int>(std::size(context.scopes)))
+				context.scopes[context.scope_depth].variables.clear();
+
 			context.object_tokens.pop_back();
 			--context.scope_depth;
 
@@ -1581,7 +1743,14 @@ bool parse_separator(lexical_token &token, parse_context &context, CompileError 
 				auto result = call_function(*context.function_token, std::move(context.function_arguments), error);
 
 				if (result)
-					context.property_arguments.emplace_back(std::move(*result));
+				{
+					//Property argument
+					if (context.property_token)
+						context.property_arguments.emplace_back(std::move(*result));
+					//Variable argument
+					else if (context.variable_token)
+						context.variable_arguments.emplace_back(std::move(*result));
+				}
 
 				context.function_token = nullptr;
 			}
@@ -1593,13 +1762,20 @@ bool parse_separator(lexical_token &token, parse_context &context, CompileError 
 
 bool parse_unit(lexical_token &token, parse_context &context, CompileError&) noexcept
 {
-	auto &arguments = context.function_token ?
-		//Function arguments
-		context.function_arguments :
-		//Property arguments
-		context.property_arguments;
+	auto &argument =
+		[&]() noexcept -> script_tree::ArgumentNode&
+		{
+			//Function arguments
+			if (context.function_token)
+				return context.function_arguments.back();
+			//Variable arguments
+			else if (context.variable_token)
+				return context.variable_arguments.back();
+			//Property arguments
+			else
+				return context.property_arguments.back();
+		}();
 
-	auto &argument = arguments.back();
 	argument.Visit(
 		//Integer
 		[&](const script_tree::IntegerArgument &arg) mutable noexcept

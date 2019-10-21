@@ -55,7 +55,11 @@ namespace ion::script
 
 			//Rule
 			InvalidImportStatement,
+			InvalidRule,
 			UnexpectedImportStatement,
+
+			//Selector
+			UnexpectedSelector,
 
 			//Separator
 			EmptyParentheses,
@@ -63,6 +67,7 @@ namespace ion::script
 			MissingOpenCurlyBrace,
 			MissingCloseParenthesis,
 			MissingOpenParenthesis,
+			MissingSemicolon,
 			UnexpectedColon,
 			UnexpectedComma,
 			UnexpectedSemicolon,
@@ -75,6 +80,10 @@ namespace ion::script
 
 			//Unit
 			InvalidUnit,
+
+			//Variable
+			UndeclaredVariable,
+			UnexpectedVariableDeclaration,
 
 			//Unknown symbol
 			UnknownSymbol

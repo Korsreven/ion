@@ -99,8 +99,16 @@ std::string compile_error_category_impl::message(int error_value) const
 		case CompileErrorCode::InvalidImportStatement:
 		return "An invalid import statement found";
 
+		case CompileErrorCode::InvalidRule:
+		return "An invalid rule found";
+
 		case CompileErrorCode::UnexpectedImportStatement:
 		return "An unexpected import statement found";
+
+
+		//Selector
+		case CompileErrorCode::UnexpectedSelector:
+		return "An unexpected selector found";
 
 
 		//Separator
@@ -118,6 +126,9 @@ std::string compile_error_category_impl::message(int error_value) const
 
 		case CompileErrorCode::MissingOpenParenthesis:
 		return "A missing open parenthesis detected";
+
+		case CompileErrorCode::MissingSemicolon:
+		return "A missing semicolon detected";
 
 		case CompileErrorCode::UnexpectedColon:
 		return "An unexpected colon found";
@@ -150,6 +161,14 @@ std::string compile_error_category_impl::message(int error_value) const
 		//Unit
 		case CompileErrorCode::InvalidUnit:
 		return "An invalid unit found";
+
+
+		//Variable
+		case CompileErrorCode::UndeclaredVariable:
+		return "An undeclared variable found";
+
+		case CompileErrorCode::UnexpectedVariableDeclaration:
+		return "An unexpected variable declaration found";
 
 
 		//UnknownSymbol

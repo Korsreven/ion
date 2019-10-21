@@ -103,6 +103,7 @@ namespace ion::script
 			};
 
 			using template_rules = std::vector<template_rule>;
+			using variable_declarations = adaptors::FlatMap<std::string_view, script_tree::ArgumentNodes>;
 
 
 			struct file_trace
@@ -146,9 +147,10 @@ namespace ion::script
 			};
 
 			struct scope
-			{				
+			{
 				script_tree::ObjectNodes objects;
 				script_tree::PropertyNodes properties;
+				variable_declarations variables;
 				std::string classes;
 			};
 
@@ -165,6 +167,7 @@ namespace ion::script
 				bool inside_object_signature = false;
 				bool inside_template_signature = false;
 				bool inside_property = false;
+				bool inside_variable = false;
 				bool inside_function = false;
 				bool inside_calc_function = false;
 			};
@@ -173,18 +176,20 @@ namespace ion::script
 			{
 				std::vector<scope> scopes;
 				script_tree::ArgumentNodes property_arguments;
+				script_tree::ArgumentNodes variable_arguments;
 				script_tree::ArgumentNodes function_arguments;
 
-				std::vector<lexical_token*> object_tokens;		
+				std::vector<lexical_token*> object_tokens;
 				lexical_token *identifier_token = nullptr;
 				lexical_token *property_token = nullptr;
+				lexical_token *variable_token = nullptr;
 				lexical_token *function_token = nullptr;
-				
-				template_rules templates;	
-				selector_groups selectors;
+
+				template_rules templates;
+				selector_groups selectors;	
 				adaptors::FlatSet<std::string_view> selector_classes;
 				std::string classes;
-				
+
 				int scope_depth = 0;
 				bool unary_minus = false;
 			};
@@ -263,9 +268,19 @@ namespace ion::script
 				}
 			}
 
+			constexpr auto is_variable_prefix(char c) noexcept
+			{
+				return c == '$';
+			}
+
 			constexpr auto is_class_identifier(std::string_view str) noexcept
 			{
 				return is_class_selector(str.front());
+			}
+
+			constexpr auto is_variable_identifier(std::string_view str) noexcept
+			{
+				return is_variable_prefix(str.front());
 			}
 
 
@@ -478,6 +493,7 @@ namespace ion::script
 			bool check_selector_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept;
 			bool check_separator_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept;
 			bool check_unit_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept;
+			bool check_unknown_symbol_syntax(lexical_token &token, syntax_context &context, CompileError &error) noexcept;
 
 			bool check_syntax(lexical_tokens &tokens, CompileError &error) noexcept;
 
