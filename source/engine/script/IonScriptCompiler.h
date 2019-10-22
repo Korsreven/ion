@@ -37,8 +37,8 @@ namespace ion::script
 			Nothing,
 			Summary,
 			SummaryWithFiles,
-			SummaryWithAST,
-			SummaryWithFilesAndAST
+			SummaryWithTreeView,
+			SummaryWithFilesAndTreeView
 		};
 
 
@@ -515,7 +515,7 @@ namespace ion::script
 
 			bool parse_function(lexical_token &token, parse_context &context, CompileError &error) noexcept;
 			bool parse_identifier(lexical_token &token, parse_context &context, CompileError &error);
-			bool parse_literal(lexical_token &token, parse_context &context, CompileError &error);
+			bool parse_literal(lexical_token &token, lexical_token *next_token, parse_context &context, CompileError &error);
 			bool parse_unary_operator(lexical_token &token, parse_context &context, CompileError &error) noexcept;
 			bool parse_selector(lexical_token &token, parse_context &context, CompileError &error) noexcept;
 			bool parse_separator(lexical_token &token, parse_context &context, CompileError &error);

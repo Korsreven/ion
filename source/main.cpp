@@ -176,7 +176,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 	//Compile script
 	{
 		ion::script::ScriptCompiler script;
-		script.Output(ion::script::script_compiler::OutputOptions::SummaryWithFilesAndAST,
+		script.Output(ion::script::script_compiler::OutputOptions::SummaryWithFilesAndTreeView,
 					  ion::script::script_tree::PrintOptions::ObjectsWithPropertiesAndArguments);
 
 		ion::script::CompileError compile_error;

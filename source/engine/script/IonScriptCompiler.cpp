@@ -30,6 +30,7 @@ namespace ion::script
 using namespace script_compiler;
 using namespace script_error;
 
+using namespace std::string_literals;
 using namespace std::string_view_literals;
 using namespace types::type_literals;
 
@@ -1472,7 +1473,7 @@ bool parse_identifier(lexical_token &token, parse_context &context, CompileError
 	return true;
 }
 
-bool parse_literal(lexical_token &token, parse_context &context, CompileError &error)
+bool parse_literal(lexical_token &token, lexical_token *next_token, parse_context &context, CompileError &error)
 {
 	switch (token.name)
 	{
@@ -1531,6 +1532,10 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 		//Numeric literal
 		case token_name::NumericLiteral:
 		{
+			auto unit =
+				next_token && next_token->name == token_name::Unit && next_token->value.front() != '%' ?
+				std::string{next_token->value} : ""s;
+
 			//Real
 			if (utilities::parse::detail::parse_as_floating_point(token.value))
 			{
@@ -1540,13 +1545,13 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 				{
 					//Function argument
 					if (context.function_token)
-						context.function_arguments.emplace_back(script_tree::FloatingPointArgument{context.unary_minus ? -*result : *result});
+						context.function_arguments.emplace_back(script_tree::FloatingPointArgument{context.unary_minus ? -*result : *result}, unit);
 					//Property argument
 					else if (context.property_token)
-						context.property_arguments.emplace_back(script_tree::FloatingPointArgument{context.unary_minus ? -*result : *result});
+						context.property_arguments.emplace_back(script_tree::FloatingPointArgument{context.unary_minus ? -*result : *result}, unit);
 					//Variable argument
 					else if (context.variable_token)
-						context.variable_arguments.emplace_back(script_tree::FloatingPointArgument{context.unary_minus ? -*result : *result});
+						context.variable_arguments.emplace_back(script_tree::FloatingPointArgument{context.unary_minus ? -*result : *result}, unit);
 				}
 				else
 				{
@@ -1563,13 +1568,13 @@ bool parse_literal(lexical_token &token, parse_context &context, CompileError &e
 				{
 					//Function argument
 					if (context.function_token)
-						context.function_arguments.emplace_back(script_tree::IntegerArgument{context.unary_minus ? -*result : *result});
+						context.function_arguments.emplace_back(script_tree::IntegerArgument{context.unary_minus ? -*result : *result}, unit);
 					//Property argument
 					else if (context.property_token)
-						context.property_arguments.emplace_back(script_tree::IntegerArgument{context.unary_minus ? -*result : *result});
+						context.property_arguments.emplace_back(script_tree::IntegerArgument{context.unary_minus ? -*result : *result}, unit);
 					//Variable argument
 					else if (context.variable_token)
-						context.variable_arguments.emplace_back(script_tree::IntegerArgument{context.unary_minus ? -*result : *result});
+						context.variable_arguments.emplace_back(script_tree::IntegerArgument{context.unary_minus ? -*result : *result}, unit);
 				}
 				else
 				{
@@ -1836,6 +1841,7 @@ std::optional<ScriptTree> parse(lexical_tokens tokens, build_system &system, Com
 	//Parse and build tree
 	parse_context context;
 	
+	auto off = 0U;
 	for (auto &token : tokens)
 	{
 		switch (token.name)
@@ -1888,7 +1894,8 @@ std::optional<ScriptTree> parse(lexical_tokens tokens, build_system &system, Com
 			case token_name::NumericLiteral:
 			case token_name::StringLiteral:
 			{
-				parse_literal(token, context, token.unit->error);
+				auto next_token = off + 1 < std::size(tokens) ? &tokens[off + 1] : nullptr; //For units
+				parse_literal(token, next_token, context, token.unit->error);
 				break;
 			}
 		}
@@ -1896,6 +1903,8 @@ std::optional<ScriptTree> parse(lexical_tokens tokens, build_system &system, Com
 		//An error has occurred
 		if (token.unit->error)
 			return {};
+
+		++off;
 	}
 
 	if (std::empty(context.scopes))
@@ -2288,8 +2297,8 @@ std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_pat
 			{
 				case script_compiler::OutputOptions::Summary:
 				case script_compiler::OutputOptions::SummaryWithFiles:
-				case script_compiler::OutputOptions::SummaryWithAST:
-				case script_compiler::OutputOptions::SummaryWithFilesAndAST:
+				case script_compiler::OutputOptions::SummaryWithTreeView:
+				case script_compiler::OutputOptions::SummaryWithFilesAndTreeView:
 				{
 					auto output = ion::utilities::string::Concat(
 						file_path.filename().string(), "\n",
@@ -2305,7 +2314,7 @@ std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_pat
 						"Files built - ", std::size(system.units));
 
 					if (output_options_ == script_compiler::OutputOptions::SummaryWithFiles ||
-						output_options_ == script_compiler::OutputOptions::SummaryWithFilesAndAST)
+						output_options_ == script_compiler::OutputOptions::SummaryWithFilesAndTreeView)
 					{
 						output += "\n\n<Files>";
 
@@ -2318,10 +2327,10 @@ std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_pat
 					}
 
 					if (tree &&
-						(output_options_ == script_compiler::OutputOptions::SummaryWithAST ||
-						output_options_ == script_compiler::OutputOptions::SummaryWithFilesAndAST))
+						(output_options_ == script_compiler::OutputOptions::SummaryWithTreeView ||
+						output_options_ == script_compiler::OutputOptions::SummaryWithFilesAndTreeView))
 					{
-						output += "\n\n<AST>";
+						output += "\n\n<Tree view>";
 						output += tree->Print(print_options_);
 					}
 

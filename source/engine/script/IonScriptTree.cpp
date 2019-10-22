@@ -55,6 +55,7 @@ void serialize_argument(const ArgumentNode &argument, std::vector<std::byte> &by
 		{
 			return serialize_argument(arg, bytes);
 		});
+	serialize_value(argument.Unit(), bytes);
 }
 
 void serialize_property(const PropertyNode &property, std::vector<std::byte> &bytes)
@@ -311,9 +312,9 @@ std::string print(const ObjectNodes &objects, PrintOptions print_options)
 									return ion::utilities::string::Concat('{', x, ", ", y, '}');
 								},
 								//Default
-								[](auto &&arg)
+								[&](auto &&arg)
 								{
-									return ion::utilities::convert::ToString(arg.Value());
+									return ion::utilities::convert::ToString(arg.Value()) + argument.Unit();
 								});
 
 							if (--remaining_args > 0)
@@ -530,6 +531,12 @@ PropertyNode::PropertyNode(std::string name, ArgumentNodes arguments) noexcept :
 
 ArgumentNode::ArgumentNode(ArgumentType argument) noexcept :
 	argument_{std::move(argument)}
+{
+	//Empty
+}
+
+ArgumentNode::ArgumentNode(ArgumentType argument, std::string unit) noexcept :
+	argument_{std::move(argument)}, unit_{std::move(unit)}
 {
 	//Empty
 }

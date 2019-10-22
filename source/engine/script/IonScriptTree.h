@@ -233,10 +233,14 @@ namespace ion::script
 				typename T::value_type value;
 				auto bytes_deserialized = deserialize_value(bytes, value);
 
-				if (bytes_deserialized > 0)
-					arguments.emplace_back(T{value});
+				std::string unit;
+				auto unit_bytes_deserialized = bytes_deserialized > 0 ?
+					deserialize_value(bytes.substr(bytes_deserialized), unit) : 0;
 
-				return bytes_deserialized;
+				if (unit_bytes_deserialized > 0)
+					arguments.emplace_back(T{value}, unit);
+
+				return bytes_deserialized + unit_bytes_deserialized;
 			}
 
 
@@ -521,11 +525,15 @@ namespace ion::script
 			private:
 
 				ArgumentType argument_;
+				std::string unit_;
 			
 			public:
 
 				//Constructs a new argument node with the given argument
 				ArgumentNode(ArgumentType argument) noexcept;
+
+				//Constructs a new argument node with the given argument and unit
+				ArgumentNode(ArgumentType argument, std::string unit) noexcept;
 
 
 				/*
@@ -545,6 +553,12 @@ namespace ion::script
 				inline auto Visit(T &&callable, Ts &&...callables) const noexcept
 				{
 					return std::visit(detail::overloaded{std::forward<T>(callable), std::forward<Ts>(callables)...}, argument_);
+				}
+
+				//Returns the unit of this argument
+				[[nodiscard]] inline const auto& Unit() const noexcept
+				{
+					return unit_;
 				}
 		};
 	} //script_tree
