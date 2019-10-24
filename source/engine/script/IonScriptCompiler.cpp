@@ -2304,7 +2304,7 @@ std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_pat
 						file_path.filename().string(), "\n",
 						script_compiler::detail::current_date_time(), "\n\n",
 
-						"<Summary>\n",
+						"[Summary]\n",
 						"Messages - ",
 							!error ?
 							"Build succeeded!" :
@@ -2316,7 +2316,7 @@ std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_pat
 					if (output_options_ == script_compiler::OutputOptions::SummaryWithFiles ||
 						output_options_ == script_compiler::OutputOptions::SummaryWithFilesAndTreeView)
 					{
-						output += "\n\n<Files>";
+						output += "\n\n[Files]";
 
 						for (const auto &unit : system.units)
 							output += ion::utilities::string::Concat(
@@ -2330,7 +2330,7 @@ std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_pat
 						(output_options_ == script_compiler::OutputOptions::SummaryWithTreeView ||
 						output_options_ == script_compiler::OutputOptions::SummaryWithFilesAndTreeView))
 					{
-						output += "\n\n<Tree view>";
+						output += "\n\n[Tree View]";
 						output += tree->Print(print_options_);
 					}
 

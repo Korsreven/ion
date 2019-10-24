@@ -259,7 +259,7 @@ std::string print(const ObjectNodes &objects, PrintOptions print_options)
 	//Print objects
 	for (auto &[object, parent, depth] : depth_first_search(objects, DepthFirstSearchTraversal::PreOrder))
 	{
-		output += "\n" + std::string(depth * 4, ' ') + "[-] " + object.Name();
+		output += "\n" + std::string(depth * 4, ' ') + "+-- " + object.Name();
 
 		if (auto &classes = object.Classes(); !std::empty(classes))
 			output += " \"" + classes + "\"";
@@ -270,7 +270,7 @@ std::string print(const ObjectNodes &objects, PrintOptions print_options)
 			//Print properties
 			for (auto &property : object.Properties())
 			{
-				output += "\n" + std::string(depth * 4 + 1, ' ') + "|-- " + property.Name();
+				output += "\n" + std::string(depth * 4 + 4, ' ') + "|-- " + property.Name();
 
 				if (print_options == PrintOptions::ObjectsWithPropertiesAndArguments)
 				{
