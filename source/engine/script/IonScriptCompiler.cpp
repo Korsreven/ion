@@ -248,7 +248,7 @@ std::pair<std::string_view, int> get_string_literal_lexeme(std::string_view str)
 	auto line_breaks = 0;
 
 	if (auto iter = std::find_if(std::begin(str) + 1, std::end(str),
-		[&, escaped = false](auto c) mutable noexcept
+		[&, escaped = false, escaped_cr = false](auto c) mutable noexcept
 		{
 			//Double or single quote
 			if (c == str.front())
@@ -260,19 +260,27 @@ std::pair<std::string_view, int> get_string_literal_lexeme(std::string_view str)
 			{
 				switch (c)
 				{
-					case '\\':
+					case '\\': //Backslash
 					escaped = !escaped;
-					return false;
+					return (escaped_cr = false);
 
-					case '\n':
+					case '\r': //Carriage return
+					escaped_cr = escaped;
+					break;
+
+					case '\n': //Line feed
 					{
-						if (!escaped)
+						if (!escaped && !escaped_cr)
 							return true;
 						else
 							++line_breaks;
 
-						break;
-					}	
+						[[fallthrough]];
+					}
+					
+					default:
+					escaped_cr = false;
+					break;
 				}
 			}
 

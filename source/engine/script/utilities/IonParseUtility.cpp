@@ -268,6 +268,18 @@ std::optional<std::string> string_literal_as_string(std::string_view str)
 						case '\n': //Consume escaped line feed (multi-line string)
 						break;
 
+						case '\r': //Consume escaped carriage return + line feed (multi-line string)
+						{
+							//CR LF
+							if (iter + 2 != end && *(iter + 2) == '\n')
+							{
+								++iter; //Skip CR
+								break;
+							}
+
+							[[fallthrough]];
+						}
+
 						//Unrecognized character escape sequence
 						default:
 						continue;
