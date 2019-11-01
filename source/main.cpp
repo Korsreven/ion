@@ -185,6 +185,10 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 		//Serialize tree
 		if (compiled_tree)
 		{
+			auto &color_depth = compiled_tree->Search("settings").Find("advanced").Property("color-depth");
+			auto value = color_depth[0].Get<ion::script::script_tree::IntegerArgument>().value_or(8).As<int>();
+			auto break_point = true;
+
 			/*auto component = ion::script::script_validator::ClassDefinition::Create("component")
 				.AddRequiredProperty("name", ion::script::script_validator::ParameterType::String);
 

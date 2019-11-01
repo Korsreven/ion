@@ -347,7 +347,7 @@ bool validate_property(const script_tree::PropertyNode &property, const property
 						match &= arg_iter->Visit(
 							[&](const script_tree::EnumerableArgument &arg) noexcept
 							{
-								return param_iter->HasValue(arg.Value());
+								return param_iter->HasValue(arg.Get());
 							},
 							[](auto&&) noexcept
 							{
@@ -534,7 +534,7 @@ bool validate(const ScriptTree &tree, const ClassDefinition &root, ValidateError
 	std::vector<scope> scopes{{nullptr, root, get_required_classes(root_classes)}};
 	auto next_search_depth = -1;
 
-	for (auto &[object, parent, depth] : tree.DepthFirst())
+	for (auto &[object, parent, depth] : tree.DepthFirstSearch())
 	{
 		if (next_search_depth >= 0)
 		{

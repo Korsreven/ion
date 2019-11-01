@@ -29,20 +29,6 @@ namespace detail
 using namespace std::string_literals;
 using namespace types::type_literals;
 
-tree_node::tree_node(const ObjectNode &object) :
-	Object{object}
-{
-	//Empty
-}
-
-tree_node::tree_node(const ObjectNode &object, const ObjectNode &parent, int depth) :
-	Object{object},
-	Parent{&parent},
-	Depth{depth}
-{
-	//Empty
-}
-
 
 /*
 	Serializing
@@ -67,7 +53,7 @@ void serialize_property(const PropertyNode &property, std::vector<std::byte> &by
 	serialize_value(property.Name(), bytes);
 }
 
-void serialize_object(const tree_node &node, std::vector<std::byte> &bytes)
+void serialize_object(const TreeNode &node, std::vector<std::byte> &bytes)
 {
 	for (auto &property : node.Object.Properties())
 		serialize_property(property, bytes);
@@ -82,7 +68,7 @@ std::vector<std::byte> serialize(const ObjectNodes &objects)
 {
 	std::vector<std::byte> bytes;
 
-	for (auto &node : depth_first_search(objects, DepthFirstSearchTraversal::PostOrder))
+	for (auto &node : depth_first_search(objects, DepthFirstTraversal::PostOrder))
 		serialize_object(node, bytes);
 
 	return bytes;
@@ -257,7 +243,7 @@ std::string print(const ObjectNodes &objects, PrintOptions print_options)
 	std::string output;
 
 	//Print objects
-	for (auto &[object, parent, depth] : depth_first_search(objects, DepthFirstSearchTraversal::PreOrder))
+	for (auto &[object, parent, depth] : depth_first_search(objects, DepthFirstTraversal::PreOrder))
 	{
 		output += "\n" + std::string(depth * 4, ' ') + "+-- " + object.Name();
 
@@ -285,13 +271,13 @@ std::string print(const ObjectNodes &objects, PrintOptions print_options)
 							output += argument.Visit(
 								[](const BooleanArgument &arg)
 								{
-									return arg.Value() ? "true"s : "false"s;
+									return arg.Get() ? "true"s : "false"s;
 								},
 								[](const ColorArgument &arg)
 								{
-									auto name = std::string{utilities::parse::AsString(arg.Value()).value_or("")};
-									auto [r, g, b] = arg.Value().ToRGB();
-									auto a = arg.Value().A();
+									auto name = std::string{utilities::parse::AsString(arg.Get()).value_or("")};
+									auto [r, g, b] = arg.Get().ToRGB();
+									auto a = arg.Get().A();
 
 									if (a < 1.0_r)
 										return ion::utilities::string::Format(name + "({0}, {1}, {2}, {3:0.##})", r, g, b, a);
@@ -300,21 +286,21 @@ std::string print(const ObjectNodes &objects, PrintOptions print_options)
 								},
 								[](const EnumerableArgument &arg)
 								{
-									return arg.Value();
+									return arg.Get();
 								},
 								[](const StringArgument &arg)
 								{
-									return ion::utilities::string::Concat('"', arg.Value(), '"');
+									return ion::utilities::string::Concat('"', arg.Get(), '"');
 								},
 								[](const Vector2Argument &arg)
 								{
-									auto [x, y] = arg.Value().XY();
+									auto [x, y] = arg.Get().XY();
 									return ion::utilities::string::Concat('{', x, ", ", y, '}');
 								},
 								//Default
 								[&](auto &&arg)
 								{
-									return ion::utilities::convert::ToString(arg.Value()) + argument.Unit();
+									return ion::utilities::convert::ToString(arg.Get()) + argument.Unit();
 								});
 
 							if (--remaining_args > 0)
@@ -350,7 +336,7 @@ void breadth_first_search_impl(search_result &result, size_t off)
 	}
 }
 
-void depth_first_search_post_order_impl(search_result &result, const tree_node &node)
+void depth_first_search_post_order_impl(search_result &result, const TreeNode &node)
 {
 	for (auto &object : node.Object.Objects())
 		depth_first_search_post_order_impl(result, {object, node.Object, node.Depth + 1});
@@ -358,7 +344,7 @@ void depth_first_search_post_order_impl(search_result &result, const tree_node &
 	result.push_back(node);
 }
 
-void depth_first_search_pre_order_impl(search_result &result, const tree_node &node)
+void depth_first_search_pre_order_impl(search_result &result, const TreeNode &node)
 {
 	result.push_back(node);
 
@@ -398,12 +384,12 @@ search_result breadth_first_search(const ObjectNodes &objects)
 	return result;
 }
 
-search_result depth_first_search(const ObjectNodes &objects, DepthFirstSearchTraversal traversal)
+search_result depth_first_search(const ObjectNodes &objects, DepthFirstTraversal traversal)
 {
 	search_result result;
 
 	//Post-order
-	if (traversal == DepthFirstSearchTraversal::PostOrder)
+	if (traversal == DepthFirstTraversal::PostOrder)
 	{
 		for (auto &object : objects)
 			depth_first_search_post_order_impl(result, {object});
@@ -470,6 +456,25 @@ lineage_search_result lineage_depth_first_search(ObjectNodes &objects)
 } //detail
 
 
+//TreeNode
+
+TreeNode::TreeNode(const ObjectNode &object) noexcept :
+	Object{object}
+{
+	//Empty
+}
+
+TreeNode::TreeNode(const ObjectNode &object, const ObjectNode &parent, int depth) noexcept :
+	Object{object},
+	Parent{&parent},
+	Depth{depth}
+{
+	//Empty
+}
+
+
+//ObjectNode
+
 ObjectNode::ObjectNode(std::string name, std::string classes, PropertyNodes properties) noexcept :
 	ObjectNode{std::move(name), std::move(classes), std::move(properties), {}}
 {
@@ -492,35 +497,138 @@ ObjectNode::ObjectNode(std::string name, std::string classes, PropertyNodes prop
 
 void ObjectNode::Append(const ObjectNodes &objects, AppendCondition append_condition)
 {
-	detail::append_nodes(objects_, objects, append_condition);
+	if (*this) //Not allowed to modify if not valid
+		detail::append_nodes(objects_, objects, append_condition);
 }
 
 void ObjectNode::Append(const adaptors::ranges::Iterable<ObjectNodes&> &objects, AppendCondition append_condition)
 {
-	detail::append_nodes(objects_, objects, append_condition);
+	if (*this) //Not allowed to modify if not valid
+		detail::append_nodes(objects_, objects, append_condition);
 }
 
 void ObjectNode::Append(const adaptors::ranges::Iterable<const ObjectNodes&> &objects, AppendCondition append_condition)
 {
-	detail::append_nodes(objects_, objects, append_condition);
+	if (*this) //Not allowed to modify if not valid
+		detail::append_nodes(objects_, objects, append_condition);
 }
 
 
 void ObjectNode::Append(const PropertyNodes &properties, AppendCondition append_condition)
 {
-	detail::append_nodes(properties_, properties, append_condition);
+	if (*this) //Not allowed to modify if not valid
+		detail::append_nodes(properties_, properties, append_condition);
 }
 
 void ObjectNode::Append(const adaptors::ranges::Iterable<PropertyNodes&> &properties, AppendCondition append_condition)
 {
-	detail::append_nodes(properties_, properties, append_condition);
+	if (*this) //Not allowed to modify if not valid
+		detail::append_nodes(properties_, properties, append_condition);
 }
 
 void ObjectNode::Append(const adaptors::ranges::Iterable<const PropertyNodes&> &properties, AppendCondition append_condition)
 {
-	detail::append_nodes(properties_, properties, append_condition);
+	if (*this) //Not allowed to modify if not valid
+		detail::append_nodes(properties_, properties, append_condition);
 }
 
+
+/*
+	Finding / searching
+*/
+
+ObjectNode& ObjectNode::Find(std::string_view name) noexcept
+{
+	for (auto &object : objects_)
+	{
+		if (object.Name() == name)
+			return object;
+	}
+
+	return const_cast<ObjectNode&>(InvalidObjectNode);
+}
+
+const ObjectNode& ObjectNode::Find(std::string_view name) const noexcept
+{
+	for (const auto &object : objects_)
+	{
+		if (object.Name() == name)
+			return object;
+	}
+
+	return InvalidObjectNode;
+}
+
+
+ObjectNode& ObjectNode::Search(std::string_view name, SearchStrategy strategy) noexcept
+{
+	if (strategy == SearchStrategy::BreadthFirst)
+	{
+		for (auto &node : BreadthFirstSearch())
+		{
+			if (node.Object.Name() == name)
+				return const_cast<ObjectNode&>(node.Object);
+		}
+	}
+	else if (strategy == SearchStrategy::DepthFirst)
+	{
+		for (auto &node : DepthFirstSearch())
+		{
+			if (node.Object.Name() == name)
+				return const_cast<ObjectNode&>(node.Object);
+		}
+	}
+
+	return const_cast<ObjectNode&>(InvalidObjectNode);
+}
+
+const ObjectNode& ObjectNode::Search(std::string_view name, SearchStrategy strategy) const noexcept
+{
+	if (strategy == SearchStrategy::BreadthFirst)
+	{
+		for (auto &node : BreadthFirstSearch())
+		{
+			if (node.Object.Name() == name)
+				return node.Object;
+		}
+	}
+	else if (strategy == SearchStrategy::DepthFirst)
+	{
+		for (auto &node : DepthFirstSearch())
+		{
+			if (node.Object.Name() == name)
+				return node.Object;
+		}
+	}
+
+	return InvalidObjectNode;
+}
+
+
+PropertyNode& ObjectNode::Property(std::string_view name) noexcept
+{
+	for (auto &property : properties_)
+	{
+		if (property.Name() == name)
+			return property;
+	}
+
+	return const_cast<PropertyNode&>(InvalidPropertyNode);
+}
+
+const PropertyNode& ObjectNode::Property(std::string_view name) const noexcept
+{
+	for (const auto &property : properties_)
+	{
+		if (property.Name() == name)
+			return property;
+	}
+
+	return InvalidPropertyNode;
+}
+
+
+//PropertyNode
 
 PropertyNode::PropertyNode(std::string name, ArgumentNodes arguments) noexcept :
 	name_{std::move(name)},
@@ -528,6 +636,28 @@ PropertyNode::PropertyNode(std::string name, ArgumentNodes arguments) noexcept :
 {
 	//Empty
 }
+
+
+/*
+	Arguments
+*/
+
+ArgumentNode& PropertyNode::Argument(int number) noexcept
+{
+	return number < NumberOfArguments() ?
+		arguments_[number] :
+		const_cast<ArgumentNode&>(InvalidArgumentNode);
+}
+
+const ArgumentNode& PropertyNode::Argument(int number) const noexcept
+{
+	return number < NumberOfArguments() ?
+		arguments_[number] :
+		InvalidArgumentNode;
+}
+
+
+//ArgumentNode
 
 ArgumentNode::ArgumentNode(ArgumentType argument) noexcept :
 	argument_{std::move(argument)}
@@ -537,6 +667,11 @@ ArgumentNode::ArgumentNode(ArgumentType argument) noexcept :
 
 ArgumentNode::ArgumentNode(ArgumentType argument, std::string unit) noexcept :
 	argument_{std::move(argument)}, unit_{std::move(unit)}
+{
+	//Empty
+}
+
+ArgumentNode::ArgumentNode(std::nullopt_t) noexcept
 {
 	//Empty
 }
@@ -570,6 +705,78 @@ void ScriptTree::Append(const adaptors::ranges::Iterable<script_tree::ObjectNode
 void ScriptTree::Append(const adaptors::ranges::Iterable<const script_tree::ObjectNodes&> &objects, script_tree::AppendCondition append_condition)
 {
 	detail::append_nodes(objects_, objects, append_condition);
+}
+
+
+/*
+	Finding / searching
+*/
+
+script_tree::ObjectNode& ScriptTree::Find(std::string_view name) noexcept
+{
+	for (auto &object : objects_)
+	{
+		if (object.Name() == name)
+			return object;
+	}
+
+	return const_cast<ObjectNode&>(script_tree::InvalidObjectNode);
+}
+
+const script_tree::ObjectNode& ScriptTree::Find(std::string_view name) const noexcept
+{
+	for (const auto &object : objects_)
+	{
+		if (object.Name() == name)
+			return object;
+	}
+
+	return script_tree::InvalidObjectNode;
+}
+
+
+script_tree::ObjectNode& ScriptTree::Search(std::string_view name, script_tree::SearchStrategy strategy) noexcept
+{
+	if (strategy == script_tree::SearchStrategy::BreadthFirst)
+	{
+		for (auto &node : BreadthFirstSearch())
+		{
+			if (node.Object.Name() == name)
+				return const_cast<ObjectNode&>(node.Object);
+		}
+	}
+	else if (strategy == script_tree::SearchStrategy::DepthFirst)
+	{
+		for (auto &node : DepthFirstSearch())
+		{
+			if (node.Object.Name() == name)
+				return const_cast<ObjectNode&>(node.Object);
+		}
+	}
+
+	return const_cast<ObjectNode&>(script_tree::InvalidObjectNode);
+}
+
+const script_tree::ObjectNode& ScriptTree::Search(std::string_view name, script_tree::SearchStrategy strategy) const noexcept
+{
+	if (strategy == script_tree::SearchStrategy::BreadthFirst)
+	{
+		for (auto &node : BreadthFirstSearch())
+		{
+			if (node.Object.Name() == name)
+				return node.Object;
+		}
+	}
+	else if (strategy == script_tree::SearchStrategy::DepthFirst)
+	{
+		for (auto &node : DepthFirstSearch())
+		{
+			if (node.Object.Name() == name)
+				return node.Object;
+		}
+	}
+
+	return script_tree::InvalidObjectNode;
 }
 
 

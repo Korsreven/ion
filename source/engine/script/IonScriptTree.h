@@ -13,6 +13,7 @@ File:	IonScriptTree.h
 #ifndef _ION_SCRIPT_TREE_
 #define _ION_SCRIPT_TREE_
 
+#include <cassert>
 #include <optional>
 #include <string>
 #include <variant>
@@ -32,13 +33,26 @@ namespace ion::script
 		using graphics::utilities::Color;
 		using graphics::utilities::Vector2;
 
+
+		/*
+			Forward declaration
+			Node types
+		*/
+
+		struct TreeNode;
 		class ObjectNode;
 		class PropertyNode;
-		class ArgumentNode;
+		class ArgumentNode;		
 
 		using ObjectNodes = std::vector<ObjectNode>;
 		using PropertyNodes = std::vector<PropertyNode>;
 		using ArgumentNodes = std::vector<ArgumentNode>;
+
+
+		/*
+			Forward declaration
+			Strong argument types
+		*/
 
 		struct BooleanArgument;
 		struct ColorArgument;
@@ -58,7 +72,14 @@ namespace ion::script
 				StringArgument,
 				Vector2Argument>;
 
-		enum class DepthFirstSearchTraversal : bool
+
+		enum class SearchStrategy : bool
+		{
+			DepthFirst,
+			BreadthFirst
+		};
+
+		enum class DepthFirstTraversal : bool
 		{
 			PreOrder,
 			PostOrder
@@ -91,18 +112,7 @@ namespace ion::script
 				Argument
 			};
 
-
-			struct tree_node
-			{
-				const ObjectNode &Object;
-				const ObjectNode *const Parent = nullptr;
-				const int Depth = 0;
-
-				tree_node(const ObjectNode &object);
-				tree_node(const ObjectNode &object, const ObjectNode &parent, int depth);
-			};
-
-			using search_result = std::vector<tree_node>;
+			using search_result = std::vector<TreeNode>;
 
 			using generation = std::vector<ObjectNode*>;
 			using generations = std::vector<generation>;
@@ -110,7 +120,7 @@ namespace ion::script
 
 
 			template <typename T>
-			class argument
+			class argument_type
 			{
 				private:
 
@@ -120,31 +130,44 @@ namespace ion::script
 
 					using value_type = T;
 
-					explicit argument(T value) noexcept :
+					argument_type(const T &value) noexcept :
+						value_{value}
+					{
+						//Empty
+					}
+
+					argument_type(T &&value) noexcept :
 						value_{std::move(value)}
 					{
 						//Empty
 					}
 
-					//Returns an immutable reference to the value of this argument
-					[[nodiscard]] inline const auto& Value() const noexcept
+					//Returns a mutable reference to the value
+					[[nodiscard]] inline auto& Get() noexcept
+					{
+						return value_;
+					}
+
+					//Returns an immutable reference to the value
+					[[nodiscard]] inline const auto& Get() const noexcept
 					{
 						return value_;
 					}
 			};
 
 			template <typename T>
-			struct arithmetic_argument : argument<T>
+			struct arithmetic_type : argument_type<T>
 			{
 				static_assert(std::is_arithmetic_v<T>);
-				using argument<T>::argument;
+				using argument_type<T>::argument_type;
 
 				//Returns the value of this argument casted to another arithmetic type
 				template <typename U>		
 				[[nodiscard]] inline auto As() const noexcept
 				{
 					static_assert(std::is_arithmetic_v<U>);
-					return static_cast<U>(argument<T>::Value());
+					static_assert(std::is_convertible_v<T, U>);
+					return static_cast<U>(argument_type<T>::Get());
 				}
 			};
 
@@ -185,11 +208,11 @@ namespace ion::script
 			template <typename T>
 			inline void serialize_argument(const T &arg, std::vector<std::byte> &bytes)
 			{
-				static_assert(std::is_base_of_v<argument<typename T::value_type>, T>);
+				static_assert(std::is_base_of_v<argument_type<typename T::value_type>, T>);
 
 				bytes.push_back(static_cast<std::byte>(serialization_section_token::Argument));
 				bytes.push_back(static_cast<std::byte>(variant_index<ArgumentType, T>()));
-				serialize_value(arg.Value(), bytes);
+				serialize_value(arg.Get(), bytes);
 			}
 
 
@@ -246,7 +269,7 @@ namespace ion::script
 
 			void serialize_argument(const ArgumentNode &argument, std::vector<std::byte> &bytes);
 			void serialize_property(const PropertyNode &property, std::vector<std::byte> &bytes);
-			void serialize_object(const tree_node &node, std::vector<std::byte> &bytes);
+			void serialize_object(const TreeNode &node, std::vector<std::byte> &bytes);
 			std::vector<std::byte> serialize(const ObjectNodes &objects);
 
 			int deserialize_argument(std::string_view bytes, ArgumentNodes &arguments);
@@ -322,12 +345,12 @@ namespace ion::script
 			*/
 
 			void breadth_first_search_impl(search_result &result, size_t off);
-			void depth_first_search_post_order_impl(search_result &result, const tree_node &node);
-			void depth_first_search_pre_order_impl(search_result &result, const tree_node &node);
+			void depth_first_search_post_order_impl(search_result &result, const TreeNode &node);
+			void depth_first_search_pre_order_impl(search_result &result, const TreeNode &node);
 			void fully_qualified_name_impl(std::string &name, const ObjectNode &parent, const ObjectNode &what_object);
 			
 			search_result breadth_first_search(const ObjectNodes &objects);
-			search_result depth_first_search(const ObjectNodes &objects, DepthFirstSearchTraversal traversal);
+			search_result depth_first_search(const ObjectNodes &objects, DepthFirstTraversal traversal);
 			std::string fully_qualified_name(const ObjectNodes &objects, const ObjectNode &what_object);
 
 			void lineage_depth_first_search_impl(lineage_search_result &result, generations &descendants, ObjectNode &object);
@@ -335,39 +358,61 @@ namespace ion::script
 		} //detail
 
 
-		struct BooleanArgument final : detail::arithmetic_argument<bool>
+		/*
+			Strong argument types
+		*/
+
+		struct BooleanArgument final : detail::arithmetic_type<bool>
 		{
-			using arithmetic_argument::arithmetic_argument;
+			using arithmetic_type::arithmetic_type;
 		};
 
-		struct ColorArgument final : detail::argument<Color>
+		struct ColorArgument final : detail::argument_type<Color>
 		{
-			using argument::argument;
+			using argument_type::argument_type;
 		};
 
-		struct EnumerableArgument final : detail::argument<std::string>
+		struct EnumerableArgument final : detail::argument_type<std::string>
 		{
-			using argument::argument;
+			using argument_type::argument_type;
 		};
 
-		struct FloatingPointArgument final : detail::arithmetic_argument<float80>
+		struct FloatingPointArgument final : detail::arithmetic_type<float80>
 		{
-			using arithmetic_argument::arithmetic_argument;
+			using arithmetic_type::arithmetic_type;
 		};
 
-		struct IntegerArgument final : detail::arithmetic_argument<int64>
+		struct IntegerArgument final : detail::arithmetic_type<int64>
 		{
-			using arithmetic_argument::arithmetic_argument;
+			using arithmetic_type::arithmetic_type;
 		};
 
-		struct StringArgument final : detail::argument<std::string>
+		struct StringArgument final : detail::argument_type<std::string>
 		{
-			using argument::argument;
+			using argument_type::argument_type;
 		};
 
-		struct Vector2Argument final : detail::argument<Vector2>
+		struct Vector2Argument final : detail::argument_type<Vector2>
 		{
-			using argument::argument;
+			using argument_type::argument_type;
+		};
+
+
+		/*
+			Node types
+		*/
+
+		struct TreeNode final
+		{
+			const ObjectNode &Object;
+			const ObjectNode *const Parent = nullptr;
+			const int Depth = 0;
+
+			//Constructs a new tree node containing the given root object
+			TreeNode(const ObjectNode &object) noexcept;
+
+			//Constructs a new tree node containing the given child object, parent object and depth
+			TreeNode(const ObjectNode &object, const ObjectNode &parent, int depth) noexcept;
 		};
 
 		class ObjectNode final
@@ -386,6 +431,17 @@ namespace ion::script
 
 				//Constructs a new object node with the given name, properties and child objects
 				ObjectNode(std::string name, std::string classes, PropertyNodes properties, ObjectNodes objects) noexcept;
+
+
+				/*
+					Operators
+				*/
+
+				//Returns true if this object is valid
+				[[nodiscard]] inline operator bool() const noexcept
+				{
+					return !std::empty(name_);
+				}
 
 
 				/*
@@ -430,21 +486,54 @@ namespace ion::script
 
 
 				/*
+					Finding / searching
+				*/
+
+				//Find an object (top-level child object) by the given name, and return a mutable reference to it
+				//Returns InvalidObjectNode if the given object is not found
+				[[nodiscard]] ObjectNode& Find(std::string_view name) noexcept;
+
+				//Find an object (top-level child object) by the given name, and return an immutable reference to it
+				//Returns InvalidObjectNode if the given object is not found
+				[[nodiscard]] const ObjectNode& Find(std::string_view name) const noexcept;
+
+
+				//Search for an object (all child objects) by the given name and search strategy and return a mutable reference to it
+				//Returns InvalidObjectNode if the given object is not found
+				[[nodiscard]] ObjectNode& Search(std::string_view name,
+					SearchStrategy strategy = SearchStrategy::BreadthFirst) noexcept;
+
+				//Search for an object (all child objects) by the given name and search strategy and return an immutable reference to it
+				//Returns InvalidObjectNode if the given object is not found
+				[[nodiscard]] const ObjectNode& Search(std::string_view name,
+					SearchStrategy strategy = SearchStrategy::BreadthFirst) const noexcept;
+
+
+				//Find a property by the given name and return a mutable reference to it
+				//Returns InvalidPropertyNode if the given property is not found
+				[[nodiscard]] PropertyNode& Property(std::string_view name) noexcept;
+
+				//Find a property by the given name and return an immutable reference to it
+				//Returns InvalidPropertyNode if the given property is not found
+				[[nodiscard]] const PropertyNode& Property(std::string_view name) const noexcept;
+
+
+				/*
 					Ranges
 				*/
 
 				//Returns an immutable (BFS) range of all child objects in this object
 				//This can be used directly with a range-based for loop
-				[[nodiscard]] inline const auto BreadthFirst() const
+				[[nodiscard]] inline const auto BreadthFirstSearch() const
 				{
-					return adaptors::ranges::Iterable<const script_tree::detail::search_result>{script_tree::detail::breadth_first_search(objects_)};
+					return adaptors::ranges::Iterable<const detail::search_result>{detail::breadth_first_search(objects_)};
 				}
 
 				//Returns an immutable (DFS) range of all child objects in this object
 				//This can be used directly with a range-based for loop
-				[[nodiscard]] inline const auto DepthFirst(DepthFirstSearchTraversal traversal = DepthFirstSearchTraversal::PreOrder) const
+				[[nodiscard]] inline const auto DepthFirstSearch(DepthFirstTraversal traversal = DepthFirstTraversal::PreOrder) const
 				{
-					return adaptors::ranges::Iterable<const script_tree::detail::search_result>{script_tree::detail::depth_first_search(objects_, traversal)};
+					return adaptors::ranges::Iterable<const detail::search_result>{detail::depth_first_search(objects_, traversal)};
 				}
 
 
@@ -491,6 +580,17 @@ namespace ion::script
 
 
 				/*
+					Operators
+				*/
+
+				//Returns true if this property is valid
+				[[nodiscard]] inline operator bool() const noexcept
+				{
+					return !std::empty(name_);
+				}
+
+
+				/*
 					Observers
 				*/
 
@@ -502,10 +602,41 @@ namespace ion::script
 
 
 				/*
+					Arguments
+				*/
+
+				//Returns a mutable argument at the given argument number
+				[[nodiscard]] ArgumentNode& Argument(int number) noexcept;
+
+				//Returns an immutable argument at the given argument number
+				[[nodiscard]] const ArgumentNode& Argument(int number) const noexcept;
+
+
+				//Returns a mutable argument at the given argument number
+				[[nodiscard]] inline auto& operator[](int number) noexcept
+				{
+					return Argument(number);
+				}
+
+				//Returns an immutable argument at the given argument number
+				[[nodiscard]] inline const auto& operator[](int number) const noexcept
+				{
+					return Argument(number);
+				}
+
+
+				//Return the number of arguments in this property
+				[[nodiscard]] inline auto NumberOfArguments() const noexcept
+				{
+					return static_cast<int>(std::size(arguments_));
+				}
+
+
+				/*
 					Ranges
 				*/
 
-				//Returns an mutable range of all arguments in this property
+				//Returns a mutable range of all arguments in this property
 				//This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto Arguments() noexcept
 				{
@@ -524,7 +655,7 @@ namespace ion::script
 		{
 			private:
 
-				ArgumentType argument_;
+				std::optional<ArgumentType> argument_;
 				std::string unit_;
 			
 			public:
@@ -535,6 +666,20 @@ namespace ion::script
 				//Constructs a new argument node with the given argument and unit
 				ArgumentNode(ArgumentType argument, std::string unit) noexcept;
 
+				//Construct an invalid argument node
+				explicit ArgumentNode(std::nullopt_t) noexcept;
+
+
+				/*
+					Operators
+				*/
+
+				//Returns true if this argument is valid
+				[[nodiscard]] inline operator bool() const noexcept
+				{
+					return argument_.has_value();
+				}
+
 
 				/*
 					Observers
@@ -544,7 +689,7 @@ namespace ion::script
 				template <typename T>
 				[[nodiscard]] inline auto Get() const noexcept
 				{
-					auto value = std::get_if<T>(&argument_);
+					auto value = *this ? std::get_if<T>(&*argument_) : nullptr;
 					return value ? std::make_optional(*value) : std::nullopt;
 				}
 
@@ -552,7 +697,8 @@ namespace ion::script
 				template <typename T, typename ...Ts>
 				inline auto Visit(T &&callable, Ts &&...callables) const noexcept
 				{
-					return std::visit(detail::overloaded{std::forward<T>(callable), std::forward<Ts>(callables)...}, argument_);
+					assert(*this);
+					return std::visit(detail::overloaded{std::forward<T>(callable), std::forward<Ts>(callables)...}, *argument_);
 				}
 
 				//Returns the unit of this argument
@@ -593,6 +739,30 @@ namespace ion::script
 
 
 			/*
+				Finding / searching
+			*/
+
+			//Find an object (top-level object) by the given name, and return a mutable reference to it
+			//Returns InvalidObjectNode if the given object is not found
+			[[nodiscard]] script_tree::ObjectNode& Find(std::string_view name) noexcept;
+
+			//Find an object (top-level object) by the given name, and return an immutable reference to it
+			//Returns InvalidObjectNode if the given object is not found
+			[[nodiscard]] const script_tree::ObjectNode& Find(std::string_view name) const noexcept;
+
+
+			//Search for an object (all objects) by the given name and search strategy and return a mutable reference to it
+			//Returns InvalidObjectNode if the given object is not found
+			[[nodiscard]] script_tree::ObjectNode& Search(std::string_view name,
+				script_tree::SearchStrategy strategy = script_tree::SearchStrategy::BreadthFirst) noexcept;
+
+			//Search for an object (all objects) by the given name and search strategy and return an immutable reference to it
+			//Returns InvalidObjectNode if the given object is not found
+			[[nodiscard]] const script_tree::ObjectNode& Search(std::string_view name,
+				script_tree::SearchStrategy strategy = script_tree::SearchStrategy::BreadthFirst) const noexcept;
+
+
+			/*
 				Fully qualified names
 			*/
 
@@ -620,20 +790,20 @@ namespace ion::script
 
 			//Returns an immutable (BFS) range of all objects in this script tree
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto BreadthFirst() const
+			[[nodiscard]] inline const auto BreadthFirstSearch() const
 			{
 				return adaptors::ranges::Iterable<const script_tree::detail::search_result>{script_tree::detail::breadth_first_search(objects_)};
 			}
 
 			//Returns an immutable (DFS) range of all objects in this script tree
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto DepthFirst(script_tree::DepthFirstSearchTraversal traversal = script_tree::DepthFirstSearchTraversal::PreOrder) const
+			[[nodiscard]] inline const auto DepthFirstSearch(script_tree::DepthFirstTraversal traversal = script_tree::DepthFirstTraversal::PreOrder) const
 			{
 				return adaptors::ranges::Iterable<const script_tree::detail::search_result>{script_tree::detail::depth_first_search(objects_, traversal)};
 			}
 
 
-			//Returns an mutable range of all top-level objects in this script tree
+			//Returns a mutable range of all top-level objects in this script tree
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Objects() noexcept
 			{
@@ -658,6 +828,19 @@ namespace ion::script
 			//Serialize this script tree to a byte array
 			[[nodiscard]] std::vector<std::byte> Serialize() const;
 	};
+
+	namespace script_tree
+	{
+		/*
+			Predefined node constants
+			For fluent interface design
+		*/
+
+		inline const auto InvalidObjectNode = ObjectNode{"", "", {}};
+		inline const auto InvalidPropertyNode = PropertyNode{"", {}};
+		inline const auto InvalidArgumentNode = ArgumentNode{std::nullopt};
+	} //script_tree
+
 } //ion::script
 
 #endif

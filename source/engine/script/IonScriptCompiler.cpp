@@ -1139,7 +1139,7 @@ std::optional<script_tree::ArgumentType> call_cmyk(lexical_token &token, script_
 			{
 				//As percent
 				argument = script_tree::ArgumentType{script_tree::FloatingPointArgument{
-					arg.Value() * script_tree::FloatingPointArgument::value_type{0.01}}};
+					arg.Get() * script_tree::FloatingPointArgument::value_type{0.01}}};
 			},
 			//Floating point
 			[](const script_tree::FloatingPointArgument&) noexcept
@@ -1193,7 +1193,7 @@ std::optional<script_tree::ArgumentType> call_hsl(lexical_token &token, script_t
 						arg.As<script_tree::FloatingPointArgument::value_type>()}} :
 					//Saturation, lightness and alpha as percent
 					script_tree::ArgumentType{script_tree::FloatingPointArgument{
-						arg.Value() * script_tree::FloatingPointArgument::value_type{0.01}}};
+						arg.Get() * script_tree::FloatingPointArgument::value_type{0.01}}};
 			},
 			//Floating point
 			[](const script_tree::FloatingPointArgument&) noexcept
@@ -1246,7 +1246,7 @@ std::optional<script_tree::ArgumentType> call_hwb(lexical_token &token, script_t
 						arg.As<script_tree::FloatingPointArgument::value_type>()}} :
 					//Whiteness, blackness and alpha as percent
 					script_tree::ArgumentType{script_tree::FloatingPointArgument{
-						arg.Value() * script_tree::FloatingPointArgument::value_type{0.01}}};
+						arg.Get() * script_tree::FloatingPointArgument::value_type{0.01}}};
 			},
 			//Floating point
 			[](const script_tree::FloatingPointArgument&) noexcept
@@ -1296,10 +1296,10 @@ std::optional<script_tree::ArgumentType> call_rgb(lexical_token &token, script_t
 					&argument == &arguments.back() && std::size(arguments) == 4 ?
 					//Alpha as percent
 					script_tree::ArgumentType{script_tree::FloatingPointArgument{
-						arg.Value() * script_tree::FloatingPointArgument::value_type{0.01}}} :
+						arg.Get() * script_tree::FloatingPointArgument::value_type{0.01}}} :
 					//RGB divide by 255
 					script_tree::ArgumentType{script_tree::FloatingPointArgument{
-						arg.Value() / script_tree::FloatingPointArgument::value_type{255.0}}};
+						arg.Get() / script_tree::FloatingPointArgument::value_type{255.0}}};
 			},
 			//Floating point
 			[](const script_tree::FloatingPointArgument&) noexcept
@@ -1795,14 +1795,14 @@ bool parse_unit(lexical_token &token, parse_context &context, CompileError&) noe
 		{
 			if (token.value == "%")
 				argument = script_tree::ArgumentType{script_tree::FloatingPointArgument{
-					arg.Value() * script_tree::FloatingPointArgument::value_type{0.01}}};
+					arg.Get() * script_tree::FloatingPointArgument::value_type{0.01}}};
 		},
 		//Floating point
 		[&](const script_tree::FloatingPointArgument &arg) mutable noexcept
 		{
 			if (token.value == "%")
 				argument = script_tree::ArgumentType{script_tree::FloatingPointArgument{
-					arg.Value() * script_tree::FloatingPointArgument::value_type{0.01}}};
+					arg.Get() * script_tree::FloatingPointArgument::value_type{0.01}}};
 		},
 		//Default
 		[](auto&&) noexcept {});
