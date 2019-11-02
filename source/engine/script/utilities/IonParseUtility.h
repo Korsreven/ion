@@ -235,7 +235,7 @@ namespace ion::script::utilities::parse
 		std::optional<graphics::utilities::Color> hex_as_color(std::string_view str) noexcept;
 		std::optional<graphics::utilities::Color> rgb_as_color(std::string_view str) noexcept;
 		std::optional<graphics::utilities::Color> color_name_as_color(std::string_view str) noexcept;
-		std::optional<std::string_view> color_as_color_name(const graphics::utilities::Color &color) noexcept;
+		std::optional<std::string_view> color_as_color_name(graphics::utilities::Color color) noexcept;
 
 		std::optional<bool> string_as_boolean(std::string_view str) noexcept;
 		std::optional<graphics::utilities::Color> string_as_color(std::string_view str) noexcept;
@@ -276,7 +276,7 @@ namespace ion::script::utilities::parse
 
 	//Parses the given color value as a color name
 	//Return nullopt of the given color does not have a X11/W3C color name
-	[[nodiscard]] std::optional<std::string_view> AsString(const graphics::utilities::Color &color);
+	[[nodiscard]] std::optional<std::string_view> AsString(graphics::utilities::Color color);
 
 
 	/*

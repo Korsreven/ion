@@ -180,14 +180,18 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 					  ion::script::script_tree::PrintOptions::ObjectsWithPropertiesAndArguments);
 
 		ion::script::CompileError compile_error;
-		auto compiled_tree = script.Compile("bin/main.ion", compile_error);
+		auto tree = script.Compile("bin/main.ion", compile_error);
 
 		//Serialize tree
-		if (compiled_tree)
+		if (tree)
 		{
-			auto &color_depth = compiled_tree->Search("settings").Find("advanced").Property("color-depth");
-			auto value = color_depth[0].Get<ion::script::script_tree::IntegerArgument>().value_or(8).As<int>();
-			auto break_point = true;
+			auto color_depth =
+				tree->Search("settings")
+				.Find("advanced")
+				.Property("color-depth")[0]
+				.Get<ion::script::script_tree::IntegerArgument>()
+				.value_or(8)
+				.As<int>();
 
 			/*auto component = ion::script::script_validator::ClassDefinition::Create("component")
 				.AddRequiredProperty("name", ion::script::script_validator::ParameterType::String);
@@ -221,7 +225,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 				.AddClass(std::move(group_box));
 
 			ion::script::ValidateError validate_error;
-			auto okay = validator.Validate(*compiled_tree, validate_error);
+			auto okay = validator.Validate(*tree, validate_error);
 
 			if (!okay && validate_error)
 			{
@@ -230,7 +234,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 			}*/
 
 
-			auto tree_bytes = compiled_tree->Serialize();
+			auto tree_bytes = tree->Serialize();
 			ion::utilities::file::Save("bin/main.obj",
 				{reinterpret_cast<char*>(std::data(tree_bytes)), std::size(tree_bytes)},
 				ion::utilities::file::FileSaveMode::Binary);

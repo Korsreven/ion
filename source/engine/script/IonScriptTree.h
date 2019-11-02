@@ -42,7 +42,7 @@ namespace ion::script
 		struct TreeNode;
 		class ObjectNode;
 		class PropertyNode;
-		class ArgumentNode;		
+		class ArgumentNode;
 
 		using ObjectNodes = std::vector<ObjectNode>;
 		using PropertyNodes = std::vector<PropertyNode>;
@@ -500,13 +500,11 @@ namespace ion::script
 
 				//Search for an object (all child objects) by the given name and search strategy and return a mutable reference to it
 				//Returns InvalidObjectNode if the given object is not found
-				[[nodiscard]] ObjectNode& Search(std::string_view name,
-					SearchStrategy strategy = SearchStrategy::BreadthFirst) noexcept;
+				[[nodiscard]] ObjectNode& Search(std::string_view name, SearchStrategy strategy = SearchStrategy::BreadthFirst) noexcept;
 
 				//Search for an object (all child objects) by the given name and search strategy and return an immutable reference to it
 				//Returns InvalidObjectNode if the given object is not found
-				[[nodiscard]] const ObjectNode& Search(std::string_view name,
-					SearchStrategy strategy = SearchStrategy::BreadthFirst) const noexcept;
+				[[nodiscard]] const ObjectNode& Search(std::string_view name, SearchStrategy strategy = SearchStrategy::BreadthFirst) const noexcept;
 
 
 				//Find a property by the given name and return a mutable reference to it
@@ -753,13 +751,11 @@ namespace ion::script
 
 			//Search for an object (all objects) by the given name and search strategy and return a mutable reference to it
 			//Returns InvalidObjectNode if the given object is not found
-			[[nodiscard]] script_tree::ObjectNode& Search(std::string_view name,
-				script_tree::SearchStrategy strategy = script_tree::SearchStrategy::BreadthFirst) noexcept;
+			[[nodiscard]] script_tree::ObjectNode& Search(std::string_view name, script_tree::SearchStrategy strategy = script_tree::SearchStrategy::BreadthFirst) noexcept;
 
 			//Search for an object (all objects) by the given name and search strategy and return an immutable reference to it
 			//Returns InvalidObjectNode if the given object is not found
-			[[nodiscard]] const script_tree::ObjectNode& Search(std::string_view name,
-				script_tree::SearchStrategy strategy = script_tree::SearchStrategy::BreadthFirst) const noexcept;
+			[[nodiscard]] const script_tree::ObjectNode& Search(std::string_view name, script_tree::SearchStrategy strategy = script_tree::SearchStrategy::BreadthFirst) const noexcept;
 
 
 			/*

@@ -124,9 +124,15 @@ std::optional<graphics::utilities::Color> color_name_as_color(std::string_view s
 		std::nullopt;
 }
 
-std::optional<std::string_view> color_as_color_name(const graphics::utilities::Color &color) noexcept
+std::optional<std::string_view> color_as_color_name(graphics::utilities::Color color) noexcept
 {
 	static auto color_name_map = make_color_name_map();
+
+	auto [r, g, b] = color.ToRGB(); //Convert to RGB in range [0, 255]
+	color = Color::RGB(
+		static_cast<uint8>(r),
+		static_cast<uint8>(g),
+		static_cast<uint8>(b)); //Create new color from RGB (no alpha)
 
 	//Look up in color name map
 	auto iter =
@@ -340,7 +346,7 @@ std::optional<std::string> AsString(std::string_view str)
 	return detail::string_literal_as_string(str);
 }
 
-std::optional<std::string_view> AsString(const graphics::utilities::Color &color)
+std::optional<std::string_view> AsString(graphics::utilities::Color color)
 {
 	return detail::color_as_color_name(color);
 }
