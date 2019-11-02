@@ -419,7 +419,7 @@
     <ClInclude Include="..\source\engine\parallel\IonWorkerPool.h">
       <Filter>Header Files\parallel</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\IonSingleton.h">
+    <ClInclude Include="..\source\engine\types\IonSingleton.h">
       <Filter>Header Files\types</Filter>
     </ClInclude>
   </ItemGroup>

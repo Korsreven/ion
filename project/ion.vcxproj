@@ -213,7 +213,6 @@
     <ClInclude Include="..\source\engine\graphics\utilities\IonObb.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonSphere.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonVector2.h" />
-    <ClInclude Include="..\source\engine\IonSingleton.h" />
     <ClInclude Include="..\source\engine\parallel\IonWorker.h" />
     <ClInclude Include="..\source\engine\parallel\IonWorkerPool.h" />
     <ClInclude Include="..\source\engine\resources\files\IonFileResource.h" />
@@ -240,6 +239,7 @@
     <ClInclude Include="..\source\engine\timers\IonStopwatch.h" />
     <ClInclude Include="..\source\engine\timers\IonTimer.h" />
     <ClInclude Include="..\source\engine\timers\IonTimerManager.h" />
+    <ClInclude Include="..\source\engine\types\IonSingleton.h" />
     <ClInclude Include="..\source\engine\types\IonTypeCasts.h" />
     <ClInclude Include="..\source\engine\types\IonTypes.h" />
     <ClInclude Include="..\source\engine\types\IonTypeTraits.h" />

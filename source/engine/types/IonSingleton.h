@@ -5,7 +5,7 @@ This source file is part of Ion Engine
 	- Written in C++ using OpenGL
 
 Author:	Jan Ivar Goli
-Area:	core
+Area:	types
 File:	IonSingleton.h
 -------------------------------------------
 */
@@ -13,7 +13,7 @@ File:	IonSingleton.h
 #ifndef _ION_SINGLETON_
 #define _ION_SINGLETON_
 
-namespace ion
+namespace ion::types
 {
 	template <typename T>
 	class Singleton
@@ -38,6 +38,6 @@ namespace ion
 				return instance;
 			}
 	};
-} //ion
+} //ion::types
 
 #endif
