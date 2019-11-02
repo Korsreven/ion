@@ -10,8 +10,6 @@ File:	main.cpp
 -------------------------------------------
 */
 
-#include "IonSingleton.h"
-
 #include "adaptors/IonFlatMap.h"
 #include "adaptors/IonFlatSet.h"
 #include "adaptors/ranges/IonBasicIterable.h"
@@ -68,6 +66,7 @@ File:	main.cpp
 #include "timers/IonTimerManager.h"
 #include "timers/IonStopwatch.h"
 
+#include "types/IonSingleton.h"
 #include "types/IonTypes.h"
 #include "types/IonTypeCasts.h"
 #include "types/IonTypeTraits.h"

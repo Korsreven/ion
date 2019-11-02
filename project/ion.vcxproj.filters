@@ -227,9 +227,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\source\engine\IonSingleton.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
       <Filter>Header Files\adaptors\iterators</Filter>
     </ClInclude>
@@ -421,6 +418,9 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\parallel\IonWorkerPool.h">
       <Filter>Header Files\parallel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\IonSingleton.h">
+      <Filter>Header Files\types</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
