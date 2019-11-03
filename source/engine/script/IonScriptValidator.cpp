@@ -11,7 +11,9 @@ File:	IonScriptValidator.cpp
 */
 
 #include "IonScriptValidator.h"
+
 #include <algorithm>
+#include "IonScriptTypes.h"
 
 namespace ion::script
 {
@@ -317,7 +319,7 @@ bool validate_property(const script_tree::PropertyNode &property, const property
 					case ParameterType::Boolean:
 					{
 						match &= arg_iter->Visit(
-							[](const script_tree::BooleanArgument&) noexcept
+							[](const ScriptType::Boolean&) noexcept
 							{
 								return true;
 							},
@@ -331,7 +333,7 @@ bool validate_property(const script_tree::PropertyNode &property, const property
 					case ParameterType::Color:
 					{
 						match &= arg_iter->Visit(
-							[](const script_tree::ColorArgument&) noexcept
+							[](const ScriptType::Color&) noexcept
 							{
 								return true;
 							},
@@ -345,9 +347,9 @@ bool validate_property(const script_tree::PropertyNode &property, const property
 					case ParameterType::Enumerable:
 					{
 						match &= arg_iter->Visit(
-							[&](const script_tree::EnumerableArgument &arg) noexcept
+							[&](const ScriptType::Enumerable &value) noexcept
 							{
-								return param_iter->HasValue(arg.Get());
+								return param_iter->HasValue(value.Get());
 							},
 							[](auto&&) noexcept
 							{
@@ -356,14 +358,28 @@ bool validate_property(const script_tree::PropertyNode &property, const property
 						break;
 					}
 
-					case ParameterType::Number:
+					case ParameterType::FloatingPoint:
 					{
 						match &= arg_iter->Visit(
-							[](const script_tree::FloatingPointArgument&) noexcept
+							[](const ScriptType::FloatingPoint&) noexcept
 							{
 								return true;
 							},
-							[](const script_tree::IntegerArgument&) noexcept
+							[](const ScriptType::Integer&) noexcept //Okay, non-narrowing
+							{
+								return true;
+							},
+							[](auto&&) noexcept
+							{
+								return false;
+							});
+						break;
+					}
+
+					case ParameterType::Integer:
+					{
+						match &= arg_iter->Visit(
+							[](const ScriptType::Integer&) noexcept
 							{
 								return true;
 							},
@@ -377,7 +393,7 @@ bool validate_property(const script_tree::PropertyNode &property, const property
 					case ParameterType::String:
 					{
 						match &= arg_iter->Visit(
-							[](const script_tree::StringArgument&) noexcept
+							[](const ScriptType::String&) noexcept
 							{
 								return true;
 							},
@@ -391,7 +407,7 @@ bool validate_property(const script_tree::PropertyNode &property, const property
 					case ParameterType::Vector2:
 					{
 						match &= arg_iter->Visit(
-							[](const script_tree::Vector2Argument&) noexcept
+							[](const ScriptType::Vector2&) noexcept
 							{
 								return true;
 							},

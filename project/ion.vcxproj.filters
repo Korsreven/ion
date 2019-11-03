@@ -422,5 +422,11 @@
     <ClInclude Include="..\source\engine\types\IonSingleton.h">
       <Filter>Header Files\types</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\engine\types\IonStrongType.h">
+      <Filter>Header Files\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\script\IonScriptTypes.h">
+      <Filter>Header Files\script</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

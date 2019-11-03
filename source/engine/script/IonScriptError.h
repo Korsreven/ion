@@ -14,7 +14,6 @@ File:	IonScriptError.h
 #define _ION_SCRIPT_ERROR_
 
 #include <filesystem>
-#include <optional>
 #include <string>
 #include <system_error>
 #include <type_traits>

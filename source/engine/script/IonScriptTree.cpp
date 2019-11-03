@@ -37,9 +37,9 @@ using namespace types::type_literals;
 void serialize_argument(const ArgumentNode &argument, std::vector<std::byte> &bytes)
 {
 	argument.Visit(
-		[&](auto &&arg)
+		[&](auto &&value)
 		{
-			return serialize_argument(arg, bytes);
+			return serialize_argument(value, bytes);
 		});
 	serialize_value(argument.Unit(), bytes);
 }
@@ -83,45 +83,45 @@ int deserialize_argument(std::string_view bytes, ArgumentNodes &arguments)
 	{
 		switch (static_cast<size_t>(bytes.front()))
 		{
-			case variant_index<ArgumentType, BooleanArgument>():
+			case variant_index<ArgumentType, ScriptType::Boolean>():
 			{
-				bytes_deserialized = deserialize_argument<BooleanArgument>(bytes.substr(1), arguments);
+				bytes_deserialized = deserialize_argument<ScriptType::Boolean>(bytes.substr(1), arguments);
 				break;
 			}
 
-			case variant_index<ArgumentType, ColorArgument>():
+			case variant_index<ArgumentType, ScriptType::Color>():
 			{
-				bytes_deserialized = deserialize_argument<ColorArgument>(bytes.substr(1), arguments);
+				bytes_deserialized = deserialize_argument<ScriptType::Color>(bytes.substr(1), arguments);
 				break;
 			}
 
-			case variant_index<ArgumentType, EnumerableArgument>():
+			case variant_index<ArgumentType, ScriptType::Enumerable>():
 			{
-				bytes_deserialized = deserialize_argument<EnumerableArgument>(bytes.substr(1), arguments);
+				bytes_deserialized = deserialize_argument<ScriptType::Enumerable>(bytes.substr(1), arguments);
 				break;
 			}
 
-			case variant_index<ArgumentType, FloatingPointArgument>():
+			case variant_index<ArgumentType, ScriptType::FloatingPoint>():
 			{
-				bytes_deserialized = deserialize_argument<FloatingPointArgument>(bytes.substr(1), arguments);
+				bytes_deserialized = deserialize_argument<ScriptType::FloatingPoint>(bytes.substr(1), arguments);
 				break;
 			}
 
-			case variant_index<ArgumentType, IntegerArgument>():
+			case variant_index<ArgumentType, ScriptType::Integer>():
 			{
-				bytes_deserialized = deserialize_argument<IntegerArgument>(bytes.substr(1), arguments);
+				bytes_deserialized = deserialize_argument<ScriptType::Integer>(bytes.substr(1), arguments);
 				break;
 			}
 
-			case variant_index<ArgumentType, StringArgument>():
+			case variant_index<ArgumentType, ScriptType::String>():
 			{
-				bytes_deserialized = deserialize_argument<StringArgument>(bytes.substr(1), arguments);
+				bytes_deserialized = deserialize_argument<ScriptType::String>(bytes.substr(1), arguments);
 				break;
 			}
 
-			case variant_index<ArgumentType, Vector2Argument>():
+			case variant_index<ArgumentType, ScriptType::Vector2>():
 			{
-				bytes_deserialized = deserialize_argument<Vector2Argument>(bytes.substr(1), arguments);
+				bytes_deserialized = deserialize_argument<ScriptType::Vector2>(bytes.substr(1), arguments);
 				break;
 			}
 		}
@@ -269,38 +269,38 @@ std::string print(const ObjectNodes &objects, PrintOptions print_options)
 						for (auto &argument : property.Arguments())
 						{
 							output += argument.Visit(
-								[](const BooleanArgument &arg)
+								[](const ScriptType::Boolean &value)
 								{
-									return arg.Get() ? "true"s : "false"s;
+									return value.Get() ? "true"s : "false"s;
 								},
-								[](const ColorArgument &arg)
+								[](const ScriptType::Color &value)
 								{
-									auto name = std::string{utilities::parse::AsString(arg.Get()).value_or("")};
-									auto [r, g, b] = arg.Get().ToRGB();
-									auto a = arg.Get().A();
+									auto name = std::string{utilities::parse::AsString(value.Get()).value_or("")};
+									auto [r, g, b] = value.Get().ToRGB();
+									auto a = value.Get().A();
 
 									if (a < 1.0_r)
 										return ion::utilities::string::Format(name + "({0}, {1}, {2}, {3:0.##})", r, g, b, a);
 									else
 										return ion::utilities::string::Format(name + "({0}, {1}, {2})", r, g, b);
 								},
-								[](const EnumerableArgument &arg)
+								[](const ScriptType::Enumerable &value)
 								{
-									return arg.Get();
+									return value.Get();
 								},
-								[](const StringArgument &arg)
+								[](const ScriptType::String &value)
 								{
-									return ion::utilities::string::Concat('"', arg.Get(), '"');
+									return ion::utilities::string::Concat('"', value.Get(), '"');
 								},
-								[](const Vector2Argument &arg)
+								[](const ScriptType::Vector2 &value)
 								{
-									auto [x, y] = arg.Get().XY();
+									auto [x, y] = value.Get().XY();
 									return ion::utilities::string::Concat('{', x, ", ", y, '}');
 								},
 								//Default
-								[&](auto &&arg)
+								[&](auto &&value)
 								{
-									return ion::utilities::convert::ToString(arg.Get()) + argument.Unit();
+									return ion::utilities::convert::ToString(value.Get()) + argument.Unit();
 								});
 
 							if (--remaining_args > 0)

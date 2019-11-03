@@ -38,7 +38,8 @@ namespace ion::script
 			Boolean,
 			Color,
 			Enumerable,
-			Number,
+			FloatingPoint,
+			Integer,
 			String,
 			Vector2
 		};

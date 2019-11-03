@@ -15,6 +15,7 @@ File:	IonScriptCompiler.cpp
 #include <algorithm>
 #include <chrono>
 
+#include "IonScriptTypes.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "types/IonTypes.h"
@@ -1135,14 +1136,14 @@ std::optional<script_tree::ArgumentType> call_cmyk(lexical_token &token, script_
 	{		
 		argument.Visit(
 			//Integer
-			[&](const script_tree::IntegerArgument &arg) mutable noexcept
+			[&](const ScriptType::Integer &value) mutable noexcept
 			{
 				//As percent
-				argument = script_tree::ArgumentType{script_tree::FloatingPointArgument{
-					arg.Get() * script_tree::FloatingPointArgument::value_type{0.01}}};
+				argument = script_tree::ArgumentType{ScriptType::FloatingPoint{
+					value.Get() * ScriptType::FloatingPoint::value_type{0.01}}};
 			},
 			//Floating point
-			[](const script_tree::FloatingPointArgument&) noexcept
+			[](const ScriptType::FloatingPoint&) noexcept
 			{
 				//Nothing to do
 			},
@@ -1157,16 +1158,16 @@ std::optional<script_tree::ArgumentType> call_cmyk(lexical_token &token, script_
 	}
 
 	auto color = graphics::utilities::Color::CMYK(
-		arguments[0].Get<script_tree::FloatingPointArgument>()->As<real>(),
-		arguments[1].Get<script_tree::FloatingPointArgument>()->As<real>(),
-		arguments[2].Get<script_tree::FloatingPointArgument>()->As<real>(),
-		arguments[3].Get<script_tree::FloatingPointArgument>()->As<real>());
+		arguments[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+		arguments[1].Get<ScriptType::FloatingPoint>()->As<real>(),
+		arguments[2].Get<ScriptType::FloatingPoint>()->As<real>(),
+		arguments[3].Get<ScriptType::FloatingPoint>()->As<real>());
 
 	//Alpha component
 	if (std::size(arguments) == 5)
-		color.A(arguments[4].Get<script_tree::FloatingPointArgument>()->As<real>());
+		color.A(arguments[4].Get<ScriptType::FloatingPoint>()->As<real>());
 
-	return std::optional<script_tree::ColorArgument>(color);
+	return std::optional<ScriptType::Color>(color);
 }
 
 std::optional<script_tree::ArgumentType> call_hsl(lexical_token &token, script_tree::ArgumentNodes arguments, CompileError &error) noexcept
@@ -1184,19 +1185,19 @@ std::optional<script_tree::ArgumentType> call_hsl(lexical_token &token, script_t
 	{		
 		argument.Visit(
 			//Integer
-			[&](const script_tree::IntegerArgument &arg) mutable noexcept
+			[&](const ScriptType::Integer &value) mutable noexcept
 			{
 				argument =
 					&argument == &arguments.front() ?
 					//Hue as is
-					script_tree::ArgumentType{script_tree::FloatingPointArgument{
-						arg.As<script_tree::FloatingPointArgument::value_type>()}} :
+					script_tree::ArgumentType{ScriptType::FloatingPoint{
+						value.As<ScriptType::FloatingPoint::value_type>()}} :
 					//Saturation, lightness and alpha as percent
-					script_tree::ArgumentType{script_tree::FloatingPointArgument{
-						arg.Get() * script_tree::FloatingPointArgument::value_type{0.01}}};
+					script_tree::ArgumentType{ScriptType::FloatingPoint{
+						value.Get() * ScriptType::FloatingPoint::value_type{0.01}}};
 			},
 			//Floating point
-			[](const script_tree::FloatingPointArgument&) noexcept
+			[](const ScriptType::FloatingPoint&) noexcept
 			{
 				//Nothing to do
 			},
@@ -1211,15 +1212,15 @@ std::optional<script_tree::ArgumentType> call_hsl(lexical_token &token, script_t
 	}
 
 	auto color = graphics::utilities::Color::HSL(
-		arguments[0].Get<script_tree::FloatingPointArgument>()->As<real>(),
-		arguments[1].Get<script_tree::FloatingPointArgument>()->As<real>(),
-		arguments[2].Get<script_tree::FloatingPointArgument>()->As<real>());
+		arguments[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+		arguments[1].Get<ScriptType::FloatingPoint>()->As<real>(),
+		arguments[2].Get<ScriptType::FloatingPoint>()->As<real>());
 
 	//Alpha component
 	if (std::size(arguments) == 4)
-		color.A(arguments[3].Get<script_tree::FloatingPointArgument>()->As<real>());
+		color.A(arguments[3].Get<ScriptType::FloatingPoint>()->As<real>());
 
-	return std::optional<script_tree::ColorArgument>(color);
+	return std::optional<ScriptType::Color>(color);
 }
 
 std::optional<script_tree::ArgumentType> call_hwb(lexical_token &token, script_tree::ArgumentNodes arguments, CompileError &error) noexcept
@@ -1237,19 +1238,19 @@ std::optional<script_tree::ArgumentType> call_hwb(lexical_token &token, script_t
 	{		
 		argument.Visit(
 			//Integer
-			[&](const script_tree::IntegerArgument &arg) mutable noexcept
+			[&](const ScriptType::Integer &value) mutable noexcept
 			{
 				argument =
 					&argument == &arguments.front() ?
 					//Hue as is
-					script_tree::ArgumentType{script_tree::FloatingPointArgument{
-						arg.As<script_tree::FloatingPointArgument::value_type>()}} :
+					script_tree::ArgumentType{ScriptType::FloatingPoint{
+						value.As<ScriptType::FloatingPoint::value_type>()}} :
 					//Whiteness, blackness and alpha as percent
-					script_tree::ArgumentType{script_tree::FloatingPointArgument{
-						arg.Get() * script_tree::FloatingPointArgument::value_type{0.01}}};
+					script_tree::ArgumentType{ScriptType::FloatingPoint{
+						value.Get() * ScriptType::FloatingPoint::value_type{0.01}}};
 			},
 			//Floating point
-			[](const script_tree::FloatingPointArgument&) noexcept
+			[](const ScriptType::FloatingPoint&) noexcept
 			{
 				//Nothing to do
 			},
@@ -1264,15 +1265,15 @@ std::optional<script_tree::ArgumentType> call_hwb(lexical_token &token, script_t
 	}
 
 	auto color = graphics::utilities::Color::HWB(
-		arguments[0].Get<script_tree::FloatingPointArgument>()->As<real>(),
-		arguments[1].Get<script_tree::FloatingPointArgument>()->As<real>(),
-		arguments[2].Get<script_tree::FloatingPointArgument>()->As<real>());
+		arguments[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+		arguments[1].Get<ScriptType::FloatingPoint>()->As<real>(),
+		arguments[2].Get<ScriptType::FloatingPoint>()->As<real>());
 
 	//Alpha component
 	if (std::size(arguments) == 4)
-		color.A(arguments[3].Get<script_tree::FloatingPointArgument>()->As<real>());
+		color.A(arguments[3].Get<ScriptType::FloatingPoint>()->As<real>());
 
-	return std::optional<script_tree::ColorArgument>(color);
+	return std::optional<ScriptType::Color>(color);
 }
 
 std::optional<script_tree::ArgumentType> call_rgb(lexical_token &token, script_tree::ArgumentNodes arguments, CompileError &error) noexcept
@@ -1290,19 +1291,19 @@ std::optional<script_tree::ArgumentType> call_rgb(lexical_token &token, script_t
 	{		
 		argument.Visit(
 			//Integer
-			[&](const script_tree::IntegerArgument &arg) mutable noexcept
+			[&](const ScriptType::Integer &value) mutable noexcept
 			{
 				argument =
 					&argument == &arguments.back() && std::size(arguments) == 4 ?
 					//Alpha as percent
-					script_tree::ArgumentType{script_tree::FloatingPointArgument{
-						arg.Get() * script_tree::FloatingPointArgument::value_type{0.01}}} :
+					script_tree::ArgumentType{ScriptType::FloatingPoint{
+						value.Get() * ScriptType::FloatingPoint::value_type{0.01}}} :
 					//RGB divide by 255
-					script_tree::ArgumentType{script_tree::FloatingPointArgument{
-						arg.Get() / script_tree::FloatingPointArgument::value_type{255.0}}};
+					script_tree::ArgumentType{ScriptType::FloatingPoint{
+						value.Get() / ScriptType::FloatingPoint::value_type{255.0}}};
 			},
 			//Floating point
-			[](const script_tree::FloatingPointArgument&) noexcept
+			[](const ScriptType::FloatingPoint&) noexcept
 			{
 				//Nothing to do
 			},
@@ -1317,15 +1318,15 @@ std::optional<script_tree::ArgumentType> call_rgb(lexical_token &token, script_t
 	}
 
 	auto color = graphics::utilities::Color{
-		arguments[0].Get<script_tree::FloatingPointArgument>()->As<real>(),
-		arguments[1].Get<script_tree::FloatingPointArgument>()->As<real>(),
-		arguments[2].Get<script_tree::FloatingPointArgument>()->As<real>()};
+		arguments[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+		arguments[1].Get<ScriptType::FloatingPoint>()->As<real>(),
+		arguments[2].Get<ScriptType::FloatingPoint>()->As<real>()};
 
 	//Alpha component
 	if (std::size(arguments) == 4)
-		color.A(arguments[3].Get<script_tree::FloatingPointArgument>()->As<real>());
+		color.A(arguments[3].Get<ScriptType::FloatingPoint>()->As<real>());
 
-	return std::optional<script_tree::ColorArgument>(color);
+	return std::optional<ScriptType::Color>(color);
 }
 
 std::optional<script_tree::ArgumentType> call_vec2(lexical_token &token, script_tree::ArgumentNodes arguments, CompileError &error) noexcept
@@ -1342,13 +1343,13 @@ std::optional<script_tree::ArgumentType> call_vec2(lexical_token &token, script_
 	{		
 		argument.Visit(
 			//Integer
-			[&](const script_tree::IntegerArgument &arg) mutable noexcept
+			[&](const ScriptType::Integer &value) mutable noexcept
 			{
-				argument = script_tree::ArgumentType{script_tree::FloatingPointArgument{
-					arg.As<script_tree::FloatingPointArgument::value_type>()}};
+				argument = script_tree::ArgumentType{ScriptType::FloatingPoint{
+					value.As<ScriptType::FloatingPoint::value_type>()}};
 			},
 			//Floating point
-			[](const script_tree::FloatingPointArgument&) noexcept
+			[](const ScriptType::FloatingPoint&) noexcept
 			{
 				//Nothing to do
 			},
@@ -1364,12 +1365,12 @@ std::optional<script_tree::ArgumentType> call_vec2(lexical_token &token, script_
 
 	return std::size(arguments) == 1 ?
 		//Scalar
-		std::optional<script_tree::Vector2Argument>(graphics::utilities::Vector2{
-			arguments[0].Get<script_tree::FloatingPointArgument>()->As<real>()}) :
+		std::optional<ScriptType::Vector2>(graphics::utilities::Vector2{
+			arguments[0].Get<ScriptType::FloatingPoint>()->As<real>()}) :
 		//Two components
-		std::optional<script_tree::Vector2Argument>(graphics::utilities::Vector2{
-			arguments[0].Get<script_tree::FloatingPointArgument>()->As<real>(),
-			arguments[1].Get<script_tree::FloatingPointArgument>()->As<real>()});
+		std::optional<ScriptType::Vector2>(graphics::utilities::Vector2{
+			arguments[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+			arguments[1].Get<ScriptType::FloatingPoint>()->As<real>()});
 }
 
 std::optional<script_tree::ArgumentType> call_function(lexical_token &token, script_tree::ArgumentNodes arguments, CompileError &error) noexcept
@@ -1448,9 +1449,9 @@ bool parse_identifier(lexical_token &token, parse_context &context, CompileError
 				[&]() noexcept -> script_tree::ArgumentType
 				{
 					if (auto color = utilities::parse::detail::color_name_as_color(token.value); color)
-						return script_tree::ColorArgument{*color};
+						return ScriptType::Color{*color};
 					else
-						return script_tree::EnumerableArgument{std::string{token.value}};
+						return ScriptType::Enumerable{std::string{token.value}};
 				}();
 
 			//Function argument
@@ -1494,13 +1495,13 @@ bool parse_literal(lexical_token &token, lexical_token *next_token, parse_contex
 			{
 				//Function argument
 				if (context.function_token)
-					context.function_arguments.emplace_back(script_tree::BooleanArgument{*result});
+					context.function_arguments.emplace_back(ScriptType::Boolean{*result});
 				//Property argument
 				else if (context.property_token)
-					context.property_arguments.emplace_back(script_tree::BooleanArgument{*result});
+					context.property_arguments.emplace_back(ScriptType::Boolean{*result});
 				//Variable argument
 				else if (context.variable_token)
-					context.variable_arguments.emplace_back(script_tree::BooleanArgument{*result});
+					context.variable_arguments.emplace_back(ScriptType::Boolean{*result});
 			}
 			else
 			{
@@ -1520,13 +1521,13 @@ bool parse_literal(lexical_token &token, lexical_token *next_token, parse_contex
 			{
 				//Function argument
 				if (context.function_token)
-					context.function_arguments.emplace_back(script_tree::ColorArgument{*result});
+					context.function_arguments.emplace_back(ScriptType::Color{*result});
 				//Property argument
 				else if (context.property_token)
-					context.property_arguments.emplace_back(script_tree::ColorArgument{*result});
+					context.property_arguments.emplace_back(ScriptType::Color{*result});
 				//Variable argument
 				else if (context.variable_token)
-					context.variable_arguments.emplace_back(script_tree::ColorArgument{*result});
+					context.variable_arguments.emplace_back(ScriptType::Color{*result});
 			}
 			else
 			{
@@ -1547,19 +1548,19 @@ bool parse_literal(lexical_token &token, lexical_token *next_token, parse_contex
 			//Real
 			if (utilities::parse::detail::parse_as_floating_point(token.value))
 			{
-				auto result = ion::utilities::convert::To<script_tree::FloatingPointArgument::value_type>(token.value);
+				auto result = ion::utilities::convert::To<ScriptType::FloatingPoint::value_type>(token.value);
 
 				if (result)
 				{
 					//Function argument
 					if (context.function_token)
-						context.function_arguments.emplace_back(script_tree::FloatingPointArgument{context.unary_minus ? -*result : *result}, unit);
+						context.function_arguments.emplace_back(ScriptType::FloatingPoint{context.unary_minus ? -*result : *result}, unit);
 					//Property argument
 					else if (context.property_token)
-						context.property_arguments.emplace_back(script_tree::FloatingPointArgument{context.unary_minus ? -*result : *result}, unit);
+						context.property_arguments.emplace_back(ScriptType::FloatingPoint{context.unary_minus ? -*result : *result}, unit);
 					//Variable argument
 					else if (context.variable_token)
-						context.variable_arguments.emplace_back(script_tree::FloatingPointArgument{context.unary_minus ? -*result : *result}, unit);
+						context.variable_arguments.emplace_back(ScriptType::FloatingPoint{context.unary_minus ? -*result : *result}, unit);
 				}
 				else
 				{
@@ -1570,19 +1571,19 @@ bool parse_literal(lexical_token &token, lexical_token *next_token, parse_contex
 			//Integer
 			else
 			{
-				auto result = ion::utilities::convert::To<script_tree::IntegerArgument::value_type>(token.value);
+				auto result = ion::utilities::convert::To<ScriptType::Integer::value_type>(token.value);
 
 				if (result)
 				{
 					//Function argument
 					if (context.function_token)
-						context.function_arguments.emplace_back(script_tree::IntegerArgument{context.unary_minus ? -*result : *result}, unit);
+						context.function_arguments.emplace_back(ScriptType::Integer{context.unary_minus ? -*result : *result}, unit);
 					//Property argument
 					else if (context.property_token)
-						context.property_arguments.emplace_back(script_tree::IntegerArgument{context.unary_minus ? -*result : *result}, unit);
+						context.property_arguments.emplace_back(ScriptType::Integer{context.unary_minus ? -*result : *result}, unit);
 					//Variable argument
 					else if (context.variable_token)
-						context.variable_arguments.emplace_back(script_tree::IntegerArgument{context.unary_minus ? -*result : *result}, unit);
+						context.variable_arguments.emplace_back(ScriptType::Integer{context.unary_minus ? -*result : *result}, unit);
 				}
 				else
 				{
@@ -1604,13 +1605,13 @@ bool parse_literal(lexical_token &token, lexical_token *next_token, parse_contex
 			{
 				//Function argument
 				if (context.function_token)
-					context.function_arguments.emplace_back(script_tree::StringArgument{*result});
+					context.function_arguments.emplace_back(ScriptType::String{*result});
 				//Property argument
 				else if (context.property_token)
-					context.property_arguments.emplace_back(script_tree::StringArgument{*result});
+					context.property_arguments.emplace_back(ScriptType::String{*result});
 				//Variable argument
 				else if (context.variable_token)
-					context.variable_arguments.emplace_back(script_tree::StringArgument{*result});
+					context.variable_arguments.emplace_back(ScriptType::String{*result});
 				//Objects/Templates
 				else
 					context.classes = std::move(*result);
@@ -1791,18 +1792,18 @@ bool parse_unit(lexical_token &token, parse_context &context, CompileError&) noe
 
 	argument.Visit(
 		//Integer
-		[&](const script_tree::IntegerArgument &arg) mutable noexcept
+		[&](const ScriptType::Integer &value) mutable noexcept
 		{
 			if (token.value == "%")
-				argument = script_tree::ArgumentType{script_tree::FloatingPointArgument{
-					arg.Get() * script_tree::FloatingPointArgument::value_type{0.01}}};
+				argument = script_tree::ArgumentType{ScriptType::FloatingPoint{
+					value.Get() * ScriptType::FloatingPoint::value_type{0.01}}};
 		},
 		//Floating point
-		[&](const script_tree::FloatingPointArgument &arg) mutable noexcept
+		[&](const ScriptType::FloatingPoint &value) mutable noexcept
 		{
 			if (token.value == "%")
-				argument = script_tree::ArgumentType{script_tree::FloatingPointArgument{
-					arg.Get() * script_tree::FloatingPointArgument::value_type{0.01}}};
+				argument = script_tree::ArgumentType{ScriptType::FloatingPoint{
+					value.Get() * ScriptType::FloatingPoint::value_type{0.01}}};
 		},
 		//Default
 		[](auto&&) noexcept {});

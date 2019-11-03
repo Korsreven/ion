@@ -52,6 +52,7 @@ File:	main.cpp
 #include "script/IonScriptCompiler.h"
 #include "script/IonScriptError.h"
 #include "script/IonScriptTree.h"
+#include "script/IonScriptTypes.h"
 #include "script/IonScriptValidator.h"
 #include "script/utilities/IonParseUtility.h"
 
@@ -67,6 +68,7 @@ File:	main.cpp
 #include "timers/IonStopwatch.h"
 
 #include "types/IonSingleton.h"
+#include "types/IonStrongType.h"
 #include "types/IonTypes.h"
 #include "types/IonTypeCasts.h"
 #include "types/IonTypeTraits.h"
@@ -188,7 +190,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 				tree->Search("settings")
 				.Find("advanced")
 				.Property("color-depth")[0]
-				.Get<ion::script::script_tree::IntegerArgument>()
+				.Get<ion::script::ScriptType::Integer>()
 				.value_or(8)
 				.As<int>();
 

@@ -20,6 +20,7 @@ File:	IonScriptTree.h
 #include <type_traits>
 #include <vector>
 
+#include "IonScriptTypes.h"
 #include "adaptors/ranges/IonIterable.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
@@ -30,10 +31,6 @@ namespace ion::script
 {
 	namespace script_tree
 	{
-		using graphics::utilities::Color;
-		using graphics::utilities::Vector2;
-
-
 		/*
 			Forward declaration
 			Node types
@@ -48,29 +45,15 @@ namespace ion::script
 		using PropertyNodes = std::vector<PropertyNode>;
 		using ArgumentNodes = std::vector<ArgumentNode>;
 
-
-		/*
-			Forward declaration
-			Strong argument types
-		*/
-
-		struct BooleanArgument;
-		struct ColorArgument;
-		struct EnumerableArgument;
-		struct FloatingPointArgument;
-		struct IntegerArgument;
-		struct StringArgument;
-		struct Vector2Argument;
-
 		using ArgumentType =
 			std::variant<
-				BooleanArgument,
-				ColorArgument,
-				EnumerableArgument,
-				FloatingPointArgument,
-				IntegerArgument,
-				StringArgument,
-				Vector2Argument>;
+				ScriptType::Boolean,
+				ScriptType::Color,
+				ScriptType::Enumerable,
+				ScriptType::FloatingPoint,
+				ScriptType::Integer,
+				ScriptType::String,
+				ScriptType::Vector2>;
 
 
 		enum class SearchStrategy : bool
@@ -105,6 +88,16 @@ namespace ion::script
 			template <typename ...Ts> struct overloaded : Ts... { using Ts::operator()...; };
 			template <typename ...Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
+			template <typename T, typename Ts>
+			struct is_contained_in;
+
+			template <typename T, template <typename...> typename U, typename ...Ts>
+			struct is_contained_in<T, U<Ts...>> : std::disjunction<std::is_same<T, Ts>...> {};
+
+			template <typename T, typename U>
+			constexpr auto is_contained_in_v = is_contained_in<T, U>::value;
+
+
 			enum class serialization_section_token : std::underlying_type_t<std::byte>
 			{	
 				Object,
@@ -117,59 +110,6 @@ namespace ion::script
 			using generation = std::vector<ObjectNode*>;
 			using generations = std::vector<generation>;
 			using lineage_search_result = std::vector<generations>;
-
-
-			template <typename T>
-			class argument_type
-			{
-				private:
-
-					T value_{};
-
-				public:
-
-					using value_type = T;
-
-					argument_type(const T &value) noexcept :
-						value_{value}
-					{
-						//Empty
-					}
-
-					argument_type(T &&value) noexcept :
-						value_{std::move(value)}
-					{
-						//Empty
-					}
-
-					//Returns a mutable reference to the value
-					[[nodiscard]] inline auto& Get() noexcept
-					{
-						return value_;
-					}
-
-					//Returns an immutable reference to the value
-					[[nodiscard]] inline const auto& Get() const noexcept
-					{
-						return value_;
-					}
-			};
-
-			template <typename T>
-			struct arithmetic_type : argument_type<T>
-			{
-				static_assert(std::is_arithmetic_v<T>);
-				using argument_type<T>::argument_type;
-
-				//Returns the value of this argument casted to another arithmetic type
-				template <typename U>		
-				[[nodiscard]] inline auto As() const noexcept
-				{
-					static_assert(std::is_arithmetic_v<U>);
-					static_assert(std::is_convertible_v<T, U>);
-					return static_cast<U>(argument_type<T>::Get());
-				}
-			};
 
 
 			/*
@@ -206,13 +146,13 @@ namespace ion::script
 			}
 			
 			template <typename T>
-			inline void serialize_argument(const T &arg, std::vector<std::byte> &bytes)
+			inline void serialize_argument(const T &value, std::vector<std::byte> &bytes)
 			{
-				static_assert(std::is_base_of_v<argument_type<typename T::value_type>, T>);
+				static_assert(is_contained_in_v<T, ArgumentType>);
 
 				bytes.push_back(static_cast<std::byte>(serialization_section_token::Argument));
 				bytes.push_back(static_cast<std::byte>(variant_index<ArgumentType, T>()));
-				serialize_value(arg.Get(), bytes);
+				serialize_value(value.Get(), bytes);
 			}
 
 
@@ -356,46 +296,6 @@ namespace ion::script
 			void lineage_depth_first_search_impl(lineage_search_result &result, generations &descendants, ObjectNode &object);
 			lineage_search_result lineage_depth_first_search(ObjectNodes &objects);
 		} //detail
-
-
-		/*
-			Strong argument types
-		*/
-
-		struct BooleanArgument final : detail::arithmetic_type<bool>
-		{
-			using arithmetic_type::arithmetic_type;
-		};
-
-		struct ColorArgument final : detail::argument_type<Color>
-		{
-			using argument_type::argument_type;
-		};
-
-		struct EnumerableArgument final : detail::argument_type<std::string>
-		{
-			using argument_type::argument_type;
-		};
-
-		struct FloatingPointArgument final : detail::arithmetic_type<float80>
-		{
-			using arithmetic_type::arithmetic_type;
-		};
-
-		struct IntegerArgument final : detail::arithmetic_type<int64>
-		{
-			using arithmetic_type::arithmetic_type;
-		};
-
-		struct StringArgument final : detail::argument_type<std::string>
-		{
-			using argument_type::argument_type;
-		};
-
-		struct Vector2Argument final : detail::argument_type<Vector2>
-		{
-			using argument_type::argument_type;
-		};
 
 
 		/*
@@ -688,6 +588,18 @@ namespace ion::script
 				[[nodiscard]] inline auto Get() const noexcept
 				{
 					auto value = *this ? std::get_if<T>(&*argument_) : nullptr;
+
+					if constexpr (std::is_same_v<T, ScriptType::FloatingPoint>)
+					{		
+						if (!value)
+						{
+							//Try to get as integer
+							if (auto val = *this ? std::get_if<ScriptType::Integer>(&*argument_) : nullptr; val)
+								//Okay, non-narrowing
+								return std::make_optional(ScriptType::FloatingPoint{val->As<ScriptType::FloatingPoint::value_type>()});
+						}
+					}
+
 					return value ? std::make_optional(*value) : std::nullopt;
 				}
 
