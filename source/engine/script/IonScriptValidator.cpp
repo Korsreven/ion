@@ -13,12 +13,18 @@ File:	IonScriptValidator.cpp
 #include "IonScriptValidator.h"
 
 #include <algorithm>
+
 #include "IonScriptTypes.h"
+#include "timers/IonStopwatch.h"
 
 namespace ion::script
 {
 
+using namespace script_validator;
 using namespace script_error;
+
+using namespace std::string_literals;
+using namespace std::string_view_literals;
 
 namespace script_validator
 {
@@ -439,10 +445,11 @@ bool validate_property(const script_tree::PropertyNode &property, const property
 }
 
 bool validate_properties(const ScriptTree &tree, const script_tree::ObjectNode &object, const ClassDefinition &class_def,
-	class_declarations_cacher &declarations_cacher, ValidateError &error)
+	class_declarations_cacher &declarations_cacher, std::vector<ValidateError> &errors)
 {
 	auto [inner_classes, properties] = declarations_cacher.Get(class_def);
 	auto required_properties = get_required_properties(properties);
+	ValidateError error;
 
 	for (auto &property : object.Properties())
 	{
@@ -452,33 +459,34 @@ bool validate_properties(const ScriptTree &tree, const script_tree::ObjectNode &
 			if (!validate_property(property, iter->second))
 			{
 				error = {ValidateErrorCode::InvalidPropertyArguments, *tree.GetFullyQualifiedName(object, property)};
-				return false;
+				errors.push_back(error);
 			}
+
+			required_properties.erase(property.Name());
 		}
 		else
 		{
 			error = {ValidateErrorCode::UnexpectedProperty, *tree.GetFullyQualifiedName(object, property)};
-			return false;
+			errors.push_back(error);
 		}
-
-		required_properties.erase(property.Name());
 	}
 
-	if (!std::empty(required_properties))
+	for (auto &required_property : required_properties)
 	{
 		error = {ValidateErrorCode::MissingRequiredProperty, *tree.GetFullyQualifiedName(object) + "." +
-															 std::string{*std::begin(required_properties)}};
-		return false;
+															 std::string{required_property}};
+		errors.push_back(error);
 	}
 
-	return true;
+	return !error;
 }
 
 const ClassDefinition* validate_class(const ScriptTree &tree, const script_tree::ObjectNode &object, const ClassDefinition &class_owner,
-	class_definition_cacher &definition_cacher, class_declarations_cacher &declarations_cacher, ValidateError &error)
+	class_definition_cacher &definition_cacher, class_declarations_cacher &declarations_cacher, std::vector<ValidateError> &errors)
 {
 	auto [inner_classes, properties] = declarations_cacher.Get(class_owner);
 	inner_class_declarations::value_type *class_candidate = nullptr;
+	ValidateError error;
 
 	if (auto iter = inner_classes.find(object.Name());
 		iter != std::end(inner_classes))
@@ -494,6 +502,7 @@ const ClassDefinition* validate_class(const ScriptTree &tree, const script_tree:
 			if (class_candidate)
 			{
 				error = {ValidateErrorCode::AmbiguousClass, *tree.GetFullyQualifiedName(object)};
+				errors.push_back(error);
 				break;
 			}
 			//A candidate found
@@ -504,16 +513,16 @@ const ClassDefinition* validate_class(const ScriptTree &tree, const script_tree:
 
 	if (error)
 		return nullptr;
-
-	if (!class_candidate)
+	else if (!class_candidate)
 	{
 		error = {ValidateErrorCode::UnexpectedClass, *tree.GetFullyQualifiedName(object)};
+		errors.push_back(error);
 		return nullptr;
 	}
-	
-	if (!class_candidate->Declaration->Instantiatable())
+	else if (!class_candidate->Declaration->Instantiatable())
 	{
 		error = {ValidateErrorCode::AbstractClassInstantiated, *tree.GetFullyQualifiedName(object)};
+		errors.push_back(error);
 		return nullptr;
 	}
 
@@ -523,18 +532,29 @@ const ClassDefinition* validate_class(const ScriptTree &tree, const script_tree:
 		definition_cacher.Get({class_candidate->Declaration->Name(), *class_candidate->Owner});
 
 	//Class definition found, validate properties
-	if (class_def &&
-		validate_properties(tree, object, *class_def, declarations_cacher, error))
+	if (class_def)
+	{
+		validate_properties(tree, object, *class_def, declarations_cacher, errors); //Ignoring return value
 		return class_def;
+	}
 	else
 		return nullptr;
 }
 
-bool validate(const ScriptTree &tree, const ClassDefinition &root, ValidateError &error)
+bool validate(const ScriptTree &tree, const ClassDefinition &root, ValidateError &error, std::vector<ValidateError> &errors)
 {
-	class_definition_cacher definition_cacher{root};
-	class_declarations_cacher declarations_cacher{root};
+	//Start by validating the given tree
+	auto result = validate_tree(tree, root, errors);
+	
+	//Set to first error
+	if (!std::empty(errors))
+		error = errors.front();
 
+	return result;
+}
+
+bool validate_tree(const ScriptTree &tree, const ClassDefinition &root, std::vector<ValidateError> &errors)
+{
 	//No top level (global) classes found
 	if (std::empty(root.InnerClasses()))
 		return true; //Nothing to validate against
@@ -546,9 +566,13 @@ bool validate(const ScriptTree &tree, const ClassDefinition &root, ValidateError
 		adaptors::FlatSet<std::string_view> required_classes;
 	};
 
+	class_definition_cacher definition_cacher{root};
+	class_declarations_cacher declarations_cacher{root};	
+
 	auto [root_classes, root_properties] = declarations_cacher.Get(root);
 	std::vector<scope> scopes{{nullptr, root, get_required_classes(root_classes)}};
 	auto next_search_depth = -1;
+	ValidateError error;
 
 	for (auto &[object, parent, depth] : tree.DepthFirstSearch())
 	{
@@ -567,17 +591,17 @@ bool validate(const ScriptTree &tree, const ClassDefinition &root, ValidateError
 		{
 			const auto &scope = scopes.back();
 
-			if (!std::empty(scope.required_classes))
+			for (auto &required_class : scope.required_classes)
 			{
 				error = {ValidateErrorCode::MissingRequiredClass, *tree.GetFullyQualifiedName(*scope.object) + "." +
-																  std::string{*std::begin(scope.required_classes)}};
-				return false;
+																  std::string{required_class}};
+				errors.push_back(error);
 			}
 
 			scopes.pop_back();
 		}
 
-		if (auto class_def = validate_class(tree, object, scopes.back().class_def, definition_cacher, declarations_cacher, error); class_def)
+		if (auto class_def = validate_class(tree, object, scopes.back().class_def, definition_cacher, declarations_cacher, errors); class_def)
 		{
 			auto [inner_classes, properties] = declarations_cacher.Get(*class_def);
 
@@ -586,11 +610,7 @@ bool validate(const ScriptTree &tree, const ClassDefinition &root, ValidateError
 		}
 		else
 		{
-			if (error)
-				return false;
-			else
-				next_search_depth = depth; //Forward to next search depth
-
+			next_search_depth = depth; //Forward to next search depth
 			scopes.back().required_classes.erase(object.Name());
 		}
 	}
@@ -598,15 +618,73 @@ bool validate(const ScriptTree &tree, const ClassDefinition &root, ValidateError
 	//Check if some required classes are missing
 	for (const auto &scope : adaptors::ranges::ReverseIterable<decltype(scopes)&>{scopes})
 	{
-		if (!std::empty(scope.required_classes))
+		for (auto &required_class : scope.required_classes)
 		{
 			error = {ValidateErrorCode::MissingRequiredClass, (scope.object ? *tree.GetFullyQualifiedName(*scope.object) + "." : "") +
-															  std::string{*std::begin(scope.required_classes)}};
-			return false;
+															  std::string{required_class}};
+			errors.push_back(error);
 		}
 	}
 
-	return true;
+	return std::empty(errors);
+}
+
+
+/*
+	Outputting
+*/
+
+std::string print_output(std::chrono::duration<real> validate_time, const std::vector<ValidateError> &errors, OutputOptions output_options)
+{
+	std::string output;
+	{
+		auto error = !std::empty(errors) ? errors.front() : ValidateError{};
+	
+		//Find first error (if any)
+		if (!error)
+		{
+			if (auto iter = std::find_if(std::begin(errors), std::end(errors),
+				[](auto &error) noexcept
+				{
+					return !error;
+				}); iter != std::end(errors))
+				//Has error
+				error = *iter;
+		}	
+
+		if (output_options == OutputOptions::Summary ||
+			output_options == OutputOptions::SummaryAndErrors)
+		{
+			if (!std::empty(output))
+				output += "\n\n";
+
+			output += ion::utilities::string::Concat(
+				"[Validator summary]\n"
+				"Message - ",
+					!error ?
+					"Validation succeeded!" :
+					ion::utilities::string::Concat("Validation failed. ", error.Condition.message(), " (", error.FullyQualifiedName, ")"),
+				"\n"
+				"Validate time - ", ion::utilities::string::Format(validate_time.count(), "0.0000"sv), " seconds\n"
+				"Validation errors - ", std::size(errors));
+		}
+	}
+
+	if (!std::empty(errors) &&
+		(output_options == OutputOptions::Errors ||
+		 output_options == OutputOptions::SummaryAndErrors))
+	{
+		if (!std::empty(output))
+			output += "\n\n";
+
+		output += "[Validation errors]";
+
+		for (const auto &error : errors)
+			output += ion::utilities::string::Concat(
+				"\n", "Error. ", error.Condition.message(), " (", error.FullyQualifiedName, ")");
+	}
+
+	return output;
 }
 
 } //detail
@@ -882,9 +960,6 @@ ClassDeclaration::ClassDeclaration(ClassDefinition definition, Ordinality ordina
 } //script_validator
 
 
-using namespace script_validator;
-
-
 /*
 	Classes
 */
@@ -923,6 +998,26 @@ ScriptValidator& ScriptValidator::AddRequiredClass(ClassDefinition class_def)
 
 
 /*
+	Lookup
+*/
+
+const ClassDeclaration* ScriptValidator::GetClass(std::string_view name) const noexcept
+{
+	return root_.GetInnerClass(name);
+}
+
+
+/*
+	Outputting
+*/
+
+std::string ScriptValidator::PrintOutput(OutputOptions output_options) const
+{
+	return script_validator::detail::print_output(validate_time_, validate_errors_, output_options);
+}
+
+
+/*
 	Validating
 */
 
@@ -931,19 +1026,15 @@ ScriptValidator ScriptValidator::Create() noexcept
 	return {};
 }
 
-bool ScriptValidator::Validate(const ScriptTree &tree, ValidateError &error) const noexcept
+bool ScriptValidator::Validate(const ScriptTree &tree, ValidateError &error)
 {
-	return script_validator::detail::validate(tree, root_, error);
-}
+	validate_errors_.clear();
+	validate_time_ = {}; //Reset
 
-
-/*
-	Lookup
-*/
-
-const ClassDeclaration* ScriptValidator::GetClass(std::string_view name) const noexcept
-{
-	return root_.GetInnerClass(name);
+	auto stopwatch = timers::Stopwatch::StartNew();
+	auto result = script_validator::detail::validate(tree, root_, error, validate_errors_);
+	validate_time_ = stopwatch.Elapsed();
+	return result;
 }
 
 } //ion::script

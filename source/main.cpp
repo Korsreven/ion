@@ -49,6 +49,7 @@ File:	main.cpp
 #include "resources/files/repositories/IonShaderRepository.h"
 #include "resources/files/repositories/IonVideoRepository.h"
 
+#include "script/IonScriptBuilder.h"
 #include "script/IonScriptCompiler.h"
 #include "script/IonScriptError.h"
 #include "script/IonScriptTree.h"
@@ -176,12 +177,29 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 
 	//Compile script
 	{
-		ion::script::ScriptCompiler script;
-		script.Output(ion::script::script_compiler::OutputOptions::SummaryWithFilesAndTreeView,
-					  ion::script::script_tree::PrintOptions::ObjectsWithPropertiesAndArguments);
+		auto basic = ion::script::script_validator::ClassDefinition::Create("basic")
+			.AddRequiredProperty("resolution", {ion::script::script_validator::ParameterType::Integer, ion::script::script_validator::ParameterType::Integer})
+			.AddRequiredProperty("fullscreen", ion::script::script_validator::ParameterType::Boolean);
+		auto advanced = ion::script::script_validator::ClassDefinition::Create("advanced")
+			.AddRequiredProperty("color-depth", ion::script::script_validator::ParameterType::Integer)
+			.AddRequiredProperty("vertical-sync", ion::script::script_validator::ParameterType::Boolean);
+		auto settings = ion::script::script_validator::ClassDefinition::Create("settings")
+			.AddRequiredClass(std::move(basic))
+			.AddRequiredClass(std::move(advanced));
+		auto engine = ion::script::script_validator::ClassDefinition::Create("engine")
+			.AddRequiredClass(std::move(settings));
 
-		ion::script::CompileError compile_error;
-		auto tree = script.Compile("bin/main.ion", compile_error);
+		auto validator = ion::script::ScriptValidator::Create()
+			.AddRequiredClass(std::move(engine));
+
+		ion::script::ScriptBuilder builder;
+		builder.Validator(std::move(validator));
+		builder.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+		builder.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+		builder.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+		builder.TreeOutput(ion::script::script_tree::PrintOptions::Arguments);
+		builder.Build("bin/main.ion");
+		auto &tree = builder.Tree();
 
 		//Serialize tree
 		if (tree)

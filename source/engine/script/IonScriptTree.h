@@ -78,8 +78,8 @@ namespace ion::script
 		enum class PrintOptions
 		{
 			Objects,
-			ObjectsWithProperties,
-			ObjectsWithPropertiesAndArguments
+			Properties,
+			Arguments
 		};
 
 
@@ -689,7 +689,7 @@ namespace ion::script
 
 			//Print out this script tree as an hierarchical list with objects, properties and arguments.
 			//Choose what to print based on the given print options (optionally)
-			[[nodiscard]] std::string Print(script_tree::PrintOptions print_options = script_tree::PrintOptions::ObjectsWithProperties) const;
+			[[nodiscard]] std::string Print(script_tree::PrintOptions print_options = script_tree::PrintOptions::Arguments) const;
 
 
 			/*

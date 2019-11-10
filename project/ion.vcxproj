@@ -164,6 +164,7 @@
     <ClCompile Include="..\source\engine\resources\files\repositories\IonImageRepository.cpp" />
     <ClCompile Include="..\source\engine\resources\files\repositories\IonShaderRepository.cpp" />
     <ClCompile Include="..\source\engine\resources\files\repositories\IonVideoRepository.cpp" />
+    <ClCompile Include="..\source\engine\script\IonScriptBuilder.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptCompiler.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptError.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptTree.cpp" />
@@ -225,6 +226,7 @@
     <ClInclude Include="..\source\engine\resources\files\repositories\IonVideoRepository.h" />
     <ClInclude Include="..\source\engine\resources\IonResource.h" />
     <ClInclude Include="..\source\engine\resources\IonResourceManager.h" />
+    <ClInclude Include="..\source\engine\script\IonScriptBuilder.h" />
     <ClInclude Include="..\source\engine\script\IonScriptCompiler.h" />
     <ClInclude Include="..\source\engine\script\IonScriptError.h" />
     <ClInclude Include="..\source\engine\script\IonScriptTree.h" />

@@ -13,6 +13,7 @@ File:	IonScriptCompiler.h
 #ifndef _ION_SCRIPT_COMPILER_
 #define _ION_SCRIPT_COMPILER_
 
+#include <chrono>
 #include <filesystem>
 #include <memory>
 #include <mutex>
@@ -34,11 +35,9 @@ namespace ion::script
 	{
 		enum class OutputOptions
 		{
-			Nothing,
 			Summary,
-			SummaryWithFiles,
-			SummaryWithTreeView,
-			SummaryWithFilesAndTreeView
+			Units,
+			SummaryAndUnits
 		};
 
 
@@ -458,12 +457,12 @@ namespace ion::script
 				}
 			}
 
-			std::string current_date_time() noexcept;
 
 			std::optional<std::filesystem::path> full_file_path(std::filesystem::path file_path,
 				const std::filesystem::path &root_path, const std::filesystem::path &current_path);
 			bool open_file(const std::filesystem::path &file_path, const std::filesystem::path &root_path,
 				file_trace &trace, std::string &str, CompileError &error);
+
 
 			/*
 				Lexing
@@ -541,36 +540,32 @@ namespace ion::script
 			/*
 				Compiling
 			*/
-	
-			std::optional<ScriptTree> compile(translation_unit &unit, file_trace trace, build_system &system);
-			std::optional<lexical_tokens> partial_compile(translation_unit &unit, file_trace trace, build_system &system);
+
+			std::optional<ScriptTree> compile(file_trace trace, build_system &system, CompileError &error, std::vector<CompileError> &errors);
+			std::optional<ScriptTree> compile_unit(translation_unit &unit, file_trace trace, build_system &system);
+			std::optional<lexical_tokens> partial_compile_unit(translation_unit &unit, file_trace trace, build_system &system);
+			
+
+			/*
+				Outputting
+			*/
+
+			std::string print_output(std::chrono::duration<real> compile_time, const std::vector<CompileError> &errors, OutputOptions output_options);
 		} //detail
 	} //script_compiler
 
 	class ScriptCompiler final
 	{
 		private:
-
+		
 			std::optional<int> max_build_processes_;
-			script_compiler::OutputOptions output_options_ = script_compiler::OutputOptions::Nothing;
-			script_tree::PrintOptions print_options_ = script_tree::PrintOptions::ObjectsWithProperties;			
+
+			std::vector<CompileError> compile_errors_;
+			std::chrono::duration<real> compile_time_;
 
 		public:
 
 			ScriptCompiler() = default;
-
-
-			/*
-				Compiling
-			*/
-
-			//Compile the given script file by lexing, parsing and linking it.
-			//Returns a ScriptTree that contains objects and object properties
-			[[nodiscard]] std::optional<ScriptTree> Compile(std::filesystem::path file_path, CompileError &error);
-
-			//Compile the given script file and root path by lexing, parsing and linking it.
-			//Returns a ScriptTree that contains objects and object properties
-			[[nodiscard]] std::optional<ScriptTree> Compile(std::filesystem::path file_path, std::filesystem::path root_path, CompileError &error);
 
 
 			/*
@@ -584,18 +579,25 @@ namespace ion::script
 				max_build_processes_ = max_build_processes;
 			}
 
-			//Set the compiler output and tree print options that will be used when outputting
-			inline void Output(script_compiler::OutputOptions output_options,
-				script_tree::PrintOptions print_options = script_tree::PrintOptions::ObjectsWithProperties) noexcept
-			{
-				output_options_ = output_options;
-				print_options_ = print_options;
-			}
-
 
 			/*
 				Observers
 			*/
+
+			//Returns all compile errors from the previous compilation (per unit)
+			//The errors returned are per compiled unit (file)
+			//The compilation is successful if all errors returned indicates a success
+			[[nodiscard]] inline const auto& CompileErrors() const noexcept
+			{
+				return compile_errors_;
+			}
+
+			//Returns the compile time of the previous compilation
+			[[nodiscard]] inline auto CompileTime() const noexcept
+			{
+				return compile_time_;
+			}
+
 
 			//Returns the max number of build processes the compiler is allowed to use
 			//If nullopt is returned, a default number of build processes is being used (based on your system)
@@ -604,11 +606,27 @@ namespace ion::script
 				return max_build_processes_;
 			}
 
-			//Returns the compiler output and tree print options currently being used
-			[[nodiscard]] inline auto Output() const noexcept
-			{
-				return std::pair{output_options_, print_options_};
-			}
+
+			/*
+				Compiling
+			*/
+
+			//Compile the given script file by lexing, parsing and linking it.
+			//Returns a ScriptTree that contains objects, object properties and property arguments
+			[[nodiscard]] std::optional<ScriptTree> Compile(std::filesystem::path file_path, CompileError &error);
+
+			//Compile the given script file (with root path) by lexing, parsing and linking it.
+			//Returns a ScriptTree that contains objects, object properties and property arguments
+			[[nodiscard]] std::optional<ScriptTree> Compile(std::filesystem::path file_path, std::filesystem::path root_path, CompileError &error);
+
+
+			/*
+				Outputting
+			*/
+
+			//Prints the output from the previous compilation
+			//Whats printed is based on the given compiler output options
+			[[nodiscard]] std::string PrintOutput(script_compiler::OutputOptions output_options = script_compiler::OutputOptions::SummaryAndUnits) const;
 	};
 } //ion::script
 

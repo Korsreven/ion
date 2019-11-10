@@ -225,6 +225,9 @@
     <ClCompile Include="..\source\engine\script\IonScriptValidator.cpp">
       <Filter>Source Files\script</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\script\IonScriptBuilder.cpp">
+      <Filter>Source Files\script</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -426,6 +429,9 @@
       <Filter>Header Files\types</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\script\IonScriptTypes.h">
+      <Filter>Header Files\script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\script\IonScriptBuilder.h">
       <Filter>Header Files\script</Filter>
     </ClInclude>
   </ItemGroup>

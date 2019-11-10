@@ -13,7 +13,6 @@ File:	IonScriptCompiler.cpp
 #include "IonScriptCompiler.h"
 
 #include <algorithm>
-#include <chrono>
 
 #include "IonScriptTypes.h"
 #include "graphics/utilities/IonColor.h"
@@ -52,7 +51,7 @@ void build_system::start_process(std::string str, file_trace trace)
 	}
 
 	auto id = ion::utilities::string::ToLowerCaseCopy(unit->file_path);
-	processes.RunTask(std::move(id), partial_compile, std::ref(*unit), std::move(trace), std::ref(*this));
+	processes.RunTask(std::move(id), partial_compile_unit, std::ref(*unit), std::move(trace), std::ref(*this));
 }
 
 bool file_trace::push_file(std::filesystem::path file_path)
@@ -80,14 +79,6 @@ void file_trace::pop_file()
 		stack.pop_back();
 }
 
-
-std::string current_date_time() noexcept
-{
-	std::array<char, 32> data;
-	auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());	
-	return std::strftime(std::data(data), std::size(data), "%F %T", std::localtime(&now)) != 0 ?
-		std::data(data) : "";
-}
 
 std::optional<std::filesystem::path> full_file_path(std::filesystem::path file_path,
 	const std::filesystem::path &root_path, const std::filesystem::path &current_path)
@@ -1384,7 +1375,7 @@ std::optional<script_tree::ArgumentType> call_function(lexical_token &token, scr
 	//hwb/hwba
 	else if (token.value == "hwb" || token.value == "hwba")
 		return call_hwb(token, arguments, error);
-	//hsl/hsla
+	//cmyk/cmyka
 	else if (token.value == "cmyk" || token.value == "cmyka")
 		return call_cmyk(token, arguments, error);
 	//vec2
@@ -2229,7 +2220,35 @@ void inherit(script_tree::ObjectNodes &objects, template_rules &templates)
 	Compiling
 */
 
-std::optional<ScriptTree> compile(translation_unit &unit, file_trace trace, build_system &system)
+std::optional<ScriptTree> compile(file_trace trace, build_system &system, CompileError &error, std::vector<CompileError> &errors)
+{
+	//Start by compiling the given unit (entry point)
+	auto tree = compile_unit(*system.units.front(), trace, system);
+
+	//Inherit error from the first unit that failed to build
+	for (const auto &unit : system.units)
+	{
+		//Add error
+		if (unit->error)
+		{
+			if (!error)
+				error = unit->error;
+
+			errors.push_back(unit->error);
+		}
+		//Add success (file path)
+		else
+			errors.emplace_back().FilePath = unit->file_path;
+	}
+
+	//Set file path on no error (success)
+	if (!error && !std::empty(errors))
+		error.FilePath = errors.front().FilePath;
+
+	return tree;
+}
+
+std::optional<ScriptTree> compile_unit(translation_unit &unit, file_trace trace, build_system &system)
 {
 	auto tokens = lex(unit, std::move(trace), system);
 	auto result = tokens ? parse(std::move(*tokens), system, unit.error) : std::nullopt;
@@ -2237,7 +2256,7 @@ std::optional<ScriptTree> compile(translation_unit &unit, file_trace trace, buil
 	return result;
 }
 
-std::optional<lexical_tokens> partial_compile(translation_unit &unit, file_trace trace, build_system &system)
+std::optional<lexical_tokens> partial_compile_unit(translation_unit &unit, file_trace trace, build_system &system)
 {
 	auto tokens = lex(unit, std::move(trace), system);
 
@@ -2251,6 +2270,66 @@ std::optional<lexical_tokens> partial_compile(translation_unit &unit, file_trace
 	}
 
 	return {unit.error ? std::nullopt : std::move(tokens)};
+}
+
+
+/*
+	Outputting
+*/
+
+std::string print_output(std::chrono::duration<real> compile_time, const std::vector<CompileError> &errors, OutputOptions output_options)
+{
+	std::string output;
+	{
+		auto error = !std::empty(errors) ? errors.front() : CompileError{};
+	
+		//Find first error (if any)
+		if (!error)
+		{
+			if (auto iter = std::find_if(std::begin(errors), std::end(errors),
+				[](auto &error) noexcept
+				{
+					return !error;
+				}); iter != std::end(errors))
+				//Has error
+				error = *iter;
+		}
+
+		if (output_options == OutputOptions::Summary ||
+			output_options == OutputOptions::SummaryAndUnits)
+		{
+			if (!std::empty(output))
+				output += "\n\n";
+
+			output += ion::utilities::string::Concat(
+				"[Compiler summary]\n"
+				"Message - ",
+					!error ?
+					"Compilation succeeded!" :
+					ion::utilities::string::Concat("Compilation failed. ", error.Condition.message(), " ('", error.FilePath.string(), "', line ", error.LineNumber, ")"),
+				"\n"
+				"Compile time - ", ion::utilities::string::Format(compile_time.count(), "0.0000"sv), " seconds\n"
+				"Compiled units - ", std::size(errors));
+		}
+	}
+
+	if (!std::empty(errors) &&
+		(output_options == OutputOptions::Units ||
+		 output_options == OutputOptions::SummaryAndUnits))
+	{
+		if (!std::empty(output))
+			output += "\n\n";
+
+		output += "[Compiled units]";
+
+		for (const auto &error : errors)
+			output += ion::utilities::string::Concat(
+				"\n'", error.FilePath.string(), "' - ",
+					!error ?
+					"OK" : ion::utilities::string::Concat("Error. ", error.Condition.message(), " (line ", error.LineNumber, ")"));
+	}
+
+	return output;
 }
 
 } //script_compiler::detail
@@ -2271,6 +2350,9 @@ std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_pat
 
 std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_path, std::filesystem::path root_path, CompileError &error)
 {
+	compile_errors_.clear();
+	compile_time_ = {}; //Reset
+
 	//Root path needs to be a valid directory
 	if (ion::utilities::file::IsDirectory(root_path))
 	{
@@ -2286,73 +2368,24 @@ std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_pat
 			if (max_build_processes_)
 				system.processes.MaxWorkerThreads(*max_build_processes_);
 
-			//Start by compiling the given file (entry point)
 			auto stopwatch = timers::Stopwatch::StartNew();
-			auto tree = script_compiler::detail::compile(*system.units.back(), trace, system);
-			auto elapsed = stopwatch.Elapsed();
-
-			//Inherit error from the first unit that failed to build
-			for (const auto &unit : system.units)
-			{
-				if (unit->error)
-				{
-					error = unit->error;
-					break;
-				}
-			}
-
-			//Output
-			switch (output_options_)
-			{
-				case script_compiler::OutputOptions::Summary:
-				case script_compiler::OutputOptions::SummaryWithFiles:
-				case script_compiler::OutputOptions::SummaryWithTreeView:
-				case script_compiler::OutputOptions::SummaryWithFilesAndTreeView:
-				{
-					auto output = ion::utilities::string::Concat(
-						file_path.filename().string(), "\n",
-						script_compiler::detail::current_date_time(), "\n\n",
-
-						"[Summary]\n",
-						"Messages - ",
-							!error ?
-							"Build succeeded!" :
-							ion::utilities::string::Concat("Build failed. ", error.Condition.message(), " ('", error.FilePath.string(), "', line ", error.LineNumber, ")"),
-						"\n",
-						"Build time - ", ion::utilities::string::Format(elapsed.count(), "0.0000"sv), " seconds\n",
-						"Files built - ", std::size(system.units));
-
-					if (output_options_ == script_compiler::OutputOptions::SummaryWithFiles ||
-						output_options_ == script_compiler::OutputOptions::SummaryWithFilesAndTreeView)
-					{
-						output += "\n\n[Files]";
-
-						for (const auto &unit : system.units)
-							output += ion::utilities::string::Concat(
-								"\n'", unit->file_path, "' - ",
-									!unit->error ?
-									"OK" :
-									ion::utilities::string::Concat("Error. ", unit->error.Condition.message(), " (line ", unit->error.LineNumber, ")"));
-					}
-
-					if (tree &&
-						(output_options_ == script_compiler::OutputOptions::SummaryWithTreeView ||
-						output_options_ == script_compiler::OutputOptions::SummaryWithFilesAndTreeView))
-					{
-						output += "\n\n[Tree View]";
-						output += tree->Print(print_options_);
-					}
-
-					ion::utilities::file::Save(file_path.replace_filename(file_path.filename().string() + ".output.txt"), output);
-					break;
-				}
-			}
-
+			auto tree = script_compiler::detail::compile(std::move(trace), system, error, compile_errors_);
+			compile_time_ = stopwatch.Elapsed();
 			return tree;
 		}
 	}
 
 	return {};
+}
+
+
+/*
+	Outputting
+*/
+
+std::string ScriptCompiler::PrintOutput(OutputOptions output_options) const
+{
+	return script_compiler::detail::print_output(compile_time_, compile_errors_, output_options);
 }
 
 } //ion::script

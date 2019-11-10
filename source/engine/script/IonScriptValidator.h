@@ -14,6 +14,7 @@ File:	IonScriptValidator.h
 #define _ION_SCRIPT_VALIDATOR_
 
 #include <cassert>
+#include <chrono>
 #include <initializer_list>
 #include <optional>
 #include <string>
@@ -54,6 +55,13 @@ namespace ion::script
 		{
 			Abstract,
 			Concrete
+		};
+
+		enum class OutputOptions
+		{
+			Summary,
+			Errors,
+			SummaryAndErrors
 		};
 
 
@@ -252,11 +260,19 @@ namespace ion::script
 
 			bool validate_property(const script_tree::PropertyNode &property, const property_declarations &overload_set);
 			bool validate_properties(const ScriptTree &tree, const script_tree::ObjectNode &object, const ClassDefinition &class_def,
-				class_declarations_cacher &declarations_cacher, ValidateError &error);
+				class_declarations_cacher &declarations_cacher, std::vector<ValidateError> &errors);
 			const ClassDefinition* validate_class(const ScriptTree &tree, const script_tree::ObjectNode &object, const ClassDefinition &class_owner,
-				class_definition_cacher &definition_cacher, class_declarations_cacher &declarations_cacher, ValidateError &error);
+				class_definition_cacher &definition_cacher, class_declarations_cacher &declarations_cacher, std::vector<ValidateError> &errors);
 
-			bool validate(const ScriptTree &tree, const ClassDefinition &root, ValidateError &error);
+			bool validate(const ScriptTree &tree, const ClassDefinition &root, ValidateError &error, std::vector<ValidateError> &errors);
+			bool validate_tree(const ScriptTree &tree, const ClassDefinition &root, std::vector<ValidateError> &errors);
+
+
+			/*
+				Outputting
+			*/
+
+			std::string print_output(std::chrono::duration<real> validate_time, const std::vector<ValidateError> &errors, OutputOptions output_options);
 		} //detail
 
 
@@ -566,6 +582,9 @@ namespace ion::script
 		private:
 
 			script_validator::ClassDefinition root_{{}};
+
+			std::vector<ValidateError> validate_errors_;
+			std::chrono::duration<real> validate_time_;
     
 		public:
 
@@ -579,6 +598,25 @@ namespace ion::script
 			//Returns a newly created script validator
 			//Designed for fluent interface by using function chaining (named parameter idiom)
 			[[nodiscard]] static ScriptValidator Create() noexcept;
+
+
+			/*
+				Observers
+			*/
+
+			//Returns all validate errors from the previous validation
+			//The errors returned are all validation errors found
+			//The validation is okay if no errors returned
+			[[nodiscard]] inline const auto& ValidateErrors() const noexcept
+			{
+				return validate_errors_;
+			}
+
+			//Returns the validate time of the previous validation
+			[[nodiscard]] inline auto ValidateTime() const noexcept
+			{
+				return validate_time_;
+			}
 
 
 			/*
@@ -604,20 +642,29 @@ namespace ion::script
 
 
 			/*
-				Validating
-			*/
-
-			//Returns true if this validator validates the given script tree
-			[[nodiscard]] bool Validate(const ScriptTree &tree, ValidateError &error) const noexcept;
-
-
-			/*
 				Lookup
 			*/
 
 			//Returns a pointer to an immutable ClassDeclaration with the given name
 			//If no class with the given name is found, it returns nullptr
 			[[nodiscard]] const script_validator::ClassDeclaration* GetClass(std::string_view name) const noexcept;
+
+
+			/*
+				Outputting
+			*/
+
+			//Prints the output from the previous compilation
+			//Whats printed is based on the given compiler output options
+			[[nodiscard]] std::string PrintOutput(script_validator::OutputOptions output_options = script_validator::OutputOptions::SummaryAndErrors) const;
+
+
+			/*
+				Validating
+			*/
+
+			//Returns true if this validator validates the given script tree
+			[[nodiscard]] bool Validate(const ScriptTree &tree, ValidateError &error);
 
 
 			/*

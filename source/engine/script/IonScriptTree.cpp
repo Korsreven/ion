@@ -250,15 +250,15 @@ std::string print(const ObjectNodes &objects, PrintOptions print_options)
 		if (auto &classes = object.Classes(); !std::empty(classes))
 			output += " \"" + classes + "\"";
 
-		if (print_options == PrintOptions::ObjectsWithProperties ||
-			print_options == PrintOptions::ObjectsWithPropertiesAndArguments)
+		if (print_options == PrintOptions::Properties ||
+			print_options == PrintOptions::Arguments)
 		{
 			//Print properties
 			for (auto &property : object.Properties())
 			{
 				output += "\n" + std::string(depth * 4 + 4, ' ') + "|-- " + property.Name();
 
-				if (print_options == PrintOptions::ObjectsWithPropertiesAndArguments)
+				if (print_options == PrintOptions::Arguments)
 				{
 					if (auto remaining_args = static_cast<int>(property.Arguments().size());
 						remaining_args > 0)
@@ -692,17 +692,17 @@ ScriptTree::ScriptTree(ObjectNodes objects) noexcept :
 	Appending
 */
 
-void ScriptTree::Append(const script_tree::ObjectNodes &objects, script_tree::AppendCondition append_condition)
+void ScriptTree::Append(const ObjectNodes &objects, AppendCondition append_condition)
 {
 	detail::append_nodes(objects_, objects, append_condition);
 }
 
-void ScriptTree::Append(const adaptors::ranges::Iterable<script_tree::ObjectNodes&> &objects, script_tree::AppendCondition append_condition)
+void ScriptTree::Append(const adaptors::ranges::Iterable<ObjectNodes&> &objects, AppendCondition append_condition)
 {
 	detail::append_nodes(objects_, objects, append_condition);
 }
 
-void ScriptTree::Append(const adaptors::ranges::Iterable<const script_tree::ObjectNodes&> &objects, script_tree::AppendCondition append_condition)
+void ScriptTree::Append(const adaptors::ranges::Iterable<const ObjectNodes&> &objects, AppendCondition append_condition)
 {
 	detail::append_nodes(objects_, objects, append_condition);
 }
@@ -712,7 +712,7 @@ void ScriptTree::Append(const adaptors::ranges::Iterable<const script_tree::Obje
 	Finding / searching
 */
 
-script_tree::ObjectNode& ScriptTree::Find(std::string_view name) noexcept
+ObjectNode& ScriptTree::Find(std::string_view name) noexcept
 {
 	for (auto &object : objects_)
 	{
@@ -720,10 +720,10 @@ script_tree::ObjectNode& ScriptTree::Find(std::string_view name) noexcept
 			return object;
 	}
 
-	return const_cast<ObjectNode&>(script_tree::InvalidObjectNode);
+	return const_cast<ObjectNode&>(InvalidObjectNode);
 }
 
-const script_tree::ObjectNode& ScriptTree::Find(std::string_view name) const noexcept
+const ObjectNode& ScriptTree::Find(std::string_view name) const noexcept
 {
 	for (const auto &object : objects_)
 	{
@@ -731,13 +731,13 @@ const script_tree::ObjectNode& ScriptTree::Find(std::string_view name) const noe
 			return object;
 	}
 
-	return script_tree::InvalidObjectNode;
+	return InvalidObjectNode;
 }
 
 
-script_tree::ObjectNode& ScriptTree::Search(std::string_view name, script_tree::SearchStrategy strategy) noexcept
+ObjectNode& ScriptTree::Search(std::string_view name, SearchStrategy strategy) noexcept
 {
-	if (strategy == script_tree::SearchStrategy::BreadthFirst)
+	if (strategy == SearchStrategy::BreadthFirst)
 	{
 		for (auto &node : BreadthFirstSearch())
 		{
@@ -745,7 +745,7 @@ script_tree::ObjectNode& ScriptTree::Search(std::string_view name, script_tree::
 				return const_cast<ObjectNode&>(node.Object);
 		}
 	}
-	else if (strategy == script_tree::SearchStrategy::DepthFirst)
+	else if (strategy == SearchStrategy::DepthFirst)
 	{
 		for (auto &node : DepthFirstSearch())
 		{
@@ -754,12 +754,12 @@ script_tree::ObjectNode& ScriptTree::Search(std::string_view name, script_tree::
 		}
 	}
 
-	return const_cast<ObjectNode&>(script_tree::InvalidObjectNode);
+	return const_cast<ObjectNode&>(InvalidObjectNode);
 }
 
-const script_tree::ObjectNode& ScriptTree::Search(std::string_view name, script_tree::SearchStrategy strategy) const noexcept
+const ObjectNode& ScriptTree::Search(std::string_view name, SearchStrategy strategy) const noexcept
 {
-	if (strategy == script_tree::SearchStrategy::BreadthFirst)
+	if (strategy == SearchStrategy::BreadthFirst)
 	{
 		for (auto &node : BreadthFirstSearch())
 		{
@@ -767,7 +767,7 @@ const script_tree::ObjectNode& ScriptTree::Search(std::string_view name, script_
 				return node.Object;
 		}
 	}
-	else if (strategy == script_tree::SearchStrategy::DepthFirst)
+	else if (strategy == SearchStrategy::DepthFirst)
 	{
 		for (auto &node : DepthFirstSearch())
 		{
@@ -776,7 +776,7 @@ const script_tree::ObjectNode& ScriptTree::Search(std::string_view name, script_
 		}
 	}
 
-	return script_tree::InvalidObjectNode;
+	return InvalidObjectNode;
 }
 
 
@@ -784,7 +784,7 @@ const script_tree::ObjectNode& ScriptTree::Search(std::string_view name, script_
 	Fully qualified names
 */
 
-std::optional<std::string> ScriptTree::GetFullyQualifiedName(const script_tree::ObjectNode &object) const
+std::optional<std::string> ScriptTree::GetFullyQualifiedName(const ObjectNode &object) const
 {
 	auto name = detail::fully_qualified_name(objects_, object);
 	return !std::empty(name) ?
@@ -792,7 +792,7 @@ std::optional<std::string> ScriptTree::GetFullyQualifiedName(const script_tree::
 		std::nullopt;
 }
 
-std::optional<std::string> ScriptTree::GetFullyQualifiedName(const script_tree::ObjectNode &object, const script_tree::PropertyNode &property) const
+std::optional<std::string> ScriptTree::GetFullyQualifiedName(const ObjectNode &object, const PropertyNode &property) const
 {
 	auto found = false;
 
