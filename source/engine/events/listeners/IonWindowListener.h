@@ -10,8 +10,8 @@ File:	IonWindowListener.h
 -------------------------------------------
 */
 
-#ifndef _ION_WINDOW_LISTENER_
-#define _ION_WINDOW_LISTENER_
+#ifndef ION_WINDOW_LISTENER_H
+#define ION_WINDOW_LISTENER_H
 
 #include "IonListener.h"
 

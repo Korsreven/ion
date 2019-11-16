@@ -10,8 +10,8 @@ File:	IonResourceListener.h
 -------------------------------------------
 */
 
-#ifndef _ION_RESOURCE_LISTENER_
-#define _ION_RESOURCE_LISTENER_
+#ifndef ION_RESOURCE_LISTENER_H
+#define ION_RESOURCE_LISTENER_H
 
 #include "IonListener.h"
 

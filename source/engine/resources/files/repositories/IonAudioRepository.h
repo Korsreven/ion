@@ -10,8 +10,8 @@ File:	IonAudioRepository.h
 -------------------------------------------
 */
 
-#ifndef _ION_AUDIO_REPOSITORY_
-#define _ION_AUDIO_REPOSITORY_
+#ifndef ION_AUDIO_REPOSITORY_H
+#define ION_AUDIO_REPOSITORY_H
 
 #include <string_view>
 #include "IonFileRepository.h"

@@ -10,8 +10,8 @@ File:	IonBasicIterable.h
 -------------------------------------------
 */
 
-#ifndef _ION_BASIC_ITERABLE_
-#define _ION_BASIC_ITERABLE_
+#ifndef ION_BASIC_ITERABLE_H
+#define ION_BASIC_ITERABLE_H
 
 #include "adaptors/IonContainerHolder.h"
 #include "types/IonTypeTraits.h"

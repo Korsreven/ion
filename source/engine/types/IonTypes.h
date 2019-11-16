@@ -10,8 +10,8 @@ File:	IonTypes.h
 -------------------------------------------
 */
 
-#ifndef _ION_TYPES_
-#define _ION_TYPES_
+#ifndef ION_TYPES_H
+#define ION_TYPES_H
 
 #include <cstddef>
 #include <cstdint>

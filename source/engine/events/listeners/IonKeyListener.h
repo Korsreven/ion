@@ -10,8 +10,8 @@ File:	IonKeyListener.h
 -------------------------------------------
 */
 
-#ifndef _ION_KEY_LISTENER_
-#define _ION_KEY_LISTENER_
+#ifndef ION_KEY_LISTENER_H
+#define ION_KEY_LISTENER_H
 
 #include "IonListener.h"
 

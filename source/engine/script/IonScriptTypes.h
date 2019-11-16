@@ -10,8 +10,8 @@ File:	IonScriptTypes.h
 -------------------------------------------
 */
 
-#ifndef _ION_SCRIPT_TYPES_
-#define _ION_SCRIPT_TYPES_
+#ifndef ION_SCRIPT_TYPES_H
+#define ION_SCRIPT_TYPES_H
 
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"

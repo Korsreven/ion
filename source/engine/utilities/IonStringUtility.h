@@ -10,8 +10,8 @@ File:	IonStringUtility.h
 -------------------------------------------
 */
 
-#ifndef _ION_STRING_UTILITY_
-#define _ION_STRING_UTILITY_
+#ifndef ION_STRING_UTILITY_H
+#define ION_STRING_UTILITY_H
 
 #include <cstddef>
 #include <memory>

@@ -10,8 +10,8 @@ File:	IonBasicContainerHolder.h
 -------------------------------------------
 */
 
-#ifndef _ION_BASIC_CONTAINER_HOLDER_
-#define _ION_BASIC_CONTAINER_HOLDER_
+#ifndef ION_BASIC_CONTAINER_HOLDER_H
+#define ION_BASIC_CONTAINER_HOLDER_H
 
 #include <initializer_list>
 

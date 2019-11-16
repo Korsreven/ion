@@ -10,8 +10,8 @@ File:	IonTypeCasts.h
 -------------------------------------------
 */
 
-#ifndef _ION_TYPE_CASTS_
-#define _ION_TYPE_CASTS_
+#ifndef ION_TYPE_CASTS_H
+#define ION_TYPE_CASTS_H
 
 #include <cassert>
 #include <limits>

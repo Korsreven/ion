@@ -10,8 +10,8 @@ File:	IonCallback.h
 -------------------------------------------
 */
 
-#ifndef _ION_CALLBACK_
-#define _ION_CALLBACK_
+#ifndef ION_CALLBACK_H
+#define ION_CALLBACK_H
 
 #include <cassert>
 #include <functional>

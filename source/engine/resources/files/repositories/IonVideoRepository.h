@@ -10,8 +10,8 @@ File:	IonVideoRepository.h
 -------------------------------------------
 */
 
-#ifndef _ION_VIDEO_REPOSITORY_
-#define _ION_VIDEO_REPOSITORY_
+#ifndef ION_VIDEO_REPOSITORY_H
+#define ION_VIDEO_REPOSITORY_H
 
 #include <string_view>
 #include "IonFileRepository.h"

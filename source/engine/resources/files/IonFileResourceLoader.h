@@ -10,8 +10,8 @@ File:	IonFileResourceLoader.h
 -------------------------------------------
 */
 
-#ifndef _ION_FILE_RESOURCE_LOADER_
-#define _ION_FILE_RESOURCE_LOADER_
+#ifndef ION_FILE_RESOURCE_LOADER_H
+#define ION_FILE_RESOURCE_LOADER_H
 
 #include <filesystem>
 #include <string>

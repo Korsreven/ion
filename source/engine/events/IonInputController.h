@@ -10,8 +10,8 @@ File:	IonInputController.h
 -------------------------------------------
 */
 
-#ifndef _ION_INPUT_CONTROLLER_
-#define _ION_INPUT_CONTROLLER_
+#ifndef ION_INPUT_CONTROLLER_H
+#define ION_INPUT_CONTROLLER_H
 
 #include <vector>
 

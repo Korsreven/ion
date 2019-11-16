@@ -10,8 +10,8 @@ File:	IonListener.h
 -------------------------------------------
 */
 
-#ifndef _ION_LISTENER_
-#define _ION_LISTENER_
+#ifndef ION_LISTENER_H
+#define ION_LISTENER_H
 
 namespace ion::events::listeners
 {

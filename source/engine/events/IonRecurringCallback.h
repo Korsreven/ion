@@ -10,8 +10,8 @@ File:	IonRecurringCallback.h
 -------------------------------------------
 */
 
-#ifndef _ION_RECURRING_CALLBACK_
-#define _ION_RECURRING_CALLBACK_
+#ifndef ION_RECURRING_CALLBACK_H
+#define ION_RECURRING_CALLBACK_H
 
 #include <atomic>
 #include <thread>

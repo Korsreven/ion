@@ -10,8 +10,8 @@ File:	IonSystemWindow.h
 -------------------------------------------
 */
 
-#ifndef _ION_SYSTEM_WINDOW_
-#define _ION_SYSTEM_WINDOW_
+#ifndef ION_SYSTEM_WINDOW_H
+#define ION_SYSTEM_WINDOW_H
 
 #ifdef _WIN32
 //Dependencies for windows 32/64 bit

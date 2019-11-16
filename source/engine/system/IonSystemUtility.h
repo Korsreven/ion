@@ -10,8 +10,8 @@ File:	IonSystemUtility.h
 -------------------------------------------
 */
 
-#ifndef _ION_SYSTEM_UTILITY_
-#define _ION_SYSTEM_UTILITY_
+#ifndef ION_SYSTEM_UTILITY_H
+#define ION_SYSTEM_UTILITY_H
 
 #include <chrono>
 #include <filesystem>

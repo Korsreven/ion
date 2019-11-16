@@ -10,8 +10,8 @@ File:	IonSphere.h
 -------------------------------------------
 */
 
-#ifndef _ION_SPHERE_
-#define _ION_SPHERE_
+#ifndef ION_SPHERE_H
+#define ION_SPHERE_H
 
 #include <cmath>
 

@@ -10,8 +10,8 @@ File:	IonWorkerPool.h
 -------------------------------------------
 */
 
-#ifndef _ION_WORKER_POOL_
-#define _ION_WORKER_POOL_
+#ifndef ION_WORKER_POOL_H
+#define ION_WORKER_POOL_H
 
 #include <condition_variable>
 #include <functional>

@@ -10,8 +10,8 @@ File:	IonImageRepository.h
 -------------------------------------------
 */
 
-#ifndef _ION_IMAGE_REPOSITORY_
-#define _ION_IMAGE_REPOSITORY_
+#ifndef ION_IMAGE_REPOSITORY_H
+#define ION_IMAGE_REPOSITORY_H
 
 #include <string_view>
 #include "IonFileRepository.h"

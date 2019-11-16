@@ -10,8 +10,8 @@ File:	IonSingleton.h
 -------------------------------------------
 */
 
-#ifndef _ION_SINGLETON_
-#define _ION_SINGLETON_
+#ifndef ION_SINGLETON_H
+#define ION_SINGLETON_H
 
 namespace ion::types
 {

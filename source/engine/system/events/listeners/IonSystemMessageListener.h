@@ -10,8 +10,8 @@ File:	IonSystemMessageListener.h
 -------------------------------------------
 */
 
-#ifndef _ION_SYSTEM_MESSAGE_LISTENER_
-#define _ION_SYSTEM_MESSAGE_LISTENER_
+#ifndef ION_SYSTEM_MESSAGE_LISTENER_H
+#define ION_SYSTEM_MESSAGE_LISTENER_H
 
 #ifdef _WIN32
 //Dependencies for windows 32/64 bit

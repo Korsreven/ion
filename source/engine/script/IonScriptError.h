@@ -10,8 +10,8 @@ File:	IonScriptError.h
 -------------------------------------------
 */
 
-#ifndef _ION_SCRIPT_ERROR_
-#define _ION_SCRIPT_ERROR_
+#ifndef ION_SCRIPT_ERROR_H
+#define ION_SCRIPT_ERROR_H
 
 #include <filesystem>
 #include <string>

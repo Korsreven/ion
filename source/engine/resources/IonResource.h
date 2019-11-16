@@ -10,8 +10,8 @@ File:	IonResource.h
 -------------------------------------------
 */
 
-#ifndef _ION_RESOURCE_
-#define _ION_RESOURCE_
+#ifndef ION_RESOURCE_H
+#define ION_RESOURCE_H
 
 namespace ion::resources
 {

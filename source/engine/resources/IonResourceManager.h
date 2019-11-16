@@ -10,8 +10,8 @@ File:	IonResourceManager.h
 -------------------------------------------
 */
 
-#ifndef _ION_RESOURCE_MANAGER_
-#define _ION_RESOURCE_MANAGER_
+#ifndef ION_RESOURCE_MANAGER_H
+#define ION_RESOURCE_MANAGER_H
 
 #include <algorithm>
 #include <cassert>

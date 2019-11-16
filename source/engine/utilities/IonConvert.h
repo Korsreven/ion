@@ -10,8 +10,8 @@ File:	IonConvert.h
 -------------------------------------------
 */
 
-#ifndef _ION_CONVERT_
-#define _ION_CONVERT_
+#ifndef ION_CONVERT_H
+#define ION_CONVERT_H
 
 #include <array>
 #include <cassert>

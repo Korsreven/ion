@@ -10,8 +10,8 @@ File:	IonScriptValidator.h
 -------------------------------------------
 */
 
-#ifndef _ION_SCRIPT_VALIDATOR_
-#define _ION_SCRIPT_VALIDATOR_
+#ifndef ION_SCRIPT_VALIDATOR_H
+#define ION_SCRIPT_VALIDATOR_H
 
 #include <cassert>
 #include <chrono>

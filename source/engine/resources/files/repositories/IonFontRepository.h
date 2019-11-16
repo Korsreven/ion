@@ -10,8 +10,8 @@ File:	IonFontRepository.h
 -------------------------------------------
 */
 
-#ifndef _ION_FONT_REPOSITORY_
-#define _ION_FONT_REPOSITORY_
+#ifndef ION_FONT_REPOSITORY_H
+#define ION_FONT_REPOSITORY_H
 
 #include <string_view>
 #include "IonFileRepository.h"

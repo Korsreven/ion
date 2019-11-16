@@ -10,8 +10,8 @@ File:	IonFlatMapIterator.h
 -------------------------------------------
 */
 
-#ifndef _ION_FLAT_MAP_ITERATOR_
-#define _ION_FLAT_MAP_ITERATOR_
+#ifndef ION_FLAT_MAP_ITERATOR_H
+#define ION_FLAT_MAP_ITERATOR_H
 
 #include <cstddef>
 #include <iterator>

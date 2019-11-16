@@ -10,8 +10,8 @@ File:	IonScriptBuilder.h
 -------------------------------------------
 */
 
-#ifndef _ION_SCRIPT_BUILDER_
-#define _ION_SCRIPT_BUILDER_
+#ifndef ION_SCRIPT_BUILDER_H
+#define ION_SCRIPT_BUILDER_H
 
 #include <chrono>
 #include <filesystem>

@@ -10,8 +10,8 @@ File:	IonFileUtility.h
 -------------------------------------------
 */
 
-#ifndef _ION_FILE_UTILITY_
-#define _ION_FILE_UTILITY_
+#ifndef ION_FILE_UTILITY_H
+#define ION_FILE_UTILITY_H
 
 #include <filesystem>
 #include <iosfwd>

@@ -10,8 +10,8 @@ File:	IonRandom.h
 -------------------------------------------
 */
 
-#ifndef _ION_RANDOM_
-#define _ION_RANDOM_
+#ifndef ION_RANDOM_H
+#define ION_RANDOM_H
 
 #include <algorithm>
 #include <array>

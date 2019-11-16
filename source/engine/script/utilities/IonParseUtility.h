@@ -10,8 +10,8 @@ File:	IonParseUtility.h
 -------------------------------------------
 */
 
-#ifndef _ION_PARSE_UTILITY_
-#define _ION_PARSE_UTILITY_
+#ifndef ION_PARSE_UTILITY_H
+#define ION_PARSE_UTILITY_H
 
 #include <algorithm>
 #include <array>

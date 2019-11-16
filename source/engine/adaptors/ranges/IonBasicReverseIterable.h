@@ -10,8 +10,8 @@ File:	IonBasicReverseIterable.h
 -------------------------------------------
 */
 
-#ifndef _ION_BASIC_REVERSE_ITERABLE_
-#define _ION_BASIC_REVERSE_ITERABLE_
+#ifndef ION_BASIC_REVERSE_ITERABLE_H
+#define ION_BASIC_REVERSE_ITERABLE_H
 
 #include "adaptors/IonContainerHolder.h"
 #include "types/IonTypeTraits.h"

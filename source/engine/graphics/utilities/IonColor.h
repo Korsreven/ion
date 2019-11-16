@@ -10,8 +10,8 @@ File:	IonColor.h
 -------------------------------------------
 */
 
-#ifndef _ION_COLOR_
-#define _ION_COLOR_
+#ifndef ION_COLOR_H
+#define ION_COLOR_H
 
 #include <algorithm>
 #include <cassert>

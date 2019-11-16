@@ -10,8 +10,8 @@ File:	IonCodec.h
 -------------------------------------------
 */
 
-#ifndef _ION_CODEC_
-#define _ION_CODEC_
+#ifndef ION_CODEC_H
+#define ION_CODEC_H
 
 #include <array>
 #include <cassert>

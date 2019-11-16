@@ -10,8 +10,8 @@ File:	IonMouseListener.h
 -------------------------------------------
 */
 
-#ifndef _ION_MOUSE_LISTENER_
-#define _ION_MOUSE_LISTENER_
+#ifndef ION_MOUSE_LISTENER_H
+#define ION_MOUSE_LISTENER_H
 
 #include "IonListener.h"
 #include "graphics/utilities/IonVector2.h"

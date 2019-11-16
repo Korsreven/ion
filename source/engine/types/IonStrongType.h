@@ -10,8 +10,8 @@ File:	IonStrongType.h
 -------------------------------------------
 */
 
-#ifndef _ION_STRONG_TYPE_
-#define _ION_STRONG_TYPE_
+#ifndef ION_STRONG_TYPE_H
+#define ION_STRONG_TYPE_H
 
 namespace ion::types
 {

@@ -10,8 +10,8 @@ File:	IonScriptTree.h
 -------------------------------------------
 */
 
-#ifndef _ION_SCRIPT_TREE_
-#define _ION_SCRIPT_TREE_
+#ifndef ION_SCRIPT_TREE_H
+#define ION_SCRIPT_TREE_H
 
 #include <cassert>
 #include <optional>

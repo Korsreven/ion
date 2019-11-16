@@ -10,8 +10,8 @@ File:	IonScriptCompiler.h
 -------------------------------------------
 */
 
-#ifndef _ION_SCRIPT_COMPILER_
-#define _ION_SCRIPT_COMPILER_
+#ifndef ION_SCRIPT_COMPILER_H
+#define ION_SCRIPT_COMPILER_H
 
 #include <chrono>
 #include <filesystem>

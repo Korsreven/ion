@@ -10,8 +10,8 @@ File:	IonMatrix3.h
 -------------------------------------------
 */
 
-#ifndef _ION_MATRIX3_
-#define _ION_MATRIX3_
+#ifndef ION_MATRIX3_H
+#define ION_MATRIX3_H
 
 #include "IonVector2.h"
 #include "types/IonTypes.h"

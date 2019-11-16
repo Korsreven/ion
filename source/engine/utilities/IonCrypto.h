@@ -10,8 +10,8 @@ File:	IonCrypto.h
 -------------------------------------------
 */
 
-#ifndef _ION_CRYPTO_
-#define _ION_CRYPTO_
+#ifndef ION_CRYPTO_H
+#define ION_CRYPTO_H
 
 #include <array>
 #include <string>

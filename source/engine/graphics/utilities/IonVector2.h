@@ -10,8 +10,8 @@ File:	IonVector2.h
 -------------------------------------------
 */
 
-#ifndef _ION_VECTOR2_
-#define _ION_VECTOR2_
+#ifndef ION_VECTOR2_H
+#define ION_VECTOR2_H
 
 #include <cassert>
 #include <utility>

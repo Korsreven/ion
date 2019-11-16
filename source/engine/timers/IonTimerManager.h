@@ -10,8 +10,8 @@ File:	IonTimerManager.h
 -------------------------------------------
 */
 
-#ifndef _ION_TIMER_MANAGER_
-#define _ION_TIMER_MANAGER_
+#ifndef ION_TIMER_MANAGER_H
+#define ION_TIMER_MANAGER_H
 
 #include <chrono>
 

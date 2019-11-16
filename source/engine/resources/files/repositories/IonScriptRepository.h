@@ -10,8 +10,8 @@ File:	IonScriptRepository.h
 -------------------------------------------
 */
 
-#ifndef _ION_SCRIPT_REPOSITORY_
-#define _ION_SCRIPT_REPOSITORY_
+#ifndef ION_SCRIPT_REPOSITORY_H
+#define ION_SCRIPT_REPOSITORY_H
 
 #include <string_view>
 #include "IonFileRepository.h"

@@ -10,8 +10,8 @@ File:	IonFileResource.h
 -------------------------------------------
 */
 
-#ifndef _ION_FILE_RESOURCE_
-#define _ION_FILE_RESOURCE_
+#ifndef ION_FILE_RESOURCE_H
+#define ION_FILE_RESOURCE_H
 
 #include "resources/IonResource.h"
 #include "repositories/IonFileRepository.h"

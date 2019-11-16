@@ -10,8 +10,8 @@ File:	IonFlatSetIterator.h
 -------------------------------------------
 */
 
-#ifndef _ION_FLAT_SET_ITERATOR_
-#define _ION_FLAT_SET_ITERATOR_
+#ifndef ION_FLAT_SET_ITERATOR_H
+#define ION_FLAT_SET_ITERATOR_H
 
 #include <iterator>
 #include "types/IonTypeTraits.h"

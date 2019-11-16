@@ -10,8 +10,8 @@ File:	IonFlatMap.h
 -------------------------------------------
 */
 
-#ifndef _ION_FLAT_MAP_
-#define _ION_FLAT_MAP_
+#ifndef ION_FLAT_MAP_H
+#define ION_FLAT_MAP_H
 
 #include <functional>
 #include <stdexcept>

@@ -10,8 +10,8 @@ File:	IonObb.h
 -------------------------------------------
 */
 
-#ifndef _ION_OBB_
-#define _ION_OBB_
+#ifndef ION_OBB_H
+#define ION_OBB_H
 
 #include <array>
 

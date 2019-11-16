@@ -10,8 +10,8 @@ File:	IonFlatSet.h
 -------------------------------------------
 */
 
-#ifndef _ION_FLAT_SET_
-#define _ION_FLAT_SET_
+#ifndef ION_FLAT_SET_H
+#define ION_FLAT_SET_H
 
 #include <functional>
 #include <iterator>

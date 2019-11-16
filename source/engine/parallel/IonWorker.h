@@ -10,8 +10,8 @@ File:	IonWorker.h
 -------------------------------------------
 */
 
-#ifndef _ION_WORKER_
-#define _ION_WORKER_
+#ifndef ION_WORKER_H
+#define ION_WORKER_H
 
 #include <future>
 

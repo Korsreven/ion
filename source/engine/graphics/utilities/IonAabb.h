@@ -10,8 +10,8 @@ File:	IonAabb.h
 -------------------------------------------
 */
 
-#ifndef _ION_AABB_
-#define _ION_AABB_
+#ifndef ION_AABB_H
+#define ION_AABB_H
 
 #include <cmath>
 #include <utility>

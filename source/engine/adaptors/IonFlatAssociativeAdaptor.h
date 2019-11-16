@@ -10,8 +10,8 @@ File:	IonFlatAssociativeAdaptor.h
 -------------------------------------------
 */
 
-#ifndef _ION_FLAT_ASSOCIATIVE_ADAPTOR_
-#define _ION_FLAT_ASSOCIATIVE_ADAPTOR_
+#ifndef ION_FLAT_ASSOCIATIVE_ADAPTOR_H
+#define ION_FLAT_ASSOCIATIVE_ADAPTOR_H
 
 #include <algorithm>
 #include <type_traits>

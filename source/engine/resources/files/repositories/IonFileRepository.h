@@ -10,8 +10,8 @@ files:	IonFileRepository.h
 -------------------------------------------
 */
 
-#ifndef _ION_FILE_REPOSITORY_
-#define _ION_FILE_REPOSITORY_
+#ifndef ION_FILE_REPOSITORY_H
+#define ION_FILE_REPOSITORY_H
 
 #include <algorithm>
 #include <filesystem>

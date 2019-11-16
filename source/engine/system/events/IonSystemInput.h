@@ -10,8 +10,8 @@ File:	IonSystemInput.h
 -------------------------------------------
 */
 
-#ifndef _ION_SYSTEM_INPUT_
-#define _ION_SYSTEM_INPUT_
+#ifndef ION_SYSTEM_INPUT_H
+#define ION_SYSTEM_INPUT_H
 
 #include <algorithm>
 #include <array>

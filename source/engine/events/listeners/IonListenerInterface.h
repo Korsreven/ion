@@ -10,8 +10,8 @@ File:	IonListenerInterface.h
 -------------------------------------------
 */
 
-#ifndef _ION_LISTENER_INTERFACE_
-#define _ION_LISTENER_INTERFACE_
+#ifndef ION_LISTENER_INTERFACE_H
+#define ION_LISTENER_INTERFACE_H
 
 #include <algorithm>
 #include <functional>

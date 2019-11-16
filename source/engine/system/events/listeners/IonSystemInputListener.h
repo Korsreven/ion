@@ -10,8 +10,8 @@ File:	IonSystemInputListener.h
 -------------------------------------------
 */
 
-#ifndef _ION_SYSTEM_INPUT_LISTENER_
-#define _ION_SYSTEM_INPUT_LISTENER_
+#ifndef ION_SYSTEM_INPUT_LISTENER_H
+#define ION_SYSTEM_INPUT_LISTENER_H
 
 #include "events/listeners/IonListenerInterface.h"
 #include "system/events/IonSystemInput.h"

@@ -10,8 +10,8 @@ File:	IonStopwatch.h
 -------------------------------------------
 */
 
-#ifndef _ION_STOPWATCH_
-#define _ION_STOPWATCH_
+#ifndef ION_STOPWATCH_H
+#define ION_STOPWATCH_H
 
 #include <chrono>
 #include "types/IonTypes.h"

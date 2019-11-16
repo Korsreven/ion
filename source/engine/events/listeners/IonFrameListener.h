@@ -10,8 +10,8 @@ File:	IonFrameListener.h
 -------------------------------------------
 */
 
-#ifndef _ION_FRAME_LISTENER_
-#define _ION_FRAME_LISTENER_
+#ifndef ION_FRAME_LISTENER_H
+#define ION_FRAME_LISTENER_H
 
 #include <chrono>
 

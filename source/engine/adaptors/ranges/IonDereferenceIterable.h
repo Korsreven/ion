@@ -10,8 +10,8 @@ File:	IonDereferenceIterable.h
 -------------------------------------------
 */
 
-#ifndef _ION_DEREFERENCE_ITERABLE_
-#define _ION_DEREFERENCE_ITERABLE_
+#ifndef ION_DEREFERENCE_ITERABLE_H
+#define ION_DEREFERENCE_ITERABLE_H
 
 #include "IonBasicIterable.h"
 #include "IonBasicReverseIterable.h"

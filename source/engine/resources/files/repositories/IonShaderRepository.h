@@ -10,8 +10,8 @@ File:	IonShaderRepository.h
 -------------------------------------------
 */
 
-#ifndef _ION_SHADER_REPOSITORY_
-#define _ION_SHADER_REPOSITORY_
+#ifndef ION_SHADER_REPOSITORY_H
+#define ION_SHADER_REPOSITORY_H
 
 #include <string_view>
 #include "IonFileRepository.h"

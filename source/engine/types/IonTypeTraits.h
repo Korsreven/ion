@@ -10,8 +10,8 @@ File:	IonTypeTraits.h
 -------------------------------------------
 */
 
-#ifndef _ION_TYPE_TRAITS_
-#define _ION_TYPE_TRAITS_
+#ifndef ION_TYPE_TRAITS_H
+#define ION_TYPE_TRAITS_H
 
 #include <functional>
 #include <iterator>

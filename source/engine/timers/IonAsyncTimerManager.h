@@ -10,8 +10,8 @@ File:	IonAsyncTimerManager.h
 -------------------------------------------
 */
 
-#ifndef _ION_ASYNC_TIMER_MANAGER_
-#define _ION_ASYNC_TIMER_MANAGER_
+#ifndef ION_ASYNC_TIMER_MANAGER_H
+#define ION_ASYNC_TIMER_MANAGER_H
 
 #include <chrono>
 

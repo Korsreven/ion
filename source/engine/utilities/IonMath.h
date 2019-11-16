@@ -10,8 +10,8 @@ File:	IonMath.h
 -------------------------------------------
 */
 
-#ifndef _ION_MATH_
-#define _ION_MATH_
+#ifndef ION_MATH_H
+#define ION_MATH_H
 
 #include <algorithm>
 #include <array>
