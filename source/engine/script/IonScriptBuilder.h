@@ -17,6 +17,7 @@ File:	IonScriptBuilder.h
 #include <filesystem>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "IonScriptCompiler.h"
@@ -59,9 +60,22 @@ namespace ion::script
 			std::optional<script_validator::OutputOptions> validator_output_options_;
 			std::optional<script_tree::PrintOptions> tree_print_options_;
 
+
+			/*
+				Helper functions
+			*/
+
+			bool ValidateTree();
+			void SaveOutput() noexcept;
+
+
 		public:
 
+			//Construct a new script builder without a repository
 			ScriptBuilder() = default;
+
+			//Construct a new script builder with the given repository
+			ScriptBuilder(const resources::files::repositories::ScriptRepository &repository);
 
 
 			/*
@@ -204,13 +218,17 @@ namespace ion::script
 				Building
 			*/
 
-			//Build the given script file by compiling and validating it
+			//Build a script entry with the given name (from a repository) by compiling and validating it
 			//Returns true if the script is built successfully
-			bool Build(std::filesystem::path file_path);
+			bool Build(std::string_view name);
 
-			//Build the given script file (with root path) by compiling and validating it
+			//Build a script file with the given file path by compiling and validating it
 			//Returns true if the script is built successfully
-			bool Build(std::filesystem::path file_path, std::filesystem::path root_path);
+			bool BuildFile(std::filesystem::path file_path);
+
+			//Build a script file with the given file path (and root path) by compiling and validating it
+			//Returns true if the script is built successfully
+			bool BuildFile(std::filesystem::path file_path, std::filesystem::path root_path);
 
 
 			/*

@@ -183,15 +183,15 @@ bool FileRepository::AddFile(std::filesystem::path file_path)
 
 bool FileRepository::AddFile(file_repository::FileEntry file)
 {
-	if (!utilities::file::IsFile(file.Path))
-		return false;
-	else
+	if (file.DataFile || utilities::file::IsFile(file.Path))
 	{
 		auto [iter, inserted] =
 			files_.emplace(detail::file_path_to_name(file.Path, naming_convention_),
 						   std::move(file));
 		return inserted;
 	}
+	else
+		return false;
 }
 
 bool FileRepository::AddFiles(utilities::file::Paths file_paths)
@@ -225,7 +225,7 @@ bool FileRepository::AddFiles(std::vector<file_repository::FileEntry> files)
 
 	for (auto &file : files)
 	{
-		if (utilities::file::IsFile(file.Path))
+		if (file.DataFile || utilities::file::IsFile(file.Path))
 			file_container.emplace_back(detail::file_path_to_name(file.Path, naming_convention_),
 										std::move(file));
 	}

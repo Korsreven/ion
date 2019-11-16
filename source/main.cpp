@@ -46,6 +46,7 @@ File:	main.cpp
 #include "resources/files/repositories/IonAudioRepository.h"
 #include "resources/files/repositories/IonFontRepository.h"
 #include "resources/files/repositories/IonImageRepository.h"
+#include "resources/files/repositories/IonScriptRepository.h"
 #include "resources/files/repositories/IonShaderRepository.h"
 #include "resources/files/repositories/IonVideoRepository.h"
 
@@ -177,17 +178,28 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 
 	//Compile script
 	{
+		/*ion::resources::files::repositories::ScriptRepository script_repository{ion::resources::files::repositories::file_repository::NamingConvention::FilePath};
+		ion::resources::files::FileResourceLoader loader;
+		loader.Attach(script_repository);
+		loader.LoadDirectory("bin", ion::utilities::file::DirectoryIteration::Recursive);*/
+		//loader.CompileDataFile("bin/resources.dat");
+		//loader.LoadFile("bin/resources.dat");
+
 		auto basic = ion::script::script_validator::ClassDefinition::Create("basic")
 			.AddRequiredProperty("resolution", {ion::script::script_validator::ParameterType::Integer, ion::script::script_validator::ParameterType::Integer})
 			.AddRequiredProperty("fullscreen", ion::script::script_validator::ParameterType::Boolean);
 		auto advanced = ion::script::script_validator::ClassDefinition::Create("advanced")
 			.AddRequiredProperty("color-depth", ion::script::script_validator::ParameterType::Integer)
-			.AddRequiredProperty("vertical-sync", ion::script::script_validator::ParameterType::Boolean);
+			.AddRequiredProperty("vertical-sync", ion::script::script_validator::ParameterType::Boolean)
+			.AddRequiredProperty("frame-limit", ion::script::script_validator::ParameterType::FloatingPoint);
 		auto settings = ion::script::script_validator::ClassDefinition::Create("settings")
 			.AddRequiredClass(std::move(basic))
 			.AddRequiredClass(std::move(advanced));
 		auto engine = ion::script::script_validator::ClassDefinition::Create("engine")
-			.AddRequiredClass(std::move(settings));
+			.AddRequiredClass(std::move(settings))
+			.AddRequiredProperty("window-title", ion::script::script_validator::ParameterType::String)
+			.AddRequiredProperty("window-position", ion::script::script_validator::ParameterType::Vector2)
+			.AddRequiredProperty("clear-color", ion::script::script_validator::ParameterType::Color);
 
 		auto validator = ion::script::ScriptValidator::Create()
 			.AddRequiredClass(std::move(engine));
@@ -198,7 +210,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 		builder.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 		builder.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
 		builder.TreeOutput(ion::script::script_tree::PrintOptions::Arguments);
-		builder.Build("bin/main.ion");
+		builder.BuildFile("bin/main.ion");
 		auto &tree = builder.Tree();
 
 		//Serialize tree
@@ -272,13 +284,15 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 	/*ion::resources::files::repositories::AudioRepository audio_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
 	ion::resources::files::repositories::FontRepository font_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
 	ion::resources::files::repositories::ImageRepository image_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
+	ion::resources::files::repositories::ScriptRepository script_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
 	ion::resources::files::repositories::ShaderRepository shader_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-	ion::resources::files::repositories::VideoRepository video_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
+	ion::resources::files::repositories::VideoRepository video_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};	
 
 	ion::resources::files::FileResourceLoader file_resource_loader;
 	file_resource_loader.Attach(audio_repository);
 	file_resource_loader.Attach(font_repository);
 	file_resource_loader.Attach(image_repository);
+	file_resource_loader.Attach(script_repository);
 	file_resource_loader.Attach(shader_repository);
 	file_resource_loader.Attach(video_repository);
 	

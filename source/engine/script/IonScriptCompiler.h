@@ -26,6 +26,7 @@ File:	IonScriptCompiler.h
 #include "IonScriptTree.h"
 #include "adaptors/IonFlatMap.h"
 #include "adaptors/IonFlatSet.h"
+#include "resources/files/repositories/IonScriptRepository.h"
 #include "parallel/IonWorkerPool.h"
 #include "utilities/IonConvert.h"
 
@@ -66,6 +67,7 @@ namespace ion::script
 				BinaryOperator,
 				UnaryOperator
 			};
+
 
 			struct translation_unit
 			{
@@ -137,13 +139,19 @@ namespace ion::script
 			struct build_system
 			{
 				std::filesystem::path root_path;
+				const resources::files::repositories::ScriptRepository *repository = nullptr;		
+				
 				translation_units units; //Need stable memory addressing
 				std::mutex m; //Protects 'units'
+				parallel::WorkerPool<std::optional<lexical_tokens>, std::string> processes;	
 
-				parallel::WorkerPool<std::optional<lexical_tokens>, std::string> processes;
+
+				build_system(std::filesystem::path root_path);
+				build_system(const resources::files::repositories::ScriptRepository &repository);		
 
 				void start_process(std::string str, file_trace trace);
 			};
+
 
 			struct scope
 			{
@@ -152,7 +160,6 @@ namespace ion::script
 				variable_declarations variables;
 				std::string classes;
 			};
-
 
 			struct syntax_context
 			{
@@ -459,8 +466,13 @@ namespace ion::script
 
 
 			std::optional<std::filesystem::path> full_file_path(std::filesystem::path file_path,
-				const std::filesystem::path &root_path, const std::filesystem::path &current_path);
-			bool open_file(const std::filesystem::path &file_path, const std::filesystem::path &root_path,
+				const build_system &system, const std::filesystem::path &current_path);
+			
+			bool open_file(const std::filesystem::path &file_path, const build_system &system,
+				file_trace &trace, std::string &str, CompileError &error);
+			bool load_from_repository(std::string_view name, const build_system &system,
+				file_trace &trace, std::string &str, CompileError &error);
+			bool import_unit(std::string str_argument, const build_system &system,
 				file_trace &trace, std::string &str, CompileError &error);
 
 
@@ -558,6 +570,7 @@ namespace ion::script
 	{
 		private:
 		
+			const resources::files::repositories::ScriptRepository *repository_ = nullptr;	
 			std::optional<int> max_build_processes_;
 
 			std::vector<CompileError> compile_errors_;
@@ -565,7 +578,11 @@ namespace ion::script
 
 		public:
 
+			//Construct a new script compiler without a repository
 			ScriptCompiler() = default;
+
+			//Construct a new script compiler with the given repository
+			ScriptCompiler(const resources::files::repositories::ScriptRepository &repository);
 
 
 			/*
@@ -611,13 +628,17 @@ namespace ion::script
 				Compiling
 			*/
 
-			//Compile the given script file by lexing, parsing and linking it.
+			//Compile a script entry with the given name (from a repository) by lexing, parsing and linking it.
 			//Returns a ScriptTree that contains objects, object properties and property arguments
-			[[nodiscard]] std::optional<ScriptTree> Compile(std::filesystem::path file_path, CompileError &error);
+			[[nodiscard]] std::optional<ScriptTree> Compile(std::string_view name, CompileError &error);
 
-			//Compile the given script file (with root path) by lexing, parsing and linking it.
+			//Compile a script file with the given file path by lexing, parsing and linking it.
 			//Returns a ScriptTree that contains objects, object properties and property arguments
-			[[nodiscard]] std::optional<ScriptTree> Compile(std::filesystem::path file_path, std::filesystem::path root_path, CompileError &error);
+			[[nodiscard]] std::optional<ScriptTree> CompileFile(std::filesystem::path file_path, CompileError &error);
+
+			//Compile a script file with the given file path (and root path) by lexing, parsing and linking it.
+			//Returns a ScriptTree that contains objects, object properties and property arguments
+			[[nodiscard]] std::optional<ScriptTree> CompileFile(std::filesystem::path file_path, std::filesystem::path root_path, CompileError &error);
 
 
 			/*

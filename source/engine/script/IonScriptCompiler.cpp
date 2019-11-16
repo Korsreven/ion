@@ -37,22 +37,7 @@ using namespace types::type_literals;
 namespace script_compiler::detail
 {
 
-void build_system::start_process(std::string str, file_trace trace)
-{
-	auto file_path = trace.current_file_path().string();
-	translation_unit *unit = nullptr;
-
-	{
-		std::lock_guard lock{m};
-
-		units.push_back(std::make_unique<translation_unit>(
-			translation_unit{std::move(file_path), std::move(str)}));
-		unit = units.back().get();
-	}
-
-	auto id = ion::utilities::string::ToLowerCaseCopy(unit->file_path);
-	processes.RunTask(std::move(id), partial_compile_unit, std::ref(*unit), std::move(trace), std::ref(*this));
-}
+//file_trace
 
 bool file_trace::push_file(std::filesystem::path file_path)
 {
@@ -79,35 +64,72 @@ void file_trace::pop_file()
 		stack.pop_back();
 }
 
+//build_system
+
+build_system::build_system(const resources::files::repositories::ScriptRepository &repository) :
+	repository{&repository}
+{
+	//Empty
+}
+
+build_system::build_system(std::filesystem::path root_path) :
+	root_path{std::move(root_path)}
+{
+	//Empty
+}
+
+void build_system::start_process(std::string str, file_trace trace)
+{
+	auto file_path = trace.current_file_path().string();
+	translation_unit *unit = nullptr;
+
+	{
+		std::lock_guard lock{m};
+
+		units.push_back(std::make_unique<translation_unit>(
+			translation_unit{std::move(file_path), std::move(str)}));
+		unit = units.back().get();
+	}
+
+	auto id = ion::utilities::string::ToLowerCaseCopy(unit->file_path);
+	processes.RunTask(std::move(id), partial_compile_unit, std::ref(*unit), std::move(trace), std::ref(*this));
+}
+
 
 std::optional<std::filesystem::path> full_file_path(std::filesystem::path file_path,
-	const std::filesystem::path &root_path, const std::filesystem::path &current_path)
+	const build_system &system, const std::filesystem::path &current_path)
 {
-	std::error_code error;
+	if (system.repository)
+	{
+		if (auto full_path = system.repository->FilePath(file_path.string()); full_path)
+			file_path = *full_path;
+
+		return std::make_optional(std::move(file_path));
+	}
 
 	//File path is relative to...
 	if (file_path.is_relative())
 	{
 		//root path
  		if (std::empty(current_path))
-			file_path = root_path / std::filesystem::relative(file_path, root_path);
+			file_path = system.root_path / std::filesystem::relative(file_path, system.root_path);
 		//root path
 		else if (auto str = file_path.string(); str.front() == '/' || str.front() == '\\')
-			file_path = root_path / file_path;
+			file_path = system.root_path / file_path;
 		//current path
 		else
 			file_path = current_path / file_path;
 	}
 
-	return !error && ion::utilities::file::IsFile(file_path) ?
+	return ion::utilities::file::IsFile(file_path) ?
 		std::make_optional(std::move(file_path)) :
 		std::nullopt;
 }
 
-bool open_file(const std::filesystem::path &file_path, const std::filesystem::path &root_path,
+bool open_file(const std::filesystem::path &file_path, const build_system &system,
 	file_trace &trace, std::string &str, CompileError &error)
 {
-	if (auto full_path = full_file_path(file_path, root_path,
+	if (auto full_path = full_file_path(file_path, system,
 		!std::empty(trace.stack) ? trace.current_file_path().parent_path() : ""); full_path)
 	{
 		if (ion::utilities::file::Load(*full_path, str, ion::utilities::file::FileLoadMode::Binary) &&
@@ -115,9 +137,9 @@ bool open_file(const std::filesystem::path &file_path, const std::filesystem::pa
 			return true;
 		else
 		{
-			error = {CompileErrorCode::CircularImport, trace.current_file_path()};						
+			error = {CompileErrorCode::CircularImport, trace.current_file_path()};
 			return false;
-		}		
+		}
 	}
 	else
 	{
@@ -125,6 +147,40 @@ bool open_file(const std::filesystem::path &file_path, const std::filesystem::pa
 			!std::empty(trace.stack) ? trace.current_file_path() : file_path.lexically_normal()};
 		return false;
 	}
+}
+
+bool load_from_repository(std::string_view name, const build_system &system,
+	file_trace &trace, std::string &str, CompileError &error)
+{
+	if (auto file_path = system.repository->FilePath(name); file_path)
+	{
+		if (auto data = system.repository->FileData(name); data &&
+			trace.push_file(file_path->lexically_normal()))
+		{
+			str = std::move(*data);
+			return true;
+		}
+		else
+		{
+			error = {CompileErrorCode::CircularImport, trace.current_file_path()};
+			return false;
+		}
+	}
+	else
+	{
+		error = {CompileErrorCode::InvalidFilePath,
+			!std::empty(trace.stack) ? trace.current_file_path() : std::filesystem::path{name}};
+		return false;
+	}
+}
+
+bool import_unit(std::string str_argument, const build_system &system,
+	file_trace &trace, std::string &str, CompileError &error)
+{
+	if (system.repository)
+		return load_from_repository(str_argument, system, trace, str, error);
+	else
+		return open_file(std::move(str_argument), system, trace, str, error);
 }
 
 
@@ -452,7 +508,7 @@ std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, buil
 				{
 					if (auto result = utilities::parse::AsString(import_argument); result)
 					{
-						if (std::string imported_str; open_file(std::move(*result), system.root_path, trace, imported_str, unit.error))
+						if (std::string imported_str; import_unit(std::move(*result), system, trace, imported_str, unit.error))
 						{
 							system.start_process(std::move(imported_str), trace);
 							trace.pop_file();
@@ -1094,7 +1150,7 @@ void link(lexical_tokens &tokens, const adaptors::FlatMap<std::string, std::opti
 			is_import_rule(token.value))
 		{
 			auto file_path = utilities::parse::AsString((iter + 1)->value);
-			auto full_path = *full_file_path(*file_path, system.root_path, std::filesystem::path{token.unit->file_path}.parent_path());
+			auto full_path = *full_file_path(*file_path, system, std::filesystem::path{token.unit->file_path}.parent_path());
 			auto id = ion::utilities::string::ToLowerCaseCopy(full_path.lexically_normal().string());
 
 			if (auto it = results.find(id); it != std::end(results))
@@ -2337,18 +2393,53 @@ std::string print_output(std::chrono::duration<real> compile_time, const std::ve
 
 //ScriptCompiler
 
+ScriptCompiler::ScriptCompiler(const resources::files::repositories::ScriptRepository &repository) :
+	repository_{&repository}
+{
+	//Empty
+}
+
 
 /*
 	Compiling
 */
 
-std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_path, CompileError &error)
+std::optional<ScriptTree> ScriptCompiler::Compile(std::string_view name, CompileError &error)
 {
-	auto root_path = file_path.parent_path();
-	return Compile(std::move(file_path), std::move(root_path), error);
+	compile_errors_.clear();
+	compile_time_ = {}; //Reset
+
+	if (repository_)
+	{
+		script_compiler::detail::build_system system{*repository_};
+		script_compiler::detail::file_trace trace;
+
+		//File path needs to be a valid file
+		if (std::string str; script_compiler::detail::load_from_repository(name, system, trace, str, error))
+		{	
+			system.units.push_back(std::make_unique<script_compiler::detail::translation_unit>(
+				script_compiler::detail::translation_unit{trace.current_file_path().string(), std::move(str)}));
+
+			if (max_build_processes_)
+				system.processes.MaxWorkerThreads(*max_build_processes_);
+
+			auto stopwatch = timers::Stopwatch::StartNew();
+			auto tree = script_compiler::detail::compile(std::move(trace), system, error, compile_errors_);
+			compile_time_ = stopwatch.Elapsed();
+			return tree;
+		}
+	}
+
+	return {};
 }
 
-std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_path, std::filesystem::path root_path, CompileError &error)
+std::optional<ScriptTree> ScriptCompiler::CompileFile(std::filesystem::path file_path, CompileError &error)
+{
+	auto root_path = file_path.parent_path();
+	return CompileFile(std::move(file_path), std::move(root_path), error);
+}
+
+std::optional<ScriptTree> ScriptCompiler::CompileFile(std::filesystem::path file_path, std::filesystem::path root_path, CompileError &error)
 {
 	compile_errors_.clear();
 	compile_time_ = {}; //Reset
@@ -2356,12 +2447,12 @@ std::optional<ScriptTree> ScriptCompiler::Compile(std::filesystem::path file_pat
 	//Root path needs to be a valid directory
 	if (ion::utilities::file::IsDirectory(root_path))
 	{
+		script_compiler::detail::build_system system{std::move(root_path)};
 		script_compiler::detail::file_trace trace;
 		
 		//File path needs to be a valid file
-		if (std::string str; script_compiler::detail::open_file(file_path, root_path, trace, str, error))
-		{
-			script_compiler::detail::build_system system{std::move(root_path)};
+		if (std::string str; script_compiler::detail::open_file(file_path, system, trace, str, error))
+		{	
 			system.units.push_back(std::make_unique<script_compiler::detail::translation_unit>(
 				script_compiler::detail::translation_unit{trace.current_file_path().string(), std::move(str)}));
 

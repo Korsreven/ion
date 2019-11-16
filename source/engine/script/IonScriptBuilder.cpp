@@ -70,34 +70,67 @@ std::string print_output(std::filesystem::path file_path, std::chrono::duration<
 } //script_builder::detail
 
 
+//ScriptBuilder
+//Private
+
+/*
+	Helper functions
+*/
+
+bool ScriptBuilder::ValidateTree()
+{
+	return validator_ && tree_ && !validator_->Validate(*tree_, validate_error_) ?
+		false :
+		tree_.has_value();
+}
+
+void ScriptBuilder::SaveOutput() noexcept
+{
+	if (output_options_)
+		ion::utilities::file::Save(
+			compile_error_.FilePath.string() + ".output.txt", PrintOutput(*output_options_));
+}
+
+//Public
+
+ScriptBuilder::ScriptBuilder(const resources::files::repositories::ScriptRepository &repository) :
+	compiler_{repository}
+{
+	//Empty
+}
+
+
 /*
 	Building
 */
 
-bool ScriptBuilder::Build(std::filesystem::path file_path)
-{
-	auto root_path = file_path.parent_path();
-	return Build(std::move(file_path), std::move(root_path));
-}
-
-bool ScriptBuilder::Build(std::filesystem::path file_path, std::filesystem::path root_path)
+bool ScriptBuilder::Build(std::string_view name)
 {
 	tree_.reset();
 	compile_error_ = {}; //Reset
 	validate_error_ = {}; //Reset
 
-	tree_ = compiler_.Compile(std::move(file_path), std::move(root_path), compile_error_);
+	tree_ = compiler_.Compile(name, compile_error_);
+	auto result = ValidateTree();
+	SaveOutput();
+	return result;
+}
 
-	auto result = validator_ && tree_ &&
-		!validator_->Validate(*tree_, validate_error_) ?
-		false :
-		tree_.has_value();
+bool ScriptBuilder::BuildFile(std::filesystem::path file_path)
+{
+	auto root_path = file_path.parent_path();
+	return BuildFile(std::move(file_path), std::move(root_path));
+}
 
-	if (output_options_)
-		ion::utilities::file::Save(
-			compile_error_.FilePath.string() + ".output.txt",
-			PrintOutput(*output_options_));
+bool ScriptBuilder::BuildFile(std::filesystem::path file_path, std::filesystem::path root_path)
+{
+	tree_.reset();
+	compile_error_ = {}; //Reset
+	validate_error_ = {}; //Reset
 
+	tree_ = compiler_.CompileFile(std::move(file_path), std::move(root_path), compile_error_);
+	auto result = ValidateTree();
+	SaveOutput();
 	return result;
 }
 

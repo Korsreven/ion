@@ -162,6 +162,7 @@
     <ClCompile Include="..\source\engine\resources\files\repositories\IonFileRepository.cpp" />
     <ClCompile Include="..\source\engine\resources\files\repositories\IonFontRepository.cpp" />
     <ClCompile Include="..\source\engine\resources\files\repositories\IonImageRepository.cpp" />
+    <ClCompile Include="..\source\engine\resources\files\repositories\IonScriptRepository.cpp" />
     <ClCompile Include="..\source\engine\resources\files\repositories\IonShaderRepository.cpp" />
     <ClCompile Include="..\source\engine\resources\files\repositories\IonVideoRepository.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptBuilder.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="..\source\engine\resources\files\repositories\IonFileRepository.h" />
     <ClInclude Include="..\source\engine\resources\files\repositories\IonFontRepository.h" />
     <ClInclude Include="..\source\engine\resources\files\repositories\IonImageRepository.h" />
+    <ClInclude Include="..\source\engine\resources\files\repositories\IonScriptRepository.h" />
     <ClInclude Include="..\source\engine\resources\files\repositories\IonShaderRepository.h" />
     <ClInclude Include="..\source\engine\resources\files\repositories\IonVideoRepository.h" />
     <ClInclude Include="..\source\engine\resources\IonResource.h" />
