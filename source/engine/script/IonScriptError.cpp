@@ -31,12 +31,15 @@ std::string compile_error_category_impl::message(int error_value) const
 {
 	switch (static_cast<CompileErrorCode>(error_value))
 	{
-		//File
+		//File/resource
 		case CompileErrorCode::CircularImport:
 		return "A circular import detected";
 
 		case CompileErrorCode::InvalidFilePath:
 		return "An invalid file path found";
+
+		case CompileErrorCode::InvalidResourceName:
+		return "An invalid resource name found";
 
 		
 		//Function

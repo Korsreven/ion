@@ -24,9 +24,10 @@ namespace ion::script
 	{
 		enum class CompileErrorCode
 		{
-			//File
+			//File/resource
 			CircularImport = 1,
 			InvalidFilePath,
+			InvalidResourceName,
 
 			//Function
 			EmptyFunctionArgument,

@@ -168,8 +168,11 @@ bool load_from_repository(std::string_view name, const build_system &system,
 	}
 	else
 	{
-		error = {CompileErrorCode::InvalidFilePath,
-			!std::empty(trace.stack) ? trace.current_file_path() : std::filesystem::path{name}};
+		if (std::empty(trace.stack))
+			error = {CompileErrorCode::InvalidResourceName, name};
+		else
+			error = {CompileErrorCode::InvalidFilePath, trace.current_file_path()};
+
 		return false;
 	}
 }
