@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClCompile Include="..\source\engine\events\IonInputController.cpp" />
     <ClCompile Include="..\source\engine\events\IonRecurringCallback.cpp" />
+    <ClCompile Include="..\source\engine\graphics\particles\IonParticle.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonAabb.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonColor.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonMatrix3.cpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="..\source\engine\events\listeners\IonMouseListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonResourceListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonWindowListener.h" />
+    <ClInclude Include="..\source\engine\graphics\particles\IonParticle.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonAabb.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonColor.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonMatrix3.h" />

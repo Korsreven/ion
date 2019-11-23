@@ -231,6 +231,9 @@
     <ClCompile Include="..\source\engine\resources\files\repositories\IonScriptRepository.cpp">
       <Filter>Source Files\resources\files\repositories</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\particles\IonParticle.cpp">
+      <Filter>Source Files\graphics\particles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -439,6 +442,9 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\resources\files\repositories\IonScriptRepository.h">
       <Filter>Header Files\resources\files\repositories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\particles\IonParticle.h">
+      <Filter>Header Files\graphics\particles</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

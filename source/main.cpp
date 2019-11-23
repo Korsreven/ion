@@ -29,6 +29,7 @@ File:	main.cpp
 #include "events/listeners/IonResourceListener.h"
 #include "events/listeners/IonWindowListener.h"
 
+#include "graphics/particles/IonParticle.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonMatrix3.h"
@@ -176,6 +177,9 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 		Test code
 	*/
 
+	ion::graphics::particles::Particle particle;
+	ion::graphics::particles::Particle particle2 = particle;
+
 	//Compile script
 	{
 		/*ion::resources::files::repositories::ScriptRepository script_repository{ion::resources::files::repositories::file_repository::NamingConvention::FilePath};
@@ -216,7 +220,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 		//Serialize tree
 		if (tree)
 		{
-			auto color_depth =
+			[[maybe_unused]] auto color_depth =
 				tree->Search("settings")
 				.Find("advanced")
 				.Property("color-depth")[0]
