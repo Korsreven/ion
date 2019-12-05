@@ -13,22 +13,20 @@ File:	IonParticle.h
 #ifndef ION_PARTICLE_H
 #define ION_PARTICLE_H
 
-#include <chrono>
+#include <utility>
 
-#include "types/IonTypes.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
+#include "types/IonCumulative.h"
+#include "types/IonTypes.h"
 
 namespace ion::graphics::particles
 {
 	using namespace types::type_literals;
 
+	using types::Cumulative;
 	using utilities::Color;
 	using utilities::Vector2;
-
-	namespace particle::detail
-	{
-	} //particle::detail
 
 
 	//Particle class that can be represented by...
@@ -42,10 +40,8 @@ namespace ion::graphics::particles
 			Vector2 direction_; //Length represents velocity
 			Vector2 size_;
 			real mass_ = 0.0_r;
-			Color solid_color_ = utilities::color::White;
-
-			std::chrono::duration<real> life_time_{};
-			std::chrono::duration<real> total_life_time_{};	
+			Color solid_color_;
+			Cumulative<duration> life_time_;
 
 		public:
 
@@ -54,7 +50,7 @@ namespace ion::graphics::particles
 			//Constructs a new particle from the given initial values
 			Particle(const Vector2 &position, const Vector2 &direction,
 					 const Vector2 &size, real mass, const Color &solid_color,
-					 std::chrono::duration<real> life_time) noexcept;
+					 duration life_time) noexcept;
 
 
 			/*
@@ -92,14 +88,11 @@ namespace ion::graphics::particles
 				solid_color_ = color;
 			}
 
-			//Sets the life time of the particle to the given value
-			inline void LifeTime(std::chrono::duration<real> life_time) noexcept
+			//Sets the life time of the particle to the given duration
+			inline void LifeTime(duration life_time) noexcept
 			{
-				if (life_time_.count() <= 0.0_r)
-					total_life_time_ = life_time;
-
-				life_time_ = life_time;
-			}	
+				life_time_.Limit(life_time);
+			}
 
 
 			/*
@@ -137,10 +130,10 @@ namespace ion::graphics::particles
 				return solid_color_;
 			}
 
-			//Return the life time and total life time of the particle
+			//Returns the life time of the particle
 			[[nodiscard]] inline auto LifeTime() const noexcept
 			{
-				return std::pair{life_time_, total_life_time_};
+				return life_time_.Limit();
 			}
 
 
@@ -150,15 +143,15 @@ namespace ion::graphics::particles
 
 			//Evolve particle by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
-			inline auto Evolve(std::chrono::duration<real> time) noexcept
+			inline auto Evolve(duration time) noexcept
 			{
-				if ((life_time_ -= time) > std::chrono::duration<real>::zero())
+				if (life_time_ += time)
+					return false;
+				else
 				{
 					position_ += direction_ * time.count();
 					return true;
 				}
-				else
-					return false;
 			}
 	};
 } //ion::graphics::particles

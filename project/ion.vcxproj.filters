@@ -234,6 +234,9 @@
     <ClCompile Include="..\source\engine\graphics\particles\IonParticle.cpp">
       <Filter>Source Files\graphics\particles</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\particles\IonEmitter.cpp">
+      <Filter>Source Files\graphics\particles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -445,6 +448,15 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\particles\IonParticle.h">
       <Filter>Header Files\graphics\particles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\particles\IonEmitter.h">
+      <Filter>Header Files\graphics\particles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\types\IonCumulative.h">
+      <Filter>Header Files\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\types\IonProgress.h">
+      <Filter>Header Files\types</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

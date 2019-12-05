@@ -144,22 +144,20 @@ namespace ion::types
 			static constexpr auto value =
 				1LL << std::numeric_limits<long double>::digits;
 		};
+
+
+		template <typename T, typename U = void>
+		struct representation_impl
+		{
+			using type = T;
+		};
+
+		template <typename T>
+		struct representation_impl<T, typename std::enable_if_t<std::is_arithmetic_v<typename T::rep>>>
+		{
+			using type = typename T::rep;
+		};
 	} //detail
-
-
-	/*
-		Remove const volatile reference
-		Type trait scheduled for C++20
-	*/
-
-	template <typename T>
-	struct remove_cvref :
-		std::remove_reference<std::remove_cv_t<T>>
-	{
-	};
-
-	template <typename T>
-	using remove_cvref_t = typename remove_cvref<T>::type;
 
 
 	/*
@@ -199,7 +197,7 @@ namespace ion::types
 
 	template <typename T>
 	struct is_pair :
-		detail::is_pair_impl<remove_cvref_t<T>>
+		detail::is_pair_impl<std::remove_cvref_t<T>>
 	{
 	};
 
@@ -214,7 +212,7 @@ namespace ion::types
 
 	template <typename T>
 	struct is_char :
-		detail::is_char_impl<remove_cvref_t<T>>
+		detail::is_char_impl<std::remove_cvref_t<T>>
 	{
 	};
 
@@ -283,6 +281,21 @@ namespace ion::types
 
 	template <typename T>
 	constexpr auto max_whole_number_v = max_whole_number<T>::value;
+
+
+	/*
+		Underlying representation
+		Type trait that checks the underlying type
+	*/
+
+	template <typename T>
+	struct representation
+	{
+		using type = typename detail::representation_impl<T>::type;
+	};
+
+	template <typename T>
+	using representation_t = typename representation<T>::type;
 } //ion::types
 
 #endif

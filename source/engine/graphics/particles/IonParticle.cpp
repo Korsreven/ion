@@ -15,22 +15,16 @@ File:	IonParticle.cpp
 namespace ion::graphics::particles
 {
 
-namespace particle::detail
-{
-} //particle::detail
-
-
 Particle::Particle(const Vector2 &position, const Vector2 &direction,
 				   const Vector2 &size, real mass, const Color &solid_color,
-				   std::chrono::duration<real> life_time) noexcept :
+				   duration life_time) noexcept :
+
 	position_{position},
 	direction_{direction},
 	size_{size},
 	mass_{mass},
 	solid_color_{solid_color},
-
-	life_time_{life_time},
-	total_life_time_{life_time}
+	life_time_{life_time}
 {
 	//Empty
 }

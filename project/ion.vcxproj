@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClCompile Include="..\source\engine\events\IonInputController.cpp" />
     <ClCompile Include="..\source\engine\events\IonRecurringCallback.cpp" />
+    <ClCompile Include="..\source\engine\graphics\particles\IonEmitter.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonParticle.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonAabb.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonColor.cpp" />
@@ -210,6 +211,7 @@
     <ClInclude Include="..\source\engine\events\listeners\IonMouseListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonResourceListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonWindowListener.h" />
+    <ClInclude Include="..\source\engine\graphics\particles\IonEmitter.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonParticle.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonAabb.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonColor.h" />
@@ -246,6 +248,8 @@
     <ClInclude Include="..\source\engine\timers\IonStopwatch.h" />
     <ClInclude Include="..\source\engine\timers\IonTimer.h" />
     <ClInclude Include="..\source\engine\timers\IonTimerManager.h" />
+    <ClInclude Include="..\source\engine\types\IonCumulative.h" />
+    <ClInclude Include="..\source\engine\types\IonProgress.h" />
     <ClInclude Include="..\source\engine\types\IonSingleton.h" />
     <ClInclude Include="..\source\engine\types\IonStrongType.h" />
     <ClInclude Include="..\source\engine\types\IonTypeCasts.h" />

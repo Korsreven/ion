@@ -70,6 +70,8 @@ File:	main.cpp
 #include "timers/IonTimerManager.h"
 #include "timers/IonStopwatch.h"
 
+#include "types/IonCumulative.h"
+#include "types/IonProgress.h"
 #include "types/IonSingleton.h"
 #include "types/IonStrongType.h"
 #include "types/IonTypes.h"
@@ -179,6 +181,14 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 
 	ion::graphics::particles::Particle particle;
 	ion::graphics::particles::Particle particle2 = particle;
+
+	ion::types::Cumulative<int> foo{10};
+	foo.Add(5);
+	auto foo_percent = foo.Percent();
+
+	ion::types::Progress<int> bar{5, 15};
+	bar.StepBy(5);
+	auto bar_percent = bar.Percent();
 
 	//Compile script
 	{
