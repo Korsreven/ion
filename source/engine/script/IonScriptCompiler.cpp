@@ -2336,7 +2336,7 @@ std::optional<lexical_tokens> partial_compile_unit(translation_unit &unit, file_
 	Outputting
 */
 
-std::string print_output(std::chrono::duration<real> compile_time, const std::vector<CompileError> &errors, OutputOptions output_options)
+std::string print_output(duration compile_time, const std::vector<CompileError> &errors, OutputOptions output_options)
 {
 	std::string output;
 	{

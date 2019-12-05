@@ -93,9 +93,9 @@ bool Stopwatch::IsRunning() const noexcept
 	Get total elapsed time in different units
 */
 
-std::chrono::duration<real> Stopwatch::Elapsed() noexcept
+duration Stopwatch::Elapsed() noexcept
 {
-	return std::chrono::duration<real>(Sync());
+	return duration(Sync());
 }
 
 std::chrono::hours Stopwatch::ElapsedHours() noexcept

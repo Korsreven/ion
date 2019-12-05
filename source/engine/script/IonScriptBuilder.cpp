@@ -34,7 +34,7 @@ std::string current_date_time()
 		std::data(data) : "";
 }
 
-std::string print_output(std::filesystem::path file_path, std::chrono::duration<real> built_time, ScriptError error, OutputOptions output_options)
+std::string print_output(std::filesystem::path file_path, duration built_time, ScriptError error, OutputOptions output_options)
 {
 	std::string output;
 
@@ -146,7 +146,7 @@ std::string ScriptBuilder::PrintOutput(OutputOptions output_options) const
 		ScriptError{validate_error_};
 
 	auto output = detail::print_output(compile_error_.FilePath,
-		compiler_.CompileTime() + (validator_ ? validator_->ValidateTime() : std::chrono::duration<real>{}),
+		compiler_.CompileTime() + (validator_ ? validator_->ValidateTime() : duration{}),
 		error, output_options);
 
 	if (compiler_output_options_)

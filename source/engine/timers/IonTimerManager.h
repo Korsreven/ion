@@ -13,8 +13,6 @@ File:	IonTimerManager.h
 #ifndef ION_TIMER_MANAGER_H
 #define ION_TIMER_MANAGER_H
 
-#include <chrono>
-
 #include "resources/IonResourceManager.h"
 #include "timers/IonTimer.h"
 
@@ -53,10 +51,10 @@ namespace ion::timers
 		*/
 
 		//
-		[[nodiscard]] Timer& CreateTimer(std::chrono::duration<real> interval);
+		[[nodiscard]] Timer& CreateTimer(duration interval);
 
 		//
-		[[nodiscard]] Timer& CreateTimer(std::chrono::duration<real> interval, events::Callback<void, Timer&> on_tick);
+		[[nodiscard]] Timer& CreateTimer(duration interval, events::Callback<void, Timer&> on_tick);
 
 		//
 		[[nodiscard]] Timer& CreateTimer(const Timer &timer);
@@ -68,7 +66,7 @@ namespace ion::timers
 
 		//Elapse all timers by the given time in seconds
 		//This function is typically called each frame, with the time in seconds since last frame
-		void Elapse(std::chrono::duration<real> time) noexcept;
+		void Elapse(duration time) noexcept;
 	};
 } //ion::timers
 

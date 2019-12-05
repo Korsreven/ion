@@ -13,7 +13,6 @@ File:	IonScriptCompiler.h
 #ifndef ION_SCRIPT_COMPILER_H
 #define ION_SCRIPT_COMPILER_H
 
-#include <chrono>
 #include <filesystem>
 #include <memory>
 #include <mutex>
@@ -562,7 +561,7 @@ namespace ion::script
 				Outputting
 			*/
 
-			std::string print_output(std::chrono::duration<real> compile_time, const std::vector<CompileError> &errors, OutputOptions output_options);
+			std::string print_output(duration compile_time, const std::vector<CompileError> &errors, OutputOptions output_options);
 		} //detail
 	} //script_compiler
 
@@ -574,7 +573,7 @@ namespace ion::script
 			std::optional<int> max_build_processes_;
 
 			std::vector<CompileError> compile_errors_;
-			std::chrono::duration<real> compile_time_;
+			duration compile_time_;
 
 		public:
 

@@ -19,12 +19,12 @@ namespace ion::timers
 	Creating
 */
 
-Timer& TimerManager::CreateTimer(std::chrono::duration<real> interval)
+Timer& TimerManager::CreateTimer(duration interval)
 {
 	return Create(interval);
 }
 
-Timer& TimerManager::CreateTimer(std::chrono::duration<real> interval, events::Callback<void, Timer&> on_tick)
+Timer& TimerManager::CreateTimer(duration interval, events::Callback<void, Timer&> on_tick)
 {
 	return Create(interval, on_tick);
 }
@@ -39,7 +39,7 @@ Timer& TimerManager::CreateTimer(const Timer &timer)
 	Elapse time
 */
 
-void TimerManager::Elapse(std::chrono::duration<real> time) noexcept
+void TimerManager::Elapse(duration time) noexcept
 {
 	for (auto &timer : Resources())
 		timer.Elapse(time);

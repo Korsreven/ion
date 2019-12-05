@@ -13,6 +13,7 @@ File:	IonTypes.h
 #ifndef ION_TYPES_H
 #define ION_TYPES_H
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -61,6 +62,14 @@ namespace ion::types
 	#else //ION_SINGLE_PRECISION
 	using real = float32;
 	#endif
+
+
+	/*
+		Duration (variable width)
+		Engine default floating point duration in seconds
+	*/
+
+	using duration = std::chrono::duration<real>;
 
 
 	/*
@@ -159,6 +168,17 @@ namespace ion::types
 			return static_cast<real>(value);
 		}
 
+
+		/*
+			User defined literals (UDLs)
+			For duration type
+		*/
+
+		constexpr auto operator""_sec(long double value) noexcept
+		{
+			return duration{static_cast<real>(value)};
+		}
+
 		
 		/*
 			User defined literals (UDLs)
@@ -201,6 +221,7 @@ using ion::types::float64;
 using ion::types::float80;
 using ion::types::real;
 
+using ion::types::duration;
 using ion::types::index_t;
 
 #endif

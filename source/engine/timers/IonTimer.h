@@ -13,7 +13,6 @@ File:	IonTimer.h
 #ifndef ION_TIMER_H
 #define ION_TIMER_H
 
-#include <chrono>
 #include <optional>
 
 #include "types/IonTypes.h"
@@ -28,10 +27,10 @@ namespace ion::timers
 	{
 		using namespace types::type_literals;
 
-		constexpr auto valid_interval(std::chrono::duration<real> interval) noexcept
+		constexpr auto valid_interval(duration interval) noexcept
 		{
 			return interval.count() < 0.0_r ?
-				std::chrono::duration<real>{} :
+				duration{} :
 				interval;
 		}
 	} //timer::detail
@@ -40,8 +39,8 @@ namespace ion::timers
 	{
 		private:
 
-			std::chrono::duration<real> interval_{};
-			std::chrono::duration<real> elapsed_{};
+			duration interval_{};
+			duration elapsed_{};
 			bool running_ = false;
 			bool ticked_ = false;
 
@@ -53,10 +52,10 @@ namespace ion::timers
 			Timer() = default;
 
 			//Constructs a new timer from the given interval
-			Timer(std::chrono::duration<real> interval) noexcept;
+			Timer(duration interval) noexcept;
 
 			//Constructs a new timer from the given interval and callback
-			Timer(std::chrono::duration<real> interval, events::Callback<void, Timer&> on_tick) noexcept;
+			Timer(duration interval, events::Callback<void, Timer&> on_tick) noexcept;
 
 
 			/*
@@ -64,7 +63,7 @@ namespace ion::timers
 			*/
 
 			//Sets the interval in seconds (as real)
-			inline void Interval(std::chrono::duration<real> interval) noexcept
+			inline void Interval(duration interval) noexcept
 			{
 				interval_ = timer::detail::valid_interval(interval);
 			}
@@ -122,7 +121,7 @@ namespace ion::timers
 
 			//Elapse timer by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
-			void Elapse(std::chrono::duration<real> time) noexcept;
+			void Elapse(duration time) noexcept;
 
 
 			/*

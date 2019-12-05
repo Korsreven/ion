@@ -19,13 +19,13 @@ using namespace timer;
 
 //Public
 
-Timer::Timer(std::chrono::duration<real> interval) noexcept :
+Timer::Timer(duration interval) noexcept :
 	interval_{detail::valid_interval(interval)}
 {
 	//Empty
 }
 
-Timer::Timer(std::chrono::duration<real> interval, events::Callback<void, Timer&> on_tick) noexcept :
+Timer::Timer(duration interval, events::Callback<void, Timer&> on_tick) noexcept :
 	interval_{detail::valid_interval(interval)},
 	on_tick_{std::in_place, std::move(on_tick)}
 {
@@ -64,7 +64,7 @@ void Timer::Restart() noexcept
 	Elapse time
 */
 
-void Timer::Elapse(std::chrono::duration<real> time) noexcept
+void Timer::Elapse(duration time) noexcept
 {
 	if (running_ &&
 		(elapsed_ += time) >= interval_)

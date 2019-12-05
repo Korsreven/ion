@@ -73,7 +73,7 @@ namespace ion::timers
 			*/
 
 			//Returns elapsed time in seconds (as real)
-			[[nodiscard]] std::chrono::duration<real> Elapsed() noexcept;
+			[[nodiscard]] duration Elapsed() noexcept;
 
 			//Returns elapsed time in hours (1 hour = 60 min)
 			[[nodiscard]] std::chrono::hours ElapsedHours() noexcept;

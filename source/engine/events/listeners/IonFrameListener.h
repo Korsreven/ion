@@ -13,8 +13,6 @@ File:	IonFrameListener.h
 #ifndef ION_FRAME_LISTENER_H
 #define ION_FRAME_LISTENER_H
 
-#include <chrono>
-
 #include "IonListener.h"
 #include "types/IonTypes.h"
 
@@ -28,11 +26,11 @@ namespace ion::events::listeners
 
 		//Called just after a frame has been rendered, with elapsed time in seconds since the last frame
 		//Return true to continue rendering, or false to drop out of the rendering loop
-		virtual bool FrameStarted(std::chrono::duration<real> time) noexcept = 0;
+		virtual bool FrameStarted(duration time) noexcept = 0;
 
 		//Called when a frame is about to begin rendering, with elapsed time in seconds since the last frame
 		//Return true to continue rendering, or false to drop out of the rendering loop
-		virtual bool FrameEnded(std::chrono::duration<real> time) noexcept = 0;
+		virtual bool FrameEnded(duration time) noexcept = 0;
 	};
 } //ion::events::listeners
 

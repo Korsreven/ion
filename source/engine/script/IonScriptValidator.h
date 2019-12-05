@@ -14,7 +14,6 @@ File:	IonScriptValidator.h
 #define ION_SCRIPT_VALIDATOR_H
 
 #include <cassert>
-#include <chrono>
 #include <initializer_list>
 #include <optional>
 #include <string>
@@ -272,7 +271,7 @@ namespace ion::script
 				Outputting
 			*/
 
-			std::string print_output(std::chrono::duration<real> validate_time, const std::vector<ValidateError> &errors, OutputOptions output_options);
+			std::string print_output(duration validate_time, const std::vector<ValidateError> &errors, OutputOptions output_options);
 		} //detail
 
 
@@ -584,7 +583,7 @@ namespace ion::script
 			script_validator::ClassDefinition root_{{}};
 
 			std::vector<ValidateError> validate_errors_;
-			std::chrono::duration<real> validate_time_;
+			duration validate_time_;
     
 		public:
 

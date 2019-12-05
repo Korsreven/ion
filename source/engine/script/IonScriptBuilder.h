@@ -13,7 +13,6 @@ File:	IonScriptBuilder.h
 #ifndef ION_SCRIPT_BUILDER_H
 #define ION_SCRIPT_BUILDER_H
 
-#include <chrono>
 #include <filesystem>
 #include <optional>
 #include <string>
@@ -39,7 +38,7 @@ namespace ion::script
 		namespace detail
 		{
 			std::string current_date_time();
-			std::string print_output(std::filesystem::path file_path, std::chrono::duration<real> built_time, ScriptError error, OutputOptions output_options);
+			std::string print_output(std::filesystem::path file_path, duration built_time, ScriptError error, OutputOptions output_options);
 		} //detail
 	} //script_builder
 

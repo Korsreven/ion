@@ -634,7 +634,7 @@ bool validate_tree(const ScriptTree &tree, const ClassDefinition &root, std::vec
 	Outputting
 */
 
-std::string print_output(std::chrono::duration<real> validate_time, const std::vector<ValidateError> &errors, OutputOptions output_options)
+std::string print_output(duration validate_time, const std::vector<ValidateError> &errors, OutputOptions output_options)
 {
 	std::string output;
 	{
