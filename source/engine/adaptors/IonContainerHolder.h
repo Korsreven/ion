@@ -13,6 +13,7 @@ File:	IonContainerHolder.h
 #ifndef ION_CONTAINER_HOLDER_H
 #define ION_CONTAINER_HOLDER_H
 
+#include <iterator>
 #include <type_traits>
 #include "IonBasicContainerHolder.h"
 
