@@ -30,7 +30,6 @@ namespace ion::types
 		}
 
 		//Enable support for chrono::duration
-		template <typename T>
 		constexpr auto underlying_value(duration value) noexcept
 		{
 			return value.count();
