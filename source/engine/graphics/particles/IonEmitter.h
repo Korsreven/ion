@@ -23,6 +23,7 @@ File:	IonEmitter.h
 #include "adaptors/ranges/IonIterable.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
+#include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
 #include "utilities/IonRandom.h"
@@ -104,7 +105,7 @@ namespace ion::graphics::particles
 
 		inline auto particle_direction(const Vector2 &direction, real angle)
 		{
-			return direction.Deviant(ion::utilities::random::Number(-angle, angle));
+			return direction.RandomDeviant(angle);
 		}
 
 		inline auto particle_direction(const Vector2 &direction, real angle, real min_velocity, real max_velocity)
@@ -188,17 +189,17 @@ namespace ion::graphics::particles
 			*/
 
 			//Returns a new point emitter from the given initial values
-			static Emitter Point(const Vector2 &position, const Vector2 &direction,
+			[[nodiscard]] static Emitter Point(const Vector2 &position, const Vector2 &direction,
 				real emission_rate, real emission_angle, std::optional<duration> emission_duration,
 				int particle_quota = 100);
 
 			//Returns a new box emitter from the given initial values
-			static Emitter Box(const Vector2 &position, const Vector2 &direction,
+			[[nodiscard]] static Emitter Box(const Vector2 &position, const Vector2 &direction,
 				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 				std::optional<duration> emission_duration, int particle_quota = 100);
 
 			//Returns a new ring emitter from the given initial values
-			static Emitter Ring(const Vector2 &position, const Vector2 &direction,
+			[[nodiscard]] static Emitter Ring(const Vector2 &position, const Vector2 &direction,
 				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 				std::optional<duration> emission_duration, int particle_quota = 100);
 
@@ -246,10 +247,10 @@ namespace ion::graphics::particles
 				emission_rate_ = rate;
 			}
 
-			//Sets the emission angle of the emitter to the given value
+			//Sets the emission angle of the emitter to the given value in range [0.0, pi]
 			inline void EmissionAngle(real angle) noexcept
 			{
-				emission_angle_ = angle;
+				emission_angle_ = std::clamp(angle, 0.0_r, ion::utilities::math::Pi);
 			}
 
 			//Sets the emission duration of the emitter to the given amount
@@ -322,7 +323,7 @@ namespace ion::graphics::particles
 				return emission_rate_;
 			}
 
-			//Returns the emission angle of the emitter
+			//Returns the emission angle of the emitter in range [0.0, pi]
 			[[nodiscard]] inline auto EmissionAngle() const noexcept
 			{
 				return emission_angle_;
@@ -333,6 +334,14 @@ namespace ion::graphics::particles
 			[[nodiscard]] inline auto EmissionDuration() const noexcept
 			{
 				return emission_duration_;
+			}
+
+			//Returns the emission duration percent of the emitter in range [0.0, 1.0]
+			[[nodiscard]] inline auto EmissionDurationPercent() const noexcept
+			{
+				return emission_duration_ ?
+					emission_duration_->Percent() :
+					0.0_r;
 			}
 
 
