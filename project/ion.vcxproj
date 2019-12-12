@@ -151,6 +151,14 @@
   <ItemGroup>
     <ClCompile Include="..\source\engine\events\IonInputController.cpp" />
     <ClCompile Include="..\source\engine\events\IonRecurringCallback.cpp" />
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonAffector.cpp" />
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonColorFader.cpp" />
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonDirectionRandomizer.cpp" />
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonGravitation.cpp" />
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonLinearForce.cpp" />
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonScaler.cpp" />
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonSineForce.cpp" />
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonVelocityRandomizer.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonEmitter.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonParticle.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonAabb.cpp" />
@@ -211,6 +219,14 @@
     <ClInclude Include="..\source\engine\events\listeners\IonMouseListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonResourceListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonWindowListener.h" />
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffector.h" />
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonColorFader.h" />
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonDirectionRandomizer.h" />
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonGravitation.h" />
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonLinearForce.h" />
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonScaler.h" />
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonSineForce.h" />
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonVelocityRandomizer.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonEmitter.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonParticle.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonAabb.h" />

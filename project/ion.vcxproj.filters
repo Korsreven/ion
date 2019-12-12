@@ -121,6 +121,12 @@
     <Filter Include="Header Files\parallel">
       <UniqueIdentifier>{58fda629-bd76-4e0e-ab68-cc0db6eab972}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\graphics\particles\affectors">
+      <UniqueIdentifier>{eefdbf4f-46e9-4d56-a3f5-fe27e3643957}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics\particles\affectors">
+      <UniqueIdentifier>{1c7abd8b-198a-4a24-8949-fe0d385913ea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -236,6 +242,30 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\particles\IonEmitter.cpp">
       <Filter>Source Files\graphics\particles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonColorFader.cpp">
+      <Filter>Source Files\graphics\particles\affectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonScaler.cpp">
+      <Filter>Source Files\graphics\particles\affectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonDirectionRandomizer.cpp">
+      <Filter>Source Files\graphics\particles\affectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonGravitation.cpp">
+      <Filter>Source Files\graphics\particles\affectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonLinearForce.cpp">
+      <Filter>Source Files\graphics\particles\affectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonSineForce.cpp">
+      <Filter>Source Files\graphics\particles\affectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonAffector.cpp">
+      <Filter>Source Files\graphics\particles\affectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonVelocityRandomizer.cpp">
+      <Filter>Source Files\graphics\particles\affectors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -457,6 +487,30 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\types\IonProgress.h">
       <Filter>Header Files\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffector.h">
+      <Filter>Header Files\graphics\particles\affectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonColorFader.h">
+      <Filter>Header Files\graphics\particles\affectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonScaler.h">
+      <Filter>Header Files\graphics\particles\affectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonDirectionRandomizer.h">
+      <Filter>Header Files\graphics\particles\affectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonGravitation.h">
+      <Filter>Header Files\graphics\particles\affectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonLinearForce.h">
+      <Filter>Header Files\graphics\particles\affectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonSineForce.h">
+      <Filter>Header Files\graphics\particles\affectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonVelocityRandomizer.h">
+      <Filter>Header Files\graphics\particles\affectors</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

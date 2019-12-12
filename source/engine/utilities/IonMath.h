@@ -218,7 +218,15 @@ namespace ion::utilities::math
 	//Returns x normalized to range [0.0, 1.0]
 	[[nodiscard]] constexpr auto Normalize(real x, real min, real max) noexcept
 	{
-		return (x - min) / (max - min);
+		return min != max ?
+			(x - min) / (max - min) :
+			0.0_r;
+	}
+
+	//Returns x normalized to range [new min, new max]
+	[[nodiscard]] constexpr auto Normalize(real x, real min, real max, real new_min, real new_max) noexcept
+	{
+		return Normalize(x, min, max) * (new_max - new_min) + new_min;
 	}
 
 	//Return x raised to the y-th power for any integral type

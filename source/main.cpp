@@ -29,7 +29,16 @@ File:	main.cpp
 #include "events/listeners/IonResourceListener.h"
 #include "events/listeners/IonWindowListener.h"
 
+#include "graphics/particles/IonEmitter.h"
 #include "graphics/particles/IonParticle.h"
+#include "graphics/particles/affectors/IonAffector.h"
+#include "graphics/particles/affectors/IonColorFader.h"
+#include "graphics/particles/affectors/IonDirectionRandomizer.h"
+#include "graphics/particles/affectors/IonGravitation.h"
+#include "graphics/particles/affectors/IonLinearForce.h"
+#include "graphics/particles/affectors/IonScaler.h"
+#include "graphics/particles/affectors/IonSineForce.h"
+#include "graphics/particles/affectors/IonVelocityRandomizer.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonMatrix3.h"
@@ -178,17 +187,6 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 	/*
 		Test code
 	*/
-
-	ion::graphics::particles::Particle particle;
-	ion::graphics::particles::Particle particle2 = particle;
-
-	ion::types::Cumulative<int> foo{10};
-	foo.Add(5);
-	auto foo_percent = foo.Percent();
-
-	ion::types::Progress<int> bar{5, 15};
-	bar.StepBy(5);
-	auto bar_percent = bar.Percent();
 
 	//Compile script
 	{
