@@ -70,6 +70,13 @@ namespace ion::graphics::particles
 				direction_ = direction;
 			}
 
+			//Sets the velocity (direction length) of the particle to the given value
+			inline void Velocity(real velocity) noexcept
+			{
+				direction_.Normalize();
+				direction_ *= velocity;
+			}
+
 			//Sets the size of the particle to the given vector
 			inline void Size(const Vector2 &size) noexcept
 			{
@@ -112,6 +119,12 @@ namespace ion::graphics::particles
 				return direction_;
 			}
 
+			//Returns the velocity (direction length) of the particle
+			[[nodiscard]] inline auto Velocity() const noexcept
+			{
+				return direction_.Length();
+			}
+
 			//Returns the size of the particle
 			[[nodiscard]] inline const auto& Size() const noexcept
 			{
@@ -134,6 +147,12 @@ namespace ion::graphics::particles
 			[[nodiscard]] inline auto LifeTime() const noexcept
 			{
 				return life_time_.Limit();
+			}
+
+			//Returns the life time percent of the particle in range [0.0, 1.0]
+			[[nodiscard]] inline auto LifeTimePercent() const noexcept
+			{
+				return life_time_.Percent();
 			}
 
 
