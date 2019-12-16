@@ -21,6 +21,7 @@ File:	IonEmitter.h
 
 #include "IonParticle.h"
 #include "adaptors/ranges/IonIterable.h"
+#include "affectors/IonAffectorInterface.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "types/IonCumulative.h"
@@ -36,119 +37,122 @@ namespace ion::graphics::particles
 	using utilities::Color;
 	using utilities::Vector2;
 
-	enum class EmitterType
+
+	namespace emitter
 	{
-		Point,
-		Box,
-		Ring
-	};
-
-	namespace emitter::detail
-	{
-		template <typename T>
-		using container_type = std::vector<T>;
-
-
-		inline auto box_coordinate(real coord, real rand, real half_size, real half_inner_size1, real half_inner_size2) noexcept
+		enum class EmitterType
 		{
-			return coord > -half_inner_size1 && coord < half_inner_size1 ?
-					(half_size - half_inner_size2) * rand + (rand < 0.0_r ? -half_inner_size2 : half_inner_size2) :
-					half_size * rand;
-		}
+			Point,
+			Box,
+			Ring
+		};
 
-		inline auto position_inside_box(const Vector2 &half_size, const Vector2 &half_inner_size) noexcept
+		namespace detail
 		{
-			using namespace ion::utilities;
+			template <typename T>
+			using container_type = std::vector<T>;
 
-			if (random::Number(0, 1))
+
+			inline auto box_coordinate(real coord, real rand, real half_size, real half_inner_size1, real half_inner_size2) noexcept
 			{
-				auto x = half_size.X() * random::Number(-1.0_r, 1.0_r);
-				return Vector2{x, box_coordinate(x, random::Number(-1.0_r, 1.0_r), half_size.Y(), half_inner_size.X(), half_inner_size.Y())};
+				return coord > -half_inner_size1 && coord < half_inner_size1 ?
+						(half_size - half_inner_size2) * rand + (rand < 0.0_r ? -half_inner_size2 : half_inner_size2) :
+						half_size * rand;
 			}
-			else
+
+			inline auto position_inside_box(const Vector2 &half_size, const Vector2 &half_inner_size) noexcept
 			{
-				auto y = half_size.Y() * random::Number(-1.0_r, 1.0_r);
-				return Vector2{box_coordinate(y, random::Number(-1.0_r, 1.0_r), half_size.X(), half_inner_size.Y(), half_inner_size.X()), y};
+				using namespace ion::utilities;
+
+				if (random::Number(0, 1))
+				{
+					auto x = half_size.X() * random::Number(-1.0_r, 1.0_r);
+					return Vector2{x, box_coordinate(x, random::Number(-1.0_r, 1.0_r), half_size.Y(), half_inner_size.X(), half_inner_size.Y())};
+				}
+				else
+				{
+					auto y = half_size.Y() * random::Number(-1.0_r, 1.0_r);
+					return Vector2{box_coordinate(y, random::Number(-1.0_r, 1.0_r), half_size.X(), half_inner_size.Y(), half_inner_size.X()), y};
+				}
 			}
-		}
 
-		inline auto position_inside_ring(const Vector2 &half_size, const Vector2 &half_inner_size) noexcept
-		{
-			using namespace ion::utilities;
-
-			auto theta = math::TwoPi * random::Number();
-			auto radius = (half_size - half_inner_size) * random::Number() + half_inner_size;
-			return Vector2{radius.X() * math::Cos(theta),
-						   radius.Y() * math::Sin(theta)};
-		}
-
-
-		inline auto particle_position(EmitterType emitter_type, const Vector2 &half_size, const Vector2 &half_inner_size) noexcept
-		{
-			switch (emitter_type)
+			inline auto position_inside_ring(const Vector2 &half_size, const Vector2 &half_inner_size) noexcept
 			{
-				case EmitterType::Box:
-				return position_inside_box(half_size, half_inner_size);
+				using namespace ion::utilities;
 
-				case EmitterType::Ring:
-				return position_inside_ring(half_size, half_inner_size);
-
-				default: //Point
-				return utilities::vector2::Zero;
+				auto theta = math::TwoPi * random::Number();
+				auto radius = (half_size - half_inner_size) * random::Number() + half_inner_size;
+				return Vector2{radius.X() * math::Cos(theta),
+							   radius.Y() * math::Sin(theta)};
 			}
-		}
-
-		inline auto particle_velocity(real min_velocity, real max_velocity)
-		{
-			return ion::utilities::random::Number(min_velocity, max_velocity);
-		}
-
-		inline auto particle_direction(const Vector2 &direction, real angle)
-		{
-			return direction.RandomDeviant(angle);
-		}
-
-		inline auto particle_direction(const Vector2 &direction, real angle, real min_velocity, real max_velocity)
-		{
-			return particle_direction(direction, angle) * particle_velocity(min_velocity, max_velocity);
-		}
-
-		inline auto particle_size(const Vector2 &min_size, const Vector2 &max_size)
-		{
-			using namespace ion::utilities;
-
-			auto [min_x, min_y] = min_size.XY();
-			auto [max_x, max_y] = max_size.XY();
-			return Vector2{random::Number(min_x, max_x),
-						   random::Number(min_y, max_y)};
-		}
-
-		inline auto particle_mass(real min_mass, real max_mass)
-		{
-			return ion::utilities::random::Number(min_mass, max_mass);
-		}
-
-		inline auto particle_solid_color(const Color &from_solid_color, const Color &to_solid_color)
-		{
-			return from_solid_color.MixCopy(to_solid_color, ion::utilities::random::Number());
-		}
-
-		inline auto particle_life_time(duration min_life_time, duration max_life_time)
-		{
-			return duration{ion::utilities::random::Number(min_life_time.count(), max_life_time.count())};
-		}
 
 
-		void evolve_particles(container_type<Particle> &particles, duration time) noexcept;
-	} //emitter::detail
+			inline auto particle_position(EmitterType emitter_type, const Vector2 &half_size, const Vector2 &half_inner_size) noexcept
+			{
+				switch (emitter_type)
+				{
+					case EmitterType::Box:
+					return position_inside_box(half_size, half_inner_size);
 
+					case EmitterType::Ring:
+					return position_inside_ring(half_size, half_inner_size);
+
+					default: //Point
+					return utilities::vector2::Zero;
+				}
+			}
+
+			inline auto particle_velocity(real min_velocity, real max_velocity)
+			{
+				return ion::utilities::random::Number(min_velocity, max_velocity);
+			}
+
+			inline auto particle_direction(const Vector2 &direction, real angle)
+			{
+				return direction.RandomDeviant(angle);
+			}
+
+			inline auto particle_direction(const Vector2 &direction, real angle, real min_velocity, real max_velocity)
+			{
+				return particle_direction(direction, angle) * particle_velocity(min_velocity, max_velocity);
+			}
+
+			inline auto particle_size(const Vector2 &min_size, const Vector2 &max_size)
+			{
+				using namespace ion::utilities;
+
+				auto [min_x, min_y] = min_size.XY();
+				auto [max_x, max_y] = max_size.XY();
+				return Vector2{random::Number(min_x, max_x),
+							   random::Number(min_y, max_y)};
+			}
+
+			inline auto particle_mass(real min_mass, real max_mass)
+			{
+				return ion::utilities::random::Number(min_mass, max_mass);
+			}
+
+			inline auto particle_solid_color(const Color &from_solid_color, const Color &to_solid_color)
+			{
+				return from_solid_color.MixCopy(to_solid_color, ion::utilities::random::Number());
+			}
+
+			inline auto particle_life_time(duration min_life_time, duration max_life_time)
+			{
+				return duration{ion::utilities::random::Number(min_life_time.count(), max_life_time.count())};
+			}
+
+
+			void evolve_particles(container_type<Particle> &particles, duration time) noexcept;
+		} //detail
+	} //emitter
 
 	//An emitter class that can emit multiple particles
-	class Emitter final
+	class Emitter final : public affectors::AffectorInterface
 	{
 		private:
 
-			EmitterType type_ = EmitterType::Point;
+			emitter::EmitterType type_ = emitter::EmitterType::Point;
 			Vector2 position_;
 			Vector2 direction_;
 			Vector2 size_;
@@ -179,7 +183,7 @@ namespace ion::graphics::particles
 			Emitter() = default;
 
 			//Construct a new emitter from the given initial values
-			Emitter(EmitterType type, const Vector2 &position, const Vector2 &direction,
+			Emitter(emitter::EmitterType type, const Vector2 &position, const Vector2 &direction,
 				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 				std::optional<duration> emission_duration, int particle_quota = 100);
 
@@ -209,7 +213,7 @@ namespace ion::graphics::particles
 			*/
 
 			//Sets the type of the emitter to the given value
-			inline void Type(EmitterType type) noexcept
+			inline void Type(emitter::EmitterType type) noexcept
 			{
 				type_ = type;
 			}
@@ -500,6 +504,12 @@ namespace ion::graphics::particles
 
 			//Clears all particles emitted by this emitter
 			void ClearParticles() noexcept;
+
+			//Returns true if this emitter has any active particles
+			[[nodiscard]] inline auto HasActiveParticles() const noexcept
+			{
+				return !std::empty(particles_);
+			}
 
 
 			/*

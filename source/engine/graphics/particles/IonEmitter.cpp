@@ -139,7 +139,9 @@ void Emitter::Elapse(duration time) noexcept
 	if (!std::empty(particles_))
 		detail::evolve_particles(particles_, time);
 
-	//Local affectors
+	//Affect particles (even when not emitting)
+	for (auto &affector : Affectors())
+		affector.Affect(Particles(), time);
 }
 
 
