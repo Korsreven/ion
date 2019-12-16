@@ -36,22 +36,25 @@ void ParticleSystem::ResourceCreated(resources::Texture&) noexcept
 
 void ParticleSystem::ResourceRemoved([[maybe_unused]] resources::Texture &texture) noexcept
 {
-	//Set particle textures to nullopt
+	//Texture has been removed from texture manager
+	//Set particle textures that matches 'texture' to nullopt
+
 	/*for (auto &emitter : emitters_)
 	{
-		if (emitter->ParticleTexture() == texture)
+		if (auto particle_texture = emitter->ParticleTexture();		
+			particle_texture && *particle_texture == &texture)
+
 			emitter->ParticleTexture({});
 	}*/
 }
 
 void ParticleSystem::Unsubscribed(events::listeners::ListenerInterface<events::listeners::ResourceListener<resources::Texture>>&) noexcept
 {
-	//Set particle textures to nullopt
-	/*for (auto &emitter : emitters_
-	{
-		if (emitter->ParticleTexture() == texture)
-			emitter->ParticleTexture({});
-	}*/
+	//Particle system unsubscribed from texture manager
+	//Set all particle textures to nullopt
+
+	//for (auto &emitter : emitters_
+	//	emitter->ParticleTexture({});
 }
 
 
