@@ -56,6 +56,10 @@ namespace ion::graphics::particles::affectors
 
 		public:
 
+			//Default virtual destructor
+			virtual ~Affector() = default;
+
+
 			/*
 				Modifiers
 			*/

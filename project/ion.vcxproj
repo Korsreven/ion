@@ -152,6 +152,7 @@
     <ClCompile Include="..\source\engine\events\IonInputController.cpp" />
     <ClCompile Include="..\source\engine\events\IonRecurringCallback.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonAffector.cpp" />
+    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonAffectorInterface.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonColorFader.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonDirectionRandomizer.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonGravitation.cpp" />
@@ -161,6 +162,7 @@
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonVelocityRandomizer.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonEmitter.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonParticle.cpp" />
+    <ClCompile Include="..\source\engine\graphics\particles\IonParticleSystem.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonAabb.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonColor.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonMatrix3.cpp" />
@@ -220,6 +222,7 @@
     <ClInclude Include="..\source\engine\events\listeners\IonResourceListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonWindowListener.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffector.h" />
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffectorInterface.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonColorFader.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonDirectionRandomizer.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonGravitation.h" />
@@ -229,6 +232,7 @@
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonVelocityRandomizer.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonEmitter.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonParticle.h" />
+    <ClInclude Include="..\source\engine\graphics\particles\IonParticleSystem.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonAabb.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonColor.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonMatrix3.h" />

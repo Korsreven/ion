@@ -31,7 +31,9 @@ File:	main.cpp
 
 #include "graphics/particles/IonEmitter.h"
 #include "graphics/particles/IonParticle.h"
+#include "graphics/particles/IonParticleSystem.h"
 #include "graphics/particles/affectors/IonAffector.h"
+#include "graphics/particles/affectors/IonAffectorInterface.h"
 #include "graphics/particles/affectors/IonColorFader.h"
 #include "graphics/particles/affectors/IonDirectionRandomizer.h"
 #include "graphics/particles/affectors/IonGravitation.h"
@@ -39,6 +41,7 @@ File:	main.cpp
 #include "graphics/particles/affectors/IonScaler.h"
 #include "graphics/particles/affectors/IonSineForce.h"
 #include "graphics/particles/affectors/IonVelocityRandomizer.h"
+
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonMatrix3.h"
