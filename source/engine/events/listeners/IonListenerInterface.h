@@ -214,7 +214,7 @@ namespace ion::events::listeners
 			*/
 
 			//Subscribe a subscribable listener to this interface
-			auto Subscribe(T &listener) noexcept
+			auto Subscribe(T &listener)
 			{
 				auto iter =
 					std::find_if(std::cbegin(listeners_), std::cend(listeners_),

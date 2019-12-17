@@ -22,12 +22,18 @@ File:	IonEmitter.h
 #include "IonParticle.h"
 #include "adaptors/ranges/IonIterable.h"
 #include "affectors/IonAffectorInterface.h"
+#include "events/listeners/IonResourceListener.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
 #include "utilities/IonRandom.h"
+
+namespace ion::graphics::textures
+{
+	class Texture;
+}
 
 namespace ion::graphics::particles
 {
@@ -147,8 +153,11 @@ namespace ion::graphics::particles
 		} //detail
 	} //emitter
 
+
 	//An emitter class that can emit multiple particles
-	class Emitter final : public affectors::AffectorInterface
+	class Emitter final :
+		public affectors::AffectorInterface,
+		protected events::listeners::ResourceListener<textures::Texture>
 	{
 		private:
 
@@ -176,6 +185,22 @@ namespace ion::graphics::particles
 			std::pair<real, real> particle_mass_;
 			std::pair<Color, Color> particle_solid_color_;
 			std::pair<duration, duration> particle_life_time_;
+			textures::Texture *particle_texture_ = nullptr;
+
+		protected:
+
+			/*
+				Events
+			*/
+
+			//See ResourceListener::ResourceCreated for more details
+			void ResourceCreated(textures::Texture&) noexcept override;
+
+			//See ResourceListener::ResourceRemoved for more details
+			void ResourceRemoved(textures::Texture &texture) noexcept override;
+
+			//See Listener::Unsubscribed for more details
+			void Unsubscribed(events::listeners::ListenerInterface<events::listeners::ResourceListener<textures::Texture>>&) noexcept override;
 
 		public:
 
@@ -427,6 +452,12 @@ namespace ion::graphics::particles
 			{
 				particle_life_time_ = std::minmax(min_life_time, max_life_time);
 			}
+			
+			//Attach the given texture to all active and new particles
+			void ParticleTexture(textures::Texture &texture);
+
+			//Detach (if any) particle texture from all active and new particles
+			void ParticleTexture(std::nullptr_t) noexcept;
 
 
 			/*
@@ -461,6 +492,13 @@ namespace ion::graphics::particles
 			[[nodiscard]] inline auto ParticleLifeTime() const noexcept
 			{
 				return particle_life_time_;
+			}
+
+			//Returns the attached particle texture
+			//Returns nullptr if no particle texture is attached
+			[[nodiscard]] inline auto ParticleTexture() const noexcept
+			{
+				return particle_texture_;
 			}
 
 

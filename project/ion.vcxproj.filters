@@ -127,6 +127,12 @@
     <Filter Include="Source Files\graphics\particles\affectors">
       <UniqueIdentifier>{1c7abd8b-198a-4a24-8949-fe0d385913ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\graphics\textures">
+      <UniqueIdentifier>{a2a0ec57-43da-4400-8840-d8fc6a731cd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics\textures">
+      <UniqueIdentifier>{2ffd5361-66db-42e1-87d7-fb579bd6a521}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -272,6 +278,12 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\particles\IonParticleSystem.cpp">
       <Filter>Source Files\graphics\particles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\textures\IonTexture.cpp">
+      <Filter>Source Files\graphics\textures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\textures\IonTextureManager.cpp">
+      <Filter>Source Files\graphics\textures</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -523,6 +535,12 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\particles\IonParticleSystem.h">
       <Filter>Header Files\graphics\particles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\textures\IonTexture.h">
+      <Filter>Header Files\graphics\textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\textures\IonTextureManager.h">
+      <Filter>Header Files\graphics\textures</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

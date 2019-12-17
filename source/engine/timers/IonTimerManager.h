@@ -13,8 +13,8 @@ File:	IonTimerManager.h
 #ifndef ION_TIMER_MANAGER_H
 #define ION_TIMER_MANAGER_H
 
+#include "IonTimer.h"
 #include "resources/IonResourceManager.h"
-#include "timers/IonTimer.h"
 
 namespace ion::timers
 {

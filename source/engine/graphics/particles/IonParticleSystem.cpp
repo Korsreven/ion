@@ -23,43 +23,6 @@ namespace particle_system::detail
 } //particle_system::detail
 
 
-//Protected
-
-/*
-	Events
-*/
-
-void ParticleSystem::ResourceCreated(resources::Texture&) noexcept
-{
-	//Ignore
-}
-
-void ParticleSystem::ResourceRemoved([[maybe_unused]] resources::Texture &texture) noexcept
-{
-	//Texture has been removed from texture manager
-	//Set particle textures that matches 'texture' to nullopt
-
-	/*for (auto &emitter : emitters_)
-	{
-		if (auto particle_texture = emitter->ParticleTexture();		
-			particle_texture && *particle_texture == &texture)
-
-			emitter->ParticleTexture({});
-	}*/
-}
-
-void ParticleSystem::Unsubscribed(events::listeners::ListenerInterface<events::listeners::ResourceListener<resources::Texture>>&) noexcept
-{
-	//Particle system unsubscribed from texture manager
-	//Set all particle textures to nullopt
-
-	//for (auto &emitter : emitters_
-	//	emitter->ParticleTexture({});
-}
-
-
-//Public
-
 ParticleSystem::ParticleSystem(ParticlePrimitive particle_primitive) noexcept :
 	particle_primitive_{particle_primitive}
 {

@@ -18,26 +18,6 @@ File:	IonParticleSystem.h
 
 #include "IonEmitter.h"
 #include "affectors/IonAffectorInterface.h"
-#include "events/listeners/IonResourceListener.h"
-
-
-//TEMP begin, remove when texture has been implemented
-#include "resources/IonResource.h"
-#include "resources/IonResourceManager.h"
-
-namespace ion::graphics::resources
-{
-	struct TextureManger;
-
-	struct Texture : ion::resources::Resource<TextureManger>
-	{	
-	};
-
-	struct TextureManger : ion::resources::ResourceManager<TextureManger, Texture>
-	{
-	};
-}
-//TEMP end
 
 namespace ion::graphics::particles
 {
@@ -58,29 +38,12 @@ namespace ion::graphics::particles
 
 
 	//A particle system class that can contain one ore more emitters and affectors
-	class ParticleSystem final :
-		public affectors::AffectorInterface,
-		protected events::listeners::ResourceListener<resources::Texture>
+	class ParticleSystem final : public affectors::AffectorInterface
 	{
 		private:
 
 			particle_system::ParticlePrimitive particle_primitive_ = particle_system::ParticlePrimitive::Point;
 			particle_system::detail::container_type<Emitter> emitters_;
-
-		protected:
-
-			/*
-				Events
-			*/
-
-			//See ResourceListener::ResourceCreated for more details
-			void ResourceCreated(resources::Texture&) noexcept override;
-
-			//See ResourceListener::ResourceRemoved for more details
-			void ResourceRemoved(resources::Texture &texture) noexcept override;
-
-			//See Listener::Unsubscribed for more details
-			void Unsubscribed(events::listeners::ListenerInterface<events::listeners::ResourceListener<resources::Texture>>&) noexcept override;
 
 		public:
 
