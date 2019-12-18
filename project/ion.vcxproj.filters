@@ -542,5 +542,8 @@
     <ClInclude Include="..\source\engine\graphics\textures\IonTextureManager.h">
       <Filter>Header Files\graphics\textures</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\engine\resources\IonResourceHolder.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

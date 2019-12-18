@@ -22,18 +22,14 @@ File:	IonEmitter.h
 #include "IonParticle.h"
 #include "adaptors/ranges/IonIterable.h"
 #include "affectors/IonAffectorInterface.h"
-#include "events/listeners/IonResourceListener.h"
+#include "graphics/textures/IonTextureManager.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
+#include "resources/IonResourceHolder.h"
 #include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
 #include "utilities/IonRandom.h"
-
-namespace ion::graphics::textures
-{
-	class Texture;
-}
 
 namespace ion::graphics::particles
 {
@@ -155,9 +151,7 @@ namespace ion::graphics::particles
 
 
 	//An emitter class that can emit multiple particles
-	class Emitter final :
-		public affectors::AffectorInterface,
-		protected events::listeners::ResourceListener<textures::Texture>
+	class Emitter final : public affectors::AffectorInterface
 	{
 		private:
 
@@ -185,22 +179,7 @@ namespace ion::graphics::particles
 			std::pair<real, real> particle_mass_;
 			std::pair<Color, Color> particle_solid_color_;
 			std::pair<duration, duration> particle_life_time_;
-			textures::Texture *particle_texture_ = nullptr;
-
-		protected:
-
-			/*
-				Events
-			*/
-
-			//See ResourceListener::ResourceCreated for more details
-			void ResourceCreated(textures::Texture&) noexcept override;
-
-			//See ResourceListener::ResourceRemoved for more details
-			void ResourceRemoved(textures::Texture &texture) noexcept override;
-
-			//See Listener::Unsubscribed for more details
-			void Unsubscribed(events::listeners::ListenerInterface<events::listeners::ResourceListener<textures::Texture>>&) noexcept override;
+			resources::ResourceHolder<textures::Texture> particle_texture_;
 
 		public:
 

@@ -12,9 +12,6 @@ File:	IonEmitter.cpp
 
 #include "IonEmitter.h"
 
-#include "graphics/textures/IonTexture.h"
-#include "graphics/textures/IonTextureManager.h"
-
 namespace ion::graphics::particles
 {
 
@@ -43,31 +40,6 @@ void evolve_particles(container_type<Particle> &particles, duration time) noexce
 
 } //emitter::detail
 
-
-//Protected
-
-/*
-	Events
-*/
-
-void Emitter::ResourceCreated(textures::Texture&) noexcept
-{
-	//Ignore
-}
-
-void Emitter::ResourceRemoved([[maybe_unused]] textures::Texture &texture) noexcept
-{
-	if (particle_texture_ == &texture)
-		ParticleTexture(nullptr);
-}
-
-void Emitter::Unsubscribed(events::listeners::ListenerInterface<events::listeners::ResourceListener<textures::Texture>>&) noexcept
-{
-	particle_texture_ = nullptr;
-}
-
-
-//Public
 
 Emitter::Emitter(EmitterType type, const Vector2 &position, const Vector2 &direction,
 	const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
@@ -120,28 +92,12 @@ Emitter Emitter::Ring(const Vector2 &position, const Vector2 &direction,
 
 void Emitter::ParticleTexture(textures::Texture &texture)
 {
-	if (particle_texture_ != &texture)
-	{
-		ParticleTexture(nullptr);
-
-		if (auto owner = texture.Owner(); owner)
-		{
-			//Subscribe to owner
-			if (owner->Subscribe(*this))
-				particle_texture_ = &texture;
-		}
-	}
+	particle_texture_.Hold(texture);
 }
 
 void Emitter::ParticleTexture(std::nullptr_t) noexcept
 {
-	if (particle_texture_)
-	{
-		if (auto owner = particle_texture_->Owner(); owner)
-			owner->Unsubscribe(*this); //Unsubscribe from owner
-
-		particle_texture_ = nullptr;
-	}
+	particle_texture_.Release();
 }
 
 

@@ -41,6 +41,8 @@ File:	main.cpp
 #include "graphics/particles/affectors/IonScaler.h"
 #include "graphics/particles/affectors/IonSineForce.h"
 #include "graphics/particles/affectors/IonVelocityRandomizer.h"
+#include "graphics/textures/IonTexture.h"
+#include "graphics/textures/IonTextureManager.h"
 
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
@@ -53,6 +55,7 @@ File:	main.cpp
 #include "parallel/IonWorkerPool.h"
 
 #include "resources/IonResource.h"
+#include "resources/IonResourceHolder.h"
 #include "resources/IonResourceManager.h"
 #include "resources/files/IonFileResource.h"
 #include "resources/files/IonFileResourceLoader.h"

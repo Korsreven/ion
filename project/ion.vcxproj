@@ -256,6 +256,7 @@
     <ClInclude Include="..\source\engine\resources\files\repositories\IonVideoRepository.h" />
     <ClInclude Include="..\source\engine\resources\IonResource.h" />
     <ClInclude Include="..\source\engine\resources\IonResourceManager.h" />
+    <ClInclude Include="..\source\engine\resources\IonResourceHolder.h" />
     <ClInclude Include="..\source\engine\script\IonScriptBuilder.h" />
     <ClInclude Include="..\source\engine\script\IonScriptCompiler.h" />
     <ClInclude Include="..\source\engine\script\IonScriptError.h" />

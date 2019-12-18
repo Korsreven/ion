@@ -18,41 +18,39 @@ File:	IonFileResource.h
 
 namespace ion::resources::files
 {
+	template <typename T>
+	class FileResource : public Resource<T>
+	{
+		protected:
 
-template <typename T>
-class FileResource : public Resource<T>
-{
-	protected:
+			repositories::file_repository::FileEntry &file_;
 
-		repositories::file_repository::FileEntry &file_;
+		public:
 
-	public:
-
-		//Constructor
-		FileResource(repositories::file_repository::FileEntry &file) :
-			file_{file}
-		{
-			//Empty
-		}
+			//Constructor
+			FileResource(repositories::file_repository::FileEntry &file) :
+				file_{file}
+			{
+				//Empty
+			}
 
 
-		/*
-			Observers
-		*/
+			/*
+				Observers
+			*/
 
-		//Returns a mutable file entry for this resource
-		[[nodiscard]] inline auto& File() noexcept
-		{
-			return file_;
-		}
+			//Returns a mutable file entry for this resource
+			[[nodiscard]] inline auto& File() noexcept
+			{
+				return file_;
+			}
 
-		//Returns an immutable file entry for this resource
-		[[nodiscard]] inline const auto& File() const noexcept
-		{
-			return file_;
-		}
-};
-
+			//Returns an immutable file entry for this resource
+			[[nodiscard]] inline const auto& File() const noexcept
+			{
+				return file_;
+			}
+	};
 } //ion::resources::files
 
 #endif
