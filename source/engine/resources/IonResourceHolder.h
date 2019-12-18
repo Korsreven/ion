@@ -10,8 +10,8 @@ File:	IonResourceHolder.h
 -------------------------------------------
 */
 
-#ifndef ION_resource_holder_H
-#define ION_resource_holder_H
+#ifndef ION_RESOURCE_HOLDER_H
+#define ION_RESOURCE_HOLDER_H
 
 #include <type_traits>
 
