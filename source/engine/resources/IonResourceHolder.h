@@ -161,7 +161,8 @@ namespace ion::resources
 			//Destructor
 			~ResourceHolder() noexcept
 			{
-				DoUnsubscribe();
+				this->Listening(false);
+				DoUnsubscribe(); //Force
 			}
 
 
@@ -205,21 +206,21 @@ namespace ion::resources
 			}
 
 
-			//Returns true if this resource holder contains a resource
+			//Returns true if this resource holder holds a resource
 			inline operator bool() const noexcept
 			{
 				return !!resource_;
 			}
 
 			//Returns a pointer to a mutable resource
-			//Returns nullptr if this resource holder does not contain a resource
+			//Returns nullptr if this resource holder does not hold a resource
 			inline auto operator->() noexcept
 			{
 				return resource_;
 			}
 
 			//Returns a pointer to an immutable resource
-			//Returns nullptr if this resource holder does not contain a resource
+			//Returns nullptr if this resource holder does not hold a resource
 			inline const auto operator->() const noexcept
 			{
 				return resource_;
