@@ -74,6 +74,7 @@ File:	main.cpp
 #include "script/IonScriptValidator.h"
 #include "script/utilities/IonParseUtility.h"
 
+#include "system/IonSystemAPI.h"
 #include "system/IonSystemUtility.h"
 #include "system/IonSystemWindow.h"
 #include "system/events/IonSystemInput.h"
@@ -101,7 +102,7 @@ File:	main.cpp
 #include "utilities/IonRandom.h"
 #include "utilities/IonStringUtility.h"
 
-#ifdef _WIN32
+#ifdef ION_WIN32
 
 using namespace std::string_literals;
 using namespace std::string_view_literals;

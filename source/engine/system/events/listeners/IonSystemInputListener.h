@@ -14,6 +14,7 @@ File:	IonSystemInputListener.h
 #define ION_SYSTEM_INPUT_LISTENER_H
 
 #include "events/listeners/IonListenerInterface.h"
+#include "system/IonSystemAPI.h"
 #include "system/events/IonSystemInput.h"
 #include "system/events/listeners/IonSystemMessageListener.h"
 
@@ -50,7 +51,7 @@ namespace ion::system::events::listeners
 				Message listener events
 			*/
 
-			#ifdef _WIN32
+			#ifdef ION_WIN32
 			//See MessageListener::MessageReceived for more details
 			//Handle all key and mouse input messages from the system window
 			bool MessageReceived(HWND, UINT message, WPARAM w_param, LPARAM l_param) noexcept override final;

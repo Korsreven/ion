@@ -100,6 +100,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>..\libraries</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -131,6 +132,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>..\libraries</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -223,6 +225,7 @@
     <ClInclude Include="..\source\engine\events\listeners\IonMouseListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonResourceListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonWindowListener.h" />
+    <ClInclude Include="..\source\engine\graphics\IonGraphicsAPI.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffector.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffectorInterface.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonColorFader.h" />
@@ -267,6 +270,7 @@
     <ClInclude Include="..\source\engine\system\events\IonSystemInput.h" />
     <ClInclude Include="..\source\engine\system\events\listeners\IonSystemInputListener.h" />
     <ClInclude Include="..\source\engine\system\events\listeners\IonSystemMessageListener.h" />
+    <ClInclude Include="..\source\engine\system\IonSystemAPI.h" />
     <ClInclude Include="..\source\engine\system\IonSystemUtility.h" />
     <ClInclude Include="..\source\engine\system\IonSystemWindow.h" />
     <ClInclude Include="..\source\engine\timers\IonAsyncTimerManager.h" />

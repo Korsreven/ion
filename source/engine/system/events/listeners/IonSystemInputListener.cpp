@@ -37,7 +37,7 @@ bool InputListener::Unsubscribable(ListenerInterface<MessageListener>&) noexcept
 	Message listener events
 */
 
-#ifdef _WIN32
+#ifdef ION_WIN32
 bool InputListener::MessageReceived(HWND, UINT message, WPARAM w_param, LPARAM l_param) noexcept
 {
 	switch (message)

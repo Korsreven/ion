@@ -13,13 +13,10 @@ File:	IonSystemWindow.h
 #ifndef ION_SYSTEM_WINDOW_H
 #define ION_SYSTEM_WINDOW_H
 
-#ifdef _WIN32
-//Dependencies for windows 32/64 bit
-#include <windows.h>
-#endif
-
+#include "IonSystemAPI.h"
 #include "events/listeners/IonListenerInterface.h"
 #include "events/listeners/IonWindowListener.h"
+#include "graphics/IonGraphicsAPI.h"
 #include "system/events/listeners/IonSystemMessageListener.h"
 
 namespace ion::system

@@ -14,11 +14,8 @@ File:	IonSystemUtility.cpp
 
 #include <algorithm>
 
-#ifdef _WIN32
-
-//Dependencies for windows 32/64 bit
-#include <shellapi.h>
-
+#ifdef ION_WIN32
+	#include <shellapi.h> //Windows shell API
 #endif
 
 namespace ion::system::utilities
@@ -29,7 +26,7 @@ namespace detail
 
 using namespace types::type_literals;
 
-#ifdef _WIN32
+#ifdef ION_WIN32
 
 clipboard::global_alloc_guard::global_alloc_guard(std::string_view text) noexcept :
 	buffer{GlobalAlloc(GMEM_MOVEABLE, std::size(text) + 1)}
@@ -59,7 +56,7 @@ clipboard::global_lock_guard::~global_lock_guard()
 
 clipboard::clipboard() noexcept :
 	open_{
-		#ifdef _WIN32
+		#ifdef ION_WIN32
 		!!OpenClipboard(nullptr)
 		#else
 		false
@@ -73,7 +70,7 @@ clipboard::~clipboard()
 {
 	if (open_)
 	{
-		#ifdef _WIN32
+		#ifdef ION_WIN32
 		CloseClipboard();
 		#else
 
@@ -85,7 +82,7 @@ bool clipboard::set(std::string_view text) noexcept
 {
 	if (open_)
 	{
-		#ifdef _WIN32
+		#ifdef ION_WIN32
 		global_alloc_guard global_alloc_handle{text};
 
 		if (global_alloc_handle.buffer)
@@ -117,7 +114,7 @@ std::optional<std::string> clipboard::get()
 {
 	if (open_)
 	{
-		#ifdef _WIN32
+		#ifdef ION_WIN32
 		if (auto buffer = GetClipboardData(CF_TEXT))
 		{
 			global_lock_guard global_lock_handle{buffer};
@@ -136,7 +133,7 @@ std::optional<std::string> clipboard::get()
 
 std::string_view command_line() noexcept
 {
-	#ifdef _WIN32
+	#ifdef ION_WIN32
 	return GetCommandLine();
 	#else
 	return "";
@@ -228,7 +225,7 @@ bool open_or_execute(const std::filesystem::path &path,
 	std::optional<std::string> parameters, std::optional<std::filesystem::path> current_path,
 	ProcessWindowCommand window_command) noexcept
 {
-	#ifdef _WIN32
+	#ifdef ION_WIN32
 	auto command = [=]() noexcept
 		{
 			switch (window_command)
@@ -262,7 +259,7 @@ bool open_or_execute(const std::filesystem::path &path,
 
 std::optional<const PowerStatus> power_status() noexcept
 {
-	#ifdef _WIN32
+	#ifdef ION_WIN32
 	SYSTEM_POWER_STATUS system_power_status;
 
 	//Power status available

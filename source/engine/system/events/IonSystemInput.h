@@ -18,17 +18,14 @@ File:	IonSystemInput.h
 #include <optional>
 #include <utility>
 
-#ifdef _WIN32
+#include "system/IonSystemAPI.h"
 
-//Dependencies for windows 32/64 bit
-#include <windows.h>
-
-//This value must be defined to handle the WM_MOUSEHWHEEL on 
-//Windows 2000 and Windows XP
-#ifndef WM_MOUSEWHEEL
-#define WM_MOUSEWHEEL 0x020A
-#endif
-
+#ifdef ION_WIN32
+	//This value must be defined to handle the WM_MOUSEHWHEEL on 
+	//Windows 2000 and Windows XP
+	#ifndef WM_MOUSEWHEEL
+		#define WM_MOUSEWHEEL 0x020A
+	#endif
 #endif
 
 #include "events/listeners/IonKeyListener.h"
@@ -39,7 +36,7 @@ namespace ion::system::events
 	using ion::events::listeners::KeyButton;
 	using ion::events::listeners::MouseButton;
 
-	#ifdef _WIN32
+	#ifdef ION_WIN32
 	using CodeType = WPARAM;
 	#endif
 
@@ -49,7 +46,7 @@ namespace ion::system::events
 		using key_pair_type = std::pair<CodeType, KeyButton>;
 		using mouse_pair_type = std::pair<CodeType, MouseButton>;
 
-		#ifdef _WIN32
+		#ifdef ION_WIN32
 		constexpr std::array key_button_map
 		{
 			key_pair_type{VK_CANCEL,				KeyButton::Cancel},

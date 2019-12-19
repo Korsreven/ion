@@ -20,11 +20,7 @@ File:	IonSystemUtility.h
 #include <string_view>
 #include <utility>
 
-#ifdef _WIN32
-//Dependencies for windows 32/64 bit
-#include <windows.h>
-#endif
-
+#include "system/IonSystemAPI.h"
 #include "types/IonTypes.h"
 
 namespace ion::system::utilities
@@ -56,7 +52,7 @@ namespace ion::system::utilities
 
 			public:
 
-				#ifdef _WIN32
+				#ifdef ION_WIN32
 
 				struct global_alloc_guard final
 				{
