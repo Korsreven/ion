@@ -285,6 +285,9 @@
     <ClCompile Include="..\source\engine\graphics\textures\IonTextureManager.cpp">
       <Filter>Source Files\graphics\textures</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\IonEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -550,6 +553,9 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\IonGraphicsAPI.h">
       <Filter>Header Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\IonEngine.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

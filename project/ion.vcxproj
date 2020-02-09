@@ -102,6 +102,9 @@
       <AdditionalLibraryDirectories>..\libraries</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glu32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -134,6 +137,9 @@
       <AdditionalLibraryDirectories>..\libraries</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glu32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -173,6 +179,7 @@
     <ClCompile Include="..\source\engine\graphics\utilities\IonObb.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonSphere.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonVector2.cpp" />
+    <ClCompile Include="..\source\engine\IonEngine.cpp" />
     <ClCompile Include="..\source\engine\resources\files\IonFileResourceLoader.cpp" />
     <ClCompile Include="..\source\engine\resources\files\repositories\IonAudioRepository.cpp" />
     <ClCompile Include="..\source\engine\resources\files\repositories\IonFileRepository.cpp" />
@@ -246,6 +253,7 @@
     <ClInclude Include="..\source\engine\graphics\utilities\IonObb.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonSphere.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonVector2.h" />
+    <ClInclude Include="..\source\engine\IonEngine.h" />
     <ClInclude Include="..\source\engine\parallel\IonWorker.h" />
     <ClInclude Include="..\source\engine\parallel\IonWorkerPool.h" />
     <ClInclude Include="..\source\engine\resources\files\IonFileResource.h" />

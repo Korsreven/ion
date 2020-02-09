@@ -10,6 +10,8 @@ File:	main.cpp
 -------------------------------------------
 */
 
+#include "IonEngine.h"
+
 #include "adaptors/IonFlatMap.h"
 #include "adaptors/IonFlatSet.h"
 #include "adaptors/ranges/IonBasicIterable.h"
@@ -173,7 +175,7 @@ auto Concat(std::string x, std::string y)
 int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 				   [[maybe_unused]] _In_opt_ HINSTANCE prev_instance,
 				   [[maybe_unused]] _In_ LPSTR cmd_line,
-				   [[maybe_unused]] _In_ int show_cmd)
+				   [[maybe_unused]] _In_ int cmd_show)
 {
 	/*
 		Initializing Ion Engine
@@ -194,6 +196,25 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 	/*
 		Test code
 	*/
+
+	auto exit_code = 0;
+	{
+		ion::Engine engine;
+		auto &window = engine.RenderTo(
+			ion::system::Window::Resizable("ION engine", {1280.0_r, 720.0_r}));
+		window.MinSize(ion::graphics::utilities::Vector2{640.0_r, 360.0_r});
+
+		if (window.Create(instance))
+		{
+			if (window.Show(cmd_show))
+			{
+				exit_code = engine.Start();
+				window.Hide();
+			}
+
+			window.Destroy();
+		}
+	}
 
 	//Compile script
 	{
@@ -418,7 +439,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 		auto format_result = ion::utilities::string::Format("{0}, {1} and {2 : 00.0000} + {3}, {4} and {5}", 10, 'A', 3.14, "string_view"sv, "string"s, "char[]");
 	}*/
 
-	return 0;
+	return exit_code;
 }
 
 #else
