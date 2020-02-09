@@ -30,10 +30,7 @@ namespace ion::events::listeners
 		Restore,
 
 		Move,
-		Resize,
-
-		EnterFullScreen,
-		ExitFullScreen
+		Resize
 	};
 
 	struct WindowListener : Listener<WindowListener>
