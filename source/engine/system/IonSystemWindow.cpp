@@ -143,7 +143,7 @@ RECT get_non_client_window_rectangle(DWORD style, DWORD extended_style) noexcept
 	return get_adjusted_window_rectangle({}, style, extended_style);
 }
 
-RECT get_total_window_rectangle(RECT client_rectangle, DWORD style, DWORD extended_style) noexcept
+RECT get_window_rectangle(RECT client_rectangle, DWORD style, DWORD extended_style) noexcept
 {
 	auto non_client_rectangle = get_non_client_window_rectangle(style, extended_style);
 	return {
@@ -154,29 +154,29 @@ RECT get_total_window_rectangle(RECT client_rectangle, DWORD style, DWORD extend
 	};
 }
 
-RECT get_client_window_rectangle(RECT total_rectangle, DWORD style, DWORD extended_style) noexcept
+RECT get_client_window_rectangle(RECT rectangle, DWORD style, DWORD extended_style) noexcept
 {
 	auto non_client_rectangle = get_non_client_window_rectangle(style, extended_style);
 	return {
-		total_rectangle.left - non_client_rectangle.left,
-		total_rectangle.top - non_client_rectangle.top,
-		total_rectangle.right + (non_client_rectangle.left - non_client_rectangle.right),
-		total_rectangle.bottom + (non_client_rectangle.top - non_client_rectangle.bottom)
+		rectangle.left - non_client_rectangle.left,
+		rectangle.top - non_client_rectangle.top,
+		rectangle.right + (non_client_rectangle.left - non_client_rectangle.right),
+		rectangle.bottom + (non_client_rectangle.top - non_client_rectangle.bottom)
 	};
 }
 
-RECT get_centered_window_rectangle(RECT total_rectangle) noexcept
+RECT get_centered_window_rectangle(RECT rectangle) noexcept
 {
 	auto desktop_rectangle = get_desktop_rectangle();
 	return {
 		(desktop_rectangle.right - desktop_rectangle.left) / 2 -
-		(total_rectangle.right - total_rectangle.left) / 2 + desktop_rectangle.left,
+		(rectangle.right - rectangle.left) / 2 + desktop_rectangle.left,
 
 		(desktop_rectangle.bottom - desktop_rectangle.top) / 2 -
-		(total_rectangle.bottom - total_rectangle.top) / 2 + desktop_rectangle.top,
+		(rectangle.bottom - rectangle.top) / 2 + desktop_rectangle.top,
 
-		total_rectangle.right,
-		total_rectangle.bottom
+		rectangle.right,
+		rectangle.bottom
 	};
 }
 
@@ -190,7 +190,7 @@ RECT make_window_rectangle(const Vector2 &size, const std::optional<Vector2> &po
 	rectangle.bottom = static_cast<LONG>(height);
 
 	rectangle =
-		get_total_window_rectangle(
+		get_window_rectangle(
 			rectangle,
 			make_window_style(border_style),
 			make_extended_window_style(border_style));
@@ -431,7 +431,7 @@ bool change_client_size(const Vector2 &size, HWND handle) noexcept
 	rectangle.bottom = static_cast<LONG>(height);
 
 	rectangle =
-		get_total_window_rectangle(
+		get_window_rectangle(
 		rectangle,
 		get_window_style(handle),
 		get_extended_window_style(handle));
@@ -595,6 +595,13 @@ Vector2 get_position(HWND handle) noexcept
 			static_cast<real>(rectangle.top)};
 }
 
+Vector2 get_client_position(HWND handle) noexcept
+{
+	auto rectangle = get_client_window_rectangle(handle);
+	return {static_cast<real>(rectangle.left),
+			static_cast<real>(rectangle.top)};
+}
+
 bool is_active(HWND handle) noexcept
 {
 	return GetActiveWindow() == handle;
@@ -682,7 +689,7 @@ bool Window::ProcessMessage(HWND handle, UINT message, WPARAM w_param, LPARAM l_
 				rectangle.top = static_cast<short>(HIWORD(l_param));
 
 				rectangle =
-					detail::get_total_window_rectangle(
+					detail::get_window_rectangle(
 						rectangle,
 						detail::get_window_style(handle),
 						detail::get_extended_window_style(handle));

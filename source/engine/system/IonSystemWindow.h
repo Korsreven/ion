@@ -78,9 +78,9 @@ namespace ion::system
 			RECT get_desktop_rectangle() noexcept;
 			RECT get_adjusted_window_rectangle(RECT rectangle, DWORD style, DWORD extended_style) noexcept;
 			RECT get_non_client_window_rectangle(DWORD style, DWORD extended_style) noexcept;
-			RECT get_total_window_rectangle(RECT client_rectangle, DWORD style, DWORD extended_style) noexcept;
-			RECT get_client_window_rectangle(RECT total_rectangle, DWORD style, DWORD extended_style) noexcept;
-			RECT get_centered_window_rectangle(RECT total_rectangle) noexcept;
+			RECT get_window_rectangle(RECT client_rectangle, DWORD style, DWORD extended_style) noexcept;
+			RECT get_client_window_rectangle(RECT rectangle, DWORD style, DWORD extended_style) noexcept;
+			RECT get_centered_window_rectangle(RECT rectangle) noexcept;
 
 			RECT make_window_rectangle(const Vector2 &size, const std::optional<Vector2> &position, WindowBorderStyle border_style) noexcept;
 
@@ -224,6 +224,7 @@ namespace ion::system
 			Vector2 get_size(HWND handle) noexcept;
 			Vector2 get_client_size(HWND handle) noexcept;
 			Vector2 get_position(HWND handle) noexcept;
+			Vector2 get_client_position(HWND handle) noexcept;
 			bool is_active(HWND handle) noexcept;
 
 			#endif
@@ -602,25 +603,65 @@ namespace ion::system
 				#endif
 			}
 
-			//Returns the client size of the window
-			[[nodiscard]] inline auto ClientSize() const noexcept
+			//Returns the inner (client/screen) size of the window
+			//Returns nullopt if no window has been created
+			[[nodiscard]] inline auto InnerSize() const noexcept
 			{
-				if (mode_ == window::WindowMode::FullScreen)
-				{
-					#ifdef ION_WIN32
-					if (handle_)
-						return window::detail::get_client_size(*handle_);
-					#endif
-				}
+				#ifdef ION_WIN32
+				if (handle_)
+					return std::make_optional(window::detail::get_client_size(*handle_));
+				#endif
+				else
+					return std::make_optional<Vector2>();
+			}
 
-				return size_;
+			//Returns the outer size of the window
+			//Returns nullopt if no window has been created
+			[[nodiscard]] inline auto OuterSize() const noexcept
+			{
+				#ifdef ION_WIN32
+				if (handle_)
+					return std::make_optional(window::detail::get_size(*handle_));
+				#endif
+				else
+					return std::make_optional<Vector2>();
+			}
+
+			//Returns the inner (client/screen) position of the window
+			//Returns nullopt if no window has been created
+			[[nodiscard]] inline auto InnerPosition() const noexcept
+			{
+				#ifdef ION_WIN32
+				if (handle_)
+					return std::make_optional(window::detail::get_client_position(*handle_));
+				#endif
+				else
+					return std::make_optional<Vector2>();
+			}
+
+			//Returns the outer position of the window
+			//Returns nullopt if no window has been created
+			[[nodiscard]] inline auto OuterPosition() const noexcept
+			{
+				#ifdef ION_WIN32
+				if (handle_)
+					return std::make_optional(window::detail::get_position(*handle_));
+				#endif
+				else
+					return std::make_optional<Vector2>();
 			}
 
 			//Returns the aspect ratio of the window
+			//Returns nullopt if no window has been created
 			[[nodiscard]] inline auto AspectRatio() const noexcept
 			{
-				auto [width, height] = ClientSize().XY();
-				return width / height;
+				if (auto size = InnerSize(); size)
+				{
+					auto [width, height] = size->XY();
+					return std::make_optional(width / height);
+				}
+				else
+					return std::make_optional<real>();
 			}
 
 
@@ -629,12 +670,14 @@ namespace ion::system
 			*/
 
 			//Returns the window device context
+			//Returns nullptr if no window has been created
 			[[nodiscard]] inline auto DeviceContext() const noexcept
 			{
 				return *dev_context_;
 			}
 
 			//Returns the window handle
+			//Returns nullptr if no window has been created
 			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return *handle_;
