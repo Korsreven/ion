@@ -24,8 +24,8 @@ namespace ion::resources
 	{
 		enum class ResourceRequirement : bool
 		{
-			Mandatory,
-			Optional
+			Optional,
+			Mandatory
 		};
 
 		namespace detail
@@ -136,7 +136,7 @@ namespace ion::resources
 
 			//Construct a new resource holder with the given resource and requirement
 			ResourceHolder(T &resource, resource_holder::ResourceRequirement requirement = resource_holder::ResourceRequirement::Optional) :
-				resource_{resource_holder::detail::subscribe_resource(&resource, *this)},
+				resource_{resource_holder::detail::subscribe_resource(resource, *this)},
 				requirement_{requirement}
 			{
 				//Empty
@@ -267,20 +267,20 @@ namespace ion::resources
 
 			//Returns a pointer to a mutable resource
 			//Returns nullptr if this resource holder does not hold a resource
-			inline auto Resource() noexcept	
+			[[nodiscard]] inline auto Resource() noexcept	
 			{
 				return resource_;
 			}
 
 			//Returns a pointer to an immutable resource
 			//Returns nullptr if this resource holder does not hold a resource
-			inline const auto Resource() const noexcept	
+			[[nodiscard]] inline const auto Resource() const noexcept	
 			{
 				return resource_;
 			}
 
 			//Returns the resource requirement for this resource holder
-			inline auto Requirement() const noexcept
+			[[nodiscard]] inline auto Requirement() const noexcept
 			{
 				return requirement_;
 			}
@@ -291,7 +291,7 @@ namespace ion::resources
 			*/
 
 			//Returns true if this resource holder is empty
-			inline auto Empty() noexcept	
+			[[nodiscard]] inline auto Empty() noexcept	
 			{
 				return !resource_;
 			}
