@@ -12,8 +12,6 @@ File:	IonSystemWindow.cpp
 
 #include "IonSystemWindow.h"
 
-#include "graphics/IonGraphicsAPI.h"
-
 namespace ion::system
 {
 
@@ -90,41 +88,6 @@ DEVMODE make_device_mode(const Vector2 &full_screen_size, int color_depth) noexc
 }
 
 
-DWORD make_window_style(WindowBorderStyle border_style) noexcept
-{
-	switch (border_style)
-	{
-		case WindowBorderStyle::None:
-		return WS_POPUP;
-
-		case WindowBorderStyle::Dialog:
-		return WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
-
-		case WindowBorderStyle::Single:
-		return WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MAXIMIZEBOX);
-
-		case WindowBorderStyle::Sizeable:
-		default:
-		return WS_OVERLAPPEDWINDOW;
-	}
-}
-
-DWORD make_extended_window_style(WindowBorderStyle border_style) noexcept
-{
-	switch (border_style)
-	{
-		case WindowBorderStyle::None:
-		return WS_EX_APPWINDOW & ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
-
-		case WindowBorderStyle::Dialog:
-		case WindowBorderStyle::Single:
-		case WindowBorderStyle::Sizeable:
-		default:
-		return WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
-	}
-}
-
-
 RECT get_desktop_rectangle() noexcept
 {
 	RECT rectangle;
@@ -181,19 +144,14 @@ RECT get_centered_window_rectangle(RECT rectangle) noexcept
 }
 
 
-RECT make_window_rectangle(const Vector2 &size, const std::optional<Vector2> &position, WindowBorderStyle border_style) noexcept
+RECT make_window_rectangle(const Vector2 &size, const std::optional<Vector2> &position, DWORD style, DWORD extended_style) noexcept
 {
-	auto rectangle = RECT{};
-
 	auto [width, height] = size.XY();
-	rectangle.right = static_cast<LONG>(width);
-	rectangle.bottom = static_cast<LONG>(height);
-
-	rectangle =
+	auto rectangle =
 		get_window_rectangle(
-			rectangle,
-			make_window_style(border_style),
-			make_extended_window_style(border_style));
+			{0, 0, static_cast<LONG>(width), static_cast<LONG>(height)},
+			style,
+			extended_style);
 
 	if (position)
 	{
@@ -212,6 +170,8 @@ RECT make_window_rectangle(const Vector2 &size, const std::optional<Vector2> &po
 	return rectangle;
 }
 
+
+//Window class
 
 window_class::window_class(HINSTANCE instance) noexcept
 {
@@ -251,20 +211,22 @@ void window_class::reset(window_class &&rhs) noexcept
 }
 
 
+//Window handle
+
 window_handle::window_handle(window_class &win_class,
 	std::string_view title, const Vector2 &size, const std::optional<Vector2> &position,
-	WindowBorderStyle border_style, LPVOID parameter) noexcept
+	DWORD style, DWORD extended_style, LPVOID parameter) noexcept
 {
 	if (win_class)
 	{
 		auto rectangle =
-			make_window_rectangle(size, position, border_style);
+			make_window_rectangle(size, position, style, extended_style);
 
 		handle_ =
 			CreateWindowEx(
-				make_extended_window_style(border_style),
+				extended_style,
 				std::data(class_name), std::data(title),
-				make_window_style(border_style) | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
+				style | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
 				rectangle.left, rectangle.top,
 				rectangle.right, rectangle.bottom,
 				nullptr /*parent*/, nullptr /*menu*/,
@@ -296,6 +258,8 @@ void window_handle::reset(window_handle &&rhs) noexcept
 }
 
 
+//Device context
+
 device_context::device_context(window_handle &win_handle, int color_depth) noexcept :
 	win_handle_{&win_handle}
 {
@@ -312,7 +276,8 @@ device_context::device_context(window_handle &win_handle, int color_depth) noexc
 }
 
 device_context::device_context(device_context &&rhs) noexcept :
-	handle_base{std::move(rhs)}
+	handle_base{std::move(rhs)},
+	win_handle_{std::exchange(rhs.win_handle_, nullptr)}
 {
 	//Empty
 }
@@ -338,6 +303,8 @@ void device_context::reset(device_context &&rhs) noexcept
 	*this = std::move(rhs);
 }
 
+
+//Rendering context
 
 rendering_context::rendering_context(device_context &dev_context) noexcept
 {
@@ -375,66 +342,101 @@ void rendering_context::reset(rendering_context &&rhs) noexcept
 }
 
 
-bool enter_full_screen_mode(const std::optional<Vector2> &full_screen_size, int color_depth, HWND handle) noexcept
+//Full screen
+
+full_screen::full_screen(
+	window_handle &win_handle, device_context &dev_context,
+	const std::optional<Vector2> &full_screen_size) noexcept
 {
-	auto size = full_screen_size ?
-		*full_screen_size :
-		[]() noexcept
+	if (win_handle && dev_context)
+	{
+		auto size = full_screen_size ?
+			*full_screen_size :
+			get_desktop_size();
+		auto color_depth =
+			GetDeviceCaps(*dev_context, BITSPIXEL) *
+			GetDeviceCaps(*dev_context, PLANES);
+
+		if (auto dev_mode = make_device_mode(size, color_depth);
+			ChangeDisplaySettings(&dev_mode, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL)
 		{
-			auto desktop_rectangle = get_desktop_rectangle();
-			return Vector2{static_cast<real>(desktop_rectangle.right - desktop_rectangle.left),
-						   static_cast<real>(desktop_rectangle.bottom - desktop_rectangle.top)};
-		}();
+			handle_ = *win_handle;
+			size_ = get_client_size(handle_);
+			position_ = get_position(handle_);
+			style_ = get_window_style(handle_);
+			extended_style_ = get_extended_window_style(handle_);
 
-	if (auto dev_mode = make_device_mode(size, color_depth);
-		ChangeDisplaySettings(&dev_mode, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL)
-	{
-		change_border_style(WindowBorderStyle::None, handle);	
-		change_position(graphics::utilities::vector2::Zero, handle);
-		change_client_size(size, handle);
-		return true;
+			auto [style, extended_style] = get_borderless_style();
+			set_extents_and_border_style(size, graphics::utilities::vector2::Zero, style, extended_style, handle_);
+		}
 	}
-	else
-		return false;
 }
 
-bool exit_full_screen_mode(const Vector2 &size, const std::optional<Vector2> &position, WindowBorderStyle border_style, HWND handle) noexcept
+full_screen::full_screen(full_screen &&rhs) noexcept :
+	handle_base{std::move(rhs)},
+	size_{rhs.size_},
+	position_{rhs.position_},
+	style_{rhs.style_},
+	extended_style_{rhs.extended_style_}
 {
-	if (ChangeDisplaySettings(nullptr, 0) == DISP_CHANGE_SUCCESSFUL)
-	{
-		change_border_style(border_style, handle);
-		change_client_size(size, handle);
+	//Empty
+}
 
-		if (position)
-			change_position(*position, handle);
-		else
-			center_window(handle);
-		
-		return true;
+full_screen::~full_screen()
+{
+	if (handle_)
+	{
+		if (ChangeDisplaySettings(nullptr, 0) == DISP_CHANGE_SUCCESSFUL)
+			set_extents_and_border_style(size_, position_, style_, extended_style_, handle_);
 	}
-	else
-		return false;
+}
+
+full_screen& full_screen::operator=(full_screen &&rhs) noexcept
+{
+	handle_base::operator=(std::move(rhs));
+
+	if (this != &rhs)
+	{
+		size_ = rhs.size_;
+		position_ = rhs.position_;
+		style_ = rhs.style_;
+		extended_style_ = rhs.extended_style_;
+	}
+
+	return *this;
+}
+
+void full_screen::reset(full_screen &&rhs) noexcept
+{
+	*this = std::move(rhs);
 }
 
 
-bool change_title(std::string_view title, HWND handle) noexcept
+bool set_title(std::string_view title, HWND handle) noexcept
 {
 	return SetWindowText(handle, std::data(title)) != 0;
 }
 
-bool change_client_size(const Vector2 &size, HWND handle) noexcept
+bool set_size(const Vector2 &size, HWND handle) noexcept
 {
-	auto rectangle = RECT{};
-
 	auto [width, height] = size.XY();
-	rectangle.right = static_cast<LONG>(width);
-	rectangle.bottom = static_cast<LONG>(height);
+	auto [x, y] = get_position(handle).XY();
+	return MoveWindow(
+		handle,
+		static_cast<LONG>(x),
+		static_cast<LONG>(y),
+		static_cast<LONG>(width),
+		static_cast<LONG>(height), 1) != 0;
+}
 
-	rectangle =
+bool set_client_size(const Vector2 &size, HWND handle) noexcept
+{
+	auto [width, height] = size.XY();
+	auto rectangle =
 		get_window_rectangle(
-		rectangle,
-		get_window_style(handle),
-		get_extended_window_style(handle));
+			{0, 0, static_cast<LONG>(width), static_cast<LONG>(height)},
+			get_window_style(handle),
+			get_extended_window_style(handle));
 
 	auto [x, y] = get_position(handle).XY();
 	return MoveWindow(
@@ -445,15 +447,7 @@ bool change_client_size(const Vector2 &size, HWND handle) noexcept
 		rectangle.bottom, 1) != 0;
 }
 
-bool change_full_screen_size(WindowMode mode, const std::optional<Vector2> &full_screen_size, int color_depth, HWND handle) noexcept
-{
-	if (mode == WindowMode::FullScreen)
-		return enter_full_screen_mode(full_screen_size, color_depth, handle);
-	else
-		return true;
-}
-
-bool change_position(const Vector2 &position, HWND handle) noexcept
+bool set_position(const Vector2 &position, HWND handle) noexcept
 {
 	auto [x, y] = position.XY();
 	auto [width, height] = get_size(handle).XY();
@@ -465,11 +459,52 @@ bool change_position(const Vector2 &position, HWND handle) noexcept
 		static_cast<LONG>(height), 1) != 0;
 }
 
-
-bool change_border_style(WindowBorderStyle border_style, HWND handle) noexcept
+bool set_client_position(const Vector2 &position, HWND handle) noexcept
 {
-	SetWindowLong(handle, GWL_STYLE, make_window_style(border_style));
-	SetWindowLong(handle, GWL_EXSTYLE, make_extended_window_style(border_style));
+	auto [x, y] = position.XY();
+	auto rectangle =
+		get_window_rectangle(
+			{static_cast<LONG>(x), static_cast<LONG>(y), 0, 0},
+			get_window_style(handle),
+			get_extended_window_style(handle));
+
+	auto [width, height] = get_size(handle).XY();
+	return MoveWindow(
+		handle,
+		static_cast<LONG>(rectangle.left),
+		static_cast<LONG>(rectangle.top),
+		static_cast<LONG>(width),
+		static_cast<LONG>(height), 1) != 0;
+}
+
+bool set_extents_and_border_style(const Vector2 &size, const Vector2 &position,
+	DWORD style, DWORD extended_style, HWND handle) noexcept
+{
+	SetWindowLong(handle, GWL_STYLE, style);
+	SetWindowLong(handle, GWL_EXSTYLE, extended_style);
+
+	auto [width, height] = size.XY();
+	auto rectangle =
+		get_window_rectangle(
+			{0, 0, static_cast<LONG>(width), static_cast<LONG>(height)},
+			get_window_style(handle),
+			get_extended_window_style(handle));
+
+	auto [x, y] = position.XY();
+	return SetWindowPos(
+		handle, nullptr,
+		static_cast<LONG>(x),
+		static_cast<LONG>(y),
+		rectangle.right,
+		rectangle.bottom,
+		SWP_NOZORDER | SWP_FRAMECHANGED | SWP_SHOWWINDOW) != 0;
+}
+
+
+bool set_border_style(DWORD style, DWORD extended_style, HWND handle) noexcept
+{
+	SetWindowLong(handle, GWL_STYLE, style);
+	SetWindowLong(handle, GWL_EXSTYLE, extended_style);
 
 	auto rectangle = get_window_rectangle(handle);
 	return SetWindowPos(
@@ -480,25 +515,50 @@ bool change_border_style(WindowBorderStyle border_style, HWND handle) noexcept
 		SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED | SWP_SHOWWINDOW) != 0;
 }
 
-bool change_cursor(WindowCursor cursor) noexcept
+bool set_borderless_style(HWND handle) noexcept
 {
-	if (cursor == WindowCursor::Default)
+	auto [style, extended_style] = get_borderless_style();
+	return set_border_style(style, extended_style, handle);
+}
+
+bool set_dialog_border_style(HWND handle) noexcept
+{
+	auto [style, extended_style] = get_dialog_style();
+	return set_border_style(style, extended_style, handle);
+}
+
+bool set_single_border_style(HWND handle) noexcept
+{
+	auto [style, extended_style] = get_single_border_style();
+	return set_border_style(style, extended_style, handle);
+}
+
+bool set_sizeable_border_style(HWND handle) noexcept
+{
+	auto [style, extended_style] = get_sizeable_border_style();
+	return set_border_style(style, extended_style, handle);
+}
+
+
+bool show_cursor() noexcept
+{
+	for (auto counter = ShowCursor(1); counter < 0;)
 	{
-		for (auto counter = ShowCursor(1); counter < 0;)
-		{
-			if (auto prev_counter = counter;
-				(counter = ShowCursor(1)) == prev_counter)
-				return false;
-		}
+		if (auto prev_counter = counter;
+			(counter = ShowCursor(1)) == prev_counter)
+			return false;
 	}
-	else
+
+	return true;
+}
+
+bool hide_cursor() noexcept
+{
+	for (auto counter = ShowCursor(0); counter >= 0;)
 	{
-		for (auto counter = ShowCursor(0); counter >= 0;)
-		{
-			if (auto prev_counter = counter;
-				(counter = ShowCursor(0)) == prev_counter)
-				return false;
-		}
+		if (auto prev_counter = counter;
+			(counter = ShowCursor(0)) == prev_counter)
+			return false;
 	}
 
 	return true;
@@ -565,12 +625,7 @@ RECT get_client_window_rectangle(HWND handle) noexcept
 RECT get_centered_window_rectangle(HWND handle) noexcept
 {
 	auto [width, height] = get_size(handle).XY();
-
-	auto rectangle = RECT{};
-	rectangle.right = static_cast<LONG>(width);
-	rectangle.bottom = static_cast<LONG>(height);
-
-	return get_centered_window_rectangle(rectangle);
+	return get_centered_window_rectangle({0, 0, static_cast<LONG>(width), static_cast<LONG>(height)});
 }
 
 
@@ -584,6 +639,13 @@ Vector2 get_size(HWND handle) noexcept
 Vector2 get_client_size(HWND handle) noexcept
 {
 	auto rectangle = get_client_window_rectangle(handle);
+	return {static_cast<real>(rectangle.right - rectangle.left),
+			static_cast<real>(rectangle.bottom - rectangle.top)};
+}
+
+Vector2 get_desktop_size() noexcept
+{
+	auto rectangle = get_desktop_rectangle();
 	return {static_cast<real>(rectangle.right - rectangle.left),
 			static_cast<real>(rectangle.bottom - rectangle.top)};
 }
@@ -602,19 +664,21 @@ Vector2 get_client_position(HWND handle) noexcept
 			static_cast<real>(rectangle.top)};
 }
 
+
 bool is_active(HWND handle) noexcept
 {
 	return GetActiveWindow() == handle;
 }
 
-#endif
-
-
-void change_viewport(const Vector2 &size) noexcept
+bool is_centered(HWND handle) noexcept
 {
-	auto [width, height] = size.XY();
-	glViewport(0, 0, static_cast<GLsizei>(width), static_cast<GLsizei>(height));
+	auto [x, y] = get_position(handle).XY();
+	auto centered_rectangle = get_centered_window_rectangle(handle);
+	return static_cast<LONG>(x) == centered_rectangle.left &&
+		   static_cast<LONG>(y) == centered_rectangle.top;
 }
+
+#endif
 
 } //window::detail
 
@@ -622,24 +686,33 @@ void change_viewport(const Vector2 &size) noexcept
 //Private
 
 #ifdef ION_WIN32
-bool Window::ProcessMessage(HWND handle, UINT message, WPARAM w_param, LPARAM l_param,
-	std::optional<ion::events::listeners::WindowAction> &action) noexcept
+bool Window::ProcessMessage(HWND handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept
 {
 	switch (message)
 	{
 		case WM_ACTIVATE:
-		action = LOWORD(w_param) == WA_INACTIVE ?
-			ion::events::listeners::WindowAction::Deactivate :
-			ion::events::listeners::WindowAction::Activate;
-		return true;
+		{
+			switch (LOWORD(w_param))
+			{
+				case WA_ACTIVE:
+				Activated();
+				break;
+
+				case WA_INACTIVE:
+				Deactivated();
+				break;
+			}
+
+			return true;
+		}
 
 		case WM_CREATE:
-		action = ion::events::listeners::WindowAction::Open;
+		Opened();
 		return true;
 
 		case WM_CLOSE:
 		PostQuitMessage(0);
-		action = ion::events::listeners::WindowAction::Close;
+		Closed();
 		return true;
 
 		case WM_SYSCOMMAND:
@@ -647,15 +720,15 @@ bool Window::ProcessMessage(HWND handle, UINT message, WPARAM w_param, LPARAM l_
 			switch (w_param)
 			{
 				case SC_MAXIMIZE:
-				action = ion::events::listeners::WindowAction::Maximize;
+				Maximized();
 				break;
 
 				case SC_MINIMIZE:
-				action = ion::events::listeners::WindowAction::Minimize;
+				Minimized();
 				break;
 
 				case SC_RESTORE:
-				action = ion::events::listeners::WindowAction::Restore;
+				Restored();
 				break;
 			}
 
@@ -667,12 +740,14 @@ bool Window::ProcessMessage(HWND handle, UINT message, WPARAM w_param, LPARAM l_
 			//Don't register repeated key down
 			if ((l_param & 0x40000000) == 0)
 			{
-				//Alt + Enter
+				//Alt + Enter (change dispaly mode)
 				if (w_param == VK_RETURN)
 				{
-					Mode(mode_ == WindowMode::Windowed ?
-						WindowMode::FullScreen :
-						WindowMode::Windowed);
+					if (InFullScreen())
+						ExitFullScreen();
+					else
+						EnterFullScreen(GetFullScreenSize());
+
 					return true;
 				}
 			}
@@ -682,53 +757,57 @@ bool Window::ProcessMessage(HWND handle, UINT message, WPARAM w_param, LPARAM l_
 		
 		case WM_MOVE: //Client position
 		{
-			if (mode_ != WindowMode::FullScreen)
-			{
-				auto rectangle = RECT{};
-				rectangle.left = static_cast<short>(LOWORD(l_param));
-				rectangle.top = static_cast<short>(HIWORD(l_param));
+			auto rectangle =
+				detail::get_window_rectangle(
+					RECT{static_cast<short>(LOWORD(l_param)), static_cast<short>(HIWORD(l_param)), 0, 0},
+					detail::get_window_style(handle),
+					detail::get_extended_window_style(handle));
 
-				rectangle =
-					detail::get_window_rectangle(
-						rectangle,
-						detail::get_window_style(handle),
-						detail::get_extended_window_style(handle));
-
-				if (!position_)
-				{
-					if (auto centered_rectangle = detail::get_centered_window_rectangle(handle);
-						rectangle.left == centered_rectangle.left &&
-						rectangle.top == centered_rectangle.top)					
-							return true; //Do not set position if centered
-				}
-
-				position_ = Vector2{static_cast<real>(rectangle.left), static_cast<real>(rectangle.top)};
-			}
-
-			action = ion::events::listeners::WindowAction::Move;
+			Moved({static_cast<real>(rectangle.left), static_cast<real>(rectangle.top)});
 			return true;
 		}
 		
 		case WM_SIZE: //Client size
 		{
-			auto size = Vector2{static_cast<real>(LOWORD(l_param)), static_cast<real>(HIWORD(l_param))};
-
-			if (mode_ != WindowMode::FullScreen)
-				size_ = size;
-
-			window::detail::change_viewport(size);
-			action = ion::events::listeners::WindowAction::Resize;
+			PostMessage(handle, events::listeners::WM_GLSIZE, w_param, l_param);
+			Resized({static_cast<real>(LOWORD(l_param)), static_cast<real>(HIWORD(l_param))});
 			return true;
 		}
 
 		case WM_GETMINMAXINFO:
 		{
-			if (mode_ != WindowMode::FullScreen && min_size_)
+			auto [min_size, max_size] = GetSizeConstraints();
+
+			if (min_size)
 			{
-				auto rectangle = detail::make_window_rectangle(*min_size_, position_, border_style_);
-				auto minmax_info = reinterpret_cast<MINMAXINFO*>(l_param);
-				minmax_info->ptMinTrackSize.x = rectangle.right;
-				minmax_info->ptMinTrackSize.y = rectangle.bottom;
+				auto rectangle =
+					detail::make_window_rectangle(
+						*min_size,
+						detail::get_position(handle),
+						detail::get_window_style(handle),
+						detail::get_extended_window_style(handle));
+
+				if (auto min_max_info = reinterpret_cast<MINMAXINFO*>(l_param); min_max_info)
+				{
+					min_max_info->ptMinTrackSize.x = rectangle.right;
+					min_max_info->ptMinTrackSize.y = rectangle.bottom;
+				}
+			}
+
+			if (max_size)
+			{
+				auto rectangle =
+					detail::make_window_rectangle(
+						*max_size,
+						detail::get_position(handle),
+						detail::get_window_style(handle),
+						detail::get_extended_window_style(handle));
+
+				if (auto min_max_info = reinterpret_cast<MINMAXINFO*>(l_param); min_max_info)
+				{
+					min_max_info->ptMaxTrackSize.x = rectangle.right;
+					min_max_info->ptMaxTrackSize.y = rectangle.bottom;
+				}
 			}
 
 			return true;
@@ -739,68 +818,140 @@ bool Window::ProcessMessage(HWND handle, UINT message, WPARAM w_param, LPARAM l_
 }
 #endif
 
-//Public
-
-Window::Window(std::string_view title, const Vector2 &size, const std::optional<Vector2> &min_size,
-	const std::optional<Vector2> &full_screen_size, const std::optional<Vector2> &position,
-	window::WindowMode mode, WindowBorderStyle border_style) :
-
-	title_{title},
-	size_{size},
-	min_size_{min_size},
-	full_screen_size_{full_screen_size},
-	position_{position},
-
-	mode_{mode},
-	border_style_{border_style}
-{
-	//Empty
-}
-
 
 /*
-	Static window conversions
+	Notifying
 */
 
-Window Window::Borderless(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position)
+#ifdef ION_WIN32
+bool Window::NotifyMessageReceived(HWND handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept
 {
-	return {title, size, {}, {}, position, WindowMode::Windowed, WindowBorderStyle::None};
+	auto received = false;
+	for (auto &listener : Listeners())
+		received |= Notify(&system::events::listeners::MessageListener::MessageReceived, listener, handle, message, w_param, l_param).value_or(false);
+
+	return received;
+}
+#endif
+
+/*
+*/
+
+bool Window::DoCreate(std::string_view title, const Vector2 &size,
+	const std::optional<Vector2> &position, int color_depth,
+	DWORD style, DWORD extended_style) noexcept
+{
+	#ifdef ION_WIN32
+	if (!class_ && !handle_ && !dev_context_ && !gl_context_)
+	{
+		class_.reset({nullptr});
+		handle_.reset({class_, title, size, position, style, extended_style, this});
+		dev_context_.reset({handle_, color_depth});
+		gl_context_.reset({dev_context_});
+	}
+
+	return class_ && handle_ && dev_context_ && gl_context_;
+	#else
+	return false;
+	#endif
 }
 
-Window Window::Dialog(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position)
+void Window::DoDestroy() noexcept
 {
-	return {title, size, {}, {}, position, WindowMode::Windowed, WindowBorderStyle::Dialog};
-}
+	ExitFullScreen();
 
-Window Window::NonResizable(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position)
-{
-	return {title, size, {}, {}, position, WindowMode::Windowed, WindowBorderStyle::Single};
-}
-
-Window Window::Resizable(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position)
-{
-	return {title, size, {}, {}, position, WindowMode::Windowed, WindowBorderStyle::Sizeable};
+	#ifdef ION_WIN32
+	gl_context_.reset({});
+	dev_context_.reset({});
+	handle_.reset({});
+	class_.reset({});
+	#endif
 }
 
 
 /*
-	System
+	Window events
+*/
+
+void Window::Opened() noexcept
+{
+	//Optional to override
+}
+
+void Window::Closed() noexcept
+{
+	//Optional to override
+}
+
+
+void Window::Activated() noexcept
+{
+	//Optional to override
+}
+
+void Window::Deactivated() noexcept
+{
+	//Optional to override
+}
+
+
+void Window::Maximized() noexcept
+{
+	//Optional to override
+}
+
+void Window::Minimized() noexcept
+{
+	//Optional to override
+}
+
+void Window::Restored() noexcept
+{
+	//Optional to override
+}
+
+
+void Window::Moved([[maybe_unused]] const Vector2 &position) noexcept
+{
+	//Optional to override
+}
+
+void Window::Resized([[maybe_unused]] const Vector2 &size) noexcept
+{
+	//Optional to override
+}
+
+void Window::DisplayModeChanged() noexcept
+{
+	//Optional to override
+}
+
+
+std::optional<Vector2> Window::GetFullScreenSize() const noexcept
+{
+	//Optional to override
+	return {};
+}
+
+std::pair<std::optional<Vector2>, std::optional<Vector2>> Window::GetSizeConstraints() const noexcept
+{
+	//Optional to override
+	return {};
+}
+
+
+//Public
+
+/*
+	System specific
 */
 
 #ifdef ION_WIN32
 LRESULT CALLBACK Window::Procedure(HWND handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept
 {
-	std::optional<ion::events::listeners::WindowAction> action;
-	auto received = ProcessMessage(handle, message, w_param, l_param, action);
-
-	for (auto &listener : MessageEvents().Listeners())
-		received |= listener.MessageReceived(handle, message, w_param, l_param);
-
-	if (action)
-	{
-		for (auto &listener : Events().Listeners())
-			listener.WindowActionReceived(*action);
-	}
+	auto received =
+		ProcessMessage(handle, message, w_param, l_param) |
+		NotifyMessageReceived(handle, message, w_param, l_param);
 
 	//Call the default system procedure for handling all messages not received
 	return received ? 0 : DefWindowProc(handle, message, w_param, l_param);
@@ -812,35 +963,50 @@ LRESULT CALLBACK Window::Procedure(HWND handle, UINT message, WPARAM w_param, LP
 	Create/destroy
 */
 
-#ifdef ION_WIN32
-bool Window::Create(HINSTANCE instance) noexcept
-#else
-bool Window::Create() noexcept
-#endif
+bool Window::CreateBorderless(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position, int color_depth) noexcept
 {
 	#ifdef ION_WIN32
-	if (!class_ && !handle_ && !dev_context_ && !gl_context_)
-	{
-		class_.reset({instance});
-		handle_.reset({class_, title_, size_, position_, border_style_, this});
-		dev_context_.reset({handle_, color_depth_});
-		gl_context_.reset({dev_context_});
-	}
-
-	return class_ && handle_ && dev_context_ && gl_context_;
+	auto [style, extended_style] = detail::get_borderless_style();
+	return DoCreate(title, size, position, color_depth, style, extended_style);
 	#else
 	return false;
 	#endif
 }
 
-void Window::Destroy() noexcept
+bool Window::CreateDialog(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position, int color_depth) noexcept
 {
 	#ifdef ION_WIN32
-	gl_context_.reset({});
-	dev_context_.reset({});
-	handle_.reset({});
-	class_.reset({});
+	auto [style, extended_style] = detail::get_dialog_style();
+	return DoCreate(title, size, position, color_depth, style, extended_style);
+	#else
+	return false;
 	#endif
+}
+
+bool Window::CreateNonResizable(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position, int color_depth) noexcept
+{
+	#ifdef ION_WIN32
+	auto [style, extended_style] = detail::get_single_border_style();
+	return DoCreate(title, size, position, color_depth, style, extended_style);
+	#else
+	return false;
+	#endif
+}
+
+bool Window::CreateResizable(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position, int color_depth) noexcept
+{
+	#ifdef ION_WIN32
+	auto [style, extended_style] = detail::get_sizeable_border_style();
+	return DoCreate(title, size, position, color_depth, style, extended_style);
+	#else
+	return false;
+	#endif
+}
+
+
+void Window::Destroy() noexcept
+{
+	DoDestroy();
 }
 
 
@@ -848,26 +1014,10 @@ void Window::Destroy() noexcept
 	Show/hide
 */
 
-#ifdef ION_WIN32
-bool Window::Show(int cmd_show) noexcept
-#else
 bool Window::Show() noexcept
-#endif
 {
 	#ifdef ION_WIN32
-	if (handle_ && detail::show_window(cmd_show, *handle_))
-	{
-		if (cursor_ == WindowCursor::None)
-			detail::change_cursor(cursor_);
-
-		if (mode_ == WindowMode::FullScreen &&
-			!detail::enter_full_screen_mode(full_screen_size_, color_depth_, *handle_))
-			mode_ = WindowMode::Windowed;
-
-		return true;
-	}
-	else
-		return false;
+	return handle_ && detail::show_window(SW_SHOW, *handle_);
 	#else
 	return false;
 	#endif
@@ -878,13 +1028,23 @@ bool Window::Hide() noexcept
 	#ifdef ION_WIN32
 	if (handle_)
 	{
-		if (mode_ == WindowMode::FullScreen)
-			detail::exit_full_screen_mode(size_, position_, border_style_, *handle_);
-
+		ExitFullScreen();
 		return detail::hide_window(*handle_);
 	}
 	#endif
 	return false;
+}
+
+
+/*
+	Buffers
+*/
+
+void Window::SwapBuffers() const noexcept
+{
+	#ifdef ION_WIN32
+	::SwapBuffers(*dev_context_);
+	#endif
 }
 
 } //ion::system

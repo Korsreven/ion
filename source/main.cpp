@@ -23,12 +23,16 @@ File:	main.cpp
 #include "events/IonCallback.h"
 #include "events/IonRecurringCallback.h"
 #include "events/IonInputController.h"
+#include "events/listeners/IonCameraListener.h"
 #include "events/listeners/IonFrameListener.h"
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonListener.h"
 #include "events/listeners/IonListenerInterface.h"
+#include "events/listeners/IonListeningChannel.h"
 #include "events/listeners/IonMouseListener.h"
+#include "events/listeners/IonRenderTargetListener.h"
 #include "events/listeners/IonResourceListener.h"
+#include "events/listeners/IonViewportListener.h"
 #include "events/listeners/IonWindowListener.h"
 
 #include "graphics/particles/IonEmitter.h"
@@ -43,6 +47,10 @@ File:	main.cpp
 #include "graphics/particles/affectors/IonScaler.h"
 #include "graphics/particles/affectors/IonSineForce.h"
 #include "graphics/particles/affectors/IonVelocityRandomizer.h"
+#include "graphics/render/IonRenderTarget.h"
+#include "graphics/render/IonRenderWindow.h"
+#include "graphics/render/IonViewport.h"
+#include "graphics/scene/IonCamera.h"
 #include "graphics/textures/IonTexture.h"
 #include "graphics/textures/IonTextureManager.h"
 
@@ -104,7 +112,6 @@ File:	main.cpp
 #include "utilities/IonRandom.h"
 #include "utilities/IonStringUtility.h"
 
-#ifdef ION_WIN32
 
 using namespace std::string_literals;
 using namespace std::string_view_literals;
@@ -171,15 +178,20 @@ auto Concat(std::string x, std::string y)
 	return x + y;
 }
 
+#ifdef ION_WIN32
 //Entry point for windows 32/64 bit
 int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 				   [[maybe_unused]] _In_opt_ HINSTANCE prev_instance,
 				   [[maybe_unused]] _In_ LPSTR cmd_line,
 				   [[maybe_unused]] _In_ int cmd_show)
+#else
+//Entry point for non windows systems
+int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
+#endif
 {
 	/*
 		Initializing Ion Engine
-		(should eventually be located in IonCore)
+		(should eventually be located in ion::Engine)
 	*/
 
 	auto application_path = ion::system::utilities::ApplicationPath();
@@ -201,12 +213,12 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 	{
 		ion::Engine engine;
 		auto &window = engine.RenderTo(
-			ion::system::Window::Resizable("ION engine", {1280.0_r, 720.0_r}));
+			ion::graphics::render::RenderWindow::Resizable("ION engine", {1280.0_r, 720.0_r}));
 		window.MinSize(ion::graphics::utilities::Vector2{640.0_r, 360.0_r});
 
-		if (window.Create(instance))
+		if (window.Create())
 		{
-			if (window.Show(cmd_show))
+			if (window.Show())
 			{
 				exit_code = engine.Start();
 				window.Hide();
@@ -441,13 +453,3 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE instance,
 
 	return exit_code;
 }
-
-#else
-
-//Entry point for non windows systems
-int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
-{
-	return 0;
-}
-
-#endif

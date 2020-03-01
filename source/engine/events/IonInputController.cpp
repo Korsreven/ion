@@ -15,7 +15,7 @@ File:	IonInputController.cpp
 #include <cctype>
 #include <utility>
 
-#include "system/IonSystemWindow.h"
+#include "graphics/render/IonRenderWindow.h"
 
 namespace ion::events
 {
@@ -115,10 +115,10 @@ void InputController::MouseWheelRolled(int delta, Vector2 position) noexcept
 
 //Public
 
-InputController::InputController(system::Window &window) noexcept :
-	InputListener{window}
+InputController::InputController(graphics::render::RenderWindow &render_window) noexcept :
+	InputListener{render_window}
 {
-	window_.Events().Subscribe(*this);
+	render_window_.Events().Subscribe(*this);
 }
 
 //Public
@@ -128,7 +128,7 @@ InputController::~InputController()
 	ReleaseButtons();
 
 	WindowListener::Listening(false);
-	window_.Events().Unsubscribe(*this);
+	render_window_.Events().Unsubscribe(*this);
 }
 
 

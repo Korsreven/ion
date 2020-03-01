@@ -14,7 +14,6 @@ File:	IonEngine.cpp
 
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/utilities/IonColor.h"
-#include "types/IonTypes.h"
 
 namespace ion
 {
@@ -28,15 +27,39 @@ namespace engine::detail
 } //engine::detail
 
 
+/*
+	Notifying
+*/
+
+bool Engine::NotifyFrameStarted(duration time) noexcept
+{
+	for (auto &listener : Listeners())
+	{
+		if (!Notify(&events::listeners::FrameListener::FrameStarted, listener, time).value_or(true))
+			return false;
+	}
+
+	return true;
+}
+
+bool Engine::NotifyFrameEnded(duration time) noexcept
+{
+	for (auto &listener : Listeners())
+	{
+		if (!Notify(&events::listeners::FrameListener::FrameEnded, listener, time).value_or(true))
+			return false;
+	}
+
+	return true;
+}
+
+
 bool Engine::UpdateFrame() noexcept
 {
 	static bool syncronize = false; //TEMP
 
-	for (auto &listener : Listeners())
-	{
-		if (!listener.FrameStarted(0.0_sec))
-			return false;
-	}
+	if (!NotifyFrameStarted(0.0_sec))
+		return false;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
@@ -79,15 +102,8 @@ bool Engine::UpdateFrame() noexcept
 	else
 		glFlush();
 
-	SwapBuffers(window_->DeviceContext());
-
-	for (auto &listener : Listeners())
-	{
-		if (!listener.FrameEnded(0.0_sec))
-			return false;
-	}
-
-	return true;
+	render_window_->SwapBuffers();
+	return NotifyFrameEnded(0.0_sec);
 }
 
 
@@ -97,7 +113,7 @@ bool Engine::UpdateFrame() noexcept
 
 int Engine::Start() noexcept
 {
-	if (!window_ || !window_->Handle())
+	if (!render_window_ || !render_window_->Created())
 		return 1;
 
 	if (glewInit() != GLEW_OK)
@@ -142,9 +158,9 @@ int Engine::Start() noexcept
 	Window
 */
 
-system::Window& Engine::RenderTo(system::Window &&window) noexcept
+graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow &&render_window) noexcept
 {
-	return window_.emplace(std::move(window));
+	return render_window_.emplace(std::move(render_window));
 }
 
 } //ion

@@ -19,10 +19,10 @@ File:	IonSystemInputListener.h
 #include "system/events/listeners/IonSystemMessageListener.h"
 
 //Forward declaration
-namespace ion::system
+namespace ion::graphics::render
 {
-	class Window;
-} //ion::system
+	class RenderWindow;
+} //ion::graphics::render
 
 namespace ion::system::events::listeners
 {
@@ -69,7 +69,7 @@ namespace ion::system::events::listeners
 			using KeyEventsBase = ion::events::listeners::ListenerInterface<ion::events::listeners::KeyListener>; 
 			using MouseEventsBase = ion::events::listeners::ListenerInterface<ion::events::listeners::MouseListener>;
 
-			system::Window &window_;
+			graphics::render::RenderWindow &render_window_;
 
 
 			/*
@@ -114,7 +114,7 @@ namespace ion::system::events::listeners
 		public:
 
 			//Create input listener on top of the given system window
-			explicit InputListener(system::Window &window) noexcept;
+			explicit InputListener(graphics::render::RenderWindow &render_window) noexcept;
 
 			//Deleted copy constructor
 			InputListener(const InputListener&) = delete;

@@ -14,8 +14,8 @@ File:	IonSystemInputListener.cpp
 
 #include <utility>
 
+#include "graphics/render/IonRenderWindow.h"
 #include "graphics/utilities/IonAabb.h"
-#include "system/IonSystemWindow.h"
 #include "types/IonTypes.h"
 
 namespace ion::system::events::listeners
@@ -202,16 +202,16 @@ void InputListener::MouseWheelRolled(int delta, Vector2 position) noexcept
 
 //Public
 
-InputListener::InputListener(system::Window &window) noexcept :
-	window_{window}
+InputListener::InputListener(graphics::render::RenderWindow &render_window) noexcept :
+	render_window_{render_window}
 {
-	window_.MessageEvents().Subscribe(*this);
+	render_window_.MessageEvents().Subscribe(*this);
 }
 
 InputListener::~InputListener()
 {
 	MessageListener::Listening(false);
-	window_.MessageEvents().Unsubscribe(*this);
+	render_window_.MessageEvents().Unsubscribe(*this);
 }
 
 } //ion::system::events::listeners

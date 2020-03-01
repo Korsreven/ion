@@ -18,7 +18,8 @@ File:	IonEngine.h
 #include "events/listeners/IonListenerInterface.h"
 #include "events/listeners/IonFrameListener.h"
 #include "graphics/IonGraphicsAPI.h"
-#include "system/IonSystemWindow.h"
+#include "graphics/render/IonRenderWindow.h"
+#include "types/IonTypes.h"
 
 namespace ion
 {
@@ -36,7 +37,15 @@ namespace ion
 	{
 		private:
 
-			std::optional<system::Window> window_;
+			std::optional<graphics::render::RenderWindow> render_window_;
+
+
+			/*
+				Notifying
+			*/
+
+			bool NotifyFrameStarted(duration time) noexcept;
+			bool NotifyFrameEnded(duration time) noexcept;
 
 			bool UpdateFrame() noexcept;
 
@@ -77,6 +86,7 @@ namespace ion
 				Game loop
 			*/
 
+			//
 			[[nodiscard]] int Start() noexcept;
 
 
@@ -84,7 +94,8 @@ namespace ion
 				Window
 			*/
 
-			system::Window& RenderTo(system::Window &&window) noexcept;
+			//
+			graphics::render::RenderWindow& RenderTo(graphics::render::RenderWindow &&render_window) noexcept;
 	};
 } //ion
 #endif

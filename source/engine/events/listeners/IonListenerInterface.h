@@ -56,6 +56,10 @@ namespace ion::events::listeners
 	{
 		static_assert(std::is_base_of_v<Listener<T>, T>);
 
+		public:
+
+			using listener_type = T;
+
 		private:
 
 			listener_interface::detail::container_type<T> listeners_;

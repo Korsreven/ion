@@ -20,9 +20,10 @@ File:	IonSystemWindow.h
 
 #include "IonSystemAPI.h"
 #include "events/listeners/IonListenerInterface.h"
-#include "events/listeners/IonWindowListener.h"
 #include "graphics/utilities/IonVector2.h"
 #include "system/events/listeners/IonSystemMessageListener.h"
+
+#undef CreateDialog
 
 namespace ion::system
 {
@@ -30,38 +31,10 @@ namespace ion::system
 
 	namespace window
 	{
-		enum class WindowMode : bool
-		{
-			FullScreen,
-			Windowed
-		};
-
-		enum class WindowBorderStyle
-		{
-			None,
-			Dialog,
-			Single,
-			Sizeable
-		};
-
-		enum class WindowCursor : bool
-		{
-			None,
-			Default
-		};
-
 		namespace detail
 		{
 			using namespace std::string_view_literals;
 			constexpr auto class_name = "OpenGL"sv;
-
-			inline auto clamp_size(const Vector2 &size, const Vector2 &min_size) noexcept
-			{
-				auto [width, height] = size.XY();
-				auto [min_width, min_height] = min_size.XY();
-				return Vector2{width < min_width ? min_width : width,
-							   height < min_height ? min_height : height};
-			}
 
 
 			#ifdef ION_WIN32
@@ -72,8 +45,30 @@ namespace ion::system
 			PIXELFORMATDESCRIPTOR make_pixel_format_descriptor(int color_depth) noexcept;
 			DEVMODE make_device_mode(const Vector2 &full_screen_size, int color_depth) noexcept;
 
-			DWORD make_window_style(WindowBorderStyle border_style) noexcept;	
-			DWORD make_extended_window_style(WindowBorderStyle border_style) noexcept;
+
+			constexpr auto get_borderless_style() noexcept -> std::pair<DWORD, DWORD>
+			{
+				return {WS_POPUP,
+						WS_EX_APPWINDOW & ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE)};
+			}
+
+			constexpr auto get_dialog_style() noexcept -> std::pair<DWORD, DWORD>
+			{
+				return {WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX),
+						WS_EX_APPWINDOW | WS_EX_WINDOWEDGE};
+			}
+
+			constexpr auto get_single_border_style() noexcept -> std::pair<DWORD, DWORD>
+			{
+				return {WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MAXIMIZEBOX),
+						WS_EX_APPWINDOW | WS_EX_WINDOWEDGE};
+			}
+
+			constexpr auto get_sizeable_border_style() noexcept -> std::pair<DWORD, DWORD>
+			{
+				return {WS_OVERLAPPEDWINDOW,
+						WS_EX_APPWINDOW | WS_EX_WINDOWEDGE};
+			}
 
 			RECT get_desktop_rectangle() noexcept;
 			RECT get_adjusted_window_rectangle(RECT rectangle, DWORD style, DWORD extended_style) noexcept;
@@ -82,7 +77,7 @@ namespace ion::system
 			RECT get_client_window_rectangle(RECT rectangle, DWORD style, DWORD extended_style) noexcept;
 			RECT get_centered_window_rectangle(RECT rectangle) noexcept;
 
-			RECT make_window_rectangle(const Vector2 &size, const std::optional<Vector2> &position, WindowBorderStyle border_style) noexcept;
+			RECT make_window_rectangle(const Vector2 &size, const std::optional<Vector2> &position, DWORD style, DWORD extended_style) noexcept;
 
 
 			template <typename T>
@@ -162,7 +157,7 @@ namespace ion::system
 				window_handle() = default;
 				window_handle(window_class &win_class,
 					std::string_view title, const Vector2 &size, const std::optional<Vector2> &position,
-					WindowBorderStyle border_style, LPVOID parameter) noexcept;
+					DWORD style, DWORD extended_style, LPVOID parameter) noexcept;
 				window_handle(window_handle &&rhs) noexcept;
 				~window_handle();
 
@@ -198,17 +193,44 @@ namespace ion::system
 				void reset(rendering_context &&rhs) noexcept;
 			};
 
+			struct full_screen : handle_base<HWND>
+			{
+				private:
 
-			bool enter_full_screen_mode(const std::optional<Vector2> &full_screen_size, int color_depth, HWND handle) noexcept;
-			bool exit_full_screen_mode(const Vector2 &size, const std::optional<Vector2> &position, WindowBorderStyle border_style, HWND handle) noexcept;
+					Vector2 size_;
+					Vector2 position_;
+					DWORD style_ = {};
+					DWORD extended_style_ = {};
 
-			bool change_title(std::string_view title, HWND handle) noexcept;
-			bool change_client_size(const Vector2 &size, HWND handle) noexcept;
-			bool change_full_screen_size(WindowMode mode, const std::optional<Vector2> &full_screen_size, int color_depth, HWND handle) noexcept;		
-			bool change_position(const Vector2 &position, HWND handle) noexcept;
+				public:
 
-			bool change_border_style(WindowBorderStyle border_style, HWND handle) noexcept;
-			bool change_cursor(WindowCursor cursor) noexcept;
+					full_screen() = default;
+					full_screen(window_handle &win_handle, device_context &dev_context,
+						const std::optional<Vector2> &full_screen_size) noexcept;
+					full_screen(full_screen &&rhs) noexcept;
+					~full_screen();
+
+					full_screen& operator=(full_screen &&rhs) noexcept;
+					void reset(full_screen &&rhs) noexcept;
+			};
+
+
+			bool set_title(std::string_view title, HWND handle) noexcept;
+			bool set_size(const Vector2 &size, HWND handle) noexcept;
+			bool set_client_size(const Vector2 &size, HWND handle) noexcept;	
+			bool set_position(const Vector2 &position, HWND handle) noexcept;
+			bool set_client_position(const Vector2 &position, HWND handle) noexcept;
+			bool set_extents_and_border_style(const Vector2 &size, const Vector2 &position,
+				DWORD style, DWORD extended_style, HWND handle) noexcept;
+
+			bool set_border_style(DWORD style, DWORD extended_style, HWND handle) noexcept;
+			bool set_borderless_style(HWND handle) noexcept;
+			bool set_dialog_border_style(HWND handle) noexcept;
+			bool set_single_border_style(HWND handle) noexcept;
+			bool set_sizeable_border_style(HWND handle) noexcept;
+
+			bool show_cursor() noexcept;
+			bool hide_cursor() noexcept;
 
 			bool show_window(int cmd_show, HWND handle) noexcept;
 			bool hide_window(HWND handle) noexcept;
@@ -223,63 +245,106 @@ namespace ion::system
 
 			Vector2 get_size(HWND handle) noexcept;
 			Vector2 get_client_size(HWND handle) noexcept;
+			Vector2 get_desktop_size() noexcept;
 			Vector2 get_position(HWND handle) noexcept;
 			Vector2 get_client_position(HWND handle) noexcept;
+
 			bool is_active(HWND handle) noexcept;
+			bool is_centered(HWND handle) noexcept;
 
 			#endif
-
-
-			void change_viewport(const Vector2 &size) noexcept;
 		} //detail
 	} //window
 
 
-	class Window final :
-		protected ion::events::listeners::ListenerInterface<events::listeners::MessageListener>,
-		protected ion::events::listeners::ListenerInterface<ion::events::listeners::WindowListener>
+	class Window :
+		public ion::events::listeners::ListenerInterface<events::listeners::MessageListener>
 	{
 		private:
 
-			std::string title_;
-			Vector2 size_;
-			std::optional<Vector2> min_size_;
-			std::optional<Vector2> full_screen_size_;
-			std::optional<Vector2> position_;
-			int color_depth_ = 32;
-			
-			window::WindowMode mode_ = window::WindowMode::Windowed;
-			window::WindowBorderStyle border_style_ = window::WindowBorderStyle::Single;
-			window::WindowCursor cursor_ = window::WindowCursor::Default;
-			
 			#ifdef ION_WIN32
 			window::detail::window_class class_;
 			window::detail::window_handle handle_;
 			window::detail::device_context dev_context_;
 			window::detail::rendering_context gl_context_;
+			window::detail::full_screen full_screen_;
 			#endif
 
 
 			#ifdef ION_WIN32
 			//Processes a message that is sent to the window
-			bool ProcessMessage(HWND handle, UINT message, WPARAM w_param, LPARAM l_param,
-				std::optional<ion::events::listeners::WindowAction> &action) noexcept;
+			bool ProcessMessage(HWND handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept;
 			#endif
 
-		protected:
 
-			using MessageEventsBase = ion::events::listeners::ListenerInterface<events::listeners::MessageListener>;
-			using WindowEventsBase = ion::events::listeners::ListenerInterface<ion::events::listeners::WindowListener>;
+			/*
+				Notifying
+			*/
+
+			#ifdef ION_WIN32
+			bool NotifyMessageReceived(HWND handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept;
+			#endif
+
+
+			/*
+				Creating / destroying
+			*/
+
+			bool DoCreate(std::string_view title, const Vector2 &size,
+				const std::optional<Vector2> &position, int color_depth,
+				DWORD style, DWORD extended_style) noexcept;
+
+			void DoDestroy() noexcept;
+
+
+			/*
+				Window events
+			*/
+
+			//Called right after a window has been created/opened
+			virtual void Opened() noexcept;
+
+			//Called right after a window has been closed/destroyed
+			virtual void Closed() noexcept;
+
+
+			//Called right after a window has been activated
+			virtual void Activated() noexcept;
+
+			//Called right after a window has been deactivated
+			virtual void Deactivated() noexcept;
+
+
+			//Called right after a window has been maximized
+			virtual void Maximized() noexcept;
+
+			//Called right after a window has been minimized
+			virtual void Minimized() noexcept;
+
+			//Called right after a window has been restored
+			virtual void Restored() noexcept;
+
+
+			//Called right after a window has been moved, with the new position
+			virtual void Moved(const Vector2 &position) noexcept;
+
+			//Called right after a window has been resized, with the new size
+			virtual void Resized(const Vector2 &size) noexcept;
+
+			//Called right after a window display mode has been changed
+			virtual void DisplayModeChanged() noexcept;
+
+
+			//Called to retrieve the full screen size, if any
+			virtual std::optional<Vector2> GetFullScreenSize() const noexcept;
+
+			//Called to retrieve the min and max size constraints, if any
+			virtual std::pair<std::optional<Vector2>, std::optional<Vector2>> GetSizeConstraints() const noexcept;
 
 		public:
 
 			//Default constructor
 			Window() = default;
-
-			//Construct a new window with the given arguments
-			Window(std::string_view title, const Vector2 &size, const std::optional<Vector2> &min_size,
-				const std::optional<Vector2> &full_screen_size, const std::optional<Vector2> &position,
-				window::WindowMode mode, window::WindowBorderStyle border_style);
 
 			//Deleted copy constructor
 			Window(const Window&) = delete;
@@ -287,26 +352,8 @@ namespace ion::system
 			//Default move constructor
 			Window(Window &&rhs) = default;
 
-
-			/*
-				Static window conversions
-			*/
-
-			//Returns a new borderless window from the given title, size and position
-			[[nodiscard]] static Window Borderless(std::string_view title, const Vector2 &size,
-				const std::optional<Vector2> &position = std::nullopt);
-
-			//Returns a new dialog window from the given title, size and position
-			[[nodiscard]] static Window Dialog(std::string_view title, const Vector2 &size,
-				const std::optional<Vector2> &position = std::nullopt);
-
-			//Returns a new non resizable window from the given title, size and position
-			[[nodiscard]] static Window NonResizable(std::string_view title, const Vector2 &size,
-				const std::optional<Vector2> &position = std::nullopt);
-
-			//Returns a new resizable window from the given title, size and position
-			[[nodiscard]] static Window Resizable(std::string_view title, const Vector2 &size,
-				const std::optional<Vector2> &position = std::nullopt);
+			//Default virtual destructor
+			virtual ~Window() = default;
 
 
 			/*
@@ -321,49 +368,143 @@ namespace ion::system
 
 
 			/*
-				Events
-			*/
-
-			//Return a mutable reference to the message events of this input listener
-			[[nodiscard]] inline auto& MessageEvents() noexcept
-			{
-				return static_cast<MessageEventsBase&>(*this);
-			}
-
-			//Return a immutable reference to the message events of this input listener
-			[[nodiscard]] inline const auto& MessageEvents() const noexcept
-			{
-				return static_cast<const MessageEventsBase&>(*this);
-			}
-
-
-			//Return a mutable reference to the window events of this input listener
-			[[nodiscard]] inline auto& Events() noexcept
-			{
-				return static_cast<WindowEventsBase&>(*this);
-			}
-
-			//Return a immutable reference to the window events of this input listener
-			[[nodiscard]] inline auto& Events() const noexcept
-			{
-				return static_cast<const WindowEventsBase&>(*this);
-			}
-
-
-			/*
 				Modifiers
 			*/
 
-			//Sets the window position to the center of the main desktop
-			inline void Center() noexcept
+			//Sets the window title to the given title
+			inline void Title(std::string_view title) noexcept
 			{
 				#ifdef ION_WIN32
 				if (handle_)
-					window::detail::center_window(*handle_);
+					window::detail::set_title(title, *handle_);
 				#endif
-
-				position_.reset();
 			}
+
+			//Sets the window inner size to the given size
+			inline void InnerSize(const Vector2 &size) noexcept
+			{
+				#ifdef ION_WIN32
+				if (handle_)
+					window::detail::set_client_size(size, *handle_);
+				#endif
+			}
+
+			//Sets the window outer size to the given size
+			inline void OuterSize(const Vector2 &size) noexcept
+			{
+				#ifdef ION_WIN32
+				if (handle_)
+					window::detail::set_size(size, *handle_);
+				#endif
+			}
+
+			//Sets the window inner position to the given position
+			inline void InnerPosition(const Vector2 &position) noexcept
+			{
+				#ifdef ION_WIN32
+				if (handle_)
+					window::detail::set_client_position(position, *handle_);
+				#endif
+			}
+
+			//Sets the window outer position to the given position
+			inline void OuterPosition(const Vector2 &position) noexcept
+			{
+				#ifdef ION_WIN32
+				if (handle_)
+					window::detail::set_position(position, *handle_);
+				#endif
+			}
+
+
+			//Enter full screen with the given size. If no size is given, it uses the desktop size
+			//Returns true if the window successfully entered full screen
+			inline auto EnterFullScreen(const std::optional<Vector2> &full_screen_size) noexcept
+			{
+				#ifdef ION_WIN32
+				if (handle_ && !full_screen_)
+				{
+					DisplayModeChanged();
+					full_screen_.reset({handle_, dev_context_, full_screen_size});
+				}
+
+				return !!full_screen_;
+				#else
+				return false;
+				#endif
+			}
+
+			//Exit out of full screen
+			//Returns true if the window successfully exited out of full screen
+			inline auto ExitFullScreen() noexcept
+			{
+				#ifdef ION_WIN32
+				if (handle_ && full_screen_)
+				{		
+					full_screen_.reset({});
+					DisplayModeChanged();
+				}
+
+				return !full_screen_;
+				#else
+				return false;
+				#endif
+			}
+
+
+			//Switch to a borderless window style
+			inline void BorderlessStyle() noexcept
+			{
+				#ifdef ION_WIN32
+				if (handle_)
+					window::detail::set_borderless_style(*handle_);
+				#endif
+			}
+
+			//Switch to a dialog window style
+			inline void DialogStyle() noexcept
+			{
+				#ifdef ION_WIN32
+				if (handle_)
+					window::detail::set_dialog_border_style(*handle_);
+				#endif
+			}
+
+			//Switch to a single border window style
+			inline void SingleBorderStyle() noexcept
+			{
+				#ifdef ION_WIN32
+				if (handle_)
+					window::detail::set_single_border_style(*handle_);
+				#endif
+			}
+
+			//Switch to a sizeable border window style
+			inline void SizeableBorderStyle() noexcept
+			{
+				#ifdef ION_WIN32
+				if (handle_)
+					window::detail::set_sizeable_border_style(*handle_);
+				#endif
+			}
+
+
+			//Shows the window cursor
+			inline void ShowCursor() noexcept
+			{
+				#ifdef ION_WIN32
+				window::detail::show_cursor();
+				#endif
+			}
+
+			//Hides the window cursor
+			inline void HideCursor() noexcept
+			{
+				#ifdef ION_WIN32
+				window::detail::hide_cursor();
+				#endif
+			}
+
 
 			//Focuses the window by bringing it to the front
 			inline void Focus() noexcept
@@ -374,155 +515,13 @@ namespace ion::system
 				#endif
 			}
 
-
-			//Sets the window title to the given title
-			inline void Title(std::string_view title) noexcept
+			//Sets the window position to the center of the main desktop
+			inline void Center() noexcept
 			{
-				if (title_ != title)
-				{
-					title_ = title;
-
-					#ifdef ION_WIN32
-					if (handle_)
-						window::detail::change_title(title, *handle_);
-					#endif
-				}
-			}
-
-			//Sets the window size to the given size
-			inline void Size(const Vector2 &size) noexcept
-			{
-				if (size_ != size)
-				{
-					size_ = min_size_ ? window::detail::clamp_size(size, *min_size_) : size;
-
-					#ifdef ION_WIN32
-					if (handle_)
-						window::detail::change_client_size(size_, *handle_);
-					#endif
-
-					if (!position_)
-						Center();
-				}
-			}
-
-			//Sets the window min size constraint to the given min size
-			inline void MinSize(const std::optional<Vector2> &min_size) noexcept
-			{
-				if (min_size_ != min_size)
-				{
-					if ((min_size_ = min_size))
-					{
-						if (auto size = window::detail::clamp_size(size_, *min_size); size != size_)
-						{
-							size_ = size;
-
-							#ifdef ION_WIN32
-							if (handle_)
-								window::detail::change_client_size(size_, *handle_);
-							#endif
-
-							if (!position_)
-								Center();
-						}
-					}
-				}
-			}
-
-			//Sets a custom full screen size to the given size
-			inline void FullScreenSize(const std::optional<Vector2> &full_screen_size) noexcept
-			{
-				if (full_screen_size_ != full_screen_size)
-				{
-					full_screen_size_ = full_screen_size;
-
-					#ifdef ION_WIN32
-					if (handle_)
-						window::detail::change_full_screen_size(mode_, full_screen_size, color_depth_, *handle_);
-					#endif
-				}
-			}
-
-			//Sets a custom window position to the given size
-			inline void Position(const std::optional<Vector2> &position) noexcept
-			{
-				if (position_ != position)
-				{
-					if ((position_ = position))
-					{
-						#ifdef ION_WIN32
-						if (handle_)
-							window::detail::change_position(*position, *handle_);
-						#endif
-					}
-					else
-						Center();
-				}
-			}
-
-			//Sets the window color depth to the given value
-			//Changes will apply the next time the window is recreated
-			inline void ColorDepth(int color_depth) noexcept
-			{
-				color_depth_ = color_depth;
-			}
-
-
-			//Sets the window mode to the given mode
-			inline void Mode(window::WindowMode mode) noexcept
-			{		
-				if (mode_ != mode)
-				{
-					if (mode == window::WindowMode::FullScreen)
-						mode_ = mode;
-
-					#ifdef ION_WIN32
-					if (handle_)
-					{
-						switch (mode)
-						{
-							case window::WindowMode::FullScreen:
-							window::detail::enter_full_screen_mode(full_screen_size_, color_depth_, *handle_);
-							break;
-
-							case window::WindowMode::Windowed:
-							default:
-							window::detail::exit_full_screen_mode(size_, position_, border_style_, *handle_);
-							break;
-						}
-					}
-					#endif
-
-					if (mode == window::WindowMode::Windowed)
-						mode_ = mode;
-				}	
-			}
-
-			//Sets the window border style to the given style
-			inline void BorderStyle(window::WindowBorderStyle border_style) noexcept
-			{
-				if (border_style_ != border_style)
-				{
-					border_style_ = border_style;
-
-					#ifdef ION_WIN32
-					if (handle_)
-						window::detail::change_border_style(border_style, *handle_);
-					#endif
-				}
-			}
-
-			//Sets the window cursore to the given cursor
-			inline void Cursor(window::WindowCursor cursor) noexcept
-			{
-				if (cursor_ != cursor)
-				{
-					cursor_ = cursor;
-
-					#ifdef ION_WIN32
-					window::detail::change_cursor(cursor);
-					#endif
-				}
+				#ifdef ION_WIN32
+				if (handle_)
+					window::detail::center_window(*handle_);
+				#endif
 			}
 
 
@@ -530,68 +529,75 @@ namespace ion::system
 				Observers
 			*/
 
-			//Returns the window title
-			[[nodiscard]] inline const auto& Title() const noexcept
+			//Returns the inner (client/screen) size of the window
+			//Returns nullopt if no window has been created
+			[[nodiscard]] inline auto InnerSize() const noexcept
 			{
-				return title_;
+				#ifdef ION_WIN32
+				if (handle_)
+					return std::make_optional(window::detail::get_client_size(*handle_));
+				#endif
+				
+				return std::make_optional<Vector2>();
 			}
 
-			//Returns the size of the window
-			[[nodiscard]] inline const auto& Size() const noexcept
+			//Returns the outer size of the window
+			//Returns nullopt if no window has been created
+			[[nodiscard]] inline auto OuterSize() const noexcept
 			{
-				return size_;
+				#ifdef ION_WIN32
+				if (handle_)
+					return std::make_optional(window::detail::get_size(*handle_));
+				#endif
+				
+				return std::make_optional<Vector2>();
 			}
 
-			//Returns the min allowed client size of the window
-			//Returns nullopt if there is not a constraint on min size
-			[[nodiscard]] inline const auto& MinSize() const noexcept
+			//Returns the desktop size of the system
+			//Returns nullopt if system does not have a desktop
+			[[nodiscard]] inline auto DesktopSize() const noexcept
 			{
-				return min_size_;
+				#ifdef ION_WIN32
+				return std::make_optional(window::detail::get_desktop_size());
+				#else			
+				return std::make_optional<Vector2>();
+				#endif
 			}
 
-			//Returns the full screen size of the window
-			//Returns nullopt if no custom full screen size specified
-			[[nodiscard]] inline const auto& FullScreenSize() const noexcept
+			//Returns the inner (client/screen) position of the window
+			//Returns nullopt if no window has been created
+			[[nodiscard]] inline auto InnerPosition() const noexcept
 			{
-				return full_screen_size_;
+				#ifdef ION_WIN32
+				if (handle_)
+					return std::make_optional(window::detail::get_client_position(*handle_));
+				#endif
+				
+				return std::make_optional<Vector2>();
 			}
 
-			//Returns the position of the window
-			//Returns nullopt if the window does not have a custom position (centered)
-			[[nodiscard]] inline const auto& Position() const noexcept
+			//Returns the outer position of the window
+			//Returns nullopt if no window has been created
+			[[nodiscard]] inline auto OuterPosition() const noexcept
 			{
-				return position_;
-			}
-
-			//Returns the window color depth
-			[[nodiscard]] inline auto ColorDepth() const noexcept
-			{
-				return color_depth_;
-			}
-
-
-			//Returns the window mode
-			[[nodiscard]] inline auto Mode() const noexcept
-			{
-				return mode_;
-			}
-
-			//Returns the window border style
-			[[nodiscard]] inline auto BorderStyle() const noexcept
-			{
-				return border_style_;
-			}
-
-			//Returns the window cursor
-			[[nodiscard]] inline auto Cursor() const noexcept
-			{
-				return cursor_;
+				#ifdef ION_WIN32
+				if (handle_)
+					return std::make_optional(window::detail::get_position(*handle_));
+				#endif
+				
+				return std::make_optional<Vector2>();
 			}
 
 
-			/*
-				Window
-			*/
+			//Returns true if the window is created
+			[[nodiscard]] inline auto Created() const noexcept
+			{
+				#ifdef ION_WIN32
+				return !!handle_;
+				#else
+				return false;
+				#endif
+			}
 
 			//Returns true if the window is active (in focus)
 			[[nodiscard]] inline auto IsActive() const noexcept
@@ -603,78 +609,34 @@ namespace ion::system
 				#endif
 			}
 
-			//Returns the inner (client/screen) size of the window
-			//Returns nullopt if no window has been created
-			[[nodiscard]] inline auto InnerSize() const noexcept
+			//Returns true if the window is centered
+			[[nodiscard]] inline auto IsCentered() const noexcept
 			{
 				#ifdef ION_WIN32
-				if (handle_)
-					return std::make_optional(window::detail::get_client_size(*handle_));
+				return handle_ && window::detail::is_centered(*handle_);
+				#else
+				return false;
 				#endif
-				else
-					return std::make_optional<Vector2>();
 			}
 
-			//Returns the outer size of the window
-			//Returns nullopt if no window has been created
-			[[nodiscard]] inline auto OuterSize() const noexcept
+			//Returns true if the window is in full screen mode
+			[[nodiscard]] inline auto InFullScreen() const noexcept
 			{
 				#ifdef ION_WIN32
-				if (handle_)
-					return std::make_optional(window::detail::get_size(*handle_));
+				return !!full_screen_;
+				#else
+				return false;
 				#endif
-				else
-					return std::make_optional<Vector2>();
-			}
-
-			//Returns the inner (client/screen) position of the window
-			//Returns nullopt if no window has been created
-			[[nodiscard]] inline auto InnerPosition() const noexcept
-			{
-				#ifdef ION_WIN32
-				if (handle_)
-					return std::make_optional(window::detail::get_client_position(*handle_));
-				#endif
-				else
-					return std::make_optional<Vector2>();
-			}
-
-			//Returns the outer position of the window
-			//Returns nullopt if no window has been created
-			[[nodiscard]] inline auto OuterPosition() const noexcept
-			{
-				#ifdef ION_WIN32
-				if (handle_)
-					return std::make_optional(window::detail::get_position(*handle_));
-				#endif
-				else
-					return std::make_optional<Vector2>();
-			}
-
-			//Returns the aspect ratio of the window
-			//Returns nullopt if no window has been created
-			[[nodiscard]] inline auto AspectRatio() const noexcept
-			{
-				if (auto size = InnerSize(); size)
-				{
-					auto [width, height] = size->XY();
-					return std::make_optional(width / height);
-				}
-				else
-					return std::make_optional<real>();
 			}
 
 
 			/*
-				Handles
+				System specific
 			*/
 
-			//Returns the window device context
-			//Returns nullptr if no window has been created
-			[[nodiscard]] inline auto DeviceContext() const noexcept
-			{
-				return *dev_context_;
-			}
+			#ifdef ION_WIN32
+			//An application-defined function that processes messages sent to a window
+			LRESULT CALLBACK Procedure(HWND handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept;
 
 			//Returns the window handle
 			//Returns nullptr if no window has been created
@@ -682,15 +644,6 @@ namespace ion::system
 			{
 				return *handle_;
 			}
-
-
-			/*
-				System
-			*/
-
-			#ifdef ION_WIN32
-			//An application-defined function that processes messages sent to a window
-			LRESULT CALLBACK Procedure(HWND handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept;
 			#endif
 
 
@@ -698,14 +651,20 @@ namespace ion::system
 				Create/destroy
 			*/
 
-			//Creates an actual system specific window
-			#ifdef ION_WIN32
-			bool Create(HINSTANCE instance = nullptr) noexcept;
-			#else
-			bool Create() noexcept
-			#endif
+			//Creates a borderless system window
+			bool CreateBorderless(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position, int color_depth = 32) noexcept;
 
-			//Destroyes the actual system specific window (if existing)
+			//Creates a dialog system window
+			bool CreateDialog(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position, int color_depth = 32) noexcept;
+
+			//Creates a single border system window
+			bool CreateNonResizable(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position, int color_depth = 32) noexcept;
+
+			//Creates a sizeable border system window
+			bool CreateResizable(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position, int color_depth = 32) noexcept;
+
+
+			//Destroyes a system window (if existing)
 			void Destroy() noexcept;
 
 
@@ -713,17 +672,21 @@ namespace ion::system
 				Show/hide
 			*/
 
-			//Shows and focus the actual system specific window
+			//Shows and focus the system window
 			//Makes the window visible
-			#ifdef ION_WIN32
-			bool Show(int cmd_show = SW_SHOW) noexcept;
-			#else
 			bool Show() noexcept;
-			#endif
 
-			//Hides the actual system specific window
+			//Hides the system window
 			//Makes the window not visible
 			bool Hide() noexcept;
+
+
+			/*
+				Buffers
+			*/
+
+			//Exchanges the front and back buffers
+			void SwapBuffers() const noexcept;
 	};
 
 } //ion::system
