@@ -133,6 +133,18 @@
     <Filter Include="Source Files\graphics\textures">
       <UniqueIdentifier>{2ffd5361-66db-42e1-87d7-fb579bd6a521}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\graphics\scene">
+      <UniqueIdentifier>{a962918e-913c-4ee1-8e6c-2cc043da70ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics\scene">
+      <UniqueIdentifier>{2e2c6f92-7938-4772-904f-92d23bc68ffe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\graphics\render">
+      <UniqueIdentifier>{9e3926be-281a-468f-a1cd-35d1a2e2da19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics\render">
+      <UniqueIdentifier>{9964ae44-aa95-41b7-b362-a94947722cfd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -287,6 +299,18 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\IonEngine.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\IonCamera.cpp">
+      <Filter>Source Files\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\render\IonViewport.cpp">
+      <Filter>Source Files\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\render\IonRenderTarget.cpp">
+      <Filter>Source Files\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\render\IonRenderWindow.cpp">
+      <Filter>Source Files\graphics\render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -556,6 +580,27 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\IonEngine.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\IonCamera.h">
+      <Filter>Header Files\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonViewportListener.h">
+      <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\render\IonViewport.h">
+      <Filter>Header Files\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\render\IonRenderTarget.h">
+      <Filter>Header Files\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonRenderTargetListener.h">
+      <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonListeningChannel.h">
+      <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\render\IonRenderWindow.h">
+      <Filter>Header Files\graphics\render</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

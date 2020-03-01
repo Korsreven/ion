@@ -171,6 +171,10 @@
     <ClCompile Include="..\source\engine\graphics\particles\IonEmitter.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonParticle.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonParticleSystem.cpp" />
+    <ClCompile Include="..\source\engine\graphics\render\IonRenderTarget.cpp" />
+    <ClCompile Include="..\source\engine\graphics\render\IonRenderWindow.cpp" />
+    <ClCompile Include="..\source\engine\graphics\render\IonViewport.cpp" />
+    <ClCompile Include="..\source\engine\graphics\scene\IonCamera.cpp" />
     <ClCompile Include="..\source\engine\graphics\textures\IonTexture.cpp" />
     <ClCompile Include="..\source\engine\graphics\textures\IonTextureManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonAabb.cpp" />
@@ -229,8 +233,11 @@
     <ClInclude Include="..\source\engine\events\listeners\IonKeyListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonListenerInterface.h" />
+    <ClInclude Include="..\source\engine\events\listeners\IonListeningChannel.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonMouseListener.h" />
+    <ClInclude Include="..\source\engine\events\listeners\IonRenderTargetListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonResourceListener.h" />
+    <ClInclude Include="..\source\engine\events\listeners\IonViewportListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonWindowListener.h" />
     <ClInclude Include="..\source\engine\graphics\IonGraphicsAPI.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffector.h" />
@@ -245,6 +252,10 @@
     <ClInclude Include="..\source\engine\graphics\particles\IonEmitter.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonParticle.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonParticleSystem.h" />
+    <ClInclude Include="..\source\engine\graphics\render\IonRenderTarget.h" />
+    <ClInclude Include="..\source\engine\graphics\render\IonRenderWindow.h" />
+    <ClInclude Include="..\source\engine\graphics\render\IonViewport.h" />
+    <ClInclude Include="..\source\engine\graphics\scene\IonCamera.h" />
     <ClInclude Include="..\source\engine\graphics\textures\IonTexture.h" />
     <ClInclude Include="..\source\engine\graphics\textures\IonTextureManager.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonAabb.h" />
