@@ -107,14 +107,14 @@ namespace ion::graphics::particles
 			*/
 
 			//Returns the position of the particle
-			[[nodiscard]] inline const auto& Position() const noexcept
+			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}
 
 			//Returns the direction of the particle
 			//Where the length of the vector represents velocity
-			[[nodiscard]] inline const auto& Direction() const noexcept
+			[[nodiscard]] inline auto& Direction() const noexcept
 			{
 				return direction_;
 			}
@@ -126,7 +126,7 @@ namespace ion::graphics::particles
 			}
 
 			//Returns the size of the particle
-			[[nodiscard]] inline const auto& Size() const noexcept
+			[[nodiscard]] inline auto& Size() const noexcept
 			{
 				return size_;
 			}
@@ -138,7 +138,7 @@ namespace ion::graphics::particles
 			}
 
 			//Returns the solid color of the particle
-			[[nodiscard]] inline const auto& SolidColor() const noexcept
+			[[nodiscard]] inline auto& SolidColor() const noexcept
 			{
 				return solid_color_;
 			}

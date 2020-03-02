@@ -148,7 +148,7 @@ namespace ion::system::events::listeners
 			}
 
 			//Return a immutable reference to the key base of this input listener
-			[[nodiscard]] inline const auto& KeyEvents() const noexcept
+			[[nodiscard]] inline auto& KeyEvents() const noexcept
 			{
 				return static_cast<const KeyEventsBase&>(*this);
 			}

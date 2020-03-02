@@ -140,7 +140,7 @@ namespace ion::resources::files
 			*/
 
 			//Returns the data file extension for this loader
-			[[nodiscard]] inline const auto& DataFileExtension() const noexcept
+			[[nodiscard]] inline auto& DataFileExtension() const noexcept
 			{
 				return data_file_extension_;
 			}

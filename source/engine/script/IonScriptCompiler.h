@@ -603,7 +603,7 @@ namespace ion::script
 			//Returns all compile errors from the previous compilation (per unit)
 			//The errors returned are per compiled unit (file)
 			//The compilation is successful if all errors returned indicates a success
-			[[nodiscard]] inline const auto& CompileErrors() const noexcept
+			[[nodiscard]] inline auto& CompileErrors() const noexcept
 			{
 				return compile_errors_;
 			}

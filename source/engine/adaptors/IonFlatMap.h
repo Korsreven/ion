@@ -88,7 +88,7 @@ namespace ion::adaptors
 
 		//Return an immutable reference to the mapped type for the given key
 		//Does bounds checking by throwing out of range if key does not exist
-		[[nodiscard]] inline const auto& at(const typename my_base::key_type &key) const
+		[[nodiscard]] inline auto& at(const typename my_base::key_type &key) const
 		{
 			return at<typename my_base::key_type>(key);
 		}
@@ -97,7 +97,7 @@ namespace ion::adaptors
 		//Does bounds checking by throwing out of range if key does not exist
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, typename my_base::key_type> || types::is_transparent_comparator_v<Compare>>>
-		[[nodiscard]] inline const auto& at(const T &key) const
+		[[nodiscard]] inline auto& at(const T &key) const
 		{
 			auto iter = this->find(key);
 

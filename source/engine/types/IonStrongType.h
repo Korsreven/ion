@@ -52,7 +52,7 @@ namespace ion::types
 			}
 
 			//Get an immutable reference to the contained value
-			[[nodiscard]] constexpr const auto& Get() const noexcept
+			[[nodiscard]] constexpr auto& Get() const noexcept
 			{
 				return value_;
 			}

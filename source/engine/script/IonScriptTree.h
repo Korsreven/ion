@@ -349,13 +349,13 @@ namespace ion::script
 				*/
 
 				//Returns the name of this object
-				[[nodiscard]] inline const auto& Name() const noexcept
+				[[nodiscard]] inline auto& Name() const noexcept
 				{
 					return name_;
 				}
 
 				//Returns the classes of this object
-				[[nodiscard]] inline const auto& Classes() const noexcept
+				[[nodiscard]] inline auto& Classes() const noexcept
 				{
 					return classes_;
 				}
@@ -493,7 +493,7 @@ namespace ion::script
 				*/
 
 				//Returns the name of the property
-				[[nodiscard]] inline const auto& Name() const noexcept
+				[[nodiscard]] inline auto& Name() const noexcept
 				{
 					return name_;
 				}
@@ -517,7 +517,7 @@ namespace ion::script
 				}
 
 				//Returns an immutable argument at the given argument number
-				[[nodiscard]] inline const auto& operator[](int number) const noexcept
+				[[nodiscard]] inline auto& operator[](int number) const noexcept
 				{
 					return Argument(number);
 				}
@@ -612,7 +612,7 @@ namespace ion::script
 				}
 
 				//Returns the unit of this argument
-				[[nodiscard]] inline const auto& Unit() const noexcept
+				[[nodiscard]] inline auto& Unit() const noexcept
 				{
 					return unit_;
 				}

@@ -46,7 +46,7 @@ namespace ion::resources::files
 			}
 
 			//Returns an immutable file entry for this resource
-			[[nodiscard]] inline const auto& File() const noexcept
+			[[nodiscard]] inline auto& File() const noexcept
 			{
 				return file_;
 			}

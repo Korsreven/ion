@@ -113,7 +113,7 @@ namespace ion::events
 			*/
 
 			//Returns the current mouse position
-			[[nodiscard]] inline const auto& MousePosition() const noexcept
+			[[nodiscard]] inline auto& MousePosition() const noexcept
 			{
 				return mouse_position_;
 			}

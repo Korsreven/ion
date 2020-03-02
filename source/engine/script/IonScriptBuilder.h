@@ -135,7 +135,7 @@ namespace ion::script
 			}
 
 			//Returns an immutable reference to the compiler
-			[[nodiscard]] inline const auto& Compiler() const noexcept
+			[[nodiscard]] inline auto& Compiler() const noexcept
 			{
 				return compiler_;
 			}
@@ -147,7 +147,7 @@ namespace ion::script
 			}
 
 			//Returns an immutable reference to the tree
-			[[nodiscard]] inline const auto& Tree() const noexcept
+			[[nodiscard]] inline auto& Tree() const noexcept
 			{
 				return tree_;
 			}
@@ -161,7 +161,7 @@ namespace ion::script
 
 			//Returns an immutable reference to the validator
 			//Returns nullopt if no validator is in use by the builder
-			[[nodiscard]] inline const auto& Validator() const noexcept
+			[[nodiscard]] inline auto& Validator() const noexcept
 			{
 				return validator_;
 			}

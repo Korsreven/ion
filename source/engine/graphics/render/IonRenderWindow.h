@@ -206,7 +206,7 @@ namespace ion::graphics::render
 			}
 
 			//Return a immutable reference to the window events of this render window
-			[[nodiscard]] inline const auto& Events() const noexcept
+			[[nodiscard]] inline auto& Events() const noexcept
 			{
 				return static_cast<const WindowEventsBase&>(*this);
 			}
@@ -219,7 +219,7 @@ namespace ion::graphics::render
 			}
 
 			//Return a immutable reference to the render target events of this render window
-			[[nodiscard]] inline const auto& RenderTargetEvents() const noexcept
+			[[nodiscard]] inline auto& RenderTargetEvents() const noexcept
 			{
 				return static_cast<const RenderTargetEventsBase&>(*this);
 			}
@@ -232,7 +232,7 @@ namespace ion::graphics::render
 			}
 
 			//Return a immutable reference to the message events of this render window
-			[[nodiscard]] inline const auto& MessageEvents() const noexcept
+			[[nodiscard]] inline auto& MessageEvents() const noexcept
 			{
 				return static_cast<const MessageEventsBase&>(*this);
 			}
@@ -395,34 +395,34 @@ namespace ion::graphics::render
 			*/
 
 			//Returns the window title
-			[[nodiscard]] inline const auto& Title() const noexcept
+			[[nodiscard]] inline auto& Title() const noexcept
 			{
 				return title_;
 			}
 
 			//Returns the size of the window
-			[[nodiscard]] inline const auto& Size() const noexcept
+			[[nodiscard]] inline auto& Size() const noexcept
 			{
 				return size_;
 			}
 
 			//Returns the min allowed client size of the window
 			//Returns nullopt if there is not a constraint on min size
-			[[nodiscard]] inline const auto& MinSize() const noexcept
+			[[nodiscard]] inline auto& MinSize() const noexcept
 			{
 				return min_size_;
 			}
 
 			//Returns the full screen size of the window
 			//Returns nullopt if no custom full screen size specified
-			[[nodiscard]] inline const auto& FullScreenSize() const noexcept
+			[[nodiscard]] inline auto& FullScreenSize() const noexcept
 			{
 				return full_screen_size_;
 			}
 
 			//Returns the position of the window
 			//Returns nullopt if the window does not have a custom position (centered)
-			[[nodiscard]] inline const auto& Position() const noexcept
+			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}

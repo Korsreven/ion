@@ -151,13 +151,13 @@ namespace ion::graphics::scene
 			*/
 
 			//
-			[[nodiscard]] inline const auto& Position() const noexcept
+			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}
 
 			//
-			[[nodiscard]] inline const auto& ClippingPlane() const noexcept
+			[[nodiscard]] inline auto& ClippingPlane() const noexcept
 			{
 				return clipping_plane_;
 			}
@@ -182,7 +182,7 @@ namespace ion::graphics::scene
 
 
 			//
-			[[nodiscard]] inline const auto& AspectRatio() const noexcept
+			[[nodiscard]] inline auto& AspectRatio() const noexcept
 			{
 				return aspect_ratio_;
 			}

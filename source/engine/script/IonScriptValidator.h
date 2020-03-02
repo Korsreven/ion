@@ -122,7 +122,7 @@ namespace ion::script
 
 					//Returns the name from this declaration
 					//Could be just a name or the name of the actual definition
-					inline const auto& Name() const noexcept
+					inline auto& Name() const noexcept
 					{
 						return HasDefinition() ?
 							std::get<T>(entity_).Name() :
@@ -130,7 +130,7 @@ namespace ion::script
 					}
 
 					//Returns an immutable reference to the definition
-					inline const auto& Definition() const noexcept
+					inline auto& Definition() const noexcept
 					{
 						assert(HasDefinition());
 						return std::get<T>(entity_);
@@ -351,13 +351,13 @@ namespace ion::script
 				*/
 
 				//Returns the name of this property
-				[[nodiscard]] inline const auto &Name() const noexcept
+				[[nodiscard]] inline auto& Name() const noexcept
 				{
 					return name_;
 				}
 
 				//Returns the max required parameters of this property
-				[[nodiscard]] inline const auto &RequiredParameters() const noexcept
+				[[nodiscard]] inline auto& RequiredParameters() const noexcept
 				{
 					return required_parameters_;
 				}
@@ -425,7 +425,7 @@ namespace ion::script
 				*/
 
 				//Returns the name of this class
-				[[nodiscard]] inline const auto &Name() const noexcept
+				[[nodiscard]] inline auto& Name() const noexcept
 				{
 					return name_;
 				}
@@ -606,7 +606,7 @@ namespace ion::script
 			//Returns all validate errors from the previous validation
 			//The errors returned are all validation errors found
 			//The validation is okay if no errors returned
-			[[nodiscard]] inline const auto& ValidateErrors() const noexcept
+			[[nodiscard]] inline auto& ValidateErrors() const noexcept
 			{
 				return validate_errors_;
 			}
