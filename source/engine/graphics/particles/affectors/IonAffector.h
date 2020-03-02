@@ -56,8 +56,25 @@ namespace ion::graphics::particles::affectors
 
 		public:
 
+			//Default copy constructor
+			Affector(const Affector&) = default;
+
+			//Default move constructor
+			Affector(Affector&&) = default;
+
 			//Default virtual destructor
 			virtual ~Affector() = default;
+
+
+			/*
+				Operators
+			*/
+
+			//Default copy assignment
+			Affector& operator=(const Affector&) = default;
+
+			//Default move assignment
+			Affector& operator=(Affector&&) = default;
 
 
 			/*

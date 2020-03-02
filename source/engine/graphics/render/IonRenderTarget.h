@@ -53,6 +53,26 @@ namespace ion::graphics::render
 			//Default constructor
 			RenderTarget() = default;
 
+			//Default copy constructor
+			RenderTarget(const RenderTarget&) = default;
+
+			//Default move constructor
+			RenderTarget(RenderTarget&&) = default;
+
+			//Default virtual destructor
+			virtual ~RenderTarget() = default;
+
+
+			/*
+				Operators
+			*/
+
+			//Default copy assignment
+			RenderTarget& operator=(const RenderTarget&) = default;
+
+			//Default move assignment
+			RenderTarget& operator=(RenderTarget&&) = default;
+
 
 			/*
 				Events
