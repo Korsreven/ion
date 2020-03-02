@@ -20,6 +20,8 @@ File:	IonInputController.h
 
 namespace ion::events
 {
+	using graphics::utilities::Vector2;
+
 	namespace input_controller::detail
 	{
 
@@ -32,7 +34,7 @@ namespace ion::events
 	{
 		private:
 
-			graphics::utilities::Vector2 mouse_position_;
+			Vector2 mouse_position_;
 			std::vector<listeners::KeyButton> key_buttons_;
 			std::vector<listeners::MouseButton> mouse_buttons_;
 
@@ -70,17 +72,17 @@ namespace ion::events
 			*/
 
 			//See InputListener::MousePressed for more details
-			void MousePressed(listeners::MouseButton button, graphics::utilities::Vector2 position) noexcept override final;
+			void MousePressed(listeners::MouseButton button, const Vector2 &position) noexcept override final;
 
 			//See InputListener::MouseReleased for more details
-			void MouseReleased(listeners::MouseButton button, graphics::utilities::Vector2 position) noexcept override final;
+			void MouseReleased(listeners::MouseButton button, const Vector2 &position) noexcept override final;
 
 			//See InputListener::MouseMoved for more details
-			void MouseMoved(graphics::utilities::Vector2 position) noexcept override final;
+			void MouseMoved(const Vector2 &position) noexcept override final;
 
 
 			//See InputListener::MouseWheelRolled for more details
-			void MouseWheelRolled(int delta, graphics::utilities::Vector2 position) noexcept override final;
+			void MouseWheelRolled(int delta, const Vector2 &position) noexcept override final;
 
 		public:
 

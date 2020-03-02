@@ -223,27 +223,27 @@ namespace ion::graphics::particles
 			}
 
 			//Sets the position of the emitter to the given vector
-			inline void Position(Vector2 position) noexcept
+			inline void Position(const Vector2 &position) noexcept
 			{
 				position_ = position;
 			}
 
 			//Sets the direction of the emitter to the given vector
-			inline void Direction(Vector2 direction) noexcept
+			inline void Direction(const Vector2 &direction) noexcept
 			{
 				direction_ = direction;
 			}
 
 			//Sets the size of the emitter to the given vector
 			//Only in use if the emitter type is either a box or a ring
-			inline void Size(Vector2 size) noexcept
+			inline void Size(const Vector2 &size) noexcept
 			{
 				size_ = size;
 			}
 
 			//Sets the inner size of the emitter to the given vector
 			//Only in use if the emitter type is either a box or a ring
-			inline void InnerSize(Vector2 inner_size) noexcept
+			inline void InnerSize(const Vector2 &inner_size) noexcept
 			{
 				inner_size_ = inner_size;
 			}
@@ -444,31 +444,31 @@ namespace ion::graphics::particles
 			*/
 
 			//Returns the velocity of each new particle in range [min, max]
-			[[nodiscard]] inline auto ParticleVelocity() const noexcept
+			[[nodiscard]] inline auto& ParticleVelocity() const noexcept
 			{
 				return particle_velocity_;
 			}
 
 			//Returns the size of each new particle in range [min, max]
-			[[nodiscard]] inline auto ParticleSize() const noexcept
+			[[nodiscard]] inline auto& ParticleSize() const noexcept
 			{
 				return particle_size_;
 			}
 
 			//Returns the mass of each new particle in range [min, max]
-			[[nodiscard]] inline auto ParticleMass() const noexcept
+			[[nodiscard]] inline auto& ParticleMass() const noexcept
 			{
 				return particle_mass_;
 			}
 
 			//Returns the solid color of each new particle in range [from, to]
-			[[nodiscard]] inline auto ParticleSolidColor() const noexcept
+			[[nodiscard]] inline auto& ParticleSolidColor() const noexcept
 			{
 				return particle_solid_color_;
 			}
 
 			//Returns the life time of each new particle in range [min, max]
-			[[nodiscard]] inline auto ParticleLifeTime() const noexcept
+			[[nodiscard]] inline auto& ParticleLifeTime() const noexcept
 			{
 				return particle_life_time_;
 			}
@@ -477,7 +477,7 @@ namespace ion::graphics::particles
 			//Returns nullptr if no particle texture is attached
 			[[nodiscard]] inline auto ParticleTexture() const noexcept
 			{
-				return particle_texture_;
+				return particle_texture_.Resource();
 			}
 
 
