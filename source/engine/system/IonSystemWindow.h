@@ -538,7 +538,7 @@ namespace ion::system
 					return std::make_optional(window::detail::get_client_size(*handle_));
 				#endif
 				
-				return std::make_optional<Vector2>();
+				return std::optional<Vector2>{};
 			}
 
 			//Returns the outer size of the window
@@ -550,7 +550,7 @@ namespace ion::system
 					return std::make_optional(window::detail::get_size(*handle_));
 				#endif
 				
-				return std::make_optional<Vector2>();
+				return std::optional<Vector2>{};
 			}
 
 			//Returns the desktop size of the system
@@ -560,7 +560,7 @@ namespace ion::system
 				#ifdef ION_WIN32
 				return std::make_optional(window::detail::get_desktop_size());
 				#else			
-				return std::make_optional<Vector2>();
+				return std::optional<Vector2>{};
 				#endif
 			}
 
@@ -573,7 +573,7 @@ namespace ion::system
 					return std::make_optional(window::detail::get_client_position(*handle_));
 				#endif
 				
-				return std::make_optional<Vector2>();
+				return std::optional<Vector2>{};
 			}
 
 			//Returns the outer position of the window
@@ -585,7 +585,7 @@ namespace ion::system
 					return std::make_optional(window::detail::get_position(*handle_));
 				#endif
 				
-				return std::make_optional<Vector2>();
+				return std::optional<Vector2>{};
 			}
 
 
