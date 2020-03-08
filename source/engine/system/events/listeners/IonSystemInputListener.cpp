@@ -176,25 +176,25 @@ void InputListener::CharacterPressed(char character) noexcept
 	Mouse listener events
 */
 
-void InputListener::MousePressed(MouseButton button, const Vector2 &position) noexcept
+void InputListener::MousePressed(MouseButton button, Vector2 position) noexcept
 {
 	for (auto &listener : this->MouseEventsBase::Listeners())
 		this->MouseEventsBase::Notify(&MouseListener::MousePressed, listener, button, position);
 }
 
-void InputListener::MouseReleased(MouseButton button, const Vector2 &position) noexcept
+void InputListener::MouseReleased(MouseButton button, Vector2 position) noexcept
 {
 	for (auto &listener : this->MouseEventsBase::Listeners())
 		this->MouseEventsBase::Notify(&MouseListener::MouseReleased, listener, button, position);
 }
 
-void InputListener::MouseMoved(const Vector2 &position) noexcept
+void InputListener::MouseMoved(Vector2 position) noexcept
 {
 	for (auto &listener : this->MouseEventsBase::Listeners())
 		this->MouseEventsBase::Notify(&MouseListener::MouseMoved, listener, position);
 }
 
-void InputListener::MouseWheelRolled(int delta, const Vector2 &position) noexcept
+void InputListener::MouseWheelRolled(int delta, Vector2 position) noexcept
 {
 	for (auto &listener : this->MouseEventsBase::Listeners())
 		this->MouseEventsBase::Notify(&MouseListener::MouseWheelRolled, listener, delta, position);

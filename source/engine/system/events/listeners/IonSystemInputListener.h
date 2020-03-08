@@ -98,20 +98,20 @@ namespace ion::system::events::listeners
 
 			//See MouseListener::MousePressed for more details
 			//Calls MousePressed on all MouseListener that subscibes to this input listener
-			virtual void MousePressed(ion::events::listeners::MouseButton button, const Vector2 &position) noexcept override;
+			virtual void MousePressed(ion::events::listeners::MouseButton button, Vector2 position) noexcept override;
 
 			//See MouseListener::MouseReleased for more details
 			//Calls MouseReleased on all MouseListener that subscibes to this input listener
-			virtual void MouseReleased(ion::events::listeners::MouseButton button, const Vector2 &position) noexcept override;
+			virtual void MouseReleased(ion::events::listeners::MouseButton button, Vector2 position) noexcept override;
 
 			//See MouseListener::MouseMoved for more details
 			//Calls MouseMoved on all MouseListener that subscibes to this input listener
-			virtual void MouseMoved(const Vector2 &position) noexcept override;
+			virtual void MouseMoved(Vector2 position) noexcept override;
 
 
 			//See MouseListener::MouseWheelRolled for more details
 			//Calls MouseWheelRolled on all MouseListener that subscibes to this input listener
-			virtual void MouseWheelRolled(int delta, const Vector2 &position) noexcept override;
+			virtual void MouseWheelRolled(int delta, Vector2 position) noexcept override;
 
 		public:
 

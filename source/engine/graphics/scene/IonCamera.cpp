@@ -82,7 +82,7 @@ void change_projection(const Aabb &clipping_plane, real z_near, real z_far, real
 	Events
 */
 
-void Camera::ViewportResized(const Vector2 &size) noexcept
+void Camera::ViewportResized(Vector2 size) noexcept
 {
 
 }

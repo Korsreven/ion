@@ -82,7 +82,7 @@ void InputController::CharacterPressed(char character) noexcept
 	Mouse listener events
 */
 
-void InputController::MousePressed(MouseButton button, const Vector2 &position) noexcept
+void InputController::MousePressed(MouseButton button, Vector2 position) noexcept
 {
 	if (!IsButtonPressed(button))
 	{
@@ -91,7 +91,7 @@ void InputController::MousePressed(MouseButton button, const Vector2 &position) 
 	}
 }
 
-void InputController::MouseReleased(MouseButton button, const Vector2 &position) noexcept
+void InputController::MouseReleased(MouseButton button, Vector2 position) noexcept
 {
 	if (IsButtonPressed(button))
 	{
@@ -100,13 +100,13 @@ void InputController::MouseReleased(MouseButton button, const Vector2 &position)
 	}
 }
 
-void InputController::MouseMoved(const Vector2 &position) noexcept
+void InputController::MouseMoved(Vector2 position) noexcept
 {
 	mouse_position_ = position;
 	InputListener::MouseMoved(position);
 }
 
-void InputController::MouseWheelRolled(int delta, const Vector2 &position) noexcept
+void InputController::MouseWheelRolled(int delta, Vector2 position) noexcept
 {
 	InputListener::MouseWheelRolled(delta, position);
 }

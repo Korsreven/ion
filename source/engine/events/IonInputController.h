@@ -72,17 +72,17 @@ namespace ion::events
 			*/
 
 			//See InputListener::MousePressed for more details
-			void MousePressed(listeners::MouseButton button, const Vector2 &position) noexcept override final;
+			void MousePressed(listeners::MouseButton button, Vector2 position) noexcept override final;
 
 			//See InputListener::MouseReleased for more details
-			void MouseReleased(listeners::MouseButton button, const Vector2 &position) noexcept override final;
+			void MouseReleased(listeners::MouseButton button, Vector2 position) noexcept override final;
 
 			//See InputListener::MouseMoved for more details
-			void MouseMoved(const Vector2 &position) noexcept override final;
+			void MouseMoved(Vector2 position) noexcept override final;
 
 
 			//See InputListener::MouseWheelRolled for more details
-			void MouseWheelRolled(int delta, const Vector2 &position) noexcept override final;
+			void MouseWheelRolled(int delta, Vector2 position) noexcept override final;
 
 		public:
 

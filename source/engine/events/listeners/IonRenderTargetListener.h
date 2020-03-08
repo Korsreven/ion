@@ -25,7 +25,7 @@ namespace ion::events::listeners
 		*/
 
 		//Called when a render target has been resized, with the new size
-		virtual void RenderTargetResized(const graphics::utilities::Vector2 &size) noexcept = 0;
+		virtual void RenderTargetResized(graphics::utilities::Vector2 size) noexcept = 0;
 	};
 } //ion::events::listeners
 

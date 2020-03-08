@@ -44,13 +44,13 @@ namespace ion::events::listeners
 		virtual void WindowActionReceived(WindowAction action) noexcept = 0;
 
 		//Called when a window has been resized, with the new size
-		virtual void WindowResized([[maybe_unused]] const graphics::utilities::Vector2 &size) noexcept
+		virtual void WindowResized([[maybe_unused]] graphics::utilities::Vector2 size) noexcept
 		{
 			//Optional to override
 		}
 
 		//Called when a window has been moved, with the new position
-		virtual void WindowMoved([[maybe_unused]] const graphics::utilities::Vector2 &position) noexcept
+		virtual void WindowMoved([[maybe_unused]] graphics::utilities::Vector2 position) noexcept
 		{
 			//Optional to override
 		}

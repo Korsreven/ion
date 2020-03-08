@@ -75,7 +75,7 @@ namespace ion::graphics::scene
 			*/
 
 			//See ViewportListener::ViewportResized for more details
-			void ViewportResized(const Vector2 &size) noexcept override;
+			void ViewportResized(Vector2 size) noexcept override;
 
 		public:
 

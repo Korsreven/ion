@@ -25,10 +25,10 @@ namespace ion::events::listeners
 		*/
 
 		//Called when a viewport has been resized, with the new size
-		virtual void ViewportResized(const graphics::utilities::Vector2 &size) noexcept = 0;
+		virtual void ViewportResized(graphics::utilities::Vector2 size) noexcept = 0;
 
 		//Called when a viewport has been moved, with the new position
-		virtual void ViewportMoved([[maybe_unused]] const graphics::utilities::Vector2 &position) noexcept
+		virtual void ViewportMoved([[maybe_unused]] graphics::utilities::Vector2 position) noexcept
 		{
 			//Optional to override
 		}
