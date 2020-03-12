@@ -12,60 +12,205 @@ File:	IonViewport.cpp
 
 #include "IonViewport.h"
 
+#include "graphics/IonGraphicsAPI.h"
+#include "types/IonTypes.h"
+
 namespace ion::graphics::render
 {
+
+using namespace viewport;
+using namespace types::type_literals;
 
 namespace viewport::detail
 {
 
-void change_viewport() noexcept
+std::pair<HorizontalAnchorType, VerticalAnchorType> get_anchors(AlignmentType alignment) noexcept
 {
+	switch (alignment)
+	{
+		case AlignmentType::TopLeft:
+		return {HorizontalAnchorType::Left, VerticalAnchorType::Top};
 
+		case AlignmentType::TopRight:
+		return {HorizontalAnchorType::Right, VerticalAnchorType::Top};
+
+		case AlignmentType::BottomLeft:
+		return {HorizontalAnchorType::Left, VerticalAnchorType::Bottom};
+		
+		case AlignmentType::BottomRight:
+		return {HorizontalAnchorType::Right, VerticalAnchorType::Bottom};
+	}
+
+	return {HorizontalAnchorType::Percentage, VerticalAnchorType::Percentage};
+}
+
+Aabb get_aligned_aabb(AlignmentType alignment, const Vector2 &size, const Vector2 &render_target_size) noexcept
+{
+	return Aabb::Size(size,
+		[&]() noexcept
+		{
+			auto half_size = size * 0.5_r;
+			auto [half_width, half_height] = half_size.XY();
+			auto [render_target_width, render_target_height] = render_target_size.XY();
+
+			switch (alignment)
+			{
+				case AlignmentType::TopLeft:
+				return Vector2{half_width, render_target_height - half_height};
+
+				case AlignmentType::TopRight:
+				return Vector2{render_target_width - half_width, render_target_height - half_height};
+
+				case AlignmentType::BottomRight:
+				return Vector2{render_target_width - half_width, half_height};
+
+				case AlignmentType::BottomLeft:
+				default:
+				return Vector2{half_width, half_height};
+			}
+		}());
+}
+
+Vector2 get_adjusted_position(const Vector2 &position, const Vector2 &size, const Vector2 &new_size,
+	HorizontalAnchorType horizontal_anchor_type, VerticalAnchorType vertical_anchor_type) noexcept
+{
+	auto [x, y] = position.XY();
+	auto [width, height] = size.XY();
+	auto [new_width, new_height] = new_size.XY();
+
+	return {
+		[&]() noexcept
+		{
+			switch (horizontal_anchor_type)
+			{
+				case HorizontalAnchorType::Left:
+				return x;
+
+				case HorizontalAnchorType::Right:
+				return new_width - (width - x);
+
+				case HorizontalAnchorType::Percentage:
+				default:
+				return new_width * (x / width);
+			}
+		}(),
+		[&]() noexcept
+		{
+			switch (vertical_anchor_type)
+			{
+				case VerticalAnchorType::Top:
+				return new_height - (height - y);
+
+				case VerticalAnchorType::Bottom:
+				return y;
+
+				case VerticalAnchorType::Percentage:
+				default:
+				return new_height * (y / height);
+			}
+		}()
+	};
+}
+
+
+void change_viewport(const Vector2 &position, const Vector2 &size, const Color &background_color) noexcept
+{
+	auto [x, y] = position.XY();
+	auto [width, height] = size.XY();
+
+	auto gl_x = static_cast<GLint>(x);
+	auto gl_y = static_cast<GLint>(y);
+	auto gl_width = static_cast<GLsizei>(width);
+	auto gl_height = static_cast<GLsizei>(height);
+
+	glViewport(gl_x, gl_y, gl_width, gl_height);
+	glScissor(gl_x, gl_y, gl_width, gl_height);
+	glEnable(GL_SCISSOR_TEST);
+
+	auto [r, g, b, a] = background_color.RGBA();
+	glClearDepth(1.0);
+	glClearColor(r, g, b, a);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 } //viewport::detail
 
 
-//Protected
+//Private
+
+/*
+	Notifying
+*/
+
+void Viewport::NotifyViewportResized(const Vector2 &size) noexcept
+{
+	for (auto &listener : Listeners())
+		Notify(&events::listeners::ViewportListener::ViewportResized, listener, size);
+}
+
+void Viewport::NotifyViewportMoved(const Vector2 &position) noexcept
+{
+	for (auto &listener : Listeners())
+		Notify(&events::listeners::ViewportListener::ViewportMoved, listener, position);
+}
+
 
 /*
 	Events
 */
 
-void Viewport::RenderTargetResized(const Vector2 &size) noexcept
+void Viewport::RenderTargetResized(Vector2 size) noexcept
 {
-
+	auto [min, max] = bounds_.MinMax();
+	Bounds({detail::get_adjusted_position(min, render_target_size_, size, left_anchor_, bottom_anchor_),
+			detail::get_adjusted_position(max, render_target_size_, size, right_anchor_, top_anchor_)});
+	render_target_size_ = size;
 }
 
 
 //Public
 
-Viewport::Viewport(const std::optional<real> &x, const std::optional<real> &y,
-	const std::optional<real> &width, const std::optional<real> &height) noexcept :
-	
-	x_{x},
-	y_{y},
-	width_{width},
-	height_{height}
+Viewport::Viewport(const Aabb &bounds) noexcept :
+
+	ListeningChannel{events::listeners::listening_channel::SubscriptionContract::NonCancelable},
+	bounds_{bounds}
 {
 	//Empty
 }
 
-Viewport::Viewport(RenderTarget &render_target) noexcept
+Viewport::Viewport(RenderTarget &render_target) noexcept :
+
+	ListeningChannel{render_target, events::listeners::listening_channel::SubscriptionContract::NonCancelable},
+	bounds_{graphics::utilities::vector2::Zero, render_target.Size()},
+	render_target_size_{render_target.Size()}
 {
-	render_target.Subscribe(*this);
+	//Empty
 }
 
-Viewport::Viewport(RenderTarget &render_target, 
-	const std::optional<real> &x, const std::optional<real> &y,
-	const std::optional<real> &width, const std::optional<real> &height) noexcept :
+Viewport::Viewport(RenderTarget &render_target, const Aabb &bounds) noexcept :
 
-	x_{x},
-	y_{y},
-	width_{width},
-	height_{height}
+	ListeningChannel{render_target, events::listeners::listening_channel::SubscriptionContract::NonCancelable},
+	bounds_{bounds},
+	render_target_size_{render_target.Size()}
 {
-	render_target.Subscribe(*this);
+	//Empty
+}
+
+Viewport::Viewport(RenderTarget &render_target, const Aabb &bounds,
+	HorizontalAnchorType left_anchor, HorizontalAnchorType right_anchor,
+	VerticalAnchorType top_anchor, VerticalAnchorType bottom_anchor) noexcept :
+
+	ListeningChannel{render_target, events::listeners::listening_channel::SubscriptionContract::NonCancelable},
+	bounds_{bounds},
+
+	left_anchor_{left_anchor},
+	right_anchor_{right_anchor},
+	top_anchor_{top_anchor},
+	bottom_anchor_{bottom_anchor},
+
+	render_target_size_{render_target.Size()}
+{
+	//Empty
 }
 
 
@@ -73,9 +218,57 @@ Viewport::Viewport(RenderTarget &render_target,
 	Static viewport conversions
 */
 
-Viewport Viewport::Client(RenderTarget &render_target) noexcept
+Viewport Viewport::Aligned(RenderTarget &render_target, AlignmentType alignment, const Vector2 &size) noexcept
 {
-	return {render_target, {}, {}, {}, {}};
+	auto [x_anchor, y_anchor] = detail::get_anchors(alignment);
+	return {render_target, detail::get_aligned_aabb(alignment, size, render_target.Size()), x_anchor, x_anchor, y_anchor, y_anchor};
+}
+
+Viewport Viewport::Aligned(RenderTarget &render_target, AlignmentType alignment, real width_percent, real height_percent) noexcept
+{
+	auto [width, height] = render_target.Size().XY();
+	return {render_target, detail::get_aligned_aabb(alignment, {width * width_percent, height * height_percent}, render_target.Size())};
+}
+
+
+Viewport Viewport::TopLeftAligned(RenderTarget &render_target, const Vector2 &size) noexcept
+{
+	return Aligned(render_target, AlignmentType::TopLeft, size);
+}
+
+Viewport Viewport::TopLeftAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept
+{
+	return Aligned(render_target, AlignmentType::TopLeft, width_percent, height_percent);
+}
+
+Viewport Viewport::TopRightAligned(RenderTarget &render_target, const Vector2 &size) noexcept
+{
+	return Aligned(render_target, AlignmentType::TopRight, size);
+}
+
+Viewport Viewport::TopRightAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept
+{
+	return Aligned(render_target, AlignmentType::TopRight, width_percent, height_percent);
+}
+
+Viewport Viewport::BottomLeftAligned(RenderTarget &render_target, const Vector2 &size) noexcept
+{
+	return Aligned(render_target, AlignmentType::BottomLeft, size);
+}
+
+Viewport Viewport::BottomLeftAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept
+{
+	return Aligned(render_target, AlignmentType::BottomLeft, width_percent, height_percent);
+}
+
+Viewport Viewport::BottomRightAligned(RenderTarget &render_target, const Vector2 &size) noexcept
+{
+	return Aligned(render_target, AlignmentType::BottomRight, size);
+}
+
+Viewport Viewport::BottomRightAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept
+{
+	return Aligned(render_target, AlignmentType::BottomRight, width_percent, height_percent);
 }
 
 } //ion::graphics::render

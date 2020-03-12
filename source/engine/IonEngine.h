@@ -19,6 +19,7 @@ File:	IonEngine.h
 #include "events/listeners/IonFrameListener.h"
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/render/IonRenderWindow.h"
+#include "graphics/render/IonViewport.h"
 #include "types/IonTypes.h"
 
 namespace ion
@@ -38,6 +39,11 @@ namespace ion
 		private:
 
 			std::optional<graphics::render::RenderWindow> render_window_;
+
+			std::optional<graphics::render::Viewport> viewport_;
+			std::optional<graphics::render::Viewport> viewport2_;
+			std::optional<graphics::render::Viewport> viewport3_;
+			std::optional<graphics::render::Viewport> viewport4_;
 
 
 			/*

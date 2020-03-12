@@ -13,171 +13,215 @@ File:	IonViewport.h
 #ifndef ION_VIEWPORT_H
 #define ION_VIEWPORT_H
 
-#include <optional>
 #include <utility>
 
 #include "events/listeners/IonListenerInterface.h"
+#include "events/listeners/IonListeningChannel.h"
 #include "events/listeners/IonRenderTargetListener.h"
 #include "events/listeners/IonViewportListener.h"
 #include "graphics/render/IonRenderTarget.h"
+#include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 
 namespace ion::graphics::render
 {
+	using graphics::utilities::Aabb;
 	using graphics::utilities::Color;
 	using graphics::utilities::Vector2;
 
 	namespace viewport
 	{
-		enum class AnchorType
+		enum class AlignmentType
 		{
-			Top,
-			Left,
-			Right,
-			Bottom
+			TopLeft,
+			TopRight,
+			BottomLeft,
+			BottomRight
 		};
 
-		enum class OrientationMode
+		enum class HorizontalAnchorType
 		{
-			Degree_0,
-			Degree_90_CW,
-			Degree_90_CCW,
-			Degree_180
+			Left,
+			Right,
+			Percentage
+		};
+
+		enum class VerticalAnchorType
+		{
+			Top,
+			Bottom,
+			Percentage
 		};
 
 		namespace detail
 		{
-			void change_viewport() noexcept;
+			std::pair<HorizontalAnchorType, VerticalAnchorType> get_anchors(AlignmentType alignment) noexcept;
+			Aabb get_aligned_aabb(AlignmentType alignment, const Vector2 &size, const Vector2 &render_target_size) noexcept;
+			Vector2 get_adjusted_position(const Vector2 &position, const Vector2 &size, const Vector2 &new_size,
+				HorizontalAnchorType horizontal_anchor_type, VerticalAnchorType vertical_anchor_type) noexcept;
+			
+			void change_viewport(const Vector2 &position, const Vector2 &size, const Color &background_color) noexcept;
 		} //detail
 	} //viewport
 
 
 	class Viewport final :
 		public events::listeners::ListenerInterface<events::listeners::ViewportListener>,
-		protected events::listeners::RenderTargetListener
+		protected events::listeners::ListeningChannel<graphics::render::RenderTarget>
 	{
 		private:
 
-			std::optional<real> x_;
-			std::optional<real> y_;
-			std::optional<real> width_;
-			std::optional<real> height_;
+			Aabb bounds_;
+
+			viewport::HorizontalAnchorType left_anchor_ = viewport::HorizontalAnchorType::Percentage;
+			viewport::HorizontalAnchorType right_anchor_ = viewport::HorizontalAnchorType::Percentage;
+			viewport::VerticalAnchorType top_anchor_ = viewport::VerticalAnchorType::Percentage;		
+			viewport::VerticalAnchorType bottom_anchor_ = viewport::VerticalAnchorType::Percentage;
 
 			Color background_color_ = utilities::color::Black;
-			viewport::OrientationMode orientation_ = viewport::OrientationMode::Degree_0;
+			Vector2 render_target_size_;
 
-		protected:
+
+			/*
+				Notifying
+			*/
+
+			void NotifyViewportResized(const Vector2 &size) noexcept;
+			void NotifyViewportMoved(const Vector2 &position) noexcept;
+
 
 			/*
 				Events
 			*/
 
 			//See RenderTarget::RenderTargetResized for more details
-			void RenderTargetResized(const Vector2 &size) noexcept override;
+			void RenderTargetResized(Vector2 size) noexcept override;
 
 		public:
 
 			//Default constructor
 			Viewport() = default;
 
-			//Construct a viewport with the given extents
-			Viewport(const std::optional<real> &x, const std::optional<real> &y,
-				const std::optional<real> &width, const std::optional<real> &height) noexcept;
+			//Construct a viewport with the given bounds (region)
+			Viewport(const Aabb &bounds) noexcept;
 
 			//Construct a viewport connected to a given render target
 			Viewport(RenderTarget &render_target) noexcept;
 
-			//Construct a viewport connected to a given render target and with the given extents
-			Viewport(RenderTarget &render_target,
-				const std::optional<real> &x, const std::optional<real> &y,
-				const std::optional<real> &width, const std::optional<real> &height) noexcept;
+			//Construct a viewport connected to a given render target and with the given bounds (region)
+			Viewport(RenderTarget &render_target, const Aabb &bounds) noexcept;
+
+			//Construct a viewport connected to a given render target and with the given bounds (region) and anchors
+			Viewport(RenderTarget &render_target, const Aabb &bounds,
+				viewport::HorizontalAnchorType left_anchor, viewport::HorizontalAnchorType right_anchor,
+				viewport::VerticalAnchorType top_anchor, viewport::VerticalAnchorType bottom_anchor) noexcept;
 
 
 			/*
 				Static viewport conversions
 			*/
 
-			[[nodiscard]] static Viewport Client(RenderTarget &render_target) noexcept;
+			//Returns a new aligned viewport from the given render target, alignment and size
+			[[nodiscard]] static Viewport Aligned(RenderTarget &render_target, viewport::AlignmentType alignment, const Vector2 &size) noexcept;
+
+			//Returns a new aligned viewport from the given render target, alignment and width/height percent
+			//Width and height should be in range [0.0, 1.0]
+			[[nodiscard]] static Viewport Aligned(RenderTarget &render_target, viewport::AlignmentType alignment, real width_percent, real height_percent) noexcept;
+
+
+			//Returns a new top left aligned viewport from the given render target and size
+			[[nodiscard]] static Viewport TopLeftAligned(RenderTarget &render_target, const Vector2 &size) noexcept;
+
+			//Returns a new top left aligned viewport from the given render target and width/height percent
+			//Width and height should be in range [0.0, 1.0]
+			[[nodiscard]] static Viewport TopLeftAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept;
+
+			//Returns a new top right aligned viewport from the given render target and size
+			[[nodiscard]] static Viewport TopRightAligned(RenderTarget &render_target, const Vector2 &size) noexcept;
+
+			//Returns a new top right aligned viewport from the given render target and width/height percent
+			//Width and height should be in range [0.0, 1.0]
+			[[nodiscard]] static Viewport TopRightAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept;
+
+			//Returns a new bottom left aligned viewport from the given render target and size
+			[[nodiscard]] static Viewport BottomLeftAligned(RenderTarget &render_target, const Vector2 &size) noexcept;
+
+			//Returns a new bottom left aligned viewport from the given render target and width/height percent
+			//Width and height should be in range [0.0, 1.0]
+			[[nodiscard]] static Viewport BottomLeftAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept;
+
+			//Returns a new bottom right aligned viewport from the given render target and size
+			[[nodiscard]] static Viewport BottomRightAligned(RenderTarget &render_target, const Vector2 &size) noexcept;
+
+			//Returns a new bottom right aligned viewport from the given render target and width/height percent
+			//Width and height should be in range [0.0, 1.0]
+			[[nodiscard]] static Viewport BottomRightAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept;
 
 
 			/*
 				Modifiers
 			*/
 
-			//
-			inline void X(const std::optional<real> &x) noexcept
+			//Sets the viewport bounds (region)
+			inline void Bounds(const Aabb &bounds) noexcept
 			{
-				x_ = x;
-			}
-			
-			//
-			inline void Y(const std::optional<real> &y) noexcept
-			{
-				y_ = y;
+				if (bounds_ != bounds)
+				{
+					auto resized = bounds_.ToSize() != bounds.ToSize();
+					auto moved = bounds_.Min() != bounds.Min();		
+
+					bounds_ = bounds;
+
+					if (resized)
+						NotifyViewportResized(bounds_.ToSize());
+					if (moved)
+						NotifyViewportMoved(bounds_.Min());
+				}
 			}
 
-			//
-			inline void Width(const std::optional<real> &width) noexcept
+
+			//Sets the left anchor of the viewport to the given horizontal anchor type
+			inline void LeftAnchor(viewport::HorizontalAnchorType anchor_type) noexcept
 			{
-				width_ = width;
+				if (left_anchor_ != anchor_type)
+				{
+					left_anchor_ = anchor_type;
+				}
 			}
 
-			//
-			inline void Height(const std::optional<real> &height) noexcept
+			//Sets the right anchor of the viewport to the given horizontal anchor type
+			inline void RightAnchor(viewport::HorizontalAnchorType anchor_type) noexcept
 			{
-				height_ = height;
+				if (right_anchor_ != anchor_type)
+				{
+					right_anchor_  = anchor_type;
+				}
 			}
 
-			//
+			//Sets the top anchor of the viewport to the given vertical anchor type
+			inline void TopAnchor(viewport::VerticalAnchorType anchor_type) noexcept
+			{
+				if (top_anchor_ != anchor_type)
+				{
+					top_anchor_  = anchor_type;
+				}
+			}
+
+			//Sets the bottom anchor of the viewport to the given vertical anchor type
+			inline void BottomAnchor(viewport::VerticalAnchorType anchor_type) noexcept
+			{
+				if (bottom_anchor_ != anchor_type)
+				{
+					bottom_anchor_  = anchor_type;
+				}
+			}
+
+
+			//Sets the background (clear) color of the viewport to the given color
 			inline void BackgroundColor(const Color &color) noexcept
 			{
 				background_color_ = color;
-			}
-
-			//
-			inline void Orientation(viewport::OrientationMode orientation) noexcept
-			{
-				orientation_ = orientation;
-			}
-
-
-			//
-			inline void Position(const std::optional<real> &x, const std::optional<real> &y) noexcept
-			{
-				X(x);
-				Y(y);
-			}
-
-			//
-			inline void Position(const std::optional<Vector2> &position) noexcept
-			{
-				if (position)
-				{
-					auto [x, y] = position->XY();
-					Position(x, y);
-				}
-				else
-					Position({}, {});
-			}
-
-			//
-			inline void Size(const std::optional<real> &width, const std::optional<real> &height) noexcept
-			{
-				Width(width);
-				Height(height);
-			}
-
-			//
-			inline void Size(const std::optional<Vector2> &size) noexcept
-			{
-				if (size)
-				{
-					auto [width, height] = size->XY();
-					Size(width, height);
-				}
-				else
-					Size({}, {});
 			}
 
 
@@ -185,70 +229,49 @@ namespace ion::graphics::render
 				Observers
 			*/
 
-			//
-			[[nodiscard]] inline auto& X() const noexcept
+			//Returns the viewport bounds (region)
+			[[nodiscard]] inline auto& Bounds() const noexcept
 			{
-				return x_;
+				return bounds_;
 			}
 
-			//
-			[[nodiscard]] inline auto& Y() const noexcept
+
+			//Returns the left anchor of the viewport
+			[[nodiscard]] inline auto LeftAnchor() const noexcept
 			{
-				return y_;
+				return left_anchor_ ;
 			}
 
-			//
-			[[nodiscard]] inline auto& Width() const noexcept
+			//Returns the right anchor of the viewport
+			[[nodiscard]] inline auto RightAnchor() const noexcept
 			{
-				return width_;
+				return right_anchor_ ;
 			}
 
-			//
-			[[nodiscard]] inline auto& Height() const noexcept
+			//Returns the top anchor of the viewport
+			[[nodiscard]] inline auto TopAnchor() const noexcept
 			{
-				return height_;
+				return top_anchor_ ;
 			}
 
-			//
+			//Returns the bottom anchor of the viewport
+			[[nodiscard]] inline auto BottomAnchor() const noexcept
+			{
+				return bottom_anchor_ ;
+			}
+
+
+			//Returns the background (clear) color of the viewport
 			[[nodiscard]] inline auto& BackgroundColor() const noexcept
 			{
 				return background_color_;
 			}
 
-			//
-			[[nodiscard]] inline auto Orientation() const noexcept
+
+			//Change rendering context to this viewport
+			inline void Change() noexcept
 			{
-				return orientation_;
-			}
-
-
-			//
-			[[nodiscard]] inline auto Position() const noexcept
-			{
-				return std::pair{x_, y_};
-			}
-
-			//
-			[[nodiscard]] inline auto Size() const noexcept
-			{
-				return std::pair{width_, height_};
-			}
-
-
-			/*
-				Viewport
-			*/
-
-			//
-			[[nodiscard]] inline auto ActualPosition() const noexcept
-			{
-				return Vector2{};
-			}
-
-			//
-			[[nodiscard]] inline auto ActualSize() const noexcept
-			{
-				return Vector2{};
+				viewport::detail::change_viewport(bounds_.Min(), bounds_.ToSize(), background_color_);
 			}
 	};
 } //ion::graphics

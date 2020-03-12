@@ -14,6 +14,7 @@ File:	IonEngine.cpp
 
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/utilities/IonColor.h"
+#include "system/IonSystemAPI.h"
 
 namespace ion
 {
@@ -54,23 +55,15 @@ bool Engine::NotifyFrameEnded(duration time) noexcept
 }
 
 
-bool Engine::UpdateFrame() noexcept
+void Draw()
 {
-	static bool syncronize = false; //TEMP
-
-	if (!NotifyFrameStarted(0.0_sec))
-		return false;
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
-
-	glBegin(GL_QUADS);
+	/*glBegin(GL_QUADS);
 	glColor3fv(graphics::utilities::color::Beige.Channels());
 	glVertex2f(-1.0f, 1.0f);
 	glVertex2f(-1.0f, -1.0f);
 	glVertex2f(1.0f, -1.0f);
 	glVertex2f(1.0f, 1.0f);
-	glEnd();
+	glEnd();*/
 
 	glBegin(GL_QUADS);
 	glColor3fv(graphics::utilities::color::Red.Channels());
@@ -95,7 +88,34 @@ bool Engine::UpdateFrame() noexcept
 	glVertex2f(1.0f, -1.0f);
 	glVertex2f(1.0f, -0.8f);
 	glEnd();
+}
 
+bool Engine::UpdateFrame() noexcept
+{
+	static bool syncronize = false; //TEMP
+
+	if (!NotifyFrameStarted(0.0_sec))
+		return false;
+
+	viewport_->Change();
+	//camera_->Update();
+	glLoadIdentity();
+	Draw();
+
+	viewport2_->Change();
+	//camera_->Update();
+	glLoadIdentity();
+	Draw();
+
+	viewport3_->Change();
+	//camera_->Update();
+	glLoadIdentity();
+	Draw();
+
+	viewport4_->Change();
+	//camera_->Update();
+	glLoadIdentity();
+	Draw();
 
 	if (syncronize)
 		glFinish();
@@ -116,6 +136,7 @@ int Engine::Start() noexcept
 	if (!render_window_ || !render_window_->Created())
 		return 1;
 
+
 	if (glewInit() != GLEW_OK)
 		return 1;
 
@@ -130,9 +151,8 @@ int Engine::Start() noexcept
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-
+	#ifdef ION_WIN32
 	MSG message;
 
 	//Main loop
@@ -151,6 +171,9 @@ int Engine::Start() noexcept
 	}
 
 	return static_cast<int>(message.wParam);
+	#else
+	return 0;
+	#endif
 }
 
 
@@ -160,7 +183,21 @@ int Engine::Start() noexcept
 
 graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow &&render_window) noexcept
 {
-	return render_window_.emplace(std::move(render_window));
+	render_window_.emplace(std::move(render_window));
+
+	viewport_.emplace(graphics::render::Viewport::TopLeftAligned(*render_window_, 0.5_r, 0.5_r));
+	viewport_->BackgroundColor(graphics::utilities::color::Beige);
+
+	viewport2_.emplace(graphics::render::Viewport::TopRightAligned(*render_window_, 0.5_r, 0.5_r));
+	viewport2_->BackgroundColor(graphics::utilities::color::Bisque);
+
+	viewport3_.emplace(graphics::render::Viewport::BottomLeftAligned(*render_window_, 0.5_r, 0.5_r));
+	viewport3_->BackgroundColor(graphics::utilities::color::BlanchedAlmond);
+
+	viewport4_.emplace(graphics::render::Viewport::BottomRightAligned(*render_window_, 0.5_r, 0.5_r));
+	viewport4_->BackgroundColor(graphics::utilities::color::BurlyWood);
+
+	return *render_window_;
 }
 
 } //ion
