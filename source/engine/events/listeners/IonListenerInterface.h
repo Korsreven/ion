@@ -229,7 +229,7 @@ namespace ion::events::listeners
 
 				//Listener not already subscribed
 				if (iter == std::end(listeners_) &&
-					NotifyUnsubscribable(listener))
+					NotifySubscribable(listener))
 				{
 					listeners_.push_back(&listener);
 					NotifySubscribed(listener);

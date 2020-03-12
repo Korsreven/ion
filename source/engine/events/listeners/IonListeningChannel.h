@@ -65,9 +65,9 @@ namespace ion::events::listeners
 
 	template <typename T,
 		typename = std::enable_if_t<listening_channel::detail::has_listener_type_v<T>>>
-	class ListeningChannel : protected T::listener_type
+	class ListeningChannel : public T::listener_type
 	{
-		static_assert(std::is_base_of_v(events::listeners::ListenerInterface<typename T::listener_type>, T));
+		static_assert(std::is_base_of_v<events::listeners::ListenerInterface<typename T::listener_type>, T>);
 
 		private:
 
@@ -75,16 +75,29 @@ namespace ion::events::listeners
 			listening_channel::SubscriptionContract contract_ = listening_channel::SubscriptionContract::Cancelable;
 
 
-			inline void DoSubscribe(T &publisher)
+			inline auto DoSubscribe(T &publisher)
 			{
 				if (!publisher_)
+				{
 					publisher_ = listening_channel::detail::subscribe_to_publisher(publisher, *this);
+					return !!publisher_;
+				}
+				else
+					return false;
 			}
 
-			inline void DoUnsubscribe() noexcept
+			inline auto DoUnsubscribe(bool forced = false) noexcept
 			{
+				if (forced)
+					this->Listening(false);
+
 				if (publisher_)
+				{
 					publisher_ = listening_channel::detail::unsubscribe_from_publisher(*publisher_, *this);
+					return !publisher_;
+				}
+				else
+					return false;
 			}
 
 		protected:
@@ -138,14 +151,14 @@ namespace ion::events::listeners
 				publisher_(rhs.publisher_ ? listening_channel::detail::subscribe_to_publisher(*rhs.publisher_, *this) : nullptr),
 				contract_{rhs.contract_}
 			{
-				rhs.DoUnsubscribe();
+				if (publisher_)
+					rhs.DoUnsubscribe(true);
 			}
 
 			//Destructor
 			~ListeningChannel() noexcept
 			{
-				this->Listening(false);
-				DoUnsubscribe(); //Force
+				DoUnsubscribe(true);
 			}
 
 
@@ -178,8 +191,8 @@ namespace ion::events::listeners
 
 					if (rhs.publisher_)
 					{
-						DoSubscribe(*rhs.publisher_);
-						rhs.DoUnsubscribe();
+						if (DoSubscribe(*rhs.publisher_))
+							rhs.DoUnsubscribe(true);
 					}
 
 					contract_ = rhs.contract_;
@@ -196,7 +209,7 @@ namespace ion::events::listeners
 			//Start a new subscription with the given publisher
 			//If another publisher is being subscribed to, that publisher is unsubscribed automatically (if possible by the contract)
 			//Returns true if the subscription has successfully been started, or change contract
-			inline auto StartSubscription(T &publisher) noexcept
+			inline auto StartSubscription(T &publisher)
 			{
 				if (publisher_ != &publisher)
 				{
@@ -217,7 +230,7 @@ namespace ion::events::listeners
 			}
 
 			//Sets the subscription contract for this listening channel
-			inline void Contract(listening_channel::SubscriptionContract contract)
+			inline void Contract(listening_channel::SubscriptionContract contract) noexcept
 			{
 				contract_ = contract;
 			}
