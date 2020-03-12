@@ -156,14 +156,37 @@ void Viewport::NotifyViewportMoved(const Vector2 &position) noexcept
 
 
 /*
+	Bounds
+*/
+
+Aabb Viewport::ResizedBounds(const Vector2 &size, const Vector2 &new_size) noexcept
+{
+	auto [min, max] = bounds_.MinMax();
+	return {detail::get_adjusted_position(min, size, new_size, left_anchor_, bottom_anchor_),
+			detail::get_adjusted_position(max, size, new_size, right_anchor_, top_anchor_)};
+}
+
+void Viewport::UpdateBounds(const Aabb &bounds) noexcept
+{
+	auto resized = bounds_.ToSize() != bounds.ToSize();
+	auto moved = bounds_.Min() != bounds.Min();		
+
+	bounds_ = bounds;
+
+	if (resized)
+		NotifyViewportResized(bounds_.ToSize());
+	if (moved)
+		NotifyViewportMoved(bounds_.Min());
+}
+
+
+/*
 	Events
 */
 
 void Viewport::RenderTargetResized(Vector2 size) noexcept
 {
-	auto [min, max] = bounds_.MinMax();
-	Bounds({detail::get_adjusted_position(min, render_target_size_, size, left_anchor_, bottom_anchor_),
-			detail::get_adjusted_position(max, render_target_size_, size, right_anchor_, top_anchor_)});
+	UpdateBounds(ResizedBounds(render_target_size_, size));
 	render_target_size_ = size;
 }
 
@@ -228,6 +251,27 @@ Viewport Viewport::Aligned(RenderTarget &render_target, AlignmentType alignment,
 {
 	auto [width, height] = render_target.Size().XY();
 	return {render_target, detail::get_aligned_aabb(alignment, {width * width_percent, height * height_percent}, render_target.Size())};
+}
+
+
+Viewport Viewport::LeftAligned(RenderTarget &render_target, real width_percent) noexcept
+{
+	return Aligned(render_target, AlignmentType::BottomLeft, width_percent, 1.0_r);
+}
+
+Viewport Viewport::RightAligned(RenderTarget &render_target, real width_percent) noexcept
+{
+	return Aligned(render_target, AlignmentType::BottomRight, width_percent, 1.0_r);
+}
+
+Viewport Viewport::TopAligned(RenderTarget &render_target, real height_percent) noexcept
+{
+	return Aligned(render_target, AlignmentType::TopLeft, 1.0_r, height_percent);
+}
+
+Viewport Viewport::BottomAligned(RenderTarget &render_target, real height_percent) noexcept
+{
+	return Aligned(render_target, AlignmentType::BottomLeft, 1.0_r, height_percent);
 }
 
 

@@ -107,16 +107,6 @@ bool Engine::UpdateFrame() noexcept
 	glLoadIdentity();
 	Draw();
 
-	viewport3_->Change();
-	//camera_->Update();
-	glLoadIdentity();
-	Draw();
-
-	viewport4_->Change();
-	//camera_->Update();
-	glLoadIdentity();
-	Draw();
-
 	if (syncronize)
 		glFinish();
 	else
@@ -185,17 +175,11 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 {
 	render_window_.emplace(std::move(render_window));
 
-	viewport_.emplace(graphics::render::Viewport::TopLeftAligned(*render_window_, 0.5_r, 0.5_r));
+	viewport_.emplace(graphics::render::Viewport::LeftAligned(*render_window_, 0.5_r));
 	viewport_->BackgroundColor(graphics::utilities::color::Beige);
 
-	viewport2_.emplace(graphics::render::Viewport::TopRightAligned(*render_window_, 0.5_r, 0.5_r));
+	viewport2_.emplace(graphics::render::Viewport::RightAligned(*render_window_, 0.5_r));
 	viewport2_->BackgroundColor(graphics::utilities::color::Bisque);
-
-	viewport3_.emplace(graphics::render::Viewport::BottomLeftAligned(*render_window_, 0.5_r, 0.5_r));
-	viewport3_->BackgroundColor(graphics::utilities::color::BlanchedAlmond);
-
-	viewport4_.emplace(graphics::render::Viewport::BottomRightAligned(*render_window_, 0.5_r, 0.5_r));
-	viewport4_->BackgroundColor(graphics::utilities::color::BurlyWood);
 
 	return *render_window_;
 }

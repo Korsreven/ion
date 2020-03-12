@@ -42,8 +42,6 @@ namespace ion
 
 			std::optional<graphics::render::Viewport> viewport_;
 			std::optional<graphics::render::Viewport> viewport2_;
-			std::optional<graphics::render::Viewport> viewport3_;
-			std::optional<graphics::render::Viewport> viewport4_;
 
 
 			/*

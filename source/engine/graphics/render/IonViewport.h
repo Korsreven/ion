@@ -92,6 +92,14 @@ namespace ion::graphics::render
 
 
 			/*
+				Bounds
+			*/
+
+			Aabb ResizedBounds(const Vector2 &size, const Vector2 &new_size) noexcept;
+			void UpdateBounds(const Aabb &bounds) noexcept;
+
+
+			/*
 				Events
 			*/
 
@@ -128,6 +136,19 @@ namespace ion::graphics::render
 			//Returns a new aligned viewport from the given render target, alignment and width/height percent
 			//Width and height should be in range [0.0, 1.0]
 			[[nodiscard]] static Viewport Aligned(RenderTarget &render_target, viewport::AlignmentType alignment, real width_percent, real height_percent) noexcept;
+
+
+			//Returns a new left aligned viewport from the given render target and width percent
+			[[nodiscard]] static Viewport LeftAligned(RenderTarget &render_target, real width_percent) noexcept;
+
+			//Returns a new right aligned viewport from the given render target and width percent
+			[[nodiscard]] static Viewport RightAligned(RenderTarget &render_target, real width_percent) noexcept;
+
+			//Returns a new top aligned viewport from the given render target and height percent
+			[[nodiscard]] static Viewport TopAligned(RenderTarget &render_target, real height_percent) noexcept;
+
+			//Returns a new bottom aligned viewport from the given render target and height percent
+			[[nodiscard]] static Viewport BottomAligned(RenderTarget &render_target, real height_percent) noexcept;
 
 
 			//Returns a new top left aligned viewport from the given render target and size
@@ -167,54 +188,32 @@ namespace ion::graphics::render
 			inline void Bounds(const Aabb &bounds) noexcept
 			{
 				if (bounds_ != bounds)
-				{
-					auto resized = bounds_.ToSize() != bounds.ToSize();
-					auto moved = bounds_.Min() != bounds.Min();		
-
-					bounds_ = bounds;
-
-					if (resized)
-						NotifyViewportResized(bounds_.ToSize());
-					if (moved)
-						NotifyViewportMoved(bounds_.Min());
-				}
+					UpdateBounds(bounds);
 			}
 
 
 			//Sets the left anchor of the viewport to the given horizontal anchor type
 			inline void LeftAnchor(viewport::HorizontalAnchorType anchor_type) noexcept
 			{
-				if (left_anchor_ != anchor_type)
-				{
-					left_anchor_ = anchor_type;
-				}
+				left_anchor_ = anchor_type;
 			}
 
 			//Sets the right anchor of the viewport to the given horizontal anchor type
 			inline void RightAnchor(viewport::HorizontalAnchorType anchor_type) noexcept
 			{
-				if (right_anchor_ != anchor_type)
-				{
-					right_anchor_  = anchor_type;
-				}
+				right_anchor_  = anchor_type;
 			}
 
 			//Sets the top anchor of the viewport to the given vertical anchor type
 			inline void TopAnchor(viewport::VerticalAnchorType anchor_type) noexcept
 			{
-				if (top_anchor_ != anchor_type)
-				{
-					top_anchor_  = anchor_type;
-				}
+				top_anchor_  = anchor_type;
 			}
 
 			//Sets the bottom anchor of the viewport to the given vertical anchor type
 			inline void BottomAnchor(viewport::VerticalAnchorType anchor_type) noexcept
 			{
-				if (bottom_anchor_ != anchor_type)
-				{
-					bottom_anchor_  = anchor_type;
-				}
+				bottom_anchor_  = anchor_type;
 			}
 
 
