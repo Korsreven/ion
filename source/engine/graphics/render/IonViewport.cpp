@@ -131,6 +131,8 @@ void change_viewport(const Vector2 &position, const Vector2 &size, const Color &
 	glClearDepth(1.0);
 	glClearColor(r, g, b, a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glDisable(GL_SCISSOR_TEST);
 }
 
 } //viewport::detail

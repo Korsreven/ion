@@ -132,9 +132,12 @@ int Engine::Start() noexcept
 
 	glShadeModel(GL_SMOOTH);
 
+	//Depth buffer setup
+	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LEQUAL);
+	glDepthRange(0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
-
+	
 	glAlphaFunc(GL_GREATER, 0.0f); //Only draw pixels greater than 0% alpha
 	glEnable(GL_ALPHA_TEST);
 
