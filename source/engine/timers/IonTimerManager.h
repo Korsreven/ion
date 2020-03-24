@@ -50,14 +50,17 @@ namespace ion::timers
 			Creating
 		*/
 
-		//
-		[[nodiscard]] Timer& CreateTimer(duration interval);
+		//Creates a timer with the given interval
+		//Returns a reference to the newly created timer
+		Timer& CreateTimer(duration interval);
 
-		//
-		[[nodiscard]] Timer& CreateTimer(duration interval, events::Callback<void, Timer&> on_tick);
+		//Creates a timer with the given interval and callback
+		//Returns a reference to the newly created timer
+		Timer& CreateTimer(duration interval, events::Callback<void, Timer&> on_tick);
 
-		//
-		[[nodiscard]] Timer& CreateTimer(const Timer &timer);
+		//Creates a copy of the given timer
+		//Returns a reference to the newly created timer
+		Timer& CreateTimer(const Timer &timer);
 
 
 		/*
