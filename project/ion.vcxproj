@@ -171,6 +171,7 @@
     <ClCompile Include="..\source\engine\graphics\particles\IonEmitter.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonParticle.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonParticleSystem.cpp" />
+    <ClCompile Include="..\source\engine\graphics\render\IonFrustum.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonRenderTarget.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonRenderWindow.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonViewport.cpp" />
@@ -229,6 +230,7 @@
     <ClInclude Include="..\source\engine\events\IonCallback.h" />
     <ClInclude Include="..\source\engine\events\IonInputController.h" />
     <ClInclude Include="..\source\engine\events\IonRecurringCallback.h" />
+    <ClInclude Include="..\source\engine\events\listeners\IonCameraListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonFrameListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonKeyListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonListener.h" />
@@ -252,6 +254,7 @@
     <ClInclude Include="..\source\engine\graphics\particles\IonEmitter.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonParticle.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonParticleSystem.h" />
+    <ClInclude Include="..\source\engine\graphics\render\IonFrustum.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonRenderTarget.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonRenderWindow.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonViewport.h" />

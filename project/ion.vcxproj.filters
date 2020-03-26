@@ -312,6 +312,9 @@
     <ClCompile Include="..\source\engine\graphics\render\IonRenderWindow.cpp">
       <Filter>Source Files\graphics\render</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\render\IonFrustum.cpp">
+      <Filter>Source Files\graphics\render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -601,6 +604,12 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\render\IonRenderWindow.h">
       <Filter>Header Files\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\render\IonFrustum.h">
+      <Filter>Header Files\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonCameraListener.h">
+      <Filter>Header Files\events\listeners</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
