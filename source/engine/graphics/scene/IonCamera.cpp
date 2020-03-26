@@ -13,70 +13,43 @@ File:	IonCamera.cpp
 #include "IonCamera.h"
 
 #include "graphics/IonGraphicsAPI.h"
-#include "utilities/IonMath.h"
+#include "graphics/render/IonViewport.h"
 
 namespace ion::graphics::scene
 {
 
 using namespace camera;
-using namespace ion::utilities;
+using graphics::render::Frustum;
 
 namespace camera::detail
 {
 
-void gl_perspective(real fov, real aspect_ratio, real z_near, real z_far) noexcept
+void look_at() noexcept
 {
-    auto height = math::Tan(fov / 360.0_r * math::Pi) * z_near;
-    auto width = height * aspect_ratio;
-    glFrustum(-width, width, -height, height, z_near, z_far);
-}
-
-void change_projection(const Aabb &clipping_plane, real z_near, real z_far, real fov,
-	const std::optional<real> &aspect_ratio, Projection projection) noexcept
-{
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	auto [left, bottom] = clipping_plane.Min().XY();
-	auto [right, top] = clipping_plane.Max().XY();
-	auto width = right - left;
-	auto height = bottom - top;
-
-	switch (projection)
-	{
-		case Projection::Orthographic:
-		{
-			if (aspect_ratio)
-				glOrtho(left, right, bottom, top / *aspect_ratio, z_near, z_far);
-			else
-				glOrtho(left, right, bottom, top, z_near, z_far);
-
-			if (aspect_ratio)
-				glOrtho(left, right, bottom / *aspect_ratio, top / *aspect_ratio, z_near, z_far);
-			else
-				glOrtho(left, right, bottom / (width / height), top / (width / height), z_near, z_far);
-
-			break;
-		}
-
-		case Projection::Perspective:
-		{
-			if (aspect_ratio)
-				gl_perspective(fov, *aspect_ratio * width / height, z_near, z_far);
-			else
-				gl_perspective(fov, width / height, z_near, z_far);
-
-			break;
-		}
-	}
-
-	glMatrixMode(GL_MODELVIEW); //Switch back
+	//gluLookAt
 }
 
 } //camera::detail
 
 
-//Protected
+//Private
+
+/*
+	Notifying
+*/
+
+void Camera::NotifyCameraFrustumChanged(const Frustum &frustum) noexcept
+{
+	for (auto &listener : Listeners())
+		Notify(&events::listeners::CameraListener::CameraFrustumChanged, listener, frustum);
+}
+
+void Camera::NotifyCameraMoved(const Vector2 &position) noexcept
+{
+	for (auto &listener : Listeners())
+		Notify(&events::listeners::CameraListener::CameraMoved, listener, position);
+}
+
 
 /*
 	Events
@@ -84,15 +57,39 @@ void change_projection(const Aabb &clipping_plane, real z_near, real z_far, real
 
 void Camera::ViewportResized(Vector2 size) noexcept
 {
-
+	//Todo
 }
 
 
 //Public
 
-Camera::Camera(render::Viewport &viewport) noexcept
+Camera::Camera(const render::Frustum &frustum) noexcept :
+
+	ListeningChannel{events::listeners::listening_channel::SubscriptionContract::NonCancelable},
+	frustum_{frustum}
 {
-	viewport.Subscribe(*this);
+	//Empty
+}
+
+Camera::Camera(render::Viewport &viewport) noexcept :
+	ListeningChannel{viewport, events::listeners::listening_channel::SubscriptionContract::NonCancelable}
+{
+	//Empty
+}
+
+Camera::Camera(render::Viewport &viewport, const render::Frustum &frustum) noexcept :
+
+	ListeningChannel{viewport, events::listeners::listening_channel::SubscriptionContract::NonCancelable},
+	frustum_{frustum}
+{
+	//Empty
+}
+
+
+void Camera::Change() noexcept
+{
+	if (auto publisher = Publisher(); publisher)
+		frustum_.Change(static_cast<const render::Viewport&>(*publisher).Bounds().ToSize());
 }
 
 } //ion::graphics::scene
