@@ -19,13 +19,14 @@ File:	IonViewport.h
 #include "events/listeners/IonListeningChannel.h"
 #include "events/listeners/IonRenderTargetListener.h"
 #include "events/listeners/IonViewportListener.h"
-#include "graphics/render/IonRenderTarget.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 
 namespace ion::graphics::render
 {
+	class RenderTarget; //Forward declaration
+
 	using graphics::utilities::Aabb;
 	using graphics::utilities::Color;
 	using graphics::utilities::Vector2;
@@ -68,7 +69,7 @@ namespace ion::graphics::render
 
 	class Viewport final :
 		public events::listeners::ListenerInterface<events::listeners::ViewportListener>,
-		protected events::listeners::ListeningChannel<graphics::render::RenderTarget>
+		protected events::listeners::ListeningChannel<events::listeners::ListenerInterface<events::listeners::RenderTargetListener>>
 	{
 		private:
 
@@ -268,10 +269,7 @@ namespace ion::graphics::render
 
 
 			//Change rendering context to this viewport
-			inline void Change() noexcept
-			{
-				viewport::detail::change_viewport(bounds_.Min(), bounds_.ToSize(), background_color_);
-			}
+			void Change() noexcept;
 	};
 } //ion::graphics
 

@@ -13,6 +13,7 @@ File:	IonViewport.cpp
 #include "IonViewport.h"
 
 #include "graphics/IonGraphicsAPI.h"
+#include "graphics/render/IonRenderTarget.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::render
@@ -315,6 +316,12 @@ Viewport Viewport::BottomRightAligned(RenderTarget &render_target, const Vector2
 Viewport Viewport::BottomRightAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept
 {
 	return Aligned(render_target, AlignmentType::BottomRight, width_percent, height_percent);
+}
+
+
+void Viewport::Change() noexcept
+{
+	viewport::detail::change_viewport(bounds_.Min(), bounds_.ToSize(), background_color_);
 }
 
 } //ion::graphics::render

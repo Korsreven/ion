@@ -12,6 +12,8 @@ File:	IonRenderTarget.cpp
 
 #include "IonRenderTarget.h"
 
+#include <memory>
+
 namespace ion::graphics::render
 {
 
@@ -36,9 +38,48 @@ void RenderTarget::NotifyRenderTargetResized(const Vector2 &size) noexcept
 
 //Public
 
+/*
+	Buffers
+*/
+
 void RenderTarget::SwapBuffers() noexcept
 {
 	DoSwapBuffers();
+}
+
+
+/*
+	Viewports
+*/
+
+Viewport& RenderTarget::AddViewport(Viewport &&viewport)
+{
+	return *viewports_.emplace_back(std::make_unique<Viewport>(std::move(viewport)));
+}
+
+void RenderTarget::ClearViewports() noexcept
+{
+	viewports_.clear();
+	viewports_.shrink_to_fit();
+}
+
+bool RenderTarget::RemoveViewport(const Viewport &viewport) noexcept
+{
+	auto iter =
+		std::find_if(std::begin(viewports_), std::end(viewports_),
+			[&](auto &x) noexcept
+			{
+				return x.get() == &viewport;
+			});
+
+	//Viewport found
+	if (iter != std::end(viewports_))
+	{
+		viewports_.erase(iter);
+		return true;
+	}
+	else
+		return false;
 }
 
 } //ion::graphics::render

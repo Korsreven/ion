@@ -67,7 +67,7 @@ namespace ion::events::listeners
 		typename = std::enable_if_t<listening_channel::detail::has_listener_type_v<T>>>
 	class ListeningChannel : public T::listener_type
 	{
-		static_assert(std::is_base_of_v<events::listeners::ListenerInterface<typename T::listener_type>, T>);
+		static_assert(std::is_same_v<events::listeners::ListenerInterface<typename T::listener_type>, T>);
 
 		private:
 

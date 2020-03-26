@@ -57,20 +57,20 @@ bool Engine::NotifyFrameEnded(duration time) noexcept
 
 void Draw()
 {
-	/*glBegin(GL_QUADS);
-	glColor3fv(graphics::utilities::color::Beige.Channels());
-	glVertex2f(-1.0f, 1.0f);
-	glVertex2f(-1.0f, -1.0f);
-	glVertex2f(1.0f, -1.0f);
-	glVertex2f(1.0f, 1.0f);
-	glEnd();*/
+	glBegin(GL_QUADS);
+	glColor3fv(graphics::utilities::color::White.Channels());
+	glVertex2f(-1.7778f, 1.0f);
+	glVertex2f(-1.7778f, -1.0f);
+	glVertex2f(1.7778f, -1.0f);
+	glVertex2f(1.7778f, 1.0f);
+	glEnd();
 
 	glBegin(GL_QUADS);
 	glColor3fv(graphics::utilities::color::Red.Channels());
-	glVertex2f(-1.0f, 1.0f);
-	glVertex2f(-1.0f, 0.8f);
-	glVertex2f(-0.8f, 0.8f);
-	glVertex2f(-0.8f, 1.0f);
+	glVertex2f(-1.7778f, 1.0f);
+	glVertex2f(-1.7778f, 0.8f);
+	glVertex2f(-1.57788f, 0.8f);
+	glVertex2f(-1.5778f, 1.0f);
 	glEnd();
 
 	glBegin(GL_QUADS);
@@ -83,10 +83,10 @@ void Draw()
 
 	glBegin(GL_QUADS);
 	glColor3fv(graphics::utilities::color::Blue.Channels());
-	glVertex2f(0.8f, -0.8f);
-	glVertex2f(0.8f, -1.0f);
-	glVertex2f(1.0f, -1.0f);
-	glVertex2f(1.0f, -0.8f);
+	glVertex2f(1.5778f, -0.8f);
+	glVertex2f(1.5778f, -1.0f);
+	glVertex2f(1.7778f, -1.0f);
+	glVertex2f(1.7778f, -0.8f);
 	glEnd();
 }
 
@@ -97,22 +97,19 @@ bool Engine::UpdateFrame() noexcept
 	if (!NotifyFrameStarted(0.0_sec))
 		return false;
 
-	viewport_->Change();
-	//camera_->Update();
-	glLoadIdentity();
-	Draw();
-
-	viewport2_->Change();
-	//camera_->Update();
-	glLoadIdentity();
-	Draw();
+	for (auto &viewport : render_window_->Viewports())
+	{
+		viewport.Change();
+		camera_->Change();
+		glLoadIdentity();
+		Draw();
+	}
 
 	if (syncronize)
 		glFinish();
 	else
 		glFlush();
 
-	render_window_->SwapBuffers();
 	return NotifyFrameEnded(0.0_sec);
 }
 
@@ -125,7 +122,6 @@ int Engine::Start() noexcept
 {
 	if (!render_window_ || !render_window_->Created())
 		return 1;
-
 
 	if (glewInit() != GLEW_OK)
 		return 1;
@@ -144,29 +140,11 @@ int Engine::Start() noexcept
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
-
-	#ifdef ION_WIN32
-	MSG message;
-
 	//Main loop
-	while (true)
-	{
-		if (PeekMessage(&message, nullptr, 0, 0, PM_REMOVE) != 0)
-		{
-			if (message.message == WM_QUIT)
-				break;
+	while (render_window_ && render_window_->ProcessMessages() && UpdateFrame())
+		render_window_->SwapBuffers();
 
-			TranslateMessage(&message);
-			DispatchMessage(&message);
-		}
-		else if (!UpdateFrame())
-			break;
-	}
-
-	return static_cast<int>(message.wParam);
-	#else
 	return 0;
-	#endif
 }
 
 
@@ -177,12 +155,21 @@ int Engine::Start() noexcept
 graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow &&render_window) noexcept
 {
 	render_window_.emplace(std::move(render_window));
+	auto &viewport = render_window_->AddViewport(graphics::render::Viewport{*render_window_});
+	camera_.emplace(graphics::scene::Camera{viewport});
 
-	viewport_.emplace(graphics::render::Viewport::LeftAligned(*render_window_, 0.5_r));
+	auto frustum = graphics::render::Frustum::Orthographic(graphics::utilities::Aabb{{-1.7778_r, -1.0_r}, {1.7778_r, 1.0_r}},
+														   -1.0_r, 1.0_r, 16.0_r / 9.0_r,
+														   graphics::render::frustum::AspectRatioFormat::PanAndScan);
+	frustum.BaseViewportHeight(viewport.Bounds().ToSize().Y());
+	camera_->ViewFrustum(frustum);
+
+
+	/*viewport_.emplace(graphics::render::Viewport::LeftAligned(*render_window_, 0.5_r));
 	viewport_->BackgroundColor(graphics::utilities::color::Beige);
 
 	viewport2_.emplace(graphics::render::Viewport::RightAligned(*render_window_, 0.5_r));
-	viewport2_->BackgroundColor(graphics::utilities::color::Bisque);
+	viewport2_->BackgroundColor(graphics::utilities::color::Bisque);*/
 
 	return *render_window_;
 }
