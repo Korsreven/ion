@@ -630,14 +630,7 @@ namespace ion::system
 			}
 
 
-			/*
-				System specific
-			*/
-
 			#ifdef ION_WIN32
-			//An application-defined function that processes messages sent to a window
-			LRESULT CALLBACK Procedure(HWND handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept;
-
 			//Returns the window handle
 			//Returns nullptr if no window has been created
 			[[nodiscard]] inline auto Handle() const noexcept
@@ -645,6 +638,14 @@ namespace ion::system
 				return *handle_;
 			}
 			#endif
+
+
+			/*
+				Buffers
+			*/
+
+			//Exchanges the front and back buffers
+			void SwapBuffers() const noexcept;
 
 
 			/*
@@ -682,11 +683,21 @@ namespace ion::system
 
 
 			/*
-				Buffers
+				Messages
 			*/
 
-			//Exchanges the front and back buffers
-			void SwapBuffers() const noexcept;
+			//Process all messages in the message queue
+			//Returns false if a quit message has been received
+			bool ProcessMessages() noexcept;
+
+			//Process the next message in the message queue
+			//Returns false if no message remains in queue
+			bool ProcessNextMessage(bool &quit) noexcept;
+
+			#ifdef ION_WIN32
+			//An application-defined function that processes each dispatched message from the 
+			LRESULT CALLBACK Procedure(HWND handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept;
+			#endif
 	};
 
 } //ion::system

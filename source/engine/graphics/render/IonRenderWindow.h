@@ -454,6 +454,14 @@ namespace ion::graphics::render
 
 
 			/*
+				Buffers
+			*/
+
+			//Exchanges the front and back buffers
+			void SwapBuffers() noexcept;
+
+
+			/*
 				Create/destroy
 			*/
 
@@ -476,13 +484,14 @@ namespace ion::graphics::render
 			//Makes the window not visible
 			bool Hide() noexcept;
 
-			
+
 			/*
-				Buffers
+				Messages
 			*/
 
-			//Exchanges the front and back buffers
-			void SwapBuffers() noexcept;
+			//Process all messages in the message queue
+			//Returns false if a quit message has been received
+			bool ProcessMessages() noexcept;
 
 
 			/*

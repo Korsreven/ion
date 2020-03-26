@@ -943,20 +943,15 @@ std::pair<std::optional<Vector2>, std::optional<Vector2>> Window::GetSizeConstra
 //Public
 
 /*
-	System specific
+	Buffers
 */
 
-#ifdef ION_WIN32
-LRESULT CALLBACK Window::Procedure(HWND handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept
+void Window::SwapBuffers() const noexcept
 {
-	auto received =
-		ProcessMessage(handle, message, w_param, l_param) |
-		NotifyMessageReceived(handle, message, w_param, l_param);
-
-	//Call the default system procedure for handling all messages not received
-	return received ? 0 : DefWindowProc(handle, message, w_param, l_param);
+	#ifdef ION_WIN32
+	::SwapBuffers(*dev_context_);
+	#endif
 }
-#endif
 
 
 /*
@@ -1037,14 +1032,46 @@ bool Window::Hide() noexcept
 
 
 /*
-	Buffers
+	Messages
 */
 
-void Window::SwapBuffers() const noexcept
+bool Window::ProcessMessages() noexcept
+{
+	auto quit = false;
+	while (ProcessNextMessage(quit));
+	return !quit;
+}
+
+bool Window::ProcessNextMessage(bool &quit) noexcept
 {
 	#ifdef ION_WIN32
-	::SwapBuffers(*dev_context_);
+	if (MSG msg; PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) != 0)
+	{
+		if (msg.message == WM_QUIT)
+		{
+			quit = true;
+			return false;
+		}
+
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+		return true;
+	}
 	#endif
+
+	return false;
 }
+
+#ifdef ION_WIN32
+LRESULT CALLBACK Window::Procedure(HWND handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept
+{
+	auto received =
+		ProcessMessage(handle, message, w_param, l_param) |
+		NotifyMessageReceived(handle, message, w_param, l_param);
+
+	//Call the default system procedure for handling all messages not received
+	return received ? 0 : DefWindowProc(handle, message, w_param, l_param);
+}
+#endif
 
 } //ion::system

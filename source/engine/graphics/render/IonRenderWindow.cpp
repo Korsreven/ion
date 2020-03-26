@@ -210,6 +210,16 @@ Vector2 RenderWindow::GetRenderTargetSize() const noexcept
 
 
 /*
+	Buffers
+*/
+
+void RenderWindow::SwapBuffers() noexcept
+{
+	return system::Window::SwapBuffers();
+}
+
+
+/*
 	Create/destroy
 */
 
@@ -260,12 +270,12 @@ bool RenderWindow::Hide() noexcept
 
 
 /*
-	Buffers
+	Messages
 */
 
-void RenderWindow::SwapBuffers() noexcept
+bool RenderWindow::ProcessMessages() noexcept
 {
-	return system::Window::SwapBuffers();
+	return system::Window::ProcessMessages();
 }
 
 } //ion::graphics::render
