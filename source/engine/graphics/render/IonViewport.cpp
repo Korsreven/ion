@@ -14,6 +14,7 @@ File:	IonViewport.cpp
 
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/render/IonRenderTarget.h"
+#include "graphics/scene/IonCamera.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::render
@@ -114,7 +115,7 @@ Vector2 get_adjusted_position(const Vector2 &position, const Vector2 &size, cons
 }
 
 
-void change_viewport(const Vector2 &position, const Vector2 &size, const Color &background_color) noexcept
+void render_to_viewport(const Vector2 &position, const Vector2 &size, const Color &background_color) noexcept
 {
 	auto [x, y] = position.XY();
 	auto [width, height] = size.XY();
@@ -193,20 +194,18 @@ void Viewport::RenderTargetResized(Vector2 size) noexcept
 	render_target_size_ = size;
 }
 
-
-//Public
-
-Viewport::Viewport(const Aabb &bounds) noexcept :
-
-	ListeningChannel{events::listeners::listening_channel::SubscriptionContract::NonCancelable},
-	bounds_{bounds}
+void Viewport::CameraFrustumChanged(Frustum) noexcept
 {
 	//Empty
 }
 
+
+//Public
+
 Viewport::Viewport(RenderTarget &render_target) noexcept :
 
-	ListeningChannel{render_target, events::listeners::listening_channel::SubscriptionContract::NonCancelable},
+	TargetListeningChannel{render_target, events::listeners::listening_channel::SubscriptionContract::NonCancelable},
+
 	bounds_{graphics::utilities::vector2::Zero, render_target.Size()},
 	render_target_size_{render_target.Size()}
 {
@@ -215,7 +214,8 @@ Viewport::Viewport(RenderTarget &render_target) noexcept :
 
 Viewport::Viewport(RenderTarget &render_target, const Aabb &bounds) noexcept :
 
-	ListeningChannel{render_target, events::listeners::listening_channel::SubscriptionContract::NonCancelable},
+	TargetListeningChannel{render_target, events::listeners::listening_channel::SubscriptionContract::NonCancelable},
+
 	bounds_{bounds},
 	render_target_size_{render_target.Size()}
 {
@@ -226,7 +226,7 @@ Viewport::Viewport(RenderTarget &render_target, const Aabb &bounds,
 	HorizontalAnchorType left_anchor, HorizontalAnchorType right_anchor,
 	VerticalAnchorType top_anchor, VerticalAnchorType bottom_anchor) noexcept :
 
-	ListeningChannel{render_target, events::listeners::listening_channel::SubscriptionContract::NonCancelable},
+	TargetListeningChannel{render_target, events::listeners::listening_channel::SubscriptionContract::NonCancelable},
 	bounds_{bounds},
 
 	left_anchor_{left_anchor},
@@ -319,9 +319,52 @@ Viewport Viewport::BottomRightAligned(RenderTarget &render_target, real width_pe
 }
 
 
-void Viewport::Change() noexcept
+/*
+	Camera
+*/
+
+void Viewport::Cam(scene::Camera &camera) noexcept
 {
-	viewport::detail::change_viewport(bounds_.Min(), bounds_.ToSize(), background_color_);
+	CameraListeningChannel::StartSubscription(camera);
+}
+
+
+scene::Camera* Viewport::Cam() noexcept
+{
+	return static_cast<scene::Camera*>(CameraListeningChannel::Publisher());
+}
+
+const scene::Camera* Viewport::Cam() const noexcept
+{
+	return static_cast<const scene::Camera*>(CameraListeningChannel::Publisher());
+}
+
+
+/*
+	Target
+*/
+
+RenderTarget* Viewport::Target() noexcept
+{
+	return static_cast<RenderTarget*>(TargetListeningChannel::Publisher());
+}
+
+const RenderTarget* Viewport::Target() const noexcept
+{
+	return static_cast<const RenderTarget*>(TargetListeningChannel::Publisher());
+}
+
+
+/*
+	Rendering
+*/
+
+void Viewport::RenderTo() noexcept
+{
+	detail::render_to_viewport(bounds_.Min(), bounds_.ToSize(), background_color_);
+
+	if (auto camera = Cam(); camera)
+		camera->CaptureScene(*this);
 }
 
 } //ion::graphics::render

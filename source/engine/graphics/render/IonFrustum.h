@@ -86,7 +86,7 @@ namespace ion::graphics::render
 			std::tuple<real, real, real, real, real, real> to_frustum(const std::optional<Aabb> &clip_plane, real z_near, real z_far, real fov,
 				const std::optional<real> &aspect_ratio, AspectRatioFormat aspect_format, real base_viewport_height, const Vector2 &viewport_size) noexcept;
 
-			void change_projection(ProjectionType projection, const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance, real fov,
+			void project_through_frustum(ProjectionType projection, const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance, real fov,
 				const std::optional<real> &aspect_ratio, AspectRatioFormat aspect_format, real base_viewport_height, const Vector2 &viewport_size) noexcept;
 		} //detail
 	} //frustum
@@ -255,12 +255,12 @@ namespace ion::graphics::render
 			}
 
 
-			//Change projection to this frustum with the given viewport size
-			inline void Change(const Vector2 &viewport_size) noexcept
-			{
-				frustum::detail::change_projection(projection_, clip_plane_, near_clip_distance_, far_clip_distance_,
-												   field_of_view_, aspect_ratio_, aspect_format_, base_viewport_height_, viewport_size);
-			}
+			/*
+				Projecting
+			*/
+
+			//Start projecting the scene through this frustum, with the given viewport size
+			void ProjectScene(const Vector2 &viewport_size) noexcept;
 
 
 			/*

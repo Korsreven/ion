@@ -15,6 +15,7 @@ File:	IonViewport.h
 
 #include <utility>
 
+#include "events/listeners/IonCameraListener.h"
 #include "events/listeners/IonListenerInterface.h"
 #include "events/listeners/IonListeningChannel.h"
 #include "events/listeners/IonRenderTargetListener.h"
@@ -23,9 +24,15 @@ File:	IonViewport.h
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 
+namespace ion::graphics::scene
+{
+	class Camera; //Forward declaration
+} //ion::graphics::scene
+
 namespace ion::graphics::render
 {
 	class RenderTarget; //Forward declaration
+	class Frustum;
 
 	using graphics::utilities::Aabb;
 	using graphics::utilities::Color;
@@ -62,16 +69,21 @@ namespace ion::graphics::render
 			Vector2 get_adjusted_position(const Vector2 &position, const Vector2 &size, const Vector2 &new_size,
 				HorizontalAnchorType horizontal_anchor_type, VerticalAnchorType vertical_anchor_type) noexcept;
 			
-			void change_viewport(const Vector2 &position, const Vector2 &size, const Color &background_color) noexcept;
+			void render_to_viewport(const Vector2 &position, const Vector2 &size, const Color &background_color) noexcept;
 		} //detail
 	} //viewport
 
 
 	class Viewport final :
 		public events::listeners::ListenerInterface<events::listeners::ViewportListener>,
-		protected events::listeners::ListeningChannel<events::listeners::ListenerInterface<events::listeners::RenderTargetListener>>
+		protected events::listeners::ListeningChannel<events::listeners::ListenerInterface<events::listeners::RenderTargetListener>>,
+		protected events::listeners::ListeningChannel<events::listeners::ListenerInterface<events::listeners::CameraListener>>
 	{
 		private:
+			
+			using TargetListeningChannel = events::listeners::ListeningChannel<events::listeners::ListenerInterface<events::listeners::RenderTargetListener>>; 
+			using CameraListeningChannel = events::listeners::ListeningChannel<events::listeners::ListenerInterface<events::listeners::CameraListener>>;
+
 
 			Aabb bounds_;
 
@@ -107,13 +119,10 @@ namespace ion::graphics::render
 			//See RenderTarget::RenderTargetResized for more details
 			void RenderTargetResized(Vector2 size) noexcept override;
 
+			//See Camera::CameraFrustumChanged for more details
+			void CameraFrustumChanged(Frustum) noexcept override;
+
 		public:
-
-			//Default constructor
-			Viewport() = default;
-
-			//Construct a viewport with the given bounds (region)
-			Viewport(const Aabb &bounds) noexcept;
 
 			//Construct a viewport connected to a given render target
 			Viewport(RenderTarget &render_target) noexcept;
@@ -268,8 +277,42 @@ namespace ion::graphics::render
 			}
 
 
-			//Change rendering context to this viewport
-			void Change() noexcept;
+			/*
+				Camera
+			*/
+
+			//Sets the camera that should be connected to this viewport
+			void Cam(scene::Camera &camera) noexcept;
+
+
+			//Returns a mutable pointer to the camera connected to this viewport
+			//Returns nullptr if this viewport does not have a camera connected
+			[[nodiscard]] scene::Camera* Cam() noexcept;
+
+			//Returns an immutable pointer to the camera connected to this viewport
+			//Returns nullptr if this viewport does not have a camera connected
+			[[nodiscard]] const scene::Camera* Cam() const noexcept;
+
+
+			/*
+				Target
+			*/
+
+			//Returns a mutable pointer to the rendering target of this viewport
+			//Returns nullptr if this viewport does not have a rendering target
+			[[nodiscard]] RenderTarget* Target() noexcept;
+
+			//Returns an immutable pointer to the rendering target of this viewport
+			//Returns nullptr if this viewport does not have a rendering target
+			[[nodiscard]] const RenderTarget* Target() const noexcept;
+
+
+			/*
+				Rendering
+			*/
+
+			//Start rendering to this viewport
+			void RenderTo() noexcept;
 	};
 } //ion::graphics
 

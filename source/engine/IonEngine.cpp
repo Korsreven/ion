@@ -99,10 +99,9 @@ bool Engine::UpdateFrame() noexcept
 
 	for (auto &viewport : render_window_->Viewports())
 	{
-		viewport.Change();
-		camera_->Change();
+		viewport.RenderTo();
 		glLoadIdentity();
-		Draw();
+		Draw(); //RenderSystem::RenderScene()
 	}
 
 	if (syncronize)
@@ -156,20 +155,14 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 {
 	render_window_.emplace(std::move(render_window));
 	auto &viewport = render_window_->AddViewport(graphics::render::Viewport{*render_window_});
-	camera_.emplace(graphics::scene::Camera{viewport});
 
 	auto frustum = graphics::render::Frustum::Orthographic(graphics::utilities::Aabb{{-1.7778_r, -1.0_r}, {1.7778_r, 1.0_r}},
 														   -1.0_r, 1.0_r, 16.0_r / 9.0_r,
 														   graphics::render::frustum::AspectRatioFormat::PanAndScan);
 	frustum.BaseViewportHeight(viewport.Bounds().ToSize().Y());
-	camera_->ViewFrustum(frustum);
 
-
-	/*viewport_.emplace(graphics::render::Viewport::LeftAligned(*render_window_, 0.5_r));
-	viewport_->BackgroundColor(graphics::utilities::color::Beige);
-
-	viewport2_.emplace(graphics::render::Viewport::RightAligned(*render_window_, 0.5_r));
-	viewport2_->BackgroundColor(graphics::utilities::color::Bisque);*/
+	camera_.emplace(graphics::scene::Camera{frustum});
+	viewport.Cam(*camera_);
 
 	return *render_window_;
 }

@@ -17,8 +17,6 @@ File:	IonCamera.h
 
 #include "events/listeners/IonCameraListener.h"
 #include "events/listeners/IonListenerInterface.h"
-#include "events/listeners/IonListeningChannel.h"
-#include "events/listeners/IonViewportListener.h"
 #include "graphics/render/IonFrustum.h"
 #include "graphics/utilities/IonVector2.h"
 
@@ -41,8 +39,7 @@ namespace ion::graphics::scene
 
 
 	class Camera final :
-		public events::listeners::ListenerInterface<events::listeners::CameraListener>,
-		protected events::listeners::ListeningChannel<events::listeners::ListenerInterface<events::listeners::ViewportListener>>
+		public events::listeners::ListenerInterface<events::listeners::CameraListener>
 	{
 		private:
 
@@ -57,14 +54,6 @@ namespace ion::graphics::scene
 			void NotifyCameraFrustumChanged(const render::Frustum &frustum) noexcept;
 			void NotifyCameraMoved(const Vector2 &position) noexcept;
 
-
-			/*
-				Events
-			*/
-
-			//See ViewportListener::ViewportResized for more details
-			void ViewportResized(Vector2 size) noexcept override;
-
 		public:
 
 			//Default constructor
@@ -72,12 +61,6 @@ namespace ion::graphics::scene
 
 			//Construct a camera with a custom frustum
 			Camera(const render::Frustum &frustum) noexcept;
-
-			//Construct a camera connected to a given viewport
-			Camera(render::Viewport &viewport) noexcept;
-
-			//Construct a camera connected to a given viewport with a custom frustum
-			Camera(render::Viewport &viewport, const render::Frustum &frustum) noexcept;
 
 
 			/*
@@ -87,11 +70,15 @@ namespace ion::graphics::scene
 			//
 			inline void Position(const Vector2 &position) noexcept
 			{
-				position_ = position;
+				if (position_ != position)
+				{
+					position_ = position;
+					NotifyCameraMoved(position);
+				}
 			}
 
 			//
-			inline void ViewFrustum(const render::Frustum &frustum) noexcept
+			inline void Lens(const render::Frustum &frustum) noexcept
 			{
 				frustum_ = frustum;
 				NotifyCameraFrustumChanged(frustum);
@@ -109,14 +96,18 @@ namespace ion::graphics::scene
 			}
 
 			//
-			[[nodiscard]] inline auto& ViewFrustum() const noexcept
+			[[nodiscard]] inline auto& Lens() const noexcept
 			{
 				return frustum_;
 			}
 
 
-			//Change rendering context to this camera
-			void Change() noexcept;
+			/*
+				Capturing
+			*/
+
+			//Start capturing the scene from the viewpoint of this camera, with the given viewport
+			void CaptureScene(const render::Viewport &viewport) noexcept;
 	};
 } //ion::graphics::scene
 

@@ -51,45 +51,23 @@ void Camera::NotifyCameraMoved(const Vector2 &position) noexcept
 }
 
 
-/*
-	Events
-*/
-
-void Camera::ViewportResized(Vector2 size) noexcept
-{
-	//Todo
-}
-
-
 //Public
 
 Camera::Camera(const render::Frustum &frustum) noexcept :
-
-	ListeningChannel{events::listeners::listening_channel::SubscriptionContract::NonCancelable},
-	frustum_{frustum}
-{
-	//Empty
-}
-
-Camera::Camera(render::Viewport &viewport) noexcept :
-	ListeningChannel{viewport, events::listeners::listening_channel::SubscriptionContract::NonCancelable}
-{
-	//Empty
-}
-
-Camera::Camera(render::Viewport &viewport, const render::Frustum &frustum) noexcept :
-
-	ListeningChannel{viewport, events::listeners::listening_channel::SubscriptionContract::NonCancelable},
 	frustum_{frustum}
 {
 	//Empty
 }
 
 
-void Camera::Change() noexcept
+/*
+	Capturing
+*/
+
+void Camera::CaptureScene(const render::Viewport &viewport) noexcept
 {
-	if (auto publisher = Publisher(); publisher)
-		frustum_.Change(static_cast<const render::Viewport&>(*publisher).Bounds().ToSize());
+	frustum_.ProjectScene(viewport.Bounds().ToSize());
+	detail::look_at(); //Todo
 }
 
 } //ion::graphics::scene

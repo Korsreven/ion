@@ -105,7 +105,7 @@ std::tuple<real, real, real, real, real, real> to_frustum(const std::optional<Aa
 }
 
 
-void change_projection(ProjectionType projection, const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance, real fov,
+void project_through_frustum(ProjectionType projection, const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance, real fov,
 	const std::optional<real> &aspect_ratio, AspectRatioFormat aspect_format, real base_viewport_height, const Vector2 &viewport_size) noexcept
 {
 	glMatrixMode(GL_PROJECTION);
@@ -185,6 +185,17 @@ Frustum Frustum::Perspective(const std::optional<Aabb> &clip_plane, real near_cl
 {
 	return {ProjectionType::Perspective, clip_plane, near_clip_distance, far_clip_distance,
 			field_of_view, aspect_ratio, aspect_format};
+}
+
+
+/*
+	Capturing
+*/
+
+void Frustum::ProjectScene(const Vector2 &viewport_size) noexcept
+{
+	detail::project_through_frustum(projection_, clip_plane_, near_clip_distance_, far_clip_distance_,
+									field_of_view_, aspect_ratio_, aspect_format_, base_viewport_height_, viewport_size);
 }
 
 
