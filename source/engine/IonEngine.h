@@ -15,12 +15,12 @@ File:	IonEngine.h
 
 #include <optional>
 
-#include "events/listeners/IonListenerInterface.h"
+#include "events/IonListenable.h"
 #include "events/listeners/IonFrameListener.h"
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/render/IonRenderWindow.h"
 #include "graphics/render/IonViewport.h"
-#include "graphics/scene/IonCamera.h"
+#include "graphics/scene/IonSceneManager.h"
 #include "types/IonTypes.h"
 
 namespace ion
@@ -35,12 +35,12 @@ namespace ion
 
 
 	class Engine final :
-		protected events::listeners::ListenerInterface<events::listeners::FrameListener>
+		protected events::Listenable<events::listeners::FrameListener>
 	{
 		private:
 
 			std::optional<graphics::render::RenderWindow> render_window_;
-			std::optional<graphics::scene::Camera> camera_;
+			graphics::scene::SceneManager scene_manager_;
 
 
 			/*

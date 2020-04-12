@@ -47,7 +47,7 @@ void AsyncTimerManager::RemovalStarted() noexcept
 void AsyncTimerManager::RemovalEnded() noexcept
 {
 	//All timers where removed
-	if (std::empty(Resources()))
+	if (std::empty(Objects()))
 	{
 		callback_.Stop();
 		stopwatch_.Stop();
@@ -63,7 +63,7 @@ bool AsyncTimerManager::Elapse() noexcept
 
 	if (time >= detail::minimum_time_elapse_resolution)
 	{
-		for (auto &timer : Resources())
+		for (auto &timer : Objects())
 			timer.Elapse(time);
 
 		stopwatch_.Restart();

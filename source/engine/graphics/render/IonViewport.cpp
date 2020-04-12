@@ -12,8 +12,8 @@ File:	IonViewport.cpp
 
 #include "IonViewport.h"
 
+#include "IonRenderTarget.h"
 #include "graphics/IonGraphicsAPI.h"
-#include "graphics/render/IonRenderTarget.h"
 #include "graphics/scene/IonCamera.h"
 #include "types/IonTypes.h"
 
@@ -148,14 +148,14 @@ void render_to_viewport(const Vector2 &position, const Vector2 &size, const Colo
 
 void Viewport::NotifyViewportResized(const Vector2 &size) noexcept
 {
-	for (auto &listener : Listeners())
-		Notify(&events::listeners::ViewportListener::ViewportResized, listener, size);
+	if (auto owner = Owner(); owner)
+		NotifyAll(owner->ViewportEvents().Listeners(), &events::listeners::ViewportListener::ViewportResized, size);
 }
 
 void Viewport::NotifyViewportMoved(const Vector2 &position) noexcept
 {
-	for (auto &listener : Listeners())
-		Notify(&events::listeners::ViewportListener::ViewportMoved, listener, position);
+	if (auto owner = Owner(); owner)
+		NotifyAll(owner->ViewportEvents().Listeners(), &events::listeners::ViewportListener::ViewportMoved, position);
 }
 
 
@@ -194,17 +194,13 @@ void Viewport::RenderTargetResized(Vector2 size) noexcept
 	render_target_size_ = size;
 }
 
-void Viewport::CameraFrustumChanged(Frustum) noexcept
-{
-	//Empty
-}
-
 
 //Public
 
 Viewport::Viewport(RenderTarget &render_target) noexcept :
 
-	TargetListeningChannel{render_target, events::listeners::listening_channel::SubscriptionContract::NonCancelable},
+	events::EventChannel<events::Listenable<events::listeners::RenderTargetListener>>{
+		render_target, events::event_channel::SubscriptionContract::NonCancelable},
 
 	bounds_{graphics::utilities::vector2::Zero, render_target.Size()},
 	render_target_size_{render_target.Size()}
@@ -214,7 +210,8 @@ Viewport::Viewport(RenderTarget &render_target) noexcept :
 
 Viewport::Viewport(RenderTarget &render_target, const Aabb &bounds) noexcept :
 
-	TargetListeningChannel{render_target, events::listeners::listening_channel::SubscriptionContract::NonCancelable},
+	events::EventChannel<events::Listenable<events::listeners::RenderTargetListener>>{
+		render_target, events::event_channel::SubscriptionContract::NonCancelable},
 
 	bounds_{bounds},
 	render_target_size_{render_target.Size()}
@@ -226,7 +223,9 @@ Viewport::Viewport(RenderTarget &render_target, const Aabb &bounds,
 	HorizontalAnchorType left_anchor, HorizontalAnchorType right_anchor,
 	VerticalAnchorType top_anchor, VerticalAnchorType bottom_anchor) noexcept :
 
-	TargetListeningChannel{render_target, events::listeners::listening_channel::SubscriptionContract::NonCancelable},
+	events::EventChannel<events::Listenable<events::listeners::RenderTargetListener>>{
+		render_target, events::event_channel::SubscriptionContract::NonCancelable},
+
 	bounds_{bounds},
 
 	left_anchor_{left_anchor},
@@ -323,35 +322,20 @@ Viewport Viewport::BottomRightAligned(RenderTarget &render_target, real width_pe
 	Camera
 */
 
-void Viewport::Cam(scene::Camera &camera) noexcept
+void Viewport::ConnectCamera(scene::Camera &camera) noexcept
 {
-	CameraListeningChannel::StartSubscription(camera);
+	camera_.Observe(camera);
 }
 
 
-scene::Camera* Viewport::Cam() noexcept
+scene::Camera* Viewport::ConnectedCamera() noexcept
 {
-	return static_cast<scene::Camera*>(CameraListeningChannel::Publisher());
+	return camera_.Object();
 }
 
-const scene::Camera* Viewport::Cam() const noexcept
+const scene::Camera* Viewport::ConnectedCamera() const noexcept
 {
-	return static_cast<const scene::Camera*>(CameraListeningChannel::Publisher());
-}
-
-
-/*
-	Target
-*/
-
-RenderTarget* Viewport::Target() noexcept
-{
-	return static_cast<RenderTarget*>(TargetListeningChannel::Publisher());
-}
-
-const RenderTarget* Viewport::Target() const noexcept
-{
-	return static_cast<const RenderTarget*>(TargetListeningChannel::Publisher());
+	return camera_.Object();
 }
 
 
@@ -363,7 +347,7 @@ void Viewport::RenderTo() noexcept
 {
 	detail::render_to_viewport(bounds_.Min(), bounds_.ToSize(), background_color_);
 
-	if (auto camera = Cam(); camera)
+	if (auto camera = ConnectedCamera(); camera)
 		camera->CaptureScene(*this);
 }
 

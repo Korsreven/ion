@@ -25,7 +25,7 @@ File:	IonEmitter.h
 #include "graphics/textures/IonTextureManager.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
-#include "resources/IonResourceHolder.h"
+#include "managed/IonObservedObject.h"
 #include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
@@ -179,7 +179,7 @@ namespace ion::graphics::particles
 			std::pair<real, real> particle_mass_;
 			std::pair<Color, Color> particle_solid_color_;
 			std::pair<duration, duration> particle_life_time_;
-			resources::ResourceHolder<textures::Texture> particle_texture_;
+			managed::ObservedObject<textures::Texture> particle_texture_;
 
 		public:
 
@@ -477,7 +477,7 @@ namespace ion::graphics::particles
 			//Returns nullptr if no particle texture is attached
 			[[nodiscard]] inline auto ParticleTexture() const noexcept
 			{
-				return particle_texture_.Resource();
+				return particle_texture_.Object();
 			}
 
 

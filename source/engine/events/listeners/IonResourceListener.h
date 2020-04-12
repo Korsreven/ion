@@ -13,31 +13,36 @@ File:	IonResourceListener.h
 #ifndef ION_RESOURCE_LISTENER_H
 #define ION_RESOURCE_LISTENER_H
 
-#include "IonListener.h"
+#include <type_traits>
+#include "IonManagedObjectListener.h"
 
 namespace ion::events::listeners
 {
-	template <typename T>
-	struct ResourceListener : Listener<ResourceListener<T>>
+	template <typename ResourceT, typename OwnerT, typename ListenerT = void>
+	struct ResourceListener :
+		ManagedObjectListener<ResourceT, OwnerT, std::conditional_t<std::is_same_v<ListenerT, void>, ResourceListener<ResourceT, OwnerT>, ListenerT>>
 	{
 		/*
 			Events
 		*/
 
-		//Called right after a resource has been created or adopted, with a reference to the resource
-		virtual void ResourceCreated(T &resource) noexcept = 0;
-
-
-		//Called right before a resource is removed or orphaned, with a reference to the resource
-		//Return false from this function if the removal should be canceled
-		virtual bool ResourceRemovable([[maybe_unused]] T &resource) noexcept
+		//Called right after a resource has been loaded, with a reference to the resource
+		virtual void ResourceLoaded([[maybe_unused]] ResourceT &resource) noexcept
 		{
 			//Optional to override
-			return true;
 		}
 
-		//Called right after a resource has been removed or orphaned, with a reference to the resource
-		virtual void ResourceRemoved(T &resource) noexcept = 0;
+		//Called right after a resource has been unloaded, with a reference to the resource
+		virtual void ResourceUnloaded([[maybe_unused]] ResourceT &resource) noexcept
+		{
+			//Optional to override
+		}
+
+		//Called right after a resource has its status changed, with a reference to the resource
+		virtual void ResourceStatusChanged([[maybe_unused]] ResourceT &resource) noexcept
+		{
+			//Optional to override
+		}
 	};
 } //ion::events::listeners
 

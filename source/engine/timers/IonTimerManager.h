@@ -14,7 +14,7 @@ File:	IonTimerManager.h
 #define ION_TIMER_MANAGER_H
 
 #include "IonTimer.h"
-#include "resources/IonResourceManager.h"
+#include "managed/IonObjectManager.h"
 
 namespace ion::timers
 {
@@ -23,7 +23,7 @@ namespace ion::timers
 	} //timer_manager::detail
 
 
-	struct TimerManager : resources::ResourceManager<TimerManager, Timer>
+	struct TimerManager : managed::ObjectManager<Timer, TimerManager>
 	{
 		//Default constructor
 		TimerManager() = default;
@@ -44,6 +44,25 @@ namespace ion::timers
 
 		//Move assignment
 		TimerManager& operator=(TimerManager&&) = default;
+
+
+		/*
+			Ranges
+		*/
+
+		//Returns a mutable range of all timers in this manager
+		//This can be used directly with a range-based for loop
+		[[nodiscard]] inline auto Timers() noexcept
+		{
+			return Objects();
+		}
+
+		//Returns an immutable range of all timers in this manager
+		//This can be used directly with a range-based for loop
+		[[nodiscard]] inline const auto Timers() const noexcept
+		{
+			return Objects();
+		}
 
 
 		/*

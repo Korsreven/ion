@@ -13,12 +13,16 @@ File:	IonListener.h
 #ifndef ION_LISTENER_H
 #define ION_LISTENER_H
 
-namespace ion::events::listeners
+#include <type_traits>
+
+namespace ion::events
 {
 	template <typename T>
-	class ListenerInterface;
+	class Listenable;
+} //ion::events
 
-
+namespace ion::events::listeners
+{
 	template <typename T>
 	class Listener
 	{
@@ -55,31 +59,39 @@ namespace ion::events::listeners
 				Events
 			*/
 
-			//Called right before a listener is subscribed, with a reference to the listener interface
+			//Called right before this listener is subscribed, with a reference to the listenable
 			//Return false from this function if the subscription should be canceled
-			virtual bool Subscribable([[maybe_unused]] ListenerInterface<T> &listener_interface) noexcept
+			virtual bool Subscribable([[maybe_unused]] Listenable<T> &listenable) noexcept
 			{
 				//Optional to override
 				return true;
 			}
 
-			//Called right after a listener has been subscribed, with a reference to the listener interface
-			virtual void Subscribed([[maybe_unused]] ListenerInterface<T> &listener_interface) noexcept
+			//Called right after this listener has been subscribed, with a reference to the listenable
+			virtual void Subscribed([[maybe_unused]] Listenable<T> &listenable) noexcept
 			{
 				//Optional to override
 			}
 
 
-			//Called right before a listener is unsubscribed, with a reference to the listener interface
+			//Called right before this listener is unsubscribed, with a reference to the listenable
 			//Return false from this function if the unsubscription should be canceled
-			virtual bool Unsubscribable([[maybe_unused]] ListenerInterface<T> &listener_interface) noexcept
+			virtual bool Unsubscribable([[maybe_unused]] Listenable<T> &listenable) noexcept
 			{
 				//Optional to override
 				return true;
 			}
 
-			//Called right after a listener has been unsubscribed, with a reference to the listener interface
-			virtual void Unsubscribed([[maybe_unused]] ListenerInterface<T> &listener_interface) noexcept
+			//Called right after this listener has been unsubscribed, with a reference to the listenable
+			virtual void Unsubscribed([[maybe_unused]] Listenable<T> &listenable) noexcept
+			{
+				//Optional to override
+			}
+
+
+			//Called right after this subscriber has been moved, with a reference to the new listenable
+			//A subscriber is a listener that has an active subscription
+			virtual void SubscriberMoved([[maybe_unused]] Listenable<T> &listenable) noexcept
 			{
 				//Optional to override
 			}

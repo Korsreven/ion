@@ -41,7 +41,7 @@ Timer& TimerManager::CreateTimer(const Timer &timer)
 
 void TimerManager::Elapse(duration time) noexcept
 {
-	for (auto &timer : Resources())
+	for (auto &timer : Objects())
 		timer.Elapse(time);
 }
 

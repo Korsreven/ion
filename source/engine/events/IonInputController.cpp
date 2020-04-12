@@ -24,7 +24,7 @@ using namespace listeners;
 
 //Private
 
-bool InputController::Unsubscribable(ListenerInterface<WindowListener>&) noexcept
+bool InputController::Unsubscribable(Listenable<WindowListener>&) noexcept
 {
 	//Cancel all unsubscribe atempts
 	return false;

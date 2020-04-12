@@ -15,24 +15,21 @@ File:	IonViewport.h
 
 #include <utility>
 
-#include "events/listeners/IonCameraListener.h"
-#include "events/listeners/IonListenerInterface.h"
-#include "events/listeners/IonListeningChannel.h"
+#include "events/IonEventChannel.h"
+#include "events/IonEventGenerator.h"
 #include "events/listeners/IonRenderTargetListener.h"
 #include "events/listeners/IonViewportListener.h"
+#include "graphics/scene/IonSceneManager.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
-
-namespace ion::graphics::scene
-{
-	class Camera; //Forward declaration
-} //ion::graphics::scene
+#include "managed/IonManagedObject.h"
+#include "managed/IonObservedObject.h"
 
 namespace ion::graphics::render
 {
 	class RenderTarget; //Forward declaration
-	class Frustum;
+	class Frustum; //Forward declaration
 
 	using graphics::utilities::Aabb;
 	using graphics::utilities::Color;
@@ -75,15 +72,11 @@ namespace ion::graphics::render
 
 
 	class Viewport final :
-		public events::listeners::ListenerInterface<events::listeners::ViewportListener>,
-		protected events::listeners::ListeningChannel<events::listeners::ListenerInterface<events::listeners::RenderTargetListener>>,
-		protected events::listeners::ListeningChannel<events::listeners::ListenerInterface<events::listeners::CameraListener>>
+		public managed::ManagedObject<RenderTarget>,
+		protected events::EventGenerator<events::listeners::ViewportListener>,
+		protected events::EventChannel<events::Listenable<events::listeners::RenderTargetListener>>
 	{
 		private:
-			
-			using TargetListeningChannel = events::listeners::ListeningChannel<events::listeners::ListenerInterface<events::listeners::RenderTargetListener>>; 
-			using CameraListeningChannel = events::listeners::ListeningChannel<events::listeners::ListenerInterface<events::listeners::CameraListener>>;
-
 
 			Aabb bounds_;
 
@@ -94,6 +87,8 @@ namespace ion::graphics::render
 
 			Color background_color_ = utilities::color::Black;
 			Vector2 render_target_size_;
+
+			managed::ObservedObject<scene::Camera> camera_;
 
 
 			/*
@@ -118,9 +113,6 @@ namespace ion::graphics::render
 
 			//See RenderTarget::RenderTargetResized for more details
 			void RenderTargetResized(Vector2 size) noexcept override;
-
-			//See Camera::CameraFrustumChanged for more details
-			void CameraFrustumChanged(Frustum) noexcept override;
 
 		public:
 
@@ -282,29 +274,16 @@ namespace ion::graphics::render
 			*/
 
 			//Sets the camera that should be connected to this viewport
-			void Cam(scene::Camera &camera) noexcept;
+			void ConnectCamera(scene::Camera &camera) noexcept;
 
 
 			//Returns a mutable pointer to the camera connected to this viewport
 			//Returns nullptr if this viewport does not have a camera connected
-			[[nodiscard]] scene::Camera* Cam() noexcept;
+			[[nodiscard]] scene::Camera* ConnectedCamera() noexcept;
 
 			//Returns an immutable pointer to the camera connected to this viewport
 			//Returns nullptr if this viewport does not have a camera connected
-			[[nodiscard]] const scene::Camera* Cam() const noexcept;
-
-
-			/*
-				Target
-			*/
-
-			//Returns a mutable pointer to the rendering target of this viewport
-			//Returns nullptr if this viewport does not have a rendering target
-			[[nodiscard]] RenderTarget* Target() noexcept;
-
-			//Returns an immutable pointer to the rendering target of this viewport
-			//Returns nullptr if this viewport does not have a rendering target
-			[[nodiscard]] const RenderTarget* Target() const noexcept;
+			[[nodiscard]] const scene::Camera* ConnectedCamera() const noexcept;
 
 
 			/*

@@ -31,20 +31,17 @@ namespace render_window::detail
 
 void RenderWindow::NotifyWindowActionReceived(events::listeners::WindowAction action) noexcept
 {
-	for (auto &listener : Events().Listeners())
-		WindowEventsBase::Notify(&events::listeners::WindowListener::WindowActionReceived, listener, action);
+	WindowEventsBase::NotifyAll(Events().Listeners(), &events::listeners::WindowListener::WindowActionReceived, action);
 }
 
 void RenderWindow::NotifyWindowMoved(const Vector2 &position) noexcept
 {
-	for (auto &listener : Events().Listeners())
-		WindowEventsBase::Notify(&events::listeners::WindowListener::WindowMoved, listener, position);
+	WindowEventsBase::NotifyAll(Events().Listeners(), &events::listeners::WindowListener::WindowMoved, position);
 }
 
 void RenderWindow::NotifyWindowResized(const Vector2 &size) noexcept
 {
-	for (auto &listener : Events().Listeners())
-		WindowEventsBase::Notify(&events::listeners::WindowListener::WindowResized, listener, size);
+	WindowEventsBase::NotifyAll(Events().Listeners(), &events::listeners::WindowListener::WindowResized, size);
 }
 
 

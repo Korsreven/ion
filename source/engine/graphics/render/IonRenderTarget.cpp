@@ -12,8 +12,6 @@ File:	IonRenderTarget.cpp
 
 #include "IonRenderTarget.h"
 
-#include <memory>
-
 namespace ion::graphics::render
 {
 
@@ -31,8 +29,7 @@ namespace render_target::detail
 
 void RenderTarget::NotifyRenderTargetResized(const Vector2 &size) noexcept
 {
-	for (auto &listener : Listeners())
-		Notify(&events::listeners::RenderTargetListener::RenderTargetResized, listener, size);
+	RenderTargetEventsBase::NotifyAll(Events().Listeners(), &events::listeners::RenderTargetListener::RenderTargetResized, size);
 }
 
 
@@ -49,37 +46,13 @@ void RenderTarget::SwapBuffers() noexcept
 
 
 /*
-	Viewports
+	Viewport
+	Creating
 */
 
-Viewport& RenderTarget::AddViewport(Viewport &&viewport)
+Viewport& RenderTarget::CreateViewport(Viewport &&viewport)
 {
-	return *viewports_.emplace_back(std::make_unique<Viewport>(std::move(viewport)));
-}
-
-void RenderTarget::ClearViewports() noexcept
-{
-	viewports_.clear();
-	viewports_.shrink_to_fit();
-}
-
-bool RenderTarget::RemoveViewport(const Viewport &viewport) noexcept
-{
-	auto iter =
-		std::find_if(std::begin(viewports_), std::end(viewports_),
-			[&](auto &x) noexcept
-			{
-				return x.get() == &viewport;
-			});
-
-	//Viewport found
-	if (iter != std::end(viewports_))
-	{
-		viewports_.erase(iter);
-		return true;
-	}
-	else
-		return false;
+	return Create(std::move(viewport));
 }
 
 } //ion::graphics::render

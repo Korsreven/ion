@@ -176,6 +176,7 @@
     <ClCompile Include="..\source\engine\graphics\render\IonRenderWindow.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonViewport.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonCamera.cpp" />
+    <ClCompile Include="..\source\engine\graphics\scene\IonSceneManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\textures\IonTexture.cpp" />
     <ClCompile Include="..\source\engine\graphics\textures\IonTextureManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonAabb.cpp" />
@@ -228,14 +229,16 @@
     <ClInclude Include="..\source\engine\adaptors\ranges\IonDereferenceIterable.h" />
     <ClInclude Include="..\source\engine\adaptors\ranges\IonIterable.h" />
     <ClInclude Include="..\source\engine\events\IonCallback.h" />
+    <ClInclude Include="..\source\engine\events\IonEventChannel.h" />
+    <ClInclude Include="..\source\engine\events\IonEventGenerator.h" />
     <ClInclude Include="..\source\engine\events\IonInputController.h" />
+    <ClInclude Include="..\source\engine\events\IonListenable.h" />
     <ClInclude Include="..\source\engine\events\IonRecurringCallback.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonCameraListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonFrameListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonKeyListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonListener.h" />
-    <ClInclude Include="..\source\engine\events\listeners\IonListenerInterface.h" />
-    <ClInclude Include="..\source\engine\events\listeners\IonListeningChannel.h" />
+    <ClInclude Include="..\source\engine\events\listeners\IonManagedObjectListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonMouseListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonRenderTargetListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonResourceListener.h" />
@@ -259,6 +262,7 @@
     <ClInclude Include="..\source\engine\graphics\render\IonRenderWindow.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonViewport.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonCamera.h" />
+    <ClInclude Include="..\source\engine\graphics\scene\IonSceneManager.h" />
     <ClInclude Include="..\source\engine\graphics\textures\IonTexture.h" />
     <ClInclude Include="..\source\engine\graphics\textures\IonTextureManager.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonAabb.h" />
@@ -268,6 +272,9 @@
     <ClInclude Include="..\source\engine\graphics\utilities\IonSphere.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonVector2.h" />
     <ClInclude Include="..\source\engine\IonEngine.h" />
+    <ClInclude Include="..\source\engine\managed\IonManagedObject.h" />
+    <ClInclude Include="..\source\engine\managed\IonObjectManager.h" />
+    <ClInclude Include="..\source\engine\managed\IonObservedObject.h" />
     <ClInclude Include="..\source\engine\parallel\IonWorker.h" />
     <ClInclude Include="..\source\engine\parallel\IonWorkerPool.h" />
     <ClInclude Include="..\source\engine\resources\files\IonFileResource.h" />
@@ -281,7 +288,6 @@
     <ClInclude Include="..\source\engine\resources\files\repositories\IonVideoRepository.h" />
     <ClInclude Include="..\source\engine\resources\IonResource.h" />
     <ClInclude Include="..\source\engine\resources\IonResourceManager.h" />
-    <ClInclude Include="..\source\engine\resources\IonResourceHolder.h" />
     <ClInclude Include="..\source\engine\script\IonScriptBuilder.h" />
     <ClInclude Include="..\source\engine\script\IonScriptCompiler.h" />
     <ClInclude Include="..\source\engine\script\IonScriptError.h" />
@@ -306,6 +312,7 @@
     <ClInclude Include="..\source\engine\types\IonTypeCasts.h" />
     <ClInclude Include="..\source\engine\types\IonTypes.h" />
     <ClInclude Include="..\source\engine\types\IonTypeTraits.h" />
+    <ClInclude Include="..\source\engine\unmanaged\IonObjectFactory.h" />
     <ClInclude Include="..\source\engine\utilities\IonCodec.h" />
     <ClInclude Include="..\source\engine\utilities\IonConvert.h" />
     <ClInclude Include="..\source\engine\utilities\IonCrypto.h" />

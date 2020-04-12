@@ -13,19 +13,28 @@ File:	IonViewportListener.h
 #ifndef ION_VIEWPORT_LISTENER_H
 #define ION_VIEWPORT_LISTENER_H
 
-#include "IonListener.h"
+#include "IonManagedObjectListener.h"
 #include "graphics/utilities/IonVector2.h"
+
+namespace ion::graphics::render
+{
+	class RenderTarget;
+	class Viewport;
+} //ion::graphics::render
 
 namespace ion::events::listeners
 {
-	struct ViewportListener : Listener<ViewportListener>
+	struct ViewportListener : ManagedObjectListener<graphics::render::Viewport, graphics::render::RenderTarget, ViewportListener>
 	{
 		/*
 			Events
 		*/
 
 		//Called when a viewport has been resized, with the new size
-		virtual void ViewportResized(graphics::utilities::Vector2 size) noexcept = 0;
+		virtual void ViewportResized([[maybe_unused]] graphics::utilities::Vector2 size) noexcept
+		{
+			//Optional to override
+		}
 
 		//Called when a viewport has been moved, with the new position
 		virtual void ViewportMoved([[maybe_unused]] graphics::utilities::Vector2 position) noexcept

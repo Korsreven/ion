@@ -24,7 +24,7 @@ namespace ion::graphics::textures
 	} //texture_manager::detail
 
 
-	class TextureManger : public resources::ResourceManager<TextureManger, Texture>
+	class TextureManger : public resources::ResourceManager<Texture, TextureManger>
 	{
 	};
 } //ion::graphics::textures

@@ -15,10 +15,11 @@ File:	IonCamera.h
 
 #include <optional>
 
+#include "events/IonEventGenerator.h"
 #include "events/listeners/IonCameraListener.h"
-#include "events/listeners/IonListenerInterface.h"
 #include "graphics/render/IonFrustum.h"
 #include "graphics/utilities/IonVector2.h"
+#include "managed/IonManagedObject.h"
 
 namespace ion::graphics::render
 {
@@ -27,6 +28,7 @@ namespace ion::graphics::render
 
 namespace ion::graphics::scene
 {
+	class SceneManager; //Forward declaration
 	using utilities::Vector2;
 
 	namespace camera
@@ -39,7 +41,8 @@ namespace ion::graphics::scene
 
 
 	class Camera final :
-		public events::listeners::ListenerInterface<events::listeners::CameraListener>
+		public managed::ManagedObject<SceneManager>,
+		protected events::EventGenerator<events::listeners::CameraListener>
 	{
 		private:
 

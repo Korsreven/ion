@@ -27,7 +27,7 @@ using graphics::utilities::Aabb;
 
 //Private
 
-bool InputListener::Unsubscribable(ListenerInterface<MessageListener>&) noexcept
+bool InputListener::Unsubscribable(Listenable<MessageListener>&) noexcept
 {
 	//Cancel all unsubscribe atempts
 	return false;
@@ -155,20 +155,17 @@ Vector2 InputListener::ViewportAdjusted(real x, real y) const noexcept
 
 void InputListener::KeyPressed(KeyButton button) noexcept
 {
-	for (auto &listener : this->KeyEventsBase::Listeners())
-		this->KeyEventsBase::Notify(&KeyListener::KeyPressed, listener, button);
+	this->KeyEventsBase::NotifyAll(this->KeyEventsBase::Listeners(), &KeyListener::KeyPressed, button);
 }
 
 void InputListener::KeyReleased(KeyButton button) noexcept
 {
-	for (auto &listener : this->KeyEventsBase::Listeners())
-		this->KeyEventsBase::Notify(&KeyListener::KeyReleased, listener, button);
+	this->KeyEventsBase::NotifyAll(this->KeyEventsBase::Listeners(), &KeyListener::KeyReleased, button);
 }
 
 void InputListener::CharacterPressed(char character) noexcept
 {
-	for (auto &listener : this->KeyEventsBase::Listeners())
-		this->KeyEventsBase::Notify(&KeyListener::CharacterPressed, listener, character);
+	this->KeyEventsBase::NotifyAll(this->KeyEventsBase::Listeners(), &KeyListener::CharacterPressed, character);
 }
 
 
@@ -178,26 +175,22 @@ void InputListener::CharacterPressed(char character) noexcept
 
 void InputListener::MousePressed(MouseButton button, Vector2 position) noexcept
 {
-	for (auto &listener : this->MouseEventsBase::Listeners())
-		this->MouseEventsBase::Notify(&MouseListener::MousePressed, listener, button, position);
+	this->MouseEventsBase::NotifyAll(this->MouseEventsBase::Listeners(), &MouseListener::MousePressed, button, position);
 }
 
 void InputListener::MouseReleased(MouseButton button, Vector2 position) noexcept
 {
-	for (auto &listener : this->MouseEventsBase::Listeners())
-		this->MouseEventsBase::Notify(&MouseListener::MouseReleased, listener, button, position);
+	this->MouseEventsBase::NotifyAll(this->MouseEventsBase::Listeners(), &MouseListener::MouseReleased, button, position);
 }
 
 void InputListener::MouseMoved(Vector2 position) noexcept
 {
-	for (auto &listener : this->MouseEventsBase::Listeners())
-		this->MouseEventsBase::Notify(&MouseListener::MouseMoved, listener, position);
+	this->MouseEventsBase::NotifyAll(this->MouseEventsBase::Listeners(), &MouseListener::MouseMoved, position);
 }
 
 void InputListener::MouseWheelRolled(int delta, Vector2 position) noexcept
 {
-	for (auto &listener : this->MouseEventsBase::Listeners())
-		this->MouseEventsBase::Notify(&MouseListener::MouseWheelRolled, listener, delta, position);
+	this->MouseEventsBase::NotifyAll(this->MouseEventsBase::Listeners(), &MouseListener::MouseWheelRolled, delta, position);
 }
 
 

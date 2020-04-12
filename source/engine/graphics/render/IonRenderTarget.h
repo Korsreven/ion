@@ -13,35 +13,31 @@ File:	IonRenderTarget.h
 #ifndef ION_RENDER_TARGET_H
 #define ION_RENDER_TARGET_H
 
-#include <vector>
-
 #include "adaptors/ranges/IonDereferenceIterable.h"
-#include "events/listeners/IonListenerInterface.h"
+#include "events/IonListenable.h"
 #include "events/listeners/IonRenderTargetListener.h"
+#include "events/listeners/IonViewportListener.h"
 #include "graphics/render/IonViewport.h"
 #include "graphics/utilities/IonVector2.h"
+#include "managed/IonObjectManager.h"
 
 namespace ion::graphics::render
 {
-	class Viewport;
 	using graphics::utilities::Vector2;
 
-	namespace render_target
+	namespace render_target::detail
 	{
-		namespace detail
-		{
-			template <typename T>
-			using container_type = std::vector<std::unique_ptr<T>>; //Owning
-		} //detail
-	} //render_target
+	} //render_target::detail
 
 
 	class RenderTarget :
-		public events::listeners::ListenerInterface<events::listeners::RenderTargetListener>
+		public events::Listenable<events::listeners::RenderTargetListener>,
+		public managed::ObjectManager<Viewport, RenderTarget, events::listeners::ViewportListener>
 	{
 		private:
 
-			render_target::detail::container_type<Viewport> viewports_;
+			using RenderTargetEventsBase = events::Listenable<events::listeners::RenderTargetListener>;
+			using ViewportEventsBase = events::Listenable<events::listeners::ViewportListener>;
 
 		protected:
 
@@ -86,6 +82,36 @@ namespace ion::graphics::render
 
 
 			/*
+				Events
+			*/
+
+			//Return a mutable reference to the render target events of this render target
+			[[nodiscard]] inline auto& Events() noexcept
+			{
+				return static_cast<RenderTargetEventsBase&>(*this);
+			}
+
+			//Return a immutable reference to the render target events of this render target
+			[[nodiscard]] inline auto& Events() const noexcept
+			{
+				return static_cast<const RenderTargetEventsBase&>(*this);
+			}
+
+
+			//Return a mutable reference to the viewport events of this render target
+			[[nodiscard]] inline auto& ViewportEvents() noexcept
+			{
+				return static_cast<ViewportEventsBase&>(*this);
+			}
+
+			//Return a immutable reference to the viewport events of this render target
+			[[nodiscard]] inline auto& ViewportEvents() const noexcept
+			{
+				return static_cast<const ViewportEventsBase&>(*this);
+			}
+
+
+			/*
 				Buffers
 			*/
 
@@ -117,36 +143,29 @@ namespace ion::graphics::render
 				Ranges
 			*/
 
-			//Returns a mutable range of all viewports in this manager
+			//Returns a mutable range of all viewports in this render target
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Viewports() noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<render_target::detail::container_type<Viewport>&>{viewports_};
+				return Objects();
 			}
 
-			//Returns an immutable range of all viewports in this manager
+			//Returns an immutable range of all viewports in this render target
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline const auto Viewports() const noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<const render_target::detail::container_type<Viewport>&>{viewports_};
+				return Objects();
 			}
 
 
 			/*
 				Viewport
-				Adding / removing
+				Creating
 			*/
 
 			//Add the given viewport to this render target by moving it
 			//Returns a reference to the newly added viewport
-			[[nodiscard]] Viewport& AddViewport(Viewport &&viewport);
-
-			//Removes all viewports from this render target
-			void ClearViewports() noexcept;
-
-			//Remove the given viewport from this render target
-			//Returns true if the viewport was found and removed
-			bool RemoveViewport(const Viewport &viewport) noexcept;
+			[[nodiscard]] Viewport& CreateViewport(Viewport &&viewport);
 	};
 }
 

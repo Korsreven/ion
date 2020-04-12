@@ -154,15 +154,15 @@ int Engine::Start() noexcept
 graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow &&render_window) noexcept
 {
 	render_window_.emplace(std::move(render_window));
-	auto &viewport = render_window_->AddViewport(graphics::render::Viewport{*render_window_});
+	auto &viewport = render_window_->CreateViewport(graphics::render::Viewport{*render_window_});
 
 	auto frustum = graphics::render::Frustum::Orthographic(graphics::utilities::Aabb{{-1.7778_r, -1.0_r}, {1.7778_r, 1.0_r}},
 														   -1.0_r, 1.0_r, 16.0_r / 9.0_r,
 														   graphics::render::frustum::AspectRatioFormat::PanAndScan);
 	frustum.BaseViewportHeight(viewport.Bounds().ToSize().Y());
 
-	camera_.emplace(graphics::scene::Camera{frustum});
-	viewport.Cam(*camera_);
+	auto &camera = scene_manager_.CreateCamera(graphics::scene::Camera{frustum});
+	viewport.ConnectCamera(camera);
 
 	return *render_window_;
 }

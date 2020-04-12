@@ -17,7 +17,7 @@ File:	IonTimer.h
 
 #include "types/IonTypes.h"
 #include "events/IonCallback.h"
-#include "resources/IonResource.h"
+#include "managed/IonManagedObject.h"
 
 namespace ion::timers
 {
@@ -35,7 +35,7 @@ namespace ion::timers
 		}
 	} //timer::detail
 
-	class Timer final : public resources::Resource<TimerManager>
+	class Timer final : public managed::ManagedObject<TimerManager>
 	{
 		private:
 

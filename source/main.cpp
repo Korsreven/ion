@@ -21,14 +21,15 @@ File:	main.cpp
 #include "adaptors/iterators/IonFlatSetIterator.h"
 
 #include "events/IonCallback.h"
+#include "events/IonEventChannel.h"
+#include "events/IonEventGenerator.h"
+#include "events/IonListenable.h"
 #include "events/IonRecurringCallback.h"
 #include "events/IonInputController.h"
 #include "events/listeners/IonCameraListener.h"
 #include "events/listeners/IonFrameListener.h"
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonListener.h"
-#include "events/listeners/IonListenerInterface.h"
-#include "events/listeners/IonListeningChannel.h"
 #include "events/listeners/IonMouseListener.h"
 #include "events/listeners/IonRenderTargetListener.h"
 #include "events/listeners/IonResourceListener.h"
@@ -52,6 +53,7 @@ File:	main.cpp
 #include "graphics/render/IonRenderWindow.h"
 #include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonCamera.h"
+#include "graphics/scene/IonSceneManager.h"
 #include "graphics/textures/IonTexture.h"
 #include "graphics/textures/IonTextureManager.h"
 
@@ -66,7 +68,6 @@ File:	main.cpp
 #include "parallel/IonWorkerPool.h"
 
 #include "resources/IonResource.h"
-#include "resources/IonResourceHolder.h"
 #include "resources/IonResourceManager.h"
 #include "resources/files/IonFileResource.h"
 #include "resources/files/IonFileResourceLoader.h"
@@ -123,41 +124,47 @@ using namespace ion::graphics::utilities::vector2::literals;
 using namespace ion::utilities::file::literals;
 using namespace ion::utilities::math::literals;
 
-
-struct Owner
+struct SpriteContainer : ion::events::Listenable<ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManger>>
 {
 };
 
-struct Ownee
+struct Sprite : ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManger>
 {
-	Owner &owner;
-};
-
-struct Texture
-{
-	int id = 0;
-};
-
-struct Sprite : ion::events::listeners::ResourceListener<Texture>
-{
-	void ResourceCreated(Texture &resource) noexcept override
+	void ResourceLoaded(ion::graphics::textures::Texture &resource) noexcept override
 	{
 		resource;
 	}
 
-	void ResourceRemoved(Texture &resource) noexcept override
+	void ResourceUnloaded(ion::graphics::textures::Texture &resource) noexcept override
 	{
 		resource;
 	}
 
-	void Subscribed(ion::events::listeners::ListenerInterface<ion::events::listeners::ResourceListener<Texture>> &listener_interface) noexcept override
+	void ResourceStatusChanged(ion::graphics::textures::Texture &resource) noexcept override
 	{
-		listener_interface;
+		resource;
 	}
 
-	void Unsubscribed(ion::events::listeners::ListenerInterface<ion::events::listeners::ResourceListener<Texture>> &listener_interface) noexcept override
+
+	void ObjectCreated(ion::graphics::textures::Texture &resource) noexcept override
 	{
-		listener_interface;
+		resource;
+	}
+
+	void ObjectRemoved(ion::graphics::textures::Texture &resource) noexcept override
+	{
+		resource;
+	}
+
+
+	void Subscribed(ion::events::Listenable<ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManger>> &listenable) noexcept override
+	{
+		listenable;
+	}
+
+	void Unsubscribed(ion::events::Listenable<ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManger>> &listenable) noexcept override
+	{
+		listenable;
 	}
 };
 

@@ -12,6 +12,7 @@ File:	IonCamera.cpp
 
 #include "IonCamera.h"
 
+#include "IonSceneManager.h"
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/render/IonViewport.h"
 
@@ -40,14 +41,14 @@ void look_at() noexcept
 
 void Camera::NotifyCameraFrustumChanged(const Frustum &frustum) noexcept
 {
-	for (auto &listener : Listeners())
-		Notify(&events::listeners::CameraListener::CameraFrustumChanged, listener, frustum);
+	if (auto owner = Owner(); owner)
+		NotifyAll(owner->CameraEvents().Listeners(), &events::listeners::CameraListener::CameraFrustumChanged, frustum);
 }
 
 void Camera::NotifyCameraMoved(const Vector2 &position) noexcept
 {
-	for (auto &listener : Listeners())
-		Notify(&events::listeners::CameraListener::CameraMoved, listener, position);
+	if (auto owner = Owner(); owner)
+		NotifyAll(owner->CameraEvents().Listeners(), &events::listeners::CameraListener::CameraMoved, position);
 }
 
 

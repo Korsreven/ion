@@ -19,7 +19,7 @@ File:	IonRenderWindow.h
 #include <utility>
 
 #include "IonRenderTarget.h"
-#include "events/listeners/IonListenerInterface.h"
+#include "events/IonListenable.h"
 #include "events/listeners/IonWindowListener.h"
 #include "graphics/utilities/IonVector2.h"
 #include "system/IonSystemWindow.h"
@@ -65,14 +65,14 @@ namespace ion::graphics::render
 
 	class RenderWindow final :	
 		public RenderTarget,
-		public events::listeners::ListenerInterface<events::listeners::WindowListener>,
+		public events::Listenable<events::listeners::WindowListener>,
 		protected system::Window
 	{
 		private:
 
-			using WindowEventsBase = events::listeners::ListenerInterface<events::listeners::WindowListener>;
-			using RenderTargetEventsBase = events::listeners::ListenerInterface<events::listeners::RenderTargetListener>;
-			using MessageEventsBase = ion::events::listeners::ListenerInterface<system::events::listeners::MessageListener>;
+			using WindowEventsBase = events::Listenable<events::listeners::WindowListener>;
+			using RenderTargetEventsBase = events::Listenable<events::listeners::RenderTargetListener>;
+			using MessageEventsBase = ion::events::Listenable<system::events::listeners::MessageListener>;
 
 
 			std::string title_;

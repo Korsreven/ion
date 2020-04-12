@@ -92,7 +92,7 @@ Emitter Emitter::Ring(const Vector2 &position, const Vector2 &direction,
 
 void Emitter::ParticleTexture(textures::Texture &texture)
 {
-	particle_texture_.Hold(texture);
+	particle_texture_.Observe(texture);
 }
 
 void Emitter::ParticleTexture(std::nullptr_t) noexcept

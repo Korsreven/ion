@@ -13,67 +13,13 @@ File:	IonResource.h
 #ifndef ION_RESOURCE_H
 #define ION_RESOURCE_H
 
+#include "managed/IonManagedObject.h"
+
 namespace ion::resources
 {
 	template <typename T>
-	class Resource
+	class Resource : public managed::ManagedObject<T>
 	{
-		protected:
-	
-			T *owner_ = nullptr;
-
-		public:
-
-			//Default constructor
-			Resource() = default;
-
-			//Copy constructor
-			Resource(const Resource&) noexcept :
-				owner_{nullptr} //A copy of a resource has no owner
-			{
-				//Empty
-			}
-
-			//Copy assignment
-			inline auto& operator=(const Resource &rhs) noexcept
-			{
-				owner_ = nullptr;
-				return *this;
-			}
-
-
-			/*
-				Modifiers
-			*/
-
-			//Set ownership of this resource to the given owner
-			inline void Owner(T &owner) noexcept
-			{
-				owner_ = &owner;
-			}
-
-			//Release ownership for this resource
-			inline void Release() noexcept
-			{
-				owner_ = nullptr;
-			}
-
-
-			/*
-				Observers
-			*/
-
-			//Returns a mutable owner for this resource
-			[[nodiscard]] inline auto Owner() noexcept
-			{
-				return owner_;
-			}
-
-			//Returns an immutable owner for this resource
-			[[nodiscard]] inline const auto Owner() const noexcept
-			{
-				return owner_;
-			}
 	};
 } //ion::resources
 

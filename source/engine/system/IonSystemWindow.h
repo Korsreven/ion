@@ -19,7 +19,7 @@ File:	IonSystemWindow.h
 #include <utility>
 
 #include "IonSystemAPI.h"
-#include "events/listeners/IonListenerInterface.h"
+#include "events/IonListenable.h"
 #include "graphics/utilities/IonVector2.h"
 #include "system/events/listeners/IonSystemMessageListener.h"
 
@@ -258,7 +258,7 @@ namespace ion::system
 
 
 	class Window :
-		public ion::events::listeners::ListenerInterface<events::listeners::MessageListener>
+		public ion::events::Listenable<events::listeners::MessageListener>
 	{
 		private:
 

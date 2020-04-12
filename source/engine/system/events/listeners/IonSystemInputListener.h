@@ -13,7 +13,7 @@ File:	IonSystemInputListener.h
 #ifndef ION_SYSTEM_INPUT_LISTENER_H
 #define ION_SYSTEM_INPUT_LISTENER_H
 
-#include "events/listeners/IonListenerInterface.h"
+#include "events/IonListenable.h"
 #include "system/IonSystemAPI.h"
 #include "system/events/IonSystemInput.h"
 #include "system/events/listeners/IonSystemMessageListener.h"
@@ -35,8 +35,8 @@ namespace ion::system::events::listeners
 
 	class InputListener :
 		private MessageListener,
-		protected ion::events::listeners::ListenerInterface<ion::events::listeners::KeyListener>,
-		protected ion::events::listeners::ListenerInterface<ion::events::listeners::MouseListener>,
+		protected ion::events::Listenable<ion::events::listeners::KeyListener>,
+		protected ion::events::Listenable<ion::events::listeners::MouseListener>,
 
 		//Derives from key and mouse listener to be able to override all of the events,
 		//thus to enforce the same function signatures in compile time
@@ -46,7 +46,7 @@ namespace ion::system::events::listeners
 
 			//See Listener<T>::Unsubscribable for more details
 			//Make sure that if this input listener is about to unsubscribe from the system window, cancel it
-			bool Unsubscribable(ion::events::listeners::ListenerInterface<MessageListener>&) noexcept override final;
+			bool Unsubscribable(ion::events::Listenable<MessageListener>&) noexcept override final;
 
 
 			/*
@@ -68,8 +68,8 @@ namespace ion::system::events::listeners
 
 		protected:
 
-			using KeyEventsBase = ion::events::listeners::ListenerInterface<ion::events::listeners::KeyListener>; 
-			using MouseEventsBase = ion::events::listeners::ListenerInterface<ion::events::listeners::MouseListener>;
+			using KeyEventsBase = ion::events::Listenable<ion::events::listeners::KeyListener>; 
+			using MouseEventsBase = ion::events::Listenable<ion::events::listeners::MouseListener>;
 
 			graphics::render::RenderWindow &render_window_;
 

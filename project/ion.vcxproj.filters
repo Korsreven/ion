@@ -145,6 +145,12 @@
     <Filter Include="Source Files\graphics\render">
       <UniqueIdentifier>{9964ae44-aa95-41b7-b362-a94947722cfd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\managed">
+      <UniqueIdentifier>{d7c8171f-1dec-484d-be6f-fb71da19e1cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\unmanaged">
+      <UniqueIdentifier>{4f27832b-efe8-459c-88be-862acc4dd659}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -315,6 +321,9 @@
     <ClCompile Include="..\source\engine\graphics\render\IonFrustum.cpp">
       <Filter>Source Files\graphics\render</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\IonSceneManager.cpp">
+      <Filter>Source Files\graphics\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -363,9 +372,6 @@
       <Filter>Header Files\events\listeners</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\events\listeners\IonListener.h">
-      <Filter>Header Files\events\listeners</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\engine\events\listeners\IonListenerInterface.h">
       <Filter>Header Files\events\listeners</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\events\listeners\IonMouseListener.h">
@@ -572,9 +578,6 @@
     <ClInclude Include="..\source\engine\graphics\textures\IonTextureManager.h">
       <Filter>Header Files\graphics\textures</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\resources\IonResourceHolder.h">
-      <Filter>Header Files\resources</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\engine\system\IonSystemAPI.h">
       <Filter>Header Files\system</Filter>
     </ClInclude>
@@ -599,9 +602,6 @@
     <ClInclude Include="..\source\engine\events\listeners\IonRenderTargetListener.h">
       <Filter>Header Files\events\listeners</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\events\listeners\IonListeningChannel.h">
-      <Filter>Header Files\events\listeners</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\engine\graphics\render\IonRenderWindow.h">
       <Filter>Header Files\graphics\render</Filter>
     </ClInclude>
@@ -610,6 +610,33 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\events\listeners\IonCameraListener.h">
       <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\IonEventChannel.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\IonListenable.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\managed\IonManagedObject.h">
+      <Filter>Header Files\managed</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\managed\IonObjectManager.h">
+      <Filter>Header Files\managed</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonManagedObjectListener.h">
+      <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\unmanaged\IonObjectFactory.h">
+      <Filter>Header Files\unmanaged</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\managed\IonObservedObject.h">
+      <Filter>Header Files\managed</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\IonSceneManager.h">
+      <Filter>Header Files\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\events\IonEventGenerator.h">
+      <Filter>Header Files\events</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
