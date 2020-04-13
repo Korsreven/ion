@@ -83,6 +83,17 @@ namespace ion::timers
 
 
 		/*
+			Removing
+		*/
+
+		//Clear all removable timers from this manager
+		void ClearTimers() noexcept;
+
+		//Remove a removable timer from this manager
+		bool RemoveTimer(Timer &timer) noexcept;
+
+
+		/*
 			Elapse time
 		*/
 

@@ -36,6 +36,21 @@ Timer& TimerManager::CreateTimer(const Timer &timer)
 
 
 /*
+	Removing
+*/
+
+void TimerManager::ClearTimers() noexcept
+{
+	Clear();
+}
+
+bool TimerManager::RemoveTimer(Timer &timer) noexcept
+{
+	return Remove(timer);
+}
+
+
+/*
 	Elapse time
 */
 

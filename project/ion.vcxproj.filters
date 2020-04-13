@@ -291,9 +291,6 @@
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonVelocityRandomizer.cpp">
       <Filter>Source Files\graphics\particles\affectors</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\engine\graphics\particles\affectors\IonAffectorInterface.cpp">
-      <Filter>Source Files\graphics\particles\affectors</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\engine\graphics\particles\IonParticleSystem.cpp">
       <Filter>Source Files\graphics\particles</Filter>
     </ClCompile>
@@ -566,9 +563,6 @@
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonVelocityRandomizer.h">
       <Filter>Header Files\graphics\particles\affectors</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffectorInterface.h">
-      <Filter>Header Files\graphics\particles\affectors</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\engine\graphics\particles\IonParticleSystem.h">
       <Filter>Header Files\graphics\particles</Filter>
     </ClInclude>
@@ -637,6 +631,15 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\events\IonEventGenerator.h">
       <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\managed\IonObjectObserver.h">
+      <Filter>Header Files\managed</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffectorFactory.h">
+      <Filter>Header Files\graphics\particles\affectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\particles\IonEmitterFactory.h">
+      <Filter>Header Files\graphics\particles</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -32,4 +32,20 @@ Camera& SceneManager::CreateCamera(Camera &&camera)
 	return Create(std::move(camera));
 }
 
+
+/*
+	Camera
+	Removing
+*/
+
+void SceneManager::ClearCameras() noexcept
+{
+	Clear();
+}
+
+bool SceneManager::RemoveCamera(Camera &camera) noexcept
+{
+	return Remove(camera);
+}
+
 } //ion::graphics::scene

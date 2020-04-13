@@ -55,4 +55,20 @@ Viewport& RenderTarget::CreateViewport(Viewport &&viewport)
 	return Create(std::move(viewport));
 }
 
+
+/*
+	Viewport
+	Removing
+*/
+
+void RenderTarget::ClearViewports() noexcept
+{
+	Clear();
+}
+
+bool RenderTarget::RemoveViewport(Viewport &viewport) noexcept
+{
+	return Remove(viewport);
+}
+
 } //ion::graphics::render

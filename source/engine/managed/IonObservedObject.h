@@ -45,11 +45,11 @@ namespace ion::managed
 				switch (contract)
 				{
 					case events::event_channel::SubscriptionContract::NonCancelable:
-					return observed_object::ObjectRequirement::Mandatory;
+					return ObjectRequirement::Mandatory;
 
 					case events::event_channel::SubscriptionContract::Cancelable:
 					default:
-					return observed_object::ObjectRequirement::Optional;
+					return ObjectRequirement::Optional;
 				}
 			}
 
@@ -57,10 +57,10 @@ namespace ion::managed
 			{
 				switch (requirement)
 				{
-					case observed_object::ObjectRequirement::Mandatory:
+					case ObjectRequirement::Mandatory:
 					return events::event_channel::SubscriptionContract::NonCancelable;
 
-					case observed_object::ObjectRequirement::Optional:
+					case ObjectRequirement::Optional:
 					default:
 					return events::event_channel::SubscriptionContract::Cancelable;
 				}
@@ -199,30 +199,6 @@ namespace ion::managed
 				Modifiers
 			*/
 
-			//Observe the given object
-			//If another object is already being observed, that object is released automatically (if possible by the requirements)
-			//Returns true if the object has successfully been observed, or change requirements
-			inline auto Observe(T &object)
-			{
-				if (managed_object_ != &object)
-				{
-					if (auto owner = object.Owner(); owner && this->Subscribe(*owner))
-						managed_object_ = &object;
-				}
-
-				return !!managed_object_;
-			}
-
-			//Release the observed object
-			//Returns true if the object has successfully been released, or change requirements
-			inline auto Release() noexcept
-			{
-				if (this->Unsubscribe())
-					managed_object_ = nullptr;
-
-				return !managed_object_;
-			}
-
 			//Sets the object requirement for this observed object
 			inline void Requirement(observed_object::ObjectRequirement requirement)
 			{
@@ -252,6 +228,35 @@ namespace ion::managed
 			[[nodiscard]] inline auto Requirement() const noexcept
 			{
 				return as_object_requirement(this->Contract());
+			}
+
+
+			/*
+				Observing/releasing
+			*/
+
+			//Observe the given object
+			//If another object is already being observed, that object is released automatically (if possible by the requirements)
+			//Returns true if the object has successfully been observed, or change requirements
+			inline auto Observe(T &object)
+			{
+				if (managed_object_ != &object)
+				{
+					if (auto owner = object.Owner(); owner && this->Subscribe(*owner))
+						managed_object_ = &object;
+				}
+
+				return !!managed_object_;
+			}
+
+			//Release the object being observed
+			//Returns true if the object has successfully been released, or change requirements
+			inline auto Release() noexcept
+			{
+				if (this->Unsubscribe())
+					managed_object_ = nullptr;
+
+				return !managed_object_;
 			}
 	};
 } //ion::managed

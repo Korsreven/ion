@@ -102,7 +102,19 @@ namespace ion::graphics::scene
 
 			//Add the given camera to this scene manager by moving it
 			//Returns a reference to the newly added camera
-			[[nodiscard]] Camera& CreateCamera(Camera &&camera);
+			Camera& CreateCamera(Camera &&camera);
+
+
+			/*
+				Camera
+				Removing
+			*/
+
+			//Clear all removable cameras from this manager
+			void ClearCameras() noexcept;
+
+			//Remove a removable camera from this manager
+			bool RemoveCamera(Camera &camera) noexcept;
 	};
 } //ion::graphics::scene
 

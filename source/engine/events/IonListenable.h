@@ -176,7 +176,7 @@ namespace ion::events
 			auto Subscribe(T &listener)
 			{
 				auto iter =
-					std::find_if(std::cbegin(listeners_), std::cend(listeners_),
+					std::find_if(std::begin(listeners_), std::end(listeners_),
 						[&](auto &x) noexcept
 						{
 							return x == &listener;

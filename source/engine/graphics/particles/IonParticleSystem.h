@@ -13,11 +13,8 @@ File:	IonParticleSystem.h
 #ifndef ION_PARTICLE_SYSTEM_H
 #define ION_PARTICLE_SYSTEM_H
 
-#include <memory>
-#include <vector>
-
-#include "IonEmitter.h"
-#include "affectors/IonAffectorInterface.h"
+#include "IonEmitterFactory.h"
+#include "affectors/IonAffectorFactory.h"
 
 namespace ion::graphics::particles
 {
@@ -38,12 +35,13 @@ namespace ion::graphics::particles
 
 
 	//A particle system class that can contain one ore more emitters and affectors
-	class ParticleSystem final : public affectors::AffectorInterface
+	class ParticleSystem final :
+		public EmitterFactory,
+		public affectors::AffectorFactory
 	{
 		private:
 
 			particle_system::ParticlePrimitive particle_primitive_ = particle_system::ParticlePrimitive::Point;
-			particle_system::detail::container_type<Emitter> emitters_;
 
 		public:
 
@@ -103,61 +101,11 @@ namespace ion::graphics::particles
 
 
 			/*
-				Creating
-			*/
-
-			//Create an emitter
-			Emitter& CreateEmitter();
-
-			//Create an emitter as a copy of the given emitter
-			Emitter& CreateEmitter(Emitter emitter);
-
-			//Create an emitter with the given arguments
-			template <typename... Args>
-			auto& CreateEmitter(Args &&...args)
-			{
-				auto &emitter = emitters_.emplace_back(
-					std::make_unique<Emitter>(std::forward<Args>(args)...));
-				return *emitter;
-			}
-
-
-			/*
-				Removing
-			*/
-
-			//Clear all emitters from this particle system
-			void ClearEmitters() noexcept;
-
-			//Remove an emitters from this particle system
-			bool RemoveEmitter(Emitter &emitter) noexcept;
-
-
-			/*
 				Particles
 			*/
 
 			//Returns true if this emitter has any active particles
 			[[nodiscard]] bool HasActiveParticles() const noexcept;
-
-
-			/*
-				Ranges
-			*/
-
-			//Returns a mutable range of all emitters in this particle system
-			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto Emitters() noexcept
-			{
-				return adaptors::ranges::DereferenceIterable<particle_system::detail::container_type<Emitter>&>{emitters_};
-			}
-
-			//Returns an immutable range of all emitters in this particle system
-			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Emitters() const noexcept
-			{
-				return adaptors::ranges::DereferenceIterable<const particle_system::detail::container_type<Emitter>&>{emitters_};
-			}
 	};
 } //ion::graphics::particles
 

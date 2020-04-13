@@ -21,7 +21,7 @@ File:	IonEmitter.h
 
 #include "IonParticle.h"
 #include "adaptors/ranges/IonIterable.h"
-#include "affectors/IonAffectorInterface.h"
+#include "affectors/IonAffectorFactory.h"
 #include "graphics/textures/IonTextureManager.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
@@ -151,7 +151,7 @@ namespace ion::graphics::particles
 
 
 	//An emitter class that can emit multiple particles
-	class Emitter final : public affectors::AffectorInterface
+	class Emitter final : public affectors::AffectorFactory
 	{
 		private:
 

@@ -37,10 +37,11 @@ File:	main.cpp
 #include "events/listeners/IonWindowListener.h"
 
 #include "graphics/particles/IonEmitter.h"
+#include "graphics/particles/IonEmitterFactory.h"
 #include "graphics/particles/IonParticle.h"
 #include "graphics/particles/IonParticleSystem.h"
 #include "graphics/particles/affectors/IonAffector.h"
-#include "graphics/particles/affectors/IonAffectorInterface.h"
+#include "graphics/particles/affectors/IonAffectorFactory.h"
 #include "graphics/particles/affectors/IonColorFader.h"
 #include "graphics/particles/affectors/IonDirectionRandomizer.h"
 #include "graphics/particles/affectors/IonGravitation.h"
@@ -63,6 +64,11 @@ File:	main.cpp
 #include "graphics/utilities/IonObb.h"
 #include "graphics/utilities/IonSphere.h"
 #include "graphics/utilities/IonVector2.h"
+
+#include "managed/IonManagedObject.h"
+#include "managed/IonObjectManager.h"
+#include "managed/IonObjectObserver.h"
+#include "managed/IonObservedObject.h"
 
 #include "parallel/IonWorker.h"
 #include "parallel/IonWorkerPool.h"
@@ -105,6 +111,8 @@ File:	main.cpp
 #include "types/IonTypes.h"
 #include "types/IonTypeCasts.h"
 #include "types/IonTypeTraits.h"
+
+#include "unmanaged/IonObjectFactory.h"
 
 #include "utilities/IonCodec.h"
 #include "utilities/IonConvert.h"

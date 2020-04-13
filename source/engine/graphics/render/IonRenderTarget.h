@@ -165,7 +165,19 @@ namespace ion::graphics::render
 
 			//Add the given viewport to this render target by moving it
 			//Returns a reference to the newly added viewport
-			[[nodiscard]] Viewport& CreateViewport(Viewport &&viewport);
+			Viewport& CreateViewport(Viewport &&viewport);
+
+
+			/*
+				Viewport
+				Removing
+			*/
+
+			//Clear all removable viewports from this manager
+			void ClearViewports() noexcept;
+
+			//Remove a removable viewport from this manager
+			bool RemoveViewport(Viewport &viewport) noexcept;
 	};
 }
 
