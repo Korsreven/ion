@@ -35,7 +35,7 @@ namespace ion::graphics::scene
 	{
 		namespace detail
 		{
-			void look_at() noexcept;
+			void move_to(const Vector2 &position) noexcept;
 		} //detail
 	} //camera
 

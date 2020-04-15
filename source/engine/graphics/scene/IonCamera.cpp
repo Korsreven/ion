@@ -25,9 +25,13 @@ using graphics::render::Frustum;
 namespace camera::detail
 {
 
-void look_at() noexcept
+void move_to(const Vector2 &position) noexcept
 {
-	//gluLookAt
+	//glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	auto [x, y] = position.XY();
+	glTranslatef(-x, -y, 0.0f);
 }
 
 } //camera::detail
@@ -68,7 +72,7 @@ Camera::Camera(const render::Frustum &frustum) noexcept :
 void Camera::CaptureScene(const render::Viewport &viewport) noexcept
 {
 	frustum_.ProjectScene(viewport.Bounds().ToSize());
-	detail::look_at(); //Todo
+	detail::move_to(position_);
 }
 
 } //ion::graphics::scene

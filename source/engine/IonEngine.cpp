@@ -100,7 +100,6 @@ bool Engine::UpdateFrame() noexcept
 	for (auto &viewport : render_window_->Viewports())
 	{
 		viewport.RenderTo();
-		glLoadIdentity();
 		Draw(); //RenderSystem::RenderScene()
 	}
 
@@ -162,6 +161,8 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 	frustum.BaseViewportHeight(viewport.Bounds().ToSize().Y());
 
 	auto &camera = scene_manager_.CreateCamera(graphics::scene::Camera{frustum});
+	camera.Position({0.0_r, 0.0_r});
+
 	viewport.ConnectCamera(camera);
 
 	return *render_window_;
