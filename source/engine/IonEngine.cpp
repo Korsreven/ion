@@ -14,7 +14,8 @@ File:	IonEngine.cpp
 
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/utilities/IonColor.h"
-#include "system/IonSystemAPI.h"
+#include "system/IonSystemUtility.h"
+#include "utilities/IonFileUtility.h"
 
 namespace ion
 {
@@ -24,6 +25,62 @@ using namespace types::type_literals;
 
 namespace engine::detail
 {
+
+bool init_file_system() noexcept
+{
+	if (auto application_path = system::utilities::ApplicationPath(); application_path)
+	{
+		application_path->remove_filename();
+
+		if (utilities::file::CurrentPath(*application_path))
+			return true;
+	}
+	
+	return false;
+}
+
+bool init_graphics() noexcept
+{
+	#ifdef ION_GLEW
+	if (glewInit() != GLEW_OK)
+		return false;
+	#endif
+
+	glShadeModel(GL_SMOOTH);
+
+	//Depth buffer setup
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LEQUAL);
+	glDepthRange(0.0f, 1.0f);
+	glEnable(GL_DEPTH_TEST);
+	
+	glAlphaFunc(GL_GREATER, 0.0f); //Only draw pixels greater than 0% alpha
+	glEnable(GL_ALPHA_TEST);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	return true;
+}
+
+
+void set_swap_interval(bool vsync) noexcept
+{
+	#ifdef ION_WIN_GLEW
+	if (wglSwapIntervalEXT)
+		wglSwapIntervalEXT((int)vsync);
+	#else
+
+	#endif
+}
+
+bool get_swap_interval() noexcept
+{
+	#ifdef ION_WIN_GLEW
+	return wglGetSwapIntervalEXT && wglGetSwapIntervalEXT() != 0;
+	#else
+	return false;
+	#endif
+}
 
 } //engine::detail
 
@@ -92,8 +149,6 @@ void Draw()
 
 bool Engine::UpdateFrame() noexcept
 {
-	static bool syncronize = false; //TEMP
-
 	if (!NotifyFrameStarted(0.0_sec))
 		return false;
 
@@ -103,7 +158,7 @@ bool Engine::UpdateFrame() noexcept
 		Draw(); //RenderSystem::RenderScene()
 	}
 
-	if (syncronize)
+	if (syncronize_)
 		glFinish();
 	else
 		glFlush();
@@ -113,35 +168,66 @@ bool Engine::UpdateFrame() noexcept
 
 
 /*
+	Modifiers
+*/
+
+void Engine::VerticalSync(bool vsync) noexcept
+{
+	detail::set_swap_interval(vsync);
+}
+
+
+/*
+	Observers
+*/
+
+bool Engine::VerticalSync() const noexcept
+{
+	return detail::get_swap_interval();
+}
+
+
+/*
 	Game loop
 */
 
 int Engine::Start() noexcept
 {
-	if (!render_window_ || !render_window_->Created())
+	//Already running
+	if (running_)
 		return 1;
 
-	if (glewInit() != GLEW_OK)
+	//No window to render to
+	if (!render_window_)
 		return 1;
 
-	glShadeModel(GL_SMOOTH);
 
-	//Depth buffer setup
-	glDepthMask(GL_TRUE);
-	glDepthFunc(GL_LEQUAL);
-	glDepthRange(0.0f, 1.0f);
-	glEnable(GL_DEPTH_TEST);
-	
-	glAlphaFunc(GL_GREATER, 0.0f); //Only draw pixels greater than 0% alpha
-	glEnable(GL_ALPHA_TEST);
+	//Initialize file system
+	if (!detail::init_file_system())
+		return 1;
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
+	//Initialize render window
+	if (!render_window_->Created() &&
+		!(render_window_->Create() && render_window_->Show()))
+		return 1;
+
+	//Initialize graphics
+	if (!detail::init_graphics())
+		return 1;
+
+
+	syncronize_ = VerticalSync();
+	running_ = true;
 
 	//Main loop
 	while (render_window_ && render_window_->ProcessMessages() && UpdateFrame())
 		render_window_->SwapBuffers();
 
+	running_ = false;
+
+	if (render_window_)
+		render_window_->Destroy();
+	
 	return 0;
 }
 

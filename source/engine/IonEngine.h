@@ -17,9 +17,7 @@ File:	IonEngine.h
 
 #include "events/IonListenable.h"
 #include "events/listeners/IonFrameListener.h"
-#include "graphics/IonGraphicsAPI.h"
 #include "graphics/render/IonRenderWindow.h"
-#include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "types/IonTypes.h"
 
@@ -29,7 +27,11 @@ namespace ion
 	{
 		namespace detail
 		{
+			bool init_file_system() noexcept;
+			bool init_graphics() noexcept;
 
+			void set_swap_interval(bool vsync) noexcept;
+			bool get_swap_interval() noexcept;
 		} //detail
 	} //engine
 
@@ -38,6 +40,9 @@ namespace ion
 		protected events::Listenable<events::listeners::FrameListener>
 	{
 		private:
+
+			bool running_ = false;
+			bool syncronize_ = false;
 
 			std::optional<graphics::render::RenderWindow> render_window_;
 			graphics::scene::SceneManager scene_manager_;
@@ -79,10 +84,22 @@ namespace ion
 				Modifiers
 			*/
 
+			//Sets if the engine should use vertical sync or not by the given value
+			void VerticalSync(bool vsync) noexcept;
+
 
 			/*
 				Observers
 			*/
+
+			//Returns true if the engine is running
+			[[nodiscard]] inline auto Running() const noexcept
+			{
+				return running_;
+			}
+
+			//Returns true if the engine is using vertical sync
+			[[nodiscard]] bool VerticalSync() const noexcept;
 
 
 			/*

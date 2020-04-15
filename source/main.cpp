@@ -206,42 +206,19 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 #endif
 {
 	/*
-		Initializing Ion Engine
-		(should eventually be located in ion::Engine)
-	*/
-
-	auto application_path = ion::system::utilities::ApplicationPath();
-
-	if (!application_path)
-		return 1;
-	
-	application_path->remove_filename();
-	
-	if (!ion::utilities::file::CurrentPath(*application_path))
-		return 1;
-	
-
-	/*
 		Test code
 	*/
 
 	auto exit_code = 0;
 	{
 		ion::Engine engine;
+
 		auto &window = engine.RenderTo(
 			ion::graphics::render::RenderWindow::Resizable("ION engine", {1280.0_r, 720.0_r}));
 		window.MinSize(ion::graphics::utilities::Vector2{640.0_r, 360.0_r});
 
-		if (window.Create())
-		{
-			if (window.Show())
-			{
-				exit_code = engine.Start();
-				window.Hide();
-			}
-
-			window.Destroy();
-		}
+		engine.VerticalSync(false);
+		exit_code = engine.Start();
 	}
 
 	//Compile script
