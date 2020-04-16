@@ -85,6 +85,8 @@ bool get_swap_interval() noexcept
 } //engine::detail
 
 
+//Protected
+
 /*
 	Notifying
 */
@@ -149,7 +151,9 @@ void Draw()
 
 bool Engine::UpdateFrame() noexcept
 {
-	if (!NotifyFrameStarted(0.0_sec))
+	auto frame_time = stopwatch_.Elapsed(); //Todo
+
+	if (!NotifyFrameStarted(frame_time))
 		return false;
 
 	for (auto &viewport : render_window_->Viewports())
@@ -163,9 +167,11 @@ bool Engine::UpdateFrame() noexcept
 	else
 		glFlush();
 
-	return NotifyFrameEnded(0.0_sec);
+	return NotifyFrameEnded(frame_time);
 }
 
+
+//Public
 
 /*
 	Modifiers
@@ -188,47 +194,80 @@ bool Engine::VerticalSync() const noexcept
 
 
 /*
-	Game loop
+	Engine
 */
+
+bool Engine::Initialize() noexcept
+{
+	//No window to render to
+	if (!render_window_)
+		return false;
+
+	//Create render window (render target)
+	if (!render_window_->Created() && !render_window_->Create())
+		return false;
+
+	//Initialize file system and graphics
+	return detail::init_file_system() && detail::init_graphics();
+}
 
 int Engine::Start() noexcept
 {
+	//Not successfully initialized
+	if (!Initialize())
+		return 1;
+
 	//Already running
-	if (running_)
-		return 1;
-
-	//No window to render to
-	if (!render_window_)
+	if (Running())
 		return 1;
 
 
-	//Initialize file system
-	if (!detail::init_file_system())
-		return 1;
-
-	//Initialize render window
-	if (!render_window_->Created() &&
-		!(render_window_->Create() && render_window_->Show()))
-		return 1;
-
-	//Initialize graphics
-	if (!detail::init_graphics())
-		return 1;
-
+	//Show window
+	if (render_window_)
+		render_window_->Show();
 
 	syncronize_ = VerticalSync();
-	running_ = true;
+	stopwatch_.Restart();
 
 	//Main loop
 	while (render_window_ && render_window_->ProcessMessages() && UpdateFrame())
 		render_window_->SwapBuffers();
 
-	running_ = false;
+	stopwatch_.Stop();
 
+	//Hide window
 	if (render_window_)
-		render_window_->Destroy();
-	
+		render_window_->Hide();
+
 	return 0;
+}
+
+
+/*
+	Timing
+*/
+
+duration Engine::FrameTime() const noexcept
+{
+	return 0.0_sec;
+}
+
+duration Engine::TotalTime() const noexcept
+{
+	return 0.0_sec;
+}
+
+real Engine::FPS() const noexcept
+{
+	return FrameTime() > 0.0_sec ?
+		1.0_r / FrameTime().count() :
+		0.0_r;
+}
+
+
+bool Engine::Running() const noexcept
+{
+	return stopwatch_.IsRunning();
 }
 
 

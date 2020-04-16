@@ -19,6 +19,7 @@ File:	IonEngine.h
 #include "events/listeners/IonFrameListener.h"
 #include "graphics/render/IonRenderWindow.h"
 #include "graphics/scene/IonSceneManager.h"
+#include "timers/IonStopwatch.h"
 #include "types/IonTypes.h"
 
 namespace ion
@@ -41,8 +42,8 @@ namespace ion
 	{
 		private:
 
-			bool running_ = false;
 			bool syncronize_ = false;
+			timers::Stopwatch stopwatch_;
 
 			std::optional<graphics::render::RenderWindow> render_window_;
 			graphics::scene::SceneManager scene_manager_;
@@ -92,22 +93,38 @@ namespace ion
 				Observers
 			*/
 
-			//Returns true if the engine is running
-			[[nodiscard]] inline auto Running() const noexcept
-			{
-				return running_;
-			}
-
 			//Returns true if the engine is using vertical sync
 			[[nodiscard]] bool VerticalSync() const noexcept;
 
 
 			/*
-				Game loop
+				Engine
 			*/
 
-			//
+			//Returns true if all extensions, internal and external requirements where initialized succesfully
+			[[nodiscard]] bool Initialize() noexcept;
+
+			//Start the rendering loop
+			//Returns 0 if everything went fine
 			[[nodiscard]] int Start() noexcept;
+
+
+			/*
+				Timing
+			*/
+
+			//Returns the last frame time
+			[[nodiscard]] duration FrameTime() const noexcept;
+
+			//Returns the total running time
+			[[nodiscard]] duration TotalTime() const noexcept;
+
+			//Returns the FPS
+			[[nodiscard]] real FPS() const noexcept;
+
+
+			//Returns true if the engine is running
+			[[nodiscard]] bool Running() const noexcept;
 
 
 			/*
