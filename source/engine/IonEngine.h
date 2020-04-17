@@ -42,8 +42,9 @@ namespace ion
 	{
 		private:
 
-			bool syncronize_ = false;
-			timers::Stopwatch stopwatch_;
+			bool syncronize_ = false;		
+			timers::Stopwatch frame_stopwatch_;
+			timers::Stopwatch total_stopwatch_;
 
 			std::optional<graphics::render::RenderWindow> render_window_;
 			graphics::scene::SceneManager scene_manager_;

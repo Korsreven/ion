@@ -22,13 +22,11 @@ Stopwatch::clock::time_point Stopwatch::Now() noexcept
 	return clock::now();
 }
 
-Stopwatch::clock::duration Stopwatch::Sync() noexcept
+Stopwatch::clock::duration Stopwatch::Duration() const noexcept
 {
-	if (running_)
-		stop_ = Now();
-
-	return stop_ - start_;
+	return (running_ ? Now() : stop_) - start_;
 }
+
 
 //Public
 
@@ -66,7 +64,7 @@ void Stopwatch::Stop() noexcept
 {
 	if (running_)
 	{
-		Sync();
+		stop_ = Now();
 		running_ = false;
 	}
 }
@@ -77,10 +75,12 @@ void Stopwatch::Reset() noexcept
 	running_ = false;
 }
 
-void Stopwatch::Restart() noexcept
+duration Stopwatch::Restart() noexcept
 {
+	auto elapsed = Duration();
 	Reset();
 	Start();
+	return elapsed;
 }
 
 bool Stopwatch::IsRunning() const noexcept
@@ -93,39 +93,39 @@ bool Stopwatch::IsRunning() const noexcept
 	Get total elapsed time in different units
 */
 
-duration Stopwatch::Elapsed() noexcept
+duration Stopwatch::Elapsed() const noexcept
 {
-	return duration(Sync());
+	return duration(Duration());
 }
 
-std::chrono::hours Stopwatch::ElapsedHours() noexcept
+std::chrono::hours Stopwatch::ElapsedHours() const noexcept
 {
-	return std::chrono::duration_cast<std::chrono::hours>(Sync());
+	return std::chrono::duration_cast<std::chrono::hours>(Duration());
 }
 
-std::chrono::minutes Stopwatch::ElapsedMinutes() noexcept
+std::chrono::minutes Stopwatch::ElapsedMinutes() const noexcept
 {
-	return std::chrono::duration_cast<std::chrono::minutes>(Sync());
+	return std::chrono::duration_cast<std::chrono::minutes>(Duration());
 }
 
-std::chrono::seconds Stopwatch::ElapsedSeconds() noexcept
+std::chrono::seconds Stopwatch::ElapsedSeconds() const noexcept
 {
-	return std::chrono::duration_cast<std::chrono::seconds>(Sync());
+	return std::chrono::duration_cast<std::chrono::seconds>(Duration());
 }
 
-std::chrono::milliseconds Stopwatch::ElapsedMilliseconds() noexcept
+std::chrono::milliseconds Stopwatch::ElapsedMilliseconds() const noexcept
 {
-	return std::chrono::duration_cast<std::chrono::milliseconds>(Sync());
+	return std::chrono::duration_cast<std::chrono::milliseconds>(Duration());
 }
 
-std::chrono::microseconds Stopwatch::ElapsedMicroseconds() noexcept
+std::chrono::microseconds Stopwatch::ElapsedMicroseconds() const noexcept
 {
-	return std::chrono::duration_cast<std::chrono::microseconds>(Sync());
+	return std::chrono::duration_cast<std::chrono::microseconds>(Duration());
 }
 
-Stopwatch::clock::duration Stopwatch::ElapsedNanoseconds() noexcept
+Stopwatch::clock::duration Stopwatch::ElapsedNanoseconds() const noexcept
 {
-	return Sync();
+	return Duration();
 }
 
 } //ion::timers

@@ -30,7 +30,7 @@ namespace ion::timers
 
 
 			static clock::time_point Now() noexcept;
-			clock::duration Sync() noexcept;
+			clock::duration Duration() const noexcept;
 
 		public:
 
@@ -62,7 +62,8 @@ namespace ion::timers
 			void Reset() noexcept;
 
 			//Stops, resets and starts measuring elapsed time
-			void Restart() noexcept;
+			//Returns previous elapsed time
+			duration Restart() noexcept;
 
 			//Returns true if the stopwatch is running
 			[[nodiscard]] bool IsRunning() const noexcept;
@@ -73,25 +74,25 @@ namespace ion::timers
 			*/
 
 			//Returns elapsed time in seconds (as real)
-			[[nodiscard]] duration Elapsed() noexcept;
+			[[nodiscard]] duration Elapsed() const noexcept;
 
 			//Returns elapsed time in hours (1 hour = 60 min)
-			[[nodiscard]] std::chrono::hours ElapsedHours() noexcept;
+			[[nodiscard]] std::chrono::hours ElapsedHours() const noexcept;
 
 			//Returns elapsed time in minutes (1 min = 60 sec)
-			[[nodiscard]] std::chrono::minutes ElapsedMinutes() noexcept;
+			[[nodiscard]] std::chrono::minutes ElapsedMinutes() const noexcept;
 
 			//Returns elapsed time in seconds (1 sec = 1000 ms)
-			[[nodiscard]] std::chrono::seconds ElapsedSeconds() noexcept;
+			[[nodiscard]] std::chrono::seconds ElapsedSeconds() const noexcept;
 
 			//Returns elapsed time in milliseconds (1 ms = 1000 mu)
-			[[nodiscard]] std::chrono::milliseconds ElapsedMilliseconds() noexcept;
+			[[nodiscard]] std::chrono::milliseconds ElapsedMilliseconds() const noexcept;
 
 			//Returns elapsed time in microseconds (1 mu = 1000 ns)
-			[[nodiscard]] std::chrono::microseconds ElapsedMicroseconds() noexcept;
+			[[nodiscard]] std::chrono::microseconds ElapsedMicroseconds() const noexcept;
 
 			//Returns elapsed time in nanoseconds (highest precision supported)
-			[[nodiscard]] std::chrono::nanoseconds ElapsedNanoseconds() noexcept;
+			[[nodiscard]] std::chrono::nanoseconds ElapsedNanoseconds() const noexcept;
 	};
 } //ion::timers
 

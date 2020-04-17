@@ -151,9 +151,10 @@ void Draw()
 
 bool Engine::UpdateFrame() noexcept
 {
-	auto frame_time = stopwatch_.Elapsed(); //Todo
+	auto time = frame_stopwatch_.Restart();
+		//Time should always be 0.0 sec on first frame
 
-	if (!NotifyFrameStarted(frame_time))
+	if (!NotifyFrameStarted(time))
 		return false;
 
 	for (auto &viewport : render_window_->Viewports())
@@ -167,7 +168,7 @@ bool Engine::UpdateFrame() noexcept
 	else
 		glFlush();
 
-	return NotifyFrameEnded(frame_time);
+	return NotifyFrameEnded(time);
 }
 
 
@@ -227,13 +228,14 @@ int Engine::Start() noexcept
 		render_window_->Show();
 
 	syncronize_ = VerticalSync();
-	stopwatch_.Restart();
+	total_stopwatch_.Restart();
 
 	//Main loop
 	while (render_window_ && render_window_->ProcessMessages() && UpdateFrame())
 		render_window_->SwapBuffers();
 
-	stopwatch_.Stop();
+	frame_stopwatch_.Reset();
+	total_stopwatch_.Stop(); //Total time could be retrieved later
 
 	//Hide window
 	if (render_window_)
@@ -249,25 +251,26 @@ int Engine::Start() noexcept
 
 duration Engine::FrameTime() const noexcept
 {
-	return 0.0_sec;
+	return frame_stopwatch_.Elapsed();
 }
 
 duration Engine::TotalTime() const noexcept
 {
-	return 0.0_sec;
+	return total_stopwatch_.Elapsed();
 }
 
 real Engine::FPS() const noexcept
 {
-	return FrameTime() > 0.0_sec ?
-		1.0_r / FrameTime().count() :
+	auto time = FrameTime();
+	return time > 0.0_sec ?
+		1.0_r / time.count() :
 		0.0_r;
 }
 
 
 bool Engine::Running() const noexcept
 {
-	return stopwatch_.IsRunning();
+	return total_stopwatch_.IsRunning();
 }
 
 
