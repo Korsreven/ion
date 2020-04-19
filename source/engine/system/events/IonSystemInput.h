@@ -218,11 +218,11 @@ namespace ion::system::events
 
 		constexpr std::array mouse_button_map
 		{
-			mouse_pair_type{VK_LBUTTON,				MouseButton::Left},
-			mouse_pair_type{VK_RBUTTON,				MouseButton::Right},
-			mouse_pair_type{VK_MBUTTON,				MouseButton::Middle},
-			mouse_pair_type{VK_XBUTTON1,			MouseButton::X1},
-			mouse_pair_type{VK_XBUTTON2,			MouseButton::X2}
+			mouse_pair_type{MK_LBUTTON,				MouseButton::Left},
+			mouse_pair_type{MK_RBUTTON,				MouseButton::Right},
+			mouse_pair_type{MK_MBUTTON,				MouseButton::Middle},
+			mouse_pair_type{MK_XBUTTON1,			MouseButton::X1},
+			mouse_pair_type{MK_XBUTTON2,			MouseButton::X2}
 		};
 		#endif
 

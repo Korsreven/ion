@@ -15,6 +15,7 @@ File:	IonEngine.h
 
 #include <optional>
 
+#include "events/IonInputController.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonFrameListener.h"
 #include "graphics/render/IonRenderWindow.h"
@@ -47,6 +48,7 @@ namespace ion
 			timers::Stopwatch total_stopwatch_;
 
 			std::optional<graphics::render::RenderWindow> render_window_;
+			std::optional<events::InputController> input_controller_;
 			graphics::scene::SceneManager scene_manager_;
 
 
@@ -96,6 +98,36 @@ namespace ion
 
 			//Returns true if the engine is using vertical sync
 			[[nodiscard]] bool VerticalSync() const noexcept;
+
+
+			//Returns a mutable pointer to a render window
+			//Returns nullptr if the engine is not rendering to any render window
+			[[nodiscard]] inline auto Window() noexcept
+			{
+				return render_window_ ? &*render_window_ : nullptr;
+			}
+
+			//Returns an immutable pointer to a render window
+			//Returns nullptr if the engine is not rendering to any render window
+			[[nodiscard]] inline auto Window() const noexcept
+			{
+				return render_window_ ? &*render_window_ : nullptr;
+			}
+
+
+			//Returns a mutable pointer to an input controller
+			//Returns nullptr if the engine has no input controller
+			[[nodiscard]] inline auto Input() noexcept
+			{
+				return input_controller_ ? &*input_controller_ : nullptr;
+			}
+
+			//Returns an immutable pointer to an input controller
+			//Returns nullptr if the engine has no input controller
+			[[nodiscard]] inline auto Input() const noexcept
+			{
+				return input_controller_ ? &*input_controller_ : nullptr;
+			}
 
 
 			/*

@@ -281,8 +281,10 @@ bool Engine::Running() const noexcept
 graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow &&render_window) noexcept
 {
 	render_window_.emplace(std::move(render_window));
-	auto &viewport = render_window_->CreateViewport(graphics::render::Viewport{*render_window_});
+	input_controller_.emplace(*render_window_);
 
+
+	auto &viewport = render_window_->CreateViewport(graphics::render::Viewport{*render_window_});
 	auto frustum = graphics::render::Frustum::Orthographic(graphics::utilities::Aabb{{-1.7778_r, -1.0_r}, {1.7778_r, 1.0_r}},
 														   -1.0_r, 1.0_r, 16.0_r / 9.0_r,
 														   graphics::render::frustum::AspectRatioFormat::PanAndScan);
@@ -290,7 +292,6 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 
 	auto &camera = scene_manager_.CreateCamera(graphics::scene::Camera{frustum});
 	camera.Position({0.0_r, 0.0_r});
-
 	viewport.ConnectCamera(camera);
 
 	return *render_window_;

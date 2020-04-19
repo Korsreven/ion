@@ -176,12 +176,50 @@ struct Sprite : ion::events::listeners::ResourceListener<ion::graphics::textures
 	}
 };
 
-struct Test : ion::system::events::listeners::MessageListener
+class InputTest :
+	public ion::events::listeners::KeyListener,
+	public ion::events::listeners::MouseListener
 {
-	bool MessageReceived(HWND, UINT, WPARAM, LPARAM) noexcept override
-	{
-		return false;
-	}
+	public:
+
+		void KeyPressed(ion::events::listeners::KeyButton button) noexcept override
+		{
+			button;
+		}
+
+		void KeyReleased(ion::events::listeners::KeyButton button) noexcept override
+		{
+			button;
+  		}
+
+		void CharacterPressed(char character) noexcept override
+		{
+			character;
+		}
+
+
+		void MousePressed(ion::events::listeners::MouseButton button, ion::graphics::utilities::Vector2 position) noexcept override
+		{
+			button;
+			position;
+		}
+
+		void MouseReleased(ion::events::listeners::MouseButton button, ion::graphics::utilities::Vector2 position) noexcept override
+		{
+			button;
+			position;
+		}
+
+		void MouseMoved(ion::graphics::utilities::Vector2 position) noexcept override
+		{
+			position;
+		}
+
+		void MouseWheelRolled(int delta, ion::graphics::utilities::Vector2 position) noexcept override
+		{
+			delta;
+			position;
+		}
 };
 
 void OnTick(ion::timers::Timer &ticked_timer)
@@ -209,6 +247,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		Test code
 	*/
 
+	InputTest input_test;
+
 	auto exit_code = 0;
 	{	
 		ion::Engine engine;
@@ -216,6 +256,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		auto &window = engine.RenderTo(
 			ion::graphics::render::RenderWindow::Resizable("ION engine", {1280.0_r, 720.0_r}));
 		window.MinSize(ion::graphics::utilities::Vector2{640.0_r, 360.0_r});
+
+		engine.Input()->KeyEvents().Subscribe(input_test);
+		engine.Input()->MouseEvents().Subscribe(input_test);
 
 		if (engine.Initialize())
 		{

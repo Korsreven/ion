@@ -41,6 +41,46 @@ bool InputListener::Unsubscribable(Listenable<MessageListener>&) noexcept
 #ifdef ION_WIN32
 bool InputListener::MessageReceived(HWND, UINT message, WPARAM w_param, LPARAM l_param) noexcept
 {
+	//Prepare mouse buttons
+	switch (message)
+	{
+		//Left mouse button
+		case WM_LBUTTONDOWN:
+		case WM_LBUTTONUP:
+		w_param = MK_LBUTTON;
+		break;
+
+		//Right mouse button
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONUP:
+		w_param = MK_RBUTTON;
+		break;
+
+		//Middle mouse button
+		case WM_MBUTTONDOWN:
+		case WM_MBUTTONUP:
+		w_param = MK_MBUTTON;
+		break;
+
+		//X mouse button
+		case WM_XBUTTONDOWN:
+		case WM_XBUTTONUP:
+		{
+			switch (HIWORD(w_param))
+			{
+				case XBUTTON1:
+				w_param = MK_XBUTTON1;
+				break;
+
+				case XBUTTON2:
+				w_param = MK_XBUTTON2;
+				break;
+			}
+
+			break;
+		}
+	}
+
 	switch (message)
 	{
 		//Key messages
@@ -75,6 +115,7 @@ bool InputListener::MessageReceived(HWND, UINT message, WPARAM w_param, LPARAM l
 
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
+		case WM_MBUTTONDOWN:
 		case WM_XBUTTONDOWN:
 		{
 			if (auto mouse_button = events::GetMappedMouseButton(w_param); mouse_button)
@@ -83,9 +124,10 @@ bool InputListener::MessageReceived(HWND, UINT message, WPARAM w_param, LPARAM l
 									 static_cast<real>(HIWORD(l_param)))); //y
 			return true;
 		}
-
+		
 		case WM_LBUTTONUP:
 		case WM_RBUTTONUP:
+		case WM_MBUTTONUP:
 		case WM_XBUTTONUP:
 		{
 			if (auto mouse_button = events::GetMappedMouseButton(w_param); mouse_button)
@@ -106,7 +148,7 @@ bool InputListener::MessageReceived(HWND, UINT message, WPARAM w_param, LPARAM l
 		{
 			//Mouse wheel rolled coordinates are not in client space
 			if (auto x = static_cast<real>(LOWORD(l_param)),
-					 y = static_cast<real>(HIWORD(l_param)); IsInsideWindow(x, y))
+					 y = static_cast<real>(HIWORD(l_param)); IsInsideViewport(x, y))
 			{
 				//TODO, missing system::Window
 				//Emulate for now
@@ -124,7 +166,7 @@ bool InputListener::MessageReceived(HWND, UINT message, WPARAM w_param, LPARAM l
 #endif
 
 
-bool InputListener::IsInsideWindow(real x, real y) const noexcept
+bool InputListener::IsInsideViewport(real x, real y) const noexcept
 {
 	//TODO, missing system::Window
 	//Emulate for now
