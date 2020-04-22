@@ -60,11 +60,14 @@ namespace ion::system::events::listeners
 			#endif
 
 
-			//Return true if position is outside window
+			//Returns true if position is inside window
+			bool IsInsideWindow(real x, real y) const noexcept;
+
+			//Returns true if position is inside viewport
 			bool IsInsideViewport(real x, real y) const noexcept;
 
-			//Return a viewport adjusted position
-			Vector2 ViewportAdjusted(real x, real y) const noexcept;
+			//Returns a view adjusted position
+			Vector2 ViewAdjusted(Vector2 position) const noexcept;
 
 		protected:
 

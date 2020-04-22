@@ -637,6 +637,11 @@ namespace ion::system
 			{
 				return *handle_;
 			}
+			#else
+			[[nodiscard]] inline auto Handle() const noexcept -> void*
+			{
+				return nullptr;
+			}
 			#endif
 
 

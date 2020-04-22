@@ -558,6 +558,14 @@ namespace ion::graphics::render
 			{
 				return system::Window::IsActive();
 			}
+
+
+			//Returns the native window handle
+			//Returns nullptr if no window has been created
+			[[nodiscard]] inline auto Handle() const noexcept
+			{
+				return system::Window::Handle();
+			}
 	};
 } //ion::graphics::render
 
