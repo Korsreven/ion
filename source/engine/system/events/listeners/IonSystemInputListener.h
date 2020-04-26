@@ -14,15 +14,11 @@ File:	IonSystemInputListener.h
 #define ION_SYSTEM_INPUT_LISTENER_H
 
 #include "events/IonListenable.h"
+#include "graphics/render/IonRenderWindow.h"
+#include "managed/IonObservedObject.h"
 #include "system/IonSystemAPI.h"
 #include "system/events/IonSystemInput.h"
 #include "system/events/listeners/IonSystemMessageListener.h"
-
-//Forward declaration
-namespace ion::graphics::render
-{
-	class RenderWindow;
-} //ion::graphics::render
 
 namespace ion::system::events::listeners
 {
@@ -61,10 +57,10 @@ namespace ion::system::events::listeners
 
 
 			//Returns true if position is inside window
-			bool IsInsideWindow(real x, real y) const noexcept;
+			bool IsInsideWindow(Vector2 position) const noexcept;
 
 			//Returns true if position is inside viewport
-			bool IsInsideViewport(real x, real y) const noexcept;
+			bool IsInsideViewport(Vector2 position) const noexcept;
 
 			//Returns a view adjusted position
 			Vector2 ViewAdjusted(Vector2 position) const noexcept;
@@ -75,6 +71,7 @@ namespace ion::system::events::listeners
 			using MouseEventsBase = ion::events::Listenable<ion::events::listeners::MouseListener>;
 
 			graphics::render::RenderWindow &render_window_;
+			managed::ObservedObject<graphics::render::Viewport> viewport_;
 
 
 			/*
@@ -170,6 +167,23 @@ namespace ion::system::events::listeners
 			{
 				return static_cast<const MouseEventsBase&>(*this);
 			}
+
+
+			/*
+				Viewport
+			*/
+
+			//Sets the viewport that should be connected to this input listener
+			void ConnectViewport(graphics::render::Viewport &viewport) noexcept;
+
+
+			//Returns a mutable pointer to the viewport connected to this input listener
+			//Returns nullptr if this input listener does not have a viewport connected
+			[[nodiscard]] graphics::render::Viewport* ConnectedViewport() noexcept;
+
+			//Returns an immutable pointer to the viewport connected to this input listener
+			//Returns nullptr if this input listener does not have a viewport connected
+			[[nodiscard]] const graphics::render::Viewport* ConnectedViewport() const noexcept;
 	};
 } //ion::system::events::listeners
 

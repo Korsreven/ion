@@ -14,7 +14,6 @@ File:	IonSystemInputListener.cpp
 
 #include <utility>
 
-#include "graphics/render/IonRenderWindow.h"
 #include "graphics/render/IonViewport.h"
 #include "graphics/utilities/IonAabb.h"
 #include "types/IonTypes.h"
@@ -96,7 +95,7 @@ bool InputListener::MessageReceived(HWND, UINT message, WPARAM w_param, LPARAM l
 
 			//Cancel this message if outside window
 			if (auto x = static_cast<real>(point.x),
-					 y = static_cast<real>(point.y); !IsInsideWindow(x, y))
+					 y = static_cast<real>(point.y); !IsInsideWindow({x, y}))
 				return true;
 
 			[[fallthrough]];
@@ -113,7 +112,7 @@ bool InputListener::MessageReceived(HWND, UINT message, WPARAM w_param, LPARAM l
 		{
 			//Adjust coordinates from window client space to view space
 			if (auto x = static_cast<real>(LOWORD(l_param)),
-					 y = static_cast<real>(HIWORD(l_param)); !IsInsideViewport(x, y))
+					 y = static_cast<real>(HIWORD(l_param)); viewport_ && !IsInsideViewport({x, y}))
 				return true;
 		}
 	}
@@ -195,25 +194,33 @@ bool InputListener::MessageReceived(HWND, UINT message, WPARAM w_param, LPARAM l
 }
 #endif
 
-bool InputListener::IsInsideWindow(real x, real y) const noexcept
+bool InputListener::IsInsideWindow(Vector2 position) const noexcept
 {
+	//Has render window
 	if (auto inner_size = render_window_.InnerSize(); inner_size)
-		return Aabb{vector2::Zero, *inner_size}.Contains(Vector2{x, inner_size->Y() - y});
+	{
+		//Invert y-axis
+		position.Y(inner_size->Y() - position.Y());
+		return Aabb{vector2::Zero, *inner_size}.Contains(position);
+	}
 	else
 		return false;
 }
 
-bool InputListener::IsInsideViewport(real x, real y) const noexcept
+bool InputListener::IsInsideViewport(Vector2 position) const noexcept
 {
-	//Inverse y-axis
+	//Has render window
 	if (auto inner_size = render_window_.InnerSize(); inner_size)
-		y = inner_size->Y() - y;
+	{
+		//Invert y-axis
+		position.Y(inner_size->Y() - position.Y());
 
-	//Check against bounds of first viewport
-	if (auto viewports = render_window_.Viewports(); !std::empty(viewports))
-		return std::begin(viewports)->Bounds().Contains(Vector2{x, y});
-	else
-		return false;
+		//Has viewport
+		if (auto viewport = viewport_.Object(); viewport)
+			return viewport->Bounds().Contains(position);
+	}
+	
+	return false;
 }
 
 Vector2 InputListener::ViewAdjusted(Vector2 position) const noexcept
@@ -225,17 +232,15 @@ Vector2 InputListener::ViewAdjusted(Vector2 position) const noexcept
 		position.Y(inner_size->Y() - position.Y());
 
 		//Has viewport
-		if (auto viewports = render_window_.Viewports(); !std::empty(viewports))
+		if (auto viewport = viewport_.Object(); viewport)
 		{
-			auto &viewport = *std::begin(viewports);
-
 			//Adjust coordinates from client to viewport coordinates
-			position -= viewport.Bounds().Min();
+			position -= viewport->Bounds().Min();
 
 			//Has camera connected to viewport
-			if (auto camera = viewport.ConnectedCamera(); camera)
+			if (auto camera = viewport->ConnectedCamera(); camera)
 			{
-				auto viewport_size = viewport.Bounds().ToSize();
+				auto viewport_size = viewport->Bounds().ToSize();
 				auto [width, height] = viewport_size.XY();
 				auto [x, y] = position.XY();
 
@@ -310,6 +315,28 @@ InputListener::~InputListener()
 {
 	MessageListener::Listening(false);
 	render_window_.MessageEvents().Unsubscribe(*this);
+}
+
+
+/*
+	Viewport
+*/
+
+void InputListener::ConnectViewport(graphics::render::Viewport &viewport) noexcept
+{
+	if (viewport.Owner() == &render_window_)
+		viewport_.Observe(viewport);
+}
+
+
+graphics::render::Viewport* InputListener::ConnectedViewport() noexcept
+{
+	return viewport_.Object();
+}
+
+const graphics::render::Viewport* InputListener::ConnectedViewport() const noexcept
+{
+	return viewport_.Object();
 }
 
 } //ion::system::events::listeners

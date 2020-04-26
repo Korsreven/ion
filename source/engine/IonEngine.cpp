@@ -283,8 +283,9 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 	render_window_.emplace(std::move(render_window));
 	input_controller_.emplace(*render_window_);
 
-
 	auto &viewport = render_window_->CreateViewport(graphics::render::Viewport{*render_window_});
+	input_controller_->ConnectViewport(viewport);
+	
 	auto frustum = graphics::render::Frustum::Orthographic(graphics::utilities::Aabb{{-1.7778_r, -1.0_r}, {1.7778_r, 1.0_r}},
 														   -1.0_r, 1.0_r, 16.0_r / 9.0_r,
 														   graphics::render::frustum::AspectRatioFormat::PanAndScan);

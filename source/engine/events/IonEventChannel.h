@@ -63,21 +63,27 @@ namespace ion::events
 	} //event_channel
 
 
-	template <typename T,
-		typename = std::enable_if_t<event_channel::detail::has_listener_type_v<T>>>
-	class EventChannel : public T::listener_type
+	template <typename ListenableT, typename PublisherT = ListenableT,
+		typename = std::enable_if_t<event_channel::detail::has_listener_type_v<ListenableT>>>
+	class EventChannel : public ListenableT::listener_type
 	{
-		static_assert(std::is_same_v<events::Listenable<typename T::listener_type>, T> ||
-					  std::is_base_of_v<events::Listenable<typename T::listener_type>, T>);
+		static_assert(std::is_same_v<events::Listenable<typename ListenableT::listener_type>, ListenableT> ||
+					  std::is_base_of_v<events::Listenable<typename ListenableT::listener_type>, ListenableT>);
+		static_assert(std::is_same_v<ListenableT, PublisherT> ||
+					  std::is_base_of_v<ListenableT, PublisherT>);
+
+		public:
+
+			using listenable_type = events::Listenable<typename ListenableT::listener_type>;
 
 		private:
 
-			T *publisher_ = nullptr;
+			ListenableT *publisher_ = nullptr;
 			event_channel::SubscriptionContract contract_ = event_channel::SubscriptionContract::Cancelable;
 
 		protected:
 
-			inline auto DoSubscribe(T &publisher)
+			inline auto DoSubscribe(ListenableT &publisher)
 			{
 				if (!publisher_)
 				{
@@ -108,22 +114,22 @@ namespace ion::events
 			*/
 
 			//See Listener::Unsubscribed for more details
-			void Unsubscribed(events::Listenable<typename T::listener_type>&) noexcept override
+			void Unsubscribed(listenable_type&) noexcept override
 			{
 				publisher_ = nullptr;
 				Unsubscribed();
 			}
 
 			//See Listener::Unsubscribable for more details
-			bool Unsubscribable(events::Listenable<typename T::listener_type>&) noexcept override
+			bool Unsubscribable(listenable_type&) noexcept override
 			{
 				return contract_ == event_channel::SubscriptionContract::Cancelable;
 			}
 
 			//See Listener::SubscriberMoved for more details
-			void SubscriberMoved(events::Listenable<typename T::listener_type> &listenable) noexcept override
+			void SubscriberMoved(listenable_type &listenable) noexcept override
 			{
-				publisher_ = static_cast<T*>(&listenable);
+				publisher_ = static_cast<ListenableT*>(&listenable);
 			}
 
 
@@ -145,7 +151,7 @@ namespace ion::events
 			}
 
 			//Construct a new event channel with the given publisher and subscription contract
-			EventChannel(T &publisher, event_channel::SubscriptionContract contract = event_channel::SubscriptionContract::Cancelable) :
+			EventChannel(ListenableT &publisher, event_channel::SubscriptionContract contract = event_channel::SubscriptionContract::Cancelable) :
 
 				publisher_{event_channel::detail::subscribe_to_publisher(publisher, *this)},
 				contract_{contract}
@@ -226,7 +232,7 @@ namespace ion::events
 			//Subscribe to the given publisher
 			//If another publisher is being subscribed to, that publisher is unsubscribed automatically (if possible by the contract)
 			//Returns true if the publisher has successfully been subscribed to, or change contract
-			inline auto Subscribe(T &publisher)
+			inline auto Subscribe(ListenableT &publisher)
 			{
 				if (publisher_ != &publisher)
 				{
@@ -260,14 +266,14 @@ namespace ion::events
 			//Returns nullptr if this event channel does not have a publisher
 			[[nodiscard]] inline auto Publisher() noexcept	
 			{
-				return publisher_;
+				return static_cast<PublisherT*>(publisher_);
 			}
 
 			//Returns a pointer to an immutable publisher
 			//Returns nullptr if this event channel does not have a publisher
 			[[nodiscard]] inline const auto Publisher() const noexcept	
 			{
-				return publisher_;
+				return static_cast<const PublisherT*>(publisher_);
 			}
 
 			//Returns the subscription contract for this event channel

@@ -17,6 +17,8 @@ File:	IonObservedObject.h
 
 #include "IonManagedObject.h"
 #include "events/IonEventChannel.h"
+#include "events/IonListenable.h"
+#include "events/listeners/IonListenerTraits.h"
 
 namespace ion::managed
 {
@@ -71,13 +73,15 @@ namespace ion::managed
 
 	template <typename T,
 		typename = std::enable_if_t<observed_object::detail::has_owner_type_v<T>>>
-	class ObservedObject final : protected events::EventChannel<typename T::owner_type>
+	class ObservedObject final :
+		protected events::EventChannel<events::Listenable<events::listeners::listener_of_t<T, typename T::owner_type>>, typename T::owner_type>
 	{
 		static_assert(std::is_base_of_v<ManagedObject<typename T::owner_type>, T>);
+		using my_base = events::EventChannel<events::Listenable<events::listeners::listener_of_t<T, typename T::owner_type>>, typename T::owner_type>;
 
 		private:
 
-			T *managed_object_;
+			T *managed_object_ = nullptr;
 
 		protected:
 
@@ -114,7 +118,7 @@ namespace ion::managed
 
 			//Construct a new empty observed object with the given requirement
 			ObservedObject(observed_object::ObjectRequirement requirement) noexcept :
-				events::EventChannel<typename T::owner_type>{observed_object::detail::as_subscription_contract(requirement)}
+				my_base{observed_object::detail::as_subscription_contract(requirement)}
 			{
 				//Empty
 			}
@@ -122,7 +126,7 @@ namespace ion::managed
 			//Construct a new observed object with the given object and requirement
 			ObservedObject(T &object, observed_object::ObjectRequirement requirement = observed_object::ObjectRequirement::Optional) :
 
-				events::EventChannel<typename T::owner_type>{object.Owner(), observed_object::detail::as_subscription_contract(requirement)},
+				my_base{object.Owner(), observed_object::detail::as_subscription_contract(requirement)},
 				managed_object_{this->Active() ? &object : nullptr}
 			{
 				//Empty
@@ -131,7 +135,7 @@ namespace ion::managed
 			//Copy constructor
 			ObservedObject(const ObservedObject &rhs) :
 
-				events::EventChannel<typename T::owner_type>{rhs},
+				my_base{rhs},
 				managed_object_{this->Active() ? rhs.managed_object_ : nullptr}
 			{
 				//Empty
@@ -140,7 +144,7 @@ namespace ion::managed
 			//Move constructor
 			ObservedObject(ObservedObject &&rhs) :
 
-				events::EventChannel<typename T::owner_type>{std::move(rhs)},
+				my_base{std::move(rhs)},
 				managed_object_{this->Active() ? std::exchange(rhs.managed_object_, nullptr) : nullptr}
 			{
 				//Empty
@@ -154,7 +158,7 @@ namespace ion::managed
 			//Copy assignment
 			inline auto& operator=(const ObservedObject &rhs)
 			{
-				events::EventChannel<typename T::owner_type>::operator=(rhs);
+				my_base::operator=(rhs);
 
 				if (this != &rhs)
 					managed_object_ = this->Active() ? rhs.managed_object_ : nullptr;
@@ -165,7 +169,7 @@ namespace ion::managed
 			//Move assignment
 			inline auto& operator=(ObservedObject &&rhs)
 			{
-				events::EventChannel<typename T::owner_type>::operator=(std::move(rhs));
+				my_base::operator=(std::move(rhs));
 
 				if (this != &rhs)
 					managed_object_ = this->Active() ? std::exchange(rhs.managed_object_, nullptr) : nullptr;
