@@ -20,6 +20,8 @@ File:	IonObjectObserver.h
 #include "IonObservedObject.h"
 #include "adaptors/ranges/IonDereferenceIterable.h"
 #include "events/IonEventChannel.h"
+#include "events/IonListenable.h"
+#include "events/listeners/IonListenerTraits.h"
 
 namespace ion::managed
 {
@@ -32,9 +34,11 @@ namespace ion::managed
 
 	template <typename T,
 		typename = std::enable_if_t<observed_object::detail::has_owner_type_v<T>>>
-	class ObjectObserver final : protected events::EventChannel<typename T::owner_type>
+	class ObjectObserver final :
+		protected events::EventChannel<events::Listenable<events::listeners::listener_of_t<T, typename T::owner_type>>, typename T::owner_type>
 	{
 		static_assert(std::is_base_of_v<ManagedObject<typename T::owner_type>, T>);
+		using my_base = events::EventChannel<events::Listenable<events::listeners::listener_of_t<T, typename T::owner_type>>, typename T::owner_type>;
 
 		private:
 
@@ -97,7 +101,7 @@ namespace ion::managed
 
 			//Construct a new empty observed object with the given requirement
 			ObjectObserver(observed_object::ObjectRequirement requirement) noexcept :
-				events::EventChannel<typename T::owner_type>{observed_object::detail::as_subscription_contract(requirement)}
+				my_base{observed_object::detail::as_subscription_contract(requirement)}
 			{
 				//Empty
 			}
@@ -105,7 +109,7 @@ namespace ion::managed
 			//Copy constructor
 			ObjectObserver(const ObjectObserver &rhs) :
 
-				events::EventChannel<typename T::owner_type>{rhs},
+				my_base{rhs},
 				managed_objects_{this->Active() ? rhs.managed_objects_ : decltype(managed_objects_){}}
 			{
 				//Empty
@@ -114,7 +118,7 @@ namespace ion::managed
 			//Move constructor
 			ObjectObserver(ObjectObserver &&rhs) :
 
-				events::EventChannel<typename T::owner_type>{std::move(rhs)},
+				my_base{std::move(rhs)},
 				managed_objects_{this->Active() ? std::exchange(rhs.managed_objects_, decltype(managed_objects_){}) : decltype(managed_objects_){}}
 			{
 				//Empty
@@ -128,7 +132,7 @@ namespace ion::managed
 			//Copy assignment
 			inline auto& operator=(const ObjectObserver &rhs)
 			{
-				events::EventChannel<typename T::owner_type>::operator=(rhs);
+				my_base::operator=(rhs);
 
 				if (this != &rhs)
 					managed_objects_ = this->Active() ? rhs.managed_object_ : decltype(managed_objects_){};
@@ -139,7 +143,7 @@ namespace ion::managed
 			//Move assignment
 			inline auto& operator=(ObjectObserver &&rhs)
 			{
-				events::EventChannel<typename T::owner_type>::operator=(std::move(rhs));
+				my_base::operator=(std::move(rhs));
 
 				if (this != &rhs)
 					managed_objects_ = this->Active() ? std::exchange(rhs.managed_objects_, decltype(managed_objects_){}) : decltype(managed_objects_){};
