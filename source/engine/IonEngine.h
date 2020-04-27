@@ -20,11 +20,15 @@ File:	IonEngine.h
 #include "events/listeners/IonFrameListener.h"
 #include "graphics/render/IonRenderWindow.h"
 #include "graphics/scene/IonSceneManager.h"
+#include "graphics/utilities/IonAabb.h"
 #include "timers/IonStopwatch.h"
+#include "timers/IonTimerManager.h"
 #include "types/IonTypes.h"
 
 namespace ion
 {
+	using namespace types::type_literals;
+
 	namespace engine
 	{
 		namespace detail
@@ -39,7 +43,7 @@ namespace ion
 
 
 	class Engine final :
-		protected events::Listenable<events::listeners::FrameListener>
+		public events::Listenable<events::listeners::FrameListener>
 	{
 		private:
 
@@ -50,6 +54,7 @@ namespace ion
 			std::optional<graphics::render::RenderWindow> render_window_;
 			std::optional<events::InputController> input_controller_;
 			graphics::scene::SceneManager scene_manager_;
+			timers::TimerManager timer_manager_;
 
 
 			/*
@@ -101,32 +106,45 @@ namespace ion
 
 
 			//Returns a mutable pointer to a render window
-			//Returns nullptr if the engine is not rendering to any render window
-			[[nodiscard]] inline auto Window() noexcept
+			//Returns nullptr if the engine is not rendering to a target
+			[[nodiscard]] inline auto Target() noexcept
 			{
 				return render_window_ ? &*render_window_ : nullptr;
 			}
 
 			//Returns an immutable pointer to a render window
-			//Returns nullptr if the engine is not rendering to any render window
-			[[nodiscard]] inline auto Window() const noexcept
+			//Returns nullptr if the engine is not rendering to a target
+			[[nodiscard]] inline auto Target() const noexcept
 			{
 				return render_window_ ? &*render_window_ : nullptr;
 			}
 
 
 			//Returns a mutable pointer to an input controller
-			//Returns nullptr if the engine has no input controller
+			//Returns nullptr if the engine has no input controller (missing rendering target)
 			[[nodiscard]] inline auto Input() noexcept
 			{
 				return input_controller_ ? &*input_controller_ : nullptr;
 			}
 
 			//Returns an immutable pointer to an input controller
-			//Returns nullptr if the engine has no input controller
+			//Returns nullptr if the engine has no input controller (missing rendering target)
 			[[nodiscard]] inline auto Input() const noexcept
 			{
 				return input_controller_ ? &*input_controller_ : nullptr;
+			}
+
+
+			//Returns a mutable reference to a timer manager
+			[[nodiscard]] inline auto& SyncedTimers() noexcept
+			{
+				return timer_manager_;
+			}
+
+			//Returns an immutable reference to a timer manager
+			[[nodiscard]] inline auto& SyncedTimers() const noexcept
+			{
+				return timer_manager_;
 			}
 
 
@@ -161,11 +179,17 @@ namespace ion
 
 
 			/*
-				Window
+				Rendering target
 			*/
 
-			//
-			graphics::render::RenderWindow& RenderTo(graphics::render::RenderWindow &&render_window) noexcept;
+			//Render to the given render window, and create a default viewport and camera/frustum with the given aspect ratio and format
+			graphics::render::RenderWindow& RenderTo(graphics::render::RenderWindow &&render_window,
+				std::optional<real> aspect_ratio = 16.0_r / 9.0_r, graphics::render::frustum::AspectRatioFormat aspect_format = graphics::render::frustum::AspectRatioFormat::PanAndScan) noexcept;
+
+			//Render to the given render window, and create a default viewport and camera/frustum with the given clipping plane, near/far clip distance, aspect ratio and format
+			graphics::render::RenderWindow& RenderTo(graphics::render::RenderWindow &&render_window,
+				std::optional<graphics::utilities::Aabb> clipping_plane, real near_clip_distance, real far_clip_distance,
+				std::optional<real> aspect_ratio = 16.0_r / 9.0_r, graphics::render::frustum::AspectRatioFormat aspect_format = graphics::render::frustum::AspectRatioFormat::PanAndScan) noexcept;
 	};
 } //ion
 #endif

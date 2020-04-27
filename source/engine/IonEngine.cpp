@@ -21,7 +21,6 @@ namespace ion
 {
 
 using namespace engine;
-using namespace types::type_literals;
 
 namespace engine::detail
 {
@@ -154,6 +153,8 @@ bool Engine::UpdateFrame() noexcept
 	auto time = frame_stopwatch_.Restart();
 		//Time should always be 0.0 sec on first frame
 
+	timer_manager_.Elapse(time);
+
 	if (!NotifyFrameStarted(time))
 		return false;
 
@@ -278,21 +279,38 @@ bool Engine::Running() const noexcept
 	Window
 */
 
-graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow &&render_window) noexcept
+graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow &&render_window,
+	std::optional<real> aspect_ratio, graphics::render::frustum::AspectRatioFormat aspect_format) noexcept
 {
+	return RenderTo(std::move(render_window), graphics::utilities::Aabb{-1.0_r, 1.0_r}, -1.0_r, 1.0_r, aspect_ratio, aspect_format);
+}
+
+graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow &&render_window,
+	std::optional<graphics::utilities::Aabb> clipping_plane, real near_clip_distance, real far_clip_distance,
+	std::optional<real> aspect_ratio, graphics::render::frustum::AspectRatioFormat aspect_format) noexcept
+{
+	if (Running())
+		return *render_window_;
+
+
+	if (input_controller_)
+		input_controller_.reset();
+
+	//Create render window and input controller
 	render_window_.emplace(std::move(render_window));
 	input_controller_.emplace(*render_window_);
 
+	//Create a default viewport and connect to input
 	auto &viewport = render_window_->CreateViewport(graphics::render::Viewport{*render_window_});
 	input_controller_->ConnectViewport(viewport);
 	
-	auto frustum = graphics::render::Frustum::Orthographic(graphics::utilities::Aabb{{-1.7778_r, -1.0_r}, {1.7778_r, 1.0_r}},
-														   -1.0_r, 1.0_r, 16.0_r / 9.0_r,
-														   graphics::render::frustum::AspectRatioFormat::PanAndScan);
+	//Create a default ortographic frustum
+	auto frustum = graphics::render::Frustum::Orthographic(
+		clipping_plane, near_clip_distance, far_clip_distance, aspect_ratio, aspect_format);
 	frustum.BaseViewportHeight(viewport.Bounds().ToSize().Y());
 
+	//Create a default camera with frustum and connect to viewport
 	auto &camera = scene_manager_.CreateCamera(graphics::scene::Camera{frustum});
-	camera.Position({0.0_r, 0.0_r});
 	viewport.ConnectCamera(camera);
 
 	return *render_window_;
