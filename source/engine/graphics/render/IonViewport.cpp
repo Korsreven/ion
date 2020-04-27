@@ -190,8 +190,11 @@ void Viewport::UpdateBounds(const Aabb &bounds) noexcept
 
 void Viewport::RenderTargetResized(Vector2 size) noexcept
 {
-	UpdateBounds(ResizedBounds(render_target_size_, size));
-	render_target_size_ = size;
+	if (size != graphics::utilities::vector2::Zero)
+	{
+		UpdateBounds(ResizedBounds(render_target_size_, size));
+		render_target_size_ = size;
+	}
 }
 
 
