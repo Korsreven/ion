@@ -27,6 +27,9 @@ namespace ion::graphics::textures
 
 	class Texture : public resources::files::FileResource<TextureManger>
 	{
+		public:
+
+			using resources::files::FileResource<TextureManger>::FileResource;
 	};
 } //ion::graphics::textures
 

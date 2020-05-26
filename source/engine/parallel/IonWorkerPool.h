@@ -13,6 +13,7 @@ File:	IonWorkerPool.h
 #ifndef ION_WORKER_POOL_H
 #define ION_WORKER_POOL_H
 
+#include <algorithm>
 #include <condition_variable>
 #include <functional>
 #include <mutex>
@@ -31,6 +32,12 @@ namespace ion::parallel
 		{
 			NonSuspended,
 			Suspended
+		};
+
+		enum class Synchronization : bool
+		{
+			NonBlocking,
+			Blocking
 		};
 
 
@@ -60,6 +67,11 @@ namespace ion::parallel
 					return count;
 				else
 					return 1;
+			}
+
+			inline auto default_number_of_threads() noexcept
+			{
+				return number_of_cores() * threads_per_core;
 			}
 
 			template <typename Function, typename... Args>
@@ -144,7 +156,7 @@ namespace ion::parallel
 			//Create a worker pool, either running (default) or not
 			WorkerPool(worker_pool::RunningState running_state = worker_pool::RunningState::NonSuspended) noexcept :
 				running_state_{running_state},
-				max_worker_threads_{worker_pool::detail::number_of_cores() * worker_pool::detail::threads_per_core}
+				max_worker_threads_{worker_pool::detail::default_number_of_threads()}
 			{
 				//Empty
 			}
@@ -176,25 +188,73 @@ namespace ion::parallel
 			}
 
 			//Returns all of the result once they are available (blocking)
-			[[nodiscard]] auto Get()
+			[[nodiscard]] auto Get(worker_pool::Synchronization synchronization = worker_pool::Synchronization::Blocking)
 			{
-				Wait();
+				if (synchronization == worker_pool::Synchronization::Blocking)
+					Wait();
 
 				worker_pool::detail::result_type<Ret, Id> result;
-				result.reserve(std::size(workers_));
 
-				if constexpr (std::is_same_v<Id, void>)
+				if (synchronization == worker_pool::Synchronization::NonBlocking)
 				{
-					for (auto &worker : workers_)
-						result.push_back(worker.Get());
+					std::lock_guard lock{m_};
+
+					if constexpr (std::is_same_v<Id, void>)
+					{
+						//[tasks not ready, tasks ready]
+						auto iter =
+							std::stable_partition(std::begin(workers_), std::end(workers_),
+								[](auto &worker) noexcept
+								{
+									return !worker.IsReady();
+								});
+
+						//One or more tasks are ready
+						if (iter != std::end(workers_))
+						{
+							result.reserve(std::end(workers_) - iter);
+
+							for (auto it = iter; it != std::end(workers_); ++it)
+								result.push_back(it->Get());
+
+							workers_.erase(iter, std::end(workers_)); //Non-blocking
+						}
+					}
+					else
+					{
+						for (auto &[id, worker] : workers_)
+						{
+							if (worker.IsReady())
+								result.emplace(id, worker.Get());
+						}
+
+						workers_.erase_if(
+							[](auto &value) noexcept
+							{
+								auto &[id, worker] = value;
+								return worker.IsEmpty();
+							}
+						); //Non-blocking
+					}
 				}
 				else
-				{
-					for (auto &[id, worker] : workers_)
-						result.emplace(id, worker.Get());
+				{				
+					result.reserve(std::size(workers_));
+
+					if constexpr (std::is_same_v<Id, void>)
+					{
+						for (auto &worker : workers_)
+							result.push_back(worker.Get());
+					}
+					else
+					{
+						for (auto &[id, worker] : workers_)
+							result.emplace(id, worker.Get());
+					}
+
+					workers_.clear(); //Non-blocking
 				}
 
-				workers_.clear(); //Non-blocking
 				return result;
 			}
 
@@ -218,6 +278,12 @@ namespace ion::parallel
 			[[nodiscard]] inline auto IsRunning() const noexcept
 			{
 				return running_state_ == worker_pool::RunningState::NonSuspended;
+			}
+
+			//Returns true if one or more workers are active
+			[[nodiscard]] inline auto HasActiveWorkers() const noexcept
+			{
+				return worker_threads_ > 0;
 			}
 
 			//Returns the max number of worker threads allowed simultaneously

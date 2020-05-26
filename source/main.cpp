@@ -138,6 +138,11 @@ struct SpriteContainer : ion::events::Listenable<ion::events::listeners::Resourc
 
 struct Sprite : ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManger>
 {
+	void ResourcePrepared(ion::graphics::textures::Texture &resource) noexcept override
+	{
+		resource;
+	}
+
 	void ResourceLoaded(ion::graphics::textures::Texture &resource) noexcept override
 	{
 		resource;
@@ -148,7 +153,12 @@ struct Sprite : ion::events::listeners::ResourceListener<ion::graphics::textures
 		resource;
 	}
 
-	void ResourceStatusChanged(ion::graphics::textures::Texture &resource) noexcept override
+	void ResourceFailed(ion::graphics::textures::Texture &resource) noexcept override
+	{
+		resource;
+	}
+
+	void ResourceLoadingStateChanged(ion::graphics::textures::Texture &resource) noexcept override
 	{
 		resource;
 	}
@@ -393,7 +403,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		}
 	}
 
-	/*ion::resources::files::repositories::AudioRepository audio_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
+	ion::resources::files::repositories::AudioRepository audio_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
 	ion::resources::files::repositories::FontRepository font_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
 	ion::resources::files::repositories::ImageRepository image_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
 	ion::resources::files::repositories::ScriptRepository script_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
@@ -409,7 +419,19 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	file_resource_loader.Attach(video_repository);
 	
 	file_resource_loader.LoadDirectory("bin", ion::utilities::file::DirectoryIteration::Recursive);
-	//file_resource_loader.CompileDataFile("bin/resources.dat");*/
+	//file_resource_loader.CompileDataFile("bin/resources.dat");
+
+
+	ion::graphics::textures::TextureManger texture_manager;
+	texture_manager.CreateFileRepository(std::move(image_repository));
+
+	texture_manager.CreateFileResource("image.png");
+	texture_manager.LoadAll(ion::resources::resource_manager::UpdateEvaluation::Lazy);
+
+	ion::types::Progress<int> progress;
+	while (!texture_manager.Loaded(progress));
+
+	auto break_point = true;
 
 	/*{
 		auto encoded = ion::utilities::codec::EncodeTo(5050, 16);

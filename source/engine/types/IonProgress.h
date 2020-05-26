@@ -55,7 +55,7 @@ namespace ion::types
 			constexpr Progress() = default;
 
 			//Construct a new progress with the given min and max
-			constexpr explicit Progress(T min, T max) noexcept :
+			constexpr Progress(T min, T max) noexcept :
 				position_{min},
 				min_{min},
 				max_{min > max ? min : max}

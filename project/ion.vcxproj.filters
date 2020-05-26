@@ -644,5 +644,8 @@
     <ClInclude Include="..\source\engine\events\listeners\IonListenerTraits.h">
       <Filter>Header Files\events\listeners</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\engine\resources\files\IonFileResourceManager.h">
+      <Filter>Header Files\resources\files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

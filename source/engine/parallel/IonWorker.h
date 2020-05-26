@@ -13,6 +13,7 @@ File:	IonWorker.h
 #ifndef ION_WORKER_H
 #define ION_WORKER_H
 
+#include <chrono>
 #include <future>
 
 namespace ion::parallel
@@ -81,6 +82,23 @@ namespace ion::parallel
 			{
 				if (task_.valid())
 					task_.wait();
+			}
+
+
+			/*
+				Observers
+			*/
+
+			//Returns true if this worker is empty
+			[[nodiscard]] inline auto IsEmpty() const noexcept
+			{
+				return !task_.valid();
+			}
+
+			//Returns true if this worker is ready
+			[[nodiscard]] inline auto IsReady() const noexcept
+			{
+				return task_.valid() && task_.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
 			}
 	};
 } //ion::parallel

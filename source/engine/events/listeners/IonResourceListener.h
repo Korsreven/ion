@@ -26,6 +26,12 @@ namespace ion::events::listeners
 			Events
 		*/
 
+		//Called right after a resource has been prepared, with a reference to the resource
+		virtual void ResourcePrepared([[maybe_unused]] ResourceT &resource) noexcept
+		{
+			//Optional to override
+		}
+
 		//Called right after a resource has been loaded, with a reference to the resource
 		virtual void ResourceLoaded([[maybe_unused]] ResourceT &resource) noexcept
 		{
@@ -38,8 +44,15 @@ namespace ion::events::listeners
 			//Optional to override
 		}
 
-		//Called right after a resource has its status changed, with a reference to the resource
-		virtual void ResourceStatusChanged([[maybe_unused]] ResourceT &resource) noexcept
+		//Called right after a resource has failed preparing/loading, with a reference to the resource
+		virtual void ResourceFailed([[maybe_unused]] ResourceT &resource) noexcept
+		{
+			//Optional to override
+		}
+
+
+		//Called right after a resource has its loading state changed, with a reference to the resource
+		virtual void ResourceLoadingStateChanged([[maybe_unused]] ResourceT &resource) noexcept
 		{
 			//Optional to override
 		}

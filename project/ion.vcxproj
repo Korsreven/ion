@@ -281,6 +281,7 @@
     <ClInclude Include="..\source\engine\parallel\IonWorkerPool.h" />
     <ClInclude Include="..\source\engine\resources\files\IonFileResource.h" />
     <ClInclude Include="..\source\engine\resources\files\IonFileResourceLoader.h" />
+    <ClInclude Include="..\source\engine\resources\files\IonFileResourceManager.h" />
     <ClInclude Include="..\source\engine\resources\files\repositories\IonAudioRepository.h" />
     <ClInclude Include="..\source\engine\resources\files\repositories\IonFileRepository.h" />
     <ClInclude Include="..\source\engine\resources\files\repositories\IonFontRepository.h" />
