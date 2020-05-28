@@ -68,6 +68,14 @@ namespace ion::timers
 			//Default move constructor
 			AsyncTimerManager(AsyncTimerManager&&) = default;
 
+			//Destructor
+			~AsyncTimerManager() noexcept
+			{
+				this->Tidy();
+					//Call ObjectManager::Tidy before this manager is destroyed
+					//Such that virtual functions and events are called properly
+			}
+
 
 			/*
 				Operators

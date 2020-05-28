@@ -57,10 +57,9 @@ namespace ion::resources
 			//See ObjectManager::Removed for more details
 			void Removed(ResourceT &resource) noexcept override
 			{
-				//Make sure no background processes are running
-				if (background_processes_ &&
-					resource.LoadingState() == resource::LoadingState::Preparing)
-					processes_.Wait(); //Blocking
+				//Wait for resource (could be in a background process)
+				if (resource.LoadingState() == resource::LoadingState::Preparing)
+					processes_.Wait(&resource); //Blocking
 
 				if (resource.LoadingState() == resource::LoadingState::Loaded)
 					Unload(resource); //Eagerly

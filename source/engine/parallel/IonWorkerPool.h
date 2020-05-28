@@ -74,6 +74,7 @@ namespace ion::parallel
 				return number_of_cores() * threads_per_core;
 			}
 
+
 			template <typename Function, typename... Args>
 			inline auto deferred_call(Function &&function, Args &&...args)
 			{
@@ -177,6 +178,25 @@ namespace ion::parallel
 
 
 			/*
+				Ranges
+			*/
+
+			//Returns a mutable range of all workers in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Workers() noexcept
+			{
+				return adaptors::ranges::Iterable<worker_pool::detail::container_type<Ret, Id>&>{workers_};
+			}
+
+			//Returns an immutable range of all workers in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline const auto Workers() const noexcept
+			{
+				return adaptors::ranges::Iterable<const worker_pool::detail::container_type<Ret, Id>&>{workers_};
+			}
+
+
+			/*
 				Modifiers
 			*/
 
@@ -267,6 +287,15 @@ namespace ion::parallel
 					{
 						return worker_threads_ == 0;
 					});
+			}
+
+			//Wait for a worker with the given id to finish its task (blocking)
+			template <typename = std::enable_if_t<!std::is_same_v<Id, void>>>
+			void Wait(const Id &id) noexcept
+			{
+				std::unique_lock lock{m_};
+				if (auto iter = workers_.find(id); iter != std::end(workers_))
+					iter->second.Wait();
 			}
 
 

@@ -25,7 +25,7 @@ namespace ion::graphics::textures
 	} //texture_manager::detail
 
 
-	class TextureManger :
+	class TextureManger final :
 		public resources::files::FileResourceManager<Texture, TextureManger, resources::files::repositories::ImageRepository>
 	{
 		protected:
@@ -56,6 +56,14 @@ namespace ion::graphics::textures
 
 			//Default move constructor
 			TextureManger(TextureManger&&) = default;
+
+			//Destructor
+			~TextureManger() noexcept
+			{
+				this->Tidy();
+					//Call ObjectManager::Tidy before this manager is destroyed
+					//Such that virtual functions and events are called properly
+			}
 
 
 			/*
