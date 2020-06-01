@@ -58,6 +58,7 @@ File:	main.cpp
 #include "graphics/textures/IonTexture.h"
 #include "graphics/textures/IonTextureManager.h"
 
+#include "graphics/IonGraphicsAPI.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonMatrix3.h"
@@ -285,6 +286,17 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 		if (engine.Initialize())
 		{
+			//Check API support
+			{
+				auto blend_func_separate = ion::graphics::api::BlendFuncSeparate_Support();
+				auto frame_buffer_object = ion::graphics::api::FrameBufferObject_Support();
+				auto multi_texture = ion::graphics::api::MultiTexture_Support();
+				auto point_sprite = ion::graphics::api::PointSprite_Support();
+				auto shader = ion::graphics::api::Shader_Support();
+				auto vertex_buffer_object = ion::graphics::api::VertexBufferObject_Support();
+				auto max_texture_units = ion::graphics::api::MaxTextureUnits();
+			}
+
 			engine.Subscribe(frame_test);
 
 			if (auto input = engine.Input(); input)
