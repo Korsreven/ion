@@ -36,6 +36,7 @@ File:	main.cpp
 #include "events/listeners/IonViewportListener.h"
 #include "events/listeners/IonWindowListener.h"
 
+#include "graphics/IonGraphicsAPI.h"
 #include "graphics/particles/IonEmitter.h"
 #include "graphics/particles/IonEmitterFactory.h"
 #include "graphics/particles/IonParticle.h"
@@ -55,10 +56,10 @@ File:	main.cpp
 #include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonSceneManager.h"
+#include "graphics/shaders/IonShader.h"
+#include "graphics/shaders/IonShaderManager.h"
 #include "graphics/textures/IonTexture.h"
 #include "graphics/textures/IonTextureManager.h"
-
-#include "graphics/IonGraphicsAPI.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonMatrix3.h"
@@ -288,13 +289,57 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		{
 			//Check API support
 			{
-				auto blend_func_separate = ion::graphics::api::BlendFuncSeparate_Support();
-				auto frame_buffer_object = ion::graphics::api::FrameBufferObject_Support();
-				auto multi_texture = ion::graphics::api::MultiTexture_Support();
-				auto point_sprite = ion::graphics::api::PointSprite_Support();
-				auto shader = ion::graphics::api::Shader_Support();
-				auto vertex_buffer_object = ion::graphics::api::VertexBufferObject_Support();
-				auto max_texture_units = ion::graphics::api::MaxTextureUnits();
+				auto newest_gl = ion::graphics::gl::HasGL(ion::graphics::gl::Version::v4_6);
+				auto blend_func_separate = ion::graphics::gl::BlendFuncSeparate_Support();
+				auto frame_buffer_object = ion::graphics::gl::FrameBufferObject_Support();
+				auto multi_texture = ion::graphics::gl::MultiTexture_Support();
+				auto point_sprite = ion::graphics::gl::PointSprite_Support();
+				auto shader = ion::graphics::gl::Shader_Support();
+				auto vertex_buffer_object = ion::graphics::gl::VertexBufferObject_Support();
+				auto max_texture_units = ion::graphics::gl::MaxTextureUnits();
+			}
+
+			//Check resources
+			{
+				//Repositories
+				ion::resources::files::repositories::AudioRepository audio_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
+				ion::resources::files::repositories::FontRepository font_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
+				ion::resources::files::repositories::ImageRepository image_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
+				ion::resources::files::repositories::ScriptRepository script_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
+				ion::resources::files::repositories::ShaderRepository shader_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
+				ion::resources::files::repositories::VideoRepository video_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};	
+
+				ion::resources::files::FileResourceLoader file_resource_loader;
+				file_resource_loader.Attach(audio_repository);
+				file_resource_loader.Attach(font_repository);
+				file_resource_loader.Attach(image_repository);
+				file_resource_loader.Attach(script_repository);
+				file_resource_loader.Attach(shader_repository);
+				file_resource_loader.Attach(video_repository);
+	
+				file_resource_loader.LoadDirectory("bin", ion::utilities::file::DirectoryIteration::Recursive);
+				//file_resource_loader.CompileDataFile("bin/resources.dat");
+
+
+				//Textures
+				ion::graphics::textures::TextureManger textures;
+				textures.CreateRepository(std::move(image_repository));
+				textures.CreateResource("image.png");
+				textures.LoadAll(ion::resources::resource_manager::EvaluationStrategy::Lazy);
+
+				ion::types::Progress<int> progress;
+				while (!textures.Loaded(progress));
+
+
+				//Shaders
+				ion::graphics::shaders::ShaderManager shaders;
+				shaders.CreateRepository(std::move(shader_repository));
+				shaders.LogLevel(ion::graphics::shaders::shader_manager::InfoLogLevel::Error);
+				auto &vert_shader = shaders.CreateShader("default_particle.vert");
+				auto &frag_shader = shaders.CreateShader("default_particle.frag");
+				shaders.LoadAll(ion::resources::resource_manager::EvaluationStrategy::Lazy);
+
+				while (!shaders.Loaded());
 			}
 
 			engine.Subscribe(frame_test);
@@ -415,35 +460,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		}
 	}
 
-	ion::resources::files::repositories::AudioRepository audio_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-	ion::resources::files::repositories::FontRepository font_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-	ion::resources::files::repositories::ImageRepository image_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-	ion::resources::files::repositories::ScriptRepository script_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-	ion::resources::files::repositories::ShaderRepository shader_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-	ion::resources::files::repositories::VideoRepository video_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};	
-
-	ion::resources::files::FileResourceLoader file_resource_loader;
-	file_resource_loader.Attach(audio_repository);
-	file_resource_loader.Attach(font_repository);
-	file_resource_loader.Attach(image_repository);
-	file_resource_loader.Attach(script_repository);
-	file_resource_loader.Attach(shader_repository);
-	file_resource_loader.Attach(video_repository);
-	
-	file_resource_loader.LoadDirectory("bin", ion::utilities::file::DirectoryIteration::Recursive);
-	//file_resource_loader.CompileDataFile("bin/resources.dat");
-
-
-	ion::graphics::textures::TextureManger texture_manager;
-	texture_manager.CreateFileRepository(std::move(image_repository));
-
-	texture_manager.CreateFileResource("image.png");
-	texture_manager.LoadAll(ion::resources::resource_manager::UpdateEvaluation::Lazy);
-
-	ion::types::Progress<int> progress;
-	while (!texture_manager.Loaded(progress));
-
 	auto break_point = true;
+
 
 	/*{
 		auto encoded = ion::utilities::codec::EncodeTo(5050, 16);

@@ -176,7 +176,7 @@
     <ClCompile Include="..\source\engine\graphics\render\IonViewport.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonCamera.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonSceneManager.cpp" />
-    <ClCompile Include="..\source\engine\graphics\textures\IonTexture.cpp" />
+    <ClCompile Include="..\source\engine\graphics\shaders\IonShaderManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\textures\IonTextureManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonAabb.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonColor.cpp" />
@@ -264,6 +264,8 @@
     <ClInclude Include="..\source\engine\graphics\render\IonViewport.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonCamera.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonSceneManager.h" />
+    <ClInclude Include="..\source\engine\graphics\shaders\IonShader.h" />
+    <ClInclude Include="..\source\engine\graphics\shaders\IonShaderManager.h" />
     <ClInclude Include="..\source\engine\graphics\textures\IonTexture.h" />
     <ClInclude Include="..\source\engine\graphics\textures\IonTextureManager.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonAabb.h" />

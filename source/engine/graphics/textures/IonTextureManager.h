@@ -34,17 +34,8 @@ namespace ion::graphics::textures
 				Events
 			*/
 
-			bool LoadResource(Texture &texture) noexcept override
-			{
-				texture;
-				return true;
-			}
-
-			bool UnloadResource(Texture &texture) noexcept override
-			{
-				texture;
-				return true;
-			}
+			bool LoadResource(Texture &texture) noexcept override;
+			bool UnloadResource(Texture &texture) noexcept override;
 
 		public:
 
@@ -58,12 +49,7 @@ namespace ion::graphics::textures
 			TextureManger(TextureManger&&) = default;
 
 			//Destructor
-			~TextureManger() noexcept
-			{
-				this->UnloadAll();
-					//Unload all resources before this manager is destroyed
-					//Virtual functions cannot be called post destruction
-			}
+			~TextureManger() noexcept;
 
 
 			/*

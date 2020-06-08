@@ -13,6 +13,7 @@ File:	IonFileResource.h
 #ifndef ION_FILE_RESOURCE_H
 #define ION_FILE_RESOURCE_H
 
+#include <filesystem>
 #include <optional>
 #include <string>
 
@@ -25,8 +26,9 @@ namespace ion::resources::files
 	{
 		private:
 
-			std::string name_;
+			std::string name_;		
 			std::optional<std::string> file_data_;
+			std::optional<std::filesystem::path> file_path_;
 
 		public:
 
@@ -42,10 +44,17 @@ namespace ion::resources::files
 				Modifiers
 			*/
 
-			//Sets the file data of the file resource to the given data
-			inline void FileData(std::optional<std::string> data)
+			//Sets the file data of the file resource to the given data with the associated path
+			inline void FileData(std::string data, std::filesystem::path path)
 			{
-				file_data_ = std::move(data);
+				file_data_.emplace(std::move(data));
+				file_path_.emplace(std::move(path));
+			}
+
+			//Resets the file data to save some memory (if not needed anymore)
+			inline void ResetFileData() noexcept
+			{
+				file_data_.reset();
 			}
 
 
@@ -60,11 +69,18 @@ namespace ion::resources::files
 			}
 
 			//Returns the file data of the file resource
-			//Returns nullopt if the file resource has not been prepared, or that it is fully loaded
+			//Returns nullopt if the file resource has not been prepared yet, or is no longer needed (fully loaded or has failed)
 			[[nodiscard]] inline auto& FileData() const noexcept
 			{
 				return file_data_;
-			}	
+			}
+
+			//Returns the file path of the file resource
+			//Returns nullopt if the file resource has not been prepared yet
+			[[nodiscard]] inline auto& FilePath() const noexcept
+			{
+				return file_path_;
+			}
 	};
 } //ion::resources::files
 

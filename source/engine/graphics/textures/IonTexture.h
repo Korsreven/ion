@@ -17,19 +17,40 @@ File:	IonTexture.h
 
 namespace ion::graphics::textures
 {
-	class TextureManger;
-
-	namespace texture::detail
-	{
-
-	} //texture::detail
-
+	class TextureManger; //Forward declaration
 
 	class Texture : public resources::files::FileResource<TextureManger>
 	{
+		private:
+
+			std::optional<int> handle_;
+
 		public:
 
 			using resources::files::FileResource<TextureManger>::FileResource;
+
+
+			/*
+				Modifiers
+			*/
+
+			//Sets the handle for the texture to the given value
+			inline void Handle(std::optional<int> handle)
+			{
+				handle_ = handle;
+			}
+
+
+			/*
+				Observers
+			*/
+
+			//Returns the handle for the texture
+			//Returns nullopt if the texture is not loaded
+			[[nodiscard]] inline auto Handle() const noexcept
+			{
+				return handle_;
+			}	
 	};
 } //ion::graphics::textures
 

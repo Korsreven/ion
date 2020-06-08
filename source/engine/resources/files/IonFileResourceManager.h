@@ -13,9 +13,12 @@ File:	IonFileResourceManager.h
 #ifndef ION_FILE_RESOURCE_MANAGER_H
 #define ION_FILE_RESOURCE_MANAGER_H
 
+#include <filesystem>
 #include <optional>
+#include <string>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include "IonFileResource.h"
@@ -34,27 +37,16 @@ namespace ion::resources::files
 		}
 
 		template <typename RepositoriesT>
-		inline auto file_entry_from_resource_name(const RepositoriesT &repositories, std::string_view resource_name) noexcept
-		{
-			for (auto &repository : repositories)
-			{
-				if (auto file_entry = repository.File(resource_name); file_entry)
-					return file_entry;
-			}
-
-			return std::optional<repositories::file_repository::FileEntry>{};
-		}
-
-		template <typename RepositoriesT>
-		inline auto file_data_from_resource_name(const RepositoriesT &repositories, std::string_view resource_name) noexcept
+		inline auto file_data_from_resource_name(const RepositoriesT &repositories, std::string_view resource_name) noexcept ->
+			std::optional<std::pair<std::string, std::filesystem::path>>
 		{
 			for (auto &repository : repositories)
 			{
 				if (auto file_data = repository.FileData(resource_name); file_data)
-					return file_data;
+					return std::pair{std::move(*file_data), std::move(*repository.FilePath(resource_name))};
 			}
 
-			return std::optional<std::string>{};
+			return {};
 		}
 	} //file_resource_manager::detail
 
@@ -65,10 +57,6 @@ namespace ion::resources::files
 	{
 		static_assert(std::is_base_of_v<FileResource<OwnerT>, ResourceT>);
 		static_assert(std::is_base_of_v<repositories::FileRepository, RepositoryT>);
-
-		private:
-
-
 
 		protected:
 
@@ -87,8 +75,14 @@ namespace ion::resources::files
 
 			virtual bool PrepareResource(ResourceT &resource) noexcept override
 			{
-				resource.FileData(file_resource_manager::detail::file_data_from_resource_name(FileRepositories(), resource.Name()));
-				return !!resource.FileData();
+				if (auto file = file_resource_manager::detail::file_data_from_resource_name(Repositories(), resource.Name()); file)
+				{
+					auto &[data, path] = *file;
+					resource.FileData(std::move(data), std::move(path));
+					return true;
+				}
+				else
+					return false;
 			}
 
 
@@ -99,9 +93,10 @@ namespace ion::resources::files
 			}
 
 			//See ResourceManager::ResourceLoaded for more details
-			virtual void ResourceLoaded(ResourceT&) noexcept override
+			virtual void ResourceLoaded(ResourceT &resource) noexcept override
 			{
-				//Optional to override
+				resource.ResetFileData();
+					//File data not required after resource has been loaded (save memory)
 			}
 
 			//See ResourceManager::ResourceUnloaded for more details
@@ -111,9 +106,10 @@ namespace ion::resources::files
 			}
 
 			//See ResourceManager::ResourceFailed for more details
-			virtual void ResourceFailed(ResourceT&) noexcept override
+			virtual void ResourceFailed(ResourceT &resource) noexcept override
 			{
-				//Optional to override
+				resource.ResetFileData();
+					//File data not required after resource has failed (save memory)
 			}
 
 		public:
@@ -145,96 +141,51 @@ namespace ion::resources::files
 
 			//Returns a mutable range of all repositories in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto FileRepositories() noexcept
+			[[nodiscard]] inline auto Repositories() noexcept
 			{
 				return this->RepositoryBase::Objects();
 			}
 
 			//Returns an immutable range of all repositories in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto FileRepositories() const noexcept
+			[[nodiscard]] inline const auto Repositories() const noexcept
 			{
 				return this->RepositoryBase::Objects();
 			}
 
 
-			//Returns a mutable range of all resources in this manager
-			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto FileResources() noexcept
-			{
-				return this->Resources();
-			}
-
-			//Returns an immutable range of all resources in this manager
-			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto FileResources() const noexcept
-			{
-				return this->Resources();
-			}
-
-
 			/*
-				File resources
+				Repositories
 				Creating
 			*/
 
-			//Create a file resource with the given resource name
-			auto& CreateFileResource(std::string resource_name)
-			{
-				return this->CreateResource(std::move(resource_name));
-			}
-
-
-			/*
-				File resources
-				Removing
-			*/
-
-			//Clear all file repositories from this factory
-			void ClearFileResources() noexcept
-			{
-				this->ClearResource();
-			}
-
-			//Remove an affector from this factory
-			auto RemoveFileResource(ResourceT &resource) noexcept
-			{
-				return this->RemoveResource(resource);
-			}
-
-
-			/*
-				File repositories
-				Creating
-			*/
-
-			//Create an empty file repository
-			auto& CreateFileRepository()
+			//Create an empty repository
+			auto& CreateRepository()
 			{
 				return this->RepositoryBase::Create();
 			}
 
-			//Create a file repository by copying/moving the given repository
+			//Create a repository by copying/moving the given repository
 			template <typename T>
-			auto& CreateFileRepository(T &&repository)
+			auto& CreateRepository(T &&repository)
 			{
 				return this->RepositoryBase::Create(std::forward<T>(repository));
 			}
 
 
 			/*
-				File repositories
+				Repositories
 				Removing
 			*/
 
-			//Clear all file repositories from this factory
-			void ClearFileRepositories() noexcept
+			//Clear all repositories from this manager
+			void ClearRepositories() noexcept
 			{
 				this->RepositoryBase::Clear();
 			}
 
-			//Remove an affector from this factory
-			auto RemoveFileRepository(RepositoryT &repository) noexcept
+			//Remove a repository from this manager
+			auto RemoveRepository(RepositoryT &repository) noexcept
 			{
 				return this->RepositoryBase::Remove(repository);
 			}

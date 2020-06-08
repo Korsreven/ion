@@ -29,11 +29,17 @@ namespace ion::resources
 {
 	namespace resource_manager
 	{
-		enum class UpdateEvaluation : bool
+		enum class ExecutionModel : bool
+		{
+			Asynchronous,
+			Synchronous
+		};
+
+		enum class EvaluationStrategy : bool
 		{
 			Eager,
 			Lazy
-		};
+		};	
 	} //resource_manager
 
 
@@ -43,10 +49,10 @@ namespace ion::resources
 		static_assert(std::is_base_of_v<Resource<OwnerT>, ResourceT>);
 
 		private:
-
-			bool background_processes_ = true;
-			std::optional<int> max_load_processes_;
+			
 			parallel::WorkerPool<bool, ResourceT*> processes_;
+			resource_manager::ExecutionModel process_execution_model_ = resource_manager::ExecutionModel::Asynchronous;
+			std::optional<int> max_load_processes_;
 
 		protected:
 
@@ -57,7 +63,7 @@ namespace ion::resources
 			//See ObjectManager::Removed for more details
 			void Removed(ResourceT &resource) noexcept override
 			{
-				//Wait for resource (could be in a background process)
+				//Wait for resource (could be in an async process)
 				if (resource.LoadingState() == resource::LoadingState::Preparing)
 					processes_.Wait(&resource); //Blocking
 
@@ -165,21 +171,13 @@ namespace ion::resources
 			{
 				if (resource.LoadingState() != loading_state)
 				{
-					switch (loading_state)
-					{
-						case resource::LoadingState::Loaded:
-						case resource::LoadingState::Failed:
-						resource.FileData({}); //File data not required any more (save memory)
-						break;
-					}
-
 					resource.LoadingState(loading_state);
 					NotifyResourceLoadingStateChanged(resource);
 				}
 			}
 
 
-			void FinalizeBackgroundProcesses() noexcept
+			void FinalizeAsyncProcesses() noexcept
 			{
 				auto result = processes_.Get(parallel::worker_pool::Synchronization::NonBlocking);
 
@@ -210,12 +208,12 @@ namespace ion::resources
 				}
 			}
 
-			void ExecutePrepareResource(ResourceT &resource, bool async = false) noexcept
+			void ExecutePrepareResource(ResourceT &resource, resource_manager::ExecutionModel execution_model = resource_manager::ExecutionModel::Synchronous) noexcept
 			{
 				ChangeResourceLoadingState(resource, resource::LoadingState::Preparing);
 
 				//Non-blocking
-				if (async)
+				if (execution_model == resource_manager::ExecutionModel::Asynchronous)
 					processes_.RunTask(&resource, &ResourceManager::PrepareResource, std::ref(*this), std::ref(resource));
 				//Blocking
 				else
@@ -269,7 +267,7 @@ namespace ion::resources
 			}
 
 
-			void PreparePendingResources(bool async = true) noexcept
+			void PreparePendingResources(resource_manager::ExecutionModel execution_model = resource_manager::ExecutionModel::Asynchronous) noexcept
 			{
 				//Check if any resources needs preparing
 				for (auto &resource : Resources())
@@ -279,14 +277,15 @@ namespace ion::resources
 					{
 						NotifyResourceLoadingStateChanged(resource);
 							//Make sure to notify the pending state (in case someone is listening)
-						ExecutePrepareResource(resource, async);
+						ExecutePrepareResource(resource, execution_model);
 
-						if (!async)
+						if (execution_model == resource_manager::ExecutionModel::Synchronous)
 							break; //One at a time
 					}
 				}
 
-				FinalizeBackgroundProcesses();
+				FinalizeAsyncProcesses();
+					//Must be called even if the execution model is synchronous 
 			}
 
 			void LoadPendingResources() noexcept
@@ -321,9 +320,9 @@ namespace ion::resources
 				}
 			}
 
-			void UpdatePendingResources(bool async = true) noexcept
+			void UpdatePendingResources(resource_manager::ExecutionModel execution_model = resource_manager::ExecutionModel::Asynchronous) noexcept
 			{
-				PreparePendingResources(async);
+				PreparePendingResources(execution_model);
 				LoadPendingResources();
 				UnloadPendingResources();
 			}
@@ -355,10 +354,10 @@ namespace ion::resources
 				Modifiers
 			*/
 
-			//Sets whether or not some processes are allowed to run in the background (async) or not
-			inline void BackgroundProcesses(bool background_processes) noexcept
+			//Sets the process execution model the resource manager is allowed to use
+			inline void ProcessExecutionModel(resource_manager::ExecutionModel execution_model) noexcept
 			{
-				background_processes_ = background_processes;
+				process_execution_model_ = execution_model;
 			}
 
 			//Sets the max number of load processes the resource manager is allowed to use
@@ -378,10 +377,10 @@ namespace ion::resources
 				Observers
 			*/
 
-			//Returns true if some processes are allowed to run in the background (async)
-			[[nodiscard]] inline auto BackgroundProcesses() const noexcept
+			//Returns the process execution model the resource manager is allowed to use
+			[[nodiscard]] inline auto ProcessExecutionModel() const noexcept
 			{
-				return background_processes_;
+				return process_execution_model_;
 			}
 
 			//Returns the max number of load processes the resource manager is allowed to use
@@ -442,7 +441,7 @@ namespace ion::resources
 			//Returns true when completed
 			[[nodiscard]] auto Updated() noexcept
 			{
-				UpdatePendingResources(background_processes_);
+				UpdatePendingResources(process_execution_model_);
 				return ResourcesToUpdate() == 0;
 			}
 
@@ -453,7 +452,7 @@ namespace ion::resources
 				if (auto count = ResourcesToUpdate(); count > progress.Max())
 					progress.Max(count);
 
-				UpdatePendingResources(background_processes_);
+				UpdatePendingResources(process_execution_model_);
 
 				progress.Position(progress.Max() - ResourcesToUpdate());
 				return progress.IsComplete();
@@ -466,23 +465,28 @@ namespace ion::resources
 
 			//Prepares the given resource before returning (eager)
 			//Marks the given resource ready to be prepared (lazy)
-			void Prepare(ResourceT &resource, resource_manager::UpdateEvaluation evaluation = resource_manager::UpdateEvaluation::Eager) noexcept
+			auto Prepare(ResourceT &resource, resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
+				if (resource.Owner() != this)
+					return false;
+
 				if (resource.Prepare() &&
-					evaluation == resource_manager::UpdateEvaluation::Eager)
+					strategy == resource_manager::EvaluationStrategy::Eager)
 				{
 					NotifyResourceLoadingStateChanged(resource);
 						//Make sure to notify the pending state (in case someone is listening)
 					ExecutePrepareResource(resource);
 				}
+
+				return !resource.HasFailed();
 			}
 
 			//Prepares all resources before returning (eager)
 			//Marks all resources ready to be prepared (lazy)
-			void PrepareAll(resource_manager::UpdateEvaluation evaluation = resource_manager::UpdateEvaluation::Eager) noexcept
+			void PrepareAll(resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
 				for (auto &resource : Resources())
-					Prepare(resource, evaluation);
+					Prepare(resource, strategy);
 			}
 
 
@@ -509,7 +513,7 @@ namespace ion::resources
 			//Returns true when completed
 			[[nodiscard]] auto Prepared() noexcept
 			{
-				PreparePendingResources(background_processes_);
+				PreparePendingResources(process_execution_model_);
 				return ResourcesToPrepare() == 0;
 			}
 
@@ -520,7 +524,7 @@ namespace ion::resources
 				if (auto count = ResourcesToPrepare(); count > progress.Max())
 					progress.Max(count);
 
-				PreparePendingResources(background_processes_);
+				PreparePendingResources(process_execution_model_);
 
 				progress.Position(progress.Max() - ResourcesToPrepare());
 				return progress.IsComplete();
@@ -533,10 +537,13 @@ namespace ion::resources
 
 			//Loads the given resource before returning (eager)
 			//Marks the given resource ready to be loaded (lazy)
-			auto Load(ResourceT &resource, resource_manager::UpdateEvaluation evaluation = resource_manager::UpdateEvaluation::Eager) noexcept
+			auto Load(ResourceT &resource, resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
+				if (resource.Owner() != this)
+					return false;
+
 				if (resource.Load() &&
-					evaluation == resource_manager::UpdateEvaluation::Eager)
+					strategy == resource_manager::EvaluationStrategy::Eager)
 				{
 					NotifyResourceLoadingStateChanged(resource);
 						//Make sure to notify the pending state (in case someone is listening)
@@ -553,10 +560,10 @@ namespace ion::resources
 
 			//Loads all resources before returning (eager)
 			//Marks all resources ready to be loaded (lazy)
-			void LoadAll(resource_manager::UpdateEvaluation evaluation = resource_manager::UpdateEvaluation::Eager) noexcept
+			void LoadAll(resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
 				for (auto &resource : Resources())
-					Load(resource, evaluation);
+					Load(resource, strategy);
 			}
 
 
@@ -585,7 +592,7 @@ namespace ion::resources
 			//Returns true when completed
 			[[nodiscard]] auto Loaded() noexcept
 			{
-				PreparePendingResources(background_processes_);
+				PreparePendingResources(process_execution_model_);
 				LoadPendingResources();
 				return ResourcesToLoad() == 0;
 			}
@@ -597,7 +604,7 @@ namespace ion::resources
 				if (auto count = ResourcesToLoad(); count > progress.Max())
 					progress.Max(count);
 
-				PreparePendingResources(background_processes_);
+				PreparePendingResources(process_execution_model_);
 				LoadPendingResources();
 
 				progress.Position(progress.Max() - ResourcesToLoad());
@@ -611,10 +618,13 @@ namespace ion::resources
 
 			//Unloads the given resource before returning (eager)
 			//Marks the given resource ready to be unloaded (lazy)
-			auto Unload(ResourceT &resource, resource_manager::UpdateEvaluation evaluation = resource_manager::UpdateEvaluation::Eager) noexcept
+			auto Unload(ResourceT &resource, resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
+				if (resource.Owner() != this)
+					return false;
+
 				if (resource.Unload() &&
-					evaluation == resource_manager::UpdateEvaluation::Eager)
+					strategy == resource_manager::EvaluationStrategy::Eager)
 				{
 					NotifyResourceLoadingStateChanged(resource);
 						//Make sure to notify the pending state (in case someone is listening)
@@ -626,10 +636,10 @@ namespace ion::resources
 
 			//Unloads all resources before returning (eager)
 			//Marks all resources ready to be unloaded (lazy)
-			void UnloadAll(resource_manager::UpdateEvaluation evaluation = resource_manager::UpdateEvaluation::Eager) noexcept
+			void UnloadAll(resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
 				for (auto &resource : Resources())
-					Unload(resource, evaluation);
+					Unload(resource, strategy);
 			}
 
 
@@ -680,10 +690,13 @@ namespace ion::resources
 
 			//Reloads the given resource before returning (eager)
 			//Marks the given resource ready to be reloaded (lazy)
-			auto Reload(ResourceT &resource, resource_manager::UpdateEvaluation evaluation = resource_manager::UpdateEvaluation::Eager) noexcept
+			auto Reload(ResourceT &resource, resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
+				if (resource.Owner() != this)
+					return false;
+
 				if (resource.Reload() &&
-					evaluation == resource_manager::UpdateEvaluation::Eager)
+					strategy == resource_manager::EvaluationStrategy::Eager)
 				{
 					NotifyResourceLoadingStateChanged(resource);
 						//Make sure to notify the pending state (in case someone is listening)
@@ -701,10 +714,10 @@ namespace ion::resources
 
 			//Reloads all resources before returning (eager)
 			//Marks all resources ready to be reloaded (lazy)
-			void ReloadAll(resource_manager::UpdateEvaluation evaluation = resource_manager::UpdateEvaluation::Eager) noexcept
+			void ReloadAll(resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
 				for (auto &resource : Resources())
-					Reload(resource, evaluation);
+					Reload(resource, strategy);
 			}
 
 
@@ -714,10 +727,13 @@ namespace ion::resources
 
 			//Repairs the given resource before returning (eager)
 			//Marks the given resource ready to be repaired (lazy)
-			auto Repair(ResourceT &resource, resource_manager::UpdateEvaluation evaluation = resource_manager::UpdateEvaluation::Eager) noexcept
+			auto Repair(ResourceT &resource, resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
+				if (resource.Owner() != this)
+					return false;
+
 				if (resource.Repair() &&
-					evaluation == resource_manager::UpdateEvaluation::Eager)
+					strategy == resource_manager::EvaluationStrategy::Eager)
 				{
 					NotifyResourceLoadingStateChanged(resource);
 						//Make sure to notify the pending state (in case someone is listening)
@@ -735,10 +751,10 @@ namespace ion::resources
 
 			//Repairs all resources before returning (eager)
 			//Marks all resources ready to be repaired (lazy)
-			void RepairAll(resource_manager::UpdateEvaluation evaluation = resource_manager::UpdateEvaluation::Eager) noexcept
+			void RepairAll(resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
 				for (auto &resource : Resources())
-					Repair(resource, evaluation);
+					Repair(resource, strategy);
 			}
 
 
@@ -783,13 +799,13 @@ namespace ion::resources
 				Removing
 			*/
 
-			//Clear all file repositories from this factory
+			//Clear all removable resources from this manager
 			void ClearResources() noexcept
 			{
 				this->Clear();
 			}
 
-			//Remove an affector from this factory
+			//Remove a removable resource from this manager
 			auto RemoveResource(ResourceT &resource) noexcept
 			{
 				return this->Remove(resource);

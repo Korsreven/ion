@@ -294,9 +294,6 @@
     <ClCompile Include="..\source\engine\graphics\particles\IonParticleSystem.cpp">
       <Filter>Source Files\graphics\particles</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\engine\graphics\textures\IonTexture.cpp">
-      <Filter>Source Files\graphics\textures</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\engine\graphics\textures\IonTextureManager.cpp">
       <Filter>Source Files\graphics\textures</Filter>
     </ClCompile>
@@ -320,6 +317,9 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\scene\IonSceneManager.cpp">
       <Filter>Source Files\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\shaders\IonShaderManager.cpp">
+      <Filter>Source Files\graphics\shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -646,6 +646,12 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\resources\files\IonFileResourceManager.h">
       <Filter>Header Files\resources\files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\shaders\IonShader.h">
+      <Filter>Header Files\graphics\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\shaders\IonShaderManager.h">
+      <Filter>Header Files\graphics\shaders</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
