@@ -58,6 +58,10 @@ File:	main.cpp
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/shaders/IonShader.h"
 #include "graphics/shaders/IonShaderManager.h"
+#include "graphics/shaders/variables/IonShaderAttribute.h"
+#include "graphics/shaders/variables/IonShaderTypes.h"
+#include "graphics/shaders/variables/IonShaderUniform.h"
+#include "graphics/shaders/variables/IonShaderVariable.h"
 #include "graphics/textures/IonTexture.h"
 #include "graphics/textures/IonTextureManager.h"
 #include "graphics/utilities/IonAabb.h"
@@ -459,6 +463,51 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto deserialized_tree = ion::script::ScriptTree::Deserialize(bytes);
 		}
 	}
+
+
+	using namespace ion::graphics::shaders::variables;
+
+	Uniform<float> u{"my_uniform"};
+	glsl::uniform<float> &glsl_u = u.Get();
+
+	UniformVariable &u_var = u;
+	u_var.Visit(
+		[](glsl::uniform<float> &x) noexcept
+		{
+			x = 6.28f;
+			auto break_point = true;
+		},
+		[](auto&&) noexcept
+		{
+			//Everything else
+		});
+	
+
+	struct vertex
+	{
+		float x, y;
+	};
+
+	vertex vertices[]{{1.0f, 2.0f}, {2.0f, 3.0f}, {3.0f, 4.0f}, {4.0f, 5.0f}};
+
+	Attribute<glsl::vec2> a{"my_attribute"};
+	glsl::attribute<glsl::vec2> &glsl_a = a.Get();
+	
+	AttributeVariable &a_var = a;
+	a_var.Visit(
+		[&](glsl::attribute<glsl::vec2> &x) noexcept
+		{	
+			x.VertexData(vertices, sizeof(vertex));
+			auto a = x[0].XY();
+			auto b = x[1].XY();
+			auto c = x[2].XY();
+			auto d = x[3].XY();
+			auto break_point = true;
+		},
+		[](auto&&) noexcept
+		{
+			//Everything else
+		});
 
 	auto break_point = true;
 

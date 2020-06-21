@@ -151,6 +151,9 @@
     <Filter Include="Header Files\unmanaged">
       <UniqueIdentifier>{4f27832b-efe8-459c-88be-862acc4dd659}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\graphics\shaders\variables">
+      <UniqueIdentifier>{b4fe8d7b-1b67-42d5-aaec-df92613f1fa4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -319,6 +322,9 @@
       <Filter>Source Files\graphics\scene</Filter>
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderManager.cpp">
+      <Filter>Source Files\graphics\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\shaders\IonShaderProgram.cpp">
       <Filter>Source Files\graphics\shaders</Filter>
     </ClCompile>
   </ItemGroup>
@@ -652,6 +658,21 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\shaders\IonShaderManager.h">
       <Filter>Header Files\graphics\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\shaders\variables\IonShaderVariable.h">
+      <Filter>Header Files\graphics\shaders\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\shaders\IonShaderProgram.h">
+      <Filter>Header Files\graphics\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\shaders\variables\IonShaderUniform.h">
+      <Filter>Header Files\graphics\shaders\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\shaders\variables\IonShaderAttribute.h">
+      <Filter>Header Files\graphics\shaders\variables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\shaders\variables\IonShaderTypes.h">
+      <Filter>Header Files\graphics\shaders\variables</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
