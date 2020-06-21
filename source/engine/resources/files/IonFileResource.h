@@ -33,7 +33,7 @@ namespace ion::resources::files
 		public:
 
 			//Constructor
-			FileResource(std::string name) :
+			explicit FileResource(std::string name) :
 				name_{std::move(name)}
 			{
 				//Empty

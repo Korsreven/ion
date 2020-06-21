@@ -25,6 +25,8 @@ namespace ion::graphics::utilities
 	} //matrix3::detail
 
 
+	//A 3x3 column-major matrix class
+	//Follows the OpenGL matrix convention
 	class Matrix3 final
 	{
 		private:
@@ -41,12 +43,12 @@ namespace ion::graphics::utilities
 
 			Matrix3() = default;
 
-			//Constructs a new matrix from the given numbers in row-major order
+			//Constructs a new matrix from the given numbers in column-major order
 			Matrix3(real m00, real m01, real m02,
 					real m10, real m11, real m12,
 					real m20, real m21, real m22) noexcept;
 			
-			//Constructs a new matrix from only the two first columns in row-major order
+			//Constructs a new matrix from only the two first columns in column-major order
 			//The third column is filled with {0, 0, 1}
 			Matrix3(real m00, real m01,
 					real m10, real m11,

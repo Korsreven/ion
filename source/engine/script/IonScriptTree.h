@@ -25,6 +25,7 @@ File:	IonScriptTree.h
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "types/IonTypes.h"
+#include "types/IonTypeTraits.h"
 #include "utilities/IonStringUtility.h"
 
 namespace ion::script
@@ -85,9 +86,6 @@ namespace ion::script
 
 		namespace detail
 		{
-			template <typename ...Ts> struct overloaded : Ts... { using Ts::operator()...; };
-			template <typename ...Ts> overloaded(Ts...) -> overloaded<Ts...>;
-
 			template <typename T, typename Ts>
 			struct is_contained_in;
 
@@ -608,7 +606,7 @@ namespace ion::script
 				inline auto Visit(T &&callable, Ts &&...callables) const noexcept
 				{
 					assert(*this);
-					return std::visit(detail::overloaded{std::forward<T>(callable), std::forward<Ts>(callables)...}, *argument_);
+					return std::visit(types::overloaded{std::forward<T>(callable), std::forward<Ts>(callables)...}, *argument_);
 				}
 
 				//Returns the unit of this argument

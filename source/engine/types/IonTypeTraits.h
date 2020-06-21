@@ -284,6 +284,15 @@ namespace ion::types
 
 
 	/*
+		Overloaded
+		Type trait for making an overload set to std::visit
+	*/
+
+	template <typename... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+	template <typename... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
+
+	/*
 		Underlying representation
 		Type trait that checks the underlying type
 	*/

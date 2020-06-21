@@ -77,7 +77,9 @@ namespace ion::graphics::particles::affectors
 			inline auto& CreateAffector(Args &&...args)
 			{
 				static_assert(std::is_base_of_v<Affector, T>);
-				return this->Create(std::forward<Args>(args)...);
+
+				auto &affector = this->Create(std::forward<Args>(args)...);
+				return static_cast<T&>(affector);
 			}
 
 
