@@ -58,6 +58,8 @@ File:	main.cpp
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/shaders/IonShader.h"
 #include "graphics/shaders/IonShaderManager.h"
+#include "graphics/shaders/IonShaderProgram.h"
+#include "graphics/shaders/IonShaderProgramManager.h"
 #include "graphics/shaders/variables/IonShaderAttribute.h"
 #include "graphics/shaders/variables/IonShaderTypes.h"
 #include "graphics/shaders/variables/IonShaderUniform.h"

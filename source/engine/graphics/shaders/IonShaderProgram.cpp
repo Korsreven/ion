@@ -15,13 +15,29 @@ File:	IonShaderProgram.cpp
 namespace ion::graphics::shaders
 {
 
+ShaderProgram::ShaderProgram(Shader &shader) noexcept
+{
+	//The given shader can either be a vertex or a fragment shader, try both
+	VertexShader(shader);
+	FragmentShader(shader);
+}
+
+ShaderProgram::ShaderProgram(Shader &vertex_shader, Shader &fragment_shader) noexcept
+{
+	//The given shaders much match the correct shader type
+	VertexShader(vertex_shader);
+	FragmentShader(fragment_shader);
+}
+
+
 /*
 	Modifiers
 */
 
 void ShaderProgram::VertexShader(Shader &shader)
 {
-	vertex_shader_.Observe(shader);
+	if (shader.Type() == shader::ShaderType::Vertex)
+		vertex_shader_.Observe(shader);
 }
 
 void ShaderProgram::VertexShader(std::nullptr_t) noexcept
@@ -32,7 +48,8 @@ void ShaderProgram::VertexShader(std::nullptr_t) noexcept
 
 void ShaderProgram::FragmentShader(Shader &shader)
 {
-	fragment_shader_.Observe(shader);
+	if (shader.Type() == shader::ShaderType::Fragment)
+		fragment_shader_.Observe(shader);
 }
 
 void ShaderProgram::FragmentShader(std::nullptr_t) noexcept

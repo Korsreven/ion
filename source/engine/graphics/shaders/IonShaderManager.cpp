@@ -89,7 +89,7 @@ std::optional<int> load_shader(shader::ShaderType shader_type, const std::string
 	//Save shader info log
 	if (log_level &&
 		(compile_status == 0 || *log_level == InfoLogLevel::Warning))
-			//Compile error, or log success (could be warnings)
+			//Compile error, or log anyways (could be warnings)
 	{
 		if (auto log = print_info_log(shader_handle); log)
 			ion::utilities::file::Save(shader_source_path.string() + ".output.txt", *log);

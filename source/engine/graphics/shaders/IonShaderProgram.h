@@ -47,8 +47,12 @@ namespace ion::graphics::shaders
 			managed::ObservedObject<Shader> fragment_shader_;
 
 		public:
+			
+			//Constructs a new shader program with the given shader
+			explicit ShaderProgram(Shader &shader) noexcept;
 
-			using resources::Resource<ShaderProgramManager>::Resource;
+			//Constructs a new shader program with the given vertex and fragment shader
+			ShaderProgram(Shader &vertex_shader, Shader &fragment_shader) noexcept;
 
 
 			/*
