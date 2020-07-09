@@ -273,11 +273,11 @@ namespace ion::graphics::gl
 		switch (MultiTexture_Support())
 		{
 			case Extension::Core:
-			glGetIntegerv(GL_MAX_TEXTURE_UNITS, &max_texture_units);
+			glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max_texture_units);
 			break;
 
 			case Extension::ARB:
-			glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &max_texture_units);
+			glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB, &max_texture_units);
 			break;
 		}
 

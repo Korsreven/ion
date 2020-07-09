@@ -77,7 +77,7 @@ namespace ion::graphics::shaders::variables::glsl
 		template <>
 		struct basic_scalar_type_impl<bool>
 		{
-			using type = bool;
+			using type = int32; //bool values in GLSL should be of type int (0 or 1)
 		};
 
 		template <>
@@ -292,6 +292,41 @@ namespace ion::graphics::shaders::variables::glsl
 		inline operator basic_type_t<T>() const noexcept
 		{
 			return this->values_[this->off_];
+		}
+	};
+
+
+	/*
+		Scalar accessor (bool)
+	*/
+
+	template <>
+	struct ValueAccessor<bool> : ValueAccessorBase<bool>
+	{
+		using ValueAccessorBase<bool>::ValueAccessorBase;
+
+
+		/*
+			Operators
+		*/
+
+		//Sets all components to the given value
+		inline auto& operator=(bool value) noexcept
+		{
+			ValueAccessorBase<bool>::operator=(value ? 1 : 0);
+			return *this;
+		}
+
+		//Returns a modifiable reference to the value stored
+		inline operator basic_type_t<bool>&() noexcept
+		{
+			return this->values_[this->off_];
+		}
+
+		//Returns the value stored
+		inline operator bool() const noexcept
+		{
+			return this->values_[this->off_] != 0;
 		}
 	};
 
@@ -585,40 +620,20 @@ namespace ion::graphics::shaders::variables::glsl
 
 
 	/*
-		Sampler accessor
-	*/
-
-	template <typename T>
-	struct ValueAccessor<Sampler2D<T>> : ValueAccessorBase<Sampler2D<T>>
-	{
-		using ValueAccessorBase<Sampler2D<T>>::ValueAccessorBase;
-
-
-		/*
-			Operators
-		*/
-
-		//Sets all components to the given value
-		inline auto& operator=(T value) noexcept
-		{
-			ValueAccessorBase<Sampler2D<T>>::operator=(value);
-			return *this;
-		}
-	};
-
-
-	/*
 		Shader value
 	*/
 
 	template <typename T>
 	struct ShaderValue
 	{
+		using basic_type = basic_type_t<T>;
+
+
 		/*
 			Observers
 		*/
 
-		//Returns the number of components in the values stored in the attribute
+		//Returns the number of components in the values stored
 		[[nodiscard]] constexpr auto Components() const noexcept
 		{
 			return type_components_v<T>;
@@ -781,88 +796,49 @@ namespace ion::graphics::shaders::variables::glsl
 	using uvec4 = Vec<4, uint32>;
 	using vec4 = Vec<4>;
 	using dvec4 = Vec<4, float64>;
-
-
-	using bmat2x2 = Mat<2, 2, bool>;
-	using imat2x2 = Mat<2, 2, int32>;
-	using umat2x2 = Mat<2, 2, uint32>;
+	
 	using mat2x2 = Mat<2, 2>;
 	using dmat2x2 = Mat<2, 2, float64>;
 
-	using bmat2x3 = Mat<2, 3, bool>;
-	using imat2x3 = Mat<2, 3, int32>;
-	using umat2x3 = Mat<2, 3, uint32>;
 	using mat2x3 = Mat<2, 3>;
 	using dmat2x3 = Mat<2, 3, float64>;
 
-	using bmat2x4 = Mat<2, 4, bool>;
-	using imat2x4 = Mat<2, 4, int32>;
-	using umat2x4 = Mat<2, 4, uint32>;
 	using mat2x4 = Mat<2, 4>;
 	using dmat2x4 = Mat<2, 4, float64>;
 
-	using bmat3x2 = Mat<3, 2, bool>;
-	using imat3x2 = Mat<3, 2, int32>;
-	using umat3x2 = Mat<3, 2, uint32>;
 	using mat3x2 = Mat<3, 2>;
 	using dmat3x2 = Mat<3, 2, float64>;
 
-	using bmat3x3 = Mat<3, 3, bool>;
-	using imat3x3 = Mat<3, 3, int32>;
-	using umat3x3 = Mat<3, 3, uint32>;
 	using mat3x3 = Mat<3, 3>;
 	using dmat3x3 = Mat<3, 3, float64>;
 
-	using bmat3x4 = Mat<3, 4, bool>;
-	using imat3x4 = Mat<3, 4, int32>;
-	using umat3x4 = Mat<3, 4, uint32>;
 	using mat3x4 = Mat<3, 4>;
 	using dmat3x4 = Mat<3, 4, float64>;
 
-	using bmat4x2 = Mat<4, 2, bool>;
-	using imat4x2 = Mat<4, 2, int32>;
-	using umat4x2 = Mat<4, 2, uint32>;
 	using mat4x2 = Mat<4, 2>;
 	using dmat4x2 = Mat<4, 2, float64>;
 
-	using bmat4x3 = Mat<4, 3, bool>;
-	using imat4x3 = Mat<4, 3, int32>;
-	using umat4x3 = Mat<4, 3, uint32>;
 	using mat4x3 = Mat<4, 3>;
 	using dmat4x3 = Mat<4, 3, float64>;
 
-	using bmat4x4 = Mat<4, 4, bool>;
-	using imat4x4 = Mat<4, 4, int32>;
-	using umat4x4 = Mat<4, 4, uint32>;
 	using mat4x4 = Mat<4, 4>;
 	using dmat4x4 = Mat<4, 4, float64>;
-
 
 	using isampler2D = Sampler2D<int32>;
 	using usampler2D = Sampler2D<uint32>;
 	using sampler2D = Sampler2D<>;
-	using dsampler2D = Sampler2D<float64>;
 
 
 	/*
 		Shorthand matrix type aliases
 	*/
 
-	using bmat2 = bmat2x2;
-	using imat2 = imat2x2;
-	using umat2 = umat2x2;
 	using mat2 = mat2x2;
 	using dmat2 = dmat2x2;
 
-	using bmat3 = bmat3x3;
-	using imat3 = imat3x3;
-	using umat3 = umat3x3;
 	using mat3 = mat3x3;
 	using dmat3 = dmat3x3;
 
-	using bmat4 = bmat4x4;
-	using imat4 = imat4x4;
-	using umat4 = umat4x4;
 	using mat4 = mat4x4;
 	using dmat4 = dmat4x4;
 

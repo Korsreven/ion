@@ -58,73 +58,45 @@ namespace ion::graphics::shaders::variables
 				glsl::uniform<glsl::dvec4>,
 				
 				//2x2 matrix types
-				glsl::uniform<glsl::bmat2x2>,
-				glsl::uniform<glsl::imat2x2>,
-				glsl::uniform<glsl::umat2x2>,
 				glsl::uniform<glsl::mat2x2>,
 				glsl::uniform<glsl::dmat2x2>,
 
 				//2x3 matrix types
-				glsl::uniform<glsl::bmat2x3>,
-				glsl::uniform<glsl::imat2x3>,
-				glsl::uniform<glsl::umat2x3>,
 				glsl::uniform<glsl::mat2x3>,
 				glsl::uniform<glsl::dmat2x3>,
 
 				//2x4 matrix types
-				glsl::uniform<glsl::bmat2x4>,
-				glsl::uniform<glsl::imat2x4>,
-				glsl::uniform<glsl::umat2x4>,
 				glsl::uniform<glsl::mat2x4>,
 				glsl::uniform<glsl::dmat2x4>,
 
 				//3x2 matrix types
-				glsl::uniform<glsl::bmat3x2>,
-				glsl::uniform<glsl::imat3x2>,
-				glsl::uniform<glsl::umat3x2>,
 				glsl::uniform<glsl::mat3x2>,
 				glsl::uniform<glsl::dmat3x2>,
 
 				//3x3 matrix types
-				glsl::uniform<glsl::bmat3x3>,
-				glsl::uniform<glsl::imat3x3>,
-				glsl::uniform<glsl::umat3x3>,
 				glsl::uniform<glsl::mat3x3>,
 				glsl::uniform<glsl::dmat3x3>,
 
 				//3x4 matrix types
-				glsl::uniform<glsl::bmat3x4>,
-				glsl::uniform<glsl::imat3x4>,
-				glsl::uniform<glsl::umat3x4>,
 				glsl::uniform<glsl::mat3x4>,
 				glsl::uniform<glsl::dmat3x4>,
 				
 				//4x2 matrix types
-				glsl::uniform<glsl::bmat4x2>,
-				glsl::uniform<glsl::imat4x2>,
-				glsl::uniform<glsl::umat4x2>,
 				glsl::uniform<glsl::mat4x2>,
 				glsl::uniform<glsl::dmat4x2>,
 
 				//4x3 matrix types
-				glsl::uniform<glsl::bmat4x3>,
-				glsl::uniform<glsl::imat4x3>,
-				glsl::uniform<glsl::umat4x3>,
 				glsl::uniform<glsl::mat4x3>,
 				glsl::uniform<glsl::dmat4x3>,
 
 				//4x4 matrix types
-				glsl::uniform<glsl::bmat4x4>,
-				glsl::uniform<glsl::imat4x4>,
-				glsl::uniform<glsl::umat4x4>,
 				glsl::uniform<glsl::mat4x4>,
 				glsl::uniform<glsl::dmat4x4>,
 				
 				//2D sampler types
 				glsl::uniform<glsl::isampler2D>,
 				glsl::uniform<glsl::usampler2D>,
-				glsl::uniform<glsl::sampler2D>,
-				glsl::uniform<glsl::dsampler2D>>;
+				glsl::uniform<glsl::sampler2D>>;
 
 		namespace detail
 		{

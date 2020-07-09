@@ -303,6 +303,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				auto shader = ion::graphics::gl::Shader_Support();
 				auto vertex_buffer_object = ion::graphics::gl::VertexBufferObject_Support();
 				auto max_texture_units = ion::graphics::gl::MaxTextureUnits();
+				auto break_point = false;
 			}
 
 			//Check resources

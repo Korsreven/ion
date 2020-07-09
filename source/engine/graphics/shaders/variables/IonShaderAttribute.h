@@ -57,65 +57,38 @@ namespace ion::graphics::shaders::variables
 				glsl::attribute<glsl::dvec4>,
 				
 				//2x2 matrix types
-				glsl::attribute<glsl::bmat2x2>,
-				glsl::attribute<glsl::imat2x2>,
-				glsl::attribute<glsl::umat2x2>,
 				glsl::attribute<glsl::mat2x2>,
 				glsl::attribute<glsl::dmat2x2>,
 
 				//2x3 matrix types
-				glsl::attribute<glsl::bmat2x3>,
-				glsl::attribute<glsl::imat2x3>,
-				glsl::attribute<glsl::umat2x3>,
 				glsl::attribute<glsl::mat2x3>,
 				glsl::attribute<glsl::dmat2x3>,
 
 				//2x4 matrix types
-				glsl::attribute<glsl::bmat2x4>,
-				glsl::attribute<glsl::imat2x4>,
-				glsl::attribute<glsl::umat2x4>,
 				glsl::attribute<glsl::mat2x4>,
 				glsl::attribute<glsl::dmat2x4>,
 
 				//3x2 matrix types
-				glsl::attribute<glsl::bmat3x2>,
-				glsl::attribute<glsl::imat3x2>,
-				glsl::attribute<glsl::umat3x2>,
 				glsl::attribute<glsl::mat3x2>,
 				glsl::attribute<glsl::dmat3x2>,
 
 				//3x3 matrix types
-				glsl::attribute<glsl::bmat3x3>,
-				glsl::attribute<glsl::imat3x3>,
-				glsl::attribute<glsl::umat3x3>,
 				glsl::attribute<glsl::mat3x3>,
 				glsl::attribute<glsl::dmat3x3>,
 
 				//3x4 matrix types
-				glsl::attribute<glsl::bmat3x4>,
-				glsl::attribute<glsl::imat3x4>,
-				glsl::attribute<glsl::umat3x4>,
 				glsl::attribute<glsl::mat3x4>,
 				glsl::attribute<glsl::dmat3x4>,
 				
 				//4x2 matrix types
-				glsl::attribute<glsl::bmat4x2>,
-				glsl::attribute<glsl::imat4x2>,
-				glsl::attribute<glsl::umat4x2>,
 				glsl::attribute<glsl::mat4x2>,
 				glsl::attribute<glsl::dmat4x2>,
 
 				//4x3 matrix types
-				glsl::attribute<glsl::bmat4x3>,
-				glsl::attribute<glsl::imat4x3>,
-				glsl::attribute<glsl::umat4x3>,
 				glsl::attribute<glsl::mat4x3>,
 				glsl::attribute<glsl::dmat4x3>,
 
 				//4x4 matrix types
-				glsl::attribute<glsl::bmat4x4>,
-				glsl::attribute<glsl::imat4x4>,
-				glsl::attribute<glsl::umat4x4>,
 				glsl::attribute<glsl::mat4x4>,
 				glsl::attribute<glsl::dmat4x4>>;
 
