@@ -39,7 +39,7 @@ namespace ion::resources
 		{
 			Eager,
 			Lazy
-		};	
+		};
 	} //resource_manager
 
 
@@ -65,10 +65,9 @@ namespace ion::resources
 			{
 				//Wait for resource (could be in an async process)
 				if (resource.LoadingState() == resource::LoadingState::Preparing)
-					processes_.Wait(&resource); //Blocking
+					[[maybe_unused]] auto result = processes_.Get(&resource); //Blocking
 
-				if (resource.LoadingState() == resource::LoadingState::Loaded)
-					Unload(resource); //Eagerly
+				Unload(resource); //Eagerly
 			}
 
 
@@ -177,7 +176,25 @@ namespace ion::resources
 			}
 
 
-			void FinalizeAsyncProcesses() noexcept
+			void ProcessPreparedResource(ResourceT &resource, bool prepared) noexcept
+			{
+				if (prepared)
+				{
+					ChangeResourceLoadingState(resource, resource::LoadingState::Prepared);
+
+					//Check loading action
+					switch (resource.LoadingAction())
+					{
+						case resource::LoadingAction::Load:
+						ChangeResourceLoadingState(resource, resource::LoadingState::LoadPending);
+						break;
+					}
+				}
+				else
+					ChangeResourceLoadingState(resource, resource::LoadingState::Failed);
+			}
+
+			void ProcessPreparedResources() noexcept
 			{
 				auto result = processes_.Get(parallel::worker_pool::Synchronization::NonBlocking);
 
@@ -188,25 +205,26 @@ namespace ion::resources
 					{
 						//Check if resource was prepared
 						if (auto iter = result.find(&resource); iter != std::end(result))
-						{
-							if (iter->second)
-							{
-								ChangeResourceLoadingState(resource, resource::LoadingState::Prepared);
-
-								//Check loading action
-								switch (resource.LoadingAction())
-								{
-									case resource::LoadingAction::Load:
-									ChangeResourceLoadingState(resource, resource::LoadingState::LoadPending);
-									break;
-								}
-							}
-							else
-								ChangeResourceLoadingState(resource, resource::LoadingState::Failed);
-						}
+							ProcessPreparedResource(resource, iter->second);
 					}
 				}
 			}
+
+
+			void WaitWhilePreparingResource(ResourceT &resource) noexcept
+			{
+				if (auto prepared = processes_.Get(&resource); prepared) //Blocking
+					ProcessPreparedResource(resource, *prepared);
+			}
+
+			void WaitWhilePreparingAllResources() noexcept
+			{
+				auto result = processes_.Get(); //Blocking
+
+				for (auto [resource, prepared] : result)
+					ProcessPreparedResource(*resource, prepared);
+			}
+
 
 			void ExecutePrepareResource(ResourceT &resource, resource_manager::ExecutionModel execution_model = resource_manager::ExecutionModel::Synchronous) noexcept
 			{
@@ -217,22 +235,7 @@ namespace ion::resources
 					processes_.RunTask(&resource, &ResourceManager::PrepareResource, std::ref(*this), std::ref(resource));
 				//Blocking
 				else
-				{
-					if (PrepareResource(resource))
-					{
-						ChangeResourceLoadingState(resource, resource::LoadingState::Prepared);
-
-						//Check loading action
-						switch (resource.LoadingAction())
-						{
-							case resource::LoadingAction::Load:
-							ChangeResourceLoadingState(resource, resource::LoadingState::LoadPending);
-							break;
-						}
-					}
-					else
-						ChangeResourceLoadingState(resource, resource::LoadingState::Failed);
-				}
+					ProcessPreparedResource(resource, PrepareResource(resource));
 			}
 
 			void ExecuteLoadResource(ResourceT &resource) noexcept
@@ -284,7 +287,7 @@ namespace ion::resources
 					}
 				}
 
-				FinalizeAsyncProcesses();
+				ProcessPreparedResources();
 					//Must be called even if the execution model is synchronous 
 			}
 
@@ -470,21 +473,29 @@ namespace ion::resources
 				if (resource.Owner() != this)
 					return false;
 
-				if (resource.Prepare() &&
+				if (resource.LoadingState() == resource::LoadingState::Preparing &&
 					strategy == resource_manager::EvaluationStrategy::Eager)
+					WaitWhilePreparingResource(resource);
+
+				if (auto prepare = resource.Prepare();
+					prepare && strategy == resource_manager::EvaluationStrategy::Eager)
 				{
 					NotifyResourceLoadingStateChanged(resource);
 						//Make sure to notify the pending state (in case someone is listening)
 					ExecutePrepareResource(resource);
+					return resource.IsPrepared();
 				}
-
-				return !resource.HasFailed();
+				else
+					return prepare;
 			}
 
 			//Prepares all resources before returning (eager)
 			//Marks all resources ready to be prepared (lazy)
 			void PrepareAll(resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
+				if (strategy == resource_manager::EvaluationStrategy::Eager)
+					WaitWhilePreparingAllResources();
+
 				for (auto &resource : Resources())
 					Prepare(resource, strategy);
 			}
@@ -542,8 +553,12 @@ namespace ion::resources
 				if (resource.Owner() != this)
 					return false;
 
-				if (resource.Load() &&
+				if (resource.LoadingState() == resource::LoadingState::Preparing &&
 					strategy == resource_manager::EvaluationStrategy::Eager)
+					WaitWhilePreparingResource(resource);
+
+				if (auto load = resource.Load();
+					load && strategy == resource_manager::EvaluationStrategy::Eager)
 				{
 					NotifyResourceLoadingStateChanged(resource);
 						//Make sure to notify the pending state (in case someone is listening)
@@ -553,15 +568,20 @@ namespace ion::resources
 					
 					if (resource.LoadingState() == resource::LoadingState::LoadPending)
 						ExecuteLoadResource(resource);
-				}
 
-				return !resource.HasFailed();
+					return resource.IsLoaded();
+				}
+				else
+					return load;				
 			}
 
 			//Loads all resources before returning (eager)
 			//Marks all resources ready to be loaded (lazy)
 			void LoadAll(resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
+				if (strategy == resource_manager::EvaluationStrategy::Eager)
+					WaitWhilePreparingAllResources();
+
 				for (auto &resource : Resources())
 					Load(resource, strategy);
 			}
@@ -623,15 +643,16 @@ namespace ion::resources
 				if (resource.Owner() != this)
 					return false;
 
-				if (resource.Unload() &&
-					strategy == resource_manager::EvaluationStrategy::Eager)
+				if (auto unload = resource.Unload();
+					unload && strategy == resource_manager::EvaluationStrategy::Eager)
 				{
 					NotifyResourceLoadingStateChanged(resource);
 						//Make sure to notify the pending state (in case someone is listening)
 					ExecuteUnloadResource(resource);
+					return resource.IsUnloaded();
 				}
-
-				return !resource.HasFailed();
+				else
+					return unload;
 			}
 
 			//Unloads all resources before returning (eager)
@@ -695,8 +716,8 @@ namespace ion::resources
 				if (resource.Owner() != this)
 					return false;
 
-				if (resource.Reload() &&
-					strategy == resource_manager::EvaluationStrategy::Eager)
+				if (auto reload = resource.Reload();
+					reload && strategy == resource_manager::EvaluationStrategy::Eager)
 				{
 					NotifyResourceLoadingStateChanged(resource);
 						//Make sure to notify the pending state (in case someone is listening)
@@ -707,9 +728,11 @@ namespace ion::resources
 					
 					if (resource.LoadingState() == resource::LoadingState::LoadPending)
 						ExecuteLoadResource(resource);
-				}
 
-				return !resource.HasFailed();
+					return resource.IsLoaded();
+				}
+				else
+					return reload;
 			}
 
 			//Reloads all resources before returning (eager)
@@ -732,8 +755,8 @@ namespace ion::resources
 				if (resource.Owner() != this)
 					return false;
 
-				if (resource.Repair() &&
-					strategy == resource_manager::EvaluationStrategy::Eager)
+				if (auto repair = resource.Repair();
+					repair && strategy == resource_manager::EvaluationStrategy::Eager)
 				{
 					NotifyResourceLoadingStateChanged(resource);
 						//Make sure to notify the pending state (in case someone is listening)
@@ -744,9 +767,11 @@ namespace ion::resources
 					
 					if (resource.LoadingState() == resource::LoadingState::LoadPending)
 						ExecuteLoadResource(resource);
-				}
 
-				return !resource.HasFailed();
+					return resource.IsLoaded();
+				}
+				else
+					return repair;
 			}
 
 			//Repairs all resources before returning (eager)

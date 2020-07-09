@@ -17,6 +17,7 @@ File:	IonWorkerPool.h
 #include <condition_variable>
 #include <functional>
 #include <mutex>
+#include <optional>
 #include <thread>
 #include <type_traits>
 #include <vector>
@@ -208,6 +209,7 @@ namespace ion::parallel
 			}
 
 			//Returns all of the result once they are available (blocking)
+			//Returns the results that are available, then return to caller (non-blocking)
 			[[nodiscard]] auto Get(worker_pool::Synchronization synchronization = worker_pool::Synchronization::Blocking)
 			{
 				if (synchronization == worker_pool::Synchronization::Blocking)
@@ -278,6 +280,27 @@ namespace ion::parallel
 				return result;
 			}
 
+			//Returns the result of the worker with the given id once it is available (blocking)
+			//Returns the result if available, or return to caller with nullopt (non-blocking)
+			template <typename = std::enable_if_t<!std::is_same_v<Id, void>>>
+			[[nodiscard]] auto Get(const Id &id, worker_pool::Synchronization synchronization = worker_pool::Synchronization::Blocking)
+				-> std::optional<Ret>
+			{
+				if (synchronization == worker_pool::Synchronization::Blocking)
+					Wait(id);
+
+				std::lock_guard lock{m_};
+				if (auto iter = workers_.find(id); iter != std::end(workers_) && iter->second.IsReady())
+				{
+					auto result = iter->second.Get();
+					workers_.erase(iter, std::end(workers_)); //Non-blocking
+					return result;
+				}
+				else
+					return {};			
+			}
+
+
 			//Wait for all of the workers to finish their tasks (blocking)
 			void Wait() noexcept
 			{
@@ -289,11 +312,11 @@ namespace ion::parallel
 					});
 			}
 
-			//Wait for a worker with the given id to finish its task (blocking)
+			//Wait for the worker with the given id to finish its task (blocking)
 			template <typename = std::enable_if_t<!std::is_same_v<Id, void>>>
 			void Wait(const Id &id) noexcept
 			{
-				std::unique_lock lock{m_};
+				std::lock_guard lock{m_};
 				if (auto iter = workers_.find(id); iter != std::end(workers_))
 					iter->second.Wait();
 			}
