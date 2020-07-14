@@ -211,13 +211,13 @@ namespace ion::resources
 			}
 
 
-			void WaitWhilePreparingResource(ResourceT &resource) noexcept
+			void JoinAsyncResourceProcess(ResourceT &resource) noexcept
 			{
 				if (auto prepared = processes_.Get(&resource); prepared) //Blocking
 					ProcessPreparedResource(resource, *prepared);
 			}
 
-			void WaitWhilePreparingAllResources() noexcept
+			void JoinAllAsyncResourceProcesses() noexcept
 			{
 				auto result = processes_.Get(); //Blocking
 
@@ -473,9 +473,13 @@ namespace ion::resources
 				if (resource.Owner() != this)
 					return false;
 
+				//Resource already preparing
 				if (resource.LoadingState() == resource::LoadingState::Preparing &&
 					strategy == resource_manager::EvaluationStrategy::Eager)
-					WaitWhilePreparingResource(resource);
+				{
+					JoinAsyncResourceProcess(resource);
+					return resource.IsPrepared();
+				}
 
 				if (auto prepare = resource.Prepare();
 					prepare && strategy == resource_manager::EvaluationStrategy::Eager)
@@ -494,7 +498,7 @@ namespace ion::resources
 			void PrepareAll(resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
 				if (strategy == resource_manager::EvaluationStrategy::Eager)
-					WaitWhilePreparingAllResources();
+					JoinAllAsyncResourceProcesses();
 
 				for (auto &resource : Resources())
 					Prepare(resource, strategy);
@@ -553,9 +557,10 @@ namespace ion::resources
 				if (resource.Owner() != this)
 					return false;
 
+				//Resource already preparing
 				if (resource.LoadingState() == resource::LoadingState::Preparing &&
 					strategy == resource_manager::EvaluationStrategy::Eager)
-					WaitWhilePreparingResource(resource);
+					JoinAsyncResourceProcess(resource);
 
 				if (auto load = resource.Load();
 					load && strategy == resource_manager::EvaluationStrategy::Eager)
@@ -580,7 +585,7 @@ namespace ion::resources
 			void LoadAll(resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
 				if (strategy == resource_manager::EvaluationStrategy::Eager)
-					WaitWhilePreparingAllResources();
+					JoinAllAsyncResourceProcesses();
 
 				for (auto &resource : Resources())
 					Load(resource, strategy);
