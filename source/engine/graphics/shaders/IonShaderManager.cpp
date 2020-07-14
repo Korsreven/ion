@@ -239,6 +239,9 @@ bool ShaderManager::RemoveShader(Shader &shader) noexcept
 
 std::optional<std::string> ShaderManager::PrintInfoLog(const Shader &shader) const
 {
+	if (shader.Owner() != this)
+		return {};
+
 	if (auto handle = shader.Handle(); handle)
 		return detail::print_info_log(*handle);
 	else

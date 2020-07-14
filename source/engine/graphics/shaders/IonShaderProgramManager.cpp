@@ -775,6 +775,15 @@ bool ShaderProgramManager::UnloadResource(ShaderProgram &shader_program) noexcep
 	{
 		detail::unload_shader_program(*handle);
 		shader_program.Handle({});
+
+		//Set all attribute variable locations to nullopt
+		for (auto &attribute_variable : shader_program.AttributeVariables())
+			attribute_variable.Location({});
+
+		//Set all uniform variable locations to nullopt
+		for (auto &uniform_variable : shader_program.UniformVariables())
+			uniform_variable.Location({});
+
 		return true;
 	}
 	else
@@ -831,6 +840,9 @@ bool ShaderProgramManager::RemoveShaderProgram(ShaderProgram &shader_program) no
 
 void ShaderProgramManager::UpdateShaderVariables(ShaderProgram &shader_program) noexcept
 {
+	if (shader_program.Owner() != this)
+		return;
+
 	if (auto handle = shader_program.Handle(); handle)
 	{
 		//Update all attribute variables attached to shader program
@@ -850,6 +862,9 @@ void ShaderProgramManager::UpdateShaderVariables(ShaderProgram &shader_program) 
 
 std::optional<std::string> ShaderProgramManager::PrintInfoLog(const ShaderProgram &shader_program) const
 {
+	if (shader_program.Owner() != this)
+		return {};
+
 	if (auto handle = shader_program.Handle(); handle)
 		return detail::print_info_log(*handle);
 	else
