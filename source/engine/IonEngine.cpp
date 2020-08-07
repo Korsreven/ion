@@ -115,37 +115,55 @@ bool Engine::NotifyFrameEnded(duration time) noexcept
 
 void Draw()
 {
+	glColor3fv(graphics::utilities::color::LightGray.Channels());
+
 	glBegin(GL_QUADS);
-	glColor3fv(graphics::utilities::color::White.Channels());
 	glVertex2f(-1.7778f, 1.0f);
 	glVertex2f(-1.7778f, -1.0f);
 	glVertex2f(1.7778f, -1.0f);
 	glVertex2f(1.7778f, 1.0f);
 	glEnd();
 
-	glBegin(GL_QUADS);
 	glColor3fv(graphics::utilities::color::Red.Channels());
+
+	glBegin(GL_QUADS);
 	glVertex2f(-1.7778f, 1.0f);
 	glVertex2f(-1.7778f, 0.8f);
 	glVertex2f(-1.57788f, 0.8f);
 	glVertex2f(-1.5778f, 1.0f);
 	glEnd();
 
-	glBegin(GL_QUADS);
-	glColor3fv(graphics::utilities::color::Green.Channels());
+	/*glColor3fv(graphics::utilities::color::Green.Channels());
+
+	glBegin(GL_QUADS);	
 	glVertex2f(-0.1f, 0.1f);
 	glVertex2f(-0.1f, -0.1f);
 	glVertex2f(0.1f, -0.1f);
 	glVertex2f(0.1f, 0.1f);
-	glEnd();
+	glEnd();*/
 
-	glBegin(GL_QUADS);
 	glColor3fv(graphics::utilities::color::Blue.Channels());
+
+	glBegin(GL_QUADS);	
 	glVertex2f(1.5778f, -0.8f);
 	glVertex2f(1.5778f, -1.0f);
 	glVertex2f(1.7778f, -1.0f);
 	glVertex2f(1.7778f, -0.8f);
 	glEnd();
+
+	glColor3fv(graphics::utilities::color::White.Channels());
+	glBindTexture(GL_TEXTURE_2D, 1);
+	glEnable(GL_TEXTURE_2D);
+
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 1.0f); glVertex2f(-0.375f, 0.75f);
+	glTexCoord2f(0.0f, 0.0f); glVertex2f(-0.375f, -0.75f);
+	glTexCoord2f(1.0f, 0.0f); glVertex2f(0.375f, -0.75f);
+	glTexCoord2f(1.0f, 1.0f); glVertex2f(0.375f, 0.75f);
+	glEnd();
+	
+	glDisable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 bool Engine::UpdateFrame() noexcept

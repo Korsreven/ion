@@ -32,7 +32,7 @@ namespace ion::resources::files
 
 		public:
 
-			//Constructor
+			//Constructs a new file resource with the given name
 			explicit FileResource(std::string name) :
 				name_{std::move(name)}
 			{
@@ -47,8 +47,8 @@ namespace ion::resources::files
 			//Sets the file data of the file resource to the given data with the associated path
 			inline void FileData(std::string data, std::filesystem::path path)
 			{
-				file_data_.emplace(std::move(data));
-				file_path_.emplace(std::move(path));
+				file_data_ = std::move(data);
+				file_path_ = std::move(path);
 			}
 
 			//Resets the file data to save some memory (if not needed anymore)

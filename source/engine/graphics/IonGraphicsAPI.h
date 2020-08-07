@@ -253,6 +253,16 @@ namespace ion::graphics::gl
 			return Extension::None;
 	}
 
+	[[nodiscard]] inline auto TextureNonPowerOfTwo_Support() noexcept
+	{
+		if (HasGL(Version::v2_0))
+			return Extension::Core;
+		else if (GL_ARB_texture_non_power_of_two)
+			return Extension::ARB;
+		else
+			return Extension::None;
+	}
+
 	[[nodiscard]] inline auto VertexBufferObject_Support() noexcept
 	{
 		if (HasGL(Version::v2_1))
@@ -265,6 +275,13 @@ namespace ion::graphics::gl
 			return Extension::None;
 	}
 
+
+	[[nodiscard]] inline auto MaxTextureSize() noexcept
+	{
+		auto max_texture_size = 0;
+		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
+		return max_texture_size;
+	}
 
 	[[nodiscard]] inline auto MaxTextureUnits() noexcept
 	{

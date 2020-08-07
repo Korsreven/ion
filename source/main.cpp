@@ -140,11 +140,11 @@ using namespace ion::graphics::utilities::vector2::literals;
 using namespace ion::utilities::file::literals;
 using namespace ion::utilities::math::literals;
 
-struct SpriteContainer : ion::events::Listenable<ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManger>>
+struct SpriteContainer : ion::events::Listenable<ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManager>>
 {
 };
 
-struct Sprite : ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManger>
+struct Sprite : ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManager>
 {
 	void ResourcePrepared(ion::graphics::textures::Texture &resource) noexcept override
 	{
@@ -183,12 +183,12 @@ struct Sprite : ion::events::listeners::ResourceListener<ion::graphics::textures
 	}
 
 
-	void Subscribed(ion::events::Listenable<ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManger>> &listenable) noexcept override
+	void Subscribed(ion::events::Listenable<ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManager>> &listenable) noexcept override
 	{
 		listenable;
 	}
 
-	void Unsubscribed(ion::events::Listenable<ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManger>> &listenable) noexcept override
+	void Unsubscribed(ion::events::Listenable<ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManager>> &listenable) noexcept override
 	{
 		listenable;
 	}
@@ -301,53 +301,63 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				auto multi_texture = ion::graphics::gl::MultiTexture_Support();
 				auto point_sprite = ion::graphics::gl::PointSprite_Support();
 				auto shader = ion::graphics::gl::Shader_Support();
+				auto npot = ion::graphics::gl::TextureNonPowerOfTwo_Support();
 				auto vertex_buffer_object = ion::graphics::gl::VertexBufferObject_Support();
+				auto max_texture_size = ion::graphics::gl::MaxTextureSize();
 				auto max_texture_units = ion::graphics::gl::MaxTextureUnits();
 				auto break_point = false;
 			}
 
-			//Check resources
-			{
-				//Repositories
-				ion::resources::files::repositories::AudioRepository audio_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-				ion::resources::files::repositories::FontRepository font_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-				ion::resources::files::repositories::ImageRepository image_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-				ion::resources::files::repositories::ScriptRepository script_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-				ion::resources::files::repositories::ShaderRepository shader_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-				ion::resources::files::repositories::VideoRepository video_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};	
 
-				ion::resources::files::FileResourceLoader file_resource_loader;
-				file_resource_loader.Attach(audio_repository);
-				file_resource_loader.Attach(font_repository);
-				file_resource_loader.Attach(image_repository);
-				file_resource_loader.Attach(script_repository);
-				file_resource_loader.Attach(shader_repository);
-				file_resource_loader.Attach(video_repository);
+			//EXAMPLE begin
+
+			//Repositories
+			ion::resources::files::repositories::AudioRepository audio_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
+			ion::resources::files::repositories::FontRepository font_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
+			ion::resources::files::repositories::ImageRepository image_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
+			ion::resources::files::repositories::ScriptRepository script_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
+			ion::resources::files::repositories::ShaderRepository shader_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
+			ion::resources::files::repositories::VideoRepository video_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};	
+
+			ion::resources::files::FileResourceLoader file_resource_loader;
+			file_resource_loader.Attach(audio_repository);
+			file_resource_loader.Attach(font_repository);
+			file_resource_loader.Attach(image_repository);
+			file_resource_loader.Attach(script_repository);
+			file_resource_loader.Attach(shader_repository);
+			file_resource_loader.Attach(video_repository);
 	
-				file_resource_loader.LoadDirectory("bin", ion::utilities::file::DirectoryIteration::Recursive);
-				//file_resource_loader.CompileDataFile("bin/resources.dat");
+			file_resource_loader.LoadDirectory("bin", ion::utilities::file::DirectoryIteration::Recursive);
+			//file_resource_loader.CompileDataFile("bin/resources.dat");
 
 
-				//Textures
-				ion::graphics::textures::TextureManger textures;
-				textures.CreateRepository(std::move(image_repository));
-				textures.CreateResource("image.png");
-				textures.LoadAll(ion::resources::resource_manager::EvaluationStrategy::Lazy);
+			ion::types::Progress<int> progress;
 
-				ion::types::Progress<int> progress;
-				while (!textures.Loaded(progress));
+			//Textures
+			ion::graphics::textures::TextureManager textures;
+			textures.CreateRepository(std::move(image_repository));
+			auto &rikku_texture = textures.CreateTexture("rikku.png");
+			auto &rikku_np2_texture = textures.CreateTexture("rikku_np2.png");
+			auto &cloud_texture = textures.CreateTexture("cloud.png");
+			auto &cloud_np2_texture = textures.CreateTexture("cloud_np2.png");
+			auto &background_texture = textures.CreateTexture("background.jpg");
+			auto &background_np2_texture = textures.CreateTexture("background_np2.jpg");
+			textures.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
+
+			//while (!textures.Loaded());
 
 
-				//Shaders
-				ion::graphics::shaders::ShaderManager shaders;
-				shaders.CreateRepository(std::move(shader_repository));
-				shaders.LogLevel(ion::graphics::shaders::shader_manager::InfoLogLevel::Error);
-				auto &vert_shader = shaders.CreateShader("default_particle.vert");
-				auto &frag_shader = shaders.CreateShader("default_particle.frag");
-				shaders.LoadAll(ion::resources::resource_manager::EvaluationStrategy::Lazy);
+			//Shaders
+			ion::graphics::shaders::ShaderManager shaders;
+			shaders.CreateRepository(std::move(shader_repository));
+			shaders.LogLevel(ion::graphics::shaders::shader_manager::InfoLogLevel::Error);
+			auto &vert_shader = shaders.CreateShader("default_particle.vert");
+			auto &frag_shader = shaders.CreateShader("default_particle.frag");
+			shaders.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
-				while (!shaders.Loaded());
-			}
+			//while (!shaders.Loaded());
+
+			//EXAMPLE end
 
 			engine.Subscribe(frame_test);
 
