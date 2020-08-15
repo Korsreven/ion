@@ -12,7 +12,6 @@ File:	IonCamera.cpp
 
 #include "IonCamera.h"
 
-#include "IonSceneManager.h"
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/render/IonViewport.h"
 

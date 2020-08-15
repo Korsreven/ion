@@ -322,7 +322,7 @@ InputListener::~InputListener()
 	Viewport
 */
 
-void InputListener::ConnectViewport(graphics::render::Viewport &viewport) noexcept
+void InputListener::ConnectViewport(graphics::render::Viewport &viewport)
 {
 	if (viewport.Owner() == &render_window_)
 		viewport_.Observe(viewport);

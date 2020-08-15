@@ -174,7 +174,7 @@ namespace ion::system::events::listeners
 			*/
 
 			//Sets the viewport that should be connected to this input listener
-			void ConnectViewport(graphics::render::Viewport &viewport) noexcept;
+			void ConnectViewport(graphics::render::Viewport &viewport);
 
 
 			//Returns a mutable pointer to the viewport connected to this input listener

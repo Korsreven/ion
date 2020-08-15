@@ -49,10 +49,10 @@ namespace ion::graphics::shaders
 		public:
 			
 			//Constructs a new shader program with the given shader
-			explicit ShaderProgram(Shader &shader) noexcept;
+			explicit ShaderProgram(Shader &shader);
 
 			//Constructs a new shader program with the given vertex and fragment shader
-			ShaderProgram(Shader &vertex_shader, Shader &fragment_shader) noexcept;
+			ShaderProgram(Shader &vertex_shader, Shader &fragment_shader);
 
 
 			/*

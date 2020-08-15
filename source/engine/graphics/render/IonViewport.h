@@ -274,7 +274,7 @@ namespace ion::graphics::render
 			*/
 
 			//Sets the camera that should be connected to this viewport
-			void ConnectCamera(scene::Camera &camera) noexcept;
+			void ConnectCamera(scene::Camera &camera);
 
 
 			//Returns a mutable pointer to the camera connected to this viewport

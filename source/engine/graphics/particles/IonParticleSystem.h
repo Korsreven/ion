@@ -15,6 +15,12 @@ File:	IonParticleSystem.h
 
 #include "IonEmitterFactory.h"
 #include "affectors/IonAffectorFactory.h"
+#include "managed/IonManagedObject.h"
+
+namespace ion::graphics::scene
+{
+	class SceneManager; //Forward declaration
+} //ion::graphics::scene
 
 namespace ion::graphics::particles
 {
@@ -36,6 +42,7 @@ namespace ion::graphics::particles
 
 	//A particle system class that can contain one ore more emitters and affectors
 	class ParticleSystem final :
+		public managed::ManagedObject<scene::SceneManager>,
 		public EmitterFactory,
 		public affectors::AffectorFactory
 	{

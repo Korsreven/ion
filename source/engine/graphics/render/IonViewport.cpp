@@ -325,7 +325,7 @@ Viewport Viewport::BottomRightAligned(RenderTarget &render_target, real width_pe
 	Camera
 */
 
-void Viewport::ConnectCamera(scene::Camera &camera) noexcept
+void Viewport::ConnectCamera(scene::Camera &camera)
 {
 	camera_.Observe(camera);
 }
