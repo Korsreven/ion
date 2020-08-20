@@ -160,7 +160,7 @@ int deserialize_object(std::string_view bytes, std::vector<ObjectNodes> &object_
 	//Node depth, object name and classes serialized
 	if (classes_bytes_deserialized > 0)
 	{
-		if (depth >= static_cast<int>(std::size(object_stack)))
+		if (depth >= std::ssize(object_stack))
 			object_stack.insert(std::end(object_stack), depth - std::size(object_stack) + 1, {});
 
 		//Leaf object, no childrens
@@ -260,7 +260,7 @@ std::string print(const ObjectNodes &objects, PrintOptions print_options)
 
 				if (print_options == PrintOptions::Arguments)
 				{
-					if (auto remaining_args = static_cast<int>(property.Arguments().size());
+					if (auto remaining_args = std::ssize(property.Arguments());
 						remaining_args > 0)
 					{
 						output += ": ";

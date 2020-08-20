@@ -119,7 +119,7 @@ std::string keccak::operator()(int rate, int capacity, std::string_view input, c
 	if (((rate + capacity) != 1600) || ((rate % 8) != 0))
 		return "";
 
-	auto input_size = static_cast<int>(std::size(input));
+	auto input_size = std::ssize(input);
 	auto rate_in_bytes = rate / 8;
 	auto block_size = 0;
 

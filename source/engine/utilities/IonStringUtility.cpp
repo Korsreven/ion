@@ -79,13 +79,13 @@ std::string combine(const Strings &parts, std::optional<std::string_view> delimi
 		start = 0;
 
 	if (count && *count <= 0 ||
-		start >= static_cast<int>(std::size(parts)))
+		start >= std::ssize(parts))
 			return "";
 
 	auto str = parts[start];
 	auto last = std::min(
 		start + count.value_or(std::size(parts)),
-		static_cast<int>(std::size(parts)));
+		std::ssize(parts));
 
 	if (last > ++start)
 	{
@@ -135,7 +135,7 @@ Strings tokenize(std::string_view str, std::string_view delimiters,
 			parts.push_back(std::string(1, str[from - 1]));
 
 			if (max_splits &&
-				*max_splits == static_cast<int>(std::size(parts)))
+				*max_splits == std::ssize(parts))
 					break;
 		}
 
@@ -147,7 +147,7 @@ Strings tokenize(std::string_view str, std::string_view delimiters,
 		parts.emplace_back(part);
 
 		if (max_splits &&
-			*max_splits == static_cast<int>(std::size(parts)))
+			*max_splits == std::ssize(parts))
 				break;
 	}
 
@@ -480,7 +480,7 @@ std::string Format(real number, std::string_view format_str)
 std::string& PadLeft(std::string &str, int length, std::string_view characters)
 {
 	//String is too short, pad with the extra characters
-	if (static_cast<int>(std::size(str)) < length &&
+	if (std::ssize(str) < length &&
 		!std::empty(characters))
 	{
 		auto pad_length = length - std::size(str);
@@ -496,7 +496,7 @@ std::string& PadLeft(std::string &str, int length, std::string_view characters)
 std::string& PadRight(std::string &str, int length, std::string_view characters)
 {
 	//String is too short, pad with the extra characters
-	if (static_cast<int>(std::size(str)) < length &&
+	if (std::ssize(str) < length &&
 		!std::empty(characters))
 	{
 		if (static_cast<int>(str.capacity()) < length)

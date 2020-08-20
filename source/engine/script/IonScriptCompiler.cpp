@@ -1462,7 +1462,7 @@ bool parse_identifier(lexical_token &token, parse_context &context, CompileError
 			auto found = false;
 
 			//Find variable from inner to outermost scope
-			for (auto scope_depth = std::min(context.scope_depth, static_cast<int>(std::size(context.scopes)) - 1);
+			for (auto scope_depth = std::min(context.scope_depth, std::ssize(context.scopes) - 1);
 				scope_depth >= 0; --scope_depth)
 			{
 				if (auto iter = context.scopes[scope_depth].variables.find(token.value);
@@ -1697,7 +1697,7 @@ bool parse_selector(lexical_token &token, parse_context &context, CompileError&)
 	else
 	{
 		context.selectors.back().combinators.push_back(
-			static_cast<int>(std::size(context.selectors.back().classes)));
+			std::ssize(context.selectors.back().classes));
 		context.selectors.back().classes.push_back(token.value);
 	}
 
@@ -1732,7 +1732,7 @@ bool parse_separator(lexical_token &token, parse_context &context, CompileError 
 			//Variable
 			else if (context.variable_token)
 			{
-				if (context.scope_depth == static_cast<int>(std::size(context.scopes)))
+				if (context.scope_depth == std::ssize(context.scopes))
 					context.scopes.emplace_back();
 
 				context.scopes[context.scope_depth].variables[context.variable_token->value] =
@@ -1745,7 +1745,7 @@ bool parse_separator(lexical_token &token, parse_context &context, CompileError 
 
 		case '{':
 		{
-			if (context.scope_depth == static_cast<int>(std::size(context.scopes)))
+			if (context.scope_depth == std::ssize(context.scopes))
 				context.scopes.emplace_back();
 
 			//Classes
@@ -1786,7 +1786,7 @@ bool parse_separator(lexical_token &token, parse_context &context, CompileError 
 										   std::move(context.scopes[context.scope_depth].objects));
 
 			//Clear local variable stack
-			if (context.scope_depth < static_cast<int>(std::size(context.scopes)))
+			if (context.scope_depth < std::ssize(context.scopes))
 				context.scopes[context.scope_depth].variables.clear();
 
 			context.object_tokens.pop_back();
@@ -2053,7 +2053,7 @@ std::pair<bool, int> is_matching(string_views::const_iterator first_selector_cla
 						  first_selector_class + select_all, //Skip *
 						  last_selector_class, std::back_inserter(result));
 
-	auto count = static_cast<int>(std::size(result));
+	auto count = std::ssize(result);
 	return {count == last_selector_class - first_selector_class - select_all, count};
 }
 
@@ -2095,7 +2095,7 @@ void append_matching_templates(const script_tree::detail::generations &descendan
 
 			std::optional<snapshot> restore_point;
 
-			for (auto to = static_cast<int>(std::size(group.classes)); to > 0 && group_matching;)
+			for (auto to = std::ssize(group.classes); to > 0 && group_matching;)
 			{
 				auto from = iter != end ? *iter + 1 : 0;
 				auto first_selector_class = std::begin(group.classes) + from;
@@ -2251,7 +2251,7 @@ void inherit(script_tree::ObjectNodes &objects, template_rules &templates)
 		{
 			//Global scope
 			if (std::size(descendants) == 1 && //Make template previously added visible
-				available_templates < static_cast<int>(std::size(templates)) &&
+				available_templates < std::ssize(templates) &&
 				templates[available_templates].object)
 				++available_templates;
 

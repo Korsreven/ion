@@ -170,7 +170,7 @@ namespace ion::script
 						if (std::size(bytes) >= std::size(output) + data_size)
 						{
 							value = T{bytes.substr(std::size(output), data_size)};
-							return static_cast<int>(std::size(output) + data_size);
+							return std::ssize(output) + static_cast<int>(data_size);
 						}
 					}
 				}
@@ -181,7 +181,7 @@ namespace ion::script
 						std::array<std::byte, sizeof(T)> output;
 						std::copy(std::begin(bytes), std::begin(bytes) + std::size(output), reinterpret_cast<char*>(std::data(output)));
 						utilities::string::Deserialize(output, value);
-						return static_cast<int>(std::size(output));
+						return std::ssize(output);
 					}
 				}
 
@@ -524,7 +524,7 @@ namespace ion::script
 				//Return the number of arguments in this property
 				[[nodiscard]] inline auto NumberOfArguments() const noexcept
 				{
-					return static_cast<int>(std::size(arguments_));
+					return std::ssize(arguments_);
 				}
 
 

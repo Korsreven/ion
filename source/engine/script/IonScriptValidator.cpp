@@ -310,8 +310,8 @@ bool validate_property(const script_tree::PropertyNode &property, const property
 		auto &candidate_def = candidate.Declaration->Definition();
 
 		//Check if candidate has correct number of arguments
-		if (static_cast<int>(std::size(property.Arguments())) >= candidate_def.RequiredParameters() &&
-			static_cast<int>(std::size(property.Arguments())) <= std::size(candidate_def.Parameters()))
+		if (std::ssize(property.Arguments()) >= candidate_def.RequiredParameters() &&
+			std::ssize(property.Arguments()) <= std::ssize(candidate_def.Parameters()))
 		{
 			match = true;
 			auto arg_iter = std::begin(property.Arguments());
@@ -587,7 +587,7 @@ bool validate_tree(const ScriptTree &tree, const ClassDefinition &root, std::vec
 		}
 
 		//Pop back until depth is equal to scope size
-		while (depth + 1 < static_cast<int>(std::size(scopes)))
+		while (depth + 1 < std::ssize(scopes))
 		{
 			const auto &scope = scopes.back();
 
@@ -742,8 +742,8 @@ PropertyDefinition::PropertyDefinition(std::string name, ParameterDefinitions pa
 PropertyDefinition::PropertyDefinition(std::string name, ParameterDefinitions parameters, int required_parameters) noexcept :
 	name_{std::move(name)},
 	parameters_{std::move(parameters)},
-	required_parameters_{required_parameters > 0 && required_parameters <= static_cast<int>(std::size(parameters_)) ?
-						 required_parameters : static_cast<int>(std::size(parameters_))}
+	required_parameters_{required_parameters > 0 && required_parameters <= std::ssize(parameters_) ?
+						 required_parameters : std::ssize(parameters_)}
 {
 	//Empty
 }

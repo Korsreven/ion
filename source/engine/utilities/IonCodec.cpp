@@ -90,7 +90,7 @@ std::optional<std::string> hex_to_string(std::string_view str)
 	if (std::empty(str))
 		return "";
 
-	auto size = static_cast<int>(std::size(str));
+	auto size = std::ssize(str);
 
 	std::string result;
     result.reserve(size / 2);

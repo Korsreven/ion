@@ -283,7 +283,7 @@ namespace ion::graphics::particles
 				particle_quota_ = quota > 0 ? quota : 0;
 
 				//Erase all particles that does not fit quota
-				if (particle_quota_ < static_cast<int>(std::size(particles_)))
+				if (particle_quota_ < std::ssize(particles_))
 					particles_.erase(std::begin(particles_) + particle_quota_, std::end(particles_));
 			}
 

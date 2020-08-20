@@ -284,7 +284,7 @@ bool Load(const std::filesystem::path &file_path, std::string &data,
 	
 	if (file)
 	{
-		auto data_size = data.size();
+		auto data_size = std::size(data);
 		data.append(static_cast<size_t>(file_size), '\0');
 
 		file.read(&data[data_size], file_size); //Read bytes
@@ -329,7 +329,7 @@ bool LoadPartOf(const std::filesystem::path &file_path, std::string &data,
 			count = std::min(file_size - position, static_cast<std::streamsize>(count));
 			file.seekg(position, std::ios::beg); //Seek position
 
-			auto data_size = data.size();
+			auto data_size = std::size(data);
 			data.append(static_cast<size_t>(count), '\0');
 
 			file.read(&data[data_size], count); //Read bytes

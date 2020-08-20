@@ -166,7 +166,7 @@ void Emitter::Elapse(duration time) noexcept
 
 void Emitter::Emit(int particle_count) noexcept
 {
-	for (particle_count = std::min(particle_count, particle_quota_ - static_cast<int>(std::size(particles_)));
+	for (particle_count = std::min(particle_count, particle_quota_ - std::ssize(particles_));
 		particle_count > 0; --particle_count)
 
 		particles_.emplace_back(

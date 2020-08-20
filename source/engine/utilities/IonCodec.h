@@ -48,7 +48,7 @@ namespace ion::utilities::codec
 		}
 
 		template <const std::string_view &Map,
-				  auto Base = static_cast<int>(std::size(Map))>
+				  auto Base = std::ssize(Map)>
 		class base_index_table
 		{
 			private:
@@ -116,7 +116,7 @@ namespace ion::utilities::codec
 		};
 
 		template <const std::string_view &Map,
-				  int Base = static_cast<int>(std::size(Map))>
+				  auto Base = std::ssize(Map)>
 		class rfc_base final :
 			base_index_table<Map, Base>
 		{
@@ -160,7 +160,7 @@ namespace ion::utilities::codec
 
 					if (pad_length > 0)
 						buffer <<= 8 *
-							(bytes_in_block_.first - static_cast<int>(std::size(in)));
+							(bytes_in_block_.first - std::ssize(in));
 
 					//Output bytes
 					for (auto i = bytes_in_block_.second; i > pad_length; --i)
@@ -189,7 +189,7 @@ namespace ion::utilities::codec
 
 					if (pad_length > 0)
 						buffer <<= bits_in_digit_ *
-							(bytes_in_block_.second - static_cast<int>(std::size(in)));
+							(bytes_in_block_.second - std::ssize(in));
 
 					//Output bytes
 					for (auto i = bytes_in_block_.first; i > pad_length; --i)
@@ -221,7 +221,7 @@ namespace ion::utilities::codec
 					if (std::empty(str))
 						return std::string{};
 
-					auto size = static_cast<int>(std::size(str));
+					auto size = std::ssize(str);
 					auto r = size % bytes_in_block_.first;
 
 					auto length = EncodeLength(size);
@@ -257,7 +257,7 @@ namespace ion::utilities::codec
 					if (std::empty(str))
 						return std::optional<std::string>{};
 
-					auto size = static_cast<int>(std::size(str));
+					auto size = std::ssize(str);
 					auto r = size % bytes_in_block_.second;
 
 					auto length = DecodeLength(size);
@@ -332,7 +332,7 @@ namespace ion::utilities::codec
 
 			auto result = T{0};
 			{
-				auto exponent = static_cast<int>(std::size(str));
+				auto exponent = std::ssize(str);
 				for (auto c : str)
 				{
 					result +=
