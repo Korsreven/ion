@@ -64,6 +64,7 @@ File:	main.cpp
 #include "graphics/shaders/variables/IonShaderTypes.h"
 #include "graphics/shaders/variables/IonShaderUniform.h"
 #include "graphics/shaders/variables/IonShaderVariable.h"
+#include "graphics/textures/IonAnimation.h"
 #include "graphics/textures/IonTexture.h"
 #include "graphics/textures/IonTextureManager.h"
 #include "graphics/utilities/IonAabb.h"
@@ -346,6 +347,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//while (!textures.Loaded());
 
+			//Animation
+			auto animation = ion::graphics::textures::Animation::Looping(
+				{&rikku_texture, &cloud_texture, &background_texture},
+				6.0_sec, ion::graphics::textures::animation::PlaybackDirection::Alternate);
+			animation.RepeatCount(1);
+			animation.JumpForward(7.5_sec);
+			animation.RepeatCount({});
+			animation.RepeatCount(1);
 
 			//Shaders
 			ion::graphics::shaders::ShaderManager shaders;

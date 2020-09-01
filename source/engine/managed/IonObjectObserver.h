@@ -14,10 +14,10 @@ File:	IonObjectObserver.h
 #define ION_OBJECT_OBSERVER_H
 
 #include <type_traits>
-#include <vector>
 
 #include "IonManagedObject.h"
 #include "IonObservedObject.h"
+#include "adaptors/IonFlatSet.h"
 #include "adaptors/ranges/IonDereferenceIterable.h"
 #include "events/IonEventChannel.h"
 #include "events/IonListenable.h"
@@ -28,7 +28,7 @@ namespace ion::managed
 	namespace object_observer::detail
 	{
 		template <typename T>
-		using container_type = std::vector<T*>; //Non-owning
+		using container_type = adaptors::FlatSet<T*>; //Non-owning (unique)
 	} //object_observer::detail
 
 
@@ -60,19 +60,10 @@ namespace ion::managed
 			//See ManagedObjectListener::ObjectRemoved for more details
 			void ObjectRemoved(T &object) noexcept override
 			{
-				auto iter =
-					std::find_if(std::begin(managed_objects_), std::end(managed_objects_),
-						[&](auto &x) noexcept
-						{
-							return x == &object;
-						});
-
-				//Object found
-				if (iter != std::end(managed_objects_))
+				if (managed_objects_.erase(&object))
 				{
-					managed_objects_.erase(iter);
-
-					//Empty, unsubscribe from publisher
+					//Object erased
+					//Unsubscribe from publisher if empty
 					if (std::empty(managed_objects_))
 					{
 						this->DoUnsubscribe(true);
@@ -208,26 +199,16 @@ namespace ion::managed
 			//Returns true if the object has successfully been observed, or change requirements
 			inline auto Observe(T &object)
 			{
-				if (auto owner = object.Owner(); owner)
+				//Is object observable
+				if (auto owner = object.Owner(); owner &&
+					((std::empty(managed_objects_) && this->Subscribe(*owner)) ||
+					(!std::empty(managed_objects_) && (*std::begin(managed_objects_))->Owner() == owner)))
 				{
-					auto iter =
-						std::find_if(std::begin(managed_objects_), std::end(managed_objects_),
-							[&](auto &x) noexcept
-							{
-								return x == &object;
-							});
-
-					//Object not already observed
-					if (iter == std::end(managed_objects_) &&
-						((std::empty(managed_objects_) && this->Subscribe(*owner)) ||
-						(!std::empty(managed_objects_) && managed_objects_.front()->Owner() == owner)))
-					{
-						managed_objects_.push_back(&object);
-						return true;
-					}
+					managed_objects_.insert(&object);
+					return true;
 				}
-
-				return false;
+				else
+					return false;
 			}
 
 
@@ -249,20 +230,11 @@ namespace ion::managed
 			//Returns true if the object has successfully been released, or change requirements
 			inline auto Release(T &object) noexcept
 			{
-				auto iter =
-					std::find_if(std::begin(managed_objects_), std::end(managed_objects_),
-						[&](auto &x) noexcept
-						{
-							return x == &object;
-						});
-
-				//Object found
-				if (iter != std::end(managed_objects_) &&
-					ObjectRemovable(**iter))
+				if (ObjectRemovable(object) &&
+					managed_objects_.erase(&object))
 				{
-					managed_objects_.erase(iter);
-					
-					//Empty, unsubscribe from publisher
+					//Object released
+					//Unsubscribe from publisher if empty
 					if (std::empty(managed_objects_))
 						ReleaseAll();
 
