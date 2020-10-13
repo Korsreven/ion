@@ -50,7 +50,7 @@ namespace ion::graphics::textures
 		struct TextureExtents
 		{
 			int Width = 0, Height = 0;
-			int PixelWidth = 0, PixelHeight = 0;
+			int ActualWidth = 0, ActualHeight = 0;
 			int BitDepth = 0;
 		};
 	} //texture

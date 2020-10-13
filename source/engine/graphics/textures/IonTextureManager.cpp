@@ -73,8 +73,8 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 	texture::TextureExtents extents;
 	extents.Width = static_cast<int>(FreeImage_GetWidth(bitmap));
 	extents.Height = static_cast<int>(FreeImage_GetHeight(bitmap));
-	extents.PixelWidth = extents.Width;
-	extents.PixelHeight = extents.Height;
+	extents.ActualWidth = extents.Width;
+	extents.ActualHeight = extents.Height;
 	extents.BitDepth = bit_depth;
 
 	//Make sure texture is power of two
@@ -177,13 +177,13 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 
 		extents.Width = new_width;
 		extents.Height = new_height;
-		extents.PixelWidth = upper_power_of_two(new_width);
-		extents.PixelHeight = upper_power_of_two(new_height);
+		extents.ActualWidth = upper_power_of_two(new_width);
+		extents.ActualHeight = upper_power_of_two(new_height);
 	}
 
 	auto pixel_data = std::string{
 		reinterpret_cast<char*>(FreeImage_GetBits(bitmap)),
-		static_cast<size_t>(extents.PixelWidth) * extents.PixelHeight * (bit_depth / 8)};
+		static_cast<size_t>(extents.ActualWidth) * extents.ActualHeight * (bit_depth / 8)};
 	FreeImage_Unload(bitmap);
 
 	return std::pair{std::move(pixel_data), extents};
@@ -205,7 +205,7 @@ std::optional<int> load_texture(const std::string &pixel_data, const texture::Te
 	if (mip_filter)
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, number_of_mipmap_levels(extents.PixelWidth, extents.PixelHeight));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, number_of_mipmap_levels(extents.ActualWidth, extents.ActualHeight));
 
 		//Must be enabled before glTexImage2D!
 		if (!has_latest_generate_mipmap)
@@ -276,7 +276,7 @@ std::optional<int> load_texture(const std::string &pixel_data, const texture::Te
 	//Upload image to gl
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexImage2D(GL_TEXTURE_2D, 0,
-		extents.BitDepth == 32 ? GL_RGBA : GL_RGB, extents.PixelWidth, extents.PixelHeight, 0,
+		extents.BitDepth == 32 ? GL_RGBA : GL_RGB, extents.ActualWidth, extents.ActualHeight, 0,
 			[&]() noexcept
 			{
 				if (FreeImage_IsLittleEndian())
