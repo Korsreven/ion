@@ -84,7 +84,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 		auto height = extents.Height;
 		auto [new_width , new_height] =
 			power_of_two_adjusted_size(width, height,
-				npot_scale.value_or(texture_manager::NpotScale::ToNearest), npot_scale_fit);
+				npot_scale.value_or(NpotScale::ToNearest), npot_scale_fit);
 
 		//Rescale is needed (new size is different)
 		if (new_width != width || new_height != height)
@@ -309,7 +309,7 @@ void unload_texture(int texture_handle) noexcept
 
 bool TextureManager::IsResourcesEquivalent(const Texture &lhs, const Texture &rhs) noexcept
 {
-	return texture_manager::detail::is_textures_equivalent(lhs, rhs);
+	return detail::is_textures_equivalent(lhs, rhs);
 }
 
 
