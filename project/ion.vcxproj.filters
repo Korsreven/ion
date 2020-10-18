@@ -154,6 +154,12 @@
     <Filter Include="Header Files\graphics\shaders\variables">
       <UniqueIdentifier>{b4fe8d7b-1b67-42d5-aaec-df92613f1fa4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\graphics\fonts">
+      <UniqueIdentifier>{5fff99a8-7ae3-4ceb-aef6-d81e43c2cc22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics\fonts">
+      <UniqueIdentifier>{ac2d45d4-3510-4c6f-96b8-d869fb1cfdcb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -332,6 +338,9 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\textures\IonAnimation.cpp">
       <Filter>Source Files\graphics\textures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\fonts\IonFontManager.cpp">
+      <Filter>Source Files\graphics\fonts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -685,6 +694,12 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\textures\IonAnimation.h">
       <Filter>Header Files\graphics\textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\fonts\IonFont.h">
+      <Filter>Header Files\graphics\fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\fonts\IonFontManager.h">
+      <Filter>Header Files\graphics\fonts</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

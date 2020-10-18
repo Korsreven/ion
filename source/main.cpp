@@ -37,6 +37,8 @@ File:	main.cpp
 #include "events/listeners/IonWindowListener.h"
 
 #include "graphics/IonGraphicsAPI.h"
+#include "graphics/fonts/IonFont.h"
+#include "graphics/fonts/IonFontManager.h"
 #include "graphics/particles/IonEmitter.h"
 #include "graphics/particles/IonEmitterFactory.h"
 #include "graphics/particles/IonParticle.h"

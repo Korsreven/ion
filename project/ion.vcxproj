@@ -91,7 +91,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;_WINDOW;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\source\engine;..\libraries</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\source\engine;..\libraries;..\libraries\FreeType</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <ConformanceMode>true</ConformanceMode>
@@ -124,7 +124,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;_WINDOW;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\source\engine;..\libraries</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\source\engine;..\libraries;..\libraries\FreeType</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <ConformanceMode>true</ConformanceMode>
@@ -159,6 +159,7 @@
   <ItemGroup>
     <ClCompile Include="..\source\engine\events\IonInputController.cpp" />
     <ClCompile Include="..\source\engine\events\IonRecurringCallback.cpp" />
+    <ClCompile Include="..\source\engine\graphics\fonts\IonFontManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonAffector.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonColorFader.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonDirectionRandomizer.cpp" />
@@ -247,6 +248,8 @@
     <ClInclude Include="..\source\engine\events\listeners\IonResourceListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonViewportListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonWindowListener.h" />
+    <ClInclude Include="..\source\engine\graphics\fonts\IonFont.h" />
+    <ClInclude Include="..\source\engine\graphics\fonts\IonFontManager.h" />
     <ClInclude Include="..\source\engine\graphics\IonGraphicsAPI.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffector.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffectorFactory.h" />
