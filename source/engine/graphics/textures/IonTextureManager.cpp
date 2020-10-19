@@ -274,7 +274,7 @@ std::optional<int> load_texture(const std::string &pixel_data, const texture::Te
 		t_wrap_mode == texture::TextureWrapMode::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
 
 	//Upload image to gl
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); //May increase transfer speed for NPOT
 	glTexImage2D(GL_TEXTURE_2D, 0,
 		extents.BitDepth == 32 ? GL_RGBA : GL_RGB, extents.ActualWidth, extents.ActualHeight, 0,
 			[&]() noexcept

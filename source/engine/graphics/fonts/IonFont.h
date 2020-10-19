@@ -38,6 +38,15 @@ namespace ion::graphics::fonts
 			Bilinear			//Linear
 		};
 
+
+		struct GlyphExtents
+		{
+			int Left = 0, Top = 0;
+			int Width = 0, Height = 0;
+			int ActualWidth = 0, ActualHeight = 0;
+			int Advance = 0;
+		};
+
 		namespace detail
 		{
 			template <typename T>
@@ -53,8 +62,8 @@ namespace ion::graphics::fonts
 			std::optional<font::detail::container_type<int>> glyph_handles_;
 
 			std::optional<font::detail::container_type<std::string>> glyph_data_;	
-			std::optional<font::detail::container_type<int>> glyph_advances_;
-			std::optional<int> glyph_height_;
+			std::optional<font::detail::container_type<font::GlyphExtents>> glyph_extents_;
+			std::optional<int> glyph_max_height_;
 
 			int size_ = 0;
 			int face_index_ = 0;
@@ -138,11 +147,12 @@ namespace ion::graphics::fonts
 
 
 			//Sets the glyph data of the font to the given data
-			inline void GlyphData(font::detail::container_type<std::string> data, font::detail::container_type<int> advances, int height)
+			inline void GlyphData(font::detail::container_type<std::string> data,
+				font::detail::container_type<font::GlyphExtents> extents, int max_height)
 			{
 				glyph_data_ = std::move(data);
-				glyph_advances_ = std::move(advances);
-				glyph_height_ = height;
+				glyph_extents_ = std::move(extents);
+				glyph_max_height_ = max_height;
 			}
 
 			//Resets the glyph data to save some memory (if not needed anymore)
@@ -178,18 +188,18 @@ namespace ion::graphics::fonts
 				return glyph_data_;
 			}
 
-			//Returns the glyph advances for the font
+			//Returns the glyph extents for the font
 			//Returns nullopt if the font has not been prepared yet
-			[[nodiscard]] inline auto& GlyphAdvances() const noexcept
+			[[nodiscard]] inline auto& GlyphExtents() const noexcept
 			{
-				return glyph_advances_;
+				return glyph_extents_;
 			}
 
 			//Returns the max glyph height for the font
 			//Returns nullopt if the font has not been prepared yet
-			[[nodiscard]] inline auto GlyphHeight() const noexcept
+			[[nodiscard]] inline auto GlyphMaxHeight() const noexcept
 			{
-				return glyph_height_;
+				return glyph_max_height_;
 			}
 
 

@@ -368,6 +368,17 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//while (!shaders.Loaded());
 
+			//Font
+			ion::graphics::fonts::FontManager fonts;
+			fonts.CreateRepository(std::move(font_repository));
+			auto &verdana_regular = fonts.CreateFont("verdana.ttf", 12);
+			auto &verdana_bold = fonts.CreateFont("verdanab.ttf", 12);
+			auto &verdana_italic = fonts.CreateFont("verdanai.ttf", 12);
+			auto &verdana_bold_italic = fonts.CreateFont("verdanaz.ttf", 12);
+			fonts.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
+
+			//while (!fonts.Loaded());
+
 			//EXAMPLE end
 
 			engine.Subscribe(frame_test);

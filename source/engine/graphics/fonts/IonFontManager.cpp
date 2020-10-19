@@ -28,7 +28,7 @@ using namespace font_manager;
 namespace font_manager::detail
 {
 
-std::optional<std::tuple<font::detail::container_type<std::string>, font::detail::container_type<int>, int>> prepare_font(
+std::optional<std::tuple<font::detail::container_type<std::string>, font::detail::container_type<font::GlyphExtents>, int>> prepare_font(
 	const std::string &file_data, int size, int face_index, font::CharacterEncoding encoding)
 {
 	FT_Library library = nullptr;
@@ -47,8 +47,8 @@ std::optional<std::tuple<font::detail::container_type<std::string>, font::detail
 
 	auto glyph_count = static_cast<int>(encoding);
 	font::detail::container_type<std::string> glyph_data(glyph_count);
-	font::detail::container_type<int> glyph_advances(glyph_count);
-	auto glyph_height = 0;
+	font::detail::container_type<font::GlyphExtents> glyph_extents(glyph_count);
+	auto glyph_max_height = 0;
 	
 	for (auto i = 0; i < glyph_count; ++i)
 	{
@@ -60,51 +60,108 @@ std::optional<std::tuple<font::detail::container_type<std::string>, font::detail
 		if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL) != 0)
 			continue;
 
-		auto width = static_cast<int>(face->glyph->bitmap.width);
-		auto height = static_cast<int>(face->glyph->bitmap.rows);
-		auto new_width =
-			static_cast<int>(textures::texture_manager::detail::upper_power_of_two(width));
-		auto new_height =
-			static_cast<int>(textures::texture_manager::detail::upper_power_of_two(height));
-
-		glyph_data[i].assign(new_width * new_height * 2, '\0');
-
-		//Convert FreeType bitmap data to OpenGL texture data
-		for (auto y = 0; y < new_height; ++y)
-		{
-			for (auto x = 0; x < new_width; ++x)
-			{
-				glyph_data[2 * (x + y * new_width)] = '\xff'; //Anti-aliasing fix
-
-				if (x < width && y < height)
-					glyph_data[2 * (x + y * new_width) + 1] =
-						face->glyph->bitmap.buffer[x + width * y];
-			}
-		}
-
-		glyph_advances[i] = face->glyph->advance.x;
+		font::GlyphExtents extents;
+		extents.Left = face->glyph->bitmap_left;
+		extents.Top = face->glyph->bitmap_top;
+		extents.Width = static_cast<int>(face->glyph->bitmap.width);
+		extents.Height = static_cast<int>(face->glyph->bitmap.rows);
+		extents.ActualWidth = static_cast<int>(textures::texture_manager::detail::upper_power_of_two(extents.Width));
+		extents.ActualHeight = static_cast<int>(textures::texture_manager::detail::upper_power_of_two(extents.Height));
+		extents.Advance = face->glyph->advance.x;
 
 		//Update max glyph height if higher than current max
-		if (glyph_height < height)
-			glyph_height = height;
+		if (glyph_max_height < extents.Height)
+			glyph_max_height = extents.Height;
+
+		glyph_extents[i] = extents;
+		glyph_data[i].assign(extents.ActualWidth * extents.ActualHeight * 2, '\0');
+
+		//Convert FreeType bitmap data to OpenGL texture data
+		for (auto y = 0; y < extents.ActualHeight; ++y)
+		{
+			for (auto x = 0; x < extents.ActualWidth; ++x)
+			{
+				glyph_data[i][2 * (x + y * extents.ActualWidth)] = '\xff'; //Anti-aliasing fix
+
+				if (x < extents.Width && y < extents.Height)
+					glyph_data[i][2 * (x + y * extents.ActualWidth) + 1] =
+						face->glyph->bitmap.buffer[x + extents.Width * y];
+			}
+		}
 	}
 
 	//Use default font size if no visual glyphs found
-	if (glyph_height == 0)
-		glyph_height = size;
+	if (glyph_max_height == 0)
+		glyph_max_height = size;
 
 	FT_Done_Face(face);
 	FT_Done_FreeType(library);
-	return std::tuple{std::move(glyph_data), std::move(glyph_advances), glyph_height};
+	return std::tuple{std::move(glyph_data), std::move(glyph_extents), glyph_max_height};
 }
 
 std::pair<std::optional<int>, std::optional<font::detail::container_type<int>>> load_font(
 	const font::detail::container_type<std::string> &glyph_data,
+	const font::detail::container_type<font::GlyphExtents> &glyph_extents,
 	font::GlyphFilter min_filter, font::GlyphFilter mag_filter) noexcept
 {
-	//Make OpenGL textures from glyph data
+	auto glyph_count = std::ssize(glyph_data);
+	auto handle = static_cast<int>(glGenLists(glyph_count));
+	font::detail::container_type<int> glyph_handles(glyph_count);
 
-	return std::pair{0, font::detail::container_type<int>{}};
+	glGenTextures(glyph_count, reinterpret_cast<unsigned int*>(std::data(glyph_handles)));
+
+	for (auto i = 0; i < glyph_count; ++i)
+	{
+		glBindTexture(GL_TEXTURE_2D, glyph_handles[i]);
+
+		//Minification filter
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+			min_filter == font::GlyphFilter::NearestNeighbor ? GL_NEAREST : GL_LINEAR);
+
+		//Magnification filter
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+			mag_filter == font::GlyphFilter::NearestNeighbor ? GL_NEAREST : GL_LINEAR);
+
+		//Texture wrap
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		//Upload image to gl (always POT)
+		glTexImage2D(GL_TEXTURE_2D, 0,
+			GL_RGBA, glyph_extents[i].ActualWidth, glyph_extents[i].ActualHeight, 0, GL_LUMINANCE_ALPHA,
+			GL_UNSIGNED_BYTE, std::data(glyph_data[i]));
+
+
+		//Make display list for this glyph
+		glNewList(handle + i, GL_COMPILE);
+		glBindTexture(GL_TEXTURE_2D, glyph_handles[i]);
+
+		glPushMatrix();
+		glTranslatef(static_cast<real>(glyph_extents[i].Left), 0.0f, 0.0f);
+		glTranslatef(0.0f, static_cast<real>(glyph_extents[i].Top) - glyph_extents[i].Height, 0.0f);
+
+		//Texture coordinates
+		auto s = static_cast<real>(glyph_extents[i].Width) / glyph_extents[i].ActualWidth;
+		auto t = static_cast<real>(glyph_extents[i].Height) / glyph_extents[i].ActualHeight;
+
+		//Note:
+		//The texture coordinates follows [0, 0] -> [width, height] (GUI coordinate system)
+		//The vertices follows [0, height] -> [width, 0] (normal coordinate system)
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);	glVertex2i(0, glyph_extents[i].Height);
+		glTexCoord2f(0.0f, t);		glVertex2i(0, 0);
+		glTexCoord2f(s, t);			glVertex2i(glyph_extents[i].Width, 0);
+		glTexCoord2f(s, 0.0f);		glVertex2i(glyph_extents[i].Width, glyph_extents[i].Height);
+		glEnd();
+
+		glPopMatrix();
+		glTranslatef(static_cast<real>(glyph_extents[i].Advance) / 64, 0, 0); //Translate relative
+		glEndList();
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	return std::pair{handle, glyph_handles};
 }
 
 void unload_font(int font_handle, const font::detail::container_type<int> &glyph_handles) noexcept
@@ -135,8 +192,8 @@ bool FontManager::PrepareResource(Font &font) noexcept
 		if (auto font_data = detail::prepare_font(*font.FileData(),
 			font.Size(), font.FaceIndex(), font.CharacterEncoding()); font_data)
 		{
-			auto &[glyph_data, glyph_advances, glyph_height] = *font_data;
-			font.GlyphData(std::move(glyph_data), std::move(glyph_advances), glyph_height);
+			auto &[glyph_data, glyph_extents, glyph_max_height] = *font_data;
+			font.GlyphData(std::move(glyph_data), std::move(glyph_extents), glyph_max_height);
 		}
 
 		return font.GlyphData().has_value();
@@ -148,11 +205,12 @@ bool FontManager::PrepareResource(Font &font) noexcept
 bool FontManager::LoadResource(Font &font) noexcept
 {
 	auto &glyph_data = font.GlyphData();
+	auto &glyph_extents = font.GlyphExtents();
 	auto [glyph_min_filter, glyph_mag_filter] = font.GlyphFilter();
 
-	if (glyph_data)
+	if (glyph_data && glyph_extents)
 	{
-		auto [handle, glyph_handles] = detail::load_font(*glyph_data, glyph_min_filter, glyph_mag_filter);
+		auto [handle, glyph_handles] = detail::load_font(*glyph_data, *glyph_extents, glyph_min_filter, glyph_mag_filter);
 		font.Handle(handle);
 		font.GlyphHandles(std::move(glyph_handles));
 		return font.Handle().has_value();
