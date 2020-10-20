@@ -77,7 +77,7 @@ namespace ion::graphics::fonts
 		public:
 
 			//Default constructor
-			FontManager() noexcept;
+			FontManager() = default;
 
 			//Deleted copy constructor
 			FontManager(const FontManager&) = delete;

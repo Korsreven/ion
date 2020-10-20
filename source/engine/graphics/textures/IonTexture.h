@@ -55,7 +55,7 @@ namespace ion::graphics::textures
 		};
 	} //texture
 
-	class Texture : public resources::files::FileResource<TextureManager>
+	class Texture final : public resources::files::FileResource<TextureManager>
 	{
 		private:
 

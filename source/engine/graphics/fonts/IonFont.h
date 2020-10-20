@@ -54,7 +54,7 @@ namespace ion::graphics::fonts
 		} //detail
 	} //font
 
-	class Font : public resources::files::FileResource<FontManager>
+	class Font final : public resources::files::FileResource<FontManager>
 	{
 		private:
 

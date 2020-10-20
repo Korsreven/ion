@@ -250,11 +250,6 @@ void FontManager::ResourceFailed(Font &font) noexcept
 
 //Public
 
-FontManager::FontManager() noexcept
-{
-	//Empty
-}
-
 FontManager::~FontManager() noexcept
 {
 	this->UnloadAll();
