@@ -61,7 +61,7 @@ namespace ion::graphics::shaders
 			*/
 
 			//Sets the handle for the shader to the given value
-			inline void Handle(std::optional<int> handle)
+			inline void Handle(std::optional<int> handle) noexcept
 			{
 				handle_ = handle;
 			}

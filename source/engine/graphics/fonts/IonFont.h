@@ -134,7 +134,7 @@ namespace ion::graphics::fonts
 			*/
 
 			//Sets the handle for the font to the given value
-			inline void Handle(std::optional<int> handle)
+			inline void Handle(std::optional<int> handle) noexcept
 			{
 				handle_ = handle;
 			}

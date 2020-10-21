@@ -117,7 +117,7 @@ namespace ion::graphics::textures
 			*/
 
 			//Sets the handle for the texture to the given value
-			inline void Handle(std::optional<int> handle)
+			inline void Handle(std::optional<int> handle) noexcept
 			{
 				handle_ = handle;
 			}
