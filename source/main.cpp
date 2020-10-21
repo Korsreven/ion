@@ -39,6 +39,8 @@ File:	main.cpp
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/fonts/IonFont.h"
 #include "graphics/fonts/IonFontManager.h"
+#include "graphics/fonts/IonTypeFace.h"
+#include "graphics/fonts/IonTypeFaceManager.h"
 #include "graphics/particles/IonEmitter.h"
 #include "graphics/particles/IonEmitterFactory.h"
 #include "graphics/particles/IonParticle.h"
@@ -378,6 +380,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			fonts.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!fonts.Loaded());
+
+			//Type face
+			ion::graphics::fonts::TypeFaceManager type_faces;
+			auto &verdana_12 = type_faces.CreateTypeFace(verdana_regular, verdana_bold, verdana_italic, verdana_bold_italic);
 
 			//EXAMPLE end
 

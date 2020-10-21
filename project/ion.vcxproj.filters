@@ -342,6 +342,12 @@
     <ClCompile Include="..\source\engine\graphics\fonts\IonFontManager.cpp">
       <Filter>Source Files\graphics\fonts</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\fonts\IonTypeFaceManager.cpp">
+      <Filter>Source Files\graphics\fonts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\fonts\IonTypeFace.cpp">
+      <Filter>Source Files\graphics\fonts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -699,6 +705,12 @@
       <Filter>Header Files\graphics\fonts</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\fonts\IonFontManager.h">
+      <Filter>Header Files\graphics\fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\fonts\IonTypeFace.h">
+      <Filter>Header Files\graphics\fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\fonts\IonTypeFaceManager.h">
       <Filter>Header Files\graphics\fonts</Filter>
     </ClInclude>
   </ItemGroup>
