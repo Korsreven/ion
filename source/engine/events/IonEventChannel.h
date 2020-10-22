@@ -159,6 +159,15 @@ namespace ion::events
 				//Empty
 			}
 
+			//Construct a new event channel with the given publisher and subscription contract
+			EventChannel(ListenableT *publisher, event_channel::SubscriptionContract contract = event_channel::SubscriptionContract::Cancelable) :
+
+				publisher_{publisher ? event_channel::detail::subscribe_to_publisher(*publisher, *this) : nullptr},
+				contract_{contract}
+			{
+				//Empty
+			}
+
 			//Copy constructor
 			EventChannel(const EventChannel &rhs) :
 

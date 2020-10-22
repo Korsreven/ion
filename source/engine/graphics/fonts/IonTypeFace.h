@@ -23,7 +23,10 @@ namespace ion::graphics::fonts
 
 	namespace type_face::detail
 	{
-		
+		inline auto is_font_attachable(Font &regular_font, Font &font) noexcept
+		{
+			return regular_font.Size() == font.Size();
+		}
 	} //type_face::detail
 
 
@@ -117,6 +120,19 @@ namespace ion::graphics::fonts
 			[[nodiscard]] inline auto BoldItalicFont() const noexcept
 			{
 				return bold_italic_font_.Object();
+			}
+
+
+			//Returns true if this type face has at least a regular font
+			[[nodiscard]] inline auto HasRegularFont() const noexcept
+			{
+				return !!regular_font_;
+			}
+
+			//Returns true if this type face is empty (has no fonts)
+			[[nodiscard]] inline auto IsEmpty() const noexcept
+			{
+				return !regular_font_ && !bold_font_ && !italic_font_ && !bold_italic_font_;
 			}
 	};
 } //ion::graphics::fonts

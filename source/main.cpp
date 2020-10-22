@@ -373,17 +373,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Font
 			ion::graphics::fonts::FontManager fonts;
 			fonts.CreateRepository(std::move(font_repository));
-			auto &verdana_regular = fonts.CreateFont("verdana.ttf", 12);
-			auto &verdana_bold = fonts.CreateFont("verdanab.ttf", 12);
-			auto &verdana_italic = fonts.CreateFont("verdanai.ttf", 12);
-			auto &verdana_bold_italic = fonts.CreateFont("verdanaz.ttf", 12);
+			auto &verdana_regular_12 = fonts.CreateFont("verdana.ttf", 12);
+			auto &verdana_bold_12 = fonts.CreateFont("verdanab.ttf", 12);
+			auto &verdana_italic_12 = fonts.CreateFont("verdanai.ttf", 12);
+			auto &verdana_bold_italic_12 = fonts.CreateFont("verdanaz.ttf", 12);
 			fonts.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!fonts.Loaded());
 
 			//Type face
 			ion::graphics::fonts::TypeFaceManager type_faces;
-			auto &verdana_12 = type_faces.CreateTypeFace(verdana_regular, verdana_bold, verdana_italic, verdana_bold_italic);
+			auto &verdana_12 = 
+				type_faces.CreateTypeFace(
+					verdana_regular_12,
+					verdana_bold_12,
+					verdana_italic_12,
+					verdana_bold_italic_12);
 
 			//EXAMPLE end
 

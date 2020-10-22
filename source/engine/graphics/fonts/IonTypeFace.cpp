@@ -17,33 +17,34 @@ namespace ion::graphics::fonts
 
 using namespace type_face;
 
-TypeFace::TypeFace(Font &regular)
+TypeFace::TypeFace(Font &regular) :
+	regular_font_{regular}
 {
-	RegularFont(regular);
+	//Empty
 }
 
-TypeFace::TypeFace(Font &regular, Font &bold, std::nullptr_t)
+TypeFace::TypeFace(Font &regular, Font &bold, std::nullptr_t) :
+	regular_font_{regular}
 {
-	RegularFont(regular);
 	BoldFont(bold);
 }
 
-TypeFace::TypeFace(Font &regular, std::nullptr_t, Font &italic)
+TypeFace::TypeFace(Font &regular, std::nullptr_t, Font &italic) :
+	regular_font_{regular}
 {
-	RegularFont(regular);
 	ItalicFont(italic);
 }
 
-TypeFace::TypeFace(Font &regular, Font &bold, Font &italic)
+TypeFace::TypeFace(Font &regular, Font &bold, Font &italic) :
+	regular_font_{regular}
 {
-	RegularFont(regular);
 	BoldFont(bold);
 	ItalicFont(italic);
 }
 
-TypeFace::TypeFace(Font &regular, Font &bold, Font &italic, Font &bold_italic)
+TypeFace::TypeFace(Font &regular, Font &bold, Font &italic, Font &bold_italic) :
+	regular_font_{regular}
 {
-	RegularFont(regular);
 	BoldFont(bold);
 	ItalicFont(italic);
 	BoldItalicFont(bold_italic);
@@ -56,40 +57,59 @@ TypeFace::TypeFace(Font &regular, Font &bold, Font &italic, Font &bold_italic)
 
 void TypeFace::RegularFont(Font &font)
 {
-	regular_font_.Observe(font);
+	if (IsEmpty() ||
+		detail::is_font_attachable(*regular_font_.Object(), font))
+
+		regular_font_.Observe(font);
 }
 
 void TypeFace::RegularFont(std::nullptr_t) noexcept
 {
-	regular_font_.Release();
+	if (regular_font_.Release())
+	{
+		BoldFont(nullptr);
+		ItalicFont(nullptr);
+		BoldItalicFont(nullptr);
+	}
 }
 
 
 void TypeFace::BoldFont(Font &font)
 {
-	bold_font_.Observe(font);
+	if (regular_font_ &&
+		detail::is_font_attachable(*regular_font_.Object(), font))
+
+		bold_font_.Observe(font);
 }
 
 void TypeFace::BoldFont(std::nullptr_t) noexcept
 {
-	bold_font_.Release();
+	if (bold_font_.Release())
+		BoldItalicFont(nullptr);
 }
 
 
 void TypeFace::ItalicFont(Font &font)
 {
-	italic_font_.Observe(font);
+	if (regular_font_ &&
+		detail::is_font_attachable(*regular_font_.Object(), font))
+
+		italic_font_.Observe(font);
 }
 
 void TypeFace::ItalicFont(std::nullptr_t) noexcept
 {
-	italic_font_.Release();
+	if (italic_font_.Release())
+		BoldItalicFont(nullptr);
 }
 
 
 void TypeFace::BoldItalicFont(Font &font)
 {
-	bold_italic_font_.Observe(font);
+	if (regular_font_ && bold_font_ && italic_font_ &&
+		detail::is_font_attachable(*regular_font_.Object(), font))
+
+		bold_italic_font_.Observe(font);
 }
 
 void TypeFace::BoldItalicFont(std::nullptr_t) noexcept
