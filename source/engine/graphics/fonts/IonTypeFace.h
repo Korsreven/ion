@@ -30,6 +30,7 @@ namespace ion::graphics::fonts
 	} //type_face::detail
 
 
+	//A type face class that can contain a regular, bold, italic and bold italic font
 	class TypeFace final :
 		public managed::ManagedObject<TypeFaceManager>
 	{
@@ -124,6 +125,7 @@ namespace ion::graphics::fonts
 
 
 			//Returns true if this type face has at least a regular font
+			//A type face is considered invalid if regular font is missing
 			[[nodiscard]] inline auto HasRegularFont() const noexcept
 			{
 				return !!regular_font_;

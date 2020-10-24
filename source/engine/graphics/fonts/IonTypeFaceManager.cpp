@@ -73,4 +73,4 @@ bool TypeFaceManager::RemoveTypeFace(TypeFace &type_face) noexcept
 	return this->Remove(type_face);
 }
 
-}
+} //ion::graphics::fonts

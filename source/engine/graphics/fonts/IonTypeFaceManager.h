@@ -74,19 +74,19 @@ namespace ion::graphics::fonts
 			Creating
 		*/
 
-		//Create a type face with with the given regular font
+		//Create a type face with the given regular font
 		TypeFace& CreateTypeFace(Font &regular);
 
-		//Create a type face with with the given regular and bold font
+		//Create a type face with the given regular and bold font
 		TypeFace& CreateTypeFace(Font &regular, Font &bold, std::nullptr_t /*italic*/);
 
-		//Create a type face with with the given regular and italic font
+		//Create a type face with the given regular and italic font
 		TypeFace& CreateTypeFace(Font &regular, std::nullptr_t /*bold*/, Font &italic);
 
-		//Create a type face with with the given regular, bold and italic font
+		//Create a type face with the given regular, bold and italic font
 		TypeFace& CreateTypeFace(Font &regular, Font &bold, Font &italic);
 
-		//Create a type face with with the given regular, bold, italic and bold italic font
+		//Create a type face with the given regular, bold, italic and bold italic font
 		TypeFace& CreateTypeFace(Font &regular, Font &bold, Font &italic, Font &bold_italic);
 
 
