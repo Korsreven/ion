@@ -18,9 +18,9 @@ File:	IonAnimation.h
 #include <utility>
 #include <vector>
 
-#include "IonTextureManager.h"
+#include "IonFrameSequenceManager.h"
 #include "managed/IonManagedObject.h"
-#include "managed/IonObjectObserver.h"
+#include "managed/IonObservedObject.h"
 #include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 
@@ -45,9 +45,6 @@ namespace ion::graphics::textures
 
 		namespace detail
 		{
-			using container_type = std::vector<Texture*>; //Non-owning
-			
-
 			inline auto is_direction_in_reverse(PlaybackDirection direction) noexcept
 			{
 				return direction == animation::PlaybackDirection::Reverse ||
@@ -90,14 +87,19 @@ namespace ion::graphics::textures
 			bool reverse_ = false;	
 			int current_frame_ = 0;
 			
-			animation::detail::container_type frames_;
-			managed::ObjectObserver<Texture> textures_;	
-			int total_observed_textures_ = 0;
+			managed::ObservedObject<FrameSequence> frame_sequence_;
 
 
-			bool AddFrame(Texture &frame);
-			bool AddFrames(const animation::detail::container_type &frames);
-			void ClearFrames() noexcept;
+			inline auto FrameCount() const noexcept
+			{
+				return frame_sequence_ ? frame_sequence_->FrameCount() : 0;
+			}
+
+			inline auto HasFrames() const noexcept
+			{
+				return frame_sequence_ && frame_sequence_->HasAllInitialFrames();
+			}
+
 
 			void StepForward(bool rewind = false) noexcept;
 			void StepBackward(bool rewind = false) noexcept;
@@ -109,13 +111,13 @@ namespace ion::graphics::textures
 
 			//Constructs a new animation with the given frames, cycle duration, repeat count, playback direction and rate
 			//Duplicate textures are allowed within an animation
-			Animation(const animation::detail::container_type &frames,
+			Animation(FrameSequence &frame_sequence,
 				duration cycle_duration, std::optional<int> repeat_count = std::nullopt,
 				animation::PlaybackDirection direction = animation::PlaybackDirection::Normal, real playback_rate = 1.0_r);
 
 			//Constructs a new animation (in normal direction) with the given frames, cycle duration, repeat count and playback rate
 			//Duplicate textures are allowed within an animation
-			Animation(const animation::detail::container_type &frames,
+			Animation(FrameSequence &frame_sequence,
 				duration cycle_duration, std::optional<int> repeat_count, real playback_rate);
 
 
@@ -125,43 +127,24 @@ namespace ion::graphics::textures
 
 			//Returns a new looping animation from the given frames, cycle duration, playback direction and rate
 			//Duplicate textures are allowed within an animation
-			[[nodiscard]] static Animation Looping(const animation::detail::container_type &frames,
+			[[nodiscard]] static Animation Looping(FrameSequence &frame_sequence,
 				duration cycle_duration, animation::PlaybackDirection direction, real playback_rate = 1.0_r) noexcept;
 
 			//Returns a new looping animation (in normal direction) from the given frames, cycle duration and playback rate
 			//Duplicate textures are allowed within an animation
-			[[nodiscard]] static Animation Looping(const animation::detail::container_type &frames,
+			[[nodiscard]] static Animation Looping(FrameSequence &frame_sequence,
 				duration cycle_duration, real playback_rate = 1.0_r) noexcept;
 
 
 			//Returns a new non-looping animation from the given frames, cycle duration, playback direction and rate
 			//Duplicate textures are allowed within an animation
-			[[nodiscard]] static Animation NonLooping(const animation::detail::container_type &frames,
+			[[nodiscard]] static Animation NonLooping(FrameSequence &frame_sequence,
 				duration cycle_duration, animation::PlaybackDirection direction, real playback_rate = 1.0_r) noexcept;
 
 			//Returns a new non-looping animation (in normal direction) from the given frames, cycle duration and playback rate
 			//Duplicate textures are allowed within an animation
-			[[nodiscard]] static Animation NonLooping(const animation::detail::container_type &frames,
+			[[nodiscard]] static Animation NonLooping(FrameSequence &frame_sequence,
 				duration cycle_duration, real playback_rate = 1.0_r) noexcept;
-
-
-			/*
-				Ranges
-			*/
-
-			//Returns a mutable range of all frames (textures) in this animation
-			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto Frames() noexcept
-			{
-				return adaptors::ranges::DereferenceIterable<animation::detail::container_type&>{frames_};
-			}
-
-			//Returns an immutable range of all frames (textures) in this animation
-			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Frames() const noexcept
-			{
-				return adaptors::ranges::DereferenceIterable<const animation::detail::container_type&>{frames_};
-			}
 
 
 			/*
@@ -300,14 +283,22 @@ namespace ion::graphics::textures
 			void LastFrame() noexcept;
 
 
-			//Returns a pointer to the current frame in this animation
+			//Returns a pointer to the mutable current frame in this animation
 			//Returns nullptr if there is no current frame
-			[[nodiscard]] Texture* CurrentFrame() const noexcept;
+			[[nodiscard]] Texture* CurrentFrame() noexcept;
+
+			//Returns a pointer to the immutable current frame in this animation
+			//Returns nullptr if there is no current frame
+			[[nodiscard]] const Texture* CurrentFrame() const noexcept;
 
 
-			//Returns true if this animation has all of its frames
-			//An animation is considered invalid if one or more frames are missing
-			[[nodiscard]] bool HasAllFrames() const noexcept;
+			//Returns a pointer to the mutable frame sequence in this animation
+			//Returns nullptr if this animation does not have an underlying frame sequence
+			[[nodiscard]] FrameSequence* UnderlyingFrameSequence() noexcept;
+
+			//Returns a pointer to the immutable frame sequence in this animation
+			//Returns nullptr if this animation does not have an underlying frame sequence
+			[[nodiscard]] const FrameSequence* UnderlyingFrameSequence() const noexcept;
 
 
 			/*

@@ -24,44 +24,10 @@ namespace animation::detail
 
 //Private
 
-bool Animation::AddFrame(Texture &frame)
-{
-	if (textures_.Observe(frame))
-	{
-		frames_.push_back(&frame);
-		return true;
-	}
-	else
-		return false;
-}
-
-bool Animation::AddFrames(const detail::container_type &frames)
-{
-	for (auto &frame : frames)
-	{
-		if (!frame || !AddFrame(*frame))
-		{
-			ClearFrames(); //Missing a frame
-			return false;
-		}
-	}
-
-	total_observed_textures_ = std::ssize(textures_.Objects());
-	return !std::empty(frames_);
-}
-
-void Animation::ClearFrames() noexcept
-{
-	frames_.clear();
-	frames_.shrink_to_fit();
-	textures_.ReleaseAll();	
-}
-
-
 void Animation::StepForward(bool rewind) noexcept
 {
 	//Forward
-	if (current_frame_ < std::ssize(frames_) - 1)
+	if (current_frame_ < FrameCount() - 1)
 		++current_frame_;
 
 	//Loop (next cycle)
@@ -138,7 +104,7 @@ void Animation::StepBackward(bool rewind) noexcept
 
 			default:
 			{
-				current_frame_ = std::ssize(frames_) - 1;
+				current_frame_ = FrameCount() - 1;
 				break;
 			}
 		}
@@ -170,24 +136,26 @@ void Animation::Previous() noexcept
 
 //Public
 
-Animation::Animation(const detail::container_type &frames,
+Animation::Animation(FrameSequence &frame_sequence,
 	duration cycle_duration, std::optional<int> repeat_count,
 	PlaybackDirection direction, real playback_rate) :
 	
-	frame_duration_{!std::empty(frames) ? cycle_duration / std::size(frames) : 0.0_sec},
+	frame_duration_{frame_sequence ? cycle_duration / frame_sequence.FrameCount() : 0.0_sec},
 	repeat_count_{repeat_count ? std::make_optional(std::pair{0, *repeat_count}) : std::nullopt},
 	direction_{direction},
 	playback_rate_{playback_rate > 0.0_r ? playback_rate : 1.0_r},
 	reverse_{detail::is_direction_in_reverse(direction)},
-	current_frame_{!std::empty(frames) && reverse_ ? std::ssize(frames) - 1 : 0}
+	current_frame_{!frame_sequence.IsEmpty() && reverse_ ? frame_sequence.FrameCount() - 1 : 0},
+
+	frame_sequence_{frame_sequence}
 {
-	AddFrames(frames);
+	//Empty
 }
 
-Animation::Animation(const detail::container_type &frames,
+Animation::Animation(FrameSequence &frame_sequence,
 	duration cycle_duration, std::optional<int> repeat_count, real playback_rate) :
 
-	Animation{frames, cycle_duration, repeat_count, PlaybackDirection::Normal, playback_rate}
+	Animation{frame_sequence, cycle_duration, repeat_count, PlaybackDirection::Normal, playback_rate}
 {
 	//Empty
 }
@@ -197,29 +165,29 @@ Animation::Animation(const detail::container_type &frames,
 	Static animation conversions
 */
 
-Animation Animation::Looping(const detail::container_type &frames,
+Animation Animation::Looping(FrameSequence &frame_sequence,
 	duration cycle_duration, PlaybackDirection direction, real playback_rate) noexcept
 {
-	return {frames, cycle_duration, std::nullopt, direction, playback_rate};
+	return {frame_sequence, cycle_duration, std::nullopt, direction, playback_rate};
 }
 
-Animation Animation::Looping(const detail::container_type &frames,
+Animation Animation::Looping(FrameSequence &frame_sequence,
 	duration cycle_duration, real playback_rate) noexcept
 {
-	return {frames, cycle_duration, std::nullopt, playback_rate};
+	return {frame_sequence, cycle_duration, std::nullopt, playback_rate};
 }
 
 
-Animation Animation::NonLooping(const detail::container_type &frames,
+Animation Animation::NonLooping(FrameSequence &frame_sequence,
 	duration cycle_duration, PlaybackDirection direction, real playback_rate) noexcept
 {
-	return {frames, cycle_duration, 0, direction, playback_rate};
+	return {frame_sequence, cycle_duration, 0, direction, playback_rate};
 }
 
-Animation Animation::NonLooping(const detail::container_type &frames,
+Animation Animation::NonLooping(FrameSequence &frame_sequence,
 	duration cycle_duration, real playback_rate) noexcept
 {
-	return {frames, cycle_duration, 0, playback_rate};
+	return {frame_sequence, cycle_duration, 0, playback_rate};
 }
 
 
@@ -230,7 +198,7 @@ void Animation::CycleTime(duration time) noexcept
 		auto [current_duration, current_frame] =
 			detail::cycle_duration_to_frame_duration(
 				std::clamp(time, 0.0_sec, cycle_duration), cycle_duration,
-				std::ssize(frames_), reverse_);
+				FrameCount(), reverse_);
 
 		frame_duration_.Total(current_duration);
 		current_frame_ = current_frame;
@@ -240,8 +208,8 @@ void Animation::CycleTime(duration time) noexcept
 
 void Animation::CycleDuration(duration time) noexcept
 {
-	if (HasAllFrames() && time > 0.0_sec)
-		frame_duration_.Limit(time / std::size(frames_));
+	if (HasFrames() && time > 0.0_sec)
+		frame_duration_.Limit(time / FrameCount());
 }
 
 void Animation::CyclePercent(real percent) noexcept
@@ -298,7 +266,7 @@ void Animation::TotalPercent(real percent) noexcept
 void Animation::FrameRate(real rate) noexcept
 {
 	if (rate > 0.0_r)
-		CycleDuration(duration{std::size(frames_) / rate});
+		CycleDuration(duration{FrameCount() / rate});
 }
 
 void Animation::RepeatCount(std::optional<int> repeat_count) noexcept
@@ -342,18 +310,18 @@ void Animation::Direction(PlaybackDirection direction) noexcept
 
 duration Animation::CycleTime() const noexcept
 {
-	if (HasAllFrames())
+	if (HasFrames())
 		return detail::frame_duration_to_cycle_duration(
 			frame_duration_.Total(), frame_duration_.Limit(),
-			current_frame_, std::ssize(frames_), reverse_);
+			current_frame_, FrameCount(), reverse_);
 	else
 		return 0.0_sec;
 }
 
 duration Animation::CycleDuration() const noexcept
 {
-	if (HasAllFrames())
-		return frame_duration_.Limit() * std::size(frames_);
+	if (HasFrames())
+		return frame_duration_.Limit() * FrameCount();
 	else
 		return 0.0_sec;
 }
@@ -392,7 +360,7 @@ std::optional<real> Animation::TotalPercent() const noexcept
 real Animation::FrameRate() const noexcept
 {
 	if (auto cycle_duration = CycleDuration(); cycle_duration > 0.0_sec)
-		return std::size(frames_) / cycle_duration.count();
+		return FrameCount() / cycle_duration.count();
 	else
 		return 0.0_r;
 }
@@ -404,14 +372,12 @@ real Animation::FrameRate() const noexcept
 
 void Animation::Elapse(duration time) noexcept
 {
-	if (HasAllFrames())
+	if (HasFrames())
 	{
 		if (IsRunning() &&
 		   (frame_duration_ += time / playback_rate_))
 			Next();
 	}
-	else if (!std::empty(textures_.Objects()))
-		ClearFrames();
 }
 
 
@@ -421,7 +387,7 @@ void Animation::Elapse(duration time) noexcept
 
 void Animation::NextFrame() noexcept
 {
-	if (HasAllFrames())
+	if (HasFrames())
 	{
 		Next();
 		frame_duration_.Reset();
@@ -431,7 +397,7 @@ void Animation::NextFrame() noexcept
 
 void Animation::PreviousFrame() noexcept
 {
-	if (HasAllFrames())
+	if (HasFrames())
 	{
 		Previous();
 		frame_duration_.Reset();
@@ -441,12 +407,12 @@ void Animation::PreviousFrame() noexcept
 
 void Animation::FirstFrame() noexcept
 {
-	if (HasAllFrames())
+	if (HasFrames())
 	{
 		reverse_ = detail::is_direction_in_reverse(direction_);
 
 		if (reverse_)
-			current_frame_ = std::ssize(frames_) - 1;
+			current_frame_ = FrameCount() - 1;
 		else
 			current_frame_ = 0;
 
@@ -460,7 +426,7 @@ void Animation::FirstFrame() noexcept
 
 void Animation::LastFrame() noexcept
 {
-	if (HasAllFrames())
+	if (HasFrames())
 	{
 		reverse_ = detail::is_direction_in_reverse(direction_);
 
@@ -472,7 +438,7 @@ void Animation::LastFrame() noexcept
 		if (reverse_)
 			current_frame_ = 0;
 		else
-			current_frame_ = std::ssize(frames_) - 1;
+			current_frame_ = FrameCount() - 1;
 
 		frame_duration_.Reset();
 			//Make sure animation stays at start of frame
@@ -483,19 +449,31 @@ void Animation::LastFrame() noexcept
 }
 
 
-Texture* Animation::CurrentFrame() const noexcept
+Texture* Animation::CurrentFrame() noexcept
 {
-	if (HasAllFrames())
-		return frames_[current_frame_];
+	if (frame_sequence_)
+		return (*frame_sequence_.Object())[current_frame_];
 	else
 		return nullptr;
 }
 
-bool Animation::HasAllFrames() const noexcept
+const Texture* Animation::CurrentFrame() const noexcept
 {
-	return !std::empty(frames_) &&
-		total_observed_textures_ == std::ssize(textures_.Objects());
-			//All textures are still being observed
+	if (frame_sequence_)
+		return (*frame_sequence_.Object())[current_frame_];
+	else
+		return nullptr;
+}
+
+
+FrameSequence* Animation::UnderlyingFrameSequence() noexcept
+{
+	return frame_sequence_.Object();
+}
+
+const FrameSequence* Animation::UnderlyingFrameSequence() const noexcept
+{
+	return frame_sequence_.Object();
 }
 
 

@@ -65,16 +65,4 @@ FrameSequence::FrameSequence(const detail::container_type &frames)
 	AddFrames(frames);
 }
 
-
-/*
-	Observers
-*/
-
-bool FrameSequence::HasAllFrames() const noexcept
-{
-	return !std::empty(frames_) &&
-		total_observed_frames_ == std::ssize(observed_frames_.Objects());
-			//All frames are still being observed
-}
-
 } //ion::graphics::textures

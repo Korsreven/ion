@@ -360,8 +360,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Animation
 			auto animation = ion::graphics::textures::Animation::Looping(
-				{&rikku_texture, &cloud_texture, &background_texture},
-				6.0_sec, ion::graphics::textures::animation::PlaybackDirection::Alternate);
+				frame_sequence, 6.0_sec, ion::graphics::textures::animation::PlaybackDirection::Alternate);
 			animation.RepeatCount(1);
 			animation.JumpForward(7.5_sec);
 			animation.RepeatCount({});
