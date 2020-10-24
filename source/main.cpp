@@ -69,6 +69,8 @@ File:	main.cpp
 #include "graphics/shaders/variables/IonShaderUniform.h"
 #include "graphics/shaders/variables/IonShaderVariable.h"
 #include "graphics/textures/IonAnimation.h"
+#include "graphics/textures/IonFrameSequence.h"
+#include "graphics/textures/IonFrameSequenceManager.h"
 #include "graphics/textures/IonTexture.h"
 #include "graphics/textures/IonTextureManager.h"
 #include "graphics/utilities/IonAabb.h"
@@ -350,6 +352,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			textures.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!textures.Loaded());
+
+			//Frame sequences
+			ion::graphics::textures::FrameSequenceManager frame_sequences;
+			auto &frame_sequence = frame_sequences.CreateFrameSequence(
+				rikku_texture, cloud_texture, background_texture);
 
 			//Animation
 			auto animation = ion::graphics::textures::Animation::Looping(
