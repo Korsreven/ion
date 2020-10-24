@@ -277,11 +277,11 @@ namespace ion::graphics::render
 			void ConnectCamera(scene::Camera &camera);
 
 
-			//Returns a mutable pointer to the camera connected to this viewport
+			//Returns a pointer to the camera (mutable) connected to this viewport
 			//Returns nullptr if this viewport does not have a camera connected
 			[[nodiscard]] scene::Camera* ConnectedCamera() noexcept;
 
-			//Returns an immutable pointer to the camera connected to this viewport
+			//Returns a pointer to the camera (immutable) connected to this viewport
 			//Returns nullptr if this viewport does not have a camera connected
 			[[nodiscard]] const scene::Camera* ConnectedCamera() const noexcept;
 

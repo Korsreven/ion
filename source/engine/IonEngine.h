@@ -105,14 +105,14 @@ namespace ion
 			[[nodiscard]] bool VerticalSync() const noexcept;
 
 
-			//Returns a mutable pointer to a render window
+			//Returns a pointer to a mutable render window
 			//Returns nullptr if the engine is not rendering to a target
 			[[nodiscard]] inline auto Target() noexcept
 			{
 				return render_window_ ? &*render_window_ : nullptr;
 			}
 
-			//Returns an immutable pointer to a render window
+			//Returns a pointer to an immutable render window
 			//Returns nullptr if the engine is not rendering to a target
 			[[nodiscard]] inline auto Target() const noexcept
 			{
@@ -120,14 +120,14 @@ namespace ion
 			}
 
 
-			//Returns a mutable pointer to an input controller
+			//Returns a pointer to a mutable input controller
 			//Returns nullptr if the engine has no input controller (missing rendering target)
 			[[nodiscard]] inline auto Input() noexcept
 			{
 				return input_controller_ ? &*input_controller_ : nullptr;
 			}
 
-			//Returns an immutable pointer to an input controller
+			//Returns a pointer to an immutable input controller
 			//Returns nullptr if the engine has no input controller (missing rendering target)
 			[[nodiscard]] inline auto Input() const noexcept
 			{

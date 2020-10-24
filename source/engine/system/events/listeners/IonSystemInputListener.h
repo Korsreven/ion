@@ -177,11 +177,11 @@ namespace ion::system::events::listeners
 			void ConnectViewport(graphics::render::Viewport &viewport);
 
 
-			//Returns a mutable pointer to the viewport connected to this input listener
+			//Returns a pointer to the viewport (mutable) connected to this input listener
 			//Returns nullptr if this input listener does not have a viewport connected
 			[[nodiscard]] graphics::render::Viewport* ConnectedViewport() noexcept;
 
-			//Returns an immutable pointer to the viewport connected to this input listener
+			//Returns a pointer to the viewport (immutable) connected to this input listener
 			//Returns nullptr if this input listener does not have a viewport connected
 			[[nodiscard]] const graphics::render::Viewport* ConnectedViewport() const noexcept;
 	};
