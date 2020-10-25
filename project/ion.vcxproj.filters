@@ -186,9 +186,6 @@
     <ClCompile Include="..\source\engine\events\IonRecurringCallback.cpp">
       <Filter>Source Files\events</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\engine\resources\files\IonFileResourceLoader.cpp">
-      <Filter>Source Files\resources\files</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\engine\resources\files\repositories\IonAudioRepository.cpp">
       <Filter>Source Files\resources\files\repositories</Filter>
     </ClCompile>
@@ -354,6 +351,9 @@
     <ClCompile Include="..\source\engine\graphics\textures\IonFrameSequenceManager.cpp">
       <Filter>Source Files\graphics\textures</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\resources\files\IonAssetLoader.cpp">
+      <Filter>Source Files\resources\files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -433,9 +433,6 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\resources\IonResourceManager.h">
       <Filter>Header Files\resources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\engine\resources\files\IonFileResourceLoader.h">
-      <Filter>Header Files\resources\files</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\resources\files\repositories\IonAudioRepository.h">
       <Filter>Header Files\resources\files\repositories</Filter>
@@ -724,6 +721,9 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\textures\IonFrameSequenceManager.h">
       <Filter>Header Files\graphics\textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\resources\files\IonAssetLoader.h">
+      <Filter>Header Files\resources\files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

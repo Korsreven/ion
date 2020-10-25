@@ -19,7 +19,7 @@ File:	IonFileResource.h
 
 #include "resources/IonResource.h"
 
-namespace ion::resources::files
+namespace ion::resources
 {
 	template <typename T>
 	class FileResource : public Resource<T>
@@ -82,6 +82,6 @@ namespace ion::resources::files
 				return file_path_;
 			}
 	};
-} //ion::resources::files
+} //ion::resources
 
 #endif

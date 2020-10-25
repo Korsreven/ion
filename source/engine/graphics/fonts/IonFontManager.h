@@ -50,7 +50,7 @@ namespace ion::graphics::fonts
 
 
 	class FontManager final :
-		public resources::files::FileResourceManager<Font, FontManager, resources::files::repositories::FontRepository>
+		public resources::FileResourceManager<Font, FontManager, assets::repositories::FontRepository>
 	{
 		private:
 			

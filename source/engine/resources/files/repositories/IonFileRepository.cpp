@@ -5,14 +5,14 @@ This source file is part of Ion Engine
 	- Written in C++ using OpenGL
 
 Author:	Jan Ivar Goli
-Area:	resources/files/repositories
+Area:	assets/repositories
 File:	IonFileRepository.cpp
 -------------------------------------------
 */
 
 #include "IonFileRepository.h"
 
-namespace ion::resources::files::repositories
+namespace ion::assets::repositories
 {
 
 using namespace file_repository;
@@ -351,4 +351,4 @@ bool FileRepository::RemoveFileExtensions(const std::vector<std::string_view> &f
 	return count > std::size(file_extensions_);
 }
 
-} //ion::resources::files::repositories
+} //ion::assets::repositories

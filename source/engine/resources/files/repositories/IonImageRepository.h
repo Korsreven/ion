@@ -5,7 +5,7 @@ This source file is part of Ion Engine
 	- Written in C++ using OpenGL
 
 Author:	Jan Ivar Goli
-Area:	resources/files/repositories
+Area:	assets/repositories
 File:	IonImageRepository.h
 -------------------------------------------
 */
@@ -16,7 +16,7 @@ File:	IonImageRepository.h
 #include <string_view>
 #include "IonFileRepository.h"
 
-namespace ion::resources::files::repositories
+namespace ion::assets::repositories
 {
 	using namespace std::string_view_literals;
 
@@ -36,6 +36,6 @@ namespace ion::resources::files::repositories
 		//Construct an image repository with the given naming convention
 		ImageRepository(file_repository::NamingConvention naming_convention) noexcept;
 	};
-} //ion::resources::files::repositories
+} //ion::assets::repositories
 
 #endif

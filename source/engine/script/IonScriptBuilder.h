@@ -74,7 +74,7 @@ namespace ion::script
 			ScriptBuilder() = default;
 
 			//Construct a new script builder with the given repository
-			ScriptBuilder(const resources::files::repositories::ScriptRepository &repository);
+			ScriptBuilder(const assets::repositories::ScriptRepository &repository);
 
 
 			/*

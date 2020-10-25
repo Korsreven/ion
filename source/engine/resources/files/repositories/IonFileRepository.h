@@ -5,7 +5,7 @@ This source file is part of Ion Engine
 	- Written in C++ using OpenGL
 
 Author:	Jan Ivar Goli
-Area:	resources/files/repositories
+Area:	assets/repositories
 files:	IonFileRepository.h
 -------------------------------------------
 */
@@ -30,7 +30,7 @@ files:	IonFileRepository.h
 #undef RemoveDirectory
 #endif
 
-namespace ion::resources::files::repositories
+namespace ion::assets::repositories
 {
 	using namespace std::string_view_literals;
 
@@ -289,6 +289,6 @@ namespace ion::resources::files::repositories
 			//Remove all given file extensions
 			bool RemoveFileExtensions(const std::vector<std::string_view> &file_extensions) noexcept;
 	};
-} //ion::resources::files::repositories
+} //ion::assets::repositories
 
 #endif

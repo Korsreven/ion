@@ -26,7 +26,7 @@ File:	IonFileResourceManager.h
 #include "resources/IonResourceManager.h"
 #include "unmanaged/IonObjectFactory.h"
 
-namespace ion::resources::files
+namespace ion::resources
 {
 	namespace file_resource_manager::detail
 	{
@@ -56,7 +56,7 @@ namespace ion::resources::files
 		protected unmanaged::ObjectFactory<RepositoryT>
 	{
 		static_assert(std::is_base_of_v<FileResource<OwnerT>, ResourceT>);
-		static_assert(std::is_base_of_v<repositories::FileRepository, RepositoryT>);
+		static_assert(std::is_base_of_v<assets::repositories::FileRepository, RepositoryT>);
 
 		protected:
 
@@ -190,6 +190,6 @@ namespace ion::resources::files
 				return this->RepositoryBase::Remove(repository);
 			}
 	};
-} //ion::resources::files
+} //ion::resources
 
 #endif

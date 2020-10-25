@@ -55,7 +55,7 @@ namespace ion::graphics::textures
 		};
 	} //texture
 
-	class Texture final : public resources::files::FileResource<TextureManager>
+	class Texture final : public resources::FileResource<TextureManager>
 	{
 		private:
 
@@ -73,7 +73,7 @@ namespace ion::graphics::textures
 
 		public:
 
-			using resources::files::FileResource<TextureManager>::FileResource;
+			using resources::FileResource<TextureManager>::FileResource;
 
 			//Construct a new texture with the given name, texture filter for min/mag, mip filter and texture wrap mode for s/t
 			Texture(std::string name,

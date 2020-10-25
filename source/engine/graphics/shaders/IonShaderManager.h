@@ -43,7 +43,7 @@ namespace ion::graphics::shaders
 
 
 	class ShaderManager final :
-		public resources::files::FileResourceManager<Shader, ShaderManager, resources::files::repositories::ShaderRepository>
+		public resources::FileResourceManager<Shader, ShaderManager, assets::repositories::ShaderRepository>
 	{
 		private:
 

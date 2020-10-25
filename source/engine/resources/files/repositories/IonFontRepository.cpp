@@ -5,7 +5,7 @@ This source file is part of Ion Engine
 	- Written in C++ using OpenGL
 
 Author:	Jan Ivar Goli
-Area:	resources/files/repositories
+Area:	assets/repositories
 File:	IonFontRepository.cpp
 -------------------------------------------
 */
@@ -14,7 +14,7 @@ File:	IonFontRepository.cpp
 
 #include "utilities/IonStringUtility.h"
 
-namespace ion::resources::files::repositories
+namespace ion::assets::repositories
 {
 
 using namespace font_repository;
@@ -32,4 +32,4 @@ FontRepository::FontRepository(file_repository::NamingConvention naming_conventi
 	//Empty
 }
 
-} //ion::resources::files::repositories
+} //ion::assets::repositories

@@ -138,7 +138,7 @@ namespace ion::script
 			struct build_system
 			{
 				std::filesystem::path root_path;
-				const resources::files::repositories::ScriptRepository *repository = nullptr;		
+				const assets::repositories::ScriptRepository *repository = nullptr;		
 				
 				translation_units units; //Need stable memory addressing
 				std::mutex m; //Protects 'units'
@@ -146,7 +146,7 @@ namespace ion::script
 
 
 				build_system(std::filesystem::path root_path);
-				build_system(const resources::files::repositories::ScriptRepository &repository);		
+				build_system(const assets::repositories::ScriptRepository &repository);		
 
 				void start_process(std::string str, file_trace trace);
 			};
@@ -569,7 +569,7 @@ namespace ion::script
 	{
 		private:
 		
-			const resources::files::repositories::ScriptRepository *repository_ = nullptr;	
+			const assets::repositories::ScriptRepository *repository_ = nullptr;	
 			std::optional<int> max_build_processes_;
 
 			std::vector<CompileError> compile_errors_;
@@ -581,7 +581,7 @@ namespace ion::script
 			ScriptCompiler() = default;
 
 			//Construct a new script compiler with the given repository
-			ScriptCompiler(const resources::files::repositories::ScriptRepository &repository);
+			ScriptCompiler(const assets::repositories::ScriptRepository &repository);
 
 
 			/*

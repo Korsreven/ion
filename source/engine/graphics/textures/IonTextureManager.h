@@ -190,7 +190,7 @@ namespace ion::graphics::textures
 
 
 	class TextureManager final :
-		public resources::files::FileResourceManager<Texture, TextureManager, resources::files::repositories::ImageRepository>
+		public resources::FileResourceManager<Texture, TextureManager, assets::repositories::ImageRepository>
 	{
 		private:
 

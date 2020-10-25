@@ -193,7 +193,7 @@
     <ClCompile Include="..\source\engine\graphics\utilities\IonSphere.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonVector2.cpp" />
     <ClCompile Include="..\source\engine\IonEngine.cpp" />
-    <ClCompile Include="..\source\engine\resources\files\IonFileResourceLoader.cpp" />
+    <ClCompile Include="..\source\engine\resources\files\IonAssetLoader.cpp" />
     <ClCompile Include="..\source\engine\resources\files\repositories\IonAudioRepository.cpp" />
     <ClCompile Include="..\source\engine\resources\files\repositories\IonFileRepository.cpp" />
     <ClCompile Include="..\source\engine\resources\files\repositories\IonFontRepository.cpp" />
@@ -303,7 +303,7 @@
     <ClInclude Include="..\source\engine\parallel\IonWorker.h" />
     <ClInclude Include="..\source\engine\parallel\IonWorkerPool.h" />
     <ClInclude Include="..\source\engine\resources\files\IonFileResource.h" />
-    <ClInclude Include="..\source\engine\resources\files\IonFileResourceLoader.h" />
+    <ClInclude Include="..\source\engine\resources\files\IonAssetLoader.h" />
     <ClInclude Include="..\source\engine\resources\files\IonFileResourceManager.h" />
     <ClInclude Include="..\source\engine\resources\files\repositories\IonAudioRepository.h" />
     <ClInclude Include="..\source\engine\resources\files\repositories\IonFileRepository.h" />

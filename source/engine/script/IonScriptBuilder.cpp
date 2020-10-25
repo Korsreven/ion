@@ -93,7 +93,7 @@ void ScriptBuilder::SaveOutput() noexcept
 
 //Public
 
-ScriptBuilder::ScriptBuilder(const resources::files::repositories::ScriptRepository &repository) :
+ScriptBuilder::ScriptBuilder(const assets::repositories::ScriptRepository &repository) :
 	compiler_{repository}
 {
 	//Empty

@@ -45,7 +45,7 @@ namespace ion::graphics::shaders
 
 	class ShaderManager; //Forward declaration
 
-	class Shader final : public resources::files::FileResource<ShaderManager>
+	class Shader final : public resources::FileResource<ShaderManager>
 	{
 		private:
 
@@ -53,7 +53,7 @@ namespace ion::graphics::shaders
 
 		public:
 
-			using resources::files::FileResource<ShaderManager>::FileResource;
+			using resources::FileResource<ShaderManager>::FileResource;
 
 
 			/*

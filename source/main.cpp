@@ -91,7 +91,7 @@ File:	main.cpp
 #include "resources/IonResource.h"
 #include "resources/IonResourceManager.h"
 #include "resources/files/IonFileResource.h"
-#include "resources/files/IonFileResourceLoader.h"
+#include "resources/files/IonAssetLoader.h"
 #include "resources/files/repositories/IonAudioRepository.h"
 #include "resources/files/repositories/IonFontRepository.h"
 #include "resources/files/repositories/IonImageRepository.h"
@@ -319,23 +319,23 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//EXAMPLE begin
 
 			//Repositories
-			ion::resources::files::repositories::AudioRepository audio_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-			ion::resources::files::repositories::FontRepository font_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-			ion::resources::files::repositories::ImageRepository image_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-			ion::resources::files::repositories::ScriptRepository script_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-			ion::resources::files::repositories::ShaderRepository shader_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};
-			ion::resources::files::repositories::VideoRepository video_repository{ion::resources::files::repositories::file_repository::NamingConvention::FileName};	
+			ion::assets::repositories::AudioRepository audio_repository{ion::assets::repositories::file_repository::NamingConvention::FileName};
+			ion::assets::repositories::FontRepository font_repository{ion::assets::repositories::file_repository::NamingConvention::FileName};
+			ion::assets::repositories::ImageRepository image_repository{ion::assets::repositories::file_repository::NamingConvention::FileName};
+			ion::assets::repositories::ScriptRepository script_repository{ion::assets::repositories::file_repository::NamingConvention::FileName};
+			ion::assets::repositories::ShaderRepository shader_repository{ion::assets::repositories::file_repository::NamingConvention::FileName};
+			ion::assets::repositories::VideoRepository video_repository{ion::assets::repositories::file_repository::NamingConvention::FileName};	
 
-			ion::resources::files::FileResourceLoader file_resource_loader;
-			file_resource_loader.Attach(audio_repository);
-			file_resource_loader.Attach(font_repository);
-			file_resource_loader.Attach(image_repository);
-			file_resource_loader.Attach(script_repository);
-			file_resource_loader.Attach(shader_repository);
-			file_resource_loader.Attach(video_repository);
-	
-			file_resource_loader.LoadDirectory("bin", ion::utilities::file::DirectoryIteration::Recursive);
-			//file_resource_loader.CompileDataFile("bin/resources.dat");
+			ion::assets::AssetLoader asset_loader;
+			asset_loader.Attach(audio_repository);
+			asset_loader.Attach(font_repository);
+			asset_loader.Attach(image_repository);
+			asset_loader.Attach(script_repository);
+			asset_loader.Attach(shader_repository);
+			asset_loader.Attach(video_repository);
+
+			asset_loader.LoadDirectory("bin", ion::utilities::file::DirectoryIteration::Recursive);
+			//asset_loader.CompileDataFile("bin/resources.dat");
 
 
 			ion::types::Progress<int> progress;
@@ -413,8 +413,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 	//Compile script
 	{
-		/*ion::resources::files::repositories::ScriptRepository script_repository{ion::resources::files::repositories::file_repository::NamingConvention::FilePath};
-		ion::resources::files::FileResourceLoader loader;
+		/*ion::assets::repositories::ScriptRepository script_repository{ion::assets::repositories::file_repository::NamingConvention::FilePath};
+		ion::assets::AssetLoader loader;
 		loader.Attach(script_repository);
 		loader.LoadDirectory("bin", ion::utilities::file::DirectoryIteration::Recursive);*/
 		//loader.CompileDataFile("bin/resources.dat");

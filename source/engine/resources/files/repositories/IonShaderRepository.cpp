@@ -5,7 +5,7 @@ This source file is part of Ion Engine
 	- Written in C++ using OpenGL
 
 Author:	Jan Ivar Goli
-Area:	resources/files/repositories
+Area:	assets/repositories
 File:	IonShaderRepository.cpp
 -------------------------------------------
 */
@@ -14,7 +14,7 @@ File:	IonShaderRepository.cpp
 
 #include "utilities/IonStringUtility.h"
 
-namespace ion::resources::files::repositories
+namespace ion::assets::repositories
 {
 
 using namespace shader_repository;
@@ -32,4 +32,4 @@ ShaderRepository::ShaderRepository(file_repository::NamingConvention naming_conv
 	//Empty
 }
 
-} //ion::resources::files::repositories
+} //ion::assets::repositories

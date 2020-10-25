@@ -5,24 +5,24 @@ This source file is part of Ion Engine
 	- Written in C++ using OpenGL
 
 Author:	Jan Ivar Goli
-Area:	resources/files
-File:	IonFileResourceLoader.cpp
+Area:	assets
+File:	IonAssetLoader.cpp
 -------------------------------------------
 */
 
-#include "IonFileResourceLoader.h"
+#include "IonAssetLoader.h"
 
 #include "utilities/IonConvert.h"
 #include "utilities/IonStringUtility.h"
 
-namespace ion::resources::files
+namespace ion::assets
 {
 
-using namespace file_resource_loader;
+using namespace asset_loader;
 using namespace repositories;
 using namespace utilities;
 
-namespace file_resource_loader::detail
+namespace asset_loader::detail
 {
 
 bool load_data_file(const std::filesystem::path &file_path, Strings &file_entries) noexcept
@@ -92,12 +92,12 @@ bool save_data_file_footer(const std::filesystem::path &file_path, const Strings
 	return file::Save(file_path, file_entries_section, file::FileSaveMode::BinaryAppend);
 }
 
-} //file_resource_loader::detail
+} //asset_loader::detail
 
 
 //Private
 
-bool FileResourceLoader::ExtractDataFile(const std::filesystem::path &data_file_path)
+bool AssetLoader::ExtractDataFile(const std::filesystem::path &data_file_path)
 {
 	Strings file_entries;
 	
@@ -121,7 +121,7 @@ bool FileResourceLoader::ExtractDataFile(const std::filesystem::path &data_file_
 	return false;
 }
 
-bool FileResourceLoader::ExtractDataFiles(const file::Paths &data_file_paths)
+bool AssetLoader::ExtractDataFiles(const file::Paths &data_file_paths)
 {
 	auto added = false;
 
@@ -139,7 +139,7 @@ bool FileResourceLoader::ExtractDataFiles(const file::Paths &data_file_paths)
 	Attaching
 */
 
-bool FileResourceLoader::Attach(FileRepository &file_repository)
+bool AssetLoader::Attach(FileRepository &file_repository)
 {
 	auto iter =
 		std::find_if(std::begin(repositories_), std::end(repositories_),
@@ -163,7 +163,7 @@ bool FileResourceLoader::Attach(FileRepository &file_repository)
 	Clearing
 */
 
-void FileResourceLoader::Clear() noexcept
+void AssetLoader::Clear() noexcept
 {
 	repositories_.clear();
 }
@@ -173,8 +173,8 @@ void FileResourceLoader::Clear() noexcept
 	Compiling
 */
 
-bool FileResourceLoader::CompileDataFile(std::filesystem::path data_file_path,
-	file_resource_loader::FileSplitSize file_split_size) const noexcept
+bool AssetLoader::CompileDataFile(std::filesystem::path data_file_path,
+	asset_loader::FileSplitSize file_split_size) const noexcept
 {
 	//No repositories attached to loader
 	if (std::empty(repositories_))
@@ -283,7 +283,7 @@ bool FileResourceLoader::CompileDataFile(std::filesystem::path data_file_path,
 	Detaching
 */
 
-bool FileResourceLoader::Detach(FileRepository &file_repository) noexcept
+bool AssetLoader::Detach(FileRepository &file_repository) noexcept
 {
 	auto iter =
 		std::find_if(std::begin(repositories_), std::end(repositories_),
@@ -307,7 +307,7 @@ bool FileResourceLoader::Detach(FileRepository &file_repository) noexcept
 	Loading directories
 */
 
-bool FileResourceLoader::LoadDirectory(const std::filesystem::path &directory_path,
+bool AssetLoader::LoadDirectory(const std::filesystem::path &directory_path,
 	file::DirectoryIteration directory_iteration)
 {
 	if (!file::IsDirectory(directory_path))
@@ -331,7 +331,7 @@ bool FileResourceLoader::LoadDirectory(const std::filesystem::path &directory_pa
 	return added;
 }
 
-bool FileResourceLoader::LoadDirectories(const file::Paths &directory_paths,
+bool AssetLoader::LoadDirectories(const file::Paths &directory_paths,
 	file::DirectoryIteration directory_iteration)
 {
 	auto added = false;
@@ -347,7 +347,7 @@ bool FileResourceLoader::LoadDirectories(const file::Paths &directory_paths,
 	Loading files
 */
 
-bool FileResourceLoader::LoadFile(const std::filesystem::path &file_path)
+bool AssetLoader::LoadFile(const std::filesystem::path &file_path)
 {
 	{
 		auto data_files = file_repository::detail::filter_by_file_extension(
@@ -361,7 +361,7 @@ bool FileResourceLoader::LoadFile(const std::filesystem::path &file_path)
 	return LoadFile({std::move(file_path), std::nullopt});
 }
 
-bool FileResourceLoader::LoadFile(file_repository::FileEntry file)
+bool AssetLoader::LoadFile(file_repository::FileEntry file)
 {
 	auto added = false;
 
@@ -377,7 +377,7 @@ bool FileResourceLoader::LoadFile(file_repository::FileEntry file)
 	return added;
 }
 
-bool FileResourceLoader::LoadFiles(const file::Paths &file_paths)
+bool AssetLoader::LoadFiles(const file::Paths &file_paths)
 {
 	auto added = false;
 
@@ -395,7 +395,7 @@ bool FileResourceLoader::LoadFiles(const file::Paths &file_paths)
 	return added;
 }
 
-bool FileResourceLoader::LoadFiles(const std::vector<file_repository::FileEntry> &files)
+bool AssetLoader::LoadFiles(const std::vector<file_repository::FileEntry> &files)
 {
 	auto added = false;
 
@@ -409,4 +409,4 @@ bool FileResourceLoader::LoadFiles(const std::vector<file_repository::FileEntry>
 	return added;
 }
 
-} //ion::resources::files
+} //ion::assets

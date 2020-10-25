@@ -5,13 +5,13 @@ This source file is part of Ion Engine
 	- Written in C++ using OpenGL
 
 Author:	Jan Ivar Goli
-Area:	resources/files
-File:	IonFileResourceLoader.h
+Area:	assets
+File:	IonAssetLoader.h
 -------------------------------------------
 */
 
-#ifndef ION_FILE_RESOURCE_LOADER_H
-#define ION_FILE_RESOURCE_LOADER_H
+#ifndef ION_ASSET_LOADER_H
+#define ION_ASSET_LOADER_H
 
 #include <filesystem>
 #include <string>
@@ -25,11 +25,11 @@ File:	IonFileResourceLoader.h
 
 #undef max
 
-namespace ion::resources::files
+namespace ion::assets
 {
 	using namespace std::string_view_literals;
 
-	namespace file_resource_loader
+	namespace asset_loader
 	{
 		enum class FileSplitSize
 		{
@@ -87,14 +87,14 @@ namespace ion::resources::files
 			bool save_data_file_bytes(const std::filesystem::path &file_path, std::string_view file_bytes) noexcept;
 			bool save_data_file_footer(const std::filesystem::path &file_path, const Strings &file_entries) noexcept;
 		} //detail
-	} //file_resource_loader
+	} //asset_loader
 
 
-	class FileResourceLoader final
+	class AssetLoader final
 	{
 		private:
 
-			file_resource_loader::detail::container_type repositories_;
+			asset_loader::detail::container_type repositories_;
 			std::string data_file_extension_ = ".dat";
 
 
@@ -104,13 +104,13 @@ namespace ion::resources::files
 		public:
 
 			//Default constructor
-			FileResourceLoader() = default;
+			AssetLoader() = default;
 
 			//Deleted copy constructor
-			FileResourceLoader(const FileResourceLoader&) = delete;
+			AssetLoader(const AssetLoader&) = delete;
 
 			//Default move constructor
-			FileResourceLoader(FileResourceLoader&&) = default;
+			AssetLoader(AssetLoader&&) = default;
 
 
 			/*
@@ -118,10 +118,10 @@ namespace ion::resources::files
 			*/
 
 			//Deleted copy assignment
-			FileResourceLoader& operator=(const FileResourceLoader&) = delete;
+			AssetLoader& operator=(const AssetLoader&) = delete;
 
 			//Default move assignment
-			FileResourceLoader& operator=(FileResourceLoader&&) = default;
+			AssetLoader& operator=(AssetLoader&&) = default;
 
 
 			/*
@@ -154,14 +154,14 @@ namespace ion::resources::files
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Repositories() noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<file_resource_loader::detail::container_type&>{repositories_};
+				return adaptors::ranges::DereferenceIterable<asset_loader::detail::container_type&>{repositories_};
 			}
 
 			//Returns an immutable range of all repositories attached to this loader
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline const auto Repositories() const noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<const file_resource_loader::detail::container_type&>{repositories_};
+				return adaptors::ranges::DereferenceIterable<const asset_loader::detail::container_type&>{repositories_};
 			}
 
 
@@ -189,7 +189,7 @@ namespace ion::resources::files
 			//If the total size of the compilation exceeds the file split size, the compilation is split into multiple data files
 			//When multiple data files are created, a numerical suffix is added to the file name
 			bool CompileDataFile(std::filesystem::path data_file_path,
-				file_resource_loader::FileSplitSize file_split_size = file_resource_loader::FileSplitSize::Max4GB) const noexcept;
+				asset_loader::FileSplitSize file_split_size = asset_loader::FileSplitSize::Max4GB) const noexcept;
 
 
 			/*
@@ -237,6 +237,6 @@ namespace ion::resources::files
 			//Each file is added to one or more repositories with the supported file extension
 			bool LoadFiles(const std::vector<repositories::file_repository::FileEntry> &files);
 	};
-} //ion::resources::files
+} //ion::assets
 
 #endif

@@ -66,7 +66,7 @@ void file_trace::pop_file()
 
 //build_system
 
-build_system::build_system(const resources::files::repositories::ScriptRepository &repository) :
+build_system::build_system(const assets::repositories::ScriptRepository &repository) :
 	repository{&repository}
 {
 	//Empty
@@ -2396,7 +2396,7 @@ std::string print_output(duration compile_time, const std::vector<CompileError> 
 
 //ScriptCompiler
 
-ScriptCompiler::ScriptCompiler(const resources::files::repositories::ScriptRepository &repository) :
+ScriptCompiler::ScriptCompiler(const assets::repositories::ScriptRepository &repository) :
 	repository_{&repository}
 {
 	//Empty
