@@ -19,7 +19,7 @@ File:	IonTexture.h
 #include <utility>
 
 #include "graphics/utilities/IonVector2.h"
-#include "resources/files/IonFileResource.h"
+#include "resources/IonFileResource.h"
 
 namespace ion::graphics::textures
 {

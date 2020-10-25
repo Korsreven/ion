@@ -20,6 +20,15 @@ File:	main.cpp
 #include "adaptors/iterators/IonFlatMapIterator.h"
 #include "adaptors/iterators/IonFlatSetIterator.h"
 
+#include "assets/IonAssetLoader.h"
+#include "assets/repositories/IonAudioRepository.h"
+#include "assets/repositories/IonFileRepository.h"
+#include "assets/repositories/IonFontRepository.h"
+#include "assets/repositories/IonImageRepository.h"
+#include "assets/repositories/IonScriptRepository.h"
+#include "assets/repositories/IonShaderRepository.h"
+#include "assets/repositories/IonVideoRepository.h"
+
 #include "events/IonCallback.h"
 #include "events/IonEventChannel.h"
 #include "events/IonEventGenerator.h"
@@ -90,14 +99,7 @@ File:	main.cpp
 
 #include "resources/IonResource.h"
 #include "resources/IonResourceManager.h"
-#include "resources/files/IonFileResource.h"
-#include "resources/files/IonAssetLoader.h"
-#include "resources/files/repositories/IonAudioRepository.h"
-#include "resources/files/repositories/IonFontRepository.h"
-#include "resources/files/repositories/IonImageRepository.h"
-#include "resources/files/repositories/IonScriptRepository.h"
-#include "resources/files/repositories/IonShaderRepository.h"
-#include "resources/files/repositories/IonVideoRepository.h"
+#include "resources/IonFileResource.h"
 
 #include "script/IonScriptBuilder.h"
 #include "script/IonScriptCompiler.h"

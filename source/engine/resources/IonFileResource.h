@@ -5,7 +5,7 @@ This source file is part of Ion Engine
 	- Written in C++ using OpenGL
 
 Author:	Jan Ivar Goli
-Area:	resources/files
+Area:	resources
 File:	IonFileResource.h
 -------------------------------------------
 */

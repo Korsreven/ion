@@ -21,8 +21,8 @@ File:	IonTextureManager.h
 #include <utility>
 
 #include "IonTexture.h"
-#include "resources/files/IonFileResourceManager.h"
-#include "resources/files/repositories/IonImageRepository.h"
+#include "assets/repositories/IonImageRepository.h"
+#include "resources/IonFileResourceManager.h"
 #include "types/IonTypes.h"
 
 #undef max

@@ -19,8 +19,8 @@ File:	IonFontManager.h
 #include <utility>
 
 #include "IonFont.h"
-#include "resources/files/IonFileResourceManager.h"
-#include "resources/files/repositories/IonFontRepository.h"
+#include "assets/repositories/IonFontRepository.h"
+#include "resources/IonFileResourceManager.h"
 #include "types/IonTypes.h"
 
 #undef CreateFont

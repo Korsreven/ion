@@ -157,6 +157,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\source\engine\assets\IonAssetLoader.cpp" />
+    <ClCompile Include="..\source\engine\assets\repositories\IonAudioRepository.cpp" />
+    <ClCompile Include="..\source\engine\assets\repositories\IonFileRepository.cpp" />
+    <ClCompile Include="..\source\engine\assets\repositories\IonFontRepository.cpp" />
+    <ClCompile Include="..\source\engine\assets\repositories\IonImageRepository.cpp" />
+    <ClCompile Include="..\source\engine\assets\repositories\IonScriptRepository.cpp" />
+    <ClCompile Include="..\source\engine\assets\repositories\IonShaderRepository.cpp" />
+    <ClCompile Include="..\source\engine\assets\repositories\IonVideoRepository.cpp" />
     <ClCompile Include="..\source\engine\events\IonInputController.cpp" />
     <ClCompile Include="..\source\engine\events\IonRecurringCallback.cpp" />
     <ClCompile Include="..\source\engine\graphics\fonts\IonFontManager.cpp" />
@@ -193,14 +201,6 @@
     <ClCompile Include="..\source\engine\graphics\utilities\IonSphere.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonVector2.cpp" />
     <ClCompile Include="..\source\engine\IonEngine.cpp" />
-    <ClCompile Include="..\source\engine\resources\files\IonAssetLoader.cpp" />
-    <ClCompile Include="..\source\engine\resources\files\repositories\IonAudioRepository.cpp" />
-    <ClCompile Include="..\source\engine\resources\files\repositories\IonFileRepository.cpp" />
-    <ClCompile Include="..\source\engine\resources\files\repositories\IonFontRepository.cpp" />
-    <ClCompile Include="..\source\engine\resources\files\repositories\IonImageRepository.cpp" />
-    <ClCompile Include="..\source\engine\resources\files\repositories\IonScriptRepository.cpp" />
-    <ClCompile Include="..\source\engine\resources\files\repositories\IonShaderRepository.cpp" />
-    <ClCompile Include="..\source\engine\resources\files\repositories\IonVideoRepository.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptBuilder.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptCompiler.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptError.cpp" />
@@ -235,6 +235,14 @@
     <ClInclude Include="..\source\engine\adaptors\ranges\IonBasicReverseIterable.h" />
     <ClInclude Include="..\source\engine\adaptors\ranges\IonDereferenceIterable.h" />
     <ClInclude Include="..\source\engine\adaptors\ranges\IonIterable.h" />
+    <ClInclude Include="..\source\engine\assets\IonAssetLoader.h" />
+    <ClInclude Include="..\source\engine\assets\repositories\IonAudioRepository.h" />
+    <ClInclude Include="..\source\engine\assets\repositories\IonFileRepository.h" />
+    <ClInclude Include="..\source\engine\assets\repositories\IonFontRepository.h" />
+    <ClInclude Include="..\source\engine\assets\repositories\IonImageRepository.h" />
+    <ClInclude Include="..\source\engine\assets\repositories\IonScriptRepository.h" />
+    <ClInclude Include="..\source\engine\assets\repositories\IonShaderRepository.h" />
+    <ClInclude Include="..\source\engine\assets\repositories\IonVideoRepository.h" />
     <ClInclude Include="..\source\engine\events\IonCallback.h" />
     <ClInclude Include="..\source\engine\events\IonEventChannel.h" />
     <ClInclude Include="..\source\engine\events\IonEventGenerator.h" />
@@ -302,16 +310,8 @@
     <ClInclude Include="..\source\engine\managed\IonObservedObject.h" />
     <ClInclude Include="..\source\engine\parallel\IonWorker.h" />
     <ClInclude Include="..\source\engine\parallel\IonWorkerPool.h" />
-    <ClInclude Include="..\source\engine\resources\files\IonFileResource.h" />
-    <ClInclude Include="..\source\engine\resources\files\IonAssetLoader.h" />
-    <ClInclude Include="..\source\engine\resources\files\IonFileResourceManager.h" />
-    <ClInclude Include="..\source\engine\resources\files\repositories\IonAudioRepository.h" />
-    <ClInclude Include="..\source\engine\resources\files\repositories\IonFileRepository.h" />
-    <ClInclude Include="..\source\engine\resources\files\repositories\IonFontRepository.h" />
-    <ClInclude Include="..\source\engine\resources\files\repositories\IonImageRepository.h" />
-    <ClInclude Include="..\source\engine\resources\files\repositories\IonScriptRepository.h" />
-    <ClInclude Include="..\source\engine\resources\files\repositories\IonShaderRepository.h" />
-    <ClInclude Include="..\source\engine\resources\files\repositories\IonVideoRepository.h" />
+    <ClInclude Include="..\source\engine\resources\IonFileResource.h" />
+    <ClInclude Include="..\source\engine\resources\IonFileResourceManager.h" />
     <ClInclude Include="..\source\engine\resources\IonResource.h" />
     <ClInclude Include="..\source\engine\resources\IonResourceManager.h" />
     <ClInclude Include="..\source\engine\script\IonScriptBuilder.h" />

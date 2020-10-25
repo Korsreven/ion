@@ -22,7 +22,7 @@ File:	IonFileResourceManager.h
 #include <vector>
 
 #include "IonFileResource.h"
-#include "repositories/IonFileRepository.h"
+#include "assets/repositories/IonFileRepository.h"
 #include "resources/IonResourceManager.h"
 #include "unmanaged/IonObjectFactory.h"
 

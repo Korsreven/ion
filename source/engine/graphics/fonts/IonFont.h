@@ -18,7 +18,7 @@ File:	IonFont.h
 #include <utility>
 #include <vector>
 
-#include "resources/files/IonFileResource.h"
+#include "resources/IonFileResource.h"
 
 namespace ion::graphics::fonts
 {

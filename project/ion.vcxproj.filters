@@ -37,12 +37,6 @@
     <Filter Include="Header Files\resources">
       <UniqueIdentifier>{24bdcd13-1c20-4f40-b93a-b50aa7b0a12b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\resources\files">
-      <UniqueIdentifier>{f600f0ee-4d74-4f96-a6ea-be41667cd70e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\resources\files\repositories">
-      <UniqueIdentifier>{d0fbd429-a72e-4d2e-a3be-229cfa06fbce}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\script\utilities">
       <UniqueIdentifier>{fc9266b3-f5a8-4007-a1d3-6f5471ab4205}</UniqueIdentifier>
     </Filter>
@@ -63,15 +57,6 @@
     </Filter>
     <Filter Include="Source Files\graphics\utilities">
       <UniqueIdentifier>{15b78216-defa-459e-a73f-ad861f3905ca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\resources">
-      <UniqueIdentifier>{270ccc42-df7c-44bd-bd49-7d6955ae45e5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\resources\files">
-      <UniqueIdentifier>{915cec4c-68d7-47c4-8c3e-33a4cf422316}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\resources\files\repositories">
-      <UniqueIdentifier>{ac6ce5d7-b3f6-491a-b925-944460ad79f4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\script\utilities">
       <UniqueIdentifier>{a1528e3a-84de-455d-8a05-77197336a963}</UniqueIdentifier>
@@ -160,6 +145,18 @@
     <Filter Include="Source Files\graphics\fonts">
       <UniqueIdentifier>{ac2d45d4-3510-4c6f-96b8-d869fb1cfdcb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\assets">
+      <UniqueIdentifier>{a85bf9e4-31f4-4258-ad7e-5dc3bda752ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\assets">
+      <UniqueIdentifier>{3319b79b-f480-4838-abf7-dd4857bc94a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\assets\repositories">
+      <UniqueIdentifier>{85967516-a6b3-4947-b03c-a7d8ac04c683}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\assets\repositories">
+      <UniqueIdentifier>{6f1d133c-4eb0-4b5c-bc70-3e937f512d25}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -185,24 +182,6 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\events\IonRecurringCallback.cpp">
       <Filter>Source Files\events</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\engine\resources\files\repositories\IonAudioRepository.cpp">
-      <Filter>Source Files\resources\files\repositories</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\engine\resources\files\repositories\IonFileRepository.cpp">
-      <Filter>Source Files\resources\files\repositories</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\engine\resources\files\repositories\IonFontRepository.cpp">
-      <Filter>Source Files\resources\files\repositories</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\engine\resources\files\repositories\IonImageRepository.cpp">
-      <Filter>Source Files\resources\files\repositories</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\engine\resources\files\repositories\IonShaderRepository.cpp">
-      <Filter>Source Files\resources\files\repositories</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\engine\resources\files\repositories\IonVideoRepository.cpp">
-      <Filter>Source Files\resources\files\repositories</Filter>
     </ClCompile>
     <ClCompile Include="..\source\engine\script\utilities\IonParseUtility.cpp">
       <Filter>Source Files\script\utilities</Filter>
@@ -263,9 +242,6 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\script\IonScriptBuilder.cpp">
       <Filter>Source Files\script</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\engine\resources\files\repositories\IonScriptRepository.cpp">
-      <Filter>Source Files\resources\files\repositories</Filter>
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\particles\IonParticle.cpp">
       <Filter>Source Files\graphics\particles</Filter>
@@ -351,8 +327,29 @@
     <ClCompile Include="..\source\engine\graphics\textures\IonFrameSequenceManager.cpp">
       <Filter>Source Files\graphics\textures</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\engine\resources\files\IonAssetLoader.cpp">
-      <Filter>Source Files\resources\files</Filter>
+    <ClCompile Include="..\source\engine\assets\IonAssetLoader.cpp">
+      <Filter>Source Files\assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\assets\repositories\IonAudioRepository.cpp">
+      <Filter>Source Files\assets\repositories</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\assets\repositories\IonFileRepository.cpp">
+      <Filter>Source Files\assets\repositories</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\assets\repositories\IonFontRepository.cpp">
+      <Filter>Source Files\assets\repositories</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\assets\repositories\IonImageRepository.cpp">
+      <Filter>Source Files\assets\repositories</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\assets\repositories\IonScriptRepository.cpp">
+      <Filter>Source Files\assets\repositories</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\assets\repositories\IonShaderRepository.cpp">
+      <Filter>Source Files\assets\repositories</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\assets\repositories\IonVideoRepository.cpp">
+      <Filter>Source Files\assets\repositories</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -434,24 +431,6 @@
     <ClInclude Include="..\source\engine\resources\IonResourceManager.h">
       <Filter>Header Files\resources</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\resources\files\repositories\IonAudioRepository.h">
-      <Filter>Header Files\resources\files\repositories</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\engine\resources\files\repositories\IonFileRepository.h">
-      <Filter>Header Files\resources\files\repositories</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\engine\resources\files\repositories\IonFontRepository.h">
-      <Filter>Header Files\resources\files\repositories</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\engine\resources\files\repositories\IonImageRepository.h">
-      <Filter>Header Files\resources\files\repositories</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\engine\resources\files\repositories\IonShaderRepository.h">
-      <Filter>Header Files\resources\files\repositories</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\engine\resources\files\repositories\IonVideoRepository.h">
-      <Filter>Header Files\resources\files\repositories</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\engine\script\utilities\IonParseUtility.h">
       <Filter>Header Files\script\utilities</Filter>
     </ClInclude>
@@ -518,9 +497,6 @@
     <ClInclude Include="..\source\engine\resources\IonResource.h">
       <Filter>Header Files\resources</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\resources\files\IonFileResource.h">
-      <Filter>Header Files\resources\files</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\engine\script\IonScriptCompiler.h">
       <Filter>Header Files\script</Filter>
     </ClInclude>
@@ -553,9 +529,6 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\script\IonScriptBuilder.h">
       <Filter>Header Files\script</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\engine\resources\files\repositories\IonScriptRepository.h">
-      <Filter>Header Files\resources\files\repositories</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\particles\IonParticle.h">
       <Filter>Header Files\graphics\particles</Filter>
@@ -674,9 +647,6 @@
     <ClInclude Include="..\source\engine\events\listeners\IonListenerTraits.h">
       <Filter>Header Files\events\listeners</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\resources\files\IonFileResourceManager.h">
-      <Filter>Header Files\resources\files</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\engine\graphics\shaders\IonShader.h">
       <Filter>Header Files\graphics\shaders</Filter>
     </ClInclude>
@@ -722,8 +692,35 @@
     <ClInclude Include="..\source\engine\graphics\textures\IonFrameSequenceManager.h">
       <Filter>Header Files\graphics\textures</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\resources\files\IonAssetLoader.h">
-      <Filter>Header Files\resources\files</Filter>
+    <ClInclude Include="..\source\engine\resources\IonFileResource.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\resources\IonFileResourceManager.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\assets\IonAssetLoader.h">
+      <Filter>Header Files\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\assets\repositories\IonAudioRepository.h">
+      <Filter>Header Files\assets\repositories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\assets\repositories\IonFileRepository.h">
+      <Filter>Header Files\assets\repositories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\assets\repositories\IonFontRepository.h">
+      <Filter>Header Files\assets\repositories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\assets\repositories\IonImageRepository.h">
+      <Filter>Header Files\assets\repositories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\assets\repositories\IonScriptRepository.h">
+      <Filter>Header Files\assets\repositories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\assets\repositories\IonShaderRepository.h">
+      <Filter>Header Files\assets\repositories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\assets\repositories\IonVideoRepository.h">
+      <Filter>Header Files\assets\repositories</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -18,8 +18,8 @@ File:	IonShaderManager.h
 #include <string>
 
 #include "IonShader.h"
-#include "resources/files/IonFileResourceManager.h"
-#include "resources/files/repositories/IonShaderRepository.h"
+#include "assets/repositories/IonShaderRepository.h"
+#include "resources/IonFileResourceManager.h"
 
 namespace ion::graphics::shaders
 {

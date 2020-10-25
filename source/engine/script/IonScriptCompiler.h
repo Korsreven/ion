@@ -25,7 +25,7 @@ File:	IonScriptCompiler.h
 #include "IonScriptTree.h"
 #include "adaptors/IonFlatMap.h"
 #include "adaptors/IonFlatSet.h"
-#include "resources/files/repositories/IonScriptRepository.h"
+#include "assets/repositories/IonScriptRepository.h"
 #include "parallel/IonWorkerPool.h"
 #include "utilities/IonConvert.h"
 

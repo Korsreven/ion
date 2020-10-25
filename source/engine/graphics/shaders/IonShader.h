@@ -16,7 +16,7 @@ File:	IonShader.h
 #include <optional>
 #include <string_view>
 
-#include "resources/files/IonFileResource.h"
+#include "resources/IonFileResource.h"
 #include "utilities/IonStringUtility.h"
 
 namespace ion::graphics::shaders
