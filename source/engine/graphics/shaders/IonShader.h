@@ -75,7 +75,7 @@ namespace ion::graphics::shaders
 			//Returns nullopt if the shader is not loaded
 			[[nodiscard]] inline auto Type() const noexcept
 			{
-				return shader::detail::shader_type(Name());
+				return shader::detail::shader_type(AssetName());
 			}
 
 			//Returns the handle to the shader

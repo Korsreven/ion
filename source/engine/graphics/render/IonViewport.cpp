@@ -200,8 +200,9 @@ void Viewport::RenderTargetResized(Vector2 size) noexcept
 
 //Public
 
-Viewport::Viewport(RenderTarget &render_target) noexcept :
+Viewport::Viewport(std::string name, RenderTarget &render_target) noexcept :
 
+	managed::ManagedObject<RenderTarget>{std::move(name)},
 	events::EventChannel<events::Listenable<events::listeners::RenderTargetListener>>{
 		render_target, events::event_channel::SubscriptionContract::NonCancelable},
 
@@ -211,8 +212,9 @@ Viewport::Viewport(RenderTarget &render_target) noexcept :
 	//Empty
 }
 
-Viewport::Viewport(RenderTarget &render_target, const Aabb &bounds) noexcept :
+Viewport::Viewport(std::string name, RenderTarget &render_target, const Aabb &bounds) noexcept :
 
+	managed::ManagedObject<RenderTarget>{std::move(name)},
 	events::EventChannel<events::Listenable<events::listeners::RenderTargetListener>>{
 		render_target, events::event_channel::SubscriptionContract::NonCancelable},
 
@@ -222,10 +224,11 @@ Viewport::Viewport(RenderTarget &render_target, const Aabb &bounds) noexcept :
 	//Empty
 }
 
-Viewport::Viewport(RenderTarget &render_target, const Aabb &bounds,
+Viewport::Viewport(std::string name, RenderTarget &render_target, const Aabb &bounds,
 	HorizontalAnchorType left_anchor, HorizontalAnchorType right_anchor,
 	VerticalAnchorType top_anchor, VerticalAnchorType bottom_anchor) noexcept :
 
+	managed::ManagedObject<RenderTarget>{std::move(name)},
 	events::EventChannel<events::Listenable<events::listeners::RenderTargetListener>>{
 		render_target, events::event_channel::SubscriptionContract::NonCancelable},
 
@@ -246,78 +249,78 @@ Viewport::Viewport(RenderTarget &render_target, const Aabb &bounds,
 	Static viewport conversions
 */
 
-Viewport Viewport::Aligned(RenderTarget &render_target, AlignmentType alignment, const Vector2 &size) noexcept
+Viewport Viewport::Aligned(std::string name, RenderTarget &render_target, AlignmentType alignment, const Vector2 &size) noexcept
 {
 	auto [x_anchor, y_anchor] = detail::get_anchors(alignment);
-	return {render_target, detail::get_aligned_aabb(alignment, size, render_target.Size()), x_anchor, x_anchor, y_anchor, y_anchor};
+	return {std::move(name), render_target, detail::get_aligned_aabb(alignment, size, render_target.Size()), x_anchor, x_anchor, y_anchor, y_anchor};
 }
 
-Viewport Viewport::Aligned(RenderTarget &render_target, AlignmentType alignment, real width_percent, real height_percent) noexcept
+Viewport Viewport::Aligned(std::string name, RenderTarget &render_target, AlignmentType alignment, real width_percent, real height_percent) noexcept
 {
 	auto [width, height] = render_target.Size().XY();
-	return {render_target, detail::get_aligned_aabb(alignment, {width * width_percent, height * height_percent}, render_target.Size())};
+	return {std::move(name), render_target, detail::get_aligned_aabb(alignment, {width * width_percent, height * height_percent}, render_target.Size())};
 }
 
 
-Viewport Viewport::LeftAligned(RenderTarget &render_target, real width_percent) noexcept
+Viewport Viewport::LeftAligned(std::string name, RenderTarget &render_target, real width_percent) noexcept
 {
-	return Aligned(render_target, AlignmentType::BottomLeft, width_percent, 1.0_r);
+	return Aligned(std::move(name), render_target, AlignmentType::BottomLeft, width_percent, 1.0_r);
 }
 
-Viewport Viewport::RightAligned(RenderTarget &render_target, real width_percent) noexcept
+Viewport Viewport::RightAligned(std::string name, RenderTarget &render_target, real width_percent) noexcept
 {
-	return Aligned(render_target, AlignmentType::BottomRight, width_percent, 1.0_r);
+	return Aligned(std::move(name), render_target, AlignmentType::BottomRight, width_percent, 1.0_r);
 }
 
-Viewport Viewport::TopAligned(RenderTarget &render_target, real height_percent) noexcept
+Viewport Viewport::TopAligned(std::string name, RenderTarget &render_target, real height_percent) noexcept
 {
-	return Aligned(render_target, AlignmentType::TopLeft, 1.0_r, height_percent);
+	return Aligned(std::move(name), render_target, AlignmentType::TopLeft, 1.0_r, height_percent);
 }
 
-Viewport Viewport::BottomAligned(RenderTarget &render_target, real height_percent) noexcept
+Viewport Viewport::BottomAligned(std::string name, RenderTarget &render_target, real height_percent) noexcept
 {
-	return Aligned(render_target, AlignmentType::BottomLeft, 1.0_r, height_percent);
+	return Aligned(std::move(name), render_target, AlignmentType::BottomLeft, 1.0_r, height_percent);
 }
 
 
-Viewport Viewport::TopLeftAligned(RenderTarget &render_target, const Vector2 &size) noexcept
+Viewport Viewport::TopLeftAligned(std::string name, RenderTarget &render_target, const Vector2 &size) noexcept
 {
-	return Aligned(render_target, AlignmentType::TopLeft, size);
+	return Aligned(std::move(name), render_target, AlignmentType::TopLeft, size);
 }
 
-Viewport Viewport::TopLeftAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept
+Viewport Viewport::TopLeftAligned(std::string name, RenderTarget &render_target, real width_percent, real height_percent) noexcept
 {
-	return Aligned(render_target, AlignmentType::TopLeft, width_percent, height_percent);
+	return Aligned(std::move(name), render_target, AlignmentType::TopLeft, width_percent, height_percent);
 }
 
-Viewport Viewport::TopRightAligned(RenderTarget &render_target, const Vector2 &size) noexcept
+Viewport Viewport::TopRightAligned(std::string name, RenderTarget &render_target, const Vector2 &size) noexcept
 {
-	return Aligned(render_target, AlignmentType::TopRight, size);
+	return Aligned(std::move(name), render_target, AlignmentType::TopRight, size);
 }
 
-Viewport Viewport::TopRightAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept
+Viewport Viewport::TopRightAligned(std::string name, RenderTarget &render_target, real width_percent, real height_percent) noexcept
 {
-	return Aligned(render_target, AlignmentType::TopRight, width_percent, height_percent);
+	return Aligned(std::move(name), render_target, AlignmentType::TopRight, width_percent, height_percent);
 }
 
-Viewport Viewport::BottomLeftAligned(RenderTarget &render_target, const Vector2 &size) noexcept
+Viewport Viewport::BottomLeftAligned(std::string name, RenderTarget &render_target, const Vector2 &size) noexcept
 {
-	return Aligned(render_target, AlignmentType::BottomLeft, size);
+	return Aligned(std::move(name), render_target, AlignmentType::BottomLeft, size);
 }
 
-Viewport Viewport::BottomLeftAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept
+Viewport Viewport::BottomLeftAligned(std::string name, RenderTarget &render_target, real width_percent, real height_percent) noexcept
 {
-	return Aligned(render_target, AlignmentType::BottomLeft, width_percent, height_percent);
+	return Aligned(std::move(name), render_target, AlignmentType::BottomLeft, width_percent, height_percent);
 }
 
-Viewport Viewport::BottomRightAligned(RenderTarget &render_target, const Vector2 &size) noexcept
+Viewport Viewport::BottomRightAligned(std::string name, RenderTarget &render_target, const Vector2 &size) noexcept
 {
-	return Aligned(render_target, AlignmentType::BottomRight, size);
+	return Aligned(std::move(name), render_target, AlignmentType::BottomRight, size);
 }
 
-Viewport Viewport::BottomRightAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept
+Viewport Viewport::BottomRightAligned(std::string name, RenderTarget &render_target, real width_percent, real height_percent) noexcept
 {
-	return Aligned(render_target, AlignmentType::BottomRight, width_percent, height_percent);
+	return Aligned(std::move(name), render_target, AlignmentType::BottomRight, width_percent, height_percent);
 }
 
 

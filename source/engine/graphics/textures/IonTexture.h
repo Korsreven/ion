@@ -75,12 +75,12 @@ namespace ion::graphics::textures
 
 			using resources::FileResource<TextureManager>::FileResource;
 
-			//Construct a new texture with the given name, texture filter for min/mag, mip filter and texture wrap mode for s/t
-			Texture(std::string name,
+			//Construct a new texture with the given name, asset_name, texture filter for min/mag, mip filter and texture wrap mode for s/t
+			Texture(std::string name, std::string asset_name,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode) :
 
-				FileResource{std::move(name)},
+				FileResource{std::move(name), std::move(asset_name)},
 
 				min_filter_{min_filter},
 				mag_filter_{mag_filter},
@@ -92,21 +92,21 @@ namespace ion::graphics::textures
 				//Empty
 			}
 
-			//Construct a new texture with the given name, texture filter, mip filter and texture wrap mode
-			Texture(std::string name,
+			//Construct a new texture with the given name, asset name, texture filter, mip filter and texture wrap mode
+			Texture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::MipmapFilter mip_filter,
 				texture::TextureWrapMode wrap_mode) :
 
-				Texture{std::move(name), filter, filter, mip_filter, wrap_mode, wrap_mode}
+				Texture{std::move(name), std::move(asset_name), filter, filter, mip_filter, wrap_mode, wrap_mode}
 			{
 				//Empty
 			}
 
-			//Construct a new texture with the given name, texture filter and texture wrap mode (no mipmap)
-			Texture(std::string name,
+			//Construct a new texture with the given name, asset name, texture filter and texture wrap mode (no mipmap)
+			Texture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode) :
 
-				Texture{std::move(name), filter, filter, {}, wrap_mode, wrap_mode}
+				Texture{std::move(name), std::move(asset_name), filter, filter, {}, wrap_mode, wrap_mode}
 			{
 				//Empty
 			}

@@ -16,6 +16,8 @@ File:	IonObjectManager.h
 #include <algorithm>
 #include <cassert>
 #include <memory>
+#include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -31,6 +33,20 @@ namespace ion::managed
 	{
 		template <typename T>
 		using container_type = std::vector<std::unique_ptr<T>>; //Owning
+
+
+		template <typename T>
+		inline auto get_object_by_name(std::string_view name, const object_manager::detail::container_type<T> &objects) noexcept
+		{
+			auto iter =
+				std::find_if(std::begin(objects), std::end(objects),
+					[&](auto &object) noexcept
+					{
+						return object->Name() == name;
+					});
+
+			return iter != std::end(objects) ? iter->get() : nullptr;
+		}
 	} //object_manager::detail
 
 
@@ -104,6 +120,26 @@ namespace ion::managed
 				}
 			}
 
+
+			/*
+				Creating
+			*/
+
+			//Emplace an object with the given arguments
+			template <typename... Args>
+			auto& Emplace(Args &&...args)
+			{
+				AdditionStarted();
+
+				auto &object = objects_.emplace_back(
+					std::make_unique<ObjectT>(std::forward<Args>(args)...));
+				object->Owner(static_cast<OwnerT&>(*this));
+				NotifyCreated(*object);
+
+				AdditionEnded();
+				return *object;
+			}
+
 		protected:
 
 			/*
@@ -166,19 +202,26 @@ namespace ion::managed
 				Creating
 			*/
 
-			//Create a object with the given arguments
+			//Create an object with the given name and arguments
 			template <typename... Args>
-			auto& Create(Args &&...args)
+			auto& Create(std::string name, Args &&...args)
 			{
-				AdditionStarted();
+				//Check if an object with that name already exists
+				if (auto ptr = object_manager::detail::get_object_by_name(name, objects_); ptr)
+					return *ptr;
+				else
+					return Emplace(std::move(name), std::forward<Args>(args)...);
+			}
 
-				auto &object = objects_.emplace_back(
-					std::make_unique<ObjectT>(std::forward<Args>(args)...));
-				object->Owner(static_cast<OwnerT&>(*this));
-				NotifyCreated(*object);
-
-				AdditionEnded();
-				return *object;
+			//Create an object with the given argument
+			template <typename T, typename = std::enable_if_t<std::is_same_v<std::remove_cvref_t<T>, ObjectT>>>
+			auto& Create(T &&arg)
+			{
+				//Check if an object with that name already exists
+				if (auto ptr = object_manager::detail::get_object_by_name(arg.Name(), objects_); ptr)
+					return *ptr;
+				else
+					return Emplace(std::forward<T>(arg));
 			}
 
 
@@ -324,10 +367,17 @@ namespace ion::managed
 				Take / release ownership
 			*/
 
-			//Adopt (take ownership of) the given object
-			auto& Adopt(typename decltype(objects_)::value_type object_ptr) noexcept
+			//Adopt (take ownership of) the given object and returns a pointer to the adopted object
+			//Returns nullptr if the object could not be adopted and object_ptr will remain untouched
+			auto Adopt(typename decltype(objects_)::value_type &object_ptr) noexcept -> ObjectT*
 			{
 				assert(object_ptr);
+
+				//Check if an object with that name already exists
+				if (auto ptr = object_manager::detail::get_object_by_name(
+						object_ptr->Name(), objects_); ptr)
+					return nullptr; //Object exists, could not adopt
+
 				AdditionStarted();
 
 				auto &object = objects_.emplace_back(std::move(object_ptr));
@@ -335,27 +385,34 @@ namespace ion::managed
 				NotifyCreated(*object);
 
 				AdditionEnded();
-				return *object;
+				return object.get();
 			}
 
 			//Adopt (take ownership of) all the given objects
-			void Adopt(typename decltype(objects_) objects) noexcept
+			//If one or more objects could not be adopted, they will remain untouched in the given container
+			void Adopt(typename decltype(objects_) &objects) noexcept
 			{
-				objects.erase(
-					std::remove_if(std::begin(objects), std::end(objects),
-						[](const auto &object) noexcept
-						{
-							return !object;
-						}),
-					std::end(objects));
+				decltype(objects_) adoptable_objects;
 
-				if (!std::empty(objects))
+				for (auto iter = std::begin(objects); iter != std::end(objects) && *iter;)
+				{
+					if (auto ptr = object_manager::detail::get_object_by_name(
+						(*iter)->Name(), objects_); !ptr)
+					{
+						adoptable_objects.push_back(std::move(*iter));
+						iter = objects.erase(iter);
+					}
+					else
+						++iter;
+				}
+
+				if (!std::empty(adoptable_objects))
 				{
 					AdditionStarted();
 
-					std::move(std::begin(objects), std::end(objects), std::back_inserter(objects_));
-					std::for_each(std::end(objects_) - std::size(objects), std::end(objects_),
-						[](auto &object) mutable noexcept
+					std::move(std::begin(adoptable_objects), std::end(adoptable_objects), std::back_inserter(objects_));
+					std::for_each(std::end(objects_) - std::size(adoptable_objects), std::end(objects_),
+						[&](auto &object) mutable noexcept
 						{
 							object->Owner(static_cast<OwnerT&>(*this));
 							NotifyCreated(*object);
@@ -394,6 +451,42 @@ namespace ion::managed
 
 
 			/*
+				Creating
+			*/
+
+			//Create an object as a copy of the given object
+			auto& Create(const ObjectT &object)
+			{
+				return Create<decltype(object)>(object);
+			}
+
+			//Create an object by moving the given object
+			auto& Create(ObjectT &&object)
+			{
+				return Create<decltype(object)>(std::move(object));
+			}
+
+
+			/*
+				Retrieving
+			*/
+
+			//Returns a pointer to a mutable object with the given name
+			//Returns nullptr if no object could be found
+			[[nodiscard]] auto Get(std::string_view name) noexcept
+			{
+				return object_manager::detail::get_object_by_name(name, objects_);
+			}
+
+			//Returns a pointer to an immutable object with the given name
+			//Returns nullptr if no object could be found
+			[[nodiscard]] const auto Get(std::string_view name) const noexcept
+			{
+				return object_manager::detail::get_object_by_name(name, objects_);
+			}
+
+
+			/*
 				Removing
 			*/
 
@@ -408,6 +501,15 @@ namespace ion::managed
 			{
 				auto ptr = Extract(object);
 				return !!ptr;
+			}
+
+			//Remove a removable object from this manager with the given name
+			auto Remove(std::string_view name) noexcept
+			{
+				if (auto ptr = Get(name); ptr)
+					return Remove(*ptr);
+				else
+					return false;
 			}
 	};
 } //ion::managed

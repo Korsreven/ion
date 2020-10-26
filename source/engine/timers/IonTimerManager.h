@@ -69,13 +69,13 @@ namespace ion::timers
 			Creating
 		*/
 
-		//Creates a timer with the given interval
+		//Creates a timer with the given name and interval
 		//Returns a reference to the newly created timer
-		Timer& CreateTimer(duration interval);
+		Timer& CreateTimer(std::string name, duration interval);
 
-		//Creates a timer with the given interval and callback
+		//Creates a timer with the given name, interval and callback
 		//Returns a reference to the newly created timer
-		Timer& CreateTimer(duration interval, events::Callback<void, Timer&> on_tick);
+		Timer& CreateTimer(std::string name, duration interval, events::Callback<void, Timer&> on_tick);
 
 		//Creates a copy of the given timer
 		//Returns a reference to the newly created timer

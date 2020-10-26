@@ -48,11 +48,11 @@ namespace ion::graphics::shaders
 
 		public:
 			
-			//Constructs a new shader program with the given shader
-			explicit ShaderProgram(Shader &shader);
+			//Constructs a new shader program with the given name and a shader
+			ShaderProgram(std::string name, Shader &shader);
 
-			//Constructs a new shader program with the given vertex and fragment shader
-			ShaderProgram(Shader &vertex_shader, Shader &fragment_shader);
+			//Constructs a new shader program with the given name, a vertex and fragment shader
+			ShaderProgram(std::string name, Shader &vertex_shader, Shader &fragment_shader);
 
 
 			/*

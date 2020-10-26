@@ -13,6 +13,8 @@ File:	IonManagedObject.h
 #ifndef ION_MANAGED_OBJECT_H
 #define ION_MANAGED_OBJECT_H
 
+#include <string>
+
 namespace ion::managed
 {
 	template <typename T>
@@ -23,24 +25,30 @@ namespace ion::managed
 			using owner_type = T;
 
 		protected:
-	
+		
+			std::string name_;
 			T *owner_ = nullptr;
 
 		public:
 
-			//Default constructor
-			ManagedObject() = default;
+			//Constructor
+			explicit ManagedObject(std::string name) :
+				name_{std::move(name)}
+			{
+				//Empty
+			}
 
 			//Copy constructor
-			ManagedObject(const ManagedObject&) noexcept :
-				owner_{nullptr} //A copy of a managed object has no owner
+			ManagedObject(const ManagedObject &rhs) :
+				name_{rhs.name_}, owner_{nullptr} //A copy of a managed object has no owner
 			{
 				//Empty
 			}
 
 			//Copy assignment
-			inline auto& operator=(const ManagedObject &rhs) noexcept
+			inline auto& operator=(const ManagedObject &rhs)
 			{
+				name_ = rhs.name_;
 				owner_ = nullptr;
 				return *this;
 			}
@@ -66,6 +74,13 @@ namespace ion::managed
 			/*
 				Observers
 			*/
+
+			//Returns the name of this managed object
+			//A name must be unique among objects with the same owner
+			[[nodiscard]] inline auto& Name() const noexcept
+			{
+				return name_;
+			}
 
 			//Returns a mutable owner for this managed object
 			[[nodiscard]] inline auto Owner() noexcept

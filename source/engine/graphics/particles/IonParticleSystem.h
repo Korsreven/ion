@@ -52,11 +52,11 @@ namespace ion::graphics::particles
 
 		public:
 
-			//Default constructor
-			ParticleSystem() = default;
+			//Construct a new particle system with the given name
+			explicit ParticleSystem(std::string name);
 
-			//Construct a new particle system with the given particle primitive
-			ParticleSystem(particle_system::ParticlePrimitive particle_primitive) noexcept;
+			//Construct a new particle system with the given name and particle primitive
+			ParticleSystem(std::string name, particle_system::ParticlePrimitive particle_primitive);
 
 
 			/*

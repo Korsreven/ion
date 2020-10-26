@@ -71,11 +71,6 @@ namespace ion::resources
 			}
 
 
-			virtual bool IsResourcesEquivalent(const ResourceT&, const ResourceT&) noexcept
-			{
-				return false;
-			}
-
 			virtual bool PrepareResource(ResourceT&) noexcept
 			{
 				//Optional to override
@@ -812,15 +807,7 @@ namespace ion::resources
 			template <typename... Args>
 			auto& CreateResource(Args &&...args)
 			{
-				ResourceT pending_resource{std::forward<Args>(args)...};
-				
-				for (auto &resource : Resources())
-				{
-					if (IsResourcesEquivalent(resource, pending_resource))
-						return resource;
-				}
-
-				return this->Create(std::move(pending_resource));
+				return this->Create(std::forward<Args>(args)...);
 			}
 
 

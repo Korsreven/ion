@@ -46,18 +46,15 @@ namespace ion::graphics::textures
 
 		public:
 
-			//Default constructor
-			FrameSequence() = default;
-
-			//Constructs a new frame sequence with the given frames (textures)
+			//Constructs a new frame sequence with the given name and frames (textures)
 			//Duplicate frames are allowed within a frame sequence
-			FrameSequence(const frame_sequence::detail::container_type &frames);
+			FrameSequence(std::string name, const frame_sequence::detail::container_type &frames);
 
-			//Constructs a new frame sequence with the given frame references (textures)
+			//Constructs a new frame sequence with the given name and frame references (textures)
 			//Duplicate frames are allowed within a frame sequence
 			template <typename... Tn, typename = std::enable_if_t<std::conjunction_v<std::is_same<Texture, Tn>...>>>
-			FrameSequence(Texture &frame, Tn &...rest) :
-				FrameSequence{{&frame, &rest...}}
+			FrameSequence(std::string name, Texture &frame, Tn &...rest) :
+				FrameSequence{std::move(name), {&frame, &rest...}}
 			{
 				//Empty
 			}

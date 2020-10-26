@@ -30,12 +30,6 @@ namespace ion::resources
 {
 	namespace file_resource_manager::detail
 	{
-		template <typename ResourceT>
-		inline auto is_resources_equivalent(const ResourceT &lhs, const ResourceT &rhs) noexcept
-		{
-			return lhs.Name() == rhs.Name();
-		}
-
 		template <typename RepositoriesT>
 		inline auto file_data_from_resource_name(const RepositoriesT &repositories, std::string_view resource_name) noexcept ->
 			std::optional<std::pair<std::string, std::filesystem::path>>
@@ -68,14 +62,9 @@ namespace ion::resources
 				Events
 			*/
 
-			virtual bool IsResourcesEquivalent(const ResourceT &lhs, const ResourceT &rhs) noexcept override
-			{
-				return file_resource_manager::detail::is_resources_equivalent(lhs, rhs);
-			}
-
 			virtual bool PrepareResource(ResourceT &resource) noexcept override
 			{
-				if (auto file = file_resource_manager::detail::file_data_from_resource_name(Repositories(), resource.Name()); file)
+				if (auto file = file_resource_manager::detail::file_data_from_resource_name(Repositories(), resource.AssetName()); file)
 				{
 					auto &[data, path] = *file;
 					resource.FileData(std::move(data), std::move(path));

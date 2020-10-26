@@ -19,14 +19,14 @@ namespace ion::timers
 	Creating
 */
 
-Timer& TimerManager::CreateTimer(duration interval)
+Timer& TimerManager::CreateTimer(std::string name, duration interval)
 {
-	return Create(interval);
+	return Create(std::move(name), interval);
 }
 
-Timer& TimerManager::CreateTimer(duration interval, events::Callback<void, Timer&> on_tick)
+Timer& TimerManager::CreateTimer(std::string name, duration interval, events::Callback<void, Timer&> on_tick)
 {
-	return Create(interval, on_tick);
+	return Create(std::move(name), interval, on_tick);
 }
 
 Timer& TimerManager::CreateTimer(const Timer &timer)

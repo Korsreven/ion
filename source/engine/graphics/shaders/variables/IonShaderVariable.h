@@ -35,14 +35,14 @@ namespace ion::graphics::shaders::variables
 	{
 		private:
 
-			std::string name_;
 			std::optional<int> location_;
 
 		public:
 
-			//Constructor
+			//Construct a new shader variable with the given name
+			//Name should be equal to the identifier name in the shader source
 			explicit ShaderVariable(std::string name) :
-				name_{std::move(name)}
+				managed::ManagedObject<ShaderProgram>{std::move(name)}
 			{
 				//Empty
 			}
@@ -65,12 +65,6 @@ namespace ion::graphics::shaders::variables
 			/*
 				Observers
 			*/
-
-			//Returns the name of the shader variable as written in the shader source
-			[[nodiscard]] inline auto& Name() const noexcept
-			{
-				return name_;
-			}
 
 			//Returns the location of the shader variable
 			//Returns nullopt if the variable could not be located in the shader source

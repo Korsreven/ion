@@ -345,12 +345,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Textures
 			ion::graphics::textures::TextureManager textures;
 			textures.CreateRepository(std::move(image_repository));
-			auto &rikku_texture = textures.CreateTexture("rikku.png");
-			auto &rikku_np2_texture = textures.CreateTexture("rikku_np2.png");
-			auto &cloud_texture = textures.CreateTexture("cloud.png");
-			auto &cloud_np2_texture = textures.CreateTexture("cloud_np2.png");
-			auto &background_texture = textures.CreateTexture("background.jpg");
-			auto &background_np2_texture = textures.CreateTexture("background_np2.jpg");
+			auto &rikku_texture = textures.CreateTexture("rikku", "rikku.png");
+			auto &rikku_np2_texture = textures.CreateTexture("rikku_np2", "rikku_np2.png");
+			auto &cloud_texture = textures.CreateTexture("cloud", "cloud.png");
+			auto &cloud_np2_texture = textures.CreateTexture("cloud_np2", "cloud_np2.png");
+			auto &background_texture = textures.CreateTexture("background", "background.jpg");
+			auto &background_np2_texture = textures.CreateTexture("background_np2", "background_np2.jpg");
 			textures.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!textures.Loaded());
@@ -358,11 +358,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Frame sequences
 			ion::graphics::textures::FrameSequenceManager frame_sequences;
 			auto &frame_sequence = frame_sequences.CreateFrameSequence(
-				rikku_texture, cloud_texture, background_texture);
+				"misc", rikku_texture, cloud_texture, background_texture);
 
 			//Animation
 			auto animation = ion::graphics::textures::Animation::Looping(
-				frame_sequence, 6.0_sec, ion::graphics::textures::animation::PlaybackDirection::Alternate);
+				"alternate", frame_sequence, 6.0_sec, ion::graphics::textures::animation::PlaybackDirection::Alternate);
 			animation.RepeatCount(1);
 			animation.JumpForward(7.5_sec);
 			animation.RepeatCount({});
@@ -372,8 +372,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::graphics::shaders::ShaderManager shaders;
 			shaders.CreateRepository(std::move(shader_repository));
 			shaders.LogLevel(ion::graphics::shaders::shader_manager::InfoLogLevel::Error);
-			auto &vert_shader = shaders.CreateShader("default_particle.vert");
-			auto &frag_shader = shaders.CreateShader("default_particle.frag");
+			auto &vert_shader = shaders.CreateShader("default_particle_vert", "default_particle.vert");
+			auto &frag_shader = shaders.CreateShader("default_particle_frag", "default_particle.frag");
 			shaders.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!shaders.Loaded());
@@ -381,10 +381,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Font
 			ion::graphics::fonts::FontManager fonts;
 			fonts.CreateRepository(std::move(font_repository));
-			auto &verdana_regular_12 = fonts.CreateFont("verdana.ttf", 12);
-			auto &verdana_bold_12 = fonts.CreateFont("verdanab.ttf", 12);
-			auto &verdana_italic_12 = fonts.CreateFont("verdanai.ttf", 12);
-			auto &verdana_bold_italic_12 = fonts.CreateFont("verdanaz.ttf", 12);
+			auto &verdana_regular_12 = fonts.CreateFont("verdana_regular_12", "verdana.ttf", 12);
+			auto &verdana_bold_12 = fonts.CreateFont("verdana_bold_12", "verdanab.ttf", 12);
+			auto &verdana_italic_12 = fonts.CreateFont("verdana_italic_12", "verdanai.ttf", 12);
+			auto &verdana_bold_italic_12 = fonts.CreateFont("verdana_bold_italic_12", "verdanaz.ttf", 12);
 			fonts.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!fonts.Loaded());
@@ -393,6 +393,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::graphics::fonts::TypeFaceManager type_faces;
 			auto &verdana_12 = 
 				type_faces.CreateTypeFace(
+					"verdana_12",
 					verdana_regular_12,
 					verdana_bold_12,
 					verdana_italic_12,

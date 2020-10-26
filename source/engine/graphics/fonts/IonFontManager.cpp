@@ -179,12 +179,6 @@ void unload_font(int font_handle, const font::detail::container_type<int> &glyph
 	Events
 */
 
-bool FontManager::IsResourcesEquivalent(const Font &lhs, const Font &rhs) noexcept
-{
-	return detail::is_fonts_equivalent(lhs, rhs);
-}
-
-
 bool FontManager::PrepareResource(Font &font) noexcept
 {
 	if (this->FileResourceManager::PrepareResource(font))
@@ -263,32 +257,33 @@ FontManager::~FontManager() noexcept
 	Creating
 */
 
-Font& FontManager::CreateFont(std::string name, int size, int face_index,
+Font& FontManager::CreateFont(std::string name, std::string asset_name, int size, int face_index,
 	font::CharacterEncoding encoding, font::GlyphFilter min_filter, font::GlyphFilter mag_filter)
 {
-	return this->CreateResource(std::move(name), size, face_index, encoding, min_filter, mag_filter);
+	return this->CreateResource(std::move(name), std::move(asset_name), size, face_index, encoding, min_filter, mag_filter);
 }
 
-Font& FontManager::CreateFont(std::string name, int size, font::CharacterEncoding encoding,
-	font::GlyphFilter min_filter, font::GlyphFilter mag_filter)
+Font& FontManager::CreateFont(std::string name, std::string asset_name, int size,
+	font::CharacterEncoding encoding, font::GlyphFilter min_filter, font::GlyphFilter mag_filter)
 {
-	return this->CreateResource(std::move(name), size, encoding, min_filter, mag_filter);
+	return this->CreateResource(std::move(name), std::move(asset_name), size, encoding, min_filter, mag_filter);
 }
 
-Font& FontManager::CreateFont(std::string name, int size, font::CharacterEncoding encoding,
-	font::GlyphFilter filter)
+Font& FontManager::CreateFont(std::string name, std::string asset_name, int size,
+	font::CharacterEncoding encoding, font::GlyphFilter filter)
 {
-	return this->CreateResource(std::move(name), size, encoding, filter);
+	return this->CreateResource(std::move(name), std::move(asset_name), size, encoding, filter);
 }
 
-Font& FontManager::CreateFont(std::string name, int size, font::CharacterEncoding encoding)
+Font& FontManager::CreateFont(std::string name, std::string asset_name, int size,
+	font::CharacterEncoding encoding)
 {
-	return this->CreateResource(std::move(name), size, encoding);
+	return this->CreateResource(std::move(name), std::move(asset_name), size, encoding);
 }
 
-Font& FontManager::CreateFont(std::string name, int size)
+Font& FontManager::CreateFont(std::string name, std::string asset_name, int size)
 {
-	return this->CreateResource(std::move(name), size);
+	return this->CreateResource(std::move(name), std::move(asset_name), size);
 }
 
 

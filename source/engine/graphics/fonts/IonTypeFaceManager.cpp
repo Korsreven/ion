@@ -32,29 +32,29 @@ namespace type_face_manager::detail
 	Creating
 */
 
-TypeFace& TypeFaceManager::CreateTypeFace(Font &regular)
+TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular)
 {
-	return this->Create(std::ref(regular));
+	return this->Create(std::move(name), std::ref(regular));
 }
 
-TypeFace& TypeFaceManager::CreateTypeFace(Font &regular, Font &bold, std::nullptr_t)
+TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular, Font &bold, std::nullptr_t)
 {
-	return this->Create(std::ref(regular), std::ref(bold), nullptr);
+	return this->Create(std::move(name), std::ref(regular), std::ref(bold), nullptr);
 }
 
-TypeFace& TypeFaceManager::CreateTypeFace(Font &regular, std::nullptr_t, Font &italic)
+TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular, std::nullptr_t, Font &italic)
 {
-	return this->Create(std::ref(regular), nullptr, std::ref(italic));
+	return this->Create(std::move(name), std::ref(regular), nullptr, std::ref(italic));
 }
 
-TypeFace& TypeFaceManager::CreateTypeFace(Font &regular, Font &bold, Font &italic)
+TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular, Font &bold, Font &italic)
 {
-	return this->Create(std::ref(regular), std::ref(bold), std::ref(italic));
+	return this->Create(std::move(name), std::ref(regular), std::ref(bold), std::ref(italic));
 }
 
-TypeFace& TypeFaceManager::CreateTypeFace(Font &regular, Font &bold, Font &italic, Font &bold_italic)
+TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular, Font &bold, Font &italic, Font &bold_italic)
 {
-	return this->Create(std::ref(regular), std::ref(bold), std::ref(italic), std::ref(bold_italic));
+	return this->Create(std::move(name), std::ref(regular), std::ref(bold), std::ref(italic), std::ref(bold_italic));
 }
 
 

@@ -48,14 +48,14 @@ namespace ion::timers
 
 		public:
 
-			//Default constructor
-			Timer() = default;
+			//Constructs a new timer with the given name
+			explicit Timer(std::string name);
 
-			//Constructs a new timer from the given interval
-			Timer(duration interval) noexcept;
+			//Constructs a new timer with the given name and interval
+			Timer(std::string name, duration interval);
 
-			//Constructs a new timer from the given interval and callback
-			Timer(duration interval, events::Callback<void, Timer&> on_tick) noexcept;
+			//Constructs a new timer with the given name, interval and callback
+			Timer(std::string name, duration interval, events::Callback<void, Timer&> on_tick);
 
 
 			/*

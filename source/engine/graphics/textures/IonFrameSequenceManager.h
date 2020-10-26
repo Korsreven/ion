@@ -76,14 +76,14 @@ namespace ion::graphics::textures
 			Creating
 		*/
 
-		//Create a frame sequence with the given frames (textures)
-		FrameSequence& CreateFrameSequence(const frame_sequence::detail::container_type &frames);
+		//Create a frame sequence with the given name and frames (textures)
+		FrameSequence& CreateFrameSequence(std::string name, const frame_sequence::detail::container_type &frames);
 
-		//Create a frame sequence with the given frame references (textures)
+		//Create a frame sequence with the given name and frame references (textures)
 		template <typename... Tn, typename = std::enable_if_t<std::conjunction_v<std::is_same<Texture, Tn>...>>>
-		FrameSequence& CreateFrameSequence(Texture &frame, Tn &...rest)
+		FrameSequence& CreateFrameSequence(std::string name, Texture &frame, Tn &...rest)
 		{
-			return CreateFrameSequence({&frame, &rest...});
+			return CreateFrameSequence(std::move(name), {&frame, &rest...});
 		}
 
 

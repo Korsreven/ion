@@ -32,9 +32,9 @@ namespace frame_sequence_manager::detail
 	Creating
 */
 
-FrameSequence& FrameSequenceManager::CreateFrameSequence(const frame_sequence::detail::container_type &frames)
+FrameSequence& FrameSequenceManager::CreateFrameSequence(std::string name, const frame_sequence::detail::container_type &frames)
 {
-	return this->Create(frames);
+	return this->Create(std::move(name), frames);
 }
 
 

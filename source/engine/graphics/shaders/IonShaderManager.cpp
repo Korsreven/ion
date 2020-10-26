@@ -211,9 +211,9 @@ ShaderManager::~ShaderManager() noexcept
 	Creating
 */
 
-Shader& ShaderManager::CreateShader(std::string name)
+Shader& ShaderManager::CreateShader(std::string name, std::string asset_name)
 {
-	return this->CreateResource(std::move(name));
+	return this->CreateResource(std::move(name), std::move(asset_name));
 }
 
 

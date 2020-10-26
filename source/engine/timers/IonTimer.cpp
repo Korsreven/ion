@@ -19,13 +19,23 @@ using namespace timer;
 
 //Public
 
-Timer::Timer(duration interval) noexcept :
+Timer::Timer(std::string name) :
+	managed::ManagedObject<TimerManager>{std::move(name)}
+{
+	//Empty
+}
+
+Timer::Timer(std::string name, duration interval) :
+
+	managed::ManagedObject<TimerManager>{std::move(name)},
 	interval_{detail::valid_interval(interval)}
 {
 	//Empty
 }
 
-Timer::Timer(duration interval, events::Callback<void, Timer&> on_tick) noexcept :
+Timer::Timer(std::string name, duration interval, events::Callback<void, Timer&> on_tick) :
+
+	managed::ManagedObject<TimerManager>{std::move(name)},
 	interval_{detail::valid_interval(interval)},
 	on_tick_{std::in_place, std::move(on_tick)}
 {

@@ -319,7 +319,7 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 	input_controller_.emplace(*render_window_);
 
 	//Create a default viewport and connect to input
-	auto &viewport = render_window_->CreateViewport(graphics::render::Viewport{*render_window_});
+	auto &viewport = render_window_->CreateViewport(graphics::render::Viewport{"", *render_window_});
 	input_controller_->ConnectViewport(viewport);
 	
 	//Create a default ortographic frustum
@@ -328,7 +328,7 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 	frustum.BaseViewportHeight(viewport.Bounds().ToSize().Y());
 
 	//Create a default camera with frustum and connect to viewport
-	auto &camera = scene_manager_.CreateCamera(graphics::scene::Camera{frustum});
+	auto &camera = scene_manager_.CreateCamera(graphics::scene::Camera{"", frustum});
 	viewport.ConnectCamera(camera);
 
 	return *render_window_;

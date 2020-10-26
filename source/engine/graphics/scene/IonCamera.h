@@ -59,11 +59,11 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Default constructor
-			Camera() = default;
+			//Construct a camera with the given name
+			explicit Camera(std::string name);
 
-			//Construct a camera with a custom frustum
-			Camera(const render::Frustum &frustum) noexcept;
+			//Construct a camera with the given name and a custom frustum
+			Camera(std::string name, const render::Frustum &frustum);
 
 
 			/*

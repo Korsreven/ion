@@ -74,11 +74,11 @@ namespace ion::graphics::fonts
 
 		public:
 
-			//Construct a new font with the given name, size, face index, character encoding and glyph filter for min/mag
-			Font(std::string name, int size, int face_index, font::CharacterEncoding encoding,
+			//Construct a new font with the given name, asset name, size, face index, character encoding and glyph filter for min/mag
+			Font(std::string name, std::string asset_name, int size, int face_index, font::CharacterEncoding encoding,
 				font::GlyphFilter min_filter, font::GlyphFilter mag_filter) :
 
-				FileResource{std::move(name)},
+				FileResource{std::move(name), std::move(asset_name)},
 
 				size_{size},
 				face_index_{face_index},
@@ -90,28 +90,28 @@ namespace ion::graphics::fonts
 				//Empty
 			}
 
-			//Construct a new font with the given name, size, character encoding and glyph filter for min/mag
-			Font(std::string name, int size, font::CharacterEncoding encoding,
+			//Construct a new font with the given name, asset name, size, character encoding and glyph filter for min/mag
+			Font(std::string name, std::string asset_name, int size, font::CharacterEncoding encoding,
 				font::GlyphFilter min_filter, font::GlyphFilter mag_filter) :
 
-				Font{std::move(name), size, 0, encoding, min_filter, mag_filter}
+				Font{std::move(name), std::move(asset_name), size, 0, encoding, min_filter, mag_filter}
 			{
 				//Empty
 			}
 
-			//Construct a new font with the given name, size, character encoding and glyph filter
-			Font(std::string name, int size, font::CharacterEncoding encoding,
+			//Construct a new font with the given name, asset name, size, character encoding and glyph filter
+			Font(std::string name, std::string asset_name, int size, font::CharacterEncoding encoding,
 				font::GlyphFilter filter) :
 
-				Font{std::move(name), size, encoding, filter, filter}
+				Font{std::move(name), std::move(asset_name), size, encoding, filter, filter}
 			{
 				//Empty
 			}
 
-			//Construct a new font with the given name, size and character encoding
-			Font(std::string name, int size, font::CharacterEncoding encoding) :
+			//Construct a new font with the given name, asset name, size and character encoding
+			Font(std::string name, std::string asset_name, int size, font::CharacterEncoding encoding) :
 
-				FileResource{std::move(name)},
+				FileResource{std::move(name), std::move(asset_name)},
 
 				size_{size},
 				character_encoding_{encoding}
@@ -119,10 +119,10 @@ namespace ion::graphics::fonts
 				//Empty
 			}
 
-			//Construct a new font with the given name and size
-			Font(std::string name, int size) :
+			//Construct a new font with the given name, asset name and size
+			Font(std::string name, std::string asset_name, int size) :
 
-				FileResource{std::move(name)},
+				FileResource{std::move(name), std::move(asset_name)},
 				size_{size}
 			{
 				//Empty

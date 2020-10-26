@@ -17,32 +17,42 @@ namespace ion::graphics::fonts
 
 using namespace type_face;
 
-TypeFace::TypeFace(Font &regular) :
+TypeFace::TypeFace(std::string name, Font &regular) :
+
+	managed::ManagedObject<TypeFaceManager>{std::move(name)},
 	regular_font_{regular}
 {
 	//Empty
 }
 
-TypeFace::TypeFace(Font &regular, Font &bold, std::nullptr_t) :
+TypeFace::TypeFace(std::string name, Font &regular, Font &bold, std::nullptr_t) :
+
+	managed::ManagedObject<TypeFaceManager>{std::move(name)},
 	regular_font_{regular}
 {
 	BoldFont(bold);
 }
 
-TypeFace::TypeFace(Font &regular, std::nullptr_t, Font &italic) :
+TypeFace::TypeFace(std::string name, Font &regular, std::nullptr_t, Font &italic) :
+
+	managed::ManagedObject<TypeFaceManager>{std::move(name)},
 	regular_font_{regular}
 {
 	ItalicFont(italic);
 }
 
-TypeFace::TypeFace(Font &regular, Font &bold, Font &italic) :
+TypeFace::TypeFace(std::string name, Font &regular, Font &bold, Font &italic) :
+
+	managed::ManagedObject<TypeFaceManager>{std::move(name)},
 	regular_font_{regular}
 {
 	BoldFont(bold);
 	ItalicFont(italic);
 }
 
-TypeFace::TypeFace(Font &regular, Font &bold, Font &italic, Font &bold_italic) :
+TypeFace::TypeFace(std::string name, Font &regular, Font &bold, Font &italic, Font &bold_italic) :
+
+	managed::ManagedObject<TypeFaceManager>{std::move(name)},
 	regular_font_{regular}
 {
 	BoldFont(bold);

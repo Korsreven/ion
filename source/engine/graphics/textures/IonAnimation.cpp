@@ -136,10 +136,12 @@ void Animation::Previous() noexcept
 
 //Public
 
-Animation::Animation(FrameSequence &frame_sequence,
+Animation::Animation(std::string name, FrameSequence &frame_sequence,
 	duration cycle_duration, std::optional<int> repeat_count,
 	PlaybackDirection direction, real playback_rate) :
 	
+	managed::ManagedObject<scene::SceneManager>{std::move(name)},
+
 	frame_duration_{frame_sequence ? cycle_duration / frame_sequence.FrameCount() : 0.0_sec},
 	repeat_count_{repeat_count ? std::make_optional(std::pair{0, *repeat_count}) : std::nullopt},
 	direction_{direction},
@@ -152,10 +154,10 @@ Animation::Animation(FrameSequence &frame_sequence,
 	//Empty
 }
 
-Animation::Animation(FrameSequence &frame_sequence,
+Animation::Animation(std::string name, FrameSequence &frame_sequence,
 	duration cycle_duration, std::optional<int> repeat_count, real playback_rate) :
 
-	Animation{frame_sequence, cycle_duration, repeat_count, PlaybackDirection::Normal, playback_rate}
+	Animation{std::move(name), frame_sequence, cycle_duration, repeat_count, PlaybackDirection::Normal, playback_rate}
 {
 	//Empty
 }
@@ -165,29 +167,29 @@ Animation::Animation(FrameSequence &frame_sequence,
 	Static animation conversions
 */
 
-Animation Animation::Looping(FrameSequence &frame_sequence,
+Animation Animation::Looping(std::string name, FrameSequence &frame_sequence,
 	duration cycle_duration, PlaybackDirection direction, real playback_rate) noexcept
 {
-	return {frame_sequence, cycle_duration, std::nullopt, direction, playback_rate};
+	return {std::move(name), frame_sequence, cycle_duration, std::nullopt, direction, playback_rate};
 }
 
-Animation Animation::Looping(FrameSequence &frame_sequence,
+Animation Animation::Looping(std::string name, FrameSequence &frame_sequence,
 	duration cycle_duration, real playback_rate) noexcept
 {
-	return {frame_sequence, cycle_duration, std::nullopt, playback_rate};
+	return {std::move(name), frame_sequence, cycle_duration, std::nullopt, playback_rate};
 }
 
 
-Animation Animation::NonLooping(FrameSequence &frame_sequence,
+Animation Animation::NonLooping(std::string name, FrameSequence &frame_sequence,
 	duration cycle_duration, PlaybackDirection direction, real playback_rate) noexcept
 {
-	return {frame_sequence, cycle_duration, 0, direction, playback_rate};
+	return {std::move(name), frame_sequence, cycle_duration, 0, direction, playback_rate};
 }
 
-Animation Animation::NonLooping(FrameSequence &frame_sequence,
+Animation Animation::NonLooping(std::string name, FrameSequence &frame_sequence,
 	duration cycle_duration, real playback_rate) noexcept
 {
-	return {frame_sequence, cycle_duration, 0, playback_rate};
+	return {std::move(name), frame_sequence, cycle_duration, 0, playback_rate};
 }
 
 

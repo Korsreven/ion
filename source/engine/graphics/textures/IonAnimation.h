@@ -109,15 +109,15 @@ namespace ion::graphics::textures
 
 		public:
 
-			//Constructs a new animation with the given frames, cycle duration, repeat count, playback direction and rate
+			//Constructs a new animation with the given name, frames, cycle duration, repeat count, playback direction and rate
 			//Duplicate textures are allowed within an animation
-			Animation(FrameSequence &frame_sequence,
+			Animation(std::string name, FrameSequence &frame_sequence,
 				duration cycle_duration, std::optional<int> repeat_count = std::nullopt,
 				animation::PlaybackDirection direction = animation::PlaybackDirection::Normal, real playback_rate = 1.0_r);
 
-			//Constructs a new animation (in normal direction) with the given frames, cycle duration, repeat count and playback rate
+			//Constructs a new animation (in normal direction) with the given name, frames, cycle duration, repeat count and playback rate
 			//Duplicate textures are allowed within an animation
-			Animation(FrameSequence &frame_sequence,
+			Animation(std::string name, FrameSequence &frame_sequence,
 				duration cycle_duration, std::optional<int> repeat_count, real playback_rate);
 
 
@@ -125,25 +125,25 @@ namespace ion::graphics::textures
 				Static animation conversions
 			*/
 
-			//Returns a new looping animation from the given frames, cycle duration, playback direction and rate
+			//Returns a new looping animation with the given name, frames, cycle duration, playback direction and rate
 			//Duplicate textures are allowed within an animation
-			[[nodiscard]] static Animation Looping(FrameSequence &frame_sequence,
+			[[nodiscard]] static Animation Looping(std::string name, FrameSequence &frame_sequence,
 				duration cycle_duration, animation::PlaybackDirection direction, real playback_rate = 1.0_r) noexcept;
 
-			//Returns a new looping animation (in normal direction) from the given frames, cycle duration and playback rate
+			//Returns a new looping animation (in normal direction) with the given name, frames, cycle duration and playback rate
 			//Duplicate textures are allowed within an animation
-			[[nodiscard]] static Animation Looping(FrameSequence &frame_sequence,
+			[[nodiscard]] static Animation Looping(std::string name, FrameSequence &frame_sequence,
 				duration cycle_duration, real playback_rate = 1.0_r) noexcept;
 
 
-			//Returns a new non-looping animation from the given frames, cycle duration, playback direction and rate
+			//Returns a new non-looping animation with the given name, frames, cycle duration, playback direction and rate
 			//Duplicate textures are allowed within an animation
-			[[nodiscard]] static Animation NonLooping(FrameSequence &frame_sequence,
+			[[nodiscard]] static Animation NonLooping(std::string name, FrameSequence &frame_sequence,
 				duration cycle_duration, animation::PlaybackDirection direction, real playback_rate = 1.0_r) noexcept;
 
-			//Returns a new non-looping animation (in normal direction) from the given frames, cycle duration and playback rate
+			//Returns a new non-looping animation (in normal direction) with the given name, frames, cycle duration and playback rate
 			//Duplicate textures are allowed within an animation
-			[[nodiscard]] static Animation NonLooping(FrameSequence &frame_sequence,
+			[[nodiscard]] static Animation NonLooping(std::string name, FrameSequence &frame_sequence,
 				duration cycle_duration, real playback_rate = 1.0_r) noexcept;
 
 

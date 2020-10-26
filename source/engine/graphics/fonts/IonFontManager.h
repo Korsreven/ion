@@ -31,12 +31,6 @@ namespace ion::graphics::fonts
 	{
 		namespace detail
 		{
-			inline auto is_fonts_equivalent(const Font &lhs, const Font &rhs) noexcept
-			{
-				return lhs.Name() == rhs.Name() && lhs.Size() == rhs.Size() && lhs.FaceIndex() == rhs.FaceIndex() &&
-					lhs.CharacterEncoding() == rhs.CharacterEncoding() && lhs.GlyphFilter() == rhs.GlyphFilter();
-			}
-
 			std::optional<std::tuple<font::detail::container_type<std::string>, font::detail::container_type<font::GlyphExtents>, int>> prepare_font(
 				const std::string &file_data, int size, int face_index, font::CharacterEncoding encoding);
 
@@ -60,8 +54,6 @@ namespace ion::graphics::fonts
 			/*
 				Events
 			*/
-
-			bool IsResourcesEquivalent(const Font &lhs, const Font &rhs) noexcept override;
 
 			bool PrepareResource(Font &font) noexcept override;
 			bool LoadResource(Font &font) noexcept override;
@@ -124,23 +116,24 @@ namespace ion::graphics::fonts
 				Creating
 			*/
 
-			//Create a font with the given name, size, face index, character encoding and glyph min/mag filter
-			Font& CreateFont(std::string name, int size, int face_index,
+			//Create a font with the given name, asset name, size, face index, character encoding and glyph min/mag filter
+			Font& CreateFont(std::string name, std::string asset_name, int size, int face_index,
 				font::CharacterEncoding encoding, font::GlyphFilter min_filter, font::GlyphFilter mag_filter);
 
-			//Create a font with the given name, size, character encoding and glyph min/mag filter
-			Font& CreateFont(std::string name, int size, font::CharacterEncoding encoding,
-				font::GlyphFilter min_filter, font::GlyphFilter mag_filter);
+			//Create a font with the given name, asset name, size, character encoding and glyph min/mag filter
+			Font& CreateFont(std::string name, std::string asset_name, int size,
+				font::CharacterEncoding encoding, font::GlyphFilter min_filter, font::GlyphFilter mag_filter);
 
-			//Create a font with the given name, size, character encoding and glyph filter
-			Font& CreateFont(std::string name, int size, font::CharacterEncoding encoding,
-				font::GlyphFilter filter);
+			//Create a font with the given name, asset name, size, character encoding and glyph filter
+			Font& CreateFont(std::string name, std::string asset_name, int size,
+				font::CharacterEncoding encoding, font::GlyphFilter filter);
 
-			//Create a font with the given name, size and character encoding
-			Font& CreateFont(std::string name, int size, font::CharacterEncoding encoding);
+			//Create a font with the given name, asset name, size and character encoding
+			Font& CreateFont(std::string name, std::string asset_name, int size,
+				font::CharacterEncoding encoding);
 
-			//Create a font with the given name and size
-			Font& CreateFont(std::string name, int size);
+			//Create a font with the given name, asset name and size
+			Font& CreateFont(std::string name, std::string asset_name, int size);
 
 
 			/*

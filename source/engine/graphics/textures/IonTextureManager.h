@@ -170,11 +170,6 @@ namespace ion::graphics::textures
 			}
 
 
-			inline auto is_textures_equivalent(const Texture &lhs, const Texture &rhs) noexcept
-			{
-				return lhs.Name() == rhs.Name() && lhs.Filter() == rhs.Filter() && lhs.WrapMode() == rhs.WrapMode();
-			}
-
 			std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 				const std::string &file_data, const std::filesystem::path &file_path,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter,
@@ -204,8 +199,6 @@ namespace ion::graphics::textures
 			/*
 				Events
 			*/
-
-			bool IsResourcesEquivalent(const Texture &lhs, const Texture &rhs) noexcept override;
 
 			bool PrepareResource(Texture &texture) noexcept override;
 			bool LoadResource(Texture &texture) noexcept override;
@@ -317,21 +310,21 @@ namespace ion::graphics::textures
 				Creating
 			*/
 
-			//Create a texture with the given name
-			Texture& CreateTexture(std::string name);
+			//Create a texture with the given name and asset name
+			Texture& CreateTexture(std::string name, std::string asset_name);
 
-			//Create a texture with the given name, texture filter for min/mag, mip filter and texture wrap for s/t
-			Texture& CreateTexture(std::string name,
+			//Create a texture with the given name, asset name, texture filter for min/mag, mip filter and texture wrap for s/t
+			Texture& CreateTexture(std::string name, std::string asset_name,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode);
 
-			//Create a texture with the given name, texture filter, mip filter and texture wrap
-			Texture& CreateTexture(std::string name,
+			//Create a texture with the given name, asset name, texture filter, mip filter and texture wrap
+			Texture& CreateTexture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::MipmapFilter mip_filter,
 				texture::TextureWrapMode wrap_mode);
 
-			//Create a texture with the given name, texture filter and texture wrap (no mipmap)
-			Texture& CreateTexture(std::string name,
+			//Create a texture with the given name, asset name, texture filter and texture wrap (no mipmap)
+			Texture& CreateTexture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode);
 
 

@@ -59,8 +59,7 @@ namespace ion::resources
 
 		public:
 
-			//Default Constructor
-			Resource() = default;
+			using managed::ManagedObject<T>::ManagedObject;
 
 
 			/*

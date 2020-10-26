@@ -60,7 +60,8 @@ void FrameSequence::ClearFrames() noexcept
 
 //Public
 
-FrameSequence::FrameSequence(const detail::container_type &frames)
+FrameSequence::FrameSequence(std::string name, const detail::container_type &frames) :
+	managed::ManagedObject<FrameSequenceManager>{std::move(name)}
 {
 	AddFrames(frames);
 }

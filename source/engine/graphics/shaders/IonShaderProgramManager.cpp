@@ -806,14 +806,14 @@ ShaderProgramManager::~ShaderProgramManager() noexcept
 	Creating
 */
 
-ShaderProgram& ShaderProgramManager::CreateShaderProgram(Shader &shader)
+ShaderProgram& ShaderProgramManager::CreateShaderProgram(std::string name, Shader &shader)
 {
-	return this->CreateResource(std::ref(shader));
+	return this->CreateResource(std::move(name), std::ref(shader));
 }
 
-ShaderProgram& ShaderProgramManager::CreateShaderProgram(Shader &vertex_shader, Shader &fragment_shader)
+ShaderProgram& ShaderProgramManager::CreateShaderProgram(std::string name, Shader &vertex_shader, Shader &fragment_shader)
 {
-	return this->CreateResource(std::ref(vertex_shader), std::ref(fragment_shader));
+	return this->CreateResource(std::move(name), std::ref(vertex_shader), std::ref(fragment_shader));
 }
 
 

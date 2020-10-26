@@ -15,14 +15,16 @@ File:	IonShaderProgram.cpp
 namespace ion::graphics::shaders
 {
 
-ShaderProgram::ShaderProgram(Shader &shader)
+ShaderProgram::ShaderProgram(std::string name, Shader &shader) :
+	resources::Resource<ShaderProgramManager>{std::move(name)}
 {
 	//The given shader can either be a vertex or a fragment shader, try both
 	VertexShader(shader);
 	FragmentShader(shader);
 }
 
-ShaderProgram::ShaderProgram(Shader &vertex_shader, Shader &fragment_shader)
+ShaderProgram::ShaderProgram(std::string name, Shader &vertex_shader, Shader &fragment_shader) :
+	resources::Resource<ShaderProgramManager>{std::move(name)}
 {
 	//The given shaders much match the correct shader type
 	VertexShader(vertex_shader);

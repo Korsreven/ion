@@ -307,12 +307,6 @@ void unload_texture(int texture_handle) noexcept
 	Events
 */
 
-bool TextureManager::IsResourcesEquivalent(const Texture &lhs, const Texture &rhs) noexcept
-{
-	return detail::is_textures_equivalent(lhs, rhs);
-}
-
-
 bool TextureManager::PrepareResource(Texture &texture) noexcept
 {
 	if (this->FileResourceManager::PrepareResource(texture))
@@ -400,29 +394,29 @@ TextureManager::~TextureManager() noexcept
 	Creating
 */
 
-Texture& TextureManager::CreateTexture(std::string name)
+Texture& TextureManager::CreateTexture(std::string name, std::string asset_name)
 {
-	return this->CreateResource(std::move(name));
+	return this->CreateResource(std::move(name), std::move(asset_name));
 }
 
-Texture& TextureManager::CreateTexture(std::string name,
+Texture& TextureManager::CreateTexture(std::string name, std::string asset_name,
 	texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 	texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode)
 {
-	return this->CreateResource(std::move(name), min_filter, mag_filter, mip_filter, s_wrap_mode, t_wrap_mode);
+	return this->CreateResource(std::move(name), std::move(asset_name), min_filter, mag_filter, mip_filter, s_wrap_mode, t_wrap_mode);
 }
 
-Texture& TextureManager::CreateTexture(std::string name,
+Texture& TextureManager::CreateTexture(std::string name, std::string asset_name,
 	texture::TextureFilter filter, texture::MipmapFilter mip_filter,
 	texture::TextureWrapMode wrap_mode)
 {
-	return this->CreateResource(std::move(name), filter, mip_filter, wrap_mode);
+	return this->CreateResource(std::move(name), std::move(asset_name), filter, mip_filter, wrap_mode);
 }
 
-Texture& TextureManager::CreateTexture(std::string name,
+Texture& TextureManager::CreateTexture(std::string name, std::string asset_name,
 	texture::TextureFilter filter, texture::TextureWrapMode wrap_mode)
 {
-	return this->CreateResource(std::move(name), filter, wrap_mode);
+	return this->CreateResource(std::move(name), std::move(asset_name), filter, wrap_mode);
 }
 
 

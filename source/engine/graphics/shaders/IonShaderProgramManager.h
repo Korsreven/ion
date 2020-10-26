@@ -327,11 +327,11 @@ namespace ion::graphics::shaders
 				Creating
 			*/
 
-			//Create a shader program with the given shader
-			ShaderProgram& CreateShaderProgram(Shader &shader);
+			//Create a shader program with the given name and a shader
+			ShaderProgram& CreateShaderProgram(std::string name, Shader &shader);
 
-			//Create a shader program with the given vertex and fragment shader
-			ShaderProgram& CreateShaderProgram(Shader &vertex_shader, Shader &fragment_shader);
+			//Create a shader program with the given name, a vertex and fragment shader
+			ShaderProgram& CreateShaderProgram(std::string name, Shader &vertex_shader, Shader &fragment_shader);
 
 
 			/*

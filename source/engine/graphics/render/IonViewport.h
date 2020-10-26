@@ -116,14 +116,14 @@ namespace ion::graphics::render
 
 		public:
 
-			//Construct a viewport connected to a given render target
-			Viewport(RenderTarget &render_target) noexcept;
+			//Construct a viewport with the given name and connected to a given render target
+			Viewport(std::string name, RenderTarget &render_target) noexcept;
 
-			//Construct a viewport connected to a given render target and with the given bounds (region)
-			Viewport(RenderTarget &render_target, const Aabb &bounds) noexcept;
+			//Construct a viewport with the given name, connected to a given render target and with the given bounds (region)
+			Viewport(std::string name, RenderTarget &render_target, const Aabb &bounds) noexcept;
 
-			//Construct a viewport connected to a given render target and with the given bounds (region) and anchors
-			Viewport(RenderTarget &render_target, const Aabb &bounds,
+			//Construct a viewport with the given name, connected to a given render target and with the given bounds (region) and anchors
+			Viewport(std::string name, RenderTarget &render_target, const Aabb &bounds,
 				viewport::HorizontalAnchorType left_anchor, viewport::HorizontalAnchorType right_anchor,
 				viewport::VerticalAnchorType top_anchor, viewport::VerticalAnchorType bottom_anchor) noexcept;
 
@@ -132,54 +132,54 @@ namespace ion::graphics::render
 				Static viewport conversions
 			*/
 
-			//Returns a new aligned viewport from the given render target, alignment and size
-			[[nodiscard]] static Viewport Aligned(RenderTarget &render_target, viewport::AlignmentType alignment, const Vector2 &size) noexcept;
+			//Returns a new aligned viewport with the given name, render target, alignment and size
+			[[nodiscard]] static Viewport Aligned(std::string name, RenderTarget &render_target, viewport::AlignmentType alignment, const Vector2 &size) noexcept;
 
-			//Returns a new aligned viewport from the given render target, alignment and width/height percent
+			//Returns a new aligned viewport with the given name, render target, alignment and width/height percent
 			//Width and height should be in range [0.0, 1.0]
-			[[nodiscard]] static Viewport Aligned(RenderTarget &render_target, viewport::AlignmentType alignment, real width_percent, real height_percent) noexcept;
+			[[nodiscard]] static Viewport Aligned(std::string name, RenderTarget &render_target, viewport::AlignmentType alignment, real width_percent, real height_percent) noexcept;
 
 
-			//Returns a new left aligned viewport from the given render target and width percent
-			[[nodiscard]] static Viewport LeftAligned(RenderTarget &render_target, real width_percent) noexcept;
+			//Returns a new left aligned viewport with the given name, render target and width percent
+			[[nodiscard]] static Viewport LeftAligned(std::string name, RenderTarget &render_target, real width_percent) noexcept;
 
-			//Returns a new right aligned viewport from the given render target and width percent
-			[[nodiscard]] static Viewport RightAligned(RenderTarget &render_target, real width_percent) noexcept;
+			//Returns a new right aligned viewport with the given name, render target and width percent
+			[[nodiscard]] static Viewport RightAligned(std::string name, RenderTarget &render_target, real width_percent) noexcept;
 
-			//Returns a new top aligned viewport from the given render target and height percent
-			[[nodiscard]] static Viewport TopAligned(RenderTarget &render_target, real height_percent) noexcept;
+			//Returns a new top aligned viewport with the given name, render target and height percent
+			[[nodiscard]] static Viewport TopAligned(std::string name, RenderTarget &render_target, real height_percent) noexcept;
 
-			//Returns a new bottom aligned viewport from the given render target and height percent
-			[[nodiscard]] static Viewport BottomAligned(RenderTarget &render_target, real height_percent) noexcept;
+			//Returns a new bottom aligned viewport with the given name, render target and height percent
+			[[nodiscard]] static Viewport BottomAligned(std::string name, RenderTarget &render_target, real height_percent) noexcept;
 
 
-			//Returns a new top left aligned viewport from the given render target and size
-			[[nodiscard]] static Viewport TopLeftAligned(RenderTarget &render_target, const Vector2 &size) noexcept;
+			//Returns a new top left aligned viewport with the given name, render target and size
+			[[nodiscard]] static Viewport TopLeftAligned(std::string name, RenderTarget &render_target, const Vector2 &size) noexcept;
 
-			//Returns a new top left aligned viewport from the given render target and width/height percent
+			//Returns a new top left aligned viewport with the given name, render target and width/height percent
 			//Width and height should be in range [0.0, 1.0]
-			[[nodiscard]] static Viewport TopLeftAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept;
+			[[nodiscard]] static Viewport TopLeftAligned(std::string name, RenderTarget &render_target, real width_percent, real height_percent) noexcept;
 
-			//Returns a new top right aligned viewport from the given render target and size
-			[[nodiscard]] static Viewport TopRightAligned(RenderTarget &render_target, const Vector2 &size) noexcept;
+			//Returns a new top right aligned viewport with the given name, render target and size
+			[[nodiscard]] static Viewport TopRightAligned(std::string name, RenderTarget &render_target, const Vector2 &size) noexcept;
 
-			//Returns a new top right aligned viewport from the given render target and width/height percent
+			//Returns a new top right aligned viewport with the given name, render target and width/height percent
 			//Width and height should be in range [0.0, 1.0]
-			[[nodiscard]] static Viewport TopRightAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept;
+			[[nodiscard]] static Viewport TopRightAligned(std::string name, RenderTarget &render_target, real width_percent, real height_percent) noexcept;
 
-			//Returns a new bottom left aligned viewport from the given render target and size
-			[[nodiscard]] static Viewport BottomLeftAligned(RenderTarget &render_target, const Vector2 &size) noexcept;
+			//Returns a new bottom left aligned viewport with the given name, render target and size
+			[[nodiscard]] static Viewport BottomLeftAligned(std::string name, RenderTarget &render_target, const Vector2 &size) noexcept;
 
-			//Returns a new bottom left aligned viewport from the given render target and width/height percent
+			//Returns a new bottom left aligned viewport with the given name, render target and width/height percent
 			//Width and height should be in range [0.0, 1.0]
-			[[nodiscard]] static Viewport BottomLeftAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept;
+			[[nodiscard]] static Viewport BottomLeftAligned(std::string name, RenderTarget &render_target, real width_percent, real height_percent) noexcept;
 
-			//Returns a new bottom right aligned viewport from the given render target and size
-			[[nodiscard]] static Viewport BottomRightAligned(RenderTarget &render_target, const Vector2 &size) noexcept;
+			//Returns a new bottom right aligned viewport with the given name, render target and size
+			[[nodiscard]] static Viewport BottomRightAligned(std::string name, RenderTarget &render_target, const Vector2 &size) noexcept;
 
-			//Returns a new bottom right aligned viewport from the given render target and width/height percent
+			//Returns a new bottom right aligned viewport with the given name, render target and width/height percent
 			//Width and height should be in range [0.0, 1.0]
-			[[nodiscard]] static Viewport BottomRightAligned(RenderTarget &render_target, real width_percent, real height_percent) noexcept;
+			[[nodiscard]] static Viewport BottomRightAligned(std::string name, RenderTarget &render_target, real width_percent, real height_percent) noexcept;
 
 
 			/*

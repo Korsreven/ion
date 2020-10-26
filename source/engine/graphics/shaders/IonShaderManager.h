@@ -132,8 +132,8 @@ namespace ion::graphics::shaders
 				Creating
 			*/
 
-			//Create a shader with the given name
-			Shader& CreateShader(std::string name);
+			//Create a shader with the given name and asset name
+			Shader& CreateShader(std::string name, std::string asset_name);
 
 
 			/*

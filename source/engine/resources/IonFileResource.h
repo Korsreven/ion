@@ -26,15 +26,18 @@ namespace ion::resources
 	{
 		private:
 
-			std::string name_;		
+			std::string asset_name_;
 			std::optional<std::string> file_data_;
 			std::optional<std::filesystem::path> file_path_;
 
 		public:
 
-			//Constructs a new file resource with the given name
-			explicit FileResource(std::string name) :
-				name_{std::move(name)}
+			//Constructs a new file resource with the given name and asset name
+			//Asset name could be a file name or an entire file path
+			FileResource(std::string name, std::string asset_name) :
+
+				Resource<T>{std::move(name)},
+				asset_name_{std::move(asset_name)}
 			{
 				//Empty
 			}
@@ -62,10 +65,11 @@ namespace ion::resources
 				Observers
 			*/
 
-			//Returns the name of the file resource (could be a file name or an entire path)
-			[[nodiscard]] inline auto& Name() const noexcept
+			//Returns the asset name of the file resource
+			//Asset name could be a file name or an entire file path
+			[[nodiscard]] inline auto& AssetName() const noexcept
 			{
-				return name_;
+				return asset_name_;
 			}
 
 			//Returns the file data of the file resource
