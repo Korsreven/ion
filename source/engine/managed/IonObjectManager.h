@@ -125,7 +125,6 @@ namespace ion::managed
 				Creating
 			*/
 
-			//Emplace an object with the given arguments
 			template <typename... Args>
 			auto& Emplace(Args &&...args)
 			{
@@ -213,15 +212,15 @@ namespace ion::managed
 					return Emplace(std::move(name), std::forward<Args>(args)...);
 			}
 
-			//Create an object with the given argument
+			//Create an object by copying/moving the given object
 			template <typename T, typename = std::enable_if_t<std::is_same_v<std::remove_cvref_t<T>, ObjectT>>>
-			auto& Create(T &&arg)
+			auto& Create(T &&object)
 			{
 				//Check if an object with that name already exists
-				if (auto ptr = object_manager::detail::get_object_by_name(arg.Name(), objects_); ptr)
+				if (auto ptr = object_manager::detail::get_object_by_name(object.Name(), objects_); ptr)
 					return *ptr;
 				else
-					return Emplace(std::forward<T>(arg));
+					return Emplace(std::forward<T>(object));
 			}
 
 
@@ -451,35 +450,18 @@ namespace ion::managed
 
 
 			/*
-				Creating
-			*/
-
-			//Create an object as a copy of the given object
-			auto& Create(const ObjectT &object)
-			{
-				return Create<decltype(object)>(object);
-			}
-
-			//Create an object by moving the given object
-			auto& Create(ObjectT &&object)
-			{
-				return Create<decltype(object)>(std::move(object));
-			}
-
-
-			/*
 				Retrieving
 			*/
 
-			//Returns a pointer to a mutable object with the given name
-			//Returns nullptr if no object could be found
+			//Gets a pointer to a mutable object with the given name
+			//Returns nullptr if object could not be found
 			[[nodiscard]] auto Get(std::string_view name) noexcept
 			{
 				return object_manager::detail::get_object_by_name(name, objects_);
 			}
 
-			//Returns a pointer to an immutable object with the given name
-			//Returns nullptr if no object could be found
+			//Gets a pointer to an immutable object with the given name
+			//Returns nullptr if object could not be found
 			[[nodiscard]] const auto Get(std::string_view name) const noexcept
 			{
 				return object_manager::detail::get_object_by_name(name, objects_);
@@ -503,7 +485,7 @@ namespace ion::managed
 				return !!ptr;
 			}
 
-			//Remove a removable object from this manager with the given name
+			//Remove a removable object with the given name from this manager
 			auto Remove(std::string_view name) noexcept
 			{
 				if (auto ptr = Get(name); ptr)

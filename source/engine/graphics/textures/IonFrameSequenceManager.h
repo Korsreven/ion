@@ -14,6 +14,8 @@ File:	IonFrameSequenceManager.h
 #define ION_FRAME_SEQUENCE_MANAGER_H
 
 #include <type_traits>
+#include <string>
+#include <string_view>
 
 #include "IonFrameSequence.h"
 #include "managed/IonObjectManager.h"
@@ -87,6 +89,27 @@ namespace ion::graphics::textures
 		}
 
 
+		//Create a frame sequence as a copy of the given frame sequence
+		FrameSequence& CreateFrameSequence(const FrameSequence &frame_sequence);
+
+		//Create a frame sequence by moving the given frame sequence
+		FrameSequence& CreateFrameSequence(FrameSequence &&frame_sequence);
+
+
+		/*
+			Frame sequences
+			Retrieving
+		*/
+
+		//Gets a pointer to a mutable frame sequence with the given name
+		//Returns nullptr if frame sequence could not be found
+		[[nodiscard]] FrameSequence* GetFrameSequence(std::string_view name) noexcept;
+
+		//Gets a pointer to an immutable frame sequence with the given name
+		//Returns nullptr if frame sequence could not be found
+		[[nodiscard]] const FrameSequence* GetFrameSequence(std::string_view name) const noexcept;
+
+
 		/*
 			Frame sequences
 			Removing
@@ -97,6 +120,9 @@ namespace ion::graphics::textures
 
 		//Remove a removable frame sequence from this manager
 		bool RemoveFrameSequence(FrameSequence &frame_sequences) noexcept;
+
+		//Remove a removable frame sequence with the given name from this manager
+		bool RemoveFrameSequence(std::string_view name) noexcept;
 	};
 } //ion::graphics::textures
 

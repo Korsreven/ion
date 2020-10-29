@@ -217,6 +217,33 @@ Shader& ShaderManager::CreateShader(std::string name, std::string asset_name)
 }
 
 
+Shader& ShaderManager::CreateShader(const Shader &shader)
+{
+	return CreateResource(shader);
+}
+
+Shader& ShaderManager::CreateShader(Shader &&shader)
+{
+	return CreateResource(std::move(shader));
+}
+
+
+/*
+	Shaders
+	Retrieving
+*/
+
+Shader* ShaderManager::GetShader(std::string_view name) noexcept
+{
+	return GetResource(name);
+}
+
+const Shader* ShaderManager::GetShader(std::string_view name) const noexcept
+{
+	return GetResource(name);
+}
+
+
 /*
 	Shaders
 	Removing
@@ -224,12 +251,17 @@ Shader& ShaderManager::CreateShader(std::string name, std::string asset_name)
 
 void ShaderManager::ClearShaders() noexcept
 {
-	this->ClearResources();
+	ClearResources();
 }
 
 bool ShaderManager::RemoveShader(Shader &shader) noexcept
 {
-	return this->RemoveResource(shader);
+	return RemoveResource(shader);
+}
+
+bool ShaderManager::RemoveShader(std::string_view name) noexcept
+{
+	return RemoveResource(name);
 }
 
 

@@ -15,6 +15,7 @@ File:	IonResourceManager.h
 
 #include <optional>
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 #include "IonResource.h"
@@ -813,6 +814,26 @@ namespace ion::resources
 
 			/*
 				Resources
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable resource with the given name
+			//Returns nullptr if resource could not be found
+			[[nodiscard]] auto GetResource(std::string_view name) noexcept
+			{
+				return this->Get(name);
+			}
+
+			//Gets a pointer to an immutable resource with the given name
+			//Returns nullptr if resource could not be found
+			[[nodiscard]] const auto GetResource(std::string_view name) const noexcept
+			{
+				return this->Get(name);
+			}
+
+
+			/*
+				Resources
 				Removing
 			*/
 
@@ -826,6 +847,12 @@ namespace ion::resources
 			auto RemoveResource(ResourceT &resource) noexcept
 			{
 				return this->Remove(resource);
+			}
+
+			//Remove a removable resource with the given name from this manager
+			auto RemoveResource(std::string_view name) noexcept
+			{
+				return this->Remove(name);
 			}
 	};
 } //ion::resources

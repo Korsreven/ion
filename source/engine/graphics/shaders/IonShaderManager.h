@@ -16,6 +16,7 @@ File:	IonShaderManager.h
 #include <filesystem>
 #include <optional>
 #include <string>
+#include <string_view>
 
 #include "IonShader.h"
 #include "assets/repositories/IonShaderRepository.h"
@@ -136,6 +137,27 @@ namespace ion::graphics::shaders
 			Shader& CreateShader(std::string name, std::string asset_name);
 
 
+			//Create a shader as a copy of the given shader
+			Shader& CreateShader(const Shader &shader);
+
+			//Create a shader by moving the given shader
+			Shader& CreateShader(Shader &&shader);
+
+
+			/*
+				Shaders
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable shader with the given name
+			//Returns nullptr if shader could not be found
+			[[nodiscard]] Shader* GetShader(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable shader with the given name
+			//Returns nullptr if shader could not be found
+			[[nodiscard]] const Shader* GetShader(std::string_view name) const noexcept;
+
+
 			/*
 				Shaders
 				Removing
@@ -146,6 +168,9 @@ namespace ion::graphics::shaders
 
 			//Remove a removable shader from this manager
 			bool RemoveShader(Shader &shader) noexcept;
+
+			//Remove a removable shader with the given name from this manager
+			bool RemoveShader(std::string_view name) noexcept;
 
 
 			/*

@@ -23,9 +23,14 @@ namespace scene_manager::detail
 
 
 /*
-	Camera
+	Cameras
 	Creating
 */
+
+Camera& SceneManager::CreateCamera(const Camera &camera)
+{
+	return Create(camera);
+}
 
 Camera& SceneManager::CreateCamera(Camera &&camera)
 {
@@ -34,7 +39,23 @@ Camera& SceneManager::CreateCamera(Camera &&camera)
 
 
 /*
-	Camera
+	Cameras
+	Retrieving
+*/
+
+Camera* SceneManager::GetCamera(std::string_view name) noexcept
+{
+	return Get(name);
+}
+
+const Camera* SceneManager::GetCamera(std::string_view name) const noexcept
+{
+	return Get(name);
+}
+
+
+/*
+	Cameras
 	Removing
 */
 
@@ -46,6 +67,11 @@ void SceneManager::ClearCameras() noexcept
 bool SceneManager::RemoveCamera(Camera &camera) noexcept
 {
 	return Remove(camera);
+}
+
+bool SceneManager::RemoveCamera(std::string_view name) noexcept
+{
+	return Remove(name);
 }
 
 } //ion::graphics::scene

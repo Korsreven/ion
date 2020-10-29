@@ -155,7 +155,7 @@ namespace ion::resources
 			}
 
 			//Create a repository by copying/moving the given repository
-			template <typename T>
+			template <typename T, typename = std::enable_if_t<std::is_same_v<std::remove_cvref_t<T>, RepositoryT>>>
 			auto& CreateRepository(T &&repository)
 			{
 				return this->RepositoryBase::Create(std::forward<T>(repository));
@@ -167,13 +167,13 @@ namespace ion::resources
 				Removing
 			*/
 
-			//Clear all repositories from this manager
+			//Clear all repositories from this factory
 			void ClearRepositories() noexcept
 			{
 				this->RepositoryBase::Clear();
 			}
 
-			//Remove a repository from this manager
+			//Remove a repository from this factory
 			auto RemoveRepository(RepositoryT &repository) noexcept
 			{
 				return this->RepositoryBase::Remove(repository);

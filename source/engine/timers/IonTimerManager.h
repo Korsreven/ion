@@ -13,6 +13,9 @@ File:	IonTimerManager.h
 #ifndef ION_TIMER_MANAGER_H
 #define ION_TIMER_MANAGER_H
 
+#include <string>
+#include <string_view>
+
 #include "IonTimer.h"
 #include "managed/IonObjectManager.h"
 
@@ -66,23 +69,40 @@ namespace ion::timers
 
 
 		/*
+			Timers
 			Creating
 		*/
 
-		//Creates a timer with the given name and interval
-		//Returns a reference to the newly created timer
+		//Create a timer with the given name and interval
 		Timer& CreateTimer(std::string name, duration interval);
 
-		//Creates a timer with the given name, interval and callback
-		//Returns a reference to the newly created timer
+		//Create a timer with the given name, interval and callback
 		Timer& CreateTimer(std::string name, duration interval, events::Callback<void, Timer&> on_tick);
 
-		//Creates a copy of the given timer
-		//Returns a reference to the newly created timer
+
+		//Create a timer as a copy of the given timer
 		Timer& CreateTimer(const Timer &timer);
+
+		//Create a timer by moving the given timer
+		Timer& CreateTimer(Timer &&timer);
 
 
 		/*
+			Timers
+			Retrieving
+		*/
+
+		//Gets a pointer to a mutable timer with the given name
+		//Returns nullptr if timer could not be found
+		[[nodiscard]] Timer* GetTimer(std::string_view name) noexcept;
+
+		//Gets a pointer to an immutable timer with the given name
+		//Returns nullptr if timer could not be found
+		[[nodiscard]] const Timer* GetTimer(std::string_view name) const noexcept;
+
+
+		/*
+			Timers
 			Removing
 		*/
 
@@ -91,6 +111,9 @@ namespace ion::timers
 
 		//Remove a removable timer from this manager
 		bool RemoveTimer(Timer &timer) noexcept;
+
+		//Remove a removable timer with the given name from this manager
+		bool RemoveTimer(std::string_view name) noexcept;
 
 
 		/*

@@ -16,6 +16,7 @@ namespace ion::timers
 {
 
 /*
+	Timers
 	Creating
 */
 
@@ -34,8 +35,30 @@ Timer& TimerManager::CreateTimer(const Timer &timer)
 	return Create(timer);
 }
 
+Timer& TimerManager::CreateTimer(Timer &&timer)
+{
+	return Create(std::move(timer));
+}
+
 
 /*
+	Timers
+	Retrieving
+*/
+
+Timer* TimerManager::GetTimer(std::string_view name) noexcept
+{
+	return Get(name);
+}
+
+const Timer* TimerManager::GetTimer(std::string_view name) const noexcept
+{
+	return Get(name);
+}
+
+
+/*
+	Timers
 	Removing
 */
 
@@ -47,6 +70,11 @@ void TimerManager::ClearTimers() noexcept
 bool TimerManager::RemoveTimer(Timer &timer) noexcept
 {
 	return Remove(timer);
+}
+
+bool TimerManager::RemoveTimer(std::string_view name) noexcept
+{
+	return Remove(name);
 }
 
 

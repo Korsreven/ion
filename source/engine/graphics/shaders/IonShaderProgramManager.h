@@ -16,6 +16,7 @@ File:	IonShaderProgramManager.h
 #include <filesystem>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 #include "IonShaderProgram.h"
@@ -334,6 +335,24 @@ namespace ion::graphics::shaders
 			ShaderProgram& CreateShaderProgram(std::string name, Shader &vertex_shader, Shader &fragment_shader);
 
 
+			//Create a shader program by moving the given shader program
+			ShaderProgram& CreateShaderProgram(ShaderProgram &&shader_program);
+
+
+			/*
+				Shader programs
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable shader program with the given name
+			//Returns nullptr if shader program could not be found
+			[[nodiscard]] ShaderProgram* GetShaderProgram(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable shader program with the given name
+			//Returns nullptr if shader program could not be found
+			[[nodiscard]] const ShaderProgram* GetShaderProgram(std::string_view name) const noexcept;
+
+
 			/*
 				Shader programs
 				Removing
@@ -344,6 +363,9 @@ namespace ion::graphics::shaders
 
 			//Remove a removable shader program from this manager
 			bool RemoveShaderProgram(ShaderProgram &shader_program) noexcept;
+
+			//Remove a removable shader program with the given name from this manager
+			bool RemoveShaderProgram(std::string_view name) noexcept;
 
 
 			/*

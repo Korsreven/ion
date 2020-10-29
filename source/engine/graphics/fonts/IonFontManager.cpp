@@ -260,30 +260,57 @@ FontManager::~FontManager() noexcept
 Font& FontManager::CreateFont(std::string name, std::string asset_name, int size, int face_index,
 	font::CharacterEncoding encoding, font::GlyphFilter min_filter, font::GlyphFilter mag_filter)
 {
-	return this->CreateResource(std::move(name), std::move(asset_name), size, face_index, encoding, min_filter, mag_filter);
+	return CreateResource(std::move(name), std::move(asset_name), size, face_index, encoding, min_filter, mag_filter);
 }
 
 Font& FontManager::CreateFont(std::string name, std::string asset_name, int size,
 	font::CharacterEncoding encoding, font::GlyphFilter min_filter, font::GlyphFilter mag_filter)
 {
-	return this->CreateResource(std::move(name), std::move(asset_name), size, encoding, min_filter, mag_filter);
+	return CreateResource(std::move(name), std::move(asset_name), size, encoding, min_filter, mag_filter);
 }
 
 Font& FontManager::CreateFont(std::string name, std::string asset_name, int size,
 	font::CharacterEncoding encoding, font::GlyphFilter filter)
 {
-	return this->CreateResource(std::move(name), std::move(asset_name), size, encoding, filter);
+	return CreateResource(std::move(name), std::move(asset_name), size, encoding, filter);
 }
 
 Font& FontManager::CreateFont(std::string name, std::string asset_name, int size,
 	font::CharacterEncoding encoding)
 {
-	return this->CreateResource(std::move(name), std::move(asset_name), size, encoding);
+	return CreateResource(std::move(name), std::move(asset_name), size, encoding);
 }
 
 Font& FontManager::CreateFont(std::string name, std::string asset_name, int size)
 {
-	return this->CreateResource(std::move(name), std::move(asset_name), size);
+	return CreateResource(std::move(name), std::move(asset_name), size);
+}
+
+
+Font& FontManager::CreateFont(const Font &font)
+{
+	return CreateResource(font);
+}
+
+Font& FontManager::CreateFont(Font &&font)
+{
+	return CreateResource(std::move(font));
+}
+
+
+/*
+	Fonts
+	Retrieving
+*/
+
+Font* FontManager::GetFont(std::string_view name) noexcept
+{
+	return GetResource(name);
+}
+
+const Font* FontManager::GetFont(std::string_view name) const noexcept
+{
+	return GetResource(name);
 }
 
 
@@ -294,12 +321,17 @@ Font& FontManager::CreateFont(std::string name, std::string asset_name, int size
 
 void FontManager::ClearFonts() noexcept
 {
-	this->ClearResources();
+	ClearResources();
 }
 
 bool FontManager::RemoveFont(Font &font) noexcept
 {
-	return this->RemoveResource(font);
+	return RemoveResource(font);
+}
+
+bool FontManager::RemoveFont(std::string_view name) noexcept
+{
+	return RemoveResource(name);
 }
 
 } //ion::graphics::fonts

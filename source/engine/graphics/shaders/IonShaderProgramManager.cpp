@@ -808,12 +808,34 @@ ShaderProgramManager::~ShaderProgramManager() noexcept
 
 ShaderProgram& ShaderProgramManager::CreateShaderProgram(std::string name, Shader &shader)
 {
-	return this->CreateResource(std::move(name), std::ref(shader));
+	return CreateResource(std::move(name), std::ref(shader));
 }
 
 ShaderProgram& ShaderProgramManager::CreateShaderProgram(std::string name, Shader &vertex_shader, Shader &fragment_shader)
 {
-	return this->CreateResource(std::move(name), std::ref(vertex_shader), std::ref(fragment_shader));
+	return CreateResource(std::move(name), std::ref(vertex_shader), std::ref(fragment_shader));
+}
+
+
+ShaderProgram& ShaderProgramManager::CreateShaderProgram(ShaderProgram &&shader_program)
+{
+	return CreateResource(std::move(shader_program));
+}
+
+
+/*
+	Shader programs
+	Retrieving
+*/
+
+ShaderProgram* ShaderProgramManager::GetShaderProgram(std::string_view name) noexcept
+{
+	return GetResource(name);
+}
+
+const ShaderProgram* ShaderProgramManager::GetShaderProgram(std::string_view name) const noexcept
+{
+	return GetResource(name);
 }
 
 
@@ -824,12 +846,17 @@ ShaderProgram& ShaderProgramManager::CreateShaderProgram(std::string name, Shade
 
 void ShaderProgramManager::ClearShaderPrograms() noexcept
 {
-	this->ClearResources();
+	ClearResources();
 }
 
 bool ShaderProgramManager::RemoveShaderProgram(ShaderProgram &shader_program) noexcept
 {
-	return this->RemoveResource(shader_program);
+	return RemoveResource(shader_program);
+}
+
+bool ShaderProgramManager::RemoveShaderProgram(std::string_view name) noexcept
+{
+	return RemoveResource(name);
 }
 
 

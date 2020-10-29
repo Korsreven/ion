@@ -15,6 +15,7 @@ File:	IonFontManager.h
 
 #include <filesystem>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <utility>
 
@@ -136,6 +137,27 @@ namespace ion::graphics::fonts
 			Font& CreateFont(std::string name, std::string asset_name, int size);
 
 
+			//Create a font as a copy of the given font
+			Font& CreateFont(const Font &font);
+
+			//Create a font by moving the given font
+			Font& CreateFont(Font &&font);
+
+
+			/*
+				Fonts
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable font with the given name
+			//Returns nullptr if font could not be found
+			[[nodiscard]] Font* GetFont(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable font with the given name
+			//Returns nullptr if font could not be found
+			[[nodiscard]] const Font* GetFont(std::string_view name) const noexcept;
+
+
 			/*
 				Fonts
 				Removing
@@ -146,6 +168,9 @@ namespace ion::graphics::fonts
 
 			//Remove a removable font from this manager
 			bool RemoveFont(Font &font) noexcept;
+
+			//Remove a removable font with the given name from this manager
+			bool RemoveFont(std::string_view name) noexcept;
 	};
 } //ion::graphics::fonts
 

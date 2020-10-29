@@ -18,6 +18,7 @@ File:	IonTextureManager.h
 #include <numeric>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "IonTexture.h"
@@ -328,6 +329,27 @@ namespace ion::graphics::textures
 				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode);
 
 
+			//Create a texture as a copy of the given texture
+			Texture& CreateTexture(const Texture &texture);
+
+			//Create a texture by moving the given texture
+			Texture& CreateTexture(Texture &&texture);
+
+
+			/*
+				Textures
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable texture with the given name
+			//Returns nullptr if texture could not be found
+			[[nodiscard]] Texture* GetTexture(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable texture with the given name
+			//Returns nullptr if texture could not be found
+			[[nodiscard]] const Texture* GetTexture(std::string_view name) const noexcept;
+
+
 			/*
 				Textures
 				Removing
@@ -338,6 +360,9 @@ namespace ion::graphics::textures
 
 			//Remove a removable texture from this manager
 			bool RemoveTexture(Texture &texture) noexcept;
+
+			//Remove a removable texture with the given name from this manager
+			bool RemoveTexture(std::string_view name) noexcept;
 	};
 } //ion::graphics::textures
 

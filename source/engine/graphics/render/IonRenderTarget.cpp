@@ -46,9 +46,14 @@ void RenderTarget::SwapBuffers() noexcept
 
 
 /*
-	Viewport
+	Viewports
 	Creating
 */
+
+Viewport& RenderTarget::CreateViewport(const Viewport &viewport)
+{
+	return Create(viewport);
+}
 
 Viewport& RenderTarget::CreateViewport(Viewport &&viewport)
 {
@@ -57,7 +62,23 @@ Viewport& RenderTarget::CreateViewport(Viewport &&viewport)
 
 
 /*
-	Viewport
+	Viewports
+	Retrieving
+*/
+
+Viewport* RenderTarget::GetViewport(std::string_view name) noexcept
+{
+	return Get(name);
+}
+
+const Viewport* RenderTarget::GetViewport(std::string_view name) const noexcept
+{
+	return Get(name);
+}
+
+
+/*
+	Viewports
 	Removing
 */
 
@@ -69,6 +90,11 @@ void RenderTarget::ClearViewports() noexcept
 bool RenderTarget::RemoveViewport(Viewport &viewport) noexcept
 {
 	return Remove(viewport);
+}
+
+bool RenderTarget::RemoveViewport(std::string_view name) noexcept
+{
+	return Remove(name);
 }
 
 } //ion::graphics::render

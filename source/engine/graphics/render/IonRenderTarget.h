@@ -13,6 +13,9 @@ File:	IonRenderTarget.h
 #ifndef ION_RENDER_TARGET_H
 #define ION_RENDER_TARGET_H
 
+#include <string>
+#include <string_view>
+
 #include "adaptors/ranges/IonDereferenceIterable.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonRenderTargetListener.h"
@@ -139,7 +142,7 @@ namespace ion::graphics::render
 
 
 			/*
-				Viewport
+				Viewports
 				Ranges
 			*/
 
@@ -159,17 +162,33 @@ namespace ion::graphics::render
 
 
 			/*
-				Viewport
+				Viewports
 				Creating
 			*/
 
-			//Add the given viewport to this render target by moving it
-			//Returns a reference to the newly added viewport
+			//Create a viewport as a copy of the given viewport
+			Viewport& CreateViewport(const Viewport &viewport);
+
+			//Create a viewport by moving the given viewport
 			Viewport& CreateViewport(Viewport &&viewport);
 
 
 			/*
-				Viewport
+				Viewports
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable viewport with the given name
+			//Returns nullptr if viewport could not be found
+			[[nodiscard]] Viewport* GetViewport(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable viewport with the given name
+			//Returns nullptr if viewport could not be found
+			[[nodiscard]] const Viewport* GetViewport(std::string_view name) const noexcept;
+
+
+			/*
+				Viewports
 				Removing
 			*/
 
@@ -178,6 +197,9 @@ namespace ion::graphics::render
 
 			//Remove a removable viewport from this manager
 			bool RemoveViewport(Viewport &viewport) noexcept;
+
+			//Remove a removable viewport with the given name from this manager
+			bool RemoveViewport(std::string_view name) noexcept;
 	};
 }
 

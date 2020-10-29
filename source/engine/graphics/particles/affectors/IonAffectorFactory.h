@@ -74,11 +74,32 @@ namespace ion::graphics::particles::affectors
 
 			//Create an affector of type T with the given arguments
 			template <typename T, typename... Args>
-			inline auto& CreateAffector(Args &&...args)
+			auto& CreateAffector(Args &&...args)
 			{
 				static_assert(std::is_base_of_v<Affector, T>);
 
-				auto &affector = this->Create(std::forward<Args>(args)...);
+				auto &affector = Create(std::forward<Args>(args)...);
+				return static_cast<T&>(affector);
+			}
+
+
+			//Create an affector of type T as a copy of the given affector
+			template <typename T>
+			auto& CreateAffector(const T &affector_t)
+			{
+				static_assert(std::is_base_of_v<Affector, T>);
+
+				auto &affector = Create(affector_t);
+				return static_cast<T&>(affector);
+			}
+
+			//Create an affector of type T by moving the given affector
+			template <typename T>
+			auto& CreateAffector(T &&affector_t)
+			{
+				static_assert(std::is_base_of_v<Affector, T>);
+
+				auto &affector = Create(std::move(affector_t));
 				return static_cast<T&>(affector);
 			}
 
@@ -88,13 +109,13 @@ namespace ion::graphics::particles::affectors
 			*/
 
 			//Clear all affectors from this factory
-			inline void ClearAffectors() noexcept
+			void ClearAffectors() noexcept
 			{
 				Clear();
 			}
 
 			//Remove an affector from this factory
-			inline auto RemoveAffector(Affector &affector) noexcept
+			auto RemoveAffector(Affector &affector) noexcept
 			{
 				return Remove(affector);
 			}

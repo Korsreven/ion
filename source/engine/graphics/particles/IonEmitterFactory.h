@@ -74,9 +74,15 @@ namespace ion::graphics::particles
 
 			//Create an emitter with the given arguments
 			template <typename... Args>
-			inline auto& CreateEmitter(Args &&...args)
+			auto& CreateEmitter(Args &&...args)
 			{
-				return this->Create(std::forward<Args>(args)...);
+				return Create(std::forward<Args>(args)...);
+			}
+
+			//Create an emitter by moving the given emitter
+			auto& CreateEmitter(Emitter &&emitter)
+			{
+				return Create(std::move(emitter));
 			}
 
 
@@ -85,13 +91,13 @@ namespace ion::graphics::particles
 			*/
 
 			//Clear all emitters from this factory
-			inline void ClearEmitters() noexcept
+			void ClearEmitters() noexcept
 			{
 				Clear();
 			}
 
 			//Remove an emitter from this factory
-			inline auto RemoveEmitter(Emitter &Emitter) noexcept
+			auto RemoveEmitter(Emitter &Emitter) noexcept
 			{
 				return Remove(Emitter);
 			}

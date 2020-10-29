@@ -14,6 +14,8 @@ File:	IonShaderProgram.h
 #define ION_SHADER_PROGRAM_H
 
 #include <optional>
+#include <string>
+#include <string_view>
 
 #include "IonShaderManager.h"
 #include "managed/IonObjectManager.h"
@@ -173,6 +175,7 @@ namespace ion::graphics::shaders
 
 			/*
 				Attribute variables
+				Creating
 			*/
 
 			//Create an attribute variable with the given name
@@ -184,15 +187,55 @@ namespace ion::graphics::shaders
 			}
 
 
+			//Create an attribute variable as a copy of the given attribute
+			template <typename T>
+			auto& CreateAttribute(const variables::Attribute<T> &attribute)
+			{
+				auto &var = AttributeVariablesBase::Create(attribute);
+				return static_cast<variables::Attribute<T>&>(var);
+			}
+
+			//Create an attribute variable by moving the given attribute
+			template <typename T>
+			auto& CreateAttribute(variables::Attribute<T> &&attribute)
+			{
+				auto &var = AttributeVariablesBase::Create(std::move(attribute));
+				return static_cast<variables::Attribute<T>&>(var);
+			}
+
+
+			/*
+				Attribute variables
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable attribute variable with the given name
+			//Returns nullptr if attribute variable could not be found
+			[[nodiscard]] variables::AttributeVariable* GetAttribute(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable attribute variable with the given name
+			//Returns nullptr if attribute variable could not be found
+			[[nodiscard]] const variables::AttributeVariable* GetAttribute(std::string_view name) const noexcept;
+
+
+			/*
+				Attribute variables
+				Removing
+			*/
+
 			//Clear all removable attribute variables from this shader program
 			void ClearAttributes() noexcept;
 
 			//Remove a removable attribute variable from this shader program
 			bool RemoveAttribute(variables::AttributeVariable &attribute_variable) noexcept;
 
+			//Remove a removable attribute variable with the given name from this manager
+			bool RemoveAttribute(std::string_view name) noexcept;
+
 
 			/*
 				Uniform variables
+				Creating
 			*/
 
 			//Create a uniform variable with the given name and size
@@ -204,15 +247,55 @@ namespace ion::graphics::shaders
 			}
 
 
+			//Create an uniform variable as a copy of the given uniform
+			template <typename T>
+			auto& CreateUniform(const variables::Uniform<T> &uniform)
+			{
+				auto &var = AttributeVariablesBase::Create(uniform);
+				return static_cast<variables::Uniform<T>&>(var);
+			}
+
+			//Create an uniform variable by moving the given uniform
+			template <typename T>
+			auto& CreateUniform(variables::Uniform<T> &&uniform)
+			{
+				auto &var = AttributeVariablesBase::Create(std::move(uniform));
+				return static_cast<variables::Uniform<T>&>(var);
+			}
+
+
+			/*
+				Uniform variables
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable uniform variable with the given name
+			//Returns nullptr if uniform variable could not be found
+			[[nodiscard]] variables::UniformVariable* GetUniform(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable uniform variable with the given name
+			//Returns nullptr if uniform variable could not be found
+			[[nodiscard]] const variables::UniformVariable* GetUniform(std::string_view name) const noexcept;
+
+
+			/*
+				Uniform variables
+				Removing
+			*/
+
 			//Clear all removable uniform variables from this shader program
 			void ClearUniforms() noexcept;
 
 			//Remove a removable uniform variable from this shader program
 			bool RemoveUniform(variables::UniformVariable &uniform_variable) noexcept;
 
+			//Remove a removable uniform variable with the given name from this manager
+			bool RemoveUniform(std::string_view name) noexcept;
+
 
 			/*
 				Variables
+				Removing
 			*/
 
 			//Clear all removable attributes and uniform variables from this shader program

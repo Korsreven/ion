@@ -13,6 +13,9 @@ File:	IonSceneManager.h
 #ifndef ION_SCENE_MANAGER_H
 #define ION_SCENE_MANAGER_H
 
+#include <string>
+#include <string_view>
+
 #include "IonCamera.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonCameraListener.h"
@@ -76,7 +79,7 @@ namespace ion::graphics::scene
 
 
 			/*
-				Camera
+				Cameras
 				Ranges
 			*/
 
@@ -96,17 +99,33 @@ namespace ion::graphics::scene
 
 
 			/*
-				Camera
+				Cameras
 				Creating
 			*/
 
-			//Add the given camera to this scene manager by moving it
-			//Returns a reference to the newly added camera
+			//Create a camera as a copy of the given camera
+			Camera& CreateCamera(const Camera &camera);
+
+			//Create a camera by moving the given camera
 			Camera& CreateCamera(Camera &&camera);
 
 
 			/*
-				Camera
+				Cameras
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable camera with the given name
+			//Returns nullptr if camera could not be found
+			[[nodiscard]] Camera* GetCamera(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable camera with the given name
+			//Returns nullptr if camera could not be found
+			[[nodiscard]] const Camera* GetCamera(std::string_view name) const noexcept;
+
+
+			/*
+				Cameras
 				Removing
 			*/
 
@@ -115,6 +134,9 @@ namespace ion::graphics::scene
 
 			//Remove a removable camera from this manager
 			bool RemoveCamera(Camera &camera) noexcept;
+
+			//Remove a removable camera with the given name from this manager
+			bool RemoveCamera(std::string_view name) noexcept;
 	};
 } //ion::graphics::scene
 

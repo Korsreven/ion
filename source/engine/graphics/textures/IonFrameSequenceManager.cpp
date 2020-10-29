@@ -26,7 +26,6 @@ namespace frame_sequence_manager::detail
 
 //Public
 
-
 /*
 	Frame sequences
 	Creating
@@ -34,7 +33,34 @@ namespace frame_sequence_manager::detail
 
 FrameSequence& FrameSequenceManager::CreateFrameSequence(std::string name, const frame_sequence::detail::container_type &frames)
 {
-	return this->Create(std::move(name), frames);
+	return Create(std::move(name), frames);
+}
+
+
+FrameSequence& FrameSequenceManager::CreateFrameSequence(const FrameSequence &frame_sequence)
+{
+	return Create(frame_sequence);
+}
+
+FrameSequence& FrameSequenceManager::CreateFrameSequence(FrameSequence &&frame_sequence)
+{
+	return Create(std::move(frame_sequence));
+}
+
+
+/*
+	Frame sequences
+	Retrieving
+*/
+
+FrameSequence* FrameSequenceManager::GetFrameSequence(std::string_view name) noexcept
+{
+	return Get(name);
+}
+
+const FrameSequence* FrameSequenceManager::GetFrameSequence(std::string_view name) const noexcept
+{
+	return Get(name);
 }
 
 
@@ -45,12 +71,17 @@ FrameSequence& FrameSequenceManager::CreateFrameSequence(std::string name, const
 
 void FrameSequenceManager::ClearFrameSequences() noexcept
 {
-	this->Clear();
+	Clear();
 }
 
 bool FrameSequenceManager::RemoveFrameSequence(FrameSequence &frame_sequence) noexcept
 {
-	return this->Remove(frame_sequence);
+	return Remove(frame_sequence);
+}
+
+bool FrameSequenceManager::RemoveFrameSequence(std::string_view name) noexcept
+{
+	return Remove(name);
 }
 
 } //ion::graphics::textures

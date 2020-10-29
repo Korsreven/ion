@@ -13,6 +13,9 @@ File:	IonTypeFaceManager.h
 #ifndef ION_TYPE_FACE_MANAGER_H
 #define ION_TYPE_FACE_MANAGER_H
 
+#include <string>
+#include <string_view>
+
 #include "IonTypeFace.h"
 #include "managed/IonObjectManager.h"
 
@@ -90,6 +93,27 @@ namespace ion::graphics::fonts
 		TypeFace& CreateTypeFace(std::string name, Font &regular, Font &bold, Font &italic, Font &bold_italic);
 
 
+		//Create a type face as a copy of the given type face
+		TypeFace& CreateTypeFace(const TypeFace &type_face);
+
+		//Create a type face by moving the given type face
+		TypeFace& CreateTypeFace(TypeFace &&type_face);
+
+
+		/*
+			Type faces
+			Retrieving
+		*/
+
+		//Gets a pointer to a mutable type face with the given name
+		//Returns nullptr if type face could not be found
+		[[nodiscard]] TypeFace* GetTypeFace(std::string_view name) noexcept;
+
+		//Gets a pointer to an immutable type face with the given name
+		//Returns nullptr if type face could not be found
+		[[nodiscard]] const TypeFace* GetTypeFace(std::string_view name) const noexcept;
+
+
 		/*
 			Type faces
 			Removing
@@ -98,8 +122,11 @@ namespace ion::graphics::fonts
 		//Clear all removable type faces from this manager
 		void ClearTypeFaces() noexcept;
 
-		//Remove a removable type faces from this manager
+		//Remove a removable type face from this manager
 		bool RemoveTypeFace(TypeFace &type_face) noexcept;
+
+		//Remove a removable type face with the given name from this manager
+		bool RemoveTypeFace(std::string_view name) noexcept;
 	};
 } //ion::graphics::fonts
 

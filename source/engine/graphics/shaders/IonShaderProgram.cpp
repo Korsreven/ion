@@ -62,6 +62,23 @@ void ShaderProgram::FragmentShader(std::nullptr_t) noexcept
 
 /*
 	Attribute variables
+	Retrieving
+*/
+
+variables::AttributeVariable* ShaderProgram::GetAttribute(std::string_view name) noexcept
+{
+	return AttributeVariablesBase::Get(name);
+}
+
+const variables::AttributeVariable* ShaderProgram::GetAttribute(std::string_view name) const noexcept
+{
+	return AttributeVariablesBase::Get(name);
+}
+
+
+/*
+	Attribute variables
+	Removing
 */
 
 void ShaderProgram::ClearAttributes() noexcept
@@ -74,9 +91,31 @@ bool ShaderProgram::RemoveAttribute(variables::AttributeVariable &attribute_vari
 	return AttributeVariablesBase::Remove(attribute_variable);
 }
 
+bool ShaderProgram::RemoveAttribute(std::string_view name) noexcept
+{
+	return AttributeVariablesBase::Remove(name);
+}
+
 
 /*
 	Uniform variables
+	Retrieving
+*/
+
+variables::UniformVariable* ShaderProgram::GetUniform(std::string_view name) noexcept
+{
+	return UniformVariablesBase::Get(name);
+}
+
+const variables::UniformVariable* ShaderProgram::GetUniform(std::string_view name) const noexcept
+{
+	return UniformVariablesBase::Get(name);
+}
+
+
+/*
+	Uniform variables
+	Removing
 */
 
 void ShaderProgram::ClearUniforms() noexcept
@@ -89,9 +128,15 @@ bool ShaderProgram::RemoveUniform(variables::UniformVariable &uniform_variable) 
 	return UniformVariablesBase::Remove(uniform_variable);
 }
 
+bool ShaderProgram::RemoveUniform(std::string_view name) noexcept
+{
+	return UniformVariablesBase::Remove(name);
+}
+
 
 /*
 	Variables
+	Removing
 */
 
 void ShaderProgram::ClearVariables() noexcept

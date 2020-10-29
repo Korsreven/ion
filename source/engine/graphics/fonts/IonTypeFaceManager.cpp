@@ -34,27 +34,54 @@ namespace type_face_manager::detail
 
 TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular)
 {
-	return this->Create(std::move(name), std::ref(regular));
+	return Create(std::move(name), std::ref(regular));
 }
 
 TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular, Font &bold, std::nullptr_t)
 {
-	return this->Create(std::move(name), std::ref(regular), std::ref(bold), nullptr);
+	return Create(std::move(name), std::ref(regular), std::ref(bold), nullptr);
 }
 
 TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular, std::nullptr_t, Font &italic)
 {
-	return this->Create(std::move(name), std::ref(regular), nullptr, std::ref(italic));
+	return Create(std::move(name), std::ref(regular), nullptr, std::ref(italic));
 }
 
 TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular, Font &bold, Font &italic)
 {
-	return this->Create(std::move(name), std::ref(regular), std::ref(bold), std::ref(italic));
+	return Create(std::move(name), std::ref(regular), std::ref(bold), std::ref(italic));
 }
 
 TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular, Font &bold, Font &italic, Font &bold_italic)
 {
-	return this->Create(std::move(name), std::ref(regular), std::ref(bold), std::ref(italic), std::ref(bold_italic));
+	return Create(std::move(name), std::ref(regular), std::ref(bold), std::ref(italic), std::ref(bold_italic));
+}
+
+
+TypeFace& TypeFaceManager::CreateTypeFace(const TypeFace &type_face)
+{
+	return Create(type_face);
+}
+
+TypeFace& TypeFaceManager::CreateTypeFace(TypeFace &&type_face)
+{
+	return Create(std::move(type_face));
+}
+
+
+/*
+	Type faces
+	Retrieving
+*/
+
+TypeFace* TypeFaceManager::GetTypeFace(std::string_view name) noexcept
+{
+	return Get(name);
+}
+
+const TypeFace* TypeFaceManager::GetTypeFace(std::string_view name) const noexcept
+{
+	return Get(name);
 }
 
 
@@ -65,12 +92,17 @@ TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular, Font 
 
 void TypeFaceManager::ClearTypeFaces() noexcept
 {
-	this->Clear();
+	Clear();
 }
 
 bool TypeFaceManager::RemoveTypeFace(TypeFace &type_face) noexcept
 {
-	return this->Remove(type_face);
+	return Remove(type_face);
+}
+
+bool TypeFaceManager::RemoveTypeFace(std::string_view name) noexcept
+{
+	return Remove(name);
 }
 
 } //ion::graphics::fonts
