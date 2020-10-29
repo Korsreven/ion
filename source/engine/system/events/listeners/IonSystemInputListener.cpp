@@ -264,17 +264,17 @@ Vector2 InputListener::ViewAdjusted(Vector2 position) const noexcept
 
 void InputListener::KeyPressed(KeyButton button) noexcept
 {
-	this->KeyEventsBase::NotifyAll(this->KeyEventsBase::Listeners(), &KeyListener::KeyPressed, button);
+	KeyEventsBase::NotifyAll(KeyEventsBase::Listeners(), &KeyListener::KeyPressed, button);
 }
 
 void InputListener::KeyReleased(KeyButton button) noexcept
 {
-	this->KeyEventsBase::NotifyAll(this->KeyEventsBase::Listeners(), &KeyListener::KeyReleased, button);
+	KeyEventsBase::NotifyAll(KeyEventsBase::Listeners(), &KeyListener::KeyReleased, button);
 }
 
 void InputListener::CharacterPressed(char character) noexcept
 {
-	this->KeyEventsBase::NotifyAll(this->KeyEventsBase::Listeners(), &KeyListener::CharacterPressed, character);
+	KeyEventsBase::NotifyAll(KeyEventsBase::Listeners(), &KeyListener::CharacterPressed, character);
 }
 
 
@@ -284,22 +284,22 @@ void InputListener::CharacterPressed(char character) noexcept
 
 void InputListener::MousePressed(MouseButton button, Vector2 position) noexcept
 {
-	this->MouseEventsBase::NotifyAll(this->MouseEventsBase::Listeners(), &MouseListener::MousePressed, button, position);
+	MouseEventsBase::NotifyAll(MouseEventsBase::Listeners(), &MouseListener::MousePressed, button, position);
 }
 
 void InputListener::MouseReleased(MouseButton button, Vector2 position) noexcept
 {
-	this->MouseEventsBase::NotifyAll(this->MouseEventsBase::Listeners(), &MouseListener::MouseReleased, button, position);
+	MouseEventsBase::NotifyAll(MouseEventsBase::Listeners(), &MouseListener::MouseReleased, button, position);
 }
 
 void InputListener::MouseMoved(Vector2 position) noexcept
 {
-	this->MouseEventsBase::NotifyAll(this->MouseEventsBase::Listeners(), &MouseListener::MouseMoved, position);
+	MouseEventsBase::NotifyAll(MouseEventsBase::Listeners(), &MouseListener::MouseMoved, position);
 }
 
 void InputListener::MouseWheelRolled(int delta, Vector2 position) noexcept
 {
-	this->MouseEventsBase::NotifyAll(this->MouseEventsBase::Listeners(), &MouseListener::MouseWheelRolled, delta, position);
+	MouseEventsBase::NotifyAll(MouseEventsBase::Listeners(), &MouseListener::MouseWheelRolled, delta, position);
 }
 
 

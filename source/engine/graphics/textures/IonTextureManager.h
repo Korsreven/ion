@@ -246,14 +246,14 @@ namespace ion::graphics::textures
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Textures() noexcept
 			{
-				return this->Resources();
+				return Resources();
 			}
 
 			//Returns an immutable range of all textures in this manager
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline const auto Textures() const noexcept
 			{
-				return this->Resources();
+				return Resources();
 			}
 
 

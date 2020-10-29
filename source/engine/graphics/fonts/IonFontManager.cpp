@@ -181,7 +181,7 @@ void unload_font(int font_handle, const font::detail::container_type<int> &glyph
 
 bool FontManager::PrepareResource(Font &font) noexcept
 {
-	if (this->FileResourceManager::PrepareResource(font))
+	if (FileResourceManager::PrepareResource(font))
 	{
 		if (auto font_data = detail::prepare_font(*font.FileData(),
 			font.Size(), font.FaceIndex(), font.CharacterEncoding()); font_data)
@@ -246,7 +246,7 @@ void FontManager::ResourceFailed(Font &font) noexcept
 
 FontManager::~FontManager() noexcept
 {
-	this->UnloadAll();
+	UnloadAll();
 		//Unload all resources before this manager is destroyed
 		//Virtual functions cannot be called post destruction
 }

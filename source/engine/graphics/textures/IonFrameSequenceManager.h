@@ -62,14 +62,14 @@ namespace ion::graphics::textures
 		//This can be used directly with a range-based for loop
 		[[nodiscard]] inline auto FrameSequences() noexcept
 		{
-			return this->Objects();
+			return Objects();
 		}
 
 		//Returns an immutable range of all frame sequences in this manager
 		//This can be used directly with a range-based for loop
 		[[nodiscard]] inline const auto FrameSequences() const noexcept
 		{
-			return this->Objects();
+			return Objects();
 		}
 
 

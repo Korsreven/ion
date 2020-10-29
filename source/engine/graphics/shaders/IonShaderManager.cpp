@@ -200,7 +200,7 @@ bool ShaderManager::UnloadResource(Shader &shader) noexcept
 
 ShaderManager::~ShaderManager() noexcept
 {
-	this->UnloadAll();
+	UnloadAll();
 		//Unload all resources before this manager is destroyed
 		//Virtual functions cannot be called post destruction
 }
@@ -213,7 +213,7 @@ ShaderManager::~ShaderManager() noexcept
 
 Shader& ShaderManager::CreateShader(std::string name, std::string asset_name)
 {
-	return this->CreateResource(std::move(name), std::move(asset_name));
+	return CreateResource(std::move(name), std::move(asset_name));
 }
 
 

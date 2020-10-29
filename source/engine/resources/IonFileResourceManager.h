@@ -132,14 +132,14 @@ namespace ion::resources
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Repositories() noexcept
 			{
-				return this->RepositoryBase::Objects();
+				return RepositoryBase::Objects();
 			}
 
 			//Returns an immutable range of all repositories in this manager
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline const auto Repositories() const noexcept
 			{
-				return this->RepositoryBase::Objects();
+				return RepositoryBase::Objects();
 			}
 
 
@@ -151,14 +151,14 @@ namespace ion::resources
 			//Create an empty repository
 			auto& CreateRepository()
 			{
-				return this->RepositoryBase::Create();
+				return RepositoryBase::Create();
 			}
 
 			//Create a repository by copying/moving the given repository
 			template <typename T, typename = std::enable_if_t<std::is_same_v<std::remove_cvref_t<T>, RepositoryT>>>
 			auto& CreateRepository(T &&repository)
 			{
-				return this->RepositoryBase::Create(std::forward<T>(repository));
+				return RepositoryBase::Create(std::forward<T>(repository));
 			}
 
 
@@ -170,13 +170,13 @@ namespace ion::resources
 			//Clear all repositories from this factory
 			void ClearRepositories() noexcept
 			{
-				this->RepositoryBase::Clear();
+				RepositoryBase::Clear();
 			}
 
 			//Remove a repository from this factory
 			auto RemoveRepository(RepositoryT &repository) noexcept
 			{
-				return this->RepositoryBase::Remove(repository);
+				return RepositoryBase::Remove(repository);
 			}
 	};
 } //ion::resources

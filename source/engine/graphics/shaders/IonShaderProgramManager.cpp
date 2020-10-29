@@ -795,7 +795,7 @@ bool ShaderProgramManager::UnloadResource(ShaderProgram &shader_program) noexcep
 
 ShaderProgramManager::~ShaderProgramManager() noexcept
 {
-	this->UnloadAll();
+	UnloadAll();
 		//Unload all resources before this manager is destroyed
 		//Virtual functions cannot be called post destruction
 }

@@ -309,7 +309,7 @@ void unload_texture(int texture_handle) noexcept
 
 bool TextureManager::PrepareResource(Texture &texture) noexcept
 {
-	if (this->FileResourceManager::PrepareResource(texture))
+	if (FileResourceManager::PrepareResource(texture))
 	{
 		if (auto texture_data =
 			detail::prepare_texture(
@@ -383,7 +383,7 @@ TextureManager::TextureManager() noexcept
 
 TextureManager::~TextureManager() noexcept
 {
-	this->UnloadAll();
+	UnloadAll();
 		//Unload all resources before this manager is destroyed
 		//Virtual functions cannot be called post destruction
 }
