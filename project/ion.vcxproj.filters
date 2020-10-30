@@ -351,6 +351,12 @@
     <ClCompile Include="..\source\engine\assets\repositories\IonVideoRepository.cpp">
       <Filter>Source Files\assets\repositories</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\particles\IonParticleSystemManager.cpp">
+      <Filter>Source Files\graphics\particles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\textures\IonAnimationManager.cpp">
+      <Filter>Source Files\graphics\textures</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -721,6 +727,12 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\assets\repositories\IonVideoRepository.h">
       <Filter>Header Files\assets\repositories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\particles\IonParticleSystemManager.h">
+      <Filter>Header Files\graphics\particles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\textures\IonAnimationManager.h">
+      <Filter>Header Files\graphics\textures</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

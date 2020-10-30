@@ -24,13 +24,9 @@ File:	IonAnimation.h
 #include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 
-namespace ion::graphics::scene
-{
-	class SceneManager; //Forward declaration
-} //ion::graphics::scene
-
 namespace ion::graphics::textures
 {
+	struct AnimationManager; //Forward declaration
 	using namespace types::type_literals;
 
 	namespace animation
@@ -75,7 +71,7 @@ namespace ion::graphics::textures
 
 
 	//An animation class that contains one or more frames (textures)
-	class Animation final : public managed::ManagedObject<scene::SceneManager>
+	class Animation final : public managed::ManagedObject<AnimationManager>
 	{
 		private:
 

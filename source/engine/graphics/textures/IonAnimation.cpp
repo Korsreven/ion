@@ -140,7 +140,7 @@ Animation::Animation(std::string name, FrameSequence &frame_sequence,
 	duration cycle_duration, std::optional<int> repeat_count,
 	PlaybackDirection direction, real playback_rate) :
 	
-	managed::ManagedObject<scene::SceneManager>{std::move(name)},
+	managed::ManagedObject<AnimationManager>{std::move(name)},
 
 	frame_duration_{frame_sequence ? cycle_duration / frame_sequence.FrameCount() : 0.0_sec},
 	repeat_count_{repeat_count ? std::make_optional(std::pair{0, *repeat_count}) : std::nullopt},

@@ -54,6 +54,7 @@ File:	main.cpp
 #include "graphics/particles/IonEmitterFactory.h"
 #include "graphics/particles/IonParticle.h"
 #include "graphics/particles/IonParticleSystem.h"
+#include "graphics/particles/IonParticleSystemManager.h"
 #include "graphics/particles/affectors/IonAffector.h"
 #include "graphics/particles/affectors/IonAffectorFactory.h"
 #include "graphics/particles/affectors/IonColorFader.h"
@@ -78,6 +79,7 @@ File:	main.cpp
 #include "graphics/shaders/variables/IonShaderUniform.h"
 #include "graphics/shaders/variables/IonShaderVariable.h"
 #include "graphics/textures/IonAnimation.h"
+#include "graphics/textures/IonAnimationManager.h"
 #include "graphics/textures/IonFrameSequence.h"
 #include "graphics/textures/IonFrameSequenceManager.h"
 #include "graphics/textures/IonTexture.h"
@@ -361,8 +363,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				"misc", rikku_texture, cloud_texture, background_texture);
 
 			//Animation
-			auto animation = ion::graphics::textures::Animation::Looping(
-				"alternate", frame_sequence, 6.0_sec, ion::graphics::textures::animation::PlaybackDirection::Alternate);
+			ion::graphics::textures::AnimationManager animations;
+			auto animation = animations.CreateAnimation(ion::graphics::textures::Animation::Looping(
+				"alternate", frame_sequence, 6.0_sec, ion::graphics::textures::animation::PlaybackDirection::Alternate));
 			animation.RepeatCount(1);
 			animation.JumpForward(7.5_sec);
 			animation.RepeatCount({});

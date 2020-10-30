@@ -17,13 +17,10 @@ File:	IonParticleSystem.h
 #include "affectors/IonAffectorFactory.h"
 #include "managed/IonManagedObject.h"
 
-namespace ion::graphics::scene
-{
-	class SceneManager; //Forward declaration
-} //ion::graphics::scene
-
 namespace ion::graphics::particles
 {
+	struct ParticleSystemManager; //Forward declaration
+
 	namespace particle_system
 	{
 		enum class ParticlePrimitive : bool
@@ -42,7 +39,7 @@ namespace ion::graphics::particles
 
 	//A particle system class that can contain one ore more emitters and affectors
 	class ParticleSystem final :
-		public managed::ManagedObject<scene::SceneManager>,
+		public managed::ManagedObject<ParticleSystemManager>,
 		public EmitterFactory,
 		public affectors::AffectorFactory
 	{

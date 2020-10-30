@@ -24,14 +24,14 @@ namespace particle_system::detail
 
 
 ParticleSystem::ParticleSystem(std::string name) :
-	managed::ManagedObject<scene::SceneManager>{std::move(name)}
+	managed::ManagedObject<ParticleSystemManager>{std::move(name)}
 {
 	//Empty
 }
 
 ParticleSystem::ParticleSystem(std::string name, ParticlePrimitive particle_primitive) :
 
-	managed::ManagedObject<scene::SceneManager>{std::move(name)},
+	managed::ManagedObject<ParticleSystemManager>{std::move(name)},
 	particle_primitive_{particle_primitive}
 {
 	//Empty
