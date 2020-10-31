@@ -168,6 +168,8 @@
     <ClCompile Include="..\source\engine\events\IonInputController.cpp" />
     <ClCompile Include="..\source\engine\events\IonRecurringCallback.cpp" />
     <ClCompile Include="..\source\engine\graphics\fonts\IonFontManager.cpp" />
+    <ClCompile Include="..\source\engine\graphics\fonts\IonText.cpp" />
+    <ClCompile Include="..\source\engine\graphics\fonts\IonTextManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\fonts\IonTypeFace.cpp" />
     <ClCompile Include="..\source\engine\graphics\fonts\IonTypeFaceManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonAffector.cpp" />
@@ -264,6 +266,8 @@
     <ClInclude Include="..\source\engine\events\listeners\IonWindowListener.h" />
     <ClInclude Include="..\source\engine\graphics\fonts\IonFont.h" />
     <ClInclude Include="..\source\engine\graphics\fonts\IonFontManager.h" />
+    <ClInclude Include="..\source\engine\graphics\fonts\IonText.h" />
+    <ClInclude Include="..\source\engine\graphics\fonts\IonTextManager.h" />
     <ClInclude Include="..\source\engine\graphics\fonts\IonTypeFace.h" />
     <ClInclude Include="..\source\engine\graphics\fonts\IonTypeFaceManager.h" />
     <ClInclude Include="..\source\engine\graphics\IonGraphicsAPI.h" />

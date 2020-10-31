@@ -48,6 +48,8 @@ File:	main.cpp
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/fonts/IonFont.h"
 #include "graphics/fonts/IonFontManager.h"
+#include "graphics/fonts/IonText.h"
+#include "graphics/fonts/IonTextManager.h"
 #include "graphics/fonts/IonTypeFace.h"
 #include "graphics/fonts/IonTypeFaceManager.h"
 #include "graphics/particles/IonEmitter.h"
