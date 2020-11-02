@@ -17,9 +17,11 @@ namespace ion::graphics::fonts
 
 using namespace text;
 
-Text::Text(std::string name, TypeFace &type_face) :
+Text::Text(std::string name, std::string str, TypeFace &type_face) :
 
 	managed::ManagedObject<TextManager>{std::move(name)},
+
+	unformatted_{std::move(str)},
 	type_face_{type_face}
 {
 	//Empty
@@ -30,19 +32,37 @@ Text::Text(std::string name, TypeFace &type_face) :
 	Modifiers
 */
 
+void Text::Lettering(TypeFace &type_face)
+{
+	type_face_.Observe(type_face);
+}
 
+void Text::Lettering(std::nullptr_t) noexcept
+{
+	type_face_.Release();
+}
+
+
+/*
+	Observers
+*/
+
+std::string Text::FormattedStr() const noexcept
+{
+	return "";
+}
 
 
 /*
 	Type face
 */
 
-TypeFace* Text::UnderlyingTypeFace() noexcept
+TypeFace* Text::Lettering() noexcept
 {
 	return type_face_.Object();
 }
 
-const TypeFace* Text::UnderlyingTypeFace() const noexcept
+const TypeFace* Text::Lettering() const noexcept
 {
 	return type_face_.Object();
 }
