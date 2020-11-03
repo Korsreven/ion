@@ -107,70 +107,78 @@ namespace ion::graphics::fonts
 				Modifiers
 			*/
 
-			//
+			//Sets the unformatted (raw) string used by this text to the given string
 			inline void UnformattedStr(std::string str)
 			{
 				unformatted_ = std::move(str);
 			}
 
-			//
+			//Sets the horizontal alignment of the text to the given alignment
 			inline void Alignment(text::TextAlignment alignment) noexcept
 			{
 				alignment_ = alignment;
 			}
 
-			//
+			//Sets the vertical alignment of the text to the given alignment
 			inline void VerticalAlignment(text::TextVerticalAlignment vertical_alignment) noexcept
 			{
 				vertical_alignment_ = vertical_alignment;
 			}
 
-			//
+			//Sets the formatting of the text to the given format
+			//If nullopt is passed, all formatting will be turned off
 			inline void Formatting(std::optional<text::TextFormatting> formatting) noexcept
 			{
 				formatting_ = formatting;
 			}
 
 
-			//
+			//Sets the area size of the text to the given size
+			//If nullopt is passed, no area size will be used
 			inline void AreaSize(const std::optional<Vector2> &area_size) noexcept
 			{
 				area_size_ = area_size;
 			}
 
-			//
+			//Sets the padding size of the text area to the given padding (in pixels)
+			//Padding size is the space between the area and the displayed text
+			//If nullopt is passed, default padding is used (could vary based on type face)
 			inline void Padding(std::optional<int> padding) noexcept
 			{
 				padding_ = padding;
 			}
 
-			//
+			//Sets the line spacing to the given spacing (in pixels)
+			//Line spacing is the space between lines in the displayed text
+			//If nullopt is passed, default line spacing is used (could vary based on type face)
 			inline void LineSpacing(std::optional<int> line_spacing) noexcept
 			{
 				line_spacing_ = line_spacing;
 			}
 
 
-			//
+			//Sets which line (from the displayed text) to start rendering from to the given value
 			inline void FromLine(int from_line) noexcept
 			{
 				from_line_ = from_line;
 			}
 
-			//
+			//Sets the maximum allowed lines to display at once to the given value
+			//If nullopt is passed, no maximum lines will be used
 			inline void MaxLines(int max_lines) noexcept
 			{
 				max_lines_ = max_lines;
 			}
 
 
-			//
+			//Sets the default color of the displayed text to the given color
 			inline void DefaultColor(const Color &color) noexcept
 			{
 				default_color_ = color;
 			}
 
-			//
+			//Sets the default decoration of the displayed text to the given decoration
+			//If nullopt is passed, no default decoration will be used
 			inline void DefaultDecoration(std::optional<text::TextDecoration> decoration) noexcept
 			{
 				default_decoration_ = decoration;
@@ -187,73 +195,82 @@ namespace ion::graphics::fonts
 				Observers
 			*/
 
-			//
+			//Returns the unformatted (raw) string used by this text
 			[[nodiscard]] inline auto& UnformattedStr() const noexcept
 			{
 				return unformatted_;
 			}
 
-			//
+			//Returns the formatted string, meaning all formatting tags removed
+			//Which tags are removed and kept, is based on TextFormatting
 			[[nodiscard]] std::string FormattedStr() const noexcept;
 
-			//
+			//Returns the horizontal alignment of the text
 			[[nodiscard]] inline auto Alignment() const noexcept
 			{
 				return alignment_;
 			}
 
-			//
+			//Returns the vertical alignment of the text
 			[[nodiscard]] inline auto VerticalAlignment() const noexcept
 			{
 				return vertical_alignment_;
 			}
 
-			//
+			//Returns the formatting of the text
+			//Returns nullopt if all formatting is turned off
 			[[nodiscard]] inline auto Formatting() const noexcept
 			{
 				return formatting_;
 			}
 
 
-			//
+			//Returns the area size of the text
+			//Returns nullopt if no area size has been specified
 			[[nodiscard]] inline auto& AreaSize() const noexcept
 			{
 				return area_size_;
 			}
 
-			//
+			//Returns the padding size of the text area in pixels
+			//Padding size is the space between the area and the displayed text
+			//Returns nullopt if default padding is used (could vary based on type face)
 			[[nodiscard]] inline auto Padding() const noexcept
 			{
 				return padding_;
 			}
 
-			//
+			//Returns the line spacing in pixels
+			//Line spacing is the space between lines in the displayed text
+			//Returns nullopt if default line spacing is used (could vary based on type face)
 			[[nodiscard]] inline auto LineSpacing() const noexcept
 			{
 				return line_spacing_;
 			}
 
 
-			//
+			//Returns which line (from the displayed text) to start rendering from
 			[[nodiscard]] inline auto FromLine() const noexcept
 			{
 				return from_line_;
 			}
 
-			//
+			//Returns the maximum allowed lines to display at once
+			//Returns nullopt if no maximum lines has been specified
 			[[nodiscard]] inline auto MaxLines() const noexcept
 			{
 				return max_lines_;
 			}
 
 
-			//
+			//Returns the default color of the displayed text
 			[[nodiscard]] inline auto& DefaultColor() const noexcept
 			{
 				return default_color_;
 			}
 
-			//
+			//Returns the default decoration of the displayed text
+			//Returns nullopt if no default decoration has been specified
 			[[nodiscard]] inline auto DefaultDecoration() const noexcept
 			{
 				return default_decoration_;
