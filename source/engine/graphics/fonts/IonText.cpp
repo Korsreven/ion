@@ -21,7 +21,7 @@ Text::Text(std::string name, std::string str, TypeFace &type_face) :
 
 	managed::ManagedObject<TextManager>{std::move(name)},
 
-	unformatted_{std::move(str)},
+	unformatted_str_{std::move(str)},
 	type_face_{type_face}
 {
 	//Empty
@@ -44,7 +44,7 @@ void Text::Lettering(std::nullptr_t) noexcept
 
 
 /*
-	Type face
+	Observers
 */
 
 TypeFace* Text::Lettering() noexcept
@@ -59,7 +59,22 @@ const TypeFace* Text::Lettering() const noexcept
 
 
 /*
-	Formatting
+	Unformatted
+*/
+
+void Text::AppendFront(std::string_view str)
+{
+	unformatted_str_.insert(0, str);
+}
+
+void Text::AppendBack(std::string_view str)
+{
+	unformatted_str_ += str;
+}
+
+
+/*
+	Formatted
 */
 
 std::string Text::FormattedStr() const noexcept

@@ -15,7 +15,7 @@ File:	IonText.h
 
 #include <optional>
 #include <string>
-#include <variant>
+#include <string_view>
 
 #include "IonTypeFaceManager.h"
 #include "adaptors/ranges/IonIterable.h"
@@ -79,7 +79,9 @@ namespace ion::graphics::fonts
 			struct formatted_element
 			{
 				std::string str;
-				std::variant<Color, TextDecoration, FontStyle> formatting;
+				std::optional<Color> color;
+				std::optional<TextDecoration> decoration;
+				std::optional<FontStyle> font_style;
 			};
 
 			using formatted_elements = std::vector<formatted_element>;
@@ -100,7 +102,7 @@ namespace ion::graphics::fonts
 	{
 		private:
 
-			std::string unformatted_;
+			std::string unformatted_str_;
 			text::TextAlignment alignment_ = text::TextAlignment::Left;
 			text::TextVerticalAlignment vertical_alignment_ = text::TextVerticalAlignment::Top;
 			std::optional<text::TextFormatting> formatting_ = text::TextFormatting::Both;
@@ -139,7 +141,7 @@ namespace ion::graphics::fonts
 			//Sets the unformatted (raw) string used by this text to the given string
 			inline void UnformattedStr(std::string str)
 			{
-				unformatted_ = std::move(str);
+				unformatted_str_ = std::move(str);
 			}
 
 			//Sets the horizontal alignment of the text to the given alignment
@@ -235,7 +237,7 @@ namespace ion::graphics::fonts
 			//Returns the unformatted (raw) string used by this text
 			[[nodiscard]] inline auto& UnformattedStr() const noexcept
 			{
-				return unformatted_;
+				return unformatted_str_;
 			}
 
 			//Returns the horizontal alignment of the text
@@ -327,7 +329,20 @@ namespace ion::graphics::fonts
 
 
 			/*
-				Formatting
+				Unformatted
+			*/
+
+			//Append the given string to the front of the unformatted (raw) string used by this text
+			//This will only parse and format the appended string (unlike UnformattedStr)
+			void AppendFront(std::string_view str);
+
+			//Append the given string to the back of the unformatted (raw) string used by this text
+			//This will only parse and format the appended string (unlike UnformattedStr)
+			void AppendBack(std::string_view str);
+
+
+			/*
+				Formatted
 			*/
 
 			//Returns the formatted string, meaning all formatting tags removed
