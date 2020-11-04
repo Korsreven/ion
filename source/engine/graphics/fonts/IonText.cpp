@@ -44,16 +44,6 @@ void Text::Lettering(std::nullptr_t) noexcept
 
 
 /*
-	Observers
-*/
-
-std::string Text::FormattedStr() const noexcept
-{
-	return "";
-}
-
-
-/*
 	Type face
 */
 
@@ -65,6 +55,16 @@ TypeFace* Text::Lettering() noexcept
 const TypeFace* Text::Lettering() const noexcept
 {
 	return type_face_.Object();
+}
+
+
+/*
+	Formatting
+*/
+
+std::string Text::FormattedStr() const noexcept
+{
+	return "";
 }
 
 } //ion::graphics::fonts

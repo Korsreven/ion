@@ -15,8 +15,10 @@ File:	IonText.h
 
 #include <optional>
 #include <string>
+#include <variant>
 
 #include "IonTypeFaceManager.h"
+#include "adaptors/ranges/IonIterable.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "managed/IonManagedObject.h"
@@ -61,10 +63,34 @@ namespace ion::graphics::fonts
 			Overline
 		};
 
+		enum class FontStyle
+		{
+			Bold,
+			Italic,
+			BoldItalic
+		};
+
 
 		namespace detail
 		{
 			inline const auto jet_black = Color::RGB(52, 52, 52);
+
+
+			struct formatted_element
+			{
+				std::string str;
+				std::variant<Color, TextDecoration, FontStyle> formatting;
+			};
+
+			using formatted_elements = std::vector<formatted_element>;
+
+			struct formatted_line
+			{
+				formatted_elements elements;
+				int width = 0;
+			};
+
+			using formatted_lines = std::vector<formatted_line>;
 		} //detail
 	} //text
 
@@ -88,7 +114,10 @@ namespace ion::graphics::fonts
 
 			Color default_color_ = text::detail::jet_black;
 			std::optional<text::TextDecoration> default_decoration_;
+			std::optional<text::FontStyle> default_font_style_;
+
 			managed::ObservedObject<TypeFace> type_face_;
+			text::detail::formatted_lines formatted_lines_;
 
 		public:
 
@@ -171,18 +200,26 @@ namespace ion::graphics::fonts
 			}
 
 
-			//Sets the default color of the displayed text to the given color
+			//Sets the default color for the displayed text to the given color
 			inline void DefaultColor(const Color &color) noexcept
 			{
 				default_color_ = color;
 			}
 
-			//Sets the default decoration of the displayed text to the given decoration
+			//Sets the default decoration for the displayed text to the given decoration
 			//If nullopt is passed, no default decoration will be used
 			inline void DefaultDecoration(std::optional<text::TextDecoration> decoration) noexcept
 			{
 				default_decoration_ = decoration;
 			}
+
+			//Sets the default font style for the displayed text to the given style
+			//If nullopt is passed, no default font style will be used
+			inline void DefaultFontStyle(std::optional<text::FontStyle> font_style) noexcept
+			{
+				default_font_style_ = font_style;
+			}
+
 
 			//Attach the given type face to the text (used for lettering)
 			void Lettering(TypeFace &type_face);
@@ -200,10 +237,6 @@ namespace ion::graphics::fonts
 			{
 				return unformatted_;
 			}
-
-			//Returns the formatted string, meaning all formatting tags removed
-			//Which tags are removed and kept, is based on TextFormatting
-			[[nodiscard]] std::string FormattedStr() const noexcept;
 
 			//Returns the horizontal alignment of the text
 			[[nodiscard]] inline auto Alignment() const noexcept
@@ -263,18 +296,26 @@ namespace ion::graphics::fonts
 			}
 
 
-			//Returns the default color of the displayed text
+			//Returns the default color for the displayed text
 			[[nodiscard]] inline auto& DefaultColor() const noexcept
 			{
 				return default_color_;
 			}
 
-			//Returns the default decoration of the displayed text
+			//Returns the default decoration for the displayed text
 			//Returns nullopt if no default decoration has been specified
 			[[nodiscard]] inline auto DefaultDecoration() const noexcept
 			{
 				return default_decoration_;
 			}
+
+			//Returns the default font style for the displayed text
+			//Returns nullopt if no default decoration has been specified
+			[[nodiscard]] inline auto DefaultFontStyle() const noexcept
+			{
+				return default_font_style_;
+			}
+
 
 			//Returns a pointer to the mutable type face in this text (used for lettering)
 			//Returns nullptr if this text does not have a type face
@@ -283,6 +324,30 @@ namespace ion::graphics::fonts
 			//Returns a pointer to the immutable type face in this text (used for lettering)
 			//Returns nullptr if this text does not have a type face
 			[[nodiscard]] const TypeFace* Lettering() const noexcept;
+
+
+			/*
+				Formatting
+			*/
+
+			//Returns the formatted string, meaning all formatting tags removed
+			//Which tags are removed and kept, is based on TextFormatting
+			[[nodiscard]] std::string FormattedStr() const noexcept;
+
+
+			//Returns a mutable range of all formatted lines in this text
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto FormattedLines() noexcept
+			{
+				return adaptors::ranges::Iterable<text::detail::formatted_lines&>{formatted_lines_};
+			}
+
+			//Returns an immutable range of all formatted lines in this text
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline const auto FormattedLines() const noexcept
+			{
+				return adaptors::ranges::Iterable<const text::detail::formatted_lines&>{formatted_lines_};
+			}
 	};
 } //ion::graphics::fonts
 
