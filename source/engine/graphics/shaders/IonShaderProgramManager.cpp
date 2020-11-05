@@ -753,9 +753,9 @@ bool ShaderProgramManager::LoadResource(ShaderProgram &shader_program) noexcept
 
 		//Make sure vertex or/and fragment shaders are loaded, otherwise load them eagerly
 		if (vertex_shader)
-			loaded &= vertex_shader->Owner() ? vertex_shader->Owner()->Load(*vertex_shader) : vertex_shader->IsLoaded();
+			loaded &= vertex_shader->IsLoaded() || (vertex_shader->Owner() && vertex_shader->Owner()->Load(*vertex_shader));
 		if (fragment_shader)
-			loaded &= fragment_shader->Owner() ? fragment_shader->Owner()->Load(*fragment_shader) : fragment_shader->IsLoaded();
+			loaded &= fragment_shader->IsLoaded() || (fragment_shader->Owner() && fragment_shader->Owner()->Load(*fragment_shader));
 
 		auto &source_path = vertex_shader ? vertex_shader->FilePath() : fragment_shader->FilePath();
 

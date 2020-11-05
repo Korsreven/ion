@@ -349,14 +349,6 @@ namespace ion::graphics::fonts
 			//Which tags are removed and kept, is based on TextFormatting
 			[[nodiscard]] std::string FormattedStr() const noexcept;
 
-
-			//Returns a mutable range of all formatted lines in this text
-			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto FormattedLines() noexcept
-			{
-				return adaptors::ranges::Iterable<text::detail::formatted_lines&>{formatted_lines_};
-			}
-
 			//Returns an immutable range of all formatted lines in this text
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline const auto FormattedLines() const noexcept
