@@ -79,7 +79,26 @@ void Text::AppendBack(std::string_view str)
 
 std::string Text::FormattedStr() const noexcept
 {
-	return "";
+	std::string str;
+
+	//First
+	if (!std::empty(formatted_lines_))
+	{
+		for (auto &element : formatted_lines_.front().elements)
+			str += element.str;
+	}
+
+	//Rest
+	for (auto iter = std::begin(formatted_lines_) + 1,
+		end = std::end(formatted_lines_); iter != end; ++iter)
+	{
+		str += '\n';
+
+		for (auto &element : iter->elements)
+			str += element.str;
+	}
+
+	return str;
 }
 
 } //ion::graphics::fonts
