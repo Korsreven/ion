@@ -397,6 +397,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::graphics::fonts::TextManager texts;
 			auto char_size_pixels = texts.MeasureCharacter('A', verdana_regular_12);
 			auto str_size_pixels = texts.MeasureString("Hello world!", verdana_regular_12);
+			auto truncated_str = texts.TruncateString("Hello world!", 90, verdana_regular_12);
 
 			//Type face
 			ion::graphics::fonts::TypeFaceManager type_faces;

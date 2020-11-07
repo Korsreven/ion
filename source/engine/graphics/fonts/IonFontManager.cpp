@@ -67,7 +67,7 @@ std::optional<std::tuple<font::detail::container_type<std::string>, font::detail
 		extents.Height = static_cast<int>(face->glyph->bitmap.rows);
 		extents.ActualWidth = static_cast<int>(textures::texture_manager::detail::upper_power_of_two(extents.Width));
 		extents.ActualHeight = static_cast<int>(textures::texture_manager::detail::upper_power_of_two(extents.Height));
-		extents.Advance = face->glyph->advance.x;
+		extents.Advance = face->glyph->advance.x / 64;
 
 		//Update max glyph height if higher than current max
 		if (glyph_max_height < extents.Height)
@@ -155,7 +155,7 @@ std::pair<std::optional<int>, std::optional<font::detail::container_type<int>>> 
 		glEnd();
 
 		glPopMatrix();
-		glTranslatef(static_cast<real>(glyph_extents[i].Advance) / 64, 0, 0); //Translate relative
+		glTranslatef(static_cast<real>(glyph_extents[i].Advance), 0, 0); //Translate relative
 		glEndList();
 
 		glBindTexture(GL_TEXTURE_2D, 0);
