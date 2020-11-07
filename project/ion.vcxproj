@@ -172,6 +172,7 @@
     <ClCompile Include="..\source\engine\graphics\fonts\IonTextManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\fonts\IonTypeFace.cpp" />
     <ClCompile Include="..\source\engine\graphics\fonts\IonTypeFaceManager.cpp" />
+    <ClCompile Include="..\source\engine\graphics\fonts\utilities\IonFontUtility.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonAffector.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonColorFader.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonDirectionRandomizer.cpp" />
@@ -270,6 +271,7 @@
     <ClInclude Include="..\source\engine\graphics\fonts\IonTextManager.h" />
     <ClInclude Include="..\source\engine\graphics\fonts\IonTypeFace.h" />
     <ClInclude Include="..\source\engine\graphics\fonts\IonTypeFaceManager.h" />
+    <ClInclude Include="..\source\engine\graphics\fonts\utilities\IonFontUtility.h" />
     <ClInclude Include="..\source\engine\graphics\IonGraphicsAPI.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffector.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffectorFactory.h" />

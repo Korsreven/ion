@@ -52,6 +52,7 @@ File:	main.cpp
 #include "graphics/fonts/IonTextManager.h"
 #include "graphics/fonts/IonTypeFace.h"
 #include "graphics/fonts/IonTypeFaceManager.h"
+#include "graphics/fonts/utilities/IonFontUtility.h"
 #include "graphics/particles/IonEmitter.h"
 #include "graphics/particles/IonEmitterFactory.h"
 #include "graphics/particles/IonParticle.h"
@@ -394,10 +395,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//while (!fonts.Loaded());
 
-			ion::graphics::fonts::TextManager texts;
-			auto char_size_pixels = texts.MeasureCharacter('A', verdana_regular_12);
-			auto str_size_pixels = texts.MeasureString("Hello world!", verdana_regular_12);
-			auto truncated_str = texts.TruncateString("Hello world!", 90, verdana_regular_12);
+			//Font utility
+			auto char_size_pixels = ion::graphics::fonts::utilities::MeasureCharacter('A', verdana_regular_12);
+			auto str_size_pixels = ion::graphics::fonts::utilities::MeasureString("Hello world!", verdana_regular_12);
+			auto truncated_str = ion::graphics::fonts::utilities::TruncateString("Hello world!", 90, verdana_regular_12);
 
 			//Type face
 			ion::graphics::fonts::TypeFaceManager type_faces;
