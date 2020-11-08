@@ -399,6 +399,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto char_size_pixels = ion::graphics::fonts::utilities::MeasureCharacter('A', verdana_regular_12);
 			auto str_size_pixels = ion::graphics::fonts::utilities::MeasureString("Hello world!", verdana_regular_12);
 			auto truncated_str = ion::graphics::fonts::utilities::TruncateString("Hello world!", 90, verdana_regular_12);
+			auto word_wrapped_str = ion::graphics::fonts::utilities::WordWrap("The quick brown fox jumps over the lazy dog", 100, verdana_regular_12);
 
 			//Type face
 			ion::graphics::fonts::TypeFaceManager type_faces;

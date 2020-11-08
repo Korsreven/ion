@@ -55,6 +55,52 @@ std::string truncate_string(std::string str, int max_width, std::string suffix,
 std::string word_wrap(std::string str, int max_width,
 	const font::detail::container_type<font::GlyphExtents> &extents)
 {
+	auto width = 0;
+	auto space_off = std::optional<int>{};
+
+	for (auto i = 0; i < std::ssize(str); ++i)
+	{
+		switch (str[i])
+		{
+			//New line found
+			case '\n':
+			break;
+
+			//Space found
+			case ' ':
+			space_off = i;
+			[[fallthrough]];
+
+			default:
+			{
+				auto [c_width, c_height] = character_size_in_pixels(str[i], extents);			
+
+				//Insert new line
+				if (width > 0 && //At least one character
+					width + c_width > max_width) //Too  wide
+				{
+					//Break at last space
+					if (space_off)
+						str[(i = *space_off)] = '\n';
+
+					//No space found, cut inside word
+					else
+						str.insert(i, 1, '\n');
+				}
+				else
+				{
+					width += c_width;
+					continue;
+				}
+				
+				break;
+			}
+		}
+
+		width = 0;
+		space_off = {};
+	}
+
 	return str;
 }
 
