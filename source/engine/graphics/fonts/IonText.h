@@ -81,6 +81,7 @@ namespace ion::graphics::fonts
 				std::string str;
 				std::optional<Color> color;
 				std::optional<TextDecoration> decoration;
+				std::optional<Color> decoration_color;
 				std::optional<FontStyle> font_style;
 			};
 
@@ -114,8 +115,9 @@ namespace ion::graphics::fonts
 			int from_line_ = 0;				//Render lines in range:
 			std::optional<int> max_lines_;	//[from_line, from_line + max_lines)
 
-			Color default_color_ = text::detail::jet_black;
+			Color default_color_ = text::detail::jet_black;	
 			std::optional<text::TextDecoration> default_decoration_;
+			std::optional<Color> default_decoration_color_;
 			std::optional<text::FontStyle> default_font_style_;
 
 			managed::ObservedObject<TypeFace> type_face_;
@@ -215,6 +217,13 @@ namespace ion::graphics::fonts
 				default_decoration_ = decoration;
 			}
 
+			//Sets the default decoration color for the displayed text decoration to the given color
+			//If nullopt is passed, no default decoration color will be used
+			inline void DefaultDecoration(const std::optional<Color> &color) noexcept
+			{
+				default_decoration_color_ = color;
+			}
+
 			//Sets the default font style for the displayed text to the given style
 			//If nullopt is passed, no default font style will be used
 			inline void DefaultFontStyle(std::optional<text::FontStyle> font_style) noexcept
@@ -309,6 +318,13 @@ namespace ion::graphics::fonts
 			[[nodiscard]] inline auto DefaultDecoration() const noexcept
 			{
 				return default_decoration_;
+			}
+
+			//Returns the default decoration color for the displayed text decoration
+			//Returns nullopt if no default decoration color has been specified
+			[[nodiscard]] inline auto DefaultDecorationColor() const noexcept
+			{
+				return default_decoration_color_;
 			}
 
 			//Returns the default font style for the displayed text
