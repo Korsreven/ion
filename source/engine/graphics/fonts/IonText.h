@@ -49,11 +49,10 @@ namespace ion::graphics::fonts
 			Bottom
 		};
 
-		enum class TextFormatting
+		enum class TextFormatting : bool
 		{
-			HTML,
-			CSS,
-			Both
+			None,
+			HTML
 		};
 
 		enum class TextDecoration
@@ -106,7 +105,7 @@ namespace ion::graphics::fonts
 			std::string unformatted_str_;
 			text::TextAlignment alignment_ = text::TextAlignment::Left;
 			text::TextVerticalAlignment vertical_alignment_ = text::TextVerticalAlignment::Top;
-			std::optional<text::TextFormatting> formatting_ = text::TextFormatting::Both;
+			text::TextFormatting formatting_ = text::TextFormatting::HTML;
 
 			std::optional<Vector2> area_size_;
 			std::optional<int> padding_;
@@ -159,8 +158,7 @@ namespace ion::graphics::fonts
 			}
 
 			//Sets the formatting of the text to the given format
-			//If nullopt is passed, all formatting will be turned off
-			inline void Formatting(std::optional<text::TextFormatting> formatting) noexcept
+			inline void Formatting(text::TextFormatting formatting) noexcept
 			{
 				formatting_ = formatting;
 			}
@@ -262,7 +260,6 @@ namespace ion::graphics::fonts
 			}
 
 			//Returns the formatting of the text
-			//Returns nullopt if all formatting is turned off
 			[[nodiscard]] inline auto Formatting() const noexcept
 			{
 				return formatting_;

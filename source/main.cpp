@@ -396,6 +396,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//while (!fonts.Loaded());
 
 			//Font utility
+			auto fmt_elements = ion::graphics::fonts::utilities::FormattedElements(
+				"<p style=\"font-color:black;\">Hello<b><font color=\"red\">Roses<br><i><u style=\"font-decoration-color:black;\">are</u> red</i></font></b>World!</p>"
+			);
+
 			auto char_size_pixels = ion::graphics::fonts::utilities::MeasureCharacter('A', verdana_regular_12);
 			auto str_size_pixels = ion::graphics::fonts::utilities::MeasureString("Hello world!", verdana_regular_12);
 			auto truncated_str = ion::graphics::fonts::utilities::TruncateString("Hello world!", 90, verdana_regular_12);
