@@ -16,6 +16,7 @@ File:	IonFontUtility.cpp
 #include <functional>
 
 #include "graphics/fonts/IonFontManager.h"
+#include "script/utilities/IonParseUtility.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::fonts::utilities
@@ -23,6 +24,18 @@ namespace ion::graphics::fonts::utilities
 
 namespace detail
 {
+
+std::optional<std::string_view> get_tag(std::string_view str) noexcept
+{
+	if (auto iter = std::find_if(std::begin(str), std::end(str), is_end_of_tag);
+		iter != std::end(str))
+	{
+		str.remove_suffix(std::size(str) - (iter - std::begin(str)));
+		return str;
+	}
+	else
+		return {};
+}
 
 std::optional<html_element> parse_opening_tag(std::string_view str) noexcept
 {
@@ -68,11 +81,90 @@ std::optional<html_element> parse_opening_tag(std::string_view str) noexcept
 		return {};
 }
 
-text::detail::formatted_elements string_to_formatted_elements(std::string_view str)
+
+text::TextSectionStyle html_element_to_text_section_style(const html_element &element, text::TextSectionStyle *parent_section) noexcept
+{
+	std::optional<Color> section_color;
+	std::optional<text::TextDecoration> section_decoration;
+	std::optional<Color> section_decoration_color;
+	std::optional<text::FontStyle> section_font_style;
+
+	//Inherit from parent
+	if (parent_section)
+	{
+		section_color = parent_section->TextColor();
+		section_decoration = parent_section->Decoration();
+		section_decoration_color = parent_section->DecorationColor();
+		section_font_style = parent_section->TextFontStyle();
+	}
+
+	//Tags
+	//Underline
+	if (element.tag == "u" || element.tag == "ins")
+		section_decoration = text::TextDecoration::Underline;
+
+	//Line-through
+	else if (element.tag == "del")
+		section_decoration = text::TextDecoration::LineThrough;
+
+	//Bold
+	else if (element.tag == "b" || element.tag == "strong")
+		section_font_style =
+			[&]() noexcept
+			{
+				if (section_font_style &&
+					(*section_font_style == text::FontStyle::Italic ||
+					 *section_font_style == text::FontStyle::BoldItalic))
+					return text::FontStyle::BoldItalic;
+				else
+					return text::FontStyle::Bold;
+			}();
+
+	//Italic
+	else if (element.tag == "i" || element.tag == "em")
+		section_font_style =
+			[&]() noexcept
+			{
+				if (section_font_style &&
+					(*section_font_style == text::FontStyle::Bold ||
+					 *section_font_style == text::FontStyle::BoldItalic))
+					return text::FontStyle::BoldItalic;
+				else
+					return text::FontStyle::Italic;
+			}();
+
+
+	//Attributes
+	if (element.attribute)
+	{
+		//Parse attribute value (as string literal)
+		if (auto value =
+			script::utilities::parse::AsString(element.attribute->value); value)
+		{
+			//Color
+			if (is_color_attribute(element.attribute->name))
+			{
+				if (auto color = script::utilities::parse::AsColor(*value); color)
+					section_color = *color;
+			}
+
+			//Style
+			else if (is_style_attribute(element.attribute->name))
+			{
+				//TODO
+			}
+		}
+	}
+
+	return {section_color, section_decoration, section_decoration_color, section_font_style};
+}
+
+text::TextSections string_to_text_sections(std::string_view str)
 {
 	html_elements elements;
-	text::detail::formatted_element fmt_element;
-	std::string s;
+	text::TextSectionStyles text_section_styles;
+	text::TextSections text_sections;
+	std::string content;
 
 	for (auto iter = std::begin(str), end = std::end(str); iter != end; ++iter)
 	{
@@ -80,52 +172,78 @@ text::detail::formatted_elements string_to_formatted_elements(std::string_view s
 		auto next_c = iter + 1 != end ? *(iter + 1) : '\0';
 		auto off = iter - std::begin(str);
 
+		
 		//Closing tag, must be checked before opening tag
 		if (is_start_of_closing_tag(c, next_c))
 		{
 			//Something to close
 			if (!std::empty(elements))
 			{
-				//Check for end tag
-				if (auto it = std::find_if(std::begin(str) + off + 2, end, is_end_of_tag); it != end)
+				//Tag matches opening tag
+				if (auto tag = get_tag(str.substr(off + 2));
+					tag && *tag == elements.back().tag) 
 				{
-					//Tag matches opening tag
-					if (str.substr(off + 2, it - std::begin(str) - (off + 2)) == elements.back().tag)
-					{
-						elements.pop_back();
-						iter = it;
-						continue;
-					}
+					if (!std::empty(content))
+						text_sections.emplace_back(std::move(content), text_section_styles.back());
+
+					elements.pop_back();
+					text_section_styles.pop_back();
+
+					iter += std::size(*tag) + 2;
+					continue;
 				}
 			}
 		}
 		//Opening tag
 		else if (is_start_of_opening_tag(c))
 		{
-			//Check for end tag
-			if (auto it = std::find_if(std::begin(str) + off + 1, end, is_end_of_tag); it != end)
+			if (auto tag = get_tag(str.substr(off + 1)); tag) 
 			{
 				//Opening tag has been parsed and validated
-				if (auto element = parse_opening_tag(str.substr(off + 1, it - std::begin(str) - (off + 1))); element)
+				if (auto element = parse_opening_tag(*tag); element)
 				{
 					if (is_empty_tag(element->tag))
 					{
 						if (is_br_tag(element->tag))
-							s += '\n';
+							content += '\n';
 					}
 					else
-						elements.push_back(std::move(*element));
+					{
+						if (!std::empty(content))
+						{
+							if (!std::empty(text_section_styles))
+								text_sections.emplace_back(std::move(content), text_section_styles.back());
+							else
+								text_sections.emplace_back(std::move(content));
+						}
 
-					iter = it;
+						elements.push_back(std::move(*element));
+						text_section_styles.push_back(
+							html_element_to_text_section_style(
+								elements.back(),
+								!std::empty(text_section_styles) ?
+								&text_section_styles.back() : nullptr
+							));
+					}
+
+					iter += std::size(*tag) + 1;
 					continue;
 				}
 			}
 		}
 
-		s += c;
+		content += c;
 	}
 
-	return {};
+	if (!std::empty(content))
+	{
+		if (!std::empty(text_section_styles))
+			text_sections.emplace_back(std::move(content), text_section_styles.back());
+		else
+			text_sections.emplace_back(std::move(content));
+	}
+
+	return text_sections;
 }
 
 std::string truncate_string(std::string str, int max_width, std::string suffix,
@@ -218,9 +336,9 @@ std::string word_wrap(std::string str, int max_width,
 	Formatting
 */
 
-text::detail::formatted_elements FormattedElements(std::string_view str)
+text::TextSections AsTextSections(std::string_view str)
 {
-	return detail::string_to_formatted_elements(str);
+	return detail::string_to_text_sections(str);
 }
 
 

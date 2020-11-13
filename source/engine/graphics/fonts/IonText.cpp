@@ -17,6 +17,48 @@ namespace ion::graphics::fonts
 
 using namespace text;
 
+
+TextSectionStyle::TextSectionStyle(std::optional<Color> color,
+	std::optional<TextDecoration> decoration, std::optional<Color> decoration_color,
+	std::optional<FontStyle> font_style) noexcept :
+
+	color_{color},
+	decoration_{decoration},
+	decoration_color_{decoration_color},
+	font_style_{font_style}
+{
+	//Empty
+}
+
+
+TextSection::TextSection(std::string content) :
+	content_{std::move(content)}
+{
+	//Empty
+}
+
+TextSection::TextSection(std::string content, TextSectionStyle text_section_style) noexcept :
+
+	TextSectionStyle{std::move(text_section_style)},
+	content_{std::move(content)}
+{
+	//Empty
+}
+
+
+TextLine::TextLine(TextSections sections, int string_width) :
+
+	sections_{std::move(sections)},
+	string_width_{string_width}
+{
+	//Empty
+}
+
+
+/*
+	Text
+*/
+
 Text::Text(std::string name, std::string str, TypeFace &type_face) :
 
 	managed::ManagedObject<TextManager>{std::move(name)},
@@ -84,8 +126,8 @@ std::string Text::FormattedStr() const noexcept
 	//First
 	if (!std::empty(formatted_lines_))
 	{
-		for (auto &element : formatted_lines_.front().elements)
-			str += element.str;
+		for (auto &section : formatted_lines_.front().Sections())
+			str += section.Content();
 	}
 
 	//Rest
@@ -94,8 +136,8 @@ std::string Text::FormattedStr() const noexcept
 	{
 		str += '\n';
 
-		for (auto &element : iter->elements)
-			str += element.str;
+		for (auto &section : iter->Sections())
+			str += section.Content();
 	}
 
 	return str;

@@ -140,13 +140,14 @@ namespace ion::graphics::fonts::utilities
 		}
 
 
+		std::optional<std::string_view> get_tag(std::string_view str) noexcept;
 		std::optional<html_element> parse_opening_tag(std::string_view str) noexcept;
 
-		text::detail::formatted_elements string_to_formatted_elements(std::string_view str);
+		text::TextSectionStyle html_element_to_text_section_style(const html_element &element, text::TextSectionStyle *parent_section) noexcept;
+		text::TextSections string_to_text_sections(std::string_view str);
 
 		std::string truncate_string(std::string str, int max_width, std::string suffix,
 			const font::detail::container_type<font::GlyphExtents> &extents);
-
 		std::string word_wrap(std::string str, int max_width,
 			const font::detail::container_type<font::GlyphExtents> &extents);
 	} //detail
@@ -156,8 +157,8 @@ namespace ion::graphics::fonts::utilities
 		Formatting
 	*/
 
-	//Returns formatted elements, by parsing all HTML elements found in the given string
-	[[nodiscard]] text::detail::formatted_elements FormattedElements(std::string_view str);
+	//Returns text sections, by parsing all HTML elements found in the given string
+	[[nodiscard]] text::TextSections AsTextSections(std::string_view str);
 
 
 	/*

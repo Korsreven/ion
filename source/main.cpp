@@ -396,8 +396,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//while (!fonts.Loaded());
 
 			//Font utility
-			auto fmt_elements = ion::graphics::fonts::utilities::FormattedElements(
-				"<p style=\"font-color:black;\">Hello<b><font color=\"red\">Roses<br><i><u style=\"font-decoration-color:black;\">are</u> red</i></font></b>World!</p>"
+			auto text_sections = ion::graphics::fonts::utilities::AsTextSections(
+				"First<p>Hello<b><font color=\"red\">Roses<i><br><u>are</u>red</i></font></b>World!</p>Last"
 			);
 
 			auto char_size_pixels = ion::graphics::fonts::utilities::MeasureCharacter('A', verdana_regular_12);

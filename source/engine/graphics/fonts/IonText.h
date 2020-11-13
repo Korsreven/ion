@@ -70,29 +70,149 @@ namespace ion::graphics::fonts
 		};
 
 
+		class TextSectionStyle
+		{
+			protected:
+
+				std::optional<Color> color_;
+				std::optional<TextDecoration> decoration_;
+				std::optional<Color> decoration_color_;
+				std::optional<FontStyle> font_style_;
+
+			public:
+
+				//Default constructor
+				TextSectionStyle() = default;
+
+				//Alternative constructor
+				TextSectionStyle(std::optional<Color> color,
+					std::optional<TextDecoration> decoration, std::optional<Color> decoration_color,
+					std::optional<FontStyle> font_style) noexcept;
+
+
+				/*
+					Operators
+				*/
+
+				//
+				[[nodiscard]] inline auto operator==(const TextSectionStyle &rhs) const noexcept
+				{
+					return color_ == rhs.color_ &&
+						   decoration_ == rhs.decoration_ &&
+						   decoration_color_ == rhs.decoration_color_ &&
+						   font_style_ == rhs.font_style_;
+				}
+
+
+				/*
+					Observers
+				*/
+
+				//
+				[[nodiscard]] inline auto& TextColor() const noexcept
+				{
+					return color_;
+				}
+
+				//
+				[[nodiscard]] inline auto& Decoration() const noexcept
+				{
+					return decoration_;
+				}
+
+				//
+				[[nodiscard]] inline auto& DecorationColor() const noexcept
+				{
+					return decoration_color_;
+				}
+
+				//
+				[[nodiscard]] inline auto& TextFontStyle() const noexcept
+				{
+					return font_style_;
+				}
+		};
+
+		using TextSectionStyles = std::vector<TextSectionStyle>;
+
+
+		class TextSection final : public TextSectionStyle
+		{
+			private:
+
+				std::string content_;
+
+			public:
+
+				//Constructor
+				explicit TextSection(std::string content);
+
+				//Alternative constructor
+				TextSection(std::string content, TextSectionStyle text_section_style) noexcept;
+
+
+				/*
+					Modifiers
+				*/
+
+				//
+				inline void AppendContent(std::string_view content) noexcept
+				{
+					content_ += content;
+				}
+
+
+				/*
+					Observers
+				*/
+
+				//
+				[[nodiscard]] inline auto& Content() const noexcept
+				{
+					return content_;
+				}
+		};
+
+		using TextSections = std::vector<TextSection>;
+
+
+		class TextLine final
+		{
+			private:
+
+				TextSections sections_;
+				int string_width_ = 0;
+
+			public:
+
+				//Constructor
+				explicit TextLine(TextSections sections, int string_width = 0);
+
+
+				/*
+					Observers
+				*/
+
+				//Returns an immutable range of all sections on this line
+				//This can be used directly with a range-based for loop
+				[[nodiscard]] inline const auto Sections() const noexcept
+				{
+					return adaptors::ranges::Iterable<const TextSections&>{sections_};
+				}
+
+				//
+				[[nodiscard]] inline auto StringWidth() const noexcept
+				{
+					return string_width_;
+				}
+		};
+
+		using TextLines = std::vector<TextLine>;
+
+
 		namespace detail
 		{
 			inline const auto jet_black = Color::RGB(52, 52, 52);
-
-
-			struct formatted_element
-			{
-				std::string str;
-				std::optional<Color> color;
-				std::optional<TextDecoration> decoration;
-				std::optional<Color> decoration_color;
-				std::optional<FontStyle> font_style;
-			};
-
-			using formatted_elements = std::vector<formatted_element>;
-
-			struct formatted_line
-			{
-				formatted_elements elements;
-				int width = 0;
-			};
-
-			using formatted_lines = std::vector<formatted_line>;
 		} //detail
 	} //text
 
@@ -120,7 +240,7 @@ namespace ion::graphics::fonts
 			std::optional<text::FontStyle> default_font_style_;
 
 			managed::ObservedObject<TypeFace> type_face_;
-			text::detail::formatted_lines formatted_lines_;
+			text::TextLines formatted_lines_;
 
 		public:
 
@@ -366,7 +486,7 @@ namespace ion::graphics::fonts
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline const auto FormattedLines() const noexcept
 			{
-				return adaptors::ranges::Iterable<const text::detail::formatted_lines&>{formatted_lines_};
+				return adaptors::ranges::Iterable<const text::TextLines&>{formatted_lines_};
 			}
 	};
 } //ion::graphics::fonts
