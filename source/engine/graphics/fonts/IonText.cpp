@@ -22,10 +22,10 @@ TextSectionStyle::TextSectionStyle(std::optional<Color> color,
 	std::optional<TextDecoration> decoration, std::optional<Color> decoration_color,
 	std::optional<FontStyle> font_style) noexcept :
 
-	color_{color},
-	decoration_{decoration},
-	decoration_color_{decoration_color},
-	font_style_{font_style}
+	default_color_{color},
+	default_decoration_{decoration},
+	default_decoration_color_{decoration_color},
+	default_font_style_{font_style}
 {
 	//Empty
 }
@@ -46,12 +46,27 @@ TextSection::TextSection(std::string content, TextSectionStyle text_section_styl
 }
 
 
-TextLine::TextLine(TextSections sections, int string_width) :
+TextLine::TextLine(TextSections sections, int width) :
 
 	sections_{std::move(sections)},
-	string_width_{string_width}
+	width_{width}
 {
 	//Empty
+}
+
+
+/*
+	Content
+*/
+
+std::string TextLine::Content() const
+{
+	std::string content;
+
+	for (auto &section : Sections())
+		content += section.Content();
+
+	return content;
 }
 
 
@@ -126,18 +141,12 @@ std::string Text::FormattedStr() const noexcept
 	//First
 	if (!std::empty(formatted_lines_))
 	{
-		for (auto &section : formatted_lines_.front().Sections())
-			str += section.Content();
-	}
+		str += formatted_lines_.front().Content();
 
-	//Rest
-	for (auto iter = std::begin(formatted_lines_) + 1,
-		end = std::end(formatted_lines_); iter != end; ++iter)
-	{
-		str += '\n';
-
-		for (auto &section : iter->Sections())
-			str += section.Content();
+		//Rest
+		for (auto iter = std::begin(formatted_lines_) + 1,
+			end = std::end(formatted_lines_); iter != end; ++iter)
+			str += "\n" + iter->Content();
 	}
 
 	return str;

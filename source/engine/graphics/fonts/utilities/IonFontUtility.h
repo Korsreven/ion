@@ -21,6 +21,7 @@ File:	IonFontUtility.h
 
 #include "graphics/fonts/IonFont.h"
 #include "graphics/fonts/IonText.h"
+#include "graphics/fonts/IonTypeFace.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 
@@ -140,15 +141,21 @@ namespace ion::graphics::fonts::utilities
 		}
 
 
+		void add_text_section(std::string content, text::TextSections &text_sections, const text::TextSectionStyles &text_section_styles);
+
 		std::optional<std::string_view> get_tag(std::string_view str) noexcept;
 		std::optional<html_element> parse_opening_tag(std::string_view str) noexcept;
 
 		text::TextSectionStyle html_element_to_text_section_style(const html_element &element, text::TextSectionStyle *parent_section) noexcept;
 		text::TextSections string_to_text_sections(std::string_view str);
+		text::TextLines text_sections_to_text_lines(text::TextSections text_sections);
 
 		std::string truncate_string(std::string str, int max_width, std::string suffix,
 			const font::detail::container_type<font::GlyphExtents> &extents);
+
 		std::string word_wrap(std::string str, int max_width,
+			const font::detail::container_type<font::GlyphExtents> &extents);
+		text::TextSections word_wrap(text::TextSections text_sections, int max_width,
 			const font::detail::container_type<font::GlyphExtents> &extents);
 	} //detail
 
@@ -159,6 +166,9 @@ namespace ion::graphics::fonts::utilities
 
 	//Returns text sections, by parsing all HTML elements found in the given string
 	[[nodiscard]] text::TextSections AsTextSections(std::string_view str);
+
+	//Returns text lines, by splitting up text sections into lines when a '\n' character is found
+	[[nodiscard]] text::TextLines SplitTextSections(text::TextSections text_sections);
 
 
 	/*
@@ -198,6 +208,12 @@ namespace ion::graphics::fonts::utilities
 	//Does only cut words if one word is wider than max width, then a '\n' character is inserted
 	//Returns nullopt if font could not be loaded properly
 	[[nodiscard]] std::optional<std::string> WordWrap(std::string str, int max_width, Font &font);
+
+	//Word wraps the given text sections if wider than max width, in pixels, when rendered with the given type face
+	//Replaces a ' ' character in between words, with a '\n' character where the line needs to be broken
+	//Does only cut words if one word is wider than max width, then a '\n' character is inserted
+	//Returns nullopt if font could not be loaded properly
+	[[nodiscard]] std::optional<text::TextSections> WordWrap(text::TextSections text_sections, int max_width, TypeFace &type_face);
 } //ion::graphics::fonts::utilities
 
 #endif

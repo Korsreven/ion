@@ -25,6 +25,26 @@ namespace ion::graphics::fonts::utilities
 namespace detail
 {
 
+void add_text_section(std::string content, text::TextSections &text_sections, const text::TextSectionStyles &text_section_styles)
+{
+	//Combine with previous section if equal styles
+	if (!std::empty(text_sections) &&
+		((!std::empty(text_section_styles) && text_sections.back() == text_section_styles.back()) ||
+		(std::empty(text_section_styles) && text_sections.back().IsPlain())))
+
+		text_sections.back().Content() += content;
+	
+	//Add new section
+	else
+	{
+		if (!std::empty(text_section_styles))
+			text_sections.emplace_back(std::move(content), text_section_styles.back());
+		else
+			text_sections.emplace_back(std::move(content));
+	}
+}
+
+
 std::optional<std::string_view> get_tag(std::string_view str) noexcept
 {
 	if (auto iter = std::find_if(std::begin(str), std::end(str), is_end_of_tag);
@@ -84,54 +104,44 @@ std::optional<html_element> parse_opening_tag(std::string_view str) noexcept
 
 text::TextSectionStyle html_element_to_text_section_style(const html_element &element, text::TextSectionStyle *parent_section) noexcept
 {
-	std::optional<Color> section_color;
-	std::optional<text::TextDecoration> section_decoration;
-	std::optional<Color> section_decoration_color;
-	std::optional<text::FontStyle> section_font_style;
-
-	//Inherit from parent
-	if (parent_section)
-	{
-		section_color = parent_section->TextColor();
-		section_decoration = parent_section->Decoration();
-		section_decoration_color = parent_section->DecorationColor();
-		section_font_style = parent_section->TextFontStyle();
-	}
+	auto section = parent_section ?
+		*parent_section : //Inherit from parent
+		text::TextSectionStyle{}; //Plain
 
 	//Tags
 	//Underline
 	if (element.tag == "u" || element.tag == "ins")
-		section_decoration = text::TextDecoration::Underline;
+		section.DefaultDecoration(text::TextDecoration::Underline);
 
 	//Line-through
 	else if (element.tag == "del")
-		section_decoration = text::TextDecoration::LineThrough;
+		section.DefaultDecoration(text::TextDecoration::LineThrough);
 
 	//Bold
 	else if (element.tag == "b" || element.tag == "strong")
-		section_font_style =
-			[&]() noexcept
+		section.DefaultFontStyle(
+			[&font_style = section.DefaultFontStyle()]() noexcept
 			{
-				if (section_font_style &&
-					(*section_font_style == text::FontStyle::Italic ||
-					 *section_font_style == text::FontStyle::BoldItalic))
+				if (font_style &&
+					(*font_style == text::FontStyle::Italic ||
+					 *font_style == text::FontStyle::BoldItalic))
 					return text::FontStyle::BoldItalic;
 				else
 					return text::FontStyle::Bold;
-			}();
+			}());
 
 	//Italic
 	else if (element.tag == "i" || element.tag == "em")
-		section_font_style =
-			[&]() noexcept
+		section.DefaultFontStyle(
+			[&font_style = section.DefaultFontStyle()]() noexcept
 			{
-				if (section_font_style &&
-					(*section_font_style == text::FontStyle::Bold ||
-					 *section_font_style == text::FontStyle::BoldItalic))
+				if (font_style &&
+					(*font_style == text::FontStyle::Bold ||
+					 *font_style == text::FontStyle::BoldItalic))
 					return text::FontStyle::BoldItalic;
 				else
 					return text::FontStyle::Italic;
-			}();
+			}());
 
 
 	//Attributes
@@ -145,7 +155,7 @@ text::TextSectionStyle html_element_to_text_section_style(const html_element &el
 			if (is_color_attribute(element.attribute->name))
 			{
 				if (auto color = script::utilities::parse::AsColor(*value); color)
-					section_color = *color;
+					section.DefaultColor(*color);
 			}
 
 			//Style
@@ -156,7 +166,7 @@ text::TextSectionStyle html_element_to_text_section_style(const html_element &el
 		}
 	}
 
-	return {section_color, section_decoration, section_decoration_color, section_font_style};
+	return section;
 }
 
 text::TextSections string_to_text_sections(std::string_view str)
@@ -184,7 +194,7 @@ text::TextSections string_to_text_sections(std::string_view str)
 					tag && *tag == elements.back().tag) 
 				{
 					if (!std::empty(content))
-						text_sections.emplace_back(std::move(content), text_section_styles.back());
+						add_text_section(std::move(content), text_sections, text_section_styles);
 
 					elements.pop_back();
 					text_section_styles.pop_back();
@@ -210,12 +220,7 @@ text::TextSections string_to_text_sections(std::string_view str)
 					else
 					{
 						if (!std::empty(content))
-						{
-							if (!std::empty(text_section_styles))
-								text_sections.emplace_back(std::move(content), text_section_styles.back());
-							else
-								text_sections.emplace_back(std::move(content));
-						}
+							add_text_section(std::move(content), text_sections, text_section_styles);
 
 						elements.push_back(std::move(*element));
 						text_section_styles.push_back(
@@ -236,15 +241,16 @@ text::TextSections string_to_text_sections(std::string_view str)
 	}
 
 	if (!std::empty(content))
-	{
-		if (!std::empty(text_section_styles))
-			text_sections.emplace_back(std::move(content), text_section_styles.back());
-		else
-			text_sections.emplace_back(std::move(content));
-	}
+		add_text_section(std::move(content), text_sections, text_section_styles);
 
 	return text_sections;
 }
+
+text::TextLines text_sections_to_text_lines(text::TextSections text_sections)
+{
+	return {};
+}
+
 
 std::string truncate_string(std::string str, int max_width, std::string suffix,
 	const font::detail::container_type<font::GlyphExtents> &extents)
@@ -276,6 +282,7 @@ std::string truncate_string(std::string str, int max_width, std::string suffix,
 
 	return str;
 }
+
 
 std::string word_wrap(std::string str, int max_width,
 	const font::detail::container_type<font::GlyphExtents> &extents)
@@ -329,6 +336,12 @@ std::string word_wrap(std::string str, int max_width,
 	return str;
 }
 
+text::TextSections word_wrap(text::TextSections text_sections, int max_width,
+	const font::detail::container_type<font::GlyphExtents> &extents)
+{
+	return {};
+}
+
 } //detail
 
 
@@ -339,6 +352,11 @@ std::string word_wrap(std::string str, int max_width,
 text::TextSections AsTextSections(std::string_view str)
 {
 	return detail::string_to_text_sections(str);
+}
+
+text::TextLines SplitTextSections(text::TextSections text_sections)
+{
+	return detail::text_sections_to_text_lines(std::move(text_sections));
 }
 
 
@@ -406,6 +424,20 @@ std::optional<std::string> WordWrap(std::string str, int max_width, Font &font)
 	{
 		if (auto &extents = font.GlyphExtents(); extents)
 			return detail::word_wrap(std::move(str), max_width, *extents);
+	}
+
+	return {};
+}
+
+std::optional<text::TextSections> WordWrap(text::TextSections text_sections, int max_width, TypeFace &type_face)
+{
+	if (auto font = type_face.RegularFont(); font) //TODO
+	{
+		if (font->IsLoaded() || (font->Owner() && font->Owner()->Load(*font)))
+		{
+			if (auto &extents = font->GlyphExtents(); extents)
+				return detail::word_wrap(std::move(text_sections), max_width, *extents);
+		}
 	}
 
 	return {};

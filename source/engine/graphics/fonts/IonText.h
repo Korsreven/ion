@@ -74,10 +74,10 @@ namespace ion::graphics::fonts
 		{
 			protected:
 
-				std::optional<Color> color_;
-				std::optional<TextDecoration> decoration_;
-				std::optional<Color> decoration_color_;
-				std::optional<FontStyle> font_style_;
+				std::optional<Color> default_color_;
+				std::optional<TextDecoration> default_decoration_;
+				std::optional<Color> default_decoration_color_;
+				std::optional<FontStyle> default_font_style_;
 
 			public:
 
@@ -97,10 +97,39 @@ namespace ion::graphics::fonts
 				//
 				[[nodiscard]] inline auto operator==(const TextSectionStyle &rhs) const noexcept
 				{
-					return color_ == rhs.color_ &&
-						   decoration_ == rhs.decoration_ &&
-						   decoration_color_ == rhs.decoration_color_ &&
-						   font_style_ == rhs.font_style_;
+					return default_color_ == rhs.default_color_ &&
+						   default_decoration_ == rhs.default_decoration_ &&
+						   default_decoration_color_ == rhs.default_decoration_color_ &&
+						   default_font_style_ == rhs.default_font_style_;
+				}
+
+
+				/*
+					Modifiers
+				*/
+
+				//
+				inline void DefaultColor(const Color &color) noexcept
+				{
+					default_color_ = color;
+				}
+
+				//
+				inline void DefaultDecoration(TextDecoration decoration) noexcept
+				{
+					default_decoration_ = decoration;
+				}
+
+				//
+				inline void DefaultDecorationColor(const Color &color) noexcept
+				{
+					default_decoration_color_ = color;
+				}
+
+				//
+				inline void DefaultFontStyle(FontStyle font_style) noexcept
+				{
+					default_font_style_ = font_style;
 				}
 
 
@@ -109,27 +138,34 @@ namespace ion::graphics::fonts
 				*/
 
 				//
-				[[nodiscard]] inline auto& TextColor() const noexcept
+				[[nodiscard]] inline auto& DefaultColor() const noexcept
 				{
-					return color_;
+					return default_color_;
 				}
 
 				//
-				[[nodiscard]] inline auto& Decoration() const noexcept
+				[[nodiscard]] inline auto& DefaultDecoration() const noexcept
 				{
-					return decoration_;
+					return default_decoration_;
 				}
 
 				//
-				[[nodiscard]] inline auto& DecorationColor() const noexcept
+				[[nodiscard]] inline auto& DefaultDecorationColor() const noexcept
 				{
-					return decoration_color_;
+					return default_decoration_color_;
 				}
 
 				//
-				[[nodiscard]] inline auto& TextFontStyle() const noexcept
+				[[nodiscard]] inline auto& DefaultFontStyle() const noexcept
 				{
-					return font_style_;
+					return default_font_style_;
+				}
+
+
+				//
+				[[nodiscard]] inline auto IsPlain() const noexcept
+				{
+					return !default_color_ && !default_decoration_ && !default_decoration_color_ && !default_font_style_;
 				}
 		};
 
@@ -152,19 +188,14 @@ namespace ion::graphics::fonts
 
 
 				/*
-					Modifiers
+					Observers
 				*/
 
 				//
-				inline void AppendContent(std::string_view content) noexcept
+				[[nodiscard]] inline auto& Content() noexcept
 				{
-					content_ += content;
+					return content_;
 				}
-
-
-				/*
-					Observers
-				*/
 
 				//
 				[[nodiscard]] inline auto& Content() const noexcept
@@ -181,12 +212,12 @@ namespace ion::graphics::fonts
 			private:
 
 				TextSections sections_;
-				int string_width_ = 0;
+				int width_ = 0;
 
 			public:
 
 				//Constructor
-				explicit TextLine(TextSections sections, int string_width = 0);
+				explicit TextLine(TextSections sections, int width = 0);
 
 
 				/*
@@ -201,10 +232,18 @@ namespace ion::graphics::fonts
 				}
 
 				//
-				[[nodiscard]] inline auto StringWidth() const noexcept
+				[[nodiscard]] inline auto Width() const noexcept
 				{
-					return string_width_;
+					return width_;
 				}
+
+
+				/*
+					Content
+				*/
+
+				//
+				[[nodiscard]] std::string Content() const;
 		};
 
 		using TextLines = std::vector<TextLine>;

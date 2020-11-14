@@ -309,17 +309,17 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		{
 			//Check API support
 			{
-				auto newest_gl = ion::graphics::gl::HasGL(ion::graphics::gl::Version::v4_6);
-				auto blend_func_separate = ion::graphics::gl::BlendFuncSeparate_Support();
-				auto frame_buffer_object = ion::graphics::gl::FrameBufferObject_Support();
-				auto multi_texture = ion::graphics::gl::MultiTexture_Support();
-				auto point_sprite = ion::graphics::gl::PointSprite_Support();
-				auto shader = ion::graphics::gl::Shader_Support();
-				auto npot = ion::graphics::gl::TextureNonPowerOfTwo_Support();
-				auto vertex_buffer_object = ion::graphics::gl::VertexBufferObject_Support();
-				auto max_texture_size = ion::graphics::gl::MaxTextureSize();
-				auto max_texture_units = ion::graphics::gl::MaxTextureUnits();
-				auto break_point = false;
+				[[maybe_unused]] auto newest_gl = ion::graphics::gl::HasGL(ion::graphics::gl::Version::v4_6);
+				[[maybe_unused]] auto blend_func_separate = ion::graphics::gl::BlendFuncSeparate_Support();
+				[[maybe_unused]] auto frame_buffer_object = ion::graphics::gl::FrameBufferObject_Support();
+				[[maybe_unused]] auto multi_texture = ion::graphics::gl::MultiTexture_Support();
+				[[maybe_unused]] auto point_sprite = ion::graphics::gl::PointSprite_Support();
+				[[maybe_unused]] auto shader = ion::graphics::gl::Shader_Support();
+				[[maybe_unused]] auto npot = ion::graphics::gl::TextureNonPowerOfTwo_Support();
+				[[maybe_unused]] auto vertex_buffer_object = ion::graphics::gl::VertexBufferObject_Support();
+				[[maybe_unused]] auto max_texture_size = ion::graphics::gl::MaxTextureSize();
+				[[maybe_unused]] auto max_texture_units = ion::graphics::gl::MaxTextureUnits();
+				[[maybe_unused]] auto break_point = false;
 			}
 
 
@@ -351,11 +351,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::graphics::textures::TextureManager textures;
 			textures.CreateRepository(std::move(image_repository));
 			auto &rikku_texture = textures.CreateTexture("rikku", "rikku.png");
-			auto &rikku_np2_texture = textures.CreateTexture("rikku_np2", "rikku_np2.png");
+			[[maybe_unused]] auto &rikku_np2_texture = textures.CreateTexture("rikku_np2", "rikku_np2.png");
 			auto &cloud_texture = textures.CreateTexture("cloud", "cloud.png");
-			auto &cloud_np2_texture = textures.CreateTexture("cloud_np2", "cloud_np2.png");
+			[[maybe_unused]] auto &cloud_np2_texture = textures.CreateTexture("cloud_np2", "cloud_np2.png");
 			auto &background_texture = textures.CreateTexture("background", "background.jpg");
-			auto &background_np2_texture = textures.CreateTexture("background_np2", "background_np2.jpg");
+			[[maybe_unused]] auto &background_np2_texture = textures.CreateTexture("background_np2", "background_np2.jpg");
 			textures.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!textures.Loaded());
@@ -378,8 +378,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::graphics::shaders::ShaderManager shaders;
 			shaders.CreateRepository(std::move(shader_repository));
 			shaders.LogLevel(ion::graphics::shaders::shader_manager::InfoLogLevel::Error);
-			auto &vert_shader = shaders.CreateShader("default_particle_vert", "default_particle.vert");
-			auto &frag_shader = shaders.CreateShader("default_particle_frag", "default_particle.frag");
+			[[maybe_unused]] auto &vert_shader = shaders.CreateShader("default_particle_vert", "default_particle.vert");
+			[[maybe_unused]] auto &frag_shader = shaders.CreateShader("default_particle_frag", "default_particle.frag");
 			shaders.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!shaders.Loaded());
@@ -397,7 +397,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Font utility
 			auto text_sections = ion::graphics::fonts::utilities::AsTextSections(
-				"First<p>Hello<b><font color=\"red\">Roses<i><br><u>are</u>red</i></font></b>World!</p>Last"
+				"First<p>Hello<b><font color=\"red\">Ros<b>es</b><br><i><u>a</u><u>re</u>red</i></font></b>World!</p>Last"
 			);
 
 			auto char_size_pixels = ion::graphics::fonts::utilities::MeasureCharacter('A', verdana_regular_12);
@@ -407,7 +407,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Type face
 			ion::graphics::fonts::TypeFaceManager type_faces;
-			auto &verdana_12 = 
+			[[maybe_unused]] auto &verdana_12 = 
 				type_faces.CreateTypeFace(
 					"verdana_12",
 					verdana_regular_12,
@@ -539,14 +539,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	using namespace ion::graphics::shaders::variables;
 
 	Uniform<float> u{"my_uniform"};
-	glsl::uniform<float> &glsl_u = u.Get();
+	[[maybe_unused]] glsl::uniform<float> &glsl_u = u.Get();
 
 	UniformVariable &u_var = u;
 	u_var.Visit(
 		[](glsl::uniform<float> &x) noexcept
 		{
 			x = 6.28f;
-			auto break_point = true;
 		},
 		[](auto&&) noexcept
 		{
@@ -562,7 +561,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	vertex vertices[]{{1.0f, 2.0f}, {2.0f, 3.0f}, {3.0f, 4.0f}, {4.0f, 5.0f}};
 
 	Attribute<glsl::vec2> a{"my_attribute"};
-	glsl::attribute<glsl::vec2> &glsl_a = a.Get();
+	[[maybe_unused]] glsl::attribute<glsl::vec2> &glsl_a = a.Get();
 	
 	AttributeVariable &a_var = a;
 	a_var.Visit(
@@ -573,15 +572,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto b = x[1].XY();
 			auto c = x[2].XY();
 			auto d = x[3].XY();
-			auto break_point = true;
 		},
 		[](auto&&) noexcept
 		{
 			//Everything else
 		});
-
-	auto break_point = true;
-
 
 	/*{
 		auto encoded = ion::utilities::codec::EncodeTo(5050, 16);
