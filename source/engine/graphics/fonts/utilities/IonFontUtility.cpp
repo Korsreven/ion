@@ -25,6 +25,102 @@ namespace ion::graphics::fonts::utilities
 namespace detail
 {
 
+std::pair<size_t, size_t> glyph_rope::get_offsets(size_t off) const noexcept
+{
+	//One string in rope (optimization)
+	if (std::size(strings_) == 1)
+		return {0, off};
+
+	auto &[str_off, total_size] = range_;
+
+	//Above or inside range
+	if (off >= total_size)
+	{
+		for (; str_off < std::size(strings_); ++str_off)
+		{
+			//Offset is inside string
+			if (off - total_size < std::size(strings_[str_off].value))
+				break;
+			else
+				total_size += std::size(strings_[str_off].value);
+		}
+	}
+
+	//Below range
+	else
+	{
+		while (str_off > 0)
+		{
+			total_size -= std::size(strings_[--str_off].value);
+
+			//Offset is inside string
+			if (off >= total_size)
+				break;
+		}
+	}
+
+	return {str_off, off - total_size};
+}
+
+glyph_rope::glyph_rope(glyph_string str)  :
+	strings_{std::move(str)}
+{
+	//Empty
+}
+
+glyph_rope::glyph_rope(glyph_strings strings) :
+	strings_{std::move(strings)}
+{
+	//Empty
+}
+
+char& glyph_rope::operator[](size_t off) noexcept
+{
+	auto [str_off, ch_off] = get_offsets(off);
+	auto &str = strings_[str_off].value;
+	return str[ch_off];
+}
+
+const char& glyph_rope::operator[](size_t off) const noexcept
+{
+	auto [str_off, ch_off] = get_offsets(off);
+	auto &str = strings_[str_off].value;
+	return str[ch_off];
+}
+
+const font::detail::container_type<font::GlyphExtents>& glyph_rope::glyph(size_t off) const noexcept
+{
+	auto [str_off, ch_off] = get_offsets(off);
+	return strings_[str_off].extents;
+}
+
+std::string& glyph_rope::insert(size_t off, size_t count, char ch)
+{
+	size_ = 0;
+	range_ = {};
+
+	auto [str_off, ch_off] = get_offsets(off);
+	auto &str = strings_[str_off].value;
+	return str.insert(ch_off, count, ch);
+}
+
+bool glyph_rope::empty() const noexcept
+{
+	return size() == 0;
+}
+
+size_t glyph_rope::size() const noexcept
+{
+	if (size_ == 0)
+	{
+		for (auto &str : strings_)
+			size_ += std::size(str.value);
+	}
+
+	return size_;
+}
+
+
 void add_text_section(std::string content, text::TextSections &text_sections, const text::TextSectionStyles &text_section_styles)
 {
 	//Combine with previous section if equal styles
@@ -287,8 +383,14 @@ std::string truncate_string(std::string str, int max_width, std::string suffix,
 std::string word_wrap(std::string str, int max_width,
 	const font::detail::container_type<font::GlyphExtents> &extents)
 {
+	word_wrap(glyph_string{str, extents}, max_width);
+	return str;
+}
+
+void word_wrap(glyph_rope str, int max_width)
+{
 	auto width = 0;
-	auto space_off = std::optional<int>{};
+	auto line_break_off = std::optional<int>{};
 
 	for (auto i = 0; i < std::ssize(str); ++i)
 	{
@@ -300,27 +402,44 @@ std::string word_wrap(std::string str, int max_width,
 
 			//Space found
 			case ' ':
-			space_off = i;
+			line_break_off = i;
 			[[fallthrough]];
 
 			default:
 			{
-				auto [c_width, c_height] = character_size_in_pixels(str[i], extents);			
+				auto [c_width, c_height] = character_size_in_pixels(str[i], str.glyph(i));
 
 				//Insert new line
 				if (width > 0 && //At least one character
-					width + c_width > max_width) //Too  wide
+					width + c_width > max_width) //Too wide
 				{
-					//Break at last space
-					if (space_off)
-						str[(i = *space_off)] = '\n';
+					//Break at last line break candidate
+					if (line_break_off)
+					{
+						switch (str[*line_break_off])
+						{
+							//Space
+							case ' ':
+							str[(i = *line_break_off)] = '\n'; //Replace space with new line
+							break;
 
-					//No space found, cut inside word
+							//Hyphen
+							case '-':
+							str.insert((i = *line_break_off + 1), 1, '\n'); //Insert new line after hyphen
+							break;
+						}
+					}
+
+					//No space found, cut word
 					else
 						str.insert(i, 1, '\n');
 				}
 				else
 				{
+					//Hyphen found (that fits)
+					if (width > 0 && str[i] == '-')
+						line_break_off = i;
+
 					width += c_width;
 					continue;
 				}
@@ -330,16 +449,58 @@ std::string word_wrap(std::string str, int max_width,
 		}
 
 		width = 0;
-		space_off = {};
+		line_break_off = {};
 	}
-
-	return str;
 }
 
-text::TextSections word_wrap(text::TextSections text_sections, int max_width,
-	const font::detail::container_type<font::GlyphExtents> &extents)
+
+const font::detail::container_type<font::GlyphExtents>* get_glyph_extents(Font &font)
 {
-	return {};
+	if (font.IsLoaded() || (font.Owner() && font.Owner()->Load(font)))
+	{
+		if (auto &extents = font.GlyphExtents(); extents)
+			return &*extents;
+	}
+
+	return nullptr;
+}
+
+glyph_rope make_glyph_rope(text::TextSections &text_sections,
+	const font::detail::container_type<font::GlyphExtents> &regular_extents,
+	const font::detail::container_type<font::GlyphExtents> *bold_extents,
+	const font::detail::container_type<font::GlyphExtents> *italic_extents,
+	const font::detail::container_type<font::GlyphExtents> *bold_italic_extents)
+{
+	glyph_strings strings;
+
+	for (auto &text_section : text_sections)
+	{
+		auto extents =
+			[&]()
+			{
+				if (text_section.DefaultFontStyle())
+				{
+					switch (*text_section.DefaultFontStyle())
+					{
+						case text::FontStyle::Bold:
+						return bold_extents;
+
+						case text::FontStyle::Italic:
+						return italic_extents;
+
+						case text::FontStyle::BoldItalic:
+						return bold_italic_extents;
+					}
+				}
+
+				return &regular_extents;
+			}();
+		
+		strings.push_back({text_section.Content(),
+			extents ? *extents : regular_extents});
+	}
+
+	return strings;
 }
 
 } //detail
@@ -366,30 +527,24 @@ text::TextLines SplitTextSections(text::TextSections text_sections)
 
 std::optional<Vector2> MeasureCharacter(char c, Font &font) noexcept
 {
-	if (font.IsLoaded() || (font.Owner() && font.Owner()->Load(font)))
+	if (auto extents = detail::get_glyph_extents(font); extents)
 	{
-		if (auto &extents = font.GlyphExtents(); extents)
-		{
-			auto [width, height] = detail::character_size_in_pixels(c, *extents);
-			return Vector2{static_cast<real>(width), static_cast<real>(height)};
-		}
+		auto [width, height] = detail::character_size_in_pixels(c, *extents);
+		return Vector2{static_cast<real>(width), static_cast<real>(height)};
 	}
-	
-	return {};
+	else
+		return {};
 }
 
 std::optional<Vector2> MeasureString(std::string_view str, Font &font) noexcept
 {
-	if (font.IsLoaded() || (font.Owner() && font.Owner()->Load(font)))
+	if (auto extents = detail::get_glyph_extents(font); extents)
 	{
-		if (auto &extents = font.GlyphExtents(); extents)
-		{
-			auto [width, height] = detail::string_size_in_pixels(str, *extents);
-			return Vector2{static_cast<real>(width), static_cast<real>(height)};
-		}
+		auto [width, height] = detail::string_size_in_pixels(str, *extents);
+		return Vector2{static_cast<real>(width), static_cast<real>(height)};
 	}
-	
-	return {};
+	else
+		return {};
 }
 
 
@@ -404,13 +559,10 @@ std::optional<std::string> TruncateString(std::string str, int max_width, Font &
 
 std::optional<std::string> TruncateString(std::string str, int max_width, std::string suffix, Font &font)
 {
-	if (font.IsLoaded() || (font.Owner() && font.Owner()->Load(font)))
-	{
-		if (auto &extents = font.GlyphExtents(); extents)
-			return detail::truncate_string(std::move(str), max_width, std::move(suffix), *extents);
-	}
-
-	return {};
+	if (auto extents = detail::get_glyph_extents(font); extents)
+		return detail::truncate_string(std::move(str), max_width, std::move(suffix), *extents);
+	else
+		return {};
 }
 
 
@@ -420,27 +572,34 @@ std::optional<std::string> TruncateString(std::string str, int max_width, std::s
 
 std::optional<std::string> WordWrap(std::string str, int max_width, Font &font)
 {
-	if (font.IsLoaded() || (font.Owner() && font.Owner()->Load(font)))
-	{
-		if (auto &extents = font.GlyphExtents(); extents)
-			return detail::word_wrap(std::move(str), max_width, *extents);
-	}
-
-	return {};
+	if (auto extents = detail::get_glyph_extents(font); extents)
+		return detail::word_wrap(std::move(str), max_width, *extents);
+	else
+		return {};
 }
 
 std::optional<text::TextSections> WordWrap(text::TextSections text_sections, int max_width, TypeFace &type_face)
 {
-	if (auto font = type_face.RegularFont(); font) //TODO
-	{
-		if (font->IsLoaded() || (font->Owner() && font->Owner()->Load(*font)))
-		{
-			if (auto &extents = font->GlyphExtents(); extents)
-				return detail::word_wrap(std::move(text_sections), max_width, *extents);
-		}
-	}
+	if (!type_face.HasRegularFont())
+		return {};
 
-	return {};
+	if (auto extents = detail::get_glyph_extents(*type_face.RegularFont()); extents)
+	{
+		auto bold_extents = type_face.BoldFont() ?
+			detail::get_glyph_extents(*type_face.BoldFont()) : nullptr;
+		auto italic_extents = type_face.ItalicFont() ?
+			detail::get_glyph_extents(*type_face.ItalicFont()) : nullptr;
+		auto bold_italic_extents = type_face.BoldItalicFont() ?
+			detail::get_glyph_extents(*type_face.BoldItalicFont()) : nullptr;
+
+		detail::word_wrap(
+			detail::make_glyph_rope(text_sections,
+				*extents, bold_extents, italic_extents, bold_italic_extents),
+			max_width);
+		return text_sections;
+	}
+	else
+		return {};
 }
 
 } //ion::graphics::fonts::utilities

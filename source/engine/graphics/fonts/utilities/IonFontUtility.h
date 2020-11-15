@@ -32,13 +32,48 @@ namespace ion::graphics::fonts::utilities
 
 	namespace detail
 	{
-		struct html_attribute
+		struct glyph_string final
+		{
+			std::string &value;
+			const font::detail::container_type<font::GlyphExtents> &extents;
+		};
+
+		using glyph_strings = std::vector<glyph_string>;
+
+		class glyph_rope final
+		{
+			private:
+
+				glyph_strings strings_;
+
+				mutable size_t size_ = 0;
+				mutable std::pair<size_t, size_t> range_;
+
+				std::pair<size_t, size_t> get_offsets(size_t off) const noexcept;
+
+			public:
+
+				glyph_rope(glyph_string str);
+				glyph_rope(glyph_strings strings);
+
+				char& operator[](size_t off) noexcept;
+				const char& operator[](size_t off) const noexcept;
+				const font::detail::container_type<font::GlyphExtents>& glyph(size_t off) const noexcept;
+
+				std::string& insert(size_t off, size_t count, char ch);
+
+				bool empty() const noexcept;
+				size_t size() const noexcept;
+		};
+
+
+		struct html_attribute final
 		{
 			std::string_view name;
 			std::string_view value;
 		};
 
-		struct html_element
+		struct html_element final
 		{
 			std::string_view tag;
 			std::optional<html_attribute> attribute;
@@ -155,8 +190,14 @@ namespace ion::graphics::fonts::utilities
 
 		std::string word_wrap(std::string str, int max_width,
 			const font::detail::container_type<font::GlyphExtents> &extents);
-		text::TextSections word_wrap(text::TextSections text_sections, int max_width,
-			const font::detail::container_type<font::GlyphExtents> &extents);
+		void word_wrap(glyph_rope str, int max_width);
+
+		const font::detail::container_type<font::GlyphExtents>* get_glyph_extents(Font &font);
+		glyph_rope make_glyph_rope(text::TextSections &text_sections,
+			const font::detail::container_type<font::GlyphExtents> &regular_extents,
+			const font::detail::container_type<font::GlyphExtents> *bold_extents,
+			const font::detail::container_type<font::GlyphExtents> *italic_extents,
+			const font::detail::container_type<font::GlyphExtents> *bold_italic_extents);
 	} //detail
 
 

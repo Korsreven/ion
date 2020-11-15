@@ -395,16 +395,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//while (!fonts.Loaded());
 
-			//Font utility
-			auto text_sections = ion::graphics::fonts::utilities::AsTextSections(
-				"First<p>Hello<b><font color=\"red\">Ros<b>es</b><br><i><u>a</u><u>re</u>red</i></font></b>World!</p>Last"
-			);
-
-			auto char_size_pixels = ion::graphics::fonts::utilities::MeasureCharacter('A', verdana_regular_12);
-			auto str_size_pixels = ion::graphics::fonts::utilities::MeasureString("Hello world!", verdana_regular_12);
-			auto truncated_str = ion::graphics::fonts::utilities::TruncateString("Hello world!", 90, verdana_regular_12);
-			auto word_wrapped_str = ion::graphics::fonts::utilities::WordWrap("The quick brown fox jumps over the lazy dog", 100, verdana_regular_12);
-
 			//Type face
 			ion::graphics::fonts::TypeFaceManager type_faces;
 			[[maybe_unused]] auto &verdana_12 = 
@@ -414,6 +404,17 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					verdana_bold_12,
 					verdana_italic_12,
 					verdana_bold_italic_12);
+
+			//Font utility
+			auto text_sections = ion::graphics::fonts::utilities::AsTextSections(
+				"First<p>Hello<b><font color=\"red\">Ros<b>es</b><br><i><u>a</u><u>re</u>red</i></font></b>World!</p>Last"
+			);
+
+			auto char_size_pixels = ion::graphics::fonts::utilities::MeasureCharacter('A', verdana_regular_12);
+			auto str_size_pixels = ion::graphics::fonts::utilities::MeasureString("Hello world!", verdana_regular_12);
+			auto truncated_str = ion::graphics::fonts::utilities::TruncateString("Hello world!", 90, verdana_regular_12);
+			auto word_wrapped_str = ion::graphics::fonts::utilities::WordWrap("The quick-brown fox jumps over-the lazy dog", 100, verdana_regular_12);
+			auto word_wrapped_txt = ion::graphics::fonts::utilities::WordWrap(std::move(text_sections), 100, verdana_12);
 
 			//EXAMPLE end
 
