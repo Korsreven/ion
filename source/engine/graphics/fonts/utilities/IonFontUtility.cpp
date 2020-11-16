@@ -18,6 +18,7 @@ File:	IonFontUtility.cpp
 #include "graphics/fonts/IonFontManager.h"
 #include "script/utilities/IonParseUtility.h"
 #include "types/IonTypes.h"
+#include "utilities/IonStringUtility.h"
 
 namespace ion::graphics::fonts::utilities
 {
@@ -344,7 +345,41 @@ text::TextSections string_to_text_sections(std::string_view str)
 
 text::TextLines text_sections_to_text_lines(text::TextSections text_sections)
 {
-	return {};
+	text::TextLines lines;
+	text::TextSections line_sections;
+
+	for (auto &section : text_sections)
+	{
+		//Content contains one or more new lines characters
+		//Split text section into multiple copies
+		if (section.Content().find('\n') != std::string::npos)
+		{
+			auto parts = ion::utilities::string::Split(section.Content(), "\n",
+				ion::utilities::string::StringSplitOptions::PreserveEmptyEntries);
+
+			section.Content().clear();
+				//Clear content before duplicating text section
+			
+			for (auto i = 0; auto &part : parts)
+			{
+				if (!std::empty(part))
+				{
+					line_sections.push_back(section);
+					line_sections.back().Content() = std::move(part);
+				}
+				
+				if (++i < std::ssize(parts))
+					lines.emplace_back(std::move(line_sections), 0);
+			}
+		}
+		else
+			line_sections.push_back(std::move(section));
+	}
+
+	if (!std::empty(line_sections))
+		lines.emplace_back(std::move(line_sections), 0);
+
+	return lines;
 }
 
 
@@ -473,14 +508,14 @@ glyph_rope make_glyph_rope(text::TextSections &text_sections,
 {
 	glyph_strings strings;
 
-	for (auto &text_section : text_sections)
+	for (auto &section : text_sections)
 	{
 		auto extents =
 			[&]()
 			{
-				if (text_section.DefaultFontStyle())
+				if (section.DefaultFontStyle())
 				{
-					switch (*text_section.DefaultFontStyle())
+					switch (*section.DefaultFontStyle())
 					{
 						case text::FontStyle::Bold:
 						return bold_extents;
@@ -496,7 +531,7 @@ glyph_rope make_glyph_rope(text::TextSections &text_sections,
 				return &regular_extents;
 			}();
 		
-		strings.push_back({text_section.Content(),
+		strings.push_back({section.Content(),
 			extents ? *extents : regular_extents});
 	}
 
