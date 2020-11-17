@@ -406,7 +406,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					verdana_bold_italic_12);
 
 			//Font utility
-			auto text_sections = ion::graphics::fonts::utilities::AsTextSections(
+			auto text_sections = ion::graphics::fonts::utilities::HTMLToTextSections(
 				"<p>The <i>quick</i> <font color=\"brown\">brown</font> fox <b>jumps</b> over the <i>lazy</i> dog</p>"
 			);
 

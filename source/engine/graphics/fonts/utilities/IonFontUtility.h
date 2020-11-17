@@ -32,6 +32,10 @@ namespace ion::graphics::fonts::utilities
 
 	namespace detail
 	{
+		/*
+			Glyph rope
+		*/
+
 		struct glyph_string final
 		{
 			std::string &value;
@@ -66,6 +70,16 @@ namespace ion::graphics::fonts::utilities
 				size_t size() const noexcept;
 		};
 
+		glyph_rope make_glyph_rope(text::TextSections &text_sections,
+			const font::detail::container_type<font::GlyphExtents> &regular_extents,
+			const font::detail::container_type<font::GlyphExtents> *bold_extents,
+			const font::detail::container_type<font::GlyphExtents> *italic_extents,
+			const font::detail::container_type<font::GlyphExtents> *bold_italic_extents);
+
+
+		/*
+			Formatting
+		*/
 
 		struct html_attribute final
 		{
@@ -148,6 +162,55 @@ namespace ion::graphics::fonts::utilities
 		}
 
 
+		void append_text_section(std::string content, text::TextSections &text_sections, const text::TextSectionStyles &text_section_styles);
+
+		std::optional<std::string_view> get_html_tag(std::string_view str) noexcept;
+		std::optional<html_element> parse_html_opening_tag(std::string_view str) noexcept;
+		text::TextSectionStyle html_element_to_text_section_style(const html_element &element, text::TextSectionStyle *parent_section) noexcept;
+
+		text::TextSections html_to_text_sections(std::string_view str);
+		text::TextLines text_sections_to_text_lines(text::TextSections text_sections);
+		std::string text_sections_to_string(const text::TextSections &text_sections);
+
+
+		/*
+			Measuring
+		*/
+
+		const font::detail::container_type<font::GlyphExtents>* get_glyph_extents(Font &font);
+
+		inline auto& get_text_section_extents(
+			const text::TextSection &section,
+			const font::detail::container_type<font::GlyphExtents> &regular_extents,
+			const font::detail::container_type<font::GlyphExtents> *bold_extents,
+			const font::detail::container_type<font::GlyphExtents> *italic_extents,
+			const font::detail::container_type<font::GlyphExtents> *bold_italic_extents) noexcept
+		{
+			auto extents =
+				[&]() noexcept -> decltype(&regular_extents)
+				{
+					if (section.DefaultFontStyle())
+					{
+						switch (*section.DefaultFontStyle())
+						{
+							case text::FontStyle::Bold:
+							return bold_extents;
+
+							case text::FontStyle::Italic:
+							return italic_extents;
+
+							case text::FontStyle::BoldItalic:
+							return bold_italic_extents;
+						}
+					}
+
+					return nullptr;
+				}();
+
+			return extents ? *extents : regular_extents;
+		}
+
+
 		inline auto character_size_in_pixels(char c,
 			const font::detail::container_type<font::GlyphExtents> &extents) noexcept
 		{
@@ -175,29 +238,28 @@ namespace ion::graphics::fonts::utilities
 			return std::pair{width, height};
 		}
 
+		std::pair<int,int> text_sections_size_in_pixels(const text::TextSections &text_sections,
+			const font::detail::container_type<font::GlyphExtents> &regular_extents,
+			const font::detail::container_type<font::GlyphExtents> *bold_extents,
+			const font::detail::container_type<font::GlyphExtents> *italic_extents,
+			const font::detail::container_type<font::GlyphExtents> *bold_italic_extents) noexcept;
 
-		void add_text_section(std::string content, text::TextSections &text_sections, const text::TextSectionStyles &text_section_styles);
 
-		std::optional<std::string_view> get_tag(std::string_view str) noexcept;
-		std::optional<html_element> parse_opening_tag(std::string_view str) noexcept;
-
-		text::TextSectionStyle html_element_to_text_section_style(const html_element &element, text::TextSectionStyle *parent_section) noexcept;
-		text::TextSections string_to_text_sections(std::string_view str);
-		text::TextLines text_sections_to_text_lines(text::TextSections text_sections);
+		/*
+			Truncating
+		*/
 
 		std::string truncate_string(std::string str, int max_width, std::string suffix,
 			const font::detail::container_type<font::GlyphExtents> &extents);
 
+
+		/*
+			Word wrapping
+		*/
+
 		std::string word_wrap(std::string str, int max_width,
 			const font::detail::container_type<font::GlyphExtents> &extents);
 		void word_wrap(glyph_rope str, int max_width);
-
-		const font::detail::container_type<font::GlyphExtents>* get_glyph_extents(Font &font);
-		glyph_rope make_glyph_rope(text::TextSections &text_sections,
-			const font::detail::container_type<font::GlyphExtents> &regular_extents,
-			const font::detail::container_type<font::GlyphExtents> *bold_extents,
-			const font::detail::container_type<font::GlyphExtents> *italic_extents,
-			const font::detail::container_type<font::GlyphExtents> *bold_italic_extents);
 	} //detail
 
 
@@ -206,7 +268,11 @@ namespace ion::graphics::fonts::utilities
 	*/
 
 	//Returns text sections, by parsing all HTML elements found in the given string
-	[[nodiscard]] text::TextSections AsTextSections(std::string_view str);
+	[[nodiscard]] text::TextSections HTMLToTextSections(std::string_view str);
+
+	//Returns a plain string, by parsing and removing all HTML tags found in the given string
+	[[nodiscard]] std::string HTMLToString(std::string_view str);
+
 
 	//Returns text lines, by splitting up text sections into lines when a '\n' character is found
 	[[nodiscard]] text::TextLines SplitTextSections(text::TextSections text_sections);

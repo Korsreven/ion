@@ -26,6 +26,10 @@ namespace ion::graphics::fonts::utilities
 namespace detail
 {
 
+/*
+	Glyph rope
+*/
+
 std::pair<size_t, size_t> glyph_rope::get_offsets(size_t off) const noexcept
 {
 	//One string in rope (optimization)
@@ -75,6 +79,7 @@ glyph_rope::glyph_rope(glyph_strings strings) :
 	//Empty
 }
 
+
 char& glyph_rope::operator[](size_t off) noexcept
 {
 	auto [str_off, ch_off] = get_offsets(off);
@@ -121,8 +126,29 @@ size_t glyph_rope::size() const noexcept
 	return size_;
 }
 
+glyph_rope make_glyph_rope(text::TextSections &text_sections,
+	const font::detail::container_type<font::GlyphExtents> &regular_extents,
+	const font::detail::container_type<font::GlyphExtents> *bold_extents,
+	const font::detail::container_type<font::GlyphExtents> *italic_extents,
+	const font::detail::container_type<font::GlyphExtents> *bold_italic_extents)
+{
+	glyph_strings strings;
 
-void add_text_section(std::string content, text::TextSections &text_sections, const text::TextSectionStyles &text_section_styles)
+	for (auto &section : text_sections)
+	{
+		auto &extents = get_text_section_extents(section, regular_extents, bold_extents, italic_extents, bold_italic_extents);
+		strings.push_back({section.Content(), extents});
+	}
+
+	return strings;
+}
+
+
+/*
+	Formatting
+*/
+
+void append_text_section(std::string content, text::TextSections &text_sections, const text::TextSectionStyles &text_section_styles)
 {
 	//Combine with previous section if equal styles
 	if (!std::empty(text_sections) &&
@@ -142,7 +168,7 @@ void add_text_section(std::string content, text::TextSections &text_sections, co
 }
 
 
-std::optional<std::string_view> get_tag(std::string_view str) noexcept
+std::optional<std::string_view> get_html_tag(std::string_view str) noexcept
 {
 	if (auto iter = std::find_if(std::begin(str), std::end(str), is_end_of_tag);
 		iter != std::end(str))
@@ -154,10 +180,10 @@ std::optional<std::string_view> get_tag(std::string_view str) noexcept
 		return {};
 }
 
-std::optional<html_element> parse_opening_tag(std::string_view str) noexcept
+std::optional<html_element> parse_html_opening_tag(std::string_view str) noexcept
 {
 	auto element =
-		[&]()
+		[&]() noexcept
 		{
 			//Check if opening tag has attribute
 			if (auto off = str.find(' ', 1);
@@ -197,7 +223,6 @@ std::optional<html_element> parse_opening_tag(std::string_view str) noexcept
 	else
 		return {};
 }
-
 
 text::TextSectionStyle html_element_to_text_section_style(const html_element &element, text::TextSectionStyle *parent_section) noexcept
 {
@@ -266,7 +291,8 @@ text::TextSectionStyle html_element_to_text_section_style(const html_element &el
 	return section;
 }
 
-text::TextSections string_to_text_sections(std::string_view str)
+
+text::TextSections html_to_text_sections(std::string_view str)
 {
 	html_elements elements;
 	text::TextSectionStyles text_section_styles;
@@ -287,11 +313,11 @@ text::TextSections string_to_text_sections(std::string_view str)
 			if (!std::empty(elements))
 			{
 				//Tag matches opening tag
-				if (auto tag = get_tag(str.substr(off + 2));
+				if (auto tag = get_html_tag(str.substr(off + 2));
 					tag && *tag == elements.back().tag) 
 				{
 					if (!std::empty(content))
-						add_text_section(std::move(content), text_sections, text_section_styles);
+						append_text_section(std::move(content), text_sections, text_section_styles);
 
 					elements.pop_back();
 					text_section_styles.pop_back();
@@ -304,10 +330,10 @@ text::TextSections string_to_text_sections(std::string_view str)
 		//Opening tag
 		else if (is_start_of_opening_tag(c))
 		{
-			if (auto tag = get_tag(str.substr(off + 1)); tag) 
+			if (auto tag = get_html_tag(str.substr(off + 1)); tag) 
 			{
 				//Opening tag has been parsed and validated
-				if (auto element = parse_opening_tag(*tag); element)
+				if (auto element = parse_html_opening_tag(*tag); element)
 				{
 					if (is_empty_tag(element->tag))
 					{
@@ -317,7 +343,7 @@ text::TextSections string_to_text_sections(std::string_view str)
 					else
 					{
 						if (!std::empty(content))
-							add_text_section(std::move(content), text_sections, text_section_styles);
+							append_text_section(std::move(content), text_sections, text_section_styles);
 
 						elements.push_back(std::move(*element));
 						text_section_styles.push_back(
@@ -338,7 +364,7 @@ text::TextSections string_to_text_sections(std::string_view str)
 	}
 
 	if (!std::empty(content))
-		add_text_section(std::move(content), text_sections, text_section_styles);
+		append_text_section(std::move(content), text_sections, text_section_styles);
 
 	return text_sections;
 }
@@ -382,6 +408,56 @@ text::TextLines text_sections_to_text_lines(text::TextSections text_sections)
 	return lines;
 }
 
+std::string text_sections_to_string(const text::TextSections &text_sections)
+{
+	std::string str;
+
+	for (auto &section : text_sections)
+		str += section.Content();
+
+	return str;
+}
+
+
+/*
+	Measuring
+*/
+
+const font::detail::container_type<font::GlyphExtents>* get_glyph_extents(Font &font)
+{
+	if (font.IsLoaded() || (font.Owner() && font.Owner()->Load(font)))
+	{
+		if (auto &extents = font.GlyphExtents(); extents)
+			return &*extents;
+	}
+
+	return nullptr;
+}
+
+std::pair<int,int> text_sections_size_in_pixels(const text::TextSections &text_sections,
+	const font::detail::container_type<font::GlyphExtents> &regular_extents,
+	const font::detail::container_type<font::GlyphExtents> *bold_extents,
+	const font::detail::container_type<font::GlyphExtents> *italic_extents,
+	const font::detail::container_type<font::GlyphExtents> *bold_italic_extents) noexcept
+{
+	auto width = 0;
+	auto height = 0;
+
+	for (auto &section : text_sections)
+	{
+		auto &extents = get_text_section_extents(section, regular_extents, bold_extents, italic_extents, bold_italic_extents);
+		auto [str_width, str_height] = string_size_in_pixels(section.Content(), extents);
+		width += str_width;
+		height = std::max(height, str_height);
+	}
+
+	return {width, height};
+}
+
+
+/*
+	Truncating
+*/
 
 std::string truncate_string(std::string str, int max_width, std::string suffix,
 	const font::detail::container_type<font::GlyphExtents> &extents)
@@ -414,6 +490,10 @@ std::string truncate_string(std::string str, int max_width, std::string suffix,
 	return str;
 }
 
+
+/*
+	Word wrapping
+*/
 
 std::string word_wrap(std::string str, int max_width,
 	const font::detail::container_type<font::GlyphExtents> &extents)
@@ -488,56 +568,6 @@ void word_wrap(glyph_rope str, int max_width)
 	}
 }
 
-
-const font::detail::container_type<font::GlyphExtents>* get_glyph_extents(Font &font)
-{
-	if (font.IsLoaded() || (font.Owner() && font.Owner()->Load(font)))
-	{
-		if (auto &extents = font.GlyphExtents(); extents)
-			return &*extents;
-	}
-
-	return nullptr;
-}
-
-glyph_rope make_glyph_rope(text::TextSections &text_sections,
-	const font::detail::container_type<font::GlyphExtents> &regular_extents,
-	const font::detail::container_type<font::GlyphExtents> *bold_extents,
-	const font::detail::container_type<font::GlyphExtents> *italic_extents,
-	const font::detail::container_type<font::GlyphExtents> *bold_italic_extents)
-{
-	glyph_strings strings;
-
-	for (auto &section : text_sections)
-	{
-		auto extents =
-			[&]()
-			{
-				if (section.DefaultFontStyle())
-				{
-					switch (*section.DefaultFontStyle())
-					{
-						case text::FontStyle::Bold:
-						return bold_extents;
-
-						case text::FontStyle::Italic:
-						return italic_extents;
-
-						case text::FontStyle::BoldItalic:
-						return bold_italic_extents;
-					}
-				}
-
-				return &regular_extents;
-			}();
-		
-		strings.push_back({section.Content(),
-			extents ? *extents : regular_extents});
-	}
-
-	return strings;
-}
-
 } //detail
 
 
@@ -545,10 +575,16 @@ glyph_rope make_glyph_rope(text::TextSections &text_sections,
 	Formatting
 */
 
-text::TextSections AsTextSections(std::string_view str)
+text::TextSections HTMLToTextSections(std::string_view str)
 {
-	return detail::string_to_text_sections(str);
+	return detail::html_to_text_sections(str);
 }
+
+std::string HTMLToString(std::string_view str)
+{
+	return detail::text_sections_to_string(detail::html_to_text_sections(str));
+}
+
 
 text::TextLines SplitTextSections(text::TextSections text_sections)
 {
