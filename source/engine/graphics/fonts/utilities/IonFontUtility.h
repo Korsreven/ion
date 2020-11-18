@@ -290,6 +290,10 @@ namespace ion::graphics::fonts::utilities
 	//Returns nullopt if font could not be loaded properly
 	[[nodiscard]] std::optional<Vector2> MeasureString(std::string_view str, Font &font) noexcept;
 
+	//Returns the size, in pixels, of the given text sections when rendered with the given type face
+	//Returns nullopt if type face fonts could not be loaded properly
+	[[nodiscard]] std::optional<Vector2> MeasureTextSections(const text::TextSections &text_sections, TypeFace &type_face) noexcept;
+
 
 	/*
 		Truncating
@@ -319,7 +323,7 @@ namespace ion::graphics::fonts::utilities
 	//Word wraps the given text sections if wider than max width, in pixels, when rendered with the given type face
 	//Replaces a ' ' character in between words, with a '\n' character where the line needs to be broken
 	//Does only cut words if one word is wider than max width, then a '\n' character is inserted
-	//Returns nullopt if font could not be loaded properly
+	//Returns nullopt if type face fonts could not be loaded properly
 	[[nodiscard]] std::optional<text::TextSections> WordWrap(text::TextSections text_sections, int max_width, TypeFace &type_face);
 } //ion::graphics::fonts::utilities
 

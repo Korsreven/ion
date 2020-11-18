@@ -618,6 +618,28 @@ std::optional<Vector2> MeasureString(std::string_view str, Font &font) noexcept
 		return {};
 }
 
+std::optional<Vector2> MeasureTextSections(const text::TextSections &text_sections, TypeFace &type_face) noexcept
+{
+	if (!type_face.HasRegularFont())
+		return {};
+
+	if (auto extents = detail::get_glyph_extents(*type_face.RegularFont()); extents)
+	{
+		auto bold_extents = type_face.BoldFont() ?
+			detail::get_glyph_extents(*type_face.BoldFont()) : nullptr;
+		auto italic_extents = type_face.ItalicFont() ?
+			detail::get_glyph_extents(*type_face.ItalicFont()) : nullptr;
+		auto bold_italic_extents = type_face.BoldItalicFont() ?
+			detail::get_glyph_extents(*type_face.BoldItalicFont()) : nullptr;
+
+		auto [width, height] = detail::text_sections_size_in_pixels(
+			text_sections, *extents, bold_extents, italic_extents, bold_italic_extents);
+		return Vector2{static_cast<real>(width), static_cast<real>(height)};
+	}
+	else
+		return {};
+}
+
 
 /*
 	Truncating
