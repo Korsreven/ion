@@ -18,14 +18,14 @@ namespace ion::graphics::fonts
 using namespace text;
 
 
-TextSectionStyle::TextSectionStyle(std::optional<Color> color,
-	std::optional<TextDecoration> decoration, std::optional<Color> decoration_color,
-	std::optional<FontStyle> font_style) noexcept :
+TextSectionStyle::TextSectionStyle(std::optional<Color> foreground_color, std::optional<Color> background_color,
+	std::optional<TextFontStyle> font_style, std::optional<TextDecoration> decoration, std::optional<Color> decoration_color) noexcept :
 
-	default_color_{color},
-	default_decoration_{decoration},
-	default_decoration_color_{decoration_color},
-	default_font_style_{font_style}
+	foreground_color_{foreground_color},
+	background_color_{background_color},
+	font_style_{font_style},
+	decoration_{decoration},
+	decoration_color_{decoration_color}
 {
 	//Empty
 }
@@ -37,7 +37,7 @@ TextSection::TextSection(std::string content) :
 	//Empty
 }
 
-TextSection::TextSection(std::string content, TextSectionStyle text_section_style) noexcept :
+TextSection::TextSection(std::string content, TextSectionStyle text_section_style) :
 
 	TextSectionStyle{std::move(text_section_style)},
 	content_{std::move(content)}

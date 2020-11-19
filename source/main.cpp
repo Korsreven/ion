@@ -410,6 +410,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				"<p>The <i>quick</i> <font color=\"brown\">brown</font> fox <b>jumps</b> over the <i>lazy</i> dog</p>"
 			);
 
+			auto section_size_pixels = ion::graphics::fonts::utilities::MeasureTextSections(text_sections, verdana_12);
+
 			text_sections = *ion::graphics::fonts::utilities::WordWrap(std::move(text_sections), 100, verdana_12);
 			auto text_lines = ion::graphics::fonts::utilities::SplitTextSections(std::move(text_sections));
 

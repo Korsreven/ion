@@ -55,6 +55,14 @@ namespace ion::graphics::fonts
 			HTML
 		};
 
+
+		enum class TextFontStyle
+		{
+			Bold,
+			Italic,
+			BoldItalic
+		};
+
 		enum class TextDecoration
 		{
 			Underline,
@@ -62,22 +70,16 @@ namespace ion::graphics::fonts
 			Overline
 		};
 
-		enum class FontStyle
-		{
-			Bold,
-			Italic,
-			BoldItalic
-		};
-
 
 		class TextSectionStyle
 		{
 			protected:
 
-				std::optional<Color> default_color_;
-				std::optional<TextDecoration> default_decoration_;
-				std::optional<Color> default_decoration_color_;
-				std::optional<FontStyle> default_font_style_;
+				std::optional<Color> foreground_color_;
+				std::optional<Color> background_color_;
+				std::optional<TextFontStyle> font_style_;
+				std::optional<TextDecoration> decoration_;
+				std::optional<Color> decoration_color_;
 
 			public:
 
@@ -85,9 +87,9 @@ namespace ion::graphics::fonts
 				TextSectionStyle() = default;
 
 				//Alternative constructor
-				TextSectionStyle(std::optional<Color> color,
-					std::optional<TextDecoration> decoration, std::optional<Color> decoration_color,
-					std::optional<FontStyle> font_style) noexcept;
+				TextSectionStyle(std::optional<Color> foreground_color, std::optional<Color> background_color,
+					std::optional<TextFontStyle> font_style, std::optional<TextDecoration> decoration,
+					std::optional<Color> decoration_color) noexcept;
 
 
 				/*
@@ -97,10 +99,11 @@ namespace ion::graphics::fonts
 				//
 				[[nodiscard]] inline auto operator==(const TextSectionStyle &rhs) const noexcept
 				{
-					return default_color_ == rhs.default_color_ &&
-						   default_decoration_ == rhs.default_decoration_ &&
-						   default_decoration_color_ == rhs.default_decoration_color_ &&
-						   default_font_style_ == rhs.default_font_style_;
+					return foreground_color_ == rhs.foreground_color_ &&
+						   background_color_ == rhs.background_color_ &&
+						   font_style_ == rhs.font_style_ &&
+						   decoration_ == rhs.decoration_ &&
+						   decoration_color_ == rhs.decoration_color_;
 				}
 
 
@@ -109,27 +112,33 @@ namespace ion::graphics::fonts
 				*/
 
 				//
-				inline void DefaultColor(const Color &color) noexcept
+				inline void ForegroundColor(const Color &color) noexcept
 				{
-					default_color_ = color;
+					foreground_color_ = color;
 				}
 
 				//
-				inline void DefaultDecoration(TextDecoration decoration) noexcept
+				inline void BackgroundColor(const Color &color) noexcept
 				{
-					default_decoration_ = decoration;
+					background_color_ = color;
 				}
 
 				//
-				inline void DefaultDecorationColor(const Color &color) noexcept
+				inline void FontStyle(TextFontStyle font_style) noexcept
 				{
-					default_decoration_color_ = color;
+					font_style_ = font_style;
 				}
 
 				//
-				inline void DefaultFontStyle(FontStyle font_style) noexcept
+				inline void Decoration(TextDecoration decoration) noexcept
 				{
-					default_font_style_ = font_style;
+					decoration_ = decoration;
+				}
+
+				//
+				inline void DecorationColor(const Color &color) noexcept
+				{
+					decoration_color_ = color;
 				}
 
 
@@ -138,34 +147,40 @@ namespace ion::graphics::fonts
 				*/
 
 				//
-				[[nodiscard]] inline auto& DefaultColor() const noexcept
+				[[nodiscard]] inline auto& ForegroundColor() const noexcept
 				{
-					return default_color_;
+					return foreground_color_;
 				}
 
 				//
-				[[nodiscard]] inline auto& DefaultDecoration() const noexcept
+				[[nodiscard]] inline auto& BackgroundColor() const noexcept
 				{
-					return default_decoration_;
+					return background_color_;
 				}
 
 				//
-				[[nodiscard]] inline auto& DefaultDecorationColor() const noexcept
+				[[nodiscard]] inline auto& FontStyle() const noexcept
 				{
-					return default_decoration_color_;
+					return font_style_;
 				}
 
 				//
-				[[nodiscard]] inline auto& DefaultFontStyle() const noexcept
+				[[nodiscard]] inline auto& Decoration() const noexcept
 				{
-					return default_font_style_;
+					return decoration_;
+				}
+
+				//
+				[[nodiscard]] inline auto& DecorationColor() const noexcept
+				{
+					return decoration_color_;
 				}
 
 
 				//
 				[[nodiscard]] inline auto IsPlain() const noexcept
 				{
-					return !default_color_ && !default_decoration_ && !default_decoration_color_ && !default_font_style_;
+					return !foreground_color_ &&  !background_color_ && !font_style_ && !decoration_ && !decoration_color_;
 				}
 		};
 
@@ -184,7 +199,7 @@ namespace ion::graphics::fonts
 				explicit TextSection(std::string content);
 
 				//Alternative constructor
-				TextSection(std::string content, TextSectionStyle text_section_style) noexcept;
+				TextSection(std::string content, TextSectionStyle text_section_style);
 
 
 				/*
@@ -273,10 +288,11 @@ namespace ion::graphics::fonts
 			int from_line_ = 0;				//Render lines in range:
 			std::optional<int> max_lines_;	//[from_line, from_line + max_lines)
 
-			Color default_color_ = text::detail::jet_black;	
+			Color default_foreground_color_ = text::detail::jet_black;	
+			std::optional<Color> default_background_color_;	
+			std::optional<text::TextFontStyle> default_font_style_;
 			std::optional<text::TextDecoration> default_decoration_;
 			std::optional<Color> default_decoration_color_;
-			std::optional<text::FontStyle> default_font_style_;
 
 			managed::ObservedObject<TypeFace> type_face_;
 			text::TextLines formatted_lines_;
@@ -361,10 +377,23 @@ namespace ion::graphics::fonts
 			}
 
 
-			//Sets the default color for the displayed text to the given color
-			inline void DefaultColor(const Color &color) noexcept
+			//Sets the default foreground color for the displayed text to the given color
+			inline void DefaultForegroundColor(const Color &color) noexcept
 			{
-				default_color_ = color;
+				default_foreground_color_ = color;
+			}
+
+			//Sets the default background color behind the displayed text to the given color
+			inline void DefaultBackgroundColor(const Color &color) noexcept
+			{
+				default_background_color_ = color;
+			}
+
+			//Sets the default font style for the displayed text to the given style
+			//If nullopt is passed, no default font style will be used
+			inline void DefaultFontStyle(std::optional<text::TextFontStyle> font_style) noexcept
+			{
+				default_font_style_ = font_style;
 			}
 
 			//Sets the default decoration for the displayed text to the given decoration
@@ -379,13 +408,6 @@ namespace ion::graphics::fonts
 			inline void DefaultDecoration(const std::optional<Color> &color) noexcept
 			{
 				default_decoration_color_ = color;
-			}
-
-			//Sets the default font style for the displayed text to the given style
-			//If nullopt is passed, no default font style will be used
-			inline void DefaultFontStyle(std::optional<text::FontStyle> font_style) noexcept
-			{
-				default_font_style_ = font_style;
 			}
 
 
@@ -463,10 +485,23 @@ namespace ion::graphics::fonts
 			}
 
 
-			//Returns the default color for the displayed text
-			[[nodiscard]] inline auto& DefaultColor() const noexcept
+			//Returns the default foreground color for the displayed text
+			[[nodiscard]] inline auto& DefaultForegroundColor() const noexcept
 			{
-				return default_color_;
+				return default_foreground_color_;
+			}
+
+			//Returns the default background color behind the displayed text
+			[[nodiscard]] inline auto& DefaultBackgroundColor() const noexcept
+			{
+				return default_background_color_;
+			}
+
+			//Returns the default font style for the displayed text
+			//Returns nullopt if no default decoration has been specified
+			[[nodiscard]] inline auto DefaultFontStyle() const noexcept
+			{
+				return default_font_style_;
 			}
 
 			//Returns the default decoration for the displayed text
@@ -481,13 +516,6 @@ namespace ion::graphics::fonts
 			[[nodiscard]] inline auto DefaultDecorationColor() const noexcept
 			{
 				return default_decoration_color_;
-			}
-
-			//Returns the default font style for the displayed text
-			//Returns nullopt if no default decoration has been specified
-			[[nodiscard]] inline auto DefaultFontStyle() const noexcept
-			{
-				return default_font_style_;
 			}
 
 

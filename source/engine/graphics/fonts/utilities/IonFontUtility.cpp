@@ -148,9 +148,30 @@ glyph_rope make_glyph_rope(text::TextSections &text_sections,
 	Formatting
 */
 
-void append_text_section(std::string content, text::TextSections &text_sections, const text::TextSectionStyles &text_section_styles)
+void append_front_text_section(std::string content, text::TextSections &text_sections,
+	const text::TextSectionStyles &text_section_styles)
 {
-	//Combine with previous section if equal styles
+	//Combine with first section if equal styles
+	if (!std::empty(text_sections) &&
+		((!std::empty(text_section_styles) && text_sections.front() == text_section_styles.back()) ||
+		(std::empty(text_section_styles) && text_sections.front().IsPlain())))
+
+		text_sections.front().Content() += content;
+	
+	//Add new section
+	else
+	{
+		if (!std::empty(text_section_styles))
+			text_sections.emplace(std::begin(text_sections), std::move(content), text_section_styles.back());
+		else
+			text_sections.emplace(std::begin(text_sections), std::move(content));
+	}
+}
+
+void append_back_text_section(std::string content, text::TextSections &text_sections,
+	const text::TextSectionStyles &text_section_styles)
+{
+	//Combine with last section if equal styles
 	if (!std::empty(text_sections) &&
 		((!std::empty(text_section_styles) && text_sections.back() == text_section_styles.back()) ||
 		(std::empty(text_section_styles) && text_sections.back().IsPlain())))
@@ -224,7 +245,8 @@ std::optional<html_element> parse_html_opening_tag(std::string_view str) noexcep
 		return {};
 }
 
-text::TextSectionStyle html_element_to_text_section_style(const html_element &element, text::TextSectionStyle *parent_section) noexcept
+text::TextSectionStyle html_element_to_text_section_style(const html_element &element,
+	text::TextSectionStyle *parent_section) noexcept
 {
 	auto section = parent_section ?
 		*parent_section : //Inherit from parent
@@ -233,36 +255,36 @@ text::TextSectionStyle html_element_to_text_section_style(const html_element &el
 	//Tags
 	//Underline
 	if (element.tag == "u" || element.tag == "ins")
-		section.DefaultDecoration(text::TextDecoration::Underline);
+		section.Decoration(text::TextDecoration::Underline);
 
 	//Line-through
 	else if (element.tag == "del")
-		section.DefaultDecoration(text::TextDecoration::LineThrough);
+		section.Decoration(text::TextDecoration::LineThrough);
 
 	//Bold
 	else if (element.tag == "b" || element.tag == "strong")
-		section.DefaultFontStyle(
-			[&font_style = section.DefaultFontStyle()]() noexcept
+		section.FontStyle(
+			[&font_style = section.FontStyle()]() noexcept
 			{
 				if (font_style &&
-					(*font_style == text::FontStyle::Italic ||
-					 *font_style == text::FontStyle::BoldItalic))
-					return text::FontStyle::BoldItalic;
+					(*font_style == text::TextFontStyle::Italic ||
+					 *font_style == text::TextFontStyle::BoldItalic))
+					return text::TextFontStyle::BoldItalic;
 				else
-					return text::FontStyle::Bold;
+					return text::TextFontStyle::Bold;
 			}());
 
 	//Italic
 	else if (element.tag == "i" || element.tag == "em")
-		section.DefaultFontStyle(
-			[&font_style = section.DefaultFontStyle()]() noexcept
+		section.FontStyle(
+			[&font_style = section.FontStyle()]() noexcept
 			{
 				if (font_style &&
-					(*font_style == text::FontStyle::Bold ||
-					 *font_style == text::FontStyle::BoldItalic))
-					return text::FontStyle::BoldItalic;
+					(*font_style == text::TextFontStyle::Bold ||
+					 *font_style == text::TextFontStyle::BoldItalic))
+					return text::TextFontStyle::BoldItalic;
 				else
-					return text::FontStyle::Italic;
+					return text::TextFontStyle::Italic;
 			}());
 
 
@@ -273,11 +295,11 @@ text::TextSectionStyle html_element_to_text_section_style(const html_element &el
 		if (auto value =
 			script::utilities::parse::AsString(element.attribute->value); value)
 		{
-			//Color
+			//Foreground color
 			if (is_color_attribute(element.attribute->name))
 			{
 				if (auto color = script::utilities::parse::AsColor(*value); color)
-					section.DefaultColor(*color);
+					section.ForegroundColor(*color);
 			}
 
 			//Style
@@ -317,7 +339,7 @@ text::TextSections html_to_text_sections(std::string_view str)
 					tag && *tag == elements.back().tag) 
 				{
 					if (!std::empty(content))
-						append_text_section(std::move(content), text_sections, text_section_styles);
+						append_back_text_section(std::move(content), text_sections, text_section_styles);
 
 					elements.pop_back();
 					text_section_styles.pop_back();
@@ -343,7 +365,7 @@ text::TextSections html_to_text_sections(std::string_view str)
 					else
 					{
 						if (!std::empty(content))
-							append_text_section(std::move(content), text_sections, text_section_styles);
+							append_back_text_section(std::move(content), text_sections, text_section_styles);
 
 						elements.push_back(std::move(*element));
 						text_section_styles.push_back(
@@ -364,7 +386,7 @@ text::TextSections html_to_text_sections(std::string_view str)
 	}
 
 	if (!std::empty(content))
-		append_text_section(std::move(content), text_sections, text_section_styles);
+		append_back_text_section(std::move(content), text_sections, text_section_styles);
 
 	return text_sections;
 }

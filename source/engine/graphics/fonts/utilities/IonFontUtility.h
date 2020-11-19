@@ -162,11 +162,15 @@ namespace ion::graphics::fonts::utilities
 		}
 
 
-		void append_text_section(std::string content, text::TextSections &text_sections, const text::TextSectionStyles &text_section_styles);
+		void append_front_text_section(std::string content, text::TextSections &text_sections,
+			const text::TextSectionStyles &text_section_styles);
+		void append_back_text_section(std::string content, text::TextSections &text_sections,
+			const text::TextSectionStyles &text_section_styles);
 
 		std::optional<std::string_view> get_html_tag(std::string_view str) noexcept;
 		std::optional<html_element> parse_html_opening_tag(std::string_view str) noexcept;
-		text::TextSectionStyle html_element_to_text_section_style(const html_element &element, text::TextSectionStyle *parent_section) noexcept;
+		text::TextSectionStyle html_element_to_text_section_style(const html_element &element,
+			text::TextSectionStyle *parent_section) noexcept;
 
 		text::TextSections html_to_text_sections(std::string_view str);
 		text::TextLines text_sections_to_text_lines(text::TextSections text_sections);
@@ -189,17 +193,17 @@ namespace ion::graphics::fonts::utilities
 			auto extents =
 				[&]() noexcept -> decltype(&regular_extents)
 				{
-					if (section.DefaultFontStyle())
+					if (section.FontStyle())
 					{
-						switch (*section.DefaultFontStyle())
+						switch (*section.FontStyle())
 						{
-							case text::FontStyle::Bold:
+							case text::TextFontStyle::Bold:
 							return bold_extents;
 
-							case text::FontStyle::Italic:
+							case text::TextFontStyle::Italic:
 							return italic_extents;
 
-							case text::FontStyle::BoldItalic:
+							case text::TextFontStyle::BoldItalic:
 							return bold_italic_extents;
 						}
 					}
