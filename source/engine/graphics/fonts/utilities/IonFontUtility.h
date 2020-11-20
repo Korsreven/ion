@@ -116,6 +116,8 @@ namespace ion::graphics::fonts::utilities
 		{
 			return str == "p" ||
 				   str == "br" ||
+				   str == "div" ||
+				   str == "span" ||
 
 				   str == "b" ||
 				   str == "i" ||
@@ -125,6 +127,7 @@ namespace ion::graphics::fonts::utilities
 				   str == "u" ||
 				   str == "ins" ||
 				   str == "del" ||
+				   str == "mark" ||
 				   
 				   str == "font";
 		}

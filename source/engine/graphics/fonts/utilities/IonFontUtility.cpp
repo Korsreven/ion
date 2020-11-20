@@ -16,12 +16,15 @@ File:	IonFontUtility.cpp
 #include <functional>
 
 #include "graphics/fonts/IonFontManager.h"
+#include "graphics/utilities/IonColor.h"
 #include "script/utilities/IonParseUtility.h"
 #include "types/IonTypes.h"
 #include "utilities/IonStringUtility.h"
 
 namespace ion::graphics::fonts::utilities
 {
+
+using namespace graphics::utilities;
 
 namespace detail
 {
@@ -253,14 +256,13 @@ text::TextSectionStyle html_element_to_text_section_style(const html_element &el
 		text::TextSectionStyle{}; //Plain
 
 	//Tags
-	//Underline
-	if (element.tag == "u" || element.tag == "ins")
-		section.Decoration(text::TextDecoration::Underline);
 
-	//Line-through
-	else if (element.tag == "del")
-		section.Decoration(text::TextDecoration::LineThrough);
+	//Background color
+	//Mark
+	if (element.tag == "mark")
+		section.BackgroundColor(color::Yellow);
 
+	//Font style
 	//Bold
 	else if (element.tag == "b" || element.tag == "strong")
 		section.FontStyle(
@@ -274,6 +276,7 @@ text::TextSectionStyle html_element_to_text_section_style(const html_element &el
 					return text::TextFontStyle::Bold;
 			}());
 
+	//Font style
 	//Italic
 	else if (element.tag == "i" || element.tag == "em")
 		section.FontStyle(
@@ -286,6 +289,16 @@ text::TextSectionStyle html_element_to_text_section_style(const html_element &el
 				else
 					return text::TextFontStyle::Italic;
 			}());
+
+	//Decoration
+	//Underline
+	else if (element.tag == "u" || element.tag == "ins")
+		section.Decoration(text::TextDecoration::Underline);
+
+	//Decoration
+	//Line-through
+	else if (element.tag == "del")
+		section.Decoration(text::TextDecoration::LineThrough);
 
 
 	//Attributes

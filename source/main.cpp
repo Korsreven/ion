@@ -407,7 +407,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Font utility
 			auto text_sections = ion::graphics::fonts::utilities::HTMLToTextSections(
-				"<p>The <i>quick</i> <font color=\"brown\">brown</font> fox <b>jumps</b> over the <i>lazy</i> dog</p>"
+				"<p>The <i>quick</i> <font color=\"brown\">brown</font> <mark>fox</mark> <b>jumps</b> over the <i>lazy</i> dog</p>"
 			);
 
 			auto section_size_pixels = ion::graphics::fonts::utilities::MeasureTextSections(text_sections, verdana_12);
