@@ -406,14 +406,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					verdana_bold_italic_12);
 
 			//Font utility
-			auto text_sections = ion::graphics::fonts::utilities::HTMLToTextSections(
+			auto text_sections = ion::graphics::fonts::utilities::HTMLToTextBlocks(
 				"<p>The <i>quick</i> <font color=\"brown\">brown</font> <mark>fox</mark> <b>jumps</b> over the <i>lazy</i> dog</p>"
 			);
 
-			auto section_size_pixels = ion::graphics::fonts::utilities::MeasureTextSections(text_sections, verdana_12);
+			auto section_size_pixels = ion::graphics::fonts::utilities::MeasureTextBlocks(text_sections, verdana_12);
 
 			text_sections = *ion::graphics::fonts::utilities::WordWrap(std::move(text_sections), 100, verdana_12);
-			auto text_lines = ion::graphics::fonts::utilities::SplitTextSections(std::move(text_sections));
+			auto text_lines = ion::graphics::fonts::utilities::SplitTextBlocks(std::move(text_sections));
 
 			auto char_size_pixels = ion::graphics::fonts::utilities::MeasureCharacter('A', verdana_regular_12);
 			auto str_size_pixels = ion::graphics::fonts::utilities::MeasureString("Hello world!", verdana_regular_12);

@@ -11,74 +11,18 @@ File:	IonText.cpp
 */
 
 #include "IonText.h"
+#include "utilities/IonFontUtility.h"
 
 namespace ion::graphics::fonts
 {
 
 using namespace text;
 
-
-TextSectionStyle::TextSectionStyle(std::optional<Color> foreground_color, std::optional<Color> background_color,
-	std::optional<TextFontStyle> font_style, std::optional<TextDecoration> decoration, std::optional<Color> decoration_color) noexcept :
-
-	foreground_color_{foreground_color},
-	background_color_{background_color},
-	font_style_{font_style},
-	decoration_{decoration},
-	decoration_color_{decoration_color}
-{
-	//Empty
-}
-
-
-TextSection::TextSection(std::string content) :
-	content_{std::move(content)}
-{
-	//Empty
-}
-
-TextSection::TextSection(std::string content, TextSectionStyle text_section_style) :
-
-	TextSectionStyle{std::move(text_section_style)},
-	content_{std::move(content)}
-{
-	//Empty
-}
-
-
-TextLine::TextLine(TextSections sections, int width) :
-
-	sections_{std::move(sections)},
-	width_{width}
-{
-	//Empty
-}
-
-
-/*
-	Content
-*/
-
-std::string TextLine::Content() const
-{
-	std::string content;
-
-	for (auto &section : Sections())
-		content += section.Content();
-
-	return content;
-}
-
-
-/*
-	Text
-*/
-
-Text::Text(std::string name, std::string str, TypeFace &type_face) :
+Text::Text(std::string name, std::string content, TypeFace &type_face) :
 
 	managed::ManagedObject<TextManager>{std::move(name)},
 
-	unformatted_str_{std::move(str)},
+	content_{std::move(content)},
 	type_face_{type_face}
 {
 	//Empty
@@ -116,40 +60,40 @@ const TypeFace* Text::Lettering() const noexcept
 
 
 /*
-	Unformatted
+	Content
 */
 
-void Text::AppendFront(std::string_view str)
+void Text::AppendFront(std::string_view content)
 {
-	unformatted_str_.insert(0, str);
+	content_.insert(0, content);
 }
 
-void Text::AppendBack(std::string_view str)
+void Text::AppendBack(std::string_view content)
 {
-	unformatted_str_ += str;
+	content_ += content;
 }
 
 
 /*
-	Formatted
+	Unformatted
 */
 
-std::string Text::FormattedStr() const noexcept
+std::string Text::UnformattedContent() const noexcept
 {
-	std::string str;
+	std::string content;
 
 	//First
 	if (!std::empty(formatted_lines_))
 	{
-		str += formatted_lines_.front().Content();
+		content += utilities::detail::text_blocks_to_string(formatted_lines_.front().Blocks);
 
 		//Rest
 		for (auto iter = std::begin(formatted_lines_) + 1,
 			end = std::end(formatted_lines_); iter != end; ++iter)
-			str += "\n" + iter->Content();
+			content += "\n" + utilities::detail::text_blocks_to_string(iter->Blocks);
 	}
 
-	return str;
+	return content;
 }
 
 } //ion::graphics::fonts

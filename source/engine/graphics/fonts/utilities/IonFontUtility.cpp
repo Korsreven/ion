@@ -129,7 +129,7 @@ size_t glyph_rope::size() const noexcept
 	return size_;
 }
 
-glyph_rope make_glyph_rope(text::TextSections &text_sections,
+glyph_rope make_glyph_rope(text::TextBlocks &text_blocks,
 	const font::detail::container_type<font::GlyphExtents> &regular_extents,
 	const font::detail::container_type<font::GlyphExtents> *bold_extents,
 	const font::detail::container_type<font::GlyphExtents> *italic_extents,
@@ -137,10 +137,10 @@ glyph_rope make_glyph_rope(text::TextSections &text_sections,
 {
 	glyph_strings strings;
 
-	for (auto &section : text_sections)
+	for (auto &text_block : text_blocks)
 	{
-		auto &extents = get_text_section_extents(section, regular_extents, bold_extents, italic_extents, bold_italic_extents);
-		strings.push_back({section.Content(), extents});
+		auto &extents = get_text_block_extents(text_block, regular_extents, bold_extents, italic_extents, bold_italic_extents);
+		strings.push_back({text_block.Content, extents});
 	}
 
 	return strings;
@@ -151,43 +151,43 @@ glyph_rope make_glyph_rope(text::TextSections &text_sections,
 	Formatting
 */
 
-void append_front_text_section(std::string content, text::TextSections &text_sections,
-	const text::TextSectionStyles &text_section_styles)
+void append_front_text_block(std::string content, text::TextBlocks &text_blocks,
+	const text::TextBlockStyles &text_block_styles)
 {
-	//Combine with first section if equal styles
-	if (!std::empty(text_sections) &&
-		((!std::empty(text_section_styles) && text_sections.front() == text_section_styles.back()) ||
-		(std::empty(text_section_styles) && text_sections.front().IsPlain())))
+	//Combine with first text block if equal styles
+	if (!std::empty(text_blocks) &&
+		((!std::empty(text_block_styles) && text_blocks.front() == text_block_styles.back()) ||
+		(std::empty(text_block_styles) && text_blocks.front().IsPlain())))
 
-		text_sections.front().Content() += content;
+		text_blocks.front().Content += content;
 	
-	//Add new section
+	//Add new text_block
 	else
 	{
-		if (!std::empty(text_section_styles))
-			text_sections.emplace(std::begin(text_sections), std::move(content), text_section_styles.back());
+		if (!std::empty(text_block_styles))
+			text_blocks.insert(std::begin(text_blocks), {text_block_styles.back(), std::move(content)});
 		else
-			text_sections.emplace(std::begin(text_sections), std::move(content));
+			text_blocks.insert(std::begin(text_blocks), {{}, std::move(content)});
 	}
 }
 
-void append_back_text_section(std::string content, text::TextSections &text_sections,
-	const text::TextSectionStyles &text_section_styles)
+void append_back_text_block(std::string content, text::TextBlocks &text_blocks,
+	const text::TextBlockStyles &text_block_styles)
 {
-	//Combine with last section if equal styles
-	if (!std::empty(text_sections) &&
-		((!std::empty(text_section_styles) && text_sections.back() == text_section_styles.back()) ||
-		(std::empty(text_section_styles) && text_sections.back().IsPlain())))
+	//Combine with last text block if equal styles
+	if (!std::empty(text_blocks) &&
+		((!std::empty(text_block_styles) && text_blocks.back() == text_block_styles.back()) ||
+		(std::empty(text_block_styles) && text_blocks.back().IsPlain())))
 
-		text_sections.back().Content() += content;
+		text_blocks.back().Content += content;
 	
-	//Add new section
+	//Add new text_block
 	else
 	{
-		if (!std::empty(text_section_styles))
-			text_sections.emplace_back(std::move(content), text_section_styles.back());
+		if (!std::empty(text_block_styles))
+			text_blocks.push_back({text_block_styles.back(), std::move(content)});
 		else
-			text_sections.emplace_back(std::move(content));
+			text_blocks.push_back({{}, std::move(content)});
 	}
 }
 
@@ -248,25 +248,25 @@ std::optional<html_element> parse_html_opening_tag(std::string_view str) noexcep
 		return {};
 }
 
-text::TextSectionStyle html_element_to_text_section_style(const html_element &element,
-	text::TextSectionStyle *parent_section) noexcept
+text::TextBlockStyle html_element_to_text_block_style(const html_element &element,
+	text::TextBlockStyle *parent_text_block) noexcept
 {
-	auto section = parent_section ?
-		*parent_section : //Inherit from parent
-		text::TextSectionStyle{}; //Plain
+	auto text_block = parent_text_block ?
+		*parent_text_block : //Inherit from parent
+		text::TextBlockStyle{}; //Plain
 
 	//Tags
 
 	//Background color
 	//Mark
 	if (element.tag == "mark")
-		section.BackgroundColor(color::Yellow);
+		text_block.BackgroundColor = color::Yellow;
 
 	//Font style
 	//Bold
 	else if (element.tag == "b" || element.tag == "strong")
-		section.FontStyle(
-			[&font_style = section.FontStyle()]() noexcept
+		text_block.FontStyle =
+			[&font_style = text_block.FontStyle]() noexcept
 			{
 				if (font_style &&
 					(*font_style == text::TextFontStyle::Italic ||
@@ -274,13 +274,13 @@ text::TextSectionStyle html_element_to_text_section_style(const html_element &el
 					return text::TextFontStyle::BoldItalic;
 				else
 					return text::TextFontStyle::Bold;
-			}());
+			}();
 
 	//Font style
 	//Italic
 	else if (element.tag == "i" || element.tag == "em")
-		section.FontStyle(
-			[&font_style = section.FontStyle()]() noexcept
+		text_block.FontStyle =
+			[&font_style = text_block.FontStyle]() noexcept
 			{
 				if (font_style &&
 					(*font_style == text::TextFontStyle::Bold ||
@@ -288,17 +288,17 @@ text::TextSectionStyle html_element_to_text_section_style(const html_element &el
 					return text::TextFontStyle::BoldItalic;
 				else
 					return text::TextFontStyle::Italic;
-			}());
+			}();
 
 	//Decoration
 	//Underline
 	else if (element.tag == "u" || element.tag == "ins")
-		section.Decoration(text::TextDecoration::Underline);
+		text_block.Decoration = text::TextDecoration::Underline;
 
 	//Decoration
 	//Line-through
 	else if (element.tag == "del")
-		section.Decoration(text::TextDecoration::LineThrough);
+		text_block.Decoration = text::TextDecoration::LineThrough;
 
 
 	//Attributes
@@ -312,7 +312,7 @@ text::TextSectionStyle html_element_to_text_section_style(const html_element &el
 			if (is_color_attribute(element.attribute->name))
 			{
 				if (auto color = script::utilities::parse::AsColor(*value); color)
-					section.ForegroundColor(*color);
+					text_block.ForegroundColor = *color;
 			}
 
 			//Style
@@ -323,15 +323,15 @@ text::TextSectionStyle html_element_to_text_section_style(const html_element &el
 		}
 	}
 
-	return section;
+	return text_block;
 }
 
 
-text::TextSections html_to_text_sections(std::string_view str)
+text::TextBlocks html_to_text_blocks(std::string_view str)
 {
 	html_elements elements;
-	text::TextSectionStyles text_section_styles;
-	text::TextSections text_sections;
+	text::TextBlockStyles text_block_styles;
+	text::TextBlocks text_blocks;
 	std::string content;
 
 	for (auto iter = std::begin(str), end = std::end(str); iter != end; ++iter)
@@ -352,10 +352,10 @@ text::TextSections html_to_text_sections(std::string_view str)
 					tag && *tag == elements.back().tag) 
 				{
 					if (!std::empty(content))
-						append_back_text_section(std::move(content), text_sections, text_section_styles);
+						append_back_text_block(std::move(content), text_blocks, text_block_styles);
 
 					elements.pop_back();
-					text_section_styles.pop_back();
+					text_block_styles.pop_back();
 
 					iter += std::size(*tag) + 2;
 					continue;
@@ -378,14 +378,14 @@ text::TextSections html_to_text_sections(std::string_view str)
 					else
 					{
 						if (!std::empty(content))
-							append_back_text_section(std::move(content), text_sections, text_section_styles);
+							append_back_text_block(std::move(content), text_blocks, text_block_styles);
 
 						elements.push_back(std::move(*element));
-						text_section_styles.push_back(
-							html_element_to_text_section_style(
+						text_block_styles.push_back(
+							html_element_to_text_block_style(
 								elements.back(),
-								!std::empty(text_section_styles) ?
-								&text_section_styles.back() : nullptr
+								!std::empty(text_block_styles) ?
+								&text_block_styles.back() : nullptr
 							));
 					}
 
@@ -399,56 +399,56 @@ text::TextSections html_to_text_sections(std::string_view str)
 	}
 
 	if (!std::empty(content))
-		append_back_text_section(std::move(content), text_sections, text_section_styles);
+		append_back_text_block(std::move(content), text_blocks, text_block_styles);
 
-	return text_sections;
+	return text_blocks;
 }
 
-text::TextLines text_sections_to_text_lines(text::TextSections text_sections)
+text::TextLines text_blocks_to_text_lines(text::TextBlocks text_blocks)
 {
 	text::TextLines lines;
-	text::TextSections line_sections;
+	text::TextBlocks line_text_blocks;
 
-	for (auto &section : text_sections)
+	for (auto &text_block : text_blocks)
 	{
 		//Content contains one or more new lines characters
-		//Split text section into multiple copies
-		if (section.Content().find('\n') != std::string::npos)
+		//Split text block into multiple copies
+		if (text_block.Content.find('\n') != std::string::npos)
 		{
-			auto parts = ion::utilities::string::Split(section.Content(), "\n",
+			auto parts = ion::utilities::string::Split(text_block.Content, "\n",
 				ion::utilities::string::StringSplitOptions::PreserveEmptyEntries);
 
-			section.Content().clear();
-				//Clear content before duplicating text section
+			text_block.Content.clear();
+				//Clear content before duplicating text text_block
 			
 			for (auto i = 0; auto &part : parts)
 			{
 				if (!std::empty(part))
 				{
-					line_sections.push_back(section);
-					line_sections.back().Content() = std::move(part);
+					line_text_blocks.push_back(text_block);
+					line_text_blocks.back().Content = std::move(part);
 				}
 				
 				if (++i < std::ssize(parts))
-					lines.emplace_back(std::move(line_sections), 0);
+					lines.push_back({std::move(line_text_blocks)});
 			}
 		}
 		else
-			line_sections.push_back(std::move(section));
+			line_text_blocks.push_back(std::move(text_block));
 	}
 
-	if (!std::empty(line_sections))
-		lines.emplace_back(std::move(line_sections), 0);
+	if (!std::empty(line_text_blocks))
+		lines.push_back({std::move(line_text_blocks)});
 
 	return lines;
 }
 
-std::string text_sections_to_string(const text::TextSections &text_sections)
+std::string text_blocks_to_string(const text::TextBlocks &text_blocks)
 {
 	std::string str;
 
-	for (auto &section : text_sections)
-		str += section.Content();
+	for (auto &text_block : text_blocks)
+		str += text_block.Content;
 
 	return str;
 }
@@ -469,7 +469,7 @@ const font::detail::container_type<font::GlyphExtents>* get_glyph_extents(Font &
 	return nullptr;
 }
 
-std::pair<int,int> text_sections_size_in_pixels(const text::TextSections &text_sections,
+std::pair<int,int> text_blocks_size_in_pixels(const text::TextBlocks &text_blocks,
 	const font::detail::container_type<font::GlyphExtents> &regular_extents,
 	const font::detail::container_type<font::GlyphExtents> *bold_extents,
 	const font::detail::container_type<font::GlyphExtents> *italic_extents,
@@ -478,10 +478,10 @@ std::pair<int,int> text_sections_size_in_pixels(const text::TextSections &text_s
 	auto width = 0;
 	auto height = 0;
 
-	for (auto &section : text_sections)
+	for (auto &text_block : text_blocks)
 	{
-		auto &extents = get_text_section_extents(section, regular_extents, bold_extents, italic_extents, bold_italic_extents);
-		auto [str_width, str_height] = string_size_in_pixels(section.Content(), extents);
+		auto &extents = get_text_block_extents(text_block, regular_extents, bold_extents, italic_extents, bold_italic_extents);
+		auto [str_width, str_height] = string_size_in_pixels(text_block.Content, extents);
 		width += str_width;
 		height = std::max(height, str_height);
 	}
@@ -610,20 +610,20 @@ void word_wrap(glyph_rope str, int max_width)
 	Formatting
 */
 
-text::TextSections HTMLToTextSections(std::string_view str)
+text::TextBlocks HTMLToTextBlocks(std::string_view str)
 {
-	return detail::html_to_text_sections(str);
+	return detail::html_to_text_blocks(str);
 }
 
 std::string HTMLToString(std::string_view str)
 {
-	return detail::text_sections_to_string(detail::html_to_text_sections(str));
+	return detail::text_blocks_to_string(detail::html_to_text_blocks(str));
 }
 
 
-text::TextLines SplitTextSections(text::TextSections text_sections)
+text::TextLines SplitTextBlocks(text::TextBlocks text_blocks)
 {
-	return detail::text_sections_to_text_lines(std::move(text_sections));
+	return detail::text_blocks_to_text_lines(std::move(text_blocks));
 }
 
 
@@ -653,7 +653,7 @@ std::optional<Vector2> MeasureString(std::string_view str, Font &font) noexcept
 		return {};
 }
 
-std::optional<Vector2> MeasureTextSections(const text::TextSections &text_sections, TypeFace &type_face) noexcept
+std::optional<Vector2> MeasureTextBlocks(const text::TextBlocks &text_blocks, TypeFace &type_face) noexcept
 {
 	if (!type_face.HasRegularFont())
 		return {};
@@ -667,8 +667,8 @@ std::optional<Vector2> MeasureTextSections(const text::TextSections &text_sectio
 		auto bold_italic_extents = type_face.BoldItalicFont() ?
 			detail::get_glyph_extents(*type_face.BoldItalicFont()) : nullptr;
 
-		auto [width, height] = detail::text_sections_size_in_pixels(
-			text_sections, *extents, bold_extents, italic_extents, bold_italic_extents);
+		auto [width, height] = detail::text_blocks_size_in_pixels(
+			text_blocks, *extents, bold_extents, italic_extents, bold_italic_extents);
 		return Vector2{static_cast<real>(width), static_cast<real>(height)};
 	}
 	else
@@ -706,7 +706,7 @@ std::optional<std::string> WordWrap(std::string str, int max_width, Font &font)
 		return {};
 }
 
-std::optional<text::TextSections> WordWrap(text::TextSections text_sections, int max_width, TypeFace &type_face)
+std::optional<text::TextBlocks> WordWrap(text::TextBlocks text_blocks, int max_width, TypeFace &type_face)
 {
 	if (!type_face.HasRegularFont())
 		return {};
@@ -721,10 +721,10 @@ std::optional<text::TextSections> WordWrap(text::TextSections text_sections, int
 			detail::get_glyph_extents(*type_face.BoldItalicFont()) : nullptr;
 
 		detail::word_wrap(
-			detail::make_glyph_rope(text_sections,
+			detail::make_glyph_rope(text_blocks,
 				*extents, bold_extents, italic_extents, bold_italic_extents),
 			max_width);
-		return text_sections;
+		return text_blocks;
 	}
 	else
 		return {};

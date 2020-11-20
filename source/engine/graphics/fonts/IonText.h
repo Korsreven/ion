@@ -71,197 +71,55 @@ namespace ion::graphics::fonts
 		};
 
 
-		class TextSectionStyle
+		struct TextBlockStyle
 		{
-			protected:
-
-				std::optional<Color> foreground_color_;
-				std::optional<Color> background_color_;
-				std::optional<TextFontStyle> font_style_;
-				std::optional<TextDecoration> decoration_;
-				std::optional<Color> decoration_color_;
-
-			public:
-
-				//Default constructor
-				TextSectionStyle() = default;
-
-				//Alternative constructor
-				TextSectionStyle(std::optional<Color> foreground_color, std::optional<Color> background_color,
-					std::optional<TextFontStyle> font_style, std::optional<TextDecoration> decoration,
-					std::optional<Color> decoration_color) noexcept;
+				std::optional<Color> ForegroundColor;
+				std::optional<Color> BackgroundColor;
+				std::optional<TextFontStyle> FontStyle;
+				std::optional<TextDecoration> Decoration;
+				std::optional<Color> DecorationColor;
 
 
-				/*
-					Operators
-				*/
-
-				//
-				[[nodiscard]] inline auto operator==(const TextSectionStyle &rhs) const noexcept
+				//Returns true if all styles is equal to the given text block style
+				[[nodiscard]] inline auto operator==(const TextBlockStyle &rhs) const noexcept
 				{
-					return foreground_color_ == rhs.foreground_color_ &&
-						   background_color_ == rhs.background_color_ &&
-						   font_style_ == rhs.font_style_ &&
-						   decoration_ == rhs.decoration_ &&
-						   decoration_color_ == rhs.decoration_color_;
+					return ForegroundColor == rhs.ForegroundColor &&
+						   BackgroundColor == rhs.BackgroundColor &&
+						   FontStyle == rhs.FontStyle &&
+						   Decoration == rhs.Decoration &&
+						   DecorationColor == rhs.DecorationColor;
 				}
 
-
-				/*
-					Modifiers
-				*/
-
-				//
-				inline void ForegroundColor(const Color &color) noexcept
-				{
-					foreground_color_ = color;
-				}
-
-				//
-				inline void BackgroundColor(const Color &color) noexcept
-				{
-					background_color_ = color;
-				}
-
-				//
-				inline void FontStyle(TextFontStyle font_style) noexcept
-				{
-					font_style_ = font_style;
-				}
-
-				//
-				inline void Decoration(TextDecoration decoration) noexcept
-				{
-					decoration_ = decoration;
-				}
-
-				//
-				inline void DecorationColor(const Color &color) noexcept
-				{
-					decoration_color_ = color;
-				}
-
-
-				/*
-					Observers
-				*/
-
-				//
-				[[nodiscard]] inline auto& ForegroundColor() const noexcept
-				{
-					return foreground_color_;
-				}
-
-				//
-				[[nodiscard]] inline auto& BackgroundColor() const noexcept
-				{
-					return background_color_;
-				}
-
-				//
-				[[nodiscard]] inline auto& FontStyle() const noexcept
-				{
-					return font_style_;
-				}
-
-				//
-				[[nodiscard]] inline auto& Decoration() const noexcept
-				{
-					return decoration_;
-				}
-
-				//
-				[[nodiscard]] inline auto& DecorationColor() const noexcept
-				{
-					return decoration_color_;
-				}
-
-
-				//
+				//Returns true if this text block style has no styles
 				[[nodiscard]] inline auto IsPlain() const noexcept
 				{
-					return !foreground_color_ &&  !background_color_ && !font_style_ && !decoration_ && !decoration_color_;
+					return !ForegroundColor &&
+						   !BackgroundColor &&
+						   !FontStyle &&
+						   !Decoration &&
+						   !DecorationColor;
 				}
 		};
 
-		using TextSectionStyles = std::vector<TextSectionStyle>;
+		using TextBlockStyles = std::vector<TextBlockStyle>;
 
 
-		class TextSection final : public TextSectionStyle
+		struct TextBlock final : TextBlockStyle
 		{
-			private:
-
-				std::string content_;
-
-			public:
-
-				//Constructor
-				explicit TextSection(std::string content);
-
-				//Alternative constructor
-				TextSection(std::string content, TextSectionStyle text_section_style);
-
-
-				/*
-					Observers
-				*/
-
-				//
-				[[nodiscard]] inline auto& Content() noexcept
-				{
-					return content_;
-				}
-
-				//
-				[[nodiscard]] inline auto& Content() const noexcept
-				{
-					return content_;
-				}
+			std::string Content;
 		};
 
-		using TextSections = std::vector<TextSection>;
+		using TextBlocks = std::vector<TextBlock>;
 
-
-		class TextLine final
+		struct TextLine final
 		{
-			private:
-
-				TextSections sections_;
-				int width_ = 0;
-
-			public:
-
-				//Constructor
-				explicit TextLine(TextSections sections, int width = 0);
-
-
-				/*
-					Observers
-				*/
-
-				//Returns an immutable range of all sections on this line
-				//This can be used directly with a range-based for loop
-				[[nodiscard]] inline const auto Sections() const noexcept
-				{
-					return adaptors::ranges::Iterable<const TextSections&>{sections_};
-				}
-
-				//
-				[[nodiscard]] inline auto Width() const noexcept
-				{
-					return width_;
-				}
-
-
-				/*
-					Content
-				*/
-
-				//
-				[[nodiscard]] std::string Content() const;
+			TextBlocks Blocks;
 		};
-
+		
 		using TextLines = std::vector<TextLine>;
+
+		using MeasuredTextLine = std::pair<TextLine, Vector2>;
+		using MeasuredTextLines = std::vector<MeasuredTextLine>;
 
 
 		namespace detail
@@ -276,7 +134,7 @@ namespace ion::graphics::fonts
 	{
 		private:
 
-			std::string unformatted_str_;
+			std::string content_;
 			text::TextAlignment alignment_ = text::TextAlignment::Left;
 			text::TextVerticalAlignment vertical_alignment_ = text::TextVerticalAlignment::Top;
 			text::TextFormatting formatting_ = text::TextFormatting::HTML;
@@ -300,7 +158,7 @@ namespace ion::graphics::fonts
 		public:
 
 			//Construct a new text with the given name, string and a type face
-			Text(std::string name, std::string str, TypeFace &type_face);
+			Text(std::string name, std::string content, TypeFace &type_face);
 			
 
 			/*
@@ -314,10 +172,11 @@ namespace ion::graphics::fonts
 				Modifiers
 			*/
 
-			//Sets the unformatted (raw) string used by this text to the given string
-			inline void UnformattedStr(std::string str)
+			//Sets the (raw) content used by this text to the given content
+			//Content can contain HTML tags and CSS code
+			inline void Content(std::string content)
 			{
-				unformatted_str_ = std::move(str);
+				content_ = std::move(content);
 			}
 
 			//Sets the horizontal alignment of the text to the given alignment
@@ -422,10 +281,11 @@ namespace ion::graphics::fonts
 				Observers
 			*/
 
-			//Returns the unformatted (raw) string used by this text
-			[[nodiscard]] inline auto& UnformattedStr() const noexcept
+			//Returns the (raw) content used by this text
+			//Content can contain HTML tags and CSS code
+			[[nodiscard]] inline auto& Content() const noexcept
 			{
-				return unformatted_str_;
+				return content_;
 			}
 
 			//Returns the horizontal alignment of the text
@@ -529,25 +389,21 @@ namespace ion::graphics::fonts
 
 
 			/*
-				Unformatted
+				Content
 			*/
 
-			//Append the given string to the front of the unformatted (raw) string used by this text
-			//This will only parse and format the appended string (unlike UnformattedStr)
-			void AppendFront(std::string_view str);
+			//Append the given string to the front of the (raw) content used by this text
+			//This will only parse and format the appended content (unlike Text::Content)
+			void AppendFront(std::string_view content);
 
-			//Append the given string to the back of the unformatted (raw) string used by this text
-			//This will only parse and format the appended string (unlike UnformattedStr)
-			void AppendBack(std::string_view str);
+			//Append the given string to the back of the (raw) content used by this text
+			//This will only parse and format the appended content (unlike Text::Content)
+			void AppendBack(std::string_view content);
 
 
 			/*
 				Formatted
 			*/
-
-			//Returns the formatted string, meaning all formatting tags removed
-			//Which tags are removed and kept, is based on TextFormatting
-			[[nodiscard]] std::string FormattedStr() const noexcept;
 
 			//Returns an immutable range of all formatted lines in this text
 			//This can be used directly with a range-based for loop
@@ -555,6 +411,15 @@ namespace ion::graphics::fonts
 			{
 				return adaptors::ranges::Iterable<const text::TextLines&>{formatted_lines_};
 			}
+
+
+			/*
+				Unformatted
+			*/
+
+			//Returns the (plain) unformatted content, meaning all HTML tags and CSS code removed
+			//Which tags are removed and kept, is based on TextFormatting
+			[[nodiscard]] std::string UnformattedContent() const noexcept;
 	};
 } //ion::graphics::fonts
 
