@@ -39,19 +39,17 @@ namespace ion::graphics::fonts
 		};
 
 
-		struct GlyphExtents
+		struct GlyphMetric
 		{
 			int Left = 0, Top = 0;
 			int Width = 0, Height = 0;
 			int ActualWidth = 0, ActualHeight = 0;
 			int Advance = 0;
 		};
-
-		namespace detail
-		{
-			template <typename T>
-			using container_type = std::vector<T>;
-		} //detail
+		
+		using GlyphTextureHandles = std::vector<int>;
+		using GlyphBitmapData = std::vector<std::string>;
+		using GlyphMetrices = std::vector<GlyphMetric>;
 	} //font
 
 	class Font final : public resources::FileResource<FontManager>
@@ -59,10 +57,10 @@ namespace ion::graphics::fonts
 		private:
 
 			std::optional<int> handle_;	
-			std::optional<font::detail::container_type<int>> glyph_handles_;
+			std::optional<font::GlyphTextureHandles> glyph_handles_;
 
-			std::optional<font::detail::container_type<std::string>> glyph_data_;	
-			std::optional<font::detail::container_type<font::GlyphExtents>> glyph_extents_;
+			std::optional<font::GlyphBitmapData> glyph_data_;
+			std::optional<font::GlyphMetrices> glyph_metrics_;
 			std::optional<int> glyph_max_height_;
 
 			int size_ = 0;
@@ -140,18 +138,17 @@ namespace ion::graphics::fonts
 			}
 
 			//Sets the handle for the font to the given value
-			inline void GlyphHandles(std::optional<font::detail::container_type<int>> handles)
+			inline void GlyphHandles(std::optional<font::GlyphTextureHandles> handles)
 			{
 				glyph_handles_ = std::move(handles);
 			}
 
 
 			//Sets the glyph data of the font to the given data
-			inline void GlyphData(font::detail::container_type<std::string> data,
-				font::detail::container_type<font::GlyphExtents> extents, int max_height)
+			inline void GlyphData(font::GlyphBitmapData data, font::GlyphMetrices glyph_metrics, int max_height)
 			{
 				glyph_data_ = std::move(data);
-				glyph_extents_ = std::move(extents);
+				glyph_metrics_ = std::move(glyph_metrics);
 				glyph_max_height_ = max_height;
 			}
 
@@ -188,11 +185,11 @@ namespace ion::graphics::fonts
 				return glyph_data_;
 			}
 
-			//Returns the glyph extents for the font
+			//Returns the glyph metrics for the font
 			//Returns nullopt if the font has not been prepared yet
-			[[nodiscard]] inline auto& GlyphExtents() const noexcept
+			[[nodiscard]] inline auto& GlyphMetrics() const noexcept
 			{
-				return glyph_extents_;
+				return glyph_metrics_;
 			}
 
 			//Returns the max glyph height for the font

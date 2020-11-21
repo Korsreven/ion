@@ -32,14 +32,14 @@ namespace ion::graphics::fonts
 	{
 		namespace detail
 		{
-			std::optional<std::tuple<font::detail::container_type<std::string>, font::detail::container_type<font::GlyphExtents>, int>> prepare_font(
+			std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, int>> prepare_font(
 				const std::string &file_data, int size, int face_index, font::CharacterEncoding encoding);
 
-			std::pair<std::optional<int>, std::optional<font::detail::container_type<int>>> load_font(
-				const font::detail::container_type<std::string> &glyph_data,
-				const font::detail::container_type<font::GlyphExtents> &glyph_extents,
+			std::pair<std::optional<int>, std::optional<font::GlyphTextureHandles>> load_font(
+				const font::GlyphBitmapData &glyph_data,
+				const font::GlyphMetrices &glyph_metrics,
 				font::GlyphFilter min_filter, font::GlyphFilter mag_filter) noexcept;
-			void unload_font(int font_handle, const font::detail::container_type<int> &glyph_handles) noexcept;
+			void unload_font(int font_handle, const font::GlyphTextureHandles &glyph_handles) noexcept;
 		} //detail
 	} //font_manager
 

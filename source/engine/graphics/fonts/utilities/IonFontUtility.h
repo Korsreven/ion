@@ -39,7 +39,7 @@ namespace ion::graphics::fonts::utilities
 		struct glyph_string final
 		{
 			std::string &value;
-			const font::detail::container_type<font::GlyphExtents> &extents;
+			const font::GlyphMetrices &metrics;
 		};
 
 		using glyph_strings = std::vector<glyph_string>;
@@ -62,7 +62,7 @@ namespace ion::graphics::fonts::utilities
 
 				char& operator[](size_t off) noexcept;
 				const char& operator[](size_t off) const noexcept;
-				const font::detail::container_type<font::GlyphExtents>& glyph(size_t off) const noexcept;
+				const font::GlyphMetrices& glyph_metrics(size_t off) const noexcept;
 
 				std::string& insert(size_t off, size_t count, char ch);
 
@@ -71,10 +71,10 @@ namespace ion::graphics::fonts::utilities
 		};
 
 		glyph_rope make_glyph_rope(text::TextBlocks &text_blocks,
-			const font::detail::container_type<font::GlyphExtents> &regular_extents,
-			const font::detail::container_type<font::GlyphExtents> *bold_extents,
-			const font::detail::container_type<font::GlyphExtents> *italic_extents,
-			const font::detail::container_type<font::GlyphExtents> *bold_italic_extents);
+			const font::GlyphMetrices &regular_metrics,
+			const font::GlyphMetrices *bold_metrics,
+			const font::GlyphMetrices *italic_metrics,
+			const font::GlyphMetrices *bold_italic_metrics);
 
 
 		/*
@@ -184,60 +184,60 @@ namespace ion::graphics::fonts::utilities
 			Measuring
 		*/
 
-		const font::detail::container_type<font::GlyphExtents>* get_glyph_extents(Font &font);
+		const font::GlyphMetrices* get_glyph_metrics(Font &font);
 
-		inline auto& get_text_block_extents(
+		inline auto& get_text_block_metrics(
 			const text::TextBlock &text_block,
-			const font::detail::container_type<font::GlyphExtents> &regular_extents,
-			const font::detail::container_type<font::GlyphExtents> *bold_extents,
-			const font::detail::container_type<font::GlyphExtents> *italic_extents,
-			const font::detail::container_type<font::GlyphExtents> *bold_italic_extents) noexcept
+			const font::GlyphMetrices &regular_metrics,
+			const font::GlyphMetrices *bold_metrics,
+			const font::GlyphMetrices *italic_metrics,
+			const font::GlyphMetrices *bold_italic_metrics) noexcept
 		{
-			auto extents =
-				[&]() noexcept -> decltype(&regular_extents)
+			auto metrics =
+				[&]() noexcept -> decltype(&regular_metrics)
 				{
 					if (text_block.FontStyle)
 					{
 						switch (*text_block.FontStyle)
 						{
 							case text::TextFontStyle::Bold:
-							return bold_extents;
+							return bold_metrics;
 
 							case text::TextFontStyle::Italic:
-							return italic_extents;
+							return italic_metrics;
 
 							case text::TextFontStyle::BoldItalic:
-							return bold_italic_extents;
+							return bold_italic_metrics;
 						}
 					}
 
 					return nullptr;
 				}();
 
-			return extents ? *extents : regular_extents;
+			return metrics ? *metrics : regular_metrics;
 		}
 
 
 		inline auto character_size_in_pixels(char c,
-			const font::detail::container_type<font::GlyphExtents> &extents) noexcept
+			const font::GlyphMetrices &metrics) noexcept
 		{
 			auto glyph_index = static_cast<unsigned char>(c);
 
-			if (glyph_index < std::size(extents))
-				return std::pair{extents[glyph_index].Advance, extents[glyph_index].Height};
+			if (glyph_index < std::size(metrics))
+				return std::pair{metrics[glyph_index].Advance, metrics[glyph_index].Height};
 			else
 				return std::pair{0, 0};
 		}
 
 		inline auto string_size_in_pixels(std::string_view str,
-			const font::detail::container_type<font::GlyphExtents> &extents) noexcept
+			const font::GlyphMetrices &metrics) noexcept
 		{
 			auto width = 0;
 			auto height = 0;
 
 			for (auto c : str)
 			{
-				auto [c_width, c_height] = character_size_in_pixels(c, extents);
+				auto [c_width, c_height] = character_size_in_pixels(c, metrics);
 				width += c_width;
 				height = std::max(height, c_height);
 			}
@@ -246,10 +246,10 @@ namespace ion::graphics::fonts::utilities
 		}
 
 		std::pair<int,int> text_blocks_size_in_pixels(const text::TextBlocks &text_blocks,
-			const font::detail::container_type<font::GlyphExtents> &regular_extents,
-			const font::detail::container_type<font::GlyphExtents> *bold_extents,
-			const font::detail::container_type<font::GlyphExtents> *italic_extents,
-			const font::detail::container_type<font::GlyphExtents> *bold_italic_extents) noexcept;
+			const font::GlyphMetrices &regular_metrics,
+			const font::GlyphMetrices *bold_metrics,
+			const font::GlyphMetrices *italic_metrics,
+			const font::GlyphMetrices *bold_italic_metrics) noexcept;
 
 
 		/*
@@ -257,7 +257,7 @@ namespace ion::graphics::fonts::utilities
 		*/
 
 		std::string truncate_string(std::string str, int max_width, std::string suffix,
-			const font::detail::container_type<font::GlyphExtents> &extents);
+			const font::GlyphMetrices &metrics);
 
 
 		/*
@@ -265,7 +265,7 @@ namespace ion::graphics::fonts::utilities
 		*/
 
 		std::string word_wrap(std::string str, int max_width,
-			const font::detail::container_type<font::GlyphExtents> &extents);
+			const font::GlyphMetrices &metrics);
 		void word_wrap(glyph_rope str, int max_width);
 	} //detail
 

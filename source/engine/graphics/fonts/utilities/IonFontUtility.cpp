@@ -97,10 +97,10 @@ const char& glyph_rope::operator[](size_t off) const noexcept
 	return str[ch_off];
 }
 
-const font::detail::container_type<font::GlyphExtents>& glyph_rope::glyph(size_t off) const noexcept
+const font::GlyphMetrices& glyph_rope::glyph_metrics(size_t off) const noexcept
 {
 	auto [str_off, ch_off] = get_offsets(off);
-	return strings_[str_off].extents;
+	return strings_[str_off].metrics;
 }
 
 std::string& glyph_rope::insert(size_t off, size_t count, char ch)
@@ -130,17 +130,17 @@ size_t glyph_rope::size() const noexcept
 }
 
 glyph_rope make_glyph_rope(text::TextBlocks &text_blocks,
-	const font::detail::container_type<font::GlyphExtents> &regular_extents,
-	const font::detail::container_type<font::GlyphExtents> *bold_extents,
-	const font::detail::container_type<font::GlyphExtents> *italic_extents,
-	const font::detail::container_type<font::GlyphExtents> *bold_italic_extents)
+	const font::GlyphMetrices &regular_metrics,
+	const font::GlyphMetrices *bold_metrics,
+	const font::GlyphMetrices *italic_metrics,
+	const font::GlyphMetrices *bold_italic_metrics)
 {
 	glyph_strings strings;
 
 	for (auto &text_block : text_blocks)
 	{
-		auto &extents = get_text_block_extents(text_block, regular_extents, bold_extents, italic_extents, bold_italic_extents);
-		strings.push_back({text_block.Content, extents});
+		auto &metrics = get_text_block_metrics(text_block, regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics);
+		strings.push_back({text_block.Content, metrics});
 	}
 
 	return strings;
@@ -458,30 +458,30 @@ std::string text_blocks_to_string(const text::TextBlocks &text_blocks)
 	Measuring
 */
 
-const font::detail::container_type<font::GlyphExtents>* get_glyph_extents(Font &font)
+const font::GlyphMetrices* get_glyph_metrics(Font &font)
 {
 	if (font.IsLoaded() || (font.Owner() && font.Owner()->Load(font)))
 	{
-		if (auto &extents = font.GlyphExtents(); extents)
-			return &*extents;
+		if (auto &metrics = font.GlyphMetrics(); metrics)
+			return &*metrics;
 	}
 
 	return nullptr;
 }
 
 std::pair<int,int> text_blocks_size_in_pixels(const text::TextBlocks &text_blocks,
-	const font::detail::container_type<font::GlyphExtents> &regular_extents,
-	const font::detail::container_type<font::GlyphExtents> *bold_extents,
-	const font::detail::container_type<font::GlyphExtents> *italic_extents,
-	const font::detail::container_type<font::GlyphExtents> *bold_italic_extents) noexcept
+	const font::GlyphMetrices &regular_metrics,
+	const font::GlyphMetrices *bold_metrics,
+	const font::GlyphMetrices *italic_metrics,
+	const font::GlyphMetrices *bold_italic_metrics) noexcept
 {
 	auto width = 0;
 	auto height = 0;
 
 	for (auto &text_block : text_blocks)
 	{
-		auto &extents = get_text_block_extents(text_block, regular_extents, bold_extents, italic_extents, bold_italic_extents);
-		auto [str_width, str_height] = string_size_in_pixels(text_block.Content, extents);
+		auto &metrics = get_text_block_metrics(text_block, regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics);
+		auto [str_width, str_height] = string_size_in_pixels(text_block.Content, metrics);
 		width += str_width;
 		height = std::max(height, str_height);
 	}
@@ -495,13 +495,13 @@ std::pair<int,int> text_blocks_size_in_pixels(const text::TextBlocks &text_block
 */
 
 std::string truncate_string(std::string str, int max_width, std::string suffix,
-	const font::detail::container_type<font::GlyphExtents> &extents)
+	const font::GlyphMetrices &metrics)
 {
 	//Truncate
-	if (auto [width, height] = detail::string_size_in_pixels(str, extents);
+	if (auto [width, height] = detail::string_size_in_pixels(str, metrics);
 		width > max_width)
 	{
-		auto [suffix_width, suffix_height] = detail::string_size_in_pixels(suffix, extents);
+		auto [suffix_width, suffix_height] = detail::string_size_in_pixels(suffix, metrics);
 
 		if (suffix_width > max_width)
 			return "";
@@ -512,7 +512,7 @@ std::string truncate_string(std::string str, int max_width, std::string suffix,
 
 		while (!std::empty(str))
 		{
-			auto [c_width, c_height] = character_size_in_pixels(str.back(), extents);
+			auto [c_width, c_height] = character_size_in_pixels(str.back(), metrics);
 			str.pop_back();
 
 			if ((width -= c_width) <= max_width)
@@ -531,9 +531,9 @@ std::string truncate_string(std::string str, int max_width, std::string suffix,
 */
 
 std::string word_wrap(std::string str, int max_width,
-	const font::detail::container_type<font::GlyphExtents> &extents)
+	const font::GlyphMetrices &metrics)
 {
-	word_wrap(glyph_string{str, extents}, max_width);
+	word_wrap(glyph_string{str, metrics}, max_width);
 	return str;
 }
 
@@ -557,7 +557,7 @@ void word_wrap(glyph_rope str, int max_width)
 
 			default:
 			{
-				auto [c_width, c_height] = character_size_in_pixels(str[i], str.glyph(i));
+				auto [c_width, c_height] = character_size_in_pixels(str[i], str.glyph_metrics(i));
 
 				//Insert new line
 				if (width > 0 && //At least one character
@@ -633,9 +633,9 @@ text::TextLines SplitTextBlocks(text::TextBlocks text_blocks)
 
 std::optional<Vector2> MeasureCharacter(char c, Font &font) noexcept
 {
-	if (auto extents = detail::get_glyph_extents(font); extents)
+	if (auto metrics = detail::get_glyph_metrics(font); metrics)
 	{
-		auto [width, height] = detail::character_size_in_pixels(c, *extents);
+		auto [width, height] = detail::character_size_in_pixels(c, *metrics);
 		return Vector2{static_cast<real>(width), static_cast<real>(height)};
 	}
 	else
@@ -644,9 +644,9 @@ std::optional<Vector2> MeasureCharacter(char c, Font &font) noexcept
 
 std::optional<Vector2> MeasureString(std::string_view str, Font &font) noexcept
 {
-	if (auto extents = detail::get_glyph_extents(font); extents)
+	if (auto metrics = detail::get_glyph_metrics(font); metrics)
 	{
-		auto [width, height] = detail::string_size_in_pixels(str, *extents);
+		auto [width, height] = detail::string_size_in_pixels(str, *metrics);
 		return Vector2{static_cast<real>(width), static_cast<real>(height)};
 	}
 	else
@@ -658,17 +658,17 @@ std::optional<Vector2> MeasureTextBlocks(const text::TextBlocks &text_blocks, Ty
 	if (!type_face.HasRegularFont())
 		return {};
 
-	if (auto extents = detail::get_glyph_extents(*type_face.RegularFont()); extents)
+	if (auto metrics = detail::get_glyph_metrics(*type_face.RegularFont()); metrics)
 	{
-		auto bold_extents = type_face.BoldFont() ?
-			detail::get_glyph_extents(*type_face.BoldFont()) : nullptr;
-		auto italic_extents = type_face.ItalicFont() ?
-			detail::get_glyph_extents(*type_face.ItalicFont()) : nullptr;
-		auto bold_italic_extents = type_face.BoldItalicFont() ?
-			detail::get_glyph_extents(*type_face.BoldItalicFont()) : nullptr;
+		auto bold_metrics = type_face.BoldFont() ?
+			detail::get_glyph_metrics(*type_face.BoldFont()) : nullptr;
+		auto italic_metrics = type_face.ItalicFont() ?
+			detail::get_glyph_metrics(*type_face.ItalicFont()) : nullptr;
+		auto bold_italic_metrics = type_face.BoldItalicFont() ?
+			detail::get_glyph_metrics(*type_face.BoldItalicFont()) : nullptr;
 
 		auto [width, height] = detail::text_blocks_size_in_pixels(
-			text_blocks, *extents, bold_extents, italic_extents, bold_italic_extents);
+			text_blocks, *metrics, bold_metrics, italic_metrics, bold_italic_metrics);
 		return Vector2{static_cast<real>(width), static_cast<real>(height)};
 	}
 	else
@@ -687,8 +687,8 @@ std::optional<std::string> TruncateString(std::string str, int max_width, Font &
 
 std::optional<std::string> TruncateString(std::string str, int max_width, std::string suffix, Font &font)
 {
-	if (auto extents = detail::get_glyph_extents(font); extents)
-		return detail::truncate_string(std::move(str), max_width, std::move(suffix), *extents);
+	if (auto metrics = detail::get_glyph_metrics(font); metrics)
+		return detail::truncate_string(std::move(str), max_width, std::move(suffix), *metrics);
 	else
 		return {};
 }
@@ -700,8 +700,8 @@ std::optional<std::string> TruncateString(std::string str, int max_width, std::s
 
 std::optional<std::string> WordWrap(std::string str, int max_width, Font &font)
 {
-	if (auto extents = detail::get_glyph_extents(font); extents)
-		return detail::word_wrap(std::move(str), max_width, *extents);
+	if (auto metrics = detail::get_glyph_metrics(font); metrics)
+		return detail::word_wrap(std::move(str), max_width, *metrics);
 	else
 		return {};
 }
@@ -711,18 +711,18 @@ std::optional<text::TextBlocks> WordWrap(text::TextBlocks text_blocks, int max_w
 	if (!type_face.HasRegularFont())
 		return {};
 
-	if (auto extents = detail::get_glyph_extents(*type_face.RegularFont()); extents)
+	if (auto metrics = detail::get_glyph_metrics(*type_face.RegularFont()); metrics)
 	{
-		auto bold_extents = type_face.BoldFont() ?
-			detail::get_glyph_extents(*type_face.BoldFont()) : nullptr;
-		auto italic_extents = type_face.ItalicFont() ?
-			detail::get_glyph_extents(*type_face.ItalicFont()) : nullptr;
-		auto bold_italic_extents = type_face.BoldItalicFont() ?
-			detail::get_glyph_extents(*type_face.BoldItalicFont()) : nullptr;
+		auto bold_metrics = type_face.BoldFont() ?
+			detail::get_glyph_metrics(*type_face.BoldFont()) : nullptr;
+		auto italic_metrics = type_face.ItalicFont() ?
+			detail::get_glyph_metrics(*type_face.ItalicFont()) : nullptr;
+		auto bold_italic_metrics = type_face.BoldItalicFont() ?
+			detail::get_glyph_metrics(*type_face.BoldItalicFont()) : nullptr;
 
 		detail::word_wrap(
 			detail::make_glyph_rope(text_blocks,
-				*extents, bold_extents, italic_extents, bold_italic_extents),
+				*metrics, bold_metrics, italic_metrics, bold_italic_metrics),
 			max_width);
 		return text_blocks;
 	}
