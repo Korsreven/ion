@@ -16,6 +16,8 @@ File:	IonText.h
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include "IonTypeFaceManager.h"
 #include "adaptors/ranges/IonIterable.h"
@@ -29,7 +31,7 @@ File:	IonText.h
 namespace ion::graphics::fonts
 {
 	struct TextManager; //Forward declaration
-
+	
 	using utilities::Color;
 	using utilities::Vector2;
 
@@ -125,6 +127,9 @@ namespace ion::graphics::fonts
 		namespace detail
 		{
 			inline const auto jet_black = Color::RGB(52, 52, 52);
+
+			MeasuredTextLines string_to_formatted_lines(std::string_view content,
+				const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding, TypeFace &type_face);
 		} //detail
 	} //text
 
@@ -140,7 +145,7 @@ namespace ion::graphics::fonts
 			text::TextFormatting formatting_ = text::TextFormatting::HTML;
 
 			std::optional<Vector2> area_size_;
-			std::optional<int> padding_;
+			std::optional<Vector2> padding_;
 			std::optional<int> line_spacing_;
 
 			int from_line_ = 0;				//Render lines in range:
@@ -153,11 +158,14 @@ namespace ion::graphics::fonts
 			std::optional<Color> default_decoration_color_;
 
 			managed::ObservedObject<TypeFace> type_face_;
-			text::TextLines formatted_lines_;
+			text::MeasuredTextLines formatted_lines_;
+
+
+			text::MeasuredTextLines GetFormattedLines() const;
 
 		public:
 
-			//Construct a new text with the given name, string and a type face
+			//Construct a new text with the given name, content and a type face
 			Text(std::string name, std::string content, TypeFace &type_face);
 			
 
@@ -174,10 +182,7 @@ namespace ion::graphics::fonts
 
 			//Sets the (raw) content used by this text to the given content
 			//Content can contain HTML tags and CSS code
-			inline void Content(std::string content)
-			{
-				content_ = std::move(content);
-			}
+			void Content(std::string content);
 
 			//Sets the horizontal alignment of the text to the given alignment
 			inline void Alignment(text::TextAlignment alignment) noexcept
@@ -192,26 +197,17 @@ namespace ion::graphics::fonts
 			}
 
 			//Sets the formatting of the text to the given format
-			inline void Formatting(text::TextFormatting formatting) noexcept
-			{
-				formatting_ = formatting;
-			}
+			void Formatting(text::TextFormatting formatting);
 
 
 			//Sets the area size of the text to the given size
 			//If nullopt is passed, no area size will be used
-			inline void AreaSize(const std::optional<Vector2> &area_size) noexcept
-			{
-				area_size_ = area_size;
-			}
+			void AreaSize(const std::optional<Vector2> &area_size);
 
 			//Sets the padding size of the text area to the given padding (in pixels)
 			//Padding size is the space between the area and the displayed text
 			//If nullopt is passed, default padding is used (could vary based on type face)
-			inline void Padding(std::optional<int> padding) noexcept
-			{
-				padding_ = padding;
-			}
+			void Padding(const std::optional<Vector2> &padding);
 
 			//Sets the line spacing to the given spacing (in pixels)
 			//Line spacing is the space between lines in the displayed text
@@ -317,7 +313,7 @@ namespace ion::graphics::fonts
 			//Returns the padding size of the text area in pixels
 			//Padding size is the space between the area and the displayed text
 			//Returns nullopt if default padding is used (could vary based on type face)
-			[[nodiscard]] inline auto Padding() const noexcept
+			[[nodiscard]] inline auto& Padding() const noexcept
 			{
 				return padding_;
 			}
@@ -392,13 +388,13 @@ namespace ion::graphics::fonts
 				Content
 			*/
 
-			//Append the given string to the front of the (raw) content used by this text
-			//This will only parse and format the appended content (unlike Text::Content)
-			void AppendFront(std::string_view content);
+			//Insert the given content to the back of the (raw) content used by this text
+			//This will only parse and format the added content (unlike Text::Content)
+			void AppendContent(std::string_view content);
 
-			//Append the given string to the back of the (raw) content used by this text
-			//This will only parse and format the appended content (unlike Text::Content)
-			void AppendBack(std::string_view content);
+			//Insert the given content to the front of the (raw) content used by this text
+			//This will only parse and format the added content (unlike Text::Content)
+			void PrependContent(std::string_view content);
 
 
 			/*
@@ -409,7 +405,7 @@ namespace ion::graphics::fonts
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline const auto FormattedLines() const noexcept
 			{
-				return adaptors::ranges::Iterable<const text::TextLines&>{formatted_lines_};
+				return adaptors::ranges::Iterable<const text::MeasuredTextLines&>{formatted_lines_};
 			}
 
 
@@ -419,7 +415,7 @@ namespace ion::graphics::fonts
 
 			//Returns the (plain) unformatted content, meaning all HTML tags and CSS code removed
 			//Which tags are removed and kept, is based on TextFormatting
-			[[nodiscard]] std::string UnformattedContent() const noexcept;
+			[[nodiscard]] std::string UnformattedContent() const;
 	};
 } //ion::graphics::fonts
 

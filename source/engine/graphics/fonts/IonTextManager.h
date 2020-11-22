@@ -80,8 +80,8 @@ namespace ion::graphics::fonts
 			Creating
 		*/
 
-		//Create a text with the given name, string and a type face
-		Text& CreateText(std::string name, std::string str, TypeFace &type_face);
+		//Create a text with the given name, content and a type face
+		Text& CreateText(std::string name, std::string content, TypeFace &type_face);
 
 
 		//Create a text as a copy of the given text

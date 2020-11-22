@@ -30,9 +30,9 @@ namespace text_manager::detail
 	Creating
 */
 
-Text& TextManager::CreateText(std::string name, std::string str, TypeFace &type_face)
+Text& TextManager::CreateText(std::string name, std::string content, TypeFace &type_face)
 {
-	return Create(std::move(name), std::move(str), std::ref(type_face));
+	return Create(std::move(name), std::move(content), std::ref(type_face));
 }
 
 

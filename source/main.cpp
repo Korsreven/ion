@@ -367,7 +367,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Animation
 			ion::graphics::textures::AnimationManager animations;
-			auto animation = animations.CreateAnimation(ion::graphics::textures::Animation::Looping(
+			auto &animation = animations.CreateAnimation(ion::graphics::textures::Animation::Looping(
 				"alternate", frame_sequence, 6.0_sec, ion::graphics::textures::animation::PlaybackDirection::Alternate));
 			animation.RepeatCount(1);
 			animation.JumpForward(7.5_sec);
@@ -405,20 +405,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					verdana_italic_12,
 					verdana_bold_italic_12);
 
-			//Font utility
-			auto text_sections = ion::graphics::fonts::utilities::HTMLToTextBlocks(
-				"<p>The <i>quick</i> <font color=\"brown\">brown</font> <mark>fox</mark> <b>jumps</b> over the <i>lazy</i> dog</p>"
-			);
-
-			auto section_size_pixels = ion::graphics::fonts::utilities::MeasureTextBlocks(text_sections, verdana_12);
-
-			text_sections = *ion::graphics::fonts::utilities::WordWrap(std::move(text_sections), 100, verdana_12);
-			auto text_lines = ion::graphics::fonts::utilities::SplitTextBlocks(std::move(text_sections));
-
-			auto char_size_pixels = ion::graphics::fonts::utilities::MeasureCharacter('A', verdana_regular_12);
-			auto str_size_pixels = ion::graphics::fonts::utilities::MeasureString("Hello world!", verdana_regular_12);
-			auto truncated_str = ion::graphics::fonts::utilities::TruncateString("Hello world!", 90, verdana_regular_12);
-			auto word_wrapped_str = ion::graphics::fonts::utilities::WordWrap("The quick-brown fox jumps over-the lazy dog", 100, verdana_regular_12);
+			//Text
+			ion::graphics::fonts::TextManager texts;
+			[[maybe_unused]] auto &text =
+				texts.CreateText(
+					"pangram",
+					"<p>The <i>quick</i> <font color=\"brown\">brown</font> fox <b>jumps</b> over the <i>lazy</i> dog</p>",
+					verdana_12);
 
 			//EXAMPLE end
 
