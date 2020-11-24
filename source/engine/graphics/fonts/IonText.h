@@ -128,7 +128,8 @@ namespace ion::graphics::fonts
 		{
 			inline const auto jet_black = Color::RGB(52, 52, 52);
 
-			MeasuredTextLines string_to_formatted_lines(std::string_view content,
+			TextBlocks html_to_formatted_blocks(std::string_view content);
+			MeasuredTextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks,
 				const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding, TypeFace &type_face);
 		} //detail
 	} //text
@@ -158,10 +159,14 @@ namespace ion::graphics::fonts
 			std::optional<Color> default_decoration_color_;
 
 			managed::ObservedObject<TypeFace> type_face_;
+			text::TextBlocks formatted_blocks_;
 			text::MeasuredTextLines formatted_lines_;
 
 
-			text::MeasuredTextLines GetFormattedLines() const;
+			text::TextBlocks MakeFormattedBlocks(std::string_view content) const;
+			text::MeasuredTextLines MakeFormattedLines(text::TextBlocks text_blocks,
+				const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
+				managed::ObservedObject<TypeFace> &type_face) const;
 
 		public:
 
@@ -401,7 +406,15 @@ namespace ion::graphics::fonts
 				Formatted
 			*/
 
+			//Returns all of the formatted blocks in this text, with associated styles
+			//Text styles has been parsed from HTML tags and CSS code
+			[[nodiscard]] inline auto& FormattedBlocks() const noexcept
+			{
+				return formatted_blocks_;
+			}
+
 			//Returns an immutable range of all formatted lines in this text
+			//Each line contains formatted blocks of text, with associated styles
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline const auto FormattedLines() const noexcept
 			{

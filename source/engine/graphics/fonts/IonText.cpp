@@ -24,35 +24,30 @@ using namespace types::type_literals;
 namespace text::detail
 {
 
-MeasuredTextLines string_to_formatted_lines(std::string_view content,
+TextBlocks html_to_formatted_blocks(std::string_view content)
+{
+	return utilities::HTMLToTextBlocks(content);
+}
+
+MeasuredTextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks,
 	const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding, TypeFace &type_face)
 {
 	using namespace graphics::utilities;
+
+	//Word wrap text blocks to area size
+	if (area_size)
+	{
+		auto max_width = static_cast<int>(
+			(*area_size - padding.value_or(vector2::Zero) * 2.0_r).Ceil(vector2::Zero).X()
+		);
+
+		text_blocks = std::move(
+			utilities::WordWrap(std::move(text_blocks), max_width, type_face).
+			value_or(TextBlocks{})
+		);
+	}
+
 	MeasuredTextLines formatted_lines;
-
-	auto text_blocks =
-		[&]() -> TextBlocks
-		{
-			//Make sure content is word wrapped inside area
-			if (area_size)
-			{
-				auto max_width = static_cast<int>(
-					(*area_size - padding.value_or(vector2::Zero) * 2.0_r).Ceil(vector2::Zero).X()
-				);
-
-				if (auto text_blocks = utilities::WordWrap(
-					utilities::HTMLToTextBlocks(content), max_width, type_face);
-					text_blocks)
-
-					return *text_blocks;
-
-				else
-					return {};
-			}
-			else
-				return utilities::HTMLToTextBlocks(content);
-		}();
-
 	for (auto lines = utilities::SplitTextBlocks(std::move(text_blocks));
 		auto &line : lines)
 	{
@@ -68,10 +63,20 @@ MeasuredTextLines string_to_formatted_lines(std::string_view content,
 
 //Private
 
-text::MeasuredTextLines Text::GetFormattedLines() const
+text::TextBlocks Text::MakeFormattedBlocks(std::string_view content) const
 {
-	if (formatting_ == TextFormatting::HTML && type_face_)
-		return text::detail::string_to_formatted_lines(content_, area_size_, padding_, *type_face_.Object());
+	if (formatting_ == TextFormatting::HTML)
+		return detail::html_to_formatted_blocks(content);
+	else
+		return {};
+}
+
+text::MeasuredTextLines Text::MakeFormattedLines(text::TextBlocks text_blocks,
+	const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
+	managed::ObservedObject<TypeFace> &type_face) const
+{
+	if (formatting_ == TextFormatting::HTML && type_face)
+		return detail::formatted_blocks_to_formatted_lines(std::move(text_blocks), area_size, padding, *type_face.Object());
 	else
 		return {};
 }
@@ -85,7 +90,8 @@ Text::Text(std::string name, std::string content, TypeFace &type_face) :
 
 	content_{std::move(content)},
 	type_face_{type_face},
-	formatted_lines_{GetFormattedLines()}
+	formatted_blocks_{MakeFormattedBlocks(content_)},
+	formatted_lines_{MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_)}
 {
 	//Empty
 }
@@ -100,7 +106,8 @@ void Text::Content(std::string content)
 	if (content_ != content)
 	{
 		content_ = std::move(content);
-		formatted_lines_ = GetFormattedLines();
+		formatted_blocks_ = MakeFormattedBlocks(content_);
+		formatted_lines_ = MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_);
 	}
 }
 
@@ -109,7 +116,8 @@ void Text::Formatting(text::TextFormatting formatting)
 	if (formatting_ != formatting)
 	{
 		formatting_ = formatting;
-		formatted_lines_ = GetFormattedLines();
+		formatted_blocks_ = MakeFormattedBlocks(content_);
+		formatted_lines_ = MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_);
 	}
 }
 
@@ -119,7 +127,7 @@ void Text::AreaSize(const std::optional<Vector2> &area_size)
 	if (area_size_ != area_size)
 	{
 		area_size_ = area_size;
-		formatted_lines_ = GetFormattedLines();
+		formatted_lines_ = MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_);
 	}
 }
 
@@ -128,7 +136,7 @@ void Text::Padding(const std::optional<Vector2> &padding)
 	if (padding_ != padding)
 	{
 		padding_ = padding;
-		formatted_lines_ = GetFormattedLines();
+		formatted_lines_ = MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_);
 	}
 }
 
@@ -136,7 +144,7 @@ void Text::Padding(const std::optional<Vector2> &padding)
 void Text::Lettering(TypeFace &type_face)
 {
 	if (type_face_.Observe(type_face))
-		formatted_lines_ = GetFormattedLines();
+		formatted_lines_ = MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_);
 }
 
 void Text::Lettering(std::nullptr_t) noexcept
