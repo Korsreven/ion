@@ -183,6 +183,44 @@ void Text::PrependContent(std::string_view content)
 	content_.insert(0, content);
 }
 
+void Text::AppendLine(std::string_view content)
+{
+	if (std::empty(content_))
+	{
+		Content(std::string{content});
+		return;
+	}
+
+	content_ += "\n" + std::string{content};
+	auto formatted_blocks = MakeFormattedBlocks(content);
+	auto formatted_lines = MakeFormattedLines(formatted_blocks, area_size_, padding_, type_face_);
+	formatted_blocks.insert(std::begin(formatted_blocks), {{}, "\n"});
+
+	std::move(std::begin(formatted_blocks), std::end(formatted_blocks),
+		std::back_inserter(formatted_blocks_));
+	std::move(std::begin(formatted_lines), std::end(formatted_lines),
+		std::back_inserter(formatted_lines_));
+}
+
+void Text::PrependLine(std::string_view content)
+{
+	if (std::empty(content_))
+	{
+		Content(std::string{content});
+		return;
+	}
+
+	content_.insert(0, std::string{content} + "\n");
+	auto formatted_blocks = MakeFormattedBlocks(content);
+	auto formatted_lines = MakeFormattedLines(formatted_blocks, area_size_, padding_, type_face_);
+	formatted_blocks.push_back({{}, "\n"});
+
+	std::move(std::begin(formatted_blocks), std::end(formatted_blocks),
+		std::inserter(formatted_blocks_, std::begin(formatted_blocks_)));
+	std::move(std::begin(formatted_lines), std::end(formatted_lines),
+		std::inserter(formatted_lines_, std::begin(formatted_lines_)));
+}
+
 
 /*
 	Unformatted

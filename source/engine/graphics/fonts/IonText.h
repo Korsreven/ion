@@ -402,6 +402,15 @@ namespace ion::graphics::fonts
 			void PrependContent(std::string_view content);
 
 
+			//Insert the given content as a new line to the back of the (raw) content used by this text
+			//This is an optimization of Text::AppendContent (no changes to existing lines or blocks)
+			void AppendLine(std::string_view content);
+
+			//Insert the given content as a new line to the front of the (raw) content used by this text
+			//This is an optimization of Text::PrependContent (no changes to existing lines or blocks)
+			void PrependLine(std::string_view content);
+
+
 			/*
 				Formatted
 			*/
