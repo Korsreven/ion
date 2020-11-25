@@ -175,9 +175,18 @@ const TypeFace* Text::Lettering() const noexcept
 
 void Text::AppendContent(std::string_view content)
 {
-	if (std::empty(content_))
+	if (std::empty(content))
+		return;
+
+	else if (std::empty(content_))
 	{
 		Content(std::string{content});
+		return;
+	}
+	else if (content.front() == '\n')
+	{
+		content.remove_prefix(1);
+		AppendLine(content); //Faster
 		return;
 	}
 
@@ -198,9 +207,18 @@ void Text::AppendContent(std::string_view content)
 
 void Text::PrependContent(std::string_view content)
 {
-	if (std::empty(content_))
+	if (std::empty(content))
+		return;
+
+	else if (std::empty(content_))
 	{
 		Content(std::string{content});
+		return;
+	}
+	else if (content.back() == '\n')
+	{
+		content.remove_suffix(1);
+		PrependLine(content); //Faster
 		return;
 	}
 
@@ -211,7 +229,7 @@ void Text::PrependContent(std::string_view content)
 	//Merge last block with the first one already in text
 	if (formatted_blocks.back() == formatted_blocks_.front())
 	{
-		formatted_blocks_.front().Content += formatted_blocks.back().Content;
+		formatted_blocks_.front().Content.insert(0, formatted_blocks.back().Content);
 		--iter; //Skip last
 	}
 

@@ -413,6 +413,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					"<p>The <i>quick</i> <font color=\"brown\">brown</font> fox <b>jumps</b> over the <i>lazy</i> dog</p>",
 					verdana_12);
 
+			text.AreaSize(ion::graphics::utilities::Vector2{100.0_r, 768.0_r});
+			text.AppendLine("<p>How <del>vexingly</del> <i>quick</i> daft zebras <b>jump</b>!</p>");
+			text.AreaSize(ion::graphics::utilities::Vector2{200.0_r, 768.0_r});
+
 			//EXAMPLE end
 
 			engine.Subscribe(frame_test);
