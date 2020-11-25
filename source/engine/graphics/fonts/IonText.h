@@ -411,6 +411,10 @@ namespace ion::graphics::fonts
 			void PrependLine(std::string_view content);
 
 
+			//Clears all content in this text
+			void Clear() noexcept;
+
+
 			/*
 				Formatted
 			*/

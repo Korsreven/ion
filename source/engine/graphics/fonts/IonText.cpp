@@ -175,12 +175,49 @@ const TypeFace* Text::Lettering() const noexcept
 
 void Text::AppendContent(std::string_view content)
 {
+	if (std::empty(content_))
+	{
+		Content(std::string{content});
+		return;
+	}
+
 	content_ += content;
+	auto formatted_blocks = MakeFormattedBlocks(content);
+	auto iter = std::begin(formatted_blocks);
+
+	//Merge first block with the last one already in text
+	if (formatted_blocks.front() == formatted_blocks_.back())
+	{
+		formatted_blocks_.back().Content += formatted_blocks.front().Content;
+		++iter; //Skip first
+	}
+
+	std::move(iter, std::end(formatted_blocks), std::back_inserter(formatted_blocks_));
+	formatted_lines_ = MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_);
 }
 
 void Text::PrependContent(std::string_view content)
 {
+	if (std::empty(content_))
+	{
+		Content(std::string{content});
+		return;
+	}
+
 	content_.insert(0, content);
+	auto formatted_blocks = MakeFormattedBlocks(content);
+	auto iter = std::end(formatted_blocks);
+
+	//Merge last block with the first one already in text
+	if (formatted_blocks.back() == formatted_blocks_.front())
+	{
+		formatted_blocks_.front().Content += formatted_blocks.back().Content;
+		--iter; //Skip last
+	}
+
+	std::move(std::begin(formatted_blocks), iter,
+		std::inserter(formatted_blocks_, std::begin(formatted_blocks_)));
+	formatted_lines_ = MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_);
 }
 
 void Text::AppendLine(std::string_view content)
@@ -219,6 +256,18 @@ void Text::PrependLine(std::string_view content)
 		std::inserter(formatted_blocks_, std::begin(formatted_blocks_)));
 	std::move(std::begin(formatted_lines), std::end(formatted_lines),
 		std::inserter(formatted_lines_, std::begin(formatted_lines_)));
+}
+
+
+void Text::Clear() noexcept
+{
+	content_.clear();
+	formatted_blocks_.clear();
+	formatted_lines_.clear();
+
+	content_.shrink_to_fit();
+	formatted_blocks_.shrink_to_fit();
+	formatted_lines_.shrink_to_fit();
 }
 
 
