@@ -68,14 +68,14 @@ text::TextBlocks Text::MakeFormattedBlocks(std::string_view content) const
 	if (formatting_ == TextFormatting::HTML)
 		return detail::html_to_formatted_blocks(content);
 	else
-		return {};
+		return {{{}, std::string{content}}};
 }
 
 text::MeasuredTextLines Text::MakeFormattedLines(text::TextBlocks text_blocks,
 	const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
 	managed::ObservedObject<TypeFace> &type_face) const
 {
-	if (formatting_ == TextFormatting::HTML && type_face)
+	if (type_face)
 		return detail::formatted_blocks_to_formatted_lines(std::move(text_blocks), area_size, padding, *type_face.Object());
 	else
 		return {};
@@ -295,11 +295,13 @@ void Text::Clear() noexcept
 
 std::string Text::UnformattedContent() const
 {
-	if (formatting_ == TextFormatting::None)
-		return content_;
+	return utilities::detail::text_blocks_to_string(formatted_blocks_);
+}
 
-	//HTML
-	else if (!std::empty(formatted_lines_))
+std::string Text::UnformattedDisplayedContent() const
+{
+	//One or more lines to display
+	if (!std::empty(formatted_lines_))
 	{
 		auto content = utilities::detail::text_blocks_to_string(formatted_lines_.front().first.Blocks);
 
@@ -310,6 +312,8 @@ std::string Text::UnformattedContent() const
 
 		return content;
 	}
+	//Nothing to display
+	//Could be missing/invalid type face
 	else
 		return "";
 }

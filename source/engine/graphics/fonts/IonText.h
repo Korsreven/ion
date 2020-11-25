@@ -439,9 +439,14 @@ namespace ion::graphics::fonts
 				Unformatted
 			*/
 
-			//Returns the (plain) unformatted content, meaning all HTML tags and CSS code removed
-			//Which tags are removed and kept, is based on TextFormatting
+			//Returns the (plain) unformatted content
+			//All valid HTML tags are removed if TextFormatting is HTML
 			[[nodiscard]] std::string UnformattedContent() const;
+
+			//Returns the (plain) unformatted content as displayed
+			//All valid HTML tags are removed if TextFormatting is HTML
+			//If area size has been specified, content may be word wrapped
+			[[nodiscard]] std::string UnformattedDisplayedContent() const;
 	};
 } //ion::graphics::fonts
 
