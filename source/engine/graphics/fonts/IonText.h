@@ -141,9 +141,9 @@ namespace ion::graphics::fonts
 		private:
 
 			std::string content_;
+			text::TextFormatting formatting_ = text::TextFormatting::HTML;
 			text::TextAlignment alignment_ = text::TextAlignment::Left;
 			text::TextVerticalAlignment vertical_alignment_ = text::TextVerticalAlignment::Top;
-			text::TextFormatting formatting_ = text::TextFormatting::HTML;
 
 			std::optional<Vector2> area_size_;
 			std::optional<Vector2> padding_;
@@ -170,15 +170,30 @@ namespace ion::graphics::fonts
 
 		public:
 
-			//Construct a new text with the given name, content and a type face
+			//Construct a new (unbounded) text with the given name, content, alignment and a type face
+			Text(std::string name, std::string content, text::TextAlignment alignment, TypeFace &type_face);
+
+			//Construct a new (unbounded) text with the given name, content and a type face
 			Text(std::string name, std::string content, TypeFace &type_face);
-			
 
-			/*
-				Static text conversions
-			*/
+			//Construct a new text with the given name, content, formatting,
+			//horizontal and vertical alignment, area size, padding, line spacing and a type face
+			Text(std::string name, std::string content, text::TextFormatting formatting,
+				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
+				const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
+				std::optional<int> line_spacing, TypeFace &type_face);
 
+			//Construct a new text (area) with the given name, content,
+			//horizontal and vertical alignment, area size, padding, line spacing and a type face
+			Text(std::string name, std::string content,
+				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
+				const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
+				std::optional<int> line_spacing, TypeFace &type_face);	
 
+			//Construct a new text (area) with the given name, content, area size, padding, line spacing and a type face
+			Text(std::string name, std::string content,
+				const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
+				std::optional<int> line_spacing, TypeFace &type_face);
 
 
 			/*
@@ -188,6 +203,9 @@ namespace ion::graphics::fonts
 			//Sets the (raw) content used by this text to the given content
 			//Content can contain HTML tags and CSS code
 			void Content(std::string content);
+
+			//Sets the formatting of the text to the given format
+			void Formatting(text::TextFormatting formatting);
 
 			//Sets the horizontal alignment of the text to the given alignment
 			inline void Alignment(text::TextAlignment alignment) noexcept
@@ -200,9 +218,6 @@ namespace ion::graphics::fonts
 			{
 				vertical_alignment_ = vertical_alignment;
 			}
-
-			//Sets the formatting of the text to the given format
-			void Formatting(text::TextFormatting formatting);
 
 
 			//Sets the area size of the text to the given size
@@ -289,6 +304,12 @@ namespace ion::graphics::fonts
 				return content_;
 			}
 
+			//Returns the formatting of the text
+			[[nodiscard]] inline auto Formatting() const noexcept
+			{
+				return formatting_;
+			}
+
 			//Returns the horizontal alignment of the text
 			[[nodiscard]] inline auto Alignment() const noexcept
 			{
@@ -299,12 +320,6 @@ namespace ion::graphics::fonts
 			[[nodiscard]] inline auto VerticalAlignment() const noexcept
 			{
 				return vertical_alignment_;
-			}
-
-			//Returns the formatting of the text
-			[[nodiscard]] inline auto Formatting() const noexcept
-			{
-				return formatting_;
 			}
 
 

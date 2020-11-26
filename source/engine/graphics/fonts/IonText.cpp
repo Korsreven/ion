@@ -84,14 +84,68 @@ text::MeasuredTextLines Text::MakeFormattedLines(text::TextBlocks text_blocks,
 
 //Public
 
+Text::Text(std::string name, std::string content, text::TextAlignment alignment, TypeFace &type_face) :
+	
+	managed::ManagedObject<TextManager>{std::move(name)},
+
+	content_{std::move(content)},
+	alignment_{alignment},
+	type_face_{type_face},
+
+	formatted_blocks_{MakeFormattedBlocks(content_)},
+	formatted_lines_{MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_)}
+{
+	//Empty
+}
+
 Text::Text(std::string name, std::string content, TypeFace &type_face) :
+
+	Text{std::move(name), std::move(content), text::TextAlignment::Left, type_face}
+{
+	//Empty
+}
+
+Text::Text(std::string name, std::string content, text::TextFormatting formatting,
+	text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
+	const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
+	std::optional<int> line_spacing, TypeFace &type_face) :
 
 	managed::ManagedObject<TextManager>{std::move(name)},
 
 	content_{std::move(content)},
+	formatting_{formatting},
+	alignment_{alignment},
+	vertical_alignment_{vertical_alignment},
+	area_size_{area_size},
+	padding_{padding},
+	line_spacing_{line_spacing},
 	type_face_{type_face},
+
 	formatted_blocks_{MakeFormattedBlocks(content_)},
 	formatted_lines_{MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_)}
+{
+	//Empty
+}
+
+Text::Text(std::string name, std::string content,
+	text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
+	const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
+	std::optional<int> line_spacing, TypeFace &type_face) :
+
+	Text{std::move(name), std::move(content), text::TextFormatting::HTML,
+		 alignment, vertical_alignment,
+		 area_size, padding, line_spacing, type_face}
+{
+	//Empty
+}
+
+Text::Text(std::string name, std::string content,
+	const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
+	std::optional<int> line_spacing, TypeFace &type_face) :
+
+	Text{std::move(name), std::move(content), text::TextFormatting::HTML,
+		 text::TextAlignment::Left, text::TextVerticalAlignment::Top,
+		 area_size, padding, line_spacing, type_face}
 {
 	//Empty
 }
