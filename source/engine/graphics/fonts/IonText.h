@@ -72,6 +72,12 @@ namespace ion::graphics::fonts
 			Overline
 		};
 
+		enum TextBlockVerticalAlignment : bool
+		{
+			Subscript,
+			Superscript
+		};
+
 
 		struct TextBlockStyle
 		{
@@ -80,6 +86,7 @@ namespace ion::graphics::fonts
 				std::optional<TextFontStyle> FontStyle;
 				std::optional<TextDecoration> Decoration;
 				std::optional<Color> DecorationColor;
+				std::optional<TextBlockVerticalAlignment> VerticalAlignment;
 
 
 				//Returns true if all styles is equal to the given text block style
@@ -89,7 +96,8 @@ namespace ion::graphics::fonts
 						   BackgroundColor == rhs.BackgroundColor &&
 						   FontStyle == rhs.FontStyle &&
 						   Decoration == rhs.Decoration &&
-						   DecorationColor == rhs.DecorationColor;
+						   DecorationColor == rhs.DecorationColor &&
+						   VerticalAlignment == rhs.VerticalAlignment;
 				}
 
 				//Returns true if this text block style has no styles
@@ -99,7 +107,8 @@ namespace ion::graphics::fonts
 						   !BackgroundColor &&
 						   !FontStyle &&
 						   !Decoration &&
-						   !DecorationColor;
+						   !DecorationColor &&
+						   !VerticalAlignment;
 				}
 		};
 

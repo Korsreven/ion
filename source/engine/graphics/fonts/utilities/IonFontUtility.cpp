@@ -300,6 +300,16 @@ text::TextBlockStyle html_element_to_text_block_style(const html_element &elemen
 	else if (element.tag == "del")
 		text_block.Decoration = text::TextDecoration::LineThrough;
 
+	//Vertical alignment
+	//Subscript
+	else if (element.tag == "sub")
+		text_block.VerticalAlignment = text::TextBlockVerticalAlignment::Subscript;
+
+	//Vertical alignment
+	//Superscript
+	else if (element.tag == "sup")
+		text_block.VerticalAlignment = text::TextBlockVerticalAlignment::Superscript;
+
 
 	//Attributes
 	if (element.attribute)

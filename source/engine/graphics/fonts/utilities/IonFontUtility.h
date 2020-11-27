@@ -128,6 +128,9 @@ namespace ion::graphics::fonts::utilities
 				   str == "ins" ||
 				   str == "del" ||
 				   str == "mark" ||
+
+				   str == "sub" ||
+				   str == "sup" ||
 				   
 				   str == "font";
 		}
