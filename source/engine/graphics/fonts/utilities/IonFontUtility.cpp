@@ -297,7 +297,7 @@ text::TextBlockStyle html_element_to_text_block_style(const html_element &elemen
 
 	//Decoration
 	//Line-through
-	else if (element.tag == "del")
+	else if (element.tag == "s" || element.tag == "del")
 		text_block.Decoration = text::TextDecoration::LineThrough;
 
 	//Vertical alignment
@@ -342,7 +342,9 @@ text::TextBlocks html_to_text_blocks(std::string_view str)
 	html_elements elements;
 	text::TextBlockStyles text_block_styles;
 	text::TextBlocks text_blocks;
+
 	std::string content;
+	auto margin = 0;
 
 	for (auto iter = std::begin(str), end = std::end(str); iter != end; ++iter)
 	{
@@ -361,6 +363,11 @@ text::TextBlocks html_to_text_blocks(std::string_view str)
 				if (auto tag = get_html_tag(str.substr(off + 2));
 					tag && *tag == elements.back().tag) 
 				{
+					if (is_p_tag(*tag))
+						margin = std::max(margin, 2);
+					else if (is_div_tag(*tag))
+						margin = std::max(margin, 1);
+
 					if (!std::empty(content))
 						append_back_text_block(std::move(content), text_blocks, text_block_styles);
 
@@ -380,13 +387,20 @@ text::TextBlocks html_to_text_blocks(std::string_view str)
 				//Opening tag has been parsed and validated
 				if (auto element = parse_html_opening_tag(*tag); element)
 				{
+					iter += std::size(*tag) + 1;
+
 					if (is_empty_tag(element->tag))
 					{
 						if (is_br_tag(element->tag))
-							content += '\n';
+							c = '\n';
 					}
 					else
 					{
+						if (is_p_tag(element->tag))
+							margin = std::max(margin, 2);
+						else if (is_div_tag(element->tag))
+							margin = std::max(margin, 1);
+
 						if (!std::empty(content))
 							append_back_text_block(std::move(content), text_blocks, text_block_styles);
 
@@ -397,15 +411,25 @@ text::TextBlocks html_to_text_blocks(std::string_view str)
 								!std::empty(text_block_styles) ?
 								&text_block_styles.back() : nullptr
 							));
-					}
 
-					iter += std::size(*tag) + 1;
-					continue;
+						continue;
+					}
 				}
 			}
 		}
 
+		//Append p/div margins as new line
+		if (margin > 0 && !std::empty(text_blocks))
+		{
+			//New line already found
+			if (text_blocks.back().Content.back() == '\n')
+				--margin;
+
+			content.append(margin, '\n');
+		}
+
 		content += c;
+		margin = 0;
 	}
 
 	if (!std::empty(content))
