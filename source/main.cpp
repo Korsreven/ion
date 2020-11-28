@@ -467,6 +467,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		builder.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
 		builder.TreeOutput(ion::script::script_tree::PrintOptions::Arguments);
 		builder.BuildFile("bin/main.ion");
+		//builder.BuildString("@import 'bin/main.ion';");
 		auto &tree = builder.Tree();
 
 		//Serialize tree

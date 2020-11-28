@@ -134,6 +134,23 @@ bool ScriptBuilder::BuildFile(std::filesystem::path file_path, std::filesystem::
 	return result;
 }
 
+bool ScriptBuilder::BuildString(std::string str)
+{
+	return BuildString(std::move(str), ".");
+}
+
+bool ScriptBuilder::BuildString(std::string str, std::filesystem::path root_path)
+{
+	tree_.reset();
+	compile_error_ = {}; //Reset
+	validate_error_ = {}; //Reset
+
+	tree_ = compiler_.CompileString(std::move(str), std::move(root_path), compile_error_);
+	auto result = ValidateTree();
+	SaveOutput();
+	return result;
+}
+
 
 /*
 	Outputting

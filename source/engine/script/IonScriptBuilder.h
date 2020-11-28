@@ -229,6 +229,14 @@ namespace ion::script
 			//Returns true if the script is built successfully
 			bool BuildFile(std::filesystem::path file_path, std::filesystem::path root_path);
 
+			//Build the given script string by compiling and validating it
+			//Returns true if the script is built successfully
+			bool BuildString(std::string str);
+
+			//Build the given script string (and root path) by compiling and validating it
+			//Returns true if the script is built successfully
+			bool BuildString(std::string str, std::filesystem::path root_path);
+
 
 			/*
 				Outputting

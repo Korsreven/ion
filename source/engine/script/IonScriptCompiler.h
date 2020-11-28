@@ -627,17 +627,23 @@ namespace ion::script
 				Compiling
 			*/
 
-			//Compile a script entry with the given name (from a repository) by lexing, parsing and linking it.
+			//Compile a script entry with the given name (from a repository) by lexing, parsing and linking it
 			//Returns a ScriptTree that contains objects, object properties and property arguments
 			[[nodiscard]] std::optional<ScriptTree> Compile(std::string_view name, CompileError &error);
 
-			//Compile a script file with the given file path by lexing, parsing and linking it.
+			//Compile a script file with the given file path by lexing, parsing and linking it
 			//Returns a ScriptTree that contains objects, object properties and property arguments
 			[[nodiscard]] std::optional<ScriptTree> CompileFile(std::filesystem::path file_path, CompileError &error);
 
-			//Compile a script file with the given file path (and root path) by lexing, parsing and linking it.
+			//Compile a script file with the given file path (and root path) by lexing, parsing and linking it
 			//Returns a ScriptTree that contains objects, object properties and property arguments
 			[[nodiscard]] std::optional<ScriptTree> CompileFile(std::filesystem::path file_path, std::filesystem::path root_path, CompileError &error);
+
+			//Compile the given script string by lexing, parsing and linking it
+			[[nodiscard]] std::optional<ScriptTree> CompileString(std::string str, CompileError &error);
+
+			//Compile the given script string (and root path) by lexing, parsing and linking it
+			[[nodiscard]] std::optional<ScriptTree> CompileString(std::string str, std::filesystem::path root_path, CompileError &error);
 
 
 			/*

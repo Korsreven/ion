@@ -2472,6 +2472,37 @@ std::optional<ScriptTree> ScriptCompiler::CompileFile(std::filesystem::path file
 	return {};
 }
 
+std::optional<ScriptTree> ScriptCompiler::CompileString(std::string str, CompileError &error)
+{
+	return CompileString(std::move(str), ".", error);
+}
+
+std::optional<ScriptTree> ScriptCompiler::CompileString(std::string str, std::filesystem::path root_path, CompileError &error)
+{
+	compile_errors_.clear();
+	compile_time_ = {}; //Reset
+
+	//Root path needs to be a valid directory
+	if (ion::utilities::file::IsDirectory(root_path))
+	{
+		script_compiler::detail::build_system system{std::move(root_path)};
+		script_compiler::detail::file_trace trace{{".ion"}};
+
+		system.units.push_back(std::make_unique<script_compiler::detail::translation_unit>(
+			script_compiler::detail::translation_unit{trace.current_file_path().string(), std::move(str)}));
+
+		if (max_build_processes_)
+			system.processes.MaxWorkerThreads(*max_build_processes_);
+
+		auto stopwatch = timers::Stopwatch::StartNew();
+		auto tree = script_compiler::detail::compile(std::move(trace), system, error, compile_errors_);
+		compile_time_ = stopwatch.Elapsed();
+		return tree;
+	}
+
+	return {};
+}
+
 
 /*
 	Outputting
