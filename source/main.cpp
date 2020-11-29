@@ -410,7 +410,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			[[maybe_unused]] auto &text =
 				texts.CreateText(
 					"pangram",
-					"<p>The <i>quick</i> <font color=\"brown\">brown</font> fox <b>jumps</b> over the <i>lazy</i> dog</p>",
+					"<p>The <i>quick</i> <font color='brown'>brown</font> fox <b>jumps</b> over the <i>lazy</i> dog</p>",
 					verdana_12);
 
 			text.AreaSize(ion::graphics::utilities::Vector2{100.0_r, 768.0_r});

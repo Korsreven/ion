@@ -17,6 +17,7 @@ File:	IonFontUtility.cpp
 
 #include "graphics/fonts/IonFontManager.h"
 #include "graphics/utilities/IonColor.h"
+#include "script/IonScriptCompiler.h"
 #include "script/utilities/IonParseUtility.h"
 #include "types/IonTypes.h"
 #include "utilities/IonStringUtility.h"
@@ -151,27 +152,7 @@ glyph_rope make_glyph_rope(text::TextBlocks &text_blocks,
 	Formatting
 */
 
-void append_front_text_block(std::string content, text::TextBlocks &text_blocks,
-	const text::TextBlockStyles &text_block_styles)
-{
-	//Combine with first text block if equal styles
-	if (!std::empty(text_blocks) &&
-		((!std::empty(text_block_styles) && text_blocks.front() == text_block_styles.back()) ||
-		(std::empty(text_block_styles) && text_blocks.front().IsPlain())))
-
-		text_blocks.front().Content += content;
-	
-	//Add new text_block
-	else
-	{
-		if (!std::empty(text_block_styles))
-			text_blocks.insert(std::begin(text_blocks), {text_block_styles.back(), std::move(content)});
-		else
-			text_blocks.insert(std::begin(text_blocks), {{}, std::move(content)});
-	}
-}
-
-void append_back_text_block(std::string content, text::TextBlocks &text_blocks,
+void append_text_block(std::string content, text::TextBlocks &text_blocks,
 	const text::TextBlockStyles &text_block_styles)
 {
 	//Combine with last text block if equal styles
@@ -204,49 +185,85 @@ std::optional<std::string_view> get_html_tag(std::string_view str) noexcept
 		return {};
 }
 
-std::optional<html_element> parse_html_opening_tag(std::string_view str) noexcept
+std::optional<html_attribute> parse_html_attribute(std::string_view str) noexcept
 {
-	auto element =
-		[&]() noexcept
+	if (auto off = str.find_first_not_of(' ');
+		off != std::string_view::npos)
+	{
+		if (script::script_compiler::detail::is_start_of_identifier(
+			str[off], off + 1 < std::size(str) ? str[off + 1] : '\0'))
 		{
-			//Check if opening tag has attribute
-			if (auto off = str.find(' ', 1);
-				off != std::string_view::npos)
+			auto name =
+				script::script_compiler::detail::get_identifer_lexeme(str.substr(off));
+
+			if (off = str.find_first_not_of(' ', str.find_first_of("= ", off + std::size(name)));
+				off != std::string_view::npos && str[off] == '=')
 			{
-				//Attribute name and value found
-				if (auto off2 = str.find("=\"", off + 1);
-					off2 != std::string_view::npos && str.back() == '\"')
+				if (off = str.find_first_not_of(' ', off + 1);
+					off != std::string_view::npos &&
+					script::script_compiler::detail::is_start_of_string_literal(str[off]))
 				{
-					return html_element{
-						str.substr(0, off),
-						html_attribute{str.substr(off + 1, off2 - (off + 1)), str.substr(off2 + 1)}
-					};
+					auto [value, line_breaks] =
+						script::script_compiler::detail::get_string_literal_lexeme(str.substr(off));
+					return html_attribute{name, value};
 				}
 			}
-
-			return html_element{str};
-		}();
-
-	auto valid = is_html_tag(element.tag);
-
-	//Has attribute
-	if (element.attribute)
-	{
-		valid &= !is_empty_tag(element.attribute->name) &&
-				  is_html_attribute(element.attribute->name);
-
-		//Is attribute supported
-		if (is_style_attribute(element.attribute->name))
-			valid &= !is_font_tag(element.tag);
-		else if (is_color_attribute(element.attribute->name))
-			valid &= is_font_tag(element.tag);
+		}
 	}
+	
+	return {};
+}
 
-	if (valid)
-		return element;
+std::optional<html_element> parse_html_element(std::string_view str) noexcept
+{
+	if (!std::empty(str) &&
+		script::script_compiler::detail::is_start_of_identifier(
+			str[0], std::size(str) > 1 ? str[1] : '\0'))
+	{
+		auto name = script::script_compiler::detail::get_identifer_lexeme(str);
+		auto attribute = parse_html_attribute(str.substr(std::size(name)));
+		return html_element{name, attribute};
+	}
 	else
 		return {};
 }
+
+std::optional<html_element> parse_html_opening_tag(std::string_view str) noexcept
+{
+	if (auto element = parse_html_element(str); element)
+	{
+		auto valid = is_html_tag(element->tag);
+
+		//Has attribute
+		if (element->attribute)
+		{
+			valid &= !is_empty_tag(element->attribute->name) &&
+					  is_html_attribute(element->attribute->name);
+
+			//Is attribute supported
+			if (is_style_attribute(element->attribute->name))
+				valid &= !is_font_tag(element->tag);
+			else if (is_color_attribute(element->attribute->name))
+				valid &= is_font_tag(element->tag);
+		}
+
+		if (valid)
+			return element;
+	}
+	
+	return {};
+}
+
+std::optional<html_element> parse_html_closing_tag(std::string_view str) noexcept
+{
+	str.remove_suffix(std::size(str) - str.find_last_not_of(' ') - 1);
+
+	if (!std::empty(str))
+		return html_element{str};
+	else
+		return {};
+}
+
 
 text::TextBlockStyle html_element_to_text_block_style(const html_element &element,
 	text::TextBlockStyle *parent_text_block) noexcept
@@ -336,7 +353,6 @@ text::TextBlockStyle html_element_to_text_block_style(const html_element &elemen
 	return text_block;
 }
 
-
 text::TextBlocks html_to_text_blocks(std::string_view str)
 {
 	html_elements elements;
@@ -351,30 +367,31 @@ text::TextBlocks html_to_text_blocks(std::string_view str)
 		auto c = *iter;
 		auto next_c = iter + 1 != end ? *(iter + 1) : '\0';
 		auto off = iter - std::begin(str);
-
 		
 		//Closing tag, must be checked before opening tag
 		if (is_start_of_closing_tag(c, next_c))
 		{
 			//Something to close
-			if (!std::empty(elements))
+			if (auto tag = get_html_tag(str.substr(off + 2));
+				tag && !std::empty(elements))
 			{
-				//Tag matches opening tag
-				if (auto tag = get_html_tag(str.substr(off + 2));
-					tag && *tag == elements.back().tag) 
+				//Closing tag has been parsed and validated
+				if (auto element = parse_html_closing_tag(*tag);
+					element && element->tag == elements.back().tag)
+						//Tag matches opening tag
 				{
-					if (is_p_tag(*tag))
+					iter += std::size(*tag) + 2;
+
+					if (is_p_tag(element->tag))
 						margin = std::max(margin, 2);
-					else if (is_div_tag(*tag))
+					else if (is_div_tag(element->tag))
 						margin = std::max(margin, 1);
 
 					if (!std::empty(content))
-						append_back_text_block(std::move(content), text_blocks, text_block_styles);
+						append_text_block(std::move(content), text_blocks, text_block_styles);
 
 					elements.pop_back();
 					text_block_styles.pop_back();
-
-					iter += std::size(*tag) + 2;
 					continue;
 				}
 			}
@@ -402,7 +419,7 @@ text::TextBlocks html_to_text_blocks(std::string_view str)
 							margin = std::max(margin, 1);
 
 						if (!std::empty(content))
-							append_back_text_block(std::move(content), text_blocks, text_block_styles);
+							append_text_block(std::move(content), text_blocks, text_block_styles);
 
 						elements.push_back(std::move(*element));
 						text_block_styles.push_back(
@@ -433,7 +450,7 @@ text::TextBlocks html_to_text_blocks(std::string_view str)
 	}
 
 	if (!std::empty(content))
-		append_back_text_block(std::move(content), text_blocks, text_block_styles);
+		append_text_block(std::move(content), text_blocks, text_block_styles);
 
 	return text_blocks;
 }

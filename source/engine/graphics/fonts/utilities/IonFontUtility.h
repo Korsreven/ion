@@ -179,16 +179,17 @@ namespace ion::graphics::fonts::utilities
 		}
 
 
-		void append_front_text_block(std::string content, text::TextBlocks &text_blocks,
-			const text::TextBlockStyles &text_block_styles);
-		void append_back_text_block(std::string content, text::TextBlocks &text_blocks,
+		void append_text_block(std::string content, text::TextBlocks &text_blocks,
 			const text::TextBlockStyles &text_block_styles);
 
 		std::optional<std::string_view> get_html_tag(std::string_view str) noexcept;
+		std::optional<html_attribute> parse_html_attribute(std::string_view str) noexcept;
+		std::optional<html_element> parse_html_element(std::string_view str) noexcept;
 		std::optional<html_element> parse_html_opening_tag(std::string_view str) noexcept;
+		std::optional<html_element> parse_html_closing_tag(std::string_view str) noexcept;
+
 		text::TextBlockStyle html_element_to_text_block_style(const html_element &element,
 			text::TextBlockStyle *parent_text_block) noexcept;
-
 		text::TextBlocks html_to_text_blocks(std::string_view str);
 		text::TextLines text_blocks_to_text_lines(text::TextBlocks text_blocks);
 		std::string text_blocks_to_string(const text::TextBlocks &text_blocks);
