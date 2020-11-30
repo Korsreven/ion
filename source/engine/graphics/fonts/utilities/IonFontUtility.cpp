@@ -345,7 +345,90 @@ text::TextBlockStyle html_element_to_text_block_style(const html_element &elemen
 			//Style
 			else if (is_style_attribute(element.attribute->name))
 			{
-				//TODO
+				script::ScriptCompiler compiler;
+				script::CompileError error;
+
+				if (auto tree = compiler.CompileString("style{" + *value + "}", error);
+					!error && tree)
+				{
+					if (auto &object = tree->Find("style"); object)
+					{
+						for (auto &property : object.Properties())
+						{
+							//Foreground color
+							if (property.Name() == "color")
+							{
+								if (auto color = property[0].Get<script::ScriptType::Color>(); color)
+									;
+							}
+							//Background color
+							else if (property.Name() == "background-color")
+							{
+								if (auto color = property[0].Get<script::ScriptType::Color>(); color)
+									;
+							}
+							//Font weight
+							else if (property.Name() == "font-weight")
+							{
+								if (auto weight = property[0].Get<script::ScriptType::Enumerable>(); weight)
+								{
+									if (weight->Get() == "normal")
+										;
+									else if (weight->Get() == "bold")
+										;
+								}
+								//100-900
+								else if (auto weight = property[0].Get<script::ScriptType::Integer>(); weight)
+									;
+							}
+							//Font style
+							else if (property.Name() == "font-style")
+							{
+								if (auto style = property[0].Get<script::ScriptType::Enumerable>(); style)
+								{
+									if (style->Get() == "normal")
+										;
+									else if (style->Get() == "italic")
+										;
+								}
+							}
+							//Text decoration
+							else if (property.Name() == "text-decoration")
+							{
+								if (auto decoration = property[0].Get<script::ScriptType::Enumerable>(); decoration)
+								{
+									if (decoration->Get() == "none")
+										;
+									else if (decoration->Get() == "overline")
+										;
+									else if (decoration->Get() == "line-through")
+										;
+									else if (decoration->Get() == "underline")
+										;
+								}
+							}
+							//Text decoration color
+							else if (property.Name() == "text-decoration-color")
+							{
+								if (auto color = property[0].Get<script::ScriptType::Color>(); color)
+									;
+							}
+							//Vertical align
+							else if (property.Name() == "vertical-align")
+							{
+								if (auto align = property[0].Get<script::ScriptType::Enumerable>(); align)
+								{
+									if (align->Get() == "baseline")
+										;
+									else if (align->Get() == "sub")
+										;
+									else if (align->Get() == "super")
+										;
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
