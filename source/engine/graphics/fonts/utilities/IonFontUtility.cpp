@@ -185,10 +185,13 @@ std::optional<std::string_view> get_html_tag(std::string_view str) noexcept
 		return {};
 }
 
-std::optional<html_attribute> parse_html_attribute(std::string_view str) noexcept
+html_attributes parse_html_attributes(std::string_view str) noexcept
 {
-	if (auto off = str.find_first_not_of(' ');
-		off != std::string_view::npos)
+	html_attributes attributes;
+	auto has_style_attribute = false;
+
+	for (size_t off = 0;
+		(off = str.find_first_not_of(' ', off)) != std::string_view::npos;)
 	{
 		if (script::script_compiler::detail::is_start_of_identifier(
 			str[off], off + 1 < std::size(str) ? str[off + 1] : '\0'))
@@ -205,13 +208,33 @@ std::optional<html_attribute> parse_html_attribute(std::string_view str) noexcep
 				{
 					auto [value, line_breaks] =
 						script::script_compiler::detail::get_string_literal_lexeme(str.substr(off));
-					return html_attribute{name, value};
+
+					//Add only unique attributes (discard duplicates) while keeping original order
+					//There is only a few attributes per tag (usually one or two)
+					//Because N is small, find_if is one of the simplest and fastest solutions
+					if (std::find_if(std::begin(attributes), std::end(attributes),
+						[&](auto &attribute) noexcept
+						{
+							return attribute.name == name;
+						}) == std::end(attributes)) //Unique
+					{
+						//Keep style attribute at the end (special case)
+						if (has_style_attribute)
+							attributes.emplace(std::end(attributes) - 1, name, value);
+						else
+						{
+							attributes.emplace_back(name, value);
+							has_style_attribute = is_style_attribute(name);
+						}
+					}
+
+					off += std::size(value);
 				}
 			}
 		}
 	}
 	
-	return {};
+	return attributes;
 }
 
 std::optional<html_element> parse_html_element(std::string_view str) noexcept
@@ -221,8 +244,8 @@ std::optional<html_element> parse_html_element(std::string_view str) noexcept
 			str[0], std::size(str) > 1 ? str[1] : '\0'))
 	{
 		auto name = script::script_compiler::detail::get_identifer_lexeme(str);
-		auto attribute = parse_html_attribute(str.substr(std::size(name)));
-		return html_element{name, attribute};
+		auto attributes = parse_html_attributes(str.substr(std::size(name)));
+		return html_element{name, std::move(attributes)};
 	}
 	else
 		return {};
@@ -234,16 +257,14 @@ std::optional<html_element> parse_html_opening_tag(std::string_view str) noexcep
 	{
 		auto valid = is_html_tag(element->tag);
 
-		//Has attribute
-		if (element->attribute)
+		//Check validity of each attribute
+		for (auto &attribute : element->attributes)
 		{
-			valid &= !is_empty_tag(element->attribute->name) &&
-					  is_html_attribute(element->attribute->name);
+			valid &= !is_empty_tag(attribute.name) &&
+					  is_html_attribute(attribute.name);
 
 			//Is attribute supported
-			if (is_style_attribute(element->attribute->name))
-				valid &= !is_font_tag(element->tag);
-			else if (is_color_attribute(element->attribute->name))
+			if (is_color_attribute(attribute.name))
 				valid &= is_font_tag(element->tag);
 		}
 
@@ -328,22 +349,38 @@ text::TextBlockStyle html_element_to_text_block_style(const html_element &elemen
 		text_block.VerticalAlignment = text::TextBlockVerticalAlignment::Superscript;
 
 
-	//Attributes
-	if (element.attribute)
+	//Has attributes
+	if (!std::empty(element.attributes))
+		return html_attributes_to_text_block_style(element.attributes, &text_block);
+	else
+		return text_block;
+}
+
+text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &attributes,
+	text::TextBlockStyle *parent_text_block) noexcept
+{
+	auto text_block = parent_text_block ?
+		*parent_text_block : //Inherit from parent
+		text::TextBlockStyle{}; //Plain
+
+	//For each attribute
+	for (auto &attribute : attributes)
 	{
 		//Parse attribute value (as string literal)
 		if (auto value =
-			script::utilities::parse::AsString(element.attribute->value); value)
+			script::utilities::parse::AsString(attribute.value); value)
 		{
+			//Color
 			//Foreground color
-			if (is_color_attribute(element.attribute->name))
+			if (is_color_attribute(attribute.name))
 			{
 				if (auto color = script::utilities::parse::AsColor(*value); color)
 					text_block.ForegroundColor = *color;
 			}
 
 			//Style
-			else if (is_style_attribute(element.attribute->name))
+			//CSS properties
+			else if (is_style_attribute(attribute.name))
 			{
 				script::ScriptCompiler compiler;
 				script::CompileError error;
@@ -351,80 +388,114 @@ text::TextBlockStyle html_element_to_text_block_style(const html_element &elemen
 				if (auto tree = compiler.CompileString("style{" + *value + "}", error);
 					!error && tree)
 				{
-					if (auto &object = tree->Find("style"); object)
+					for (auto &object = tree->Find("style");
+						auto &property : object.Properties())
 					{
-						for (auto &property : object.Properties())
+						//Foreground color
+						if (property.Name() == "color")
 						{
-							//Foreground color
-							if (property.Name() == "color")
+							if (auto color = property[0].Get<script::ScriptType::Color>(); color)
+								text_block.ForegroundColor = color->Get();
+						}
+
+						//Background color
+						else if (property.Name() == "background-color")
+						{
+							if (auto color = property[0].Get<script::ScriptType::Color>(); color)
+								text_block.BackgroundColor = color->Get();
+						}
+
+						//Font weight
+						else if (property.Name() == "font-weight")
+						{
+							auto weight =
+								property[0].Get<script::ScriptType::Enumerable>().value_or(
+									[&]()
+									{
+										//100-900
+										if (auto weight_value = property[0].Get<script::ScriptType::Integer>();
+											weight_value &&
+											weight_value->Get() >= 1 && weight_value->Get() <= 1000)
+										{
+											if (weight_value->Get() < 550) //Cutoff
+												return script::ScriptType::Enumerable{"normal"};
+											else
+												return script::ScriptType::Enumerable{"bold"};
+										}
+										else
+											return script::ScriptType::Enumerable{""};
+									}());
+
+							if (weight.Get() == "normal")
+								text_block.FontStyle = {};
+							else if (weight.Get() == "bold")
+								text_block.FontStyle =
+									[&font_style = text_block.FontStyle]() noexcept
+									{
+										if (font_style &&
+											(*font_style == text::TextFontStyle::Italic ||
+												*font_style == text::TextFontStyle::BoldItalic))
+											return text::TextFontStyle::BoldItalic;
+										else
+											return text::TextFontStyle::Bold;
+									}();
+						}
+
+						//Font style
+						else if (property.Name() == "font-style")
+						{
+							if (auto style = property[0].Get<script::ScriptType::Enumerable>(); style)
 							{
-								if (auto color = property[0].Get<script::ScriptType::Color>(); color)
-									;
+								if (style->Get() == "normal")
+									text_block.FontStyle = {};
+								else if (style->Get() == "italic")
+									text_block.FontStyle =
+										[&font_style = text_block.FontStyle]() noexcept
+										{
+											if (font_style &&
+												(*font_style == text::TextFontStyle::Bold ||
+												 *font_style == text::TextFontStyle::BoldItalic))
+												return text::TextFontStyle::BoldItalic;
+											else
+												return text::TextFontStyle::Italic;
+										}();
 							}
-							//Background color
-							else if (property.Name() == "background-color")
+						}
+
+						//Text decoration
+						else if (property.Name() == "text-decoration")
+						{
+							if (auto decoration = property[0].Get<script::ScriptType::Enumerable>(); decoration)
 							{
-								if (auto color = property[0].Get<script::ScriptType::Color>(); color)
-									;
+								if (decoration->Get() == "none")
+									text_block.Decoration = {};
+								else if (decoration->Get() == "overline")
+									text_block.Decoration = text::TextDecoration::Overline;
+								else if (decoration->Get() == "line-through")
+									text_block.Decoration = text::TextDecoration::LineThrough;
+								else if (decoration->Get() == "underline")
+									text_block.Decoration = text::TextDecoration::Underline;
 							}
-							//Font weight
-							else if (property.Name() == "font-weight")
+						}
+
+						//Text decoration color
+						else if (property.Name() == "text-decoration-color")
+						{
+							if (auto color = property[0].Get<script::ScriptType::Color>(); color)
+								text_block.DecorationColor = color->Get();
+						}
+
+						//Vertical align
+						else if (property.Name() == "vertical-align")
+						{
+							if (auto align = property[0].Get<script::ScriptType::Enumerable>(); align)
 							{
-								if (auto weight = property[0].Get<script::ScriptType::Enumerable>(); weight)
-								{
-									if (weight->Get() == "normal")
-										;
-									else if (weight->Get() == "bold")
-										;
-								}
-								//100-900
-								else if (auto weight = property[0].Get<script::ScriptType::Integer>(); weight)
-									;
-							}
-							//Font style
-							else if (property.Name() == "font-style")
-							{
-								if (auto style = property[0].Get<script::ScriptType::Enumerable>(); style)
-								{
-									if (style->Get() == "normal")
-										;
-									else if (style->Get() == "italic")
-										;
-								}
-							}
-							//Text decoration
-							else if (property.Name() == "text-decoration")
-							{
-								if (auto decoration = property[0].Get<script::ScriptType::Enumerable>(); decoration)
-								{
-									if (decoration->Get() == "none")
-										;
-									else if (decoration->Get() == "overline")
-										;
-									else if (decoration->Get() == "line-through")
-										;
-									else if (decoration->Get() == "underline")
-										;
-								}
-							}
-							//Text decoration color
-							else if (property.Name() == "text-decoration-color")
-							{
-								if (auto color = property[0].Get<script::ScriptType::Color>(); color)
-									;
-							}
-							//Vertical align
-							else if (property.Name() == "vertical-align")
-							{
-								if (auto align = property[0].Get<script::ScriptType::Enumerable>(); align)
-								{
-									if (align->Get() == "baseline")
-										;
-									else if (align->Get() == "sub")
-										;
-									else if (align->Get() == "super")
-										;
-								}
+								if (align->Get() == "baseline")
+									text_block.VerticalAlignment = {};
+								else if (align->Get() == "sub")
+									text_block.VerticalAlignment = text::TextBlockVerticalAlignment::Subscript;
+								else if (align->Get() == "super")
+									text_block.VerticalAlignment = text::TextBlockVerticalAlignment::Superscript;
 							}
 						}
 					}
@@ -435,6 +506,7 @@ text::TextBlockStyle html_element_to_text_block_style(const html_element &elemen
 
 	return text_block;
 }
+
 
 text::TextBlocks html_to_text_blocks(std::string_view str)
 {
