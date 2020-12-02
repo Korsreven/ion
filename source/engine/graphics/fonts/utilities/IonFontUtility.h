@@ -189,10 +189,12 @@ namespace ion::graphics::fonts::utilities
 		std::optional<html_element> parse_html_element(std::string_view str) noexcept;
 		std::optional<html_element> parse_html_opening_tag(std::string_view str) noexcept;
 		std::optional<html_element> parse_html_closing_tag(std::string_view str) noexcept;
-
-		text::TextBlockStyle html_element_to_text_block_style(const html_element &element,
+		
+		text::TextBlockStyle html_tag_to_text_block_style(std::string_view tag,
 			text::TextBlockStyle *parent_text_block) noexcept;
 		text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &attributes,
+			text::TextBlockStyle *parent_text_block) noexcept;
+		text::TextBlockStyle html_element_to_text_block_style(const html_element &element,
 			text::TextBlockStyle *parent_text_block) noexcept;
 
 		text::TextBlocks html_to_text_blocks(std::string_view str);

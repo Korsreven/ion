@@ -286,7 +286,7 @@ std::optional<html_element> parse_html_closing_tag(std::string_view str) noexcep
 }
 
 
-text::TextBlockStyle html_element_to_text_block_style(const html_element &element,
+text::TextBlockStyle html_tag_to_text_block_style(std::string_view tag,
 	text::TextBlockStyle *parent_text_block) noexcept
 {
 	auto text_block = parent_text_block ?
@@ -297,12 +297,12 @@ text::TextBlockStyle html_element_to_text_block_style(const html_element &elemen
 
 	//Background color
 	//Mark
-	if (element.tag == "mark")
+	if (tag == "mark")
 		text_block.BackgroundColor = color::Yellow;
 
 	//Font style
 	//Bold
-	else if (element.tag == "b" || element.tag == "strong")
+	else if (tag == "b" || tag == "strong")
 		text_block.FontStyle =
 			[&font_style = text_block.FontStyle]() noexcept
 			{
@@ -316,7 +316,7 @@ text::TextBlockStyle html_element_to_text_block_style(const html_element &elemen
 
 	//Font style
 	//Italic
-	else if (element.tag == "i" || element.tag == "em")
+	else if (tag == "i" || tag == "em")
 		text_block.FontStyle =
 			[&font_style = text_block.FontStyle]() noexcept
 			{
@@ -330,30 +330,25 @@ text::TextBlockStyle html_element_to_text_block_style(const html_element &elemen
 
 	//Decoration
 	//Underline
-	else if (element.tag == "u" || element.tag == "ins")
+	else if (tag == "u" || tag == "ins")
 		text_block.Decoration = text::TextDecoration::Underline;
 
 	//Decoration
 	//Line-through
-	else if (element.tag == "s" || element.tag == "del")
+	else if (tag == "s" || tag == "del")
 		text_block.Decoration = text::TextDecoration::LineThrough;
 
 	//Vertical alignment
 	//Subscript
-	else if (element.tag == "sub")
+	else if (tag == "sub")
 		text_block.VerticalAlignment = text::TextBlockVerticalAlignment::Subscript;
 
 	//Vertical alignment
 	//Superscript
-	else if (element.tag == "sup")
+	else if (tag == "sup")
 		text_block.VerticalAlignment = text::TextBlockVerticalAlignment::Superscript;
 
-
-	//Has attributes
-	if (!std::empty(element.attributes))
-		return html_attributes_to_text_block_style(element.attributes, &text_block);
-	else
-		return text_block;
+	return text_block;
 }
 
 text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &attributes,
@@ -427,7 +422,17 @@ text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &
 									}());
 
 							if (weight.Get() == "normal")
-								text_block.FontStyle = {};
+								text_block.FontStyle =
+									[&font_style = text_block.FontStyle]() noexcept
+										-> std::optional<text::TextFontStyle>
+									{
+										if (font_style && *font_style == text::TextFontStyle::Bold)
+											return {};
+										else if (font_style && *font_style == text::TextFontStyle::BoldItalic)
+											return text::TextFontStyle::Italic;
+										else
+											return font_style;
+									}();
 							else if (weight.Get() == "bold")
 								text_block.FontStyle =
 									[&font_style = text_block.FontStyle]() noexcept
@@ -447,7 +452,17 @@ text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &
 							if (auto style = property[0].Get<script::ScriptType::Enumerable>(); style)
 							{
 								if (style->Get() == "normal")
-									text_block.FontStyle = {};
+									text_block.FontStyle =
+										[&font_style = text_block.FontStyle]() noexcept
+											-> std::optional<text::TextFontStyle>
+										{
+											if (font_style && *font_style == text::TextFontStyle::Italic)
+												return {};
+											else if (font_style && *font_style == text::TextFontStyle::BoldItalic)
+												return text::TextFontStyle::Bold;
+											else
+												return font_style;
+										}();
 								else if (style->Get() == "italic")
 									text_block.FontStyle =
 										[&font_style = text_block.FontStyle]() noexcept
@@ -505,6 +520,20 @@ text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &
 	}
 
 	return text_block;
+}
+
+text::TextBlockStyle html_element_to_text_block_style(const html_element &element,
+	text::TextBlockStyle *parent_text_block) noexcept
+{
+	//Tag
+	auto text_block = html_tag_to_text_block_style(element.tag, parent_text_block);
+
+	//Attributes
+	if (!std::empty(element.attributes))
+		return html_attributes_to_text_block_style(element.attributes, &text_block);
+
+	else
+		return text_block;
 }
 
 
