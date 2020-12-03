@@ -20,7 +20,7 @@ File:	IonColor.h
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
 
-#pragma warning(disable : 4201) //Should be allowed in C11
+#pragma warning(disable : 4201) //nameless struct/union
 
 #undef RGB
 #undef CMYK

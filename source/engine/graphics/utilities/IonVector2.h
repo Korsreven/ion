@@ -18,7 +18,7 @@ File:	IonVector2.h
 
 #include "types/IonTypes.h"
 
-#pragma warning(disable : 4201) //Should be allowed in C11
+#pragma warning(disable : 4201) //nameless struct/union
 
 namespace ion::graphics::utilities
 {
