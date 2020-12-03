@@ -116,41 +116,41 @@ namespace ion::graphics::fonts::utilities
 
 		constexpr auto is_html_tag(std::string_view str) noexcept
 		{
-			return str == "p" ||   
-				   str == "div" ||
+			return str == "br" ||
 				   str == "span" ||
-				   str == "br" ||
+				   str == "font" ||
 
+				   //Bold
 				   str == "b" ||
-				   str == "i" ||
 				   str == "strong" ||
-				   str == "em" ||
 
+				   //Italic
+				   str == "i" ||
+				   str == "em" ||
+				   str == "dfn" ||
+				   str == "var" ||
+				   str == "cite" ||
+
+				   //Underline
 				   str == "u" ||
 				   str == "ins" ||
+
+				   //Line-through
 				   str == "s" ||
 				   str == "del" ||
+				   str == "strike" ||
 
-				   str == "mark" ||
+				   //Vertical-align
 				   str == "sub" ||
 				   str == "sup" ||
-				   
-				   str == "font";
+
+				   //Other
+				   str == "mark";			   
 		}
 
 		constexpr auto is_empty_tag(std::string_view str) noexcept
 		{
 			return str == "br";
-		}
-
-		constexpr auto is_p_tag(std::string_view str) noexcept
-		{
-			return str == "p";
-		}
-
-		constexpr auto is_div_tag(std::string_view str) noexcept
-		{
-			return str == "div";
 		}
 
 		constexpr auto is_br_tag(std::string_view str) noexcept

@@ -352,16 +352,46 @@ std::string Text::UnformattedContent() const
 	return utilities::detail::text_blocks_to_string(formatted_blocks_);
 }
 
-std::string Text::UnformattedDisplayedContent() const
+std::string Text::UnformattedWrappedContent() const
 {
 	//One or more lines to display
 	if (!std::empty(formatted_lines_))
 	{
+		//First
 		auto content = utilities::detail::text_blocks_to_string(formatted_lines_.front().first.Blocks);
 
 		//Rest
 		for (auto iter = std::begin(formatted_lines_) + 1,
 			end = std::end(formatted_lines_); iter != end; ++iter)
+			content += "\n" + utilities::detail::text_blocks_to_string(iter->first.Blocks);
+
+		return content;
+	}
+	//Nothing to display
+	//Could be missing/invalid type face
+	else
+		return "";
+}
+
+std::string Text::UnformattedDisplayedContent() const
+{
+	//One or more lines to display
+	if (!std::empty(formatted_lines_) &&
+		from_line_ < std::ssize(formatted_lines_))
+	{
+		auto max_lines = max_lines_.value_or(std::ssize(formatted_lines_));
+
+		if (from_line_ + max_lines > std::ssize(formatted_lines_))
+			max_lines = std::ssize(formatted_lines_) - from_line_;
+
+		auto iter = std::begin(formatted_lines_) + from_line_;
+		auto end = iter + max_lines;
+
+		//First
+		auto content = utilities::detail::text_blocks_to_string(iter->first.Blocks);
+
+		//Rest
+		for (++iter; iter != end; ++iter)
 			content += "\n" + utilities::detail::text_blocks_to_string(iter->first.Blocks);
 
 		return content;

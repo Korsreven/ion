@@ -293,16 +293,8 @@ text::TextBlockStyle html_tag_to_text_block_style(std::string_view tag,
 		*parent_text_block : //Inherit from parent
 		text::TextBlockStyle{}; //Plain
 
-	//Tags
-
-	//Background color
-	//Mark
-	if (tag == "mark")
-		text_block.BackgroundColor = color::Yellow;
-
-	//Font style
 	//Bold
-	else if (tag == "b" || tag == "strong")
+	 if (tag == "b" || tag == "strong")
 		text_block.FontStyle =
 			[&font_style = text_block.FontStyle]() noexcept
 			{
@@ -314,9 +306,8 @@ text::TextBlockStyle html_tag_to_text_block_style(std::string_view tag,
 					return text::TextFontStyle::Bold;
 			}();
 
-	//Font style
 	//Italic
-	else if (tag == "i" || tag == "em")
+	else if (tag == "i" || tag == "em" || tag == "dfn" || tag == "var" || tag == "cite")
 		text_block.FontStyle =
 			[&font_style = text_block.FontStyle]() noexcept
 			{
@@ -328,25 +319,28 @@ text::TextBlockStyle html_tag_to_text_block_style(std::string_view tag,
 					return text::TextFontStyle::Italic;
 			}();
 
-	//Decoration
 	//Underline
 	else if (tag == "u" || tag == "ins")
 		text_block.Decoration = text::TextDecoration::Underline;
 
-	//Decoration
 	//Line-through
-	else if (tag == "s" || tag == "del")
+	else if (tag == "s" || tag == "del" || tag == "strike")
 		text_block.Decoration = text::TextDecoration::LineThrough;
 
-	//Vertical alignment
 	//Subscript
 	else if (tag == "sub")
-		text_block.VerticalAlignment = text::TextBlockVerticalAlignment::Subscript;
+		text_block.VerticalAlign = text::TextBlockVerticalAlign::Subscript;
 
-	//Vertical alignment
 	//Superscript
 	else if (tag == "sup")
-		text_block.VerticalAlignment = text::TextBlockVerticalAlignment::Superscript;
+		text_block.VerticalAlign = text::TextBlockVerticalAlign::Superscript;
+
+	//Mark
+	else if (tag == "mark")
+	{
+		text_block.ForegroundColor = color::Black;
+		text_block.BackgroundColor = color::Yellow;
+	}
 
 	return text_block;
 }
@@ -366,7 +360,6 @@ text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &
 			script::utilities::parse::AsString(attribute.value); value)
 		{
 			//Color
-			//Foreground color
 			if (is_color_attribute(attribute.name))
 			{
 				if (auto color = script::utilities::parse::AsColor(*value); color)
@@ -374,7 +367,6 @@ text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &
 			}
 
 			//Style
-			//CSS properties
 			else if (is_style_attribute(attribute.name))
 			{
 				script::ScriptCompiler compiler;
@@ -383,6 +375,7 @@ text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &
 				if (auto tree = compiler.CompileString("style{" + *value + "}", error);
 					!error && tree)
 				{
+					//For each CSS property
 					for (auto &object = tree->Find("style");
 						auto &property : object.Properties())
 					{
@@ -478,7 +471,7 @@ text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &
 						}
 
 						//Text decoration
-						else if (property.Name() == "text-decoration")
+						else if (property.Name() == "text-decoration" || property.Name() == "text-decoration-line")
 						{
 							if (auto decoration = property[0].Get<script::ScriptType::Enumerable>(); decoration)
 							{
@@ -506,11 +499,11 @@ text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &
 							if (auto align = property[0].Get<script::ScriptType::Enumerable>(); align)
 							{
 								if (align->Get() == "baseline")
-									text_block.VerticalAlignment = {};
+									text_block.VerticalAlign = {};
 								else if (align->Get() == "sub")
-									text_block.VerticalAlignment = text::TextBlockVerticalAlignment::Subscript;
+									text_block.VerticalAlign = text::TextBlockVerticalAlign::Subscript;
 								else if (align->Get() == "super")
-									text_block.VerticalAlignment = text::TextBlockVerticalAlignment::Superscript;
+									text_block.VerticalAlign = text::TextBlockVerticalAlign::Superscript;
 							}
 						}
 					}
@@ -544,7 +537,6 @@ text::TextBlocks html_to_text_blocks(std::string_view str)
 	text::TextBlocks text_blocks;
 
 	std::string content;
-	auto margin = 0;
 
 	for (auto iter = std::begin(str), end = std::end(str); iter != end; ++iter)
 	{
@@ -565,11 +557,6 @@ text::TextBlocks html_to_text_blocks(std::string_view str)
 						//Tag matches opening tag
 				{
 					iter += std::size(*tag) + 2;
-
-					if (is_p_tag(element->tag))
-						margin = std::max(margin, 2);
-					else if (is_div_tag(element->tag))
-						margin = std::max(margin, 1);
 
 					if (!std::empty(content))
 						append_text_block(std::move(content), text_blocks, text_block_styles);
@@ -597,11 +584,6 @@ text::TextBlocks html_to_text_blocks(std::string_view str)
 					}
 					else
 					{
-						if (is_p_tag(element->tag))
-							margin = std::max(margin, 2);
-						else if (is_div_tag(element->tag))
-							margin = std::max(margin, 1);
-
 						if (!std::empty(content))
 							append_text_block(std::move(content), text_blocks, text_block_styles);
 
@@ -619,18 +601,7 @@ text::TextBlocks html_to_text_blocks(std::string_view str)
 			}
 		}
 
-		//Append p/div margins as new line
-		if (margin > 0 && !std::empty(text_blocks))
-		{
-			//New line already found
-			if (text_blocks.back().Content.back() == '\n')
-				--margin;
-
-			content.append(margin, '\n');
-		}
-
 		content += c;
-		margin = 0;
 	}
 
 	if (!std::empty(content))

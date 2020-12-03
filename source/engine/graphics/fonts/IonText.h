@@ -72,7 +72,7 @@ namespace ion::graphics::fonts
 			Overline
 		};
 
-		enum TextBlockVerticalAlignment : bool
+		enum TextBlockVerticalAlign : bool
 		{
 			Subscript,
 			Superscript
@@ -86,7 +86,7 @@ namespace ion::graphics::fonts
 				std::optional<TextFontStyle> FontStyle;
 				std::optional<TextDecoration> Decoration;
 				std::optional<Color> DecorationColor;
-				std::optional<TextBlockVerticalAlignment> VerticalAlignment;
+				std::optional<TextBlockVerticalAlign> VerticalAlign;
 
 
 				//Returns true if all styles is equal to the given text block style
@@ -97,7 +97,7 @@ namespace ion::graphics::fonts
 						   FontStyle == rhs.FontStyle &&
 						   Decoration == rhs.Decoration &&
 						   DecorationColor == rhs.DecorationColor &&
-						   VerticalAlignment == rhs.VerticalAlignment;
+						   VerticalAlign == rhs.VerticalAlign;
 				}
 
 				//Returns true if this text block style has no styles
@@ -108,7 +108,7 @@ namespace ion::graphics::fonts
 						   !FontStyle &&
 						   !Decoration &&
 						   !DecorationColor &&
-						   !VerticalAlignment;
+						   !VerticalAlign;
 				}
 		};
 
@@ -250,13 +250,16 @@ namespace ion::graphics::fonts
 			//Sets which line (from the displayed text) to start rendering from to the given value
 			inline void FromLine(int from_line) noexcept
 			{
-				from_line_ = from_line;
+				from_line_ = from_line >= 0 ? from_line : 0;
 			}
 
 			//Sets the maximum allowed lines to display at once to the given value
 			//If nullopt is passed, no maximum lines will be used
-			inline void MaxLines(int max_lines) noexcept
+			inline void MaxLines(std::optional<int> max_lines) noexcept
 			{
+				if (max_lines && *max_lines < 0)
+					*max_lines = 0;
+
 				max_lines_ = max_lines;
 			}
 
@@ -466,6 +469,10 @@ namespace ion::graphics::fonts
 			//Returns the (plain) unformatted content
 			//All valid HTML tags are removed if TextFormatting is HTML
 			[[nodiscard]] std::string UnformattedContent() const;
+
+			//Returns the (plain) unformatted word-wrapped content
+			//All valid HTML tags are removed if TextFormatting is HTML
+			[[nodiscard]] std::string UnformattedWrappedContent() const;
 
 			//Returns the (plain) unformatted content as displayed
 			//All valid HTML tags are removed if TextFormatting is HTML
