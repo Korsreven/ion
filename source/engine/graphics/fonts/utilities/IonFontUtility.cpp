@@ -343,11 +343,23 @@ text::TextBlockStyle html_tag_to_text_block_style(std::string_view tag,
 
 	//Small
 	else if (tag == "small")
-		text_block.FontSize = text::TextBlockFontSize::Smaller;
+	{
+		if (text_block.FontSize &&
+			*text_block.FontSize == text::TextBlockFontSize::Larger)
+			text_block.FontSize = {};
+		else
+			text_block.FontSize = text::TextBlockFontSize::Smaller;
+	}
 
 	//Big
 	else if (tag == "big")
-		text_block.FontSize = text::TextBlockFontSize::Larger;
+	{
+		if (text_block.FontSize &&
+			*text_block.FontSize == text::TextBlockFontSize::Smaller)
+			text_block.FontSize = {};
+		else
+			text_block.FontSize = text::TextBlockFontSize::Larger;
+	}
 
 	//Mark
 	else if (tag == "mark")
@@ -535,9 +547,21 @@ text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &
 								if (size->Get() == "medium")
 									text_block.FontSize = {};
 								else if (size->Get() == "smaller")
-									text_block.FontSize = text::TextBlockFontSize::Smaller;
+								{
+									if (text_block.FontSize &&
+										*text_block.FontSize == text::TextBlockFontSize::Larger)
+										text_block.FontSize = {};
+									else
+										text_block.FontSize = text::TextBlockFontSize::Smaller;
+								}
 								else if (size->Get() == "larger")
-									text_block.FontSize = text::TextBlockFontSize::Larger;
+								{
+									if (text_block.FontSize &&
+										*text_block.FontSize == text::TextBlockFontSize::Smaller)
+										text_block.FontSize = {};
+									else
+										text_block.FontSize = text::TextBlockFontSize::Larger;
+								}
 							}
 						}
 					}
