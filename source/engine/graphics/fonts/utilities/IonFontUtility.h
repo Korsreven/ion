@@ -24,14 +24,20 @@ File:	IonFontUtility.h
 #include "graphics/fonts/IonTypeFace.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
+#include "types/IonTypes.h"
 
 namespace ion::graphics::fonts::utilities
 {
 	using graphics::utilities::Color;
 	using graphics::utilities::Vector2;
+	using namespace types::type_literals;
 
 	namespace detail
 	{
+		constexpr auto smaller_scale_factor = 5.0_r / 6.0_r; //83.33%
+		constexpr auto larger_scale_factor = 1.20_r; //120%
+
+
 		/*
 			Glyph rope
 		*/
@@ -40,6 +46,7 @@ namespace ion::graphics::fonts::utilities
 		{
 			std::string &value;
 			const font::GlyphMetrices &metrics;
+			real scale_factor = 1.0_r;
 		};
 
 		using glyph_strings = std::vector<glyph_string>;
@@ -62,7 +69,7 @@ namespace ion::graphics::fonts::utilities
 
 				char& operator[](size_t off) noexcept;
 				const char& operator[](size_t off) const noexcept;
-				const font::GlyphMetrices& glyph_metrics(size_t off) const noexcept;
+				const glyph_string& glyph_str(size_t off) const noexcept;
 
 				std::string& insert(size_t off, size_t count, char ch);
 
@@ -144,6 +151,10 @@ namespace ion::graphics::fonts::utilities
 				   str == "sub" ||
 				   str == "sup" ||
 
+				   //Font-size
+				   str == "small" ||
+				   str == "big" ||
+
 				   //Other
 				   str == "mark";			   
 		}
@@ -216,7 +227,7 @@ namespace ion::graphics::fonts::utilities
 			const font::GlyphMetrices *bold_italic_metrics) noexcept
 		{
 			auto metrics =
-				[&]() noexcept -> decltype(&regular_metrics)
+				[&]() noexcept -> const font::GlyphMetrices*
 				{
 					if (text_block.FontStyle)
 					{
@@ -237,6 +248,23 @@ namespace ion::graphics::fonts::utilities
 				}();
 
 			return metrics ? *metrics : regular_metrics;
+		}
+
+		inline auto get_text_block_scale_factor(const text::TextBlock &text_block)
+		{
+			if (text_block.FontSize)
+			{
+				switch (*text_block.FontSize)
+				{
+					case text::TextBlockFontSize::Smaller:
+					return smaller_scale_factor;
+
+					case text::TextBlockFontSize::Larger:
+					return larger_scale_factor;
+				}
+			}
+			
+			return 1.0_r;
 		}
 
 

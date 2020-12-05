@@ -13,13 +13,13 @@ File:	IonFontUtility.cpp
 #include "IonFontUtility.h"
 
 #include <algorithm>
+#include <cmath>
 #include <functional>
 
 #include "graphics/fonts/IonFontManager.h"
 #include "graphics/utilities/IonColor.h"
 #include "script/IonScriptCompiler.h"
 #include "script/utilities/IonParseUtility.h"
-#include "types/IonTypes.h"
 #include "utilities/IonStringUtility.h"
 
 namespace ion::graphics::fonts::utilities
@@ -98,10 +98,10 @@ const char& glyph_rope::operator[](size_t off) const noexcept
 	return str[ch_off];
 }
 
-const font::GlyphMetrices& glyph_rope::glyph_metrics(size_t off) const noexcept
+const glyph_string& glyph_rope::glyph_str(size_t off) const noexcept
 {
 	auto [str_off, ch_off] = get_offsets(off);
-	return strings_[str_off].metrics;
+	return strings_[str_off];
 }
 
 std::string& glyph_rope::insert(size_t off, size_t count, char ch)
@@ -141,7 +141,7 @@ glyph_rope make_glyph_rope(text::TextBlocks &text_blocks,
 	for (auto &text_block : text_blocks)
 	{
 		auto &metrics = get_text_block_metrics(text_block, regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics);
-		strings.push_back({text_block.Content, metrics});
+		strings.push_back({text_block.Content, metrics, get_text_block_scale_factor(text_block)});
 	}
 
 	return strings;
@@ -329,11 +329,25 @@ text::TextBlockStyle html_tag_to_text_block_style(std::string_view tag,
 
 	//Subscript
 	else if (tag == "sub")
+	{
 		text_block.VerticalAlign = text::TextBlockVerticalAlign::Subscript;
+		text_block.FontSize = text::TextBlockFontSize::Smaller;
+	}
 
 	//Superscript
 	else if (tag == "sup")
+	{
 		text_block.VerticalAlign = text::TextBlockVerticalAlign::Superscript;
+		text_block.FontSize = text::TextBlockFontSize::Smaller;
+	}
+
+	//Small
+	else if (tag == "small")
+		text_block.FontSize = text::TextBlockFontSize::Smaller;
+
+	//Big
+	else if (tag == "big")
+		text_block.FontSize = text::TextBlockFontSize::Larger;
 
 	//Mark
 	else if (tag == "mark")
@@ -501,9 +515,29 @@ text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &
 								if (align->Get() == "baseline")
 									text_block.VerticalAlign = {};
 								else if (align->Get() == "sub")
+								{
 									text_block.VerticalAlign = text::TextBlockVerticalAlign::Subscript;
+									text_block.FontSize = text::TextBlockFontSize::Smaller;
+								}
 								else if (align->Get() == "super")
+								{
 									text_block.VerticalAlign = text::TextBlockVerticalAlign::Superscript;
+									text_block.FontSize = text::TextBlockFontSize::Smaller;
+								}
+							}
+						}
+
+						//Font-size
+						else if (property.Name() == "font-size")
+						{
+							if (auto size = property[0].Get<script::ScriptType::Enumerable>(); size)
+							{
+								if (size->Get() == "medium")
+									text_block.FontSize = {};
+								else if (size->Get() == "smaller")
+									text_block.FontSize = text::TextBlockFontSize::Smaller;
+								else if (size->Get() == "larger")
+									text_block.FontSize = text::TextBlockFontSize::Larger;
 							}
 						}
 					}
@@ -681,18 +715,23 @@ std::pair<int,int> text_blocks_size_in_pixels(const text::TextBlocks &text_block
 	const font::GlyphMetrices *italic_metrics,
 	const font::GlyphMetrices *bold_italic_metrics) noexcept
 {
-	auto width = 0;
-	auto height = 0;
+	auto width = 0.0_r;
+	auto height = 0.0_r;
 
 	for (auto &text_block : text_blocks)
 	{
 		auto &metrics = get_text_block_metrics(text_block, regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics);
-		auto [str_width, str_height] = string_size_in_pixels(text_block.Content, metrics);
+		auto [string_width, string_height] = string_size_in_pixels(text_block.Content, metrics);
+
+		auto scale_factor = get_text_block_scale_factor(text_block);
+		auto str_width = string_width * scale_factor;
+		auto str_height = string_height * scale_factor;
+
 		width += str_width;
 		height = std::max(height, str_height);
 	}
 
-	return {width, height};
+	return {static_cast<int>(std::ceil(width)), static_cast<int>(std::ceil(height))};
 }
 
 
@@ -745,7 +784,7 @@ std::string word_wrap(std::string str, int max_width,
 
 void word_wrap(glyph_rope str, int max_width)
 {
-	auto width = 0;
+	auto width = 0.0_r;
 	auto line_break_off = std::optional<int>{};
 
 	for (auto i = 0; i < std::ssize(str); ++i)
@@ -763,11 +802,12 @@ void word_wrap(glyph_rope str, int max_width)
 
 			default:
 			{
-				auto [c_width, c_height] = character_size_in_pixels(str[i], str.glyph_metrics(i));
+				auto [char_width, char_height] = character_size_in_pixels(str[i], str.glyph_str(i).metrics);
+				auto c_width = char_width * str.glyph_str(i).scale_factor;
 
 				//Insert new line
-				if (width > 0 && //At least one character
-					width + c_width > max_width) //Too wide
+				if (width > 0.0_r && //At least one character
+					static_cast<int>(std::ceil(width + c_width)) > max_width) //Too wide
 				{
 					//Break at last line break candidate
 					if (line_break_off)
@@ -793,7 +833,7 @@ void word_wrap(glyph_rope str, int max_width)
 				else
 				{
 					//Hyphen found (that fits)
-					if (width > 0 && str[i] == '-')
+					if (width > 0.0_r && str[i] == '-')
 						line_break_off = i;
 
 					width += c_width;
@@ -804,7 +844,7 @@ void word_wrap(glyph_rope str, int max_width)
 			}
 		}
 
-		width = 0;
+		width = 0.0_r;
 		line_break_off = {};
 	}
 }

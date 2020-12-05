@@ -75,6 +75,13 @@ namespace ion::graphics::fonts
 			Overline
 		};
 
+
+		enum TextBlockFontSize : bool
+		{
+			Smaller,
+			Larger
+		};
+
 		enum TextBlockVerticalAlign : bool
 		{
 			Subscript,
@@ -84,35 +91,38 @@ namespace ion::graphics::fonts
 
 		struct TextBlockStyle
 		{
-				std::optional<Color> ForegroundColor;
-				std::optional<Color> BackgroundColor;
-				std::optional<TextFontStyle> FontStyle;
-				std::optional<TextDecoration> Decoration;
-				std::optional<Color> DecorationColor;
-				std::optional<TextBlockVerticalAlign> VerticalAlign;
+			std::optional<Color> ForegroundColor;
+			std::optional<Color> BackgroundColor;
+			std::optional<TextFontStyle> FontStyle;
+			std::optional<TextDecoration> Decoration;
+			std::optional<Color> DecorationColor;
+			std::optional<TextBlockFontSize> FontSize;
+			std::optional<TextBlockVerticalAlign> VerticalAlign;
 
 
-				//Returns true if all styles is equal to the given text block style
-				[[nodiscard]] inline auto operator==(const TextBlockStyle &rhs) const noexcept
-				{
-					return ForegroundColor == rhs.ForegroundColor &&
-						   BackgroundColor == rhs.BackgroundColor &&
-						   FontStyle == rhs.FontStyle &&
-						   Decoration == rhs.Decoration &&
-						   DecorationColor == rhs.DecorationColor &&
-						   VerticalAlign == rhs.VerticalAlign;
-				}
+			//Returns true if all styles is equal to the given text block style
+			[[nodiscard]] inline auto operator==(const TextBlockStyle &rhs) const noexcept
+			{
+				return ForegroundColor == rhs.ForegroundColor &&
+					   BackgroundColor == rhs.BackgroundColor &&
+					   FontStyle == rhs.FontStyle &&
+					   Decoration == rhs.Decoration &&
+					   DecorationColor == rhs.DecorationColor &&
+					   FontSize == rhs.FontSize &&
+					   VerticalAlign == rhs.VerticalAlign;
+			}
 
-				//Returns true if this text block style has no styles
-				[[nodiscard]] inline auto IsPlain() const noexcept
-				{
-					return !ForegroundColor &&
-						   !BackgroundColor &&
-						   !FontStyle &&
-						   !Decoration &&
-						   !DecorationColor &&
-						   !VerticalAlign;
-				}
+			//Returns true if this text block style has no styles
+			[[nodiscard]] inline auto IsPlain() const noexcept
+			{
+				return !ForegroundColor &&
+					   !BackgroundColor &&
+					   !FontStyle &&
+					   !Decoration &&
+					   !DecorationColor &&
+					   !FontSize &&
+					   !VerticalAlign;
+			}
 		};
 
 		using TextBlockStyles = std::vector<TextBlockStyle>;
