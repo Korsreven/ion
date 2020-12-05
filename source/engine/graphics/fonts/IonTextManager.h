@@ -87,23 +87,24 @@ namespace ion::graphics::fonts
 		Text& CreateText(std::string name, std::string content, TypeFace &type_face);
 
 		//Create a text with the given name, content, formatting,
-		//horizontal and vertical alignment, area size, padding, line spacing and a type face
+		//horizontal and vertical alignment, area size, padding, line height factor and a type face
 		Text& CreateText(std::string name, std::string content, text::TextFormatting formatting,
 			text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
-			const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
-			std::optional<int> line_spacing, TypeFace &type_face);
+			const std::optional<Vector2> &area_size, const Vector2 &padding,
+			std::optional<real> line_height_factor, TypeFace &type_face);
 
 		//Create a text (area) with the given name, content,
-		//horizontal and vertical alignment, area size, padding, line spacing and a type face
+		//horizontal and vertical alignment, area size, padding, line height factor and a type face
 		Text& CreateText(std::string name, std::string content,
 			text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
-			const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
-			std::optional<int> line_spacing, TypeFace &type_face);
+			const std::optional<Vector2> &area_size, const Vector2 &padding,
+			std::optional<real> line_height_factor, TypeFace &type_face);
 
-		//Create a text (area) with the given name, content, area size, padding, line spacing and a type face
+		//Create a text (area) with the given name, content,
+		//area size, padding, line height factor and a type face
 		Text& CreateText(std::string name, std::string content,
-			const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
-			std::optional<int> line_spacing, TypeFace &type_face);
+			const std::optional<Vector2> &area_size, const Vector2 &padding,
+			std::optional<real> line_height_factor, TypeFace &type_face);
 
 
 		//Create a text as a copy of the given text

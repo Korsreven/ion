@@ -25,6 +25,7 @@ File:	IonText.h
 #include "graphics/utilities/IonVector2.h"
 #include "managed/IonManagedObject.h"
 #include "managed/IonObservedObject.h"
+#include "types/IonTypes.h"
 
 #undef RGB
 
@@ -34,6 +35,8 @@ namespace ion::graphics::fonts
 	
 	using utilities::Color;
 	using utilities::Vector2;
+
+	using namespace types::type_literals;
 
 	namespace text
 	{
@@ -135,11 +138,25 @@ namespace ion::graphics::fonts
 
 		namespace detail
 		{
+			constexpr auto default_line_height_factor= 2.0_r;
 			inline const auto jet_black = Color::RGB(52, 52, 52);
+			
+
+			inline auto text_area_max_size(const Vector2 &area_size, const Vector2 &padding) noexcept
+			{
+				using namespace graphics::utilities;
+				return (area_size - padding * 2.0_r).CeilCopy(vector2::Zero);
+			}
+
+			inline auto text_area_max_lines(const Vector2 &area_size, const Vector2 &padding, real line_height) noexcept
+			{
+				auto [width, height] = text_area_max_size(area_size, padding).XY();
+				return static_cast<int>(height / line_height);
+			}
 
 			TextBlocks html_to_formatted_blocks(std::string_view content);
 			MeasuredTextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks,
-				const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding, TypeFace &type_face);
+				const std::optional<Vector2> &area_size, const Vector2 &padding, TypeFace &type_face);
 		} //detail
 	} //text
 
@@ -155,8 +172,8 @@ namespace ion::graphics::fonts
 			text::TextVerticalAlignment vertical_alignment_ = text::TextVerticalAlignment::Top;
 
 			std::optional<Vector2> area_size_;
-			std::optional<Vector2> padding_;
-			std::optional<int> line_spacing_;
+			Vector2 padding_;
+			real line_height_factor_ = text::detail::default_line_height_factor;
 
 			int from_line_ = 0;				//Render lines in range:
 			std::optional<int> max_lines_;	//[from_line, from_line + max_lines)
@@ -174,7 +191,7 @@ namespace ion::graphics::fonts
 
 			text::TextBlocks MakeFormattedBlocks(std::string_view content) const;
 			text::MeasuredTextLines MakeFormattedLines(text::TextBlocks text_blocks,
-				const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
+				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				managed::ObservedObject<TypeFace> &type_face) const;
 
 		public:
@@ -186,23 +203,24 @@ namespace ion::graphics::fonts
 			Text(std::string name, std::string content, TypeFace &type_face);
 
 			//Construct a new text with the given name, content, formatting,
-			//horizontal and vertical alignment, area size, padding, line spacing and a type face
+			//horizontal and vertical alignment, area size, padding, line height factor and a type face
 			Text(std::string name, std::string content, text::TextFormatting formatting,
 				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
-				const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
-				std::optional<int> line_spacing, TypeFace &type_face);
+				const std::optional<Vector2> &area_size, const Vector2 &padding,
+				std::optional<real> line_height_factor, TypeFace &type_face);
 
 			//Construct a new text (area) with the given name, content,
-			//horizontal and vertical alignment, area size, padding, line spacing and a type face
+			//horizontal and vertical alignment, area size, padding, line height factor and a type face
 			Text(std::string name, std::string content,
 				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
-				const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
-				std::optional<int> line_spacing, TypeFace &type_face);	
+				const std::optional<Vector2> &area_size, const Vector2 &padding,
+				std::optional<real> line_height_factor, TypeFace &type_face);	
 
-			//Construct a new text (area) with the given name, content, area size, padding, line spacing and a type face
+			//Construct a new text (area) with the given name, content,
+			//area size, padding, line height factor and a type face
 			Text(std::string name, std::string content,
-				const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
-				std::optional<int> line_spacing, TypeFace &type_face);
+				const std::optional<Vector2> &area_size, const Vector2 &padding,
+				std::optional<real> line_height_factor, TypeFace &type_face);
 
 
 			/*
@@ -234,16 +252,19 @@ namespace ion::graphics::fonts
 			void AreaSize(const std::optional<Vector2> &area_size);
 
 			//Sets the padding size of the text area to the given padding (in pixels)
-			//Padding size is the space between the area and the displayed text
-			//If nullopt is passed, default padding is used (could vary based on type face)
-			void Padding(const std::optional<Vector2> &padding);
+			//Padding size is the space between the area border and the displayed text
+			void Padding(const Vector2 &padding);
 
-			//Sets the line spacing to the given spacing (in pixels)
-			//Line spacing is the space between lines in the displayed text
-			//If nullopt is passed, default line spacing is used (could vary based on type face)
-			inline void LineSpacing(std::optional<int> line_spacing) noexcept
+			//Sets the line height in pixels
+			//Line height is the amount of space between lines of text
+			void LineHeight(real height) noexcept;
+
+			//Sets the line height factor to the given factor (of the font size)
+			//Line height is the amount of space between lines of text
+			//If nullopt is passed, default line height factor is used
+			inline void LineHeightFactor(std::optional<real> factor) noexcept
 			{
-				line_spacing_ = line_spacing;
+				line_height_factor_ = factor.value_or(text::detail::default_line_height_factor);
 			}
 
 
@@ -343,19 +364,22 @@ namespace ion::graphics::fonts
 			}
 
 			//Returns the padding size of the text area in pixels
-			//Padding size is the space between the area and the displayed text
-			//Returns nullopt if default padding is used (could vary based on type face)
+			//Padding size is the space between the area border and the displayed text
 			[[nodiscard]] inline auto& Padding() const noexcept
 			{
 				return padding_;
 			}
 
-			//Returns the line spacing in pixels
-			//Line spacing is the space between lines in the displayed text
-			//Returns nullopt if default line spacing is used (could vary based on type face)
-			[[nodiscard]] inline auto LineSpacing() const noexcept
+			//Returns the line height in pixels
+			//Line height is the amount of space between lines of text
+			//Returns nullopt if the text does not have a type face or regular font
+			[[nodiscard]] std::optional<real> LineHeight() const noexcept;
+
+			//Returns the line height factor (of the font size)
+			//Line height is the amount of space between lines of text
+			[[nodiscard]] inline auto LineHeightFactor() const noexcept
 			{
-				return line_spacing_;
+				return line_height_factor_;
 			}
 
 

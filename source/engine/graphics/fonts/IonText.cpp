@@ -30,17 +30,14 @@ TextBlocks html_to_formatted_blocks(std::string_view content)
 }
 
 MeasuredTextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks,
-	const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding, TypeFace &type_face)
+	const std::optional<Vector2> &area_size, const Vector2 &padding, TypeFace &type_face)
 {
 	using namespace graphics::utilities;
 
 	//Word wrap text blocks to area size
 	if (area_size)
 	{
-		auto max_width = static_cast<int>(
-			(*area_size - padding.value_or(vector2::Zero) * 2.0_r).Ceil(vector2::Zero).X()
-		);
-
+		auto max_width = static_cast<int>(text_area_max_size(*area_size, padding).X());
 		text_blocks = std::move(
 			utilities::WordWrap(std::move(text_blocks), max_width, type_face).
 			value_or(TextBlocks{})
@@ -72,7 +69,7 @@ text::TextBlocks Text::MakeFormattedBlocks(std::string_view content) const
 }
 
 text::MeasuredTextLines Text::MakeFormattedLines(text::TextBlocks text_blocks,
-	const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
+	const std::optional<Vector2> &area_size, const Vector2 &padding,
 	managed::ObservedObject<TypeFace> &type_face) const
 {
 	if (type_face)
@@ -107,8 +104,8 @@ Text::Text(std::string name, std::string content, TypeFace &type_face) :
 
 Text::Text(std::string name, std::string content, text::TextFormatting formatting,
 	text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
-	const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
-	std::optional<int> line_spacing, TypeFace &type_face) :
+	const std::optional<Vector2> &area_size, const Vector2 &padding,
+	std::optional<real> line_height_factor, TypeFace &type_face) :
 
 	managed::ManagedObject<TextManager>{std::move(name)},
 
@@ -118,7 +115,7 @@ Text::Text(std::string name, std::string content, text::TextFormatting formattin
 	vertical_alignment_{vertical_alignment},
 	area_size_{area_size},
 	padding_{padding},
-	line_spacing_{line_spacing},
+	line_height_factor_{line_height_factor.value_or(detail::default_line_height_factor)},
 	type_face_{type_face},
 
 	formatted_blocks_{MakeFormattedBlocks(content_)},
@@ -129,23 +126,23 @@ Text::Text(std::string name, std::string content, text::TextFormatting formattin
 
 Text::Text(std::string name, std::string content,
 	text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
-	const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
-	std::optional<int> line_spacing, TypeFace &type_face) :
+	const std::optional<Vector2> &area_size, const Vector2 &padding,
+	std::optional<real> line_height_factor, TypeFace &type_face) :
 
 	Text{std::move(name), std::move(content), text::TextFormatting::HTML,
 		 alignment, vertical_alignment,
-		 area_size, padding, line_spacing, type_face}
+		 area_size, padding, line_height_factor, type_face}
 {
 	//Empty
 }
 
 Text::Text(std::string name, std::string content,
-	const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
-	std::optional<int> line_spacing, TypeFace &type_face) :
+	const std::optional<Vector2> &area_size, const Vector2 &padding,
+	std::optional<real> line_height_factor, TypeFace &type_face) :
 
 	Text{std::move(name), std::move(content), text::TextFormatting::HTML,
 		 text::TextAlignment::Left, text::TextVerticalAlignment::Top,
-		 area_size, padding, line_spacing, type_face}
+		 area_size, padding, line_height_factor, type_face}
 {
 	//Empty
 }
@@ -185,12 +182,21 @@ void Text::AreaSize(const std::optional<Vector2> &area_size)
 	}
 }
 
-void Text::Padding(const std::optional<Vector2> &padding)
+void Text::Padding(const Vector2 &padding)
 {
 	if (padding_ != padding)
 	{
 		padding_ = padding;
 		formatted_lines_ = MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_);
+	}
+}
+
+void Text::LineHeight(real height) noexcept
+{
+	if (type_face_ && type_face_->HasRegularFont())
+	{
+		if (auto size = type_face_->RegularFont()->Size(); size > 0)
+			LineHeightFactor(height / size);
 	}
 }
 
@@ -211,6 +217,18 @@ void Text::Lettering(std::nullptr_t) noexcept
 /*
 	Observers
 */
+
+std::optional<real> Text::LineHeight() const noexcept
+{
+	if (type_face_ && type_face_->HasRegularFont())
+	{
+		auto factor = line_height_factor_ >= 0.0_r ? line_height_factor_ : 0.0_r;
+		return type_face_->RegularFont()->Size() * factor;
+	}
+	else
+		return {};
+}
+
 
 TypeFace* Text::Lettering() noexcept
 {
@@ -375,12 +393,22 @@ std::string Text::UnformattedWrappedContent() const
 
 std::string Text::UnformattedDisplayedContent() const
 {
+	auto max_lines = max_lines_.value_or(std::ssize(formatted_lines_));
+
+	if (area_size_)
+	{
+		if (auto line_height = LineHeight();
+			line_height && *line_height > 0.0_r)
+		{
+			auto area_max_lines = detail::text_area_max_lines(*area_size_, padding_, *line_height);
+			max_lines = std::min(max_lines, area_max_lines);
+		}
+	}
+
 	//One or more lines to display
 	if (!std::empty(formatted_lines_) &&
-		from_line_ < std::ssize(formatted_lines_))
+		from_line_ < std::ssize(formatted_lines_) && max_lines > 0)
 	{
-		auto max_lines = max_lines_.value_or(std::ssize(formatted_lines_));
-
 		if (from_line_ + max_lines > std::ssize(formatted_lines_))
 			max_lines = std::ssize(formatted_lines_) - from_line_;
 

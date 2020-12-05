@@ -42,30 +42,30 @@ Text& TextManager::CreateText(std::string name, std::string content, TypeFace &t
 
 Text& TextManager::CreateText(std::string name, std::string content, text::TextFormatting formatting,
 	text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
-	const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
-	std::optional<int> line_spacing, TypeFace &type_face)
+	const std::optional<Vector2> &area_size, const Vector2 &padding,
+	std::optional<real> line_height_factor, TypeFace &type_face)
 {
 	return Create(std::move(name), std::move(content), formatting,
 				  alignment, vertical_alignment,
-				  area_size, padding, line_spacing, std::ref(type_face));
+				  area_size, padding, line_height_factor, std::ref(type_face));
 }
 
 Text& TextManager::CreateText(std::string name, std::string content,
 	text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
-	const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
-	std::optional<int> line_spacing, TypeFace &type_face)
+	const std::optional<Vector2> &area_size, const Vector2 &padding,
+	std::optional<real> line_height_factor, TypeFace &type_face)
 {
 	return Create(std::move(name), std::move(content),
 				  alignment, vertical_alignment,
-				  area_size, padding, line_spacing, std::ref(type_face));
+				  area_size, padding, line_height_factor, std::ref(type_face));
 }
 
 Text& TextManager::CreateText(std::string name, std::string content,
-	const std::optional<Vector2> &area_size, const std::optional<Vector2> &padding,
-	std::optional<int> line_spacing, TypeFace &type_face)
+	const std::optional<Vector2> &area_size, const Vector2 &padding,
+	std::optional<real> line_height_factor, TypeFace &type_face)
 {
 	return Create(std::move(name), std::move(content),
-				  area_size, padding, line_spacing, std::ref(type_face));
+				  area_size, padding, line_height_factor, std::ref(type_face));
 }
 
 
