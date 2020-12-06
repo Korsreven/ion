@@ -118,37 +118,37 @@ void Draw()
 	glColor3fv(graphics::utilities::color::LightGray.Channels());
 
 	glBegin(GL_QUADS);
-	glVertex2f(-1.7778f, 1.0f);
-	glVertex2f(-1.7778f, -1.0f);
-	glVertex2f(1.7778f, -1.0f);
-	glVertex2f(1.7778f, 1.0f);
+	glVertex3f(-1.7778f, 1.0f, -4.0f);
+	glVertex3f(-1.7778f, -1.0f, -4.0f);
+	glVertex3f(1.7778f, -1.0f, -4.0f);
+	glVertex3f(1.7778f, 1.0f, -4.0f);
 	glEnd();
 
 	glColor3fv(graphics::utilities::color::Red.Channels());
 
 	glBegin(GL_QUADS);
-	glVertex2f(-1.7778f, 1.0f);
-	glVertex2f(-1.7778f, 0.8f);
-	glVertex2f(-1.57788f, 0.8f);
-	glVertex2f(-1.5778f, 1.0f);
+	glVertex3f(-1.7778f, 1.0f, -2.5f);
+	glVertex3f(-1.7778f, 0.8f, -2.5f);
+	glVertex3f(-1.57788f, 0.8f, -2.5f);
+	glVertex3f(-1.5778f, 1.0f, -2.5f);
 	glEnd();
 
 	/*glColor3fv(graphics::utilities::color::Green.Channels());
 
 	glBegin(GL_QUADS);	
-	glVertex2f(-0.1f, 0.1f);
-	glVertex2f(-0.1f, -0.1f);
-	glVertex2f(0.1f, -0.1f);
-	glVertex2f(0.1f, 0.1f);
+	glVertex3f(-0.1f, 0.1f, -1.5f);
+	glVertex3f(-0.1f, -0.1f, -1.5f);
+	glVertex3f(0.1f, -0.1f, -1.5f);
+	glVertex3f(0.1f, 0.1f, -1.5f);
 	glEnd();*/
 
 	glColor3fv(graphics::utilities::color::Blue.Channels());
 
 	glBegin(GL_QUADS);	
-	glVertex2f(1.5778f, -0.8f);
-	glVertex2f(1.5778f, -1.0f);
-	glVertex2f(1.7778f, -1.0f);
-	glVertex2f(1.7778f, -0.8f);
+	glVertex3f(1.5778f, -0.8f, -1.25f);
+	glVertex3f(1.5778f, -1.0f, -1.25f);
+	glVertex3f(1.7778f, -1.0f, -1.25f);
+	glVertex3f(1.7778f, -0.8f, -1.25f);
 	glEnd();
 
 	glColor3fv(graphics::utilities::color::White.Channels());
@@ -156,10 +156,10 @@ void Draw()
 	glEnable(GL_TEXTURE_2D);
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 1.0f); glVertex2f(-0.375f, 0.75f);
-	glTexCoord2f(0.0f, 0.0f); glVertex2f(-0.375f, -0.75f);
-	glTexCoord2f(1.0f, 0.0f); glVertex2f(0.375f, -0.75f);
-	glTexCoord2f(1.0f, 1.0f); glVertex2f(0.375f, 0.75f);
+	glTexCoord3f(0.0f, 1.0f, -1.0f); glVertex3f(-0.375f, 0.75f, -1.0f);
+	glTexCoord3f(0.0f, 0.0f, -1.0f); glVertex3f(-0.375f, -0.75f, -1.0f);
+	glTexCoord3f(1.0f, 0.0f, -1.0f); glVertex3f(0.375f, -0.75f, -1.0f);
+	glTexCoord3f(1.0f, 1.0f, -1.0f); glVertex3f(0.375f, 0.75f, -1.0f);
 	glEnd();
 	
 	glDisable(GL_TEXTURE_2D);
@@ -325,6 +325,8 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 	//Create a default ortographic frustum
 	auto frustum = graphics::render::Frustum::Orthographic(
 		clipping_plane, near_clip_distance, far_clip_distance, aspect_ratio, aspect_format);
+	//auto frustum = graphics::render::Frustum::Perspective(
+	//	clipping_plane, near_clip_distance, far_clip_distance, 90.0, aspect_ratio, aspect_format);
 	frustum.BaseViewportHeight(viewport.Bounds().ToSize().Y());
 
 	//Create a default camera with frustum and connect to viewport

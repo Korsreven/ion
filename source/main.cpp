@@ -302,7 +302,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 		auto &window = engine.RenderTo(
 			ion::graphics::render::RenderWindow::Resizable("ION engine", {1280.0_r, 720.0_r}),
-			ion::graphics::utilities::Aabb{-1.0_r, 1.0_r}, -1.0_r, 1.0_r, 16.0_r / 9.0_r);
+			ion::graphics::utilities::Aabb{-1.0_r, 1.0_r}, 1.0_r, 100.0_r, 16.0_r / 9.0_r);
 		window.MinSize(ion::graphics::utilities::Vector2{640.0_r, 360.0_r});
 
 		if (engine.Initialize())

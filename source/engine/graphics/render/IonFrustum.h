@@ -101,7 +101,7 @@ namespace ion::graphics::render
 			std::optional<Aabb> clip_plane_ = Aabb{{-1.0_r}, {1.0_r}};
 			real near_clip_distance_ = -1.0_r; //Front plane
 			real far_clip_distance_ = 1.0_r; //Back plane
-			real field_of_view_ = 60.0_r;
+			real field_of_view_ = 90.0_r;
 
 			std::optional<real> aspect_ratio_;
 			frustum::AspectRatioFormat aspect_format_ = frustum::AspectRatioFormat::PanAndScan;
