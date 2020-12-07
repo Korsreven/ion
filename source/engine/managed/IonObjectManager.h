@@ -213,7 +213,7 @@ namespace ion::managed
 			}
 
 			//Create an object by copying/moving the given object
-			template <typename T, typename = std::enable_if_t<std::is_same_v<std::remove_cvref_t<T>, ObjectT>>>
+			template <typename T, typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto& Create(T &&object)
 			{
 				//Check if an object with that name already exists
