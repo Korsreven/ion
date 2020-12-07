@@ -59,17 +59,17 @@ namespace ion::graphics::textures
 	{
 		private:
 
+			std::optional<int> handle_;
+
+			std::optional<std::string> pixel_data_;
+			std::optional<texture::TextureExtents> extents_;
+
 			texture::TextureFilter min_filter_ = texture::TextureFilter::Bilinear;
 			texture::TextureFilter mag_filter_ = texture::TextureFilter::Bilinear;		
 			std::optional<texture::MipmapFilter> mip_filter_;
 
 			texture::TextureWrapMode s_wrap_mode_ = texture::TextureWrapMode::Clamp;
 			texture::TextureWrapMode t_wrap_mode_ = texture::TextureWrapMode::Clamp;
-
-			std::optional<int> handle_;
-
-			std::optional<std::string> pixel_data_;
-			std::optional<texture::TextureExtents> extents_;
 
 		public:
 
