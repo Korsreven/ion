@@ -56,19 +56,19 @@ namespace ion::graphics::fonts
 	{
 		private:
 
+			int size_ = 0;
+			int face_index_ = 0;
+			font::CharacterEncoding character_encoding_ = font::CharacterEncoding::ASCII;
+
+			font::GlyphFilter glyph_min_filter_ = font::GlyphFilter::Bilinear;
+			font::GlyphFilter glyph_mag_filter_ = font::GlyphFilter::Bilinear;
+			
 			std::optional<int> handle_;	
 			std::optional<font::GlyphTextureHandles> glyph_handles_;
 
 			std::optional<font::GlyphBitmapData> glyph_data_;
 			std::optional<font::GlyphMetrices> glyph_metrics_;
 			std::optional<int> glyph_max_height_;
-
-			int size_ = 0;
-			int face_index_ = 0;
-			font::CharacterEncoding character_encoding_ = font::CharacterEncoding::ASCII;
-
-			font::GlyphFilter glyph_min_filter_ = font::GlyphFilter::Bilinear;
-			font::GlyphFilter glyph_mag_filter_ = font::GlyphFilter::Bilinear;		
 
 		public:
 
