@@ -115,6 +115,67 @@ bool Engine::NotifyFrameEnded(duration time) noexcept
 
 void Draw()
 {
+	static std::vector vertices{
+		//vertex
+		-0.375f, 0.75f, -1.0f,
+		-0.375f, -0.75f, -1.0f,
+		0.375f, -0.75f, -1.0f,
+		0.375f, -0.75f, -1.0f,
+		0.375f, 0.75f, -1.0f,
+		-0.375f, 0.75f, -1.0f,
+		//normal
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		//color
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		//texcoord
+		0.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f
+	};
+
+	static auto vao = 0u;
+	static auto vbo = 0u;
+
+	if (!std::empty(vertices))
+	{
+		glGenVertexArrays(1, &vao);
+		glGenBuffers(1, &vbo);
+		
+		glBindVertexArray(vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, std::size(vertices) * sizeof(float), std::data(vertices), GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(18 * sizeof(float)));
+		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, (void*)(36 * sizeof(float)));
+		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, (void*)(60 * sizeof(float)));
+
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
+		glEnableVertexAttribArray(3);
+
+		glBindVertexArray(0);
+
+		vertices.clear();
+		vertices.shrink_to_fit();
+	}
+	
+
 	glColor3fv(graphics::utilities::color::LightGray.Channels());
 
 	glBegin(GL_QUADS);
@@ -133,14 +194,14 @@ void Draw()
 	glVertex3f(-1.5778f, 1.0f, -2.5f);
 	glEnd();
 
-	/*glColor3fv(graphics::utilities::color::Green.Channels());
+	glColor3fv(graphics::utilities::color::Green.Channels());
 
 	glBegin(GL_QUADS);	
 	glVertex3f(-0.1f, 0.1f, -1.5f);
 	glVertex3f(-0.1f, -0.1f, -1.5f);
 	glVertex3f(0.1f, -0.1f, -1.5f);
 	glVertex3f(0.1f, 0.1f, -1.5f);
-	glEnd();*/
+	glEnd();
 
 	glColor3fv(graphics::utilities::color::Blue.Channels());
 
@@ -151,19 +212,52 @@ void Draw()
 	glVertex3f(1.7778f, -0.8f, -1.25f);
 	glEnd();
 
-	glColor3fv(graphics::utilities::color::White.Channels());
-	glBindTexture(GL_TEXTURE_2D, 1);
-	glEnable(GL_TEXTURE_2D);
 
-	glBegin(GL_QUADS);
-	glTexCoord3f(0.0f, 1.0f, -1.0f); glVertex3f(-0.375f, 0.75f, -1.0f);
-	glTexCoord3f(0.0f, 0.0f, -1.0f); glVertex3f(-0.375f, -0.75f, -1.0f);
-	glTexCoord3f(1.0f, 0.0f, -1.0f); glVertex3f(0.375f, -0.75f, -1.0f);
-	glTexCoord3f(1.0f, 1.0f, -1.0f); glVertex3f(0.375f, 0.75f, -1.0f);
-	glEnd();
+	//glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	/*glVertexPointer(3, GL_FLOAT, 0, nullptr);
+	glNormalPointer(GL_FLOAT, 0, (void*)(18 * sizeof(float)));
+	glColorPointer(4, GL_FLOAT, 0, (void*)(36 * sizeof(float)));
+	glTexCoordPointer(2, GL_FLOAT, 0, (void*)(60 * sizeof(float)));
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);*/
+
+	/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(18 * sizeof(float)));
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, (void*)(36 * sizeof(float)));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, (void*)(60 * sizeof(float)));
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);*/
 	
-	glDisable(GL_TEXTURE_2D);
+	
+	glActiveTexture(GL_TEXTURE0 + 0);
+	glBindTexture(GL_TEXTURE_2D, 1);
+	
+	glBindVertexArray(vao);
+	glUseProgram(5);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glUseProgram(0);
+	glBindVertexArray(0);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE0);	
+	
+
+	/*glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(3);*/
+
+	/*glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);*/
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 bool Engine::UpdateFrame() noexcept
@@ -219,6 +313,10 @@ bool Engine::VerticalSync() const noexcept
 
 bool Engine::Initialize() noexcept
 {
+	//Already initialized
+	if (initialized_)
+		return true;
+
 	//No window to render to
 	if (!render_window_)
 		return false;
@@ -228,7 +326,8 @@ bool Engine::Initialize() noexcept
 		return false;
 
 	//Initialize file system and graphics
-	return detail::init_file_system() && detail::init_graphics();
+	initialized_ = detail::init_file_system() && detail::init_graphics();
+	return initialized_;
 }
 
 int Engine::Start() noexcept

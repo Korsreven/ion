@@ -380,9 +380,27 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			shaders.LogLevel(ion::graphics::shaders::shader_manager::InfoLogLevel::Error);
 			[[maybe_unused]] auto &vert_shader = shaders.CreateShader("default_particle_vert", "default_particle.vert");
 			[[maybe_unused]] auto &frag_shader = shaders.CreateShader("default_particle_frag", "default_particle.frag");
+			auto &mesh_vert_shader = shaders.CreateShader("default_mesh_vert", "default_mesh.vert");
+			auto &mesh_frag_shader = shaders.CreateShader("default_mesh_frag", "default_mesh.frag");
 			shaders.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!shaders.Loaded());
+
+			//Shader programs
+			ion::graphics::shaders::ShaderProgramManager shader_programs;
+			shader_programs.LogLevel(ion::graphics::shaders::shader_program_manager::InfoLogLevel::Error);
+			auto &mesh_shader_prog = shader_programs.CreateShaderProgram("default_mesh_prog", mesh_vert_shader, mesh_frag_shader);	
+			shader_programs.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
+
+			//while (!shader_programs.Loaded());
+
+			//Shader variables
+			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec3>("vertex");
+			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec3>("normal");
+			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec4>("color");
+			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec2>("tex_coord");
+			mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::sampler2D>("texture");
+			shader_programs.UpdateShaderVariables(mesh_shader_prog);
 
 			//Font
 			ion::graphics::fonts::FontManager fonts;

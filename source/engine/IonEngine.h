@@ -47,6 +47,7 @@ namespace ion
 	{
 		private:
 
+			bool initialized_ = false;
 			bool syncronize_ = false;		
 			timers::Stopwatch frame_stopwatch_;
 			timers::Stopwatch total_stopwatch_;
