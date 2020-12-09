@@ -117,12 +117,12 @@ void Draw()
 {
 	static std::vector vertices{
 		//vertex
-		-0.375f, 0.75f, -1.0f,
-		-0.375f, -0.75f, -1.0f,
-		0.375f, -0.75f, -1.0f,
-		0.375f, -0.75f, -1.0f,
-		0.375f, 0.75f, -1.0f,
-		-0.375f, 0.75f, -1.0f,
+		-0.75f, 0.75f, -1.3f,
+		-0.75f, -0.75f, -1.3f,
+		0.75f, -0.75f, -1.3f,
+		0.75f, -0.75f, -1.3f,
+		0.75f, 0.75f, -1.3f,
+		-0.75f, 0.75f, -1.3f,
 		//normal
 		0.0f, 0.0f, 1.0f,
 		0.0f, 0.0f, 1.0f,
@@ -212,7 +212,6 @@ void Draw()
 	glVertex3f(1.7778f, -0.8f, -1.25f);
 	glEnd();
 
-
 	//glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	/*glVertexPointer(3, GL_FLOAT, 0, nullptr);
 	glNormalPointer(GL_FLOAT, 0, (void*)(18 * sizeof(float)));
@@ -236,7 +235,12 @@ void Draw()
 	
 	
 	glActiveTexture(GL_TEXTURE0 + 0);
-	glBindTexture(GL_TEXTURE_2D, 1);
+	glBindTexture(GL_TEXTURE_2D, 7);
+
+	glActiveTexture(GL_TEXTURE0 + 1);
+	glBindTexture(GL_TEXTURE_2D, 8);
+
+	glActiveTexture(GL_TEXTURE0);
 	
 	glBindVertexArray(vao);
 	glUseProgram(5);
@@ -258,6 +262,22 @@ void Draw()
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);*/
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+	glColor3fv(graphics::utilities::color::White.Channels());
+
+	glBindTexture(GL_TEXTURE_2D, 9);
+	glEnable(GL_TEXTURE_2D);
+
+	glBegin(GL_QUADS);	
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.05f, 0.05f, -1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.05f, -0.05f, -1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.05f, -0.05f, -1.0f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.05f, 0.05f, -1.0f);
+	glEnd();
+
+	glDisable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 9);
 }
 
 bool Engine::UpdateFrame() noexcept
