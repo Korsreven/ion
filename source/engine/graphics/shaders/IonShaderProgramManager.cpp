@@ -872,6 +872,17 @@ void ShaderProgramManager::UpdateShaderVariables(ShaderProgram &shader_program) 
 
 	if (auto handle = shader_program.Handle(); handle)
 	{
+		switch (gl::Shader_Support())
+		{
+			case gl::Extension::Core:
+			glUseProgram(*handle);
+			break;
+
+			case gl::Extension::ARB:
+			glUseProgramObjectARB(*handle);
+			break;
+		}
+
 		//Update all attribute variables attached to shader program
 		for (auto &attribute_variable : shader_program.AttributeVariables())
 			detail::update_attribute_value(*handle, attribute_variable);
@@ -879,6 +890,17 @@ void ShaderProgramManager::UpdateShaderVariables(ShaderProgram &shader_program) 
 		//Update all uniform variables attached to shader program
 		for (auto &uniform_variable : shader_program.UniformVariables())
 			detail::update_uniform_value(*handle, uniform_variable);
+
+		switch (gl::Shader_Support())
+		{
+			case gl::Extension::Core:
+			glUseProgram(0);
+			break;
+
+			case gl::Extension::ARB:
+			glUseProgramObjectARB(0);
+			break;
+		}
 	}
 }
 

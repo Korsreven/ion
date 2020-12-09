@@ -579,7 +579,7 @@ namespace ion::graphics::utilities
 		inline const auto OldLace = Color::RGB(253, 245, 230);
 		inline const auto Olive = Color::RGB(128, 128, 0);
 		inline const auto OliveDrab = Color::RGB(107, 142, 35);
-		inline const auto Orange = Color::RGB(255, 69, 0);
+		inline const auto Orange = Color::RGB(255, 165, 0);
 		inline const auto OrangeRed = Color::RGB(255, 69, 0);
 		inline const auto Orchid = Color::RGB(218, 112, 214);
 		inline const auto PaleGoldenrod = Color::RGB(238, 232, 170);
