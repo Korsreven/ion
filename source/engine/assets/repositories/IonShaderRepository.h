@@ -22,7 +22,7 @@ namespace ion::assets::repositories
 
 	namespace shader_repository::detail
 	{
-		constexpr auto file_extensions = ".frag/.vert"sv;
+		constexpr auto file_extensions = ".fs/.vs/.frag/.vert"sv;
 	} //shader_repository::detail
 
 

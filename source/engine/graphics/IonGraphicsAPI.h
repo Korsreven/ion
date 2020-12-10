@@ -263,6 +263,18 @@ namespace ion::graphics::gl
 			return Extension::None;
 	}
 
+	[[nodiscard]] inline auto VertexArrayObject_Support() noexcept
+	{
+		if (HasGL(Version::v3_0))
+			return Extension::Core;
+		#ifdef ION_GLEW
+		else if (GLEW_ARB_vertex_array_object)
+			return Extension::ARB;
+		#endif
+		else
+			return Extension::None;
+	}
+
 	[[nodiscard]] inline auto VertexBufferObject_Support() noexcept
 	{
 		if (HasGL(Version::v2_1))
