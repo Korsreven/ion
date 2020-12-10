@@ -357,7 +357,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto &background_texture = textures.CreateTexture("background", "background.jpg");
 			[[maybe_unused]] auto &background_np2_texture = textures.CreateTexture("background_np2", "background_np2.jpg");
 			[[maybe_unused]] auto &brick_wall_texture = textures.CreateTexture("brick_wall", "brick_wall.jpg");
-			[[maybe_unused]] auto &brick_wall_normal_map = textures.CreateTexture("brick_wall_normal_map", "brick_wall_normal_map.jpg");
+			[[maybe_unused]] auto &brick_wall_normal_map = textures.CreateTexture("brick_wall_normal", "brick_wall_normal_map.jpg");
+			[[maybe_unused]] auto &brick_wall_specular_map = textures.CreateTexture("brick_wall_specular", "brick_wall_specular_map.jpg");
 			[[maybe_unused]] auto &light_bulb = textures.CreateTexture("light_bulb", "light_bulb.png");
 			textures.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
@@ -404,9 +405,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec2>("tex_coord");
 			auto &diffuse_map = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::sampler2D>("diffuse_map");
 			auto &normal_map = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::sampler2D>("normal_map");
+			auto &specular_map = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::sampler2D>("specular_map");
 
 			diffuse_map.Get() = 0;
 			normal_map.Get() = 1;
+			specular_map.Get() = 2;
 			shader_programs.UpdateShaderVariables(mesh_shader_prog);
 
 			//Font

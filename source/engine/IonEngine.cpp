@@ -232,25 +232,27 @@ void Draw()
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);*/
-	
-	
-	glActiveTexture(GL_TEXTURE0 + 0);
-	glBindTexture(GL_TEXTURE_2D, 7);
 
+	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 7);
+	
 	glActiveTexture(GL_TEXTURE0 + 1);
 	glBindTexture(GL_TEXTURE_2D, 8);
 
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0 + 2);
+	glBindTexture(GL_TEXTURE_2D, 9);
 	
+	glActiveTexture(GL_TEXTURE0);
+
 	glBindVertexArray(vao);
 	glUseProgram(5);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glUseProgram(0);
 	glBindVertexArray(0);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glActiveTexture(GL_TEXTURE0);	
 	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	/*glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
@@ -265,9 +267,9 @@ void Draw()
 
 
 	glColor3fv(graphics::utilities::color::White.Channels());
-
-	glBindTexture(GL_TEXTURE_2D, 9);
+	
 	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 10);
 
 	glBegin(GL_QUADS);	
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.05f, 0.05f, -1.0f);
@@ -275,9 +277,9 @@ void Draw()
 	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.05f, -0.05f, -1.0f);
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.05f, 0.05f, -1.0f);
 	glEnd();
-
+	
+	glBindTexture(GL_TEXTURE_2D, 0);	
 	glDisable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 9);
 }
 
 bool Engine::UpdateFrame() noexcept
