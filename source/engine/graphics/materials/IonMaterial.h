@@ -204,16 +204,16 @@ namespace ion::graphics::materials
 			}
 
 
-			//Returns the attached diffuse map as a variant
-			//Returns std::monostate if no diffuse map is in use
+			//Returns the attached diffuse map as a pair of animation and texture
+			//Returns nullptr on both components if no diffuse map is in use
 			[[nodiscard]] std::pair<const Animation*, const Texture*> DiffuseMap() const noexcept;
 
-			//Returns the attached specular map as a variant
-			//Returns std::monostate if no specular map is in use
+			//Returns the attached specular map as a pair of animation and texture
+			//Returns nullptr on both components if no specular map is in use
 			[[nodiscard]] std::pair<const Animation*, const Texture*> SpecularMap() const noexcept;
 
-			//Returns the attached normal map as a variant
-			//Returns std::monostate if no normal map is in use
+			//Returns the attached normal map as a pair of animation and texture
+			//Returns nullptr on both components if no normal map is in use
 			[[nodiscard]] std::pair<const Animation*, const Texture*> NormalMap() const noexcept;
 
 
