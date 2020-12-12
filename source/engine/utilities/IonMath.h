@@ -202,7 +202,7 @@ namespace ion::utilities::math
 		return Abs(x - y) < epsilon;
 	}
 
-	//Return the binary logarithm of x for any integral type
+	//Return the binary (base-2) logarithm of x for any integral type
 	template <typename T>
 	[[nodiscard]] constexpr auto Log2(T x) noexcept
 	{
@@ -211,6 +211,19 @@ namespace ion::utilities::math
 
 		for (; x > T{1}; ++result)
 			x /= T{2};
+
+		return result;
+	}
+
+	//Return the common (base-10) logarithm of x for any integral type
+	template <typename T>
+	[[nodiscard]] constexpr auto Log10(T x) noexcept
+	{
+		static_assert(std::is_integral_v<T>);
+		auto result = T{0};
+
+		for (; x > T{9}; ++result)
+			x /= T{10};
 
 		return result;
 	}

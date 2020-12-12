@@ -27,6 +27,9 @@ namespace ion::graphics::textures
 	namespace frame_sequence::detail
 	{
 		using container_type = std::vector<Texture*>; //Non-owning
+
+
+		container_type get_frames_from_first_frame(Texture &first_frame, int total_frames);
 	} //frame_sequence::detail
 
 
@@ -45,7 +48,7 @@ namespace ion::graphics::textures
 			void ClearFrames() noexcept;
 
 		public:
-
+			
 			//Constructs a new frame sequence with the given name and frames (textures)
 			//Duplicate frames are allowed within a frame sequence
 			FrameSequence(std::string name, const frame_sequence::detail::container_type &frames);
@@ -58,6 +61,14 @@ namespace ion::graphics::textures
 			{
 				//Empty
 			}
+
+			//Constructs a new frame sequence with the given name, first frame (texture) and total frames
+			//Takes the name of the first frame with a numeric suffix and increases it in range [first, total frames)
+			//The generated names must be actual frames located in the same owner as the first frame
+			//First example: frame_0 and 4, produces the sequence: frame_0, frame_1, frame_2, frame_3
+			//Second example: frame_01 and 4, produces the sequence: frame_01, frame_02, frame_03, frame_04
+			//Third example: frame09 and 3, produces the sequence: frame09, frame10, frame11
+			FrameSequence(std::string name, Texture &first_frame, int total_frames);
 
 
 			/*

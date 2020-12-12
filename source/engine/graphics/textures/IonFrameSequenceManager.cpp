@@ -36,6 +36,11 @@ FrameSequence& FrameSequenceManager::CreateFrameSequence(std::string name, const
 	return Create(std::move(name), frames);
 }
 
+FrameSequence& FrameSequenceManager::CreateFrameSequence(std::string name, Texture &first_frame, int total_frames)
+{
+	return Create(std::move(name), first_frame, total_frames);
+}
+
 
 FrameSequence& FrameSequenceManager::CreateFrameSequence(const FrameSequence &frame_sequence)
 {
