@@ -84,7 +84,7 @@ namespace ion::graphics::scene
 			//Constructor
 			Light(light::LightType type,
 				const Vector2 &position, const Vector2 &direction, real cutoff_angle,
-				const Color &ambient_color, const Color &diffuse_color, const Color &specular_color,
+				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				bool cast_shadows = true);
 
@@ -95,19 +95,19 @@ namespace ion::graphics::scene
 
 			//Returns a new point light from the given values
 			[[nodiscard]] static Light Point(const Vector2 &position,
-				const Color &ambient_color, const Color &diffuse_color, const Color &specular_color,
+				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				bool cast_shadows = true) noexcept;
 
 			//Returns a new directional light from the given values
 			[[nodiscard]] static Light Directional(const Vector2 &direction,
-				const Color &ambient_color, const Color &diffuse_color, const Color &specular_color,
+				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				bool cast_shadows = true) noexcept;
 
 			//Returns a new spotlight from the given values
 			[[nodiscard]] static Light Spotlight(const Vector2 &position, const Vector2 &direction, real cutoff_angle,
-				const Color &ambient_color, const Color &diffuse_color, const Color &specular_color,
+				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				bool cast_shadows = true) noexcept;
 
@@ -145,21 +145,21 @@ namespace ion::graphics::scene
 
 
 			//Sets the color of the ambient light given off by this light source to the given color
-			inline void AmbientColor(const Color &ambient_color) noexcept
+			inline void AmbientColor(const Color &ambient) noexcept
 			{
-				ambient_color_ = ambient_color;
+				ambient_color_ = ambient;
 			}
 			
 			//Sets the color of the diffuse light given off by this light source to the given color
-			inline void DiffuseColor(const Color &diffuse_color) noexcept
+			inline void DiffuseColor(const Color &diffuse) noexcept
 			{
-				diffuse_color_ = diffuse_color;
+				diffuse_color_ = diffuse;
 			}
 			
 			//Sets the color of the specular light given off by this light source to the given color
-			inline void SpecularColor(const Color &specular_color) noexcept
+			inline void SpecularColor(const Color &specular) noexcept
 			{
-				specular_color_ = specular_color;
+				specular_color_ = specular;
 			}
 
 

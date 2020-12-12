@@ -20,7 +20,7 @@ using namespace utilities;
 
 Light::Light(LightType type,
 	const Vector2 &position, const Vector2 &direction, real cutoff_angle,
-	const Color &ambient_color, const Color &diffuse_color, const Color &specular_color,
+	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 	bool cast_shadows) :
 
@@ -29,9 +29,9 @@ Light::Light(LightType type,
 	direction_{direction},
 	cutoff_{detail::angle_to_cutoff(cutoff_angle)},
 
-	ambient_color_{ambient_color},
-	diffuse_color_{diffuse_color},
-	specular_color_{specular_color},
+	ambient_color_{ambient},
+	diffuse_color_{diffuse},
+	specular_color_{specular},
 
 	attenuation_constant_{attenuation_constant},
 	attenuation_linear_{attenuation_linear},
@@ -48,37 +48,37 @@ Light::Light(LightType type,
 */
 
 Light Light::Point(const Vector2 &position,
-	const Color &ambient_color, const Color &diffuse_color, const Color &specular_color,
+	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 	bool cast_shadows) noexcept
 {
 	return {LightType::Point,
 			position, vector2::Zero, detail::default_cutoff_angle,
-			ambient_color, diffuse_color, specular_color,
+			ambient, diffuse, specular,
 			attenuation_constant, attenuation_linear, attenuation_quadratic,
 			cast_shadows};
 }
 
 Light Light::Directional(const Vector2 &direction,
-	const Color &ambient_color, const Color &diffuse_color, const Color &specular_color,
+	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 	bool cast_shadows) noexcept
 {
 	return {LightType::Directional,
 			vector2::Zero, direction, detail::default_cutoff_angle,
-			ambient_color, diffuse_color, specular_color,
+			ambient, diffuse, specular,
 			attenuation_constant, attenuation_linear, attenuation_quadratic,
 			cast_shadows};
 }
 
 Light Light::Spotlight(const Vector2 &position, const Vector2 &direction, real cutoff_angle,
-	const Color &ambient_color, const Color &diffuse_color, const Color &specular_color,
+	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 	bool cast_shadows) noexcept
 {
 	return {LightType::Spotlight,
 			position, direction, cutoff_angle,
-			ambient_color, diffuse_color, specular_color,
+			ambient, diffuse, specular,
 			attenuation_constant, attenuation_linear, attenuation_quadratic,
 			cast_shadows};
 }
