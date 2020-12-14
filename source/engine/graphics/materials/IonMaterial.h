@@ -20,7 +20,9 @@ File:	IonMaterial.h
 
 #include "graphics/textures/IonAnimationManager.h"
 #include "graphics/textures/IonTextureManager.h"
+#include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
+#include "graphics/utilities/IonVector2.h"
 #include "managed/IonManagedObject.h"
 #include "managed/IonObservedObject.h"
 #include "types/IonTypes.h"
@@ -30,10 +32,10 @@ namespace ion::graphics::materials
 	struct MaterialManager; //Forward declaration
 
 	using namespace types::type_literals;
+	using namespace utilities;
 
 	using textures::Animation;
 	using textures::Texture;
-	using utilities::Color;
 
 	namespace material::detail
 	{
@@ -41,6 +43,16 @@ namespace ion::graphics::materials
 			std::monostate,
 			managed::ObservedObject<Animation>,
 			managed::ObservedObject<Texture>>;
+
+
+		inline auto get_tex_coords(real bottom_left, real top_right, real min, real max) noexcept
+		{
+			//Tex coords are flipped
+			if (top_right < bottom_left)
+				return std::pair{max, min};
+			else
+				return std::pair{min, max};
+		}
 	} //material::detail
 
 
@@ -57,6 +69,8 @@ namespace ion::graphics::materials
 			material::detail::map_type specular_map_;
 			material::detail::map_type normal_map_;
 
+			Vector2 bottom_left_tex_coord_ = vector2::Zero;
+			Vector2 top_right_tex_coord_ = vector2::UnitScale;
 			std::optional<Color> emissive_color_;
 			bool receive_shadows_ = true;
 
@@ -162,6 +176,13 @@ namespace ion::graphics::materials
 			void NormalMap(std::nullptr_t) noexcept;
 
 
+			//Sets the bottom left and top right texture coordinates for this material to the given coordinates
+			inline void TexCoords(const Vector2 &bottom_left, const Vector2 &top_right) noexcept
+			{
+				bottom_left_tex_coord_ = bottom_left;
+				top_right_tex_coord_ = top_right;
+			}
+
 			//Sets the emissive (self-illumination) color of this material to the given color
 			inline void EmissiveColor(const std::optional<Color> &emissive) noexcept
 			{
@@ -217,6 +238,12 @@ namespace ion::graphics::materials
 			[[nodiscard]] std::pair<const Animation*, const Texture*> NormalMap() const noexcept;
 
 
+			//Returns the bottom left and top right texture coordinates for this material
+			[[nodiscard]] inline auto TexCoords() const noexcept
+			{
+				return std::pair{bottom_left_tex_coord_, top_right_tex_coord_};
+			}
+
 			//Returns the emissive (self-illumination) color of the material
 			//Returns nullopt if this material is not emissive
 			[[nodiscard]] inline auto& EmissiveColor() const noexcept
@@ -229,6 +256,26 @@ namespace ion::graphics::materials
 			{
 				return receive_shadows_;
 			}
+
+
+			/*
+				Texture coordinates
+			*/
+
+			//Crop material textures by the given area, where values are in range [0.0, 1.0]
+			//This operation will discard any repeating previously applied
+			void Crop(const std::optional<Aabb> &area) noexcept;
+
+			//Repeat material textures by the given amount, where values are in range [0.0, oo)
+			//This operation will discard any cropping previously applied
+			void Repeat(const std::optional<Vector2> &amount) noexcept;
+
+
+			//Flip material textures horizontally (mirror)
+			void FlipHorizontal() noexcept;
+
+			//Flip material textures vertically (up-down)
+			void FlipVertical() noexcept;
 	};
 } //ion::graphics::materials
 

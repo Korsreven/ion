@@ -242,4 +242,85 @@ std::pair<const Animation*, const Texture*> Material::NormalMap() const noexcept
 	}, normal_map_);
 }
 
+
+/*
+	Texture coordinates
+*/
+
+void Material::Crop(const std::optional<Aabb> &area) noexcept
+{
+	//Crop by area
+	if (area)
+	{
+		auto min = area->Min().CeilCopy(vector2::Zero).FloorCopy(vector2::UnitScale);
+		auto max = area->Max().CeilCopy(vector2::Zero).FloorCopy(vector2::UnitScale);
+
+		auto [bl_s, bl_t] = bottom_left_tex_coord_.XY();
+		auto [tr_s, tr_t] = top_right_tex_coord_.XY();
+		auto [new_bl_s, new_tr_s] = detail::get_tex_coords(bl_s, tr_s, min.X(), max.X());
+		auto [new_bl_t, new_tr_t] = detail::get_tex_coords(bl_t, tr_t, min.Y(), max.Y());
+
+		bottom_left_tex_coord_ = {new_bl_s, new_bl_t};
+		top_right_tex_coord_ = {new_tr_s, new_tr_t};
+	}
+	//Un-crop
+	else
+	{
+		auto [bl_s, bl_t] = bottom_left_tex_coord_.XY();
+		auto [tr_s, tr_t] = top_right_tex_coord_.XY();
+		auto [new_bl_s, new_tr_s] = detail::get_tex_coords(bl_s, tr_s, 0.0_r, 1.0_r);
+		auto [new_bl_t, new_tr_t] = detail::get_tex_coords(bl_t, tr_t, 0.0_r, 1.0_r);
+
+		bottom_left_tex_coord_ = {new_bl_s, new_bl_t};
+		top_right_tex_coord_ = {new_tr_s, new_tr_t};
+	}
+}
+
+void Material::Repeat(const std::optional<Vector2> &amount) noexcept
+{
+	//Repeat by amount
+	if (amount)
+	{
+		auto max = amount->CeilCopy(vector2::Zero);
+
+		auto [bl_s, bl_t] = bottom_left_tex_coord_.XY();
+		auto [tr_s, tr_t] = top_right_tex_coord_.XY();
+		auto [new_bl_s, new_tr_s] = detail::get_tex_coords(bl_s, tr_s, 0.0_r, max.X());
+		auto [new_bl_t, new_tr_t] = detail::get_tex_coords(bl_t, tr_t, 0.0_r, max.Y());
+
+		bottom_left_tex_coord_ = {new_bl_s, new_bl_t};
+		top_right_tex_coord_ = {new_tr_s, new_tr_t};
+	}
+	//Un-repeat
+	else
+	{
+		auto [bl_s, bl_t] = bottom_left_tex_coord_.XY();
+		auto [tr_s, tr_t] = top_right_tex_coord_.XY();
+		auto [new_bl_s, new_tr_s] = detail::get_tex_coords(bl_s, tr_s, 0.0_r, 1.0_r);
+		auto [new_bl_t, new_tr_t] = detail::get_tex_coords(bl_t, tr_t, 0.0_r, 1.0_r);
+
+		bottom_left_tex_coord_ = {new_bl_s, new_bl_t};
+		top_right_tex_coord_ = {new_tr_s, new_tr_t};
+	}
+}
+
+
+void Material::FlipHorizontal() noexcept
+{
+	auto bl_s = bottom_left_tex_coord_.X();
+	auto tr_s = top_right_tex_coord_.X();
+
+	bottom_left_tex_coord_.X(tr_s);
+	top_right_tex_coord_.X(bl_s);
+}
+
+void Material::FlipVertical() noexcept
+{
+	auto bl_t = bottom_left_tex_coord_.Y();
+	auto tr_t = top_right_tex_coord_.Y();
+
+	bottom_left_tex_coord_.Y(tr_t);
+	top_right_tex_coord_.Y(bl_t);
+}
+
 } //ion::graphics::materials
