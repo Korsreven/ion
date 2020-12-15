@@ -379,17 +379,14 @@ std::pair<Vector2, Vector2> Material::WorldTexCoords() const noexcept
 	auto texture =
 		[&]() noexcept -> const Texture*
 		{
-			if (auto [animation, texture] = this->DiffuseMap();
-				texture || (animation && !animation->UnderlyingFrameSequence()->IsEmpty()))
-				return animation ? &*animation->UnderlyingFrameSequence()->Frames().begin() : texture;
+			if (auto [animation, texture] = this->DiffuseMap(); texture || animation)
+				return animation ? animation->UnderlyingFrameSequence()->FirstFrame() : texture;
 
-			if (auto [animation, texture] = this->SpecularMap();
-				texture || (animation && !animation->UnderlyingFrameSequence()->IsEmpty()))
-				return animation ? &*animation->UnderlyingFrameSequence()->Frames().begin() : texture;
+			if (auto [animation, texture] = this->SpecularMap(); texture || animation)
+				return animation ? animation->UnderlyingFrameSequence()->FirstFrame() : texture;
 
-			if (auto [animation, texture] = this->NormalMap();
-				texture || (animation && !animation->UnderlyingFrameSequence()->IsEmpty()))
-				return animation ? &*animation->UnderlyingFrameSequence()->Frames().begin() : texture;
+			if (auto [animation, texture] = this->NormalMap(); texture || animation)
+				return animation ? animation->UnderlyingFrameSequence()->FirstFrame() : texture;
 
 			return nullptr;
 		}();

@@ -140,6 +140,40 @@ namespace ion::graphics::textures
 			{
 				return !!*this;
 			}
+
+
+			/*
+				Frames
+			*/
+
+			//Returns a pointer to the first frame (mutable) in this frame sequence
+			//Returns nullptr if frame sequence has no frames
+			[[nodiscard]] inline auto FirstFrame() noexcept
+			{
+				return !std::empty(frames_) ? frames_.front() : nullptr;
+			}
+
+			//Returns a pointer to the first frame (immutable) in this frame sequence
+			//Returns nullptr if frame sequence has no frames
+			[[nodiscard]] inline auto FirstFrame() const noexcept
+			{
+				return !std::empty(frames_) ? frames_.front() : nullptr;
+			}
+
+
+			//Returns a pointer to the last frame (mutable) in this frame sequence
+			//Returns nullptr if frame sequence has no frames
+			[[nodiscard]] inline auto LastFrame() noexcept
+			{
+				return !std::empty(frames_) ? frames_.back() : nullptr;
+			}
+
+			//Returns a pointer to the last frame (immutable) in this frame sequence
+			//Returns nullptr if frame sequence has no frames
+			[[nodiscard]] inline auto LastFrame() const noexcept
+			{
+				return !std::empty(frames_) ? frames_.back() : nullptr;
+			}
 	};
 } //ion::graphics::textures
 
