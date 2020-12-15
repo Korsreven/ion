@@ -255,16 +255,19 @@ void Material::Crop(const std::optional<Aabb> &area) noexcept
 		auto min = area->Min().CeilCopy(vector2::Zero).FloorCopy(vector2::UnitScale);
 		auto max = area->Max().CeilCopy(vector2::Zero).FloorCopy(vector2::UnitScale);
 
-		auto [bl_s, bl_t] = bottom_left_tex_coord_.XY();
-		auto [tr_s, tr_t] = top_right_tex_coord_.XY();
-		auto [new_bl_s, new_tr_s] = detail::get_tex_coords(bl_s, tr_s, min.X(), max.X());
-		auto [new_bl_t, new_tr_t] = detail::get_tex_coords(bl_t, tr_t, min.Y(), max.Y());
+		if (min != max)
+		{
+			auto [bl_s, bl_t] = bottom_left_tex_coord_.XY();
+			auto [tr_s, tr_t] = top_right_tex_coord_.XY();
+			auto [new_bl_s, new_tr_s] = detail::get_tex_coords(bl_s, tr_s, min.X(), max.X());
+			auto [new_bl_t, new_tr_t] = detail::get_tex_coords(bl_t, tr_t, min.Y(), max.Y());
 
-		bottom_left_tex_coord_ = {new_bl_s, new_bl_t};
-		top_right_tex_coord_ = {new_tr_s, new_tr_t};
+			bottom_left_tex_coord_ = {new_bl_s, new_bl_t};
+			top_right_tex_coord_ = {new_tr_s, new_tr_t};
+		}
 	}
 	//Un-crop
-	else
+	else if (IsCropped())
 	{
 		auto [bl_s, bl_t] = bottom_left_tex_coord_.XY();
 		auto [tr_s, tr_t] = top_right_tex_coord_.XY();
@@ -281,18 +284,19 @@ void Material::Repeat(const std::optional<Vector2> &amount) noexcept
 	//Repeat by amount
 	if (amount)
 	{
-		auto max = amount->CeilCopy(vector2::Zero);
+		if (auto max = amount->CeilCopy(vector2::Zero); max > vector2::Zero)
+		{
+			auto [bl_s, bl_t] = bottom_left_tex_coord_.XY();
+			auto [tr_s, tr_t] = top_right_tex_coord_.XY();
+			auto [new_bl_s, new_tr_s] = detail::get_tex_coords(bl_s, tr_s, 0.0_r, max.X());
+			auto [new_bl_t, new_tr_t] = detail::get_tex_coords(bl_t, tr_t, 0.0_r, max.Y());
 
-		auto [bl_s, bl_t] = bottom_left_tex_coord_.XY();
-		auto [tr_s, tr_t] = top_right_tex_coord_.XY();
-		auto [new_bl_s, new_tr_s] = detail::get_tex_coords(bl_s, tr_s, 0.0_r, max.X());
-		auto [new_bl_t, new_tr_t] = detail::get_tex_coords(bl_t, tr_t, 0.0_r, max.Y());
-
-		bottom_left_tex_coord_ = {new_bl_s, new_bl_t};
-		top_right_tex_coord_ = {new_tr_s, new_tr_t};
+			bottom_left_tex_coord_ = {new_bl_s, new_bl_t};
+			top_right_tex_coord_ = {new_tr_s, new_tr_t};
+		}
 	}
 	//Un-repeat
-	else
+	else if (IsRepeated())
 	{
 		auto [bl_s, bl_t] = bottom_left_tex_coord_.XY();
 		auto [tr_s, tr_t] = top_right_tex_coord_.XY();
@@ -321,6 +325,48 @@ void Material::FlipVertical() noexcept
 
 	bottom_left_tex_coord_.Y(tr_t);
 	top_right_tex_coord_.Y(bl_t);
+}
+
+
+bool Material::IsCropped() const noexcept
+{
+	auto [bl_s, bl_t] = bottom_left_tex_coord_.XY();
+	auto [tr_s, tr_t] = top_right_tex_coord_.XY();
+
+	if (IsFlippedHorizontally())
+		std::swap(bl_s, tr_s);
+	
+	if (IsFlippedVertically())
+		std::swap(bl_t, tr_t);
+	
+	return bl_s > 0.0_r || bl_t > 0.0_r ||
+		   tr_s < 1.0_r || tr_t < 1.0_r;
+}
+
+bool Material::IsRepeated() const noexcept
+{
+	auto [bl_s, bl_t] = bottom_left_tex_coord_.XY();
+	auto [tr_s, tr_t] = top_right_tex_coord_.XY();
+
+	if (IsFlippedHorizontally())
+		std::swap(bl_s, tr_s);
+	
+	if (IsFlippedVertically())
+		std::swap(bl_t, tr_t);
+	
+	return bl_s < 0.0_r || bl_t < 0.0_r ||
+		   tr_s > 1.0_r || tr_t > 1.0_r;
+}
+
+
+bool Material::IsFlippedHorizontally() const noexcept
+{
+	return top_right_tex_coord_.X() < bottom_left_tex_coord_.X();
+}
+
+bool Material::IsFlippedVertically() const noexcept
+{
+	return top_right_tex_coord_.Y() < bottom_left_tex_coord_.Y();
 }
 
 } //ion::graphics::materials

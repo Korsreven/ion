@@ -276,6 +276,20 @@ namespace ion::graphics::materials
 
 			//Flip material textures vertically (up-down)
 			void FlipVertical() noexcept;
+
+
+			//Returns true if this materials textures are cropped
+			[[nodiscard]] bool IsCropped() const noexcept;
+
+			//Returns true if this materials textures are repeated
+			[[nodiscard]] bool IsRepeated() const noexcept;
+
+
+			//Returns true if this materials textures are flipped horizontally
+			[[nodiscard]] bool IsFlippedHorizontally() const noexcept;
+
+			//Returns true if this materials textures are flipped vertically
+			[[nodiscard]] bool IsFlippedVertically() const noexcept;
 	};
 } //ion::graphics::materials
 
