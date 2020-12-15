@@ -45,10 +45,10 @@ namespace ion::graphics::materials
 			managed::ObservedObject<Texture>>;
 
 
-		inline auto get_tex_coords(real bottom_left, real top_right, real min, real max) noexcept
+		inline auto get_tex_coords(real lower_left, real upper_right, real min, real max) noexcept
 		{
 			//Tex coords are flipped
-			if (top_right < bottom_left)
+			if (upper_right < lower_left)
 				return std::pair{max, min};
 			else
 				return std::pair{min, max};
@@ -69,8 +69,8 @@ namespace ion::graphics::materials
 			material::detail::map_type specular_map_;
 			material::detail::map_type normal_map_;
 
-			Vector2 bottom_left_tex_coord_ = vector2::Zero;
-			Vector2 top_right_tex_coord_ = vector2::UnitScale;
+			Vector2 lower_left_tex_coord_ = vector2::Zero;
+			Vector2 upper_right_tex_coord_ = vector2::UnitScale;
 			std::optional<Color> emissive_color_;
 			bool receive_shadows_ = true;
 
@@ -176,11 +176,11 @@ namespace ion::graphics::materials
 			void NormalMap(std::nullptr_t) noexcept;
 
 
-			//Sets the bottom left and top right texture coordinates for this material to the given coordinates
-			inline void TexCoords(const Vector2 &bottom_left, const Vector2 &top_right) noexcept
+			//Sets the lower left and upper right texture coordinates for this material to the given coordinates
+			inline void TexCoords(const Vector2 &lower_left, const Vector2 &upper_right) noexcept
 			{
-				bottom_left_tex_coord_ = bottom_left;
-				top_right_tex_coord_ = top_right;
+				lower_left_tex_coord_ = lower_left;
+				upper_right_tex_coord_ = upper_right;
 			}
 
 			//Sets the emissive (self-illumination) color of this material to the given color
@@ -238,10 +238,10 @@ namespace ion::graphics::materials
 			[[nodiscard]] std::pair<const Animation*, const Texture*> NormalMap() const noexcept;
 
 
-			//Returns the bottom left and top right texture coordinates for this material
+			//Returns the lower left and upper right texture coordinates for this material
 			[[nodiscard]] inline auto TexCoords() const noexcept
 			{
-				return std::pair{bottom_left_tex_coord_, top_right_tex_coord_};
+				return std::pair{lower_left_tex_coord_, upper_right_tex_coord_};
 			}
 
 			//Returns the emissive (self-illumination) color of the material
@@ -290,6 +290,12 @@ namespace ion::graphics::materials
 
 			//Returns true if this materials textures are flipped vertically
 			[[nodiscard]] bool IsFlippedVertically() const noexcept;
+
+
+			//Returns the lower left and upper right texture coordinates for this material
+			//Combines the relative tex coords for the material, to that of the actual texture
+			//For animations, tex coords are only retrieved from the first frame
+			[[nodiscard]] std::pair<Vector2, Vector2> WorldTexCoords() const noexcept;
 	};
 } //ion::graphics::materials
 

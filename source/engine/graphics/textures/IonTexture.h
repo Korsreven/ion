@@ -20,6 +20,7 @@ File:	IonTexture.h
 
 #include "graphics/utilities/IonVector2.h"
 #include "resources/IonFileResource.h"
+#include "types/IonTypes.h"
 
 namespace ion::graphics::textures
 {
@@ -204,6 +205,41 @@ namespace ion::graphics::textures
 			[[nodiscard]] inline auto TWrapMode() const noexcept
 			{
 				return t_wrap_mode_;
+			}
+
+
+			/*
+				Texture coordinates
+			*/
+
+			//Returns the lower left and upper right texture coordinates for the texture
+			//This is important if one or both of the texture sides are NPOT
+			//Returns nullopt if the texture is missing extents (not loaded)
+			[[nodiscard]] inline auto TexCoords() const noexcept
+				-> std::optional<std::pair<Vector2, Vector2>>
+			{
+				using namespace types::type_literals;
+
+				if (extents_)
+				{
+					auto delta_x = (1.0_r - static_cast<real>(extents_->Width) / extents_->ActualWidth) * 0.5_r;
+					auto delta_y = (1.0_r - static_cast<real>(extents_->Height) / extents_->ActualHeight) * 0.5_r;
+					return std::pair{Vector2{delta_x, delta_y}, Vector2{1.0_r - delta_x, 1.0_r - delta_y}};
+				}
+				else
+					return {};
+			}
+
+			//Returns a pair of true/false to indicate which texture axis is repeatable
+			//Returns nullopt if the texture is missing extents (not loaded)
+			[[nodiscard]] inline auto IsRepeatable() const noexcept
+				-> std::optional<std::pair<bool, bool>>
+			{
+				if (extents_)
+					return std::pair{extents_->Width == extents_->ActualWidth,
+									 extents_->Height == extents_->ActualHeight};
+				else
+					return {};
 			}
 	};
 } //ion::graphics::textures
