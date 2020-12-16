@@ -163,6 +163,12 @@
     <Filter Include="Source Files\graphics\fonts\utilities">
       <UniqueIdentifier>{b68790e5-f977-4465-95fb-3b33b81d5b1f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\graphics\materials">
+      <UniqueIdentifier>{73d1db3a-bc48-4c3e-bdf7-35625081fd1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics\materials">
+      <UniqueIdentifier>{02cf4d34-73f6-4c1a-982d-711680f83e7c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -371,6 +377,21 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\fonts\utilities\IonFontUtility.cpp">
       <Filter>Source Files\graphics\fonts\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\IonLight.cpp">
+      <Filter>Source Files\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\materials\IonMaterial.cpp">
+      <Filter>Source Files\graphics\materials</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\materials\IonMaterialManager.cpp">
+      <Filter>Source Files\graphics\materials</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\IonModel.cpp">
+      <Filter>Source Files\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\render\IonMesh.cpp">
+      <Filter>Source Files\graphics\render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -757,6 +778,21 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\fonts\utilities\IonFontUtility.h">
       <Filter>Header Files\graphics\fonts\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\IonLight.h">
+      <Filter>Header Files\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\materials\IonMaterial.h">
+      <Filter>Header Files\graphics\materials</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\materials\IonMaterialManager.h">
+      <Filter>Header Files\graphics\materials</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\IonModel.h">
+      <Filter>Header Files\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\render\IonMesh.h">
+      <Filter>Header Files\graphics\render</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

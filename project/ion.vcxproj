@@ -175,6 +175,8 @@
     <ClCompile Include="..\source\engine\graphics\fonts\IonTypeFace.cpp" />
     <ClCompile Include="..\source\engine\graphics\fonts\IonTypeFaceManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\fonts\utilities\IonFontUtility.cpp" />
+    <ClCompile Include="..\source\engine\graphics\materials\IonMaterial.cpp" />
+    <ClCompile Include="..\source\engine\graphics\materials\IonMaterialManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonAffector.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonColorFader.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonDirectionRandomizer.cpp" />
@@ -188,10 +190,13 @@
     <ClCompile Include="..\source\engine\graphics\particles\IonParticleSystem.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonParticleSystemManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonFrustum.cpp" />
+    <ClCompile Include="..\source\engine\graphics\render\IonMesh.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonRenderTarget.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonRenderWindow.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonViewport.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonCamera.cpp" />
+    <ClCompile Include="..\source\engine\graphics\scene\IonLight.cpp" />
+    <ClCompile Include="..\source\engine\graphics\scene\IonModel.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonSceneManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderProgram.cpp" />
@@ -275,6 +280,8 @@
     <ClInclude Include="..\source\engine\graphics\fonts\IonTypeFaceManager.h" />
     <ClInclude Include="..\source\engine\graphics\fonts\utilities\IonFontUtility.h" />
     <ClInclude Include="..\source\engine\graphics\IonGraphicsAPI.h" />
+    <ClInclude Include="..\source\engine\graphics\materials\IonMaterial.h" />
+    <ClInclude Include="..\source\engine\graphics\materials\IonMaterialManager.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffector.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffectorFactory.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonColorFader.h" />
@@ -290,10 +297,13 @@
     <ClInclude Include="..\source\engine\graphics\particles\IonParticleSystem.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonParticleSystemManager.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonFrustum.h" />
+    <ClInclude Include="..\source\engine\graphics\render\IonMesh.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonRenderTarget.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonRenderWindow.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonViewport.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonCamera.h" />
+    <ClInclude Include="..\source\engine\graphics\scene\IonLight.h" />
+    <ClInclude Include="..\source\engine\graphics\scene\IonModel.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonSceneManager.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\IonShader.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\IonShaderManager.h" />

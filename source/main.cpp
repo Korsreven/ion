@@ -53,6 +53,8 @@ File:	main.cpp
 #include "graphics/fonts/IonTypeFace.h"
 #include "graphics/fonts/IonTypeFaceManager.h"
 #include "graphics/fonts/utilities/IonFontUtility.h"
+#include "graphics/materials/IonMaterial.h"
+#include "graphics/materials/IonMaterialManager.h"
 #include "graphics/particles/IonEmitter.h"
 #include "graphics/particles/IonEmitterFactory.h"
 #include "graphics/particles/IonParticle.h"
@@ -68,10 +70,13 @@ File:	main.cpp
 #include "graphics/particles/affectors/IonSineForce.h"
 #include "graphics/particles/affectors/IonVelocityRandomizer.h"
 #include "graphics/render/IonFrustum.h"
+#include "graphics/render/IonMesh.h"
 #include "graphics/render/IonRenderTarget.h"
 #include "graphics/render/IonRenderWindow.h"
 #include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonCamera.h"
+#include "graphics/scene/IonLight.h"
+#include "graphics/scene/IonModel.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/shaders/IonShader.h"
 #include "graphics/shaders/IonShaderManager.h"
@@ -439,6 +444,19 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			text.AppendLine("How <del>vexingly</del> <ins>quick</ins> daft zebras <b>jump</b>!");
 			text.AreaSize(ion::graphics::utilities::Vector2{250.0_r, 100.0_r});
+
+
+			//Material
+			ion::graphics::materials::MaterialManager materials;
+			auto &material =
+				materials.CreateMaterial("gold",
+					ion::graphics::utilities::Color{0.24725_r, 0.1995_r, 0.0745_r},
+					ion::graphics::utilities::Color{0.75164_r, 0.60648_r, 0.22648_r},
+					ion::graphics::utilities::Color{0.628281_r, 0.555802_r, 0.366065_r},
+					51.2_r, &rikku_texture, nullptr, nullptr);
+
+			material.Crop(ion::graphics::utilities::Aabb{{0.25_r, 0.25_r}, {0.75_r, 0.75_r}});
+			auto [lower_left, upper_right] = material.WorldTexCoords();
 
 			//EXAMPLE end
 
