@@ -92,7 +92,7 @@ namespace ion::graphics::textures
 			}
 
 			//Returns a pointer to an immutable frame at the given offset
-			[[nodiscard]] inline auto operator[](int off) const noexcept
+			[[nodiscard]] inline const auto operator[](int off) const noexcept
 			{
 				assert(off >= 0 && off < std::ssize(frames_));
 				return *this ? frames_[off] : nullptr;
@@ -155,7 +155,7 @@ namespace ion::graphics::textures
 
 			//Returns a pointer to the first frame (immutable) in this frame sequence
 			//Returns nullptr if frame sequence has no frames
-			[[nodiscard]] inline auto FirstFrame() const noexcept
+			[[nodiscard]] inline const auto FirstFrame() const noexcept
 			{
 				return !std::empty(frames_) ? frames_.front() : nullptr;
 			}
@@ -170,7 +170,7 @@ namespace ion::graphics::textures
 
 			//Returns a pointer to the last frame (immutable) in this frame sequence
 			//Returns nullptr if frame sequence has no frames
-			[[nodiscard]] inline auto LastFrame() const noexcept
+			[[nodiscard]] inline const auto LastFrame() const noexcept
 			{
 				return !std::empty(frames_) ? frames_.back() : nullptr;
 			}

@@ -700,7 +700,7 @@ namespace ion::graphics::shaders::variables::glsl
 			*/
 
 			//Returns a pointer to the first vertex attribute (immutable)
-			[[nodiscard]] inline auto VertexData() const noexcept
+			[[nodiscard]] inline const auto VertexData() const noexcept
 			{
 				return vertex_data_;
 			}
