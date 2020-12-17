@@ -13,6 +13,7 @@ File:	IonCamera.h
 #ifndef ION_CAMERA_H
 #define ION_CAMERA_H
 
+#include <array>
 #include <optional>
 
 #include "events/IonEventGenerator.h"
@@ -111,6 +112,14 @@ namespace ion::graphics::scene
 
 			//Start capturing the scene from the viewpoint of this camera, with the given viewport
 			void CaptureScene(const render::Viewport &viewport) noexcept;
+
+
+			/*
+				View matrix
+			*/
+
+			//Returns the view matrix of this camera
+			[[nodiscard]] std::array<real, 16> ViewMatrix() const noexcept;
 	};
 } //ion::graphics::scene
 

@@ -184,6 +184,11 @@ void Model::Draw(shaders::ShaderProgram *shader_program) noexcept
 	Creating
 */
 
+render::Mesh& Model::CreateMesh()
+{
+	return Create(vbo_handle_, std::ssize(vertex_buffer_));
+}
+
 render::Mesh& Model::CreateMesh(const render::mesh::Vertices &vertices)
 {
 	reload_vertex_buffer_ = true;

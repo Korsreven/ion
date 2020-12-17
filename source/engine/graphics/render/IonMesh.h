@@ -104,16 +104,18 @@ namespace ion::graphics::render
 
 			std::optional<int> create_vertex_array_object(int vbo_handle) noexcept;
 			void delete_vertex_array_object(int vao_handle) noexcept;
-
-			void use_shader_program(int program_handle) noexcept;
+			
+			void bind_vertex_array_object(int vao_handle) noexcept;
 			void bind_vertex_buffer_object(int vbo_handle) noexcept;
-			void set_vertex_buffer_data(int vbo_handle, int vbo_offset, const vertex_storage_type &vertex_data) noexcept;
+			void bind_vbo_to_vao(int vao_handle, int vbo_handle) noexcept;
 
+			void set_vertex_buffer_data(int vbo_handle, int vbo_offset, const vertex_storage_type &vertex_data) noexcept;	
 			void set_vertex_attribute_pointers(int vertex_count, int vbo_offset) noexcept;
 			void set_vertex_attribute_pointers(int vertex_count, const vertex_storage_type &vertex_data) noexcept;
-
 			void set_vertex_pointers(int vertex_count, int vbo_offset) noexcept;
 			void set_vertex_pointers(int vertex_count, const vertex_storage_type &vertex_data) noexcept;
+
+			void use_shader_program(int program_handle) noexcept;
 
 			vertex_storage_type vertices_to_vertex_data(const Vertices &vertices);
 		} //detail
@@ -140,9 +142,12 @@ namespace ion::graphics::render
 			
 			mesh::detail::vertex_storage_type vertex_data_;
 			bool reload_vertex_array_ = false;
-			bool reload_vertex_data_ = false;
+			bool reload_vertex_data_ = false;		
 
 		public:
+
+			//Construct a new empty mesh
+			Mesh(std::optional<int> vbo_handle, int vbo_offset) noexcept;
 
 			//Construct a new mesh with the given VBO handle, offset and vertices
 			Mesh(std::optional<int> vbo_handle, int vbo_offset, const mesh::Vertices &vertices);
@@ -191,11 +196,52 @@ namespace ion::graphics::render
 			//Sets the VBO handle and offset to the given values
 			inline void VboHandle(std::optional<int> handle, int offset) noexcept
 			{
+				//New handle
 				if (vbo_handle_ != handle)
 				{
 					vbo_handle_ = handle;
 					vertex_buffer_offset_ = offset;
+
+					if (vao_handle_ && vbo_handle_)
+						mesh::detail::bind_vbo_to_vao(*vao_handle_, *vbo_handle_);
+				}
+				//Same handle new offset
+				else if (vertex_buffer_offset_ != offset)
+				{
+					vertex_buffer_offset_ = offset;		
+					reload_vertex_array_ = vertex_count_ > 0 && vao_handle_;
 					reload_vertex_data_ = vertex_count_ > 0;
+				}
+			}
+
+			//Sets the vertex data of this mesh to the given vertices
+			inline void VertexData(const mesh::Vertices &vertices) noexcept
+			{
+				auto new_vertex_count = std::ssize(vertices);
+
+				if (vertex_count_ < new_vertex_count)
+					vbo_handle_ = std::nullopt; //Request new resized vertex buffer
+				else
+					reload_vertex_data_ = vertex_count_ > 0;
+
+				vertex_count_ = new_vertex_count;
+				vertex_data_ = mesh::detail::vertices_to_vertex_data(vertices);
+			}
+
+			//Sets the vertex data of this mesh to the given raw vertex data
+			inline void VertexData(mesh::detail::vertex_storage_type vertex_data) noexcept
+			{
+				if (std::ssize(vertex_data) % mesh::detail::vertex_components == 0)
+				{
+					auto new_vertex_count = std::ssize(vertex_data) / mesh::detail::vertex_components;
+
+					if (vertex_count_ < new_vertex_count)
+						vbo_handle_ = std::nullopt; //Request new resized vertex buffer
+					else
+						reload_vertex_data_ = vertex_count_ > 0;
+
+					vertex_count_ = new_vertex_count;
+					vertex_data_ = std::move(vertex_data);
 				}
 			}
 

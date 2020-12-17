@@ -82,4 +82,16 @@ void Camera::CaptureScene(const render::Viewport &viewport) noexcept
 	detail::move_to(position_);
 }
 
+
+/*
+	View matrix
+*/
+
+std::array<real, 16> Camera::ViewMatrix() const noexcept
+{
+	std::array<real, 16> mat4;
+	glGetFloatv(GL_PROJECTION_MATRIX, std::data(mat4)); //TODO needs a view matrix per camera
+	return mat4;
+}
+
 } //ion::graphics::scene

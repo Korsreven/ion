@@ -164,6 +164,9 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
+			//Create an empty mesh
+			render::Mesh& CreateMesh();
+
 			//Create a mesh with the given vertices
 			render::Mesh& CreateMesh(const render::mesh::Vertices &vertices);
 

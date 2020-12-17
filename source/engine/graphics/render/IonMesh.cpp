@@ -76,10 +76,7 @@ std::optional<int> create_vertex_array_object(int vbo_handle) noexcept
 
 	if (handle > 0)
 	{
-		glBindVertexArray(handle);
-		bind_vertex_buffer_object(vbo_handle);
-		glBindVertexArray(0);
-
+		bind_vbo_to_vao(handle, vbo_handle);
 		return handle;
 	}
 	else
@@ -98,16 +95,13 @@ void delete_vertex_array_object(int vao_handle) noexcept
 }
 
 
-void use_shader_program(int program_handle) noexcept
+void bind_vertex_array_object(int vao_handle) noexcept
 {
-	switch (gl::Shader_Support())
+	switch (gl::VertexArrayObject_Support())
 	{
 		case gl::Extension::Core:
-		glUseProgram(program_handle);
-		break;
-
 		case gl::Extension::ARB:
-		glUseProgramObjectARB(program_handle);
+		glBindVertexArray(vao_handle);
 		break;
 	}
 }
@@ -126,6 +120,14 @@ void bind_vertex_buffer_object(int vbo_handle) noexcept
 	}
 }
 
+void bind_vbo_to_vao(int vao_handle, int vbo_handle) noexcept
+{
+	glBindVertexArray(vao_handle);
+	bind_vertex_buffer_object(vbo_handle);
+	glBindVertexArray(0);
+}
+
+
 void set_vertex_buffer_data(int vbo_handle, int vbo_offset, const vertex_storage_type &vertex_data) noexcept
 {
 	bind_vertex_buffer_object(vbo_handle);
@@ -133,7 +135,6 @@ void set_vertex_buffer_data(int vbo_handle, int vbo_offset, const vertex_storage
 		std::size(vertex_data) * sizeof(real), std::data(vertex_data));
 	bind_vertex_buffer_object(0);
 }
-
 
 void set_vertex_attribute_pointers(int vertex_count, int vbo_offset) noexcept
 {
@@ -172,7 +173,6 @@ void set_vertex_attribute_pointers(int vertex_count, const vertex_storage_type &
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
 }
-
 
 void set_vertex_pointers(int vertex_count, int vbo_offset) noexcept
 {
@@ -213,6 +213,21 @@ void set_vertex_pointers(int vertex_count, const vertex_storage_type &vertex_dat
 }
 
 
+void use_shader_program(int program_handle) noexcept
+{
+	switch (gl::Shader_Support())
+	{
+		case gl::Extension::Core:
+		glUseProgram(program_handle);
+		break;
+
+		case gl::Extension::ARB:
+		glUseProgramObjectARB(program_handle);
+		break;
+	}
+}
+
+
 vertex_storage_type vertices_to_vertex_data(const Vertices &vertices)
 {
 	vertex_storage_type vertex_data;
@@ -246,12 +261,20 @@ vertex_storage_type vertices_to_vertex_data(const Vertices &vertices)
 } //mesh::detail
 
 
+Mesh::Mesh(std::optional<int> vbo_handle, int vbo_offset) noexcept :
+
+	vao_handle_{vbo_handle ? detail::create_vertex_array_object(*vbo_handle) : std::nullopt},
+	vertex_buffer_offset_{vbo_handle ? vbo_offset : 0}
+{
+	//Empty
+}
+
 Mesh::Mesh(std::optional<int> vbo_handle, int vbo_offset, const mesh::Vertices &vertices) :
 
 	vertex_count_{std::ssize(vertices)},
 
 	vao_handle_{vbo_handle ? detail::create_vertex_array_object(*vbo_handle) : std::nullopt},
-	vertex_buffer_offset_{vbo_offset},
+	vertex_buffer_offset_{vbo_handle ? vbo_offset : 0},
 
 	vertex_data_{detail::vertices_to_vertex_data(vertices)},
 	reload_vertex_array_{vertex_count_ > 0 && vao_handle_}
@@ -265,7 +288,7 @@ Mesh::Mesh(std::optional<int> vbo_handle, int vbo_offset, detail::vertex_storage
 		std::ssize(vertex_data) / detail::vertex_components : 0},
 
 	vao_handle_{vbo_handle ? detail::create_vertex_array_object(*vbo_handle) : std::nullopt},
-	vertex_buffer_offset_{vbo_offset},
+	vertex_buffer_offset_{vbo_handle ? vbo_offset : 0},
 
 	vertex_data_{vertex_count_ > 0 ? std::move(vertex_data) : decltype(vertex_data){}},
 	reload_vertex_array_{vertex_count_ > 0 && vao_handle_}
@@ -315,9 +338,9 @@ void Mesh::Prepare() noexcept
 	{
 		if (vao_handle_)
 		{
-			glBindVertexArray(*vao_handle_);
+			detail::bind_vertex_array_object(*vao_handle_);
 			detail::set_vertex_attribute_pointers(vertex_count_, vertex_buffer_offset_);
-			glBindVertexArray(0);
+			detail::bind_vertex_array_object(0);
 		}
 
 		reload_vertex_array_ = false;
@@ -384,12 +407,12 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 
 
 	if (vao_handle_)
-		glBindVertexArray(*vao_handle_);
+		detail::bind_vertex_array_object(*vao_handle_);
 
 	glDrawArrays(detail::mesh_draw_mode_to_gl_draw_mode(draw_mode_), 0, vertex_count_);
 
 	if (vao_handle_)
-		glBindVertexArray(0);
+		detail::bind_vertex_array_object(0);
 
 
 	//Shaders
