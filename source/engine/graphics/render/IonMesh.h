@@ -101,12 +101,19 @@ namespace ion::graphics::render
 
 
 			int mesh_draw_mode_to_gl_draw_mode(MeshDrawMode draw_mode) noexcept;
+			vertex_storage_type vertices_to_vertex_data(const Vertices &vertices);
+
+
+			/*
+				Graphics API
+			*/
 
 			std::optional<int> create_vertex_array_object() noexcept;
 			void delete_vertex_array_object(int vao_handle) noexcept;
 			
 			void bind_vertex_array_object(int vao_handle) noexcept;
 			void bind_vertex_buffer_object(int vbo_handle) noexcept;
+			void bind_vertex_attributes(int vao_handle, int vbo_handle, int vertex_count, int vbo_offset) noexcept;
 
 			void set_vertex_buffer_sub_data(int vbo_handle, int vbo_offset, const vertex_storage_type &vertex_data) noexcept;	
 			void set_vertex_attribute_pointers(int vertex_count, int vbo_offset) noexcept;
@@ -114,9 +121,7 @@ namespace ion::graphics::render
 			void set_vertex_pointers(int vertex_count, int vbo_offset) noexcept;
 			void set_vertex_pointers(int vertex_count, const vertex_storage_type &vertex_data) noexcept;
 
-			void use_shader_program(int program_handle) noexcept;
-
-			vertex_storage_type vertices_to_vertex_data(const Vertices &vertices);
+			void use_shader_program(int program_handle) noexcept;		
 		} //detail
 	} //mesh
 
@@ -145,11 +150,11 @@ namespace ion::graphics::render
 
 		public:
 
-			//Construct a new mesh with the given VBO handle, offset and vertices
-			Mesh(std::optional<int> vbo_handle, int vbo_offset, const mesh::Vertices &vertices);
+			//Construct a new mesh with the given vertices
+			Mesh(const mesh::Vertices &vertices);
 
-			//Construct a new mesh with the given VBO handle, offset and raw vertex data
-			Mesh(std::optional<int> vbo_handle, int vbo_offset, mesh::detail::vertex_storage_type vertex_data);
+			//Construct a new mesh with the given raw vertex data
+			Mesh(mesh::detail::vertex_storage_type vertex_data);
 
 			//Destructor
 			~Mesh() noexcept;
@@ -172,7 +177,7 @@ namespace ion::graphics::render
 				if (material_ != material)
 				{
 					material_ = material;
-					reload_vertex_data_ = true;
+					reload_vertex_data_ = vbo_handle_ && vertex_count_ > 0;
 				}
 			}
 
@@ -196,8 +201,7 @@ namespace ion::graphics::render
 				{
 					vbo_handle_ = handle;
 					vertex_buffer_offset_ = offset;
-					//reload_vertex_data_ = true; //Already done by model
-					rebind_vertex_attributes_ = true;
+					rebind_vertex_attributes_ = vbo_handle_ && vertex_count_ > 0;
 				}
 			}
 

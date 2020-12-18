@@ -38,6 +38,26 @@ int model_buffer_usage_to_gl_buffer_usage(ModelBufferUsage buffer_usage) noexcep
 	}
 }
 
+ModelBufferUsage gl_buffer_usage_to_model_buffer_usage(int buffer_usage) noexcept
+{
+	switch (buffer_usage)
+	{
+		case GL_DYNAMIC_DRAW:
+		return ModelBufferUsage::Dynamic;
+
+		case GL_STREAM_DRAW:
+		return ModelBufferUsage::Stream;
+
+		case GL_STATIC_DRAW:
+		default:
+		return ModelBufferUsage::Static;
+	}
+}
+
+
+/*
+	Graphics API
+*/
 
 std::optional<int> create_vertex_buffer_object() noexcept
 {
@@ -116,6 +136,26 @@ int get_vertex_buffer_size(int vbo_handle) noexcept
 	return size / sizeof(real);
 }
 
+ModelBufferUsage get_vertex_buffer_usage(int vbo_handle) noexcept
+{
+	auto usage = 0;
+	render::mesh::detail::bind_vertex_buffer_object(vbo_handle);
+
+	switch (gl::VertexBufferObject_Support())
+	{
+		case gl::Extension::Core:
+		glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_USAGE, &usage);
+		break;
+
+		case gl::Extension::ARB:
+		glGetBufferParameterivARB(GL_ARRAY_BUFFER_ARB, GL_BUFFER_USAGE_ARB, &usage);
+		break;
+	}
+
+	render::mesh::detail::bind_vertex_buffer_object(0);
+	return gl_buffer_usage_to_model_buffer_usage(usage);
+}
+
 } //model::detail
 
 
@@ -137,18 +177,10 @@ void Model::FetchVertexData()
 
 //Public
 
-Model::Model() :
-	vbo_handle_{detail::create_vertex_buffer_object()}
-{
-	//Empty
-}
-
-Model::Model(model::ModelBufferUsage buffer_usage, bool visible) :
+Model::Model(model::ModelBufferUsage buffer_usage, bool visible) noexcept :
 
 	buffer_usage_{buffer_usage},
-	visible_{visible},
-
-	vbo_handle_{detail::create_vertex_buffer_object()}
+	visible_{visible}
 {
 	//Empty
 }
@@ -182,6 +214,9 @@ void Model::Prepare() noexcept
 {
 	if (reload_vertex_buffer_)
 	{
+		if (!vbo_handle_)
+			vbo_handle_ = detail::create_vertex_buffer_object();
+
 		if (vbo_handle_)
 		{
 			if (std::empty(vertex_buffer_))
@@ -189,10 +224,12 @@ void Model::Prepare() noexcept
 
 			if (!std::empty(vertex_buffer_))
 			{
-				//Buffer size is too small, replace with new buffer
-				if (detail::get_vertex_buffer_size(*vbo_handle_) < std::ssize(vertex_buffer_))
+				//Reallocate new buffer
+				if (detail::get_vertex_buffer_size(*vbo_handle_) < std::ssize(vertex_buffer_) ||
+					detail::get_vertex_buffer_usage(*vbo_handle_) != buffer_usage_)
+
 					detail::set_vertex_buffer_data(*vbo_handle_, buffer_usage_, vertex_buffer_); //Send to VRAM
-				//Use same buffer
+				//Reuse same buffer
 				else
 					render::mesh::detail::set_vertex_buffer_sub_data(*vbo_handle_, 0, vertex_buffer_); //Send to VRAM
 
@@ -230,13 +267,13 @@ void Model::Draw(shaders::ShaderProgram *shader_program) noexcept
 render::Mesh& Model::CreateMesh(const render::mesh::Vertices &vertices)
 {
 	reload_vertex_buffer_ = !std::empty(vertices);
-	return Create(vbo_handle_, std::ssize(vertex_buffer_), vertices);
+	return Create(vertices);
 }
 
 render::Mesh& Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data)
 {
 	reload_vertex_buffer_ = !std::empty(vertex_data);
-	return Create(vbo_handle_, std::ssize(vertex_buffer_), std::move(vertex_data));
+	return Create(std::move(vertex_data));
 }
 
 

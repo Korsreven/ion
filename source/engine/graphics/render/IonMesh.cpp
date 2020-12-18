@@ -61,6 +61,40 @@ int mesh_draw_mode_to_gl_draw_mode(MeshDrawMode draw_mode) noexcept
 	}
 }
 
+vertex_storage_type vertices_to_vertex_data(const Vertices &vertices)
+{
+	vertex_storage_type vertex_data;
+	vertex_data.reserve(std::ssize(vertices) * vertex_components);
+
+	//Insert positions
+	for (auto &vertex : vertices)
+	{
+		vertex_data.insert(std::end(vertex_data), vertex.position.Components(), vertex.position.Components() + 2);
+		vertex_data.push_back(-1.0_r); //z
+	}
+
+	//Insert normals
+	for (auto &vertex : vertices)
+	{
+		vertex_data.insert(std::end(vertex_data), vertex.normal.Components(), vertex.normal.Components() + 2);
+		vertex_data.push_back(1.0_r); //z
+	}
+
+	//Insert colors
+	for (auto &vertex : vertices)
+		vertex_data.insert(std::end(vertex_data), vertex.color.Channels(), vertex.color.Channels() + 4);
+
+	//insert tex coords
+	for (auto &vertex : vertices)
+		vertex_data.insert(std::end(vertex_data), vertex.tex_coord.Components(), vertex.tex_coord.Components() + 2);
+
+	return vertex_data;
+}
+
+
+/*
+	Graphics API
+*/
 
 std::optional<int> create_vertex_array_object() noexcept
 {
@@ -115,6 +149,14 @@ void bind_vertex_buffer_object(int vbo_handle) noexcept
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo_handle);
 		break;
 	}
+}
+
+void bind_vertex_attributes(int vao_handle, int vbo_handle, int vertex_count, int vbo_offset) noexcept
+{
+	bind_vertex_array_object(vao_handle);
+	bind_vertex_buffer_object(vbo_handle);
+	set_vertex_attribute_pointers(vertex_count, vbo_offset);
+	bind_vertex_array_object(0);
 }
 
 
@@ -229,65 +271,22 @@ void use_shader_program(int program_handle) noexcept
 	}
 }
 
-
-vertex_storage_type vertices_to_vertex_data(const Vertices &vertices)
-{
-	vertex_storage_type vertex_data;
-	vertex_data.reserve(std::ssize(vertices) * vertex_components);
-
-	//Insert positions
-	for (auto &vertex : vertices)
-	{
-		vertex_data.insert(std::end(vertex_data), vertex.position.Components(), vertex.position.Components() + 2);
-		vertex_data.push_back(-1.0_r); //z
-	}
-
-	//Insert normals
-	for (auto &vertex : vertices)
-	{
-		vertex_data.insert(std::end(vertex_data), vertex.normal.Components(), vertex.normal.Components() + 2);
-		vertex_data.push_back(1.0_r); //z
-	}
-
-	//Insert colors
-	for (auto &vertex : vertices)
-		vertex_data.insert(std::end(vertex_data), vertex.color.Channels(), vertex.color.Channels() + 4);
-
-	//insert tex coords
-	for (auto &vertex : vertices)
-		vertex_data.insert(std::end(vertex_data), vertex.tex_coord.Components(), vertex.tex_coord.Components() + 2);
-
-	return vertex_data;
-}
-
 } //mesh::detail
 
 
-Mesh::Mesh(std::optional<int> vbo_handle, int vbo_offset, const mesh::Vertices &vertices) :
+Mesh::Mesh(const mesh::Vertices &vertices) :
 
 	vertex_count_{std::ssize(vertices)},
-
-	vao_handle_{vertex_count_ > 0 ? detail::create_vertex_array_object() : std::nullopt},
-	vbo_handle_{vbo_handle},
-	vertex_buffer_offset_{vbo_offset},
-
-	vertex_data_{detail::vertices_to_vertex_data(vertices)},
-	rebind_vertex_attributes_{vertex_count_ > 0 && vao_handle_ && vbo_handle_}
+	vertex_data_{detail::vertices_to_vertex_data(vertices)}
 {
 	//Empty
 }
 
-Mesh::Mesh(std::optional<int> vbo_handle, int vbo_offset, detail::vertex_storage_type vertex_data) :
+Mesh::Mesh(detail::vertex_storage_type vertex_data) :
 
 	vertex_count_{std::ssize(vertex_data) % detail::vertex_components == 0 ?
 		std::ssize(vertex_data) / detail::vertex_components : 0},
-
-	vao_handle_{vertex_count_ > 0 ? detail::create_vertex_array_object() : std::nullopt},
-	vbo_handle_{vbo_handle},
-	vertex_buffer_offset_{vbo_offset},
-
-	vertex_data_{vertex_count_ > 0 ? std::move(vertex_data) : decltype(vertex_data){}},
-	rebind_vertex_attributes_{vertex_count_ > 0 && vao_handle_ && vbo_handle_}
+	vertex_data_{vertex_count_ > 0 ? std::move(vertex_data) : decltype(vertex_data){}}
 {
 	//Empty
 }
@@ -311,7 +310,7 @@ void Mesh::VertexColor(const Color &color) noexcept
 			std::copy(color.Channels(), color.Channels() + 4,
 				std::begin(vertex_data_) + detail::color_data_offset(vertex_count_) + (i * detail::color_components));
 
-		reload_vertex_data_ = true;
+		reload_vertex_data_ = vbo_handle_ && vertex_count_ > 0;
 	}
 }
 
@@ -332,12 +331,13 @@ void Mesh::Prepare() noexcept
 
 	if (rebind_vertex_attributes_)
 	{
-		if (vao_handle_ && vbo_handle_ && vertex_count_ > 0)
+		if (vbo_handle_ && vertex_count_ > 0)
 		{
-			detail::bind_vertex_array_object(*vao_handle_);
-			detail::bind_vertex_buffer_object(*vbo_handle_);
-			detail::set_vertex_attribute_pointers(vertex_count_, vertex_buffer_offset_);
-			detail::bind_vertex_array_object(0);
+			if (!vao_handle_)
+				vao_handle_ = detail::create_vertex_array_object();
+
+			if (vao_handle_)
+				detail::bind_vertex_attributes(*vao_handle_, *vbo_handle_, vertex_count_, vertex_buffer_offset_);
 		}
 
 		rebind_vertex_attributes_ = false;

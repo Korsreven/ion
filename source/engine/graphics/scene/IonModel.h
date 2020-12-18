@@ -41,6 +41,12 @@ namespace ion::graphics::scene
 		namespace detail
 		{
 			int model_buffer_usage_to_gl_buffer_usage(ModelBufferUsage buffer_usage) noexcept;
+			ModelBufferUsage gl_buffer_usage_to_model_buffer_usage(int buffer_usage) noexcept;
+
+
+			/*
+				Graphics API
+			*/
 
 			std::optional<int> create_vertex_buffer_object() noexcept;
 			void delete_vertex_buffer_object(int vbo_handle) noexcept;
@@ -48,6 +54,7 @@ namespace ion::graphics::scene
 			void set_vertex_buffer_data(int vbo_handle, ModelBufferUsage buffer_usage,
 				const render::mesh::detail::vertex_storage_type &vertex_buffer) noexcept;
 			int get_vertex_buffer_size(int vbo_handle) noexcept;
+			ModelBufferUsage get_vertex_buffer_usage(int vbo_handle) noexcept;
 		} //detail
 	} //model
 
@@ -73,11 +80,11 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new static model
-			Model();
+			//Default constructor
+			Model() = default;
 
 			//Construct a new model with the given vertex buffer usage pattern and visibility
-			Model(model::ModelBufferUsage buffer_usage, bool visible = true);
+			Model(model::ModelBufferUsage buffer_usage, bool visible = true) noexcept;
 
 			//Destructor
 			~Model() noexcept;
@@ -112,7 +119,7 @@ namespace ion::graphics::scene
 				if (buffer_usage_ != buffer_usage)
 				{
 					buffer_usage_ = buffer_usage;
-					reload_vertex_buffer_ = true;
+					reload_vertex_buffer_ = !!vbo_handle_;
 				}
 			}
 
