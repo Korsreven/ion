@@ -79,9 +79,41 @@ void set_vertex_buffer_data(int vbo_handle, ModelBufferUsage buffer_usage,
 	const render::mesh::detail::vertex_storage_type &vertex_buffer) noexcept
 {
 	render::mesh::detail::bind_vertex_buffer_object(vbo_handle);
-	glBufferData(GL_ARRAY_BUFFER, std::size(vertex_buffer) * sizeof(real),
-		std::data(vertex_buffer), model_buffer_usage_to_gl_buffer_usage(buffer_usage));
+
+	switch (gl::VertexBufferObject_Support())
+	{
+		case gl::Extension::Core:
+		glBufferData(GL_ARRAY_BUFFER, std::size(vertex_buffer) * sizeof(real),
+			std::data(vertex_buffer), model_buffer_usage_to_gl_buffer_usage(buffer_usage));
+		break;
+
+		case gl::Extension::ARB:
+		glBufferDataARB(GL_ARRAY_BUFFER_ARB, std::size(vertex_buffer) * sizeof(real),
+			std::data(vertex_buffer), model_buffer_usage_to_gl_buffer_usage(buffer_usage));
+		break;
+	}
+
 	render::mesh::detail::bind_vertex_buffer_object(0);
+}
+
+int get_vertex_buffer_size(int vbo_handle) noexcept
+{
+	auto size = 0;
+	render::mesh::detail::bind_vertex_buffer_object(vbo_handle);
+
+	switch (gl::VertexBufferObject_Support())
+	{
+		case gl::Extension::Core:
+		glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+		break;
+
+		case gl::Extension::ARB:
+		glGetBufferParameterivARB(GL_ARRAY_BUFFER_ARB, GL_BUFFER_SIZE_ARB, &size);
+		break;
+	}
+
+	render::mesh::detail::bind_vertex_buffer_object(0);
+	return size / sizeof(real);
 }
 
 } //model::detail
@@ -157,11 +189,22 @@ void Model::Prepare() noexcept
 
 			if (!std::empty(vertex_buffer_))
 			{
-				detail::set_vertex_buffer_data(*vbo_handle_, buffer_usage_, vertex_buffer_); //Send to VRAM
+				//Buffer size is too small, replace with new buffer
+				if (detail::get_vertex_buffer_size(*vbo_handle_) < std::ssize(vertex_buffer_))
+					detail::set_vertex_buffer_data(*vbo_handle_, buffer_usage_, vertex_buffer_); //Send to VRAM
+				//Use same buffer
+				else
+					render::mesh::detail::set_vertex_buffer_sub_data(*vbo_handle_, 0, vertex_buffer_); //Send to VRAM
 
 				//Vertex data has been loaded to VRAM, clear RAM
 				vertex_buffer_.clear();
 				vertex_buffer_.shrink_to_fit();
+
+				for (auto offset = 0; auto &mesh : Meshes())
+				{
+					mesh.VboHandle(vbo_handle_, offset);
+					offset += std::ssize(mesh.VertexData());
+				}
 			}
 		}
 
@@ -184,40 +227,29 @@ void Model::Draw(shaders::ShaderProgram *shader_program) noexcept
 	Creating
 */
 
-render::Mesh& Model::CreateMesh()
-{
-	return Create(vbo_handle_, std::ssize(vertex_buffer_));
-}
-
 render::Mesh& Model::CreateMesh(const render::mesh::Vertices &vertices)
 {
-	reload_vertex_buffer_ = true;
+	reload_vertex_buffer_ = !std::empty(vertices);
 	return Create(vbo_handle_, std::ssize(vertex_buffer_), vertices);
 }
 
 render::Mesh& Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data)
 {
-	reload_vertex_buffer_ = true;
+	reload_vertex_buffer_ = !std::empty(vertex_data);
 	return Create(vbo_handle_, std::ssize(vertex_buffer_), std::move(vertex_data));
 }
 
 
 render::Mesh& Model::CreateMesh(const render::Mesh &mesh)
 {
-	reload_vertex_buffer_ = true;
-
-	auto &ref = Create(mesh);
-	ref.VboHandle(vbo_handle_, std::ssize(vertex_buffer_));
-	return ref;
+	reload_vertex_buffer_ = mesh.VertexCount() > 0;
+	return Create(mesh);
 }
 
 render::Mesh& Model::CreateMesh(render::Mesh &&mesh)
 {
-	reload_vertex_buffer_ = true;
-
-	auto &ref = Create(std::move(mesh));
-	ref.VboHandle(vbo_handle_, std::ssize(vertex_buffer_));
-	return ref;
+	reload_vertex_buffer_ = mesh.VertexCount() > 0;
+	return Create(std::move(mesh));
 }
 
 

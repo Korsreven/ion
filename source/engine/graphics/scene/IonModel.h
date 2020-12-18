@@ -47,6 +47,7 @@ namespace ion::graphics::scene
 
 			void set_vertex_buffer_data(int vbo_handle, ModelBufferUsage buffer_usage,
 				const render::mesh::detail::vertex_storage_type &vertex_buffer) noexcept;
+			int get_vertex_buffer_size(int vbo_handle) noexcept;
 		} //detail
 	} //model
 
@@ -163,9 +164,6 @@ namespace ion::graphics::scene
 				Meshes
 				Creating
 			*/
-
-			//Create an empty mesh
-			render::Mesh& CreateMesh();
 
 			//Create a mesh with the given vertices
 			render::Mesh& CreateMesh(const render::mesh::Vertices &vertices);

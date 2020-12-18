@@ -102,14 +102,13 @@ namespace ion::graphics::render
 
 			int mesh_draw_mode_to_gl_draw_mode(MeshDrawMode draw_mode) noexcept;
 
-			std::optional<int> create_vertex_array_object(int vbo_handle) noexcept;
+			std::optional<int> create_vertex_array_object() noexcept;
 			void delete_vertex_array_object(int vao_handle) noexcept;
 			
 			void bind_vertex_array_object(int vao_handle) noexcept;
 			void bind_vertex_buffer_object(int vbo_handle) noexcept;
-			void bind_vbo_to_vao(int vao_handle, int vbo_handle) noexcept;
 
-			void set_vertex_buffer_data(int vbo_handle, int vbo_offset, const vertex_storage_type &vertex_data) noexcept;	
+			void set_vertex_buffer_sub_data(int vbo_handle, int vbo_offset, const vertex_storage_type &vertex_data) noexcept;	
 			void set_vertex_attribute_pointers(int vertex_count, int vbo_offset) noexcept;
 			void set_vertex_attribute_pointers(int vertex_count, const vertex_storage_type &vertex_data) noexcept;
 			void set_vertex_pointers(int vertex_count, int vbo_offset) noexcept;
@@ -141,13 +140,10 @@ namespace ion::graphics::render
 			std::optional<Sphere> sphere_;
 			
 			mesh::detail::vertex_storage_type vertex_data_;
-			bool reload_vertex_array_ = false;
-			bool reload_vertex_data_ = false;		
+			bool reload_vertex_data_ = false;
+			bool rebind_vertex_attributes_ = false;
 
 		public:
-
-			//Construct a new empty mesh
-			Mesh(std::optional<int> vbo_handle, int vbo_offset) noexcept;
 
 			//Construct a new mesh with the given VBO handle, offset and vertices
 			Mesh(std::optional<int> vbo_handle, int vbo_offset, const mesh::Vertices &vertices);
@@ -176,7 +172,7 @@ namespace ion::graphics::render
 				if (material_ != material)
 				{
 					material_ = material;
-					reload_vertex_data_ = vertex_count_ > 0;
+					reload_vertex_data_ = true;
 				}
 			}
 
@@ -196,52 +192,12 @@ namespace ion::graphics::render
 			//Sets the VBO handle and offset to the given values
 			inline void VboHandle(std::optional<int> handle, int offset) noexcept
 			{
-				//New handle
-				if (vbo_handle_ != handle)
+				if (vbo_handle_ != handle || vertex_buffer_offset_ != offset)
 				{
 					vbo_handle_ = handle;
 					vertex_buffer_offset_ = offset;
-
-					if (vao_handle_ && vbo_handle_)
-						mesh::detail::bind_vbo_to_vao(*vao_handle_, *vbo_handle_);
-				}
-				//Same handle new offset
-				else if (vertex_buffer_offset_ != offset)
-				{
-					vertex_buffer_offset_ = offset;		
-					reload_vertex_array_ = vertex_count_ > 0 && vao_handle_;
-					reload_vertex_data_ = vertex_count_ > 0;
-				}
-			}
-
-			//Sets the vertex data of this mesh to the given vertices
-			inline void VertexData(const mesh::Vertices &vertices) noexcept
-			{
-				auto new_vertex_count = std::ssize(vertices);
-
-				if (vertex_count_ < new_vertex_count)
-					vbo_handle_ = std::nullopt; //Request new resized vertex buffer
-				else
-					reload_vertex_data_ = vertex_count_ > 0;
-
-				vertex_count_ = new_vertex_count;
-				vertex_data_ = mesh::detail::vertices_to_vertex_data(vertices);
-			}
-
-			//Sets the vertex data of this mesh to the given raw vertex data
-			inline void VertexData(mesh::detail::vertex_storage_type vertex_data) noexcept
-			{
-				if (std::ssize(vertex_data) % mesh::detail::vertex_components == 0)
-				{
-					auto new_vertex_count = std::ssize(vertex_data) / mesh::detail::vertex_components;
-
-					if (vertex_count_ < new_vertex_count)
-						vbo_handle_ = std::nullopt; //Request new resized vertex buffer
-					else
-						reload_vertex_data_ = vertex_count_ > 0;
-
-					vertex_count_ = new_vertex_count;
-					vertex_data_ = std::move(vertex_data);
+					//reload_vertex_data_ = true; //Already done by model
+					rebind_vertex_attributes_ = true;
 				}
 			}
 
@@ -301,6 +257,7 @@ namespace ion::graphics::render
 				return vbo_handle_;
 			}
 
+
 			//Returns all of the vertex data from this mesh
 			[[nodiscard]] inline const auto& VertexData() const noexcept
 			{
@@ -313,7 +270,7 @@ namespace ion::graphics::render
 			*/
 
 			//Sets all vertices of the mesh to the given color
-			//Does only apply if no materials is attached to this mesh
+			//Applies only if no materials is attached to this mesh
 			void VertexColor(const Color &color) noexcept;
 
 

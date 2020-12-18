@@ -62,7 +62,7 @@ int mesh_draw_mode_to_gl_draw_mode(MeshDrawMode draw_mode) noexcept
 }
 
 
-std::optional<int> create_vertex_array_object(int vbo_handle) noexcept
+std::optional<int> create_vertex_array_object() noexcept
 {
 	auto handle = 0;
 
@@ -75,10 +75,7 @@ std::optional<int> create_vertex_array_object(int vbo_handle) noexcept
 	}
 
 	if (handle > 0)
-	{
-		bind_vbo_to_vao(handle, vbo_handle);
 		return handle;
-	}
 	else
 		return {};
 }
@@ -120,19 +117,24 @@ void bind_vertex_buffer_object(int vbo_handle) noexcept
 	}
 }
 
-void bind_vbo_to_vao(int vao_handle, int vbo_handle) noexcept
-{
-	glBindVertexArray(vao_handle);
-	bind_vertex_buffer_object(vbo_handle);
-	glBindVertexArray(0);
-}
 
-
-void set_vertex_buffer_data(int vbo_handle, int vbo_offset, const vertex_storage_type &vertex_data) noexcept
+void set_vertex_buffer_sub_data(int vbo_handle, int vbo_offset, const vertex_storage_type &vertex_data) noexcept
 {
-	bind_vertex_buffer_object(vbo_handle);
-	glBufferSubData(GL_ARRAY_BUFFER, vbo_offset * sizeof(real),
-		std::size(vertex_data) * sizeof(real), std::data(vertex_data));
+	bind_vertex_buffer_object(vbo_handle);	
+
+	switch (gl::VertexBufferObject_Support())
+	{
+		case gl::Extension::Core:
+		glBufferSubData(GL_ARRAY_BUFFER, vbo_offset * sizeof(real),
+			std::size(vertex_data) * sizeof(real), std::data(vertex_data));
+		break;
+
+		case gl::Extension::ARB:
+		glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, vbo_offset * sizeof(real),
+			std::size(vertex_data) * sizeof(real), std::data(vertex_data));
+		break;
+	}
+
 	bind_vertex_buffer_object(0);
 }
 
@@ -261,23 +263,16 @@ vertex_storage_type vertices_to_vertex_data(const Vertices &vertices)
 } //mesh::detail
 
 
-Mesh::Mesh(std::optional<int> vbo_handle, int vbo_offset) noexcept :
-
-	vao_handle_{vbo_handle ? detail::create_vertex_array_object(*vbo_handle) : std::nullopt},
-	vertex_buffer_offset_{vbo_handle ? vbo_offset : 0}
-{
-	//Empty
-}
-
 Mesh::Mesh(std::optional<int> vbo_handle, int vbo_offset, const mesh::Vertices &vertices) :
 
 	vertex_count_{std::ssize(vertices)},
 
-	vao_handle_{vbo_handle ? detail::create_vertex_array_object(*vbo_handle) : std::nullopt},
-	vertex_buffer_offset_{vbo_handle ? vbo_offset : 0},
+	vao_handle_{vertex_count_ > 0 ? detail::create_vertex_array_object() : std::nullopt},
+	vbo_handle_{vbo_handle},
+	vertex_buffer_offset_{vbo_offset},
 
 	vertex_data_{detail::vertices_to_vertex_data(vertices)},
-	reload_vertex_array_{vertex_count_ > 0 && vao_handle_}
+	rebind_vertex_attributes_{vertex_count_ > 0 && vao_handle_ && vbo_handle_}
 {
 	//Empty
 }
@@ -287,11 +282,12 @@ Mesh::Mesh(std::optional<int> vbo_handle, int vbo_offset, detail::vertex_storage
 	vertex_count_{std::ssize(vertex_data) % detail::vertex_components == 0 ?
 		std::ssize(vertex_data) / detail::vertex_components : 0},
 
-	vao_handle_{vbo_handle ? detail::create_vertex_array_object(*vbo_handle) : std::nullopt},
-	vertex_buffer_offset_{vbo_handle ? vbo_offset : 0},
+	vao_handle_{vertex_count_ > 0 ? detail::create_vertex_array_object() : std::nullopt},
+	vbo_handle_{vbo_handle},
+	vertex_buffer_offset_{vbo_offset},
 
 	vertex_data_{vertex_count_ > 0 ? std::move(vertex_data) : decltype(vertex_data){}},
-	reload_vertex_array_{vertex_count_ > 0 && vao_handle_}
+	rebind_vertex_attributes_{vertex_count_ > 0 && vao_handle_ && vbo_handle_}
 {
 	//Empty
 }
@@ -315,7 +311,7 @@ void Mesh::VertexColor(const Color &color) noexcept
 			std::copy(color.Channels(), color.Channels() + 4,
 				std::begin(vertex_data_) + detail::color_data_offset(vertex_count_) + (i * detail::color_components));
 
-		reload_vertex_data_ = vertex_count_ > 0;
+		reload_vertex_data_ = true;
 	}
 }
 
@@ -328,22 +324,23 @@ void Mesh::Prepare() noexcept
 {
 	if (reload_vertex_data_)
 	{
-		if (vbo_handle_)
-			detail::set_vertex_buffer_data(*vbo_handle_, vertex_buffer_offset_, vertex_data_);
+		if (vbo_handle_ && vertex_count_ > 0)
+			detail::set_vertex_buffer_sub_data(*vbo_handle_, vertex_buffer_offset_, vertex_data_); //Send to VRAM
 
 		reload_vertex_data_ = false;
 	}
 
-	if (reload_vertex_array_)
+	if (rebind_vertex_attributes_)
 	{
-		if (vao_handle_)
+		if (vao_handle_ && vbo_handle_ && vertex_count_ > 0)
 		{
 			detail::bind_vertex_array_object(*vao_handle_);
+			detail::bind_vertex_buffer_object(*vbo_handle_);
 			detail::set_vertex_attribute_pointers(vertex_count_, vertex_buffer_offset_);
 			detail::bind_vertex_array_object(0);
 		}
 
-		reload_vertex_array_ = false;
+		rebind_vertex_attributes_ = false;
 	}
 }
 
@@ -354,13 +351,14 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 		return;
 
 	auto has_supported_attributes = false;
+	auto use_vao = vao_handle_ && vbo_handle_;
 
 	//Use shaders
 	if (shader_program && shader_program->Handle())
 	{
 		detail::use_shader_program(*shader_program->Handle());	
 
-		if (!vao_handle_)
+		if (!use_vao)
 		{
 			has_supported_attributes = true;
 
@@ -369,9 +367,7 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 				//VRAM
 				if (vbo_handle_)
 				{
-					if (!vao_handle_)
-						detail::bind_vertex_buffer_object(*vbo_handle_);
-
+					detail::bind_vertex_buffer_object(*vbo_handle_);
 					detail::set_vertex_attribute_pointers(vertex_count_, vertex_buffer_offset_);
 				}
 				else //RAM
@@ -392,7 +388,7 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 	}
 	else //Fixed-function pipeline
 	{
-		if (!vao_handle_)
+		if (!use_vao)
 		{
 			//VRAM
 			if (vbo_handle_)
@@ -406,19 +402,19 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 	}
 
 
-	if (vao_handle_)
+	if (use_vao)
 		detail::bind_vertex_array_object(*vao_handle_);
 
 	glDrawArrays(detail::mesh_draw_mode_to_gl_draw_mode(draw_mode_), 0, vertex_count_);
 
-	if (vao_handle_)
+	if (use_vao)
 		detail::bind_vertex_array_object(0);
 
 
 	//Shaders
 	if (shader_program && shader_program->Handle())
 	{
-		if (!vao_handle_)
+		if (!use_vao)
 		{
 			if (has_supported_attributes)
 			{
@@ -440,7 +436,7 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 	}
 	else //Fixed-function pipeline
 	{
-		if (!vao_handle_)
+		if (!use_vao)
 		{
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_NORMAL_ARRAY);
