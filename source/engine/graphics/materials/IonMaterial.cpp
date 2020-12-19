@@ -58,21 +58,24 @@ std::pair<Vector2, Vector2> get_unflipped_tex_coords(const Vector2 &lower_left, 
 	return {{ll_s, ll_t}, {ur_s, ur_t}};
 }
 
-std::pair<Vector2, Vector2> get_normalized_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right,
-	const Vector2 &min, const Vector2 &max) noexcept
+
+Vector2 get_normalized_tex_coords(const Vector2 &tex_coords, const Vector2 &min, const Vector2 &max) noexcept
 {
 	using namespace ion::utilities;
 
-	auto [ll_s, ll_t] = lower_left.XY();
-	auto [ur_s, ur_t] = upper_right.XY();
+	auto [s, t] = tex_coords.XY();
 	auto [min_s, min_t] = min.XY();
 	auto [max_s, max_t] = max.XY();
 
-	return {{math::Normalize(ll_s, 0.0_r, 1.0_r, min_s, max_s),
-			 math::Normalize(ll_t, 0.0_r, 1.0_r, min_t, max_t)},	
+	return {math::Normalize(s, 0.0_r, 1.0_r, min_s, max_s),
+			math::Normalize(t, 0.0_r, 1.0_r, min_t, max_t)};
+}
 
-			{math::Normalize(ur_s, 0.0_r, 1.0_r, min_s, max_s),
-			 math::Normalize(ur_t, 0.0_r, 1.0_r, min_t, max_t)}};
+std::pair<Vector2, Vector2> get_normalized_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right,
+	const Vector2 &min, const Vector2 &max) noexcept
+{
+	return {get_normalized_tex_coords(lower_left, min, max),
+			get_normalized_tex_coords(upper_right, min, max)};
 }
 
 
