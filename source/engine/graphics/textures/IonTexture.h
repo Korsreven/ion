@@ -236,8 +236,10 @@ namespace ion::graphics::textures
 				-> std::optional<std::pair<bool, bool>>
 			{
 				if (extents_)
-					return std::pair{extents_->Width == extents_->ActualWidth,
-									 extents_->Height == extents_->ActualHeight};
+					return std::pair{s_wrap_mode_ == texture::TextureWrapMode::Repeat &&
+										extents_->Width == extents_->ActualWidth,
+									 t_wrap_mode_ == texture::TextureWrapMode::Repeat &&
+										extents_->Height == extents_->ActualHeight};
 				else
 					return {};
 			}

@@ -519,6 +519,18 @@ namespace ion::graphics::utilities
 			//Rotate point by the given angle (radians) and origin vector
 			//Returns the result as a copy
 			[[nodiscard]] Vector2 RotateCopy(real angle, const Vector2 &origin) const noexcept;
+
+
+			/*
+				Scaling
+			*/
+
+			//Scale point by the given scaling vector and origin vector
+			Vector2& Scale(const Vector2 &scaling, const Vector2 &origin) noexcept;
+
+			//Scale point by the given scaling vector and origin vector
+			//Returns the result as a copy
+			[[nodiscard]] Vector2 ScaleCopy(const Vector2 &scaling, const Vector2 &origin) const noexcept;
 	};
 
 

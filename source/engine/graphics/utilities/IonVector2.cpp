@@ -334,4 +334,19 @@ Vector2 Vector2::RotateCopy(real angle, const Vector2 &origin) const noexcept
 	return (*this - origin).Deviant(angle) + origin;
 }
 
+
+/*
+	Scaling
+*/
+
+Vector2& Vector2::Scale(const Vector2 &scaling, const Vector2 &origin) noexcept
+{
+	return *this = ScaleCopy(scaling, origin);
+}
+
+Vector2 Vector2::ScaleCopy(const Vector2 &scaling, const Vector2 &origin) const noexcept
+{
+	return (*this - origin) * scaling + origin;
+}
+
 } //ion::graphics::utilities

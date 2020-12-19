@@ -45,14 +45,55 @@ namespace ion::graphics::materials
 			managed::ObservedObject<Texture>>;
 
 
-		inline auto get_tex_coords(real lower_left, real upper_right, real min, real max) noexcept
+		/*
+			Texure coordinates
+		*/
+
+		inline auto is_cropped(const Vector2 &lower_left, const Vector2 &upper_right) noexcept
 		{
-			//Tex coords are flipped
-			if (upper_right < lower_left)
-				return std::pair{max, min};
-			else
-				return std::pair{min, max};
+			auto [ll_s, ll_t] = lower_left.XY();
+			auto [ur_s, ur_t] = upper_right.XY();
+
+			return ll_s > 0.0_r || ll_t > 0.0_r ||
+				   ur_s < 1.0_r || ur_t < 1.0_r;
 		}
+
+		inline auto is_repeated(const Vector2 &lower_left, const Vector2 &upper_right) noexcept
+		{
+			auto [ll_s, ll_t] = lower_left.XY();
+			auto [ur_s, ur_t] = upper_right.XY();
+
+			return ll_s < 0.0_r || ll_t < 0.0_r ||
+				   ur_s > 1.0_r || ur_t > 1.0_r;
+		}
+
+		inline auto is_flipped_horizontally(const Vector2 &lower_left, const Vector2 &upper_right) noexcept
+		{
+			return upper_right.X() < lower_left.X();
+		}
+
+		inline auto is_flipped_vertically(const Vector2 &lower_left, const Vector2 &upper_right) noexcept
+		{
+			return upper_right.Y() < lower_left.Y();
+		}
+
+		std::pair<Vector2, Vector2> get_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right,
+			const Vector2 &new_lower_left, const Vector2 &new_upper_right) noexcept;
+		std::pair<Vector2, Vector2> get_unflipped_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right) noexcept;
+		std::pair<Vector2, Vector2> get_normalized_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right,
+			const Vector2 &min, const Vector2 &max) noexcept;
+
+
+		/*
+			Texture map
+		*/
+
+		std::pair<const Animation*, const Texture*> get_texture_maps(const map_type &map) noexcept;
+		const Texture* get_texture_map(const map_type &map) noexcept;
+		const Texture* get_first_texture_map(const map_type &diffuse_map, const map_type &specular_map, const map_type &normal_map) noexcept;
+
+		std::pair<bool, bool> is_texture_map_repeatable(const Texture &texture,
+			const Vector2 &lower_left, const Vector2 &upper_right) noexcept;
 	} //material::detail
 
 
@@ -69,8 +110,8 @@ namespace ion::graphics::materials
 			material::detail::map_type specular_map_;
 			material::detail::map_type normal_map_;
 
-			Vector2 lower_left_tex_coord_ = vector2::Zero;
-			Vector2 upper_right_tex_coord_ = vector2::UnitScale;
+			Vector2 lower_left_tex_coords_ = vector2::Zero;
+			Vector2 upper_right_tex_coords_ = vector2::UnitScale;
 			std::optional<Color> emissive_color_;
 			bool receive_shadows_ = true;
 
@@ -179,8 +220,8 @@ namespace ion::graphics::materials
 			//Sets the lower left and upper right texture coordinates for this material to the given coordinates
 			inline void TexCoords(const Vector2 &lower_left, const Vector2 &upper_right) noexcept
 			{
-				lower_left_tex_coord_ = lower_left;
-				upper_right_tex_coord_ = upper_right;
+				lower_left_tex_coords_ = lower_left;
+				upper_right_tex_coords_ = upper_right;
 			}
 
 			//Sets the emissive (self-illumination) color of this material to the given color
@@ -225,15 +266,15 @@ namespace ion::graphics::materials
 			}
 
 
-			//Returns the attached diffuse map as a pair of animation and texture
+			//Returns the attached diffuse map as a pair of either animation or texture
 			//Returns nullptr on both components if no diffuse map is in use
 			[[nodiscard]] std::pair<const Animation*, const Texture*> DiffuseMap() const noexcept;
 
-			//Returns the attached specular map as a pair of animation and texture
+			//Returns the attached specular map as a pair of either animation or texture
 			//Returns nullptr on both components if no specular map is in use
 			[[nodiscard]] std::pair<const Animation*, const Texture*> SpecularMap() const noexcept;
 
-			//Returns the attached normal map as a pair of animation and texture
+			//Returns the attached normal map as a pair of either animation or texture
 			//Returns nullptr on both components if no normal map is in use
 			[[nodiscard]] std::pair<const Animation*, const Texture*> NormalMap() const noexcept;
 
@@ -241,7 +282,7 @@ namespace ion::graphics::materials
 			//Returns the lower left and upper right texture coordinates for this material
 			[[nodiscard]] inline auto TexCoords() const noexcept
 			{
-				return std::pair{lower_left_tex_coord_, upper_right_tex_coord_};
+				return std::pair{lower_left_tex_coords_, upper_right_tex_coords_};
 			}
 
 			//Returns the emissive (self-illumination) color of the material
@@ -262,33 +303,37 @@ namespace ion::graphics::materials
 				Texture coordinates
 			*/
 
-			//Crop material textures by the given area, where values are in range [0.0, 1.0]
+			//Crop material texture maps by the given area, where values are in range [0.0, 1.0]
 			//This operation will discard any repeating previously applied
 			void Crop(const std::optional<Aabb> &area) noexcept;
 
-			//Repeat material textures by the given amount, where values are in range [0.0, oo)
+			//Repeat material texture maps by the given amount, where values are in range [0.0, oo)
 			//This operation will discard any cropping previously applied
 			void Repeat(const std::optional<Vector2> &amount) noexcept;
 
 
-			//Flip material textures horizontally (mirror)
+			//Flip material texture maps horizontally (mirror)
 			void FlipHorizontal() noexcept;
 
-			//Flip material textures vertically (up-down)
+			//Flip material texture maps vertically (up-down)
 			void FlipVertical() noexcept;
 
 
-			//Returns true if this materials textures are cropped
+			//Returns true if this materials texture maps are cropped
 			[[nodiscard]] bool IsCropped() const noexcept;
 
-			//Returns true if this materials textures are repeated
+			//Returns true if this materials texture maps are repeated
 			[[nodiscard]] bool IsRepeated() const noexcept;
 
+			//Returns a pair of true/false to indicate which texture maps axis for this material is repeatable
+			//For animations, repeatability is only retrieved from the first frame
+			[[nodiscard]] std::pair<bool, bool> IsRepeatable() const noexcept;
 
-			//Returns true if this materials textures are flipped horizontally
+
+			//Returns true if this materials texture maps are flipped horizontally
 			[[nodiscard]] bool IsFlippedHorizontally() const noexcept;
 
-			//Returns true if this materials textures are flipped vertically
+			//Returns true if this materials texture maps are flipped vertically
 			[[nodiscard]] bool IsFlippedVertically() const noexcept;
 
 

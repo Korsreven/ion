@@ -23,6 +23,113 @@ using namespace material;
 namespace material::detail
 {
 
+/*
+	Texure coordinates
+*/
+
+std::pair<Vector2, Vector2> get_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right,
+	const Vector2 &new_lower_left, const Vector2 &new_upper_right) noexcept
+{
+	auto [ll_s, ll_t] = lower_left.XY();
+	auto [ur_s, ur_t] = upper_right.XY();
+	auto [new_ll_s, new_ll_t] = new_lower_left.XY();
+	auto [new_ur_s, new_ur_t] = new_upper_right.XY();
+
+	if (is_flipped_horizontally(lower_left, upper_right))
+		std::swap(new_ll_s, new_ur_s);
+
+	if (is_flipped_vertically(lower_left, upper_right))
+		std::swap(new_ll_t, new_ur_t);
+
+	return {{new_ll_s, new_ll_t}, {new_ur_s, new_ur_t}};
+}
+
+std::pair<Vector2, Vector2> get_unflipped_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right) noexcept
+{
+	auto [ll_s, ll_t] = lower_left.XY();
+	auto [ur_s, ur_t] = upper_right.XY();
+
+	if (is_flipped_horizontally(lower_left, upper_right))
+		std::swap(ll_s, ur_s);
+
+	if (is_flipped_vertically(lower_left, upper_right))
+		std::swap(ll_t, ur_t);
+
+	return {{ll_s, ll_t}, {ur_s, ur_t}};
+}
+
+std::pair<Vector2, Vector2> get_normalized_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right,
+	const Vector2 &min, const Vector2 &max) noexcept
+{
+	using namespace ion::utilities;
+
+	auto [ll_s, ll_t] = lower_left.XY();
+	auto [ur_s, ur_t] = upper_right.XY();
+	auto [min_s, min_t] = min.XY();
+	auto [max_s, max_t] = max.XY();
+
+	return {{math::Normalize(ll_s, 0.0_r, 1.0_r, min_s, max_s),
+			 math::Normalize(ll_t, 0.0_r, 1.0_r, min_t, max_t)},	
+
+			{math::Normalize(ur_s, 0.0_r, 1.0_r, min_s, max_s),
+			 math::Normalize(ur_t, 0.0_r, 1.0_r, min_t, max_t)}};
+}
+
+
+/*
+	Texture map
+*/
+
+std::pair<const Animation*, const Texture*> get_texture_maps(const map_type &map) noexcept
+{
+	using result_type = std::pair<const Animation*, const Texture*>;
+
+	return std::visit(types::overloaded{
+		[](std::monostate) -> result_type { return {nullptr, nullptr}; },
+		[](const managed::ObservedObject<Animation> &animation) -> result_type { return {animation.Object(), nullptr}; },
+		[](const managed::ObservedObject<Texture> &texture) -> result_type { return {nullptr, texture.Object()}; }	
+	}, map);
+}
+
+const Texture* get_texture_map(const map_type &map) noexcept
+{
+	if (auto [animation, texture] = get_texture_maps(map); texture || animation)
+		return animation ? animation->UnderlyingFrameSequence()->FirstFrame() : texture;
+	else
+		return nullptr;
+}
+
+const Texture* get_first_texture_map(const map_type &diffuse_map, const map_type &specular_map, const map_type &normal_map) noexcept
+{
+	if (auto texture = get_texture_map(diffuse_map); texture)
+		return texture;
+
+	if (auto texture = get_texture_map(specular_map); texture)
+		return texture;
+
+	if (auto texture = get_texture_map(normal_map); texture)
+		return texture;
+
+	return nullptr;
+}
+
+
+std::pair<bool, bool> is_texture_map_repeatable(const Texture &texture,
+	const Vector2 &lower_left, const Vector2 &upper_right) noexcept
+{
+	if (auto repeatable = texture.IsRepeatable(); repeatable)
+	{
+		auto &[s_repeatable, t_repeatable] = *repeatable;
+
+		auto [ll_s, ll_t] = lower_left.XY();
+		auto [ur_s, ur_t] = upper_right.XY();
+		return {s_repeatable && ll_s <= 0.0_r && ur_s >= 1.0_r,
+				t_repeatable && ll_t <= 0.0_r && ur_t >= 1.0_r};
+	}
+	else
+		return {false, false};
+}
+
 } //material::detail
 
 
@@ -212,35 +319,17 @@ void Material::NormalMap(std::nullptr_t) noexcept
 
 std::pair<const Animation*, const Texture*> Material::DiffuseMap() const noexcept
 {
-	using result_type = std::pair<const Animation*, const Texture*>;
-
-	return std::visit(types::overloaded{
-		[](std::monostate) -> result_type { return {nullptr, nullptr}; },
-		[](const managed::ObservedObject<Animation> &animation) -> result_type { return {animation.Object(), nullptr}; },
-		[](const managed::ObservedObject<Texture> &texture) -> result_type { return {nullptr, texture.Object()}; }	
-	}, diffuse_map_);
+	return detail::get_texture_maps(diffuse_map_);
 }
 
 std::pair<const Animation*, const Texture*> Material::SpecularMap() const noexcept
 {
-	using result_type = std::pair<const Animation*, const Texture*>;
-
-	return std::visit(types::overloaded{
-		[](std::monostate) -> result_type { return {nullptr, nullptr}; },
-		[](const managed::ObservedObject<Animation> &animation) -> result_type { return {animation.Object(), nullptr}; },
-		[](const managed::ObservedObject<Texture> &texture) -> result_type { return {nullptr, texture.Object()}; }
-	}, specular_map_);
+	return detail::get_texture_maps(specular_map_);
 }
 
 std::pair<const Animation*, const Texture*> Material::NormalMap() const noexcept
 {
-	using result_type = std::pair<const Animation*, const Texture*>;
-
-	return std::visit(types::overloaded{
-		[](std::monostate) -> result_type { return {nullptr, nullptr}; },
-		[](const managed::ObservedObject<Animation> &animation) -> result_type { return {animation.Object(), nullptr}; },
-		[](const managed::ObservedObject<Texture> &texture) -> result_type { return {nullptr, texture.Object()}; }
-	}, normal_map_);
+	return detail::get_texture_maps(normal_map_);
 }
 
 
@@ -258,25 +347,21 @@ void Material::Crop(const std::optional<Aabb> &area) noexcept
 
 		if (min != max)
 		{
-			auto [ll_s, ll_t] = lower_left_tex_coord_.XY();
-			auto [ur_s, ur_t] = upper_right_tex_coord_.XY();
-			auto [new_ll_s, new_ur_s] = detail::get_tex_coords(ll_s, ur_s, min.X(), max.X());
-			auto [new_ll_t, new_ur_t] = detail::get_tex_coords(ll_t, ur_t, min.Y(), max.Y());
+			auto [lower_left, upper_right] =
+				detail::get_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_, min, max);
 
-			lower_left_tex_coord_ = {new_ll_s, new_ll_t};
-			upper_right_tex_coord_ = {new_ur_s, new_ur_t};
+			lower_left_tex_coords_ = lower_left;
+			upper_right_tex_coords_ = upper_right;
 		}
 	}
 	//Un-crop
 	else if (IsCropped())
 	{
-		auto [ll_s, ll_t] = lower_left_tex_coord_.XY();
-		auto [ur_s, ur_t] = upper_right_tex_coord_.XY();
-		auto [new_ll_s, new_ur_s] = detail::get_tex_coords(ll_s, ur_s, 0.0_r, 1.0_r);
-		auto [new_ll_t, new_ur_t] = detail::get_tex_coords(ll_t, ur_t, 0.0_r, 1.0_r);
+		auto [lower_left, upper_right] =
+			detail::get_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_, 0.0_r, 1.0_r);
 
-		lower_left_tex_coord_ = {new_ll_s, new_ll_t};
-		upper_right_tex_coord_ = {new_ur_s, new_ur_t};
+		lower_left_tex_coords_ = lower_left;
+		upper_right_tex_coords_ = upper_right;
 	}
 }
 
@@ -287,154 +372,122 @@ void Material::Repeat(const std::optional<Vector2> &amount) noexcept
 	{
 		if (auto max = amount->CeilCopy(vector2::Zero); max > vector2::Zero)
 		{
-			auto [ll_s, ll_t] = lower_left_tex_coord_.XY();
-			auto [ur_s, ur_t] = upper_right_tex_coord_.XY();
-			auto [new_ll_s, new_ur_s] = detail::get_tex_coords(ll_s, ur_s, 0.0_r, max.X());
-			auto [new_ll_t, new_ur_t] = detail::get_tex_coords(ll_t, ur_t, 0.0_r, max.Y());
+			auto [lower_left, upper_right] =
+				detail::get_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_, 0.0_r, max);
 
-			lower_left_tex_coord_ = {new_ll_s, new_ll_t};
-			upper_right_tex_coord_ = {new_ur_s, new_ur_t};
+			lower_left_tex_coords_ = lower_left;
+			upper_right_tex_coords_ = upper_right;
 		}
 	}
 	//Un-repeat
 	else if (IsRepeated())
 	{
-		auto [ll_s, ll_t] = lower_left_tex_coord_.XY();
-		auto [ur_s, ur_t] = upper_right_tex_coord_.XY();
-		auto [new_ll_s, new_ur_s] = detail::get_tex_coords(ll_s, ur_s, 0.0_r, 1.0_r);
-		auto [new_ll_t, new_ur_t] = detail::get_tex_coords(ll_t, ur_t, 0.0_r, 1.0_r);
+		auto [lower_left, upper_right] =
+			detail::get_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_, 0.0_r, 1.0_r);
 
-		lower_left_tex_coord_ = {new_ll_s, new_ll_t};
-		upper_right_tex_coord_ = {new_ur_s, new_ur_t};
+		lower_left_tex_coords_ = lower_left;
+		upper_right_tex_coords_ = upper_right;
 	}
 }
 
 
 void Material::FlipHorizontal() noexcept
 {
-	auto ll_s = lower_left_tex_coord_.X();
-	auto ur_s = upper_right_tex_coord_.X();
+	auto ll_s = lower_left_tex_coords_.X();
+	auto ur_s = upper_right_tex_coords_.X();
 
-	lower_left_tex_coord_.X(ur_s);
-	upper_right_tex_coord_.X(ll_s);
+	lower_left_tex_coords_.X(ur_s);
+	upper_right_tex_coords_.X(ll_s);
 }
 
 void Material::FlipVertical() noexcept
 {
-	auto ll_t = lower_left_tex_coord_.Y();
-	auto ur_t = upper_right_tex_coord_.Y();
+	auto ll_t = lower_left_tex_coords_.Y();
+	auto ur_t = upper_right_tex_coords_.Y();
 
-	lower_left_tex_coord_.Y(ur_t);
-	upper_right_tex_coord_.Y(ll_t);
+	lower_left_tex_coords_.Y(ur_t);
+	upper_right_tex_coords_.Y(ll_t);
 }
 
 
 bool Material::IsCropped() const noexcept
 {
-	auto [ll_s, ll_t] = lower_left_tex_coord_.XY();
-	auto [ur_s, ur_t] = upper_right_tex_coord_.XY();
-
-	if (IsFlippedHorizontally())
-		std::swap(ll_s, ur_s);
-	
-	if (IsFlippedVertically())
-		std::swap(ll_t, ur_t);
-	
-	return ll_s > 0.0_r || ll_t > 0.0_r ||
-		   ur_s < 1.0_r || ur_t < 1.0_r;
+	auto [lower_left, upper_right] =
+		detail::get_unflipped_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_);
+	return detail::is_cropped(lower_left, upper_right);
 }
 
 bool Material::IsRepeated() const noexcept
 {
-	auto [ll_s, ll_t] = lower_left_tex_coord_.XY();
-	auto [ur_s, ur_t] = upper_right_tex_coord_.XY();
+	auto [lower_left, upper_right] =
+		detail::get_unflipped_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_);
+	return detail::is_repeated(lower_left, upper_right);
+}
 
-	if (IsFlippedHorizontally())
-		std::swap(ll_s, ur_s);
-	
-	if (IsFlippedVertically())
-		std::swap(ll_t, ur_t);
-	
-	return ll_s < 0.0_r || ll_t < 0.0_r ||
-		   ur_s > 1.0_r || ur_t > 1.0_r;
+std::pair<bool, bool> Material::IsRepeatable() const noexcept
+{
+	if (auto texture = detail::get_first_texture_map(diffuse_map_, specular_map_, normal_map_); texture)
+	{
+		auto [lower_left, upper_right] =
+			detail::get_unflipped_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_);
+		return detail::is_texture_map_repeatable(*texture, lower_left, upper_right);
+	}
+	else
+		return {false, false};
 }
 
 
 bool Material::IsFlippedHorizontally() const noexcept
 {
-	return upper_right_tex_coord_.X() < lower_left_tex_coord_.X();
+	return detail::is_flipped_horizontally(lower_left_tex_coords_, upper_right_tex_coords_);
 }
 
 bool Material::IsFlippedVertically() const noexcept
 {
-	return upper_right_tex_coord_.Y() < lower_left_tex_coord_.Y();
+	return detail::is_flipped_vertically(lower_left_tex_coords_, upper_right_tex_coords_);
 }
 
 
 std::pair<Vector2, Vector2> Material::WorldTexCoords() const noexcept
 {
-	using namespace ion::utilities;
-
-	//Get texture
-	auto texture =
-		[&]() noexcept -> const Texture*
-		{
-			if (auto [animation, texture] = this->DiffuseMap(); texture || animation)
-				return animation ? animation->UnderlyingFrameSequence()->FirstFrame() : texture;
-
-			if (auto [animation, texture] = this->SpecularMap(); texture || animation)
-				return animation ? animation->UnderlyingFrameSequence()->FirstFrame() : texture;
-
-			if (auto [animation, texture] = this->NormalMap(); texture || animation)
-				return animation ? animation->UnderlyingFrameSequence()->FirstFrame() : texture;
-
-			return nullptr;
-		}();
-
-	//Has texture
-	if (texture)
+	if (auto texture = detail::get_first_texture_map(diffuse_map_, specular_map_, normal_map_); texture)
 	{
 		//Use local tex coords relative to world tex coords
 		if (auto world_tex_coords = texture->TexCoords(); world_tex_coords)
 		{
-			auto [ll_s, ll_t] = lower_left_tex_coord_.XY();
-			auto [ur_s, ur_t] = upper_right_tex_coord_.XY();
-
-			if (IsFlippedHorizontally())
-				std::swap(ll_s, ur_s);
-
-			if (IsFlippedVertically())
-				std::swap(ll_t, ur_t);
-
-
-			//Calculate world tex coords
+			auto [lower_left, upper_right] =
+				detail::get_unflipped_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_);
 			auto &[world_lower_left, world_upper_right] = *world_tex_coords;
-			auto [world_ll_s, world_ll_t] = world_lower_left.XY();
-			auto [world_ur_s, world_ur_t] = world_upper_right.XY();
 
-			ll_s = ll_s < 0.0_r && world_ll_s != 0.0_r ?
-				world_ll_s : math::Normalize(ll_s, 0.0_r, 1.0_r, world_ll_s, world_ur_s);
-			ll_t = ll_t < 0.0_r && world_ll_t != 0.0_r ?
-				world_ll_t : math::Normalize(ll_t, 0.0_r, 1.0_r, world_ll_t, world_ur_t);
+			auto [s_repeatable, t_repeatable] =
+				detail::is_texture_map_repeatable(*texture, lower_left, upper_right);
 
-			ur_s = ur_s > 1.0_r && world_ur_s != 1.0_r ?
-				world_ur_s : math::Normalize(ur_s, 0.0_r, 1.0_r, world_ll_s, world_ur_s);
-			ur_t = ur_t > 1.0_r && world_ur_t != 1.0_r ?
-				world_ur_t : math::Normalize(ur_t, 0.0_r, 1.0_r, world_ll_t, world_ur_t);
+			if (!s_repeatable)
+			{
+				if (lower_left.X() < 0.0_r)
+					lower_left.X(0.0_r);
+				if (upper_right.X() > 1.0_r)
+					upper_right.X(1.0_r);
+			}
 
+			if (!t_repeatable)
+			{
+				if (lower_left.Y() < 0.0_r)
+					lower_left.Y(0.0_r);
+				if (upper_right.Y() > 1.0_r)
+					upper_right.Y(1.0_r);
+			}
 
-			if (IsFlippedHorizontally())
-				std::swap(ll_s, ur_s);
+			auto [norm_lower_left, norm_upper_right] =
+				detail::get_normalized_tex_coords(lower_left, upper_right, world_lower_left, world_upper_right);
 
-			if (IsFlippedVertically())
-				std::swap(ll_t, ur_t);
-
-			return {Vector2{ll_s, ll_t}, Vector2{ur_s, ur_t}};
+			return detail::get_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_,
+										  norm_lower_left, norm_upper_right);
 		}
 	}
 
 	//Use local tex coords
-	return {lower_left_tex_coord_, upper_right_tex_coord_};
+	return {lower_left_tex_coords_, upper_right_tex_coords_};
 }
 
 } //ion::graphics::materials
