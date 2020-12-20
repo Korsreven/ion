@@ -264,16 +264,30 @@ void Model::Draw(shaders::ShaderProgram *shader_program) noexcept
 	Creating
 */
 
-render::Mesh& Model::CreateMesh(const render::mesh::Vertices &vertices)
+render::Mesh& Model::CreateMesh(const render::mesh::Vertices &vertices, bool auto_generate_tex_coords)
 {
 	reload_vertex_buffer_ = !std::empty(vertices);
-	return Create(vertices);
+	return Create(vertices, auto_generate_tex_coords);
 }
 
-render::Mesh& Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data)
+render::Mesh& Model::CreateMesh(const render::mesh::Vertices &vertices,
+	const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords)
+{
+	reload_vertex_buffer_ = !std::empty(vertices);
+	return Create(vertices, lower_left_tex_coords, upper_right_tex_coords);
+}
+
+render::Mesh& Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, bool auto_generate_tex_coords)
 {
 	reload_vertex_buffer_ = !std::empty(vertex_data);
-	return Create(std::move(vertex_data));
+	return Create(std::move(vertex_data), auto_generate_tex_coords);
+}
+
+render::Mesh& Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data,
+	const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords)
+{
+	reload_vertex_buffer_ = !std::empty(vertex_data);
+	return Create(std::move(vertex_data), lower_left_tex_coords, upper_right_tex_coords);
 }
 
 

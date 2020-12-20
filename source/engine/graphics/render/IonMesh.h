@@ -14,6 +14,7 @@ File:	IonMesh.h
 #define ION_MESH_H
 
 #include <optional>
+#include <tuple>
 #include <vector>
 
 #include "graphics/utilities/IonAabb.h"
@@ -59,7 +60,7 @@ namespace ion::graphics::render
 		{
 			Vector2 position;
 			Vector2 normal;
-			Color color;
+			Color color = color::White;
 			Vector2 tex_coord;
 		};
 
@@ -101,7 +102,12 @@ namespace ion::graphics::render
 
 
 			int mesh_draw_mode_to_gl_draw_mode(MeshDrawMode draw_mode) noexcept;
+
 			vertex_storage_type vertices_to_vertex_data(const Vertices &vertices);
+			std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const vertex_storage_type &vertex_data);
+			void generate_tex_coords(vertex_storage_type &vertex_data, const Aabb &aabb,
+				const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords,
+				const materials::Material *material) noexcept;
 
 
 			/*
@@ -121,7 +127,7 @@ namespace ion::graphics::render
 			void set_vertex_pointers(int vertex_count, int vbo_offset) noexcept;
 			void set_vertex_pointers(int vertex_count, const vertex_storage_type &vertex_data) noexcept;
 
-			void use_shader_program(int program_handle) noexcept;		
+			void use_shader_program(int program_handle) noexcept;
 		} //detail
 	} //mesh
 
@@ -136,25 +142,43 @@ namespace ion::graphics::render
 			bool show_wireframe_ = false;
 			bool visible_ = true;
 
+			Aabb aabb_;
+			Obb obb_;
+			Sphere sphere_;
+
 			std::optional<int> vao_handle_;
 			std::optional<int> vbo_handle_;
 			int vertex_buffer_offset_ = 0;
 
-			std::optional<Aabb> aabb_;
-			std::optional<Obb> obb_;
-			std::optional<Sphere> sphere_;
-			
 			mesh::detail::vertex_storage_type vertex_data_;
+			std::optional<std::pair<Vector2, Vector2>> tex_coords_;
+
 			bool reload_vertex_data_ = false;
 			bool rebind_vertex_attributes_ = false;
+			bool regenerate_bounding_volumes_ = false;
+			bool regenerate_tex_coords_ = false;
 
 		public:
 
-			//Construct a new mesh with the given vertices
-			Mesh(const mesh::Vertices &vertices);
+			//Construct a new mesh with the given vertices and whether or not tex coords should automatically be generated
+			//If auto generate tex coords is true, user specified vertex tex coords will be ignored
+			explicit Mesh(const mesh::Vertices &vertices, bool auto_generate_tex_coords = false);
+
+			//Construct a new mesh with the given vertices, lower left and upper right tex coords
+			//Tex coords are auto generated in range [lower_left_tex_coords, upper_right_tex_coords]
+			//User specified vertex tex coords will be ignored
+			Mesh(const mesh::Vertices &vertices,
+				const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords);
+
+			//Construct a new mesh with the given raw vertex data and whether or not tex coords should automatically be generated
+			//If auto generate tex coords is true, user specified vertex tex coords will be ignored
+			explicit Mesh(mesh::detail::vertex_storage_type vertex_data, bool auto_generate_tex_coords = false);
 
 			//Construct a new mesh with the given raw vertex data
-			Mesh(mesh::detail::vertex_storage_type vertex_data);
+			//Tex coords are auto generated in range [lower_left_tex_coords, upper_right_tex_coords]
+			//User specified vertex tex coords will be ignored
+			Mesh(mesh::detail::vertex_storage_type vertex_data,
+				const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords);
 
 			//Destructor
 			~Mesh() noexcept;
@@ -246,6 +270,24 @@ namespace ion::graphics::render
 			[[nodiscard]] inline auto Visible() const noexcept
 			{
 				return visible_;
+			}
+
+			//Returns the local axis-aligned bounding box (AABB) for this mesh
+			[[nodiscard]] inline auto AxisAlignedBoundingBox() const noexcept
+			{
+				return aabb_;
+			}
+
+			//Returns the local oriented bounding box (OBB) for this mesh
+			[[nodiscard]] inline auto OrientedBoundingBox() const noexcept
+			{
+				return obb_;
+			}
+
+			//Returns the local bounding sphere for this mesh
+			[[nodiscard]] inline auto BoundingSphere() const noexcept
+			{
+				return sphere_;
 			}
 
 

@@ -61,6 +61,7 @@ int mesh_draw_mode_to_gl_draw_mode(MeshDrawMode draw_mode) noexcept
 	}
 }
 
+
 vertex_storage_type vertices_to_vertex_data(const Vertices &vertices)
 {
 	vertex_storage_type vertex_data;
@@ -89,6 +90,52 @@ vertex_storage_type vertices_to_vertex_data(const Vertices &vertices)
 		vertex_data.insert(std::end(vertex_data), vertex.tex_coord.Components(), vertex.tex_coord.Components() + 2);
 
 	return vertex_data;
+}
+
+vertex_storage_type vertices_to_vertex_data(vertex_storage_type vertex_data)
+{
+	return vertex_data;
+}
+
+std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const vertex_storage_type &vertex_data)
+{
+	if (auto vertex_count = std::ssize(vertex_data) % vertex_components; vertex_count > 0)
+	{
+		auto min = Vector2{vertex_data[0], vertex_data[1]};
+		auto max = min;
+
+		//For each vertex position (x,y)
+		for (auto i = 1; i < vertex_count; ++i)
+		{
+			auto position = Vector2{vertex_data[i * vertex_components],
+									vertex_data[i * vertex_components + 1]};
+
+			min = std::min(min, position);
+			max = std::max(max, position);
+		}
+
+		Aabb aabb{min, max};
+		return {aabb, aabb, {aabb.ToHalfSize().Length(), aabb.Center()}};
+	}
+
+	return {};
+}
+
+void generate_tex_coords(vertex_storage_type &vertex_data, const Aabb &aabb,
+	const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords,
+	const materials::Material *material) noexcept
+{
+	if (auto vertex_count = std::ssize(vertex_data) % vertex_components; vertex_count > 0)
+	{
+		auto offset = tex_coord_data_offset(vertex_count);
+
+		//For each vertex tex coords (x,y)
+		for (auto i = 0; i < vertex_count; ++i)
+		{
+			auto tex_coords = Vector2{vertex_data[i * vertex_components + offset],
+									  vertex_data[i * vertex_components + offset + 1]};
+		}
+	}
 }
 
 
@@ -274,19 +321,62 @@ void use_shader_program(int program_handle) noexcept
 } //mesh::detail
 
 
-Mesh::Mesh(const mesh::Vertices &vertices) :
+Mesh::Mesh(const mesh::Vertices &vertices, bool auto_generate_tex_coords) :
 
 	vertex_count_{std::ssize(vertices)},
-	vertex_data_{detail::vertices_to_vertex_data(vertices)}
+
+	vertex_data_{detail::vertices_to_vertex_data(vertices)},
+	tex_coords_{auto_generate_tex_coords ?
+		std::make_optional(std::pair{vector2::Zero, vector2::UnitScale}) : std::nullopt},
+
+	regenerate_bounding_volumes_{vertex_count_ > 0},
+	regenerate_tex_coords_{auto_generate_tex_coords}
 {
 	//Empty
 }
 
-Mesh::Mesh(detail::vertex_storage_type vertex_data) :
+Mesh::Mesh(const mesh::Vertices &vertices,
+	const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords) :
+
+	vertex_count_{std::ssize(vertices)},
+
+	vertex_data_{detail::vertices_to_vertex_data(vertices)},
+	tex_coords_{std::pair{lower_left_tex_coords.FloorCopy(upper_right_tex_coords),
+						  upper_right_tex_coords.CeilCopy(lower_left_tex_coords)}},
+
+	regenerate_bounding_volumes_{vertex_count_ > 0},
+	regenerate_tex_coords_{true}
+{
+	//Empty
+}
+
+Mesh::Mesh(detail::vertex_storage_type vertex_data, bool auto_generate_tex_coords) :
 
 	vertex_count_{std::ssize(vertex_data) % detail::vertex_components == 0 ?
 		std::ssize(vertex_data) / detail::vertex_components : 0},
-	vertex_data_{vertex_count_ > 0 ? std::move(vertex_data) : decltype(vertex_data){}}
+
+	vertex_data_{vertex_count_ > 0 ? std::move(vertex_data) : decltype(vertex_data){}},
+	tex_coords_{auto_generate_tex_coords ?
+		std::make_optional(std::pair{vector2::Zero, vector2::UnitScale}) : std::nullopt},
+
+	regenerate_bounding_volumes_{vertex_count_ > 0},
+	regenerate_tex_coords_{auto_generate_tex_coords}
+{
+	//Empty
+}
+
+Mesh::Mesh(detail::vertex_storage_type vertex_data,
+	const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords) :
+
+	vertex_count_{std::ssize(vertex_data) % detail::vertex_components == 0 ?
+		std::ssize(vertex_data) / detail::vertex_components : 0},
+
+	vertex_data_{vertex_count_ > 0 ? std::move(vertex_data) : decltype(vertex_data){}},
+	tex_coords_{std::pair{lower_left_tex_coords.FloorCopy(upper_right_tex_coords),
+						  upper_right_tex_coords.CeilCopy(lower_left_tex_coords)}},
+
+	regenerate_bounding_volumes_{vertex_count_ > 0},
+	regenerate_tex_coords_{true}
 {
 	//Empty
 }
@@ -321,6 +411,27 @@ void Mesh::VertexColor(const Color &color) noexcept
 
 void Mesh::Prepare() noexcept
 {
+	if (regenerate_bounding_volumes_)
+	{
+		if (vertex_count_ > 0)
+		{
+			auto [aabb, obb, sphere] = detail::generate_bounding_volumes(vertex_data_);
+			aabb_ = aabb;
+			obb_ = obb;
+			sphere_ = sphere;
+		}
+
+		regenerate_bounding_volumes_ = false;
+	}
+
+	if (regenerate_tex_coords_)
+	{
+		if (tex_coords_ && vertex_count_ > 0)
+			detail::generate_tex_coords(vertex_data_, aabb_, tex_coords_->first, tex_coords_->second, material_);
+
+		regenerate_tex_coords_ = false;
+	}
+
 	if (reload_vertex_data_)
 	{
 		if (vbo_handle_ && vertex_count_ > 0)

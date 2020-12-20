@@ -20,6 +20,7 @@ File:	IonModel.h
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonObb.h"
 #include "graphics/utilities/IonSphere.h"
+#include "graphics/utilities/IonVector2.h"
 #include "types/IonTypes.h"
 #include "unmanaged/IonObjectFactory.h"
 
@@ -28,6 +29,7 @@ namespace ion::graphics::scene
 	using utilities::Aabb;
 	using utilities::Obb;
 	using utilities::Sphere;
+	using utilities::Vector2;
 
 	namespace model
 	{
@@ -84,7 +86,7 @@ namespace ion::graphics::scene
 			Model() = default;
 
 			//Construct a new model with the given vertex buffer usage pattern and visibility
-			Model(model::ModelBufferUsage buffer_usage, bool visible = true) noexcept;
+			explicit Model(model::ModelBufferUsage buffer_usage, bool visible = true) noexcept;
 
 			//Destructor
 			~Model() noexcept;
@@ -172,11 +174,25 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a mesh with the given vertices
-			render::Mesh& CreateMesh(const render::mesh::Vertices &vertices);
+			//Create a mesh with the given vertices and whether or not tex coords should automatically be generated
+			//If auto generate tex coords is true, user specified vertex tex coords will be ignored
+			render::Mesh& CreateMesh(const render::mesh::Vertices &vertices, bool auto_generate_tex_coords = false);
+
+			//Create a mesh with the given vertices, lower left and upper right tex coords
+			//Tex coords are auto generated in range [lower_left_tex_coords, upper_right_tex_coords]
+			//User specified vertex tex coords will be ignored
+			render::Mesh& CreateMesh(const render::mesh::Vertices &vertices,
+				const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords);
+
+			//Create a mesh with the given raw vertex data and whether or not tex coords should automatically be generated
+			//If auto generate tex coords is true, user specified vertex tex coords will be ignored
+			render::Mesh& CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, bool auto_generate_tex_coords = false);
 
 			//Create a mesh with the given raw vertex data
-			render::Mesh& CreateMesh(render::mesh::detail::vertex_storage_type vertex_data);
+			//Tex coords are auto generated in range [lower_left_tex_coords, upper_right_tex_coords]
+			//User specified vertex tex coords will be ignored
+			render::Mesh& CreateMesh(render::mesh::detail::vertex_storage_type vertex_data,
+				const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords);
 
 
 			//Create a mesh as a copy of the given mesh
