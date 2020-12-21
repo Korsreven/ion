@@ -355,8 +355,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Textures
 			ion::graphics::textures::TextureManager textures;
 			textures.CreateRepository(std::move(image_repository));
-			auto &rikku_texture = textures.CreateTexture("rikku", "rikku.png");
-			[[maybe_unused]] auto &rikku_np2_texture = textures.CreateTexture("rikku_np2", "rikku_np2.png");
+			auto &rikku_texture = textures.CreateTexture("rikku", "rikku.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			[[maybe_unused]] auto &rikku_np2_texture = textures.CreateTexture("rikku_np2", "rikku_np2.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 			auto &cloud_texture = textures.CreateTexture("cloud", "cloud.png");
 			[[maybe_unused]] auto &cloud_np2_texture = textures.CreateTexture("cloud_np2", "cloud_np2.png");
 			auto &background_texture = textures.CreateTexture("background", "background.jpg");
@@ -453,10 +455,26 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					ion::graphics::utilities::Color{0.24725_r, 0.1995_r, 0.0745_r},
 					ion::graphics::utilities::Color{0.75164_r, 0.60648_r, 0.22648_r},
 					ion::graphics::utilities::Color{0.628281_r, 0.555802_r, 0.366065_r},
-					51.2_r, &rikku_texture, nullptr, nullptr);
+					51.2_r, &rikku_np2_texture, nullptr, nullptr);
 
-			material.Crop(ion::graphics::utilities::Aabb{{0.25_r, 0.25_r}, {0.75_r, 0.75_r}});
-			auto [lower_left, upper_right] = material.WorldTexCoords();
+			//material.Crop(ion::graphics::utilities::Aabb{{0.25_r, 0.25_r}, {0.75_r, 0.75_r}});
+			material.Repeat(ion::graphics::utilities::Vector2{2.0_r, 2.0_r});
+			material.FlipHorizontal();
+			material.FlipVertical();
+
+
+			//Mesh
+			using namespace ion::graphics::utilities;
+
+			ion::graphics::render::mesh::Vertices vertices;
+			vertices.push_back({{-0.25_r, 0.25_r}, vector2::Zero, color::White, {0.0_r, 1.0_r}});
+			vertices.push_back({{-0.25_r, -0.25_r}, vector2::Zero, color::White, {0.0_r, 0.0_r}});
+			vertices.push_back({{0.25_r, -0.25_r}, vector2::Zero, color::White, {1.0_r, 0.0_r}});
+			vertices.push_back({{0.25_r, 0.25_r}, vector2::Zero, color::White, {1.0_r, 1.0_r}});
+
+			ion::graphics::render::Mesh mesh{vertices};
+			mesh.AttachMaterial(&material);
+			mesh.Prepare();
 
 			//EXAMPLE end
 

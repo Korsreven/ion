@@ -99,11 +99,11 @@ std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(int vertex_count, const 
 		Vector2{vertex_data[0], vertex_data[1]} : vector2::Zero;
 	auto max = min;
 
-	//Find min / max for each vertex position (x,y)
+	//Find lower left / upper right for each vertex position (x,y)
 	for (auto i = 1; i < vertex_count; ++i)
 	{
-		auto position = Vector2{vertex_data[i * vertex_components],
-								vertex_data[i * vertex_components + 1]};
+		auto position = Vector2{vertex_data[i * position_components],
+								vertex_data[i * position_components + 1]};
 
 		min = std::min(min, position);
 		max = std::max(max, position);
@@ -122,12 +122,12 @@ void generate_tex_coords(int vertex_count, vertex_storage_type &vertex_data, con
 	{
 		auto tex_coords =
 			materials::material::detail::get_normalized_tex_coords(
-				{vertex_data[i * vertex_components], vertex_data[i * vertex_components + 1]},
+				{vertex_data[i * position_components], vertex_data[i * position_components + 1]},
 				aabb.Min(), aabb.Max(), vector2::Zero, vector2::UnitScale);
 		auto [s, t] = tex_coords.XY();
 
-		vertex_data[i * vertex_components + offset] = s;
-		vertex_data[i * vertex_components + offset + 1] = t;
+		vertex_data[offset + i * tex_coord_components] = s;
+		vertex_data[offset + i * tex_coord_components + 1] = t;
 	}
 }
 
@@ -142,8 +142,8 @@ void normalize_tex_coords(int vertex_count, vertex_storage_type &vertex_data, co
 	//Find lower left / upper right for each vertex tex coords (s,t)
 	for (auto i = 1; i < vertex_count; ++i)
 	{
-		auto tex_coords = Vector2{vertex_data[i * vertex_components + offset],
-									vertex_data[i * vertex_components + offset + 1]};
+		auto tex_coords = Vector2{vertex_data[offset + i * tex_coord_components],
+								  vertex_data[offset + i * tex_coord_components + 1]};
 
 		lower_left = std::min(lower_left, tex_coords);
 		upper_right = std::max(upper_right, tex_coords);
@@ -164,7 +164,7 @@ void normalize_tex_coords(int vertex_count, vertex_storage_type &vertex_data, co
 	{
 		auto norm_tex_coords =
 			materials::material::detail::get_normalized_tex_coords(
-				{vertex_data[i * vertex_components + offset], vertex_data[i * vertex_components + offset + 1]},
+				{vertex_data[offset + i * tex_coord_components], vertex_data[offset + i * tex_coord_components + 1]},
 				lower_left, upper_right, world_lower_left,  world_upper_right);
 		auto [s, t] = norm_tex_coords.XY();
 
@@ -174,8 +174,8 @@ void normalize_tex_coords(int vertex_count, vertex_storage_type &vertex_data, co
 		if (flip_t)
 			t = 2.0_r * mid_t - t; //Reflect t across middle point
 
-		vertex_data[i * vertex_components + offset] = s;
-		vertex_data[i * vertex_components + offset + 1] = t;
+		vertex_data[offset + i * tex_coord_components] = s;
+		vertex_data[offset + i * tex_coord_components + 1] = t;
 	}
 }
 

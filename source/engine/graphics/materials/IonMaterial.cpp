@@ -376,7 +376,7 @@ void Material::Repeat(const std::optional<Vector2> &amount) noexcept
 	//Repeat by amount
 	if (amount)
 	{
-		if (auto max = amount->CeilCopy(vector2::Zero); max > vector2::Zero)
+		if (auto max = amount->CeilCopy(vector2::Zero); vector2::Zero < max)
 		{
 			auto [lower_left, upper_right] =
 				detail::get_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_, 0.0_r, max);
