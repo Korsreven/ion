@@ -87,7 +87,7 @@ namespace ion::graphics::utilities
 	{
 		private:
 
-			real radius_;
+			real radius_ = 0.0_r;
 			Vector2 center_;
 
 		public:
