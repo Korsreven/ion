@@ -59,23 +59,26 @@ std::pair<Vector2, Vector2> get_unflipped_tex_coords(const Vector2 &lower_left, 
 }
 
 
-Vector2 get_normalized_tex_coords(const Vector2 &tex_coords, const Vector2 &min, const Vector2 &max) noexcept
+Vector2 get_normalized_tex_coords(const Vector2 &tex_coords, const Vector2 &min, const Vector2 &max,
+	const Vector2 &new_min, const Vector2 &new_max) noexcept
 {
 	using namespace ion::utilities;
 
 	auto [s, t] = tex_coords.XY();
 	auto [min_s, min_t] = min.XY();
 	auto [max_s, max_t] = max.XY();
+	auto [new_min_s, new_min_t] = new_min.XY();
+	auto [new_max_s, new_max_t] = new_max.XY();
 
-	return {math::Normalize(s, 0.0_r, 1.0_r, min_s, max_s),
-			math::Normalize(t, 0.0_r, 1.0_r, min_t, max_t)};
+	return {math::Normalize(s, min_s, max_s, new_min_s, new_max_s),
+			math::Normalize(t, min_t, max_t, new_min_t, new_max_t)};
 }
 
 std::pair<Vector2, Vector2> get_normalized_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right,
 	const Vector2 &min, const Vector2 &max) noexcept
 {
-	return {get_normalized_tex_coords(lower_left, min, max),
-			get_normalized_tex_coords(upper_right, min, max)};
+	return {get_normalized_tex_coords(lower_left, vector2::Zero, vector2::UnitScale, min, max),
+			get_normalized_tex_coords(upper_right, vector2::Zero, vector2::UnitScale, min, max)};
 }
 
 
@@ -465,20 +468,18 @@ std::pair<Vector2, Vector2> Material::WorldTexCoords() const noexcept
 			auto [s_repeatable, t_repeatable] =
 				detail::is_texture_map_repeatable(*texture, lower_left, upper_right);
 
+			//Discard any repetition on s
 			if (!s_repeatable)
 			{
-				if (lower_left.X() < 0.0_r)
-					lower_left.X(0.0_r);
-				if (upper_right.X() > 1.0_r)
-					upper_right.X(1.0_r);
+				lower_left.X(std::max(lower_left.X(), 0.0_r));
+				upper_right.X(std::min(upper_right.X(), 1.0_r));
 			}
 
+			//Discard any repetition on t
 			if (!t_repeatable)
 			{
-				if (lower_left.Y() < 0.0_r)
-					lower_left.Y(0.0_r);
-				if (upper_right.Y() > 1.0_r)
-					upper_right.Y(1.0_r);
+				lower_left.Y(std::max(lower_left.Y(), 0.0_r));
+				upper_right.Y(std::min(upper_right.Y(), 1.0_r));
 			}
 
 			auto [norm_lower_left, norm_upper_right] =

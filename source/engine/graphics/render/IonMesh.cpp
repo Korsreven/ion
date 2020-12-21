@@ -12,6 +12,7 @@ File:	IonMesh.cpp
 
 #include "IonMesh.h"
 
+#include <algorithm>
 #include <type_traits>
 #include <utility>
 
@@ -61,7 +62,6 @@ int mesh_draw_mode_to_gl_draw_mode(MeshDrawMode draw_mode) noexcept
 	}
 }
 
-
 vertex_storage_type vertices_to_vertex_data(const Vertices &vertices)
 {
 	vertex_storage_type vertex_data;
@@ -92,49 +92,90 @@ vertex_storage_type vertices_to_vertex_data(const Vertices &vertices)
 	return vertex_data;
 }
 
-vertex_storage_type vertices_to_vertex_data(vertex_storage_type vertex_data)
-{
-	return vertex_data;
-}
 
-std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const vertex_storage_type &vertex_data)
+std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(int vertex_count, const vertex_storage_type &vertex_data)
 {
-	if (auto vertex_count = std::ssize(vertex_data) % vertex_components; vertex_count > 0)
+	auto min = std::ssize(vertex_data) > 1 ?
+		Vector2{vertex_data[0], vertex_data[1]} : vector2::Zero;
+	auto max = min;
+
+	//Find min / max for each vertex position (x,y)
+	for (auto i = 1; i < vertex_count; ++i)
 	{
-		auto min = Vector2{vertex_data[0], vertex_data[1]};
-		auto max = min;
+		auto position = Vector2{vertex_data[i * vertex_components],
+								vertex_data[i * vertex_components + 1]};
 
-		//For each vertex position (x,y)
-		for (auto i = 1; i < vertex_count; ++i)
-		{
-			auto position = Vector2{vertex_data[i * vertex_components],
-									vertex_data[i * vertex_components + 1]};
-
-			min = std::min(min, position);
-			max = std::max(max, position);
-		}
-
-		Aabb aabb{min, max};
-		return {aabb, aabb, {aabb.ToHalfSize().Length(), aabb.Center()}};
+		min = std::min(min, position);
+		max = std::max(max, position);
 	}
 
-	return {};
+	Aabb aabb{min, max};
+	return {aabb, aabb, {aabb.ToHalfSize().Length(), aabb.Center()}};
 }
 
-void generate_tex_coords(vertex_storage_type &vertex_data, const Aabb &aabb,
-	const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords,
-	const materials::Material *material) noexcept
+void generate_tex_coords(int vertex_count, vertex_storage_type &vertex_data, const Aabb &aabb) noexcept
 {
-	if (auto vertex_count = std::ssize(vertex_data) % vertex_components; vertex_count > 0)
-	{
-		auto offset = tex_coord_data_offset(vertex_count);
+	auto offset = tex_coord_data_offset(vertex_count);
 
-		//For each vertex tex coords (x,y)
-		for (auto i = 0; i < vertex_count; ++i)
-		{
-			auto tex_coords = Vector2{vertex_data[i * vertex_components + offset],
-									  vertex_data[i * vertex_components + offset + 1]};
-		}
+	//Generate each vertex tex coords (s,t) from position (x,y) in range [0, 1]
+	for (auto i = 0; i < vertex_count; ++i)
+	{
+		auto tex_coords =
+			materials::material::detail::get_normalized_tex_coords(
+				{vertex_data[i * vertex_components], vertex_data[i * vertex_components + 1]},
+				aabb.Min(), aabb.Max(), vector2::Zero, vector2::UnitScale);
+		auto [s, t] = tex_coords.XY();
+
+		vertex_data[i * vertex_components + offset] = s;
+		vertex_data[i * vertex_components + offset + 1] = t;
+	}
+}
+
+void normalize_tex_coords(int vertex_count, vertex_storage_type &vertex_data, const materials::Material *material) noexcept
+{
+	auto offset = tex_coord_data_offset(vertex_count);
+
+	auto lower_left = std::ssize(vertex_data) > 1 ?
+		Vector2{vertex_data[offset], vertex_data[offset + 1]} : vector2::Zero;
+	auto upper_right = lower_left;
+
+	//Find lower left / upper right for each vertex tex coords (s,t)
+	for (auto i = 1; i < vertex_count; ++i)
+	{
+		auto tex_coords = Vector2{vertex_data[i * vertex_components + offset],
+									vertex_data[i * vertex_components + offset + 1]};
+
+		lower_left = std::min(lower_left, tex_coords);
+		upper_right = std::max(upper_right, tex_coords);
+	}
+
+	auto [world_lower_left_tex_coords, world_upper_right_tex_coords] = material ?
+		material->WorldTexCoords() :
+		std::pair{vector2::Zero, vector2::UnitScale};
+	auto [world_lower_left, world_upper_right] =
+		materials::material::detail::get_unflipped_tex_coords(world_lower_left_tex_coords, world_upper_right_tex_coords);
+
+	auto [mid_s, mid_t] = world_lower_left.Midpoint(world_upper_right).XY();
+	auto flip_s = materials::material::detail::is_flipped_horizontally(world_lower_left_tex_coords, world_upper_right_tex_coords);
+	auto flip_t = materials::material::detail::is_flipped_vertically(world_lower_left_tex_coords, world_upper_right_tex_coords);
+
+	//Normalize each vertex tex coords (s,t)
+	for (auto i = 0; i < vertex_count; ++i)
+	{
+		auto norm_tex_coords =
+			materials::material::detail::get_normalized_tex_coords(
+				{vertex_data[i * vertex_components + offset], vertex_data[i * vertex_components + offset + 1]},
+				lower_left, upper_right, world_lower_left,  world_upper_right);
+		auto [s, t] = norm_tex_coords.XY();
+
+		//Make sure mesh texture is flipped the same way as material texture
+		if (flip_s)
+			s = 2.0_r * mid_s - s; //Reflect s across middle point
+		if (flip_t)
+			t = 2.0_r * mid_t - t; //Reflect t across middle point
+
+		vertex_data[i * vertex_components + offset] = s;
+		vertex_data[i * vertex_components + offset + 1] = t;
 	}
 }
 
@@ -326,26 +367,10 @@ Mesh::Mesh(const mesh::Vertices &vertices, bool auto_generate_tex_coords) :
 	vertex_count_{std::ssize(vertices)},
 
 	vertex_data_{detail::vertices_to_vertex_data(vertices)},
-	tex_coords_{auto_generate_tex_coords ?
-		std::make_optional(std::pair{vector2::Zero, vector2::UnitScale}) : std::nullopt},
+	auto_generate_tex_coords_{auto_generate_tex_coords},
 
-	regenerate_bounding_volumes_{vertex_count_ > 0},
-	regenerate_tex_coords_{auto_generate_tex_coords}
-{
-	//Empty
-}
-
-Mesh::Mesh(const mesh::Vertices &vertices,
-	const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords) :
-
-	vertex_count_{std::ssize(vertices)},
-
-	vertex_data_{detail::vertices_to_vertex_data(vertices)},
-	tex_coords_{std::pair{lower_left_tex_coords.FloorCopy(upper_right_tex_coords),
-						  upper_right_tex_coords.CeilCopy(lower_left_tex_coords)}},
-
-	regenerate_bounding_volumes_{vertex_count_ > 0},
-	regenerate_tex_coords_{true}
+	update_bounding_volumes_{vertex_count_ > 0},
+	update_tex_coords_{vertex_count_ > 0}
 {
 	//Empty
 }
@@ -356,27 +381,10 @@ Mesh::Mesh(detail::vertex_storage_type vertex_data, bool auto_generate_tex_coord
 		std::ssize(vertex_data) / detail::vertex_components : 0},
 
 	vertex_data_{vertex_count_ > 0 ? std::move(vertex_data) : decltype(vertex_data){}},
-	tex_coords_{auto_generate_tex_coords ?
-		std::make_optional(std::pair{vector2::Zero, vector2::UnitScale}) : std::nullopt},
+	auto_generate_tex_coords_{auto_generate_tex_coords},
 
-	regenerate_bounding_volumes_{vertex_count_ > 0},
-	regenerate_tex_coords_{auto_generate_tex_coords}
-{
-	//Empty
-}
-
-Mesh::Mesh(detail::vertex_storage_type vertex_data,
-	const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords) :
-
-	vertex_count_{std::ssize(vertex_data) % detail::vertex_components == 0 ?
-		std::ssize(vertex_data) / detail::vertex_components : 0},
-
-	vertex_data_{vertex_count_ > 0 ? std::move(vertex_data) : decltype(vertex_data){}},
-	tex_coords_{std::pair{lower_left_tex_coords.FloorCopy(upper_right_tex_coords),
-						  upper_right_tex_coords.CeilCopy(lower_left_tex_coords)}},
-
-	regenerate_bounding_volumes_{vertex_count_ > 0},
-	regenerate_tex_coords_{true}
+	update_bounding_volumes_{vertex_count_ > 0},
+	update_tex_coords_{vertex_count_ > 0}
 {
 	//Empty
 }
@@ -411,31 +419,40 @@ void Mesh::VertexColor(const Color &color) noexcept
 
 void Mesh::Prepare() noexcept
 {
-	if (regenerate_bounding_volumes_)
+	if (update_bounding_volumes_)
 	{
 		if (vertex_count_ > 0)
 		{
-			auto [aabb, obb, sphere] = detail::generate_bounding_volumes(vertex_data_);
+			auto [aabb, obb, sphere] = detail::generate_bounding_volumes(vertex_count_, vertex_data_);
 			aabb_ = aabb;
 			obb_ = obb;
 			sphere_ = sphere;
 		}
 
-		regenerate_bounding_volumes_ = false;
+		update_bounding_volumes_ = false;
 	}
 
-	if (regenerate_tex_coords_)
+	if (update_tex_coords_)
 	{
-		if (tex_coords_ && vertex_count_ > 0)
-			detail::generate_tex_coords(vertex_data_, aabb_, tex_coords_->first, tex_coords_->second, material_);
+		if (vertex_count_ > 0)
+		{
+			//Auto generate tex coords
+			if (auto_generate_tex_coords_)
+				detail::generate_tex_coords(vertex_count_, vertex_data_, aabb_);
 
-		regenerate_tex_coords_ = false;
+			//Normalize tex coords
+			if (!auto_generate_tex_coords_ || material_)
+				detail::normalize_tex_coords(vertex_count_, vertex_data_, material_);
+		}
+
+		update_tex_coords_ = false;
 	}
 
 	if (reload_vertex_data_)
 	{
+		//Send vertex data to VRAM
 		if (vbo_handle_ && vertex_count_ > 0)
-			detail::set_vertex_buffer_sub_data(*vbo_handle_, vertex_buffer_offset_, vertex_data_); //Send to VRAM
+			detail::set_vertex_buffer_sub_data(*vbo_handle_, vertex_buffer_offset_, vertex_data_);
 
 		reload_vertex_data_ = false;
 	}

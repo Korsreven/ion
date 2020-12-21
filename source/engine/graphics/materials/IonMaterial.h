@@ -81,7 +81,8 @@ namespace ion::graphics::materials
 			const Vector2 &new_lower_left, const Vector2 &new_upper_right) noexcept;
 		std::pair<Vector2, Vector2> get_unflipped_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right) noexcept;
 
-		Vector2 get_normalized_tex_coords(const Vector2 &tex_coords, const Vector2 &min, const Vector2 &max) noexcept;
+		Vector2 get_normalized_tex_coords(const Vector2 &tex_coords, const Vector2 &min, const Vector2 &max,
+			const Vector2 &new_min, const Vector2 &new_max) noexcept;
 		std::pair<Vector2, Vector2> get_normalized_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right,
 			const Vector2 &min, const Vector2 &max) noexcept;
 

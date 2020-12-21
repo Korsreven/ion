@@ -102,12 +102,11 @@ namespace ion::graphics::render
 
 
 			int mesh_draw_mode_to_gl_draw_mode(MeshDrawMode draw_mode) noexcept;
-
 			vertex_storage_type vertices_to_vertex_data(const Vertices &vertices);
-			std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const vertex_storage_type &vertex_data);
-			void generate_tex_coords(vertex_storage_type &vertex_data, const Aabb &aabb,
-				const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords,
-				const materials::Material *material) noexcept;
+
+			std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(int vertex_count, const vertex_storage_type &vertex_data);
+			void generate_tex_coords(int vertex_count, vertex_storage_type &vertex_data, const Aabb &aabb) noexcept;
+			void normalize_tex_coords(int vertex_count, vertex_storage_type &vertex_data, const materials::Material *material) noexcept;
 
 
 			/*
@@ -151,12 +150,12 @@ namespace ion::graphics::render
 			int vertex_buffer_offset_ = 0;
 
 			mesh::detail::vertex_storage_type vertex_data_;
-			std::optional<std::pair<Vector2, Vector2>> tex_coords_;
+			bool auto_generate_tex_coords_ = false;
 
 			bool reload_vertex_data_ = false;
 			bool rebind_vertex_attributes_ = false;
-			bool regenerate_bounding_volumes_ = false;
-			bool regenerate_tex_coords_ = false;
+			bool update_bounding_volumes_ = false;
+			bool update_tex_coords_ = false;
 
 		public:
 
@@ -202,6 +201,7 @@ namespace ion::graphics::render
 				{
 					material_ = material;
 					reload_vertex_data_ = vbo_handle_ && vertex_count_ > 0;
+					update_tex_coords_ = vertex_count_ > 0;
 				}
 			}
 
