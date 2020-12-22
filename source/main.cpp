@@ -463,18 +463,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			material.FlipVertical();
 
 
-			//Mesh
-			using namespace ion::graphics::utilities;
-
+			//Model and mesh
 			ion::graphics::render::mesh::Vertices vertices;
-			vertices.push_back({{-0.25_r, 0.25_r}, vector2::Zero, color::White, {0.0_r, 1.0_r}});
-			vertices.push_back({{-0.25_r, -0.25_r}, vector2::Zero, color::White, {0.0_r, 0.0_r}});
-			vertices.push_back({{0.25_r, -0.25_r}, vector2::Zero, color::White, {1.0_r, 0.0_r}});
-			vertices.push_back({{0.25_r, 0.25_r}, vector2::Zero, color::White, {1.0_r, 1.0_r}});
+			vertices.push_back({{-0.25_r, 0.25_r}, {}, {0.0_r, 1.0_r}});
+			vertices.push_back({{-0.25_r, -0.25_r}, {}, {0.0_r, 0.0_r}});
+			vertices.push_back({{0.25_r, -0.25_r}, {}, {1.0_r, 0.0_r}});
+			vertices.push_back({{0.25_r, 0.25_r}, {}, {1.0_r, 1.0_r}});
 
-			ion::graphics::render::Mesh mesh{vertices};
-			mesh.AttachMaterial(&material);
-			mesh.Prepare();
+			ion::graphics::scene::Model model;
+			[[maybe_unused]] auto &mesh = model.CreateMesh(vertices, material);
+			model.Prepare();
 
 			//EXAMPLE end
 

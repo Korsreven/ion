@@ -264,28 +264,89 @@ void Model::Draw(shaders::ShaderProgram *shader_program) noexcept
 	Creating
 */
 
-render::Mesh& Model::CreateMesh(const render::mesh::Vertices &vertices, bool auto_generate_tex_coords)
+render::Mesh& Model::CreateMesh(const render::mesh::Vertices &vertices, bool visible)
 {
 	reload_vertex_buffer_ = !std::empty(vertices);
-	return Create(vertices, auto_generate_tex_coords);
+	update_bounding_volumes_ = reload_vertex_buffer_;
+
+	return Create(vertices, visible);
 }
 
-render::Mesh& Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, bool auto_generate_tex_coords)
+render::Mesh& Model::CreateMesh(const render::mesh::Vertices &vertices, materials::Material &material,
+	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
+{
+	reload_vertex_buffer_ = !std::empty(vertices);
+	update_bounding_volumes_ = reload_vertex_buffer_;
+
+	return Create(vertices, material, tex_coord_mode, visible);
+}
+
+render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, bool visible)
+{
+	reload_vertex_buffer_ = !std::empty(vertices);
+	update_bounding_volumes_ = reload_vertex_buffer_;
+
+	return Create(draw_mode, vertices, visible);
+}
+
+render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, materials::Material &material,
+	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
+{
+	reload_vertex_buffer_ = !std::empty(vertices);
+	update_bounding_volumes_ = reload_vertex_buffer_;
+
+	return Create(draw_mode, vertices, material, tex_coord_mode, visible);
+}
+
+
+render::Mesh& Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, bool visible)
 {
 	reload_vertex_buffer_ = !std::empty(vertex_data);
-	return Create(std::move(vertex_data), auto_generate_tex_coords);
+	update_bounding_volumes_ = reload_vertex_buffer_;
+
+	return Create(std::move(vertex_data), visible);
+}
+
+render::Mesh& Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
+{
+	reload_vertex_buffer_ = !std::empty(vertex_data);
+	update_bounding_volumes_ = reload_vertex_buffer_;
+
+	return Create(std::move(vertex_data), material, tex_coord_mode, visible);
+}
+
+render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, bool visible)
+{
+	reload_vertex_buffer_ = !std::empty(vertex_data);
+	update_bounding_volumes_ = reload_vertex_buffer_;
+
+	return Create(draw_mode, std::move(vertex_data), visible);
+}
+
+render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
+{
+	reload_vertex_buffer_ = !std::empty(vertex_data);
+	update_bounding_volumes_ = reload_vertex_buffer_;
+
+	return Create(draw_mode, std::move(vertex_data), material, tex_coord_mode, visible);
 }
 
 
 render::Mesh& Model::CreateMesh(const render::Mesh &mesh)
 {
 	reload_vertex_buffer_ = mesh.VertexCount() > 0;
+	update_bounding_volumes_ = reload_vertex_buffer_;
+
 	return Create(mesh);
 }
 
 render::Mesh& Model::CreateMesh(render::Mesh &&mesh)
 {
 	reload_vertex_buffer_ = mesh.VertexCount() > 0;
+	update_bounding_volumes_ = reload_vertex_buffer_;
+
 	return Create(std::move(mesh));
 }
 

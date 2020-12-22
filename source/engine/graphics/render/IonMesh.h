@@ -56,12 +56,28 @@ namespace ion::graphics::render
 			Polygon
 		};
 
-		struct Vertex
+		enum class MeshTexCoordMode
 		{
-			Vector2 position;
-			Vector2 normal;
-			Color color = color::White;
-			Vector2 tex_coord;
+			Manual,
+			Auto
+		};
+
+		struct Vertex final
+		{
+			Vector2 Position;
+			Vector2 Normal;
+			Color BaseColor;
+			Vector2 TexCoord;
+
+
+			//Construct a new vertex with the given position
+			Vertex(const Vector2 &position) noexcept;
+
+			//Construct a new vertex with the given position, normal and base color (default white)
+			Vertex(const Vector2 &position, const Vector2 &normal, const Color &base_color = color::White) noexcept;
+
+			//Construct a new vertex with the given position, normal, tex coord and base color (default white)
+			Vertex(const Vector2 &position, const Vector2 &normal, const Vector2 &tex_coord, const Color &base_color = color::White) noexcept;
 		};
 
 		using Vertices = std::vector<Vertex>;
@@ -134,13 +150,15 @@ namespace ion::graphics::render
 	class Mesh final
 	{
 		private:
-
-			int vertex_count_ = 0;
+		
 			mesh::MeshDrawMode draw_mode_ = mesh::MeshDrawMode::Triangles;
-			materials::Material *material_ = nullptr;
+			mesh::detail::vertex_storage_type vertex_data_;
+			materials::Material *material_ = nullptr;	
+			mesh::MeshTexCoordMode tex_coord_mode_ = mesh::MeshTexCoordMode::Auto;
 			bool show_wireframe_ = false;
 			bool visible_ = true;
 
+			int vertex_count_ = 0;	
 			Aabb aabb_;
 			Obb obb_;
 			Sphere sphere_;
@@ -149,9 +167,6 @@ namespace ion::graphics::render
 			std::optional<int> vbo_handle_;
 			int vertex_buffer_offset_ = 0;
 
-			mesh::detail::vertex_storage_type vertex_data_;
-			bool auto_generate_tex_coords_ = false;
-
 			bool reload_vertex_data_ = false;
 			bool rebind_vertex_attributes_ = false;
 			bool update_bounding_volumes_ = false;
@@ -159,25 +174,34 @@ namespace ion::graphics::render
 
 		public:
 
-			//Construct a new mesh with the given vertices and whether or not tex coords should automatically be generated
-			//If auto generate tex coords is true, user specified vertex tex coords will be ignored
-			explicit Mesh(const mesh::Vertices &vertices, bool auto_generate_tex_coords = false);
+			//Construct a new mesh with the given vertices and visibility
+			explicit Mesh(const mesh::Vertices &vertices, bool visible = true);
 
-			//Construct a new mesh with the given vertices, lower left and upper right tex coords
-			//Tex coords are auto generated in range [lower_left_tex_coords, upper_right_tex_coords]
-			//User specified vertex tex coords will be ignored
-			Mesh(const mesh::Vertices &vertices,
-				const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords);
+			//Construct a new mesh with the given vertices, material, tex coord mode and visibility
+			Mesh(const mesh::Vertices &vertices, materials::Material &material,
+				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
-			//Construct a new mesh with the given raw vertex data and whether or not tex coords should automatically be generated
-			//If auto generate tex coords is true, user specified vertex tex coords will be ignored
-			explicit Mesh(mesh::detail::vertex_storage_type vertex_data, bool auto_generate_tex_coords = false);
+			//Construct a new mesh with the given draw mode, vertices and visibility
+			Mesh(mesh::MeshDrawMode draw_mode, const mesh::Vertices &vertices, bool visible = true);
 
-			//Construct a new mesh with the given raw vertex data
-			//Tex coords are auto generated in range [lower_left_tex_coords, upper_right_tex_coords]
-			//User specified vertex tex coords will be ignored
-			Mesh(mesh::detail::vertex_storage_type vertex_data,
-				const Vector2 &lower_left_tex_coords, const Vector2 &upper_right_tex_coords);
+			//Construct a new mesh with the given draw mode, vertices, material, tex coord mode and visibility
+			Mesh(mesh::MeshDrawMode draw_mode, const mesh::Vertices &vertices, materials::Material &material,
+				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
+
+
+			//Construct a new mesh with the given raw vertex data and visibility
+			explicit Mesh(mesh::detail::vertex_storage_type vertex_data, bool visible = true);
+
+			//Construct a new mesh with the given raw vertex data, material, tex coord mode and visibility
+			Mesh(mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
+
+			//Construct a new mesh with the given draw mode, raw vertex data and visibility
+			Mesh(mesh::MeshDrawMode draw_mode, mesh::detail::vertex_storage_type vertex_data, bool visible = true);
+
+			//Construct a new mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
+			Mesh(mesh::MeshDrawMode draw_mode, mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 			//Destructor
 			~Mesh() noexcept;
@@ -193,14 +217,23 @@ namespace ion::graphics::render
 				draw_mode_ = draw_mode;
 			}
 
-			//Attach the given material to this mesh
-			//Detach an already attached material by passing nullptr
-			inline void AttachMaterial(materials::Material *material) noexcept
+			//Sets the material used by this mesh to the given material
+			inline void MaterialPtr(materials::Material *material) noexcept
 			{
 				if (material_ != material)
 				{
 					material_ = material;
 					reload_vertex_data_ = vbo_handle_ && vertex_count_ > 0;
+					update_tex_coords_ = vertex_count_ > 0;
+				}
+			}
+
+			//Sets the tex coord mode of this mesh to the given mode
+			inline void TexCoordMode(mesh::MeshTexCoordMode tex_coord_mode) noexcept
+			{
+				if (tex_coord_mode_ != tex_coord_mode)
+				{
+					tex_coord_mode_ = tex_coord_mode;
 					update_tex_coords_ = vertex_count_ > 0;
 				}
 			}
@@ -234,28 +267,28 @@ namespace ion::graphics::render
 				Observers
 			*/
 
-			//Returns the vertex count of this mesh
-			[[nodiscard]] inline auto VertexCount() const noexcept
-			{
-				return vertex_count_;
-			}
-
 			//Returns the draw mode of this mesh
 			[[nodiscard]] inline auto DrawMode() const noexcept
 			{
 				return draw_mode_;
 			}
 
-			//Returns a pointer to the material (mutable) attached to this mesh
-			//Returns nullptr if this mesh does not have a material attached
-			[[nodiscard]] inline auto AttachedMaterial() noexcept
+			//Returns all of the vertex data from this mesh
+			[[nodiscard]] inline const auto& VertexData() const noexcept
+			{
+				return vertex_data_;
+			}
+
+			//Returns a pointer to the material (mutable) used by this mesh
+			//Returns nullptr if this mesh does not have a material
+			[[nodiscard]] inline auto MaterialPtr() noexcept
 			{
 				return material_;
 			}
 
-			//Returns a pointer to the material (immutable) attached to this mesh
-			//Returns nullptr if this mesh does not have a material attached
-			[[nodiscard]] inline const auto AttachedMaterial() const noexcept
+			//Returns a pointer to the material (immutable) used by this mesh
+			//Returns nullptr if this mesh does not have a material
+			[[nodiscard]] inline const auto MaterialPtr() const noexcept
 			{
 				return material_;
 			}
@@ -270,6 +303,13 @@ namespace ion::graphics::render
 			[[nodiscard]] inline auto Visible() const noexcept
 			{
 				return visible_;
+			}
+
+
+			//Returns the vertex count of this mesh
+			[[nodiscard]] inline auto VertexCount() const noexcept
+			{
+				return vertex_count_;
 			}
 
 			//Returns the local axis-aligned bounding box (AABB) for this mesh
@@ -301,13 +341,6 @@ namespace ion::graphics::render
 			[[nodiscard]] inline auto VboHandle() const noexcept
 			{
 				return vbo_handle_;
-			}
-
-
-			//Returns all of the vertex data from this mesh
-			[[nodiscard]] inline const auto& VertexData() const noexcept
-			{
-				return vertex_data_;
 			}
 
 

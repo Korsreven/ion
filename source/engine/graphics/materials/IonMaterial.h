@@ -81,7 +81,7 @@ namespace ion::graphics::materials
 			const Vector2 &new_lower_left, const Vector2 &new_upper_right) noexcept;
 		std::pair<Vector2, Vector2> get_unflipped_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right) noexcept;
 
-		Vector2 get_normalized_tex_coords(const Vector2 &tex_coords, const Vector2 &min, const Vector2 &max,
+		Vector2 get_normalized_tex_coord(const Vector2 &tex_coord, const Vector2 &min, const Vector2 &max,
 			const Vector2 &new_min, const Vector2 &new_max) noexcept;
 		std::pair<Vector2, Vector2> get_normalized_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right,
 			const Vector2 &min, const Vector2 &max) noexcept;
@@ -113,8 +113,8 @@ namespace ion::graphics::materials
 			material::detail::map_type specular_map_;
 			material::detail::map_type normal_map_;
 
-			Vector2 lower_left_tex_coords_ = vector2::Zero;
-			Vector2 upper_right_tex_coords_ = vector2::UnitScale;
+			Vector2 lower_left_tex_coord_ = vector2::Zero;
+			Vector2 upper_right_tex_coord_ = vector2::UnitScale;
 			std::optional<Color> emissive_color_;
 			bool receive_shadows_ = true;
 
@@ -223,8 +223,8 @@ namespace ion::graphics::materials
 			//Sets the lower left and upper right texture coordinates for this material to the given coordinates
 			inline void TexCoords(const Vector2 &lower_left, const Vector2 &upper_right) noexcept
 			{
-				lower_left_tex_coords_ = lower_left;
-				upper_right_tex_coords_ = upper_right;
+				lower_left_tex_coord_ = lower_left;
+				upper_right_tex_coord_ = upper_right;
 			}
 
 			//Sets the emissive (self-illumination) color of this material to the given color
@@ -285,7 +285,7 @@ namespace ion::graphics::materials
 			//Returns the lower left and upper right texture coordinates for this material
 			[[nodiscard]] inline auto TexCoords() const noexcept
 			{
-				return std::pair{lower_left_tex_coords_, upper_right_tex_coords_};
+				return std::pair{lower_left_tex_coord_, upper_right_tex_coord_};
 			}
 
 			//Returns the emissive (self-illumination) color of the material

@@ -25,7 +25,33 @@ namespace ion::graphics::render
 
 using namespace mesh;
 
-namespace mesh::detail
+namespace mesh
+{
+
+Vertex::Vertex(const Vector2 &position) noexcept :
+	Position{position}
+{
+	//Empty
+}
+
+Vertex::Vertex(const Vector2 &position, const Vector2 &normal, const Color &base_color) noexcept :
+	Position{position},
+	Normal{normal},
+	BaseColor{base_color}
+{
+	//Empty
+}
+
+Vertex::Vertex(const Vector2 &position, const Vector2 &normal, const Vector2 &tex_coord, const Color &base_color) noexcept :
+	Position{position},
+	Normal{normal},
+	TexCoord{tex_coord},
+	BaseColor{base_color}
+{
+	//Empty
+}
+
+namespace detail
 {
 
 int mesh_draw_mode_to_gl_draw_mode(MeshDrawMode draw_mode) noexcept
@@ -70,24 +96,24 @@ vertex_storage_type vertices_to_vertex_data(const Vertices &vertices)
 	//Insert positions
 	for (auto &vertex : vertices)
 	{
-		vertex_data.insert(std::end(vertex_data), vertex.position.Components(), vertex.position.Components() + 2);
+		vertex_data.insert(std::end(vertex_data), vertex.Position.Components(), vertex.Position.Components() + 2);
 		vertex_data.push_back(-1.0_r); //z
 	}
 
 	//Insert normals
 	for (auto &vertex : vertices)
 	{
-		vertex_data.insert(std::end(vertex_data), vertex.normal.Components(), vertex.normal.Components() + 2);
+		vertex_data.insert(std::end(vertex_data), vertex.Normal.Components(), vertex.Normal.Components() + 2);
 		vertex_data.push_back(1.0_r); //z
 	}
 
-	//Insert colors
+	//Insert base colors
 	for (auto &vertex : vertices)
-		vertex_data.insert(std::end(vertex_data), vertex.color.Channels(), vertex.color.Channels() + 4);
+		vertex_data.insert(std::end(vertex_data), vertex.BaseColor.Channels(), vertex.BaseColor.Channels() + 4);
 
-	//insert tex coords
+	//Insert tex coords
 	for (auto &vertex : vertices)
-		vertex_data.insert(std::end(vertex_data), vertex.tex_coord.Components(), vertex.tex_coord.Components() + 2);
+		vertex_data.insert(std::end(vertex_data), vertex.TexCoord.Components(), vertex.TexCoord.Components() + 2);
 
 	return vertex_data;
 }
@@ -120,11 +146,11 @@ void generate_tex_coords(int vertex_count, vertex_storage_type &vertex_data, con
 	//Generate each vertex tex coords (s,t) from position (x,y) in range [0, 1]
 	for (auto i = 0; i < vertex_count; ++i)
 	{
-		auto tex_coords =
-			materials::material::detail::get_normalized_tex_coords(
+		auto tex_coord =
+			materials::material::detail::get_normalized_tex_coord(
 				{vertex_data[i * position_components], vertex_data[i * position_components + 1]},
 				aabb.Min(), aabb.Max(), vector2::Zero, vector2::UnitScale);
-		auto [s, t] = tex_coords.XY();
+		auto [s, t] = tex_coord.XY();
 
 		vertex_data[offset + i * tex_coord_components] = s;
 		vertex_data[offset + i * tex_coord_components + 1] = t;
@@ -142,31 +168,31 @@ void normalize_tex_coords(int vertex_count, vertex_storage_type &vertex_data, co
 	//Find lower left / upper right for each vertex tex coords (s,t)
 	for (auto i = 1; i < vertex_count; ++i)
 	{
-		auto tex_coords = Vector2{vertex_data[offset + i * tex_coord_components],
-								  vertex_data[offset + i * tex_coord_components + 1]};
+		auto tex_coord = Vector2{vertex_data[offset + i * tex_coord_components],
+								 vertex_data[offset + i * tex_coord_components + 1]};
 
-		lower_left = std::min(lower_left, tex_coords);
-		upper_right = std::max(upper_right, tex_coords);
+		lower_left = std::min(lower_left, tex_coord);
+		upper_right = std::max(upper_right, tex_coord);
 	}
 
-	auto [world_lower_left_tex_coords, world_upper_right_tex_coords] = material ?
+	auto [world_lower_left_tex_coord, world_upper_right_tex_coord] = material ?
 		material->WorldTexCoords() :
 		std::pair{vector2::Zero, vector2::UnitScale};
 	auto [world_lower_left, world_upper_right] =
-		materials::material::detail::get_unflipped_tex_coords(world_lower_left_tex_coords, world_upper_right_tex_coords);
+		materials::material::detail::get_unflipped_tex_coords(world_lower_left_tex_coord, world_upper_right_tex_coord);
 
 	auto [mid_s, mid_t] = world_lower_left.Midpoint(world_upper_right).XY();
-	auto flip_s = materials::material::detail::is_flipped_horizontally(world_lower_left_tex_coords, world_upper_right_tex_coords);
-	auto flip_t = materials::material::detail::is_flipped_vertically(world_lower_left_tex_coords, world_upper_right_tex_coords);
+	auto flip_s = materials::material::detail::is_flipped_horizontally(world_lower_left_tex_coord, world_upper_right_tex_coord);
+	auto flip_t = materials::material::detail::is_flipped_vertically(world_lower_left_tex_coord, world_upper_right_tex_coord);
 
 	//Normalize each vertex tex coords (s,t)
 	for (auto i = 0; i < vertex_count; ++i)
 	{
-		auto norm_tex_coords =
-			materials::material::detail::get_normalized_tex_coords(
+		auto norm_tex_coord =
+			materials::material::detail::get_normalized_tex_coord(
 				{vertex_data[offset + i * tex_coord_components], vertex_data[offset + i * tex_coord_components + 1]},
 				lower_left, upper_right, world_lower_left,  world_upper_right);
-		auto [s, t] = norm_tex_coords.XY();
+		auto [s, t] = norm_tex_coord.XY();
 
 		//Make sure mesh texture is flipped the same way as material texture
 		if (flip_s)
@@ -359,30 +385,91 @@ void use_shader_program(int program_handle) noexcept
 	}
 }
 
-} //mesh::detail
+} //detail
+} //mesh
 
 
-Mesh::Mesh(const mesh::Vertices &vertices, bool auto_generate_tex_coords) :
+Mesh::Mesh(const mesh::Vertices &vertices, bool visible) :
+	Mesh{MeshDrawMode::Triangles, vertices, visible}
+{
+	//Empty
+}
+
+Mesh::Mesh(const mesh::Vertices &vertices, materials::Material &material,
+	mesh::MeshTexCoordMode tex_coord_mode, bool visible) :
+
+	Mesh{MeshDrawMode::Triangles, vertices, material, tex_coord_mode, visible}
+{
+	//Empty
+}
+
+Mesh::Mesh(mesh::MeshDrawMode draw_mode, const mesh::Vertices &vertices, bool visible) :
+
+	draw_mode_{draw_mode},
+	vertex_data_{detail::vertices_to_vertex_data(vertices)},
+	visible_{visible},
 
 	vertex_count_{std::ssize(vertices)},
-
-	vertex_data_{detail::vertices_to_vertex_data(vertices)},
-	auto_generate_tex_coords_{auto_generate_tex_coords},
-
 	update_bounding_volumes_{vertex_count_ > 0},
 	update_tex_coords_{vertex_count_ > 0}
 {
 	//Empty
 }
 
-Mesh::Mesh(detail::vertex_storage_type vertex_data, bool auto_generate_tex_coords) :
+Mesh::Mesh(mesh::MeshDrawMode draw_mode, const mesh::Vertices &vertices, materials::Material &material,
+	mesh::MeshTexCoordMode tex_coord_mode, bool visible) :
+	
+	draw_mode_{draw_mode},
+	vertex_data_{detail::vertices_to_vertex_data(vertices)},
+	material_{&material},
+	tex_coord_mode_{tex_coord_mode},
+	visible_{visible},
 
-	vertex_count_{std::ssize(vertex_data) % detail::vertex_components == 0 ?
-		std::ssize(vertex_data) / detail::vertex_components : 0},
+	vertex_count_{std::ssize(vertices)},
+	update_bounding_volumes_{vertex_count_ > 0},
+	update_tex_coords_{vertex_count_ > 0}
+{
+	//Empty
+}
 
-	vertex_data_{vertex_count_ > 0 ? std::move(vertex_data) : decltype(vertex_data){}},
-	auto_generate_tex_coords_{auto_generate_tex_coords},
 
+Mesh::Mesh(mesh::detail::vertex_storage_type vertex_data, bool visible) :
+	Mesh{MeshDrawMode::Triangles, std::move(vertex_data), visible}
+{
+	//Empty
+}
+
+Mesh::Mesh(mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+	mesh::MeshTexCoordMode tex_coord_mode, bool visible) :
+
+	Mesh{MeshDrawMode::Triangles, std::move(vertex_data), material, tex_coord_mode, visible}
+{
+	//Empty
+}
+
+Mesh::Mesh(mesh::MeshDrawMode draw_mode, mesh::detail::vertex_storage_type vertex_data, bool visible) :
+
+	draw_mode_{draw_mode},
+	vertex_data_{std::move(vertex_data)},
+	visible_{visible},
+
+	vertex_count_{std::ssize(vertex_data) / detail::vertex_components},
+	update_bounding_volumes_{vertex_count_ > 0},
+	update_tex_coords_{vertex_count_ > 0}
+{
+	//Empty
+}
+
+Mesh::Mesh(mesh::MeshDrawMode draw_mode, mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+	mesh::MeshTexCoordMode tex_coord_mode, bool visible) :
+
+	draw_mode_{draw_mode},
+	vertex_data_{std::move(vertex_data)},
+	material_{&material},
+	tex_coord_mode_{tex_coord_mode},
+	visible_{visible},
+
+	vertex_count_{std::ssize(vertex_data) / detail::vertex_components},
 	update_bounding_volumes_{vertex_count_ > 0},
 	update_tex_coords_{vertex_count_ > 0}
 {
@@ -419,31 +506,29 @@ void Mesh::VertexColor(const Color &color) noexcept
 
 void Mesh::Prepare() noexcept
 {
+	//Nothing to prepare
+	if (vertex_count_ == 0)
+		return;
+
 	if (update_bounding_volumes_)
 	{
-		if (vertex_count_ > 0)
-		{
-			auto [aabb, obb, sphere] = detail::generate_bounding_volumes(vertex_count_, vertex_data_);
-			aabb_ = aabb;
-			obb_ = obb;
-			sphere_ = sphere;
-		}
+		auto [aabb, obb, sphere] = detail::generate_bounding_volumes(vertex_count_, vertex_data_);
+		aabb_ = aabb;
+		obb_ = obb;
+		sphere_ = sphere;
 
 		update_bounding_volumes_ = false;
 	}
 
 	if (update_tex_coords_)
 	{
-		if (vertex_count_ > 0)
-		{
-			//Auto generate tex coords
-			if (auto_generate_tex_coords_)
-				detail::generate_tex_coords(vertex_count_, vertex_data_, aabb_);
+		//Auto generate tex coords
+		if (tex_coord_mode_ == mesh::MeshTexCoordMode::Auto)
+			detail::generate_tex_coords(vertex_count_, vertex_data_, aabb_);
 
-			//Normalize tex coords
-			if (!auto_generate_tex_coords_ || material_)
-				detail::normalize_tex_coords(vertex_count_, vertex_data_, material_);
-		}
+		//Normalize tex coords
+		if (tex_coord_mode_ == mesh::MeshTexCoordMode::Manual || material_)
+			detail::normalize_tex_coords(vertex_count_, vertex_data_, material_);
 
 		update_tex_coords_ = false;
 	}
@@ -451,7 +536,7 @@ void Mesh::Prepare() noexcept
 	if (reload_vertex_data_)
 	{
 		//Send vertex data to VRAM
-		if (vbo_handle_ && vertex_count_ > 0)
+		if (vbo_handle_)
 			detail::set_vertex_buffer_sub_data(*vbo_handle_, vertex_buffer_offset_, vertex_data_);
 
 		reload_vertex_data_ = false;
@@ -459,7 +544,7 @@ void Mesh::Prepare() noexcept
 
 	if (rebind_vertex_attributes_)
 	{
-		if (vbo_handle_ && vertex_count_ > 0)
+		if (vbo_handle_)
 		{
 			if (!vao_handle_)
 				vao_handle_ = detail::create_vertex_array_object();
@@ -475,7 +560,7 @@ void Mesh::Prepare() noexcept
 void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 {
 	//Nothing to draw
-	if (vertex_count_ == 0)
+	if (vertex_count_ == 0 || !visible_)
 		return;
 
 	auto has_supported_attributes = false;

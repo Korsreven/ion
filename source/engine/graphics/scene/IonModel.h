@@ -68,14 +68,15 @@ namespace ion::graphics::scene
 			model::ModelBufferUsage buffer_usage_ = model::ModelBufferUsage::Static;
 			bool visible_ = true;
 
+			Aabb aabb_;
+			Obb obb_;
+			Sphere sphere_;
+
 			std::optional<int> vbo_handle_;
-
-			std::optional<Aabb> aabb_;
-			std::optional<Obb> obb_;
-			std::optional<Sphere> sphere_;
-
 			render::mesh::detail::vertex_storage_type vertex_buffer_;
+
 			bool reload_vertex_buffer_ = false;
+			bool update_bounding_volumes_ = false;
 
 
 			void FetchVertexData();
@@ -149,6 +150,25 @@ namespace ion::graphics::scene
 			}
 
 
+			//Returns the local axis-aligned bounding box (AABB) for this model
+			[[nodiscard]] inline auto AxisAlignedBoundingBox() const noexcept
+			{
+				return aabb_;
+			}
+
+			//Returns the local oriented bounding box (OBB) for this model
+			[[nodiscard]] inline auto OrientedBoundingBox() const noexcept
+			{
+				return obb_;
+			}
+
+			//Returns the local bounding sphere for this model
+			[[nodiscard]] inline auto BoundingSphere() const noexcept
+			{
+				return sphere_;
+			}
+
+
 			//Return the VBO handle this model uses
 			[[nodiscard]] inline auto VboHandle() const noexcept
 			{
@@ -174,13 +194,34 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a mesh with the given vertices and whether or not tex coords should automatically be generated
-			//If auto generate tex coords is true, user specified vertex tex coords will be ignored
-			render::Mesh& CreateMesh(const render::mesh::Vertices &vertices, bool auto_generate_tex_coords = false);
+			//Create a mesh with the given vertices and visibility
+			render::Mesh& CreateMesh(const render::mesh::Vertices &vertices, bool visible = true);
 
-			//Create a mesh with the given raw vertex data and whether or not tex coords should automatically be generated
-			//If auto generate tex coords is true, user specified vertex tex coords will be ignored
-			render::Mesh& CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, bool auto_generate_tex_coords = false);
+			//Create a mesh with the given vertices, material, tex coord mode and visibility
+			render::Mesh& CreateMesh(const render::mesh::Vertices &vertices, materials::Material &material,
+				render::mesh::MeshTexCoordMode tex_coord_mode = render::mesh::MeshTexCoordMode::Auto, bool visible = true);
+
+			//Create a mesh with the given draw mode, vertices and visibility
+			render::Mesh& CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, bool visible = true);
+
+			//Create a mesh with the given draw mode, vertices, material, tex coord mode and visibility
+			render::Mesh& CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, materials::Material &material,
+				render::mesh::MeshTexCoordMode tex_coord_mode = render::mesh::MeshTexCoordMode::Auto, bool visible = true);
+
+
+			//Create a mesh with the given raw vertex data and visibility
+			render::Mesh& CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, bool visible = true);
+
+			//Create a mesh with the given raw vertex data, material, tex coord mode and visibility
+			render::Mesh& CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+				render::mesh::MeshTexCoordMode tex_coord_mode = render::mesh::MeshTexCoordMode::Auto, bool visible = true);
+
+			//Create a mesh with the given draw mode, raw vertex data and visibility
+			render::Mesh& CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, bool visible = true);
+
+			//Create a mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
+			render::Mesh& CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+				render::mesh::MeshTexCoordMode tex_coord_mode = render::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
 			//Create a mesh as a copy of the given mesh

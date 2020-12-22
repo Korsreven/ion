@@ -59,12 +59,12 @@ std::pair<Vector2, Vector2> get_unflipped_tex_coords(const Vector2 &lower_left, 
 }
 
 
-Vector2 get_normalized_tex_coords(const Vector2 &tex_coords, const Vector2 &min, const Vector2 &max,
+Vector2 get_normalized_tex_coord(const Vector2 &tex_coord, const Vector2 &min, const Vector2 &max,
 	const Vector2 &new_min, const Vector2 &new_max) noexcept
 {
 	using namespace ion::utilities;
 
-	auto [s, t] = tex_coords.XY();
+	auto [s, t] = tex_coord.XY();
 	auto [min_s, min_t] = min.XY();
 	auto [max_s, max_t] = max.XY();
 	auto [new_min_s, new_min_t] = new_min.XY();
@@ -77,8 +77,8 @@ Vector2 get_normalized_tex_coords(const Vector2 &tex_coords, const Vector2 &min,
 std::pair<Vector2, Vector2> get_normalized_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right,
 	const Vector2 &min, const Vector2 &max) noexcept
 {
-	return {get_normalized_tex_coords(lower_left, vector2::Zero, vector2::UnitScale, min, max),
-			get_normalized_tex_coords(upper_right, vector2::Zero, vector2::UnitScale, min, max)};
+	return {get_normalized_tex_coord(lower_left, vector2::Zero, vector2::UnitScale, min, max),
+			get_normalized_tex_coord(upper_right, vector2::Zero, vector2::UnitScale, min, max)};
 }
 
 
@@ -354,20 +354,20 @@ void Material::Crop(const std::optional<Aabb> &area) noexcept
 		if (min != max)
 		{
 			auto [lower_left, upper_right] =
-				detail::get_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_, min, max);
+				detail::get_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_, min, max);
 
-			lower_left_tex_coords_ = lower_left;
-			upper_right_tex_coords_ = upper_right;
+			lower_left_tex_coord_ = lower_left;
+			upper_right_tex_coord_ = upper_right;
 		}
 	}
 	//Un-crop
 	else if (IsCropped())
 	{
 		auto [lower_left, upper_right] =
-			detail::get_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_, 0.0_r, 1.0_r);
+			detail::get_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_, 0.0_r, 1.0_r);
 
-		lower_left_tex_coords_ = lower_left;
-		upper_right_tex_coords_ = upper_right;
+		lower_left_tex_coord_ = lower_left;
+		upper_right_tex_coord_ = upper_right;
 	}
 }
 
@@ -379,54 +379,54 @@ void Material::Repeat(const std::optional<Vector2> &amount) noexcept
 		if (auto max = amount->CeilCopy(vector2::Zero); vector2::Zero < max)
 		{
 			auto [lower_left, upper_right] =
-				detail::get_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_, 0.0_r, max);
+				detail::get_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_, 0.0_r, max);
 
-			lower_left_tex_coords_ = lower_left;
-			upper_right_tex_coords_ = upper_right;
+			lower_left_tex_coord_ = lower_left;
+			upper_right_tex_coord_ = upper_right;
 		}
 	}
 	//Un-repeat
 	else if (IsRepeated())
 	{
 		auto [lower_left, upper_right] =
-			detail::get_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_, 0.0_r, 1.0_r);
+			detail::get_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_, 0.0_r, 1.0_r);
 
-		lower_left_tex_coords_ = lower_left;
-		upper_right_tex_coords_ = upper_right;
+		lower_left_tex_coord_ = lower_left;
+		upper_right_tex_coord_ = upper_right;
 	}
 }
 
 
 void Material::FlipHorizontal() noexcept
 {
-	auto ll_s = lower_left_tex_coords_.X();
-	auto ur_s = upper_right_tex_coords_.X();
+	auto ll_s = lower_left_tex_coord_.X();
+	auto ur_s = upper_right_tex_coord_.X();
 
-	lower_left_tex_coords_.X(ur_s);
-	upper_right_tex_coords_.X(ll_s);
+	lower_left_tex_coord_.X(ur_s);
+	upper_right_tex_coord_.X(ll_s);
 }
 
 void Material::FlipVertical() noexcept
 {
-	auto ll_t = lower_left_tex_coords_.Y();
-	auto ur_t = upper_right_tex_coords_.Y();
+	auto ll_t = lower_left_tex_coord_.Y();
+	auto ur_t = upper_right_tex_coord_.Y();
 
-	lower_left_tex_coords_.Y(ur_t);
-	upper_right_tex_coords_.Y(ll_t);
+	lower_left_tex_coord_.Y(ur_t);
+	upper_right_tex_coord_.Y(ll_t);
 }
 
 
 bool Material::IsCropped() const noexcept
 {
 	auto [lower_left, upper_right] =
-		detail::get_unflipped_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_);
+		detail::get_unflipped_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_);
 	return detail::is_cropped(lower_left, upper_right);
 }
 
 bool Material::IsRepeated() const noexcept
 {
 	auto [lower_left, upper_right] =
-		detail::get_unflipped_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_);
+		detail::get_unflipped_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_);
 	return detail::is_repeated(lower_left, upper_right);
 }
 
@@ -435,7 +435,7 @@ std::pair<bool, bool> Material::IsRepeatable() const noexcept
 	if (auto texture = detail::get_first_texture_map(diffuse_map_, specular_map_, normal_map_); texture)
 	{
 		auto [lower_left, upper_right] =
-			detail::get_unflipped_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_);
+			detail::get_unflipped_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_);
 		return detail::is_texture_map_repeatable(*texture, lower_left, upper_right);
 	}
 	else
@@ -445,12 +445,12 @@ std::pair<bool, bool> Material::IsRepeatable() const noexcept
 
 bool Material::IsFlippedHorizontally() const noexcept
 {
-	return detail::is_flipped_horizontally(lower_left_tex_coords_, upper_right_tex_coords_);
+	return detail::is_flipped_horizontally(lower_left_tex_coord_, upper_right_tex_coord_);
 }
 
 bool Material::IsFlippedVertically() const noexcept
 {
-	return detail::is_flipped_vertically(lower_left_tex_coords_, upper_right_tex_coords_);
+	return detail::is_flipped_vertically(lower_left_tex_coord_, upper_right_tex_coord_);
 }
 
 
@@ -462,7 +462,7 @@ std::pair<Vector2, Vector2> Material::WorldTexCoords() const noexcept
 		if (auto world_tex_coords = texture->TexCoords(); world_tex_coords)
 		{
 			auto [lower_left, upper_right] =
-				detail::get_unflipped_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_);
+				detail::get_unflipped_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_);
 			auto &[world_lower_left, world_upper_right] = *world_tex_coords;
 
 			auto [s_repeatable, t_repeatable] =
@@ -485,13 +485,13 @@ std::pair<Vector2, Vector2> Material::WorldTexCoords() const noexcept
 			auto [norm_lower_left, norm_upper_right] =
 				detail::get_normalized_tex_coords(lower_left, upper_right, world_lower_left, world_upper_right);
 
-			return detail::get_tex_coords(lower_left_tex_coords_, upper_right_tex_coords_,
+			return detail::get_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_,
 										  norm_lower_left, norm_upper_right);
 		}
 	}
 
 	//Use local tex coords
-	return {lower_left_tex_coords_, upper_right_tex_coords_};
+	return {lower_left_tex_coord_, upper_right_tex_coord_};
 }
 
 } //ion::graphics::materials
