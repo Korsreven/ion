@@ -248,14 +248,34 @@ void Model::Prepare() noexcept
 		reload_vertex_buffer_ = false;
 	}
 
+
+	//Prepare all meshes
 	for (auto &mesh : Meshes())
 		mesh.Prepare();
+
+
+	if (update_bounding_volumes_)
+	{
+		aabb_ = {};
+
+		for (auto &mesh : Meshes())
+			aabb_.Merge(mesh.AxisAlignedBoundingBox());
+
+		obb_ = aabb_;
+		sphere_ = {aabb_.ToHalfSize().Length(), aabb_.Center()};
+
+		update_bounding_volumes_ = false;
+	}
 }
 
 void Model::Draw(shaders::ShaderProgram *shader_program) noexcept
 {
-	for (auto &mesh : Meshes())
-		mesh.Draw(shader_program);
+	if (visible_)
+	{
+		//Draw all meshes
+		for (auto &mesh : Meshes())
+			mesh.Draw(shader_program);
+	}
 }
 
 
@@ -266,8 +286,8 @@ void Model::Draw(shaders::ShaderProgram *shader_program) noexcept
 
 render::Mesh& Model::CreateMesh(const render::mesh::Vertices &vertices, bool visible)
 {
-	reload_vertex_buffer_ = !std::empty(vertices);
-	update_bounding_volumes_ = reload_vertex_buffer_;
+	reload_vertex_buffer_ |= !std::empty(vertices);
+	update_bounding_volumes_ |= reload_vertex_buffer_;
 
 	return Create(vertices, visible);
 }
@@ -275,16 +295,16 @@ render::Mesh& Model::CreateMesh(const render::mesh::Vertices &vertices, bool vis
 render::Mesh& Model::CreateMesh(const render::mesh::Vertices &vertices, materials::Material &material,
 	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
-	reload_vertex_buffer_ = !std::empty(vertices);
-	update_bounding_volumes_ = reload_vertex_buffer_;
+	reload_vertex_buffer_ |= !std::empty(vertices);
+	update_bounding_volumes_ |= reload_vertex_buffer_;
 
 	return Create(vertices, material, tex_coord_mode, visible);
 }
 
 render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, bool visible)
 {
-	reload_vertex_buffer_ = !std::empty(vertices);
-	update_bounding_volumes_ = reload_vertex_buffer_;
+	reload_vertex_buffer_ |= !std::empty(vertices);
+	update_bounding_volumes_ |= reload_vertex_buffer_;
 
 	return Create(draw_mode, vertices, visible);
 }
@@ -292,8 +312,8 @@ render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, const rend
 render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, materials::Material &material,
 	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
-	reload_vertex_buffer_ = !std::empty(vertices);
-	update_bounding_volumes_ = reload_vertex_buffer_;
+	reload_vertex_buffer_ |= !std::empty(vertices);
+	update_bounding_volumes_ |= reload_vertex_buffer_;
 
 	return Create(draw_mode, vertices, material, tex_coord_mode, visible);
 }
@@ -301,8 +321,8 @@ render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, const rend
 
 render::Mesh& Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, bool visible)
 {
-	reload_vertex_buffer_ = !std::empty(vertex_data);
-	update_bounding_volumes_ = reload_vertex_buffer_;
+	reload_vertex_buffer_ |= !std::empty(vertex_data);
+	update_bounding_volumes_ |= reload_vertex_buffer_;
 
 	return Create(std::move(vertex_data), visible);
 }
@@ -310,16 +330,16 @@ render::Mesh& Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex
 render::Mesh& Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
 	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
-	reload_vertex_buffer_ = !std::empty(vertex_data);
-	update_bounding_volumes_ = reload_vertex_buffer_;
+	reload_vertex_buffer_ |= !std::empty(vertex_data);
+	update_bounding_volumes_ |= reload_vertex_buffer_;
 
 	return Create(std::move(vertex_data), material, tex_coord_mode, visible);
 }
 
 render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, bool visible)
 {
-	reload_vertex_buffer_ = !std::empty(vertex_data);
-	update_bounding_volumes_ = reload_vertex_buffer_;
+	reload_vertex_buffer_ |= !std::empty(vertex_data);
+	update_bounding_volumes_ |= reload_vertex_buffer_;
 
 	return Create(draw_mode, std::move(vertex_data), visible);
 }
@@ -327,8 +347,8 @@ render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, render::me
 render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
 	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
-	reload_vertex_buffer_ = !std::empty(vertex_data);
-	update_bounding_volumes_ = reload_vertex_buffer_;
+	reload_vertex_buffer_ |= !std::empty(vertex_data);
+	update_bounding_volumes_ |= reload_vertex_buffer_;
 
 	return Create(draw_mode, std::move(vertex_data), material, tex_coord_mode, visible);
 }
@@ -336,16 +356,16 @@ render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, render::me
 
 render::Mesh& Model::CreateMesh(const render::Mesh &mesh)
 {
-	reload_vertex_buffer_ = mesh.VertexCount() > 0;
-	update_bounding_volumes_ = reload_vertex_buffer_;
+	reload_vertex_buffer_ |= mesh.VertexCount() > 0;
+	update_bounding_volumes_ |= reload_vertex_buffer_;
 
 	return Create(mesh);
 }
 
 render::Mesh& Model::CreateMesh(render::Mesh &&mesh)
 {
-	reload_vertex_buffer_ = mesh.VertexCount() > 0;
-	update_bounding_volumes_ = reload_vertex_buffer_;
+	reload_vertex_buffer_ |= mesh.VertexCount() > 0;
+	update_bounding_volumes_ |= reload_vertex_buffer_;
 
 	return Create(std::move(mesh));
 }
@@ -358,12 +378,15 @@ render::Mesh& Model::CreateMesh(render::Mesh &&mesh)
 
 void Model::ClearMeshes() noexcept
 {
+	update_bounding_volumes_ |= !std::empty(Meshes());
 	Clear();
 }
 
 bool Model::RemoveMesh(render::Mesh &mesh) noexcept
 {
-	return Remove(mesh);
+	auto removed = Remove(mesh);
+	update_bounding_volumes_ |= removed;
+	return removed;
 }
 
 } //ion::graphics::scene

@@ -204,12 +204,12 @@ void set_attribute_value::set_vertex_pointer(int index, int size, bool normalize
 	{
 		case gl::Extension::Core:
 		glVertexAttribPointer(index, size, GL_INT, normalized, stride, pointer);
-		glEnableVertexAttribArray(index);
+		//glEnableVertexAttribArray(index);
 		break;
 
 		case gl::Extension::ARB:
 		glVertexAttribPointerARB(index, size, GL_INT, normalized, stride, pointer);
-		glEnableVertexAttribArrayARB(index);
+		//glEnableVertexAttribArrayARB(index);
 		break;
 	}
 }
@@ -220,12 +220,12 @@ void set_attribute_value::set_vertex_pointer(int index, int size, bool normalize
 	{
 		case gl::Extension::Core:
 		glVertexAttribPointer(index, size, GL_UNSIGNED_INT, normalized, stride, pointer);
-		glEnableVertexAttribArray(index);
+		//glEnableVertexAttribArray(index);
 		break;
 
 		case gl::Extension::ARB:
 		glVertexAttribPointerARB(index, size, GL_UNSIGNED_INT, normalized, stride, pointer);
-		glEnableVertexAttribArrayARB(index);
+		//glEnableVertexAttribArrayARB(index);
 		break;
 	}
 }
@@ -236,12 +236,12 @@ void set_attribute_value::set_vertex_pointer(int index, int size, bool normalize
 	{
 		case gl::Extension::Core:
 		glVertexAttribPointer(index, size, GL_FLOAT, normalized, stride, pointer);
-		glEnableVertexAttribArray(index);
+		//glEnableVertexAttribArray(index);
 		break;
 
 		case gl::Extension::ARB:
 		glVertexAttribPointerARB(index, size, GL_FLOAT, normalized, stride, pointer);
-		glEnableVertexAttribArrayARB(index);
+		//glEnableVertexAttribArrayARB(index);
 		break;
 	}
 }
@@ -252,12 +252,12 @@ void set_attribute_value::set_vertex_pointer(int index, int size, bool normalize
 	{
 		case gl::Extension::Core:
 		glVertexAttribPointer(index, size, GL_DOUBLE, normalized, stride, pointer);
-		glEnableVertexAttribArray(index);
+		//glEnableVertexAttribArray(index);
 		break;
 
 		case gl::Extension::ARB:	
 		glVertexAttribPointerARB(index, size, GL_DOUBLE, normalized, stride, pointer);
-		glEnableVertexAttribArrayARB(index);
+		//glEnableVertexAttribArrayARB(index);
 		break;
 	}
 }
@@ -268,7 +268,7 @@ void set_attribute_value::set_vertex_ipointer(int index, int size, bool normaliz
 	if (gl::HasGL(gl::Version::v3_0))
 	{		
 		glVertexAttribIPointer(index, size, GL_INT, stride, pointer);
-		glEnableVertexAttribArray(index);
+		//glEnableVertexAttribArray(index);
 	}
 	else //Use glVertexAttribPointer (will be converted to float)
 		set_vertex_pointer(index, size, normalized, stride, pointer, int32{});
@@ -279,7 +279,7 @@ void set_attribute_value::set_vertex_ipointer(int index, int size, bool normaliz
 	if (gl::HasGL(gl::Version::v3_0))
 	{	
 		glVertexAttribIPointer(index, size, GL_UNSIGNED_INT, stride, pointer);
-		glEnableVertexAttribArray(index);
+		//glEnableVertexAttribArray(index);
 	}
 	else //Use glVertexAttribPointer (will be converted to float)
 		set_vertex_pointer(index, size, normalized, stride, pointer, uint32{});
@@ -291,7 +291,7 @@ void set_attribute_value::set_vertex_lpointer(int index, int size, bool normaliz
 	if (gl::HasGL(gl::Version::v4_1))
 	{		
 		glVertexAttribLPointer(index, size, GL_DOUBLE, stride, pointer);
-		glEnableVertexAttribArray(index);
+		//glEnableVertexAttribArray(index);
 	}
 	else //Use glVertexAttribPointer (will be converted to float)
 		set_vertex_pointer(index, size, normalized, stride, pointer, float64{});

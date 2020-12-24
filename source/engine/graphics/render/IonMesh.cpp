@@ -125,7 +125,7 @@ std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(int vertex_count, const 
 		Vector2{vertex_data[0], vertex_data[1]} : vector2::Zero;
 	auto max = min;
 
-	//Find lower left / upper right for each vertex position (x,y)
+	//Find min/max for each vertex position (x,y)
 	for (auto i = 1; i < vertex_count; ++i)
 	{
 		auto position = Vector2{vertex_data[i * position_components],
@@ -165,7 +165,7 @@ void normalize_tex_coords(int vertex_count, vertex_storage_type &vertex_data, co
 		Vector2{vertex_data[offset], vertex_data[offset + 1]} : vector2::Zero;
 	auto upper_right = lower_left;
 
-	//Find lower left / upper right for each vertex tex coords (s,t)
+	//Find lower left/upper right for each vertex tex coords (s,t)
 	for (auto i = 1; i < vertex_count; ++i)
 	{
 		auto tex_coord = Vector2{vertex_data[offset + i * tex_coord_components],
@@ -564,7 +564,7 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 		return;
 
 	auto has_supported_attributes = false;
-	auto use_vao = vao_handle_ && vbo_handle_;
+	auto use_vao = shader_program && vao_handle_ && vbo_handle_;
 
 	//Use shaders
 	if (shader_program && shader_program->Handle())
