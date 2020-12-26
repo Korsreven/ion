@@ -383,6 +383,13 @@ namespace ion::graphics::shaders::variables::glsl
 			this->values_[2 * this->off_ + 1] = y;
 		}
 
+		//Sets the x and y components to the given values
+		inline void XY(T x, T y) noexcept
+		{
+			X(x);
+			Y(y);
+		}
+
 
 		/*
 			Observers
@@ -459,6 +466,14 @@ namespace ion::graphics::shaders::variables::glsl
 		inline void Z(T z) noexcept
 		{
 			this->values_[3 * this->off_ + 2] = z;
+		}
+
+		//Sets the x, y and z components to the given values
+		inline void XYZ(T x, T y, T z) noexcept
+		{
+			X(x);
+			Y(y);
+			Z(z);
 		}
 
 
@@ -549,6 +564,15 @@ namespace ion::graphics::shaders::variables::glsl
 		inline void W(T w) noexcept
 		{
 			this->values_[4 * this->off_ + 3] = w;
+		}
+
+		//Sets the x, y, z and w components to the given values
+		inline void XYZW(T x, T y, T z, T w) noexcept
+		{
+			X(x);
+			Y(y);
+			Z(z);
+			W(w);
 		}
 
 
@@ -739,6 +763,22 @@ namespace ion::graphics::shaders::variables::glsl
 			explicit UniformValue(int size = 1) :
 				size_{size > 0 ? size : 1},
 				values_(type_components_v<T> * size_, basic_type_t<T>{})
+			{
+				ValueAccessor<T>::values_ = &values_[0];
+			}
+
+			//Copy constructor
+			UniformValue(const UniformValue &rhs) :
+				size_{rhs.size_},
+				values_{rhs.values_}
+			{
+				ValueAccessor<T>::values_ = &values_[0];
+			}
+
+			//Move constructor
+			UniformValue(UniformValue &&rhs) :
+				size_{rhs.size_},
+				values_{std::move(rhs.values_)}
 			{
 				ValueAccessor<T>::values_ = &values_[0];
 			}
