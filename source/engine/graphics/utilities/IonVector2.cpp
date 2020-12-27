@@ -14,6 +14,7 @@ File:	IonVector2.cpp
 
 #include <cmath>
 
+#include "IonVector3.h"
 #include "utilities/IonRandom.h"
 #include "utilities/IonMath.h"
 
@@ -39,6 +40,25 @@ Vector2::Vector2(real scalar) noexcept :
 	x_{scalar}, y_{scalar}
 {
 	//Empty
+}
+
+Vector2::Vector2(const Vector3 &vector) noexcept :
+	x_{vector.X()}, y_{vector.Y()}
+{
+	//Empty
+}
+
+
+/*
+	Operators
+*/
+
+Vector2& Vector2::operator=(const Vector3 &vector) noexcept
+{
+	auto [x, y, z] = vector.XYZ();
+	x_ = x;
+	y_ = y;
+	return *this;
 }
 
 

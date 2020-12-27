@@ -212,6 +212,7 @@
     <ClCompile Include="..\source\engine\graphics\utilities\IonObb.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonSphere.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonVector2.cpp" />
+    <ClCompile Include="..\source\engine\graphics\utilities\IonVector3.cpp" />
     <ClCompile Include="..\source\engine\IonEngine.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptBuilder.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptCompiler.cpp" />
@@ -325,6 +326,7 @@
     <ClInclude Include="..\source\engine\graphics\utilities\IonObb.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonSphere.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonVector2.h" />
+    <ClInclude Include="..\source\engine\graphics\utilities\IonVector3.h" />
     <ClInclude Include="..\source\engine\IonEngine.h" />
     <ClInclude Include="..\source\engine\managed\IonManagedObject.h" />
     <ClInclude Include="..\source\engine\managed\IonObjectManager.h" />
