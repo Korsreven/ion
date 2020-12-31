@@ -95,9 +95,11 @@ File:	main.cpp
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonMatrix3.h"
+#include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonObb.h"
 #include "graphics/utilities/IonSphere.h"
 #include "graphics/utilities/IonVector2.h"
+#include "graphics/utilities/IonVector3.h"
 
 #include "managed/IonManagedObject.h"
 #include "managed/IonObjectManager.h"
@@ -364,8 +366,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto &background_texture = textures.CreateTexture("background", "background.jpg");
 			[[maybe_unused]] auto &background_np2_texture = textures.CreateTexture("background_np2", "background_np2.jpg");
 			[[maybe_unused]] auto &brick_wall_texture = textures.CreateTexture("brick_wall", "brick_wall.jpg");
-			[[maybe_unused]] auto &brick_wall_normal_map = textures.CreateTexture("brick_wall_normal", "brick_wall_normal_map.jpg");
 			[[maybe_unused]] auto &brick_wall_specular_map = textures.CreateTexture("brick_wall_specular", "brick_wall_specular_map.jpg");
+			[[maybe_unused]] auto &brick_wall_normal_map = textures.CreateTexture("brick_wall_normal", "brick_wall_normal_map.jpg");
 			[[maybe_unused]] auto &light_bulb = textures.CreateTexture("light_bulb", "light_bulb.png");
 			textures.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
@@ -406,13 +408,54 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//while (!shader_programs.Loaded());
 
 			//Shader variables
-			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec3>("vertex");
-			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec3>("normal");
-			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec4>("color");
-			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec2>("tex_coord");
-			mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::sampler2D>("diffuse_map");
-			mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::sampler2D>("normal_map");
-			mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::sampler2D>("specular_map");
+			//Vertex
+			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec3>("vertex.position");
+			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec3>("vertex.normal");
+			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec4>("vertex.color");
+			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec2>("vertex.tex_coord");
+
+			//Material
+			auto &material_ambient = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec4>("material.ambient");
+			auto &material_diffuse = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec4>("material.diffuse");
+			auto &material_specular = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec4>("material.specular");
+			auto &material_shininess = mesh_shader_prog.CreateUniform<float>("material.shininess");
+			auto &material_diffuse_map = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::sampler2D>("material.diffuse_map");	
+			auto &material_specular_map = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::sampler2D>("material.specular_map");
+			auto &material_normal_map = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::sampler2D>("material.normal_map");
+
+			//Light
+			auto &light_position = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec3>("light.position");
+			auto &light_direction = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec3>("light.direction");
+			auto &light_cutoff = mesh_shader_prog.CreateUniform<float>("light.cutoff");
+			auto &light_ambient = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec4>("light.ambient");
+			auto &light_diffuse = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec4>("light.diffuse");
+			auto &light_specular = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec4>("light.specular");
+
+			//Camera
+			auto &camera_position = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec3>("camera.position");
+
+			//Scene
+			auto &scene_gamma = mesh_shader_prog.CreateUniform<float>("scene.gamma");
+
+
+			material_ambient.Get().XYZW(0.19125_r, 0.0735_r, 0.0225_r, 1.0_r);
+			material_diffuse.Get().XYZW(0.7038_r, 0.27048_r, 0.0828_r, 1.0_r);
+			material_specular.Get().XYZW(0.256777_r, 0.137622_r, 0.086014_r, 1.0_r);
+			material_shininess.Get() = 12.8_r;
+			material_diffuse_map.Get() = 0;
+			material_specular_map.Get() = 1;
+			material_normal_map.Get() = 2;
+
+			light_position.Get().XYZ(0.0_r, 0.0_r, -1.0_r);
+			light_direction.Get().XYZ(0.0_r, 0.0_r, -1.0_r);
+			light_cutoff.Get() = 1.0_r;
+			light_ambient.Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
+			light_diffuse.Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
+			light_specular.Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
+
+			camera_position.Get().XYZ(1.0_r, 0.0_r, 1.7_r);
+			scene_gamma.Get() = 1.0_r;
+
 			shader_programs.UpdateShaderVariables(mesh_shader_prog);
 
 			//Font

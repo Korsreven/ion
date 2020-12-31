@@ -209,6 +209,7 @@
     <ClCompile Include="..\source\engine\graphics\utilities\IonAabb.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonColor.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonMatrix3.cpp" />
+    <ClCompile Include="..\source\engine\graphics\utilities\IonMatrix4.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonObb.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonSphere.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonVector2.cpp" />
@@ -323,6 +324,7 @@
     <ClInclude Include="..\source\engine\graphics\utilities\IonAabb.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonColor.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonMatrix3.h" />
+    <ClInclude Include="..\source\engine\graphics\utilities\IonMatrix4.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonObb.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonSphere.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonVector2.h" />

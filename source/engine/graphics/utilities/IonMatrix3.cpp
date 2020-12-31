@@ -12,7 +12,9 @@ File:	IonMatrix3.cpp
 
 #include "IonMatrix3.h"
 
+#include <cassert>
 #include <cmath>
+
 #include "utilities/IonMath.h"
 
 namespace ion::graphics::utilities
@@ -35,6 +37,8 @@ Matrix3::Matrix3(real m00, real m01, real m02,
 	//Empty
 }
 
+#ifdef ION_ROW_MAJOR
+//Row-major layout (Direct3D)
 Matrix3::Matrix3(real m00, real m01,
 				 real m10, real m11,
 				 real m20, real m21) noexcept :
@@ -44,6 +48,17 @@ Matrix3::Matrix3(real m00, real m01,
 {
 	//Empty
 }
+#else
+//Column-major layout (OpenGL)
+Matrix3::Matrix3(real m00, real m01, real m02,
+				 real m10, real m11, real m12) noexcept :
+	m_{{m00, m01, m02},
+	   {m10, m11, m12},
+	   {0.0_r, 0.0_r, 1.0_r}}
+{
+	//Empty
+}
+#endif
 
 
 /*
@@ -55,10 +70,22 @@ Matrix3 Matrix3::Reflection(real angle) noexcept
 	auto sin_of_angle = math::Sin(angle * 2.0_r);
 	auto cos_of_angle = math::Cos(angle * 2.0_r);
 
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
 	//Same for both left and right handed rotation
+	//cos, sin
+	//sin, -cos
 	return {cos_of_angle, sin_of_angle,
 			sin_of_angle, -cos_of_angle,
 			0.0_r, 0.0_r};
+	#else
+	//Column-major layout (OpenGL)
+	//Same for both left and right handed rotation
+	//cos, sin
+	//sin, -cos
+	return {cos_of_angle, sin_of_angle, 0.0_r,
+			sin_of_angle, -cos_of_angle, 0.0_r};
+	#endif
 }
 
 Matrix3 Matrix3::Rotation(real angle) noexcept
@@ -66,20 +93,21 @@ Matrix3 Matrix3::Rotation(real angle) noexcept
 	auto sin_of_angle = math::Sin(angle);
 	auto cos_of_angle = math::Cos(angle);
 	
-	#ifdef ION_LEFT_HAND_ROTATION
-	//Left-hand rotation CW (Direct3D)
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+	//Left-hand rotation CW
 	// cos, sin
 	//-sin, cos
 	return {cos_of_angle, sin_of_angle,
 			-sin_of_angle, cos_of_angle,
 			0.0_r, 0.0_r};
 	#else
-	//Right-hand rotation CCW (OpenGL)
+	//Column-major layout (OpenGL)
+	//Right-hand rotation CCW
 	//cos, -sin
 	//sin, cos
-	return {cos_of_angle, -sin_of_angle,
-			sin_of_angle, cos_of_angle,
-			0.0_r, 0.0_r};
+	return {cos_of_angle, -sin_of_angle, 0.0_r,
+			sin_of_angle, cos_of_angle, 0.0_r};
 	#endif
 }
 
@@ -90,23 +118,44 @@ Matrix3 Matrix3::Rotation(real angle, const Vector2 &origin) noexcept
 
 Matrix3 Matrix3::Scaling(const Vector2 &vector) noexcept
 {
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
 	return {vector.X(), 0.0_r,
 			0.0_r, vector.Y(),
 			0.0_r, 0.0_r};
+	#else
+	//Column-major layout (OpenGL)
+	return {vector.X(), 0.0_r, 0.0_r,
+			0.0_r, vector.Y(), 0.0_r};
+	#endif	
 }
 
 Matrix3 Matrix3::Shearing(const Vector2 &vector) noexcept
 {
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
 	return {1.0_r, vector.Y(),
 			vector.X(), 1.0_r,
 			0.0_r, 0.0_r};
+	#else
+	//Column-major layout (OpenGL)
+	return {1.0_r, vector.X(), 0.0_r,
+			vector.Y(), 1.0_r, 0.0_r};
+	#endif	
 }
 
 Matrix3 Matrix3::Translation(const Vector2 &vector) noexcept
 {
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
 	return {1.0_r, 0.0_r,
 			0.0_r, 1.0_r,
 			vector.X(), vector.Y()};
+	#else
+	//Column-major layout (OpenGL)
+	return {1.0_r, 0.0_r, vector.X(),
+			0.0_r, 1.0_r, vector.Y()};
+	#endif
 }
 
 
@@ -116,34 +165,56 @@ Matrix3 Matrix3::Translation(const Vector2 &vector) noexcept
 
 real Matrix3::ToReflection() const noexcept
 {
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
 	//Same for both left and right handed rotation
 	return std::atan2(m_[1][0], m_[0][0]) / 2.0_r;
+	#else
+	//Column-major layout (OpenGL)
+	//Same for both left and right handed rotation
+	return std::atan2(m_[0][1], m_[0][0]) / 2.0_r;
+	#endif
 }
 
 real Matrix3::ToRotation() const noexcept
 {
-	#ifdef ION_LEFT_HAND_ROTATION
-	//Left-hand rotation CW (Direct3D)
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+	//Left-hand rotation CW
 	return std::atan2(m_[0][1], m_[0][0]);
 	#else
-	//Right-hand rotation CCW (OpenGL)
+	//Column-major layout (OpenGL)
+	//Right-hand rotation CCW
 	return std::atan2(m_[1][0], m_[0][0]);
 	#endif
 }
 
 Vector2 Matrix3::ToScaling() const noexcept
 {
+	//Same for both row and column-major
 	return {m_[0][0], m_[1][1]};
 }
 
 Vector2 Matrix3::ToShearing() const noexcept
 {
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
 	return {m_[1][0], m_[0][1]};
+	#else
+	//Column-major layout (OpenGL)
+	return {m_[0][1], m_[1][0]};
+	#endif
 }
 
 Vector2 Matrix3::ToTranslation() const noexcept
 {
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
 	return {m_[2][0], m_[2][1]};
+	#else
+	//Column-major layout (OpenGL)
+	return {m_[0][2], m_[1][2]};
+	#endif
 }
 
 
@@ -169,9 +240,17 @@ Matrix3 Matrix3::AdjointCopy() const noexcept
 
 Matrix3& Matrix3::Affine() noexcept
 {
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+	m_[0][2] = 0.0_r;
+	m_[1][2] = 0.0_r;
+	m_[2][2] = 1.0_r;
+	#else
+	//Column-major layout (OpenGL)
 	m_[2][0] = 0.0_r;
 	m_[2][1] = 0.0_r;
 	m_[2][2] = 1.0_r;
+	#endif
 	return *this;
 }
 
@@ -183,7 +262,13 @@ Matrix3 Matrix3::AffineCopy() const noexcept
 
 bool Matrix3::IsAffine() const noexcept
 {
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+	return m_[0][2] == 0.0_r && m_[1][2] == 0.0_r && m_[2][2] == 1.0_r;
+	#else
+	//Column-major layout (OpenGL)
 	return m_[2][0] == 0.0_r && m_[2][1] == 0.0_r && m_[2][2] == 1.0_r;
+	#endif
 }
 
 
@@ -210,22 +295,33 @@ Matrix3& Matrix3::ConcatenateAffine(const Matrix3 &matrix) noexcept
 Matrix3 Matrix3::ConcatenateAffineCopy(const Matrix3 &matrix) const noexcept
 {
 	//Matrices must be affine
-	if (!IsAffine() || !matrix.IsAffine())
-		return Zero;
-	else
-	{
-		return {m_[0][0] * matrix.m_[0][0] + m_[0][1] * matrix.m_[1][0] + m_[0][2],
-				m_[0][0] * matrix.m_[0][1] + m_[0][1] * matrix.m_[1][1] + m_[0][2],
-				m_[0][0] * matrix.m_[0][2] + m_[0][1] * matrix.m_[1][2] + m_[0][2] + m_[0][2],
-			
-				m_[1][0] * matrix.m_[0][0] + m_[1][1] * matrix.m_[1][0] + m_[1][2],
-				m_[1][0] * matrix.m_[0][1] + m_[1][1] * matrix.m_[1][1] + m_[1][2],
-				m_[1][0] * matrix.m_[0][2] + m_[1][1] * matrix.m_[1][2] + m_[1][2] + m_[1][2],
-			
-				0.0_r,
-				0.0_r,
-				1.0_r};
-	}
+	assert(IsAffine() && matrix.IsAffine());
+
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+	return {m_[0][0] * matrix.m_[0][0] + m_[1][0] * matrix.m_[0][1],
+			m_[0][1] * matrix.m_[0][0] + m_[1][1] * matrix.m_[0][1],
+			0.0_r,
+
+			m_[0][0] * matrix.m_[1][0] + m_[1][0] * matrix.m_[1][1],
+			m_[0][1] * matrix.m_[1][0] + m_[1][1] * matrix.m_[1][1],
+			0.0_r,
+
+			m_[0][0] * matrix.m_[2][0] + m_[1][0] * matrix.m_[2][1] + m_[2][0],
+			m_[0][1] * matrix.m_[2][0] + m_[1][1] * matrix.m_[2][1] + m_[2][1],
+			1.0_r};
+	#else
+	//Column-major layout (OpenGL)
+	return {m_[0][0] * matrix.m_[0][0] + m_[0][1] * matrix.m_[1][0],
+			m_[0][0] * matrix.m_[0][1] + m_[0][1] * matrix.m_[1][1],
+			m_[0][0] * matrix.m_[0][2] + m_[0][1] * matrix.m_[1][2] + m_[0][2],
+
+			m_[1][0] * matrix.m_[0][0] + m_[1][1] * matrix.m_[1][0],
+			m_[1][0] * matrix.m_[0][1] + m_[1][1] * matrix.m_[1][1],
+			m_[1][0] * matrix.m_[0][2] + m_[1][1] * matrix.m_[1][2] + m_[1][2],
+
+			0.0_r, 0.0_r, 1.0_r};
+	#endif
 }
 
 
@@ -346,12 +442,14 @@ Vector2 Matrix3::TransformPoint(const Vector2 &point) const noexcept
 {
 	auto [x, y] = point.XY();
 
-	#ifdef ION_LEFT_HAND_ROTATION
-	//Left-hand rotation CW (Direct3D)
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+	//Left-hand rotation CW
 	return {(m_[0][0] * x + m_[1][0] * y) + m_[2][0],
 			(m_[0][1] * x + m_[1][1] * y) + m_[2][1]};
 	#else
-	//Right-hand rotation CCW (OpenGL)
+	//Column-major layout (OpenGL)
+	//Right-hand rotation CCW
 	return {(m_[0][0] * x + m_[0][1] * y) + m_[0][2],
 			(m_[1][0] * x + m_[1][1] * y) + m_[1][2]};
 	#endif

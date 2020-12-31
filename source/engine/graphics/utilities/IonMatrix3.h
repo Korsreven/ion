@@ -25,8 +25,9 @@ namespace ion::graphics::utilities
 	} //matrix3::detail
 
 
-	//A 3x3 column-major matrix class
-	//Follows the OpenGL matrix convention
+	//A 3x3 column-major matrix class with right hand rotation
+	//Follows the OpenGL matrix convention by default
+	//Define ION_ROW_MAJOR to use this class with Direct3D
 	class Matrix3 final
 	{
 		private:
@@ -43,16 +44,25 @@ namespace ion::graphics::utilities
 
 			Matrix3() = default;
 
-			//Constructs a new matrix from the given numbers in column-major order
+			//Constructs a new matrix from the given numbers
 			Matrix3(real m00, real m01, real m02,
 					real m10, real m11, real m12,
 					real m20, real m21, real m22) noexcept;
 			
-			//Constructs a new matrix from only the two first columns in column-major order
+			#ifdef ION_ROW_MAJOR
+			//Row-major layout (Direct3D)
+			//Constructs a new matrix from only the two first columns
 			//The third column is filled with {0, 0, 1}
 			Matrix3(real m00, real m01,
 					real m10, real m11,
 					real m20, real m21) noexcept;
+			#else
+			//Column-major layout (OpenGL)
+			//Constructs a new matrix from only the two first rows
+			//The third row is filled with {0, 0, 1}
+			Matrix3(real m00, real m01, real m02,
+					real m10, real m11, real m12) noexcept;
+			#endif
 			
 
 			/*
@@ -193,6 +203,21 @@ namespace ion::graphics::utilities
 			//Multiply two matrices (matrix multiplication)
 			[[nodiscard]] inline auto operator*(const Matrix3 &rhs) const noexcept
 			{
+				#ifdef ION_ROW_MAJOR
+				//Row-major layout (Direct3D)
+				return Matrix3{m_[0][0] * rhs.m_[0][0] + m_[1][0] * rhs.m_[0][1] + m_[2][0] * rhs.m_[0][2],
+							   m_[0][1] * rhs.m_[0][0] + m_[1][1] * rhs.m_[0][1] + m_[2][1] * rhs.m_[0][2],
+							   m_[0][2] * rhs.m_[0][0] + m_[1][2] * rhs.m_[0][1] + m_[2][2] * rhs.m_[0][2],
+
+							   m_[0][0] * rhs.m_[1][0] + m_[1][0] * rhs.m_[1][1] + m_[2][0] * rhs.m_[1][2],
+							   m_[0][1] * rhs.m_[1][0] + m_[1][1] * rhs.m_[1][1] + m_[2][1] * rhs.m_[1][2],
+							   m_[0][2] * rhs.m_[1][0] + m_[1][2] * rhs.m_[1][1] + m_[2][2] * rhs.m_[1][2],
+
+							   m_[0][0] * rhs.m_[2][0] + m_[1][0] * rhs.m_[2][1] + m_[2][0] * rhs.m_[2][2],
+							   m_[0][1] * rhs.m_[2][0] + m_[1][1] * rhs.m_[2][1] + m_[2][1] * rhs.m_[2][2],
+							   m_[0][2] * rhs.m_[2][0] + m_[1][2] * rhs.m_[2][1] + m_[2][2] * rhs.m_[2][2]};
+				#else
+				//Column-major layout (OpenGL)
 				return Matrix3{m_[0][0] * rhs.m_[0][0] + m_[0][1] * rhs.m_[1][0] + m_[0][2] * rhs.m_[2][0],
 							   m_[0][0] * rhs.m_[0][1] + m_[0][1] * rhs.m_[1][1] + m_[0][2] * rhs.m_[2][1],
 							   m_[0][0] * rhs.m_[0][2] + m_[0][1] * rhs.m_[1][2] + m_[0][2] * rhs.m_[2][2],
@@ -204,6 +229,7 @@ namespace ion::graphics::utilities
 							   m_[2][0] * rhs.m_[0][0] + m_[2][1] * rhs.m_[1][0] + m_[2][2] * rhs.m_[2][0],
 							   m_[2][0] * rhs.m_[0][1] + m_[2][1] * rhs.m_[1][1] + m_[2][2] * rhs.m_[2][1],
 							   m_[2][0] * rhs.m_[0][2] + m_[2][1] * rhs.m_[1][2] + m_[2][2] * rhs.m_[2][2]};
+				#endif
 			}
 
 			//Multiply all numbers with the given scalar
@@ -219,9 +245,18 @@ namespace ion::graphics::utilities
 			[[nodiscard]] inline auto operator*(const Vector2 &vector) const noexcept
 			{
 				auto [x, y] = vector.XY();
+
+				#ifdef ION_ROW_MAJOR
+				//Row-major layout (Direct3D)
+				auto inv_w = 1.0_r / (m_[0][2] * x + m_[1][2] * y + m_[2][2]);
+				return Vector2{(m_[0][0] * x + m_[1][0] * y + m_[2][0]) * inv_w,
+							   (m_[0][1] * x + m_[1][1] * y + m_[2][1]) * inv_w};
+				#else
+				//Column-major layout (OpenGL)
 				auto inv_w = 1.0_r / (m_[2][0] * x + m_[2][1] * y + m_[2][2]);
 				return Vector2{(m_[0][0] * x + m_[0][1] * y + m_[0][2]) * inv_w,
 							   (m_[1][0] * x + m_[1][1] * y + m_[1][2]) * inv_w};
+				#endif
 			}
 
 			//Multiply all numbers with the given scalar
@@ -292,6 +327,7 @@ namespace ion::graphics::utilities
 				m_[1][1] = m11;
 			}
 
+			#ifdef ION_ROW_MAJOR
 			//Sets the m20 number to the given value
 			inline void M20(real m20) noexcept
 			{
@@ -303,6 +339,19 @@ namespace ion::graphics::utilities
 			{
 				m_[2][1] = m21;
 			}
+			#else
+			//Sets the m02 number to the given value
+			inline void M02(real m02) noexcept
+			{
+				m_[0][2] = m02;
+			}
+
+			//Sets the m12 number to the given value
+			inline void M12(real m12) noexcept
+			{
+				m_[1][2] = m12;
+			}
+			#endif
 
 
 			/*
@@ -333,6 +382,7 @@ namespace ion::graphics::utilities
 				return m_[1][1];
 			}
 
+			#ifdef ION_ROW_MAJOR
 			//Returns the m20 number
 			[[nodiscard]] inline auto M20() const noexcept
 			{
@@ -344,6 +394,19 @@ namespace ion::graphics::utilities
 			{
 				return m_[2][1];
 			}
+			#else
+			//Returns the m02 number
+			[[nodiscard]] inline auto M02() const noexcept
+			{
+				return m_[0][2];
+			}
+
+			//Returns the m12 number
+			[[nodiscard]] inline auto M12() const noexcept
+			{
+				return m_[1][2];
+			}
+			#endif
 
 
 			//Returns direct access to the matrix

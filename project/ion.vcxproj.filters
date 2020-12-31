@@ -396,6 +396,9 @@
     <ClCompile Include="..\source\engine\graphics\utilities\IonVector3.cpp">
       <Filter>Source Files\graphics\utilities</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\utilities\IonMatrix4.cpp">
+      <Filter>Source Files\graphics\utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -798,6 +801,9 @@
       <Filter>Header Files\graphics\render</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\utilities\IonVector3.h">
+      <Filter>Header Files\graphics\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\utilities\IonMatrix4.h">
       <Filter>Header Files\graphics\utilities</Filter>
     </ClInclude>
   </ItemGroup>
