@@ -28,13 +28,13 @@ using namespace mesh;
 namespace mesh
 {
 
-Vertex::Vertex(const Vector2 &position) noexcept :
+Vertex::Vertex(const Vector3 &position) noexcept :
 	Position{position}
 {
 	//Empty
 }
 
-Vertex::Vertex(const Vector2 &position, const Vector2 &normal, const Color &base_color) noexcept :
+Vertex::Vertex(const Vector3 &position, const Vector3 &normal, const Color &base_color) noexcept :
 	Position{position},
 	Normal{normal},
 	BaseColor{base_color}
@@ -42,7 +42,7 @@ Vertex::Vertex(const Vector2 &position, const Vector2 &normal, const Color &base
 	//Empty
 }
 
-Vertex::Vertex(const Vector2 &position, const Vector2 &normal, const Vector2 &tex_coord, const Color &base_color) noexcept :
+Vertex::Vertex(const Vector3 &position, const Vector3 &normal, const Vector2 &tex_coord, const Color &base_color) noexcept :
 	Position{position},
 	Normal{normal},
 	TexCoord{tex_coord},
@@ -95,17 +95,11 @@ vertex_storage_type vertices_to_vertex_data(const Vertices &vertices)
 
 	//Insert positions
 	for (auto &vertex : vertices)
-	{
-		vertex_data.insert(std::end(vertex_data), vertex.Position.Components(), vertex.Position.Components() + 2);
-		vertex_data.push_back(-1.0_r); //z
-	}
+		vertex_data.insert(std::end(vertex_data), vertex.Position.Components(), vertex.Position.Components() + 3);
 
 	//Insert normals
 	for (auto &vertex : vertices)
-	{
-		vertex_data.insert(std::end(vertex_data), vertex.Normal.Components(), vertex.Normal.Components() + 2);
-		vertex_data.push_back(1.0_r); //z
-	}
+		vertex_data.insert(std::end(vertex_data), vertex.Normal.Components(), vertex.Normal.Components() + 3);
 
 	//Insert base colors
 	for (auto &vertex : vertices)

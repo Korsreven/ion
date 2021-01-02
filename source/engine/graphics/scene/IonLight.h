@@ -16,7 +16,7 @@ File:	IonLight.h
 #include <cmath>
 
 #include "graphics/utilities/IonColor.h"
-#include "graphics/utilities/IonVector2.h"
+#include "graphics/utilities/IonVector3.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
 
@@ -28,7 +28,7 @@ namespace ion::graphics::scene
 	using namespace types::type_literals;
 
 	using utilities::Color;
-	using utilities::Vector2;
+	using utilities::Vector3;
 
 	namespace light
 	{
@@ -62,8 +62,8 @@ namespace ion::graphics::scene
 		private:
 
 			light::LightType type_ = light::LightType::Point;
-			Vector2 position_;
-			Vector2 direction_; //Todo: Should be Vector3
+			Vector3 position_;
+			Vector3 direction_;
 			real cutoff_ = light::detail::angle_to_cutoff(light::detail::default_cutoff_angle);
 
 			Color ambient_color_;
@@ -83,7 +83,7 @@ namespace ion::graphics::scene
 
 			//Constructor
 			Light(light::LightType type,
-				const Vector2 &position, const Vector2 &direction, real cutoff_angle,
+				const Vector3 &position, const Vector3 &direction, real cutoff_angle,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				bool cast_shadows = true);
@@ -94,19 +94,19 @@ namespace ion::graphics::scene
 			*/
 
 			//Returns a new point light from the given values
-			[[nodiscard]] static Light Point(const Vector2 &position,
+			[[nodiscard]] static Light Point(const Vector3 &position,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				bool cast_shadows = true) noexcept;
 
 			//Returns a new directional light from the given values
-			[[nodiscard]] static Light Directional(const Vector2 &direction,
+			[[nodiscard]] static Light Directional(const Vector3 &direction,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				bool cast_shadows = true) noexcept;
 
 			//Returns a new spotlight from the given values
-			[[nodiscard]] static Light Spotlight(const Vector2 &position, const Vector2 &direction, real cutoff_angle,
+			[[nodiscard]] static Light Spotlight(const Vector3 &position, const Vector3 &direction, real cutoff_angle,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				bool cast_shadows = true) noexcept;
@@ -124,14 +124,14 @@ namespace ion::graphics::scene
 
 			//Sets the position of the light to the given position
 			//This value only applies for lights of type point
-			inline void Position(const Vector2 &position) noexcept
+			inline void Position(const Vector3 &position) noexcept
 			{
 				position_ = position;
 			}
 
 			//Sets the direction of the light to the given direction
 			//This value only applies for lights of type directional
-			inline void Direction(const Vector2 &direction) noexcept
+			inline void Direction(const Vector3 &direction) noexcept
 			{
 				direction_ = direction;
 			}

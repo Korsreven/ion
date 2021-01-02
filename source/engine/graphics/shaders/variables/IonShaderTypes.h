@@ -19,10 +19,17 @@ File:	IonShaderTypes.h
 #include <type_traits>
 #include <utility>
 
+#include "graphics/utilities/IonColor.h"
+#include "graphics/utilities/IonVector2.h"
+#include "graphics/utilities/IonVector3.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::shaders::variables::glsl
 {
+	using utilities::Color;
+	using utilities::Vector2;
+	using utilities::Vector3;
+
 	/*
 		Basic vector type for:
 
@@ -390,6 +397,13 @@ namespace ion::graphics::shaders::variables::glsl
 			Y(y);
 		}
 
+		//Sets the components to the given vector
+		inline void XY(const Vector2 &vector) noexcept
+		{
+			auto [x, y] = vector.XY();
+			XY(x, y);
+		}
+
 
 		/*
 			Observers
@@ -474,6 +488,13 @@ namespace ion::graphics::shaders::variables::glsl
 			X(x);
 			Y(y);
 			Z(z);
+		}
+
+		//Sets the x, y and z components to the given vector
+		inline void XYZ(const Vector3 &vector) noexcept
+		{
+			auto [x, y, z] = vector.XYZ();
+			XYZ(x, y, z);
 		}
 
 
@@ -573,6 +594,13 @@ namespace ion::graphics::shaders::variables::glsl
 			Y(y);
 			Z(z);
 			W(w);
+		}
+
+		//Sets the x, y, z and w components to the given color
+		inline void XYZW(const Color &color) noexcept
+		{
+			auto [r, g, b, a] = color.RGBA();
+			XYZW(r, g, b, a);
 		}
 
 

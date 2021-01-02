@@ -305,6 +305,7 @@ namespace ion::script
 					   str == "cmyk" ||
 					   str == "cmyka" ||
 					   str == "vec2" ||
+					   str == "vec3" ||
 					   str == "calc";
 			}
 
@@ -518,6 +519,7 @@ namespace ion::script
 			std::optional<script_tree::ArgumentType> call_hwb(lexical_token &token, script_tree::ArgumentNodes arguments, CompileError &error) noexcept;
 			std::optional<script_tree::ArgumentType> call_rgb(lexical_token &token, script_tree::ArgumentNodes arguments, CompileError &error) noexcept;
 			std::optional<script_tree::ArgumentType> call_vec2(lexical_token &token, script_tree::ArgumentNodes arguments, CompileError &error) noexcept;
+			std::optional<script_tree::ArgumentType> call_vec3(lexical_token &token, script_tree::ArgumentNodes arguments, CompileError &error) noexcept;
 
 			std::optional<script_tree::ArgumentType> call_function(lexical_token &token, script_tree::ArgumentNodes arguments, CompileError &error) noexcept;
 

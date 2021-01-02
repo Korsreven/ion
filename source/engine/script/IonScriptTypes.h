@@ -15,6 +15,7 @@ File:	IonScriptTypes.h
 
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
+#include "graphics/utilities/IonVector3.h"
 #include "types/IonStrongType.h"
 #include "types/IonTypes.h"
 
@@ -96,6 +97,12 @@ namespace ion::script
 
 		struct Vector2 final :
 			script_types::detail::script_type<graphics::utilities::Vector2, Vector2>
+		{
+			using script_type::script_type;
+		};
+
+		struct Vector3 final :
+			script_types::detail::script_type<graphics::utilities::Vector3, Vector3>
 		{
 			using script_type::script_type;
 		};

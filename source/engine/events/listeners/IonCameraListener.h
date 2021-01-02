@@ -15,7 +15,7 @@ File:	IonCameraListener.h
 
 #include "IonManagedObjectListener.h"
 #include "graphics/render/IonFrustum.h"
-#include "graphics/utilities/IonVector2.h"
+#include "graphics/utilities/IonVector3.h"
 
 namespace ion::graphics::scene
 {
@@ -38,7 +38,7 @@ namespace ion::events::listeners
 		}
 
 		//Called when a camera has been repositioned, with the new position
-		virtual void CameraMoved([[maybe_unused]] graphics::utilities::Vector2 position) noexcept
+		virtual void CameraMoved([[maybe_unused]] graphics::utilities::Vector3 position) noexcept
 		{
 			//Optional to override
 		}

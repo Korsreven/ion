@@ -19,7 +19,7 @@ using namespace light;
 using namespace utilities;
 
 Light::Light(LightType type,
-	const Vector2 &position, const Vector2 &direction, real cutoff_angle,
+	const Vector3 &position, const Vector3 &direction, real cutoff_angle,
 	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 	bool cast_shadows) :
@@ -47,31 +47,31 @@ Light::Light(LightType type,
 	Static light conversions
 */
 
-Light Light::Point(const Vector2 &position,
+Light Light::Point(const Vector3 &position,
 	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 	bool cast_shadows) noexcept
 {
 	return {LightType::Point,
-			position, vector2::Zero, detail::default_cutoff_angle,
+			position, vector3::Zero, detail::default_cutoff_angle,
 			ambient, diffuse, specular,
 			attenuation_constant, attenuation_linear, attenuation_quadratic,
 			cast_shadows};
 }
 
-Light Light::Directional(const Vector2 &direction,
+Light Light::Directional(const Vector3 &direction,
 	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 	bool cast_shadows) noexcept
 {
 	return {LightType::Directional,
-			vector2::Zero, direction, detail::default_cutoff_angle,
+			vector3::Zero, direction, detail::default_cutoff_angle,
 			ambient, diffuse, specular,
 			attenuation_constant, attenuation_linear, attenuation_quadratic,
 			cast_shadows};
 }
 
-Light Light::Spotlight(const Vector2 &position, const Vector2 &direction, real cutoff_angle,
+Light Light::Spotlight(const Vector3 &position, const Vector3 &direction, real cutoff_angle,
 	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 	bool cast_shadows) noexcept

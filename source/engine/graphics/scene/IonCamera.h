@@ -19,7 +19,7 @@ File:	IonCamera.h
 #include "events/IonEventGenerator.h"
 #include "events/listeners/IonCameraListener.h"
 #include "graphics/render/IonFrustum.h"
-#include "graphics/utilities/IonVector2.h"
+#include "graphics/utilities/IonVector3.h"
 #include "managed/IonManagedObject.h"
 
 namespace ion::graphics::render
@@ -30,13 +30,13 @@ namespace ion::graphics::render
 namespace ion::graphics::scene
 {
 	class SceneManager; //Forward declaration
-	using utilities::Vector2;
+	using utilities::Vector3;
 
 	namespace camera
 	{
 		namespace detail
 		{
-			void move_to(const Vector2 &position) noexcept;
+			void move_to(const Vector3 &position) noexcept;
 		} //detail
 	} //camera
 
@@ -47,7 +47,7 @@ namespace ion::graphics::scene
 	{
 		private:
 
-			Vector2 position_;
+			Vector3 position_;
 			render::Frustum frustum_;
 
 
@@ -56,7 +56,7 @@ namespace ion::graphics::scene
 			*/
 
 			void NotifyCameraFrustumChanged(const render::Frustum &frustum) noexcept;
-			void NotifyCameraMoved(const Vector2 &position) noexcept;
+			void NotifyCameraMoved(const Vector3 &position) noexcept;
 
 		public:
 
@@ -72,7 +72,7 @@ namespace ion::graphics::scene
 			*/
 
 			//
-			inline void Position(const Vector2 &position) noexcept
+			inline void Position(const Vector3 &position) noexcept
 			{
 				if (position_ != position)
 				{

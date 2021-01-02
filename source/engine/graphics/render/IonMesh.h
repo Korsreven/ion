@@ -22,6 +22,7 @@ File:	IonMesh.h
 #include "graphics/utilities/IonObb.h"
 #include "graphics/utilities/IonSphere.h"
 #include "graphics/utilities/IonVector2.h"
+#include "graphics/utilities/IonVector3.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics
@@ -64,20 +65,20 @@ namespace ion::graphics::render
 
 		struct Vertex final
 		{
-			Vector2 Position;
-			Vector2 Normal;
+			Vector3 Position;
+			Vector3 Normal;
 			Color BaseColor;
 			Vector2 TexCoord;
 
 
 			//Construct a new vertex with the given position
-			Vertex(const Vector2 &position) noexcept;
+			Vertex(const Vector3 &position) noexcept;
 
 			//Construct a new vertex with the given position, normal and base color (default white)
-			Vertex(const Vector2 &position, const Vector2 &normal, const Color &base_color = color::White) noexcept;
+			Vertex(const Vector3 &position, const Vector3 &normal, const Color &base_color = color::White) noexcept;
 
 			//Construct a new vertex with the given position, normal, tex coord and base color (default white)
-			Vertex(const Vector2 &position, const Vector2 &normal, const Vector2 &tex_coord, const Color &base_color = color::White) noexcept;
+			Vertex(const Vector3 &position, const Vector3 &normal, const Vector2 &tex_coord, const Color &base_color = color::White) noexcept;
 		};
 
 		using Vertices = std::vector<Vertex>;

@@ -22,8 +22,6 @@ File:	IonScriptTree.h
 
 #include "IonScriptTypes.h"
 #include "adaptors/ranges/IonIterable.h"
-#include "graphics/utilities/IonColor.h"
-#include "graphics/utilities/IonVector2.h"
 #include "types/IonTypes.h"
 #include "types/IonTypeTraits.h"
 #include "utilities/IonStringUtility.h"
@@ -54,7 +52,8 @@ namespace ion::script
 				ScriptType::FloatingPoint,
 				ScriptType::Integer,
 				ScriptType::String,
-				ScriptType::Vector2>;
+				ScriptType::Vector2,
+				ScriptType::Vector3>;
 
 
 		enum class SearchStrategy : bool

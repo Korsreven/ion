@@ -124,6 +124,12 @@ int deserialize_argument(std::string_view bytes, ArgumentNodes &arguments)
 				bytes_deserialized = deserialize_argument<ScriptType::Vector2>(bytes.substr(1), arguments);
 				break;
 			}
+
+			case variant_index<ArgumentType, ScriptType::Vector3>():
+			{
+				bytes_deserialized = deserialize_argument<ScriptType::Vector3>(bytes.substr(1), arguments);
+				break;
+			}
 		}
 	}
 	
@@ -296,6 +302,11 @@ std::string print(const ObjectNodes &objects, PrintOptions print_options)
 								{
 									auto [x, y] = value.Get().XY();
 									return ion::utilities::string::Concat('{', x, ", ", y, '}');
+								},
+								[](const ScriptType::Vector3 &value)
+								{
+									auto [x, y, z] = value.Get().XYZ();
+									return ion::utilities::string::Concat('{', x, ", ", y, ", ", z, '}');
 								},
 								//Default
 								[&](auto &&value)

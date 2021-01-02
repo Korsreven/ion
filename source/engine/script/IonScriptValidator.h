@@ -41,7 +41,8 @@ namespace ion::script
 			FloatingPoint,
 			Integer,
 			String,
-			Vector2
+			Vector2,
+			Vector3
 		};
 
 		enum class Ordinality : bool

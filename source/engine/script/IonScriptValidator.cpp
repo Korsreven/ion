@@ -424,6 +424,20 @@ bool validate_property(const script_tree::PropertyNode &property, const property
 						break;
 					}
 
+					case ParameterType::Vector3:
+					{
+						match &= arg_iter->Visit(
+							[](const ScriptType::Vector3&) noexcept
+							{
+								return true;
+							},
+							[](auto&&) noexcept
+							{
+								return false;
+							});
+						break;
+					}
+
 					default:
 					match = false;
 					break;

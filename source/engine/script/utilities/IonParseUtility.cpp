@@ -206,6 +206,31 @@ std::optional<Vector2> string_as_vector2(std::string_view str) noexcept
 	return {};
 }
 
+std::optional<Vector3> string_as_vector3(std::string_view str) noexcept
+{
+	//Components (x,y,z)
+	if (auto off = str.find(','), off2 = str.find(',', off + 1);
+		off != std::string_view::npos && off2 != std::string_view::npos)
+	{
+		auto x = convert::To<real>(str.substr(0, off));
+		auto y = convert::To<real>(str.substr(off + 1, off2 - off - 1));
+		auto z = convert::To<real>(str.substr(off2 + 1));
+
+		if (x && y && z)
+			return Vector3{*x, *y, *z};
+	}
+	//Scalar
+	else
+	{
+		auto scalar = convert::To<real>(str);
+
+		if (scalar)
+			return Vector3{*scalar};
+	}
+
+	return {};
+}
+
 std::optional<std::string> string_literal_as_string(std::string_view str)
 {
 	//Double or single quoted
@@ -353,12 +378,17 @@ std::optional<std::string_view> AsString(graphics::utilities::Color color)
 
 
 /*
-	String as vector2
+	String as vector
 */
 
 std::optional<Vector2> AsVector2(std::string_view str) noexcept
 {
 	return detail::string_as_vector2(str);
+}
+
+std::optional<Vector3> AsVector3(std::string_view str) noexcept
+{
+	return detail::string_as_vector3(str);
 }
 
 } //ion::script::utilities::parse

@@ -17,6 +17,7 @@ File:	IonScriptCompiler.cpp
 #include "IonScriptTypes.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
+#include "graphics/utilities/IonVector3.h"
 #include "types/IonTypes.h"
 #include "timers/IonStopwatch.h"
 #include "utilities/IonConvert.h"
@@ -1423,6 +1424,51 @@ std::optional<script_tree::ArgumentType> call_vec2(lexical_token &token, script_
 			arguments[1].Get<ScriptType::FloatingPoint>()->As<real>()});
 }
 
+std::optional<script_tree::ArgumentType> call_vec3(lexical_token &token, script_tree::ArgumentNodes arguments, CompileError &error) noexcept
+{
+	if (std::size(arguments) != 1 &&
+		std::size(arguments) != 3)
+	{
+		error = {CompileErrorCode::InvalidNumberOfFunctionArguments, token.unit->file_path, token.line_number};
+		return {};
+	}
+
+	//Convert all arguments to floating point
+	for (auto &argument : arguments)
+	{		
+		argument.Visit(
+			//Integer
+			[&](const ScriptType::Integer &value) mutable noexcept
+			{
+				argument = script_tree::ArgumentType{ScriptType::FloatingPoint{
+					value.As<ScriptType::FloatingPoint::value_type>()}};
+			},
+			//Floating point
+			[](const ScriptType::FloatingPoint&) noexcept
+			{
+				//Nothing to do
+			},
+			//Default
+			[&](auto&&) noexcept
+			{
+				error = {CompileErrorCode::InvalidFunctionArgument, token.unit->file_path, token.line_number};
+			});
+
+		if (error)
+			return {};
+	}
+
+	return std::size(arguments) == 1 ?
+		//Scalar
+		std::optional<ScriptType::Vector3>(graphics::utilities::Vector3{
+			arguments[0].Get<ScriptType::FloatingPoint>()->As<real>()}) :
+		//Three components
+		std::optional<ScriptType::Vector3>(graphics::utilities::Vector3{
+			arguments[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+			arguments[1].Get<ScriptType::FloatingPoint>()->As<real>(),
+			arguments[2].Get<ScriptType::FloatingPoint>()->As<real>()});
+}
+
 std::optional<script_tree::ArgumentType> call_function(lexical_token &token, script_tree::ArgumentNodes arguments, CompileError &error) noexcept
 {
 	//rgb/rgba
@@ -1440,6 +1486,9 @@ std::optional<script_tree::ArgumentType> call_function(lexical_token &token, scr
 	//vec2
 	else if (token.value == "vec2")
 		return call_vec2(token, arguments, error);
+	//vec3
+	else if (token.value == "vec3")
+		return call_vec3(token, arguments, error);
 
 	return {};
 }

@@ -22,6 +22,7 @@ File:	IonParseUtility.h
 
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
+#include "graphics/utilities/IonVector3.h"
 
 namespace ion::script::utilities::parse
 {
@@ -240,6 +241,7 @@ namespace ion::script::utilities::parse
 		std::optional<bool> string_as_boolean(std::string_view str) noexcept;
 		std::optional<graphics::utilities::Color> string_as_color(std::string_view str) noexcept;
 		std::optional<graphics::utilities::Vector2> string_as_vector2(std::string_view str) noexcept;
+		std::optional<graphics::utilities::Vector3> string_as_vector3(std::string_view str) noexcept;
 		std::optional<std::string> string_literal_as_string(std::string_view str);
 	} //detail
 
@@ -280,12 +282,16 @@ namespace ion::script::utilities::parse
 
 
 	/*
-		String as vector2
+		String as vector
 	*/
 
 	//Parses the given string as a vector2 value
 	//Supports both scalar and x,y values
 	[[nodiscard]] std::optional<graphics::utilities::Vector2> AsVector2(std::string_view str) noexcept;
+
+	//Parses the given string as a vector3 value
+	//Supports both scalar and x,y values
+	[[nodiscard]] std::optional<graphics::utilities::Vector3> AsVector3(std::string_view str) noexcept;
 
 } //ion::script::utilities::parse
 

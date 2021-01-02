@@ -24,13 +24,13 @@ using graphics::render::Frustum;
 namespace camera::detail
 {
 
-void move_to(const Vector2 &position) noexcept
+void move_to(const Vector3 &position) noexcept
 {
 	//glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	auto [x, y] = position.XY();
-	glTranslatef(-x, -y, 0.0f);
+	auto [x, y, z] = position.XYZ();
+	glTranslatef(-x, -y, -z);
 }
 
 } //camera::detail
@@ -48,7 +48,7 @@ void Camera::NotifyCameraFrustumChanged(const Frustum &frustum) noexcept
 		NotifyAll(owner->CameraEvents().Listeners(), &events::listeners::CameraListener::CameraFrustumChanged, frustum);
 }
 
-void Camera::NotifyCameraMoved(const Vector2 &position) noexcept
+void Camera::NotifyCameraMoved(const Vector3 &position) noexcept
 {
 	if (auto owner = Owner(); owner)
 		NotifyAll(owner->CameraEvents().Listeners(), &events::listeners::CameraListener::CameraMoved, position);

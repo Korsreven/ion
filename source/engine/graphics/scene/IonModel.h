@@ -20,7 +20,6 @@ File:	IonModel.h
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonObb.h"
 #include "graphics/utilities/IonSphere.h"
-#include "graphics/utilities/IonVector2.h"
 #include "types/IonTypes.h"
 #include "unmanaged/IonObjectFactory.h"
 
@@ -29,7 +28,6 @@ namespace ion::graphics::scene
 	using utilities::Aabb;
 	using utilities::Obb;
 	using utilities::Sphere;
-	using utilities::Vector2;
 
 	namespace model
 	{
