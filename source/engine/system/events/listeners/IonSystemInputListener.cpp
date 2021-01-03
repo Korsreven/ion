@@ -245,7 +245,7 @@ Vector2 InputListener::ViewAdjusted(Vector2 position) const noexcept
 				auto [x, y] = position.XY();
 
 				//Adjust coordinates from viewport to camera coordinates
-				auto [left, right, bottom, top, z_near, z_far] = camera->Lens().ToOrthoBounds(viewport_size);
+				auto [left, right, bottom, top, z_near, z_far] = camera->ViewFrustum().ToOrthoBounds(viewport_size);
 				position = {utilities::math::Normalize(x, 0.0_r, width, left, right),
 							utilities::math::Normalize(y, 0.0_r, height, bottom, top)};
 			}

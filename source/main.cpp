@@ -323,6 +323,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				[[maybe_unused]] auto point_sprite = ion::graphics::gl::PointSprite_Support();
 				[[maybe_unused]] auto shader = ion::graphics::gl::Shader_Support();
 				[[maybe_unused]] auto npot = ion::graphics::gl::TextureNonPowerOfTwo_Support();
+				[[maybe_unused]] auto vertex_array_object = ion::graphics::gl::VertexArrayObject_Support();
 				[[maybe_unused]] auto vertex_buffer_object = ion::graphics::gl::VertexBufferObject_Support();
 				[[maybe_unused]] auto max_texture_size = ion::graphics::gl::MaxTextureSize();
 				[[maybe_unused]] auto max_texture_units = ion::graphics::gl::MaxTextureUnits();
@@ -531,6 +532,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			model.Prepare();
 			model.Draw();
+
+
+			//Projection and view matrix
+			engine.Target()->GetViewport("")->RenderTo();
+
+			std::array<real, 16> gl_proj_mat;
+			glGetFloatv(GL_PROJECTION_MATRIX, std::data(gl_proj_mat));
+
+			std::array<real, 16> gl_view_mat;
+			glGetFloatv(GL_MODELVIEW_MATRIX, std::data(gl_view_mat));
+
+			auto proj_mat = engine.Target()->GetViewport("")->ConnectedCamera()->ViewFrustum().ProjectionMatrix();
+			auto view_mat = engine.Target()->GetViewport("")->ConnectedCamera()->ViewMatrix();
+			proj_mat.Transpose();
+			view_mat.Transpose();
+
 
 			//EXAMPLE end
 

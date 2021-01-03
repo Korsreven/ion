@@ -105,6 +105,52 @@ std::tuple<real, real, real, real, real, real> to_frustum(const std::optional<Aa
 }
 
 
+Matrix4 get_projection_matrix(ProjectionType projection, const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance, real fov,
+	const std::optional<real> &aspect_ratio, AspectRatioFormat aspect_format, real base_viewport_height, const Vector2 &viewport_size)
+{
+	switch (projection)
+	{
+		case ProjectionType::Perspective:
+		{
+			auto [left, right, bottom, top, z_near, z_far] =
+				to_frustum(clip_plane, near_clip_distance, far_clip_distance, fov,
+						   aspect_ratio, aspect_format, base_viewport_height, viewport_size);
+
+			#ifdef ION_ROW_MAJOR
+			return {2.0_r * z_near / (right - left),	0.0_r,								0.0_r,										0.0_r,
+					0.0_r,								2.0_r * z_near / (top - bottom),	0.0_r,										0.0_r,
+					(right + left) / (right - left),	(top + bottom) / (top - bottom),	-(z_far + z_near) / (z_far - z_near),		-1.0,
+					0.0_r,								0.0_r,								-(2 * z_far * z_near) / (z_far - z_near),	0.0_r};
+			#else
+			return {2.0_r * z_near / (right - left),	0.0_r,								(right + left) / (right - left),		0.0_r,
+					0.0_r,								2.0_r * z_near / (top - bottom),	(top + bottom) / (top - bottom),		0.0_r,
+					0.0_r,								0.0_r,								-(z_far + z_near) / (z_far - z_near),	-(2 * z_far * z_near) / (z_far - z_near),
+					0.0_r,								0.0_r,								-1.0_r,									0.0_r};
+			#endif
+		}
+
+		case ProjectionType::Orthographic:
+		default:
+		{
+			auto [left, right, bottom, top, z_near, z_far] =
+				to_ortho(clip_plane, near_clip_distance, far_clip_distance,
+						 aspect_ratio, aspect_format, base_viewport_height, viewport_size);
+
+			#ifdef ION_ROW_MAJOR
+			return {2.0_r / (right - left),				0.0_r,								0.0_r,									0.0_r,
+					0.0_r,								2.0_r / (top - bottom),				0.0_r,									0.0_r,
+					0.0_r,								0.0_r,								-2.0_r / (z_far - z_near),				0.0_r,
+					-(right + left) / (right - left),	-(top + bottom) / (top - bottom),	-(z_far + z_near) / (z_far - z_near),	1.0_r};
+			#else
+			return {2.0_r / (right - left),	0.0_r,					0.0_r,						-(right + left) / (right - left),
+					0.0_r,					2.0_r / (top - bottom), 0.0_r,						-(top + bottom) / (top - bottom),
+					0.0_r,					0.0_r,					-2.0_r / (z_far - z_near),	-(z_far + z_near) / (z_far - z_near),
+					0.0_r,					0.0_r,					0.0_r,						1.0_r};
+			#endif
+		}
+	}
+}
+
 void project_through_frustum(ProjectionType projection, const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance, real fov,
 	const std::optional<real> &aspect_ratio, AspectRatioFormat aspect_format, real base_viewport_height, const Vector2 &viewport_size) noexcept
 {
@@ -134,6 +180,7 @@ void project_through_frustum(ProjectionType projection, const std::optional<Aabb
 	}
 
 	glMatrixMode(GL_MODELVIEW); //Switch back
+	glLoadIdentity();
 }
 
 } //frustum::detail
@@ -196,6 +243,9 @@ void Frustum::ProjectScene(const Vector2 &viewport_size) noexcept
 {
 	detail::project_through_frustum(projection_, clip_plane_, near_clip_distance_, far_clip_distance_,
 									field_of_view_, aspect_ratio_, aspect_format_, base_viewport_height_, viewport_size);
+	projection_matrix_ =
+		detail::get_projection_matrix(projection_, clip_plane_, near_clip_distance_, far_clip_distance_,
+									  field_of_view_, aspect_ratio_, aspect_format_, base_viewport_height_, viewport_size);
 }
 
 

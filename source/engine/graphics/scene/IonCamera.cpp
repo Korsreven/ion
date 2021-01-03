@@ -26,11 +26,13 @@ namespace camera::detail
 
 void move_to(const Vector3 &position) noexcept
 {
-	//glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
 	auto [x, y, z] = position.XYZ();
 	glTranslatef(-x, -y, -z);
+}
+
+Matrix4 get_view_matrix(const Vector3 &position) noexcept
+{
+	return Matrix4::Translation(-position);
 }
 
 } //camera::detail
@@ -80,18 +82,8 @@ void Camera::CaptureScene(const render::Viewport &viewport) noexcept
 {
 	frustum_.ProjectScene(viewport.Bounds().ToSize());
 	detail::move_to(position_);
-}
 
-
-/*
-	View matrix
-*/
-
-std::array<real, 16> Camera::ViewMatrix() const noexcept
-{
-	std::array<real, 16> mat4;
-	glGetFloatv(GL_PROJECTION_MATRIX, std::data(mat4)); //TODO needs a view matrix per camera
-	return mat4;
+	view_matrix_ = detail::get_view_matrix(position_);
 }
 
 } //ion::graphics::scene

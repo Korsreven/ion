@@ -17,6 +17,7 @@ File:	IonFrustum.h
 #include <tuple>
 
 #include "graphics/utilities/IonAabb.h"
+#include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector2.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
@@ -26,6 +27,7 @@ namespace ion::graphics::render
 	using namespace types::type_literals;
 
 	using graphics::utilities::Aabb;
+	using graphics::utilities::Matrix4;
 	using graphics::utilities::Vector2;
 
 	namespace frustum
@@ -86,6 +88,9 @@ namespace ion::graphics::render
 			std::tuple<real, real, real, real, real, real> to_frustum(const std::optional<Aabb> &clip_plane, real z_near, real z_far, real fov,
 				const std::optional<real> &aspect_ratio, AspectRatioFormat aspect_format, real base_viewport_height, const Vector2 &viewport_size) noexcept;
 
+			Matrix4 get_projection_matrix(ProjectionType projection, const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance, real fov,
+				const std::optional<real> &aspect_ratio, AspectRatioFormat aspect_format, real base_viewport_height, const Vector2 &viewport_size);
+
 			void project_through_frustum(ProjectionType projection, const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance, real fov,
 				const std::optional<real> &aspect_ratio, AspectRatioFormat aspect_format, real base_viewport_height, const Vector2 &viewport_size) noexcept;
 		} //detail
@@ -106,6 +111,8 @@ namespace ion::graphics::render
 			std::optional<real> aspect_ratio_;
 			frustum::AspectRatioFormat aspect_format_ = frustum::AspectRatioFormat::PanAndScan;
 			real base_viewport_height_ = 0.0_r;
+
+			Matrix4 projection_matrix_;
 
 		public:
 
@@ -252,6 +259,13 @@ namespace ion::graphics::render
 			[[nodiscard]] inline auto BaseViewportHeight() const noexcept
 			{
 				return base_viewport_height_;
+			}
+
+
+			//Returns the projection matrix for this frustum
+			[[nodiscard]] inline auto& ProjectionMatrix() const noexcept
+			{
+				return projection_matrix_;
 			}
 
 

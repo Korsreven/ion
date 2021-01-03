@@ -13,12 +13,12 @@ File:	IonCamera.h
 #ifndef ION_CAMERA_H
 #define ION_CAMERA_H
 
-#include <array>
 #include <optional>
 
 #include "events/IonEventGenerator.h"
 #include "events/listeners/IonCameraListener.h"
 #include "graphics/render/IonFrustum.h"
+#include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector3.h"
 #include "managed/IonManagedObject.h"
 
@@ -30,6 +30,8 @@ namespace ion::graphics::render
 namespace ion::graphics::scene
 {
 	class SceneManager; //Forward declaration
+
+	using utilities::Matrix4;
 	using utilities::Vector3;
 
 	namespace camera
@@ -37,6 +39,8 @@ namespace ion::graphics::scene
 		namespace detail
 		{
 			void move_to(const Vector3 &position) noexcept;
+
+			Matrix4 get_view_matrix(const Vector3 &position) noexcept;
 		} //detail
 	} //camera
 
@@ -49,6 +53,8 @@ namespace ion::graphics::scene
 
 			Vector3 position_;
 			render::Frustum frustum_;
+
+			Matrix4 view_matrix_;
 
 
 			/*
@@ -82,7 +88,7 @@ namespace ion::graphics::scene
 			}
 
 			//
-			inline void Lens(const render::Frustum &frustum) noexcept
+			inline void ViewFrustum(const render::Frustum &frustum) noexcept
 			{
 				frustum_ = frustum;
 				NotifyCameraFrustumChanged(frustum);
@@ -100,9 +106,16 @@ namespace ion::graphics::scene
 			}
 
 			//
-			[[nodiscard]] inline auto& Lens() const noexcept
+			[[nodiscard]] inline auto& ViewFrustum() const noexcept
 			{
 				return frustum_;
+			}
+
+
+			//Returns the view matrix for this camera
+			[[nodiscard]] inline auto& ViewMatrix() const noexcept
+			{
+				return view_matrix_;
 			}
 
 
@@ -112,14 +125,6 @@ namespace ion::graphics::scene
 
 			//Start capturing the scene from the viewpoint of this camera, with the given viewport
 			void CaptureScene(const render::Viewport &viewport) noexcept;
-
-
-			/*
-				View matrix
-			*/
-
-			//Returns the view matrix of this camera
-			[[nodiscard]] std::array<real, 16> ViewMatrix() const noexcept;
 	};
 } //ion::graphics::scene
 
