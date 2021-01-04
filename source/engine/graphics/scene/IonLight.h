@@ -15,6 +15,7 @@ File:	IonLight.h
 
 #include <cmath>
 
+#include "IonMovableObject.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector3.h"
 #include "types/IonTypes.h"
@@ -57,7 +58,7 @@ namespace ion::graphics::scene
 	} //light
 
 
-	class Light final
+	class Light final : public MovableObject
 	{
 		private:
 

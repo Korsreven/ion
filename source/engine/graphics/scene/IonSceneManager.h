@@ -17,6 +17,8 @@ File:	IonSceneManager.h
 #include <string_view>
 
 #include "IonCamera.h"
+#include "IonLight.h"
+#include "IonModel.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonCameraListener.h"
 #include "managed/IonObjectManager.h"
@@ -29,11 +31,17 @@ namespace ion::graphics::scene
 
 
 	class SceneManager :
-		public managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>
+		public managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>,
+		protected unmanaged::ObjectFactory<Light>,
+		protected unmanaged::ObjectFactory<Model>
 	{
 		private:
 
 			using CameraEventsBase = events::Listenable<events::listeners::CameraListener>;
+
+			using CameraManagerBase = managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>;
+			using LightFactoryBase = unmanaged::ObjectFactory<Light>;
+			using ModelFactoryBase = unmanaged::ObjectFactory<Model>;
 
 		public:
 
@@ -79,7 +87,6 @@ namespace ion::graphics::scene
 
 
 			/*
-				Cameras
 				Ranges
 			*/
 
@@ -87,14 +94,44 @@ namespace ion::graphics::scene
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Cameras() noexcept
 			{
-				return Objects();
+				return CameraManagerBase::Objects();
 			}
 
 			//Returns an immutable range of all cameras in this scene manager
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline const auto Cameras() const noexcept
 			{
-				return Objects();
+				return CameraManagerBase::Objects();
+			}
+
+
+			//Returns a mutable range of all lights in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Lights() noexcept
+			{
+				return LightFactoryBase::Objects();
+			}
+
+			//Returns an immutable range of all lights in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline const auto Lights() const noexcept
+			{
+				return LightFactoryBase::Objects();
+			}
+
+
+			//Returns a mutable range of all models in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Models() noexcept
+			{
+				return ModelFactoryBase::Objects();
+			}
+
+			//Returns an immutable range of all models in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline const auto Models() const noexcept
+			{
+				return ModelFactoryBase::Objects();
 			}
 
 

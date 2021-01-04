@@ -15,6 +15,7 @@ File:	IonCamera.h
 
 #include <optional>
 
+#include "IonMovableObject.h"
 #include "events/IonEventGenerator.h"
 #include "events/listeners/IonCameraListener.h"
 #include "graphics/render/IonFrustum.h"
@@ -46,6 +47,7 @@ namespace ion::graphics::scene
 
 
 	class Camera final :
+		public MovableObject,
 		public managed::ManagedObject<SceneManager>,
 		protected events::EventGenerator<events::listeners::CameraListener>
 	{

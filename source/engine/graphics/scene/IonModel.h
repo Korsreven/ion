@@ -16,6 +16,7 @@ File:	IonModel.h
 #include <optional>
 #include <vector>
 
+#include "IonMovableObject.h"
 #include "graphics/render/IonMesh.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonObb.h"
@@ -59,7 +60,9 @@ namespace ion::graphics::scene
 	} //model
 
 
-	class Model final : protected unmanaged::ObjectFactory<render::Mesh>
+	class Model final :
+		public MovableObject,
+		protected unmanaged::ObjectFactory<render::Mesh>
 	{
 		private:
 

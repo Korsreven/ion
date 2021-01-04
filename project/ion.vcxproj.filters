@@ -806,5 +806,8 @@
     <ClInclude Include="..\source\engine\graphics\utilities\IonMatrix4.h">
       <Filter>Header Files\graphics\utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\IonMovableObject.h">
+      <Filter>Header Files\graphics\scene</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

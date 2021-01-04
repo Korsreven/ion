@@ -77,6 +77,7 @@ File:	main.cpp
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonLight.h"
 #include "graphics/scene/IonModel.h"
+#include "graphics/scene/IonMovableObject.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/shaders/IonShader.h"
 #include "graphics/shaders/IonShaderManager.h"

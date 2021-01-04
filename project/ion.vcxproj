@@ -306,6 +306,7 @@
     <ClInclude Include="..\source\engine\graphics\scene\IonCamera.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonLight.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonModel.h" />
+    <ClInclude Include="..\source\engine\graphics\scene\IonMovableObject.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonSceneManager.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\IonShader.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\IonShaderManager.h" />
