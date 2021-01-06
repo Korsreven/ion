@@ -409,37 +409,55 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//while (!shader_programs.Loaded());
 
+			using namespace ion::graphics::shaders::variables;
+
 			//Shader variables
 			//Vertex
-			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec3>("vertex.position");
-			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec3>("vertex.normal");
-			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec4>("vertex.color");
-			mesh_shader_prog.CreateAttribute<ion::graphics::shaders::variables::glsl::vec2>("vertex.tex_coord");
+			mesh_shader_prog.CreateAttribute<glsl::vec3>("vertex.position");
+			mesh_shader_prog.CreateAttribute<glsl::vec3>("vertex.normal");
+			mesh_shader_prog.CreateAttribute<glsl::vec4>("vertex.color");
+			mesh_shader_prog.CreateAttribute<glsl::vec2>("vertex.tex_coord");
 
 			//Material
-			auto &material_ambient = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec4>("material.ambient");
-			auto &material_diffuse = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec4>("material.diffuse");
-			auto &material_specular = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec4>("material.specular");
+			auto &material_ambient = mesh_shader_prog.CreateUniform<glsl::vec4>("material.ambient");
+			auto &material_diffuse = mesh_shader_prog.CreateUniform<glsl::vec4>("material.diffuse");
+			auto &material_specular = mesh_shader_prog.CreateUniform<glsl::vec4>("material.specular");
 			auto &material_shininess = mesh_shader_prog.CreateUniform<float>("material.shininess");
-			auto &material_diffuse_map = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::sampler2D>("material.diffuse_map");	
-			auto &material_specular_map = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::sampler2D>("material.specular_map");
-			auto &material_normal_map = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::sampler2D>("material.normal_map");
+			auto &material_diffuse_map = mesh_shader_prog.CreateUniform<glsl::sampler2D>("material.diffuse_map");	
+			auto &material_specular_map = mesh_shader_prog.CreateUniform<glsl::sampler2D>("material.specular_map");
+			auto &material_normal_map = mesh_shader_prog.CreateUniform<glsl::sampler2D>("material.normal_map");
 
 			//Light
-			auto &light_position = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec3>("light.position");
-			auto &light_direction = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec3>("light.direction");
+			auto &light_position = mesh_shader_prog.CreateUniform<glsl::vec3>("light.position");
+			auto &light_direction = mesh_shader_prog.CreateUniform<glsl::vec3>("light.direction");
 			auto &light_cutoff = mesh_shader_prog.CreateUniform<float>("light.cutoff");
-			auto &light_ambient = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec4>("light.ambient");
-			auto &light_diffuse = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec4>("light.diffuse");
-			auto &light_specular = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec4>("light.specular");
+			auto &light_ambient = mesh_shader_prog.CreateUniform<glsl::vec4>("light.ambient");
+			auto &light_diffuse = mesh_shader_prog.CreateUniform<glsl::vec4>("light.diffuse");
+			auto &light_specular = mesh_shader_prog.CreateUniform<glsl::vec4>("light.specular");
 
 			//Camera
-			auto &camera_position = mesh_shader_prog.CreateUniform<ion::graphics::shaders::variables::glsl::vec3>("camera.position");
+			auto &camera_position = mesh_shader_prog.CreateUniform<glsl::vec3>("camera.position");
 
 			//Scene
 			auto &scene_gamma = mesh_shader_prog.CreateUniform<float>("scene.gamma");
 
+			//Matrices
+			auto &projection_matrix = mesh_shader_prog.CreateUniform<glsl::mat4>("projection_matrix");
+			auto &model_view_matrix = mesh_shader_prog.CreateUniform<glsl::mat4>("model_view_matrix");
+			auto &model_view_projection_matrix = mesh_shader_prog.CreateUniform<glsl::mat4>("model_view_projection_matrix");
 
+
+			//Projection and view matrix
+			auto camera = engine.Target()->GetViewport("")->ConnectedCamera();
+			camera->Position({0.0_r, 0.0_r, 0.0_r});
+			camera->Rotation(ion::utilities::math::Degree(0.0_r));
+
+			engine.Target()->GetViewport("")->RenderTo();
+			auto proj_mat = camera->ViewFrustum().ProjectionMatrix();
+			auto view_mat = camera->ViewMatrix();
+			auto view_proj_mat = proj_mat * view_mat;
+
+			//Uniforms
 			material_ambient.Get().XYZW(0.19125_r, 0.0735_r, 0.0225_r, 1.0_r);
 			material_diffuse.Get().XYZW(0.7038_r, 0.27048_r, 0.0828_r, 1.0_r);
 			material_specular.Get().XYZW(0.256777_r, 0.137622_r, 0.086014_r, 1.0_r);
@@ -455,8 +473,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			light_diffuse.Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
 			light_specular.Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
 
-			camera_position.Get().XYZ(1.0_r, 0.0_r, 1.7_r);
+			camera_position.Get() = camera->Position();
 			scene_gamma.Get() = 1.0_r;
+
+			proj_mat.Transpose();
+			view_mat.Transpose();
+			view_proj_mat.Transpose();
+			projection_matrix.Get() = proj_mat;
+			model_view_matrix.Get() = view_mat;
+			model_view_projection_matrix.Get() = view_proj_mat;
 
 			shader_programs.UpdateShaderVariables(mesh_shader_prog);
 
@@ -533,21 +558,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			model.Prepare();
 			model.Draw();
-
-
-			//Projection and view matrix
-			engine.Target()->GetViewport("")->RenderTo();
-
-			std::array<real, 16> gl_proj_mat;
-			glGetFloatv(GL_PROJECTION_MATRIX, std::data(gl_proj_mat));
-
-			std::array<real, 16> gl_view_mat;
-			glGetFloatv(GL_MODELVIEW_MATRIX, std::data(gl_view_mat));
-
-			auto proj_mat = engine.Target()->GetViewport("")->ConnectedCamera()->ViewFrustum().ProjectionMatrix();
-			auto view_mat = engine.Target()->GetViewport("")->ConnectedCamera()->ViewMatrix();
-			proj_mat.Transpose();
-			view_mat.Transpose();
 
 
 			//EXAMPLE end

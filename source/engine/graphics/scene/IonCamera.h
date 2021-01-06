@@ -40,8 +40,9 @@ namespace ion::graphics::scene
 		namespace detail
 		{
 			void move_to(const Vector3 &position) noexcept;
+			void rotate_by(real angle) noexcept;
 
-			Matrix4 get_view_matrix(const Vector3 &position) noexcept;
+			Matrix4 get_view_matrix(const Vector3 &position, real angle) noexcept;
 		} //detail
 	} //camera
 
@@ -53,7 +54,8 @@ namespace ion::graphics::scene
 	{
 		private:
 
-			Vector3 position_;
+			Vector3 position_; //TEMP, should be located in parent node
+			real rotation_ = real{0.0}; //TEMP, should be located in parent node
 			render::Frustum frustum_;
 
 			Matrix4 view_matrix_;
@@ -90,6 +92,13 @@ namespace ion::graphics::scene
 			}
 
 			//
+			inline void Rotation(real angle) noexcept
+			{
+				if (rotation_ != angle)
+					rotation_ = angle;
+			}
+
+			//
 			inline void ViewFrustum(const render::Frustum &frustum) noexcept
 			{
 				frustum_ = frustum;
@@ -105,6 +114,12 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
+			}
+
+			//
+			[[nodiscard]] inline auto& Rotation() const noexcept
+			{
+				return rotation_;
 			}
 
 			//

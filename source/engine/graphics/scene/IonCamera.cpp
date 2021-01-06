@@ -30,9 +30,15 @@ void move_to(const Vector3 &position) noexcept
 	glTranslatef(-x, -y, -z);
 }
 
-Matrix4 get_view_matrix(const Vector3 &position) noexcept
+void rotate_by(real angle) noexcept
 {
-	return Matrix4::Translation(-position);
+	glRotatef(-math::Radian(angle), 0.0_r, 0.0_r, 1.0_r); //Rotate around the z-axis
+}
+
+
+Matrix4 get_view_matrix(const Vector3 &position, real angle) noexcept
+{
+	return Matrix4::Translation(-position) * Matrix4::Rotation(angle).Transpose();
 }
 
 } //camera::detail
@@ -81,9 +87,10 @@ Camera::Camera(std::string name, const render::Frustum &frustum) :
 void Camera::CaptureScene(const render::Viewport &viewport) noexcept
 {
 	frustum_.ProjectScene(viewport.Bounds().ToSize());
+	detail::rotate_by(rotation_);
 	detail::move_to(position_);
 
-	view_matrix_ = detail::get_view_matrix(position_);
+	view_matrix_ = detail::get_view_matrix(position_, rotation_);
 }
 
 } //ion::graphics::scene

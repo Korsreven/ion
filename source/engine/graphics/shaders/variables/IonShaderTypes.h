@@ -20,6 +20,8 @@ File:	IonShaderTypes.h
 #include <utility>
 
 #include "graphics/utilities/IonColor.h"
+#include "graphics/utilities/IonMatrix3.h"
+#include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 #include "types/IonTypes.h"
@@ -27,6 +29,8 @@ File:	IonShaderTypes.h
 namespace ion::graphics::shaders::variables::glsl
 {
 	using utilities::Color;
+	using utilities::Matrix3;
+	using utilities::Matrix4;
 	using utilities::Vector2;
 	using utilities::Vector3;
 
@@ -397,13 +401,6 @@ namespace ion::graphics::shaders::variables::glsl
 			Y(y);
 		}
 
-		//Sets the components to the given vector
-		inline void XY(const Vector2 &vector) noexcept
-		{
-			auto [x, y] = vector.XY();
-			XY(x, y);
-		}
-
 
 		/*
 			Observers
@@ -425,6 +422,19 @@ namespace ion::graphics::shaders::variables::glsl
 		[[nodiscard]] inline auto XY() const noexcept
 		{
 			return std::pair{X(), Y()};
+		}
+
+
+		/*
+			Operators
+		*/
+
+		//Sets vec2 components to the given vector
+		inline auto& operator=(const Vector2 &vector) noexcept
+		{
+			auto [x, y] = vector.XY();
+			XY(static_cast<T>(x), static_cast<T>(y));
+			return *this;
 		}
 	};
 
@@ -490,13 +500,6 @@ namespace ion::graphics::shaders::variables::glsl
 			Z(z);
 		}
 
-		//Sets the x, y and z components to the given vector
-		inline void XYZ(const Vector3 &vector) noexcept
-		{
-			auto [x, y, z] = vector.XYZ();
-			XYZ(x, y, z);
-		}
-
 
 		/*
 			Observers
@@ -524,6 +527,19 @@ namespace ion::graphics::shaders::variables::glsl
 		[[nodiscard]] inline auto XYZ() const noexcept
 		{
 			return std::tuple{X(), Y(), Z()};
+		}
+
+
+		/*
+			Operators
+		*/
+
+		//Sets vec3 components to the given vector
+		inline auto& operator=(const Vector3 &vector) noexcept
+		{
+			auto [x, y, z] = vector.XYZ();
+			XYZ(static_cast<T>(x), static_cast<T>(y), static_cast<T>(z));
+			return *this;
 		}
 	};
 
@@ -596,13 +612,6 @@ namespace ion::graphics::shaders::variables::glsl
 			W(w);
 		}
 
-		//Sets the x, y, z and w components to the given color
-		inline void XYZW(const Color &color) noexcept
-		{
-			auto [r, g, b, a] = color.RGBA();
-			XYZW(r, g, b, a);
-		}
-
 
 		/*
 			Observers
@@ -638,6 +647,19 @@ namespace ion::graphics::shaders::variables::glsl
 		{
 			return std::tuple{X(), Y(), Z(), W()};
 		}
+
+
+		/*
+			Operators
+		*/
+
+		//Sets vec4 components to the given color
+		inline auto& operator=(const Color &color) noexcept
+		{
+			auto [r, g, b, a] = color.RGBA();
+			XYZW(static_cast<T>(r), static_cast<T>(g), static_cast<T>(b), static_cast<T>(a));
+			return *this;
+		}
 	};
 
 
@@ -659,6 +681,21 @@ namespace ion::graphics::shaders::variables::glsl
 		inline auto& operator=(T value) noexcept
 		{
 			ValueAccessorBase<Mat<N, M, T>>::operator=(value);
+			return *this;
+		}
+
+		//Sets matNxM elements to the given matrix
+		template <typename Matrix,
+			typename = std::enable_if_t<(N == 3 && M == 3 && std::is_same_v<Matrix, Matrix3>) ||
+										(N == 4 && M == 4 && std::is_same_v<Matrix, Matrix4>)>>
+		inline auto& operator=(const Matrix &matrix) noexcept
+		{
+			for (auto i = 0; i < N; ++i)
+			{
+				for (auto j = 0; j < M; ++j)
+					this->values_[type_components_v<Mat<N, M, T>> * this->off_ + M * i + j] = static_cast<T>(matrix.M()[i][j]);
+			}
+
 			return *this;
 		}
 
@@ -818,6 +855,14 @@ namespace ion::graphics::shaders::variables::glsl
 
 			//Sets all components to the given value
 			inline auto& operator=(basic_type_t<T> value) noexcept
+			{
+				ValueAccessor<T>::operator=(value);
+				return *this;
+			}
+
+			//Sets all components to the given value
+			template <typename U>
+			inline auto& operator=(const U &value) noexcept
 			{
 				ValueAccessor<T>::operator=(value);
 				return *this;
