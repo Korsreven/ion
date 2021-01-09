@@ -282,6 +282,19 @@ namespace ion::graphics::materials
 			[[nodiscard]] std::pair<const Animation*, const Texture*> NormalMap() const noexcept;
 
 
+			//Returns the attached diffuse map texture at the given time
+			//Returns nullptr if no diffuse map is in use
+			[[nodiscard]] const Texture* DiffuseMap(duration time) const noexcept;
+
+			//Returns the attached specular map texture at the given time
+			//Returns nullptr if no specular map is in use
+			[[nodiscard]] const Texture* SpecularMap(duration time) const noexcept;
+
+			//Returns the attached normal map texture at the given time
+			//Returns nullptr if no normal map is in use
+			[[nodiscard]] const Texture* NormalMap(duration time) const noexcept;
+
+
 			//Returns the lower left and upper right texture coordinates for this material
 			[[nodiscard]] inline auto TexCoords() const noexcept
 			{

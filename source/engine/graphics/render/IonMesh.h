@@ -25,11 +25,17 @@ File:	IonMesh.h
 #include "graphics/utilities/IonVector3.h"
 #include "types/IonTypes.h"
 
+//Forward declarations
 namespace ion::graphics
 {
 	namespace materials
 	{
 		class Material;
+	}
+
+	namespace scene
+	{
+		class Model;
 	}
 
 	namespace shaders
@@ -40,7 +46,8 @@ namespace ion::graphics
 
 namespace ion::graphics::render
 {
-	using namespace utilities;
+	using namespace types::type_literals;
+	using namespace utilities;	
 
 	namespace mesh
 	{
@@ -154,16 +161,18 @@ namespace ion::graphics::render
 		
 			mesh::MeshDrawMode draw_mode_ = mesh::MeshDrawMode::Triangles;
 			mesh::detail::vertex_storage_type vertex_data_;
-			materials::Material *material_ = nullptr;	
+			materials::Material *material_ = nullptr;
 			mesh::MeshTexCoordMode tex_coord_mode_ = mesh::MeshTexCoordMode::Auto;
 			bool show_wireframe_ = false;
 			bool visible_ = true;
-
-			int vertex_count_ = 0;	
+			
+			int vertex_count_ = 0;
+			duration time_ = 0.0_sec;
 			Aabb aabb_;
 			Obb obb_;
 			Sphere sphere_;
 
+			scene::Model *parent_model_ = nullptr;
 			std::optional<int> vao_handle_;
 			std::optional<int> vbo_handle_;
 			int vertex_buffer_offset_ = 0;
@@ -252,6 +261,12 @@ namespace ion::graphics::render
 			}
 
 
+			//Sets parent model of this mesh to the given model
+			inline void ParentModel(scene::Model *model) noexcept
+			{
+				parent_model_ = model;
+			}
+
 			//Sets the VBO handle and offset to the given values
 			inline void VboHandle(std::optional<int> handle, int offset) noexcept
 			{
@@ -332,6 +347,18 @@ namespace ion::graphics::render
 			}
 
 
+			//Returns a pointer to a mutable parent model for this mesh
+			[[nodiscard]] inline auto ParentModel() noexcept
+			{
+				return parent_model_;
+			}
+
+			//Returns a pointer to an immutable parent model for this mesh
+			[[nodiscard]] inline const auto ParentModel() const noexcept
+			{
+				return parent_model_;
+			}
+
 			//Returns the VAO handle this mesh uses
 			[[nodiscard]] inline auto VaoHandle() const noexcept
 			{
@@ -365,6 +392,15 @@ namespace ion::graphics::render
 			//Draw this mesh with the given shader program (optional)
 			//This can be called multiple times if more than one pass
 			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept;
+
+
+			/*
+				Elapse time
+			*/
+
+			//Elapse mesh by the given time in seconds
+			//This function is typically called each frame, with the time in seconds since last frame
+			void Elapse(duration time) noexcept;
 	};
 } //ion::graphics::render
 

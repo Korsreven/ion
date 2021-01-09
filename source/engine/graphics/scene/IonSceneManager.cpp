@@ -22,6 +22,20 @@ namespace scene_manager::detail
 } //scene_manager::detail
 
 
+//Protected
+
+/*
+	Events
+*/
+
+void SceneManager::Created(Camera &camera) noexcept
+{
+	camera.Scene(this);
+}
+
+
+//Public
+
 /*
 	Cameras
 	Creating

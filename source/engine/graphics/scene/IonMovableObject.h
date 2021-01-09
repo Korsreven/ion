@@ -15,6 +15,7 @@ File:	IonMovableObject.h
 
 namespace ion::graphics::scene
 {
+	class SceneManager; //Forward declaration
 	class SceneNode; //Forward declaration
 
 	namespace movable_object
@@ -25,11 +26,12 @@ namespace ion::graphics::scene
 	} //movable_object
 
 
-	//A movable object can be attached to a scene node
+	//A movable object that can be attached to a scene node
 	class MovableObject
 	{
 		private:
 
+			SceneManager *scene_manager_ = nullptr;
 			SceneNode *parent_node_ = nullptr;
 
 		public:
@@ -39,6 +41,7 @@ namespace ion::graphics::scene
 
 			//Copy constructor
 			MovableObject(const MovableObject&) :
+				scene_manager_{nullptr}, //A copy of a movable object has no scene manager
 				parent_node_{nullptr} //A copy of a movable object has no parent node
 			{
 				//Empty
@@ -47,6 +50,7 @@ namespace ion::graphics::scene
 			//Copy assignment
 			inline auto& operator=(const MovableObject&)
 			{
+				scene_manager_ = nullptr;
 				parent_node_ = nullptr;
 				return *this;
 			}
@@ -56,22 +60,35 @@ namespace ion::graphics::scene
 				Modifiers
 			*/
 
-			//Sets parent node of this movable object to the given scene node
-			inline void ParentNode(SceneNode &parent) noexcept
+			//Sets the scene that contains this movable object to the given scene
+			inline void Scene(SceneManager *scene) noexcept
 			{
-				parent_node_ = &parent;
+				scene_manager_ = scene;
 			}
 
-			//Releases parent node of this movable object
-			inline void ParentNode(std::nullptr_t) noexcept
+			//Sets parent node of this movable object to the given node
+			inline void ParentNode(SceneNode *node) noexcept
 			{
-				parent_node_ = nullptr;
+				parent_node_ = node;
 			}
 
 
 			/*
 				Observers
 			*/
+
+			//Returns a pointer to a mutable scene that contains this movable object
+			[[nodiscard]] inline auto Scene() noexcept
+			{
+				return scene_manager_;
+			}
+
+			//Returns a pointer to an immutable scene that contains this movable object
+			[[nodiscard]] inline const auto Scene() const noexcept
+			{
+				return scene_manager_;
+			}
+
 
 			//Returns a pointer to a mutable parent node for this movable object
 			[[nodiscard]] inline auto ParentNode() noexcept

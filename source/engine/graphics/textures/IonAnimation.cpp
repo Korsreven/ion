@@ -19,6 +19,37 @@ using namespace animation;
 
 namespace animation::detail
 {
+
+int frame_at(duration time, duration cycle_duration, std::optional<int> repeat_count, PlaybackDirection direction, int frame_count)
+{
+	if (repeat_count)
+		time = std::clamp(time, 0.0_sec, cycle_duration * (*repeat_count + 1));
+
+	auto position = time / cycle_duration;
+	auto current_cycle = static_cast<int>(position);
+	auto reverse = is_direction_in_reverse(direction);
+
+	if (current_cycle % 2 == 1)
+	{
+		switch (direction)
+		{
+			//Flip direction
+			case PlaybackDirection::Alternate:
+			case PlaybackDirection::AlternateReverse:
+			{
+				reverse = !reverse;
+				break;
+			}
+		}
+	}
+
+	auto percent = reverse ?
+		1.0_r - (position - current_cycle) :
+		position - current_cycle;
+
+	return std::clamp(static_cast<int>(frame_count * percent), 0, frame_count - 1);
+}
+
 } //animation::detail
 
 
@@ -463,6 +494,27 @@ const Texture* Animation::CurrentFrame() const noexcept
 {
 	if (frame_sequence_)
 		return (*frame_sequence_.Object())[current_frame_];
+	else
+		return nullptr;
+}
+
+
+Texture* Animation::FrameAt(duration time) noexcept
+{
+	if (frame_sequence_ && !frame_sequence_.Object()->IsEmpty())
+		return (*frame_sequence_.Object())[detail::frame_at(time / playback_rate_, CycleDuration(),
+			repeat_count_ ? repeat_count_->second : std::optional<int>{},
+			direction_, frame_sequence_.Object()->FrameCount())];
+	else
+		return nullptr;
+}
+
+const Texture* Animation::FrameAt(duration time) const noexcept
+{
+	if (frame_sequence_ && !frame_sequence_.Object()->IsEmpty())
+		return (*frame_sequence_.Object())[detail::frame_at(time / playback_rate_, CycleDuration(),
+			repeat_count_ ? repeat_count_->second : std::optional<int>{},
+			direction_, frame_sequence_.Object()->FrameCount())];
 	else
 		return nullptr;
 }

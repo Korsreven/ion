@@ -63,8 +63,8 @@ namespace ion::graphics::scene
 		private:
 
 			light::LightType type_ = light::LightType::Point;
-			Vector3 position_;
-			Vector3 direction_;
+			Vector3 position_; //TEMP, should be located in parent node
+			Vector3 direction_; //TEMP, should be located in parent node
 			real cutoff_ = light::detail::angle_to_cutoff(light::detail::default_cutoff_angle);
 
 			Color ambient_color_;

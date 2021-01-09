@@ -557,13 +557,41 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 	if (vertex_count_ == 0 || !visible_)
 		return;
 
+	//Use material
+	if (material_)
+	{
+		if (auto diffuse_map = material_->DiffuseMap(time_); diffuse_map)
+		{
+			if (auto handle = diffuse_map->Handle(); handle)
+			{
+				//auto texture_id = *handle;
+			}
+		}
+
+		if (auto specular_map = material_->SpecularMap(time_); specular_map)
+		{
+			if (auto handle = specular_map->Handle(); handle)
+			{
+				//auto texture_id = *handle;
+			}
+		}
+
+		if (auto normal_map = material_->NormalMap(time_); normal_map)
+		{
+			if (auto handle = normal_map->Handle(); handle)
+			{
+				//auto texture_id = *handle;
+			}
+		}
+	}
+
 	auto has_supported_attributes = false;
 	auto use_vao = shader_program && vao_handle_ && vbo_handle_;
 
 	//Use shaders
 	if (shader_program && shader_program->Handle())
 	{
-		detail::use_shader_program(*shader_program->Handle());	
+		detail::use_shader_program(*shader_program->Handle());
 
 		if (!use_vao)
 		{
@@ -655,6 +683,16 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 				detail::bind_vertex_buffer_object(0);
 		}
 	}
+}
+
+
+/*
+	Elapse time
+*/
+
+void Mesh::Elapse(duration time) noexcept
+{
+	time_ += time;
 }
 
 } //ion::graphics::render

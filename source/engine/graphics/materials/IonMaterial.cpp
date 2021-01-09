@@ -339,6 +339,37 @@ std::pair<const Animation*, const Texture*> Material::NormalMap() const noexcept
 }
 
 
+const Texture* Material::DiffuseMap(duration time) const noexcept
+{
+	if (auto [animation, texture] = DiffuseMap(); animation)
+		return animation->FrameAt(time);
+	else if (texture)
+		return texture;
+	else
+		return nullptr;
+}
+
+const Texture* Material::SpecularMap(duration time) const noexcept
+{
+	if (auto [animation, texture] = SpecularMap(); animation)
+		return animation->FrameAt(time);
+	else if (texture)
+		return texture;
+	else
+		return nullptr;
+}
+
+const Texture* Material::NormalMap(duration time) const noexcept
+{
+	if (auto [animation, texture] = NormalMap(); animation)
+		return animation->FrameAt(time);
+	else if (texture)
+		return texture;
+	else
+		return nullptr;
+}
+
+
 /*
 	Texture coordinates
 */

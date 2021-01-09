@@ -66,6 +66,8 @@ namespace ion::graphics::textures
 
 				return total_frame_duration * current_frame + current_frame_duration;
 			}
+
+			int frame_at(duration time, duration cycle_duration, std::optional<int> repeat_count, PlaybackDirection direction, int frame_count);
 		} //detail
 	} //animation
 
@@ -106,13 +108,11 @@ namespace ion::graphics::textures
 		public:
 
 			//Constructs a new animation with the given name, frames, cycle duration, repeat count, playback direction and rate
-			//Duplicate textures are allowed within an animation
 			Animation(std::string name, FrameSequence &frame_sequence,
 				duration cycle_duration, std::optional<int> repeat_count = std::nullopt,
 				animation::PlaybackDirection direction = animation::PlaybackDirection::Normal, real playback_rate = 1.0_r);
 
 			//Constructs a new animation (in normal direction) with the given name, frames, cycle duration, repeat count and playback rate
-			//Duplicate textures are allowed within an animation
 			Animation(std::string name, FrameSequence &frame_sequence,
 				duration cycle_duration, std::optional<int> repeat_count, real playback_rate);
 
@@ -122,23 +122,19 @@ namespace ion::graphics::textures
 			*/
 
 			//Returns a new looping animation with the given name, frames, cycle duration, playback direction and rate
-			//Duplicate textures are allowed within an animation
 			[[nodiscard]] static Animation Looping(std::string name, FrameSequence &frame_sequence,
 				duration cycle_duration, animation::PlaybackDirection direction, real playback_rate = 1.0_r) noexcept;
 
 			//Returns a new looping animation (in normal direction) with the given name, frames, cycle duration and playback rate
-			//Duplicate textures are allowed within an animation
 			[[nodiscard]] static Animation Looping(std::string name, FrameSequence &frame_sequence,
 				duration cycle_duration, real playback_rate = 1.0_r) noexcept;
 
 
 			//Returns a new non-looping animation with the given name, frames, cycle duration, playback direction and rate
-			//Duplicate textures are allowed within an animation
 			[[nodiscard]] static Animation NonLooping(std::string name, FrameSequence &frame_sequence,
 				duration cycle_duration, animation::PlaybackDirection direction, real playback_rate = 1.0_r) noexcept;
 
 			//Returns a new non-looping animation (in normal direction) with the given name, frames, cycle duration and playback rate
-			//Duplicate textures are allowed within an animation
 			[[nodiscard]] static Animation NonLooping(std::string name, FrameSequence &frame_sequence,
 				duration cycle_duration, real playback_rate = 1.0_r) noexcept;
 
@@ -286,6 +282,15 @@ namespace ion::graphics::textures
 			//Returns a pointer to the immutable current frame in this animation
 			//Returns nullptr if there is no current frame
 			[[nodiscard]] const Texture* CurrentFrame() const noexcept;
+
+
+			//Returns a pointer to a mutable frame in this animation at the given time
+			//Returns nullptr if there is no frame at the given time
+			[[nodiscard]] Texture* FrameAt(duration time) noexcept;
+
+			//Returns a pointer to an immutable frame in this animation at the given time
+			//Returns nullptr if there is no frame at the given time
+			[[nodiscard]] const Texture* FrameAt(duration time) const noexcept;
 
 
 			//Returns a pointer to the mutable frame sequence in this animation

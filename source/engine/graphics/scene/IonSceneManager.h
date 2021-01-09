@@ -37,35 +37,44 @@ namespace ion::graphics::scene
 	{
 		private:
 
-			using CameraEventsBase = events::Listenable<events::listeners::CameraListener>;
-
 			using CameraManagerBase = managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>;
 			using LightFactoryBase = unmanaged::ObjectFactory<Light>;
 			using ModelFactoryBase = unmanaged::ObjectFactory<Model>;
+
+			using CameraEventsBase = events::Listenable<events::listeners::CameraListener>;
+
+		protected:
+
+			/*
+				Events
+			*/
+
+			//See ObjectManager::Created for more details
+			void Created(Camera &camera) noexcept override;
 
 		public:
 
 			//Default constructor
 			SceneManager() = default;
 
-			//Default copy constructor
-			SceneManager(const SceneManager&) = default;
+			//Deleted copy constructor
+			SceneManager(const SceneManager&) = delete;
 
 			//Default move constructor
 			SceneManager(SceneManager&&) = default;
 
-			//Default virtual destructor
-			virtual ~SceneManager() = default;
+			//Default destructor
+			~SceneManager() = default;
 
 
 			/*
 				Operators
 			*/
 
-			//Default copy assignment
-			SceneManager& operator=(const SceneManager&) = default;
+			//Deleted copy assignment
+			SceneManager& operator=(const SceneManager&) = delete;
 
-			//Default move assignment
+			//Move assignment
 			SceneManager& operator=(SceneManager&&) = default;
 
 

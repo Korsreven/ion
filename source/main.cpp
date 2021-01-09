@@ -384,10 +384,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::graphics::textures::AnimationManager animations;
 			auto &animation = animations.CreateAnimation(ion::graphics::textures::Animation::Looping(
 				"alternate", frame_sequence, 6.0_sec, ion::graphics::textures::animation::PlaybackDirection::Alternate));
-			animation.RepeatCount(1);
-			animation.JumpForward(7.5_sec);
-			animation.RepeatCount({});
-			animation.RepeatCount(1);
+			[[maybe_unused]] auto frame = animation.FrameAt(10.01_sec);
 
 			//Shaders
 			ion::graphics::shaders::ShaderManager shaders;

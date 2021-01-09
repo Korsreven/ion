@@ -80,6 +80,7 @@ namespace ion::graphics::scene
 			bool update_bounding_volumes_ = false;
 
 
+			void Created(render::Mesh &mesh);
 			void FetchVertexData();
 
 		public:
@@ -188,6 +189,15 @@ namespace ion::graphics::scene
 			//Draw this model with the given shader program (optional)
 			//This can be called multiple times if more than one pass
 			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept;
+
+
+			/*
+				Elapse time
+			*/
+
+			//Elapse model by the given time in seconds
+			//This function is typically called each frame, with the time in seconds since last frame
+			void Elapse(duration time) noexcept;
 
 
 			/*

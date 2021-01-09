@@ -78,13 +78,11 @@ namespace ion::graphics::textures
 		*/
 
 		//Create an animation with the given name, frames, cycle duration, repeat count, playback direction and rate
-		//Duplicate textures are allowed within an animation
 		Animation& CreateAnimation(std::string name, FrameSequence &frame_sequence,
 			duration cycle_duration, std::optional<int> repeat_count = std::nullopt,
 			animation::PlaybackDirection direction = animation::PlaybackDirection::Normal, real playback_rate = 1.0_r);
 
 		//Create an animation (in normal direction) with the given name, frames, cycle duration, repeat count and playback rate
-		//Duplicate textures are allowed within an animation
 		Animation& CreateAnimation(std::string name, FrameSequence &frame_sequence,
 			duration cycle_duration, std::optional<int> repeat_count, real playback_rate);
 
