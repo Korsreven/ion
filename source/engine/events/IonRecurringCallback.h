@@ -16,7 +16,7 @@ File:	IonRecurringCallback.h
 #include <atomic>
 #include <thread>
 
-#include "events/IonCallback.h"
+#include "IonCallback.h"
 
 namespace ion::events
 {

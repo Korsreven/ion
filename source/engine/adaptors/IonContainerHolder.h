@@ -15,6 +15,7 @@ File:	IonContainerHolder.h
 
 #include <iterator>
 #include <type_traits>
+
 #include "IonBasicContainerHolder.h"
 
 namespace ion::adaptors

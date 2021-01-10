@@ -20,7 +20,7 @@ File:	IonSystemUtility.h
 #include <string_view>
 #include <utility>
 
-#include "system/IonSystemAPI.h"
+#include "IonSystemAPI.h"
 #include "types/IonTypes.h"
 
 namespace ion::system::utilities

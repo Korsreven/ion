@@ -31,8 +31,6 @@ namespace ion::graphics::particles
 
 		namespace detail
 		{
-			template <typename T>
-			using container_type = std::vector<std::unique_ptr<T>>; //Owning
 		} //detail
 	} //particle_system
 

@@ -17,7 +17,7 @@ File:	IonFileResource.h
 #include <optional>
 #include <string>
 
-#include "resources/IonResource.h"
+#include "IonResource.h"
 
 namespace ion::resources
 {

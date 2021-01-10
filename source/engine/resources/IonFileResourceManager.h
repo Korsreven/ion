@@ -22,8 +22,8 @@ File:	IonFileResourceManager.h
 #include <vector>
 
 #include "IonFileResource.h"
+#include "IonResourceManager.h"
 #include "assets/repositories/IonFileRepository.h"
-#include "resources/IonResourceManager.h"
 #include "unmanaged/IonObjectFactory.h"
 
 namespace ion::resources

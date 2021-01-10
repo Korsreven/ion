@@ -13,12 +13,12 @@ File:	IonSystemInputListener.h
 #ifndef ION_SYSTEM_INPUT_LISTENER_H
 #define ION_SYSTEM_INPUT_LISTENER_H
 
+#include "IonSystemMessageListener.h"
 #include "events/IonListenable.h"
 #include "graphics/render/IonRenderWindow.h"
 #include "managed/IonObservedObject.h"
 #include "system/IonSystemAPI.h"
 #include "system/events/IonSystemInput.h"
-#include "system/events/listeners/IonSystemMessageListener.h"
 
 namespace ion::system::events::listeners
 {

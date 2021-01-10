@@ -15,8 +15,8 @@ File:	IonListenerTraits.h
 
 #include <type_traits>
 
-#include "events/listeners/IonManagedObjectListener.h"
-#include "events/listeners/IonResourceListener.h"
+#include "IonManagedObjectListener.h"
+#include "IonResourceListener.h"
 #include "resources/IonResource.h"
 
 //Forward declarations

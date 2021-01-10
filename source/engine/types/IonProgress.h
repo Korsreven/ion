@@ -16,8 +16,8 @@ File:	IonProgress.h
 #include <algorithm>
 #include <type_traits>
 
-#include "types/IonTypes.h"
-#include "types/IonTypeTraits.h"
+#include "IonTypes.h"
+#include "IonTypeTraits.h"
 
 namespace ion::types
 {

@@ -15,7 +15,7 @@ File:	IonInputController.h
 
 #include <vector>
 
-#include "events/listeners/IonWindowListener.h"
+#include "listeners/IonWindowListener.h"
 #include "system/events/listeners/IonSystemInputListener.h"
 
 namespace ion::events
