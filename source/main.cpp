@@ -107,6 +107,9 @@ File:	main.cpp
 #include "managed/IonObjectObserver.h"
 #include "managed/IonObservedObject.h"
 
+#include "memory/IonNonOwningPtr.h"
+#include "memory/IonOwningPtr.h"
+
 #include "parallel/IonWorker.h"
 #include "parallel/IonWorkerPool.h"
 

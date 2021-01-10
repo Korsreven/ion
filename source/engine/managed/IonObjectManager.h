@@ -15,7 +15,6 @@ File:	IonObjectManager.h
 
 #include <algorithm>
 #include <cassert>
-#include <memory>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -26,13 +25,14 @@ File:	IonObjectManager.h
 #include "adaptors/ranges/IonDereferenceIterable.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonManagedObjectListener.h"
+#include "memory/IonOwningPtr.h"
 
 namespace ion::managed
 {
 	namespace object_manager::detail
 	{
 		template <typename T>
-		using container_type = std::vector<std::unique_ptr<T>>; //Owning
+		using container_type = std::vector<OwningPtr<T>>;
 
 
 		template <typename T>
@@ -134,7 +134,7 @@ namespace ion::managed
 				AdditionStarted();
 
 				auto &object = objects_.emplace_back(
-					std::make_unique<ObjectT>(std::forward<Args>(args)...));
+					make_owning<ObjectT>(std::forward<Args>(args)...));
 				object->Owner(static_cast<OwnerT&>(*this));
 				NotifyCreated(*object);
 

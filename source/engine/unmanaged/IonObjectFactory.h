@@ -13,18 +13,18 @@ File:	IonObjectFactory.h
 #ifndef ION_OBJECT_FACTORY_H
 #define ION_OBJECT_FACTORY_H
 
-#include <memory>
 #include <utility>
 #include <vector>
 
 #include "adaptors/ranges/IonDereferenceIterable.h"
+#include "memory/IonOwningPtr.h"
 
 namespace ion::unmanaged
 {
 	namespace object_factory::detail
 	{
 		template <typename T>
-		using container_type = std::vector<std::unique_ptr<T>>; //Owning
+		using container_type = std::vector<OwningPtr<T>>;
 	} //object_factory::detail
 
 
@@ -50,7 +50,7 @@ namespace ion::unmanaged
 			auto& Create(Args &&...args)
 			{
 				auto &object = objects_.emplace_back(
-					std::make_unique<T>(std::forward<Args>(args)...));
+					make_owning<T>(std::forward<Args>(args)...));
 				return *object;
 			}
 

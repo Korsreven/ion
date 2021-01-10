@@ -335,6 +335,8 @@
     <ClInclude Include="..\source\engine\managed\IonObjectManager.h" />
     <ClInclude Include="..\source\engine\managed\IonObjectObserver.h" />
     <ClInclude Include="..\source\engine\managed\IonObservedObject.h" />
+    <ClInclude Include="..\source\engine\memory\IonNonOwningPtr.h" />
+    <ClInclude Include="..\source\engine\memory\IonOwningPtr.h" />
     <ClInclude Include="..\source\engine\parallel\IonWorker.h" />
     <ClInclude Include="..\source\engine\parallel\IonWorkerPool.h" />
     <ClInclude Include="..\source\engine\resources\IonFileResource.h" />

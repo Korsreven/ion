@@ -169,6 +169,9 @@
     <Filter Include="Source Files\graphics\materials">
       <UniqueIdentifier>{02cf4d34-73f6-4c1a-982d-711680f83e7c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\memory">
+      <UniqueIdentifier>{633c1b32-6683-439a-9c03-9fce2d257559}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -808,6 +811,12 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffectorManager.h">
       <Filter>Header Files\graphics\particles\affectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\memory\IonOwningPtr.h">
+      <Filter>Header Files\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\memory\IonNonOwningPtr.h">
+      <Filter>Header Files\memory</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
