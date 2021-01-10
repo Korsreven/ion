@@ -66,14 +66,14 @@ void Camera::NotifyCameraMoved(const Vector3 &position) noexcept
 //Public
 
 Camera::Camera(std::string name) :
-	managed::ManagedObject<SceneManager>{std::move(name)}
+	MovableObject{std::move(name)}
 {
 	//Empty
 }
 
 Camera::Camera(std::string name, const render::Frustum &frustum) :
 
-	managed::ManagedObject<SceneManager>{std::move(name)},
+	MovableObject{std::move(name)},
 	frustum_{frustum}
 {
 	//Empty

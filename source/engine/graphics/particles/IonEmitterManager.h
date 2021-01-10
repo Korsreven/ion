@@ -6,35 +6,35 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/particles
-File:	IonEmitterFactory.h
+File:	IonEmitterManager.h
 -------------------------------------------
 */
 
-#ifndef ION_EMITTER_FACTORY_H
-#define ION_EMITTER_FACTORY_H
+#ifndef ION_EMITTER_MANAGER_H
+#define ION_EMITTER_MANAGER_H
 
 #include "IonEmitter.h"
-#include "unmanaged/IonObjectFactory.h"
+#include "managed/IonObjectManager.h"
 
 namespace ion::graphics::particles
 {
-	namespace emitter_factory::detail
+	namespace emitter_manager::detail
 	{
-	} //emitter_factory::detail
+	} //emitter_manager::detail
 
 
-	class EmitterFactory : public unmanaged::ObjectFactory<Emitter>
+	class EmitterManager : public managed::ObjectManager<Emitter, EmitterManager>
 	{
 		protected:
 
 			//Can only be instantiated by derived
-			EmitterFactory() = default;
+			EmitterManager() = default;
 
 			//Deleted copy constructor
-			EmitterFactory(const EmitterFactory&) = delete;
+			EmitterManager(const EmitterManager&) = delete;
 
 			//Default move constructor
-			EmitterFactory(EmitterFactory&&) = default;
+			EmitterManager(EmitterManager&&) = default;
 
 		public:
 
@@ -43,24 +43,24 @@ namespace ion::graphics::particles
 			*/
 
 			//Deleted copy assignment
-			EmitterFactory& operator=(const EmitterFactory&) = delete;
+			EmitterManager& operator=(const EmitterManager&) = delete;
 
 			//Move assignment
-			EmitterFactory& operator=(EmitterFactory&&) = default;
+			EmitterManager& operator=(EmitterManager&&) = default;
 
 
 			/*
 				Ranges
 			*/
 
-			//Returns a mutable range of all emitters in this factory
+			//Returns a mutable range of all emitters in this manager
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Emitters() noexcept
 			{
 				return Objects();
 			}
 
-			//Returns an immutable range of all emitters in this factory
+			//Returns an immutable range of all emitters in this manager
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline const auto Emitters() const noexcept
 			{
@@ -72,11 +72,11 @@ namespace ion::graphics::particles
 				Creating
 			*/
 
-			//Create an emitter with the given arguments
+			//Create an emitter with the given name and arguments
 			template <typename... Args>
-			auto& CreateEmitter(Args &&...args)
+			auto& CreateEmitter(std::string name, Args &&...args)
 			{
-				return Create(std::forward<Args>(args)...);
+				return Create(std::move(name), std::forward<Args>(args)...);
 			}
 
 			//Create an emitter by moving the given emitter
@@ -90,13 +90,13 @@ namespace ion::graphics::particles
 				Removing
 			*/
 
-			//Clear all emitters from this factory
+			//Clear all emitters from this manager
 			void ClearEmitters() noexcept
 			{
 				Clear();
 			}
 
-			//Remove an emitter from this factory
+			//Remove an emitter from this manager
 			auto RemoveEmitter(Emitter &Emitter) noexcept
 			{
 				return Remove(Emitter);

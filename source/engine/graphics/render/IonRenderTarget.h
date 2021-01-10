@@ -77,8 +77,8 @@ namespace ion::graphics::render
 				Operators
 			*/
 
-			//Default copy assignment
-			RenderTarget& operator=(const RenderTarget&) = default;
+			//Deleted copy assignment
+			RenderTarget& operator=(const RenderTarget&) = delete;
 
 			//Default move assignment
 			RenderTarget& operator=(RenderTarget&&) = default;

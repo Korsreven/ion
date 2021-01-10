@@ -32,25 +32,16 @@ namespace ion::graphics::scene
 
 	class SceneManager :
 		public managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>,
-		protected unmanaged::ObjectFactory<Light>,
-		protected unmanaged::ObjectFactory<Model>
+		protected managed::ObjectManager<Light, SceneManager>,
+		protected managed::ObjectManager<Model, SceneManager>
 	{
 		private:
 
-			using CameraManagerBase = managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>;
-			using LightFactoryBase = unmanaged::ObjectFactory<Light>;
-			using ModelFactoryBase = unmanaged::ObjectFactory<Model>;
+			using CameraBase = managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>;
+			using LightBase = managed::ObjectManager<Light, SceneManager>;
+			using ModelBase = managed::ObjectManager<Model, SceneManager>;
 
 			using CameraEventsBase = events::Listenable<events::listeners::CameraListener>;
-
-		protected:
-
-			/*
-				Events
-			*/
-
-			//See ObjectManager::Created for more details
-			void Created(Camera &camera) noexcept override;
 
 		public:
 
@@ -103,14 +94,14 @@ namespace ion::graphics::scene
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Cameras() noexcept
 			{
-				return CameraManagerBase::Objects();
+				return CameraBase::Objects();
 			}
 
 			//Returns an immutable range of all cameras in this scene manager
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline const auto Cameras() const noexcept
 			{
-				return CameraManagerBase::Objects();
+				return CameraBase::Objects();
 			}
 
 
@@ -118,14 +109,14 @@ namespace ion::graphics::scene
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Lights() noexcept
 			{
-				return LightFactoryBase::Objects();
+				return LightBase::Objects();
 			}
 
 			//Returns an immutable range of all lights in this scene manager
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline const auto Lights() const noexcept
 			{
-				return LightFactoryBase::Objects();
+				return LightBase::Objects();
 			}
 
 
@@ -133,14 +124,14 @@ namespace ion::graphics::scene
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Models() noexcept
 			{
-				return ModelFactoryBase::Objects();
+				return ModelBase::Objects();
 			}
 
 			//Returns an immutable range of all models in this scene manager
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline const auto Models() const noexcept
 			{
-				return ModelFactoryBase::Objects();
+				return ModelBase::Objects();
 			}
 
 

@@ -142,7 +142,15 @@ void ColorFader::DoAffect(affector::detail::particle_range particles, [[maybe_un
 
 //Public
 
-ColorFader::ColorFader(const std::vector<color_fader::Step> &steps) :
+ColorFader::ColorFader(std::string name) :
+	Affector{std::move(name)}
+{
+	//Empty
+}
+
+ColorFader::ColorFader(std::string name, const std::vector<color_fader::Step> &steps) :
+
+	Affector{std::move(name)},
 	steps_{detail::normalize_steps(std::move(steps))}
 {
 	//Empty
@@ -153,16 +161,16 @@ ColorFader::ColorFader(const std::vector<color_fader::Step> &steps) :
 	Static color fader conversions
 */
 
-ColorFader ColorFader::UniformSteps(const std::vector<Color> &colors)
+ColorFader ColorFader::UniformSteps(std::string name, const std::vector<Color> &colors)
 {
-	return {detail::uniformly_distribute_steps(colors, 0.0_r, 1.0_r)};
+	return {std::move(name), detail::uniformly_distribute_steps(colors, 0.0_r, 1.0_r)};
 }
 
-ColorFader ColorFader::UniformSteps(const std::vector<Color> &colors, real from_percent, real to_percent)
+ColorFader ColorFader::UniformSteps(std::string name, const std::vector<Color> &colors, real from_percent, real to_percent)
 {
 	auto [min, max] = std::minmax(from_percent, to_percent);
 	auto [from, to] = detail::clamp_range(min, max);
-	return {detail::uniformly_distribute_steps(colors, from, to)};
+	return {std::move(name), detail::uniformly_distribute_steps(colors, from, to)};
 }
 
 

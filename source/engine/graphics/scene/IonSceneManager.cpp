@@ -22,18 +22,6 @@ namespace scene_manager::detail
 } //scene_manager::detail
 
 
-//Protected
-
-/*
-	Events
-*/
-
-void SceneManager::Created(Camera &camera) noexcept
-{
-	camera.Scene(this);
-}
-
-
 //Public
 
 /*
@@ -43,12 +31,12 @@ void SceneManager::Created(Camera &camera) noexcept
 
 Camera& SceneManager::CreateCamera(const Camera &camera)
 {
-	return CameraManagerBase::Create(camera);
+	return CameraBase::Create(camera);
 }
 
 Camera& SceneManager::CreateCamera(Camera &&camera)
 {
-	return CameraManagerBase::Create(std::move(camera));
+	return CameraBase::Create(std::move(camera));
 }
 
 
@@ -59,12 +47,12 @@ Camera& SceneManager::CreateCamera(Camera &&camera)
 
 Camera* SceneManager::GetCamera(std::string_view name) noexcept
 {
-	return CameraManagerBase::Get(name);
+	return CameraBase::Get(name);
 }
 
 const Camera* SceneManager::GetCamera(std::string_view name) const noexcept
 {
-	return CameraManagerBase::Get(name);
+	return CameraBase::Get(name);
 }
 
 
@@ -75,17 +63,17 @@ const Camera* SceneManager::GetCamera(std::string_view name) const noexcept
 
 void SceneManager::ClearCameras() noexcept
 {
-	CameraManagerBase::Clear();
+	CameraBase::Clear();
 }
 
 bool SceneManager::RemoveCamera(Camera &camera) noexcept
 {
-	return CameraManagerBase::Remove(camera);
+	return CameraBase::Remove(camera);
 }
 
 bool SceneManager::RemoveCamera(std::string_view name) noexcept
 {
-	return CameraManagerBase::Remove(name);
+	return CameraBase::Remove(name);
 }
 
 } //ion::graphics::scene

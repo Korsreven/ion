@@ -14,6 +14,7 @@ File:	IonAffector.h
 #define ION_AFFECTOR_H
 
 #include "adaptors/ranges/IonIterable.h"
+#include "managed/IonManagedObject.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::particles
@@ -23,6 +24,8 @@ namespace ion::graphics::particles
 
 namespace ion::graphics::particles::affectors
 {
+	class AffectorManager; //Forward declaration
+
 	namespace affector::detail
 	{
 		template <typename T>
@@ -34,7 +37,7 @@ namespace ion::graphics::particles::affectors
 
 	//Affector class that can affect single particles
 	//This base class must support inheritance (open set of affectors)
-	class Affector
+	class Affector : public managed::ManagedObject<AffectorManager>
 	{
 		private:
 
@@ -42,8 +45,9 @@ namespace ion::graphics::particles::affectors
 
 		protected:
 
+			//Construct a new affector with the given name
 			//Can only be instantiated by derived
-			Affector() = default;
+			explicit Affector(std::string name);
 
 
 			/*

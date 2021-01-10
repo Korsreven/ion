@@ -6,35 +6,35 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/particles/affectors
-File:	IonAffectorFactory.h
+File:	IonAffectorManager.h
 -------------------------------------------
 */
 
-#ifndef ION_AFFECTOR_FACTORY_H
-#define ION_AFFECTOR_FACTORY_H
+#ifndef ION_AFFECTOR_MANAGER_H
+#define ION_AFFECTOR_MANAGER_H
 
 #include "IonAffector.h"
-#include "unmanaged/IonObjectFactory.h"
+#include "managed/IonObjectManager.h"
 
 namespace ion::graphics::particles::affectors
 {
-	namespace affector_factory::detail
+	namespace affector_manager::detail
 	{
-	} //affector_factory::detail
+	} //affector_manager::detail
 
 
-	class AffectorFactory : public unmanaged::ObjectFactory<Affector>
+	class AffectorManager : public managed::ObjectManager<Affector, AffectorManager>
 	{
 		protected:
 
 			//Can only be instantiated by derived
-			AffectorFactory() = default;
+			AffectorManager() = default;
 
 			//Deleted copy constructor
-			AffectorFactory(const AffectorFactory&) = delete;
+			AffectorManager(const AffectorManager&) = delete;
 
 			//Default move constructor
-			AffectorFactory(AffectorFactory&&) = default;
+			AffectorManager(AffectorManager&&) = default;
 
 		public:
 
@@ -43,24 +43,24 @@ namespace ion::graphics::particles::affectors
 			*/
 
 			//Deleted copy assignment
-			AffectorFactory& operator=(const AffectorFactory&) = delete;
+			AffectorManager& operator=(const AffectorManager&) = delete;
 
 			//Move assignment
-			AffectorFactory& operator=(AffectorFactory&&) = default;
+			AffectorManager& operator=(AffectorManager&&) = default;
 
 
 			/*
 				Ranges
 			*/
 
-			//Returns a mutable range of all affectors in this factory
+			//Returns a mutable range of all affectors in this manager
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Affectors() noexcept
 			{
 				return Objects();
 			}
 
-			//Returns an immutable range of all affectors in this factory
+			//Returns an immutable range of all affectors in this manager
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline const auto Affectors() const noexcept
 			{
@@ -72,13 +72,13 @@ namespace ion::graphics::particles::affectors
 				Creating
 			*/
 
-			//Create an affector of type T with the given arguments
+			//Create an affector of type T with the given name and arguments
 			template <typename T, typename... Args>
-			auto& CreateAffector(Args &&...args)
+			auto& CreateAffector(std::string name, Args &&...args)
 			{
 				static_assert(std::is_base_of_v<Affector, T>);
 
-				auto &affector = Create(std::forward<Args>(args)...);
+				auto &affector = Create(std::move(name), std::forward<Args>(args)...);
 				return static_cast<T&>(affector);
 			}
 
@@ -108,13 +108,13 @@ namespace ion::graphics::particles::affectors
 				Removing
 			*/
 
-			//Clear all affectors from this factory
+			//Clear all affectors from this manager
 			void ClearAffectors() noexcept
 			{
 				Clear();
 			}
 
-			//Remove an affector from this factory
+			//Remove an affector from this manager
 			auto RemoveAffector(Affector &affector) noexcept
 			{
 				return Remove(affector);

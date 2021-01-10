@@ -49,14 +49,14 @@ namespace ion::graphics::particles::affectors
 
 		public:
 
-			//Default constructor
-			VelocityRandomizer() = default;
+			//Construct a new velocity randomizer with the given name
+			explicit VelocityRandomizer(std::string name);
 
-			//Construct a new velocity randomizer with the given initial values
-			VelocityRandomizer(real velocity, real scope) noexcept;
+			//Construct a new velocity randomizer with the given name, velocity and scope
+			VelocityRandomizer(std::string name, real velocity, real scope);
 
-			//Construct a new velocity randomizer with the given initial values
-			VelocityRandomizer(real min_velocity, real max_velocity, real scope) noexcept;
+			//Construct a new velocity randomizer with the  given name, min/max velocity and scope
+			VelocityRandomizer(std::string name, real min_velocity, real max_velocity, real scope);
 
 
 			/*

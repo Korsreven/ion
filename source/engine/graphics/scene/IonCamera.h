@@ -21,7 +21,6 @@ File:	IonCamera.h
 #include "graphics/render/IonFrustum.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector3.h"
-#include "managed/IonManagedObject.h"
 
 namespace ion::graphics::render
 {
@@ -30,8 +29,6 @@ namespace ion::graphics::render
 
 namespace ion::graphics::scene
 {
-	class SceneManager; //Forward declaration
-
 	using utilities::Matrix4;
 	using utilities::Vector3;
 
@@ -49,7 +46,6 @@ namespace ion::graphics::scene
 
 	class Camera final :
 		public MovableObject,
-		public managed::ManagedObject<SceneManager>,
 		protected events::EventGenerator<events::listeners::CameraListener>
 	{
 		private:
@@ -70,10 +66,10 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a camera with the given name
+			//Construct a new camera with the given name
 			explicit Camera(std::string name);
 
-			//Construct a camera with the given name and a custom frustum
+			//Construct a new camera with the given name and a custom frustum
 			Camera(std::string name, const render::Frustum &frustum);
 
 

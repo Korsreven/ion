@@ -82,12 +82,12 @@ namespace ion::graphics::scene
 			//Default constructor
 			Light() = default;
 
-			//Constructor
+			//Construct a new light with the given values
 			Light(light::LightType type,
 				const Vector3 &position, const Vector3 &direction, real cutoff_angle,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
-				bool cast_shadows = true);
+				bool cast_shadows = true) noexcept;
 
 
 			/*

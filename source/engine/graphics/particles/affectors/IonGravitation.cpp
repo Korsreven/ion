@@ -57,7 +57,16 @@ void Gravitation::DoAffect(affector::detail::particle_range particles, duration 
 
 //Public
 
-Gravitation::Gravitation(const Vector2 &position, real gravity, real mass) noexcept :
+Gravitation::Gravitation(std::string name) :
+	Affector{std::move(name)}
+{
+	//Empty
+}
+
+Gravitation::Gravitation(std::string name, const Vector2 &position, real gravity, real mass) :
+
+	Affector{std::move(name)},
+
 	position_{position},
 	gravity_{gravity},
 	mass_{mass}

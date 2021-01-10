@@ -32,8 +32,11 @@ namespace ion::managed
 
 		public:
 
-			//Constructor
-			explicit ManagedObject(std::optional<std::string> name) :
+			//Default constructor
+			ManagedObject() = default;
+
+			//Construct a new managed object with the given name
+			explicit ManagedObject(std::string name) :
 				name_{std::move(name)}
 			{
 				//Empty

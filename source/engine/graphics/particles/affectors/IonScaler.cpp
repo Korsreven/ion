@@ -142,7 +142,15 @@ void Scaler::DoAffect(affector::detail::particle_range particles, [[maybe_unused
 
 //Public
 
-Scaler::Scaler(const std::vector<scaler::Step> &steps) :
+Scaler::Scaler(std::string name) :
+	Affector{std::move(name)}
+{
+	//Empty
+}
+
+Scaler::Scaler(std::string name, const std::vector<scaler::Step> &steps) :
+
+	Affector{std::move(name)},
 	steps_{detail::normalize_steps(std::move(steps))}
 {
 	//Empty
@@ -153,16 +161,16 @@ Scaler::Scaler(const std::vector<scaler::Step> &steps) :
 	Static scaler conversions
 */
 
-Scaler Scaler::UniformSteps(const std::vector<Vector2> &sizes)
+Scaler Scaler::UniformSteps(std::string name, const std::vector<Vector2> &sizes)
 {
-	return {detail::uniformly_distribute_steps(sizes, 0.0_r, 1.0_r)};
+	return {std::move(name), detail::uniformly_distribute_steps(sizes, 0.0_r, 1.0_r)};
 }
 
-Scaler Scaler::UniformSteps(const std::vector<Vector2> &sizes, real from_percent, real to_percent)
+Scaler Scaler::UniformSteps(std::string name, const std::vector<Vector2> &sizes, real from_percent, real to_percent)
 {
 	auto [min, max] = std::minmax(from_percent, to_percent);
 	auto [from, to] = detail::clamp_range(min, max);
-	return {detail::uniformly_distribute_steps(sizes, from, to)};
+	return {std::move(name), detail::uniformly_distribute_steps(sizes, from, to)};
 }
 
 

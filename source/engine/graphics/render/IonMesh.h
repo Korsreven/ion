@@ -172,7 +172,6 @@ namespace ion::graphics::render
 			Obb obb_;
 			Sphere sphere_;
 
-			scene::Model *parent_model_ = nullptr;
 			std::optional<int> vao_handle_;
 			std::optional<int> vbo_handle_;
 			int vertex_buffer_offset_ = 0;
@@ -261,12 +260,6 @@ namespace ion::graphics::render
 			}
 
 
-			//Sets parent model of this mesh to the given model
-			inline void ParentModel(scene::Model *model) noexcept
-			{
-				parent_model_ = model;
-			}
-
 			//Sets the VBO handle and offset to the given values
 			inline void VboHandle(std::optional<int> handle, int offset) noexcept
 			{
@@ -346,18 +339,6 @@ namespace ion::graphics::render
 				return sphere_;
 			}
 
-
-			//Returns a pointer to a mutable parent model for this mesh
-			[[nodiscard]] inline auto ParentModel() noexcept
-			{
-				return parent_model_;
-			}
-
-			//Returns a pointer to an immutable parent model for this mesh
-			[[nodiscard]] inline const auto ParentModel() const noexcept
-			{
-				return parent_model_;
-			}
 
 			//Returns the VAO handle this mesh uses
 			[[nodiscard]] inline auto VaoHandle() const noexcept

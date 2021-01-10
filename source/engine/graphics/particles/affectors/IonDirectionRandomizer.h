@@ -49,11 +49,11 @@ namespace ion::graphics::particles::affectors
 
 		public:
 
-			//Default constructor
-			DirectionRandomizer() = default;
+			//Construct a new direction randomizer with the given name
+			explicit DirectionRandomizer(std::string name);
 
-			//Construct a new direction randomizer with the given initial values
-			DirectionRandomizer(real angle, real scope) noexcept;
+			//Construct a new direction randomizer with the given name, angle and scope
+			DirectionRandomizer(std::string name, real angle, real scope);
 
 
 			/*

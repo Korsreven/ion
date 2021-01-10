@@ -285,7 +285,7 @@
     <ClInclude Include="..\source\engine\graphics\materials\IonMaterial.h" />
     <ClInclude Include="..\source\engine\graphics\materials\IonMaterialManager.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffector.h" />
-    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffectorFactory.h" />
+    <ClInclude Include="..\source\engine\graphics\particles\affectors\IonAffectorManager.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonColorFader.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonDirectionRandomizer.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonGravitation.h" />
@@ -294,7 +294,7 @@
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonSineForce.h" />
     <ClInclude Include="..\source\engine\graphics\particles\affectors\IonVelocityRandomizer.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonEmitter.h" />
-    <ClInclude Include="..\source\engine\graphics\particles\IonEmitterFactory.h" />
+    <ClInclude Include="..\source\engine\graphics\particles\IonEmitterManager.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonParticle.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonParticleSystem.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonParticleSystemManager.h" />

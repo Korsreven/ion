@@ -59,6 +59,17 @@ namespace ion::unmanaged
 			//Default constructor
 			ObjectFactory() = default;
 
+			//Deleted copy constructor
+			ObjectFactory(const ObjectFactory&) = delete;
+
+
+			/*
+				Operators
+			*/
+
+			//Deleted copy assignment
+			ObjectFactory& operator=(const ObjectFactory&) = delete;
+
 
 			/*
 				Ranges

@@ -107,25 +107,25 @@ namespace ion::graphics::particles::affectors
 
 		public:
 
-			//Default constructor
-			Scaler() = default;
+			//Construct a new scaler with the given name
+			explicit Scaler(std::string name);
 
-			//Construct a new scaler with the given steps
+			//Construct a new scaler with the given name and steps
 			//Percentages are normalized to range [0.0, 1.0]
-			Scaler(const std::vector<scaler::Step> &steps);
+			Scaler(std::string name, const std::vector<scaler::Step> &steps);
 
 
 			/*
 				Static scaler conversions
 			*/
 
-			//Returns a new scaler from the given sizes
+			//Returns a new scaler from the given name and sizes
 			//Percentages are uniformly distributed in range [0.0, 1.0]
-			[[nodiscard]] static Scaler UniformSteps(const std::vector<Vector2> &sizes);
+			[[nodiscard]] static Scaler UniformSteps(std::string name, const std::vector<Vector2> &sizes);
 
-			//Returns a new scaler from the given sizes, from percent and to percent
+			//Returns a new scaler from the given name, sizes, from percent and to percent
 			//Percentages are uniformly distributed in range [from, to]
-			[[nodiscard]] static Scaler UniformSteps(const std::vector<Vector2> &sizes, real from_percent, real to_percent);
+			[[nodiscard]] static Scaler UniformSteps(std::string name, const std::vector<Vector2> &sizes, real from_percent, real to_percent);
 
 
 			/*

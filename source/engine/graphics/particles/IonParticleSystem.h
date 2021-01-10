@@ -13,8 +13,8 @@ File:	IonParticleSystem.h
 #ifndef ION_PARTICLE_SYSTEM_H
 #define ION_PARTICLE_SYSTEM_H
 
-#include "IonEmitterFactory.h"
-#include "affectors/IonAffectorFactory.h"
+#include "IonEmitterManager.h"
+#include "affectors/IonAffectorManager.h"
 #include "managed/IonManagedObject.h"
 
 namespace ion::graphics::particles
@@ -40,8 +40,8 @@ namespace ion::graphics::particles
 	//A particle system class that can contain one ore more emitters and affectors
 	class ParticleSystem final :
 		public managed::ManagedObject<ParticleSystemManager>,
-		public EmitterFactory,
-		public affectors::AffectorFactory
+		public EmitterManager,
+		public affectors::AffectorManager
 	{
 		private:
 

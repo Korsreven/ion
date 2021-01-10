@@ -59,7 +59,16 @@ void LinearForce::DoAffect(affector::detail::particle_range particles, duration 
 
 //Public
 
-LinearForce::LinearForce(ForceType type, const Vector2 &force) noexcept :
+LinearForce::LinearForce(std::string name) :
+	Affector{std::move(name)}
+{
+	//Empty
+}
+
+LinearForce::LinearForce(std::string name, ForceType type, const Vector2 &force) :
+
+	Affector{std::move(name)},
+
 	type_{type},
 	force_{force}
 {

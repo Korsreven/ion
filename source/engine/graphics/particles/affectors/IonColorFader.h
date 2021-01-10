@@ -107,25 +107,25 @@ namespace ion::graphics::particles::affectors
 
 		public:
 
-			//Default constructor
-			ColorFader() = default;
+			//Construct a new color fader with the given name
+			explicit ColorFader(std::string name);
 
-			//Construct a new color fader with the given steps
+			//Construct a new color fader with the given name and steps
 			//Percentages are normalized to range [0.0, 1.0]
-			ColorFader(const std::vector<color_fader::Step> &steps);
+			ColorFader(std::string name, const std::vector<color_fader::Step> &steps);
 
 
 			/*
 				Static color fader conversions
 			*/
 
-			//Returns a new color fader from the given colors
+			//Returns a new color fader from the given name and colors
 			//Percentages are uniformly distributed in range [0.0, 1.0]
-			[[nodiscard]] static ColorFader UniformSteps(const std::vector<Color> &colors);
+			[[nodiscard]] static ColorFader UniformSteps(std::string name, const std::vector<Color> &colors);
 
-			//Returns a new color fader from the given colors, from percent and to percent
+			//Returns a new color fader from the given name, colors, from percent and to percent
 			//Percentages are uniformly distributed in range [from, to]
-			[[nodiscard]] static ColorFader UniformSteps(const std::vector<Color> &colors, real from_percent, real to_percent);
+			[[nodiscard]] static ColorFader UniformSteps(std::string name, const std::vector<Color> &colors, real from_percent, real to_percent);
 
 
 			/*

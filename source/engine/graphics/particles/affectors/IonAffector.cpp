@@ -15,6 +15,13 @@ File:	IonDirectionRandomizer.cpp
 namespace ion::graphics::particles::affectors
 {
 
+Affector::Affector(std::string name) :
+	managed::ManagedObject<AffectorManager>{std::move(name)}
+{
+	//Empty
+}
+
+
 /*
 	Affect particles
 */

@@ -165,7 +165,6 @@ void Model::Created(render::Mesh &mesh)
 {
 	reload_vertex_buffer_ |= mesh.VertexCount() > 0;
 	update_bounding_volumes_ |= reload_vertex_buffer_;
-	mesh.ParentModel(this);
 }
 
 void Model::FetchVertexData()

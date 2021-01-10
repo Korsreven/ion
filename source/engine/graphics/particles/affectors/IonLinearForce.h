@@ -59,11 +59,11 @@ namespace ion::graphics::particles::affectors
 
 		public:
 
-			//Default constructor
-			LinearForce() = default;
+			//Construct a new linear force with the given name
+			explicit LinearForce(std::string name);
 
-			//Construct a new linear force with the given initial values
-			LinearForce(linear_force::ForceType type, const Vector2 &force) noexcept;
+			//Construct a new linear force with the given name, type and force
+			LinearForce(std::string name, linear_force::ForceType type, const Vector2 &force);
 
 
 			/*

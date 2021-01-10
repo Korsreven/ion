@@ -61,7 +61,16 @@ void DirectionRandomizer::DoAffect(affector::detail::particle_range particles, d
 
 //Public
 
-DirectionRandomizer::DirectionRandomizer(real angle, real scope) noexcept :
+DirectionRandomizer::DirectionRandomizer(std::string name) :
+	Affector{std::move(name)}
+{
+	//Empty
+}
+
+DirectionRandomizer::DirectionRandomizer(std::string name, real angle, real scope) :
+
+	Affector{std::move(name)},
+
 	angle_{std::clamp(angle, 0.0_r, math::Pi)},
 	scope_{std::clamp(scope, 0.0_r, 1.0_r)}
 {
