@@ -40,7 +40,7 @@ container_type get_frames_from_first_frame(Texture &first_frame, int total_frame
 	//Multiple frames
 	if (total_frames > 1)
 	{
-		auto &name = first_frame.Name();
+		auto &name = *first_frame.Name();
 		
 		if (auto iter = std::find_if_not(std::rbegin(name), std::rend(name),
 			[](auto c) noexcept

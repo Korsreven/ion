@@ -185,7 +185,7 @@ void update_attribute_value(int shader_program_handle, AttributeVariable &attrib
 		//Vertex attribute pointer needs to be enabled each time (ignore flag)
 
 	if (!attribute_variable.Location())
-		attribute_variable.Location(get_attribute_location(shader_program_handle, attribute_variable.Name()));
+		attribute_variable.Location(get_attribute_location(shader_program_handle, *attribute_variable.Name()));
 
 	if (auto location = attribute_variable.Location(); location)
 		attribute_variable.Visit(set_attribute_value{*location});
@@ -318,7 +318,7 @@ void update_uniform_value(int shader_program_handle, UniformVariable &uniform_va
 	if (uniform_variable.HasNewValue())
 	{
 		if (!uniform_variable.Location())
-			uniform_variable.Location(get_uniform_location(shader_program_handle, uniform_variable.Name()));
+			uniform_variable.Location(get_uniform_location(shader_program_handle, *uniform_variable.Name()));
 
 		if (auto location = uniform_variable.Location(); location)
 			uniform_variable.Visit(set_uniform_value{*location});

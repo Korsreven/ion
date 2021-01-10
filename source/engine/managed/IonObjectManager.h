@@ -42,7 +42,10 @@ namespace ion::managed
 				std::find_if(std::begin(objects), std::end(objects),
 					[&](auto &object) noexcept
 					{
-						return object->Name() == name;
+						if (auto object_name = object->Name(); object_name)
+							return *object_name == name;
+						else
+							return false;
 					});
 
 			return iter != std::end(objects) ? iter->get() : nullptr;
@@ -201,6 +204,13 @@ namespace ion::managed
 				Creating
 			*/
 
+			//Create an object with the given arguments
+			template <typename... Args>
+			auto& Create(Args &&...args)
+			{
+				return Emplace(std::forward<Args>(args)...);
+			}
+
 			//Create an object with the given name and arguments
 			template <typename... Args>
 			auto& Create(std::string name, Args &&...args)
@@ -216,11 +226,15 @@ namespace ion::managed
 			template <typename T, typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto& Create(T &&object)
 			{
-				//Check if an object with that name already exists
-				if (auto ptr = object_manager::detail::get_object_by_name(object.Name(), objects_); ptr)
-					return *ptr;
-				else
-					return Emplace(std::forward<T>(object));
+				//Object has name
+				if (auto object_name = object.Name(); object_name)
+				{
+					//Check if an object with that name already exists
+					if (auto ptr = object_manager::detail::get_object_by_name(*object_name, objects_); ptr)
+						return *ptr;
+				}
+				
+				return Emplace(std::forward<T>(object));
 			}
 
 
@@ -372,10 +386,12 @@ namespace ion::managed
 			{
 				assert(object_ptr);
 
-				//Check if an object with that name already exists
-				if (auto ptr = object_manager::detail::get_object_by_name(
-						object_ptr->Name(), objects_); ptr)
-					return nullptr; //Object exists, could not adopt
+				if (auto object_name = object_ptr.Name(); object_name)
+				{
+					//Check if an object with that name already exists
+					if (auto ptr = object_manager::detail::get_object_by_name(*object_name, objects_); ptr)
+						return nullptr; //Object exists, could not adopt
+				}
 
 				AdditionStarted();
 
@@ -395,14 +411,17 @@ namespace ion::managed
 
 				for (auto iter = std::begin(objects); iter != std::end(objects) && *iter;)
 				{
-					if (auto ptr = object_manager::detail::get_object_by_name(
-						(*iter)->Name(), objects_); !ptr)
+					if (auto object_name = (*iter).Name(); object_name)
 					{
-						adoptable_objects.push_back(std::move(*iter));
-						iter = objects.erase(iter);
+						if (auto ptr = object_manager::detail::get_object_by_name(*object_name, objects_); ptr)
+						{
+							++iter;
+							continue; //Object exists, could not adopt
+						}
 					}
-					else
-						++iter;
+
+					adoptable_objects.push_back(std::move(*iter));
+					iter = objects.erase(iter);
 				}
 
 				if (!std::empty(adoptable_objects))

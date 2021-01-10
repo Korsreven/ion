@@ -13,6 +13,7 @@ File:	IonManagedObject.h
 #ifndef ION_MANAGED_OBJECT_H
 #define ION_MANAGED_OBJECT_H
 
+#include <optional>
 #include <string>
 
 namespace ion::managed
@@ -26,13 +27,13 @@ namespace ion::managed
 
 		protected:
 		
-			std::string name_;
+			std::optional<std::string> name_;
 			T *owner_ = nullptr;
 
 		public:
 
 			//Constructor
-			explicit ManagedObject(std::string name) :
+			explicit ManagedObject(std::optional<std::string> name) :
 				name_{std::move(name)}
 			{
 				//Empty
@@ -76,7 +77,8 @@ namespace ion::managed
 			*/
 
 			//Returns the name of this managed object
-			//A name must be unique among objects with the same owner
+			//A name must be unique among named objects with the same owner
+			//Returns nullopt if this object has no name
 			[[nodiscard]] inline auto& Name() const noexcept
 			{
 				return name_;
