@@ -69,9 +69,15 @@ namespace ion::timers
 			}
 
 			//Sets the on tick callback
-			inline void OnTick(std::optional<events::Callback<void, Timer&>> on_tick) noexcept
+			inline void OnTick(events::Callback<void, Timer&> on_tick) noexcept
 			{
-				on_tick_.swap(on_tick);
+				on_tick_ = on_tick;
+			}
+
+			//Sets the on tick callback
+			inline void OnTick(std::nullopt_t) noexcept
+			{
+				on_tick_ = {};
 			}
 
 

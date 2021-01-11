@@ -39,13 +39,15 @@ namespace ion::graphics::textures
 		private:
 
 			frame_sequence::detail::container_type frames_;
-			managed::ObjectObserver<Texture> observed_frames_;	
-			int total_observed_frames_ = 0;
+			managed::ObjectObserver<Texture> observed_frames_;
 
 
 			bool AddFrame(Texture &frame);
 			bool AddFrames(const frame_sequence::detail::container_type &frames);
 			void ClearFrames() noexcept;
+
+			void FrameRemoved(Texture&) noexcept;
+			void AllFramesRemoved() noexcept;
 
 		public:
 			
@@ -75,27 +77,18 @@ namespace ion::graphics::textures
 				Operators
 			*/
 
-			//Returns true if this frame sequence has all of its initial frames
-			//A frame sequence is considered invalid if one or more frames are missing
-			inline operator bool() const noexcept
-			{
-				return !std::empty(frames_) &&
-					total_observed_frames_ == std::ssize(observed_frames_.Objects());
-					//All initial frames are still being observed
-			}
-
 			//Returns a pointer to a mutable frame at the given offset
 			[[nodiscard]] inline auto operator[](int off) noexcept
 			{
 				assert(off >= 0 && off < std::ssize(frames_));
-				return *this ? frames_[off] : nullptr;
+				return frames_[off];
 			}
 
 			//Returns a pointer to an immutable frame at the given offset
 			[[nodiscard]] inline const auto operator[](int off) const noexcept
 			{
 				assert(off >= 0 && off < std::ssize(frames_));
-				return *this ? frames_[off] : nullptr;
+				return frames_[off];
 			}
 
 			
@@ -132,13 +125,6 @@ namespace ion::graphics::textures
 			[[nodiscard]] inline auto IsEmpty() const noexcept
 			{
 				return std::empty(frames_);
-			}
-
-			//Returns true if this frame sequence has all of its initial frames (textures)
-			//A frame sequence is considered invalid if one or more frames are missing
-			[[nodiscard]] inline auto HasAllInitialFrames() const noexcept
-			{
-				return !!*this;
 			}
 
 

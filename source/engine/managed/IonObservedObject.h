@@ -13,9 +13,11 @@ File:	IonObservedObject.h
 #ifndef ION_OBSERVED_OBJECT_H
 #define ION_OBSERVED_OBJECT_H
 
+#include <optional>
 #include <type_traits>
 
 #include "IonManagedObject.h"
+#include "events/IonCallback.h"
 #include "events/IonEventChannel.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonListenerTraits.h"
@@ -82,6 +84,7 @@ namespace ion::managed
 		private:
 
 			T *managed_object_ = nullptr;
+			std::optional<events::Callback<void, T&>> on_removed_;
 
 		protected:
 
@@ -94,6 +97,11 @@ namespace ion::managed
 			{
 				if (managed_object_ == &object)
 				{
+					//Execute callback before object is set to nullptr
+					//The callback owner can then know in advance which object is going to be removed
+					if (on_removed_)
+						(*on_removed_)(object);
+
 					managed_object_ = nullptr;
 					this->DoUnsubscribe(true);
 				}
@@ -108,6 +116,11 @@ namespace ion::managed
 
 			void Unsubscribed() noexcept override
 			{
+				//Execute callback before object is set to nullptr
+				//The callback owner can then know in advance which object is going to be removed
+				if (on_removed_)
+					(*on_removed_)(*managed_object_);
+
 				managed_object_ = nullptr;
 			}
 
@@ -123,6 +136,14 @@ namespace ion::managed
 				//Empty
 			}
 
+			//Construct a new empty observed object with the given requirement and callback
+			ObservedObject(events::Callback<void, T&> on_removed, observed_object::ObjectRequirement requirement = observed_object::ObjectRequirement::Optional) noexcept :
+				my_base{observed_object::detail::as_subscription_contract(requirement)},
+				on_removed_{on_removed}
+			{
+				//Empty
+			}
+
 			//Construct a new observed object with the given object and requirement
 			ObservedObject(T &object, observed_object::ObjectRequirement requirement = observed_object::ObjectRequirement::Optional) :
 
@@ -132,11 +153,22 @@ namespace ion::managed
 				//Empty
 			}
 
+			//Construct a new observed object with the given object, callback and requirement
+			ObservedObject(T &object, events::Callback<void, T&> on_removed, observed_object::ObjectRequirement requirement = observed_object::ObjectRequirement::Optional) :
+
+				my_base{object.Owner(), observed_object::detail::as_subscription_contract(requirement)},
+				managed_object_{this->Active() ? &object : nullptr},
+				on_removed_{on_removed}
+			{
+				//Empty
+			}
+
 			//Copy constructor
 			ObservedObject(const ObservedObject &rhs) :
 
 				my_base{rhs},
-				managed_object_{this->Active() ? rhs.managed_object_ : nullptr}
+				managed_object_{this->Active() ? rhs.managed_object_ : nullptr},
+				on_removed_{rhs.on_removed_}
 			{
 				//Empty
 			}
@@ -145,7 +177,8 @@ namespace ion::managed
 			ObservedObject(ObservedObject &&rhs) :
 
 				my_base{std::move(rhs)},
-				managed_object_{this->Active() ? std::exchange(rhs.managed_object_, nullptr) : nullptr}
+				managed_object_{this->Active() ? std::exchange(rhs.managed_object_, nullptr) : nullptr},
+				on_removed_{std::move(rhs.on_removed_)}
 			{
 				//Empty
 			}
@@ -161,7 +194,10 @@ namespace ion::managed
 				my_base::operator=(rhs);
 
 				if (this != &rhs)
+				{
 					managed_object_ = this->Active() ? rhs.managed_object_ : nullptr;
+					on_removed_ = rhs.on_removed_;
+				}
 
 				return *this;
 			}
@@ -172,7 +208,10 @@ namespace ion::managed
 				my_base::operator=(std::move(rhs));
 
 				if (this != &rhs)
+				{
 					managed_object_ = this->Active() ? std::exchange(rhs.managed_object_, nullptr) : nullptr;
+					on_removed_ = std::move(rhs.on_removed_);
+				}
 
 				return *this;
 			}
@@ -209,6 +248,18 @@ namespace ion::managed
 				this->Contract(observed_object::detail::as_subscription_contract(requirement));
 			}
 
+			//Sets the on removed callback
+			inline void OnRemoved(events::Callback<void, T&> on_removed) noexcept
+			{
+				on_removed_ = on_removed;
+			}
+
+			//Sets the on removed callback
+			inline void OnRemoved(std::nullopt_t) noexcept
+			{
+				on_removed_ = {};
+			}
+
 
 			/*
 				Observers
@@ -232,6 +283,12 @@ namespace ion::managed
 			[[nodiscard]] inline auto Requirement() const noexcept
 			{
 				return as_object_requirement(this->Contract());
+			}
+
+			//Returns the on removed callback
+			[[nodiscard]] inline auto OnRemoved() const noexcept
+			{
+				return on_removed_;
 			}
 
 

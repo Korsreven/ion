@@ -95,7 +95,7 @@ namespace ion::graphics::textures
 
 			inline auto HasFrames() const noexcept
 			{
-				return frame_sequence_ && frame_sequence_->HasAllInitialFrames();
+				return frame_sequence_ && !frame_sequence_->IsEmpty();
 			}
 
 

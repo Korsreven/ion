@@ -106,15 +106,43 @@ bool FrameSequence::AddFrames(const detail::container_type &frames)
 		}
 	}
 
-	total_observed_frames_ = std::ssize(observed_frames_.Objects());
-	return !std::empty(frames_);
+	if (!std::empty(frames_))
+	{
+		//Set up callbacks
+		observed_frames_.OnRemoved({&FrameSequence::FrameRemoved, this});
+		observed_frames_.OnRemovedAll({&FrameSequence::AllFramesRemoved, this});
+		return true;
+	}
+	else
+		return false;
 }
 
 void FrameSequence::ClearFrames() noexcept
 {
 	frames_.clear();
 	frames_.shrink_to_fit();
-	observed_frames_.ReleaseAll();	
+	
+	if (observed_frames_.ReleaseAll())
+	{
+		//Release callbacks
+		observed_frames_.OnRemoved(std::nullopt);
+		observed_frames_.OnRemovedAll(std::nullopt);
+	}
+}
+
+
+void FrameSequence::FrameRemoved(Texture&) noexcept
+{
+	//A frame sequence is considered invalid if one or more frames are missing
+	//All frames or no frames
+	ClearFrames();
+}
+
+void FrameSequence::AllFramesRemoved() noexcept
+{
+	//A frame sequence is considered invalid if one or more frames are missing
+	//All frames or no frames
+	ClearFrames();
 }
 
 

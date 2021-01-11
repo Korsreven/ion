@@ -13,12 +13,14 @@ File:	IonObjectObserver.h
 #ifndef ION_OBJECT_OBSERVER_H
 #define ION_OBJECT_OBSERVER_H
 
+#include <optional>
 #include <type_traits>
 
 #include "IonManagedObject.h"
 #include "IonObservedObject.h"
 #include "adaptors/IonFlatSet.h"
 #include "adaptors/ranges/IonDereferenceIterable.h"
+#include "events/IonCallback.h"
 #include "events/IonEventChannel.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonListenerTraits.h"
@@ -43,7 +45,8 @@ namespace ion::managed
 		private:
 
 			object_observer::detail::container_type<T> managed_objects_;
-
+			std::optional<events::Callback<void, T&>> on_removed_;
+			std::optional<events::Callback<>> on_removed_all_;
 
 			void Tidy() noexcept
 			{
@@ -60,8 +63,10 @@ namespace ion::managed
 			//See ManagedObjectListener::ObjectRemoved for more details
 			void ObjectRemoved(T &object) noexcept override
 			{
-				if (managed_objects_.erase(&object))
+				if (auto iter = managed_objects_.find(&object); iter != std::end(managed_objects_))
 				{
+					managed_objects_.erase(iter);
+
 					//Object erased
 					//Unsubscribe from publisher if empty
 					if (std::empty(managed_objects_))
@@ -69,6 +74,10 @@ namespace ion::managed
 						this->DoUnsubscribe(true);
 						Tidy();
 					}
+
+					//Execute callback after object has been erased
+					if (on_removed_)
+						(*on_removed_)(object);
 				}
 			}
 
@@ -83,6 +92,10 @@ namespace ion::managed
 			void Unsubscribed() noexcept override
 			{
 				Tidy();
+
+				//Execute callback after all objects has been erased
+				if (on_removed_all_)
+					(*on_removed_all_)();
 			}
 
 		public:
@@ -97,11 +110,24 @@ namespace ion::managed
 				//Empty
 			}
 
+			//Construct a new empty observed object with the given requirement and callback
+			ObjectObserver(events::Callback<void, T&> on_removed, events::Callback<> on_removed_all,
+				observed_object::ObjectRequirement requirement = observed_object::ObjectRequirement::Optional) noexcept :
+
+				my_base{observed_object::detail::as_subscription_contract(requirement)},
+				on_removed_{on_removed},
+				on_removed_all_{on_removed_all}
+			{
+				//Empty
+			}
+
 			//Copy constructor
 			ObjectObserver(const ObjectObserver &rhs) :
 
 				my_base{rhs},
-				managed_objects_{this->Active() ? rhs.managed_objects_ : decltype(managed_objects_){}}
+				managed_objects_{this->Active() ? rhs.managed_objects_ : decltype(managed_objects_){}},
+				on_removed_{rhs.on_removed_},
+				on_removed_all_{rhs.on_removed_all_}
 			{
 				//Empty
 			}
@@ -110,7 +136,9 @@ namespace ion::managed
 			ObjectObserver(ObjectObserver &&rhs) :
 
 				my_base{std::move(rhs)},
-				managed_objects_{this->Active() ? std::exchange(rhs.managed_objects_, decltype(managed_objects_){}) : decltype(managed_objects_){}}
+				managed_objects_{this->Active() ? std::exchange(rhs.managed_objects_, decltype(managed_objects_){}) : decltype(managed_objects_){}},
+				on_removed_{std::move(rhs.on_removed_)},
+				on_removed_all_{std::move(rhs.on_removed_all_)}
 			{
 				//Empty
 			}
@@ -126,7 +154,11 @@ namespace ion::managed
 				my_base::operator=(rhs);
 
 				if (this != &rhs)
+				{
 					managed_objects_ = this->Active() ? rhs.managed_object_ : decltype(managed_objects_){};
+					on_removed_ = rhs.on_removed_;
+					on_removed_all_ = rhs.on_removed_all_;
+				}
 
 				return *this;
 			}
@@ -137,7 +169,11 @@ namespace ion::managed
 				my_base::operator=(std::move(rhs));
 
 				if (this != &rhs)
+				{
 					managed_objects_ = this->Active() ? std::exchange(rhs.managed_objects_, decltype(managed_objects_){}) : decltype(managed_objects_){};
+					on_removed_ = std::move(rhs.on_removed_);
+					on_removed_all_ = std::move(rhs.on_removed_all_);
+				}
 
 				return *this;
 			}
@@ -160,6 +196,30 @@ namespace ion::managed
 				this->Contract(observed_object::detail::as_subscription_contract(requirement));
 			}
 
+			//Sets the on removed callback
+			inline void OnRemoved(events::Callback<void, T&> on_removed) noexcept
+			{
+				on_removed_ = on_removed;
+			}
+
+			//Sets the on removed callback
+			inline void OnRemoved(std::nullopt_t) noexcept
+			{
+				on_removed_ = {};
+			}
+
+			//Sets the on removed all callback
+			inline void OnRemovedAll(events::Callback<> on_removed_all) noexcept
+			{
+				on_removed_all_ = on_removed_all;
+			}
+
+			//Sets the on removed all callback
+			inline void OnRemovedAll(std::nullopt_t) noexcept
+			{
+				on_removed_all_ = {};
+			}
+
 
 			/*
 				Observers
@@ -169,6 +229,18 @@ namespace ion::managed
 			[[nodiscard]] inline auto Requirement() const noexcept
 			{
 				return as_object_requirement(this->Contract());
+			}
+
+			//Returns the on removed callback
+			[[nodiscard]] inline auto OnRemoved() const noexcept
+			{
+				return on_removed_;
+			}
+
+			//Returns the on removed all callback
+			[[nodiscard]] inline auto OnRemovedAll() const noexcept
+			{
+				return on_removed_all_;
 			}
 
 
