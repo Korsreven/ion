@@ -19,6 +19,7 @@ File:	IonMesh.cpp
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/materials/IonMaterial.h"
 #include "graphics/shaders/IonShaderProgram.h"
+#include "graphics/shaders/IonShaderProgramManager.h"
 
 namespace ion::graphics::render
 {
@@ -364,21 +365,6 @@ void set_vertex_pointers(int vertex_count, const vertex_storage_type &vertex_dat
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-
-void use_shader_program(int program_handle) noexcept
-{
-	switch (gl::Shader_Support())
-	{
-		case gl::Extension::Core:
-		glUseProgram(program_handle);
-		break;
-
-		case gl::Extension::ARB:
-		glUseProgramObjectARB(program_handle);
-		break;
-	}
-}
-
 } //detail
 } //mesh
 
@@ -591,7 +577,8 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 	//Use shaders
 	if (shader_program && shader_program->Handle())
 	{
-		detail::use_shader_program(*shader_program->Handle());
+		shaders::shader_program_manager::detail::use_shader_program(*shader_program->Handle());
+		shader_program->Owner()->UpdateShaderVariables(*shader_program);
 
 		if (!use_vao)
 		{
@@ -667,7 +654,7 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 			}
 		}
 
-		detail::use_shader_program(0);
+		shaders::shader_program_manager::detail::use_shader_program(0);
 	}
 	else //Fixed-function pipeline
 	{

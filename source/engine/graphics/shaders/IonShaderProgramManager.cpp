@@ -153,6 +153,28 @@ std::optional<std::string> print_info_log(int shader_program_handle)
 }
 
 
+int get_active_shader_program() noexcept
+{
+	auto program_handle = 0;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &program_handle);
+	return program_handle;
+}
+
+void use_shader_program(int program_handle) noexcept
+{
+	switch (gl::Shader_Support())
+	{
+		case gl::Extension::Core:
+		glUseProgram(program_handle);
+		break;
+
+		case gl::Extension::ARB:
+		glUseProgramObjectARB(program_handle);
+		break;
+	}
+}
+
+
 /*
 	Attribute
 */
@@ -861,16 +883,10 @@ void ShaderProgramManager::UpdateShaderVariables(ShaderProgram &shader_program) 
 
 	if (auto handle = shader_program.Handle(); handle)
 	{
-		switch (gl::Shader_Support())
-		{
-			case gl::Extension::Core:
-			glUseProgram(*handle);
-			break;
+		auto in_use = detail::get_active_shader_program() == *handle;
 
-			case gl::Extension::ARB:
-			glUseProgramObjectARB(*handle);
-			break;
-		}
+		if (!in_use)
+			detail::use_shader_program(*handle);
 
 		//Update all attribute variables attached to shader program
 		for (auto &attribute_variable : shader_program.AttributeVariables())
@@ -880,16 +896,8 @@ void ShaderProgramManager::UpdateShaderVariables(ShaderProgram &shader_program) 
 		for (auto &uniform_variable : shader_program.UniformVariables())
 			detail::update_uniform_value(*handle, uniform_variable);
 
-		switch (gl::Shader_Support())
-		{
-			case gl::Extension::Core:
-			glUseProgram(0);
-			break;
-
-			case gl::Extension::ARB:
-			glUseProgramObjectARB(0);
-			break;
-		}
+		if (!in_use)
+			detail::use_shader_program(0);
 	}
 }
 

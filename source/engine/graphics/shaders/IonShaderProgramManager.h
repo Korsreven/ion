@@ -44,6 +44,9 @@ namespace ion::graphics::shaders
 
 			std::optional<std::string> print_info_log(int shader_program_handle);
 
+			int get_active_shader_program() noexcept;
+			void use_shader_program(int program_handle) noexcept;
+
 
 			/*
 				Attribute

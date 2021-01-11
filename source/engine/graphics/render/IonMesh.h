@@ -149,8 +149,6 @@ namespace ion::graphics::render
 			void set_vertex_attribute_pointers(int vertex_count, const vertex_storage_type &vertex_data) noexcept;
 			void set_vertex_pointers(int vertex_count, int vbo_offset) noexcept;
 			void set_vertex_pointers(int vertex_count, const vertex_storage_type &vertex_data) noexcept;
-
-			void use_shader_program(int program_handle) noexcept;
 		} //detail
 	} //mesh
 
