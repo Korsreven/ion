@@ -543,32 +543,21 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 	if (vertex_count_ == 0 || !visible_)
 		return;
 
+	std::optional<int> diffuse_id;
+	std::optional<int> specular_id;
+	std::optional<int> normal_id;
+
 	//Use material
 	if (material_)
 	{
 		if (auto diffuse_map = material_->DiffuseMap(time_); diffuse_map)
-		{
-			if (auto handle = diffuse_map->Handle(); handle)
-			{
-				//auto texture_id = *handle;
-			}
-		}
+			diffuse_id = diffuse_map->Handle();
 
 		if (auto specular_map = material_->SpecularMap(time_); specular_map)
-		{
-			if (auto handle = specular_map->Handle(); handle)
-			{
-				//auto texture_id = *handle;
-			}
-		}
+			specular_id = specular_map->Handle();
 
 		if (auto normal_map = material_->NormalMap(time_); normal_map)
-		{
-			if (auto handle = normal_map->Handle(); handle)
-			{
-				//auto texture_id = *handle;
-			}
-		}
+			normal_id = normal_map->Handle();
 	}
 
 	auto has_supported_attributes = false;
@@ -621,6 +610,13 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 			else //RAM
 				detail::set_vertex_pointers(vertex_count_, vertex_data_);
 		}
+
+		//Draw diffuse texture
+		if (diffuse_id)
+		{
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, *diffuse_id);			
+		}
 	}
 
 
@@ -658,6 +654,12 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 	}
 	else //Fixed-function pipeline
 	{
+		if (diffuse_id)
+		{
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glDisable(GL_TEXTURE_2D);
+		}
+
 		if (!use_vao)
 		{
 			glDisableClientState(GL_VERTEX_ARRAY);
