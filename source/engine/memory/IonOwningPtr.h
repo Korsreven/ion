@@ -14,6 +14,7 @@ File:	IonOwningPtr.h
 #define ION_OWNING_PTR_H
 
 #include <memory>
+#include <type_traits>
 
 namespace ion::memory
 {
@@ -23,9 +24,12 @@ namespace ion::memory
 	namespace owning_ptr::detail
 	{
 		template <typename T>
+		using pointer_type = std::unique_ptr<T>;
+
+
 		struct ControlBlock
 		{
-			T *ptr = nullptr;
+			void *ptr = nullptr;
 			int ref_count = 1;
 		};
 	} //owning_ptr::detail
@@ -34,18 +38,24 @@ namespace ion::memory
 	template <typename T>
 	class OwningPtr final
 	{
-		friend NonOwningPtr<T>;
-
-		private:
-
-			std::unique_ptr<T> ptr_;
-			owning_ptr::detail::ControlBlock<T> *ctrl_block_ = nullptr;
+		template <typename U>
+		friend class OwningPtr;
+		
+		template <typename U>
+		friend class NonOwningPtr;
 
 		public:
 		
-			using pointer = T*;
-			using element_type = T;
+			using pointer = typename owning_ptr::detail::pointer_type<T>::pointer;
+			using element_type = typename owning_ptr::detail::pointer_type<T>::element_type;
+			using deleter_type = typename owning_ptr::detail::pointer_type<T>::deleter_type;
 
+		private:
+
+			owning_ptr::detail::pointer_type<T> ptr_;
+			owning_ptr::detail::ControlBlock *ctrl_block_ = nullptr;
+
+		public:
 
 			//Default constructor
 			OwningPtr() = default;
@@ -53,7 +63,7 @@ namespace ion::memory
 			//Construct a new owning ptr with the given raw ptr
 			explicit OwningPtr(T *ptr) noexcept :
 				ptr_{ptr},
-				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock<T>{ptr_.get()} : nullptr}
+				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock{ptr_.get()} : nullptr}
 			{
 				//Empty
 			}
@@ -68,7 +78,16 @@ namespace ion::memory
 			//Construct a new owning ptr with the given unique ptr
 			OwningPtr(std::unique_ptr<T> &&ptr) noexcept :
 				ptr_{std::move(ptr)},
-				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock<T>{ptr_.get()} : nullptr}
+				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock{ptr_.get()} : nullptr}
+			{
+				//Empty
+			}
+
+			//Construct a new owning ptr with the given unique ptr of type U
+			template <typename U, typename = std::enable_if_t<std::is_convertible_v<typename std::unique_ptr<U>::pointer, pointer>>>
+			OwningPtr(std::unique_ptr<U> &&ptr) noexcept :
+				ptr_{std::move(ptr)},
+				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock{ptr_.get()} : nullptr}
 			{
 				//Empty
 			}
@@ -78,6 +97,15 @@ namespace ion::memory
 
 			//Move constructor
 			OwningPtr(OwningPtr<T> &&rhs) noexcept :	
+				ptr_{std::move(rhs.ptr_)},
+				ctrl_block_{std::exchange(rhs.ctrl_block_, nullptr)}
+			{
+				//Empty
+			}
+
+			//Move construct a new owning ptr with the given owning ptr of type U
+			template <typename U, typename = std::enable_if_t<std::is_convertible_v<typename OwningPtr<U>::pointer, pointer>>>
+			OwningPtr(OwningPtr<U> &&rhs) noexcept :
 				ptr_{std::move(rhs.ptr_)},
 				ctrl_block_{std::exchange(rhs.ctrl_block_, nullptr)}
 			{
@@ -106,6 +134,14 @@ namespace ion::memory
 
 			//Move assignment
 			auto& operator=(OwningPtr<T> &&rhs) noexcept
+			{
+				OwningPtr{std::move(rhs)}.swap(*this);
+				return *this;
+			}
+
+			//Move assign with the given owning ptr of type U
+			template <typename U>
+			auto& operator=(OwningPtr<U> &&rhs) noexcept
 			{
 				OwningPtr{std::move(rhs)}.swap(*this);
 				return *this;
