@@ -251,6 +251,14 @@ namespace ion::memory
 	}
 
 	template <typename T, typename U>
+	[[nodiscard]] auto static_pointer_cast(NonOwningPtr<U> &&ptr) noexcept
+	{
+		auto p = static_cast<typename NonOwningPtr<T>::pointer>(ptr.get());
+		return NonOwningPtr<T>{std::move(ptr), p};
+	}
+
+
+	template <typename T, typename U>
 	[[nodiscard]] auto dynamic_pointer_cast(const NonOwningPtr<U> &ptr) noexcept
 	{
 		if (auto p = dynamic_cast<typename NonOwningPtr<T>::pointer>(ptr.get()); p)
@@ -260,6 +268,16 @@ namespace ion::memory
 	}
 
 	template <typename T, typename U>
+	[[nodiscard]] auto dynamic_pointer_cast(NonOwningPtr<U> &&ptr) noexcept
+	{
+		if (auto p = dynamic_cast<typename NonOwningPtr<T>::pointer>(ptr.get()); p)
+			return NonOwningPtr<T>{std::move(ptr), p};
+		else
+			return NonOwningPtr<T>{};
+	}
+
+
+	template <typename T, typename U>
 	[[nodiscard]] auto const_pointer_cast(const NonOwningPtr<U> &ptr) noexcept
 	{
 		auto p = const_cast<typename NonOwningPtr<T>::pointer>(ptr.get());
@@ -267,10 +285,25 @@ namespace ion::memory
 	}
 
 	template <typename T, typename U>
+	[[nodiscard]] auto const_pointer_cast(NonOwningPtr<U> &&ptr) noexcept
+	{
+		auto p = const_cast<typename NonOwningPtr<T>::pointer>(ptr.get());
+		return NonOwningPtr<T>{std::move(ptr), p};
+	}
+
+
+	template <typename T, typename U>
 	[[nodiscard]] auto reinterpret_pointer_cast(const NonOwningPtr<U> &ptr) noexcept
 	{
 		auto p = reinterpret_cast<typename NonOwningPtr<T>::pointer>(ptr.get());
 		return NonOwningPtr<T>{ptr, p};
+	}
+
+	template <typename T, typename U>
+	[[nodiscard]] auto reinterpret_pointer_cast(NonOwningPtr<U> &&ptr) noexcept
+	{
+		auto p = reinterpret_cast<typename NonOwningPtr<T>::pointer>(ptr.get());
+		return NonOwningPtr<T>{std::move(ptr), p};
 	}
 } //ion::memory
 
