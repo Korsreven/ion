@@ -61,7 +61,7 @@ namespace ion::memory
 			OwningPtr() = default;
 
 			//Construct a new owning ptr with the given raw ptr
-			explicit OwningPtr(T *ptr) noexcept :
+			explicit OwningPtr(pointer ptr) noexcept :
 				ptr_{ptr},
 				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock{ptr_.get()} : nullptr}
 			{
@@ -148,6 +148,43 @@ namespace ion::memory
 			}
 
 
+			//Compares this equal to rhs
+			[[nodiscard]] auto operator==(const OwningPtr<T> &rhs) const noexcept
+			{
+				return ptr_ == rhs.ptr_;
+			}
+
+			//Compares this different from rhs
+			[[nodiscard]] auto operator!=(const OwningPtr<T> &rhs) const noexcept
+			{
+				return ptr_ != rhs.ptr_;
+			}
+
+			//Compares this less than rhs
+			[[nodiscard]] auto operator<(const OwningPtr<T> &rhs) const noexcept
+			{
+				return ptr_ < rhs.ptr_;
+			}
+
+			//Compares this less or equal to rhs
+			[[nodiscard]] auto operator<=(const OwningPtr<T> &rhs) const noexcept
+			{
+				return ptr_ <= rhs.ptr_;
+			}
+
+			//Compares this greater than rhs
+			[[nodiscard]] auto operator>(const OwningPtr<T> &rhs) const noexcept
+			{
+				return ptr_ > rhs.ptr_;
+			}
+
+			//Compares this greater or equal to rhs
+			[[nodiscard]] auto operator>=(const OwningPtr<T> &rhs) const noexcept
+			{
+				return ptr_ >= rhs.ptr_;
+			}
+
+
 			//Checks if there is an associated owned object
 			[[nodiscard]] explicit operator bool() const noexcept
 			{
@@ -180,7 +217,7 @@ namespace ion::memory
 			}
 
 			//Replaces the owned object
-			void reset(T *ptr = nullptr) noexcept
+			void reset(pointer ptr = pointer{}) noexcept
 			{
 				OwningPtr{ptr}.swap(*this);
 			}
@@ -203,6 +240,98 @@ namespace ion::memory
 				return ptr_.get();
 			}
 	};
+
+
+	/*
+		Operators
+
+		OwningPtr<T> <=> nullptr
+		nullptr <=> OwningPtr<T>
+	*/
+
+	//Compares ptr equal to nullptr
+	template <typename T>
+	[[nodiscard]] auto operator==(const OwningPtr<T> &ptr, std::nullptr_t) noexcept
+	{
+		return ptr.get() == nullptr;
+	}
+
+	//Compares nullptr equal to ptr
+	template <typename T>
+	[[nodiscard]] auto operator==(std::nullptr_t, const OwningPtr<T> &ptr) noexcept
+	{
+		return nullptr == ptr.get();
+	}
+
+	//Compares ptr different from nullptr
+	template <typename T>
+	[[nodiscard]] auto operator!=(const OwningPtr<T> &ptr, std::nullptr_t) noexcept
+	{
+		return ptr.get() != nullptr;
+	}
+
+	//Compares nullptr different from ptr
+	template <typename T>
+	[[nodiscard]] auto operator!=(std::nullptr_t, const OwningPtr<T> &ptr) noexcept
+	{
+		return nullptr != ptr.get();
+	}
+
+	//Compares ptr less than nullptr
+	template <typename T>
+	[[nodiscard]] auto operator<(const OwningPtr<T> &ptr, std::nullptr_t) noexcept
+	{
+		return ptr.get() < nullptr;
+	}
+
+	//Compares nullptr less than ptr
+	template <typename T>
+	[[nodiscard]] auto operator<(std::nullptr_t, const OwningPtr<T> &ptr) noexcept
+	{
+		return nullptr < ptr.get();
+	}
+
+	//Compares ptr less or equal to nullptr
+	template <typename T>
+	[[nodiscard]] auto operator<=(const OwningPtr<T> &ptr, std::nullptr_t) noexcept
+	{
+		return ptr.get() <= nullptr;
+	}
+
+	//Compares nullptr less or equal to ptr
+	template <typename T>
+	[[nodiscard]] auto operator<=(std::nullptr_t, const OwningPtr<T> &ptr) noexcept
+	{
+		return nullptr <= ptr.get();
+	}
+
+	//Compares ptr greater than nullptr
+	template <typename T>
+	[[nodiscard]] auto operator>(const OwningPtr<T> &ptr, std::nullptr_t) noexcept
+	{
+		return ptr.get() > nullptr;
+	}
+
+	//Compares nullptr greater than ptr
+	template <typename T>
+	[[nodiscard]] auto operator>(std::nullptr_t, const OwningPtr<T> &ptr) noexcept
+	{
+		return nullptr > ptr.get();
+	}
+
+	//Compares ptr greater or equal to nullptr
+	template <typename T>
+	[[nodiscard]] auto operator>=(const OwningPtr<T> &ptr, std::nullptr_t) noexcept
+	{
+		return ptr.get() >= nullptr;
+	}
+
+	//Compares nullptr greater or equal to ptr
+	template <typename T>
+	[[nodiscard]] auto operator>=(std::nullptr_t, const OwningPtr<T> &ptr) noexcept
+	{
+		return nullptr >= ptr.get();
+	}
 
 
 	//Helper function for creating a owning ptr

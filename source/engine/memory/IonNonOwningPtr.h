@@ -184,6 +184,43 @@ namespace ion::memory
 			}
 
 
+			//Compares this equal to rhs
+			[[nodiscard]] auto operator==(const NonOwningPtr<T> &rhs) const noexcept
+			{
+				return ctrl_block_ == rhs.ctrl_block_;
+			}
+
+			//Compares this different from rhs
+			[[nodiscard]] auto operator!=(const NonOwningPtr<T> &rhs) const noexcept
+			{
+				return ctrl_block_ != rhs.ctrl_block_;
+			}
+
+			//Compares this less than rhs
+			[[nodiscard]] auto operator<(const NonOwningPtr<T> &rhs) const noexcept
+			{
+				return ctrl_block_ < rhs.ctrl_block_;
+			}
+
+			//Compares this less or equal to rhs
+			[[nodiscard]] auto operator<=(const NonOwningPtr<T> &rhs) const noexcept
+			{
+				return ctrl_block_ <= rhs.ctrl_block_;
+			}
+
+			//Compares this greater than rhs
+			[[nodiscard]] auto operator>(const NonOwningPtr<T> &rhs) const noexcept
+			{
+				return ctrl_block_ > rhs.ctrl_block_;
+			}
+
+			//Compares this greater or equal to rhs
+			[[nodiscard]] auto operator>=(const NonOwningPtr<T> &rhs) const noexcept
+			{
+				return ctrl_block_ >= rhs.ctrl_block_;
+			}
+
+
 			//Checks if there is an associated watched object
 			[[nodiscard]] explicit operator bool() const noexcept
 			{
@@ -207,10 +244,10 @@ namespace ion::memory
 				Modifers
 			*/
 
-			//Releases the watched object
-			void reset() noexcept
+			//Replaces the watched object
+			void reset(pointer ptr = pointer{}) noexcept
 			{
-				NonOwningPtr{}.swap(*this);
+				NonOwningPtr{ptr}.swap(*this);
 			}
 
 			//Swaps the watched objects
@@ -229,10 +266,9 @@ namespace ion::memory
 			//Returns nullptr if the watched object has expired
 			[[nodiscard]] auto get() const noexcept
 			{
-				if (ctrl_block_)
-					return static_cast<pointer>(ctrl_block_->ptr);
-				else
-					return static_cast<pointer>(nullptr);
+				return ctrl_block_ ?
+					static_cast<pointer>(ctrl_block_->ptr) :
+					static_cast<pointer>(nullptr);
 			}
 
 			//Checks whether the watched object was already deleted
@@ -242,6 +278,102 @@ namespace ion::memory
 			}
 	};
 
+
+	/*
+		Operators
+
+		NonOwningPtr<T> <=> nullptr
+		nullptr <=> NonOwningPtr<T>
+	*/
+
+	//Compares ptr equal to nullptr
+	template <typename T>
+	[[nodiscard]] auto operator==(const NonOwningPtr<T> &ptr, std::nullptr_t) noexcept
+	{
+		return ptr.get() == nullptr;
+	}
+
+	//Compares nullptr equal to ptr
+	template <typename T>
+	[[nodiscard]] auto operator==(std::nullptr_t, const NonOwningPtr<T> &ptr) noexcept
+	{
+		return nullptr == ptr.get();
+	}
+
+	//Compares ptr different from nullptr
+	template <typename T>
+	[[nodiscard]] auto operator!=(const NonOwningPtr<T> &ptr, std::nullptr_t) noexcept
+	{
+		return ptr.get() != nullptr;
+	}
+
+	//Compares nullptr different from ptr
+	template <typename T>
+	[[nodiscard]] auto operator!=(std::nullptr_t, const NonOwningPtr<T> &ptr) noexcept
+	{
+		return nullptr != ptr.get();
+	}
+
+	//Compares ptr less than nullptr
+	template <typename T>
+	[[nodiscard]] auto operator<(const NonOwningPtr<T> &ptr, std::nullptr_t) noexcept
+	{
+		return ptr.get() < nullptr;
+	}
+
+	//Compares nullptr less than ptr
+	template <typename T>
+	[[nodiscard]] auto operator<(std::nullptr_t, const NonOwningPtr<T> &ptr) noexcept
+	{
+		return nullptr < ptr.get();
+	}
+
+	//Compares ptr less or equal to nullptr
+	template <typename T>
+	[[nodiscard]] auto operator<=(const NonOwningPtr<T> &ptr, std::nullptr_t) noexcept
+	{
+		return ptr.get() <= nullptr;
+	}
+
+	//Compares nullptr less or equal to ptr
+	template <typename T>
+	[[nodiscard]] auto operator<=(std::nullptr_t, const NonOwningPtr<T> &ptr) noexcept
+	{
+		return nullptr <= ptr.get();
+	}
+
+	//Compares ptr greater than nullptr
+	template <typename T>
+	[[nodiscard]] auto operator>(const NonOwningPtr<T> &ptr, std::nullptr_t) noexcept
+	{
+		return ptr.get() > nullptr;
+	}
+
+	//Compares nullptr greater than ptr
+	template <typename T>
+	[[nodiscard]] auto operator>(std::nullptr_t, const NonOwningPtr<T> &ptr) noexcept
+	{
+		return nullptr > ptr.get();
+	}
+
+	//Compares ptr greater or equal to nullptr
+	template <typename T>
+	[[nodiscard]] auto operator>=(const NonOwningPtr<T> &ptr, std::nullptr_t) noexcept
+	{
+		return ptr.get() >= nullptr;
+	}
+
+	//Compares nullptr greater or equal to ptr
+	template <typename T>
+	[[nodiscard]] auto operator>=(std::nullptr_t, const NonOwningPtr<T> &ptr) noexcept
+	{
+		return nullptr >= ptr.get();
+	}
+
+
+	/*
+		Pointer casts
+	*/
 
 	template <typename T, typename U>
 	[[nodiscard]] auto static_pointer_cast(const NonOwningPtr<U> &ptr) noexcept
