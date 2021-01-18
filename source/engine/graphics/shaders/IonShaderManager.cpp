@@ -211,18 +211,18 @@ ShaderManager::~ShaderManager() noexcept
 	Creating
 */
 
-Shader& ShaderManager::CreateShader(std::string name, std::string asset_name)
+NonOwningPtr<Shader> ShaderManager::CreateShader(std::string name, std::string asset_name)
 {
 	return CreateResource(std::move(name), std::move(asset_name));
 }
 
 
-Shader& ShaderManager::CreateShader(const Shader &shader)
+NonOwningPtr<Shader> ShaderManager::CreateShader(const Shader &shader)
 {
 	return CreateResource(shader);
 }
 
-Shader& ShaderManager::CreateShader(Shader &&shader)
+NonOwningPtr<Shader> ShaderManager::CreateShader(Shader &&shader)
 {
 	return CreateResource(std::move(shader));
 }
@@ -233,12 +233,12 @@ Shader& ShaderManager::CreateShader(Shader &&shader)
 	Retrieving
 */
 
-Shader* ShaderManager::GetShader(std::string_view name) noexcept
+NonOwningPtr<Shader> ShaderManager::GetShader(std::string_view name) noexcept
 {
 	return GetResource(name);
 }
 
-const Shader* ShaderManager::GetShader(std::string_view name) const noexcept
+NonOwningPtr<const Shader> ShaderManager::GetShader(std::string_view name) const noexcept
 {
 	return GetResource(name);
 }

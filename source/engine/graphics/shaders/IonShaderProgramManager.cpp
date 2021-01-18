@@ -12,6 +12,7 @@ File:	IonShaderProgramManager.cpp
 
 #include "IonShaderProgramManager.h"
 
+#include "IonShaderManager.h"
 #include "graphics/IonGraphicsAPI.h"
 #include "utilities/IonFileUtility.h"
 
@@ -817,18 +818,18 @@ ShaderProgramManager::~ShaderProgramManager() noexcept
 	Creating
 */
 
-ShaderProgram& ShaderProgramManager::CreateShaderProgram(std::string name, Shader &shader)
+NonOwningPtr<ShaderProgram> ShaderProgramManager::CreateShaderProgram(std::string name, NonOwningPtr<Shader> shader)
 {
-	return CreateResource(std::move(name), std::ref(shader));
+	return CreateResource(std::move(name), shader);
 }
 
-ShaderProgram& ShaderProgramManager::CreateShaderProgram(std::string name, Shader &vertex_shader, Shader &fragment_shader)
+NonOwningPtr<ShaderProgram>ShaderProgramManager::CreateShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader)
 {
-	return CreateResource(std::move(name), std::ref(vertex_shader), std::ref(fragment_shader));
+	return CreateResource(std::move(name), vertex_shader, fragment_shader);
 }
 
 
-ShaderProgram& ShaderProgramManager::CreateShaderProgram(ShaderProgram &&shader_program)
+NonOwningPtr<ShaderProgram> ShaderProgramManager::CreateShaderProgram(ShaderProgram &&shader_program)
 {
 	return CreateResource(std::move(shader_program));
 }
@@ -839,12 +840,12 @@ ShaderProgram& ShaderProgramManager::CreateShaderProgram(ShaderProgram &&shader_
 	Retrieving
 */
 
-ShaderProgram* ShaderProgramManager::GetShaderProgram(std::string_view name) noexcept
+NonOwningPtr<ShaderProgram> ShaderProgramManager::GetShaderProgram(std::string_view name) noexcept
 {
 	return GetResource(name);
 }
 
-const ShaderProgram* ShaderProgramManager::GetShaderProgram(std::string_view name) const noexcept
+NonOwningPtr<const ShaderProgram> ShaderProgramManager::GetShaderProgram(std::string_view name) const noexcept
 {
 	return GetResource(name);
 }

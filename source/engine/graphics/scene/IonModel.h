@@ -21,6 +21,7 @@ File:	IonModel.h
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonObb.h"
 #include "graphics/utilities/IonSphere.h"
+#include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 #include "unmanaged/IonObjectFactory.h"
 
@@ -206,40 +207,40 @@ namespace ion::graphics::scene
 			*/
 
 			//Create a mesh with the given vertices and visibility
-			render::Mesh& CreateMesh(const render::mesh::Vertices &vertices, bool visible = true);
+			NonOwningPtr<render::Mesh> CreateMesh(const render::mesh::Vertices &vertices, bool visible = true);
 
 			//Create a mesh with the given vertices, material, tex coord mode and visibility
-			render::Mesh& CreateMesh(const render::mesh::Vertices &vertices, materials::Material &material,
+			NonOwningPtr<render::Mesh> CreateMesh(const render::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				render::mesh::MeshTexCoordMode tex_coord_mode = render::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 			//Create a mesh with the given draw mode, vertices and visibility
-			render::Mesh& CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, bool visible = true);
+			NonOwningPtr<render::Mesh> CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, bool visible = true);
 
 			//Create a mesh with the given draw mode, vertices, material, tex coord mode and visibility
-			render::Mesh& CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, materials::Material &material,
+			NonOwningPtr<render::Mesh> CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				render::mesh::MeshTexCoordMode tex_coord_mode = render::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
 			//Create a mesh with the given raw vertex data and visibility
-			render::Mesh& CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, bool visible = true);
+			NonOwningPtr<render::Mesh> CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, bool visible = true);
 
 			//Create a mesh with the given raw vertex data, material, tex coord mode and visibility
-			render::Mesh& CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+			NonOwningPtr<render::Mesh> CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, NonOwningPtr<materials::Material>material,
 				render::mesh::MeshTexCoordMode tex_coord_mode = render::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 			//Create a mesh with the given draw mode, raw vertex data and visibility
-			render::Mesh& CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, bool visible = true);
+			NonOwningPtr<render::Mesh> CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, bool visible = true);
 
 			//Create a mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
-			render::Mesh& CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+			NonOwningPtr<render::Mesh> CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, NonOwningPtr<materials::Material> material,
 				render::mesh::MeshTexCoordMode tex_coord_mode = render::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
 			//Create a mesh as a copy of the given mesh
-			render::Mesh& CreateMesh(const render::Mesh &mesh);
+			NonOwningPtr<render::Mesh> CreateMesh(const render::Mesh &mesh);
 
 			//Create a mesh by moving the given mesh
-			render::Mesh& CreateMesh(render::Mesh &&mesh);
+			NonOwningPtr<render::Mesh> CreateMesh(render::Mesh &&mesh);
 
 
 			/*

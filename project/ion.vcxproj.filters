@@ -402,6 +402,9 @@
     <ClCompile Include="..\source\engine\graphics\utilities\IonMatrix4.cpp">
       <Filter>Source Files\graphics\utilities</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\particles\IonEmitterManager.cpp">
+      <Filter>Source Files\graphics\particles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">

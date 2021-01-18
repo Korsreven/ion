@@ -167,25 +167,25 @@ void Animation::Previous() noexcept
 
 //Public
 
-Animation::Animation(std::string name, FrameSequence &frame_sequence,
+Animation::Animation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 	duration cycle_duration, std::optional<int> repeat_count,
 	PlaybackDirection direction, real playback_rate) :
 	
 	managed::ManagedObject<AnimationManager>{std::move(name)},
 
-	frame_duration_{frame_sequence.FrameCount() > 0 ? cycle_duration / frame_sequence.FrameCount() : 0.0_sec},
+	frame_duration_{frame_sequence->FrameCount() > 0 ? cycle_duration / frame_sequence->FrameCount() : 0.0_sec},
 	repeat_count_{repeat_count ? std::make_optional(std::pair{0, *repeat_count}) : std::nullopt},
 	direction_{direction},
 	playback_rate_{playback_rate > 0.0_r ? playback_rate : 1.0_r},
 	reverse_{detail::is_direction_in_reverse(direction)},
-	current_frame_{!frame_sequence.IsEmpty() && reverse_ ? frame_sequence.FrameCount() - 1 : 0},
+	current_frame_{!frame_sequence->IsEmpty() && reverse_ ? frame_sequence->FrameCount() - 1 : 0},
 
 	frame_sequence_{frame_sequence}
 {
 	//Empty
 }
 
-Animation::Animation(std::string name, FrameSequence &frame_sequence,
+Animation::Animation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 	duration cycle_duration, std::optional<int> repeat_count, real playback_rate) :
 
 	Animation{std::move(name), frame_sequence, cycle_duration, repeat_count, PlaybackDirection::Normal, playback_rate}
@@ -198,26 +198,26 @@ Animation::Animation(std::string name, FrameSequence &frame_sequence,
 	Static animation conversions
 */
 
-Animation Animation::Looping(std::string name, FrameSequence &frame_sequence,
+Animation Animation::Looping(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 	duration cycle_duration, PlaybackDirection direction, real playback_rate) noexcept
 {
 	return {std::move(name), frame_sequence, cycle_duration, std::nullopt, direction, playback_rate};
 }
 
-Animation Animation::Looping(std::string name, FrameSequence &frame_sequence,
+Animation Animation::Looping(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 	duration cycle_duration, real playback_rate) noexcept
 {
 	return {std::move(name), frame_sequence, cycle_duration, std::nullopt, playback_rate};
 }
 
 
-Animation Animation::NonLooping(std::string name, FrameSequence &frame_sequence,
+Animation Animation::NonLooping(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 	duration cycle_duration, PlaybackDirection direction, real playback_rate) noexcept
 {
 	return {std::move(name), frame_sequence, cycle_duration, 0, direction, playback_rate};
 }
 
-Animation Animation::NonLooping(std::string name, FrameSequence &frame_sequence,
+Animation Animation::NonLooping(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 	duration cycle_duration, real playback_rate) noexcept
 {
 	return {std::move(name), frame_sequence, cycle_duration, 0, playback_rate};
@@ -482,37 +482,37 @@ void Animation::LastFrame() noexcept
 }
 
 
-Texture* Animation::CurrentFrame() noexcept
+NonOwningPtr<Texture> Animation::CurrentFrame() noexcept
 {
 	if (HasFrames())
-		return (*frame_sequence_.Object())[current_frame_];
+		return (*frame_sequence_)[current_frame_];
 	else
 		return nullptr;
 }
 
-const Texture* Animation::CurrentFrame() const noexcept
+NonOwningPtr<const Texture> Animation::CurrentFrame() const noexcept
 {
 	if (HasFrames())
-		return (*frame_sequence_.Object())[current_frame_];
+		return (*frame_sequence_)[current_frame_];
 	else
 		return nullptr;
 }
 
 
-Texture* Animation::FrameAt(duration time) noexcept
+NonOwningPtr<Texture> Animation::FrameAt(duration time) noexcept
 {
 	if (HasFrames())
-		return (*frame_sequence_.Object())[detail::frame_at(time / playback_rate_, CycleDuration(),
+		return (*frame_sequence_)[detail::frame_at(time / playback_rate_, CycleDuration(),
 			repeat_count_ ? repeat_count_->second : std::optional<int>{},
 			direction_, frame_sequence_->FrameCount())];
 	else
 		return nullptr;
 }
 
-const Texture* Animation::FrameAt(duration time) const noexcept
+NonOwningPtr<const Texture> Animation::FrameAt(duration time) const noexcept
 {
 	if (HasFrames())
-		return (*frame_sequence_.Object())[detail::frame_at(time / playback_rate_, CycleDuration(),
+		return (*frame_sequence_)[detail::frame_at(time / playback_rate_, CycleDuration(),
 			repeat_count_ ? repeat_count_->second : std::optional<int>{},
 			direction_, frame_sequence_->FrameCount())];
 	else
@@ -520,14 +520,14 @@ const Texture* Animation::FrameAt(duration time) const noexcept
 }
 
 
-FrameSequence* Animation::UnderlyingFrameSequence() noexcept
+NonOwningPtr<FrameSequence> Animation::UnderlyingFrameSequence() noexcept
 {
-	return frame_sequence_.Object();
+	return frame_sequence_;
 }
 
-const FrameSequence* Animation::UnderlyingFrameSequence() const noexcept
+NonOwningPtr<const FrameSequence> Animation::UnderlyingFrameSequence() const noexcept
 {
-	return frame_sequence_.Object();
+	return frame_sequence_;
 }
 
 

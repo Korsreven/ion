@@ -31,23 +31,23 @@ namespace frame_sequence_manager::detail
 	Creating
 */
 
-FrameSequence& FrameSequenceManager::CreateFrameSequence(std::string name, const frame_sequence::detail::container_type &frames)
+NonOwningPtr<FrameSequence> FrameSequenceManager::CreateFrameSequence(std::string name, const frame_sequence::detail::container_type &frames)
 {
 	return Create(std::move(name), frames);
 }
 
-FrameSequence& FrameSequenceManager::CreateFrameSequence(std::string name, Texture &first_frame, int total_frames)
+NonOwningPtr<FrameSequence> FrameSequenceManager::CreateFrameSequence(std::string name, NonOwningPtr<Texture> first_frame, int total_frames)
 {
 	return Create(std::move(name), first_frame, total_frames);
 }
 
 
-FrameSequence& FrameSequenceManager::CreateFrameSequence(const FrameSequence &frame_sequence)
+NonOwningPtr<FrameSequence> FrameSequenceManager::CreateFrameSequence(const FrameSequence &frame_sequence)
 {
 	return Create(frame_sequence);
 }
 
-FrameSequence& FrameSequenceManager::CreateFrameSequence(FrameSequence &&frame_sequence)
+NonOwningPtr<FrameSequence> FrameSequenceManager::CreateFrameSequence(FrameSequence &&frame_sequence)
 {
 	return Create(std::move(frame_sequence));
 }
@@ -58,12 +58,12 @@ FrameSequence& FrameSequenceManager::CreateFrameSequence(FrameSequence &&frame_s
 	Retrieving
 */
 
-FrameSequence* FrameSequenceManager::GetFrameSequence(std::string_view name) noexcept
+NonOwningPtr<FrameSequence> FrameSequenceManager::GetFrameSequence(std::string_view name) noexcept
 {
 	return Get(name);
 }
 
-const FrameSequence* FrameSequenceManager::GetFrameSequence(std::string_view name) const noexcept
+NonOwningPtr<const FrameSequence> FrameSequenceManager::GetFrameSequence(std::string_view name) const noexcept
 {
 	return Get(name);
 }

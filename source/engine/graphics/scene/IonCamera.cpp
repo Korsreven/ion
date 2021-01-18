@@ -12,13 +12,20 @@ File:	IonCamera.cpp
 
 #include "IonCamera.h"
 
+#include <type_traits>
+
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/render/IonViewport.h"
+#include "graphics/scene/IonSceneManager.h"
+#include "types/IonTypes.h"
+#include "utilities/IonMath.h"
 
 namespace ion::graphics::scene
 {
 
 using namespace camera;
+using namespace types::type_literals;
+using namespace ion::utilities;
 using graphics::render::Frustum;
 
 namespace camera::detail
@@ -27,12 +34,19 @@ namespace camera::detail
 void move_to(const Vector3 &position) noexcept
 {
 	auto [x, y, z] = position.XYZ();
-	glTranslatef(-x, -y, -z);
+
+	if constexpr (std::is_same_v<real, double>)
+		glTranslated(-x, -y, -z);
+	else
+		glTranslatef(-x, -y, -z);
 }
 
 void rotate_by(real angle) noexcept
 {
-	glRotatef(-math::Radian(angle), 0.0_r, 0.0_r, 1.0_r); //Rotate around the z-axis
+	if constexpr (std::is_same_v<real, double>)
+		glRotated(-math::Radian(angle), 0.0_r, 0.0_r, 1.0_r); //Rotate around the z-axis
+	else
+		glRotatef(-math::Radian(angle), 0.0_r, 0.0_r, 1.0_r); //Rotate around the z-axis
 }
 
 

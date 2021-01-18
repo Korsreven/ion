@@ -26,21 +26,21 @@ using namespace frame_sequence;
 namespace frame_sequence::detail
 {
 
-container_type get_frames_from_first_frame(Texture &first_frame, int total_frames)
+container_type get_frames_from_first_frame(NonOwningPtr<Texture> first_frame, int total_frames)
 {
 	using namespace ion::utilities;
 
-	if (!first_frame.Owner())
+	if (!first_frame->Owner())
 		return {};
 
 	container_type frames;
 	frames.reserve(total_frames);
-	frames.push_back(&first_frame);
+	frames.push_back(first_frame);
 
 	//Multiple frames
 	if (total_frames > 1)
 	{
-		auto &name = *first_frame.Name();
+		auto &name = *first_frame->Name();
 		
 		if (auto iter = std::find_if_not(std::rbegin(name), std::rend(name),
 			[](auto c) noexcept
@@ -67,7 +67,7 @@ container_type get_frames_from_first_frame(Texture &first_frame, int total_frame
 
 					next_name += convert::ToString(*number);
 
-					if (auto next_frame = first_frame.Owner()->GetTexture(next_name); next_frame)
+					if (auto next_frame = first_frame->Owner()->GetTexture(next_name); next_frame)
 						frames.push_back(next_frame);
 					else
 						return {};
@@ -82,83 +82,22 @@ container_type get_frames_from_first_frame(Texture &first_frame, int total_frame
 } //frame_sequence::detail
 
 
-//Private
-
-bool FrameSequence::AddFrame(Texture &frame)
-{
-	if (observed_frames_.Observe(frame))
-	{
-		frames_.push_back(&frame);
-		return true;
-	}
-	else
-		return false;
-}
-
-bool FrameSequence::AddFrames(const detail::container_type &frames)
-{
-	for (auto &frame : frames)
-	{
-		if (!frame || !AddFrame(*frame))
-		{
-			ClearFrames(); //Missing a frame
-			return false;
-		}
-	}
-
-	if (!std::empty(frames_))
-	{
-		//Set up callbacks
-		observed_frames_.OnRemoved({&FrameSequence::FrameRemoved, this});
-		observed_frames_.OnRemovedAll({&FrameSequence::AllFramesRemoved, this});
-		return true;
-	}
-	else
-		return false;
-}
-
-void FrameSequence::ClearFrames() noexcept
-{
-	frames_.clear();
-	frames_.shrink_to_fit();
-	
-	if (observed_frames_.ReleaseAll())
-	{
-		//Release callbacks
-		observed_frames_.OnRemoved(std::nullopt);
-		observed_frames_.OnRemovedAll(std::nullopt);
-	}
-}
-
-
-void FrameSequence::FrameRemoved(Texture&) noexcept
-{
-	//A frame sequence is considered invalid if one or more frames are missing
-	//All frames or no frames
-	ClearFrames();
-}
-
-void FrameSequence::AllFramesRemoved() noexcept
-{
-	//A frame sequence is considered invalid if one or more frames are missing
-	//All frames or no frames
-	ClearFrames();
-}
-
-
 //Public
 
 FrameSequence::FrameSequence(std::string name, const detail::container_type &frames) :
-	managed::ManagedObject<FrameSequenceManager>{std::move(name)}
+
+	managed::ManagedObject<FrameSequenceManager>{std::move(name)},
+	frames_{frames}
 {
-	AddFrames(frames);
+	//Empty
 }
 
-FrameSequence::FrameSequence(std::string name, Texture &first_frame, int total_frames)  :
-	managed::ManagedObject<FrameSequenceManager>{std::move(name)}
+FrameSequence::FrameSequence(std::string name, NonOwningPtr<Texture> first_frame, int total_frames)  :
+
+	managed::ManagedObject<FrameSequenceManager>{std::move(name)},
+	frames_{first_frame && total_frames > 0 ? detail::get_frames_from_first_frame(first_frame, total_frames) : decltype(frames_){}}
 {
-	if (total_frames > 0)
-		AddFrames(detail::get_frames_from_first_frame(first_frame, total_frames));
+	//Empty
 }
 
 } //ion::graphics::textures

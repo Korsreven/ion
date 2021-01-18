@@ -21,6 +21,7 @@ File:	IonFontManager.h
 
 #include "IonFont.h"
 #include "assets/repositories/IonFontRepository.h"
+#include "memory/IonNonOwningPtr.h"
 #include "resources/IonFileResourceManager.h"
 #include "types/IonTypes.h"
 
@@ -118,30 +119,30 @@ namespace ion::graphics::fonts
 			*/
 
 			//Create a font with the given name, asset name, size, face index, character encoding and glyph min/mag filter
-			Font& CreateFont(std::string name, std::string asset_name, int size, int face_index,
+			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size, int face_index,
 				font::CharacterEncoding encoding, font::GlyphFilter min_filter, font::GlyphFilter mag_filter);
 
 			//Create a font with the given name, asset name, size, character encoding and glyph min/mag filter
-			Font& CreateFont(std::string name, std::string asset_name, int size,
+			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size,
 				font::CharacterEncoding encoding, font::GlyphFilter min_filter, font::GlyphFilter mag_filter);
 
 			//Create a font with the given name, asset name, size, character encoding and glyph filter
-			Font& CreateFont(std::string name, std::string asset_name, int size,
+			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size,
 				font::CharacterEncoding encoding, font::GlyphFilter filter);
 
 			//Create a font with the given name, asset name, size and character encoding
-			Font& CreateFont(std::string name, std::string asset_name, int size,
+			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size,
 				font::CharacterEncoding encoding);
 
 			//Create a font with the given name, asset name and size
-			Font& CreateFont(std::string name, std::string asset_name, int size);
+			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size);
 
 
 			//Create a font as a copy of the given font
-			Font& CreateFont(const Font &font);
+			NonOwningPtr<Font> CreateFont(const Font &font);
 
 			//Create a font by moving the given font
-			Font& CreateFont(Font &&font);
+			NonOwningPtr<Font> CreateFont(Font &&font);
 
 
 			/*
@@ -151,11 +152,11 @@ namespace ion::graphics::fonts
 
 			//Gets a pointer to a mutable font with the given name
 			//Returns nullptr if font could not be found
-			[[nodiscard]] Font* GetFont(std::string_view name) noexcept;
+			[[nodiscard]] NonOwningPtr<Font> GetFont(std::string_view name) noexcept;
 
 			//Gets a pointer to an immutable font with the given name
 			//Returns nullptr if font could not be found
-			[[nodiscard]] const Font* GetFont(std::string_view name) const noexcept;
+			[[nodiscard]] NonOwningPtr<const Font> GetFont(std::string_view name) const noexcept;
 
 
 			/*

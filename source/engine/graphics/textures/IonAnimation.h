@@ -18,15 +18,16 @@ File:	IonAnimation.h
 #include <utility>
 #include <vector>
 
-#include "IonFrameSequenceManager.h"
+#include "IonFrameSequence.h"
 #include "managed/IonManagedObject.h"
-#include "managed/IonObservedObject.h"
+#include "memory/IonNonOwningPtr.h"
 #include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::textures
 {
 	struct AnimationManager; //Forward declaration
+
 	using namespace types::type_literals;
 
 	namespace animation
@@ -85,7 +86,7 @@ namespace ion::graphics::textures
 			bool reverse_ = false;	
 			int current_frame_ = 0;
 			
-			managed::ObservedObject<FrameSequence> frame_sequence_;
+			NonOwningPtr<FrameSequence> frame_sequence_;
 
 
 			inline auto FrameCount() const noexcept
@@ -108,12 +109,12 @@ namespace ion::graphics::textures
 		public:
 
 			//Constructs a new animation with the given name, frames, cycle duration, repeat count, playback direction and rate
-			Animation(std::string name, FrameSequence &frame_sequence,
+			Animation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 				duration cycle_duration, std::optional<int> repeat_count = std::nullopt,
 				animation::PlaybackDirection direction = animation::PlaybackDirection::Normal, real playback_rate = 1.0_r);
 
 			//Constructs a new animation (in normal direction) with the given name, frames, cycle duration, repeat count and playback rate
-			Animation(std::string name, FrameSequence &frame_sequence,
+			Animation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 				duration cycle_duration, std::optional<int> repeat_count, real playback_rate);
 
 
@@ -122,20 +123,20 @@ namespace ion::graphics::textures
 			*/
 
 			//Returns a new looping animation with the given name, frames, cycle duration, playback direction and rate
-			[[nodiscard]] static Animation Looping(std::string name, FrameSequence &frame_sequence,
+			[[nodiscard]] static Animation Looping(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 				duration cycle_duration, animation::PlaybackDirection direction, real playback_rate = 1.0_r) noexcept;
 
 			//Returns a new looping animation (in normal direction) with the given name, frames, cycle duration and playback rate
-			[[nodiscard]] static Animation Looping(std::string name, FrameSequence &frame_sequence,
+			[[nodiscard]] static Animation Looping(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 				duration cycle_duration, real playback_rate = 1.0_r) noexcept;
 
 
 			//Returns a new non-looping animation with the given name, frames, cycle duration, playback direction and rate
-			[[nodiscard]] static Animation NonLooping(std::string name, FrameSequence &frame_sequence,
+			[[nodiscard]] static Animation NonLooping(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 				duration cycle_duration, animation::PlaybackDirection direction, real playback_rate = 1.0_r) noexcept;
 
 			//Returns a new non-looping animation (in normal direction) with the given name, frames, cycle duration and playback rate
-			[[nodiscard]] static Animation NonLooping(std::string name, FrameSequence &frame_sequence,
+			[[nodiscard]] static Animation NonLooping(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 				duration cycle_duration, real playback_rate = 1.0_r) noexcept;
 
 
@@ -277,29 +278,29 @@ namespace ion::graphics::textures
 
 			//Returns a pointer to the mutable current frame in this animation
 			//Returns nullptr if there is no current frame
-			[[nodiscard]] Texture* CurrentFrame() noexcept;
+			[[nodiscard]] NonOwningPtr<Texture> CurrentFrame() noexcept;
 
 			//Returns a pointer to the immutable current frame in this animation
 			//Returns nullptr if there is no current frame
-			[[nodiscard]] const Texture* CurrentFrame() const noexcept;
+			[[nodiscard]] NonOwningPtr<const Texture> CurrentFrame() const noexcept;
 
 
 			//Returns a pointer to a mutable frame in this animation at the given time
 			//Returns nullptr if there is no frame at the given time
-			[[nodiscard]] Texture* FrameAt(duration time) noexcept;
+			[[nodiscard]] NonOwningPtr<Texture> FrameAt(duration time) noexcept;
 
 			//Returns a pointer to an immutable frame in this animation at the given time
 			//Returns nullptr if there is no frame at the given time
-			[[nodiscard]] const Texture* FrameAt(duration time) const noexcept;
+			[[nodiscard]] NonOwningPtr<const Texture> FrameAt(duration time) const noexcept;
 
 
 			//Returns a pointer to the mutable frame sequence in this animation
 			//Returns nullptr if this animation does not have an underlying frame sequence
-			[[nodiscard]] FrameSequence* UnderlyingFrameSequence() noexcept;
+			[[nodiscard]] NonOwningPtr<FrameSequence> UnderlyingFrameSequence() noexcept;
 
 			//Returns a pointer to the immutable frame sequence in this animation
 			//Returns nullptr if this animation does not have an underlying frame sequence
-			[[nodiscard]] const FrameSequence* UnderlyingFrameSequence() const noexcept;
+			[[nodiscard]] NonOwningPtr<const FrameSequence> UnderlyingFrameSequence() const noexcept;
 
 
 			/*

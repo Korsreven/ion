@@ -806,7 +806,7 @@ namespace ion::resources
 
 			//Create a resource with the given arguments
 			template <typename... Args>
-			auto& CreateResource(Args &&...args)
+			auto CreateResource(Args &&...args)
 			{
 				return this->Create(std::forward<Args>(args)...);
 			}
@@ -826,7 +826,7 @@ namespace ion::resources
 
 			//Gets a pointer to an immutable resource with the given name
 			//Returns nullptr if resource could not be found
-			[[nodiscard]] const auto GetResource(std::string_view name) const noexcept
+			[[nodiscard]] auto GetResource(std::string_view name) const noexcept
 			{
 				return this->Get(name);
 			}

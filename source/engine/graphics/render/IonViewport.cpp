@@ -328,20 +328,20 @@ Viewport Viewport::BottomRightAligned(std::string name, RenderTarget &render_tar
 	Camera
 */
 
-void Viewport::ConnectCamera(scene::Camera &camera)
+void Viewport::ConnectedCamera(NonOwningPtr<scene::Camera> camera) noexcept
 {
-	camera_.Observe(camera);
+	camera_ = camera;
 }
 
 
-scene::Camera* Viewport::ConnectedCamera() noexcept
+NonOwningPtr<scene::Camera> Viewport::ConnectedCamera() noexcept
 {
-	return camera_.Object();
+	return camera_;
 }
 
-const scene::Camera* Viewport::ConnectedCamera() const noexcept
+NonOwningPtr<const scene::Camera> Viewport::ConnectedCamera() const noexcept
 {
-	return camera_.Object();
+	return camera_;
 }
 
 
@@ -353,8 +353,8 @@ void Viewport::RenderTo() noexcept
 {
 	detail::render_to_viewport(bounds_.Min(), bounds_.ToSize(), background_color_);
 
-	if (auto camera = ConnectedCamera(); camera)
-		camera->CaptureScene(*this);
+	if (camera_)
+		camera_->CaptureScene(*this);
 }
 
 } //ion::graphics::render

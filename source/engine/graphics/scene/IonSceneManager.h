@@ -22,6 +22,7 @@ File:	IonSceneManager.h
 #include "events/IonListenable.h"
 #include "events/listeners/IonCameraListener.h"
 #include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 
 namespace ion::graphics::scene
 {
@@ -140,11 +141,18 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
+			//Create a camera with the given name
+			NonOwningPtr<Camera> CreateCamera(std::string name);
+
+			//Create a camera with the given name and a custom frustum
+			NonOwningPtr<Camera> CreateCamera(std::string name, const render::Frustum &frustum);
+
+
 			//Create a camera as a copy of the given camera
-			Camera& CreateCamera(const Camera &camera);
+			NonOwningPtr<Camera> CreateCamera(const Camera &camera);
 
 			//Create a camera by moving the given camera
-			Camera& CreateCamera(Camera &&camera);
+			NonOwningPtr<Camera> CreateCamera(Camera &&camera);
 
 
 			/*
@@ -154,11 +162,11 @@ namespace ion::graphics::scene
 
 			//Gets a pointer to a mutable camera with the given name
 			//Returns nullptr if camera could not be found
-			[[nodiscard]] Camera* GetCamera(std::string_view name) noexcept;
+			[[nodiscard]] NonOwningPtr<Camera> GetCamera(std::string_view name) noexcept;
 
 			//Gets a pointer to an immutable camera with the given name
 			//Returns nullptr if camera could not be found
-			[[nodiscard]] const Camera* GetCamera(std::string_view name) const noexcept;
+			[[nodiscard]] NonOwningPtr<const Camera> GetCamera(std::string_view name) const noexcept;
 
 
 			/*

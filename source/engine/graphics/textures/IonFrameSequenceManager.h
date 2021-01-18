@@ -19,6 +19,7 @@ File:	IonFrameSequenceManager.h
 
 #include "IonFrameSequence.h"
 #include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 
 namespace ion::graphics::textures
 {
@@ -79,13 +80,13 @@ namespace ion::graphics::textures
 		*/
 
 		//Create a frame sequence with the given name and frames (textures)
-		FrameSequence& CreateFrameSequence(std::string name, const frame_sequence::detail::container_type &frames);
+		NonOwningPtr<FrameSequence> CreateFrameSequence(std::string name, const frame_sequence::detail::container_type &frames);
 
 		//Create a frame sequence with the given name and frame references (textures)
-		template <typename... Tn, typename = std::enable_if_t<std::conjunction_v<std::is_same<Texture, Tn>...>>>
-		FrameSequence& CreateFrameSequence(std::string name, Texture &frame, Tn &...rest)
+		template <typename... Tn, typename = std::enable_if_t<std::conjunction_v<std::is_same<NonOwningPtr<Texture>, Tn>...>>>
+		NonOwningPtr<FrameSequence> CreateFrameSequence(std::string name, NonOwningPtr<Texture> frame, Tn ...rest)
 		{
-			return CreateFrameSequence(std::move(name), {&frame, &rest...});
+			return CreateFrameSequence(std::move(name), {frame, rest...});
 		}
 
 		//Create a frame sequence with the given name, first frame (texture) and total frames
@@ -94,14 +95,14 @@ namespace ion::graphics::textures
 		//First example: frame_0 and 4, produces the sequence: frame_0, frame_1, frame_2, frame_3
 		//Second example: frame_01 and 4, produces the sequence: frame_01, frame_02, frame_03, frame_04
 		//Third example: frame09 and 3, produces the sequence: frame09, frame10, frame11
-		FrameSequence& CreateFrameSequence(std::string name, Texture &first_frame, int total_frames);
+		NonOwningPtr<FrameSequence> CreateFrameSequence(std::string name, NonOwningPtr<Texture> first_frame, int total_frames);
 
 
 		//Create a frame sequence as a copy of the given frame sequence
-		FrameSequence& CreateFrameSequence(const FrameSequence &frame_sequence);
+		NonOwningPtr<FrameSequence> CreateFrameSequence(const FrameSequence &frame_sequence);
 
 		//Create a frame sequence by moving the given frame sequence
-		FrameSequence& CreateFrameSequence(FrameSequence &&frame_sequence);
+		NonOwningPtr<FrameSequence> CreateFrameSequence(FrameSequence &&frame_sequence);
 
 
 		/*
@@ -111,11 +112,11 @@ namespace ion::graphics::textures
 
 		//Gets a pointer to a mutable frame sequence with the given name
 		//Returns nullptr if frame sequence could not be found
-		[[nodiscard]] FrameSequence* GetFrameSequence(std::string_view name) noexcept;
+		[[nodiscard]] NonOwningPtr<FrameSequence> GetFrameSequence(std::string_view name) noexcept;
 
 		//Gets a pointer to an immutable frame sequence with the given name
 		//Returns nullptr if frame sequence could not be found
-		[[nodiscard]] const FrameSequence* GetFrameSequence(std::string_view name) const noexcept;
+		[[nodiscard]] NonOwningPtr<const FrameSequence> GetFrameSequence(std::string_view name) const noexcept;
 
 
 		/*

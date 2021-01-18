@@ -186,6 +186,7 @@
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonSineForce.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\affectors\IonVelocityRandomizer.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonEmitter.cpp" />
+    <ClCompile Include="..\source\engine\graphics\particles\IonEmitterManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonParticle.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonParticleSystem.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonParticleSystemManager.cpp" />

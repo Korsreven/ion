@@ -149,14 +149,14 @@ namespace ion::resources
 			*/
 
 			//Create an empty repository
-			auto& CreateRepository()
+			auto CreateRepository()
 			{
 				return RepositoryBase::Create();
 			}
 
 			//Create a repository by copying/moving the given repository
 			template <typename T, typename = std::enable_if_t<std::is_same_v<std::remove_cvref_t<T>, RepositoryT>>>
-			auto& CreateRepository(T &&repository)
+			auto CreateRepository(T &&repository)
 			{
 				return RepositoryBase::Create(std::forward<T>(repository));
 			}

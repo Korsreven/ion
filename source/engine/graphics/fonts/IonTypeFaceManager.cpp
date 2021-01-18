@@ -32,38 +32,29 @@ namespace type_face_manager::detail
 	Creating
 */
 
-TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular)
+NonOwningPtr<TypeFace> TypeFaceManager::CreateTypeFace(std::string name, NonOwningPtr<Font> regular)
 {
-	return Create(std::move(name), std::ref(regular));
+	return Create(std::move(name), regular);
 }
 
-TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular, Font &bold, std::nullptr_t)
+NonOwningPtr<TypeFace> TypeFaceManager::CreateTypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic)
 {
-	return Create(std::move(name), std::ref(regular), std::ref(bold), nullptr);
+	return Create(std::move(name), regular, bold, italic);
 }
 
-TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular, std::nullptr_t, Font &italic)
+NonOwningPtr<TypeFace> TypeFaceManager::CreateTypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic,
+	NonOwningPtr<Font> bold_italic)
 {
-	return Create(std::move(name), std::ref(regular), nullptr, std::ref(italic));
-}
-
-TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular, Font &bold, Font &italic)
-{
-	return Create(std::move(name), std::ref(regular), std::ref(bold), std::ref(italic));
-}
-
-TypeFace& TypeFaceManager::CreateTypeFace(std::string name, Font &regular, Font &bold, Font &italic, Font &bold_italic)
-{
-	return Create(std::move(name), std::ref(regular), std::ref(bold), std::ref(italic), std::ref(bold_italic));
+	return Create(std::move(name), regular, bold, italic, bold_italic);
 }
 
 
-TypeFace& TypeFaceManager::CreateTypeFace(const TypeFace &type_face)
+NonOwningPtr<TypeFace> TypeFaceManager::CreateTypeFace(const TypeFace &type_face)
 {
 	return Create(type_face);
 }
 
-TypeFace& TypeFaceManager::CreateTypeFace(TypeFace &&type_face)
+NonOwningPtr<TypeFace> TypeFaceManager::CreateTypeFace(TypeFace &&type_face)
 {
 	return Create(std::move(type_face));
 }
@@ -74,12 +65,12 @@ TypeFace& TypeFaceManager::CreateTypeFace(TypeFace &&type_face)
 	Retrieving
 */
 
-TypeFace* TypeFaceManager::GetTypeFace(std::string_view name) noexcept
+NonOwningPtr<TypeFace> TypeFaceManager::GetTypeFace(std::string_view name) noexcept
 {
 	return Get(name);
 }
 
-const TypeFace* TypeFaceManager::GetTypeFace(std::string_view name) const noexcept
+NonOwningPtr<const TypeFace> TypeFaceManager::GetTypeFace(std::string_view name) const noexcept
 {
 	return Get(name);
 }

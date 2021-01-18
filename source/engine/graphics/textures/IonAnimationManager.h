@@ -18,6 +18,7 @@ File:	IonAnimationManager.h
 
 #include "IonAnimation.h"
 #include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 
 namespace ion::graphics::textures
 {
@@ -73,43 +74,43 @@ namespace ion::graphics::textures
 
 
 		/*
-			Animation
+			Animations
 			Creating
 		*/
 
 		//Create an animation with the given name, frames, cycle duration, repeat count, playback direction and rate
-		Animation& CreateAnimation(std::string name, FrameSequence &frame_sequence,
+		NonOwningPtr<Animation> CreateAnimation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 			duration cycle_duration, std::optional<int> repeat_count = std::nullopt,
 			animation::PlaybackDirection direction = animation::PlaybackDirection::Normal, real playback_rate = 1.0_r);
 
 		//Create an animation (in normal direction) with the given name, frames, cycle duration, repeat count and playback rate
-		Animation& CreateAnimation(std::string name, FrameSequence &frame_sequence,
+		NonOwningPtr<Animation> CreateAnimation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 			duration cycle_duration, std::optional<int> repeat_count, real playback_rate);
 
 
 		//Create an animation as a copy of the given animation
-		Animation& CreateAnimation(const Animation &animation);
+		NonOwningPtr<Animation> CreateAnimation(const Animation &animation);
 
 		//Create an animation by moving the given animation
-		Animation& CreateAnimation(Animation &&animation);
+		NonOwningPtr<Animation> CreateAnimation(Animation &&animation);
 
 
 		/*
-			Animation
+			Animations
 			Retrieving
 		*/
 
 		//Gets a pointer to a mutable animation with the given name
 		//Returns nullptr if animation could not be found
-		[[nodiscard]] Animation* GetAnimation(std::string_view name) noexcept;
+		[[nodiscard]] NonOwningPtr<Animation> GetAnimation(std::string_view name) noexcept;
 
 		//Gets a pointer to an immutable animation with the given name
 		//Returns nullptr if animation could not be found
-		[[nodiscard]] const Animation* GetAnimation(std::string_view name) const noexcept;
+		[[nodiscard]] NonOwningPtr<const Animation> GetAnimation(std::string_view name) const noexcept;
 
 
 		/*
-			Animation
+			Animations
 			Removing
 		*/
 

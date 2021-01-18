@@ -394,38 +394,38 @@ TextureManager::~TextureManager() noexcept
 	Creating
 */
 
-Texture& TextureManager::CreateTexture(std::string name, std::string asset_name)
+NonOwningPtr<Texture> TextureManager::CreateTexture(std::string name, std::string asset_name)
 {
 	return CreateResource(std::move(name), std::move(asset_name));
 }
 
-Texture& TextureManager::CreateTexture(std::string name, std::string asset_name,
+NonOwningPtr<Texture> TextureManager::CreateTexture(std::string name, std::string asset_name,
 	texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 	texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode)
 {
 	return CreateResource(std::move(name), std::move(asset_name), min_filter, mag_filter, mip_filter, s_wrap_mode, t_wrap_mode);
 }
 
-Texture& TextureManager::CreateTexture(std::string name, std::string asset_name,
+NonOwningPtr<Texture> TextureManager::CreateTexture(std::string name, std::string asset_name,
 	texture::TextureFilter filter, texture::MipmapFilter mip_filter,
 	texture::TextureWrapMode wrap_mode)
 {
 	return CreateResource(std::move(name), std::move(asset_name), filter, mip_filter, wrap_mode);
 }
 
-Texture& TextureManager::CreateTexture(std::string name, std::string asset_name,
+NonOwningPtr<Texture> TextureManager::CreateTexture(std::string name, std::string asset_name,
 	texture::TextureFilter filter, texture::TextureWrapMode wrap_mode)
 {
 	return CreateResource(std::move(name), std::move(asset_name), filter, wrap_mode);
 }
 
 
-Texture& TextureManager::CreateTexture(const Texture &texture)
+NonOwningPtr<Texture> TextureManager::CreateTexture(const Texture &texture)
 {
 	return CreateResource(texture);
 }
 
-Texture& TextureManager::CreateTexture(Texture &&texture)
+NonOwningPtr<Texture> TextureManager::CreateTexture(Texture &&texture)
 {
 	return CreateResource(std::move(texture));
 }
@@ -436,12 +436,12 @@ Texture& TextureManager::CreateTexture(Texture &&texture)
 	Retrieving
 */
 
-Texture* TextureManager::GetTexture(std::string_view name) noexcept
+NonOwningPtr<Texture> TextureManager::GetTexture(std::string_view name) noexcept
 {
 	return GetResource(name);
 }
 
-const Texture* TextureManager::GetTexture(std::string_view name) const noexcept
+NonOwningPtr<const Texture> TextureManager::GetTexture(std::string_view name) const noexcept
 {
 	return GetResource(name);
 }

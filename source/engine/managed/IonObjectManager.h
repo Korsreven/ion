@@ -25,6 +25,7 @@ File:	IonObjectManager.h
 #include "adaptors/ranges/IonDereferenceIterable.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonManagedObjectListener.h"
+#include "memory/IonNonOwningPtr.h"
 #include "memory/IonOwningPtr.h"
 
 namespace ion::managed
@@ -48,7 +49,7 @@ namespace ion::managed
 							return false;
 					});
 
-			return iter != std::end(objects) ? iter->get() : nullptr;
+			return iter != std::end(objects) ? NonOwningPtr<T>{*iter} : NonOwningPtr<T>{};
 		}
 	} //object_manager::detail
 
@@ -129,17 +130,17 @@ namespace ion::managed
 			*/
 
 			template <typename... Args>
-			auto& Emplace(Args &&...args)
+			auto Emplace(Args &&...args)
 			{
 				AdditionStarted();
 
-				auto &object = objects_.emplace_back(
+				auto &ptr = objects_.emplace_back(
 					make_owning<ObjectT>(std::forward<Args>(args)...));
-				object->Owner(static_cast<OwnerT&>(*this));
-				NotifyCreated(*object);
+				ptr->Owner(static_cast<OwnerT&>(*this));
+				NotifyCreated(*ptr);
 
 				AdditionEnded();
-				return *object;
+				return NonOwningPtr<ObjectT>{ptr};
 			}
 
 		protected:
@@ -206,32 +207,32 @@ namespace ion::managed
 
 			//Create an object with the given arguments
 			template <typename... Args>
-			auto& Create(Args &&...args)
+			auto Create(Args &&...args)
 			{
 				return Emplace(std::forward<Args>(args)...);
 			}
 
 			//Create an object with the given name and arguments
 			template <typename... Args>
-			auto& Create(std::string name, Args &&...args)
+			auto Create(std::string name, Args &&...args)
 			{
 				//Check if an object with that name already exists
 				if (auto ptr = object_manager::detail::get_object_by_name(name, objects_); ptr)
-					return *ptr;
+					return ptr;
 				else
 					return Emplace(std::move(name), std::forward<Args>(args)...);
 			}
 
 			//Create an object by copying/moving the given object
 			template <typename T, typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
-			auto& Create(T &&object)
+			auto Create(T &&object)
 			{
 				//Object has name
 				if (auto object_name = object.Name(); object_name)
 				{
 					//Check if an object with that name already exists
 					if (auto ptr = object_manager::detail::get_object_by_name(*object_name, objects_); ptr)
-						return *ptr;
+						return ptr;
 				}
 				
 				return Emplace(std::forward<T>(object));
@@ -382,7 +383,7 @@ namespace ion::managed
 
 			//Adopt (take ownership of) the given object and returns a pointer to the adopted object
 			//Returns nullptr if the object could not be adopted and object_ptr will remain untouched
-			auto Adopt(typename decltype(objects_)::value_type &object_ptr) noexcept -> ObjectT*
+			auto Adopt(typename decltype(objects_)::value_type &object_ptr) noexcept
 			{
 				assert(object_ptr);
 
@@ -390,17 +391,17 @@ namespace ion::managed
 				{
 					//Check if an object with that name already exists
 					if (auto ptr = object_manager::detail::get_object_by_name(*object_name, objects_); ptr)
-						return nullptr; //Object exists, could not adopt
+						return NonOwningPtr<ObjectT>{}; //Object exists, could not adopt
 				}
 
 				AdditionStarted();
 
-				auto &object = objects_.emplace_back(std::move(object_ptr));
-				object->Owner(static_cast<OwnerT&>(*this));
-				NotifyCreated(*object);
+				auto &ptr = objects_.emplace_back(std::move(object_ptr));
+				ptr->Owner(static_cast<OwnerT&>(*this));
+				NotifyCreated(*ptr);
 
 				AdditionEnded();
-				return object.get();
+				return NonOwningPtr<ObjectT>{ptr};
 			}
 
 			//Adopt (take ownership of) all the given objects
@@ -430,10 +431,10 @@ namespace ion::managed
 
 					std::move(std::begin(adoptable_objects), std::end(adoptable_objects), std::back_inserter(objects_));
 					std::for_each(std::end(objects_) - std::size(adoptable_objects), std::end(objects_),
-						[&](auto &object) mutable noexcept
+						[&](auto &ptr) mutable noexcept
 						{
-							object->Owner(static_cast<OwnerT&>(*this));
-							NotifyCreated(*object);
+							ptr->Owner(static_cast<OwnerT&>(*this));
+							NotifyCreated(*ptr);
 						});
 
 					AdditionEnded();
@@ -481,7 +482,8 @@ namespace ion::managed
 
 			//Gets a pointer to an immutable object with the given name
 			//Returns nullptr if object could not be found
-			[[nodiscard]] const auto Get(std::string_view name) const noexcept
+			[[nodiscard]] auto Get(std::string_view name) const noexcept
+				-> NonOwningPtr<const ObjectT>
 			{
 				return object_manager::detail::get_object_by_name(name, objects_);
 			}

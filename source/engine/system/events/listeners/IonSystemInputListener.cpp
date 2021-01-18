@@ -14,7 +14,9 @@ File:	IonSystemInputListener.cpp
 
 #include <utility>
 
+#include "graphics/render/IonRenderWindow.h"
 #include "graphics/render/IonViewport.h"
+#include "graphics/scene/IonCamera.h"
 #include "graphics/utilities/IonAabb.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
@@ -216,8 +218,8 @@ bool InputListener::IsInsideViewport(Vector2 position) const noexcept
 		position.Y(inner_size->Y() - position.Y());
 
 		//Has viewport
-		if (auto viewport = viewport_.Object(); viewport)
-			return viewport->Bounds().Contains(position);
+		if (viewport_)
+			return viewport_->Bounds().Contains(position);
 	}
 	
 	return false;
@@ -232,15 +234,15 @@ Vector2 InputListener::ViewAdjusted(Vector2 position) const noexcept
 		position.Y(inner_size->Y() - position.Y());
 
 		//Has viewport
-		if (auto viewport = viewport_.Object(); viewport)
+		if (viewport_)
 		{
 			//Adjust coordinates from client to viewport coordinates
-			position -= viewport->Bounds().Min();
+			position -= viewport_->Bounds().Min();
 
 			//Has camera connected to viewport
-			if (auto camera = viewport->ConnectedCamera(); camera)
+			if (auto camera = viewport_->ConnectedCamera(); camera)
 			{
-				auto viewport_size = viewport->Bounds().ToSize();
+				auto viewport_size = viewport_->Bounds().ToSize();
 				auto [width, height] = viewport_size.XY();
 				auto [x, y] = position.XY();
 
@@ -322,21 +324,26 @@ InputListener::~InputListener()
 	Viewport
 */
 
-void InputListener::ConnectViewport(graphics::render::Viewport &viewport)
+void InputListener::ConnectedViewport(NonOwningPtr<graphics::render::Viewport> viewport) noexcept
 {
-	if (viewport.Owner() == &render_window_)
-		viewport_.Observe(viewport);
+	if (viewport)
+	{
+		if (viewport->Owner() == &render_window_)
+			viewport_ = viewport;
+	}
+	else
+		viewport_ = nullptr;
 }
 
 
-graphics::render::Viewport* InputListener::ConnectedViewport() noexcept
+NonOwningPtr<graphics::render::Viewport> InputListener::ConnectedViewport() noexcept
 {
-	return viewport_.Object();
+	return viewport_;
 }
 
-const graphics::render::Viewport* InputListener::ConnectedViewport() const noexcept
+NonOwningPtr<const graphics::render::Viewport> InputListener::ConnectedViewport() const noexcept
 {
-	return viewport_.Object();
+	return viewport_;
 }
 
 } //ion::system::events::listeners

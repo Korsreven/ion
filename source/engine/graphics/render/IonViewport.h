@@ -19,12 +19,16 @@ File:	IonViewport.h
 #include "events/IonEventGenerator.h"
 #include "events/listeners/IonRenderTargetListener.h"
 #include "events/listeners/IonViewportListener.h"
-#include "graphics/scene/IonSceneManager.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "managed/IonManagedObject.h"
-#include "managed/IonObservedObject.h"
+#include "memory/IonNonOwningPtr.h"
+
+namespace ion::graphics::scene
+{
+	class Camera; //Forward declaration
+}
 
 namespace ion::graphics::render
 {
@@ -88,7 +92,7 @@ namespace ion::graphics::render
 			Color background_color_ = utilities::color::Black;
 			Vector2 render_target_size_;
 
-			managed::ObservedObject<scene::Camera> camera_;
+			NonOwningPtr<scene::Camera> camera_;
 
 
 			/*
@@ -116,13 +120,13 @@ namespace ion::graphics::render
 
 		public:
 
-			//Construct a viewport with the given name and connected to a given render target
+			//Construct a new viewport with the given name and connected to a given render target
 			Viewport(std::string name, RenderTarget &render_target) noexcept;
 
-			//Construct a viewport with the given name, connected to a given render target and with the given bounds (region)
+			//Construct a new viewport with the given name, connected to a given render target and with the given bounds (region)
 			Viewport(std::string name, RenderTarget &render_target, const Aabb &bounds) noexcept;
 
-			//Construct a viewport with the given name, connected to a given render target and with the given bounds (region) and anchors
+			//Construct a new viewport with the given name, connected to a given render target and with the given bounds (region) and anchors
 			Viewport(std::string name, RenderTarget &render_target, const Aabb &bounds,
 				viewport::HorizontalAnchorType left_anchor, viewport::HorizontalAnchorType right_anchor,
 				viewport::VerticalAnchorType top_anchor, viewport::VerticalAnchorType bottom_anchor) noexcept;
@@ -273,17 +277,17 @@ namespace ion::graphics::render
 				Camera
 			*/
 
-			//Sets the camera that should be connected to this viewport
-			void ConnectCamera(scene::Camera &camera);
+			//Sets the camera connected to this viewport to the given camera
+			void ConnectedCamera(NonOwningPtr<scene::Camera> camera) noexcept;
 
 
 			//Returns a pointer to the camera (mutable) connected to this viewport
 			//Returns nullptr if this viewport does not have a camera connected
-			[[nodiscard]] scene::Camera* ConnectedCamera() noexcept;
+			[[nodiscard]] NonOwningPtr<scene::Camera> ConnectedCamera() noexcept;
 
 			//Returns a pointer to the camera (immutable) connected to this viewport
 			//Returns nullptr if this viewport does not have a camera connected
-			[[nodiscard]] const scene::Camera* ConnectedCamera() const noexcept;
+			[[nodiscard]] NonOwningPtr<const scene::Camera> ConnectedCamera() const noexcept;
 
 
 			/*

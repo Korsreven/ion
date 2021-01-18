@@ -15,6 +15,7 @@ File:	IonAffectorManager.h
 
 #include "IonAffector.h"
 #include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 
 namespace ion::graphics::particles::affectors
 {
@@ -69,42 +70,64 @@ namespace ion::graphics::particles::affectors
 
 
 			/*
+				Affectors
 				Creating
 			*/
 
 			//Create an affector of type T with the given name and arguments
 			template <typename T, typename... Args>
-			auto& CreateAffector(std::string name, Args &&...args)
+			auto CreateAffector(std::string name, Args &&...args)
 			{
 				static_assert(std::is_base_of_v<Affector, T>);
 
-				auto &affector = Create(std::move(name), std::forward<Args>(args)...);
-				return static_cast<T&>(affector);
+				auto ptr = Create(std::move(name), std::forward<Args>(args)...);
+				return static_pointer_cast<T>(ptr);
 			}
 
 
 			//Create an affector of type T as a copy of the given affector
 			template <typename T>
-			auto& CreateAffector(const T &affector_t)
+			auto CreateAffector(const T &affector_t)
 			{
 				static_assert(std::is_base_of_v<Affector, T>);
 
-				auto &affector = Create(affector_t);
-				return static_cast<T&>(affector);
+				auto ptr = Create(affector_t);
+				return static_pointer_cast<T>(ptr);
 			}
 
 			//Create an affector of type T by moving the given affector
 			template <typename T>
-			auto& CreateAffector(T &&affector_t)
+			auto CreateAffector(T &&affector_t)
 			{
 				static_assert(std::is_base_of_v<Affector, T>);
 
-				auto &affector = Create(std::move(affector_t));
-				return static_cast<T&>(affector);
+				auto ptr = Create(std::move(affector_t));
+				return static_pointer_cast<T>(ptr);
 			}
 
 
 			/*
+				Affectors
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable affector with the given name
+			//Returns nullptr if affector could not be found
+			[[nodiscard]] auto GetAffector(std::string_view name) noexcept
+			{
+				return Get(name);
+			}
+
+			//Gets a pointer to an immutable affector with the given name
+			//Returns nullptr if affector could not be found
+			[[nodiscard]] auto GetAffector(std::string_view name) const noexcept
+			{
+				return Get(name);
+			}
+
+
+			/*
+				Affectors
 				Removing
 			*/
 

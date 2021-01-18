@@ -18,7 +18,7 @@ File:	IonFrameSequence.h
 
 #include "IonTextureManager.h"
 #include "managed/IonManagedObject.h"
-#include "managed/IonObjectObserver.h"
+#include "memory/IonNonOwningPtr.h"
 
 namespace ion::graphics::textures
 {
@@ -26,10 +26,9 @@ namespace ion::graphics::textures
 
 	namespace frame_sequence::detail
 	{
-		using container_type = std::vector<Texture*>; //Non-owning
+		using container_type = std::vector<NonOwningPtr<Texture>>;
 
-
-		container_type get_frames_from_first_frame(Texture &first_frame, int total_frames);
+		container_type get_frames_from_first_frame(NonOwningPtr<Texture> first_frame, int total_frames);
 	} //frame_sequence::detail
 
 
@@ -39,15 +38,6 @@ namespace ion::graphics::textures
 		private:
 
 			frame_sequence::detail::container_type frames_;
-			managed::ObjectObserver<Texture> observed_frames_;
-
-
-			bool AddFrame(Texture &frame);
-			bool AddFrames(const frame_sequence::detail::container_type &frames);
-			void ClearFrames() noexcept;
-
-			void FrameRemoved(Texture&) noexcept;
-			void AllFramesRemoved() noexcept;
 
 		public:
 			
@@ -57,9 +47,9 @@ namespace ion::graphics::textures
 
 			//Constructs a new frame sequence with the given name and frame references (textures)
 			//Duplicate frames are allowed within a frame sequence
-			template <typename... Tn, typename = std::enable_if_t<std::conjunction_v<std::is_same<Texture, Tn>...>>>
-			FrameSequence(std::string name, Texture &frame, Tn &...rest) :
-				FrameSequence{std::move(name), {&frame, &rest...}}
+			template <typename... Tn, typename = std::enable_if_t<std::conjunction_v<std::is_same<NonOwningPtr<Texture>, Tn>...>>>
+			FrameSequence(std::string name, NonOwningPtr<Texture> frame, Tn ...rest) :
+				FrameSequence{std::move(name), {frame, rest...}}
 			{
 				//Empty
 			}
@@ -70,7 +60,7 @@ namespace ion::graphics::textures
 			//First example: frame_0 and 4, produces the sequence: frame_0, frame_1, frame_2, frame_3
 			//Second example: frame_01 and 4, produces the sequence: frame_01, frame_02, frame_03, frame_04
 			//Third example: frame09 and 3, produces the sequence: frame09, frame10, frame11
-			FrameSequence(std::string name, Texture &first_frame, int total_frames);
+			FrameSequence(std::string name, NonOwningPtr<Texture> first_frame, int total_frames);
 
 
 			/*

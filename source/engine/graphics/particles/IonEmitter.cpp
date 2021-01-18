@@ -95,21 +95,6 @@ Emitter Emitter::Ring(std::string name, const Vector2 &position, const Vector2 &
 
 
 /*
-	Spawn modifiers
-*/
-
-void Emitter::ParticleTexture(textures::Texture &texture)
-{
-	particle_texture_.Observe(texture);
-}
-
-void Emitter::ParticleTexture(std::nullptr_t) noexcept
-{
-	particle_texture_.Release();
-}
-
-
-/*
 	Common functions for controlling the emitter
 */
 

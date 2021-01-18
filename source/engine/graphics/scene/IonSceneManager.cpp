@@ -29,12 +29,23 @@ namespace scene_manager::detail
 	Creating
 */
 
-Camera& SceneManager::CreateCamera(const Camera &camera)
+NonOwningPtr<Camera> SceneManager::CreateCamera(std::string name)
+{
+	return CameraBase::Create(std::move(name));
+}
+
+NonOwningPtr<Camera> SceneManager::CreateCamera(std::string name, const render::Frustum &frustum)
+{
+	return CameraBase::Create(std::move(name), frustum);
+}
+
+
+NonOwningPtr<Camera> SceneManager::CreateCamera(const Camera &camera)
 {
 	return CameraBase::Create(camera);
 }
 
-Camera& SceneManager::CreateCamera(Camera &&camera)
+NonOwningPtr<Camera> SceneManager::CreateCamera(Camera &&camera)
 {
 	return CameraBase::Create(std::move(camera));
 }
@@ -45,12 +56,12 @@ Camera& SceneManager::CreateCamera(Camera &&camera)
 	Retrieving
 */
 
-Camera* SceneManager::GetCamera(std::string_view name) noexcept
+NonOwningPtr<Camera> SceneManager::GetCamera(std::string_view name) noexcept
 {
 	return CameraBase::Get(name);
 }
 
-const Camera* SceneManager::GetCamera(std::string_view name) const noexcept
+NonOwningPtr<const Camera> SceneManager::GetCamera(std::string_view name) const noexcept
 {
 	return CameraBase::Get(name);
 }

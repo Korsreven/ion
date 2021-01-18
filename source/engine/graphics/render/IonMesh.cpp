@@ -375,7 +375,7 @@ Mesh::Mesh(const mesh::Vertices &vertices, bool visible) :
 	//Empty
 }
 
-Mesh::Mesh(const mesh::Vertices &vertices, materials::Material &material,
+Mesh::Mesh(const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 	mesh::MeshTexCoordMode tex_coord_mode, bool visible) :
 
 	Mesh{MeshDrawMode::Triangles, vertices, material, tex_coord_mode, visible}
@@ -396,12 +396,12 @@ Mesh::Mesh(mesh::MeshDrawMode draw_mode, const mesh::Vertices &vertices, bool vi
 	//Empty
 }
 
-Mesh::Mesh(mesh::MeshDrawMode draw_mode, const mesh::Vertices &vertices, materials::Material &material,
+Mesh::Mesh(mesh::MeshDrawMode draw_mode, const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 	mesh::MeshTexCoordMode tex_coord_mode, bool visible) :
 	
 	draw_mode_{draw_mode},
 	vertex_data_{detail::vertices_to_vertex_data(vertices)},
-	material_{&material},
+	material_{material},
 	tex_coord_mode_{tex_coord_mode},
 	visible_{visible},
 
@@ -419,7 +419,7 @@ Mesh::Mesh(mesh::detail::vertex_storage_type vertex_data, bool visible) :
 	//Empty
 }
 
-Mesh::Mesh(mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+Mesh::Mesh(mesh::detail::vertex_storage_type vertex_data, NonOwningPtr<materials::Material> material,
 	mesh::MeshTexCoordMode tex_coord_mode, bool visible) :
 
 	Mesh{MeshDrawMode::Triangles, std::move(vertex_data), material, tex_coord_mode, visible}
@@ -440,12 +440,12 @@ Mesh::Mesh(mesh::MeshDrawMode draw_mode, mesh::detail::vertex_storage_type verte
 	//Empty
 }
 
-Mesh::Mesh(mesh::MeshDrawMode draw_mode, mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+Mesh::Mesh(mesh::MeshDrawMode draw_mode, mesh::detail::vertex_storage_type vertex_data, NonOwningPtr<materials::Material> material,
 	mesh::MeshTexCoordMode tex_coord_mode, bool visible) :
 
 	draw_mode_{draw_mode},
 	vertex_data_{std::move(vertex_data)},
-	material_{&material},
+	material_{material},
 	tex_coord_mode_{tex_coord_mode},
 	visible_{visible},
 
@@ -508,7 +508,7 @@ void Mesh::Prepare() noexcept
 
 		//Normalize tex coords
 		if (tex_coord_mode_ == mesh::MeshTexCoordMode::Manual || material_)
-			detail::normalize_tex_coords(vertex_count_, vertex_data_, material_);
+			detail::normalize_tex_coords(vertex_count_, vertex_data_, material_.get());
 
 		update_tex_coords_ = false;
 	}

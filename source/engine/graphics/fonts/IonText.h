@@ -19,12 +19,11 @@ File:	IonText.h
 #include <utility>
 #include <vector>
 
-#include "IonTypeFaceManager.h"
+#include "IonTypeFace.h"
 #include "adaptors/ranges/IonIterable.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
-#include "managed/IonManagedObject.h"
-#include "managed/IonObservedObject.h"
+#include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
 #undef RGB
@@ -194,7 +193,7 @@ namespace ion::graphics::fonts
 			std::optional<text::TextDecoration> default_decoration_;
 			std::optional<Color> default_decoration_color_;
 
-			managed::ObservedObject<TypeFace> type_face_;
+			NonOwningPtr<TypeFace> type_face_;
 			text::TextBlocks formatted_blocks_;
 			text::MeasuredTextLines formatted_lines_;
 
@@ -202,35 +201,36 @@ namespace ion::graphics::fonts
 			text::TextBlocks MakeFormattedBlocks(std::string_view content) const;
 			text::MeasuredTextLines MakeFormattedLines(text::TextBlocks text_blocks,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
-				managed::ObservedObject<TypeFace> &type_face) const;
+				NonOwningPtr<TypeFace> type_face) const;
 
 		public:
 
 			//Construct a new (unbounded) text with the given name, content, alignment and a type face
-			Text(std::string name, std::string content, text::TextAlignment alignment, TypeFace &type_face);
+			Text(std::string name, std::string content, text::TextAlignment alignment,
+				NonOwningPtr<TypeFace> type_face);
 
 			//Construct a new (unbounded) text with the given name, content and a type face
-			Text(std::string name, std::string content, TypeFace &type_face);
+			Text(std::string name, std::string content, NonOwningPtr<TypeFace> type_face);
 
 			//Construct a new text with the given name, content, formatting,
 			//horizontal and vertical alignment, area size, padding, line height factor and a type face
 			Text(std::string name, std::string content, text::TextFormatting formatting,
 				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
-				std::optional<real> line_height_factor, TypeFace &type_face);
+				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
 			//Construct a new text (area) with the given name, content,
 			//horizontal and vertical alignment, area size, padding, line height factor and a type face
 			Text(std::string name, std::string content,
 				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
-				std::optional<real> line_height_factor, TypeFace &type_face);	
+				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);	
 
 			//Construct a new text (area) with the given name, content,
 			//area size, padding, line height factor and a type face
 			Text(std::string name, std::string content,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
-				std::optional<real> line_height_factor, TypeFace &type_face);
+				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
 
 			/*
@@ -330,10 +330,7 @@ namespace ion::graphics::fonts
 
 
 			//Attach the given type face to the text (used for lettering)
-			void Lettering(TypeFace &type_face);
-
-			//Detach the type face from the text
-			void Lettering(std::nullptr_t) noexcept;
+			void Lettering(NonOwningPtr<TypeFace> type_face) noexcept;
 
 
 			/*
@@ -443,11 +440,11 @@ namespace ion::graphics::fonts
 
 			//Returns a pointer to the mutable type face in this text (used for lettering)
 			//Returns nullptr if this text does not have a type face
-			[[nodiscard]] TypeFace* Lettering() noexcept;
+			[[nodiscard]] NonOwningPtr<TypeFace> Lettering() noexcept;
 
 			//Returns a pointer to the immutable type face in this text (used for lettering)
 			//Returns nullptr if this text does not have a type face
-			[[nodiscard]] const TypeFace* Lettering() const noexcept;
+			[[nodiscard]] NonOwningPtr<const TypeFace> Lettering() const noexcept;
 
 
 			/*

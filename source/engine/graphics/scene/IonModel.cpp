@@ -302,80 +302,80 @@ void Model::Elapse(duration time) noexcept
 	Creating
 */
 
-render::Mesh& Model::CreateMesh(const render::mesh::Vertices &vertices, bool visible)
+NonOwningPtr<render::Mesh> Model::CreateMesh(const render::mesh::Vertices &vertices, bool visible)
 {
-	auto& mesh = Create(vertices, visible);
-	Created(mesh);
-	return mesh;
+	auto ptr = Create(vertices, visible);
+	Created(*ptr);
+	return ptr;
 }
 
-render::Mesh& Model::CreateMesh(const render::mesh::Vertices &vertices, materials::Material &material,
+NonOwningPtr<render::Mesh> Model::CreateMesh(const render::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
-	auto& mesh = Create(vertices, material, tex_coord_mode, visible);
-	Created(mesh);
-	return mesh;
+	auto ptr = Create(vertices, material, tex_coord_mode, visible);
+	Created(*ptr);
+	return ptr;
 }
 
-render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, bool visible)
+NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, bool visible)
 {
-	auto& mesh = Create(draw_mode, vertices, visible);
-	Created(mesh);
-	return mesh;
+	auto ptr = Create(draw_mode, vertices, visible);
+	Created(*ptr);
+	return ptr;
 }
 
-render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, materials::Material &material,
+NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
-	auto& mesh = Create(draw_mode, vertices, material, tex_coord_mode, visible);
-	Created(mesh);
-	return mesh;
+	auto ptr = Create(draw_mode, vertices, material, tex_coord_mode, visible);
+	Created(*ptr);
+	return ptr;
 }
 
 
-render::Mesh& Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, bool visible)
+NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, bool visible)
 {
-	auto& mesh = Create(std::move(vertex_data), visible);
-	Created(mesh);
-	return mesh;
+	auto ptr = Create(std::move(vertex_data), visible);
+	Created(*ptr);
+	return ptr;
 }
 
-render::Mesh& Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, NonOwningPtr<materials::Material> material,
 	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
-	auto& mesh = Create(std::move(vertex_data), material, tex_coord_mode, visible);
-	Created(mesh);
-	return mesh;
+	auto ptr = Create(std::move(vertex_data), material, tex_coord_mode, visible);
+	Created(*ptr);
+	return ptr;
 }
 
-render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, bool visible)
+NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, bool visible)
 {
-	auto& mesh = Create(draw_mode, std::move(vertex_data), visible);
-	Created(mesh);
-	return mesh;
+	auto ptr = Create(draw_mode, std::move(vertex_data), visible);
+	Created(*ptr);
+	return ptr;
 }
 
-render::Mesh& Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, NonOwningPtr<materials::Material> material,
 	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
-	auto& mesh = Create(draw_mode, std::move(vertex_data), material, tex_coord_mode, visible);
-	Created(mesh);
-	return mesh;
+	auto ptr = Create(draw_mode, std::move(vertex_data), material, tex_coord_mode, visible);
+	Created(*ptr);
+	return ptr;
 }
 
 
-render::Mesh& Model::CreateMesh(const render::Mesh &mesh)
+NonOwningPtr<render::Mesh> Model::CreateMesh(const render::Mesh &mesh)
 {
-	auto& ref = Create(mesh);
-	Created(ref);
-	return ref;
+	auto ptr = Create(mesh);
+	Created(*ptr);
+	return ptr;
 }
 
-render::Mesh& Model::CreateMesh(render::Mesh &&mesh)
+NonOwningPtr<render::Mesh> Model::CreateMesh(render::Mesh &&mesh)
 {
-	auto& ref = Create(std::move(mesh));
-	Created(mesh);
-	return ref;
+	auto ptr = Create(std::move(mesh));
+	Created(*ptr);
+	return ptr;
 }
 
 

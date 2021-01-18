@@ -31,18 +31,18 @@ namespace particle_system_manager::detail
 	Creating
 */
 
-ParticleSystem& ParticleSystemManager::CreateParticleSystem(std::string name)
+NonOwningPtr<ParticleSystem> ParticleSystemManager::CreateParticleSystem(std::string name)
 {
 	return Create(std::move(name));
 }
 
-ParticleSystem& ParticleSystemManager::CreateParticleSystem(std::string name, particle_system::ParticlePrimitive particle_primitive)
+NonOwningPtr<ParticleSystem> ParticleSystemManager::CreateParticleSystem(std::string name, particle_system::ParticlePrimitive particle_primitive)
 {
 	return Create(std::move(name), particle_primitive);
 }
 
 
-ParticleSystem& ParticleSystemManager::CreateParticleSystem(ParticleSystem &&particle_system)
+NonOwningPtr<ParticleSystem> ParticleSystemManager::CreateParticleSystem(ParticleSystem &&particle_system)
 {
 	return Create(std::move(particle_system));
 }
@@ -53,12 +53,12 @@ ParticleSystem& ParticleSystemManager::CreateParticleSystem(ParticleSystem &&par
 	Retrieving
 */
 
-ParticleSystem* ParticleSystemManager::GetParticleSystem(std::string_view name) noexcept
+NonOwningPtr<ParticleSystem> ParticleSystemManager::GetParticleSystem(std::string_view name) noexcept
 {
 	return Get(name);
 }
 
-const ParticleSystem* ParticleSystemManager::GetParticleSystem(std::string_view name) const noexcept
+NonOwningPtr<const ParticleSystem> ParticleSystemManager::GetParticleSystem(std::string_view name) const noexcept
 {
 	return Get(name);
 }

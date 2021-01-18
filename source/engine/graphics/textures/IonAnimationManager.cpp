@@ -28,53 +28,53 @@ namespace animation_manager::detail
 
 
 /*
-	Animation
+	Animations
 	Creating
 */
 
-Animation& AnimationManager::CreateAnimation(std::string name, FrameSequence &frame_sequence,
+NonOwningPtr<Animation> AnimationManager::CreateAnimation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 	duration cycle_duration, std::optional<int> repeat_count,
 	animation::PlaybackDirection direction, real playback_rate)
 {
-	return Create(std::move(name), std::ref(frame_sequence), cycle_duration, repeat_count, direction, playback_rate);
+	return Create(std::move(name), frame_sequence, cycle_duration, repeat_count, direction, playback_rate);
 }
 
-Animation& AnimationManager::CreateAnimation(std::string name, FrameSequence &frame_sequence,
+NonOwningPtr<Animation> AnimationManager::CreateAnimation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 	duration cycle_duration, std::optional<int> repeat_count, real playback_rate)
 {
-	return Create(std::move(name), std::ref(frame_sequence), cycle_duration, repeat_count, playback_rate);
+	return Create(std::move(name), frame_sequence, cycle_duration, repeat_count, playback_rate);
 }
 
 
-Animation& AnimationManager::CreateAnimation(const Animation &animation)
+NonOwningPtr<Animation> AnimationManager::CreateAnimation(const Animation &animation)
 {
 	return Create(animation);
 }
 
-Animation& AnimationManager::CreateAnimation(Animation &&animation)
+NonOwningPtr<Animation> AnimationManager::CreateAnimation(Animation &&animation)
 {
 	return Create(std::move(animation));
 }
 
 
 /*
-	Animation
+	Animations
 	Retrieving
 */
 
-Animation* AnimationManager::GetAnimation(std::string_view name) noexcept
+NonOwningPtr<Animation> AnimationManager::GetAnimation(std::string_view name) noexcept
 {
 	return Get(name);
 }
 
-const Animation* AnimationManager::GetAnimation(std::string_view name) const noexcept
+NonOwningPtr<const Animation> AnimationManager::GetAnimation(std::string_view name) const noexcept
 {
 	return Get(name);
 }
 
 
 /*
-	Animation
+	Animations
 	Removing
 */
 

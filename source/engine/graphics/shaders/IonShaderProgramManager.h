@@ -20,6 +20,7 @@ File:	IonShaderProgramManager.h
 #include <type_traits>
 
 #include "IonShaderProgram.h"
+#include "memory/IonNonOwningPtr.h"
 #include "resources/IonResourceManager.h"
 #include "types/IonTypes.h"
 #include "variables/IonShaderTypes.h"
@@ -332,14 +333,14 @@ namespace ion::graphics::shaders
 			*/
 
 			//Create a shader program with the given name and a shader
-			ShaderProgram& CreateShaderProgram(std::string name, Shader &shader);
+			NonOwningPtr<ShaderProgram> CreateShaderProgram(std::string name, NonOwningPtr<Shader> shader);
 
 			//Create a shader program with the given name, a vertex and fragment shader
-			ShaderProgram& CreateShaderProgram(std::string name, Shader &vertex_shader, Shader &fragment_shader);
+			NonOwningPtr<ShaderProgram> CreateShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader);
 
 
 			//Create a shader program by moving the given shader program
-			ShaderProgram& CreateShaderProgram(ShaderProgram &&shader_program);
+			NonOwningPtr<ShaderProgram> CreateShaderProgram(ShaderProgram &&shader_program);
 
 
 			/*
@@ -349,11 +350,11 @@ namespace ion::graphics::shaders
 
 			//Gets a pointer to a mutable shader program with the given name
 			//Returns nullptr if shader program could not be found
-			[[nodiscard]] ShaderProgram* GetShaderProgram(std::string_view name) noexcept;
+			[[nodiscard]] NonOwningPtr<ShaderProgram> GetShaderProgram(std::string_view name) noexcept;
 
 			//Gets a pointer to an immutable shader program with the given name
 			//Returns nullptr if shader program could not be found
-			[[nodiscard]] const ShaderProgram* GetShaderProgram(std::string_view name) const noexcept;
+			[[nodiscard]] NonOwningPtr<const ShaderProgram> GetShaderProgram(std::string_view name) const noexcept;
 
 
 			/*

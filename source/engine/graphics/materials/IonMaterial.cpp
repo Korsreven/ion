@@ -86,18 +86,16 @@ std::pair<Vector2, Vector2> get_normalized_tex_coords(const Vector2 &lower_left,
 	Texture map
 */
 
-std::pair<const Animation*, const Texture*> get_texture_maps(const map_type &map) noexcept
+map_pair_type get_texture_maps(const map_type &map) noexcept
 {
-	using result_type = std::pair<const Animation*, const Texture*>;
-
 	return std::visit(types::overloaded{
-		[](std::monostate) -> result_type { return {nullptr, nullptr}; },
-		[](const managed::ObservedObject<Animation> &animation) -> result_type { return {animation.Object(), nullptr}; },
-		[](const managed::ObservedObject<Texture> &texture) -> result_type { return {nullptr, texture.Object()}; }	
+		[](std::monostate) -> map_pair_type { return {nullptr, nullptr}; },
+		[](NonOwningPtr<Animation> animation) -> map_pair_type { return {animation, nullptr}; },
+		[](NonOwningPtr<Texture> texture) -> map_pair_type { return {nullptr, texture}; }	
 	}, map);
 }
 
-const Texture* get_texture_map(const map_type &map) noexcept
+NonOwningPtr<Texture> get_texture_map(const map_type &map) noexcept
 {
 	if (auto [animation, texture] = get_texture_maps(map); texture || animation)
 		return animation ? animation->UnderlyingFrameSequence()->FirstFrame() : texture;
@@ -105,7 +103,7 @@ const Texture* get_texture_map(const map_type &map) noexcept
 		return nullptr;
 }
 
-const Texture* get_first_texture_map(const map_type &diffuse_map, const map_type &specular_map, const map_type &normal_map) noexcept
+NonOwningPtr<Texture> get_first_texture_map(const map_type &diffuse_map, const map_type &specular_map, const map_type &normal_map) noexcept
 {
 	if (auto texture = get_texture_map(diffuse_map); texture)
 		return texture;
@@ -169,7 +167,7 @@ Material::Material(std::string name,
 
 Material::Material(std::string name,
 	const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-	Animation *diffuse_map, Animation *specular_map, Animation *normal_map) :
+	NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> normal_map) :
 
 	Material{std::move(name), ambient, diffuse, specular, shininess, diffuse_map, specular_map, normal_map, {}}
 {
@@ -178,7 +176,7 @@ Material::Material(std::string name,
 
 Material::Material(std::string name,
 	const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-	Animation *diffuse_map, Animation *specular_map, Animation *normal_map,
+	NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> normal_map,
 	const std::optional<Color> &emissive, bool receive_shadows) :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
@@ -188,23 +186,20 @@ Material::Material(std::string name,
 	specular_color_{specular},
 	shininess_{shininess},
 
+	diffuse_map_{diffuse_map},
+	specular_map_{specular_map},
+	normal_map_{normal_map},
+
 	emissive_color_{emissive},
 	receive_shadows_{receive_shadows}
 {
-	if (diffuse_map)
-		DiffuseMap(*diffuse_map);
-
-	if (specular_map)
-		SpecularMap(*specular_map);
-
-	if (normal_map)
-		NormalMap(*normal_map);
+	//Empty
 }
 
 
 Material::Material(std::string name,
 	const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-	Texture *diffuse_map, Texture *specular_map, Texture *normal_map) :
+	NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> normal_map) :
 
 	Material{std::move(name), ambient, diffuse, specular, shininess, diffuse_map, specular_map, normal_map, {}}
 {
@@ -213,7 +208,7 @@ Material::Material(std::string name,
 
 Material::Material(std::string name,
 	const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-	Texture *diffuse_map, Texture *specular_map, Texture *normal_map,
+	NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> normal_map,
 	const std::optional<Color> &emissive, bool receive_shadows) :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
@@ -223,17 +218,14 @@ Material::Material(std::string name,
 	specular_color_{specular},
 	shininess_{shininess},
 
+	diffuse_map_{diffuse_map},
+	specular_map_{specular_map},
+	normal_map_{normal_map},
+
 	emissive_color_{emissive},
 	receive_shadows_{receive_shadows}
 {
-	if (diffuse_map)
-		DiffuseMap(*diffuse_map);
-
-	if (specular_map)
-		SpecularMap(*specular_map);
-
-	if (normal_map)
-		NormalMap(*normal_map);
+	//Empty
 }
 
 
@@ -241,24 +233,14 @@ Material::Material(std::string name,
 	Modifiers
 */
 
-void Material::DiffuseMap(Animation &animation)
+void Material::DiffuseMap(NonOwningPtr<Animation> animation) noexcept
 {
-	DiffuseMap(nullptr);
-
-	std::visit(types::overloaded{
-		[&](std::monostate) { diffuse_map_ = managed::ObservedObject<Animation>{animation}; },
-		[](auto&&) {} //Something still attached
-	}, diffuse_map_);
+	diffuse_map_ = animation;
 }
 
-void Material::DiffuseMap(Texture &texture)
+void Material::DiffuseMap(NonOwningPtr<Texture> texture) noexcept
 {
-	DiffuseMap(nullptr);
-
-	std::visit(types::overloaded{
-		[&](std::monostate) { diffuse_map_ = managed::ObservedObject<Texture>{texture}; },
-		[](auto&&) {} //Something still attached
-	}, diffuse_map_);
+	diffuse_map_ = texture;
 }
 
 void Material::DiffuseMap(std::nullptr_t) noexcept
@@ -267,24 +249,14 @@ void Material::DiffuseMap(std::nullptr_t) noexcept
 }
 
 
-void Material::SpecularMap(Animation &animation)
+void Material::SpecularMap(NonOwningPtr<Animation> animation) noexcept
 {
-	SpecularMap(nullptr);
-
-	std::visit(types::overloaded{
-		[&](std::monostate) { specular_map_ = managed::ObservedObject<Animation>{animation}; },
-		[](auto&&) {} //Something still attached
-	}, specular_map_);
+	specular_map_ = animation;
 }
 
-void Material::SpecularMap(Texture &texture)
+void Material::SpecularMap(NonOwningPtr<Texture> texture) noexcept
 {
-	SpecularMap(nullptr);
-
-	std::visit(types::overloaded{
-		[&](std::monostate) { specular_map_ = managed::ObservedObject<Texture>{texture}; },
-		[](auto&&) {} //Something still attached
-	}, specular_map_);
+	specular_map_ = texture;
 }
 
 void Material::SpecularMap(std::nullptr_t) noexcept
@@ -293,24 +265,14 @@ void Material::SpecularMap(std::nullptr_t) noexcept
 }
 
 
-void Material::NormalMap(Animation &animation)
+void Material::NormalMap(NonOwningPtr<Animation> animation) noexcept
 {
-	NormalMap(nullptr);
-
-	std::visit(types::overloaded{
-		[&](std::monostate) { normal_map_ = managed::ObservedObject<Animation>{animation}; },
-		[](auto&&) {} //Something still attached
-	}, normal_map_);
+	normal_map_ = animation;
 }
 
-void Material::NormalMap(Texture &texture)
+void Material::NormalMap(NonOwningPtr<Texture> texture) noexcept
 {
-	NormalMap(nullptr);
-
-	std::visit(types::overloaded{
-		[&](std::monostate) { normal_map_ = managed::ObservedObject<Texture>{texture}; },
-		[](auto&&) {} //Something still attached
-	}, normal_map_);
+	normal_map_ = texture;
 }
 
 void Material::NormalMap(std::nullptr_t) noexcept
@@ -323,23 +285,23 @@ void Material::NormalMap(std::nullptr_t) noexcept
 	Observers
 */
 
-std::pair<const Animation*, const Texture*> Material::DiffuseMap() const noexcept
+detail::map_pair_type Material::DiffuseMap() const noexcept
 {
 	return detail::get_texture_maps(diffuse_map_);
 }
 
-std::pair<const Animation*, const Texture*> Material::SpecularMap() const noexcept
+detail::map_pair_type Material::SpecularMap() const noexcept
 {
 	return detail::get_texture_maps(specular_map_);
 }
 
-std::pair<const Animation*, const Texture*> Material::NormalMap() const noexcept
+detail::map_pair_type Material::NormalMap() const noexcept
 {
 	return detail::get_texture_maps(normal_map_);
 }
 
 
-const Texture* Material::DiffuseMap(duration time) const noexcept
+NonOwningPtr<Texture> Material::DiffuseMap(duration time) const noexcept
 {
 	if (auto [animation, texture] = DiffuseMap(); animation)
 		return animation->FrameAt(time);
@@ -349,7 +311,7 @@ const Texture* Material::DiffuseMap(duration time) const noexcept
 		return nullptr;
 }
 
-const Texture* Material::SpecularMap(duration time) const noexcept
+NonOwningPtr<Texture> Material::SpecularMap(duration time) const noexcept
 {
 	if (auto [animation, texture] = SpecularMap(); animation)
 		return animation->FrameAt(time);
@@ -359,7 +321,7 @@ const Texture* Material::SpecularMap(duration time) const noexcept
 		return nullptr;
 }
 
-const Texture* Material::NormalMap(duration time) const noexcept
+NonOwningPtr<Texture> Material::NormalMap(duration time) const noexcept
 {
 	if (auto [animation, texture] = NormalMap(); animation)
 		return animation->FrameAt(time);

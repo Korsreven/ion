@@ -20,22 +20,22 @@ namespace ion::timers
 	Creating
 */
 
-Timer& TimerManager::CreateTimer(std::string name, duration interval)
+NonOwningPtr<Timer> TimerManager::CreateTimer(std::string name, duration interval)
 {
 	return Create(std::move(name), interval);
 }
 
-Timer& TimerManager::CreateTimer(std::string name, duration interval, events::Callback<void, Timer&> on_tick)
+NonOwningPtr<Timer> TimerManager::CreateTimer(std::string name, duration interval, events::Callback<void, Timer&> on_tick)
 {
 	return Create(std::move(name), interval, on_tick);
 }
 
-Timer& TimerManager::CreateTimer(const Timer &timer)
+NonOwningPtr<Timer> TimerManager::CreateTimer(const Timer &timer)
 {
 	return Create(timer);
 }
 
-Timer& TimerManager::CreateTimer(Timer &&timer)
+NonOwningPtr<Timer> TimerManager::CreateTimer(Timer &&timer)
 {
 	return Create(std::move(timer));
 }
@@ -46,12 +46,12 @@ Timer& TimerManager::CreateTimer(Timer &&timer)
 	Retrieving
 */
 
-Timer* TimerManager::GetTimer(std::string_view name) noexcept
+NonOwningPtr<Timer> TimerManager::GetTimer(std::string_view name) noexcept
 {
 	return Get(name);
 }
 
-const Timer* TimerManager::GetTimer(std::string_view name) const noexcept
+NonOwningPtr<const Timer> TimerManager::GetTimer(std::string_view name) const noexcept
 {
 	return Get(name);
 }

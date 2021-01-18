@@ -18,6 +18,7 @@ File:	IonParticleSystemManager.h
 
 #include "IonParticleSystem.h"
 #include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 
 namespace ion::graphics::particles
 {
@@ -78,14 +79,14 @@ namespace ion::graphics::particles
 		*/
 
 		//Create a particle system with the given name
-		ParticleSystem& CreateParticleSystem(std::string name);
+		NonOwningPtr<ParticleSystem> CreateParticleSystem(std::string name);
 
 		//Create a particle system with the given name and particle primitive
-		ParticleSystem& CreateParticleSystem(std::string name, particle_system::ParticlePrimitive particle_primitive);
+		NonOwningPtr<ParticleSystem> CreateParticleSystem(std::string name, particle_system::ParticlePrimitive particle_primitive);
 
 
 		//Create a particle system by moving the given particle system
-		ParticleSystem& CreateParticleSystem(ParticleSystem &&particle_system);
+		NonOwningPtr<ParticleSystem> CreateParticleSystem(ParticleSystem &&particle_system);
 
 
 		/*
@@ -95,11 +96,11 @@ namespace ion::graphics::particles
 
 		//Gets a pointer to a mutable particle system with the given name
 		//Returns nullptr if particle system could not be found
-		[[nodiscard]] ParticleSystem* GetParticleSystem(std::string_view name) noexcept;
+		[[nodiscard]] NonOwningPtr<ParticleSystem> GetParticleSystem(std::string_view name) noexcept;
 
 		//Gets a pointer to an immutable particle system with the given name
 		//Returns nullptr if particle system could not be found
-		[[nodiscard]] const ParticleSystem* GetParticleSystem(std::string_view name) const noexcept;
+		[[nodiscard]] NonOwningPtr<const ParticleSystem> GetParticleSystem(std::string_view name) const noexcept;
 
 
 		/*

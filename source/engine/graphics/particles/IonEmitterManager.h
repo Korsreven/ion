@@ -15,6 +15,7 @@ File:	IonEmitterManager.h
 
 #include "IonEmitter.h"
 #include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 
 namespace ion::graphics::particles
 {
@@ -69,38 +70,47 @@ namespace ion::graphics::particles
 
 
 			/*
+				Emitters
 				Creating
 			*/
 
-			//Create an emitter with the given name and arguments
-			template <typename... Args>
-			auto& CreateEmitter(std::string name, Args &&...args)
-			{
-				return Create(std::move(name), std::forward<Args>(args)...);
-			}
+			//Create an emitter with the given name
+			NonOwningPtr<Emitter> CreateEmitter(std::string name);
+
+			//Create an emitter with the given name and initial values
+			NonOwningPtr<Emitter> CreateEmitter(std::string name, emitter::EmitterType type, const Vector2 &position, const Vector2 &direction,
+				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
+				std::optional<duration> emission_duration, int particle_quota = 100);
+
 
 			//Create an emitter by moving the given emitter
-			auto& CreateEmitter(Emitter &&emitter)
-			{
-				return Create(std::move(emitter));
-			}
+			NonOwningPtr<Emitter> CreateEmitter(Emitter &&emitter);
 
 
 			/*
+				Emitters
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable emitter with the given name
+			//Returns nullptr if emitter could not be found
+			[[nodiscard]] NonOwningPtr<Emitter> GetEmitter(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable emitter with the given name
+			//Returns nullptr if emitter could not be found
+			[[nodiscard]] NonOwningPtr<const Emitter> GetEmitter(std::string_view name) const noexcept;
+
+
+			/*
+				Emitters
 				Removing
 			*/
 
 			//Clear all emitters from this manager
-			void ClearEmitters() noexcept
-			{
-				Clear();
-			}
+			void ClearEmitters() noexcept;
 
 			//Remove an emitter from this manager
-			auto RemoveEmitter(Emitter &Emitter) noexcept
-			{
-				return Remove(Emitter);
-			}
+			bool RemoveEmitter(Emitter &Emitter) noexcept;
 	};
 } //ion::graphics::particles
 

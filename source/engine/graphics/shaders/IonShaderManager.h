@@ -20,6 +20,7 @@ File:	IonShaderManager.h
 
 #include "IonShader.h"
 #include "assets/repositories/IonShaderRepository.h"
+#include "memory/IonNonOwningPtr.h"
 #include "resources/IonFileResourceManager.h"
 
 namespace ion::graphics::shaders
@@ -134,14 +135,14 @@ namespace ion::graphics::shaders
 			*/
 
 			//Create a shader with the given name and asset name
-			Shader& CreateShader(std::string name, std::string asset_name);
+			NonOwningPtr<Shader> CreateShader(std::string name, std::string asset_name);
 
 
 			//Create a shader as a copy of the given shader
-			Shader& CreateShader(const Shader &shader);
+			NonOwningPtr<Shader> CreateShader(const Shader &shader);
 
 			//Create a shader by moving the given shader
-			Shader& CreateShader(Shader &&shader);
+			NonOwningPtr<Shader> CreateShader(Shader &&shader);
 
 
 			/*
@@ -151,11 +152,11 @@ namespace ion::graphics::shaders
 
 			//Gets a pointer to a mutable shader with the given name
 			//Returns nullptr if shader could not be found
-			[[nodiscard]] Shader* GetShader(std::string_view name) noexcept;
+			[[nodiscard]] NonOwningPtr<Shader> GetShader(std::string_view name) noexcept;
 
 			//Gets a pointer to an immutable shader with the given name
 			//Returns nullptr if shader could not be found
-			[[nodiscard]] const Shader* GetShader(std::string_view name) const noexcept;
+			[[nodiscard]] NonOwningPtr<const Shader> GetShader(std::string_view name) const noexcept;
 
 
 			/*

@@ -23,6 +23,7 @@ File:	IonRenderTarget.h
 #include "graphics/render/IonViewport.h"
 #include "graphics/utilities/IonVector2.h"
 #include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 
 namespace ion::graphics::render
 {
@@ -166,11 +167,23 @@ namespace ion::graphics::render
 				Creating
 			*/
 
+			//Create a viewport with the given name and connected to a given render target
+			NonOwningPtr<Viewport> CreateViewport(std::string name, RenderTarget &render_target) noexcept;
+
+			//Create a viewport with the given name, connected to a given render target and with the given bounds (region)
+			NonOwningPtr<Viewport> CreateViewport(std::string name, RenderTarget &render_target, const Aabb &bounds) noexcept;
+
+			//Create a viewport with the given name, connected to a given render target and with the given bounds (region) and anchors
+			NonOwningPtr<Viewport> CreateViewport(std::string name, RenderTarget &render_target, const Aabb &bounds,
+				viewport::HorizontalAnchorType left_anchor, viewport::HorizontalAnchorType right_anchor,
+				viewport::VerticalAnchorType top_anchor, viewport::VerticalAnchorType bottom_anchor) noexcept;
+
+
 			//Create a viewport as a copy of the given viewport
-			Viewport& CreateViewport(const Viewport &viewport);
+			NonOwningPtr<Viewport> CreateViewport(const Viewport &viewport);
 
 			//Create a viewport by moving the given viewport
-			Viewport& CreateViewport(Viewport &&viewport);
+			NonOwningPtr<Viewport> CreateViewport(Viewport &&viewport);
 
 
 			/*
@@ -180,11 +193,11 @@ namespace ion::graphics::render
 
 			//Gets a pointer to a mutable viewport with the given name
 			//Returns nullptr if viewport could not be found
-			[[nodiscard]] Viewport* GetViewport(std::string_view name) noexcept;
+			[[nodiscard]] NonOwningPtr<Viewport> GetViewport(std::string_view name) noexcept;
 
 			//Gets a pointer to an immutable viewport with the given name
 			//Returns nullptr if viewport could not be found
-			[[nodiscard]] const Viewport* GetViewport(std::string_view name) const noexcept;
+			[[nodiscard]] NonOwningPtr<const Viewport> GetViewport(std::string_view name) const noexcept;
 
 
 			/*

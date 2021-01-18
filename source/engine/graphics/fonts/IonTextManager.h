@@ -21,6 +21,7 @@ File:	IonTextManager.h
 
 #include "IonText.h"
 #include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 
 namespace ion::graphics::fonts
 {
@@ -81,37 +82,38 @@ namespace ion::graphics::fonts
 		*/
 
 		//Create a (unbounded) text with the given name, content, alignment and a type face
-		Text& CreateText(std::string name, std::string content, text::TextAlignment alignment, TypeFace &type_face);
+		NonOwningPtr<Text> CreateText(std::string name, std::string content, text::TextAlignment alignment,
+			NonOwningPtr<TypeFace> type_face);
 
 		//Create a (unbounded) text with the given name, content and a type face
-		Text& CreateText(std::string name, std::string content, TypeFace &type_face);
+		NonOwningPtr<Text> CreateText(std::string name, std::string content, NonOwningPtr<TypeFace> type_face);
 
 		//Create a text with the given name, content, formatting,
 		//horizontal and vertical alignment, area size, padding, line height factor and a type face
-		Text& CreateText(std::string name, std::string content, text::TextFormatting formatting,
+		NonOwningPtr<Text> CreateText(std::string name, std::string content, text::TextFormatting formatting,
 			text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 			const std::optional<Vector2> &area_size, const Vector2 &padding,
-			std::optional<real> line_height_factor, TypeFace &type_face);
+			std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
 		//Create a text (area) with the given name, content,
 		//horizontal and vertical alignment, area size, padding, line height factor and a type face
-		Text& CreateText(std::string name, std::string content,
+		NonOwningPtr<Text> CreateText(std::string name, std::string content,
 			text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 			const std::optional<Vector2> &area_size, const Vector2 &padding,
-			std::optional<real> line_height_factor, TypeFace &type_face);
+			std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
 		//Create a text (area) with the given name, content,
 		//area size, padding, line height factor and a type face
-		Text& CreateText(std::string name, std::string content,
+		NonOwningPtr<Text> CreateText(std::string name, std::string content,
 			const std::optional<Vector2> &area_size, const Vector2 &padding,
-			std::optional<real> line_height_factor, TypeFace &type_face);
+			std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
 
 		//Create a text as a copy of the given text
-		Text& CreateText(const Text &text);
+		NonOwningPtr<Text> CreateText(const Text &text);
 
 		//Create a text by moving the given text
-		Text& CreateText(Text &&text);
+		NonOwningPtr<Text> CreateText(Text &&text);
 
 
 		/*
@@ -121,11 +123,11 @@ namespace ion::graphics::fonts
 
 		//Gets a pointer to a mutable text with the given name
 		//Returns nullptr if text could not be found
-		[[nodiscard]] Text* GetText(std::string_view name) noexcept;
+		[[nodiscard]] NonOwningPtr<Text> GetText(std::string_view name) noexcept;
 
 		//Gets a pointer to an immutable text with the given name
 		//Returns nullptr if text could not be found
-		[[nodiscard]] const Text* GetText(std::string_view name) const noexcept;
+		[[nodiscard]] NonOwningPtr<const Text> GetText(std::string_view name) const noexcept;
 
 
 		/*

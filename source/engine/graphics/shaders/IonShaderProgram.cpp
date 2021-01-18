@@ -15,7 +15,7 @@ File:	IonShaderProgram.cpp
 namespace ion::graphics::shaders
 {
 
-ShaderProgram::ShaderProgram(std::string name, Shader &shader) :
+ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> shader) :
 	resources::Resource<ShaderProgramManager>{std::move(name)}
 {
 	//The given shader can either be a vertex or a fragment shader, try both
@@ -23,7 +23,7 @@ ShaderProgram::ShaderProgram(std::string name, Shader &shader) :
 	FragmentShader(shader);
 }
 
-ShaderProgram::ShaderProgram(std::string name, Shader &vertex_shader, Shader &fragment_shader) :
+ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader) :
 	resources::Resource<ShaderProgramManager>{std::move(name)}
 {
 	//The given shaders much match the correct shader type
@@ -36,27 +36,26 @@ ShaderProgram::ShaderProgram(std::string name, Shader &vertex_shader, Shader &fr
 	Modifiers
 */
 
-void ShaderProgram::VertexShader(Shader &shader)
+void ShaderProgram::VertexShader(NonOwningPtr<Shader> shader) noexcept
 {
-	if (shader.Type() == shader::ShaderType::Vertex)
-		vertex_shader_.Observe(shader);
+	if (shader)
+	{
+		if (shader->Type() == shader::ShaderType::Vertex)
+			vertex_shader_ = shader;
+	}
+	else
+		vertex_shader_ = nullptr;
 }
 
-void ShaderProgram::VertexShader(std::nullptr_t) noexcept
+void ShaderProgram::FragmentShader(NonOwningPtr<Shader> shader) noexcept
 {
-	vertex_shader_.Release();
-}
-
-
-void ShaderProgram::FragmentShader(Shader &shader)
-{
-	if (shader.Type() == shader::ShaderType::Fragment)
-		fragment_shader_.Observe(shader);
-}
-
-void ShaderProgram::FragmentShader(std::nullptr_t) noexcept
-{
-	fragment_shader_.Release();
+	if (shader)
+	{
+		if (shader->Type() == shader::ShaderType::Fragment)
+			fragment_shader_ = shader;
+	}
+	else
+		fragment_shader_ = nullptr;
 }
 
 
@@ -65,12 +64,12 @@ void ShaderProgram::FragmentShader(std::nullptr_t) noexcept
 	Retrieving
 */
 
-variables::AttributeVariable* ShaderProgram::GetAttribute(std::string_view name) noexcept
+NonOwningPtr<variables::AttributeVariable> ShaderProgram::GetAttribute(std::string_view name) noexcept
 {
 	return AttributeVariablesBase::Get(name);
 }
 
-const variables::AttributeVariable* ShaderProgram::GetAttribute(std::string_view name) const noexcept
+NonOwningPtr<const variables::AttributeVariable> ShaderProgram::GetAttribute(std::string_view name) const noexcept
 {
 	return AttributeVariablesBase::Get(name);
 }
@@ -102,12 +101,12 @@ bool ShaderProgram::RemoveAttribute(std::string_view name) noexcept
 	Retrieving
 */
 
-variables::UniformVariable* ShaderProgram::GetUniform(std::string_view name) noexcept
+NonOwningPtr<variables::UniformVariable> ShaderProgram::GetUniform(std::string_view name) noexcept
 {
 	return UniformVariablesBase::Get(name);
 }
 
-const variables::UniformVariable* ShaderProgram::GetUniform(std::string_view name) const noexcept
+NonOwningPtr<const variables::UniformVariable> ShaderProgram::GetUniform(std::string_view name) const noexcept
 {
 	return UniformVariablesBase::Get(name);
 }

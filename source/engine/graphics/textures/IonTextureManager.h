@@ -23,6 +23,7 @@ File:	IonTextureManager.h
 
 #include "IonTexture.h"
 #include "assets/repositories/IonImageRepository.h"
+#include "memory/IonNonOwningPtr.h"
 #include "resources/IonFileResourceManager.h"
 #include "types/IonTypes.h"
 
@@ -312,28 +313,28 @@ namespace ion::graphics::textures
 			*/
 
 			//Create a texture with the given name and asset name
-			Texture& CreateTexture(std::string name, std::string asset_name);
+			NonOwningPtr<Texture> CreateTexture(std::string name, std::string asset_name);
 
 			//Create a texture with the given name, asset name, texture filter for min/mag, mip filter and texture wrap for s/t
-			Texture& CreateTexture(std::string name, std::string asset_name,
+			NonOwningPtr<Texture> CreateTexture(std::string name, std::string asset_name,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode);
 
 			//Create a texture with the given name, asset name, texture filter, mip filter and texture wrap
-			Texture& CreateTexture(std::string name, std::string asset_name,
+			NonOwningPtr<Texture> CreateTexture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::MipmapFilter mip_filter,
 				texture::TextureWrapMode wrap_mode);
 
 			//Create a texture with the given name, asset name, texture filter and texture wrap (no mipmap)
-			Texture& CreateTexture(std::string name, std::string asset_name,
+			NonOwningPtr<Texture> CreateTexture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode);
 
 
 			//Create a texture as a copy of the given texture
-			Texture& CreateTexture(const Texture &texture);
+			NonOwningPtr<Texture> CreateTexture(const Texture &texture);
 
 			//Create a texture by moving the given texture
-			Texture& CreateTexture(Texture &&texture);
+			NonOwningPtr<Texture> CreateTexture(Texture &&texture);
 
 
 			/*
@@ -343,11 +344,11 @@ namespace ion::graphics::textures
 
 			//Gets a pointer to a mutable texture with the given name
 			//Returns nullptr if texture could not be found
-			[[nodiscard]] Texture* GetTexture(std::string_view name) noexcept;
+			[[nodiscard]] NonOwningPtr<Texture> GetTexture(std::string_view name) noexcept;
 
 			//Gets a pointer to an immutable texture with the given name
 			//Returns nullptr if texture could not be found
-			[[nodiscard]] const Texture* GetTexture(std::string_view name) const noexcept;
+			[[nodiscard]] NonOwningPtr<const Texture> GetTexture(std::string_view name) const noexcept;
 
 
 			/*

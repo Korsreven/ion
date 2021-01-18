@@ -70,10 +70,10 @@ text::TextBlocks Text::MakeFormattedBlocks(std::string_view content) const
 
 text::MeasuredTextLines Text::MakeFormattedLines(text::TextBlocks text_blocks,
 	const std::optional<Vector2> &area_size, const Vector2 &padding,
-	managed::ObservedObject<TypeFace> &type_face) const
+	NonOwningPtr<TypeFace> type_face) const
 {
 	if (type_face)
-		return detail::formatted_blocks_to_formatted_lines(std::move(text_blocks), area_size, padding, *type_face.Object());
+		return detail::formatted_blocks_to_formatted_lines(std::move(text_blocks), area_size, padding, *type_face);
 	else
 		return {};
 }
@@ -81,7 +81,8 @@ text::MeasuredTextLines Text::MakeFormattedLines(text::TextBlocks text_blocks,
 
 //Public
 
-Text::Text(std::string name, std::string content, text::TextAlignment alignment, TypeFace &type_face) :
+Text::Text(std::string name, std::string content, text::TextAlignment alignment,
+	NonOwningPtr<TypeFace> type_face) :
 	
 	managed::ManagedObject<TextManager>{std::move(name)},
 
@@ -95,7 +96,7 @@ Text::Text(std::string name, std::string content, text::TextAlignment alignment,
 	//Empty
 }
 
-Text::Text(std::string name, std::string content, TypeFace &type_face) :
+Text::Text(std::string name, std::string content, NonOwningPtr<TypeFace> type_face) :
 
 	Text{std::move(name), std::move(content), text::TextAlignment::Left, type_face}
 {
@@ -105,7 +106,7 @@ Text::Text(std::string name, std::string content, TypeFace &type_face) :
 Text::Text(std::string name, std::string content, text::TextFormatting formatting,
 	text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 	const std::optional<Vector2> &area_size, const Vector2 &padding,
-	std::optional<real> line_height_factor, TypeFace &type_face) :
+	std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face) :
 
 	managed::ManagedObject<TextManager>{std::move(name)},
 
@@ -127,7 +128,7 @@ Text::Text(std::string name, std::string content, text::TextFormatting formattin
 Text::Text(std::string name, std::string content,
 	text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 	const std::optional<Vector2> &area_size, const Vector2 &padding,
-	std::optional<real> line_height_factor, TypeFace &type_face) :
+	std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face) :
 
 	Text{std::move(name), std::move(content), text::TextFormatting::HTML,
 		 alignment, vertical_alignment,
@@ -138,7 +139,7 @@ Text::Text(std::string name, std::string content,
 
 Text::Text(std::string name, std::string content,
 	const std::optional<Vector2> &area_size, const Vector2 &padding,
-	std::optional<real> line_height_factor, TypeFace &type_face) :
+	std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face) :
 
 	Text{std::move(name), std::move(content), text::TextFormatting::HTML,
 		 text::TextAlignment::Left, text::TextVerticalAlignment::Top,
@@ -201,16 +202,17 @@ void Text::LineHeight(real height) noexcept
 }
 
 
-void Text::Lettering(TypeFace &type_face)
+void Text::Lettering(NonOwningPtr<TypeFace> type_face) noexcept
 {
-	if (type_face_.Observe(type_face))
+	if (type_face)
 		formatted_lines_ = MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_);
-}
-
-void Text::Lettering(std::nullptr_t) noexcept
-{
-	if (type_face_.Release())
+	else
+	{
 		formatted_lines_.clear();
+		formatted_lines_.shrink_to_fit();
+	}
+
+	type_face_ = type_face;
 }
 
 
@@ -230,14 +232,14 @@ std::optional<real> Text::LineHeight() const noexcept
 }
 
 
-TypeFace* Text::Lettering() noexcept
+NonOwningPtr<TypeFace> Text::Lettering() noexcept
 {
-	return type_face_.Object();
+	return type_face_;
 }
 
-const TypeFace* Text::Lettering() const noexcept
+NonOwningPtr<const TypeFace> Text::Lettering() const noexcept
 {
-	return type_face_.Object();
+	return type_face_;
 }
 
 

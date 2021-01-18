@@ -18,6 +18,7 @@ File:	IonTypeFaceManager.h
 
 #include "IonTypeFace.h"
 #include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 
 namespace ion::graphics::fonts
 {
@@ -78,26 +79,21 @@ namespace ion::graphics::fonts
 		*/
 
 		//Create a type face with the given name and a regular font
-		TypeFace& CreateTypeFace(std::string name, Font &regular);
-
-		//Create a type face with the given name, a regular and bold font
-		TypeFace& CreateTypeFace(std::string name, Font &regular, Font &bold, std::nullptr_t /*italic*/);
-
-		//Create a type face with the given name, a regular and italic font
-		TypeFace& CreateTypeFace(std::string name, Font &regular, std::nullptr_t /*bold*/, Font &italic);
+		NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular);
 
 		//Create a type face with the given name, a regular, bold and italic font
-		TypeFace& CreateTypeFace(std::string name, Font &regular, Font &bold, Font &italic);
+		NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic);
 
 		//Create a type face with the given name, a regular, bold, italic and bold italic font
-		TypeFace& CreateTypeFace(std::string name, Font &regular, Font &bold, Font &italic, Font &bold_italic);
+		NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic,
+			NonOwningPtr<Font> bold_italic);
 
 
 		//Create a type face as a copy of the given type face
-		TypeFace& CreateTypeFace(const TypeFace &type_face);
+		NonOwningPtr<TypeFace> CreateTypeFace(const TypeFace &type_face);
 
 		//Create a type face by moving the given type face
-		TypeFace& CreateTypeFace(TypeFace &&type_face);
+		NonOwningPtr<TypeFace> CreateTypeFace(TypeFace &&type_face);
 
 
 		/*
@@ -107,11 +103,11 @@ namespace ion::graphics::fonts
 
 		//Gets a pointer to a mutable type face with the given name
 		//Returns nullptr if type face could not be found
-		[[nodiscard]] TypeFace* GetTypeFace(std::string_view name) noexcept;
+		[[nodiscard]] NonOwningPtr<TypeFace> GetTypeFace(std::string_view name) noexcept;
 
 		//Gets a pointer to an immutable type face with the given name
 		//Returns nullptr if type face could not be found
-		[[nodiscard]] const TypeFace* GetTypeFace(std::string_view name) const noexcept;
+		[[nodiscard]] NonOwningPtr<const TypeFace> GetTypeFace(std::string_view name) const noexcept;
 
 
 		/*

@@ -15,10 +15,15 @@ File:	IonSystemInputListener.h
 
 #include "IonSystemMessageListener.h"
 #include "events/IonListenable.h"
-#include "graphics/render/IonRenderWindow.h"
-#include "managed/IonObservedObject.h"
+#include "memory/IonNonOwningPtr.h"
 #include "system/IonSystemAPI.h"
 #include "system/events/IonSystemInput.h"
+
+namespace ion::graphics::render
+{
+	class RenderWindow; //Forward declaration
+	class Viewport; //Forward declaration
+}
 
 namespace ion::system::events::listeners
 {
@@ -71,7 +76,7 @@ namespace ion::system::events::listeners
 			using MouseEventsBase = ion::events::Listenable<ion::events::listeners::MouseListener>;
 
 			graphics::render::RenderWindow &render_window_;
-			managed::ObservedObject<graphics::render::Viewport> viewport_;
+			NonOwningPtr<graphics::render::Viewport> viewport_;
 
 
 			/*
@@ -173,17 +178,17 @@ namespace ion::system::events::listeners
 				Viewport
 			*/
 
-			//Sets the viewport that should be connected to this input listener
-			void ConnectViewport(graphics::render::Viewport &viewport);
+			//Sets the viewport connected to this input listener to the given viewport
+			void ConnectedViewport(NonOwningPtr<graphics::render::Viewport> viewport) noexcept;
 
 
 			//Returns a pointer to the viewport (mutable) connected to this input listener
 			//Returns nullptr if this input listener does not have a viewport connected
-			[[nodiscard]] graphics::render::Viewport* ConnectedViewport() noexcept;
+			[[nodiscard]] NonOwningPtr<graphics::render::Viewport> ConnectedViewport() noexcept;
 
 			//Returns a pointer to the viewport (immutable) connected to this input listener
 			//Returns nullptr if this input listener does not have a viewport connected
-			[[nodiscard]] const graphics::render::Viewport* ConnectedViewport() const noexcept;
+			[[nodiscard]] NonOwningPtr<const graphics::render::Viewport> ConnectedViewport() const noexcept;
 	};
 } //ion::system::events::listeners
 

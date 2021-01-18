@@ -23,6 +23,7 @@ File:	IonMesh.h
 #include "graphics/utilities/IonSphere.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
+#include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
 //Forward declarations
@@ -159,7 +160,7 @@ namespace ion::graphics::render
 		
 			mesh::MeshDrawMode draw_mode_ = mesh::MeshDrawMode::Triangles;
 			mesh::detail::vertex_storage_type vertex_data_;
-			materials::Material *material_ = nullptr;
+			NonOwningPtr<materials::Material> material_;
 			mesh::MeshTexCoordMode tex_coord_mode_ = mesh::MeshTexCoordMode::Auto;
 			bool show_wireframe_ = false;
 			bool visible_ = true;
@@ -185,14 +186,14 @@ namespace ion::graphics::render
 			explicit Mesh(const mesh::Vertices &vertices, bool visible = true);
 
 			//Construct a new mesh with the given vertices, material, tex coord mode and visibility
-			Mesh(const mesh::Vertices &vertices, materials::Material &material,
+			Mesh(const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 			//Construct a new mesh with the given draw mode, vertices and visibility
 			Mesh(mesh::MeshDrawMode draw_mode, const mesh::Vertices &vertices, bool visible = true);
 
 			//Construct a new mesh with the given draw mode, vertices, material, tex coord mode and visibility
-			Mesh(mesh::MeshDrawMode draw_mode, const mesh::Vertices &vertices, materials::Material &material,
+			Mesh(mesh::MeshDrawMode draw_mode, const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
@@ -200,14 +201,14 @@ namespace ion::graphics::render
 			explicit Mesh(mesh::detail::vertex_storage_type vertex_data, bool visible = true);
 
 			//Construct a new mesh with the given raw vertex data, material, tex coord mode and visibility
-			Mesh(mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+			Mesh(mesh::detail::vertex_storage_type vertex_data, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 			//Construct a new mesh with the given draw mode, raw vertex data and visibility
 			Mesh(mesh::MeshDrawMode draw_mode, mesh::detail::vertex_storage_type vertex_data, bool visible = true);
 
 			//Construct a new mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
-			Mesh(mesh::MeshDrawMode draw_mode, mesh::detail::vertex_storage_type vertex_data, materials::Material &material,
+			Mesh(mesh::MeshDrawMode draw_mode, mesh::detail::vertex_storage_type vertex_data, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 			//Destructor
@@ -225,7 +226,7 @@ namespace ion::graphics::render
 			}
 
 			//Sets the material used by this mesh to the given material
-			inline void MaterialPtr(materials::Material *material) noexcept
+			inline void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
 				if (material_ != material)
 				{
@@ -288,14 +289,14 @@ namespace ion::graphics::render
 
 			//Returns a pointer to the material (mutable) used by this mesh
 			//Returns nullptr if this mesh does not have a material
-			[[nodiscard]] inline auto MaterialPtr() noexcept
+			[[nodiscard]] inline auto SurfaceMaterial() noexcept
 			{
 				return material_;
 			}
 
 			//Returns a pointer to the material (immutable) used by this mesh
 			//Returns nullptr if this mesh does not have a material
-			[[nodiscard]] inline const auto MaterialPtr() const noexcept
+			[[nodiscard]] inline const auto SurfaceMaterial() const noexcept
 			{
 				return material_;
 			}

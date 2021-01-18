@@ -30,51 +30,52 @@ namespace text_manager::detail
 	Creating
 */
 
-Text& TextManager::CreateText(std::string name, std::string content, text::TextAlignment alignment, TypeFace &type_face)
+NonOwningPtr<Text> TextManager::CreateText(std::string name, std::string content, text::TextAlignment alignment,
+	NonOwningPtr<TypeFace> type_face)
 {
-	return Create(std::move(name), std::move(content), alignment, std::ref(type_face));
+	return Create(std::move(name), std::move(content), alignment, type_face);
 }
 
-Text& TextManager::CreateText(std::string name, std::string content, TypeFace &type_face)
+NonOwningPtr<Text> TextManager::CreateText(std::string name, std::string content, NonOwningPtr<TypeFace> type_face)
 {
-	return Create(std::move(name), std::move(content), std::ref(type_face));
+	return Create(std::move(name), std::move(content), type_face);
 }
 
-Text& TextManager::CreateText(std::string name, std::string content, text::TextFormatting formatting,
+NonOwningPtr<Text> TextManager::CreateText(std::string name, std::string content, text::TextFormatting formatting,
 	text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 	const std::optional<Vector2> &area_size, const Vector2 &padding,
-	std::optional<real> line_height_factor, TypeFace &type_face)
+	std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face)
 {
 	return Create(std::move(name), std::move(content), formatting,
 				  alignment, vertical_alignment,
-				  area_size, padding, line_height_factor, std::ref(type_face));
+				  area_size, padding, line_height_factor, type_face);
 }
 
-Text& TextManager::CreateText(std::string name, std::string content,
+NonOwningPtr<Text> TextManager::CreateText(std::string name, std::string content,
 	text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 	const std::optional<Vector2> &area_size, const Vector2 &padding,
-	std::optional<real> line_height_factor, TypeFace &type_face)
+	std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face)
 {
 	return Create(std::move(name), std::move(content),
 				  alignment, vertical_alignment,
-				  area_size, padding, line_height_factor, std::ref(type_face));
+				  area_size, padding, line_height_factor, type_face);
 }
 
-Text& TextManager::CreateText(std::string name, std::string content,
+NonOwningPtr<Text> TextManager::CreateText(std::string name, std::string content,
 	const std::optional<Vector2> &area_size, const Vector2 &padding,
-	std::optional<real> line_height_factor, TypeFace &type_face)
+	std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face)
 {
 	return Create(std::move(name), std::move(content),
-				  area_size, padding, line_height_factor, std::ref(type_face));
+				  area_size, padding, line_height_factor, type_face);
 }
 
 
-Text& TextManager::CreateText(const Text &text)
+NonOwningPtr<Text> TextManager::CreateText(const Text &text)
 {
 	return Create(text);
 }
 
-Text& TextManager::CreateText(Text &&text)
+NonOwningPtr<Text> TextManager::CreateText(Text &&text)
 {
 	return Create(std::move(text));
 }
@@ -85,12 +86,12 @@ Text& TextManager::CreateText(Text &&text)
 	Retrieving
 */
 
-Text* TextManager::GetText(std::string_view name) noexcept
+NonOwningPtr<Text> TextManager::GetText(std::string_view name) noexcept
 {
 	return Get(name);
 }
 
-const Text* TextManager::GetText(std::string_view name) const noexcept
+NonOwningPtr<const Text> TextManager::GetText(std::string_view name) const noexcept
 {
 	return Get(name);
 }

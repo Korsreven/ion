@@ -19,6 +19,7 @@ File:	IonMaterialManager.h
 
 #include "IonMaterial.h"
 #include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 
 namespace ion::graphics::materials
 {
@@ -79,51 +80,51 @@ namespace ion::graphics::materials
 		*/
 
 		//Create a material with the given name, ambient color, diffuse color, specular color and shininess
-		Material& CreateMaterial(std::string name,
+		NonOwningPtr<Material> CreateMaterial(std::string name,
 			const Color &ambient, const Color &diffuse, const Color &specular, real shininess);
 
 		//Create a material with the given name, ambient color, diffuse color, specular color, shininess,
 		//and emissive color and receive shadows
-		Material& CreateMaterial(std::string name,
+		NonOwningPtr<Material> CreateMaterial(std::string name,
 			const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
 			const std::optional<Color> &emissive, bool receive_shadows = true);
 
 
 		//Create a material with the given name, ambient color, diffuse color, specular color, shininess,
 		//and diffuse map, specular map and normal map as animations
-		Material& CreateMaterial(std::string name,
+		NonOwningPtr<Material> CreateMaterial(std::string name,
 			const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-			Animation *diffuse_map, Animation *specular_map, Animation *normal_map);
+			NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> normal_map);
 
 		//Create a material with the given name, ambient color, diffuse color, specular color, shininess,
 		//and diffuse map, specular map and normal map as animations,
 		//and emissive color and receive shadows
-		Material& CreateMaterial(std::string name,
+		NonOwningPtr<Material> CreateMaterial(std::string name,
 			const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-			Animation *diffuse_map, Animation *specular_map, Animation *normal_map,
+			NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> normal_map,
 			const std::optional<Color> &emissive, bool receive_shadows = true);
 
 
 		//Create a material with the given name, ambient color, diffuse color, specular color, shininess,
 		//and diffuse map, specular map and normal map as textures
-		Material& CreateMaterial(std::string name,
+		NonOwningPtr<Material> CreateMaterial(std::string name,
 			const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-			Texture *diffuse_map, Texture *specular_map, Texture *normal_map);
+			NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> normal_map);
 
 		//Create a material with the given name, ambient color, diffuse color, specular color, shininess,
 		//and diffuse map, specular map and normal map as textures,
 		//and emissive color and receive shadows
-		Material& CreateMaterial(std::string name,
+		NonOwningPtr<Material> CreateMaterial(std::string name,
 			const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-			Texture *diffuse_map, Texture *specular_map, Texture *normal_map,
+			NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> normal_map,
 			const std::optional<Color> &emissive, bool receive_shadows = true);
 
 
 		//Create a material as a copy of the given material
-		Material& CreateMaterial(const Material &material);
+		NonOwningPtr<Material> CreateMaterial(const Material &material);
 
 		//Create a material by moving the given material
-		Material& CreateMaterial(Material &&material);
+		NonOwningPtr<Material> CreateMaterial(Material &&material);
 
 
 		/*
@@ -133,11 +134,11 @@ namespace ion::graphics::materials
 
 		//Gets a pointer to a mutable material with the given name
 		//Returns nullptr if material could not be found
-		[[nodiscard]] Material* GetMaterial(std::string_view name) noexcept;
+		[[nodiscard]] NonOwningPtr<Material> GetMaterial(std::string_view name) noexcept;
 
 		//Gets a pointer to an immutable material with the given name
 		//Returns nullptr if material could not be found
-		[[nodiscard]] const Material* GetMaterial(std::string_view name) const noexcept;
+		[[nodiscard]] NonOwningPtr<const Material> GetMaterial(std::string_view name) const noexcept;
 
 
 		/*

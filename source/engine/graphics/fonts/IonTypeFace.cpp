@@ -17,7 +17,7 @@ namespace ion::graphics::fonts
 
 using namespace type_face;
 
-TypeFace::TypeFace(std::string name, Font &regular) :
+TypeFace::TypeFace(std::string name, NonOwningPtr<Font> regular) :
 
 	managed::ManagedObject<TypeFaceManager>{std::move(name)},
 	regular_font_{regular}
@@ -25,23 +25,7 @@ TypeFace::TypeFace(std::string name, Font &regular) :
 	//Empty
 }
 
-TypeFace::TypeFace(std::string name, Font &regular, Font &bold, std::nullptr_t) :
-
-	managed::ManagedObject<TypeFaceManager>{std::move(name)},
-	regular_font_{regular}
-{
-	BoldFont(bold);
-}
-
-TypeFace::TypeFace(std::string name, Font &regular, std::nullptr_t, Font &italic) :
-
-	managed::ManagedObject<TypeFaceManager>{std::move(name)},
-	regular_font_{regular}
-{
-	ItalicFont(italic);
-}
-
-TypeFace::TypeFace(std::string name, Font &regular, Font &bold, Font &italic) :
+TypeFace::TypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic) :
 
 	managed::ManagedObject<TypeFaceManager>{std::move(name)},
 	regular_font_{regular}
@@ -50,7 +34,8 @@ TypeFace::TypeFace(std::string name, Font &regular, Font &bold, Font &italic) :
 	ItalicFont(italic);
 }
 
-TypeFace::TypeFace(std::string name, Font &regular, Font &bold, Font &italic, Font &bold_italic) :
+TypeFace::TypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic,
+	NonOwningPtr<Font> bold_italic) :
 
 	managed::ManagedObject<TypeFaceManager>{std::move(name)},
 	regular_font_{regular}
@@ -65,66 +50,67 @@ TypeFace::TypeFace(std::string name, Font &regular, Font &bold, Font &italic, Fo
 	Modifiers
 */
 
-void TypeFace::RegularFont(Font &font)
+void TypeFace::RegularFont(NonOwningPtr<Font> font) noexcept
 {
-	if (IsEmpty() ||
-		detail::is_font_attachable(*regular_font_.Object(), font))
-
-		regular_font_.Observe(font);
-}
-
-void TypeFace::RegularFont(std::nullptr_t) noexcept
-{
-	if (regular_font_.Release())
+	if (font)
 	{
-		BoldFont(nullptr);
-		ItalicFont(nullptr);
-		BoldItalicFont(nullptr);
+		if (IsEmpty() ||
+			detail::is_font_attachable(*regular_font_, *font))
+
+			regular_font_ = font;
+	}
+	else
+	{
+		regular_font_ = nullptr;
+		bold_font_ = nullptr;
+		italic_font_ = nullptr;
+		bold_italic_font_ = nullptr;
 	}
 }
 
-
-void TypeFace::BoldFont(Font &font)
+void TypeFace::BoldFont(NonOwningPtr<Font> font) noexcept
 {
-	if (regular_font_ &&
-		detail::is_font_attachable(*regular_font_.Object(), font))
+	if (font)
+	{
+		if (regular_font_ &&
+			detail::is_font_attachable(*regular_font_, *font))
 
-		bold_font_.Observe(font);
+			bold_font_ = font;
+	}
+	else
+	{
+		bold_font_ = nullptr;
+		bold_italic_font_ = nullptr;
+	}
 }
 
-void TypeFace::BoldFont(std::nullptr_t) noexcept
+void TypeFace::ItalicFont(NonOwningPtr<Font> font) noexcept
 {
-	if (bold_font_.Release())
-		BoldItalicFont(nullptr);
+	if (font)
+		{
+		if (regular_font_ &&
+			detail::is_font_attachable(*regular_font_, *font))
+
+			italic_font_ = font;
+	}
+	else
+	{
+		italic_font_ = nullptr;
+		bold_italic_font_ = nullptr;
+	}
 }
 
-
-void TypeFace::ItalicFont(Font &font)
+void TypeFace::BoldItalicFont(NonOwningPtr<Font> font) noexcept
 {
-	if (regular_font_ &&
-		detail::is_font_attachable(*regular_font_.Object(), font))
+	if (font)
+	{
+		if (regular_font_ && bold_font_ && italic_font_ &&
+			detail::is_font_attachable(*regular_font_, *font))
 
-		italic_font_.Observe(font);
-}
-
-void TypeFace::ItalicFont(std::nullptr_t) noexcept
-{
-	if (italic_font_.Release())
-		BoldItalicFont(nullptr);
-}
-
-
-void TypeFace::BoldItalicFont(Font &font)
-{
-	if (regular_font_ && bold_font_ && italic_font_ &&
-		detail::is_font_attachable(*regular_font_.Object(), font))
-
-		bold_italic_font_.Observe(font);
-}
-
-void TypeFace::BoldItalicFont(std::nullptr_t) noexcept
-{
-	bold_italic_font_.Release();
+			bold_italic_font_ = font;
+	}
+	else
+		bold_italic_font_ = nullptr;
 }
 
 } //ion::graphics::fonts

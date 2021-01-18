@@ -22,11 +22,9 @@ File:	IonEmitter.h
 #include "IonParticle.h"
 #include "adaptors/ranges/IonIterable.h"
 #include "affectors/IonAffectorManager.h"
-#include "graphics/textures/IonTextureManager.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "managed/IonManagedObject.h"
-#include "managed/IonObservedObject.h"
 #include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
@@ -183,7 +181,6 @@ namespace ion::graphics::particles
 			std::pair<real, real> particle_mass_;
 			std::pair<Color, Color> particle_solid_color_;
 			std::pair<duration, duration> particle_life_time_;
-			managed::ObservedObject<textures::Texture> particle_texture_;
 
 		public:
 
@@ -435,12 +432,6 @@ namespace ion::graphics::particles
 			{
 				particle_life_time_ = std::minmax(min_life_time, max_life_time);
 			}
-			
-			//Attach the given texture to all active and new particles
-			void ParticleTexture(textures::Texture &texture);
-
-			//Detach (if any) particle texture from all active and new particles
-			void ParticleTexture(std::nullptr_t) noexcept;
 
 
 			/*
@@ -475,13 +466,6 @@ namespace ion::graphics::particles
 			[[nodiscard]] inline auto& ParticleLifeTime() const noexcept
 			{
 				return particle_life_time_;
-			}
-
-			//Returns the attached particle texture
-			//Returns nullptr if no particle texture is attached
-			[[nodiscard]] inline auto ParticleTexture() const noexcept
-			{
-				return particle_texture_.Object();
 			}
 
 

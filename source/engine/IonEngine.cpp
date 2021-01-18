@@ -439,19 +439,19 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 	input_controller_.emplace(*render_window_);
 
 	//Create a default viewport and connect to input
-	auto &viewport = render_window_->CreateViewport(graphics::render::Viewport{"", *render_window_});
-	input_controller_->ConnectViewport(viewport);
+	auto viewport = render_window_->CreateViewport("", *render_window_);
+	input_controller_->ConnectedViewport(viewport);
 	
 	//Create a default ortographic frustum
 	auto frustum = graphics::render::Frustum::Orthographic(
 		clipping_plane, near_clip_distance, far_clip_distance, aspect_ratio, aspect_format);
 	//auto frustum = graphics::render::Frustum::Perspective(
 	//	clipping_plane, near_clip_distance, far_clip_distance, 90.0, aspect_ratio, aspect_format);
-	frustum.BaseViewportHeight(viewport.Bounds().ToSize().Y());
+	frustum.BaseViewportHeight(viewport->Bounds().ToSize().Y());
 
 	//Create a default camera with frustum and connect to viewport
-	auto &camera = scene_manager_.CreateCamera(graphics::scene::Camera{"", frustum});
-	viewport.ConnectCamera(camera);
+	auto camera = scene_manager_.CreateCamera("", frustum);
+	viewport->ConnectedCamera(camera);
 
 	return *render_window_;
 }

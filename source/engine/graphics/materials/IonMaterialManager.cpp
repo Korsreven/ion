@@ -30,14 +30,14 @@ namespace material_manager::detail
 	Creating
 */
 
-Material& MaterialManager::CreateMaterial(std::string name,
+NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name,
 	const Color &ambient, const Color &diffuse, const Color &specular, real shininess)
 {
 	return Create(std::move(name),
 				  ambient, diffuse, specular, shininess);
 }
 
-Material& MaterialManager::CreateMaterial(std::string name,
+NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name,
 	const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
 	const std::optional<Color> &emissive, bool receive_shadows)
 {
@@ -47,18 +47,18 @@ Material& MaterialManager::CreateMaterial(std::string name,
 }
 
 
-Material& MaterialManager::CreateMaterial(std::string name,
+NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name,
 	const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-	Animation *diffuse_map, Animation *specular_map, Animation *normal_map)
+	NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> normal_map)
 {
 	return Create(std::move(name),
 				  ambient, diffuse, specular, shininess,
 				  diffuse_map, specular_map, normal_map);
 }
 
-Material& MaterialManager::CreateMaterial(std::string name,
+NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name,
 	const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-	Animation *diffuse_map, Animation *specular_map, Animation *normal_map,
+	NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> normal_map,
 	const std::optional<Color> &emissive, bool receive_shadows)
 {
 	return Create(std::move(name),
@@ -68,18 +68,18 @@ Material& MaterialManager::CreateMaterial(std::string name,
 }
 
 
-Material& MaterialManager::CreateMaterial(std::string name,
+NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name,
 	const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-	Texture *diffuse_map, Texture *specular_map, Texture *normal_map)
+	NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> normal_map)
 {
 	return Create(std::move(name),
 				  ambient, diffuse, specular, shininess,
 				  diffuse_map, specular_map, normal_map);
 }
 
-Material& MaterialManager::CreateMaterial(std::string name,
+NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name,
 	const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-	Texture *diffuse_map, Texture *specular_map, Texture *normal_map,
+	NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> normal_map,
 	const std::optional<Color> &emissive, bool receive_shadows)
 {
 	return Create(std::move(name),
@@ -89,12 +89,12 @@ Material& MaterialManager::CreateMaterial(std::string name,
 }
 
 
-Material& MaterialManager::CreateMaterial(const Material &material)
+NonOwningPtr<Material> MaterialManager::CreateMaterial(const Material &material)
 {
 	return Create(material);
 }
 
-Material& MaterialManager::CreateMaterial(Material &&material)
+NonOwningPtr<Material> MaterialManager::CreateMaterial(Material &&material)
 {
 	return Create(std::move(material));
 }
@@ -105,12 +105,12 @@ Material& MaterialManager::CreateMaterial(Material &&material)
 	Retrieving
 */
 
-Material* MaterialManager::GetMaterial(std::string_view name) noexcept
+NonOwningPtr<Material> MaterialManager::GetMaterial(std::string_view name) noexcept
 {
 	return Get(name);
 }
 
-const Material* MaterialManager::GetMaterial(std::string_view name) const noexcept
+NonOwningPtr<const Material> MaterialManager::GetMaterial(std::string_view name) const noexcept
 {
 	return Get(name);
 }

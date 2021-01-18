@@ -50,12 +50,31 @@ void RenderTarget::SwapBuffers() noexcept
 	Creating
 */
 
-Viewport& RenderTarget::CreateViewport(const Viewport &viewport)
+NonOwningPtr<Viewport> RenderTarget::CreateViewport(std::string name, RenderTarget &render_target) noexcept
+{
+	return Create(std::move(name), render_target);
+}
+
+NonOwningPtr<Viewport> RenderTarget::CreateViewport(std::string name, RenderTarget &render_target, const Aabb &bounds) noexcept
+{
+	return Create(std::move(name), render_target, bounds);
+}
+
+NonOwningPtr<Viewport> RenderTarget::CreateViewport(std::string name, RenderTarget &render_target, const Aabb &bounds,
+	viewport::HorizontalAnchorType left_anchor, viewport::HorizontalAnchorType right_anchor,
+	viewport::VerticalAnchorType top_anchor, viewport::VerticalAnchorType bottom_anchor) noexcept
+{
+	return Create(std::move(name), render_target, bounds,
+				  left_anchor, right_anchor, top_anchor, bottom_anchor);
+}
+
+
+NonOwningPtr<Viewport> RenderTarget::CreateViewport(const Viewport &viewport)
 {
 	return Create(viewport);
 }
 
-Viewport& RenderTarget::CreateViewport(Viewport &&viewport)
+NonOwningPtr<Viewport> RenderTarget::CreateViewport(Viewport &&viewport)
 {
 	return Create(std::move(viewport));
 }
@@ -66,12 +85,12 @@ Viewport& RenderTarget::CreateViewport(Viewport &&viewport)
 	Retrieving
 */
 
-Viewport* RenderTarget::GetViewport(std::string_view name) noexcept
+NonOwningPtr<Viewport> RenderTarget::GetViewport(std::string_view name) noexcept
 {
 	return Get(name);
 }
 
-const Viewport* RenderTarget::GetViewport(std::string_view name) const noexcept
+NonOwningPtr<const Viewport> RenderTarget::GetViewport(std::string_view name) const noexcept
 {
 	return Get(name);
 }

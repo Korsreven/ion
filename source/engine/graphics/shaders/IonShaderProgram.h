@@ -17,9 +17,9 @@ File:	IonShaderProgram.h
 #include <string>
 #include <string_view>
 
-#include "IonShaderManager.h"
+#include "IonShader.h"
 #include "managed/IonObjectManager.h"
-#include "managed/IonObservedObject.h"
+#include "memory/IonNonOwningPtr.h"
 #include "resources/IonResource.h"
 #include "variables/IonShaderAttribute.h"
 #include "variables/IonShaderUniform.h"
@@ -45,16 +45,16 @@ namespace ion::graphics::shaders
 
 
 			std::optional<int> handle_;
-			managed::ObservedObject<Shader> vertex_shader_;
-			managed::ObservedObject<Shader> fragment_shader_;
+			NonOwningPtr<Shader> vertex_shader_;
+			NonOwningPtr<Shader> fragment_shader_;
 
 		public:
 			
 			//Constructs a new shader program with the given name and a shader
-			ShaderProgram(std::string name, Shader &shader);
+			ShaderProgram(std::string name, NonOwningPtr<Shader> shader);
 
 			//Constructs a new shader program with the given name, a vertex and fragment shader
-			ShaderProgram(std::string name, Shader &vertex_shader, Shader &fragment_shader);
+			ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader);
 
 
 			/*
@@ -133,17 +133,10 @@ namespace ion::graphics::shaders
 
 
 			//Attach the given vertex shader to the shader program
-			void VertexShader(Shader &shader);
-
-			//Detach the vertex shader from the shader program
-			void VertexShader(std::nullptr_t) noexcept;
-
+			void VertexShader(NonOwningPtr<Shader> shader) noexcept;
 
 			//Attach the given fragment shader to the shader program
-			void FragmentShader(Shader &shader);
-
-			//Detach the fragment shader from the shader program
-			void FragmentShader(std::nullptr_t) noexcept;
+			void FragmentShader(NonOwningPtr<Shader> shader) noexcept;
 
 
 			/*
@@ -162,14 +155,14 @@ namespace ion::graphics::shaders
 			//Returns nullptr if no vertex shader is attached
 			[[nodiscard]] inline auto VertexShader() const noexcept
 			{
-				return vertex_shader_.Object();
+				return vertex_shader_;
 			}
 
 			//Returns the attached fragment shader
 			//Returns nullptr if no fragment shader is attached
 			[[nodiscard]] inline auto FragmentShader() const noexcept
 			{
-				return fragment_shader_.Object();
+				return fragment_shader_;
 			}
 
 
@@ -180,27 +173,27 @@ namespace ion::graphics::shaders
 
 			//Create an attribute variable with the given name
 			template <typename T>
-			auto& CreateAttribute(std::string name)
+			auto CreateAttribute(std::string name)
 			{
-				auto &var = AttributeVariablesBase::Create(variables::Attribute<T>{std::move(name)});
-				return static_cast<variables::Attribute<T>&>(var);
+				auto ptr = AttributeVariablesBase::Create(variables::Attribute<T>{std::move(name)});
+				return static_pointer_cast<variables::Attribute<T>>(ptr);
 			}
 
 
 			//Create an attribute variable as a copy of the given attribute
 			template <typename T>
-			auto& CreateAttribute(const variables::Attribute<T> &attribute)
+			auto CreateAttribute(const variables::Attribute<T> &attribute)
 			{
-				auto &var = AttributeVariablesBase::Create(attribute);
-				return static_cast<variables::Attribute<T>&>(var);
+				auto ptr = AttributeVariablesBase::Create(attribute);
+				return static_pointer_cast<variables::Attribute<T>>(ptr);
 			}
 
 			//Create an attribute variable by moving the given attribute
 			template <typename T>
-			auto& CreateAttribute(variables::Attribute<T> &&attribute)
+			auto CreateAttribute(variables::Attribute<T> &&attribute)
 			{
-				auto &var = AttributeVariablesBase::Create(std::move(attribute));
-				return static_cast<variables::Attribute<T>&>(var);
+				auto ptr = AttributeVariablesBase::Create(std::move(attribute));
+				return static_pointer_cast<variables::Attribute<T>>(ptr);
 			}
 
 
@@ -211,11 +204,11 @@ namespace ion::graphics::shaders
 
 			//Gets a pointer to a mutable attribute variable with the given name
 			//Returns nullptr if attribute variable could not be found
-			[[nodiscard]] variables::AttributeVariable* GetAttribute(std::string_view name) noexcept;
+			[[nodiscard]] NonOwningPtr<variables::AttributeVariable> GetAttribute(std::string_view name) noexcept;
 
 			//Gets a pointer to an immutable attribute variable with the given name
 			//Returns nullptr if attribute variable could not be found
-			[[nodiscard]] const variables::AttributeVariable* GetAttribute(std::string_view name) const noexcept;
+			[[nodiscard]] NonOwningPtr<const variables::AttributeVariable> GetAttribute(std::string_view name) const noexcept;
 
 
 			/*
@@ -240,27 +233,27 @@ namespace ion::graphics::shaders
 
 			//Create a uniform variable with the given name and size
 			template <typename T>
-			auto& CreateUniform(std::string name, int size = 1)
+			auto CreateUniform(std::string name, int size = 1)
 			{
-				auto &var = UniformVariablesBase::Create(variables::Uniform<T>{std::move(name), size});
-				return static_cast<variables::Uniform<T>&>(var);
+				auto ptr = UniformVariablesBase::Create(variables::Uniform<T>{std::move(name), size});
+				return static_pointer_cast<variables::Uniform<T>>(ptr);
 			}
 
 
 			//Create an uniform variable as a copy of the given uniform
 			template <typename T>
-			auto& CreateUniform(const variables::Uniform<T> &uniform)
+			auto CreateUniform(const variables::Uniform<T> &uniform)
 			{
-				auto &var = AttributeVariablesBase::Create(uniform);
-				return static_cast<variables::Uniform<T>&>(var);
+				auto ptr = AttributeVariablesBase::Create(uniform);
+				return static_pointer_cast<variables::Uniform<T>>(ptr);
 			}
 
 			//Create an uniform variable by moving the given uniform
 			template <typename T>
-			auto& CreateUniform(variables::Uniform<T> &&uniform)
+			auto CreateUniform(variables::Uniform<T> &&uniform)
 			{
-				auto &var = AttributeVariablesBase::Create(std::move(uniform));
-				return static_cast<variables::Uniform<T>&>(var);
+				auto ptr = AttributeVariablesBase::Create(std::move(uniform));
+				return static_pointer_cast<variables::Uniform<T>>(ptr);
 			}
 
 
@@ -271,11 +264,11 @@ namespace ion::graphics::shaders
 
 			//Gets a pointer to a mutable uniform variable with the given name
 			//Returns nullptr if uniform variable could not be found
-			[[nodiscard]] variables::UniformVariable* GetUniform(std::string_view name) noexcept;
+			[[nodiscard]] NonOwningPtr<variables::UniformVariable> GetUniform(std::string_view name) noexcept;
 
 			//Gets a pointer to an immutable uniform variable with the given name
 			//Returns nullptr if uniform variable could not be found
-			[[nodiscard]] const variables::UniformVariable* GetUniform(std::string_view name) const noexcept;
+			[[nodiscard]] NonOwningPtr<const variables::UniformVariable> GetUniform(std::string_view name) const noexcept;
 
 
 			/*

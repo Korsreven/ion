@@ -18,6 +18,7 @@ File:	IonTimerManager.h
 
 #include "IonTimer.h"
 #include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 
 namespace ion::timers
 {
@@ -74,17 +75,17 @@ namespace ion::timers
 		*/
 
 		//Create a timer with the given name and interval
-		Timer& CreateTimer(std::string name, duration interval);
+		NonOwningPtr<Timer> CreateTimer(std::string name, duration interval);
 
 		//Create a timer with the given name, interval and callback
-		Timer& CreateTimer(std::string name, duration interval, events::Callback<void, Timer&> on_tick);
+		NonOwningPtr<Timer> CreateTimer(std::string name, duration interval, events::Callback<void, Timer&> on_tick);
 
 
 		//Create a timer as a copy of the given timer
-		Timer& CreateTimer(const Timer &timer);
+		NonOwningPtr<Timer> CreateTimer(const Timer &timer);
 
 		//Create a timer by moving the given timer
-		Timer& CreateTimer(Timer &&timer);
+		NonOwningPtr<Timer> CreateTimer(Timer &&timer);
 
 
 		/*
@@ -94,11 +95,11 @@ namespace ion::timers
 
 		//Gets a pointer to a mutable timer with the given name
 		//Returns nullptr if timer could not be found
-		[[nodiscard]] Timer* GetTimer(std::string_view name) noexcept;
+		[[nodiscard]] NonOwningPtr<Timer> GetTimer(std::string_view name) noexcept;
 
 		//Gets a pointer to an immutable timer with the given name
 		//Returns nullptr if timer could not be found
-		[[nodiscard]] const Timer* GetTimer(std::string_view name) const noexcept;
+		[[nodiscard]] NonOwningPtr<const Timer> GetTimer(std::string_view name) const noexcept;
 
 
 		/*

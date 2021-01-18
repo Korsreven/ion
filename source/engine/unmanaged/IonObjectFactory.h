@@ -17,6 +17,7 @@ File:	IonObjectFactory.h
 #include <vector>
 
 #include "adaptors/ranges/IonDereferenceIterable.h"
+#include "memory/IonNonOwningPtr.h"
 #include "memory/IonOwningPtr.h"
 
 namespace ion::unmanaged
@@ -47,11 +48,11 @@ namespace ion::unmanaged
 
 			//Create an object with the given arguments
 			template <typename... Args>
-			auto& Create(Args &&...args)
+			auto Create(Args &&...args)
 			{
-				auto &object = objects_.emplace_back(
+				auto &ptr = objects_.emplace_back(
 					make_owning<T>(std::forward<Args>(args)...));
-				return *object;
+				return NonOwningPtr<T>{ptr};
 			}
 
 		public:
