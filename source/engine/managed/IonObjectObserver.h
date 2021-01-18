@@ -65,6 +65,11 @@ namespace ion::managed
 			{
 				if (auto iter = managed_objects_.find(&object); iter != std::end(managed_objects_))
 				{
+					//Execute callback before object is erased
+					//The callback owner can then know in advance which object is going to be removed
+					if (on_removed_)
+						(*on_removed_)(object);
+
 					managed_objects_.erase(iter);
 
 					//Object erased
@@ -74,10 +79,6 @@ namespace ion::managed
 						this->DoUnsubscribe(true);
 						Tidy();
 					}
-
-					//Execute callback after object has been erased
-					if (on_removed_)
-						(*on_removed_)(object);
 				}
 			}
 
@@ -91,11 +92,12 @@ namespace ion::managed
 			//See EventChannel::Unsubscribed for more details
 			void Unsubscribed() noexcept override
 			{
-				Tidy();
-
-				//Execute callback after all objects has been erased
-				if (on_removed_all_)
+				//Execute callback before all objects are erased
+				//The callback owner can then know in advance which object is going to be removed
+				if (on_removed_all_ && !std::empty(managed_objects_))
 					(*on_removed_all_)();
+
+				Tidy();
 			}
 
 		public:
@@ -293,7 +295,7 @@ namespace ion::managed
 			inline auto ReleaseAll() noexcept
 			{
 				if (this->Unsubscribe())
-					Tidy();
+					Unsubscribed();
 
 				return std::empty(managed_objects_);
 			}
@@ -302,8 +304,7 @@ namespace ion::managed
 			//Returns true if the object has successfully been released, or change requirements
 			inline auto Release(T &object) noexcept
 			{
-				if (ObjectRemovable(object) &&
-					managed_objects_.erase(&object))
+				if (ObjectRemovable(object) && ObjectRemoved(object))
 				{
 					//Object released
 					//Unsubscribe from publisher if empty

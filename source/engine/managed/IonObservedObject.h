@@ -118,7 +118,7 @@ namespace ion::managed
 			{
 				//Execute callback before object is set to nullptr
 				//The callback owner can then know in advance which object is going to be removed
-				if (on_removed_)
+				if (on_removed_ && managed_object_)
 					(*on_removed_)(*managed_object_);
 
 				managed_object_ = nullptr;
@@ -315,7 +315,7 @@ namespace ion::managed
 			inline auto Release() noexcept
 			{
 				if (this->Unsubscribe())
-					managed_object_ = nullptr;
+					Unsubscribed();
 
 				return !managed_object_;
 			}
