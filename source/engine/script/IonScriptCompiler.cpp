@@ -2430,7 +2430,7 @@ std::string print_output(duration compile_time, const std::vector<CompileError> 
 
 		output += "[Compiled units]";
 
-		for (const auto &error : errors)
+		for (auto &error : errors)
 			output += ion::utilities::string::Concat(
 				"\n'", error.FilePath.string(), "' - ",
 					!error ?

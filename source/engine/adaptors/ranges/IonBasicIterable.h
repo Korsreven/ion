@@ -13,6 +13,8 @@ File:	IonBasicIterable.h
 #ifndef ION_BASIC_ITERABLE_H
 #define ION_BASIC_ITERABLE_H
 
+#include <type_traits>
+
 #include "adaptors/IonContainerHolder.h"
 #include "types/IonTypeTraits.h"
 
@@ -40,13 +42,19 @@ namespace ion::adaptors::ranges
 		//Returns an iterator to the beginning of the range
 		[[nodiscard]] constexpr auto begin() noexcept
 		{
-			return iterator{std::begin(this->container_)};
+			if constexpr (std::is_const_v<std::remove_reference_t<Container>>)
+				return const_iterator{std::begin(this->container_)};
+			else
+				return iterator{std::begin(this->container_)};
 		}
 
 		//Returns an iterator to the end of the range
 		[[nodiscard]] constexpr auto end() noexcept
 		{
-			return iterator{std::end(this->container_)};
+			if constexpr (std::is_const_v<std::remove_reference_t<Container>>)
+				return const_iterator{std::end(this->container_)};
+			else
+				return iterator{std::end(this->container_)};
 		}
 
 		//Returns a const iterator to the beginning of the range
@@ -82,13 +90,19 @@ namespace ion::adaptors::ranges
 		//Returns a reverse iterator to the end of the range
 		[[nodiscard]] constexpr auto rbegin() noexcept
 		{
-			return reverse_iterator{std::rbegin(this->container_)};
+			if constexpr (std::is_const_v<std::remove_reference_t<Container>>)
+				return const_reverse_iterator{std::rbegin(this->container_)};
+			else
+				return reverse_iterator{std::rbegin(this->container_)};
 		}
 
 		//Returns a reverse iterator to the beginning of the range
 		[[nodiscard]] constexpr auto rend() noexcept
 		{
-			return reverse_iterator{std::rend(this->container_)};
+			if constexpr (std::is_const_v<std::remove_reference_t<Container>>)
+				return const_reverse_iterator{std::rend(this->container_)};
+			else
+				return reverse_iterator{std::rend(this->container_)};
 		}
 
 		//Returns a const reverse iterator to the end of the range

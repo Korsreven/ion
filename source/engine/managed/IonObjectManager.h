@@ -371,7 +371,7 @@ namespace ion::managed
 
 			//Returns an immutable range of all objects in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Objects() const noexcept
+			[[nodiscard]] inline auto Objects() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const object_manager::detail::container_type<ObjectT>&>{objects_};
 			}

@@ -67,7 +67,7 @@ namespace ion::graphics::textures
 
 		//Returns an immutable range of all animations in this manager
 		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline const auto Animations() const noexcept
+		[[nodiscard]] inline auto Animations() const noexcept
 		{
 			return Objects();
 		}

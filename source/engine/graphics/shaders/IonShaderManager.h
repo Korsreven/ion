@@ -99,7 +99,7 @@ namespace ion::graphics::shaders
 
 			//Returns an immutable range of all shaders in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Shaders() const noexcept
+			[[nodiscard]] inline auto Shaders() const noexcept
 			{
 				return Resources();
 			}

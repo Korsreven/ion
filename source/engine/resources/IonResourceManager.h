@@ -403,7 +403,7 @@ namespace ion::resources
 
 			//Returns an immutable range of all resources in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Resources() const noexcept
+			[[nodiscard]] inline auto Resources() const noexcept
 			{
 				return this->Objects();
 			}

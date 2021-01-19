@@ -337,15 +337,8 @@ namespace ion::graphics::utilities
 				return std::tuple{x_, y_, z_};
 			}
 
-
 			//Returns direct access to all vector components
-			[[nodiscard]] inline auto Components() noexcept
-			{
-				return components_;
-			}
-
-			//Returns direct access to all vector components
-			[[nodiscard]] inline const auto Components() const noexcept
+			[[nodiscard]] inline auto Components() const noexcept
 			{
 				return components_;
 			}

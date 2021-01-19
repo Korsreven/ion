@@ -282,21 +282,14 @@ namespace ion::graphics::render
 			}
 
 			//Returns all of the vertex data from this mesh
-			[[nodiscard]] inline const auto& VertexData() const noexcept
+			[[nodiscard]] inline auto& VertexData() const noexcept
 			{
 				return vertex_data_;
 			}
 
-			//Returns a pointer to the material (mutable) used by this mesh
+			//Returns a pointer to the material used by this mesh
 			//Returns nullptr if this mesh does not have a material
-			[[nodiscard]] inline auto SurfaceMaterial() noexcept
-			{
-				return material_;
-			}
-
-			//Returns a pointer to the material (immutable) used by this mesh
-			//Returns nullptr if this mesh does not have a material
-			[[nodiscard]] inline const auto SurfaceMaterial() const noexcept
+			[[nodiscard]] inline auto SurfaceMaterial() const noexcept
 			{
 				return material_;
 			}

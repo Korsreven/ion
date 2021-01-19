@@ -67,15 +67,8 @@ namespace ion::graphics::textures
 				Operators
 			*/
 
-			//Returns a pointer to a mutable frame at the given offset
-			[[nodiscard]] inline auto operator[](int off) noexcept
-			{
-				assert(off >= 0 && off < std::ssize(frames_));
-				return frames_[off];
-			}
-
-			//Returns a pointer to an immutable frame at the given offset
-			[[nodiscard]] inline const auto operator[](int off) const noexcept
+			//Returns a pointer to the frame at the given offset
+			[[nodiscard]] inline auto operator[](int off) const noexcept
 			{
 				assert(off >= 0 && off < std::ssize(frames_));
 				return frames_[off];
@@ -95,7 +88,7 @@ namespace ion::graphics::textures
 
 			//Returns an immutable range of all frames (textures) in this frame sequence
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Frames() const noexcept
+			[[nodiscard]] inline auto Frames() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const frame_sequence::detail::container_type&>{frames_};
 			}
@@ -122,31 +115,16 @@ namespace ion::graphics::textures
 				Frames
 			*/
 
-			//Returns a pointer to the first frame (mutable) in this frame sequence
+			//Returns a pointer to the first frame in this frame sequence
 			//Returns nullptr if frame sequence has no frames
-			[[nodiscard]] inline auto FirstFrame() noexcept
+			[[nodiscard]] inline auto FirstFrame() const noexcept
 			{
 				return !std::empty(frames_) ? frames_.front() : nullptr;
 			}
 
-			//Returns a pointer to the first frame (immutable) in this frame sequence
+			//Returns a pointer to the last frame in this frame sequence
 			//Returns nullptr if frame sequence has no frames
-			[[nodiscard]] inline const auto FirstFrame() const noexcept
-			{
-				return !std::empty(frames_) ? frames_.front() : nullptr;
-			}
-
-
-			//Returns a pointer to the last frame (mutable) in this frame sequence
-			//Returns nullptr if frame sequence has no frames
-			[[nodiscard]] inline auto LastFrame() noexcept
-			{
-				return !std::empty(frames_) ? frames_.back() : nullptr;
-			}
-
-			//Returns a pointer to the last frame (immutable) in this frame sequence
-			//Returns nullptr if frame sequence has no frames
-			[[nodiscard]] inline const auto LastFrame() const noexcept
+			[[nodiscard]] inline auto LastFrame() const noexcept
 			{
 				return !std::empty(frames_) ? frames_.back() : nullptr;
 			}

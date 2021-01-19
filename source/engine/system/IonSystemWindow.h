@@ -115,22 +115,12 @@ namespace ion::system
 					}
 
 
-					inline auto operator*() noexcept
+					inline auto operator*() const noexcept
 					{
 						return handle_;
 					}
 
-					inline const auto operator*() const noexcept
-					{
-						return handle_;
-					}
-
-					inline auto operator->() noexcept
-					{
-						return handle_;
-					}
-
-					inline const auto operator->() const noexcept
+					inline auto operator->() const noexcept
 					{
 						return handle_;
 					}

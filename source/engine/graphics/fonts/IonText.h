@@ -487,7 +487,7 @@ namespace ion::graphics::fonts
 			//Returns an immutable range of all formatted lines in this text
 			//Each line contains formatted blocks of text, with associated styles
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto FormattedLines() const noexcept
+			[[nodiscard]] inline auto FormattedLines() const noexcept
 			{
 				return adaptors::ranges::Iterable<const text::MeasuredTextLines&>{formatted_lines_};
 			}

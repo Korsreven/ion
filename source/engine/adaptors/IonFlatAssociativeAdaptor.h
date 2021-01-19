@@ -51,7 +51,7 @@ namespace ion::adaptors
 		};
 
 		template <typename KeyType, typename ValueType>
-		const auto& extract_key(const ValueType &value) noexcept
+		auto& extract_key(const ValueType &value) noexcept
 		{
 			if constexpr (std::is_same_v<KeyType, ValueType>)
 				return value; //Set
@@ -220,7 +220,7 @@ namespace ion::adaptors
 
 		//Returns an immutable range of all elements in the underlying container
 		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline const auto Elements() const noexcept
+		[[nodiscard]] inline auto Elements() const noexcept
 		{
 			return ranges::BasicIterable<const typename my_base::container_type&, IteratorAdaptor>{this->container_};
 		}

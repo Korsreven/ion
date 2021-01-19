@@ -107,7 +107,7 @@ namespace ion::graphics::fonts
 
 			//Returns an immutable range of all fonts in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Fonts() const noexcept
+			[[nodiscard]] inline auto Fonts() const noexcept
 			{
 				return Resources();
 			}

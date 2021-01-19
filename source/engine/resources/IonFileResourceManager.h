@@ -137,7 +137,7 @@ namespace ion::resources
 
 			//Returns an immutable range of all repositories in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Repositories() const noexcept
+			[[nodiscard]] inline auto Repositories() const noexcept
 			{
 				return RepositoryBase::Objects();
 			}

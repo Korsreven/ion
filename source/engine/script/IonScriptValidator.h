@@ -320,7 +320,7 @@ namespace ion::script
 
 				//Returns an immutable range of all values for this enumerable parameter
 				//This can be used directly with a range-based for loop
-				[[nodiscard]] inline const auto Values() const noexcept
+				[[nodiscard]] inline auto Values() const noexcept
 				{
 					assert(type_ == ParameterType::Enumerable && values_);
 					return values_->Elements();
@@ -370,7 +370,7 @@ namespace ion::script
 
 				//Returns an immutable range of all parameters for this property
 				//This can be used directly with a range-based for loop
-				[[nodiscard]] inline const auto Parameters() const noexcept
+				[[nodiscard]] inline auto Parameters() const noexcept
 				{
 					return adaptors::ranges::Iterable<const ParameterDefinitions&>{parameters_};
 				}
@@ -519,21 +519,21 @@ namespace ion::script
 
 				//Returns an immutable range of all base classes of this class
 				//This can be used directly with a range-based for loop
-				[[nodiscard]] inline const auto BaseClasses() const noexcept
+				[[nodiscard]] inline auto BaseClasses() const noexcept
 				{
 					return base_classes_.Elements();
 				}
 
 				//Returns an immutable range of all inner classes of this class
 				//This can be used directly with a range-based for loop
-				[[nodiscard]] inline const auto InnerClasses() const noexcept
+				[[nodiscard]] inline auto InnerClasses() const noexcept
 				{
 					return inner_classes_.Elements();
 				}
 
 				//Returns an immutable range of all properties of this class
 				//This can be used directly with a range-based for loop
-				[[nodiscard]] inline const auto Properties() const noexcept
+				[[nodiscard]] inline auto Properties() const noexcept
 				{
 					return properties_.Elements();
 				}
@@ -673,7 +673,7 @@ namespace ion::script
 
 			//Returns an immutable range of all classes in this validator
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Classes() const noexcept
+			[[nodiscard]] inline auto Classes() const noexcept
 			{
 				return root_.InnerClasses();
 			}

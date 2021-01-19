@@ -159,7 +159,7 @@ namespace ion::assets
 
 			//Returns an immutable range of all repositories attached to this loader
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Repositories() const noexcept
+			[[nodiscard]] inline auto Repositories() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const asset_loader::detail::container_type&>{repositories_};
 			}

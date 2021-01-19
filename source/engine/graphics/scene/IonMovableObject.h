@@ -88,14 +88,8 @@ namespace ion::graphics::scene
 				Observers
 			*/
 
-			//Returns a pointer to a mutable parent node for this movable object
-			[[nodiscard]] inline auto ParentNode() noexcept
-			{
-				return parent_node_;
-			}
-
-			//Returns a pointer to an immutable parent node for this movable object
-			[[nodiscard]] inline const auto ParentNode() const noexcept
+			//Returns a pointer to the parent node for this movable object
+			[[nodiscard]] inline auto ParentNode() const noexcept
 			{
 				return parent_node_;
 			}

@@ -155,9 +155,8 @@ namespace ion::graphics::utilities
 				return corners_[2];
 			}
 
-
 			//Returns direct access to all corners
-			[[nodiscard]] inline const auto Corners() const noexcept
+			[[nodiscard]] inline auto Corners() const noexcept
 			{
 				return &corners_[0];
 			}

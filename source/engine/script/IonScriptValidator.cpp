@@ -461,7 +461,7 @@ bool validate_property(const script_tree::PropertyNode &property, const property
 bool validate_properties(const ScriptTree &tree, const script_tree::ObjectNode &object, const ClassDefinition &class_def,
 	class_declarations_cacher &declarations_cacher, std::vector<ValidateError> &errors)
 {
-	auto [inner_classes, properties] = declarations_cacher.Get(class_def);
+	auto &[inner_classes, properties] = declarations_cacher.Get(class_def);
 	auto required_properties = get_required_properties(properties);
 	ValidateError error;
 
@@ -498,8 +498,8 @@ bool validate_properties(const ScriptTree &tree, const script_tree::ObjectNode &
 const ClassDefinition* validate_class(const ScriptTree &tree, const script_tree::ObjectNode &object, const ClassDefinition &class_owner,
 	class_definition_cacher &definition_cacher, class_declarations_cacher &declarations_cacher, std::vector<ValidateError> &errors)
 {
-	auto [inner_classes, properties] = declarations_cacher.Get(class_owner);
-	inner_class_declarations::value_type *class_candidate = nullptr;
+	auto &[inner_classes, properties] = declarations_cacher.Get(class_owner);
+	const inner_class_declarations::value_type *class_candidate = nullptr;
 	ValidateError error;
 
 	if (auto iter = inner_classes.find(object.Name());
@@ -583,7 +583,7 @@ bool validate_tree(const ScriptTree &tree, const ClassDefinition &root, std::vec
 	class_definition_cacher definition_cacher{root};
 	class_declarations_cacher declarations_cacher{root};	
 
-	auto [root_classes, root_properties] = declarations_cacher.Get(root);
+	auto &[root_classes, root_properties] = declarations_cacher.Get(root);
 	std::vector<scope> scopes{{nullptr, root, get_required_classes(root_classes)}};
 	auto next_search_depth = -1;
 	ValidateError error;
@@ -617,7 +617,7 @@ bool validate_tree(const ScriptTree &tree, const ClassDefinition &root, std::vec
 
 		if (auto class_def = validate_class(tree, object, scopes.back().class_def, definition_cacher, declarations_cacher, errors); class_def)
 		{
-			auto [inner_classes, properties] = declarations_cacher.Get(*class_def);
+			auto &[inner_classes, properties] = declarations_cacher.Get(*class_def);
 
 			scopes.back().required_classes.erase(class_def->Name());
 			scopes.push_back({&object, *class_def, get_required_classes(inner_classes)});
@@ -693,7 +693,7 @@ std::string print_output(duration validate_time, const std::vector<ValidateError
 
 		output += "[Validation errors]";
 
-		for (const auto &error : errors)
+		for (auto &error : errors)
 			output += ion::utilities::string::Concat(
 				"\n", "Error. ", error.Condition.message(), " (", error.FullyQualifiedName, ")");
 	}

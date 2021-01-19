@@ -530,7 +530,7 @@ namespace ion::graphics::particles
 
 			//Returns an immutable range of all particles in this emitter
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Particles() const noexcept
+			[[nodiscard]] inline auto Particles() const noexcept
 			{
 				return adaptors::ranges::Iterable<const emitter::detail::container_type<Particle>&>{particles_};
 			}

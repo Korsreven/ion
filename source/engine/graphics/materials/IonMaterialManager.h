@@ -68,7 +68,7 @@ namespace ion::graphics::materials
 
 		//Returns an immutable range of all materials in this manager
 		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline const auto Materials() const noexcept
+		[[nodiscard]] inline auto Materials() const noexcept
 		{
 			return Objects();
 		}

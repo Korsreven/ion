@@ -561,7 +561,7 @@ ObjectNode& ObjectNode::Find(std::string_view name) noexcept
 
 const ObjectNode& ObjectNode::Find(std::string_view name) const noexcept
 {
-	for (const auto &object : objects_)
+	for (auto &object : objects_)
 	{
 		if (object.Name() == name)
 			return object;
@@ -629,7 +629,7 @@ PropertyNode& ObjectNode::Property(std::string_view name) noexcept
 
 const PropertyNode& ObjectNode::Property(std::string_view name) const noexcept
 {
-	for (const auto &property : properties_)
+	for (auto &property : properties_)
 	{
 		if (property.Name() == name)
 			return property;
@@ -736,7 +736,7 @@ ObjectNode& ScriptTree::Find(std::string_view name) noexcept
 
 const ObjectNode& ScriptTree::Find(std::string_view name) const noexcept
 {
-	for (const auto &object : objects_)
+	for (auto &object : objects_)
 	{
 		if (object.Name() == name)
 			return object;

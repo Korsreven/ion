@@ -162,7 +162,7 @@ namespace ion::events
 
 			//Returns an immutable range of all listeners subscribed to this listener listenable
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Listeners() const noexcept
+			[[nodiscard]] inline auto Listeners() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const listenable::detail::container_type<T>&>{listeners_};
 			}

@@ -218,21 +218,14 @@ namespace ion::managed
 
 
 			//Returns true if this observed object is observing an object
-			inline operator bool() const noexcept
+			[[nodiscard]] inline operator bool() const noexcept
 			{
 				return !!managed_object_;
 			}
 
-			//Returns a pointer to a mutable object
+			//Returns a pointer to the managed object
 			//Returns nullptr if this observed object is not observing an object
-			inline auto operator->() noexcept
-			{
-				return managed_object_;
-			}
-
-			//Returns a pointer to an immutable object
-			//Returns nullptr if this observed object is not observing an object
-			inline const auto operator->() const noexcept
+			[[nodiscard]] inline auto operator->() const noexcept
 			{
 				return managed_object_;
 			}
@@ -274,7 +267,7 @@ namespace ion::managed
 
 			//Returns a pointer to an immutable object
 			//Returns nullptr if this observed object does not observe an object
-			[[nodiscard]] inline const auto Object() const noexcept	
+			[[nodiscard]] inline auto Object() const noexcept	
 			{
 				return managed_object_;
 			}

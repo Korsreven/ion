@@ -115,7 +115,7 @@ namespace ion
 
 			//Returns a pointer to an immutable render window
 			//Returns nullptr if the engine is not rendering to a target
-			[[nodiscard]] inline const auto Target() const noexcept
+			[[nodiscard]] inline auto Target() const noexcept
 			{
 				return render_window_ ? &*render_window_ : nullptr;
 			}
@@ -130,7 +130,7 @@ namespace ion
 
 			//Returns a pointer to an immutable input controller
 			//Returns nullptr if the engine has no input controller (missing rendering target)
-			[[nodiscard]] inline const auto Input() const noexcept
+			[[nodiscard]] inline auto Input() const noexcept
 			{
 				return input_controller_ ? &*input_controller_ : nullptr;
 			}

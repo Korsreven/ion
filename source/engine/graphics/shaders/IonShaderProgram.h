@@ -100,7 +100,7 @@ namespace ion::graphics::shaders
 
 			//Returns an immutable range of all attribute variables in this shader program
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto AttributeVariables() const noexcept
+			[[nodiscard]] inline auto AttributeVariables() const noexcept
 			{
 				return AttributeVariablesBase::Objects();
 			}
@@ -115,7 +115,7 @@ namespace ion::graphics::shaders
 
 			//Returns an immutable range of all uniform variables in this shader program
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto UniformVariables() const noexcept
+			[[nodiscard]] inline auto UniformVariables() const noexcept
 			{
 				return UniformVariablesBase::Objects();
 			}

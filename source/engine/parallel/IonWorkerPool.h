@@ -191,7 +191,7 @@ namespace ion::parallel
 
 			//Returns an immutable range of all workers in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Workers() const noexcept
+			[[nodiscard]] inline auto Workers() const noexcept
 			{
 				return adaptors::ranges::Iterable<const worker_pool::detail::container_type<Ret, Id>&>{workers_};
 			}

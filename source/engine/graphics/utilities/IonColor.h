@@ -384,9 +384,8 @@ namespace ion::graphics::utilities
 				return std::tuple{red_, green_, blue_, alpha_};
 			}
 
-
 			//Returns direct access to all color channels as percentages in range [0.0, 1.0]
-			[[nodiscard]] inline const auto Channels() const noexcept
+			[[nodiscard]] inline auto Channels() const noexcept
 			{
 				return channels_;
 			}

@@ -63,7 +63,7 @@ namespace ion::timers
 
 		//Returns an immutable range of all timers in this manager
 		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline const auto Timers() const noexcept
+		[[nodiscard]] inline auto Timers() const noexcept
 		{
 			return Objects();
 		}

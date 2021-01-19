@@ -265,7 +265,7 @@ namespace ion::graphics::shaders::variables::glsl
 			}
 
 			//Returns a pointer to all values (immutable) from off
-			[[nodiscard]] inline const auto Values() const noexcept
+			[[nodiscard]] inline auto Values() const noexcept
 			{
 				return &values_[type_components_v<T> * off_];
 			}
@@ -788,8 +788,8 @@ namespace ion::graphics::shaders::variables::glsl
 				Observers
 			*/
 
-			//Returns a pointer to the first vertex attribute (immutable)
-			[[nodiscard]] inline const auto VertexData() const noexcept
+			//Returns a pointer to the first vertex attribute
+			[[nodiscard]] inline auto VertexData() const noexcept
 			{
 				return vertex_data_;
 			}

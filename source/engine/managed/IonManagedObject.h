@@ -87,14 +87,8 @@ namespace ion::managed
 				return name_;
 			}
 
-			//Returns a mutable owner for this managed object
-			[[nodiscard]] inline auto Owner() noexcept
-			{
-				return owner_;
-			}
-
-			//Returns an immutable owner for this managed object
-			[[nodiscard]] inline const auto Owner() const noexcept
+			//Returns a pointer to the owner of this managed object
+			[[nodiscard]] inline auto Owner() const noexcept
 			{
 				return owner_;
 			}

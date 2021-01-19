@@ -109,7 +109,7 @@ namespace ion::graphics::scene
 
 			//Returns an immutable range of all meshes in this model
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Meshes() const noexcept
+			[[nodiscard]] inline auto Meshes() const noexcept
 			{
 				return Objects();
 			}

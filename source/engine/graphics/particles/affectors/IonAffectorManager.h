@@ -63,7 +63,7 @@ namespace ion::graphics::particles::affectors
 
 			//Returns an immutable range of all affectors in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Affectors() const noexcept
+			[[nodiscard]] inline auto Affectors() const noexcept
 			{
 				return Objects();
 			}

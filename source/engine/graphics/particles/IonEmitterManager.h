@@ -63,7 +63,7 @@ namespace ion::graphics::particles
 
 			//Returns an immutable range of all emitters in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Emitters() const noexcept
+			[[nodiscard]] inline auto Emitters() const noexcept
 			{
 				return Objects();
 			}

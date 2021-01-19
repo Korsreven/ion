@@ -297,7 +297,7 @@ namespace ion::graphics::shaders
 
 			//Returns an immutable range of all shader programs in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto ShaderPrograms() const noexcept
+			[[nodiscard]] inline auto ShaderPrograms() const noexcept
 			{
 				return Resources();
 			}

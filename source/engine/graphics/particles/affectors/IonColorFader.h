@@ -134,7 +134,7 @@ namespace ion::graphics::particles::affectors
 
 			//Returns an immutable range of all fading steps in this color fader
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Steps() const noexcept
+			[[nodiscard]] inline auto Steps() const noexcept
 			{
 				return adaptors::ranges::Iterable<const color_fader::detail::color_steps&>{steps_};
 			}

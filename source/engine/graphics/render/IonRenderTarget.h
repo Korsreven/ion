@@ -156,7 +156,7 @@ namespace ion::graphics::render
 
 			//Returns an immutable range of all viewports in this render target
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Viewports() const noexcept
+			[[nodiscard]] inline auto Viewports() const noexcept
 			{
 				return Objects();
 			}

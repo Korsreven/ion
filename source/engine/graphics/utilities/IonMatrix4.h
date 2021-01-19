@@ -532,13 +532,7 @@ namespace ion::graphics::utilities
 
 
 			//Returns direct access to the matrix
-			[[nodiscard]] inline auto M() noexcept
-			{
-				return m_;
-			}
-
-			//Returns direct access to the matrix
-			[[nodiscard]] inline const auto M() const noexcept
+			[[nodiscard]] inline auto M() const noexcept
 			{
 				return m_;
 			}

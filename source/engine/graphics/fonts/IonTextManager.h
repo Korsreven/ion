@@ -70,7 +70,7 @@ namespace ion::graphics::fonts
 
 		//Returns an immutable range of all texts in this manager
 		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline const auto Texts() const noexcept
+		[[nodiscard]] inline auto Texts() const noexcept
 		{
 			return Objects();
 		}

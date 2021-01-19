@@ -134,7 +134,7 @@ namespace ion::graphics::particles::affectors
 
 			//Returns an immutable range of all size steps in this scaler
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Steps() const noexcept
+			[[nodiscard]] inline auto Steps() const noexcept
 			{
 				return adaptors::ranges::Iterable<const scaler::detail::size_steps&>{steps_};
 			}

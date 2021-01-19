@@ -303,7 +303,7 @@ bool FileRepository::RemoveDirectories(const utilities::file::Paths &directory_p
 {
 	auto count = std::size(files_);
 
-	for (const auto &directory_path : directory_paths)
+	for (auto &directory_path : directory_paths)
 		RemoveDirectory(directory_path, directory_iteration);
 
 	return count > std::size(files_);

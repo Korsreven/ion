@@ -168,7 +168,7 @@ namespace ion::assets::repositories
 
 			//Returns an immutable range of all files in this repository
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Files() const noexcept
+			[[nodiscard]] inline auto Files() const noexcept
 			{
 				return files_.Elements();
 			}
@@ -182,7 +182,7 @@ namespace ion::assets::repositories
 
 			//Returns an immutable range of all files in this repository
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto FileExtensions() const noexcept
+			[[nodiscard]] inline auto FileExtensions() const noexcept
 			{
 				return file_extensions_.Elements();
 			}

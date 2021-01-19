@@ -85,7 +85,7 @@ namespace ion::unmanaged
 
 			//Returns an immutable range of all objects in this factory
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Objects() const noexcept
+			[[nodiscard]] inline auto Objects() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const object_factory::detail::container_type<T>&>{objects_};
 			}

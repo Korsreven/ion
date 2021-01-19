@@ -271,18 +271,11 @@ namespace ion::events
 				Observers
 			*/
 
-			//Returns a pointer to a mutable publisher
+			//Returns a pointer to the publisher
 			//Returns nullptr if this event channel does not have a publisher
-			[[nodiscard]] inline auto Publisher() noexcept	
+			[[nodiscard]] inline auto Publisher() const noexcept	
 			{
-				return static_cast<PublisherT*>(publisher_);
-			}
-
-			//Returns a pointer to an immutable publisher
-			//Returns nullptr if this event channel does not have a publisher
-			[[nodiscard]] inline const auto Publisher() const noexcept	
-			{
-				return static_cast<const PublisherT*>(publisher_);
+				return publisher_;
 			}
 
 			//Returns the subscription contract for this event channel

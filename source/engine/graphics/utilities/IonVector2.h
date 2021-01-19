@@ -313,15 +313,8 @@ namespace ion::graphics::utilities
 				return std::pair{x_, y_};
 			}
 
-
 			//Returns direct access to both vector components
-			[[nodiscard]] inline auto Components() noexcept
-			{
-				return components_;
-			}
-
-			//Returns direct access to both vector components
-			[[nodiscard]] inline const auto Components() const noexcept
+			[[nodiscard]] inline auto Components() const noexcept
 			{
 				return components_;
 			}

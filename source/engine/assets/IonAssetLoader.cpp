@@ -183,9 +183,9 @@ bool AssetLoader::CompileDataFile(std::filesystem::path data_file_path,
 	file::Paths file_paths;
 
 	//Add all files that does not already come from a data file
-	for (const auto &repository : repositories_)
+	for (auto &repository : repositories_)
 	{
-		for (const auto &file : repository->Files())
+		for (auto &file : repository->Files())
 		{
 			if (!file.second.DataFile)
 				file_paths.push_back(file.second.Path);

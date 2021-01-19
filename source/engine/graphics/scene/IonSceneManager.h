@@ -100,7 +100,7 @@ namespace ion::graphics::scene
 
 			//Returns an immutable range of all cameras in this scene manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Cameras() const noexcept
+			[[nodiscard]] inline auto Cameras() const noexcept
 			{
 				return CameraBase::Objects();
 			}
@@ -115,7 +115,7 @@ namespace ion::graphics::scene
 
 			//Returns an immutable range of all lights in this scene manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Lights() const noexcept
+			[[nodiscard]] inline auto Lights() const noexcept
 			{
 				return LightBase::Objects();
 			}
@@ -130,7 +130,7 @@ namespace ion::graphics::scene
 
 			//Returns an immutable range of all models in this scene manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline const auto Models() const noexcept
+			[[nodiscard]] inline auto Models() const noexcept
 			{
 				return ModelBase::Objects();
 			}

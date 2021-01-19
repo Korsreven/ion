@@ -67,7 +67,7 @@ namespace ion::graphics::fonts
 
 		//Returns an immutable range of all type faces in this manager
 		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline const auto TypeFaces() const noexcept
+		[[nodiscard]] inline auto TypeFaces() const noexcept
 		{
 			return Objects();
 		}

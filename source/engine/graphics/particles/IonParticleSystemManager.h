@@ -67,7 +67,7 @@ namespace ion::graphics::particles
 
 		//Returns an immutable range of all particle systems in this manager
 		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline const auto ParticleSystems() const noexcept
+		[[nodiscard]] inline auto ParticleSystems() const noexcept
 		{
 			return Objects();
 		}
