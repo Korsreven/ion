@@ -482,7 +482,7 @@ void Animation::LastFrame() noexcept
 }
 
 
-NonOwningPtr<Texture> Animation::CurrentFrame() noexcept
+NonOwningPtr<Texture> Animation::CurrentFrame() const noexcept
 {
 	if (HasFrames())
 		return (*frame_sequence_)[current_frame_];
@@ -490,16 +490,7 @@ NonOwningPtr<Texture> Animation::CurrentFrame() noexcept
 		return nullptr;
 }
 
-NonOwningPtr<const Texture> Animation::CurrentFrame() const noexcept
-{
-	if (HasFrames())
-		return (*frame_sequence_)[current_frame_];
-	else
-		return nullptr;
-}
-
-
-NonOwningPtr<Texture> Animation::FrameAt(duration time) noexcept
+NonOwningPtr<Texture> Animation::FrameAt(duration time) const noexcept
 {
 	if (HasFrames())
 		return (*frame_sequence_)[detail::frame_at(time / playback_rate_, CycleDuration(),
@@ -507,27 +498,6 @@ NonOwningPtr<Texture> Animation::FrameAt(duration time) noexcept
 			direction_, frame_sequence_->FrameCount())];
 	else
 		return nullptr;
-}
-
-NonOwningPtr<const Texture> Animation::FrameAt(duration time) const noexcept
-{
-	if (HasFrames())
-		return (*frame_sequence_)[detail::frame_at(time / playback_rate_, CycleDuration(),
-			repeat_count_ ? repeat_count_->second : std::optional<int>{},
-			direction_, frame_sequence_->FrameCount())];
-	else
-		return nullptr;
-}
-
-
-NonOwningPtr<FrameSequence> Animation::UnderlyingFrameSequence() noexcept
-{
-	return frame_sequence_;
-}
-
-NonOwningPtr<const FrameSequence> Animation::UnderlyingFrameSequence() const noexcept
-{
-	return frame_sequence_;
 }
 
 

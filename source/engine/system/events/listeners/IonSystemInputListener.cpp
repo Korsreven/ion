@@ -335,15 +335,4 @@ void InputListener::ConnectedViewport(NonOwningPtr<graphics::render::Viewport> v
 		viewport_ = nullptr;
 }
 
-
-NonOwningPtr<graphics::render::Viewport> InputListener::ConnectedViewport() noexcept
-{
-	return viewport_;
-}
-
-NonOwningPtr<const graphics::render::Viewport> InputListener::ConnectedViewport() const noexcept
-{
-	return viewport_;
-}
-
 } //ion::system::events::listeners

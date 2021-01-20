@@ -86,24 +86,26 @@ std::pair<Vector2, Vector2> get_normalized_tex_coords(const Vector2 &lower_left,
 	Texture map
 */
 
-map_pair_type get_texture_maps(const map_type &map) noexcept
+std::pair<NonOwningPtr<Animation>, NonOwningPtr<Texture>> get_texture_maps(const texture_map_type &texture_map) noexcept
 {
+	using pair_type = std::pair<NonOwningPtr<Animation>, NonOwningPtr<Texture>>;
+
 	return std::visit(types::overloaded{
-		[](std::monostate) -> map_pair_type { return {nullptr, nullptr}; },
-		[](NonOwningPtr<Animation> animation) -> map_pair_type { return {animation, nullptr}; },
-		[](NonOwningPtr<Texture> texture) -> map_pair_type { return {nullptr, texture}; }	
-	}, map);
+		[](std::monostate) { return pair_type{nullptr, nullptr}; },
+		[](NonOwningPtr<Animation> animation) { return pair_type{animation, nullptr}; },
+		[](NonOwningPtr<Texture> texture) { return pair_type{nullptr, texture}; }	
+	}, texture_map);
 }
 
-NonOwningPtr<Texture> get_texture_map(const map_type &map) noexcept
+NonOwningPtr<Texture> get_texture_map(const texture_map_type &texture_map) noexcept
 {
-	if (auto [animation, texture] = get_texture_maps(map); texture || animation)
+	if (auto [animation, texture] = get_texture_maps(texture_map); texture || animation)
 		return animation ? animation->UnderlyingFrameSequence()->FirstFrame() : texture;
 	else
 		return nullptr;
 }
 
-NonOwningPtr<Texture> get_first_texture_map(const map_type &diffuse_map, const map_type &specular_map, const map_type &normal_map) noexcept
+NonOwningPtr<Texture> get_first_texture_map(const texture_map_type &diffuse_map, const texture_map_type &specular_map, const texture_map_type &normal_map) noexcept
 {
 	if (auto texture = get_texture_map(diffuse_map); texture)
 		return texture;
@@ -230,76 +232,8 @@ Material::Material(std::string name,
 
 
 /*
-	Modifiers
-*/
-
-void Material::DiffuseMap(NonOwningPtr<Animation> animation) noexcept
-{
-	diffuse_map_ = animation;
-}
-
-void Material::DiffuseMap(NonOwningPtr<Texture> texture) noexcept
-{
-	diffuse_map_ = texture;
-}
-
-void Material::DiffuseMap(std::nullptr_t) noexcept
-{
-	diffuse_map_ = std::monostate{};
-}
-
-
-void Material::SpecularMap(NonOwningPtr<Animation> animation) noexcept
-{
-	specular_map_ = animation;
-}
-
-void Material::SpecularMap(NonOwningPtr<Texture> texture) noexcept
-{
-	specular_map_ = texture;
-}
-
-void Material::SpecularMap(std::nullptr_t) noexcept
-{
-	specular_map_ = std::monostate{};
-}
-
-
-void Material::NormalMap(NonOwningPtr<Animation> animation) noexcept
-{
-	normal_map_ = animation;
-}
-
-void Material::NormalMap(NonOwningPtr<Texture> texture) noexcept
-{
-	normal_map_ = texture;
-}
-
-void Material::NormalMap(std::nullptr_t) noexcept
-{
-	normal_map_ = std::monostate{};
-}
-
-
-/*
 	Observers
 */
-
-detail::map_pair_type Material::DiffuseMap() const noexcept
-{
-	return detail::get_texture_maps(diffuse_map_);
-}
-
-detail::map_pair_type Material::SpecularMap() const noexcept
-{
-	return detail::get_texture_maps(specular_map_);
-}
-
-detail::map_pair_type Material::NormalMap() const noexcept
-{
-	return detail::get_texture_maps(normal_map_);
-}
-
 
 NonOwningPtr<Texture> Material::DiffuseMap(duration time) const noexcept
 {

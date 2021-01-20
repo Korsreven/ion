@@ -232,17 +232,6 @@ std::optional<real> Text::LineHeight() const noexcept
 }
 
 
-NonOwningPtr<TypeFace> Text::Lettering() noexcept
-{
-	return type_face_;
-}
-
-NonOwningPtr<const TypeFace> Text::Lettering() const noexcept
-{
-	return type_face_;
-}
-
-
 /*
 	Content
 */

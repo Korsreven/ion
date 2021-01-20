@@ -181,14 +181,12 @@ namespace ion::system::events::listeners
 			//Sets the viewport connected to this input listener to the given viewport
 			void ConnectedViewport(NonOwningPtr<graphics::render::Viewport> viewport) noexcept;
 
-
-			//Returns a pointer to the viewport (mutable) connected to this input listener
+			//Returns a pointer to the viewport connected to this input listener
 			//Returns nullptr if this input listener does not have a viewport connected
-			[[nodiscard]] NonOwningPtr<graphics::render::Viewport> ConnectedViewport() noexcept;
-
-			//Returns a pointer to the viewport (immutable) connected to this input listener
-			//Returns nullptr if this input listener does not have a viewport connected
-			[[nodiscard]] NonOwningPtr<const graphics::render::Viewport> ConnectedViewport() const noexcept;
+			[[nodiscard]] inline auto ConnectedViewport() const noexcept
+			{
+				return viewport_;
+			}
 	};
 } //ion::system::events::listeners
 

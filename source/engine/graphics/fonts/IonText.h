@@ -437,14 +437,12 @@ namespace ion::graphics::fonts
 				return default_decoration_color_;
 			}
 
-
-			//Returns a pointer to the mutable type face in this text (used for lettering)
+			//Returns a pointer to the type face in this text (used for lettering)
 			//Returns nullptr if this text does not have a type face
-			[[nodiscard]] NonOwningPtr<TypeFace> Lettering() noexcept;
-
-			//Returns a pointer to the immutable type face in this text (used for lettering)
-			//Returns nullptr if this text does not have a type face
-			[[nodiscard]] NonOwningPtr<const TypeFace> Lettering() const noexcept;
+			[[nodiscard]] inline auto Lettering() const noexcept
+			{
+				return type_face_;
+			}
 
 
 			/*

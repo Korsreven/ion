@@ -39,12 +39,10 @@ namespace ion::graphics::materials
 
 	namespace material::detail
 	{
-		using map_type = std::variant<
+		using texture_map_type = std::variant<
 			std::monostate,
 			NonOwningPtr<Animation>,
 			NonOwningPtr<Texture>>;
-
-		using map_pair_type = std::pair<NonOwningPtr<Animation>, NonOwningPtr<Texture>>;
 
 		/*
 			Texure coordinates
@@ -92,9 +90,9 @@ namespace ion::graphics::materials
 			Texture map
 		*/
 
-		map_pair_type get_texture_maps(const map_type &map) noexcept;
-		NonOwningPtr<Texture> get_texture_map(const map_type &map) noexcept;
-		NonOwningPtr<Texture> get_first_texture_map(const map_type &diffuse_map, const map_type &specular_map, const map_type &normal_map) noexcept;
+		std::pair<NonOwningPtr<Animation>, NonOwningPtr<Texture>> get_texture_maps(const texture_map_type &texture_map) noexcept;
+		NonOwningPtr<Texture> get_texture_map(const texture_map_type &texture_map) noexcept;
+		NonOwningPtr<Texture> get_first_texture_map(const texture_map_type &diffuse_map, const texture_map_type &specular_map, const texture_map_type &normal_map) noexcept;
 
 		std::pair<bool, bool> is_texture_map_repeatable(const Texture &texture,
 			const Vector2 &lower_left, const Vector2 &upper_right) noexcept;
@@ -110,9 +108,9 @@ namespace ion::graphics::materials
 			Color specular_color_;
 			real shininess_ = 0.0_r;
 
-			material::detail::map_type diffuse_map_;
-			material::detail::map_type specular_map_;
-			material::detail::map_type normal_map_;
+			material::detail::texture_map_type diffuse_map_;
+			material::detail::texture_map_type specular_map_;
+			material::detail::texture_map_type normal_map_;
 
 			Vector2 lower_left_tex_coord_ = vector2::Zero;
 			Vector2 upper_right_tex_coord_ = vector2::UnitScale;
@@ -192,33 +190,60 @@ namespace ion::graphics::materials
 
 
 			//Attach the given animation as a diffuse map for the material
-			void DiffuseMap(NonOwningPtr<Animation> animation) noexcept;
+			inline void DiffuseMap(NonOwningPtr<Animation> animation) noexcept
+			{
+				diffuse_map_ = animation;
+			}
 
 			//Attach the given texture as a diffuse map for the material
-			void DiffuseMap(NonOwningPtr<Texture> texture) noexcept;
+			inline void DiffuseMap(NonOwningPtr<Texture> texture) noexcept
+			{
+				diffuse_map_ = texture;
+			}
 
 			//Detach the diffuse map from the material
-			void DiffuseMap(std::nullptr_t) noexcept;
+			inline void DiffuseMap(std::nullptr_t) noexcept
+			{
+				diffuse_map_ = std::monostate{};
+			}
 
 
 			//Attach the given animation as a specular map for the material
-			void SpecularMap(NonOwningPtr<Animation> animation) noexcept;
+			inline void SpecularMap(NonOwningPtr<Animation> animation) noexcept
+			{
+				specular_map_ = animation;
+			}
 
 			//Attach the given texture as a specular map for the material
-			void SpecularMap(NonOwningPtr<Texture> texture) noexcept;
+			inline void SpecularMap(NonOwningPtr<Texture> texture) noexcept
+			{
+				specular_map_ = texture;
+			}
 
 			//Detach the specular map from the material
-			void SpecularMap(std::nullptr_t) noexcept;
+			inline void SpecularMap(std::nullptr_t) noexcept
+			{
+				specular_map_ = std::monostate{};
+			}
 
 
 			//Attach the given animation as a normal map for the material
-			void NormalMap(NonOwningPtr<Animation> animation) noexcept;
+			inline void NormalMap(NonOwningPtr<Animation> animation) noexcept
+			{
+				normal_map_ = animation;
+			}
 
 			//Attach the given texture as a normal map for the material
-			void NormalMap(NonOwningPtr<Texture> texture) noexcept;
+			inline void NormalMap(NonOwningPtr<Texture> texture) noexcept
+			{
+				normal_map_ = texture;
+			}
 
 			//Detach the normal map from the material
-			void NormalMap(std::nullptr_t) noexcept;
+			inline void NormalMap(std::nullptr_t) noexcept
+			{
+				normal_map_ = std::monostate{};
+			}
 
 
 			//Sets the lower left and upper right texture coordinates for this material to the given coordinates
@@ -272,15 +297,24 @@ namespace ion::graphics::materials
 
 			//Returns the attached diffuse map as a pair of either animation or texture
 			//Returns nullptr on both components if no diffuse map is in use
-			[[nodiscard]] material::detail::map_pair_type DiffuseMap() const noexcept;
+			[[nodiscard]] inline auto DiffuseMap() const noexcept
+			{
+				return material::detail::get_texture_maps(diffuse_map_);
+			}
 
 			//Returns the attached specular map as a pair of either animation or texture
 			//Returns nullptr on both components if no specular map is in use
-			[[nodiscard]] material::detail::map_pair_type SpecularMap() const noexcept;
+			[[nodiscard]] inline auto SpecularMap() const noexcept
+			{
+				return material::detail::get_texture_maps(specular_map_);
+			}
 
 			//Returns the attached normal map as a pair of either animation or texture
 			//Returns nullptr on both components if no normal map is in use
-			[[nodiscard]] material::detail::map_pair_type NormalMap() const noexcept;
+			[[nodiscard]] inline auto NormalMap() const noexcept
+			{
+				return material::detail::get_texture_maps(normal_map_);
+			}
 
 
 			//Returns the attached diffuse map texture at the given time

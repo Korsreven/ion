@@ -325,27 +325,6 @@ Viewport Viewport::BottomRightAligned(std::string name, RenderTarget &render_tar
 
 
 /*
-	Camera
-*/
-
-void Viewport::ConnectedCamera(NonOwningPtr<scene::Camera> camera) noexcept
-{
-	camera_ = camera;
-}
-
-
-NonOwningPtr<scene::Camera> Viewport::ConnectedCamera() noexcept
-{
-	return camera_;
-}
-
-NonOwningPtr<const scene::Camera> Viewport::ConnectedCamera() const noexcept
-{
-	return camera_;
-}
-
-
-/*
 	Rendering
 */
 

@@ -276,31 +276,21 @@ namespace ion::graphics::textures
 			void LastFrame() noexcept;
 
 
-			//Returns a pointer to the mutable current frame in this animation
+			//Returns a pointer to the current frame in this animation
 			//Returns nullptr if there is no current frame
-			[[nodiscard]] NonOwningPtr<Texture> CurrentFrame() noexcept;
+			[[nodiscard]] NonOwningPtr<Texture> CurrentFrame() const noexcept;
 
-			//Returns a pointer to the immutable current frame in this animation
-			//Returns nullptr if there is no current frame
-			[[nodiscard]] NonOwningPtr<const Texture> CurrentFrame() const noexcept;
-
-
-			//Returns a pointer to a mutable frame in this animation at the given time
+			//Returns a pointer to the frame in this animation at the given time
 			//Returns nullptr if there is no frame at the given time
-			[[nodiscard]] NonOwningPtr<Texture> FrameAt(duration time) noexcept;
-
-			//Returns a pointer to an immutable frame in this animation at the given time
-			//Returns nullptr if there is no frame at the given time
-			[[nodiscard]] NonOwningPtr<const Texture> FrameAt(duration time) const noexcept;
+			[[nodiscard]] NonOwningPtr<Texture> FrameAt(duration time) const noexcept;
 
 
-			//Returns a pointer to the mutable frame sequence in this animation
+			//Returns a pointer to the underlying frame sequence in this animation
 			//Returns nullptr if this animation does not have an underlying frame sequence
-			[[nodiscard]] NonOwningPtr<FrameSequence> UnderlyingFrameSequence() noexcept;
-
-			//Returns a pointer to the immutable frame sequence in this animation
-			//Returns nullptr if this animation does not have an underlying frame sequence
-			[[nodiscard]] NonOwningPtr<const FrameSequence> UnderlyingFrameSequence() const noexcept;
+			[[nodiscard]] inline auto UnderlyingFrameSequence() const noexcept
+			{
+				return frame_sequence_;
+			}
 
 
 			/*
