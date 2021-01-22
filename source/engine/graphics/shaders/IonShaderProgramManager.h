@@ -380,6 +380,12 @@ namespace ion::graphics::shaders
 			//Update all shader variables attached to the given shader program
 			void UpdateShaderVariables(ShaderProgram &shader_program) noexcept;
 
+			//Update all attribute variables attached to the given shader program
+			void UpdateAttributeVariables(ShaderProgram &shader_program) noexcept;
+
+			//Update all uniform variables attached to the given shader program
+			void UpdateUniformVariables(ShaderProgram &shader_program) noexcept;
+
 
 			/*
 				Outputting

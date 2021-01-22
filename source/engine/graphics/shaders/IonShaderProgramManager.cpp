@@ -902,6 +902,48 @@ void ShaderProgramManager::UpdateShaderVariables(ShaderProgram &shader_program) 
 	}
 }
 
+void ShaderProgramManager::UpdateAttributeVariables(ShaderProgram &shader_program) noexcept
+{
+	if (shader_program.Owner() != this)
+		return;
+
+	if (auto handle = shader_program.Handle(); handle)
+	{
+		auto in_use = detail::get_active_shader_program() == *handle;
+
+		if (!in_use)
+			detail::use_shader_program(*handle);
+
+		//Update all attribute variables attached to shader program
+		for (auto &attribute_variable : shader_program.AttributeVariables())
+			detail::update_attribute_value(*handle, attribute_variable);
+
+		if (!in_use)
+			detail::use_shader_program(0);
+	}
+}
+
+void ShaderProgramManager::UpdateUniformVariables(ShaderProgram &shader_program) noexcept
+{
+	if (shader_program.Owner() != this)
+		return;
+
+	if (auto handle = shader_program.Handle(); handle)
+	{
+		auto in_use = detail::get_active_shader_program() == *handle;
+
+		if (!in_use)
+			detail::use_shader_program(*handle);
+
+		//Update all uniform variables attached to shader program
+		for (auto &uniform_variable : shader_program.UniformVariables())
+			detail::update_uniform_value(*handle, uniform_variable);
+
+		if (!in_use)
+			detail::use_shader_program(0);
+	}
+}
+
 
 /*
 	Outputting
