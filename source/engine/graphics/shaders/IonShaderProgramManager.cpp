@@ -803,7 +803,27 @@ bool ShaderProgramManager::UnloadResource(ShaderProgram &shader_program) noexcep
 }
 
 
+void ShaderProgramManager::Created(ShaderProgram &shader_program) noexcept
+{
+	//No user defined shader layout
+	if (!shader_program.Layout())
+		shader_program.Layout(GetShaderLayout("")); //Use default shader layout
+}
+
+bool ShaderProgramManager::Removable(ShaderLayout &shader_layout) noexcept
+{
+	return shader_layout.Name() != ""; //Don't remove default shader layout
+}
+
+
 //Public
+
+ShaderProgramManager::ShaderProgramManager()
+{
+	CreateShaderLayout(shader_layout::DefaultShaderLayout);
+		//All shader program managers should contain a default shader layout
+		//When a shader program is created, without a user defined layout, the default shader layout is passed automatically
+}
 
 ShaderProgramManager::~ShaderProgramManager() noexcept
 {
@@ -823,9 +843,21 @@ NonOwningPtr<ShaderProgram> ShaderProgramManager::CreateShaderProgram(std::strin
 	return CreateResource(std::move(name), shader);
 }
 
+NonOwningPtr<ShaderProgram> ShaderProgramManager::CreateShaderProgram(std::string name, NonOwningPtr<Shader> shader,
+	NonOwningPtr<ShaderLayout> shader_layout)
+{
+	return CreateResource(std::move(name), shader, shader_layout);
+}
+
 NonOwningPtr<ShaderProgram>ShaderProgramManager::CreateShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader)
 {
 	return CreateResource(std::move(name), vertex_shader, fragment_shader);
+}
+
+NonOwningPtr<ShaderProgram>ShaderProgramManager::CreateShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader,
+	NonOwningPtr<ShaderLayout> shader_layout)
+{
+	return CreateResource(std::move(name), vertex_shader, fragment_shader, shader_layout);
 }
 
 
@@ -942,6 +974,72 @@ void ShaderProgramManager::UpdateUniformVariables(ShaderProgram &shader_program)
 		if (!in_use)
 			detail::use_shader_program(0);
 	}
+}
+
+
+/*
+	Shader layouts
+	Creating
+*/
+
+NonOwningPtr<ShaderLayout> ShaderProgramManager::CreateShaderLayout(std::string name)
+{
+	return ShaderLayoutBase::Create(std::move(name));
+}
+
+NonOwningPtr<ShaderLayout> ShaderProgramManager::CreateShaderLayout(std::string name,
+	std::vector<shader_layout::VariableBinding> attribute_bindings,
+	std::vector<shader_layout::VariableBinding> uniform_bindings)
+{
+	return ShaderLayoutBase::Create(std::move(name), std::move(attribute_bindings), std::move(uniform_bindings));
+}
+
+
+NonOwningPtr<ShaderLayout> ShaderProgramManager::CreateShaderLayout(const ShaderLayout &shader_layout)
+{
+	return ShaderLayoutBase::Create(shader_layout);
+}
+
+NonOwningPtr<ShaderLayout> ShaderProgramManager::CreateShaderLayout(ShaderLayout &&shader_layout)
+{
+	return ShaderLayoutBase::Create(std::move(shader_layout));
+}
+
+
+/*
+	Shader layouts
+	Retrieving
+*/
+
+NonOwningPtr<ShaderLayout> ShaderProgramManager::GetShaderLayout(std::string_view name) noexcept
+{
+	return ShaderLayoutBase::Get(name);
+}
+
+NonOwningPtr<const ShaderLayout> ShaderProgramManager::GetShaderLayout(std::string_view name) const noexcept
+{
+	return ShaderLayoutBase::Get(name);
+}
+
+
+/*
+	Shader layouts
+	Removing
+*/
+
+void ShaderProgramManager::ClearShaderLayouts() noexcept
+{
+	return ShaderLayoutBase::Clear();
+}
+
+bool ShaderProgramManager::RemoveShaderLayout(ShaderLayout &shader_layout) noexcept
+{
+	return ShaderLayoutBase::Remove(shader_layout);
+}
+
+bool ShaderProgramManager::RemoveShaderLayout(std::string_view name) noexcept
+{
+	return ShaderLayoutBase::Remove(name);
 }
 
 

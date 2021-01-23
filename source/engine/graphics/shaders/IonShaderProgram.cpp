@@ -23,8 +23,30 @@ ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> shader) :
 	FragmentShader(shader);
 }
 
+ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> shader,
+	NonOwningPtr<ShaderLayout> shader_layout) :
+
+	resources::Resource<ShaderProgramManager>{std::move(name)},
+	shader_layout_{shader_layout}
+{
+	//The given shader can either be a vertex or a fragment shader, try both
+	VertexShader(shader);
+	FragmentShader(shader);
+}
+
 ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader) :
 	resources::Resource<ShaderProgramManager>{std::move(name)}
+{
+	//The given shaders much match the correct shader type
+	VertexShader(vertex_shader);
+	FragmentShader(fragment_shader);
+}
+
+ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader,
+	NonOwningPtr<ShaderLayout> shader_layout) :
+
+	resources::Resource<ShaderProgramManager>{std::move(name)},
+	shader_layout_{shader_layout}
 {
 	//The given shaders much match the correct shader type
 	VertexShader(vertex_shader);
@@ -56,6 +78,16 @@ void ShaderProgram::FragmentShader(NonOwningPtr<Shader> shader) noexcept
 	}
 	else
 		fragment_shader_ = nullptr;
+}
+
+
+void ShaderProgram::Layout(NonOwningPtr<ShaderLayout> shader_layout) noexcept
+{
+	if (shader_layout_ != shader_layout)
+	{
+		shader_layout_ = shader_layout;
+		//TODO: Update variable mapping
+	}
 }
 
 

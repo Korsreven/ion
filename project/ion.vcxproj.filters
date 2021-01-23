@@ -405,6 +405,9 @@
     <ClCompile Include="..\source\engine\graphics\particles\IonEmitterManager.cpp">
       <Filter>Source Files\graphics\particles</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\shaders\IonShaderLayout.cpp">
+      <Filter>Source Files\graphics\shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -820,6 +823,9 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\memory\IonNonOwningPtr.h">
       <Filter>Header Files\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\shaders\IonShaderLayout.h">
+      <Filter>Header Files\graphics\shaders</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

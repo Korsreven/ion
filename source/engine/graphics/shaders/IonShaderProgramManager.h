@@ -19,6 +19,7 @@ File:	IonShaderProgramManager.h
 #include <string_view>
 #include <type_traits>
 
+#include "IonShaderLayout.h"
 #include "IonShaderProgram.h"
 #include "memory/IonNonOwningPtr.h"
 #include "resources/IonResourceManager.h"
@@ -243,9 +244,13 @@ namespace ion::graphics::shaders
 
 
 	class ShaderProgramManager final :
-		public resources::ResourceManager<ShaderProgram, ShaderProgramManager>
+		public resources::ResourceManager<ShaderProgram, ShaderProgramManager>,
+		public managed::ObjectManager<ShaderLayout, ShaderProgramManager>
 	{
 		private:
+
+			using ShaderProgramBase = resources::ResourceManager<ShaderProgram, ShaderProgramManager>;
+			using ShaderLayoutBase = managed::ObjectManager<ShaderLayout, ShaderProgramManager>;
 
 			std::optional<shader_program_manager::InfoLogLevel> log_level_;
 
@@ -258,10 +263,13 @@ namespace ion::graphics::shaders
 			bool LoadResource(ShaderProgram &shader) noexcept override;
 			bool UnloadResource(ShaderProgram &shader) noexcept override;
 
+			void Created(ShaderProgram &shader_program) noexcept override;
+			bool Removable(ShaderLayout &shader_layout) noexcept override;
+
 		public:
 
 			//Default constructor
-			ShaderProgramManager() = default;
+			ShaderProgramManager();
 
 			//Deleted copy constructor
 			ShaderProgramManager(const ShaderProgramManager&) = delete;
@@ -303,6 +311,21 @@ namespace ion::graphics::shaders
 			}
 
 
+			//Returns a mutable range of all shader layouts in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto ShaderLayouts() noexcept
+			{
+				return ShaderLayoutBase::Objects();
+			}
+
+			//Returns an immutable range of all shader layouts in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto ShaderLayouts() const noexcept
+			{
+				return ShaderLayoutBase::Objects();
+			}
+
+
 			/*
 				Modifiers
 			*/
@@ -332,11 +355,19 @@ namespace ion::graphics::shaders
 				Creating
 			*/
 
-			//Create a shader program with the given name and a shader
+			//Create a shader program with the given name and shader
 			NonOwningPtr<ShaderProgram> CreateShaderProgram(std::string name, NonOwningPtr<Shader> shader);
 
-			//Create a shader program with the given name, a vertex and fragment shader
+			//Create a shader program with the given name, shader and a user defined shader layout
+			NonOwningPtr<ShaderProgram> CreateShaderProgram(std::string name, NonOwningPtr<Shader> shader,
+				NonOwningPtr<ShaderLayout> shader_layout);
+
+			//Create a shader program with the given name, vertex and fragment shader
 			NonOwningPtr<ShaderProgram> CreateShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader);
+
+			//Create a shader program with the given name, vertex and fragment shader and a user defined shader layout
+			NonOwningPtr<ShaderProgram> CreateShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader,
+				NonOwningPtr<ShaderLayout> shader_layout);
 
 
 			//Create a shader program by moving the given shader program
@@ -385,6 +416,56 @@ namespace ion::graphics::shaders
 
 			//Update all uniform variables attached to the given shader program
 			void UpdateUniformVariables(ShaderProgram &shader_program) noexcept;
+
+
+			/*
+				Shader layouts
+				Creating
+			*/
+
+			//Create a shader layout with the given name
+			NonOwningPtr<ShaderLayout> CreateShaderLayout(std::string name);
+
+			//Create a shader layout with the given name, attribute and uniform bindings
+			NonOwningPtr<ShaderLayout> CreateShaderLayout(std::string name,
+				std::vector<shader_layout::VariableBinding> attribute_bindings,
+				std::vector<shader_layout::VariableBinding> uniform_bindings);
+
+
+			//Create a shader layout by copying the given shader layout
+			NonOwningPtr<ShaderLayout> CreateShaderLayout(const ShaderLayout &shader_layout);
+
+			//Create a shader layout by moving the given shader layout
+			NonOwningPtr<ShaderLayout> CreateShaderLayout(ShaderLayout &&shader_layout);
+
+
+			/*
+				Shader layouts
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable shader layout with the given name
+			//Returns nullptr if shader layout could not be found
+			[[nodiscard]] NonOwningPtr<ShaderLayout> GetShaderLayout(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable shader layout with the given name
+			//Returns nullptr if shader layout could not be found
+			[[nodiscard]] NonOwningPtr<const ShaderLayout> GetShaderLayout(std::string_view name) const noexcept;
+
+
+			/*
+				Shader layouts
+				Removing
+			*/
+
+			//Clear all removable shader layouts from this manager
+			void ClearShaderLayouts() noexcept;
+
+			//Remove a removable shader layout from this manager
+			bool RemoveShaderLayout(ShaderLayout &shader_layout) noexcept;
+
+			//Remove a removable shader layout with the given name from this manager
+			bool RemoveShaderLayout(std::string_view name) noexcept;
 
 
 			/*

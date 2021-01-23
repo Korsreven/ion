@@ -14,11 +14,11 @@ File:	main.cpp
 
 #include "adaptors/IonFlatMap.h"
 #include "adaptors/IonFlatSet.h"
-#include "adaptors/ranges/IonBasicIterable.h"
-#include "adaptors/ranges/IonDereferenceIterable.h"
 #include "adaptors/iterators/IonDereferenceIterator.h"
 #include "adaptors/iterators/IonFlatMapIterator.h"
 #include "adaptors/iterators/IonFlatSetIterator.h"
+#include "adaptors/ranges/IonDereferenceIterable.h"
+#include "adaptors/ranges/IonIterable.h"
 
 #include "assets/IonAssetLoader.h"
 #include "assets/repositories/IonAudioRepository.h"
@@ -80,6 +80,7 @@ File:	main.cpp
 #include "graphics/scene/IonMovableObject.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/shaders/IonShader.h"
+#include "graphics/shaders/IonShaderLayout.h"
 #include "graphics/shaders/IonShaderManager.h"
 #include "graphics/shaders/IonShaderProgram.h"
 #include "graphics/shaders/IonShaderProgramManager.h"

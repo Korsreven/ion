@@ -18,6 +18,7 @@ File:	IonShaderProgram.h
 #include <string_view>
 
 #include "IonShader.h"
+#include "IonShaderLayout.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
 #include "resources/IonResource.h"
@@ -48,13 +49,23 @@ namespace ion::graphics::shaders
 			NonOwningPtr<Shader> vertex_shader_;
 			NonOwningPtr<Shader> fragment_shader_;
 
+			NonOwningPtr<ShaderLayout> shader_layout_;
+
 		public:
 			
-			//Constructs a new shader program with the given name and a shader
+			//Constructs a new shader program with the given name and shader
 			ShaderProgram(std::string name, NonOwningPtr<Shader> shader);
 
-			//Constructs a new shader program with the given name, a vertex and fragment shader
+			//Constructs a new shader program with the given name, shader and a user defined shader layout
+			ShaderProgram(std::string name, NonOwningPtr<Shader> shader,
+				NonOwningPtr<ShaderLayout> shader_layout);
+
+			//Constructs a new shader program with the given name, vertex and fragment shader
 			ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader);
+
+			//Constructs a new shader program with the given name, vertex and fragment shader and a user defined shader layout
+			ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader,
+				NonOwningPtr<ShaderLayout> shader_layout);
 
 
 			/*
@@ -139,6 +150,10 @@ namespace ion::graphics::shaders
 			void FragmentShader(NonOwningPtr<Shader> shader) noexcept;
 
 
+			//Use the given shader layout for mapping variables in this shader program
+			void Layout(NonOwningPtr<ShaderLayout> shader_layout) noexcept;
+
+
 			/*
 				Observers
 			*/
@@ -163,6 +178,14 @@ namespace ion::graphics::shaders
 			[[nodiscard]] inline auto FragmentShader() const noexcept
 			{
 				return fragment_shader_;
+			}
+
+
+			//Returns the shader layout used by this shader program
+			//Returns nullptr if no shader layout is used
+			[[nodiscard]] inline auto Layout() const noexcept
+			{
+				return shader_layout_;
 			}
 
 
