@@ -16,6 +16,7 @@ File:	IonShaderLayout.h
 #include <algorithm>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -279,13 +280,31 @@ namespace ion::graphics::shaders
 				Observers
 			*/
 
-			//Returns the attribute declaration bound to the given name
-			//Returns nullptr if no attribute binding could be found
+			//Returns the attribute declaration bound to the given standardized attribute name
+			//Returns nullopt if no attribute binding could be found
 			[[nodiscard]] std::optional<shader_layout::VariableDeclaration> BoundAttribute(shader_layout::AttributeName name) const noexcept;
 
-			//Returns the uniform declaration bound to the given name
-			//Returns nullptr if no uniform binding could be found
+			//Returns the uniform declaration bound to the given standardized uniform name
+			//Returns nullopt if no uniform binding could be found
 			[[nodiscard]] std::optional<shader_layout::VariableDeclaration> BoundUniform(shader_layout::UniformName name) const noexcept;
+
+
+			//Returns the standardized attribute name that is bound to the given attribute name
+			//Returns nullopt if no attribute binding could be found
+			[[nodiscard]] std::optional<shader_layout::AttributeName> GetAttributeName(std::string_view name) const noexcept;
+
+			//Returns the standardized uniform name that is bound to the given uniform name
+			//Returns nullopt if no uniform binding could be found
+			[[nodiscard]] std::optional<shader_layout::UniformName> GetUniformName(std::string_view name) const noexcept;
+
+
+			//Returns the standardized attribute name that is bound to the given attribute location
+			//Returns nullopt if no attribute binding could be found
+			[[nodiscard]] std::optional<shader_layout::AttributeName> GetAttributeName(int location) const noexcept;
+
+			//Returns the standardized uniform name that is bound to the given uniform location
+			//Returns nullopt if no uniform binding could be found
+			[[nodiscard]] std::optional<shader_layout::UniformName> GetUniformName(int location) const noexcept;
 	};
 
 

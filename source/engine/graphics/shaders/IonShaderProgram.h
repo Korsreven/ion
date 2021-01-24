@@ -13,6 +13,7 @@ File:	IonShaderProgram.h
 #ifndef ION_SHADER_PROGRAM_H
 #define ION_SHADER_PROGRAM_H
 
+#include <array>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -29,6 +30,12 @@ namespace ion::graphics::shaders
 {
 	namespace shader_program::detail
 	{
+		using mapped_attributes = std::array<NonOwningPtr<variables::AttributeVariable>, shader_layout::detail::attribute_name_count>;
+		using mapped_uniforms = std::array<NonOwningPtr<variables::UniformVariable>, shader_layout::detail::uniform_name_count>;
+
+
+		void remap_attribute(NonOwningPtr<variables::AttributeVariable> attribute_variable, ShaderLayout &shader_layout, mapped_attributes &attributes) noexcept;
+		void remap_uniform(NonOwningPtr<variables::UniformVariable> uniform_variable, ShaderLayout &shader_layout, mapped_uniforms &uniforms) noexcept;
 	} //shader::detail
 
 
@@ -48,8 +55,22 @@ namespace ion::graphics::shaders
 			std::optional<int> handle_;
 			NonOwningPtr<Shader> vertex_shader_;
 			NonOwningPtr<Shader> fragment_shader_;
-
 			NonOwningPtr<ShaderLayout> shader_layout_;
+
+			shader_program::detail::mapped_attributes mapped_attributes_;
+			shader_program::detail::mapped_uniforms mapped_uniforms_;
+
+		protected:
+
+			/*
+				Events
+			*/
+
+			void Created(variables::AttributeVariable &attribute_variable) noexcept override;
+			void Created(variables::UniformVariable &uniform_variable) noexcept override;
+
+			void Removed(variables::AttributeVariable &attribute_variable) noexcept override;
+			void Removed(variables::UniformVariable &uniform_variable) noexcept override;
 
 		public:
 			
@@ -66,6 +87,26 @@ namespace ion::graphics::shaders
 			//Constructs a new shader program with the given name, vertex and fragment shader and a user defined shader layout
 			ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader,
 				NonOwningPtr<ShaderLayout> shader_layout);
+
+			//Deleted copy constructor
+			ShaderProgram(const ShaderProgram&) = delete;
+
+			//Default move constructor
+			ShaderProgram(ShaderProgram&&) = default;
+
+			//Destructor
+			~ShaderProgram() noexcept;
+
+
+			/*
+				Operators
+			*/
+
+			//Deleted copy assignment
+			ShaderProgram& operator=(const ShaderProgram&) = delete;
+
+			//Move assignment
+			ShaderProgram& operator=(ShaderProgram&&) = default;
 
 
 			/*
@@ -149,7 +190,6 @@ namespace ion::graphics::shaders
 			//Attach the given fragment shader to the shader program
 			void FragmentShader(NonOwningPtr<Shader> shader) noexcept;
 
-
 			//Use the given shader layout for mapping variables in this shader program
 			void Layout(NonOwningPtr<ShaderLayout> shader_layout) noexcept;
 
@@ -179,7 +219,6 @@ namespace ion::graphics::shaders
 			{
 				return fragment_shader_;
 			}
-
 
 			//Returns the shader layout used by this shader program
 			//Returns nullptr if no shader layout is used
@@ -232,6 +271,15 @@ namespace ion::graphics::shaders
 			//Gets a pointer to an immutable attribute variable with the given name
 			//Returns nullptr if attribute variable could not be found
 			[[nodiscard]] NonOwningPtr<const variables::AttributeVariable> GetAttribute(std::string_view name) const noexcept;
+
+
+			//Gets a pointer to a mutable attribute variable that is mapped to the given standardized name
+			//Returns nullptr if that standardized name has no mapped attribute variable
+			[[nodiscard]] NonOwningPtr<variables::AttributeVariable> GetAttribute(shader_layout::AttributeName name) noexcept;
+
+			//Gets a pointer to an immutable attribute variable that is mapped to the given standardized name
+			//Returns nullptr if that standardized name has no mapped attribute variable
+			[[nodiscard]] NonOwningPtr<const variables::AttributeVariable> GetAttribute(shader_layout::AttributeName name) const noexcept;
 
 
 			/*
@@ -292,6 +340,15 @@ namespace ion::graphics::shaders
 			//Gets a pointer to an immutable uniform variable with the given name
 			//Returns nullptr if uniform variable could not be found
 			[[nodiscard]] NonOwningPtr<const variables::UniformVariable> GetUniform(std::string_view name) const noexcept;
+
+
+			//Gets a pointer to a mutable uniform variable that is mapped to the given standardized name
+			//Returns nullptr if that standardized name has no mapped uniform variable
+			[[nodiscard]] NonOwningPtr<variables::UniformVariable> GetUniform(shader_layout::UniformName name) noexcept;
+
+			//Gets a pointer to an immutable uniform variable that is mapped to the given standardized name
+			//Returns nullptr if that standardized name has no mapped uniform variable
+			[[nodiscard]] NonOwningPtr<const variables::UniformVariable> GetUniform(shader_layout::UniformName name) const noexcept;
 
 
 			/*

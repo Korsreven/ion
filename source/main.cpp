@@ -442,10 +442,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Scene
 			auto scene_gamma = mesh_shader_prog->CreateUniform<float>("scene.gamma");
 
-			//Matrices
-			auto projection_matrix = mesh_shader_prog->CreateUniform<glsl::mat4>("projection_matrix");
-			auto model_view_matrix = mesh_shader_prog->CreateUniform<glsl::mat4>("model_view_matrix");
-			auto model_view_projection_matrix = mesh_shader_prog->CreateUniform<glsl::mat4>("model_view_projection_matrix");
+			//Matrices			
+			auto matrix_model_view = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.model_view");
+			auto matrix_projection = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.projection");
+			auto matrix_model_view_projection = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.model_view_projection");
 
 
 			//Projection and view matrix
@@ -480,9 +480,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			proj_mat.Transpose();
 			view_mat.Transpose();
 			view_proj_mat.Transpose();
-			projection_matrix->Get() = proj_mat;
-			model_view_matrix->Get() = view_mat;
-			model_view_projection_matrix->Get() = view_proj_mat;
+			matrix_model_view->Get() = view_mat;
+			matrix_projection->Get() = proj_mat;		
+			matrix_model_view_projection->Get() = view_proj_mat;
 
 			shader_programs.UpdateShaderVariables(*mesh_shader_prog);
 

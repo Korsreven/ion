@@ -95,7 +95,7 @@ std::optional<shader_layout::VariableDeclaration> ShaderLayout::BoundAttribute(A
 	if (auto iter = attribute_bindings_.find(name); iter != std::end(attribute_bindings_))
 		return iter->second;
 	else
-		return std::nullopt;
+		return {};
 }
 
 std::optional<shader_layout::VariableDeclaration> ShaderLayout::BoundUniform(UniformName name) const noexcept
@@ -103,7 +103,53 @@ std::optional<shader_layout::VariableDeclaration> ShaderLayout::BoundUniform(Uni
 	if (auto iter = uniform_bindings_.find(name); iter != std::end(uniform_bindings_))
 		return iter->second;
 	else
-		return std::nullopt;
+		return {};
+}
+
+
+std::optional<shader_layout::AttributeName> ShaderLayout::GetAttributeName(std::string_view name) const noexcept
+{
+	for (auto &[key, value] : attribute_bindings_)
+	{
+		if (value.Name() && *value.Name() == name)
+			return key;
+	}
+
+	return {};
+}
+
+std::optional<shader_layout::UniformName> ShaderLayout::GetUniformName(std::string_view name) const noexcept
+{
+	for (auto &[key, value] : uniform_bindings_)
+	{
+		if (value.Name() && *value.Name() == name)
+			return key;
+	}
+
+	return {};
+}
+
+
+std::optional<shader_layout::AttributeName> ShaderLayout::GetAttributeName(int location) const noexcept
+{
+	for (auto &[key, value] : attribute_bindings_)
+	{
+		if (value.Location() && *value.Location() == location)
+			return key;
+	}
+
+	return {};
+}
+
+std::optional<shader_layout::UniformName> ShaderLayout::GetUniformName(int location) const noexcept
+{
+	for (auto &[key, value] : uniform_bindings_)
+	{
+		if (value.Location() && *value.Location() == location)
+			return key;
+	}
+
+	return {};
 }
 
 } //ion::graphics::shaders

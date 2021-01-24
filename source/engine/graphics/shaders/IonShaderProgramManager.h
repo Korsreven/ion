@@ -293,6 +293,23 @@ namespace ion::graphics::shaders
 
 
 			/*
+				Managers
+			*/
+
+			//Return a mutable reference to the shader layout manager of this shader program manager
+			[[nodiscard]] inline auto& ShaderLayoutManager() noexcept
+			{
+				return static_cast<ShaderLayoutBase&>(*this);
+			}
+
+			//Return a immutable reference to the shader layout manager of this shader program manager
+			[[nodiscard]] inline auto& ShaderLayoutManager() const noexcept
+			{
+				return static_cast<const ShaderLayoutBase&>(*this);
+			}
+
+
+			/*
 				Ranges
 			*/
 
