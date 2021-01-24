@@ -988,8 +988,7 @@ NonOwningPtr<ShaderLayout> ShaderProgramManager::CreateShaderLayout(std::string 
 }
 
 NonOwningPtr<ShaderLayout> ShaderProgramManager::CreateShaderLayout(std::string name,
-	std::vector<shader_layout::VariableBinding> attribute_bindings,
-	std::vector<shader_layout::VariableBinding> uniform_bindings)
+	shader_layout::AttributeBindings attribute_bindings, shader_layout::UniformBindings uniform_bindings)
 {
 	return ShaderLayoutBase::Create(std::move(name), std::move(attribute_bindings), std::move(uniform_bindings));
 }
