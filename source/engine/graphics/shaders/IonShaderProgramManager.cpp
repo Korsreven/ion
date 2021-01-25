@@ -202,13 +202,19 @@ std::optional<int> get_attribute_location(int shader_program_handle, const std::
 		return {};
 }
 
-void update_attribute_value(int shader_program_handle, AttributeVariable &attribute_variable) noexcept
+
+void load_attribute_location(int shader_program_handle, AttributeVariable &attribute_variable) noexcept
+{
+	if (!attribute_variable.Location())
+		attribute_variable.Location(get_attribute_location(shader_program_handle, *attribute_variable.Name()));
+}
+
+void send_attribute_value(int shader_program_handle, AttributeVariable &attribute_variable) noexcept
 {
 	[[maybe_unused]] auto need_update = attribute_variable.HasNewValue();
 		//Vertex attribute pointer needs to be enabled each time (ignore flag)
 
-	if (!attribute_variable.Location())
-		attribute_variable.Location(get_attribute_location(shader_program_handle, *attribute_variable.Name()));
+	load_attribute_location(shader_program_handle, attribute_variable);
 
 	if (auto location = attribute_variable.Location(); location)
 		attribute_variable.Visit(set_attribute_value{*location});
@@ -335,13 +341,19 @@ std::optional<int> get_uniform_location(int shader_program_handle, const std::st
 		return {};
 }
 
-void update_uniform_value(int shader_program_handle, UniformVariable &uniform_variable) noexcept
+
+void load_uniform_location(int shader_program_handle, UniformVariable &uniform_variable) noexcept
+{
+	if (!uniform_variable.Location())
+		uniform_variable.Location(get_uniform_location(shader_program_handle, *uniform_variable.Name()));
+}
+
+void send_uniform_value(int shader_program_handle, UniformVariable &uniform_variable) noexcept
 {
 	//Uniform has new value (need update)
 	if (uniform_variable.HasNewValue())
 	{
-		if (!uniform_variable.Location())
-			uniform_variable.Location(get_uniform_location(shader_program_handle, *uniform_variable.Name()));
+		load_uniform_location(shader_program_handle, uniform_variable);
 
 		if (auto location = uniform_variable.Location(); location)
 			uniform_variable.Visit(set_uniform_value{*location});
@@ -909,7 +921,51 @@ bool ShaderProgramManager::RemoveShaderProgram(std::string_view name) noexcept
 	Updating
 */
 
-void ShaderProgramManager::UpdateShaderVariables(ShaderProgram &shader_program) noexcept
+void ShaderProgramManager::LoadShaderVariableLocations(ShaderProgram &shader_program) noexcept
+{
+	if (shader_program.Owner() != this)
+		return;
+
+	if (auto handle = shader_program.Handle(); handle)
+	{
+		//Load all attribute variable locations attached to shader program
+		for (auto &attribute_variable : shader_program.AttributeVariables())
+			detail::load_attribute_location(*handle, attribute_variable);
+
+		//Load all uniform variable locations attached to shader program
+		for (auto &uniform_variable : shader_program.UniformVariables())
+			detail::load_uniform_location(*handle, uniform_variable);
+	}
+}
+
+void ShaderProgramManager::LoadAttributeLocations(ShaderProgram &shader_program) noexcept
+{
+	if (shader_program.Owner() != this)
+		return;
+
+	if (auto handle = shader_program.Handle(); handle)
+	{
+		//Load all attribute variable locations attached to shader program
+		for (auto &attribute_variable : shader_program.AttributeVariables())
+			detail::load_attribute_location(*handle, attribute_variable);
+	}
+}
+
+void ShaderProgramManager::LoadUniformLocations(ShaderProgram &shader_program) noexcept
+{
+	if (shader_program.Owner() != this)
+		return;
+
+	if (auto handle = shader_program.Handle(); handle)
+	{
+		//Load all uniform variable locations attached to shader program
+		for (auto &uniform_variable : shader_program.UniformVariables())
+			detail::load_uniform_location(*handle, uniform_variable);
+	}
+}
+
+
+void ShaderProgramManager::SendShaderVariableValues(ShaderProgram &shader_program) noexcept
 {
 	if (shader_program.Owner() != this)
 		return;
@@ -923,18 +979,18 @@ void ShaderProgramManager::UpdateShaderVariables(ShaderProgram &shader_program) 
 
 		//Update all attribute variables attached to shader program
 		for (auto &attribute_variable : shader_program.AttributeVariables())
-			detail::update_attribute_value(*handle, attribute_variable);
+			detail::send_attribute_value(*handle, attribute_variable);
 
 		//Update all uniform variables attached to shader program
 		for (auto &uniform_variable : shader_program.UniformVariables())
-			detail::update_uniform_value(*handle, uniform_variable);
+			detail::send_uniform_value(*handle, uniform_variable);
 
 		if (!in_use)
 			detail::use_shader_program(0);
 	}
 }
 
-void ShaderProgramManager::UpdateAttributeVariables(ShaderProgram &shader_program) noexcept
+void ShaderProgramManager::SendAttributeValues(ShaderProgram &shader_program) noexcept
 {
 	if (shader_program.Owner() != this)
 		return;
@@ -948,14 +1004,14 @@ void ShaderProgramManager::UpdateAttributeVariables(ShaderProgram &shader_progra
 
 		//Update all attribute variables attached to shader program
 		for (auto &attribute_variable : shader_program.AttributeVariables())
-			detail::update_attribute_value(*handle, attribute_variable);
+			detail::send_attribute_value(*handle, attribute_variable);
 
 		if (!in_use)
 			detail::use_shader_program(0);
 	}
 }
 
-void ShaderProgramManager::UpdateUniformVariables(ShaderProgram &shader_program) noexcept
+void ShaderProgramManager::SendUniformValues(ShaderProgram &shader_program) noexcept
 {
 	if (shader_program.Owner() != this)
 		return;
@@ -969,7 +1025,7 @@ void ShaderProgramManager::UpdateUniformVariables(ShaderProgram &shader_program)
 
 		//Update all uniform variables attached to shader program
 		for (auto &uniform_variable : shader_program.UniformVariables())
-			detail::update_uniform_value(*handle, uniform_variable);
+			detail::send_uniform_value(*handle, uniform_variable);
 
 		if (!in_use)
 			detail::use_shader_program(0);

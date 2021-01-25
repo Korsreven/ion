@@ -566,13 +566,16 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 	//Use shaders
 	if (shader_program && shader_program->Handle())
 	{
-		shaders::shader_program_manager::detail::use_shader_program(*shader_program->Handle());
-		shader_program->Owner()->UpdateShaderVariables(*shader_program);
+		auto vertex_position = shader_program->GetAttribute(shaders::shader_layout::AttributeName::Vertex_Position);
+		auto vertex_normal = shader_program->GetAttribute(shaders::shader_layout::AttributeName::Vertex_Normal);
+		auto vertex_color = shader_program->GetAttribute(shaders::shader_layout::AttributeName::Vertex_Color);
+		auto vertex_tex_coord = shader_program->GetAttribute(shaders::shader_layout::AttributeName::Vertex_TexCoord);
+		has_supported_attributes = vertex_position && vertex_normal && vertex_color && vertex_tex_coord;
+
+		shaders::shader_program_manager::detail::use_shader_program(*shader_program->Handle());	
 
 		if (!use_vao)
 		{
-			has_supported_attributes = true;
-
 			if (has_supported_attributes)
 			{
 				//VRAM
@@ -596,6 +599,8 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 					detail::set_vertex_pointers(vertex_count_, vertex_data_);
 			}
 		}
+
+		shader_program->Owner()->SendShaderVariableValues(*shader_program);
 	}
 	else //Fixed-function pipeline
 	{

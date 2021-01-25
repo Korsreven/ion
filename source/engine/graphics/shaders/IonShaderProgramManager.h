@@ -55,7 +55,9 @@ namespace ion::graphics::shaders
 			*/
 
 			std::optional<int> get_attribute_location(int shader_program_handle, const std::string &attribute_name) noexcept;
-			void update_attribute_value(int shader_program_handle, AttributeVariable &attribute_variable) noexcept;
+
+			void load_attribute_location(int shader_program_handle, AttributeVariable &attribute_variable) noexcept;
+			void send_attribute_value(int shader_program_handle, AttributeVariable &attribute_variable) noexcept;
 
 
 			class set_attribute_value
@@ -153,7 +155,9 @@ namespace ion::graphics::shaders
 			*/
 
 			std::optional<int> get_uniform_location(int shader_program_handle, const std::string &uniform_name) noexcept;
-			void update_uniform_value(int shader_program_handle, UniformVariable &uniform_variable) noexcept;
+
+			void load_uniform_location(int shader_program_handle, UniformVariable &uniform_variable) noexcept;
+			void send_uniform_value(int shader_program_handle, UniformVariable &uniform_variable) noexcept;
 
 			class set_uniform_value
 			{
@@ -422,17 +426,27 @@ namespace ion::graphics::shaders
 
 			/*
 				Shader variables
-				Updating
+				Load / send
 			*/
 
-			//Update all shader variables attached to the given shader program
-			void UpdateShaderVariables(ShaderProgram &shader_program) noexcept;
+			//Load all shader variable locations attached to the given shader program
+			void LoadShaderVariableLocations(ShaderProgram &shader_program) noexcept;
 
-			//Update all attribute variables attached to the given shader program
-			void UpdateAttributeVariables(ShaderProgram &shader_program) noexcept;
+			//Load all attribute variable locations attached to the given shader program
+			void LoadAttributeLocations(ShaderProgram &shader_program) noexcept;
 
-			//Update all uniform variables attached to the given shader program
-			void UpdateUniformVariables(ShaderProgram &shader_program) noexcept;
+			//Load all uniform variable locations attached to the given shader program
+			void LoadUniformLocations(ShaderProgram &shader_program) noexcept;
+
+
+			//Send all shader variable values to the given shader program
+			void SendShaderVariableValues(ShaderProgram &shader_program) noexcept;
+
+			//Send all attribute variable values to the given shader program
+			void SendAttributeValues(ShaderProgram &shader_program) noexcept;
+
+			//Send all uniform variable values to the given shader program
+			void SendUniformValues(ShaderProgram &shader_program) noexcept;
 
 
 			/*

@@ -22,33 +22,31 @@ namespace shader_program::detail
 
 void remap_attribute(NonOwningPtr<variables::AttributeVariable> attribute_variable, ShaderLayout &shader_layout, mapped_attributes &attributes) noexcept
 {
-	//Has name
-	if (auto &name = attribute_variable->Name(); name)
-	{
-		if (auto attribute_name = shader_layout.GetAttributeName(*name); attribute_name)
-			attributes[static_cast<int>(*attribute_name)] = attribute_variable;
-	}
+	//Map with name
+	if (auto name = shader_layout.GetAttributeName(*attribute_variable->Name()); name)
+		attributes[static_cast<int>(*name)] = attribute_variable;
+
 	//Has location
 	else if (auto location = attribute_variable->Location(); location)
 	{
-		if (auto attribute_name = shader_layout.GetAttributeName(*location); attribute_name)
-			attributes[static_cast<int>(*attribute_name)] = attribute_variable;
+		//Map with location
+		if (name = shader_layout.GetAttributeName(*location); name)
+			attributes[static_cast<int>(*name)] = attribute_variable;
 	}
 }
 
 void remap_uniform(NonOwningPtr<variables::UniformVariable> uniform_variable, ShaderLayout &shader_layout, mapped_uniforms &uniforms) noexcept
 {
-	//Has name
-	if (auto &name = uniform_variable->Name(); name)
-	{
-		if (auto uniform_name = shader_layout.GetUniformName(*name); uniform_name)
-			uniforms[static_cast<int>(*uniform_name)] = uniform_variable;
-	}
+	//Map with name
+	if (auto name = shader_layout.GetUniformName(*uniform_variable->Name()); name)
+		uniforms[static_cast<int>(*name)] = uniform_variable;
+
 	//Has location
 	else if (auto location = uniform_variable->Location(); location)
 	{
-		if (auto uniform_name = shader_layout.GetUniformName(*location); uniform_name)
-			uniforms[static_cast<int>(*uniform_name)] = uniform_variable;
+		//Map with location
+		if (name = shader_layout.GetUniformName(*location); name)
+			uniforms[static_cast<int>(*name)] = uniform_variable;
 	}
 }
 
@@ -64,19 +62,13 @@ void remap_uniform(NonOwningPtr<variables::UniformVariable> uniform_variable, Sh
 void ShaderProgram::Created(variables::AttributeVariable &attribute_variable) noexcept
 {
 	if (shader_layout_)
-	{
-		if (auto &name = attribute_variable.Name(); name)
-			detail::remap_attribute(GetAttribute(*name), *shader_layout_, mapped_attributes_);
-	}
+		detail::remap_attribute(GetAttribute(*attribute_variable.Name()), *shader_layout_, mapped_attributes_);
 }
 
 void ShaderProgram::Created(variables::UniformVariable &uniform_variable) noexcept
 {
 	if (shader_layout_)
-	{
-		if (auto &name = uniform_variable.Name(); name)
-			detail::remap_uniform(GetUniform(*name), *shader_layout_, mapped_uniforms_);
-	}
+		detail::remap_uniform(GetUniform(*uniform_variable.Name()), *shader_layout_, mapped_uniforms_);
 }
 
 

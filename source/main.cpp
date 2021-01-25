@@ -447,6 +447,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto matrix_projection = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.projection");
 			auto matrix_model_view_projection = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.model_view_projection");
 
+			shader_programs.LoadShaderVariableLocations(*mesh_shader_prog);
+
 
 			//Projection and view matrix
 			auto camera = engine.Target()->GetViewport("")->ConnectedCamera();
@@ -483,8 +485,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			matrix_model_view->Get() = view_mat;
 			matrix_projection->Get() = proj_mat;		
 			matrix_model_view_projection->Get() = view_proj_mat;
-
-			shader_programs.UpdateShaderVariables(*mesh_shader_prog);
+			
+			shader_programs.SendUniformValues(*mesh_shader_prog);
 
 			//Font
 			ion::graphics::fonts::FontManager fonts;
