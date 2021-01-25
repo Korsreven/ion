@@ -269,7 +269,7 @@ void bind_vertex_attributes(int vao_handle, int vbo_handle, int vertex_count, in
 }
 
 
-void set_vertex_buffer_sub_data(int vbo_handle, int vbo_offset, const vertex_storage_type &vertex_data) noexcept
+void set_vertex_buffer_sub_data(int vbo_handle, int vbo_offset, vertex_storage_type &vertex_data) noexcept
 {
 	bind_vertex_buffer_object(vbo_handle);	
 
@@ -289,18 +289,19 @@ void set_vertex_buffer_sub_data(int vbo_handle, int vbo_offset, const vertex_sto
 	bind_vertex_buffer_object(0);
 }
 
+
 void set_vertex_attribute_pointers(int vertex_count, int vbo_offset) noexcept
 {
-	constexpr auto type = std::is_same_v<real, double> ? GL_DOUBLE : GL_FLOAT;
+	//For fixed location attributes
 
-	glVertexAttribPointer(0, position_components, type, GL_FALSE, 0,
-		(void*)(vbo_offset * sizeof(real)));
-	glVertexAttribPointer(1, normal_components, type, GL_FALSE, 0,
-		(void*)((vbo_offset + normal_data_offset(vertex_count)) * sizeof(real)));
-	glVertexAttribPointer(2, color_components, type, GL_FALSE, 0,
-		(void*)((vbo_offset + color_data_offset(vertex_count)) * sizeof(real)));
-	glVertexAttribPointer(3, tex_coord_components, type, GL_FALSE, 0,
-		(void*)((vbo_offset + tex_coord_data_offset(vertex_count)) * sizeof(real)));
+	shaders::shader_program_manager::detail::set_attribute_value{0}.
+		set_vertex_pointer(0, position_components, false, 0, (void*)(vbo_offset * sizeof(real)), real{});
+	shaders::shader_program_manager::detail::set_attribute_value{1}.
+		set_vertex_pointer(1, normal_components, false, 0, (void*)((vbo_offset + normal_data_offset(vertex_count)) * sizeof(real)), real{});
+	shaders::shader_program_manager::detail::set_attribute_value{2}.
+		set_vertex_pointer(2, color_components, false, 0, (void*)((vbo_offset + color_data_offset(vertex_count)) * sizeof(real)), real{});
+	shaders::shader_program_manager::detail::set_attribute_value{3}.
+		set_vertex_pointer(3, tex_coord_components, false, 0, (void*)((vbo_offset + tex_coord_data_offset(vertex_count)) * sizeof(real)), real{});
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -308,24 +309,106 @@ void set_vertex_attribute_pointers(int vertex_count, int vbo_offset) noexcept
 	glEnableVertexAttribArray(3);
 }
 
-void set_vertex_attribute_pointers(int vertex_count, const vertex_storage_type &vertex_data) noexcept
+void set_vertex_attribute_pointers(int vertex_count, vertex_storage_type &vertex_data) noexcept
 {
-	constexpr auto type = std::is_same_v<real, double> ? GL_DOUBLE : GL_FLOAT;
+	//For fixed location attributes
 
-	glVertexAttribPointer(0, position_components, type, GL_FALSE, 0,
-		std::data(vertex_data));
-	glVertexAttribPointer(1, normal_components, type, GL_FALSE, 0,
-		std::data(vertex_data) + normal_data_offset(vertex_count));
-	glVertexAttribPointer(2, color_components, type, GL_FALSE, 0,
-		std::data(vertex_data) + color_data_offset(vertex_count));
-	glVertexAttribPointer(3, tex_coord_components, type, GL_FALSE, 0,
-		std::data(vertex_data) + tex_coord_data_offset(vertex_count));
+	shaders::shader_program_manager::detail::set_attribute_value{0}.
+		set_vertex_pointer(0, position_components, false, 0, std::data(vertex_data), real{});
+	shaders::shader_program_manager::detail::set_attribute_value{1}.
+		set_vertex_pointer(1, normal_components, false, 0, std::data(vertex_data) + normal_data_offset(vertex_count), real{});
+	shaders::shader_program_manager::detail::set_attribute_value{2}.
+		set_vertex_pointer(2, color_components, false, 0, std::data(vertex_data) + color_data_offset(vertex_count), real{});
+	shaders::shader_program_manager::detail::set_attribute_value{3}.
+		set_vertex_pointer(3, tex_coord_components, false, 0, std::data(vertex_data) + tex_coord_data_offset(vertex_count), real{});
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
 }
+
+void set_vertex_attribute_pointers(int vertex_count, int vbo_offset, shaders::ShaderProgram &shader_program) noexcept
+{
+	using namespace shaders::variables;
+
+	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Position); attribute)
+	{
+		static_cast<Attribute<glsl::vec3>&>(*attribute).Get().
+			VertexData((void*)(vbo_offset * sizeof(real)));
+		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+	}
+
+	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Normal); attribute)
+	{
+		static_cast<Attribute<glsl::vec3>&>(*attribute).Get().
+			VertexData((void*)((vbo_offset + normal_data_offset(vertex_count)) * sizeof(real)));
+		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+	}
+
+	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Color); attribute)
+	{
+		static_cast<Attribute<glsl::vec4>&>(*attribute).Get().
+			VertexData((void*)((vbo_offset + color_data_offset(vertex_count)) * sizeof(real)));
+		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+	}
+
+	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_TexCoord); attribute)
+	{
+		static_cast<Attribute<glsl::vec2>&>(*attribute).Get().
+			VertexData((void*)((vbo_offset + tex_coord_data_offset(vertex_count)) * sizeof(real)));
+		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+	}
+}
+
+void set_vertex_attribute_pointers(int vertex_count, vertex_storage_type &vertex_data, shaders::ShaderProgram &shader_program) noexcept
+{
+	using namespace shaders::variables;
+
+	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Position); attribute)
+	{
+		static_cast<Attribute<glsl::vec3>&>(*attribute).Get().
+			VertexData(std::data(vertex_data));
+		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+	}
+
+	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Normal); attribute)
+	{
+		static_cast<Attribute<glsl::vec3>&>(*attribute).Get().
+			VertexData(std::data(vertex_data) + normal_data_offset(vertex_count));
+		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+	}
+
+	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Color); attribute)
+	{
+		static_cast<Attribute<glsl::vec4>&>(*attribute).Get().
+			VertexData(std::data(vertex_data) + color_data_offset(vertex_count));
+		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+	}
+
+	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_TexCoord); attribute)
+	{
+		static_cast<Attribute<glsl::vec2>&>(*attribute).Get().
+			VertexData(std::data(vertex_data) + tex_coord_data_offset(vertex_count));
+		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+	}
+}
+
+void disable_vertex_attribute_pointers(const shaders::ShaderProgram &shader_program) noexcept
+{
+	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Position); attribute)
+		glDisableVertexAttribArray(attribute->Location().value_or(-1));
+
+	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Normal); attribute)
+		glDisableVertexAttribArray(attribute->Location().value_or(-1));
+
+	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Color); attribute)
+		glDisableVertexAttribArray(attribute->Location().value_or(-1));
+
+	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_TexCoord); attribute)
+		glDisableVertexAttribArray(attribute->Location().value_or(-1));
+}
+
 
 void set_vertex_pointers(int vertex_count, int vbo_offset) noexcept
 {
@@ -346,7 +429,7 @@ void set_vertex_pointers(int vertex_count, int vbo_offset) noexcept
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-void set_vertex_pointers(int vertex_count, const vertex_storage_type &vertex_data) noexcept
+void set_vertex_pointers(int vertex_count, vertex_storage_type &vertex_data) noexcept
 {
 	constexpr auto type = std::is_same_v<real, double> ? GL_DOUBLE : GL_FLOAT;
 
@@ -363,6 +446,14 @@ void set_vertex_pointers(int vertex_count, const vertex_storage_type &vertex_dat
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
+void disable_vertex_pointers() noexcept
+{
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 } //detail
@@ -570,7 +661,15 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 		auto vertex_normal = shader_program->GetAttribute(shaders::shader_layout::AttributeName::Vertex_Normal);
 		auto vertex_color = shader_program->GetAttribute(shaders::shader_layout::AttributeName::Vertex_Color);
 		auto vertex_tex_coord = shader_program->GetAttribute(shaders::shader_layout::AttributeName::Vertex_TexCoord);
-		has_supported_attributes = vertex_position && vertex_normal && vertex_color && vertex_tex_coord;
+
+		has_supported_attributes =
+			vertex_position && vertex_normal && vertex_color && vertex_tex_coord;
+
+		use_vao &=
+			vertex_position->Location().value_or(0) == 0 &&
+			vertex_normal->Location().value_or(1) == 1 &&
+			vertex_color->Location().value_or(2) == 2 &&
+			vertex_tex_coord->Location().value_or(3) == 3;
 
 		shaders::shader_program_manager::detail::use_shader_program(*shader_program->Handle());	
 
@@ -582,10 +681,10 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 				if (vbo_handle_)
 				{
 					detail::bind_vertex_buffer_object(*vbo_handle_);
-					detail::set_vertex_attribute_pointers(vertex_count_, vertex_buffer_offset_);
+					detail::set_vertex_attribute_pointers(vertex_count_, vertex_buffer_offset_, *shader_program);
 				}
 				else //RAM
-					detail::set_vertex_attribute_pointers(vertex_count_, vertex_data_);
+					detail::set_vertex_attribute_pointers(vertex_count_, vertex_data_, *shader_program);
 			}
 			else
 			{
@@ -640,19 +739,9 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 		if (!use_vao)
 		{
 			if (has_supported_attributes)
-			{
-				glDisableVertexAttribArray(0);
-				glDisableVertexAttribArray(1);
-				glDisableVertexAttribArray(2);
-				glDisableVertexAttribArray(3);
-			}
+				detail::disable_vertex_attribute_pointers(*shader_program);
 			else
-			{
-				glDisableClientState(GL_VERTEX_ARRAY);
-				glDisableClientState(GL_NORMAL_ARRAY);
-				glDisableClientState(GL_COLOR_ARRAY);
-				glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-			}
+				detail::disable_vertex_pointers();
 		}
 
 		shaders::shader_program_manager::detail::use_shader_program(0);
@@ -667,10 +756,7 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 
 		if (!use_vao)
 		{
-			glDisableClientState(GL_VERTEX_ARRAY);
-			glDisableClientState(GL_NORMAL_ARRAY);
-			glDisableClientState(GL_COLOR_ARRAY);
-			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			detail::disable_vertex_pointers();
 
 			//VRAM
 			if (vbo_handle_)

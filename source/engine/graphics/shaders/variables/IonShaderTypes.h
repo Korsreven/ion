@@ -775,7 +775,7 @@ namespace ion::graphics::shaders::variables::glsl
 			*/
 
 			//Sets the vertex data, stride between consecutive vertex attributes and whether or not data values should be normalized
-			inline void VertexData(void *vertex_data, int stride, bool normalized = false) noexcept
+			inline void VertexData(void *vertex_data, int stride = 0, bool normalized = false) noexcept
 			{
 				assert(stride >= 0);
 				vertex_data_ = vertex_data;

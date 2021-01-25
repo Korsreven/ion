@@ -145,11 +145,17 @@ namespace ion::graphics::render
 			void bind_vertex_buffer_object(int vbo_handle) noexcept;
 			void bind_vertex_attributes(int vao_handle, int vbo_handle, int vertex_count, int vbo_offset) noexcept;
 
-			void set_vertex_buffer_sub_data(int vbo_handle, int vbo_offset, const vertex_storage_type &vertex_data) noexcept;	
+			void set_vertex_buffer_sub_data(int vbo_handle, int vbo_offset, vertex_storage_type &vertex_data) noexcept;
+
 			void set_vertex_attribute_pointers(int vertex_count, int vbo_offset) noexcept;
-			void set_vertex_attribute_pointers(int vertex_count, const vertex_storage_type &vertex_data) noexcept;
+			void set_vertex_attribute_pointers(int vertex_count, vertex_storage_type &vertex_data) noexcept;
+			void set_vertex_attribute_pointers(int vertex_count, int vbo_offset, shaders::ShaderProgram &shader_program) noexcept;			
+			void set_vertex_attribute_pointers(int vertex_count, vertex_storage_type &vertex_data, shaders::ShaderProgram &shader_program) noexcept;
+			void disable_vertex_attribute_pointers(const shaders::ShaderProgram &shader_program) noexcept;
+
 			void set_vertex_pointers(int vertex_count, int vbo_offset) noexcept;
-			void set_vertex_pointers(int vertex_count, const vertex_storage_type &vertex_data) noexcept;
+			void set_vertex_pointers(int vertex_count, vertex_storage_type &vertex_data) noexcept;
+			void disable_vertex_pointers() noexcept;
 		} //detail
 	} //mesh
 
