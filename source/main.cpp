@@ -414,10 +414,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Shader variables
 			//Vertex
-			mesh_shader_prog->CreateAttribute<glsl::vec3>("vertex.position");
-			mesh_shader_prog->CreateAttribute<glsl::vec3>("vertex.normal");
-			mesh_shader_prog->CreateAttribute<glsl::vec4>("vertex.color");
-			mesh_shader_prog->CreateAttribute<glsl::vec2>("vertex.tex_coord");
+			mesh_shader_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			mesh_shader_prog->CreateAttribute<glsl::vec3>("vertex_normal");
+			mesh_shader_prog->CreateAttribute<glsl::vec4>("vertex_color");
+			mesh_shader_prog->CreateAttribute<glsl::vec2>("vertex_tex_coord");
 
 			//Material
 			auto material_ambient = mesh_shader_prog->CreateUniform<glsl::vec4>("material.ambient");

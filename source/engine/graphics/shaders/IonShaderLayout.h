@@ -99,11 +99,11 @@ namespace ion::graphics::shaders
 		inline const auto DefaultAttributeBindings =
 			AttributeBindings
 			{
-				{AttributeName::Vertex_Position, 	{"vertex.position", 	0}},
-				{AttributeName::Vertex_Normal, 		{"vertex.normal", 		1}},
-				{AttributeName::Vertex_Color, 		{"vertex.color", 		2}},
-				{AttributeName::Vertex_TexCoord, 	{"vertex.tex_coord", 	3}},
-				{AttributeName::Vertex_PointSize,	{"vertex.point_size", 	4}}
+				{AttributeName::Vertex_Position, 	{"vertex_position", 	0}},
+				{AttributeName::Vertex_Normal, 		{"vertex_normal", 		1}},
+				{AttributeName::Vertex_Color, 		{"vertex_color", 		2}},
+				{AttributeName::Vertex_TexCoord, 	{"vertex_tex_coord", 	3}},
+				{AttributeName::Vertex_PointSize,	{"vertex_point_size", 	4}}
 			};
 
 		inline const auto DefaultUniformBindings =
