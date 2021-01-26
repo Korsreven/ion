@@ -456,6 +456,77 @@ void disable_vertex_pointers() noexcept
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
+
+void set_material_uniforms(materials::Material &material, duration time, shaders::ShaderProgram &shader_program) noexcept
+{
+	using namespace shaders::variables;
+
+	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Ambient); uniform)
+		static_cast<Uniform<glsl::vec4>&>(*uniform).Get() = material.AmbientColor();
+
+	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Diffuse); uniform)
+		static_cast<Uniform<glsl::vec4>&>(*uniform).Get() = material.DiffuseColor();
+
+	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Specular); uniform)
+		static_cast<Uniform<glsl::vec4>&>(*uniform).Get() = material.SpecularColor();
+
+	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Shininess); uniform)
+		static_cast<Uniform<float>&>(*uniform).Get() = material.Shininess(); //Using 'real' could make this uniform double
+
+
+	auto texture_unit = 0;
+	auto max_texture_units = gl::MaxTextureUnits();
+		//Todo: Generate automatic texture_unit sequence (per shader program)
+		//In Created(UniformVariable&) if < max_texture_unit then ++texture_unit else texture_unit = -1
+		//Set uniform value to texture_unit automatically
+
+	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_DiffuseMap); uniform)
+	{
+		if (auto diffuse_map = material.DiffuseMap(time); diffuse_map && diffuse_map->Handle())
+		{
+			static_cast<Uniform<glsl::sampler2D>&>(*uniform).Get() = texture_unit;
+			set_active_texture(texture_unit, *diffuse_map->Handle());
+			++texture_unit;
+		}
+	}
+
+	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_SpecularMap); uniform)
+	{
+		if (auto specular_map = material.SpecularMap(time); specular_map && specular_map->Handle())
+		{
+			static_cast<Uniform<glsl::sampler2D>&>(*uniform).Get() = texture_unit;
+			set_active_texture(texture_unit, *specular_map->Handle());
+			++texture_unit;
+		}
+	}
+
+	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_NormalMap); uniform)
+	{
+		if (auto normal_map = material.NormalMap(time); normal_map && normal_map->Handle())
+		{
+			static_cast<Uniform<glsl::sampler2D>&>(*uniform).Get() = texture_unit;
+			set_active_texture(texture_unit, *normal_map->Handle());
+			++texture_unit;
+		}
+	}
+}
+
+void set_active_texture(int texture_unit, int texture_handle) noexcept
+{
+	switch (gl::MultiTexture_Support())
+	{
+		case gl::Extension::Core:
+		glActiveTexture(GL_TEXTURE0 + texture_unit);
+		break;
+
+		case gl::Extension::ARB:
+		glActiveTextureARB(GL_TEXTURE0_ARB + texture_unit);
+		break;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, texture_handle);
+}
+
 } //detail
 } //mesh
 
@@ -634,23 +705,6 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 	if (vertex_count_ == 0 || !visible_)
 		return;
 
-	std::optional<int> diffuse_id;
-	std::optional<int> specular_id;
-	std::optional<int> normal_id;
-
-	//Use material
-	if (material_)
-	{
-		if (auto diffuse_map = material_->DiffuseMap(time_); diffuse_map)
-			diffuse_id = diffuse_map->Handle();
-
-		if (auto specular_map = material_->SpecularMap(time_); specular_map)
-			specular_id = specular_map->Handle();
-
-		if (auto normal_map = material_->NormalMap(time_); normal_map)
-			normal_id = normal_map->Handle();
-	}
-
 	auto has_supported_attributes = false;
 	auto use_vao = shader_program && vao_handle_ && vbo_handle_;
 
@@ -699,6 +753,10 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 			}
 		}
 
+		//Has material
+		if (material_)
+			detail::set_material_uniforms(*material_, time_, *shader_program);
+
 		shader_program->Owner()->SendShaderVariableValues(*shader_program);
 	}
 	else //Fixed-function pipeline
@@ -715,11 +773,15 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 				detail::set_vertex_pointers(vertex_count_, vertex_data_);
 		}
 
-		//Draw diffuse texture
-		if (diffuse_id)
+		//Has material
+		if (material_)
 		{
-			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, *diffuse_id);			
+			//Enable diffuse texture
+			if (auto diffuse_map = material_->DiffuseMap(time_); diffuse_map && diffuse_map->Handle())
+			{
+				glEnable(GL_TEXTURE_2D);
+				glBindTexture(GL_TEXTURE_2D, *diffuse_map->Handle());			
+			}
 		}
 	}
 
@@ -745,10 +807,15 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 		}
 
 		shaders::shader_program_manager::detail::use_shader_program(0);
+
+		//Has material
+		if (material_)
+			detail::set_active_texture(0, 0);
 	}
 	else //Fixed-function pipeline
 	{
-		if (diffuse_id)
+		//Has material
+		if (material_)
 		{
 			glBindTexture(GL_TEXTURE_2D, 0);
 			glDisable(GL_TEXTURE_2D);

@@ -156,6 +156,9 @@ namespace ion::graphics::render
 			void set_vertex_pointers(int vertex_count, int vbo_offset) noexcept;
 			void set_vertex_pointers(int vertex_count, vertex_storage_type &vertex_data) noexcept;
 			void disable_vertex_pointers() noexcept;
+
+			void set_material_uniforms(materials::Material &material, duration time, shaders::ShaderProgram &shader_program) noexcept;
+			void set_active_texture(int texture_unit, int texture_handle) noexcept;
 		} //detail
 	} //mesh
 
