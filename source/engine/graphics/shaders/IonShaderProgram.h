@@ -36,6 +36,8 @@ namespace ion::graphics::shaders
 
 		void remap_attribute(NonOwningPtr<variables::AttributeVariable> attribute_variable, ShaderLayout &shader_layout, mapped_attributes &attributes) noexcept;
 		void remap_uniform(NonOwningPtr<variables::UniformVariable> uniform_variable, ShaderLayout &shader_layout, mapped_uniforms &uniforms) noexcept;
+
+		int get_next_texture_unit(int &next_texture_unit) noexcept;
 	} //shader::detail
 
 
@@ -57,6 +59,7 @@ namespace ion::graphics::shaders
 			NonOwningPtr<Shader> fragment_shader_;
 			NonOwningPtr<ShaderLayout> shader_layout_;
 
+			int next_texture_unit_ = 0;
 			shader_program::detail::mapped_attributes mapped_attributes_;
 			shader_program::detail::mapped_uniforms mapped_uniforms_;
 

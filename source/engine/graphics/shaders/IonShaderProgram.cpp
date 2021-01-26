@@ -12,6 +12,8 @@ File:	IonShaderProgram.cpp
 
 #include "IonShaderProgram.h"
 
+#include "graphics/IonGraphicsAPI.h"
+
 namespace ion::graphics::shaders
 {
 
@@ -50,6 +52,17 @@ void remap_uniform(NonOwningPtr<variables::UniformVariable> uniform_variable, Sh
 	}
 }
 
+
+int get_next_texture_unit(int &next_texture_unit) noexcept
+{
+	static auto max_texture_units = gl::MaxTextureUnits();
+
+	if (next_texture_unit < max_texture_units)
+		return next_texture_unit++;
+	else
+		return -1; //Invalid unit
+}
+
 } //shader_program::detail
 
 
@@ -69,6 +82,22 @@ void ShaderProgram::Created(variables::UniformVariable &uniform_variable) noexce
 {
 	if (shader_layout_)
 		detail::remap_uniform(GetUniform(*uniform_variable.Name()), *shader_layout_, mapped_uniforms_);
+
+	uniform_variable.Visit(
+		[&](variables::glsl::uniform<variables::glsl::isampler2D> &sampler)
+		{
+			sampler = detail::get_next_texture_unit(next_texture_unit_);
+		},
+		[&](variables::glsl::uniform<variables::glsl::usampler2D> &sampler)
+		{
+			sampler = detail::get_next_texture_unit(next_texture_unit_);
+		},
+		[&](variables::glsl::uniform<variables::glsl::sampler2D> &sampler)
+		{
+			sampler = detail::get_next_texture_unit(next_texture_unit_);
+		},
+		[](auto&&) {}
+	);
 }
 
 
@@ -285,6 +314,7 @@ NonOwningPtr<const variables::UniformVariable> ShaderProgram::GetUniform(shader_
 
 void ShaderProgram::ClearUniforms() noexcept
 {
+	next_texture_unit_ = 0;
 	return UniformVariablesBase::Clear();
 }
 

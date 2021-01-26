@@ -474,19 +474,12 @@ void set_material_uniforms(materials::Material &material, duration time, shaders
 		static_cast<Uniform<float>&>(*uniform).Get() = material.Shininess(); //Using 'real' could make this uniform double
 
 
-	auto texture_unit = 0;
-	auto max_texture_units = gl::MaxTextureUnits();
-		//Todo: Generate automatic texture_unit sequence (per shader program)
-		//In Created(UniformVariable&) if < max_texture_unit then ++texture_unit else texture_unit = -1
-		//Set uniform value to texture_unit automatically
-
 	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_DiffuseMap); uniform)
 	{
 		if (auto diffuse_map = material.DiffuseMap(time); diffuse_map && diffuse_map->Handle())
 		{
-			static_cast<Uniform<glsl::sampler2D>&>(*uniform).Get() = texture_unit;
-			set_active_texture(texture_unit, *diffuse_map->Handle());
-			++texture_unit;
+			if (auto texture_unit = static_cast<Uniform<glsl::sampler2D>&>(*uniform).Get(); texture_unit >= 0)
+				set_active_texture(texture_unit, *diffuse_map->Handle());
 		}
 	}
 
@@ -494,9 +487,8 @@ void set_material_uniforms(materials::Material &material, duration time, shaders
 	{
 		if (auto specular_map = material.SpecularMap(time); specular_map && specular_map->Handle())
 		{
-			static_cast<Uniform<glsl::sampler2D>&>(*uniform).Get() = texture_unit;
-			set_active_texture(texture_unit, *specular_map->Handle());
-			++texture_unit;
+			if (auto texture_unit = static_cast<Uniform<glsl::sampler2D>&>(*uniform).Get(); texture_unit >= 0)
+				set_active_texture(texture_unit, *specular_map->Handle());
 		}
 	}
 
@@ -504,9 +496,8 @@ void set_material_uniforms(materials::Material &material, duration time, shaders
 	{
 		if (auto normal_map = material.NormalMap(time); normal_map && normal_map->Handle())
 		{
-			static_cast<Uniform<glsl::sampler2D>&>(*uniform).Get() = texture_unit;
-			set_active_texture(texture_unit, *normal_map->Handle());
-			++texture_unit;
+			if (auto texture_unit = static_cast<Uniform<glsl::sampler2D>&>(*uniform).Get(); texture_unit >= 0)
+				set_active_texture(texture_unit, *normal_map->Handle());
 		}
 	}
 }

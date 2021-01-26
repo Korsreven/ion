@@ -465,9 +465,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			material_diffuse->Get().XYZW(0.7038_r, 0.27048_r, 0.0828_r, 1.0_r);
 			material_specular->Get().XYZW(0.256777_r, 0.137622_r, 0.086014_r, 1.0_r);
 			material_shininess->Get() = 12.8_r;
-			material_diffuse_map->Get() = 0;
-			material_specular_map->Get() = 1;
-			material_normal_map->Get() = 2;
 
 			light_position->Get().XYZ(0.0_r, 0.0_r, -1.0_r);
 			light_direction->Get().XYZ(0.0_r, 0.0_r, -1.0_r);
