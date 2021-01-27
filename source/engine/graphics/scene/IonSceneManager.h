@@ -33,8 +33,8 @@ namespace ion::graphics::scene
 
 	class SceneManager :
 		public managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>,
-		protected managed::ObjectManager<Light, SceneManager>,
-		protected managed::ObjectManager<Model, SceneManager>
+		public managed::ObjectManager<Light, SceneManager>,
+		public managed::ObjectManager<Model, SceneManager>
 	{
 		private:
 
@@ -182,6 +182,65 @@ namespace ion::graphics::scene
 
 			//Remove a removable camera with the given name from this manager
 			bool RemoveCamera(std::string_view name) noexcept;
+
+
+			/*
+				Lights
+				Creating
+			*/
+
+			//Create a light
+			NonOwningPtr<Light> CreateLight();
+
+			//Create a light with the given values
+			NonOwningPtr<Light> CreateLight(light::LightType type,
+				const Vector3 &position, const Vector3 &direction, real cutoff_angle,
+				const Color &ambient, const Color &diffuse, const Color &specular,
+				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
+				bool cast_shadows = true);
+
+
+			//Create a light as a copy of the given light
+			NonOwningPtr<Light> CreateLight(const Light &light);
+
+			//Create a light by moving the given light
+			NonOwningPtr<Light> CreateLight(Light &&light);
+
+
+			/*
+				Lights
+				Removing
+			*/
+
+			//Clear all removable lights from this manager
+			void ClearLights() noexcept;
+
+			//Remove a removable light from this manager
+			bool RemoveLight(Light &light) noexcept;
+
+
+			/*
+				Models
+				Creating
+			*/
+
+			//Create a model
+			NonOwningPtr<Model> CreateModel();
+
+			//Create a model with the given vertex buffer usage pattern and visibility
+			NonOwningPtr<Model> CreateModel(model::ModelBufferUsage buffer_usage, bool visible = true);
+
+
+			/*
+				Models
+				Removing
+			*/
+
+			//Clear all removable models from this manager
+			void ClearModels() noexcept;
+
+			//Remove a removable model from this manager
+			bool RemoveModel(Model &model) noexcept;
 	};
 } //ion::graphics::scene
 

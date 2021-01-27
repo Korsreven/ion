@@ -87,4 +87,87 @@ bool SceneManager::RemoveCamera(std::string_view name) noexcept
 	return CameraBase::Remove(name);
 }
 
+
+/*
+	Lights
+	Creating
+*/
+
+NonOwningPtr<Light> SceneManager::CreateLight()
+{
+	return LightBase::Create();
+}
+
+NonOwningPtr<Light> SceneManager::CreateLight(light::LightType type,
+	const Vector3 &position, const Vector3 &direction, real cutoff_angle,
+	const Color &ambient, const Color &diffuse, const Color &specular,
+	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
+	bool cast_shadows)
+{
+	return LightBase::Create(type,
+		position, direction, cutoff_angle,
+		ambient, diffuse, specular,
+		attenuation_constant, attenuation_linear, attenuation_quadratic,
+		cast_shadows);
+}
+
+
+NonOwningPtr<Light> SceneManager::CreateLight(const Light &light)
+{
+	return LightBase::Create(light);
+}
+
+NonOwningPtr<Light> SceneManager::CreateLight(Light &&light)
+{
+	return LightBase::Create(std::move(light));
+}
+
+
+/*
+	Lights
+	Removing
+*/
+
+void SceneManager::ClearLights() noexcept
+{
+	return LightBase::Clear();
+}
+
+bool SceneManager::RemoveLight(Light &light) noexcept
+{
+	return LightBase::Remove(light);
+}
+
+
+/*
+	Models
+	Creating
+*/
+
+NonOwningPtr<Model> SceneManager::CreateModel()
+{
+	return ModelBase::Create();
+}
+
+NonOwningPtr<Model> SceneManager::CreateModel(model::ModelBufferUsage buffer_usage, bool visible)
+{
+	return ModelBase::Create(buffer_usage, visible);
+}
+
+
+/*
+	Models
+	Removing
+*/
+
+void SceneManager::ClearModels() noexcept
+{
+	return ModelBase::Clear();
+}
+
+bool SceneManager::RemoveModel(Model &model) noexcept
+{
+	return ModelBase::Remove(model);
+}
+
 } //ion::graphics::scene

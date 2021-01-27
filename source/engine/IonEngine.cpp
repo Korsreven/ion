@@ -112,173 +112,18 @@ bool Engine::NotifyFrameEnded(duration time) noexcept
 	return true;
 }
 
-
-void Draw()
+//TEMP
+void Draw(graphics::scene::SceneManager &scene_manager, graphics::shaders::ShaderProgram *shader_program)
 {
-	static std::vector vertices{
-		//vertex
-		-0.75f, 0.75f, -1.3f,
-		-0.75f, -0.75f, -1.3f,
-		0.75f, -0.75f, -1.3f,
-		0.75f, -0.75f, -1.3f,
-		0.75f, 0.75f, -1.3f,
-		-0.75f, 0.75f, -1.3f,
-		//normal
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		//color
-		1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		//texcoord
-		0.0f, 1.0f,
-		0.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f
-	};
-
-	static auto vao = 0u;
-	static auto vbo = 0u;
-
-	if (!std::empty(vertices))
+	for (auto i = 0; auto &model : scene_manager.Models())
 	{
-		glGenVertexArrays(1, &vao);
-		glGenBuffers(1, &vbo);
-		
-		glBindVertexArray(vao);
+		if (i + 1 == std::ssize(scene_manager.Models()))
+			model.Draw(shader_program);
+		else
+			model.Draw();
 
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, std::size(vertices) * sizeof(float), std::data(vertices), GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(18 * sizeof(float)));
-		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, (void*)(36 * sizeof(float)));
-		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, (void*)(60 * sizeof(float)));
-
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-		glEnableVertexAttribArray(3);
-
-		glBindVertexArray(0);
-
-		vertices.clear();
-		vertices.shrink_to_fit();
+		++i;
 	}
-	
-
-	glColor3fv(graphics::utilities::color::LightGray.Channels());
-
-	glBegin(GL_QUADS);
-	glVertex3f(-1.7778f, 1.0f, -4.0f);
-	glVertex3f(-1.7778f, -1.0f, -4.0f);
-	glVertex3f(1.7778f, -1.0f, -4.0f);
-	glVertex3f(1.7778f, 1.0f, -4.0f);
-	glEnd();
-
-	glColor3fv(graphics::utilities::color::Red.Channels());
-
-	glBegin(GL_QUADS);
-	glVertex3f(-1.7778f, 1.0f, -2.5f);
-	glVertex3f(-1.7778f, 0.8f, -2.5f);
-	glVertex3f(-1.57788f, 0.8f, -2.5f);
-	glVertex3f(-1.5778f, 1.0f, -2.5f);
-	glEnd();
-
-	glColor3fv(graphics::utilities::color::Green.Channels());
-
-	glBegin(GL_QUADS);	
-	glVertex3f(-0.1f, 0.1f, -1.5f);
-	glVertex3f(-0.1f, -0.1f, -1.5f);
-	glVertex3f(0.1f, -0.1f, -1.5f);
-	glVertex3f(0.1f, 0.1f, -1.5f);
-	glEnd();
-
-	glColor3fv(graphics::utilities::color::Blue.Channels());
-
-	glBegin(GL_QUADS);	
-	glVertex3f(1.5778f, -0.8f, -1.25f);
-	glVertex3f(1.5778f, -1.0f, -1.25f);
-	glVertex3f(1.7778f, -1.0f, -1.25f);
-	glVertex3f(1.7778f, -0.8f, -1.25f);
-	glEnd();
-
-	//glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	/*glVertexPointer(3, GL_FLOAT, 0, nullptr);
-	glNormalPointer(GL_FLOAT, 0, (void*)(18 * sizeof(float)));
-	glColorPointer(4, GL_FLOAT, 0, (void*)(36 * sizeof(float)));
-	glTexCoordPointer(2, GL_FLOAT, 0, (void*)(60 * sizeof(float)));
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);*/
-
-	/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(18 * sizeof(float)));
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, (void*)(36 * sizeof(float)));
-	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, (void*)(60 * sizeof(float)));
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-	glEnableVertexAttribArray(3);*/
-
-	glUseProgram(5);
-	
-	glActiveTexture(GL_TEXTURE0 + 0);
-	glBindTexture(GL_TEXTURE_2D, 7);
-	
-	glActiveTexture(GL_TEXTURE0 + 1);
-	glBindTexture(GL_TEXTURE_2D, 8);
-
-	glActiveTexture(GL_TEXTURE0 + 2);
-	glBindTexture(GL_TEXTURE_2D, 9);
-
-	glBindVertexArray(vao);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
-
-	glUseProgram(0);
-	
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	/*glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(3);*/
-
-	/*glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);*/
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-	glColor3fv(graphics::utilities::color::White.Channels());
-	
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 10);
-
-	glBegin(GL_QUADS);	
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.05f, 0.05f, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.05f, -0.05f, -1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.05f, -0.05f, -1.0f);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.05f, 0.05f, -1.0f);
-	glEnd();
-	
-	glBindTexture(GL_TEXTURE_2D, 0);	
-	glDisable(GL_TEXTURE_2D);
 }
 
 bool Engine::UpdateFrame() noexcept
@@ -294,7 +139,7 @@ bool Engine::UpdateFrame() noexcept
 	for (auto &viewport : render_window_->Viewports())
 	{
 		viewport.RenderTo();
-		Draw(); //RenderSystem::RenderScene()
+		Draw(scene_manager_, shader_program); //RenderSystem::RenderScene()
 	}
 
 	if (syncronize_)

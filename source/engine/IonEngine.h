@@ -149,6 +149,14 @@ namespace ion
 			}
 
 
+			//TEMP
+			graphics::shaders::ShaderProgram *shader_program = nullptr;
+			[[nodiscard]] inline auto& Scene() noexcept
+			{
+				return scene_manager_;
+			}
+
+
 			/*
 				Engine
 			*/

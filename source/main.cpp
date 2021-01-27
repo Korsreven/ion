@@ -166,66 +166,31 @@ using namespace ion::graphics::utilities::vector2::literals;
 using namespace ion::utilities::file::literals;
 using namespace ion::utilities::math::literals;
 
-struct SpriteContainer : ion::events::Listenable<ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManager>>
+
+struct Game :
+	ion::events::listeners::FrameListener,
+	ion::events::listeners::KeyListener,
+	ion::events::listeners::MouseListener
 {
-};
+	std::vector<ion::NonOwningPtr<ion::graphics::scene::Model>> models;
+	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<ion::graphics::shaders::variables::glsl::vec3>> light_position = nullptr;
 
-struct Sprite : ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManager>
-{
-	void ResourcePrepared(ion::graphics::textures::Texture &resource) noexcept override
-	{
-		resource;
-	}
+	/*
+		Frame listener
+	*/
 
-	void ResourceLoaded(ion::graphics::textures::Texture &resource) noexcept override
-	{
-		resource;
-	}
-
-	void ResourceUnloaded(ion::graphics::textures::Texture &resource) noexcept override
-	{
-		resource;
-	}
-
-	void ResourceFailed(ion::graphics::textures::Texture &resource) noexcept override
-	{
-		resource;
-	}
-
-	void ResourceLoadingStateChanged(ion::graphics::textures::Texture &resource) noexcept override
-	{
-		resource;
-	}
-
-
-	void ObjectCreated(ion::graphics::textures::Texture &resource) noexcept override
-	{
-		resource;
-	}
-
-	void ObjectRemoved(ion::graphics::textures::Texture &resource) noexcept override
-	{
-		resource;
-	}
-
-
-	void Subscribed(ion::events::Listenable<ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManager>> &listenable) noexcept override
-	{
-		listenable;
-	}
-
-	void Unsubscribed(ion::events::Listenable<ion::events::listeners::ResourceListener<ion::graphics::textures::Texture, ion::graphics::textures::TextureManager>> &listenable) noexcept override
-	{
-		listenable;
-	}
-};
-
-struct FrameTest :
-	ion::events::listeners::FrameListener
-{
 	bool FrameStarted(duration time) noexcept override
 	{
-		time;
+		//Initialize (one time)
+		if (time == 0.0_sec)
+		{
+			for (auto &model : models)
+				model->Prepare();
+		}
+
+		for (auto &model : models)
+			model->Elapse(time);
+
 		return true;
 	}
 
@@ -234,12 +199,12 @@ struct FrameTest :
 		time;
 		return true;
 	}
-};
 
-struct InputTest :
-	ion::events::listeners::KeyListener,
-	ion::events::listeners::MouseListener
-{
+
+	/*
+		Key listener
+	*/
+
 	void KeyPressed(ion::events::listeners::KeyButton button) noexcept override
 	{
 		button;
@@ -256,6 +221,10 @@ struct InputTest :
 	}
 
 
+	/*
+		Mouse listener
+	*/
+
 	void MousePressed(ion::events::listeners::MouseButton button, ion::graphics::utilities::Vector2 position) noexcept override
 	{
 		button;
@@ -270,7 +239,11 @@ struct InputTest :
 
 	void MouseMoved(ion::graphics::utilities::Vector2 position) noexcept override
 	{
-		position;
+		if (light_position)
+		{
+			auto [x, y] = position.XY();
+			light_position->Get() = ion::graphics::utilities::Vector3{x, y, -1.0_r};
+		}
 	}
 
 	void MouseWheelRolled(int delta, ion::graphics::utilities::Vector2 position) noexcept override
@@ -279,16 +252,6 @@ struct InputTest :
 		position;
 	}
 };
-
-void OnTick(ion::timers::Timer &ticked_timer)
-{
-	ticked_timer;
-}
-
-auto Concat(std::string x, std::string y)
-{
-	return x + y;
-}
 
 #ifdef ION_WIN32
 //Entry point for windows 32/64 bit
@@ -305,8 +268,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		Test code
 	*/
 
-	FrameTest frame_test;
-	InputTest input_test;
+	Game game;
 
 	auto exit_code = 0;
 	{	
@@ -450,41 +412,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			shader_programs.LoadShaderVariableLocations(*mesh_shader_prog);
 
 
-			//Projection and view matrix
-			auto camera = engine.Target()->GetViewport("")->ConnectedCamera();
-			camera->Position({0.0_r, 0.0_r, 0.0_r});
-			camera->Rotation(ion::utilities::math::Degree(0.0_r));
-
-			engine.Target()->GetViewport("")->RenderTo();
-			auto proj_mat = camera->ViewFrustum().ProjectionMatrix();
-			auto view_mat = camera->ViewMatrix();
-			auto view_proj_mat = proj_mat * view_mat;
-
-			//Uniforms
-			material_ambient->Get().XYZW(0.19125_r, 0.0735_r, 0.0225_r, 1.0_r);
-			material_diffuse->Get().XYZW(0.7038_r, 0.27048_r, 0.0828_r, 1.0_r);
-			material_specular->Get().XYZW(0.256777_r, 0.137622_r, 0.086014_r, 1.0_r);
-			material_shininess->Get() = 12.8_r;
-
-			light_position->Get().XYZ(0.0_r, 0.0_r, -1.0_r);
-			light_direction->Get().XYZ(0.0_r, 0.0_r, -1.0_r);
-			light_cutoff->Get() = 1.0_r;
-			light_ambient->Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
-			light_diffuse->Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
-			light_specular->Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
-
-			camera_position->Get() = camera->Position();
-			scene_gamma->Get() = 1.0_r;
-
-			proj_mat.Transpose();
-			view_mat.Transpose();
-			view_proj_mat.Transpose();
-			matrix_model_view->Get() = view_mat;
-			matrix_projection->Get() = proj_mat;		
-			matrix_model_view_projection->Get() = view_proj_mat;
-			
-			shader_programs.SendUniformValues(*mesh_shader_prog);
-
 			//Font
 			ion::graphics::fonts::FontManager fonts;
 			fonts.CreateRepository(std::move(font_repository));
@@ -519,54 +446,129 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Material
 			ion::graphics::materials::MaterialManager materials;
-			auto material =
+			auto brick =
+				materials.CreateMaterial("brick",
+					ion::graphics::utilities::Color{0.19125_r, 0.0735_r, 0.0225_r},
+					ion::graphics::utilities::Color{0.7038_r, 0.27048_r, 0.0828_r},
+					ion::graphics::utilities::Color{0.256777_r, 0.137622_r, 0.086014_r},
+					12.8_r, brick_wall_texture, brick_wall_specular_map, brick_wall_normal_map);
+			auto gold =
 				materials.CreateMaterial("gold",
 					ion::graphics::utilities::Color{0.24725_r, 0.1995_r, 0.0745_r},
 					ion::graphics::utilities::Color{0.75164_r, 0.60648_r, 0.22648_r},
 					ion::graphics::utilities::Color{0.628281_r, 0.555802_r, 0.366065_r},
-					51.2_r, rikku_np2_texture, nullptr, nullptr);
+					51.2_r);
 
 			//material.Crop(ion::graphics::utilities::Aabb{{0.25_r, 0.25_r}, {0.75_r, 0.75_r}});
 			//material.Repeat(ion::graphics::utilities::Vector2{2.0_r, 2.0_r});
 			//material.FlipHorizontal();
 			//material.FlipVertical();
 
+			using namespace ion::graphics::utilities;
 
-			//Model and mesh
-			ion::graphics::render::mesh::Vertices vertices;
-			vertices.push_back({{-0.75_r, 0.75_r, -1.0_r}, {0.0_r, 0.0_r, 1.0_r}, {0.0_r, 1.0_r}});
-			vertices.push_back({{-0.75_r, -0.75_r, -1.0_r}, {0.0_r, 0.0_r, 1.0_r}, {0.0_r, 0.0_r}});
-			vertices.push_back({{0.75_r, -0.75_r, -1.0_r}, {0.0_r, 0.0_r, 1.0_r}, {1.0_r, 0.0_r}});
-			vertices.push_back({{0.75_r, -0.75_r, -1.0_r}, {0.0_r, 0.0_r, 1.0_r}, {1.0_r, 0.0_r}});
-			vertices.push_back({{0.75_r, 0.75_r, -1.0_r}, {0.0_r, 0.0_r, 1.0_r}, {1.0_r, 1.0_r}});
-			vertices.push_back({{-0.75_r, 0.75_r, -1.0_r}, {0.0_r, 0.0_r, 1.0_r}, {0.0_r, 1.0_r}});
+			//Mesh vertices
+			ion::graphics::render::mesh::Vertices gray_vertices;
+			gray_vertices.push_back({{-1.7778_r, 1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
+			gray_vertices.push_back({{-1.7778_r, -1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
+			gray_vertices.push_back({{1.7778_r, -1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
+			gray_vertices.push_back({{1.7778_r, -1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
+			gray_vertices.push_back({{1.7778_r, 1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
+			gray_vertices.push_back({{-1.7778_r, 1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
 
-			ion::graphics::render::mesh::Vertices vertices2;
-			vertices2.push_back({{-0.75_r, 0.25_r, -1.0_r}, {0.0_r, 0.0_r, 1.0_r}, {0.0_r, 1.0_r}});
-			vertices2.push_back({{-0.75_r, -0.25_r, -1.0_r}, {0.0_r, 0.0_r, 1.0_r}, {0.0_r, 0.0_r}});
-			vertices2.push_back({{-0.25_r, -0.25_r, -1.0_r}, {0.0_r, 0.0_r, 1.0_r}, {1.0_r, 0.0_r}});
-			vertices2.push_back({{-0.25_r, -0.25_r, -1.0_r}, {0.0_r, 0.0_r, 1.0_r}, {1.0_r, 0.0_r}});
-			vertices2.push_back({{-0.25_r, 0.25_r, -1.0_r}, {0.0_r, 0.0_r, 1.0_r}, {1.0_r, 1.0_r}});
-			vertices2.push_back({{-0.75_r, 0.25_r, -1.0_r}, {0.0_r, 0.0_r, 1.0_r}, {0.0_r, 1.0_r}});
+			ion::graphics::render::mesh::Vertices red_vertices;
+			red_vertices.push_back({{-1.7778_r, 1.0_r, -2.5_r}, vector3::UnitZ, color::Red});
+			red_vertices.push_back({{-1.7778_r, 0.8_r, -2.5_r}, vector3::UnitZ, color::Red});
+			red_vertices.push_back({{-1.57788_r, 0.8_r, -2.5_r}, vector3::UnitZ, color::Red});
+			red_vertices.push_back({{-1.57788_r, 0.8_r, -2.5_r}, vector3::UnitZ, color::Red});
+			red_vertices.push_back({{-1.5778_r, 1.0_r, -2.5_r}, vector3::UnitZ, color::Red});
+			red_vertices.push_back({{-1.7778_r, 1.0_r, -2.5_r}, vector3::UnitZ, color::Red});
 
-			ion::graphics::scene::Model model;
-			[[maybe_unused]] auto mesh = model.CreateMesh(vertices, material,
-				ion::graphics::render::mesh::MeshTexCoordMode::Manual);
-			[[maybe_unused]] auto mesh2 = model.CreateMesh(vertices2, material,
-				ion::graphics::render::mesh::MeshTexCoordMode::Manual);
+			ion::graphics::render::mesh::Vertices green_vertices;
+			red_vertices.push_back({{-0.1_r, 0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
+			red_vertices.push_back({{-0.1_r, -0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
+			red_vertices.push_back({{0.1_r, -0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
+			red_vertices.push_back({{0.1_r, -0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
+			red_vertices.push_back({{0.1_r, 0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
+			red_vertices.push_back({{-0.1_r, 0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
 
-			model.Prepare();
-			model.Draw();
+			ion::graphics::render::mesh::Vertices blue_vertices;
+			red_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
+			red_vertices.push_back({{1.5778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Blue});
+			red_vertices.push_back({{1.7778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Blue});
+			red_vertices.push_back({{1.7778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Blue});
+			red_vertices.push_back({{1.7778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
+			red_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
 
+			ion::graphics::render::mesh::Vertices brick_wall_vertices;
+			brick_wall_vertices.push_back({{-0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 1.0_r}});
+			brick_wall_vertices.push_back({{-0.75_r, -0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 0.0_r}});
+			brick_wall_vertices.push_back({{0.75_r, -0.75_r, -1.3_r}, vector3::UnitZ, {1.0_r, 0.0_r}});
+			brick_wall_vertices.push_back({{0.75_r, -0.75_r, -1.3_r}, vector3::UnitZ, {1.0_r, 0.0_r}});
+			brick_wall_vertices.push_back({{0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {1.0_r, 1.0_r}});
+			brick_wall_vertices.push_back({{-0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 1.0_r}});
+
+			//Models
+			auto gray_rectangle = engine.Scene().CreateModel();
+			gray_rectangle->CreateMesh(std::move(gray_vertices));
+
+			auto red_square = engine.Scene().CreateModel();
+			red_square->CreateMesh(std::move(red_vertices));
+
+			auto green_square = engine.Scene().CreateModel();
+			green_square->CreateMesh(std::move(green_vertices));
+
+			auto blue_square = engine.Scene().CreateModel();
+			blue_square->CreateMesh(std::move(blue_vertices));
+
+			auto brick_wall = engine.Scene().CreateModel();
+			brick_wall->CreateMesh(std::move(brick_wall_vertices),
+				brick, ion::graphics::render::mesh::MeshTexCoordMode::Manual);
+
+			//Setup
+			engine.shader_program = mesh_shader_prog.get();
+			game.light_position = light_position;
+			game.models.push_back(gray_rectangle);
+			game.models.push_back(red_square);
+			game.models.push_back(green_square);
+			game.models.push_back(blue_square);
+			game.models.push_back(brick_wall);
+
+			//Camera, projection and view matrix
+			auto camera = engine.Target()->GetViewport("")->ConnectedCamera();
+			camera->Position({0.0_r, 0.0_r, 0.0_r});
+			camera->Rotation(ion::utilities::math::Degree(0.0_r));
+
+			engine.Target()->GetViewport("")->RenderTo();
+			auto proj_mat = camera->ViewFrustum().ProjectionMatrix();
+			auto view_mat = camera->ViewMatrix();
+			auto view_proj_mat = proj_mat * view_mat;
+
+			//Uniforms
+			light_position->Get().XYZ(0.0_r, 0.0_r, -1.0_r);
+			light_direction->Get().XYZ(0.0_r, 0.0_r, -1.0_r);
+			light_cutoff->Get() = 1.0_r;
+			light_ambient->Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
+			light_diffuse->Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
+			light_specular->Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
+
+			camera_position->Get() = camera->Position();
+			scene_gamma->Get() = 1.0_r;
+
+			proj_mat.Transpose();
+			view_mat.Transpose();
+			view_proj_mat.Transpose();
+			matrix_model_view->Get() = view_mat;
+			matrix_projection->Get() = proj_mat;		
+			matrix_model_view_projection->Get() = view_proj_mat;
 
 			//EXAMPLE end
 
-			engine.Subscribe(frame_test);
+			engine.Subscribe(game);
 
 			if (auto input = engine.Input(); input)
 			{
-				input->KeyEvents().Subscribe(input_test);
-				input->MouseEvents().Subscribe(input_test);
+				input->KeyEvents().Subscribe(game);
+				input->MouseEvents().Subscribe(game);
 			}
 
 			engine.VerticalSync(false);
