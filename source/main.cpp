@@ -389,6 +389,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto material_diffuse_map = mesh_shader_prog->CreateUniform<glsl::sampler2D>("material.diffuse_map");	
 			auto material_specular_map = mesh_shader_prog->CreateUniform<glsl::sampler2D>("material.specular_map");
 			auto material_normal_map = mesh_shader_prog->CreateUniform<glsl::sampler2D>("material.normal_map");
+			auto material_has_diffuse_map = mesh_shader_prog->CreateUniform<bool>("material.has_diffuse_map");
+			auto material_has_specular_map = mesh_shader_prog->CreateUniform<bool>("material.has_specular_map");
+			auto material_has_normal_map = mesh_shader_prog->CreateUniform<bool>("material.has_normal_map");
 
 			//Light
 			auto light_position = mesh_shader_prog->CreateUniform<glsl::vec3>("light.position");
@@ -452,12 +455,34 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					ion::graphics::utilities::Color{0.7038_r, 0.27048_r, 0.0828_r},
 					ion::graphics::utilities::Color{0.256777_r, 0.137622_r, 0.086014_r},
 					12.8_r, brick_wall_texture, brick_wall_specular_map, brick_wall_normal_map);
+			
+			auto emerald =
+				materials.CreateMaterial("emerald",
+					ion::graphics::utilities::Color{0.0215_r, 0.1745_r, 0.0215_r},
+					ion::graphics::utilities::Color{0.07568_r, 0.61424_r, 0.07568_r},
+					ion::graphics::utilities::Color{0.633_r, 0.727811_r, 0.633_r},
+					76.8_r);
+
 			auto gold =
 				materials.CreateMaterial("gold",
 					ion::graphics::utilities::Color{0.24725_r, 0.1995_r, 0.0745_r},
 					ion::graphics::utilities::Color{0.75164_r, 0.60648_r, 0.22648_r},
 					ion::graphics::utilities::Color{0.628281_r, 0.555802_r, 0.366065_r},
 					51.2_r);
+
+			auto pearl =
+				materials.CreateMaterial("pearl",
+					ion::graphics::utilities::Color{0.25_r, 0.20725_r, 0.20725_r},
+					ion::graphics::utilities::Color{1.0_r, 0.829_r, 0.829_r},
+					ion::graphics::utilities::Color{0.296648_r, 0.296648_r, 0.296648_r},
+					11.264_r);
+
+			auto ruby =
+				materials.CreateMaterial("ruby",
+					ion::graphics::utilities::Color{0.1745_r, 0.01175_r, 0.01175_r},
+					ion::graphics::utilities::Color{0.61424_r, 0.04136_r, 0.04136_r},
+					ion::graphics::utilities::Color{0.727811_r, 0.626959_r, 0.626959_r},
+					76.8_r);
 
 			//material.Crop(ion::graphics::utilities::Aabb{{0.25_r, 0.25_r}, {0.75_r, 0.75_r}});
 			//material.Repeat(ion::graphics::utilities::Vector2{2.0_r, 2.0_r});
@@ -476,28 +501,28 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			gray_vertices.push_back({{-1.7778_r, 1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
 
 			ion::graphics::render::mesh::Vertices red_vertices;
-			red_vertices.push_back({{-1.7778_r, 1.0_r, -2.5_r}, vector3::UnitZ, color::Red});
-			red_vertices.push_back({{-1.7778_r, 0.8_r, -2.5_r}, vector3::UnitZ, color::Red});
-			red_vertices.push_back({{-1.57788_r, 0.8_r, -2.5_r}, vector3::UnitZ, color::Red});
-			red_vertices.push_back({{-1.57788_r, 0.8_r, -2.5_r}, vector3::UnitZ, color::Red});
-			red_vertices.push_back({{-1.5778_r, 1.0_r, -2.5_r}, vector3::UnitZ, color::Red});
-			red_vertices.push_back({{-1.7778_r, 1.0_r, -2.5_r}, vector3::UnitZ, color::Red});
+			red_vertices.push_back({{-1.7778_r, 1.0_r, -1.25_r}, vector3::UnitZ, color::Red});
+			red_vertices.push_back({{-1.7778_r, 0.8_r, -1.25_r}, vector3::UnitZ, color::Red});
+			red_vertices.push_back({{-1.57788_r, 0.8_r, -1.25_r}, vector3::UnitZ, color::Red});
+			red_vertices.push_back({{-1.57788_r, 0.8_r, -1.25_r}, vector3::UnitZ, color::Red});
+			red_vertices.push_back({{-1.5778_r, 1.0_r, -1.25_r}, vector3::UnitZ, color::Red});
+			red_vertices.push_back({{-1.7778_r, 1.0_r, -1.25_r}, vector3::UnitZ, color::Red});
 
 			ion::graphics::render::mesh::Vertices green_vertices;
-			red_vertices.push_back({{-0.1_r, 0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
-			red_vertices.push_back({{-0.1_r, -0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
-			red_vertices.push_back({{0.1_r, -0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
-			red_vertices.push_back({{0.1_r, -0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
-			red_vertices.push_back({{0.1_r, 0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
-			red_vertices.push_back({{-0.1_r, 0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
+			green_vertices.push_back({{-0.1_r, 0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
+			green_vertices.push_back({{-0.1_r, -0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
+			green_vertices.push_back({{0.1_r, -0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
+			green_vertices.push_back({{0.1_r, -0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
+			green_vertices.push_back({{0.1_r, 0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
+			green_vertices.push_back({{-0.1_r, 0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
 
 			ion::graphics::render::mesh::Vertices blue_vertices;
-			red_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
-			red_vertices.push_back({{1.5778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Blue});
-			red_vertices.push_back({{1.7778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Blue});
-			red_vertices.push_back({{1.7778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Blue});
-			red_vertices.push_back({{1.7778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
-			red_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
+			blue_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Orange});
+			blue_vertices.push_back({{1.5778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Orange});
+			blue_vertices.push_back({{1.7778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Orange});
+			blue_vertices.push_back({{1.7778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Orange});
+			blue_vertices.push_back({{1.7778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Orange});
+			blue_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Orange});
 
 			ion::graphics::render::mesh::Vertices brick_wall_vertices;
 			brick_wall_vertices.push_back({{-0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 1.0_r}});
@@ -509,20 +534,20 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Models
 			auto gray_rectangle = engine.Scene().CreateModel();
-			gray_rectangle->CreateMesh(std::move(gray_vertices));
+			gray_rectangle->CreateMesh(std::move(gray_vertices), pearl);
 
 			auto red_square = engine.Scene().CreateModel();
-			red_square->CreateMesh(std::move(red_vertices));
+			red_square->CreateMesh(std::move(red_vertices), ruby);
 
 			auto green_square = engine.Scene().CreateModel();
-			green_square->CreateMesh(std::move(green_vertices));
+			green_square->CreateMesh(std::move(green_vertices), emerald);
 
 			auto blue_square = engine.Scene().CreateModel();
-			blue_square->CreateMesh(std::move(blue_vertices));
+			blue_square->CreateMesh(std::move(blue_vertices), gold);
 
 			auto brick_wall = engine.Scene().CreateModel();
-			brick_wall->CreateMesh(std::move(brick_wall_vertices),
-				brick, ion::graphics::render::mesh::MeshTexCoordMode::Manual);
+			brick_wall->CreateMesh(std::move(brick_wall_vertices), brick,
+				ion::graphics::render::mesh::MeshTexCoordMode::Manual);
 
 			//Setup
 			engine.shader_program = mesh_shader_prog.get();

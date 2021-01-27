@@ -56,6 +56,9 @@ namespace ion::graphics::shaders
 			Material_DiffuseMap,
 			Material_SpecularMap,
 			Material_NormalMap,
+			Material_HasDiffuseMap,
+			Material_HasSpecularMap,
+			Material_HasNormalMap,
 
 			Matrix_ModelView,
 			Matrix_Projection,
@@ -125,12 +128,15 @@ namespace ion::graphics::shaders
 				{UniformName::Material_DiffuseMap, 			{"material.diffuse_map", 			11}},
 				{UniformName::Material_SpecularMap, 		{"material.specular_map", 			12}},
 				{UniformName::Material_NormalMap, 			{"material.normal_map", 			13}},
+				{UniformName::Material_HasDiffuseMap, 		{"material.has_diffuse_map", 		14}},
+				{UniformName::Material_HasSpecularMap, 		{"material.has_specular_map", 		15}},
+				{UniformName::Material_HasNormalMap, 		{"material.has_normal_map", 		16}},
 
-				{UniformName::Matrix_ModelView, 			{"matrix.model_view", 				14}},
-				{UniformName::Matrix_Projection, 			{"matrix.projection", 				15}},
-				{UniformName::Matrix_ModelViewProjection,	{"matrix.model_view_projection",	16}},
+				{UniformName::Matrix_ModelView, 			{"matrix.model_view", 				17}},
+				{UniformName::Matrix_Projection, 			{"matrix.projection", 				18}},
+				{UniformName::Matrix_ModelViewProjection,	{"matrix.model_view_projection",	19}},
 
-				{UniformName::Scene_Gamma,					{"scene.gamma",						17}}
+				{UniformName::Scene_Gamma,					{"scene.gamma",						20}}
 			};
 
 		namespace detail

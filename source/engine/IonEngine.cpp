@@ -115,15 +115,8 @@ bool Engine::NotifyFrameEnded(duration time) noexcept
 //TEMP
 void Draw(graphics::scene::SceneManager &scene_manager, graphics::shaders::ShaderProgram *shader_program)
 {
-	for (auto i = 0; auto &model : scene_manager.Models())
-	{
-		if (i + 1 == std::ssize(scene_manager.Models()))
-			model.Draw(shader_program);
-		else
-			model.Draw();
-
-		++i;
-	}
+	for (auto &model : scene_manager.Models())
+		model.Draw(shader_program);
 }
 
 bool Engine::UpdateFrame() noexcept

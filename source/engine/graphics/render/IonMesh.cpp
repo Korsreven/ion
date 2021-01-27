@@ -396,17 +396,17 @@ void set_vertex_attribute_pointers(int vertex_count, vertex_storage_type &vertex
 
 void disable_vertex_attribute_pointers(const shaders::ShaderProgram &shader_program) noexcept
 {
-	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Position); attribute)
-		glDisableVertexAttribArray(attribute->Location().value_or(-1));
+	if (auto position = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Position); position)
+		glDisableVertexAttribArray(position->Location().value_or(-1));
 
-	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Normal); attribute)
-		glDisableVertexAttribArray(attribute->Location().value_or(-1));
+	if (auto normal = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Normal); normal)
+		glDisableVertexAttribArray(normal->Location().value_or(-1));
 
-	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Color); attribute)
-		glDisableVertexAttribArray(attribute->Location().value_or(-1));
+	if (auto color = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Color); color)
+		glDisableVertexAttribArray(color->Location().value_or(-1));
 
-	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_TexCoord); attribute)
-		glDisableVertexAttribArray(attribute->Location().value_or(-1));
+	if (auto tex_coord = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_TexCoord); tex_coord)
+		glDisableVertexAttribArray(tex_coord->Location().value_or(-1));
 }
 
 
@@ -461,45 +461,68 @@ void set_material_uniforms(materials::Material &material, duration time, shaders
 {
 	using namespace shaders::variables;
 
-	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Ambient); uniform)
-		static_cast<Uniform<glsl::vec4>&>(*uniform).Get() = material.AmbientColor();
+	if (auto ambient = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Ambient); ambient)
+		static_cast<Uniform<glsl::vec4>&>(*ambient).Get() = material.AmbientColor();
 
-	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Diffuse); uniform)
-		static_cast<Uniform<glsl::vec4>&>(*uniform).Get() = material.DiffuseColor();
+	if (auto diffuse = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Diffuse); diffuse)
+		static_cast<Uniform<glsl::vec4>&>(*diffuse).Get() = material.DiffuseColor();
 
-	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Specular); uniform)
-		static_cast<Uniform<glsl::vec4>&>(*uniform).Get() = material.SpecularColor();
+	if (auto specular = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Specular); specular)
+		static_cast<Uniform<glsl::vec4>&>(*specular).Get() = material.SpecularColor();
 
-	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Shininess); uniform)
-		static_cast<Uniform<float>&>(*uniform).Get() = material.Shininess(); //Using 'real' could make this uniform double
+	if (auto shininess = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Shininess); shininess)
+		static_cast<Uniform<float>&>(*shininess).Get() = material.Shininess(); //Using 'real' could make this uniform double
 
 
-	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_DiffuseMap); uniform)
+	auto diffuse_map_activated = false;
+	auto specular_map_activated = false;
+	auto normal_map_activated = false;
+	
+	if (auto diffuse_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_DiffuseMap); diffuse_map)
 	{
-		if (auto diffuse_map = material.DiffuseMap(time); diffuse_map && diffuse_map->Handle())
+		if (auto texture = material.DiffuseMap(time); texture && texture->Handle())
 		{
-			if (auto texture_unit = static_cast<Uniform<glsl::sampler2D>&>(*uniform).Get(); texture_unit >= 0)
-				set_active_texture(texture_unit, *diffuse_map->Handle());
+			if (auto texture_unit = static_cast<Uniform<glsl::sampler2D>&>(*diffuse_map).Get(); texture_unit >= 0)
+			{
+				set_active_texture(texture_unit, *texture->Handle());
+				diffuse_map_activated = true;
+			}
 		}
 	}
 
-	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_SpecularMap); uniform)
+	if (auto specular_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_SpecularMap); specular_map)
 	{
-		if (auto specular_map = material.SpecularMap(time); specular_map && specular_map->Handle())
+		if (auto texture = material.SpecularMap(time); texture && texture->Handle())
 		{
-			if (auto texture_unit = static_cast<Uniform<glsl::sampler2D>&>(*uniform).Get(); texture_unit >= 0)
-				set_active_texture(texture_unit, *specular_map->Handle());
+			if (auto texture_unit = static_cast<Uniform<glsl::sampler2D>&>(*specular_map).Get(); texture_unit >= 0)
+			{
+				set_active_texture(texture_unit, *texture->Handle());
+				specular_map_activated = true;
+			}
+		}
+	}
+	
+	if (auto normal_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_NormalMap); normal_map)
+	{
+		if (auto texture = material.NormalMap(time); texture && texture->Handle())
+		{
+			if (auto texture_unit = static_cast<Uniform<glsl::sampler2D>&>(*normal_map).Get(); texture_unit >= 0)
+			{
+				set_active_texture(texture_unit, *texture->Handle());
+				normal_map_activated = true;
+			}
 		}
 	}
 
-	if (auto uniform = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_NormalMap); uniform)
-	{
-		if (auto normal_map = material.NormalMap(time); normal_map && normal_map->Handle())
-		{
-			if (auto texture_unit = static_cast<Uniform<glsl::sampler2D>&>(*uniform).Get(); texture_unit >= 0)
-				set_active_texture(texture_unit, *normal_map->Handle());
-		}
-	}
+
+	if (auto has_diffuse_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasDiffuseMap); has_diffuse_map)
+		static_cast<Uniform<bool>&>(*has_diffuse_map).Get() = diffuse_map_activated;
+
+	if (auto has_specular_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasSpecularMap); has_specular_map)
+		static_cast<Uniform<bool>&>(*has_specular_map).Get() = specular_map_activated;
+
+	if (auto has_normal_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasNormalMap); has_normal_map)
+		static_cast<Uniform<bool>&>(*has_normal_map).Get() = normal_map_activated;
 }
 
 void set_active_texture(int texture_unit, int texture_handle) noexcept
