@@ -21,6 +21,7 @@ File:	IonCamera.h
 #include "graphics/render/IonFrustum.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector3.h"
+#include "types/IonTypes.h"
 
 namespace ion::graphics::render
 {
@@ -29,6 +30,7 @@ namespace ion::graphics::render
 
 namespace ion::graphics::scene
 {
+	using namespace types::type_literals;
 	using utilities::Matrix4;
 	using utilities::Vector3;
 
@@ -51,7 +53,8 @@ namespace ion::graphics::scene
 		private:
 
 			Vector3 position_; //TEMP, should be located in parent node
-			real rotation_ = real{0.0}; //TEMP, should be located in parent node
+			real rotation_ = 0.0_r; //TEMP, should be located in parent node
+			real gamma_ = 1.0_r;
 			render::Frustum frustum_;
 
 			Matrix4 view_matrix_;
@@ -95,6 +98,12 @@ namespace ion::graphics::scene
 			}
 
 			//
+			inline void Gamma(real gamma) noexcept
+			{
+				gamma_ = gamma;
+			}
+
+			//
 			inline void ViewFrustum(const render::Frustum &frustum) noexcept
 			{
 				frustum_ = frustum;
@@ -113,9 +122,15 @@ namespace ion::graphics::scene
 			}
 
 			//
-			[[nodiscard]] inline auto& Rotation() const noexcept
+			[[nodiscard]] inline auto Rotation() const noexcept
 			{
 				return rotation_;
+			}
+
+			//
+			[[nodiscard]] inline auto Gamma() const noexcept
+			{
+				return gamma_;
 			}
 
 			//

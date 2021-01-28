@@ -381,6 +381,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			mesh_shader_prog->CreateAttribute<glsl::vec4>("vertex_color");
 			mesh_shader_prog->CreateAttribute<glsl::vec2>("vertex_tex_coord");
 
+			//Matrices			
+			auto matrix_model_view = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.model_view");
+			auto matrix_projection = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.projection");
+			auto matrix_model_view_projection = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.model_view_projection");
+
+			//Camera
+			auto camera_position = mesh_shader_prog->CreateUniform<glsl::vec3>("camera.position");
+			auto camera_gamma = mesh_shader_prog->CreateUniform<float>("camera.gamma");
+
 			//Material
 			auto material_ambient = mesh_shader_prog->CreateUniform<glsl::vec4>("material.ambient");
 			auto material_diffuse = mesh_shader_prog->CreateUniform<glsl::vec4>("material.diffuse");
@@ -392,25 +401,20 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto material_has_diffuse_map = mesh_shader_prog->CreateUniform<bool>("material.has_diffuse_map");
 			auto material_has_specular_map = mesh_shader_prog->CreateUniform<bool>("material.has_specular_map");
 			auto material_has_normal_map = mesh_shader_prog->CreateUniform<bool>("material.has_normal_map");
+			auto material_enabled = mesh_shader_prog->CreateUniform<bool>("material.enabled");
 
 			//Light
+			auto light_type = mesh_shader_prog->CreateUniform<int>("light.type");
 			auto light_position = mesh_shader_prog->CreateUniform<glsl::vec3>("light.position");
 			auto light_direction = mesh_shader_prog->CreateUniform<glsl::vec3>("light.direction");
 			auto light_cutoff = mesh_shader_prog->CreateUniform<float>("light.cutoff");
 			auto light_ambient = mesh_shader_prog->CreateUniform<glsl::vec4>("light.ambient");
 			auto light_diffuse = mesh_shader_prog->CreateUniform<glsl::vec4>("light.diffuse");
 			auto light_specular = mesh_shader_prog->CreateUniform<glsl::vec4>("light.specular");
-
-			//Camera
-			auto camera_position = mesh_shader_prog->CreateUniform<glsl::vec3>("camera.position");
-
-			//Scene
-			auto scene_gamma = mesh_shader_prog->CreateUniform<float>("scene.gamma");
-
-			//Matrices			
-			auto matrix_model_view = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.model_view");
-			auto matrix_projection = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.projection");
-			auto matrix_model_view_projection = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.model_view_projection");
+			auto light_attenuation_constant = mesh_shader_prog->CreateUniform<float>("light.attenuation_constant");
+			auto light_attenuation_linear = mesh_shader_prog->CreateUniform<float>("light.attenuation_linear");
+			auto light_attenuation_quadratic = mesh_shader_prog->CreateUniform<float>("light.attenuation_quadratic");
+			auto light_count = mesh_shader_prog->CreateUniform<int>("light.count");
 
 			shader_programs.LoadShaderVariableLocations(*mesh_shader_prog);
 
@@ -517,12 +521,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			green_vertices.push_back({{-0.1_r, 0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
 
 			ion::graphics::render::mesh::Vertices blue_vertices;
-			blue_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Orange});
-			blue_vertices.push_back({{1.5778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Orange});
-			blue_vertices.push_back({{1.7778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Orange});
-			blue_vertices.push_back({{1.7778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Orange});
-			blue_vertices.push_back({{1.7778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Orange});
-			blue_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Orange});
+			blue_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
+			blue_vertices.push_back({{1.5778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Blue});
+			blue_vertices.push_back({{1.7778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Blue});
+			blue_vertices.push_back({{1.7778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Blue});
+			blue_vertices.push_back({{1.7778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
+			blue_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
 
 			ion::graphics::render::mesh::Vertices brick_wall_vertices;
 			brick_wall_vertices.push_back({{-0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 1.0_r}});
@@ -534,16 +538,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Models
 			auto gray_rectangle = engine.Scene().CreateModel();
-			gray_rectangle->CreateMesh(std::move(gray_vertices), pearl);
+			gray_rectangle->CreateMesh(std::move(gray_vertices));
 
 			auto red_square = engine.Scene().CreateModel();
-			red_square->CreateMesh(std::move(red_vertices), ruby);
+			red_square->CreateMesh(std::move(red_vertices));
 
 			auto green_square = engine.Scene().CreateModel();
-			green_square->CreateMesh(std::move(green_vertices), emerald);
+			green_square->CreateMesh(std::move(green_vertices));
 
 			auto blue_square = engine.Scene().CreateModel();
-			blue_square->CreateMesh(std::move(blue_vertices), gold);
+			blue_square->CreateMesh(std::move(blue_vertices));
 
 			auto brick_wall = engine.Scene().CreateModel();
 			brick_wall->CreateMesh(std::move(brick_wall_vertices), brick,
@@ -562,6 +566,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto camera = engine.Target()->GetViewport("")->ConnectedCamera();
 			camera->Position({0.0_r, 0.0_r, 0.0_r});
 			camera->Rotation(ion::utilities::math::Degree(0.0_r));
+			camera->Gamma(1.0_r);
 
 			engine.Target()->GetViewport("")->RenderTo();
 			auto proj_mat = camera->ViewFrustum().ProjectionMatrix();
@@ -569,15 +574,20 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto view_proj_mat = proj_mat * view_mat;
 
 			//Uniforms
+			camera_position->Get() = camera->Position();
+			camera_gamma->Get() = camera->Gamma();
+
+			light_type->Get() = 0;
 			light_position->Get().XYZ(0.0_r, 0.0_r, -1.0_r);
 			light_direction->Get().XYZ(0.0_r, 0.0_r, -1.0_r);
 			light_cutoff->Get() = 1.0_r;
 			light_ambient->Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
 			light_diffuse->Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
 			light_specular->Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
-
-			camera_position->Get() = camera->Position();
-			scene_gamma->Get() = 1.0_r;
+			light_attenuation_constant->Get() = 1.0_r;
+			light_attenuation_linear->Get() = 0.0_r;
+			light_attenuation_quadratic->Get() = 0.0_r;
+			light_count->Get() = 1;
 
 			proj_mat.Transpose();
 			view_mat.Transpose();

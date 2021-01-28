@@ -771,6 +771,9 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 		if (material_)
 			detail::set_material_uniforms(*material_, time_, *shader_program);
 
+		if (auto enabled = shader_program->GetUniform(shaders::shader_layout::UniformName::Material_Enabled); enabled)
+			static_cast<shaders::variables::Uniform<bool>&>(*enabled).Get() = !!material_;
+
 		shader_program->Owner()->SendShaderVariableValues(*shader_program);
 	}
 	else //Fixed-function pipeline

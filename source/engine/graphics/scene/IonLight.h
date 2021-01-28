@@ -72,8 +72,8 @@ namespace ion::graphics::scene
 			Color specular_color_;
 
 			real attenuation_constant_ = 1.0_r;
-			real attenuation_linear_ = 1.0_r;
-			real attenuation_quadratic_ = 1.0_r;
+			real attenuation_linear_ = 0.0_r;
+			real attenuation_quadratic_ = 0.0_r;
 
 			bool cast_shadows_ = true;
 
