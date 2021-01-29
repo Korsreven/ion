@@ -194,9 +194,10 @@ namespace ion::graphics::scene
 
 			//Create a light with the given values
 			NonOwningPtr<Light> CreateLight(light::LightType type,
-				const Vector3 &position, const Vector3 &direction, real cutoff_angle,
+				const Vector3 &position, const Vector3 &direction,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
+				real cutoff_angle, real outer_cutoff_angle,
 				bool cast_shadows = true);
 
 

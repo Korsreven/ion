@@ -43,6 +43,7 @@ namespace ion::graphics::scene
 		namespace detail
 		{
 			constexpr auto default_cutoff_angle = math::Degree(45.0_r);
+			constexpr auto default_outer_cutoff_angle = math::Degree(50.0_r);
 
 
 			inline auto angle_to_cutoff(real angle) noexcept
@@ -65,7 +66,6 @@ namespace ion::graphics::scene
 			light::LightType type_ = light::LightType::Point;
 			Vector3 position_; //TEMP, should be located in parent node
 			Vector3 direction_; //TEMP, should be located in parent node
-			real cutoff_ = light::detail::angle_to_cutoff(light::detail::default_cutoff_angle);
 
 			Color ambient_color_;
 			Color diffuse_color_;
@@ -74,6 +74,9 @@ namespace ion::graphics::scene
 			real attenuation_constant_ = 1.0_r;
 			real attenuation_linear_ = 0.0_r;
 			real attenuation_quadratic_ = 0.0_r;
+
+			real cutoff_ = light::detail::angle_to_cutoff(light::detail::default_cutoff_angle);
+			real outer_cutoff_ = light::detail::angle_to_cutoff(light::detail::default_outer_cutoff_angle);
 
 			bool cast_shadows_ = true;
 
@@ -84,9 +87,10 @@ namespace ion::graphics::scene
 
 			//Construct a new light with the given values
 			Light(light::LightType type,
-				const Vector3 &position, const Vector3 &direction, real cutoff_angle,
+				const Vector3 &position, const Vector3 &direction,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
+				real cutoff_angle, real outer_cutoff_angle,
 				bool cast_shadows = true) noexcept;
 
 
@@ -103,13 +107,13 @@ namespace ion::graphics::scene
 			//Returns a new directional light from the given values
 			[[nodiscard]] static Light Directional(const Vector3 &direction,
 				const Color &ambient, const Color &diffuse, const Color &specular,
-				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				bool cast_shadows = true) noexcept;
 
 			//Returns a new spotlight from the given values
-			[[nodiscard]] static Light Spotlight(const Vector3 &position, const Vector3 &direction, real cutoff_angle,
+			[[nodiscard]] static Light Spotlight(const Vector3 &position, const Vector3 &direction,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
+				real cutoff_angle, real outer_cutoff_angle,
 				bool cast_shadows = true) noexcept;
 
 
@@ -135,13 +139,6 @@ namespace ion::graphics::scene
 			inline void Direction(const Vector3 &direction) noexcept
 			{
 				direction_ = direction;
-			}
-
-			//Sets the cutoff value of the light to the given angle (radians)
-			//This value only applies for lights of type spotlight
-			inline void Cutoff(real angle) noexcept
-			{
-				cutoff_ = light::detail::angle_to_cutoff(angle);
 			}
 
 
@@ -183,6 +180,21 @@ namespace ion::graphics::scene
 			}
 
 
+			//Sets the cutoff value of the light to the given angle (radians)
+			//This value only applies for lights of type spotlight
+			inline void Cutoff(real angle) noexcept
+			{
+				cutoff_ = light::detail::angle_to_cutoff(angle);
+			}
+
+			//Sets the outer cutoff value of the light to the given angle (radians)
+			//This value only applies for lights of type spotlight
+			inline void OuterCutoff(real angle) noexcept
+			{
+				outer_cutoff_ = light::detail::angle_to_cutoff(angle);
+			}
+
+
 			//Sets if this light casts shadows or not
 			inline void CastShadows(bool enabled) noexcept
 			{
@@ -212,13 +224,6 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto& Direction() const noexcept
 			{
 				return direction_;
-			}
-
-			//Returns the cutoff angle (radians) of the light
-			//This value only applies for lights of type spotlight
-			[[nodiscard]] inline auto Cutoff() const noexcept
-			{
-				return light::detail::cutoff_to_angle(cutoff_);
 			}
 
 
@@ -257,6 +262,21 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto AttenuationQuadratic() const noexcept
 			{
 				return attenuation_quadratic_;
+			}
+
+
+			//Returns the cutoff angle (radians) of the light
+			//This value only applies for lights of type spotlight
+			[[nodiscard]] inline auto Cutoff() const noexcept
+			{
+				return light::detail::cutoff_to_angle(cutoff_);
+			}
+
+			//Returns the outer cutoff angle (radians) of the light
+			//This value only applies for lights of type spotlight
+			[[nodiscard]] inline auto OuterCutoff() const noexcept
+			{
+				return light::detail::cutoff_to_angle(outer_cutoff_);
 			}
 
 

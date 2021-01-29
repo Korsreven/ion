@@ -292,6 +292,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				[[maybe_unused]] auto npot = ion::graphics::gl::TextureNonPowerOfTwo_Support();
 				[[maybe_unused]] auto vertex_array_object = ion::graphics::gl::VertexArrayObject_Support();
 				[[maybe_unused]] auto vertex_buffer_object = ion::graphics::gl::VertexBufferObject_Support();
+				[[maybe_unused]] auto max_fragment_uniform_components = ion::graphics::gl::MaxFragmentUniformComponents();
+				[[maybe_unused]] auto max_vertex_uniform_components = ion::graphics::gl::MaxVertexUniformComponents();
 				[[maybe_unused]] auto max_texture_size = ion::graphics::gl::MaxTextureSize();
 				[[maybe_unused]] auto max_texture_units = ion::graphics::gl::MaxTextureUnits();
 				[[maybe_unused]] auto break_point = false;
@@ -386,9 +388,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto matrix_projection = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.projection");
 			auto matrix_model_view_projection = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.model_view_projection");
 
+			//Scene
+			auto scene_light_count = mesh_shader_prog->CreateUniform<int>("scene.light_count");
+			auto scene_gamma = mesh_shader_prog->CreateUniform<float>("scene.gamma");	
+
 			//Camera
 			auto camera_position = mesh_shader_prog->CreateUniform<glsl::vec3>("camera.position");
-			auto camera_gamma = mesh_shader_prog->CreateUniform<float>("camera.gamma");
+
+			//Mesh
+			auto mesh_has_material = mesh_shader_prog->CreateUniform<bool>("mesh.has_material");
 
 			//Material
 			auto material_ambient = mesh_shader_prog->CreateUniform<glsl::vec4>("material.ambient");
@@ -401,20 +409,19 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto material_has_diffuse_map = mesh_shader_prog->CreateUniform<bool>("material.has_diffuse_map");
 			auto material_has_specular_map = mesh_shader_prog->CreateUniform<bool>("material.has_specular_map");
 			auto material_has_normal_map = mesh_shader_prog->CreateUniform<bool>("material.has_normal_map");
-			auto material_enabled = mesh_shader_prog->CreateUniform<bool>("material.enabled");
 
 			//Light
 			auto light_type = mesh_shader_prog->CreateUniform<int>("light.type");
 			auto light_position = mesh_shader_prog->CreateUniform<glsl::vec3>("light.position");
 			auto light_direction = mesh_shader_prog->CreateUniform<glsl::vec3>("light.direction");
-			auto light_cutoff = mesh_shader_prog->CreateUniform<float>("light.cutoff");
 			auto light_ambient = mesh_shader_prog->CreateUniform<glsl::vec4>("light.ambient");
 			auto light_diffuse = mesh_shader_prog->CreateUniform<glsl::vec4>("light.diffuse");
 			auto light_specular = mesh_shader_prog->CreateUniform<glsl::vec4>("light.specular");
-			auto light_attenuation_constant = mesh_shader_prog->CreateUniform<float>("light.attenuation_constant");
-			auto light_attenuation_linear = mesh_shader_prog->CreateUniform<float>("light.attenuation_linear");
-			auto light_attenuation_quadratic = mesh_shader_prog->CreateUniform<float>("light.attenuation_quadratic");
-			auto light_count = mesh_shader_prog->CreateUniform<int>("light.count");
+			auto light_constant = mesh_shader_prog->CreateUniform<float>("light.constant");
+			auto light_linear = mesh_shader_prog->CreateUniform<float>("light.linear");
+			auto light_quadratic = mesh_shader_prog->CreateUniform<float>("light.quadratic");
+			auto light_cutoff = mesh_shader_prog->CreateUniform<float>("light.cutoff");
+			auto light_outer_cutoff = mesh_shader_prog->CreateUniform<float>("light.outer_cutoff");
 
 			shader_programs.LoadShaderVariableLocations(*mesh_shader_prog);
 
@@ -566,7 +573,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto camera = engine.Target()->GetViewport("")->ConnectedCamera();
 			camera->Position({0.0_r, 0.0_r, 0.0_r});
 			camera->Rotation(ion::utilities::math::Degree(0.0_r));
-			camera->Gamma(1.0_r);
 
 			engine.Target()->GetViewport("")->RenderTo();
 			auto proj_mat = camera->ViewFrustum().ProjectionMatrix();
@@ -574,20 +580,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto view_proj_mat = proj_mat * view_mat;
 
 			//Uniforms
+			scene_light_count->Get() = 1;
+			scene_gamma->Get() = 1.0_r;
+
 			camera_position->Get() = camera->Position();
-			camera_gamma->Get() = camera->Gamma();
 
 			light_type->Get() = 0;
 			light_position->Get().XYZ(0.0_r, 0.0_r, -1.0_r);
 			light_direction->Get().XYZ(0.0_r, 0.0_r, -1.0_r);
-			light_cutoff->Get() = 1.0_r;
 			light_ambient->Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
 			light_diffuse->Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
 			light_specular->Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
-			light_attenuation_constant->Get() = 1.0_r;
-			light_attenuation_linear->Get() = 0.0_r;
-			light_attenuation_quadratic->Get() = 0.0_r;
-			light_count->Get() = 1;
+			light_constant->Get() = 1.0_r;
+			light_linear->Get() = 0.09_r;
+			light_quadratic->Get() = 0.032_r;
+			light_cutoff->Get() = 0.218;
+			light_outer_cutoff->Get() = 0.262;
 
 			proj_mat.Transpose();
 			view_mat.Transpose();

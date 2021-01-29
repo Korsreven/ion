@@ -44,8 +44,11 @@ namespace ion::graphics::shaders
 			Matrix_Projection,
 			Matrix_ModelViewProjection,
 
+			Scene_LightCount,
+			Scene_Gamma,
+
 			Camera_Position,
-			Camera_Gamma,
+			Mesh_HasMaterial,
 			
 			Material_Ambient,
 			Material_Diffuse,
@@ -57,19 +60,18 @@ namespace ion::graphics::shaders
 			Material_HasDiffuseMap,
 			Material_HasSpecularMap,
 			Material_HasNormalMap,
-			Material_Enabled,
 
 			Light_Type,
 			Light_Position,
 			Light_Direction,
-			Light_Cutoff,
 			Light_Ambient,
 			Light_Diffuse,
 			Light_Specular,
-			Light_AttenuationConstant,
-			Light_AttenuationLinear,
-			Light_AttenuationQuadratic,
-			Light_Count
+			Light_Constant,
+			Light_Linear,
+			Light_Quadratic,
+			Light_Cutoff,
+			Light_OuterCutoff
 		};
 
 
@@ -119,40 +121,42 @@ namespace ion::graphics::shaders
 			{
 				{UniformName::Matrix_ModelView, 			{"matrix.model_view", 				0}},
 				{UniformName::Matrix_Projection, 			{"matrix.projection", 				1}},
-				{UniformName::Matrix_ModelViewProjection,	{"matrix.model_view_projection",	2}},	
+				{UniformName::Matrix_ModelViewProjection,	{"matrix.model_view_projection",	2}},
 
-				{UniformName::Camera_Position, 				{"camera.position", 				3}},
-				{UniformName::Camera_Gamma,					{"camera.gamma",					4}},
+				{UniformName::Scene_LightCount,				{"scene.light_count",				3}},
+				{UniformName::Scene_Gamma,					{"scene.gamma",						4}},
 
-				{UniformName::Material_Ambient, 			{"material.ambient", 				5}},
-				{UniformName::Material_Diffuse, 			{"material.diffuse", 				6}},
-				{UniformName::Material_Specular, 			{"material.specular", 				7}},
-				{UniformName::Material_Shininess, 			{"material.shininess", 				8}},
-				{UniformName::Material_DiffuseMap, 			{"material.diffuse_map", 			9}},
-				{UniformName::Material_SpecularMap, 		{"material.specular_map", 			10}},
-				{UniformName::Material_NormalMap, 			{"material.normal_map", 			11}},
-				{UniformName::Material_HasDiffuseMap, 		{"material.has_diffuse_map", 		12}},
-				{UniformName::Material_HasSpecularMap, 		{"material.has_specular_map", 		13}},
-				{UniformName::Material_HasNormalMap, 		{"material.has_normal_map", 		14}},
-				{UniformName::Material_Enabled, 			{"material.enabled", 				15}},
+				{UniformName::Camera_Position, 				{"camera.position", 				5}},
+				{UniformName::Mesh_HasMaterial, 			{"mesh.has_material", 				6}},
 
-				{UniformName::Light_Type, 					{"light.type", 						16}},
-				{UniformName::Light_Position, 				{"light.position", 					17}},
-				{UniformName::Light_Direction, 				{"light.direction", 				18}},
-				{UniformName::Light_Cutoff, 				{"light.cutoff", 					19}},
+				{UniformName::Material_Ambient, 			{"material.ambient", 				7}},
+				{UniformName::Material_Diffuse, 			{"material.diffuse", 				8}},
+				{UniformName::Material_Specular, 			{"material.specular", 				9}},
+				{UniformName::Material_Shininess, 			{"material.shininess", 				10}},
+				{UniformName::Material_DiffuseMap, 			{"material.diffuse_map", 			11}},
+				{UniformName::Material_SpecularMap, 		{"material.specular_map", 			12}},
+				{UniformName::Material_NormalMap, 			{"material.normal_map", 			13}},
+				{UniformName::Material_HasDiffuseMap, 		{"material.has_diffuse_map", 		14}},
+				{UniformName::Material_HasSpecularMap, 		{"material.has_specular_map", 		15}},
+				{UniformName::Material_HasNormalMap, 		{"material.has_normal_map", 		16}},
+
+				{UniformName::Light_Type, 					{"light.type", 						17}},
+				{UniformName::Light_Position, 				{"light.position", 					18}},
+				{UniformName::Light_Direction, 				{"light.direction", 				19}},
 				{UniformName::Light_Ambient, 				{"light.ambient", 					20}},
 				{UniformName::Light_Diffuse, 				{"light.diffuse", 					21}},
 				{UniformName::Light_Specular, 				{"light.specular", 					22}},
-				{UniformName::Light_AttenuationConstant, 	{"light.attenuation_constant", 		23}},
-				{UniformName::Light_AttenuationLinear, 		{"light.attenuation_linear", 		24}},
-				{UniformName::Light_AttenuationQuadratic, 	{"light.attenuation_quadratic", 	25}},
-				{UniformName::Light_Count, 					{"light.count", 					26}}
+				{UniformName::Light_Constant, 				{"light.constant", 					23}},
+				{UniformName::Light_Linear, 				{"light.linear", 					24}},
+				{UniformName::Light_Quadratic, 				{"light.quadratic", 				25}},
+				{UniformName::Light_Cutoff, 				{"light.cutoff", 					26}},
+				{UniformName::Light_OuterCutoff, 			{"light.outer_cutoff", 				27}}
 			};
 
 		namespace detail
 		{
 			constexpr auto attribute_name_count = static_cast<int>(AttributeName::Vertex_PointSize) + 1;
-			constexpr auto uniform_name_count = static_cast<int>(UniformName::Light_Count) + 1;
+			constexpr auto uniform_name_count = static_cast<int>(UniformName::Light_OuterCutoff) + 1;
 
 			using attribute_binding_map = adaptors::FlatMap<AttributeName, shader_layout::VariableDeclaration>;
 			using uniform_binding_map = adaptors::FlatMap<UniformName, shader_layout::VariableDeclaration>;

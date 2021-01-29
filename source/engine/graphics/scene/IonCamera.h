@@ -54,7 +54,6 @@ namespace ion::graphics::scene
 
 			Vector3 position_; //TEMP, should be located in parent node
 			real rotation_ = 0.0_r; //TEMP, should be located in parent node
-			real gamma_ = 1.0_r;
 			render::Frustum frustum_;
 
 			Matrix4 view_matrix_;
@@ -98,12 +97,6 @@ namespace ion::graphics::scene
 			}
 
 			//
-			inline void Gamma(real gamma) noexcept
-			{
-				gamma_ = gamma;
-			}
-
-			//
 			inline void ViewFrustum(const render::Frustum &frustum) noexcept
 			{
 				frustum_ = frustum;
@@ -125,12 +118,6 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto Rotation() const noexcept
 			{
 				return rotation_;
-			}
-
-			//
-			[[nodiscard]] inline auto Gamma() const noexcept
-			{
-				return gamma_;
 			}
 
 			//

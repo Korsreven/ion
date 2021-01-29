@@ -286,6 +286,43 @@ namespace ion::graphics::gl
 		else
 			return Extension::None;
 	}
+	
+
+	[[nodiscard]] inline auto MaxFragmentUniformComponents() noexcept
+	{
+		auto max_uniform_components = 0;
+
+		switch (Shader_Support())
+		{
+			case Extension::Core:
+			glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &max_uniform_components);
+			break;
+
+			case Extension::ARB:
+			glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS_ARB, &max_uniform_components);
+			break;
+		}
+
+		return max_uniform_components;
+	}
+
+	[[nodiscard]] inline auto MaxVertexUniformComponents() noexcept
+	{
+		auto max_uniform_components = 0;
+
+		switch (Shader_Support())
+		{
+			case Extension::Core:
+			glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &max_uniform_components);
+			break;
+
+			case Extension::ARB:
+			glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS_ARB, &max_uniform_components);
+			break;
+		}
+
+		return max_uniform_components;
+	}
 
 
 	[[nodiscard]] inline auto MaxTextureSize() noexcept

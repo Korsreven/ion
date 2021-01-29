@@ -99,15 +99,17 @@ NonOwningPtr<Light> SceneManager::CreateLight()
 }
 
 NonOwningPtr<Light> SceneManager::CreateLight(light::LightType type,
-	const Vector3 &position, const Vector3 &direction, real cutoff_angle,
+	const Vector3 &position, const Vector3 &direction,
 	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
+	real cutoff_angle, real outer_cutoff_angle,
 	bool cast_shadows)
 {
 	return LightBase::Create(type,
-		position, direction, cutoff_angle,
+		position, direction,
 		ambient, diffuse, specular,
 		attenuation_constant, attenuation_linear, attenuation_quadratic,
+		cutoff_angle, outer_cutoff_angle,
 		cast_shadows);
 }
 
