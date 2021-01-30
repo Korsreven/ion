@@ -38,7 +38,7 @@ namespace ion::graphics::shaders
 		void remap_uniform(NonOwningPtr<variables::UniformVariable> uniform_variable, ShaderLayout &shader_layout, mapped_uniforms &uniforms) noexcept;
 
 		int get_next_texture_unit(int &next_texture_unit) noexcept;
-	} //shader::detail
+	} //shader_program::detail
 
 
 	class ShaderProgramManager; //Forward declaration

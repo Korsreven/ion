@@ -13,6 +13,7 @@ File:	IonShaderTypes.h
 #ifndef ION_SHADER_TYPES_H
 #define ION_SHADER_TYPES_H
 
+#include <array>
 #include <cassert>
 #include <cstddef>
 #include <tuple>
@@ -169,6 +170,9 @@ namespace ion::graphics::shaders::variables::glsl
 			Uniform value
 		*/
 
+		template <typename T, size_t Size>
+		using sbo_container_type = std::array<T, Size>;
+
 		template <typename T>
 		using container_type = std::vector<T>;
 	} //detail
@@ -296,13 +300,13 @@ namespace ion::graphics::shaders::variables::glsl
 		//Returns a modifiable reference to the value stored
 		inline operator basic_type_t<T>&() noexcept
 		{
-			return this->values_[this->off_];
+			return this->Values()[0];
 		}
 
 		//Returns the value stored
 		inline operator basic_type_t<T>() const noexcept
 		{
-			return this->values_[this->off_];
+			return this->Values()[0];
 		}
 	};
 
@@ -331,13 +335,13 @@ namespace ion::graphics::shaders::variables::glsl
 		//Returns a modifiable reference to the value stored
 		inline operator basic_type_t<bool>&() noexcept
 		{
-			return this->values_[this->off_];
+			return this->Values()[0];
 		}
 
 		//Returns the value stored
 		inline operator bool() const noexcept
 		{
-			return this->values_[this->off_] != 0;
+			return this->Values()[0] != 0;
 		}
 	};
 
@@ -367,14 +371,14 @@ namespace ion::graphics::shaders::variables::glsl
 		[[nodiscard]] inline auto& operator[](int off) noexcept
 		{
 			assert(off >= 0 && off < 2);
-			return this->values_[2 * this->off_ + off];
+			return this->Values()[off];
 		}
 
 		//Returns the component at the given offset
 		[[nodiscard]] inline auto operator[](int off) const noexcept
 		{
 			assert(off >= 0 && off < 2);
-			return this->values_[2 * this->off_ + off];
+			return this->Values()[off];
 		}
 
 
@@ -385,13 +389,13 @@ namespace ion::graphics::shaders::variables::glsl
 		//Sets the x component to the given value
 		inline void X(T x) noexcept
 		{
-			this->values_[2 * this->off_] = x;
+			this->Values()[0] = x;
 		}
 
 		//Sets the y component to the given value
 		inline void Y(T y) noexcept
 		{
-			this->values_[2 * this->off_ + 1] = y;
+			this->Values()[1] = y;
 		}
 
 		//Sets the x and y components to the given values
@@ -409,13 +413,13 @@ namespace ion::graphics::shaders::variables::glsl
 		//Returns the x component
 		[[nodiscard]] inline auto X() const noexcept
 		{
-			return this->values_[2 * this->off_];
+			return this->Values()[0];
 		}
 
 		//Returns the y component
 		[[nodiscard]] inline auto Y() const noexcept
 		{
-			return this->values_[2 * this->off_ + 1];
+			return this->Values()[1];
 		}
 
 		//Returns both the x and y components
@@ -459,14 +463,14 @@ namespace ion::graphics::shaders::variables::glsl
 		[[nodiscard]] inline auto& operator[](int off) noexcept
 		{
 			assert(off >= 0 && off < 3);
-			return this->values_[3 * this->off_ + off];
+			return this->Values()[off];
 		}
 
 		//Returns the component at the given offset
 		[[nodiscard]] inline auto operator[](int off) const noexcept
 		{
 			assert(off >= 0 && off < 3);
-			return this->values_[3 * this->off_ + off];
+			return this->Values()[off];
 		}
 
 
@@ -477,19 +481,19 @@ namespace ion::graphics::shaders::variables::glsl
 		//Sets the x component to the given value
 		inline void X(T x) noexcept
 		{
-			this->values_[3 * this->off_] = x;
+			this->Values()[0] = x;
 		}
 
 		//Sets the y component to the given value
 		inline void Y(T y) noexcept
 		{
-			this->values_[3 * this->off_ + 1] = y;
+			this->Values()[1] = y;
 		}
 
 		//Sets the z component to the given value
 		inline void Z(T z) noexcept
 		{
-			this->values_[3 * this->off_ + 2] = z;
+			this->Values()[2] = z;
 		}
 
 		//Sets the x, y and z components to the given values
@@ -508,19 +512,19 @@ namespace ion::graphics::shaders::variables::glsl
 		//Returns the x component
 		[[nodiscard]] inline auto X() const noexcept
 		{
-			return this->values_[3 * this->off_];
+			return this->Values()[0];
 		}
 
 		//Returns the y component
 		[[nodiscard]] inline auto Y() const noexcept
 		{
-			return this->values_[3 * this->off_ + 1];
+			return this->Values()[1];
 		}
 
 		//Returns the z component
 		[[nodiscard]] inline auto Z() const noexcept
 		{
-			return this->values_[3 * this->off_ + 2];
+			return this->Values()[2];
 		}
 
 		//Returns the x, y and z components
@@ -564,14 +568,14 @@ namespace ion::graphics::shaders::variables::glsl
 		[[nodiscard]] inline auto& operator[](int off) noexcept
 		{
 			assert(off >= 0 && off < 4);
-			return this->values_[4 * this->off_ + off];
+			return this->Values()[off];
 		}
 
 		//Returns the component at the given offset
 		[[nodiscard]] inline auto operator[](int off) const noexcept
 		{
 			assert(off >= 0 && off < 4);
-			return this->values_[4 * this->off_ + off];
+			return this->Values()[off];
 		}
 
 
@@ -582,25 +586,25 @@ namespace ion::graphics::shaders::variables::glsl
 		//Sets the x component to the given value
 		inline void X(T x) noexcept
 		{
-			this->values_[4 * this->off_] = x;
+			this->Values()[0] = x;
 		}
 
 		//Sets the y component to the given value
 		inline void Y(T y) noexcept
 		{
-			this->values_[4 * this->off_ + 1] = y;
+			this->Values()[1] = y;
 		}
 
 		//Sets the z component to the given value
 		inline void Z(T z) noexcept
 		{
-			this->values_[4 * this->off_ + 2] = z;
+			this->Values()[2] = z;
 		}
 
 		//Sets the w component to the given value
 		inline void W(T w) noexcept
 		{
-			this->values_[4 * this->off_ + 3] = w;
+			this->Values()[3] = w;
 		}
 
 		//Sets the x, y, z and w components to the given values
@@ -620,25 +624,25 @@ namespace ion::graphics::shaders::variables::glsl
 		//Returns the x component
 		[[nodiscard]] inline auto X() const noexcept
 		{
-			return this->values_[4 * this->off_];
+			return this->Values()[0];
 		}
 
 		//Returns the y component
 		[[nodiscard]] inline auto Y() const noexcept
 		{
-			return this->values_[4 * this->off_ + 1];
+			return this->Values()[1];
 		}
 
 		//Returns the z component
 		[[nodiscard]] inline auto Z() const noexcept
 		{
-			return this->values_[4 * this->off_ + 2];
+			return this->Values()[2];
 		}
 
 		//Returns the w component
 		[[nodiscard]] inline auto W() const noexcept
 		{
-			return this->values_[4 * this->off_ + 3];
+			return this->Values()[3];
 		}
 
 
@@ -693,7 +697,7 @@ namespace ion::graphics::shaders::variables::glsl
 			for (auto i = 0; i < N; ++i)
 			{
 				for (auto j = 0; j < M; ++j)
-					this->values_[type_components_v<Mat<N, M, T>> * this->off_ + M * i + j] = static_cast<T>(matrix.M()[i][j]);
+					this->Values()[M * i + j] = static_cast<T>(matrix.M()[i][j]);
 			}
 
 			return *this;
@@ -703,7 +707,7 @@ namespace ion::graphics::shaders::variables::glsl
 		[[nodiscard]] inline auto operator[](int column_off) noexcept
 		{
 			assert(column_off >= 0 && column_off < N);
-			return ValueAccessor<Vec<M, T>>{&this->values_[type_components_v<Mat<N, M, T>> * this->off_ + M * column_off]};
+			return ValueAccessor<Vec<M, T>>{this->Values() + M * column_off};
 		}
 	};
 
@@ -820,32 +824,49 @@ namespace ion::graphics::shaders::variables::glsl
 		private:
 
 			const int size_ = 1;
-			detail::container_type<basic_type_t<T>> values_;
+
+			detail::sbo_container_type<basic_type_t<T>, type_components_v<T>> stack_values_{}; //SBO (small buffer optimization)
+			detail::container_type<basic_type_t<T>> heap_values_; //Heap allocated if size is greater than 1
+			basic_type_t<T> *external_values_ = nullptr;
+
+
+			inline auto Data() noexcept
+			{
+				return external_values_ ? external_values_ :
+					size_ > 1 ? std::data(heap_values_) : std::data(stack_values_);
+			}
 
 		public:
 
 			//Constructor
 			explicit UniformValue(int size = 1) :
+
 				size_{size > 0 ? size : 1},
-				values_(type_components_v<T> * size_, basic_type_t<T>{})
+				heap_values_{size_ > 1 ?
+					decltype(heap_values_)(type_components_v<T> * size_, basic_type_t<T>{}) :
+					decltype(heap_values_){}}
 			{
-				ValueAccessor<T>::values_ = &values_[0];
+				ValueAccessor<T>::values_ = Data();
 			}
 
 			//Copy constructor
 			UniformValue(const UniformValue &rhs) :
+
 				size_{rhs.size_},
-				values_{rhs.values_}
+				stack_values_{rhs.stack_values_},
+				heap_values_{rhs.heap_values_}
 			{
-				ValueAccessor<T>::values_ = &values_[0];
+				ValueAccessor<T>::values_ = Data();
 			}
 
 			//Move constructor
 			UniformValue(UniformValue &&rhs) :
+
 				size_{rhs.size_},
-				values_{std::move(rhs.values_)}
+				stack_values_{std::move(rhs.stack_values_)},
+				heap_values_{std::move(rhs.heap_values_)}
 			{
-				ValueAccessor<T>::values_ = &values_[0];
+				ValueAccessor<T>::values_ = Data();
 			}
 
 
@@ -872,7 +893,7 @@ namespace ion::graphics::shaders::variables::glsl
 			[[nodiscard]] inline auto At(int off) noexcept
 			{
 				assert(off < size_);
-				return ValueAccessor<T>{&values_[0], off};
+				return ValueAccessor<T>{Data(), off};
 			}
 
 
