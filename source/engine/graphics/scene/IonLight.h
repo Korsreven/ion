@@ -14,6 +14,8 @@ File:	IonLight.h
 #define ION_LIGHT_H
 
 #include <cmath>
+#include <tuple>
+#include <utility>
 
 #include "IonMovableObject.h"
 #include "graphics/utilities/IonColor.h"
@@ -161,37 +163,20 @@ namespace ion::graphics::scene
 			}
 
 
-			//Sets the constant attenuation factor to the given value
-			inline void AttenuationConstant(real factor) noexcept
+			//Sets the attenuation to the given values
+			inline void Attenuation(real constant, real linear, real quadratic) noexcept
 			{
-				attenuation_constant_ = factor;
+				attenuation_constant_ = constant;
+				attenuation_constant_ = linear;
+				attenuation_constant_ = quadratic;
 			}
 
-			//Sets the linear attenuation factor to the given value
-			inline void AttenuationLinear(real factor) noexcept
+			//Sets the inner and outer cutoff values of the light to the given angles (radians)
+			//These values only applies for lights of type spotlight
+			inline void Cutoff(real inner_angle, real outer_angle) noexcept
 			{
-				attenuation_linear_ = factor;
-			}
-
-			//Sets the quadratic attenuation factor to the given value
-			inline void AttenuationQuadratic(real factor) noexcept
-			{
-				attenuation_quadratic_ = factor;
-			}
-
-
-			//Sets the cutoff value of the light to the given angle (radians)
-			//This value only applies for lights of type spotlight
-			inline void Cutoff(real angle) noexcept
-			{
-				cutoff_ = light::detail::angle_to_cutoff(angle);
-			}
-
-			//Sets the outer cutoff value of the light to the given angle (radians)
-			//This value only applies for lights of type spotlight
-			inline void OuterCutoff(real angle) noexcept
-			{
-				outer_cutoff_ = light::detail::angle_to_cutoff(angle);
+				cutoff_ = light::detail::angle_to_cutoff(inner_angle);
+				outer_cutoff_ = light::detail::angle_to_cutoff(outer_angle);
 			}
 
 
@@ -246,37 +231,18 @@ namespace ion::graphics::scene
 			}
 
 
-			//Returns the constant attenuation factor
-			[[nodiscard]] inline auto AttenuationConstant() const noexcept
+			//Returns the constant, linear and quadratic attenuation values
+			[[nodiscard]] inline auto Attenuation() const noexcept
 			{
-				return attenuation_constant_;
+				return std::tuple{attenuation_constant_, attenuation_linear_, attenuation_quadratic_};
 			}
 
-			//Returns the linear attenuation factor
-			[[nodiscard]] inline auto AttenuationLinear() const noexcept
-			{
-				return attenuation_linear_;
-			}
-
-			//Returns the linear quadratic factor
-			[[nodiscard]] inline auto AttenuationQuadratic() const noexcept
-			{
-				return attenuation_quadratic_;
-			}
-
-
-			//Returns the cutoff angle (radians) of the light
-			//This value only applies for lights of type spotlight
+			//Returns the inner and outer cutoff angle (radians) of the light
+			//These values only applies for lights of type spotlight
 			[[nodiscard]] inline auto Cutoff() const noexcept
 			{
-				return light::detail::cutoff_to_angle(cutoff_);
-			}
-
-			//Returns the outer cutoff angle (radians) of the light
-			//This value only applies for lights of type spotlight
-			[[nodiscard]] inline auto OuterCutoff() const noexcept
-			{
-				return light::detail::cutoff_to_angle(outer_cutoff_);
+				return std::pair{light::detail::cutoff_to_angle(cutoff_),
+								 light::detail::cutoff_to_angle(outer_cutoff_)};
 			}
 
 

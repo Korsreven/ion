@@ -448,6 +448,9 @@ namespace ion::graphics::shaders
 			//Send all uniform variable values to the given shader program
 			void SendUniformValues(ShaderProgram &shader_program) noexcept;
 
+			//Send all uniform variable values inside the given struct to the shader program
+			void SendUniformValues(ShaderStruct &shader_struct) noexcept;
+
 
 			/*
 				Shader layouts
@@ -457,8 +460,8 @@ namespace ion::graphics::shaders
 			//Create a shader layout with the given name
 			NonOwningPtr<ShaderLayout> CreateShaderLayout(std::string name);
 
-			//Create a shader layout with the given name, attribute and uniform bindings
-			NonOwningPtr<ShaderLayout> CreateShaderLayout(std::string name,
+			//Create a shader layout with the given name, struct, attribute and uniform bindings
+			NonOwningPtr<ShaderLayout> CreateShaderLayout(std::string name, shader_layout::StructBindings struct_bindings,
 				shader_layout::AttributeBindings attribute_bindings, shader_layout::UniformBindings uniform_bindings);
 
 

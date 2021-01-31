@@ -408,6 +408,9 @@
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderLayout.cpp">
       <Filter>Source Files\graphics\shaders</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\shaders\IonShaderStruct.cpp">
+      <Filter>Source Files\graphics\shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -825,6 +828,9 @@
       <Filter>Header Files\memory</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\shaders\IonShaderLayout.h">
+      <Filter>Header Files\graphics\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\shaders\IonShaderStruct.h">
       <Filter>Header Files\graphics\shaders</Filter>
     </ClInclude>
   </ItemGroup>

@@ -935,6 +935,14 @@ void ShaderProgramManager::LoadShaderVariableLocations(ShaderProgram &shader_pro
 		//Load all uniform variable locations attached to shader program
 		for (auto &uniform_variable : shader_program.UniformVariables())
 			detail::load_uniform_location(*handle, uniform_variable);
+
+		//Load all struct member locations attached to shader program
+		for (auto &shader_struct : shader_program.Structs())
+		{
+			//Load all member uniform variable locations inside struct
+			for (auto &uniform_variable : shader_struct.UniformVariables())
+				detail::load_uniform_location(*handle, uniform_variable);
+		}
 	}
 }
 
@@ -961,6 +969,14 @@ void ShaderProgramManager::LoadUniformLocations(ShaderProgram &shader_program) n
 		//Load all uniform variable locations attached to shader program
 		for (auto &uniform_variable : shader_program.UniformVariables())
 			detail::load_uniform_location(*handle, uniform_variable);
+
+		//Load all struct member locations attached to shader program
+		for (auto &shader_struct : shader_program.Structs())
+		{
+			//Load all member uniform variable locations inside struct
+			for (auto &uniform_variable : shader_struct.UniformVariables())
+				detail::load_uniform_location(*handle, uniform_variable);
+		}
 	}
 }
 
@@ -984,6 +1000,14 @@ void ShaderProgramManager::SendShaderVariableValues(ShaderProgram &shader_progra
 		//Update all uniform variables attached to shader program
 		for (auto &uniform_variable : shader_program.UniformVariables())
 			detail::send_uniform_value(*handle, uniform_variable);
+
+		//Update all struct members attached to shader program
+		for (auto &shader_struct : shader_program.Structs())
+		{
+			//Update all member uniform variables inside struct
+			for (auto &uniform_variable : shader_struct.UniformVariables())
+				detail::send_uniform_value(*handle, uniform_variable);
+		}
 
 		if (!in_use)
 			detail::use_shader_program(0);
@@ -1027,6 +1051,41 @@ void ShaderProgramManager::SendUniformValues(ShaderProgram &shader_program) noex
 		for (auto &uniform_variable : shader_program.UniformVariables())
 			detail::send_uniform_value(*handle, uniform_variable);
 
+		//Update all struct members attached to shader program
+		for (auto &shader_struct : shader_program.Structs())
+		{
+			//Update all member uniform variables inside struct
+			for (auto &uniform_variable : shader_struct.UniformVariables())
+				detail::send_uniform_value(*handle, uniform_variable);
+		}
+
+		if (!in_use)
+			detail::use_shader_program(0);
+	}
+}
+
+void ShaderProgramManager::SendUniformValues(ShaderStruct &shader_struct) noexcept
+{
+	auto shader_program = shader_struct.Owner();
+
+	if (!shader_program || shader_program->Owner() != this)
+		return;
+
+	if (auto handle = shader_program->Handle(); handle)
+	{
+		auto in_use = detail::get_active_shader_program() == *handle;
+
+		if (!in_use)
+			detail::use_shader_program(*handle);
+
+		//Update all struct members attached to shader program
+		for (auto &s_struct : shader_program->Structs())
+		{
+			//Update all member uniform variables inside struct
+			for (auto &uniform_variable : s_struct.UniformVariables())
+				detail::send_uniform_value(*handle, uniform_variable);
+		}
+
 		if (!in_use)
 			detail::use_shader_program(0);
 	}
@@ -1043,10 +1102,11 @@ NonOwningPtr<ShaderLayout> ShaderProgramManager::CreateShaderLayout(std::string 
 	return ShaderLayoutBase::Create(std::move(name));
 }
 
-NonOwningPtr<ShaderLayout> ShaderProgramManager::CreateShaderLayout(std::string name,
+NonOwningPtr<ShaderLayout> ShaderProgramManager::CreateShaderLayout(std::string name, shader_layout::StructBindings struct_bindings,
 	shader_layout::AttributeBindings attribute_bindings, shader_layout::UniformBindings uniform_bindings)
 {
-	return ShaderLayoutBase::Create(std::move(name), std::move(attribute_bindings), std::move(uniform_bindings));
+	return ShaderLayoutBase::Create(std::move(name), std::move(struct_bindings),
+		std::move(attribute_bindings), std::move(uniform_bindings));
 }
 
 

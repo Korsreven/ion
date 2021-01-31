@@ -203,6 +203,7 @@
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderProgram.cpp" />
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderProgramManager.cpp" />
+    <ClCompile Include="..\source\engine\graphics\shaders\IonShaderStruct.cpp" />
     <ClCompile Include="..\source\engine\graphics\textures\IonAnimation.cpp" />
     <ClCompile Include="..\source\engine\graphics\textures\IonAnimationManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\textures\IonFrameSequence.cpp" />
@@ -315,6 +316,7 @@
     <ClInclude Include="..\source\engine\graphics\shaders\IonShaderManager.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\IonShaderProgram.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\IonShaderProgramManager.h" />
+    <ClInclude Include="..\source\engine\graphics\shaders\IonShaderStruct.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\variables\IonShaderAttribute.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\variables\IonShaderTypes.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\variables\IonShaderUniform.h" />

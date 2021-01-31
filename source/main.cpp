@@ -376,6 +376,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			using namespace ion::graphics::shaders::variables;
 
+			//Shader structs
+			auto matrix_struct = mesh_shader_prog->CreateStruct("matrix");
+			auto scene_struct = mesh_shader_prog->CreateStruct("scene");
+			auto camera_struct = mesh_shader_prog->CreateStruct("camera");
+			auto mesh_struct = mesh_shader_prog->CreateStruct("mesh");
+			auto material_struct = mesh_shader_prog->CreateStruct("material");
+			auto light_struct = mesh_shader_prog->CreateStruct("light", 16);
+
 			//Shader variables
 			//Vertex
 			mesh_shader_prog->CreateAttribute<glsl::vec3>("vertex_position");
@@ -411,6 +419,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto material_has_normal_map = mesh_shader_prog->CreateUniform<bool>("material.has_normal_map");
 
 			//Light
+			//auto light_position = light_struct->CreateUniform<glsl::vec3>("position");
+
 			auto light_type = mesh_shader_prog->CreateUniform<int>("light.type");
 			auto light_position = mesh_shader_prog->CreateUniform<glsl::vec3>("light.position");
 			auto light_direction = mesh_shader_prog->CreateUniform<glsl::vec3>("light.direction");
@@ -462,37 +472,37 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::graphics::materials::MaterialManager materials;
 			auto brick =
 				materials.CreateMaterial("brick",
-					ion::graphics::utilities::Color{0.19125_r, 0.0735_r, 0.0225_r},
-					ion::graphics::utilities::Color{0.7038_r, 0.27048_r, 0.0828_r},
-					ion::graphics::utilities::Color{0.256777_r, 0.137622_r, 0.086014_r},
+					{0.19125_r, 0.0735_r, 0.0225_r},
+					{0.7038_r, 0.27048_r, 0.0828_r},
+					{0.256777_r, 0.137622_r, 0.086014_r},
 					12.8_r, brick_wall_texture, brick_wall_specular_map, brick_wall_normal_map);
 			
 			auto emerald =
 				materials.CreateMaterial("emerald",
-					ion::graphics::utilities::Color{0.0215_r, 0.1745_r, 0.0215_r},
-					ion::graphics::utilities::Color{0.07568_r, 0.61424_r, 0.07568_r},
-					ion::graphics::utilities::Color{0.633_r, 0.727811_r, 0.633_r},
+					{0.0215_r, 0.1745_r, 0.0215_r},
+					{0.07568_r, 0.61424_r, 0.07568_r},
+					{0.633_r, 0.727811_r, 0.633_r},
 					76.8_r);
 
 			auto gold =
 				materials.CreateMaterial("gold",
-					ion::graphics::utilities::Color{0.24725_r, 0.1995_r, 0.0745_r},
-					ion::graphics::utilities::Color{0.75164_r, 0.60648_r, 0.22648_r},
-					ion::graphics::utilities::Color{0.628281_r, 0.555802_r, 0.366065_r},
+					{0.24725_r, 0.1995_r, 0.0745_r},
+					{0.75164_r, 0.60648_r, 0.22648_r},
+					{0.628281_r, 0.555802_r, 0.366065_r},
 					51.2_r);
 
 			auto pearl =
 				materials.CreateMaterial("pearl",
-					ion::graphics::utilities::Color{0.25_r, 0.20725_r, 0.20725_r},
-					ion::graphics::utilities::Color{1.0_r, 0.829_r, 0.829_r},
-					ion::graphics::utilities::Color{0.296648_r, 0.296648_r, 0.296648_r},
+					{0.25_r, 0.20725_r, 0.20725_r},
+					{1.0_r, 0.829_r, 0.829_r},
+					{0.296648_r, 0.296648_r, 0.296648_r},
 					11.264_r);
 
 			auto ruby =
 				materials.CreateMaterial("ruby",
-					ion::graphics::utilities::Color{0.1745_r, 0.01175_r, 0.01175_r},
-					ion::graphics::utilities::Color{0.61424_r, 0.04136_r, 0.04136_r},
-					ion::graphics::utilities::Color{0.727811_r, 0.626959_r, 0.626959_r},
+					{0.1745_r, 0.01175_r, 0.01175_r},
+					{0.61424_r, 0.04136_r, 0.04136_r},
+					{0.727811_r, 0.626959_r, 0.626959_r},
 					76.8_r);
 
 			//material.Crop(ion::graphics::utilities::Aabb{{0.25_r, 0.25_r}, {0.75_r, 0.75_r}});
@@ -544,17 +554,17 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			brick_wall_vertices.push_back({{-0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 1.0_r}});
 
 			//Models
-			auto gray_rectangle = engine.Scene().CreateModel();
-			gray_rectangle->CreateMesh(std::move(gray_vertices));
+			//auto gray_rectangle = engine.Scene().CreateModel();
+			//gray_rectangle->CreateMesh(std::move(gray_vertices), pearl);
 
 			auto red_square = engine.Scene().CreateModel();
-			red_square->CreateMesh(std::move(red_vertices));
+			red_square->CreateMesh(std::move(red_vertices), ruby);
 
-			auto green_square = engine.Scene().CreateModel();
-			green_square->CreateMesh(std::move(green_vertices));
+			//auto green_square = engine.Scene().CreateModel();
+			//green_square->CreateMesh(std::move(green_vertices), emerald);
 
 			auto blue_square = engine.Scene().CreateModel();
-			blue_square->CreateMesh(std::move(blue_vertices));
+			blue_square->CreateMesh(std::move(blue_vertices), emerald);
 
 			auto brick_wall = engine.Scene().CreateModel();
 			brick_wall->CreateMesh(std::move(brick_wall_vertices), brick,
@@ -563,9 +573,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Setup
 			engine.shader_program = mesh_shader_prog.get();
 			game.light_position = light_position;
-			game.models.push_back(gray_rectangle);
+			//game.models.push_back(gray_rectangle);
 			game.models.push_back(red_square);
-			game.models.push_back(green_square);
+			//game.models.push_back(green_square);
 			game.models.push_back(blue_square);
 			game.models.push_back(brick_wall);
 
@@ -594,8 +604,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			light_constant->Get() = 1.0_r;
 			light_linear->Get() = 0.09_r;
 			light_quadratic->Get() = 0.032_r;
-			light_cutoff->Get() = 0.218;
-			light_outer_cutoff->Get() = 0.262;
+			light_cutoff->Get() = 0.218_r;
+			light_outer_cutoff->Get() = 0.262_r;
 
 			proj_mat.Transpose();
 			view_mat.Transpose();

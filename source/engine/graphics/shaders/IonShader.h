@@ -21,6 +21,8 @@ File:	IonShader.h
 
 namespace ion::graphics::shaders
 {
+	class ShaderManager; //Forward declaration
+
 	namespace shader
 	{
 		enum class ShaderType : bool
@@ -47,7 +49,6 @@ namespace ion::graphics::shaders
 		} //detail
 	} //shader
 
-	class ShaderManager; //Forward declaration
 
 	class Shader final : public resources::FileResource<ShaderManager>
 	{

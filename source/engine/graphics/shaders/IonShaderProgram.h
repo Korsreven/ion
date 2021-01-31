@@ -20,6 +20,7 @@ File:	IonShaderProgram.h
 
 #include "IonShader.h"
 #include "IonShaderLayout.h"
+#include "IonShaderStruct.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
 #include "resources/IonResource.h"
@@ -28,12 +29,16 @@ File:	IonShaderProgram.h
 
 namespace ion::graphics::shaders
 {
+	class ShaderProgramManager; //Forward declaration
+
 	namespace shader_program::detail
 	{
+		using mapped_structs = std::array<NonOwningPtr<ShaderStruct>, shader_layout::detail::struct_name_count>;
 		using mapped_attributes = std::array<NonOwningPtr<variables::AttributeVariable>, shader_layout::detail::attribute_name_count>;
 		using mapped_uniforms = std::array<NonOwningPtr<variables::UniformVariable>, shader_layout::detail::uniform_name_count>;
 
 
+		void remap_struct(NonOwningPtr<ShaderStruct> shader_struct, ShaderLayout &shader_layout, mapped_structs &shader_structs) noexcept;
 		void remap_attribute(NonOwningPtr<variables::AttributeVariable> attribute_variable, ShaderLayout &shader_layout, mapped_attributes &attributes) noexcept;
 		void remap_uniform(NonOwningPtr<variables::UniformVariable> uniform_variable, ShaderLayout &shader_layout, mapped_uniforms &uniforms) noexcept;
 
@@ -41,15 +46,17 @@ namespace ion::graphics::shaders
 	} //shader_program::detail
 
 
-	class ShaderProgramManager; //Forward declaration
-
 	class ShaderProgram final :
 		public resources::Resource<ShaderProgramManager>,
+		public managed::ObjectManager<ShaderStruct, ShaderProgram>,
 		public managed::ObjectManager<variables::AttributeVariable, ShaderProgram>,
-		public managed::ObjectManager<variables::UniformVariable, ShaderProgram>
+		public managed::ObjectManager<variables::UniformVariable, ShaderProgram>		
 	{
+		friend class ShaderStruct;
+
 		private:
 
+			using ShaderStructBase = managed::ObjectManager<ShaderStruct, ShaderProgram>;
 			using AttributeVariablesBase = managed::ObjectManager<variables::AttributeVariable, ShaderProgram>;
 			using UniformVariablesBase = managed::ObjectManager<variables::UniformVariable, ShaderProgram>;
 
@@ -60,6 +67,7 @@ namespace ion::graphics::shaders
 			NonOwningPtr<ShaderLayout> shader_layout_;
 
 			int next_texture_unit_ = 0;
+			shader_program::detail::mapped_structs mapped_structs_;
 			shader_program::detail::mapped_attributes mapped_attributes_;
 			shader_program::detail::mapped_uniforms mapped_uniforms_;
 
@@ -69,9 +77,11 @@ namespace ion::graphics::shaders
 				Events
 			*/
 
+			void Created(ShaderStruct &shader_struct) noexcept override;
 			void Created(variables::AttributeVariable &attribute_variable) noexcept override;
 			void Created(variables::UniformVariable &uniform_variable) noexcept override;
 
+			void Removed(ShaderStruct &shader_struct) noexcept override;
 			void Removed(variables::AttributeVariable &attribute_variable) noexcept override;
 			void Removed(variables::UniformVariable &uniform_variable) noexcept override;
 
@@ -116,6 +126,19 @@ namespace ion::graphics::shaders
 				Managers
 			*/
 
+			//Return a mutable reference to the struct manager of this shader program
+			[[nodiscard]] inline auto& StructManager() noexcept
+			{
+				return static_cast<ShaderStructBase&>(*this);
+			}
+
+			//Return a immutable reference to the struct manager of this shader program
+			[[nodiscard]] inline auto& StructManager() const noexcept
+			{
+				return static_cast<const ShaderStructBase&>(*this);
+			}
+
+
 			//Return a mutable reference to the attribute variable manager of this shader program
 			[[nodiscard]] inline auto& AttributeVariableManager() noexcept
 			{
@@ -145,6 +168,21 @@ namespace ion::graphics::shaders
 			/*
 				Ranges
 			*/
+
+			//Returns a mutable range of all structs in this shader program
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Structs() noexcept
+			{
+				return ShaderStructBase::Objects();
+			}
+
+			//Returns an immutable range of all structs in this shader program
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Structs() const noexcept
+			{
+				return ShaderStructBase::Objects();
+			}
+
 
 			//Returns a mutable range of all attribute variables in this shader program
 			//This can be used directly with a range-based for loop
@@ -229,6 +267,53 @@ namespace ion::graphics::shaders
 			{
 				return shader_layout_;
 			}
+
+
+			/*
+				Shader structs
+				Creating
+			*/
+
+			//Create a struct with the given name and size
+			NonOwningPtr<ShaderStruct> CreateStruct(std::string name, int size = 1);
+
+
+			/*
+				Shader structs
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable struct with the given name
+			//Returns nullptr if struct could not be found
+			[[nodiscard]] NonOwningPtr<ShaderStruct> GetStruct(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable struct with the given name
+			//Returns nullptr if struct could not be found
+			[[nodiscard]] NonOwningPtr<const ShaderStruct> GetStruct(std::string_view name) const noexcept;
+
+
+			//Gets a pointer to a mutable struct that is mapped to the given standardized name
+			//Returns nullptr if that standardized name has no mapped struct
+			[[nodiscard]] NonOwningPtr<ShaderStruct> GetStruct(shader_layout::StructName name) noexcept;
+
+			//Gets a pointer to an immutable struct that is mapped to the given standardized name
+			//Returns nullptr if that standardized name has no mapped struct
+			[[nodiscard]] NonOwningPtr<const ShaderStruct> GetStruct(shader_layout::StructName name) const noexcept;
+
+
+			/*
+				Shader structs
+				Removing
+			*/
+
+			//Clear all removable structs from this shader program
+			void ClearStructs() noexcept;
+
+			//Remove a removable struct from this shader program
+			bool RemoveStruct(ShaderStruct &shader_struct) noexcept;
+
+			//Remove a removable structs with the given name from this manager
+			bool RemoveStruct(std::string_view name) noexcept;
 
 
 			/*
@@ -318,7 +403,7 @@ namespace ion::graphics::shaders
 			template <typename T>
 			auto CreateUniform(const variables::Uniform<T> &uniform)
 			{
-				auto ptr = AttributeVariablesBase::Create(uniform);
+				auto ptr = UniformVariablesBase::Create(uniform);
 				return static_pointer_cast<variables::Uniform<T>>(ptr);
 			}
 
@@ -326,7 +411,7 @@ namespace ion::graphics::shaders
 			template <typename T>
 			auto CreateUniform(variables::Uniform<T> &&uniform)
 			{
-				auto ptr = AttributeVariablesBase::Create(std::move(uniform));
+				auto ptr = UniformVariablesBase::Create(std::move(uniform));
 				return static_pointer_cast<variables::Uniform<T>>(ptr);
 			}
 
@@ -376,6 +461,15 @@ namespace ion::graphics::shaders
 
 			//Clear all removable attributes and uniform variables from this shader program
 			void ClearVariables() noexcept;
+
+
+			/*
+				Struct / variables
+				Removing
+			*/
+
+			//Clear all removable structs, attributes and uniform variables from this shader program
+			void Clear() noexcept;
 	};
 } //ion::graphics::shaders
 

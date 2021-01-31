@@ -854,7 +854,8 @@ namespace ion::graphics::shaders::variables::glsl
 
 				size_{rhs.size_},
 				stack_values_{rhs.stack_values_},
-				heap_values_{rhs.heap_values_}
+				heap_values_{rhs.heap_values_},
+				external_values_{rhs.external_values_}
 			{
 				ValueAccessor<T>::values_ = Data();
 			}
@@ -864,7 +865,8 @@ namespace ion::graphics::shaders::variables::glsl
 
 				size_{rhs.size_},
 				stack_values_{std::move(rhs.stack_values_)},
-				heap_values_{std::move(rhs.heap_values_)}
+				heap_values_{std::move(rhs.heap_values_)},
+				external_values_{rhs.external_values_}
 			{
 				ValueAccessor<T>::values_ = Data();
 			}
@@ -873,6 +875,19 @@ namespace ion::graphics::shaders::variables::glsl
 			/*
 				Operators
 			*/
+
+			//Copy assignment
+			inline auto& operator=(const UniformValue &rhs) noexcept
+			{
+				if (size_ == rhs.size_)
+				{
+					stack_values_ = rhs.stack_values_;
+					heap_values_ = rhs.heap_values_;
+					external_values_ = rhs.external_values_;
+				}
+
+				return *this;
+			}
 
 			//Sets all components to the given value
 			inline auto& operator=(basic_type_t<T> value) noexcept

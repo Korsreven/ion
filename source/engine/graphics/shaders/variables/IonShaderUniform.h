@@ -14,6 +14,7 @@ File:	IonShaderUniform.h
 #define ION_SHADER_UNIFORM_H
 
 #include <optional>
+#include <type_traits>
 #include <variant>
 
 #include "IonShaderTypes.h"
@@ -101,14 +102,17 @@ namespace ion::graphics::shaders::variables
 		namespace detail
 		{
 			template <typename T>
-			auto inline hash_value(const glsl::uniform<T> &value) noexcept
+			inline auto is_value_different(const glsl::uniform<T> &lhs, const glsl::uniform<T> &rhs) noexcept
 			{
-				auto count = value.Components() * value.Size();
+				auto count = lhs.Components() * lhs.Size();
 
-				auto hash = 0_ui32;
 				for (auto i = 0; i < count; ++i)
-					hash ^= reinterpret_cast<uint32&>(value.Values()[i]);
-				return hash;
+				{
+					if (lhs.Values()[i] != rhs.Values()[i])
+						return true;
+				}
+
+				return false;
 			}
 		} //detail
 	} //uniform_variable
@@ -119,7 +123,7 @@ namespace ion::graphics::shaders::variables
 		protected:
 
 			uniform_variable::VariableType value_;
-			std::optional<uint32> current_value_hash_;
+			std::optional<uniform_variable::VariableType> current_value_;
 
 		public:
 
@@ -163,26 +167,27 @@ namespace ion::graphics::shaders::variables
 			//Returns true if the uniform variable value has changed
 			[[nodiscard]] inline auto HasNewValue() noexcept
 			{
-				auto value_hash =
-					Visit(
-						[&](auto &&value) noexcept
-						{
-							return uniform_variable::detail::hash_value(value);
-						});
+				auto changed = 
+					current_value_ ?
+						Visit(
+							[&](auto &&value) noexcept
+							{
+								return uniform_variable::detail::is_value_different(
+									value,
+									std::get<std::remove_cvref_t<decltype(value)>>(*current_value_));
+							}) :
+						true;
 
-				if (!current_value_hash_ || *current_value_hash_ != value_hash)
-				{
-					current_value_hash_ = value_hash;
-					return true;
-				}
-				else			
-					return false;
+				if (changed)
+					current_value_ = value_;
+				
+				return changed;
 			}
 
 			//Force the uniform value to be refreshed next time it is processed
 			inline void Refresh()
 			{
-				current_value_hash_.reset();
+				current_value_.reset();
 			}
 	};
 

@@ -22,6 +22,13 @@ using namespace shader_program;
 namespace shader_program::detail
 {
 
+void remap_struct(NonOwningPtr<ShaderStruct> shader_struct, ShaderLayout &shader_layout, mapped_structs &shader_structs) noexcept
+{
+	//Map with name
+	if (auto name = shader_layout.GetStructName(*shader_struct->Name()); name)
+		shader_structs[static_cast<int>(*name)] = shader_struct;
+}
+
 void remap_attribute(NonOwningPtr<variables::AttributeVariable> attribute_variable, ShaderLayout &shader_layout, mapped_attributes &attributes) noexcept
 {
 	//Map with name
@@ -72,16 +79,25 @@ int get_next_texture_unit(int &next_texture_unit) noexcept
 	Events
 */
 
+void ShaderProgram::Created(ShaderStruct &shader_struct) noexcept
+{
+	if (shader_layout_)
+		detail::remap_struct(
+			shader_struct.Owner()->GetStruct(*shader_struct.Name()), *shader_layout_, mapped_structs_);
+}
+
 void ShaderProgram::Created(variables::AttributeVariable &attribute_variable) noexcept
 {
 	if (shader_layout_)
-		detail::remap_attribute(GetAttribute(*attribute_variable.Name()), *shader_layout_, mapped_attributes_);
+		detail::remap_attribute(
+			attribute_variable.Owner()->GetAttribute(*attribute_variable.Name()), *shader_layout_, mapped_attributes_);
 }
 
 void ShaderProgram::Created(variables::UniformVariable &uniform_variable) noexcept
 {
 	if (shader_layout_)
-		detail::remap_uniform(GetUniform(*uniform_variable.Name()), *shader_layout_, mapped_uniforms_);
+		detail::remap_uniform(
+			uniform_variable.Owner()->GetUniform(*uniform_variable.Name()), *shader_layout_, mapped_uniforms_);
 
 	uniform_variable.Visit(
 		[&](variables::glsl::uniform<variables::glsl::isampler2D> &sampler)
@@ -100,6 +116,23 @@ void ShaderProgram::Created(variables::UniformVariable &uniform_variable) noexce
 	);
 }
 
+
+void ShaderProgram::Removed(ShaderStruct &shader_struct) noexcept
+{
+	if (shader_layout_)
+	{
+		for (auto i = 0; auto &s_struct : mapped_structs_)
+		{
+			if (s_struct.get() == &shader_struct)
+			{
+				mapped_structs_[i] = nullptr;
+				break;
+			}
+			else
+				++i;
+		}
+	}
+}
 
 void ShaderProgram::Removed(variables::AttributeVariable &attribute_variable) noexcept
 {
@@ -215,11 +248,16 @@ void ShaderProgram::Layout(NonOwningPtr<ShaderLayout> shader_layout) noexcept
 	{
 		shader_layout_ = shader_layout;
 
+		mapped_structs_.fill(nullptr);
 		mapped_attributes_.fill(nullptr);
 		mapped_uniforms_.fill(nullptr);
 
 		if (shader_layout_)
 		{
+			//Remap all structs
+			for (auto &shader_struct : Structs())
+				Created(shader_struct); //Reuse functionality
+
 			//Remap all attributes
 			for (auto &attribute : AttributeVariables())
 				Created(attribute); //Reuse functionality
@@ -229,6 +267,66 @@ void ShaderProgram::Layout(NonOwningPtr<ShaderLayout> shader_layout) noexcept
 				Created(uniform); //Reuse functionality
 		}
 	}
+}
+
+
+/*
+	Shader structs
+	Creating
+*/
+
+NonOwningPtr<ShaderStruct> ShaderProgram::CreateStruct(std::string name, int size)
+{
+	return ShaderStructBase::Create(std::move(name), size);
+}
+
+
+/*
+	Shader structs
+	Retrieving
+*/
+
+NonOwningPtr<ShaderStruct> ShaderProgram::GetStruct(std::string_view name) noexcept
+{
+	return ShaderStructBase::Get(name);
+}
+
+NonOwningPtr<const ShaderStruct> ShaderProgram::GetStruct(std::string_view name) const noexcept
+{
+	return ShaderStructBase::Get(name);
+}
+
+
+NonOwningPtr<ShaderStruct> ShaderProgram::GetStruct(shader_layout::StructName name) noexcept
+{
+	return mapped_structs_[static_cast<int>(name)];
+}
+
+NonOwningPtr<const ShaderStruct> ShaderProgram::GetStruct(shader_layout::StructName name) const noexcept
+{
+	return mapped_structs_[static_cast<int>(name)];
+}
+
+
+/*
+	Shader structs
+	Removing
+*/
+
+void ShaderProgram::ClearStructs() noexcept
+{
+	mapped_structs_.fill(nullptr);
+	ShaderStructBase::Clear();
+}
+
+bool ShaderProgram::RemoveStruct(ShaderStruct &shader_struct) noexcept
+{
+	return ShaderStructBase::Remove(shader_struct);
+}
+
+bool ShaderProgram::RemoveStruct(std::string_view name) noexcept
+{
+	return ShaderStructBase::Remove(name);
 }
 
 
@@ -266,7 +364,8 @@ NonOwningPtr<const variables::AttributeVariable> ShaderProgram::GetAttribute(sha
 
 void ShaderProgram::ClearAttributes() noexcept
 {
-	return AttributeVariablesBase::Clear();
+	mapped_attributes_.fill(nullptr);
+	AttributeVariablesBase::Clear();
 }
 
 bool ShaderProgram::RemoveAttribute(variables::AttributeVariable &attribute_variable) noexcept
@@ -315,7 +414,12 @@ NonOwningPtr<const variables::UniformVariable> ShaderProgram::GetUniform(shader_
 void ShaderProgram::ClearUniforms() noexcept
 {
 	next_texture_unit_ = 0;
-	return UniformVariablesBase::Clear();
+	mapped_uniforms_.fill(nullptr);
+	UniformVariablesBase::Clear();
+
+	//Clear from structs
+	for (auto &shader_struct : Structs())
+		shader_struct.ClearUniforms();
 }
 
 bool ShaderProgram::RemoveUniform(variables::UniformVariable &uniform_variable) noexcept
@@ -338,6 +442,18 @@ void ShaderProgram::ClearVariables() noexcept
 {
 	ClearAttributes();
 	ClearUniforms();
+}
+
+
+/*
+	Struct / variables
+	Removing
+*/
+
+void ShaderProgram::Clear() noexcept
+{
+	ClearVariables();
+	ClearStructs();
 }
 
 } //ion::graphics::shaders

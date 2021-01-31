@@ -95,7 +95,7 @@ namespace ion::graphics::shaders::variables
 		namespace detail
 		{
 			template <typename T>
-			auto inline is_value_different(const glsl::attribute<T> &lhs, const glsl::attribute<T> &rhs) noexcept
+			inline auto is_value_different(const glsl::attribute<T> &lhs, const glsl::attribute<T> &rhs) noexcept
 			{
 				return lhs.VertexData() != rhs.VertexData() ||
 					   lhs.Stride() != rhs.Stride() ||

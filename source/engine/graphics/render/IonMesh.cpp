@@ -765,6 +765,8 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 				else //RAM
 					detail::set_vertex_pointers(vertex_count_, vertex_data_);
 			}
+
+			shader_program->Owner()->SendAttributeValues(*shader_program);
 		}
 
 		//Has material
@@ -774,7 +776,7 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 		if (auto has_material = shader_program->GetUniform(shaders::shader_layout::UniformName::Mesh_HasMaterial); has_material)
 			static_cast<shaders::variables::Uniform<bool>&>(*has_material).Get() = !!material_;
 
-		shader_program->Owner()->SendShaderVariableValues(*shader_program);
+		shader_program->Owner()->SendUniformValues(*shader_program);
 	}
 	else //Fixed-function pipeline
 	{
