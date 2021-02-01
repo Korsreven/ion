@@ -24,6 +24,9 @@ File:	IonShaderAttribute.h
 
 namespace ion::graphics::shaders::variables
 {
+	template <typename T>
+	struct Attribute; //Forward declaration
+
 	namespace attribute_variable
 	{
 		using VariableType =
@@ -124,6 +127,25 @@ namespace ion::graphics::shaders::variables
 
 			//Default virtual destructor
 			virtual ~AttributeVariable() = default;
+
+
+			/*
+				Observers
+			*/
+
+			//Get a mutable reference to the contained glsl attribute value
+			template <typename T, typename = std::enable_if_t<std::is_base_of_v<AttributeVariable, Attribute<T>>>>
+			[[nodiscard]] inline auto& Get() noexcept
+			{
+				return static_cast<Attribute<T>&>(*this).Get();
+			}
+
+			//Get an immutable reference to the contained glsl attribute value
+			template <typename T, typename = std::enable_if_t<std::is_base_of_v<AttributeVariable, Attribute<T>>>>
+			[[nodiscard]] inline auto& Get() const noexcept
+			{
+				return static_cast<const Attribute<T>&>(*this).Get();
+			}
 
 
 			/*

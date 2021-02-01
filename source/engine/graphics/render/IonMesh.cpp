@@ -332,32 +332,28 @@ void set_vertex_attribute_pointers(int vertex_count, int vbo_offset, shaders::Sh
 {
 	using namespace shaders::variables;
 
-	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Position); attribute)
+	if (auto position = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Position); position)
 	{
-		static_cast<Attribute<glsl::vec3>&>(*attribute).Get().
-			VertexData((void*)(vbo_offset * sizeof(real)));
-		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+		position->Get<glsl::vec3>().VertexData((void*)(vbo_offset * sizeof(real)));
+		glEnableVertexAttribArray(position->Location().value_or(-1));
 	}
 
-	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Normal); attribute)
+	if (auto normal = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Normal); normal)
 	{
-		static_cast<Attribute<glsl::vec3>&>(*attribute).Get().
-			VertexData((void*)((vbo_offset + normal_data_offset(vertex_count)) * sizeof(real)));
-		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+		normal->Get<glsl::vec3>().VertexData((void*)((vbo_offset + normal_data_offset(vertex_count)) * sizeof(real)));
+		glEnableVertexAttribArray(normal->Location().value_or(-1));
 	}
 
-	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Color); attribute)
+	if (auto color = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Color); color)
 	{
-		static_cast<Attribute<glsl::vec4>&>(*attribute).Get().
-			VertexData((void*)((vbo_offset + color_data_offset(vertex_count)) * sizeof(real)));
-		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+		color->Get<glsl::vec4>().VertexData((void*)((vbo_offset + color_data_offset(vertex_count)) * sizeof(real)));
+		glEnableVertexAttribArray(color->Location().value_or(-1));
 	}
 
-	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_TexCoord); attribute)
+	if (auto tex_coord = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_TexCoord); tex_coord)
 	{
-		static_cast<Attribute<glsl::vec2>&>(*attribute).Get().
-			VertexData((void*)((vbo_offset + tex_coord_data_offset(vertex_count)) * sizeof(real)));
-		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+		tex_coord->Get<glsl::vec2>().VertexData((void*)((vbo_offset + tex_coord_data_offset(vertex_count)) * sizeof(real)));
+		glEnableVertexAttribArray(tex_coord->Location().value_or(-1));
 	}
 }
 
@@ -365,32 +361,28 @@ void set_vertex_attribute_pointers(int vertex_count, vertex_storage_type &vertex
 {
 	using namespace shaders::variables;
 
-	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Position); attribute)
+	if (auto position = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Position); position)
 	{
-		static_cast<Attribute<glsl::vec3>&>(*attribute).Get().
-			VertexData(std::data(vertex_data));
-		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+		position->Get<glsl::vec3>().VertexData(std::data(vertex_data));
+		glEnableVertexAttribArray(position->Location().value_or(-1));
 	}
 
-	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Normal); attribute)
+	if (auto normal = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Normal); normal)
 	{
-		static_cast<Attribute<glsl::vec3>&>(*attribute).Get().
-			VertexData(std::data(vertex_data) + normal_data_offset(vertex_count));
-		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+		normal->Get<glsl::vec3>().VertexData(std::data(vertex_data) + normal_data_offset(vertex_count));
+		glEnableVertexAttribArray(normal->Location().value_or(-1));
 	}
 
-	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Color); attribute)
+	if (auto color = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Color); color)
 	{
-		static_cast<Attribute<glsl::vec4>&>(*attribute).Get().
-			VertexData(std::data(vertex_data) + color_data_offset(vertex_count));
-		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+		color->Get<glsl::vec4>().VertexData(std::data(vertex_data) + color_data_offset(vertex_count));
+		glEnableVertexAttribArray(color->Location().value_or(-1));
 	}
 
-	if (auto attribute = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_TexCoord); attribute)
+	if (auto tex_coord = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_TexCoord); tex_coord)
 	{
-		static_cast<Attribute<glsl::vec2>&>(*attribute).Get().
-			VertexData(std::data(vertex_data) + tex_coord_data_offset(vertex_count));
-		glEnableVertexAttribArray(attribute->Location().value_or(-1));
+		tex_coord->Get<glsl::vec2>().VertexData(std::data(vertex_data) + tex_coord_data_offset(vertex_count));
+		glEnableVertexAttribArray(tex_coord->Location().value_or(-1));
 	}
 }
 
@@ -462,16 +454,16 @@ void set_material_uniforms(materials::Material &material, duration time, shaders
 	using namespace shaders::variables;
 
 	if (auto ambient = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Ambient); ambient)
-		static_cast<Uniform<glsl::vec4>&>(*ambient).Get() = material.AmbientColor();
+		ambient->Get<glsl::vec4>() = material.AmbientColor();
 
 	if (auto diffuse = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Diffuse); diffuse)
-		static_cast<Uniform<glsl::vec4>&>(*diffuse).Get() = material.DiffuseColor();
+		diffuse->Get<glsl::vec4>() = material.DiffuseColor();
 
 	if (auto specular = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Specular); specular)
-		static_cast<Uniform<glsl::vec4>&>(*specular).Get() = material.SpecularColor();
+		specular->Get<glsl::vec4>() = material.SpecularColor();
 
 	if (auto shininess = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Shininess); shininess)
-		static_cast<Uniform<float>&>(*shininess).Get() = material.Shininess(); //Using 'real' could make this uniform double
+		shininess->Get<float>() = material.Shininess(); //Using 'real' could make this uniform double
 
 
 	auto diffuse_map_activated = false;
@@ -482,7 +474,7 @@ void set_material_uniforms(materials::Material &material, duration time, shaders
 	{
 		if (auto texture = material.DiffuseMap(time); texture && texture->Handle())
 		{
-			if (auto texture_unit = static_cast<Uniform<glsl::sampler2D>&>(*diffuse_map).Get(); texture_unit >= 0)
+			if (auto texture_unit = diffuse_map->Get<glsl::sampler2D>(); texture_unit >= 0)
 			{
 				set_active_texture(texture_unit, *texture->Handle());
 				diffuse_map_activated = true;
@@ -494,7 +486,7 @@ void set_material_uniforms(materials::Material &material, duration time, shaders
 	{
 		if (auto texture = material.SpecularMap(time); texture && texture->Handle())
 		{
-			if (auto texture_unit = static_cast<Uniform<glsl::sampler2D>&>(*specular_map).Get(); texture_unit >= 0)
+			if (auto texture_unit = specular_map->Get<glsl::sampler2D>(); texture_unit >= 0)
 			{
 				set_active_texture(texture_unit, *texture->Handle());
 				specular_map_activated = true;
@@ -506,7 +498,7 @@ void set_material_uniforms(materials::Material &material, duration time, shaders
 	{
 		if (auto texture = material.NormalMap(time); texture && texture->Handle())
 		{
-			if (auto texture_unit = static_cast<Uniform<glsl::sampler2D>&>(*normal_map).Get(); texture_unit >= 0)
+			if (auto texture_unit = normal_map->Get<glsl::sampler2D>(); texture_unit >= 0)
 			{
 				set_active_texture(texture_unit, *texture->Handle());
 				normal_map_activated = true;
@@ -516,13 +508,13 @@ void set_material_uniforms(materials::Material &material, duration time, shaders
 
 
 	if (auto has_diffuse_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasDiffuseMap); has_diffuse_map)
-		static_cast<Uniform<bool>&>(*has_diffuse_map).Get() = diffuse_map_activated;
+		has_diffuse_map->Get<bool>() = diffuse_map_activated;
 
 	if (auto has_specular_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasSpecularMap); has_specular_map)
-		static_cast<Uniform<bool>&>(*has_specular_map).Get() = specular_map_activated;
+		has_specular_map->Get<bool>() = specular_map_activated;
 
 	if (auto has_normal_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasNormalMap); has_normal_map)
-		static_cast<Uniform<bool>&>(*has_normal_map).Get() = normal_map_activated;
+		has_normal_map->Get<bool>() = normal_map_activated;
 }
 
 void set_active_texture(int texture_unit, int texture_handle) noexcept
@@ -774,7 +766,7 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 			detail::set_material_uniforms(*material_, time_, *shader_program);
 
 		if (auto has_material = shader_program->GetUniform(shaders::shader_layout::UniformName::Mesh_HasMaterial); has_material)
-			static_cast<shaders::variables::Uniform<bool>&>(*has_material).Get() = !!material_;
+			has_material->Get<bool>() = !!material_;
 
 		shader_program->Owner()->SendUniformValues(*shader_program);
 	}

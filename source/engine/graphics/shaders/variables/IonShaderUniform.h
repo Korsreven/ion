@@ -24,7 +24,8 @@ File:	IonShaderUniform.h
 
 namespace ion::graphics::shaders::variables
 {
-	using namespace types::type_literals;
+	template <typename T>
+	struct Uniform; //Forward declaration
 
 	namespace uniform_variable
 	{
@@ -137,6 +138,25 @@ namespace ion::graphics::shaders::variables
 
 			//Default virtual destructor
 			virtual ~UniformVariable() = default;
+
+
+			/*
+				Observers
+			*/
+
+			//Get a mutable reference to the contained glsl uniform value
+			template <typename T, typename = std::enable_if_t<std::is_base_of_v<UniformVariable, Uniform<T>>>>
+			[[nodiscard]] inline auto& Get() noexcept
+			{
+				return static_cast<Uniform<T>&>(*this).Get();
+			}
+
+			//Get an immutable reference to the contained glsl uniform value
+			template <typename T, typename = std::enable_if_t<std::is_base_of_v<UniformVariable, Uniform<T>>>>
+			[[nodiscard]] inline auto& Get() const noexcept
+			{
+				return static_cast<const Uniform<T>&>(*this).Get();
+			}
 
 
 			/*
