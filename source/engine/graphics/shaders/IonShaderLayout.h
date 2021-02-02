@@ -163,17 +163,17 @@ namespace ion::graphics::shaders
 				{UniformName::Material_HasSpecularMap,		{"material.has_specular_map",		15}},
 				{UniformName::Material_HasNormalMap,		{"material.has_normal_map",			16}},
 
-				{UniformName::Light_Type,					{"light.type",						17}},
-				{UniformName::Light_Position,				{"light.position",					18}},
-				{UniformName::Light_Direction,				{"light.direction",					19}},
-				{UniformName::Light_Ambient,				{"light.ambient",					20}},
-				{UniformName::Light_Diffuse,				{"light.diffuse",					21}},
-				{UniformName::Light_Specular,				{"light.specular",					22}},
-				{UniformName::Light_Constant,				{"light.constant",					23}},
-				{UniformName::Light_Linear,					{"light.linear",					24}},
-				{UniformName::Light_Quadratic,				{"light.quadratic",					25}},
-				{UniformName::Light_Cutoff,					{"light.cutoff",					26}},
-				{UniformName::Light_OuterCutoff,			{"light.outer_cutoff",				27}}
+				{UniformName::Light_Type,					{"light[0].type",					17}},
+				{UniformName::Light_Position,				{"light[0].position",				18}},
+				{UniformName::Light_Direction,				{"light[0].direction",				19}},
+				{UniformName::Light_Ambient,				{"light[0].ambient",				20}},
+				{UniformName::Light_Diffuse,				{"light[0].diffuse",				21}},
+				{UniformName::Light_Specular,				{"light[0].specular",				22}},
+				{UniformName::Light_Constant,				{"light[0].constant",				23}},
+				{UniformName::Light_Linear,					{"light[0].linear",					24}},
+				{UniformName::Light_Quadratic,				{"light[0].quadratic",				25}},
+				{UniformName::Light_Cutoff,					{"light[0].cutoff",					26}},
+				{UniformName::Light_OuterCutoff,			{"light[0].outer_cutoff",			27}}
 			};
 
 		namespace detail

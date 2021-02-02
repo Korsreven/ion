@@ -498,13 +498,13 @@ namespace ion::utilities::math
 	[[nodiscard]] real Tan(real radian) noexcept;
 
 	//Converts angle value in degrees to radians
-	[[nodiscard]] constexpr auto Degree(real degree) noexcept
+	[[nodiscard]] constexpr auto ToRadians(real degree) noexcept
 	{
 		return degree * detail::degree_to_radian_factor;
 	}
 
 	//Converts angle value in radians to degrees
-	[[nodiscard]] constexpr auto Radian(real radian) noexcept
+	[[nodiscard]] constexpr auto ToDegrees(real radian) noexcept
 	{
 		return radian * detail::radian_to_degree_factor;
 	}
@@ -518,12 +518,12 @@ namespace ion::utilities::math
 
 		constexpr auto operator""_deg(long double degree) noexcept
 		{
-			return Degree(static_cast<real>(degree));
+			return ToRadians(static_cast<real>(degree));
 		}
 
 		constexpr auto operator""_rad(long double radian) noexcept
 		{
-			return Radian(static_cast<real>(radian));
+			return ToDegrees(static_cast<real>(radian));
 		}
 	} //literals
 } //ion::utilities::math

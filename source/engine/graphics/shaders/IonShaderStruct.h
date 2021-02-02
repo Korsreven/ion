@@ -29,6 +29,8 @@ namespace ion::graphics::shaders
 
 	namespace shader_struct::detail
 	{
+		using mapped_members = std::vector<NonOwningPtr<variables::UniformVariable>>;
+
 		std::string get_fully_qualified_name(std::string_view struct_name, std::string_view variable_name, std::optional<int> off) noexcept;
 	} //shader_struct::detail
 
@@ -40,6 +42,7 @@ namespace ion::graphics::shaders
 		private:
 
 			const int size_ = 1;
+			shader_struct::detail::mapped_members mapped_members_;
 
 		protected:
 
@@ -105,7 +108,7 @@ namespace ion::graphics::shaders
 				Uniform variables
 				Creating
 			*/
-			  
+			
 			//Create a uniform variable with the given name and size
 			template <typename T>
 			auto CreateUniform(std::string name, int size = 1)
@@ -124,6 +127,7 @@ namespace ion::graphics::shaders
 						size
 					});
 
+				mapped_members_.push_back(ptr);
 				return static_pointer_cast<variables::Uniform<T>>(ptr);
 			}
 
@@ -140,15 +144,6 @@ namespace ion::graphics::shaders
 			//Gets a pointer to an immutable uniform variable with the given name
 			//Returns nullptr if uniform variable could not be found
 			[[nodiscard]] NonOwningPtr<const variables::UniformVariable> GetUniform(std::string_view name, std::optional<int> off = {}) const noexcept;
-
-
-			//Gets a pointer to a mutable uniform variable that is mapped to the given standardized name
-			//Returns nullptr if that standardized name has no mapped uniform variable
-			[[nodiscard]] NonOwningPtr<variables::UniformVariable> GetUniform(shader_layout::UniformName name) noexcept;
-
-			//Gets a pointer to an immutable uniform variable that is mapped to the given standardized name
-			//Returns nullptr if that standardized name has no mapped uniform variable
-			[[nodiscard]] NonOwningPtr<const variables::UniformVariable> GetUniform(shader_layout::UniformName name) const noexcept;
 
 
 			/*

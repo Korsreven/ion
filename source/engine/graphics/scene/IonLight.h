@@ -44,8 +44,8 @@ namespace ion::graphics::scene
 
 		namespace detail
 		{
-			constexpr auto default_cutoff_angle = math::Degree(45.0_r);
-			constexpr auto default_outer_cutoff_angle = math::Degree(50.0_r);
+			constexpr auto default_cutoff_angle = math::ToRadians(45.0_r);
+			constexpr auto default_outer_cutoff_angle = math::ToRadians(55.0_r);
 
 
 			inline auto angle_to_cutoff(real angle) noexcept

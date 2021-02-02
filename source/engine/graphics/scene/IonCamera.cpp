@@ -44,9 +44,9 @@ void move_to(const Vector3 &position) noexcept
 void rotate_by(real angle) noexcept
 {
 	if constexpr (std::is_same_v<real, double>)
-		glRotated(-math::Radian(angle), 0.0_r, 0.0_r, 1.0_r); //Rotate around the z-axis
+		glRotated(-math::ToDegrees(angle), 0.0_r, 0.0_r, 1.0_r); //Rotate around the z-axis
 	else
-		glRotatef(-math::Radian(angle), 0.0_r, 0.0_r, 1.0_r); //Rotate around the z-axis
+		glRotatef(-math::ToDegrees(angle), 0.0_r, 0.0_r, 1.0_r); //Rotate around the z-axis
 }
 
 

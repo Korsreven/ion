@@ -173,7 +173,10 @@ struct Game :
 	ion::events::listeners::MouseListener
 {
 	std::vector<ion::NonOwningPtr<ion::graphics::scene::Model>> models;
+	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<int>> light_type = nullptr;
 	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<ion::graphics::shaders::variables::glsl::vec3>> light_position = nullptr;
+	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<ion::graphics::shaders::variables::glsl::vec3>> light_direction = nullptr;
+	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<ion::graphics::shaders::variables::glsl::vec4>> light_diffuse = nullptr;
 
 	/*
 		Frame listener
@@ -233,8 +236,28 @@ struct Game :
 
 	void MouseReleased(ion::events::listeners::MouseButton button, ion::graphics::utilities::Vector2 position) noexcept override
 	{
-		button;
+		static auto left_click_count = 0;
+		static auto right_click_count = 0;
 		position;
+
+		if (button == ion::events::listeners::MouseButton::Left)
+		{
+			if (light_type)
+				light_type->Get() = ++left_click_count % 3;
+		}
+		else if (button == ion::events::listeners::MouseButton::Right)
+		{
+			if (light_diffuse)
+			{
+				switch (++right_click_count % 4)
+				{
+					case 0: light_diffuse->Get() = ion::graphics::utilities::color::White; break;
+					case 1: light_diffuse->Get() = ion::graphics::utilities::color::Red; break;
+					case 2: light_diffuse->Get() = ion::graphics::utilities::color::Green; break;
+					case 3: light_diffuse->Get() = ion::graphics::utilities::color::Blue; break;
+				}
+			}
+		}
 	}
 
 	void MouseMoved(ion::graphics::utilities::Vector2 position) noexcept override
@@ -243,6 +266,10 @@ struct Game :
 		{
 			auto [x, y] = position.XY();
 			light_position->Get() = ion::graphics::utilities::Vector3{x, y, -1.0_r};
+
+			if (light_direction)
+				light_direction->Get() = (ion::graphics::utilities::Vector3{0.0, 0.0, -1.0_r} -
+										  ion::graphics::utilities::Vector3{x, y, 0.0_r}).NormalizeCopy();
 		}
 	}
 
@@ -382,7 +409,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto camera_struct = mesh_shader_prog->CreateStruct("camera");
 			auto mesh_struct = mesh_shader_prog->CreateStruct("mesh");
 			auto material_struct = mesh_shader_prog->CreateStruct("material");
-			auto light_struct = mesh_shader_prog->CreateStruct("light", 16);
+			auto light_struct = mesh_shader_prog->CreateStruct("light", 8);
 
 			//Shader variables
 			//Vertex
@@ -392,46 +419,44 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			mesh_shader_prog->CreateAttribute<glsl::vec2>("vertex_tex_coord");
 
 			//Matrices			
-			auto matrix_model_view = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.model_view");
-			auto matrix_projection = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.projection");
-			auto matrix_model_view_projection = mesh_shader_prog->CreateUniform<glsl::mat4>("matrix.model_view_projection");
+			auto matrix_model_view = matrix_struct->CreateUniform<glsl::mat4>("model_view");
+			auto matrix_projection = matrix_struct->CreateUniform<glsl::mat4>("projection");
+			auto matrix_model_view_projection = matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
 
 			//Scene
-			auto scene_light_count = mesh_shader_prog->CreateUniform<int>("scene.light_count");
-			auto scene_gamma = mesh_shader_prog->CreateUniform<float>("scene.gamma");	
+			auto scene_light_count = scene_struct->CreateUniform<int>("light_count");
+			auto scene_gamma = scene_struct->CreateUniform<float>("gamma");	
 
 			//Camera
-			auto camera_position = mesh_shader_prog->CreateUniform<glsl::vec3>("camera.position");
+			auto camera_position = camera_struct->CreateUniform<glsl::vec3>("position");
 
 			//Mesh
-			auto mesh_has_material = mesh_shader_prog->CreateUniform<bool>("mesh.has_material");
+			auto mesh_has_material = mesh_struct->CreateUniform<bool>("has_material");
 
 			//Material
-			auto material_ambient = mesh_shader_prog->CreateUniform<glsl::vec4>("material.ambient");
-			auto material_diffuse = mesh_shader_prog->CreateUniform<glsl::vec4>("material.diffuse");
-			auto material_specular = mesh_shader_prog->CreateUniform<glsl::vec4>("material.specular");
-			auto material_shininess = mesh_shader_prog->CreateUniform<float>("material.shininess");
-			auto material_diffuse_map = mesh_shader_prog->CreateUniform<glsl::sampler2D>("material.diffuse_map");	
-			auto material_specular_map = mesh_shader_prog->CreateUniform<glsl::sampler2D>("material.specular_map");
-			auto material_normal_map = mesh_shader_prog->CreateUniform<glsl::sampler2D>("material.normal_map");
-			auto material_has_diffuse_map = mesh_shader_prog->CreateUniform<bool>("material.has_diffuse_map");
-			auto material_has_specular_map = mesh_shader_prog->CreateUniform<bool>("material.has_specular_map");
-			auto material_has_normal_map = mesh_shader_prog->CreateUniform<bool>("material.has_normal_map");
+			auto material_ambient = material_struct->CreateUniform<glsl::vec4>("ambient");
+			auto material_diffuse = material_struct->CreateUniform<glsl::vec4>("diffuse");
+			auto material_specular = material_struct->CreateUniform<glsl::vec4>("specular");
+			auto material_shininess = material_struct->CreateUniform<float>("shininess");
+			auto material_diffuse_map = material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");	
+			auto material_specular_map = material_struct->CreateUniform<glsl::sampler2D>("specular_map");
+			auto material_normal_map = material_struct->CreateUniform<glsl::sampler2D>("normal_map");
+			auto material_has_diffuse_map = material_struct->CreateUniform<bool>("has_diffuse_map");
+			auto material_has_specular_map = material_struct->CreateUniform<bool>("has_specular_map");
+			auto material_has_normal_map = material_struct->CreateUniform<bool>("has_normal_map");
 
 			//Light
-			//auto light_position = light_struct->CreateUniform<glsl::vec3>("position");
-
-			auto light_type = mesh_shader_prog->CreateUniform<int>("light.type");
-			auto light_position = mesh_shader_prog->CreateUniform<glsl::vec3>("light.position");
-			auto light_direction = mesh_shader_prog->CreateUniform<glsl::vec3>("light.direction");
-			auto light_ambient = mesh_shader_prog->CreateUniform<glsl::vec4>("light.ambient");
-			auto light_diffuse = mesh_shader_prog->CreateUniform<glsl::vec4>("light.diffuse");
-			auto light_specular = mesh_shader_prog->CreateUniform<glsl::vec4>("light.specular");
-			auto light_constant = mesh_shader_prog->CreateUniform<float>("light.constant");
-			auto light_linear = mesh_shader_prog->CreateUniform<float>("light.linear");
-			auto light_quadratic = mesh_shader_prog->CreateUniform<float>("light.quadratic");
-			auto light_cutoff = mesh_shader_prog->CreateUniform<float>("light.cutoff");
-			auto light_outer_cutoff = mesh_shader_prog->CreateUniform<float>("light.outer_cutoff");
+			auto light_type = light_struct->CreateUniform<int>("type");
+			auto light_position = light_struct->CreateUniform<glsl::vec3>("position");
+			auto light_direction = light_struct->CreateUniform<glsl::vec3>("direction");
+			auto light_ambient = light_struct->CreateUniform<glsl::vec4>("ambient");
+			auto light_diffuse = light_struct->CreateUniform<glsl::vec4>("diffuse");
+			auto light_specular = light_struct->CreateUniform<glsl::vec4>("specular");
+			auto light_constant = light_struct->CreateUniform<float>("constant");
+			auto light_linear = light_struct->CreateUniform<float>("linear");
+			auto light_quadratic = light_struct->CreateUniform<float>("quadratic");
+			auto light_cutoff = light_struct->CreateUniform<float>("cutoff");
+			auto light_outer_cutoff = light_struct->CreateUniform<float>("outer_cutoff");
 
 			shader_programs.LoadShaderVariableLocations(*mesh_shader_prog);
 
@@ -570,19 +595,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			brick_wall->CreateMesh(std::move(brick_wall_vertices), brick,
 				ion::graphics::render::mesh::MeshTexCoordMode::Manual);
 
-			//Setup
-			engine.shader_program = mesh_shader_prog.get();
-			game.light_position = light_position;
-			//game.models.push_back(gray_rectangle);
-			game.models.push_back(red_square);
-			//game.models.push_back(green_square);
-			game.models.push_back(blue_square);
-			game.models.push_back(brick_wall);
 
 			//Camera, projection and view matrix
 			auto camera = engine.Target()->GetViewport("")->ConnectedCamera();
 			camera->Position({0.0_r, 0.0_r, 0.0_r});
-			camera->Rotation(ion::utilities::math::Degree(0.0_r));
+			camera->Rotation(ion::utilities::math::ToRadians(0.0_r));
 
 			engine.Target()->GetViewport("")->RenderTo();
 			auto proj_mat = camera->ViewFrustum().ProjectionMatrix();
@@ -604,8 +621,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			light_constant->Get() = 1.0_r;
 			light_linear->Get() = 0.09_r;
 			light_quadratic->Get() = 0.032_r;
-			light_cutoff->Get() = 0.218_r;
-			light_outer_cutoff->Get() = 0.262_r;
+			light_cutoff->Get() = ion::utilities::math::Cos(ion::utilities::math::ToRadians(45.0_r));
+			light_outer_cutoff->Get() = ion::utilities::math::Cos(ion::utilities::math::ToRadians(55.0_r));
 
 			proj_mat.Transpose();
 			view_mat.Transpose();
@@ -613,6 +630,20 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			matrix_model_view->Get() = view_mat;
 			matrix_projection->Get() = proj_mat;		
 			matrix_model_view_projection->Get() = view_proj_mat;
+
+
+			//Demo setup
+			engine.shader_program = mesh_shader_prog.get();
+			game.light_type = light_type;
+			game.light_position = light_position;
+			game.light_direction = light_direction;
+			game.light_diffuse = light_diffuse;
+			//game.models.push_back(gray_rectangle);
+			game.models.push_back(red_square);
+			//game.models.push_back(green_square);
+			game.models.push_back(blue_square);
+			game.models.push_back(brick_wall);
+
 
 			//EXAMPLE end
 

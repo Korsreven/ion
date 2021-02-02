@@ -43,14 +43,32 @@ std::string get_fully_qualified_name(std::string_view struct_name, std::string_v
 
 void ShaderStruct::Created(variables::UniformVariable &uniform_variable) noexcept
 {
-	if (size_ == 1)
-		Owner()->Created(uniform_variable); //Use ShaderProgram functionality
+	Owner()->Created(uniform_variable); //Use ShaderProgram functionality
+	uniform_variable.ParentStruct(*this, std::size(mapped_members_));
 }
 
 void ShaderStruct::Removed(variables::UniformVariable &uniform_variable) noexcept
 {
-	if (size_ == 1)
-		Owner()->Removed(uniform_variable); //Use ShaderProgram functionality
+	Owner()->Removed(uniform_variable); //Use ShaderProgram functionality
+
+	for (auto i = 0; auto &uniform : mapped_members_)
+	{
+		if (uniform.get() == &uniform_variable)
+		{
+			mapped_members_.erase(std::begin(mapped_members_) + i);
+
+			//Refresh member offsets
+			for (auto &member : UniformVariables())
+			{
+				if (member.MemberOffset() > uniform_variable.MemberOffset())
+					member.ParentStruct(*this, *member.MemberOffset() - 1);
+			}
+
+			break;
+		}
+		else
+			++i;
+	}
 }
 
 
@@ -81,17 +99,6 @@ NonOwningPtr<const variables::UniformVariable> ShaderStruct::GetUniform(std::str
 }
 
 
-NonOwningPtr<variables::UniformVariable> ShaderStruct::GetUniform(shader_layout::UniformName name) noexcept
-{
-	return size_ == 1 ? Owner()->GetUniform(name) : nullptr;
-}
-
-NonOwningPtr<const variables::UniformVariable> ShaderStruct::GetUniform(shader_layout::UniformName name) const noexcept
-{
-	return size_ == 1 ? Owner()->GetUniform(name) : nullptr;
-}
-
-
 /*
 	Uniform variables
 	Removing
@@ -99,17 +106,37 @@ NonOwningPtr<const variables::UniformVariable> ShaderStruct::GetUniform(shader_l
 
 void ShaderStruct::ClearUniforms() noexcept
 {
+	mapped_members_.clear();
+	mapped_members_.shrink_to_fit();
 	Clear();
 }
 
 bool ShaderStruct::RemoveUniform(variables::UniformVariable &uniform_variable) noexcept
 {
-	return Remove(uniform_variable);
+	if (size_ > 1)
+	{
+		auto removed = true;
+
+		for (auto i = size_; i > 0; --i)
+			removed &= Remove(uniform_variable[i - 1]);
+
+		return removed;
+	}
+	else
+		return Remove(uniform_variable);
 }
 
 bool ShaderStruct::RemoveUniform(std::string_view name, std::optional<int> off) noexcept
 {
-	return Remove(detail::get_fully_qualified_name(*Name(), name, off));
+	if (size_ > 1)
+	{
+		if (auto uniform_variable = GetUniform(name, off); uniform_variable)
+			return RemoveUniform(*uniform_variable);
+		else
+			return false;
+	}
+	else
+		return Remove(detail::get_fully_qualified_name(*Name(), name, off));
 }
 
 } //ion::graphics::shaders

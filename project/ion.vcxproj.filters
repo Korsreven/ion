@@ -172,6 +172,9 @@
     <Filter Include="Header Files\memory">
       <UniqueIdentifier>{633c1b32-6683-439a-9c03-9fce2d257559}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\graphics\shaders\variables">
+      <UniqueIdentifier>{c1743455-cd92-446f-b137-6d6341f4c138}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -410,6 +413,12 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderStruct.cpp">
       <Filter>Source Files\graphics\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\shaders\variables\IonShaderUniform.cpp">
+      <Filter>Source Files\graphics\shaders\variables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\shaders\variables\IonShaderAttribute.cpp">
+      <Filter>Source Files\graphics\shaders\variables</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

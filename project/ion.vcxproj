@@ -204,6 +204,8 @@
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderProgram.cpp" />
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderProgramManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderStruct.cpp" />
+    <ClCompile Include="..\source\engine\graphics\shaders\variables\IonShaderAttribute.cpp" />
+    <ClCompile Include="..\source\engine\graphics\shaders\variables\IonShaderUniform.cpp" />
     <ClCompile Include="..\source\engine\graphics\textures\IonAnimation.cpp" />
     <ClCompile Include="..\source\engine\graphics\textures\IonAnimationManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\textures\IonFrameSequence.cpp" />

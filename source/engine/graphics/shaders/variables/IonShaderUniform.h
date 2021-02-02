@@ -22,6 +22,11 @@ File:	IonShaderUniform.h
 #include "types/IonTypes.h"
 #include "types/IonTypeTraits.h"
 
+namespace ion::graphics::shaders
+{
+	class ShaderStruct; //Forward declaration
+}
+
 namespace ion::graphics::shaders::variables
 {
 	template <typename T>
@@ -121,6 +126,11 @@ namespace ion::graphics::shaders::variables
 
 	class UniformVariable : public ShaderVariable
 	{
+		private:
+
+			ShaderStruct *parent_struct_ = nullptr;
+			std::optional<int> member_offset_;
+
 		protected:
 
 			uniform_variable::VariableType value_;
@@ -128,21 +138,61 @@ namespace ion::graphics::shaders::variables
 
 		public:
 
-			//Protected constructor
-			UniformVariable(std::string name, uniform_variable::VariableType value) :
-				ShaderVariable{std::move(name)},
-				value_{std::move(value)}
-			{
-				//Empty
-			}
+			//Constructor
+			UniformVariable(std::string name, uniform_variable::VariableType value);
 
 			//Default virtual destructor
 			virtual ~UniformVariable() = default;
 
 
 			/*
+				Operators
+			*/
+
+			//Returns a mutable member uniform variable at the given offset
+			[[nodiscard]] UniformVariable& operator[](int off) noexcept;
+
+			//Returns an immutable member uniform variable at the given offset
+			[[nodiscard]] const UniformVariable& operator[](int off) const noexcept;
+
+
+			/*
+				Modifiers
+			*/
+
+			//Sets the parent struct of this member uniform variable
+			inline void ParentStruct(ShaderStruct &shader_struct, int member_off) noexcept
+			{
+				parent_struct_ = &shader_struct;
+				member_offset_ = member_off;
+			}
+
+			//Releases the parent struct of this member uniform variable
+			inline void ParentStruct(std::nullptr_t) noexcept
+			{
+				parent_struct_ = nullptr;
+				member_offset_ = {};
+			}
+
+
+			/*
 				Observers
 			*/
+
+			//Returns the parent struct of this member uniform variable
+			//Returns nullptr if this uniform variable is not a struct member
+			[[nodiscard]] inline auto ParentStruct() const noexcept
+			{
+				return parent_struct_;
+			}
+
+			//Returns the member offset of this member uniform variable
+			//Returns nullopt if this uniform variable is not a struct member
+			[[nodiscard]] inline auto& MemberOffset() const noexcept
+			{
+				return member_offset_;
+			}
+
 
 			//Get a mutable reference to the contained glsl uniform value
 			template <typename T, typename = std::enable_if_t<std::is_base_of_v<UniformVariable, Uniform<T>>>>
@@ -185,30 +235,10 @@ namespace ion::graphics::shaders::variables
 			*/
 
 			//Returns true if the uniform variable value has changed
-			[[nodiscard]] inline auto HasNewValue() noexcept
-			{
-				auto changed = 
-					current_value_ ?
-						Visit(
-							[&](auto &&value) noexcept
-							{
-								return uniform_variable::detail::is_value_different(
-									value,
-									std::get<std::remove_cvref_t<decltype(value)>>(*current_value_));
-							}) :
-						true;
-
-				if (changed)
-					current_value_ = value_;
-				
-				return changed;
-			}
+			[[nodiscard]] bool HasNewValue() noexcept;
 
 			//Force the uniform value to be refreshed next time it is processed
-			inline void Refresh()
-			{
-				current_value_.reset();
-			}
+			void Refresh() noexcept;
 	};
 
 

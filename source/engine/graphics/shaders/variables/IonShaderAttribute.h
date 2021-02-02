@@ -118,12 +118,7 @@ namespace ion::graphics::shaders::variables
 		public:
 
 			//Constructor
-			AttributeVariable(std::string name, attribute_variable::VariableType value) :
-				ShaderVariable{std::move(name)},
-				value_{std::move(value)}
-			{
-				//Empty
-			}
+			AttributeVariable(std::string name, attribute_variable::VariableType value);
 
 			//Default virtual destructor
 			virtual ~AttributeVariable() = default;
@@ -174,30 +169,10 @@ namespace ion::graphics::shaders::variables
 			*/
 
 			//Returns true if the attribute variable value has changed
-			[[nodiscard]] inline auto HasNewValue() noexcept
-			{
-				auto changed = 
-					current_value_ ?
-						Visit(
-							[&](auto &&value) noexcept
-							{
-								return attribute_variable::detail::is_value_different(
-									value,
-									std::get<std::remove_cvref_t<decltype(value)>>(*current_value_));
-							}) :
-						true;
-
-				if (changed)
-					current_value_ = value_;
-				
-				return changed;
-			}
+			[[nodiscard]] bool HasNewValue() noexcept;
 
 			//Force the attribute value to be refreshed next time it is processed
-			inline void Refresh()
-			{
-				current_value_.reset();
-			}
+			void Refresh() noexcept;
 	};
 
 
