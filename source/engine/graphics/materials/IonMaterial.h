@@ -106,6 +106,7 @@ namespace ion::graphics::materials
 			Color ambient_color_;
 			Color diffuse_color_;
 			Color specular_color_;
+			Color emissive_color_;
 			real shininess_ = 0.0_r;
 
 			material::detail::texture_map_type diffuse_map_;
@@ -114,50 +115,28 @@ namespace ion::graphics::materials
 
 			Vector2 lower_left_tex_coord_ = vector2::Zero;
 			Vector2 upper_right_tex_coord_ = vector2::UnitScale;
-			std::optional<Color> emissive_color_;
 			bool receive_shadows_ = true;
 
 		public:
-			
-			//Constructs a new material with the given name, ambient color, diffuse color, specular color and shininess
-			Material(std::string name,
-				const Color &ambient, const Color &diffuse, const Color &specular, real shininess);
 
-			//Constructs a new material with the given name, ambient color, diffuse color, specular color, shininess,
-			//and emissive color and receive shadows
+			//Constructs a new material with the given name, ambient, diffuse, specular and emissive color + shininess and receive shadows
 			Material(std::string name,
-				const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-				const std::optional<Color> &emissive, bool receive_shadows = true);
+				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
+				bool receive_shadows = true);
 
-
-			//Constructs a new material with the given name, ambient color, diffuse color, specular color, shininess,
-			//and diffuse map, specular map and normal map as animations
+			//Constructs a new material with the given name, ambient, diffuse, specular and emissive color + shininess,
+			//diffuse, specular and normal map as animations + receive shadows
 			Material(std::string name,
-				const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-				NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> normal_map);
-
-			//Constructs a new material with the given name, ambient color, diffuse color, specular color, shininess,
-			//and diffuse map, specular map and normal map as animations,
-			//and emissive color and receive shadows
-			Material(std::string name,
-				const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
+				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
 				NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> normal_map,
-				const std::optional<Color> &emissive, bool receive_shadows = true);
+				bool receive_shadows = true);
 
-
-			//Constructs a new material with the given name, ambient color, diffuse color, specular color, shininess,
-			//and diffuse map, specular map and normal map as textures
+			//Constructs a new material with the given name, ambient, diffuse, specular and emissive color + shininess,
+			//diffuse, specular and normal map as textures + receive shadows
 			Material(std::string name,
-				const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-				NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> normal_map);
-
-			//Constructs a new material with the given name, ambient color, diffuse color, specular color, shininess,
-			//and diffuse map, specular map and normal map as textures,
-			//and emissive color and receive shadows
-			Material(std::string name,
-				const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
+				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
 				NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> normal_map,
-				const std::optional<Color> &emissive, bool receive_shadows = true);
+				bool receive_shadows = true);
 
 
 			/*
@@ -180,6 +159,12 @@ namespace ion::graphics::materials
 			inline void SpecularColor(const Color &specular) noexcept
 			{
 				specular_color_ = specular;
+			}
+
+			//Sets the emissive (self-illumination) color of this material to the given color
+			inline void EmissiveColor(const Color &emissive) noexcept
+			{
+				emissive_color_ = emissive;
 			}
 
 			//Sets the shininess of the material to the given value
@@ -253,12 +238,6 @@ namespace ion::graphics::materials
 				upper_right_tex_coord_ = upper_right;
 			}
 
-			//Sets the emissive (self-illumination) color of this material to the given color
-			inline void EmissiveColor(const std::optional<Color> &emissive) noexcept
-			{
-				emissive_color_ = emissive;
-			}
-
 			//Sets if this material receives shadows or not
 			inline void ReceiveShadows(bool enabled) noexcept
 			{
@@ -286,6 +265,12 @@ namespace ion::graphics::materials
 			[[nodiscard]] inline auto& SpecularColor() const noexcept
 			{
 				return specular_color_;
+			}
+
+			//Returns the emissive (self-illumination) color of the material
+			[[nodiscard]] inline auto& EmissiveColor() const noexcept
+			{
+				return emissive_color_;
 			}
 
 			//Returns the shininess of this material
@@ -334,13 +319,6 @@ namespace ion::graphics::materials
 			[[nodiscard]] inline auto TexCoords() const noexcept
 			{
 				return std::pair{lower_left_tex_coord_, upper_right_tex_coord_};
-			}
-
-			//Returns the emissive (self-illumination) color of the material
-			//Returns nullopt if this material is not emissive
-			[[nodiscard]] inline auto& EmissiveColor() const noexcept
-			{
-				return emissive_color_;
 			}
 
 			//Returns true if this material receives shadows

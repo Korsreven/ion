@@ -142,89 +142,61 @@ std::pair<bool, bool> is_texture_map_repeatable(const Texture &texture,
 //Public
 
 Material::Material(std::string name,
-	const Color &ambient, const Color &diffuse, const Color &specular, real shininess) :
-
-	Material{std::move(name), ambient, diffuse, specular, shininess, {}}
-{
-	//Empty
-}
-
-Material::Material(std::string name,
-	const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-	const std::optional<Color> &emissive, bool receive_shadows) :
+	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
+	bool receive_shadows) :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
 
 	ambient_color_{ambient},
 	diffuse_color_{diffuse},
 	specular_color_{specular},
+	emissive_color_{emissive},
 	shininess_{shininess},
 
-	emissive_color_{emissive},
 	receive_shadows_{receive_shadows}
 {
 	//Empty
 }
 
-
 Material::Material(std::string name,
-	const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-	NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> normal_map) :
-
-	Material{std::move(name), ambient, diffuse, specular, shininess, diffuse_map, specular_map, normal_map, {}}
-{
-	//Empty
-}
-
-Material::Material(std::string name,
-	const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
+	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
 	NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> normal_map,
-	const std::optional<Color> &emissive, bool receive_shadows) :
+	bool receive_shadows) :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
 
 	ambient_color_{ambient},
 	diffuse_color_{diffuse},
 	specular_color_{specular},
+	emissive_color_{emissive},
 	shininess_{shininess},
 
 	diffuse_map_{diffuse_map},
 	specular_map_{specular_map},
 	normal_map_{normal_map},
 
-	emissive_color_{emissive},
 	receive_shadows_{receive_shadows}
 {
 	//Empty
 }
 
-
 Material::Material(std::string name,
-	const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
-	NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> normal_map) :
-
-	Material{std::move(name), ambient, diffuse, specular, shininess, diffuse_map, specular_map, normal_map, {}}
-{
-	//Empty
-}
-
-Material::Material(std::string name,
-	const Color &ambient, const Color &diffuse, const Color &specular, real shininess,
+	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
 	NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> normal_map,
-	const std::optional<Color> &emissive, bool receive_shadows) :
+	bool receive_shadows) :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
 
 	ambient_color_{ambient},
 	diffuse_color_{diffuse},
 	specular_color_{specular},
+	emissive_color_{emissive},
 	shininess_{shininess},
 
 	diffuse_map_{diffuse_map},
 	specular_map_{specular_map},
 	normal_map_{normal_map},
 
-	emissive_color_{emissive},
 	receive_shadows_{receive_shadows}
 {
 	//Empty

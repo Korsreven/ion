@@ -1,4 +1,4 @@
-/*
+ /*
 -------------------------------------------
 This source file is part of Ion Engine
 	- A fast and lightweight 2D game engine
@@ -437,6 +437,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto material_ambient = material_struct->CreateUniform<glsl::vec4>("ambient");
 			auto material_diffuse = material_struct->CreateUniform<glsl::vec4>("diffuse");
 			auto material_specular = material_struct->CreateUniform<glsl::vec4>("specular");
+			auto material_emissive = material_struct->CreateUniform<glsl::vec4>("emissive");
 			auto material_shininess = material_struct->CreateUniform<float>("shininess");
 			auto material_diffuse_map = material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");	
 			auto material_specular_map = material_struct->CreateUniform<glsl::sampler2D>("specular_map");
@@ -500,6 +501,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{0.19125_r, 0.0735_r, 0.0225_r},
 					{0.7038_r, 0.27048_r, 0.0828_r},
 					{0.256777_r, 0.137622_r, 0.086014_r},
+					{0.0_r, 0.0_r, 0.0_r},
 					12.8_r, brick_wall_texture, brick_wall_specular_map, brick_wall_normal_map);
 			
 			auto emerald =
@@ -507,6 +509,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{0.0215_r, 0.1745_r, 0.0215_r},
 					{0.07568_r, 0.61424_r, 0.07568_r},
 					{0.633_r, 0.727811_r, 0.633_r},
+					{0.0_r, 0.0_r, 0.0_r},
 					76.8_r);
 
 			auto gold =
@@ -514,6 +517,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{0.24725_r, 0.1995_r, 0.0745_r},
 					{0.75164_r, 0.60648_r, 0.22648_r},
 					{0.628281_r, 0.555802_r, 0.366065_r},
+					{0.0_r, 0.0_r, 0.0_r},
 					51.2_r);
 
 			auto pearl =
@@ -521,6 +525,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{0.25_r, 0.20725_r, 0.20725_r},
 					{1.0_r, 0.829_r, 0.829_r},
 					{0.296648_r, 0.296648_r, 0.296648_r},
+					{0.0_r, 0.0_r, 0.0_r},
 					11.264_r);
 
 			auto ruby =
@@ -528,6 +533,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{0.1745_r, 0.01175_r, 0.01175_r},
 					{0.61424_r, 0.04136_r, 0.04136_r},
 					{0.727811_r, 0.626959_r, 0.626959_r},
+					{0.0_r, 0.0_r, 0.0_r},
 					76.8_r);
 
 			//material.Crop(ion::graphics::utilities::Aabb{{0.25_r, 0.25_r}, {0.75_r, 0.75_r}});

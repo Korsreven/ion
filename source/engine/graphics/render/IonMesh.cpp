@@ -462,6 +462,9 @@ void set_material_uniforms(materials::Material &material, duration time, shaders
 	if (auto specular = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Specular); specular)
 		specular->Get<glsl::vec4>() = material.SpecularColor();
 
+	if (auto emissive = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Emissive); emissive)
+		emissive->Get<glsl::vec4>() = material.EmissiveColor();
+
 	if (auto shininess = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Shininess); shininess)
 		shininess->Get<float>() = material.Shininess(); //Using 'real' could make this uniform double
 
