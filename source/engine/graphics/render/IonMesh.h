@@ -234,7 +234,10 @@ namespace ion::graphics::render
 				draw_mode_ = draw_mode;
 			}
 
-			//Sets the material used by this mesh to the given material
+			//Sets the surface color of this mesh to the given color
+			void SurfaceColor(const Color &color) noexcept;
+
+			//Sets the surface material used by this mesh to the given material
 			inline void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
 				if (material_ != material)
@@ -352,15 +355,6 @@ namespace ion::graphics::render
 			{
 				return vbo_handle_;
 			}
-
-
-			/*
-				Vertices
-			*/
-
-			//Sets all vertices of the mesh to the given color
-			//Applies only if no materials is attached to this mesh
-			void VertexColor(const Color &color) noexcept;
 
 
 			/*

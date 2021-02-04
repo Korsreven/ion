@@ -1,4 +1,4 @@
- /*
+/*
 -------------------------------------------
 This source file is part of Ion Engine
 	- A fast and lightweight 2D game engine
@@ -424,8 +424,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto matrix_model_view_projection = matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
 
 			//Scene
+			auto scene_ambient = scene_struct->CreateUniform<glsl::vec4>("ambient");
+			auto scene_gamma = scene_struct->CreateUniform<float>("gamma");
 			auto scene_light_count = scene_struct->CreateUniform<int>("light_count");
-			auto scene_gamma = scene_struct->CreateUniform<float>("gamma");	
 
 			//Camera
 			auto camera_position = camera_struct->CreateUniform<glsl::vec3>("position");
@@ -613,8 +614,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto view_proj_mat = proj_mat * view_mat;
 
 			//Uniforms
-			scene_light_count->Get() = 1;
+			scene_ambient->Get() = Color{1.0, 1.0, 1.0, 1.0};
 			scene_gamma->Get() = 1.0_r;
+			scene_light_count->Get() = 1;		
 
 			camera_position->Get() = camera->Position();
 

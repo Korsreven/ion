@@ -635,19 +635,16 @@ Mesh::~Mesh() noexcept
 
 
 /*
-	Vertices
+	Modifiers
 */
 
-void Mesh::VertexColor(const Color &color) noexcept
+void Mesh::SurfaceColor(const Color &color) noexcept
 {
-	if (!material_)
-	{
-		for (auto i = 0; i < vertex_count_; ++i)
-			std::copy(color.Channels(), color.Channels() + 4,
-				std::begin(vertex_data_) + detail::color_data_offset(vertex_count_) + (i * detail::color_components));
+	for (auto i = 0; i < vertex_count_; ++i)
+		std::copy(color.Channels(), color.Channels() + 4,
+			std::begin(vertex_data_) + detail::color_data_offset(vertex_count_) + (i * detail::color_components));
 
-		reload_vertex_data_ = vbo_handle_ && vertex_count_ > 0;
-	}
+	reload_vertex_data_ = vbo_handle_ && vertex_count_ > 0;
 }
 
 
