@@ -89,13 +89,13 @@ namespace ion::graphics::shaders
 					inline void operator()(const glsl::attribute<T> &value) const noexcept
 					{
 						if constexpr (std::is_same_v<glsl::attribute<T>::basic_type, int32>)
-							set_vertex_ipointer(location_, value.Components(), value.Normalized(), value.Stride(), value.VertexData(), int32{});
+							set_vertex_ipointer(location_, value.Components(), value.Normalized(), value.Stride(), value.Pointer(), int32{});
 						else if constexpr (std::is_same_v<glsl::attribute<T>::basic_type, uint32>)
-							set_vertex_ipointer(location_, value.Components(), value.Normalized(), value.Stride(), value.VertexData(), uint32{});
+							set_vertex_ipointer(location_, value.Components(), value.Normalized(), value.Stride(), value.Pointer(), uint32{});
 						else if constexpr (std::is_same_v<glsl::attribute<T>::basic_type, float32>)
-							set_vertex_pointer(location_, value.Components(), value.Normalized(), value.Stride(), value.VertexData(), float32{});
+							set_vertex_pointer(location_, value.Components(), value.Normalized(), value.Stride(), value.Pointer(), float32{});
 						else if constexpr (std::is_same_v<glsl::attribute<T>::basic_type, float64>)
-							set_vertex_lpointer(location_, value.Components(), value.Normalized(), value.Stride(), value.VertexData());
+							set_vertex_lpointer(location_, value.Components(), value.Normalized(), value.Stride(), value.Pointer());
 					}
 
 					//Matrices
@@ -104,47 +104,47 @@ namespace ion::graphics::shaders
 					{
 						if constexpr (std::is_same_v<T, int32>)
 						{
-							set_vertex_ipointer(location_, M, value.Normalized(), value.Stride(), value.VertexData(), int32{});
+							set_vertex_ipointer(location_, M, value.Normalized(), value.Stride(), value.Pointer(), int32{});
 
 							if constexpr (N >= 1)
-								set_vertex_ipointer(location_ + 1, M, value.Normalized(), value.Stride(), value.VertexData(), int32{});
+								set_vertex_ipointer(location_ + 1, M, value.Normalized(), value.Stride(), value.Pointer(), int32{});
 							if constexpr (N >= 2)
-								set_vertex_ipointer(location_ + 2, M, value.Normalized(), value.Stride(), value.VertexData(), int32{});
+								set_vertex_ipointer(location_ + 2, M, value.Normalized(), value.Stride(), value.Pointer(), int32{});
 							if constexpr (N >= 3)
-								set_vertex_ipointer(location_ + 3, M, value.Normalized(), value.Stride(), value.VertexData(), int32{});
+								set_vertex_ipointer(location_ + 3, M, value.Normalized(), value.Stride(), value.Pointer(), int32{});
 						}
 						else if constexpr (std::is_same_v<T, uint32>)
 						{
-							set_vertex_ipointer(location_, M, value.Normalized(), value.Stride(), value.VertexData(), uint32{});
+							set_vertex_ipointer(location_, M, value.Normalized(), value.Stride(), value.Pointer(), uint32{});
 
 							if constexpr (N >= 1)
-								set_vertex_ipointer(location_ + 1, M, value.Normalized(), value.Stride(), value.VertexData(), uint32{});
+								set_vertex_ipointer(location_ + 1, M, value.Normalized(), value.Stride(), value.Pointer(), uint32{});
 							if constexpr (N >= 2)
-								set_vertex_ipointer(location_ + 2, M, value.Normalized(), value.Stride(), value.VertexData(), uint32{});
+								set_vertex_ipointer(location_ + 2, M, value.Normalized(), value.Stride(), value.Pointer(), uint32{});
 							if constexpr (N >= 3)
-								set_vertex_ipointer(location_ + 3, M, value.Normalized(), value.Stride(), value.VertexData(), uint32{});
+								set_vertex_ipointer(location_ + 3, M, value.Normalized(), value.Stride(), value.Pointer(), uint32{});
 						}
 						else if constexpr (std::is_same_v<T, float32>)
 						{
-							set_vertex_pointer(location_, M, value.Normalized(), value.Stride(), value.VertexData(), float32{});
+							set_vertex_pointer(location_, M, value.Normalized(), value.Stride(), value.Pointer(), float32{});
 
 							if constexpr (N >= 1)
-								set_vertex_pointer(location_ + 1, M, value.Normalized(), value.Stride(), value.VertexData(), float32{});
+								set_vertex_pointer(location_ + 1, M, value.Normalized(), value.Stride(), value.Pointer(), float32{});
 							if constexpr (N >= 2)
-								set_vertex_pointer(location_ + 2, M, value.Normalized(), value.Stride(), value.VertexData(), float32{});
+								set_vertex_pointer(location_ + 2, M, value.Normalized(), value.Stride(), value.Pointer(), float32{});
 							if constexpr (N >= 3)
-								set_vertex_pointer(location_ + 3, M, value.Normalized(), value.Stride(), value.VertexData(), float32{});
+								set_vertex_pointer(location_ + 3, M, value.Normalized(), value.Stride(), value.Pointer(), float32{});
 						}
 						else if constexpr (std::is_same_v<T, float64>)
 						{
-							set_vertex_lpointer(location_, M, value.Normalized(), value.Stride(), value.VertexData());
+							set_vertex_lpointer(location_, M, value.Normalized(), value.Stride(), value.Pointer());
 
 							if constexpr (N >= 1)
-								set_vertex_lpointer(location_ + 1, M, value.Normalized(), value.Stride(), value.VertexData());
+								set_vertex_lpointer(location_ + 1, M, value.Normalized(), value.Stride(), value.Pointer());
 							if constexpr (N >= 2)
-								set_vertex_lpointer(location_ + 2, M, value.Normalized(), value.Stride(), value.VertexData());
+								set_vertex_lpointer(location_ + 2, M, value.Normalized(), value.Stride(), value.Pointer());
 							if constexpr (N >= 3)
-								set_vertex_lpointer(location_ + 3, M, value.Normalized(), value.Stride(), value.VertexData());
+								set_vertex_lpointer(location_ + 3, M, value.Normalized(), value.Stride(), value.Pointer());
 						}
 					}
 			};

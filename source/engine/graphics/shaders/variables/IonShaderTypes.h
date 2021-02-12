@@ -743,7 +743,7 @@ namespace ion::graphics::shaders::variables::glsl
 	{
 		private:
 
-			void *vertex_data_ = nullptr;
+			void *pointer_ = nullptr;
 			int stride_ = 0;
 			bool normalized_ = false;
 
@@ -769,7 +769,7 @@ namespace ion::graphics::shaders::variables::glsl
 
 				return ValueAccessor<T>{
 					reinterpret_cast<basic_type_t<T>*>(
-						reinterpret_cast<std::byte*>(vertex_data_) + vertex_off * stride
+						reinterpret_cast<std::byte*>(pointer_) + vertex_off * stride
 					), 0};
 			}
 
@@ -778,11 +778,11 @@ namespace ion::graphics::shaders::variables::glsl
 				Modifiers
 			*/
 
-			//Sets the vertex data, stride between consecutive vertex attributes and whether or not data values should be normalized
-			inline void VertexData(void *vertex_data, int stride = 0, bool normalized = false) noexcept
+			//Sets the vertex pointer, stride between consecutive vertex attributes and whether or not data values should be normalized
+			inline void Pointer(void *pointer, int stride = 0, bool normalized = false) noexcept
 			{
 				assert(stride >= 0);
-				vertex_data_ = vertex_data;
+				pointer_ = pointer;
 				stride_ = stride;
 				normalized_ = normalized;
 			}
@@ -793,9 +793,9 @@ namespace ion::graphics::shaders::variables::glsl
 			*/
 
 			//Returns a pointer to the first vertex attribute
-			[[nodiscard]] inline auto VertexData() const noexcept
+			[[nodiscard]] inline auto Pointer() const noexcept
 			{
-				return vertex_data_;
+				return pointer_;
 			}
 
 

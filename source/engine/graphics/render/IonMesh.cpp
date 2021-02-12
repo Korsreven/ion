@@ -334,25 +334,25 @@ void set_vertex_attribute_pointers(int vertex_count, int vbo_offset, shaders::Sh
 
 	if (auto position = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Position); position)
 	{
-		position->Get<glsl::vec3>().VertexData((void*)(vbo_offset * sizeof(real)));
+		position->Get<glsl::vec3>().Pointer((void*)(vbo_offset * sizeof(real)));
 		glEnableVertexAttribArray(position->Location().value_or(-1));
 	}
 
 	if (auto normal = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Normal); normal)
 	{
-		normal->Get<glsl::vec3>().VertexData((void*)((vbo_offset + normal_data_offset(vertex_count)) * sizeof(real)));
+		normal->Get<glsl::vec3>().Pointer((void*)((vbo_offset + normal_data_offset(vertex_count)) * sizeof(real)));
 		glEnableVertexAttribArray(normal->Location().value_or(-1));
 	}
 
 	if (auto color = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Color); color)
 	{
-		color->Get<glsl::vec4>().VertexData((void*)((vbo_offset + color_data_offset(vertex_count)) * sizeof(real)));
+		color->Get<glsl::vec4>().Pointer((void*)((vbo_offset + color_data_offset(vertex_count)) * sizeof(real)));
 		glEnableVertexAttribArray(color->Location().value_or(-1));
 	}
 
 	if (auto tex_coord = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_TexCoord); tex_coord)
 	{
-		tex_coord->Get<glsl::vec2>().VertexData((void*)((vbo_offset + tex_coord_data_offset(vertex_count)) * sizeof(real)));
+		tex_coord->Get<glsl::vec2>().Pointer((void*)((vbo_offset + tex_coord_data_offset(vertex_count)) * sizeof(real)));
 		glEnableVertexAttribArray(tex_coord->Location().value_or(-1));
 	}
 }
@@ -363,25 +363,25 @@ void set_vertex_attribute_pointers(int vertex_count, vertex_storage_type &vertex
 
 	if (auto position = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Position); position)
 	{
-		position->Get<glsl::vec3>().VertexData(std::data(vertex_data));
+		position->Get<glsl::vec3>().Pointer(std::data(vertex_data));
 		glEnableVertexAttribArray(position->Location().value_or(-1));
 	}
 
 	if (auto normal = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Normal); normal)
 	{
-		normal->Get<glsl::vec3>().VertexData(std::data(vertex_data) + normal_data_offset(vertex_count));
+		normal->Get<glsl::vec3>().Pointer(std::data(vertex_data) + normal_data_offset(vertex_count));
 		glEnableVertexAttribArray(normal->Location().value_or(-1));
 	}
 
 	if (auto color = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_Color); color)
 	{
-		color->Get<glsl::vec4>().VertexData(std::data(vertex_data) + color_data_offset(vertex_count));
+		color->Get<glsl::vec4>().Pointer(std::data(vertex_data) + color_data_offset(vertex_count));
 		glEnableVertexAttribArray(color->Location().value_or(-1));
 	}
 
 	if (auto tex_coord = shader_program.GetAttribute(shaders::shader_layout::AttributeName::Vertex_TexCoord); tex_coord)
 	{
-		tex_coord->Get<glsl::vec2>().VertexData(std::data(vertex_data) + tex_coord_data_offset(vertex_count));
+		tex_coord->Get<glsl::vec2>().Pointer(std::data(vertex_data) + tex_coord_data_offset(vertex_count));
 		glEnableVertexAttribArray(tex_coord->Location().value_or(-1));
 	}
 }

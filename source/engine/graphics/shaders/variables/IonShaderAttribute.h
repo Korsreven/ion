@@ -100,7 +100,7 @@ namespace ion::graphics::shaders::variables
 			template <typename T>
 			inline auto is_value_different(const glsl::attribute<T> &lhs, const glsl::attribute<T> &rhs) noexcept
 			{
-				return lhs.VertexData() != rhs.VertexData() ||
+				return lhs.Pointer() != rhs.Pointer() ||
 					   lhs.Stride() != rhs.Stride() ||
 					   lhs.Normalized() != rhs.Normalized();
 			}

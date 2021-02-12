@@ -35,7 +35,8 @@ NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name,
 	bool receive_shadows)
 {
 	return Create(std::move(name),
-				  ambient, diffuse, specular, emissive, shininess);
+				  ambient, diffuse, specular, emissive, shininess,
+				  receive_shadows);
 }
 
 NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name,

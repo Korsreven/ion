@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -195,6 +195,11 @@
     <ClCompile Include="..\source\engine\graphics\render\IonRenderTarget.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonRenderWindow.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonViewport.cpp" />
+    <ClCompile Include="..\source\engine\graphics\render\vertex\IonVertexArrayObject.cpp" />
+    <ClCompile Include="..\source\engine\graphics\render\vertex\IonVertexBufferObject.cpp" />
+    <ClCompile Include="..\source\engine\graphics\render\vertex\IonVertexBufferView.cpp" />
+    <ClCompile Include="..\source\engine\graphics\render\vertex\IonVertexBatch.cpp" />
+    <ClCompile Include="..\source\engine\graphics\render\vertex\IonVertexDeclaration.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonCamera.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonLight.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonModel.cpp" />
@@ -308,6 +313,12 @@
     <ClInclude Include="..\source\engine\graphics\render\IonRenderTarget.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonRenderWindow.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonViewport.h" />
+    <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexArrayObject.h" />
+    <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexBufferObject.h" />
+    <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexBufferView.h" />
+    <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexBatch.h" />
+    <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexData.h" />
+    <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexDeclaration.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonCamera.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonLight.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonModel.h" />

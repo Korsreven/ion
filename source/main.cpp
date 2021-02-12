@@ -74,6 +74,12 @@ File:	main.cpp
 #include "graphics/render/IonRenderTarget.h"
 #include "graphics/render/IonRenderWindow.h"
 #include "graphics/render/IonViewport.h"
+#include "graphics/render/vertex/IonVertexArrayObject.h"
+#include "graphics/render/vertex/IonVertexBatch.h"
+#include "graphics/render/vertex/IonVertexBufferObject.h"
+#include "graphics/render/vertex/IonVertexBufferView.h"
+#include "graphics/render/vertex/IonVertexData.h"
+#include "graphics/render/vertex/IonVertexDeclaration.h"
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonLight.h"
 #include "graphics/scene/IonModel.h"
@@ -616,7 +622,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Uniforms
 			scene_ambient->Get() = Color{1.0, 1.0, 1.0, 1.0};
 			scene_gamma->Get() = 1.0_r;
-			scene_light_count->Get() = 1;		
+			scene_light_count->Get() = 1;
 
 			camera_position->Get() = camera->Position();
 
@@ -806,7 +812,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	a_var.Visit(
 		[&](glsl::attribute<glsl::vec2> &x) noexcept
 		{	
-			x.VertexData(vertices, sizeof(vertex));
+			x.Pointer(vertices, sizeof(vertex));
 			auto a = x[0].XY();
 			auto b = x[1].XY();
 			auto c = x[2].XY();
