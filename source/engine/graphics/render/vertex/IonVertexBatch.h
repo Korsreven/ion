@@ -43,6 +43,7 @@ namespace ion::graphics::render::vertex
 		namespace detail
 		{
 			int vertex_draw_mode_to_gl_draw_mode(VertexDrawMode draw_mode) noexcept;
+			int get_vertex_count(const VertexDeclaration &vertex_declaration, const VertexData &vertex_data) noexcept;
 
 			/*
 				Graphics API
@@ -81,6 +82,9 @@ namespace ion::graphics::render::vertex
 
 		public:
 
+			//Construct a new vertex batch with the given draw mode and vertex declaration
+			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration) noexcept;
+
 			//Construct a new vertex batch with the given draw mode, vertex declaration and vertex data
 			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration, const VertexData &vertex_data) noexcept;
 
@@ -89,19 +93,40 @@ namespace ion::graphics::render::vertex
 				Modifiers
 			*/
 
-			//Sets the draw mode of this vertex renderer to the given mode
+			//Sets the draw mode of this vertex batch to the given mode
 			inline void DrawMode(vertex_batch::VertexDrawMode draw_mode) noexcept
 			{
 				draw_mode_ = draw_mode;
 			}
 
-			//Sets the VBO of this vertex batch to the given VBO
-			inline void VertexBuffer(std::optional<VertexBufferView> vbo) noexcept
+			//Sets the vertex declaration of this vertex batch to the given declaration
+			inline void Declaration(VertexDeclaration vertex_declaration) noexcept
 			{
-				if (vbo_ != vbo)
+				vertex_declaration_ = std::move(vertex_declaration);
+				vertex_count_ = vertex_batch::detail::get_vertex_count(vertex_declaration, vertex_data_);
+				rebind_vertex_attributes_ = vertex_count_ > 0;
+			}
+
+			//Sets the vertex data of this vertex batch to the given data
+			inline void Data(const VertexData &vertex_data) noexcept
+			{
+				if (vertex_data_ != vertex_data)
 				{
-					vbo_ = vbo;
-					rebind_vertex_attributes_ = vbo_ && *vbo_ && vertex_count_ > 0;
+					vertex_data_ = vertex_data;
+					vertex_count_ = vertex_batch::detail::get_vertex_count(vertex_declaration_, vertex_data);
+					reload_vertex_data_ = vertex_count_ > 0;
+				}
+			}
+
+
+			//Sets the vertex buffer of this vertex batch to the given VBO
+			inline void VertexBuffer(std::optional<VertexBufferView> vertex_buffer) noexcept
+			{
+				if (vbo_ != vertex_buffer)
+				{
+					vbo_ = vertex_buffer;
+					reload_vertex_data_ = vertex_count_ > 0;
+					rebind_vertex_attributes_ = reload_vertex_data_;
 				}
 			}
 
@@ -116,8 +141,14 @@ namespace ion::graphics::render::vertex
 				return draw_mode_;
 			}
 
-			//Returns the vertex data for this vertex batch
+			//Returns the vertex declaration for this vertex batch
 			//Returns nullptr if no vertex data is available
+			[[nodiscard]] inline auto Declaration() const noexcept
+			{
+				return vertex_declaration_;
+			}
+
+			//Returns the vertex data for this vertex batch
 			[[nodiscard]] inline auto Data() const noexcept
 			{
 				return vertex_data_;
@@ -130,15 +161,15 @@ namespace ion::graphics::render::vertex
 			}
 
 
-			//Returns the VAO that this vertex batch is using
-			//Returns nullopt if no VAO is available
+			//Returns the vertex array that this vertex batch is using for buffer and attribute bindings
+			//Returns nullopt if no vertex array is available
 			[[nodiscard]] inline auto& VertexArray() const noexcept
 			{
 				return vao_;
 			}
 
-			//Returns the VBO that this vertex batch is using
-			//Returns nullptr if no VBO is available
+			//Returns the vertex buffer that this vertex batch is using
+			//Returns nullopt if no vertex buffer is available
 			[[nodiscard]] inline auto VertexBuffer() const noexcept
 			{
 				return vbo_;

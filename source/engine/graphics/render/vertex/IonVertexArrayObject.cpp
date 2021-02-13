@@ -95,7 +95,7 @@ void set_vertex_attribute_pointers(const VertexDeclaration &vertex_declaration, 
 
 
 VertexArrayObject::VertexArrayObject() noexcept :
-	handle_{vertex_array_object::detail::create_vertex_array_object()}
+	handle_{detail::create_vertex_array_object()}
 {
 	//Empty
 }
@@ -108,7 +108,7 @@ VertexArrayObject::VertexArrayObject(const VertexArrayObject&) noexcept
 VertexArrayObject::~VertexArrayObject() noexcept
 {
 	if (handle_)
-		vertex_array_object::detail::delete_vertex_array_object(*handle_);
+		detail::delete_vertex_array_object(*handle_);
 }
 
 
@@ -116,10 +116,22 @@ VertexArrayObject::~VertexArrayObject() noexcept
 	Modifiers
 */
 
-void VertexArrayObject::Bind(const VertexDeclaration &vertex_declaration, const VertexBufferView &vbo) noexcept
+void VertexArrayObject::Bind() noexcept
 {
-	if (handle_ && vbo)
-		vertex_array_object::detail::bind_vertex_attributes(vertex_declaration, *handle_, *vbo.Handle(), vbo.Offset());
+	if (handle_)
+		detail::bind_vertex_array_object(*handle_);
+}
+
+void VertexArrayObject::Bind(const VertexDeclaration &vertex_declaration, const VertexBufferView &vertex_buffer) noexcept
+{
+	if (handle_ && vertex_buffer)
+		detail::bind_vertex_attributes(vertex_declaration, *handle_, *vertex_buffer.Handle(), vertex_buffer.Offset());
+}
+
+void VertexArrayObject::Unbind() noexcept
+{
+	if (handle_)
+		detail::bind_vertex_array_object(0);
 }
 
 } //ion::graphics::render::vertex

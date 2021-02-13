@@ -59,6 +59,13 @@ int vertex_draw_mode_to_gl_draw_mode(VertexDrawMode draw_mode) noexcept
 	}
 }
 
+int get_vertex_count(const VertexDeclaration &vertex_declaration, const VertexData &vertex_data) noexcept
+{
+	return vertex_data && vertex_declaration.VertexSize() > 0 ?
+		vertex_data.Size() / vertex_declaration.VertexSize() :
+		0;
+}
+
 
 /*
 	Graphics API
@@ -270,13 +277,20 @@ void disable_vertex_pointers(const VertexDeclaration &vertex_declaration) noexce
 } //vertex_batch::detail
 
 
+VertexBatch::VertexBatch(VertexDrawMode draw_mode, VertexDeclaration vertex_declaration) noexcept :
+
+	draw_mode_{draw_mode},
+	vertex_declaration_{std::move(vertex_declaration)}
+{
+	//Empty
+}
+
 VertexBatch::VertexBatch(VertexDrawMode draw_mode, VertexDeclaration vertex_declaration, const VertexData &vertex_data) noexcept :
 
 	draw_mode_{draw_mode},
 	vertex_declaration_{std::move(vertex_declaration)},
 	vertex_data_{vertex_data},
-	vertex_count_{vertex_data && std::ssize(vertex_declaration_.Elements()) > 0 ?
-		vertex_data.Size() / vertex_declaration_.VertexSize() : 0}
+	vertex_count_{detail::get_vertex_count(vertex_declaration, vertex_data)}
 {
 	//Empty
 }
@@ -324,10 +338,10 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 		return;
 	
 	auto use_vbo = vbo_ && *vbo_;
-	auto use_vao = shader_program && vao_ && *vao_ && use_vbo;
+	auto use_vao = shader_program && use_vbo && vao_ && *vao_;
 	auto has_all_attributes = true;
 
-	//Use shaders
+	//Use shader
 	if (shader_program && shader_program->Handle())
 	{
 		//Check if shader program has all attributes declared in vertex declaration
@@ -344,25 +358,22 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 
 		if (!use_vao)
 		{
+			if (use_vbo)
+				vbo_->Bind();
+
 			if (has_all_attributes)
 			{
 				//VRAM
 				if (use_vbo)
-				{
-					vertex_buffer_object::detail::bind_vertex_buffer_object(*vbo_->Handle());
 					detail::set_vertex_attribute_pointers(vertex_declaration_, vbo_->Offset(), *shader_program);
-				}
 				else //RAM
 					detail::set_vertex_attribute_pointers(vertex_declaration_, vertex_data_.Pointer(), *shader_program);
 			}
-			else
+			else //Client-side
 			{
 				//VRAM
 				if (use_vbo)
-				{
-					vertex_buffer_object::detail::bind_vertex_buffer_object(*vbo_->Handle());
 					detail::set_vertex_pointers(vertex_declaration_, vbo_->Offset());
-				}
 				else //RAM
 					detail::set_vertex_pointers(vertex_declaration_, vertex_data_.Pointer());
 			}
@@ -377,7 +388,7 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 			//VRAM
 			if (use_vbo)
 			{
-				vertex_buffer_object::detail::bind_vertex_buffer_object(*vbo_->Handle());
+				vbo_->Bind();
 				detail::set_vertex_pointers(vertex_declaration_, vbo_->Offset());
 			}
 			else //RAM
@@ -387,24 +398,27 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 
 
 	if (use_vao)
-		vertex_array_object::detail::bind_vertex_array_object(*vao_->Handle());
+		vao_->Bind();
 
-	glDrawArrays(detail::vertex_draw_mode_to_gl_draw_mode(draw_mode_), 0, vertex_count_);
+	glDrawArrays(detail::vertex_draw_mode_to_gl_draw_mode(draw_mode_), 0, vertex_count_); //Draw
 
 	if (use_vao)
-		vertex_array_object::detail::bind_vertex_array_object(0);
+		vao_->Unbind();
 
 
-	//Shaders
+	//Use shader
 	if (shader_program && shader_program->Handle())
 	{
 		if (!use_vao)
 		{
 			if (has_all_attributes)
 				detail::disable_vertex_attribute_pointers(vertex_declaration_, *shader_program);
-			else
+			else //Client-side
 				detail::disable_vertex_pointers(vertex_declaration_);
 		}
+
+		if (use_vbo)
+			vbo_->Unbind();
 
 		shaders::shader_program_manager::detail::use_shader_program(0);
 	}
@@ -416,7 +430,7 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 
 			//VRAM
 			if (use_vbo)
-				vertex_buffer_object::detail::bind_vertex_buffer_object(0);
+				vbo_->Unbind();
 		}
 	}
 }

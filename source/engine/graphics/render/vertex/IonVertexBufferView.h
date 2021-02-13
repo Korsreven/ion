@@ -75,6 +75,13 @@ namespace ion::graphics::render::vertex
 				Modifiers
 			*/
 
+			//Bind the given vertex buffer view
+			void Bind() noexcept;
+
+			//Unbind the given vertex buffer view
+			void Unbind() noexcept;
+
+
 			//Sets the buffer data for this vertex buffer view to the given vertex data with offset
 			void Data(const VertexData &vertex_data, int offset = 0) noexcept;
 
@@ -85,7 +92,7 @@ namespace ion::graphics::render::vertex
 
 			//Returns the handle to this vertex buffer view
 			//Returns nullopt if this vertex buffer view has no handle
-			[[nodiscard]] inline auto& Handle() const noexcept
+			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return handle_;
 			}

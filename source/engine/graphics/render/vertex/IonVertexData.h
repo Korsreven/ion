@@ -68,6 +68,18 @@ namespace ion::graphics::render::vertex
 				Operators
 			*/
 
+			//Checks if two vertex data are equal (pointers and sizes are equal)
+			[[nodiscard]] inline auto operator==(const VertexData &rhs) const noexcept
+			{
+				return pointer_ == rhs.pointer_ && size_ == rhs.size_;
+			}
+
+			//Checks if two vertex data are different (pointers and sizes are different)
+			[[nodiscard]] inline auto operator!=(const VertexData &rhs) const noexcept
+			{
+				return !(*this == rhs);
+			}
+
 			//Returns true if vertex data points to some vertices
 			[[nodiscard]] inline operator bool() const noexcept
 			{

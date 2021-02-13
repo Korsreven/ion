@@ -95,8 +95,14 @@ namespace ion::graphics::render::vertex
 				Modifiers
 			*/
 
-			//Bind vertex attributes to vbo and store bindings in this vertex array object
-			void Bind(const VertexDeclaration &vertex_declaration, const VertexBufferView &vbo) noexcept;
+			//Bind the given vertex array object
+			void Bind() noexcept;
+
+			//Bind vertex attributes declared in the given declaration to the given vertex buffer and store bindings in this vertex array object
+			void Bind(const VertexDeclaration &vertex_declaration, const VertexBufferView &vertex_buffer) noexcept;
+
+			//Unbind the given vertex array object
+			void Unbind() noexcept;
 
 
 			/*
@@ -104,7 +110,7 @@ namespace ion::graphics::render::vertex
 			*/
 
 			//Returns the handle to this vertex array object
-			[[nodiscard]] inline auto& Handle() const noexcept
+			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return handle_;
 			}

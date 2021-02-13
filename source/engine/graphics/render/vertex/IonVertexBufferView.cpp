@@ -56,6 +56,19 @@ VertexBufferView::VertexBufferView(int handle, int offset, int size) noexcept :
 	Modifiers
 */
 
+void VertexBufferView::Bind() noexcept
+{
+	if (handle_)
+		vertex_buffer_object::detail::bind_vertex_buffer_object(*handle_);
+}
+
+void VertexBufferView::Unbind() noexcept
+{
+	if (handle_)
+		vertex_buffer_object::detail::bind_vertex_buffer_object(0);
+}
+
+
 void VertexBufferView::Data(const VertexData &vertex_data, int offset) noexcept
 {
 	if (handle_ && offset_ + offset + vertex_data.Size() <= size_)

@@ -120,6 +120,13 @@ namespace ion::graphics::render::vertex
 				Modifiers
 			*/
 
+			//Bind the given vertex buffer object
+			void Bind() noexcept;
+
+			//Unbind the given vertex buffer object
+			void Unbind() noexcept;
+
+
 			//Sets the buffer data for this vertex buffer object to the given vertex data
 			void Data(const VertexData &vertex_data) noexcept;
 
@@ -143,7 +150,7 @@ namespace ion::graphics::render::vertex
 
 			//Returns the handle to this vertex buffer object
 			//Returns nullopt if this vertex buffer has no handle
-			[[nodiscard]] inline auto& Handle() const noexcept
+			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return handle_;
 			}

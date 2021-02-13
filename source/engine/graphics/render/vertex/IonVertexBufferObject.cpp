@@ -232,6 +232,19 @@ VertexBufferObject::~VertexBufferObject() noexcept
 	Modifiers
 */
 
+void VertexBufferObject::Bind() noexcept
+{
+	if (handle_)
+		detail::bind_vertex_buffer_object(*handle_);
+}
+
+void VertexBufferObject::Unbind() noexcept
+{
+	if (handle_)
+		detail::bind_vertex_buffer_object(0);
+}
+
+
 void VertexBufferObject::Data(const VertexData &vertex_data) noexcept
 {
 	Data(vertex_data, usage_);
