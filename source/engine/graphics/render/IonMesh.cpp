@@ -731,7 +731,7 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 			vertex_color->Location().value_or(2) == 2 &&
 			vertex_tex_coord->Location().value_or(3) == 3;
 
-		shaders::shader_program_manager::detail::use_shader_program(*shader_program->Handle());	
+		shader_program->Owner()->ActivateShaderProgram(*shader_program);
 
 		if (!use_vao)
 		{
@@ -817,7 +817,7 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 				detail::disable_vertex_pointers();
 		}
 
-		shaders::shader_program_manager::detail::use_shader_program(0);
+		shader_program->Owner()->DeactivateShaderProgram(*shader_program);
 
 		//Has material
 		if (material_)

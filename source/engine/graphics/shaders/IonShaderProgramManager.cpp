@@ -760,6 +760,27 @@ void set_uniform_value::operator()(const glsl::uniform<glsl::sampler2D> &value) 
 
 } //shader_manager::detail
 
+
+//Private
+
+void ShaderProgramManager::ActivateShaderProgram(int handle) noexcept
+{
+	if (handle != active_shader_program_handle_)
+		detail::use_shader_program(active_shader_program_handle_ = handle);
+}
+
+void ShaderProgramManager::DeactivateShaderProgram(int handle) noexcept
+{
+	if (handle == active_shader_program_handle_)
+		detail::use_shader_program(active_shader_program_handle_ = 0);
+}
+
+bool ShaderProgramManager::IsShaderProgramActive(int handle) noexcept
+{
+	return handle == active_shader_program_handle_;
+}
+
+
 //Protected
 
 /*
@@ -800,6 +821,9 @@ bool ShaderProgramManager::UnloadResource(ShaderProgram &shader_program) noexcep
 		detail::unload_shader_program(*handle);
 		shader_program.Handle({});
 
+		if (IsShaderProgramActive(*handle))
+			active_shader_program_handle_ = 0;
+
 		//Set all attribute variable locations to nullopt
 		for (auto &attribute_variable : shader_program.AttributeVariables())
 			attribute_variable.Location({});
@@ -807,6 +831,14 @@ bool ShaderProgramManager::UnloadResource(ShaderProgram &shader_program) noexcep
 		//Set all uniform variable locations to nullopt
 		for (auto &uniform_variable : shader_program.UniformVariables())
 			uniform_variable.Location({});
+
+		//Set all struct member locations to nullopt
+		for (auto &shader_struct : shader_program.Structs())
+		{
+			//Set all uniform variable locations inside struct to nullopt
+			for (auto &uniform_variable : shader_struct.UniformVariables())
+				uniform_variable.Location({});
+		}
 
 		return true;
 	}
@@ -917,8 +949,40 @@ bool ShaderProgramManager::RemoveShaderProgram(std::string_view name) noexcept
 
 
 /*
+	Shader programs
+	Activate / deactivate
+*/
+
+void ShaderProgramManager::ActivateShaderProgram(const ShaderProgram &shader_program) noexcept
+{
+	if (shader_program.Owner() != this)
+		return;
+
+	if (auto handle = shader_program.Handle(); handle)
+		ActivateShaderProgram(*handle);
+}
+
+void ShaderProgramManager::DeactivateShaderProgram(const ShaderProgram &shader_program) noexcept
+{
+	if (shader_program.Owner() != this)
+		return;
+
+	if (auto handle = shader_program.Handle(); handle)
+		DeactivateShaderProgram(*handle);
+}
+
+bool ShaderProgramManager::IsShaderProgramActive(const ShaderProgram &shader_program) const noexcept
+{
+	if (auto handle = shader_program.Handle(); handle)
+		return IsShaderProgramActive(*handle);
+	else
+		return false;
+}
+
+
+/*
 	Shader variables
-	Updating
+	Load / send
 */
 
 void ShaderProgramManager::LoadShaderVariableLocations(ShaderProgram &shader_program) noexcept
@@ -988,10 +1052,10 @@ void ShaderProgramManager::SendShaderVariableValues(ShaderProgram &shader_progra
 
 	if (auto handle = shader_program.Handle(); handle)
 	{
-		auto in_use = detail::get_active_shader_program() == *handle;
+		auto in_use = IsShaderProgramActive(*handle);
 
 		if (!in_use)
-			detail::use_shader_program(*handle);
+			ActivateShaderProgram(*handle);
 
 		//Update all attribute variables attached to shader program
 		for (auto &attribute_variable : shader_program.AttributeVariables())
@@ -1010,7 +1074,7 @@ void ShaderProgramManager::SendShaderVariableValues(ShaderProgram &shader_progra
 		}
 
 		if (!in_use)
-			detail::use_shader_program(0);
+			DeactivateShaderProgram(*handle);
 	}
 }
 
@@ -1021,17 +1085,17 @@ void ShaderProgramManager::SendAttributeValues(ShaderProgram &shader_program) no
 
 	if (auto handle = shader_program.Handle(); handle)
 	{
-		auto in_use = detail::get_active_shader_program() == *handle;
+		auto in_use = IsShaderProgramActive(*handle);
 
 		if (!in_use)
-			detail::use_shader_program(*handle);
+			ActivateShaderProgram(*handle);
 
 		//Update all attribute variables attached to shader program
 		for (auto &attribute_variable : shader_program.AttributeVariables())
 			detail::send_attribute_value(*handle, attribute_variable);
 
 		if (!in_use)
-			detail::use_shader_program(0);
+			DeactivateShaderProgram(*handle);
 	}
 }
 
@@ -1042,10 +1106,10 @@ void ShaderProgramManager::SendUniformValues(ShaderProgram &shader_program) noex
 
 	if (auto handle = shader_program.Handle(); handle)
 	{
-		auto in_use = detail::get_active_shader_program() == *handle;
+		auto in_use = IsShaderProgramActive(*handle);
 
 		if (!in_use)
-			detail::use_shader_program(*handle);
+			ActivateShaderProgram(*handle);
 
 		//Update all uniform variables attached to shader program
 		for (auto &uniform_variable : shader_program.UniformVariables())
@@ -1060,7 +1124,7 @@ void ShaderProgramManager::SendUniformValues(ShaderProgram &shader_program) noex
 		}
 
 		if (!in_use)
-			detail::use_shader_program(0);
+			DeactivateShaderProgram(*handle);
 	}
 }
 
@@ -1073,10 +1137,10 @@ void ShaderProgramManager::SendUniformValues(ShaderStruct &shader_struct) noexce
 
 	if (auto handle = shader_program->Handle(); handle)
 	{
-		auto in_use = detail::get_active_shader_program() == *handle;
+		auto in_use = IsShaderProgramActive(*handle);
 
 		if (!in_use)
-			detail::use_shader_program(*handle);
+			ActivateShaderProgram(*handle);
 
 		//Update all struct members attached to shader program
 		for (auto &s_struct : shader_program->Structs())
@@ -1087,7 +1151,7 @@ void ShaderProgramManager::SendUniformValues(ShaderStruct &shader_struct) noexce
 		}
 
 		if (!in_use)
-			detail::use_shader_program(0);
+			DeactivateShaderProgram(*handle);
 	}
 }
 

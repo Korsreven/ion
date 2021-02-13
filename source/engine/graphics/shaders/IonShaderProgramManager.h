@@ -258,6 +258,14 @@ namespace ion::graphics::shaders
 
 			std::optional<shader_program_manager::InfoLogLevel> log_level_;
 
+
+			inline static auto active_shader_program_handle_ = 0;
+				//Only one shader program can be in use at any given time
+
+			static void ActivateShaderProgram(int handle) noexcept;
+			static void DeactivateShaderProgram(int handle) noexcept;
+			static bool IsShaderProgramActive(int handle) noexcept;
+
 		protected:
 
 			/*
@@ -422,6 +430,21 @@ namespace ion::graphics::shaders
 
 			//Remove a removable shader program with the given name from this manager
 			bool RemoveShaderProgram(std::string_view name) noexcept;
+
+
+			/*
+				Shader programs
+				Activate / deactivate
+			*/
+
+			//Activate (use) the given shader progam (if not already active)
+			void ActivateShaderProgram(const ShaderProgram &shader_program) noexcept;
+
+			//Deactive the given shader progam (if active)
+			void DeactivateShaderProgram(const ShaderProgram &shader_program) noexcept;
+
+			//Returns true if the given shader program is currently active (in use)
+			[[nodiscard]] bool IsShaderProgramActive(const ShaderProgram &shader_program) const noexcept;
 
 
 			/*

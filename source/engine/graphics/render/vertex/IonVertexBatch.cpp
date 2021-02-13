@@ -337,12 +337,15 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 	if (vertex_count_ == 0)
 		return;
 	
+	auto use_shader = shader_program && shader_program->Owner() && shader_program->Handle();
+	auto shader_in_use = use_shader && shader_program->Owner()->IsShaderProgramActive(*shader_program);
+	auto has_all_attributes = use_shader;
+
 	auto use_vbo = vbo_ && *vbo_;
-	auto use_vao = shader_program && use_vbo && vao_ && *vao_;
-	auto has_all_attributes = true;
+	auto use_vao = use_shader && use_vbo && vao_ && *vao_;
 
 	//Use shader
-	if (shader_program && shader_program->Handle())
+	if (use_shader)
 	{
 		//Check if shader program has all attributes declared in vertex declaration
 		for (auto i = 0; auto &vertex_element : vertex_declaration_.Elements())
@@ -354,7 +357,8 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 			}
 		}
 
-		shaders::shader_program_manager::detail::use_shader_program(*shader_program->Handle());	
+		if (!shader_in_use)
+			shader_program->Owner()->ActivateShaderProgram(*shader_program);
 
 		if (!use_vao)
 		{
@@ -407,7 +411,7 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 
 
 	//Use shader
-	if (shader_program && shader_program->Handle())
+	if (use_shader)
 	{
 		if (!use_vao)
 		{
@@ -420,7 +424,8 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 		if (use_vbo)
 			vbo_->Unbind();
 
-		shaders::shader_program_manager::detail::use_shader_program(0);
+		if (!shader_in_use)
+			shader_program->Owner()->DeactivateShaderProgram(*shader_program);
 	}
 	else //Fixed-function pipeline
 	{
