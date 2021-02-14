@@ -106,7 +106,7 @@ namespace ion::graphics::render::vertex
 			VertexDeclaration() = default;
 
 			//Construct a new vertex declaration with the given vertex elements
-			explicit VertexDeclaration(int vertex_size, vertex_declaration::VertexElements vertex_elements) noexcept;
+			VertexDeclaration(int vertex_size, vertex_declaration::VertexElements vertex_elements) noexcept;
 
 
 			/*
