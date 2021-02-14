@@ -765,7 +765,7 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 		if (material_)
 			detail::set_material_uniforms(*material_, time_, *shader_program);
 
-		if (auto has_material = shader_program->GetUniform(shaders::shader_layout::UniformName::Mesh_HasMaterial); has_material)
+		if (auto has_material = shader_program->GetUniform(shaders::shader_layout::UniformName::HasMaterial); has_material)
 			has_material->Get<bool>() = !!material_;
 
 		shader_program->Owner()->SendUniformValues(*shader_program);

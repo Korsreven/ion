@@ -34,7 +34,6 @@ namespace ion::graphics::shaders
 			Matrix,
 			Scene,
 			Camera,
-			Mesh,
 			Material,
 			Light
 		};
@@ -59,8 +58,8 @@ namespace ion::graphics::shaders
 			Scene_LightCount,
 
 			Camera_Position,
-			Mesh_HasMaterial,
 			
+			HasMaterial,
 			Material_Ambient,
 			Material_Diffuse,
 			Material_Specular,
@@ -126,7 +125,6 @@ namespace ion::graphics::shaders
 				{StructName::Matrix,	"matrix"},
 				{StructName::Scene,		"scene"},
 				{StructName::Camera,	"camera"},
-				{StructName::Mesh,		"mesh"},
 				{StructName::Material,	"material"},
 				{StructName::Light,		"light"}
 			};
@@ -153,8 +151,8 @@ namespace ion::graphics::shaders
 				{UniformName::Scene_LightCount,				{"scene.light_count",				5}},
 
 				{UniformName::Camera_Position,				{"camera.position",					6}},
-				{UniformName::Mesh_HasMaterial,				{"mesh.has_material",				7}},
 
+				{UniformName::HasMaterial,					{"has_material",					7}},
 				{UniformName::Material_Ambient,				{"material.ambient",				8}},
 				{UniformName::Material_Diffuse,				{"material.diffuse",				9}},
 				{UniformName::Material_Specular,			{"material.specular",				10}},

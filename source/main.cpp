@@ -413,7 +413,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto matrix_struct = mesh_shader_prog->CreateStruct("matrix");
 			auto scene_struct = mesh_shader_prog->CreateStruct("scene");
 			auto camera_struct = mesh_shader_prog->CreateStruct("camera");
-			auto mesh_struct = mesh_shader_prog->CreateStruct("mesh");
 			auto material_struct = mesh_shader_prog->CreateStruct("material");
 			auto light_struct = mesh_shader_prog->CreateStruct("light", 8);
 
@@ -435,12 +434,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto scene_light_count = scene_struct->CreateUniform<int>("light_count");
 
 			//Camera
-			auto camera_position = camera_struct->CreateUniform<glsl::vec3>("position");
-
-			//Mesh
-			auto mesh_has_material = mesh_struct->CreateUniform<bool>("has_material");
+			auto camera_position = camera_struct->CreateUniform<glsl::vec3>("position");	
 
 			//Material
+			auto has_material = mesh_shader_prog->CreateUniform<bool>("has_material");
 			auto material_ambient = material_struct->CreateUniform<glsl::vec4>("ambient");
 			auto material_diffuse = material_struct->CreateUniform<glsl::vec4>("diffuse");
 			auto material_specular = material_struct->CreateUniform<glsl::vec4>("specular");

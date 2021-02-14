@@ -14,7 +14,9 @@ File:	IonVertexBatch.cpp
 
 #include <cstddef>
 #include "graphics/IonGraphicsAPI.h"
+#include "graphics/materials/IonMaterial.h"
 #include "graphics/shaders/IonShaderLayout.h"
+#include "graphics/shaders/IonShaderProgram.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
 
 namespace ion::graphics::render::vertex
@@ -274,6 +276,111 @@ void disable_vertex_pointers(const VertexDeclaration &vertex_declaration) noexce
 	}
 }
 
+
+void bind_texture(int texture_handle) noexcept
+{
+	if (texture_handle > 0)
+		glEnable(GL_TEXTURE_2D);
+	else
+		glDisable(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, texture_handle);
+}
+
+void bind_texture(int texture_handle, int texture_unit) noexcept
+{
+	switch (gl::MultiTexture_Support())
+	{
+		case gl::Extension::Core:
+		glActiveTexture(GL_TEXTURE0 + texture_unit);
+		break;
+
+		case gl::Extension::ARB:
+		glActiveTextureARB(GL_TEXTURE0_ARB + texture_unit);
+		break;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, texture_handle);
+}
+
+
+void set_has_material_uniform(materials::Material *material, shaders::ShaderProgram &shader_program) noexcept
+{
+	if (auto has_material = shader_program.GetUniform(shaders::shader_layout::UniformName::HasMaterial); has_material)
+		has_material->Get<bool>() = !!material;
+}
+
+void set_material_uniforms(materials::Material &material, duration time, shaders::ShaderProgram &shader_program) noexcept
+{
+	using namespace shaders::variables;
+
+	if (auto ambient = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Ambient); ambient)
+		ambient->Get<glsl::vec4>() = material.AmbientColor();
+
+	if (auto diffuse = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Diffuse); diffuse)
+		diffuse->Get<glsl::vec4>() = material.DiffuseColor();
+
+	if (auto specular = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Specular); specular)
+		specular->Get<glsl::vec4>() = material.SpecularColor();
+
+	if (auto emissive = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Emissive); emissive)
+		emissive->Get<glsl::vec4>() = material.EmissiveColor();
+
+	if (auto shininess = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Shininess); shininess)
+		shininess->Get<float>() = material.Shininess(); //Using 'real' could make this uniform double
+
+
+	auto diffuse_map_activated = false;
+	auto specular_map_activated = false;
+	auto normal_map_activated = false;
+	
+	if (auto diffuse_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_DiffuseMap); diffuse_map)
+	{
+		if (auto texture = material.DiffuseMap(time); texture && texture->Handle())
+		{
+			if (auto texture_unit = diffuse_map->Get<glsl::sampler2D>(); texture_unit >= 0)
+			{
+				bind_texture(*texture->Handle(), texture_unit);
+				diffuse_map_activated = true;
+			}
+		}
+	}
+
+	if (auto specular_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_SpecularMap); specular_map)
+	{
+		if (auto texture = material.SpecularMap(time); texture && texture->Handle())
+		{
+			if (auto texture_unit = specular_map->Get<glsl::sampler2D>(); texture_unit >= 0)
+			{
+				bind_texture(*texture->Handle(), texture_unit);
+				specular_map_activated = true;
+			}
+		}
+	}
+	
+	if (auto normal_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_NormalMap); normal_map)
+	{
+		if (auto texture = material.NormalMap(time); texture && texture->Handle())
+		{
+			if (auto texture_unit = normal_map->Get<glsl::sampler2D>(); texture_unit >= 0)
+			{
+				bind_texture(*texture->Handle(), texture_unit);
+				normal_map_activated = true;
+			}
+		}
+	}
+
+
+	if (auto has_diffuse_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasDiffuseMap); has_diffuse_map)
+		has_diffuse_map->Get<bool>() = diffuse_map_activated;
+
+	if (auto has_specular_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasSpecularMap); has_specular_map)
+		has_specular_map->Get<bool>() = specular_map_activated;
+
+	if (auto has_normal_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasNormalMap); has_normal_map)
+		has_normal_map->Get<bool>() = normal_map_activated;
+}
+
 } //vertex_batch::detail
 
 
@@ -384,6 +491,14 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 
 			shader_program->Owner()->SendAttributeValues(*shader_program);
 		}
+
+		detail::set_has_material_uniform(material_.get(), *shader_program);
+
+		//Has material
+		if (material_)
+			detail::set_material_uniforms(*material_, time_, *shader_program);
+
+		shader_program->Owner()->SendUniformValues(*shader_program);
 	}
 	else //Fixed-function pipeline
 	{
@@ -397,6 +512,14 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 			}
 			else //RAM
 				detail::set_vertex_pointers(vertex_declaration_, vertex_data_.Pointer());
+		}
+
+		//Has material
+		if (material_)
+		{
+			//Enable diffuse texture
+			if (auto diffuse_map = material_->DiffuseMap(time_); diffuse_map && diffuse_map->Handle())
+				detail::bind_texture(*diffuse_map->Handle());
 		}
 	}
 
@@ -426,6 +549,10 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 
 		if (!shader_in_use)
 			shader_program->Owner()->DeactivateShaderProgram(*shader_program);
+
+		//Has material
+		if (material_)
+			detail::bind_texture(0, 0);
 	}
 	else //Fixed-function pipeline
 	{
@@ -437,7 +564,21 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 			if (use_vbo)
 				vbo_->Unbind();
 		}
+
+		//Has material
+		if (material_)
+			detail::bind_texture(0);
 	}
+}
+
+
+/*
+	Elapse time
+*/
+
+void VertexBatch::Elapse(duration time) noexcept
+{
+	time_ += time;
 }
 
 } //ion::graphics::render::vertex

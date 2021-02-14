@@ -19,11 +19,27 @@ File:	IonVertexBatch.h
 #include "IonVertexBufferObject.h"
 #include "IonVertexData.h"
 #include "IonVertexDeclaration.h"
-#include "graphics/shaders/IonShaderProgram.h"
+#include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
+
+//Forward declarations
+namespace ion::graphics
+{
+	namespace materials
+	{
+		class Material;
+	}
+
+	namespace shaders
+	{
+		class ShaderProgram;
+	}
+}
 
 namespace ion::graphics::render::vertex
 {
+	using namespace types::type_literals;
+
 	namespace vertex_batch
 	{
 		enum class VertexDrawMode
@@ -61,6 +77,12 @@ namespace ion::graphics::render::vertex
 			void set_vertex_pointers(const VertexDeclaration &vertex_declaration, int vbo_offset) noexcept;
 			void set_vertex_pointers(const VertexDeclaration &vertex_declaration, const void *data) noexcept;
 			void disable_vertex_pointers(const VertexDeclaration &vertex_declaration) noexcept;
+
+			void bind_texture(int texture_handle) noexcept;
+			void bind_texture(int texture_handle, int texture_unit) noexcept;
+			
+			void set_has_material_uniform(materials::Material *material, shaders::ShaderProgram &shader_program) noexcept;
+			void set_material_uniforms(materials::Material &material, duration time, shaders::ShaderProgram &shader_program) noexcept;
 		} //detail
 	} //vertex_batch
 
@@ -76,7 +98,9 @@ namespace ion::graphics::render::vertex
 
 			std::optional<VertexArrayObject> vao_;
 			std::optional<VertexBufferView> vbo_;
+			NonOwningPtr<materials::Material> material_;
 
+			duration time_ = 0.0_sec;
 			bool reload_vertex_data_ = false;
 			bool rebind_vertex_attributes_ = false;
 
@@ -130,6 +154,13 @@ namespace ion::graphics::render::vertex
 				}
 			}
 
+			//Sets the material used by this vertex batch to the given material
+			inline void BatchMaterial(NonOwningPtr<materials::Material> material) noexcept
+			{
+				if (material_ != material)
+					material_ = material;
+			}
+
 
 			/*
 				Observers
@@ -175,6 +206,13 @@ namespace ion::graphics::render::vertex
 				return vbo_;
 			}
 
+			//Returns the material that this vertex batch is using
+			//Returns nullptr if no material is available
+			[[nodiscard]] inline auto BatchMaterial() const noexcept
+			{
+				return material_;
+			}
+
 
 			/*
 				Drawing
@@ -187,6 +225,15 @@ namespace ion::graphics::render::vertex
 			//Draw all of the vertices in this vertex batch with the given shader program (optional)
 			//This can be called multiple times if more than one pass
 			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept;
+
+
+			/*
+				Elapse time
+			*/
+
+			//Elapse the total time for this vertex batch by the given time in seconds
+			//This function is typically called each frame, with the time in seconds since last frame
+			void Elapse(duration time) noexcept;
 	};
 } //ion::graphics::render::vertex
 
