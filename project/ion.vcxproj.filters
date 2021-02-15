@@ -878,7 +878,7 @@
     <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexBatch.h">
       <Filter>Header Files\graphics\render\vertex</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexData.h">
+    <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexDataView.h">
       <Filter>Header Files\graphics\render\vertex</Filter>
     </ClInclude>
   </ItemGroup>

@@ -14,7 +14,7 @@ File:	IonVertexBufferObject.h
 #define ION_VERTEX_BUFFER_OBJECT_H
 
 #include <optional>
-#include "IonVertexData.h"
+#include "IonVertexDataView.h"
 
 namespace ion::graphics::render::vertex
 {
@@ -128,13 +128,13 @@ namespace ion::graphics::render::vertex
 
 
 			//Sets the buffer data for this vertex buffer object to the given vertex data
-			void Data(const VertexData &vertex_data) noexcept;
+			void Data(const VertexDataView &vertex_data) noexcept;
 
 			//Sets the buffer data for this vertex buffer object to the given vertex data with a new usage pattern
-			void Data(const VertexData &vertex_data, vertex_buffer_object::VertexBufferUsage usage) noexcept;
+			void Data(const VertexDataView &vertex_data, vertex_buffer_object::VertexBufferUsage usage) noexcept;
 
 			//Sets the buffer data for this vertex buffer object to the given vertex data with offset
-			void Data(const VertexData &vertex_data, int offset = 0) noexcept;
+			void Data(const VertexDataView &vertex_data, int offset = 0) noexcept;
 
 
 			//Reserves the buffer data for this vertex buffer object to the size

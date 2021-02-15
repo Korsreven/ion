@@ -245,12 +245,12 @@ void VertexBufferObject::Unbind() noexcept
 }
 
 
-void VertexBufferObject::Data(const VertexData &vertex_data) noexcept
+void VertexBufferObject::Data(const VertexDataView &vertex_data) noexcept
 {
 	Data(vertex_data, usage_);
 }
 
-void VertexBufferObject::Data(const VertexData &vertex_data, VertexBufferUsage usage) noexcept
+void VertexBufferObject::Data(const VertexDataView &vertex_data, VertexBufferUsage usage) noexcept
 {
 	if (handle_)
 	{
@@ -267,7 +267,7 @@ void VertexBufferObject::Data(const VertexData &vertex_data, VertexBufferUsage u
 	}
 }
 
-void VertexBufferObject::Data(const VertexData &vertex_data, int offset) noexcept
+void VertexBufferObject::Data(const VertexDataView &vertex_data, int offset) noexcept
 {
 	if (handle_ && offset + vertex_data.Size() <= size_)
 		detail::set_vertex_buffer_sub_data(*handle_, vertex_data.Pointer(), offset, vertex_data.Size()); //Copy data to VRAM

@@ -61,7 +61,7 @@ int vertex_draw_mode_to_gl_draw_mode(VertexDrawMode draw_mode) noexcept
 	}
 }
 
-int get_vertex_count(const VertexDeclaration &vertex_declaration, const VertexData &vertex_data) noexcept
+int get_vertex_count(const VertexDeclaration &vertex_declaration, const VertexDataView &vertex_data) noexcept
 {
 	return vertex_data && vertex_declaration.VertexSize() > 0 ?
 		vertex_data.Size() / vertex_declaration.VertexSize() :
@@ -392,7 +392,7 @@ VertexBatch::VertexBatch(VertexDrawMode draw_mode, VertexDeclaration vertex_decl
 	//Empty
 }
 
-VertexBatch::VertexBatch(VertexDrawMode draw_mode, VertexDeclaration vertex_declaration, const VertexData &vertex_data) noexcept :
+VertexBatch::VertexBatch(VertexDrawMode draw_mode, VertexDeclaration vertex_declaration, const VertexDataView &vertex_data) noexcept :
 
 	draw_mode_{draw_mode},
 	vertex_declaration_{std::move(vertex_declaration)},
@@ -404,7 +404,7 @@ VertexBatch::VertexBatch(VertexDrawMode draw_mode, VertexDeclaration vertex_decl
 
 
 /*
-	Drawing
+	Preparing / drawing
 */
 
 void VertexBatch::Prepare() noexcept

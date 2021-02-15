@@ -69,7 +69,7 @@ void VertexBufferView::Unbind() noexcept
 }
 
 
-void VertexBufferView::Data(const VertexData &vertex_data, int offset) noexcept
+void VertexBufferView::Data(const VertexDataView &vertex_data, int offset) noexcept
 {
 	if (handle_ && offset_ + offset + vertex_data.Size() <= size_)
 		vertex_buffer_object::detail::set_vertex_buffer_sub_data(*handle_, vertex_data.Pointer(), offset_ + offset, vertex_data.Size()); //Copy data to VRAM

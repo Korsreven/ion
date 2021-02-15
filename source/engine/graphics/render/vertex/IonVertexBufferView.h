@@ -14,7 +14,7 @@ File:	IonVertexBufferView.h
 #define ION_VERTEX_BUFFER_VIEW_H
 
 #include <optional>
-#include "IonVertexData.h"
+#include "IonVertexDataView.h"
 
 namespace ion::graphics::render::vertex
 {
@@ -83,7 +83,7 @@ namespace ion::graphics::render::vertex
 
 
 			//Sets the buffer data for this vertex buffer view to the given vertex data with offset
-			void Data(const VertexData &vertex_data, int offset = 0) noexcept;
+			void Data(const VertexDataView &vertex_data, int offset = 0) noexcept;
 
 
 			/*

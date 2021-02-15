@@ -6,18 +6,18 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/render/vertex
-File:	IonVertexData.h
+File:	IonVertexDataView.h
 -------------------------------------------
 */
 
-#ifndef ION_VERTEX_DATA_H
-#define ION_VERTEX_DATA_H
+#ifndef ION_VERTEX_DATA_VIEW_H
+#define ION_VERTEX_DATA_VIEW_H
 
 #include <vector>
 
 namespace ion::graphics::render::vertex
 {
-	namespace vertex_data
+	namespace vertex_data_view
 	{
 		template <typename T>
 		using VertexContainer = std::vector<T>;
@@ -25,10 +25,10 @@ namespace ion::graphics::render::vertex
 		namespace detail
 		{
 		} //detail
-	} //vertex_data
+	} //vertex_data_view
 
 
-	class VertexData
+	class VertexDataView
 	{
 		private:
 
@@ -39,11 +39,11 @@ namespace ion::graphics::render::vertex
 		public:
 
 			//Default constructor
-			VertexData() = default;
+			VertexDataView() = default;
 
-			//Construct a new vertex data with the given first vertex pointer and size of vertices
+			//Construct a new vertex data view with the given first vertex pointer and size of vertices
 			template <typename T>
-			VertexData(const T *first_vertex, int size) noexcept :
+			VertexDataView(const T *first_vertex, int size) noexcept :
 
 				pointer_{first_vertex},
 				size_{size * sizeof(T)},
@@ -52,9 +52,9 @@ namespace ion::graphics::render::vertex
 				//Empty
 			}
 
-			//Construct a new vertex data with the given vertices
+			//Construct a new vertex data view with the given vertices
 			template <typename T>
-			VertexData(const vertex_data::VertexContainer<T> &vertices) noexcept :
+			VertexDataView(const vertex_data_view::VertexContainer<T> &vertices) noexcept :
 
 				pointer_{std::data(vertices)},
 				size_{std::ssize(vertices) * sizeof(T)},
@@ -68,19 +68,19 @@ namespace ion::graphics::render::vertex
 				Operators
 			*/
 
-			//Checks if two vertex data are equal (pointers and sizes are equal)
-			[[nodiscard]] inline auto operator==(const VertexData &rhs) const noexcept
+			//Checks if two vertex data view are equal (pointers and sizes are equal)
+			[[nodiscard]] inline auto operator==(const VertexDataView &rhs) const noexcept
 			{
 				return pointer_ == rhs.pointer_ && size_ == rhs.size_;
 			}
 
-			//Checks if two vertex data are different (pointers and sizes are different)
-			[[nodiscard]] inline auto operator!=(const VertexData &rhs) const noexcept
+			//Checks if two vertex data view are different (pointers and sizes are different)
+			[[nodiscard]] inline auto operator!=(const VertexDataView &rhs) const noexcept
 			{
 				return !(*this == rhs);
 			}
 
-			//Returns true if vertex data points to some vertices
+			//Returns true if vertex data view points to some vertices
 			[[nodiscard]] inline operator bool() const noexcept
 			{
 				return !!pointer_;
@@ -91,7 +91,7 @@ namespace ion::graphics::render::vertex
 				Modifiers
 			*/
 
-			//Sets the vertex data pointer to the given first vertex and size of vertices
+			//Sets the vertex data view pointer to the given first vertex and size of vertices
 			template <typename T>
 			inline void Pointer(const T *first_vertex, int size) noexcept
 			{
@@ -100,9 +100,9 @@ namespace ion::graphics::render::vertex
 				element_size_ = sizeof(T);
 			}
 
-			//Sets the vertex data pointer to the given vertices
+			//Sets the vertex data view pointer to the given vertices
 			template <typename T>
-			inline void Pointer(const vertex_data::VertexContainer<T> &vertices) noexcept
+			inline void Pointer(const vertex_data_view::VertexContainer<T> &vertices) noexcept
 			{
 				pointer_ = std::data(vertices);
 				size_ = std::ssize(vertices) * sizeof(T);
@@ -114,19 +114,19 @@ namespace ion::graphics::render::vertex
 				Observers
 			*/
 
-			//Returns a pointer to the vertices of this vertex data
+			//Returns a pointer to the vertices of this vertex data view
 			[[nodiscard]] inline auto Pointer() const noexcept
 			{
 				return pointer_;
 			}
 
-			//Returns the size of the vertices of this vertex data
+			//Returns the size of the vertices of this vertex data view
 			[[nodiscard]] inline auto Size() const noexcept
 			{
 				return size_;
 			}
 			
-			//Returns the size of each element of this vertex data
+			//Returns the size of each element of this vertex data view
 			[[nodiscard]] inline auto ElementSize() const noexcept
 			{
 				return element_size_;

@@ -317,7 +317,7 @@
     <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexBufferObject.h" />
     <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexBufferView.h" />
     <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexBatch.h" />
-    <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexData.h" />
+    <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexDataView.h" />
     <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexDeclaration.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonCamera.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonLight.h" />
