@@ -78,7 +78,7 @@ File:	main.cpp
 #include "graphics/render/vertex/IonVertexBatch.h"
 #include "graphics/render/vertex/IonVertexBufferObject.h"
 #include "graphics/render/vertex/IonVertexBufferView.h"
-#include "graphics/render/vertex/IonVertexData.h"
+#include "graphics/render/vertex/IonVertexDataView.h"
 #include "graphics/render/vertex/IonVertexDeclaration.h"
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonLight.h"
