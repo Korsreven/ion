@@ -109,8 +109,9 @@ namespace ion::graphics::render::vertex
 			//Construct a new vertex batch with the given draw mode and vertex declaration
 			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration) noexcept;
 
-			//Construct a new vertex batch with the given draw mode, vertex declaration and vertex data
-			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration, const VertexDataView &vertex_data) noexcept;
+			//Construct a new vertex batch with the given draw mode, vertex declaration, vertex data and material (optional)
+			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration, const VertexDataView &vertex_data,
+				NonOwningPtr<materials::Material> material = nullptr) noexcept;
 
 
 			/*

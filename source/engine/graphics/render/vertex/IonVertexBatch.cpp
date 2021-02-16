@@ -392,12 +392,15 @@ VertexBatch::VertexBatch(VertexDrawMode draw_mode, VertexDeclaration vertex_decl
 	//Empty
 }
 
-VertexBatch::VertexBatch(VertexDrawMode draw_mode, VertexDeclaration vertex_declaration, const VertexDataView &vertex_data) noexcept :
+VertexBatch::VertexBatch(VertexDrawMode draw_mode, VertexDeclaration vertex_declaration, const VertexDataView &vertex_data,
+	NonOwningPtr<materials::Material> material) noexcept :
 
 	draw_mode_{draw_mode},
 	vertex_declaration_{std::move(vertex_declaration)},
 	vertex_data_{vertex_data},
-	vertex_count_{detail::get_vertex_count(vertex_declaration, vertex_data)}
+	vertex_count_{detail::get_vertex_count(vertex_declaration, vertex_data)},
+
+	material_{material}
 {
 	//Empty
 }

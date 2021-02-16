@@ -41,10 +41,10 @@ int VertexElement::Components() const noexcept
 } //vertex_declaration
 
 
-VertexDeclaration::VertexDeclaration(int vertex_size, VertexElements vertex_elements) noexcept :
-
-	vertex_size_{vertex_size},
-	vertex_elements_{std::move(vertex_elements)}
+VertexDeclaration::VertexDeclaration(vertex_declaration::VertexElements vertex_elements, std::optional<int> vertex_size = std::nullopt) :
+	
+	vertex_elements_{std::move(vertex_elements)},
+	vertex_size_{vertex_size}
 {
 	//Empty
 }

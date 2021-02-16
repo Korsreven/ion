@@ -13,6 +13,7 @@ File:	IonVertexDeclaration.h
 #ifndef ION_VERTEX_DECLARATION_H
 #define ION_VERTEX_DECLARATION_H
 
+#include <optional>
 #include <vector>
 
 #include "adaptors/ranges/IonIterable.h"
@@ -96,17 +97,17 @@ namespace ion::graphics::render::vertex
 	class VertexDeclaration final
 	{
 		private:
-
-			int vertex_size_ = 0;
+			
 			vertex_declaration::VertexElements vertex_elements_;
+			std::optional<int> vertex_size_;
 
 		public:
 
 			//Default constructor
 			VertexDeclaration() = default;
 
-			//Construct a new vertex declaration with the given vertex elements
-			VertexDeclaration(int vertex_size, vertex_declaration::VertexElements vertex_elements) noexcept;
+			//Construct a new vertex declaration with the given vertex elements and vertex size (optional)
+			explicit VertexDeclaration(vertex_declaration::VertexElements vertex_elements, std::optional<int> vertex_size = std::nullopt);
 
 
 			/*
@@ -132,8 +133,9 @@ namespace ion::graphics::render::vertex
 				Modifiers
 			*/
 
-			//Sets the vertex size for this vertex declaration to the given size
-			inline void VertexSize(int size) noexcept
+			//Sets the size of one vertex for this vertex declaration to the given size
+			//If nullopt is passed the vertex size would be automatically calculated
+			inline void VertexSize(std::optional<int> size) noexcept
 			{
 				vertex_size_ = size;
 			}
@@ -143,14 +145,14 @@ namespace ion::graphics::render::vertex
 				Observers
 			*/
 
-			//Returns the vertex size for this vertex declaration
-			[[nodiscard]] inline auto VertexSize() const noexcept
-			{
-				return vertex_size_;
-			}
-
 			//Returns the total number of components for this vertex declaration
 			[[nodiscard]] int Components() const noexcept;
+
+			//Returns the size of one vertex for this vertex declaration
+			[[nodiscard]] inline auto VertexSize() const noexcept
+			{
+				return vertex_size_ ? *vertex_size_ : Components() * sizeof(real);
+			}
 
 
 			/*
