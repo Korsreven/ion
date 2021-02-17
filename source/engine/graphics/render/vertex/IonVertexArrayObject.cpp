@@ -78,6 +78,7 @@ void bind_vertex_attributes(const VertexDeclaration &vertex_declaration, int vao
 	bind_vertex_array_object(0);
 }
 
+
 void set_vertex_attribute_pointers(const VertexDeclaration &vertex_declaration, int vbo_offset) noexcept
 {
 	//For fixed location attributes
@@ -87,6 +88,19 @@ void set_vertex_attribute_pointers(const VertexDeclaration &vertex_declaration, 
 		shaders::shader_program_manager::detail::set_attribute_value{i}.
 			set_vertex_pointer(i, vertex_element.Components(), false, vertex_element.Stride,
 							   (void*)(vbo_offset + vertex_element.Offset), real{});
+		glEnableVertexAttribArray(i++);
+	}
+}
+
+void set_vertex_attribute_pointers(const VertexDeclaration &vertex_declaration, const void *data) noexcept
+{
+	//For fixed location attributes
+
+	for (auto i = 0; auto &vertex_element : vertex_declaration.Elements())
+	{
+		shaders::shader_program_manager::detail::set_attribute_value{i}.
+			set_vertex_pointer(i, vertex_element.Components(), false, vertex_element.Stride,
+							   static_cast<const std::byte*>(data) + vertex_element.Offset, real{});
 		glEnableVertexAttribArray(i++);
 	}
 }

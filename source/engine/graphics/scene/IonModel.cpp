@@ -21,141 +21,6 @@ using namespace model;
 
 namespace model::detail
 {
-
-int model_buffer_usage_to_gl_buffer_usage(ModelBufferUsage buffer_usage) noexcept
-{
-	switch (buffer_usage)
-	{
-		case ModelBufferUsage::Dynamic:
-		return GL_DYNAMIC_DRAW;
-
-		case ModelBufferUsage::Stream:
-		return GL_STREAM_DRAW;
-
-		case ModelBufferUsage::Static:
-		default:
-		return GL_STATIC_DRAW;
-	}
-}
-
-ModelBufferUsage gl_buffer_usage_to_model_buffer_usage(int buffer_usage) noexcept
-{
-	switch (buffer_usage)
-	{
-		case GL_DYNAMIC_DRAW:
-		return ModelBufferUsage::Dynamic;
-
-		case GL_STREAM_DRAW:
-		return ModelBufferUsage::Stream;
-
-		case GL_STATIC_DRAW:
-		default:
-		return ModelBufferUsage::Static;
-	}
-}
-
-
-/*
-	Graphics API
-*/
-
-std::optional<int> create_vertex_buffer_object() noexcept
-{
-	auto handle = 0;
-
-	switch (gl::VertexBufferObject_Support())
-	{
-		case gl::Extension::Core:
-		glGenBuffers(1, reinterpret_cast<unsigned int*>(&handle));
-		break;
-
-		case gl::Extension::ARB:
-		glGenBuffersARB(1, reinterpret_cast<unsigned int*>(&handle));
-		break;
-	}
-
-	if (handle > 0)
-		return handle;
-	else
-		return {};
-}
-
-void delete_vertex_buffer_object(int vbo_handle) noexcept
-{
-	switch (gl::VertexBufferObject_Support())
-	{
-		case gl::Extension::Core:
-		glDeleteBuffers(1, reinterpret_cast<unsigned int*>(&vbo_handle));
-		break;
-
-		case gl::Extension::ARB:
-		glDeleteBuffersARB(1, reinterpret_cast<unsigned int*>(&vbo_handle));
-		break;
-	}
-}
-
-
-void set_vertex_buffer_data(int vbo_handle, ModelBufferUsage buffer_usage,
-	const render::mesh::detail::vertex_storage_type &vertex_buffer) noexcept
-{
-	render::mesh::detail::bind_vertex_buffer_object(vbo_handle);
-
-	switch (gl::VertexBufferObject_Support())
-	{
-		case gl::Extension::Core:
-		glBufferData(GL_ARRAY_BUFFER, std::size(vertex_buffer) * sizeof(real),
-			std::data(vertex_buffer), model_buffer_usage_to_gl_buffer_usage(buffer_usage));
-		break;
-
-		case gl::Extension::ARB:
-		glBufferDataARB(GL_ARRAY_BUFFER_ARB, std::size(vertex_buffer) * sizeof(real),
-			std::data(vertex_buffer), model_buffer_usage_to_gl_buffer_usage(buffer_usage));
-		break;
-	}
-
-	render::mesh::detail::bind_vertex_buffer_object(0);
-}
-
-int get_vertex_buffer_size(int vbo_handle) noexcept
-{
-	auto size = 0;
-	render::mesh::detail::bind_vertex_buffer_object(vbo_handle);
-
-	switch (gl::VertexBufferObject_Support())
-	{
-		case gl::Extension::Core:
-		glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-		break;
-
-		case gl::Extension::ARB:
-		glGetBufferParameterivARB(GL_ARRAY_BUFFER_ARB, GL_BUFFER_SIZE_ARB, &size);
-		break;
-	}
-
-	render::mesh::detail::bind_vertex_buffer_object(0);
-	return size / sizeof(real);
-}
-
-ModelBufferUsage get_vertex_buffer_usage(int vbo_handle) noexcept
-{
-	auto usage = 0;
-	render::mesh::detail::bind_vertex_buffer_object(vbo_handle);
-
-	switch (gl::VertexBufferObject_Support())
-	{
-		case gl::Extension::Core:
-		glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_USAGE, &usage);
-		break;
-
-		case gl::Extension::ARB:
-		glGetBufferParameterivARB(GL_ARRAY_BUFFER_ARB, GL_BUFFER_USAGE_ARB, &usage);
-		break;
-	}
-
-	render::mesh::detail::bind_vertex_buffer_object(0);
-	return gl_buffer_usage_to_model_buffer_usage(usage);
-}
-
 } //model::detail
 
 
@@ -167,86 +32,54 @@ void Model::Created(render::Mesh &mesh)
 	update_bounding_volumes_ |= reload_vertex_buffer_;
 }
 
-void Model::FetchVertexData()
+render::mesh::VertexContainer Model::MeshVertexData() const
 {
 	auto size = 0;
 	for (auto &mesh : Meshes())
-		size += render::mesh::detail::vertex_data_size(mesh.VertexCount());
+		size += std::ssize(mesh.VertexData());
 
-	vertex_buffer_.reserve(size);
+	render::mesh::VertexContainer vertex_data;
+	vertex_data.reserve(size);
 
 	//Copy and append vertex data from each mesh
 	for (auto &mesh : Meshes())
-		vertex_buffer_.insert(std::end(vertex_buffer_), std::begin(mesh.VertexData()), std::end(mesh.VertexData()));
+		vertex_data.insert(std::end(vertex_data), std::begin(mesh.VertexData()), std::end(mesh.VertexData()));
+
+	return vertex_data;
 }
 
 
 //Public
 
-Model::Model(model::ModelBufferUsage buffer_usage, bool visible) noexcept :
-
-	buffer_usage_{buffer_usage},
+Model::Model(bool visible) noexcept :
 	visible_{visible}
 {
 	//Empty
 }
 
-Model::~Model() noexcept
-{
-	if (vbo_handle_)
-		detail::delete_vertex_buffer_object(*vbo_handle_);
-}
-			
 
 /*
-	Modifiers
-*/
-
-
-
-
-/*
-	Observers
-*/
-
-
-
-
-/*
-	Drawing
+	Preparing / drawing
 */
 
 void Model::Prepare() noexcept
 {
 	if (reload_vertex_buffer_)
 	{
-		if (!vbo_handle_)
-			vbo_handle_ = detail::create_vertex_buffer_object();
+		if (!vbo_)
+			vbo_.emplace(render::vertex::vertex_buffer_object::VertexBufferUsage::Static);
 
-		if (vbo_handle_)
+		if (vbo_ && *vbo_)
 		{
-			if (std::empty(vertex_buffer_))
-				FetchVertexData();
-
-			if (!std::empty(vertex_buffer_))
+			if (auto vertex_data = MeshVertexData(); !std::empty(vertex_data))
 			{
-				//Reallocate new buffer
-				if (detail::get_vertex_buffer_size(*vbo_handle_) < std::ssize(vertex_buffer_) ||
-					detail::get_vertex_buffer_usage(*vbo_handle_) != buffer_usage_)
-
-					detail::set_vertex_buffer_data(*vbo_handle_, buffer_usage_, vertex_buffer_); //Send to VRAM
-				//Reuse same buffer
-				else
-					render::mesh::detail::set_vertex_buffer_sub_data(*vbo_handle_, 0, vertex_buffer_); //Send to VRAM
-
-				//Vertex data has been loaded to VRAM, clear RAM
-				vertex_buffer_.clear();
-				vertex_buffer_.shrink_to_fit();
+				vbo_->Data(vertex_data);
 
 				for (auto offset = 0; auto &mesh : Meshes())
 				{
-					mesh.VboHandle(vbo_handle_, offset);
-					offset += std::ssize(mesh.VertexData());
+					auto size = std::ssize(mesh.VertexData());
+					mesh.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), size * sizeof(real)), false);
+					offset += size;
 				}
 			}
 		}
@@ -317,14 +150,14 @@ NonOwningPtr<render::Mesh> Model::CreateMesh(const render::mesh::Vertices &verti
 	return ptr;
 }
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, bool visible)
+NonOwningPtr<render::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const render::mesh::Vertices &vertices, bool visible)
 {
 	auto ptr = Create(draw_mode, vertices, visible);
 	Created(*ptr);
 	return ptr;
 }
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, const render::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
+NonOwningPtr<render::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const render::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
 	auto ptr = Create(draw_mode, vertices, material, tex_coord_mode, visible);
@@ -333,14 +166,14 @@ NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::MeshDrawMode draw_mod
 }
 
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, bool visible)
+NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::VertexContainer vertex_data, bool visible)
 {
 	auto ptr = Create(std::move(vertex_data), visible);
 	Created(*ptr);
 	return ptr;
 }
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::detail::vertex_storage_type vertex_data, NonOwningPtr<materials::Material> material,
+NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
 	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
 	auto ptr = Create(std::move(vertex_data), material, tex_coord_mode, visible);
@@ -348,14 +181,14 @@ NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::detail::vertex_storag
 	return ptr;
 }
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, bool visible)
+NonOwningPtr<render::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::mesh::VertexContainer vertex_data, bool visible)
 {
 	auto ptr = Create(draw_mode, std::move(vertex_data), visible);
 	Created(*ptr);
 	return ptr;
 }
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::MeshDrawMode draw_mode, render::mesh::detail::vertex_storage_type vertex_data, NonOwningPtr<materials::Material> material,
+NonOwningPtr<render::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::mesh::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
 	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
 	auto ptr = Create(draw_mode, std::move(vertex_data), material, tex_coord_mode, visible);

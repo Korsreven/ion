@@ -229,7 +229,7 @@ namespace ion::graphics::scene
 			NonOwningPtr<Model> CreateModel();
 
 			//Create a model with the given vertex buffer usage pattern and visibility
-			NonOwningPtr<Model> CreateModel(model::ModelBufferUsage buffer_usage, bool visible = true);
+			NonOwningPtr<Model> CreateModel(bool visible);
 
 
 			/*

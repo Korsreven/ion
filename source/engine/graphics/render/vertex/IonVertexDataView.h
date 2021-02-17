@@ -46,8 +46,8 @@ namespace ion::graphics::render::vertex
 			VertexDataView(const T *first_vertex, int size) noexcept :
 
 				pointer_{first_vertex},
-				size_{size * sizeof(T)},
-				element_size_{sizeof(T)}
+				size_{size * static_cast<int>(sizeof(T))},
+				element_size_{static_cast<int>(sizeof(T))}
 			{
 				//Empty
 			}
@@ -57,8 +57,8 @@ namespace ion::graphics::render::vertex
 			VertexDataView(const vertex_data_view::VertexContainer<T> &vertices) noexcept :
 
 				pointer_{std::data(vertices)},
-				size_{std::ssize(vertices) * sizeof(T)},
-				element_size_{sizeof(T)}
+				size_{std::ssize(vertices) * static_cast<int>(sizeof(T))},
+				element_size_{static_cast<int>(sizeof(T))}
 			{
 				//Empty
 			}

@@ -134,7 +134,7 @@ namespace ion::graphics::render::vertex
 			void Data(const VertexDataView &vertex_data, vertex_buffer_object::VertexBufferUsage usage) noexcept;
 
 			//Sets the buffer data for this vertex buffer object to the given vertex data with offset
-			void Data(const VertexDataView &vertex_data, int offset = 0) noexcept;
+			void Data(const VertexDataView &vertex_data, int offset) noexcept;
 
 
 			//Reserves the buffer data for this vertex buffer object to the size

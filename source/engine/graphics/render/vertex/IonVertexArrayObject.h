@@ -32,7 +32,9 @@ namespace ion::graphics::render::vertex
 		void bind_vertex_array_object(int vao_handle) noexcept;
 
 		void bind_vertex_attributes(const VertexDeclaration &vertex_declaration, int vao_handle, int vbo_handle, int vbo_offset) noexcept;
+
 		void set_vertex_attribute_pointers(const VertexDeclaration &vertex_declaration, int vbo_offset) noexcept;
+		void set_vertex_attribute_pointers(const VertexDeclaration &vertex_declaration, const void *data) noexcept;
 	} //vertex_array_object::detail
 
 

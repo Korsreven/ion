@@ -17,6 +17,10 @@ File:	IonMesh.h
 #include <tuple>
 #include <vector>
 
+#include "graphics/render/vertex/IonVertexBatch.h"
+#include "graphics/render/vertex/IonVertexBufferView.h"
+#include "graphics/render/vertex/IonVertexDeclaration.h"
+#include "graphics/shaders/IonShaderLayout.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonObb.h"
@@ -34,11 +38,6 @@ namespace ion::graphics
 		class Material;
 	}
 
-	namespace scene
-	{
-		class Model;
-	}
-
 	namespace shaders
 	{
 		class ShaderProgram;
@@ -52,19 +51,6 @@ namespace ion::graphics::render
 
 	namespace mesh
 	{
-		enum class MeshDrawMode
-		{
-			Points,
-			Lines,
-			LineLoop,
-			LineStrip,
-			Triangles,
-			TriangleFan,
-			TriangleStrip,
-			Quads,
-			Polygon
-		};
-
 		enum class MeshTexCoordMode
 		{
 			Manual,
@@ -90,75 +76,56 @@ namespace ion::graphics::render
 		};
 
 		using Vertices = std::vector<Vertex>;
+		using VertexContainer = std::vector<real>;	
 
 
 		namespace detail
 		{
-			using vertex_storage_type = std::vector<real>;
-
 			constexpr auto position_components = 3; //x,y,z
 			constexpr auto normal_components = 3; //x,y,z
 			constexpr auto color_components = 4; //r,g,b,a
 			constexpr auto tex_coord_components = 2; //s,t
 
+			constexpr auto position_offset = 0;
+			constexpr auto normal_offset = position_offset + position_components;
+			constexpr auto color_offset = normal_offset + normal_components;
+			constexpr auto tex_coord_offset = color_offset + color_components;
+
 			constexpr auto vertex_components =
 				position_components + normal_components + color_components + tex_coord_components;
 
 
-			constexpr auto vertex_data_size(int vertex_count) noexcept
+			inline auto get_vertex_declaration() noexcept
 			{
-				return vertex_count * vertex_components;
+				return
+					vertex::VertexDeclaration
+					{
+						{
+							{shaders::shader_layout::AttributeName::Vertex_Position,
+								vertex::vertex_declaration::VertexElementType::Float3,
+								position_offset * sizeof(real), vertex_components * sizeof(real)},
+
+							{shaders::shader_layout::AttributeName::Vertex_Normal,
+								vertex::vertex_declaration::VertexElementType::Float3,
+								normal_offset * sizeof(real), vertex_components * sizeof(real)},
+
+							{shaders::shader_layout::AttributeName::Vertex_Color,
+								vertex::vertex_declaration::VertexElementType::Float4,
+								color_offset * sizeof(real), vertex_components * sizeof(real)},
+
+							{shaders::shader_layout::AttributeName::Vertex_TexCoord,
+								vertex::vertex_declaration::VertexElementType::Float2,
+								tex_coord_offset * sizeof(real), vertex_components * sizeof(real)}
+						}
+					};
 			}
 
-			constexpr auto normal_data_offset(int vertex_count) noexcept
-			{
-				return vertex_count * position_components;
-			}
 
-			constexpr auto color_data_offset(int vertex_count) noexcept
-			{
-				return normal_data_offset(vertex_count) + vertex_count * normal_components;
-			}
+			VertexContainer vertices_to_vertex_data(const Vertices &vertices);
 
-			constexpr auto tex_coord_data_offset(int vertex_count) noexcept
-			{
-				return color_data_offset(vertex_count) + vertex_count * color_components;
-			}
-
-
-			int mesh_draw_mode_to_gl_draw_mode(MeshDrawMode draw_mode) noexcept;
-			vertex_storage_type vertices_to_vertex_data(const Vertices &vertices);
-
-			std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(int vertex_count, const vertex_storage_type &vertex_data);
-			void generate_tex_coords(int vertex_count, vertex_storage_type &vertex_data, const Aabb &aabb) noexcept;
-			void normalize_tex_coords(int vertex_count, vertex_storage_type &vertex_data, const materials::Material *material) noexcept;
-
-
-			/*
-				Graphics API
-			*/
-
-			std::optional<int> create_vertex_array_object() noexcept;
-			void delete_vertex_array_object(int vao_handle) noexcept;
-			
-			void bind_vertex_array_object(int vao_handle) noexcept;
-			void bind_vertex_buffer_object(int vbo_handle) noexcept;
-			void bind_vertex_attributes(int vao_handle, int vbo_handle, int vertex_count, int vbo_offset) noexcept;
-
-			void set_vertex_buffer_sub_data(int vbo_handle, int vbo_offset, vertex_storage_type &vertex_data) noexcept;
-
-			void set_vertex_attribute_pointers(int vertex_count, int vbo_offset) noexcept;
-			void set_vertex_attribute_pointers(int vertex_count, vertex_storage_type &vertex_data) noexcept;
-			void set_vertex_attribute_pointers(int vertex_count, int vbo_offset, shaders::ShaderProgram &shader_program) noexcept;			
-			void set_vertex_attribute_pointers(int vertex_count, vertex_storage_type &vertex_data, shaders::ShaderProgram &shader_program) noexcept;
-			void disable_vertex_attribute_pointers(const shaders::ShaderProgram &shader_program) noexcept;
-
-			void set_vertex_pointers(int vertex_count, int vbo_offset) noexcept;
-			void set_vertex_pointers(int vertex_count, vertex_storage_type &vertex_data) noexcept;
-			void disable_vertex_pointers() noexcept;
-
-			void set_material_uniforms(materials::Material &material, duration time, shaders::ShaderProgram &shader_program) noexcept;
-			void set_active_texture(int texture_unit, int texture_handle) noexcept;
+			std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const VertexContainer &vertex_data);
+			void generate_tex_coords(VertexContainer &vertex_data, const Aabb &aabb) noexcept;
+			void normalize_tex_coords(VertexContainer &vertex_data, const materials::Material *material) noexcept;
 		} //detail
 	} //mesh
 
@@ -166,26 +133,17 @@ namespace ion::graphics::render
 	class Mesh final
 	{
 		private:
-		
-			mesh::MeshDrawMode draw_mode_ = mesh::MeshDrawMode::Triangles;
-			mesh::detail::vertex_storage_type vertex_data_;
-			NonOwningPtr<materials::Material> material_;
+
+			mesh::VertexContainer vertex_data_;
 			mesh::MeshTexCoordMode tex_coord_mode_ = mesh::MeshTexCoordMode::Auto;
 			bool show_wireframe_ = false;
 			bool visible_ = true;
 			
-			int vertex_count_ = 0;
-			duration time_ = 0.0_sec;
 			Aabb aabb_;
 			Obb obb_;
 			Sphere sphere_;
 
-			std::optional<int> vao_handle_;
-			std::optional<int> vbo_handle_;
-			int vertex_buffer_offset_ = 0;
-
-			bool reload_vertex_data_ = false;
-			bool rebind_vertex_attributes_ = false;
+			vertex::VertexBatch vertex_batch_;
 			bool update_bounding_volumes_ = false;
 			bool update_tex_coords_ = false;
 
@@ -199,29 +157,26 @@ namespace ion::graphics::render
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 			//Construct a new mesh with the given draw mode, vertices and visibility
-			Mesh(mesh::MeshDrawMode draw_mode, const mesh::Vertices &vertices, bool visible = true);
+			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices, bool visible = true);
 
 			//Construct a new mesh with the given draw mode, vertices, material, tex coord mode and visibility
-			Mesh(mesh::MeshDrawMode draw_mode, const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
+			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
 			//Construct a new mesh with the given raw vertex data and visibility
-			explicit Mesh(mesh::detail::vertex_storage_type vertex_data, bool visible = true);
+			explicit Mesh(mesh::VertexContainer vertex_data, bool visible = true);
 
 			//Construct a new mesh with the given raw vertex data, material, tex coord mode and visibility
-			Mesh(mesh::detail::vertex_storage_type vertex_data, NonOwningPtr<materials::Material> material,
+			Mesh(mesh::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 			//Construct a new mesh with the given draw mode, raw vertex data and visibility
-			Mesh(mesh::MeshDrawMode draw_mode, mesh::detail::vertex_storage_type vertex_data, bool visible = true);
+			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, mesh::VertexContainer vertex_data, bool visible = true);
 
 			//Construct a new mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
-			Mesh(mesh::MeshDrawMode draw_mode, mesh::detail::vertex_storage_type vertex_data, NonOwningPtr<materials::Material> material,
+			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, mesh::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
-
-			//Destructor
-			~Mesh() noexcept;
 
 
 			/*
@@ -229,9 +184,9 @@ namespace ion::graphics::render
 			*/
 
 			//Sets the draw mode of this mesh to the given mode
-			inline void DrawMode(mesh::MeshDrawMode draw_mode) noexcept
+			inline void DrawMode(vertex::vertex_batch::VertexDrawMode draw_mode) noexcept
 			{
-				draw_mode_ = draw_mode;
+				vertex_batch_.DrawMode(draw_mode);
 			}
 
 			//Sets the surface color of this mesh to the given color
@@ -240,12 +195,7 @@ namespace ion::graphics::render
 			//Sets the surface material used by this mesh to the given material
 			inline void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
-				if (material_ != material)
-				{
-					material_ = material;
-					reload_vertex_data_ = vbo_handle_ && vertex_count_ > 0;
-					update_tex_coords_ = vertex_count_ > 0;
-				}
+				vertex_batch_.BatchMaterial(material);
 			}
 
 			//Sets the tex coord mode of this mesh to the given mode
@@ -254,7 +204,7 @@ namespace ion::graphics::render
 				if (tex_coord_mode_ != tex_coord_mode)
 				{
 					tex_coord_mode_ = tex_coord_mode;
-					update_tex_coords_ = vertex_count_ > 0;
+					update_tex_coords_ = true;
 				}
 			}
 
@@ -271,15 +221,10 @@ namespace ion::graphics::render
 			}
 
 
-			//Sets the VBO handle and offset to the given values
-			inline void VboHandle(std::optional<int> handle, int offset) noexcept
+			//Sets the vertex buffer to the given vertex buffer
+			inline void VertexBuffer(vertex::VertexBufferView vertex_buffer, bool reload_data = true) noexcept
 			{
-				if (vbo_handle_ != handle || vertex_buffer_offset_ != offset)
-				{
-					vbo_handle_ = handle;
-					vertex_buffer_offset_ = offset;
-					rebind_vertex_attributes_ = vbo_handle_ && vertex_count_ > 0;
-				}
+				vertex_batch_.VertexBuffer(vertex_buffer, reload_data);
 			}
 
 
@@ -290,7 +235,7 @@ namespace ion::graphics::render
 			//Returns the draw mode of this mesh
 			[[nodiscard]] inline auto DrawMode() const noexcept
 			{
-				return draw_mode_;
+				return vertex_batch_.DrawMode();
 			}
 
 			//Returns all of the vertex data from this mesh
@@ -299,11 +244,17 @@ namespace ion::graphics::render
 				return vertex_data_;
 			}
 
+			//Returns the vertex count of this mesh
+			[[nodiscard]] inline auto VertexCount() const noexcept
+			{
+				return vertex_batch_.VertexCount();
+			}
+
 			//Returns a pointer to the material used by this mesh
 			//Returns nullptr if this mesh does not have a material
 			[[nodiscard]] inline auto SurfaceMaterial() const noexcept
 			{
-				return material_;
+				return vertex_batch_.BatchMaterial();
 			}
 
 			//Returns true if this mesh is shown in wireframe
@@ -318,12 +269,6 @@ namespace ion::graphics::render
 				return visible_;
 			}
 
-
-			//Returns the vertex count of this mesh
-			[[nodiscard]] inline auto VertexCount() const noexcept
-			{
-				return vertex_count_;
-			}
 
 			//Returns the local axis-aligned bounding box (AABB) for this mesh
 			[[nodiscard]] inline auto AxisAlignedBoundingBox() const noexcept
@@ -344,21 +289,8 @@ namespace ion::graphics::render
 			}
 
 
-			//Returns the VAO handle this mesh uses
-			[[nodiscard]] inline auto VaoHandle() const noexcept
-			{
-				return vbo_handle_;
-			}
-
-			//Returns the VBO handle this mesh uses
-			[[nodiscard]] inline auto VboHandle() const noexcept
-			{
-				return vbo_handle_;
-			}
-
-
 			/*
-				Drawing
+				Preparing / drawing
 			*/
 
 			//Prepare this mesh such that it is ready to be drawn
@@ -374,7 +306,7 @@ namespace ion::graphics::render
 				Elapse time
 			*/
 
-			//Elapse mesh by the given time in seconds
+			//Elapse the total time for this mesh by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 	};

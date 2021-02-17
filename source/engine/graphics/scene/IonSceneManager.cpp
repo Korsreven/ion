@@ -151,9 +151,9 @@ NonOwningPtr<Model> SceneManager::CreateModel()
 	return ModelBase::Create();
 }
 
-NonOwningPtr<Model> SceneManager::CreateModel(model::ModelBufferUsage buffer_usage, bool visible)
+NonOwningPtr<Model> SceneManager::CreateModel(bool visible)
 {
-	return ModelBase::Create(buffer_usage, visible);
+	return ModelBase::Create(visible);
 }
 
 
