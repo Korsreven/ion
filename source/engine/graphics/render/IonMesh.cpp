@@ -296,7 +296,15 @@ void Mesh::Prepare() noexcept
 void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 {
 	if (visible_)
+	{
+		if (show_wireframe_)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 		vertex_batch_.Draw(shader_program);
+
+		if (show_wireframe_)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 }
 
 
