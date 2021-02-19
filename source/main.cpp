@@ -502,48 +502,35 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::graphics::materials::MaterialManager materials;
 			auto brick =
 				materials.CreateMaterial("brick",
-					{0.19125_r, 0.0735_r, 0.0225_r},
-					{0.7038_r, 0.27048_r, 0.0828_r},
-					{0.256777_r, 0.137622_r, 0.086014_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
 					{0.0_r, 0.0_r, 0.0_r},
-					12.8_r, brick_wall_texture, brick_wall_specular_map, brick_wall_normal_map);
+					{0.0_r, 0.0_r, 0.0_r},
+					32.0_r, brick_wall_texture, brick_wall_specular_map, brick_wall_normal_map);
 			
-			auto emerald =
-				materials.CreateMaterial("emerald",
-					{0.0215_r, 0.1745_r, 0.0215_r},
-					{0.07568_r, 0.61424_r, 0.07568_r},
-					{0.633_r, 0.727811_r, 0.633_r},
-					{0.0_r, 0.0_r, 0.0_r},
-					76.8_r);
-
-			auto gold =
-				materials.CreateMaterial("gold",
-					{0.24725_r, 0.1995_r, 0.0745_r},
-					{0.75164_r, 0.60648_r, 0.22648_r},
-					{0.628281_r, 0.555802_r, 0.366065_r},
-					{0.0_r, 0.0_r, 0.0_r},
-					51.2_r);
-
-			auto pearl =
-				materials.CreateMaterial("pearl",
-					{0.25_r, 0.20725_r, 0.20725_r},
-					{1.0_r, 0.829_r, 0.829_r},
-					{0.296648_r, 0.296648_r, 0.296648_r},
-					{0.0_r, 0.0_r, 0.0_r},
-					11.264_r);
-
 			auto ruby =
 				materials.CreateMaterial("ruby",
-					{0.1745_r, 0.01175_r, 0.01175_r},
-					{0.61424_r, 0.04136_r, 0.04136_r},
-					{0.727811_r, 0.626959_r, 0.626959_r},
+					{1.0_r, 0.0_r, 0.0_r},
+					{1.0_r, 0.0_r, 0.0_r},
 					{0.0_r, 0.0_r, 0.0_r},
-					76.8_r);
+					{0.0_r, 0.0_r, 0.0_r},
+					32.0_r);
 
-			//material.Crop(ion::graphics::utilities::Aabb{{0.25_r, 0.25_r}, {0.75_r, 0.75_r}});
-			//material.Repeat(ion::graphics::utilities::Vector2{2.0_r, 2.0_r});
-			//material.FlipHorizontal();
-			//material.FlipVertical();
+			auto emerald =
+				materials.CreateMaterial("emerald",
+					{0.0_r, 1.0_r, 0.0_r},
+					{0.0_r, 1.0_r, 0.0_r},
+					{0.0_r, 0.0_r, 0.0_r},
+					{0.0_r, 0.0_r, 0.0_r},
+					32.0_r);
+
+			auto sapphire =
+				materials.CreateMaterial("sapphire",
+					{0.0_r, 0.0_r, 1.0_r},
+					{0.0_r, 0.0_r, 1.0_r},
+					{0.0_r, 0.0_r, 0.0_r},
+					{0.0_r, 0.0_r, 0.0_r},
+					32.0_r);
 
 			using namespace ion::graphics::utilities;
 
@@ -590,7 +577,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Models
 			//auto gray_rectangle = engine.Scene().CreateModel();
-			//gray_rectangle->CreateMesh(std::move(gray_vertices), pearl);
+			//gray_rectangle->CreateMesh(std::move(gray_vertices));
 
 			auto red_square = engine.Scene().CreateModel();
 			red_square->CreateMesh(std::move(red_vertices), ruby);
@@ -599,7 +586,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//green_square->CreateMesh(std::move(green_vertices), emerald);
 
 			auto blue_square = engine.Scene().CreateModel();
-			blue_square->CreateMesh(std::move(blue_vertices), emerald);
+			blue_square->CreateMesh(std::move(blue_vertices), sapphire);
 
 			auto brick_wall = engine.Scene().CreateModel();
 			brick_wall->CreateMesh(std::move(brick_wall_vertices), brick,
@@ -617,7 +604,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto view_proj_mat = proj_mat * view_mat;
 
 			//Uniforms
-			scene_ambient->Get() = Color{1.0, 1.0, 1.0, 1.0};
+			scene_ambient->Get() = Color{0.8_r, 0.8_r, 0.8_r, 1.0};
 			scene_gamma->Get() = 1.0_r;
 			scene_light_count->Get() = 1;
 
