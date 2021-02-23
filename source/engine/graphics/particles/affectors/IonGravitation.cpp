@@ -74,4 +74,14 @@ Gravitation::Gravitation(std::string name, const Vector2 &position, real gravity
 	//Empty
 }
 
+
+/*
+	Cloning
+*/
+
+OwningPtr<Affector> Gravitation::Clone() const
+{
+	return make_owning<Gravitation>(*this);
+}
+
 } //ion::graphics::particles::affectors

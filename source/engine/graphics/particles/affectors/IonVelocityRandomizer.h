@@ -17,6 +17,7 @@ File:	IonVelocityRandomizer.h
 #include <utility>
 
 #include "IonAffector.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::particles::affectors
@@ -57,6 +58,14 @@ namespace ion::graphics::particles::affectors
 
 			//Construct a new velocity randomizer with the  given name, min/max velocity and scope
 			VelocityRandomizer(std::string name, real min_velocity, real max_velocity, real scope);
+
+
+			/*
+				Cloning
+			*/
+
+			//Returns an owning ptr to a clone of this affector
+			[[nodiscard]] OwningPtr<Affector> Clone() const override;
 
 
 			/*

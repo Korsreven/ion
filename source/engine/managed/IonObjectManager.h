@@ -387,7 +387,7 @@ namespace ion::managed
 			{
 				assert(object_ptr);
 
-				if (auto object_name = object_ptr.Name(); object_name)
+				if (auto object_name = object_ptr->Name(); object_name)
 				{
 					//Check if an object with that name already exists
 					if (auto ptr = object_manager::detail::get_object_by_name(*object_name, objects_); ptr)
@@ -404,6 +404,13 @@ namespace ion::managed
 				return NonOwningPtr<ObjectT>{ptr};
 			}
 
+			//Adopt (take ownership of) the given object and returns a pointer to the adopted object
+			//Returns nullptr if the object could not be adopted and object_ptr will be released
+			auto Adopt(typename decltype(objects_)::value_type &&object_ptr) noexcept
+			{	
+				return Adopt(object_ptr);
+			}
+
 			//Adopt (take ownership of) all the given objects
 			//If one or more objects could not be adopted, they will remain untouched in the given container
 			void Adopt(typename decltype(objects_) &objects) noexcept
@@ -412,7 +419,7 @@ namespace ion::managed
 
 				for (auto iter = std::begin(objects); iter != std::end(objects) && *iter;)
 				{
-					if (auto object_name = (*iter).Name(); object_name)
+					if (auto object_name = (*iter)->Name(); object_name)
 					{
 						if (auto ptr = object_manager::detail::get_object_by_name(*object_name, objects_); ptr)
 						{
@@ -439,6 +446,13 @@ namespace ion::managed
 
 					AdditionEnded();
 				}
+			}
+
+			//Adopt (take ownership of) all the given objects
+			//If one or more objects could not be adopted, they will be released
+			void Adopt(typename decltype(objects_) &&objects) noexcept
+			{
+				Adopt(objects);
 			}
 
 

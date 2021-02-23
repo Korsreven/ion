@@ -175,6 +175,16 @@ Scaler Scaler::UniformSteps(std::string name, const std::vector<Vector2> &sizes,
 
 
 /*
+	Cloning
+*/
+
+OwningPtr<Affector> Scaler::Clone() const
+{
+	return make_owning<Scaler>(*this);
+}
+
+
+/*
 	Steps
 */
 

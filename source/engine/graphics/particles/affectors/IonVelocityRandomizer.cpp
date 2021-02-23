@@ -75,4 +75,14 @@ VelocityRandomizer::VelocityRandomizer(std::string name, real min_velocity, real
 	//Empty
 }
 
+
+/*
+	Cloning
+*/
+
+OwningPtr<Affector> VelocityRandomizer::Clone() const
+{
+	return make_owning<VelocityRandomizer>(*this);
+}
+
 } //ion::graphics::particles::affectors

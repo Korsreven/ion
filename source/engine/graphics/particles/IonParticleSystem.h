@@ -55,6 +55,14 @@ namespace ion::graphics::particles
 
 
 			/*
+				Cloning
+			*/
+
+			//Returns a clone of this particle system
+			[[nodiscard]] ParticleSystem Clone() const;
+
+
+			/*
 				Modifiers
 			*/
 

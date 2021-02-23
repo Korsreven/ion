@@ -95,6 +95,38 @@ Emitter Emitter::Ring(std::string name, const Vector2 &position, const Vector2 &
 
 
 /*
+	Cloning
+*/
+
+OwningPtr<Emitter> Emitter::Clone() const
+{
+	auto emitter = make_owning<Emitter>(*name_);
+	emitter->position_ = position_;
+	emitter->direction_ = direction_;
+	emitter->size_ = size_;
+	emitter->inner_size_ = inner_size_;
+
+	emitter->emission_rate_ = emission_rate_;
+	emitter->emission_angle_ = emission_angle_;
+	emitter->emission_duration_ = emission_duration_;			
+
+	emitter->particle_quota_ = particle_quota_;
+	emitter->particle_velocity_ = particle_velocity_;
+	emitter->particle_size_ = particle_size_;		
+	emitter->particle_mass_ = particle_mass_;
+	emitter->particle_solid_color_ = particle_solid_color_;
+	emitter->particle_life_time_ = particle_life_time_;
+	emitter->particle_material_ = particle_material_;
+
+	//Clone local affectors
+	for (auto &affector : Affectors())
+		emitter->AffectorManager::Adopt(affector.Clone());
+
+	return emitter;
+}
+
+
+/*
 	Common functions for controlling the emitter
 */
 

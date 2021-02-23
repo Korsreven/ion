@@ -90,4 +90,14 @@ SineForce::SineForce(std::string name, ForceType type, const Vector2 &force, rea
 	//Empty
 }
 
+
+/*
+	Cloning
+*/
+
+OwningPtr<Affector> SineForce::Clone() const
+{
+	return make_owning<SineForce>(*this);
+}
+
 } //ion::graphics::particles::affectors

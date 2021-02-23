@@ -39,6 +39,27 @@ ParticleSystem::ParticleSystem(std::string name, ParticlePrimitive particle_prim
 
 
 /*
+	Cloning
+*/
+
+ParticleSystem ParticleSystem::Clone() const
+{
+	auto particle_system = ParticleSystem{*name_};
+	particle_system.particle_primitive_ = particle_primitive_;
+	
+	//Clone emitters
+	for (auto &emitter : Emitters())
+		particle_system.EmitterManager::Adopt(emitter.Clone());
+
+	//Clone global affectors
+	for (auto &affector : Affectors())
+		particle_system.AffectorManager::Adopt(affector.Clone());
+
+	return particle_system;
+}
+
+
+/*
 	Common functions for controlling the particle system
 */
 

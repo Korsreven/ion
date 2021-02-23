@@ -25,10 +25,17 @@ File:	IonEmitter.h
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "managed/IonManagedObject.h"
+#include "memory/IonNonOwningPtr.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
 #include "utilities/IonRandom.h"
+
+namespace ion::graphics::materials
+{
+	class Material; //Forward declaration
+}
 
 namespace ion::graphics::particles
 {
@@ -181,6 +188,7 @@ namespace ion::graphics::particles
 			std::pair<real, real> particle_mass_;
 			std::pair<Color, Color> particle_solid_color_;
 			std::pair<duration, duration> particle_life_time_;
+			NonOwningPtr<materials::Material> particle_material_;
 
 		public:
 
@@ -211,6 +219,14 @@ namespace ion::graphics::particles
 			[[nodiscard]] static Emitter Ring(std::string name, const Vector2 &position, const Vector2 &direction,
 				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 				std::optional<duration> emission_duration, int particle_quota = 100);
+
+
+			/*
+				Cloning
+			*/
+
+			//Returns an owning ptr to a clone of this emitter
+			[[nodiscard]] OwningPtr<Emitter> Clone() const;
 
 
 			/*
@@ -433,6 +449,12 @@ namespace ion::graphics::particles
 				particle_life_time_ = std::minmax(min_life_time, max_life_time);
 			}
 
+			//Sets the material of each new particle to the given material
+			inline void ParticleMaterial(NonOwningPtr<materials::Material> particle_material) noexcept
+			{
+				particle_material_ = particle_material;
+			}
+
 
 			/*
 				Spawn observers
@@ -466,6 +488,12 @@ namespace ion::graphics::particles
 			[[nodiscard]] inline auto& ParticleLifeTime() const noexcept
 			{
 				return particle_life_time_;
+			}
+
+			//Returns the material of each new particle
+			[[nodiscard]] inline auto ParticleMaterial() const noexcept
+			{
+				return particle_material_;
 			}
 
 

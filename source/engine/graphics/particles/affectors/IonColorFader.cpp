@@ -175,6 +175,16 @@ ColorFader ColorFader::UniformSteps(std::string name, const std::vector<Color> &
 
 
 /*
+	Cloning
+*/
+
+OwningPtr<Affector> ColorFader::Clone() const
+{
+	return make_owning<ColorFader>(*this);
+}
+
+
+/*
 	Steps
 */
 

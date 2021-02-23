@@ -18,6 +18,7 @@ File:	IonSineForce.h
 
 #include "IonAffector.h"
 #include "graphics/utilities/IonVector2.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
@@ -77,6 +78,14 @@ namespace ion::graphics::particles::affectors
 
 			//Construct a new sine force with the given name, type, force, min and max frequency
 			SineForce(std::string name, sine_force::ForceType type, const Vector2 &force, real min_frequency, real max_frequency);
+
+
+			/*
+				Cloning
+			*/
+
+			//Returns an owning ptr to a clone of this affector
+			[[nodiscard]] OwningPtr<Affector> Clone() const override;
 
 
 			/*

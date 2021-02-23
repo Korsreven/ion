@@ -17,6 +17,7 @@ File:	IonLinearForce.h
 
 #include "IonAffector.h"
 #include "graphics/utilities/IonVector2.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::particles::affectors
@@ -64,6 +65,14 @@ namespace ion::graphics::particles::affectors
 
 			//Construct a new linear force with the given name, type and force
 			LinearForce(std::string name, linear_force::ForceType type, const Vector2 &force);
+
+
+			/*
+				Cloning
+			*/
+
+			//Returns an owning ptr to a clone of this affector
+			[[nodiscard]] OwningPtr<Affector> Clone() const override;
 
 
 			/*

@@ -77,4 +77,14 @@ DirectionRandomizer::DirectionRandomizer(std::string name, real angle, real scop
 	//Empty
 }
 
+
+/*
+	Cloning
+*/
+
+OwningPtr<Affector> DirectionRandomizer::Clone() const
+{
+	return make_owning<DirectionRandomizer>(*this);
+}
+
 } //ion::graphics::particles::affectors

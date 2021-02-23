@@ -25,8 +25,6 @@ File:	IonLight.h
 
 namespace ion::graphics::scene
 {
-	class SceneManager; //Forward declaration
-
 	using namespace ion::utilities;
 	using namespace types::type_literals;
 

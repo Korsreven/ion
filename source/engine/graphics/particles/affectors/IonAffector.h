@@ -15,6 +15,7 @@ File:	IonAffector.h
 
 #include "adaptors/ranges/IonIterable.h"
 #include "managed/IonManagedObject.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::particles
@@ -79,6 +80,14 @@ namespace ion::graphics::particles::affectors
 
 			//Default move assignment
 			Affector& operator=(Affector&&) = default;
+
+
+			/*
+				Cloning
+			*/
+
+			//Returns an owning ptr to a clone of this affector
+			[[nodiscard]] virtual OwningPtr<Affector> Clone() const = 0;
 
 
 			/*

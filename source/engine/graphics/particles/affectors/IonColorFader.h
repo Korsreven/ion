@@ -19,6 +19,7 @@ File:	IonColorFader.h
 #include "IonAffector.h"
 #include "adaptors/IonFlatSet.h"
 #include "graphics/utilities/IonColor.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
 
@@ -126,6 +127,14 @@ namespace ion::graphics::particles::affectors
 			//Returns a new color fader from the given name, colors, from percent and to percent
 			//Percentages are uniformly distributed in range [from, to]
 			[[nodiscard]] static ColorFader UniformSteps(std::string name, const std::vector<Color> &colors, real from_percent, real to_percent);
+
+
+			/*
+				Cloning
+			*/
+
+			//Returns an owning ptr to a clone of this affector
+			[[nodiscard]] OwningPtr<Affector> Clone() const override;
 
 
 			/*

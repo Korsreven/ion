@@ -16,6 +16,7 @@ File:	IonDirectionRandomizer.h
 #include <algorithm>
 
 #include "IonAffector.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
 
@@ -54,6 +55,14 @@ namespace ion::graphics::particles::affectors
 
 			//Construct a new direction randomizer with the given name, angle and scope
 			DirectionRandomizer(std::string name, real angle, real scope);
+
+
+			/*
+				Cloning
+			*/
+
+			//Returns an owning ptr to a clone of this affector
+			[[nodiscard]] OwningPtr<Affector> Clone() const override;
 
 
 			/*

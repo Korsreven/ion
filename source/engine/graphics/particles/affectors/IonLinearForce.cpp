@@ -75,4 +75,14 @@ LinearForce::LinearForce(std::string name, ForceType type, const Vector2 &force)
 	//Empty
 }
 
+
+/*
+	Cloning
+*/
+
+OwningPtr<Affector> LinearForce::Clone() const
+{
+	return make_owning<LinearForce>(*this);
+}
+
 } //ion::graphics::particles::affectors
