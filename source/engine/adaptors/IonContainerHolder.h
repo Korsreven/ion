@@ -45,6 +45,12 @@ namespace ion::adaptors
 			Observers
 		*/
 
+		//Returns a pointer to the data of this holder
+		[[nodiscard]] constexpr auto data() const noexcept
+		{
+			return std::data(this->container_);
+		}
+
 		//Returns true if this holders holds an empty container
 		[[nodiscard]] constexpr auto empty() const noexcept
 		{
