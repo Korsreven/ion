@@ -124,26 +124,26 @@ namespace ion::graphics::scene
 
 
 			//Returns the local axis-aligned bounding box (AABB) for this model
-			[[nodiscard]] inline auto AxisAlignedBoundingBox() const noexcept
+			[[nodiscard]] inline auto& AxisAlignedBoundingBox() const noexcept
 			{
 				return aabb_;
 			}
 
 			//Returns the local oriented bounding box (OBB) for this model
-			[[nodiscard]] inline auto OrientedBoundingBox() const noexcept
+			[[nodiscard]] inline auto& OrientedBoundingBox() const noexcept
 			{
 				return obb_;
 			}
 
 			//Returns the local bounding sphere for this model
-			[[nodiscard]] inline auto BoundingSphere() const noexcept
+			[[nodiscard]] inline auto& BoundingSphere() const noexcept
 			{
 				return sphere_;
 			}
 
 
 			//Return the vertex buffer this model uses
-			[[nodiscard]] inline auto VertexBuffer() const noexcept
+			[[nodiscard]] inline auto& VertexBuffer() const noexcept
 			{
 				return vbo_;
 			}

@@ -18,23 +18,72 @@ namespace ion::graphics::scene
 {
 
 using namespace movable_particle_system;
+using namespace types::type_literals;
 
 namespace movable_particle_system::detail
 {
+
+/*
+	Graphics API
+*/
+
+void set_point_size(real size) noexcept
+{
+	glPointSize(size); //Set fixed point size
+}
+
+
+void enable_point_sprites() noexcept
+{
+	switch (gl::PointSprite_Support())
+	{
+		case gl::Extension::Core:
+		glEnable(GL_POINT_SPRITE); //Enable point sprite
+		glEnable(GL_VERTEX_PROGRAM_POINT_SIZE); //Enable varying point size
+		glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE); //Enable sprite tex coords
+		break;
+
+		case gl::Extension::ARB:
+		glEnable(GL_POINT_SPRITE_ARB); //Enable point sprite
+		glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB); //Enable varying point size
+		glTexEnvf(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE); //Enable sprite tex coords
+		break;
+	}
+}
+
+void disable_point_sprites() noexcept
+{
+	switch (gl::PointSprite_Support())
+	{
+		case gl::Extension::Core:
+		glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_FALSE); //Disable sprite tex coords
+		glDisable(GL_VERTEX_PROGRAM_POINT_SIZE); //Disable varying point size
+		glDisable(GL_POINT_SPRITE); //Disable point sprite
+		break;
+
+		case gl::Extension::ARB:
+		glTexEnvf(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE); //Disable sprite tex coords
+		glDisable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB); //Disable varying point size
+		glDisable(GL_POINT_SPRITE_ARB); //Disable point sprite
+		break;
+	}
+}
+
 } //movable_particle_system::detail
 
 
 //Private
 
-void MovableParticleSystem::PrepareEmitterVertexData()
+void MovableParticleSystem::PrepareEmitterVertexStreams()
 {
 	for (auto off = 0; auto &emitter : particle_system_->Emitters())
 	{
 		//New emitter
-		if (off == std::ssize(emitters_))
+		if (off == std::ssize(vertex_streams_))
 		{
-			emitters_.emplace_back(
+			vertex_streams_.emplace_back(
 				emitter.ParticleQuota(),
+				particle_system_->GetEmitter(*emitter.Name()),
 				render::vertex::VertexBatch{
 					render::vertex::vertex_batch::VertexDrawMode::Points,
 					detail::get_vertex_declaration(),
@@ -49,20 +98,26 @@ void MovableParticleSystem::PrepareEmitterVertexData()
 		//Update existing emitter
 		else
 		{
-			if (emitters_[off].particle_quota != emitter.ParticleQuota())
+			if (vertex_streams_[off].particle_quota != emitter.ParticleQuota())
 			{
-				emitters_[off].particle_quota = emitter.ParticleQuota();
+				vertex_streams_[off].particle_quota = emitter.ParticleQuota();
 				reload_vertex_buffer_ = true;
 			}
 
-			emitters_[off].vertex_batch.VertexData({std::data(emitter.Particles()), std::ssize(emitter.Particles())});
-			emitters_[off].vertex_batch.BatchMaterial(emitter.ParticleMaterial());
+			if (vertex_streams_[off].emitter.get() != &emitter)
+				vertex_streams_[off].emitter = particle_system_->GetEmitter(*emitter.Name());
+
+			vertex_streams_[off].vertex_batch.VertexData({std::data(emitter.Particles()), std::ssize(emitter.Particles())});
+			vertex_streams_[off].vertex_batch.BatchMaterial(emitter.ParticleMaterial());
 		}
 
 		++off;
 	}
-}
 
+	//Erase unused vertex streams
+	if (std::ssize(vertex_streams_) > std::ssize(particle_system_->Emitters()))
+		vertex_streams_.erase(std::begin(vertex_streams_) + std::ssize(particle_system_->Emitters()), std::end(vertex_streams_));
+}
 
 //Public
 
@@ -95,7 +150,7 @@ void MovableParticleSystem::Prepare() noexcept
 	if (!particle_system_)
 		return;
 
-	PrepareEmitterVertexData();
+	PrepareEmitterVertexStreams();
 
 	if (reload_vertex_buffer_)
 	{
@@ -104,18 +159,18 @@ void MovableParticleSystem::Prepare() noexcept
 
 		if (vbo_ && *vbo_)
 		{
-			if (!std::empty(emitters_))
+			if (!std::empty(vertex_streams_))
 			{
 				auto size = 0;
-				for (auto &emitter : emitters_)
-					size += emitter.particle_quota;
+				for (auto &stream : vertex_streams_)
+					size += stream.particle_quota;
 
 				vbo_->Reserve(size * sizeof(particles::Particle));
 
-				for (auto offset = 0; auto &emitter : emitters_)
+				for (auto offset = 0; auto &stream : vertex_streams_)
 				{
-					size = emitter.particle_quota;
-					emitter.vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(particles::Particle), size * sizeof(particles::Particle)));
+					size = stream.particle_quota;
+					stream.vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(particles::Particle), size * sizeof(particles::Particle)));
 					offset += size;
 				}
 			}
@@ -124,8 +179,8 @@ void MovableParticleSystem::Prepare() noexcept
 		reload_vertex_buffer_ = false;
 	}
 
-	for (auto &emitter : emitters_)
-		emitter.vertex_batch.Prepare();
+	for (auto &stream : vertex_streams_)
+		stream.vertex_batch.Prepare();
 }
 
 
@@ -133,11 +188,14 @@ void MovableParticleSystem::Draw(shaders::ShaderProgram *shader_program) noexcep
 {
 	if (particle_system_)
 	{
-		for (auto &emitter : emitters_)
+		for (auto &stream : vertex_streams_)
 		{
-			//auto &[min_size, max_size] = emitter.ParticleSize();
-			//glPointSize((min_size.X() + max_size.X()) * 0.5f);
-			emitter.vertex_batch.Draw(shader_program);
+			auto &[min_size, max_size] = stream.emitter->ParticleSize();
+			detail::set_point_size((min_size.X() + max_size.X()) * 0.5_r);
+
+			detail::enable_point_sprites();
+			stream.vertex_batch.Draw(shader_program);
+			detail::disable_point_sprites();
 		}
 	}
 }
@@ -150,7 +208,12 @@ void MovableParticleSystem::Draw(shaders::ShaderProgram *shader_program) noexcep
 void MovableParticleSystem::Elapse(duration time) noexcept
 {
 	if (particle_system_)
+	{
 		particle_system_->Elapse(time);
+
+		for (auto &stream : vertex_streams_)
+			stream.vertex_batch.Elapse(time);
+	}
 }
 
 } //ion::graphics::scene

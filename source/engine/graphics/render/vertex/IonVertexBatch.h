@@ -61,6 +61,7 @@ namespace ion::graphics::render::vertex
 			int vertex_draw_mode_to_gl_draw_mode(VertexDrawMode draw_mode) noexcept;
 			int get_vertex_count(const VertexDeclaration &vertex_declaration, const VertexDataView &vertex_data) noexcept;
 
+
 			/*
 				Graphics API
 			*/
@@ -170,7 +171,7 @@ namespace ion::graphics::render::vertex
 
 			//Returns the vertex declaration for this vertex batch
 			//Returns nullptr if no vertex data is available
-			[[nodiscard]] inline auto Declaration() const noexcept
+			[[nodiscard]] inline auto& Declaration() const noexcept
 			{
 				return vertex_declaration_;
 			}

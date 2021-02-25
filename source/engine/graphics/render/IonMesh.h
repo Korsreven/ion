@@ -126,6 +126,14 @@ namespace ion::graphics::render
 			std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const VertexContainer &vertex_data);
 			void generate_tex_coords(VertexContainer &vertex_data, const Aabb &aabb) noexcept;
 			void normalize_tex_coords(VertexContainer &vertex_data, const materials::Material *material) noexcept;
+
+
+			/*
+				Graphics API
+			*/
+
+			void enable_wire_frames() noexcept;
+			void disable_wire_frames() noexcept;
 		} //detail
 	} //mesh
 
@@ -271,19 +279,19 @@ namespace ion::graphics::render
 
 
 			//Returns the local axis-aligned bounding box (AABB) for this mesh
-			[[nodiscard]] inline auto AxisAlignedBoundingBox() const noexcept
+			[[nodiscard]] inline auto& AxisAlignedBoundingBox() const noexcept
 			{
 				return aabb_;
 			}
 
 			//Returns the local oriented bounding box (OBB) for this mesh
-			[[nodiscard]] inline auto OrientedBoundingBox() const noexcept
+			[[nodiscard]] inline auto& OrientedBoundingBox() const noexcept
 			{
 				return obb_;
 			}
 
 			//Returns the local bounding sphere for this mesh
-			[[nodiscard]] inline auto BoundingSphere() const noexcept
+			[[nodiscard]] inline auto& BoundingSphere() const noexcept
 			{
 				return sphere_;
 			}

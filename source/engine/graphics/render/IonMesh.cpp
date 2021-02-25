@@ -159,6 +159,21 @@ void normalize_tex_coords(VertexContainer &vertex_data, const materials::Materia
 	}
 }
 
+
+/*
+	Graphics API
+*/
+
+void enable_wire_frames() noexcept
+{
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+}
+
+void disable_wire_frames() noexcept
+{
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
 } //detail
 } //mesh
 
@@ -298,12 +313,12 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 	if (visible_)
 	{
 		if (show_wireframe_)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			detail::enable_wire_frames();
 
 		vertex_batch_.Draw(shader_program);
 
 		if (show_wireframe_)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			detail::disable_wire_frames();
 	}
 }
 

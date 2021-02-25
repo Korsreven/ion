@@ -24,6 +24,7 @@ File:	IonMovableParticleSystem.h
 #include "graphics/render/vertex/IonVertexDeclaration.h"
 #include "graphics/shaders/IonShaderLayout.h"
 #include "memory/IonNonOwningPtr.h"
+#include "types/IonTypes.h"
 
 namespace ion::graphics
 {
@@ -37,13 +38,14 @@ namespace ion::graphics::scene
 {
 	namespace movable_particle_system::detail
 	{
-		struct movable_emitter
+		struct emitter_vertex_stream
 		{
 			int particle_quota = 0;
-			render::vertex::VertexBatch vertex_batch;		
+			NonOwningPtr<particles::Emitter> emitter;
+			render::vertex::VertexBatch vertex_batch;
 		};
 
-		using movable_emitters = std::vector<movable_emitter>;
+		using emitter_vertex_streams = std::vector<emitter_vertex_stream>;
 
 
 		inline auto get_vertex_declaration() noexcept
@@ -71,6 +73,16 @@ namespace ion::graphics::scene
 					sizeof(particles::Particle)
 				};
 		}
+
+
+		/*
+			Graphics API
+		*/
+
+		void set_point_size(real size) noexcept;
+
+		void enable_point_sprites() noexcept;
+		void disable_point_sprites() noexcept;
 	} //movable_particle_system::detail
 
 
@@ -83,11 +95,11 @@ namespace ion::graphics::scene
 			NonOwningPtr<particles::ParticleSystem> initial_particle_system_;
 
 			std::optional<render::vertex::VertexBufferObject> vbo_;
-			movable_particle_system::detail::movable_emitters emitters_;
+			movable_particle_system::detail::emitter_vertex_streams vertex_streams_;
 			bool reload_vertex_buffer_ = false;
 
 
-			void PrepareEmitterVertexData();
+			void PrepareEmitterVertexStreams();
 
 		public:
 
@@ -121,7 +133,7 @@ namespace ion::graphics::scene
 
 
 			//Return the vertex buffer this particle system uses
-			[[nodiscard]] inline auto VertexBuffer() const noexcept
+			[[nodiscard]] inline auto& VertexBuffer() const noexcept
 			{
 				return vbo_;
 			}
