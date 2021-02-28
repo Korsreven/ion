@@ -27,6 +27,8 @@ namespace ion::graphics::particles::affectors
 
 	namespace gravitation::detail
 	{
+		constexpr auto g = 6.67430E-11_r;
+
 		void affect_particles(affector::detail::particle_range particles, duration time,
 							  const Vector2 &position, real gravity, real mass) noexcept;
 	} //gravitation::detail
@@ -36,9 +38,9 @@ namespace ion::graphics::particles::affectors
 	{
 		private:
 
-			Vector2 position_;
-			real gravity_ = 0.0_r;
+			Vector2 position_;	
 			real mass_ = 0.0_r;
+			real gravity_ = gravitation::detail::g;
 
 		protected:
 
@@ -55,8 +57,11 @@ namespace ion::graphics::particles::affectors
 			//Construct a new gravitation with the given name
 			explicit Gravitation(std::string name);
 
-			//Construct a new gravitation with the given name, position, gravity and mass
-			Gravitation(std::string name, const Vector2 &position, real gravity, real mass);
+			//Construct a new gravitation with the given name, position and mass
+			Gravitation(std::string name, const Vector2 &position, real mass);
+
+			//Construct a new gravitation with the given name, position, mass and a custom gravity
+			Gravitation(std::string name, const Vector2 &position, real mass, real gravity);
 
 
 			/*
@@ -77,16 +82,16 @@ namespace ion::graphics::particles::affectors
 				position_ = position;
 			}
 
-			//Sets the gravity of the gravitation
-			inline void Gravity(real gravity) noexcept
-			{
-				gravity_ = gravity;
-			}
-
 			//Sets the mass of the gravitation
 			inline void Mass(real mass) noexcept
 			{
 				mass_ = mass;
+			}
+
+			//Sets the gravity of the gravitation
+			inline void Gravity(real gravity) noexcept
+			{
+				gravity_ = gravity;
 			}
 
 
@@ -100,16 +105,16 @@ namespace ion::graphics::particles::affectors
 				return position_;
 			}
 
-			//Returns the gravity of the gravitation
-			[[nodiscard]] inline auto Gravity() const noexcept
-			{
-				return gravity_;
-			}
-
 			//Returns the mass of the gravitation
 			[[nodiscard]] inline auto Mass() const noexcept
 			{
 				return mass_;
+			}
+
+			//Returns the gravity of the gravitation
+			[[nodiscard]] inline auto Gravity() const noexcept
+			{
+				return gravity_;
 			}
 	};
 } //ion::graphics::particles::affectors

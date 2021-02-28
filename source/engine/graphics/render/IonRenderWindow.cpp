@@ -96,9 +96,9 @@ void RenderWindow::Moved(const Vector2 &position) noexcept
 		if (position_ || !IsCentered())
 			position_ = position;
 	}
-
-	NotifyWindowActionReceived(events::listeners::WindowAction::Move);
+	
 	NotifyWindowMoved(position);
+	NotifyWindowActionReceived(events::listeners::WindowAction::Move);
 }
 
 void RenderWindow::Resized(const Vector2 &size) noexcept
@@ -106,10 +106,10 @@ void RenderWindow::Resized(const Vector2 &size) noexcept
 	//Track position only in windowed mode
 	if (display_mode_ == WindowDisplayMode::Windowed)
 		size_ = size;
-
-	NotifyWindowActionReceived(events::listeners::WindowAction::Resize);
+	
 	NotifyWindowResized(size);
 	NotifyRenderTargetResized(size);
+	NotifyWindowActionReceived(events::listeners::WindowAction::Resize);
 }
 
 void RenderWindow::DisplayModeChanged() noexcept

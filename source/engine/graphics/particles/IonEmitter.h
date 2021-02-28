@@ -24,6 +24,7 @@ File:	IonEmitter.h
 #include "affectors/IonAffectorManager.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
+#include "graphics/utilities/IonVector3.h"
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
 #include "memory/IonOwningPtr.h"
@@ -44,6 +45,7 @@ namespace ion::graphics::particles
 	using types::Cumulative;
 	using utilities::Color;
 	using utilities::Vector2;
+	using utilities::Vector3;
 
 	class EmitterManager; //Forward declaration
 
@@ -165,7 +167,7 @@ namespace ion::graphics::particles
 		private:
 
 			emitter::EmitterType type_ = emitter::EmitterType::Point;
-			Vector2 position_;
+			Vector3 position_;
 			Vector2 direction_;
 			Vector2 size_;
 			Vector2 inner_size_;
@@ -196,7 +198,7 @@ namespace ion::graphics::particles
 			explicit Emitter(std::string name);
 
 			//Construct a new emitter with the given name and initial values
-			Emitter(std::string name, emitter::EmitterType type, const Vector2 &position, const Vector2 &direction,
+			Emitter(std::string name, emitter::EmitterType type, const Vector3 &position, const Vector2 &direction,
 				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 				std::optional<duration> emission_duration, int particle_quota = 100);
 
@@ -206,17 +208,17 @@ namespace ion::graphics::particles
 			*/
 
 			//Returns a new point emitter from the given name and initial values
-			[[nodiscard]] static Emitter Point(std::string name, const Vector2 &position, const Vector2 &direction,
+			[[nodiscard]] static Emitter Point(std::string name, const Vector3 &position, const Vector2 &direction,
 				real emission_rate, real emission_angle, std::optional<duration> emission_duration,
 				int particle_quota = 100);
 
 			//Returns a new box emitter from the given name and initial values
-			[[nodiscard]] static Emitter Box(std::string name, const Vector2 &position, const Vector2 &direction,
+			[[nodiscard]] static Emitter Box(std::string name, const Vector3 &position, const Vector2 &direction,
 				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 				std::optional<duration> emission_duration, int particle_quota = 100);
 
 			//Returns a new ring emitter from the given name and initial values
-			[[nodiscard]] static Emitter Ring(std::string name, const Vector2 &position, const Vector2 &direction,
+			[[nodiscard]] static Emitter Ring(std::string name, const Vector3 &position, const Vector2 &direction,
 				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 				std::optional<duration> emission_duration, int particle_quota = 100);
 
@@ -240,7 +242,7 @@ namespace ion::graphics::particles
 			}
 
 			//Sets the position of the emitter to the given vector
-			inline void Position(const Vector2 &position) noexcept
+			inline void Position(const Vector3 &position) noexcept
 			{
 				position_ = position;
 			}

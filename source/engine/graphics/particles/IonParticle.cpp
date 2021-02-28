@@ -15,7 +15,7 @@ File:	IonParticle.cpp
 namespace ion::graphics::particles
 {
 
-Particle::Particle(const Vector2 &position, const Vector2 &direction,
+Particle::Particle(const Vector3 &position, const Vector2 &direction,
 				   const Vector2 &size, real mass, const Color &solid_color,
 				   duration life_time) noexcept :
 

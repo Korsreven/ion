@@ -17,6 +17,7 @@ File:	IonParticle.h
 
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
+#include "graphics/utilities/IonVector3.h"
 #include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 
@@ -27,6 +28,7 @@ namespace ion::graphics::particles
 	using types::Cumulative;
 	using utilities::Color;
 	using utilities::Vector2;
+	using utilities::Vector3;
 
 
 	//Particle class that can be represented by...
@@ -36,7 +38,7 @@ namespace ion::graphics::particles
 	{
 		private:
 
-			Vector2 position_;
+			Vector3 position_;
 			Vector2 direction_; //Length represents velocity
 			Vector2 size_;
 			real mass_ = 0.0_r;
@@ -48,7 +50,7 @@ namespace ion::graphics::particles
 			Particle() = default;
 
 			//Constructs a new particle from the given initial values
-			Particle(const Vector2 &position, const Vector2 &direction,
+			Particle(const Vector3 &position, const Vector2 &direction,
 					 const Vector2 &size, real mass, const Color &solid_color,
 					 duration life_time) noexcept;
 
@@ -58,7 +60,7 @@ namespace ion::graphics::particles
 			*/
 
 			//Sets the position of the particle to the given vector
-			inline void Position(const Vector2 &position) noexcept
+			inline void Position(const Vector3 &position) noexcept
 			{
 				position_ = position;
 			}

@@ -125,7 +125,7 @@ namespace ion::graphics::render::vertex
 			{
 				vertex_declaration_ = std::move(vertex_declaration);
 				vertex_count_ = vertex_batch::detail::get_vertex_count(vertex_declaration, vertex_data_);
-				rebind_vertex_attributes_ = vertex_count_ > 0;
+				rebind_vertex_attributes_ = true;
 			}
 
 			//Sets the vertex data of this vertex batch to the given data
@@ -135,7 +135,7 @@ namespace ion::graphics::render::vertex
 				{
 					vertex_data_ = vertex_data;
 					vertex_count_ = vertex_batch::detail::get_vertex_count(vertex_declaration_, vertex_data);
-					reload_vertex_data_ = reload_data && vertex_count_ > 0;
+					reload_vertex_data_ = reload_data;
 				}
 			}
 
@@ -146,8 +146,8 @@ namespace ion::graphics::render::vertex
 				if (vbo_ != vertex_buffer)
 				{
 					vbo_ = vertex_buffer;
-					reload_vertex_data_ = reload_data && vertex_count_ > 0;
-					rebind_vertex_attributes_ = vertex_count_ > 0;
+					reload_vertex_data_ = reload_data;
+					rebind_vertex_attributes_ = true;
 				}
 			}
 
@@ -218,7 +218,7 @@ namespace ion::graphics::render::vertex
 			//Force reloading of vertex data by sending data from RAM to VRAM
 			inline void ReloadData() noexcept
 			{
-				reload_vertex_data_ = vertex_count_ > 0;
+				reload_vertex_data_ = true;
 			}
 
 

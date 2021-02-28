@@ -76,10 +76,30 @@ void disable_point_sprites() noexcept
 
 void MovableParticleSystem::PrepareEmitterVertexStreams()
 {
+	if (std::size(particle_system_->Emitters()) > vertex_streams_.capacity())
+		vertex_streams_.reserve(std::size(particle_system_->Emitters()));
+
 	for (auto off = 0; auto &emitter : particle_system_->Emitters())
 	{
+		//Update existing emitter
+		if (off < std::ssize(vertex_streams_))
+		{
+			if (vertex_streams_[off].particle_quota != emitter.ParticleQuota())
+			{
+				vertex_streams_[off].particle_quota = emitter.ParticleQuota();
+				reload_vertex_buffer_ = true;
+			}
+
+			if (vertex_streams_[off].emitter.get() != &emitter)
+				vertex_streams_[off].emitter = particle_system_->GetEmitter(*emitter.Name());
+
+			vertex_streams_[off].vertex_batch.VertexData({std::data(emitter.Particles()), std::ssize(emitter.Particles())});
+			vertex_streams_[off].vertex_batch.ReloadData(); //Must reload data even if vertex data view (range) is unchanged
+			vertex_streams_[off].vertex_batch.BatchMaterial(emitter.ParticleMaterial());
+		}
+
 		//New emitter
-		if (off == std::ssize(vertex_streams_))
+		else
 		{
 			vertex_streams_.emplace_back(
 				emitter.ParticleQuota(),
@@ -95,28 +115,12 @@ void MovableParticleSystem::PrepareEmitterVertexStreams()
 			reload_vertex_buffer_ = true;
 		}
 
-		//Update existing emitter
-		else
-		{
-			if (vertex_streams_[off].particle_quota != emitter.ParticleQuota())
-			{
-				vertex_streams_[off].particle_quota = emitter.ParticleQuota();
-				reload_vertex_buffer_ = true;
-			}
-
-			if (vertex_streams_[off].emitter.get() != &emitter)
-				vertex_streams_[off].emitter = particle_system_->GetEmitter(*emitter.Name());
-
-			vertex_streams_[off].vertex_batch.VertexData({std::data(emitter.Particles()), std::ssize(emitter.Particles())});
-			vertex_streams_[off].vertex_batch.BatchMaterial(emitter.ParticleMaterial());
-		}
-
 		++off;
 	}
 
 	//Erase unused vertex streams
-	if (std::ssize(vertex_streams_) > std::ssize(particle_system_->Emitters()))
-		vertex_streams_.erase(std::begin(vertex_streams_) + std::ssize(particle_system_->Emitters()), std::end(vertex_streams_));
+	if (std::size(vertex_streams_) > std::size(particle_system_->Emitters()))
+		vertex_streams_.erase(std::begin(vertex_streams_) + std::size(particle_system_->Emitters()), std::end(vertex_streams_));
 }
 
 //Public

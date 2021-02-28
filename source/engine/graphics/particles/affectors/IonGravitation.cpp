@@ -63,13 +63,19 @@ Gravitation::Gravitation(std::string name) :
 	//Empty
 }
 
-Gravitation::Gravitation(std::string name, const Vector2 &position, real gravity, real mass) :
+Gravitation::Gravitation(std::string name, const Vector2 &position, real mass) :
+	Gravitation{std::move(name), position, mass, detail::g}
+{
+	//Empty
+}
+
+Gravitation::Gravitation(std::string name, const Vector2 &position, real mass, real gravity) :
 
 	Affector{std::move(name)},
 
 	position_{position},
-	gravity_{gravity},
-	mass_{mass}
+	mass_{mass},
+	gravity_{gravity}	
 {
 	//Empty
 }

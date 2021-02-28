@@ -175,14 +175,21 @@ using namespace ion::utilities::math::literals;
 
 struct Game :
 	ion::events::listeners::FrameListener,
+	ion::events::listeners::WindowListener,
 	ion::events::listeners::KeyListener,
 	ion::events::listeners::MouseListener
 {
 	std::vector<ion::NonOwningPtr<ion::graphics::scene::Model>> models;
-	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<int>> light_type = nullptr;
-	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<ion::graphics::shaders::variables::glsl::vec3>> light_position = nullptr;
-	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<ion::graphics::shaders::variables::glsl::vec3>> light_direction = nullptr;
-	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<ion::graphics::shaders::variables::glsl::vec4>> light_diffuse = nullptr;
+	std::vector<ion::NonOwningPtr<ion::graphics::scene::MovableParticleSystem>> particle_systems;
+	ion::NonOwningPtr<ion::graphics::render::Viewport> viewport;
+
+	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<ion::graphics::shaders::variables::glsl::mat4>> matrix_projection;
+	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<ion::graphics::shaders::variables::glsl::mat4>> matrix_model_view_projection;
+
+	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<int>> light_type;	
+	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<ion::graphics::shaders::variables::glsl::vec3>> light_position;
+	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<ion::graphics::shaders::variables::glsl::vec3>> light_direction;
+	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<ion::graphics::shaders::variables::glsl::vec4>> light_diffuse;
 
 	/*
 		Frame listener
@@ -190,15 +197,17 @@ struct Game :
 
 	bool FrameStarted(duration time) noexcept override
 	{
-		//Initialize (one time)
-		if (time == 0.0_sec)
+		for (auto &model : models)
 		{
-			for (auto &model : models)
-				model->Prepare();
+			model->Elapse(time);
+			model->Prepare();			
 		}
 
-		for (auto &model : models)
-			model->Elapse(time);
+		for (auto &particle_system : particle_systems)
+		{
+			particle_system->Elapse(time);	
+			particle_system->Prepare();			
+		}
 
 		return true;
 	}
@@ -207,6 +216,29 @@ struct Game :
 	{
 		time;
 		return true;
+	}
+
+
+	/*
+		Window listener
+	*/
+
+	void WindowActionReceived(ion::events::listeners::WindowAction action) noexcept override
+	{
+		if (action == ion::events::listeners::WindowAction::Resize)
+		{
+			if (viewport)
+			{
+				viewport->RenderTo();
+
+				auto camera = viewport->ConnectedCamera();
+				auto &proj_mat = camera->ViewFrustum().ProjectionMatrix();
+				auto &view_mat = camera->ViewMatrix();
+
+				matrix_projection->Get() = proj_mat.TransposeCopy();		
+				matrix_model_view_projection->Get() = (proj_mat * view_mat).TransposeCopy();
+			}
+		}
 	}
 
 
@@ -360,18 +392,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Textures
 			ion::graphics::textures::TextureManager textures;
 			textures.CreateRepository(std::move(image_repository));
-			auto rikku_texture = textures.CreateTexture("rikku", "rikku.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			[[maybe_unused]] auto rikku_np2_texture = textures.CreateTexture("rikku_np2", "rikku_np2.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto cloud_texture = textures.CreateTexture("cloud", "cloud.png");
-			[[maybe_unused]] auto cloud_np2_texture = textures.CreateTexture("cloud_np2", "cloud_np2.png");
-			auto background_texture = textures.CreateTexture("background", "background.jpg");
-			[[maybe_unused]] auto background_np2_texture = textures.CreateTexture("background_np2", "background_np2.jpg");
-			[[maybe_unused]] auto brick_wall_texture = textures.CreateTexture("brick_wall", "brick_wall.jpg");
-			[[maybe_unused]] auto brick_wall_specular_map = textures.CreateTexture("brick_wall_specular", "brick_wall_specular_map.jpg");
-			[[maybe_unused]] auto brick_wall_normal_map = textures.CreateTexture("brick_wall_normal", "brick_wall_normal_map.jpg");
-			[[maybe_unused]] auto light_bulb = textures.CreateTexture("light_bulb", "light_bulb.png");
+			auto asteroid_diffuse = textures.CreateTexture("asteroid_diffuse", "asteroid_diffuse.png");
+			auto asteroid_normal = textures.CreateTexture("asteroid_normal", "asteroid_normal.png");
+			auto asteroid_specular = textures.CreateTexture("asteroid_specular", "asteroid_specular.png");
+			
+			auto brick_wall_diffuse = textures.CreateTexture("brick_wall_diffuse", "brick_wall_diffuse.jpg");
+			auto brick_wall_normal = textures.CreateTexture("brick_wall_normal", "brick_wall_normal.jpg");
+			auto brick_wall_specular = textures.CreateTexture("brick_wall_specular", "brick_wall_specular.jpg");
+			
+			auto pebbles_diffuse = textures.CreateTexture("pebbles_diffuse", "pebbles_diffuse.jpg");
+			auto pebbles_normal = textures.CreateTexture("pebbles_normal", "pebbles_normal.jpg");
+			auto pebbles_specular = textures.CreateTexture("pebbles_specular", "pebbles_specular.jpg");		
+
 			textures.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!textures.Loaded());
@@ -379,7 +411,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Frame sequences
 			ion::graphics::textures::FrameSequenceManager frame_sequences;
 			auto frame_sequence = frame_sequences.CreateFrameSequence(
-				"misc", rikku_texture, cloud_texture, background_texture);
+				"misc", brick_wall_diffuse, pebbles_diffuse, pebbles_diffuse, brick_wall_diffuse);
 
 			//Animation
 			ion::graphics::textures::AnimationManager animations;
@@ -390,11 +422,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Shaders
 			ion::graphics::shaders::ShaderManager shaders;
 			shaders.CreateRepository(std::move(shader_repository));
-			shaders.LogLevel(ion::graphics::shaders::shader_manager::InfoLogLevel::Error);
-			[[maybe_unused]] auto vert_shader = shaders.CreateShader("default_particle_vert", "default_particle.vert");
-			[[maybe_unused]] auto frag_shader = shaders.CreateShader("default_particle_frag", "default_particle.frag");
+			shaders.LogLevel(ion::graphics::shaders::shader_manager::InfoLogLevel::Error);		
 			auto mesh_vert_shader = shaders.CreateShader("default_mesh_vert", "default_mesh.vert");
 			auto mesh_frag_shader = shaders.CreateShader("default_mesh_frag", "default_mesh.frag");
+			auto particle_vert_shader = shaders.CreateShader("default_particle_vert", "default_particle.vert");
+			auto particle_frag_shader = shaders.CreateShader("default_particle_frag", "default_particle.frag");
 			shaders.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!shaders.Loaded());
@@ -402,7 +434,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Shader programs
 			ion::graphics::shaders::ShaderProgramManager shader_programs;
 			shader_programs.LogLevel(ion::graphics::shaders::shader_program_manager::InfoLogLevel::Error);
-			auto mesh_shader_prog = shader_programs.CreateShaderProgram("default_mesh_prog", mesh_vert_shader, mesh_frag_shader);	
+			//auto mesh_shader_prog = shader_programs.CreateShaderProgram("default_mesh_prog", mesh_vert_shader, mesh_frag_shader);
+			auto shader_prog = shader_programs.CreateShaderProgram("default_particle_prog", particle_vert_shader, particle_frag_shader);	
 			shader_programs.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!shader_programs.Loaded());
@@ -410,18 +443,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			using namespace ion::graphics::shaders::variables;
 
 			//Shader structs
-			auto matrix_struct = mesh_shader_prog->CreateStruct("matrix");
-			auto scene_struct = mesh_shader_prog->CreateStruct("scene");
-			auto camera_struct = mesh_shader_prog->CreateStruct("camera");
-			auto material_struct = mesh_shader_prog->CreateStruct("material");
-			auto light_struct = mesh_shader_prog->CreateStruct("light", 8);
+			auto matrix_struct = shader_prog->CreateStruct("matrix");
+			auto scene_struct = shader_prog->CreateStruct("scene");
+			auto camera_struct = shader_prog->CreateStruct("camera");
+			auto material_struct = shader_prog->CreateStruct("material");
+			auto light_struct = shader_prog->CreateStruct("light", 8);
 
 			//Shader variables
 			//Vertex
-			mesh_shader_prog->CreateAttribute<glsl::vec3>("vertex_position");
-			mesh_shader_prog->CreateAttribute<glsl::vec3>("vertex_normal");
-			mesh_shader_prog->CreateAttribute<glsl::vec4>("vertex_color");
-			mesh_shader_prog->CreateAttribute<glsl::vec2>("vertex_tex_coord");
+			//shader_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			//shader_prog->CreateAttribute<glsl::vec3>("vertex_normal");
+			//shader_prog->CreateAttribute<glsl::vec4>("vertex_color");
+			//shader_prog->CreateAttribute<glsl::vec2>("vertex_tex_coord");
+
+			shader_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			shader_prog->CreateAttribute<float>("vertex_point_size");
+			shader_prog->CreateAttribute<glsl::vec4>("vertex_color");
 
 			//Matrices			
 			auto matrix_model_view = matrix_struct->CreateUniform<glsl::mat4>("model_view");
@@ -437,7 +474,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto camera_position = camera_struct->CreateUniform<glsl::vec3>("position");	
 
 			//Material
-			auto has_material = mesh_shader_prog->CreateUniform<bool>("has_material");
+			auto has_material = shader_prog->CreateUniform<bool>("has_material");
 			auto material_ambient = material_struct->CreateUniform<glsl::vec4>("ambient");
 			auto material_diffuse = material_struct->CreateUniform<glsl::vec4>("diffuse");
 			auto material_specular = material_struct->CreateUniform<glsl::vec4>("specular");
@@ -463,7 +500,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto light_cutoff = light_struct->CreateUniform<float>("cutoff");
 			auto light_outer_cutoff = light_struct->CreateUniform<float>("outer_cutoff");
 
-			shader_programs.LoadShaderVariableLocations(*mesh_shader_prog);
+			shader_programs.LoadShaderVariableLocations(*shader_prog);
 
 
 			//Font
@@ -500,13 +537,29 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Material
 			ion::graphics::materials::MaterialManager materials;
+			auto asteroid =
+				materials.CreateMaterial("asteroid",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{0.0_r, 0.0_r, 0.0_r},
+					{0.0_r, 0.0_r, 0.0_r},
+					32.0_r, asteroid_diffuse, asteroid_specular, asteroid_normal);
+
 			auto brick =
 				materials.CreateMaterial("brick",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.0_r, 0.0_r, 0.0_r},
 					{0.0_r, 0.0_r, 0.0_r},
-					32.0_r, brick_wall_texture, brick_wall_specular_map, brick_wall_normal_map);
+					32.0_r, brick_wall_diffuse, brick_wall_specular, brick_wall_normal);
+
+			auto pebbles =
+				materials.CreateMaterial("pebbles",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{0.6_r, 0.6_r, 0.6_r},
+					{0.0_r, 0.0_r, 0.0_r},
+					32.0_r, pebbles_diffuse, pebbles_specular, pebbles_normal);
 			
 			auto ruby =
 				materials.CreateMaterial("ruby",
@@ -534,8 +587,27 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			using namespace ion::graphics::utilities;
 
+			//Particle system
+			ion::graphics::particles::ParticleSystemManager particle_systems;
+			auto particle_system = particle_systems.CreateParticleSystem("asteroids");
+
+			auto emitter = particle_system->CreateEmitter(
+				ion::graphics::particles::Emitter::Point(
+					"spawner", {-0.75_r, 0.5_r, -1.3_r}, {-0.5_r, -0.5_r}, 2.5_r, ion::utilities::math::ToRadians(2.5_r), {}, 25
+				));
+
+			emitter->ParticleVelocity(0.4_r, 0.6_r);
+			emitter->ParticleSize(24.0_r, 32.0_r);
+			emitter->ParticleMass(0.4_r, 0.6_r);
+			emitter->ParticleSolidColor(color::White);
+			emitter->ParticleLifeTime(50.0_sec, 60.0_sec);
+			emitter->ParticleMaterial(asteroid);
+
+			particle_system->CreateAffector(
+				ion::graphics::particles::affectors::Gravitation{"gravity", {0.0_r, 0.0_r}, 2.0_r, 0.5_r});
+
 			//Mesh vertices
-			ion::graphics::render::mesh::Vertices gray_vertices;
+			/*ion::graphics::render::mesh::Vertices gray_vertices;
 			gray_vertices.push_back({{-1.7778_r, 1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
 			gray_vertices.push_back({{-1.7778_r, -1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
 			gray_vertices.push_back({{1.7778_r, -1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
@@ -567,30 +639,34 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			blue_vertices.push_back({{1.7778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
 			blue_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
 
-			ion::graphics::render::mesh::Vertices brick_wall_vertices;
-			brick_wall_vertices.push_back({{-0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 1.0_r}});
-			brick_wall_vertices.push_back({{-0.75_r, -0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 0.0_r}});
-			brick_wall_vertices.push_back({{0.75_r, -0.75_r, -1.3_r}, vector3::UnitZ, {1.0_r, 0.0_r}});
-			brick_wall_vertices.push_back({{0.75_r, -0.75_r, -1.3_r}, vector3::UnitZ, {1.0_r, 0.0_r}});
-			brick_wall_vertices.push_back({{0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {1.0_r, 1.0_r}});
-			brick_wall_vertices.push_back({{-0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 1.0_r}});
+			ion::graphics::render::mesh::Vertices sprite_vertices;
+			sprite_vertices.push_back({{-0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 1.0_r}, color::Red});
+			sprite_vertices.push_back({{-0.75_r, -0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 0.0_r}, color::Green});
+			sprite_vertices.push_back({{0.75_r, -0.75_r, -1.3_r}, vector3::UnitZ, {1.0_r, 0.0_r}, color::Blue});
+			sprite_vertices.push_back({{0.75_r, -0.75_r, -1.3_r}, vector3::UnitZ, {1.0_r, 0.0_r}, color::Blue});
+			sprite_vertices.push_back({{0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {1.0_r, 1.0_r}, color::Green});
+			sprite_vertices.push_back({{-0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 1.0_r}, color::Red});*/
 
 			//Models
 			//auto gray_rectangle = engine.Scene().CreateModel();
 			//gray_rectangle->CreateMesh(std::move(gray_vertices));
 
-			auto red_square = engine.Scene().CreateModel();
-			red_square->CreateMesh(std::move(red_vertices), ruby);
+			//auto red_square = engine.Scene().CreateModel();
+			//red_square->CreateMesh(std::move(red_vertices), ruby);
 
 			//auto green_square = engine.Scene().CreateModel();
 			//green_square->CreateMesh(std::move(green_vertices), emerald);
 
-			auto blue_square = engine.Scene().CreateModel();
-			blue_square->CreateMesh(std::move(blue_vertices), sapphire);
+			//auto blue_square = engine.Scene().CreateModel();
+			//blue_square->CreateMesh(std::move(blue_vertices), sapphire);
 
-			auto brick_wall = engine.Scene().CreateModel();
-			brick_wall->CreateMesh(std::move(brick_wall_vertices), brick,
-				ion::graphics::render::mesh::MeshTexCoordMode::Manual);
+			//auto sprite = engine.Scene().CreateModel();
+			//sprite->CreateMesh(std::move(sprite_vertices), pebbles,
+			//	ion::graphics::render::mesh::MeshTexCoordMode::Manual);
+
+			//Particle systems
+			auto asteroids = engine.Scene().CreateParticleSystem(particle_system);
+			asteroids->Get()->StartAll();
 
 
 			//Camera, projection and view matrix
@@ -599,12 +675,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			camera->Rotation(ion::utilities::math::ToRadians(0.0_r));
 
 			engine.Target()->GetViewport("")->RenderTo();
-			auto proj_mat = camera->ViewFrustum().ProjectionMatrix();
-			auto view_mat = camera->ViewMatrix();
-			auto view_proj_mat = proj_mat * view_mat;
+			auto &proj_mat = camera->ViewFrustum().ProjectionMatrix();
+			auto &view_mat = camera->ViewMatrix();
 
 			//Uniforms
-			scene_ambient->Get() = Color{0.8_r, 0.8_r, 0.8_r, 1.0};
+			scene_ambient->Get() = Color{0.2_r, 0.2_r, 0.2_r, 1.0};
 			scene_gamma->Get() = 1.0_r;
 			scene_light_count->Get() = 1;
 
@@ -621,31 +696,36 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			light_quadratic->Get() = 0.032_r;
 			light_cutoff->Get() = ion::utilities::math::Cos(ion::utilities::math::ToRadians(45.0_r));
 			light_outer_cutoff->Get() = ion::utilities::math::Cos(ion::utilities::math::ToRadians(55.0_r));
-
-			proj_mat.Transpose();
-			view_mat.Transpose();
-			view_proj_mat.Transpose();
-			matrix_model_view->Get() = view_mat;
-			matrix_projection->Get() = proj_mat;		
-			matrix_model_view_projection->Get() = view_proj_mat;
+			
+			matrix_projection->Get() = proj_mat.TransposeCopy();
+			matrix_model_view->Get() = view_mat.TransposeCopy();
+			matrix_model_view_projection->Get() = (proj_mat * view_mat).TransposeCopy();
 
 
 			//Demo setup
-			engine.shader_program = mesh_shader_prog.get();
+			engine.shader_program = shader_prog.get();
+
+			//game.models.push_back(gray_rectangle);
+			//game.models.push_back(red_square);
+			//game.models.push_back(green_square);
+			//game.models.push_back(blue_square);
+			//game.models.push_back(sprite);
+
+			game.particle_systems.push_back(asteroids);
+
+			game.viewport = engine.Target()->GetViewport("");
+			game.matrix_projection = matrix_projection;
+			game.matrix_model_view_projection = matrix_model_view_projection;
 			game.light_type = light_type;
 			game.light_position = light_position;
 			game.light_direction = light_direction;
 			game.light_diffuse = light_diffuse;
-			//game.models.push_back(gray_rectangle);
-			game.models.push_back(red_square);
-			//game.models.push_back(green_square);
-			game.models.push_back(blue_square);
-			game.models.push_back(brick_wall);
 
 
 			//EXAMPLE end
 
 			engine.Subscribe(game);
+			window.Events().Subscribe(game);
 
 			if (auto input = engine.Input(); input)
 			{
@@ -763,49 +843,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto deserialized_tree = ion::script::ScriptTree::Deserialize(bytes);
 		}
 	}
-
-
-	using namespace ion::graphics::shaders::variables;
-
-	Uniform<float> u{"my_uniform"};
-	[[maybe_unused]] glsl::uniform<float> &glsl_u = u.Get();
-
-	UniformVariable &u_var = u;
-	u_var.Visit(
-		[](glsl::uniform<float> &x) noexcept
-		{
-			x = 6.28f;
-		},
-		[](auto&&) noexcept
-		{
-			//Everything else
-		});
-	
-
-	struct vertex
-	{
-		float x, y;
-	};
-
-	vertex vertices[]{{1.0f, 2.0f}, {2.0f, 3.0f}, {3.0f, 4.0f}, {4.0f, 5.0f}};
-
-	Attribute<glsl::vec2> a{"my_attribute"};
-	[[maybe_unused]] glsl::attribute<glsl::vec2> &glsl_a = a.Get();
-	
-	AttributeVariable &a_var = a;
-	a_var.Visit(
-		[&](glsl::attribute<glsl::vec2> &x) noexcept
-		{	
-			x.Pointer(vertices, sizeof(vertex));
-			auto a = x[0].XY();
-			auto b = x[1].XY();
-			auto c = x[2].XY();
-			auto d = x[3].XY();
-		},
-		[](auto&&) noexcept
-		{
-			//Everything else
-		});
 
 	/*{
 		auto encoded = ion::utilities::codec::EncodeTo(5050, 16);

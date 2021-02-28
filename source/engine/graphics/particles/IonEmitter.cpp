@@ -47,7 +47,7 @@ Emitter::Emitter(std::string name) :
 	//Empty
 }
 
-Emitter::Emitter(std::string name, EmitterType type, const Vector2 &position, const Vector2 &direction,
+Emitter::Emitter(std::string name, EmitterType type, const Vector3 &position, const Vector2 &direction,
 	const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 	std::optional<duration> emission_duration, int particle_quota) :
 
@@ -72,21 +72,21 @@ Emitter::Emitter(std::string name, EmitterType type, const Vector2 &position, co
 	Static emitter conversions
 */
 
-Emitter Emitter::Point(std::string name, const Vector2 &position, const Vector2 &direction,
+Emitter Emitter::Point(std::string name, const Vector3 &position, const Vector2 &direction,
 	real emission_rate, real emission_angle, std::optional<duration> emission_duration,
 	int particle_quota)
 {
 	return {std::move(name), EmitterType::Point, position, direction, {}, {}, emission_rate, emission_angle, emission_duration, particle_quota};
 }
 
-Emitter Emitter::Box(std::string name, const Vector2 &position, const Vector2 &direction,
+Emitter Emitter::Box(std::string name, const Vector3 &position, const Vector2 &direction,
 	const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 	std::optional<duration> emission_duration, int particle_quota)
 {
 	return {std::move(name), EmitterType::Box, position, direction, size, inner_size, emission_rate, emission_angle, emission_duration, particle_quota};
 }
 
-Emitter Emitter::Ring(std::string name, const Vector2 &position, const Vector2 &direction,
+Emitter Emitter::Ring(std::string name, const Vector3 &position, const Vector2 &direction,
 	const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 	std::optional<duration> emission_duration, int particle_quota)
 {
