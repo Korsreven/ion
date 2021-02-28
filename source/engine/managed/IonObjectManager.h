@@ -129,13 +129,13 @@ namespace ion::managed
 				Creating
 			*/
 
-			template <typename... Args>
+			template <typename T, typename... Args>
 			auto Emplace(Args &&...args)
 			{
 				AdditionStarted();
 
 				auto &ptr = objects_.emplace_back(
-					make_owning<ObjectT>(std::forward<Args>(args)...));
+					make_owning<T>(std::forward<Args>(args)...));
 				ptr->Owner(static_cast<OwnerT&>(*this));
 				NotifyCreated(*ptr);
 
@@ -209,7 +209,7 @@ namespace ion::managed
 			template <typename... Args>
 			auto Create(Args &&...args)
 			{
-				return Emplace(std::forward<Args>(args)...);
+				return Emplace<ObjectT>(std::forward<Args>(args)...);
 			}
 
 			//Create an object with the given name and arguments
@@ -220,7 +220,7 @@ namespace ion::managed
 				if (auto ptr = object_manager::detail::get_object_by_name(name, objects_); ptr)
 					return ptr;
 				else
-					return Emplace(std::move(name), std::forward<Args>(args)...);
+					return Emplace<ObjectT>(std::move(name), std::forward<Args>(args)...);
 			}
 
 			//Create an object by copying/moving the given object
@@ -235,7 +235,7 @@ namespace ion::managed
 						return ptr;
 				}
 				
-				return Emplace(std::forward<T>(object));
+				return Emplace<std::remove_cvref_t<T>>(std::forward<T>(object));
 			}
 
 

@@ -29,16 +29,29 @@ namespace ion::unmanaged
 	} //object_factory::detail
 
 
-	template <typename T>
+	template <typename ObjectT>
 	class ObjectFactory
 	{
 		public:
 
-			using object_type = T;
+			using object_type = ObjectT;
 
 		private:
 
-			object_factory::detail::container_type<T> objects_;
+			object_factory::detail::container_type<ObjectT> objects_;
+
+
+			/*
+				Creating
+			*/
+
+			template <typename T, typename... Args>
+			auto Emplace(Args &&...args)
+			{
+				auto &ptr = objects_.emplace_back(
+					make_owning<T>(std::forward<Args>(args)...));
+				return NonOwningPtr<ObjectT>{ptr};
+			}
 
 		protected:
 
@@ -50,9 +63,14 @@ namespace ion::unmanaged
 			template <typename... Args>
 			auto Create(Args &&...args)
 			{
-				auto &ptr = objects_.emplace_back(
-					make_owning<T>(std::forward<Args>(args)...));
-				return NonOwningPtr<T>{ptr};
+				return Emplace<ObjectT>(std::forward<Args>(args)...);
+			}
+
+			//Create an object by copying/moving the given object
+			template <typename T, typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
+			auto Create(T &&object)
+			{
+				return Emplace<std::remove_cvref_t<T>>(std::forward<T>(object));
 			}
 
 		public:
@@ -80,14 +98,14 @@ namespace ion::unmanaged
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Objects() noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<object_factory::detail::container_type<T>&>{objects_};
+				return adaptors::ranges::DereferenceIterable<object_factory::detail::container_type<ObjectT>&>{objects_};
 			}
 
 			//Returns an immutable range of all objects in this factory
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Objects() const noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<const object_factory::detail::container_type<T>&>{objects_};
+				return adaptors::ranges::DereferenceIterable<const object_factory::detail::container_type<ObjectT>&>{objects_};
 			}
 
 
@@ -103,7 +121,7 @@ namespace ion::unmanaged
 			}
 
 			//Remove an object from this factory
-			auto Remove(T &object) noexcept
+			auto Remove(ObjectT &object) noexcept
 			{
 				auto iter =
 					std::find_if(std::begin(objects_), std::end(objects_),
