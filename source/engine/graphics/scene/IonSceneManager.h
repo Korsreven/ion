@@ -19,10 +19,16 @@ File:	IonSceneManager.h
 #include "IonCamera.h"
 #include "IonLight.h"
 #include "IonModel.h"
+#include "IonMovableParticleSystem.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonCameraListener.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
+
+namespace ion::graphics::particles
+{
+	class ParticleSystem; //Forward declaration
+}
 
 namespace ion::graphics::scene
 {
@@ -34,13 +40,15 @@ namespace ion::graphics::scene
 	class SceneManager :
 		public managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>,
 		public managed::ObjectManager<Light, SceneManager>,
-		public managed::ObjectManager<Model, SceneManager>
+		public managed::ObjectManager<Model, SceneManager>,
+		public managed::ObjectManager<MovableParticleSystem, SceneManager>
 	{
 		private:
 
 			using CameraBase = managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>;
 			using LightBase = managed::ObjectManager<Light, SceneManager>;
 			using ModelBase = managed::ObjectManager<Model, SceneManager>;
+			using ParticleSystemBase = managed::ObjectManager<MovableParticleSystem, SceneManager>;
 
 			using CameraEventsBase = events::Listenable<events::listeners::CameraListener>;
 
@@ -133,6 +141,21 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto Models() const noexcept
 			{
 				return ModelBase::Objects();
+			}
+
+
+			//Returns a mutable range of all particle systems in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto ParticleSystems() noexcept
+			{
+				return ParticleSystemBase::Objects();
+			}
+
+			//Returns an immutable range of all particle systems in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto ParticleSystems() const noexcept
+			{
+				return ParticleSystemBase::Objects();
 			}
 
 
@@ -242,6 +265,27 @@ namespace ion::graphics::scene
 
 			//Remove a removable model from this manager
 			bool RemoveModel(Model &model) noexcept;
+
+
+			/*
+				Particle systems
+				Creating
+			*/
+
+			//Create a movable particle system with the given particle system
+			NonOwningPtr<MovableParticleSystem> CreateParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system);
+
+
+			/*
+				Particle systems
+				Removing
+			*/
+
+			//Clear all removable particle system from this manager
+			void ClearParticleSystem() noexcept;
+
+			//Remove a removable particle system from this manager
+			bool RemoveParticleSystem(MovableParticleSystem &particle_system) noexcept;
 	};
 } //ion::graphics::scene
 
