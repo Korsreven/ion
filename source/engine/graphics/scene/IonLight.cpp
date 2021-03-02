@@ -18,12 +18,20 @@ namespace ion::graphics::scene
 using namespace light;
 using namespace utilities;
 
+Light::Light(bool visible) noexcept :
+	MovableObject{visible}
+{
+	//Empty
+}
+
 Light::Light(LightType type,
 	const Vector3 &position, const Vector3 &direction,
 	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 	real cutoff_angle, real outer_cutoff_angle,
-	bool cast_shadows) noexcept :
+	bool cast_shadows, bool visible) noexcept :
+
+	MovableObject{visible},
 
 	type_{type},
 	position_{position},

@@ -58,8 +58,6 @@ namespace ion::graphics::scene
 	{
 		private:
 
-			bool visible_ = true;
-
 			Aabb aabb_;
 			Obb obb_;
 			Sphere sphere_;
@@ -75,11 +73,8 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Default constructor
-			Model() = default;
-
 			//Construct a new model with the given visibility
-			explicit Model(bool visible) noexcept;
+			explicit Model(bool visible = true) noexcept;
 
 
 			/*
@@ -99,29 +94,11 @@ namespace ion::graphics::scene
 			{
 				return Objects();
 			}
-			
-
-			/*
-				Modifiers
-			*/
-
-			//Sets the visibility of this model to the given value
-			inline void Visible(bool visible) noexcept
-			{
-				visible_ = visible;
-			}
 
 
 			/*
 				Observers
 			*/
-
-			//Returns true if this model is visible
-			[[nodiscard]] inline auto Visible() const noexcept
-			{
-				return visible_;
-			}
-
 
 			//Returns the local axis-aligned bounding box (AABB) for this model
 			[[nodiscard]] inline auto& AxisAlignedBoundingBox() const noexcept

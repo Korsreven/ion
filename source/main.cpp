@@ -446,6 +446,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto matrix_struct = shader_prog->CreateStruct("matrix");
 			auto scene_struct = shader_prog->CreateStruct("scene");
 			auto camera_struct = shader_prog->CreateStruct("camera");
+			auto primitive_struct = shader_prog->CreateStruct("primitive");
 			auto material_struct = shader_prog->CreateStruct("material");
 			auto light_struct = shader_prog->CreateStruct("light", 8);
 
@@ -473,8 +474,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Camera
 			auto camera_position = camera_struct->CreateUniform<glsl::vec3>("position");	
 
-			//Material
-			auto has_material = shader_prog->CreateUniform<bool>("has_material");
+			//Primitive
+			//auto primitive_texture = primitive_struct->CreateUniform<glsl::sampler2D>("texture");
+			//auto primitive_has_texture = primitive_struct->CreateUniform<bool>("has_texture");
+			auto primitive_has_material = primitive_struct->CreateUniform<bool>("has_material");
+
+			//Material			
 			auto material_ambient = material_struct->CreateUniform<glsl::vec4>("ambient");
 			auto material_diffuse = material_struct->CreateUniform<glsl::vec4>("diffuse");
 			auto material_specular = material_struct->CreateUniform<glsl::vec4>("specular");

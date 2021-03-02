@@ -35,14 +35,26 @@ namespace ion::graphics::scene
 
 			SceneNode *parent_node_ = nullptr;
 
+		protected:
+
+			bool visible_ = true;
+
 		public:
 
 			//Default constructor
 			MovableObject() = default;
 
-			//Construct a movable object with the given name
-			explicit MovableObject(std::string name) :
-				managed::ManagedObject<SceneManager>{std::move(name)}
+			//Construct a movable object with the given visibility
+			explicit MovableObject(bool visible) :
+				visible_{visible}
+			{
+				//Empty
+			}
+
+			//Construct a movable object with the given name and visibility
+			explicit MovableObject(std::string name, bool visible = true) :
+				managed::ManagedObject<SceneManager>{std::move(name)},
+				visible_{visible}
 			{
 				//Empty
 			}
@@ -83,6 +95,12 @@ namespace ion::graphics::scene
 				parent_node_ = node;
 			}
 
+			//Sets the visibility of this movable object to the given value
+			inline void Visible(bool visible) noexcept
+			{
+				visible_ = visible;
+			}
+
 
 			/*
 				Observers
@@ -92,6 +110,12 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto ParentNode() const noexcept
 			{
 				return parent_node_;
+			}
+
+			//Returns true if this model is visible
+			[[nodiscard]] inline auto Visible() const noexcept
+			{
+				return visible_;
 			}
 	};
 } //ion::graphics::scene

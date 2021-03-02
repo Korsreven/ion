@@ -103,8 +103,8 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new movable particle system with the given particle system
-			explicit MovableParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system);
+			//Construct a new movable particle system with the given particle system and visibility
+			explicit MovableParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible = true);
 
 
 			/*

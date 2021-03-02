@@ -34,6 +34,7 @@ namespace ion::graphics::shaders
 			Matrix,
 			Scene,
 			Camera,
+			Primitive,
 			Material,
 			Light
 		};
@@ -59,7 +60,10 @@ namespace ion::graphics::shaders
 
 			Camera_Position,
 			
-			HasMaterial,
+			Primitive_Texture,
+			Primitive_HasTexture,
+			Primitive_HasMaterial,
+
 			Material_Ambient,
 			Material_Diffuse,
 			Material_Specular,
@@ -125,6 +129,7 @@ namespace ion::graphics::shaders
 				{StructName::Matrix,	"matrix"},
 				{StructName::Scene,		"scene"},
 				{StructName::Camera,	"camera"},
+				{StructName::Primitive,	"primitive"},
 				{StructName::Material,	"material"},
 				{StructName::Light,		"light"}
 			};
@@ -152,30 +157,33 @@ namespace ion::graphics::shaders
 
 				{UniformName::Camera_Position,				{"camera.position",					6}},
 
-				{UniformName::HasMaterial,					{"has_material",					7}},
-				{UniformName::Material_Ambient,				{"material.ambient",				8}},
-				{UniformName::Material_Diffuse,				{"material.diffuse",				9}},
-				{UniformName::Material_Specular,			{"material.specular",				10}},
-				{UniformName::Material_Emissive,			{"material.emissive",				11}},
-				{UniformName::Material_Shininess,			{"material.shininess",				12}},
-				{UniformName::Material_DiffuseMap,			{"material.diffuse_map",			13}},
-				{UniformName::Material_SpecularMap,			{"material.specular_map",			14}},
-				{UniformName::Material_NormalMap,			{"material.normal_map",				15}},
-				{UniformName::Material_HasDiffuseMap,		{"material.has_diffuse_map",		16}},
-				{UniformName::Material_HasSpecularMap,		{"material.has_specular_map",		17}},
-				{UniformName::Material_HasNormalMap,		{"material.has_normal_map",			18}},
+				{UniformName::Primitive_Texture,			{"primitive.texture",				7}},
+				{UniformName::Primitive_HasTexture,			{"primitive.has_texture",			8}},
+				{UniformName::Primitive_HasMaterial,		{"primitive.has_material",			9}},
 
-				{UniformName::Light_Type,					{"light[0].type",					19}},
-				{UniformName::Light_Position,				{"light[0].position",				20}},
-				{UniformName::Light_Direction,				{"light[0].direction",				21}},
-				{UniformName::Light_Ambient,				{"light[0].ambient",				22}},
-				{UniformName::Light_Diffuse,				{"light[0].diffuse",				23}},
-				{UniformName::Light_Specular,				{"light[0].specular",				24}},
-				{UniformName::Light_Constant,				{"light[0].constant",				25}},
-				{UniformName::Light_Linear,					{"light[0].linear",					26}},
-				{UniformName::Light_Quadratic,				{"light[0].quadratic",				27}},
-				{UniformName::Light_Cutoff,					{"light[0].cutoff",					28}},
-				{UniformName::Light_OuterCutoff,			{"light[0].outer_cutoff",			29}}
+				{UniformName::Material_Ambient,				{"material.ambient",				10}},
+				{UniformName::Material_Diffuse,				{"material.diffuse",				11}},
+				{UniformName::Material_Specular,			{"material.specular",				12}},
+				{UniformName::Material_Emissive,			{"material.emissive",				13}},
+				{UniformName::Material_Shininess,			{"material.shininess",				14}},
+				{UniformName::Material_DiffuseMap,			{"material.diffuse_map",			15}},
+				{UniformName::Material_SpecularMap,			{"material.specular_map",			16}},
+				{UniformName::Material_NormalMap,			{"material.normal_map",				17}},
+				{UniformName::Material_HasDiffuseMap,		{"material.has_diffuse_map",		18}},
+				{UniformName::Material_HasSpecularMap,		{"material.has_specular_map",		19}},
+				{UniformName::Material_HasNormalMap,		{"material.has_normal_map",			20}},
+
+				{UniformName::Light_Type,					{"light[0].type",					21}},
+				{UniformName::Light_Position,				{"light[0].position",				22}},
+				{UniformName::Light_Direction,				{"light[0].direction",				23}},
+				{UniformName::Light_Ambient,				{"light[0].ambient",				24}},
+				{UniformName::Light_Diffuse,				{"light[0].diffuse",				25}},
+				{UniformName::Light_Specular,				{"light[0].specular",				26}},
+				{UniformName::Light_Constant,				{"light[0].constant",				27}},
+				{UniformName::Light_Linear,					{"light[0].linear",					28}},
+				{UniformName::Light_Quadratic,				{"light[0].quadratic",				29}},
+				{UniformName::Light_Cutoff,					{"light[0].cutoff",					30}},
+				{UniformName::Light_OuterCutoff,			{"light[0].outer_cutoff",			31}}
 			};
 
 		namespace detail

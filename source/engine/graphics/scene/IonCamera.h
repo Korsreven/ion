@@ -68,11 +68,11 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new camera with the given name
-			explicit Camera(std::string name);
+			//Construct a new camera with the given name and visibility
+			explicit Camera(std::string name, bool visible = true);
 
-			//Construct a new camera with the given name and a custom frustum
-			Camera(std::string name, const render::Frustum &frustum);
+			//Construct a new camera with the given name, a custom frustum and visibility
+			Camera(std::string name, const render::Frustum &frustum, bool visible = true);
 
 
 			/*
@@ -96,7 +96,7 @@ namespace ion::graphics::scene
 					rotation_ = angle;
 			}
 
-			//
+			//Sets the view frustum of the camera to the given frustum
 			inline void ViewFrustum(const render::Frustum &frustum) noexcept
 			{
 				frustum_ = frustum;
@@ -120,7 +120,7 @@ namespace ion::graphics::scene
 				return rotation_;
 			}
 
-			//
+			//Returns the view frustum of the camera
 			[[nodiscard]] inline auto& ViewFrustum() const noexcept
 			{
 				return frustum_;

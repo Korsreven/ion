@@ -41,12 +41,14 @@ void enable_point_sprites() noexcept
 		glEnable(GL_POINT_SPRITE); //Enable point sprite
 		glEnable(GL_VERTEX_PROGRAM_POINT_SIZE); //Enable varying point size
 		glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE); //Enable sprite tex coords
+		glPointParameterf(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT); //Set 0,0 to lower left
 		break;
 
 		case gl::Extension::ARB:
 		glEnable(GL_POINT_SPRITE_ARB); //Enable point sprite
 		glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB); //Enable varying point size
 		glTexEnvf(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE); //Enable sprite tex coords
+		glPointParameterf(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT); //Set 0,0 to lower left
 		break;
 	}
 }
@@ -56,12 +58,14 @@ void disable_point_sprites() noexcept
 	switch (gl::PointSprite_Support())
 	{
 		case gl::Extension::Core:
+		glPointParameterf(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT); //Set 0,0 back to upper left
 		glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_FALSE); //Disable sprite tex coords
 		glDisable(GL_VERTEX_PROGRAM_POINT_SIZE); //Disable varying point size
 		glDisable(GL_POINT_SPRITE); //Disable point sprite
 		break;
 
 		case gl::Extension::ARB:
+		glPointParameterf(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT); //Set 0,0 back to upper left
 		glTexEnvf(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE); //Disable sprite tex coords
 		glDisable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB); //Disable varying point size
 		glDisable(GL_POINT_SPRITE_ARB); //Disable point sprite
@@ -125,8 +129,9 @@ void MovableParticleSystem::PrepareEmitterVertexStreams()
 
 //Public
 
-MovableParticleSystem::MovableParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system) :
+MovableParticleSystem::MovableParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible) :
 	
+	MovableObject{visible},
 	particle_system_{particle_system ? std::make_optional(particle_system->Clone()) : std::nullopt},
 	initial_particle_system_{particle_system}
 {
@@ -190,7 +195,7 @@ void MovableParticleSystem::Prepare() noexcept
 
 void MovableParticleSystem::Draw(shaders::ShaderProgram *shader_program) noexcept
 {
-	if (particle_system_)
+	if (visible_ && particle_system_)
 	{
 		for (auto &stream : vertex_streams_)
 		{

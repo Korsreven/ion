@@ -79,15 +79,15 @@ void Camera::NotifyCameraMoved(const Vector3 &position) noexcept
 
 //Public
 
-Camera::Camera(std::string name) :
-	MovableObject{std::move(name)}
+Camera::Camera(std::string name, bool visible) :
+	MovableObject{std::move(name), visible}
 {
 	//Empty
 }
 
-Camera::Camera(std::string name, const render::Frustum &frustum) :
+Camera::Camera(std::string name, const render::Frustum &frustum, bool visible) :
 
-	MovableObject{std::move(name)},
+	MovableObject{std::move(name), visible},
 	frustum_{frustum}
 {
 	//Empty

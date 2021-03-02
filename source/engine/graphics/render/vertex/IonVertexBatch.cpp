@@ -270,7 +270,7 @@ void bind_texture(int texture_handle, int texture_unit) noexcept
 
 void set_has_material_uniform(materials::Material *material, shaders::ShaderProgram &shader_program) noexcept
 {
-	if (auto has_material = shader_program.GetUniform(shaders::shader_layout::UniformName::HasMaterial); has_material)
+	if (auto has_material = shader_program.GetUniform(shaders::shader_layout::UniformName::Primitive_HasMaterial); has_material)
 		has_material->Get<bool>() = !!material;
 }
 

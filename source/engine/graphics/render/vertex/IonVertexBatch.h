@@ -90,11 +90,12 @@ namespace ion::graphics::render::vertex
 			vertex_batch::VertexDrawMode draw_mode_;
 			VertexDeclaration vertex_declaration_;
 			VertexDataView vertex_data_;
+			NonOwningPtr<materials::Material> material_;
 			int vertex_count_ = 0;
 
+			bool use_vao_ = true;
 			std::optional<VertexArrayObject> vao_;
 			std::optional<VertexBufferView> vbo_;
-			NonOwningPtr<materials::Material> material_;
 
 			duration time_ = 0.0_sec;
 			bool reload_vertex_data_ = false;
@@ -125,7 +126,7 @@ namespace ion::graphics::render::vertex
 			{
 				vertex_declaration_ = std::move(vertex_declaration);
 				vertex_count_ = vertex_batch::detail::get_vertex_count(vertex_declaration, vertex_data_);
-				rebind_vertex_attributes_ = true;
+				rebind_vertex_attributes_ = use_vao_;
 			}
 
 			//Sets the vertex data of this vertex batch to the given data
@@ -139,6 +140,25 @@ namespace ion::graphics::render::vertex
 				}
 			}
 
+			//Sets the material used by this vertex batch to the given material
+			inline void BatchMaterial(NonOwningPtr<materials::Material> material) noexcept
+			{
+				material_ = material;
+			}
+
+
+			//Sets if this vertex batch should use vertex array or not for vertex buffer and attribute bindings
+			inline void UseVertexArray(bool use) noexcept
+			{
+				if (use_vao_ != use)
+				{
+					use_vao_ = use;
+					rebind_vertex_attributes_ = use_vao_;
+					
+					if (!use_vao_ && vao_)
+						vao_.reset();
+				}
+			}
 
 			//Sets the vertex buffer of this vertex batch to the given vertex buffer
 			inline void VertexBuffer(std::optional<VertexBufferView> vertex_buffer, bool reload_data = true) noexcept
@@ -147,15 +167,8 @@ namespace ion::graphics::render::vertex
 				{
 					vbo_ = vertex_buffer;
 					reload_vertex_data_ = reload_data;
-					rebind_vertex_attributes_ = true;
+					rebind_vertex_attributes_ = use_vao_;
 				}
-			}
-
-			//Sets the material used by this vertex batch to the given material
-			inline void BatchMaterial(NonOwningPtr<materials::Material> material) noexcept
-			{
-				if (material_ != material)
-					material_ = material;
 			}
 
 
@@ -182,12 +195,25 @@ namespace ion::graphics::render::vertex
 				return vertex_data_;
 			}
 
+			//Returns the material that this vertex batch is using
+			//Returns nullptr if no material is available
+			[[nodiscard]] inline auto BatchMaterial() const noexcept
+			{
+				return material_;
+			}
+
 			//Returns the vertex count of this vertex batch
 			[[nodiscard]] inline auto VertexCount() const noexcept
 			{
 				return vertex_count_;
 			}
 
+
+			//Returns true if this vertex batch is using vertex array for vertex buffer and attribute bindings
+			[[nodiscard]] inline auto UseVertexArray() const noexcept
+			{
+				return use_vao_;
+			}
 
 			//Returns the vertex array that this vertex batch is using for buffer and attribute bindings
 			//Returns nullopt if no vertex array is available
@@ -201,13 +227,6 @@ namespace ion::graphics::render::vertex
 			[[nodiscard]] inline auto VertexBuffer() const noexcept
 			{
 				return vbo_;
-			}
-
-			//Returns the material that this vertex batch is using
-			//Returns nullptr if no material is available
-			[[nodiscard]] inline auto BatchMaterial() const noexcept
-			{
-				return material_;
 			}
 
 

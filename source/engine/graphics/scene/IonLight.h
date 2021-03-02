@@ -82,8 +82,8 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Default constructor
-			Light() = default;
+			//Construct a new light with the given visibility
+			explicit Light(bool visible = true) noexcept;
 
 			//Construct a new light with the given values
 			Light(light::LightType type,
@@ -91,7 +91,7 @@ namespace ion::graphics::scene
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				real cutoff_angle, real outer_cutoff_angle,
-				bool cast_shadows = true) noexcept;
+				bool cast_shadows = true, bool visible = true) noexcept;
 
 
 			/*

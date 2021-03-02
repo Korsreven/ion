@@ -52,7 +52,7 @@ render::mesh::VertexContainer Model::MeshVertexData() const
 //Public
 
 Model::Model(bool visible) noexcept :
-	visible_{visible}
+	MovableObject{visible}
 {
 	//Empty
 }
