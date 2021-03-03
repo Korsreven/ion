@@ -13,11 +13,15 @@ File:	IonVertexBatch.cpp
 #include "IonVertexBatch.h"
 
 #include <cstddef>
+
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/materials/IonMaterial.h"
 #include "graphics/shaders/IonShaderLayout.h"
 #include "graphics/shaders/IonShaderProgram.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
+#include "graphics/textures/IonAnimation.h"
+#include "graphics/textures/IonTexture.h"
+#include "types/IonTypeTraits.h"
 
 namespace ion::graphics::render::vertex
 {
@@ -66,6 +70,34 @@ int get_vertex_count(const VertexDeclaration &vertex_declaration, const VertexDa
 	return vertex_data && vertex_declaration.VertexSize() > 0 ?
 		vertex_data.Size() / vertex_declaration.VertexSize() :
 		0;
+}
+
+
+std::tuple<NonOwningPtr<textures::Animation>, NonOwningPtr<textures::Texture>, std::optional<int>> get_textures(const texture_type &some_texture) noexcept
+{
+	using tuple_type = std::tuple<NonOwningPtr<textures::Animation>, NonOwningPtr<textures::Texture>, std::optional<int>>;
+
+	return std::visit(types::overloaded{
+		[](std::monostate) { return tuple_type{nullptr, nullptr, std::nullopt}; },
+		[](NonOwningPtr<textures::Animation> animation) { return tuple_type{animation, nullptr, std::nullopt}; },
+		[](NonOwningPtr<textures::Texture> texture) { return tuple_type{nullptr, texture, std::nullopt}; },
+		[](int texture_handle) { return tuple_type{nullptr, nullptr, texture_handle}; }
+	}, some_texture);
+}
+
+std::optional<int> get_texture_handle(const texture_type &some_texture, duration time) noexcept
+{
+	if (auto [animation, texture, texture_handle] = get_textures(some_texture); animation)
+	{
+		if (auto frame = animation->FrameAt(time); frame)
+			return frame->Handle();
+		else
+			return {};
+	}
+	else if (texture)
+		return texture->Handle();
+	else
+		return texture_handle;
 }
 
 
@@ -268,30 +300,31 @@ void bind_texture(int texture_handle, int texture_unit) noexcept
 }
 
 
-void set_has_material_uniform(materials::Material *material, shaders::ShaderProgram &shader_program) noexcept
-{
-	if (auto has_material = shader_program.GetUniform(shaders::shader_layout::UniformName::Primitive_HasMaterial); has_material)
-		has_material->Get<bool>() = !!material;
-}
-
-void set_material_uniforms(materials::Material &material, duration time, shaders::ShaderProgram &shader_program) noexcept
+void set_material_uniforms(materials::Material *material, duration time, shaders::ShaderProgram &shader_program) noexcept
 {
 	using namespace shaders::variables;
 
+	if (auto has_material = shader_program.GetUniform(shaders::shader_layout::UniformName::Primitive_HasMaterial); has_material)
+		has_material->Get<bool>() = !!material;
+
+	if (!material)
+		return; //Nothing more to set
+
+
 	if (auto ambient = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Ambient); ambient)
-		ambient->Get<glsl::vec4>() = material.AmbientColor();
+		ambient->Get<glsl::vec4>() = material->AmbientColor();
 
 	if (auto diffuse = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Diffuse); diffuse)
-		diffuse->Get<glsl::vec4>() = material.DiffuseColor();
+		diffuse->Get<glsl::vec4>() = material->DiffuseColor();
 
 	if (auto specular = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Specular); specular)
-		specular->Get<glsl::vec4>() = material.SpecularColor();
+		specular->Get<glsl::vec4>() = material->SpecularColor();
 
 	if (auto emissive = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Emissive); emissive)
-		emissive->Get<glsl::vec4>() = material.EmissiveColor();
+		emissive->Get<glsl::vec4>() = material->EmissiveColor();
 
 	if (auto shininess = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Shininess); shininess)
-		shininess->Get<float>() = material.Shininess(); //Using 'real' could make this uniform double
+		shininess->Get<float>() = material->Shininess(); //Using 'real' could make this uniform double
 
 
 	auto diffuse_map_activated = false;
@@ -300,7 +333,7 @@ void set_material_uniforms(materials::Material &material, duration time, shaders
 	
 	if (auto diffuse_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_DiffuseMap); diffuse_map)
 	{
-		if (auto texture = material.DiffuseMap(time); texture && texture->Handle())
+		if (auto texture = material->DiffuseMap(time); texture && texture->Handle())
 		{
 			if (auto texture_unit = diffuse_map->Get<glsl::sampler2D>(); texture_unit >= 0)
 			{
@@ -312,7 +345,7 @@ void set_material_uniforms(materials::Material &material, duration time, shaders
 
 	if (auto specular_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_SpecularMap); specular_map)
 	{
-		if (auto texture = material.SpecularMap(time); texture && texture->Handle())
+		if (auto texture = material->SpecularMap(time); texture && texture->Handle())
 		{
 			if (auto texture_unit = specular_map->Get<glsl::sampler2D>(); texture_unit >= 0)
 			{
@@ -324,7 +357,7 @@ void set_material_uniforms(materials::Material &material, duration time, shaders
 	
 	if (auto normal_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_NormalMap); normal_map)
 	{
-		if (auto texture = material.NormalMap(time); texture && texture->Handle())
+		if (auto texture = material->NormalMap(time); texture && texture->Handle())
 		{
 			if (auto texture_unit = normal_map->Get<glsl::sampler2D>(); texture_unit >= 0)
 			{
@@ -343,6 +376,27 @@ void set_material_uniforms(materials::Material &material, duration time, shaders
 
 	if (auto has_normal_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasNormalMap); has_normal_map)
 		has_normal_map->Get<bool>() = normal_map_activated;
+}
+
+void set_texture_uniforms(texture_type &some_texture, duration time, shaders::ShaderProgram &shader_program) noexcept
+{
+	using namespace shaders::variables;
+	auto texture_activated = false;
+
+	if (auto texture = shader_program.GetUniform(shaders::shader_layout::UniformName::Primitive_Texture); texture && some_texture.index() > 0)
+	{
+		if (auto texture_handle = get_texture_handle(some_texture, time); texture_handle)
+		{
+			if (auto texture_unit = texture->Get<glsl::sampler2D>(); texture_unit >= 0)
+			{
+				bind_texture(*texture_handle, texture_unit);
+				texture_activated = true;
+			}
+		}
+	}
+
+	if (auto has_texture = shader_program.GetUniform(shaders::shader_layout::UniformName::Primitive_HasTexture); has_texture)
+		has_texture->Get<bool>() = texture_activated;
 }
 
 } //vertex_batch::detail
@@ -459,11 +513,8 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 			shader_program->Owner()->SendAttributeValues(*shader_program);
 		}
 
-		detail::set_has_material_uniform(material_.get(), *shader_program);
-
-		//Has material
-		if (material_)
-			detail::set_material_uniforms(*material_, time_, *shader_program);
+		detail::set_material_uniforms(material_.get(), time_, *shader_program);
+		detail::set_texture_uniforms(texture_, time_, *shader_program);
 
 		shader_program->Owner()->SendUniformValues(*shader_program);
 	}
@@ -481,12 +532,16 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 				detail::set_vertex_pointers(vertex_declaration_, vertex_data_.Pointer());
 		}
 
-		//Has material
-		if (material_)
+		//Has material or texture
+		if (material_ || texture_.index() > 0)
 		{
 			//Enable diffuse texture
 			if (auto diffuse_map = material_->DiffuseMap(time_); diffuse_map && diffuse_map->Handle())
 				detail::bind_texture(*diffuse_map->Handle());
+
+			//Enable texture
+			else if (auto texture_handle = detail::get_texture_handle(texture_, time_); texture_handle)
+				detail::bind_texture(*texture_handle);
 		}
 	}
 
@@ -518,8 +573,8 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 		if (!shader_in_use)
 			shader_program->Owner()->DeactivateShaderProgram(*shader_program);
 
-		//Has material
-		if (material_)
+		//Has material or texture
+		if (material_ || texture_.index() > 0)
 			detail::bind_texture(0, 0);
 	}
 	else //Fixed-function pipeline
@@ -533,8 +588,8 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 				vbo_->Unbind();
 		}
 
-		//Has material
-		if (material_)
+		//Has material or texture
+		if (material_ || texture_.index() > 0)
 			detail::bind_texture(0);
 	}
 }

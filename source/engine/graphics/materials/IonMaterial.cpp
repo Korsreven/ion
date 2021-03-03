@@ -12,6 +12,8 @@ File:	IonMaterial.cpp
 
 #include "IonMaterial.h"
 
+#include "graphics/textures/IonAnimation.h"
+#include "graphics/textures/IonTexture.h"
 #include "types/IonTypeTraits.h"
 #include "utilities/IonMath.h"
 
@@ -93,7 +95,7 @@ std::pair<NonOwningPtr<Animation>, NonOwningPtr<Texture>> get_texture_maps(const
 	return std::visit(types::overloaded{
 		[](std::monostate) { return pair_type{nullptr, nullptr}; },
 		[](NonOwningPtr<Animation> animation) { return pair_type{animation, nullptr}; },
-		[](NonOwningPtr<Texture> texture) { return pair_type{nullptr, texture}; }	
+		[](NonOwningPtr<Texture> texture) { return pair_type{nullptr, texture}; }
 	}, texture_map);
 }
 

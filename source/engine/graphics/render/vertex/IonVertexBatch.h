@@ -14,6 +14,8 @@ File:	IonVertexBatch.h
 #define ION_VERTEX_BATCH_H
 
 #include <optional>
+#include <tuple>
+#include <variant>
 
 #include "IonVertexArrayObject.h"
 #include "IonVertexBufferObject.h"
@@ -33,6 +35,12 @@ namespace ion::graphics
 	namespace shaders
 	{
 		class ShaderProgram;
+	}
+
+	namespace textures
+	{
+		class Animation;
+		class Texture;
 	}
 }
 
@@ -58,8 +66,18 @@ namespace ion::graphics::render::vertex
 
 		namespace detail
 		{
+			using texture_type = std::variant<
+				std::monostate,
+				NonOwningPtr<textures::Animation>,
+				NonOwningPtr<textures::Texture>,
+				int>; //Texture handle
+
+
 			int vertex_draw_mode_to_gl_draw_mode(VertexDrawMode draw_mode) noexcept;
 			int get_vertex_count(const VertexDeclaration &vertex_declaration, const VertexDataView &vertex_data) noexcept;
+
+			std::tuple<NonOwningPtr<textures::Animation>, NonOwningPtr<textures::Texture>, std::optional<int>> get_textures(const texture_type &some_texture) noexcept;
+			std::optional<int> get_texture_handle(const texture_type &some_texture, duration time) noexcept;
 
 
 			/*
@@ -76,9 +94,9 @@ namespace ion::graphics::render::vertex
 
 			void bind_texture(int texture_handle) noexcept;
 			void bind_texture(int texture_handle, int texture_unit) noexcept;
-			
-			void set_has_material_uniform(materials::Material *material, shaders::ShaderProgram &shader_program) noexcept;
-			void set_material_uniforms(materials::Material &material, duration time, shaders::ShaderProgram &shader_program) noexcept;
+
+			void set_material_uniforms(materials::Material *material, duration time, shaders::ShaderProgram &shader_program) noexcept;
+			void set_texture_uniforms(texture_type &some_texture, duration time, shaders::ShaderProgram &shader_program) noexcept;
 		} //detail
 	} //vertex_batch
 
@@ -91,6 +109,7 @@ namespace ion::graphics::render::vertex
 			VertexDeclaration vertex_declaration_;
 			VertexDataView vertex_data_;
 			NonOwningPtr<materials::Material> material_;
+			vertex_batch::detail::texture_type texture_;
 			int vertex_count_ = 0;
 
 			bool use_vao_ = true;
@@ -144,6 +163,36 @@ namespace ion::graphics::render::vertex
 			inline void BatchMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
 				material_ = material;
+			}
+
+			//Sets the texture used by this vertex batch to the given animation
+			inline void BatchTexture(NonOwningPtr<textures::Animation> animation) noexcept
+			{
+				texture_ = animation;
+			}
+
+			//Sets the texture used by this vertex batch to the given texture
+			inline void BatchTexture(NonOwningPtr<textures::Texture> texture) noexcept
+			{
+				texture_ = texture;
+			}
+
+			//Sets the texture used by this vertex batch to the given texture handle
+			inline void BatchTexture(int texture_handle) noexcept
+			{
+				texture_ = texture_handle;
+			}
+
+			//Detach the texture used by this vertex batch
+			inline void BatchTexture(std::nullptr_t) noexcept
+			{
+				texture_ = std::monostate{};
+			}
+
+			//Detach the texture used by this vertex batch
+			inline void BatchTexture(std::nullopt_t) noexcept
+			{
+				BatchTexture(nullptr);
 			}
 
 
@@ -200,6 +249,13 @@ namespace ion::graphics::render::vertex
 			[[nodiscard]] inline auto BatchMaterial() const noexcept
 			{
 				return material_;
+			}
+
+			//Returns the attached texture as a tuple of either animation, texture or a texture handle that this vertex batch is using
+			//Returns {nullptr, nullptr, nullopt} if no texture is available
+			[[nodiscard]] inline auto BatchTexture() const noexcept
+			{
+				return vertex_batch::detail::get_textures(texture_);
 			}
 
 			//Returns the vertex count of this vertex batch

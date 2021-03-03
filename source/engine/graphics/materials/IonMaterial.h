@@ -18,14 +18,22 @@ File:	IonMaterial.h
 #include <utility>
 #include <variant>
 
-#include "graphics/textures/IonAnimation.h"
-#include "graphics/textures/IonTexture.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
+
+//Forward declarations
+namespace ion::graphics
+{
+	namespace textures
+	{
+		class Animation;
+		class Texture;
+	}
+}
 
 namespace ion::graphics::materials
 {
