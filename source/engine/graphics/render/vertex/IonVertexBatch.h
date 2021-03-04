@@ -126,8 +126,20 @@ namespace ion::graphics::render::vertex
 			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration) noexcept;
 
 			//Construct a new vertex batch with the given draw mode, vertex declaration, vertex data and material (optional)
-			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration, const VertexDataView &vertex_data,
-				NonOwningPtr<materials::Material> material = nullptr) noexcept;
+			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
+				const VertexDataView &vertex_data, NonOwningPtr<materials::Material> material = nullptr) noexcept;
+
+			//Construct a new vertex batch with the given draw mode, vertex declaration, vertex data and animation
+			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
+				const VertexDataView &vertex_data, NonOwningPtr<textures::Animation> animation) noexcept;
+
+			//Construct a new vertex batch with the given draw mode, vertex declaration, vertex data and texture
+			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
+				const VertexDataView &vertex_data, NonOwningPtr<textures::Texture> texture) noexcept;
+
+			//Construct a new vertex batch with the given draw mode, vertex declaration, vertex data and a texture handle
+			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
+				const VertexDataView &vertex_data, int texture_handle) noexcept;
 
 
 			/*

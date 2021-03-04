@@ -410,8 +410,8 @@ VertexBatch::VertexBatch(VertexDrawMode draw_mode, VertexDeclaration vertex_decl
 	//Empty
 }
 
-VertexBatch::VertexBatch(VertexDrawMode draw_mode, VertexDeclaration vertex_declaration, const VertexDataView &vertex_data,
-	NonOwningPtr<materials::Material> material) noexcept :
+VertexBatch::VertexBatch(VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
+	const VertexDataView &vertex_data, NonOwningPtr<materials::Material> material) noexcept :
 
 	draw_mode_{draw_mode},
 	vertex_declaration_{std::move(vertex_declaration)},
@@ -419,6 +419,46 @@ VertexBatch::VertexBatch(VertexDrawMode draw_mode, VertexDeclaration vertex_decl
 	vertex_count_{detail::get_vertex_count(vertex_declaration_, vertex_data_)},
 
 	material_{material}
+{
+	//Empty
+}
+
+
+VertexBatch::VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
+	const VertexDataView &vertex_data, NonOwningPtr<textures::Animation> animation) noexcept :
+
+	draw_mode_{draw_mode},
+	vertex_declaration_{std::move(vertex_declaration)},
+	vertex_data_{vertex_data},
+	vertex_count_{detail::get_vertex_count(vertex_declaration_, vertex_data_)},
+
+	texture_{animation}
+{
+	//Empty
+}
+
+VertexBatch::VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
+	const VertexDataView &vertex_data, NonOwningPtr<textures::Texture> texture) noexcept :
+
+	draw_mode_{draw_mode},
+	vertex_declaration_{std::move(vertex_declaration)},
+	vertex_data_{vertex_data},
+	vertex_count_{detail::get_vertex_count(vertex_declaration_, vertex_data_)},
+
+	texture_{texture}
+{
+	//Empty
+}
+
+VertexBatch::VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
+	const VertexDataView &vertex_data, int texture_handle) noexcept :
+
+	draw_mode_{draw_mode},
+	vertex_declaration_{std::move(vertex_declaration)},
+	vertex_data_{vertex_data},
+	vertex_count_{detail::get_vertex_count(vertex_declaration_, vertex_data_)},
+
+	texture_{texture_handle}
 {
 	//Empty
 }
