@@ -84,6 +84,8 @@ File:	main.cpp
 #include "graphics/scene/IonLight.h"
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/IonMovableObject.h"
+#include "graphics/scene/IonMovableParticleSystem.h"
+#include "graphics/scene/IonMovableText.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/shaders/IonShader.h"
 #include "graphics/shaders/IonShaderLayout.h"

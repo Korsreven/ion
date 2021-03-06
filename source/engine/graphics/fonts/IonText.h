@@ -417,7 +417,7 @@ namespace ion::graphics::fonts
 			}
 
 			//Returns the default font style for the displayed text
-			//Returns nullopt if no default decoration has been specified
+			//Returns nullopt if no default font style has been specified
 			[[nodiscard]] inline auto DefaultFontStyle() const noexcept
 			{
 				return default_font_style_;

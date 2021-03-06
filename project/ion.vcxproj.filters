@@ -444,6 +444,9 @@
     <ClCompile Include="..\source\engine\graphics\scene\IonMovableParticleSystem.cpp">
       <Filter>Source Files\graphics\scene</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\IonMovableText.cpp">
+      <Filter>Source Files\graphics\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -885,6 +888,9 @@
       <Filter>Header Files\graphics\render\vertex</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\scene\IonMovableParticleSystem.h">
+      <Filter>Header Files\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\IonMovableText.h">
       <Filter>Header Files\graphics\scene</Filter>
     </ClInclude>
   </ItemGroup>
