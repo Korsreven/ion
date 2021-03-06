@@ -13,19 +13,14 @@ File:	IonVertexDataView.h
 #ifndef ION_VERTEX_DATA_VIEW_H
 #define ION_VERTEX_DATA_VIEW_H
 
+#include <array>
 #include <vector>
 
 namespace ion::graphics::render::vertex
 {
-	namespace vertex_data_view
+	namespace vertex_data_view::detail
 	{
-		template <typename T>
-		using VertexContainer = std::vector<T>;
-
-		namespace detail
-		{
-		} //detail
-	} //vertex_data_view
+	} //vertex_data_view::detail
 
 
 	class VertexDataView
@@ -53,8 +48,19 @@ namespace ion::graphics::render::vertex
 			}
 
 			//Construct a new vertex data view with the given vertices
+			template <typename T, size_t Size>
+			VertexDataView(const std::array<T, Size> &vertices) noexcept :
+
+				pointer_{std::data(vertices)},
+				size_{Size * static_cast<int>(sizeof(T))},
+				element_size_{static_cast<int>(sizeof(T))}
+			{
+				//Empty
+			}
+
+			//Construct a new vertex data view with the given vertices
 			template <typename T>
-			VertexDataView(const vertex_data_view::VertexContainer<T> &vertices) noexcept :
+			VertexDataView(const std::vector<T> &vertices) noexcept :
 
 				pointer_{std::data(vertices)},
 				size_{std::ssize(vertices) * static_cast<int>(sizeof(T))},
@@ -101,8 +107,17 @@ namespace ion::graphics::render::vertex
 			}
 
 			//Sets the vertex data view pointer to the given vertices
+			template <typename T, size_t Size>
+			inline void Pointer(const std::array<T, Size> &vertices) noexcept
+			{
+				pointer_ = std::data(vertices);
+				size_ = Size * sizeof(T);
+				element_size_ = sizeof(T);
+			}
+
+			//Sets the vertex data view pointer to the given vertices
 			template <typename T>
-			inline void Pointer(const vertex_data_view::VertexContainer<T> &vertices) noexcept
+			inline void Pointer(const std::vector<T> &vertices) noexcept
 			{
 				pointer_ = std::data(vertices);
 				size_ = std::ssize(vertices) * sizeof(T);
