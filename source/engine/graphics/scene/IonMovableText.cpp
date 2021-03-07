@@ -111,13 +111,93 @@ fonts::Font* get_default_font(const fonts::text::TextBlock &text_block, const fo
 real get_glyph_horizontal_position(const std::optional<Vector2> &area_size, const Vector2 &padding,
 	fonts::text::TextAlignment horizontal_alignment, real line_width, const Vector3 &position) noexcept
 {
-	return 0.0_r;
+	auto [x, y, z] = position.XYZ();
+
+	if (area_size)
+	{
+		auto area_max_size = fonts::text::detail::text_area_max_size(*area_size, padding);
+		auto [width, height] = area_max_size.XY();
+
+		switch (horizontal_alignment)
+		{
+			case fonts::text::TextAlignment::Left:
+			return x - width * 0.5_r;
+
+			case fonts::text::TextAlignment::Center:
+			return x - line_width * 0.5_r;
+
+			case fonts::text::TextAlignment::Right:
+			return x + width * 0.5_r - line_width;
+		}
+	}
+	else
+	{
+		switch (horizontal_alignment)
+		{
+			case fonts::text::TextAlignment::Left:
+			return x;
+
+			case fonts::text::TextAlignment::Center:
+			return x - line_width * 0.5_r;
+
+			case fonts::text::TextAlignment::Right:
+			return x - line_width;
+		}
+	}
+
+	return x;
 }
 
 real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const Vector2 &padding,
-	fonts::text::TextVerticalAlignment vertical_alignment, real line_height, int current_line, int total_lines, const Vector3 &position) noexcept
+	fonts::text::TextVerticalAlignment vertical_alignment, real line_height, int font_size, int total_lines, const Vector3 &position) noexcept
 {
-	return 0.0_r;
+	auto [x, y, z] = position.XYZ();
+
+	if (area_size)
+	{
+		auto area_max_size = fonts::text::detail::text_area_max_size(*area_size, padding);
+		auto [width, height] = area_max_size.XY();
+
+		switch (vertical_alignment)
+		{
+			case fonts::text::TextVerticalAlignment::Top:	
+			return y + height * 0.5_r - line_height + (line_height - font_size) * 0.5_r;
+
+			case fonts::text::TextVerticalAlignment::Middle:
+			{
+				//Even lines
+				if (total_lines % 2 == 0)
+					return y + (line_height + (line_height - font_size) * 0.5_r) * (total_lines * 0.5_r - 1.0_r);	
+				else //Odd lines
+					return y + (line_height - font_size * 0.5_r) * (total_lines / 2); //Integer division
+			}
+
+			case fonts::text::TextVerticalAlignment::Bottom:
+			return y - height * 0.5_r + line_height * (total_lines - 1) + (line_height - font_size) * 0.5_r;
+		}
+	}
+	else
+	{
+		switch (vertical_alignment)
+		{
+			case fonts::text::TextVerticalAlignment::Top:
+			return y - line_height + (line_height - font_size) * 0.5_r;
+
+			case fonts::text::TextVerticalAlignment::Middle:
+			{
+				//Even lines
+				if (total_lines % 2 == 0)
+					return y + (line_height + (line_height - font_size) * 0.5_r) * (total_lines * 0.5_r - 1.0_r);	
+				else //Odd lines
+					return y + (line_height - font_size * 0.5_r) * (total_lines / 2); //Integer division
+			}
+
+			case fonts::text::TextVerticalAlignment::Bottom:
+			return y + line_height * (total_lines - 1) + (line_height - font_size) * 0.5_r;
+		}
+	}
+
+	return y;
 }
 
 
@@ -223,7 +303,7 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, g
 	if (!line_height)
 		return; //Text type face is not available/loaded
 
-
+	auto font_size = text.Lettering()->RegularFont()->Size();
 	auto formatted_lines = text.FormattedLines();
 	auto from_line = text.FromLine();
 	auto max_lines = text.MaxLines().value_or(std::ssize(formatted_lines));
@@ -248,7 +328,7 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, g
 		glyph_position.Y(
 			get_glyph_vertical_position(
 				text.AreaSize(), text.Padding(), text.VerticalAlignment(),
-				*line_height, 0, total_lines, position
+				*line_height, font_size, total_lines, position
 			));
 
 		for (auto iter = std::begin(formatted_lines) + from_line,
