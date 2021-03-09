@@ -166,6 +166,8 @@ namespace ion::graphics::fonts
 			TextBlocks html_to_formatted_blocks(std::string_view content);
 			MeasuredTextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks,
 				const std::optional<Vector2> &area_size, const Vector2 &padding, TypeFace &type_face);
+
+			int get_character_count(const TextBlocks &text_blocks) noexcept;
 		} //detail
 	} //text
 
@@ -507,6 +509,15 @@ namespace ion::graphics::fonts
 			//All valid HTML tags are removed if TextFormatting is HTML
 			//If area size has been specified, content may be word wrapped
 			[[nodiscard]] std::string UnformattedDisplayedContent() const;
+
+
+			//Returns the number of characters in the (plain) unformatted content
+			//All valid HTML tags are removed if TextFormatting is HTML
+			[[nodiscard]] int UnformattedCharacterCount() const;
+
+			//Returns the number of characters in the (plain) unformatted content as displayed
+			//All valid HTML tags are removed if TextFormatting is HTML
+			[[nodiscard]] int UnformattedDisplayedCharacterCount() const;
 	};
 } //ion::graphics::fonts
 

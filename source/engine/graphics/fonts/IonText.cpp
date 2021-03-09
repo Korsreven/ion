@@ -55,6 +55,17 @@ MeasuredTextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks,
 	return formatted_lines;
 }
 
+
+int get_character_count(const TextBlocks &text_blocks) noexcept
+{
+	auto count = 0;
+
+	for (auto &text_block : text_blocks)
+		count += std::ssize(text_block.Content);
+
+	return count;
+}
+
 } //text::detail
 
 
@@ -419,6 +430,48 @@ std::string Text::UnformattedDisplayedContent() const
 	//Could be missing/invalid type face
 	else
 		return "";
+}
+
+
+int Text::UnformattedCharacterCount() const
+{
+	return detail::get_character_count(formatted_blocks_);
+}
+
+int Text::UnformattedDisplayedCharacterCount() const
+{
+	auto max_lines = max_lines_.value_or(std::ssize(formatted_lines_));
+
+	if (area_size_)
+	{
+		if (auto line_height = LineHeight();
+			line_height && *line_height > 0.0_r)
+		{
+			auto area_max_lines = detail::text_area_max_lines(*area_size_, padding_, *line_height);
+			max_lines = std::min(max_lines, area_max_lines);
+		}
+	}
+
+	//One or more lines to display
+	if (!std::empty(formatted_lines_) &&
+		from_line_ < std::ssize(formatted_lines_) && max_lines > 0)
+	{
+		if (from_line_ + max_lines > std::ssize(formatted_lines_))
+			max_lines = std::ssize(formatted_lines_) - from_line_;
+
+		auto iter = std::begin(formatted_lines_) + from_line_;
+		auto end = iter + max_lines;
+		auto count = 0;
+
+		for (; iter != end; ++iter)
+			count += detail::get_character_count(iter->first.Blocks);
+
+		return count;
+	}
+	//Nothing to display
+	//Could be missing/invalid type face
+	else
+		return 0;
 }
 
 } //ion::graphics::fonts
