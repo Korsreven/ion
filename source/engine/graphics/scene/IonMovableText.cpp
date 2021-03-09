@@ -164,13 +164,7 @@ real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const 
 			return y + height * 0.5_r - line_height + (line_height - font_size) * 0.5_r;
 
 			case fonts::text::TextVerticalAlignment::Middle:
-			{
-				//Even lines
-				if (total_lines % 2 == 0)
-					return y + (line_height + (line_height - font_size) * 0.5_r) * (total_lines * 0.5_r - 1.0_r);	
-				else //Odd lines
-					return y + (line_height - font_size * 0.5_r) * (total_lines / 2); //Integer division
-			}
+			return y + (line_height * total_lines) * 0.5_r - (line_height - font_size) * 0.5_r - font_size;
 
 			case fonts::text::TextVerticalAlignment::Bottom:
 			return y - height * 0.5_r + line_height * (total_lines - 1) + (line_height - font_size) * 0.5_r;
@@ -184,13 +178,7 @@ real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const 
 			return y - line_height + (line_height - font_size) * 0.5_r;
 
 			case fonts::text::TextVerticalAlignment::Middle:
-			{
-				//Even lines
-				if (total_lines % 2 == 0)
-					return y + (line_height + (line_height - font_size) * 0.5_r) * (total_lines * 0.5_r - 1.0_r);	
-				else //Odd lines
-					return y + (line_height - font_size * 0.5_r) * (total_lines / 2); //Integer division
-			}
+			return y + (line_height * total_lines) * 0.5_r - (line_height - font_size) * 0.5_r - font_size;
 
 			case fonts::text::TextVerticalAlignment::Bottom:
 			return y + line_height * (total_lines - 1) + (line_height - font_size) * 0.5_r;
@@ -255,7 +243,8 @@ vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric, c
 		};
 }
 
-void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text, Vector3 &position, glyph_vertex_streams &streams)
+void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text, int &glyph_count,
+	Vector3 &position, glyph_vertex_streams &streams)
 {
 	if (auto font = get_default_font(text_block, text); font)
 	{
@@ -274,17 +263,30 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 						glyph_index = static_cast<unsigned char>('?');
 							//Use question mark for characters outside current font encoding
 
-					streams.emplace_back(
-						get_glyph_vertex_data((*metrics)[glyph_index], position, foreground_color),
-						(*handles)[glyph_index]
-					);
+					//Update existing stream
+					if (glyph_count < std::ssize(streams))
+					{
+						streams[glyph_count].vertex_data = get_glyph_vertex_data((*metrics)[glyph_index], position, foreground_color);
+						streams[glyph_count].vertex_batch.VertexData(streams[glyph_count].vertex_data);
+						streams[glyph_count].vertex_batch.BatchTexture((*handles)[glyph_index]);
+					}
 
-					streams.back().vertex_batch.UseVertexArray(false);
-						//Turn off vertex array object (VAO) for each glyph
-						//There could be a lot of glyphs in a text,
-						//so keep hardware VAOs for other geometry
+					//New stream
+					else
+					{
+						streams.emplace_back(
+							get_glyph_vertex_data((*metrics)[glyph_index], position, foreground_color),
+							(*handles)[glyph_index]
+						);
+
+						streams.back().vertex_batch.UseVertexArray(false);
+							//Turn off vertex array object (VAO) for each glyph
+							//There could be a lot of glyphs in a text,
+							//so keep hardware VAOs for other geometry
+					}
 
 					position.X(position.X() + (*metrics)[glyph_index].Advance);
+					++glyph_count;
 				}
 
 				//Decorations
@@ -321,14 +323,14 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, g
 	if (!std::empty(formatted_lines) &&
 		from_line < std::ssize(formatted_lines) && max_lines > 0)
 	{
-		auto total_lines = max_lines - from_line;
-		auto glyph_position = position;
+		auto glyph_count = 0;
+		auto glyph_position = position;	
 
 		//Get first glyph y position
 		glyph_position.Y(
 			get_glyph_vertical_position(
 				text.AreaSize(), text.Padding(), text.VerticalAlignment(),
-				*line_height, font_size, total_lines, position
+				*line_height, font_size, max_lines - from_line, position
 			));
 
 		for (auto iter = std::begin(formatted_lines) + from_line,
@@ -342,7 +344,7 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, g
 				));
 
 			for (auto &block : iter->first.Blocks)
-				get_block_vertex_streams(block, text, glyph_position, streams);
+				get_block_vertex_streams(block, text, glyph_count, glyph_position, streams);
 
 			glyph_position.Y(glyph_position.Y() - *line_height); //Next glyph y position
 		}
@@ -354,53 +356,20 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, g
 
 //Private
 
-void MovableText::PrepareGlyphVertexStreams()
+void MovableText::PrepareVertexStreams()
 {
-	/*if (std::size(text_->Emitters()) > vertex_streams_.capacity())
-		vertex_streams_.reserve(std::size(text_->Emitters()));
+	auto max_glyphs = text_->UnformattedDisplayedCharacterCount();
 
-	for (auto off = 0; auto &emitter : text_->Emitters())
+	if (max_glyphs > static_cast<int>(vertex_streams_.capacity()))
 	{
-		//Update existing emitter
-		if (off < std::ssize(vertex_streams_))
-		{
-			if (vertex_streams_[off].particle_quota != emitter.ParticleQuota())
-			{
-				vertex_streams_[off].particle_quota = emitter.ParticleQuota();
-				reload_vertex_buffer_ = true;
-			}
-
-			if (vertex_streams_[off].emitter.get() != &emitter)
-				vertex_streams_[off].emitter = text_->GetEmitter(*emitter.Name());
-
-			vertex_streams_[off].vertex_batch.VertexData({std::data(emitter.Particles()), std::ssize(emitter.Particles())});
-			vertex_streams_[off].vertex_batch.ReloadData(); //Must reload data even if vertex data view (range) is unchanged
-			vertex_streams_[off].vertex_batch.BatchMaterial(emitter.ParticleMaterial());
-		}
-
-		//New emitter
-		else
-		{
-			vertex_streams_.emplace_back(
-				emitter.ParticleQuota(),
-				text_->GetEmitter(*emitter.Name()),
-				render::vertex::VertexBatch{
-					render::vertex::vertex_batch::VertexDrawMode::Points,
-					detail::get_vertex_declaration(),
-					{std::data(emitter.Particles()), std::ssize(emitter.Particles())},
-					emitter.ParticleMaterial()
-				}
-			);
-
-			reload_vertex_buffer_ = true;
-		}
-
-		++off;
+		vertex_streams_.reserve(max_glyphs);
+		reload_vertex_buffer_ = true;
 	}
 
-	//Erase unused vertex streams
-	if (std::size(vertex_streams_) > std::size(text_->Emitters()))
-		vertex_streams_.erase(std::begin(vertex_streams_) + std::size(text_->Emitters()), std::end(vertex_streams_));*/
+	get_text_vertex_streams(*text_, {0.0_r, 0.0_r, -1.0_r}, vertex_streams_);
+
+	if (std::ssize(vertex_streams_) > max_glyphs)
+		vertex_streams_.erase(std::begin(vertex_streams_) + max_glyphs, std::end(vertex_streams_));
 }
 
 //Public
@@ -409,7 +378,9 @@ MovableText::MovableText(NonOwningPtr<fonts::Text> text, bool visible) :
 	
 	MovableObject{visible},
 	text_{text ? std::make_optional(*text) : std::nullopt},
-	initial_text_{text}
+	initial_text_{text},
+
+	reload_vertex_streams_{!!text_}
 {
 	//Empty
 }
@@ -435,7 +406,8 @@ void MovableText::Prepare() noexcept
 	if (!text_)
 		return;
 
-	PrepareGlyphVertexStreams();
+	if (reload_vertex_streams_)
+		PrepareVertexStreams();
 
 	if (reload_vertex_buffer_)
 	{

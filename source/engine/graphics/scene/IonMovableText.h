@@ -113,7 +113,8 @@ namespace ion::graphics::scene
 			fonts::text::TextVerticalAlignment vertical_alignment, real line_height, int font_size, int total_lines, const Vector3 &position) noexcept;
 
 		vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric, const Vector3 &position, const Color &color);
-		void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text, Vector3 &position, glyph_vertex_streams &streams);
+		void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text, int &glyph_count,
+			Vector3 &position, glyph_vertex_streams &streams);
 		void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, glyph_vertex_streams &streams);
 	} //movable_text::detail
 
@@ -125,13 +126,15 @@ namespace ion::graphics::scene
 
 			std::optional<fonts::Text> text_;
 			NonOwningPtr<fonts::Text> initial_text_;
-			movable_text::detail::glyph_vertex_streams vertex_streams_;
 
+			movable_text::detail::glyph_vertex_streams vertex_streams_;	
 			std::optional<render::vertex::VertexBufferObject> vbo_;
+
+			bool reload_vertex_streams_ = false;
 			bool reload_vertex_buffer_ = false;
 
 
-			void PrepareGlyphVertexStreams();
+			void PrepareVertexStreams();
 
 		public:
 
