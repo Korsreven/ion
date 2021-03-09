@@ -93,13 +93,14 @@ namespace ion::graphics::scene
 
 			std::optional<particles::ParticleSystem> particle_system_;
 			NonOwningPtr<particles::ParticleSystem> initial_particle_system_;
-			movable_particle_system::detail::emitter_vertex_streams vertex_streams_;
 
+			movable_particle_system::detail::emitter_vertex_streams vertex_streams_;
 			std::optional<render::vertex::VertexBufferObject> vbo_;
+
 			bool reload_vertex_buffer_ = false;
 
 
-			void PrepareEmitterVertexStreams();
+			void PrepareVertexStreams();
 
 		public:
 

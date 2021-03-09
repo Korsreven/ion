@@ -78,14 +78,14 @@ void disable_point_sprites() noexcept
 
 //Private
 
-void MovableParticleSystem::PrepareEmitterVertexStreams()
+void MovableParticleSystem::PrepareVertexStreams()
 {
 	if (std::size(particle_system_->Emitters()) > vertex_streams_.capacity())
 		vertex_streams_.reserve(std::size(particle_system_->Emitters()));
 
 	for (auto off = 0; auto &emitter : particle_system_->Emitters())
 	{
-		//Update existing emitter
+		//Update existing stream
 		if (off < std::ssize(vertex_streams_))
 		{
 			if (vertex_streams_[off].particle_quota != emitter.ParticleQuota())
@@ -102,7 +102,7 @@ void MovableParticleSystem::PrepareEmitterVertexStreams()
 			vertex_streams_[off].vertex_batch.BatchMaterial(emitter.ParticleMaterial());
 		}
 
-		//New emitter
+		//New stream
 		else
 		{
 			vertex_streams_.emplace_back(
@@ -159,7 +159,7 @@ void MovableParticleSystem::Prepare() noexcept
 	if (!particle_system_)
 		return;
 
-	PrepareEmitterVertexStreams();
+	PrepareVertexStreams();
 
 	if (reload_vertex_buffer_)
 	{
