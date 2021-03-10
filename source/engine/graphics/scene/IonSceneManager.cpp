@@ -178,9 +178,9 @@ bool SceneManager::RemoveModel(Model &model) noexcept
 	Creating
 */
 
-NonOwningPtr<MovableParticleSystem> SceneManager::CreateParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system)
+NonOwningPtr<MovableParticleSystem> SceneManager::CreateParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible)
 {
-	return ParticleSystemBase::Create(particle_system);
+	return ParticleSystemBase::Create(particle_system, visible);
 }
 
 
@@ -189,7 +189,7 @@ NonOwningPtr<MovableParticleSystem> SceneManager::CreateParticleSystem(NonOwning
 	Removing
 */
 
-void SceneManager::ClearParticleSystem() noexcept
+void SceneManager::ClearParticleSystems() noexcept
 {
 	ParticleSystemBase::Clear();
 }
@@ -197,6 +197,33 @@ void SceneManager::ClearParticleSystem() noexcept
 bool SceneManager::RemoveParticleSystem(MovableParticleSystem &particle_system) noexcept
 {
 	return ParticleSystemBase::Remove(particle_system);
+}
+
+
+/*
+	Text
+	Creating
+*/
+
+NonOwningPtr<MovableText> SceneManager::CreateText(NonOwningPtr<fonts::Text> text, bool visible)
+{
+	return TextBase::Create(text, visible);
+}
+
+
+/*
+	Text
+	Removing
+*/
+
+void SceneManager::ClearTexts() noexcept
+{
+	TextBase::Clear();
+}
+
+bool SceneManager::RemoveText(MovableText &text) noexcept
+{
+	return TextBase::Remove(text);
 }
 
 } //ion::graphics::scene

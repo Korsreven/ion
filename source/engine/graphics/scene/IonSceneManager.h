@@ -20,6 +20,7 @@ File:	IonSceneManager.h
 #include "IonLight.h"
 #include "IonModel.h"
 #include "IonMovableParticleSystem.h"
+#include "IonMovableText.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonCameraListener.h"
 #include "managed/IonObjectManager.h"
@@ -28,6 +29,11 @@ File:	IonSceneManager.h
 namespace ion::graphics::particles
 {
 	class ParticleSystem; //Forward declaration
+}
+
+namespace ion::graphics::render
+{
+	class Viewport; //Forward declaration
 }
 
 namespace ion::graphics::scene
@@ -41,7 +47,8 @@ namespace ion::graphics::scene
 		public managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>,
 		public managed::ObjectManager<Light, SceneManager>,
 		public managed::ObjectManager<Model, SceneManager>,
-		public managed::ObjectManager<MovableParticleSystem, SceneManager>
+		public managed::ObjectManager<MovableParticleSystem, SceneManager>,
+		public managed::ObjectManager<MovableText, SceneManager>
 	{
 		private:
 
@@ -49,8 +56,12 @@ namespace ion::graphics::scene
 			using LightBase = managed::ObjectManager<Light, SceneManager>;
 			using ModelBase = managed::ObjectManager<Model, SceneManager>;
 			using ParticleSystemBase = managed::ObjectManager<MovableParticleSystem, SceneManager>;
+			using TextBase = managed::ObjectManager<MovableText, SceneManager>;
 
 			using CameraEventsBase = events::Listenable<events::listeners::CameraListener>;
+
+
+			NonOwningPtr<render::Viewport> viewport_;
 
 		public:
 
@@ -156,6 +167,21 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto ParticleSystems() const noexcept
 			{
 				return ParticleSystemBase::Objects();
+			}
+
+
+			//Returns a mutable range of all texts in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Texts() noexcept
+			{
+				return TextBase::Objects();
+			}
+
+			//Returns an immutable range of all texts in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Texts() const noexcept
+			{
+				return TextBase::Objects();
 			}
 
 
@@ -272,8 +298,8 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a movable particle system with the given particle system
-			NonOwningPtr<MovableParticleSystem> CreateParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system);
+			//Create a movable particle system with the given particle system and visibility
+			NonOwningPtr<MovableParticleSystem> CreateParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible = true);
 
 
 			/*
@@ -281,11 +307,50 @@ namespace ion::graphics::scene
 				Removing
 			*/
 
-			//Clear all removable particle system from this manager
-			void ClearParticleSystem() noexcept;
+			//Clear all removable particle systems from this manager
+			void ClearParticleSystems() noexcept;
 
 			//Remove a removable particle system from this manager
 			bool RemoveParticleSystem(MovableParticleSystem &particle_system) noexcept;
+
+
+			/*
+				Text
+				Creating
+			*/
+
+			//Create a movable text with the given text and visibility
+			NonOwningPtr<MovableText> CreateText(NonOwningPtr<fonts::Text> text, bool visible = true);
+
+
+			/*
+				Text
+				Removing
+			*/
+
+			//Clear all removable texts from this manager
+			void ClearTexts() noexcept;
+
+			//Remove a removable text from this manager
+			bool RemoveText(MovableText &text) noexcept;
+
+
+			/*
+				Viewport
+			*/
+
+			//Sets the viewport connected to this scene manager to the given viewport
+			inline void ConnectedViewport(NonOwningPtr<graphics::render::Viewport> viewport) noexcept
+			{
+				viewport_ = viewport;
+			}
+
+			//Returns a pointer to the viewport connected to this scene manager
+			//Returns nullptr if this scene manager does not have a viewport connected
+			[[nodiscard]] inline auto ConnectedViewport() const noexcept
+			{
+				return viewport_;
+			}
 	};
 } //ion::graphics::scene
 

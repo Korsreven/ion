@@ -291,8 +291,9 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 	frustum.BaseViewportHeight(viewport->Bounds().ToSize().Y());
 
 	//Create a default camera with frustum and connect to viewport
+	scene_manager_.ConnectedViewport(viewport);
 	auto camera = scene_manager_.CreateCamera("", frustum);
-	viewport->ConnectedCamera(camera);
+	viewport->ConnectedCamera(camera); //TEMP should be controlled by scene manager
 
 	return *render_window_;
 }
