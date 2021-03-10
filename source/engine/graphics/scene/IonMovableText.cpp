@@ -17,6 +17,9 @@ File:	IonMovableText.cpp
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/fonts/IonFont.h"
 #include "graphics/fonts/IonTypeFace.h"
+#include "graphics/fonts/utilities/IonFontUtility.h"
+#include "graphics/render/IonViewport.h"
+#include "graphics/scene/IonSceneManager.h"
 
 #undef min
 
@@ -24,6 +27,8 @@ namespace ion::graphics::scene
 {
 
 using namespace movable_text;
+
+using namespace graphics::utilities;
 using namespace types::type_literals;
 
 namespace movable_text::detail
@@ -189,16 +194,22 @@ real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const 
 }
 
 
-vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric, const Vector3 &position, const Color &color)
+vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
+	const Vector2 &coordinate_scaling, const Vector3 &position, const Vector2 &scaling, const Color &color)
 {
 	auto [x, y, z] = position.XYZ();
 	auto [r, g, b, a] = color.RGBA();
 
-	x += metric.Left;
-	y += static_cast<real>(metric.Top) - metric.Height;
-
 	auto s = static_cast<real>(metric.Width) / metric.ActualWidth;
 	auto t = static_cast<real>(metric.Height) / metric.ActualHeight;
+
+	auto left = metric.Left * scaling.X() * coordinate_scaling.X();
+	auto top = metric.Top * scaling.Y() * coordinate_scaling.Y();
+	auto width = metric.Width * scaling.X() * coordinate_scaling.X();
+	auto height = metric.Height * scaling.Y() * coordinate_scaling.Y();
+
+	x += left;
+	y += top - height;
 
 	//Note:
 	//The vertices follows [0, height] -> [width, 0] (normal coordinate system)
@@ -212,7 +223,7 @@ vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric, c
 	return
 		{
 			//Vertex #1
-			x, y + metric.Height, z,
+			x, y + height, z,
 			r, g, b, a,
 			0.0_r, 0.0_r,
 
@@ -222,29 +233,29 @@ vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric, c
 			0.0_r, t,
 
 			//Vertex #3
-			x + metric.Width, y, z,
+			x + width, y, z,
 			r, g, b, a,
 			s, t,
 
 			//Vertex #4
-			x + metric.Width, y, z,
+			x + width, y, z,
 			r, g, b, a,
 			s, t,
 
 			//Vertex #5
-			x + metric.Width, y + metric.Height, z,
+			x + width, y + height, z,
 			r, g, b, a,
 			s, 0.0_r,
 
 			//Vertex #6
-			x, y + metric.Height, z,
+			x, y + height, z,
 			r, g, b, a,
 			0.0_r, 0.0_r
 		};
 }
 
 void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text, int &glyph_count,
-	Vector3 &position, glyph_vertex_streams &streams)
+	const Vector2 &coordinate_scaling, Vector3 &position, glyph_vertex_streams &streams)
 {
 	if (auto font = get_default_font(text_block, text); font)
 	{
@@ -252,7 +263,24 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 		{
 			if (auto &metrics = font->GlyphMetrics(); metrics)
 			{
-				auto foreground_color = get_foreground_color(text_block, text);	
+				auto foreground_color = get_foreground_color(text_block, text);
+				auto scaling =
+					[&]() noexcept
+					{
+						if (text_block.FontSize)
+						{
+							switch (*text_block.FontSize)
+							{
+								case fonts::text::TextBlockFontSize::Smaller:
+								return fonts::utilities::detail::smaller_scale_factor;
+
+								case fonts::text::TextBlockFontSize::Larger:
+								return fonts::utilities::detail::larger_scale_factor;
+							}
+						}
+
+						return 1.0_r;
+					}();
 
 				//For each character
 				for (auto c : text_block.Content)
@@ -266,7 +294,8 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 					//Update existing stream
 					if (glyph_count < std::ssize(streams))
 					{
-						streams[glyph_count].vertex_data = get_glyph_vertex_data((*metrics)[glyph_index], position, foreground_color);
+						streams[glyph_count].vertex_data =
+							get_glyph_vertex_data((*metrics)[glyph_index], coordinate_scaling, position, scaling, foreground_color);
 						streams[glyph_count].vertex_batch.VertexData(streams[glyph_count].vertex_data);
 						streams[glyph_count].vertex_batch.BatchTexture((*handles)[glyph_index]);
 					}
@@ -275,7 +304,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 					else
 					{
 						streams.emplace_back(
-							get_glyph_vertex_data((*metrics)[glyph_index], position, foreground_color),
+							get_glyph_vertex_data((*metrics)[glyph_index], coordinate_scaling, position, scaling, foreground_color),
 							(*handles)[glyph_index]
 						);
 
@@ -298,7 +327,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 	}
 }
 
-void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, glyph_vertex_streams &streams)
+void get_text_vertex_streams(const fonts::Text &text, const Vector2 &coordinate_scaling, const Vector3 &position, glyph_vertex_streams &streams)
 {
 	auto line_height = text.LineHeight();
 
@@ -344,7 +373,7 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, g
 				));
 
 			for (auto &block : iter->first.Blocks)
-				get_block_vertex_streams(block, text, glyph_count, glyph_position, streams);
+				get_block_vertex_streams(block, text, glyph_count, coordinate_scaling, glyph_position, streams);
 
 			glyph_position.Y(glyph_position.Y() - *line_height); //Next glyph y position
 		}
@@ -358,6 +387,23 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, g
 
 void MovableText::PrepareVertexStreams()
 {
+	auto coordinate_scaling = vector2::UnitScale;
+
+	//Has viewport connected to scene
+	if (auto viewport = Owner()->ConnectedViewport(); viewport)
+	{
+		//Has camera connected to viewport
+		if (auto camera = viewport->ConnectedCamera(); camera)
+		{
+			auto viewport_size = viewport->Bounds().ToSize();
+			auto [width, height] = viewport_size.XY();
+
+			//Get scaling factor from viewport to camera coordinates
+			auto [left, right, bottom, top, z_near, z_far] = camera->ViewFrustum().ToOrthoBounds(viewport_size);
+			coordinate_scaling = {(right - left) / width, (top - bottom) / height};
+		}
+	}
+
 	auto max_glyphs = text_->UnformattedDisplayedCharacterCount();
 
 	if (max_glyphs > static_cast<int>(vertex_streams_.capacity()))
@@ -366,7 +412,7 @@ void MovableText::PrepareVertexStreams()
 		reload_vertex_buffer_ = true;
 	}
 
-	get_text_vertex_streams(*text_, {0.0_r, 0.0_r, -1.0_r}, vertex_streams_);
+	get_text_vertex_streams(*text_, coordinate_scaling, {0.0_r, 0.0_r, -1.0_r}, vertex_streams_);
 
 	if (std::ssize(vertex_streams_) > max_glyphs)
 		vertex_streams_.erase(std::begin(vertex_streams_) + max_glyphs, std::end(vertex_streams_));

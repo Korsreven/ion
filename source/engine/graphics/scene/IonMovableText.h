@@ -112,10 +112,11 @@ namespace ion::graphics::scene
 		real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const Vector2 &padding,
 			fonts::text::TextVerticalAlignment vertical_alignment, real line_height, int font_size, int total_lines, const Vector3 &position) noexcept;
 
-		vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric, const Vector3 &position, const Color &color);
+		vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
+			const Vector2 &coordinate_scaling, const Vector3 &position, const Vector2 &scaling, const Color &color);
 		void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text, int &glyph_count,
-			Vector3 &position, glyph_vertex_streams &streams);
-		void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, glyph_vertex_streams &streams);
+			const Vector2 &coordinate_scaling, Vector3 &position, glyph_vertex_streams &streams);
+		void get_text_vertex_streams(const fonts::Text &text, const Vector2 &coordinate_scaling, const Vector3 &position, glyph_vertex_streams &streams);
 	} //movable_text::detail
 
 
@@ -157,6 +158,7 @@ namespace ion::graphics::scene
 			//Returns a mutable reference to the text
 			[[nodiscard]] auto& Get() noexcept
 			{
+				reload_vertex_streams_ = true; //Text could be changed
 				return text_;
 			}
 

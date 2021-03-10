@@ -26,6 +26,8 @@ File:	IonFontUtility.h
 #include "graphics/utilities/IonVector2.h"
 #include "types/IonTypes.h"
 
+#undef max
+
 namespace ion::graphics::fonts::utilities
 {
 	using graphics::utilities::Color;
