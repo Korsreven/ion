@@ -13,6 +13,8 @@ File:	IonMovableParticleSystem.cpp
 #include "IonMovableParticleSystem.h"
 
 #include "graphics/IonGraphicsAPI.h"
+#include "graphics/shaders/IonShaderProgram.h"
+#include "graphics/shaders/IonShaderProgramManager.h"
 
 namespace ion::graphics::scene
 {
@@ -195,8 +197,13 @@ void MovableParticleSystem::Prepare() noexcept
 
 void MovableParticleSystem::Draw(shaders::ShaderProgram *shader_program) noexcept
 {
-	if (visible_ && particle_system_)
+	if (visible_ && particle_system_ && !std::empty(vertex_streams_))
 	{
+		auto use_shader = shader_program && shader_program->Owner() && shader_program->Handle();
+
+		if (use_shader)
+			shader_program->Owner()->ActivateShaderProgram(*shader_program);
+
 		for (auto &stream : vertex_streams_)
 		{
 			auto &[min_size, max_size] = stream.emitter->ParticleSize();
@@ -206,6 +213,9 @@ void MovableParticleSystem::Draw(shaders::ShaderProgram *shader_program) noexcep
 			stream.vertex_batch.Draw(shader_program);
 			detail::disable_point_sprites();
 		}
+
+		if (use_shader)
+			shader_program->Owner()->ActivateShaderProgram(*shader_program);
 	}
 }
 
