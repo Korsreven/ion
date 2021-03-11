@@ -183,6 +183,7 @@ struct Game :
 {
 	std::vector<ion::NonOwningPtr<ion::graphics::scene::Model>> models;
 	std::vector<ion::NonOwningPtr<ion::graphics::scene::MovableParticleSystem>> particle_systems;
+	std::vector<ion::NonOwningPtr<ion::graphics::scene::MovableText>> texts;
 	ion::NonOwningPtr<ion::graphics::render::Viewport> viewport;
 
 	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<ion::graphics::shaders::variables::glsl::mat4>> matrix_projection;
@@ -209,6 +210,12 @@ struct Game :
 		{
 			particle_system->Elapse(time);	
 			particle_system->Prepare();			
+		}
+
+		for (auto &text : texts)
+		{
+			text->Elapse(time);	
+			text->Prepare();			
 		}
 
 		return true;
@@ -429,6 +436,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto mesh_frag_shader = shaders.CreateShader("default_mesh_frag", "default_mesh.frag");
 			auto particle_vert_shader = shaders.CreateShader("default_particle_vert", "default_particle.vert");
 			auto particle_frag_shader = shaders.CreateShader("default_particle_frag", "default_particle.frag");
+			auto text_vert_shader = shaders.CreateShader("default_text_vert", "default_text.vert");
+			auto text_frag_shader = shaders.CreateShader("default_text_frag", "default_text.frag");
 			shaders.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!shaders.Loaded());
@@ -436,8 +445,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Shader programs
 			ion::graphics::shaders::ShaderProgramManager shader_programs;
 			shader_programs.LogLevel(ion::graphics::shaders::shader_program_manager::InfoLogLevel::Error);
-			//auto mesh_shader_prog = shader_programs.CreateShaderProgram("default_mesh_prog", mesh_vert_shader, mesh_frag_shader);
-			auto shader_prog = shader_programs.CreateShaderProgram("default_particle_prog", particle_vert_shader, particle_frag_shader);	
+			//auto shader_prog = shader_programs.CreateShaderProgram("default_mesh_prog", mesh_vert_shader, mesh_frag_shader);
+			//auto shader_prog = shader_programs.CreateShaderProgram("default_particle_prog", particle_vert_shader, particle_frag_shader);
+			auto shader_prog = shader_programs.CreateShaderProgram("default_text_prog", text_vert_shader, text_frag_shader);	
 			shader_programs.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!shader_programs.Loaded());
@@ -449,7 +459,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto scene_struct = shader_prog->CreateStruct("scene");
 			auto camera_struct = shader_prog->CreateStruct("camera");
 			auto primitive_struct = shader_prog->CreateStruct("primitive");
-			auto material_struct = shader_prog->CreateStruct("material");
+			//auto material_struct = shader_prog->CreateStruct("material");
 			auto light_struct = shader_prog->CreateStruct("light", 8);
 
 			//Shader variables
@@ -459,9 +469,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//shader_prog->CreateAttribute<glsl::vec4>("vertex_color");
 			//shader_prog->CreateAttribute<glsl::vec2>("vertex_tex_coord");
 
+			//shader_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			//shader_prog->CreateAttribute<float>("vertex_point_size");
+			//shader_prog->CreateAttribute<glsl::vec4>("vertex_color");
+
 			shader_prog->CreateAttribute<glsl::vec3>("vertex_position");
-			shader_prog->CreateAttribute<float>("vertex_point_size");
 			shader_prog->CreateAttribute<glsl::vec4>("vertex_color");
+			shader_prog->CreateAttribute<glsl::vec2>("vertex_tex_coord");
 
 			//Matrices			
 			auto matrix_model_view = matrix_struct->CreateUniform<glsl::mat4>("model_view");
@@ -477,12 +491,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto camera_position = camera_struct->CreateUniform<glsl::vec3>("position");	
 
 			//Primitive
-			//auto primitive_texture = primitive_struct->CreateUniform<glsl::sampler2D>("texture");
-			//auto primitive_has_texture = primitive_struct->CreateUniform<bool>("has_texture");
-			auto primitive_has_material = primitive_struct->CreateUniform<bool>("has_material");
+			auto primitive_texture = primitive_struct->CreateUniform<glsl::sampler2D>("texture");
+			auto primitive_has_texture = primitive_struct->CreateUniform<bool>("has_texture");
+			//auto primitive_has_material = primitive_struct->CreateUniform<bool>("has_material");
 
 			//Material			
-			auto material_ambient = material_struct->CreateUniform<glsl::vec4>("ambient");
+			/*auto material_ambient = material_struct->CreateUniform<glsl::vec4>("ambient");
 			auto material_diffuse = material_struct->CreateUniform<glsl::vec4>("diffuse");
 			auto material_specular = material_struct->CreateUniform<glsl::vec4>("specular");
 			auto material_emissive = material_struct->CreateUniform<glsl::vec4>("emissive");
@@ -492,7 +506,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto material_normal_map = material_struct->CreateUniform<glsl::sampler2D>("normal_map");
 			auto material_has_diffuse_map = material_struct->CreateUniform<bool>("has_diffuse_map");
 			auto material_has_specular_map = material_struct->CreateUniform<bool>("has_specular_map");
-			auto material_has_normal_map = material_struct->CreateUniform<bool>("has_normal_map");
+			auto material_has_normal_map = material_struct->CreateUniform<bool>("has_normal_map");*/
 
 			//Light
 			auto light_type = light_struct->CreateUniform<int>("type");
@@ -530,17 +544,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					verdana_bold_12,
 					verdana_italic_12,
 					verdana_bold_italic_12);
-
-			//Text
-			ion::graphics::fonts::TextManager texts;
-			[[maybe_unused]] auto text =
-				texts.CreateText(
-					"pangram",
-					"The <i>quick</i> <font color='brown'>brown</font> fox <b>jumps</b> over the <i>lazy</i> dog",
-					verdana_12);
-
-			text->AppendLine("How <del>vexingly</del> <ins>quick</ins> daft zebras <b>jump</b>!");
-			text->AreaSize(ion::graphics::utilities::Vector2{250.0_r, 100.0_r});
 
 			//Material
 			ion::graphics::materials::MaterialManager materials;
@@ -613,6 +616,17 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			particle_system->CreateAffector(
 				ion::graphics::particles::affectors::Gravitation{"gravity", {0.0_r, 0.0_r}, 2.0_r, 0.5_r});
 
+			//Text
+			ion::graphics::fonts::TextManager texts;
+			[[maybe_unused]] auto text =
+				texts.CreateText(
+					"pangram",
+					"The <i>quick</i> <font color='brown'>brown</font> fox <b>jumps</b> over the <i>lazy</i> dog",
+					verdana_12);
+
+			//text->AppendLine("How <del>vexingly</del> <ins>quick</ins> daft zebras <b>jump</b>!");
+			//text->AreaSize(ion::graphics::utilities::Vector2{250.0_r, 100.0_r});
+
 			//Mesh vertices
 			/*ion::graphics::render::mesh::Vertices gray_vertices;
 			gray_vertices.push_back({{-1.7778_r, 1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
@@ -672,8 +686,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//	ion::graphics::render::mesh::MeshTexCoordMode::Manual);
 
 			//Particle systems
-			auto asteroids = engine.Scene().CreateParticleSystem(particle_system);
-			asteroids->Get()->StartAll();
+			//auto asteroids = engine.Scene().CreateParticleSystem(particle_system);
+			//asteroids->Get()->StartAll();
+
+			//Texts
+			auto hello_world = engine.Scene().CreateText(text);
 
 
 			//Camera, projection and view matrix
@@ -718,7 +735,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//game.models.push_back(blue_square);
 			//game.models.push_back(sprite);
 
-			game.particle_systems.push_back(asteroids);
+			//game.particle_systems.push_back(asteroids);
+			game.texts.push_back(hello_world);
 
 			game.viewport = engine.Target()->GetViewport("");
 			game.matrix_projection = matrix_projection;

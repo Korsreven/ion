@@ -20,6 +20,8 @@ File:	IonMovableText.cpp
 #include "graphics/fonts/utilities/IonFontUtility.h"
 #include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonSceneManager.h"
+#include "graphics/shaders/IonShaderProgram.h"
+#include "graphics/shaders/IonShaderProgramManager.h"
 
 #undef min
 
@@ -154,7 +156,7 @@ real get_glyph_horizontal_position(const std::optional<Vector2> &area_size, cons
 }
 
 real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const Vector2 &padding,
-	fonts::text::TextVerticalAlignment vertical_alignment, real line_height, int font_size, int total_lines, const Vector3 &position) noexcept
+	fonts::text::TextVerticalAlignment vertical_alignment, real font_height, real line_height, int total_lines, const Vector3 &position) noexcept
 {
 	auto [x, y, z] = position.XYZ();
 
@@ -166,13 +168,13 @@ real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const 
 		switch (vertical_alignment)
 		{
 			case fonts::text::TextVerticalAlignment::Top:	
-			return y + height * 0.5_r - line_height + (line_height - font_size) * 0.5_r;
+			return y + height * 0.5_r - line_height + (line_height - font_height) * 0.5_r;
 
 			case fonts::text::TextVerticalAlignment::Middle:
-			return y + (line_height * total_lines) * 0.5_r - (line_height - font_size) * 0.5_r - font_size;
+			return y + (line_height * total_lines) * 0.5_r - (line_height - font_height) * 0.5_r - font_height;
 
 			case fonts::text::TextVerticalAlignment::Bottom:
-			return y - height * 0.5_r + line_height * (total_lines - 1) + (line_height - font_size) * 0.5_r;
+			return y - height * 0.5_r + line_height * (total_lines - 1) + (line_height - font_height) * 0.5_r;
 		}
 	}
 	else
@@ -180,13 +182,13 @@ real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const 
 		switch (vertical_alignment)
 		{
 			case fonts::text::TextVerticalAlignment::Top:
-			return y - line_height + (line_height - font_size) * 0.5_r;
+			return y - line_height + (line_height - font_height) * 0.5_r;
 
 			case fonts::text::TextVerticalAlignment::Middle:
-			return y + (line_height * total_lines) * 0.5_r - (line_height - font_size) * 0.5_r - font_size;
+			return y + (line_height * total_lines) * 0.5_r - (line_height - font_height) * 0.5_r - font_height;
 
 			case fonts::text::TextVerticalAlignment::Bottom:
-			return y + line_height * (total_lines - 1) + (line_height - font_size) * 0.5_r;
+			return y + line_height * (total_lines - 1) + (line_height - font_height) * 0.5_r;
 		}
 	}
 
@@ -195,7 +197,7 @@ real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const 
 
 
 vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
-	const Vector2 &coordinate_scaling, const Vector3 &position, const Vector2 &scaling, const Color &color)
+	const Vector3 &position, const Vector2 &scaling, const Vector2 &coordinate_scaling, const Color &color)
 {
 	auto [x, y, z] = position.XYZ();
 	auto [r, g, b, a] = color.RGBA();
@@ -255,7 +257,7 @@ vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 }
 
 void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text, int &glyph_count,
-	const Vector2 &coordinate_scaling, Vector3 &position, glyph_vertex_streams &streams)
+	Vector3 &position, const Vector2 &coordinate_scaling, glyph_vertex_streams &streams)
 {
 	if (auto font = get_default_font(text_block, text); font)
 	{
@@ -295,7 +297,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 					if (glyph_count < std::ssize(streams))
 					{
 						streams[glyph_count].vertex_data =
-							get_glyph_vertex_data((*metrics)[glyph_index], coordinate_scaling, position, scaling, foreground_color);
+							get_glyph_vertex_data((*metrics)[glyph_index], position, scaling, coordinate_scaling, foreground_color);
 						streams[glyph_count].vertex_batch.VertexData(streams[glyph_count].vertex_data);
 						streams[glyph_count].vertex_batch.BatchTexture((*handles)[glyph_index]);
 					}
@@ -304,7 +306,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 					else
 					{
 						streams.emplace_back(
-							get_glyph_vertex_data((*metrics)[glyph_index], coordinate_scaling, position, scaling, foreground_color),
+							get_glyph_vertex_data((*metrics)[glyph_index], position, scaling, coordinate_scaling, foreground_color),
 							(*handles)[glyph_index]
 						);
 
@@ -314,7 +316,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 							//so keep hardware VAOs for other geometry
 					}
 
-					position.X(position.X() + (*metrics)[glyph_index].Advance);
+					position.X(position.X() + (*metrics)[glyph_index].Advance * scaling * coordinate_scaling.X());
 					++glyph_count;
 				}
 
@@ -327,26 +329,37 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 	}
 }
 
-void get_text_vertex_streams(const fonts::Text &text, const Vector2 &coordinate_scaling, const Vector3 &position, glyph_vertex_streams &streams)
+void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, const Vector2 &coordinate_scaling, glyph_vertex_streams &streams)
 {
 	auto line_height = text.LineHeight();
 
 	if (!line_height)
 		return; //Text type face is not available/loaded
 
-	auto font_size = text.Lettering()->RegularFont()->Size();
+	auto area_size = text.AreaSize();
+	auto padding = text.Padding();
 	auto formatted_lines = text.FormattedLines();
 	auto from_line = text.FromLine();
 	auto max_lines = text.MaxLines().value_or(std::ssize(formatted_lines));
+	auto font_height = static_cast<real>(text.Lettering()->RegularFont()->Size());
 
-	if (auto area_size = text.AreaSize(); area_size)
+	if (area_size)
 	{
 		if (*line_height > 0.0_r)
 		{
-			auto area_max_lines = fonts::text::detail::text_area_max_lines(*area_size, text.Padding(), *line_height);
+			auto area_max_lines = fonts::text::detail::text_area_max_lines(*area_size, padding, *line_height);
 			max_lines = std::min(max_lines, area_max_lines);
 		}
 	}
+
+	//Convert text sizes to camera coordinates
+	*line_height *= coordinate_scaling.Y();
+
+	if (area_size)
+		*area_size *= coordinate_scaling.Y();
+
+	padding *= coordinate_scaling;
+	font_height *= coordinate_scaling.Y();
 
 	//One or more text lines to display
 	if (!std::empty(formatted_lines) &&
@@ -358,8 +371,8 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector2 &coordinate_
 		//Get first glyph y position
 		glyph_position.Y(
 			get_glyph_vertical_position(
-				text.AreaSize(), text.Padding(), text.VerticalAlignment(),
-				*line_height, font_size, max_lines - from_line, position
+				area_size, padding, text.VerticalAlignment(),
+				font_height, *line_height, max_lines - from_line, position
 			));
 
 		for (auto iter = std::begin(formatted_lines) + from_line,
@@ -368,12 +381,12 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector2 &coordinate_
 			//Get first glyph x position
 			glyph_position.X(
 				get_glyph_horizontal_position(
-					text.AreaSize(), text.Padding(), text.Alignment(),
-					iter->second.X(), position
+					area_size, padding, text.Alignment(),
+					iter->second.X() * coordinate_scaling.X(), position
 				));
 
 			for (auto &block : iter->first.Blocks)
-				get_block_vertex_streams(block, text, glyph_count, coordinate_scaling, glyph_position, streams);
+				get_block_vertex_streams(block, text, glyph_count, glyph_position, coordinate_scaling, streams);
 
 			glyph_position.Y(glyph_position.Y() - *line_height); //Next glyph y position
 		}
@@ -412,7 +425,7 @@ void MovableText::PrepareVertexStreams()
 		reload_vertex_buffer_ = true;
 	}
 
-	get_text_vertex_streams(*text_, coordinate_scaling, {0.0_r, 0.0_r, -1.0_r}, vertex_streams_);
+	get_text_vertex_streams(*text_, {0.0_r, 0.0_r, -1.0_r}, coordinate_scaling, vertex_streams_);
 
 	if (std::ssize(vertex_streams_) > max_glyphs)
 		vertex_streams_.erase(std::begin(vertex_streams_) + max_glyphs, std::end(vertex_streams_));
@@ -453,7 +466,10 @@ void MovableText::Prepare() noexcept
 		return;
 
 	if (reload_vertex_streams_)
+	{
 		PrepareVertexStreams();
+		reload_vertex_streams_ = false;
+	}
 
 	if (reload_vertex_buffer_)
 	{
@@ -485,10 +501,18 @@ void MovableText::Prepare() noexcept
 
 void MovableText::Draw(shaders::ShaderProgram *shader_program) noexcept
 {
-	if (visible_ && text_)
+	if (visible_ && text_ && !std::empty(vertex_streams_))
 	{
+		auto use_shader = shader_program && shader_program->Owner() && shader_program->Handle();
+
+		if (use_shader)
+			shader_program->Owner()->ActivateShaderProgram(*shader_program);
+
 		for (auto &stream : vertex_streams_)
 			stream.vertex_batch.Draw(shader_program);
+
+		if (use_shader)
+			shader_program->Owner()->DeactivateShaderProgram(*shader_program);
 	}
 }
 

@@ -120,6 +120,9 @@ void Draw(graphics::scene::SceneManager &scene_manager, graphics::shaders::Shade
 
 	for (auto &particle_system : scene_manager.ParticleSystems())
 		particle_system.Draw(shader_program);
+
+	for (auto &text : scene_manager.Texts())
+		text.Draw(shader_program);
 }
 
 bool Engine::UpdateFrame() noexcept
