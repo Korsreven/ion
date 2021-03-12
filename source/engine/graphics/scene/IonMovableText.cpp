@@ -206,12 +206,15 @@ vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 	auto t = static_cast<real>(metric.Height) / metric.ActualHeight;
 
 	auto left = metric.Left * coordinate_scaling.X();
-	auto top = metric.Top * coordinate_scaling.Y();
-	auto width = metric.Width * scaling.X() * coordinate_scaling.X();
-	auto height = metric.Height * scaling.Y() * coordinate_scaling.Y();
+	auto top = metric.Top * coordinate_scaling.Y();	
+	auto width = metric.Width * coordinate_scaling.X();
+	auto height = metric.Height * coordinate_scaling.Y();
 
 	x += left;
 	y += top - height;
+
+	width *= scaling.X();
+	height *= scaling.Y();
 
 	//Note:
 	//The vertices follows [0, height] -> [width, 0] (normal coordinate system)
