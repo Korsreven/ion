@@ -436,8 +436,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto mesh_frag_shader = shaders.CreateShader("default_mesh_frag", "default_mesh.frag");
 			auto particle_vert_shader = shaders.CreateShader("default_particle_vert", "default_particle.vert");
 			auto particle_frag_shader = shaders.CreateShader("default_particle_frag", "default_particle.frag");
-			auto text_vert_shader = shaders.CreateShader("default_text_vert", "default_text.vert");
-			auto text_frag_shader = shaders.CreateShader("default_text_frag", "default_text.frag");
+			//auto text_vert_shader = shaders.CreateShader("default_text_vert", "default_text.vert");
+			//auto text_frag_shader = shaders.CreateShader("default_text_frag", "default_text.frag");
+			auto gui_text_vert_shader = shaders.CreateShader("default_gui_text_vert", "default_gui_text.vert");
+			auto gui_text_frag_shader = shaders.CreateShader("default_gui_text_frag", "default_gui_text.frag");
 			shaders.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!shaders.Loaded());
@@ -447,7 +449,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			shader_programs.LogLevel(ion::graphics::shaders::shader_program_manager::InfoLogLevel::Error);
 			//auto shader_prog = shader_programs.CreateShaderProgram("default_mesh_prog", mesh_vert_shader, mesh_frag_shader);
 			//auto shader_prog = shader_programs.CreateShaderProgram("default_particle_prog", particle_vert_shader, particle_frag_shader);
-			auto shader_prog = shader_programs.CreateShaderProgram("default_text_prog", text_vert_shader, text_frag_shader);	
+			//auto shader_prog = shader_programs.CreateShaderProgram("default_text_prog", text_vert_shader, text_frag_shader);
+			auto shader_prog = shader_programs.CreateShaderProgram("default_gui_text_prog", gui_text_vert_shader, gui_text_frag_shader);
 			shader_programs.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!shader_programs.Loaded());
@@ -457,10 +460,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Shader structs
 			auto matrix_struct = shader_prog->CreateStruct("matrix");
 			auto scene_struct = shader_prog->CreateStruct("scene");
-			auto camera_struct = shader_prog->CreateStruct("camera");
+			//auto camera_struct = shader_prog->CreateStruct("camera");
 			auto primitive_struct = shader_prog->CreateStruct("primitive");
 			//auto material_struct = shader_prog->CreateStruct("material");
-			auto light_struct = shader_prog->CreateStruct("light", 8);
+			//auto light_struct = shader_prog->CreateStruct("light", 8);
 
 			//Shader variables
 			//Vertex
@@ -483,12 +486,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto matrix_model_view_projection = matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
 
 			//Scene
-			auto scene_ambient = scene_struct->CreateUniform<glsl::vec4>("ambient");
+			//auto scene_ambient = scene_struct->CreateUniform<glsl::vec4>("ambient");
 			auto scene_gamma = scene_struct->CreateUniform<float>("gamma");
-			auto scene_light_count = scene_struct->CreateUniform<int>("light_count");
+			//auto scene_light_count = scene_struct->CreateUniform<int>("light_count");
 
 			//Camera
-			auto camera_position = camera_struct->CreateUniform<glsl::vec3>("position");	
+			//auto camera_position = camera_struct->CreateUniform<glsl::vec3>("position");	
 
 			//Primitive
 			auto primitive_texture = primitive_struct->CreateUniform<glsl::sampler2D>("texture");
@@ -509,7 +512,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto material_has_normal_map = material_struct->CreateUniform<bool>("has_normal_map");*/
 
 			//Light
-			auto light_type = light_struct->CreateUniform<int>("type");
+			/*auto light_type = light_struct->CreateUniform<int>("type");
 			auto light_position = light_struct->CreateUniform<glsl::vec3>("position");
 			auto light_direction = light_struct->CreateUniform<glsl::vec3>("direction");
 			auto light_ambient = light_struct->CreateUniform<glsl::vec4>("ambient");
@@ -519,7 +522,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto light_linear = light_struct->CreateUniform<float>("linear");
 			auto light_quadratic = light_struct->CreateUniform<float>("quadratic");
 			auto light_cutoff = light_struct->CreateUniform<float>("cutoff");
-			auto light_outer_cutoff = light_struct->CreateUniform<float>("outer_cutoff");
+			auto light_outer_cutoff = light_struct->CreateUniform<float>("outer_cutoff");*/
 
 			shader_programs.LoadShaderVariableLocations(*shader_prog);
 
@@ -621,11 +624,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			[[maybe_unused]] auto text =
 				texts.CreateText(
 					"pangram",
-					"The <i>quick</i> <font color='brown'>brown</font> fox <b>jumps</b> over the <i>lazy</i> dog",
+					"The <i>quick</i> <font color='saddlebrown'>brown</font> fox <b>jumps</b> over the <i>lazy</i> dog",
 					verdana_12);
 
-			//text->AppendLine("How <del>vexingly</del> <ins>quick</ins> daft zebras <b>jump</b>!");
-			//text->AreaSize(ion::graphics::utilities::Vector2{250.0_r, 100.0_r});
+			text->AppendLine("How <font color='olivedrab'>vexingly</font> <i>quick</i> daft zebras <b>jump</b>!");
+			//text->AreaSize(ion::graphics::utilities::Vector2{300.0_r, 100.0_r});
+			text->Alignment(ion::graphics::fonts::text::TextAlignment::Left);
+			text->VerticalAlignment(ion::graphics::fonts::text::TextVerticalAlignment::Top);
+			text->DefaultForegroundColor(color::White);
 
 			//Mesh vertices
 			/*ion::graphics::render::mesh::Vertices gray_vertices;
@@ -703,13 +709,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto &view_mat = camera->ViewMatrix();
 
 			//Uniforms
-			scene_ambient->Get() = Color{0.2_r, 0.2_r, 0.2_r, 1.0};
+			//scene_ambient->Get() = Color{0.2_r, 0.2_r, 0.2_r, 1.0};
 			scene_gamma->Get() = 1.0_r;
-			scene_light_count->Get() = 1;
+			//scene_light_count->Get() = 1;
 
-			camera_position->Get() = camera->Position();
+			//camera_position->Get() = camera->Position();
 
-			light_type->Get() = 0;
+			/*light_type->Get() = 0;
 			light_position->Get().XYZ(0.0_r, 0.0_r, -1.0_r);
 			light_direction->Get().XYZ(0.0_r, 0.0_r, -1.0_r);
 			light_ambient->Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
@@ -719,7 +725,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			light_linear->Get() = 0.09_r;
 			light_quadratic->Get() = 0.032_r;
 			light_cutoff->Get() = ion::utilities::math::Cos(ion::utilities::math::ToRadians(45.0_r));
-			light_outer_cutoff->Get() = ion::utilities::math::Cos(ion::utilities::math::ToRadians(55.0_r));
+			light_outer_cutoff->Get() = ion::utilities::math::Cos(ion::utilities::math::ToRadians(55.0_r));*/
 			
 			matrix_projection->Get() = proj_mat.TransposeCopy();
 			matrix_model_view->Get() = view_mat.TransposeCopy();
@@ -741,10 +747,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			game.viewport = engine.Target()->GetViewport("");
 			game.matrix_projection = matrix_projection;
 			game.matrix_model_view_projection = matrix_model_view_projection;
-			game.light_type = light_type;
+			/*game.light_type = light_type;
 			game.light_position = light_position;
 			game.light_direction = light_direction;
-			game.light_diffuse = light_diffuse;
+			game.light_diffuse = light_diffuse;*/
 
 
 			//EXAMPLE end

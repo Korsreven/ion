@@ -365,6 +365,9 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, c
 	if (!std::empty(formatted_lines) &&
 		from_line < std::ssize(formatted_lines) && max_lines > 0)
 	{
+		if (from_line + max_lines > std::ssize(formatted_lines))
+			max_lines = std::ssize(formatted_lines) - from_line;
+
 		auto glyph_count = 0;
 		auto glyph_position = position;	
 
