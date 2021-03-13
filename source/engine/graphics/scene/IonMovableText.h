@@ -110,7 +110,7 @@ namespace ion::graphics::scene
 		real get_glyph_horizontal_position(const std::optional<Vector2> &area_size, const Vector2 &padding,
 			fonts::text::TextAlignment horizontal_alignment, real line_width, const Vector3 &position) noexcept;
 		real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const Vector2 &padding,
-			fonts::text::TextVerticalAlignment vertical_alignment, real font_height, real line_height, int total_lines, const Vector3 &position) noexcept;
+			fonts::text::TextVerticalAlignment vertical_alignment, int font_size, real line_height, int total_lines, const Vector3 &position) noexcept;
 
 		vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 			const Vector3 &position, const Vector2 &scaling, const Vector2 &coordinate_scaling, const Color &color);

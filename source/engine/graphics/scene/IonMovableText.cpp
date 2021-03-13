@@ -13,6 +13,7 @@ File:	IonMovableText.cpp
 #include "IonMovableText.h"
 
 #include <algorithm>
+#include <cmath>
 
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/fonts/IonFont.h"
@@ -156,7 +157,7 @@ real get_glyph_horizontal_position(const std::optional<Vector2> &area_size, cons
 }
 
 real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const Vector2 &padding,
-	fonts::text::TextVerticalAlignment vertical_alignment, real font_height, real line_height, int total_lines, const Vector3 &position) noexcept
+	fonts::text::TextVerticalAlignment vertical_alignment, int font_size, real line_height, int total_lines, const Vector3 &position) noexcept
 {
 	auto [x, y, z] = position.XYZ();
 
@@ -168,13 +169,13 @@ real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const 
 		switch (vertical_alignment)
 		{
 			case fonts::text::TextVerticalAlignment::Top:	
-			return y + height * 0.5_r - line_height + (line_height - font_height) * 0.5_r;
+			return y + height * 0.5_r - line_height + (line_height - font_size) * 0.5_r;
 
 			case fonts::text::TextVerticalAlignment::Middle:
-			return y + (line_height * total_lines) * 0.5_r - (line_height - font_height) * 0.5_r - font_height;
+			return y + (line_height * total_lines) * 0.5_r - (line_height - font_size) * 0.5_r - font_size;
 
 			case fonts::text::TextVerticalAlignment::Bottom:
-			return y - height * 0.5_r + line_height * (total_lines - 1) + (line_height - font_height) * 0.5_r;
+			return y - height * 0.5_r + line_height * (total_lines - 1) + (line_height - font_size) * 0.5_r;
 		}
 	}
 	else
@@ -182,13 +183,13 @@ real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const 
 		switch (vertical_alignment)
 		{
 			case fonts::text::TextVerticalAlignment::Top:
-			return y - line_height + (line_height - font_height) * 0.5_r;
+			return y - line_height + (line_height - font_size) * 0.5_r;
 
 			case fonts::text::TextVerticalAlignment::Middle:
-			return y + (line_height * total_lines) * 0.5_r - (line_height - font_height) * 0.5_r - font_height;
+			return y + (line_height * total_lines) * 0.5_r - (line_height - font_size) * 0.5_r - font_size;
 
 			case fonts::text::TextVerticalAlignment::Bottom:
-			return y + line_height * (total_lines - 1) + (line_height - font_height) * 0.5_r;
+			return y + line_height * (total_lines - 1) + (line_height - font_size) * 0.5_r;
 		}
 	}
 
@@ -201,20 +202,25 @@ vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 {
 	auto [x, y, z] = position.XYZ();
 	auto [r, g, b, a] = color.RGBA();
-
 	auto s = static_cast<real>(metric.Width) / metric.ActualWidth;
 	auto t = static_cast<real>(metric.Height) / metric.ActualHeight;
 
-	auto left = metric.Left * coordinate_scaling.X();
-	auto top = metric.Top * coordinate_scaling.Y();	
-	auto width = metric.Width * coordinate_scaling.X();
-	auto height = metric.Height * coordinate_scaling.Y();
+	x += metric.Left;
+	y += metric.Top - metric.Height;
+	auto width = metric.Width * scaling.X();
+	auto height = metric.Height * scaling.Y();
 
-	x += left;
-	y += top - height;
+	//Floor values (glyphs may appear blurry if positioned off-pixel)
+	x = std::floor(x);
+	y = std::floor(y);
+	width = std::floor(width);
+	height = std::floor(height);
 
-	width *= scaling.X();
-	height *= scaling.Y();
+	//Scale values from viewport to camera coordinates
+	x *= coordinate_scaling.X();
+	y *= coordinate_scaling.Y();
+	width *= coordinate_scaling.X();
+	height *= coordinate_scaling.Y();
 
 	//Note:
 	//The vertices follows [0, height] -> [width, 0] (normal coordinate system)
@@ -319,7 +325,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 							//so keep hardware VAOs for other geometry
 					}
 
-					position.X(position.X() + (*metrics)[glyph_index].Advance * scaling * coordinate_scaling.X());
+					position.X(position.X() + (*metrics)[glyph_index].Advance * scaling);
 					++glyph_count;
 				}
 
@@ -339,12 +345,12 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, c
 	if (!line_height)
 		return; //Text type face is not available/loaded
 
-	auto area_size = text.AreaSize();
-	auto padding = text.Padding();
 	auto formatted_lines = text.FormattedLines();
+	auto &area_size = text.AreaSize();
+	auto &padding = text.Padding();
 	auto from_line = text.FromLine();
 	auto max_lines = text.MaxLines().value_or(std::ssize(formatted_lines));
-	auto font_height = static_cast<real>(text.Lettering()->RegularFont()->Size());
+	auto font_size = text.Lettering()->RegularFont()->Size();
 
 	if (area_size)
 	{
@@ -354,15 +360,6 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, c
 			max_lines = std::min(max_lines, area_max_lines);
 		}
 	}
-
-	//Convert text sizes to camera coordinates
-	*line_height *= coordinate_scaling.Y();
-
-	if (area_size)
-		*area_size *= coordinate_scaling.Y();
-
-	padding *= coordinate_scaling;
-	font_height *= coordinate_scaling.Y();
 
 	//One or more text lines to display
 	if (!std::empty(formatted_lines) &&
@@ -378,7 +375,7 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, c
 		glyph_position.Y(
 			get_glyph_vertical_position(
 				area_size, padding, text.VerticalAlignment(),
-				font_height, *line_height, max_lines - from_line, position
+				font_size, *line_height, max_lines - from_line, position
 			));
 
 		for (auto iter = std::begin(formatted_lines) + from_line,
@@ -388,7 +385,7 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, c
 			glyph_position.X(
 				get_glyph_horizontal_position(
 					area_size, padding, text.Alignment(),
-					iter->second.X() * coordinate_scaling.X(), position
+					iter->second.X(), position
 				));
 
 			for (auto &block : iter->first.Blocks)
