@@ -210,11 +210,11 @@ vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 	auto width = metric.Width * scaling.X();
 	auto height = metric.Height * scaling.Y();
 
-	//Floor values (glyphs may appear blurry if positioned off-pixel)
+	//Floor/ceil values (glyphs may appear blurry if positioned off-pixel)
 	x = std::floor(x);
 	y = std::floor(y);
-	width = std::floor(width);
-	height = std::floor(height);
+	width = std::ceil(width);
+	height = std::ceil(height);
 
 	//Scale values from viewport to camera coordinates
 	x *= coordinate_scaling.X();
@@ -265,8 +265,8 @@ vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 		};
 }
 
-void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text, int &glyph_count,
-	Vector3 &position, const Vector2 &coordinate_scaling, glyph_vertex_streams &streams)
+void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text, int font_size,
+	int &glyph_count, Vector3 &position, const Vector2 &coordinate_scaling, glyph_vertex_streams &streams)
 {
 	if (auto font = get_default_font(text_block, text); font)
 	{
@@ -274,7 +274,22 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 		{
 			if (auto &metrics = font->GlyphMetrics(); metrics)
 			{
-				auto foreground_color = get_foreground_color(text_block, text);
+				auto pos_y = position.Y();
+
+				if (text_block.VerticalAlign)
+				{
+					switch (*text_block.VerticalAlign)
+					{
+						case fonts::text::TextBlockVerticalAlign::Subscript:
+						position.Y(position.Y() - font_size * fonts::utilities::detail::subscript_translate_factor);
+						break;
+
+						case fonts::text::TextBlockVerticalAlign::Superscript:
+						position.Y(position.Y() + font_size * fonts::utilities::detail::superscript_translate_factor);
+						break;
+					}
+				}
+
 				auto scaling =
 					[&]() noexcept
 					{
@@ -292,6 +307,8 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 
 						return 1.0_r;
 					}();
+
+				auto foreground_color = get_foreground_color(text_block, text);
 
 				//For each character
 				for (auto c : text_block.Content)
@@ -328,6 +345,8 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 					position.X(position.X() + (*metrics)[glyph_index].Advance * scaling);
 					++glyph_count;
 				}
+
+				position.Y(pos_y);
 
 				//Decorations
 				//auto background_color = get_foreground_color(text_block, text);
@@ -389,7 +408,7 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, c
 				));
 
 			for (auto &block : iter->first.Blocks)
-				get_block_vertex_streams(block, text, glyph_count, glyph_position, coordinate_scaling, streams);
+				get_block_vertex_streams(block, text, font_size, glyph_count, glyph_position, coordinate_scaling, streams);
 
 			glyph_position.Y(glyph_position.Y() - *line_height); //Next glyph y position
 		}

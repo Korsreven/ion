@@ -39,6 +39,9 @@ namespace ion::graphics::fonts::utilities
 		constexpr auto smaller_scale_factor = 5.0_r / 6.0_r; //83.33%
 		constexpr auto larger_scale_factor = 1.20_r; //120%
 
+		constexpr auto subscript_translate_factor = 1.0_r / 3.0_r; //33.33%
+		constexpr auto superscript_translate_factor = 0.5_r; //50%
+
 
 		/*
 			Glyph rope

@@ -114,7 +114,7 @@ namespace ion::graphics::scene
 
 		vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 			const Vector3 &position, const Vector2 &scaling, const Vector2 &coordinate_scaling, const Color &color);
-		void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text,
+		void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text, int font_size,
 			int &glyph_count, Vector3 &position, const Vector2 &coordinate_scaling, glyph_vertex_streams &streams);
 		void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, const Vector2 &coordinate_scaling, glyph_vertex_streams &streams);
 	} //movable_text::detail
