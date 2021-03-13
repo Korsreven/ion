@@ -12,6 +12,8 @@ File:	IonFontManager.cpp
 
 #include "IonFontManager.h"
 
+#include <algorithm>
+
 #include "graphics/IonGraphicsAPI.h"
 #include "FreeType/ft2build.h"
 #include FT_FREETYPE_H
@@ -84,8 +86,12 @@ std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, int>> prepa
 				glyph_data[i][2 * (x + y * metric.ActualWidth)] = '\xff'; //Anti-aliasing fix
 
 				if (x < metric.Width && y < metric.Height)
+				{
+					auto color_component = face->glyph->bitmap.buffer[x + metric.Width * y];
 					glyph_data[i][2 * (x + y * metric.ActualWidth) + 1] =
-						face->glyph->bitmap.buffer[x + metric.Width * y];
+						static_cast<unsigned char>(std::clamp(color_component + color_component / 2, 0, 255));
+							//Combine color components to better define each glyph
+				}
 			}
 		}
 	}
