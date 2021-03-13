@@ -13,6 +13,8 @@ File:	IonModel.cpp
 #include "IonModel.h"
 
 #include "graphics/IonGraphicsAPI.h"
+#include "graphics/shaders/IonShaderProgram.h"
+#include "graphics/shaders/IonShaderProgramManager.h"
 
 namespace ion::graphics::scene
 {
@@ -109,11 +111,19 @@ void Model::Prepare() noexcept
 
 void Model::Draw(shaders::ShaderProgram *shader_program) noexcept
 {
-	if (visible_)
+	if (auto meshes = Meshes(); visible_ && !std::empty(meshes))
 	{
+		auto use_shader = shader_program && shader_program->Owner() && shader_program->Handle();
+
+		if (use_shader)
+			shader_program->Owner()->ActivateShaderProgram(*shader_program);
+
 		//Draw all meshes
-		for (auto &mesh : Meshes())
+		for (auto &mesh : meshes)
 			mesh.Draw(shader_program);
+
+		if (use_shader)
+			shader_program->Owner()->DeactivateShaderProgram(*shader_program);
 	}
 }
 
