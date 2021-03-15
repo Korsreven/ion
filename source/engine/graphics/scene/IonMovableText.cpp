@@ -51,6 +51,16 @@ glyph_vertex_stream::glyph_vertex_stream(vertex_container vertex_data, int textu
 	//Empty
 }
 
+decoration_vertex_stream::decoration_vertex_stream() :
+	vertex_batch
+	{
+		render::vertex::vertex_batch::VertexDrawMode::Triangles,
+		get_vertex_declaration()
+	}
+{
+	//Empty
+}
+
 
 Color get_foreground_color(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept
 {
@@ -198,7 +208,7 @@ real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const 
 
 
 vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
-	const Vector3 &position, const Vector2 &scaling, const Vector2 &coordinate_scaling, const Color &color)
+	const Vector3 &position, const Vector2 &scaling, const Color &color, const Vector2 &coordinate_scaling)
 {
 	auto [x, y, z] = position.XYZ();
 	auto [r, g, b, a] = color.RGBA();
@@ -265,8 +275,67 @@ vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 		};
 }
 
-void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text, int font_size,
-	int &glyph_count, Vector3 &position, const Vector2 &coordinate_scaling, glyph_vertex_streams &streams)
+decoration_vertex_container get_decoration_vertex_data(const Vector3 &position, const Vector2 &size, const Color &color, const Vector2 &coordinate_scaling)
+{
+	auto [x, y, z] = position.XYZ();
+	auto [width, height] = size.XY();
+	auto [r, g, b, a] = color.RGBA();
+
+	//Floor/ceil values (decorations may appear blurry if positioned off-pixel)
+	x = std::floor(x);
+	y = std::floor(y);
+	width = std::ceil(width);
+	height = std::ceil(height);
+
+	//Scale values from viewport to camera coordinates
+	x *= coordinate_scaling.X();
+	y *= coordinate_scaling.Y();
+	width *= coordinate_scaling.X();
+	height *= coordinate_scaling.Y();
+
+	//Vertex format:
+	//x, y, z
+	//r, g, b, a
+	//s, t
+
+	return
+		{
+			//Vertex #1
+			x, y + height, z,
+			r, g, b, a,
+			0.0_r, 0.0_r,
+
+			//Vertex #2
+			x, y, z,
+			r, g, b, a,
+			0.0_r, 1.0_r,
+
+			//Vertex #3
+			x + width, y, z,
+			r, g, b, a,
+			1.0_r, 1.0_r,
+
+			//Vertex #4
+			x + width, y, z,
+			r, g, b, a,
+			1.0_r, 1.0_r,
+
+			//Vertex #5
+			x + width, y + height, z,
+			r, g, b, a,
+			1.0_r, 0.0_r,
+
+			//Vertex #6
+			x, y + height, z,
+			r, g, b, a,
+			0.0_r, 0.0_r
+		};
+}
+
+
+void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text,
+	int font_size, int &glyph_count, Vector3 &position, const Vector2 &coordinate_scaling,
+	glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream)
 {
 	if (auto font = get_default_font(text_block, text); font)
 	{
@@ -320,23 +389,23 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 							//Use question mark for characters outside current font encoding
 
 					//Update existing stream
-					if (glyph_count < std::ssize(streams))
+					if (glyph_count < std::ssize(glyph_streams))
 					{
-						streams[glyph_count].vertex_data =
-							get_glyph_vertex_data((*metrics)[glyph_index], position, scaling, coordinate_scaling, foreground_color);
-						streams[glyph_count].vertex_batch.VertexData(streams[glyph_count].vertex_data);
-						streams[glyph_count].vertex_batch.BatchTexture((*handles)[glyph_index]);
+						glyph_streams[glyph_count].vertex_data =
+							get_glyph_vertex_data((*metrics)[glyph_index], position, scaling, foreground_color, coordinate_scaling);
+						glyph_streams[glyph_count].vertex_batch.VertexData(glyph_streams[glyph_count].vertex_data);
+						glyph_streams[glyph_count].vertex_batch.BatchTexture((*handles)[glyph_index]);
 					}
 
 					//New stream
 					else
 					{
-						streams.emplace_back(
-							get_glyph_vertex_data((*metrics)[glyph_index], position, scaling, coordinate_scaling, foreground_color),
+						glyph_streams.emplace_back(
+							get_glyph_vertex_data((*metrics)[glyph_index], position, scaling, foreground_color, coordinate_scaling),
 							(*handles)[glyph_index]
 						);
 
-						streams.back().vertex_batch.UseVertexArray(false);
+						glyph_streams.back().vertex_batch.UseVertexArray(false);
 							//Turn off vertex array object (VAO) for each glyph
 							//There could be a lot of glyphs in a text,
 							//so keep hardware VAOs for other geometry
@@ -349,15 +418,33 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 				position.Y(pos_y);
 
 				//Decorations
-				//auto background_color = get_foreground_color(text_block, text);
-				//auto decoration = get_foreground_color(text_block, text);
-				//auto decoration_color = get_foreground_color(text_block, text);
+				//Background
+				if (auto background_color = get_background_color(text_block, text); background_color)
+				{
+					auto decoration_position = position;
+					auto decoration_size = vector2::Zero;
+
+					auto vertex_data = get_decoration_vertex_data(decoration_position, decoration_size, *background_color, coordinate_scaling);
+					decoration_stream.vertex_data.insert(std::end(decoration_stream.vertex_data), std::begin(vertex_data), std::end(vertex_data));
+				}
+				
+				//Text decoration
+				if (auto decoration = get_text_decoration(text_block, text); decoration)
+				{
+					auto decoration_position = position;
+					auto decoration_size = vector2::Zero;
+
+					auto decoration_color = get_text_decoration_color(text_block, text).value_or(foreground_color);
+					auto vertex_data = get_decoration_vertex_data(decoration_position, decoration_size, decoration_color, coordinate_scaling);
+					decoration_stream.vertex_data.insert(std::end(decoration_stream.vertex_data), std::begin(vertex_data), std::end(vertex_data));
+				}
 			}
 		}
 	}
 }
 
-void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, const Vector2 &coordinate_scaling, glyph_vertex_streams &streams)
+void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, const Vector2 &coordinate_scaling,
+	glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream)
 {
 	auto line_height = text.LineHeight();
 
@@ -408,7 +495,9 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, c
 				));
 
 			for (auto &block : iter->first.Blocks)
-				get_block_vertex_streams(block, text, font_size, glyph_count, glyph_position, coordinate_scaling, streams);
+				get_block_vertex_streams(block, text,
+					font_size, glyph_count, glyph_position, coordinate_scaling,
+					glyph_streams, decoration_stream);
 
 			glyph_position.Y(glyph_position.Y() - *line_height); //Next glyph y position
 		}
@@ -439,18 +528,33 @@ void MovableText::PrepareVertexStreams()
 		}
 	}
 
-	auto max_glyphs = text_->UnformattedDisplayedCharacterCount();
+	auto glyph_count = text_->UnformattedDisplayedCharacterCount();
+	auto decoration_count = std::ssize(decoration_vertex_stream_.vertex_data);
 
-	if (max_glyphs > static_cast<int>(vertex_streams_.capacity()))
+	if (glyph_count > static_cast<int>(glyph_vertex_streams_.capacity()))
 	{
-		vertex_streams_.reserve(max_glyphs);
+		glyph_vertex_streams_.reserve(glyph_count);
 		reload_vertex_buffer_ = true;
 	}
 
-	get_text_vertex_streams(*text_, {0.0_r, 0.0_r, -1.0_r}, coordinate_scaling, vertex_streams_);
+	if (decoration_count > 0)
+	{
+		decoration_vertex_stream_.vertex_data.clear();
+		decoration_vertex_stream_.vertex_batch.VertexData(decoration_vertex_stream_.vertex_data);
+	}
 
-	if (std::ssize(vertex_streams_) > max_glyphs)
-		vertex_streams_.erase(std::begin(vertex_streams_) + max_glyphs, std::end(vertex_streams_));
+	get_text_vertex_streams(*text_, {0.0_r, 0.0_r, -1.0_r}, coordinate_scaling, glyph_vertex_streams_, decoration_vertex_stream_);
+
+	if (std::ssize(glyph_vertex_streams_) > glyph_count)
+		glyph_vertex_streams_.erase(std::begin(glyph_vertex_streams_) + glyph_count, std::end(glyph_vertex_streams_));
+
+	if (!std::empty(decoration_vertex_stream_.vertex_data))
+	{
+		decoration_vertex_stream_.vertex_batch.VertexData(decoration_vertex_stream_.vertex_data);
+
+		if (std::ssize(decoration_vertex_stream_.vertex_data) > decoration_count)
+			reload_vertex_buffer_ = true;
+	}
 }
 
 //Public
@@ -500,15 +604,21 @@ void MovableText::Prepare() noexcept
 
 		if (vbo_ && *vbo_)
 		{
-			if (!std::empty(vertex_streams_))
+			if (!std::empty(glyph_vertex_streams_))
 			{
-				auto size = detail::vertex_components * 6;
-				vbo_->Reserve(size * std::ssize(vertex_streams_) * sizeof(real));
+				auto glyph_size = detail::vertex_components * 6;
+				auto decoration_size = std::ssize(decoration_vertex_stream_.vertex_data);
+				vbo_->Reserve((std::ssize(glyph_vertex_streams_) * glyph_size + decoration_size) * sizeof(real));
 
-				for (auto offset = 0; auto &stream : vertex_streams_)
 				{
-					stream.vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), size * sizeof(real)));
-					offset += size;
+					auto offset = 0;
+					for (auto &stream : glyph_vertex_streams_)
+					{
+						stream.vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), glyph_size * sizeof(real)));
+						offset += glyph_size;
+					}
+
+					decoration_vertex_stream_.vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), decoration_size * sizeof(real)));
 				}
 			}
 		}
@@ -516,21 +626,26 @@ void MovableText::Prepare() noexcept
 		reload_vertex_buffer_ = false;
 	}
 
-	for (auto &stream : vertex_streams_)
+	for (auto &stream : glyph_vertex_streams_)
 		stream.vertex_batch.Prepare();
+
+	decoration_vertex_stream_.vertex_batch.Prepare();
 }
 
 
 void MovableText::Draw(shaders::ShaderProgram *shader_program) noexcept
 {
-	if (visible_ && text_ && !std::empty(vertex_streams_))
+	if (visible_ && text_ && !std::empty(glyph_vertex_streams_))
 	{
 		auto use_shader = shader_program && shader_program->Owner() && shader_program->Handle();
 
 		if (use_shader)
 			shader_program->Owner()->ActivateShaderProgram(*shader_program);
 
-		for (auto &stream : vertex_streams_)
+		decoration_vertex_stream_.vertex_batch.Draw(shader_program);
+			//Draw text decorations before character glyphs
+
+		for (auto &stream : glyph_vertex_streams_)
 			stream.vertex_batch.Draw(shader_program);
 
 		if (use_shader)
@@ -547,8 +662,10 @@ void MovableText::Elapse(duration time) noexcept
 {
 	if (text_)
 	{
-		for (auto &stream : vertex_streams_)
+		for (auto &stream : glyph_vertex_streams_)
 			stream.vertex_batch.Elapse(time);
+
+		decoration_vertex_stream_.vertex_batch.Elapse(time);
 	}
 }
 
