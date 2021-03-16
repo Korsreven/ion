@@ -354,11 +354,14 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 				auto scaling = fonts::utilities::detail::get_text_block_scale_factor(text_block);
 				auto foreground_color = get_foreground_color(text_block, text);
 
+				auto line_thickness = std::max(1.0_r, std::floor(font_size * scaling / 8.0_r));
+				auto line_margin = std::ceil(font_size * scaling / 16.0_r);
+
 				//Background
 				if (auto background_color = get_background_color(text_block, text); background_color)
 				{
-					auto decoration_position = position;
-					auto decoration_size = *text_block.Size * scaling;
+					auto decoration_position = Vector3{position.X(), position.Y() - (line_margin * 2 + 1.0_r), position.Z()};
+					auto decoration_size = Vector2{text_block.Size->X(), font_size * scaling + (line_margin * 4 + line_thickness + 2.0_r)};
 
 					auto vertex_data = get_decoration_vertex_data(decoration_position, decoration_size, *background_color, coordinate_scaling);
 					decoration_stream.back_vertex_data.insert(std::end(decoration_stream.back_vertex_data), std::begin(vertex_data), std::end(vertex_data));
@@ -367,22 +370,19 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 				//Text decoration
 				if (auto decoration = get_text_decoration(text_block, text); decoration)
 				{
-					auto line_thickness = std::max(1.0_r, std::floor(font_size * scaling / 8.0_r));
-					auto line_margin = 1.0_r + std::ceil(font_size * scaling / 16.0_r);
-
 					auto decoration_position =
 						[&]() noexcept -> Vector3
 						{
 							switch (*decoration)
 							{
 								case fonts::text::TextDecoration::Underline:
-								return {position.X(), position.Y() - line_margin, position.Z()};
+								return {position.X(), position.Y() - (line_margin + 1.0_r), position.Z()};
 
 								case fonts::text::TextDecoration::LineThrough:
 								return {position.X(), position.Y() + font_size * scaling * 0.5_r - line_thickness, position.Z()};
 
 								case fonts::text::TextDecoration::Overline:
-								return {position.X(), position.Y() + font_size * scaling + line_margin, position.Z()};
+								return {position.X(), position.Y() + font_size * scaling + (line_margin + 1.0_r), position.Z()};
 							}
 
 							return position;
