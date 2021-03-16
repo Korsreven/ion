@@ -29,7 +29,7 @@ TextBlocks html_to_formatted_blocks(std::string_view content)
 	return utilities::HTMLToTextBlocks(content);
 }
 
-MeasuredTextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks,
+TextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks,
 	const std::optional<Vector2> &area_size, const Vector2 &padding, TypeFace &type_face)
 {
 	using namespace graphics::utilities;
@@ -44,15 +44,24 @@ MeasuredTextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks,
 		);
 	}
 
-	MeasuredTextLines formatted_lines;
-	for (auto lines = utilities::SplitTextBlocks(std::move(text_blocks));
-		auto &line : lines)
+	auto lines = utilities::SplitTextBlocks(std::move(text_blocks));
+
+	//Measure blocks and lines
+	for (auto &line : lines)
 	{
-		auto size = utilities::MeasureTextBlocks(line.Blocks, type_face);
-		formatted_lines.emplace_back(std::move(line), size.value_or(vector2::Zero));
+		line.Size = vector2::Zero;
+
+		for (auto &block : line.Blocks)
+		{
+			auto size = utilities::MeasureTextBlock(block, type_face);
+			block.Size = size.value_or(vector2::Zero);
+
+			line.Size->X(line.Size->X() + block.Size->X());
+			line.Size->Y(std::max(line.Size->Y(), block.Size->Y()));
+		}
 	}
 
-	return formatted_lines;
+	return lines;
 }
 
 
@@ -79,7 +88,7 @@ text::TextBlocks Text::MakeFormattedBlocks(std::string_view content) const
 		return {{{}, std::string{content}}};
 }
 
-text::MeasuredTextLines Text::MakeFormattedLines(text::TextBlocks text_blocks,
+text::TextLines Text::MakeFormattedLines(text::TextBlocks text_blocks,
 	const std::optional<Vector2> &area_size, const Vector2 &padding,
 	NonOwningPtr<TypeFace> type_face) const
 {
@@ -378,12 +387,12 @@ std::string Text::UnformattedWrappedContent() const
 	if (!std::empty(formatted_lines_))
 	{
 		//First
-		auto content = utilities::detail::text_blocks_to_string(formatted_lines_.front().first.Blocks);
+		auto content = utilities::detail::text_blocks_to_string(formatted_lines_.front().Blocks);
 
 		//Rest
 		for (auto iter = std::begin(formatted_lines_) + 1,
 			end = std::end(formatted_lines_); iter != end; ++iter)
-			content += "\n" + utilities::detail::text_blocks_to_string(iter->first.Blocks);
+			content += "\n" + utilities::detail::text_blocks_to_string(iter->Blocks);
 
 		return content;
 	}
@@ -418,11 +427,11 @@ std::string Text::UnformattedDisplayedContent() const
 		auto end = iter + max_lines;
 
 		//First
-		auto content = utilities::detail::text_blocks_to_string(iter->first.Blocks);
+		auto content = utilities::detail::text_blocks_to_string(iter->Blocks);
 
 		//Rest
 		for (++iter; iter != end; ++iter)
-			content += "\n" + utilities::detail::text_blocks_to_string(iter->first.Blocks);
+			content += "\n" + utilities::detail::text_blocks_to_string(iter->Blocks);
 
 		return content;
 	}
@@ -464,7 +473,7 @@ int Text::UnformattedDisplayedCharacterCount() const
 		auto count = 0;
 
 		for (; iter != end; ++iter)
-			count += detail::get_character_count(iter->first.Blocks);
+			count += detail::get_character_count(iter->Blocks);
 
 		return count;
 	}

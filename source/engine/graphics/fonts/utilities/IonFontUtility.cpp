@@ -733,29 +733,41 @@ const font::GlyphMetrices* get_glyph_metrics(Font &font)
 	return nullptr;
 }
 
+std::pair<int,int> text_block_size_in_pixels(const text::TextBlock &text_block,
+	const font::GlyphMetrices &regular_metrics,
+	const font::GlyphMetrices *bold_metrics,
+	const font::GlyphMetrices *italic_metrics,
+	const font::GlyphMetrices *bold_italic_metrics) noexcept
+{
+	auto &metrics = get_text_block_metrics(text_block, regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics);
+	auto [string_width, string_height] = string_size_in_pixels(text_block.Content, metrics);
+
+	auto scale_factor = get_text_block_scale_factor(text_block);
+	auto width = string_width * scale_factor;
+	auto height = string_height * scale_factor;
+
+	return {static_cast<int>(std::ceil(width)), static_cast<int>(std::ceil(height))};
+}
+
 std::pair<int,int> text_blocks_size_in_pixels(const text::TextBlocks &text_blocks,
 	const font::GlyphMetrices &regular_metrics,
 	const font::GlyphMetrices *bold_metrics,
 	const font::GlyphMetrices *italic_metrics,
 	const font::GlyphMetrices *bold_italic_metrics) noexcept
 {
-	auto width = 0.0_r;
-	auto height = 0.0_r;
+	auto width = 0;
+	auto height = 0;
 
 	for (auto &text_block : text_blocks)
 	{
-		auto &metrics = get_text_block_metrics(text_block, regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics);
-		auto [string_width, string_height] = string_size_in_pixels(text_block.Content, metrics);
+		auto [block_width, block_height] =
+			text_block_size_in_pixels(text_block, regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics);
 
-		auto scale_factor = get_text_block_scale_factor(text_block);
-		auto str_width = string_width * scale_factor;
-		auto str_height = string_height * scale_factor;
-
-		width += str_width;
-		height = std::max(height, str_height);
+		width += block_width;
+		height = std::max(height, block_height);
 	}
 
-	return {static_cast<int>(std::ceil(width)), static_cast<int>(std::ceil(height))};
+	return {width, height};
 }
 
 
@@ -917,6 +929,28 @@ std::optional<Vector2> MeasureString(std::string_view str, Font &font) noexcept
 	if (auto metrics = detail::get_glyph_metrics(font); metrics)
 	{
 		auto [width, height] = detail::string_size_in_pixels(str, *metrics);
+		return Vector2{static_cast<real>(width), static_cast<real>(height)};
+	}
+	else
+		return {};
+}
+
+std::optional<Vector2> MeasureTextBlock(const text::TextBlock &text_block, TypeFace &type_face) noexcept
+{
+	if (!type_face.HasRegularFont())
+		return {};
+
+	if (auto metrics = detail::get_glyph_metrics(*type_face.RegularFont()); metrics)
+	{
+		auto bold_metrics = type_face.BoldFont() ?
+			detail::get_glyph_metrics(*type_face.BoldFont()) : nullptr;
+		auto italic_metrics = type_face.ItalicFont() ?
+			detail::get_glyph_metrics(*type_face.ItalicFont()) : nullptr;
+		auto bold_italic_metrics = type_face.BoldItalicFont() ?
+			detail::get_glyph_metrics(*type_face.BoldItalicFont()) : nullptr;
+
+		auto [width, height] = detail::text_block_size_in_pixels(
+			text_block, *metrics, bold_metrics, italic_metrics, bold_italic_metrics);
 		return Vector2{static_cast<real>(width), static_cast<real>(height)};
 	}
 	else

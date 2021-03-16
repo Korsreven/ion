@@ -130,6 +130,7 @@ namespace ion::graphics::fonts
 		struct TextBlock final : TextBlockStyle
 		{
 			std::string Content;
+			std::optional<Vector2> Size;
 		};
 
 		using TextBlocks = std::vector<TextBlock>;
@@ -137,12 +138,10 @@ namespace ion::graphics::fonts
 		struct TextLine final
 		{
 			TextBlocks Blocks;
+			std::optional<Vector2> Size;
 		};
 		
 		using TextLines = std::vector<TextLine>;
-
-		using MeasuredTextLine = std::pair<TextLine, Vector2>;
-		using MeasuredTextLines = std::vector<MeasuredTextLine>;
 
 
 		namespace detail
@@ -164,7 +163,7 @@ namespace ion::graphics::fonts
 			}
 
 			TextBlocks html_to_formatted_blocks(std::string_view content);
-			MeasuredTextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks,
+			TextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks,
 				const std::optional<Vector2> &area_size, const Vector2 &padding, TypeFace &type_face);
 
 			int get_character_count(const TextBlocks &text_blocks) noexcept;
@@ -197,11 +196,11 @@ namespace ion::graphics::fonts
 
 			NonOwningPtr<TypeFace> type_face_;
 			text::TextBlocks formatted_blocks_;
-			text::MeasuredTextLines formatted_lines_;
+			text::TextLines formatted_lines_;
 
 
 			text::TextBlocks MakeFormattedBlocks(std::string_view content) const;
-			text::MeasuredTextLines MakeFormattedLines(text::TextBlocks text_blocks,
+			text::TextLines MakeFormattedLines(text::TextBlocks text_blocks,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				NonOwningPtr<TypeFace> type_face) const;
 
@@ -489,7 +488,7 @@ namespace ion::graphics::fonts
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto FormattedLines() const noexcept
 			{
-				return adaptors::ranges::Iterable<const text::MeasuredTextLines&>{formatted_lines_};
+				return adaptors::ranges::Iterable<const text::TextLines&>{formatted_lines_};
 			}
 
 

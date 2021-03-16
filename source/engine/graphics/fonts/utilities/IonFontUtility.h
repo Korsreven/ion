@@ -272,6 +272,23 @@ namespace ion::graphics::fonts::utilities
 			return 1.0_r;
 		}
 
+		inline auto get_text_block_translate_factor(const text::TextBlock &text_block)
+		{
+			if (text_block.VerticalAlign)
+			{
+				switch (*text_block.VerticalAlign)
+				{
+					case text::TextBlockVerticalAlign::Subscript:
+					return -subscript_translate_factor;
+
+					case text::TextBlockVerticalAlign::Superscript:
+					return superscript_translate_factor;
+				}
+			}
+			
+			return 0.0_r;
+		}
+
 
 		inline auto character_size_in_pixels(char c,
 			const font::GlyphMetrices &metrics) noexcept
@@ -299,6 +316,12 @@ namespace ion::graphics::fonts::utilities
 
 			return std::pair{width, height};
 		}
+
+		std::pair<int,int> text_block_size_in_pixels(const text::TextBlock &text_block,
+			const font::GlyphMetrices &regular_metrics,
+			const font::GlyphMetrices *bold_metrics,
+			const font::GlyphMetrices *italic_metrics,
+			const font::GlyphMetrices *bold_italic_metrics) noexcept;
 
 		std::pair<int,int> text_blocks_size_in_pixels(const text::TextBlocks &text_blocks,
 			const font::GlyphMetrices &regular_metrics,
@@ -351,6 +374,10 @@ namespace ion::graphics::fonts::utilities
 	//Returns the size, in pixels, of the given string when rendered with the given font
 	//Returns nullopt if font could not be loaded properly
 	[[nodiscard]] std::optional<Vector2> MeasureString(std::string_view str, Font &font) noexcept;
+
+	//Returns the size, in pixels, of the given text block when rendered with the given type face
+	//Returns nullopt if type face fonts could not be loaded properly
+	[[nodiscard]] std::optional<Vector2> MeasureTextBlock(const text::TextBlock &text_block, TypeFace &type_face) noexcept;
 
 	//Returns the size, in pixels, of the given text blocks when rendered with the given type face
 	//Returns nullopt if type face fonts could not be loaded properly
