@@ -349,7 +349,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 		{
 			if (auto &metrics = font->GlyphMetrics(); metrics)
 			{
-				auto pos_y = position.Y();
+				auto base_y = position.Y();
 				position.Y(position.Y() + font_size * fonts::utilities::detail::get_text_block_translate_factor(text_block));
 				auto scaling = fonts::utilities::detail::get_text_block_scale_factor(text_block);
 				auto foreground_color = get_foreground_color(text_block, text);
@@ -360,8 +360,8 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 				//Background
 				if (auto background_color = get_background_color(text_block, text); background_color)
 				{
-					auto decoration_position = Vector3{position.X(), position.Y() - (line_margin * 2 + 1.0_r), position.Z()};
-					auto decoration_size = Vector2{text_block.Size->X(), font_size * scaling + (line_margin * 4 + line_thickness + 2.0_r)};
+					auto decoration_position = Vector3{position.X(), base_y - (line_margin * 2 + 1.0_r), position.Z()};
+					auto decoration_size = Vector2{text_block.Size->X(), font_size + (line_margin * 4 + line_thickness + 2.0_r)};
 
 					auto vertex_data = get_decoration_vertex_data(decoration_position, decoration_size, *background_color, coordinate_scaling);
 					decoration_stream.back_vertex_data.insert(std::end(decoration_stream.back_vertex_data), std::begin(vertex_data), std::end(vertex_data));
@@ -432,7 +432,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 					}
 				}
 
-				position.Y(pos_y);
+				position.Y(base_y);
 			}
 		}
 	}
