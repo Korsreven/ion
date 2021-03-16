@@ -77,8 +77,10 @@ namespace ion::graphics::scene
 
 		struct decoration_vertex_stream
 		{
-			decoration_vertex_container vertex_data;
-			render::vertex::VertexBatch vertex_batch;
+			decoration_vertex_container back_vertex_data;
+			decoration_vertex_container front_vertex_data;
+			render::vertex::VertexBatch back_vertex_batch;
+			render::vertex::VertexBatch front_vertex_batch;
 
 			decoration_vertex_stream();
 		};

@@ -624,10 +624,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			[[maybe_unused]] auto text =
 				texts.CreateText(
 					"pangram",
-					"The <i>quick</i> <font color='saddlebrown'>brown</font> fox <b>jumps</b> <sup>over</sup> the <i>lazy</i> dog",
+					"The <u><i>quick</i></u> <del><font color='saddlebrown'>brown</font></del> fox <b>jumps</b> <sup>over</sup> the <i>lazy</i> dog",
 					verdana_12);
 
-			text->AppendLine("How <font color='olivedrab'>vexingly</font> <i>quick</i> <sub>daft</sub> zebras <b>jump</b>!");
+			text->AppendLine("How <del><font color='olivedrab'>vexingly</font></del> <span style='text-decoration:overline;'>quick</span> <sub>daft</sub> zebras <b>jump</b>!");
 			//text->AreaSize(ion::graphics::utilities::Vector2{300.0_r, 100.0_r});
 			text->Alignment(ion::graphics::fonts::text::TextAlignment::Left);
 			text->VerticalAlignment(ion::graphics::fonts::text::TextVerticalAlignment::Top);

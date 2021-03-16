@@ -52,7 +52,13 @@ glyph_vertex_stream::glyph_vertex_stream(vertex_container vertex_data, int textu
 }
 
 decoration_vertex_stream::decoration_vertex_stream() :
-	vertex_batch
+
+	back_vertex_batch
+	{
+		render::vertex::vertex_batch::VertexDrawMode::Triangles,
+		get_vertex_declaration()
+	},
+	front_vertex_batch
 	{
 		render::vertex::vertex_batch::VertexDrawMode::Triangles,
 		get_vertex_declaration()
@@ -344,100 +350,89 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 			if (auto &metrics = font->GlyphMetrics(); metrics)
 			{
 				auto pos_y = position.Y();
-
-				if (text_block.VerticalAlign)
-				{
-					switch (*text_block.VerticalAlign)
-					{
-						case fonts::text::TextBlockVerticalAlign::Subscript:
-						position.Y(position.Y() - font_size * fonts::utilities::detail::subscript_translate_factor);
-						break;
-
-						case fonts::text::TextBlockVerticalAlign::Superscript:
-						position.Y(position.Y() + font_size * fonts::utilities::detail::superscript_translate_factor);
-						break;
-					}
-				}
-
-				auto scaling =
-					[&]() noexcept
-					{
-						if (text_block.FontSize)
-						{
-							switch (*text_block.FontSize)
-							{
-								case fonts::text::TextBlockFontSize::Smaller:
-								return fonts::utilities::detail::smaller_scale_factor;
-
-								case fonts::text::TextBlockFontSize::Larger:
-								return fonts::utilities::detail::larger_scale_factor;
-							}
-						}
-
-						return 1.0_r;
-					}();
-
+				position.Y(position.Y() + font_size * fonts::utilities::detail::get_text_block_translate_factor(text_block));
+				auto scaling = fonts::utilities::detail::get_text_block_scale_factor(text_block);
 				auto foreground_color = get_foreground_color(text_block, text);
 
-				//For each character
-				for (auto c : text_block.Content)
-				{
-					auto glyph_index = static_cast<unsigned char>(c);
-					
-					if (glyph_index >= static_cast<int>(font->CharacterEncoding()))
-						glyph_index = static_cast<unsigned char>('?');
-							//Use question mark for characters outside current font encoding
-
-					//Update existing stream
-					if (glyph_count < std::ssize(glyph_streams))
-					{
-						glyph_streams[glyph_count].vertex_data =
-							get_glyph_vertex_data((*metrics)[glyph_index], position, scaling, foreground_color, coordinate_scaling);
-						glyph_streams[glyph_count].vertex_batch.VertexData(glyph_streams[glyph_count].vertex_data);
-						glyph_streams[glyph_count].vertex_batch.BatchTexture((*handles)[glyph_index]);
-					}
-
-					//New stream
-					else
-					{
-						glyph_streams.emplace_back(
-							get_glyph_vertex_data((*metrics)[glyph_index], position, scaling, foreground_color, coordinate_scaling),
-							(*handles)[glyph_index]
-						);
-
-						glyph_streams.back().vertex_batch.UseVertexArray(false);
-							//Turn off vertex array object (VAO) for each glyph
-							//There could be a lot of glyphs in a text,
-							//so keep hardware VAOs for other geometry
-					}
-
-					position.X(position.X() + (*metrics)[glyph_index].Advance * scaling);
-					++glyph_count;
-				}
-
-				position.Y(pos_y);
-
-				//Decorations
 				//Background
 				if (auto background_color = get_background_color(text_block, text); background_color)
 				{
 					auto decoration_position = position;
-					auto decoration_size = vector2::Zero;
+					auto decoration_size = *text_block.Size * scaling;
 
 					auto vertex_data = get_decoration_vertex_data(decoration_position, decoration_size, *background_color, coordinate_scaling);
-					decoration_stream.vertex_data.insert(std::end(decoration_stream.vertex_data), std::begin(vertex_data), std::end(vertex_data));
+					decoration_stream.back_vertex_data.insert(std::end(decoration_stream.back_vertex_data), std::begin(vertex_data), std::end(vertex_data));
 				}
 				
 				//Text decoration
 				if (auto decoration = get_text_decoration(text_block, text); decoration)
 				{
-					auto decoration_position = position;
-					auto decoration_size = vector2::Zero;
+					auto line_thickness = std::max(1.0_r, std::floor(font_size * scaling / 8.0_r));
+					auto line_margin = 1.0_r + std::ceil(font_size * scaling / 16.0_r);
 
+					auto decoration_position =
+						[&]() noexcept -> Vector3
+						{
+							switch (*decoration)
+							{
+								case fonts::text::TextDecoration::Underline:
+								return {position.X(), position.Y() - line_margin, position.Z()};
+
+								case fonts::text::TextDecoration::LineThrough:
+								return {position.X(), position.Y() + font_size * scaling * 0.5_r - line_thickness, position.Z()};
+
+								case fonts::text::TextDecoration::Overline:
+								return {position.X(), position.Y() + font_size * scaling + line_margin, position.Z()};
+							}
+
+							return position;
+						}();
+					
+					auto decoration_size = Vector2{text_block.Size->X(), line_thickness};
 					auto decoration_color = get_text_decoration_color(text_block, text).value_or(foreground_color);
 					auto vertex_data = get_decoration_vertex_data(decoration_position, decoration_size, decoration_color, coordinate_scaling);
-					decoration_stream.vertex_data.insert(std::end(decoration_stream.vertex_data), std::begin(vertex_data), std::end(vertex_data));
+
+					if (*decoration == fonts::text::TextDecoration::LineThrough)
+						decoration_stream.front_vertex_data.insert(std::end(decoration_stream.front_vertex_data), std::begin(vertex_data), std::end(vertex_data));
+					else
+						decoration_stream.back_vertex_data.insert(std::end(decoration_stream.back_vertex_data), std::begin(vertex_data), std::end(vertex_data));
 				}
+
+				//For each character
+				for (auto c : text_block.Content)
+				{
+					if (auto glyph_index = static_cast<unsigned char>(c);
+						glyph_index < std::size(*metrics))
+					{
+						//Update existing stream
+						if (glyph_count < std::ssize(glyph_streams))
+						{
+							glyph_streams[glyph_count].vertex_data =
+								get_glyph_vertex_data((*metrics)[glyph_index], position, scaling, foreground_color, coordinate_scaling);
+							glyph_streams[glyph_count].vertex_batch.VertexData(glyph_streams[glyph_count].vertex_data);
+							glyph_streams[glyph_count].vertex_batch.BatchTexture((*handles)[glyph_index]);
+						}
+
+						//New stream
+						else
+						{
+							glyph_streams.emplace_back(
+								get_glyph_vertex_data((*metrics)[glyph_index], position, scaling, foreground_color, coordinate_scaling),
+								(*handles)[glyph_index]
+							);
+
+							glyph_streams.back().vertex_batch.UseVertexArray(false);
+								//Turn off vertex array object (VAO) for each glyph
+								//There could be a lot of glyphs in a text,
+								//so keep hardware VAOs for other geometry
+						}
+
+						position.X(position.X() + (*metrics)[glyph_index].Advance * scaling);
+						++glyph_count;
+					}
+				}
+
+				position.Y(pos_y);
 			}
 		}
 	}
@@ -491,10 +486,10 @@ void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, c
 			glyph_position.X(
 				get_glyph_horizontal_position(
 					area_size, padding, text.Alignment(),
-					iter->second.X(), position
+					iter->Size->X(), position
 				));
 
-			for (auto &block : iter->first.Blocks)
+			for (auto &block : iter->Blocks)
 				get_block_vertex_streams(block, text,
 					font_size, glyph_count, glyph_position, coordinate_scaling,
 					glyph_streams, decoration_stream);
@@ -528,8 +523,10 @@ void MovableText::PrepareVertexStreams()
 		}
 	}
 
+
 	auto glyph_count = text_->UnformattedDisplayedCharacterCount();
-	auto decoration_count = std::ssize(decoration_vertex_stream_.vertex_data);
+	auto back_decoration_count = std::ssize(decoration_vertex_stream_.back_vertex_data);
+	auto front_decoration_count = std::ssize(decoration_vertex_stream_.front_vertex_data);
 
 	if (glyph_count > static_cast<int>(glyph_vertex_streams_.capacity()))
 	{
@@ -537,22 +534,38 @@ void MovableText::PrepareVertexStreams()
 		reload_vertex_buffer_ = true;
 	}
 
-	if (decoration_count > 0)
+	if (front_decoration_count > 0)
 	{
-		decoration_vertex_stream_.vertex_data.clear();
-		decoration_vertex_stream_.vertex_batch.VertexData(decoration_vertex_stream_.vertex_data);
+		decoration_vertex_stream_.front_vertex_data.clear();
+		decoration_vertex_stream_.front_vertex_batch.VertexData(decoration_vertex_stream_.front_vertex_data);
 	}
 
+	if (back_decoration_count > 0)
+	{
+		decoration_vertex_stream_.back_vertex_data.clear();
+		decoration_vertex_stream_.back_vertex_batch.VertexData(decoration_vertex_stream_.back_vertex_data);
+	}
+
+
 	get_text_vertex_streams(*text_, {0.0_r, 0.0_r, -1.0_r}, coordinate_scaling, glyph_vertex_streams_, decoration_vertex_stream_);
+
 
 	if (std::ssize(glyph_vertex_streams_) > glyph_count)
 		glyph_vertex_streams_.erase(std::begin(glyph_vertex_streams_) + glyph_count, std::end(glyph_vertex_streams_));
 
-	if (!std::empty(decoration_vertex_stream_.vertex_data))
+	if (!std::empty(decoration_vertex_stream_.front_vertex_data))
 	{
-		decoration_vertex_stream_.vertex_batch.VertexData(decoration_vertex_stream_.vertex_data);
+		decoration_vertex_stream_.front_vertex_batch.VertexData(decoration_vertex_stream_.front_vertex_data);
 
-		if (std::ssize(decoration_vertex_stream_.vertex_data) > decoration_count)
+		if (std::ssize(decoration_vertex_stream_.front_vertex_data) > front_decoration_count)
+			reload_vertex_buffer_ = true;
+	}
+
+	if (!std::empty(decoration_vertex_stream_.back_vertex_data))
+	{
+		decoration_vertex_stream_.back_vertex_batch.VertexData(decoration_vertex_stream_.back_vertex_data);
+
+		if (std::ssize(decoration_vertex_stream_.back_vertex_data) > back_decoration_count)
 			reload_vertex_buffer_ = true;
 	}
 }
@@ -607,18 +620,24 @@ void MovableText::Prepare() noexcept
 			if (!std::empty(glyph_vertex_streams_))
 			{
 				auto glyph_size = detail::vertex_components * 6;
-				auto decoration_size = std::ssize(decoration_vertex_stream_.vertex_data);
-				vbo_->Reserve((std::ssize(glyph_vertex_streams_) * glyph_size + decoration_size) * sizeof(real));
+				auto back_decoration_size = std::ssize(decoration_vertex_stream_.back_vertex_data);
+				auto front_decoration_size = std::ssize(decoration_vertex_stream_.front_vertex_data);
+
+				vbo_->Reserve((std::ssize(glyph_vertex_streams_) * glyph_size + back_decoration_size + front_decoration_size) * sizeof(real));
 
 				{
 					auto offset = 0;
+
+					decoration_vertex_stream_.back_vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), back_decoration_size * sizeof(real)));
+					offset += back_decoration_size;
+
 					for (auto &stream : glyph_vertex_streams_)
 					{
 						stream.vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), glyph_size * sizeof(real)));
 						offset += glyph_size;
 					}
-
-					decoration_vertex_stream_.vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), decoration_size * sizeof(real)));
+					
+					decoration_vertex_stream_.front_vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), front_decoration_size * sizeof(real)));
 				}
 			}
 		}
@@ -626,10 +645,12 @@ void MovableText::Prepare() noexcept
 		reload_vertex_buffer_ = false;
 	}
 
+	decoration_vertex_stream_.back_vertex_batch.Prepare();
+
 	for (auto &stream : glyph_vertex_streams_)
 		stream.vertex_batch.Prepare();
 
-	decoration_vertex_stream_.vertex_batch.Prepare();
+	decoration_vertex_stream_.front_vertex_batch.Prepare();
 }
 
 
@@ -642,11 +663,14 @@ void MovableText::Draw(shaders::ShaderProgram *shader_program) noexcept
 		if (use_shader)
 			shader_program->Owner()->ActivateShaderProgram(*shader_program);
 
-		decoration_vertex_stream_.vertex_batch.Draw(shader_program);
-			//Draw text decorations before character glyphs
+		decoration_vertex_stream_.back_vertex_batch.Draw(shader_program);
+			//Draw back decorations before character glyphs
 
 		for (auto &stream : glyph_vertex_streams_)
 			stream.vertex_batch.Draw(shader_program);
+
+		decoration_vertex_stream_.front_vertex_batch.Draw(shader_program);
+			//Draw front decorations after character glyphs
 
 		if (use_shader)
 			shader_program->Owner()->DeactivateShaderProgram(*shader_program);
@@ -662,10 +686,12 @@ void MovableText::Elapse(duration time) noexcept
 {
 	if (text_)
 	{
+		decoration_vertex_stream_.back_vertex_batch.Elapse(time);
+
 		for (auto &stream : glyph_vertex_streams_)
 			stream.vertex_batch.Elapse(time);
 
-		decoration_vertex_stream_.vertex_batch.Elapse(time);
+		decoration_vertex_stream_.front_vertex_batch.Elapse(time);
 	}
 }
 
