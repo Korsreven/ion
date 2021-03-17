@@ -105,13 +105,12 @@ std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, int>> prepa
 	return std::tuple{std::move(glyph_data), std::move(glyph_metrics), glyph_max_height};
 }
 
-std::pair<std::optional<int>, std::optional<font::GlyphTextureHandles>> load_font(
+std::optional<font::GlyphTextureHandles> load_font(
 	const font::GlyphBitmapData &glyph_data,
 	const font::GlyphMetrices &glyph_metrics,
 	font::GlyphFilter min_filter, font::GlyphFilter mag_filter) noexcept
 {
 	auto glyph_count = std::ssize(glyph_data);
-	auto handle = static_cast<int>(glGenLists(glyph_count));
 	font::GlyphTextureHandles glyph_handles(glyph_count);
 
 	glGenTextures(glyph_count, reinterpret_cast<unsigned int*>(std::data(glyph_handles)));
@@ -137,42 +136,14 @@ std::pair<std::optional<int>, std::optional<font::GlyphTextureHandles>> load_fon
 			GL_RGBA, glyph_metrics[i].ActualWidth, glyph_metrics[i].ActualHeight, 0, GL_LUMINANCE_ALPHA,
 			GL_UNSIGNED_BYTE, std::data(glyph_data[i]));
 
-
-		//Make display list for this glyph
-		glNewList(handle + i, GL_COMPILE);
-		glBindTexture(GL_TEXTURE_2D, glyph_handles[i]);
-
-		glPushMatrix();
-		glTranslatef(static_cast<real>(glyph_metrics[i].Left), 0.0f, 0.0f);
-		glTranslatef(0.0f, static_cast<real>(glyph_metrics[i].Top) - glyph_metrics[i].Height, 0.0f);
-
-		//Texture coordinates
-		auto s = static_cast<real>(glyph_metrics[i].Width) / glyph_metrics[i].ActualWidth;
-		auto t = static_cast<real>(glyph_metrics[i].Height) / glyph_metrics[i].ActualHeight;
-
-		//Note:
-		//The texture coordinates follows [0, 0] -> [width, height] (GUI coordinate system)
-		//The vertices follows [0, height] -> [width, 0] (normal coordinate system)
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex2i(0, glyph_metrics[i].Height);
-		glTexCoord2f(0.0f, t);		glVertex2i(0, 0);
-		glTexCoord2f(s, t);			glVertex2i(glyph_metrics[i].Width, 0);
-		glTexCoord2f(s, 0.0f);		glVertex2i(glyph_metrics[i].Width, glyph_metrics[i].Height);
-		glEnd();
-
-		glPopMatrix();
-		glTranslatef(static_cast<real>(glyph_metrics[i].Advance), 0, 0); //Translate relative
-		glEndList();
-
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	return std::pair{handle, glyph_handles};
+	return glyph_handles;
 }
 
-void unload_font(int font_handle, const font::GlyphTextureHandles &glyph_handles) noexcept
+void unload_font(const font::GlyphTextureHandles &glyph_handles) noexcept
 {
-	glDeleteLists(font_handle, std::ssize(glyph_handles));
 	glDeleteTextures(std::ssize(glyph_handles), reinterpret_cast<const unsigned int*>(std::data(glyph_handles)));
 }
 
@@ -210,10 +181,9 @@ bool FontManager::LoadResource(Font &font) noexcept
 
 	if (glyph_data && glyph_metrics)
 	{
-		auto [handle, glyph_handles] = detail::load_font(*glyph_data, *glyph_metrics, glyph_min_filter, glyph_mag_filter);
-		font.Handle(handle);
+		auto glyph_handles = detail::load_font(*glyph_data, *glyph_metrics, glyph_min_filter, glyph_mag_filter);
 		font.GlyphHandles(std::move(glyph_handles));
-		return font.Handle().has_value();
+		return font.GlyphHandles().has_value();
 	}
 	else
 		return false;
@@ -221,10 +191,9 @@ bool FontManager::LoadResource(Font &font) noexcept
 
 bool FontManager::UnloadResource(Font &font) noexcept
 {
-	if (auto handle = font.Handle(); handle)
+	if (auto &glyph_handles = font.GlyphHandles(); glyph_handles)
 	{
-		detail::unload_font(*handle, *font.GlyphHandles());
-		font.Handle({});
+		detail::unload_font(*glyph_handles);
 		font.GlyphHandles({});
 		return true;
 	}

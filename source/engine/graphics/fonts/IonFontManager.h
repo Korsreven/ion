@@ -36,11 +36,11 @@ namespace ion::graphics::fonts
 			std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, int>> prepare_font(
 				const std::string &file_data, int size, int face_index, font::CharacterEncoding encoding);
 
-			std::pair<std::optional<int>, std::optional<font::GlyphTextureHandles>> load_font(
+			std::optional<font::GlyphTextureHandles> load_font(
 				const font::GlyphBitmapData &glyph_data,
 				const font::GlyphMetrices &glyph_metrics,
 				font::GlyphFilter min_filter, font::GlyphFilter mag_filter) noexcept;
-			void unload_font(int font_handle, const font::GlyphTextureHandles &glyph_handles) noexcept;
+			void unload_font(const font::GlyphTextureHandles &glyph_handles) noexcept;
 		} //detail
 	} //font_manager
 

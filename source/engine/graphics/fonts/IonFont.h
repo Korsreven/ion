@@ -62,8 +62,7 @@ namespace ion::graphics::fonts
 
 			font::GlyphFilter glyph_min_filter_ = font::GlyphFilter::Bilinear;
 			font::GlyphFilter glyph_mag_filter_ = font::GlyphFilter::Bilinear;
-			
-			std::optional<int> handle_;	
+
 			std::optional<font::GlyphTextureHandles> glyph_handles_;
 
 			std::optional<font::GlyphBitmapData> glyph_data_;
@@ -132,12 +131,6 @@ namespace ion::graphics::fonts
 			*/
 
 			//Sets the handle for the font to the given value
-			inline void Handle(std::optional<int> handle) noexcept
-			{
-				handle_ = handle;
-			}
-
-			//Sets the handle for the font to the given value
 			inline void GlyphHandles(std::optional<font::GlyphTextureHandles> handles)
 			{
 				glyph_handles_ = std::move(handles);
@@ -162,13 +155,6 @@ namespace ion::graphics::fonts
 			/*
 				Observers
 			*/
-
-			//Returns the handle for the font
-			//Returns nullopt if the font is not loaded
-			[[nodiscard]] inline auto Handle() const noexcept
-			{
-				return handle_;
-			}
 
 			//Returns the handle for each of the glyphs in the font
 			//Returns nullopt if the font is not loaded
