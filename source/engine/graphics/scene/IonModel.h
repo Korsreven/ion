@@ -69,7 +69,6 @@ namespace ion::graphics::scene
 
 
 			void Created(render::Mesh &mesh);
-			render::mesh::VertexContainer MeshVertexData() const;
 
 		public:
 

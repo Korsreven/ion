@@ -34,22 +34,6 @@ void Model::Created(render::Mesh &mesh)
 	update_bounding_volumes_ |= reload_vertex_buffer_;
 }
 
-render::mesh::VertexContainer Model::MeshVertexData() const
-{
-	auto size = 0;
-	for (auto &mesh : Meshes())
-		size += std::ssize(mesh.VertexData());
-
-	render::mesh::VertexContainer vertex_data;
-	vertex_data.reserve(size);
-
-	//Copy and append vertex data from each mesh
-	for (auto &mesh : Meshes())
-		vertex_data.insert(std::end(vertex_data), std::begin(mesh.VertexData()), std::end(mesh.VertexData()));
-
-	return vertex_data;
-}
-
 
 //Public
 
@@ -73,16 +57,17 @@ void Model::Prepare() noexcept
 
 		if (vbo_ && *vbo_)
 		{
-			if (auto vertex_data = MeshVertexData(); !std::empty(vertex_data))
-			{
-				vbo_->Data(vertex_data);
+			auto size = 0;
+			for (auto &mesh : Meshes())
+				size += std::ssize(mesh.VertexData());
 
-				for (auto offset = 0; auto &mesh : Meshes())
-				{
-					auto size = std::ssize(mesh.VertexData());
-					mesh.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), size * sizeof(real)), false);
-					offset += size;
-				}
+			vbo_->Reserve(size * sizeof(real));
+
+			for (auto offset = 0; auto &mesh : Meshes())
+			{
+				size = std::ssize(mesh.VertexData());
+				mesh.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), size * sizeof(real)));
+				offset += size;
 			}
 		}
 
