@@ -112,21 +112,6 @@ void generate_tex_coords(VertexContainer &vertex_data, const Aabb &aabb) noexcep
 
 void normalize_tex_coords(VertexContainer &vertex_data, const materials::Material *material) noexcept
 {
-	auto lower_left = std::ssize(vertex_data) > 1 ?
-		Vector2{vertex_data[detail::tex_coord_offset], vertex_data[detail::tex_coord_offset + 1]} :
-		vector2::Zero;
-	auto upper_right = lower_left;
-
-	//Find lower left/upper right for each vertex tex coords (s,t)
-	for (auto i = detail::tex_coord_offset + vertex_components; i < std::ssize(vertex_data);
-		i += detail::vertex_components)
-	{
-		auto tex_coord = Vector2{vertex_data[i], vertex_data[i + 1]};
-
-		lower_left = std::min(lower_left, tex_coord);
-		upper_right = std::max(upper_right, tex_coord);
-	}
-
 	auto [world_lower_left_tex_coord, world_upper_right_tex_coord] = material ?
 		material->WorldTexCoords() :
 		std::pair{vector2::Zero, vector2::UnitScale};
@@ -144,7 +129,8 @@ void normalize_tex_coords(VertexContainer &vertex_data, const materials::Materia
 		auto norm_tex_coord =
 			materials::material::detail::get_normalized_tex_coord(
 				{vertex_data[i], vertex_data[i + 1]},
-				lower_left, upper_right, world_lower_left,  world_upper_right);
+				vector2::Zero, vector2::UnitScale,
+				world_lower_left,  world_upper_right);
 
 		auto [s, t] = norm_tex_coord.XY();
 
