@@ -112,6 +112,14 @@ void generate_tex_coords(VertexContainer &vertex_data, const Aabb &aabb) noexcep
 
 void normalize_tex_coords(VertexContainer &vertex_data, const materials::Material *material) noexcept
 {
+	//Clamp each vertex tex coords (s,t) to range [0, 1]
+	for (auto i = detail::tex_coord_offset; i < std::ssize(vertex_data);
+		i += detail::vertex_components)
+	{
+		vertex_data[i] = std::clamp(vertex_data[i], 0.0_r, 1.0_r);
+		vertex_data[i + 1] = std::clamp(vertex_data[i + 1], 0.0_r, 1.0_r);
+	}
+
 	auto [world_lower_left_tex_coord, world_upper_right_tex_coord] = material ?
 		material->WorldTexCoords() :
 		std::pair{vector2::Zero, vector2::UnitScale};
