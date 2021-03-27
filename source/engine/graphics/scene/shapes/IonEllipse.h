@@ -24,6 +24,7 @@ File:	IonEllipse.h
 
 namespace ion::graphics::scene::shapes
 {
+	using namespace types::type_literals;
 	using namespace utilities;
 
 	namespace ellipse::detail

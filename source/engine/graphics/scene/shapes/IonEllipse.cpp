@@ -16,7 +16,6 @@ namespace ion::graphics::scene::shapes
 {
 
 using namespace ellipse;
-using namespace types::type_literals;
 
 namespace ellipse::detail
 {

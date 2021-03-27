@@ -462,6 +462,12 @@
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonEllipse.cpp">
       <Filter>Source Files\graphics\scene\shapes</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\shapes\IonLine.cpp">
+      <Filter>Source Files\graphics\scene\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\shapes\IonTriangle.cpp">
+      <Filter>Source Files\graphics\scene\shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -915,6 +921,12 @@
       <Filter>Header Files\graphics\scene\shapes</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonEllipse.h">
+      <Filter>Header Files\graphics\scene\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\shapes\IonLine.h">
+      <Filter>Header Files\graphics\scene\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\shapes\IonTriangle.h">
       <Filter>Header Files\graphics\scene\shapes</Filter>
     </ClInclude>
   </ItemGroup>

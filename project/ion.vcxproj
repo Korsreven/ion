@@ -206,9 +206,11 @@
     <ClCompile Include="..\source\engine\graphics\scene\IonMovableText.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonSceneManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonEllipse.cpp" />
+    <ClCompile Include="..\source\engine\graphics\scene\shapes\IonLine.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonMesh.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonRectangle.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonShape.cpp" />
+    <ClCompile Include="..\source\engine\graphics\scene\shapes\IonTriangle.cpp" />
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderLayout.cpp" />
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderProgram.cpp" />
@@ -331,9 +333,11 @@
     <ClInclude Include="..\source\engine\graphics\scene\IonMovableText.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonSceneManager.h" />
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonEllipse.h" />
+    <ClInclude Include="..\source\engine\graphics\scene\shapes\IonLine.h" />
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonMesh.h" />
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonRectangle.h" />
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonShape.h" />
+    <ClInclude Include="..\source\engine\graphics\scene\shapes\IonTriangle.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\IonShader.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\IonShaderLayout.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\IonShaderManager.h" />
