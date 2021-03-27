@@ -86,6 +86,7 @@ File:	main.cpp
 #include "graphics/scene/IonMovableParticleSystem.h"
 #include "graphics/scene/IonMovableText.h"
 #include "graphics/scene/IonSceneManager.h"
+#include "graphics/scene/shapes/IonEllipse.h"
 #include "graphics/scene/shapes/IonMesh.h"
 #include "graphics/scene/shapes/IonRectangle.h"
 #include "graphics/scene/shapes/IonShape.h"
@@ -847,8 +848,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			model->CreateMesh(std::move(knees_vertices), tifa,
 				ion::graphics::scene::shapes::mesh::MeshTexCoordMode::Manual);
 
-			auto rect = model->CreateMesh(ion::graphics::scene::shapes::Rectangle{
-				{1.0_r, 0.0_r, -1.3_r}, {0.5_r, 0.5_r}, color::Coral});
+			auto rectangle = model->CreateMesh(ion::graphics::scene::shapes::Rectangle{
+				{1.0_r, 0.0_r, -1.3_r}, {0.6_r, 0.5_r}, color::Coral});
+			auto ellipse = model->CreateMesh(ion::graphics::scene::shapes::Ellipse{
+				{1.0_r, 0.0_r, -1.3_r}, {0.5_r, 0.4_r}, color::Crimson});
 
 			//Particle systems
 			//auto asteroids = engine.Scene().CreateParticleSystem(particle_system);

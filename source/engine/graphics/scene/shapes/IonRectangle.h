@@ -24,7 +24,7 @@ namespace ion::graphics::scene::shapes
 
 	namespace rectangle::detail
 	{
-		mesh::Vertices rectangle_to_vertices(const Vector3 &position, const Vector2 &size, const Color &color);
+		mesh::Vertices rectangle_vertices(const Vector3 &position, const Vector2 &size, const Color &color);
 	} //rectangle::detail
 
 
@@ -37,10 +37,10 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			//Construct a new rectangle with the given size and visibility
+			//Construct a new rectangle with the given size, color and visibility
 			Rectangle(const Vector2 &size, const Color &color, bool visible = true);
 
-			//Construct a new rectangle with the given position, size and visibility
+			//Construct a new rectangle with the given position, size, color and visibility
 			Rectangle(const Vector3 &position, const Vector2 &size, const Color &color, bool visible = true);
 
 
@@ -54,7 +54,7 @@ namespace ion::graphics::scene::shapes
 				if (position_ != position)
 				{
 					position_ = position;
-					Mesh::VertexData(rectangle::detail::rectangle_to_vertices(position_, size_, color_));
+					Mesh::VertexData(rectangle::detail::rectangle_vertices(position_, size_, color_));
 				}
 			}
 
@@ -64,7 +64,7 @@ namespace ion::graphics::scene::shapes
 				if (size_ != size)
 				{
 					size_ = size;
-					Mesh::VertexData(rectangle::detail::rectangle_to_vertices(position_, size_, color_));
+					Mesh::VertexData(rectangle::detail::rectangle_vertices(position_, size_, color_));
 				}
 			}
 

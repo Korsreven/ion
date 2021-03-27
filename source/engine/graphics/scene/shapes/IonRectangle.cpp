@@ -23,7 +23,7 @@ using namespace types::type_literals;
 namespace rectangle::detail
 {
 
-mesh::Vertices rectangle_to_vertices(const Vector3 &position, const Vector2 &size, const Color &color)
+mesh::Vertices rectangle_vertices(const Vector3 &position, const Vector2 &size, const Color &color)
 {
 	auto [x, y, z] = position.XYZ();
 	auto [half_width, half_height] = (size * 0.5_r).XY();
@@ -47,7 +47,7 @@ Rectangle::Rectangle(const Vector2 &size, const Color &color, bool visible) :
 
 Rectangle::Rectangle(const Vector3 &position, const Vector2 &size, const Color &color, bool visible) :
 
-	Shape{detail::rectangle_to_vertices(position, size, color), visible},
+	Shape{detail::rectangle_vertices(position, size, color), visible},
 
 	position_{position},
 	size_{size}
