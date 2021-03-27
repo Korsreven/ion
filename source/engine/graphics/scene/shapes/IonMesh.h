@@ -5,7 +5,7 @@ This source file is part of Ion Engine
 	- Written in C++ using OpenGL
 
 Author:	Jan Ivar Goli
-Area:	graphics/render
+Area:	graphics/scene/shapes
 File:	IonMesh.h
 -------------------------------------------
 */
@@ -44,8 +44,9 @@ namespace ion::graphics
 	}
 }
 
-namespace ion::graphics::render
+namespace ion::graphics::scene::shapes
 {
+	using namespace render;
 	using namespace types::type_literals;
 	using namespace utilities;	
 
@@ -138,7 +139,9 @@ namespace ion::graphics::render
 	} //mesh
 
 
-	class Mesh final
+	//Mesh class that supports any complex shape
+	//This base class must support inheritance (open set of shapes)
+	class Mesh
 	{
 		private:
 
@@ -187,23 +190,40 @@ namespace ion::graphics::render
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
+			//Default virtual destructor
+			virtual ~Mesh() = default;
+
+
 			/*
 				Modifiers
 			*/
 
-			//Sets the draw mode of this mesh to the given mode
-			inline void DrawMode(vertex::vertex_batch::VertexDrawMode draw_mode) noexcept
+			//Sets the vertex data of this mesh to the given vertices
+			inline void VertexData(const mesh::Vertices &vertices) noexcept
 			{
-				vertex_batch_.DrawMode(draw_mode);
+				//Check if vertex buffer has enough allocated space for the new vertex data
+				if (auto vbo = vertex_batch_.VertexBuffer();
+					!vbo || vbo->Size() <= std::ssize(vertices) * mesh::detail::vertex_components * static_cast<int>(sizeof(real)))
+				{
+					vertex_data_ = mesh::detail::vertices_to_vertex_data(vertices);
+					vertex_batch_.VertexData(vertex_data_);
+					update_bounding_volumes_ = true;
+					update_tex_coords_ = true;
+				}
 			}
 
-			//Sets the surface color of this mesh to the given color
-			void SurfaceColor(const Color &color) noexcept;
-
-			//Sets the surface material used by this mesh to the given material
-			inline void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
+			//Sets the vertex data of this mesh to the given raw vertex data
+			inline void VertexData(mesh::VertexContainer vertex_data) noexcept
 			{
-				vertex_batch_.BatchMaterial(material);
+				//Check if vertex buffer has enough allocated space for the new vertex data
+				if (auto vbo = vertex_batch_.VertexBuffer();
+					!vbo || vbo->Size() <= std::ssize(vertex_data) * static_cast<int>(sizeof(real)))
+				{
+					vertex_data_ = std::move(vertex_data);
+					vertex_batch_.VertexData(vertex_data_);
+					update_bounding_volumes_ = true;
+					update_tex_coords_ = true;
+				}
 			}
 
 			//Sets the tex coord mode of this mesh to the given mode
@@ -229,6 +249,21 @@ namespace ion::graphics::render
 			}
 
 
+			//Sets the draw mode of this mesh to the given mode
+			inline void DrawMode(vertex::vertex_batch::VertexDrawMode draw_mode) noexcept
+			{
+				vertex_batch_.DrawMode(draw_mode);
+			}
+
+			//Sets the surface color of this mesh to the given color
+			void SurfaceColor(const Color &color) noexcept;
+
+			//Sets the surface material used by this mesh to the given material
+			inline void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
+			{
+				vertex_batch_.BatchMaterial(material);
+			}
+
 			//Sets the vertex buffer to the given vertex buffer
 			inline void VertexBuffer(vertex::VertexBufferView vertex_buffer, bool reload_data = true) noexcept
 			{
@@ -240,29 +275,10 @@ namespace ion::graphics::render
 				Observers
 			*/
 
-			//Returns the draw mode of this mesh
-			[[nodiscard]] inline auto DrawMode() const noexcept
-			{
-				return vertex_batch_.DrawMode();
-			}
-
 			//Returns all of the vertex data from this mesh
 			[[nodiscard]] inline auto& VertexData() const noexcept
 			{
 				return vertex_data_;
-			}
-
-			//Returns the vertex count of this mesh
-			[[nodiscard]] inline auto VertexCount() const noexcept
-			{
-				return vertex_batch_.VertexCount();
-			}
-
-			//Returns a pointer to the material used by this mesh
-			//Returns nullptr if this mesh does not have a material
-			[[nodiscard]] inline auto SurfaceMaterial() const noexcept
-			{
-				return vertex_batch_.BatchMaterial();
 			}
 
 			//Returns true if this mesh is shown in wireframe
@@ -297,17 +313,40 @@ namespace ion::graphics::render
 			}
 
 
+			//Returns the draw mode of this mesh
+			[[nodiscard]] inline auto DrawMode() const noexcept
+			{
+				return vertex_batch_.DrawMode();
+			}		
+
+			//Returns the vertex count of this mesh
+			[[nodiscard]] inline auto VertexCount() const noexcept
+			{
+				return vertex_batch_.VertexCount();
+			}
+
+			//Returns the surface color of this mesh (from first vertex)
+			[[nodiscard]] Color SurfaceColor() const noexcept;
+
+			//Returns a pointer to the material used by this mesh
+			//Returns nullptr if this mesh does not have a material
+			[[nodiscard]] inline auto SurfaceMaterial() const noexcept
+			{
+				return vertex_batch_.BatchMaterial();
+			}
+
+
 			/*
 				Preparing / drawing
 			*/
 
 			//Prepare this mesh such that it is ready to be drawn
 			//This is called once regardless of passes
-			void Prepare() noexcept;
+			virtual void Prepare() noexcept;
 
 			//Draw this mesh with the given shader program (optional)
 			//This can be called multiple times if more than one pass
-			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept;
+			virtual void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept;
 
 
 			/*
@@ -316,8 +355,8 @@ namespace ion::graphics::render
 
 			//Elapse the total time for this mesh by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
-			void Elapse(duration time) noexcept;
+			virtual void Elapse(duration time) noexcept;
 	};
-} //ion::graphics::render
+} //ion::graphics::scene::shapes
 
 #endif

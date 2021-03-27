@@ -70,7 +70,6 @@ File:	main.cpp
 #include "graphics/particles/affectors/IonSineForce.h"
 #include "graphics/particles/affectors/IonVelocityRandomizer.h"
 #include "graphics/render/IonFrustum.h"
-#include "graphics/render/IonMesh.h"
 #include "graphics/render/IonRenderTarget.h"
 #include "graphics/render/IonRenderWindow.h"
 #include "graphics/render/IonViewport.h"
@@ -87,6 +86,9 @@ File:	main.cpp
 #include "graphics/scene/IonMovableParticleSystem.h"
 #include "graphics/scene/IonMovableText.h"
 #include "graphics/scene/IonSceneManager.h"
+#include "graphics/scene/shapes/IonMesh.h"
+#include "graphics/scene/shapes/IonRectangle.h"
+#include "graphics/scene/shapes/IonShape.h"
 #include "graphics/shaders/IonShader.h"
 #include "graphics/shaders/IonShaderLayout.h"
 #include "graphics/shaders/IonShaderManager.h"
@@ -401,6 +403,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Textures
 			ion::graphics::textures::TextureManager textures;
 			textures.CreateRepository(std::move(image_repository));
+
 			auto asteroid_diffuse = textures.CreateTexture("asteroid_diffuse", "asteroid_diffuse.png");
 			auto asteroid_normal = textures.CreateTexture("asteroid_normal", "asteroid_normal.png");
 			auto asteroid_specular = textures.CreateTexture("asteroid_specular", "asteroid_specular.png");
@@ -411,7 +414,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			
 			auto pebbles_diffuse = textures.CreateTexture("pebbles_diffuse", "pebbles_diffuse.jpg");
 			auto pebbles_normal = textures.CreateTexture("pebbles_normal", "pebbles_normal.jpg");
-			auto pebbles_specular = textures.CreateTexture("pebbles_specular", "pebbles_specular.jpg");		
+			auto pebbles_specular = textures.CreateTexture("pebbles_specular", "pebbles_specular.jpg");
+
+			auto tifa_diffuse = textures.CreateTexture("tifa", "tifa.png");
 
 			textures.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
@@ -434,12 +439,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			shaders.LogLevel(ion::graphics::shaders::shader_manager::InfoLogLevel::Error);		
 			auto mesh_vert_shader = shaders.CreateShader("default_mesh_vert", "default_mesh.vert");
 			auto mesh_frag_shader = shaders.CreateShader("default_mesh_frag", "default_mesh.frag");
-			auto particle_vert_shader = shaders.CreateShader("default_particle_vert", "default_particle.vert");
-			auto particle_frag_shader = shaders.CreateShader("default_particle_frag", "default_particle.frag");
+			//auto particle_vert_shader = shaders.CreateShader("default_particle_vert", "default_particle.vert");
+			//auto particle_frag_shader = shaders.CreateShader("default_particle_frag", "default_particle.frag");
 			//auto text_vert_shader = shaders.CreateShader("default_text_vert", "default_text.vert");
 			//auto text_frag_shader = shaders.CreateShader("default_text_frag", "default_text.frag");
-			auto gui_text_vert_shader = shaders.CreateShader("default_gui_text_vert", "default_gui_text.vert");
-			auto gui_text_frag_shader = shaders.CreateShader("default_gui_text_frag", "default_gui_text.frag");
+			//auto gui_text_vert_shader = shaders.CreateShader("default_gui_text_vert", "default_gui_text.vert");
+			//auto gui_text_frag_shader = shaders.CreateShader("default_gui_text_frag", "default_gui_text.frag");
 			shaders.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!shaders.Loaded());
@@ -447,10 +452,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Shader programs
 			ion::graphics::shaders::ShaderProgramManager shader_programs;
 			shader_programs.LogLevel(ion::graphics::shaders::shader_program_manager::InfoLogLevel::Error);
-			//auto shader_prog = shader_programs.CreateShaderProgram("default_mesh_prog", mesh_vert_shader, mesh_frag_shader);
+			auto shader_prog = shader_programs.CreateShaderProgram("default_mesh_prog", mesh_vert_shader, mesh_frag_shader);
 			//auto shader_prog = shader_programs.CreateShaderProgram("default_particle_prog", particle_vert_shader, particle_frag_shader);
 			//auto shader_prog = shader_programs.CreateShaderProgram("default_text_prog", text_vert_shader, text_frag_shader);
-			auto shader_prog = shader_programs.CreateShaderProgram("default_gui_text_prog", gui_text_vert_shader, gui_text_frag_shader);
+			//auto shader_prog = shader_programs.CreateShaderProgram("default_gui_text_prog", gui_text_vert_shader, gui_text_frag_shader);
 			shader_programs.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!shader_programs.Loaded());
@@ -460,25 +465,25 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Shader structs
 			auto matrix_struct = shader_prog->CreateStruct("matrix");
 			auto scene_struct = shader_prog->CreateStruct("scene");
-			//auto camera_struct = shader_prog->CreateStruct("camera");
+			auto camera_struct = shader_prog->CreateStruct("camera");
 			auto primitive_struct = shader_prog->CreateStruct("primitive");
-			//auto material_struct = shader_prog->CreateStruct("material");
-			//auto light_struct = shader_prog->CreateStruct("light", 8);
+			auto material_struct = shader_prog->CreateStruct("material");
+			auto light_struct = shader_prog->CreateStruct("light", 8);
 
 			//Shader variables
 			//Vertex
-			//shader_prog->CreateAttribute<glsl::vec3>("vertex_position");
-			//shader_prog->CreateAttribute<glsl::vec3>("vertex_normal");
-			//shader_prog->CreateAttribute<glsl::vec4>("vertex_color");
-			//shader_prog->CreateAttribute<glsl::vec2>("vertex_tex_coord");
+			shader_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			shader_prog->CreateAttribute<glsl::vec3>("vertex_normal");
+			shader_prog->CreateAttribute<glsl::vec4>("vertex_color");
+			shader_prog->CreateAttribute<glsl::vec2>("vertex_tex_coord");
 
 			//shader_prog->CreateAttribute<glsl::vec3>("vertex_position");
 			//shader_prog->CreateAttribute<float>("vertex_point_size");
 			//shader_prog->CreateAttribute<glsl::vec4>("vertex_color");
 
-			shader_prog->CreateAttribute<glsl::vec3>("vertex_position");
-			shader_prog->CreateAttribute<glsl::vec4>("vertex_color");
-			shader_prog->CreateAttribute<glsl::vec2>("vertex_tex_coord");
+			//shader_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			//shader_prog->CreateAttribute<glsl::vec4>("vertex_color");
+			//shader_prog->CreateAttribute<glsl::vec2>("vertex_tex_coord");
 
 			//Matrices			
 			auto matrix_model_view = matrix_struct->CreateUniform<glsl::mat4>("model_view");
@@ -486,20 +491,20 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto matrix_model_view_projection = matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
 
 			//Scene
-			//auto scene_ambient = scene_struct->CreateUniform<glsl::vec4>("ambient");
+			auto scene_ambient = scene_struct->CreateUniform<glsl::vec4>("ambient");
 			auto scene_gamma = scene_struct->CreateUniform<float>("gamma");
-			//auto scene_light_count = scene_struct->CreateUniform<int>("light_count");
+			auto scene_light_count = scene_struct->CreateUniform<int>("light_count");
 
 			//Camera
-			//auto camera_position = camera_struct->CreateUniform<glsl::vec3>("position");	
+			auto camera_position = camera_struct->CreateUniform<glsl::vec3>("position");	
 
 			//Primitive
 			auto primitive_texture = primitive_struct->CreateUniform<glsl::sampler2D>("texture");
 			auto primitive_has_texture = primitive_struct->CreateUniform<bool>("has_texture");
-			//auto primitive_has_material = primitive_struct->CreateUniform<bool>("has_material");
+			auto primitive_has_material = primitive_struct->CreateUniform<bool>("has_material");
 
 			//Material			
-			/*auto material_ambient = material_struct->CreateUniform<glsl::vec4>("ambient");
+			auto material_ambient = material_struct->CreateUniform<glsl::vec4>("ambient");
 			auto material_diffuse = material_struct->CreateUniform<glsl::vec4>("diffuse");
 			auto material_specular = material_struct->CreateUniform<glsl::vec4>("specular");
 			auto material_emissive = material_struct->CreateUniform<glsl::vec4>("emissive");
@@ -509,10 +514,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto material_normal_map = material_struct->CreateUniform<glsl::sampler2D>("normal_map");
 			auto material_has_diffuse_map = material_struct->CreateUniform<bool>("has_diffuse_map");
 			auto material_has_specular_map = material_struct->CreateUniform<bool>("has_specular_map");
-			auto material_has_normal_map = material_struct->CreateUniform<bool>("has_normal_map");*/
+			auto material_has_normal_map = material_struct->CreateUniform<bool>("has_normal_map");
 
 			//Light
-			/*auto light_type = light_struct->CreateUniform<int>("type");
+			auto light_type = light_struct->CreateUniform<int>("type");
 			auto light_position = light_struct->CreateUniform<glsl::vec3>("position");
 			auto light_direction = light_struct->CreateUniform<glsl::vec3>("direction");
 			auto light_ambient = light_struct->CreateUniform<glsl::vec4>("ambient");
@@ -522,7 +527,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto light_linear = light_struct->CreateUniform<float>("linear");
 			auto light_quadratic = light_struct->CreateUniform<float>("quadratic");
 			auto light_cutoff = light_struct->CreateUniform<float>("cutoff");
-			auto light_outer_cutoff = light_struct->CreateUniform<float>("outer_cutoff");*/
+			auto light_outer_cutoff = light_struct->CreateUniform<float>("outer_cutoff");
 
 			shader_programs.LoadShaderVariableLocations(*shader_prog);
 
@@ -598,6 +603,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{0.0_r, 0.0_r, 0.0_r},
 					32.0_r);
 
+			auto tifa =
+				materials.CreateMaterial("tifa",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{0.6_r, 0.6_r, 0.6_r},
+					{0.0_r, 0.0_r, 0.0_r},
+					32.0_r, tifa_diffuse, nullptr, nullptr);
+
 			using namespace ion::graphics::utilities;
 
 			//Particle system
@@ -634,7 +647,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			text->DefaultForegroundColor(color::White);
 
 			//Mesh vertices
-			/*ion::graphics::render::mesh::Vertices gray_vertices;
+			/*ion::graphics::scene::shapes::mesh::Vertices gray_vertices;
 			gray_vertices.push_back({{-1.7778_r, 1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
 			gray_vertices.push_back({{-1.7778_r, -1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
 			gray_vertices.push_back({{1.7778_r, -1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
@@ -642,7 +655,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			gray_vertices.push_back({{1.7778_r, 1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
 			gray_vertices.push_back({{-1.7778_r, 1.0_r, -4.0_r}, vector3::UnitZ, color::LightGray});
 
-			ion::graphics::render::mesh::Vertices red_vertices;
+			ion::graphics::scene::shapes::mesh::Vertices red_vertices;
 			red_vertices.push_back({{-1.7778_r, 1.0_r, -1.25_r}, vector3::UnitZ, color::Red});
 			red_vertices.push_back({{-1.7778_r, 0.8_r, -1.25_r}, vector3::UnitZ, color::Red});
 			red_vertices.push_back({{-1.57788_r, 0.8_r, -1.25_r}, vector3::UnitZ, color::Red});
@@ -650,7 +663,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			red_vertices.push_back({{-1.5778_r, 1.0_r, -1.25_r}, vector3::UnitZ, color::Red});
 			red_vertices.push_back({{-1.7778_r, 1.0_r, -1.25_r}, vector3::UnitZ, color::Red});
 
-			ion::graphics::render::mesh::Vertices green_vertices;
+			ion::graphics::scene::shapes::mesh::Vertices green_vertices;
 			green_vertices.push_back({{-0.1_r, 0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
 			green_vertices.push_back({{-0.1_r, -0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
 			green_vertices.push_back({{0.1_r, -0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
@@ -658,21 +671,145 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			green_vertices.push_back({{0.1_r, 0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
 			green_vertices.push_back({{-0.1_r, 0.1_r, -1.5_r}, vector3::UnitZ, color::Green});
 
-			ion::graphics::render::mesh::Vertices blue_vertices;
+			ion::graphics::scene::shapes::mesh::Vertices blue_vertices;
 			blue_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
 			blue_vertices.push_back({{1.5778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Blue});
 			blue_vertices.push_back({{1.7778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Blue});
 			blue_vertices.push_back({{1.7778_r, -1.0_r, -1.25_r}, vector3::UnitZ, color::Blue});
 			blue_vertices.push_back({{1.7778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
-			blue_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
+			blue_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});*/
 
-			ion::graphics::render::mesh::Vertices sprite_vertices;
-			sprite_vertices.push_back({{-0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 1.0_r}, color::Red});
-			sprite_vertices.push_back({{-0.75_r, -0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 0.0_r}, color::Green});
-			sprite_vertices.push_back({{0.75_r, -0.75_r, -1.3_r}, vector3::UnitZ, {1.0_r, 0.0_r}, color::Blue});
-			sprite_vertices.push_back({{0.75_r, -0.75_r, -1.3_r}, vector3::UnitZ, {1.0_r, 0.0_r}, color::Blue});
-			sprite_vertices.push_back({{0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {1.0_r, 1.0_r}, color::Green});
-			sprite_vertices.push_back({{-0.75_r, 0.75_r, -1.3_r}, vector3::UnitZ, {0.0_r, 1.0_r}, color::Red});*/
+			Vector3 scale_factor{0.001953125_r, 0.001953125_r, 1.0_r};
+
+			ion::graphics::scene::shapes::mesh::Vertices sprite_vertices;
+			sprite_vertices.push_back({{-0.38867_r, 1.0_r, -1.3_r}, vector3::UnitZ, {0.0_r, 1.0_r}, color::White});
+			sprite_vertices.push_back({{-0.38867_r, -1.0_r, -1.3_r}, vector3::UnitZ, {0.0_r, 0.0_r}, color::White});
+			sprite_vertices.push_back({{0.38867_r, -1.0_r, -1.3_r}, vector3::UnitZ, {1.0_r, 0.0_r}, color::White});
+			sprite_vertices.push_back({{0.38867_r, -1.0_r, -1.3_r}, vector3::UnitZ, {1.0_r, 0.0_r}, color::White});
+			sprite_vertices.push_back({{0.38867_r, 1.0_r, -1.3_r}, vector3::UnitZ, {1.0_r, 1.0_r}, color::White});
+			sprite_vertices.push_back({{-0.38867_r, 1.0_r, -1.3_r}, vector3::UnitZ, {0.0_r, 1.0_r}, color::White});
+
+
+			ion::graphics::scene::shapes::mesh::Vertices head_vertices_crop; //140x140
+			Vector3 head_pos_crop{-47.0_r, 440.0_r, 0.0_r};
+			head_pos_crop *= scale_factor;
+			head_vertices_crop.push_back({Vector3{-0.1367_r, 0.1367_r, -1.3_r} + head_pos_crop, vector3::UnitZ, color::Red});
+			head_vertices_crop.push_back({Vector3{-0.1367_r, -0.1367_r, -1.3_r} + head_pos_crop, vector3::UnitZ, color::Red});
+			head_vertices_crop.push_back({Vector3{0.1367_r, -0.1367_r, -1.3_r} + head_pos_crop, vector3::UnitZ, color::Red});
+			head_vertices_crop.push_back({Vector3{0.1367_r, -0.1367_r, -1.3_r} + head_pos_crop, vector3::UnitZ, color::Red});
+			head_vertices_crop.push_back({Vector3{0.1367_r, 0.1367_r, -1.3_r} + head_pos_crop, vector3::UnitZ, color::Red});
+			head_vertices_crop.push_back({Vector3{-0.1367_r, 0.1367_r, -1.3_r} + head_pos_crop, vector3::UnitZ, color::Red});
+
+			ion::graphics::scene::shapes::mesh::Vertices breast_vertices_crop; //160x115
+			Vector3 breast_pos_crop{-56.0_r, 278.0_r, 0.0_r};
+			breast_pos_crop *= scale_factor;
+			breast_vertices_crop.push_back({Vector3{-0.1562_r, 0.1123_r, -1.3_r} + breast_pos_crop, vector3::UnitZ, color::Red});
+			breast_vertices_crop.push_back({Vector3{-0.1562_r, -0.1123_r, -1.3_r} + breast_pos_crop, vector3::UnitZ, color::Red});
+			breast_vertices_crop.push_back({Vector3{0.1562_r, -0.1123_r, -1.3_r} + breast_pos_crop, vector3::UnitZ, color::Red});
+			breast_vertices_crop.push_back({Vector3{0.1562_r, -0.1123_r, -1.3_r} + breast_pos_crop, vector3::UnitZ, color::Red});
+			breast_vertices_crop.push_back({Vector3{0.1562_r, 0.1123_r, -1.3_r} + breast_pos_crop, vector3::UnitZ, color::Red});
+			breast_vertices_crop.push_back({Vector3{-0.1562_r, 0.1123_r, -1.3_r} + breast_pos_crop, vector3::UnitZ, color::Red});
+
+			ion::graphics::scene::shapes::mesh::Vertices elbow_vertices_crop; //100x100
+			Vector3 elbow_pos_crop{150.0_r, 253.0_r, 0.0_r};
+			elbow_pos_crop *= scale_factor;
+			elbow_vertices_crop.push_back({Vector3{-0.0976_r, 0.0976_r, -1.3_r} + elbow_pos_crop, vector3::UnitZ, color::Red});
+			elbow_vertices_crop.push_back({Vector3{-0.0976_r, -0.0976_r, -1.3_r} + elbow_pos_crop, vector3::UnitZ, color::Red});
+			elbow_vertices_crop.push_back({Vector3{0.0976_r, -0.0976_r, -1.3_r} + elbow_pos_crop, vector3::UnitZ, color::Red});
+			elbow_vertices_crop.push_back({Vector3{0.0976_r, -0.0976_r, -1.3_r} + elbow_pos_crop, vector3::UnitZ, color::Red});
+			elbow_vertices_crop.push_back({Vector3{0.0976_r, 0.0976_r, -1.3_r} + elbow_pos_crop, vector3::UnitZ, color::Red});
+			elbow_vertices_crop.push_back({Vector3{-0.0976_r, 0.0976_r, -1.3_r} + elbow_pos_crop, vector3::UnitZ, color::Red});
+
+			ion::graphics::scene::shapes::mesh::Vertices belly_vertices_crop; //70x70
+			Vector3 belly_pos_crop{-66.0_r, 139.0_r, 0.0_r};
+			belly_pos_crop *= scale_factor;
+			belly_vertices_crop.push_back({Vector3{-0.0683_r, 0.0683_r, -1.3_r} + belly_pos_crop, vector3::UnitZ, color::Red});
+			belly_vertices_crop.push_back({Vector3{-0.0683_r, -0.0683_r, -1.3_r} + belly_pos_crop, vector3::UnitZ, color::Red});
+			belly_vertices_crop.push_back({Vector3{0.0683_r, -0.0683_r, -1.3_r} + belly_pos_crop, vector3::UnitZ, color::Red});
+			belly_vertices_crop.push_back({Vector3{0.0683_r, -0.0683_r, -1.3_r} + belly_pos_crop, vector3::UnitZ, color::Red});
+			belly_vertices_crop.push_back({Vector3{0.0683_r, 0.0683_r, -1.3_r} + belly_pos_crop, vector3::UnitZ, color::Red});
+			belly_vertices_crop.push_back({Vector3{-0.0683_r, 0.0683_r, -1.3_r} + belly_pos_crop, vector3::UnitZ, color::Red});
+
+			ion::graphics::scene::shapes::mesh::Vertices hand_vertices_crop; //70x140
+			Vector3 hand_pos_crop{-165.0_r, 0.0_r, 0.0_r};
+			hand_pos_crop *= scale_factor;
+			hand_vertices_crop.push_back({Vector3{-0.0683_r, 0.1367_r, -1.3_r} + hand_pos_crop, vector3::UnitZ, color::Red});
+			hand_vertices_crop.push_back({Vector3{-0.0683_r, -0.1367_r, -1.3_r} + hand_pos_crop, vector3::UnitZ, color::Red});
+			hand_vertices_crop.push_back({Vector3{0.0683_r, -0.1367_r, -1.3_r} + hand_pos_crop, vector3::UnitZ, color::Red});
+			hand_vertices_crop.push_back({Vector3{0.0683_r, -0.1367_r, -1.3_r} + hand_pos_crop, vector3::UnitZ, color::Red});
+			hand_vertices_crop.push_back({Vector3{0.0683_r, 0.1367_r, -1.3_r} + hand_pos_crop, vector3::UnitZ, color::Red});
+			hand_vertices_crop.push_back({Vector3{-0.0683_r, 0.1367_r, -1.3_r} + hand_pos_crop, vector3::UnitZ, color::Red});
+
+			ion::graphics::scene::shapes::mesh::Vertices knees_vertices_crop; //170x100
+			Vector3 knees_pos_crop{-65.0_r, -207.0_r, 0.0_r};
+			knees_pos_crop *= scale_factor;
+			knees_vertices_crop.push_back({Vector3{-0.166_r, 0.0976_r, -1.3_r} + knees_pos_crop, vector3::UnitZ, color::Red});
+			knees_vertices_crop.push_back({Vector3{-0.166_r, -0.0976_r, -1.3_r} + knees_pos_crop, vector3::UnitZ, color::Red});
+			knees_vertices_crop.push_back({Vector3{0.166_r, -0.0976_r, -1.3_r} + knees_pos_crop, vector3::UnitZ, color::Red});
+			knees_vertices_crop.push_back({Vector3{0.166_r, -0.0976_r, -1.3_r} + knees_pos_crop, vector3::UnitZ, color::Red});
+			knees_vertices_crop.push_back({Vector3{0.166_r, 0.0976_r, -1.3_r} + knees_pos_crop, vector3::UnitZ, color::Red});
+			knees_vertices_crop.push_back({Vector3{-0.166_r, 0.0976_r, -1.3_r} + knees_pos_crop, vector3::UnitZ, color::Red});
+
+
+			ion::graphics::scene::shapes::mesh::Vertices head_vertices; //140x140
+			Vector3 head_pos{-547.0_r, 440.0_r, 0.0_r};
+			head_pos *= scale_factor;
+			head_vertices.push_back({Vector3{-0.1367_r, 0.1367_r, -1.3_r} + head_pos, vector3::UnitZ, {0.2035_r, 0.998_r}, color::White});
+			head_vertices.push_back({Vector3{-0.1367_r, -0.1367_r, -1.3_r} + head_pos, vector3::UnitZ, {0.2035_r, 0.8623_r}, color::White});
+			head_vertices.push_back({Vector3{0.1367_r, -0.1367_r, -1.3_r} + head_pos, vector3::UnitZ, {0.5552_r, 0.8623_r}, color::White});
+			head_vertices.push_back({Vector3{0.1367_r, -0.1367_r, -1.3_r} + head_pos, vector3::UnitZ, {0.5552_r, 0.8623_r}, color::White});
+			head_vertices.push_back({Vector3{0.1367_r, 0.1367_r, -1.3_r} + head_pos, vector3::UnitZ, {0.5552_r, 0.998_r}, color::White});
+			head_vertices.push_back({Vector3{-0.1367_r, 0.1367_r, -1.3_r} + head_pos, vector3::UnitZ, {0.2035_r, 0.998_r}, color::White});
+
+			ion::graphics::scene::shapes::mesh::Vertices breast_vertices; //160x115
+			Vector3 breast_pos{-556.0_r, 278.0_r, 0.0_r};
+			breast_pos *= scale_factor;
+			breast_vertices.push_back({Vector3{-0.1562_r, 0.1123_r, -1.3_r} + breast_pos, vector3::UnitZ, {0.1582_r, 0.8281_r}, color::White});
+			breast_vertices.push_back({Vector3{-0.1562_r, -0.1123_r, -1.3_r} + breast_pos, vector3::UnitZ, {0.1582_r, 0.7158_r}, color::White});
+			breast_vertices.push_back({Vector3{0.1562_r, -0.1123_r, -1.3_r} + breast_pos, vector3::UnitZ, {0.5577_r, 0.7158_r}, color::White});
+			breast_vertices.push_back({Vector3{0.1562_r, -0.1123_r, -1.3_r} + breast_pos, vector3::UnitZ, {0.5577_r, 0.7158_r}, color::White});
+			breast_vertices.push_back({Vector3{0.1562_r, 0.1123_r, -1.3_r} + breast_pos, vector3::UnitZ, {0.5577_r, 0.8281_r}, color::White});
+			breast_vertices.push_back({Vector3{-0.1562_r, 0.1123_r, -1.3_r} + breast_pos, vector3::UnitZ, {0.1582_r, 0.8281_r}, color::White});
+
+			ion::graphics::scene::shapes::mesh::Vertices elbow_vertices; //100x100
+			Vector3 elbow_pos{-350.0_r, 253.0_r, 0.0_r};
+			elbow_pos *= scale_factor;
+			elbow_vertices.push_back({Vector3{-0.0976_r, 0.0976_r, -1.3_r} + elbow_pos, vector3::UnitZ, {0.7512_r, 0.7958_r}, color::White});
+			elbow_vertices.push_back({Vector3{-0.0976_r, -0.0976_r, -1.3_r} + elbow_pos, vector3::UnitZ, {0.7512_r, 0.6992_r}, color::White});
+			elbow_vertices.push_back({Vector3{0.0976_r, -0.0976_r, -1.3_r} + elbow_pos, vector3::UnitZ, {1.0_r, 0.6992_r}, color::White});
+			elbow_vertices.push_back({Vector3{0.0976_r, -0.0976_r, -1.3_r} + elbow_pos, vector3::UnitZ, {1.0_r, 0.6992_r}, color::White});
+			elbow_vertices.push_back({Vector3{0.0976_r, 0.0976_r, -1.3_r} + elbow_pos, vector3::UnitZ, {1.0_r, 0.7958_r}, color::White});
+			elbow_vertices.push_back({Vector3{-0.0976_r, 0.0976_r, -1.3_r} + elbow_pos, vector3::UnitZ, {0.7512_r, 0.7958_r}, color::White});
+
+			ion::graphics::scene::shapes::mesh::Vertices belly_vertices; //70x70
+			Vector3 belly_pos{-566.0_r, 139.0_r, 0.0_r};
+			belly_pos *= scale_factor;
+			belly_vertices.push_back({Vector3{-0.0683_r, 0.0683_r, -1.3_r} + belly_pos, vector3::UnitZ, {0.2462_r, 0.6699_r}, color::White});
+			belly_vertices.push_back({Vector3{-0.0683_r, -0.0683_r, -1.3_r} + belly_pos, vector3::UnitZ, {0.2462_r, 0.6025_r}, color::White});
+			belly_vertices.push_back({Vector3{0.0683_r, -0.0683_r, -1.3_r} + belly_pos, vector3::UnitZ, {0.4195_r, 0.6025_r}, color::White});
+			belly_vertices.push_back({Vector3{0.0683_r, -0.0683_r, -1.3_r} + belly_pos, vector3::UnitZ, {0.4195_r, 0.6025_r}, color::White});
+			belly_vertices.push_back({Vector3{0.0683_r, 0.0683_r, -1.3_r} + belly_pos, vector3::UnitZ, {0.4195_r, 0.6699_r}, color::White});
+			belly_vertices.push_back({Vector3{-0.0683_r, 0.0683_r, -1.3_r} + belly_pos, vector3::UnitZ, {0.2462_r, 0.6699_r}, color::White});
+
+			ion::graphics::scene::shapes::mesh::Vertices hand_vertices; //70x140
+			Vector3 hand_pos{-665.0_r, 0.0_r, 0.0_r};
+			hand_pos *= scale_factor;
+			hand_vertices.push_back({Vector3{-0.0683_r, 0.1367_r, -1.3_r} + hand_pos, vector3::UnitZ, {0.0_r, 0.5683_r}, color::White});
+			hand_vertices.push_back({Vector3{-0.0683_r, -0.1367_r, -1.3_r} + hand_pos, vector3::UnitZ, {0.0_r, 0.4316_r}, color::White});
+			hand_vertices.push_back({Vector3{0.0683_r, -0.1367_r, -1.3_r} + hand_pos, vector3::UnitZ, {0.1708_r, 0.4316_r}, color::White});
+			hand_vertices.push_back({Vector3{0.0683_r, -0.1367_r, -1.3_r} + hand_pos, vector3::UnitZ, {0.1708_r, 0.4316_r}, color::White});
+			hand_vertices.push_back({Vector3{0.0683_r, 0.1367_r, -1.3_r} + hand_pos, vector3::UnitZ, {0.1708_r, 0.5683_r}, color::White});
+			hand_vertices.push_back({Vector3{-0.0683_r, 0.1367_r, -1.3_r} + hand_pos, vector3::UnitZ, {0.0_r, 0.5683_r}, color::White});
+
+			ion::graphics::scene::shapes::mesh::Vertices knees_vertices; //170x100
+			Vector3 knees_pos{-565.0_r, -207.0_r, 0.0_r};
+			knees_pos *= scale_factor;
+			knees_vertices.push_back({Vector3{-0.166_r, 0.0976_r, -1.3_r} + knees_pos, vector3::UnitZ, {0.1231_r, 0.3466_r}, color::White});
+			knees_vertices.push_back({Vector3{-0.166_r, -0.0976_r, -1.3_r} + knees_pos, vector3::UnitZ, {0.1231_r, 0.25_r}, color::White});
+			knees_vertices.push_back({Vector3{0.166_r, -0.0976_r, -1.3_r} + knees_pos, vector3::UnitZ, {0.5477_r, 0.25_r}, color::White});
+			knees_vertices.push_back({Vector3{0.166_r, -0.0976_r, -1.3_r} + knees_pos, vector3::UnitZ, {0.5477_r, 0.25_r}, color::White});
+			knees_vertices.push_back({Vector3{0.166_r, 0.0976_r, -1.3_r} + knees_pos, vector3::UnitZ, {0.5477_r, 0.3466_r}, color::White});
+			knees_vertices.push_back({Vector3{-0.166_r, 0.0976_r, -1.3_r} + knees_pos, vector3::UnitZ, {0.1231_r, 0.3466_r}, color::White});
 
 			//Models
 			//auto gray_rectangle = engine.Scene().CreateModel();
@@ -687,16 +824,38 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//auto blue_square = engine.Scene().CreateModel();
 			//blue_square->CreateMesh(std::move(blue_vertices), sapphire);
 
-			//auto sprite = engine.Scene().CreateModel();
-			//sprite->CreateMesh(std::move(sprite_vertices), pebbles,
-			//	ion::graphics::render::mesh::MeshTexCoordMode::Manual);
+			auto model = engine.Scene().CreateModel();
+			model->CreateMesh(std::move(sprite_vertices), tifa,
+				ion::graphics::scene::shapes::mesh::MeshTexCoordMode::Manual);
+			model->CreateMesh(std::move(head_vertices_crop))->ShowWireframe(true);
+			model->CreateMesh(std::move(breast_vertices_crop))->ShowWireframe(true);
+			model->CreateMesh(std::move(elbow_vertices_crop))->ShowWireframe(true);
+			model->CreateMesh(std::move(belly_vertices_crop))->ShowWireframe(true);
+			model->CreateMesh(std::move(hand_vertices_crop))->ShowWireframe(true);
+			model->CreateMesh(std::move(knees_vertices_crop))->ShowWireframe(true);
+
+			model->CreateMesh(std::move(head_vertices), tifa,
+				ion::graphics::scene::shapes::mesh::MeshTexCoordMode::Manual);
+			model->CreateMesh(std::move(breast_vertices), tifa,
+				ion::graphics::scene::shapes::mesh::MeshTexCoordMode::Manual);
+			model->CreateMesh(std::move(elbow_vertices), tifa,
+				ion::graphics::scene::shapes::mesh::MeshTexCoordMode::Manual);
+			model->CreateMesh(std::move(belly_vertices), tifa,
+				ion::graphics::scene::shapes::mesh::MeshTexCoordMode::Manual);
+			model->CreateMesh(std::move(hand_vertices), tifa,
+				ion::graphics::scene::shapes::mesh::MeshTexCoordMode::Manual);
+			model->CreateMesh(std::move(knees_vertices), tifa,
+				ion::graphics::scene::shapes::mesh::MeshTexCoordMode::Manual);
+
+			auto rect = model->CreateMesh(ion::graphics::scene::shapes::Rectangle{
+				{1.0_r, 0.0_r, -1.3_r}, {0.5_r, 0.5_r}, color::Coral});
 
 			//Particle systems
 			//auto asteroids = engine.Scene().CreateParticleSystem(particle_system);
 			//asteroids->Get()->StartAll();
 
 			//Texts
-			auto hello_world = engine.Scene().CreateText(text);
+			//auto hello_world = engine.Scene().CreateText(text);
 
 
 			//Camera, projection and view matrix
@@ -709,13 +868,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto &view_mat = camera->ViewMatrix();
 
 			//Uniforms
-			//scene_ambient->Get() = Color{0.2_r, 0.2_r, 0.2_r, 1.0};
+			scene_ambient->Get() = Color{1.0_r, 1.0_r, 1.0_r, 1.0};
 			scene_gamma->Get() = 1.0_r;
-			//scene_light_count->Get() = 1;
+			scene_light_count->Get() = 0;
 
-			//camera_position->Get() = camera->Position();
+			camera_position->Get() = camera->Position();
 
-			/*light_type->Get() = 0;
+			light_type->Get() = 0;
 			light_position->Get().XYZ(0.0_r, 0.0_r, -1.0_r);
 			light_direction->Get().XYZ(0.0_r, 0.0_r, -1.0_r);
 			light_ambient->Get().XYZW(1.0_r, 1.0_r, 1.0_r, 1.0_r);
@@ -725,7 +884,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			light_linear->Get() = 0.09_r;
 			light_quadratic->Get() = 0.032_r;
 			light_cutoff->Get() = ion::utilities::math::Cos(ion::utilities::math::ToRadians(45.0_r));
-			light_outer_cutoff->Get() = ion::utilities::math::Cos(ion::utilities::math::ToRadians(55.0_r));*/
+			light_outer_cutoff->Get() = ion::utilities::math::Cos(ion::utilities::math::ToRadians(55.0_r));
 			
 			matrix_projection->Get() = proj_mat.TransposeCopy();
 			matrix_model_view->Get() = view_mat.TransposeCopy();
@@ -739,18 +898,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//game.models.push_back(red_square);
 			//game.models.push_back(green_square);
 			//game.models.push_back(blue_square);
-			//game.models.push_back(sprite);
+			game.models.push_back(model);
 
 			//game.particle_systems.push_back(asteroids);
-			game.texts.push_back(hello_world);
+			//game.texts.push_back(hello_world);
 
 			game.viewport = engine.Target()->GetViewport("");
 			game.matrix_projection = matrix_projection;
 			game.matrix_model_view_projection = matrix_model_view_projection;
-			/*game.light_type = light_type;
+			game.light_type = light_type;
 			game.light_position = light_position;
 			game.light_direction = light_direction;
-			game.light_diffuse = light_diffuse;*/
+			game.light_diffuse = light_diffuse;
 
 
 			//EXAMPLE end

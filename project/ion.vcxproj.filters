@@ -181,6 +181,12 @@
     <Filter Include="Source Files\graphics\render\vertex">
       <UniqueIdentifier>{95a40b8a-2953-4333-9165-edd942a65074}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\graphics\scene\shapes">
+      <UniqueIdentifier>{33e1b2d6-3b97-4cbd-925f-e3d085be89f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics\scene\shapes">
+      <UniqueIdentifier>{f52d10f5-8d89-4775-afa4-2bbbc3174a79}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -402,9 +408,6 @@
     <ClCompile Include="..\source\engine\graphics\scene\IonModel.cpp">
       <Filter>Source Files\graphics\scene</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\engine\graphics\render\IonMesh.cpp">
-      <Filter>Source Files\graphics\render</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\engine\graphics\utilities\IonVector3.cpp">
       <Filter>Source Files\graphics\utilities</Filter>
     </ClCompile>
@@ -446,6 +449,15 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\scene\IonMovableText.cpp">
       <Filter>Source Files\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\shapes\IonMesh.cpp">
+      <Filter>Source Files\graphics\scene\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\shapes\IonRectangle.cpp">
+      <Filter>Source Files\graphics\scene\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\shapes\IonShape.cpp">
+      <Filter>Source Files\graphics\scene\shapes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -839,9 +851,6 @@
     <ClInclude Include="..\source\engine\graphics\scene\IonModel.h">
       <Filter>Header Files\graphics\scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\graphics\render\IonMesh.h">
-      <Filter>Header Files\graphics\render</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\engine\graphics\utilities\IonVector3.h">
       <Filter>Header Files\graphics\utilities</Filter>
     </ClInclude>
@@ -892,6 +901,15 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\scene\IonMovableText.h">
       <Filter>Header Files\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\shapes\IonMesh.h">
+      <Filter>Header Files\graphics\scene\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\shapes\IonRectangle.h">
+      <Filter>Header Files\graphics\scene\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\shapes\IonShape.h">
+      <Filter>Header Files\graphics\scene\shapes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

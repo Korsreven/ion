@@ -5,7 +5,7 @@ This source file is part of Ion Engine
 	- Written in C++ using OpenGL
 
 Author:	Jan Ivar Goli
-Area:	graphics/render
+Area:	graphics/scene/shapes
 File:	IonMesh.cpp
 -------------------------------------------
 */
@@ -21,7 +21,7 @@ File:	IonMesh.cpp
 #include "graphics/shaders/IonShaderProgram.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
 
-namespace ion::graphics::render
+namespace ion::graphics::scene::shapes
 {
 
 using namespace mesh;
@@ -268,11 +268,29 @@ void Mesh::SurfaceColor(const Color &color) noexcept
 
 
 /*
+	Observers
+*/
+
+Color Mesh::SurfaceColor() const noexcept
+{
+	if (auto i = detail::color_offset; i < std::ssize(vertex_data_))
+		return Color{vertex_data_[i], vertex_data_[i + 1], vertex_data_[i + 2], vertex_data_[i + 3]};
+	else
+		return color::Transparent;
+}
+
+
+/*
 	Preparing / drawing
 */
 
 void Mesh::Prepare() noexcept
 {
+	//Make sure, if vertex data view has been initialized, that it is viewing the correct vertex data
+	//Could happen if vertex data has been reallocated post init
+	if (vertex_batch_.VertexData() && vertex_batch_.VertexData() != vertex_data_)
+		vertex_batch_.VertexData(vertex_data_);
+
 	if (vertex_batch_.VertexCount() > 0)
 	{
 		if (update_bounding_volumes_)
@@ -326,4 +344,4 @@ void Mesh::Elapse(duration time) noexcept
 	vertex_batch_.Elapse(time);
 }
 
-} //ion::graphics::render
+} //ion::graphics::scene::shapes

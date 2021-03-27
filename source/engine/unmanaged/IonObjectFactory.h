@@ -60,14 +60,16 @@ namespace ion::unmanaged
 			*/
 
 			//Create an object with the given arguments
-			template <typename... Args>
+			template <typename T = ObjectT, typename... Args,
+				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(Args &&...args)
 			{
-				return Emplace<ObjectT>(std::forward<Args>(args)...);
+				return Emplace<std::remove_cvref_t<T>>(std::forward<Args>(args)...);
 			}
 
 			//Create an object by copying/moving the given object
-			template <typename T, typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
+			template <typename T,
+				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(T &&object)
 			{
 				return Emplace<std::remove_cvref_t<T>>(std::forward<T>(object));

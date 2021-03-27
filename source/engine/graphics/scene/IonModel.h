@@ -14,16 +14,18 @@ File:	IonModel.h
 #define ION_MODEL_H
 
 #include <optional>
+#include <type_traits>
 #include <vector>
 
 #include "IonMovableObject.h"
-#include "graphics/render/IonMesh.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
 #include "graphics/render/vertex/IonVertexBufferObject.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonObb.h"
 #include "graphics/utilities/IonSphere.h"
 #include "memory/IonNonOwningPtr.h"
+#include "shapes/IonMesh.h"
+#include "shapes/IonShape.h"
 #include "types/IonTypes.h"
 #include "unmanaged/IonObjectFactory.h"
 
@@ -54,7 +56,7 @@ namespace ion::graphics::scene
 
 	class Model final :
 		public MovableObject,
-		protected unmanaged::ObjectFactory<render::Mesh>
+		protected unmanaged::ObjectFactory<shapes::Mesh>
 	{
 		private:
 
@@ -68,7 +70,7 @@ namespace ion::graphics::scene
 			bool update_bounding_volumes_ = false;
 
 
-			void Created(render::Mesh &mesh);
+			void Created(shapes::Mesh &mesh);
 
 		public:
 
@@ -153,40 +155,83 @@ namespace ion::graphics::scene
 			*/
 
 			//Create a mesh with the given vertices and visibility
-			NonOwningPtr<render::Mesh> CreateMesh(const render::mesh::Vertices &vertices, bool visible = true);
+			NonOwningPtr<shapes::Mesh> CreateMesh(const shapes::mesh::Vertices &vertices, bool visible = true);
 
 			//Create a mesh with the given vertices, material, tex coord mode and visibility
-			NonOwningPtr<render::Mesh> CreateMesh(const render::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
-				render::mesh::MeshTexCoordMode tex_coord_mode = render::mesh::MeshTexCoordMode::Auto, bool visible = true);
+			NonOwningPtr<shapes::Mesh> CreateMesh(const shapes::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
+				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 			//Create a mesh with the given draw mode, vertices and visibility
-			NonOwningPtr<render::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const render::mesh::Vertices &vertices, bool visible = true);
+			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices, bool visible = true);
 
 			//Create a mesh with the given draw mode, vertices, material, tex coord mode and visibility
-			NonOwningPtr<render::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const render::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
-				render::mesh::MeshTexCoordMode tex_coord_mode = render::mesh::MeshTexCoordMode::Auto, bool visible = true);
+			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
+				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
 			//Create a mesh with the given raw vertex data and visibility
-			NonOwningPtr<render::Mesh> CreateMesh(render::mesh::VertexContainer vertex_data, bool visible = true);
+			NonOwningPtr<shapes::Mesh> CreateMesh(shapes::mesh::VertexContainer vertex_data, bool visible = true);
 
 			//Create a mesh with the given raw vertex data, material, tex coord mode and visibility
-			NonOwningPtr<render::Mesh> CreateMesh(render::mesh::VertexContainer vertex_data, NonOwningPtr<materials::Material>material,
-				render::mesh::MeshTexCoordMode tex_coord_mode = render::mesh::MeshTexCoordMode::Auto, bool visible = true);
+			NonOwningPtr<shapes::Mesh> CreateMesh(shapes::mesh::VertexContainer vertex_data, NonOwningPtr<materials::Material>material,
+				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 			//Create a mesh with the given draw mode, raw vertex data and visibility
-			NonOwningPtr<render::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::mesh::VertexContainer vertex_data, bool visible = true);
+			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, shapes::mesh::VertexContainer vertex_data, bool visible = true);
 
 			//Create a mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
-			NonOwningPtr<render::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::mesh::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
-				render::mesh::MeshTexCoordMode tex_coord_mode = render::mesh::MeshTexCoordMode::Auto, bool visible = true);
+			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, shapes::mesh::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
+				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
 			//Create a mesh as a copy of the given mesh
-			NonOwningPtr<render::Mesh> CreateMesh(const render::Mesh &mesh);
+			NonOwningPtr<shapes::Mesh> CreateMesh(const shapes::Mesh &mesh);
 
 			//Create a mesh by moving the given mesh
-			NonOwningPtr<render::Mesh> CreateMesh(render::Mesh &&mesh);
+			NonOwningPtr<shapes::Mesh> CreateMesh(shapes::Mesh &&mesh);
+
+
+			/*
+				Meshes (derived)
+				Creating
+			*/
+
+			//Create a mesh of type T with the given arguments
+			template <typename T, typename... Args,
+				typename = std::enable_if_t<std::is_base_of_v<shapes::Shape, T>>>
+			auto CreateMesh(Args &&...args)
+			{
+				static_assert(std::is_base_of_v<shapes::Mesh, T>);
+
+				auto ptr = Create<T>(std::forward<Args>(args)...);
+				Created(*ptr);
+				return static_pointer_cast<T>(ptr);
+			}
+
+
+			//Create a mesh of type T as a copy of the given mesh
+			template <typename T,
+				typename = std::enable_if_t<std::is_base_of_v<shapes::Shape, T>>>
+			auto CreateMesh(const T &mesh_t)
+			{
+				static_assert(std::is_base_of_v<shapes::Mesh, T>);
+
+				auto ptr = Create(mesh_t);
+				Created(*ptr);
+				return static_pointer_cast<T>(ptr);
+			}
+
+			//Create a mesh of type T by moving the given mesh
+			template <typename T,
+				typename = std::enable_if_t<std::is_base_of_v<shapes::Shape, T>>>
+			auto CreateMesh(T &&mesh_t)
+			{
+				static_assert(std::is_base_of_v<shapes::Mesh, T>);
+
+				auto ptr = Create(std::move(mesh_t));
+				Created(*ptr);
+				return static_pointer_cast<T>(ptr);
+			}
 
 
 			/*
@@ -198,7 +243,7 @@ namespace ion::graphics::scene
 			void ClearMeshes() noexcept;
 
 			//Remove a mesh from this model
-			bool RemoveMesh(render::Mesh &mesh) noexcept;
+			bool RemoveMesh(shapes::Mesh &mesh) noexcept;
 	};
 } //ion::graphics::scene
 

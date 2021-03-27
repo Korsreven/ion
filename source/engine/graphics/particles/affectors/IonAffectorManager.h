@@ -80,7 +80,7 @@ namespace ion::graphics::particles::affectors
 			{
 				static_assert(std::is_base_of_v<Affector, T>);
 
-				auto ptr = Create(std::move(name), std::forward<Args>(args)...);
+				auto ptr = Create<T>(std::move(name), std::forward<Args>(args)...);
 				return static_pointer_cast<T>(ptr);
 			}
 

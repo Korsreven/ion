@@ -28,7 +28,7 @@ namespace model::detail
 
 //Private
 
-void Model::Created(render::Mesh &mesh)
+void Model::Created(shapes::Mesh &mesh)
 {
 	reload_vertex_buffer_ |= mesh.VertexCount() > 0;
 	update_bounding_volumes_ |= reload_vertex_buffer_;
@@ -130,30 +130,30 @@ void Model::Elapse(duration time) noexcept
 	Creating
 */
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(const render::mesh::Vertices &vertices, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(const shapes::mesh::Vertices &vertices, bool visible)
 {
 	auto ptr = Create(vertices, visible);
 	Created(*ptr);
 	return ptr;
 }
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(const render::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
-	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(const shapes::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
+	shapes::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
 	auto ptr = Create(vertices, material, tex_coord_mode, visible);
 	Created(*ptr);
 	return ptr;
 }
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const render::mesh::Vertices &vertices, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices, bool visible)
 {
 	auto ptr = Create(draw_mode, vertices, visible);
 	Created(*ptr);
 	return ptr;
 }
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const render::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
-	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
+	shapes::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
 	auto ptr = Create(draw_mode, vertices, material, tex_coord_mode, visible);
 	Created(*ptr);
@@ -161,30 +161,30 @@ NonOwningPtr<render::Mesh> Model::CreateMesh(render::vertex::vertex_batch::Verte
 }
 
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::VertexContainer vertex_data, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(shapes::mesh::VertexContainer vertex_data, bool visible)
 {
 	auto ptr = Create(std::move(vertex_data), visible);
 	Created(*ptr);
 	return ptr;
 }
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(render::mesh::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
-	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(shapes::mesh::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
+	shapes::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
 	auto ptr = Create(std::move(vertex_data), material, tex_coord_mode, visible);
 	Created(*ptr);
 	return ptr;
 }
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::mesh::VertexContainer vertex_data, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, shapes::mesh::VertexContainer vertex_data, bool visible)
 {
 	auto ptr = Create(draw_mode, std::move(vertex_data), visible);
 	Created(*ptr);
 	return ptr;
 }
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::mesh::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
-	render::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, shapes::mesh::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
+	shapes::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
 	auto ptr = Create(draw_mode, std::move(vertex_data), material, tex_coord_mode, visible);
 	Created(*ptr);
@@ -192,14 +192,14 @@ NonOwningPtr<render::Mesh> Model::CreateMesh(render::vertex::vertex_batch::Verte
 }
 
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(const render::Mesh &mesh)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(const shapes::Mesh &mesh)
 {
 	auto ptr = Create(mesh);
 	Created(*ptr);
 	return ptr;
 }
 
-NonOwningPtr<render::Mesh> Model::CreateMesh(render::Mesh &&mesh)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(shapes::Mesh &&mesh)
 {
 	auto ptr = Create(std::move(mesh));
 	Created(*ptr);
@@ -218,7 +218,7 @@ void Model::ClearMeshes() noexcept
 	Clear();
 }
 
-bool Model::RemoveMesh(render::Mesh &mesh) noexcept
+bool Model::RemoveMesh(shapes::Mesh &mesh) noexcept
 {
 	auto removed = Remove(mesh);
 	update_bounding_volumes_ |= removed;

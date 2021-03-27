@@ -191,7 +191,6 @@
     <ClCompile Include="..\source\engine\graphics\particles\IonParticleSystem.cpp" />
     <ClCompile Include="..\source\engine\graphics\particles\IonParticleSystemManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonFrustum.cpp" />
-    <ClCompile Include="..\source\engine\graphics\render\IonMesh.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonRenderTarget.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonRenderWindow.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonViewport.cpp" />
@@ -206,6 +205,9 @@
     <ClCompile Include="..\source\engine\graphics\scene\IonMovableParticleSystem.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonMovableText.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonSceneManager.cpp" />
+    <ClCompile Include="..\source\engine\graphics\scene\shapes\IonMesh.cpp" />
+    <ClCompile Include="..\source\engine\graphics\scene\shapes\IonRectangle.cpp" />
+    <ClCompile Include="..\source\engine\graphics\scene\shapes\IonShape.cpp" />
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderLayout.cpp" />
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\shaders\IonShaderProgram.cpp" />
@@ -311,7 +313,6 @@
     <ClInclude Include="..\source\engine\graphics\particles\IonParticleSystem.h" />
     <ClInclude Include="..\source\engine\graphics\particles\IonParticleSystemManager.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonFrustum.h" />
-    <ClInclude Include="..\source\engine\graphics\render\IonMesh.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonRenderTarget.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonRenderWindow.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonViewport.h" />
@@ -328,6 +329,9 @@
     <ClInclude Include="..\source\engine\graphics\scene\IonMovableParticleSystem.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonMovableText.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonSceneManager.h" />
+    <ClInclude Include="..\source\engine\graphics\scene\shapes\IonMesh.h" />
+    <ClInclude Include="..\source\engine\graphics\scene\shapes\IonRectangle.h" />
+    <ClInclude Include="..\source\engine\graphics\scene\shapes\IonShape.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\IonShader.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\IonShaderLayout.h" />
     <ClInclude Include="..\source\engine\graphics\shaders\IonShaderManager.h" />

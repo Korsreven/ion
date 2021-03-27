@@ -206,25 +206,28 @@ namespace ion::managed
 			*/
 
 			//Create an object with the given arguments
-			template <typename... Args>
+			template <typename T = ObjectT, typename... Args,
+				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(Args &&...args)
 			{
-				return Emplace<ObjectT>(std::forward<Args>(args)...);
+				return Emplace<std::remove_cvref_t<T>>(std::forward<Args>(args)...);
 			}
 
 			//Create an object with the given name and arguments
-			template <typename... Args>
+			template <typename T = ObjectT, typename... Args,
+				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(std::string name, Args &&...args)
 			{
 				//Check if an object with that name already exists
 				if (auto ptr = object_manager::detail::get_object_by_name(name, objects_); ptr)
 					return ptr;
 				else
-					return Emplace<ObjectT>(std::move(name), std::forward<Args>(args)...);
+					return Emplace<std::remove_cvref_t<T>>(std::move(name), std::forward<Args>(args)...);
 			}
 
 			//Create an object by copying/moving the given object
-			template <typename T, typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
+			template <typename T,
+				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(T &&object)
 			{
 				//Object has name
