@@ -50,8 +50,7 @@ Rectangle::Rectangle(const Vector3 &position, const Vector2 &size, const Color &
 	Shape{detail::rectangle_to_vertices(position, size, color), visible},
 
 	position_{position},
-	size_{size},
-	color_{color}
+	size_{size}
 {
 	//Empty
 }

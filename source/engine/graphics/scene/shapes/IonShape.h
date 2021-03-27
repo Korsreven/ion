@@ -15,6 +15,7 @@ File:	IonShape.h
 
 #include "IonMesh.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
+#include "graphics/utilities/IonColor.h"
 #include "memory/IonNonOwningPtr.h"
 
 namespace ion::graphics
@@ -27,14 +28,20 @@ namespace ion::graphics
 
 namespace ion::graphics::scene::shapes
 {
+	using namespace utilities;
+
 	namespace shape::detail
 	{
+		Color first_vertex_color(const mesh::Vertices &vertices) noexcept;
 	} //shape::detail
 
 
 	class Shape : public Mesh
 	{
 		protected:
+
+			Color color_;
+
 
 			//Construct a new shape with the given visibility
 			//Can only be instantiated by derived
@@ -60,6 +67,16 @@ namespace ion::graphics::scene::shapes
 				Modifiers
 			*/
 
+			//Sets the solid color of this shape to the given color
+			inline void SolidColor(const Color &color) noexcept
+			{
+				if (color_ != color)
+				{
+					color_ = color;
+					Mesh::SurfaceColor(color);
+				}
+			}
+
 			//Sets if this shape should be shown in wireframe or not
 			inline void ShowWireframe(bool show) noexcept
 			{
@@ -76,6 +93,12 @@ namespace ion::graphics::scene::shapes
 			/*
 				Observers
 			*/
+
+			//Returns the solid color of this rectangle
+			[[nodiscard]] inline auto& SolidColor() const noexcept
+			{
+				return color_;
+			}
 
 			//Returns true if this shape is shown in wireframe
 			[[nodiscard]] inline auto ShowWireframe() const noexcept

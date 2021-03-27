@@ -34,7 +34,6 @@ namespace ion::graphics::scene::shapes
 
 			Vector3 position_;
 			Vector2 size_;
-			Color color_;
 
 		public:
 		
@@ -69,16 +68,6 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the solid color of this rectangle to the given color
-			inline void SolidColor(const Color &color) noexcept
-			{
-				if (color_ != color)
-				{
-					color_ = color;
-					Mesh::SurfaceColor(color);
-				}
-			}
-
 
 			/*
 				Observers
@@ -94,12 +83,6 @@ namespace ion::graphics::scene::shapes
 			[[nodiscard]] inline auto& Size() const noexcept
 			{
 				return size_;
-			}
-
-			//Returns the solid color of this rectangle
-			[[nodiscard]] inline auto& SolidColor() const noexcept
-			{
-				return color_;
 			}
 	};
 } //ion::graphics::scene::shapes
