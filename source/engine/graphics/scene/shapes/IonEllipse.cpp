@@ -12,6 +12,9 @@ File:	IonEllipse.cpp
 
 #include "IonEllipse.h"
 
+#include <cmath>
+#include "utilities/IonMath.h"
+
 namespace ion::graphics::scene::shapes
 {
 

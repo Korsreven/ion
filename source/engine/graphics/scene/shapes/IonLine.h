@@ -41,10 +41,10 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			//Construct a new line with the given positions a b, color and visibility
+			//Construct a new line with the given points a b, color and visibility
 			Line(const Vector3 &a, const Vector3 &b, const Color &color, bool visible = true);
 
-			//Construct a new line with the given positions a b, color, thickness and visibility
+			//Construct a new line with the given points a b, color, thickness and visibility
 			Line(const Vector3 &a, const Vector3 &b, const Color &color, real thickness, bool visible = true);
 
 
@@ -52,7 +52,7 @@ namespace ion::graphics::scene::shapes
 				Modifiers
 			*/
 
-			//Sets the position a of this line to the given position
+			//Sets the point a of this line to the given point
 			inline void A(const Vector3 &a) noexcept
 			{
 				if (a_ != a)
@@ -62,7 +62,7 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the position b of this line to the given position
+			//Sets the point b of this line to the given point
 			inline void B(const Vector3 &b) noexcept
 			{
 				if (b_ != b)
@@ -72,7 +72,7 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the positions a b of this line to the given positions
+			//Sets the points a b of this line to the given points
 			inline void AB(const Vector3 &a, const Vector3 &b) noexcept
 			{
 				if (a_ != a || b_ != b)
@@ -83,27 +83,39 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
+			//Sets the thickness of this line
+			inline void Thickness(real thickness) noexcept
+			{
+				thickness_ = thickness;
+			}
+
 
 			/*
 				Observers
 			*/
 
-			//Returns the position a of this line
+			//Returns the point a of this line
 			[[nodiscard]] inline auto& A() const noexcept
 			{
 				return a_;
 			}
 
-			//Returns the position b of this line
+			//Returns the point b of this line
 			[[nodiscard]] inline auto& B() const noexcept
 			{
 				return b_;
 			}
 
-			//Returns the positions a b of this line
+			//Returns the points a b of this line
 			[[nodiscard]] inline auto AB() const noexcept
 			{
 				return std::pair{a_, b_};
+			}
+
+			//Returns the thickness of this line
+			[[nodiscard]] inline auto Thickness() const noexcept
+			{
+				return thickness_;
 			}
 
 

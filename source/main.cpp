@@ -86,6 +86,7 @@ File:	main.cpp
 #include "graphics/scene/IonMovableParticleSystem.h"
 #include "graphics/scene/IonMovableText.h"
 #include "graphics/scene/IonSceneManager.h"
+#include "graphics/scene/shapes/IonCurve.h"
 #include "graphics/scene/shapes/IonEllipse.h"
 #include "graphics/scene/shapes/IonLine.h"
 #include "graphics/scene/shapes/IonMesh.h"
@@ -421,6 +422,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto pebbles_specular = textures.CreateTexture("pebbles_specular", "pebbles_specular.jpg");
 
 			auto tifa_diffuse = textures.CreateTexture("tifa", "tifa.png");
+			auto cat_first_frame = textures.CreateTexture("cat01", "cat01.png");
+			textures.CreateTexture("cat02", "cat02.png");
+			textures.CreateTexture("cat03", "cat03.png");
+			textures.CreateTexture("cat04", "cat04.png");
+			textures.CreateTexture("cat05", "cat05.png");
+			textures.CreateTexture("cat06", "cat06.png");
+			textures.CreateTexture("cat07", "cat07.png");
+			textures.CreateTexture("cat08", "cat08.png");
 
 			textures.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
@@ -428,14 +437,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Frame sequences
 			ion::graphics::textures::FrameSequenceManager frame_sequences;
-			auto frame_sequence = frame_sequences.CreateFrameSequence(
-				"misc", brick_wall_diffuse, pebbles_diffuse, pebbles_diffuse, brick_wall_diffuse);
+			auto cat_sequence = frame_sequences.CreateFrameSequence("cat_sequence", cat_first_frame, 8);
 
 			//Animation
 			ion::graphics::textures::AnimationManager animations;
-			auto animation = animations.CreateAnimation(ion::graphics::textures::Animation::Looping(
-				"alternate", frame_sequence, 6.0_sec, ion::graphics::textures::animation::PlaybackDirection::Alternate));
-			[[maybe_unused]] auto frame = animation->FrameAt(10.01_sec);
+			auto cat_running = animations.CreateAnimation(
+				ion::graphics::textures::Animation::Looping("cat_running", cat_sequence, 0.8_sec));
 
 			//Shaders
 			ion::graphics::shaders::ShaderManager shaders;
@@ -614,6 +621,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{0.6_r, 0.6_r, 0.6_r},
 					{0.0_r, 0.0_r, 0.0_r},
 					32.0_r, tifa_diffuse, nullptr, nullptr);
+
+			auto cat =
+				materials.CreateMaterial("cat",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{0.6_r, 0.6_r, 0.6_r},
+					{0.0_r, 0.0_r, 0.0_r},
+					32.0_r, cat_running, nullptr, nullptr);
 
 			using namespace ion::graphics::utilities;
 
@@ -859,11 +874,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{1.0_r, 0.0_r, -1.3_r}, {0.5_r, 0.4_r}, color::Crimson});
 			auto line = model->CreateMesh(ion::graphics::scene::shapes::Line{
 				{0.5_r, -0.4_r, -1.3_r}, {1.5_r, -0.4_r, -1.3_r}, color::Goldenrod, 2.0_r});
+			auto curve = model->CreateMesh(ion::graphics::scene::shapes::Curve{
+				{{0.5_r, 0.4_r, -1.3_r}, {1.0_r, 0.8_r, -1.3_r}, {1.5_r, 0.4_r, -1.3_r}}, color::Indigo, 2.0_r});
 
 			auto sprite = model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{1.0_r, 0.1_r, -1.3_r}, {0.3886_r, 1.0_r}, tifa});
 			sprite->Crop(Aabb{{0.0251_r, 0.3359_r}, {0.6884_r, 1.0_r}});
 			sprite->FlipHorizontal();
+
+			model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{1.0_r, -0.7_r, -1.3_r}, {1.0_r, 0.5_r}, cat});
 
 			//Particle systems
 			//auto asteroids = engine.Scene().CreateParticleSystem(particle_system);

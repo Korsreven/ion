@@ -13,14 +13,11 @@ File:	IonEllipse.h
 #ifndef ION_ELLIPSE_H
 #define ION_ELLIPSE_H
 
-#include <cmath>
-
 #include "IonShape.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 #include "types/IonTypes.h"
-#include "utilities/IonMath.h"
 
 namespace ion::graphics::scene::shapes
 {
@@ -118,6 +115,12 @@ namespace ion::graphics::scene::shapes
 			[[nodiscard]] inline auto& Size() const noexcept
 			{
 				return size_;
+			}
+
+			//Returns the number of sides used to render this ellipse
+			[[nodiscard]] inline auto Sides() const noexcept
+			{
+				return sides_;
 			}
 	};
 } //ion::graphics::scene::shapes
