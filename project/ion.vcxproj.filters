@@ -468,6 +468,9 @@
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonTriangle.cpp">
       <Filter>Source Files\graphics\scene\shapes</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\shapes\IonSprite.cpp">
+      <Filter>Source Files\graphics\scene\shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -927,6 +930,9 @@
       <Filter>Header Files\graphics\scene\shapes</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonTriangle.h">
+      <Filter>Header Files\graphics\scene\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\shapes\IonSprite.h">
       <Filter>Header Files\graphics\scene\shapes</Filter>
     </ClInclude>
   </ItemGroup>

@@ -17,6 +17,7 @@ File:	IonRectangle.h
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
+#include "memory/IonNonOwningPtr.h"
 
 namespace ion::graphics::scene::shapes
 {
@@ -30,10 +31,20 @@ namespace ion::graphics::scene::shapes
 
 	class Rectangle : public Shape
 	{
-		private:
+		protected:
 
 			Vector3 position_;
 			Vector2 size_;
+
+
+			//Construct a new rectangle with the given size, color, material and visibility
+			//Can only be instantiated by derived
+			Rectangle(const Vector2 &size, const Color &color, NonOwningPtr<materials::Material> material, bool visible = true);
+
+			//Construct a new rectangle with the given position, size, color, material and visibility
+			//Can only be instantiated by derived
+			Rectangle(const Vector3 &position, const Vector2 &size, const Color &color,
+				NonOwningPtr<materials::Material> material, bool visible = true);
 
 		public:
 		

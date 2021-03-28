@@ -44,7 +44,7 @@ namespace ion::graphics::scene::shapes
 
 	class Ellipse : public Shape
 	{
-		private:
+		protected:
 
 			Vector3 position_;
 			Vector2 size_;

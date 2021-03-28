@@ -33,7 +33,7 @@ namespace ion::graphics::scene::shapes
 
 	class Triangle : public Shape
 	{
-		private:
+		protected:
 
 			Vector3 a_;
 			Vector3 b_;

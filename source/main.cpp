@@ -91,6 +91,7 @@ File:	main.cpp
 #include "graphics/scene/shapes/IonMesh.h"
 #include "graphics/scene/shapes/IonRectangle.h"
 #include "graphics/scene/shapes/IonShape.h"
+#include "graphics/scene/shapes/IonSprite.h"
 #include "graphics/scene/shapes/IonTriangle.h"
 #include "graphics/shaders/IonShader.h"
 #include "graphics/shaders/IonShaderLayout.h"
@@ -858,6 +859,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{1.0_r, 0.0_r, -1.3_r}, {0.5_r, 0.4_r}, color::Crimson});
 			auto line = model->CreateMesh(ion::graphics::scene::shapes::Line{
 				{0.5_r, -0.4_r, -1.3_r}, {1.5_r, -0.4_r, -1.3_r}, color::Goldenrod, 2.0_r});
+
+			auto sprite = model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{1.0_r, 0.1_r, -1.3_r}, {0.3886_r, 1.0_r}, tifa});
+			sprite->Crop(Aabb{{0.0251_r, 0.3359_r}, {0.6884_r, 1.0_r}});
+			sprite->FlipHorizontal();
 
 			//Particle systems
 			//auto asteroids = engine.Scene().CreateParticleSystem(particle_system);
