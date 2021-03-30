@@ -1,0 +1,201 @@
+/*
+-------------------------------------------
+This source file is part of Ion Engine
+	- A fast and lightweight 2D game engine
+	- Written in C++ using OpenGL
+
+Author:	Jan Ivar Goli
+Area:	graphics/scene
+File:	IonMovableAnimation.cpp
+-------------------------------------------
+*/
+
+#include "IonMovableAnimation.h"
+
+namespace ion::graphics::scene
+{
+
+using namespace movable_animation;
+using namespace utilities;
+
+namespace movable_animation::detail
+{
+
+animation_vertex_stream::animation_vertex_stream() :
+
+	vertex_batch
+	{
+		render::vertex::vertex_batch::VertexDrawMode::Triangles,
+		get_vertex_declaration()
+	}
+{
+	//Empty
+}
+
+vertex_container get_animation_vertex_data(textures::Animation &animation, const Vector3 &position, const Vector2 &size, const Color &color)
+{
+	auto [x, y, z] = position.XYZ();
+	auto [width, height] = size.XY();
+	auto [r, g, b, a] = color.RGBA();
+
+	auto first_frame =
+		animation.UnderlyingFrameSequence()->FirstFrame();
+	auto tex_coords = first_frame ?
+		first_frame->TexCoords().value_or(std::pair{vector2::Zero, vector2::UnitScale}) :
+		std::pair{vector2::Zero, vector2::UnitScale};
+
+	auto [ll_s, ll_t] = tex_coords.first.XY();
+	auto [ur_s, ur_t] = tex_coords.second.XY();
+
+	//Vertex format:
+	//x, y, z
+	//r, g, b, a
+	//s, t
+
+	return
+		{
+			//Vertex #1
+			x, y + height, z,
+			r, g, b, a,
+			ll_s, ur_t,
+
+			//Vertex #2
+			x, y, z,
+			r, g, b, a,
+			ll_s, ll_t,
+
+			//Vertex #3
+			x + width, y, z,
+			r, g, b, a,
+			ur_s, ll_t,
+
+			//Vertex #4
+			x + width, y, z,
+			r, g, b, a,
+			ur_s, ll_t,
+
+			//Vertex #5
+			x + width, y + height, z,
+			r, g, b, a,
+			ur_s, ur_t,
+
+			//Vertex #6
+			x, y + height, z,
+			r, g, b, a,
+			ll_s, ur_t
+		};
+}
+
+} //movable_animation::detail
+
+
+//Private
+
+void MovableAnimation::PrepareVertexStream()
+{
+	if (std::empty(vertex_stream_.vertex_data))
+		reload_vertex_buffer_ = true;
+
+	vertex_stream_.vertex_data = detail::get_animation_vertex_data(*animation_, {0.0_r, 0.0_r, -1.0_r}, size_, color_);
+	vertex_stream_.vertex_batch.VertexData(vertex_stream_.vertex_data);
+}
+
+//Public
+
+MovableAnimation::MovableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible) :
+
+	MovableObject{visible},
+
+	size_{size},
+	color_{color::White},
+
+	animation_{animation ? std::make_optional(*animation) : std::nullopt},
+	initial_animation_{animation},
+
+	reload_vertex_stream_{!!animation}
+{
+	//Empty
+}
+
+MovableAnimation::MovableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
+	
+	MovableObject{visible},
+
+	size_{size},
+	color_{color},
+
+	animation_{animation ? std::make_optional(*animation) : std::nullopt},
+	initial_animation_{animation},
+
+	reload_vertex_stream_{!!animation}
+{
+	//Empty
+}
+
+
+/*
+	Modifiers
+*/
+
+void MovableAnimation::Revert()
+{
+	if (initial_animation_)
+		animation_ = *initial_animation_;
+}
+
+
+/*
+	Preparing / drawing
+*/
+
+void MovableAnimation::Prepare() noexcept
+{
+	if (!animation_)
+		return;
+
+	if (reload_vertex_stream_)
+	{
+		PrepareVertexStream();
+		reload_vertex_stream_ = false;
+	}
+
+	if (reload_vertex_buffer_)
+	{
+		if (!vbo_)
+			vbo_.emplace(render::vertex::vertex_buffer_object::VertexBufferUsage::Static);
+
+		if (vbo_ && *vbo_)
+		{
+			auto size = detail::vertex_components * 6;
+			vbo_->Reserve(size * sizeof(real));
+			vertex_stream_.vertex_batch.VertexBuffer(vbo_);
+		}
+
+		reload_vertex_buffer_ = false;
+	}
+
+	vertex_stream_.vertex_batch.Prepare();
+}
+
+void MovableAnimation::Draw(shaders::ShaderProgram *shader_program) noexcept
+{
+	if (visible_ && animation_)
+		vertex_stream_.vertex_batch.Draw(shader_program);
+}
+
+
+/*
+	Elapse time
+*/
+
+void MovableAnimation::Elapse(duration time) noexcept
+{
+	if (animation_)
+	{
+		animation_->Elapse(time);
+		vertex_stream_.vertex_batch.BatchTexture(animation_->CurrentFrame());
+		vertex_stream_.vertex_batch.Elapse(time);
+	}
+}
+
+} //ion::graphics::scene

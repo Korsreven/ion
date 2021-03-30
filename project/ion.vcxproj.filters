@@ -474,6 +474,9 @@
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonCurve.cpp">
       <Filter>Source Files\graphics\scene\shapes</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\IonMovableAnimation.cpp">
+      <Filter>Source Files\graphics\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -940,6 +943,9 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonCurve.h">
       <Filter>Header Files\graphics\scene\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\IonMovableAnimation.h">
+      <Filter>Header Files\graphics\scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
