@@ -19,6 +19,7 @@ File:	IonSceneManager.h
 #include "IonCamera.h"
 #include "IonLight.h"
 #include "IonModel.h"
+#include "IonMovableAnimation.h"
 #include "IonMovableParticleSystem.h"
 #include "IonMovableText.h"
 #include "events/IonListenable.h"
@@ -47,6 +48,7 @@ namespace ion::graphics::scene
 		public managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>,
 		public managed::ObjectManager<Light, SceneManager>,
 		public managed::ObjectManager<Model, SceneManager>,
+		public managed::ObjectManager<MovableAnimation, SceneManager>,
 		public managed::ObjectManager<MovableParticleSystem, SceneManager>,
 		public managed::ObjectManager<MovableText, SceneManager>
 	{
@@ -55,6 +57,7 @@ namespace ion::graphics::scene
 			using CameraBase = managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>;
 			using LightBase = managed::ObjectManager<Light, SceneManager>;
 			using ModelBase = managed::ObjectManager<Model, SceneManager>;
+			using AnimationBase = managed::ObjectManager<MovableAnimation, SceneManager>;
 			using ParticleSystemBase = managed::ObjectManager<MovableParticleSystem, SceneManager>;
 			using TextBase = managed::ObjectManager<MovableText, SceneManager>;
 
@@ -152,6 +155,21 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto Models() const noexcept
 			{
 				return ModelBase::Objects();
+			}
+
+
+			//Returns a mutable range of all animations in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Animations() noexcept
+			{
+				return AnimationBase::Objects();
+			}
+
+			//Returns an immutable range of all animations in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Animations() const noexcept
+			{
+				return AnimationBase::Objects();
 			}
 
 
@@ -291,6 +309,30 @@ namespace ion::graphics::scene
 
 			//Remove a removable model from this manager
 			bool RemoveModel(Model &model) noexcept;
+
+
+			/*
+				Animations
+				Creating
+			*/
+
+			//Create a movable animation with the given animation, size and visibility
+			NonOwningPtr<MovableAnimation> CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+
+			//Create a movable animation with the given animation, size, color and visibility
+			NonOwningPtr<MovableAnimation> CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+
+
+			/*
+				Animations
+				Removing
+			*/
+
+			//Clear all removable animations from this manager
+			void ClearAnimations() noexcept;
+
+			//Remove a removable animation from this manager
+			bool RemoveAnimation(MovableAnimation &animation) noexcept;
 
 
 			/*

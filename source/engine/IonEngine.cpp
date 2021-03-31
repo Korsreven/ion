@@ -118,6 +118,9 @@ void Draw(graphics::scene::SceneManager &scene_manager, graphics::shaders::Shade
 	for (auto &model : scene_manager.Models())
 		model.Draw(shader_program);
 
+	for (auto &animation : scene_manager.Animations())
+		animation.Draw(shader_program);
+
 	for (auto &particle_system : scene_manager.ParticleSystems())
 		particle_system.Draw(shader_program);
 

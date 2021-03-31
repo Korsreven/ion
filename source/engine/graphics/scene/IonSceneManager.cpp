@@ -132,7 +132,7 @@ NonOwningPtr<Light> SceneManager::CreateLight(Light &&light)
 
 void SceneManager::ClearLights() noexcept
 {
-	return LightBase::Clear();
+	LightBase::Clear();
 }
 
 bool SceneManager::RemoveLight(Light &light) noexcept
@@ -164,12 +164,44 @@ NonOwningPtr<Model> SceneManager::CreateModel(bool visible)
 
 void SceneManager::ClearModels() noexcept
 {
-	return ModelBase::Clear();
+	ModelBase::Clear();
 }
 
 bool SceneManager::RemoveModel(Model &model) noexcept
 {
 	return ModelBase::Remove(model);
+}
+
+
+/*
+	Animations
+	Creating
+*/
+
+NonOwningPtr<MovableAnimation> SceneManager::CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible)
+{
+	return AnimationBase::Create(size, animation, visible);
+}
+
+NonOwningPtr<MovableAnimation> SceneManager::CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
+{
+	return AnimationBase::Create(size, animation, color, visible);
+}
+
+
+/*
+	Animations
+	Removing
+*/
+
+void SceneManager::ClearAnimations() noexcept
+{
+	AnimationBase::Clear();
+}
+
+bool SceneManager::RemoveAnimation(MovableAnimation &animation) noexcept
+{
+	return AnimationBase::Remove(animation);
 }
 
 

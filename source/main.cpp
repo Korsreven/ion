@@ -190,6 +190,7 @@ struct Game :
 	ion::events::listeners::MouseListener
 {
 	std::vector<ion::NonOwningPtr<ion::graphics::scene::Model>> models;
+	std::vector<ion::NonOwningPtr<ion::graphics::scene::MovableAnimation>> animations;
 	std::vector<ion::NonOwningPtr<ion::graphics::scene::MovableParticleSystem>> particle_systems;
 	std::vector<ion::NonOwningPtr<ion::graphics::scene::MovableText>> texts;
 	ion::NonOwningPtr<ion::graphics::render::Viewport> viewport;
@@ -212,6 +213,12 @@ struct Game :
 		{
 			model->Elapse(time);
 			model->Prepare();			
+		}
+
+		for (auto &animation : animations)
+		{
+			animation->Elapse(time);	
+			animation->Prepare();			
 		}
 
 		for (auto &particle_system : particle_systems)
@@ -886,6 +893,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{1.0_r, -0.7_r, -1.3_r}, {1.0_r, 0.5_r}, cat});
 
+			//Animations
+			//auto running = engine.Scene().CreateAnimation({1.0_r, 0.5_r}, cat_running);
+			//running->Get()->Start();
+
 			//Particle systems
 			//auto asteroids = engine.Scene().CreateParticleSystem(particle_system);
 			//asteroids->Get()->StartAll();
@@ -906,7 +917,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Uniforms
 			scene_ambient->Get() = Color{1.0_r, 1.0_r, 1.0_r, 1.0};
 			scene_gamma->Get() = 1.0_r;
-			scene_light_count->Get() = 0;
+			scene_light_count->Get() = 1;
 
 			camera_position->Get() = camera->Position();
 
@@ -936,6 +947,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//game.models.push_back(blue_square);
 			game.models.push_back(model);
 
+			//game.animations.push_back(running);
 			//game.particle_systems.push_back(asteroids);
 			//game.texts.push_back(hello_world);
 

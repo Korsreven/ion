@@ -547,7 +547,7 @@ void MovableText::PrepareVertexStreams()
 	}
 
 
-	detail::get_text_vertex_streams(*text_, {0.0_r, 0.0_r, -1.0_r}, coordinate_scaling, glyph_vertex_streams_, decoration_vertex_stream_);
+	detail::get_text_vertex_streams(*text_, {0.0_r, 0.0_r, -1.3_r}, coordinate_scaling, glyph_vertex_streams_, decoration_vertex_stream_);
 
 
 	if (std::ssize(glyph_vertex_streams_) > glyph_count)

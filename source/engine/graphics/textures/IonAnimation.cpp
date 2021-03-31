@@ -408,7 +408,7 @@ void Animation::Elapse(duration time) noexcept
 	if (HasFrames())
 	{
 		if (IsRunning() &&
-		   (frame_duration_ += time / playback_rate_))
+		   (frame_duration_ += time * playback_rate_))
 			Next();
 	}
 }
@@ -493,7 +493,7 @@ NonOwningPtr<Texture> Animation::CurrentFrame() const noexcept
 NonOwningPtr<Texture> Animation::FrameAt(duration time) const noexcept
 {
 	if (HasFrames())
-		return (*frame_sequence_)[detail::frame_at(time / playback_rate_, CycleDuration(),
+		return (*frame_sequence_)[detail::frame_at(time * playback_rate_, CycleDuration(),
 			repeat_count_ ? repeat_count_->second : std::optional<int>{},
 			direction_, frame_sequence_->FrameCount())];
 	else
@@ -573,7 +573,7 @@ std::optional<duration> Animation::TotalPlaybackDuration() const noexcept
 
 real Animation::PlaybackFrameRate() const noexcept
 {
-	return FrameRate() / playback_rate_;
+	return FrameRate() * playback_rate_;
 }
 
 } //ion::graphics::textures

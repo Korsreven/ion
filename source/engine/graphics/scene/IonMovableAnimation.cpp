@@ -35,7 +35,7 @@ animation_vertex_stream::animation_vertex_stream() :
 vertex_container get_animation_vertex_data(textures::Animation &animation, const Vector3 &position, const Vector2 &size, const Color &color)
 {
 	auto [x, y, z] = position.XYZ();
-	auto [width, height] = size.XY();
+	auto [half_width, half_height] = (size * 0.5_r).XY();
 	auto [r, g, b, a] = color.RGBA();
 
 	auto first_frame =
@@ -55,32 +55,32 @@ vertex_container get_animation_vertex_data(textures::Animation &animation, const
 	return
 		{
 			//Vertex #1
-			x, y + height, z,
+			x - half_width, y + half_height, z,
 			r, g, b, a,
 			ll_s, ur_t,
 
 			//Vertex #2
-			x, y, z,
+			x - half_width, y - half_height, z,
 			r, g, b, a,
 			ll_s, ll_t,
 
 			//Vertex #3
-			x + width, y, z,
+			x + half_width, y - half_height, z,
 			r, g, b, a,
 			ur_s, ll_t,
 
 			//Vertex #4
-			x + width, y, z,
+			x + half_width, y - half_height, z,
 			r, g, b, a,
 			ur_s, ll_t,
 
 			//Vertex #5
-			x + width, y + height, z,
+			x + half_width, y + half_height, z,
 			r, g, b, a,
 			ur_s, ur_t,
 
 			//Vertex #6
-			x, y + height, z,
+			x - half_width, y + half_height, z,
 			r, g, b, a,
 			ll_s, ur_t
 		};
@@ -93,10 +93,10 @@ vertex_container get_animation_vertex_data(textures::Animation &animation, const
 
 void MovableAnimation::PrepareVertexStream()
 {
-	if (std::empty(vertex_stream_.vertex_data))
+	if (!vbo_)
 		reload_vertex_buffer_ = true;
 
-	vertex_stream_.vertex_data = detail::get_animation_vertex_data(*animation_, {0.0_r, 0.0_r, -1.0_r}, size_, color_);
+	vertex_stream_.vertex_data = detail::get_animation_vertex_data(*animation_, {0.0_r, 0.0_r, -1.3_r}, size_, color_);
 	vertex_stream_.vertex_batch.VertexData(vertex_stream_.vertex_data);
 }
 
