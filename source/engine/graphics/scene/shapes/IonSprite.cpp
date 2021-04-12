@@ -24,21 +24,25 @@ using namespace types::type_literals;
 namespace sprite::detail
 {
 
-mesh::Vertices sprite_vertices(const Vector3 &position, const Vector2 &size, const Color &color,
+mesh::Vertices sprite_vertices(const Vector3 &position, real rotation, const Vector2 &size, const Color &color,
 	const Vector2 &lower_left_tex_coord, const Vector2 &upper_right_tex_coord)
 {
-	auto [x, y, z] = position.XYZ();
 	auto [half_width, half_height] = (size * 0.5_r).XY();
+
+	auto v1 = Vector3{-half_width, half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
+	auto v2 = Vector3{-half_width, -half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
+	auto v3 = Vector3{half_width, -half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
+	auto v4 = Vector3{half_width, half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
 
 	auto [ll_s, ll_t] = lower_left_tex_coord.XY();
 	auto [ur_s, ur_t] = upper_right_tex_coord.XY();
 
-	return {{{x - half_width, y + half_height, z}, vector3::UnitZ, {ll_s, ur_t}, color},
-			{{x - half_width, y - half_height, z}, vector3::UnitZ, {ll_s, ll_t}, color},
-			{{x + half_width, y - half_height, z}, vector3::UnitZ, {ur_s, ll_t}, color},
-			{{x + half_width, y - half_height, z}, vector3::UnitZ, {ur_s, ll_t}, color},
-			{{x + half_width, y + half_height, z}, vector3::UnitZ, {ur_s, ur_t}, color},
-			{{x - half_width, y + half_height, z}, vector3::UnitZ, {ll_s, ur_t}, color}};
+	return {{v1, vector3::UnitZ, {ll_s, ur_t}, color},
+			{v2, vector3::UnitZ, {ll_s, ll_t}, color},
+			{v3, vector3::UnitZ, {ur_s, ll_t}, color},
+			{v3, vector3::UnitZ, {ur_s, ll_t}, color},
+			{v4, vector3::UnitZ, {ur_s, ur_t}, color},
+			{v1, vector3::UnitZ, {ll_s, ur_t}, color}};
 }
 
 } //sprite::detail
@@ -51,7 +55,13 @@ Sprite::Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, 
 }
 
 Sprite::Sprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible) :
-	Rectangle{position, size, color::White, material, visible}
+	Sprite{position, 0.0_r, size, material, color::White, visible}
+{
+	//Empty
+}
+
+Sprite::Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible) :
+	Rectangle{position, rotation, size, color::White, material, visible}
 {
 	//Empty
 }
@@ -64,7 +74,13 @@ Sprite::Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, 
 }
 
 Sprite::Sprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
-	Rectangle{position, size, color, material, visible}
+	Sprite{position, 0.0_r, size, material, color, visible}
+{
+	//Empty
+}
+
+Sprite::Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
+	Rectangle{position, rotation, size, color, material, visible}
 {
 	//Empty
 }
@@ -107,8 +123,7 @@ void Sprite::Crop(const std::optional<Aabb> &area) noexcept
 
 	if (need_update)
 	{
-		Mesh::TexCoordMode(mesh::MeshTexCoordMode::Manual);
-		Mesh::VertexData(sprite::detail::sprite_vertices(position_, size_, color_,
+		Mesh::VertexData(sprite::detail::sprite_vertices(position_, rotation_, size_, color_,
 			lower_left_tex_coord_, upper_right_tex_coord_));
 	}
 }
@@ -121,8 +136,7 @@ void Sprite::FlipHorizontal() noexcept
 	lower_left_tex_coord_.X(ur_s);
 	upper_right_tex_coord_.X(ll_s);
 
-	Mesh::TexCoordMode(mesh::MeshTexCoordMode::Manual);
-	Mesh::VertexData(sprite::detail::sprite_vertices(position_, size_, color_,
+	Mesh::VertexData(sprite::detail::sprite_vertices(position_, rotation_, size_, color_,
 		lower_left_tex_coord_, upper_right_tex_coord_));
 }
 
@@ -134,8 +148,7 @@ void Sprite::FlipVertical() noexcept
 	lower_left_tex_coord_.Y(ur_t);
 	upper_right_tex_coord_.Y(ll_t);
 
-	Mesh::TexCoordMode(mesh::MeshTexCoordMode::Manual);
-	Mesh::VertexData(sprite::detail::sprite_vertices(position_, size_, color_,
+	Mesh::VertexData(sprite::detail::sprite_vertices(position_, rotation_, size_, color_,
 		lower_left_tex_coord_, upper_right_tex_coord_));
 }
 

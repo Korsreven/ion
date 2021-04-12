@@ -23,11 +23,10 @@ using namespace ellipse;
 namespace ellipse::detail
 {
 
-mesh::Vertices ellipse_vertices(const Vector3 &position, const Vector2 &size, const Color &color, int sides)
+mesh::Vertices ellipse_vertices(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, int sides)
 {
 	using namespace ion::utilities;
 
-	auto [x, y, z] = position.XYZ();
 	auto [half_width, half_height] = (size * 0.5_r).XY();
 
 	auto angle = 0.0_r;
@@ -37,7 +36,13 @@ mesh::Vertices ellipse_vertices(const Vector3 &position, const Vector2 &size, co
 	vertices.reserve(sides);
 
 	for (auto i = 0; i < sides; ++i, angle += delta_angle)
-		vertices.push_back({{x + half_width * math::Cos(angle), y + half_height * math::Sin(angle), z}, vector3::UnitZ, color});
+	{
+		auto v =
+			Vector3{half_width * math::Cos(angle), half_height * math::Sin(angle), 0.0_r}.
+			RotateCopy(rotation, vector3::Zero) + position;
+
+		vertices.push_back({v, vector3::UnitZ, color});
+	}
 
 	return vertices;
 }
@@ -52,14 +57,22 @@ Ellipse::Ellipse(const Vector2 &size, const Color &color, bool visible) :
 }
 
 Ellipse::Ellipse(const Vector3 &position, const Vector2 &size, const Color &color, bool visible) :
+	Ellipse{position, 0.0_r, size, color, visible}
+{
+	//Empty
+}
 
-	Shape{vertex::vertex_batch::VertexDrawMode::TriangleFan, detail::ellipse_vertices(position, size, color, ellipse::detail::default_ellipse_sides), visible},
+Ellipse::Ellipse(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, bool visible) :
+
+	Shape{vertex::vertex_batch::VertexDrawMode::TriangleFan, detail::ellipse_vertices(position, rotation, size, color, ellipse::detail::default_ellipse_sides), visible},
 
 	position_{position},
+	rotation_{rotation},
 	size_{size}
 {
 	//Empty
 }
+
 
 Ellipse::Ellipse(const Vector2 &size, const Color &color, int sides, bool visible) :
 	Ellipse{vector3::Zero, size, color, sides, visible}
@@ -68,10 +81,17 @@ Ellipse::Ellipse(const Vector2 &size, const Color &color, int sides, bool visibl
 }
 
 Ellipse::Ellipse(const Vector3 &position, const Vector2 &size, const Color &color, int sides, bool visible) :
+	Ellipse{position, 0.0_r, size, color, sides, visible}
+{
+	//Empty
+}
 
-	Shape{vertex::vertex_batch::VertexDrawMode::TriangleFan, detail::ellipse_vertices(position, size, color, detail::ellipse_sides(sides)), visible},
+Ellipse::Ellipse(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, int sides, bool visible) :
+
+	Shape{vertex::vertex_batch::VertexDrawMode::TriangleFan, detail::ellipse_vertices(position, rotation, size, color, detail::ellipse_sides(sides)), visible},
 
 	position_{position},
+	rotation_{rotation},
 	size_{size},
 	sides_{detail::ellipse_sides(sides)}
 {

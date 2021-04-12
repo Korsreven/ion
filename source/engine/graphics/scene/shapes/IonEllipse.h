@@ -35,7 +35,7 @@ namespace ion::graphics::scene::shapes
 			return sides < min_ellipse_sides ? min_ellipse_sides : sides;
 		}
 
-		mesh::Vertices ellipse_vertices(const Vector3 &position, const Vector2 &size, const Color &color, int sides);
+		mesh::Vertices ellipse_vertices(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, int sides);
 	} //ellipse::detail
 
 
@@ -44,6 +44,7 @@ namespace ion::graphics::scene::shapes
 		protected:
 
 			Vector3 position_;
+			real rotation_ = 0.0_r;
 			Vector2 size_;
 			int sides_ = ellipse::detail::default_ellipse_sides;
 
@@ -55,12 +56,18 @@ namespace ion::graphics::scene::shapes
 			//Construct a new ellipse with the given position, size, color and visibility
 			Ellipse(const Vector3 &position, const Vector2 &size, const Color &color, bool visible = true);
 
+			//Construct a new ellipse with the given position, rotation, size, color and visibility
+			Ellipse(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, bool visible = true);
+
 
 			//Construct a new ellipse with the given size, color, sides and visibility
 			Ellipse(const Vector2 &size, const Color &color, int sides, bool visible = true);
 
 			//Construct a new ellipse with the given position, size, color, sides and visibility
 			Ellipse(const Vector3 &position, const Vector2 &size, const Color &color, int sides, bool visible = true);
+
+			//Construct a new ellipse with the given position, rotation, size, color, sides and visibility
+			Ellipse(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, int sides, bool visible = true);
 
 
 			/*
@@ -73,7 +80,17 @@ namespace ion::graphics::scene::shapes
 				if (position_ != position)
 				{
 					position_ = position;
-					Mesh::VertexData(ellipse::detail::ellipse_vertices(position_, size_, color_, sides_));
+					Mesh::VertexData(ellipse::detail::ellipse_vertices(position_, rotation_, size_, color_, sides_));
+				}
+			}
+
+			//Sets the rotation of this ellipse to the given angle (in radians)
+			inline void Rotation(real angle) noexcept
+			{
+				if (rotation_ != angle)
+				{
+					rotation_ = angle;
+					Mesh::VertexData(ellipse::detail::ellipse_vertices(position_, rotation_, size_, color_, sides_));
 				}
 			}
 
@@ -83,7 +100,7 @@ namespace ion::graphics::scene::shapes
 				if (size_ != size)
 				{
 					size_ = size;
-					Mesh::VertexData(ellipse::detail::ellipse_vertices(position_, size_, color_, sides_));
+					Mesh::VertexData(ellipse::detail::ellipse_vertices(position_, rotation_, size_, color_, sides_));
 				}
 			}
 
@@ -105,10 +122,16 @@ namespace ion::graphics::scene::shapes
 				Observers
 			*/
 
-			//Returns the size of this ellipse
+			//Returns the position of this ellipse
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
+			}
+
+			//Returns the angle of rotation (in radians) for this ellipse
+			[[nodiscard]] inline auto Rotation() const noexcept
+			{
+				return rotation_;
 			}
 
 			//Returns the size of this ellipse

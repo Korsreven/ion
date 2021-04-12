@@ -22,14 +22,16 @@ File:	IonSprite.h
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 #include "memory/IonNonOwningPtr.h"
+#include "types/IonTypes.h"
 
 namespace ion::graphics::scene::shapes
 {
 	using namespace utilities;
+	using namespace types::type_literals;
 
 	namespace sprite::detail
 	{
-		mesh::Vertices sprite_vertices(const Vector3 &position, const Vector2 &size, const Color &color,
+		mesh::Vertices sprite_vertices(const Vector3 &position, real rotation, const Vector2 &size, const Color &color,
 			const Vector2 &lower_left_tex_coord, const Vector2 &upper_right_tex_coord);
 	} //sprite::detail
 
@@ -49,12 +51,18 @@ namespace ion::graphics::scene::shapes
 			//Construct a new sprite with the given position, size, material and visibility
 			Sprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
+			//Construct a new sprite with the given position, rotation, size, material and visibility
+			Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
+
 
 			//Construct a new sprite with the given size, material, color and visibility
 			Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
 			//Construct a new sprite with the given position, size, material, color and visibility
 			Sprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
+
+			//Construct a new sprite with the given position, rotation, size, material, color and visibility
+			Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
 
 			/*
@@ -69,8 +77,7 @@ namespace ion::graphics::scene::shapes
 					lower_left_tex_coord_ = lower_left;
 					upper_right_tex_coord_ = upper_right;
 
-					Mesh::TexCoordMode(mesh::MeshTexCoordMode::Manual);
-					Mesh::VertexData(sprite::detail::sprite_vertices(position_, size_, color_,
+					Mesh::VertexData(sprite::detail::sprite_vertices(position_, rotation_, size_, color_,
 						lower_left_tex_coord_, upper_right_tex_coord_));
 				}
 			}

@@ -23,17 +23,21 @@ using namespace types::type_literals;
 namespace rectangle::detail
 {
 
-mesh::Vertices rectangle_vertices(const Vector3 &position, const Vector2 &size, const Color &color)
+mesh::Vertices rectangle_vertices(const Vector3 &position, real rotation, const Vector2 &size, const Color &color)
 {
-	auto [x, y, z] = position.XYZ();
 	auto [half_width, half_height] = (size * 0.5_r).XY();
 
-	return {{{x - half_width, y + half_height, z}, vector3::UnitZ, color},
-			{{x - half_width, y - half_height, z}, vector3::UnitZ, color},
-			{{x + half_width, y - half_height, z}, vector3::UnitZ, color},
-			{{x + half_width, y - half_height, z}, vector3::UnitZ, color},
-			{{x + half_width, y + half_height, z}, vector3::UnitZ, color},
-			{{x - half_width, y + half_height, z}, vector3::UnitZ, color}};
+	auto v1 = Vector3{-half_width, half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
+	auto v2 = Vector3{-half_width, -half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
+	auto v3 = Vector3{half_width, -half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
+	auto v4 = Vector3{half_width, half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
+
+	return {{v1, vector3::UnitZ, {0.0_r, 1.0_r}, color},
+			{v2, vector3::UnitZ, {0.0_r, 0.0_r}, color},
+			{v3, vector3::UnitZ, {1.0_r, 0.0_r}, color},
+			{v3, vector3::UnitZ, {1.0_r, 0.0_r}, color},
+			{v4, vector3::UnitZ, {1.0_r, 1.0_r}, color},
+			{v1, vector3::UnitZ, {0.0_r, 1.0_r}, color}};
 }
 
 } //rectangle::detail
@@ -50,13 +54,23 @@ Rectangle::Rectangle(const Vector2 &size, const Color &color, NonOwningPtr<mater
 Rectangle::Rectangle(const Vector3 &position, const Vector2 &size, const Color &color,
 	NonOwningPtr<materials::Material> material, bool visible) :
 
-	Shape{detail::rectangle_vertices(position, size, color), material, visible},
-	
-	position_{position},
-	size_{size}
+	Rectangle{position, 0.0_r, size, color, material, visible}
 {
 	//Empty
 }
+
+Rectangle::Rectangle(const Vector3 &position, real rotation, const Vector2 &size, const Color &color,
+	NonOwningPtr<materials::Material> material, bool visible) :
+
+	Shape{detail::rectangle_vertices(position, rotation, size, color), material, visible},
+	
+	position_{position},
+	rotation_{rotation},
+	size_{size}
+{
+	Mesh::TexCoordMode(mesh::MeshTexCoordMode::Manual);
+}
+
 
 //Public
 
@@ -68,9 +82,17 @@ Rectangle::Rectangle(const Vector2 &size, const Color &color, bool visible) :
 
 Rectangle::Rectangle(const Vector3 &position, const Vector2 &size, const Color &color, bool visible) :
 
-	Shape{detail::rectangle_vertices(position, size, color), visible},
+	Rectangle{position, 0.0_r, size, color, visible}
+{
+	//Empty
+}
+
+Rectangle::Rectangle(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, bool visible) :
+
+	Shape{detail::rectangle_vertices(position, rotation, size, color), visible},
 
 	position_{position},
+	rotation_{rotation},
 	size_{size}
 {
 	//Empty

@@ -18,14 +18,16 @@ File:	IonRectangle.h
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 #include "memory/IonNonOwningPtr.h"
+#include "types/IonTypes.h"
 
 namespace ion::graphics::scene::shapes
 {
 	using namespace utilities;
+	using namespace types::type_literals;
 
 	namespace rectangle::detail
 	{
-		mesh::Vertices rectangle_vertices(const Vector3 &position, const Vector2 &size, const Color &color);
+		mesh::Vertices rectangle_vertices(const Vector3 &position, real rotation, const Vector2 &size, const Color &color);
 	} //rectangle::detail
 
 
@@ -34,6 +36,7 @@ namespace ion::graphics::scene::shapes
 		protected:
 
 			Vector3 position_;
+			real rotation_ = 0.0_r;
 			Vector2 size_;
 
 
@@ -46,6 +49,11 @@ namespace ion::graphics::scene::shapes
 			Rectangle(const Vector3 &position, const Vector2 &size, const Color &color,
 				NonOwningPtr<materials::Material> material, bool visible = true);
 
+			//Construct a new rectangle with the given position, rotation, size, color, material and visibility
+			//Can only be instantiated by derived
+			Rectangle(const Vector3 &position, real rotation, const Vector2 &size, const Color &color,
+				NonOwningPtr<materials::Material> material, bool visible = true);
+
 		public:
 		
 			//Construct a new rectangle with the given size, color and visibility
@@ -53,6 +61,9 @@ namespace ion::graphics::scene::shapes
 
 			//Construct a new rectangle with the given position, size, color and visibility
 			Rectangle(const Vector3 &position, const Vector2 &size, const Color &color, bool visible = true);
+
+			//Construct a new rectangle with the given position, rotation, size, color and visibility
+			Rectangle(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, bool visible = true);
 
 
 			/*
@@ -65,7 +76,17 @@ namespace ion::graphics::scene::shapes
 				if (position_ != position)
 				{
 					position_ = position;
-					Mesh::VertexData(rectangle::detail::rectangle_vertices(position_, size_, color_));
+					Mesh::VertexData(rectangle::detail::rectangle_vertices(position_, rotation_, size_, color_));
+				}
+			}
+
+			//Sets the rotation of this rectangle to the given angle (in radians)
+			inline void Rotation(real angle) noexcept
+			{
+				if (rotation_ != angle)
+				{
+					rotation_ = angle;
+					Mesh::VertexData(rectangle::detail::rectangle_vertices(position_, rotation_, size_, color_));
 				}
 			}
 
@@ -75,7 +96,7 @@ namespace ion::graphics::scene::shapes
 				if (size_ != size)
 				{
 					size_ = size;
-					Mesh::VertexData(rectangle::detail::rectangle_vertices(position_, size_, color_));
+					Mesh::VertexData(rectangle::detail::rectangle_vertices(position_, rotation_, size_, color_));
 				}
 			}
 
@@ -84,10 +105,16 @@ namespace ion::graphics::scene::shapes
 				Observers
 			*/
 
-			//Returns the size of this rectangle
+			//Returns the position of this rectangle
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
+			}
+
+			//Returns the angle of rotation (in radians) for this rectangle
+			[[nodiscard]] inline auto Rotation() const noexcept
+			{
+				return rotation_;
 			}
 
 			//Returns the size of this rectangle
