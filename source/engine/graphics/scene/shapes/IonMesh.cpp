@@ -85,8 +85,12 @@ std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const VertexContainer &v
 	{
 		auto position = Vector2{vertex_data[i], vertex_data[i + 1]};
 
-		min = std::min(min, position);
-		max = std::max(max, position);
+		auto [x, y] = position.XY();
+		auto [min_x, min_y] = min.XY();
+		auto [max_x, max_y] = max.XY();
+
+		min = {std::min(min_x, x), std::min(min_y, y)};
+		max = {std::max(max_x, x), std::max(max_y, y)};
 	}
 
 	Aabb aabb{min, max};
