@@ -52,7 +52,13 @@ namespace ion::graphics::scene::shapes
 
 	namespace mesh
 	{
-		enum class MeshTexCoordMode
+		enum class MeshBoundingVolumeStatus : bool
+		{
+			Unchanged,
+			Changed
+		};
+
+		enum class MeshTexCoordMode : bool
 		{
 			Manual,
 			Auto
@@ -342,7 +348,7 @@ namespace ion::graphics::scene::shapes
 
 			//Prepare this mesh such that it is ready to be drawn
 			//This is called once regardless of passes
-			virtual void Prepare() noexcept;
+			virtual mesh::MeshBoundingVolumeStatus Prepare() noexcept;
 
 			//Draw this mesh with the given shader program (optional)
 			//This can be called multiple times if more than one pass

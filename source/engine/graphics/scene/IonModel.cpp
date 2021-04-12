@@ -77,8 +77,8 @@ void Model::Prepare() noexcept
 
 	//Prepare all meshes
 	for (auto &mesh : Meshes())
-		mesh.Prepare();
-
+		update_bounding_volumes_ |=
+			mesh.Prepare() == shapes::mesh::MeshBoundingVolumeStatus::Changed;
 
 	if (update_bounding_volumes_)
 	{

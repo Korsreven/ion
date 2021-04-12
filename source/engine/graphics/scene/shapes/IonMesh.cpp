@@ -284,12 +284,14 @@ Color Mesh::SurfaceColor() const noexcept
 	Preparing / drawing
 */
 
-void Mesh::Prepare() noexcept
+MeshBoundingVolumeStatus Mesh::Prepare() noexcept
 {
 	//Make sure, if vertex data view has been initialized, that it is viewing the correct vertex data
 	//Could happen if vertex data has been reallocated post init
 	if (vertex_batch_.VertexData() && vertex_batch_.VertexData() != vertex_data_)
 		vertex_batch_.VertexData(vertex_data_);
+
+	auto bounding_volume_status = MeshBoundingVolumeStatus::Unchanged;
 
 	if (vertex_batch_.VertexCount() > 0)
 	{
@@ -301,6 +303,7 @@ void Mesh::Prepare() noexcept
 			sphere_ = sphere;
 
 			update_bounding_volumes_ = false;
+			bounding_volume_status = MeshBoundingVolumeStatus::Changed;
 		}
 
 		if (update_tex_coords_)
@@ -318,6 +321,7 @@ void Mesh::Prepare() noexcept
 	}
 
 	vertex_batch_.Prepare();
+	return bounding_volume_status;
 }
 
 void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
