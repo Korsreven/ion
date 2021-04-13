@@ -55,13 +55,13 @@ Sprite::Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, 
 }
 
 Sprite::Sprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible) :
-	Sprite{position, 0.0_r, size, material, color::White, visible}
+	Sprite{position, 0.0_r, size, material, visible}
 {
 	//Empty
 }
 
 Sprite::Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible) :
-	Rectangle{position, rotation, size, color::White, material, visible}
+	Sprite{position, rotation, size, material, color::White, visible}
 {
 	//Empty
 }

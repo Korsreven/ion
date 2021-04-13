@@ -183,9 +183,30 @@ NonOwningPtr<MovableAnimation> SceneManager::CreateAnimation(const Vector2 &size
 	return AnimationBase::Create(size, animation, visible);
 }
 
+NonOwningPtr<MovableAnimation> SceneManager::CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible)
+{
+	return AnimationBase::Create(position, size, animation, visible);
+}
+
+NonOwningPtr<MovableAnimation> SceneManager::CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible)
+{
+	return AnimationBase::Create(position, rotation, size, animation, visible);
+}
+
+
 NonOwningPtr<MovableAnimation> SceneManager::CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
 {
 	return AnimationBase::Create(size, animation, color, visible);
+}
+
+NonOwningPtr<MovableAnimation> SceneManager::CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
+{
+	return AnimationBase::Create(position, size, animation, color, visible);
+}
+
+NonOwningPtr<MovableAnimation> SceneManager::CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
+{
+	return AnimationBase::Create(position, rotation, size, animation, color, visible);
 }
 
 

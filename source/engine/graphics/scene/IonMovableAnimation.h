@@ -44,6 +44,7 @@ namespace ion::graphics
 
 namespace ion::graphics::scene
 {
+	using namespace types::type_literals;
 	using utilities::Color;
 	using utilities::Vector2;
 	using utilities::Vector3;
@@ -96,7 +97,7 @@ namespace ion::graphics::scene
 		}
 
 		vertex_container get_animation_vertex_data(textures::Animation &animation,
-			const Vector3 &position, const Vector2 &size, const Color &color);
+			const Vector3 &position, real rotation, const Vector2 &size, const Color &color);
 	} //movable_animation::detail
 
 
@@ -104,7 +105,9 @@ namespace ion::graphics::scene
 	class MovableAnimation final : public MovableObject
 	{
 		private:
-
+		
+			Vector3 position_;
+			real rotation_ = 0.0_r;
 			Vector2 size_;
 			Color color_;
 
@@ -125,13 +128,46 @@ namespace ion::graphics::scene
 			//Construct a new movable animation with the given size, animation and visibility
 			MovableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
 
+			//Construct a new movable animation with the given position, size, animation and visibility
+			MovableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+
+			//Construct a new movable animation with the given position, rotation, size, animation and visibility
+			MovableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+
+
 			//Construct a new movable animation with the given size, animation, color and visibility
 			MovableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+
+			//Construct a new movable animation with the given position, size, animation, color and visibility
+			MovableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+
+			//Construct a new movable animation with the given position, rotation, size, animation, color and visibility
+			MovableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
 
 
 			/*
 				Modifiers
 			*/
+
+			//Sets the position of this animation to the given position
+			inline void Position(const Vector3 &position) noexcept
+			{
+				if (position_ != position)
+				{
+					position_ = position;
+					reload_vertex_stream_ = true;
+				}
+			}
+
+			//Sets the rotation of this animation to the given angle (in radians)
+			inline void Rotation(real angle) noexcept
+			{
+				if (rotation_ != angle)
+				{
+					rotation_ = angle;
+					reload_vertex_stream_ = true;
+				}
+			}
 
 			//Sets the size of this animation to the given size
 			inline void Size(const Vector2 &size) noexcept
@@ -161,6 +197,18 @@ namespace ion::graphics::scene
 			/*
 				Observers
 			*/
+
+			//Returns the position of this animation
+			[[nodiscard]] inline auto& Position() const noexcept
+			{
+				return position_;
+			}
+
+			//Returns the angle of rotation (in radians) for this animation
+			[[nodiscard]] inline auto Rotation() const noexcept
+			{
+				return rotation_;
+			}
 
 			//Returns the size of this animation
 			[[nodiscard]] inline auto& Size() const noexcept

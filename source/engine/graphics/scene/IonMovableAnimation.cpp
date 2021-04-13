@@ -32,11 +32,16 @@ animation_vertex_stream::animation_vertex_stream() :
 	//Empty
 }
 
-vertex_container get_animation_vertex_data(textures::Animation &animation, const Vector3 &position, const Vector2 &size, const Color &color)
+vertex_container get_animation_vertex_data(textures::Animation &animation,
+	const Vector3 &position, real rotation, const Vector2 &size, const Color &color)
 {
-	auto [x, y, z] = position.XYZ();
 	auto [half_width, half_height] = (size * 0.5_r).XY();
 	auto [r, g, b, a] = color.RGBA();
+
+	auto v1 = Vector3{-half_width, half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
+	auto v2 = Vector3{-half_width, -half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
+	auto v3 = Vector3{half_width, -half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
+	auto v4 = Vector3{half_width, half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
 
 	auto first_frame =
 		animation.UnderlyingFrameSequence()->FirstFrame();
@@ -55,32 +60,32 @@ vertex_container get_animation_vertex_data(textures::Animation &animation, const
 	return
 		{
 			//Vertex #1
-			x - half_width, y + half_height, z,
+			v1.X(), v1.Y(), v1.Z(),
 			r, g, b, a,
 			ll_s, ur_t,
 
 			//Vertex #2
-			x - half_width, y - half_height, z,
+			v2.X(), v2.Y(), v2.Z(),
 			r, g, b, a,
 			ll_s, ll_t,
 
 			//Vertex #3
-			x + half_width, y - half_height, z,
+			v3.X(), v3.Y(), v3.Z(),
 			r, g, b, a,
 			ur_s, ll_t,
 
 			//Vertex #4
-			x + half_width, y - half_height, z,
+			v3.X(), v3.Y(), v3.Z(),
 			r, g, b, a,
 			ur_s, ll_t,
 
 			//Vertex #5
-			x + half_width, y + half_height, z,
+			v4.X(), v4.Y(), v4.Z(),
 			r, g, b, a,
 			ur_s, ur_t,
 
 			//Vertex #6
-			x - half_width, y + half_height, z,
+			v1.X(), v1.Y(), v1.Z(),
 			r, g, b, a,
 			ll_s, ur_t
 		};
@@ -96,31 +101,49 @@ void MovableAnimation::PrepareVertexStream()
 	if (!vbo_)
 		reload_vertex_buffer_ = true;
 
-	vertex_stream_.vertex_data = detail::get_animation_vertex_data(*animation_, {0.0_r, 0.0_r, -1.3_r}, size_, color_);
+	vertex_stream_.vertex_data = detail::get_animation_vertex_data(*animation_, position_, rotation_, size_, color_);
 	vertex_stream_.vertex_batch.VertexData(vertex_stream_.vertex_data);
 }
 
 //Public
 
 MovableAnimation::MovableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible) :
-
-	MovableObject{visible},
-
-	size_{size},
-	color_{color::White},
-
-	animation_{animation ? std::make_optional(*animation) : std::nullopt},
-	initial_animation_{animation},
-
-	reload_vertex_stream_{!!animation}
+	MovableAnimation{vector3::Zero, size, animation, visible}
 {
 	//Empty
 }
 
+MovableAnimation::MovableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible) :
+	MovableAnimation{position, 0.0_r, size, animation, visible}
+{
+	//Empty
+}
+
+MovableAnimation::MovableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible) :
+	MovableAnimation{position, rotation, size, animation, color::White, visible}
+{
+	//Empty
+}
+
+
 MovableAnimation::MovableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
+	MovableAnimation{vector3::Zero, size, animation, color, visible}
+{
+	//Empty
+}
+
+MovableAnimation::MovableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
+	MovableAnimation{position, 0.0_r, size, animation, color, visible}
+{
+	//Empty
+}
+
+MovableAnimation::MovableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
 	
 	MovableObject{visible},
 
+	position_{position},
+	rotation_{rotation},
 	size_{size},
 	color_{color},
 

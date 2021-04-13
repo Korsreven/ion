@@ -26,6 +26,7 @@ File:	IonSceneManager.h
 #include "events/listeners/IonCameraListener.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
+#include "types/IonTypes.h"
 
 namespace ion::graphics::particles
 {
@@ -316,11 +317,24 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a movable animation with the given animation, size and visibility
+			//Create a movable animation with the given size, animation and visibility
 			NonOwningPtr<MovableAnimation> CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
 
-			//Create a movable animation with the given animation, size, color and visibility
+			//Create a movable animation with the given position, size, animation and visibility
+			NonOwningPtr<MovableAnimation> CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+
+			//Create a movable animation with the given position, rotation, size, animation and visibility
+			NonOwningPtr<MovableAnimation> CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+
+
+			//Create a movable animation with the given size, animation, color and visibility
 			NonOwningPtr<MovableAnimation> CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+
+			//Create a movable animation with the given position, size, animation, color and visibility
+			NonOwningPtr<MovableAnimation> CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+
+			//Create a movable animation with the given position, rotation, size, animation, color and visibility
+			NonOwningPtr<MovableAnimation> CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
 
 
 			/*
