@@ -263,6 +263,16 @@ NonOwningPtr<MovableText> SceneManager::CreateText(NonOwningPtr<fonts::Text> tex
 	return TextBase::Create(text, visible);
 }
 
+NonOwningPtr<MovableText> SceneManager::CreateText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible)
+{
+	return TextBase::Create(position, text, visible);
+}
+
+NonOwningPtr<MovableText> SceneManager::CreateText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible)
+{
+	return TextBase::Create(position, rotation, text, visible);
+}
+
 
 /*
 	Text

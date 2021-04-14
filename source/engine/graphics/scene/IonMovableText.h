@@ -45,6 +45,7 @@ namespace ion::graphics
 
 namespace ion::graphics::scene
 {
+	using namespace types::type_literals;
 	using utilities::Color;
 	using utilities::Vector2;
 	using utilities::Vector3;
@@ -128,13 +129,16 @@ namespace ion::graphics::scene
 			fonts::text::TextVerticalAlignment vertical_alignment, int font_size, real line_height, int total_lines, const Vector3 &position) noexcept;
 
 		vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
-			const Vector3 &position, const Vector2 &scaling, const Color &color, const Vector2 &coordinate_scaling);
-		decoration_vertex_container get_decoration_vertex_data(const Vector3 &position, const Vector2 &size, const Color &color, const Vector2 &coordinate_scaling);
+			const Vector3 &position, real rotation, const Vector2 &scaling, const Color &color,
+			const Vector3 &origin, const Vector2 &coordinate_scaling);
+		decoration_vertex_container get_decoration_vertex_data(const Vector3 &position, real rotation, const Vector2 &size, const Color &color,
+			const Vector3 &origin, const Vector2 &coordinate_scaling);
 
 		void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text,
-			int font_size, int &glyph_count, Vector3 &position, const Vector2 &coordinate_scaling,
+			int font_size, int &glyph_count, Vector3 &position, real rotation,
+			const Vector3 &origin, const Vector2 &coordinate_scaling,
 			glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream);
-		void get_text_vertex_streams(const fonts::Text &text, const Vector3 &position, const Vector2 &coordinate_scaling,
+		void get_text_vertex_streams(const fonts::Text &text, Vector3 position, real rotation, const Vector2 &coordinate_scaling,
 			glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream);
 	} //movable_text::detail
 
@@ -143,6 +147,9 @@ namespace ion::graphics::scene
 	class MovableText final : public MovableObject
 	{
 		private:
+
+			Vector3 position_;
+			real rotation_ = 0.0_r;
 
 			std::optional<fonts::Text> text_;
 			NonOwningPtr<fonts::Text> initial_text_;
@@ -162,10 +169,37 @@ namespace ion::graphics::scene
 			//Construct a new movable text with the given text and visibility
 			explicit MovableText(NonOwningPtr<fonts::Text> text, bool visible = true);
 
+			//Construct a new movable text with the given position, text and visibility
+			MovableText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible = true);
+
+			//Construct a new movable text with the given position, rotation, text and visibility
+			MovableText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible = true);
+
 
 			/*
 				Modifiers
 			*/
+
+			//Sets the position of this text to the given position
+			inline void Position(const Vector3 &position) noexcept
+			{
+				if (position_ != position)
+				{
+					position_ = position;
+					reload_vertex_streams_ = true;
+				}
+			}
+
+			//Sets the rotation of this text to the given angle (in radians)
+			inline void Rotation(real angle) noexcept
+			{
+				if (rotation_ != angle)
+				{
+					rotation_ = angle;
+					reload_vertex_streams_ = true;
+				}
+			}
+
 
 			//Revert to the initial text
 			void Revert();
@@ -174,6 +208,19 @@ namespace ion::graphics::scene
 			/*
 				Observers
 			*/
+
+			//Returns the position of this text
+			[[nodiscard]] inline auto& Position() const noexcept
+			{
+				return position_;
+			}
+
+			//Returns the angle of rotation (in radians) for this text
+			[[nodiscard]] inline auto Rotation() const noexcept
+			{
+				return rotation_;
+			}
+
 
 			//Returns a mutable reference to the text
 			[[nodiscard]] auto& Get() noexcept

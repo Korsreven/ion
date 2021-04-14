@@ -378,6 +378,12 @@ namespace ion::graphics::scene
 			//Create a movable text with the given text and visibility
 			NonOwningPtr<MovableText> CreateText(NonOwningPtr<fonts::Text> text, bool visible = true);
 
+			//Create a movable text with the given position, text and visibility
+			NonOwningPtr<MovableText> CreateText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible = true);
+
+			//Create a movable text with the given position, rotation, text and visibility
+			NonOwningPtr<MovableText> CreateText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible = true);
+
 
 			/*
 				Text
