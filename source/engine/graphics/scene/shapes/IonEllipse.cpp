@@ -38,8 +38,8 @@ mesh::Vertices ellipse_vertices(const Vector3 &position, real rotation, const Ve
 	for (auto i = 0; i < sides; ++i, angle += delta_angle)
 	{
 		auto v =
-			Vector3{half_width * math::Cos(angle), half_height * math::Sin(angle), 0.0_r}.
-			RotateCopy(rotation, vector3::Zero) + position;
+			(position + Vector2{half_width * math::Cos(angle), half_height * math::Sin(angle)}).
+			RotateCopy(rotation, position);
 
 		vertices.push_back({v, vector3::UnitZ, color});
 	}

@@ -38,10 +38,10 @@ vertex_container get_animation_vertex_data(textures::Animation &animation,
 	auto [half_width, half_height] = (size * 0.5_r).XY();
 	auto [r, g, b, a] = color.RGBA();
 
-	auto v1 = Vector3{-half_width, half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
-	auto v2 = Vector3{-half_width, -half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
-	auto v3 = Vector3{half_width, -half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
-	auto v4 = Vector3{half_width, half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
+	auto v1 = (position + Vector2{-half_width, half_height}).RotateCopy(rotation, position);
+	auto v2 = (position + Vector2{-half_width, -half_height}).RotateCopy(rotation, position);
+	auto v3 = (position + Vector2{half_width, -half_height}).RotateCopy(rotation, position);
+	auto v4 = (position + Vector2{half_width, half_height}).RotateCopy(rotation, position);
 
 	auto first_frame =
 		animation.UnderlyingFrameSequence()->FirstFrame();

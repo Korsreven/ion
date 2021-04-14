@@ -29,10 +29,10 @@ mesh::Vertices sprite_vertices(const Vector3 &position, real rotation, const Vec
 {
 	auto [half_width, half_height] = (size * 0.5_r).XY();
 
-	auto v1 = Vector3{-half_width, half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
-	auto v2 = Vector3{-half_width, -half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
-	auto v3 = Vector3{half_width, -half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
-	auto v4 = Vector3{half_width, half_height, 0.0_r}.RotateCopy(rotation, vector3::Zero) + position;
+	auto v1 = (position + Vector2{-half_width, half_height}).RotateCopy(rotation, position);
+	auto v2 = (position + Vector2{-half_width, -half_height}).RotateCopy(rotation, position);
+	auto v3 = (position + Vector2{half_width, -half_height}).RotateCopy(rotation, position);
+	auto v4 = (position + Vector2{half_width, half_height}).RotateCopy(rotation, position);
 
 	auto [ll_s, ll_t] = lower_left_tex_coord.XY();
 	auto [ur_s, ur_t] = upper_right_tex_coord.XY();
