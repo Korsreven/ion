@@ -48,6 +48,9 @@ namespace ion::graphics::scene::shapes
 			Vector2 size_;
 			int sides_ = ellipse::detail::default_ellipse_sides;
 
+
+			virtual mesh::Vertices GetVertices() const noexcept override;
+
 		public:
 		
 			//Construct a new ellipse with the given size, color and visibility
@@ -80,7 +83,7 @@ namespace ion::graphics::scene::shapes
 				if (position_ != position)
 				{
 					position_ = position;
-					Mesh::VertexData(ellipse::detail::ellipse_vertices(position_, rotation_, size_, color_, sides_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 
@@ -90,7 +93,7 @@ namespace ion::graphics::scene::shapes
 				if (rotation_ != angle)
 				{
 					rotation_ = angle;
-					Mesh::VertexData(ellipse::detail::ellipse_vertices(position_, rotation_, size_, color_, sides_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 
@@ -100,7 +103,7 @@ namespace ion::graphics::scene::shapes
 				if (size_ != size)
 				{
 					size_ = size;
-					Mesh::VertexData(ellipse::detail::ellipse_vertices(position_, rotation_, size_, color_, sides_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 

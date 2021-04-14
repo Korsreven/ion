@@ -58,6 +58,9 @@ namespace ion::graphics::scene::shapes
 			real thickness_ = 1.0_r;
 			int smoothness_ = curve::detail::default_curve_smoothness;
 
+
+			virtual mesh::Vertices GetVertices() const noexcept override;
+
 		public:
 		
 			//Construct a new curve with the given control points, color and visibility
@@ -86,7 +89,7 @@ namespace ion::graphics::scene::shapes
 				if (control_points_[n] != p)
 				{
 					control_points_[n] = p;
-					Mesh::VertexData(curve::detail::curve_vertices(control_points_, color_, smoothness_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 
@@ -127,7 +130,7 @@ namespace ion::graphics::scene::shapes
 
 			//Draw this curve with the given shader program (optional)
 			//This can be called multiple times if more than one pass
-			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept override;
+			virtual void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept override;
 	};
 } //ion::graphics::scene::shapes
 

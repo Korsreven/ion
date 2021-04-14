@@ -72,6 +72,12 @@ Rectangle::Rectangle(const Vector3 &position, real rotation, const Vector2 &size
 }
 
 
+mesh::Vertices Rectangle::GetVertices() const noexcept
+{
+	return detail::rectangle_vertices(position_, rotation_, size_, color_);
+}
+
+
 //Public
 
 Rectangle::Rectangle(const Vector2 &size, const Color &color, bool visible) :

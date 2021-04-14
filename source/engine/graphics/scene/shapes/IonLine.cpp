@@ -31,6 +31,16 @@ mesh::Vertices line_vertices(const Vector3 &a, const Vector3 &b, const Color &co
 } //line::detail
 
 
+//Protected
+
+mesh::Vertices Line::GetVertices() const noexcept
+{
+	return detail::line_vertices(a_, b_, color_);
+}
+
+
+//Public
+
 Line::Line(const Vector3 &a, const Vector3 &b, const Color &color, bool visible) :
 
 	Shape{vertex::vertex_batch::VertexDrawMode::Lines, detail::line_vertices(a, b, color), visible},

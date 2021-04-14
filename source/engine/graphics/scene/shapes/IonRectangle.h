@@ -54,6 +54,9 @@ namespace ion::graphics::scene::shapes
 			Rectangle(const Vector3 &position, real rotation, const Vector2 &size, const Color &color,
 				NonOwningPtr<materials::Material> material, bool visible = true);
 
+
+			virtual mesh::Vertices GetVertices() const noexcept override;
+
 		public:
 		
 			//Construct a new rectangle with the given size, color and visibility
@@ -76,7 +79,7 @@ namespace ion::graphics::scene::shapes
 				if (position_ != position)
 				{
 					position_ = position;
-					Mesh::VertexData(rectangle::detail::rectangle_vertices(position_, rotation_, size_, color_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 
@@ -86,7 +89,7 @@ namespace ion::graphics::scene::shapes
 				if (rotation_ != angle)
 				{
 					rotation_ = angle;
-					Mesh::VertexData(rectangle::detail::rectangle_vertices(position_, rotation_, size_, color_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 
@@ -96,7 +99,7 @@ namespace ion::graphics::scene::shapes
 				if (size_ != size)
 				{
 					size_ = size;
-					Mesh::VertexData(rectangle::detail::rectangle_vertices(position_, rotation_, size_, color_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 

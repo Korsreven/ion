@@ -50,6 +50,16 @@ mesh::Vertices ellipse_vertices(const Vector3 &position, real rotation, const Ve
 } //ellipse::detail
 
 
+//Protected
+
+mesh::Vertices Ellipse::GetVertices() const noexcept
+{
+	return detail::ellipse_vertices(position_, rotation_, size_, color_, sides_);
+}
+
+
+//Public
+
 Ellipse::Ellipse(const Vector2 &size, const Color &color, bool visible) :
 	Ellipse{vector3::Zero, size, color, visible}
 {

@@ -75,6 +75,16 @@ mesh::Vertices curve_vertices(const ControlPoints &control_points, const Color &
 } //curve::detail
 
 
+//Protected
+
+mesh::Vertices Curve::GetVertices() const noexcept
+{
+	return detail::curve_vertices(control_points_, color_, smoothness_);
+}
+
+
+//Public
+
 Curve::Curve(ControlPoints control_points, const Color &color, bool visible) :
 
 	Shape{vertex::vertex_batch::VertexDrawMode::LineStrip, detail::curve_vertices(control_points, color, detail::default_curve_smoothness), visible},

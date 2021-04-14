@@ -30,6 +30,16 @@ mesh::Vertices triangle_vertices(const Vector3 &a, const Vector3 &b, const Vecto
 } //triangle::detail
 
 
+//Protected
+
+mesh::Vertices Triangle::GetVertices() const noexcept
+{
+	return detail::triangle_vertices(a_, b_, c_, color_);
+}
+
+
+//Public
+
 Triangle::Triangle(const Vector3 &a, const Vector3 &b, const Vector3 &c, const Color &color, bool visible) :
 
 	Shape{detail::triangle_vertices(a, b, c, color), visible},

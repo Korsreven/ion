@@ -39,6 +39,9 @@ namespace ion::graphics::scene::shapes
 			Vector3 b_;
 			Vector3 c_;
 
+
+			virtual mesh::Vertices GetVertices() const noexcept override;
+
 		public:
 		
 			//Construct a new triangle with the given points a b c, color and visibility
@@ -55,7 +58,7 @@ namespace ion::graphics::scene::shapes
 				if (a_ != a)
 				{
 					a_ = a;
-					Mesh::VertexData(triangle::detail::triangle_vertices(a_, b_, c_, color_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 
@@ -65,7 +68,7 @@ namespace ion::graphics::scene::shapes
 				if (b_ != b)
 				{
 					b_ = b;
-					Mesh::VertexData(triangle::detail::triangle_vertices(a_, b_, c_, color_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 
@@ -75,7 +78,7 @@ namespace ion::graphics::scene::shapes
 				if (c_ != c)
 				{
 					c_ = c;
-					Mesh::VertexData(triangle::detail::triangle_vertices(a_, b_, c_, color_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 
@@ -87,7 +90,7 @@ namespace ion::graphics::scene::shapes
 					a_ = a;
 					b_ = b;
 					c_ = c;
-					Mesh::VertexData(triangle::detail::triangle_vertices(a_, b_, c_, color_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 

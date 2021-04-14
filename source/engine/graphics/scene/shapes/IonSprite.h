@@ -43,6 +43,9 @@ namespace ion::graphics::scene::shapes
 			Vector2 lower_left_tex_coord_ = vector2::Zero;
 			Vector2 upper_right_tex_coord_ = vector2::UnitScale;
 
+
+			virtual mesh::Vertices GetVertices() const noexcept override;
+
 		public:
 		
 			//Construct a new sprite with the given size, material and visibility
@@ -77,8 +80,7 @@ namespace ion::graphics::scene::shapes
 					lower_left_tex_coord_ = lower_left;
 					upper_right_tex_coord_ = upper_right;
 
-					Mesh::VertexData(sprite::detail::sprite_vertices(position_, rotation_, size_, color_,
-						lower_left_tex_coord_, upper_right_tex_coord_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 

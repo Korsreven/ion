@@ -61,6 +61,10 @@ namespace ion::graphics::scene::shapes
 			Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
 				NonOwningPtr<materials::Material> material, bool visible = true);
 
+
+			//Must be overridden in derived to return vertices
+			virtual mesh::Vertices GetVertices() const noexcept = 0;
+
 		public:
 
 			/*

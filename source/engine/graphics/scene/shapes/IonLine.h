@@ -39,6 +39,9 @@ namespace ion::graphics::scene::shapes
 			Vector3 b_;
 			real thickness_ = 1.0_r;
 
+
+			virtual mesh::Vertices GetVertices() const noexcept override;
+
 		public:
 		
 			//Construct a new line with the given points a b, color and visibility
@@ -58,7 +61,7 @@ namespace ion::graphics::scene::shapes
 				if (a_ != a)
 				{
 					a_ = a;
-					Mesh::VertexData(line::detail::line_vertices(a_, b_, color_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 
@@ -68,7 +71,7 @@ namespace ion::graphics::scene::shapes
 				if (b_ != b)
 				{
 					b_ = b;
-					Mesh::VertexData(line::detail::line_vertices(a_, b_, color_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 
@@ -79,7 +82,7 @@ namespace ion::graphics::scene::shapes
 				{
 					a_ = a;
 					b_ = b;
-					Mesh::VertexData(line::detail::line_vertices(a_, b_, color_));
+					Mesh::VertexData(GetVertices());
 				}
 			}
 
@@ -125,7 +128,7 @@ namespace ion::graphics::scene::shapes
 
 			//Draw this line with the given shader program (optional)
 			//This can be called multiple times if more than one pass
-			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept override;
+			virtual void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept override;
 	};
 } //ion::graphics::scene::shapes
 
