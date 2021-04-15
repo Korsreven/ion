@@ -12,13 +12,10 @@ File:	IonRectangle.cpp
 
 #include "IonRectangle.h"
 
-#include "types/IonTypes.h"
-
 namespace ion::graphics::scene::shapes
 {
 
 using namespace rectangle;
-using namespace types::type_literals;
 
 namespace rectangle::detail
 {

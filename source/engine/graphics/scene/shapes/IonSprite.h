@@ -27,7 +27,6 @@ File:	IonSprite.h
 namespace ion::graphics::scene::shapes
 {
 	using namespace utilities;
-	using namespace types::type_literals;
 
 	namespace sprite::detail
 	{

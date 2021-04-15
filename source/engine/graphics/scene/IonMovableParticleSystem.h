@@ -67,7 +67,7 @@ namespace ion::graphics::scene
 
 						{shaders::shader_layout::AttributeName::Vertex_Color,
 							render::vertex::vertex_declaration::VertexElementType::Float4,
-							reinterpret_cast<const std::byte*>(particle.SolidColor().Channels()) - reinterpret_cast<const std::byte*>(&particle),
+							reinterpret_cast<const std::byte*>(particle.FillColor().Channels()) - reinterpret_cast<const std::byte*>(&particle),
 							sizeof(particles::Particle)}
 					},
 					sizeof(particles::Particle)

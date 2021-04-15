@@ -71,13 +71,13 @@ namespace ion::graphics::scene::shapes
 				Modifiers
 			*/
 
-			//Sets the solid color of this shape to the given color
-			inline void SolidColor(const Color &color) noexcept
+			//Sets the color of this shape to the given color
+			inline void FillColor(const Color &color) noexcept
 			{
 				if (color_ != color)
 				{
 					color_ = color;
-					Mesh::SurfaceColor(color);
+					Mesh::VertexData(GetVertices());
 				}
 			}
 
@@ -98,8 +98,8 @@ namespace ion::graphics::scene::shapes
 				Observers
 			*/
 
-			//Returns the solid color of this rectangle
-			[[nodiscard]] inline auto& SolidColor() const noexcept
+			//Returns the color of this rectangle
+			[[nodiscard]] inline auto& FillColor() const noexcept
 			{
 				return color_;
 			}

@@ -18,11 +18,9 @@ File:	IonTriangle.h
 #include "IonShape.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector3.h"
-#include "types/IonTypes.h"
 
 namespace ion::graphics::scene::shapes
 {
-	using namespace types::type_literals;
 	using namespace utilities;
 
 	namespace triangle::detail

@@ -114,7 +114,7 @@ OwningPtr<Emitter> Emitter::Clone() const
 	emitter->particle_velocity_ = particle_velocity_;
 	emitter->particle_size_ = particle_size_;		
 	emitter->particle_mass_ = particle_mass_;
-	emitter->particle_solid_color_ = particle_solid_color_;
+	emitter->particle_color_ = particle_color_;
 	emitter->particle_life_time_ = particle_life_time_;
 	emitter->particle_material_ = particle_material_;
 
@@ -199,7 +199,7 @@ void Emitter::Emit(int particle_count) noexcept
 			detail::particle_direction(direction_, emission_angle_, particle_velocity_.first, particle_velocity_.second), //Direction + velocity
 			detail::particle_size(particle_size_.first, particle_size_.second), //Size
 			detail::particle_mass(particle_mass_.first, particle_mass_.second), //Mass
-			detail::particle_solid_color(particle_solid_color_.first, particle_solid_color_.second), //Solid color
+			detail::particle_color(particle_color_.first, particle_color_.second), //Color
 			detail::particle_life_time(particle_life_time_.first, particle_life_time_.second) //Life time
 		);
 }

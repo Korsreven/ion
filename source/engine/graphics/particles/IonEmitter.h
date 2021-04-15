@@ -143,9 +143,9 @@ namespace ion::graphics::particles
 				return ion::utilities::random::Number(min_mass, max_mass);
 			}
 
-			inline auto particle_solid_color(const Color &from_solid_color, const Color &to_solid_color)
+			inline auto particle_color(const Color &from_color, const Color &to_color)
 			{
-				return from_solid_color.MixCopy(to_solid_color, ion::utilities::random::Number());
+				return from_color.MixCopy(to_color, ion::utilities::random::Number());
 			}
 
 			inline auto particle_life_time(duration min_life_time, duration max_life_time)
@@ -188,7 +188,7 @@ namespace ion::graphics::particles
 			std::pair<real, real> particle_velocity_;
 			std::pair<Vector2, Vector2> particle_size_;		
 			std::pair<real, real> particle_mass_;
-			std::pair<Color, Color> particle_solid_color_;
+			std::pair<Color, Color> particle_color_;
 			std::pair<duration, duration> particle_life_time_;
 			NonOwningPtr<materials::Material> particle_material_;
 
@@ -426,17 +426,17 @@ namespace ion::graphics::particles
 				particle_mass_ = std::minmax(min_mass, max_mass);
 			}
 
-			//Sets the solid color of each new particle to the given value
-			inline void ParticleSolidColor(const Color &solid_color) noexcept
+			//Sets the color of each new particle to the given value
+			inline void ParticleColor(const Color &color) noexcept
 			{
-				particle_solid_color_ = std::pair(solid_color, solid_color);
+				particle_color_ = std::pair(color, color);
 			}
 
-			//Sets the solid color range of each new particle to the given range
+			//Sets the color range of each new particle to the given range
 			//The final color of the new particle is determined by mixing both colors with a random percentage
-			inline void ParticleSolidColor(const Color &from_solid_color, const Color &to_solid_color) noexcept
+			inline void ParticleColor(const Color &from_color, const Color &to_color) noexcept
 			{
-				particle_solid_color_ = std::pair(from_solid_color, to_solid_color); //minmax not needed
+				particle_color_ = std::pair(from_color, to_color); //minmax not needed
 			}
 
 			//Sets the life time of each new particle to the given value
@@ -480,10 +480,10 @@ namespace ion::graphics::particles
 				return particle_mass_;
 			}
 
-			//Returns the solid color of each new particle in range [from, to]
-			[[nodiscard]] inline auto& ParticleSolidColor() const noexcept
+			//Returns the color of each new particle in range [from, to]
+			[[nodiscard]] inline auto& ParticleColor() const noexcept
 			{
-				return particle_solid_color_;
+				return particle_color_;
 			}
 
 			//Returns the life time of each new particle in range [min, max]

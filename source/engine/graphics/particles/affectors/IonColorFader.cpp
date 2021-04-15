@@ -116,10 +116,10 @@ void affect_particles(affector::detail::particle_range particles, const color_st
 
 			//from -> to
 			if (from->ToColor)
-				particle.SolidColor(from->ToColor->MixCopy(*(to->ToColor), percent));
+				particle.FillColor(from->ToColor->MixCopy(*(to->ToColor), percent));
 			//current -> to
 			else
-				particle.SolidColor(particle.SolidColor().MixCopy(*(to->ToColor), percent));
+				particle.FillColor(particle.FillColor().MixCopy(*(to->ToColor), percent));
 		}
 	}
 }

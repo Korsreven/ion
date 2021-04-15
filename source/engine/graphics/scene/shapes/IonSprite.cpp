@@ -13,7 +13,6 @@ File:	IonSprite.cpp
 #include "IonSprite.h"
 
 #include "graphics/materials/IonMaterial.h"
-#include "types/IonTypes.h"
 
 namespace ion::graphics::scene::shapes
 {

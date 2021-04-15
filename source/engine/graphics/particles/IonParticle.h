@@ -42,7 +42,7 @@ namespace ion::graphics::particles
 			Vector2 direction_; //Length represents velocity
 			Vector2 size_;
 			real mass_ = 0.0_r;
-			Color solid_color_;
+			Color color_;
 			Cumulative<duration> life_time_;
 
 		public:
@@ -51,7 +51,7 @@ namespace ion::graphics::particles
 
 			//Constructs a new particle from the given initial values
 			Particle(const Vector3 &position, const Vector2 &direction,
-					 const Vector2 &size, real mass, const Color &solid_color,
+					 const Vector2 &size, real mass, const Color &color,
 					 duration life_time) noexcept;
 
 
@@ -91,10 +91,10 @@ namespace ion::graphics::particles
 				mass_ = mass;
 			}
 
-			//Sets the solid color of the particle to the given color
-			inline void SolidColor(const Color &color) noexcept
+			//Sets the color of the particle to the given color
+			inline void FillColor(const Color &color) noexcept
 			{
-				solid_color_ = color;
+				color_ = color;
 			}
 
 			//Sets the life time of the particle to the given duration
@@ -139,10 +139,10 @@ namespace ion::graphics::particles
 				return mass_;
 			}
 
-			//Returns the solid color of the particle
-			[[nodiscard]] inline auto& SolidColor() const noexcept
+			//Returns the color of the particle
+			[[nodiscard]] inline auto& FillColor() const noexcept
 			{
-				return solid_color_;
+				return color_;
 			}
 
 			//Returns the life time of the particle

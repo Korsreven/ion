@@ -16,14 +16,14 @@ namespace ion::graphics::particles
 {
 
 Particle::Particle(const Vector3 &position, const Vector2 &direction,
-				   const Vector2 &size, real mass, const Color &solid_color,
+				   const Vector2 &size, real mass, const Color &color,
 				   duration life_time) noexcept :
 
 	position_{position},
 	direction_{direction},
 	size_{size},
 	mass_{mass},
-	solid_color_{solid_color},
+	color_{color},
 	life_time_{life_time}
 {
 	//Empty
