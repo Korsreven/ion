@@ -89,7 +89,7 @@ namespace ion::graphics::scene::shapes
 				if (control_points_[n] != p)
 				{
 					control_points_[n] = p;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 

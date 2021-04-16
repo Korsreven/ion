@@ -83,7 +83,7 @@ namespace ion::graphics::scene::shapes
 				if (position_ != position)
 				{
 					position_ = position;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 
@@ -93,7 +93,7 @@ namespace ion::graphics::scene::shapes
 				if (rotation_ != angle)
 				{
 					rotation_ = angle;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 
@@ -103,7 +103,7 @@ namespace ion::graphics::scene::shapes
 				if (size_ != size)
 				{
 					size_ = size;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 

@@ -43,7 +43,7 @@ mesh::Vertices Line::GetVertices() const noexcept
 
 Line::Line(const Vector3 &a, const Vector3 &b, const Color &color, bool visible) :
 
-	Shape{vertex::vertex_batch::VertexDrawMode::Lines, detail::line_vertices(a, b, color), visible},
+	Shape{vertex::vertex_batch::VertexDrawMode::Lines, detail::line_vertices(a, b, color), color, visible},
 
 	a_{a},
 	b_{b}
@@ -53,7 +53,7 @@ Line::Line(const Vector3 &a, const Vector3 &b, const Color &color, bool visible)
 
 Line::Line(const Vector3 &a, const Vector3 &b, const Color &color, real thickness, bool visible) :
 
-	Shape{vertex::vertex_batch::VertexDrawMode::Lines, detail::line_vertices(a, b, color), visible},
+	Shape{vertex::vertex_batch::VertexDrawMode::Lines, detail::line_vertices(a, b, color), color, visible},
 
 	a_{a},
 	b_{b},

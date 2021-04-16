@@ -42,24 +42,22 @@ mesh::Vertices rectangle_vertices(const Vector3 &position, real rotation, const 
 
 //Protected
 
-Rectangle::Rectangle(const Vector2 &size, const Color &color, NonOwningPtr<materials::Material> material, bool visible) :
-	Rectangle{vector3::Zero, size, color, material, visible}
+Rectangle::Rectangle(const mesh::Vertices &vertices, const Vector3 &position, real rotation, const Vector2 &size,
+	const Color &color, bool visible) :
+
+	Shape{vertices, color, visible},
+	
+	position_{position},
+	rotation_{rotation},
+	size_{size}
 {
 	//Empty
 }
 
-Rectangle::Rectangle(const Vector3 &position, const Vector2 &size, const Color &color,
-	NonOwningPtr<materials::Material> material, bool visible) :
+Rectangle::Rectangle(const mesh::Vertices &vertices, const Vector3 &position, real rotation, const Vector2 &size,
+	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
 
-	Rectangle{position, 0.0_r, size, color, material, visible}
-{
-	//Empty
-}
-
-Rectangle::Rectangle(const Vector3 &position, real rotation, const Vector2 &size, const Color &color,
-	NonOwningPtr<materials::Material> material, bool visible) :
-
-	Shape{detail::rectangle_vertices(position, rotation, size, color), material, visible},
+	Shape{vertices, material, color, visible},
 	
 	position_{position},
 	rotation_{rotation},
@@ -84,19 +82,13 @@ Rectangle::Rectangle(const Vector2 &size, const Color &color, bool visible) :
 }
 
 Rectangle::Rectangle(const Vector3 &position, const Vector2 &size, const Color &color, bool visible) :
-
 	Rectangle{position, 0.0_r, size, color, visible}
 {
 	//Empty
 }
 
 Rectangle::Rectangle(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, bool visible) :
-
-	Shape{detail::rectangle_vertices(position, rotation, size, color), visible},
-
-	position_{position},
-	rotation_{rotation},
-	size_{size}
+	Rectangle{detail::rectangle_vertices(position, rotation, size, color), position, rotation, size, color, visible}
 {
 	//Empty
 }

@@ -56,7 +56,7 @@ namespace ion::graphics::scene::shapes
 				if (a_ != a)
 				{
 					a_ = a;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 
@@ -66,7 +66,7 @@ namespace ion::graphics::scene::shapes
 				if (b_ != b)
 				{
 					b_ = b;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 
@@ -76,7 +76,7 @@ namespace ion::graphics::scene::shapes
 				if (c_ != c)
 				{
 					c_ = c;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 
@@ -88,7 +88,7 @@ namespace ion::graphics::scene::shapes
 					a_ = a;
 					b_ = b;
 					c_ = c;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 

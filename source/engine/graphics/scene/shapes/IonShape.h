@@ -32,7 +32,6 @@ namespace ion::graphics::scene::shapes
 
 	namespace shape::detail
 	{
-		Color first_vertex_color(const mesh::Vertices &vertices) noexcept;
 	} //shape::detail
 
 
@@ -41,28 +40,31 @@ namespace ion::graphics::scene::shapes
 		protected:
 
 			Color color_;
+			bool update_vertices_ = false;
 
 
-			//Construct a new shape with the given visibility
+			//Construct a new shape with the given vertices, color and visibility
 			//Can only be instantiated by derived
-			explicit Shape(const mesh::Vertices &vertices, bool visible = true);
+			Shape(const mesh::Vertices &vertices, const Color &color, bool visible = true);
 
-			//Construct a new shape with the given draw mode, vertices and visibility
-			//Can only be instantiated by derived
-			Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices, bool visible = true);
-
-
-			//Construct a new texturized shape with the given vertices, material and visibility
-			//Can only be instantiated by derived
-			Shape(const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material, bool visible = true);
-
-			//Construct a new texturized shape with the given draw mode, vertices, material and visibility
+			//Construct a new shape with the given draw mode, vertices, color and visibility
 			//Can only be instantiated by derived
 			Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
-				NonOwningPtr<materials::Material> material, bool visible = true);
+				const Color &color, bool visible = true);
 
 
-			//Must be overridden in derived to return vertices
+			//Construct a new texturized shape with the given vertices, material, color and visibility
+			//Can only be instantiated by derived
+			Shape(const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
+				const Color &color, bool visible = true);
+
+			//Construct a new texturized shape with the given draw mode, vertices, material, color and visibility
+			//Can only be instantiated by derived
+			Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
+				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
+
+
+			//Must be overridden to return the vertices of the derived shape
 			virtual mesh::Vertices GetVertices() const noexcept = 0;
 
 		public:
@@ -77,7 +79,7 @@ namespace ion::graphics::scene::shapes
 				if (color_ != color)
 				{
 					color_ = color;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 
@@ -134,6 +136,15 @@ namespace ion::graphics::scene::shapes
 			{
 				return Mesh::BoundingSphere();
 			}
+
+
+			/*
+				Preparing
+			*/
+
+			//Prepare this shape such that it is ready to be drawn
+			//This is called once regardless of passes
+			virtual mesh::MeshBoundingVolumeStatus Prepare() noexcept override;
 	};
 } //ion::graphics::scene::shapes
 

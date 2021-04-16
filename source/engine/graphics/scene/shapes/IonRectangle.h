@@ -40,19 +40,15 @@ namespace ion::graphics::scene::shapes
 			Vector2 size_;
 
 
-			//Construct a new rectangle with the given size, color, material and visibility
+			//Construct a new rectangle with the given vertices, position, rotation, size, color and visibility
 			//Can only be instantiated by derived
-			Rectangle(const Vector2 &size, const Color &color, NonOwningPtr<materials::Material> material, bool visible = true);
+			Rectangle(const mesh::Vertices &vertices, const Vector3 &position, real rotation, const Vector2 &size,
+				const Color &color, bool visible = true);
 
-			//Construct a new rectangle with the given position, size, color, material and visibility
+			//Construct a new texturized rectangle with the given vertices, position, rotation, size, material, color and visibility
 			//Can only be instantiated by derived
-			Rectangle(const Vector3 &position, const Vector2 &size, const Color &color,
-				NonOwningPtr<materials::Material> material, bool visible = true);
-
-			//Construct a new rectangle with the given position, rotation, size, color, material and visibility
-			//Can only be instantiated by derived
-			Rectangle(const Vector3 &position, real rotation, const Vector2 &size, const Color &color,
-				NonOwningPtr<materials::Material> material, bool visible = true);
+			Rectangle(const mesh::Vertices &vertices, const Vector3 &position, real rotation, const Vector2 &size,
+				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
 
 			virtual mesh::Vertices GetVertices() const noexcept override;
@@ -79,7 +75,7 @@ namespace ion::graphics::scene::shapes
 				if (position_ != position)
 				{
 					position_ = position;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 
@@ -89,7 +85,7 @@ namespace ion::graphics::scene::shapes
 				if (rotation_ != angle)
 				{
 					rotation_ = angle;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 
@@ -99,7 +95,7 @@ namespace ion::graphics::scene::shapes
 				if (size_ != size)
 				{
 					size_ = size;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 

@@ -79,7 +79,7 @@ namespace ion::graphics::scene::shapes
 					lower_left_tex_coord_ = lower_left;
 					upper_right_tex_coord_ = upper_right;
 
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 

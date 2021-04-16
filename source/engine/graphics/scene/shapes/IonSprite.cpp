@@ -90,7 +90,8 @@ Sprite::Sprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materi
 }
 
 Sprite::Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
-	Rectangle{position, rotation, size, color, material, visible}
+	Rectangle{rectangle::detail::rectangle_vertices(position, rotation, size, color),
+			  position, rotation, size, material, color, visible}
 {
 	//Empty
 }
@@ -102,8 +103,6 @@ Sprite::Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonO
 
 void Sprite::Crop(const std::optional<Aabb> &area) noexcept
 {
-	auto need_update = false;
-
 	//Crop by area
 	if (area)
 	{
@@ -117,7 +116,7 @@ void Sprite::Crop(const std::optional<Aabb> &area) noexcept
 
 			lower_left_tex_coord_ = lower_left;
 			upper_right_tex_coord_ = upper_right;
-			need_update = true;
+			update_vertices_ = true;
 		}
 	}
 	//Un-crop
@@ -128,11 +127,8 @@ void Sprite::Crop(const std::optional<Aabb> &area) noexcept
 
 		lower_left_tex_coord_ = lower_left;
 		upper_right_tex_coord_ = upper_right;
-		need_update = true;
+		update_vertices_ = true;
 	}
-
-	if (need_update)
-		Mesh::VertexData(GetVertices());
 }
 
 void Sprite::FlipHorizontal() noexcept
@@ -143,7 +139,7 @@ void Sprite::FlipHorizontal() noexcept
 	lower_left_tex_coord_.X(ur_s);
 	upper_right_tex_coord_.X(ll_s);
 
-	Mesh::VertexData(GetVertices());
+	update_vertices_ = true;
 }
 
 void Sprite::FlipVertical() noexcept
@@ -154,7 +150,7 @@ void Sprite::FlipVertical() noexcept
 	lower_left_tex_coord_.Y(ur_t);
 	upper_right_tex_coord_.Y(ll_t);
 
-	Mesh::VertexData(GetVertices());
+	update_vertices_ = true;
 }
 
 

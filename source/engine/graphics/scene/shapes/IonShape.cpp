@@ -19,46 +19,59 @@ using namespace shape;
 
 namespace shape::detail
 {
-
-Color first_vertex_color(const mesh::Vertices &vertices) noexcept
-{
-	return !std::empty(vertices) ? vertices.front().BaseColor : color::Transparent;
-}
-
 } //shape::detail
 
-Shape::Shape(const mesh::Vertices &vertices, bool visible) :
+
+Shape::Shape(const mesh::Vertices &vertices, const Color &color, bool visible) :
 
 	Mesh{vertices, visible},
-	color_{detail::first_vertex_color(vertices)}
-{
-	//Empty
-}
-
-Shape::Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices, bool visible ) :
-
-	Mesh{draw_mode, vertices, visible},
-	color_{detail::first_vertex_color(vertices)}
-{
-	//Empty
-}
-
-
-Shape::Shape(const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material, bool visible) :
-
-	Mesh{vertices, material, mesh::MeshTexCoordMode::Auto, visible},
-	color_{detail::first_vertex_color(vertices)}
+	color_{color}
 {
 	//Empty
 }
 
 Shape::Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
-	NonOwningPtr<materials::Material> material, bool visible) :
+	const Color &color, bool visible ) :
 
-	Mesh{draw_mode, vertices, material, mesh::MeshTexCoordMode::Auto, visible},
-	color_{detail::first_vertex_color(vertices)}
+	Mesh{draw_mode, vertices, visible},
+	color_{color}
 {
 	//Empty
+}
+
+
+Shape::Shape(const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
+	const Color &color, bool visible) :
+
+	Mesh{vertices, material, mesh::MeshTexCoordMode::Auto, visible},
+	color_{color}
+{
+	//Empty
+}
+
+Shape::Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
+	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
+
+	Mesh{draw_mode, vertices, material, mesh::MeshTexCoordMode::Auto, visible},
+	color_{color}
+{
+	//Empty
+}
+
+
+/*
+	Preparing
+*/
+
+mesh::MeshBoundingVolumeStatus Shape::Prepare() noexcept
+{
+	if (update_vertices_)
+	{
+		Mesh::VertexData(GetVertices());
+		update_vertices_ = false;
+	}
+
+	return Mesh::Prepare();
 }
 
 } //ion::graphics::scene::shapes
