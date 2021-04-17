@@ -87,6 +87,7 @@ File:	main.cpp
 #include "graphics/scene/IonMovableParticleSystem.h"
 #include "graphics/scene/IonMovableText.h"
 #include "graphics/scene/IonSceneManager.h"
+#include "graphics/scene/shapes/IonBorder.h"
 #include "graphics/scene/shapes/IonCurve.h"
 #include "graphics/scene/shapes/IonEllipse.h"
 #include "graphics/scene/shapes/IonLine.h"
@@ -652,7 +653,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			emitter->ParticleVelocity(0.4_r, 0.6_r);
 			emitter->ParticleSize(24.0_r, 32.0_r);
 			emitter->ParticleMass(0.4_r, 0.6_r);
-			emitter->ParticleSolidColor(color::White);
+			emitter->ParticleColor(color::White);
 			emitter->ParticleLifeTime(50.0_sec, 60.0_sec);
 			emitter->ParticleMaterial(asteroid);
 
@@ -874,7 +875,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			model->CreateMesh(std::move(knees_vertices), tifa,
 				ion::graphics::scene::shapes::mesh::MeshTexCoordMode::Manual);
 
-			auto triangle = model->CreateMesh(ion::graphics::scene::shapes::Triangle{
+			/*auto triangle = model->CreateMesh(ion::graphics::scene::shapes::Triangle{
 				{1.0_r, 0.8_r, -1.3_r}, {0.5_r, 0.4_r, -1.3_r}, {1.5_r, 0.4_r, -1.3_r}, color::DarkGreen});
 			auto rectangle = model->CreateMesh(ion::graphics::scene::shapes::Rectangle{
 				{1.0_r, 0.0_r, -1.3_r}, {0.6_r, 0.5_r}, color::Coral});
@@ -883,18 +884,23 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto line = model->CreateMesh(ion::graphics::scene::shapes::Line{
 				{0.5_r, -0.4_r, -1.3_r}, {1.5_r, -0.4_r, -1.3_r}, color::Goldenrod, 2.0_r});
 			auto curve = model->CreateMesh(ion::graphics::scene::shapes::Curve{
-				{{0.5_r, 0.4_r, -1.3_r}, {1.0_r, 0.8_r, -1.3_r}, {1.5_r, 0.4_r, -1.3_r}}, color::Indigo, 2.0_r});
+				{{0.5_r, 0.4_r, -1.3_r}, {1.0_r, 0.8_r, -1.3_r}, {1.5_r, 0.4_r, -1.3_r}}, color::Indigo, 2.0_r});*/
 
 			auto sprite = model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{1.0_r, 0.1_r, -1.3_r}, {0.3886_r, 1.0_r}, tifa});
 			sprite->Crop(Aabb{{0.0251_r, 0.3359_r}, {0.6884_r, 1.0_r}});
 			sprite->FlipHorizontal();
 
-			model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{1.0_r, -0.7_r, -1.3_r}, {1.0_r, 0.5_r}, cat});
+			auto border = model->CreateMesh(ion::graphics::scene::shapes::Border{
+				{1.0_r, 0.1_r, -1.3_r}, {0.3886_r, 1.0_r}, {0.02_r, 0.02_r},
+				ion::graphics::scene::shapes::border::BorderCornerStyle::Oblique, color::DarkGray});
+
+			/*model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{1.0_r, -0.7_r, -1.3_r}, {1.0_r, 0.5_r}, cat});*/
 
 			//Animations
-			//auto running = engine.Scene().CreateAnimation({1.0_r, 0.5_r}, cat_running);
+			//auto running = engine.Scene().CreateAnimation(
+			//	{0.0_r, 0.0_r, -1.3_r}, {1.0_r, 0.5_r}, cat_running);
 			//running->Get()->Start();
 
 			//Particle systems
@@ -902,8 +908,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//asteroids->Get()->StartAll();
 
 			//Texts
-			//auto hello_world = engine.Scene().CreateText(text);
-
+			auto hello_world = engine.Scene().CreateText(
+				{0.0_r, 0.0_r, -1.3_r}, ion::utilities::math::ToRadians(0.0_r), text);
 
 			//Camera, projection and view matrix
 			auto camera = engine.Target()->GetViewport("")->ConnectedCamera();

@@ -206,6 +206,7 @@
     <ClCompile Include="..\source\engine\graphics\scene\IonMovableParticleSystem.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonMovableText.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonSceneManager.cpp" />
+    <ClCompile Include="..\source\engine\graphics\scene\shapes\IonBorder.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonCurve.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonEllipse.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonLine.cpp" />
@@ -336,6 +337,7 @@
     <ClInclude Include="..\source\engine\graphics\scene\IonMovableParticleSystem.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonMovableText.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonSceneManager.h" />
+    <ClInclude Include="..\source\engine\graphics\scene\shapes\IonBorder.h" />
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonCurve.h" />
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonEllipse.h" />
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonLine.h" />
