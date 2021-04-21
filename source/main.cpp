@@ -87,6 +87,7 @@ File:	main.cpp
 #include "graphics/scene/IonMovableParticleSystem.h"
 #include "graphics/scene/IonMovableText.h"
 #include "graphics/scene/IonSceneManager.h"
+#include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/scene/shapes/IonBorder.h"
 #include "graphics/scene/shapes/IonCurve.h"
 #include "graphics/scene/shapes/IonEllipse.h"
