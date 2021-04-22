@@ -22,17 +22,17 @@ namespace scene_node::detail
 } //scene_node::detail
 
 
-SceneNode::SceneNode(bool visible)
+SceneNode::SceneNode(bool visible) noexcept
 {
 	//Empty
 }
 
-SceneNode::SceneNode(const Vector2 &initial_direction, bool visible)
+SceneNode::SceneNode(const Vector2 &initial_direction, bool visible) noexcept
 {
 	//Empty
 }
 
-SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, bool visible)
+SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept
 {
 	//Empty
 }

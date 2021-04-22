@@ -38,7 +38,7 @@ namespace ion::graphics::scene::graph
 
 	namespace scene_node
 	{
-		enum class RotationOrigin : bool
+		enum class NodeRotationOrigin : bool
 		{
 			Parent,
 			Local
@@ -62,7 +62,7 @@ namespace ion::graphics::scene::graph
 			Vector2 scaling_ = vector2::UnitScale;
 
 			Vector2 initial_direction_ = vector2::UnitY;
-			scene_node::RotationOrigin rotation_origin_ = scene_node::RotationOrigin::Parent;
+			scene_node::NodeRotationOrigin rotation_origin_ = scene_node::NodeRotationOrigin::Parent;
 			bool inherit_rotation_ = true;
 			bool inherit_scaling_ = true;
 			bool visible_ = true;
@@ -76,6 +76,7 @@ namespace ion::graphics::scene::graph
 			Vector2 world_direction_ = vector2::UnitY;
 			real world_rotation_ = 0.0_r;
 			Vector2 world_scaling_ = vector2::UnitScale;
+
 			Matrix4 world_tranformation_;
 			Matrix4 world_transformation_projection_;
 
@@ -89,13 +90,13 @@ namespace ion::graphics::scene::graph
 
 
 			//Construct a scene node as the root with the given visibility
-			explicit SceneNode(bool visible);
+			explicit SceneNode(bool visible) noexcept;
 
 			//Construct a scene node as the root with the given initial direction and visibility
-			explicit SceneNode(const Vector2 &initial_direction, bool visible = true);
+			explicit SceneNode(const Vector2 &initial_direction, bool visible = true) noexcept;
 
 			//Construct a scene node as the root with the given position, initial direction and visibility
-			explicit SceneNode(const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true);
+			explicit SceneNode(const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true) noexcept;
 
 
 			//Construct a scene node as a child of the given parent node and visibility
@@ -146,14 +147,192 @@ namespace ion::graphics::scene::graph
 				Modifiers
 			*/
 
+			//Sets the local position of this node to the given position
+			inline void Position(const Vector3 &position) noexcept
+			{
+				if (position_ != position)
+				{
+					if (position_.Z() != position.Z())
+						rearrange_node_ = true;
 
+					position_ = position;
+					need_update_ = true;
+				}
+			}
+
+			//Sets the local direction of this node to the given direction
+			inline void Direction(const Vector2 &direction) noexcept
+			{
+				if (direction_ != direction)
+				{
+					direction_ = direction;
+					need_update_ = true;
+				}
+			}
+
+			//Sets the local rotation of this node to the given angle in radians
+			inline void Rotation(real angle) noexcept
+			{
+				if (rotation_ != angle)
+				{
+					rotation_ = angle;
+					need_update_ = true;
+				}
+			}
+
+			//Sets the local rotation of this node to the given scaling
+			inline void Scaling(const Vector2 &scaling) noexcept
+			{
+				if (scaling_ != scaling)
+				{
+					scaling_ = scaling;
+					need_update_ = true;
+				}
+			}
+
+
+			//Sets the rotation origin of this node to the given origin
+			inline void RotationOrigin(scene_node::NodeRotationOrigin origin) noexcept
+			{
+				if (rotation_origin_ != origin)
+				{
+					rotation_origin_ = origin;
+					need_update_ = true;
+				}
+			}
+
+			//Sets whether or not this node should inherit rotation
+			inline void InheritRotation(bool inherit) noexcept
+			{
+				if (inherit_rotation_ != inherit)
+				{
+					inherit_rotation_ = inherit;
+					need_update_ = true;
+				}
+			}
+
+			//Sets whether or not this node should inherit scaling
+			inline void InheritScaling(bool inherit) noexcept
+			{
+				if (inherit_scaling_ != inherit)
+				{
+					inherit_scaling_ = inherit;
+					need_update_ = true;
+				}
+			}
+
+			//Sets whether or not this node should be visible
+			inline void Visible(bool visible) noexcept
+			{
+				visible_ = visible;
+			}
 
 
 			/*
 				Observers
 			*/
 
+			//Returns the local position of this node
+			[[nodiscard]] inline auto& Position() const noexcept
+			{
+				return position_;
+			}
 
+			//Returns the local direction of this node
+			[[nodiscard]] inline auto& Direction() const noexcept
+			{
+				return direction_;
+			}
+
+			//Returns the local rotation of this node in radians
+			[[nodiscard]] inline auto Rotation() const noexcept
+			{
+				return rotation_;
+			}
+
+			//Returns the local scaling of this node
+			[[nodiscard]] inline auto& Scaling() const noexcept
+			{
+				return scaling_;
+			}
+
+
+			//Returns the initial direction of this node
+			[[nodiscard]] inline auto& InitialDirection() const noexcept
+			{
+				return initial_direction_;
+			}
+
+			//Returns the rotation origin of this node
+			[[nodiscard]] inline auto RotationOrigin() const noexcept
+			{
+				return rotation_origin_;
+			}
+
+			//Returns whether or not this node inherit rotation
+			[[nodiscard]] inline auto InheritRotation() const noexcept
+			{
+				return inherit_rotation_;
+			}
+
+			//Returns whether or not this node inherit scaling
+			[[nodiscard]] inline auto InheritScaling() const noexcept
+			{
+				return inherit_scaling_;
+			}
+
+			//Returns whether or not this node is visible
+			[[nodiscard]] inline auto Visible() const noexcept
+			{
+				return visible_;
+			}
+
+
+			//Returns the parent node of this node
+			//Returns nullptr if this node is the root
+			[[nodiscard]] inline auto ParentNode() const noexcept
+			{
+				return parent_node_;
+			}
+
+
+
+			//Returns the world position of this node
+			[[nodiscard]] inline auto& WorldPosition() const noexcept
+			{
+				return world_position_;
+			}
+
+			//Returns the world direction of this node
+			[[nodiscard]] inline auto& WorldDirection() const noexcept
+			{
+				return world_direction_;
+			}
+
+			//Returns the world rotation of this node in radians
+			[[nodiscard]] auto WorldRotation() const noexcept
+			{
+				return world_rotation_;
+			}
+
+			//Returns the world scaling of this node
+			[[nodiscard]] inline auto& WorldScaling() const noexcept
+			{
+				return world_scaling_;
+			}
+
+
+			//Returns the world transformation matrix for this node
+			[[nodiscard]] inline auto& WorldTransformation() const noexcept
+			{
+				return world_tranformation_;
+			}
+
+			//Returns the world transformation projection matrix for this node
+			[[nodiscard]] inline auto& WorldTransformationProjection() const noexcept
+			{
+				return world_transformation_projection_;
+			}
 
 
 			//Returns true if this node is axis aligned
@@ -161,6 +340,33 @@ namespace ion::graphics::scene::graph
 			{
 				return true;
 			}
+
+
+			/*
+				Transformations
+				Relative
+			*/
+
+			//Translate this node by the given unit
+			void Translate(const Vector3 &unit) noexcept;
+
+			//Translate this node by the given unit
+			void Translate(real unit) noexcept;
+
+			//Rotate this node by the given angle in radians
+			void Rotate(real angle) noexcept;
+
+			//Scale this node by the given unit
+			void Scale(const Vector2 &unit) noexcept;
+
+
+			/*
+				Transformations
+				Absolute
+			*/
+
+			//Turn this node such that it faces the given position
+			void LookAt(const Vector3 &position) noexcept;
 
 
 			/*
