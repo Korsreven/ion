@@ -20,8 +20,8 @@ File:	IonSceneNode.h
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
-#include "memory/IonOwningPtr.h"
 #include "memory/IonNonOwningPtr.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::scene
@@ -83,6 +83,15 @@ namespace ion::graphics::scene::graph
 			bool need_update_ = false;
 			bool rearrange_node_ = false;
 
+
+			inline void NotifyUpdate() noexcept
+			{
+				need_update_ = true;
+
+				for (auto &child_node : child_nodes_)
+					child_node->NotifyUpdate(); //Recursive
+			}
+
 		public:
 
 			//Default construct a scene node as the root
@@ -100,13 +109,13 @@ namespace ion::graphics::scene::graph
 
 
 			//Construct a scene node as a child of the given parent node and visibility
-			explicit SceneNode(NonOwningPtr<SceneNode> parent_node, bool visible = true);
+			explicit SceneNode(SceneNode &parent_node, bool visible = true);
 
 			//Construct a scene node as a child of the given parent node, initial direction and visibility
-			SceneNode(NonOwningPtr<SceneNode> parent_node, const Vector2 &initial_direction, bool visible = true);
+			SceneNode(SceneNode &parent_node, const Vector2 &initial_direction, bool visible = true);
 
 			//Construct a scene node as a child of the given parent node, position, initial direction and visibility
-			SceneNode(NonOwningPtr<SceneNode> parent_node, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true);
+			SceneNode(SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true);
 
 
 			/*
@@ -156,7 +165,7 @@ namespace ion::graphics::scene::graph
 						rearrange_node_ = true;
 
 					position_ = position;
-					need_update_ = true;
+					NotifyUpdate();
 				}
 			}
 
@@ -166,7 +175,7 @@ namespace ion::graphics::scene::graph
 				if (direction_ != direction)
 				{
 					direction_ = direction;
-					need_update_ = true;
+					NotifyUpdate();
 				}
 			}
 
@@ -176,7 +185,7 @@ namespace ion::graphics::scene::graph
 				if (rotation_ != angle)
 				{
 					rotation_ = angle;
-					need_update_ = true;
+					NotifyUpdate();
 				}
 			}
 
@@ -186,7 +195,7 @@ namespace ion::graphics::scene::graph
 				if (scaling_ != scaling)
 				{
 					scaling_ = scaling;
-					need_update_ = true;
+					NotifyUpdate();
 				}
 			}
 
@@ -197,7 +206,7 @@ namespace ion::graphics::scene::graph
 				if (rotation_origin_ != origin)
 				{
 					rotation_origin_ = origin;
-					need_update_ = true;
+					NotifyUpdate();
 				}
 			}
 
@@ -207,7 +216,7 @@ namespace ion::graphics::scene::graph
 				if (inherit_rotation_ != inherit)
 				{
 					inherit_rotation_ = inherit;
-					need_update_ = true;
+					NotifyUpdate();
 				}
 			}
 
@@ -217,14 +226,20 @@ namespace ion::graphics::scene::graph
 				if (inherit_scaling_ != inherit)
 				{
 					inherit_scaling_ = inherit;
-					need_update_ = true;
+					NotifyUpdate();
 				}
 			}
 
 			//Sets whether or not this node should be visible
-			inline void Visible(bool visible) noexcept
+			inline void Visible(bool visible, bool cascade = true) noexcept
 			{
 				visible_ = visible;
+
+				if (cascade)
+				{
+					for (auto &child_node : child_nodes_)
+						child_node->Visible(visible); //Recursive
+				}
 			}
 
 

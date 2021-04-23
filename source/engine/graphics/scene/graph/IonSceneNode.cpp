@@ -38,19 +38,56 @@ SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, 
 }
 
 
-SceneNode::SceneNode(NonOwningPtr<SceneNode> parent_node, bool visible)
+SceneNode::SceneNode(SceneNode &parent_node, bool visible)
 {
 	//Empty
 }
 
-SceneNode::SceneNode(NonOwningPtr<SceneNode> parent_node, const Vector2 &initial_direction, bool visible)
+SceneNode::SceneNode(SceneNode &parent_node, const Vector2 &initial_direction, bool visible)
 {
 	//Empty
 }
 
-SceneNode::SceneNode(NonOwningPtr<SceneNode> parent_node, const Vector3 &position, const Vector2 &initial_direction, bool visible)
+SceneNode::SceneNode(SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction, bool visible)
 {
 	//Empty
+}
+
+
+/*
+	Transformations
+	Relative
+*/
+
+void SceneNode::Translate(const Vector3 &unit) noexcept
+{
+
+}
+
+void SceneNode::Translate(real unit) noexcept
+{
+
+}
+
+void SceneNode::Rotate(real angle) noexcept
+{
+
+}
+
+void SceneNode::Scale(const Vector2 &unit) noexcept
+{
+
+}
+
+
+/*
+	Transformations
+	Absolute
+*/
+
+void SceneNode::LookAt(const Vector3 &position) noexcept
+{
+
 }
 
 
@@ -59,7 +96,20 @@ SceneNode::SceneNode(NonOwningPtr<SceneNode> parent_node, const Vector3 &positio
 	Creating
 */
 
+NonOwningPtr<SceneNode> SceneNode::CreateChildNode(bool visible)
+{
+	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), visible));
+}
 
+NonOwningPtr<SceneNode> SceneNode::CreateChildNode(const Vector2 &initial_direction, bool visible)
+{
+	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), initial_direction, visible));
+}
+
+NonOwningPtr<SceneNode> SceneNode::CreateChildNode(const Vector3 &position, const Vector2 &initial_direction, bool visible)
+{
+	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), position, initial_direction, visible));
+}
 
 
 /*
@@ -67,7 +117,26 @@ SceneNode::SceneNode(NonOwningPtr<SceneNode> parent_node, const Vector3 &positio
 	Take / release ownership
 */
 
+NonOwningPtr<SceneNode> SceneNode::Adopt(OwningPtr<SceneNode> scene_node)
+{
+	return nullptr;
+}
 
+void SceneNode::Adopt(detail::scene_node_container &scene_nodes)
+{
+
+}
+
+
+OwningPtr<SceneNode> SceneNode::Orphan(SceneNode &child_node) noexcept
+{
+	return nullptr;
+}
+
+detail::scene_node_container SceneNode::OrphanAll() noexcept
+{
+	return {};
+}
 
 
 /*
@@ -75,13 +144,34 @@ SceneNode::SceneNode(NonOwningPtr<SceneNode> parent_node, const Vector3 &positio
 	Removing
 */
 
+void SceneNode::ClearChildNodes() noexcept
+{
 
+}
+
+bool SceneNode::RemoveChildNode(SceneNode &child_node) noexcept
+{
+	return false;
+}
 
 
 /*
 	Movable objects
 */
 
+bool SceneNode::Attach(NonOwningPtr<MovableObject> movable_object)
+{
+	return false;
+}
 
+bool SceneNode::Detach(MovableObject &movable_object) noexcept
+{
+	return false;
+}
+
+void SceneNode::Detach() noexcept
+{
+
+}
 
 } //ion::graphics::scene::graph
