@@ -80,9 +80,13 @@ namespace ion::graphics::scene::graph
 			Matrix4 world_tranformation_;
 			Matrix4 world_transformation_projection_;
 
-			bool need_update_ = false;
-			bool rearrange_node_ = false;
+			bool need_update_ = true;
+			bool rearrange_node_ = true;
 
+
+			/*
+				Notifying
+			*/
 
 			inline void NotifyUpdate() noexcept
 			{
@@ -91,6 +95,14 @@ namespace ion::graphics::scene::graph
 				for (auto &child_node : child_nodes_)
 					child_node->NotifyUpdate(); //Recursive
 			}
+
+
+			/*
+				Removing
+			*/
+
+			OwningPtr<SceneNode> Extract(SceneNode &child_node) noexcept;
+			scene_node::detail::scene_node_container ExtractAll() noexcept;
 
 		public:
 
@@ -116,6 +128,10 @@ namespace ion::graphics::scene::graph
 
 			//Construct a scene node as a child of the given parent node, position, initial direction and visibility
 			SceneNode(SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true);
+
+
+			//Destructor
+			~SceneNode() noexcept;
 
 
 			/*
@@ -448,7 +464,7 @@ namespace ion::graphics::scene::graph
 			bool Detach(MovableObject &movable_object) noexcept;
 
 			//Detach all movable objects attached to this node
-			void Detach() noexcept;
+			void DetachAll() noexcept;
 	};
 } //ion::graphics::scene::graph
 

@@ -18,7 +18,11 @@ File:	IonMovableObject.h
 namespace ion::graphics::scene
 {
 	class SceneManager; //Forward declaration
-	class SceneNode; //Forward declaration
+
+	namespace graph
+	{
+		class SceneNode; //Forward declaration
+	}
 
 	namespace movable_object
 	{
@@ -33,7 +37,7 @@ namespace ion::graphics::scene
 	{
 		private:
 
-			SceneNode *parent_node_ = nullptr;
+			graph::SceneNode *parent_node_;
 
 		protected:
 
@@ -90,9 +94,9 @@ namespace ion::graphics::scene
 			*/
 
 			//Sets parent node of this movable object to the given node
-			inline void ParentNode(SceneNode *node) noexcept
+			inline void ParentNode(graph::SceneNode *scene_node) noexcept
 			{
-				parent_node_ = node;
+				parent_node_ = scene_node;
 			}
 
 			//Sets the visibility of this movable object to the given value
