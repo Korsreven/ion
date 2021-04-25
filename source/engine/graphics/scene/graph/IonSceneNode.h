@@ -67,7 +67,7 @@ namespace ion::graphics::scene::graph
 			bool inherit_scaling_ = true;
 			bool visible_ = true;
 
-			NonOwningPtr<SceneNode> parent_node_;
+			SceneNode *parent_node_ = nullptr;
 			scene_node::detail::scene_node_container child_nodes_;
 			scene_node::detail::movable_object_container movable_objects_;
 
@@ -109,7 +109,6 @@ namespace ion::graphics::scene::graph
 			//Default construct a scene node as the root
 			SceneNode() = default;
 
-
 			//Construct a scene node as the root with the given visibility
 			explicit SceneNode(bool visible) noexcept;
 
@@ -118,16 +117,6 @@ namespace ion::graphics::scene::graph
 
 			//Construct a scene node as the root with the given position, initial direction and visibility
 			explicit SceneNode(const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true) noexcept;
-
-
-			//Construct a scene node as a child of the given parent node and visibility
-			explicit SceneNode(SceneNode &parent_node, bool visible = true);
-
-			//Construct a scene node as a child of the given parent node, initial direction and visibility
-			SceneNode(SceneNode &parent_node, const Vector2 &initial_direction, bool visible = true);
-
-			//Construct a scene node as a child of the given parent node, position, initial direction and visibility
-			SceneNode(SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true);
 
 
 			//Destructor
@@ -421,12 +410,21 @@ namespace ion::graphics::scene::graph
 			*/
 
 			//Adopt (take ownership of) the given scene node and returns a pointer to the adopted node
+			//Returns nullptr if the scene node could not be adopted and scene node will remain untouched
+			NonOwningPtr<SceneNode> Adopt(OwningPtr<SceneNode> &scene_node);
+
+			//Adopt (take ownership of) the given scene node and returns a pointer to the adopted node
 			//Returns nullptr if the scene node could not be adopted and scene node will be released
-			NonOwningPtr<SceneNode> Adopt(OwningPtr<SceneNode> scene_node);
+			NonOwningPtr<SceneNode> Adopt(OwningPtr<SceneNode> &&scene_node);
+
+
+			//Adopt (take ownership of) all the given scene nodes
+			//If one or more scene nodes could not be adopted, they will remain untouched in the given container
+			void Adopt(scene_node::detail::scene_node_container &scene_nodes);
 
 			//Adopt (take ownership of) all the given scene nodes
 			//If one or more scene nodes could not be adopted, they will be released
-			void Adopt(scene_node::detail::scene_node_container &scene_nodes);
+			void Adopt(scene_node::detail::scene_node_container &&scene_nodes);
 
 
 			//Orphan (release ownership of) the given child node

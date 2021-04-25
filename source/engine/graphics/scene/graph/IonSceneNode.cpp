@@ -13,6 +13,8 @@ File:	IonSceneNode.cpp
 #include "IonSceneNode.h"
 
 #include <algorithm>
+#include <cassert>
+
 #include "graphics/scene/IonMovableObject.h"
 
 namespace ion::graphics::scene::graph
@@ -43,9 +45,10 @@ OwningPtr<SceneNode> SceneNode::Extract(SceneNode &child_node) noexcept
 	//Child node found
 	if (iter != std::end(child_nodes_))
 	{
-		auto node_ptr = std::move(*iter); //Extend lifetime
-		child_nodes_.erase(iter);
-		return std::move(node_ptr);
+		auto node = std::move(*iter); //Extend lifetime
+		node->parent_node_ = nullptr;
+		child_nodes_.erase(iter);	
+		return std::move(node);
 	}
 	else
 		return nullptr;
@@ -56,9 +59,13 @@ scene_node::detail::scene_node_container SceneNode::ExtractAll() noexcept
 	//Something to remove
 	if (!std::empty(child_nodes_))
 	{
-		auto scene_nodes = std::move(child_nodes_); //Extend lifetime
+		auto nodes = std::move(child_nodes_); //Extend lifetime
+		
+		for (auto &node : nodes)
+			node->parent_node_ = nullptr;
+
 		child_nodes_.shrink_to_fit();	
-		return std::move(scene_nodes);
+		return std::move(nodes);
 	}
 	else
 		return {};
@@ -67,33 +74,25 @@ scene_node::detail::scene_node_container SceneNode::ExtractAll() noexcept
 
 //Public
 
-SceneNode::SceneNode(bool visible) noexcept
+SceneNode::SceneNode(bool visible) noexcept :
+	visible_{visible}
 {
 	//Empty
 }
 
-SceneNode::SceneNode(const Vector2 &initial_direction, bool visible) noexcept
+SceneNode::SceneNode(const Vector2 &initial_direction, bool visible) noexcept :
+
+	initial_direction_{initial_direction},
+	visible_{visible}
 {
 	//Empty
 }
 
-SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept
-{
-	//Empty
-}
+SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept :
 
-
-SceneNode::SceneNode(SceneNode &parent_node, bool visible)
-{
-	//Empty
-}
-
-SceneNode::SceneNode(SceneNode &parent_node, const Vector2 &initial_direction, bool visible)
-{
-	//Empty
-}
-
-SceneNode::SceneNode(SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction, bool visible)
+	position_{position},
+	initial_direction_{initial_direction},
+	visible_{visible}
 {
 	//Empty
 }
@@ -149,17 +148,23 @@ void SceneNode::LookAt(const Vector3 &position) noexcept
 
 NonOwningPtr<SceneNode> SceneNode::CreateChildNode(bool visible)
 {
-	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), visible));
+	auto &node = child_nodes_.emplace_back(make_owning<SceneNode>(visible));
+	node->parent_node_ = this;
+	return node;
 }
 
 NonOwningPtr<SceneNode> SceneNode::CreateChildNode(const Vector2 &initial_direction, bool visible)
 {
-	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), initial_direction, visible));
+	auto &node = child_nodes_.emplace_back(make_owning<SceneNode>(initial_direction, visible));
+	node->parent_node_ = this;
+	return node;
 }
 
 NonOwningPtr<SceneNode> SceneNode::CreateChildNode(const Vector3 &position, const Vector2 &initial_direction, bool visible)
 {
-	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), position, initial_direction, visible));
+	auto &node = child_nodes_.emplace_back(make_owning<SceneNode>(position, initial_direction, visible));
+	node->parent_node_ = this;
+	return node;
 }
 
 
@@ -168,14 +173,39 @@ NonOwningPtr<SceneNode> SceneNode::CreateChildNode(const Vector3 &position, cons
 	Take / release ownership
 */
 
-NonOwningPtr<SceneNode> SceneNode::Adopt(OwningPtr<SceneNode> scene_node)
+NonOwningPtr<SceneNode> SceneNode::Adopt(OwningPtr<SceneNode> &scene_node)
 {
-	return nullptr;
+	assert(scene_node);
+
+	auto &node = child_nodes_.emplace_back(std::move(scene_node));
+	node->parent_node_ = this;
+	node->NotifyUpdate();
+	return node;
 }
+
+NonOwningPtr<SceneNode> SceneNode::Adopt(OwningPtr<SceneNode> &&scene_node)
+{
+	return Adopt(scene_node);
+}
+
 
 void SceneNode::Adopt(detail::scene_node_container &scene_nodes)
 {
+	for (auto iter = std::begin(scene_nodes); iter != std::end(scene_nodes);)
+	{
+		if (*iter)
+		{
+			Adopt(*iter);
+			iter = scene_nodes.erase(iter);
+		}
+		else
+			++iter;
+	}
+}
 
+void SceneNode::Adopt(detail::scene_node_container &&scene_nodes)
+{
+	return Adopt(scene_nodes);
 }
 
 
@@ -202,8 +232,8 @@ void SceneNode::ClearChildNodes() noexcept
 
 bool SceneNode::RemoveChildNode(SceneNode &child_node) noexcept
 {
-	auto ptr = Extract(child_node);
-	return !!ptr;
+	auto node = Extract(child_node);
+	return !!node;
 }
 
 
