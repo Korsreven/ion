@@ -14,13 +14,16 @@ File:	IonSceneNode.cpp
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 
 #include "graphics/scene/IonMovableObject.h"
+#include "utilities/IonMath.h"
 
 namespace ion::graphics::scene::graph
 {
 
 using namespace scene_node;
+using namespace ion::utilities;
 
 namespace scene_node::detail
 {
@@ -105,28 +108,43 @@ SceneNode::~SceneNode() noexcept
 
 
 /*
+	Observers
+*/
+
+bool SceneNode::AxisAligned() noexcept
+{
+	//Axis aligned when 0, +-90, +-180, +-270 and +-360 (half degree tolerance)
+	return std::fmod(math::Round(math::ToDegrees(WorldRotation())), 90.0_r) == 0.0_r;
+}
+
+
+/*
 	Transformations
 	Relative
 */
 
 void SceneNode::Translate(const Vector3 &unit) noexcept
 {
-
+	if (unit != vector3::Zero)
+		Position(position_ + unit.Deviant(unit.SignedAngleBetween(vector3::UnitY)));
 }
 
 void SceneNode::Translate(real unit) noexcept
 {
-
+	if (unit != 0.0_r)
+		Position(position_ + direction_ * unit);
 }
 
 void SceneNode::Rotate(real angle) noexcept
 {
-
+	if (angle != 0.0_r)
+		Rotation(rotation_ + angle);
 }
 
 void SceneNode::Scale(const Vector2 &unit) noexcept
 {
-
+	if (unit != vector2::Zero)
+		Scaling(scaling_ + unit);
 }
 
 
@@ -137,7 +155,7 @@ void SceneNode::Scale(const Vector2 &unit) noexcept
 
 void SceneNode::LookAt(const Vector3 &position) noexcept
 {
-
+	Rotate((position - WorldPosition()).SignedAngleBetween(WorldDirection()));
 }
 
 

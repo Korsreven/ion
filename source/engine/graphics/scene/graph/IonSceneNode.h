@@ -356,10 +356,7 @@ namespace ion::graphics::scene::graph
 
 
 			//Returns true if this node is axis aligned
-			[[nodiscard]] inline auto AxisAligned() noexcept
-			{
-				return true;
-			}
+			[[nodiscard]] bool AxisAligned() noexcept;
 
 
 			/*
