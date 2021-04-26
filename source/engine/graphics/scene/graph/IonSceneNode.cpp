@@ -33,6 +33,47 @@ namespace scene_node::detail
 //Private
 
 /*
+	Updating
+*/
+
+void SceneNode::Update() const noexcept
+{
+	if (parent_node_)
+	{
+		if (parent_node_->need_update_)
+			parent_node_->Update(); //Recursive
+		else
+		{
+			derived_rotation_ = inherit_rotation_ ? rotation_ + parent_node_->derived_rotation_ : rotation_;
+			derived_direction_ = initial_direction_.Deviant(parent_node_->derived_rotation_);
+			derived_scaling_ = inherit_scaling_ ? scaling_ * parent_node_->scaling_ : scaling_;
+
+			switch (rotation_origin_)
+			{
+				case NodeRotationOrigin::Local:
+				derived_position_ = position_ * parent_node_->scaling_ + parent_node_->derived_position_;
+				break;
+
+				case NodeRotationOrigin::Parent:
+				default:
+				derived_position_ = (position_ * parent_node_->scaling_).Deviant(parent_node_->derived_rotation_) + parent_node_->derived_position_;
+				break;
+			}
+		}
+	}
+	else
+	{
+		derived_position_ = position_;
+		derived_direction_ = direction_;
+		derived_rotation_ = rotation_;
+		derived_scaling_ = scaling_;
+	}
+
+	need_update_ = false;
+}
+
+
+/*
 	Removing
 */
 
@@ -57,7 +98,7 @@ OwningPtr<SceneNode> SceneNode::Extract(SceneNode &child_node) noexcept
 		return nullptr;
 }
 
-scene_node::detail::scene_node_container SceneNode::ExtractAll() noexcept
+detail::scene_node_container SceneNode::ExtractAll() noexcept
 {
 	//Something to remove
 	if (!std::empty(child_nodes_))
@@ -103,7 +144,7 @@ SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, 
 
 SceneNode::~SceneNode() noexcept
 {
-	DetachAll();
+	DetachAllObjects();
 }
 
 
@@ -111,10 +152,10 @@ SceneNode::~SceneNode() noexcept
 	Observers
 */
 
-bool SceneNode::AxisAligned() noexcept
+bool SceneNode::AxisAligned() const noexcept
 {
 	//Axis aligned when 0, +-90, +-180, +-270 and +-360 (half degree tolerance)
-	return std::fmod(math::Round(math::ToDegrees(WorldRotation())), 90.0_r) == 0.0_r;
+	return std::fmod(math::Round(math::ToDegrees(DerivedRotation())), 90.0_r) == 0.0_r;
 }
 
 
@@ -155,7 +196,7 @@ void SceneNode::Scale(const Vector2 &unit) noexcept
 
 void SceneNode::LookAt(const Vector3 &position) noexcept
 {
-	Rotate((position - WorldPosition()).SignedAngleBetween(WorldDirection()));
+	Rotate((position - DerivedPosition()).SignedAngleBetween(DerivedDirection()));
 }
 
 
@@ -259,7 +300,7 @@ bool SceneNode::RemoveChildNode(SceneNode &child_node) noexcept
 	Movable objects
 */
 
-bool SceneNode::Attach(NonOwningPtr<MovableObject> movable_object)
+bool SceneNode::AttachObject(NonOwningPtr<MovableObject> movable_object)
 {
 	if (movable_object && !movable_object->ParentNode())
 	{
@@ -271,7 +312,7 @@ bool SceneNode::Attach(NonOwningPtr<MovableObject> movable_object)
 		return false;
 }
 
-bool SceneNode::Detach(MovableObject &movable_object) noexcept
+bool SceneNode::DetachObject(MovableObject &movable_object) noexcept
 {
 	auto iter =
 		std::find_if(std::begin(movable_objects_), std::end(movable_objects_),
@@ -291,7 +332,7 @@ bool SceneNode::Detach(MovableObject &movable_object) noexcept
 		return false;
 }
 
-void SceneNode::DetachAll() noexcept
+void SceneNode::DetachAllObjects() noexcept
 {
 	for (auto &mov_object : movable_objects_)
 	{

@@ -70,22 +70,20 @@ namespace ion::graphics::scene::graph
 			SceneNode *parent_node_ = nullptr;
 			scene_node::detail::scene_node_container child_nodes_;
 			scene_node::detail::movable_object_container movable_objects_;
-
-
-			Vector3 world_position_;
-			Vector2 world_direction_ = vector2::UnitY;
-			real world_rotation_ = 0.0_r;
-			Vector2 world_scaling_ = vector2::UnitScale;
-
-			Matrix4 world_tranformation_;
-			Matrix4 world_transformation_projection_;
-
-			bool need_update_ = true;
 			bool rearrange_node_ = true;
 
 
+			mutable Vector3 derived_position_;
+			mutable Vector2 derived_direction_ = vector2::UnitY;
+			mutable real derived_rotation_ = 0.0_r;
+			mutable Vector2 derived_scaling_ = vector2::UnitScale;
+			mutable Matrix4 full_tranformation_;
+
+			mutable bool need_update_ = true;
+
+
 			/*
-				Notifying
+				Updating
 			*/
 
 			inline void NotifyUpdate() noexcept
@@ -95,6 +93,8 @@ namespace ion::graphics::scene::graph
 				for (auto &child_node : child_nodes_)
 					child_node->NotifyUpdate(); //Recursive
 			}
+
+			void Update() const noexcept;
 
 
 			/*
@@ -180,6 +180,7 @@ namespace ion::graphics::scene::graph
 				if (direction_ != direction)
 				{
 					direction_ = direction;
+					rotation_ = direction.SignedAngleBetween(initial_direction_); //Update rotation
 					NotifyUpdate();
 				}
 			}
@@ -190,11 +191,12 @@ namespace ion::graphics::scene::graph
 				if (rotation_ != angle)
 				{
 					rotation_ = angle;
+					direction_ = initial_direction_.Deviant(angle); //Update direction
 					NotifyUpdate();
 				}
 			}
 
-			//Sets the local rotation of this node to the given scaling
+			//Sets the local scaling of this node to the given scaling
 			inline void Scaling(const Vector2 &scaling) noexcept
 			{
 				if (scaling_ != scaling)
@@ -235,7 +237,8 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
-			//Sets whether or not this node should be visible
+			//Sets whether or not this and all attached nodes should be visible
+			//If cascade is set to false, only this node is set
 			inline void Visible(bool visible, bool cascade = true) noexcept
 			{
 				visible_ = visible;
@@ -244,6 +247,19 @@ namespace ion::graphics::scene::graph
 				{
 					for (auto &child_node : child_nodes_)
 						child_node->Visible(visible); //Recursive
+				}
+			}
+
+			//Flips the visibility of this and all attached nodes
+			//If cascade is set to false, only this node is flipped
+			inline void FlipVisibility(bool cascade = true) noexcept
+			{
+				visible_ = !visible_;
+
+				if (cascade)
+				{
+					for (auto &child_node : child_nodes_)
+						child_node->FlipVisibility(); //Recursive
 				}
 			}
 
@@ -317,46 +333,54 @@ namespace ion::graphics::scene::graph
 
 
 
-			//Returns the world position of this node
-			[[nodiscard]] inline auto& WorldPosition() const noexcept
+			//Returns the derived position of this node
+			[[nodiscard]] inline auto& DerivedPosition() const noexcept
 			{
-				return world_position_;
+				if (need_update_)
+					Update();
+
+				return derived_position_;
 			}
 
-			//Returns the world direction of this node
-			[[nodiscard]] inline auto& WorldDirection() const noexcept
+			//Returns the derived direction of this node
+			[[nodiscard]] inline auto& DerivedDirection() const noexcept
 			{
-				return world_direction_;
+				if (need_update_)
+					Update();
+
+				return derived_direction_;
 			}
 
-			//Returns the world rotation of this node in radians
-			[[nodiscard]] auto WorldRotation() const noexcept
+			//Returns the derived rotation of this node in radians
+			[[nodiscard]] inline auto DerivedRotation() const noexcept
 			{
-				return world_rotation_;
+				if (need_update_)
+					Update();
+
+				return derived_rotation_;
 			}
 
-			//Returns the world scaling of this node
-			[[nodiscard]] inline auto& WorldScaling() const noexcept
+			//Returns the derived scaling of this node
+			[[nodiscard]] inline auto& DerivedScaling() const noexcept
 			{
-				return world_scaling_;
+				if (need_update_)
+					Update();
+
+				return derived_scaling_;
 			}
 
-
-			//Returns the world transformation matrix for this node
-			[[nodiscard]] inline auto& WorldTransformation() const noexcept
+			//Returns the full transformation matrix for this node
+			[[nodiscard]] inline auto& FullTransformation() const noexcept
 			{
-				return world_tranformation_;
-			}
+				if (need_update_)
+					Update();
 
-			//Returns the world transformation projection matrix for this node
-			[[nodiscard]] inline auto& WorldTransformationProjection() const noexcept
-			{
-				return world_transformation_projection_;
+				return full_tranformation_;
 			}
 
 
 			//Returns true if this node is axis aligned
-			[[nodiscard]] bool AxisAligned() noexcept;
+			[[nodiscard]] bool AxisAligned() const noexcept;
 
 
 			/*
@@ -452,14 +476,14 @@ namespace ion::graphics::scene::graph
 
 			//Attach the given movable object to this node if not already attached
 			//Return true if the given movable object was attached
-			bool Attach(NonOwningPtr<MovableObject> movable_object);
+			bool AttachObject(NonOwningPtr<MovableObject> movable_object);
 
 			//Detach the given movable objects if attached to this node
 			//Returns true if the given movable object was detached
-			bool Detach(MovableObject &movable_object) noexcept;
+			bool DetachObject(MovableObject &movable_object) noexcept;
 
 			//Detach all movable objects attached to this node
-			void DetachAll() noexcept;
+			void DetachAllObjects() noexcept;
 	};
 } //ion::graphics::scene::graph
 
