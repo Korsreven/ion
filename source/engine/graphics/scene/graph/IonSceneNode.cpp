@@ -45,18 +45,18 @@ void SceneNode::Update() const noexcept
 		else
 		{
 			derived_rotation_ = inherit_rotation_ ? rotation_ + parent_node_->derived_rotation_ : rotation_;
-			derived_direction_ = initial_direction_.Deviant(parent_node_->derived_rotation_);
-			derived_scaling_ = inherit_scaling_ ? scaling_ * parent_node_->scaling_ : scaling_;
+			derived_direction_ = initial_direction_.Deviant(derived_rotation_);
+			derived_scaling_ = inherit_scaling_ ? scaling_ * parent_node_->derived_scaling_ : scaling_;
 
 			switch (rotation_origin_)
 			{
 				case NodeRotationOrigin::Local:
-				derived_position_ = position_ * parent_node_->scaling_ + parent_node_->derived_position_;
+				derived_position_ = position_ * parent_node_->derived_scaling_ + parent_node_->derived_position_;
 				break;
 
 				case NodeRotationOrigin::Parent:
 				default:
-				derived_position_ = (position_ * parent_node_->scaling_).Deviant(parent_node_->derived_rotation_) + parent_node_->derived_position_;
+				derived_position_ = (position_ * parent_node_->derived_scaling_).Deviant(parent_node_->derived_rotation_) + parent_node_->derived_position_;
 				break;
 			}
 		}
