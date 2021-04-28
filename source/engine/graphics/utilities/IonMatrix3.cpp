@@ -158,6 +158,22 @@ Matrix3 Matrix3::Translation(const Vector2 &vector) noexcept
 	#endif
 }
 
+Matrix3 Matrix3::Transformation(real rotation, const Vector2 &scaling, const Vector2 &translation) noexcept
+{
+	auto rot = Rotation(rotation);
+
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+	return {rot.M00() * scaling.X(), rot.M01() * scaling.X(),
+			rot.M10() * scaling.Y(), rot.M11() * scaling.Y(),
+			translation.X(), translation.Y()};
+	#else
+	//Column-major layout (OpenGL)
+	return {rot.M00() * scaling.X(), rot.M01() * scaling.Y(), translation.X(),
+			rot.M10() * scaling.X(), rot.M11() * scaling.Y(), translation.Y()};
+	#endif
+}
+
 
 /*
 	Matrix conversions

@@ -48,6 +48,8 @@ namespace ion::graphics::scene::graph
 		{
 			using scene_node_container = std::vector<OwningPtr<SceneNode>>;
 			using movable_object_container = std::vector<NonOwningPtr<MovableObject>>;
+
+			Matrix4 make_transformation(const Vector3 &position, real rotation, const Vector2 &scaling) noexcept;
 		} //detail
 	} //scene_node
 
@@ -80,6 +82,7 @@ namespace ion::graphics::scene::graph
 			mutable Matrix4 full_tranformation_;
 
 			mutable bool need_update_ = true;
+			mutable bool transformation_out_of_date_ = true;
 
 
 			/*
@@ -374,6 +377,13 @@ namespace ion::graphics::scene::graph
 			{
 				if (need_update_)
 					Update();
+
+				if (transformation_out_of_date_)
+				{
+					full_tranformation_ =
+						scene_node::detail::make_transformation(derived_position_, derived_rotation_, derived_scaling_);
+					transformation_out_of_date_ = false;
+				}
 
 				return full_tranformation_;
 			}

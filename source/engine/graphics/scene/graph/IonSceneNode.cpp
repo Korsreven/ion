@@ -17,6 +17,7 @@ File:	IonSceneNode.cpp
 #include <cmath>
 
 #include "graphics/scene/IonMovableObject.h"
+#include "graphics/utilities/IonMatrix3.h"
 #include "utilities/IonMath.h"
 
 namespace ion::graphics::scene::graph
@@ -27,6 +28,12 @@ using namespace ion::utilities;
 
 namespace scene_node::detail
 {
+
+Matrix4 make_transformation(const Vector3 &position, real rotation, const Vector2 &scaling) noexcept
+{
+	return Matrix4::Transformation(rotation, Vector3{scaling.X(), scaling.Y(), 1.0_r}, position);
+}
+
 } //scene_node::detail
 
 
@@ -70,6 +77,7 @@ void SceneNode::Update() const noexcept
 	}
 
 	need_update_ = false;
+	transformation_out_of_date_ = true;
 }
 
 
