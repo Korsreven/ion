@@ -17,7 +17,6 @@ File:	IonSceneNode.cpp
 #include <cmath>
 
 #include "graphics/scene/IonMovableObject.h"
-#include "graphics/utilities/IonMatrix3.h"
 #include "utilities/IonMath.h"
 
 namespace ion::graphics::scene::graph
