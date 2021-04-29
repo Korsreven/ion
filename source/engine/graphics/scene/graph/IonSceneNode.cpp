@@ -29,6 +29,12 @@ using namespace ion::utilities;
 namespace scene_node::detail
 {
 
+bool scene_node_comparator::operator()(const SceneNode *x, const SceneNode *y) const noexcept
+{
+	return *x < *y;
+}
+
+
 Matrix4 make_transformation(const Vector3 &position, real rotation, const Vector2 &scaling) noexcept
 {
 	return Matrix4::Transformation(rotation, Vector3{scaling.X(), scaling.Y(), 1.0_r}, position);
@@ -362,7 +368,7 @@ bool SceneNode::AttachObject(Camera &camera)
 {
 	if (AttachObject(static_cast<MovableObject&>(camera)))
 	{
-		RootNode()->attached_cameras_.insert(&camera);
+		RootNode().attached_cameras_.insert(&camera);
 		return true;
 	}
 	else
@@ -373,7 +379,7 @@ bool SceneNode::DetachObject(Camera &camera) noexcept
 {
 	if (DetachObject(static_cast<MovableObject&>(camera)))
 	{
-		RootNode()->attached_cameras_.erase(&camera);
+		RootNode().attached_cameras_.erase(&camera);
 		return true;
 	}
 	else
@@ -390,7 +396,7 @@ bool SceneNode::AttachObject(Light &light)
 {
 	if (AttachObject(static_cast<MovableObject&>(light)))
 	{
-		RootNode()->attached_lights_.insert(&light);
+		RootNode().attached_lights_.insert(&light);
 		return true;
 	}
 	else
@@ -401,7 +407,7 @@ bool SceneNode::DetachObject(Light &light) noexcept
 {
 	if (DetachObject(static_cast<MovableObject&>(light)))
 	{
-		RootNode()->attached_lights_.erase(&light);
+		RootNode().attached_lights_.erase(&light);
 		return true;
 	}
 	else

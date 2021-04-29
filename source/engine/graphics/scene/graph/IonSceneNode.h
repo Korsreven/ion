@@ -58,10 +58,16 @@ namespace ion::graphics::scene::graph
 			using camera_container = adaptors::FlatSet<Camera*>;
 			using light_container = adaptors::FlatSet<Light*>;
 
+			struct scene_node_comparator
+			{
+				bool operator()(const SceneNode *x, const SceneNode *y) const noexcept;
+			};
+
 
 			template <typename Compare>
 			inline void add_node(scene_node_container &scene_nodes, SceneNode *scene_node, Compare compare)
 			{
+				//Search for first scene node with greater z-order
 				auto iter = std::upper_bound(std::begin(scene_nodes), std::end(scene_nodes), scene_node, compare);
 				scene_nodes.insert(iter, scene_node);
 			}
@@ -69,10 +75,17 @@ namespace ion::graphics::scene::graph
 			template <typename Compare>
 			inline void remove_node(scene_node_container &scene_nodes, SceneNode *scene_node, Compare compare) noexcept
 			{
-				if (auto iter = std::lower_bound(std::begin(scene_nodes), std::end(scene_nodes), scene_node, compare);
-					iter != std::end(scene_nodes) && !compare(scene_node, *iter)) //Todo
+				//Search for first scene node with equal z-order
+				if (auto first = std::lower_bound(std::begin(scene_nodes), std::end(scene_nodes), scene_node, compare);
+					first != std::end(scene_nodes) && !compare(scene_node, *first)) //Found
+				{
+					//Search for first scene node with greater z-order
+					auto last = std::upper_bound(first, std::end(scene_nodes), scene_node, compare);			
 
-					scene_nodes.erase(iter);
+					//Search for exact scene node in range [first, last)
+					if (first = std::find(first, last); first != last) //Found
+						scene_nodes.erase(first);
+				}
 			}
 
 			template <typename Compare>
@@ -80,13 +93,14 @@ namespace ion::graphics::scene::graph
 			{
 				auto size = std::size(dest);
 
+				//Insert source nodes to the back of dest nodes
 				dest.insert(
 					std::end(dest),
 					std::begin(source), std::end(source));
 
-				//Something to move
+				//One or more source node has been inserted
 				if (auto first = std::begin(dest) + size; first != std::begin(dest))
-					//Move source nodes and merge with dest nodes
+					//Merge dest and source nodes
 					std::inplace_merge(
 						std::begin(dest), first,
 						std::end(dest), compare);
@@ -135,23 +149,6 @@ namespace ion::graphics::scene::graph
 			mutable bool transformation_out_of_date_ = true;
 
 
-			inline auto RootNode() noexcept -> decltype(this)
-			{
-				if (parent_node_)
-					return parent_node_->RootNode(); //Recursive
-
-				return this;
-			}
-
-			inline auto RootNode() const noexcept -> decltype(this)
-			{
-				if (parent_node_)
-					return parent_node_->RootNode(); //Recursive
-
-				return this;
-			}
-
-
 			/*
 				Updating
 			*/
@@ -191,6 +188,18 @@ namespace ion::graphics::scene::graph
 
 			//Destructor
 			~SceneNode() noexcept;
+
+
+			/*
+				Operators
+			*/
+
+			//Checks if one node is less than another one (z-order)
+			//Needed for sorting two nodes (strict weak ordering)
+			[[nodiscard]] inline auto operator<(const SceneNode &rhs) const noexcept
+			{
+				return position_.Z() < rhs.position_.Z();
+			}
 
 
 			/*
@@ -451,6 +460,14 @@ namespace ion::graphics::scene::graph
 				return parent_node_;
 			}
 
+			//Returns the root node of this node
+			[[nodiscard]] inline auto RootNode() const noexcept -> SceneNode&
+			{
+				if (parent_node_)
+					return parent_node_->RootNode(); //Recursive
+				else
+					return const_cast<SceneNode&>(*this);
+			}
 
 
 			//Returns the derived position of this node
