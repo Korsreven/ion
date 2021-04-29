@@ -12,7 +12,6 @@ File:	IonSceneNode.cpp
 
 #include "IonSceneNode.h"
 
-#include <algorithm>
 #include <cassert>
 #include <cmath>
 
