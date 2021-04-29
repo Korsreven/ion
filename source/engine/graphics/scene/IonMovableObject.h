@@ -24,12 +24,9 @@ namespace ion::graphics::scene
 		class SceneNode; //Forward declaration
 	}
 
-	namespace movable_object
+	namespace movable_object::detail
 	{
-		namespace detail
-		{
-		} //detail
-	} //movable_object
+	} //movable_object::detail
 
 
 	//A movable object that can be attached to a scene node
@@ -49,31 +46,16 @@ namespace ion::graphics::scene
 			MovableObject() = default;
 
 			//Construct a movable object with the given visibility
-			explicit MovableObject(bool visible) :
-				visible_{visible}
-			{
-				//Empty
-			}
+			explicit MovableObject(bool visible);
 
 			//Construct a movable object with the given name and visibility
-			explicit MovableObject(std::string name, bool visible = true) :
-				managed::ManagedObject<SceneManager>{std::move(name)},
-				visible_{visible}
-			{
-				//Empty
-			}
+			explicit MovableObject(std::string name, bool visible = true);
 
 			//Copy constructor
-			MovableObject(const MovableObject &rhs) noexcept :
+			MovableObject(const MovableObject &rhs) noexcept;
 
-				managed::ManagedObject<SceneManager>{rhs},
-				parent_node_{nullptr} //A copy of a movable object has no parent node
-			{
-				//Empty
-			}
-
-			//Default virtual destructor
-			virtual ~MovableObject() = default;
+			//Virtual destructor
+			virtual ~MovableObject() noexcept;
 
 
 			/*

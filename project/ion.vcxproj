@@ -204,6 +204,7 @@
     <ClCompile Include="..\source\engine\graphics\scene\IonLight.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonModel.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonMovableAnimation.cpp" />
+    <ClCompile Include="..\source\engine\graphics\scene\IonMovableObject.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonMovableParticleSystem.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonMovableText.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonSceneManager.cpp" />

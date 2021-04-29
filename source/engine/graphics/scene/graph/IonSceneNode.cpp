@@ -16,6 +16,8 @@ File:	IonSceneNode.cpp
 #include <cassert>
 #include <cmath>
 
+#include "graphics/scene/IonCamera.h"
+#include "graphics/scene/IonLight.h"
 #include "graphics/scene/IonMovableObject.h"
 #include "utilities/IonMath.h"
 
@@ -105,7 +107,7 @@ OwningPtr<SceneNode> SceneNode::Extract(SceneNode &child_node) noexcept
 		return nullptr;
 }
 
-detail::scene_node_container SceneNode::ExtractAll() noexcept
+SceneNodes SceneNode::ExtractAll() noexcept
 {
 	//Something to remove
 	if (!std::empty(child_nodes_))
@@ -255,7 +257,7 @@ NonOwningPtr<SceneNode> SceneNode::Adopt(OwningPtr<SceneNode> &&scene_node)
 }
 
 
-void SceneNode::Adopt(detail::scene_node_container &scene_nodes)
+void SceneNode::Adopt(SceneNodes &scene_nodes)
 {
 	for (auto iter = std::begin(scene_nodes); iter != std::end(scene_nodes);)
 	{
@@ -269,7 +271,7 @@ void SceneNode::Adopt(detail::scene_node_container &scene_nodes)
 	}
 }
 
-void SceneNode::Adopt(detail::scene_node_container &&scene_nodes)
+void SceneNode::Adopt(SceneNodes &&scene_nodes)
 {
 	return Adopt(scene_nodes);
 }
@@ -280,7 +282,7 @@ OwningPtr<SceneNode> SceneNode::Orphan(SceneNode &child_node) noexcept
 	return Extract(child_node);
 }
 
-detail::scene_node_container SceneNode::OrphanAll() noexcept
+SceneNodes SceneNode::OrphanAll() noexcept
 {
 	return ExtractAll();
 }
@@ -307,12 +309,12 @@ bool SceneNode::RemoveChildNode(SceneNode &child_node) noexcept
 	Movable objects
 */
 
-bool SceneNode::AttachObject(NonOwningPtr<MovableObject> movable_object)
+bool SceneNode::AttachObject(MovableObject &movable_object)
 {
-	if (movable_object && !movable_object->ParentNode())
+	if (!movable_object.ParentNode())
 	{
-		movable_object->ParentNode(this);
-		movable_objects_.push_back(movable_object);
+		movable_object.ParentNode(this);
+		attached_objects_.push_back(&movable_object);
 		return true;
 	}
 	else
@@ -322,17 +324,17 @@ bool SceneNode::AttachObject(NonOwningPtr<MovableObject> movable_object)
 bool SceneNode::DetachObject(MovableObject &movable_object) noexcept
 {
 	auto iter =
-		std::find_if(std::begin(movable_objects_), std::end(movable_objects_),
+		std::find_if(std::begin(attached_objects_), std::end(attached_objects_),
 			[&](auto &x) noexcept
 			{
-				return x.get() == &movable_object;
+				return x == &movable_object;
 			});
 
 	//Movable object found
-	if (iter != std::end(movable_objects_))
+	if (iter != std::end(attached_objects_))
 	{
 		(*iter)->ParentNode(nullptr);
-		movable_objects_.erase(iter);
+		attached_objects_.erase(iter);
 		return true;
 	}
 	else
@@ -341,14 +343,70 @@ bool SceneNode::DetachObject(MovableObject &movable_object) noexcept
 
 void SceneNode::DetachAllObjects() noexcept
 {
-	for (auto &mov_object : movable_objects_)
+	for (auto &mov_object : attached_objects_)
 	{
 		if (mov_object)
 			mov_object->ParentNode(nullptr);
 	}
 
-	movable_objects_.clear();
-	movable_objects_.shrink_to_fit();
+	attached_objects_.clear();
+	attached_objects_.shrink_to_fit();
+}
+
+
+/*
+	Attached objects
+	Camera
+*/
+
+bool SceneNode::AttachObject(Camera &camera)
+{
+	if (AttachObject(static_cast<MovableObject&>(camera)))
+	{
+		RootNode()->attached_cameras_.insert(&camera);
+		return true;
+	}
+	else
+		return false;
+}
+
+bool SceneNode::DetachObject(Camera &camera) noexcept
+{
+	if (DetachObject(static_cast<MovableObject&>(camera)))
+	{
+		RootNode()->attached_cameras_.erase(&camera);
+		return true;
+	}
+	else
+		return false;
+}
+
+
+/*
+	Attached objects
+	Light
+*/
+
+bool SceneNode::AttachObject(Light &light)
+{
+	if (AttachObject(static_cast<MovableObject&>(light)))
+	{
+		RootNode()->attached_lights_.insert(&light);
+		return true;
+	}
+	else
+		return false;
+}
+
+bool SceneNode::DetachObject(Light &light) noexcept
+{
+	if (DetachObject(static_cast<MovableObject&>(light)))
+	{
+		RootNode()->attached_lights_.erase(&light);
+		return true;
+	}
+	else
+		return false;
 }
 
 } //ion::graphics::scene::graph

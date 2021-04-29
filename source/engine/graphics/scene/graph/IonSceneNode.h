@@ -13,10 +13,11 @@ File:	IonSceneNode.h
 #ifndef ION_SCENE_NODE
 #define ION_SCENE_NODE
 
+#include <algorithm>
 #include <vector>
 
+#include "adaptors/IonFlatSet.h"
 #include "adaptors/ranges/IonDereferenceIterable.h"
-#include "adaptors/ranges/IonIterable.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
@@ -24,9 +25,12 @@ File:	IonSceneNode.h
 #include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
 
+//Forward declaration
 namespace ion::graphics::scene
 {
-	class MovableObject;  //Forward declaration
+	class MovableObject;
+	class Camera;
+	class Light;
 }
 
 namespace ion::graphics::scene::graph
@@ -44,10 +48,53 @@ namespace ion::graphics::scene::graph
 			Local
 		};
 
+		using SceneNodes = std::vector<OwningPtr<SceneNode>>;
+
+
 		namespace detail
 		{
-			using scene_node_container = std::vector<OwningPtr<SceneNode>>;
-			using movable_object_container = std::vector<NonOwningPtr<MovableObject>>;
+			using scene_node_container = std::vector<SceneNode*>;
+			using movable_object_container = std::vector<MovableObject*>;
+			using camera_container = adaptors::FlatSet<Camera*>;
+			using light_container = adaptors::FlatSet<Light*>;
+
+
+			template <typename Compare>
+			inline void add_node(scene_node_container &scene_nodes, SceneNode *scene_node, Compare compare)
+			{
+				auto iter = std::upper_bound(std::begin(scene_nodes), std::end(scene_nodes), scene_node, compare);
+				scene_nodes.insert(iter, scene_node);
+			}
+
+			template <typename Compare>
+			inline void remove_node(scene_node_container &scene_nodes, SceneNode *scene_node, Compare compare) noexcept
+			{
+				if (auto iter = std::lower_bound(std::begin(scene_nodes), std::end(scene_nodes), scene_node, compare);
+					iter != std::end(scene_nodes) && !compare(scene_node, *iter)) //Todo
+
+					scene_nodes.erase(iter);
+			}
+
+			template <typename Compare>
+			inline void move_nodes(scene_node_container &dest, scene_node_container &source, Compare compare)
+			{
+				auto size = std::size(dest);
+
+				dest.insert(
+					std::end(dest),
+					std::begin(source), std::end(source));
+
+				//Something to move
+				if (auto first = std::begin(dest) + size; first != std::begin(dest))
+					//Move source nodes and merge with dest nodes
+					std::inplace_merge(
+						std::begin(dest), first,
+						std::end(dest), compare);
+
+				source.clear();
+				source.shrink_to_fit();
+			}
+
 
 			Matrix4 make_transformation(const Vector3 &position, real rotation, const Vector2 &scaling) noexcept;
 		} //detail
@@ -70,9 +117,12 @@ namespace ion::graphics::scene::graph
 			bool visible_ = true;
 
 			SceneNode *parent_node_ = nullptr;
-			scene_node::detail::scene_node_container child_nodes_;
-			scene_node::detail::movable_object_container movable_objects_;
-			bool rearrange_node_ = true;
+			scene_node::SceneNodes child_nodes_;
+			scene_node::detail::movable_object_container attached_objects_;
+
+			scene_node::detail::scene_node_container ordered_nodes_; //Root node only
+			scene_node::detail::camera_container attached_cameras_; //Root node only
+			scene_node::detail::light_container attached_lights_; //Root node only
 
 
 			mutable Vector3 derived_position_;
@@ -83,6 +133,23 @@ namespace ion::graphics::scene::graph
 
 			mutable bool need_update_ = true;
 			mutable bool transformation_out_of_date_ = true;
+
+
+			inline auto RootNode() noexcept -> decltype(this)
+			{
+				if (parent_node_)
+					return parent_node_->RootNode(); //Recursive
+
+				return this;
+			}
+
+			inline auto RootNode() const noexcept -> decltype(this)
+			{
+				if (parent_node_)
+					return parent_node_->RootNode(); //Recursive
+
+				return this;
+			}
 
 
 			/*
@@ -105,7 +172,7 @@ namespace ion::graphics::scene::graph
 			*/
 
 			OwningPtr<SceneNode> Extract(SceneNode &child_node) noexcept;
-			scene_node::detail::scene_node_container ExtractAll() noexcept;
+			scene_node::SceneNodes ExtractAll() noexcept;
 
 		public:
 
@@ -134,29 +201,79 @@ namespace ion::graphics::scene::graph
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto ChildNodes() noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<scene_node::detail::scene_node_container&>{child_nodes_};
+				return adaptors::ranges::DereferenceIterable<scene_node::SceneNodes&>{child_nodes_};
 			}
 
 			//Returns an immutable range of all child nodes
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto ChildNodes() const noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<const scene_node::detail::scene_node_container&>{child_nodes_};
+				return adaptors::ranges::DereferenceIterable<const scene_node::SceneNodes&>{child_nodes_};
 			}
 
 
 			//Returns a mutable range of all movable objects attached to this node
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto MovableObjects() noexcept
+			[[nodiscard]] inline auto AttachedObjects() noexcept
 			{
-				return adaptors::ranges::Iterable<scene_node::detail::movable_object_container&>{movable_objects_};
+				return adaptors::ranges::DereferenceIterable<scene_node::detail::movable_object_container&>{attached_objects_};
 			}
 
 			//Returns an immutable range of all movable objects attached to this node
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto MovableObjects() const noexcept
+			[[nodiscard]] inline auto AttachedObjects() const noexcept
 			{
-				return adaptors::ranges::Iterable<const scene_node::detail::movable_object_container&>{movable_objects_};
+				return adaptors::ranges::DereferenceIterable<const scene_node::detail::movable_object_container&>{attached_objects_};
+			}
+
+
+			/*
+				Ranges
+				Root node only
+			*/
+
+			//Returns a mutable range of this and all descendant nodes ordered for rendering
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto OrderedSceneNodes() noexcept
+			{
+				return adaptors::ranges::DereferenceIterable<scene_node::detail::scene_node_container&>{ordered_nodes_};
+			}
+
+			//Returns an immutable range of this and all descendant nodes ordered for rendering
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto OrderedSceneNodes() const noexcept
+			{
+				return adaptors::ranges::DereferenceIterable<const scene_node::detail::scene_node_container&>{ordered_nodes_};
+			}
+
+
+			//Returns a mutable range of all cameras attached to this and all descendant nodes
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto AttachedCameras() noexcept
+			{
+				return adaptors::ranges::DereferenceIterable<scene_node::detail::camera_container&>{attached_cameras_};
+			}
+
+			//Returns an immutable range of all cameras attached to this and all descendant nodes
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto AttachedCameras() const noexcept
+			{
+				return adaptors::ranges::DereferenceIterable<const scene_node::detail::camera_container&>{attached_cameras_};
+			}
+
+
+			//Returns a mutable range of all lights attached to this and all descendant nodes
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto AttachedLights() noexcept
+			{
+				return adaptors::ranges::DereferenceIterable<scene_node::detail::light_container&>{attached_lights_};
+			}
+
+			//Returns an immutable range of all lights attached to this and all descendant nodes
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto AttachedLights() const noexcept
+			{
+				return adaptors::ranges::DereferenceIterable<const scene_node::detail::light_container&>{attached_lights_};
 			}
 
 
@@ -170,7 +287,7 @@ namespace ion::graphics::scene::graph
 				if (position_ != position)
 				{
 					if (position_.Z() != position.Z())
-						rearrange_node_ = true;
+						; //Todo
 
 					position_ = position;
 					NotifyUpdate();
@@ -240,7 +357,7 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
-			//Sets whether or not this and all attached nodes should be visible
+			//Sets whether or not this and all descendant nodes should be visible
 			//If cascade is set to false, only this node is set
 			inline void Visible(bool visible, bool cascade = true) noexcept
 			{
@@ -253,7 +370,7 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
-			//Flips the visibility of this and all attached nodes
+			//Flips the visibility of this and all descendant nodes
 			//If cascade is set to false, only this node is flipped
 			inline void FlipVisibility(bool cascade = true) noexcept
 			{
@@ -451,11 +568,11 @@ namespace ion::graphics::scene::graph
 
 			//Adopt (take ownership of) all the given scene nodes
 			//If one or more scene nodes could not be adopted, they will remain untouched in the given container
-			void Adopt(scene_node::detail::scene_node_container &scene_nodes);
+			void Adopt(scene_node::SceneNodes &scene_nodes);
 
 			//Adopt (take ownership of) all the given scene nodes
 			//If one or more scene nodes could not be adopted, they will be released
-			void Adopt(scene_node::detail::scene_node_container &&scene_nodes);
+			void Adopt(scene_node::SceneNodes &&scene_nodes);
 
 
 			//Orphan (release ownership of) the given child node
@@ -464,7 +581,7 @@ namespace ion::graphics::scene::graph
 
 			//Orphan (release ownership of) all child nodes in this scene node
 			//Returns pointers to the scene nodes released
-			[[nodiscard]] scene_node::detail::scene_node_container OrphanAll() noexcept;
+			[[nodiscard]] scene_node::SceneNodes OrphanAll() noexcept;
 
 
 			/*
@@ -481,12 +598,12 @@ namespace ion::graphics::scene::graph
 
 
 			/*
-				Movable objects
+				Attached objects
 			*/
 
 			//Attach the given movable object to this node if not already attached
 			//Return true if the given movable object was attached
-			bool AttachObject(NonOwningPtr<MovableObject> movable_object);
+			bool AttachObject(MovableObject &movable_object);
 
 			//Detach the given movable objects if attached to this node
 			//Returns true if the given movable object was detached
@@ -494,6 +611,34 @@ namespace ion::graphics::scene::graph
 
 			//Detach all movable objects attached to this node
 			void DetachAllObjects() noexcept;
+
+
+			/*
+				Attached objects
+				Camera
+			*/
+
+			//Attach the given camera to this node if not already attached
+			//Return true if the given camera was attached
+			bool AttachObject(Camera &camera);
+
+			//Detach the given camera if attached to this node
+			//Returns true if the given camera was detached
+			bool DetachObject(Camera &camera) noexcept;
+
+
+			/*
+				Attached objects
+				Light
+			*/
+
+			//Attach the given light to this node if not already attached
+			//Return true if the given light was attached
+			bool AttachObject(Light &light);
+
+			//Detach the given light if attached to this node
+			//Returns true if the given light was detached
+			bool DetachObject(Light &light) noexcept;
 	};
 } //ion::graphics::scene::graph
 
