@@ -86,7 +86,23 @@ void SceneNode::Update() const noexcept
 	}
 
 	need_update_ = false;
+	need_z_update_ = false;
 	transformation_out_of_date_ = true;
+}
+
+void SceneNode::UpdateZ() const noexcept
+{
+	if (parent_node_)
+	{
+		if (parent_node_->need_z_update_)
+			parent_node_->UpdateZ(); //Recursive
+		else
+			derived_position_.Z(position_.Z() + parent_node_->derived_position_.Z());
+	}
+	else
+		derived_position_.Z(position_.Z());
+	
+	need_z_update_ = false;
 }
 
 

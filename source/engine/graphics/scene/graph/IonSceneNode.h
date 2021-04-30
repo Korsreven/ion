@@ -157,6 +157,7 @@ namespace ion::graphics::scene::graph
 			mutable Matrix4 full_tranformation_;
 
 			mutable bool need_update_ = true;
+			mutable bool need_z_update_ = true;
 			mutable bool transformation_out_of_date_ = true;
 
 
@@ -172,7 +173,16 @@ namespace ion::graphics::scene::graph
 					child_node->NotifyUpdate(); //Recursive
 			}
 
+			inline void NotifyUpdateZ() noexcept
+			{
+				need_z_update_ = true;
+
+				for (auto &child_node : child_nodes_)
+					child_node->NotifyUpdateZ(); //Recursive
+			}
+
 			void Update() const noexcept;
+			void UpdateZ() const noexcept;
 
 
 			/*
@@ -215,11 +225,17 @@ namespace ion::graphics::scene::graph
 				Operators
 			*/
 
-			//Checks if one node is less than another one (z-order)
+			//Checks if one node is less than another one (z-order wise)
 			//Needed for sorting two nodes (strict weak ordering)
 			[[nodiscard]] inline auto operator<(const SceneNode &rhs) const noexcept
 			{
-				return position_.Z() < rhs.position_.Z();
+				if (need_z_update_)
+					UpdateZ();
+
+				if (rhs.need_z_update_)
+					rhs.UpdateZ();
+
+				return derived_position_.Z() < rhs.derived_position_.Z();
 			}
 
 
@@ -324,7 +340,10 @@ namespace ion::graphics::scene::graph
 					position_ = position;
 
 					if (rearrange)
+					{
+						NotifyUpdateZ();
 						scene_node::detail::add_node(RootNode().ordered_nodes_, this);
+					}
 
 					NotifyUpdate();
 				}
