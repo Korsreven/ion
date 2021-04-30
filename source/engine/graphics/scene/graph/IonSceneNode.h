@@ -338,14 +338,13 @@ namespace ion::graphics::scene::graph
 						scene_node::detail::remove_node(RootNode().ordered_nodes_, this);
 
 					position_ = position;
+					NotifyUpdate();
 
 					if (rearrange)
 					{
 						NotifyUpdateZ();
 						scene_node::detail::add_node(RootNode().ordered_nodes_, this);
 					}
-
-					NotifyUpdate();
 				}
 			}
 
