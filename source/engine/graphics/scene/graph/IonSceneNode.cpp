@@ -47,6 +47,27 @@ Matrix4 make_transformation(const Vector3 &position, real rotation, const Vector
 //Private
 
 /*
+	Notifying
+*/
+
+void SceneNode::NotifyUpdate() noexcept
+{
+	need_update_ = true;
+
+	for (auto &child_node : child_nodes_)
+		child_node->NotifyUpdate(); //Recursive
+}
+
+void SceneNode::NotifyUpdateZ() noexcept
+{
+	need_z_update_ = true;
+
+	for (auto &child_node : child_nodes_)
+		child_node->NotifyUpdateZ(); //Recursive
+}
+
+
+/*
 	Updating
 */
 
@@ -149,12 +170,50 @@ SceneNodes SceneNode::ExtractAll() noexcept
 }
 
 
+/*
+	Ordering
+*/
+
+void SceneNode::AddNode(bool cascade)
+{
+	AddNode(RootNode(), cascade);
+}
+
+void SceneNode::AddNode(SceneNode &root_node, bool cascade)
+{
+	detail::add_node(root_node.ordered_nodes_, this);
+
+	if (cascade)
+	{
+		for (auto &child_node : child_nodes_)
+			child_node->AddNode(root_node, cascade); //Recursive
+	}
+}
+
+
+void SceneNode::RemoveNode(bool cascade) noexcept
+{
+	RemoveNode(RootNode(), cascade);
+}
+
+void SceneNode::RemoveNode(SceneNode &root_node, bool cascade) noexcept
+{
+	detail::remove_node(root_node.ordered_nodes_, this);
+
+	if (cascade)
+	{
+		for (auto &child_node : child_nodes_)
+			child_node->RemoveNode(root_node, cascade); //Recursive
+	}
+}
+
+
 //Public
 
 SceneNode::SceneNode(bool visible) noexcept :
 	visible_{visible}
 {
-	detail::add_node(ordered_nodes_, this);
+	AddNode();
 }
 
 SceneNode::SceneNode(const Vector2 &initial_direction, bool visible) noexcept :
@@ -162,7 +221,7 @@ SceneNode::SceneNode(const Vector2 &initial_direction, bool visible) noexcept :
 	initial_direction_{initial_direction},
 	visible_{visible}
 {
-	detail::add_node(ordered_nodes_, this);
+	AddNode();
 }
 
 SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept :
@@ -171,7 +230,7 @@ SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, 
 	initial_direction_{initial_direction},
 	visible_{visible}
 {
-	detail::add_node(ordered_nodes_, this);
+	AddNode();
 }
 
 
@@ -180,7 +239,7 @@ SceneNode::SceneNode(SceneNode &parent_node, bool visible) noexcept :
 	visible_{visible},
 	parent_node_{&parent_node}
 {
-	detail::add_node(RootNode().ordered_nodes_, this);
+	AddNode();
 }
 
 SceneNode::SceneNode(SceneNode &parent_node, const Vector2 &initial_direction, bool visible) noexcept :
@@ -189,7 +248,7 @@ SceneNode::SceneNode(SceneNode &parent_node, const Vector2 &initial_direction, b
 	visible_{visible},
 	parent_node_{&parent_node}
 {
-	detail::add_node(RootNode().ordered_nodes_, this);
+	AddNode();
 }
 
 SceneNode::SceneNode(SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept :
@@ -199,14 +258,14 @@ SceneNode::SceneNode(SceneNode &parent_node, const Vector3 &position, const Vect
 	visible_{visible},
 	parent_node_{&parent_node}
 {
-	detail::add_node(RootNode().ordered_nodes_, this);
+	AddNode();
 }
 
 
 SceneNode::~SceneNode() noexcept
 {
 	DetachAllObjects();
-	detail::remove_node(RootNode().ordered_nodes_, this);
+	RemoveNode();
 }
 
 

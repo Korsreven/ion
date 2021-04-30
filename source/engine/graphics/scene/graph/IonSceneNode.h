@@ -162,24 +162,16 @@ namespace ion::graphics::scene::graph
 
 
 			/*
-				Updating
+				Notifying
 			*/
 
-			inline void NotifyUpdate() noexcept
-			{
-				need_update_ = true;
+			void NotifyUpdate() noexcept;
+			void NotifyUpdateZ() noexcept;
 
-				for (auto &child_node : child_nodes_)
-					child_node->NotifyUpdate(); //Recursive
-			}
 
-			inline void NotifyUpdateZ() noexcept
-			{
-				need_z_update_ = true;
-
-				for (auto &child_node : child_nodes_)
-					child_node->NotifyUpdateZ(); //Recursive
-			}
+			/*
+				Updating
+			*/
 
 			void Update() const noexcept;
 			void UpdateZ() const noexcept;
@@ -192,13 +184,21 @@ namespace ion::graphics::scene::graph
 			OwningPtr<SceneNode> Extract(SceneNode &child_node) noexcept;
 			scene_node::SceneNodes ExtractAll() noexcept;
 
+
+			/*
+				Ordering
+			*/
+
+			void AddNode(bool cascade = false);
+			void AddNode(SceneNode &root_node, bool cascade = false);
+
+			void RemoveNode(bool cascade = false) noexcept;
+			void RemoveNode(SceneNode &root_node, bool cascade = false) noexcept;
+
 		public:
 
-			//Default construct a scene node as the root
-			SceneNode() = default;
-
 			//Construct a scene node as the root with the given visibility
-			explicit SceneNode(bool visible) noexcept;
+			explicit SceneNode(bool visible = true) noexcept;
 
 			//Construct a scene node as the root with the given initial direction and visibility
 			explicit SceneNode(const Vector2 &initial_direction, bool visible = true) noexcept;
@@ -332,10 +332,12 @@ namespace ion::graphics::scene::graph
 			{
 				if (position_ != position)
 				{
-					auto rearrange = position_.Z() != position.Z();
+					auto rearrange =
+						parent_node_ && position_.Z() != position.Z();
+						//If root node, no need to rearrange
 
 					if (rearrange)
-						scene_node::detail::remove_node(RootNode().ordered_nodes_, this);
+						RemoveNode(true); //Cascade
 
 					position_ = position;
 					NotifyUpdate();
@@ -343,7 +345,7 @@ namespace ion::graphics::scene::graph
 					if (rearrange)
 					{
 						NotifyUpdateZ();
-						scene_node::detail::add_node(RootNode().ordered_nodes_, this);
+						AddNode(true); //Cascade
 					}
 				}
 			}
@@ -420,7 +422,7 @@ namespace ion::graphics::scene::graph
 				if (cascade)
 				{
 					for (auto &child_node : child_nodes_)
-						child_node->Visible(visible); //Recursive
+						child_node->Visible(visible, cascade); //Recursive
 				}
 			}
 
@@ -433,7 +435,7 @@ namespace ion::graphics::scene::graph
 				if (cascade)
 				{
 					for (auto &child_node : child_nodes_)
-						child_node->FlipVisibility(); //Recursive
+						child_node->FlipVisibility(cascade); //Recursive
 				}
 			}
 
