@@ -14,6 +14,7 @@ File:	IonSceneNode.cpp
 
 #include <cassert>
 #include <cmath>
+#include <type_traits>
 
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonLight.h"
@@ -37,7 +38,7 @@ bool scene_node_comparator::operator()(const SceneNode *x, const SceneNode *y) c
 
 Matrix4 make_transformation(const Vector3 &position, real rotation, const Vector2 &scaling) noexcept
 {
-	return Matrix4::Transformation(rotation, Vector3{scaling.X(), scaling.Y(), 1.0_r}, position);
+	return Matrix4::Transformation(rotation, to_scaling3(scaling), position);
 }
 
 } //scene_node::detail
@@ -64,12 +65,14 @@ void SceneNode::Update() const noexcept
 			switch (rotation_origin_)
 			{
 				case NodeRotationOrigin::Local:
-				derived_position_ = position_ * parent_node_->derived_scaling_ + parent_node_->derived_position_;
+				derived_position_ =
+					position_ * detail::to_scaling3(parent_node_->derived_scaling_) + parent_node_->derived_position_;
 				break;
 
 				case NodeRotationOrigin::Parent:
 				default:
-				derived_position_ = (position_ * parent_node_->derived_scaling_).Deviant(parent_node_->derived_rotation_) + parent_node_->derived_position_;
+				derived_position_ =
+					(position_ * detail::to_scaling3(parent_node_->derived_scaling_)).Deviant(parent_node_->derived_rotation_) + parent_node_->derived_position_;
 				break;
 			}
 		}
@@ -135,7 +138,7 @@ SceneNodes SceneNode::ExtractAll() noexcept
 SceneNode::SceneNode(bool visible) noexcept :
 	visible_{visible}
 {
-	//Empty
+	detail::add_node(ordered_nodes_, this);
 }
 
 SceneNode::SceneNode(const Vector2 &initial_direction, bool visible) noexcept :
@@ -143,7 +146,7 @@ SceneNode::SceneNode(const Vector2 &initial_direction, bool visible) noexcept :
 	initial_direction_{initial_direction},
 	visible_{visible}
 {
-	//Empty
+	detail::add_node(ordered_nodes_, this);
 }
 
 SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept :
@@ -152,13 +155,42 @@ SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, 
 	initial_direction_{initial_direction},
 	visible_{visible}
 {
-	//Empty
+	detail::add_node(ordered_nodes_, this);
+}
+
+
+SceneNode::SceneNode(SceneNode &parent_node, bool visible) noexcept :
+
+	visible_{visible},
+	parent_node_{&parent_node}
+{
+	detail::add_node(RootNode().ordered_nodes_, this);
+}
+
+SceneNode::SceneNode(SceneNode &parent_node, const Vector2 &initial_direction, bool visible) noexcept :
+
+	initial_direction_{initial_direction},
+	visible_{visible},
+	parent_node_{&parent_node}
+{
+	detail::add_node(RootNode().ordered_nodes_, this);
+}
+
+SceneNode::SceneNode(SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept :
+	
+	position_{position},
+	initial_direction_{initial_direction},
+	visible_{visible},
+	parent_node_{&parent_node}
+{
+	detail::add_node(RootNode().ordered_nodes_, this);
 }
 
 
 SceneNode::~SceneNode() noexcept
 {
 	DetachAllObjects();
+	detail::remove_node(RootNode().ordered_nodes_, this);
 }
 
 
@@ -221,23 +253,17 @@ void SceneNode::LookAt(const Vector3 &position) noexcept
 
 NonOwningPtr<SceneNode> SceneNode::CreateChildNode(bool visible)
 {
-	auto &node = child_nodes_.emplace_back(make_owning<SceneNode>(visible));
-	node->parent_node_ = this;
-	return node;
+	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), visible));
 }
 
 NonOwningPtr<SceneNode> SceneNode::CreateChildNode(const Vector2 &initial_direction, bool visible)
 {
-	auto &node = child_nodes_.emplace_back(make_owning<SceneNode>(initial_direction, visible));
-	node->parent_node_ = this;
-	return node;
+	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), initial_direction, visible));;
 }
 
 NonOwningPtr<SceneNode> SceneNode::CreateChildNode(const Vector3 &position, const Vector2 &initial_direction, bool visible)
 {
-	auto &node = child_nodes_.emplace_back(make_owning<SceneNode>(position, initial_direction, visible));
-	node->parent_node_ = this;
-	return node;
+	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), position, initial_direction, visible));;
 }
 
 
@@ -338,6 +364,10 @@ bool SceneNode::DetachObject(MovableObject &movable_object) noexcept
 	//Movable object found
 	if (iter != std::end(attached_objects_))
 	{
+		auto &root_node = RootNode();
+		root_node.attached_cameras_.erase(*iter);
+		root_node.attached_lights_.erase(*iter);
+
 		(*iter)->ParentNode(nullptr);
 		attached_objects_.erase(iter);
 		return true;
@@ -351,7 +381,13 @@ void SceneNode::DetachAllObjects() noexcept
 	for (auto &mov_object : attached_objects_)
 	{
 		if (mov_object)
+		{
+			auto &root_node = RootNode();
+			root_node.attached_cameras_.erase(mov_object);
+			root_node.attached_lights_.erase(mov_object);
+
 			mov_object->ParentNode(nullptr);
+		}
 	}
 
 	attached_objects_.clear();
@@ -361,7 +397,7 @@ void SceneNode::DetachAllObjects() noexcept
 
 /*
 	Attached objects
-	Camera
+	Camera / light
 */
 
 bool SceneNode::AttachObject(Camera &camera)
@@ -375,39 +411,11 @@ bool SceneNode::AttachObject(Camera &camera)
 		return false;
 }
 
-bool SceneNode::DetachObject(Camera &camera) noexcept
-{
-	if (DetachObject(static_cast<MovableObject&>(camera)))
-	{
-		RootNode().attached_cameras_.erase(&camera);
-		return true;
-	}
-	else
-		return false;
-}
-
-
-/*
-	Attached objects
-	Light
-*/
-
 bool SceneNode::AttachObject(Light &light)
 {
 	if (AttachObject(static_cast<MovableObject&>(light)))
 	{
 		RootNode().attached_lights_.insert(&light);
-		return true;
-	}
-	else
-		return false;
-}
-
-bool SceneNode::DetachObject(Light &light) noexcept
-{
-	if (DetachObject(static_cast<MovableObject&>(light)))
-	{
-		RootNode().attached_lights_.erase(&light);
 		return true;
 	}
 	else

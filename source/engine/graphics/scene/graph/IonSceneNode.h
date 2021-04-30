@@ -64,16 +64,16 @@ namespace ion::graphics::scene::graph
 			};
 
 
-			template <typename Compare>
-			inline void add_node(scene_node_container &scene_nodes, SceneNode *scene_node, Compare compare)
+			template <typename Compare = scene_node_comparator>
+			inline void add_node(scene_node_container &scene_nodes, SceneNode *scene_node, Compare compare = Compare{})
 			{
 				//Search for first scene node with greater z-order
 				auto iter = std::upper_bound(std::begin(scene_nodes), std::end(scene_nodes), scene_node, compare);
 				scene_nodes.insert(iter, scene_node);
 			}
 
-			template <typename Compare>
-			inline void remove_node(scene_node_container &scene_nodes, SceneNode *scene_node, Compare compare) noexcept
+			template <typename Compare = scene_node_comparator>
+			inline auto remove_node(scene_node_container &scene_nodes, SceneNode *scene_node, Compare compare = Compare{}) noexcept -> SceneNode*
 			{
 				//Search for first scene node with equal z-order
 				if (auto first = std::lower_bound(std::begin(scene_nodes), std::end(scene_nodes), scene_node, compare);
@@ -83,13 +83,18 @@ namespace ion::graphics::scene::graph
 					auto last = std::upper_bound(first, std::end(scene_nodes), scene_node, compare);			
 
 					//Search for exact scene node in range [first, last)
-					if (first = std::find(first, last); first != last) //Found
+					if (first = std::find(first, last, scene_node); first != last) //Found
+					{
 						scene_nodes.erase(first);
+						return scene_node;
+					}
 				}
+
+				return nullptr;
 			}
 
-			template <typename Compare>
-			inline void move_nodes(scene_node_container &dest, scene_node_container &source, Compare compare)
+			template <typename Compare = scene_node_comparator>
+			inline void move_nodes(scene_node_container &dest, scene_node_container &source, Compare compare = Compare{})
 			{
 				auto size = std::size(dest);
 
@@ -109,6 +114,12 @@ namespace ion::graphics::scene::graph
 				source.shrink_to_fit();
 			}
 
+
+			inline auto to_scaling3(const Vector2 &scaling) noexcept
+			{
+				auto [x, y] = scaling.XY();
+				return Vector3{x, y, 1.0_r};
+			}
 
 			Matrix4 make_transformation(const Vector3 &position, real rotation, const Vector2 &scaling) noexcept;
 		} //detail
@@ -184,6 +195,16 @@ namespace ion::graphics::scene::graph
 
 			//Construct a scene node as the root with the given position, initial direction and visibility
 			explicit SceneNode(const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true) noexcept;
+
+
+			//Construct a scene node as a child with the given parent and visibility
+			explicit SceneNode(SceneNode &parent_node, bool visible = true) noexcept;
+
+			//Construct a scene node as a child with the given parent, initial direction and visibility
+			SceneNode(SceneNode &parent_node, const Vector2 &initial_direction, bool visible = true) noexcept;
+
+			//Construct a scene node as a child with the given parent, position, initial direction and visibility
+			SceneNode(SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true) noexcept;
 
 
 			//Destructor
@@ -295,10 +316,16 @@ namespace ion::graphics::scene::graph
 			{
 				if (position_ != position)
 				{
-					if (position_.Z() != position.Z())
-						; //Todo
+					auto rearrange = position_.Z() != position.Z();
+
+					if (rearrange)
+						scene_node::detail::remove_node(RootNode().ordered_nodes_, this);
 
 					position_ = position;
+
+					if (rearrange)
+						scene_node::detail::add_node(RootNode().ordered_nodes_, this);
+
 					NotifyUpdate();
 				}
 			}
@@ -460,13 +487,22 @@ namespace ion::graphics::scene::graph
 				return parent_node_;
 			}
 
-			//Returns the root node of this node
-			[[nodiscard]] inline auto RootNode() const noexcept -> SceneNode&
+			//Returns a mutable reference to the root node of this node
+			[[nodiscard]] inline auto RootNode() noexcept -> SceneNode&
 			{
 				if (parent_node_)
 					return parent_node_->RootNode(); //Recursive
 				else
-					return const_cast<SceneNode&>(*this);
+					return *this;
+			}
+
+			//Returns an immutable reference to the root node of this node
+			[[nodiscard]] inline auto RootNode() const noexcept -> const SceneNode&
+			{
+				if (parent_node_)
+					return parent_node_->RootNode(); //Recursive
+				else
+					return *this;
 			}
 
 
@@ -632,30 +668,16 @@ namespace ion::graphics::scene::graph
 
 			/*
 				Attached objects
-				Camera
+				Camera / light
 			*/
 
 			//Attach the given camera to this node if not already attached
 			//Return true if the given camera was attached
 			bool AttachObject(Camera &camera);
 
-			//Detach the given camera if attached to this node
-			//Returns true if the given camera was detached
-			bool DetachObject(Camera &camera) noexcept;
-
-
-			/*
-				Attached objects
-				Light
-			*/
-
 			//Attach the given light to this node if not already attached
 			//Return true if the given light was attached
 			bool AttachObject(Light &light);
-
-			//Detach the given light if attached to this node
-			//Returns true if the given light was detached
-			bool DetachObject(Light &light) noexcept;
 	};
 } //ion::graphics::scene::graph
 
