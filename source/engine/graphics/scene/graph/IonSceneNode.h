@@ -16,7 +16,6 @@ File:	IonSceneNode.h
 #include <algorithm>
 #include <vector>
 
-#include "adaptors/IonFlatSet.h"
 #include "adaptors/ranges/IonDereferenceIterable.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector2.h"
@@ -53,65 +52,181 @@ namespace ion::graphics::scene::graph
 
 		namespace detail
 		{
-			using scene_node_container = std::vector<SceneNode*>;
-			using movable_object_container = std::vector<MovableObject*>;
-			using camera_container = adaptors::FlatSet<Camera*>;
-			using light_container = adaptors::FlatSet<Light*>;
+			using node_container = std::vector<SceneNode*>;
+			using object_container = std::vector<MovableObject*>;
+			using camera_container = std::vector<Camera*>;
+			using light_container = std::vector<Light*>;
 
-			struct scene_node_comparator
+			struct node_comparator
 			{
 				bool operator()(const SceneNode *x, const SceneNode *y) const noexcept;
 			};
 
 
-			template <typename Compare = scene_node_comparator>
-			inline void add_node(scene_node_container &scene_nodes, SceneNode *scene_node, Compare compare = Compare{})
+			template <typename Compare = node_comparator>
+			inline void add_node(node_container &dest_nodes, SceneNode *node, Compare compare = Compare{})
 			{
 				//Search for first scene node with greater z-order
-				auto iter = std::upper_bound(std::begin(scene_nodes), std::end(scene_nodes), scene_node, compare);
-				scene_nodes.insert(iter, scene_node);
+				auto iter = std::upper_bound(std::begin(dest_nodes), std::end(dest_nodes), node, compare);
+				dest_nodes.insert(iter, node);
 			}
 
-			template <typename Compare = scene_node_comparator>
-			inline auto remove_node(scene_node_container &scene_nodes, SceneNode *scene_node, Compare compare = Compare{}) noexcept -> SceneNode*
+			template <typename Compare = node_comparator>
+			inline void move_nodes(node_container &dest_nodes, node_container &source_nodes, Compare compare = Compare{})
 			{
-				//Search for first scene node with equal z-order
-				if (auto first = std::lower_bound(std::begin(scene_nodes), std::end(scene_nodes), scene_node, compare);
-					first != std::end(scene_nodes) && !compare(scene_node, *first)) //Found
-				{
-					//Search for first scene node with greater z-order
-					auto last = std::upper_bound(first, std::end(scene_nodes), scene_node, compare);			
-
-					//Search for exact scene node in range [first, last)
-					if (first = std::find(first, last, scene_node); first != last) //Found
-					{
-						scene_nodes.erase(first);
-						return scene_node;
-					}
-				}
-
-				return nullptr;
-			}
-
-			template <typename Compare = scene_node_comparator>
-			inline void move_nodes(scene_node_container &dest, scene_node_container &source, Compare compare = Compare{})
-			{
-				auto size = std::size(dest);
+				auto size = std::size(dest_nodes);
 
 				//Insert source nodes to the back of dest nodes
-				dest.insert(
-					std::end(dest),
-					std::begin(source), std::end(source));
+				dest_nodes.insert(
+					std::end(dest_nodes),
+					std::begin(source_nodes), std::end(source_nodes));
 
 				//One or more source node has been inserted
-				if (auto first = std::begin(dest) + size; first != std::begin(dest))
+				if (auto first = std::begin(dest_nodes) + size; first != std::begin(dest_nodes))
 					//Merge dest and source nodes
 					std::inplace_merge(
-						std::begin(dest), first,
-						std::end(dest), compare);
+						std::begin(dest_nodes), first,
+						std::end(dest_nodes), compare);
 
-				source.clear();
-				source.shrink_to_fit();
+				source_nodes.clear(); //Moved
+				source_nodes.shrink_to_fit();
+			}
+
+
+			template <typename Compare = node_comparator>
+			inline void remove_node(node_container &from_nodes, SceneNode *node, Compare compare = Compare{}) noexcept
+			{
+				//Search for first scene node with equal z-order
+				if (auto first = std::lower_bound(std::begin(from_nodes), std::end(from_nodes), node, compare);
+					first != std::end(from_nodes) && !compare(node, *first)) //Found z-order
+				{
+					//Search for first scene node with greater z-order
+					auto last = std::upper_bound(first, std::end(from_nodes), node, compare);			
+
+					//Search for exact scene node in range [first, last)
+					if (first = std::find(first, last, node); first != last) //Found exact
+						from_nodes.erase(first);
+				}
+			}
+
+			template <typename Compare = node_comparator>
+			inline void remove_nodes(node_container &from_nodes, node_container &nodes, Compare compare = Compare{}) noexcept
+			{
+				if (std::empty(nodes))
+					return;
+
+				if (std::size(nodes) == 1)
+				{
+					remove_node(from_nodes, nodes.front(), compare);
+					return;
+				}
+
+				//Search for first scene node with equal z-order
+				if (auto first = std::lower_bound(std::begin(from_nodes), std::end(from_nodes), nodes.front(), compare);
+					first != std::end(from_nodes) && !compare(nodes.front(), *first)) //Found z-order
+				{
+					//Search for first scene node with greater z-order
+					auto last = std::upper_bound(first, std::end(from_nodes), nodes.back(), compare);			
+
+					for (auto iter = first; auto &node : nodes)
+					{
+						//Search for each exact scene node in range [first, last)
+						//Range is narrowed for each node found
+						if (iter = std::find(iter, last, node); iter != last) //Found exact
+						{
+							*iter = nullptr; //Tag
+							++iter;
+						}
+					}
+
+					//Erase all tagged in range [first, last)
+					from_nodes.erase(
+						std::remove_if(first, last,
+							[](auto &node) noexcept
+							{
+								return !node;
+							}),
+						last);
+				}
+			}
+
+
+			template <typename Container, typename Compare = std::less<>>
+			inline void add_object(Container &dest_objects, typename Container::value_type object, Compare compare = Compare{})
+			{
+				auto iter = std::upper_bound(std::begin(dest_objects), std::end(dest_objects), object, compare);
+				dest_objects.insert(iter, object);
+			}
+
+			template <typename Container, typename Compare = std::less<>>
+			inline void move_objects(Container &dest_objects, Container &source_objects, Compare compare = Compare{})
+			{
+				auto size = std::size(dest_objects);
+
+				//Insert source objects to the back of dest objects
+				dest_objects.insert(
+					std::end(dest_objects),
+					std::begin(source_objects), std::end(source_objects));
+
+				//One or more source object has been inserted
+				if (auto first = std::begin(dest_objects) + size; first != std::begin(dest_objects))
+					//Merge dest and source objects
+					std::inplace_merge(
+						std::begin(dest_objects), first,
+						std::end(dest_objects), compare);
+
+				source_objects.clear(); //Moved
+				source_objects.shrink_to_fit();
+			}
+
+
+			template <typename Container, typename Compare = std::less<>>
+			inline void remove_object(Container &from_objects, typename Container::value_type object, Compare compare = Compare{}) noexcept
+			{
+				if (auto first = std::lower_bound(std::begin(from_objects), std::end(from_objects), object, compare);
+					first != std::end(from_objects) && !compare(object, *first)) //Found exact
+					
+					from_objects.erase(first);
+			}
+
+			template <typename Container, typename Compare = std::less<>>
+			inline void remove_objects(Container &from_objects, Container &objects, Compare compare = Compare{}) noexcept
+			{
+				if (std::empty(objects))
+					return;
+
+				if (std::size(objects) == 1)
+				{
+					remove_object(from_objects, objects.front(), compare);
+					return;
+				}
+
+				if (auto first = std::lower_bound(std::begin(from_objects), std::end(from_objects), objects.front(), compare);
+					first != std::end(from_objects) && !compare(objects.front(), *first)) //Found first exact
+				{
+					//Search for first object with greater z-order
+					auto last = std::upper_bound(first, std::end(from_objects), objects.back(), compare);			
+
+					for (auto iter = first; auto &object : objects)
+					{
+						//Search for each exact object in range [first, last)
+						//Range is narrowed for each object found
+						if (iter = std::find(iter, last, object); iter != last) //Found
+						{
+							*iter = nullptr; //Tag
+							++iter;
+						}
+					}
+
+					//Erase all tagged in range [first, last)
+					from_objects.erase(
+						std::remove_if(first, last,
+							[](auto &object) noexcept
+							{
+								return !object;
+							}),
+						last);
+				}
 			}
 
 
@@ -143,11 +258,12 @@ namespace ion::graphics::scene::graph
 
 			SceneNode *parent_node_ = nullptr;
 			scene_node::SceneNodes child_nodes_;
-			scene_node::detail::movable_object_container attached_objects_;
+			scene_node::detail::object_container attached_objects_;
 
-			scene_node::detail::scene_node_container ordered_nodes_; //Root node only
+			scene_node::detail::node_container ordered_nodes_; //Root node only
 			scene_node::detail::camera_container attached_cameras_; //Root node only
 			scene_node::detail::light_container attached_lights_; //Root node only
+			bool removed_ = false; //For optimized destruction
 
 
 			mutable Vector3 derived_position_;
@@ -165,9 +281,10 @@ namespace ion::graphics::scene::graph
 				Notifying
 			*/
 
-			void NotifyUpdate() noexcept;
-			void NotifyUpdateZ() noexcept;
+			void NotifyRemoved() noexcept;
 
+			void NotifyUpdate() noexcept;
+			void NotifyUpdateZ() noexcept;		
 
 			/*
 				Updating
@@ -186,14 +303,29 @@ namespace ion::graphics::scene::graph
 
 
 			/*
-				Ordering
+				Helper functions
 			*/
 
-			void AddNode(bool cascade = false);
-			void AddNode(SceneNode &root_node, bool cascade = false);
+			void AddNode(scene_node::detail::node_container &dest_nodes);
+			void MoveNodes(scene_node::detail::node_container &dest_nodes, scene_node::detail::node_container &source_nodes);
+			void RemoveNode(scene_node::detail::node_container &from_nodes) noexcept;
+			void RemoveNodes(scene_node::detail::node_container &from_nodes, scene_node::detail::node_container &nodes) noexcept;	
+			void GatherNodes(scene_node::detail::node_container &nodes);
 
-			void RemoveNode(bool cascade = false) noexcept;
-			void RemoveNode(SceneNode &root_node, bool cascade = false) noexcept;
+			void AddCamera(scene_node::detail::camera_container &dest_cameras, Camera &camera);
+			void MoveCameras(scene_node::detail::camera_container &dest_cameras, scene_node::detail::camera_container &source_cameras);
+			void RemoveCamera(scene_node::detail::camera_container &from_cameras, Camera &camera) noexcept;
+			void RemoveCameras(scene_node::detail::camera_container &from_cameras, scene_node::detail::camera_container &cameras) noexcept;	
+			void GatherCameras(scene_node::detail::camera_container &cameras);
+
+			void AddLight(scene_node::detail::light_container &dest_lights, Light &light);
+			void MoveLights(scene_node::detail::light_container &dest_lights, scene_node::detail::light_container &source_lights);
+			void RemoveLight(scene_node::detail::light_container &from_lights, Light &light) noexcept;
+			void RemoveLights(scene_node::detail::light_container &from_lights, scene_node::detail::light_container &lights) noexcept;	
+			void GatherLights(scene_node::detail::light_container &lights);
+
+			void AttachObjectToNode(MovableObject &object);
+			void DetachObjectFromNode(MovableObject &object) noexcept;
 
 		public:
 
@@ -262,14 +394,14 @@ namespace ion::graphics::scene::graph
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedObjects() noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<scene_node::detail::movable_object_container&>{attached_objects_};
+				return adaptors::ranges::DereferenceIterable<scene_node::detail::object_container&>{attached_objects_};
 			}
 
 			//Returns an immutable range of all movable objects attached to this node
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedObjects() const noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<const scene_node::detail::movable_object_container&>{attached_objects_};
+				return adaptors::ranges::DereferenceIterable<const scene_node::detail::object_container&>{attached_objects_};
 			}
 
 
@@ -282,14 +414,14 @@ namespace ion::graphics::scene::graph
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto OrderedSceneNodes() noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<scene_node::detail::scene_node_container&>{ordered_nodes_};
+				return adaptors::ranges::DereferenceIterable<scene_node::detail::node_container&>{ordered_nodes_};
 			}
 
 			//Returns an immutable range of this and all descendant nodes ordered for rendering
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto OrderedSceneNodes() const noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<const scene_node::detail::scene_node_container&>{ordered_nodes_};
+				return adaptors::ranges::DereferenceIterable<const scene_node::detail::node_container&>{ordered_nodes_};
 			}
 
 
@@ -332,20 +464,23 @@ namespace ion::graphics::scene::graph
 			{
 				if (position_ != position)
 				{
-					auto rearrange =
-						parent_node_ && position_.Z() != position.Z();
-						//If root node, no need to rearrange
+					auto z_changed = position_.Z() != position.Z();
 
-					if (rearrange)
-						RemoveNode(true); //Cascade
+					if (z_changed && parent_node_)
+					{
+						GatherNodes(ordered_nodes_);
+						RemoveNodes(RootNode().ordered_nodes_, ordered_nodes_);
+					}
 
 					position_ = position;
 					NotifyUpdate();
 
-					if (rearrange)
+					if (z_changed)
 					{
 						NotifyUpdateZ();
-						AddNode(true); //Cascade
+
+						if (parent_node_)
+							MoveNodes(RootNode().ordered_nodes_, ordered_nodes_);
 					}
 				}
 			}
@@ -676,28 +811,14 @@ namespace ion::graphics::scene::graph
 
 			//Attach the given movable object to this node if not already attached
 			//Return true if the given movable object was attached
-			bool AttachObject(MovableObject &movable_object);
+			bool AttachObject(MovableObject &object);
 
 			//Detach the given movable objects if attached to this node
 			//Returns true if the given movable object was detached
-			bool DetachObject(MovableObject &movable_object) noexcept;
+			bool DetachObject(MovableObject &object) noexcept;
 
 			//Detach all movable objects attached to this node
 			void DetachAllObjects() noexcept;
-
-
-			/*
-				Attached objects
-				Camera / light
-			*/
-
-			//Attach the given camera to this node if not already attached
-			//Return true if the given camera was attached
-			bool AttachObject(Camera &camera);
-
-			//Attach the given light to this node if not already attached
-			//Return true if the given light was attached
-			bool AttachObject(Light &light);
 	};
 } //ion::graphics::scene::graph
 
