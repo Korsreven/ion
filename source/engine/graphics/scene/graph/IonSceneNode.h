@@ -286,6 +286,7 @@ namespace ion::graphics::scene::graph
 			void NotifyUpdate() noexcept;
 			void NotifyUpdateZ() noexcept;		
 
+
 			/*
 				Updating
 			*/
@@ -295,37 +296,35 @@ namespace ion::graphics::scene::graph
 
 
 			/*
-				Removing
-			*/
-
-			OwningPtr<SceneNode> Extract(SceneNode &child_node) noexcept;
-			scene_node::SceneNodes ExtractAll() noexcept;
-
-
-			/*
 				Helper functions
 			*/
 
-			void AddNode(scene_node::detail::node_container &dest_nodes);
+			void AddNode(scene_node::detail::node_container &dest_nodes, SceneNode *node);
 			void MoveNodes(scene_node::detail::node_container &dest_nodes, scene_node::detail::node_container &source_nodes);
-			void RemoveNode(scene_node::detail::node_container &from_nodes) noexcept;
+			void RemoveNode(scene_node::detail::node_container &from_nodes, SceneNode *node) noexcept;
 			void RemoveNodes(scene_node::detail::node_container &from_nodes, scene_node::detail::node_container &nodes) noexcept;	
 			void GatherNodes(scene_node::detail::node_container &nodes);
 
-			void AddCamera(scene_node::detail::camera_container &dest_cameras, Camera &camera);
+			void AddCamera(scene_node::detail::camera_container &dest_cameras, Camera *camera);
 			void MoveCameras(scene_node::detail::camera_container &dest_cameras, scene_node::detail::camera_container &source_cameras);
-			void RemoveCamera(scene_node::detail::camera_container &from_cameras, Camera &camera) noexcept;
+			void RemoveCamera(scene_node::detail::camera_container &from_cameras, Camera *camera) noexcept;
 			void RemoveCameras(scene_node::detail::camera_container &from_cameras, scene_node::detail::camera_container &cameras) noexcept;	
 			void GatherCameras(scene_node::detail::camera_container &cameras);
 
-			void AddLight(scene_node::detail::light_container &dest_lights, Light &light);
+			void AddLight(scene_node::detail::light_container &dest_lights, Light *light);
 			void MoveLights(scene_node::detail::light_container &dest_lights, scene_node::detail::light_container &source_lights);
-			void RemoveLight(scene_node::detail::light_container &from_lights, Light &light) noexcept;
+			void RemoveLight(scene_node::detail::light_container &from_lights, Light *light) noexcept;
 			void RemoveLights(scene_node::detail::light_container &from_lights, scene_node::detail::light_container &lights) noexcept;	
 			void GatherLights(scene_node::detail::light_container &lights);
+			
+			void AttachNode(SceneNode *node);
+			void DetachNode(SceneNode *node);
 
-			void AttachObjectToNode(MovableObject &object);
-			void DetachObjectFromNode(MovableObject &object) noexcept;
+			void AttachObjectToNode(MovableObject *object);
+			void DetachObjectFromNode(MovableObject *object, bool tidy = true) noexcept;
+			void DetachObjectsFromNode(scene_node::detail::object_container &objects, bool tidy = true) noexcept;
+
+			void Tidy();
 
 		public:
 
@@ -767,20 +766,20 @@ namespace ion::graphics::scene::graph
 
 			//Adopt (take ownership of) the given scene node and returns a pointer to the adopted node
 			//Returns nullptr if the scene node could not be adopted and scene node will remain untouched
-			NonOwningPtr<SceneNode> Adopt(OwningPtr<SceneNode> &scene_node);
+			NonOwningPtr<SceneNode> Adopt(OwningPtr<SceneNode> &root_node);
 
 			//Adopt (take ownership of) the given scene node and returns a pointer to the adopted node
 			//Returns nullptr if the scene node could not be adopted and scene node will be released
-			NonOwningPtr<SceneNode> Adopt(OwningPtr<SceneNode> &&scene_node);
+			NonOwningPtr<SceneNode> Adopt(OwningPtr<SceneNode> &&root_node);
 
 
 			//Adopt (take ownership of) all the given scene nodes
 			//If one or more scene nodes could not be adopted, they will remain untouched in the given container
-			void Adopt(scene_node::SceneNodes &scene_nodes);
+			void AdoptAll(scene_node::SceneNodes &nodes);
 
 			//Adopt (take ownership of) all the given scene nodes
 			//If one or more scene nodes could not be adopted, they will be released
-			void Adopt(scene_node::SceneNodes &&scene_nodes);
+			void AdoptAll(scene_node::SceneNodes &&nodes);
 
 
 			//Orphan (release ownership of) the given child node
