@@ -49,7 +49,7 @@ MovableObject::MovableObject(const MovableObject &rhs) noexcept :
 MovableObject::~MovableObject() noexcept
 {
 	if (parent_node_)
-		parent_node_->DetachObject(*this);
+		parent_node_->DetachObject(this);
 }
 
 } //ion::graphics::scene

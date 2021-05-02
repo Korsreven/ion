@@ -193,8 +193,8 @@ void SceneNode::GatherCameras(detail::camera_container &cameras)
 {
 	for (auto &object : attached_objects_)
 	{
-		if (auto camera = dynamic_cast<Camera*>(object))
-			cameras.push_back(camera);
+		if (auto camera = std::get_if<Camera*>(&object))
+			cameras.push_back(*camera);
 	}
 
 	for (auto &child_node : child_nodes_)
@@ -226,8 +226,8 @@ void SceneNode::GatherLights(detail::light_container &lights)
 {
 	for (auto &object : attached_objects_)
 	{
-		if (auto light = dynamic_cast<Light*>(object))
-			lights.push_back(light);
+		if (auto light = std::get_if<Light*>(&object))
+			lights.push_back(*light);
 	}
 
 	for (auto &child_node : child_nodes_)
@@ -254,33 +254,33 @@ void SceneNode::DetachNode(SceneNode *node)
 }
 
 
-void SceneNode::AttachObjectToNode(MovableObject *object)
+void SceneNode::AttachObjectToNode(AttachableObject object)
 {
-	object->ParentNode(this);
+	std::visit([&](auto &&object) noexcept { object->ParentNode(this); }, object);
 
 	//More likely
-	if (auto light = dynamic_cast<Light*>(object))
-		AddLight(RootNode().attached_lights_, light);
+	if (auto light = std::get_if<Light*>(&object))
+		AddLight(RootNode().attached_lights_, *light);
 
 	//Less likely
-	else if (auto camera = dynamic_cast<Camera*>(object))
-		AddCamera(RootNode().attached_cameras_, camera);
+	else if (auto camera = std::get_if<Camera*>(&object))
+		AddCamera(RootNode().attached_cameras_, *camera);
 }
 
-void SceneNode::DetachObjectFromNode(MovableObject *object, bool tidy) noexcept
+void SceneNode::DetachObjectFromNode(AttachableObject object, bool tidy) noexcept
 {
 	if (tidy)
 	{
 		//More likely
-		if (auto light = dynamic_cast<Light*>(object))
-			RemoveLight(RootNode().attached_lights_, light);
+		if (auto light = std::get_if<Light*>(&object))
+			RemoveLight(RootNode().attached_lights_, *light);
 
 		//Less likely
-		else if (auto camera = dynamic_cast<Camera*>(object))
-			RemoveCamera(RootNode().attached_cameras_, camera);
+		else if (auto camera = std::get_if<Camera*>(&object))
+			RemoveCamera(RootNode().attached_cameras_, *camera);
 	}
 
-	object->ParentNode(nullptr);
+	std::visit([](auto &&object) noexcept { object->ParentNode(nullptr); }, object);
 }
 
 void SceneNode::DetachObjectsFromNode(scene_node::detail::object_container &objects, bool tidy) noexcept
@@ -561,31 +561,31 @@ bool SceneNode::RemoveChildNode(SceneNode &child_node) noexcept
 
 
 /*
-	Movable objects
+	Attachable objects
 */
 
-bool SceneNode::AttachObject(MovableObject &object)
+bool SceneNode::AttachObject(AttachableObject object)
 {
-	if (!object.ParentNode())
+	if (!std::visit([](auto &&object) noexcept { return object->ParentNode(); }, object))
 	{
-		AttachObjectToNode(&object);
-		attached_objects_.push_back(&object);
+		attached_objects_.push_back(object);
+		AttachObjectToNode(object);
 		return true;
 	}
 	else
 		return false;
 }
 
-bool SceneNode::DetachObject(MovableObject &object) noexcept
+bool SceneNode::DetachObject(AttachableObject object) noexcept
 {
 	auto iter =
 		std::find_if(std::begin(attached_objects_), std::end(attached_objects_),
 			[&](auto &x) noexcept
 			{
-				return x == &object;
+				return x == object;
 			});
 
-	//Movable object found
+	//Object found
 	if (iter != std::end(attached_objects_))
 	{
 		DetachObjectFromNode(*iter);

@@ -14,9 +14,11 @@ File:	IonSceneNode.h
 #define ION_SCENE_NODE
 
 #include <algorithm>
+#include <variant>
 #include <vector>
 
 #include "adaptors/ranges/IonDereferenceIterable.h"
+#include "adaptors/ranges/IonIterable.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
@@ -48,12 +50,12 @@ namespace ion::graphics::scene::graph
 		};
 
 		using SceneNodes = std::vector<OwningPtr<SceneNode>>;
-
+		using AttachableObject = std::variant<MovableObject*, Camera*, Light*>;
 
 		namespace detail
 		{
 			using node_container = std::vector<SceneNode*>;
-			using object_container = std::vector<MovableObject*>;
+			using object_container = std::vector<AttachableObject>;
 			using camera_container = std::vector<Camera*>;
 			using light_container = std::vector<Light*>;
 
@@ -320,8 +322,8 @@ namespace ion::graphics::scene::graph
 			void AttachNode(SceneNode *node);
 			void DetachNode(SceneNode *node);
 
-			void AttachObjectToNode(MovableObject *object);
-			void DetachObjectFromNode(MovableObject *object, bool tidy = true) noexcept;
+			void AttachObjectToNode(scene_node::AttachableObject object);
+			void DetachObjectFromNode(scene_node::AttachableObject object, bool tidy = true) noexcept;
 			void DetachObjectsFromNode(scene_node::detail::object_container &objects, bool tidy = true) noexcept;
 
 			void Tidy();
@@ -389,18 +391,18 @@ namespace ion::graphics::scene::graph
 			}
 
 
-			//Returns a mutable range of all movable objects attached to this node
+			//Returns a mutable range of all objects attached to this node
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedObjects() noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<scene_node::detail::object_container&>{attached_objects_};
+				return adaptors::ranges::Iterable<scene_node::detail::object_container&>{attached_objects_};
 			}
 
-			//Returns an immutable range of all movable objects attached to this node
+			//Returns an immutable range of all objects attached to this node
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedObjects() const noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<const scene_node::detail::object_container&>{attached_objects_};
+				return adaptors::ranges::Iterable<const scene_node::detail::object_container&>{attached_objects_};
 			}
 
 
@@ -428,14 +430,14 @@ namespace ion::graphics::scene::graph
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedCameras() noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<scene_node::detail::camera_container&>{attached_cameras_};
+				return adaptors::ranges::Iterable<scene_node::detail::camera_container&>{attached_cameras_};
 			}
 
 			//Returns an immutable range of all cameras attached to this and all descendant nodes
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedCameras() const noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<const scene_node::detail::camera_container&>{attached_cameras_};
+				return adaptors::ranges::Iterable<const scene_node::detail::camera_container&>{attached_cameras_};
 			}
 
 
@@ -443,14 +445,14 @@ namespace ion::graphics::scene::graph
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedLights() noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<scene_node::detail::light_container&>{attached_lights_};
+				return adaptors::ranges::Iterable<scene_node::detail::light_container&>{attached_lights_};
 			}
 
 			//Returns an immutable range of all lights attached to this and all descendant nodes
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedLights() const noexcept
 			{
-				return adaptors::ranges::DereferenceIterable<const scene_node::detail::light_container&>{attached_lights_};
+				return adaptors::ranges::Iterable<const scene_node::detail::light_container&>{attached_lights_};
 			}
 
 
@@ -805,18 +807,18 @@ namespace ion::graphics::scene::graph
 
 
 			/*
-				Attached objects
+				Attachable objects
 			*/
 
-			//Attach the given movable object to this node if not already attached
-			//Return true if the given movable object was attached
-			bool AttachObject(MovableObject &object);
+			//Attach the given object to this node if not already attached
+			//Return true if the given object was attached
+			bool AttachObject(scene_node::AttachableObject object);
 
-			//Detach the given movable objects if attached to this node
-			//Returns true if the given movable object was detached
-			bool DetachObject(MovableObject &object) noexcept;
+			//Detach the given objects if attached to this node
+			//Returns true if the given object was detached
+			bool DetachObject(scene_node::AttachableObject object) noexcept;
 
-			//Detach all movable objects attached to this node
+			//Detach all objects attached to this node
 			void DetachAllObjects() noexcept;
 	};
 } //ion::graphics::scene::graph
