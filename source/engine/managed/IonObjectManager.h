@@ -416,7 +416,7 @@ namespace ion::managed
 
 			//Adopt (take ownership of) all the given objects
 			//If one or more objects could not be adopted, they will remain untouched in the given container
-			void Adopt(typename decltype(objects_) &objects) noexcept
+			void AdoptAll(typename decltype(objects_) &objects) noexcept
 			{
 				decltype(objects_) adoptable_objects;
 
@@ -453,9 +453,9 @@ namespace ion::managed
 
 			//Adopt (take ownership of) all the given objects
 			//If one or more objects could not be adopted, they will be released
-			void Adopt(typename decltype(objects_) &&objects) noexcept
+			void AdoptAll(typename decltype(objects_) &&objects) noexcept
 			{
-				Adopt(objects);
+				AdoptAll(objects);
 			}
 
 
