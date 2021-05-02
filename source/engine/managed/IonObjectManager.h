@@ -266,7 +266,7 @@ namespace ion::managed
 					NotifyRemoved(object); //Still valid
 
 					RemovalEnded();
-					return std::move(object_ptr);
+					return object_ptr;
 				}
 				else
 					return typename decltype(objects_)::value_type{};
@@ -294,7 +294,7 @@ namespace ion::managed
 					NotifyRemovedAll(objects); //Still valid
 
 					RemovalEnded();
-					return std::move(objects);
+					return objects;
 				}
 				else
 					return decltype(objects_){};
