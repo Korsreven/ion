@@ -34,7 +34,7 @@ namespace ion::graphics::scene
 	{
 		private:
 
-			graph::SceneNode *parent_node_;
+			graph::SceneNode *parent_node_ = nullptr;
 
 		protected:
 

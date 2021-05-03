@@ -86,25 +86,23 @@ void SceneNode::Update() const noexcept
 	{
 		if (parent_node_->need_update_)
 			parent_node_->Update(); //Recursive
-		else
+
+		derived_rotation_ = inherit_rotation_ ? rotation_ + parent_node_->derived_rotation_ : rotation_;
+		derived_direction_ = initial_direction_.Deviant(derived_rotation_);
+		derived_scaling_ = inherit_scaling_ ? scaling_ * parent_node_->derived_scaling_ : scaling_;
+
+		switch (rotation_origin_)
 		{
-			derived_rotation_ = inherit_rotation_ ? rotation_ + parent_node_->derived_rotation_ : rotation_;
-			derived_direction_ = initial_direction_.Deviant(derived_rotation_);
-			derived_scaling_ = inherit_scaling_ ? scaling_ * parent_node_->derived_scaling_ : scaling_;
+			case NodeRotationOrigin::Local:
+			derived_position_ =
+				position_ * detail::to_scaling3(parent_node_->derived_scaling_) + parent_node_->derived_position_;
+			break;
 
-			switch (rotation_origin_)
-			{
-				case NodeRotationOrigin::Local:
-				derived_position_ =
-					position_ * detail::to_scaling3(parent_node_->derived_scaling_) + parent_node_->derived_position_;
-				break;
-
-				case NodeRotationOrigin::Parent:
-				default:
-				derived_position_ =
-					(position_ * detail::to_scaling3(parent_node_->derived_scaling_)).Deviant(parent_node_->derived_rotation_) + parent_node_->derived_position_;
-				break;
-			}
+			case NodeRotationOrigin::Parent:
+			default:
+			derived_position_ =
+				(position_ * detail::to_scaling3(parent_node_->derived_scaling_)).Deviant(parent_node_->derived_rotation_) + parent_node_->derived_position_;
+			break;
 		}
 	}
 	else
@@ -126,8 +124,8 @@ void SceneNode::UpdateZ() const noexcept
 	{
 		if (parent_node_->need_z_update_)
 			parent_node_->UpdateZ(); //Recursive
-		else
-			derived_position_.Z(position_.Z() + parent_node_->derived_position_.Z());
+		
+		derived_position_.Z(position_.Z() + parent_node_->derived_position_.Z());
 	}
 	else
 		derived_position_.Z(position_.Z());
@@ -162,7 +160,7 @@ void SceneNode::RemoveNodes(detail::node_container &from_nodes, detail::node_con
 
 void SceneNode::GatherNodes(detail::node_container &nodes)
 {
-	nodes.push_back(this);
+	detail::add_node(nodes, this);
 
 	for (auto &child_node : child_nodes_)
 		child_node->GatherNodes(nodes); //Recursive
@@ -194,7 +192,7 @@ void SceneNode::GatherCameras(detail::camera_container &cameras)
 	for (auto &object : attached_objects_)
 	{
 		if (auto camera = std::get_if<Camera*>(&object))
-			cameras.push_back(*camera);
+			detail::add_object(cameras, *camera);
 	}
 
 	for (auto &child_node : child_nodes_)
@@ -227,7 +225,7 @@ void SceneNode::GatherLights(detail::light_container &lights)
 	for (auto &object : attached_objects_)
 	{
 		if (auto light = std::get_if<Light*>(&object))
-			lights.push_back(*light);
+			detail::add_object(lights, *light);
 	}
 
 	for (auto &child_node : child_nodes_)
@@ -316,6 +314,8 @@ SceneNode::SceneNode(bool visible) noexcept :
 
 SceneNode::SceneNode(const Vector2 &initial_direction, bool visible) noexcept :
 
+	direction_{initial_direction},
+
 	initial_direction_{initial_direction},
 	visible_{visible}
 {
@@ -325,6 +325,8 @@ SceneNode::SceneNode(const Vector2 &initial_direction, bool visible) noexcept :
 SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept :
 
 	position_{position},
+	direction_{initial_direction},
+
 	initial_direction_{initial_direction},
 	visible_{visible}
 {
@@ -342,6 +344,8 @@ SceneNode::SceneNode(SceneNode &parent_node, bool visible) noexcept :
 
 SceneNode::SceneNode(SceneNode &parent_node, const Vector2 &initial_direction, bool visible) noexcept :
 
+	direction_{initial_direction},
+
 	initial_direction_{initial_direction},
 	visible_{visible},
 	parent_node_{&parent_node}
@@ -352,6 +356,8 @@ SceneNode::SceneNode(SceneNode &parent_node, const Vector2 &initial_direction, b
 SceneNode::SceneNode(SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept :
 	
 	position_{position},
+	direction_{initial_direction},
+
 	initial_direction_{initial_direction},
 	visible_{visible},
 	parent_node_{&parent_node}

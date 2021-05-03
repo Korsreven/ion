@@ -269,9 +269,9 @@ namespace ion::graphics::scene::graph
 
 
 			mutable Vector3 derived_position_;
-			mutable Vector2 derived_direction_ = vector2::UnitY;
+			mutable Vector2 derived_direction_;
 			mutable real derived_rotation_ = 0.0_r;
-			mutable Vector2 derived_scaling_ = vector2::UnitScale;
+			mutable Vector2 derived_scaling_;
 			mutable Matrix4 full_tranformation_;
 
 			mutable bool need_update_ = true;
@@ -481,7 +481,12 @@ namespace ion::graphics::scene::graph
 						NotifyUpdateZ();
 
 						if (parent_node_)
+						{
+							for (auto &node : ordered_nodes_)
+								node->UpdateZ();
+
 							MoveNodes(RootNode().ordered_nodes_, ordered_nodes_);
+						}
 					}
 				}
 			}
