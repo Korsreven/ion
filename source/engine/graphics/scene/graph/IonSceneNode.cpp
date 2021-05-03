@@ -463,7 +463,8 @@ NonOwningPtr<SceneNode> SceneNode::CreateChildNode(const Vector3 &position, cons
 
 NonOwningPtr<SceneNode> SceneNode::Adopt(OwningPtr<SceneNode> &root_node)
 {
-	assert(root_node);
+	assert(root_node && &RootNode() != root_node.get());
+		//nullptr and cyclic check
 
 	auto &node = child_nodes_.emplace_back(std::move(root_node));
 	AttachNode(node.get());
