@@ -288,6 +288,39 @@ void SceneNode::DetachObjectsFromNode(scene_node::detail::object_container &obje
 }
 
 
+bool SceneNode::AttachObject(AttachableObject object)
+{
+	if (!std::visit([](auto &&object) noexcept { return object->ParentNode(); }, object))
+	{
+		attached_objects_.push_back(object);
+		AttachObjectToNode(object);
+		return true;
+	}
+	else
+		return false;
+}
+
+bool SceneNode::DetachObject(AttachableObject object) noexcept
+{
+	auto iter =
+		std::find_if(std::begin(attached_objects_), std::end(attached_objects_),
+			[&](auto &x) noexcept
+			{
+				return x == object;
+			});
+
+	//Object found
+	if (iter != std::end(attached_objects_))
+	{
+		DetachObjectFromNode(*iter);
+		attached_objects_.erase(iter);
+		return true;
+	}
+	else
+		return false;
+}
+
+
 void SceneNode::Tidy()
 {
 	//Gather and remove this and all descendant nodes in one batch
@@ -571,37 +604,37 @@ bool SceneNode::RemoveChildNode(SceneNode &child_node) noexcept
 	Attachable objects
 */
 
-bool SceneNode::AttachObject(AttachableObject object)
+bool SceneNode::AttachObject(MovableObject &object)
 {
-	if (!std::visit([](auto &&object) noexcept { return object->ParentNode(); }, object))
-	{
-		attached_objects_.push_back(object);
-		AttachObjectToNode(object);
-		return true;
-	}
-	else
-		return false;
+	return AttachObject(&object);
 }
 
-bool SceneNode::DetachObject(AttachableObject object) noexcept
+bool SceneNode::AttachObject(Camera &camera)
 {
-	auto iter =
-		std::find_if(std::begin(attached_objects_), std::end(attached_objects_),
-			[&](auto &x) noexcept
-			{
-				return x == object;
-			});
-
-	//Object found
-	if (iter != std::end(attached_objects_))
-	{
-		DetachObjectFromNode(*iter);
-		attached_objects_.erase(iter);
-		return true;
-	}
-	else
-		return false;
+	return AttachObject(&camera);
 }
+
+bool SceneNode::AttachObject(Light &light)
+{
+	return AttachObject(&light);
+}
+
+
+bool SceneNode::DetachObject(MovableObject &object) noexcept
+{
+	return DetachObject(&object);
+}
+
+bool SceneNode::DetachObject(Camera &camera) noexcept
+{
+	return DetachObject(&camera);
+}
+
+bool SceneNode::DetachObject(Light &light) noexcept
+{
+	return DetachObject(&light);
+}
+
 
 void SceneNode::DetachAllObjects() noexcept
 {

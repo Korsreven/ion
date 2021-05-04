@@ -326,6 +326,9 @@ namespace ion::graphics::scene::graph
 			void DetachObjectFromNode(scene_node::AttachableObject object, bool tidy = true) noexcept;
 			void DetachObjectsFromNode(scene_node::detail::object_container &objects, bool tidy = true) noexcept;
 
+			bool AttachObject(scene_node::AttachableObject object);
+			bool DetachObject(scene_node::AttachableObject object) noexcept;
+
 			void Tidy();
 
 		public:
@@ -481,12 +484,7 @@ namespace ion::graphics::scene::graph
 						NotifyUpdateZ();
 
 						if (parent_node_)
-						{
-							for (auto &node : ordered_nodes_)
-								node->UpdateZ();
-
 							MoveNodes(RootNode().ordered_nodes_, ordered_nodes_);
-						}
 					}
 				}
 			}
@@ -817,14 +815,32 @@ namespace ion::graphics::scene::graph
 
 			//Attach the given object to this node if not already attached
 			//Return true if the given object was attached
-			bool AttachObject(scene_node::AttachableObject object);
+			bool AttachObject(MovableObject &object);
 
-			//Detach the given objects if attached to this node
+			//Attach the given camera to this node if not already attached
+			//Return true if the given camera was attached
+			bool AttachObject(Camera &camera);
+
+			//Attach the given light to this node if not already attached
+			//Return true if the given light was attached
+			bool AttachObject(Light &light);
+
+
+			//Detach the given object if attached to this node
 			//Returns true if the given object was detached
-			bool DetachObject(scene_node::AttachableObject object) noexcept;
+			bool DetachObject(MovableObject &object) noexcept;
+
+			//Detach the given camera if attached to this node
+			//Returns true if the given camera was detached
+			bool DetachObject(Camera &camera) noexcept;
+
+			//Detach the given light if attached to this node
+			//Returns true if the given light was detached
+			bool DetachObject(Light &light) noexcept;
+
 
 			//Detach all objects attached to this node
-			void DetachAllObjects() noexcept;
+			void DetachAllObjects() noexcept;		
 	};
 } //ion::graphics::scene::graph
 
