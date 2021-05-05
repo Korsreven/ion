@@ -199,6 +199,7 @@
     <ClCompile Include="..\source\engine\graphics\render\vertex\IonVertexBufferView.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\vertex\IonVertexBatch.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\vertex\IonVertexDeclaration.cpp" />
+    <ClCompile Include="..\source\engine\graphics\scene\graph\IonSceneGraph.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\graph\IonSceneNode.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonCamera.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonLight.cpp" />
@@ -331,6 +332,7 @@
     <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexBatch.h" />
     <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexDataView.h" />
     <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexDeclaration.h" />
+    <ClInclude Include="..\source\engine\graphics\scene\graph\IonSceneGraph.h" />
     <ClInclude Include="..\source\engine\graphics\scene\graph\IonSceneNode.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonCamera.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonLight.h" />

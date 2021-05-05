@@ -87,6 +87,7 @@ File:	main.cpp
 #include "graphics/scene/IonMovableParticleSystem.h"
 #include "graphics/scene/IonMovableText.h"
 #include "graphics/scene/IonSceneManager.h"
+#include "graphics/scene/graph/IonSceneGraph.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/scene/shapes/IonBorder.h"
 #include "graphics/scene/shapes/IonCurve.h"
@@ -920,6 +921,69 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			engine.Target()->GetViewport("")->RenderTo();
 			auto &proj_mat = camera->ViewFrustum().ProjectionMatrix();
 			auto &view_mat = camera->ViewMatrix();
+
+
+			//Camera
+			auto cam1 = engine.Scene().CreateCamera("Cam1");
+			auto cam2 = engine.Scene().CreateCamera("Cam2");
+
+			//Lights
+			auto light = engine.Scene().CreateLight();
+			auto light1 = engine.Scene().CreateLight();
+			auto light2 = engine.Scene().CreateLight();
+
+			//Model
+			auto model1 = engine.Scene().CreateModel();
+			auto model2 = engine.Scene().CreateModel();
+
+			//Scene graph
+			{
+				auto scene_graph = ion::graphics::scene::graph::SceneGraph{};
+
+				//Root
+				auto model_node = scene_graph.RootNode().CreateChildNode({0.0_r, 0.0_r, -0.1_r});
+				auto camera_node = model_node->CreateChildNode({0.0_r, -0.5_r, -0.1_r});
+				auto light_node = camera_node->CreateChildNode({0.0_r, 0.0_r, -0.1_r});
+				model_node->AttachObject(*model);
+				camera_node->AttachObject(*camera);
+				light_node->AttachObject(*light);
+
+				//Loose branch a
+				auto branch_root_node_a = ion::make_owning<ion::graphics::scene::graph::SceneNode>(Vector3{0.0_r, 0.0_r, -0.1_r});
+				auto animation_node_a = branch_root_node_a->CreateChildNode({0.0_r, 0.0_r, -0.1_r});
+				auto model_node_a = animation_node_a->CreateChildNode({0.0_r, 0.5_r, -0.1_r});
+				auto camera_node_a_a = model_node_a->CreateChildNode({-0.5_r, 0.0_r, 0.2_r});
+				auto light_node_b_a = model_node_a->CreateChildNode({0.5_r, 0.0_r, 0.1_r});
+				model_node_a->AttachObject(*model1);
+				camera_node_a_a->AttachObject(*cam1);
+				light_node_b_a->AttachObject(*light1);
+
+				//Loose branch b
+				auto branch_root_node_b = ion::make_owning<ion::graphics::scene::graph::SceneNode>(Vector3{0.0_r, 0.0_r, -0.1_r});
+				auto animation_node_b = branch_root_node_b->CreateChildNode({0.0_r, 0.0_r, -0.1_r});
+				auto model_node_b = animation_node_b->CreateChildNode({0.0_r, 0.5_r, -0.1_r});
+				auto camera_node_a_b = model_node_b->CreateChildNode({-0.5_r, 0.0_r, 0.2_r});
+				auto light_node_b_b = model_node_b->CreateChildNode({0.5_r, 0.0_r, 0.1_r});
+				model_node_b->AttachObject(*model2);
+				camera_node_a_b->AttachObject(*cam2);
+				light_node_b_b->AttachObject(*light2);
+
+				auto branch_a = branch_root_node_a.get();
+				auto branch_b = branch_root_node_b.get();
+
+				//Adopt/orphan
+				scene_graph.RootNode().Adopt(branch_root_node_a);
+				scene_graph.RootNode().Adopt(branch_root_node_b);
+
+				branch_a->Position({0.0_r, 0.0_r, -10.0_r});
+
+				branch_root_node_a = scene_graph.RootNode().Orphan(*branch_a);
+				branch_root_node_b = scene_graph.RootNode().Orphan(*branch_b);
+
+				branch_root_node_a.reset();
+				branch_root_node_b.reset();
+			}
+
 
 			//Uniforms
 			scene_ambient->Get() = Color{1.0_r, 1.0_r, 1.0_r, 1.0};
