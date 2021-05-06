@@ -14,6 +14,7 @@ File:	IonSceneNode.h
 #define ION_SCENE_NODE
 
 #include <algorithm>
+#include <any>
 #include <variant>
 #include <vector>
 
@@ -261,6 +262,7 @@ namespace ion::graphics::scene::graph
 			SceneNode *parent_node_ = nullptr;
 			scene_node::SceneNodes child_nodes_;
 			scene_node::detail::object_container attached_objects_;
+			std::any user_data_;
 
 			scene_node::detail::node_container ordered_nodes_; //Root node only
 			scene_node::detail::camera_container attached_cameras_; //Root node only
@@ -579,6 +581,13 @@ namespace ion::graphics::scene::graph
 			}
 
 
+			//Sets the custom user data for this node to the given data
+			inline void UserData(std::any data) noexcept
+			{
+				user_data_ = data;
+			}
+
+
 			/*
 				Observers
 			*/
@@ -662,6 +671,12 @@ namespace ion::graphics::scene::graph
 					return parent_node_->RootNode(); //Recursive
 				else
 					return *this;
+			}
+
+			//Returns the custom user data for this node
+			[[nodiscard]] inline auto& UserData() const noexcept
+			{
+				return user_data_;
 			}
 
 

@@ -24,6 +24,20 @@ namespace movable_object::detail
 } //movable_object::detail
 
 
+//Private
+
+void MovableObject::Detach()
+{
+	if (parent_node_)
+	{
+		parent_node_->DetachObject(*this);
+		parent_node_ = nullptr;
+	}
+}
+
+
+//Public
+
 MovableObject::MovableObject(bool visible) :
 	visible_{visible}
 {
@@ -48,8 +62,7 @@ MovableObject::MovableObject(const MovableObject &rhs) noexcept :
 
 MovableObject::~MovableObject() noexcept
 {
-	if (parent_node_)
-		parent_node_->DetachObject(*this);
+	Detach();
 }
 
 } //ion::graphics::scene
