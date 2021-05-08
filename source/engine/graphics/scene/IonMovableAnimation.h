@@ -242,11 +242,11 @@ namespace ion::graphics::scene
 
 			//Prepare this animation such that it is ready to be drawn
 			//This is called once regardless of passes
-			void Prepare() noexcept;
+			void Prepare() noexcept override;
 
 			//Draw this animation with the given shader program (optional)
 			//This can be called multiple times if more than one pass
-			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept;
+			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept override;
 
 
 			/*
@@ -255,7 +255,7 @@ namespace ion::graphics::scene
 
 			//Elapse the total time for this animation by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
-			void Elapse(duration time) noexcept;
+			void Elapse(duration time) noexcept override;
 	};
 } //ion::graphics::scene
 

@@ -15,7 +15,20 @@ File:	IonMovableObject.h
 
 #include <any>
 
+#include "graphics/utilities/IonAabb.h"
+#include "graphics/utilities/IonObb.h"
+#include "graphics/utilities/IonSphere.h"
 #include "managed/IonManagedObject.h"
+#include "types/IonTypes.h"
+
+//Forward declarations
+namespace ion::graphics
+{
+	namespace shaders
+	{
+		class ShaderProgram;
+	}
+}
 
 namespace ion::graphics::scene
 {
@@ -25,6 +38,11 @@ namespace ion::graphics::scene
 	{
 		class SceneNode; //Forward declaration
 	}
+
+	using utilities::Aabb;
+	using utilities::Obb;
+	using utilities::Sphere;
+
 
 	namespace movable_object::detail
 	{
@@ -38,17 +56,35 @@ namespace ion::graphics::scene
 
 			bool visible_ = true;
 
+			Aabb aabb_;
+			Obb obb_;
+			Sphere sphere_;
+			bool update_bounding_volumes_ = false;
+
 		private:
 
 			graph::SceneNode *parent_node_ = nullptr;
 			std::any user_data_;
 
 
+			mutable Aabb world_aabb_;
+			mutable Obb world_obb_;
+			mutable Sphere world_sphere_;
+			mutable bool need_bounding_update_ = true;
+
+
+			/*
+				Updating
+			*/
+
+			void UpdateBoundingVolumes() const noexcept;
+
+
 			/*
 				Helper functions
 			*/
 
-			void Detach();
+			void Detach() noexcept;
 
 		public:
 
@@ -110,10 +146,29 @@ namespace ion::graphics::scene
 				Observers
 			*/
 
-			//Returns true if this model is visible
+			//Returns true if this movable object is visible
 			[[nodiscard]] inline auto Visible() const noexcept
 			{
 				return visible_;
+			}
+
+
+			//Returns the local axis-aligned bounding box (AABB) for this movable object
+			[[nodiscard]] inline auto& AxisAlignedBoundingBox() const noexcept
+			{
+				return aabb_;
+			}
+
+			//Returns the local oriented bounding box (OBB) for this movable object
+			[[nodiscard]] inline auto& OrientedBoundingBox() const noexcept
+			{
+				return obb_;
+			}
+
+			//Returns the local bounding sphere for this movable object
+			[[nodiscard]] inline auto& BoundingSphere() const noexcept
+			{
+				return sphere_;
 			}
 
 
@@ -128,6 +183,66 @@ namespace ion::graphics::scene
 			{
 				return user_data_;
 			}
+
+
+			//Returns the world axis-aligned bounding box (AABB) for this movable object
+			[[nodiscard]] inline auto& WorldAxisAlignedBoundingBox() const noexcept
+			{
+				if (need_bounding_update_)
+					UpdateBoundingVolumes();
+
+				return world_aabb_;
+			}
+
+			//Returns the world oriented bounding box (OBB) for this movable object
+			[[nodiscard]] inline auto& WorldOrientedBoundingBox() const noexcept
+			{
+				if (need_bounding_update_)
+					UpdateBoundingVolumes();
+
+				return world_obb_;
+			}
+
+			//Returns the world bounding sphere for this movable object
+			[[nodiscard]] inline auto& WorldBoundingSphere() const noexcept
+			{
+				if (need_bounding_update_)
+					UpdateBoundingVolumes();
+
+				return world_sphere_;
+			}
+
+
+			/*
+				Rendering
+			*/
+
+			//Render this movable object based on its defined passes
+			//This is called once from a scene graph render queue, with the time in seconds since last frame
+			//It will call elapse then prepare, and then call draw one time per pass
+			void Render(duration time) noexcept;
+
+
+			/*
+				Preparing / drawing
+			*/
+
+			//Prepare this movable object such that it is ready to be drawn
+			//This is called once regardless of passes
+			virtual void Prepare() noexcept;
+
+			//Draw this movable object with the given shader program (optional)
+			//This can be called multiple times if more than one pass
+			virtual void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept;
+
+
+			/*
+				Elapse time
+			*/
+
+			//Elapse the total time for this movable object by the given time in seconds
+			//This function is typically called each frame, with the time in seconds since last frame
+			virtual void Elapse(duration time) noexcept;
 	};
 } //ion::graphics::scene
 

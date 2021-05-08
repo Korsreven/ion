@@ -13,6 +13,7 @@ File:	IonMovableObject.cpp
 #include "IonMovableObject.h"
 
 #include "graph/IonSceneNode.h"
+#include "graphics/utilities/IonMatrix3.h"
 
 namespace ion::graphics::scene
 {
@@ -26,7 +27,33 @@ namespace movable_object::detail
 
 //Private
 
-void MovableObject::Detach()
+/*
+	Updating
+*/
+
+void MovableObject::UpdateBoundingVolumes() const noexcept
+{
+	world_aabb_ = aabb_;
+	world_obb_ = obb_;
+	world_sphere_ = sphere_;
+
+	if (parent_node_)
+	{
+		auto mat = graphics::utilities::Matrix3{parent_node_->FullTransformation()};
+		world_aabb_.Transform(mat);
+		world_obb_.Transform(mat);
+		world_sphere_.Transform(mat);
+	}
+
+	need_bounding_update_ = false;
+}
+
+
+/*
+	Helper functions
+*/
+
+void MovableObject::Detach() noexcept
 {
 	if (parent_node_)
 	{
@@ -63,6 +90,43 @@ MovableObject::MovableObject(const MovableObject &rhs) noexcept :
 MovableObject::~MovableObject() noexcept
 {
 	Detach();
+}
+
+
+/*
+	Rendering
+*/
+
+void MovableObject::Render(duration time) noexcept
+{
+	Elapse(time);
+	Prepare();
+	Draw(); //Todo
+}
+
+
+/*
+	Preparing / drawing
+*/
+
+void MovableObject::Prepare() noexcept
+{
+	//Optional to override
+}
+
+void MovableObject::Draw([[maybe_unused]] shaders::ShaderProgram *shader_program) noexcept
+{
+	//Optional to override
+}
+
+
+/*
+	Elapse time
+*/
+
+void MovableObject::Elapse([[maybe_unused]] duration time) noexcept
+{
+	//Optional to override
 }
 
 } //ion::graphics::scene

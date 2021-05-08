@@ -20,9 +20,6 @@ File:	IonModel.h
 #include "IonMovableObject.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
 #include "graphics/render/vertex/IonVertexBufferObject.h"
-#include "graphics/utilities/IonAabb.h"
-#include "graphics/utilities/IonObb.h"
-#include "graphics/utilities/IonSphere.h"
 #include "memory/IonNonOwningPtr.h"
 #include "shapes/IonMesh.h"
 #include "shapes/IonShape.h"
@@ -45,10 +42,6 @@ namespace ion::graphics
 
 namespace ion::graphics::scene
 {
-	using utilities::Aabb;
-	using utilities::Obb;
-	using utilities::Sphere;
-
 	namespace model::detail
 	{
 	} //model
@@ -60,14 +53,8 @@ namespace ion::graphics::scene
 	{
 		private:
 
-			Aabb aabb_;
-			Obb obb_;
-			Sphere sphere_;
-
 			std::optional<render::vertex::VertexBufferObject> vbo_;
-
 			bool reload_vertex_buffer_ = false;
-			bool update_bounding_volumes_ = false;
 
 
 			void Created(shapes::Mesh &mesh);
@@ -101,25 +88,6 @@ namespace ion::graphics::scene
 				Observers
 			*/
 
-			//Returns the local axis-aligned bounding box (AABB) for this model
-			[[nodiscard]] inline auto& AxisAlignedBoundingBox() const noexcept
-			{
-				return aabb_;
-			}
-
-			//Returns the local oriented bounding box (OBB) for this model
-			[[nodiscard]] inline auto& OrientedBoundingBox() const noexcept
-			{
-				return obb_;
-			}
-
-			//Returns the local bounding sphere for this model
-			[[nodiscard]] inline auto& BoundingSphere() const noexcept
-			{
-				return sphere_;
-			}
-
-
 			//Return the vertex buffer this model uses
 			[[nodiscard]] inline auto& VertexBuffer() const noexcept
 			{
@@ -133,11 +101,11 @@ namespace ion::graphics::scene
 
 			//Prepare this model such that it is ready to be drawn
 			//This is called once regardless of passes
-			void Prepare() noexcept;
+			void Prepare() noexcept override;
 
 			//Draw this model with the given shader program (optional)
 			//This can be called multiple times if more than one pass
-			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept;
+			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept override;
 
 
 			/*
@@ -146,7 +114,7 @@ namespace ion::graphics::scene
 
 			//Elapse the total time for each mesh in this model by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
-			void Elapse(duration time) noexcept;
+			void Elapse(duration time) noexcept override;
 
 
 			/*
