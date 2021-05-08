@@ -59,18 +59,18 @@ namespace ion::graphics::scene
 			Aabb aabb_;
 			Obb obb_;
 			Sphere sphere_;
+
 			bool update_bounding_volumes_ = false;
+			mutable bool need_bounding_update_ = false;
 
 		private:
 
 			graph::SceneNode *parent_node_ = nullptr;
 			std::any user_data_;
 
-
 			mutable Aabb world_aabb_;
 			mutable Obb world_obb_;
 			mutable Sphere world_sphere_;
-			mutable bool need_bounding_update_ = true;
 
 
 			/*

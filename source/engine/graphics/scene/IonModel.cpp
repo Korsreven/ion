@@ -91,6 +91,7 @@ void Model::Prepare() noexcept
 		sphere_ = {aabb_.ToHalfSize().Length(), aabb_.Center()};
 
 		update_bounding_volumes_ = false;
+		need_bounding_update_ = true;
 	}
 }
 
