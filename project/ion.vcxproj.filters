@@ -495,6 +495,9 @@
     <ClCompile Include="..\source\engine\graphics\scene\graph\IonSceneGraph.cpp">
       <Filter>Source Files\graphics\scene\graph</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\IonGeometricObject.cpp">
+      <Filter>Source Files\graphics\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -976,6 +979,9 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\events\listeners\IonSceneNodeListener.h">
       <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\IonGeometricObject.h">
+      <Filter>Header Files\graphics\scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

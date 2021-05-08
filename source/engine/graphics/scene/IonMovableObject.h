@@ -49,7 +49,7 @@ namespace ion::graphics::scene
 	} //movable_object::detail
 
 
-	//A movable object that can be attached to a scene node
+	//A movable object with bounding volumes, that can be attached to a scene node
 	class MovableObject : public managed::ManagedObject<SceneManager>
 	{
 		protected:
@@ -220,20 +220,7 @@ namespace ion::graphics::scene
 			//Render this movable object based on its defined passes
 			//This is called once from a scene graph render queue, with the time in seconds since last frame
 			//It will call elapse then prepare, and then call draw one time per pass
-			void Render(duration time) noexcept;
-
-
-			/*
-				Preparing / drawing
-			*/
-
-			//Prepare this movable object such that it is ready to be drawn
-			//This is called once regardless of passes
-			virtual void Prepare() noexcept;
-
-			//Draw this movable object with the given shader program (optional)
-			//This can be called multiple times if more than one pass
-			virtual void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept;
+			virtual void Render(duration time) noexcept;
 
 
 			/*

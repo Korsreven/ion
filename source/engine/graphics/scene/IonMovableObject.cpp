@@ -97,24 +97,7 @@ MovableObject::~MovableObject() noexcept
 	Rendering
 */
 
-void MovableObject::Render(duration time) noexcept
-{
-	Elapse(time);
-	Prepare();
-	Draw(); //Todo
-}
-
-
-/*
-	Preparing / drawing
-*/
-
-void MovableObject::Prepare() noexcept
-{
-	//Optional to override
-}
-
-void MovableObject::Draw([[maybe_unused]] shaders::ShaderProgram *shader_program) noexcept
+void MovableObject::Render([[maybe_unused]] duration time) noexcept
 {
 	//Optional to override
 }

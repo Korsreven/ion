@@ -16,7 +16,7 @@ File:	IonMovableAnimation.h
 #include <array>
 #include <optional>
 
-#include "IonMovableObject.h"
+#include "IonGeometricObject.h"
 #include "graphics/textures/IonAnimation.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
 #include "graphics/render/vertex/IonVertexBufferObject.h"
@@ -102,7 +102,7 @@ namespace ion::graphics::scene
 
 
 	//A movable animation that can be attached to a scene node
-	class MovableAnimation final : public MovableObject
+	class MovableAnimation final : public GeometricObject
 	{
 		private:
 		

@@ -133,7 +133,7 @@ void MovableParticleSystem::PrepareVertexStreams()
 
 MovableParticleSystem::MovableParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible) :
 	
-	MovableObject{visible},
+	GeometricObject{visible},
 	particle_system_{particle_system ? std::make_optional(particle_system->Clone()) : std::nullopt},
 	initial_particle_system_{particle_system}
 {
