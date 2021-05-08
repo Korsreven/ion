@@ -18,6 +18,7 @@ File:	IonMatrix3.h
 
 namespace ion::graphics::utilities
 {
+	class Matrix4; //Forward declaration
 	using namespace types::type_literals;
 
 	namespace matrix3::detail
@@ -63,6 +64,9 @@ namespace ion::graphics::utilities
 			Matrix3(real m00, real m01, real m02,
 					real m10, real m11, real m12) noexcept;
 			#endif
+
+			//Constructs a new matrix from the given 4x4 matrix
+			Matrix3(const Matrix4 &matrix) noexcept;
 			
 
 			/*
@@ -94,6 +98,10 @@ namespace ion::graphics::utilities
 			/*
 				Operators
 			*/
+
+			//Sets this matrix equal to the given 4x4 matrix
+			Matrix3& operator=(const Matrix4 &matrix) noexcept;
+
 
 			//Checks if two matrices are equal (all numbers are equal)
 			[[nodiscard]] inline auto operator==(const Matrix3 &rhs) const noexcept

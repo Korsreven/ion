@@ -15,6 +15,7 @@ File:	IonMatrix3.cpp
 #include <cassert>
 #include <cmath>
 
+#include "IonMatrix4.h"
 #include "utilities/IonMath.h"
 
 namespace ion::graphics::utilities
@@ -59,6 +60,21 @@ Matrix3::Matrix3(real m00, real m01, real m02,
 	//Empty
 }
 #endif
+
+Matrix3::Matrix3(const Matrix4 &matrix) noexcept :
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+	Matrix3{matrix.M00(), matrix.M01(),
+			matrix.M10(), matrix.M11(),
+			matrix.M30(), matrix.M31()}
+	#else
+	//Column-major layout (OpenGL)
+	Matrix3{matrix.M00(), matrix.M01(), matrix.M03(),
+			matrix.M10(), matrix.M11(), matrix.M13()}
+	#endif
+{
+	//Empty
+}
 
 
 /*
@@ -172,6 +188,28 @@ Matrix3 Matrix3::Transformation(real rotation, const Vector2 &scaling, const Vec
 	return {rot.M00() * scaling.X(), rot.M01() * scaling.Y(), translation.X(),
 			rot.M10() * scaling.X(), rot.M11() * scaling.Y(), translation.Y()};
 	#endif
+}
+
+
+/*
+	Operators
+*/
+
+Matrix3& Matrix3::operator=(const Matrix4 &matrix) noexcept
+{
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+	m_[0][0] = matrix.M00();		m_[0][1] = matrix.M01();		m_[0][2] = 0.0_r;
+	m_[1][0] = matrix.M10();		m_[1][1] = matrix.M11();		m_[1][2] = 0.0_r;
+	m_[2][0] = matrix.M30();		m_[2][1] = matrix.M31();		m_[2][2] = 1.0_r;
+	#else
+	//Column-major layout (OpenGL)
+	m_[0][0] = matrix.M00();		m_[0][1] = matrix.M01();		m_[0][2] = matrix.M03();
+	m_[1][0] = matrix.M10();		m_[1][1] = matrix.M11();		m_[1][2] = matrix.M13();
+	m_[2][0] = 0.0_r;				m_[2][1] = 0.0_r;				m_[2][2] = 1.0_r;
+	#endif
+
+	return *this;
 }
 
 
