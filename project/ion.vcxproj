@@ -296,6 +296,7 @@
     <ClInclude Include="..\source\engine\events\listeners\IonMouseListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonRenderTargetListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonResourceListener.h" />
+    <ClInclude Include="..\source\engine\events\listeners\IonSceneNodeListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonViewportListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonWindowListener.h" />
     <ClInclude Include="..\source\engine\graphics\fonts\IonFont.h" />

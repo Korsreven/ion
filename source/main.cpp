@@ -42,6 +42,7 @@ File:	main.cpp
 #include "events/listeners/IonMouseListener.h"
 #include "events/listeners/IonRenderTargetListener.h"
 #include "events/listeners/IonResourceListener.h"
+#include "events/listeners/IonSceneNodeListener.h"
 #include "events/listeners/IonViewportListener.h"
 #include "events/listeners/IonWindowListener.h"
 

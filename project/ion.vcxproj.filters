@@ -974,5 +974,8 @@
     <ClInclude Include="..\source\engine\graphics\scene\graph\IonSceneGraph.h">
       <Filter>Header Files\graphics\scene\graph</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonSceneNodeListener.h">
+      <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

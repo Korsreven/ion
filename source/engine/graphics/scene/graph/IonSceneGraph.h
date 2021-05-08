@@ -14,6 +14,8 @@ File:	IonSceneGraph.h
 #define ION_SCENE_GRAPH
 
 #include "IonSceneNode.h"
+#include "events/IonListenable.h"
+#include "events/listeners/IonSceneNodeListener.h"
 
 namespace ion::graphics::scene::graph
 {
@@ -25,9 +27,13 @@ namespace ion::graphics::scene::graph
 	} //scene_graph
 
 
-	class SceneGraph final
+	class SceneGraph final :
+		protected events::Listenable<events::listeners::SceneNodeListener>
 	{
 		private:
+
+			using NodeEventsBase = events::Listenable<events::listeners::SceneNodeListener>;
+
 
 			SceneNode root_node_;
 
@@ -35,6 +41,23 @@ namespace ion::graphics::scene::graph
 
 			//Default constructor
 			SceneGraph() = default;
+
+
+			/*
+				Events
+			*/
+
+			//Return a mutable reference to the node events of this scene graph
+			[[nodiscard]] inline auto& NodeEvents() noexcept
+			{
+				return static_cast<NodeEventsBase&>(*this);
+			}
+
+			//Return a immutable reference to the node events of this scene graph
+			[[nodiscard]] inline auto& NodeEvents() const noexcept
+			{
+				return static_cast<const NodeEventsBase&>(*this);
+			}
 
 
 			/*
