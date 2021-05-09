@@ -23,6 +23,9 @@ namespace ion::graphics::scene::graph
 	{
 		namespace detail
 		{
+			constexpr auto max_light_count = 8;
+				//Warning: This value must be less or equal to the actual array size used for lights (in the fragment shader)
+				//If scene graph contains more visible lights, then only the lights nearest to the geometry will be rendered
 		} //detail
 	} //scene_graph
 
