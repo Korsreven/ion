@@ -17,7 +17,7 @@ File:	IonModel.h
 #include <type_traits>
 #include <vector>
 
-#include "IonGeometricObject.h"
+#include "IonDrawableObject.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
 #include "graphics/render/vertex/IonVertexBufferObject.h"
 #include "memory/IonNonOwningPtr.h"
@@ -48,7 +48,7 @@ namespace ion::graphics::scene
 
 
 	class Model final :
-		public GeometricObject,
+		public DrawableObject,
 		protected unmanaged::ObjectFactory<shapes::Mesh>
 	{
 		private:

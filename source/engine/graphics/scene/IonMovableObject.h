@@ -131,7 +131,6 @@ namespace ion::graphics::scene
 			//Sets parent node of this movable object to the given node
 			inline void ParentNode(graph::SceneNode *scene_node) noexcept
 			{
-				Detach();
 				parent_node_ = scene_node;
 			}
 

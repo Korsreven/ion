@@ -6,7 +6,7 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/scene
-File:	IonGeometricObject.h
+File:	IonDrawableObject.h
 -------------------------------------------
 */
 
@@ -17,13 +17,13 @@ File:	IonGeometricObject.h
 
 namespace ion::graphics::scene
 {
-	namespace geometric_object::detail
+	namespace drawable_object::detail
 	{
-	} //geometric_object::detail
+	} //drawable_object::detail
 
 
-	//A geometric object that can be prepared and drawn with one or more passes
-	class GeometricObject : public MovableObject
+	//A drawable object that can be prepared and drawn with one or more passes
+	class DrawableObject : public MovableObject
 	{
 		private:
 
@@ -32,16 +32,16 @@ namespace ion::graphics::scene
 		public:
 
 			//Default constructor
-			GeometricObject() = default;
+			DrawableObject() = default;
 
-			//Construct a geometric object with the given visibility
-			explicit GeometricObject(bool visible);
+			//Construct a drawable object with the given visibility
+			explicit DrawableObject(bool visible);
 
-			//Construct a geometric object with the given name and visibility
-			explicit GeometricObject(std::string name, bool visible = true);
+			//Construct a drawable object with the given name and visibility
+			explicit DrawableObject(std::string name, bool visible = true);
 
 			//Copy constructor
-			GeometricObject(const GeometricObject &rhs) noexcept;
+			DrawableObject(const DrawableObject &rhs) noexcept;
 
 
 			/*
@@ -60,7 +60,7 @@ namespace ion::graphics::scene
 				Rendering
 			*/
 
-			//Render this geometric object based on its defined passes
+			//Render this drawable object based on its defined passes
 			//This is called once from a scene graph render queue, with the time in seconds since last frame
 			//It will call elapse then prepare, and then call draw one time per pass
 			void Render(duration time) noexcept override;

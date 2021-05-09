@@ -6,35 +6,35 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/scene
-File:	IonGeometricObject.cpp
+File:	IonDrawableObject.cpp
 -------------------------------------------
 */
 
-#include "IonGeometricObject.h"
+#include "IonDrawableObject.h"
 
 namespace ion::graphics::scene
 {
 
-using namespace geometric_object;
+using namespace drawable_object;
 
-namespace geometric_object::detail
+namespace drawable_object::detail
 {
-} //geometric_object::detail
+} //drawable_object::detail
 
 
-GeometricObject::GeometricObject(bool visible) :
+DrawableObject::DrawableObject(bool visible) :
 	MovableObject{visible}
 {
 	//Empty
 }
 
-GeometricObject::GeometricObject(std::string name, bool visible) :
+DrawableObject::DrawableObject(std::string name, bool visible) :
 	MovableObject{std::move(name), visible}
 {
 	//Empty
 }
 
-GeometricObject::GeometricObject(const GeometricObject &rhs) noexcept :
+DrawableObject::DrawableObject(const DrawableObject &rhs) noexcept :
 	MovableObject{rhs}
 {
 	//Empty
@@ -45,7 +45,7 @@ GeometricObject::GeometricObject(const GeometricObject &rhs) noexcept :
 	Rendering
 */
 
-void GeometricObject::Render(duration time) noexcept
+void DrawableObject::Render(duration time) noexcept
 {
 	Elapse(time);
 	Prepare();
@@ -57,7 +57,7 @@ void GeometricObject::Render(duration time) noexcept
 	Elapse time
 */
 
-void GeometricObject::Elapse([[maybe_unused]] duration time) noexcept
+void DrawableObject::Elapse([[maybe_unused]] duration time) noexcept
 {
 	//Optional to override
 }

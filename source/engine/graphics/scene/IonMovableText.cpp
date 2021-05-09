@@ -604,7 +604,7 @@ MovableText::MovableText(const Vector3 &position, NonOwningPtr<fonts::Text> text
 
 MovableText::MovableText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible) :
 	
-	GeometricObject{visible},
+	DrawableObject{visible},
 
 	position_{position},
 	rotation_{rotation},

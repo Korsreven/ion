@@ -38,7 +38,7 @@ void Model::Created(shapes::Mesh &mesh)
 //Public
 
 Model::Model(bool visible) noexcept :
-	GeometricObject{visible}
+	DrawableObject{visible}
 {
 	//Empty
 }

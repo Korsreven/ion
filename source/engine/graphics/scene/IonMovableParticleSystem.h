@@ -17,7 +17,7 @@ File:	IonMovableParticleSystem.h
 #include <optional>
 #include <vector>
 
-#include "IonGeometricObject.h"
+#include "IonDrawableObject.h"
 #include "graphics/particles/IonParticleSystem.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
 #include "graphics/render/vertex/IonVertexBufferObject.h"
@@ -87,7 +87,7 @@ namespace ion::graphics::scene
 
 
 	//A movable particle system that can be attached to a scene node
-	class MovableParticleSystem final : public GeometricObject
+	class MovableParticleSystem final : public DrawableObject
 	{
 		private:
 

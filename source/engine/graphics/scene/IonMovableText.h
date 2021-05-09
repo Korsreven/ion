@@ -18,7 +18,7 @@ File:	IonMovableText.h
 #include <optional>
 #include <vector>
 
-#include "IonGeometricObject.h"
+#include "IonDrawableObject.h"
 #include "graphics/fonts/IonText.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
 #include "graphics/render/vertex/IonVertexBufferObject.h"
@@ -144,7 +144,7 @@ namespace ion::graphics::scene
 
 
 	//A movable text that can be attached to a scene node
-	class MovableText final : public GeometricObject
+	class MovableText final : public DrawableObject
 	{
 		private:
 

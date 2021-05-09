@@ -495,7 +495,7 @@
     <ClCompile Include="..\source\engine\graphics\scene\graph\IonSceneGraph.cpp">
       <Filter>Source Files\graphics\scene\graph</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\engine\graphics\scene\IonGeometricObject.cpp">
+    <ClCompile Include="..\source\engine\graphics\scene\IonDrawableObject.cpp">
       <Filter>Source Files\graphics\scene</Filter>
     </ClCompile>
   </ItemGroup>
@@ -980,7 +980,7 @@
     <ClInclude Include="..\source\engine\events\listeners\IonSceneNodeListener.h">
       <Filter>Header Files\events\listeners</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\graphics\scene\IonGeometricObject.h">
+    <ClInclude Include="..\source\engine\graphics\scene\IonDrawableObject.h">
       <Filter>Header Files\graphics\scene</Filter>
     </ClInclude>
   </ItemGroup>

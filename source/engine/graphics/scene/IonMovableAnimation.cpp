@@ -140,7 +140,7 @@ MovableAnimation::MovableAnimation(const Vector3 &position, const Vector2 &size,
 
 MovableAnimation::MovableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
 	
-	GeometricObject{visible},
+	DrawableObject{visible},
 
 	position_{position},
 	rotation_{rotation},

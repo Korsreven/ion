@@ -87,6 +87,7 @@ File:	main.cpp
 #include "graphics/scene/IonMovableObject.h"
 #include "graphics/scene/IonMovableParticleSystem.h"
 #include "graphics/scene/IonMovableText.h"
+#include "graphics/scene/IonDrawableObject.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneGraph.h"
 #include "graphics/scene/graph/IonSceneNode.h"
@@ -460,8 +461,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::graphics::shaders::ShaderManager shaders;
 			shaders.CreateRepository(std::move(shader_repository));
 			shaders.LogLevel(ion::graphics::shaders::shader_manager::InfoLogLevel::Error);		
-			auto mesh_vert_shader = shaders.CreateShader("default_mesh_vert", "default_mesh.vert");
-			auto mesh_frag_shader = shaders.CreateShader("default_mesh_frag", "default_mesh.frag");
+			auto model_vert_shader = shaders.CreateShader("default_model_vert", "default_model.vert");
+			auto model_frag_shader = shaders.CreateShader("default_model_frag", "default_model.frag");
 			//auto particle_vert_shader = shaders.CreateShader("default_particle_vert", "default_particle.vert");
 			//auto particle_frag_shader = shaders.CreateShader("default_particle_frag", "default_particle.frag");
 			//auto text_vert_shader = shaders.CreateShader("default_text_vert", "default_text.vert");
@@ -475,7 +476,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Shader programs
 			ion::graphics::shaders::ShaderProgramManager shader_programs;
 			shader_programs.LogLevel(ion::graphics::shaders::shader_program_manager::InfoLogLevel::Error);
-			auto shader_prog = shader_programs.CreateShaderProgram("default_mesh_prog", mesh_vert_shader, mesh_frag_shader);
+			auto shader_prog = shader_programs.CreateShaderProgram("default_model_prog", model_vert_shader, model_frag_shader);
 			//auto shader_prog = shader_programs.CreateShaderProgram("default_particle_prog", particle_vert_shader, particle_frag_shader);
 			//auto shader_prog = shader_programs.CreateShaderProgram("default_text_prog", text_vert_shader, text_frag_shader);
 			//auto shader_prog = shader_programs.CreateShaderProgram("default_gui_text_prog", gui_text_vert_shader, gui_text_frag_shader);
