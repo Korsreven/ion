@@ -70,6 +70,7 @@ File:	main.cpp
 #include "graphics/particles/affectors/IonScaler.h"
 #include "graphics/particles/affectors/IonSineForce.h"
 #include "graphics/particles/affectors/IonVelocityRandomizer.h"
+#include "graphics/render/IonFog.h"
 #include "graphics/render/IonFrustum.h"
 #include "graphics/render/IonRenderTarget.h"
 #include "graphics/render/IonRenderWindow.h"
