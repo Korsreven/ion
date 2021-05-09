@@ -6,7 +6,7 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/scene
-File:	IonMovableParticleSystem.h
+File:	IonDrawableParticleSystem.h
 -------------------------------------------
 */
 
@@ -36,7 +36,7 @@ namespace ion::graphics
 
 namespace ion::graphics::scene
 {
-	namespace movable_particle_system::detail
+	namespace drawable_particle_system::detail
 	{
 		struct emitter_vertex_stream
 		{
@@ -83,18 +83,18 @@ namespace ion::graphics::scene
 
 		void enable_point_sprites() noexcept;
 		void disable_point_sprites() noexcept;
-	} //movable_particle_system::detail
+	} //drawable_particle_system::detail
 
 
-	//A movable particle system that can be attached to a scene node
-	class MovableParticleSystem final : public DrawableObject
+	//A drawable particle system that can be attached to a scene node
+	class DrawableParticleSystem final : public DrawableObject
 	{
 		private:
 
 			std::optional<particles::ParticleSystem> particle_system_;
 			NonOwningPtr<particles::ParticleSystem> initial_particle_system_;
 
-			movable_particle_system::detail::emitter_vertex_streams vertex_streams_;
+			drawable_particle_system::detail::emitter_vertex_streams vertex_streams_;
 			std::optional<render::vertex::VertexBufferObject> vbo_;
 
 			bool reload_vertex_buffer_ = false;
@@ -104,8 +104,8 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new movable particle system with the given particle system and visibility
-			explicit MovableParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible = true);
+			//Construct a new drawable particle system with the given particle system and visibility
+			explicit DrawableParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible = true);
 
 
 			/*

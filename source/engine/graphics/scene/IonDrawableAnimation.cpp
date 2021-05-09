@@ -6,19 +6,19 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/scene
-File:	IonMovableAnimation.cpp
+File:	IonDrawableAnimation.cpp
 -------------------------------------------
 */
 
-#include "IonMovableAnimation.h"
+#include "IonDrawableAnimation.h"
 
 namespace ion::graphics::scene
 {
 
-using namespace movable_animation;
+using namespace drawable_animation;
 using namespace utilities;
 
-namespace movable_animation::detail
+namespace drawable_animation::detail
 {
 
 animation_vertex_stream::animation_vertex_stream() :
@@ -91,12 +91,12 @@ vertex_container get_animation_vertex_data(textures::Animation &animation,
 		};
 }
 
-} //movable_animation::detail
+} //drawable_animation::detail
 
 
 //Private
 
-void MovableAnimation::PrepareVertexStream()
+void DrawableAnimation::PrepareVertexStream()
 {
 	if (!vbo_)
 		reload_vertex_buffer_ = true;
@@ -107,38 +107,38 @@ void MovableAnimation::PrepareVertexStream()
 
 //Public
 
-MovableAnimation::MovableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible) :
-	MovableAnimation{vector3::Zero, size, animation, visible}
+DrawableAnimation::DrawableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible) :
+	DrawableAnimation{vector3::Zero, size, animation, visible}
 {
 	//Empty
 }
 
-MovableAnimation::MovableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible) :
-	MovableAnimation{position, 0.0_r, size, animation, visible}
+DrawableAnimation::DrawableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible) :
+	DrawableAnimation{position, 0.0_r, size, animation, visible}
 {
 	//Empty
 }
 
-MovableAnimation::MovableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible) :
-	MovableAnimation{position, rotation, size, animation, color::White, visible}
+DrawableAnimation::DrawableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible) :
+	DrawableAnimation{position, rotation, size, animation, color::White, visible}
 {
 	//Empty
 }
 
 
-MovableAnimation::MovableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
-	MovableAnimation{vector3::Zero, size, animation, color, visible}
+DrawableAnimation::DrawableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
+	DrawableAnimation{vector3::Zero, size, animation, color, visible}
 {
 	//Empty
 }
 
-MovableAnimation::MovableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
-	MovableAnimation{position, 0.0_r, size, animation, color, visible}
+DrawableAnimation::DrawableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
+	DrawableAnimation{position, 0.0_r, size, animation, color, visible}
 {
 	//Empty
 }
 
-MovableAnimation::MovableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
+DrawableAnimation::DrawableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
 	
 	DrawableObject{visible},
 
@@ -160,7 +160,7 @@ MovableAnimation::MovableAnimation(const Vector3 &position, real rotation, const
 	Modifiers
 */
 
-void MovableAnimation::Revert()
+void DrawableAnimation::Revert()
 {
 	if (initial_animation_)
 		animation_ = *initial_animation_;
@@ -171,7 +171,7 @@ void MovableAnimation::Revert()
 	Preparing / drawing
 */
 
-void MovableAnimation::Prepare() noexcept
+void DrawableAnimation::Prepare() noexcept
 {
 	if (!animation_)
 		return;
@@ -200,7 +200,7 @@ void MovableAnimation::Prepare() noexcept
 	vertex_stream_.vertex_batch.Prepare();
 }
 
-void MovableAnimation::Draw(shaders::ShaderProgram *shader_program) noexcept
+void DrawableAnimation::Draw(shaders::ShaderProgram *shader_program) noexcept
 {
 	if (visible_ && animation_)
 		vertex_stream_.vertex_batch.Draw(shader_program);
@@ -211,7 +211,7 @@ void MovableAnimation::Draw(shaders::ShaderProgram *shader_program) noexcept
 	Elapse time
 */
 
-void MovableAnimation::Elapse(duration time) noexcept
+void DrawableAnimation::Elapse(duration time) noexcept
 {
 	if (animation_)
 	{

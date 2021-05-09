@@ -178,33 +178,33 @@ bool SceneManager::RemoveModel(Model &model) noexcept
 	Creating
 */
 
-NonOwningPtr<MovableAnimation> SceneManager::CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible)
+NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible)
 {
 	return AnimationBase::Create(size, animation, visible);
 }
 
-NonOwningPtr<MovableAnimation> SceneManager::CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible)
+NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible)
 {
 	return AnimationBase::Create(position, size, animation, visible);
 }
 
-NonOwningPtr<MovableAnimation> SceneManager::CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible)
+NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible)
 {
 	return AnimationBase::Create(position, rotation, size, animation, visible);
 }
 
 
-NonOwningPtr<MovableAnimation> SceneManager::CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
+NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
 {
 	return AnimationBase::Create(size, animation, color, visible);
 }
 
-NonOwningPtr<MovableAnimation> SceneManager::CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
+NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
 {
 	return AnimationBase::Create(position, size, animation, color, visible);
 }
 
-NonOwningPtr<MovableAnimation> SceneManager::CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
+NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
 {
 	return AnimationBase::Create(position, rotation, size, animation, color, visible);
 }
@@ -220,7 +220,7 @@ void SceneManager::ClearAnimations() noexcept
 	AnimationBase::Clear();
 }
 
-bool SceneManager::RemoveAnimation(MovableAnimation &animation) noexcept
+bool SceneManager::RemoveAnimation(DrawableAnimation &animation) noexcept
 {
 	return AnimationBase::Remove(animation);
 }
@@ -231,7 +231,7 @@ bool SceneManager::RemoveAnimation(MovableAnimation &animation) noexcept
 	Creating
 */
 
-NonOwningPtr<MovableParticleSystem> SceneManager::CreateParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible)
+NonOwningPtr<DrawableParticleSystem> SceneManager::CreateParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible)
 {
 	return ParticleSystemBase::Create(particle_system, visible);
 }
@@ -247,7 +247,7 @@ void SceneManager::ClearParticleSystems() noexcept
 	ParticleSystemBase::Clear();
 }
 
-bool SceneManager::RemoveParticleSystem(MovableParticleSystem &particle_system) noexcept
+bool SceneManager::RemoveParticleSystem(DrawableParticleSystem &particle_system) noexcept
 {
 	return ParticleSystemBase::Remove(particle_system);
 }
@@ -258,17 +258,17 @@ bool SceneManager::RemoveParticleSystem(MovableParticleSystem &particle_system) 
 	Creating
 */
 
-NonOwningPtr<MovableText> SceneManager::CreateText(NonOwningPtr<fonts::Text> text, bool visible)
+NonOwningPtr<DrawableText> SceneManager::CreateText(NonOwningPtr<fonts::Text> text, bool visible)
 {
 	return TextBase::Create(text, visible);
 }
 
-NonOwningPtr<MovableText> SceneManager::CreateText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible)
+NonOwningPtr<DrawableText> SceneManager::CreateText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible)
 {
 	return TextBase::Create(position, text, visible);
 }
 
-NonOwningPtr<MovableText> SceneManager::CreateText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible)
+NonOwningPtr<DrawableText> SceneManager::CreateText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible)
 {
 	return TextBase::Create(position, rotation, text, visible);
 }
@@ -284,7 +284,7 @@ void SceneManager::ClearTexts() noexcept
 	TextBase::Clear();
 }
 
-bool SceneManager::RemoveText(MovableText &text) noexcept
+bool SceneManager::RemoveText(DrawableText &text) noexcept
 {
 	return TextBase::Remove(text);
 }

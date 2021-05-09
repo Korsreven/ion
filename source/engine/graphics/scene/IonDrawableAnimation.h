@@ -6,7 +6,7 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/scene/
-File:	IonMovableAnimation.h
+File:	IonDrawableAnimation.h
 -------------------------------------------
 */
 
@@ -50,7 +50,7 @@ namespace ion::graphics::scene
 	using utilities::Vector3;
 
 
-	namespace movable_animation::detail
+	namespace drawable_animation::detail
 	{
 		constexpr auto position_components = 3; //x,y,z
 		constexpr auto color_components = 4; //r,g,b,a
@@ -98,11 +98,11 @@ namespace ion::graphics::scene
 
 		vertex_container get_animation_vertex_data(textures::Animation &animation,
 			const Vector3 &position, real rotation, const Vector2 &size, const Color &color);
-	} //movable_animation::detail
+	} //drawable_animation::detail
 
 
-	//A movable animation that can be attached to a scene node
-	class MovableAnimation final : public DrawableObject
+	//A drawable animation that can be attached to a scene node
+	class DrawableAnimation final : public DrawableObject
 	{
 		private:
 		
@@ -114,7 +114,7 @@ namespace ion::graphics::scene
 			std::optional<textures::Animation> animation_;
 			NonOwningPtr<textures::Animation> initial_animation_;
 
-			movable_animation::detail::animation_vertex_stream vertex_stream_;
+			drawable_animation::detail::animation_vertex_stream vertex_stream_;
 			std::optional<render::vertex::VertexBufferObject> vbo_;
 
 			bool reload_vertex_stream_ = false;
@@ -125,24 +125,24 @@ namespace ion::graphics::scene
 
 		public:
 		
-			//Construct a new movable animation with the given size, animation and visibility
-			MovableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+			//Construct a new drawable animation with the given size, animation and visibility
+			DrawableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
 
-			//Construct a new movable animation with the given position, size, animation and visibility
-			MovableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+			//Construct a new drawable animation with the given position, size, animation and visibility
+			DrawableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
 
-			//Construct a new movable animation with the given position, rotation, size, animation and visibility
-			MovableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+			//Construct a new drawable animation with the given position, rotation, size, animation and visibility
+			DrawableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
 
 
-			//Construct a new movable animation with the given size, animation, color and visibility
-			MovableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+			//Construct a new drawable animation with the given size, animation, color and visibility
+			DrawableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
 
-			//Construct a new movable animation with the given position, size, animation, color and visibility
-			MovableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+			//Construct a new drawable animation with the given position, size, animation, color and visibility
+			DrawableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
 
-			//Construct a new movable animation with the given position, rotation, size, animation, color and visibility
-			MovableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+			//Construct a new drawable animation with the given position, rotation, size, animation, color and visibility
+			DrawableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
 
 
 			/*

@@ -6,7 +6,7 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/scene
-File:	IonMovableText.h
+File:	IonDrawableText.h
 -------------------------------------------
 */
 
@@ -51,7 +51,7 @@ namespace ion::graphics::scene
 	using utilities::Vector3;
 
 
-	namespace movable_text::detail
+	namespace drawable_text::detail
 	{
 		constexpr auto position_components = 3; //x,y,z
 		constexpr auto color_components = 4; //r,g,b,a
@@ -140,11 +140,11 @@ namespace ion::graphics::scene
 			glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream);
 		void get_text_vertex_streams(const fonts::Text &text, Vector3 position, real rotation, const Vector2 &coordinate_scaling,
 			glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream);
-	} //movable_text::detail
+	} //drawable_text::detail
 
 
-	//A movable text that can be attached to a scene node
-	class MovableText final : public DrawableObject
+	//A drawable text that can be attached to a scene node
+	class DrawableText final : public DrawableObject
 	{
 		private:
 
@@ -154,8 +154,8 @@ namespace ion::graphics::scene
 			std::optional<fonts::Text> text_;
 			NonOwningPtr<fonts::Text> initial_text_;
 
-			movable_text::detail::glyph_vertex_streams glyph_vertex_streams_;
-			movable_text::detail::decoration_vertex_stream decoration_vertex_stream_;
+			drawable_text::detail::glyph_vertex_streams glyph_vertex_streams_;
+			drawable_text::detail::decoration_vertex_stream decoration_vertex_stream_;
 			std::optional<render::vertex::VertexBufferObject> vbo_;
 
 			bool reload_vertex_streams_ = false;
@@ -166,14 +166,14 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new movable text with the given text and visibility
-			explicit MovableText(NonOwningPtr<fonts::Text> text, bool visible = true);
+			//Construct a new drawable text with the given text and visibility
+			explicit DrawableText(NonOwningPtr<fonts::Text> text, bool visible = true);
 
-			//Construct a new movable text with the given position, text and visibility
-			MovableText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible = true);
+			//Construct a new drawable text with the given position, text and visibility
+			DrawableText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible = true);
 
-			//Construct a new movable text with the given position, rotation, text and visibility
-			MovableText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible = true);
+			//Construct a new drawable text with the given position, rotation, text and visibility
+			DrawableText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible = true);
 
 
 			/*

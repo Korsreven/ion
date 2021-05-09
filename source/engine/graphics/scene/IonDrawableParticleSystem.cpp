@@ -6,11 +6,11 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/scene
-File:	IonMovableParticleSystem.cpp
+File:	IonDrawableParticleSystem.cpp
 -------------------------------------------
 */
 
-#include "IonMovableParticleSystem.h"
+#include "IonDrawableParticleSystem.h"
 
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/shaders/IonShaderProgram.h"
@@ -19,10 +19,10 @@ File:	IonMovableParticleSystem.cpp
 namespace ion::graphics::scene
 {
 
-using namespace movable_particle_system;
+using namespace drawable_particle_system;
 using namespace types::type_literals;
 
-namespace movable_particle_system::detail
+namespace drawable_particle_system::detail
 {
 
 /*
@@ -75,12 +75,12 @@ void disable_point_sprites() noexcept
 	}
 }
 
-} //movable_particle_system::detail
+} //drawable_particle_system::detail
 
 
 //Private
 
-void MovableParticleSystem::PrepareVertexStreams()
+void DrawableParticleSystem::PrepareVertexStreams()
 {
 	if (std::size(particle_system_->Emitters()) > vertex_streams_.capacity())
 		vertex_streams_.reserve(std::size(particle_system_->Emitters()));
@@ -131,7 +131,7 @@ void MovableParticleSystem::PrepareVertexStreams()
 
 //Public
 
-MovableParticleSystem::MovableParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible) :
+DrawableParticleSystem::DrawableParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible) :
 	
 	DrawableObject{visible},
 	particle_system_{particle_system ? std::make_optional(particle_system->Clone()) : std::nullopt},
@@ -145,7 +145,7 @@ MovableParticleSystem::MovableParticleSystem(NonOwningPtr<particles::ParticleSys
 	Modifiers
 */
 
-void MovableParticleSystem::Revert()
+void DrawableParticleSystem::Revert()
 {
 	if (initial_particle_system_)
 		particle_system_ = initial_particle_system_->Clone();
@@ -156,7 +156,7 @@ void MovableParticleSystem::Revert()
 	Preparing / drawing
 */
 
-void MovableParticleSystem::Prepare() noexcept
+void DrawableParticleSystem::Prepare() noexcept
 {
 	if (!particle_system_)
 		return;
@@ -195,7 +195,7 @@ void MovableParticleSystem::Prepare() noexcept
 }
 
 
-void MovableParticleSystem::Draw(shaders::ShaderProgram *shader_program) noexcept
+void DrawableParticleSystem::Draw(shaders::ShaderProgram *shader_program) noexcept
 {
 	if (visible_ && particle_system_ && !std::empty(vertex_streams_))
 	{
@@ -224,7 +224,7 @@ void MovableParticleSystem::Draw(shaders::ShaderProgram *shader_program) noexcep
 	Elapse time
 */
 
-void MovableParticleSystem::Elapse(duration time) noexcept
+void DrawableParticleSystem::Elapse(duration time) noexcept
 {
 	if (particle_system_)
 	{

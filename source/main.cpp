@@ -81,13 +81,13 @@ File:	main.cpp
 #include "graphics/render/vertex/IonVertexDataView.h"
 #include "graphics/render/vertex/IonVertexDeclaration.h"
 #include "graphics/scene/IonCamera.h"
+#include "graphics/scene/IonDrawableAnimation.h"
+#include "graphics/scene/IonDrawableObject.h"
+#include "graphics/scene/IonDrawableParticleSystem.h"
+#include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonLight.h"
 #include "graphics/scene/IonModel.h"
-#include "graphics/scene/IonMovableAnimation.h"
 #include "graphics/scene/IonMovableObject.h"
-#include "graphics/scene/IonMovableParticleSystem.h"
-#include "graphics/scene/IonMovableText.h"
-#include "graphics/scene/IonDrawableObject.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneGraph.h"
 #include "graphics/scene/graph/IonSceneNode.h"
@@ -195,9 +195,9 @@ struct Game :
 	ion::events::listeners::MouseListener
 {
 	std::vector<ion::NonOwningPtr<ion::graphics::scene::Model>> models;
-	std::vector<ion::NonOwningPtr<ion::graphics::scene::MovableAnimation>> animations;
-	std::vector<ion::NonOwningPtr<ion::graphics::scene::MovableParticleSystem>> particle_systems;
-	std::vector<ion::NonOwningPtr<ion::graphics::scene::MovableText>> texts;
+	std::vector<ion::NonOwningPtr<ion::graphics::scene::DrawableAnimation>> animations;
+	std::vector<ion::NonOwningPtr<ion::graphics::scene::DrawableParticleSystem>> particle_systems;
+	std::vector<ion::NonOwningPtr<ion::graphics::scene::DrawableText>> texts;
 	ion::NonOwningPtr<ion::graphics::render::Viewport> viewport;
 
 	ion::NonOwningPtr<ion::graphics::shaders::variables::Uniform<ion::graphics::shaders::variables::glsl::mat4>> matrix_projection;

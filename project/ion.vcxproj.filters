@@ -450,10 +450,10 @@
     <ClCompile Include="..\source\engine\graphics\render\vertex\IonVertexBatch.cpp">
       <Filter>Source Files\graphics\render\vertex</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\engine\graphics\scene\IonMovableParticleSystem.cpp">
+    <ClCompile Include="..\source\engine\graphics\scene\IonDrawableParticleSystem.cpp">
       <Filter>Source Files\graphics\scene</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\engine\graphics\scene\IonMovableText.cpp">
+    <ClCompile Include="..\source\engine\graphics\scene\IonDrawableText.cpp">
       <Filter>Source Files\graphics\scene</Filter>
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonMesh.cpp">
@@ -480,7 +480,7 @@
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonCurve.cpp">
       <Filter>Source Files\graphics\scene\shapes</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\engine\graphics\scene\IonMovableAnimation.cpp">
+    <ClCompile Include="..\source\engine\graphics\scene\IonDrawableAnimation.cpp">
       <Filter>Source Files\graphics\scene</Filter>
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonBorder.cpp">
@@ -935,10 +935,10 @@
     <ClInclude Include="..\source\engine\graphics\render\vertex\IonVertexDataView.h">
       <Filter>Header Files\graphics\render\vertex</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\graphics\scene\IonMovableParticleSystem.h">
+    <ClInclude Include="..\source\engine\graphics\scene\IonDrawableParticleSystem.h">
       <Filter>Header Files\graphics\scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\graphics\scene\IonMovableText.h">
+    <ClInclude Include="..\source\engine\graphics\scene\IonDrawableText.h">
       <Filter>Header Files\graphics\scene</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonMesh.h">
@@ -965,7 +965,7 @@
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonCurve.h">
       <Filter>Header Files\graphics\scene\shapes</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\graphics\scene\IonMovableAnimation.h">
+    <ClInclude Include="..\source\engine\graphics\scene\IonDrawableAnimation.h">
       <Filter>Header Files\graphics\scene</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonBorder.h">

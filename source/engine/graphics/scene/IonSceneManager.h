@@ -17,11 +17,11 @@ File:	IonSceneManager.h
 #include <string_view>
 
 #include "IonCamera.h"
+#include "IonDrawableAnimation.h"
+#include "IonDrawableParticleSystem.h"
+#include "IonDrawableText.h"
 #include "IonLight.h"
 #include "IonModel.h"
-#include "IonMovableAnimation.h"
-#include "IonMovableParticleSystem.h"
-#include "IonMovableText.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonCameraListener.h"
 #include "managed/IonObjectManager.h"
@@ -49,18 +49,18 @@ namespace ion::graphics::scene
 		public managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>,
 		public managed::ObjectManager<Light, SceneManager>,
 		public managed::ObjectManager<Model, SceneManager>,
-		public managed::ObjectManager<MovableAnimation, SceneManager>,
-		public managed::ObjectManager<MovableParticleSystem, SceneManager>,
-		public managed::ObjectManager<MovableText, SceneManager>
+		public managed::ObjectManager<DrawableAnimation, SceneManager>,
+		public managed::ObjectManager<DrawableParticleSystem, SceneManager>,
+		public managed::ObjectManager<DrawableText, SceneManager>
 	{
 		private:
 
 			using CameraBase = managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>;
 			using LightBase = managed::ObjectManager<Light, SceneManager>;
 			using ModelBase = managed::ObjectManager<Model, SceneManager>;
-			using AnimationBase = managed::ObjectManager<MovableAnimation, SceneManager>;
-			using ParticleSystemBase = managed::ObjectManager<MovableParticleSystem, SceneManager>;
-			using TextBase = managed::ObjectManager<MovableText, SceneManager>;
+			using AnimationBase = managed::ObjectManager<DrawableAnimation, SceneManager>;
+			using ParticleSystemBase = managed::ObjectManager<DrawableParticleSystem, SceneManager>;
+			using TextBase = managed::ObjectManager<DrawableText, SceneManager>;
 
 			using CameraEventsBase = events::Listenable<events::listeners::CameraListener>;
 
@@ -317,24 +317,24 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a movable animation with the given size, animation and visibility
-			NonOwningPtr<MovableAnimation> CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+			//Create a drawable animation with the given size, animation and visibility
+			NonOwningPtr<DrawableAnimation> CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
 
-			//Create a movable animation with the given position, size, animation and visibility
-			NonOwningPtr<MovableAnimation> CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+			//Create a drawable animation with the given position, size, animation and visibility
+			NonOwningPtr<DrawableAnimation> CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
 
-			//Create a movable animation with the given position, rotation, size, animation and visibility
-			NonOwningPtr<MovableAnimation> CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+			//Create a drawable animation with the given position, rotation, size, animation and visibility
+			NonOwningPtr<DrawableAnimation> CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
 
 
-			//Create a movable animation with the given size, animation, color and visibility
-			NonOwningPtr<MovableAnimation> CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+			//Create a drawable animation with the given size, animation, color and visibility
+			NonOwningPtr<DrawableAnimation> CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
 
-			//Create a movable animation with the given position, size, animation, color and visibility
-			NonOwningPtr<MovableAnimation> CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+			//Create a drawable animation with the given position, size, animation, color and visibility
+			NonOwningPtr<DrawableAnimation> CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
 
-			//Create a movable animation with the given position, rotation, size, animation, color and visibility
-			NonOwningPtr<MovableAnimation> CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+			//Create a drawable animation with the given position, rotation, size, animation, color and visibility
+			NonOwningPtr<DrawableAnimation> CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
 
 
 			/*
@@ -346,7 +346,7 @@ namespace ion::graphics::scene
 			void ClearAnimations() noexcept;
 
 			//Remove a removable animation from this manager
-			bool RemoveAnimation(MovableAnimation &animation) noexcept;
+			bool RemoveAnimation(DrawableAnimation &animation) noexcept;
 
 
 			/*
@@ -354,8 +354,8 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a movable particle system with the given particle system and visibility
-			NonOwningPtr<MovableParticleSystem> CreateParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible = true);
+			//Create a drawable particle system with the given particle system and visibility
+			NonOwningPtr<DrawableParticleSystem> CreateParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible = true);
 
 
 			/*
@@ -367,7 +367,7 @@ namespace ion::graphics::scene
 			void ClearParticleSystems() noexcept;
 
 			//Remove a removable particle system from this manager
-			bool RemoveParticleSystem(MovableParticleSystem &particle_system) noexcept;
+			bool RemoveParticleSystem(DrawableParticleSystem &particle_system) noexcept;
 
 
 			/*
@@ -375,14 +375,14 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a movable text with the given text and visibility
-			NonOwningPtr<MovableText> CreateText(NonOwningPtr<fonts::Text> text, bool visible = true);
+			//Create a drawable text with the given text and visibility
+			NonOwningPtr<DrawableText> CreateText(NonOwningPtr<fonts::Text> text, bool visible = true);
 
-			//Create a movable text with the given position, text and visibility
-			NonOwningPtr<MovableText> CreateText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible = true);
+			//Create a drawable text with the given position, text and visibility
+			NonOwningPtr<DrawableText> CreateText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible = true);
 
-			//Create a movable text with the given position, rotation, text and visibility
-			NonOwningPtr<MovableText> CreateText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible = true);
+			//Create a drawable text with the given position, rotation, text and visibility
+			NonOwningPtr<DrawableText> CreateText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible = true);
 
 
 			/*
@@ -394,7 +394,7 @@ namespace ion::graphics::scene
 			void ClearTexts() noexcept;
 
 			//Remove a removable text from this manager
-			bool RemoveText(MovableText &text) noexcept;
+			bool RemoveText(DrawableText &text) noexcept;
 
 
 			/*

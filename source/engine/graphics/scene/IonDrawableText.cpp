@@ -6,11 +6,11 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/scene
-File:	IonMovableText.cpp
+File:	IonDrawableText.cpp
 -------------------------------------------
 */
 
-#include "IonMovableText.h"
+#include "IonDrawableText.h"
 
 #include <algorithm>
 #include <cmath>
@@ -29,11 +29,11 @@ File:	IonMovableText.cpp
 namespace ion::graphics::scene
 {
 
-using namespace movable_text;
+using namespace drawable_text;
 
 using namespace graphics::utilities;
 
-namespace movable_text::detail
+namespace drawable_text::detail
 {
 
 glyph_vertex_stream::glyph_vertex_stream(vertex_container vertex_data, int texture_handle) :
@@ -516,12 +516,12 @@ void get_text_vertex_streams(const fonts::Text &text, Vector3 position, real rot
 	}
 }
 
-} //movable_text::detail
+} //drawable_text::detail
 
 
 //Private
 
-void MovableText::PrepareVertexStreams()
+void DrawableText::PrepareVertexStreams()
 {
 	auto coordinate_scaling = vector2::UnitScale;
 
@@ -590,19 +590,19 @@ void MovableText::PrepareVertexStreams()
 
 //Public
 
-MovableText::MovableText(NonOwningPtr<fonts::Text> text, bool visible) :
-	MovableText{vector3::Zero, 0.0_r, text, visible}
+DrawableText::DrawableText(NonOwningPtr<fonts::Text> text, bool visible) :
+	DrawableText{vector3::Zero, 0.0_r, text, visible}
 {
 	//Empty
 }
 
-MovableText::MovableText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible) :
-	MovableText{position, 0.0_r, text, visible}
+DrawableText::DrawableText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible) :
+	DrawableText{position, 0.0_r, text, visible}
 {
 	//Empty
 }
 
-MovableText::MovableText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible) :
+DrawableText::DrawableText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible) :
 	
 	DrawableObject{visible},
 
@@ -622,7 +622,7 @@ MovableText::MovableText(const Vector3 &position, real rotation, NonOwningPtr<fo
 	Modifiers
 */
 
-void MovableText::Revert()
+void DrawableText::Revert()
 {
 	if (initial_text_)
 		text_ = *initial_text_;
@@ -633,7 +633,7 @@ void MovableText::Revert()
 	Preparing / drawing
 */
 
-void MovableText::Prepare() noexcept
+void DrawableText::Prepare() noexcept
 {
 	if (!text_)
 		return;
@@ -688,7 +688,7 @@ void MovableText::Prepare() noexcept
 }
 
 
-void MovableText::Draw(shaders::ShaderProgram *shader_program) noexcept
+void DrawableText::Draw(shaders::ShaderProgram *shader_program) noexcept
 {
 	if (visible_ && text_ && !std::empty(glyph_vertex_streams_))
 	{
@@ -716,7 +716,7 @@ void MovableText::Draw(shaders::ShaderProgram *shader_program) noexcept
 	Elapse time
 */
 
-void MovableText::Elapse(duration time) noexcept
+void DrawableText::Elapse(duration time) noexcept
 {
 	if (text_)
 	{
