@@ -59,8 +59,7 @@ namespace ion::graphics::scene
 			Aabb aabb_;
 			Obb obb_;
 			Sphere sphere_;
-
-			bool update_bounding_volumes_ = false;
+			
 			mutable bool need_bounding_update_ = false;
 
 		private:
@@ -88,11 +87,8 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Default constructor
-			MovableObject() = default;
-
 			//Construct a movable object with the given visibility
-			explicit MovableObject(bool visible);
+			explicit MovableObject(bool visible = true);
 
 			//Construct a movable object with the given name and visibility
 			explicit MovableObject(std::string name, bool visible = true);

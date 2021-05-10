@@ -31,11 +31,8 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Default constructor
-			DrawableObject() = default;
-
 			//Construct a drawable object with the given visibility
-			explicit DrawableObject(bool visible);
+			explicit DrawableObject(bool visible = true);
 
 			//Construct a drawable object with the given name and visibility
 			explicit DrawableObject(std::string name, bool visible = true);

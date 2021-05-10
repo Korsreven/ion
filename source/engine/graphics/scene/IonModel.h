@@ -54,7 +54,9 @@ namespace ion::graphics::scene
 		private:
 
 			std::optional<render::vertex::VertexBufferObject> vbo_;
+
 			bool reload_vertex_buffer_ = false;
+			bool update_bounding_volumes_ = false;
 
 
 			void Created(shapes::Mesh &mesh);

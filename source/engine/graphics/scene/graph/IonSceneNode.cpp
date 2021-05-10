@@ -19,6 +19,7 @@ File:	IonSceneNode.cpp
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonLight.h"
 #include "graphics/scene/IonMovableObject.h"
+#include "graphics/utilities/IonMatrix3.h"
 #include "utilities/IonMath.h"
 
 namespace ion::graphics::scene::graph
@@ -320,6 +321,23 @@ bool SceneNode::DetachObject(AttachableObject object) noexcept
 		return false;
 }
 
+Aabb SceneNode::LocalAabb(bool cascade) const noexcept
+{
+	Aabb aabb;
+
+	//Merge local AABBs
+	for (auto &object : attached_objects_)
+		aabb.Merge(std::visit([](auto &&object) noexcept { return object->AxisAlignedBoundingBox(); }, object));
+
+	if (cascade)
+	{
+		for (auto &child_node : child_nodes_)
+			aabb.Merge(child_node->LocalAabb(cascade)); //Recursive
+	}
+
+	return aabb;
+}
+
 
 void SceneNode::Tidy()
 {
@@ -424,6 +442,48 @@ bool SceneNode::AxisAligned() const noexcept
 {
 	//Axis aligned when 0, +-90, +-180, +-270 and +-360 (half degree tolerance)
 	return std::fmod(math::Round(math::ToDegrees(DerivedRotation())), 90.0_r) == 0.0_r;
+}
+
+
+Aabb SceneNode::WorldAxisAlignedBoundingBox(bool cascade) const noexcept
+{
+	Aabb aabb;
+
+	//Merge world AABBs
+	for (auto &object : attached_objects_)
+		aabb.Merge(std::visit([](auto &&object) noexcept { return object->WorldAxisAlignedBoundingBox(); }, object));
+
+	if (cascade)
+	{
+		for (auto &child_node : child_nodes_)
+			aabb.Merge(child_node->WorldAxisAlignedBoundingBox(cascade)); //Recursive
+	}
+
+	return aabb;
+}
+
+Obb SceneNode::WorldOrientedBoundingBox(bool cascade) const noexcept
+{
+	Obb obb{LocalAabb(cascade)};
+	obb.Transform(FullTransformation());
+	return obb;
+}
+
+Sphere SceneNode::WorldBoundingSphere(bool cascade) const noexcept
+{
+	Sphere sphere;
+
+	//Merge world spheres
+	for (auto &object : attached_objects_)
+		sphere.Merge(std::visit([](auto &&object) noexcept { return object->WorldBoundingSphere(); }, object));
+
+	if (cascade)
+	{
+		for (auto &child_node : child_nodes_)
+			sphere.Merge(child_node->WorldBoundingSphere(cascade)); //Recursive
+	}
+
+	return sphere;
 }
 
 

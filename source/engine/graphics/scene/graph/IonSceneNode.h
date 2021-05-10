@@ -20,7 +20,10 @@ File:	IonSceneNode.h
 
 #include "adaptors/ranges/IonDereferenceIterable.h"
 #include "adaptors/ranges/IonIterable.h"
+#include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonMatrix4.h"
+#include "graphics/utilities/IonObb.h"
+#include "graphics/utilities/IonSphere.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 #include "memory/IonNonOwningPtr.h"
@@ -330,6 +333,7 @@ namespace ion::graphics::scene::graph
 
 			bool AttachObject(scene_node::AttachableObject object);
 			bool DetachObject(scene_node::AttachableObject object) noexcept;
+			Aabb LocalAabb(bool cascade) const noexcept;
 
 			void Tidy();
 
@@ -735,6 +739,19 @@ namespace ion::graphics::scene::graph
 
 			//Returns true if this node is axis aligned
 			[[nodiscard]] bool AxisAligned() const noexcept;
+
+
+			//Returns the world axis-aligned bounding box (AABB) for objects attached to this and all descendant nodes
+			//If cascade is set to false, only objects attached to this node is merged
+			[[nodiscard]] Aabb WorldAxisAlignedBoundingBox(bool cascade = true) const noexcept;
+
+			//Returns the world oriented bounding box (OBB) for objects attached to this and all descendant nodes
+			//If cascade is set to false, only objects attached to this node is merged
+			[[nodiscard]] Obb WorldOrientedBoundingBox(bool cascade = true) const noexcept;
+
+			//Returns the world bounding sphere for objects attached to this and all descendant nodes
+			//If cascade is set to false, only objects attached to this node is merged
+			[[nodiscard]] Sphere WorldBoundingSphere(bool cascade = true) const noexcept;
 
 
 			/*
