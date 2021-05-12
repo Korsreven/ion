@@ -192,6 +192,7 @@
     <ClCompile Include="..\source\engine\graphics\particles\IonParticleSystemManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonFog.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonFrustum.cpp" />
+    <ClCompile Include="..\source\engine\graphics\render\IonPass.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonRenderTarget.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonRenderWindow.cpp" />
     <ClCompile Include="..\source\engine\graphics\render\IonViewport.cpp" />
@@ -327,6 +328,7 @@
     <ClInclude Include="..\source\engine\graphics\particles\IonParticleSystemManager.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonFog.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonFrustum.h" />
+    <ClInclude Include="..\source\engine\graphics\render\IonPass.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonRenderTarget.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonRenderWindow.h" />
     <ClInclude Include="..\source\engine\graphics\render\IonViewport.h" />

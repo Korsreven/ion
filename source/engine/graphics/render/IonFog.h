@@ -61,7 +61,7 @@ namespace ion::graphics::render
 
 
 			/*
-				Static light conversions
+				Static fog conversions
 			*/
 
 			//Returns a new exponential fog from the given values

@@ -72,6 +72,7 @@ File:	main.cpp
 #include "graphics/particles/affectors/IonVelocityRandomizer.h"
 #include "graphics/render/IonFog.h"
 #include "graphics/render/IonFrustum.h"
+#include "graphics/render/IonPass.h"
 #include "graphics/render/IonRenderTarget.h"
 #include "graphics/render/IonRenderWindow.h"
 #include "graphics/render/IonViewport.h"
