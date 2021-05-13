@@ -81,6 +81,7 @@ int pass_blend_factor_to_gl_blend_factor(BlendFactor factor) noexcept
 		case BlendFactor::SourceAlphaSaturate:
 		return GL_SRC_ALPHA_SATURATE;
 
+
 		case BlendFactor::Zero:
 		return GL_ZERO;
 
@@ -94,9 +95,6 @@ int pass_blend_equation_mode_to_gl_blend_equation_mode(BlendEquationMode mode) n
 {
 	switch (mode)
 	{
-		case BlendEquationMode::Add:
-		return GL_FUNC_ADD;
-
 		case BlendEquationMode::Subtract:
 		return GL_FUNC_SUBTRACT;
 
@@ -108,6 +106,10 @@ int pass_blend_equation_mode_to_gl_blend_equation_mode(BlendEquationMode mode) n
 
 		case BlendEquationMode::Max:
 		return GL_MAX;
+
+		case BlendEquationMode::Add:
+		default:
+		return GL_FUNC_ADD;
 	}
 }
 
