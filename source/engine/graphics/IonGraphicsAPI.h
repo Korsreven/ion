@@ -191,6 +191,18 @@ namespace ion::graphics::gl
 	}
 
 
+	[[nodiscard]] inline auto BlendEquationSeparate_Support() noexcept
+	{
+		if (HasGL(Version::v2_0))
+			return Extension::Core;
+		#ifdef ION_GLEW
+		else if (GLEW_EXT_blend_equation_separate)
+			return Extension::EXT;
+		#endif
+		else
+			return Extension::None;
+	}
+
 	[[nodiscard]] inline auto BlendFuncSeparate_Support() noexcept
 	{
 		if (HasGL(Version::v2_0))
