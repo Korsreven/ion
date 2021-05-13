@@ -242,4 +242,19 @@ Pass::Pass(pass::BlendFactor blend_source_factor, pass::BlendFactor blend_destin
 	//Empty
 }
 
+
+/*
+	Blending
+*/
+
+void Pass::Blend() noexcept
+{
+	if (blend_source_factor_alpha_ && blend_destination_factor_alpha_)
+		detail::blend_separate(blend_source_factor_, blend_destination_factor_,
+							   *blend_source_factor_alpha_, *blend_destination_factor_alpha_,
+							   blend_equation_mode_, blend_equation_mode_alpha_.value_or(BlendEquationMode::Add));
+	else
+		detail::blend(blend_source_factor_, blend_destination_factor_, blend_equation_mode_);
+}
+
 } //ion::graphics::render

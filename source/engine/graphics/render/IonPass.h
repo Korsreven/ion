@@ -234,6 +234,14 @@ namespace ion::graphics::render
 			{
 				return shader_program_;
 			}
+
+
+			/*
+				Blending
+			*/
+
+			//Set up and enable blending before this render pass
+			void Blend() noexcept;
 	};
 } //ion::graphics::render
 
