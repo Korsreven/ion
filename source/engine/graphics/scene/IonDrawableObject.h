@@ -10,16 +10,25 @@ File:	IonDrawableObject.h
 -------------------------------------------
 */
 
-#ifndef ION_GEOMETRIC_OBJECT_H
-#define ION_GEOMETRIC_OBJECT_H
+#ifndef ION_DRAWABLE_OBJECT_H
+#define ION_DRAWABLE_OBJECT_H
+
+#include <vector>
 
 #include "IonMovableObject.h"
+#include "adaptors/ranges/IonIterable.h"
+#include "graphics/render/IonPass.h"
 
 namespace ion::graphics::scene
 {
-	namespace drawable_object::detail
+	namespace drawable_object
 	{
-	} //drawable_object::detail
+		using Passes = std::vector<render::Pass>;
+
+		namespace detail
+		{
+		} //detail
+	} //drawable_object
 
 
 	//A drawable object that can be prepared and drawn with one or more passes
@@ -27,7 +36,7 @@ namespace ion::graphics::scene
 	{
 		private:
 
-
+			drawable_object::Passes passes_;
 
 		public:
 
@@ -50,6 +59,25 @@ namespace ion::graphics::scene
 			{
 				MovableObject::operator=(rhs);
 				return *this;
+			}
+
+
+			/*
+				Ranges
+			*/
+
+			//Returns a mutable range of all passes of this drawable
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Passes() noexcept
+			{
+				return adaptors::ranges::Iterable<drawable_object::Passes&>{passes_};
+			}
+
+			//Returns an immutable range of all passes of this drawable
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Passes() const noexcept
+			{
+				return adaptors::ranges::Iterable<const drawable_object::Passes&>{passes_};
 			}
 
 
@@ -83,6 +111,42 @@ namespace ion::graphics::scene
 			//Elapse the total time for this movable object by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			virtual void Elapse(duration time) noexcept;
+
+
+			/*
+				Passes
+				Adding
+			*/
+
+			//Add the given pass for this drawable object
+			void AddPass(render::Pass pass);
+
+			//Add the given passes for this drawable object
+			void AddPasses(drawable_object::Passes passes);
+
+
+			/*
+				Passes
+				Retrieving
+			*/
+
+			//Returns a mutable reference to the pass at the given offset
+			[[nodiscard]] render::Pass& GetPass(int off) noexcept;
+
+			//Returns an immutable reference to the pass at the given offset
+			[[nodiscard]] const render::Pass& GetPass(int off) const noexcept;
+
+
+			/*
+				Passes
+				Removing
+			*/
+
+			//Clear all passes for this drawable object
+			void ClearPasses() noexcept;
+
+			//Remove a pass at the given offset from this drawable object
+			bool RemovePass(int off) noexcept;
 	};
 } //ion::graphics::scene
 

@@ -252,7 +252,7 @@ void Pass::Blend() noexcept
 	if (blend_source_factor_alpha_ && blend_destination_factor_alpha_)
 		detail::blend_separate(blend_source_factor_, blend_destination_factor_,
 							   *blend_source_factor_alpha_, *blend_destination_factor_alpha_,
-							   blend_equation_mode_, blend_equation_mode_alpha_.value_or(BlendEquationMode::Add));
+							   blend_equation_mode_, blend_equation_mode_alpha_.value_or(blend_equation_mode_));
 	else
 		detail::blend(blend_source_factor_, blend_destination_factor_, blend_equation_mode_);
 }
