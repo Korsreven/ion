@@ -97,7 +97,7 @@ MovableObject::~MovableObject() noexcept
 	Rendering
 */
 
-void MovableObject::Render([[maybe_unused]] duration time) noexcept
+void MovableObject::Render() noexcept
 {
 	//Optional to override
 }

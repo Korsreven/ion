@@ -86,9 +86,9 @@ namespace ion::graphics::scene
 			*/
 
 			//Render this drawable object based on its defined passes
-			//This is called once from a scene graph render queue, with the time in seconds since last frame
-			//It will call elapse then prepare, and then call draw one time per pass
-			void Render(duration time) noexcept override;
+			//This is called once from a scene graph render queue
+			//It will call prepare, and then draw one time per pass
+			void Render() noexcept override;
 
 
 			/*

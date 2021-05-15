@@ -13,19 +13,27 @@ File:	IonSceneGraph.h
 #ifndef ION_SCENE_GRAPH
 #define ION_SCENE_GRAPH
 
+#include <optional>
+
 #include "IonSceneNode.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonSceneNodeListener.h"
+#include "graphics/render/IonFog.h"
+#include "graphics/utilities/IonColor.h"
+#include "types/IonTypes.h"
 
 namespace ion::graphics::scene::graph
 {
+	using namespace types::type_literals;
+	using namespace graphics::utilities;
+
 	namespace scene_graph
 	{
 		namespace detail
 		{
 			constexpr auto max_light_count = 8;
 				//Warning: This value must be less or equal to the actual array size used for lights (in the fragment shader)
-				//If scene graph contains more visible lights, then only the lights nearest to the geometry will be rendered
+				//If scene graph contains more visible lights, then only the lights nearest to the geometry should be rendered
 		} //detail
 	} //scene_graph
 
@@ -38,7 +46,21 @@ namespace ion::graphics::scene::graph
 			using NodeEventsBase = events::Listenable<events::listeners::SceneNodeListener>;
 
 
+			real gamma_ = 1.0_r; //100% gamma
+			Color ambient_color_ = color::White; //No ambient
+			std::optional<render::Fog> fog_; //No fog
+			bool lighting_enabled_ = true;
+
 			SceneNode root_node_;
+			bool update_uniforms_ = true;
+
+
+			/*
+				Notifying
+			*/
+
+			void NotifyNodeRenderStarted(SceneNode &node) noexcept;
+			void NotifyNodeRenderEnded(SceneNode &node) noexcept;
 
 		public:
 
@@ -67,12 +89,74 @@ namespace ion::graphics::scene::graph
 				Modifiers
 			*/
 
+			//Sets the gamma of the scene to the given percent
+			inline void Gamma(real percent) noexcept
+			{
+				if (gamma_ != percent)
+				{
+					gamma_ = percent;
+					update_uniforms_ = true;
+				}
+			}
 
+			//Sets the ambient color for this scene to the given color
+			inline void AmbientColor(const Color &ambient) noexcept
+			{
+				if (ambient_color_ != ambient)
+				{
+					ambient_color_ = ambient;
+					update_uniforms_ = true;
+				}
+			}
+
+			//Sets the fog effect for this scene to the given fog
+			//Pass nullopt to turn off fog effect for this scene
+			inline void FogEffect(const std::optional<render::Fog> &fog) noexcept
+			{
+				fog_ = fog;
+				update_uniforms_ = true;
+			}
+
+			//Sets whether or not this scene has lighting enabled
+			inline void LightingEnabled(bool enable) noexcept
+			{
+				if (lighting_enabled_ != enable)
+				{
+					lighting_enabled_ = enable;
+					update_uniforms_ = true;
+				}
+			}
 
 
 			/*
 				Observers
 			*/
+
+			//Returns the gamma of this scene
+			[[nodiscard]] inline auto Gamma() const noexcept
+			{
+				return gamma_;
+			}
+
+			//Returns the ambient color for this scene
+			[[nodiscard]] inline auto& AmbientColor() const noexcept
+			{
+				return ambient_color_;
+			}
+
+			//Returns the fog effect for this scene
+			//Returns nullopt if the scene has no fog effect
+			[[nodiscard]] inline auto& FogEffect() const noexcept
+			{
+				return fog_;
+			}
+
+			//Returns whether or not this scene has lighting enabled
+			[[nodiscard]] inline auto LightingEnabled() const noexcept
+			{
+				return lighting_enabled_;
+			}
+
 
 			//Return a mutable reference to the root node of this scene graph
 			[[nodiscard]] inline auto& RootNode() noexcept
@@ -85,6 +169,15 @@ namespace ion::graphics::scene::graph
 			{
 				return root_node_;
 			}
+
+
+			/*
+				Rendering
+			*/
+
+			//Render this entire scene graph
+			//This is called once from the engine, with the time in seconds since last frame
+			void Render(duration time) noexcept;
 	};
 } //ion::graphics::scene::graph
 

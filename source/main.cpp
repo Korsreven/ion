@@ -216,30 +216,7 @@ struct Game :
 
 	bool FrameStarted(duration time) noexcept override
 	{
-		for (auto &model : models)
-		{
-			model->Elapse(time);
-			model->Prepare();			
-		}
-
-		for (auto &animation : animations)
-		{
-			animation->Elapse(time);	
-			animation->Prepare();			
-		}
-
-		for (auto &particle_system : particle_systems)
-		{
-			particle_system->Elapse(time);	
-			particle_system->Prepare();			
-		}
-
-		for (auto &text : texts)
-		{
-			text->Elapse(time);	
-			text->Prepare();			
-		}
-
+		time;
 		return true;
 	}
 
@@ -1012,9 +989,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			matrix_model_view->Get() = view_mat.TransposeCopy();
 			matrix_model_view_projection->Get() = (proj_mat * view_mat).TransposeCopy();
 
-
-			//Demo setup
-			engine.shader_program = shader_prog.get();
 
 			//game.models.push_back(gray_rectangle);
 			//game.models.push_back(red_square);

@@ -112,21 +112,6 @@ bool Engine::NotifyFrameEnded(duration time) noexcept
 	return true;
 }
 
-//TEMP
-void Draw(graphics::scene::SceneManager &scene_manager, graphics::shaders::ShaderProgram *shader_program)
-{
-	for (auto &model : scene_manager.Models())
-		model.Draw(shader_program);
-
-	for (auto &animation : scene_manager.Animations())
-		animation.Draw(shader_program);
-
-	for (auto &particle_system : scene_manager.ParticleSystems())
-		particle_system.Draw(shader_program);
-
-	for (auto &text : scene_manager.Texts())
-		text.Draw(shader_program);
-}
 
 bool Engine::UpdateFrame() noexcept
 {
@@ -141,7 +126,7 @@ bool Engine::UpdateFrame() noexcept
 	for (auto &viewport : render_window_->Viewports())
 	{
 		viewport.RenderTo();
-		Draw(scene_manager_, shader_program); //RenderSystem::RenderScene()
+		scene_graph_.Render(time); //TODO
 	}
 
 	if (syncronize_)
@@ -297,9 +282,9 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 	frustum.BaseViewportHeight(viewport->Bounds().ToSize().Y());
 
 	//Create a default camera with frustum and connect to viewport
-	scene_manager_.ConnectedViewport(viewport);
-	auto camera = scene_manager_.CreateCamera("", frustum);
-	viewport->ConnectedCamera(camera); //TEMP should be controlled by scene manager
+	scene_.ConnectedViewport(viewport);
+	auto camera = scene_.CreateCamera("", frustum);
+	viewport->ConnectedCamera(camera); //TEMP should be controlled by scene graph
 
 	return *render_window_;
 }

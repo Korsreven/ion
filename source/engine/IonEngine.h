@@ -18,8 +18,10 @@ File:	IonEngine.h
 #include "events/IonInputController.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonFrameListener.h"
+#include "graphics/render/IonFrustum.h"
 #include "graphics/render/IonRenderWindow.h"
 #include "graphics/scene/IonSceneManager.h"
+#include "graphics/scene/graph/IonSceneGraph.h"
 #include "graphics/utilities/IonAabb.h"
 #include "timers/IonStopwatch.h"
 #include "timers/IonTimerManager.h"
@@ -54,7 +56,8 @@ namespace ion
 
 			std::optional<graphics::render::RenderWindow> render_window_;
 			std::optional<events::InputController> input_controller_;
-			graphics::scene::SceneManager scene_manager_;
+			graphics::scene::SceneManager scene_;
+			graphics::scene::graph::SceneGraph scene_graph_;
 			timers::TimerManager timer_manager_;
 
 
@@ -136,6 +139,31 @@ namespace ion
 			}
 
 
+			//Returns a mutable reference to a scene manager
+			[[nodiscard]] inline auto& Scene() noexcept
+			{
+				return scene_;
+			}
+
+			//Returns an immutable reference to a scene manager
+			[[nodiscard]] inline auto& Scene() const noexcept
+			{
+				return scene_;
+			}
+
+			//Returns a mutable reference to a scene graph
+			[[nodiscard]] inline auto& SceneGraph() noexcept
+			{
+				return scene_graph_;
+			}
+
+			//Returns an immutable reference to a scene graph
+			[[nodiscard]] inline auto& SceneGraph() const noexcept
+			{
+				return scene_graph_;
+			}
+
+
 			//Returns a mutable reference to a timer manager
 			[[nodiscard]] inline auto& SyncedTimers() noexcept
 			{
@@ -146,14 +174,6 @@ namespace ion
 			[[nodiscard]] inline auto& SyncedTimers() const noexcept
 			{
 				return timer_manager_;
-			}
-
-
-			//TEMP
-			graphics::shaders::ShaderProgram *shader_program = nullptr;
-			[[nodiscard]] inline auto& Scene() noexcept
-			{
-				return scene_manager_;
 			}
 
 

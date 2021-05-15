@@ -47,9 +47,8 @@ DrawableObject::DrawableObject(const DrawableObject &rhs) noexcept :
 	Rendering
 */
 
-void DrawableObject::Render(duration time) noexcept
+void DrawableObject::Render() noexcept
 {
-	Elapse(time);
 	Prepare();
 
 	for (auto &pass : passes_)

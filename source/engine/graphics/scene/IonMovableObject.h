@@ -212,10 +212,9 @@ namespace ion::graphics::scene
 				Rendering
 			*/
 
-			//Render this movable object based on its defined passes
-			//This is called once from a scene graph render queue, with the time in seconds since last frame
-			//It will call elapse then prepare, and then call draw one time per pass
-			virtual void Render(duration time) noexcept;
+			//Render this movable object
+			//This is called once from a scene graph render queue
+			virtual void Render() noexcept;
 
 
 			/*
