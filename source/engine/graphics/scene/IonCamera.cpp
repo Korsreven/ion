@@ -17,6 +17,7 @@ File:	IonCamera.cpp
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonSceneManager.h"
+#include "graphics/scene/graph/IonSceneNode.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
 
@@ -101,10 +102,19 @@ Camera::Camera(std::string name, const render::Frustum &frustum, bool visible) :
 void Camera::CaptureScene(const render::Viewport &viewport) noexcept
 {
 	frustum_.ProjectScene(viewport.Bounds().ToSize());
-	detail::rotate_by(rotation_);
-	detail::move_to(position_);
 
-	view_matrix_ = detail::get_view_matrix(position_, rotation_);
+	auto position = position_;
+	auto rotation = rotation_;
+
+	if (auto parent_node = ParentNode(); parent_node)
+	{		
+		position += parent_node->DerivedPosition();
+		rotation += parent_node->DerivedRotation();
+	}
+
+	detail::rotate_by(rotation);
+	detail::move_to(position);
+	view_matrix_ = detail::get_view_matrix(position, rotation);
 }
 
 } //ion::graphics::scene

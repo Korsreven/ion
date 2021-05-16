@@ -126,7 +126,9 @@ bool Engine::UpdateFrame() noexcept
 	for (auto &viewport : render_window_->Viewports())
 	{
 		viewport.RenderTo();
-		scene_graph_.Render(time); //TODO
+
+		//for (auto &scene_graph : scene_graphs_)
+			scene_graph_.Render(viewport, time); //TODO
 	}
 
 	if (syncronize_)

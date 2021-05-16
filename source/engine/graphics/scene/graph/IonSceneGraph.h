@@ -14,6 +14,8 @@ File:	IonSceneGraph.h
 #define ION_SCENE_GRAPH
 
 #include <optional>
+#include <unordered_set>
+#include <vector>
 
 #include "IonSceneNode.h"
 #include "events/IonListenable.h"
@@ -21,6 +23,21 @@ File:	IonSceneGraph.h
 #include "graphics/render/IonFog.h"
 #include "graphics/utilities/IonColor.h"
 #include "types/IonTypes.h"
+
+namespace ion::graphics::render
+{
+	class Viewport; //Forward declaration
+}
+
+namespace ion::graphics::scene
+{
+	class Light; //Forward declaration
+}
+
+namespace ion::graphics::shaders
+{
+	class ShaderProgram; //Forward declaration
+}
 
 namespace ion::graphics::scene::graph
 {
@@ -34,6 +51,14 @@ namespace ion::graphics::scene::graph
 			constexpr auto max_light_count = 8;
 				//Warning: This value must be less or equal to the actual array size used for lights (in the fragment shader)
 				//If scene graph contains more visible lights, then only the lights nearest to the geometry should be rendered
+
+
+			/*
+				Graphics API
+			*/
+
+			void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &shader_program) noexcept;
+			void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, shaders::ShaderProgram &shader_program) noexcept;			
 		} //detail
 	} //scene_graph
 
@@ -53,6 +78,10 @@ namespace ion::graphics::scene::graph
 
 			SceneNode root_node_;
 			bool update_uniforms_ = true;
+
+
+			std::array<Light*, scene_graph::detail::max_light_count> active_lights_;
+			std::unordered_set<shaders::ShaderProgram*> active_shader_programs_;
 
 
 			/*
@@ -175,9 +204,9 @@ namespace ion::graphics::scene::graph
 				Rendering
 			*/
 
-			//Render this entire scene graph
+			//Render this entire scene graph to the given viewport
 			//This is called once from the engine, with the time in seconds since last frame
-			void Render(duration time) noexcept;
+			void Render(render::Viewport &viewport, duration time) noexcept;
 	};
 } //ion::graphics::scene::graph
 

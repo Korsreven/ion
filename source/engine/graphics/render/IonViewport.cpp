@@ -331,9 +331,6 @@ Viewport Viewport::BottomRightAligned(std::string name, RenderTarget &render_tar
 void Viewport::RenderTo() noexcept
 {
 	detail::render_to_viewport(bounds_.Min(), bounds_.ToSize(), background_color_);
-
-	if (camera_)
-		camera_->CaptureScene(*this);
 }
 
 } //ion::graphics::render
