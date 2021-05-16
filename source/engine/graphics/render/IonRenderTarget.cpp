@@ -96,6 +96,23 @@ NonOwningPtr<const Viewport> RenderTarget::GetViewport(std::string_view name) co
 }
 
 
+NonOwningPtr<Viewport> RenderTarget::GetViewport(const Vector2 &position) noexcept
+{
+	for (auto &viewport : Viewports())
+	{
+		if (viewport.Bounds().Contains(position))
+			return Get(*viewport.Name());
+	}
+
+	return nullptr;
+}
+
+NonOwningPtr<const Viewport> RenderTarget::GetViewport(const Vector2 &position) const noexcept
+{
+	return const_cast<RenderTarget&>(*this).GetViewport(position);
+}
+
+
 /*
 	Viewports
 	Removing

@@ -198,6 +198,15 @@ namespace ion::graphics::render
 			//Gets a pointer to an immutable viewport with the given name
 			//Returns nullptr if viewport could not be found
 			[[nodiscard]] NonOwningPtr<const Viewport> GetViewport(std::string_view name) const noexcept;
+			
+
+			//Gets a pointer to a mutable viewport at a given position
+			//Returns nullptr if viewport could not be found
+			[[nodiscard]] NonOwningPtr<Viewport> GetViewport(const Vector2 &position) noexcept;
+
+			//Gets a pointer to an immutable viewport at a given position
+			//Returns nullptr if viewport could not be found
+			[[nodiscard]] NonOwningPtr<const Viewport> GetViewport(const Vector2 &position) const noexcept;
 
 
 			/*
