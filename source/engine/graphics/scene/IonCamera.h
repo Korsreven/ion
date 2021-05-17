@@ -52,8 +52,8 @@ namespace ion::graphics::scene
 	{
 		private:
 
-			Vector3 position_; //TEMP, should be located in parent node
-			real rotation_ = 0.0_r; //TEMP, should be located in parent node
+			Vector3 position_;
+			real rotation_ = 0.0_r;
 			render::Frustum frustum_;
 
 			Matrix4 view_matrix_;
@@ -79,7 +79,7 @@ namespace ion::graphics::scene
 				Modifiers
 			*/
 
-			//
+			//Sets the position of this camera to the given position
 			inline void Position(const Vector3 &position) noexcept
 			{
 				if (position_ != position)
@@ -89,7 +89,7 @@ namespace ion::graphics::scene
 				}
 			}
 
-			//
+			//Sets the rotation of this camera to the given angle (in radians)
 			inline void Rotation(real angle) noexcept
 			{
 				if (rotation_ != angle)
@@ -108,13 +108,13 @@ namespace ion::graphics::scene
 				Observers
 			*/
 
-			//
+			//Returns the position of the camera
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}
 
-			//
+			//Returns the angle of rotation (in radians) for this camera
 			[[nodiscard]] inline auto Rotation() const noexcept
 			{
 				return rotation_;

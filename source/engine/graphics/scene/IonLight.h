@@ -64,8 +64,8 @@ namespace ion::graphics::scene
 		private:
 
 			light::LightType type_ = light::LightType::Point;
-			Vector3 position_; //TEMP, should be located in parent node
-			Vector3 direction_; //TEMP, should be located in parent node
+			Vector3 position_;
+			Vector3 direction_;
 
 			Color ambient_color_;
 			Color diffuse_color_;

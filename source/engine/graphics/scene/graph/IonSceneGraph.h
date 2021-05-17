@@ -22,6 +22,8 @@ File:	IonSceneGraph.h
 #include "events/listeners/IonSceneNodeListener.h"
 #include "graphics/render/IonFog.h"
 #include "graphics/utilities/IonColor.h"
+#include "graphics/utilities/IonMatrix4.h"
+#include "graphics/utilities/IonVector3.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::render
@@ -52,13 +54,19 @@ namespace ion::graphics::scene::graph
 				//Warning: This value must be less or equal to the actual array size used for lights (in the fragment shader)
 				//If scene graph contains more visible lights, then only the lights nearest to the geometry should be rendered
 
+			using light_container = std::array<Light*, max_light_count>;
+
 
 			/*
 				Graphics API
 			*/
 
+			void set_camera_uniforms(const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &shader_program) noexcept;
-			void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, shaders::ShaderProgram &shader_program) noexcept;			
+			void set_light_uniforms(const light_container &lights, int light_count, shaders::ShaderProgram &shader_program) noexcept;	
+			void set_matrix_uniforms(const Matrix4 &projection_mat, shaders::ShaderProgram &shader_program) noexcept;
+			void set_matrix_uniforms(const Matrix4 &projection_mat, const Matrix4 &view_mat, const Matrix4 &model_mat, shaders::ShaderProgram &shader_program) noexcept;
+			void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, shaders::ShaderProgram &shader_program) noexcept;
 		} //detail
 	} //scene_graph
 
@@ -77,11 +85,7 @@ namespace ion::graphics::scene::graph
 			bool lighting_enabled_ = true;
 
 			SceneNode root_node_;
-			bool update_uniforms_ = true;
-
-
-			std::array<Light*, scene_graph::detail::max_light_count> active_lights_;
-			std::unordered_set<shaders::ShaderProgram*> active_shader_programs_;
+			scene_graph::detail::light_container active_lights_;
 
 
 			/*
@@ -121,21 +125,13 @@ namespace ion::graphics::scene::graph
 			//Sets the gamma of the scene to the given percent
 			inline void Gamma(real percent) noexcept
 			{
-				if (gamma_ != percent)
-				{
-					gamma_ = percent;
-					update_uniforms_ = true;
-				}
+				gamma_ = percent;
 			}
 
 			//Sets the ambient color for this scene to the given color
 			inline void AmbientColor(const Color &ambient) noexcept
 			{
-				if (ambient_color_ != ambient)
-				{
-					ambient_color_ = ambient;
-					update_uniforms_ = true;
-				}
+				ambient_color_ = ambient;
 			}
 
 			//Sets the fog effect for this scene to the given fog
@@ -143,17 +139,12 @@ namespace ion::graphics::scene::graph
 			inline void FogEffect(const std::optional<render::Fog> &fog) noexcept
 			{
 				fog_ = fog;
-				update_uniforms_ = true;
 			}
 
 			//Sets whether or not this scene has lighting enabled
 			inline void LightingEnabled(bool enable) noexcept
 			{
-				if (lighting_enabled_ != enable)
-				{
-					lighting_enabled_ = enable;
-					update_uniforms_ = true;
-				}
+				lighting_enabled_ = enable;
 			}
 
 

@@ -286,7 +286,7 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 	//Create a default camera with frustum and connect to viewport
 	scene_.ConnectedViewport(viewport);
 	auto camera = scene_.CreateCamera("", frustum);
-	viewport->ConnectedCamera(camera); //TEMP should be controlled by scene graph
+	viewport->ConnectedCamera(camera);
 
 	return *render_window_;
 }

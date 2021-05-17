@@ -281,10 +281,12 @@ namespace ion::graphics::render
 				Frustum conversions
 			*/
 
-			//
+			//Returns the ortho bounds (left, right, bottom, top, z_near, z_far) from this frustum with the given viewport size
+			//This returns all the values needed by glOrtho
 			[[nodiscard]] std::tuple<real, real, real, real, real, real> ToOrthoBounds(const Vector2 &viewport_size) const noexcept;
 
-			//
+			//Returns the frustum bounds (left, right, bottom, top, z_near, z_far) from this frustum with the given viewport size
+			//This returns all the values needed by glFrustum
 			[[nodiscard]] std::tuple<real, real, real, real, real, real> ToFrustumBounds(const Vector2 &viewport_size) const noexcept;
 	};
 } //ion::graphics::render

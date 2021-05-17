@@ -19,6 +19,7 @@ File:	IonSceneGraph.cpp
 #include "graphics/scene/IonLight.h"
 #include "graphics/scene/IonMovableObject.h"
 #include "graphics/shaders/IonShaderProgram.h"
+#include "utilities/IonMath.h"
 
 namespace ion::graphics::scene::graph
 {
@@ -27,6 +28,14 @@ using namespace scene_graph;
 
 namespace scene_graph::detail
 {
+
+void set_camera_uniforms(const Camera &camera, shaders::ShaderProgram &shader_program) noexcept
+{
+	using namespace shaders::variables;
+
+	if (auto position = shader_program.GetUniform(shaders::shader_layout::UniformName::Camera_Position); position)
+		position->Get<glsl::vec3>() = camera.ParentNode()->DerivedPosition();
+}
 
 void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &shader_program) noexcept
 {
@@ -53,6 +62,108 @@ void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &sh
 
 	if (auto color = shader_program.GetUniform(shaders::shader_layout::UniformName::Fog_Color); color)
 		color->Get<glsl::vec4>() = fog->Tint();
+}
+
+void set_light_uniforms(const light_container &lights, int light_count, shaders::ShaderProgram &shader_program) noexcept
+{
+	using namespace shaders::variables;
+	using namespace ion::utilities;
+
+	if (light_count == 0)
+		return; //Nothing to set
+
+
+	auto type = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Type);
+	auto position = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Position);
+	auto direction = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Direction);
+
+	auto ambient = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Ambient);
+	auto diffuse = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Diffuse);
+	auto specular = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Specular);
+
+	auto constant = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Constant);
+	auto linear = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Linear);
+	auto quadratic = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Quadratic);
+
+	auto cutoff = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Cutoff);
+	auto outer_cutoff = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_OuterCutoff);
+
+
+	for (auto i = 0; i < light_count; ++i)
+	{
+		if (type)
+			(*type)[i].Get<int>() = static_cast<int>(lights[i]->Type());
+
+		if (position)
+			(*position)[i].Get<glsl::vec3>() = lights[i]->Position() + lights[i]->ParentNode()->DerivedPosition();
+
+		if (direction)
+			(*direction)[i].Get<glsl::vec3>() = lights[i]->Direction().Deviant(lights[i]->ParentNode()->DerivedRotation());
+
+
+		if (ambient)
+			(*ambient)[i].Get<glsl::vec4>() = lights[i]->AmbientColor();
+
+		if (diffuse)
+			(*diffuse)[i].Get<glsl::vec4>() = lights[i]->DiffuseColor();
+
+		if (specular)
+			(*specular)[i].Get<glsl::vec4>() = lights[i]->SpecularColor();
+
+
+		auto [constant_attenuation, linear_attenuation, quadratic_attenuation] = lights[i]->Attenuation();
+
+		if (constant)
+			(*constant)[i].Get<float>() = constant_attenuation;
+
+		if (linear)
+			(*linear)[i].Get<float>() = linear_attenuation;
+
+		if (quadratic)
+			(*quadratic)[i].Get<float>() = quadratic_attenuation;
+
+
+		auto [cutoff_angle, outer_cutoff_angle] = lights[i]->Cutoff();
+
+		if (cutoff)
+			(*cutoff)[i].Get<float>() = math::Cos(cutoff_angle);
+
+		if (outer_cutoff)
+			(*outer_cutoff)[i].Get<float>() = math::Cos(outer_cutoff_angle);
+	}
+}
+
+void set_matrix_uniforms(const Matrix4 &projection_mat, shaders::ShaderProgram &shader_program) noexcept
+{
+	using namespace shaders::variables;
+
+	if (auto projection = shader_program.GetUniform(shaders::shader_layout::UniformName::Matrix_Projection); projection)
+		#ifdef ION_ROW_MAJOR
+		projection->Get<glsl::mat4>() = projection_mat;
+		#else
+		projection->Get<glsl::mat4>() = projection_mat.TransposeCopy();
+		#endif
+}
+
+void set_matrix_uniforms(const Matrix4 &projection_mat, const Matrix4 &view_mat, const Matrix4 &model_mat, shaders::ShaderProgram &shader_program) noexcept
+{
+	using namespace shaders::variables;
+
+	auto model_view_mat = model_mat * view_mat;
+
+	if (auto model_view = shader_program.GetUniform(shaders::shader_layout::UniformName::Matrix_ModelView); model_view)
+		#ifdef ION_ROW_MAJOR
+		model_view->Get<glsl::mat4>() = model_view_mat;
+		#else
+		model_view->Get<glsl::mat4>() = model_view_mat.TransposeCopy();
+		#endif
+
+	if (auto model_view_projection = shader_program.GetUniform(shaders::shader_layout::UniformName::Matrix_ModelViewProjection); model_view_projection)
+		#ifdef ION_ROW_MAJOR
+		model_view_projection->Get<glsl::mat4>() = projection_mat * model_view_mat;
+		#else
+		model_view_projection->Get<glsl::mat4>() = (projection_mat * model_view_mat).TransposeCopy();
+		#endif
 }
 
 void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, shaders::ShaderProgram &shader_program) noexcept
@@ -113,9 +224,9 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	else
 		return;
 	
-	auto &projection_mat = camera->ViewFrustum().ProjectionMatrix();
-	auto &view_mat = camera->ViewMatrix();
-	
+	const auto &projection_mat = camera->ViewFrustum().ProjectionMatrix();
+	const auto &view_mat = camera->ViewMatrix();
+
 
 	/*
 		Lights
@@ -123,16 +234,35 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	
 	auto active_light_count = 0;
 
-	//For each visible light
-	for (auto &light : root_node_.AttachedLights())
+	if (lighting_enabled_)
 	{
-		if (light->Visible() && light->ParentNode()->Visible())
+		//For each visible light
+		for (auto &light : root_node_.AttachedLights())
 		{
-			active_lights_[active_light_count++] = light;
+			if (light->Visible() && light->ParentNode()->Visible())
+			{
+				active_lights_[active_light_count++] = light;
 
-			if (active_light_count == detail::max_light_count)
-				break;
+				if (active_light_count == detail::max_light_count)
+					break;
+			}
 		}
+	}
+
+
+	/*
+		Shader programs
+	*/
+
+	//For each shader program in graph
+	//for (auto &shader_program : root_node_.ShaderPrograms())
+	{
+		shaders::ShaderProgram *shader_program = nullptr; //TEMP
+		detail::set_camera_uniforms(*camera, *shader_program);
+		detail::set_fog_uniforms(fog_, *shader_program);
+		detail::set_light_uniforms(active_lights_, active_light_count, *shader_program);
+		detail::set_matrix_uniforms(projection_mat, *shader_program);
+		detail::set_scene_uniforms(gamma_, ambient_color_, active_light_count, *shader_program);	
 	}
 
 
@@ -149,15 +279,25 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 		{
 			NotifyNodeRenderStarted(node);
 
-			//For each attached object
-			for (auto &object : node.AttachedObjects())
+			//For each shader program on node
+			//for (auto &shader_program : node.ShaderPrograms())
 			{
-				std::visit(
-					[=](auto &&object) noexcept
-					{
-						object->Elapse(time);
-						object->Render();
-					}, object);
+				shaders::ShaderProgram *shader_program = nullptr; //TEMP
+				detail::set_matrix_uniforms(projection_mat, view_mat, node.FullTransformation(), *shader_program);
+			}
+
+			//For each attached object
+			for (auto &attached_object : node.AttachedObjects())
+			{
+				auto object =
+					std::visit(
+						[=](auto &&object) noexcept -> MovableObject*
+						{
+							return object;
+						}, attached_object);
+
+				object->Elapse(time);
+				object->Render();
 			}
 
 			NotifyNodeRenderEnded(node);
