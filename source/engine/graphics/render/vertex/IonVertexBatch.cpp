@@ -183,7 +183,7 @@ void disable_vertex_attribute_pointers(const VertexDeclaration &vertex_declarati
 
 void set_vertex_pointers(const VertexDeclaration &vertex_declaration, int vbo_offset) noexcept
 {
-	constexpr auto type = std::is_same_v<real, double> ? GL_DOUBLE : GL_FLOAT;
+	constexpr auto type = std::is_same_v<real, float> ? GL_FLOAT : GL_DOUBLE;
 
 	for (auto &vertex_element : vertex_declaration.Elements())
 	{
@@ -216,7 +216,7 @@ void set_vertex_pointers(const VertexDeclaration &vertex_declaration, int vbo_of
 
 void set_vertex_pointers(const VertexDeclaration &vertex_declaration, const void *data) noexcept
 {
-	constexpr auto type = std::is_same_v<real, double> ? GL_DOUBLE : GL_FLOAT;
+	constexpr auto type = std::is_same_v<real, float> ? GL_FLOAT : GL_DOUBLE;
 
 	for (auto &vertex_element : vertex_declaration.Elements())
 	{
