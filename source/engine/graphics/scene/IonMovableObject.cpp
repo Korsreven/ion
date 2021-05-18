@@ -102,6 +102,12 @@ void MovableObject::Render() noexcept
 	//Optional to override
 }
 
+const ShaderPrograms& MovableObject::RenderPrograms([[maybe_unused]] bool derive) const
+{
+	//Optional to override
+	return shader_programs_;
+}
+
 
 /*
 	Elapse time

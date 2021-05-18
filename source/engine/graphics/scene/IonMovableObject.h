@@ -14,6 +14,7 @@ File:	IonMovableObject.h
 #define ION_MOVABLE_OBJECT_H
 
 #include <any>
+#include <vector>
 
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonObb.h"
@@ -44,9 +45,14 @@ namespace ion::graphics::scene
 	using utilities::Sphere;
 
 
-	namespace movable_object::detail
+	namespace movable_object
 	{
-	} //movable_object::detail
+		using ShaderPrograms = std::vector<shaders::ShaderProgram*>;
+
+		namespace detail
+		{
+		} //detail
+	} //movable_object
 
 
 	//A movable object with bounding volumes, that can be attached to a scene node
@@ -61,6 +67,7 @@ namespace ion::graphics::scene
 			Sphere sphere_;
 			
 			mutable bool need_bounding_update_ = false;
+			mutable movable_object::ShaderPrograms shader_programs_;
 
 		private:
 
@@ -215,6 +222,9 @@ namespace ion::graphics::scene
 			//Render this movable object
 			//This is called once from a scene graph render queue
 			virtual void Render() noexcept;
+
+			//Returns all (distinct) shader programs used to render this movable object
+			[[nodiscard]] virtual const movable_object::ShaderPrograms& RenderPrograms(bool derive = true) const;
 
 
 			/*

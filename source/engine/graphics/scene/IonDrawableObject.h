@@ -90,16 +90,19 @@ namespace ion::graphics::scene
 			//It will call prepare, and then draw one time per pass
 			void Render() noexcept override;
 
+			//Returns all (distinct) shader programs used to render this drawable object
+			[[nodiscard]] virtual const movable_object::ShaderPrograms& RenderPrograms(bool derive = true) const;
+
 
 			/*
 				Preparing / drawing
 			*/
 
-			//Prepare this movable object such that it is ready to be drawn
+			//Prepare this drawable object such that it is ready to be drawn
 			//This is called once regardless of passes
 			virtual void Prepare() noexcept = 0;
 
-			//Draw this movable object with the given shader program (optional)
+			//Draw this drawable object with the given shader program (optional)
 			//This can be called multiple times if more than one pass
 			virtual void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept = 0;
 
@@ -108,7 +111,7 @@ namespace ion::graphics::scene
 				Elapse time
 			*/
 
-			//Elapse the total time for this movable object by the given time in seconds
+			//Elapse the total time for this drawable object by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			virtual void Elapse(duration time) noexcept;
 

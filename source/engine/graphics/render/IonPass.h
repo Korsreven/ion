@@ -228,9 +228,9 @@ namespace ion::graphics::render
 			}
 
 
-			//Returns the shader program this pass uses
+			//Returns the shader program this pass uses to render
 			//Returns nullptr if this pass uses the fixed-functionality pipeline
-			[[nodiscard]] inline auto ShaderProg() const noexcept
+			[[nodiscard]] inline auto RenderProgram() const noexcept
 			{
 				return shader_program_;
 			}

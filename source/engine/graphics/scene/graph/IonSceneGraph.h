@@ -14,7 +14,6 @@ File:	IonSceneGraph.h
 #define ION_SCENE_GRAPH
 
 #include <optional>
-#include <unordered_set>
 #include <vector>
 
 #include "IonSceneNode.h"
@@ -55,6 +54,7 @@ namespace ion::graphics::scene::graph
 				//If scene graph contains more visible lights, then only the lights nearest to the geometry should be rendered
 
 			using light_container = std::array<Light*, max_light_count>;
+			using shader_program_container = std::vector<shaders::ShaderProgram*>;
 
 
 			/*
@@ -65,8 +65,10 @@ namespace ion::graphics::scene::graph
 			void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &shader_program) noexcept;
 			void set_light_uniforms(const light_container &lights, int light_count, shaders::ShaderProgram &shader_program) noexcept;	
 			void set_matrix_uniforms(const Matrix4 &projection_mat, shaders::ShaderProgram &shader_program) noexcept;
-			void set_matrix_uniforms(const Matrix4 &projection_mat, const Matrix4 &view_mat, const Matrix4 &model_mat, shaders::ShaderProgram &shader_program) noexcept;
+			void set_matrix_uniforms(const Matrix4 &projection_mat, const Matrix4 &model_view_mat, shaders::ShaderProgram &shader_program) noexcept;
 			void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, shaders::ShaderProgram &shader_program) noexcept;
+
+			void set_gl_model_view_matrix(const Matrix4 &model_view_mat) noexcept;
 		} //detail
 	} //scene_graph
 
@@ -85,7 +87,13 @@ namespace ion::graphics::scene::graph
 			bool lighting_enabled_ = true;
 
 			SceneNode root_node_;
+
+
 			scene_graph::detail::light_container active_lights_;
+
+			scene_graph::detail::shader_program_container shader_programs_;
+			scene_graph::detail::shader_program_container shader_programs_node_;
+				//Keep these as members so we don't have to reallocate storage for each render call
 
 
 			/*

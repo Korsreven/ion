@@ -12,6 +12,7 @@ File:	IonDrawableObject.cpp
 
 #include "IonDrawableObject.h"
 
+#include <algorithm>
 #include <cassert>
 
 namespace ion::graphics::scene
@@ -55,10 +56,31 @@ void DrawableObject::Render() noexcept
 	{
 		pass.Blend();
 
-		auto shader_program = pass.ShaderProg().get();
+		auto shader_program = pass.RenderProgram().get();
 		for (auto iterations = pass.Iterations(); iterations > 0; --iterations)
 			Draw(shader_program);
 	}
+}
+
+const movable_object::ShaderPrograms& DrawableObject::RenderPrograms(bool derive) const
+{
+	if (derive)
+	{
+		shader_programs_.clear();
+
+		for (auto &pass : passes_)
+		{
+			if (auto shader_program = pass.RenderProgram().get(); shader_program)
+			{
+				//There is probably <= 3 distinct shader programs per drawable object
+				//So std::find with its linear complexity will be the fastest method to make sure each added element is unique
+				if (std::find(std::begin(shader_programs_), std::end(shader_programs_), shader_program) == std::end(shader_programs_))
+					shader_programs_.push_back(shader_program); //Only distinct
+			}
+		}
+	}
+	
+	return shader_programs_;
 }
 
 
