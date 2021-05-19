@@ -690,7 +690,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			blue_vertices.push_back({{1.7778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});
 			blue_vertices.push_back({{1.5778_r, -0.8_r, -1.25_r}, vector3::UnitZ, color::Blue});*/
 
-			Vector3 scale_factor{0.001953125_r, 0.001953125_r, 1.0_r};
+			/*Vector3 scale_factor{0.001953125_r, 0.001953125_r, 1.0_r};
 
 			ion::graphics::scene::shapes::mesh::Vertices sprite_vertices;
 			sprite_vertices.push_back({{-0.38867_r, 1.0_r, -1.3_r}, vector3::UnitZ, {0.0_r, 1.0_r}, color::White});
@@ -820,7 +820,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			knees_vertices.push_back({Vector3{0.166_r, -0.0976_r, -1.3_r} + knees_pos, vector3::UnitZ, {0.5477_r, 0.25_r}, color::White});
 			knees_vertices.push_back({Vector3{0.166_r, -0.0976_r, -1.3_r} + knees_pos, vector3::UnitZ, {0.5477_r, 0.25_r}, color::White});
 			knees_vertices.push_back({Vector3{0.166_r, 0.0976_r, -1.3_r} + knees_pos, vector3::UnitZ, {0.5477_r, 0.3466_r}, color::White});
-			knees_vertices.push_back({Vector3{-0.166_r, 0.0976_r, -1.3_r} + knees_pos, vector3::UnitZ, {0.1231_r, 0.3466_r}, color::White});
+			knees_vertices.push_back({Vector3{-0.166_r, 0.0976_r, -1.3_r} + knees_pos, vector3::UnitZ, {0.1231_r, 0.3466_r}, color::White});*/
 
 			//Models
 			//auto gray_rectangle = engine.Scene().CreateModel();
@@ -835,7 +835,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//auto blue_square = engine.Scene().CreateModel();
 			//blue_square->CreateMesh(std::move(blue_vertices), sapphire);
 
-			auto model = engine.Scene().CreateModel();
+			/*auto model = engine.Scene().CreateModel();
 			model->CreateMesh(std::move(sprite_vertices), tifa,
 				ion::graphics::scene::shapes::mesh::MeshTexCoordMode::Manual);
 			model->CreateMesh(std::move(head_vertices_crop))->ShowWireframe(true);
@@ -856,7 +856,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			model->CreateMesh(std::move(hand_vertices), tifa,
 				ion::graphics::scene::shapes::mesh::MeshTexCoordMode::Manual);
 			model->CreateMesh(std::move(knees_vertices), tifa,
-				ion::graphics::scene::shapes::mesh::MeshTexCoordMode::Manual);
+				ion::graphics::scene::shapes::mesh::MeshTexCoordMode::Manual);*/
 
 			/*auto triangle = model->CreateMesh(ion::graphics::scene::shapes::Triangle{
 				{1.0_r, 0.8_r, -1.3_r}, {0.5_r, 0.4_r, -1.3_r}, {1.5_r, 0.4_r, -1.3_r}, color::DarkGreen});
@@ -869,7 +869,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto curve = model->CreateMesh(ion::graphics::scene::shapes::Curve{
 				{{0.5_r, 0.4_r, -1.3_r}, {1.0_r, 0.8_r, -1.3_r}, {1.5_r, 0.4_r, -1.3_r}}, color::Indigo, 2.0_r});*/
 
-			auto sprite = model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			/*auto sprite = model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{1.0_r, 0.1_r, -1.3_r}, {0.3886_r, 1.0_r}, tifa});
 			sprite->Crop(Aabb{{0.0251_r, 0.3359_r}, {0.6884_r, 1.0_r}});
 			sprite->FlipHorizontal();
@@ -878,7 +878,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{1.0_r, 0.1_r, -1.3_r}, {0.3886_r, 1.0_r}, {0.02_r, 0.02_r},
 				ion::graphics::scene::shapes::border::BorderCornerStyle::Oblique, color::DarkGray});
 
-			/*model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{1.0_r, -0.7_r, -1.3_r}, {1.0_r, 0.5_r}, cat});*/
 
 			//Animations
@@ -891,11 +891,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//asteroids->Get()->StartAll();
 
 			//Texts
-			auto hello_world = engine.Scene().CreateText(
-				{0.0_r, 0.0_r, -1.3_r}, ion::utilities::math::ToRadians(0.0_r), text);
+			//auto hello_world = engine.Scene().CreateText(
+			//	{0.0_r, 0.0_r, -1.3_r}, ion::utilities::math::ToRadians(0.0_r), text);
 
 			//Camera, projection and view matrix
-			auto camera = engine.Target()->GetViewport("")->ConnectedCamera();
+			/*auto camera = engine.Target()->GetViewport("")->ConnectedCamera();
 			camera->Position({0.0_r, 0.0_r, 0.0_r});
 			camera->Rotation(ion::utilities::math::ToRadians(0.0_r));
 
@@ -915,10 +915,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Model
 			auto model1 = engine.Scene().CreateModel();
-			auto model2 = engine.Scene().CreateModel();
+			auto model2 = engine.Scene().CreateModel();*/
 
 			//Scene graph
-			{
+			/*{
 				auto scene_graph = ion::graphics::scene::graph::SceneGraph{};
 
 				//Root
@@ -963,11 +963,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 				branch_root_node_a.reset();
 				branch_root_node_b.reset();
-			}
+			}*/
 
 
 			//Uniforms
-			scene_ambient->Get() = Color{1.0_r, 1.0_r, 1.0_r, 1.0};
+			/*scene_ambient->Get() = Color{1.0_r, 1.0_r, 1.0_r, 1.0};
 			scene_gamma->Get() = 1.0_r;
 			scene_light_count->Get() = 1;
 
@@ -987,26 +987,63 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			
 			matrix_projection->Get() = proj_mat.TransposeCopy();
 			matrix_model_view->Get() = view_mat.TransposeCopy();
-			matrix_model_view_projection->Get() = (proj_mat * view_mat).TransposeCopy();
+			matrix_model_view_projection->Get() = (proj_mat * view_mat).TransposeCopy();*/
 
 
 			//game.models.push_back(gray_rectangle);
 			//game.models.push_back(red_square);
 			//game.models.push_back(green_square);
 			//game.models.push_back(blue_square);
-			game.models.push_back(model);
+			//game.models.push_back(model);
 
 			//game.animations.push_back(running);
 			//game.particle_systems.push_back(asteroids);
 			//game.texts.push_back(hello_world);
 
-			game.viewport = engine.Target()->GetViewport("");
+			/*game.viewport = engine.Target()->GetViewport("");
 			game.matrix_projection = matrix_projection;
 			game.matrix_model_view_projection = matrix_model_view_projection;
 			game.light_type = light_type;
 			game.light_position = light_position;
 			game.light_direction = light_direction;
-			game.light_diffuse = light_diffuse;
+			game.light_diffuse = light_diffuse;*/
+
+			using namespace ion::utilities;
+
+			//EXAMPLE
+			//Scene
+			engine.SceneGraph().AmbientColor(color::DimGray);
+
+			//Camera
+			auto camera = engine.Target()->GetViewport("")->ConnectedCamera();
+
+			//Light
+			auto light = engine.Scene().CreateLight();
+			light->Type(ion::graphics::scene::light::LightType::Point);
+			light->Direction({0.0_r, 0.0_r, -1.0_r});
+			light->AmbientColor(color::White);
+			light->DiffuseColor(color::White);
+			light->SpecularColor(color::White);
+			light->Attenuation(1.0_r, 0.09_r, 0.032_r);
+			light->Cutoff(math::ToRadians(45.0_r), math::ToRadians(55.0_r));
+
+			//Model
+			auto model = engine.Scene().CreateModel();
+			auto sprite = model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {0.3886_r, 1.0_r}, tifa});
+			model->AddPass(ion::graphics::render::Pass{shader_prog});
+
+			//Scene
+			auto cam_node = engine.SceneGraph().RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});
+			cam_node->AttachObject(*camera);
+
+			auto light_node = engine.SceneGraph().RootNode().CreateChildNode({0.0_r, 0.0_r, -1.0_r});
+			light_node->AttachObject(*light);
+
+			auto model_node = engine.SceneGraph().RootNode().CreateChildNode({0.0_r, 0.0_r, -1.5_r});
+			//model_node->Rotate(math::ToRadians(25.0_r));
+			model_node->Scale({0.5_r, 0.5_r});
+			model_node->AttachObject(*model);
 
 
 			//EXAMPLE end

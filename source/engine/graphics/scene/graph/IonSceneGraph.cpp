@@ -20,6 +20,7 @@ File:	IonSceneGraph.cpp
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonLight.h"
 #include "graphics/scene/IonMovableObject.h"
+#include "graphics/shaders/IonShaderLayout.h"
 #include "graphics/shaders/IonShaderProgram.h"
 #include "utilities/IonMath.h"
 
@@ -66,7 +67,7 @@ void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &sh
 		color->Get<glsl::vec4>() = fog->Tint();
 }
 
-void set_light_uniforms(const light_container &lights, int light_count, shaders::ShaderProgram &shader_program) noexcept
+void set_light_uniforms(const light_container &lights, int light_count, const Camera &camera, shaders::ShaderProgram &shader_program) noexcept
 {
 	using namespace shaders::variables;
 	using namespace ion::utilities;
@@ -97,11 +98,13 @@ void set_light_uniforms(const light_container &lights, int light_count, shaders:
 			(*type)[i].Get<int>() = static_cast<int>(lights[i]->Type());
 
 		if (position)
-			(*position)[i].Get<glsl::vec3>() = lights[i]->Position() + lights[i]->ParentNode()->DerivedPosition();
+			(*position)[i].Get<glsl::vec3>() = (lights[i]->Position() + lights[i]->ParentNode()->DerivedPosition()) -
+											   (camera.Position() + camera.ParentNode()->DerivedPosition()); //View adjusted
 
 		if (direction)
-			(*direction)[i].Get<glsl::vec3>() = lights[i]->Direction().Deviant(lights[i]->ParentNode()->DerivedRotation());
-
+			(*direction)[i].Get<glsl::vec3>() = lights[i]->Direction().Deviant(lights[i]->ParentNode()->DerivedRotation() -
+												(camera.Rotation() + camera.ParentNode()->DerivedRotation())); //View adjusted
+												
 
 		if (ambient)
 			(*ambient)[i].Get<glsl::vec4>() = lights[i]->AmbientColor();
@@ -190,15 +193,15 @@ void set_gl_model_view_matrix(const Matrix4 &model_view_mat) noexcept
 	//would not work here, because all branches are compiled in a non-templated function
 	#if defined(ION_DOUBLE_PRECISION) || defined(ION_EXTENDED_PRECISION)
 		#ifdef ION_ROW_MAJOR
-		glLoadMatrixd(model_view_mat.TransposeCopy().M()[0]);
-		#else
 		glLoadMatrixd(model_view_mat.M()[0]);
+		#else
+		glLoadMatrixd(model_view_mat.TransposeCopy().M()[0]);
 		#endif
 	#else
 		#ifdef ION_ROW_MAJOR
-		glLoadMatrixf(model_view_mat.TransposeCopy().M());
-		#else
 		glLoadMatrixf(model_view_mat.M()[0]);
+		#else
+		glLoadMatrixf(model_view_mat.TransposeCopy().M()[0]);
 		#endif
 	#endif
 }
@@ -290,52 +293,55 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 		{
 			NotifyNodeRenderStarted(node);
 
-			auto model_view_mat = node.FullTransformation() * view_mat;
-			detail::set_gl_model_view_matrix(model_view_mat);
-
-			//For each attached object
-			for (auto &attached_object : node.AttachedObjects())
+			if (!std::empty(node.AttachedObjects()))
 			{
-				auto object =
-					std::visit(
-						[=](auto &&object) noexcept -> MovableObject*
-						{
-							return object;
-						}, attached_object);
+				auto model_view_mat = view_mat * node.FullTransformation();
+				detail::set_gl_model_view_matrix(model_view_mat);
 
-				//Update uniforms
-				if (object->Visible())
+				//For each attached object
+				for (auto &attached_object : node.AttachedObjects())
 				{
-					//For each shader program
-					for (auto &shader_program : object->RenderPrograms())
-					{
-						//There is probably <= 10 distinct shader programs per scene
-						//So std::find with its linear complexity will be the fastest method to make sure each added element is unique
-						if (std::find(std::begin(shader_programs_), std::end(shader_programs_), shader_program) == std::end(shader_programs_))
-							//One time per program per scene
-						{
-							detail::set_camera_uniforms(*camera, *shader_program);
-							detail::set_fog_uniforms(fog_, *shader_program);
-							detail::set_light_uniforms(active_lights_, active_light_count, *shader_program);
-							detail::set_matrix_uniforms(projection_mat, *shader_program);
-							detail::set_scene_uniforms(gamma_, ambient_color_, active_light_count, *shader_program);
-							shader_programs_.push_back(shader_program); //Only distinct
-						}
+					auto object =
+						std::visit(
+							[=](auto &&object) noexcept -> MovableObject*
+							{
+								return object;
+							}, attached_object);
 
-						//There is probably <= 5 distinct shader programs per node
-						//So std::find with its linear complexity will be the fastest method to make sure each added element is unique
-						if (std::find(std::begin(shader_programs_node_), std::end(shader_programs_node_), shader_program) == std::end(shader_programs_node_))
-							//One time per program per node
+					//Update uniforms
+					if (object->Visible())
+					{
+						//For each shader program
+						for (auto &shader_program : object->RenderPrograms())
 						{
-							detail::set_matrix_uniforms(projection_mat, model_view_mat, *shader_program);
-							shader_programs_node_.push_back(shader_program); //Only distinct
+							//There is probably <= 10 distinct shader programs per scene
+							//So std::find with its linear complexity will be the fastest method to make sure each added element is unique
+							if (std::find(std::begin(shader_programs_), std::end(shader_programs_), shader_program) == std::end(shader_programs_))
+								//One time per program per scene
+							{
+								detail::set_camera_uniforms(*camera, *shader_program);
+								detail::set_fog_uniforms(fog_, *shader_program);
+								detail::set_light_uniforms(active_lights_, active_light_count, *camera, *shader_program);
+								detail::set_matrix_uniforms(projection_mat, *shader_program);
+								detail::set_scene_uniforms(gamma_, ambient_color_, active_light_count, *shader_program);
+								shader_programs_.push_back(shader_program); //Only distinct
+							}
+
+							//There is probably <= 5 distinct shader programs per node
+							//So std::find with its linear complexity will be the fastest method to make sure each added element is unique
+							if (std::find(std::begin(shader_programs_node_), std::end(shader_programs_node_), shader_program) == std::end(shader_programs_node_))
+								//One time per program per node
+							{
+								detail::set_matrix_uniforms(projection_mat, model_view_mat, *shader_program);
+								shader_programs_node_.push_back(shader_program); //Only distinct
+							}
 						}
 					}
-				}
 
-				//Render object
-				object->Elapse(time);
-				object->Render();
+					//Render object
+					object->Elapse(time);
+					object->Render();
+				}
 			}
 
 			NotifyNodeRenderEnded(node);

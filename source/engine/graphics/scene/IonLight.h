@@ -165,8 +165,8 @@ namespace ion::graphics::scene
 			inline void Attenuation(real constant, real linear, real quadratic) noexcept
 			{
 				attenuation_constant_ = constant;
-				attenuation_constant_ = linear;
-				attenuation_constant_ = quadratic;
+				attenuation_linear_ = linear;
+				attenuation_quadratic_ = quadratic;
 			}
 
 			//Sets the inner and outer cutoff values of the light to the given angles (radians)
