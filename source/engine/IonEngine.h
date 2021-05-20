@@ -20,7 +20,6 @@ File:	IonEngine.h
 #include "events/listeners/IonFrameListener.h"
 #include "graphics/render/IonFrustum.h"
 #include "graphics/render/IonRenderWindow.h"
-#include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneGraph.h"
 #include "graphics/utilities/IonAabb.h"
 #include "timers/IonStopwatch.h"
@@ -56,7 +55,6 @@ namespace ion
 
 			std::optional<graphics::render::RenderWindow> render_window_;
 			std::optional<events::InputController> input_controller_;
-			graphics::scene::SceneManager scene_;
 			graphics::scene::graph::SceneGraph scene_graph_;
 			timers::TimerManager timer_manager_;
 
@@ -139,26 +137,14 @@ namespace ion
 			}
 
 
-			//Returns a mutable reference to a scene manager
-			[[nodiscard]] inline auto& Scene() noexcept
-			{
-				return scene_;
-			}
-
-			//Returns an immutable reference to a scene manager
-			[[nodiscard]] inline auto& Scene() const noexcept
-			{
-				return scene_;
-			}
-
 			//Returns a mutable reference to a scene graph
-			[[nodiscard]] inline auto& SceneGraph() noexcept
+			[[nodiscard]] inline auto& Scene() noexcept
 			{
 				return scene_graph_;
 			}
 
 			//Returns an immutable reference to a scene graph
-			[[nodiscard]] inline auto& SceneGraph() const noexcept
+			[[nodiscard]] inline auto& Scene() const noexcept
 			{
 				return scene_graph_;
 			}
@@ -211,14 +197,8 @@ namespace ion
 				Rendering target
 			*/
 
-			//Render to the given render window, and create a default viewport and camera/frustum with the given aspect ratio and format
-			graphics::render::RenderWindow& RenderTo(graphics::render::RenderWindow &&render_window,
-				std::optional<real> aspect_ratio = 16.0_r / 9.0_r, graphics::render::frustum::AspectRatioFormat aspect_format = graphics::render::frustum::AspectRatioFormat::PanAndScan) noexcept;
-
-			//Render to the given render window, and create a default viewport and camera/frustum with the given clipping plane, near/far clip distance, aspect ratio and format
-			graphics::render::RenderWindow& RenderTo(graphics::render::RenderWindow &&render_window,
-				std::optional<graphics::utilities::Aabb> clipping_plane, real near_clip_distance, real far_clip_distance,
-				std::optional<real> aspect_ratio = 16.0_r / 9.0_r, graphics::render::frustum::AspectRatioFormat aspect_format = graphics::render::frustum::AspectRatioFormat::PanAndScan) noexcept;
+			//Render to the given render window, and create a default viewport
+			graphics::render::RenderWindow& RenderTo(graphics::render::RenderWindow &&render_window) noexcept;
 	};
 } //ion
 #endif

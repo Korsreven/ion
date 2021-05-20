@@ -251,15 +251,7 @@ bool Engine::Running() const noexcept
 	Window
 */
 
-graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow &&render_window,
-	std::optional<real> aspect_ratio, graphics::render::frustum::AspectRatioFormat aspect_format) noexcept
-{
-	return RenderTo(std::move(render_window), graphics::utilities::Aabb{-1.0_r, 1.0_r}, -1.0_r, 1.0_r, aspect_ratio, aspect_format);
-}
-
-graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow &&render_window,
-	std::optional<graphics::utilities::Aabb> clipping_plane, real near_clip_distance, real far_clip_distance,
-	std::optional<real> aspect_ratio, graphics::render::frustum::AspectRatioFormat aspect_format) noexcept
+graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow &&render_window) noexcept
 {
 	if (Running())
 		return *render_window_;
@@ -275,18 +267,6 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 	//Create a default viewport and connect to input
 	auto viewport = render_window_->CreateViewport("", *render_window_);
 	input_controller_->ConnectedViewport(viewport);
-	
-	//Create a default ortographic frustum
-	auto frustum = graphics::render::Frustum::Orthographic(
-		clipping_plane, near_clip_distance, far_clip_distance, aspect_ratio, aspect_format);
-	//auto frustum = graphics::render::Frustum::Perspective(
-	//	clipping_plane, near_clip_distance, far_clip_distance, 90.0, aspect_ratio, aspect_format);
-	frustum.BaseViewportHeight(viewport->Bounds().ToSize().Y());
-
-	//Create a default camera with frustum and connect to viewport
-	scene_.ConnectedViewport(viewport);
-	auto camera = scene_.CreateCamera("", frustum);
-	viewport->ConnectedCamera(camera);
 
 	return *render_window_;
 }
