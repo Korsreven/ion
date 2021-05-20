@@ -15,6 +15,9 @@ File:	IonDrawableObject.cpp
 #include <algorithm>
 #include <cassert>
 
+#include "graphics/shaders/IonShaderProgram.h"
+#include "graphics/shaders/IonShaderProgramManager.h"
+
 namespace ion::graphics::scene
 {
 
@@ -52,14 +55,34 @@ void DrawableObject::Render() noexcept
 {
 	Prepare();
 
+	shaders::ShaderProgram *shader_program = nullptr;
+	shaders::ShaderProgram *previous_shader_program = nullptr;
+	auto use_shader = false;
+
 	for (auto &pass : passes_)
 	{
 		pass.Blend();
 
-		auto shader_program = pass.RenderProgram().get();
+		shader_program = pass.RenderProgram().get();
+		use_shader = shader_program && shader_program->Owner() && shader_program->Handle();
+
+		//Switch shader program
+		if (shader_program != previous_shader_program)
+		{
+			if (use_shader)
+				shader_program->Owner()->ActivateShaderProgram(*shader_program);
+			else //Fixed-function pipeline
+				shader_program->Owner()->DeactivateShaderProgram(*previous_shader_program);
+		}
+
 		for (auto iterations = pass.Iterations(); iterations > 0; --iterations)
 			Draw(shader_program);
+
+		previous_shader_program = shader_program;
 	}
+
+	if (use_shader)
+		shader_program->Owner()->DeactivateShaderProgram(*shader_program);
 }
 
 const movable_object::ShaderPrograms& DrawableObject::RenderPrograms(bool derive) const

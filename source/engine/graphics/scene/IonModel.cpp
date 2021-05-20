@@ -100,15 +100,16 @@ void Model::Draw(shaders::ShaderProgram *shader_program) noexcept
 	if (auto meshes = Meshes(); visible_ && !std::empty(meshes))
 	{
 		auto use_shader = shader_program && shader_program->Owner() && shader_program->Handle();
+		auto shader_in_use = use_shader && shader_program->Owner()->IsShaderProgramActive(*shader_program);
 
-		if (use_shader)
+		if (use_shader && !shader_in_use)
 			shader_program->Owner()->ActivateShaderProgram(*shader_program);
 
 		//Draw all meshes
 		for (auto &mesh : meshes)
 			mesh.Draw(shader_program);
 
-		if (use_shader)
+		if (use_shader && !shader_in_use)
 			shader_program->Owner()->DeactivateShaderProgram(*shader_program);
 	}
 }
