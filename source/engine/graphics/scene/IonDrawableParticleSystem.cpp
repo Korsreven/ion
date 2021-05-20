@@ -200,8 +200,9 @@ void DrawableParticleSystem::Draw(shaders::ShaderProgram *shader_program) noexce
 	if (visible_ && particle_system_ && !std::empty(vertex_streams_))
 	{
 		auto use_shader = shader_program && shader_program->Owner() && shader_program->Handle();
+		auto shader_in_use = use_shader && shader_program->Owner()->IsShaderProgramActive(*shader_program);
 
-		if (use_shader)
+		if (use_shader && !shader_in_use)
 			shader_program->Owner()->ActivateShaderProgram(*shader_program);
 
 		for (auto &stream : vertex_streams_)
@@ -214,7 +215,7 @@ void DrawableParticleSystem::Draw(shaders::ShaderProgram *shader_program) noexce
 			detail::disable_point_sprites();
 		}
 
-		if (use_shader)
+		if (use_shader && !shader_in_use)
 			shader_program->Owner()->ActivateShaderProgram(*shader_program);
 	}
 }

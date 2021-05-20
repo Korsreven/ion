@@ -693,8 +693,9 @@ void DrawableText::Draw(shaders::ShaderProgram *shader_program) noexcept
 	if (visible_ && text_ && !std::empty(glyph_vertex_streams_))
 	{
 		auto use_shader = shader_program && shader_program->Owner() && shader_program->Handle();
+		auto shader_in_use = use_shader && shader_program->Owner()->IsShaderProgramActive(*shader_program);
 
-		if (use_shader)
+		if (use_shader && !shader_in_use)
 			shader_program->Owner()->ActivateShaderProgram(*shader_program);
 
 		decoration_vertex_stream_.back_vertex_batch.Draw(shader_program);
@@ -706,7 +707,7 @@ void DrawableText::Draw(shaders::ShaderProgram *shader_program) noexcept
 		decoration_vertex_stream_.front_vertex_batch.Draw(shader_program);
 			//Draw front decorations after character glyphs
 
-		if (use_shader)
+		if (use_shader && !shader_in_use)
 			shader_program->Owner()->DeactivateShaderProgram(*shader_program);
 	}
 }
