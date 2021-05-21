@@ -55,34 +55,37 @@ void DrawableObject::Render() noexcept
 {
 	Prepare();
 
-	shaders::ShaderProgram *shader_program = nullptr;
-	shaders::ShaderProgram *previous_shader_program = nullptr;
-	auto use_shader = false;
+	static NonOwningPtr<shaders::ShaderProgram> active_shader_program = nullptr;
 
 	for (auto &pass : passes_)
 	{
 		pass.Blend();
 
-		shader_program = pass.RenderProgram().get();
-		use_shader = shader_program && shader_program->Owner() && shader_program->Handle();
+		auto shader_program = pass.RenderProgram().get();
+		auto active_program = active_shader_program.get();
+		auto use_shader = shader_program && shader_program->Owner() && shader_program->Handle();
 
 		//Switch shader program
-		if (shader_program != previous_shader_program)
+		if (shader_program != active_program)
 		{
-			if (use_shader)
+			if (use_shader) //Custom pipeline
 				shader_program->Owner()->ActivateShaderProgram(*shader_program);
-			else //Fixed-function pipeline
-				shader_program->Owner()->DeactivateShaderProgram(*previous_shader_program);
+			else if (active_program) //Fixed-function pipeline
+				shader_program->Owner()->DeactivateShaderProgram(*active_program);
+
+			active_shader_program = pass.RenderProgram();
 		}
 
 		for (auto iterations = pass.Iterations(); iterations > 0; --iterations)
 			Draw(shader_program);
-
-		previous_shader_program = shader_program;
 	}
 
-	if (use_shader)
-		shader_program->Owner()->DeactivateShaderProgram(*shader_program);
+	//Optimization
+	//When not deactivating the active shader program below...
+	//a program will always be active until switched with another program
+
+	//if (use_shader)
+	//	shader_program->Owner()->DeactivateShaderProgram(*shader_program);
 }
 
 const movable_object::ShaderPrograms& DrawableObject::RenderPrograms(bool derive) const
