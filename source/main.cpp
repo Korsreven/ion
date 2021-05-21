@@ -196,13 +196,21 @@ struct Game :
 	ion::events::listeners::KeyListener,
 	ion::events::listeners::MouseListener
 {
+	ion::types::Cumulative<duration> aggregate{1.0_sec};
+	ion::NonOwningPtr<ion::graphics::scene::DrawableText> fps;
+
 	/*
 		Frame listener
 	*/
 
 	bool FrameStarted(duration time) noexcept override
 	{
-		time;
+		if (fps)
+		{
+			if (aggregate += time)
+				fps->Get()->Content(ion::utilities::convert::ToString(1.0_sec / time, 0));
+		}
+
 		return true;
 	}
 
@@ -388,8 +396,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto particle_frag_shader = shaders.CreateShader("default_particle_frag", "default_particle.frag");
 			auto text_vert_shader = shaders.CreateShader("default_text_vert", "default_text.vert");
 			auto text_frag_shader = shaders.CreateShader("default_text_frag", "default_text.frag");
-			//auto gui_text_vert_shader = shaders.CreateShader("default_gui_text_vert", "default_gui_text.vert");
-			//auto gui_text_frag_shader = shaders.CreateShader("default_gui_text_frag", "default_gui_text.frag");
+			auto gui_text_vert_shader = shaders.CreateShader("default_gui_text_vert", "default_gui_text.vert");
+			auto gui_text_frag_shader = shaders.CreateShader("default_gui_text_frag", "default_gui_text.frag");
 			shaders.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!shaders.Loaded());
@@ -400,7 +408,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto model_program = shader_programs.CreateShaderProgram("default_model_prog", model_vert_shader, model_frag_shader);
 			auto particle_program = shader_programs.CreateShaderProgram("default_particle_prog", particle_vert_shader, particle_frag_shader);
 			auto text_program = shader_programs.CreateShaderProgram("default_text_prog", text_vert_shader, text_frag_shader);
-			//auto gui_text_program = shader_programs.CreateShaderProgram("default_gui_text_prog", gui_text_vert_shader, gui_text_frag_shader);
+			auto gui_text_program = shader_programs.CreateShaderProgram("default_gui_text_prog", gui_text_vert_shader, gui_text_frag_shader);
 			shader_programs.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!shader_programs.Loaded());
@@ -581,6 +589,35 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				shader_programs.LoadShaderVariableLocations(*text_program);
 			}
 
+			//GUI text program
+			{
+				//Shader structs
+				auto matrix_struct = gui_text_program->CreateStruct("matrix");
+				auto scene_struct = gui_text_program->CreateStruct("scene");
+				auto primitive_struct = gui_text_program->CreateStruct("primitive");
+
+
+				//Shader variables
+				//Vertex
+				gui_text_program->CreateAttribute<glsl::vec3>("vertex_position");
+				gui_text_program->CreateAttribute<glsl::vec4>("vertex_color");
+				gui_text_program->CreateAttribute<glsl::vec2>("vertex_tex_coord");
+
+				//Matrices			
+				matrix_struct->CreateUniform<glsl::mat4>("model_view");
+				matrix_struct->CreateUniform<glsl::mat4>("projection");
+				matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
+
+				//Scene
+				scene_struct->CreateUniform<float>("gamma");
+
+				//Primitive
+				primitive_struct->CreateUniform<glsl::sampler2D>("texture");
+				primitive_struct->CreateUniform<bool>("has_texture");
+
+				shader_programs.LoadShaderVariableLocations(*gui_text_program);
+			}
+
 
 			//Font
 			ion::graphics::fonts::FontManager fonts;
@@ -589,19 +626,32 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto verdana_bold_12 = fonts.CreateFont("verdana_bold_12", "verdanab.ttf", 12);
 			auto verdana_italic_12 = fonts.CreateFont("verdana_italic_12", "verdanai.ttf", 12);
 			auto verdana_bold_italic_12 = fonts.CreateFont("verdana_bold_italic_12", "verdanaz.ttf", 12);
+			auto verdana_regular_36 = fonts.CreateFont("verdana_regular_36", "verdana.ttf", 36);
+			auto verdana_bold_36 = fonts.CreateFont("verdana_bold_36", "verdanab.ttf", 36);
+			auto verdana_italic_36 = fonts.CreateFont("verdana_italic_36", "verdanai.ttf", 36);
+			auto verdana_bold_italic_36 = fonts.CreateFont("verdana_bold_italic_36", "verdanaz.ttf", 36);
 			fonts.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!fonts.Loaded());
 
 			//Type face
 			ion::graphics::fonts::TypeFaceManager type_faces;
-			[[maybe_unused]] auto verdana_12 = 
+			auto verdana_12 = 
 				type_faces.CreateTypeFace(
 					"verdana_12",
 					verdana_regular_12,
 					verdana_bold_12,
 					verdana_italic_12,
 					verdana_bold_italic_12);
+
+			auto verdana_36 = 
+				type_faces.CreateTypeFace(
+					"verdana_36",
+					verdana_regular_36,
+					verdana_bold_36,
+					verdana_italic_36,
+					verdana_bold_italic_36);
+
 
 			//Material
 			ion::graphics::materials::MaterialManager materials;
@@ -692,17 +742,26 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Text
 			ion::graphics::fonts::TextManager texts;
-			[[maybe_unused]] auto text =
+			auto pangram =
 				texts.CreateText(
 					"pangram",
 					"The <i>quick</i> <del><font color='saddlebrown'>brown</font></del> fox <b>jumps</b> <sup>over</sup> the <i>lazy</i> dog",
 					verdana_12);
 
-			text->AppendLine("How <del><font color='olivedrab'>vexingly</font></del> <u>quick</u> <sub>daft</sub> zebras <b>jump</b>!");
-			//text->AreaSize(ion::graphics::utilities::Vector2{300.0_r, 100.0_r});
-			text->Alignment(ion::graphics::fonts::text::TextAlignment::Left);
-			text->VerticalAlignment(ion::graphics::fonts::text::TextVerticalAlignment::Top);
-			text->DefaultForegroundColor(color::White);
+			pangram->AppendLine("How <del><font color='olivedrab'>vexingly</font></del> <u>quick</u> <sub>daft</sub> zebras <b>jump</b>!");
+			//pangram->AreaSize(ion::graphics::utilities::Vector2{300.0_r, 100.0_r});
+			pangram->Alignment(ion::graphics::fonts::text::TextAlignment::Left);
+			pangram->VerticalAlignment(ion::graphics::fonts::text::TextVerticalAlignment::Top);
+			pangram->DefaultForegroundColor(color::White);
+
+			auto fps =
+				texts.CreateText(
+					"fps",
+					"",
+					verdana_36);
+
+			fps->Formatting(ion::graphics::fonts::text::TextFormatting::None);
+			fps->DefaultForegroundColor(color::White);
 
 
 			using namespace ion::utilities;
@@ -726,34 +785,87 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Light
 			auto light = scene_manager.CreateLight();
-			light->Type(ion::graphics::scene::light::LightType::Point);
-			light->Direction({0.0_r, 0.0_r, -1.0_r});
+			light->Type(ion::graphics::scene::light::LightType::Spotlight);
+			light->Direction((Vector3{0.0_r, 0.25_r, -0.5_r} - Vector3{0.0_r, 0.0_r, 0.0_r}).NormalizeCopy());
 			light->AmbientColor(color::White);
 			light->DiffuseColor(color::White);
 			light->SpecularColor(color::White);
 			light->Attenuation(1.0_r, 0.09_r, 0.032_r);
-			light->Cutoff(math::ToRadians(45.0_r), math::ToRadians(55.0_r));
+			light->Cutoff(math::ToRadians(20.0_r), math::ToRadians(30.0_r));
+
+			auto red_light = scene_manager.CreateLight();
+			red_light->Type(ion::graphics::scene::light::LightType::Point);
+			red_light->Direction({0.0_r, 0.0_r, -1.0_r});
+			red_light->AmbientColor(color::Transparent);
+			red_light->DiffuseColor(color::Red);
+			red_light->SpecularColor(color::Red);
+			red_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
+			red_light->Cutoff(math::ToRadians(45.0_r), math::ToRadians(55.0_r));
+
+			auto green_light = scene_manager.CreateLight();
+			green_light->Type(ion::graphics::scene::light::LightType::Point);
+			green_light->Direction({0.0_r, 0.0_r, -1.0_r});
+			green_light->AmbientColor(color::Transparent);
+			green_light->DiffuseColor(color::Green);
+			green_light->SpecularColor(color::Green);
+			green_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
+			green_light->Cutoff(math::ToRadians(45.0_r), math::ToRadians(55.0_r));
+
+
+			//Text
+			auto text = scene_manager.CreateText(fps);
+			text->AddPass(ion::graphics::render::Pass{gui_text_program});
 
 			//Model
 			auto model = scene_manager.CreateModel();
-			auto sprite = model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {0.3886_r, 1.0_r}, tifa});
+			model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {0.5829_r, 1.5_r}, tifa});
 			model->AddPass(ion::graphics::render::Pass{model_program});
 
-			//Scene
-			engine.Scene().AmbientColor(color::DimGray);
+			auto background = scene_manager.CreateModel();
+			background->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Center
+			background->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Left
+			background->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Right
+			background->AddPass(ion::graphics::render::Pass{model_program});
 
+
+			//Scene
+			engine.Scene().AmbientColor(Color::RGB(50, 50, 50));
+
+			//Camera
 			auto cam_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});
 			cam_node->AttachObject(*camera);
 
-			auto light_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, -1.0_r});
+			//Lights
+			auto light_node = engine.Scene().RootNode().CreateChildNode({0.0_r, -1.0_r, 0.0_r});
 			light_node->AttachObject(*light);
 
-			auto model_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, -1.5_r});
+			auto red_light_node = engine.Scene().RootNode().CreateChildNode({-1.5_r, -0.75_r, -1.0_r});
+			red_light_node->AttachObject(*red_light);
+
+			auto green_light_node = engine.Scene().RootNode().CreateChildNode({1.5_r, 0.75_r, -1.0_r});
+			green_light_node->AttachObject(*green_light);
+
+			//Text
+			auto fps_node = engine.Scene().RootNode().CreateChildNode({-1.75_r, 0.98_r, -1.5_r});
+			fps_node->Scale({-0.5_r, -0.5_r});
+			fps_node->AttachObject(*text);
+
+			//Models
+			auto model_node = engine.Scene().RootNode().CreateChildNode({0.0_r, -0.115_r, -1.9_r});
 			//model_node->Rotate(math::ToRadians(25.0_r));
-			model_node->Scale({0.5_r, 0.5_r});
+			//model_node->Scale({0.5_r, 0.5_r});
 			model_node->AttachObject(*model);
 
+			auto background_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, -2.0_r});
+			background_node->AttachObject(*background);
+
+
+			//Game
+			game.fps = text;
 
 			//Engine
 			engine.Subscribe(game);
