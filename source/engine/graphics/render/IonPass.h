@@ -179,7 +179,7 @@ namespace ion::graphics::render
 
 			//Sets the shader program this pass uses to the given shader
 			//Pass nullptr to use the fixed-functionality pipeline
-			inline void ShaderProg(NonOwningPtr<shaders::ShaderProgram> shader_program) noexcept
+			inline void RenderProgram(NonOwningPtr<shaders::ShaderProgram> shader_program) noexcept
 			{
 				shader_program_ = shader_program;
 			}

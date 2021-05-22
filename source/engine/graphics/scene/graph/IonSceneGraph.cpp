@@ -37,7 +37,7 @@ void set_camera_uniforms(const Camera &camera, shaders::ShaderProgram &shader_pr
 	using namespace shaders::variables;
 
 	if (auto position = shader_program.GetUniform(shaders::shader_layout::UniformName::Camera_Position); position)
-		position->Get<glsl::vec3>() = camera.ParentNode()->DerivedPosition();
+		position->Get<glsl::vec3>() = camera.Position() + camera.ParentNode()->DerivedPosition();
 }
 
 void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &shader_program) noexcept

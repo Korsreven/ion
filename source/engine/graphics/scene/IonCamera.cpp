@@ -53,7 +53,7 @@ void rotate_by(real angle) noexcept
 
 Matrix4 get_view_matrix(const Vector3 &position, real angle) noexcept
 {
-	return Matrix4::Translation(-position) * Matrix4::Rotation(angle).Transpose();
+	return Matrix4::Rotation(angle).Transpose() * Matrix4::Translation(-position);
 }
 
 } //camera::detail

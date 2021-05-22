@@ -71,7 +71,7 @@ void DrawableObject::Render() noexcept
 			if (use_shader) //Custom pipeline
 				shader_program->Owner()->ActivateShaderProgram(*shader_program);
 			else if (active_program) //Fixed-function pipeline
-				shader_program->Owner()->DeactivateShaderProgram(*active_program);
+				active_program->Owner()->DeactivateShaderProgram(*active_program);
 
 			active_shader_program = pass.RenderProgram();
 		}

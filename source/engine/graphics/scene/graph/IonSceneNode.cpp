@@ -495,7 +495,7 @@ Sphere SceneNode::WorldBoundingSphere(bool cascade) const noexcept
 void SceneNode::Translate(const Vector3 &unit) noexcept
 {
 	if (unit != vector3::Zero)
-		Position(position_ + unit.Deviant(unit.SignedAngleBetween(vector3::UnitY)));
+		Position(position_ + unit.Deviant(vector2::UnitY.SignedAngleBetween(direction_)));
 }
 
 void SceneNode::Translate(real unit) noexcept
