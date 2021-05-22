@@ -196,8 +196,25 @@ struct Game :
 	ion::events::listeners::KeyListener,
 	ion::events::listeners::MouseListener
 {
-	ion::types::Cumulative<duration> aggregate{1.0_sec};
 	ion::NonOwningPtr<ion::graphics::scene::DrawableText> fps;
+	ion::types::Cumulative<duration> fps_update_rate{1.0_sec};
+
+	ion::NonOwningPtr<ion::graphics::scene::Model> model;
+	bool move_model_up = false;
+	bool move_model_left = false;
+	bool move_model_down = false;	
+	bool move_model_right = false;
+	bool rotate_model_left = false;
+	bool rotate_model_right = false;
+
+	ion::NonOwningPtr<ion::graphics::scene::Camera> camera;
+	bool move_camera_up = false;
+	bool move_camera_left = false;
+	bool move_camera_down = false;	
+	bool move_camera_right = false;
+	bool rotate_camera_left = false;
+	bool rotate_camera_right = false;
+
 
 	/*
 		Frame listener
@@ -205,10 +222,46 @@ struct Game :
 
 	bool FrameStarted(duration time) noexcept override
 	{
+		using namespace ion::utilities;
+		using namespace ion::graphics::utilities;
+
 		if (fps)
 		{
-			if (aggregate += time)
+			if (fps_update_rate += time)
 				fps->Get()->Content(ion::utilities::convert::ToString(1.0_sec / time, 0));
+		}
+
+		if (model)
+		{
+			if (move_model_up)
+				model->ParentNode()->Translate(1.0_r * time.count());
+			if (move_model_left)
+				model->ParentNode()->Translate(Vector2{-1.0_r, 0.0_r} * time.count());
+			if (move_model_down)
+				model->ParentNode()->Translate(-1.0_r * time.count());
+			if (move_model_right)
+				model->ParentNode()->Translate(Vector2{1.0_r, 0.0_r} * time.count());
+			if (rotate_model_left)
+				model->ParentNode()->Rotate(math::ToRadians(180.0_r) * time.count());
+			if (rotate_model_right)
+				model->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
+		}
+
+
+		if (camera)
+		{
+			if (move_camera_up)
+				camera->ParentNode()->Translate(1.0_r * time.count());
+			if (move_camera_left)
+				camera->ParentNode()->Translate(Vector2{-1.0_r, 0.0_r} * time.count());
+			if (move_camera_down)
+				camera->ParentNode()->Translate(-1.0_r * time.count());
+			if (move_camera_right)
+				camera->ParentNode()->Translate(Vector2{1.0_r, 0.0_r} * time.count());
+			if (rotate_camera_left)
+				camera->ParentNode()->Rotate(math::ToRadians(180.0_r) * time.count());
+			if (rotate_camera_right)
+				camera->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
 		}
 
 		return true;
@@ -237,12 +290,112 @@ struct Game :
 
 	void KeyPressed(ion::events::listeners::KeyButton button) noexcept override
 	{
-		button;
+		switch (button)
+		{
+			case ion::events::listeners::KeyButton::W:
+			move_model_up = true;
+			break;
+
+			case ion::events::listeners::KeyButton::A:
+			move_model_left = true;
+			break;
+
+			case ion::events::listeners::KeyButton::S:
+			move_model_down = true;
+			break;
+
+			case ion::events::listeners::KeyButton::D:
+			move_model_right = true;
+			break;
+
+			case ion::events::listeners::KeyButton::Q:
+			rotate_model_left = true;
+			break;
+
+			case ion::events::listeners::KeyButton::E:
+			rotate_model_right = true;
+			break;
+
+
+			case ion::events::listeners::KeyButton::UpArrow:
+			move_camera_up = true;
+			break;
+
+			case ion::events::listeners::KeyButton::LeftArrow:
+			move_camera_left = true;
+			break;
+
+			case ion::events::listeners::KeyButton::DownArrow:
+			move_camera_down = true;
+			break;
+
+			case ion::events::listeners::KeyButton::RightArrow:
+			move_camera_right = true;
+			break;
+
+			case ion::events::listeners::KeyButton::Subtract:
+			rotate_camera_left = true;
+			break;
+
+			case ion::events::listeners::KeyButton::Add:
+			rotate_camera_right = true;
+			break;
+		}
 	}
 
 	void KeyReleased(ion::events::listeners::KeyButton button) noexcept override
 	{
-		button;
+		switch (button)
+		{
+			case ion::events::listeners::KeyButton::W:
+			move_model_up = false;
+			break;
+
+			case ion::events::listeners::KeyButton::A:
+			move_model_left = false;
+			break;
+
+			case ion::events::listeners::KeyButton::S:
+			move_model_down = false;
+			break;
+
+			case ion::events::listeners::KeyButton::D:
+			move_model_right = false;
+			break;
+
+			case ion::events::listeners::KeyButton::Q:
+			rotate_model_left = false;
+			break;
+
+			case ion::events::listeners::KeyButton::E:
+			rotate_model_right = false;
+			break;
+
+
+			case ion::events::listeners::KeyButton::UpArrow:
+			move_camera_up = false;
+			break;
+
+			case ion::events::listeners::KeyButton::LeftArrow:
+			move_camera_left = false;
+			break;
+
+			case ion::events::listeners::KeyButton::DownArrow:
+			move_camera_down = false;
+			break;
+
+			case ion::events::listeners::KeyButton::RightArrow:
+			move_camera_right = false;
+			break;
+
+			case ion::events::listeners::KeyButton::Subtract:
+			rotate_camera_left = false;
+			break;
+
+			case ion::events::listeners::KeyButton::Add:
+			rotate_camera_right = false;
+			break;
+		}
   	}
 
 	void CharacterPressed(char character) noexcept override
@@ -364,6 +517,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto pebbles_specular = textures.CreateTexture("pebbles_specular", "pebbles_specular.jpg");
 
 			auto tifa_diffuse = textures.CreateTexture("tifa", "tifa.png");
+			auto cloud_diffuse = textures.CreateTexture("cloud", "cloud.png");
+			auto ship_diffuse = textures.CreateTexture("ship", "ship.png");
+
 			auto cat_first_frame = textures.CreateTexture("cat01", "cat01.png");
 			textures.CreateTexture("cat02", "cat02.png");
 			textures.CreateTexture("cat03", "cat03.png");
@@ -372,7 +528,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			textures.CreateTexture("cat06", "cat06.png");
 			textures.CreateTexture("cat07", "cat07.png");
 			textures.CreateTexture("cat08", "cat08.png");
-
+			
 			textures.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!textures.Loaded());
@@ -711,6 +867,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{0.0_r, 0.0_r, 0.0_r},
 					32.0_r, tifa_diffuse, nullptr, nullptr);
 
+			auto cloud =
+				materials.CreateMaterial("cloud",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{0.6_r, 0.6_r, 0.6_r},
+					{0.0_r, 0.0_r, 0.0_r},
+					32.0_r, cloud_diffuse, nullptr, nullptr);
+
+			auto ship =
+				materials.CreateMaterial("ship",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{0.6_r, 0.6_r, 0.6_r},
+					{0.0_r, 0.0_r, 0.0_r},
+					32.0_r, ship_diffuse, nullptr, nullptr);
+
 			auto cat =
 				materials.CreateMaterial("cat",
 					{1.0_r, 1.0_r, 1.0_r},
@@ -787,9 +959,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto light = scene_manager.CreateLight();
 			light->Type(ion::graphics::scene::light::LightType::Spotlight);
 			light->Direction((Vector3{0.0_r, 0.25_r, -0.5_r} - Vector3{0.0_r, 0.0_r, 0.0_r}).NormalizeCopy());
-			light->AmbientColor(color::White);
-			light->DiffuseColor(color::White);
-			light->SpecularColor(color::White);
+			light->AmbientColor(color::Transparent);
+			light->DiffuseColor(Color{255, 255, 255, 0.0_r});
+			light->SpecularColor(Color{255, 255, 255, 0.0_r});
 			light->Attenuation(1.0_r, 0.09_r, 0.032_r);
 			light->Cutoff(math::ToRadians(20.0_r), math::ToRadians(30.0_r));
 
@@ -797,8 +969,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			red_light->Type(ion::graphics::scene::light::LightType::Point);
 			red_light->Direction({0.0_r, 0.0_r, -1.0_r});
 			red_light->AmbientColor(color::Transparent);
-			red_light->DiffuseColor(color::Red);
-			red_light->SpecularColor(color::Red);
+			red_light->DiffuseColor(Color{255, 0, 0, 0.0_r});
+			red_light->SpecularColor(Color{255, 0, 0, 0.0_r});
 			red_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
 			red_light->Cutoff(math::ToRadians(45.0_r), math::ToRadians(55.0_r));
 
@@ -806,8 +978,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			green_light->Type(ion::graphics::scene::light::LightType::Point);
 			green_light->Direction({0.0_r, 0.0_r, -1.0_r});
 			green_light->AmbientColor(color::Transparent);
-			green_light->DiffuseColor(color::Green);
-			green_light->SpecularColor(color::Green);
+			green_light->DiffuseColor(Color{0, 255, 0, 0.0_r});
+			green_light->SpecularColor(Color{0, 255, 0, 0.0_r});
 			green_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
 			green_light->Cutoff(math::ToRadians(45.0_r), math::ToRadians(55.0_r));
 
@@ -819,7 +991,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Model
 			auto model = scene_manager.CreateModel();
 			model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {0.5829_r, 1.5_r}, tifa});
+				{0.0_r, 0.0_r, 0.0_r}, {0.3671875_r, 0.5_r}, ship});
 			model->AddPass(ion::graphics::render::Pass{model_program});
 
 			auto background = scene_manager.CreateModel();
@@ -831,17 +1003,25 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Right
 			background->AddPass(ion::graphics::render::Pass{model_program});
 
+			auto clouds = scene_manager.CreateModel();
+			clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-1.0_r, 0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Left
+			clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{1.0_r, -0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Right
+			clouds->AddPass(ion::graphics::render::Pass{model_program});
+
 
 			//Scene
 			engine.Scene().AmbientColor(Color::RGB(50, 50, 50));
+			//engine.Scene().LightingEnabled(false);
 
 			//Camera
 			auto cam_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});
 			cam_node->AttachObject(*camera);
 
 			//Lights
-			auto light_node = engine.Scene().RootNode().CreateChildNode({0.0_r, -1.0_r, 0.0_r});
-			light_node->AttachObject(*light);
+			//auto light_node = engine.Scene().RootNode().CreateChildNode({0.0_r, -1.0_r, 0.0_r});
+			//light_node->AttachObject(*light);
 
 			auto red_light_node = engine.Scene().RootNode().CreateChildNode({-1.5_r, -0.75_r, -1.0_r});
 			red_light_node->AttachObject(*red_light);
@@ -856,16 +1036,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Models
 			auto model_node = engine.Scene().RootNode().CreateChildNode({0.0_r, -0.115_r, -1.9_r});
-			//model_node->Rotate(math::ToRadians(25.0_r));
-			//model_node->Scale({0.5_r, 0.5_r});
 			model_node->AttachObject(*model);
 
 			auto background_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, -2.0_r});
 			background_node->AttachObject(*background);
 
+			auto cloud_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, -1.8_r});
+			cloud_node->AttachObject(*clouds);
 
 			//Game
 			game.fps = text;
+			game.model = model;
+			game.camera = camera;
 
 			//Engine
 			engine.Subscribe(game);
