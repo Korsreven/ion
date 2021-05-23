@@ -101,6 +101,7 @@ Emitter Emitter::Ring(std::string name, const Vector3 &position, const Vector2 &
 OwningPtr<Emitter> Emitter::Clone() const
 {
 	auto emitter = make_owning<Emitter>(*name_);
+	emitter->type_ = type_;
 	emitter->position_ = position_;
 	emitter->direction_ = direction_;
 	emitter->size_ = size_;

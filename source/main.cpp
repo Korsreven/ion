@@ -200,6 +200,7 @@ struct Game :
 	ion::types::Cumulative<duration> fps_update_rate{1.0_sec};
 
 	ion::NonOwningPtr<ion::graphics::scene::Model> model;
+	ion::NonOwningPtr<ion::graphics::scene::Model> aura;
 	bool move_model_up = false;
 	bool move_model_left = false;
 	bool move_model_down = false;	
@@ -247,6 +248,8 @@ struct Game :
 				model->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
 		}
 
+		if (aura)
+			aura->ParentNode()->Rotate(math::ToRadians(-90.0_r) * time.count());
 
 		if (camera)
 		{
@@ -518,7 +521,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto tifa_diffuse = textures.CreateTexture("tifa", "tifa.png");
 			auto cloud_diffuse = textures.CreateTexture("cloud", "cloud.png");
+			auto star_diffuse = textures.CreateTexture("star", "star.png");
 			auto ship_diffuse = textures.CreateTexture("ship", "ship.png");
+			auto aura_diffuse = textures.CreateTexture("aura", "aura.png");
+			auto raindrop_diffuse = textures.CreateTexture("raindrop", "raindrop.png");
 
 			auto cat_first_frame = textures.CreateTexture("cat01", "cat01.png");
 			textures.CreateTexture("cat02", "cat02.png");
@@ -875,6 +881,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{0.0_r, 0.0_r, 0.0_r},
 					32.0_r, cloud_diffuse, nullptr, nullptr);
 
+			auto star =
+				materials.CreateMaterial("star",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					32.0_r, star_diffuse, nullptr, nullptr);
+
 			auto ship =
 				materials.CreateMaterial("ship",
 					{1.0_r, 1.0_r, 1.0_r},
@@ -882,6 +896,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{0.6_r, 0.6_r, 0.6_r},
 					{0.0_r, 0.0_r, 0.0_r},
 					32.0_r, ship_diffuse, nullptr, nullptr);
+
+			auto aura =
+				materials.CreateMaterial("aura",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{0.6_r, 0.6_r, 0.6_r},
+					{0.0_r, 0.0_r, 0.0_r},
+					32.0_r, aura_diffuse, nullptr, nullptr);
+
+			auto raindrop =
+				materials.CreateMaterial("raindrop",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{0.6_r, 0.6_r, 0.6_r},
+					{0.0_r, 0.0_r, 0.0_r},
+					32.0_r, raindrop_diffuse, nullptr, nullptr);
 
 			auto cat =
 				materials.CreateMaterial("cat",
@@ -893,24 +923,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			using namespace ion::graphics::utilities;
 
+
 			//Particle system
 			ion::graphics::particles::ParticleSystemManager particle_systems;
-			auto particle_system = particle_systems.CreateParticleSystem("asteroids");
+			auto rain = particle_systems.CreateParticleSystem("rain");
 
-			auto emitter = particle_system->CreateEmitter(
-				ion::graphics::particles::Emitter::Point(
-					"spawner", {-0.75_r, 0.5_r, -1.3_r}, {-0.5_r, -0.5_r}, 2.5_r, ion::utilities::math::ToRadians(2.5_r), {}, 25
+			auto emitter = rain->CreateEmitter(
+				ion::graphics::particles::Emitter::Box(
+					"spawner", {0.0_r, 0.0_r, 0.0_r}, vector2::NegativeUnitY, {3.56_r, 0.1_r}, {}, 50.0_r, 0.0_r, {}, 100
 				));
 
-			emitter->ParticleVelocity(0.4_r, 0.6_r);
-			emitter->ParticleSize(24.0_r, 32.0_r);
-			emitter->ParticleMass(0.4_r, 0.6_r);
-			emitter->ParticleColor(color::White);
-			emitter->ParticleLifeTime(50.0_sec, 60.0_sec);
-			emitter->ParticleMaterial(asteroid);
-
-			particle_system->CreateAffector(
-				ion::graphics::particles::affectors::Gravitation{"gravity", {0.0_r, 0.0_r}, 2.0_r, 0.5_r});
+			emitter->ParticleVelocity(1.5_r, 2.0_r);
+			emitter->ParticleSize(8.0_r, 24.0_r);
+			emitter->ParticleMass(1.0_r, 1.0_r);
+			emitter->ParticleColor(Color{255, 255, 255, 0.75_r}, color::White);
+			emitter->ParticleLifeTime(1.4_sec, 1.4_sec);
+			emitter->ParticleMaterial(raindrop);
 
 			//Text
 			ion::graphics::fonts::TextManager texts;
@@ -960,8 +988,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			light->Type(ion::graphics::scene::light::LightType::Spotlight);
 			light->Direction((Vector3{0.0_r, 0.25_r, -0.5_r} - Vector3{0.0_r, 0.0_r, 0.0_r}).NormalizeCopy());
 			light->AmbientColor(color::Transparent);
-			light->DiffuseColor(Color{255, 255, 255, 0.0_r});
-			light->SpecularColor(Color{255, 255, 255, 0.0_r});
+			light->DiffuseColor(color::White);
+			light->SpecularColor(color::White);
 			light->Attenuation(1.0_r, 0.09_r, 0.032_r);
 			light->Cutoff(math::ToRadians(20.0_r), math::ToRadians(30.0_r));
 
@@ -969,8 +997,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			red_light->Type(ion::graphics::scene::light::LightType::Point);
 			red_light->Direction({0.0_r, 0.0_r, -1.0_r});
 			red_light->AmbientColor(color::Transparent);
-			red_light->DiffuseColor(Color{255, 0, 0, 0.0_r});
-			red_light->SpecularColor(Color{255, 0, 0, 0.0_r});
+			red_light->DiffuseColor(color::Red);
+			red_light->SpecularColor(color::Red);
 			red_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
 			red_light->Cutoff(math::ToRadians(45.0_r), math::ToRadians(55.0_r));
 
@@ -978,8 +1006,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			green_light->Type(ion::graphics::scene::light::LightType::Point);
 			green_light->Direction({0.0_r, 0.0_r, -1.0_r});
 			green_light->AmbientColor(color::Transparent);
-			green_light->DiffuseColor(Color{0, 255, 0, 0.0_r});
-			green_light->SpecularColor(Color{0, 255, 0, 0.0_r});
+			green_light->DiffuseColor(color::Green);
+			green_light->SpecularColor(color::Green);
 			green_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
 			green_light->Cutoff(math::ToRadians(45.0_r), math::ToRadians(55.0_r));
 
@@ -988,11 +1016,27 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto text = scene_manager.CreateText(fps);
 			text->AddPass(ion::graphics::render::Pass{gui_text_program});
 
+			//Particle system
+			auto particle_system = scene_manager.CreateParticleSystem(rain);
+			particle_system->AddPass(ion::graphics::render::Pass{particle_program});
+			particle_system->Get()->StartAll();
+
 			//Model
 			auto model = scene_manager.CreateModel();
 			model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.3671875_r, 0.5_r}, ship});
 			model->AddPass(ion::graphics::render::Pass{model_program});
+
+			auto model_star = scene_manager.CreateModel();
+			model_star->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {0.05_r, 0.05_r}, star});
+			model_star->AddPass(ion::graphics::render::Pass{model_program});
+
+			auto model_aura = scene_manager.CreateModel();
+			auto sprite = model_aura->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {0.432_r, 0.45_r}, aura});
+			sprite->FillColor(Color{255, 255, 255, 0.75_r});
+			model_aura->AddPass(ion::graphics::render::Pass{model_program});
 
 			auto background = scene_manager.CreateModel();
 			background->CreateMesh(ion::graphics::scene::shapes::Sprite{
@@ -1009,7 +1053,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{1.0_r, -0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Right
 			clouds->AddPass(ion::graphics::render::Pass{model_program});
-
+			
 
 			//Scene
 			engine.Scene().AmbientColor(Color::RGB(50, 50, 50));
@@ -1034,19 +1078,32 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			fps_node->Scale({-0.5_r, -0.5_r});
 			fps_node->AttachObject(*text);
 
+			//Particles
+			auto particle_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 1.0_r, -1.75_r});
+			particle_node->AttachObject(*particle_system);
+
 			//Models
-			auto model_node = engine.Scene().RootNode().CreateChildNode({0.0_r, -0.115_r, -1.9_r});
+			auto model_node = engine.Scene().RootNode().CreateChildNode({0.0_r, -0.115_r, -1.8_r});
 			model_node->AttachObject(*model);
+
+			auto star_node = model_node->CreateChildNode({0.15_r, 0.2_r, 0.1_r});
+			star_node->AttachObject(*model_star);
+
+			auto aura_node = model_node->CreateChildNode({0.0_r, -0.05_r, -0.1_r});
+			aura_node->InheritRotation(false);
+			aura_node->AttachObject(*model_aura);
 
 			auto background_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, -2.0_r});
 			background_node->AttachObject(*background);
 
-			auto cloud_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, -1.8_r});
+			auto cloud_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, -1.6_r});
 			cloud_node->AttachObject(*clouds);
+
 
 			//Game
 			game.fps = text;
 			game.model = model;
+			game.aura = model_aura;
 			game.camera = camera;
 
 			//Engine
