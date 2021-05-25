@@ -15,6 +15,7 @@ File:	IonMatrix3.cpp
 #include <cassert>
 #include <cmath>
 
+#include "IonMatrix2.h"
 #include "IonMatrix4.h"
 #include "utilities/IonMath.h"
 
@@ -60,6 +61,21 @@ Matrix3::Matrix3(real m00, real m01, real m02,
 	//Empty
 }
 #endif
+
+Matrix3::Matrix3(const Matrix2 &matrix) noexcept :
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+	Matrix3{matrix.M00(), matrix.M01(),
+			matrix.M10(), matrix.M11(),
+			0.0_r, 0.0_r}
+	#else
+	//Column-major layout (OpenGL)
+	Matrix3{matrix.M00(), matrix.M01(), 0.0_r,
+			matrix.M10(), matrix.M11(), 0.0_r}
+	#endif
+{
+	//Empty
+}
 
 Matrix3::Matrix3(const Matrix4 &matrix) noexcept :
 	#ifdef ION_ROW_MAJOR
@@ -194,6 +210,14 @@ Matrix3 Matrix3::Transformation(real rotation, const Vector2 &scaling, const Vec
 /*
 	Operators
 */
+
+Matrix3& Matrix3::operator=(const Matrix2 &matrix) noexcept
+{
+	m_[0][0] = matrix.M00();		m_[0][1] = matrix.M01();		m_[0][2] = 0.0_r;
+	m_[1][0] = matrix.M10();		m_[1][1] = matrix.M11();		m_[1][2] = 0.0_r;
+	m_[2][0] = 0.0_r;				m_[2][1] = 0.0_r;				m_[2][2] = 1.0_r;
+	return *this;
+}
 
 Matrix3& Matrix3::operator=(const Matrix4 &matrix) noexcept
 {

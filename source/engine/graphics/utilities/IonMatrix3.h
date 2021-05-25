@@ -18,6 +18,7 @@ File:	IonMatrix3.h
 
 namespace ion::graphics::utilities
 {
+	class Matrix2; //Forward declaration
 	class Matrix4; //Forward declaration
 	using namespace types::type_literals;
 
@@ -65,6 +66,9 @@ namespace ion::graphics::utilities
 					real m10, real m11, real m12) noexcept;
 			#endif
 
+			//Constructs a new matrix from the given 2x2 matrix
+			Matrix3(const Matrix2 &matrix) noexcept;
+
 			//Constructs a new matrix from the given 4x4 matrix
 			Matrix3(const Matrix4 &matrix) noexcept;
 			
@@ -98,6 +102,9 @@ namespace ion::graphics::utilities
 			/*
 				Operators
 			*/
+
+			//Sets this matrix equal to the given 2x2 matrix
+			Matrix3& operator=(const Matrix2 &matrix) noexcept;
 
 			//Sets this matrix equal to the given 4x4 matrix
 			Matrix3& operator=(const Matrix4 &matrix) noexcept;

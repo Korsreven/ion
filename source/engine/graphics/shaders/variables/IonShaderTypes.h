@@ -21,6 +21,7 @@ File:	IonShaderTypes.h
 #include <utility>
 
 #include "graphics/utilities/IonColor.h"
+#include "graphics/utilities/IonMatrix2.h"
 #include "graphics/utilities/IonMatrix3.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector2.h"
@@ -30,6 +31,7 @@ File:	IonShaderTypes.h
 namespace ion::graphics::shaders::variables::glsl
 {
 	using utilities::Color;
+	using utilities::Matrix2;
 	using utilities::Matrix3;
 	using utilities::Matrix4;
 	using utilities::Vector2;
@@ -690,7 +692,8 @@ namespace ion::graphics::shaders::variables::glsl
 
 		//Sets matNxM elements to the given matrix
 		template <typename Matrix,
-			typename = std::enable_if_t<(N == 3 && M == 3 && std::is_same_v<Matrix, Matrix3>) ||
+			typename = std::enable_if_t<(N == 2 && M == 2 && std::is_same_v<Matrix, Matrix2>) ||
+										(N == 3 && M == 3 && std::is_same_v<Matrix, Matrix3>) ||
 										(N == 4 && M == 4 && std::is_same_v<Matrix, Matrix4>)>>
 		inline auto& operator=(const Matrix &matrix) noexcept
 		{

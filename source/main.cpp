@@ -119,6 +119,7 @@ File:	main.cpp
 #include "graphics/textures/IonTextureManager.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
+#include "graphics/utilities/IonMatrix2.h"
 #include "graphics/utilities/IonMatrix3.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonObb.h"
