@@ -60,6 +60,11 @@ namespace ion::graphics::scene
 							reinterpret_cast<const std::byte*>(particle.Position().Components()) - reinterpret_cast<const std::byte*>(&particle),
 							sizeof(particles::Particle)},
 
+						{shaders::shader_layout::AttributeName::Vertex_Rotation,
+							render::vertex::vertex_declaration::VertexElementType::Float1,
+							reinterpret_cast<const std::byte*>(&particle.Rotation()) - reinterpret_cast<const std::byte*>(&particle),
+							sizeof(particles::Particle)},
+
 						{shaders::shader_layout::AttributeName::Vertex_PointSize,
 							render::vertex::vertex_declaration::VertexElementType::Float1,
 							reinterpret_cast<const std::byte*>(particle.Size().Components()) - reinterpret_cast<const std::byte*>(&particle),

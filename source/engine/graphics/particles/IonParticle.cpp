@@ -17,14 +17,17 @@ namespace ion::graphics::particles
 
 Particle::Particle(const Vector3 &position, const Vector2 &direction,
 				   const Vector2 &size, real mass, const Color &color,
-				   duration life_time) noexcept :
+				   duration life_time, const Vector2 &initial_direction) noexcept :
 
 	position_{position},
 	direction_{direction},
+	rotation_{direction.SignedAngleBetween(initial_direction)},
 	size_{size},
 	mass_{mass},
 	color_{color},
-	life_time_{life_time}
+	life_time_{life_time},
+
+	initial_direction_{initial_direction}
 {
 	//Empty
 }

@@ -38,6 +38,9 @@ void set_camera_uniforms(const Camera &camera, shaders::ShaderProgram &shader_pr
 
 	if (auto position = shader_program.GetUniform(shaders::shader_layout::UniformName::Camera_Position); position)
 		position->Get<glsl::vec3>() = camera.Position() + camera.ParentNode()->DerivedPosition();
+
+	if (auto rotation = shader_program.GetUniform(shaders::shader_layout::UniformName::Camera_Rotation); rotation)
+		rotation->Get<float>() = camera.Rotation() + camera.ParentNode()->DerivedRotation(); //Using 'real' could make this uniform double
 }
 
 void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &shader_program) noexcept
@@ -167,6 +170,23 @@ void set_matrix_uniforms(const Matrix4 &projection_mat, const Matrix4 &model_vie
 		#else
 		model_view_projection->Get<glsl::mat4>() = (projection_mat * model_view_mat).TransposeCopy();
 		#endif
+}
+
+void set_node_uniforms(const SceneNode &node, shaders::ShaderProgram &shader_program) noexcept
+{
+	using namespace shaders::variables;
+
+	if (auto position = shader_program.GetUniform(shaders::shader_layout::UniformName::Node_Position); position)
+		position->Get<glsl::vec3>() = node.DerivedPosition();
+
+	if (auto direction = shader_program.GetUniform(shaders::shader_layout::UniformName::Node_Direction); direction)
+		direction->Get<glsl::vec2>() = node.DerivedDirection();
+
+	if (auto rotation = shader_program.GetUniform(shaders::shader_layout::UniformName::Node_Rotation); rotation)
+		rotation->Get<float>() = node.DerivedRotation(); //Using 'real' could make this uniform double
+
+	if (auto scaling = shader_program.GetUniform(shaders::shader_layout::UniformName::Node_Scaling); scaling)
+		scaling->Get<glsl::vec2>() = node.DerivedScaling();
 }
 
 void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, shaders::ShaderProgram &shader_program) noexcept
@@ -333,6 +353,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 								//One time per program per node
 							{
 								detail::set_matrix_uniforms(projection_mat, model_view_mat, *shader_program);
+								detail::set_node_uniforms(node, *shader_program);
 								shader_programs_node_.push_back(shader_program); //Only distinct
 							}
 						}

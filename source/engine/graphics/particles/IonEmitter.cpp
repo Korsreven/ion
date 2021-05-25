@@ -201,7 +201,8 @@ void Emitter::Emit(int particle_count) noexcept
 			detail::particle_size(particle_size_.first, particle_size_.second), //Size
 			detail::particle_mass(particle_mass_.first, particle_mass_.second), //Mass
 			detail::particle_color(particle_color_.first, particle_color_.second), //Color
-			detail::particle_life_time(particle_life_time_.first, particle_life_time_.second) //Life time
+			detail::particle_life_time(particle_life_time_.first, particle_life_time_.second), //Life time
+			direction_ //Initial direction
 		);
 }
 

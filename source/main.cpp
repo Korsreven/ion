@@ -607,7 +607,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				scene_struct->CreateUniform<int>("light_count");
 
 				//Camera
-				camera_struct->CreateUniform<glsl::vec3>("position");	
+				camera_struct->CreateUniform<glsl::vec3>("position");
 
 				//Primitive
 				primitive_struct->CreateUniform<bool>("has_material");
@@ -618,7 +618,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				material_struct->CreateUniform<glsl::vec4>("specular");
 				material_struct->CreateUniform<glsl::vec4>("emissive");
 				material_struct->CreateUniform<float>("shininess");
-				material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");	
+				material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");
 				material_struct->CreateUniform<glsl::sampler2D>("specular_map");
 				material_struct->CreateUniform<glsl::sampler2D>("normal_map");
 				material_struct->CreateUniform<bool>("has_diffuse_map");
@@ -647,6 +647,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				auto matrix_struct = particle_program->CreateStruct("matrix");
 				auto scene_struct = particle_program->CreateStruct("scene");
 				auto camera_struct = particle_program->CreateStruct("camera");
+				auto node_struct = particle_program->CreateStruct("node");
 				auto primitive_struct = particle_program->CreateStruct("primitive");
 				auto material_struct = particle_program->CreateStruct("material");
 				auto light_struct = particle_program->CreateStruct("light", 8);
@@ -655,6 +656,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				//Shader variables
 				//Vertex
 				particle_program->CreateAttribute<glsl::vec3>("vertex_position");
+				particle_program->CreateAttribute<float>("vertex_rotation");
 				particle_program->CreateAttribute<float>("vertex_point_size");
 				particle_program->CreateAttribute<glsl::vec4>("vertex_color");
 
@@ -669,7 +671,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				scene_struct->CreateUniform<int>("light_count");
 
 				//Camera
-				camera_struct->CreateUniform<glsl::vec3>("position");	
+				camera_struct->CreateUniform<glsl::vec3>("position");
+				camera_struct->CreateUniform<float>("rotation");
+
+				//Node
+				node_struct->CreateUniform<float>("rotation");
+				node_struct->CreateUniform<glsl::vec2>("scaling");
 
 				//Primitive
 				primitive_struct->CreateUniform<bool>("has_material");
@@ -1080,7 +1087,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			fps_node->AttachObject(*text);
 
 			//Particles
-			auto particle_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 1.0_r, -1.75_r});
+			auto particle_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 1.0_r, -1.75_r}, vector2::NegativeUnitY);
 			particle_node->AttachObject(*particle_system);
 
 			//Models

@@ -208,7 +208,7 @@ void DrawableParticleSystem::Draw(shaders::ShaderProgram *shader_program) noexce
 		for (auto &stream : vertex_streams_)
 		{
 			auto &[min_size, max_size] = stream.emitter->ParticleSize();
-			detail::set_point_size((min_size.X() + max_size.X()) * 0.5_r);
+			detail::set_point_size((min_size.X() + max_size.X() + min_size.Y() + max_size.Y()) * 0.25_r);
 
 			detail::enable_point_sprites();
 			stream.vertex_batch.Draw(shader_program);

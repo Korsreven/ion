@@ -34,6 +34,7 @@ namespace ion::graphics::shaders
 			Matrix,
 			Scene,
 			Camera,
+			Node,
 			Primitive,
 			Material,
 			Fog,
@@ -46,6 +47,7 @@ namespace ion::graphics::shaders
 			Vertex_Normal,
 			Vertex_Color,
 			Vertex_TexCoord,
+			Vertex_Rotation,
 			Vertex_PointSize
 		};
 
@@ -61,7 +63,13 @@ namespace ion::graphics::shaders
 			Scene_LightCount,
 
 			Camera_Position,
+			Camera_Rotation,
 			
+			Node_Position,
+			Node_Direction,
+			Node_Rotation,
+			Node_Scaling,
+
 			Primitive_Texture,
 			Primitive_HasTexture,
 			Primitive_HasMaterial,
@@ -137,6 +145,7 @@ namespace ion::graphics::shaders
 				{StructName::Matrix,	"matrix"},
 				{StructName::Scene,		"scene"},
 				{StructName::Camera,	"camera"},
+				{StructName::Node,		"node"},
 				{StructName::Primitive,	"primitive"},
 				{StructName::Material,	"material"},
 				{StructName::Fog,		"fog"},
@@ -150,7 +159,8 @@ namespace ion::graphics::shaders
 				{AttributeName::Vertex_Normal,		{"vertex_normal",		1}},
 				{AttributeName::Vertex_Color,		{"vertex_color",		2}},
 				{AttributeName::Vertex_TexCoord,	{"vertex_tex_coord",	3}},
-				{AttributeName::Vertex_PointSize,	{"vertex_point_size",	4}}
+				{AttributeName::Vertex_Rotation,	{"vertex_rotation",		4}},
+				{AttributeName::Vertex_PointSize,	{"vertex_point_size",	5}}
 			};
 
 		inline const auto DefaultUniformBindings =
@@ -166,40 +176,46 @@ namespace ion::graphics::shaders
 				{UniformName::Scene_LightCount,				{"scene.light_count",				6}},
 
 				{UniformName::Camera_Position,				{"camera.position",					7}},
+				{UniformName::Camera_Rotation,				{"camera.rotation",					8}},
 
-				{UniformName::Primitive_Texture,			{"primitive.texture",				8}},
-				{UniformName::Primitive_HasTexture,			{"primitive.has_texture",			9}},
-				{UniformName::Primitive_HasMaterial,		{"primitive.has_material",			10}},
+				{UniformName::Node_Position,				{"node.position",					9}},
+				{UniformName::Node_Direction,				{"node.direction",					10}},
+				{UniformName::Node_Rotation,				{"node.rotation",					11}},
+				{UniformName::Node_Scaling,					{"node.scaling",					12}},
 
-				{UniformName::Material_Ambient,				{"material.ambient",				11}},
-				{UniformName::Material_Diffuse,				{"material.diffuse",				12}},
-				{UniformName::Material_Specular,			{"material.specular",				13}},
-				{UniformName::Material_Emissive,			{"material.emissive",				14}},
-				{UniformName::Material_Shininess,			{"material.shininess",				15}},
-				{UniformName::Material_DiffuseMap,			{"material.diffuse_map",			16}},
-				{UniformName::Material_SpecularMap,			{"material.specular_map",			17}},
-				{UniformName::Material_NormalMap,			{"material.normal_map",				18}},
-				{UniformName::Material_HasDiffuseMap,		{"material.has_diffuse_map",		19}},
-				{UniformName::Material_HasSpecularMap,		{"material.has_specular_map",		20}},
-				{UniformName::Material_HasNormalMap,		{"material.has_normal_map",			21}},
+				{UniformName::Primitive_Texture,			{"primitive.texture",				13}},
+				{UniformName::Primitive_HasTexture,			{"primitive.has_texture",			14}},
+				{UniformName::Primitive_HasMaterial,		{"primitive.has_material",			15}},
 
-				{UniformName::Fog_Mode,						{"fog.mode",						22}},
-				{UniformName::Fog_Density,					{"fog.density",						23}},
-				{UniformName::Fog_Near,						{"fog.near",						24}},
-				{UniformName::Fog_Far,						{"fog.far",							25}},
-				{UniformName::Fog_Color,					{"fog.color",						26}},
+				{UniformName::Material_Ambient,				{"material.ambient",				16}},
+				{UniformName::Material_Diffuse,				{"material.diffuse",				17}},
+				{UniformName::Material_Specular,			{"material.specular",				18}},
+				{UniformName::Material_Emissive,			{"material.emissive",				19}},
+				{UniformName::Material_Shininess,			{"material.shininess",				20}},
+				{UniformName::Material_DiffuseMap,			{"material.diffuse_map",			21}},
+				{UniformName::Material_SpecularMap,			{"material.specular_map",			22}},
+				{UniformName::Material_NormalMap,			{"material.normal_map",				23}},
+				{UniformName::Material_HasDiffuseMap,		{"material.has_diffuse_map",		24}},
+				{UniformName::Material_HasSpecularMap,		{"material.has_specular_map",		25}},
+				{UniformName::Material_HasNormalMap,		{"material.has_normal_map",			26}},
 
-				{UniformName::Light_Type,					{"light[0].type",					27}},
-				{UniformName::Light_Position,				{"light[0].position",				28}},
-				{UniformName::Light_Direction,				{"light[0].direction",				29}},
-				{UniformName::Light_Ambient,				{"light[0].ambient",				30}},
-				{UniformName::Light_Diffuse,				{"light[0].diffuse",				31}},
-				{UniformName::Light_Specular,				{"light[0].specular",				32}},
-				{UniformName::Light_Constant,				{"light[0].constant",				33}},
-				{UniformName::Light_Linear,					{"light[0].linear",					34}},
-				{UniformName::Light_Quadratic,				{"light[0].quadratic",				35}},
-				{UniformName::Light_Cutoff,					{"light[0].cutoff",					36}},
-				{UniformName::Light_OuterCutoff,			{"light[0].outer_cutoff",			37}}
+				{UniformName::Fog_Mode,						{"fog.mode",						27}},
+				{UniformName::Fog_Density,					{"fog.density",						28}},
+				{UniformName::Fog_Near,						{"fog.near",						29}},
+				{UniformName::Fog_Far,						{"fog.far",							30}},
+				{UniformName::Fog_Color,					{"fog.color",						31}},
+
+				{UniformName::Light_Type,					{"light[0].type",					32}},
+				{UniformName::Light_Position,				{"light[0].position",				33}},
+				{UniformName::Light_Direction,				{"light[0].direction",				34}},
+				{UniformName::Light_Ambient,				{"light[0].ambient",				35}},
+				{UniformName::Light_Diffuse,				{"light[0].diffuse",				36}},
+				{UniformName::Light_Specular,				{"light[0].specular",				37}},
+				{UniformName::Light_Constant,				{"light[0].constant",				38}},
+				{UniformName::Light_Linear,					{"light[0].linear",					39}},
+				{UniformName::Light_Quadratic,				{"light[0].quadratic",				40}},
+				{UniformName::Light_Cutoff,					{"light[0].cutoff",					41}},
+				{UniformName::Light_OuterCutoff,			{"light[0].outer_cutoff",			42}}
 			};
 
 		namespace detail

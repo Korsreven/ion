@@ -39,11 +39,14 @@ namespace ion::graphics::particles
 		private:
 
 			Vector3 position_;
-			Vector2 direction_; //Length represents velocity
+			Vector2 direction_; //Length represents velocity		
+			real rotation_ = 0.0_r;
 			Vector2 size_;
 			real mass_ = 0.0_r;
 			Color color_;
 			Cumulative<duration> life_time_;
+
+			Vector2 initial_direction_;
 
 		public:
 
@@ -52,7 +55,7 @@ namespace ion::graphics::particles
 			//Constructs a new particle from the given initial values
 			Particle(const Vector3 &position, const Vector2 &direction,
 					 const Vector2 &size, real mass, const Color &color,
-					 duration life_time) noexcept;
+					 duration life_time, const Vector2 &initial_direction) noexcept;
 
 
 			/*
@@ -70,6 +73,7 @@ namespace ion::graphics::particles
 			inline void Direction(const Vector2 &direction) noexcept
 			{
 				direction_ = direction;
+				rotation_ = direction.SignedAngleBetween(initial_direction_); //Update rotation
 			}
 
 			//Sets the velocity (direction length) of the particle to the given value
@@ -125,6 +129,12 @@ namespace ion::graphics::particles
 			[[nodiscard]] inline auto Velocity() const noexcept
 			{
 				return direction_.Length();
+			}
+
+			//Returns the angle of rotation (in radians) of the particle
+			[[nodiscard]] inline auto& Rotation() const noexcept
+			{
+				return rotation_;
 			}
 
 			//Returns the size of the particle
