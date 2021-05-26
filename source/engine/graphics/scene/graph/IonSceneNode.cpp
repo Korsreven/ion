@@ -540,12 +540,12 @@ NonOwningPtr<SceneNode> SceneNode::CreateChildNode(bool visible)
 
 NonOwningPtr<SceneNode> SceneNode::CreateChildNode(const Vector2 &initial_direction, bool visible)
 {
-	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), initial_direction, visible));;
+	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), initial_direction, visible));
 }
 
 NonOwningPtr<SceneNode> SceneNode::CreateChildNode(const Vector3 &position, const Vector2 &initial_direction, bool visible)
 {
-	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), position, initial_direction, visible));;
+	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), position, initial_direction, visible));
 }
 
 

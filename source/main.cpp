@@ -197,23 +197,19 @@ struct Game :
 	ion::events::listeners::KeyListener,
 	ion::events::listeners::MouseListener
 {
+	ion::graphics::scene::graph::SceneGraph *scene = nullptr;
 	ion::NonOwningPtr<ion::graphics::scene::DrawableText> fps;
 	ion::types::Cumulative<duration> fps_update_rate{1.0_sec};
 
 	ion::NonOwningPtr<ion::graphics::scene::Model> model;
+	ion::NonOwningPtr<ion::graphics::scene::Light> head_light;
 	ion::NonOwningPtr<ion::graphics::scene::Model> aura;
-	bool move_model_up = false;
-	bool move_model_left = false;
-	bool move_model_down = false;	
-	bool move_model_right = false;
+	ion::graphics::utilities::Vector2 move_model;
 	bool rotate_model_left = false;
 	bool rotate_model_right = false;
 
 	ion::NonOwningPtr<ion::graphics::scene::Camera> camera;
-	bool move_camera_up = false;
-	bool move_camera_left = false;
-	bool move_camera_down = false;	
-	bool move_camera_right = false;
+	ion::graphics::utilities::Vector2 move_camera;
 	bool rotate_camera_left = false;
 	bool rotate_camera_right = false;
 
@@ -235,14 +231,9 @@ struct Game :
 
 		if (model)
 		{
-			if (move_model_up)
-				model->ParentNode()->Translate(1.0_r * time.count());
-			if (move_model_left)
-				model->ParentNode()->Translate(Vector2{-1.0_r, 0.0_r} * time.count());
-			if (move_model_down)
-				model->ParentNode()->Translate(-1.0_r * time.count());
-			if (move_model_right)
-				model->ParentNode()->Translate(Vector2{1.0_r, 0.0_r} * time.count());
+			if (move_model != vector2::Zero)
+				model->ParentNode()->Translate(move_model.NormalizeCopy() * time.count());
+
 			if (rotate_model_left)
 				model->ParentNode()->Rotate(math::ToRadians(180.0_r) * time.count());
 			if (rotate_model_right)
@@ -254,14 +245,9 @@ struct Game :
 
 		if (camera)
 		{
-			if (move_camera_up)
-				camera->ParentNode()->Translate(1.0_r * time.count());
-			if (move_camera_left)
-				camera->ParentNode()->Translate(Vector2{-1.0_r, 0.0_r} * time.count());
-			if (move_camera_down)
-				camera->ParentNode()->Translate(-1.0_r * time.count());
-			if (move_camera_right)
-				camera->ParentNode()->Translate(Vector2{1.0_r, 0.0_r} * time.count());
+			if (move_camera != vector2::Zero)
+				camera->ParentNode()->Translate(move_camera.NormalizeCopy() * time.count());
+
 			if (rotate_camera_left)
 				camera->ParentNode()->Rotate(math::ToRadians(180.0_r) * time.count());
 			if (rotate_camera_right)
@@ -294,22 +280,24 @@ struct Game :
 
 	void KeyPressed(ion::events::listeners::KeyButton button) noexcept override
 	{
+		using namespace ion::graphics::utilities;
+
 		switch (button)
 		{
 			case ion::events::listeners::KeyButton::W:
-			move_model_up = true;
+			move_model.Y(move_model.Y() + 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::A:
-			move_model_left = true;
+			move_model.X(move_model.X() - 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::S:
-			move_model_down = true;
+			move_model.Y(move_model.Y() - 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::D:
-			move_model_right = true;
+			move_model.X(move_model.X() + 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::Q:
@@ -322,19 +310,19 @@ struct Game :
 
 
 			case ion::events::listeners::KeyButton::UpArrow:
-			move_camera_up = true;
+			move_camera.Y(move_camera.Y() + 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::LeftArrow:
-			move_camera_left = true;
+			move_camera.X(move_camera.X() - 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::DownArrow:
-			move_camera_down = true;
+			move_camera.Y(move_camera.Y() - 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::RightArrow:
-			move_camera_right = true;
+			move_camera.X(move_camera.X() + 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::Subtract:
@@ -349,22 +337,24 @@ struct Game :
 
 	void KeyReleased(ion::events::listeners::KeyButton button) noexcept override
 	{
+		using namespace ion::graphics::utilities;
+
 		switch (button)
 		{
 			case ion::events::listeners::KeyButton::W:
-			move_model_up = false;
+			move_model.Y(move_model.Y() - 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::A:
-			move_model_left = false;
+			move_model.X(move_model.X() + 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::S:
-			move_model_down = false;
+			move_model.Y(move_model.Y() + 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::D:
-			move_model_right = false;
+			move_model.X(move_model.X() - 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::Q:
@@ -377,19 +367,19 @@ struct Game :
 
 
 			case ion::events::listeners::KeyButton::UpArrow:
-			move_camera_up = false;
+			move_camera.Y(move_camera.Y() - 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::LeftArrow:
-			move_camera_left = false;
+			move_camera.X(move_camera.X() + 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::DownArrow:
-			move_camera_down = false;
+			move_camera.Y(move_camera.Y() + 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::RightArrow:
-			move_camera_right = false;
+			move_camera.X(move_camera.X() - 1.0_r);
 			break;
 
 			case ion::events::listeners::KeyButton::Subtract:
@@ -399,6 +389,21 @@ struct Game :
 			case ion::events::listeners::KeyButton::Add:
 			rotate_camera_right = false;
 			break;
+
+
+			case ion::events::listeners::KeyButton::F:
+			{
+				if (scene)
+					scene->FogEnabled(!scene->FogEnabled());
+				break;
+			}
+
+			case ion::events::listeners::KeyButton::L:
+			{
+				if (head_light)
+					head_light->ParentNode()->Visible(!head_light->ParentNode()->Visible());
+				break;
+			}
 		}
   	}
 
@@ -586,6 +591,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				auto camera_struct = model_program->CreateStruct("camera");
 				auto primitive_struct = model_program->CreateStruct("primitive");
 				auto material_struct = model_program->CreateStruct("material");
+				auto fog_struct = model_program->CreateStruct("fog");
 				auto light_struct = model_program->CreateStruct("light", 8);
 
 
@@ -604,6 +610,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				//Scene
 				scene_struct->CreateUniform<glsl::vec4>("ambient");
 				scene_struct->CreateUniform<float>("gamma");
+				scene_struct->CreateUniform<bool>("has_fog");
 				scene_struct->CreateUniform<int>("light_count");
 
 				//Camera
@@ -624,6 +631,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				material_struct->CreateUniform<bool>("has_diffuse_map");
 				material_struct->CreateUniform<bool>("has_specular_map");
 				material_struct->CreateUniform<bool>("has_normal_map");
+
+				//Fog
+				fog_struct->CreateUniform<int>("mode");
+				fog_struct->CreateUniform<float>("density");
+				fog_struct->CreateUniform<float>("near");
+				fog_struct->CreateUniform<float>("far");
+				fog_struct->CreateUniform<glsl::vec4>("color");
 
 				//Light
 				light_struct->CreateUniform<int>("type");
@@ -650,6 +664,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				auto node_struct = particle_program->CreateStruct("node");
 				auto primitive_struct = particle_program->CreateStruct("primitive");
 				auto material_struct = particle_program->CreateStruct("material");
+				auto fog_struct = particle_program->CreateStruct("fog");
 				auto light_struct = particle_program->CreateStruct("light", 8);
 
 
@@ -668,6 +683,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				//Scene
 				scene_struct->CreateUniform<glsl::vec4>("ambient");
 				scene_struct->CreateUniform<float>("gamma");
+				scene_struct->CreateUniform<bool>("has_fog");
 				scene_struct->CreateUniform<int>("light_count");
 
 				//Camera
@@ -694,6 +710,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				material_struct->CreateUniform<bool>("has_specular_map");
 				material_struct->CreateUniform<bool>("has_normal_map");
 
+				//Fog
+				fog_struct->CreateUniform<int>("mode");
+				fog_struct->CreateUniform<float>("density");
+				fog_struct->CreateUniform<float>("near");
+				fog_struct->CreateUniform<float>("far");
+				fog_struct->CreateUniform<glsl::vec4>("color");
+
 				//Light
 				light_struct->CreateUniform<int>("type");
 				light_struct->CreateUniform<glsl::vec3>("position");
@@ -717,6 +740,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				auto scene_struct = text_program->CreateStruct("scene");
 				auto camera_struct = text_program->CreateStruct("camera");
 				auto primitive_struct = text_program->CreateStruct("primitive");
+				auto fog_struct = text_program->CreateStruct("fog");
 				auto light_struct = text_program->CreateStruct("light", 8);
 
 
@@ -734,6 +758,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				//Scene
 				scene_struct->CreateUniform<glsl::vec4>("ambient");
 				scene_struct->CreateUniform<float>("gamma");
+				scene_struct->CreateUniform<bool>("has_fog");
 				scene_struct->CreateUniform<int>("light_count");
 
 				//Camera
@@ -742,6 +767,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				//Primitive
 				primitive_struct->CreateUniform<glsl::sampler2D>("texture");
 				primitive_struct->CreateUniform<bool>("has_texture");
+
+				//Fog
+				fog_struct->CreateUniform<int>("mode");
+				fog_struct->CreateUniform<float>("density");
+				fog_struct->CreateUniform<float>("near");
+				fog_struct->CreateUniform<float>("far");
+				fog_struct->CreateUniform<glsl::vec4>("color");
 
 				//Light
 				light_struct->CreateUniform<int>("type");
@@ -991,15 +1023,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto camera = scene_manager.CreateCamera("", frustum);
 			viewport->ConnectedCamera(camera);
 
-			//Light
-			auto light = scene_manager.CreateLight();
-			light->Type(ion::graphics::scene::light::LightType::Spotlight);
-			light->Direction((Vector3{0.0_r, 0.25_r, -0.5_r} - Vector3{0.0_r, 0.0_r, 0.0_r}).NormalizeCopy());
-			light->AmbientColor(color::Transparent);
-			light->DiffuseColor(color::White);
-			light->SpecularColor(color::White);
-			light->Attenuation(1.0_r, 0.09_r, 0.032_r);
-			light->Cutoff(math::ToRadians(20.0_r), math::ToRadians(30.0_r));
+			//Lights
+			auto head_light = scene_manager.CreateLight();
+			head_light->Type(ion::graphics::scene::light::LightType::Spotlight);
+			head_light->Direction(Vector3{0.0_r, 0.6_r, -0.4_r});
+			head_light->AmbientColor(color::Transparent);
+			head_light->DiffuseColor(color::White);
+			head_light->SpecularColor(color::White);
+			head_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
+			head_light->Cutoff(math::ToRadians(20.0_r), math::ToRadians(30.0_r));
 
 			auto red_light = scene_manager.CreateLight();
 			red_light->Type(ion::graphics::scene::light::LightType::Point);
@@ -1064,7 +1096,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			
 
 			//Scene
+			engine.Scene().Gamma(1.0_r);
 			engine.Scene().AmbientColor(Color::RGB(50, 50, 50));
+			engine.Scene().FogEffect(ion::graphics::render::Fog::Linear(0.0_r, 4.0_r, Color::RGB(50, 50, 50)));
+			engine.Scene().FogEnabled(false);
 			//engine.Scene().LightingEnabled(false);
 
 			//Camera
@@ -1072,9 +1107,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			cam_node->AttachObject(*camera);
 
 			//Lights
-			//auto light_node = engine.Scene().RootNode().CreateChildNode({0.0_r, -1.0_r, 0.0_r});
-			//light_node->AttachObject(*light);
-
 			auto red_light_node = engine.Scene().RootNode().CreateChildNode({-1.5_r, -0.75_r, -1.0_r});
 			red_light_node->AttachObject(*red_light);
 
@@ -1101,18 +1133,25 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			aura_node->InheritRotation(false);
 			aura_node->AttachObject(*model_aura);
 
-			auto background_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, -2.0_r});
+			auto background_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, -2.25_r});
 			background_node->AttachObject(*background);
 
 			auto cloud_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, -1.6_r});
 			cloud_node->AttachObject(*clouds);
 
+			//Head light
+			auto light_node = model_node->CreateChildNode({0.0_r, -0.15_r, -0.05_r}, vector2::UnitY, false);
+			light_node->AttachObject(*head_light);
+
 
 			//Game
+			game.scene = &engine.Scene();
 			game.fps = text;
 			game.model = model;
+			game.head_light = head_light;
 			game.aura = model_aura;
 			game.camera = camera;
+
 
 			//Engine
 			engine.Subscribe(game);

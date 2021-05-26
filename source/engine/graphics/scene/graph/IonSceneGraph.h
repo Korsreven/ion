@@ -85,7 +85,8 @@ namespace ion::graphics::scene::graph
 			real gamma_ = 1.0_r; //100% gamma
 			Color ambient_color_ = color::White; //No ambient
 			std::optional<render::Fog> fog_; //No fog
-			bool lighting_enabled_ = true;
+			bool fog_enabled_ = true;
+			bool lighting_enabled_ = true;		
 
 			SceneNode root_node_;
 
@@ -150,6 +151,12 @@ namespace ion::graphics::scene::graph
 				fog_ = fog;
 			}
 
+			//Sets whether or not this scene has fog effect enabled
+			inline void FogEnabled(bool enable) noexcept
+			{
+				fog_enabled_ = enable;
+			}
+
 			//Sets whether or not this scene has lighting enabled
 			inline void LightingEnabled(bool enable) noexcept
 			{
@@ -178,6 +185,12 @@ namespace ion::graphics::scene::graph
 			[[nodiscard]] inline auto& FogEffect() const noexcept
 			{
 				return fog_;
+			}
+
+			//Returns whether or not this scene has fog effect enabled
+			[[nodiscard]] inline auto FogEnabled() const noexcept
+			{
+				return fog_enabled_;
 			}
 
 			//Returns whether or not this scene has lighting enabled

@@ -50,7 +50,7 @@ Fog Fog::Exp2(real density, real near_distance, real far_distance, const Color &
 
 Fog Fog::Linear(real near_distance, real far_distance, const Color &color) noexcept
 {
-	return {FogMode::Exp2, 1.0_r, near_distance, far_distance, color};
+	return {FogMode::Linear, 1.0_r, near_distance, far_distance, color};
 }
 
 } //ion::graphics::render

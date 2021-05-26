@@ -101,13 +101,13 @@ void set_light_uniforms(const light_container &lights, int light_count, const Ca
 			(*type)[i].Get<int>() = static_cast<int>(lights[i]->Type());
 
 		if (position)
-			(*position)[i].Get<glsl::vec3>() = (lights[i]->Position() + lights[i]->ParentNode()->DerivedPosition()) -
-											   (camera.Position() + camera.ParentNode()->DerivedPosition()); //View adjusted
+			(*position)[i].Get<glsl::vec3>() =
+				camera.ViewMatrix() * (lights[i]->Position() + lights[i]->ParentNode()->DerivedPosition());
 
 		if (direction)
 			(*direction)[i].Get<glsl::vec3>() = lights[i]->Direction().Deviant(lights[i]->ParentNode()->DerivedRotation() -
 												(camera.Rotation() + camera.ParentNode()->DerivedRotation())); //View adjusted
-												
+
 
 		if (ambient)
 			(*ambient)[i].Get<glsl::vec4>() = lights[i]->AmbientColor();
@@ -340,7 +340,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 								//One time per program per scene
 							{
 								detail::set_camera_uniforms(*camera, *shader_program);
-								detail::set_fog_uniforms(fog_, *shader_program);
+								detail::set_fog_uniforms(fog_enabled_ ? fog_ : std::optional<render::Fog>{}, *shader_program);
 								detail::set_light_uniforms(active_lights_, active_light_count, *camera, *shader_program);
 								detail::set_matrix_uniforms(projection_mat, *shader_program);
 								detail::set_scene_uniforms(gamma_, ambient_color_, active_light_count, *shader_program);
