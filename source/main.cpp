@@ -198,6 +198,8 @@ struct Game :
 	ion::events::listeners::MouseListener
 {
 	ion::graphics::scene::graph::SceneGraph *scene = nullptr;
+	ion::NonOwningPtr<ion::graphics::render::Viewport> viewport;
+
 	ion::NonOwningPtr<ion::graphics::scene::DrawableText> fps;
 	ion::types::Cumulative<duration> fps_update_rate{1.0_sec};
 
@@ -209,10 +211,11 @@ struct Game :
 	bool rotate_model_right = false;
 
 	ion::NonOwningPtr<ion::graphics::scene::Camera> camera;
+	ion::NonOwningPtr<ion::graphics::scene::Camera> player_camera;
 	ion::graphics::utilities::Vector2 move_camera;
 	bool rotate_camera_left = false;
 	bool rotate_camera_right = false;
-
+	
 
 	/*
 		Frame listener
@@ -243,7 +246,8 @@ struct Game :
 		if (aura)
 			aura->ParentNode()->Rotate(math::ToRadians(-90.0_r) * time.count());
 
-		if (camera)
+		if (camera && viewport &&
+			viewport->ConnectedCamera() == camera)
 		{
 			if (move_camera != vector2::Zero)
 				camera->ParentNode()->Translate(move_camera.NormalizeCopy() * time.count());
@@ -252,6 +256,15 @@ struct Game :
 				camera->ParentNode()->Rotate(math::ToRadians(180.0_r) * time.count());
 			if (rotate_camera_right)
 				camera->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
+		}
+		
+		if (player_camera && viewport &&
+			viewport->ConnectedCamera() == player_camera)
+		{
+			if (rotate_camera_left)
+				player_camera->ParentNode()->Rotate(math::ToRadians(180.0_r) * time.count());
+			if (rotate_camera_right)
+				player_camera->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
 		}
 
 		return true;
@@ -390,6 +403,19 @@ struct Game :
 			rotate_camera_right = false;
 			break;
 
+
+			case ion::events::listeners::KeyButton::C:
+			{
+				if (viewport && camera && player_camera)
+				{
+					if (viewport->ConnectedCamera() == camera)
+						viewport->ConnectedCamera(player_camera);
+					else if (viewport->ConnectedCamera() == player_camera)
+						viewport->ConnectedCamera(camera);
+				}
+
+				break;
+			}
 
 			case ion::events::listeners::KeyButton::F:
 			{
@@ -1023,6 +1049,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto camera = scene_manager.CreateCamera("", frustum);
 			viewport->ConnectedCamera(camera);
 
+			auto player_camera = scene_manager.CreateCamera("player", frustum);
+
 			//Lights
 			auto head_light = scene_manager.CreateLight();
 			head_light->Type(ion::graphics::scene::light::LightType::Spotlight);
@@ -1098,7 +1126,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Scene
 			engine.Scene().Gamma(1.0_r);
 			engine.Scene().AmbientColor(Color::RGB(50, 50, 50));
-			engine.Scene().FogEffect(ion::graphics::render::Fog::Linear(0.0_r, 4.0_r, Color::RGB(50, 50, 50)));
+			engine.Scene().FogEffect(ion::graphics::render::Fog::Linear(0.0_r, 2.25_r));
 			engine.Scene().FogEnabled(false);
 			//engine.Scene().LightingEnabled(false);
 
@@ -1143,14 +1171,20 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto light_node = model_node->CreateChildNode({0.0_r, -0.15_r, -0.05_r}, vector2::UnitY, false);
 			light_node->AttachObject(*head_light);
 
+			//Player camera
+			auto player_cam_node = model_node->CreateChildNode({0.0_r, 0.0_r, 1.8_r});
+			player_cam_node->AttachObject(*player_camera);
+
 
 			//Game
 			game.scene = &engine.Scene();
+			game.viewport = viewport;
 			game.fps = text;
 			game.model = model;
 			game.head_light = head_light;
 			game.aura = model_aura;
 			game.camera = camera;
+			game.player_camera = player_camera;
 
 
 			//Engine
