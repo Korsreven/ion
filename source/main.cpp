@@ -150,6 +150,9 @@ File:	main.cpp
 #include "script/IonScriptValidator.h"
 #include "script/utilities/IonParseUtility.h"
 
+#include "sounds/IonSound.h"
+#include "sounds/IonSoundManager.h"
+
 #include "system/IonSystemAPI.h"
 #include "system/IonSystemUtility.h"
 #include "system/IonSystemWindow.h"

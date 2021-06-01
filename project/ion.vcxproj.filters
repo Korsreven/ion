@@ -193,6 +193,12 @@
     <Filter Include="Source Files\graphics\scene\graph">
       <UniqueIdentifier>{27a098ad-2585-4743-9bf3-b5df4926dbc6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\sounds">
+      <UniqueIdentifier>{c2b79616-b368-40da-8d53-ce9a3f5c1aec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sounds">
+      <UniqueIdentifier>{46863129-c161-4c9c-9d81-691a974f79d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -506,6 +512,12 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\utilities\IonMatrix2.cpp">
       <Filter>Source Files\graphics\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\sounds\IonSound.cpp">
+      <Filter>Source Files\sounds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\sounds\IonSoundManager.cpp">
+      <Filter>Source Files\sounds</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1000,6 +1012,12 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\utilities\IonMatrix2.h">
       <Filter>Header Files\graphics\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\sounds\IonSound.h">
+      <Filter>Header Files\sounds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\sounds\IonSoundManager.h">
+      <Filter>Header Files\sounds</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

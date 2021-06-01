@@ -249,6 +249,8 @@
     <ClCompile Include="..\source\engine\script\IonScriptTree.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptValidator.cpp" />
     <ClCompile Include="..\source\engine\script\utilities\IonParseUtility.cpp" />
+    <ClCompile Include="..\source\engine\sounds\IonSound.cpp" />
+    <ClCompile Include="..\source\engine\sounds\IonSoundManager.cpp" />
     <ClCompile Include="..\source\engine\system\events\listeners\IonSystemInputListener.cpp" />
     <ClCompile Include="..\source\engine\system\IonSystemUtility.cpp" />
     <ClCompile Include="..\source\engine\system\IonSystemWindow.cpp" />
@@ -404,6 +406,8 @@
     <ClInclude Include="..\source\engine\script\IonScriptTypes.h" />
     <ClInclude Include="..\source\engine\script\IonScriptValidator.h" />
     <ClInclude Include="..\source\engine\script\utilities\IonParseUtility.h" />
+    <ClInclude Include="..\source\engine\sounds\IonSound.h" />
+    <ClInclude Include="..\source\engine\sounds\IonSoundManager.h" />
     <ClInclude Include="..\source\engine\system\events\IonSystemInput.h" />
     <ClInclude Include="..\source\engine\system\events\listeners\IonSystemInputListener.h" />
     <ClInclude Include="..\source\engine\system\events\listeners\IonSystemMessageListener.h" />
