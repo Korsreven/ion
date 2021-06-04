@@ -81,6 +81,31 @@ NonOwningPtr<Sound> SoundManager::CreateSound(std::string name, std::string asse
 	return CreateResource(std::move(name), std::move(asset_name));
 }
 
+NonOwningPtr<Sound> SoundManager::CreateSound(std::string name, std::string asset_name, sound::SoundType type,
+	sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
+	sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
+	std::optional<sound::SoundLoopingMode> looping_mode)
+{
+	return CreateResource(std::move(name), std::move(asset_name), type,
+						  mixing_mode, processing_mode, orientation_mode, rolloff_mode,
+						  looping_mode);
+}
+
+NonOwningPtr<Sound> SoundManager::CreateSound(std::string name, std::string asset_name, sound::SoundType type,
+	sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
+	std::optional<sound::SoundLoopingMode> looping_mode)
+{
+	return CreateResource(std::move(name), std::move(asset_name), type,
+						  mixing_mode, processing_mode, looping_mode);
+}
+
+NonOwningPtr<Sound> SoundManager::CreateSound(std::string name, std::string asset_name, sound::SoundType type,
+	std::optional<sound::SoundLoopingMode> looping_mode)
+{
+	return CreateResource(std::move(name), std::move(asset_name), type,
+						  looping_mode);
+}
+
 
 NonOwningPtr<Sound> SoundManager::CreateSound(const Sound &sound)
 {

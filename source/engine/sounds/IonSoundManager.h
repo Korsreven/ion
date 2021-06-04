@@ -13,6 +13,7 @@ File:	IonSoundManager.h
 #ifndef ION_SOUND_MANAGER_H
 #define ION_SOUND_MANAGER_H
 
+#include <optional>
 #include <string>
 
 #include "IonSound.h"
@@ -120,6 +121,21 @@ namespace ion::sounds
 
 			//Create a sound with the given name and asset name
 			NonOwningPtr<Sound> CreateSound(std::string name, std::string asset_name);
+
+			//Create a sound with the given name, asset name, type, mixing, processing, orientation, rolloff and looping mode
+			NonOwningPtr<Sound> CreateSound(std::string name, std::string asset_name, sound::SoundType type,
+				sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
+				sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
+				std::optional<sound::SoundLoopingMode> looping_mode = {});
+
+			//Create a sound with the given name, asset name, type, mixing, processing and looping mode
+			NonOwningPtr<Sound> CreateSound(std::string name, std::string asset_name, sound::SoundType type,
+				sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
+				std::optional<sound::SoundLoopingMode> looping_mode = {});
+
+			//Create a sound with the given name, asset name, type and looping mode
+			NonOwningPtr<Sound> CreateSound(std::string name, std::string asset_name, sound::SoundType type,
+				std::optional<sound::SoundLoopingMode> looping_mode = {});
 
 
 			//Create a sound as a copy of the given sound
