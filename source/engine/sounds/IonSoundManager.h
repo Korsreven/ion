@@ -49,12 +49,16 @@ namespace ion::sounds
 				Events
 			*/
 
+			bool PrepareResource(Sound &sound) noexcept override;
 			bool LoadResource(Sound &sound) noexcept override;
 			bool UnloadResource(Sound &sound) noexcept override;
 
 
 			//See FileResourceManager::ResourceLoaded for more details
 			void ResourceLoaded(Sound &sound) noexcept override;
+
+			//See FileResourceManager::ResourceUnloaded for more details
+			void ResourceUnloaded(Sound &sound) noexcept override;
 
 			//See FileResourceManager::ResourceFailed for more details
 			void ResourceFailed(Sound &sound) noexcept override;

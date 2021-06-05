@@ -42,6 +42,24 @@ void unload_sound(int sound_handle) noexcept
 	Events
 */
 
+bool SoundManager::PrepareResource(Sound &sound) noexcept
+{
+	if (FileResourceManager::PrepareResource(sound))
+	{
+		if (sound.Type() == sound::SoundType::Stream)
+		{
+			if (sound.FileData())
+				sound.StreamData(*sound.FileData());
+
+			return sound.StreamData().has_value();
+		}
+		else
+			return true;
+	}
+	else
+		return false;
+}
+
 bool SoundManager::LoadResource(Sound &sound) noexcept
 {
 	auto &file_data = sound.FileData();
@@ -79,6 +97,13 @@ bool SoundManager::UnloadResource(Sound &sound) noexcept
 void SoundManager::ResourceLoaded(Sound &sound) noexcept
 {
 	FileResourceManager::ResourceLoaded(sound);
+}
+
+void SoundManager::ResourceUnloaded(Sound &sound) noexcept
+{
+	FileResourceManager::ResourceUnloaded(sound);
+	sound.ResetStreamData();
+		//Stream data not required after sound has failed (save memory)
 }
 
 void SoundManager::ResourceFailed(Sound &sound) noexcept
