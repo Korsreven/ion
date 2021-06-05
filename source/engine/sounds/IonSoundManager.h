@@ -27,6 +27,12 @@ namespace ion::sounds
 	{
 		namespace detail
 		{
+			std::optional<int> load_sound(
+				const std::string &file_data, sound::SoundType type,
+				sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
+				sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
+				const std::optional<sound::SoundLoopingMode> &looping_mode) noexcept;
+			void unload_sound(int sound_handle) noexcept;
 		} //detail
 	} //sound_manager
 
@@ -37,14 +43,12 @@ namespace ion::sounds
 		private:
 
 
-
 		protected:
 
 			/*
 				Events
 			*/
 
-			bool PrepareResource(Sound &sound) noexcept override;
 			bool LoadResource(Sound &sound) noexcept override;
 			bool UnloadResource(Sound &sound) noexcept override;
 

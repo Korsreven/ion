@@ -19,6 +19,22 @@ using namespace sound_manager;
 
 namespace sound_manager::detail
 {
+
+std::optional<int> load_sound(
+	const std::string &file_data, sound::SoundType type,
+	sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
+	sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
+	const std::optional<sound::SoundLoopingMode> &looping_mode) noexcept
+{
+	//Todo
+	return {};
+}
+
+void unload_sound(int sound_handle) noexcept
+{
+	//Todo
+}
+
 } //sound_manager::detail
 
 
@@ -26,22 +42,37 @@ namespace sound_manager::detail
 	Events
 */
 
-bool SoundManager::PrepareResource(Sound &sound) noexcept
+bool SoundManager::LoadResource(Sound &sound) noexcept
 {
-	if (FileResourceManager::PrepareResource(sound))
-		return true;
+	auto &file_data = sound.FileData();
+	auto type = sound.Type();
+	auto mixing_mode = sound.MixingMode();
+	auto processing_mode = sound.ProcessingMode();
+	auto orientation_mode = sound.OrientationMode();
+	auto rolloff_mode = sound.RolloffMode();
+	auto &looping_mode = sound.LoopingMode();
+
+	if (file_data)
+	{
+		auto sound_handle = detail::load_sound(*file_data, type, mixing_mode, processing_mode, orientation_mode, rolloff_mode, looping_mode);
+		return sound_handle.has_value(); //TEMP
+	}
 	else
 		return false;
 }
 
-bool SoundManager::LoadResource(Sound &sound) noexcept
-{
-	return false;
-}
-
 bool SoundManager::UnloadResource(Sound &sound) noexcept
 {
-	return false;
+	int *sound_handle = nullptr; //TEMP
+
+	if (auto handle = sound_handle; handle)
+	{
+		detail::unload_sound(*handle);
+		//sound.Handle({});
+		return true;
+	}
+	else
+		return false;
 }
 
 
@@ -53,6 +84,8 @@ void SoundManager::ResourceLoaded(Sound &sound) noexcept
 void SoundManager::ResourceFailed(Sound &sound) noexcept
 {
 	FileResourceManager::ResourceFailed(sound);
+	sound.ResetStreamData();
+		//Stream data not required after sound has failed (save memory)
 }
 
 
