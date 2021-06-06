@@ -21,18 +21,32 @@ File:	IonSoundManager.h
 #include "memory/IonNonOwningPtr.h"
 #include "resources/IonFileResourceManager.h"
 
+//Forward declarations
+namespace FMOD
+{
+	class Sound;
+	class System;
+};
+
 namespace ion::sounds
 {
 	namespace sound_manager
 	{
 		namespace detail
 		{
-			std::optional<int> load_sound(
-				const std::string &file_data, sound::SoundType type,
+			constexpr auto max_sound_channels = 256;
+
+
+			FMOD::System* init_sound_system() noexcept;
+			void release_sound_system(FMOD::System *system) noexcept;
+
+			FMOD::Sound* load_sound(
+				FMOD::System &sound_system,
+				const std::string &file_data, const std::optional<std::string> &stream_data, sound::SoundType type,
 				sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
 				sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
 				const std::optional<sound::SoundLoopingMode> &looping_mode) noexcept;
-			void unload_sound(int sound_handle) noexcept;
+			void unload_sound(FMOD::Sound *sound_handle) noexcept;
 		} //detail
 	} //sound_manager
 
@@ -42,6 +56,7 @@ namespace ion::sounds
 	{
 		private:
 
+			FMOD::System *sound_system_ = nullptr;
 
 		protected:
 

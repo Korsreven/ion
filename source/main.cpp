@@ -883,6 +883,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					verdana_italic_36,
 					verdana_bold_italic_36);
 
+			//Sound
+			ion::sounds::SoundManager sounds;
+			sounds.CreateRepository(std::move(audio_repository));
+			auto click = sounds.CreateSound("click", "click.wav", ion::sounds::sound::SoundType::Sample);
+			auto night_runner = sounds.CreateSound("night_runner", "night_runner.mp3", ion::sounds::sound::SoundType::Stream);
+			sounds.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
+
+			//while (!sounds.Loaded());
+
 
 			//Material
 			ion::graphics::materials::MaterialManager materials;

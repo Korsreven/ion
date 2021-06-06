@@ -12,6 +12,8 @@ File:	IonSoundManager.cpp
 
 #include "IonSoundManager.h"
 
+#include "Fmod/fmod.hpp"
+
 namespace ion::sounds
 {
 
@@ -20,19 +22,136 @@ using namespace sound_manager;
 namespace sound_manager::detail
 {
 
-std::optional<int> load_sound(
-	const std::string &file_data, sound::SoundType type,
+FMOD::System* init_sound_system() noexcept
+{
+	if (FMOD::System *system = nullptr;
+		FMOD::System_Create(&system) == FMOD_OK &&
+		system->init(max_sound_channels, FMOD_INIT_NORMAL, nullptr) == FMOD_OK)
+		
+		return system;
+
+	else
+	{
+		release_sound_system(system);
+		return nullptr;
+	}
+}
+
+void release_sound_system(FMOD::System *system) noexcept
+{
+	if (system)
+	{
+		system->release();
+		system = nullptr;
+	}
+}
+
+
+FMOD::Sound* load_sound(
+	FMOD::System &sound_system,
+	const std::string &file_data, const std::optional<std::string> &stream_data, sound::SoundType type,
 	sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
 	sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
 	const std::optional<sound::SoundLoopingMode> &looping_mode) noexcept
 {
-	//Todo
-	return {};
+	FMOD_CREATESOUNDEXINFO ex_info{};
+	ex_info.cbsize = sizeof(FMOD_CREATESOUNDEXINFO); //Required
+	ex_info.length = std::size(file_data);
+
+	FMOD_MODE mode =
+		FMOD_OPENMEMORY |
+		FMOD_LOWMEM | //Save 256 bytes per sound, by disabling some unneeded functionality
+		[&]() noexcept
+		{
+			switch (type)
+			{
+				case sound::SoundType::Stream:
+				return FMOD_CREATESTREAM;
+
+				case sound::SoundType::CompressedSample:
+				return FMOD_CREATECOMPRESSEDSAMPLE;
+
+				case sound::SoundType::Sample:
+				default:
+				return FMOD_CREATESAMPLE;
+			}
+		}() |
+		[&]() noexcept
+		{
+			switch (processing_mode)
+			{
+				case sound::SoundProcessingMode::ThreeDimensional:
+				return FMOD_3D |
+					[&]() noexcept
+					{
+						switch (orientation_mode)
+						{
+							case sound::SoundOrientationMode::Head:
+							return FMOD_3D_HEADRELATIVE;
+
+							case sound::SoundOrientationMode::World:
+							default:
+							return FMOD_3D_WORLDRELATIVE;
+						}
+					}() |
+					[&]() noexcept
+					{
+						switch (rolloff_mode)
+						{
+							case sound::SoundRolloffMode::Linear:
+							return FMOD_3D_LINEARROLLOFF;
+
+							case sound::SoundRolloffMode::LinearSquare:
+							return FMOD_3D_LINEARSQUAREROLLOFF;
+
+							case sound::SoundRolloffMode::InverseTapered:
+							return FMOD_3D_INVERSETAPEREDROLLOFF;
+
+							case sound::SoundRolloffMode::Inverse:
+							default:
+							return FMOD_3D_INVERSEROLLOFF;
+						}
+					}();
+
+				case sound::SoundProcessingMode::TwoDimensional:
+				default:
+				return FMOD_2D;
+			}
+		}() |
+		[&]() noexcept
+		{
+			if (looping_mode)
+			{
+				switch (*looping_mode)
+				{
+					case sound::SoundLoopingMode::Bidirectional:
+					return FMOD_LOOP_BIDI;
+
+					case sound::SoundLoopingMode::Forward:
+					return FMOD_LOOP_NORMAL;
+				}
+			}
+			
+			return FMOD_LOOP_OFF;
+		}();
+
+
+	if (FMOD::Sound *sound_handle = nullptr;
+		sound_system.createSound(stream_data ? std::data(*stream_data) : std::data(file_data), mode, &ex_info, &sound_handle) == FMOD_OK)
+
+		return sound_handle;
+
+	else
+	{
+		unload_sound(sound_handle);
+		return nullptr;
+	}
 }
 
-void unload_sound(int sound_handle) noexcept
+void unload_sound(FMOD::Sound *sound_handle) noexcept
 {
-	//Todo
+	if (sound_handle)
+		sound_handle->release();
 }
 
 } //sound_manager::detail
@@ -63,6 +182,8 @@ bool SoundManager::PrepareResource(Sound &sound) noexcept
 bool SoundManager::LoadResource(Sound &sound) noexcept
 {
 	auto &file_data = sound.FileData();
+	auto &stream_data = sound.StreamData();
+
 	auto type = sound.Type();
 	auto mixing_mode = sound.MixingMode();
 	auto processing_mode = sound.ProcessingMode();
@@ -70,10 +191,14 @@ bool SoundManager::LoadResource(Sound &sound) noexcept
 	auto rolloff_mode = sound.RolloffMode();
 	auto &looping_mode = sound.LoopingMode();
 
-	if (file_data)
+	if (sound_system_ && file_data)
 	{
-		auto sound_handle = detail::load_sound(*file_data, type, mixing_mode, processing_mode, orientation_mode, rolloff_mode, looping_mode);
-		return sound_handle.has_value(); //TEMP
+		sound.Handle(
+			detail::load_sound(
+				*sound_system_,
+				*file_data, stream_data, type, mixing_mode, processing_mode, orientation_mode, rolloff_mode, looping_mode
+			));
+		return sound.Handle();
 	}
 	else
 		return false;
@@ -81,12 +206,10 @@ bool SoundManager::LoadResource(Sound &sound) noexcept
 
 bool SoundManager::UnloadResource(Sound &sound) noexcept
 {
-	int *sound_handle = nullptr; //TEMP
-
-	if (auto handle = sound_handle; handle)
+	if (auto handle = sound.Handle(); handle)
 	{
-		detail::unload_sound(*handle);
-		//sound.Handle({});
+		detail::unload_sound(handle);
+		sound.Handle(nullptr);
 		return true;
 	}
 	else
@@ -116,7 +239,8 @@ void SoundManager::ResourceFailed(Sound &sound) noexcept
 
 //Public
 
-SoundManager::SoundManager() noexcept
+SoundManager::SoundManager() noexcept :
+	sound_system_{detail::init_sound_system()}
 {
 	//Empty
 }
@@ -126,6 +250,8 @@ SoundManager::~SoundManager() noexcept
 	UnloadAll();
 		//Unload all resources before this manager is destroyed
 		//Virtual functions cannot be called post destruction
+
+	detail::release_sound_system(sound_system_);
 }
 
 

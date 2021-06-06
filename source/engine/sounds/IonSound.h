@@ -18,6 +18,11 @@ File:	IonSound.h
 
 #include "resources/IonFileResource.h"
 
+namespace FMOD
+{
+	class Sound; //Forward declaration
+};
+
 namespace ion::sounds
 {
 	class SoundManager; //Forward declaration
@@ -50,10 +55,11 @@ namespace ion::sounds
 		};
 
 		enum class SoundRolloffMode
-		{		
-			Inverse,
+		{	
 			Linear,
-			LinearSquare
+			LinearSquare,
+			Inverse,
+			InverseTapered
 		};
 
 		enum class SoundLoopingMode : bool
@@ -80,6 +86,7 @@ namespace ion::sounds
 			sound::SoundRolloffMode rolloff_mode_ = sound::SoundRolloffMode::Inverse;
 			std::optional<sound::SoundLoopingMode> looping_mode_; //No looping
 
+			FMOD::Sound *handle_ = nullptr;
 			std::optional<std::string> stream_data_;
 
 		public:
@@ -133,6 +140,12 @@ namespace ion::sounds
 				Modifiers
 			*/
 
+			//Sets the handle for the sound to the given value
+			inline void Handle(FMOD::Sound *handle) noexcept
+			{
+				handle_ = handle;
+			}
+
 			//Sets the stream data of the texture to the given data
 			inline void StreamData(std::string data)
 			{
@@ -149,6 +162,21 @@ namespace ion::sounds
 			/*
 				Observers
 			*/
+
+			//Returns the handle for the sound
+			//Returns nullptr if the sound is not loaded
+			[[nodiscard]] inline auto Handle() const noexcept
+			{
+				return handle_;
+			}
+
+			//Returns the stream data of the sound
+			//Returns nullopt if the sound has not been prepared yet, or is not streamed
+			[[nodiscard]] inline auto& StreamData() const noexcept
+			{
+				return stream_data_;
+			}
+
 
 			//Returns the sound type
 			[[nodiscard]] inline auto Type() const noexcept
@@ -185,15 +213,7 @@ namespace ion::sounds
 			[[nodiscard]] inline auto& LoopingMode() const noexcept
 			{
 				return looping_mode_;
-			}
-
-
-			//Returns the stream data of the sound
-			//Returns nullopt if the sound has not been prepared yet, or is not streamed
-			[[nodiscard]] inline auto& StreamData() const noexcept
-			{
-				return stream_data_;
-			}
+			}		
 	};
 } //ion::sounds
 
