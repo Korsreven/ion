@@ -13,11 +13,13 @@ File:	IonSoundManager.cpp
 #include "IonSoundManager.h"
 
 #include "Fmod/fmod.hpp"
+#include "types/IonTypes.h"
 
 namespace ion::sounds
 {
 
 using namespace sound_manager;
+using namespace types::type_literals;
 
 namespace sound_manager::detail
 {
@@ -154,6 +156,18 @@ void unload_sound(FMOD::Sound *sound_handle) noexcept
 		sound_handle->release();
 }
 
+
+FMOD::ChannelGroup* get_master_channel_group(FMOD::System &sound_system) noexcept
+{
+	if (FMOD::ChannelGroup *channel_group = nullptr;
+		sound_system.getMasterChannelGroup(&channel_group) == FMOD_OK)
+
+		return channel_group;
+
+	else
+		return nullptr;
+}
+
 } //sound_manager::detail
 
 
@@ -252,6 +266,82 @@ SoundManager::~SoundManager() noexcept
 		//Virtual functions cannot be called post destruction
 
 	detail::release_sound_system(sound_system_);
+}
+
+
+/*
+	Modifiers
+*/
+
+void SoundManager::Mute(bool mute) noexcept
+{
+	if (sound_system_)
+	{
+		if (auto channel_group = detail::get_master_channel_group(*sound_system_); channel_group)
+			channel_group->setMute(mute);
+	}
+}
+
+void SoundManager::Pitch(real pitch) noexcept
+{
+	if (sound_system_)
+	{
+		if (auto channel_group = detail::get_master_channel_group(*sound_system_); channel_group)
+			channel_group->setPitch(pitch);
+	}
+}
+
+void SoundManager::Volume(real volume) noexcept
+{
+	if (sound_system_)
+	{
+		if (auto channel_group = detail::get_master_channel_group(*sound_system_); channel_group)
+			channel_group->setVolume(volume);
+	}
+}
+
+
+/*
+	Observers
+*/
+
+bool SoundManager::IsMuted() const noexcept
+{
+	auto mute = true;
+
+	if (sound_system_)
+	{
+		if (auto channel_group = detail::get_master_channel_group(*sound_system_); channel_group)
+			channel_group->getMute(&mute);
+	}
+
+	return mute;
+}
+
+real SoundManager::Pitch() const noexcept
+{
+	auto pitch = 1.0_r;
+
+	if (sound_system_)
+	{
+		if (auto channel_group = detail::get_master_channel_group(*sound_system_); channel_group)
+			channel_group->getPitch(&pitch);
+	}
+
+	return pitch;
+}
+
+real SoundManager::Volume() const noexcept
+{
+	auto volume = 0.0_r;
+
+	if (sound_system_)
+	{
+		if (auto channel_group = detail::get_master_channel_group(*sound_system_); channel_group)
+			channel_group->getVolume(&volume);
+	}
+
+	return volume;
 }
 
 

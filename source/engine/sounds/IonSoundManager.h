@@ -24,6 +24,7 @@ File:	IonSoundManager.h
 //Forward declarations
 namespace FMOD
 {
+	class ChannelGroup;
 	class Sound;
 	class System;
 };
@@ -47,6 +48,8 @@ namespace ion::sounds
 				sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
 				const std::optional<sound::SoundLoopingMode> &looping_mode) noexcept;
 			void unload_sound(FMOD::Sound *sound_handle) noexcept;
+
+			FMOD::ChannelGroup* get_master_channel_group(FMOD::System &sound_system) noexcept;
 		} //detail
 	} //sound_manager
 
@@ -127,14 +130,28 @@ namespace ion::sounds
 				Modifiers
 			*/
 
+			//Mute all sounds in this sound manager
+			void Mute(bool mute) noexcept;
+			
+			//Sets the relative pitch / playback rate of this sound manager
+			void Pitch(real pitch) noexcept;
 
+			//Sets the master volume of this sound manager to the given volume in range [0.0, 1.0]
+			void Volume(real volume) noexcept;
 
 
 			/*
 				Observers
 			*/
 
+			//Returns true if this sound manager has muted all sounds
+			[[nodiscard]] bool IsMuted() const noexcept;
 
+			//Returns the relative pitch / playback rate of this sound manager
+			[[nodiscard]] real Pitch() const noexcept;
+
+			//Returns the master volume of this sound manager
+			[[nodiscard]] real Volume() const noexcept;
 
 
 			/*
