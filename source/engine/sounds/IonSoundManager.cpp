@@ -168,6 +168,80 @@ FMOD::ChannelGroup* get_master_channel_group(FMOD::System &sound_system) noexcep
 		return nullptr;
 }
 
+
+void set_mute(FMOD::Channel &channel, bool mute) noexcept
+{
+	channel.setMute(mute);
+}
+
+void set_pitch(FMOD::Channel &channel, real pitch) noexcept
+{
+	channel.setPitch(pitch);
+}
+
+void set_volume(FMOD::Channel &channel, real volume) noexcept
+{
+	channel.setVolume(volume);
+}
+
+bool get_mute(FMOD::Channel &channel) noexcept
+{
+	auto mute = true;
+	channel.getMute(&mute);
+	return mute;
+}
+
+real get_pitch(FMOD::Channel &channel) noexcept
+{
+	auto pitch = 1.0_r;
+	channel.getPitch(&pitch);
+	return pitch;
+}
+
+real get_volume(FMOD::Channel &channel) noexcept
+{
+	auto volume = 0.0_r;
+	channel.getVolume(&volume);
+	return volume;
+}
+
+
+void set_mute(FMOD::ChannelGroup &channel_group, bool mute) noexcept
+{
+	channel_group.setMute(mute);
+}
+
+void set_pitch(FMOD::ChannelGroup &channel_group, real pitch) noexcept
+{
+	channel_group.setPitch(pitch);
+}
+
+void set_volume(FMOD::ChannelGroup &channel_group, real volume) noexcept
+{
+	channel_group.setVolume(volume);
+}
+
+bool get_mute(FMOD::ChannelGroup &channel_group) noexcept
+{
+	auto mute = true;
+	channel_group.getMute(&mute);
+	return mute;
+}
+
+real get_pitch(FMOD::ChannelGroup &channel_group) noexcept
+{
+	auto pitch = 1.0_r;
+	channel_group.getPitch(&pitch);
+	return pitch;
+}
+
+real get_volume(FMOD::ChannelGroup &channel_group) noexcept
+{
+	auto volume = 0.0_r;
+	channel_group.getVolume(&volume);
+	return volume;
+}
+
 } //sound_manager::detail
 
 
@@ -278,7 +352,7 @@ void SoundManager::Mute(bool mute) noexcept
 	if (sound_system_)
 	{
 		if (auto channel_group = detail::get_master_channel_group(*sound_system_); channel_group)
-			channel_group->setMute(mute);
+			detail::set_mute(*channel_group, mute);
 	}
 }
 
@@ -287,7 +361,7 @@ void SoundManager::Pitch(real pitch) noexcept
 	if (sound_system_)
 	{
 		if (auto channel_group = detail::get_master_channel_group(*sound_system_); channel_group)
-			channel_group->setPitch(pitch);
+			detail::set_pitch(*channel_group, pitch);
 	}
 }
 
@@ -296,7 +370,7 @@ void SoundManager::Volume(real volume) noexcept
 	if (sound_system_)
 	{
 		if (auto channel_group = detail::get_master_channel_group(*sound_system_); channel_group)
-			channel_group->setVolume(volume);
+			detail::set_volume(*channel_group, volume);
 	}
 }
 
@@ -307,41 +381,35 @@ void SoundManager::Volume(real volume) noexcept
 
 bool SoundManager::IsMuted() const noexcept
 {
-	auto mute = true;
-
 	if (sound_system_)
 	{
 		if (auto channel_group = detail::get_master_channel_group(*sound_system_); channel_group)
-			channel_group->getMute(&mute);
+			return detail::get_mute(*channel_group);
 	}
-
-	return mute;
+	
+	return false;
 }
 
 real SoundManager::Pitch() const noexcept
 {
-	auto pitch = 1.0_r;
-
 	if (sound_system_)
 	{
 		if (auto channel_group = detail::get_master_channel_group(*sound_system_); channel_group)
-			channel_group->getPitch(&pitch);
+			return detail::get_pitch(*channel_group);
 	}
 
-	return pitch;
+	return 1.0_r;
 }
 
 real SoundManager::Volume() const noexcept
 {
-	auto volume = 0.0_r;
-
 	if (sound_system_)
 	{
 		if (auto channel_group = detail::get_master_channel_group(*sound_system_); channel_group)
-			channel_group->getVolume(&volume);
+			return detail::get_volume(*channel_group);
 	}
 
-	return volume;
+	return 0.0_r;
 }
 
 

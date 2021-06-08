@@ -17,13 +17,18 @@ File:	IonSoundManager.h
 #include <string>
 
 #include "IonSound.h"
+#include "IonSoundChannel.h"
+#include "IonSoundChannelGroup.h"
 #include "assets/repositories/IonAudioRepository.h"
+#include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
 #include "resources/IonFileResourceManager.h"
+#include "unmanaged/IonObjectFactory.h"
 
 //Forward declarations
 namespace FMOD
 {
+	class Channel;
 	class ChannelGroup;
 	class Sound;
 	class System;
@@ -50,18 +55,39 @@ namespace ion::sounds
 			void unload_sound(FMOD::Sound *sound_handle) noexcept;
 
 			FMOD::ChannelGroup* get_master_channel_group(FMOD::System &sound_system) noexcept;
+
+			void set_mute(FMOD::Channel &channel, bool mute) noexcept;
+			void set_pitch(FMOD::Channel &channel, real pitch) noexcept;
+			void set_volume(FMOD::Channel &channel, real volume) noexcept;
+			bool get_mute(FMOD::Channel &channel) noexcept;
+			real get_pitch(FMOD::Channel &channel) noexcept;
+			real get_volume(FMOD::Channel &channel) noexcept;
+
+			void set_mute(FMOD::ChannelGroup &channel_group, bool mute) noexcept;
+			void set_pitch(FMOD::ChannelGroup &channel_group, real pitch) noexcept;
+			void set_volume(FMOD::ChannelGroup &channel_group, real volume) noexcept;
+			bool get_mute(FMOD::ChannelGroup &channel_group) noexcept;
+			real get_pitch(FMOD::ChannelGroup &channel_group) noexcept;
+			real get_volume(FMOD::ChannelGroup &channel_group) noexcept;
 		} //detail
 	} //sound_manager
 
 
 	class SoundManager final :
-		public resources::FileResourceManager<Sound, SoundManager, assets::repositories::AudioRepository>
+		public resources::FileResourceManager<Sound, SoundManager, assets::repositories::AudioRepository>,
+		public unmanaged::ObjectFactory<SoundChannel>,
+		public managed::ObjectManager<SoundChannelGroup, SoundManager>
 	{
 		private:
 
 			FMOD::System *sound_system_ = nullptr;
 
 		protected:
+
+			using SoundBase = FileResourceManager<Sound, SoundManager, assets::repositories::AudioRepository>;
+			using SoundChannelBase = unmanaged::ObjectFactory<SoundChannel>;
+			using SoundChannelGroupBase = managed::ObjectManager<SoundChannelGroup, SoundManager>;
+
 
 			/*
 				Events
@@ -115,14 +141,44 @@ namespace ion::sounds
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Sounds() noexcept
 			{
-				return Resources();
+				return SoundBase::Resources();
 			}
 
 			//Returns an immutable range of all sounds in this manager
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Sounds() const noexcept
 			{
-				return Resources();
+				return SoundBase::Resources();
+			}
+
+
+			//Returns a mutable range of all sound channels in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SoundChannels() noexcept
+			{
+				return SoundChannelBase::Objects();
+			}
+
+			//Returns an immutable range of all sound channels in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SoundChannels() const noexcept
+			{
+				return SoundChannelBase::Objects();
+			}
+
+
+			//Returns a mutable range of all sound channel groups in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SoundChannelGroups() noexcept
+			{
+				return SoundChannelGroupBase::Objects();
+			}
+
+			//Returns an immutable range of all sound channel groups in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SoundChannelGroups() const noexcept
+			{
+				return SoundChannelGroupBase::Objects();
 			}
 
 
@@ -212,6 +268,54 @@ namespace ion::sounds
 
 			//Remove a removable sound with the given name from this manager
 			bool RemoveSound(std::string_view name) noexcept;
+
+
+			/*
+				Sound channel
+				Creating
+			*/
+
+
+
+
+			/*
+				Sound channel
+				Retrieving
+			*/
+
+
+
+
+			/*
+				Sound channel
+				Removing
+			*/
+
+
+
+
+			/*
+				Sound channel groups
+				Creating
+			*/
+
+
+
+
+			/*
+				Sound channel groups
+				Retrieving
+			*/
+
+
+
+
+			/*
+				Sound channel groups
+				Removing
+			*/
+
+
 	};
 } //ion::sounds
 

@@ -151,6 +151,8 @@ File:	main.cpp
 #include "script/utilities/IonParseUtility.h"
 
 #include "sounds/IonSound.h"
+#include "sounds/IonSoundChannel.h"
+#include "sounds/IonSoundChannelGroup.h"
 #include "sounds/IonSoundManager.h"
 
 #include "system/IonSystemAPI.h"

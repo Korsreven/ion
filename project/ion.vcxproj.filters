@@ -519,6 +519,12 @@
     <ClCompile Include="..\source\engine\sounds\IonSoundManager.cpp">
       <Filter>Source Files\sounds</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\sounds\IonSoundChannel.cpp">
+      <Filter>Source Files\sounds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\sounds\IonSoundChannelGroup.cpp">
+      <Filter>Source Files\sounds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1017,6 +1023,12 @@
       <Filter>Header Files\sounds</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\sounds\IonSoundManager.h">
+      <Filter>Header Files\sounds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\sounds\IonSoundChannel.h">
+      <Filter>Header Files\sounds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\sounds\IonSoundChannelGroup.h">
       <Filter>Header Files\sounds</Filter>
     </ClInclude>
   </ItemGroup>
