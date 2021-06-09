@@ -157,10 +157,15 @@ void unload_sound(FMOD::Sound *sound_handle) noexcept
 }
 
 
-FMOD::ChannelGroup* get_master_channel_group(FMOD::System &sound_system) noexcept
+void set_channel_group(FMOD::Channel &channel, FMOD::ChannelGroup *group) noexcept
+{
+	channel.setChannelGroup(group);
+}
+
+FMOD::ChannelGroup* get_master_channel_group(FMOD::System &system) noexcept
 {
 	if (FMOD::ChannelGroup *channel_group = nullptr;
-		sound_system.getMasterChannelGroup(&channel_group) == FMOD_OK)
+		system.getMasterChannelGroup(&channel_group) == FMOD_OK)
 
 		return channel_group;
 
@@ -169,76 +174,40 @@ FMOD::ChannelGroup* get_master_channel_group(FMOD::System &sound_system) noexcep
 }
 
 
-void set_mute(FMOD::Channel &channel, bool mute) noexcept
+void set_mute(FMOD::ChannelControl &control, bool mute) noexcept
 {
-	channel.setMute(mute);
+	control.setMute(mute);
 }
 
-void set_pitch(FMOD::Channel &channel, real pitch) noexcept
+void set_pitch(FMOD::ChannelControl &control, real pitch) noexcept
 {
-	channel.setPitch(pitch);
+	control.setPitch(pitch);
 }
 
-void set_volume(FMOD::Channel &channel, real volume) noexcept
+void set_volume(FMOD::ChannelControl &control, real volume) noexcept
 {
-	channel.setVolume(volume);
+	control.setVolume(volume);
 }
 
-bool get_mute(FMOD::Channel &channel) noexcept
+
+bool get_mute(FMOD::ChannelControl &control) noexcept
 {
 	auto mute = true;
-	channel.getMute(&mute);
+	control.getMute(&mute);
 	return mute;
 }
 
-real get_pitch(FMOD::Channel &channel) noexcept
+real get_pitch(FMOD::ChannelControl &control) noexcept
 {
 	auto pitch = 1.0_r;
-	channel.getPitch(&pitch);
+	control.getPitch(&pitch);
 	return pitch;
 }
 
-real get_volume(FMOD::Channel &channel) noexcept
+real get_volume(FMOD::ChannelControl &control) noexcept
 {
 	auto volume = 0.0_r;
-	channel.getVolume(&volume);
-	return volume;
-}
-
-
-void set_mute(FMOD::ChannelGroup &channel_group, bool mute) noexcept
-{
-	channel_group.setMute(mute);
-}
-
-void set_pitch(FMOD::ChannelGroup &channel_group, real pitch) noexcept
-{
-	channel_group.setPitch(pitch);
-}
-
-void set_volume(FMOD::ChannelGroup &channel_group, real volume) noexcept
-{
-	channel_group.setVolume(volume);
-}
-
-bool get_mute(FMOD::ChannelGroup &channel_group) noexcept
-{
-	auto mute = true;
-	channel_group.getMute(&mute);
-	return mute;
-}
-
-real get_pitch(FMOD::ChannelGroup &channel_group) noexcept
-{
-	auto pitch = 1.0_r;
-	channel_group.getPitch(&pitch);
-	return pitch;
-}
-
-real get_volume(FMOD::ChannelGroup &channel_group) noexcept
-{
-	auto volume = 0.0_r;
-	channel_group.getVolume(&volume);
+	control.getVolume(&volume);
 	return volume;
 }
 
@@ -494,6 +463,65 @@ bool SoundManager::RemoveSound(Sound &sound) noexcept
 bool SoundManager::RemoveSound(std::string_view name) noexcept
 {
 	return RemoveResource(name);
+}
+
+
+/*
+	Sound channel groups
+	Creating
+*/
+
+NonOwningPtr<SoundChannelGroup> SoundManager::CreateSoundChannelGroup(std::string name)
+{
+	return SoundChannelGroupBase::Create(std::move(name));
+}
+
+
+NonOwningPtr<SoundChannelGroup> SoundManager::CreateSoundChannelGroup(const SoundChannelGroup &channel_group)
+{
+	return SoundChannelGroupBase::Create(channel_group);
+}
+
+NonOwningPtr<SoundChannelGroup> SoundManager::CreateSoundChannelGroup(SoundChannelGroup &&channel_group)
+{
+	return SoundChannelGroupBase::Create(std::move(channel_group));
+}
+
+
+/*
+	Sound channel groups
+	Retrieving
+*/
+
+NonOwningPtr<SoundChannelGroup> SoundManager::GetSoundChannelGroup(std::string_view name) noexcept
+{
+	return SoundChannelGroupBase::Get(name);
+}
+
+NonOwningPtr<const SoundChannelGroup> SoundManager::GetSoundChannelGroup(std::string_view name) const noexcept
+{
+	return SoundChannelGroupBase::Get(name);
+}
+
+
+/*
+	Sound channel groups
+	Removing
+*/
+
+void SoundManager::ClearSoundChannelGroups() noexcept
+{
+	SoundChannelGroupBase::Clear();
+}
+
+bool SoundManager::RemoveSoundChannelGroup(SoundChannelGroup &channel_group) noexcept
+{
+	return SoundChannelGroupBase::Remove(channel_group);
+}
+
+bool SoundManager::RemoveSoundChannelGroup(std::string_view name) noexcept
+{
+	return SoundChannelGroupBase::Remove(name);
 }
 
 } //ion::sounds

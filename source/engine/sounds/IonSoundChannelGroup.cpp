@@ -13,7 +13,9 @@ File:	IonSoundChannelGroup.cpp
 #include "IonSoundChannelGroup.h"
 
 #include <cassert>
+
 #include "IonSoundManager.h"
+#include "Fmod/fmod.hpp"
 
 namespace ion::sounds
 {

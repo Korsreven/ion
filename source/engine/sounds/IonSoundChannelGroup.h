@@ -35,7 +35,7 @@ namespace ion::sounds
 	} //sound_channel_group
 
 
-	class SoundChannelGroup final : managed::ManagedObject<SoundManager>
+	class SoundChannelGroup final : public managed::ManagedObject<SoundManager>
 	{
 		private:
 

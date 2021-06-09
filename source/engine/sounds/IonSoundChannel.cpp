@@ -13,7 +13,9 @@ File:	IonSoundChannel.cpp
 #include "IonSoundChannel.h"
 
 #include <cassert>
+
 #include "IonSoundManager.h"
+#include "Fmod/fmod.hpp"
 
 namespace ion::sounds
 {
@@ -45,6 +47,16 @@ SoundChannel::SoundChannel(NonOwningPtr<Sound> sound, NonOwningPtr<SoundChannelG
 /*
 	Modifiers
 */
+
+void SoundChannel::CurrentChannelGroup(NonOwningPtr<SoundChannelGroup> group) noexcept
+{
+	if (sound_ && group_ != group)
+	{
+		assert(handle_);
+		sound_manager::detail::set_channel_group(*handle_, group ? group->Handle() : nullptr);
+	}
+}
+
 
 void SoundChannel::Mute(bool mute) noexcept
 {

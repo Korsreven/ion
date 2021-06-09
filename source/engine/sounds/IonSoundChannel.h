@@ -37,10 +37,10 @@ namespace ion::sounds
 	class SoundChannel final
 	{
 		private:
-
+		
+			FMOD::Channel *handle_ = nullptr;
 			NonOwningPtr<Sound> sound_;
 			NonOwningPtr<SoundChannelGroup> group_;
-			FMOD::Channel *handle_ = nullptr;
 
 		public:
 
@@ -60,6 +60,9 @@ namespace ion::sounds
 			{
 				handle_ = handle;
 			}
+
+			//Sets the current channel group for this sound channel
+			void CurrentChannelGroup(NonOwningPtr<SoundChannelGroup> group) noexcept;
 
 
 			//Mute this sound channel
@@ -84,6 +87,20 @@ namespace ion::sounds
 					return handle_;
 				else
 					return nullptr;
+			}
+
+			//Returns a pointer to the current sound used by this sound channel
+			//Returns nullptr if this sound channel does not currently have a sound
+			[[nodiscard]] inline auto CurrentSound() const noexcept
+			{
+				return sound_;
+			}
+
+			//Returns a pointer to the current channel group for this sound channel
+			//Returns nullptr if this sound channel is currently not in a channel group
+			[[nodiscard]] inline auto CurrentChannelGroup() const noexcept
+			{
+				return group_;
 			}
 
 
