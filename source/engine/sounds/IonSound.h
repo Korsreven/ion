@@ -16,6 +16,7 @@ File:	IonSound.h
 #include <optional>
 #include <string>
 
+#include "memory/IonNonOwningPtr.h"
 #include "resources/IonFileResource.h"
 
 namespace FMOD
@@ -25,7 +26,10 @@ namespace FMOD
 
 namespace ion::sounds
 {
-	class SoundManager; //Forward declaration
+	//Forward declarations
+	class SoundChannel; 
+	class SoundChannelGroup;
+	class SoundManager;
 	
 	namespace sound
 	{
@@ -34,12 +38,6 @@ namespace ion::sounds
 			Sample,
 			CompressedSample,
 			Stream
-		};
-
-		enum class SoundMixingMode : bool
-		{		
-			Hardware,
-			Software
 		};
 
 		enum class SoundProcessingMode : bool
@@ -80,7 +78,6 @@ namespace ion::sounds
 		private:
 
 			sound::SoundType type_ = sound::SoundType::Sample;
-			sound::SoundMixingMode mixing_mode_ = sound::SoundMixingMode::Hardware;
 			sound::SoundProcessingMode processing_mode_ = sound::SoundProcessingMode::TwoDimensional;
 			sound::SoundOrientationMode orientation_mode_ = sound::SoundOrientationMode::World;
 			sound::SoundRolloffMode rolloff_mode_ = sound::SoundRolloffMode::Inverse;
@@ -93,47 +90,39 @@ namespace ion::sounds
 
 			using resources::FileResource<SoundManager>::FileResource;
 
-			//Construct a new sound with the given name, asset name, type, mixing, processing, orientation, rolloff and looping mode
-			Sound(std::string name, std::string asset_name, sound::SoundType type,
-				sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
+			//Construct a new sound with the given name, asset name, type, processing, orientation, rolloff and looping mode
+			Sound(std::string name, std::string asset_name,
+				sound::SoundType type, sound::SoundProcessingMode processing_mode,
 				sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
 				std::optional<sound::SoundLoopingMode> looping_mode = {});
 
-			//Construct a new sound with the given name, asset name, type, mixing, processing and looping mode
-			Sound(std::string name, std::string asset_name, sound::SoundType type,
-				sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
+			//Construct a new sound with the given name, asset name, type, processing and looping mode
+			Sound(std::string name, std::string asset_name,
+				sound::SoundType type, sound::SoundProcessingMode processing_mode,
 				std::optional<sound::SoundLoopingMode> looping_mode = {});
 
 			//Construct a new sound with the given name, asset name, type and looping mode
-			Sound(std::string name, std::string asset_name, sound::SoundType type,
-				std::optional<sound::SoundLoopingMode> looping_mode = {});
+			Sound(std::string name, std::string asset_name,
+				sound::SoundType type, std::optional<sound::SoundLoopingMode> looping_mode = {});
 
 
 			/*
 				Static sound conversions
 			*/
 
-			//Returns a non-positional (2D) sound with the given name, asset name, type, mixing and looping mode
-			[[nodiscard]] static Sound NonPositional(std::string name, std::string asset_name, sound::SoundType type,
-				sound::SoundMixingMode mixing_mode, std::optional<sound::SoundLoopingMode> looping_mode = {});
-
 			//Returns a non-positional (2D) sound with the given name, asset name, type and looping mode
-			[[nodiscard]] static Sound NonPositional(std::string name, std::string asset_name, sound::SoundType type,
+			[[nodiscard]] static Sound NonPositional(std::string name, std::string asset_name,
+				sound::SoundType type, std::optional<sound::SoundLoopingMode> looping_mode = {});
+
+
+			//Returns a positional (3D) sound with the given name, asset name, type, orientation, rolloff and looping mode
+			[[nodiscard]] static Sound Positional(std::string name, std::string asset_name,
+				sound::SoundType type, sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
 				std::optional<sound::SoundLoopingMode> looping_mode = {});
-
-
-			//Returns a positional (3D) sound with the given name, asset name, type, mixing, orientation, rolloff and looping mode
-			[[nodiscard]] static Sound Positional(std::string name, std::string asset_name, sound::SoundType type,
-				sound::SoundMixingMode mixing_mode, sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
-				std::optional<sound::SoundLoopingMode> looping_mode = {});
-
-			//Returns a positional (3D) sound with the given name, asset name, type, mixing and looping mode
-			[[nodiscard]] static Sound Positional(std::string name, std::string asset_name, sound::SoundType type,
-				sound::SoundMixingMode mixing_mode, std::optional<sound::SoundLoopingMode> looping_mode = {});
 
 			//Returns a positional (3D) sound with the given name, asset name, type and looping mode
-			[[nodiscard]] static Sound Positional(std::string name, std::string asset_name, sound::SoundType type,
-				std::optional<sound::SoundLoopingMode> looping_mode = {});
+			[[nodiscard]] static Sound Positional(std::string name, std::string asset_name,
+				sound::SoundType type, std::optional<sound::SoundLoopingMode> looping_mode = {});
 
 
 			/*
@@ -184,12 +173,6 @@ namespace ion::sounds
 				return type_;
 			}
 
-			//Returns the mixing mode of the sound
-			[[nodiscard]] inline auto MixingMode() const noexcept
-			{
-				return mixing_mode_;
-			}
-
 			//Returns the processing mode of the sound
 			[[nodiscard]] inline auto ProcessingMode() const noexcept
 			{
@@ -213,7 +196,19 @@ namespace ion::sounds
 			[[nodiscard]] inline auto& LoopingMode() const noexcept
 			{
 				return looping_mode_;
-			}		
+			}
+			
+
+			/*
+				Creating
+				Sound channel
+			*/
+
+			//Play this sound, by creating a sound channel outputting to the master channel group
+			[[nodiscard]] NonOwningPtr<SoundChannel> Play(bool paused = false) noexcept;
+
+			//Play this sound, by creating a sound channel outputting to the given channel group
+			[[nodiscard]] NonOwningPtr<SoundChannel> Play(SoundChannelGroup &channel_group, bool paused = false) noexcept;
 	};
 } //ion::sounds
 

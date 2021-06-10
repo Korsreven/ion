@@ -112,6 +112,24 @@ namespace ion::sounds
 
 			//Returns the volume of this sound channel
 			[[nodiscard]] real Volume() const noexcept;
+
+
+			/*
+				Playback 
+			*/
+
+			//Resumes sound channel playback
+			void Resume() noexcept;
+
+			//Pause sound channel playback
+			void Pause() noexcept;
+
+			//Pauses playback and reset position to zero
+			void Reset() noexcept;
+
+
+			//Returns true if this sound channel is playing
+			[[nodiscard]] bool IsPlaying() const noexcept;
 	};
 } //ion::sounds
 

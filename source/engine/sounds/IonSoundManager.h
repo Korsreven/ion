@@ -48,22 +48,31 @@ namespace ion::sounds
 			void release_sound_system(FMOD::System *system) noexcept;
 
 			FMOD::Sound* load_sound(
-				FMOD::System &sound_system,
-				const std::string &file_data, const std::optional<std::string> &stream_data, sound::SoundType type,
-				sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
+				FMOD::System &system,
+				const std::string &file_data, const std::optional<std::string> &stream_data,
+				sound::SoundType type, sound::SoundProcessingMode processing_mode,
 				sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
 				const std::optional<sound::SoundLoopingMode> &looping_mode) noexcept;
 			void unload_sound(FMOD::Sound *sound_handle) noexcept;
+
+			FMOD::Channel* play_sound(
+				FMOD::System &system, FMOD::Sound &sound,
+				FMOD::ChannelGroup *channel_group, FMOD::Channel *channel,
+				bool paused);
 
 			void set_channel_group(FMOD::Channel &channel, FMOD::ChannelGroup *group) noexcept;
 			FMOD::ChannelGroup* get_master_channel_group(FMOD::System &system) noexcept;
 
 			void set_mute(FMOD::ChannelControl &control, bool mute) noexcept;
+			void set_paused(FMOD::ChannelControl &control, bool paused) noexcept;
 			void set_pitch(FMOD::ChannelControl &control, real pitch) noexcept;
 			void set_volume(FMOD::ChannelControl &control, real volume) noexcept;
 			bool get_mute(FMOD::ChannelControl &control) noexcept;
 			real get_pitch(FMOD::ChannelControl &control) noexcept;
 			real get_volume(FMOD::ChannelControl &control) noexcept;
+			bool is_playing(FMOD::ChannelControl &control) noexcept;
+			
+			void set_position(FMOD::Channel &channel, int position) noexcept;		
 		} //detail
 	} //sound_manager
 
@@ -213,15 +222,15 @@ namespace ion::sounds
 			//Create a sound with the given name and asset name
 			NonOwningPtr<Sound> CreateSound(std::string name, std::string asset_name);
 
-			//Create a sound with the given name, asset name, type, mixing, processing, orientation, rolloff and looping mode
-			NonOwningPtr<Sound> CreateSound(std::string name, std::string asset_name, sound::SoundType type,
-				sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
+			//Create a sound with the given name, asset name, type, processing, orientation, rolloff and looping mode
+			NonOwningPtr<Sound> CreateSound(std::string name, std::string asset_name,
+				sound::SoundType type, sound::SoundProcessingMode processing_mode,
 				sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
 				std::optional<sound::SoundLoopingMode> looping_mode = {});
 
-			//Create a sound with the given name, asset name, type, mixing, processing and looping mode
-			NonOwningPtr<Sound> CreateSound(std::string name, std::string asset_name, sound::SoundType type,
-				sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
+			//Create a sound with the given name, asset name, type, processing and looping mode
+			NonOwningPtr<Sound> CreateSound(std::string name, std::string asset_name,
+				sound::SoundType type, sound::SoundProcessingMode processing_mode,
 				std::optional<sound::SoundLoopingMode> looping_mode = {});
 
 			//Create a sound with the given name, asset name, type and looping mode

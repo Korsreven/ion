@@ -123,4 +123,49 @@ real SoundChannel::Volume() const noexcept
 		return 0.0_r;
 }
 
+
+/*
+	Playback 
+*/
+
+void SoundChannel::Resume() noexcept
+{
+	if (sound_)
+	{
+		assert(handle_);
+		sound_manager::detail::set_paused(*handle_, false);
+	}
+}
+
+void SoundChannel::Pause() noexcept
+{
+	if (sound_)
+	{
+		assert(handle_);
+		sound_manager::detail::set_paused(*handle_, true);
+	}
+}
+
+void SoundChannel::Reset() noexcept
+{
+	if (sound_)
+	{
+		assert(handle_);
+		sound_manager::detail::set_paused(*handle_, true);
+		sound_manager::detail::set_position(*handle_, 0);
+	}
+}
+
+
+bool SoundChannel::IsPlaying() const noexcept
+{
+	if (sound_)
+	{
+		assert(handle_);
+		return sound_manager::detail::is_playing(*handle_);
+	}
+	else
+		return false;
+}
+
 } //ion::sounds

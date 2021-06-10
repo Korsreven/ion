@@ -50,9 +50,9 @@ void release_sound_system(FMOD::System *system) noexcept
 
 
 FMOD::Sound* load_sound(
-	FMOD::System &sound_system,
-	const std::string &file_data, const std::optional<std::string> &stream_data, sound::SoundType type,
-	sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
+	FMOD::System &system,
+	const std::string &file_data, const std::optional<std::string> &stream_data,
+	sound::SoundType type, sound::SoundProcessingMode processing_mode,
 	sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
 	const std::optional<sound::SoundLoopingMode> &looping_mode) noexcept
 {
@@ -139,7 +139,7 @@ FMOD::Sound* load_sound(
 
 
 	if (FMOD::Sound *sound_handle = nullptr;
-		sound_system.createSound(stream_data ? std::data(*stream_data) : std::data(file_data), mode, &ex_info, &sound_handle) == FMOD_OK)
+		system.createSound(stream_data ? std::data(*stream_data) : std::data(file_data), mode, &ex_info, &sound_handle) == FMOD_OK)
 
 		return sound_handle;
 
@@ -154,6 +154,18 @@ void unload_sound(FMOD::Sound *sound_handle) noexcept
 {
 	if (sound_handle)
 		sound_handle->release();
+}
+
+
+FMOD::Channel* play_sound(
+	FMOD::System &system, FMOD::Sound &sound,
+	FMOD::ChannelGroup *channel_group, FMOD::Channel *channel,
+	bool paused)
+{
+	if (system.playSound(&sound, channel_group, paused, &channel) == FMOD_OK && channel)
+		return channel;
+	else
+		return nullptr;
 }
 
 
@@ -177,6 +189,11 @@ FMOD::ChannelGroup* get_master_channel_group(FMOD::System &system) noexcept
 void set_mute(FMOD::ChannelControl &control, bool mute) noexcept
 {
 	control.setMute(mute);
+}
+
+void set_paused(FMOD::ChannelControl &control, bool paused) noexcept
+{
+	control.setPaused(paused);
 }
 
 void set_pitch(FMOD::ChannelControl &control, real pitch) noexcept
@@ -211,6 +228,19 @@ real get_volume(FMOD::ChannelControl &control) noexcept
 	return volume;
 }
 
+bool is_playing(FMOD::ChannelControl &control) noexcept
+{
+	auto playing = false;
+	control.isPlaying(&playing);
+	return playing;
+}
+
+
+void set_position(FMOD::Channel &channel, int position) noexcept
+{
+	channel.setPosition(position, FMOD_TIMEUNIT_MS);
+}
+
 } //sound_manager::detail
 
 
@@ -242,7 +272,6 @@ bool SoundManager::LoadResource(Sound &sound) noexcept
 	auto &stream_data = sound.StreamData();
 
 	auto type = sound.Type();
-	auto mixing_mode = sound.MixingMode();
 	auto processing_mode = sound.ProcessingMode();
 	auto orientation_mode = sound.OrientationMode();
 	auto rolloff_mode = sound.RolloffMode();
@@ -253,7 +282,7 @@ bool SoundManager::LoadResource(Sound &sound) noexcept
 		sound.Handle(
 			detail::load_sound(
 				*sound_system_,
-				*file_data, stream_data, type, mixing_mode, processing_mode, orientation_mode, rolloff_mode, looping_mode
+				*file_data, stream_data, type, processing_mode, orientation_mode, rolloff_mode, looping_mode
 			));
 		return sound.Handle();
 	}
@@ -392,29 +421,29 @@ NonOwningPtr<Sound> SoundManager::CreateSound(std::string name, std::string asse
 	return CreateResource(std::move(name), std::move(asset_name));
 }
 
-NonOwningPtr<Sound> SoundManager::CreateSound(std::string name, std::string asset_name, sound::SoundType type,
-	sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
+NonOwningPtr<Sound> SoundManager::CreateSound(std::string name, std::string asset_name,
+	sound::SoundType type, sound::SoundProcessingMode processing_mode,
 	sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
 	std::optional<sound::SoundLoopingMode> looping_mode)
 {
-	return CreateResource(std::move(name), std::move(asset_name), type,
-						  mixing_mode, processing_mode, orientation_mode, rolloff_mode,
+	return CreateResource(std::move(name), std::move(asset_name),
+						  type, processing_mode, orientation_mode, rolloff_mode,
 						  looping_mode);
 }
 
-NonOwningPtr<Sound> SoundManager::CreateSound(std::string name, std::string asset_name, sound::SoundType type,
-	sound::SoundMixingMode mixing_mode, sound::SoundProcessingMode processing_mode,
+NonOwningPtr<Sound> SoundManager::CreateSound(std::string name, std::string asset_name,
+	sound::SoundType type, sound::SoundProcessingMode processing_mode,
 	std::optional<sound::SoundLoopingMode> looping_mode)
 {
-	return CreateResource(std::move(name), std::move(asset_name), type,
-						  mixing_mode, processing_mode, looping_mode);
+	return CreateResource(std::move(name), std::move(asset_name),
+						  type, processing_mode, looping_mode);
 }
 
-NonOwningPtr<Sound> SoundManager::CreateSound(std::string name, std::string asset_name, sound::SoundType type,
-	std::optional<sound::SoundLoopingMode> looping_mode)
+NonOwningPtr<Sound> SoundManager::CreateSound(std::string name, std::string asset_name,
+	sound::SoundType type, std::optional<sound::SoundLoopingMode> looping_mode)
 {
-	return CreateResource(std::move(name), std::move(asset_name), type,
-						  looping_mode);
+	return CreateResource(std::move(name), std::move(asset_name),
+						  type, looping_mode);
 }
 
 
