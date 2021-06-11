@@ -13,6 +13,7 @@ File:	IonSoundChannel.h
 #ifndef ION_SOUND_CHANNEL_H
 #define ION_SOUND_CHANNEL_H
 
+#include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
@@ -23,9 +24,10 @@ namespace FMOD
 
 namespace ion::sounds
 {
-	class Sound; //Forward declaration
-	class SoundChannelGroup; //Forward declaration
-	
+	//Forward declarations
+	class Sound;
+	class SoundChannelGroup;
+
 	namespace sound_channel
 	{
 		namespace detail
@@ -34,21 +36,20 @@ namespace ion::sounds
 	} //sound_channel
 
 
-	class SoundChannel final
+	class SoundChannel final : public managed::ManagedObject<Sound>
 	{
 		private:
 		
 			FMOD::Channel *handle_ = nullptr;
-			NonOwningPtr<Sound> sound_;
 			NonOwningPtr<SoundChannelGroup> group_;
 
 		public:
 
-			//Construct a new sound channel with the given sound
-			explicit SoundChannel(NonOwningPtr<Sound> sound) noexcept;
+			//Default constructor
+			SoundChannel() = default;
 
-			//Construct a new sound channel with the given sound and sound channel group
-			SoundChannel(NonOwningPtr<Sound> sound, NonOwningPtr<SoundChannelGroup> group) noexcept;
+			//Construct a new sound channel with the given sound channel group
+			explicit SoundChannel(NonOwningPtr<SoundChannelGroup> sound_channel_group) noexcept;
 
 
 			/*
@@ -62,7 +63,7 @@ namespace ion::sounds
 			}
 
 			//Sets the current channel group for this sound channel
-			void CurrentChannelGroup(NonOwningPtr<SoundChannelGroup> group) noexcept;
+			void CurrentChannelGroup(NonOwningPtr<SoundChannelGroup> sound_channel_group) noexcept;
 
 
 			//Mute this sound channel
@@ -81,19 +82,9 @@ namespace ion::sounds
 
 			//Returns the handle for the sound channel
 			//Returns nullptr if the sound channel is not valid
-			[[nodiscard]] inline auto Handle() const noexcept -> FMOD::Channel*
+			[[nodiscard]] inline auto Handle() const noexcept
 			{
-				if (sound_)
-					return handle_;
-				else
-					return nullptr;
-			}
-
-			//Returns a pointer to the current sound used by this sound channel
-			//Returns nullptr if this sound channel does not currently have a sound
-			[[nodiscard]] inline auto CurrentSound() const noexcept
-			{
-				return sound_;
+				return handle_;
 			}
 
 			//Returns a pointer to the current channel group for this sound channel
@@ -124,7 +115,7 @@ namespace ion::sounds
 			//Pause sound channel playback
 			void Pause() noexcept;
 
-			//Pauses playback and reset position to zero
+			//Pauses sound channel playback and reset position to zero
 			void Reset() noexcept;
 
 

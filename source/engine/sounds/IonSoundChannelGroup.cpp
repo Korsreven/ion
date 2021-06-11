@@ -12,8 +12,6 @@ File:	IonSoundChannelGroup.cpp
 
 #include "IonSoundChannelGroup.h"
 
-#include <cassert>
-
 #include "IonSoundManager.h"
 #include "Fmod/fmod.hpp"
 
@@ -21,6 +19,7 @@ namespace ion::sounds
 {
 
 using namespace sound_channel_group;
+using namespace types::type_literals;
 
 namespace sound_channel_group::detail
 {
@@ -34,20 +33,20 @@ namespace sound_channel_group::detail
 
 void SoundChannelGroup::Mute(bool mute) noexcept
 {
-	assert(handle_);
-	sound_manager::detail::set_mute(*handle_, mute);
+	if (handle_)
+		sound_manager::detail::set_mute(*handle_, mute);
 }
 			
 void SoundChannelGroup::Pitch(real pitch) noexcept
 {
-	assert(handle_);
-	sound_manager::detail::set_pitch(*handle_, pitch);
+	if (handle_)
+		sound_manager::detail::set_pitch(*handle_, pitch);
 }
 
 void SoundChannelGroup::Volume(real volume) noexcept
 {
-	assert(handle_);
-	sound_manager::detail::set_volume(*handle_, volume);
+	if (handle_)
+		sound_manager::detail::set_volume(*handle_, volume);
 }
 
 
@@ -57,20 +56,26 @@ void SoundChannelGroup::Volume(real volume) noexcept
 
 bool SoundChannelGroup::IsMuted() const noexcept
 {
-	assert(handle_);
-	return sound_manager::detail::get_mute(*handle_);
+	if (handle_)
+		return sound_manager::detail::get_mute(*handle_);
+	else
+		return true;
 }
 
 real SoundChannelGroup::Pitch() const noexcept
 {
-	assert(handle_);
-	return sound_manager::detail::get_pitch(*handle_);
+	if (handle_)
+		return sound_manager::detail::get_pitch(*handle_);
+	else
+		return 1.0_r;
 }
 
 real SoundChannelGroup::Volume() const noexcept
 {
-	assert(handle_);
-	return sound_manager::detail::get_volume(*handle_);
+	if (handle_)
+		return sound_manager::detail::get_volume(*handle_);
+	else
+		return 0.0_r;
 }
 
 } //ion::sounds

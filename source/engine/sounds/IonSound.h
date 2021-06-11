@@ -16,18 +16,20 @@ File:	IonSound.h
 #include <optional>
 #include <string>
 
+#include "IonSoundChannel.h"
+#include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
 #include "resources/IonFileResource.h"
 
+//Forward declarations
 namespace FMOD
 {
-	class Sound; //Forward declaration
+	class Sound;
 };
 
 namespace ion::sounds
 {
 	//Forward declarations
-	class SoundChannel; 
 	class SoundChannelGroup;
 	class SoundManager;
 	
@@ -73,7 +75,9 @@ namespace ion::sounds
 	} //sound
 
 
-	class Sound final : public resources::FileResource<SoundManager>
+	class Sound final :
+		public resources::FileResource<SoundManager>,
+		public managed::ObjectManager<SoundChannel, Sound>
 	{
 		private:
 
@@ -85,6 +89,15 @@ namespace ion::sounds
 
 			FMOD::Sound *handle_ = nullptr;
 			std::optional<std::string> stream_data_;
+
+		protected:
+
+			/*
+				Events
+			*/
+
+			//See ObjectManager::Removed for more details
+			void Removed(SoundChannel &sound_channel) noexcept override;
 
 		public:
 
@@ -106,6 +119,16 @@ namespace ion::sounds
 				sound::SoundType type, std::optional<sound::SoundLoopingMode> looping_mode = {});
 
 
+			//Deleted copy constructor
+			Sound(const Sound&) = delete;
+
+			//Default move constructor
+			Sound(Sound&&) = default;
+
+			//Destructor
+			~Sound() noexcept;
+
+
 			/*
 				Static sound conversions
 			*/
@@ -123,6 +146,36 @@ namespace ion::sounds
 			//Returns a positional (3D) sound with the given name, asset name, type and looping mode
 			[[nodiscard]] static Sound Positional(std::string name, std::string asset_name,
 				sound::SoundType type, std::optional<sound::SoundLoopingMode> looping_mode = {});
+
+
+			/*
+				Operators
+			*/
+
+			//Deleted copy assignment
+			Sound& operator=(const Sound&) = delete;
+
+			//Move assignment
+			Sound& operator=(Sound&&) = default;
+
+
+			/*
+				Ranges
+			*/
+
+			//Returns a mutable range of all sound channels playing this sound
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SoundChannels() noexcept
+			{
+				return Objects();
+			}
+
+			//Returns an immutable range of all sound channels playing this sound
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SoundChannels() const noexcept
+			{
+				return Objects();
+			}
 
 
 			/*
@@ -200,15 +253,31 @@ namespace ion::sounds
 			
 
 			/*
+				Sound channels
 				Creating
-				Sound channel
 			*/
 
 			//Play this sound, by creating a sound channel outputting to the master channel group
 			[[nodiscard]] NonOwningPtr<SoundChannel> Play(bool paused = false) noexcept;
 
 			//Play this sound, by creating a sound channel outputting to the given channel group
-			[[nodiscard]] NonOwningPtr<SoundChannel> Play(SoundChannelGroup &channel_group, bool paused = false) noexcept;
+			[[nodiscard]] NonOwningPtr<SoundChannel> Play(NonOwningPtr<SoundChannelGroup> sound_channel_group, bool paused = false) noexcept;
+
+
+			//Play this sound, by reusing the given sound channel
+			[[nodiscard]] NonOwningPtr<SoundChannel> Play(NonOwningPtr<SoundChannel> sound_channel, bool paused = false) noexcept;
+
+
+			/*
+				Sound channels
+				Removing
+			*/
+
+			//Clear all removable sound channels from this sound
+			void ClearSoundChannels() noexcept;
+
+			//Remove a removable sound channel from this sound
+			bool RemoveSoundChannel(SoundChannel &sound_channel) noexcept;
 	};
 } //ion::sounds
 

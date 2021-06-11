@@ -59,7 +59,7 @@ namespace ion::graphics::scene
 			bool update_bounding_volumes_ = false;
 
 
-			void Created(shapes::Mesh &mesh);
+			void Created(shapes::Mesh &mesh) noexcept;
 
 		public:
 

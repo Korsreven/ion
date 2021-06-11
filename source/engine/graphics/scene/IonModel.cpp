@@ -28,7 +28,7 @@ namespace model::detail
 
 //Private
 
-void Model::Created(shapes::Mesh &mesh)
+void Model::Created(shapes::Mesh &mesh) noexcept
 {
 	reload_vertex_buffer_ |= mesh.VertexCount() > 0;
 	update_bounding_volumes_ |= reload_vertex_buffer_;

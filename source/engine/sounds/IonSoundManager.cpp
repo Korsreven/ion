@@ -31,7 +31,6 @@ FMOD::System* init_sound_system() noexcept
 		system->init(max_sound_channels, FMOD_INIT_NORMAL, nullptr) == FMOD_OK)
 		
 		return system;
-
 	else
 	{
 		release_sound_system(system);
@@ -46,6 +45,11 @@ void release_sound_system(FMOD::System *system) noexcept
 		system->release();
 		system = nullptr;
 	}
+}
+
+void update_sound_system(FMOD::System &system) noexcept
+{
+	system.update();
 }
 
 
@@ -142,7 +146,6 @@ FMOD::Sound* load_sound(
 		system.createSound(stream_data ? std::data(*stream_data) : std::data(file_data), mode, &ex_info, &sound_handle) == FMOD_OK)
 
 		return sound_handle;
-
 	else
 	{
 		unload_sound(sound_handle);
@@ -169,9 +172,31 @@ FMOD::Channel* play_sound(
 }
 
 
-void set_channel_group(FMOD::Channel &channel, FMOD::ChannelGroup *group) noexcept
+FMOD::ChannelGroup* create_channel_group(FMOD::System &system) noexcept
 {
-	channel.setChannelGroup(group);
+	if (FMOD::ChannelGroup *channel_group = nullptr;
+		system.createChannelGroup(nullptr, &channel_group) == FMOD_OK)
+		
+		return channel_group;
+	else
+		return nullptr;
+}
+
+void release_channel_group(FMOD::ChannelGroup *channel_group) noexcept
+{
+	if (channel_group)
+		channel_group->release();
+}
+
+
+FMOD::System* get_system(FMOD::Sound &sound) noexcept
+{	
+	if (FMOD::System *system = nullptr;
+		sound.getSystemObject(&system) == FMOD_OK)
+
+		return system;
+	else
+		return nullptr;
 }
 
 FMOD::ChannelGroup* get_master_channel_group(FMOD::System &system) noexcept
@@ -180,11 +205,20 @@ FMOD::ChannelGroup* get_master_channel_group(FMOD::System &system) noexcept
 		system.getMasterChannelGroup(&channel_group) == FMOD_OK)
 
 		return channel_group;
-
 	else
 		return nullptr;
 }
 
+void set_channel_group(FMOD::Channel &channel, FMOD::ChannelGroup *group) noexcept
+{
+	channel.setChannelGroup(group);
+}
+
+
+void stop(FMOD::ChannelControl &control) noexcept
+{
+	control.stop();
+}
 
 void set_mute(FMOD::ChannelControl &control, bool mute) noexcept
 {
@@ -243,6 +277,8 @@ void set_position(FMOD::Channel &channel, int position) noexcept
 
 } //sound_manager::detail
 
+
+//Protected
 
 /*
 	Events
@@ -320,6 +356,19 @@ void SoundManager::ResourceFailed(Sound &sound) noexcept
 	FileResourceManager::ResourceFailed(sound);
 	sound.ResetStreamData();
 		//Stream data not required after sound has failed (save memory)
+}
+
+
+void SoundManager::Created(SoundChannelGroup &sound_channel_group) noexcept
+{
+	if (sound_system_)
+		sound_channel_group.Handle(detail::create_channel_group(*sound_system_));
+}
+
+void SoundManager::Removed(SoundChannelGroup &sound_channel_group) noexcept
+{
+	detail::release_channel_group(sound_channel_group.Handle());
+	sound_channel_group.Handle(nullptr);
 }
 
 
@@ -412,6 +461,17 @@ real SoundManager::Volume() const noexcept
 
 
 /*
+	Updating
+*/
+
+void SoundManager::Update() noexcept
+{
+	if (sound_system_)
+		detail::update_sound_system(*sound_system_);
+}
+
+
+/*
 	Sounds
 	Creating
 */
@@ -444,17 +504,6 @@ NonOwningPtr<Sound> SoundManager::CreateSound(std::string name, std::string asse
 {
 	return CreateResource(std::move(name), std::move(asset_name),
 						  type, looping_mode);
-}
-
-
-NonOwningPtr<Sound> SoundManager::CreateSound(const Sound &sound)
-{
-	return CreateResource(sound);
-}
-
-NonOwningPtr<Sound> SoundManager::CreateSound(Sound &&sound)
-{
-	return CreateResource(std::move(sound));
 }
 
 
@@ -506,14 +555,14 @@ NonOwningPtr<SoundChannelGroup> SoundManager::CreateSoundChannelGroup(std::strin
 }
 
 
-NonOwningPtr<SoundChannelGroup> SoundManager::CreateSoundChannelGroup(const SoundChannelGroup &channel_group)
+NonOwningPtr<SoundChannelGroup> SoundManager::CreateSoundChannelGroup(const SoundChannelGroup &sound_channel_group)
 {
-	return SoundChannelGroupBase::Create(channel_group);
+	return SoundChannelGroupBase::Create(sound_channel_group);
 }
 
-NonOwningPtr<SoundChannelGroup> SoundManager::CreateSoundChannelGroup(SoundChannelGroup &&channel_group)
+NonOwningPtr<SoundChannelGroup> SoundManager::CreateSoundChannelGroup(SoundChannelGroup &&sound_channel_group)
 {
-	return SoundChannelGroupBase::Create(std::move(channel_group));
+	return SoundChannelGroupBase::Create(std::move(sound_channel_group));
 }
 
 
@@ -543,9 +592,9 @@ void SoundManager::ClearSoundChannelGroups() noexcept
 	SoundChannelGroupBase::Clear();
 }
 
-bool SoundManager::RemoveSoundChannelGroup(SoundChannelGroup &channel_group) noexcept
+bool SoundManager::RemoveSoundChannelGroup(SoundChannelGroup &sound_channel_group) noexcept
 {
-	return SoundChannelGroupBase::Remove(channel_group);
+	return SoundChannelGroupBase::Remove(sound_channel_group);
 }
 
 bool SoundManager::RemoveSoundChannelGroup(std::string_view name) noexcept

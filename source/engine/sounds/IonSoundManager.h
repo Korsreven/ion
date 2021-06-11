@@ -17,13 +17,11 @@ File:	IonSoundManager.h
 #include <string>
 
 #include "IonSound.h"
-#include "IonSoundChannel.h"
 #include "IonSoundChannelGroup.h"
 #include "assets/repositories/IonAudioRepository.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
 #include "resources/IonFileResourceManager.h"
-#include "unmanaged/IonObjectFactory.h"
 
 //Forward declarations
 namespace FMOD
@@ -46,6 +44,7 @@ namespace ion::sounds
 
 			FMOD::System* init_sound_system() noexcept;
 			void release_sound_system(FMOD::System *system) noexcept;
+			void update_sound_system(FMOD::System &system) noexcept;
 
 			FMOD::Sound* load_sound(
 				FMOD::System &system,
@@ -60,9 +59,14 @@ namespace ion::sounds
 				FMOD::ChannelGroup *channel_group, FMOD::Channel *channel,
 				bool paused);
 
-			void set_channel_group(FMOD::Channel &channel, FMOD::ChannelGroup *group) noexcept;
+			FMOD::ChannelGroup* create_channel_group(FMOD::System &system) noexcept;
+			void release_channel_group(FMOD::ChannelGroup *channel_group) noexcept;
+			
+			FMOD::System* get_system(FMOD::Sound &sound) noexcept;
 			FMOD::ChannelGroup* get_master_channel_group(FMOD::System &system) noexcept;
-
+			void set_channel_group(FMOD::Channel &channel, FMOD::ChannelGroup *group) noexcept;
+			
+			void stop(FMOD::ChannelControl &control) noexcept;
 			void set_mute(FMOD::ChannelControl &control, bool mute) noexcept;
 			void set_paused(FMOD::ChannelControl &control, bool paused) noexcept;
 			void set_pitch(FMOD::ChannelControl &control, real pitch) noexcept;
@@ -71,7 +75,7 @@ namespace ion::sounds
 			real get_pitch(FMOD::ChannelControl &control) noexcept;
 			real get_volume(FMOD::ChannelControl &control) noexcept;
 			bool is_playing(FMOD::ChannelControl &control) noexcept;
-			
+
 			void set_position(FMOD::Channel &channel, int position) noexcept;		
 		} //detail
 	} //sound_manager
@@ -79,8 +83,7 @@ namespace ion::sounds
 
 	class SoundManager final :
 		public resources::FileResourceManager<Sound, SoundManager, assets::repositories::AudioRepository>,
-		public managed::ObjectManager<SoundChannelGroup, SoundManager>,
-		public unmanaged::ObjectFactory<SoundChannel>
+		public managed::ObjectManager<SoundChannelGroup, SoundManager>
 	{
 		private:
 
@@ -110,6 +113,13 @@ namespace ion::sounds
 
 			//See FileResourceManager::ResourceFailed for more details
 			void ResourceFailed(Sound &sound) noexcept override;
+
+
+			//See ObjectManager::Created for more details
+			void Created(SoundChannelGroup &sound_channel_group) noexcept override;
+
+			//See ObjectManager::Removed for more details
+			void Removed(SoundChannelGroup &sound_channel_group) noexcept override;
 
 		public:
 
@@ -171,21 +181,6 @@ namespace ion::sounds
 			}
 
 
-			//Returns a mutable range of all sound channels in this manager
-			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto SoundChannels() noexcept
-			{
-				return SoundChannelBase::Objects();
-			}
-
-			//Returns an immutable range of all sound channels in this manager
-			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto SoundChannels() const noexcept
-			{
-				return SoundChannelBase::Objects();
-			}
-
-
 			/*
 				Modifiers
 			*/
@@ -215,6 +210,15 @@ namespace ion::sounds
 
 
 			/*
+				Updating
+			*/
+
+			//Should be called once per frame
+			//Mostly needed for positional (3D) sounds to work properly
+			void Update() noexcept;
+
+
+			/*
 				Sounds
 				Creating
 			*/
@@ -236,13 +240,6 @@ namespace ion::sounds
 			//Create a sound with the given name, asset name, type and looping mode
 			NonOwningPtr<Sound> CreateSound(std::string name, std::string asset_name, sound::SoundType type,
 				std::optional<sound::SoundLoopingMode> looping_mode = {});
-
-
-			//Create a sound as a copy of the given sound
-			NonOwningPtr<Sound> CreateSound(const Sound &sound);
-
-			//Create a sound by moving the given sound
-			NonOwningPtr<Sound> CreateSound(Sound &&sound);
 
 
 			/*
@@ -284,10 +281,10 @@ namespace ion::sounds
 
 
 			//Create a sound channel group as a copy of the given sound channel group
-			NonOwningPtr<SoundChannelGroup> CreateSoundChannelGroup(const SoundChannelGroup &channel_group);
+			NonOwningPtr<SoundChannelGroup> CreateSoundChannelGroup(const SoundChannelGroup &sound_channel_group);
 
 			//Create a sound channel group by moving the given sound channel group
-			NonOwningPtr<SoundChannelGroup> CreateSoundChannelGroup(SoundChannelGroup &&channel_group);
+			NonOwningPtr<SoundChannelGroup> CreateSoundChannelGroup(SoundChannelGroup &&sound_channel_group);
 
 
 			/*
@@ -313,26 +310,10 @@ namespace ion::sounds
 			void ClearSoundChannelGroups() noexcept;
 
 			//Remove a removable sound channel group from this manager
-			bool RemoveSoundChannelGroup(SoundChannelGroup &channel_group) noexcept;
+			bool RemoveSoundChannelGroup(SoundChannelGroup &sound_channel_group) noexcept;
 
 			//Remove a removable sound channel group with the given name from this manager
 			bool RemoveSoundChannelGroup(std::string_view name) noexcept;
-
-
-			/*
-				Sound channel
-				Creating
-			*/
-
-
-
-
-			/*
-				Sound channel
-				Removing
-			*/
-
-
 	};
 } //ion::sounds
 
