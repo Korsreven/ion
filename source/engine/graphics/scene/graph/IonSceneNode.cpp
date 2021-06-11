@@ -307,7 +307,10 @@ bool SceneNode::DetachObject(AttachableObject object) noexcept
 		std::find_if(std::begin(attached_objects_), std::end(attached_objects_),
 			[&](auto &x) noexcept
 			{
-				return x == object;
+				return
+					std::visit([](auto &&x) noexcept -> MovableObject* { return x; }, x)
+					==
+					std::visit([](auto &&object) noexcept -> MovableObject* { return object; }, object);
 			});
 
 	//Object found
