@@ -525,6 +525,12 @@
     <ClCompile Include="..\source\engine\sounds\IonSoundChannelGroup.cpp">
       <Filter>Source Files\sounds</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\IonMovableSound.cpp">
+      <Filter>Source Files\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\IonMovableSoundListener.cpp">
+      <Filter>Source Files\graphics\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1030,6 +1036,12 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\sounds\IonSoundChannelGroup.h">
       <Filter>Header Files\sounds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\IonMovableSound.h">
+      <Filter>Header Files\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\IonMovableSoundListener.h">
+      <Filter>Header Files\graphics\scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
