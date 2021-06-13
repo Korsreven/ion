@@ -15,6 +15,7 @@ File:	IonSound.h
 
 #include <optional>
 #include <string>
+#include <utility>
 
 #include "IonSoundChannel.h"
 #include "managed/IonObjectManager.h"
@@ -201,6 +202,13 @@ namespace ion::sounds
 			}
 
 
+			//Sets the min and max audible distance for the sound to the given min and max values
+			//Increase the min distance to make the sound louder
+			//Decrease the min distance to make the sound quieter
+			//Max distance is obsolete unless you need the sound to stop fading out at a certain point
+			void Distance(real min_distance, real max_distance = 10'000.0_r) noexcept;
+
+
 			/*
 				Observers
 			*/
@@ -250,6 +258,10 @@ namespace ion::sounds
 			{
 				return looping_mode_;
 			}
+
+
+			//Returns the min and max audible distance for the sound
+			[[nodiscard]] std::optional<std::pair<real, real>> Distance() const noexcept;
 			
 
 			/*

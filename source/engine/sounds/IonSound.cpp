@@ -121,6 +121,30 @@ Sound Sound::Positional(std::string name, std::string asset_name,
 
 
 /*
+	Modifiers
+*/
+
+void Sound::Distance(real min_distance, real max_distance) noexcept
+{
+	if (handle_)
+		sound_manager::detail::set_min_max_distance(*handle_, min_distance, max_distance);
+}
+
+
+/*
+	Observers
+*/
+
+std::optional<std::pair<real, real>> Sound::Distance() const noexcept
+{
+	if (handle_)
+		return sound_manager::detail::get_min_max_distance(*handle_);
+	else
+		return {};
+}
+
+
+/*
 	Sound channels
 	Creating
 */

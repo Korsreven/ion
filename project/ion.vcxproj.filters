@@ -531,6 +531,9 @@
     <ClCompile Include="..\source\engine\graphics\scene\IonMovableSoundListener.cpp">
       <Filter>Source Files\graphics\scene</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\sounds\IonSoundListener.cpp">
+      <Filter>Source Files\sounds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1042,6 +1045,9 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\scene\IonMovableSoundListener.h">
       <Filter>Header Files\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\sounds\IonSoundListener.h">
+      <Filter>Header Files\sounds</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

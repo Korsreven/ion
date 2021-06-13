@@ -13,6 +13,10 @@ File:	IonSoundChannel.h
 #ifndef ION_SOUND_CHANNEL_H
 #define ION_SOUND_CHANNEL_H
 
+#include <optional>
+#include <utility>
+
+#include "graphics/utilities/IonVector3.h"
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
@@ -27,6 +31,8 @@ namespace ion::sounds
 	//Forward declarations
 	class Sound;
 	class SoundChannelGroup;
+
+	using namespace types::type_literals;
 
 	namespace sound_channel
 	{
@@ -76,6 +82,17 @@ namespace ion::sounds
 			void Volume(real volume) noexcept;
 
 
+			//Sets the position and velocity attributes in use by the sound channel to the given position and velocity
+			//This is automatically set when a sound channel is attached to a movable sound
+			void Attributes(const graphics::utilities::Vector3 &position, const graphics::utilities::Vector3 &velocity) noexcept;
+
+			//Sets the min and max audible distance for the sound channel to the given min and max values
+			//Increase the min distance to make the sound louder
+			//Decrease the min distance to make the sound quieter
+			//Max distance is obsolete unless you need the sound to stop fading out at a certain point
+			void Distance(real min_distance, real max_distance = 10'000.0_r) noexcept;
+
+
 			/*
 				Observers
 			*/
@@ -103,6 +120,13 @@ namespace ion::sounds
 
 			//Returns the volume of this sound channel
 			[[nodiscard]] real Volume() const noexcept;
+
+
+			//Returns the position and velocity attributes in use by the sound channel
+			[[nodiscard]] std::optional<std::pair<graphics::utilities::Vector3, graphics::utilities::Vector3>> Attributes() const noexcept;
+
+			//Returns the min and max audible distance for the sound channel
+			[[nodiscard]] std::optional<std::pair<real, real>> Distance() const noexcept;
 
 
 			/*

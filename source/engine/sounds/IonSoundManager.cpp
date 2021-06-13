@@ -275,6 +275,98 @@ void set_position(FMOD::Channel &channel, int position) noexcept
 	channel.setPosition(position, FMOD_TIMEUNIT_MS);
 }
 
+
+/*
+	Positional (3D) functionality
+*/
+
+void set_settings(FMOD::System &system, real doppler_scale, real distance_factor, real rolloff_scale) noexcept
+{
+	system.set3DSettings(doppler_scale, distance_factor, rolloff_scale);
+}
+
+
+void set_listener_attributes(FMOD::System &system,
+	const graphics::utilities::Vector3 &position, const graphics::utilities::Vector3 &velocity) noexcept
+{
+	auto [x, y, z] = position.XYZ();
+	auto [vx, vy, vz] = velocity.XYZ();
+
+	FMOD_VECTOR pos{x, z, y};
+	FMOD_VECTOR vel{vx, vz, vy};
+	FMOD_VECTOR forward{0.0_r, 0.0_r, 1.0_r};
+	FMOD_VECTOR up{0.0_r, 1.0_r, 0.0_r};
+	system.set3DListenerAttributes(0, &pos, &vel, &forward, &up);
+}
+
+std::pair<graphics::utilities::Vector3, graphics::utilities::Vector3> get_listener_attributes(FMOD::System &system) noexcept
+{
+	FMOD_VECTOR pos;
+	FMOD_VECTOR vel;
+	FMOD_VECTOR forward;
+	FMOD_VECTOR up;
+	system.get3DListenerAttributes(0, &pos, &vel, &forward, &up);
+	return {graphics::utilities::Vector3{pos.x, pos.z, pos.y},
+			graphics::utilities::Vector3{vel.x, vel.z, vel.y}};
+}
+
+
+void set_attributes(FMOD::Channel &channel,
+	const graphics::utilities::Vector3 &position, const graphics::utilities::Vector3 &velocity) noexcept
+{
+	auto [x, y, z] = position.XYZ();
+	auto [vx, vy, vz] = velocity.XYZ();
+
+	FMOD_VECTOR pos{x, z, y};
+	FMOD_VECTOR vel{vx, vz, vy};
+	channel.set3DAttributes(&pos, &vel);
+}
+
+void set_min_max_distance(FMOD::Sound &sound, real min_distance, real max_distance) noexcept
+{
+	sound.set3DMinMaxDistance(min_distance, max_distance);
+}
+
+void set_min_max_distance(FMOD::Channel &channel, real min_distance, real max_distance) noexcept
+{
+	channel.set3DMinMaxDistance(min_distance, max_distance);
+}
+
+
+std::tuple<real, real, real> get_settings(FMOD::System &system) noexcept
+{
+	float doppler_scale = 1.0f;
+	float distance_factor = 1.0f;
+	float rolloff_scale = 1.0f;
+	system.get3DSettings(&doppler_scale, &distance_factor, &rolloff_scale);
+	return {doppler_scale, distance_factor, rolloff_scale};
+}
+
+std::pair<graphics::utilities::Vector3, graphics::utilities::Vector3> get_attributes(FMOD::Channel &channel) noexcept
+{
+	FMOD_VECTOR pos;
+	FMOD_VECTOR vel;
+	channel.get3DAttributes(&pos, &vel);
+	return {graphics::utilities::Vector3{pos.x, pos.z, pos.y},
+			graphics::utilities::Vector3{vel.x, vel.z, vel.y}};
+}
+
+std::pair<real, real> get_min_max_distance(FMOD::Sound &sound) noexcept
+{
+	float min_distance = 1.0f;
+	float max_distance = 10'000.0f;
+	sound.get3DMinMaxDistance(&min_distance, &max_distance);
+	return {min_distance, max_distance};
+}
+
+std::pair<real, real> get_min_max_distance(FMOD::Channel &channel) noexcept
+{
+	float min_distance = 1.0f;
+	float max_distance = 10'000.0f;
+	channel.get3DMinMaxDistance(&min_distance, &max_distance);
+	return {min_distance, max_distance};
+}
+
 } //sound_manager::detail
 
 
@@ -422,6 +514,13 @@ void SoundManager::Volume(real volume) noexcept
 }
 
 
+void SoundManager::Settings(real doppler_scale, real distance_factor, real rolloff_scale) noexcept
+{
+	if (sound_system_)
+		return detail::set_settings(*sound_system_, doppler_scale, distance_factor, rolloff_scale);
+}
+
+
 /*
 	Observers
 */
@@ -457,6 +556,15 @@ real SoundManager::Volume() const noexcept
 	}
 
 	return 0.0_r;
+}
+
+
+std::tuple<real, real, real> SoundManager::Settings() const noexcept
+{
+	if (sound_system_)
+		return detail::get_settings(*sound_system_);
+	else
+		return {1.0_r, 1.0_r, 1.0_r};
 }
 
 

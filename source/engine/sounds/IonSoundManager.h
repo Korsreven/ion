@@ -15,10 +15,12 @@ File:	IonSoundManager.h
 
 #include <optional>
 #include <string>
+#include <tuple>
 
 #include "IonSound.h"
 #include "IonSoundChannelGroup.h"
 #include "assets/repositories/IonAudioRepository.h"
+#include "graphics/utilities/IonVector3.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
 #include "resources/IonFileResourceManager.h"
@@ -65,7 +67,7 @@ namespace ion::sounds
 			FMOD::System* get_system(FMOD::Sound &sound) noexcept;
 			FMOD::ChannelGroup* get_master_channel_group(FMOD::System &system) noexcept;
 			void set_channel_group(FMOD::Channel &channel, FMOD::ChannelGroup *group) noexcept;
-			
+
 			void stop(FMOD::ChannelControl &control) noexcept;
 			void set_mute(FMOD::ChannelControl &control, bool mute) noexcept;
 			void set_paused(FMOD::ChannelControl &control, bool paused) noexcept;
@@ -76,7 +78,28 @@ namespace ion::sounds
 			real get_volume(FMOD::ChannelControl &control) noexcept;
 			bool is_playing(FMOD::ChannelControl &control) noexcept;
 
-			void set_position(FMOD::Channel &channel, int position) noexcept;		
+			void set_position(FMOD::Channel &channel, int position) noexcept;
+
+
+			/*
+				Positional (3D) functionality
+			*/
+
+			void set_settings(FMOD::System &system, real doppler_scale, real distance_factor, real rolloff_scale) noexcept;
+
+			void set_listener_attributes(FMOD::System &system,
+				const graphics::utilities::Vector3 &position, const graphics::utilities::Vector3 &velocity) noexcept;
+			std::pair<graphics::utilities::Vector3, graphics::utilities::Vector3> get_listener_attributes(FMOD::System &system) noexcept;
+
+			void set_attributes(FMOD::Channel &channel,
+				const graphics::utilities::Vector3 &position, const graphics::utilities::Vector3 &velocity) noexcept;
+			void set_min_max_distance(FMOD::Sound &sound, real min_distance, real max_distance) noexcept;
+			void set_min_max_distance(FMOD::Channel &channel, real min_distance, real max_distance) noexcept;
+
+			std::tuple<real, real, real> get_settings(FMOD::System &system) noexcept;
+			std::pair<graphics::utilities::Vector3, graphics::utilities::Vector3> get_attributes(FMOD::Channel &channel) noexcept;
+			std::pair<real, real> get_min_max_distance(FMOD::Sound &sound) noexcept;
+			std::pair<real, real> get_min_max_distance(FMOD::Channel &channel) noexcept;
 		} //detail
 	} //sound_manager
 
@@ -195,6 +218,14 @@ namespace ion::sounds
 			void Volume(real volume) noexcept;
 
 
+			//Sets the settings in use by the sound manager to the given doppler scale, distance factor and rolloff scale
+			//This function will only have effects on positional (3D) sounds
+			//Doppler scale is how much the pitch varies due to doppler shifting
+			//Distance factor is the relative distance factor, compared to 1.0 meters
+			//Rolloff scale makes the sound drop off faster or slower (only for sound::SoundRolloffMode::Inverse and InverseTapered)
+			void Settings(real doppler_scale, real distance_factor, real rolloff_scale) noexcept;
+
+
 			/*
 				Observers
 			*/
@@ -207,6 +238,11 @@ namespace ion::sounds
 
 			//Returns the master volume of this sound manager
 			[[nodiscard]] real Volume() const noexcept;
+
+
+			//Returns the settings in use by the sound manager
+			//This function will only have effects on positional (3D) sounds
+			[[nodiscard]] std::tuple<real, real, real> Settings() const noexcept;
 
 
 			/*

@@ -887,6 +887,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Sound
 			ion::sounds::SoundManager sounds;
+			sounds.Settings(1.0_r, 0.04_r, 1.0_r);
+				//2 game units = 50 meters
+				//2 / 50m = 0.04 distance factor
+
 			sounds.CreateRepository(std::move(audio_repository));
 			auto click = sounds.CreateSound("click", "click.wav", ion::sounds::sound::SoundType::Sample);
 			auto night_runner = sounds.CreateSound("night_runner", "night_runner.mp3", ion::sounds::sound::SoundType::Stream);

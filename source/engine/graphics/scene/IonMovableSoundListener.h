@@ -13,18 +13,23 @@ File:	IonMovableSoundListener.h
 #ifndef ION_MOVABLE_SOUND_LISTENER_H
 #define ION_MOVABLE_SOUND_LISTENER_H
 
+#include <optional>
+
 #include "IonMovableObject.h"
+#include "graphics/utilities/IonVector3.h"
 #include "memory/IonNonOwningPtr.h"
-#include "types/IonTypes.h"
 
 //Forward declarations
 namespace ion::sounds
 {
-	class SoundManager;
+	class SoundListener;
 }
 
 namespace ion::graphics::scene
 {
+	using utilities::Vector3;
+
+
 	namespace movable_sound_listener
 	{
 		namespace detail
@@ -38,35 +43,52 @@ namespace ion::graphics::scene
 	{
 		private:
 
-			NonOwningPtr<sounds::SoundManager> sound_manager_;
+			Vector3 position_;
+			std::optional<Vector3> previous_world_position_;
+
+			NonOwningPtr<sounds::SoundListener> sound_listener_;
 
 		public:
 
-			//Construct a new movable sound listener with the given sound manager
-			explicit MovableSoundListener(NonOwningPtr<sounds::SoundManager> sound_manager);
+			//Construct a new movable sound listener with the given sound listener
+			explicit MovableSoundListener(NonOwningPtr<sounds::SoundListener> sound_listener);
+
+			//Construct a new movable sound listener with the given position and sound listener
+			MovableSoundListener(const Vector3 &position, NonOwningPtr<sounds::SoundListener> sound_listener);
 
 
 			/*
 				Modifiers
 			*/
 
-
+			//Sets the position of this sound listener to the given position
+			inline void Position(const Vector3 &position) noexcept
+			{
+				position_ = position;
+			}
 
 
 			/*
 				Observers
 			*/
 
-			//Returns a mutable reference to the sound manager
-			[[nodiscard]] auto& Get() noexcept
+			//Returns the position of this sound listener
+			[[nodiscard]] inline auto& Position() const noexcept
 			{
-				return sound_manager_;
+				return position_;
 			}
 
-			//Returns an immutable reference to the sound manager
+
+			//Returns a mutable reference to the sound listener
+			[[nodiscard]] auto& Get() noexcept
+			{
+				return sound_listener_;
+			}
+
+			//Returns an immutable reference to the sound listener
 			[[nodiscard]] auto& Get() const noexcept
 			{
-				return sound_manager_;
+				return sound_listener_;
 			}
 
 

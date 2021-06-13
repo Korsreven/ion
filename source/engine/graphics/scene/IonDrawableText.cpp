@@ -30,7 +30,6 @@ namespace ion::graphics::scene
 {
 
 using namespace drawable_text;
-
 using namespace graphics::utilities;
 
 namespace drawable_text::detail

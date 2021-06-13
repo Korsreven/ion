@@ -19,7 +19,6 @@ namespace ion::sounds
 {
 
 using namespace sound_channel;
-using namespace types::type_literals;
 
 namespace sound_channel::detail
 {
@@ -67,6 +66,19 @@ void SoundChannel::Volume(real volume) noexcept
 }
 
 
+void SoundChannel::Attributes(const graphics::utilities::Vector3 &position, const graphics::utilities::Vector3 &velocity) noexcept
+{
+	if (handle_)
+		sound_manager::detail::set_attributes(*handle_, position, velocity);
+}
+
+void SoundChannel::Distance(real min_distance, real max_distance) noexcept
+{
+	if (handle_)
+		sound_manager::detail::set_min_max_distance(*handle_, min_distance, max_distance);
+}
+
+
 /*
 	Observers
 */
@@ -93,6 +105,23 @@ real SoundChannel::Volume() const noexcept
 		return sound_manager::detail::get_volume(*handle_);
 	else
 		return 0.0_r;
+}
+
+
+std::optional<std::pair<graphics::utilities::Vector3, graphics::utilities::Vector3>> SoundChannel::Attributes() const noexcept
+{
+	if (handle_)
+		return sound_manager::detail::get_attributes(*handle_);
+	else
+		return {};
+}
+
+std::optional<std::pair<real, real>> SoundChannel::Distance() const noexcept
+{
+	if (handle_)
+		return sound_manager::detail::get_min_max_distance(*handle_);
+	else
+		return {};
 }
 
 

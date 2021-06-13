@@ -22,16 +22,13 @@ File:	IonSceneManager.h
 #include "IonDrawableText.h"
 #include "IonLight.h"
 #include "IonModel.h"
+#include "IonMovableSound.h"
+#include "IonMovableSoundListener.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonCameraListener.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
-
-namespace ion::graphics::particles
-{
-	class ParticleSystem; //Forward declaration
-}
 
 namespace ion::graphics::render
 {
@@ -51,7 +48,9 @@ namespace ion::graphics::scene
 		public managed::ObjectManager<Model, SceneManager>,
 		public managed::ObjectManager<DrawableAnimation, SceneManager>,
 		public managed::ObjectManager<DrawableParticleSystem, SceneManager>,
-		public managed::ObjectManager<DrawableText, SceneManager>
+		public managed::ObjectManager<DrawableText, SceneManager>,
+		public managed::ObjectManager<MovableSound, SceneManager>,
+		public managed::ObjectManager<MovableSoundListener, SceneManager>
 	{
 		private:
 
@@ -61,6 +60,8 @@ namespace ion::graphics::scene
 			using AnimationBase = managed::ObjectManager<DrawableAnimation, SceneManager>;
 			using ParticleSystemBase = managed::ObjectManager<DrawableParticleSystem, SceneManager>;
 			using TextBase = managed::ObjectManager<DrawableText, SceneManager>;
+			using SoundBase = managed::ObjectManager<MovableSound, SceneManager>;
+			using SoundListenerBase = managed::ObjectManager<MovableSoundListener, SceneManager>;
 
 			using CameraEventsBase = events::Listenable<events::listeners::CameraListener>;
 
@@ -201,6 +202,36 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto Texts() const noexcept
 			{
 				return TextBase::Objects();
+			}
+
+
+			//Returns a mutable range of all sounds in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Sounds() noexcept
+			{
+				return SoundBase::Objects();
+			}
+
+			//Returns an immutable range of all sounds in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Sounds() const noexcept
+			{
+				return SoundBase::Objects();
+			}
+
+
+			//Returns a mutable range of all sound listeners in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SoundListeners() noexcept
+			{
+				return SoundListenerBase::Objects();
+			}
+
+			//Returns an immutable range of all sound listeners in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SoundListeners() const noexcept
+			{
+				return SoundListenerBase::Objects();
 			}
 
 
@@ -395,6 +426,61 @@ namespace ion::graphics::scene
 
 			//Remove a removable text from this manager
 			bool RemoveText(DrawableText &text) noexcept;
+
+
+			/*
+				Sound
+				Creating
+			*/
+
+			//Create a movable sound with the given sound and pause state
+			NonOwningPtr<MovableSound> CreateSound(NonOwningPtr<sounds::Sound> sound, bool paused = false);
+
+			//Create a movable sound with the given podition, sound and pause state
+			NonOwningPtr<MovableSound> CreateSound(const Vector3 &position, NonOwningPtr<sounds::Sound> sound, bool paused = false);
+
+
+			//Create a movable sound with the given sound, sound channel group and pause state
+			NonOwningPtr<MovableSound> CreateSound(NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
+
+			//Create a movable sound with the given position, sound, sound channel group and pause state
+			NonOwningPtr<MovableSound> CreateSound(const Vector3 &position, NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
+
+
+			/*
+				Sound
+				Removing
+			*/
+
+			//Clear all removable sounds from this manager
+			void ClearSounds() noexcept;
+
+			//Remove a removable sound from this manager
+			bool RemoveSound(MovableSound &sound) noexcept;
+
+
+			/*
+				Sound listener
+				Creating
+			*/
+
+			//Create a movable sound listener with the given sound listener
+			NonOwningPtr<MovableSoundListener> CreateSoundListener(NonOwningPtr<sounds::SoundListener> sound_listener);
+
+			//Create a movable sound listener with the given position and sound listener
+			NonOwningPtr<MovableSoundListener> CreateSoundListener(const Vector3 &position, NonOwningPtr<sounds::SoundListener> sound_listener);
+
+
+			/*
+				Sound listener
+				Removing
+			*/
+
+			//Clear all removable sound listeners from this manager
+			void ClearSoundListeners() noexcept;
+
+			//Remove a removable sound listener from this manager
+			bool RemoveSoundListener(MovableSoundListener &sound_listener) noexcept;
 
 
 			/*

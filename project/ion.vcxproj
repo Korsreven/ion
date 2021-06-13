@@ -254,6 +254,7 @@
     <ClCompile Include="..\source\engine\sounds\IonSound.cpp" />
     <ClCompile Include="..\source\engine\sounds\IonSoundChannel.cpp" />
     <ClCompile Include="..\source\engine\sounds\IonSoundChannelGroup.cpp" />
+    <ClCompile Include="..\source\engine\sounds\IonSoundListener.cpp" />
     <ClCompile Include="..\source\engine\sounds\IonSoundManager.cpp" />
     <ClCompile Include="..\source\engine\system\events\listeners\IonSystemInputListener.cpp" />
     <ClCompile Include="..\source\engine\system\IonSystemUtility.cpp" />
@@ -415,6 +416,7 @@
     <ClInclude Include="..\source\engine\sounds\IonSound.h" />
     <ClInclude Include="..\source\engine\sounds\IonSoundChannel.h" />
     <ClInclude Include="..\source\engine\sounds\IonSoundChannelGroup.h" />
+    <ClInclude Include="..\source\engine\sounds\IonSoundListener.h" />
     <ClInclude Include="..\source\engine\sounds\IonSoundManager.h" />
     <ClInclude Include="..\source\engine\system\events\IonSystemInput.h" />
     <ClInclude Include="..\source\engine\system\events\listeners\IonSystemInputListener.h" />

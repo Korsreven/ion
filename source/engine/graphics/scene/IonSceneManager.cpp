@@ -289,4 +289,79 @@ bool SceneManager::RemoveText(DrawableText &text) noexcept
 	return TextBase::Remove(text);
 }
 
+
+/*
+	Sound
+	Creating
+*/
+
+NonOwningPtr<MovableSound> SceneManager::CreateSound(NonOwningPtr<sounds::Sound> sound, bool paused)
+{
+	return SoundBase::Create(sound, paused);
+}
+
+NonOwningPtr<MovableSound> SceneManager::CreateSound(const Vector3 &position, NonOwningPtr<sounds::Sound> sound, bool paused)
+{
+	return SoundBase::Create(position, sound, paused);
+}
+
+
+NonOwningPtr<MovableSound> SceneManager::CreateSound(NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused)
+{
+	return SoundBase::Create(sound, sound_channel_group, paused);
+}
+
+NonOwningPtr<MovableSound> SceneManager::CreateSound(const Vector3 &position, NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused)
+{
+	return SoundBase::Create(position, sound, sound_channel_group, paused);
+}
+
+
+/*
+	Sound
+	Removing
+*/
+
+void SceneManager::ClearSounds() noexcept
+{
+	SoundBase::Clear();
+}
+
+bool SceneManager::RemoveSound(MovableSound &sound) noexcept
+{
+	return SoundBase::Remove(sound);
+}
+
+
+/*
+	Sound listener
+	Creating
+*/
+
+NonOwningPtr<MovableSoundListener> SceneManager::CreateSoundListener(NonOwningPtr<sounds::SoundListener> sound_listener)
+{
+	return SoundListenerBase::Create(sound_listener);
+}
+
+NonOwningPtr<MovableSoundListener> SceneManager::CreateSoundListener(const Vector3 &position, NonOwningPtr<sounds::SoundListener> sound_listener)
+{
+	return SoundListenerBase::Create(position, sound_listener);
+}
+
+
+/*
+	Sound listener
+	Removing
+*/
+
+void SceneManager::ClearSoundListeners() noexcept
+{
+	SoundListenerBase::Clear();
+}
+
+bool SceneManager::RemoveSoundListener(MovableSoundListener &sound_listener) noexcept
+{
+	return SoundListenerBase::Remove(sound_listener);
+}
+
 } //ion::graphics::scene

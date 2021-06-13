@@ -13,8 +13,6 @@ File:	IonSoundChannelGroup.h
 #ifndef ION_SOUND_CHANNEL_GROUP_H
 #define ION_SOUND_CHANNEL_GROUP_H
 
-#include <string>
-
 #include "managed/IonManagedObject.h"
 #include "types/IonTypes.h"
 
