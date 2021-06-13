@@ -787,13 +787,13 @@ namespace ion::graphics::scene::graph
 			*/
 
 			//Create a new scene node as a child of this node with the given visibility
-			[[nodiscard]] NonOwningPtr<SceneNode> CreateChildNode(bool visible = true);
+			NonOwningPtr<SceneNode> CreateChildNode(bool visible = true);
 
 			//Create a new scene node as a child of this node with the given initial direction and visibility
-			[[nodiscard]] NonOwningPtr<SceneNode> CreateChildNode(const Vector2 &initial_direction, bool visible = true);
+			NonOwningPtr<SceneNode> CreateChildNode(const Vector2 &initial_direction, bool visible = true);
 
 			//Create a new scene node as a child of this node with the given position, initial direction and visibility
-			[[nodiscard]] NonOwningPtr<SceneNode> CreateChildNode(const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true);
+			NonOwningPtr<SceneNode> CreateChildNode(const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true);
 
 
 			/*
