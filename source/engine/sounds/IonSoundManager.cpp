@@ -627,6 +627,12 @@ NonOwningPtr<Sound> SoundManager::CreateSound(std::string name, std::string asse
 }
 
 
+NonOwningPtr<Sound> SoundManager::CreateSound(Sound &&sound)
+{
+	return CreateResource(std::move(sound));
+}
+
+
 /*
 	Sounds
 	Retrieving

@@ -206,6 +206,7 @@ struct Game :
 	ion::events::listeners::MouseListener
 {
 	ion::graphics::scene::graph::SceneGraph *scene = nullptr;
+	ion::sounds::SoundManager *sound_manager = nullptr;
 	ion::NonOwningPtr<ion::graphics::render::Viewport> viewport;
 
 	ion::NonOwningPtr<ion::graphics::scene::DrawableText> fps;
@@ -280,6 +281,9 @@ struct Game :
 
 	bool FrameEnded(duration time) noexcept override
 	{
+		if (sound_manager)
+			sound_manager->Update();
+
 		time;
 		return true;
 	}
@@ -890,17 +894,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Sound
 			ion::sounds::SoundManager sounds;
-			sounds.Settings(1.0_r, 0.04_r, 1.0_r);
+			sounds.Settings(1.0_r, 0.4_r, 1.0_r);
 				//2 game units = 50 meters
 				//2 / 50m = 0.04 distance factor
 
 			sounds.CreateRepository(std::move(audio_repository));
 			auto sound_listener = sounds.CreateSoundListener("listener");
-			auto click = sounds.CreateSound("click", "click.wav", ion::sounds::sound::SoundType::Sample);
-			auto night_runner = sounds.CreateSound("night_runner", "night_runner.mp3", ion::sounds::sound::SoundType::Stream);
+			auto flicker = sounds.CreateSound(ion::sounds::Sound::Positional("flicker", "flicker.wav",
+				ion::sounds::sound::SoundType::Sample, ion::sounds::sound::SoundLoopingMode::Forward));
+			flicker->Distance(1.0_r); //Min distance of 10 meters
+			auto night_runner = sounds.CreateSound("night_runner", "night_runner.mp3",
+				ion::sounds::sound::SoundType::Stream, ion::sounds::sound::SoundLoopingMode::Forward);
 			sounds.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!sounds.Loaded());
+
+			night_runner->Play()->Volume(0.2_r);
 
 
 			//Material
@@ -1111,6 +1120,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			particle_system->AddPass(ion::graphics::render::Pass{particle_program});
 			particle_system->Get()->StartAll();
 
+			//Sound
+			auto player_sound_listener = scene_manager.CreateSoundListener(sound_listener);
+			auto red_lamp_flicker = scene_manager.CreateSound(flicker);
+			auto green_lamp_flicker = scene_manager.CreateSound(flicker);
+
+
 			//Model
 			auto model = scene_manager.CreateModel();
 			model->CreateMesh(ion::graphics::scene::shapes::Sprite{
@@ -1159,9 +1174,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Lights
 			auto red_light_node = engine.Scene().RootNode().CreateChildNode({-1.5_r, -0.75_r, -1.0_r});
 			red_light_node->AttachObject(*red_light);
+			red_light_node->AttachObject(*red_lamp_flicker);
 
 			auto green_light_node = engine.Scene().RootNode().CreateChildNode({1.5_r, 0.75_r, -1.0_r});
 			green_light_node->AttachObject(*green_light);
+			green_light_node->AttachObject(*green_lamp_flicker);
 
 			//Text
 			auto fps_node = engine.Scene().RootNode().CreateChildNode({-1.75_r, 0.98_r, -1.5_r});
@@ -1175,6 +1192,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Models
 			auto model_node = engine.Scene().RootNode().CreateChildNode({0.0_r, -0.115_r, -1.8_r});
 			model_node->AttachObject(*model);
+			model_node->AttachObject(*player_sound_listener);
 
 			auto star_node = model_node->CreateChildNode({0.15_r, 0.2_r, 0.1_r});
 			star_node->AttachObject(*model_star);
@@ -1200,6 +1218,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Game
 			game.scene = &engine.Scene();
+			game.sound_manager = &sounds;
 			game.viewport = viewport;
 			game.fps = text;
 			game.model = model;

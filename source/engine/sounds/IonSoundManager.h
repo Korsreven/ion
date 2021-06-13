@@ -297,6 +297,10 @@ namespace ion::sounds
 				std::optional<sound::SoundLoopingMode> looping_mode = {});
 
 
+			//Create a sound by moving the given sound
+			NonOwningPtr<Sound> CreateSound(Sound &&sound);
+
+
 			/*
 				Sounds
 				Retrieving
