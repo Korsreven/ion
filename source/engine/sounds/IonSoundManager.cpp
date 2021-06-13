@@ -457,10 +457,22 @@ void SoundManager::Created(SoundChannelGroup &sound_channel_group) noexcept
 		sound_channel_group.Handle(detail::create_channel_group(*sound_system_));
 }
 
+void SoundManager::Created(SoundListener &sound_listener) noexcept
+{
+	if (sound_system_)
+		sound_listener.Handle(sound_system_);
+}
+
+
 void SoundManager::Removed(SoundChannelGroup &sound_channel_group) noexcept
 {
 	detail::release_channel_group(sound_channel_group.Handle());
 	sound_channel_group.Handle(nullptr);
+}
+
+void SoundManager::Removed(SoundListener &sound_listener) noexcept
+{
+	sound_listener.Handle(nullptr);
 }
 
 
@@ -708,6 +720,54 @@ bool SoundManager::RemoveSoundChannelGroup(SoundChannelGroup &sound_channel_grou
 bool SoundManager::RemoveSoundChannelGroup(std::string_view name) noexcept
 {
 	return SoundChannelGroupBase::Remove(name);
+}
+
+
+/*
+	Sound listeners
+	Creating
+*/
+
+NonOwningPtr<SoundListener> SoundManager::CreateSoundListener(std::string name)
+{
+	return SoundListenerBase::Create(std::move(name));
+}
+
+
+/*
+	Sound listeners
+	Retrieving
+*/
+
+NonOwningPtr<SoundListener> SoundManager::GetSoundListener(std::string_view name) noexcept
+{
+	return SoundListenerBase::Get(name);
+}
+
+NonOwningPtr<const SoundListener> SoundManager::GetSoundListener(std::string_view name) const noexcept
+{
+	return SoundListenerBase::Get(name);
+}
+
+
+/*
+	Sound listeners
+	Removing
+*/
+
+void SoundManager::ClearSoundListeners() noexcept
+{
+	SoundListenerBase::Clear();
+}
+
+bool SoundManager::RemoveSoundListener(SoundListener &sound_listener) noexcept
+{
+	return SoundListenerBase::Remove(sound_listener);
+}
+
+bool SoundManager::RemoveSoundListener(std::string_view name) noexcept
+{
+	return SoundListenerBase::Remove(name);
 }
 
 } //ion::sounds

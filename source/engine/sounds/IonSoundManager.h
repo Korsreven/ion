@@ -19,6 +19,7 @@ File:	IonSoundManager.h
 
 #include "IonSound.h"
 #include "IonSoundChannelGroup.h"
+#include "IonSoundListener.h"
 #include "assets/repositories/IonAudioRepository.h"
 #include "graphics/utilities/IonVector3.h"
 #include "managed/IonObjectManager.h"
@@ -106,7 +107,8 @@ namespace ion::sounds
 
 	class SoundManager final :
 		public resources::FileResourceManager<Sound, SoundManager, assets::repositories::AudioRepository>,
-		public managed::ObjectManager<SoundChannelGroup, SoundManager>
+		public managed::ObjectManager<SoundChannelGroup, SoundManager>,
+		public managed::ObjectManager<SoundListener, SoundManager>
 	{
 		private:
 
@@ -116,7 +118,7 @@ namespace ion::sounds
 
 			using SoundBase = FileResourceManager<Sound, SoundManager, assets::repositories::AudioRepository>;	
 			using SoundChannelGroupBase = managed::ObjectManager<SoundChannelGroup, SoundManager>;
-			using SoundChannelBase = unmanaged::ObjectFactory<SoundChannel>;
+			using SoundListenerBase = managed::ObjectManager<SoundListener, SoundManager>;
 
 
 			/*
@@ -140,9 +142,11 @@ namespace ion::sounds
 
 			//See ObjectManager::Created for more details
 			void Created(SoundChannelGroup &sound_channel_group) noexcept override;
+			void Created(SoundListener &sound_listener) noexcept override;
 
 			//See ObjectManager::Removed for more details
 			void Removed(SoundChannelGroup &sound_channel_group) noexcept override;
+			void Removed(SoundListener &sound_listener) noexcept override;
 
 		public:
 
@@ -201,6 +205,21 @@ namespace ion::sounds
 			[[nodiscard]] inline auto SoundChannelGroups() const noexcept
 			{
 				return SoundChannelGroupBase::Objects();
+			}
+
+
+			//Returns a mutable range of all sound listeners in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SoundListeners() noexcept
+			{
+				return SoundListenerBase::Objects();
+			}
+
+			//Returns an immutable range of all sound listeners in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SoundListeners() const noexcept
+			{
+				return SoundListenerBase::Objects();
 			}
 
 
@@ -350,6 +369,44 @@ namespace ion::sounds
 
 			//Remove a removable sound channel group with the given name from this manager
 			bool RemoveSoundChannelGroup(std::string_view name) noexcept;
+
+
+			/*
+				Sound listeners
+				Creating
+			*/
+
+			//Create a sound listener with the given name
+			NonOwningPtr<SoundListener> CreateSoundListener(std::string name);
+
+
+			/*
+				Sound listeners
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable sound listener with the given name
+			//Returns nullptr if sound listener could not be found
+			[[nodiscard]] NonOwningPtr<SoundListener> GetSoundListener(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable sound listener with the given name
+			//Returns nullptr if sound listener could not be found
+			[[nodiscard]] NonOwningPtr<const SoundListener> GetSoundListener(std::string_view name) const noexcept;
+
+
+			/*
+				Sound listeners
+				Removing
+			*/
+
+			//Clear all removable sound listeners from this manager
+			void ClearSoundListeners() noexcept;
+
+			//Remove a removable sound listener from this manager
+			bool RemoveSoundListener(SoundListener &sound_listener) noexcept;
+
+			//Remove a removable sound listener with the given name from this manager
+			bool RemoveSoundListener(std::string_view name) noexcept;
 	};
 } //ion::sounds
 

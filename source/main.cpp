@@ -90,6 +90,8 @@ File:	main.cpp
 #include "graphics/scene/IonLight.h"
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/IonMovableObject.h"
+#include "graphics/scene/IonMovableSound.h"
+#include "graphics/scene/IonMovableSoundListener.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneGraph.h"
 #include "graphics/scene/graph/IonSceneNode.h"
@@ -153,6 +155,7 @@ File:	main.cpp
 #include "sounds/IonSound.h"
 #include "sounds/IonSoundChannel.h"
 #include "sounds/IonSoundChannelGroup.h"
+#include "sounds/IonSoundListener.h"
 #include "sounds/IonSoundManager.h"
 
 #include "system/IonSystemAPI.h"
@@ -892,6 +895,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				//2 / 50m = 0.04 distance factor
 
 			sounds.CreateRepository(std::move(audio_repository));
+			auto sound_listener = sounds.CreateSoundListener("listener");
 			auto click = sounds.CreateSound("click", "click.wav", ion::sounds::sound::SoundType::Sample);
 			auto night_runner = sounds.CreateSound("night_runner", "night_runner.mp3", ion::sounds::sound::SoundType::Stream);
 			sounds.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
