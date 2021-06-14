@@ -894,7 +894,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Sound
 			ion::sounds::SoundManager sounds;
-			sounds.Settings(1.0_r, 0.4_r, 1.0_r);
+			sounds.Settings(1.0_r, 0.04_r, 1.0_r);
 				//2 game units = 50 meters
 				//2 / 50m = 0.04 distance factor
 
@@ -902,7 +902,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto sound_listener = sounds.CreateSoundListener("listener");
 			auto flicker = sounds.CreateSound(ion::sounds::Sound::Positional("flicker", "flicker.wav",
 				ion::sounds::sound::SoundType::Sample, ion::sounds::sound::SoundLoopingMode::Forward));
-			flicker->Distance(1.0_r); //Min distance of 10 meters
+			flicker->Distance(0.4_r); //Min distance of 10 meters
 			auto night_runner = sounds.CreateSound("night_runner", "night_runner.mp3",
 				ion::sounds::sound::SoundType::Stream, ion::sounds::sound::SoundLoopingMode::Forward);
 			sounds.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
@@ -1174,11 +1174,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Lights
 			auto red_light_node = engine.Scene().RootNode().CreateChildNode({-1.5_r, -0.75_r, -1.0_r});
 			red_light_node->AttachObject(*red_light);
-			red_light_node->AttachObject(*red_lamp_flicker);
+
+			auto red_lamp_node = red_light_node->CreateChildNode({0.0_r, 0.0_r, -0.8_r});
+			red_lamp_node->AttachObject(*red_lamp_flicker);
 
 			auto green_light_node = engine.Scene().RootNode().CreateChildNode({1.5_r, 0.75_r, -1.0_r});
 			green_light_node->AttachObject(*green_light);
-			green_light_node->AttachObject(*green_lamp_flicker);
+
+			auto green_lamp_node = green_light_node->CreateChildNode({0.0_r, 0.0_r, -0.8_r});
+			green_lamp_node->AttachObject(*green_lamp_flicker);
 
 			//Text
 			auto fps_node = engine.Scene().RootNode().CreateChildNode({-1.75_r, 0.98_r, -1.5_r});
