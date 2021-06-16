@@ -286,10 +286,10 @@ Vector3 Matrix4::ToTranslation() const noexcept
 {
 	#ifdef ION_ROW_MAJOR
 	//Row-major layout (Direct3D)
-	return {m_[2][0], m_[2][1], m_[2][2]};
+	return {m_[3][0], m_[3][1], m_[3][2]};
 	#else
 	//Column-major layout (OpenGL)
-	return {m_[0][2], m_[1][2], m_[2][2]};
+	return {m_[0][3], m_[1][3], m_[2][3]};
 	#endif
 }
 
