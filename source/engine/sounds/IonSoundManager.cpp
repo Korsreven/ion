@@ -232,12 +232,12 @@ void set_paused(FMOD::ChannelControl &control, bool paused) noexcept
 
 void set_pitch(FMOD::ChannelControl &control, real pitch) noexcept
 {
-	control.setPitch(pitch);
+	control.setPitch(static_cast<float>(pitch));
 }
 
 void set_volume(FMOD::ChannelControl &control, real volume) noexcept
 {
-	control.setVolume(volume);
+	control.setVolume(static_cast<float>(volume));
 }
 
 
@@ -250,16 +250,16 @@ bool get_mute(FMOD::ChannelControl &control) noexcept
 
 real get_pitch(FMOD::ChannelControl &control) noexcept
 {
-	auto pitch = 1.0_r;
+	auto pitch = 1.0f;
 	control.getPitch(&pitch);
-	return pitch;
+	return static_cast<real>(pitch);
 }
 
 real get_volume(FMOD::ChannelControl &control) noexcept
 {
-	auto volume = 0.0_r;
+	auto volume = 0.0f;
 	control.getVolume(&volume);
-	return volume;
+	return static_cast<real>(volume);
 }
 
 bool is_playing(FMOD::ChannelControl &control) noexcept
@@ -282,7 +282,9 @@ void set_position(FMOD::Channel &channel, int position) noexcept
 
 void set_settings(FMOD::System &system, real doppler_scale, real distance_factor, real rolloff_scale) noexcept
 {
-	system.set3DSettings(doppler_scale, distance_factor, rolloff_scale);
+	system.set3DSettings(static_cast<float>(doppler_scale),
+						 static_cast<float>(distance_factor),
+						 static_cast<float>(rolloff_scale));
 }
 
 
@@ -292,10 +294,10 @@ void set_listener_attributes(FMOD::System &system,
 	auto [x, y, z] = position.XYZ();
 	auto [vx, vy, vz] = velocity.XYZ();
 
-	FMOD_VECTOR pos{x, z, y};
-	FMOD_VECTOR vel{vx, vz, vy};
-	FMOD_VECTOR forward{0.0_r, 0.0_r, 1.0_r};
-	FMOD_VECTOR up{0.0_r, 1.0_r, 0.0_r};
+	FMOD_VECTOR pos{static_cast<float>(x), static_cast<float>(z), static_cast<float>(y)};
+	FMOD_VECTOR vel{static_cast<float>(vx), static_cast<float>(vz), static_cast<float>(vy)};
+	FMOD_VECTOR forward{0.0f, 0.0f, 1.0f};
+	FMOD_VECTOR up{0.0f, 1.0f, 0.0f};
 	system.set3DListenerAttributes(0, &pos, &vel, &forward, &up);
 }
 
@@ -317,19 +319,19 @@ void set_attributes(FMOD::Channel &channel,
 	auto [x, y, z] = position.XYZ();
 	auto [vx, vy, vz] = velocity.XYZ();
 
-	FMOD_VECTOR pos{x, z, y};
-	FMOD_VECTOR vel{vx, vz, vy};
+	FMOD_VECTOR pos{static_cast<float>(x), static_cast<float>(z), static_cast<float>(y)};
+	FMOD_VECTOR vel{static_cast<float>(vx), static_cast<float>(vz), static_cast<float>(vy)};
 	channel.set3DAttributes(&pos, &vel);
 }
 
 void set_min_max_distance(FMOD::Sound &sound, real min_distance, real max_distance) noexcept
 {
-	sound.set3DMinMaxDistance(min_distance, max_distance);
+	sound.set3DMinMaxDistance(static_cast<float>(min_distance), static_cast<float>(max_distance));
 }
 
 void set_min_max_distance(FMOD::Channel &channel, real min_distance, real max_distance) noexcept
 {
-	channel.set3DMinMaxDistance(min_distance, max_distance);
+	channel.set3DMinMaxDistance(static_cast<float>(min_distance), static_cast<float>(max_distance));
 }
 
 

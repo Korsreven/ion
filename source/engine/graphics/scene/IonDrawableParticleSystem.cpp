@@ -31,7 +31,7 @@ namespace drawable_particle_system::detail
 
 void set_point_size(real size) noexcept
 {
-	glPointSize(size); //Set fixed point size
+	glPointSize(static_cast<float>(size)); //Set fixed point size
 }
 
 

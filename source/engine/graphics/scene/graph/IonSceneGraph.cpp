@@ -40,7 +40,7 @@ void set_camera_uniforms(const Camera &camera, shaders::ShaderProgram &shader_pr
 		position->Get<glsl::vec3>() = camera.Position() + camera.ParentNode()->DerivedPosition();
 
 	if (auto rotation = shader_program.GetUniform(shaders::shader_layout::UniformName::Camera_Rotation); rotation)
-		rotation->Get<float>() = camera.Rotation() + camera.ParentNode()->DerivedRotation(); //Using 'real' could make this uniform double
+		rotation->Get<float>() = static_cast<float>(camera.Rotation() + camera.ParentNode()->DerivedRotation()); //Using 'real' could make this uniform double
 }
 
 void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &shader_program) noexcept
@@ -58,13 +58,13 @@ void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &sh
 		mode->Get<int>() = static_cast<int>(fog->Mode());
 
 	if (auto density = shader_program.GetUniform(shaders::shader_layout::UniformName::Fog_Density); density)
-		density->Get<float>() = fog->Density(); //Using 'real' could make this uniform double
+		density->Get<float>() = static_cast<float>(fog->Density()); //Using 'real' could make this uniform double
 
 	if (auto near_distance = shader_program.GetUniform(shaders::shader_layout::UniformName::Fog_Near); near_distance)
-		near_distance->Get<float>() = fog->NearDistance(); //Using 'real' could make this uniform double
+		near_distance->Get<float>() = static_cast<float>(fog->NearDistance()); //Using 'real' could make this uniform double
 
 	if (auto far_distance = shader_program.GetUniform(shaders::shader_layout::UniformName::Fog_Far); far_distance)
-		far_distance->Get<float>() = fog->FarDistance(); //Using 'real' could make this uniform double
+		far_distance->Get<float>() = static_cast<float>(fog->FarDistance()); //Using 'real' could make this uniform double
 
 	if (auto color = shader_program.GetUniform(shaders::shader_layout::UniformName::Fog_Color); color)
 		color->Get<glsl::vec4>() = fog->Tint();
@@ -122,22 +122,22 @@ void set_light_uniforms(const light_container &lights, int light_count, const Ca
 		auto [constant_attenuation, linear_attenuation, quadratic_attenuation] = lights[i]->Attenuation();
 
 		if (constant)
-			(*constant)[i].Get<float>() = constant_attenuation;
+			(*constant)[i].Get<float>() = static_cast<float>(constant_attenuation); //Using 'real' could make this uniform double
 
 		if (linear)
-			(*linear)[i].Get<float>() = linear_attenuation;
+			(*linear)[i].Get<float>() = static_cast<float>(linear_attenuation); //Using 'real' could make this uniform double
 
 		if (quadratic)
-			(*quadratic)[i].Get<float>() = quadratic_attenuation;
+			(*quadratic)[i].Get<float>() = static_cast<float>(quadratic_attenuation); //Using 'real' could make this uniform double
 
 
 		auto [cutoff_angle, outer_cutoff_angle] = lights[i]->Cutoff();
 
 		if (cutoff)
-			(*cutoff)[i].Get<float>() = math::Cos(cutoff_angle);
+			(*cutoff)[i].Get<float>() = static_cast<float>(math::Cos(cutoff_angle)); //Using 'real' could make this uniform double
 
 		if (outer_cutoff)
-			(*outer_cutoff)[i].Get<float>() = math::Cos(outer_cutoff_angle);
+			(*outer_cutoff)[i].Get<float>() = static_cast<float>(math::Cos(outer_cutoff_angle)); //Using 'real' could make this uniform double
 	}
 }
 
@@ -183,7 +183,7 @@ void set_node_uniforms(const SceneNode &node, shaders::ShaderProgram &shader_pro
 		direction->Get<glsl::vec2>() = node.DerivedDirection();
 
 	if (auto rotation = shader_program.GetUniform(shaders::shader_layout::UniformName::Node_Rotation); rotation)
-		rotation->Get<float>() = node.DerivedRotation(); //Using 'real' could make this uniform double
+		rotation->Get<float>() = static_cast<float>(node.DerivedRotation()); //Using 'real' could make this uniform double
 
 	if (auto scaling = shader_program.GetUniform(shaders::shader_layout::UniformName::Node_Scaling); scaling)
 		scaling->Get<glsl::vec2>() = node.DerivedScaling();
@@ -194,7 +194,7 @@ void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, 
 	using namespace shaders::variables;
 
 	if (auto gamma = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_Gamma); gamma)
-		gamma->Get<float>() = gamma_value; //Using 'real' could make this uniform double
+		gamma->Get<float>() = static_cast<float>(gamma_value); //Using 'real' could make this uniform double
 
 	if (auto ambient = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_Ambient); ambient)
 		ambient->Get<glsl::vec4>() = ambient_color;

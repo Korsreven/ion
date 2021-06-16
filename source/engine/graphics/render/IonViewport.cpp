@@ -131,7 +131,7 @@ void render_to_viewport(const Vector2 &position, const Vector2 &size, const Colo
 
 	auto [r, g, b, a] = background_color.RGBA();
 	glClearDepth(1.0);
-	glClearColor(r, g, b, a);
+	glClearColor(static_cast<float>(r), static_cast<float>(g), static_cast<float>(b), static_cast<float>(a));
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glDisable(GL_SCISSOR_TEST);

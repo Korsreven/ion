@@ -324,7 +324,7 @@ void set_material_uniforms(materials::Material *material, duration time, shaders
 		emissive->Get<glsl::vec4>() = material->EmissiveColor();
 
 	if (auto shininess = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_Shininess); shininess)
-		shininess->Get<float>() = material->Shininess(); //Using 'real' could make this uniform double
+		shininess->Get<float>() = static_cast<float>(material->Shininess()); //Using 'real' could make this uniform double
 
 
 	auto diffuse_map_activated = false;

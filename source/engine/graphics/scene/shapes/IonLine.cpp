@@ -69,7 +69,7 @@ Line::Line(const Vector3 &a, const Vector3 &b, const Color &color, real thicknes
 
 void Line::Draw(shaders::ShaderProgram *shader_program) noexcept
 {
-	glLineWidth(thickness_);
+	glLineWidth(static_cast<float>(thickness_));
 	Mesh::Draw(shader_program);
 	glLineWidth(1.0f);
 }

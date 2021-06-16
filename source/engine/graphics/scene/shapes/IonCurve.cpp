@@ -136,7 +136,7 @@ Curve::Curve(ControlPoints control_points, const Color &color, real thickness, i
 
 void Curve::Draw(shaders::ShaderProgram *shader_program) noexcept
 {
-	glLineWidth(thickness_);
+	glLineWidth(static_cast<float>(thickness_));
 	Mesh::Draw(shader_program);
 	glLineWidth(1.0f);
 }

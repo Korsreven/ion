@@ -37,17 +37,17 @@ void move_to(const Vector3 &position) noexcept
 	auto [x, y, z] = position.XYZ();
 
 	if constexpr (std::is_same_v<real, float>)
-		glTranslatef(-x, -y, -z);
+		glTranslatef(static_cast<float>(-x), static_cast<float>(-y), static_cast<float>(-z));
 	else
-		glTranslated(-x, -y, -z);
+		glTranslated(static_cast<double>(-x), static_cast<double>(-y), static_cast<double>(-z));
 }
 
 void rotate_by(real angle) noexcept
 {
 	if constexpr (std::is_same_v<real, float>)
-		glRotatef(-math::ToDegrees(angle), 0.0_r, 0.0_r, 1.0_r); //Rotate around the z-axis
+		glRotatef(static_cast<float>(-math::ToDegrees(angle)), 0.0f, 0.0f, 1.0f); //Rotate around the z-axis
 	else
-		glRotated(-math::ToDegrees(angle), 0.0_r, 0.0_r, 1.0_r); //Rotate around the z-axis
+		glRotated(static_cast<double>(-math::ToDegrees(angle)), 0.0, 0.0, 1.0); //Rotate around the z-axis
 }
 
 
