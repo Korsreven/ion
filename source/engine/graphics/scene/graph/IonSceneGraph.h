@@ -23,21 +23,32 @@ File:	IonSceneGraph.h
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector3.h"
+#include "managed/IonManagedObject.h"
 #include "types/IonTypes.h"
 
-namespace ion::graphics::render
+//Forward declarations
+namespace ion
 {
-	class Viewport; //Forward declaration
-}
+	class Engine;
 
-namespace ion::graphics::scene
-{
-	class Light; //Forward declaration
-}
+	namespace graphics
+	{
+		namespace render
+		{
+			class Viewport;
+		}
 
-namespace ion::graphics::shaders
-{
-	class ShaderProgram; //Forward declaration
+		namespace scene
+		{
+			class Camera;
+			class Light;
+		}
+
+		namespace shaders
+		{
+			class ShaderProgram;
+		}
+	}
 }
 
 namespace ion::graphics::scene::graph
@@ -75,6 +86,7 @@ namespace ion::graphics::scene::graph
 
 
 	class SceneGraph final :
+		public managed::ManagedObject<Engine>,
 		protected events::Listenable<events::listeners::SceneNodeListener>
 	{
 		private:
@@ -107,8 +119,7 @@ namespace ion::graphics::scene::graph
 
 		public:
 
-			//Default constructor
-			SceneGraph() = default;
+			using managed::ManagedObject<Engine>::ManagedObject;
 
 
 			/*

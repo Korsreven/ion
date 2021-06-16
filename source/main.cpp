@@ -205,9 +205,9 @@ struct Game :
 	ion::events::listeners::KeyListener,
 	ion::events::listeners::MouseListener
 {
-	ion::graphics::scene::graph::SceneGraph *scene = nullptr;
-	ion::sounds::SoundManager *sound_manager = nullptr;
+	ion::NonOwningPtr<ion::graphics::scene::graph::SceneGraph> scene_graph;
 	ion::NonOwningPtr<ion::graphics::render::Viewport> viewport;
+	ion::sounds::SoundManager *sound_manager = nullptr;
 
 	ion::NonOwningPtr<ion::graphics::scene::DrawableText> fps;
 	ion::types::Cumulative<duration> fps_update_rate{1.0_sec};
@@ -431,8 +431,8 @@ struct Game :
 
 			case ion::events::listeners::KeyButton::F:
 			{
-				if (scene)
-					scene->FogEnabled(!scene->FogEnabled());
+				if (scene_graph)
+					scene_graph->FogEnabled(!scene_graph->FogEnabled());
 				break;
 			}
 
@@ -1062,12 +1062,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			using namespace ion::utilities;
-			ion::graphics::scene::SceneManager scene_manager;
+			ion::graphics::scene::SceneManager scene;
 
 
 			//Viewport
 			auto viewport = engine.Target()->GetViewport("");
-			scene_manager.ConnectedViewport(viewport); //Temp, should not be necessary
+			scene.ConnectedViewport(viewport); //Temp, should not be necessary
 
 			//Frustum
 			auto frustum = ion::graphics::render::Frustum::Orthographic(
@@ -1077,13 +1077,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			frustum.BaseViewportHeight(viewport->Bounds().ToSize().Y()); //Can this be automated
 
 			//Camera
-			auto camera = scene_manager.CreateCamera("", frustum);
+			auto camera = scene.CreateCamera("", frustum);
 			viewport->ConnectedCamera(camera);
 
-			auto player_camera = scene_manager.CreateCamera("player", frustum);
+			auto player_camera = scene.CreateCamera("player", frustum);
 
 			//Lights
-			auto head_light = scene_manager.CreateLight();
+			auto head_light = scene.CreateLight();
 			head_light->Type(ion::graphics::scene::light::LightType::Spotlight);
 			head_light->Direction(Vector3{0.0_r, 0.6_r, -0.4_r});
 			head_light->AmbientColor(color::Transparent);
@@ -1092,7 +1092,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			head_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
 			head_light->Cutoff(math::ToRadians(20.0_r), math::ToRadians(30.0_r));
 
-			auto red_light = scene_manager.CreateLight();
+			auto red_light = scene.CreateLight();
 			red_light->Type(ion::graphics::scene::light::LightType::Point);
 			red_light->Direction({0.0_r, 0.0_r, -1.0_r});
 			red_light->AmbientColor(color::Transparent);
@@ -1101,7 +1101,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			red_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
 			red_light->Cutoff(math::ToRadians(45.0_r), math::ToRadians(55.0_r));
 
-			auto green_light = scene_manager.CreateLight();
+			auto green_light = scene.CreateLight();
 			green_light->Type(ion::graphics::scene::light::LightType::Point);
 			green_light->Direction({0.0_r, 0.0_r, -1.0_r});
 			green_light->AmbientColor(color::Transparent);
@@ -1112,38 +1112,38 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//Text
-			auto text = scene_manager.CreateText(fps);
+			auto text = scene.CreateText(fps);
 			text->AddPass(ion::graphics::render::Pass{gui_text_program});
 
 			//Particle system
-			auto particle_system = scene_manager.CreateParticleSystem(rain);
+			auto particle_system = scene.CreateParticleSystem(rain);
 			particle_system->AddPass(ion::graphics::render::Pass{particle_program});
 			particle_system->Get()->StartAll();
 
 			//Sound
-			auto player_sound_listener = scene_manager.CreateSoundListener(sound_listener);
-			auto red_lamp_flicker = scene_manager.CreateSound(flicker);
-			auto green_lamp_flicker = scene_manager.CreateSound(flicker);
+			auto player_sound_listener = scene.CreateSoundListener(sound_listener);
+			auto red_lamp_flicker = scene.CreateSound(flicker);
+			auto green_lamp_flicker = scene.CreateSound(flicker);
 
 
 			//Model
-			auto model = scene_manager.CreateModel();
+			auto model = scene.CreateModel();
 			model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.3671875_r, 0.5_r}, ship});
 			model->AddPass(ion::graphics::render::Pass{model_program});
 
-			auto model_star = scene_manager.CreateModel();
+			auto model_star = scene.CreateModel();
 			model_star->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.05_r, 0.05_r}, star});
 			model_star->AddPass(ion::graphics::render::Pass{model_program});
 
-			auto model_aura = scene_manager.CreateModel();
+			auto model_aura = scene.CreateModel();
 			auto sprite = model_aura->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.432_r, 0.45_r}, aura});
 			sprite->FillColor(Color{255, 255, 255, 0.75_r});
 			model_aura->AddPass(ion::graphics::render::Pass{model_program});
 
-			auto background = scene_manager.CreateModel();
+			auto background = scene.CreateModel();
 			background->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Center
 			background->CreateMesh(ion::graphics::scene::shapes::Sprite{
@@ -1152,7 +1152,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Right
 			background->AddPass(ion::graphics::render::Pass{model_program});
 
-			auto clouds = scene_manager.CreateModel();
+			auto clouds = scene.CreateModel();
 			clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{-1.0_r, 0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Left
 			clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
@@ -1160,41 +1160,43 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			clouds->AddPass(ion::graphics::render::Pass{model_program});
 			
 
-			//Scene
-			engine.Scene().Gamma(1.0_r);
-			engine.Scene().AmbientColor(Color::RGB(50, 50, 50));
-			engine.Scene().FogEffect(ion::graphics::render::Fog::Linear(0.0_r, 2.25_r));
-			engine.Scene().FogEnabled(false);
-			//engine.Scene().LightingEnabled(false);
+			//Scene graph
+			auto scene_graph = engine.CreateSceneGraph("");
+
+			scene_graph->Gamma(1.0_r);
+			scene_graph->AmbientColor(Color::RGB(50, 50, 50));
+			scene_graph->FogEffect(ion::graphics::render::Fog::Linear(0.0_r, 2.25_r));
+			scene_graph->FogEnabled(false);
+			//scene_graph->LightingEnabled(false);
 
 			//Camera
-			auto cam_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});
+			auto cam_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});
 			cam_node->AttachObject(*camera);
 
 			//Lights
-			auto red_light_node = engine.Scene().RootNode().CreateChildNode({-1.5_r, -0.75_r, -1.0_r});
+			auto red_light_node = scene_graph->RootNode().CreateChildNode({-1.5_r, -0.75_r, -1.0_r});
 			red_light_node->AttachObject(*red_light);
 
 			auto red_lamp_node = red_light_node->CreateChildNode({0.0_r, 0.0_r, -0.8_r});
 			red_lamp_node->AttachObject(*red_lamp_flicker);
 
-			auto green_light_node = engine.Scene().RootNode().CreateChildNode({1.5_r, 0.75_r, -1.0_r});
+			auto green_light_node = scene_graph->RootNode().CreateChildNode({1.5_r, 0.75_r, -1.0_r});
 			green_light_node->AttachObject(*green_light);
 
 			auto green_lamp_node = green_light_node->CreateChildNode({0.0_r, 0.0_r, -0.8_r});
 			green_lamp_node->AttachObject(*green_lamp_flicker);
 
 			//Text
-			auto fps_node = engine.Scene().RootNode().CreateChildNode({-1.75_r, 0.98_r, -1.5_r});
+			auto fps_node = scene_graph->RootNode().CreateChildNode({-1.75_r, 0.98_r, -1.5_r});
 			fps_node->Scale({-0.5_r, -0.5_r});
 			fps_node->AttachObject(*text);
 
 			//Particles
-			auto particle_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 1.0_r, -1.75_r}, vector2::NegativeUnitY);
+			auto particle_node = scene_graph->RootNode().CreateChildNode({0.0_r, 1.0_r, -1.75_r}, vector2::NegativeUnitY);
 			particle_node->AttachObject(*particle_system);
 
 			//Models
-			auto model_node = engine.Scene().RootNode().CreateChildNode({0.0_r, -0.115_r, -1.8_r});
+			auto model_node = scene_graph->RootNode().CreateChildNode({0.0_r, -0.115_r, -1.8_r});
 			model_node->AttachObject(*model);
 			model_node->AttachObject(*player_sound_listener);
 
@@ -1205,10 +1207,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			aura_node->InheritRotation(false);
 			aura_node->AttachObject(*model_aura);
 
-			auto background_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, -2.25_r});
+			auto background_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, -2.25_r});
 			background_node->AttachObject(*background);
 
-			auto cloud_node = engine.Scene().RootNode().CreateChildNode({0.0_r, 0.0_r, -1.6_r});
+			auto cloud_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, -1.6_r});
 			cloud_node->AttachObject(*clouds);
 
 			//Head light
@@ -1221,9 +1223,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//Game
-			game.scene = &engine.Scene();
-			game.sound_manager = &sounds;
+			game.scene_graph = scene_graph;	
 			game.viewport = viewport;
+			game.sound_manager = &sounds;
 			game.fps = text;
 			game.model = model;
 			game.head_light = head_light;
@@ -1233,7 +1235,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//Engine
-			engine.Subscribe(game);
+			engine.FrameEvents().Subscribe(game);
 			window.Events().Subscribe(game);
 
 			if (auto input = engine.Input(); input)

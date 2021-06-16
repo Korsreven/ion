@@ -18,18 +18,16 @@ File:	IonEngine.h
 #include "events/IonInputController.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonFrameListener.h"
-#include "graphics/render/IonFrustum.h"
 #include "graphics/render/IonRenderWindow.h"
 #include "graphics/scene/graph/IonSceneGraph.h"
-#include "graphics/utilities/IonAabb.h"
+#include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 #include "timers/IonStopwatch.h"
 #include "timers/IonTimerManager.h"
 #include "types/IonTypes.h"
 
 namespace ion
 {
-	using namespace types::type_literals;
-
 	namespace engine
 	{
 		namespace detail
@@ -44,9 +42,13 @@ namespace ion
 
 
 	class Engine final :
-		public events::Listenable<events::listeners::FrameListener>
+		protected events::Listenable<events::listeners::FrameListener>,
+		public managed::ObjectManager<graphics::scene::graph::SceneGraph, Engine>
 	{
 		private:
+
+			using FrameEventsBase = events::Listenable<events::listeners::FrameListener>;
+
 
 			bool initialized_ = false;
 			bool syncronize_ = false;		
@@ -55,7 +57,6 @@ namespace ion
 
 			std::optional<graphics::render::RenderWindow> render_window_;
 			std::optional<events::InputController> input_controller_;
-			graphics::scene::graph::SceneGraph scene_graph_;
 			timers::TimerManager timer_manager_;
 
 
@@ -89,6 +90,42 @@ namespace ion
 
 			//Default move assignment
 			Engine& operator=(Engine&&) = default;
+
+
+			/*
+				Ranges
+			*/
+
+			//Returns a mutable range of all scene graphs in the engine
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SceneGraphs() noexcept
+			{
+				return Objects();
+			}
+
+			//Returns an immutable range of all scene graphs in the engine
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SceneGraphs() const noexcept
+			{
+				return Objects();
+			}
+
+
+			/*
+				Events
+			*/
+
+			//Return a mutable reference to the frame listener
+			[[nodiscard]] inline auto& FrameEvents() noexcept
+			{
+				return static_cast<FrameEventsBase&>(*this);
+			}
+
+			//Return a immutable reference to the frame listener
+			[[nodiscard]] inline auto& FrameEvents() const noexcept
+			{
+				return static_cast<const FrameEventsBase&>(*this);
+			}
 
 
 			/*
@@ -137,26 +174,13 @@ namespace ion
 			}
 
 
-			//Returns a mutable reference to a scene graph
-			[[nodiscard]] inline auto& Scene() noexcept
-			{
-				return scene_graph_;
-			}
-
-			//Returns an immutable reference to a scene graph
-			[[nodiscard]] inline auto& Scene() const noexcept
-			{
-				return scene_graph_;
-			}
-
-
-			//Returns a mutable reference to a timer manager
+			//Returns a mutable reference to a timer manager containing syncronized timers
 			[[nodiscard]] inline auto& SyncedTimers() noexcept
 			{
 				return timer_manager_;
 			}
 
-			//Returns an immutable reference to a timer manager
+			//Returns an immutable reference to a timer manager containing syncronized timers
 			[[nodiscard]] inline auto& SyncedTimers() const noexcept
 			{
 				return timer_manager_;
@@ -199,6 +223,44 @@ namespace ion
 
 			//Render to the given render window, and create a default viewport
 			graphics::render::RenderWindow& RenderTo(graphics::render::RenderWindow &&render_window) noexcept;
+
+
+			/*
+				Scene graphs
+				Creating
+			*/
+
+			//Create a scene graph with the given name
+			NonOwningPtr<graphics::scene::graph::SceneGraph> CreateSceneGraph(std::string name);
+
+
+			/*
+				Scene graphs
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable scene graph with the given name
+			//Returns nullptr if scene graph could not be found
+			[[nodiscard]] NonOwningPtr<graphics::scene::graph::SceneGraph> GetSceneGraph(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable scene graph with the given name
+			//Returns nullptr if scene graph could not be found
+			[[nodiscard]] NonOwningPtr<const graphics::scene::graph::SceneGraph> GetSceneGraph(std::string_view name) const noexcept;
+
+
+			/*
+				Scene graphs
+				Removing
+			*/
+
+			//Clear all removable scene graphs from the engine
+			void ClearSceneGraphs() noexcept;
+
+			//Remove a removable scene graph from the engine
+			bool RemoveSceneGraph(graphics::scene::graph::SceneGraph &scene_graph) noexcept;
+
+			//Remove a removable scene graph with the given name from the engine
+			bool RemoveSceneGraph(std::string_view name) noexcept;
 	};
 } //ion
 #endif

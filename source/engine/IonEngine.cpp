@@ -13,7 +13,6 @@ File:	IonEngine.cpp
 #include "IonEngine.h"
 
 #include "graphics/IonGraphicsAPI.h"
-#include "graphics/utilities/IonColor.h"
 #include "system/IonSystemUtility.h"
 #include "utilities/IonFileUtility.h"
 
@@ -21,6 +20,7 @@ namespace ion
 {
 
 using namespace engine;
+using namespace types::type_literals;
 
 namespace engine::detail
 {
@@ -92,9 +92,9 @@ bool get_swap_interval() noexcept
 
 bool Engine::NotifyFrameStarted(duration time) noexcept
 {
-	for (auto &listener : Listeners())
+	for (auto &listener : FrameEventsBase::Listeners())
 	{
-		if (!Notify(&events::listeners::FrameListener::FrameStarted, listener, time).value_or(true))
+		if (!FrameEventsBase::Notify(&events::listeners::FrameListener::FrameStarted, listener, time).value_or(true))
 			return false;
 	}
 
@@ -103,9 +103,9 @@ bool Engine::NotifyFrameStarted(duration time) noexcept
 
 bool Engine::NotifyFrameEnded(duration time) noexcept
 {
-	for (auto &listener : Listeners())
+	for (auto &listener : FrameEventsBase::Listeners())
 	{
-		if (!Notify(&events::listeners::FrameListener::FrameEnded, listener, time).value_or(true))
+		if (!FrameEventsBase::Notify(&events::listeners::FrameListener::FrameEnded, listener, time).value_or(true))
 			return false;
 	}
 
@@ -127,8 +127,8 @@ bool Engine::UpdateFrame() noexcept
 	{
 		viewport.RenderTo();
 
-		//for (auto &scene_graph : scene_graphs_)
-			scene_graph_.Render(viewport, time); //TODO
+		for (auto &scene_graph : SceneGraphs())
+			scene_graph.Render(viewport, time);
 	}
 
 	if (syncronize_)
@@ -269,6 +269,54 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 	input_controller_->ConnectedViewport(viewport);
 
 	return *render_window_;
+}
+
+
+/*
+	Scene graphs
+	Creating
+*/
+
+NonOwningPtr<graphics::scene::graph::SceneGraph> Engine::CreateSceneGraph(std::string name)
+{
+	return Create(std::move(name));
+}
+
+
+/*
+	Scene graphs
+	Retrieving
+*/
+
+NonOwningPtr<graphics::scene::graph::SceneGraph> Engine::GetSceneGraph(std::string_view name) noexcept
+{
+	return Get(name);
+}
+
+NonOwningPtr<const graphics::scene::graph::SceneGraph> Engine::GetSceneGraph(std::string_view name) const noexcept
+{
+	return Get(name);
+}
+
+
+/*
+	Scene graphs
+	Removing
+*/
+
+void Engine::ClearSceneGraphs() noexcept
+{
+	Clear();
+}
+
+bool Engine::RemoveSceneGraph(graphics::scene::graph::SceneGraph &scene_graph) noexcept
+{
+	return Remove(scene_graph);
+}
+
+bool Engine::RemoveSceneGraph(std::string_view name) noexcept
+{
+	return Remove(name);
 }
 
 } //ion
