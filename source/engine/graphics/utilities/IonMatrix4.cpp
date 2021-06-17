@@ -72,7 +72,7 @@ Matrix4::Matrix4(const Matrix3 &matrix) noexcept :
 	//Row-major layout (Direct3D)
 	Matrix4{matrix.M00(), matrix.M01(), 0.0_r,
 			matrix.M10(), matrix.M11(), 0.0_r,
-			0.0_r, 0.0_r, 1.0_r
+			0.0_r, 0.0_r, 1.0_r,
 			matrix.M20(), matrix.M21(), 0.0_r}
 	#else
 	//Column-major layout (OpenGL)
