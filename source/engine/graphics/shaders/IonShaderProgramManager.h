@@ -93,7 +93,7 @@ namespace ion::graphics::shaders
 						else if constexpr (std::is_same_v<glsl::attribute<T>::basic_type, uint32>)
 							set_vertex_ipointer(location_, value.Components(), value.Normalized(), value.Stride(), value.Pointer(), uint32{});
 						else if constexpr (std::is_same_v<glsl::attribute<T>::basic_type, float32>)
-							set_vertex_pointer(location_, value.Components(), value.Normalized(), value.Stride(), value.Pointer(), float32{});
+							set_vertex_pointer(location_, value.Components(), value.Normalized(), value.Stride(), value.Pointer(), real{});
 						else if constexpr (std::is_same_v<glsl::attribute<T>::basic_type, float64>)
 							set_vertex_lpointer(location_, value.Components(), value.Normalized(), value.Stride(), value.Pointer());
 					}
@@ -126,14 +126,14 @@ namespace ion::graphics::shaders
 						}
 						else if constexpr (std::is_same_v<T, float32>)
 						{
-							set_vertex_pointer(location_, M, value.Normalized(), value.Stride(), value.Pointer(), float32{});
+							set_vertex_pointer(location_, M, value.Normalized(), value.Stride(), value.Pointer(), real{});
 
 							if constexpr (N >= 1)
-								set_vertex_pointer(location_ + 1, M, value.Normalized(), value.Stride(), value.Pointer(), float32{});
+								set_vertex_pointer(location_ + 1, M, value.Normalized(), value.Stride(), value.Pointer(), real{});
 							if constexpr (N >= 2)
-								set_vertex_pointer(location_ + 2, M, value.Normalized(), value.Stride(), value.Pointer(), float32{});
+								set_vertex_pointer(location_ + 2, M, value.Normalized(), value.Stride(), value.Pointer(), real{});
 							if constexpr (N >= 3)
-								set_vertex_pointer(location_ + 3, M, value.Normalized(), value.Stride(), value.Pointer(), float32{});
+								set_vertex_pointer(location_ + 3, M, value.Normalized(), value.Stride(), value.Pointer(), real{});
 						}
 						else if constexpr (std::is_same_v<T, float64>)
 						{
