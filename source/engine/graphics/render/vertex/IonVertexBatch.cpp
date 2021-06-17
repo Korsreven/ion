@@ -572,15 +572,18 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 				detail::set_vertex_pointers(vertex_declaration_, vertex_data_.Pointer());
 		}
 
-		//Has material or texture
-		if (material_ || texture_.index() > 0)
+		//Has material
+		if (material_)
 		{
 			//Enable diffuse texture
 			if (auto diffuse_map = material_->DiffuseMap(time_); diffuse_map && diffuse_map->Handle())
 				detail::bind_texture(*diffuse_map->Handle());
-
+		}
+		//Has texture
+		else if (texture_.index() > 0)
+		{
 			//Enable texture
-			else if (auto texture_handle = detail::get_texture_handle(texture_, time_); texture_handle)
+			if (auto texture_handle = detail::get_texture_handle(texture_, time_); texture_handle)
 				detail::bind_texture(*texture_handle);
 		}
 	}
