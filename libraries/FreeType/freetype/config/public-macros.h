@@ -63,7 +63,7 @@ FT_BEGIN_HEADER
    */
 
   /* Visual C, mingw */
-#if defined( _WIN32 )
+#if defined( WIN32 )
 
 #if defined( FT2_BUILD_LIBRARY ) && defined( DLL_EXPORT )
 #define FT_PUBLIC_FUNCTION_ATTRIBUTE  __declspec( dllexport )

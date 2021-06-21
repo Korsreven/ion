@@ -1,5 +1,4 @@
 # Ion Engine
-***
 A fast, lightweight and fully functional 2D game engine, with an easy to use API for developers. One of the main targets is to be able to easily develop indy games for the Steam platform.
 
 ## Source Code
@@ -12,5 +11,5 @@ The project started in November 2017, where my main motivational factor was to m
 One of the things I enjoy the most when writing code, is to actually write most of the code myself. But there is no rule without exceptions... Ion Engine is using four different libraries.
 * FMOD v2.1.10 (https://www.fmod.com/)
 * FreeImage v3.18.0 (https://freeimage.sourceforge.io/)
-* FreeType v2.10.3 (https://www.freetype.org/)
+* FreeType v2.10.4 (https://www.freetype.org/)
 * GLEW v2.1.0 (http://glew.sourceforge.net/)
