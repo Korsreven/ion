@@ -56,15 +56,11 @@ Matrix2 Matrix2::Reflection(real angle) noexcept
 	#ifdef ION_ROW_MAJOR
 	//Row-major layout (Direct3D)
 	//Same for both left and right handed rotation
-	//cos, sin
-	//sin, -cos
 	return {cos_of_angle, sin_of_angle,
 			sin_of_angle, -cos_of_angle};
 	#else
 	//Column-major layout (OpenGL)
 	//Same for both left and right handed rotation
-	//cos, sin
-	//sin, -cos
 	return {cos_of_angle, sin_of_angle,
 			sin_of_angle, -cos_of_angle};
 	#endif
@@ -77,18 +73,26 @@ Matrix2 Matrix2::Rotation(real angle) noexcept
 	
 	#ifdef ION_ROW_MAJOR
 	//Row-major layout (Direct3D)
-	//Left-hand rotation CW
-	// cos, sin
-	//-sin, cos
-	return {cos_of_angle, sin_of_angle,
-			-sin_of_angle, cos_of_angle};
+		#ifdef ION_LEFT_HANDED
+		//Left-hand rotation CW
+		return {cos_of_angle, -sin_of_angle,
+				sin_of_angle, cos_of_angle};
+		#else
+		//Right-hand rotation CCW
+		return {cos_of_angle, sin_of_angle,
+				-sin_of_angle, cos_of_angle};
+		#endif
 	#else
 	//Column-major layout (OpenGL)
-	//Right-hand rotation CCW
-	//cos, -sin
-	//sin, cos
-	return {cos_of_angle, -sin_of_angle,
-			sin_of_angle, cos_of_angle};
+		#ifdef ION_LEFT_HANDED
+		//Left-hand rotation CW
+		return {cos_of_angle, sin_of_angle,
+				-sin_of_angle, cos_of_angle};
+		#else
+		//Right-hand rotation CCW
+		return {cos_of_angle, -sin_of_angle,
+				sin_of_angle, cos_of_angle};
+		#endif
 	#endif
 }
 
@@ -168,12 +172,22 @@ real Matrix2::ToRotation() const noexcept
 {
 	#ifdef ION_ROW_MAJOR
 	//Row-major layout (Direct3D)
-	//Left-hand rotation CW
-	return std::atan2(m_[0][1], m_[0][0]);
+		#ifdef ION_LEFT_HANDED
+		//Left-hand rotation CW
+		return std::atan2(-m_[0][1], m_[0][0]);
+		#else
+		//Right-hand rotation CCW
+		return std::atan2(m_[0][1], m_[0][0]);
+		#endif
 	#else
 	//Column-major layout (OpenGL)
-	//Right-hand rotation CCW
-	return std::atan2(m_[1][0], m_[0][0]);
+		#ifdef ION_LEFT_HANDED
+		//Left-hand rotation CW
+		return std::atan2(-m_[1][0], m_[0][0]);
+		#else
+		//Right-hand rotation CCW
+		return std::atan2(m_[1][0], m_[0][0]);
+		#endif
 	#endif
 }
 
@@ -337,12 +351,10 @@ Vector2 Matrix2::TransformPoint(const Vector2 &point) const noexcept
 
 	#ifdef ION_ROW_MAJOR
 	//Row-major layout (Direct3D)
-	//Left-hand rotation CW
 	return {m_[0][0] * x + m_[1][0] * y,
 			m_[0][1] * x + m_[1][1] * y};
 	#else
 	//Column-major layout (OpenGL)
-	//Right-hand rotation CCW
 	return {m_[0][0] * x + m_[0][1] * y,
 			m_[1][0] * x + m_[1][1] * y};
 	#endif

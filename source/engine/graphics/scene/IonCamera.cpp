@@ -44,10 +44,19 @@ void move_to(const Vector3 &position) noexcept
 
 void rotate_by(real angle) noexcept
 {
+	#ifdef ION_LEFT_HANDED
+	//Left-hand rotation CW
+	if constexpr (std::is_same_v<real, float>)
+		glRotatef(static_cast<float>(math::ToDegrees(angle)), 0.0f, 0.0f, 1.0f); //Rotate around the z-axis
+	else
+		glRotated(static_cast<double>(math::ToDegrees(angle)), 0.0, 0.0, 1.0); //Rotate around the z-axis
+	#else
+	//Right-hand rotation CCW
 	if constexpr (std::is_same_v<real, float>)
 		glRotatef(static_cast<float>(-math::ToDegrees(angle)), 0.0f, 0.0f, 1.0f); //Rotate around the z-axis
 	else
 		glRotated(static_cast<double>(-math::ToDegrees(angle)), 0.0, 0.0, 1.0); //Rotate around the z-axis
+	#endif
 }
 
 

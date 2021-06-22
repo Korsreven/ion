@@ -76,7 +76,13 @@ real Vector2::Angle() const noexcept
 
 real Vector2::SignedAngle() const noexcept
 {
+	#ifdef ION_LEFT_HANDED
+	//Left-hand rotation CW
+	return std::atan2(-y_, x_);
+	#else
+	//Right-hand rotation CCW
 	return std::atan2(y_, x_);
+	#endif
 }
 
 real Vector2::AngleBetween(const Vector2 &vector) const noexcept
@@ -86,7 +92,13 @@ real Vector2::AngleBetween(const Vector2 &vector) const noexcept
 
 real Vector2::SignedAngleBetween(const Vector2 &vector) const noexcept
 {
+	#ifdef ION_LEFT_HANDED
+	//Left-hand rotation CW
+	return std::atan2(-CrossProduct(vector), DotProduct(vector));
+	#else
+	//Right-hand rotation CCW
 	return std::atan2(CrossProduct(vector), DotProduct(vector));
+	#endif
 }
 
 real Vector2::AngleTo(const Vector2 &vector) const noexcept
@@ -121,8 +133,16 @@ Vector2 Vector2::Deviant(real angle) const noexcept
 {
 	auto sin_of_angle = math::Sin(angle);
 	auto cos_of_angle = math::Cos(angle);
+
+	#ifdef ION_LEFT_HANDED
+	//Left-hand rotation CW
+	return {cos_of_angle * x_ + sin_of_angle * y_,
+			-sin_of_angle * x_ + cos_of_angle * y_};
+	#else
+	//Right-hand rotation CCW
 	return {cos_of_angle * x_ - sin_of_angle * y_,
 			sin_of_angle * x_ + cos_of_angle * y_};
+	#endif
 }
 
 Vector2 Vector2::RandomDeviant(real angle) const noexcept

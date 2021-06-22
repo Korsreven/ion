@@ -97,8 +97,6 @@ Matrix4 Matrix4::Reflection(real angle) noexcept
 	#ifdef ION_ROW_MAJOR
 	//Row-major layout (Direct3D)
 	//Same for both left and right handed rotation
-	//cos, sin
-	//sin, -cos
 	return {cos_of_angle, sin_of_angle, 0.0_r,
 			sin_of_angle, -cos_of_angle, 0.0_r,
 			0.0_r, 0.0_r, 1.0_r,
@@ -106,8 +104,6 @@ Matrix4 Matrix4::Reflection(real angle) noexcept
 	#else
 	//Column-major layout (OpenGL)
 	//Same for both left and right handed rotation
-	//cos, sin
-	//sin, -cos
 	return {cos_of_angle, sin_of_angle, 0.0_r, 0.0_r,
 			sin_of_angle, -cos_of_angle, 0.0_r, 0.0_r,
 			0.0_r, 0.0_r, 1.0_r, 0.0_r};
@@ -121,21 +117,32 @@ Matrix4 Matrix4::Rotation(real angle) noexcept
 	
 	#ifdef ION_ROW_MAJOR
 	//Row-major layout (Direct3D)
-	//Left-hand rotation CW
-	// cos, sin
-	//-sin, cos
-	return {cos_of_angle, sin_of_angle, 0.0_r,
-			-sin_of_angle, cos_of_angle, 0.0_r,
-			0.0_r, 0.0_r, 1.0_r,
-			0.0_r, 0.0_r, 0.0_r};
+		#ifdef ION_LEFT_HANDED
+		//Left-hand rotation CW
+		return {cos_of_angle, -sin_of_angle, 0.0_r,
+				sin_of_angle, cos_of_angle, 0.0_r,
+				0.0_r, 0.0_r, 1.0_r,
+				0.0_r, 0.0_r, 0.0_r};
+		#else
+		//Right-hand rotation CCW
+		return {cos_of_angle, sin_of_angle, 0.0_r,
+				-sin_of_angle, cos_of_angle, 0.0_r,
+				0.0_r, 0.0_r, 1.0_r,
+				0.0_r, 0.0_r, 0.0_r};
+		#endif
 	#else
 	//Column-major layout (OpenGL)
-	//Right-hand rotation CCW
-	//cos, -sin
-	//sin, cos
-	return {cos_of_angle, -sin_of_angle, 0.0_r, 0.0_r,
-			sin_of_angle, cos_of_angle, 0.0_r, 0.0_r,
-			0.0_r, 0.0_r, 1.0_r, 0.0_r};
+		#ifdef ION_LEFT_HANDED
+		//Left-hand rotation CW
+		return {cos_of_angle, sin_of_angle, 0.0_r, 0.0_r,
+				-sin_of_angle, cos_of_angle, 0.0_r, 0.0_r,
+				0.0_r, 0.0_r, 1.0_r, 0.0_r};
+		#else
+		//Right-hand rotation CCW
+		return {cos_of_angle, -sin_of_angle, 0.0_r, 0.0_r,
+				sin_of_angle, cos_of_angle, 0.0_r, 0.0_r,
+				0.0_r, 0.0_r, 1.0_r, 0.0_r};
+		#endif
 	#endif
 }
 
@@ -256,12 +263,22 @@ real Matrix4::ToRotation() const noexcept
 {
 	#ifdef ION_ROW_MAJOR
 	//Row-major layout (Direct3D)
-	//Left-hand rotation CW
-	return std::atan2(m_[0][1], m_[0][0]);
+		#ifdef ION_LEFT_HANDED
+		//Left-hand rotation CW
+		return std::atan2(-m_[0][1], m_[0][0]);
+		#else
+		//Right-hand rotation CCW
+		return std::atan2(m_[0][1], m_[0][0]);
+		#endif
 	#else
 	//Column-major layout (OpenGL)
-	//Right-hand rotation CCW
-	return std::atan2(m_[1][0], m_[0][0]);
+		#ifdef ION_LEFT_HANDED
+		//Left-hand rotation CW
+		return std::atan2(-m_[1][0], m_[0][0]);
+		#else
+		//Right-hand rotation CCW
+		return std::atan2(m_[1][0], m_[0][0]);
+		#endif
 	#endif
 }
 
@@ -557,13 +574,11 @@ Vector3 Matrix4::TransformPoint(const Vector3 &point) const noexcept
 
 	#ifdef ION_ROW_MAJOR
 	//Row-major layout (Direct3D)
-	//Left-hand rotation CW
 	return {(m_[0][0] * x + m_[1][0] * y + m_[2][0] * z) + m_[3][0],
 			(m_[0][1] * x + m_[1][1] * y + m_[2][1] * z) + m_[3][1],
 			(m_[0][2] * x + m_[1][2] * y + m_[2][2] * z) + m_[3][2]};
 	#else
 	//Column-major layout (OpenGL)
-	//Right-hand rotation CCW
 	return {(m_[0][0] * x + m_[0][1] * y + m_[0][2] * z) + m_[0][3],
 			(m_[1][0] * x + m_[1][1] * y + m_[1][2] * z) + m_[1][3],
 			(m_[2][0] * x + m_[2][1] * y + m_[2][2] * z) + m_[2][3]};
