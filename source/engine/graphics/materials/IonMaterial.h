@@ -123,6 +123,8 @@ namespace ion::graphics::materials
 
 			Vector2 lower_left_tex_coord_ = vector2::Zero;
 			Vector2 upper_right_tex_coord_ = vector2::UnitScale;
+
+			bool lighting_enabled_ = true;
 			bool receive_shadows_ = true;
 
 		public:
@@ -246,6 +248,12 @@ namespace ion::graphics::materials
 				upper_right_tex_coord_ = upper_right;
 			}
 
+			//Sets if this material has lighting enabled or not
+			inline void LightingEnabled(bool enable) noexcept
+			{
+				lighting_enabled_ = enable;
+			}
+
 			//Sets if this material receives shadows or not
 			inline void ReceiveShadows(bool enabled) noexcept
 			{
@@ -327,6 +335,12 @@ namespace ion::graphics::materials
 			[[nodiscard]] inline auto TexCoords() const noexcept
 			{
 				return std::pair{lower_left_tex_coord_, upper_right_tex_coord_};
+			}
+
+			//Returns true if this material has lighting enabled
+			[[nodiscard]] inline auto LightingEnabled() const noexcept
+			{
+				return lighting_enabled_;
 			}
 
 			//Returns true if this material receives shadows

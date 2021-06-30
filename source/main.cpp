@@ -569,6 +569,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto ship_diffuse = textures.CreateTexture("ship", "ship.png");
 			auto aura_diffuse = textures.CreateTexture("aura", "aura.png");
 			auto raindrop_diffuse = textures.CreateTexture("raindrop", "raindrop.png");
+			auto color_spectrum_diffuse = textures.CreateTexture("color_spectrum", "color_spectrum.png");
 
 			auto cat_first_frame = textures.CreateTexture("cat01", "cat01.png");
 			textures.CreateTexture("cat02", "cat02.png");
@@ -669,6 +670,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				material_struct->CreateUniform<bool>("has_diffuse_map");
 				material_struct->CreateUniform<bool>("has_specular_map");
 				material_struct->CreateUniform<bool>("has_normal_map");
+				material_struct->CreateUniform<bool>("lighting_enabled");
 
 				//Fog
 				fog_struct->CreateUniform<int>("mode");
@@ -747,6 +749,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				material_struct->CreateUniform<bool>("has_diffuse_map");
 				material_struct->CreateUniform<bool>("has_specular_map");
 				material_struct->CreateUniform<bool>("has_normal_map");
+				material_struct->CreateUniform<bool>("lighting_enabled");
 
 				//Fog
 				fog_struct->CreateUniform<int>("mode");
@@ -984,7 +987,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					32.0_r, star_diffuse, nullptr, nullptr);
+					0.0_r, star_diffuse, nullptr, nullptr);
+			star->LightingEnabled(false);
 
 			auto ship =
 				materials.CreateMaterial("ship",
@@ -1009,6 +1013,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{0.6_r, 0.6_r, 0.6_r},
 					{0.0_r, 0.0_r, 0.0_r},
 					32.0_r, raindrop_diffuse, nullptr, nullptr);
+			
+			auto color_spectrum =
+				materials.CreateMaterial("color_spectrum",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, color_spectrum_diffuse, nullptr, nullptr);
+			color_spectrum->LightingEnabled(false);
 
 			auto cat =
 				materials.CreateMaterial("cat",
@@ -1158,7 +1171,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{1.0_r, -0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Right
 			clouds->AddPass(ion::graphics::render::Pass{model_program});
-			
+
+			auto model_spectrum = scene.CreateModel();
+			model_spectrum->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {0.71_r, 0.71_r}, color_spectrum});
+			model_spectrum->AddPass(ion::graphics::render::Pass{model_program});	
 
 			//Scene graph
 			auto scene_graph = engine.CreateSceneGraph("");
@@ -1212,6 +1229,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto cloud_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, -1.6_r});
 			cloud_node->AttachObject(*clouds);
+
+			auto spectrum_node = scene_graph->RootNode().CreateChildNode({1.4_r, -0.6_r, -1.0_r});
+			spectrum_node->AttachObject(*model_spectrum);
 
 			//Head light
 			auto light_node = model_node->CreateChildNode({0.0_r, -0.15_r, -0.05_r}, vector2::UnitY, false);

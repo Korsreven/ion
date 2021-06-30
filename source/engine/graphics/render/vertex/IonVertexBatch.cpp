@@ -376,6 +376,10 @@ void set_material_uniforms(materials::Material *material, duration time, shaders
 
 	if (auto has_normal_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasNormalMap); has_normal_map)
 		has_normal_map->Get<bool>() = normal_map_activated;
+
+
+	if (auto lighting_enabled = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_LightingEnabled); lighting_enabled)
+		lighting_enabled->Get<bool>() = material->LightingEnabled();
 }
 
 void set_texture_uniforms(texture_type &some_texture, duration time, shaders::ShaderProgram &shader_program) noexcept
