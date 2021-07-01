@@ -100,6 +100,11 @@ MovableObject::~MovableObject() noexcept
 void MovableObject::Render() noexcept
 {
 	//Optional to override
+
+	if (show_bounding_volumes_)
+	{
+		//Todo
+	}
 }
 
 const ShaderPrograms& MovableObject::RenderPrograms([[maybe_unused]] bool derive) const

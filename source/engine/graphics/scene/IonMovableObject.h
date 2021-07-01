@@ -14,9 +14,12 @@ File:	IonMovableObject.h
 #define ION_MOVABLE_OBJECT_H
 
 #include <any>
+#include <optional>
+#include <tuple>
 #include <vector>
 
 #include "graphics/utilities/IonAabb.h"
+#include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonObb.h"
 #include "graphics/utilities/IonSphere.h"
 #include "managed/IonManagedObject.h"
@@ -40,9 +43,7 @@ namespace ion::graphics::scene
 		class SceneNode; //Forward declaration
 	}
 
-	using utilities::Aabb;
-	using utilities::Obb;
-	using utilities::Sphere;
+	using namespace utilities;
 
 
 	namespace movable_object
@@ -65,11 +66,16 @@ namespace ion::graphics::scene
 			Aabb aabb_;
 			Obb obb_;
 			Sphere sphere_;
-			
+
 			mutable bool need_bounding_update_ = false;
 			mutable movable_object::ShaderPrograms shader_programs_;
 
 		private:
+
+			bool show_bounding_volumes_ = false;
+			Color aabb_color_ = color::White;
+			Color obb_color_ = color::White;
+			Color sphere_color_ = color::White;
 
 			graph::SceneNode *parent_node_ = nullptr;
 			std::any user_data_;
@@ -130,6 +136,21 @@ namespace ion::graphics::scene
 				visible_ = visible;
 			}
 
+			//Sets whether or not to show this movable objects bounding volumes
+			inline void ShowBoundingVolumes(bool show) noexcept
+			{
+				show_bounding_volumes_ = show;
+			}
+
+			//Sets the colors of the bounding volumes to the given colors
+			//Use color::Transparent to hide certain bounding volumes from showing
+			inline void BoundingVolumeColors(const Color &aabb_color, const Color &obb_color, const Color &sphere_color) noexcept
+			{
+				aabb_color_ = aabb_color;
+				obb_color_ = obb_color;
+				sphere_color_ = sphere_color;
+			}
+
 
 			//Sets parent node of this movable object to the given node
 			inline void ParentNode(graph::SceneNode *scene_node) noexcept
@@ -152,6 +173,18 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto Visible() const noexcept
 			{
 				return visible_;
+			}
+
+			//Returns true if this movable objects bounding volumes are shown
+			[[nodiscard]] inline auto ShowBoundingVolumes() const noexcept
+			{
+				return show_bounding_volumes_;
+			}
+
+			//Returns the bounding volume colors for this movable object
+			[[nodiscard]] inline auto BoundingVolumeColors() const noexcept
+			{
+				return std::tuple{aabb_color_, obb_color_, sphere_color_};
 			}
 
 

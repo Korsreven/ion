@@ -86,6 +86,8 @@ void DrawableObject::Render() noexcept
 
 	//if (use_shader)
 	//	shader_program->Owner()->DeactivateShaderProgram(*shader_program);
+
+	MovableObject::Render(); //Render bounding volumes
 }
 
 const movable_object::ShaderPrograms& DrawableObject::RenderPrograms(bool derive) const
