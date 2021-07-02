@@ -17,6 +17,7 @@ File:	IonAabb.h
 #include <utility>
 #include <vector>
 
+#include "IonColor.h"
 #include "IonVector2.h"
 #include "types/IonTypes.h"
 
@@ -46,6 +47,13 @@ namespace ion::graphics::utilities
 
 
 		std::pair<Vector2, Vector2> minmax_point(const std::vector<Vector2> &points) noexcept;
+
+
+		/*
+			Graphics API
+		*/
+
+		void draw_bounds(const Vector2 &min, const Vector2 &max, const Color &color) noexcept;
 	} //aabb::detail
 
 
@@ -265,6 +273,14 @@ namespace ion::graphics::utilities
 			//Translate aabb by the given vector
 			//Returns the result as a copy
 			[[nodiscard]] Aabb TranslateCopy(const Vector2 &vector) const noexcept;
+
+
+			/*
+				Drawing
+			*/
+
+			//Draw the bounds of this aabb with the given color
+			void Draw(const Color &color) noexcept;
 	};
 
 

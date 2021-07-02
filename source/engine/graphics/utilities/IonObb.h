@@ -16,6 +16,7 @@ File:	IonObb.h
 #include <array>
 
 #include "IonAabb.h"
+#include "IonColor.h"
 #include "IonVector2.h"
 #include "types/IonTypes.h"
 
@@ -26,6 +27,11 @@ namespace ion::graphics::utilities
 
 	namespace obb::detail
 	{
+		/*
+			Graphics API
+		*/
+
+		void draw_bounds(const std::array<Vector2, 4> &corners, const Color &color) noexcept;
 	} //obb::detail
 
 
@@ -252,6 +258,14 @@ namespace ion::graphics::utilities
 			//Translate obb by the given vector
 			//Returns the result as a copy
 			[[nodiscard]] Obb TranslateCopy(const Vector2 &vector) const noexcept;
+
+
+			/*
+				Drawing
+			*/
+
+			//Draw the bounds of this obb with the given color
+			void Draw(const Color &color) noexcept;
 	};
 
 

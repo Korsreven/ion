@@ -13,13 +13,51 @@ File:	IonObb.cpp
 #include "IonObb.h"
 
 #include <limits>
+
 #include "IonMatrix3.h"
+#include "graphics/IonGraphicsAPI.h"
+
+#undef max
 
 namespace ion::graphics::utilities
 {
 
+using namespace obb;
+
 namespace obb::detail
 {
+
+/*
+	Graphics API
+*/
+
+void draw_bounds(const std::array<Vector2, 4> &corners, const Color &color) noexcept
+{
+	#if defined(ION_DOUBLE_PRECISION) || defined(ION_EXTENDED_PRECISION)
+	glColor4dv(color.Channels());
+	#else
+	glColor4fv(color.Channels());
+	#endif
+
+	glBegin(GL_LINE_STRIP);
+
+	#if defined(ION_DOUBLE_PRECISION) || defined(ION_EXTENDED_PRECISION)
+	glVertex2dv(corners[3].Components());
+	glVertex2dv(corners[0].Components());
+	glVertex2dv(corners[1].Components());
+	glVertex2dv(corners[2].Components());
+	glVertex2dv(corners[3].Components());
+	#else
+	glVertex2fv(corners[3].Components());
+	glVertex2fv(corners[0].Components());
+	glVertex2fv(corners[1].Components());
+	glVertex2fv(corners[2].Components());
+	glVertex2fv(corners[3].Components());
+	#endif
+
+	glEnd();
+}
+
 } //obb::detail
 
 
@@ -270,6 +308,16 @@ Obb& Obb::Translate(const Vector2 &vector) noexcept
 Obb Obb::TranslateCopy(const Vector2 &vector) const noexcept
 {
 	return Obb(*this).Translate(vector);
+}
+
+
+/*
+	Drawing
+*/
+
+void Obb::Draw(const Color &color) noexcept
+{
+	detail::draw_bounds(corners_, color);
 }
 
 } //ion::graphics::utilities

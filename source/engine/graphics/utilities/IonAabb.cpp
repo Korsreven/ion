@@ -15,6 +15,7 @@ File:	IonAabb.cpp
 #include <algorithm>
 
 #include "IonMatrix3.h"
+#include "graphics/IonGraphicsAPI.h"
 #include "utilities\IonMath.h"
 
 namespace ion::graphics::utilities
@@ -51,6 +52,41 @@ std::pair<Vector2, Vector2> minmax_point(const std::vector<Vector2> &points) noe
 
 	return {{left_most->X(), bottom_most->Y()},
 			{right_most->X(), top_most->Y()}};
+}
+
+
+/*
+	Graphics API
+*/
+
+void draw_bounds(const Vector2 &min, const Vector2 &max, const Color &color) noexcept
+{
+	#if defined(ION_DOUBLE_PRECISION) || defined(ION_EXTENDED_PRECISION)
+	glColor4dv(color.Channels());
+	#else
+	glColor4fv(color.Channels());
+	#endif
+
+	auto [min_x, min_y] = min.XY();
+	auto [max_x, max_y] = max.XY();
+
+	glBegin(GL_LINE_STRIP);
+
+	#if defined(ION_DOUBLE_PRECISION) || defined(ION_EXTENDED_PRECISION)
+	glVertex2d(min_x, max_y);
+	glVertex2d(min_x, min_y);
+	glVertex2d(max_x, min_y);
+	glVertex2d(max_x, max_y);
+	glVertex2d(min_x, max_y);
+	#else
+	glVertex2f(min_x, max_y);
+	glVertex2f(min_x, min_y);
+	glVertex2f(max_x, min_y);
+	glVertex2f(max_x, max_y);
+	glVertex2f(min_x, max_y);
+	#endif
+
+	glEnd();
 }
 
 } //aabb::detail
@@ -318,6 +354,16 @@ Aabb& Aabb::Translate(const Vector2 &vector) noexcept
 Aabb Aabb::TranslateCopy(const Vector2 &vector) const noexcept
 {
 	return {min_ + vector, max_ + vector};
+}
+
+
+/*
+	Drawing
+*/
+
+void Aabb::Draw(const Color &color) noexcept
+{
+	detail::draw_bounds(min_, max_, color);
 }
 
 } //ion::graphics::utilities

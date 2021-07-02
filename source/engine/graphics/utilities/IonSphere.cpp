@@ -13,6 +13,7 @@ File:	IonSphere.cpp
 #include "IonSphere.h"
 
 #include "IonMatrix3.h"
+#include "graphics/IonGraphicsAPI.h"
 
 namespace ion::graphics::utilities
 {
@@ -22,6 +23,39 @@ using namespace ion::utilities;
 
 namespace sphere::detail
 {
+
+/*
+	Graphics API
+*/
+
+void draw_bounds(real radius, const Vector2 &center, const Color &color, int steps) noexcept
+{
+	#if defined(ION_DOUBLE_PRECISION) || defined(ION_EXTENDED_PRECISION)
+	glColor4dv(color.Channels());
+	#else
+	glColor4fv(color.Channels());
+	#endif
+
+	auto angle = 0.0_r;
+	auto delta_angle = math::TwoPi / steps;
+
+	glBegin(GL_LINE_STRIP);
+
+	for (auto i = 0; i < steps; ++i, angle += delta_angle)
+	{
+		auto v =
+			center + Vector2{radius * math::Cos(angle), radius * math::Sin(angle)};
+
+		#if defined(ION_DOUBLE_PRECISION) || defined(ION_EXTENDED_PRECISION)
+		glVertex2dv(v.Components());
+		#else
+		glVertex2fv(v.Components());
+		#endif
+	}
+
+	glEnd();
+}
+
 } //sphere::detail
 
 
@@ -210,6 +244,16 @@ Sphere& Sphere::Translate(const Vector2 &vector) noexcept
 Sphere Sphere::TranslateCopy(const Vector2 &vector) const noexcept
 {
 	return {radius_, center_ + vector};
+}
+
+
+/*
+	Drawing
+*/
+
+void Sphere::Draw(const Color &color, int steps) noexcept
+{
+	detail::draw_bounds(radius_, center_, color, steps);
 }
 
 } //ion::graphics::utilities

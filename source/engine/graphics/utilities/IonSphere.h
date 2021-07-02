@@ -15,6 +15,7 @@ File:	IonSphere.h
 
 #include <cmath>
 
+#include "IonColor.h"
 #include "IonVector2.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
@@ -80,6 +81,13 @@ namespace ion::graphics::utilities
 		{
 			return radius * radius * radius * shape_factor;
 		}
+
+
+		/*
+			Graphics API
+		*/
+
+		void draw_bounds(real radius, const Vector2 &center, const Color &color, int steps) noexcept;
 	} //sphere::detail
 
 
@@ -265,6 +273,14 @@ namespace ion::graphics::utilities
 			//Translate sphere by the given vector
 			//Returns the result as a copy
 			[[nodiscard]] Sphere TranslateCopy(const Vector2 &vector) const noexcept;
+
+
+			/*
+				Drawing
+			*/
+
+			//Draw the bounds of this sphere with the given color and steps
+			void Draw(const Color &color, int steps = 32) noexcept;
 	};
 
 
