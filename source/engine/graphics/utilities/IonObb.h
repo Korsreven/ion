@@ -61,6 +61,10 @@ namespace ion::graphics::utilities
 			//Constructs a new obb from the given min and max vectors
 			Obb(const Vector2 &min, const Vector2 &max) noexcept;
 
+			//Constructs a new obb from the given corners
+			Obb(const Vector2 &bottom_left, const Vector2 &bottom_right,
+				const Vector2 &top_left, const Vector2 &top_right) noexcept;
+
 			//Constructs a new obb from the given aabb
 			Obb(const Aabb &aabb) noexcept;
 

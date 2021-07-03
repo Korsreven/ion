@@ -37,7 +37,7 @@ void draw_bounds(real radius, const Vector2 &center, const Color &color, int ste
 	#endif
 
 	auto angle = 0.0_r;
-	auto delta_angle = math::TwoPi / steps;
+	auto delta_angle = math::TwoPi / (steps - 1);
 
 	glBegin(GL_LINE_STRIP);
 

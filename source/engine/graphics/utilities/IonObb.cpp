@@ -109,7 +109,14 @@ Obb::Obb(const Vector2 &min, const Vector2 &max) noexcept :
 	corners_{min, {max.X(), min.Y()},
 			 max, {min.X(), max.Y()}}
 {
+	//Empty
+}
 
+Obb::Obb(const Vector2 &bottom_left, const Vector2 &bottom_right,
+	const Vector2 &top_left, const Vector2 &top_right) noexcept :
+	corners_{bottom_left, bottom_right, top_left, top_right}
+{
+	//Empty
 }
 
 Obb::Obb(const Aabb &aabb) noexcept :
@@ -280,15 +287,22 @@ Obb Obb::TransformCopy(const Matrix3 &matrix) const noexcept
 
 	#ifdef ION_LEFT_HAND_ROTATION
 	//Left-hand rotation CW (Direct3D)
-	return HalfSize({matrix.M00() * x + matrix.M10() * y,
-					 matrix.M01() * x + matrix.M11() * y},
-					 matrix.TransformPoint(Center()));
+	auto v1 = Vector2{matrix.M00(), matrix.M01()} * x;
+	auto v2 = Vector2{matrix.M10(), matrix.M11()} * y;
 	#else
 	//Right-hand rotation CCW (OpenGL)
-	return HalfSize({matrix.M00() * x + matrix.M01() * y,
-					 matrix.M10() * x + matrix.M11() * y},
-					 matrix.TransformPoint(Center()));
+	auto v1 = Vector2{matrix.M00(), matrix.M10()} * x;
+	auto v2 = Vector2{matrix.M01(), matrix.M11()} * y;
 	#endif
+
+	auto center = matrix.TransformPoint(Center());
+
+	return Obb{
+		center - v1 - v2,
+		center + v1 - v2,
+		center + v1 + v2,
+		center - v1 + v2
+	};
 }
 
 
