@@ -201,8 +201,8 @@ Vector2 Obb::ToHalfSize() const noexcept
 
 Vector2 Obb::ToSize() const noexcept
 {
-	return (corners_[1] - corners_[0] -
-		    corners_[3] - corners_[0]).Length();
+	return {(corners_[1] - corners_[0]).Length(),
+			(corners_[3] - corners_[0]).Length()};
 }
 
 
