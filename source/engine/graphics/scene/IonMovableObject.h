@@ -67,7 +67,6 @@ namespace ion::graphics::scene
 			Obb obb_;
 			Sphere sphere_;
 
-			mutable bool need_bounding_update_ = false;
 			mutable movable_object::ShaderPrograms shader_programs_;
 
 		private:
@@ -89,7 +88,9 @@ namespace ion::graphics::scene
 				Updating
 			*/
 
-			void UpdateBoundingVolumes() const noexcept;
+			void DeriveWorldAxisAlignedBoundingBox() const noexcept;
+			void DeriveWorldOrientedBoundingBox() const noexcept;
+			void DeriveWorldBoundingSphere() const noexcept;
 
 
 			/*
@@ -221,28 +222,28 @@ namespace ion::graphics::scene
 
 
 			//Returns the world axis-aligned bounding box (AABB) for this movable object
-			[[nodiscard]] inline auto& WorldAxisAlignedBoundingBox() const noexcept
+			[[nodiscard]] inline auto& WorldAxisAlignedBoundingBox(bool derive = true) const noexcept
 			{
-				if (need_bounding_update_)
-					UpdateBoundingVolumes();
+				if (derive)
+					DeriveWorldAxisAlignedBoundingBox();
 
 				return world_aabb_;
 			}
 
 			//Returns the world oriented bounding box (OBB) for this movable object
-			[[nodiscard]] inline auto& WorldOrientedBoundingBox() const noexcept
+			[[nodiscard]] inline auto& WorldOrientedBoundingBox(bool derive = true) const noexcept
 			{
-				if (need_bounding_update_)
-					UpdateBoundingVolumes();
+				if (derive)
+					DeriveWorldOrientedBoundingBox();
 
 				return world_obb_;
 			}
 
 			//Returns the world bounding sphere for this movable object
-			[[nodiscard]] inline auto& WorldBoundingSphere() const noexcept
+			[[nodiscard]] inline auto& WorldBoundingSphere(bool derive = true) const noexcept
 			{
-				if (need_bounding_update_)
-					UpdateBoundingVolumes();
+				if (derive)
+					DeriveWorldBoundingSphere();
 
 				return world_sphere_;
 			}

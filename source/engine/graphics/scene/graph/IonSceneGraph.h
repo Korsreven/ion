@@ -81,6 +81,10 @@ namespace ion::graphics::scene::graph
 			void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, shaders::ShaderProgram &shader_program) noexcept;
 
 			void set_gl_model_view_matrix(const Matrix4 &model_view_mat) noexcept;
+			void mult_gl_model_view_matrix(const Matrix4 &model_view_mat) noexcept;
+			Matrix4 get_gl_model_view_matrix() noexcept;
+			void push_gl_matrix() noexcept;
+			void pop_gl_matrix() noexcept;
 		} //detail
 	} //scene_graph
 

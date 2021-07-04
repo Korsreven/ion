@@ -226,6 +226,60 @@ void set_gl_model_view_matrix(const Matrix4 &model_view_mat) noexcept
 	#endif
 }
 
+void mult_gl_model_view_matrix(const Matrix4 &model_view_mat) noexcept
+{
+	//Matrix should already be in model view mode
+	//glMatrixMode(GL_MODELVIEW);
+
+	//if constexpr (std::is_same_v<real, double>)...
+	//would not work here, because all branches are compiled in a non-templated function
+	#if defined(ION_DOUBLE_PRECISION) || defined(ION_EXTENDED_PRECISION)
+		#ifdef ION_ROW_MAJOR
+		glMultMatrixd(model_view_mat.M()[0]);
+		#else
+		glMultMatrixd(model_view_mat.TransposeCopy().M()[0]);
+		#endif
+	#else
+		#ifdef ION_ROW_MAJOR
+		glMultMatrixf(model_view_mat.M()[0]);
+		#else
+		glMultMatrixf(model_view_mat.TransposeCopy().M()[0]);
+		#endif
+	#endif
+}
+
+Matrix4 get_gl_model_view_matrix() noexcept
+{
+	Matrix4 model_view_mat;
+	
+	//Matrix should already be in model view mode
+	//glMatrixMode(GL_MODELVIEW);
+
+	//if constexpr (std::is_same_v<real, double>)...
+	//would not work here, because all branches are compiled in a non-templated function
+	#if defined(ION_DOUBLE_PRECISION) || defined(ION_EXTENDED_PRECISION)
+	glGetDoublev(GL_MODELVIEW_MATRIX, const_cast<double*>(model_view_mat.M()[0]));
+	#else
+	glGetFloatv(GL_MODELVIEW_MATRIX, const_cast<float*>(model_view_mat.M()[0]));
+	#endif
+
+	#ifndef ION_ROW_MAJOR
+	model_view_mat.Transpose();
+	#endif
+
+	return model_view_mat;
+}
+
+void push_gl_matrix() noexcept
+{
+	glPushMatrix();
+}
+
+void pop_gl_matrix() noexcept
+{
+	glPopMatrix();
+}
+
 } //scene_graph::detail
 
 
@@ -272,7 +326,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	
 	const auto &projection_mat = camera->ViewFrustum().ProjectionMatrix();
 	const auto &view_mat = camera->ViewMatrix();
-
+	detail::set_gl_model_view_matrix(view_mat);
 
 	/*
 		Lights
@@ -300,7 +354,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 		Scene nodes
 	*/
 
-	shader_programs_.clear();
+	shader_programs_.clear();	
 
 	//For each visible node
 	for (auto &node : root_node_.OrderedSceneNodes())
@@ -316,6 +370,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 			if (!std::empty(node.AttachedObjects()))
 			{
 				auto model_view_mat = view_mat * node.FullTransformation();
+				detail::push_gl_matrix();
 				detail::set_gl_model_view_matrix(model_view_mat);
 
 				//For each attached object
@@ -363,6 +418,8 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 					object->Elapse(time);
 					object->Render();
 				}
+
+				detail::pop_gl_matrix();
 			}
 
 			NotifyNodeRenderEnded(node);
