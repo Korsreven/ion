@@ -329,7 +329,7 @@ Obb Obb::TranslateCopy(const Vector2 &vector) const noexcept
 	Drawing
 */
 
-void Obb::Draw(const Color &color) noexcept
+void Obb::Draw(const Color &color) const noexcept
 {
 	detail::draw_bounds(corners_, color);
 }

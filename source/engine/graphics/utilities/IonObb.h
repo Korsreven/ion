@@ -269,7 +269,7 @@ namespace ion::graphics::utilities
 			*/
 
 			//Draw the bounds of this obb with the given color
-			void Draw(const Color &color) noexcept;
+			void Draw(const Color &color) const noexcept;
 	};
 
 

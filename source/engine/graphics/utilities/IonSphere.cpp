@@ -251,7 +251,7 @@ Sphere Sphere::TranslateCopy(const Vector2 &vector) const noexcept
 	Drawing
 */
 
-void Sphere::Draw(const Color &color, int steps) noexcept
+void Sphere::Draw(const Color &color, int steps) const noexcept
 {
 	detail::draw_bounds(radius_, center_, color, steps);
 }

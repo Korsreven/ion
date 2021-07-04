@@ -361,7 +361,7 @@ Aabb Aabb::TranslateCopy(const Vector2 &vector) const noexcept
 	Drawing
 */
 
-void Aabb::Draw(const Color &color) noexcept
+void Aabb::Draw(const Color &color) const noexcept
 {
 	detail::draw_bounds(min_, max_, color);
 }

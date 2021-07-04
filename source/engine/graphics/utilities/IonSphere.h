@@ -280,7 +280,7 @@ namespace ion::graphics::utilities
 			*/
 
 			//Draw the bounds of this sphere with the given color and steps
-			void Draw(const Color &color, int steps = 32) noexcept;
+			void Draw(const Color &color, int steps = 32) const noexcept;
 	};
 
 
