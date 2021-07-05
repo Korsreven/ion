@@ -35,7 +35,7 @@ namespace movable_object::detail
 
 Aabb MovableObject::DeriveWorldAxisAlignedBoundingBox(Aabb aabb) const noexcept
 {
-	if (parent_node_)
+	if (parent_node_ && !aabb.Empty())
 		aabb.Transform(parent_node_->FullTransformation());
 
 	return aabb;
@@ -43,7 +43,7 @@ Aabb MovableObject::DeriveWorldAxisAlignedBoundingBox(Aabb aabb) const noexcept
 
 Obb MovableObject::DeriveWorldOrientedBoundingBox(Obb obb) const noexcept
 {
-	if (parent_node_)
+	if (parent_node_ && !obb.Empty())
 		obb.Transform(parent_node_->FullTransformation());
 
 	return obb;
@@ -51,7 +51,7 @@ Obb MovableObject::DeriveWorldOrientedBoundingBox(Obb obb) const noexcept
 
 Sphere MovableObject::DeriveWorldBoundingSphere(Sphere sphere) const noexcept
 {
-	if (parent_node_)
+	if (parent_node_ && !sphere.Empty())
 		sphere.Transform(Matrix3::Transformation(0.0_r, parent_node_->DerivedScaling(), parent_node_->DerivedPosition()));
 			//Ignore derived rotation
 
@@ -77,7 +77,7 @@ void MovableObject::DrawBoundingVolumes(const Aabb &aabb, const Obb &obb, const 
 		shaders::shader_program_manager::detail::use_shader_program(0);
 
 	//Draw bounding sphere
-	if (sphere.Radius() > 0.0_r && sphere_color != color::Transparent)
+	if (!sphere.Empty() && sphere_color != color::Transparent)
 		sphere.Draw(sphere_color);
 
 	//Draw oriented bounding box

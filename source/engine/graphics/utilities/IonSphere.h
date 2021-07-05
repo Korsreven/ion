@@ -177,6 +177,11 @@ namespace ion::graphics::utilities
 			}
 
 
+			//Returns true if this sphere is empty
+			//Meaning that the radius is less or equal to zero
+			[[nodiscard]] bool Empty() const noexcept;
+
+
 			/*
 				Sphere conversions
 			*/

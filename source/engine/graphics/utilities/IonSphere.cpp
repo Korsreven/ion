@@ -99,6 +99,16 @@ Sphere Sphere::Volume(real volume, const Vector2 &center) noexcept
 
 
 /*
+	Observers
+*/
+
+bool Sphere::Empty() const noexcept
+{
+	return radius_ <= 0.0_r;
+}
+
+
+/*
 	Sphere conversions
 */
 
@@ -189,9 +199,9 @@ Sphere Sphere::MergeCopy(const Sphere &sphere) const noexcept
 	else
 	{
 		auto length = std::sqrt(length_squared);
-		auto t = (length + radius_diff) / (2.0_r * length);
-		return {(radius_ + sphere.radius_ + length) / 2.0_r,
-				 center_ + center_diff + t};
+		auto theta = radius_diff / (2.0_r * length) + 0.5_r;
+		return {(radius_ + sphere.radius_ + length) * 0.5_r,
+				 center_ + center_diff * theta};
 	}
 }
 
