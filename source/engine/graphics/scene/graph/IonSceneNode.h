@@ -279,6 +279,11 @@ namespace ion::graphics::scene::graph
 			mutable Vector2 derived_scaling_;
 			mutable Matrix4 full_tranformation_;
 
+			mutable Aabb aabb_;
+			mutable Aabb world_aabb_;
+			mutable Obb world_obb_;
+			mutable Sphere world_sphere_;
+
 			mutable bool need_update_ = true;
 			mutable bool need_z_update_ = true;
 			mutable bool transformation_out_of_date_ = true;
@@ -333,7 +338,6 @@ namespace ion::graphics::scene::graph
 
 			bool AttachObject(scene_node::AttachableObject object);
 			bool DetachObject(scene_node::AttachableObject object) noexcept;
-			Aabb LocalAabb(bool cascade) const noexcept;
 
 			void Tidy();
 
@@ -742,16 +746,13 @@ namespace ion::graphics::scene::graph
 
 
 			//Returns the world axis-aligned bounding box (AABB) for objects attached to this and all descendant nodes
-			//If cascade is set to false, only objects attached to this node is merged
-			[[nodiscard]] Aabb WorldAxisAlignedBoundingBox(bool cascade = true) const noexcept;
+			[[nodiscard]] const Aabb& WorldAxisAlignedBoundingBox(bool derive = true) const noexcept;
 
 			//Returns the world oriented bounding box (OBB) for objects attached to this and all descendant nodes
-			//If cascade is set to false, only objects attached to this node is merged
-			[[nodiscard]] Obb WorldOrientedBoundingBox(bool cascade = true) const noexcept;
+			[[nodiscard]] const Obb& WorldOrientedBoundingBox(bool derive = true) const noexcept;
 
 			//Returns the world bounding sphere for objects attached to this and all descendant nodes
-			//If cascade is set to false, only objects attached to this node is merged
-			[[nodiscard]] Sphere WorldBoundingSphere(bool cascade = true) const noexcept;
+			[[nodiscard]] const Sphere& WorldBoundingSphere(bool derive = true) const noexcept;
 
 
 			/*

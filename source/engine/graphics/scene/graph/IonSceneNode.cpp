@@ -324,23 +324,6 @@ bool SceneNode::DetachObject(AttachableObject object) noexcept
 		return false;
 }
 
-Aabb SceneNode::LocalAabb(bool cascade) const noexcept
-{
-	Aabb aabb;
-
-	//Merge local AABBs
-	for (auto &object : attached_objects_)
-		aabb.Merge(std::visit([](auto &&object) noexcept { return object->AxisAlignedBoundingBox(); }, object));
-
-	if (cascade)
-	{
-		for (auto &child_node : child_nodes_)
-			aabb.Merge(child_node->LocalAabb(cascade)); //Recursive
-	}
-
-	return aabb;
-}
-
 
 void SceneNode::Tidy()
 {
@@ -448,45 +431,61 @@ bool SceneNode::AxisAligned() const noexcept
 }
 
 
-Aabb SceneNode::WorldAxisAlignedBoundingBox(bool cascade) const noexcept
+const Aabb& SceneNode::WorldAxisAlignedBoundingBox(bool derive) const noexcept
 {
-	Aabb aabb;
-
-	//Merge world AABBs
-	for (auto &object : attached_objects_)
-		aabb.Merge(std::visit([](auto &&object) noexcept { return object->WorldAxisAlignedBoundingBox(); }, object));
-
-	if (cascade)
+	if (derive)
 	{
+		world_aabb_ = {};
+
+		//Merge world AABBs
+		for (auto &object : attached_objects_)
+			world_aabb_.Merge(std::visit([&](auto &&object) noexcept { return object->WorldAxisAlignedBoundingBox(derive); }, object));
+
 		for (auto &child_node : child_nodes_)
-			aabb.Merge(child_node->WorldAxisAlignedBoundingBox(cascade)); //Recursive
+			world_aabb_.Merge(child_node->WorldAxisAlignedBoundingBox(derive)); //Recursive
 	}
 
-	return aabb;
+	return world_aabb_;
 }
 
-Obb SceneNode::WorldOrientedBoundingBox(bool cascade) const noexcept
+const Obb& SceneNode::WorldOrientedBoundingBox(bool derive) const noexcept
 {
-	Obb obb{LocalAabb(cascade)};
-	obb.Transform(FullTransformation());
-	return obb;
-}
-
-Sphere SceneNode::WorldBoundingSphere(bool cascade) const noexcept
-{
-	Sphere sphere;
-
-	//Merge world spheres
-	for (auto &object : attached_objects_)
-		sphere.Merge(std::visit([](auto &&object) noexcept { return object->WorldBoundingSphere(); }, object));
-
-	if (cascade)
+	if (derive)
 	{
+		aabb_ = {};
+
+		//Merge AABBs
+		for (auto &object : attached_objects_)
+			aabb_.Merge(std::visit([](auto &&object) noexcept { return object->AxisAlignedBoundingBox(); }, object));
+
 		for (auto &child_node : child_nodes_)
-			sphere.Merge(child_node->WorldBoundingSphere(cascade)); //Recursive
+		{
+			static_cast<void>(child_node->WorldOrientedBoundingBox(derive)); //Recursive
+			aabb_.Merge(child_node->aabb_);
+		}
+
+		world_obb_ = aabb_;
+		world_obb_.Transform(FullTransformation());
 	}
 
-	return sphere;
+	return world_obb_;
+}
+
+const Sphere& SceneNode::WorldBoundingSphere(bool derive) const noexcept
+{
+	if (derive)
+	{
+		world_sphere_ = {};
+
+		//Merge world spheres
+		for (auto &object : attached_objects_)
+			world_sphere_.Merge(std::visit([&](auto &&object) noexcept { return object->WorldBoundingSphere(derive); }, object));
+
+		for (auto &child_node : child_nodes_)
+			world_sphere_.Merge(child_node->WorldBoundingSphere(derive)); //Recursive
+	}
+
+	return world_sphere_;
 }
 
 
