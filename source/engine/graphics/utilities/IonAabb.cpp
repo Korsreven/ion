@@ -290,6 +290,11 @@ Aabb& Aabb::Merge(const Vector2 &point) noexcept
 
 Aabb Aabb::MergeCopy(const Aabb &aabb) const noexcept
 {
+	if (aabb.Empty())
+		return *this;
+	else if (Empty())
+		return aabb;
+
 	return {min_.FloorCopy(aabb.min_), max_.CeilCopy(aabb.max_)};
 }
 

@@ -153,6 +153,7 @@ namespace ion::graphics::scene::shapes
 
 			mesh::VertexContainer vertex_data_;
 			mesh::MeshTexCoordMode tex_coord_mode_ = mesh::MeshTexCoordMode::Auto;
+			bool include_bounding_volumes_ = true;
 			bool show_wireframe_ = false;
 			bool visible_ = true;
 			
@@ -213,7 +214,7 @@ namespace ion::graphics::scene::shapes
 				{
 					vertex_data_ = mesh::detail::vertices_to_vertex_data(vertices);
 					vertex_batch_.VertexData(vertex_data_);
-					update_bounding_volumes_ = true;
+					update_bounding_volumes_ = include_bounding_volumes_;
 					update_tex_coords_ = true;
 				}
 			}
@@ -227,7 +228,7 @@ namespace ion::graphics::scene::shapes
 				{
 					vertex_data_ = std::move(vertex_data);
 					vertex_batch_.VertexData(vertex_data_);
-					update_bounding_volumes_ = true;
+					update_bounding_volumes_ = include_bounding_volumes_;
 					update_tex_coords_ = true;
 				}
 			}
@@ -239,6 +240,23 @@ namespace ion::graphics::scene::shapes
 				{
 					tex_coord_mode_ = tex_coord_mode;
 					update_tex_coords_ = true;
+				}
+			}
+
+			//Sets if this mesh should include bounding volumes or not
+			inline void IncludeBoundingVolumes(bool include) noexcept
+			{
+				if (include_bounding_volumes_ != include)
+				{
+					include_bounding_volumes_ = include;
+					update_bounding_volumes_ = include;
+
+					if (!include)
+					{
+						aabb_ = {};
+						obb_ = {};
+						sphere_ = {};
+					}
 				}
 			}
 
@@ -285,6 +303,12 @@ namespace ion::graphics::scene::shapes
 			[[nodiscard]] inline auto& VertexData() const noexcept
 			{
 				return vertex_data_;
+			}
+
+			//Returns true if this mesh is including bounding volumes
+			[[nodiscard]] inline auto IncludeBoundingVolumes() const noexcept
+			{
+				return include_bounding_volumes_;
 			}
 
 			//Returns true if this mesh is shown in wireframe

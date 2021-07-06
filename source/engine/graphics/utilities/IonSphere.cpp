@@ -186,6 +186,11 @@ Sphere& Sphere::Merge(const Vector2 &point) noexcept
 
 Sphere Sphere::MergeCopy(const Sphere &sphere) const noexcept
 {
+	if (sphere.Empty())
+		return *this;
+	else if (Empty())
+		return sphere;
+
 	auto center_diff = sphere.center_ - center_;
 	auto length_squared = center_diff.SquaredLength();
 
