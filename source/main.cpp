@@ -1145,7 +1145,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{0.0_r, 0.0_r, 0.0_r}, {0.3671875_r, 0.5_r}, ship});
 			model->AddPass(ion::graphics::render::Pass{model_program});		
 			model->ShowBoundingVolumes(true);
-			model->BoundingVolumeExtent({{0.1_r, 0.2_r}, {0.2_r, 0.8_r}});
+			model->BoundingVolumeExtent({{0.3_r, 0.2_r}, {0.7_r, 0.8_r}});
 
 			auto model_star = scene.CreateModel();
 			model_star->CreateMesh(ion::graphics::scene::shapes::Sprite{
