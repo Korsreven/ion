@@ -16,11 +16,13 @@ File:	IonMovableObject.cpp
 #include "graph/IonSceneNode.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
 #include "graphics/utilities/IonMatrix3.h"
+#include "types/IonTypes.h"
 
 namespace ion::graphics::scene
 {
 
 using namespace movable_object;
+using namespace types::type_literals;
 
 namespace movable_object::detail
 {
@@ -36,24 +38,57 @@ namespace movable_object::detail
 Aabb MovableObject::DeriveWorldAxisAlignedBoundingBox(Aabb aabb) const noexcept
 {
 	if (parent_node_ && !aabb.Empty())
+	{
+		if (auto [min, max] = bounding_volume_extent_.MinMax();
+			min != vector2::Zero || max != vector2::UnitScale)
+		{
+			auto size = aabb.ToSize();
+			aabb = Aabb{aabb.Min() + min * size,
+						aabb.Max() + (max - vector2::UnitScale) * size};
+		}
+
 		aabb.Transform(parent_node_->FullTransformation());
+	}
 
 	return aabb;
 }
 
-Obb MovableObject::DeriveWorldOrientedBoundingBox(Obb obb) const noexcept
+Obb MovableObject::DeriveWorldOrientedBoundingBox(Obb obb, Aabb aabb) const noexcept
 {
 	if (parent_node_ && !obb.Empty())
+	{
+		if (auto [min, max] = bounding_volume_extent_.MinMax();
+			min != vector2::Zero || max != vector2::UnitScale)
+		{
+			auto size = aabb.ToSize();
+			aabb = Aabb{aabb.Min() + min * size,
+						aabb.Max() + (max - vector2::UnitScale) * size};
+			obb = aabb;
+		}
+
 		obb.Transform(parent_node_->FullTransformation());
+	}
 
 	return obb;
 }
 
-Sphere MovableObject::DeriveWorldBoundingSphere(Sphere sphere) const noexcept
+Sphere MovableObject::DeriveWorldBoundingSphere(Sphere sphere, Aabb aabb) const noexcept
 {
 	if (parent_node_ && !sphere.Empty())
-		sphere.Transform(Matrix3::Transformation(0.0_r, parent_node_->DerivedScaling(), parent_node_->DerivedPosition()));
-			//Ignore derived rotation
+	{
+		if (auto [min, max] = bounding_volume_extent_.MinMax();
+			min != vector2::Zero || max != vector2::UnitScale)
+		{
+			auto size = aabb.ToSize();
+			aabb = Aabb{aabb.Min() + min * size,
+						aabb.Max() + (max - vector2::UnitScale) * size};
+			sphere = {aabb.ToHalfSize().Length(), aabb.Center()};
+		}
+
+		sphere.Radius(sphere.Radius() * parent_node_->DerivedScaling().Max());
+		sphere.Center(parent_node_->FullTransformation().TransformPoint(sphere.Center()));
+		//sphere.Transform(parent_node_->FullTransformation());
+	}
 
 	return sphere;
 }

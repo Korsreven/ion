@@ -23,7 +23,6 @@ File:	IonMovableObject.h
 #include "graphics/utilities/IonObb.h"
 #include "graphics/utilities/IonSphere.h"
 #include "managed/IonManagedObject.h"
-#include "types/IonTypes.h"
 
 //Forward declarations
 namespace ion::graphics
@@ -75,8 +74,8 @@ namespace ion::graphics::scene
 			*/
 
 			Aabb DeriveWorldAxisAlignedBoundingBox(Aabb aabb) const noexcept;
-			Obb DeriveWorldOrientedBoundingBox(Obb obb) const noexcept;
-			Sphere DeriveWorldBoundingSphere(Sphere sphere) const noexcept;
+			Obb DeriveWorldOrientedBoundingBox(Obb obb, Aabb aabb) const noexcept;
+			Sphere DeriveWorldBoundingSphere(Sphere sphere, Aabb aabb) const noexcept;
 
 			void DrawBoundingVolumes(const Aabb &aabb, const Obb &obb, const Sphere &sphere,
 				const Color &aabb_color, const Color &obb_color, const Color &sphere_color) const noexcept;
@@ -87,6 +86,7 @@ namespace ion::graphics::scene
 			Color aabb_color_ = color::White;
 			Color obb_color_ = color::White;
 			Color sphere_color_ = color::White;
+			Aabb bounding_volume_extent_ = {vector2::Zero, vector2::UnitScale};
 
 			graph::SceneNode *parent_node_ = nullptr;
 			std::any user_data_;
@@ -155,6 +155,14 @@ namespace ion::graphics::scene
 				sphere_color_ = sphere_color;
 			}
 
+			//Sets the relative bounding volume extent to the given extent
+			//Aabb::Min represents the bottom-left corner (default: vector2::Zero)
+			//Aabb::Max represents the top-left corner (default: vector2::UnitScale)
+			inline void BoundingVolumeExtent(const Aabb &extent) noexcept
+			{
+				bounding_volume_extent_ = extent;
+			}
+
 
 			//Sets parent node of this movable object to the given node
 			inline void ParentNode(graph::SceneNode *scene_node) noexcept
@@ -189,6 +197,14 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto BoundingVolumeColors() const noexcept
 			{
 				return std::tuple{aabb_color_, obb_color_, sphere_color_};
+			}
+
+			//Returns the relative bounding volume extent of this movable object
+			//Aabb::Min represents the bottom-left corner (default: vector2::Zero)
+			//Aabb::Max represents the top-left corner (default: vector2::UnitScale)
+			[[nodiscard]] inline auto BoundingVolumeExtent() const noexcept
+			{
+				return bounding_volume_extent_;
 			}
 
 
@@ -237,7 +253,7 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto& WorldOrientedBoundingBox(bool derive = true) const noexcept
 			{
 				if (derive)
-					world_obb_ = DeriveWorldOrientedBoundingBox(obb_);
+					world_obb_ = DeriveWorldOrientedBoundingBox(obb_, aabb_);
 
 				return world_obb_;
 			}
@@ -246,7 +262,7 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto& WorldBoundingSphere(bool derive = true) const noexcept
 			{
 				if (derive)
-					world_sphere_ = DeriveWorldBoundingSphere(sphere_);
+					world_sphere_ = DeriveWorldBoundingSphere(sphere_, aabb_);
 
 				return world_sphere_;
 			}
