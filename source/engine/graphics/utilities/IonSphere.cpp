@@ -242,7 +242,15 @@ Sphere& Sphere::Transform(const Matrix3 &matrix) noexcept
 
 Sphere Sphere::TransformCopy(const Matrix3 &matrix) const noexcept
 {
-	return {radius_ * matrix.ToScaling().Max(),
+	#ifdef ION_LEFT_HAND_ROTATION
+	//Left-hand rotation CW (Direct3D)
+	auto v = Vector2{matrix.M00(), matrix.M01()} * radius_;
+	#else
+	//Right-hand rotation CCW (OpenGL)
+	auto v = Vector2{matrix.M00(), matrix.M10()} * radius_;
+	#endif
+
+	return {((center_ + v) - (center_ - v)).Length() * 0.5_r,
 			matrix.TransformPoint(center_)};
 }
 

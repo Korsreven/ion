@@ -85,9 +85,7 @@ Sphere MovableObject::DeriveWorldBoundingSphere(Sphere sphere, Aabb aabb) const 
 			sphere = {aabb.ToHalfSize().Length(), aabb.Center()};
 		}
 
-		sphere.Radius(sphere.Radius() * parent_node_->DerivedScaling().Max());
-		sphere.Center(parent_node_->FullTransformation().TransformPoint(sphere.Center()));
-		//sphere.Transform(parent_node_->FullTransformation());
+		sphere.Transform(parent_node_->FullTransformation());
 	}
 
 	return sphere;
