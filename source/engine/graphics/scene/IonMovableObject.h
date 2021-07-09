@@ -82,13 +82,15 @@ namespace ion::graphics::scene
 
 		private:
 
+			Aabb bounding_volume_extent_ = {vector2::Zero, vector2::UnitScale};
+			uint32 query_flags_ = 0;
+
 			bool show_bounding_volumes_ = false;
 			Color aabb_color_ = color::White;
 			Color obb_color_ = color::White;
 			Color sphere_color_ = color::White;
-			Aabb bounding_volume_extent_ = {vector2::Zero, vector2::UnitScale};
 
-			graph::SceneNode *parent_node_ = nullptr;
+			graph::SceneNode *parent_node_ = nullptr;		
 			std::any user_data_;
 
 			mutable Aabb world_aabb_;
@@ -134,6 +136,39 @@ namespace ion::graphics::scene
 				Modifiers
 			*/
 
+			//Sets the relative bounding volume extent to the given extent
+			//Aabb::Min represents the bottom-left corner (default: vector2::Zero)
+			//Aabb::Max represents the top-left corner (default: vector2::UnitScale)
+			inline void BoundingVolumeExtent(const Aabb &extent) noexcept
+			{
+				bounding_volume_extent_ = extent;
+			}
+
+			//Sets the query flags for this movable object to the given flags
+			//This object will only be queried if a bitwise AND operation between the query flags and the query mask is non-zero
+			//The meaning of the bits is user-specific
+			inline void QueryFlags(uint32 flags) noexcept
+			{
+				query_flags_ = flags;
+			}
+
+			//Adds the given flags to the already existing query flags for this movable object
+			//This object will only be queried if a bitwise AND operation between the query flags and the query mask is non-zero
+			//The meaning of the bits is user-specific
+			inline void AddQueryFlags(uint32 flags) noexcept
+			{
+				query_flags_ |= flags;
+			}
+
+			//Removes the given flags to the already existing query flags for this movable object
+			//This object will only be queried if a bitwise AND operation between the query flags and the query mask is non-zero
+			//The meaning of the bits is user-specific
+			inline void RemoveQueryFlags(uint32 flags) noexcept
+			{
+				query_flags_ &= ~flags;
+			}
+
+
 			//Sets the visibility of this movable object to the given value
 			inline void Visible(bool visible) noexcept
 			{
@@ -155,14 +190,6 @@ namespace ion::graphics::scene
 				sphere_color_ = sphere_color;
 			}
 
-			//Sets the relative bounding volume extent to the given extent
-			//Aabb::Min represents the bottom-left corner (default: vector2::Zero)
-			//Aabb::Max represents the top-left corner (default: vector2::UnitScale)
-			inline void BoundingVolumeExtent(const Aabb &extent) noexcept
-			{
-				bounding_volume_extent_ = extent;
-			}
-
 
 			//Sets parent node of this movable object to the given node
 			inline void ParentNode(graph::SceneNode *scene_node) noexcept
@@ -180,6 +207,23 @@ namespace ion::graphics::scene
 			/*
 				Observers
 			*/
+
+			//Returns the relative bounding volume extent of this movable object
+			//Aabb::Min represents the bottom-left corner (default: vector2::Zero)
+			//Aabb::Max represents the top-left corner (default: vector2::UnitScale)
+			[[nodiscard]] inline auto BoundingVolumeExtent() const noexcept
+			{
+				return bounding_volume_extent_;
+			}
+
+			//Returns the query flags for this movable object
+			//This object will only be queried if a bitwise AND operation between the query flags and the query mask is non-zero
+			//The meaning of the bits is user-specific
+			[[nodiscard]] inline auto QueryFlags() const noexcept
+			{
+				return query_flags_;
+			}
+
 
 			//Returns true if this movable object is visible
 			[[nodiscard]] inline auto Visible() const noexcept
@@ -199,12 +243,17 @@ namespace ion::graphics::scene
 				return std::tuple{aabb_color_, obb_color_, sphere_color_};
 			}
 
-			//Returns the relative bounding volume extent of this movable object
-			//Aabb::Min represents the bottom-left corner (default: vector2::Zero)
-			//Aabb::Max represents the top-left corner (default: vector2::UnitScale)
-			[[nodiscard]] inline auto BoundingVolumeExtent() const noexcept
+
+			//Returns a pointer to the parent node for this movable object
+			[[nodiscard]] inline auto ParentNode() const noexcept
 			{
-				return bounding_volume_extent_;
+				return parent_node_;
+			}
+
+			//Returns the custom user data for this movable object
+			[[nodiscard]] inline auto& UserData() const noexcept
+			{
+				return user_data_;
 			}
 
 
@@ -224,19 +273,6 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto& BoundingSphere() const noexcept
 			{
 				return sphere_;
-			}
-
-
-			//Returns a pointer to the parent node for this movable object
-			[[nodiscard]] inline auto ParentNode() const noexcept
-			{
-				return parent_node_;
-			}
-
-			//Returns the custom user data for this movable object
-			[[nodiscard]] inline auto& UserData() const noexcept
-			{
-				return user_data_;
 			}
 
 
