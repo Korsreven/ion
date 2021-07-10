@@ -83,7 +83,7 @@ namespace ion::graphics::scene
 		private:
 
 			Aabb bounding_volume_extent_ = {vector2::Zero, vector2::UnitScale};
-			uint32 query_flags_ = 0;
+			std::optional<uint32> query_flags_;
 
 			bool show_bounding_volumes_ = false;
 			Color aabb_color_ = color::White;
@@ -147,7 +147,7 @@ namespace ion::graphics::scene
 			//Sets the query flags for this movable object to the given flags
 			//This object will only be queried if a bitwise AND operation between the query flags and the query mask is non-zero
 			//The meaning of the bits is user-specific
-			inline void QueryFlags(uint32 flags) noexcept
+			inline void QueryFlags(std::optional<uint32> flags) noexcept
 			{
 				query_flags_ = flags;
 			}
@@ -157,7 +157,10 @@ namespace ion::graphics::scene
 			//The meaning of the bits is user-specific
 			inline void AddQueryFlags(uint32 flags) noexcept
 			{
-				query_flags_ |= flags;
+				if (query_flags_)
+					*query_flags_ |= flags;
+				else
+					query_flags_ = flags;
 			}
 
 			//Removes the given flags to the already existing query flags for this movable object
@@ -165,7 +168,8 @@ namespace ion::graphics::scene
 			//The meaning of the bits is user-specific
 			inline void RemoveQueryFlags(uint32 flags) noexcept
 			{
-				query_flags_ &= ~flags;
+				if (query_flags_)
+					*query_flags_ &= ~flags;
 			}
 
 
