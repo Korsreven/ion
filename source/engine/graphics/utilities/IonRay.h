@@ -13,6 +13,8 @@ File:	IonRay.h
 #ifndef ION_RAY_H
 #define ION_RAY_H
 
+#include <utility>
+
 #include "IonAabb.h"
 #include "IonSphere.h"
 #include "IonVector2.h"
@@ -38,13 +40,6 @@ namespace ion::graphics::utilities
 
 			//Constructs a new ray from the given origin and direction
 			Ray(const Vector2 &origin, const Vector2 &direction) noexcept;
-
-
-			/*
-				Static ray conversions
-			*/
-
-
 
 
 			/*
@@ -107,13 +102,13 @@ namespace ion::graphics::utilities
 			*/
 
 			//Returns true if this ray intersects the given aabb
-			[[nodiscard]] bool Intersects(const Aabb &aabb) const noexcept;
+			[[nodiscard]] std::pair<bool, real> Intersects(const Aabb &aabb) const noexcept;
 
 			//Returns true if this ray intersects the given sphere
-			[[nodiscard]] bool Intersects(const Sphere &sphere) const noexcept;
+			[[nodiscard]] std::pair<bool, real> Intersects(const Sphere &sphere) const noexcept;
 
 			//Returns true if this ray intersects the given point
-			[[nodiscard]] bool Intersects(const Vector2 &point) const noexcept;
+			[[nodiscard]] std::pair<bool, real> Intersects(const Vector2 &point) const noexcept;
 	};
 
 
@@ -124,10 +119,7 @@ namespace ion::graphics::utilities
 		*/
 
 		inline const auto Zero = Ray{0.0_r, vector2::Zero};
-		inline const auto UnitX = Ray{0.0_r, vector2::UnitX};
-		inline const auto UnitY = Ray{0.0_r, vector2::UnitY};
-		inline const auto NegativeUnitX = Ray{0.0_r, vector2::NegativeUnitX};
-		inline const auto NegativeUnitY = Ray{0.0_r, vector2::NegativeUnitY};
+		inline const auto Unit = Ray{0.0_r, vector2::UnitScale};
 	} //ray
 } //ion::graphics::utilities
 
