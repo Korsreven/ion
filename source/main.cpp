@@ -125,6 +125,7 @@ File:	main.cpp
 #include "graphics/utilities/IonMatrix3.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonObb.h"
+#include "graphics/utilities/IonRay.h"
 #include "graphics/utilities/IonSphere.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
