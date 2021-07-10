@@ -212,7 +212,7 @@ Sphere Sphere::MergeCopy(const Sphere &sphere) const noexcept
 
 Sphere Sphere::MergeCopy(const Vector2 &point) const noexcept
 {
-	return MergeCopy(Sphere{0.0_r, point});
+	return MergeCopy(Sphere{math::Epsilon, point});
 }
 
 
