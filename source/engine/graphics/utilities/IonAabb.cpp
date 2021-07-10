@@ -333,17 +333,31 @@ Aabb Aabb::TransformCopy(const Matrix3 &matrix) const noexcept
 	auto half_size = ToHalfSize();
 	auto [x, y] = half_size.XY();
 
-	#ifdef ION_LEFT_HAND_ROTATION
-	//Left-hand rotation CW (Direct3D)
-	return HalfSize({math::Abs(matrix.M00()) * x + math::Abs(matrix.M10()) * y,
-					 math::Abs(matrix.M01()) * x + math::Abs(matrix.M11()) * y},
-					 matrix.TransformPoint(Center()));
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+		#ifdef ION_LEFT_HAND_ROTATION
+		//Left-hand rotation CW
+		half_size = Vector2{math::Abs(matrix.M00()) * x + math::Abs(matrix.M01()) * y,
+							math::Abs(matrix.M10()) * x + math::Abs(matrix.M11()) * y};
+		#else
+		//Right-hand rotation CCW
+		half_size = Vector2{math::Abs(matrix.M00()) * x + math::Abs(matrix.M10()) * y,
+							math::Abs(matrix.M01()) * x + math::Abs(matrix.M11()) * y};
+		#endif
 	#else
-	//Right-hand rotation CCW (OpenGL)
-	return HalfSize({math::Abs(matrix.M00()) * x + math::Abs(matrix.M01()) * y,
-					 math::Abs(matrix.M10()) * x + math::Abs(matrix.M11()) * y},
-					 matrix.TransformPoint(Center()));
+	//Column-major layout (OpenGL)
+		#ifdef ION_LEFT_HAND_ROTATION
+		//Left-hand rotation CW
+		half_size = Vector2{math::Abs(matrix.M00()) * x + math::Abs(matrix.M10()) * y,
+							math::Abs(matrix.M01()) * x + math::Abs(matrix.M11()) * y};
+		#else
+		//Right-hand rotation CCW
+		half_size = Vector2{math::Abs(matrix.M00()) * x + math::Abs(matrix.M01()) * y,
+							math::Abs(matrix.M10()) * x + math::Abs(matrix.M11()) * y};
+		#endif
 	#endif
+
+	return HalfSize(half_size, matrix.TransformPoint(Center()));
 }
 
 

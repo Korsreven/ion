@@ -285,14 +285,28 @@ Obb Obb::TransformCopy(const Matrix3 &matrix) const noexcept
 	auto half_size = ToHalfSize();
 	auto [x, y] = half_size.XY();
 
-	#ifdef ION_LEFT_HAND_ROTATION
-	//Left-hand rotation CW (Direct3D)
-	auto v1 = Vector2{matrix.M00(), matrix.M01()} * x;
-	auto v2 = Vector2{matrix.M10(), matrix.M11()} * y;
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+		#ifdef ION_LEFT_HAND_ROTATION
+		//Left-hand rotation CW
+		auto v1 = Vector2{matrix.M00(), matrix.M10()} * x;
+		auto v2 = Vector2{matrix.M01(), matrix.M11()} * y;
+		#else
+		//Right-hand rotation CCW
+		auto v1 = Vector2{matrix.M00(), matrix.M01()} * x;
+		auto v2 = Vector2{matrix.M10(), matrix.M11()} * y;
+		#endif
 	#else
-	//Right-hand rotation CCW (OpenGL)
-	auto v1 = Vector2{matrix.M00(), matrix.M10()} * x;
-	auto v2 = Vector2{matrix.M01(), matrix.M11()} * y;
+	//Column-major layout (OpenGL)
+		#ifdef ION_LEFT_HAND_ROTATION
+		//Left-hand rotation CW
+		auto v1 = Vector2{matrix.M00(), matrix.M01()} * x;
+		auto v2 = Vector2{matrix.M10(), matrix.M11()} * y;
+		#else
+		//Right-hand rotation CCW
+		auto v1 = Vector2{matrix.M00(), matrix.M10()} * x;
+		auto v2 = Vector2{matrix.M01(), matrix.M11()} * y;
+		#endif
 	#endif
 
 	auto center = matrix.TransformPoint(Center());
