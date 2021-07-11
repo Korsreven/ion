@@ -16,6 +16,7 @@ File:	IonRay.h
 #include <utility>
 
 #include "IonAabb.h"
+#include "IonObb.h"
 #include "IonSphere.h"
 #include "IonVector2.h"
 #include "types/IonTypes.h"
@@ -103,6 +104,9 @@ namespace ion::graphics::utilities
 
 			//Returns true if this ray intersects the given aabb
 			[[nodiscard]] std::pair<bool, real> Intersects(const Aabb &aabb) const noexcept;
+
+			//Returns true if this ray intersects the given obb
+			[[nodiscard]] std::pair<bool, real> Intersects(const Obb &obb) const noexcept;
 
 			//Returns true if this ray intersects the given sphere
 			[[nodiscard]] std::pair<bool, real> Intersects(const Sphere &sphere) const noexcept;

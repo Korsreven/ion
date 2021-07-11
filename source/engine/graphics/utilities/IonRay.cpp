@@ -141,6 +141,26 @@ std::pair<bool, real> Ray::Intersects(const Aabb &aabb) const noexcept
 	return {hit, min_units};
 }
 
+std::pair<bool, real> Ray::Intersects(const Obb &obb) const noexcept
+{
+	if (obb.Empty())
+		return {false, 0.0_r};
+
+	auto c0 = obb.Corners()[0];
+	auto c1 = obb.Corners()[1];
+	auto c2 = obb.Corners()[2];
+	
+	//Rotate obb to align with axis
+	auto angle = vector2::UnitX.SignedAngleBetween(c1 - c0);
+	auto center = obb.Center();
+	c0.Rotate(-angle, center); //Min
+	c2.Rotate(-angle, center); //Max
+
+	//Reduce problem to ray-aabb intersection, by rotating ray correspondingly
+	return Ray{origin_.RotateCopy(angle, center), direction_.Deviant(angle)}.
+		Intersects(Aabb{c0, c2});
+}
+
 std::pair<bool, real> Ray::Intersects(const Sphere &sphere) const noexcept
 {
 	if (sphere.Empty())
