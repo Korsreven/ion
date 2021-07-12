@@ -151,10 +151,10 @@ std::pair<bool, real> Ray::Intersects(const Obb &obb) const noexcept
 	auto c2 = obb.Corners()[2];
 	
 	//Rotate obb to align with axis
-	auto angle = vector2::UnitX.SignedAngleBetween(c1 - c0);
+	auto angle = -vector2::UnitX.SignedAngleBetween(c1 - c0);
 	auto center = obb.Center();
-	c0.Rotate(-angle, center); //Min
-	c2.Rotate(-angle, center); //Max
+	c0.Rotate(angle, center); //Min
+	c2.Rotate(angle, center); //Max
 
 	//Reduce problem to ray-aabb intersection, by rotating ray correspondingly
 	return Ray{origin_.RotateCopy(angle, center), direction_.Deviant(angle)}.
