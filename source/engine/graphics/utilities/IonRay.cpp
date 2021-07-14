@@ -13,6 +13,8 @@ File:	IonRay.cpp
 #include "IonRay.h"
 
 #include <cmath>
+
+#include "IonMatrix3.h"
 #include "utilities/IonMath.h"
 
 namespace ion::graphics::utilities
@@ -157,8 +159,7 @@ std::pair<bool, real> Ray::Intersects(const Obb &obb) const noexcept
 	c2.Rotate(angle, center); //Max
 
 	//Reduce problem to ray-aabb intersection, by rotating ray correspondingly
-	return Ray{origin_.RotateCopy(angle, center), direction_.Deviant(angle)}.
-		Intersects(Aabb{c0, c2});
+	return RotateCopy(angle, center).Intersects(Aabb{c0, c2});
 }
 
 std::pair<bool, real> Ray::Intersects(const Sphere &sphere) const noexcept
@@ -197,6 +198,62 @@ std::pair<bool, real> Ray::Intersects(const Sphere &sphere) const noexcept
 std::pair<bool, real> Ray::Intersects(const Vector2 &point) const noexcept
 {
 	return Intersects(Aabb{point - math::Epsilon, point + math::Epsilon});
+}
+
+
+/*
+	Rotating
+*/
+
+Ray& Ray::Rotate(real angle) noexcept
+{
+	return *this = RotateCopy(angle);
+}
+
+Ray Ray::RotateCopy(real angle) const noexcept
+{
+	return {origin_, direction_.Deviant(angle)};
+}
+
+
+Ray& Ray::Rotate(real angle, const Vector2 &origin) noexcept
+{
+	return *this = RotateCopy(angle, origin);
+}
+
+Ray Ray::RotateCopy(real angle, const Vector2 &origin) const noexcept
+{
+	return {origin_.RotateCopy(angle, origin), direction_.Deviant(angle)};
+}
+
+
+/*
+	Transforming
+*/
+
+Ray& Ray::Transform(const Matrix3 &matrix) noexcept
+{
+	return *this = TransformCopy(matrix);
+}
+
+Ray Ray::TransformCopy(const Matrix3 &matrix) const noexcept
+{
+	return {matrix.TransformPoint(origin_), direction_.Deviant(matrix.ToRotation())};
+}
+
+
+/*
+	Translating
+*/
+
+Ray& Ray::Translate(const Vector2 &vector) noexcept
+{
+	return *this = TranslateCopy(vector);
+}
+
+Ray Ray::TranslateCopy(const Vector2 &vector) const noexcept
+{
+	return {origin_ + vector, direction_};
 }
 
 } //ion::graphics::utilities

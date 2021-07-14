@@ -113,6 +113,50 @@ namespace ion::graphics::utilities
 
 			//Returns true if this ray intersects the given point
 			[[nodiscard]] std::pair<bool, real> Intersects(const Vector2 &point) const noexcept;
+
+
+			/*
+				Rotating
+			*/
+
+			//Rotate ray by the given angle (radians)
+			Ray& Rotate(real angle) noexcept;
+
+			//Rotate ray by the given angle (radians)
+			//Returns the result as a copy
+			[[nodiscard]] Ray RotateCopy(real angle) const noexcept;
+
+
+			//Rotate ray by the given angle (radians) and origin vector
+			Ray& Rotate(real angle, const Vector2 &origin) noexcept;
+
+			//Rotate ray by the given angle (radians) and origin vector
+			//Returns the result as a copy
+			[[nodiscard]] Ray RotateCopy(real angle, const Vector2 &origin) const noexcept;
+
+
+			/*
+				Transforming
+			*/
+
+			//Transform ray based on the given matrix
+			Ray& Transform(const Matrix3 &matrix) noexcept;
+
+			//Transform ray based on the given matrix
+			//Returns the result as a copy
+			[[nodiscard]] Ray TransformCopy(const Matrix3 &matrix) const noexcept;
+
+
+			/*
+				Translating
+			*/
+
+			//Translate ray by the given vector
+			Ray& Translate(const Vector2 &vector) noexcept;
+
+			//Translate ray by the given vector
+			//Returns the result as a copy
+			[[nodiscard]] Ray TranslateCopy(const Vector2 &vector) const noexcept;
 	};
 
 
@@ -123,7 +167,6 @@ namespace ion::graphics::utilities
 		*/
 
 		inline const auto Zero = Ray{0.0_r, vector2::Zero};
-		inline const auto Unit = Ray{0.0_r, vector2::UnitScale};
 	} //ray
 } //ion::graphics::utilities
 
