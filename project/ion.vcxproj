@@ -214,6 +214,7 @@
     <ClCompile Include="..\source\engine\graphics\scene\IonMovableSound.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonMovableSoundListener.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonSceneManager.cpp" />
+    <ClCompile Include="..\source\engine\graphics\scene\query\IonSceneQuery.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonBorder.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonCurve.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonEllipse.cpp" />
@@ -360,6 +361,7 @@
     <ClInclude Include="..\source\engine\graphics\scene\IonMovableSound.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonMovableSoundListener.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonSceneManager.h" />
+    <ClInclude Include="..\source\engine\graphics\scene\query\IonSceneQuery.h" />
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonBorder.h" />
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonCurve.h" />
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonEllipse.h" />

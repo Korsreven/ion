@@ -95,6 +95,7 @@ File:	main.cpp
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneGraph.h"
 #include "graphics/scene/graph/IonSceneNode.h"
+#include "graphics/scene/query/IonSceneQuery.h"
 #include "graphics/scene/shapes/IonBorder.h"
 #include "graphics/scene/shapes/IonCurve.h"
 #include "graphics/scene/shapes/IonEllipse.h"

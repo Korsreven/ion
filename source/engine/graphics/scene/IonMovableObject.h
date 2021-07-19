@@ -145,7 +145,7 @@ namespace ion::graphics::scene
 			}
 
 			//Sets the query flags for this movable object to the given flags
-			//This object will only be queried if a bitwise AND operation between the query flags and the query mask is non-zero
+			//This object will only be queried if a bitwise AND operation between the query flags and the scene query mask is non-zero
 			//The meaning of the bits is user-specific
 			inline void QueryFlags(std::optional<uint32> flags) noexcept
 			{
@@ -153,7 +153,7 @@ namespace ion::graphics::scene
 			}
 
 			//Adds the given flags to the already existing query flags for this movable object
-			//This object will only be queried if a bitwise AND operation between the query flags and the query mask is non-zero
+			//This object will only be queried if a bitwise AND operation between the query flags and the scene query mask is non-zero
 			//The meaning of the bits is user-specific
 			inline void AddQueryFlags(uint32 flags) noexcept
 			{
@@ -164,7 +164,7 @@ namespace ion::graphics::scene
 			}
 
 			//Removes the given flags to the already existing query flags for this movable object
-			//This object will only be queried if a bitwise AND operation between the query flags and the query mask is non-zero
+			//This object will only be queried if a bitwise AND operation between the query flags and the scene query mask is non-zero
 			//The meaning of the bits is user-specific
 			inline void RemoveQueryFlags(uint32 flags) noexcept
 			{
@@ -221,7 +221,7 @@ namespace ion::graphics::scene
 			}
 
 			//Returns the query flags for this movable object
-			//This object will only be queried if a bitwise AND operation between the query flags and the query mask is non-zero
+			//This object will only be queried if a bitwise AND operation between the query flags and the scene query mask is non-zero
 			//The meaning of the bits is user-specific
 			[[nodiscard]] inline auto QueryFlags() const noexcept
 			{

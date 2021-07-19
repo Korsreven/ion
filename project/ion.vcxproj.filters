@@ -199,6 +199,12 @@
     <Filter Include="Source Files\sounds">
       <UniqueIdentifier>{46863129-c161-4c9c-9d81-691a974f79d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\graphics\scene\query">
+      <UniqueIdentifier>{197b9c71-ada8-4166-bef2-34874cc4f2ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics\scene\query">
+      <UniqueIdentifier>{fc8ac52a-6409-4b20-b24e-0f01ee6c3b39}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -536,6 +542,9 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\utilities\IonRay.cpp">
       <Filter>Source Files\graphics\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\query\IonSceneQuery.cpp">
+      <Filter>Source Files\graphics\scene\query</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1054,6 +1063,9 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\utilities\IonRay.h">
       <Filter>Header Files\graphics\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\query\IonSceneQuery.h">
+      <Filter>Header Files\graphics\scene\query</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
