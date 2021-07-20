@@ -15,6 +15,7 @@ File:	IonDrawableParticleSystem.cpp
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/shaders/IonShaderProgram.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
+#include "query/IonSceneQuery.h"
 
 namespace ion::graphics::scene
 {
@@ -137,7 +138,7 @@ DrawableParticleSystem::DrawableParticleSystem(NonOwningPtr<particles::ParticleS
 	particle_system_{particle_system ? std::make_optional(particle_system->Clone()) : std::nullopt},
 	initial_particle_system_{particle_system}
 {
-	//Empty
+	query_type_flags_ |= query::scene_query::QueryType::ParticleSystem;
 }
 
 

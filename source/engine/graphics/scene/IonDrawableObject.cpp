@@ -17,6 +17,7 @@ File:	IonDrawableObject.cpp
 
 #include "graphics/shaders/IonShaderProgram.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
+#include "query/IonSceneQuery.h"
 
 namespace ion::graphics::scene
 {
@@ -31,13 +32,13 @@ namespace drawable_object::detail
 DrawableObject::DrawableObject(bool visible) :
 	MovableObject{visible}
 {
-	//Empty
+	query_type_flags_ |= query::scene_query::QueryType::Drawable;
 }
 
 DrawableObject::DrawableObject(std::string name, bool visible) :
 	MovableObject{std::move(name), visible}
 {
-	//Empty
+	query_type_flags_ |= query::scene_query::QueryType::Drawable;
 }
 
 DrawableObject::DrawableObject(const DrawableObject &rhs) noexcept :

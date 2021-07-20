@@ -12,6 +12,8 @@ File:	IonDrawableAnimation.cpp
 
 #include "IonDrawableAnimation.h"
 
+#include "query/IonSceneQuery.h"
+
 namespace ion::graphics::scene
 {
 
@@ -152,7 +154,7 @@ DrawableAnimation::DrawableAnimation(const Vector3 &position, real rotation, con
 
 	reload_vertex_stream_{!!animation}
 {
-	//Empty
+	query_type_flags_ |= query::scene_query::QueryType::Animation;
 }
 
 

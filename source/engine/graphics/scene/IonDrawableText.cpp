@@ -23,6 +23,7 @@ File:	IonDrawableText.cpp
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/shaders/IonShaderProgram.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
+#include "query/IonSceneQuery.h"
 
 #undef min
 
@@ -614,7 +615,7 @@ DrawableText::DrawableText(const Vector3 &position, real rotation, NonOwningPtr<
 
 	reload_vertex_streams_{!!text_}
 {
-	//Empty
+	query_type_flags_ |= query::scene_query::QueryType::Text;
 }
 
 

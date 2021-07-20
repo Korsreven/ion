@@ -45,6 +45,9 @@ namespace ion::graphics::scene::query
 			static constexpr uint32 Sound = 1 << 7;
 			static constexpr uint32 SoundListener = 1 << 8;
 			static constexpr uint32 Text = 1 << 9;
+
+			static constexpr uint32 UserType0 = 1 << 10;
+				//First (pot) value not in use by the engine
 		};
 
 

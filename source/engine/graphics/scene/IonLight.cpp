@@ -12,6 +12,8 @@ File:	IonLight.cpp
 
 #include "IonLight.h"
 
+#include "query/IonSceneQuery.h"
+
 namespace ion::graphics::scene
 {
 
@@ -21,7 +23,7 @@ using namespace utilities;
 Light::Light(bool visible) noexcept :
 	MovableObject{visible}
 {
-	//Empty
+	query_type_flags_ |= query::scene_query::QueryType::Light;
 }
 
 Light::Light(LightType type,
@@ -50,7 +52,7 @@ Light::Light(LightType type,
 
 	cast_shadows_{cast_shadows}
 {
-	//Empty
+	query_type_flags_ |= query::scene_query::QueryType::Light;
 }
 
 

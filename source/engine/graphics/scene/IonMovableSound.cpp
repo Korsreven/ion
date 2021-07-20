@@ -13,6 +13,7 @@ File:	IonMovableSound.cpp
 #include "IonMovableSound.h"
 
 #include "graph/IonSceneNode.h"
+#include "query/IonSceneQuery.h"
 #include "sounds/IonSound.h"
 
 namespace ion::graphics::scene
@@ -38,7 +39,7 @@ MovableSound::MovableSound(const Vector3 &position, NonOwningPtr<sounds::Sound> 
 	sound_channel_{sound ? sound->Play(paused) : nullptr},
 	initial_sound_{sound}
 {
-	//Empty
+	query_type_flags_ |= query::scene_query::QueryType::Sound;
 }
 
 
@@ -54,7 +55,7 @@ MovableSound::MovableSound(const Vector3 &position, NonOwningPtr<sounds::Sound> 
 	sound_channel_{sound ? sound->Play(sound_channel_group, paused) : nullptr},
 	initial_sound_{sound}
 {
-	//Empty
+	query_type_flags_ |= query::scene_query::QueryType::Sound;
 }
 
 

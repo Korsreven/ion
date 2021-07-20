@@ -18,6 +18,7 @@ File:	IonCamera.cpp
 #include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneNode.h"
+#include "query/IonSceneQuery.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
 
@@ -92,7 +93,7 @@ void Camera::NotifyCameraMoved(const Vector3 &position) noexcept
 Camera::Camera(std::string name, bool visible) :
 	MovableObject{std::move(name), visible}
 {
-	//Empty
+	query_type_flags_ |= query::scene_query::QueryType::Camera;
 }
 
 Camera::Camera(std::string name, const render::Frustum &frustum, bool visible) :
@@ -100,7 +101,7 @@ Camera::Camera(std::string name, const render::Frustum &frustum, bool visible) :
 	MovableObject{std::move(name), visible},
 	frustum_{frustum}
 {
-	//Empty
+	query_type_flags_ |= query::scene_query::QueryType::Camera;
 }
 
 

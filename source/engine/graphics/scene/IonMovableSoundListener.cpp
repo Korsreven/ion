@@ -13,6 +13,7 @@ File:	IonMovableSoundListener.cpp
 #include "IonMovableSoundListener.h"
 
 #include "graph/IonSceneNode.h"
+#include "query/IonSceneQuery.h"
 #include "sounds/IonSoundListener.h"
 #include "types/IonTypes.h"
 
@@ -30,7 +31,7 @@ namespace movable_sound_listener::detail
 MovableSoundListener::MovableSoundListener(NonOwningPtr<sounds::SoundListener> sound_listener) :
 	sound_listener_{sound_listener}
 {
-	//Empty
+	query_type_flags_ |= query::scene_query::QueryType::SoundListener;
 }
 
 MovableSoundListener::MovableSoundListener(const Vector3 &position, NonOwningPtr<sounds::SoundListener> sound_listener) :
@@ -38,7 +39,7 @@ MovableSoundListener::MovableSoundListener(const Vector3 &position, NonOwningPtr
 	position_{position},
 	sound_listener_{sound_listener}
 {
-	//Empty
+	query_type_flags_ |= query::scene_query::QueryType::SoundListener;
 }
 
 

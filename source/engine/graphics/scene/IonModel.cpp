@@ -15,6 +15,7 @@ File:	IonModel.cpp
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/shaders/IonShaderProgram.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
+#include "query/IonSceneQuery.h"
 
 namespace ion::graphics::scene
 {
@@ -40,7 +41,7 @@ void Model::Created(shapes::Mesh &mesh) noexcept
 Model::Model(bool visible) noexcept :
 	DrawableObject{visible}
 {
-	//Empty
+	query_type_flags_ |= query::scene_query::QueryType::Model;
 }
 
 

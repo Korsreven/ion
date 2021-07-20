@@ -60,6 +60,7 @@ namespace ion::graphics::scene
 	{
 		protected:
 
+			uint32 query_type_flags_ = 0;
 			bool visible_ = true;
 
 			Aabb aabb_;
@@ -226,6 +227,13 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto QueryFlags() const noexcept
 			{
 				return query_flags_;
+			}
+
+			//Returns the query type flags for this movable object
+			//This object will only be queried if a bitwise AND operation between the query type flags and the scene query type mask is non-zero
+			[[nodiscard]] inline auto QueryTypeFlags() const noexcept
+			{
+				return query_type_flags_;
 			}
 
 
