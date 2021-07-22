@@ -543,7 +543,10 @@
     <ClCompile Include="..\source\engine\graphics\utilities\IonRay.cpp">
       <Filter>Source Files\graphics\utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\engine\graphics\scene\query\IonSceneQuery.cpp">
+    <ClCompile Include="..\source\engine\graphics\scene\query\IonIntersectionSceneQuery.cpp">
+      <Filter>Source Files\graphics\scene\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\query\IonRaySceneQuery.cpp">
       <Filter>Source Files\graphics\scene\query</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1065,6 +1068,12 @@
       <Filter>Header Files\graphics\utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\scene\query\IonSceneQuery.h">
+      <Filter>Header Files\graphics\scene\query</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\query\IonIntersectionSceneQuery.h">
+      <Filter>Header Files\graphics\scene\query</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\query\IonRaySceneQuery.h">
       <Filter>Header Files\graphics\scene\query</Filter>
     </ClInclude>
   </ItemGroup>

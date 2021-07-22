@@ -14,15 +14,8 @@ File:	IonSceneQuery.h
 #define ION_SCENE_QUERY
 
 #include <optional>
-#include <vector>
 
-#include "events/IonListenable.h"
 #include "graphics/scene/graph/IonSceneGraph.h"
-#include "graphics/scene/graph/IonSceneNode.h"
-#include "graphics/render/IonFog.h"
-#include "graphics/utilities/IonAabb.h"
-#include "graphics/utilities/IonObb.h"
-#include "graphics/utilities/IonSphere.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
@@ -57,6 +50,7 @@ namespace ion::graphics::scene::query
 	} //scene_query
 
 
+	template <typename ResultT>
 	class SceneQuery
 	{
 		protected:
@@ -71,7 +65,11 @@ namespace ion::graphics::scene::query
 			SceneQuery() = default;
 
 			//Construct a new scene query with the given scene graph
-			SceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept;
+			SceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept :
+				scene_graph_{scene_graph}
+			{
+				//Empty
+			}
 
 
 			/*
@@ -165,6 +163,14 @@ namespace ion::graphics::scene::query
 			{
 				return scene_graph_;
 			}
+
+
+			/*
+				Querying
+			*/
+
+			//Returns the result of the scene query
+			[[nodiscard]] virtual ResultT Execute() const noexcept = 0;
 	};
 } //ion::graphics::scene::query
 
