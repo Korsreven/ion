@@ -14,8 +14,14 @@ File:	IonSceneQuery.h
 #define ION_SCENE_QUERY
 
 #include <optional>
+#include <variant>
+#include <vector>
 
+#include "graphics/scene/IonCamera.h"
+#include "graphics/scene/IonLight.h"
+#include "graphics/scene/IonMovableObject.h"
 #include "graphics/scene/graph/IonSceneGraph.h"
+#include "graphics/scene/graph/IonSceneNode.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
@@ -46,6 +52,39 @@ namespace ion::graphics::scene::query
 
 		namespace detail
 		{
+			using object_type = MovableObject*;
+			using object_container_type = std::vector<object_type>;
+
+
+			inline void get_eligible_objects(SceneNode &node, uint32 type_mask, bool only_visible,
+				object_container_type &objects) noexcept
+			{
+				//Check if node is eligible
+				if (!only_visible || node.Visible())
+				{
+					for (auto &attached_object : node.AttachedObjects())
+					{
+						auto object =
+							std::visit([](auto &&x) noexcept -> MovableObject* { return x; }, attached_object);
+
+						//Check if object is eligible
+						if ((!only_visible || object->Visible()) &&
+							object->QueryTypeFlags() & type_mask)
+
+							objects.push_back(object); //Eligible for querying
+					}
+				}
+
+				for (auto &child_node : node.ChildNodes())
+					get_eligible_objects(child_node, type_mask, only_visible, objects); //Recursive
+			}
+
+			inline auto get_eligible_objects(SceneNode &node, uint32 type_mask, bool only_visible) noexcept
+			{
+				object_container_type objects;
+				get_eligible_objects(node, type_mask, only_visible, objects);
+				return objects;
+			}
 		} //detail
 	} //scene_query
 
@@ -57,6 +96,7 @@ namespace ion::graphics::scene::query
 		
 			std::optional<uint32> query_mask_;
 			std::optional<uint32> query_type_mask_ = scene_query::QueryType::Model;
+			bool only_visible_objects_ = true;
 			NonOwningPtr<SceneGraph> scene_graph_;
 
 		public:
@@ -131,6 +171,12 @@ namespace ion::graphics::scene::query
 			}
 
 
+			//Sets whether or not this scene query is only querying visible objects
+			inline void OnlyVisibleObjects(bool only_visible) noexcept
+			{
+				only_visible_objects_ = only_visible;
+			}
+
 			//Sets the scene graph this scene query is querying
 			inline void Scene(NonOwningPtr<SceneGraph> scene_graph) noexcept
 			{
@@ -157,6 +203,12 @@ namespace ion::graphics::scene::query
 				return query_type_mask_;
 			}
 
+
+			//Returns whether or not this scene query is only querying visible objects
+			[[nodiscard]] inline auto OnlyVisibleObjects() const noexcept
+			{
+				return only_visible_objects_;
+			}
 
 			//Returns the scene graph this scene query is querying
 			[[nodiscard]] inline auto Scene() const noexcept
