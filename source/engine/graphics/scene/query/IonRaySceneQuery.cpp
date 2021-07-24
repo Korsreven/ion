@@ -29,6 +29,14 @@ RaySceneQuery::RaySceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept :
 	//Empty
 }
 
+RaySceneQuery::RaySceneQuery(NonOwningPtr<SceneGraph> scene_graph, const Ray &ray) noexcept :
+	
+	SceneQuery<ResultType>{scene_graph},
+	ray_{ray}
+{
+	//Empty
+}
+
 
 /*
 	Querying

@@ -37,7 +37,7 @@ namespace ion::graphics::scene::query
 
 	class IntersectionSceneQuery final : public SceneQuery<intersection_scene_query::ResultType>
 	{
-		protected:
+		private:
 
 
 

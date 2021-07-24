@@ -18,6 +18,7 @@ File:	IonRaySceneQuery.h
 
 #include "IonSceneQuery.h"
 #include "graphics/scene/graph/IonSceneGraph.h"
+#include "graphics/utilities/IonRay.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
@@ -37,9 +38,11 @@ namespace ion::graphics::scene::query
 
 	class RaySceneQuery final : public SceneQuery<ray_scene_query::ResultType>
 	{
-		protected:
+		private:
 
-
+			Ray ray_;
+			bool sort_by_distance_ = true;
+			std::optional<int> max_results_;
 
 		public:
 
@@ -49,19 +52,57 @@ namespace ion::graphics::scene::query
 			//Construct a new scene query with the given scene graph
 			RaySceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept;
 
+			//Construct a new scene query with the given scene graph and ray
+			RaySceneQuery(NonOwningPtr<SceneGraph> scene_graph, const Ray &ray) noexcept;
+
 
 			/*
 				Modifiers
 			*/
 
+			//Sets the ray this ray scene query is using when querying
+			inline void SceneRay(const Ray &ray) noexcept
+			{
+				ray_ = ray;
+			}
 
+			//Sets whether or not to this ray scene query is sorting query results by distance
+			inline void SortByDistance(bool sort) noexcept
+			{
+				sort_by_distance_ = sort;
+			}
+
+			//Sets the max results this ray scene query is returning
+			//Pass nullopt to allow indefinitely number of results
+			inline void MaxResults(std::optional<int> max_results) noexcept
+			{
+				max_results_ = max_results;
+			}
+			
 
 
 			/*
 				Observers
 			*/
 
-			
+			//Returns the ray this ray scene query is using when querying
+			[[nodiscard]] inline auto SceneRay() const noexcept
+			{
+				return ray_;
+			}
+
+			//Returns whether or not to this ray scene query is sorting query results by distance
+			[[nodiscard]] inline auto SortByDistance() const noexcept
+			{
+				return sort_by_distance_;
+			}
+
+			//Returns the max results this ray scene query is returning
+			//Returns nullopt if there is no max results set
+			[[nodiscard]] inline auto MaxResults() const noexcept
+			{
+				return max_results_;
+			}
 
 
 			/*
