@@ -13,6 +13,7 @@ File:	IonSceneQuery.h
 #ifndef ION_SCENE_QUERY
 #define ION_SCENE_QUERY
 
+#include <algorithm>
 #include <optional>
 #include <variant>
 #include <vector>
@@ -22,12 +23,14 @@ File:	IonSceneQuery.h
 #include "graphics/scene/IonMovableObject.h"
 #include "graphics/scene/graph/IonSceneGraph.h"
 #include "graphics/scene/graph/IonSceneNode.h"
+#include "graphics/utilities/IonAabb.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::scene::query
 {
 	using namespace graphics::scene::graph;
+	using graphics::utilities::Aabb;
 
 	namespace scene_query
 	{
@@ -52,12 +55,12 @@ namespace ion::graphics::scene::query
 
 		namespace detail
 		{
-			using object_type = MovableObject*;
-			using object_container_type = std::vector<object_type>;
+			using query_object = MovableObject*;
+			using query_objects = std::vector<query_object>;
 
 
 			inline void get_eligible_objects(SceneNode &node, uint32 type_mask, bool only_visible,
-				object_container_type &objects) noexcept
+				query_objects &objects) noexcept
 			{
 				//Check if node is eligible
 				if (!only_visible || node.Visible())
@@ -65,7 +68,7 @@ namespace ion::graphics::scene::query
 					for (auto &attached_object : node.AttachedObjects())
 					{
 						auto object =
-							std::visit([](auto &&x) noexcept -> MovableObject* { return x; }, attached_object);
+							std::visit([](auto &&x) noexcept -> query_object { return x; }, attached_object);
 
 						//Check if object is eligible
 						if ((!only_visible || object->Visible()) &&
@@ -81,9 +84,20 @@ namespace ion::graphics::scene::query
 
 			inline auto get_eligible_objects(SceneNode &node, uint32 type_mask, bool only_visible) noexcept
 			{
-				object_container_type objects;
+				query_objects objects;
 				get_eligible_objects(node, type_mask, only_visible, objects);
 				return objects;
+			}
+
+			inline void remove_objects_outside_region(query_objects &objects, const Aabb &region) noexcept
+			{
+				objects.erase(
+					std::remove_if(std::begin(objects), std::end(objects),
+						[&](auto &object) noexcept
+						{
+							return !object->WorldAxisAlignedBoundingBox().Intersects(region);
+						}),
+					std::end(objects));
 			}
 		} //detail
 	} //scene_query
@@ -96,6 +110,7 @@ namespace ion::graphics::scene::query
 		
 			std::optional<uint32> query_mask_;
 			std::optional<uint32> query_type_mask_ = scene_query::QueryType::Model;
+			std::optional<Aabb> query_region_;
 			bool only_visible_objects_ = true;
 			NonOwningPtr<SceneGraph> scene_graph_;
 
@@ -171,6 +186,13 @@ namespace ion::graphics::scene::query
 			}
 
 
+			//Sets the query region for this scene query to the given region
+			//Pass nullopt to query the entire scene
+			inline void QueryRegion(const Aabb &region) noexcept
+			{
+				query_region_ = region;
+			}
+
 			//Sets whether or not this scene query is only querying visible objects
 			inline void OnlyVisibleObjects(bool only_visible) noexcept
 			{
@@ -203,6 +225,13 @@ namespace ion::graphics::scene::query
 				return query_type_mask_;
 			}
 
+
+			//Returns the query region for this scene query
+			//Returns nullopt this scene query is querying the entire scene
+			[[nodiscard]] inline auto& QueryRegion() const noexcept
+			{
+				return query_region_;
+			}
 
 			//Returns whether or not this scene query is only querying visible objects
 			[[nodiscard]] inline auto OnlyVisibleObjects() const noexcept
