@@ -12,7 +12,9 @@ File:	IonSphere.cpp
 
 #include "IonSphere.h"
 
+#include "IonAabb.h"
 #include "IonMatrix3.h"
+#include "IonObb.h"
 #include "graphics/IonGraphicsAPI.h"
 
 namespace ion::graphics::utilities
@@ -167,6 +169,38 @@ bool Sphere::Intersects(const Sphere &sphere) const noexcept
 bool Sphere::Intersects(const Vector2 &point) const noexcept
 {
 	return (point - center_).SquaredLength() <= radius_ * radius_;
+}
+
+
+bool Sphere::Intersects(const Aabb &aabb) const noexcept
+{
+	if (aabb.Empty())
+		return false;
+
+	auto aabb_center = aabb.Center();
+	auto half_size = aabb.ToHalfSize();
+	auto closest = detail::clamp(center_ - aabb_center, -half_size, half_size);
+
+	return Intersects(aabb_center + closest);
+}
+
+bool Sphere::Intersects(const Obb &obb) const noexcept
+{
+	if (obb.Empty())
+		return false;
+
+	auto c0 = obb.Corners()[0];
+	auto c1 = obb.Corners()[1];
+	auto c2 = obb.Corners()[2];
+	
+	//Rotate obb to align with axis
+	auto angle = -vector2::UnitX.SignedAngleBetween(c1 - c0);
+	auto center = obb.Center();
+	c0.Rotate(angle, center); //Min
+	c2.Rotate(angle, center); //Max
+
+	//Reduce problem to sphere-aabb intersection, by rotating sphere correspondingly
+	return Sphere{radius_, center_.RotateCopy(angle, obb.Center())}.Intersects(Aabb{c0, c2});
 }
 
 

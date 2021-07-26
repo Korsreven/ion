@@ -23,7 +23,10 @@ File:	IonSphere.h
 namespace ion::graphics::utilities
 {
 	using namespace types::type_literals;
+
+	class Aabb;
 	class Matrix3;
+	class Obb;
 
 	namespace sphere::detail
 	{
@@ -80,6 +83,15 @@ namespace ion::graphics::utilities
 		constexpr auto radius_to_volume(real radius) noexcept
 		{
 			return radius * radius * radius * shape_factor;
+		}
+
+
+		inline auto clamp(const Vector2 &v, const Vector2 &min, const Vector2 &max) noexcept
+		{
+			return Vector2{
+				std::clamp(v.X(), min.X(), max.X()),
+				std::clamp(v.Y(), min.Y(), max.Y())
+			};
 		}
 
 
@@ -222,6 +234,13 @@ namespace ion::graphics::utilities
 
 			//Returns true if this sphere intersects the given point
 			[[nodiscard]] bool Intersects(const Vector2 &point) const noexcept;
+
+
+			//Returns true if this sphere intersects the given aabb
+			[[nodiscard]] bool Intersects(const Aabb &aabb) const noexcept;
+
+			//Returns true if this sphere intersects the given obb
+			[[nodiscard]] bool Intersects(const Obb &obb) const noexcept;
 
 
 			/*
