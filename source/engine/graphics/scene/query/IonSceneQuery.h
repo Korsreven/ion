@@ -15,6 +15,7 @@ File:	IonSceneQuery.h
 
 #include <algorithm>
 #include <optional>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -55,7 +56,7 @@ namespace ion::graphics::scene::query
 
 		namespace detail
 		{
-			using query_object = MovableObject*;
+			using query_object = std::pair<MovableObject*, bool>;
 			using query_objects = std::vector<query_object>;
 
 
@@ -68,13 +69,13 @@ namespace ion::graphics::scene::query
 					for (auto &attached_object : node.AttachedObjects())
 					{
 						auto object =
-							std::visit([](auto &&x) noexcept -> query_object { return x; }, attached_object);
+							std::visit([](auto &&x) noexcept -> MovableObject* { return x; }, attached_object);
 
 						//Check if object is eligible
 						if ((!only_visible || object->Visible()) &&
 							object->QueryTypeFlags() & type_mask)
 
-							objects.push_back(object); //Eligible for querying
+							objects.emplace_back(object, true); //Eligible for querying
 					}
 				}
 
@@ -89,13 +90,43 @@ namespace ion::graphics::scene::query
 				return objects;
 			}
 
+			inline void derive_bounding_volumes(query_objects &objects) noexcept
+			{
+				for (auto &object : objects)
+				{
+					switch (object.first->PreferredBoundingVolume())
+					{
+						case movable_object::PreferredBoundingVolumeType::BoundingSphere:
+						{
+							[[maybe_unused]] auto &sphere = object.first->WorldBoundingSphere();
+							break;
+						}
+
+						case movable_object::PreferredBoundingVolumeType::BoundingBox:
+						default:
+						{
+							[[maybe_unused]] auto &aabb = object.first->WorldAxisAlignedBoundingBox();
+							break;
+						}
+					}
+				}
+			}
+
 			inline void remove_objects_outside_region(query_objects &objects, const Aabb &region) noexcept
 			{
 				objects.erase(
 					std::remove_if(std::begin(objects), std::end(objects),
 						[&](auto &object) noexcept
 						{
-							return !object->WorldAxisAlignedBoundingBox().Intersects(region);
+							switch (object.first->PreferredBoundingVolume())
+							{
+								case movable_object::PreferredBoundingVolumeType::BoundingSphere:
+								return !object.first->WorldBoundingSphere(false).Intersects(region);
+
+								case movable_object::PreferredBoundingVolumeType::BoundingBox:
+								default:
+								return !object.first->WorldAxisAlignedBoundingBox(false).Intersects(region);
+							}
 						}),
 					std::end(objects));
 			}

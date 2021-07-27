@@ -47,7 +47,14 @@ namespace ion::graphics::scene
 
 	namespace movable_object
 	{
+		enum class PreferredBoundingVolumeType : bool
+		{
+			BoundingBox,
+			BoundingSphere
+		};
+
 		using ShaderPrograms = std::vector<shaders::ShaderProgram*>;
+
 
 		namespace detail
 		{
@@ -84,6 +91,8 @@ namespace ion::graphics::scene
 		private:
 
 			Aabb bounding_volume_extent_ = {vector2::Zero, vector2::UnitScale};
+			movable_object::PreferredBoundingVolumeType preferred_bounding_volume_ =
+				movable_object::PreferredBoundingVolumeType::BoundingBox;
 			std::optional<uint32> query_flags_;
 
 			bool show_bounding_volumes_ = false;
@@ -143,6 +152,13 @@ namespace ion::graphics::scene
 			inline void BoundingVolumeExtent(const Aabb &extent) noexcept
 			{
 				bounding_volume_extent_ = extent;
+			}
+
+			//Sets the preferred bounding volume for this movable object to the given type
+			//Is used for choosing bounding volume when querying
+			inline void PreferredBoundingVolume(movable_object::PreferredBoundingVolumeType type) noexcept
+			{
+				preferred_bounding_volume_ = type;
 			}
 
 			//Sets the query flags for this movable object to the given flags
@@ -219,6 +235,13 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto BoundingVolumeExtent() const noexcept
 			{
 				return bounding_volume_extent_;
+			}
+
+			//Returns the preferred bounding volume for this movable object
+			//Is used for choosing bounding volume when querying
+			[[nodiscard]] inline auto PreferredBoundingVolume() const noexcept
+			{
+				return preferred_bounding_volume_;
 			}
 
 			//Returns the query flags for this movable object
