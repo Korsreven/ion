@@ -32,6 +32,7 @@ namespace ion::graphics::scene::query
 
 		namespace detail
 		{
+			ResultType intersects(scene_query::detail::query_objects &objects, const Ray &ray) noexcept;
 		} //detail
 	} //ray_scene_query
 

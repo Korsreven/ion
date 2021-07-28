@@ -20,6 +20,32 @@ using namespace types::type_literals;
 
 namespace intersection_scene_query::detail
 {
+
+ResultType intersects(scene_query::detail::query_objects &objects) noexcept
+{
+	ResultType result;
+
+	for (auto &object : objects)
+	{
+	}
+
+	return result;
+}
+
+ResultType intersects(scene_query::detail::query_objects &objects, scene_query::detail::query_objects &objects2) noexcept
+{
+	ResultType result;
+
+	for (auto &object : objects)
+	{
+		for (auto &object2 : objects2)
+		{
+		}
+	}
+
+	return result;
+}
+
 } //intersection_scene_query::detail
 
 

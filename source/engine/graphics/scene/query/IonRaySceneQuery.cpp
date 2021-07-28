@@ -20,6 +20,43 @@ using namespace types::type_literals;
 
 namespace ray_scene_query::detail
 {
+
+ResultType intersects(scene_query::detail::query_objects &objects, const Ray &ray) noexcept
+{
+	ResultType result;
+
+	for (auto &object : objects)
+	{
+		switch (object.first->PreferredBoundingVolume())
+		{
+			case movable_object::PreferredBoundingVolumeType::BoundingSphere:
+			{
+				if (auto [hit, distance] = ray.Intersects(object.first->WorldBoundingSphere(false)); hit)
+					result.emplace_back(object.first, distance);
+
+				break;
+			}
+
+			case movable_object::PreferredBoundingVolumeType::BoundingBox:
+			default:
+			{
+				if (auto [hit, distance] = ray.Intersects(object.first->WorldAxisAlignedBoundingBox(false)); hit)
+				{
+					if (object.first->ParentNode()->AxisAligned())
+						result.emplace_back(object.first, distance);
+
+					else if (auto [hit2, distance2] = ray.Intersects(object.first->WorldOrientedBoundingBox()); hit2)
+						result.emplace_back(object.first, distance2);
+				}
+
+				break;
+			}
+		}
+	}
+
+	return result;
+}
+
 } //ray_scene_query::detail
 
 
