@@ -31,8 +31,17 @@ namespace ion::graphics::scene::query
 
 		namespace detail
 		{
+			inline auto derive_once(bool &derive) noexcept
+			{
+				auto temp = derive;
+				return derive = false, temp;
+			}
+
+			bool sphere_sphere_hit(const scene_query::detail::query_object &sphere_object, const scene_query::detail::query_object &sphere_object2) noexcept;
+			bool box_box_hit(scene_query::detail::query_object &box_object, scene_query::detail::query_object &box_object2) noexcept;
+			bool sphere_box_hit(const scene_query::detail::query_object &sphere_object, scene_query::detail::query_object &box_object) noexcept;
+
 			ResultType intersects(scene_query::detail::query_objects &objects) noexcept;
-			ResultType intersects(scene_query::detail::query_objects &objects, scene_query::detail::query_objects &objects2) noexcept;
 		} //detail
 	} //intersection_scene_query
 

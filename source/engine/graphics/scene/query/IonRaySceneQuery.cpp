@@ -12,6 +12,8 @@ File:	IonRaySceneQuery.cpp
 
 #include "IonRaySceneQuery.h"
 
+#include <algorithm>
+
 namespace ion::graphics::scene::query
 {
 
@@ -87,8 +89,21 @@ ResultType RaySceneQuery::Execute() const noexcept
 	auto objects =
 		scene_query::detail::get_eligible_objects(
 			scene_graph_->RootNode(), query_type_mask_.value_or(~0_ui32), only_visible_objects_);
+	scene_query::detail::derive_bounding_volumes(objects);
 
-	return {};
+	if (query_region_)
+		scene_query::detail::remove_objects_outside_region(objects, *query_region_);
+
+	auto result = detail::intersects(objects, ray_);
+
+	if (sort_by_distance_)
+		std::sort(std::begin(result), std::end(result),
+			[](auto &x, auto &y) noexcept
+			{
+				return x.second < y.second; //Asc
+			});
+
+	return result;
 }
 
 } //ion::graphics::scene::query

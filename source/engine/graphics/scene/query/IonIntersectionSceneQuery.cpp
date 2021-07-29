@@ -21,25 +21,106 @@ using namespace types::type_literals;
 namespace intersection_scene_query::detail
 {
 
+bool sphere_sphere_hit(const scene_query::detail::query_object &sphere_object, const scene_query::detail::query_object &sphere_object2) noexcept
+{
+	//Sphere vs Sphere
+	return sphere_object.first->WorldBoundingSphere(false).
+		Intersects(sphere_object2.first->WorldBoundingSphere(false));
+}
+
+bool box_box_hit(scene_query::detail::query_object &box_object, scene_query::detail::query_object &box_object2) noexcept
+{
+	//Aabb vs Aabb
+	if (box_object.first->WorldAxisAlignedBoundingBox(false).
+		Intersects(box_object2.first->WorldAxisAlignedBoundingBox(false)))
+	{
+		if (box_object.first->ParentNode()->AxisAligned() &&
+			box_object2.first->ParentNode()->AxisAligned())
+			return true;
+
+		else //Obb vs Obb
+			return box_object.first->WorldOrientedBoundingBox(derive_once(box_object.second)).
+				Intersects(box_object2.first->WorldOrientedBoundingBox(derive_once(box_object2.second)));
+	}
+
+	return false;
+}
+
+bool sphere_box_hit(const scene_query::detail::query_object &sphere_object, scene_query::detail::query_object &box_object) noexcept
+{
+	//Sphere vs Aabb
+	if (sphere_object.first->WorldBoundingSphere(false).
+		Intersects(box_object.first->WorldAxisAlignedBoundingBox(false)))
+	{
+		if (box_object.first->ParentNode()->AxisAligned())
+			return true;
+
+		else //Sphere vs Obb
+			return sphere_object.first->WorldBoundingSphere(false).
+				Intersects(box_object.first->WorldOrientedBoundingBox(derive_once(box_object.second)));
+	}
+
+	return false;
+}
+
+
 ResultType intersects(scene_query::detail::query_objects &objects) noexcept
 {
 	ResultType result;
 
-	for (auto &object : objects)
+	for (auto iter = std::begin(objects), end = std::end(objects); iter != end; ++iter)
 	{
-	}
-
-	return result;
-}
-
-ResultType intersects(scene_query::detail::query_objects &objects, scene_query::detail::query_objects &objects2) noexcept
-{
-	ResultType result;
-
-	for (auto &object : objects)
-	{
-		for (auto &object2 : objects2)
+		for (auto iter2 = iter + 1; iter2 != end; ++iter2)
 		{
+			switch (iter->first->PreferredBoundingVolume())
+			{
+				case movable_object::PreferredBoundingVolumeType::BoundingSphere:
+				{
+					switch (iter2->first->PreferredBoundingVolume())
+					{
+						case movable_object::PreferredBoundingVolumeType::BoundingSphere:
+						{
+							if (sphere_sphere_hit(*iter, *iter2))
+								result.emplace_back(iter->first, iter2->first);
+							break;
+						}
+
+						case movable_object::PreferredBoundingVolumeType::BoundingBox:
+						default:
+						{
+							if (sphere_box_hit(*iter, *iter2))
+								result.emplace_back(iter->first, iter2->first);
+							break;
+						}
+					}
+
+					break;
+				}
+
+				case movable_object::PreferredBoundingVolumeType::BoundingBox:
+				default:
+				{
+					switch (iter2->first->PreferredBoundingVolume())
+					{
+						case movable_object::PreferredBoundingVolumeType::BoundingSphere:
+						{
+							if (sphere_box_hit(*iter2, *iter)) //Flipped
+								result.emplace_back(iter->first, iter2->first);
+							break;
+						}
+
+						case movable_object::PreferredBoundingVolumeType::BoundingBox:
+						default:
+						{
+							if (box_box_hit(*iter, *iter2))
+								result.emplace_back(iter->first, iter2->first);
+							break;
+						}
+					}
+
+					break;
+				}
+			}
 		}
 	}
 
@@ -68,8 +149,12 @@ ResultType IntersectionSceneQuery::Execute() const noexcept
 	auto objects =
 		scene_query::detail::get_eligible_objects(
 			scene_graph_->RootNode(), query_type_mask_.value_or(~0_ui32), only_visible_objects_);
+	scene_query::detail::derive_bounding_volumes(objects);
 
-	return {};
+	if (query_region_)
+		scene_query::detail::remove_objects_outside_region(objects, *query_region_);
+
+	return detail::intersects(objects);
 }
 
 } //ion::graphics::scene::query
