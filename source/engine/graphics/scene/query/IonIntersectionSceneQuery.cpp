@@ -72,53 +72,57 @@ ResultType intersects(scene_query::detail::query_objects &objects) noexcept
 	{
 		for (auto iter2 = iter + 1; iter2 != end; ++iter2)
 		{
-			switch (iter->first->PreferredBoundingVolume())
+			if (iter->first->QueryFlags().value_or(~0_ui32) &
+				iter2->first->QueryMask().value_or(~0_ui32))
 			{
-				case movable_object::PreferredBoundingVolumeType::BoundingSphere:
+				switch (iter->first->PreferredBoundingVolume())
 				{
-					switch (iter2->first->PreferredBoundingVolume())
+					case movable_object::PreferredBoundingVolumeType::BoundingSphere:
 					{
-						case movable_object::PreferredBoundingVolumeType::BoundingSphere:
+						switch (iter2->first->PreferredBoundingVolume())
 						{
-							if (sphere_sphere_hit(*iter, *iter2))
-								result.emplace_back(iter->first, iter2->first);
-							break;
+							case movable_object::PreferredBoundingVolumeType::BoundingSphere:
+							{
+								if (sphere_sphere_hit(*iter, *iter2))
+									result.emplace_back(iter->first, iter2->first);
+								break;
+							}
+
+							case movable_object::PreferredBoundingVolumeType::BoundingBox:
+							default:
+							{
+								if (sphere_box_hit(*iter, *iter2))
+									result.emplace_back(iter->first, iter2->first);
+								break;
+							}
 						}
 
-						case movable_object::PreferredBoundingVolumeType::BoundingBox:
-						default:
-						{
-							if (sphere_box_hit(*iter, *iter2))
-								result.emplace_back(iter->first, iter2->first);
-							break;
-						}
+						break;
 					}
 
-					break;
-				}
-
-				case movable_object::PreferredBoundingVolumeType::BoundingBox:
-				default:
-				{
-					switch (iter2->first->PreferredBoundingVolume())
+					case movable_object::PreferredBoundingVolumeType::BoundingBox:
+					default:
 					{
-						case movable_object::PreferredBoundingVolumeType::BoundingSphere:
+						switch (iter2->first->PreferredBoundingVolume())
 						{
-							if (sphere_box_hit(*iter2, *iter)) //Flipped
-								result.emplace_back(iter->first, iter2->first);
-							break;
+							case movable_object::PreferredBoundingVolumeType::BoundingSphere:
+							{
+								if (sphere_box_hit(*iter2, *iter)) //Flipped
+									result.emplace_back(iter->first, iter2->first);
+								break;
+							}
+
+							case movable_object::PreferredBoundingVolumeType::BoundingBox:
+							default:
+							{
+								if (box_box_hit(*iter, *iter2))
+									result.emplace_back(iter->first, iter2->first);
+								break;
+							}
 						}
 
-						case movable_object::PreferredBoundingVolumeType::BoundingBox:
-						default:
-						{
-							if (box_box_hit(*iter, *iter2))
-								result.emplace_back(iter->first, iter2->first);
-							break;
-						}
+						break;
 					}
-
-					break;
 				}
 			}
 		}
@@ -148,7 +152,7 @@ ResultType IntersectionSceneQuery::Execute() const noexcept
 
 	auto objects =
 		scene_query::detail::get_eligible_objects(
-			scene_graph_->RootNode(), query_type_mask_.value_or(~0_ui32), only_visible_objects_);
+			scene_graph_->RootNode(), query_mask_.value_or(~0_ui32), query_type_mask_.value_or(~0_ui32), only_visible_objects_);
 	scene_query::detail::derive_bounding_volumes(objects);
 
 	if (query_region_)

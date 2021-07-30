@@ -13,6 +13,7 @@ File:	IonRaySceneQuery.h
 #ifndef ION_RAY_SCENE_QUERY
 #define ION_RAY_SCENE_QUERY
 
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -42,8 +43,8 @@ namespace ion::graphics::scene::query
 		private:
 
 			Ray ray_;
+			std::optional<uint32> ray_query_flags_;
 			bool sort_by_distance_ = true;
-			std::optional<int> max_results_;
 
 		public:
 
@@ -62,9 +63,12 @@ namespace ion::graphics::scene::query
 			*/
 
 			//Sets the ray this ray scene query is using when querying
-			inline void SceneRay(const Ray &ray) noexcept
+			//This ray scene query will only query objects if a bitwise AND operation between the ray query flags and the object query mask is non-zero
+			//The meaning of the bits is user-specific
+			inline void RayQuerier(const Ray &ray, const std::optional<uint32> &query_flags = std::nullopt) noexcept
 			{
 				ray_ = ray;
+				ray_query_flags_ = query_flags;
 			}
 
 			//Sets whether or not to this ray scene query is sorting query results by distance
@@ -73,21 +77,21 @@ namespace ion::graphics::scene::query
 				sort_by_distance_ = sort;
 			}
 
-			//Sets the max results this ray scene query is returning
-			//Pass nullopt to allow indefinitely number of results
-			inline void MaxResults(std::optional<int> max_results) noexcept
-			{
-				max_results_ = max_results;
-			}
-			
-
 
 			/*
 				Observers
 			*/
 
 			//Returns the ray this ray scene query is using when querying
-			[[nodiscard]] inline auto SceneRay() const noexcept
+			[[nodiscard]] inline auto RayQuerier() const noexcept
+			{
+				return ray_;
+			}
+
+			//Returns the ray query flags this ray scene query is using when querying
+			//This ray scene query will only query objects if a bitwise AND operation between the ray query flags and the object query mask is non-zero
+			//The meaning of the bits is user-specific
+			[[nodiscard]] inline auto RayQueryFlags() const noexcept
 			{
 				return ray_;
 			}
@@ -96,13 +100,6 @@ namespace ion::graphics::scene::query
 			[[nodiscard]] inline auto SortByDistance() const noexcept
 			{
 				return sort_by_distance_;
-			}
-
-			//Returns the max results this ray scene query is returning
-			//Returns nullopt if there is no max results set
-			[[nodiscard]] inline auto MaxResults() const noexcept
-			{
-				return max_results_;
 			}
 
 

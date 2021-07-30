@@ -94,6 +94,7 @@ namespace ion::graphics::scene
 			movable_object::PreferredBoundingVolumeType preferred_bounding_volume_ =
 				movable_object::PreferredBoundingVolumeType::BoundingBox;
 			std::optional<uint32> query_flags_;
+			std::optional<uint32> query_mask_;
 
 			bool show_bounding_volumes_ = false;
 			Color aabb_color_ = color::White;
@@ -161,6 +162,7 @@ namespace ion::graphics::scene
 				preferred_bounding_volume_ = type;
 			}
 
+
 			//Sets the query flags for this movable object to the given flags
 			//This object will only be queried if a bitwise AND operation between the query flags and the scene query mask is non-zero
 			//The meaning of the bits is user-specific
@@ -187,6 +189,35 @@ namespace ion::graphics::scene
 			{
 				if (query_flags_)
 					*query_flags_ &= ~flags;
+			}
+
+
+			//Sets the query mask for this movable object to the given mask
+			//This object can only intersect another object if a bitwise AND operation between the query flags and the other objects query mask is non-zero
+			//The meaning of the bits is user-specific
+			inline void QueryMask(std::optional<uint32> mask) noexcept
+			{
+				query_mask_ = mask;
+			}
+
+			//Adds the given mask to the already existing query mask for this movable object
+			//This object can only intersect another object if a bitwise AND operation between the query flags and the other objects query mask is non-zero
+			//The meaning of the bits is user-specific
+			inline void AddQueryMask(uint32 mask) noexcept
+			{
+				if (query_mask_)
+					*query_mask_ |= mask;
+				else
+					query_mask_ = mask;
+			}
+
+			//Removes the given mask to the already existing query mask for this movable object
+			//This object can only intersect another object if a bitwise AND operation between the query flags and the other objects query mask is non-zero
+			//The meaning of the bits is user-specific
+			inline void RemoveQueryMask(uint32 mask) noexcept
+			{
+				if (query_mask_)
+					*query_mask_ &= ~mask;
 			}
 
 
@@ -250,6 +281,14 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto QueryFlags() const noexcept
 			{
 				return query_flags_;
+			}
+
+			//Returns the query mask for this movable object
+			//This object can only intersect another object if a bitwise AND operation between the query flags and the other objects query mask is non-zero
+			//The meaning of the bits is user-specific
+			[[nodiscard]] inline auto QueryMask() const noexcept
+			{
+				return query_mask_;
 			}
 
 			//Returns the query type flags for this movable object

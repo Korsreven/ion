@@ -23,35 +23,38 @@ using namespace types::type_literals;
 namespace ray_scene_query::detail
 {
 
-ResultType intersects(scene_query::detail::query_objects &objects, const Ray &ray) noexcept
+ResultType intersects(scene_query::detail::query_objects &objects, const Ray &ray, uint32 ray_flags) noexcept
 {
 	ResultType result;
 
 	for (auto &object : objects)
 	{
-		switch (object.first->PreferredBoundingVolume())
+		if (ray_flags & object.first->QueryMask().value_or(~0_ui32))
 		{
-			case movable_object::PreferredBoundingVolumeType::BoundingSphere:
+			switch (object.first->PreferredBoundingVolume())
 			{
-				if (auto [hit, distance] = ray.Intersects(object.first->WorldBoundingSphere(false)); hit)
-					result.emplace_back(object.first, distance);
-
-				break;
-			}
-
-			case movable_object::PreferredBoundingVolumeType::BoundingBox:
-			default:
-			{
-				if (auto [hit, distance] = ray.Intersects(object.first->WorldAxisAlignedBoundingBox(false)); hit)
+				case movable_object::PreferredBoundingVolumeType::BoundingSphere:
 				{
-					if (object.first->ParentNode()->AxisAligned())
+					if (auto [hit, distance] = ray.Intersects(object.first->WorldBoundingSphere(false)); hit)
 						result.emplace_back(object.first, distance);
 
-					else if (auto [hit2, distance2] = ray.Intersects(object.first->WorldOrientedBoundingBox()); hit2)
-						result.emplace_back(object.first, distance2);
+					break;
 				}
 
-				break;
+				case movable_object::PreferredBoundingVolumeType::BoundingBox:
+				default:
+				{
+					if (auto [hit, distance] = ray.Intersects(object.first->WorldAxisAlignedBoundingBox(false)); hit)
+					{
+						if (object.first->ParentNode()->AxisAligned())
+							result.emplace_back(object.first, distance);
+
+						else if (auto [hit2, distance2] = ray.Intersects(object.first->WorldOrientedBoundingBox()); hit2)
+							result.emplace_back(object.first, distance2);
+					}
+
+					break;
+				}
 			}
 		}
 	}
@@ -88,13 +91,13 @@ ResultType RaySceneQuery::Execute() const noexcept
 
 	auto objects =
 		scene_query::detail::get_eligible_objects(
-			scene_graph_->RootNode(), query_type_mask_.value_or(~0_ui32), only_visible_objects_);
+			scene_graph_->RootNode(), query_mask_.value_or(~0_ui32), query_type_mask_.value_or(~0_ui32), only_visible_objects_);
 	scene_query::detail::derive_bounding_volumes(objects);
 
 	if (query_region_)
 		scene_query::detail::remove_objects_outside_region(objects, *query_region_);
 
-	auto result = detail::intersects(objects, ray_);
+	auto result = detail::intersects(objects, ray_, ray_query_flags_.value_or(~0_ui32));
 
 	if (sort_by_distance_)
 		std::sort(std::begin(result), std::end(result),

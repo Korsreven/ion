@@ -60,7 +60,7 @@ namespace ion::graphics::scene::query
 			using query_objects = std::vector<query_object>;
 
 
-			inline void get_eligible_objects(SceneNode &node, uint32 type_mask, bool only_visible,
+			inline void get_eligible_objects(SceneNode &node, uint32 mask, uint32 type_mask, bool only_visible,
 				query_objects &objects) noexcept
 			{
 				//Check if node is eligible
@@ -73,20 +73,21 @@ namespace ion::graphics::scene::query
 
 						//Check if object is eligible
 						if ((!only_visible || object->Visible()) &&
-							object->QueryTypeFlags() & type_mask)
+							object->QueryTypeFlags() & type_mask &&
+							object->QueryFlags().value_or(~0_ui32) & mask)
 
 							objects.emplace_back(object, true); //Eligible for querying
 					}
 				}
 
 				for (auto &child_node : node.ChildNodes())
-					get_eligible_objects(child_node, type_mask, only_visible, objects); //Recursive
+					get_eligible_objects(child_node, mask, type_mask, only_visible, objects); //Recursive
 			}
 
-			inline auto get_eligible_objects(SceneNode &node, uint32 type_mask, bool only_visible) noexcept
+			inline auto get_eligible_objects(SceneNode &node, uint32 mask, uint32 type_mask, bool only_visible) noexcept
 			{
 				query_objects objects;
-				get_eligible_objects(node, type_mask, only_visible, objects);
+				get_eligible_objects(node, mask, type_mask, only_visible, objects);
 				return objects;
 			}
 
