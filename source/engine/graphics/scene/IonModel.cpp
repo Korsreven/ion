@@ -89,7 +89,7 @@ void Model::Prepare() noexcept
 			aabb_.Merge(mesh.AxisAlignedBoundingBox());
 
 		obb_ = aabb_;
-		sphere_ = {aabb_.ToHalfSize().Length(), aabb_.Center()};
+		sphere_ = {aabb_.ToHalfSize().Max(), aabb_.Center()};
 
 		update_bounding_volumes_ = false;
 	}

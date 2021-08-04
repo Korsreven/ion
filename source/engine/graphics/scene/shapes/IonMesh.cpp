@@ -94,7 +94,7 @@ std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const VertexContainer &v
 	}
 
 	Aabb aabb{min, max};
-	return {aabb, aabb, {aabb.ToHalfSize().Length(), aabb.Center()}};
+	return {aabb, aabb, {aabb.ToHalfSize().Max(), aabb.Center()}};
 }
 
 void generate_tex_coords(VertexContainer &vertex_data, const Aabb &aabb) noexcept
