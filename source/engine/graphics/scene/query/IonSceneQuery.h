@@ -63,6 +63,8 @@ namespace ion::graphics::scene::query
 			inline void get_eligible_objects(SceneNode &node, uint32 mask, uint32 type_mask, bool only_visible,
 				query_objects &objects) noexcept
 			{
+				const auto default_flags = (mask == ~0_ui32 ? mask : 0_ui32);
+
 				//Check if node is eligible
 				if (!only_visible || node.Visible())
 				{
@@ -74,7 +76,7 @@ namespace ion::graphics::scene::query
 						//Check if object is eligible
 						if ((!only_visible || object->Visible()) &&
 							object->QueryTypeFlags() & type_mask &&
-							object->QueryFlags().value_or(~0_ui32) & mask)
+							object->QueryFlags().value_or(default_flags) & mask)
 
 							objects.emplace_back(object, true); //Eligible for querying
 					}
