@@ -446,6 +446,15 @@ struct Game :
 					head_light->ParentNode()->Visible(!head_light->ParentNode()->Visible());
 				break;
 			}
+
+			case ion::events::listeners::KeyButton::Space:
+			{
+				//Scene query
+				ion::graphics::scene::query::IntersectionSceneQuery scene_query{scene_graph};
+				scene_query.QueryMask(1 | 2 | 4);
+				[[maybe_unused]] auto result = scene_query.Execute();
+ 				break;
+			}
 		}
   	}
 
@@ -1150,6 +1159,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			model->AddPass(ion::graphics::render::Pass{model_program});		
 			model->ShowBoundingVolumes(true);
 			model->BoundingVolumeExtent({{0.3_r, 0.2_r}, {0.7_r, 0.8_r}});
+			model->QueryFlags(1);
+			model->QueryMask(2 | 4);
 
 			auto model_star = scene.CreateModel();
 			model_star->CreateMesh(ion::graphics::scene::shapes::Sprite{
@@ -1181,7 +1192,38 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto model_spectrum = scene.CreateModel();
 			model_spectrum->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.71_r, 0.71_r}, color_spectrum});
-			model_spectrum->AddPass(ion::graphics::render::Pass{model_program});	
+			model_spectrum->AddPass(ion::graphics::render::Pass{model_program});
+
+			auto box = scene.CreateModel();
+			box->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.25_r, 0.30_r}, color::DeepPink});
+			box->AddPass(ion::graphics::render::Pass{model_program});
+			box->QueryFlags(2);
+			box->QueryMask(1 | 2 | 4);
+			box->ShowBoundingVolumes(true);
+
+			auto box2 = scene.CreateModel();
+			box2->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.30_r, 0.25_r}, color::DarkViolet});
+			box2->AddPass(ion::graphics::render::Pass{model_program});
+			box2->QueryFlags(2);
+			box2->QueryMask(1 | 2 | 4);
+			box2->ShowBoundingVolumes(true);
+
+			auto circle = scene.CreateModel();
+			circle->CreateMesh(ion::graphics::scene::shapes::Ellipse{0.25_r, color::Khaki});
+			circle->AddPass(ion::graphics::render::Pass{model_program});
+			circle->PreferredBoundingVolume(ion::graphics::scene::movable_object::PreferredBoundingVolumeType::BoundingSphere);
+			circle->QueryFlags(4);
+			circle->QueryMask(1 | 2 | 4);
+			circle->ShowBoundingVolumes(true);
+
+			auto circle2 = scene.CreateModel();
+			circle2->CreateMesh(ion::graphics::scene::shapes::Ellipse{0.30_r, color::Orchid});
+			circle2->AddPass(ion::graphics::render::Pass{model_program});
+			circle2->PreferredBoundingVolume(ion::graphics::scene::movable_object::PreferredBoundingVolumeType::BoundingSphere);
+			circle2->QueryFlags(4);
+			circle2->QueryMask(1 | 2 | 4);
+			circle2->ShowBoundingVolumes(true);
+
 
 			//Scene graph
 			auto scene_graph = engine.CreateSceneGraph("");
@@ -1238,6 +1280,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto spectrum_node = scene_graph->RootNode().CreateChildNode({1.4_r, -0.6_r, -1.0_r});
 			spectrum_node->AttachObject(*model_spectrum);
+
+			auto box_node = scene_graph->RootNode().CreateChildNode({-0.35_r, 0.25_r, -2.2_r});
+			box_node->AttachObject(*box);
+
+			auto box2_node = scene_graph->RootNode().CreateChildNode({-0.45_r, 0.45_r, -2.2_r});
+			box2_node->AttachObject(*box2);
+
+			auto circle_node = scene_graph->RootNode().CreateChildNode({0.35_r, 0.25_r, -2.2_r});
+			circle_node->AttachObject(*circle);
+
+			auto circle2_node = scene_graph->RootNode().CreateChildNode({0.45_r, 0.45_r, -2.2_r});
+			circle2_node->AttachObject(*circle2);
 
 			//Head light
 			auto light_node = model_node->CreateChildNode({0.0_r, -0.15_r, -0.05_r}, vector2::UnitY, false);
