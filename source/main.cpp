@@ -449,10 +449,17 @@ struct Game :
 
 			case ion::events::listeners::KeyButton::Space:
 			{
-				//Scene query
+				//Intersection scene query
 				ion::graphics::scene::query::IntersectionSceneQuery scene_query{scene_graph};
 				scene_query.QueryMask(1 | 2 | 4);
 				[[maybe_unused]] auto result = scene_query.Execute();
+
+				//Ray scene query
+				ion::graphics::scene::query::RaySceneQuery ray_scene_query{scene_graph,
+					{model->ParentNode()->DerivedPosition(), model->ParentNode()->DerivedDirection()}};
+				ray_scene_query.QueryMask(2 | 4);
+				[[maybe_unused]] auto ray_result = ray_scene_query.Execute();
+
  				break;
 			}
 		}
