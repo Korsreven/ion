@@ -84,7 +84,7 @@ bool Obb::intersects_one_way(const Obb &obb) const noexcept
 			
 			if (dot < dot_min)
 				dot_min = dot;
-			else if (dot > dot_max)
+			if (dot > dot_max)
 				dot_max = dot;
 		}
 
