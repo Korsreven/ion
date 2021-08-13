@@ -205,6 +205,12 @@
     <Filter Include="Source Files\graphics\scene\query">
       <UniqueIdentifier>{fc8ac52a-6409-4b20-b24e-0f01ee6c3b39}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\graphics\scene\graph\animations">
+      <UniqueIdentifier>{04252f37-1003-4439-a419-905ec450ff71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics\scene\graph\animations">
+      <UniqueIdentifier>{eb705c48-80e6-4085-a1b8-d49b3998b271}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -548,6 +554,18 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\scene\query\IonRaySceneQuery.cpp">
       <Filter>Source Files\graphics\scene\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\graph\animations\IonNodeAnimation.cpp">
+      <Filter>Source Files\graphics\scene\graph\animations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\graph\animations\IonNodeAnimationGroup.cpp">
+      <Filter>Source Files\graphics\scene\graph\animations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\graph\animations\IonAttachableNodeAnimation.cpp">
+      <Filter>Source Files\graphics\scene\graph\animations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\graph\animations\IonAttachableNodeAnimationGroup.cpp">
+      <Filter>Source Files\graphics\scene\graph\animations</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1075,6 +1093,18 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\scene\query\IonRaySceneQuery.h">
       <Filter>Header Files\graphics\scene\query</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\graph\animations\IonNodeAnimation.h">
+      <Filter>Header Files\graphics\scene\graph\animations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\graph\animations\IonNodeAnimationGroup.h">
+      <Filter>Header Files\graphics\scene\graph\animations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\graph\animations\IonAttachableNodeAnimation.h">
+      <Filter>Header Files\graphics\scene\graph\animations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\graph\animations\IonAttachableNodeAnimationGroup.h">
+      <Filter>Header Files\graphics\scene\graph\animations</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

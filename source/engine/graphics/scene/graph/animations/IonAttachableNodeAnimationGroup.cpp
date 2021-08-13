@@ -1,0 +1,57 @@
+/*
+-------------------------------------------
+This source file is part of Ion Engine
+	- A fast and lightweight 2D game engine
+	- Written in C++ using OpenGL
+
+Author:	Jan Ivar Goli
+Area:	graphics/scene/graph/animations
+File:	IonAttachableNodeAnimationGroup.cpp
+-------------------------------------------
+*/
+
+#include "IonAttachableNodeAnimationGroup.h"
+
+namespace ion::graphics::scene::graph::animations
+{
+
+using namespace attachable_node_animation_group;
+
+namespace attachable_node_animation_group::detail
+{
+
+} //attachable_node_animation_group::detail
+
+
+AttachableNodeAnimationGroup::AttachableNodeAnimationGroup(NonOwningPtr<NodeAnimationGroup> node_animation_group, duration start_time) noexcept :
+
+	node_animation_group_{node_animation_group ? std::make_optional(*node_animation_group) : std::nullopt},
+	initial_node_animation_group_{node_animation_group},
+
+	start_time_{start_time}
+{
+	//Empty
+}
+
+
+/*
+	Modifiers
+*/
+
+void AttachableNodeAnimationGroup::Revert()
+{
+	if (initial_node_animation_group_)
+		node_animation_group_ = *initial_node_animation_group_;
+}
+
+
+/*
+	Elapse time
+*/
+
+void AttachableNodeAnimationGroup::Elapse(duration time) noexcept
+{
+
+}
+
+} //ion::graphics::scene::graph::animations
