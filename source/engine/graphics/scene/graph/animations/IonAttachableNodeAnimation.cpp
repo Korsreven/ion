@@ -51,7 +51,7 @@ void AttachableNodeAnimation::Revert()
 
 void AttachableNodeAnimation::Elapse(duration time) noexcept
 {
-
+	time;
 }
 
 } //ion::graphics::scene::graph::animations

@@ -67,7 +67,7 @@ namespace ion::graphics::scene::graph::animations
 				Actions
 			*/
 
-			class action
+			struct action
 			{
 				duration time = 0.0_sec;
 			};
@@ -93,11 +93,11 @@ namespace ion::graphics::scene::graph::animations
 				Motions
 			*/
 
-			class motion
+			struct motion
 			{
 				duration start_time = 0.0_sec;
 				duration current_time = 0.0_sec;
-				duration total_duration = 0.0_sec;			
+				duration total_duration = 0.0_sec;
 			};
 
 			struct rotating_motion : motion
@@ -177,27 +177,27 @@ namespace ion::graphics::scene::graph::animations
 
 			//Adds a rotation motion to this node animation with the given angle (in radians) and total duration
 			void AddRotation(real angle, duration total_duration, duration start_time = 0.0_sec,
-				node_animation::MotionTechniqueType technique = MotionTechniqueType::Linear) noexcept;
+				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear) noexcept;
 
 
 			//Adds a scaling motion to this node animation with the given unit and total duration
 			void AddScaling(const Vector2 &unit, duration total_duration, duration start_time = 0.0_sec,
-				node_animation::MotionTechniqueType technique = MotionTechniqueType::Linear) noexcept;
+				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear) noexcept;
 
 			//Adds a scaling motion to this node animation with the given unit and total duration
 			void AddScaling(const Vector2 &unit, duration total_duration, duration start_time = 0.0_sec,
-				node_animation::MotionTechniqueType technique_x = MotionTechniqueType::Linear,
-				node_animation::MotionTechniqueType technique_y = MotionTechniqueType::Linear) noexcept;
+				node_animation::MotionTechniqueType technique_x = node_animation::MotionTechniqueType::Linear,
+				node_animation::MotionTechniqueType technique_y = node_animation::MotionTechniqueType::Linear) noexcept;
 
 
 			//Adds a translation motion to this node animation with the given unit and total duration
 			void AddTranslation(const Vector2 &unit, duration total_duration, duration start_time = 0.0_sec,
-				node_animation::MotionTechniqueType technique = MotionTechniqueType::Linear) noexcept;
+				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear) noexcept;
 
 			//Adds a translation motion to this node animation with the given unit and total duration
 			void AddTranslation(const Vector2 &unit, duration total_duration, duration start_time = 0.0_sec,
-				node_animation::MotionTechniqueType technique_x = MotionTechniqueType::Linear,
-				node_animation::MotionTechniqueType technique_y = MotionTechniqueType::Linear) noexcept;
+				node_animation::MotionTechniqueType technique_x = node_animation::MotionTechniqueType::Linear,
+				node_animation::MotionTechniqueType technique_y = node_animation::MotionTechniqueType::Linear) noexcept;
 	};
 } //ion::graphics::scene::graph::animations
 
