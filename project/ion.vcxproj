@@ -205,6 +205,7 @@
     <ClCompile Include="..\source\engine\graphics\scene\graph\animations\IonAttachableNodeAnimationGroup.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\graph\animations\IonNodeAnimation.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\graph\animations\IonNodeAnimationGroup.cpp" />
+    <ClCompile Include="..\source\engine\graphics\scene\graph\animations\IonNodeAnimationManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\graph\IonSceneGraph.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\graph\IonSceneNode.cpp" />
     <ClCompile Include="..\source\engine\graphics\scene\IonCamera.cpp" />
@@ -357,6 +358,7 @@
     <ClInclude Include="..\source\engine\graphics\scene\graph\animations\IonAttachableNodeAnimationGroup.h" />
     <ClInclude Include="..\source\engine\graphics\scene\graph\animations\IonNodeAnimation.h" />
     <ClInclude Include="..\source\engine\graphics\scene\graph\animations\IonNodeAnimationGroup.h" />
+    <ClInclude Include="..\source\engine\graphics\scene\graph\animations\IonNodeAnimationManager.h" />
     <ClInclude Include="..\source\engine\graphics\scene\graph\IonSceneGraph.h" />
     <ClInclude Include="..\source\engine\graphics\scene\graph\IonSceneNode.h" />
     <ClInclude Include="..\source\engine\graphics\scene\IonCamera.h" />

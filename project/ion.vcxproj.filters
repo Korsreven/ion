@@ -567,6 +567,9 @@
     <ClCompile Include="..\source\engine\graphics\scene\graph\animations\IonAttachableNodeAnimationGroup.cpp">
       <Filter>Source Files\graphics\scene\graph\animations</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\graph\animations\IonNodeAnimationManager.cpp">
+      <Filter>Source Files\graphics\scene\graph\animations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1104,6 +1107,9 @@
       <Filter>Header Files\graphics\scene\graph\animations</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\scene\graph\animations\IonAttachableNodeAnimationGroup.h">
+      <Filter>Header Files\graphics\scene\graph\animations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\graph\animations\IonNodeAnimationManager.h">
       <Filter>Header Files\graphics\scene\graph\animations</Filter>
     </ClInclude>
   </ItemGroup>
