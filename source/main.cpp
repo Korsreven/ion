@@ -100,6 +100,7 @@ File:	main.cpp
 #include "graphics/scene/graph/animations/IonNodeAnimation.h"
 #include "graphics/scene/graph/animations/IonNodeAnimationGroup.h"
 #include "graphics/scene/graph/animations/IonNodeAnimationManager.h"
+#include "graphics/scene/graph/animations/IonNodeAnimationTimeline.h"
 #include "graphics/scene/query/IonSceneQuery.h"
 #include "graphics/scene/query/IonIntersectionSceneQuery.h"
 #include "graphics/scene/query/IonRaySceneQuery.h"

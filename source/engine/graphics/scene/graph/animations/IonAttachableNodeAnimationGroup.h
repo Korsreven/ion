@@ -16,11 +16,13 @@ File:	IonAttachableNodeAnimationGroup.h
 #include <optional>
 
 #include "IonNodeAnimationGroup.h"
+#include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::scene::graph::animations
 {
+	class NodeAnimationTimeline; //Forward declaration
 	using namespace types::type_literals;
 
 	namespace attachable_node_animation_group
@@ -31,7 +33,7 @@ namespace ion::graphics::scene::graph::animations
 	} //attachable_node_animation_group
 
 
-	class AttachableNodeAnimationGroup final
+	class AttachableNodeAnimationGroup final : public managed::ManagedObject<NodeAnimationTimeline>
 	{
 		private:
 

@@ -91,7 +91,7 @@ bool NodeAnimationManager::RemoveAnimation(std::string_view name) noexcept
 
 
 /*
-	Animation groups
+	Node animation groups
 	Creating
 */
 
@@ -146,6 +146,59 @@ bool NodeAnimationManager::RemoveAnimationGroup(NodeAnimationGroup &node_animati
 bool NodeAnimationManager::RemoveAnimationGroup(std::string_view name) noexcept
 {
 	return NodeAnimationGroupBase::Remove(name);
+}
+
+
+/*
+	Node animation timelines
+	Creating
+*/
+
+NonOwningPtr<NodeAnimationTimeline> NodeAnimationManager::CreateTimeline()
+{
+	return NodeAnimationTimelineBase::Create();
+}
+
+NonOwningPtr<NodeAnimationTimeline> NodeAnimationManager::CreateTimeline(std::string name)
+{
+	return NodeAnimationTimelineBase::Create(std::move(name));
+}
+
+
+/*
+	Node animation timelines
+	Retrieving
+*/
+
+NonOwningPtr<NodeAnimationTimeline> NodeAnimationManager::GetTimeline(std::string_view name) noexcept
+{
+	return NodeAnimationTimelineBase::Get(name);
+}
+
+NonOwningPtr<const NodeAnimationTimeline> NodeAnimationManager::GetTimeline(std::string_view name) const noexcept
+{
+	return NodeAnimationTimelineBase::Get(name);
+}
+
+
+/*
+	Node animation timelines
+	Removing
+*/
+
+void NodeAnimationManager::ClearTimelines() noexcept
+{
+	NodeAnimationTimelineBase::Clear();
+}
+
+bool NodeAnimationManager::RemoveTimeline(NodeAnimationTimeline &node_animation_timeline) noexcept
+{
+	return NodeAnimationTimelineBase::Remove(node_animation_timeline);
+}
+
+bool NodeAnimationManager::RemoveTimeline(std::string_view name) noexcept
+{
+	return NodeAnimationTimelineBase::Remove(name);
 }
 
 

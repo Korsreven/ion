@@ -18,6 +18,7 @@ File:	IonNodeAnimationManager.h
 
 #include "IonNodeAnimation.h"
 #include "IonNodeAnimationGroup.h"
+#include "IonNodeAnimationTimeline.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
 
@@ -35,7 +36,8 @@ namespace ion::graphics::scene::graph::animations
 
 	class NodeAnimationManager final :
 		public managed::ObjectManager<NodeAnimation, NodeAnimationManager>,
-		public managed::ObjectManager<NodeAnimationGroup, NodeAnimationManager>
+		public managed::ObjectManager<NodeAnimationGroup, NodeAnimationManager>,
+		public managed::ObjectManager<NodeAnimationTimeline, NodeAnimationManager>
 	{
 		private:
 
@@ -45,6 +47,7 @@ namespace ion::graphics::scene::graph::animations
 
 			using NodeAnimationBase = managed::ObjectManager<NodeAnimation, NodeAnimationManager>;
 			using NodeAnimationGroupBase = managed::ObjectManager<NodeAnimationGroup, NodeAnimationManager>;
+			using NodeAnimationTimelineBase = managed::ObjectManager<NodeAnimationTimeline, NodeAnimationManager>;
 
 
 			//Construct a new node animation manager with the given scene node
@@ -77,14 +80,14 @@ namespace ion::graphics::scene::graph::animations
 
 			//Returns a mutable range of all node animations in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto NodeAnimations() noexcept
+			[[nodiscard]] inline auto Animations() noexcept
 			{
 				return NodeAnimationBase::Objects();
 			}
 
 			//Returns an immutable range of all node animations in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto NodeAnimations() const noexcept
+			[[nodiscard]] inline auto Animations() const noexcept
 			{
 				return NodeAnimationBase::Objects();
 			}
@@ -92,16 +95,31 @@ namespace ion::graphics::scene::graph::animations
 
 			//Returns a mutable range of all node animation groups in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto NodeAnimationGroups() noexcept
+			[[nodiscard]] inline auto AnimationGroups() noexcept
 			{
 				return NodeAnimationGroupBase::Objects();
 			}
 
 			//Returns an immutable range of all node animation groups in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto NodeAnimationGroups() const noexcept
+			[[nodiscard]] inline auto AnimationGroups() const noexcept
 			{
 				return NodeAnimationGroupBase::Objects();
+			}
+
+
+			//Returns a mutable range of all node animation timelines in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto AnimationTimelines() noexcept
+			{
+				return NodeAnimationTimelineBase::Objects();
+			}
+
+			//Returns an immutable range of all node animation timelines in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto AnimationTimelines() const noexcept
+			{
+				return NodeAnimationTimelineBase::Objects();
 			}
 
 
@@ -123,7 +141,7 @@ namespace ion::graphics::scene::graph::animations
 
 
 			/*
-				Animations
+				Node animations
 				Creating
 			*/
 
@@ -168,7 +186,7 @@ namespace ion::graphics::scene::graph::animations
 
 
 			/*
-				Animation groups
+				Node animation groups
 				Creating
 			*/
 
@@ -210,6 +228,47 @@ namespace ion::graphics::scene::graph::animations
 
 			//Remove a removable node animation group with the given name from this manager
 			bool RemoveAnimationGroup(std::string_view name) noexcept;
+
+
+			/*
+				Node animation timelines
+				Creating
+			*/
+
+			//Create a node animation timeline
+			NonOwningPtr<NodeAnimationTimeline> CreateTimeline();
+
+			//Create a node animation timeline with the given name
+			NonOwningPtr<NodeAnimationTimeline> CreateTimeline(std::string name);
+
+
+			/*
+				Node animation timelines
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable node animation timeline with the given name
+			//Returns nullptr if node animation timeline could not be found
+			[[nodiscard]] NonOwningPtr<NodeAnimationTimeline> GetTimeline(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable node animation timeline with the given name
+			//Returns nullptr if node animation timeline could not be found
+			[[nodiscard]] NonOwningPtr<const NodeAnimationTimeline> GetTimeline(std::string_view name) const noexcept;
+
+
+			/*
+				Node animation timelines
+				Removing
+			*/
+
+			//Clear all removable node animation timelines from this manager
+			void ClearTimelines() noexcept;
+
+			//Remove a removable node animation timeline from this manager
+			bool RemoveTimeline(NodeAnimationTimeline &node_animation_timeline) noexcept;
+
+			//Remove a removable node animation timeline with the given name from this manager
+			bool RemoveTimeline(std::string_view name) noexcept;
 
 
 			/*
