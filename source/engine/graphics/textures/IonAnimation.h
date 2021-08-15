@@ -178,7 +178,7 @@ namespace ion::graphics::textures
 			//Sets the given playback direction to the given direction
 			void Direction(animation::PlaybackDirection direction) noexcept;
 
-			//Sets the given playback rate to the given rate range (0.0, oo)
+			//Sets the given playback rate to the given rate in range (0.0, oo)
 			inline void PlaybackRate(real rate) noexcept
 			{
 				if (rate > 0.0_r)

@@ -36,7 +36,10 @@ namespace ion::graphics::scene::graph::animations
 	{
 		private:
 
-			
+			duration current_time_ = 0.0_sec;
+			duration total_duration_ = 0.0_sec;
+			real playback_rate_ = 1.0_r;
+			bool running_ = true;
 
 		public:
 
@@ -98,6 +101,54 @@ namespace ion::graphics::scene::graph::animations
 			[[nodiscard]] inline auto AttachedAnimationGroups() const noexcept
 			{
 				return NodeAnimationGroupBase::Objects();
+			}
+
+
+			/*
+				Modifiers
+			*/
+
+			//Sets the given playback rate to the given rate in range (0.0, oo)
+			inline void PlaybackRate(real rate) noexcept
+			{
+				if (rate > 0.0_r)
+					playback_rate_ = rate;
+			}
+
+
+			/*
+				Observers
+			*/
+
+			//Returns the current time of this node animation timeline
+			[[nodiscard]] inline auto CurrentTime() const noexcept
+			{
+				return current_time_;
+			}
+
+			//Returns the total duration of this node animation timeline
+			[[nodiscard]] inline auto TotalDuration() const noexcept
+			{
+				return total_duration_;
+			}
+
+			//Returns the total percent of this node animation timeline
+			[[nodiscard]] inline auto TotalPercent() const noexcept
+			{
+				return current_time_ / total_duration_;
+			}
+
+			//Returns the playback rate of this node animation timeline
+			[[nodiscard]] inline auto PlaybackRate() const noexcept
+			{
+				return playback_rate_;
+			}
+
+
+			//Returns true if this node animation timeline is running
+			[[nodiscard]] inline auto IsRunning() const noexcept
+			{
+				return running_;
 			}
 
 
