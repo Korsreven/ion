@@ -25,6 +25,7 @@ File:	IonNodeAnimationGroup.h
 namespace ion::graphics::scene::graph::animations
 {
 	class NodeAnimationManager; //Forward declaration
+	class NodeAnimationTimeline; //Forward declaration
 
 	using namespace types::type_literals;
 
@@ -94,6 +95,14 @@ namespace ion::graphics::scene::graph::animations
 			{
 				return current_time_ / total_duration_;
 			}
+
+
+			/*
+				Playback
+			*/
+
+			//Returns a newly created timeline with this animation group attached to it
+			NonOwningPtr<NodeAnimationTimeline> Start(real playback_rate = 1.0_r, bool running = true) noexcept;
 
 
 			/*

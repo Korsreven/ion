@@ -164,6 +164,16 @@ NonOwningPtr<NodeAnimationTimeline> NodeAnimationManager::CreateTimeline(std::st
 	return NodeAnimationTimelineBase::Create(std::move(name));
 }
 
+NonOwningPtr<NodeAnimationTimeline> NodeAnimationManager::CreateTimeline(real playback_rate, bool running)
+{
+	return NodeAnimationTimelineBase::Create(playback_rate, running);
+}
+
+NonOwningPtr<NodeAnimationTimeline> NodeAnimationManager::CreateTimeline(std::string name, real playback_rate, bool running)
+{
+	return NodeAnimationTimelineBase::Create(std::move(name), playback_rate, running);
+}
+
 
 /*
 	Node animation timelines

@@ -12,6 +12,9 @@ File:	IonNodeAnimation.cpp
 
 #include "IonNodeAnimation.h"
 
+#include "IonNodeAnimationManager.h"
+#include "IonNodeAnimationTimeline.h"
+
 namespace ion::graphics::scene::graph::animations
 {
 
@@ -27,6 +30,23 @@ NodeAnimation::NodeAnimation(std::string name) noexcept :
 	ManagedObject{std::move(name)}
 {
 	//Empty
+}
+
+
+/*
+	Playback
+*/
+
+NonOwningPtr<NodeAnimationTimeline> NodeAnimation::Start(real playback_rate, bool running) noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		auto timeline = owner->CreateTimeline(playback_rate, running);
+		timeline->Attach(owner->GetAnimation(*Name()));
+		return timeline;
+	}
+	else
+		return nullptr;
 }
 
 

@@ -19,12 +19,14 @@ File:	IonNodeAnimation.h
 
 #include "graphics/utilities/IonVector2.h"
 #include "managed/IonManagedObject.h"
+#include "memory/IonNonOwningPtr.h"
 #include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::scene::graph::animations
 {
 	class NodeAnimationManager; //Forward declaration
+	class NodeAnimationTimeline; //Forward declaration
 
 	using namespace graphics::utilities;
 	using namespace types::type_literals;
@@ -169,6 +171,14 @@ namespace ion::graphics::scene::graph::animations
 			{
 				return current_time_ / total_duration_;
 			}
+
+
+			/*
+				Playback
+			*/
+
+			//Returns a newly created timeline with this animation attached to it
+			NonOwningPtr<NodeAnimationTimeline> Start(real playback_rate = 1.0_r, bool running = true) noexcept;
 
 
 			/*

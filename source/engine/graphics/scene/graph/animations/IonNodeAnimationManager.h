@@ -241,6 +241,12 @@ namespace ion::graphics::scene::graph::animations
 			//Create a node animation timeline with the given name
 			NonOwningPtr<NodeAnimationTimeline> CreateTimeline(std::string name);
 
+			//Create a node animation timeline with the given playback rate and whether it is running or not
+			NonOwningPtr<NodeAnimationTimeline> CreateTimeline(real playback_rate = 1.0_r, bool running = true);
+
+			//Create a node animation timeline with the given name, playback rate and whether it is running or not
+			NonOwningPtr<NodeAnimationTimeline> CreateTimeline(std::string name, real playback_rate = 1.0_r, bool running = true);
+
 
 			/*
 				Node animation timelines

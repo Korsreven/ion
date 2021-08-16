@@ -13,6 +13,9 @@ File:	IonNodeAnimationTimeline.h
 #ifndef ION_NODE_ANIMATION_TIMELINE_H
 #define ION_NODE_ANIMATION_TIMELINE_H
 
+#include <optional>
+#include <utility>
+
 #include "IonAttachableNodeAnimation.h"
 #include "IonAttachableNodeAnimationGroup.h"
 #include "managed/IonManagedObject.h"
@@ -38,8 +41,10 @@ namespace ion::graphics::scene::graph::animations
 
 			duration current_time_ = 0.0_sec;
 			duration total_duration_ = 0.0_sec;
+			std::optional<std::pair<int, int>> repeat_count_;
 			real playback_rate_ = 1.0_r;
-			bool running_ = true;
+			bool running_ = false;
+			bool reverse_ = false;
 
 		public:
 
@@ -48,6 +53,12 @@ namespace ion::graphics::scene::graph::animations
 
 
 			using managed::ManagedObject<NodeAnimationManager>::ManagedObject;
+
+			//Construct a new timeline with the given playback rate and whether it is running or not
+			explicit NodeAnimationTimeline(real playback_rate = 1.0_r, bool running = true) noexcept;
+
+			//Construct a new timeline with the given name, playback rate and whether it is running or not
+			explicit NodeAnimationTimeline(std::string name, real playback_rate = 1.0_r, bool running = true) noexcept;
 
 			//Deleted copy constructor
 			NodeAnimationTimeline(const NodeAnimationTimeline&) = delete;
@@ -108,6 +119,11 @@ namespace ion::graphics::scene::graph::animations
 				Modifiers
 			*/
 
+			//Sets the given repeat count to the given value
+			//A repeat count of 0 means that the timeline will not loop
+			//If repeat count is nullopt, the timeline will loop indefinitely
+			void RepeatCount(std::optional<int> repeat_count) noexcept;
+
 			//Sets the given playback rate to the given rate in range (0.0, oo)
 			inline void PlaybackRate(real rate) noexcept
 			{
@@ -120,36 +136,65 @@ namespace ion::graphics::scene::graph::animations
 				Observers
 			*/
 
-			//Returns the current time of this node animation timeline
+			//Returns the current time of this timeline
 			[[nodiscard]] inline auto CurrentTime() const noexcept
 			{
 				return current_time_;
 			}
 
-			//Returns the total duration of this node animation timeline
+			//Returns the total duration of this timeline
 			[[nodiscard]] inline auto TotalDuration() const noexcept
 			{
 				return total_duration_;
 			}
 
-			//Returns the total percent of this node animation timeline
+			//Returns the total percent of this timeline
 			[[nodiscard]] inline auto TotalPercent() const noexcept
 			{
 				return current_time_ / total_duration_;
 			}
 
-			//Returns the playback rate of this node animation timeline
+			//Returns the playback rate of this timeline
 			[[nodiscard]] inline auto PlaybackRate() const noexcept
 			{
 				return playback_rate_;
 			}
 
 
-			//Returns true if this node animation timeline is running
+			//Returns true if this timeline is running
 			[[nodiscard]] inline auto IsRunning() const noexcept
 			{
 				return running_;
 			}
+
+			//Returns true if this timeline is currently in reverse
+			[[nodiscard]] inline auto InReverse() const noexcept
+			{
+				return reverse_;
+			}
+
+
+			/*
+				Playback
+			*/
+
+			//Starts or resumes, timeline playback
+			void Start() noexcept;
+
+			//Stops timeline playback
+			void Stop() noexcept;
+
+			//Stops timeline playback and reset elapsed time to zero
+			void Reset() noexcept;
+
+			//Stops, resets and starts timeline playback
+			void Restart() noexcept;
+
+
+			//Reverts this timeline back to start by the given duration
+			//The timeline is reverted by reversing the timeline playback
+			//A total duration of 0 seconds is instantaneous
+			void Revert(duration total_duration = 0.0_sec);
 
 
 			/*
@@ -157,7 +202,7 @@ namespace ion::graphics::scene::graph::animations
 				Attaching
 			*/
 
-			//Attaches the given node animation with a given start time, to this node animation timeline
+			//Attaches the given node animation with a given start time, to this timeline
 			NonOwningPtr<AttachableNodeAnimation> Attach(NonOwningPtr<NodeAnimation> node_animation, duration start_time = 0.0_sec);
 
 
@@ -197,7 +242,7 @@ namespace ion::graphics::scene::graph::animations
 				Elapse time
 			*/
 
-			//Elapse the total time for this node animation timeline by the given time in seconds
+			//Elapse the total time for this timeline by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 	};
