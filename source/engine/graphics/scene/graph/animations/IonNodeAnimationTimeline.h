@@ -202,8 +202,9 @@ namespace ion::graphics::scene::graph::animations
 				Attaching
 			*/
 
-			//Attaches the given node animation with a given start time, to this timeline
-			NonOwningPtr<AttachableNodeAnimation> Attach(NonOwningPtr<NodeAnimation> node_animation, duration start_time = 0.0_sec);
+			//Attaches the given node animation, to this timeline
+			NonOwningPtr<AttachableNodeAnimation> Attach(NonOwningPtr<NodeAnimation> node_animation,
+				duration start_time = 0.0_sec, bool enable = true);
 
 
 			/*
@@ -223,7 +224,9 @@ namespace ion::graphics::scene::graph::animations
 				Attaching
 			*/
 
-			NonOwningPtr<AttachableNodeAnimationGroup> Attach(NonOwningPtr<NodeAnimationGroup> node_animation_group, duration start_time = 0.0_sec);
+			//Attaches the given node animation group, to this timeline
+			NonOwningPtr<AttachableNodeAnimationGroup> Attach(NonOwningPtr<NodeAnimationGroup> node_animation_group,
+				duration start_time = 0.0_sec, bool enable = true);
 
 
 			/*

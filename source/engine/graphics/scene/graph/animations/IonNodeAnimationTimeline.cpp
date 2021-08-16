@@ -97,9 +97,10 @@ void NodeAnimationTimeline::Revert(duration total_duration)
 	Attaching
 */
 
-NonOwningPtr<AttachableNodeAnimation> NodeAnimationTimeline::Attach(NonOwningPtr<NodeAnimation> node_animation, duration start_time)
+NonOwningPtr<AttachableNodeAnimation> NodeAnimationTimeline::Attach(NonOwningPtr<NodeAnimation> node_animation,
+	duration start_time, bool enable)
 {
-	return NodeAnimationBase::Create(node_animation, start_time);
+	return NodeAnimationBase::Create(node_animation, start_time, enable);
 }
 
 
@@ -124,9 +125,10 @@ bool NodeAnimationTimeline::DetachAnimation(AttachableNodeAnimation &node_animat
 	Attaching
 */
 
-NonOwningPtr<AttachableNodeAnimationGroup> NodeAnimationTimeline::Attach(NonOwningPtr<NodeAnimationGroup> node_animation_group, duration start_time)
+NonOwningPtr<AttachableNodeAnimationGroup> NodeAnimationTimeline::Attach(NonOwningPtr<NodeAnimationGroup> node_animation_group,
+	duration start_time, bool enable)
 {
-	return NodeAnimationGroupBase::Create(node_animation_group, start_time);
+	return NodeAnimationGroupBase::Create(node_animation_group, start_time, enable);
 }
 
 

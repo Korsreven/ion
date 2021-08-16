@@ -38,14 +38,16 @@ namespace ion::graphics::scene::graph::animations
 		private:
 
 			duration start_time_ = 0.0_sec;
+			bool enable_ = true;
 
 			std::optional<NodeAnimationGroup> node_animation_group_;
 			NonOwningPtr<NodeAnimationGroup> initial_node_animation_group_;
 
 		public:
 
-			//Construct a new attachable node animation group with the given node animation group
-			AttachableNodeAnimationGroup(NonOwningPtr<NodeAnimationGroup> node_animation_group, duration start_time = 0.0_sec) noexcept;
+			//Construct a new attachable node animation group with the given node animation group, start time and whether it is enabled or not
+			explicit AttachableNodeAnimationGroup(NonOwningPtr<NodeAnimationGroup> node_animation_group,
+				duration start_time = 0.0_sec, bool enable = true) noexcept;
 
 
 			/*
@@ -56,6 +58,18 @@ namespace ion::graphics::scene::graph::animations
 			inline void StartTime(duration time) noexcept
 			{
 				start_time_ = time;
+			}
+
+			//Enable the node animation group
+			inline void Enable() noexcept
+			{
+				enable_ = true;
+			}
+
+			//Disable the node animation group
+			inline void Disable() noexcept
+			{
+				enable_ = false;
 			}
 
 
@@ -71,6 +85,12 @@ namespace ion::graphics::scene::graph::animations
 			[[nodiscard]] inline auto StartTime() const noexcept
 			{
 				return start_time_;
+			}
+
+			//Returns true if this node animation group is enabled
+			[[nodiscard]] inline auto IsEnabled() const noexcept
+			{
+				return enable_;
 			}
 
 

@@ -109,8 +109,8 @@ namespace ion::graphics::scene::graph::animations
 				Node animations
 			*/
 
-			//Attaches the given node animation with a given start time, to this node animation group
-			void Attach(NonOwningPtr<NodeAnimation> node_animation, duration start_time = 0.0_sec);
+			//Attaches the given node animation to this node animation group
+			void Attach(NonOwningPtr<NodeAnimation> node_animation, duration start_time = 0.0_sec, bool enable = true);
 
 			//Detaches all node animations from this node animation group
 			void DetachAll() noexcept;

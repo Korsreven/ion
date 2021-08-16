@@ -104,25 +104,25 @@ namespace ion::graphics::scene::graph::animations
 
 			struct rotating_motion : motion
 			{
-				detail::moving_amount angle;
+				moving_amount angle;
 			};
 
 			struct scaling_motion : motion
 			{
-				detail::moving_amount x;
-				detail::moving_amount y;
+				moving_amount x;
+				moving_amount y;
 			};
 
 			struct translating_motion : motion
 			{
-				detail::moving_amount x;
-				detail::moving_amount y;
-				detail::moving_amount z;
+				moving_amount x;
+				moving_amount y;
+				moving_amount z;
 			};
 
 			struct volume_fader : motion
 			{
-				detail::moving_amount amount;
+				moving_amount amount;
 			};
 
 

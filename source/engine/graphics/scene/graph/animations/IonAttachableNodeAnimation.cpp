@@ -23,12 +23,14 @@ namespace attachable_node_animation::detail
 } //attachable_node_animation::detail
 
 
-AttachableNodeAnimation::AttachableNodeAnimation(NonOwningPtr<NodeAnimation> node_animation, duration start_time) noexcept :
+AttachableNodeAnimation::AttachableNodeAnimation(NonOwningPtr<NodeAnimation> node_animation,
+	duration start_time, bool enable) noexcept :
 
 	node_animation_{node_animation ? std::make_optional(*node_animation) : std::nullopt},
 	initial_node_animation_{node_animation},
 
-	start_time_{start_time}
+	start_time_{start_time},
+	enable_{enable}
 {
 	//Empty
 }

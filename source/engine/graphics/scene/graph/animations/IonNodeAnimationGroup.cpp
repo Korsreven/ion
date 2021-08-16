@@ -54,9 +54,9 @@ NonOwningPtr<NodeAnimationTimeline> NodeAnimationGroup::Start(real playback_rate
 	Node animations
 */
 
-void NodeAnimationGroup::Attach(NonOwningPtr<NodeAnimation> node_animation, duration start_time)
+void NodeAnimationGroup::Attach(NonOwningPtr<NodeAnimation> node_animation, duration start_time, bool enable)
 {
-	attached_animations_.emplace_back(node_animation, start_time);
+	attached_animations_.emplace_back(node_animation, start_time, enable);
 }
 
 void NodeAnimationGroup::DetachAll() noexcept
