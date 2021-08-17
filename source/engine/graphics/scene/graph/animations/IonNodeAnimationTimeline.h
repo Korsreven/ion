@@ -55,10 +55,10 @@ namespace ion::graphics::scene::graph::animations
 			using managed::ManagedObject<NodeAnimationManager>::ManagedObject;
 
 			//Construct a new timeline with the given playback rate and whether it is running or not
-			explicit NodeAnimationTimeline(real playback_rate = 1.0_r, bool running = true) noexcept;
+			explicit NodeAnimationTimeline(real playback_rate, bool running = true) noexcept;
 
 			//Construct a new timeline with the given name, playback rate and whether it is running or not
-			explicit NodeAnimationTimeline(std::string name, real playback_rate = 1.0_r, bool running = true) noexcept;
+			explicit NodeAnimationTimeline(std::string name, real playback_rate, bool running = true) noexcept;
 
 			//Deleted copy constructor
 			NodeAnimationTimeline(const NodeAnimationTimeline&) = delete;
