@@ -12,6 +12,8 @@ File:	IonNodeAnimation.cpp
 
 #include "IonNodeAnimation.h"
 
+#include <algorithm>
+
 #include "IonNodeAnimationManager.h"
 #include "IonNodeAnimationTimeline.h"
 
@@ -30,6 +32,39 @@ NodeAnimation::NodeAnimation(std::string name) noexcept :
 	ManagedObject{std::move(name)}
 {
 	//Empty
+}
+
+
+/*
+	Elapse time
+*/
+
+void NodeAnimation::Elapse(duration time, duration start_time) noexcept
+{
+	if (total_duration_ <= 0.0_sec)
+		return;
+
+
+	if (time == 0.0_sec)
+		current_time_ = 0.0_sec;
+	else
+		current_time_ += time;
+
+	auto local_time = current_time_ - start_time;
+
+	if (auto reverse = time < 0.0_sec; reverse ?
+		local_time <= total_duration_ :
+		local_time >= 0.0_sec)
+	{
+		auto percent = local_time / total_duration_;
+		percent = std::clamp(percent, 0.0_r, 1.0_r);
+
+		/*
+		for (auto &motion : motions_)
+		{
+		}
+		*/
+	}
 }
 
 

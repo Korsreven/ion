@@ -34,6 +34,17 @@ NodeAnimationGroup::NodeAnimationGroup(std::string name) noexcept :
 
 
 /*
+	Elapse time
+*/
+
+void NodeAnimationGroup::Elapse(duration time, duration start_time) noexcept
+{
+	for (auto &animation : AttachedAnimations())
+		animation.Elapse(time, start_time);
+}
+
+
+/*
 	Playback
 */
 
