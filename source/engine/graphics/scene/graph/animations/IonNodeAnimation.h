@@ -18,10 +18,15 @@ File:	IonNodeAnimation.h
 #include <vector>
 
 #include "graphics/utilities/IonVector2.h"
+#include "graphics/utilities/IonVector3.h"
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
-#include "types/IonCumulative.h"
 #include "types/IonTypes.h"
+
+namespace ion::graphics::scene::graph
+{
+	class SceneNode; //Forward declaration
+}
 
 namespace ion::graphics::scene::graph::animations
 {
@@ -59,9 +64,10 @@ namespace ion::graphics::scene::graph::animations
 		namespace detail
 		{
 			struct moving_amount
-			{
+			{		
+				real current = 0.0_r;
+				real target = 0.0_r;
 				MotionTechniqueType technique = MotionTechniqueType::Linear;
-				types::Cumulative<real> value;
 			};
 
 
@@ -120,14 +126,17 @@ namespace ion::graphics::scene::graph::animations
 				moving_amount z;
 			};
 
-			struct volume_fader : motion
-			{
-				moving_amount amount;
-			};
 
-
-			using motion_types = std::variant<rotating_motion, scaling_motion, translating_motion, volume_fader>;
+			using motion_types = std::variant<rotating_motion, scaling_motion, translating_motion>;
 			using motion_container = std::vector<motion_types>;
+
+
+			real move_amount(moving_amount &value, real percent) noexcept;
+
+			real elapse_motion(motion &m, duration time, duration start_time = 0.0_sec) noexcept;
+			void elapse_motion(rotating_motion &m, SceneNode &node, duration time, duration start_time = 0.0_sec) noexcept;
+			void elapse_motion(scaling_motion &m, SceneNode &node, duration time, duration start_time = 0.0_sec) noexcept;
+			void elapse_motion(translating_motion &m, SceneNode &node, duration time, duration start_time = 0.0_sec) noexcept;
 		} //detail
 	} //node_animation
 
@@ -210,13 +219,14 @@ namespace ion::graphics::scene::graph::animations
 
 
 			//Adds a translation motion to this node animation with the given unit and total duration
-			void AddTranslation(const Vector2 &unit, duration total_duration, duration start_time = 0.0_sec,
+			void AddTranslation(const Vector3 &unit, duration total_duration, duration start_time = 0.0_sec,
 				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear) noexcept;
 
 			//Adds a translation motion to this node animation with the given unit and total duration
-			void AddTranslation(const Vector2 &unit, duration total_duration, duration start_time = 0.0_sec,
+			void AddTranslation(const Vector3 &unit, duration total_duration, duration start_time = 0.0_sec,
 				node_animation::MotionTechniqueType technique_x = node_animation::MotionTechniqueType::Linear,
-				node_animation::MotionTechniqueType technique_y = node_animation::MotionTechniqueType::Linear) noexcept;
+				node_animation::MotionTechniqueType technique_y = node_animation::MotionTechniqueType::Linear,
+				node_animation::MotionTechniqueType technique_z = node_animation::MotionTechniqueType::Linear) noexcept;
 	};
 } //ion::graphics::scene::graph::animations
 
