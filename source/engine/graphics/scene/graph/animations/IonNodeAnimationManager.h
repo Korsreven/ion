@@ -110,14 +110,14 @@ namespace ion::graphics::scene::graph::animations
 
 			//Returns a mutable range of all node animation timelines in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto AnimationTimelines() noexcept
+			[[nodiscard]] inline auto Timelines() noexcept
 			{
 				return NodeAnimationTimelineBase::Objects();
 			}
 
 			//Returns an immutable range of all node animation timelines in this manager
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto AnimationTimelines() const noexcept
+			[[nodiscard]] inline auto Timelines() const noexcept
 			{
 				return NodeAnimationTimelineBase::Objects();
 			}

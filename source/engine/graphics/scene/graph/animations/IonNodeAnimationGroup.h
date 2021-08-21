@@ -42,9 +42,7 @@ namespace ion::graphics::scene::graph::animations
 	{
 		private:
 
-			duration current_time_ = 0.0_sec;
 			duration total_duration_ = 0.0_sec;
-
 			node_animation_group::detail::attached_animations attached_animations_;
 
 		public:
@@ -78,22 +76,10 @@ namespace ion::graphics::scene::graph::animations
 				Observers
 			*/
 
-			//Returns the current time of this node animation group
-			[[nodiscard]] inline auto CurrentTime() const noexcept
-			{
-				return current_time_;
-			}
-
 			//Returns the total duration of this node animation group
 			[[nodiscard]] inline auto TotalDuration() const noexcept
 			{
 				return total_duration_;
-			}
-
-			//Returns the total percent of this node animation group
-			[[nodiscard]] inline auto TotalPercent() const noexcept
-			{
-				return current_time_ / total_duration_;
 			}
 
 
@@ -103,7 +89,7 @@ namespace ion::graphics::scene::graph::animations
 
 			//Elapse the total time for this node animation group by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
-			void Elapse(duration time, duration start_time = 0.0_sec) noexcept;
+			void Elapse(duration time, duration current_time, duration start_time) noexcept;
 
 
 			/*

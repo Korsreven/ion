@@ -218,7 +218,8 @@ bool NodeAnimationManager::RemoveTimeline(std::string_view name) noexcept
 
 void NodeAnimationManager::Elapse(duration time) noexcept
 {
-	time;
+	for (auto &timeline : Timelines())
+		timeline.Elapse(time);
 }
 
 } //ion::graphics::scene::graph::animations

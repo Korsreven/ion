@@ -51,10 +51,10 @@ void AttachableNodeAnimationGroup::Revert()
 	Elapse time
 */
 
-void AttachableNodeAnimationGroup::Elapse(duration time) noexcept
+void AttachableNodeAnimationGroup::Elapse(duration time, duration current_time) noexcept
 {
 	if (enable_ && node_animation_group_)
-		node_animation_group_->Elapse(time, start_time_);
+		node_animation_group_->Elapse(time, current_time, start_time_);
 }
 
 } //ion::graphics::scene::graph::animations

@@ -12,6 +12,8 @@ File:	IonSceneNodeAnimationGroup.cpp
 
 #include "IonNodeAnimationGroup.h"
 
+#include <utility>
+
 #include "IonNodeAnimationManager.h"
 #include "IonNodeAnimationTimeline.h"
 
@@ -37,10 +39,10 @@ NodeAnimationGroup::NodeAnimationGroup(std::string name) noexcept :
 	Elapse time
 */
 
-void NodeAnimationGroup::Elapse(duration time, duration start_time) noexcept
+void NodeAnimationGroup::Elapse(duration time, duration current_time, duration start_time) noexcept
 {
 	for (auto &animation : AttachedAnimations())
-		animation.Elapse(time, start_time);
+		animation.Elapse(time, current_time, start_time);
 }
 
 
@@ -67,13 +69,18 @@ NonOwningPtr<NodeAnimationTimeline> NodeAnimationGroup::Start(real playback_rate
 
 void NodeAnimationGroup::Attach(NonOwningPtr<NodeAnimation> node_animation, duration start_time, bool enable)
 {
-	attached_animations_.emplace_back(node_animation, start_time, enable);
+	if (node_animation)
+	{
+		attached_animations_.emplace_back(node_animation, start_time, enable);
+		total_duration_ = std::max(total_duration_, start_time + node_animation->TotalDuration());
+	}
 }
 
 void NodeAnimationGroup::DetachAll() noexcept
 {
 	attached_animations_.clear();
 	attached_animations_.shrink_to_fit();
+	total_duration_ = 0.0_sec;
 }
 
 } //ion::graphics::scene::graph::animations

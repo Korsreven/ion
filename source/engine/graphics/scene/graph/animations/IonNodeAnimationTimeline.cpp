@@ -11,6 +11,8 @@ File:	IonNodeAnimationTimeline.cpp
 */
 
 #include "IonNodeAnimationTimeline.h"
+
+#include <algorithm>
 #include <type_traits>
 
 namespace ion::graphics::scene::graph::animations
@@ -87,7 +89,11 @@ void NodeAnimationTimeline::Restart() noexcept
 
 void NodeAnimationTimeline::Revert(duration total_duration)
 {
-	total_duration;
+	if (total_duration > 0.0_sec)
+		reverse_playback_rate_ = current_time_ / total_duration;
+	else
+		current_time_ = 0.0_sec;
+
 	reverse_ = true;
 }
 
@@ -154,7 +160,48 @@ bool NodeAnimationTimeline::DetachAnimationGroup(AttachableNodeAnimationGroup &n
 
 void NodeAnimationTimeline::Elapse(duration time) noexcept
 {
-	time;
+	if (running_)
+	{
+		if (reverse_)
+			time = -time;
+
+		current_time_ += time *
+			(reverse_ ? reverse_playback_rate_ : playback_rate_);
+
+		for (auto &animation : AttachedAnimations())
+			animation.Elapse(time, current_time_);
+
+		for (auto &animation_group : AttachedAnimationGroups())
+			animation_group.Elapse(time, current_time_);
+
+
+		//A timeline cycle has been completed
+		if (current_time_ <= 0.0_sec || current_time_ >= total_duration_)
+		{
+			//Loop (next cycle)
+			if (!reverse_ && //Forwarding
+				(!repeat_count_ || //Indefinitely
+				  repeat_count_->first < repeat_count_->second))
+			{
+				if (repeat_count_)
+					++repeat_count_->first;
+
+				current_time_ = 0.0_sec;
+			}
+			//Timeline is done
+			else
+			{
+				Stop();
+				current_time_ = std::clamp(current_time_, 0.0_sec, 1.0_sec);
+					//Make sure animation stays at 0% or 100% when stopped
+
+				if (repeat_count_)
+					repeat_count_->first = 0;
+
+				reverse_ = false;
+			}
+		}
+	}
 }
 
 } //ion::graphics::scene::graph::animations

@@ -104,7 +104,6 @@ namespace ion::graphics::scene::graph::animations
 			struct motion
 			{
 				duration start_time = 0.0_sec;
-				duration current_time = 0.0_sec;
 				duration total_duration = 0.0_sec;
 			};
 
@@ -133,10 +132,10 @@ namespace ion::graphics::scene::graph::animations
 
 			real move_amount(moving_amount &value, real percent) noexcept;
 
-			real elapse_motion(motion &m, duration time, duration start_time = 0.0_sec) noexcept;
-			void elapse_motion(rotating_motion &m, SceneNode &node, duration time, duration start_time = 0.0_sec) noexcept;
-			void elapse_motion(scaling_motion &m, SceneNode &node, duration time, duration start_time = 0.0_sec) noexcept;
-			void elapse_motion(translating_motion &m, SceneNode &node, duration time, duration start_time = 0.0_sec) noexcept;
+			real elapse_motion(motion &m, duration time, duration current_time, duration start_time) noexcept;
+			void elapse_motion(rotating_motion &m, duration time, duration current_time, duration start_time, SceneNode &node) noexcept;
+			void elapse_motion(scaling_motion &m, duration time, duration current_time, duration start_time, SceneNode &node) noexcept;
+			void elapse_motion(translating_motion &m, duration time, duration current_time, duration start_time, SceneNode &node) noexcept;
 		} //detail
 	} //node_animation
 
@@ -145,9 +144,7 @@ namespace ion::graphics::scene::graph::animations
 	{
 		private:
 
-			duration current_time_ = 0.0_sec;
 			duration total_duration_ = 0.0_sec;
-
 			node_animation::detail::action_container actions_;
 			node_animation::detail::motion_container motions_;
 
@@ -163,22 +160,10 @@ namespace ion::graphics::scene::graph::animations
 				Observers
 			*/
 
-			//Returns the current time of this node animation
-			[[nodiscard]] inline auto CurrentTime() const noexcept
-			{
-				return current_time_;
-			}
-
 			//Returns the total duration of this node animation
 			[[nodiscard]] inline auto TotalDuration() const noexcept
 			{
 				return total_duration_;
-			}
-
-			//Returns the total percent of this node animation
-			[[nodiscard]] inline auto TotalPercent() const noexcept
-			{
-				return current_time_ / total_duration_;
 			}
 
 
@@ -186,9 +171,9 @@ namespace ion::graphics::scene::graph::animations
 				Elapse time
 			*/
 
-			//Elapse the total time for this node animation by the given time in seconds
+			//Elapse the total time for this node animation group by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
-			void Elapse(duration time, duration start_time = 0.0_sec) noexcept;
+			void Elapse(duration time, duration current_time, duration start_time, SceneNode &node) noexcept;
 
 
 			/*
@@ -196,37 +181,47 @@ namespace ion::graphics::scene::graph::animations
 			*/
 
 			//Returns a newly created timeline with this animation attached to it
-			NonOwningPtr<NodeAnimationTimeline> Start(real playback_rate = 1.0_r, bool running = true) noexcept;
+			NonOwningPtr<NodeAnimationTimeline> Start(real playback_rate = 1.0_r, bool running = true);
 
 
 			/*
 				Motions
+				Adding
 			*/
 
 			//Adds a rotation motion to this node animation with the given angle (in radians) and total duration
 			void AddRotation(real angle, duration total_duration, duration start_time = 0.0_sec,
-				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear) noexcept;
+				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear);
 
 
 			//Adds a scaling motion to this node animation with the given unit and total duration
 			void AddScaling(const Vector2 &unit, duration total_duration, duration start_time = 0.0_sec,
-				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear) noexcept;
+				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear);
 
 			//Adds a scaling motion to this node animation with the given unit and total duration
 			void AddScaling(const Vector2 &unit, duration total_duration, duration start_time = 0.0_sec,
 				node_animation::MotionTechniqueType technique_x = node_animation::MotionTechniqueType::Linear,
-				node_animation::MotionTechniqueType technique_y = node_animation::MotionTechniqueType::Linear) noexcept;
+				node_animation::MotionTechniqueType technique_y = node_animation::MotionTechniqueType::Linear);
 
 
 			//Adds a translation motion to this node animation with the given unit and total duration
 			void AddTranslation(const Vector3 &unit, duration total_duration, duration start_time = 0.0_sec,
-				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear) noexcept;
+				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear);
 
 			//Adds a translation motion to this node animation with the given unit and total duration
 			void AddTranslation(const Vector3 &unit, duration total_duration, duration start_time = 0.0_sec,
 				node_animation::MotionTechniqueType technique_x = node_animation::MotionTechniqueType::Linear,
 				node_animation::MotionTechniqueType technique_y = node_animation::MotionTechniqueType::Linear,
-				node_animation::MotionTechniqueType technique_z = node_animation::MotionTechniqueType::Linear) noexcept;
+				node_animation::MotionTechniqueType technique_z = node_animation::MotionTechniqueType::Linear);
+
+
+			/*
+				Motions
+				Removing
+			*/
+
+			//Clear all motions from this node animation
+			void ClearMotions() noexcept;
 	};
 } //ion::graphics::scene::graph::animations
 

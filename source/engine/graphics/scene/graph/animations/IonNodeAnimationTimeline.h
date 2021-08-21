@@ -43,6 +43,7 @@ namespace ion::graphics::scene::graph::animations
 			duration total_duration_ = 0.0_sec;
 			std::optional<std::pair<int, int>> repeat_count_;
 			real playback_rate_ = 1.0_r;
+			real reverse_playback_rate_ = 1.0_r;
 			bool running_ = false;
 			bool reverse_ = false;
 
