@@ -344,6 +344,8 @@ void SceneNode::Tidy()
 //Public
 
 SceneNode::SceneNode(bool visible) noexcept :
+
+	NodeAnimationManager{*this},
 	visible_{visible}
 {
 	AddNode(ordered_nodes_, this);
@@ -351,8 +353,9 @@ SceneNode::SceneNode(bool visible) noexcept :
 
 SceneNode::SceneNode(const Vector2 &initial_direction, bool visible) noexcept :
 
-	direction_{initial_direction},
+	NodeAnimationManager{*this},
 
+	direction_{initial_direction},
 	initial_direction_{initial_direction},
 	visible_{visible}
 {
@@ -361,9 +364,10 @@ SceneNode::SceneNode(const Vector2 &initial_direction, bool visible) noexcept :
 
 SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept :
 
+	NodeAnimationManager{*this},
+
 	position_{position},
 	direction_{initial_direction},
-
 	initial_direction_{initial_direction},
 	visible_{visible}
 {
@@ -373,6 +377,8 @@ SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, 
 
 SceneNode::SceneNode(SceneNode &parent_node, bool visible) noexcept :
 
+	NodeAnimationManager{*this},
+
 	visible_{visible},
 	parent_node_{&parent_node}
 {
@@ -381,8 +387,9 @@ SceneNode::SceneNode(SceneNode &parent_node, bool visible) noexcept :
 
 SceneNode::SceneNode(SceneNode &parent_node, const Vector2 &initial_direction, bool visible) noexcept :
 
-	direction_{initial_direction},
+	NodeAnimationManager{*this},
 
+	direction_{initial_direction},
 	initial_direction_{initial_direction},
 	visible_{visible},
 	parent_node_{&parent_node}
@@ -391,10 +398,11 @@ SceneNode::SceneNode(SceneNode &parent_node, const Vector2 &initial_direction, b
 }
 
 SceneNode::SceneNode(SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept :
-	
+
+	NodeAnimationManager{*this},
+
 	position_{position},
 	direction_{initial_direction},
-
 	initial_direction_{initial_direction},
 	visible_{visible},
 	parent_node_{&parent_node}
@@ -527,6 +535,16 @@ void SceneNode::Scale(const Vector2 &unit) noexcept
 void SceneNode::LookAt(const Vector3 &position) noexcept
 {
 	Rotate((position - DerivedPosition()).SignedAngleBetween(DerivedDirection()));
+}
+
+
+/*
+	Elapse time
+*/
+
+void SceneNode::Elapse(duration time) noexcept
+{
+	NodeAnimationManager::Elapse(time);
 }
 
 

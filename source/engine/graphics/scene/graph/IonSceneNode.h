@@ -20,6 +20,7 @@ File:	IonSceneNode.h
 
 #include "adaptors/ranges/IonDereferenceIterable.h"
 #include "adaptors/ranges/IonIterable.h"
+#include "animations/IonNodeAnimationManager.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonObb.h"
@@ -247,7 +248,7 @@ namespace ion::graphics::scene::graph
 	} //scene_node
 
 
-	class SceneNode final
+	class SceneNode final : public animations::NodeAnimationManager
 	{
 		private:
 
@@ -363,8 +364,8 @@ namespace ion::graphics::scene::graph
 			SceneNode(SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true) noexcept;
 
 
-			//Destructor
-			~SceneNode() noexcept;
+			//Virtual destructor
+			virtual ~SceneNode() noexcept;
 
 
 			/*
@@ -780,6 +781,15 @@ namespace ion::graphics::scene::graph
 
 			//Turn this node such that it faces the given position
 			void LookAt(const Vector3 &position) noexcept;
+
+
+			/*
+				Elapse time
+			*/
+
+			//Elapse the total time for this node by the given time in seconds
+			//This function is typically called each frame, with the time in seconds since last frame
+			void Elapse(duration time) noexcept;
 
 
 			/*

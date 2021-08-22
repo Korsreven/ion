@@ -34,7 +34,7 @@ namespace ion::graphics::scene::graph::animations
 	} //node_animation_manager::detail
 
 
-	class NodeAnimationManager final :
+	class NodeAnimationManager :
 		public managed::ObjectManager<NodeAnimation, NodeAnimationManager>,
 		public managed::ObjectManager<NodeAnimationGroup, NodeAnimationManager>,
 		public managed::ObjectManager<NodeAnimationTimeline, NodeAnimationManager>
@@ -59,8 +59,8 @@ namespace ion::graphics::scene::graph::animations
 			//Default move constructor
 			NodeAnimationManager(NodeAnimationManager&&) = default;
 
-			//Destructor
-			~NodeAnimationManager() = default;
+			//Virtual destructor
+			virtual ~NodeAnimationManager() = default;
 
 
 			/*
