@@ -360,6 +360,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	for (auto &node : root_node_.OrderedSceneNodes())
 	{
 		shader_programs_node_.clear();
+		node.Elapse(time);
 
 		//The node render started/ended events can be called without any attached objects
 		//The visibility of the node is also used as a flag to enable/disable event notifications
@@ -382,8 +383,9 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 							{
 								return object;
 							}, attached_object);
+					object->Elapse(time);
 
-					//Update uniforms
+					//Update uniforms and render object
 					if (object->Visible())
 					{
 						//For each shader program
@@ -412,11 +414,9 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 								shader_programs_node_.push_back(shader_program); //Only distinct
 							}
 						}
-					}
 
-					//Render object
-					object->Elapse(time);
-					object->Render();
+						object->Render();
+					}
 				}
 
 				detail::pop_gl_matrix();
