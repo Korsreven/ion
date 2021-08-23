@@ -109,12 +109,16 @@ void NodeAnimationTimeline::Restart() noexcept
 
 void NodeAnimationTimeline::Revert(duration total_duration)
 {
-	if (total_duration > 0.0_sec)
-		reverse_playback_rate_ = current_time_ / total_duration;
-	else
-		current_time_ = 0.0_sec;
+	//Something to revert
+	if (current_time_ > 0.0_sec)
+	{
+		if (total_duration > 0.0_sec)
+			reverse_playback_rate_ = current_time_ / total_duration;
+		else
+			current_time_ = 0.0_sec;
 
-	reverse_ = true;
+		reverse_ = true;
+	}
 }
 
 
@@ -222,10 +226,8 @@ void NodeAnimationTimeline::Elapse(duration time) noexcept
 
 		for (auto &animation : AttachedAnimations())
 			animation.Elapse(time, current_time_);
-
 		for (auto &animation_group : AttachedAnimationGroups())
 			animation_group.Elapse(time, current_time_);
-
 
 		//A timeline cycle has been completed
 		if (current_time_ <= 0.0_sec || current_time_ >= total_duration_)
@@ -239,6 +241,11 @@ void NodeAnimationTimeline::Elapse(duration time) noexcept
 					++repeat_count_->first;
 
 				current_time_ = 0.0_sec;
+
+				for (auto &animation : AttachedAnimations())
+					animation.Revert();
+				for (auto &animation_group : AttachedAnimationGroups())
+					animation_group.Revert();
 			}
 			//Timeline is done
 			else
