@@ -26,6 +26,26 @@ namespace node_animation_timeline::detail
 } //node_animation_timeline::detail
 
 
+//Private
+
+duration NodeAnimationTimeline::GetTotalDuration() const noexcept
+{
+	auto total_duration = 0.0_sec;
+
+	for (auto &animation : AttachedAnimations())
+		total_duration = std::max(total_duration_, animation.StartTime() +
+			(animation.Get() ? animation.Get()->TotalDuration() : 0.0_sec));
+
+	for (auto &animation_group : AttachedAnimationGroups())
+		total_duration = std::max(total_duration_, animation_group.StartTime() +
+			(animation_group.Get() ? animation_group.Get()->TotalDuration() : 0.0_sec));
+
+	return total_duration;
+}
+
+
+//Public
+
 NodeAnimationTimeline::NodeAnimationTimeline(real playback_rate, bool running) noexcept :
 	
 	playback_rate_{playback_rate},
@@ -106,7 +126,10 @@ void NodeAnimationTimeline::Revert(duration total_duration)
 NonOwningPtr<AttachableNodeAnimation> NodeAnimationTimeline::Attach(NonOwningPtr<NodeAnimation> node_animation,
 	duration start_time, bool enable)
 {
-	return NodeAnimationBase::Create(node_animation, start_time, enable);
+	auto ptr = NodeAnimationBase::Create(node_animation, start_time, enable);
+	total_duration_ = std::max(total_duration_, ptr->StartTime() +
+		(node_animation ? node_animation->TotalDuration() : 0.0_sec));
+	return ptr;
 }
 
 
@@ -118,11 +141,18 @@ NonOwningPtr<AttachableNodeAnimation> NodeAnimationTimeline::Attach(NonOwningPtr
 void NodeAnimationTimeline::DetachAllAnimations() noexcept
 {
 	NodeAnimationBase::Clear();
+
+	if (std::empty(AttachedAnimationGroups()))
+		total_duration_ = 0.0_sec;
+	else
+		total_duration_ = GetTotalDuration();
 }
 
 bool NodeAnimationTimeline::DetachAnimation(AttachableNodeAnimation &node_animation) noexcept
 {
-	return NodeAnimationBase::Remove(node_animation);
+	auto removed = NodeAnimationBase::Remove(node_animation);
+	total_duration_ = GetTotalDuration();
+	return removed;
 }
 
 
@@ -134,7 +164,10 @@ bool NodeAnimationTimeline::DetachAnimation(AttachableNodeAnimation &node_animat
 NonOwningPtr<AttachableNodeAnimationGroup> NodeAnimationTimeline::Attach(NonOwningPtr<NodeAnimationGroup> node_animation_group,
 	duration start_time, bool enable)
 {
-	return NodeAnimationGroupBase::Create(node_animation_group, start_time, enable);
+	auto ptr = NodeAnimationGroupBase::Create(node_animation_group, start_time, enable);
+	total_duration_ = std::max(total_duration_, ptr->StartTime() +
+		(node_animation_group ? node_animation_group->TotalDuration() : 0.0_sec));
+	return ptr;
 }
 
 
@@ -146,11 +179,30 @@ NonOwningPtr<AttachableNodeAnimationGroup> NodeAnimationTimeline::Attach(NonOwni
 void NodeAnimationTimeline::DetachAllAnimationGroups() noexcept
 {
 	NodeAnimationGroupBase::Clear();
+
+	if (std::empty(AttachedAnimations()))
+		total_duration_ = 0.0_sec;
+	else
+		total_duration_ = GetTotalDuration();
 }
 
 bool NodeAnimationTimeline::DetachAnimationGroup(AttachableNodeAnimationGroup &node_animation_group) noexcept
 {
-	return NodeAnimationGroupBase::Remove(node_animation_group);
+	auto removed = NodeAnimationGroupBase::Remove(node_animation_group);
+	total_duration_ = GetTotalDuration();
+	return removed;
+}
+
+
+/*
+	Detaching
+*/
+
+void NodeAnimationTimeline::DetachAll() noexcept
+{
+	NodeAnimationBase::Clear();
+	NodeAnimationGroupBase::Clear();
+	total_duration_ = 0.0_sec;
 }
 
 
@@ -192,8 +244,8 @@ void NodeAnimationTimeline::Elapse(duration time) noexcept
 			else
 			{
 				Stop();
-				current_time_ = std::clamp(current_time_, 0.0_sec, 1.0_sec);
-					//Make sure animation stays at 0% or 100% when stopped
+				current_time_ = std::clamp(current_time_, 0.0_sec, total_duration_);
+					//Make sure animation stays at start or stop
 
 				if (repeat_count_)
 					repeat_count_->first = 0;

@@ -47,6 +47,9 @@ namespace ion::graphics::scene::graph::animations
 			bool running_ = false;
 			bool reverse_ = false;
 
+
+			duration GetTotalDuration() const noexcept;
+
 		public:
 
 			using NodeAnimationBase = managed::ObjectManager<AttachableNodeAnimation, NodeAnimationTimeline>;
@@ -240,6 +243,14 @@ namespace ion::graphics::scene::graph::animations
 
 			//Detaches a removable node animation group from this timeline
 			bool DetachAnimationGroup(AttachableNodeAnimationGroup &node_animation_group) noexcept;
+
+
+			/*
+				Detaching
+			*/
+
+			//Detaches all removable node animations and animation groups from this timeline
+			void DetachAll() noexcept;
 
 
 			/*
