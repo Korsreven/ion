@@ -13,6 +13,7 @@ File:	IonAttachableNodeAnimation.cpp
 #include "IonAttachableNodeAnimation.h"
 
 #include "IonNodeAnimationManager.h"
+#include "IonNodeAnimationTimeline.h"
 
 namespace ion::graphics::scene::graph::animations
 {
@@ -24,6 +25,17 @@ namespace attachable_node_animation::detail
 
 } //attachable_node_animation::detail
 
+
+//Private
+
+void AttachableNodeAnimation::NotifyUpdate() noexcept
+{
+	if (auto owner = Owner(); owner)
+		owner->Refresh();
+}
+
+
+//Public
 
 AttachableNodeAnimation::AttachableNodeAnimation(NonOwningPtr<NodeAnimation> node_animation,
 	duration start_time, bool enable) noexcept :
@@ -45,7 +57,10 @@ AttachableNodeAnimation::AttachableNodeAnimation(NonOwningPtr<NodeAnimation> nod
 void AttachableNodeAnimation::Revert()
 {
 	if (initial_node_animation_)
+	{
 		node_animation_ = *initial_node_animation_;
+		NotifyUpdate();
+	}
 }
 
 

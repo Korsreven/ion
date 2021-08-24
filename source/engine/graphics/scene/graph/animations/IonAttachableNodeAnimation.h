@@ -43,6 +43,9 @@ namespace ion::graphics::scene::graph::animations
 			std::optional<NodeAnimation> node_animation_;
 			NonOwningPtr<NodeAnimation> initial_node_animation_;
 
+
+			void NotifyUpdate() noexcept;
+
 		public:
 
 			//Construct a new attachable node animation with the given node animation, start time and whether it is enabled or not
@@ -54,10 +57,11 @@ namespace ion::graphics::scene::graph::animations
 				Modifiers
 			*/
 
-			//Returns the start time of this node animation
+			//Sets the start time of this node animation to the given time
 			inline void StartTime(duration time) noexcept
 			{
 				start_time_ = time;
+				NotifyUpdate();
 			}
 
 			//Enable the node animation
@@ -87,18 +91,20 @@ namespace ion::graphics::scene::graph::animations
 				return start_time_;
 			}
 
+			//Returns the total duration of this node animation
+			[[nodiscard]] inline auto TotalDuration() const noexcept
+			{
+				return node_animation_ ?
+					node_animation_->TotalDuration() :
+					0.0_sec;
+			}
+
 			//Returns true if this node animation is enabled
 			[[nodiscard]] inline auto IsEnabled() const noexcept
 			{
 				return enable_;
 			}
 
-
-			//Returns a mutable reference to the node animation
-			[[nodiscard]] auto& Get() noexcept
-			{
-				return node_animation_;
-			}
 
 			//Returns an immutable reference to the node animation
 			[[nodiscard]] auto& Get() const noexcept

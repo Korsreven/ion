@@ -48,7 +48,7 @@ namespace ion::graphics::scene::graph::animations
 			bool reverse_ = false;
 
 
-			duration GetTotalDuration() const noexcept;
+			duration RetrieveTotalDuration() const noexcept;
 
 		public:
 
@@ -134,6 +134,11 @@ namespace ion::graphics::scene::graph::animations
 				if (rate > 0.0_r)
 					playback_rate_ = rate;
 			}
+
+
+			//Refreshes the current time and total duration of this timeline
+			//This function is typically called by an attached animation or animation group
+			void Refresh() noexcept;
 
 
 			/*

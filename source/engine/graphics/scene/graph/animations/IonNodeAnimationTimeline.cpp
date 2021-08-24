@@ -28,17 +28,15 @@ namespace node_animation_timeline::detail
 
 //Private
 
-duration NodeAnimationTimeline::GetTotalDuration() const noexcept
+duration NodeAnimationTimeline::RetrieveTotalDuration() const noexcept
 {
 	auto total_duration = 0.0_sec;
 
 	for (auto &animation : AttachedAnimations())
-		total_duration = std::max(total_duration_, animation.StartTime() +
-			(animation.Get() ? animation.Get()->TotalDuration() : 0.0_sec));
+		total_duration = std::max(total_duration_, animation.StartTime() + animation.TotalDuration());
 
 	for (auto &animation_group : AttachedAnimationGroups())
-		total_duration = std::max(total_duration_, animation_group.StartTime() +
-			(animation_group.Get() ? animation_group.Get()->TotalDuration() : 0.0_sec));
+		total_duration = std::max(total_duration_, animation_group.StartTime() + animation_group.TotalDuration());
 
 	return total_duration;
 }
@@ -77,6 +75,13 @@ void NodeAnimationTimeline::RepeatCount(std::optional<int> repeat_count) noexcep
 	}
 	else
 		repeat_count_.reset();
+}
+
+
+void NodeAnimationTimeline::Refresh() noexcept
+{
+	total_duration_ = RetrieveTotalDuration();
+	current_time_ = std::clamp(current_time_, 0.0_sec, total_duration_);
 }
 
 
@@ -145,17 +150,17 @@ NonOwningPtr<AttachableNodeAnimation> NodeAnimationTimeline::Attach(NonOwningPtr
 void NodeAnimationTimeline::DetachAllAnimations() noexcept
 {
 	NodeAnimationBase::Clear();
-
-	if (std::empty(AttachedAnimationGroups()))
-		total_duration_ = 0.0_sec;
-	else
-		total_duration_ = GetTotalDuration();
+	Refresh();
 }
 
 bool NodeAnimationTimeline::DetachAnimation(AttachableNodeAnimation &node_animation) noexcept
 {
+	auto total_duration = node_animation.TotalDuration();
 	auto removed = NodeAnimationBase::Remove(node_animation);
-	total_duration_ = GetTotalDuration();
+
+	if (total_duration == total_duration_)
+		Refresh();
+
 	return removed;
 }
 
@@ -183,17 +188,17 @@ NonOwningPtr<AttachableNodeAnimationGroup> NodeAnimationTimeline::Attach(NonOwni
 void NodeAnimationTimeline::DetachAllAnimationGroups() noexcept
 {
 	NodeAnimationGroupBase::Clear();
-
-	if (std::empty(AttachedAnimations()))
-		total_duration_ = 0.0_sec;
-	else
-		total_duration_ = GetTotalDuration();
+	Refresh();
 }
 
 bool NodeAnimationTimeline::DetachAnimationGroup(AttachableNodeAnimationGroup &node_animation_group) noexcept
 {
+	auto total_duration = node_animation_group.TotalDuration();
 	auto removed = NodeAnimationGroupBase::Remove(node_animation_group);
-	total_duration_ = GetTotalDuration();
+
+	if (total_duration == total_duration_)
+		Refresh();
+
 	return removed;
 }
 
@@ -206,7 +211,7 @@ void NodeAnimationTimeline::DetachAll() noexcept
 {
 	NodeAnimationBase::Clear();
 	NodeAnimationGroupBase::Clear();
-	total_duration_ = 0.0_sec;
+	current_time_ = total_duration_ = 0.0_sec;
 }
 
 
