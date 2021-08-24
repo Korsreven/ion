@@ -104,6 +104,17 @@ NodeAnimation::NodeAnimation(std::string name) noexcept :
 
 
 /*
+	Modifiers
+*/
+
+void NodeAnimation::Reset() noexcept
+{
+	for (auto &m : motions_)
+		std::visit([&](auto &&m) noexcept { m.Reset(); }, m);
+}
+
+
+/*
 	Elapse time
 */
 

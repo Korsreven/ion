@@ -36,6 +36,17 @@ NodeAnimationGroup::NodeAnimationGroup(std::string name) noexcept :
 
 
 /*
+	Modifiers
+*/
+
+void NodeAnimationGroup::Reset() noexcept
+{
+	for (auto &animation : AttachedAnimations())
+		animation.Reset();
+}
+
+
+/*
 	Elapse time
 */
 

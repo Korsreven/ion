@@ -53,6 +53,12 @@ AttachableNodeAnimationGroup::AttachableNodeAnimationGroup(NonOwningPtr<NodeAnim
 	Modifiers
 */
 
+void AttachableNodeAnimationGroup::Reset() noexcept
+{
+	if (node_animation_group_)
+		node_animation_group_->Reset();
+}
+
 void AttachableNodeAnimationGroup::Revert()
 {
 	if (initial_node_animation_group_)

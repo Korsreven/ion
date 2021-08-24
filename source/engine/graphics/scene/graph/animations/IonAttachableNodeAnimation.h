@@ -77,6 +77,9 @@ namespace ion::graphics::scene::graph::animations
 			}
 
 
+			//Reset this node animation
+			void Reset() noexcept;
+
 			//Revert to the initial node animation
 			void Revert();
 

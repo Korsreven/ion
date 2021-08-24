@@ -54,6 +54,12 @@ AttachableNodeAnimation::AttachableNodeAnimation(NonOwningPtr<NodeAnimation> nod
 	Modifiers
 */
 
+void AttachableNodeAnimation::Reset() noexcept
+{
+	if (node_animation_)
+		node_animation_->Reset();
+}
+
 void AttachableNodeAnimation::Revert()
 {
 	if (initial_node_animation_)

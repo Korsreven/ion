@@ -73,6 +73,14 @@ namespace ion::graphics::scene::graph::animations
 
 
 			/*
+				Modifiers
+			*/
+
+			//Reset this node animation group
+			void Reset() noexcept;
+
+
+			/*
 				Observers
 			*/
 

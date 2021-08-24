@@ -102,7 +102,12 @@ void NodeAnimationTimeline::Stop() noexcept
 void NodeAnimationTimeline::Reset() noexcept
 {
 	running_ = false;
-	Revert();
+	
+	for (auto &animation : AttachedAnimations())
+		animation.Reset();
+
+	for (auto &animation_group : AttachedAnimationGroups())
+		animation_group.Reset();
 }
 
 void NodeAnimationTimeline::Restart() noexcept
@@ -231,8 +236,10 @@ void NodeAnimationTimeline::Elapse(duration time) noexcept
 
 		for (auto &animation : AttachedAnimations())
 			animation.Elapse(time, current_time_);
+
 		for (auto &animation_group : AttachedAnimationGroups())
 			animation_group.Elapse(time, current_time_);
+
 
 		//A timeline cycle has been completed
 		if (current_time_ <= 0.0_sec || current_time_ >= total_duration_)
@@ -246,11 +253,7 @@ void NodeAnimationTimeline::Elapse(duration time) noexcept
 					++repeat_count_->first;
 
 				current_time_ = 0.0_sec;
-
-				for (auto &animation : AttachedAnimations())
-					animation.Revert();
-				for (auto &animation_group : AttachedAnimationGroups())
-					animation_group.Revert();
+				Restart();
 			}
 			//Timeline is done
 			else

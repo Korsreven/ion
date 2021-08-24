@@ -110,12 +110,23 @@ namespace ion::graphics::scene::graph::animations
 			struct rotating_motion : motion
 			{
 				moving_amount angle;
+
+				inline void Reset() noexcept
+				{
+					angle.current = 0.0_r;
+				}
 			};
 
 			struct scaling_motion : motion
 			{
 				moving_amount x;
 				moving_amount y;
+
+				inline void Reset() noexcept
+				{
+					x.current = 0.0_r;
+					y.current = 0.0_r;
+				}
 			};
 
 			struct translating_motion : motion
@@ -123,6 +134,13 @@ namespace ion::graphics::scene::graph::animations
 				moving_amount x;
 				moving_amount y;
 				moving_amount z;
+
+				inline void Reset() noexcept
+				{
+					x.current = 0.0_r;
+					y.current = 0.0_r;
+					z.current = 0.0_r;
+				}
 			};
 
 
@@ -154,6 +172,14 @@ namespace ion::graphics::scene::graph::animations
 
 			//Construct a new node animation with the given name
 			NodeAnimation(std::string name) noexcept;
+
+
+			/*
+				Modifiers
+			*/
+
+			//Reset this node animation
+			void Reset() noexcept;
 
 
 			/*
