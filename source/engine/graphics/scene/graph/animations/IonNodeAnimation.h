@@ -38,12 +38,23 @@ namespace ion::graphics::scene::graph::animations
 
 	namespace node_animation
 	{
-		enum class ActionToggleType
+		enum class NodeActionType
 		{
-			EnableAnimations,
-			EnableParticleSystem,
-			MuteSounds,
-			NodeVisibility
+			//Visibility
+			FlipVisibility,
+			FlipVisibilityCascading,
+			Show,
+			ShowCascading,
+			Hide,
+			HideCascading,	
+
+			//Inheritance
+			FlipInheritRotation,
+			FlipInheritScaling,		
+			InheritRotation,
+			InheritScaling,
+			DisinheritRotation,
+			DisinheritScaling
 		};
 
 		enum class MotionTechniqueType
@@ -80,11 +91,9 @@ namespace ion::graphics::scene::graph::animations
 				duration time = 0.0_sec;
 			};
 
-			struct toggle_action : action
+			struct node_action : action
 			{
-				ActionToggleType type;
-				bool cascade = true;
-				bool value = false;
+				NodeActionType type = NodeActionType::FlipVisibilityCascading;
 			};
 
 			struct user_action : action
@@ -93,7 +102,7 @@ namespace ion::graphics::scene::graph::animations
 			};
 
 
-			using action_types = std::variant<toggle_action, user_action>;
+			using action_types = std::variant<node_action, user_action>;
 			using action_container = std::vector<action_types>;
 
 
