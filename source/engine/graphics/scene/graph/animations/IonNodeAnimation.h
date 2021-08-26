@@ -48,9 +48,7 @@ namespace ion::graphics::scene::graph::animations
 			Hide,
 			HideCascading,	
 
-			//Inheritance
-			FlipInheritRotation,
-			FlipInheritScaling,		
+			//Transformation
 			InheritRotation,
 			InheritScaling,
 			DisinheritRotation,
@@ -157,6 +155,20 @@ namespace ion::graphics::scene::graph::animations
 			using motion_container = std::vector<motion_types>;
 
 
+			/*
+				Actions
+			*/
+
+			bool execute_action(action &a, duration time, duration current_time, duration start_time) noexcept;
+
+			void execute_action(node_action &a, duration time, duration current_time, duration start_time, SceneNode &node) noexcept;
+			void execute_action(user_action &a, duration time, duration current_time, duration start_time, SceneNode &node) noexcept;
+
+
+			/*
+				Motions
+			*/
+
 			real move_amount(moving_amount &value, real percent) noexcept;
 
 			real elapse_motion(motion &m, duration time, duration current_time, duration start_time) noexcept;
@@ -174,6 +186,9 @@ namespace ion::graphics::scene::graph::animations
 			duration total_duration_ = 0.0_sec;
 			node_animation::detail::action_container actions_;
 			node_animation::detail::motion_container motions_;
+
+
+			duration RetrieveTotalDuration() const noexcept;
 
 		public:
 
@@ -220,8 +235,18 @@ namespace ion::graphics::scene::graph::animations
 
 
 			/*
+				Actions
+			*/
+
+			//Adds an action to this node animation with the given type and execution time
+			void AddAction(node_animation::NodeActionType type, duration time);
+
+			//Clear all actions from this node animation
+			void ClearActions() noexcept;
+
+
+			/*
 				Motions
-				Adding
 			*/
 
 			//Adds a rotation motion to this node animation with the given angle (in radians) and total duration
@@ -250,13 +275,16 @@ namespace ion::graphics::scene::graph::animations
 				node_animation::MotionTechniqueType technique_z = node_animation::MotionTechniqueType::Linear);
 
 
-			/*
-				Motions
-				Removing
-			*/
-
 			//Clear all motions from this node animation
 			void ClearMotions() noexcept;
+
+
+			/*
+				Actions / motions
+			*/
+
+			//Clear all actions and motions from this node animation
+			void Clear() noexcept;
 	};
 } //ion::graphics::scene::graph::animations
 

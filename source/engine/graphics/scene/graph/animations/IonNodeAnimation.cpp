@@ -28,6 +28,96 @@ using namespace node_animation;
 namespace node_animation::detail
 {
 
+/*
+	Actions
+*/
+
+bool execute_action(action &a, duration time, duration current_time, duration start_time) noexcept
+{
+	auto local_time = current_time - (start_time + a.time);
+
+	//Execute action?
+	if (auto reverse = time < 0.0_sec; reverse ?
+		local_time <= 0.0_sec && local_time - time > 0.0_sec :
+		local_time >= 0.0_sec && local_time - time < 0.0_sec)
+	
+		return true;
+
+	else
+		return false;
+}
+
+
+void execute_action(node_action &a, duration time, duration current_time, duration start_time, SceneNode &node) noexcept
+{
+	if (execute_action(static_cast<action&>(a), time, current_time, start_time))
+	{
+		auto reverse = time < 0.0_sec;
+			//Execute the opposite action if in reverse
+
+		switch (a.type)
+		{
+			//Visibility
+
+			case NodeActionType::FlipVisibility:
+			node.FlipVisibility(false);
+			break;
+
+			case NodeActionType::FlipVisibilityCascading:
+			node.FlipVisibility();
+			break;
+
+			case NodeActionType::Show:
+			node.Visible(reverse ? false : true, false);
+			break;
+
+			case NodeActionType::ShowCascading:
+			node.Visible(reverse ? false : true);
+			break;
+
+			case NodeActionType::Hide:
+			node.Visible(reverse ? true : false, false);
+			break;
+
+			case NodeActionType::HideCascading:
+			node.Visible(reverse ? true : false);
+			break;
+
+
+			//Transformation
+
+			case NodeActionType::InheritRotation:
+			node.InheritRotation(reverse ? false : true);
+			break;
+
+			case NodeActionType::InheritScaling:
+			node.InheritScaling(reverse ? false : true);
+			break;
+
+			case NodeActionType::DisinheritRotation:
+			node.InheritRotation(reverse ? true : false);
+			break;
+
+			case NodeActionType::DisinheritScaling:
+			node.InheritScaling(reverse ? true : false);
+			break;
+		}
+	}
+}
+
+void execute_action(user_action &a, duration time, duration current_time, duration start_time, SceneNode &node) noexcept
+{
+	if (execute_action(static_cast<action&>(a), time, current_time, start_time))
+	{
+		//Todo
+	}
+}
+
+
+/*
+	Motions
+*/
+
 real move_amount(moving_amount &amount, real percent) noexcept
 {
 	auto delta = 0.0_r;
@@ -96,6 +186,32 @@ void elapse_motion(translating_motion &m, duration time, duration current_time, 
 } //node_animation::detail
 
 
+//Private
+
+duration NodeAnimation::RetrieveTotalDuration() const noexcept
+{
+	auto total_duration = 0.0_sec;
+
+	for (auto &a : actions_)
+		total_duration = std::visit(
+			[&](auto &&a) noexcept
+			{
+				return std::max(total_duration_, a.time);
+			}, a);
+
+	for (auto &m : motions_)
+		total_duration = std::visit(
+			[&](auto &&m) noexcept
+			{
+				return std::max(total_duration_, m.start_time + m.total_duration);
+			}, m);
+
+	return total_duration;
+}
+
+
+//Public
+
 NodeAnimation::NodeAnimation(std::string name) noexcept :
 	ManagedObject{std::move(name)}
 {
@@ -149,6 +265,26 @@ NonOwningPtr<NodeAnimationTimeline> NodeAnimation::Start(real playback_rate, boo
 	}
 	else
 		return nullptr;
+}
+
+
+/*
+	Actions
+*/
+
+void NodeAnimation::AddAction(node_animation::NodeActionType type, duration time)
+{
+	assert(time >= 0.0_sec);
+
+	actions_.push_back(detail::node_action{{time},{type}});
+	total_duration_ = std::max(total_duration_, time);
+}
+
+void NodeAnimation::ClearActions() noexcept
+{
+	actions_.clear();
+	actions_.shrink_to_fit();
+	total_duration_ = RetrieveTotalDuration();
 }
 
 
@@ -230,15 +366,26 @@ void NodeAnimation::AddTranslation(const Vector3 &unit, duration total_duration,
 }
 
 
-/*
-	Motions
-	Removing
-*/
-
 void NodeAnimation::ClearMotions() noexcept
 {
 	motions_.clear();
 	motions_.shrink_to_fit();
+	total_duration_ = RetrieveTotalDuration();
+}
+
+
+/*
+	Actions / motions
+*/
+
+void NodeAnimation::Clear() noexcept
+{
+	actions_.clear();
+	actions_.shrink_to_fit();
+
+	motions_.clear();
+	motions_.shrink_to_fit();
+
 	total_duration_ = 0.0_sec;
 }
 
