@@ -44,7 +44,7 @@ namespace ion::graphics::scene::graph::animations
 			std::optional<std::pair<int, int>> repeat_count_;
 			real playback_rate_ = 1.0_r;
 			real reverse_playback_rate_ = 1.0_r;
-			bool running_ = false;
+			bool running_ = true;
 			bool reverse_ = false;
 
 
@@ -62,7 +62,7 @@ namespace ion::graphics::scene::graph::animations
 			explicit NodeAnimationTimeline(real playback_rate, bool running = true) noexcept;
 
 			//Construct a new timeline with the given name, playback rate and whether it is running or not
-			explicit NodeAnimationTimeline(std::string name, real playback_rate, bool running = true) noexcept;
+			NodeAnimationTimeline(std::string name, real playback_rate, bool running = true) noexcept;
 
 			//Deleted copy constructor
 			NodeAnimationTimeline(const NodeAnimationTimeline&) = delete;

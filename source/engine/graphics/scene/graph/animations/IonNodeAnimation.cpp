@@ -109,7 +109,7 @@ void execute_action(user_action &a, duration time, duration current_time, durati
 {
 	if (execute_action(static_cast<action&>(a), time, current_time, start_time))
 	{
-		//Todo
+		node; //Todo
 	}
 }
 
@@ -150,7 +150,7 @@ real elapse_motion(motion &m, duration time, duration current_time, duration sta
 		return std::clamp(percent, 0.0_r, 1.0_r);
 	}
 	else
-		return reverse ? 1.0_r : 0.0_r;
+		return local_time < 0.0_sec ? 0.0_r : 1.0_r;
 }
 
 void elapse_motion(rotating_motion &m, duration time, duration current_time, duration start_time, SceneNode &node) noexcept
@@ -245,6 +245,9 @@ void NodeAnimation::Elapse(duration time, duration current_time, duration start_
 		auto percent = local_time / total_duration_;
 		percent = std::clamp(percent, 0.0_r, 1.0_r);
 		
+		for (auto &a : actions_)
+			std::visit([&](auto &&a) noexcept { execute_action(a, time, current_time, start_time, node); }, a);
+
 		for (auto &m : motions_)
 			std::visit([&](auto &&m) noexcept { elapse_motion(m, time, current_time, start_time, node); }, m);
 	}

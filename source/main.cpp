@@ -1169,11 +1169,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto model = scene.CreateModel();
 			model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.3671875_r, 0.5_r}, ship});
-			model->AddPass(ion::graphics::render::Pass{model_program});		
-			model->ShowBoundingVolumes(true);
+			model->AddPass(ion::graphics::render::Pass{model_program});
 			model->BoundingVolumeExtent({{0.3_r, 0.2_r}, {0.7_r, 0.8_r}});
 			model->QueryFlags(1);
 			model->QueryMask(2 | 4);
+			//model->ShowBoundingVolumes(true);
 
 			auto model_star = scene.CreateModel();
 			model_star->CreateMesh(ion::graphics::scene::shapes::Sprite{
@@ -1212,14 +1212,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			box->AddPass(ion::graphics::render::Pass{model_program});
 			box->QueryFlags(2);
 			box->QueryMask(1 | 2 | 4);
-			box->ShowBoundingVolumes(true);
+			//box->ShowBoundingVolumes(true);
 
 			auto box2 = scene.CreateModel();
 			box2->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.30_r, 0.25_r}, color::DarkViolet});
 			box2->AddPass(ion::graphics::render::Pass{model_program});
 			box2->QueryFlags(2);
 			box2->QueryMask(1 | 2 | 4);
-			box2->ShowBoundingVolumes(true);
+			//box2->ShowBoundingVolumes(true);
 
 			auto circle = scene.CreateModel();
 			circle->CreateMesh(ion::graphics::scene::shapes::Ellipse{0.25_r, color::Khaki});
@@ -1227,7 +1227,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			circle->PreferredBoundingVolume(ion::graphics::scene::movable_object::PreferredBoundingVolumeType::BoundingSphere);
 			circle->QueryFlags(4);
 			circle->QueryMask(1 | 2 | 4);
-			circle->ShowBoundingVolumes(true);
+			//circle->ShowBoundingVolumes(true);
 
 			auto circle2 = scene.CreateModel();
 			circle2->CreateMesh(ion::graphics::scene::shapes::Ellipse{0.30_r, color::Orchid});
@@ -1235,7 +1235,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			circle2->PreferredBoundingVolume(ion::graphics::scene::movable_object::PreferredBoundingVolumeType::BoundingSphere);
 			circle2->QueryFlags(4);
 			circle2->QueryMask(1 | 2 | 4);
-			circle2->ShowBoundingVolumes(true);
+			//circle2->ShowBoundingVolumes(true);
 
 
 			//Scene graph
@@ -1294,10 +1294,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto spectrum_node = scene_graph->RootNode().CreateChildNode({1.4_r, -0.6_r, -1.0_r});
 			spectrum_node->AttachObject(*model_spectrum);
 
-			auto box_node = scene_graph->RootNode().CreateChildNode({-0.35_r, 0.25_r, -2.2_r});
+			auto box_base_node = scene_graph->RootNode().CreateChildNode({-0.40_r, 0.35_r, -2.2_r});
+
+			auto box_node = box_base_node->CreateChildNode({-0.05_r, -0.10_r, 0.0});
 			box_node->AttachObject(*box);
 
-			auto box2_node = scene_graph->RootNode().CreateChildNode({-0.45_r, 0.45_r, -2.2_r});
+			auto box2_node = box_base_node->CreateChildNode({0.05_r, 0.10_r, 0.0});
 			box2_node->AttachObject(*box2);
 
 			auto circle_node = scene_graph->RootNode().CreateChildNode({0.35_r, 0.25_r, -2.2_r});
@@ -1313,6 +1315,30 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Player camera
 			auto player_cam_node = model_node->CreateChildNode({0.0_r, 0.0_r, 1.8_r});
 			player_cam_node->AttachObject(*player_camera);
+
+
+			//Node animations
+			auto right_rotate = box_node->CreateAnimation("right_rotate");
+			right_rotate->AddRotation(math::ToRadians(-90.0_r), 2.0_sec);
+			right_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::HideCascading, 0.5_sec);
+			right_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::ShowCascading, 1.0_sec);
+
+			auto left_rotate = box2_node->CreateAnimation("left_rotate");
+			left_rotate->AddRotation(math::ToRadians(90.0_r), 2.0_sec);
+			left_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::HideCascading, 0.5_sec);
+			left_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::ShowCascading, 1.0_sec);
+
+			auto scale = box_base_node->CreateAnimation("scale");
+			scale->AddScaling(0.25_r, 1.5_sec);
+			scale->AddScaling(-0.25_r, 1.5_sec, 1.5_sec);
+
+			auto idle = box_base_node->CreateAnimationGroup("idle");
+			idle->Attach(right_rotate);
+			idle->Attach(left_rotate, 2.0_sec);
+			idle->Attach(scale, 4.0_sec);
+
+			auto timeline = box_base_node->CreateTimeline();
+			timeline->Attach(idle);
 
 
 			//Game

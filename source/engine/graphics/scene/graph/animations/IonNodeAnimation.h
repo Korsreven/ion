@@ -259,9 +259,9 @@ namespace ion::graphics::scene::graph::animations
 				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear);
 
 			//Adds a scaling motion to this node animation with the given unit and total duration
-			void AddScaling(const Vector2 &unit, duration total_duration, duration start_time = 0.0_sec,
-				node_animation::MotionTechniqueType technique_x = node_animation::MotionTechniqueType::Linear,
-				node_animation::MotionTechniqueType technique_y = node_animation::MotionTechniqueType::Linear);
+			void AddScaling(const Vector2 &unit, duration total_duration, duration start_time,
+				node_animation::MotionTechniqueType technique_x,
+				node_animation::MotionTechniqueType technique_y);
 
 
 			//Adds a translation motion to this node animation with the given unit and total duration
@@ -269,10 +269,10 @@ namespace ion::graphics::scene::graph::animations
 				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear);
 
 			//Adds a translation motion to this node animation with the given unit and total duration
-			void AddTranslation(const Vector3 &unit, duration total_duration, duration start_time = 0.0_sec,
-				node_animation::MotionTechniqueType technique_x = node_animation::MotionTechniqueType::Linear,
-				node_animation::MotionTechniqueType technique_y = node_animation::MotionTechniqueType::Linear,
-				node_animation::MotionTechniqueType technique_z = node_animation::MotionTechniqueType::Linear);
+			void AddTranslation(const Vector3 &unit, duration total_duration, duration start_time,
+				node_animation::MotionTechniqueType technique_x,
+				node_animation::MotionTechniqueType technique_y,
+				node_animation::MotionTechniqueType technique_z);
 
 
 			//Clear all motions from this node animation
