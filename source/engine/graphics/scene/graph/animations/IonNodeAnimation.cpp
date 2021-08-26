@@ -143,8 +143,8 @@ real elapse_motion(motion &m, duration time, duration current_time, duration sta
 	auto local_time = current_time - (start_time + m.start_time);
 
 	if (auto reverse = time < 0.0_sec; reverse ?
-		local_time <= m.total_duration :
-		local_time >= 0.0_sec)
+		local_time <= m.total_duration && local_time - time > 0.0_sec :
+		local_time >= 0.0_sec && local_time - time < m.total_duration)
 	{
 		auto percent = local_time / m.total_duration;
 		return std::clamp(percent, 0.0_r, 1.0_r);
@@ -239,8 +239,8 @@ void NodeAnimation::Elapse(duration time, duration current_time, duration start_
 	auto local_time = current_time - start_time;
 
 	if (auto reverse = time < 0.0_sec; reverse ?
-		local_time <= total_duration_ :
-		local_time >= 0.0_sec)
+		local_time <= total_duration_ && local_time - time > 0.0_sec :
+		local_time >= 0.0_sec && local_time - time < total_duration_)
 	{
 		auto percent = local_time / total_duration_;
 		percent = std::clamp(percent, 0.0_r, 1.0_r);
