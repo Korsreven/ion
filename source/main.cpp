@@ -235,6 +235,8 @@ struct Game :
 	bool rotate_camera_left = false;
 	bool rotate_camera_right = false;
 	
+	ion::NonOwningPtr<ion::graphics::scene::graph::animations::NodeAnimationTimeline> timeline;
+
 
 	/*
 		Frame listener
@@ -467,6 +469,12 @@ struct Game :
 				[[maybe_unused]] auto ray_result = ray_scene_query.Execute();
 
  				break;
+			}
+
+			case ion::events::listeners::KeyButton::Backspace:
+			{
+				if (timeline)
+					timeline->Revert(0.25_sec);
 			}
 		}
   	}
@@ -1320,13 +1328,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Node animations
 			auto right_rotate = box_node->CreateAnimation("right_rotate");
 			right_rotate->AddRotation(math::ToRadians(-90.0_r), 2.0_sec);
-			right_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::HideCascading, 0.5_sec);
-			right_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::ShowCascading, 1.0_sec);
+			//right_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::HideCascading, 0.5_sec);
+			//right_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::ShowCascading, 1.0_sec);
 
 			auto left_rotate = box2_node->CreateAnimation("left_rotate");
 			left_rotate->AddRotation(math::ToRadians(90.0_r), 2.0_sec);
-			left_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::HideCascading, 0.5_sec);
-			left_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::ShowCascading, 1.0_sec);
+			//left_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::HideCascading, 0.5_sec);
+			//left_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::ShowCascading, 1.0_sec);
 
 			auto scale = box_base_node->CreateAnimation("scale");
 			scale->AddScaling(0.25_r, 1.5_sec);
@@ -1351,6 +1359,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			game.aura = model_aura;
 			game.camera = camera;
 			game.player_camera = player_camera;
+			game.timeline = timeline;
 
 
 			//Engine

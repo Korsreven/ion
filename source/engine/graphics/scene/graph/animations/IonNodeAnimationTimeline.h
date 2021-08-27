@@ -48,6 +48,7 @@ namespace ion::graphics::scene::graph::animations
 			bool reverse_ = false;
 
 
+			void ResetCycle() noexcept;
 			duration RetrieveTotalDuration() const noexcept;
 
 		public:

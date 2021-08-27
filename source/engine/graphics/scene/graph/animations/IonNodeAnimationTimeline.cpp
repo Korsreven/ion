@@ -28,6 +28,18 @@ namespace node_animation_timeline::detail
 
 //Private
 
+void NodeAnimationTimeline::ResetCycle() noexcept
+{
+	current_time_ = 0.0_sec;
+	reverse_ = false;
+	
+	for (auto &animation : AttachedAnimations())
+		animation.Reset();
+
+	for (auto &animation_group : AttachedAnimationGroups())
+		animation_group.Reset();
+}
+
 duration NodeAnimationTimeline::RetrieveTotalDuration() const noexcept
 {
 	auto total_duration = 0.0_sec;
@@ -102,13 +114,10 @@ void NodeAnimationTimeline::Stop() noexcept
 void NodeAnimationTimeline::Reset() noexcept
 {
 	running_ = false;
-	current_time_ = 0.0_sec;
-	
-	for (auto &animation : AttachedAnimations())
-		animation.Reset();
+	ResetCycle();
 
-	for (auto &animation_group : AttachedAnimationGroups())
-		animation_group.Reset();
+	if (repeat_count_)
+		repeat_count_->first = 0;
 }
 
 void NodeAnimationTimeline::Restart() noexcept
@@ -123,12 +132,16 @@ void NodeAnimationTimeline::Revert(duration total_duration)
 	//Something to revert
 	if (current_time_ > 0.0_sec)
 	{
+		reverse_ = true;
+
+		//Over time
 		if (total_duration > 0.0_sec)
 			reverse_playback_rate_ = current_time_ / total_duration;
-		else
-			current_time_ = 0.0_sec;
-
-		reverse_ = true;
+		else //Instantaneously
+		{
+			reverse_playback_rate_ = 1.0_r;
+			Elapse(current_time_);
+		}
 	}
 }
 
@@ -255,20 +268,11 @@ void NodeAnimationTimeline::Elapse(duration time) noexcept
 				if (repeat_count_)
 					++repeat_count_->first;
 
-				Restart();
+				ResetCycle();
 			}
 			//Timeline is done
 			else
-			{
-				Stop();
-				current_time_ = std::clamp(current_time_, 0.0_sec, total_duration_);
-					//Make sure animation stays at start or stop
-
-				if (repeat_count_)
-					repeat_count_->first = 0;
-
-				reverse_ = false;
-			}
+				Reset();
 		}
 	}
 }
