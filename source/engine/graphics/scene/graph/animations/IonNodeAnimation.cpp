@@ -12,7 +12,6 @@ File:	IonNodeAnimation.cpp
 
 #include "IonNodeAnimation.h"
 
-#include <algorithm>
 #include <cassert>
 #include <utility>
 
@@ -192,19 +191,19 @@ duration NodeAnimation::RetrieveTotalDuration() const noexcept
 {
 	auto total_duration = 0.0_sec;
 
-	for (auto &a : actions_)
+	if (!std::empty(actions_))
 		total_duration = std::visit(
 			[&](auto &&a) noexcept
 			{
 				return std::max(total_duration_, a.time);
-			}, a);
+			}, actions_.back());
 
-	for (auto &m : motions_)
+	if (!std::empty(motions_))
 		total_duration = std::visit(
 			[&](auto &&m) noexcept
 			{
 				return std::max(total_duration_, m.start_time + m.total_duration);
-			}, m);
+			}, motions_.back());
 
 	return total_duration;
 }
@@ -279,7 +278,10 @@ void NodeAnimation::AddAction(node_animation::NodeActionType type, duration time
 {
 	assert(time >= 0.0_sec);
 
-	actions_.push_back(detail::node_action{{time},{type}});
+	//Insert sorted
+	actions_.insert(detail::upper_bound(actions_, time),
+		detail::node_action{{time},{type}});		
+
 	total_duration_ = std::max(total_duration_, time);
 }
 
@@ -301,9 +303,11 @@ void NodeAnimation::AddRotation(real angle, duration total_duration, duration st
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
-	motions_.push_back(detail::rotating_motion{
-		{start_time, total_duration},
-		{0.0_r, angle, technique}});
+	//Insert sorted
+	motions_.insert(detail::upper_bound(motions_, start_time + total_duration),
+		detail::rotating_motion{
+			{start_time, total_duration},
+			{0.0_r, angle, technique}});
 
 	total_duration_ = std::max(total_duration_, start_time + total_duration);
 }
@@ -315,10 +319,12 @@ void NodeAnimation::AddScaling(const Vector2 &unit, duration total_duration, dur
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
-	motions_.push_back(detail::scaling_motion{
-		{start_time, total_duration},
-		{0.0_r, unit.X(), technique},
-		{0.0_r, unit.Y(), technique}});
+	//Insert sorted
+	motions_.insert(detail::upper_bound(motions_, start_time + total_duration),
+		detail::scaling_motion{
+			{start_time, total_duration},
+			{0.0_r, unit.X(), technique},
+			{0.0_r, unit.Y(), technique}});
 
 	total_duration_ = std::max(total_duration_, start_time + total_duration);
 }
@@ -329,10 +335,12 @@ void NodeAnimation::AddScaling(const Vector2 &unit, duration total_duration, dur
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
-	motions_.push_back(detail::scaling_motion{
-		{start_time, total_duration},
-		{0.0_r, unit.X(), technique_x},
-		{0.0_r, unit.Y(), technique_y}});
+	//Insert sorted
+	motions_.insert(detail::upper_bound(motions_, start_time + total_duration),
+		detail::scaling_motion{
+			{start_time, total_duration},
+			{0.0_r, unit.X(), technique_x},
+			{0.0_r, unit.Y(), technique_y}});
 
 	total_duration_ = std::max(total_duration_, start_time + total_duration);
 }
@@ -344,11 +352,13 @@ void NodeAnimation::AddTranslation(const Vector3 &unit, duration total_duration,
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
-	motions_.push_back(detail::translating_motion{
-		{start_time, total_duration},
-		{0.0_r, unit.X(), technique},
-		{0.0_r, unit.Y(), technique},
-		{0.0_r, unit.Z(), technique}});
+	//Insert sorted
+	motions_.insert(detail::upper_bound(motions_, start_time + total_duration),
+		detail::translating_motion{
+			{start_time, total_duration},
+			{0.0_r, unit.X(), technique},
+			{0.0_r, unit.Y(), technique},
+			{0.0_r, unit.Z(), technique}});
 
 	total_duration_ = std::max(total_duration_, start_time + total_duration);
 }
@@ -359,11 +369,13 @@ void NodeAnimation::AddTranslation(const Vector3 &unit, duration total_duration,
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
-	motions_.push_back(detail::translating_motion{
-		{start_time, total_duration},
-		{0.0_r, unit.X(), technique_x},
-		{0.0_r, unit.Y(), technique_y},
-		{0.0_r, unit.Z(), technique_z}});
+	//Insert sorted
+	motions_.insert(detail::upper_bound(motions_, start_time + total_duration),
+		detail::translating_motion{
+			{start_time, total_duration},
+			{0.0_r, unit.X(), technique_x},
+			{0.0_r, unit.Y(), technique_y},
+			{0.0_r, unit.Z(), technique_z}});
 
 	total_duration_ = std::max(total_duration_, start_time + total_duration);
 }

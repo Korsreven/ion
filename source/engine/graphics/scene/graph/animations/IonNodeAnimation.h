@@ -13,6 +13,7 @@ File:	IonNodeAnimation.h
 #ifndef ION_NODE_ANIMATION
 #define ION_NODE_ANIMATION
 
+#include <algorithm>
 #include <string>
 #include <variant>
 #include <vector>
@@ -159,6 +160,16 @@ namespace ion::graphics::scene::graph::animations
 				Actions
 			*/
 
+			inline auto upper_bound(const action_container &actions, duration time) noexcept
+			{
+				return std::upper_bound(std::begin(actions), std::end(actions), time,
+					[](duration time, const detail::action_types &a) noexcept
+					{
+						return std::visit([&](auto &&a) noexcept { return time < a.time; }, a);
+					});
+			}
+
+
 			bool execute_action(action &a, duration time, duration current_time, duration start_time) noexcept;
 
 			void execute_action(node_action &a, duration time, duration current_time, duration start_time, SceneNode &node) noexcept;
@@ -168,6 +179,16 @@ namespace ion::graphics::scene::graph::animations
 			/*
 				Motions
 			*/
+
+			inline auto upper_bound(const motion_container &motions, duration total_duration) noexcept
+			{
+				return std::upper_bound(std::begin(motions), std::end(motions), total_duration,
+					[](duration total_duration, const detail::motion_types &m) noexcept
+					{
+						return std::visit([&](auto &&m) noexcept { return total_duration < m.start_time + m.total_duration; }, m);
+					});
+			}
+
 
 			real move_amount(moving_amount &value, real percent) noexcept;
 

@@ -13,6 +13,7 @@ File:	IonNodeAnimationGroup.h
 #ifndef ION_NODE_ANIMATION_GROUP
 #define ION_NODE_ANIMATION_GROUP
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -34,6 +35,16 @@ namespace ion::graphics::scene::graph::animations
 		namespace detail
 		{
 			using attached_animations = std::vector<AttachableNodeAnimation>;
+
+
+			inline auto upper_bound(const attached_animations &animations, duration total_duration) noexcept
+			{
+				return std::upper_bound(std::begin(animations), std::end(animations), total_duration,
+					[](duration total_duration, const AttachableNodeAnimation &animation) noexcept
+					{
+						return total_duration < animation.StartTime() + animation.TotalDuration();
+					});
+			}
 		} //detail
 	} //node_animation_group
 
@@ -56,13 +67,6 @@ namespace ion::graphics::scene::graph::animations
 			/*
 				Ranges
 			*/
-
-			//Returns a mutable range of all attached node animations in this node animation group
-			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto AttachedAnimations() noexcept
-			{
-				return adaptors::ranges::Iterable<node_animation_group::detail::attached_animations&>{attached_animations_};
-			}
 
 			//Returns an immutable range of all attached node animations in this node animation group
 			//This can be used directly with a range-based for loop

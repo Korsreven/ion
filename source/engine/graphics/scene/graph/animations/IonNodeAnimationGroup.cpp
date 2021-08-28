@@ -41,7 +41,7 @@ NodeAnimationGroup::NodeAnimationGroup(std::string name) noexcept :
 
 void NodeAnimationGroup::Reset() noexcept
 {
-	for (auto &animation : AttachedAnimations())
+	for (auto &animation : attached_animations_)
 		animation.Reset();
 }
 
@@ -52,7 +52,7 @@ void NodeAnimationGroup::Reset() noexcept
 
 void NodeAnimationGroup::Elapse(duration time, duration current_time, duration start_time) noexcept
 {
-	for (auto &animation : AttachedAnimations())
+	for (auto &animation : attached_animations_)
 		animation.Elapse(time, current_time, start_time);
 }
 
@@ -82,7 +82,11 @@ void NodeAnimationGroup::Attach(NonOwningPtr<NodeAnimation> node_animation, dura
 {
 	if (node_animation)
 	{
-		attached_animations_.emplace_back(node_animation, start_time, enable);
+		//Emplace sorted
+		attached_animations_.emplace(
+			detail::upper_bound(attached_animations_, start_time + node_animation->TotalDuration()),
+			node_animation, start_time, enable);
+
 		total_duration_ = std::max(total_duration_, start_time + node_animation->TotalDuration());
 	}
 }
