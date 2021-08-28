@@ -163,7 +163,7 @@ namespace ion::graphics::scene::graph::animations
 			inline auto upper_bound(const action_container &actions, duration time) noexcept
 			{
 				return std::upper_bound(std::begin(actions), std::end(actions), time,
-					[](duration time, const detail::action_types &a) noexcept
+					[](duration time, const action_types &a) noexcept
 					{
 						return std::visit([&](auto &&a) noexcept { return time < a.time; }, a);
 					});
@@ -183,7 +183,7 @@ namespace ion::graphics::scene::graph::animations
 			inline auto upper_bound(const motion_container &motions, duration total_duration) noexcept
 			{
 				return std::upper_bound(std::begin(motions), std::end(motions), total_duration,
-					[](duration total_duration, const detail::motion_types &m) noexcept
+					[](duration total_duration, const motion_types &m) noexcept
 					{
 						return std::visit([&](auto &&m) noexcept { return total_duration < m.start_time + m.total_duration; }, m);
 					});

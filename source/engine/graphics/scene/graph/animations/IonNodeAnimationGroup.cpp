@@ -16,6 +16,7 @@ File:	IonSceneNodeAnimationGroup.cpp
 
 #include "IonNodeAnimationManager.h"
 #include "IonNodeAnimationTimeline.h"
+#include "adaptors/ranges/IonIterable.h"
 
 namespace ion::graphics::scene::graph::animations
 {
@@ -52,8 +53,17 @@ void NodeAnimationGroup::Reset() noexcept
 
 void NodeAnimationGroup::Elapse(duration time, duration current_time, duration start_time) noexcept
 {
-	for (auto &animation : attached_animations_)
-		animation.Elapse(time, current_time, start_time);
+	//Reverse
+	if (time < 0.0_sec)
+	{
+		for (auto &animation : adaptors::ranges::ReverseIterable<decltype(attached_animations_)&>(attached_animations_))
+			animation.Elapse(time, current_time, start_time);
+	}
+	else //Forward
+	{
+		for (auto &animation : attached_animations_)
+			animation.Elapse(time, current_time, start_time);
+	}
 }
 
 

@@ -17,6 +17,7 @@ File:	IonNodeAnimation.cpp
 
 #include "IonNodeAnimationManager.h"
 #include "IonNodeAnimationTimeline.h"
+#include "adaptors/ranges/IonIterable.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 
 namespace ion::graphics::scene::graph::animations
@@ -244,11 +245,23 @@ void NodeAnimation::Elapse(duration time, duration current_time, duration start_
 		auto percent = local_time / total_duration_;
 		percent = std::clamp(percent, 0.0_r, 1.0_r);
 		
-		for (auto &a : actions_)
-			std::visit([&](auto &&a) noexcept { execute_action(a, time, current_time, start_time, node); }, a);
+		//Reverse
+		if (reverse)
+		{
+			for (auto &a : adaptors::ranges::ReverseIterable<decltype(actions_)&>(actions_))
+				std::visit([&](auto &&a) noexcept { execute_action(a, time, current_time, start_time, node); }, a);
 
-		for (auto &m : motions_)
-			std::visit([&](auto &&m) noexcept { elapse_motion(m, time, current_time, start_time, node); }, m);
+			for (auto &m : adaptors::ranges::ReverseIterable<decltype(motions_)&>(motions_))
+				std::visit([&](auto &&m) noexcept { elapse_motion(m, time, current_time, start_time, node); }, m);
+		}
+		else //Forward
+		{
+			for (auto &a : actions_)
+				std::visit([&](auto &&a) noexcept { execute_action(a, time, current_time, start_time, node); }, a);
+
+			for (auto &m : motions_)
+				std::visit([&](auto &&m) noexcept { elapse_motion(m, time, current_time, start_time, node); }, m);
+		}
 	}
 }
 

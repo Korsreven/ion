@@ -15,6 +15,8 @@ File:	IonNodeAnimationTimeline.cpp
 #include <algorithm>
 #include <type_traits>
 
+#include "adaptors/ranges/IonIterable.h"
+
 namespace ion::graphics::scene::graph::animations
 {
 
@@ -245,14 +247,26 @@ void NodeAnimationTimeline::Elapse(duration time) noexcept
 		if (reverse_)
 			time = -time;
 
-		current_time_ += time *
-			(reverse_ ? reverse_playback_rate_ : playback_rate_);
+		time *= (reverse_ ? reverse_playback_rate_ : playback_rate_);
+		current_time_ += time;
 
-		for (auto &animation : AttachedAnimations())
-			animation.Elapse(time, current_time_);
+		//Reverse
+		if (reverse_)
+		{
+			for (auto &animation : adaptors::ranges::ReverseIterable<decltype(AttachedAnimations())>(AttachedAnimations()))
+				animation.Elapse(time, current_time_);
 
-		for (auto &animation_group : AttachedAnimationGroups())
-			animation_group.Elapse(time, current_time_);
+			for (auto &animation_group : adaptors::ranges::ReverseIterable<decltype(AttachedAnimationGroups())>(AttachedAnimationGroups()))
+				animation_group.Elapse(time, current_time_);
+		}
+		else //Forward
+		{
+			for (auto &animation : AttachedAnimations())
+				animation.Elapse(time, current_time_);
+
+			for (auto &animation_group : AttachedAnimationGroups())
+				animation_group.Elapse(time, current_time_);
+		}
 
 
 		//A timeline cycle has been completed
