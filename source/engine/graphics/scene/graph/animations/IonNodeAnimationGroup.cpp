@@ -16,7 +16,6 @@ File:	IonSceneNodeAnimationGroup.cpp
 
 #include "IonNodeAnimationManager.h"
 #include "IonNodeAnimationTimeline.h"
-#include "adaptors/ranges/IonIterable.h"
 
 namespace ion::graphics::scene::graph::animations
 {
@@ -42,28 +41,8 @@ NodeAnimationGroup::NodeAnimationGroup(std::string name) noexcept :
 
 void NodeAnimationGroup::Reset() noexcept
 {
-	for (auto &animation : attached_animations_)
+	for (auto &animation : animations_)
 		animation.Reset();
-}
-
-
-/*
-	Elapse time
-*/
-
-void NodeAnimationGroup::Elapse(duration time, duration current_time, duration start_time) noexcept
-{
-	//Reverse
-	if (time < 0.0_sec)
-	{
-		for (auto &animation : adaptors::ranges::ReverseIterable<decltype(attached_animations_)&>(attached_animations_))
-			animation.Elapse(time, current_time, start_time);
-	}
-	else //Forward
-	{
-		for (auto &animation : attached_animations_)
-			animation.Elapse(time, current_time, start_time);
-	}
 }
 
 
@@ -88,23 +67,19 @@ NonOwningPtr<NodeAnimationTimeline> NodeAnimationGroup::Start(real playback_rate
 	Node animations
 */
 
-void NodeAnimationGroup::Attach(NonOwningPtr<NodeAnimation> node_animation, duration start_time, bool enable)
+void NodeAnimationGroup::Add(NonOwningPtr<NodeAnimation> node_animation, duration start_time, bool enable)
 {
 	if (node_animation)
 	{
-		//Emplace sorted
-		attached_animations_.emplace(
-			detail::upper_bound(attached_animations_, start_time + node_animation->TotalDuration()),
-			node_animation, start_time, enable);
-
+		animations_.emplace_back(node_animation, start_time, enable);
 		total_duration_ = std::max(total_duration_, start_time + node_animation->TotalDuration());
 	}
 }
 
-void NodeAnimationGroup::DetachAll() noexcept
+void NodeAnimationGroup::Clear() noexcept
 {
-	attached_animations_.clear();
-	attached_animations_.shrink_to_fit();
+	animations_.clear();
+	animations_.shrink_to_fit();
 	total_duration_ = 0.0_sec;
 }
 

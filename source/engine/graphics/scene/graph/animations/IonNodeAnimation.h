@@ -13,7 +13,6 @@ File:	IonNodeAnimation.h
 #ifndef ION_NODE_ANIMATION
 #define ION_NODE_ANIMATION
 
-#include <algorithm>
 #include <string>
 #include <variant>
 #include <vector>
@@ -88,6 +87,11 @@ namespace ion::graphics::scene::graph::animations
 			struct action
 			{
 				duration time = 0.0_sec;
+
+				inline auto operator<(const action &rhs) const noexcept
+				{
+					return time < rhs.time;
+				}
 			};
 
 			struct node_action : action
@@ -104,6 +108,15 @@ namespace ion::graphics::scene::graph::animations
 			using action_types = std::variant<node_action, user_action>;
 			using action_container = std::vector<action_types>;
 
+			struct action_types_comparator
+			{
+				inline auto operator()(const action_types &x, const action_types &y) const noexcept
+				{
+					return std::visit([](auto &&a) noexcept -> const action& { return a; }, x) <
+						   std::visit([](auto &&a) noexcept -> const action& { return a; }, y);
+				}
+			};
+
 
 			/*
 				Motions
@@ -113,6 +126,11 @@ namespace ion::graphics::scene::graph::animations
 			{
 				duration start_time = 0.0_sec;
 				duration total_duration = 0.0_sec;
+
+				inline auto operator<(const motion &rhs) const noexcept
+				{
+					return start_time + total_duration < rhs.start_time + rhs.total_duration;
+				}
 			};
 
 			struct rotating_motion : motion
@@ -155,20 +173,19 @@ namespace ion::graphics::scene::graph::animations
 			using motion_types = std::variant<rotating_motion, scaling_motion, translating_motion>;
 			using motion_container = std::vector<motion_types>;
 
+			struct motion_types_comparator
+			{
+				inline auto operator()(const motion_types &x, const motion_types &y) const noexcept
+				{
+					return std::visit([](auto &&m) noexcept -> const motion& { return m; }, x) <
+						   std::visit([](auto &&m) noexcept -> const motion& { return m; }, y);
+				}
+			};
+
 
 			/*
 				Actions
 			*/
-
-			inline auto upper_bound(const action_container &actions, duration time) noexcept
-			{
-				return std::upper_bound(std::begin(actions), std::end(actions), time,
-					[](duration time, const action_types &a) noexcept
-					{
-						return std::visit([&](auto &&a) noexcept { return time < a.time; }, a);
-					});
-			}
-
 
 			bool execute_action(action &a, duration time, duration current_time, duration start_time) noexcept;
 
@@ -179,16 +196,6 @@ namespace ion::graphics::scene::graph::animations
 			/*
 				Motions
 			*/
-
-			inline auto upper_bound(const motion_container &motions, duration total_duration) noexcept
-			{
-				return std::upper_bound(std::begin(motions), std::end(motions), total_duration,
-					[](duration total_duration, const motion_types &m) noexcept
-					{
-						return std::visit([&](auto &&m) noexcept { return total_duration < m.start_time + m.total_duration; }, m);
-					});
-			}
-
 
 			real move_amount(moving_amount &value, real percent) noexcept;
 

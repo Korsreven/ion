@@ -114,15 +114,6 @@ namespace ion::graphics::scene::graph::animations
 			{
 				return node_animation_group_;
 			}
-
-
-			/*
-				Elapse time
-			*/
-
-			//Elapse the total time for this node animation group by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
-			void Elapse(duration time, duration current_time) noexcept;
 	};
 } //ion::graphics::scene::graph::animations
 

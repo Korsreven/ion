@@ -12,6 +12,7 @@ File:	IonNodeAnimation.cpp
 
 #include "IonNodeAnimation.h"
 
+#include <algorithm>
 #include <cassert>
 #include <utility>
 
@@ -291,9 +292,14 @@ void NodeAnimation::AddAction(node_animation::NodeActionType type, duration time
 {
 	assert(time >= 0.0_sec);
 
+	auto a = detail::node_action{
+		{time},{type}};
+
 	//Insert sorted
-	actions_.insert(detail::upper_bound(actions_, time),
-		detail::node_action{{time},{type}});		
+	actions_.insert(
+		std::upper_bound(std::begin(actions_), std::end(actions_), a,
+			detail::action_types_comparator{}),
+		a);		
 
 	total_duration_ = std::max(total_duration_, time);
 }
@@ -316,11 +322,15 @@ void NodeAnimation::AddRotation(real angle, duration total_duration, duration st
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
+	auto m = detail::rotating_motion{
+		{start_time, total_duration},
+		{0.0_r, angle, technique}};
+
 	//Insert sorted
-	motions_.insert(detail::upper_bound(motions_, start_time + total_duration),
-		detail::rotating_motion{
-			{start_time, total_duration},
-			{0.0_r, angle, technique}});
+	motions_.insert(
+		std::upper_bound(std::begin(motions_), std::end(motions_), m,
+			detail::motion_types_comparator{}),
+		m);
 
 	total_duration_ = std::max(total_duration_, start_time + total_duration);
 }
@@ -332,12 +342,16 @@ void NodeAnimation::AddScaling(const Vector2 &unit, duration total_duration, dur
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
+	auto m = detail::scaling_motion{
+		{start_time, total_duration},
+		{0.0_r, unit.X(), technique},
+		{0.0_r, unit.Y(), technique}};
+
 	//Insert sorted
-	motions_.insert(detail::upper_bound(motions_, start_time + total_duration),
-		detail::scaling_motion{
-			{start_time, total_duration},
-			{0.0_r, unit.X(), technique},
-			{0.0_r, unit.Y(), technique}});
+	motions_.insert(
+		std::upper_bound(std::begin(motions_), std::end(motions_), m,
+			detail::motion_types_comparator{}),
+		m);
 
 	total_duration_ = std::max(total_duration_, start_time + total_duration);
 }
@@ -348,12 +362,16 @@ void NodeAnimation::AddScaling(const Vector2 &unit, duration total_duration, dur
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
+	auto m = detail::scaling_motion{
+		{start_time, total_duration},
+		{0.0_r, unit.X(), technique_x},
+		{0.0_r, unit.Y(), technique_y}};
+
 	//Insert sorted
-	motions_.insert(detail::upper_bound(motions_, start_time + total_duration),
-		detail::scaling_motion{
-			{start_time, total_duration},
-			{0.0_r, unit.X(), technique_x},
-			{0.0_r, unit.Y(), technique_y}});
+	motions_.insert(
+		std::upper_bound(std::begin(motions_), std::end(motions_), m,
+			detail::motion_types_comparator{}),
+		m);
 
 	total_duration_ = std::max(total_duration_, start_time + total_duration);
 }
@@ -365,13 +383,17 @@ void NodeAnimation::AddTranslation(const Vector3 &unit, duration total_duration,
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
+	auto m = detail::translating_motion{
+		{start_time, total_duration},
+		{0.0_r, unit.X(), technique},
+		{0.0_r, unit.Y(), technique},
+		{0.0_r, unit.Z(), technique}};
+
 	//Insert sorted
-	motions_.insert(detail::upper_bound(motions_, start_time + total_duration),
-		detail::translating_motion{
-			{start_time, total_duration},
-			{0.0_r, unit.X(), technique},
-			{0.0_r, unit.Y(), technique},
-			{0.0_r, unit.Z(), technique}});
+	motions_.insert(
+		std::upper_bound(std::begin(motions_), std::end(motions_), m,
+			detail::motion_types_comparator{}),
+		m);
 
 	total_duration_ = std::max(total_duration_, start_time + total_duration);
 }
@@ -382,13 +404,17 @@ void NodeAnimation::AddTranslation(const Vector3 &unit, duration total_duration,
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
+	auto m = detail::translating_motion{
+		{start_time, total_duration},
+		{0.0_r, unit.X(), technique_x},
+		{0.0_r, unit.Y(), technique_y},
+		{0.0_r, unit.Z(), technique_z}};
+
 	//Insert sorted
-	motions_.insert(detail::upper_bound(motions_, start_time + total_duration),
-		detail::translating_motion{
-			{start_time, total_duration},
-			{0.0_r, unit.X(), technique_x},
-			{0.0_r, unit.Y(), technique_y},
-			{0.0_r, unit.Z(), technique_z}});
+	motions_.insert(
+		std::upper_bound(std::begin(motions_), std::end(motions_), m,
+			detail::motion_types_comparator{}),
+		m);
 
 	total_duration_ = std::max(total_duration_, start_time + total_duration);
 }

@@ -15,6 +15,7 @@ File:	IonNodeAnimationTimeline.h
 
 #include <optional>
 #include <utility>
+#include <vector>
 
 #include "IonAttachableNodeAnimation.h"
 #include "IonAttachableNodeAnimationGroup.h"
@@ -29,6 +30,19 @@ namespace ion::graphics::scene::graph::animations
 
 	namespace node_animation_timeline::detail
 	{
+		struct attached_animation
+		{
+			AttachableNodeAnimation *ptr = nullptr;
+			AttachableNodeAnimationGroup *group_ptr = nullptr;
+
+			inline auto operator<(const attached_animation &rhs) const noexcept
+			{
+				return (group_ptr ? group_ptr->StartTime() : 0.0_sec) + ptr->StartTime() + ptr->TotalDuration() <
+					(rhs.group_ptr ? rhs.group_ptr->StartTime() : 0.0_sec) + rhs.ptr->StartTime() + rhs.ptr->TotalDuration();
+			}
+		};
+
+		using attached_animations = std::vector<attached_animation>; //Non-owning
 	} //node_animation_timeline::detail
 
 
@@ -47,9 +61,30 @@ namespace ion::graphics::scene::graph::animations
 			bool running_ = true;
 			bool reverse_ = false;
 
+			node_animation_timeline::detail::attached_animations attached_animations_;
+				//Sorted for internal use only
+
 
 			void ResetCycle() noexcept;
 			duration RetrieveTotalDuration() const noexcept;
+
+
+			/*
+				Events
+			*/
+
+			//See ObjectManager::Created for more details
+			void Created(AttachableNodeAnimation &animation) noexcept override final;
+
+			//See ObjectManager::Created for more details
+			void Created(AttachableNodeAnimationGroup &animation_group) noexcept override final;
+
+
+			//See ObjectManager::Removed for more details
+			void Removed(AttachableNodeAnimation &animation) noexcept override final;
+
+			//See ObjectManager::Removed for more details
+			void Removed(AttachableNodeAnimationGroup &animation_group) noexcept override final;
 
 		public:
 

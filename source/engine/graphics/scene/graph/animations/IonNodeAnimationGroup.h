@@ -13,7 +13,6 @@ File:	IonNodeAnimationGroup.h
 #ifndef ION_NODE_ANIMATION_GROUP
 #define ION_NODE_ANIMATION_GROUP
 
-#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -34,17 +33,7 @@ namespace ion::graphics::scene::graph::animations
 	{
 		namespace detail
 		{
-			using attached_animations = std::vector<AttachableNodeAnimation>;
-
-
-			inline auto upper_bound(const attached_animations &animations, duration total_duration) noexcept
-			{
-				return std::upper_bound(std::begin(animations), std::end(animations), total_duration,
-					[](duration total_duration, const AttachableNodeAnimation &animation) noexcept
-					{
-						return total_duration < animation.StartTime() + animation.TotalDuration();
-					});
-			}
+			using animation_container = std::vector<AttachableNodeAnimation>;
 		} //detail
 	} //node_animation_group
 
@@ -54,7 +43,7 @@ namespace ion::graphics::scene::graph::animations
 		private:
 
 			duration total_duration_ = 0.0_sec;
-			node_animation_group::detail::attached_animations attached_animations_;
+			node_animation_group::detail::animation_container animations_;
 
 		public:
 
@@ -68,11 +57,18 @@ namespace ion::graphics::scene::graph::animations
 				Ranges
 			*/
 
-			//Returns an immutable range of all attached node animations in this node animation group
+			//Returns a mutable range of all node animations in this node animation group
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto AttachedAnimations() const noexcept
+			[[nodiscard]] inline auto Animations() noexcept
 			{
-				return adaptors::ranges::Iterable<const node_animation_group::detail::attached_animations&>{attached_animations_};
+				return adaptors::ranges::Iterable<node_animation_group::detail::animation_container&>{animations_};
+			}
+
+			//Returns an immutable range of all node animations in this node animation group
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Animations() const noexcept
+			{
+				return adaptors::ranges::Iterable<const node_animation_group::detail::animation_container&>{animations_};
 			}
 
 
@@ -96,15 +92,6 @@ namespace ion::graphics::scene::graph::animations
 
 
 			/*
-				Elapse time
-			*/
-
-			//Elapse the total time for this node animation group by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
-			void Elapse(duration time, duration current_time, duration start_time) noexcept;
-
-
-			/*
 				Playback
 			*/
 
@@ -116,11 +103,11 @@ namespace ion::graphics::scene::graph::animations
 				Node animations
 			*/
 
-			//Attaches the given node animation to this node animation group
-			void Attach(NonOwningPtr<NodeAnimation> node_animation, duration start_time = 0.0_sec, bool enable = true);
+			//Add the given node animation to this node animation group
+			void Add(NonOwningPtr<NodeAnimation> node_animation, duration start_time = 0.0_sec, bool enable = true);
 
-			//Detaches all node animations from this node animation group
-			void DetachAll() noexcept;
+			//Clear all node animations from this node animation group
+			void Clear() noexcept;
 	};
 } //ion::graphics::scene::graph::animations
 

@@ -46,13 +46,65 @@ duration NodeAnimationTimeline::RetrieveTotalDuration() const noexcept
 {
 	auto total_duration = 0.0_sec;
 
-	for (auto &animation : AttachedAnimations())
-		total_duration = std::max(total_duration_, animation.StartTime() + animation.TotalDuration());
+	if (!std::empty(attached_animations_))
+	{
+		if (auto animation_group = attached_animations_.back().group_ptr; animation_group)
+			total_duration = std::max(total_duration_, animation_group->StartTime() + animation_group->TotalDuration());
 
-	for (auto &animation_group : AttachedAnimationGroups())
-		total_duration = std::max(total_duration_, animation_group.StartTime() + animation_group.TotalDuration());
+		else if (auto animation = attached_animations_.back().ptr; animation)
+			total_duration = std::max(total_duration_, animation->StartTime() + animation->TotalDuration());
+	}
 
 	return total_duration;
+}
+
+
+/*
+	Events
+*/
+
+void NodeAnimationTimeline::Created(AttachableNodeAnimation &animation) noexcept
+{
+	detail::attached_animation a{&animation, nullptr};
+	attached_animations_.insert(
+		std::upper_bound(std::begin(attached_animations_), std::end(attached_animations_), a),
+		a);
+}
+
+void NodeAnimationTimeline::Created(AttachableNodeAnimationGroup &animation_group) noexcept
+{
+	if (auto &group = animation_group.Get(); group)
+	{
+		for (auto &animation : group->Animations())
+		{
+			detail::attached_animation a{&const_cast<AttachableNodeAnimation&>(animation), nullptr};
+			attached_animations_.insert(
+				std::upper_bound(std::begin(attached_animations_), std::end(attached_animations_), a),
+				a);
+		}
+	}
+}
+
+
+void NodeAnimationTimeline::Removed(AttachableNodeAnimation &animation) noexcept
+{
+	if (auto iter = std::find_if(std::begin(attached_animations_), std::end(attached_animations_),
+		[&](auto &a) noexcept
+		{
+			return a.ptr == &animation;
+		}); iter != std::end(attached_animations_))
+
+		attached_animations_.erase(iter);
+}
+
+void NodeAnimationTimeline::Removed(AttachableNodeAnimationGroup &animation_group) noexcept
+{
+	attached_animations_.erase(
+		std::remove_if(std::begin(attached_animations_), std::end(attached_animations_),
+			[&](auto &a) noexcept
+			{
+				return a.group_ptr == &animation_group;
+			}), std::end(attached_animations_));
 }
 
 
@@ -94,6 +146,8 @@ void NodeAnimationTimeline::RepeatCount(std::optional<int> repeat_count) noexcep
 
 void NodeAnimationTimeline::Refresh() noexcept
 {
+	std::stable_sort(std::begin(attached_animations_), std::end(attached_animations_));
+
 	total_duration_ = RetrieveTotalDuration();
 	current_time_ = std::clamp(current_time_, 0.0_sec, total_duration_);
 }
@@ -170,8 +224,16 @@ NonOwningPtr<AttachableNodeAnimation> NodeAnimationTimeline::Attach(NonOwningPtr
 
 void NodeAnimationTimeline::DetachAllAnimations() noexcept
 {
+	attached_animations_.erase(
+		std::remove_if(std::begin(attached_animations_), std::end(attached_animations_),
+			[](auto &a) noexcept
+			{
+				return !a.group_ptr; //Not in animation group
+			}), std::end(attached_animations_));
+
 	NodeAnimationBase::Clear();
-	Refresh();
+	total_duration_ = RetrieveTotalDuration();
+	current_time_ = std::clamp(current_time_, 0.0_sec, total_duration_);
 }
 
 bool NodeAnimationTimeline::DetachAnimation(AttachableNodeAnimation &node_animation) noexcept
@@ -179,8 +241,11 @@ bool NodeAnimationTimeline::DetachAnimation(AttachableNodeAnimation &node_animat
 	auto total_duration = node_animation.TotalDuration();
 	auto removed = NodeAnimationBase::Remove(node_animation);
 
-	if (total_duration == total_duration_)
-		Refresh();
+	if (removed && total_duration == total_duration_)
+	{
+		total_duration_ = RetrieveTotalDuration();
+		current_time_ = std::clamp(current_time_, 0.0_sec, total_duration_);
+	}
 
 	return removed;
 }
@@ -208,8 +273,16 @@ NonOwningPtr<AttachableNodeAnimationGroup> NodeAnimationTimeline::Attach(NonOwni
 
 void NodeAnimationTimeline::DetachAllAnimationGroups() noexcept
 {
+	attached_animations_.erase(
+		std::remove_if(std::begin(attached_animations_), std::end(attached_animations_),
+			[](auto &a) noexcept
+			{
+				return !!a.group_ptr; //In animation group
+			}), std::end(attached_animations_));
+
 	NodeAnimationGroupBase::Clear();
-	Refresh();
+	total_duration_ = RetrieveTotalDuration();
+	current_time_ = std::clamp(current_time_, 0.0_sec, total_duration_);
 }
 
 bool NodeAnimationTimeline::DetachAnimationGroup(AttachableNodeAnimationGroup &node_animation_group) noexcept
@@ -217,8 +290,11 @@ bool NodeAnimationTimeline::DetachAnimationGroup(AttachableNodeAnimationGroup &n
 	auto total_duration = node_animation_group.TotalDuration();
 	auto removed = NodeAnimationGroupBase::Remove(node_animation_group);
 
-	if (total_duration == total_duration_)
-		Refresh();
+	if (removed && total_duration == total_duration_)
+	{
+		total_duration_ = RetrieveTotalDuration();
+		current_time_ = std::clamp(current_time_, 0.0_sec, total_duration_);
+	}
 
 	return removed;
 }
@@ -230,8 +306,12 @@ bool NodeAnimationTimeline::DetachAnimationGroup(AttachableNodeAnimationGroup &n
 
 void NodeAnimationTimeline::DetachAll() noexcept
 {
+	attached_animations_.clear();
+	attached_animations_.shrink_to_fit();
+
 	NodeAnimationBase::Clear();
 	NodeAnimationGroupBase::Clear();
+
 	current_time_ = total_duration_ = 0.0_sec;
 }
 
@@ -253,19 +333,13 @@ void NodeAnimationTimeline::Elapse(duration time) noexcept
 		//Reverse
 		if (reverse_)
 		{
-			for (auto &animation : adaptors::ranges::ReverseIterable<decltype(AttachedAnimations())>(AttachedAnimations()))
-				animation.Elapse(time, current_time_);
-
-			for (auto &animation_group : adaptors::ranges::ReverseIterable<decltype(AttachedAnimationGroups())>(AttachedAnimationGroups()))
-				animation_group.Elapse(time, current_time_);
+			for (auto &a : adaptors::ranges::ReverseIterable<detail::attached_animations&>(attached_animations_))
+				a.ptr->Elapse(time, current_time_, a.group_ptr ? a.group_ptr->StartTime() : 0.0_sec);
 		}
 		else //Forward
 		{
-			for (auto &animation : AttachedAnimations())
-				animation.Elapse(time, current_time_);
-
-			for (auto &animation_group : AttachedAnimationGroups())
-				animation_group.Elapse(time, current_time_);
+			for (auto &a : attached_animations_)
+				a.ptr->Elapse(time, current_time_, a.group_ptr ? a.group_ptr->StartTime() : 0.0_sec);
 		}
 
 

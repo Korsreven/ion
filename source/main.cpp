@@ -1341,9 +1341,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scale->AddScaling(-0.25_r, 1.5_sec, 1.5_sec);
 
 			auto idle = box_base_node->CreateAnimationGroup("idle");
-			idle->Attach(right_rotate);
-			idle->Attach(left_rotate, 2.0_sec);
-			idle->Attach(scale, 4.0_sec);
+			idle->Add(right_rotate);
+			idle->Add(left_rotate, 2.0_sec);
+			idle->Add(scale, 4.0_sec);
 
 			auto timeline = box_base_node->CreateTimeline();
 			timeline->Attach(idle);
