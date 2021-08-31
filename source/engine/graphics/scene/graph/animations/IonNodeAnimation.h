@@ -13,23 +13,21 @@ File:	IonNodeAnimation.h
 #ifndef ION_NODE_ANIMATION
 #define ION_NODE_ANIMATION
 
+#include <optional>
 #include <string>
 #include <variant>
 #include <vector>
 
+#include "events/IonCallback.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
-namespace ion::graphics::scene::graph
-{
-	class SceneNode; //Forward declaration
-}
-
 namespace ion::graphics::scene::graph::animations
 {
+	class NodeAnimation; //Forward declaration
 	class NodeAnimationManager; //Forward declaration
 	class NodeAnimationTimeline; //Forward declaration
 
@@ -101,7 +99,7 @@ namespace ion::graphics::scene::graph::animations
 
 			struct user_action : action
 			{
-				//callback
+				events::Callback<void, NodeAnimation&, duration> on_execute;
 			};
 
 
@@ -189,8 +187,8 @@ namespace ion::graphics::scene::graph::animations
 
 			bool execute_action(action &a, duration time, duration current_time, duration start_time) noexcept;
 
-			void execute_action(node_action &a, duration time, duration current_time, duration start_time, SceneNode &node) noexcept;
-			void execute_action(user_action &a, duration time, duration current_time, duration start_time, SceneNode &node) noexcept;
+			void elapse_action(NodeAnimation &animation, node_action &a, duration time, duration current_time, duration start_time) noexcept;
+			void elapse_action(NodeAnimation &animation, user_action &a, duration time, duration current_time, duration start_time) noexcept;
 
 
 			/*
@@ -200,9 +198,9 @@ namespace ion::graphics::scene::graph::animations
 			real move_amount(moving_amount &value, real percent) noexcept;
 
 			real elapse_motion(motion &m, duration time, duration current_time, duration start_time) noexcept;
-			void elapse_motion(rotating_motion &m, duration time, duration current_time, duration start_time, SceneNode &node) noexcept;
-			void elapse_motion(scaling_motion &m, duration time, duration current_time, duration start_time, SceneNode &node) noexcept;
-			void elapse_motion(translating_motion &m, duration time, duration current_time, duration start_time, SceneNode &node) noexcept;
+			void elapse_motion(NodeAnimation &animation, rotating_motion &m, duration time, duration current_time, duration start_time) noexcept;
+			void elapse_motion(NodeAnimation &animation, scaling_motion &m, duration time, duration current_time, duration start_time) noexcept;
+			void elapse_motion(NodeAnimation &animation, translating_motion &m, duration time, duration current_time, duration start_time) noexcept;
 		} //detail
 	} //node_animation
 
@@ -214,6 +212,10 @@ namespace ion::graphics::scene::graph::animations
 			duration total_duration_ = 0.0_sec;
 			node_animation::detail::action_container actions_;
 			node_animation::detail::motion_container motions_;
+
+			std::optional<events::Callback<void, NodeAnimation&>> on_start_;
+			std::optional<events::Callback<void, NodeAnimation&>> on_finish_;
+			std::optional<events::Callback<void, NodeAnimation&>> on_finish_revert_;
 
 
 			duration RetrieveTotalDuration() const noexcept;
@@ -229,6 +231,45 @@ namespace ion::graphics::scene::graph::animations
 			/*
 				Modifiers
 			*/
+
+			//Sets the on start callback
+			inline void OnStart(events::Callback<void, NodeAnimation&> on_start) noexcept
+			{
+				on_start_ = on_start;
+			}
+
+			//Sets the on start callback
+			inline void OnStart(std::nullopt_t) noexcept
+			{
+				on_start_ = {};
+			}
+
+
+			//Sets the on finish callback
+			inline void OnFinish(events::Callback<void, NodeAnimation&> on_finish) noexcept
+			{
+				on_finish_ = on_finish;
+			}
+
+			//Sets the on finish callback
+			inline void OnFinish(std::nullopt_t) noexcept
+			{
+				on_finish_ = {};
+			}
+
+
+			//Sets the on finish revert callback
+			inline void OnFinishRevert(events::Callback<void, NodeAnimation&> on_finish_revert) noexcept
+			{
+				on_finish_revert_ = on_finish_revert;
+			}
+
+			//Sets the on finish revert callback
+			inline void OnFinishRevert(std::nullopt_t) noexcept
+			{
+				on_finish_revert_ = {};
+			}
+
 
 			//Reset this node animation
 			void Reset() noexcept;
@@ -251,7 +292,11 @@ namespace ion::graphics::scene::graph::animations
 
 			//Elapse the total time for this node animation group by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
-			void Elapse(duration time, duration current_time, duration start_time, SceneNode &node) noexcept;
+			void Elapse(duration time, duration current_time, duration start_time) noexcept;
+
+			//Elapse the total time for this node animation group by the given time in seconds
+			//This function is typically called each frame, with the time in seconds since last frame
+			void Elapse(NodeAnimation &animation, duration time, duration current_time, duration start_time) noexcept;
 
 
 			/*
@@ -268,6 +313,10 @@ namespace ion::graphics::scene::graph::animations
 
 			//Adds an action to this node animation with the given type and execution time
 			void AddAction(node_animation::NodeActionType type, duration time);
+
+			//Adds a user action to this node animation with the given callback and execution time
+			void AddAction(events::Callback<void, NodeAnimation&, duration> on_execute, duration time);
+
 
 			//Clear all actions from this node animation
 			void ClearActions() noexcept;

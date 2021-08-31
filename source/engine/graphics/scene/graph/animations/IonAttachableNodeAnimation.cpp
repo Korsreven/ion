@@ -12,7 +12,6 @@ File:	IonAttachableNodeAnimation.cpp
 
 #include "IonAttachableNodeAnimation.h"
 
-#include "IonNodeAnimationManager.h"
 #include "IonNodeAnimationTimeline.h"
 
 namespace ion::graphics::scene::graph::animations
@@ -77,10 +76,7 @@ void AttachableNodeAnimation::Revert()
 void AttachableNodeAnimation::Elapse(duration time, duration current_time, duration start_time) noexcept
 {
 	if (enable_ && node_animation_ && initial_node_animation_)
-	{
-		if (auto owner = initial_node_animation_->Owner(); owner)
-			node_animation_->Elapse(time, current_time, start_time + start_time_, owner->ParentNode());
-	}
+		node_animation_->Elapse(*initial_node_animation_, time, current_time, start_time + start_time_);
 }
 
 } //ion::graphics::scene::graph::animations

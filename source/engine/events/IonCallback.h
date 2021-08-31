@@ -79,7 +79,7 @@ namespace ion::events
 			*/
 
 			//Calls the callback with the given arguments
-			inline auto operator()(Args &&...args) const noexcept
+			inline auto operator()(Args ...args) const noexcept
 			{
 				return functor_(std::forward<Args>(args)...);
 			}

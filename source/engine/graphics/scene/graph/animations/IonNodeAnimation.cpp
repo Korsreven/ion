@@ -49,69 +49,72 @@ bool execute_action(action &a, duration time, duration current_time, duration st
 }
 
 
-void execute_action(node_action &a, duration time, duration current_time, duration start_time, SceneNode &node) noexcept
+void elapse_action(NodeAnimation &animation, node_action &a, duration time, duration current_time, duration start_time) noexcept
 {
 	if (execute_action(static_cast<action&>(a), time, current_time, start_time))
 	{
 		auto reverse = time < 0.0_sec;
 			//Execute the opposite action if in reverse
 
-		switch (a.type)
+		if (auto owner = animation.Owner(); owner)
 		{
-			//Visibility
+			auto &node = owner->ParentNode();
 
-			case NodeActionType::FlipVisibility:
-			node.FlipVisibility(false);
-			break;
+			switch (a.type)
+			{
+				//Visibility
 
-			case NodeActionType::FlipVisibilityCascading:
-			node.FlipVisibility();
-			break;
+				case NodeActionType::FlipVisibility:
+				node.FlipVisibility(false);
+				break;
 
-			case NodeActionType::Show:
-			node.Visible(reverse ? false : true, false);
-			break;
+				case NodeActionType::FlipVisibilityCascading:
+				node.FlipVisibility();
+				break;
 
-			case NodeActionType::ShowCascading:
-			node.Visible(reverse ? false : true);
-			break;
+				case NodeActionType::Show:
+				node.Visible(reverse ? false : true, false);
+				break;
 
-			case NodeActionType::Hide:
-			node.Visible(reverse ? true : false, false);
-			break;
+				case NodeActionType::ShowCascading:
+				node.Visible(reverse ? false : true);
+				break;
 
-			case NodeActionType::HideCascading:
-			node.Visible(reverse ? true : false);
-			break;
+				case NodeActionType::Hide:
+				node.Visible(reverse ? true : false, false);
+				break;
+
+				case NodeActionType::HideCascading:
+				node.Visible(reverse ? true : false);
+				break;
 
 
-			//Transformation
+				//Transformation
 
-			case NodeActionType::InheritRotation:
-			node.InheritRotation(reverse ? false : true);
-			break;
+				case NodeActionType::InheritRotation:
+				node.InheritRotation(reverse ? false : true);
+				break;
 
-			case NodeActionType::InheritScaling:
-			node.InheritScaling(reverse ? false : true);
-			break;
+				case NodeActionType::InheritScaling:
+				node.InheritScaling(reverse ? false : true);
+				break;
 
-			case NodeActionType::DisinheritRotation:
-			node.InheritRotation(reverse ? true : false);
-			break;
+				case NodeActionType::DisinheritRotation:
+				node.InheritRotation(reverse ? true : false);
+				break;
 
-			case NodeActionType::DisinheritScaling:
-			node.InheritScaling(reverse ? true : false);
-			break;
+				case NodeActionType::DisinheritScaling:
+				node.InheritScaling(reverse ? true : false);
+				break;
+			}
 		}
 	}
 }
 
-void execute_action(user_action &a, duration time, duration current_time, duration start_time, SceneNode &node) noexcept
+void elapse_action(NodeAnimation &animation, user_action &a, duration time, duration current_time, duration start_time) noexcept
 {
 	if (execute_action(static_cast<action&>(a), time, current_time, start_time))
-	{
-		node; //Todo
-	}
+		a.on_execute(animation, a.time);
 }
 
 
@@ -154,34 +157,40 @@ real elapse_motion(motion &m, duration time, duration current_time, duration sta
 		return local_time < 0.0_sec ? 0.0_r : 1.0_r;
 }
 
-void elapse_motion(rotating_motion &m, duration time, duration current_time, duration start_time, SceneNode &node) noexcept
+void elapse_motion(NodeAnimation &animation, rotating_motion &m, duration time, duration current_time, duration start_time) noexcept
 {
 	auto percent = elapse_motion(static_cast<motion&>(m), time, current_time, start_time);
 		
 	if (auto angle = move_amount(m.angle, percent);
 		angle != 0.0_r)
-
-		node.Rotate(angle);
+	{
+		if (auto owner = animation.Owner(); owner)
+			owner->ParentNode().Rotate(angle);
+	}
 }
 
-void elapse_motion(scaling_motion &m, duration time, duration current_time, duration start_time, SceneNode &node) noexcept
+void elapse_motion(NodeAnimation &animation, scaling_motion &m, duration time, duration current_time, duration start_time) noexcept
 {
 	auto percent = elapse_motion(static_cast<motion&>(m), time, current_time, start_time);
 
 	if (auto unit = Vector2{move_amount(m.x, percent), move_amount(m.y, percent)};
 		unit != vector2::Zero)
-
-		node.Scale(unit);
+	{
+		if (auto owner = animation.Owner(); owner)
+			owner->ParentNode().Scale(unit);
+	}
 }
 
-void elapse_motion(translating_motion &m, duration time, duration current_time, duration start_time, SceneNode &node) noexcept
+void elapse_motion(NodeAnimation &animation, translating_motion &m, duration time, duration current_time, duration start_time) noexcept
 {
 	auto percent = elapse_motion(static_cast<motion&>(m), time, current_time, start_time);
 
 	if (auto unit = Vector3{move_amount(m.x, percent), move_amount(m.y, percent), move_amount(m.z, percent)};
 		unit != vector3::Zero)
-
-		node.Translate(unit);
+	{
+		if (auto owner = animation.Owner(); owner)
+			owner->ParentNode().Translate(unit);
+	}
 }
 
 } //node_animation::detail
@@ -235,7 +244,12 @@ void NodeAnimation::Reset() noexcept
 	Elapse time
 */
 
-void NodeAnimation::Elapse(duration time, duration current_time, duration start_time, SceneNode &node) noexcept
+void NodeAnimation::Elapse(duration time, duration current_time, duration start_time) noexcept
+{
+	Elapse(*this, time, current_time, start_time);
+}
+
+void NodeAnimation::Elapse(NodeAnimation &animation, duration time, duration current_time, duration start_time) noexcept
 {
 	auto local_time = current_time - start_time;
 
@@ -250,18 +264,18 @@ void NodeAnimation::Elapse(duration time, duration current_time, duration start_
 		if (reverse)
 		{
 			for (auto &a : adaptors::ranges::ReverseIterable<decltype(actions_)&>(actions_))
-				std::visit([&](auto &&a) noexcept { execute_action(a, time, current_time, start_time, node); }, a);
+				std::visit([&](auto &&a) noexcept { elapse_action(animation, a, time, current_time, start_time); }, a);
 
 			for (auto &m : adaptors::ranges::ReverseIterable<decltype(motions_)&>(motions_))
-				std::visit([&](auto &&m) noexcept { elapse_motion(m, time, current_time, start_time, node); }, m);
+				std::visit([&](auto &&m) noexcept { elapse_motion(animation, m, time, current_time, start_time); }, m);
 		}
 		else //Forward
 		{
 			for (auto &a : actions_)
-				std::visit([&](auto &&a) noexcept { execute_action(a, time, current_time, start_time, node); }, a);
+				std::visit([&](auto &&a) noexcept { elapse_action(animation, a, time, current_time, start_time); }, a);
 
 			for (auto &m : motions_)
-				std::visit([&](auto &&m) noexcept { elapse_motion(m, time, current_time, start_time, node); }, m);
+				std::visit([&](auto &&m) noexcept { elapse_motion(animation, m, time, current_time, start_time); }, m);
 		}
 	}
 }
@@ -303,6 +317,23 @@ void NodeAnimation::AddAction(node_animation::NodeActionType type, duration time
 
 	total_duration_ = std::max(total_duration_, time);
 }
+
+void NodeAnimation::AddAction(events::Callback<void, NodeAnimation&, duration> on_execute, duration time)
+{
+	assert(time >= 0.0_sec);
+
+	auto a = detail::user_action{
+		{time},{on_execute}};
+
+	//Insert sorted
+	actions_.insert(
+		std::upper_bound(std::begin(actions_), std::end(actions_), a,
+			detail::action_types_comparator{}),
+		a);
+
+	total_duration_ = std::max(total_duration_, time);
+}
+
 
 void NodeAnimation::ClearActions() noexcept
 {
