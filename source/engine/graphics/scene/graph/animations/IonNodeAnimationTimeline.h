@@ -19,6 +19,7 @@ File:	IonNodeAnimationTimeline.h
 
 #include "IonAttachableNodeAnimation.h"
 #include "IonAttachableNodeAnimationGroup.h"
+#include "events/IonCallback.h"
 #include "managed/IonManagedObject.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
@@ -60,6 +61,10 @@ namespace ion::graphics::scene::graph::animations
 			real reverse_playback_rate_ = 1.0_r;
 			bool running_ = true;
 			bool reverse_ = false;
+
+			std::optional<events::Callback<void, NodeAnimationTimeline&>> on_finish_;
+			std::optional<events::Callback<void, NodeAnimationTimeline&>> on_finish_cycle_;
+			std::optional<events::Callback<void, NodeAnimationTimeline&>> on_finish_revert_;
 
 			node_animation_timeline::detail::attached_animations attached_animations_;
 				//Sorted for internal use only
@@ -169,6 +174,45 @@ namespace ion::graphics::scene::graph::animations
 			{
 				if (rate > 0.0_r)
 					playback_rate_ = rate;
+			}
+
+
+			//Sets the on finish callback
+			inline void OnFinish(events::Callback<void, NodeAnimationTimeline&> on_finish) noexcept
+			{
+				on_finish_ = on_finish;
+			}
+
+			//Sets the on finish callback
+			inline void OnFinish(std::nullopt_t) noexcept
+			{
+				on_finish_ = {};
+			}
+
+
+			//Sets the on finish cycle callback
+			inline void OnFinishCycle(events::Callback<void, NodeAnimationTimeline&> on_finish_cycle) noexcept
+			{
+				on_finish_cycle_ = on_finish_cycle;
+			}
+
+			//Sets the on finish cycle callback
+			inline void OnFinishCycle(std::nullopt_t) noexcept
+			{
+				on_finish_cycle_ = {};
+			}
+
+
+			//Sets the on finish revert callback
+			inline void OnFinishRevert(events::Callback<void, NodeAnimationTimeline&> on_finish_revert) noexcept
+			{
+				on_finish_revert_ = on_finish_revert;
+			}
+
+			//Sets the on finish revert callback
+			inline void OnFinishRevert(std::nullopt_t) noexcept
+			{
+				on_finish_revert_ = {};
 			}
 
 

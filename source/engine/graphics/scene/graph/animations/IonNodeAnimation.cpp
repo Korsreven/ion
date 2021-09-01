@@ -260,6 +260,12 @@ void NodeAnimation::Elapse(NodeAnimation &animation, duration time, duration cur
 		auto percent = local_time / total_duration_;
 		percent = std::clamp(percent, 0.0_r, 1.0_r);
 		
+		//Start
+		if (on_start_ &&
+			local_time >= 0.0_sec && local_time - time < 0.0_sec)
+			(*on_start_)(animation);
+
+
 		//Reverse
 		if (reverse)
 		{
@@ -277,6 +283,17 @@ void NodeAnimation::Elapse(NodeAnimation &animation, duration time, duration cur
 			for (auto &m : motions_)
 				std::visit([&](auto &&m) noexcept { elapse_motion(animation, m, time, current_time, start_time); }, m);
 		}
+
+
+		//Finish
+		if (on_finish_ &&
+			local_time >= total_duration_ && local_time - time < total_duration_)
+			(*on_finish_)(animation);
+
+		//Finish revert
+		if (on_finish_revert_ &&
+			local_time <= 0.0_sec && local_time - time > 0.0_sec)
+			(*on_finish_revert_)(animation);
 	}
 }
 

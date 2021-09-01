@@ -356,11 +356,33 @@ void NodeAnimationTimeline::Elapse(duration time) noexcept
 				if (repeat_count_)
 					++repeat_count_->first;
 
+				//Finish cycle
+				if (on_finish_cycle_ &&
+					current_time_ >= total_duration_ && current_time_ - time < total_duration_)
+					(*on_finish_cycle_)(*this);
+
 				ResetCycle();
 			}
 			//Timeline is done
 			else
+			{
+				if (reverse_)
+				{
+					//Finish revert
+					if (on_finish_revert_ &&
+						current_time_ <= 0.0_sec && current_time_ - time > 0.0_sec)
+						(*on_finish_revert_)(*this);
+				}
+				else
+				{
+					//Finish
+					if (on_finish_ &&
+						current_time_ >= total_duration_ && current_time_ - time < total_duration_)
+						(*on_finish_)(*this);
+				}
+
 				Reset();
+			}
 		}
 	}
 }
