@@ -193,6 +193,16 @@ void elapse_motion(NodeAnimation &animation, translating_motion &m, duration tim
 	}
 }
 
+void elapse_motion(NodeAnimation &animation, user_motion &m, duration time, duration current_time, duration start_time) noexcept
+{
+	auto percent = elapse_motion(static_cast<motion&>(m), time, current_time, start_time);
+	
+	if (auto amount = move_amount(m.amount, percent);
+		amount != 0.0_r)
+
+		m.on_elapse(animation, amount);
+}
+
 } //node_animation::detail
 
 
@@ -363,6 +373,28 @@ void NodeAnimation::ClearActions() noexcept
 /*
 	Motions
 */
+
+void NodeAnimation::AddMotion(real target_amount, duration total_duration,
+	events::Callback<void, NodeAnimation&, real> on_elapse, duration start_time,
+	node_animation::MotionTechniqueType technique)
+{
+	assert(total_duration > 0.0_sec);
+	assert(start_time >= 0.0_sec);
+
+	auto m = detail::user_motion{
+		{start_time, total_duration},
+		{0.0_r, target_amount, technique},
+		on_elapse};
+
+	//Insert sorted
+	motions_.insert(
+		std::upper_bound(std::begin(motions_), std::end(motions_), m,
+			detail::motion_types_comparator{}),
+		m);
+
+	total_duration_ = std::max(total_duration_, start_time + total_duration);
+}
+
 
 void NodeAnimation::AddRotation(real angle, duration total_duration, duration start_time,
 	MotionTechniqueType technique)

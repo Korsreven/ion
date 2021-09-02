@@ -167,8 +167,19 @@ namespace ion::graphics::scene::graph::animations
 				}
 			};
 
+			struct user_motion : motion
+			{
+				moving_amount amount;
+				events::Callback<void, NodeAnimation&, real> on_elapse;
 
-			using motion_types = std::variant<rotating_motion, scaling_motion, translating_motion>;
+				inline void Reset() noexcept
+				{
+					amount.current = 0.0_r;
+				}
+			};
+
+
+			using motion_types = std::variant<rotating_motion, scaling_motion, translating_motion, user_motion>;
 			using motion_container = std::vector<motion_types>;
 
 			struct motion_types_comparator
@@ -201,6 +212,7 @@ namespace ion::graphics::scene::graph::animations
 			void elapse_motion(NodeAnimation &animation, rotating_motion &m, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_motion(NodeAnimation &animation, scaling_motion &m, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_motion(NodeAnimation &animation, translating_motion &m, duration time, duration current_time, duration start_time) noexcept;
+			void elapse_motion(NodeAnimation &animation, user_motion &m, duration time, duration current_time, duration start_time) noexcept;
 		} //detail
 	} //node_animation
 
@@ -314,7 +326,7 @@ namespace ion::graphics::scene::graph::animations
 			//Adds an action to this node animation with the given type and execution time
 			void AddAction(node_animation::NodeActionType type, duration time);
 
-			//Adds a user action to this node animation with the given callback and execution time
+			//Adds a user defined action to this node animation with the given callback and execution time
 			void AddAction(events::Callback<void, NodeAnimation&, duration> on_execute, duration time);
 
 
@@ -325,6 +337,12 @@ namespace ion::graphics::scene::graph::animations
 			/*
 				Motions
 			*/
+
+			//Adds a user defined motion to this node animation with the given target amount, total duration and callback
+			void AddMotion(real target_amount, duration total_duration,
+				events::Callback<void, NodeAnimation&, real> on_elapse, duration start_time = 0.0_sec,
+				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear);
+
 
 			//Adds a rotation motion to this node animation with the given angle (in radians) and total duration
 			void AddRotation(real angle, duration total_duration, duration start_time = 0.0_sec,
