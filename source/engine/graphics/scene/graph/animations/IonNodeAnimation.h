@@ -100,6 +100,7 @@ namespace ion::graphics::scene::graph::animations
 			struct user_action : action
 			{
 				events::Callback<void, NodeAnimation&, duration> on_execute;
+				std::optional<events::Callback<void, NodeAnimation&, duration>> on_execute_opposite;
 			};
 
 
@@ -326,8 +327,13 @@ namespace ion::graphics::scene::graph::animations
 			//Adds an action to this node animation with the given type and execution time
 			void AddAction(node_animation::NodeActionType type, duration time);
 
+
 			//Adds a user defined action to this node animation with the given callback and execution time
 			void AddAction(events::Callback<void, NodeAnimation&, duration> on_execute, duration time);
+
+			//Adds a user defined action to this node animation with the given callback, opposite callback and execution time
+			void AddAction(events::Callback<void, NodeAnimation&, duration> on_execute,
+				events::Callback<void, NodeAnimation&, duration> on_execute_opposite, duration time);
 
 
 			//Clear all actions from this node animation

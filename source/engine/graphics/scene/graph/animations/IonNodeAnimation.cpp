@@ -114,7 +114,16 @@ void elapse_action(NodeAnimation &animation, node_action &a, duration time, dura
 void elapse_action(NodeAnimation &animation, user_action &a, duration time, duration current_time, duration start_time) noexcept
 {
 	if (execute_action(static_cast<action&>(a), time, current_time, start_time))
-		a.on_execute(animation, a.time);
+	{
+		if (auto reverse = time < 0.0_sec; reverse)
+			//Execute the opposite action if in reverse
+		{
+			if (a.on_execute_opposite)
+				(*a.on_execute_opposite)(animation, a.time);
+		}
+		else
+			a.on_execute(animation, a.time);
+	}
 }
 
 
@@ -334,7 +343,7 @@ void NodeAnimation::AddAction(node_animation::NodeActionType type, duration time
 	assert(time >= 0.0_sec);
 
 	auto a = detail::node_action{
-		{time},{type}};
+		{time}, type};
 
 	//Insert sorted
 	actions_.insert(
@@ -345,12 +354,30 @@ void NodeAnimation::AddAction(node_animation::NodeActionType type, duration time
 	total_duration_ = std::max(total_duration_, time);
 }
 
+
 void NodeAnimation::AddAction(events::Callback<void, NodeAnimation&, duration> on_execute, duration time)
 {
 	assert(time >= 0.0_sec);
 
 	auto a = detail::user_action{
-		{time},{on_execute}};
+		{time}, on_execute};
+
+	//Insert sorted
+	actions_.insert(
+		std::upper_bound(std::begin(actions_), std::end(actions_), a,
+			detail::action_types_comparator{}),
+		a);
+
+	total_duration_ = std::max(total_duration_, time);
+}
+
+void NodeAnimation::AddAction(events::Callback<void, NodeAnimation&, duration> on_execute,
+	events::Callback<void, NodeAnimation&, duration> on_execute_opposite, duration time)
+{
+	assert(time >= 0.0_sec);
+
+	auto a = detail::user_action{
+		{time}, on_execute, on_execute_opposite};
 
 	//Insert sorted
 	actions_.insert(
