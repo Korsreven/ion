@@ -67,6 +67,17 @@ namespace ion::graphics::scene::graph::animations
 			BiologicalGrowthCurve,
 			SineWave
 		};
+
+		struct MotionTechnique
+		{
+			MotionTechniqueType type = MotionTechniqueType::Linear;
+			std::optional<events::Callback<real, real, real>> method;
+
+			MotionTechnique(MotionTechniqueType type) noexcept :
+				type{type} {}
+			MotionTechnique(events::Callback<real, real, real> method) noexcept :
+				method{method} {}
+		};
 		
 
 		namespace detail
@@ -75,7 +86,9 @@ namespace ion::graphics::scene::graph::animations
 			{		
 				real current = 0.0_r;
 				real target = 0.0_r;
+
 				MotionTechniqueType technique = MotionTechniqueType::Linear;
+				std::optional<events::Callback<real, real, real>> user_technique;
 			};
 
 
@@ -352,33 +365,33 @@ namespace ion::graphics::scene::graph::animations
 			//Adds a user defined motion to this node animation with the given target amount, total duration and callback
 			void AddMotion(real target_amount, duration total_duration,
 				events::Callback<void, NodeAnimation&, real> on_elapse, duration start_time = 0.0_sec,
-				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear);
+				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
 
 
 			//Adds a rotation motion to this node animation with the given angle (in radians) and total duration
 			void AddRotation(real angle, duration total_duration, duration start_time = 0.0_sec,
-				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear);
+				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
 
 
 			//Adds a scaling motion to this node animation with the given unit and total duration
 			void AddScaling(const Vector2 &unit, duration total_duration, duration start_time = 0.0_sec,
-				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear);
+				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
 
 			//Adds a scaling motion to this node animation with the given unit and total duration
 			void AddScaling(const Vector2 &unit, duration total_duration, duration start_time,
-				node_animation::MotionTechniqueType technique_x,
-				node_animation::MotionTechniqueType technique_y);
+				node_animation::MotionTechnique technique_x,
+				node_animation::MotionTechnique technique_y);
 
 
 			//Adds a translation motion to this node animation with the given unit and total duration
 			void AddTranslation(const Vector3 &unit, duration total_duration, duration start_time = 0.0_sec,
-				node_animation::MotionTechniqueType technique = node_animation::MotionTechniqueType::Linear);
+				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
 
 			//Adds a translation motion to this node animation with the given unit and total duration
 			void AddTranslation(const Vector3 &unit, duration total_duration, duration start_time,
-				node_animation::MotionTechniqueType technique_x,
-				node_animation::MotionTechniqueType technique_y,
-				node_animation::MotionTechniqueType technique_z);
+				node_animation::MotionTechnique technique_x,
+				node_animation::MotionTechnique technique_y,
+				node_animation::MotionTechnique technique_z);
 
 
 			//Clear all motions from this node animation

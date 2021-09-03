@@ -51,7 +51,7 @@ bool execute_action(action &a, duration time, duration current_time, duration st
 
 void elapse_action(NodeAnimation &animation, node_action &a, duration time, duration current_time, duration start_time) noexcept
 {
-	if (execute_action(static_cast<action&>(a), time, current_time, start_time))
+	if (execute_action(a, time, current_time, start_time))
 	{
 		auto reverse = time < 0.0_sec;
 			//Execute the opposite action if in reverse
@@ -113,7 +113,7 @@ void elapse_action(NodeAnimation &animation, node_action &a, duration time, dura
 
 void elapse_action(NodeAnimation &animation, user_action &a, duration time, duration current_time, duration start_time) noexcept
 {
-	if (execute_action(static_cast<action&>(a), time, current_time, start_time))
+	if (execute_action(a, time, current_time, start_time))
 	{
 		if (auto reverse = time < 0.0_sec; reverse)
 			//Execute the opposite action if in reverse
@@ -135,15 +135,24 @@ real move_amount(moving_amount &amount, real percent) noexcept
 {
 	auto delta = 0.0_r;
 
-	switch (amount.technique)
+	if (amount.user_technique)
 	{
-		case MotionTechniqueType::Linear:
-		default:
+		auto current = (*amount.user_technique)(amount.target, percent);
+		delta = current - amount.current;
+		amount.current = current;
+	}
+	else
+	{
+		switch (amount.technique)
 		{
-			auto current = amount.target * percent;
-			delta = current - amount.current;
-			amount.current = current;
-			break;
+			case MotionTechniqueType::Linear:
+			default:
+			{
+				auto current = amount.target * percent;
+				delta = current - amount.current;
+				amount.current = current;
+				break;
+			}
 		}
 	}
 
@@ -168,7 +177,7 @@ real elapse_motion(motion &m, duration time, duration current_time, duration sta
 
 void elapse_motion(NodeAnimation &animation, rotating_motion &m, duration time, duration current_time, duration start_time) noexcept
 {
-	auto percent = elapse_motion(static_cast<motion&>(m), time, current_time, start_time);
+	auto percent = elapse_motion(m, time, current_time, start_time);
 		
 	if (auto angle = move_amount(m.angle, percent);
 		angle != 0.0_r)
@@ -180,7 +189,7 @@ void elapse_motion(NodeAnimation &animation, rotating_motion &m, duration time, 
 
 void elapse_motion(NodeAnimation &animation, scaling_motion &m, duration time, duration current_time, duration start_time) noexcept
 {
-	auto percent = elapse_motion(static_cast<motion&>(m), time, current_time, start_time);
+	auto percent = elapse_motion(m, time, current_time, start_time);
 
 	if (auto unit = Vector2{move_amount(m.x, percent), move_amount(m.y, percent)};
 		unit != vector2::Zero)
@@ -192,7 +201,7 @@ void elapse_motion(NodeAnimation &animation, scaling_motion &m, duration time, d
 
 void elapse_motion(NodeAnimation &animation, translating_motion &m, duration time, duration current_time, duration start_time) noexcept
 {
-	auto percent = elapse_motion(static_cast<motion&>(m), time, current_time, start_time);
+	auto percent = elapse_motion(m, time, current_time, start_time);
 
 	if (auto unit = Vector3{move_amount(m.x, percent), move_amount(m.y, percent), move_amount(m.z, percent)};
 		unit != vector3::Zero)
@@ -204,7 +213,7 @@ void elapse_motion(NodeAnimation &animation, translating_motion &m, duration tim
 
 void elapse_motion(NodeAnimation &animation, user_motion &m, duration time, duration current_time, duration start_time) noexcept
 {
-	auto percent = elapse_motion(static_cast<motion&>(m), time, current_time, start_time);
+	auto percent = elapse_motion(m, time, current_time, start_time);
 	
 	if (auto amount = move_amount(m.amount, percent);
 		amount != 0.0_r)
@@ -409,14 +418,14 @@ void NodeAnimation::ClearActions() noexcept
 
 void NodeAnimation::AddMotion(real target_amount, duration total_duration,
 	events::Callback<void, NodeAnimation&, real> on_elapse, duration start_time,
-	node_animation::MotionTechniqueType technique)
+	node_animation::MotionTechnique technique)
 {
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
 	auto m = detail::user_motion{
 		{start_time, total_duration},
-		{0.0_r, target_amount, technique},
+		{0.0_r, target_amount, technique.type, technique.method},
 		on_elapse};
 
 	//Insert sorted
@@ -430,14 +439,14 @@ void NodeAnimation::AddMotion(real target_amount, duration total_duration,
 
 
 void NodeAnimation::AddRotation(real angle, duration total_duration, duration start_time,
-	MotionTechniqueType technique)
+	MotionTechnique technique)
 {
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
 	auto m = detail::rotating_motion{
 		{start_time, total_duration},
-		{0.0_r, angle, technique}};
+		{0.0_r, angle, technique.type, technique.method}};
 
 	//Insert sorted
 	motions_.insert(
@@ -450,15 +459,15 @@ void NodeAnimation::AddRotation(real angle, duration total_duration, duration st
 
 
 void NodeAnimation::AddScaling(const Vector2 &unit, duration total_duration, duration start_time,
-	MotionTechniqueType technique)
+	MotionTechnique technique)
 {
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
 	auto m = detail::scaling_motion{
 		{start_time, total_duration},
-		{0.0_r, unit.X(), technique},
-		{0.0_r, unit.Y(), technique}};
+		{0.0_r, unit.X(), technique.type, technique.method},
+		{0.0_r, unit.Y(), technique.type, technique.method}};
 
 	//Insert sorted
 	motions_.insert(
@@ -470,15 +479,15 @@ void NodeAnimation::AddScaling(const Vector2 &unit, duration total_duration, dur
 }
 
 void NodeAnimation::AddScaling(const Vector2 &unit, duration total_duration, duration start_time,
-	MotionTechniqueType technique_x, MotionTechniqueType technique_y)
+	MotionTechnique technique_x, MotionTechnique technique_y)
 {
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
 	auto m = detail::scaling_motion{
 		{start_time, total_duration},
-		{0.0_r, unit.X(), technique_x},
-		{0.0_r, unit.Y(), technique_y}};
+		{0.0_r, unit.X(), technique_x.type, technique_x.method},
+		{0.0_r, unit.Y(), technique_y.type, technique_y.method}};
 
 	//Insert sorted
 	motions_.insert(
@@ -491,16 +500,16 @@ void NodeAnimation::AddScaling(const Vector2 &unit, duration total_duration, dur
 
 
 void NodeAnimation::AddTranslation(const Vector3 &unit, duration total_duration, duration start_time,
-	MotionTechniqueType technique)
+	MotionTechnique technique)
 {
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
 	auto m = detail::translating_motion{
 		{start_time, total_duration},
-		{0.0_r, unit.X(), technique},
-		{0.0_r, unit.Y(), technique},
-		{0.0_r, unit.Z(), technique}};
+		{0.0_r, unit.X(), technique.type, technique.method},
+		{0.0_r, unit.Y(), technique.type, technique.method},
+		{0.0_r, unit.Z(), technique.type, technique.method}};
 
 	//Insert sorted
 	motions_.insert(
@@ -512,16 +521,16 @@ void NodeAnimation::AddTranslation(const Vector3 &unit, duration total_duration,
 }
 
 void NodeAnimation::AddTranslation(const Vector3 &unit, duration total_duration, duration start_time,
-	MotionTechniqueType technique_x, MotionTechniqueType technique_y, MotionTechniqueType technique_z)
+	MotionTechnique technique_x, MotionTechnique technique_y, MotionTechnique technique_z)
 {
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
 	auto m = detail::translating_motion{
 		{start_time, total_duration},
-		{0.0_r, unit.X(), technique_x},
-		{0.0_r, unit.Y(), technique_y},
-		{0.0_r, unit.Z(), technique_z}};
+		{0.0_r, unit.X(), technique_x.type, technique_x.method},
+		{0.0_r, unit.Y(), technique_y.type, technique_y.method},
+		{0.0_r, unit.Z(), technique_z.type, technique_z.method}};
 
 	//Insert sorted
 	motions_.insert(
