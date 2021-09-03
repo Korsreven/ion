@@ -119,10 +119,10 @@ void elapse_action(NodeAnimation &animation, user_action &a, duration time, dura
 			//Execute the opposite action if in reverse
 		{
 			if (a.on_execute_opposite)
-				(*a.on_execute_opposite)(animation, a.time);
+				(*a.on_execute_opposite)(animation, a.user_data);
 		}
 		else
-			a.on_execute(animation, a.time);
+			a.on_execute(animation, a.user_data);
 	}
 }
 
@@ -355,12 +355,15 @@ void NodeAnimation::AddAction(node_animation::NodeActionType type, duration time
 }
 
 
-void NodeAnimation::AddAction(events::Callback<void, NodeAnimation&, duration> on_execute, duration time)
+void NodeAnimation::AddAction(events::Callback<void, NodeAnimation&, std::any&> on_execute,
+	duration time, std::any user_data)
 {
 	assert(time >= 0.0_sec);
 
 	auto a = detail::user_action{
-		{time}, on_execute};
+		{time},
+		std::move(user_data),
+		on_execute};
 
 	//Insert sorted
 	actions_.insert(
@@ -371,13 +374,16 @@ void NodeAnimation::AddAction(events::Callback<void, NodeAnimation&, duration> o
 	total_duration_ = std::max(total_duration_, time);
 }
 
-void NodeAnimation::AddAction(events::Callback<void, NodeAnimation&, duration> on_execute,
-	events::Callback<void, NodeAnimation&, duration> on_execute_opposite, duration time)
+void NodeAnimation::AddAction(events::Callback<void, NodeAnimation&, std::any&> on_execute,
+	events::Callback<void, NodeAnimation&, std::any&> on_execute_opposite,
+	duration time, std::any user_data)
 {
 	assert(time >= 0.0_sec);
 
 	auto a = detail::user_action{
-		{time}, on_execute, on_execute_opposite};
+		{time},
+		std::move(user_data),
+		on_execute, on_execute_opposite};
 
 	//Insert sorted
 	actions_.insert(

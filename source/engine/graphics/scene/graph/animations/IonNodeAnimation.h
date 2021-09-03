@@ -13,6 +13,7 @@ File:	IonNodeAnimation.h
 #ifndef ION_NODE_ANIMATION
 #define ION_NODE_ANIMATION
 
+#include <any>
 #include <optional>
 #include <string>
 #include <variant>
@@ -99,8 +100,9 @@ namespace ion::graphics::scene::graph::animations
 
 			struct user_action : action
 			{
-				events::Callback<void, NodeAnimation&, duration> on_execute;
-				std::optional<events::Callback<void, NodeAnimation&, duration>> on_execute_opposite;
+				std::any user_data;
+				events::Callback<void, NodeAnimation&, std::any&> on_execute;
+				std::optional<events::Callback<void, NodeAnimation&, std::any&>> on_execute_opposite;
 			};
 
 
@@ -329,11 +331,14 @@ namespace ion::graphics::scene::graph::animations
 
 
 			//Adds a user defined action to this node animation with the given callback and execution time
-			void AddAction(events::Callback<void, NodeAnimation&, duration> on_execute, duration time);
+			void AddAction(events::Callback<void, NodeAnimation&, std::any&> on_execute,
+				duration time, std::any user_data = {});
 
 			//Adds a user defined action to this node animation with the given callback, opposite callback and execution time
-			void AddAction(events::Callback<void, NodeAnimation&, duration> on_execute,
-				events::Callback<void, NodeAnimation&, duration> on_execute_opposite, duration time);
+			//The opposite callback is called instead of the regular callback when an animation is in reverse
+			void AddAction(events::Callback<void, NodeAnimation&, std::any&> on_execute,
+				events::Callback<void, NodeAnimation&, std::any&> on_execute_opposite,
+				duration time, std::any user_data = {});
 
 
 			//Clear all actions from this node animation
