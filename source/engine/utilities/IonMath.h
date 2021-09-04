@@ -38,6 +38,8 @@ namespace ion::utilities::math
 		constexpr auto two_pi = 6.283185307179586476925286766559005768_r;
 		constexpr auto half_pi = 1.570796326794896619231321691639751442_r;
 		constexpr auto quarter_pi = 0.785398163397448309615660845819875721_r;
+
+		constexpr auto e = 2.718281828459045235360287471352662497_r;
 		
 		constexpr auto degree_to_radian_factor = pi / 180.0_r;
 		constexpr auto radian_to_degree_factor = 180.0_r / pi;
@@ -181,6 +183,10 @@ namespace ion::utilities::math
 	//Quarter pi, 0.78...
 	//With the highest precision supported
 	constexpr auto QuarterPi = detail::quarter_pi;
+
+	//Euler's number e, 2.71...
+	//With the highest precision supported
+	constexpr auto E = detail::e;
 
 
 	/*

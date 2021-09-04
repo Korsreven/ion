@@ -14,6 +14,7 @@ File:	IonNodeAnimation.h
 #define ION_NODE_ANIMATION
 
 #include <any>
+#include <cmath>
 #include <optional>
 #include <string>
 #include <variant>
@@ -25,6 +26,7 @@ File:	IonNodeAnimation.h
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
+#include "utilities/IonMath.h"
 
 namespace ion::graphics::scene::graph::animations
 {
@@ -90,6 +92,24 @@ namespace ion::graphics::scene::graph::animations
 				MotionTechniqueType technique = MotionTechniqueType::Linear;
 				std::optional<events::Callback<real, real, real>> user_technique;
 			};
+
+
+			/*
+				Curves
+			*/
+
+			inline auto sigmoid(real x) noexcept
+			{
+				using namespace ion::utilities;
+				return 1.0_r / (1.0_r + std::pow(math::E, -x));
+			}
+
+			inline auto sigmoid(real percent, real min, real max) noexcept
+			{
+				using namespace ion::utilities;
+				auto x = math::Normalize(percent, 0.0_r, 1.0_r, min, max);
+				return math::Normalize(sigmoid(x), sigmoid(min), sigmoid(max));
+			}
 
 
 			/*

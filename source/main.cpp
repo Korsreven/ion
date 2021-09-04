@@ -1326,19 +1326,21 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//Node animations
+			using namespace ion::graphics::scene::graph::animations;
+			
 			auto right_rotate = box_node->CreateAnimation("right_rotate");
-			right_rotate->AddRotation(math::ToRadians(-90.0_r), 2.0_sec);
-			right_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::HideCascading, 0.5_sec);
-			right_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::ShowCascading, 1.0_sec);
+			right_rotate->AddRotation(math::ToRadians(-90.0_r), 2.0_sec, 0.0_sec, node_animation::MotionTechniqueType::Sigmoid);
+			right_rotate->AddAction(node_animation::NodeActionType::HideCascading, 0.5_sec);
+			right_rotate->AddAction(node_animation::NodeActionType::ShowCascading, 1.0_sec);
 
 			auto left_rotate = box2_node->CreateAnimation("left_rotate");
-			left_rotate->AddRotation(math::ToRadians(90.0_r), 2.0_sec);
-			left_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::HideCascading, 0.5_sec);
-			left_rotate->AddAction(ion::graphics::scene::graph::animations::node_animation::NodeActionType::ShowCascading, 1.0_sec);
+			left_rotate->AddRotation(math::ToRadians(90.0_r), 2.0_sec, 0.0_sec, node_animation::MotionTechniqueType::Sigmoid);
+			left_rotate->AddAction(node_animation::NodeActionType::HideCascading, 0.5_sec);
+			left_rotate->AddAction(node_animation::NodeActionType::ShowCascading, 1.0_sec);
 
 			auto scale = box_base_node->CreateAnimation("scale");
-			scale->AddScaling(0.25_r, 1.5_sec);
-			scale->AddScaling(-0.25_r, 1.5_sec, 1.5_sec);
+			scale->AddScaling(0.25_r, 1.5_sec, 0.0_sec, node_animation::MotionTechniqueType::Sigmoid);
+			scale->AddScaling(-0.25_r, 1.5_sec, 1.5_sec, node_animation::MotionTechniqueType::Sigmoid);
 
 			auto idle = box_base_node->CreateAnimationGroup("idle");
 			idle->Add(right_rotate);

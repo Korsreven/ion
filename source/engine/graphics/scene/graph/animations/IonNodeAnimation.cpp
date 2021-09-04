@@ -133,6 +133,8 @@ void elapse_action(NodeAnimation &animation, user_action &a, duration time, dura
 
 real move_amount(moving_amount &amount, real percent) noexcept
 {
+	using namespace ion::utilities;
+
 	auto delta = 0.0_r;
 
 	if (amount.user_technique)
@@ -145,6 +147,14 @@ real move_amount(moving_amount &amount, real percent) noexcept
 	{
 		switch (amount.technique)
 		{
+			case MotionTechniqueType::Sigmoid:
+			{
+				auto current = amount.target * sigmoid(percent, -6.0_r, 6.0_r);
+				delta = current - amount.current;
+				amount.current = current;
+				break;
+			}
+
 			case MotionTechniqueType::Linear:
 			default:
 			{
