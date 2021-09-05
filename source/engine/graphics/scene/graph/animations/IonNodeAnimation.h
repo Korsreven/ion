@@ -58,16 +58,13 @@ namespace ion::graphics::scene::graph::animations
 
 		enum class MotionTechniqueType
 		{
+			Cubic,
+			Exponential,
 			Linear,
+			Logarithmic,
 			Sigmoid,
-			Tanh,
-
-			UpwardOpeningParabola,
-			ThirdDegreeCurve,
-			LogarithmicCurve,
-			ExponentialCurve,
-			BiologicalGrowthCurve,
-			SineWave
+			Sinh,
+			Tanh
 		};
 
 		struct MotionTechnique
@@ -98,6 +95,27 @@ namespace ion::graphics::scene::graph::animations
 				Curves
 			*/
 
+			inline auto cubic(real percent, real min, real max) noexcept
+			{
+				using namespace ion::utilities;
+				auto x = math::Normalize(percent, 0.0_r, 1.0_r, min, max);
+				return math::Normalize(std::pow(x, 3.0_r), std::pow(min, 3.0_r), std::pow(max, 3.0_r));
+			}
+
+			inline auto exp(real percent, real min, real max) noexcept
+			{
+				using namespace ion::utilities;
+				auto x = math::Normalize(percent, 0.0_r, 1.0_r, min, max);
+				return math::Normalize(std::exp(x), std::exp(min), std::exp(max));
+			}
+
+			inline auto log(real percent, real min, real max) noexcept
+			{
+				using namespace ion::utilities;
+				auto x = math::Normalize(percent, 0.0_r, 1.0_r, min, max);
+				return math::Normalize(std::log(x), std::log(min), std::log(max));
+			}
+
 			inline auto sigmoid(real x) noexcept
 			{
 				using namespace ion::utilities;
@@ -109,6 +127,20 @@ namespace ion::graphics::scene::graph::animations
 				using namespace ion::utilities;
 				auto x = math::Normalize(percent, 0.0_r, 1.0_r, min, max);
 				return math::Normalize(sigmoid(x), sigmoid(min), sigmoid(max));
+			}
+
+			inline auto sinh(real percent, real min, real max) noexcept
+			{
+				using namespace ion::utilities;
+				auto x = math::Normalize(percent, 0.0_r, 1.0_r, min, max);
+				return math::Normalize(std::sinh(x), std::sinh(min), std::sinh(max));
+			}
+
+			inline auto tanh(real percent, real min, real max) noexcept
+			{
+				using namespace ion::utilities;
+				auto x = math::Normalize(percent, 0.0_r, 1.0_r, min, max);
+				return math::Normalize(std::tanh(x), std::tanh(min), std::tanh(max));
 			}
 
 

@@ -135,37 +135,43 @@ real move_amount(moving_amount &amount, real percent) noexcept
 {
 	using namespace ion::utilities;
 
-	auto delta = 0.0_r;
-
-	if (amount.user_technique)
-	{
-		auto current = (*amount.user_technique)(amount.target, percent);
-		delta = current - amount.current;
-		amount.current = current;
-	}
-	else
-	{
-		switch (amount.technique)
+	auto current =
+		[&]() noexcept
 		{
-			case MotionTechniqueType::Sigmoid:
-			{
-				auto current = amount.target * sigmoid(percent, -6.0_r, 6.0_r);
-				delta = current - amount.current;
-				amount.current = current;
-				break;
-			}
+			if (amount.user_technique)
+				return (*amount.user_technique)(amount.target, percent);
 
-			case MotionTechniqueType::Linear:
-			default:
+			else
 			{
-				auto current = amount.target * percent;
-				delta = current - amount.current;
-				amount.current = current;
-				break;
-			}
-		}
-	}
+				switch (amount.technique)
+				{
+					case MotionTechniqueType::Cubic:
+					return amount.target * cubic(percent, 0.0_r, 10.0_r);
 
+					case MotionTechniqueType::Exponential:
+					return amount.target * exp(percent, 0.0_r, 10.0_r);
+
+					case MotionTechniqueType::Logarithmic:
+					return amount.target * log(percent, 1.0_r, 10.0_r);
+
+					case MotionTechniqueType::Sigmoid:
+					return amount.target * sigmoid(percent, -5.0_r, 5.0_r);
+
+					case MotionTechniqueType::Sinh:
+					return amount.target * sinh(percent, -2.5_r, 2.5_r);
+
+					case MotionTechniqueType::Tanh:
+					return amount.target * tanh(percent, -2.5_r, 2.5_r);
+
+					case MotionTechniqueType::Linear:
+					default:
+					return amount.target * percent;
+				}
+			}
+		}();
+
+	auto delta = current - amount.current;
+	amount.current = current;
 	return delta;
 }
 
