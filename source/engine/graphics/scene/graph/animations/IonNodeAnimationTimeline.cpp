@@ -165,6 +165,7 @@ void NodeAnimationTimeline::Start() noexcept
 void NodeAnimationTimeline::Stop() noexcept
 {
 	running_ = false;
+	reverse_ = false;
 }
 
 void NodeAnimationTimeline::Reset() noexcept

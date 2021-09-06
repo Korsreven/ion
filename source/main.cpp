@@ -1339,8 +1339,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//left_rotate->AddAction(node_animation::NodeActionType::ShowCascading, 1.0_sec);
 
 			auto scale = box_base_node->CreateAnimation("scale");
-			scale->AddScaling(0.25_r, 1.5_sec, 0.0_sec, node_animation::MotionTechniqueType::Exponential);
-			scale->AddScaling(-0.25_r, 1.5_sec, 1.5_sec, node_animation::MotionTechniqueType::Logarithmic);
+			scale->AddScaling(0.25_r, 1.5_sec, 0.0_sec, node_animation::MotionTechniqueType::Exponential, node_animation::MotionTechniqueType::Logarithmic);
+			scale->AddScaling(-0.25_r, 1.5_sec, 1.5_sec, node_animation::MotionTechniqueType::Logarithmic, node_animation::MotionTechniqueType::Exponential);
 
 			auto idle = box_base_node->CreateAnimationGroup("idle");
 			idle->Add(right_rotate);
