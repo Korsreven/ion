@@ -76,7 +76,6 @@ namespace ion::system::events::listeners
 			using MouseEventsBase = ion::events::Listenable<ion::events::listeners::MouseListener>;
 
 			graphics::render::RenderWindow &render_window_;
-			NonOwningPtr<graphics::render::Viewport> viewport_;
 
 
 			/*
@@ -171,21 +170,6 @@ namespace ion::system::events::listeners
 			[[nodiscard]] inline auto& MouseEvents() const noexcept
 			{
 				return static_cast<const MouseEventsBase&>(*this);
-			}
-
-
-			/*
-				Viewport
-			*/
-
-			//Sets the viewport connected to this input listener to the given viewport
-			void ConnectedViewport(NonOwningPtr<graphics::render::Viewport> viewport) noexcept;
-
-			//Returns a pointer to the viewport connected to this input listener
-			//Returns nullptr if this input listener does not have a viewport connected
-			[[nodiscard]] inline auto ConnectedViewport() const noexcept
-			{
-				return viewport_;
 			}
 	};
 } //ion::system::events::listeners

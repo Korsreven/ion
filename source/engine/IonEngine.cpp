@@ -260,13 +260,10 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 	if (input_controller_)
 		input_controller_.reset();
 
-	//Create render window and input controller
+	//Create render window, viewport and input controller
 	render_window_.emplace(std::move(render_window));
+	render_window_->CreateViewport("", *render_window_);
 	input_controller_.emplace(*render_window_);
-
-	//Create a default viewport and connect to input
-	auto viewport = render_window_->CreateViewport("", *render_window_);
-	input_controller_->ConnectedViewport(viewport);
 
 	return *render_window_;
 }

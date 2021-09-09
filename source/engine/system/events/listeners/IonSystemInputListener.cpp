@@ -114,7 +114,7 @@ bool InputListener::MessageReceived(HWND, UINT message, WPARAM w_param, LPARAM l
 		{
 			//Adjust coordinates from window client space to view space
 			if (auto x = static_cast<real>(LOWORD(l_param)),
-					 y = static_cast<real>(HIWORD(l_param)); viewport_ && !IsInsideViewport({x, y}))
+					 y = static_cast<real>(HIWORD(l_param)); !IsInsideViewport({x, y}))
 				return true;
 		}
 	}
@@ -217,9 +217,9 @@ bool InputListener::IsInsideViewport(Vector2 position) const noexcept
 		//Invert y-axis
 		position.Y(inner_size->Y() - position.Y());
 
-		//Has viewport
-		if (viewport_)
-			return viewport_->Bounds().Contains(position);
+		//Has viewport at given position
+		if (render_window_.GetViewport(position))
+			return true;
 	}
 	
 	return false;
@@ -233,16 +233,16 @@ Vector2 InputListener::ViewAdjusted(Vector2 position) const noexcept
 		//Invert y-axis
 		position.Y(inner_size->Y() - position.Y());
 
-		//Has viewport
-		if (viewport_)
+		//Has viewport at given position
+		if (auto viewport = render_window_.GetViewport(position); viewport)
 		{
 			//Adjust coordinates from client to viewport coordinates
-			position -= viewport_->Bounds().Min();
+			position -= viewport->Bounds().Min();
 
 			//Has camera connected to viewport
-			if (auto camera = viewport_->ConnectedCamera(); camera)
+			if (auto camera = viewport->ConnectedCamera(); camera)
 			{
-				auto viewport_size = viewport_->Bounds().ToSize();
+				auto viewport_size = viewport->Bounds().ToSize();
 				auto [width, height] = viewport_size.XY();
 				auto [x, y] = position.XY();
 
@@ -317,22 +317,6 @@ InputListener::~InputListener()
 {
 	MessageListener::Listening(false);
 	render_window_.MessageEvents().Unsubscribe(*this);
-}
-
-
-/*
-	Viewport
-*/
-
-void InputListener::ConnectedViewport(NonOwningPtr<graphics::render::Viewport> viewport) noexcept
-{
-	if (viewport)
-	{
-		if (viewport->Owner() == &render_window_)
-			viewport_ = viewport;
-	}
-	else
-		viewport_ = nullptr;
 }
 
 } //ion::system::events::listeners
