@@ -15,7 +15,6 @@ File:	IonSystemInputListener.h
 
 #include "IonSystemMessageListener.h"
 #include "events/IonListenable.h"
-#include "memory/IonNonOwningPtr.h"
 #include "system/IonSystemAPI.h"
 #include "system/events/IonSystemInput.h"
 
