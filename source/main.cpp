@@ -222,9 +222,9 @@ struct Game :
 	ion::NonOwningPtr<ion::graphics::scene::DrawableText> fps;
 	ion::types::Cumulative<duration> fps_update_rate{1.0_sec};
 
-	ion::NonOwningPtr<ion::graphics::scene::Model> model;
-	ion::NonOwningPtr<ion::graphics::scene::Light> head_light;
-	ion::NonOwningPtr<ion::graphics::scene::Model> aura;
+	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> player_node;
+	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> light_node;
+	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> aura_node;
 	ion::graphics::utilities::Vector2 move_model;
 	bool rotate_model_left = false;
 	bool rotate_model_right = false;
@@ -234,8 +234,9 @@ struct Game :
 	ion::graphics::utilities::Vector2 move_camera;
 	bool rotate_camera_left = false;
 	bool rotate_camera_right = false;
-	
-	ion::NonOwningPtr<ion::graphics::scene::graph::animations::NodeAnimationTimeline> timeline;
+	ion::types::Cumulative<duration> idle_time{2.0_sec};
+
+	ion::NonOwningPtr<ion::graphics::scene::graph::animations::NodeAnimationTimeline> idle;
 
 
 	/*
@@ -253,19 +254,36 @@ struct Game :
 				fps->Get()->Content(ion::utilities::convert::ToString(1.0_sec / time, 0));
 		}
 
-		if (model)
+		if (idle)
 		{
-			if (move_model != vector2::Zero)
-				model->ParentNode()->Translate(move_model.NormalizeCopy() * time.count());
-
-			if (rotate_model_left)
-				model->ParentNode()->Rotate(math::ToRadians(180.0_r) * time.count());
-			if (rotate_model_right)
-				model->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
+			if (idle_time += time)
+				idle->Start();
 		}
 
-		if (aura)
-			aura->ParentNode()->Rotate(math::ToRadians(-90.0_r) * time.count());
+
+		if (player_node)
+		{
+			if (move_model != vector2::Zero ||
+				rotate_model_left || rotate_model_right)
+			{
+				if (move_model != vector2::Zero)
+					player_node->Translate(move_model.NormalizeCopy() * time.count());
+
+				if (rotate_model_left)
+					player_node->Rotate(math::ToRadians(180.0_r) * time.count());
+				if (rotate_model_right)
+					player_node->Rotate(math::ToRadians(-180.0_r) * time.count());
+
+				if (idle)
+				{
+					idle_time.Reset();
+					idle->Revert();
+				}
+			}	
+		}
+
+		if (aura_node)
+			aura_node->Rotate(math::ToRadians(-90.0_r) * time.count());
 
 		if (camera && viewport &&
 			viewport->ConnectedCamera() == camera)
@@ -450,8 +468,8 @@ struct Game :
 
 			case ion::events::listeners::KeyButton::L:
 			{
-				if (head_light)
-					head_light->ParentNode()->Visible(!head_light->ParentNode()->Visible());
+				if (light_node)
+					light_node->Visible(!light_node->Visible());
 				break;
 			}
 
@@ -464,17 +482,11 @@ struct Game :
 
 				//Ray scene query
 				ion::graphics::scene::query::RaySceneQuery ray_scene_query{scene_graph,
-					{model->ParentNode()->DerivedPosition(), model->ParentNode()->DerivedDirection()}};
+					{player_node->DerivedPosition(), player_node->DerivedDirection()}};
 				ray_scene_query.QueryMask(2 | 4);
 				[[maybe_unused]] auto ray_result = ray_scene_query.Execute();
 
  				break;
-			}
-
-			case ion::events::listeners::KeyButton::Backspace:
-			{
-				if (timeline)
-					timeline->Revert(timeline->CurrentTime() * 0.25_r);
 			}
 		}
   	}
@@ -1215,7 +1227,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{0.0_r, 0.0_r, 0.0_r}, {0.71_r, 0.71_r}, color_spectrum});
 			model_spectrum->AddPass(ion::graphics::render::Pass{model_program});
 
-			auto box = scene.CreateModel();
+			/*auto box = scene.CreateModel();
 			box->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.25_r, 0.30_r}, color::DeepPink});
 			box->AddPass(ion::graphics::render::Pass{model_program});
 			box->QueryFlags(2);
@@ -1243,7 +1255,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			circle2->PreferredBoundingVolume(ion::graphics::scene::movable_object::PreferredBoundingVolumeType::BoundingSphere);
 			circle2->QueryFlags(4);
 			circle2->QueryMask(1 | 2 | 4);
-			//circle2->ShowBoundingVolumes(true);
+			//circle2->ShowBoundingVolumes(true);*/
 
 
 			//Scene graph
@@ -1282,14 +1294,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			particle_node->AttachObject(*particle_system);
 
 			//Models
-			auto model_node = scene_graph->RootNode().CreateChildNode({0.0_r, -0.115_r, -1.8_r});
-			model_node->AttachObject(*model);
-			model_node->AttachObject(*player_sound_listener);
+			auto player_node = scene_graph->RootNode().CreateChildNode({0.0_r, -0.115_r, -1.8_r});
 
-			auto star_node = model_node->CreateChildNode({0.15_r, 0.2_r, 0.1_r});
+			auto ship_node = player_node->CreateChildNode();
+			ship_node->AttachObject(*model);
+			ship_node->AttachObject(*player_sound_listener);
+
+			auto star_node = ship_node->CreateChildNode({0.15_r, 0.2_r, 0.1_r});
 			star_node->AttachObject(*model_star);
 
-			auto aura_node = model_node->CreateChildNode({0.0_r, -0.05_r, -0.1_r});
+			auto aura_node = ship_node->CreateChildNode({0.0_r, -0.05_r, -0.1_r});
 			aura_node->InheritRotation(false);
 			aura_node->AttachObject(*model_aura);
 
@@ -1302,7 +1316,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto spectrum_node = scene_graph->RootNode().CreateChildNode({1.4_r, -0.6_r, -1.0_r});
 			spectrum_node->AttachObject(*model_spectrum);
 
-			auto box_base_node = scene_graph->RootNode().CreateChildNode({-0.40_r, 0.35_r, -2.2_r});
+			/*auto box_base_node = scene_graph->RootNode().CreateChildNode({-0.40_r, 0.35_r, -2.2_r});
 
 			auto box_node = box_base_node->CreateChildNode({-0.05_r, -0.10_r, 0.0});
 			box_node->AttachObject(*box);
@@ -1314,40 +1328,44 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			circle_node->AttachObject(*circle);
 
 			auto circle2_node = scene_graph->RootNode().CreateChildNode({0.45_r, 0.45_r, -2.2_r});
-			circle2_node->AttachObject(*circle2);
+			circle2_node->AttachObject(*circle2);*/
 
 			//Head light
-			auto light_node = model_node->CreateChildNode({0.0_r, -0.15_r, -0.05_r}, vector2::UnitY, false);
+			auto light_node = ship_node->CreateChildNode({0.0_r, -0.15_r, -0.05_r}, vector2::UnitY, false);
 			light_node->AttachObject(*head_light);
 
 			//Player camera
-			auto player_cam_node = model_node->CreateChildNode({0.0_r, 0.0_r, 1.8_r});
+			auto player_cam_node = player_node->CreateChildNode({0.0_r, 0.0_r, 1.8_r});
 			player_cam_node->AttachObject(*player_camera);
 
 
 			//Node animations
 			using namespace ion::graphics::scene::graph::animations;
-			
-			auto right_rotate = box_node->CreateAnimation("right_rotate");
-			right_rotate->AddRotation(math::ToRadians(-90.0_r), 2.0_sec, 0.0_sec, node_animation::MotionTechniqueType::Exponential);
-			//right_rotate->AddAction(node_animation::NodeActionType::HideCascading, 0.5_sec);
-			//right_rotate->AddAction(node_animation::NodeActionType::ShowCascading, 1.0_sec);
 
-			auto left_rotate = box2_node->CreateAnimation("left_rotate");
-			left_rotate->AddRotation(math::ToRadians(90.0_r), 2.0_sec, 0.0_sec, node_animation::MotionTechniqueType::Logarithmic);
-			//left_rotate->AddAction(node_animation::NodeActionType::HideCascading, 0.5_sec);
-			//left_rotate->AddAction(node_animation::NodeActionType::ShowCascading, 1.0_sec);
+			auto scaler = cloud_node->CreateAnimation("scaler");
+			scaler->AddScaling(0.25_r, 10.0_sec, 0.0_sec, node_animation::MotionTechniqueType::Sigmoid);
+			scaler->AddScaling(-0.25_r, 10.0_sec, 10.0_sec, node_animation::MotionTechniqueType::Sigmoid);
+			scaler->Start();
 
-			auto scale = box_base_node->CreateAnimation("scale");
-			scale->AddScaling(0.25_r, 1.5_sec, 0.0_sec, node_animation::MotionTechniqueType::Exponential, node_animation::MotionTechniqueType::Logarithmic);
-			scale->AddScaling(-0.25_r, 1.5_sec, 1.5_sec, node_animation::MotionTechniqueType::Logarithmic, node_animation::MotionTechniqueType::Exponential);
+			auto mover = ship_node->CreateAnimation("mover");
+			mover->AddTranslation({0.0_r, 0.02_r, 0.0_r}, 2.0_sec);
+			mover->AddTranslation({0.02_r, -0.02_r, 0.0_r}, 2.0_sec, 2.0_sec);
+			mover->AddTranslation({-0.02_r, -0.02_r, 0.0_r}, 2.0_sec, 4.0_sec);
+			mover->AddTranslation({-0.02_r, 0.02_r, 0.0_r}, 2.0_sec, 6.0_sec);
+			mover->AddTranslation({0.02_r, 0.02_r, 0.0_r}, 2.0_sec, 8.0_sec);
+			mover->AddTranslation({0.0_r, -0.02_r, 0.0_r}, 2.0_sec, 10.0_sec);
 
-			auto idle = box_base_node->CreateAnimationGroup("idle");
-			idle->Add(right_rotate);
-			idle->Add(left_rotate, 2.0_sec);
-			idle->Add(scale, 4.0_sec);
+			auto rotator = ship_node->CreateAnimation("rotator");
+			rotator->AddRotation(math::ToRadians(-2.5_r), 2.0_sec, 2.0_sec);
+			rotator->AddRotation(math::ToRadians(2.5_r), 2.0_sec, 4.0_sec);
+			rotator->AddRotation(math::ToRadians(2.5_r), 2.0_sec, 6.0_sec);
+			rotator->AddRotation(math::ToRadians(-2.5_r), 2.0_sec, 8.0_sec);
 
-			auto timeline = box_base_node->CreateTimeline();
+			auto idle = ship_node->CreateAnimationGroup("idle");
+			idle->Add(mover);
+			idle->Add(rotator);
+
+			auto timeline = ship_node->CreateTimeline(1.0_r, false);
 			timeline->Attach(idle);
 
 
@@ -1356,12 +1374,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			game.viewport = viewport;
 			game.sound_manager = &sounds;
 			game.fps = text;
-			game.model = model;
-			game.head_light = head_light;
-			game.aura = model_aura;
+			game.player_node = player_node;
+			game.light_node = light_node;
+			game.aura_node = aura_node;
 			game.camera = camera;
 			game.player_camera = player_camera;
-			game.timeline = timeline;
+			game.idle = timeline;
 
 
 			//Engine
