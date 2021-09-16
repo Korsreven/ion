@@ -187,6 +187,7 @@ File:	main.cpp
 #include "types/IonTypes.h"
 #include "types/IonTypeCasts.h"
 #include "types/IonTypeTraits.h"
+#include "types/IonUniqueVal.h"
 
 #include "unmanaged/IonObjectFactory.h"
 

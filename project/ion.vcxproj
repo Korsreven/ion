@@ -454,6 +454,7 @@
     <ClInclude Include="..\source\engine\types\IonTypeCasts.h" />
     <ClInclude Include="..\source\engine\types\IonTypes.h" />
     <ClInclude Include="..\source\engine\types\IonTypeTraits.h" />
+    <ClInclude Include="..\source\engine\types\IonUniqueVal.h" />
     <ClInclude Include="..\source\engine\unmanaged\IonObjectFactory.h" />
     <ClInclude Include="..\source\engine\utilities\IonCodec.h" />
     <ClInclude Include="..\source\engine\utilities\IonConvert.h" />
