@@ -16,13 +16,14 @@ File:	IonUniqueVal.h
 #include <algorithm>
 #include <compare>
 #include <type_traits>
+#include <utility>
 
 namespace ion::types
 {
 	//Unique value
-	//Tag class members as UniqueVal to disable copying/moving of its value
-	//An object containing one or more tagged members can still be copied/moved normally
-	//A member tagged as UniqueVal will be default constructed when the copy/move constructor is called
+	//Tag class members as UniqueVal to disable copying of its value
+	//An object containing one or more tagged members can still be copied normally
+	//A member tagged as UniqueVal will be default constructed when the copy constructor is called
 	template <typename T>
 	class UniqueVal
 	{
@@ -34,12 +35,15 @@ namespace ion::types
 
 		private:
 
-			T value_;
+			T value_{};
 		
 		public:
 
+			//Default constructor
+			constexpr UniqueVal() = default;
+
 			//Construct a new unique value with the given value
-			explicit constexpr UniqueVal(T value = T{}) noexcept :
+			explicit constexpr UniqueVal(T value) noexcept :
 				value_{value}
 			{
 				//Empty
@@ -58,6 +62,13 @@ namespace ion::types
 				//Empty
 			}
 
+			//Move constructor
+			constexpr UniqueVal(UniqueVal<T> &&rhs) noexcept :
+				value_{std::exchange(rhs.value_, T{})}
+			{
+				//Empty
+			}
+
 
 			/*
 				Operators
@@ -66,9 +77,18 @@ namespace ion::types
 			//Copy assignment
 			constexpr auto& operator=(const UniqueVal<T>&) noexcept
 			{
+				//Do nothing
 				return *this;
 			}
 
+			//Move assignment
+			constexpr auto& operator=(UniqueVal<T> &&rhs) noexcept
+			{
+				value_ = std::exchange(rhs.value_, T{});
+				return *this;
+			}
+
+			//Combined comparison operator
 			[[nodiscard]] constexpr auto operator<=>(const UniqueVal<T>&) const = default;
 
 
