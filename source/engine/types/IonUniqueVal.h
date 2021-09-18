@@ -43,14 +43,7 @@ namespace ion::types
 			constexpr UniqueVal() = default;
 
 			//Construct a new unique value with the given value
-			explicit constexpr UniqueVal(T value) noexcept :
-				value_{value}
-			{
-				//Empty
-			}
-
-			//Construct a new unique value with the given value
-			explicit constexpr UniqueVal(T &&value) noexcept :
+			constexpr explicit UniqueVal(T value) noexcept :
 				value_{std::move(value)}
 			{
 				//Empty
@@ -106,12 +99,6 @@ namespace ion::types
 
 			//Replaces the unique value
 			constexpr void Reset(T value = T{}) noexcept
-			{
-				value_ = value;
-			}
-
-			//Replaces the unique value
-			constexpr void Reset(T &&value) noexcept
 			{
 				value_ = std::move(value);
 			}
