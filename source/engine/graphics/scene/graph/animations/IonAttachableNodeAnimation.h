@@ -10,8 +10,8 @@ File:	IonAttachableNodeAnimation.h
 -------------------------------------------
 */
 
-#ifndef ION_ATTACHABLE_NODE_ANIMATION
-#define ION_ATTACHABLE_NODE_ANIMATION
+#ifndef ION_ATTACHABLE_NODE_ANIMATION_H
+#define ION_ATTACHABLE_NODE_ANIMATION_H
 
 #include <optional>
 

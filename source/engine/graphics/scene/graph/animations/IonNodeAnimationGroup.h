@@ -10,8 +10,8 @@ File:	IonNodeAnimationGroup.h
 -------------------------------------------
 */
 
-#ifndef ION_NODE_ANIMATION_GROUP
-#define ION_NODE_ANIMATION_GROUP
+#ifndef ION_NODE_ANIMATION_GROUP_H
+#define ION_NODE_ANIMATION_GROUP_H
 
 #include <string>
 #include <vector>

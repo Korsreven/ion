@@ -10,8 +10,8 @@ File:	IonSceneGraph.h
 -------------------------------------------
 */
 
-#ifndef ION_SCENE_GRAPH
-#define ION_SCENE_GRAPH
+#ifndef ION_SCENE_GRAPH_H
+#define ION_SCENE_GRAPH_H
 
 #include <optional>
 #include <vector>

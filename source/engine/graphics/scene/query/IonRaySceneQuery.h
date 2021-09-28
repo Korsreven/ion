@@ -10,8 +10,8 @@ File:	IonRaySceneQuery.h
 -------------------------------------------
 */
 
-#ifndef ION_RAY_SCENE_QUERY
-#define ION_RAY_SCENE_QUERY
+#ifndef ION_RAY_SCENE_QUERY_H
+#define ION_RAY_SCENE_QUERY_H
 
 #include <optional>
 #include <utility>

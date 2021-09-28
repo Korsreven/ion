@@ -10,8 +10,8 @@ File:	IonNodeAnimation.h
 -------------------------------------------
 */
 
-#ifndef ION_NODE_ANIMATION
-#define ION_NODE_ANIMATION
+#ifndef ION_NODE_ANIMATION_H
+#define ION_NODE_ANIMATION_H
 
 #include <any>
 #include <cmath>

@@ -10,8 +10,8 @@ File:	IonIntersectionSceneQuery.h
 -------------------------------------------
 */
 
-#ifndef ION_INTERSECTION_SCENE_QUERY
-#define ION_INTERSECTION_SCENE_QUERY
+#ifndef ION_INTERSECTION_SCENE_QUERY_H
+#define ION_INTERSECTION_SCENE_QUERY_H
 
 #include <utility>
 #include <vector>

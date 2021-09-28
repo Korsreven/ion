@@ -10,8 +10,8 @@ File:	IonSceneNode.h
 -------------------------------------------
 */
 
-#ifndef ION_SCENE_NODE
-#define ION_SCENE_NODE
+#ifndef ION_SCENE_NODE_H
+#define ION_SCENE_NODE_H
 
 #include <algorithm>
 #include <any>
