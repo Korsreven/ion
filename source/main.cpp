@@ -139,6 +139,13 @@ File:	main.cpp
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 
+#include "gui/IonGuiComponent.h"
+#include "gui/IonGuiContainer.h"
+#include "gui/IonGuiController.h"
+#include "gui/IonGuiFrame.h"
+#include "gui/IonGuiPanel.h"
+#include "gui/controls/IonGuiControl.h"
+
 #include "managed/IonManagedObject.h"
 #include "managed/IonObjectManager.h"
 #include "managed/IonObjectObserver.h"
