@@ -52,8 +52,12 @@ namespace ion::managed
 			//Copy assignment
 			inline auto& operator=(const ManagedObject &rhs)
 			{
-				name_ = rhs.name_;
-				owner_ = nullptr;
+				if (this != &rhs)
+				{
+					name_ = rhs.name_;
+					owner_ = nullptr;
+				}
+
 				return *this;
 			}
 
