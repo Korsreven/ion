@@ -23,10 +23,9 @@ namespace gui_controller::detail
 } //gui_controller::detail
 
 
-GuiController::GuiController(SceneNode &parent_node) :
-	node_{parent_node.CreateChildNode()}
+GuiController::GuiController(SceneNode &parent_node)
 {
-	//Empty
+	node_ = parent_node.CreateChildNode();
 }
 
 
@@ -107,12 +106,12 @@ void GuiController::MouseWheelRolled(int delta, Vector2 position) noexcept
 
 NonOwningPtr<GuiFrame> GuiController::CreateFrame(std::string name)
 {
-	return Create(std::move(name));
+	return CreateComponent<GuiFrame>(std::move(name));
 }
 
 NonOwningPtr<GuiFrame> GuiController::CreateFrame(GuiFrame &&frame)
 {
-	return Create(std::move(frame));
+	return CreateComponent<GuiFrame>(std::move(frame));
 }
 
 
@@ -123,12 +122,12 @@ NonOwningPtr<GuiFrame> GuiController::CreateFrame(GuiFrame &&frame)
 
 NonOwningPtr<GuiFrame> GuiController::GetFrame(std::string_view name) noexcept
 {
-	return Get(name);
+	return static_pointer_cast<GuiFrame>(GetComponent(name));
 }
 
 NonOwningPtr<const GuiFrame> GuiController::GetFrame(std::string_view name) const noexcept
 {
-	return Get(name);
+	return static_pointer_cast<const GuiFrame>(GetComponent(name));
 }
 
 
@@ -139,18 +138,17 @@ NonOwningPtr<const GuiFrame> GuiController::GetFrame(std::string_view name) cons
 
 void GuiController::ClearFrames() noexcept
 {
-	return Clear();
+	return ClearComponents();
 }
 
 bool GuiController::RemoveFrame(GuiFrame &frame) noexcept
 {
-	return Remove(frame);
+	return RemoveComponent(frame);
 }
 
 bool GuiController::RemoveFrame(std::string_view name) noexcept
 {
-	return Remove(name);
+	return RemoveComponent(name);
 }
-
 
 } //ion::gui

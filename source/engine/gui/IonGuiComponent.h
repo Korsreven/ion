@@ -14,6 +14,7 @@ File:	IonGuiComponent.h
 #define ION_GUI_COMPONENT_H
 
 #include <string>
+#include <utility>
 
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
@@ -27,7 +28,7 @@ namespace ion::graphics::scene::graph
 namespace ion::gui
 {
 	using namespace graphics::scene::graph;
-	class GuiContainer; //Forward declaration
+	struct GuiContainer; //Forward declaration
 
 	namespace gui_component::detail
 	{
@@ -36,23 +37,25 @@ namespace ion::gui
 
 	class GuiComponent : public managed::ManagedObject<GuiContainer>
 	{
+		private:
+
+			/*
+				Helper functions
+			*/
+
+			void Detach() noexcept;
+
 		protected:
 
+			GuiContainer *parent_ = nullptr;
 			NonOwningPtr<SceneNode> node_;
 
 		public:
 
-			//Construct a component with the given name
-			explicit GuiComponent(std::string name);
+			using managed::ManagedObject<GuiContainer>::ManagedObject;
 
-			//Construct a component with the given owner and name
-			GuiComponent(GuiContainer &owner, std::string name);
-
-			//Default copy constructor
-			GuiComponent(const GuiComponent&) = default;
-
-			//Default move constructor
-			GuiComponent(GuiComponent&&) = default;
+			//Copy constructor
+			GuiComponent(const GuiComponent &rhs);
 
 			//Virtual destructor
 			virtual ~GuiComponent() noexcept;
@@ -62,23 +65,38 @@ namespace ion::gui
 				Operators
 			*/
 
-			//Default copy assignment
-			GuiComponent& operator=(const GuiComponent&) = default;
+			//Copy assignment
+			inline auto& operator=(const GuiComponent &rhs)
+			{
+				managed::ManagedObject<GuiContainer>::operator=(rhs);
 
-			//Default move assignment
-			GuiComponent& operator=(GuiComponent&&) = default;
+				if (this != &rhs)
+					Detach();
+
+				return *this;
+			}
 
 
 			/*
 				Modifiers
 			*/
 
+			//Set ownership of this component
+			void Owner(GuiContainer &owner) noexcept;
 
+			//Release ownership for this component
+			void Release() noexcept;
 
 
 			/*
 				Observers
 			*/
+
+			//Returns a pointer to the parent of this component
+			[[nodiscard]] inline auto Parent() const noexcept
+			{
+				return parent_;
+			}
 
 			//Returns a pointer to the node for this component
 			[[nodiscard]] inline auto Node() const noexcept

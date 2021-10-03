@@ -609,6 +609,9 @@
     <ClCompile Include="..\source\engine\gui\IonGuiContainer.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\gui\IonGuiPanelContainer.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1173,6 +1176,9 @@
       <Filter>Header Files\gui\controls</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\gui\IonGuiContainer.h">
+      <Filter>Header Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\gui\IonGuiPanelContainer.h">
       <Filter>Header Files\gui</Filter>
     </ClInclude>
   </ItemGroup>

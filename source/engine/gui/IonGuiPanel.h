@@ -13,10 +13,12 @@ File:	IonGuiPanel.h
 #ifndef ION_GUI_PANEL_H
 #define ION_GUI_PANEL_H
 
-#include "IonGuiContainer.h"
+#include <string>
+#include <string_view>
+
+#include "IonGuiPanelContainer.h"
 #include "controls/IonGuiControl.h"
-#include "managed/IonManagedObject.h"
-#include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 
 namespace ion::gui
 {
@@ -25,18 +27,16 @@ namespace ion::gui
 	} //gui_panel::detail
 
 
-	class GuiPanel :
-		public GuiContainer,
-		public managed::ObjectManager<controls::GuiControl, GuiContainer>
+	class GuiPanel : public GuiPanelContainer
 	{
 		private:
 
-
+			
 
 		public:
 
-			//Default constructor
-			GuiPanel() = default;
+			//Construct a panel with the given name
+			GuiPanel(std::string name);
 
 
 			/*

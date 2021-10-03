@@ -21,5 +21,10 @@ namespace gui_panel::detail
 } //gui_panel::detail
 
 
+GuiPanel::GuiPanel(std::string name) :
+	GuiPanelContainer{std::move(name)}
+{
+	//Empty
+}
 
 } //ion::gui

@@ -1,0 +1,204 @@
+/*
+-------------------------------------------
+This source file is part of Ion Engine
+	- A fast and lightweight 2D game engine
+	- Written in C++ using OpenGL
+
+Author:	Jan Ivar Goli
+Area:	gui
+File:	IonGuiPanelContainer.h
+-------------------------------------------
+*/
+
+#ifndef ION_GUI_PANEL_CONTAINER_H
+#define ION_GUI_PANEL_CONTAINER_H
+
+#include <string>
+#include <string_view>
+#include <type_traits>
+
+#include "IonGuiContainer.h"
+#include "memory/IonNonOwningPtr.h"
+
+namespace ion::gui
+{
+	class GuiPanel; //Forward declaration
+
+	namespace controls
+	{
+		class GuiControl; //Forward declaration
+	}
+
+	namespace gui_panel_container::detail
+	{
+	} //gui_panel_container::detail
+
+
+	class GuiPanelContainer : public GuiContainer
+	{
+		private:
+
+			
+
+		public:
+
+			using GuiContainer::GuiContainer;
+
+
+			/*
+				Ranges
+			*/
+
+			//Returns a mutable range of all controls in this container
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Controls() noexcept
+			{
+				return Components();
+			}
+
+			//Returns an immutable range of all controls in this container
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Controls() const noexcept
+			{
+				return Components();
+			}
+
+
+			//Returns a mutable range of all panels in this container
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Panels() noexcept
+			{
+				return Components();
+			}
+
+			//Returns an immutable range of all panels in this container
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Panels() const noexcept
+			{
+				return Components();
+			}
+
+
+			/*
+				Modifiers
+			*/
+
+
+
+
+			/*
+				Observers
+			*/
+
+
+
+
+			/*
+				Controls
+				Creating
+			*/
+
+			//Create an control of type T with the given name and arguments
+			template <typename T, typename... Args>
+			auto CreateControl(std::string name, Args &&...args)
+			{
+				static_assert(std::is_base_of_v<controls::GuiControl, T>);
+
+				auto ptr = CreateComponent<T>(std::move(name), std::forward<Args>(args)...);
+				return static_pointer_cast<T>(ptr);
+			}
+
+
+			//Create an control of type T as a copy of the given control
+			template <typename T>
+			auto CreateControl(const T &control_t)
+			{
+				static_assert(std::is_base_of_v<controls::GuiControl, T>);
+
+				auto ptr = CreateComponent(control_t);
+				return static_pointer_cast<T>(ptr);
+			}
+
+			//Create an control of type T by moving the given control
+			template <typename T>
+			auto CreateControl(T &&control_t)
+			{
+				static_assert(std::is_base_of_v<controls::GuiControl, T>);
+
+				auto ptr = CreateComponent(std::move(control_t));
+				return static_pointer_cast<T>(ptr);
+			}
+
+
+			/*
+				Controls
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable control with the given name
+			//Returns nullptr if control could not be found
+			[[nodiscard]] NonOwningPtr<controls::GuiControl> GetControl(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable control with the given name
+			//Returns nullptr if control could not be found
+			[[nodiscard]] NonOwningPtr<const controls::GuiControl> GetControl(std::string_view name) const noexcept;
+
+
+			/*
+				Controls
+				Removing
+			*/
+
+			//Clear all removable controls from this container
+			void ClearControls() noexcept;
+
+			//Remove a removable control from this container
+			bool RemoveControl(controls::GuiControl &control) noexcept;
+
+			//Remove a removable control with the given name from this container
+			bool RemoveControl(std::string_view name) noexcept;
+
+
+			/*
+				Panels
+				Creating
+			*/
+
+			//Create a panel with the given name
+			NonOwningPtr<GuiPanel> CreatePanel(std::string name);
+
+			//Create a panel by moving the given panel
+			NonOwningPtr<GuiPanel> CreatePanel(GuiPanel &&panel);
+
+
+			/*
+				Panels
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable panel with the given name
+			//Returns nullptr if panel could not be found
+			[[nodiscard]] NonOwningPtr<GuiPanel> GetPanel(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable panel with the given name
+			//Returns nullptr if panel could not be found
+			[[nodiscard]] NonOwningPtr<const GuiPanel> GetPanel(std::string_view name) const noexcept;
+
+
+			/*
+				Panels
+				Removing
+			*/
+
+			//Clear all removable panels from this container
+			void ClearPanels() noexcept;
+
+			//Remove a removable panel from this container
+			bool RemovePanel(GuiPanel &panel) noexcept;
+
+			//Remove a removable panel with the given name from this container
+			bool RemovePanel(std::string_view name) noexcept;
+	};
+} //ion::gui
+
+#endif

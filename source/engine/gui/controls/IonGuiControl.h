@@ -30,8 +30,7 @@ namespace ion::gui::controls
 
 		public:
 
-			//Default constructor
-			GuiControl() = default;
+			using GuiComponent::GuiComponent;
 
 
 			/*

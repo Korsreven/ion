@@ -16,12 +16,12 @@ File:	IonGuiController.h
 #include <string>
 #include <string_view>
 
+#include "IonGuiContainer.h"
 #include "IonGuiFrame.h"
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
 #include "events/listeners/IonWindowListener.h"
 #include "graphics/utilities/IonVector2.h"
-#include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
@@ -42,11 +42,11 @@ namespace ion::gui
 	} //gui_controller::detail
 
 
-	class GuiController final : public managed::ObjectManager<GuiFrame, GuiController>
+	class GuiController final : public GuiContainer
 	{
 		private:
 
-			NonOwningPtr<SceneNode> node_;
+			
 
 		public:
 
@@ -62,14 +62,14 @@ namespace ion::gui
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Frames() noexcept
 			{
-				return Objects();
+				return Components();
 			}
 
-			//Returns an immutable range of all cameras in this controller
+			//Returns an immutable range of all frames in this controller
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Frames() const noexcept
 			{
-				return Objects();
+				return Components();
 			}
 
 
@@ -84,12 +84,7 @@ namespace ion::gui
 				Observers
 			*/
 
-			//Returns a pointer to the node for this controller
-			//This is the top-level node for the controlled by this
-			[[nodiscard]] inline auto Node() const noexcept
-			{
-				return node_;
-			}
+
 
 
 			/*

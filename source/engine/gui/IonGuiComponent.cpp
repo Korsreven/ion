@@ -24,23 +24,54 @@ namespace gui_component::detail
 } //gui_component::detail
 
 
-GuiComponent::GuiComponent(std::string name) :
-	managed::ManagedObject<GuiContainer>{std::move(name)}
+//Private
+
+/*
+	Helper functions
+*/
+
+void GuiComponent::Detach() noexcept
 {
-	//Empty
+	parent_ = nullptr;
+
+	if (node_)
+		node_->ParentNode()->RemoveChildNode(*node_);
 }
 
-GuiComponent::GuiComponent(GuiContainer &owner, std::string name) :
-	managed::ManagedObject<GuiContainer>{std::move(name)},
-	node_{owner.Node() ? owner.Node()->CreateChildNode() : nullptr}
+
+//Public
+
+GuiComponent::GuiComponent(const GuiComponent &rhs) :
+
+	managed::ManagedObject<GuiContainer>{rhs},
+	parent_{nullptr} //A copy constructed component has no parent
 {
 	//Empty
 }
 
 GuiComponent::~GuiComponent() noexcept
 {
-	if (node_)
-		node_->ParentNode()->RemoveChildNode(*node_);
+	Detach();
+}
+
+
+/*
+	Modifiers
+*/
+
+void GuiComponent::Owner(GuiContainer &owner) noexcept
+{
+	managed::ManagedObject<GuiContainer>::Owner(owner);
+	Detach();
+
+	parent_ = &owner;
+	node_ = parent_->Node() ? parent_->Node()->CreateChildNode() : nullptr;
+}
+
+void GuiComponent::Release() noexcept
+{
+	managed::ManagedObject<GuiContainer>::Release();
+	Detach();
 }
 
 } //ion::gui

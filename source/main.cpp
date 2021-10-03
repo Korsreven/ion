@@ -144,6 +144,7 @@ File:	main.cpp
 #include "gui/IonGuiController.h"
 #include "gui/IonGuiFrame.h"
 #include "gui/IonGuiPanel.h"
+#include "gui/IonGuiPanelContainer.h"
 #include "gui/controls/IonGuiControl.h"
 
 #include "managed/IonManagedObject.h"
@@ -1274,6 +1275,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scene_graph->FogEffect(ion::graphics::render::Fog::Linear(0.0_r, 2.25_r));
 			scene_graph->FogEnabled(false);
 			//scene_graph->LightingEnabled(false);
+
+			//GUI
+			ion::gui::GuiController controller{scene_graph->RootNode()};
+			auto main_frame = controller.CreateFrame("main");
+			auto base_panel = main_frame->CreatePanel("base");
+			auto sub_panel = base_panel->CreatePanel("sub");
+			auto my_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("empty");
 
 			//Camera
 			auto cam_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});

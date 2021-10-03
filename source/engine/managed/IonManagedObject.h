@@ -49,6 +49,11 @@ namespace ion::managed
 				//Empty
 			}
 
+
+			/*
+				Operators
+			*/
+
 			//Copy assignment
 			inline auto& operator=(const ManagedObject &rhs)
 			{
