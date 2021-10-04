@@ -125,6 +125,25 @@ namespace ion::gui
 		[[nodiscard]] NonOwningPtr<const GuiComponent> GetComponent(std::string_view name) const noexcept;
 
 
+		//Gets a pointer to a mutable component of type T with the given name
+		//Returns nullptr if a component of type T could not be found
+		template <typename T>
+		[[nodiscard]] auto GetComponentAs(std::string_view name) noexcept
+		{
+			static_assert(std::is_base_of<GuiComponent, T>);
+			return dynamic_pointer_cast<T>(GetComponent(name));
+		}
+
+		//Gets a pointer to an immutable component of type T with the given name
+		//Returns nullptr if a component of type T could not be found
+		template <typename T>
+		[[nodiscard]] auto GetComponentAs(std::string_view name) const noexcept
+		{
+			static_assert(std::is_base_of<GuiComponent, T>);
+			return dynamic_pointer_cast<const T>(GetComponent(name));
+		}
+
+
 		/*
 			Components
 			Removing

@@ -16,8 +16,10 @@ File:	IonGuiPanelContainer.h
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <vector>
 
 #include "IonGuiContainer.h"
+#include "adaptors/ranges/IonDereferenceIterable.h"
 #include "memory/IonNonOwningPtr.h"
 
 namespace ion::gui
@@ -29,16 +31,36 @@ namespace ion::gui
 		class GuiControl; //Forward declaration
 	}
 
-	namespace gui_panel_container::detail
+	namespace gui_panel_container
 	{
-	} //gui_panel_container::detail
+		namespace detail
+		{
+			using control_pointers = std::vector<controls::GuiControl*>;
+			using panel_pointers = std::vector<GuiPanel*>;
+		} //detail
+	} //gui_panel_container
 
 
 	class GuiPanelContainer : public GuiContainer
 	{
 		private:
 
-			
+			gui_panel_container::detail::control_pointers controls_;
+			gui_panel_container::detail::panel_pointers panels_;
+
+		protected:
+
+			/*
+				Events
+			*/
+
+			void Created(GuiComponent &component) noexcept override;
+			void Created(controls::GuiControl &control) noexcept;
+			void Created(GuiPanel &panel) noexcept;
+
+			void Removed(GuiComponent &component) noexcept override;
+			void Removed(controls::GuiControl &control) noexcept;
+			void Removed(GuiPanel &panel) noexcept;
 
 		public:
 
@@ -53,14 +75,14 @@ namespace ion::gui
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Controls() noexcept
 			{
-				return Components();
+				return adaptors::ranges::DereferenceIterable<gui_panel_container::detail::control_pointers&>{controls_};
 			}
 
 			//Returns an immutable range of all controls in this container
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Controls() const noexcept
 			{
-				return Components();
+				return adaptors::ranges::DereferenceIterable<const gui_panel_container::detail::control_pointers&>{controls_};
 			}
 
 
@@ -68,14 +90,14 @@ namespace ion::gui
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Panels() noexcept
 			{
-				return Components();
+				return adaptors::ranges::DereferenceIterable<gui_panel_container::detail::panel_pointers&>{panels_};
 			}
 
 			//Returns an immutable range of all panels in this container
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Panels() const noexcept
 			{
-				return Components();
+				return adaptors::ranges::DereferenceIterable<const gui_panel_container::detail::panel_pointers&>{panels_};
 			}
 
 
@@ -142,6 +164,25 @@ namespace ion::gui
 			//Gets a pointer to an immutable control with the given name
 			//Returns nullptr if control could not be found
 			[[nodiscard]] NonOwningPtr<const controls::GuiControl> GetControl(std::string_view name) const noexcept;
+
+
+			//Gets a pointer to a mutable control of type T with the given name
+			//Returns nullptr if a control of type T could not be found
+			template <typename T>
+			[[nodiscard]] auto GetControlAs(std::string_view name) noexcept
+			{
+				static_assert(std::is_base_of<controls::GuiControl, T>);
+				return GetComponentAs<T>(name);
+			}
+
+			//Gets a pointer to an immutable control of type T with the given name
+			//Returns nullptr if a control of type T could not be found
+			template <typename T>
+			[[nodiscard]] auto GetControlAs(std::string_view name) const noexcept
+			{
+				static_assert(std::is_base_of<controls::GuiControl, T>);
+				return GetComponentAs<T>(name);
+			}
 
 
 			/*

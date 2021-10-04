@@ -12,6 +12,9 @@ File:	IonGuiPanelContainer.cpp
 
 #include "IonGuiPanelContainer.h"
 
+#include <algorithm>
+#include <utility>
+
 #include "IonGuiPanel.h"
 #include "controls/IonGuiControl.h"
 
@@ -22,6 +25,68 @@ namespace gui_panel_container::detail
 {
 
 } //gui_panel_container::detail
+
+
+//Protected
+
+/*
+	Events
+*/
+
+void GuiPanelContainer::Created(GuiComponent &component) noexcept
+{
+	if (auto control = dynamic_cast<controls::GuiControl*>(&component); control)
+		Created(*control);
+	else if (auto panel = dynamic_cast<GuiPanel*>(&component); panel)
+		Created(*panel);
+}
+
+void GuiPanelContainer::Created(controls::GuiControl &control) noexcept
+{
+	controls_.push_back(&control);
+}
+
+void GuiPanelContainer::Created(GuiPanel &panel) noexcept
+{
+	panels_.push_back(&panel);
+}
+
+
+void GuiPanelContainer::Removed(GuiComponent &component) noexcept
+{
+	if (auto control = dynamic_cast<controls::GuiControl*>(&component); control)
+		Removed(*control);
+	else if (auto panel = dynamic_cast<GuiPanel*>(&component); panel)
+		Removed(*panel);
+}
+
+void GuiPanelContainer::Removed(controls::GuiControl &control) noexcept
+{
+	auto iter =
+		std::find_if(std::begin(controls_), std::end(controls_),
+			[&](auto &x) noexcept
+			{
+				return x == &control;
+			});
+
+	//Control found
+	if (iter != std::end(controls_))
+		controls_.erase(iter);
+}
+
+void GuiPanelContainer::Removed(GuiPanel &panel) noexcept
+{
+	auto iter =
+		std::find_if(std::begin(panels_), std::end(panels_),
+			[&](auto &x) noexcept
+			{
+				return x == &panel;
+			});
+
+	//Panel found
+	if (iter != std::end(panels_))
+		panels_.erase(iter);
+}
 
 
 /*
@@ -47,7 +112,20 @@ NonOwningPtr<const controls::GuiControl> GuiPanelContainer::GetControl(std::stri
 
 void GuiPanelContainer::ClearControls() noexcept
 {
-	return ClearComponents();
+	auto controls = std::move(controls_);
+
+	for (auto &control : controls)
+	{
+		if (RemoveControl(*control))
+			control = nullptr;
+	}
+
+	controls.erase(
+		std::remove(std::begin(controls), std::end(controls), nullptr),
+		std::end(controls));
+
+	controls_ = std::move(controls);
+	controls_.shrink_to_fit();
 }
 
 bool GuiPanelContainer::RemoveControl(controls::GuiControl &control) noexcept
@@ -100,7 +178,20 @@ NonOwningPtr<const GuiPanel> GuiPanelContainer::GetPanel(std::string_view name) 
 
 void GuiPanelContainer::ClearPanels() noexcept
 {
-	return ClearComponents();
+	auto panels = std::move(panels_);
+
+	for (auto &panel : panels)
+	{
+		if (RemovePanel(*panel))
+			panel = nullptr;
+	}
+
+	panels.erase(
+		std::remove(std::begin(panels), std::end(panels), nullptr),
+		std::end(panels));
+
+	panels_ = std::move(panels);
+	panels_.shrink_to_fit();
 }
 
 bool GuiPanelContainer::RemovePanel(GuiPanel &panel) noexcept

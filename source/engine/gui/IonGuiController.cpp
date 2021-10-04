@@ -138,7 +138,7 @@ NonOwningPtr<const GuiFrame> GuiController::GetFrame(std::string_view name) cons
 
 void GuiController::ClearFrames() noexcept
 {
-	return ClearComponents();
+	ClearComponents();
 }
 
 bool GuiController::RemoveFrame(GuiFrame &frame) noexcept
