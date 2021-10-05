@@ -204,4 +204,26 @@ bool GuiPanelContainer::RemovePanel(std::string_view name) noexcept
 	return RemoveComponent(name);
 }
 
+
+/*
+	Components
+	Removing (optimization)
+*/
+
+void GuiPanelContainer::ClearComponents() noexcept
+{
+	controls_.clear();
+	panels_.clear();
+	GuiContainer::ClearComponents();
+		//This will go much faster because controls and panels are pre-cleared
+	
+	//Non-removable components will still be present
+	//Add them back to the controls/panels containers
+	for (auto &component : Components())
+		Created(component);
+
+	controls_.shrink_to_fit();
+	panels_.shrink_to_fit();
+}
+
 } //ion::gui

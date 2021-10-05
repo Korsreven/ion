@@ -239,6 +239,15 @@ namespace ion::gui
 
 			//Remove a removable panel with the given name from this container
 			bool RemovePanel(std::string_view name) noexcept;
+
+
+			/*
+				Components
+				Removing (optimization)
+			*/
+
+			//Clear all removable components from this container
+			void ClearComponents() noexcept;
 	};
 } //ion::gui
 
