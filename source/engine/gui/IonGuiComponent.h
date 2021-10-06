@@ -47,7 +47,7 @@ namespace ion::gui
 
 		protected:
 
-			GuiContainer *parent_ = nullptr;
+			GuiComponent *parent_ = nullptr;
 			NonOwningPtr<SceneNode> node_;
 
 		public:
@@ -80,6 +80,9 @@ namespace ion::gui
 			/*
 				Modifiers
 			*/
+
+			//Set the parent of this component
+			void Parent(GuiComponent &parent) noexcept;
 
 			//Set ownership of this component
 			void Owner(GuiContainer &owner) noexcept;

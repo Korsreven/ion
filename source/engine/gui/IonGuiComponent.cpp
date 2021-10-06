@@ -59,6 +59,14 @@ GuiComponent::~GuiComponent() noexcept
 	Modifiers
 */
 
+void GuiComponent::Parent(GuiComponent &parent) noexcept
+{
+	if (node_)
+		parent.node_->Adopt(node_->ParentNode()->Orphan(*node_));
+
+	parent_ = &parent;
+}
+
 void GuiComponent::Owner(GuiContainer &owner) noexcept
 {
 	managed::ManagedObject<GuiContainer>::Owner(owner);

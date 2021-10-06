@@ -50,7 +50,11 @@ namespace ion::gui
 				Observers
 			*/
 
-
+			//Returns a pointer to the owner of this panel
+			[[nodiscard]] inline auto Owner() const noexcept
+			{
+				return static_cast<GuiPanelContainer*>(owner_);
+			}
 	};
 } //ion::gui
 

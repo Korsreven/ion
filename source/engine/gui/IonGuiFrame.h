@@ -23,6 +23,8 @@ File:	IonGuiFrame.h
 
 namespace ion::gui
 {
+	class GuiController; //Forward declaration
+
 	namespace gui_frame::detail
 	{
 	} //gui_frame::detail
@@ -51,7 +53,8 @@ namespace ion::gui
 				Observers
 			*/
 
-
+			//Returns a pointer to the owner of this frame
+			GuiController* Owner() const noexcept;
 	};
 } //ion::gui
 

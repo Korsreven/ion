@@ -12,6 +12,8 @@ File:	IonGuiFrame.cpp
 
 #include "IonGuiFrame.h"
 
+#include "IonGuiController.h"
+
 namespace ion::gui
 {
 
@@ -25,6 +27,16 @@ GuiFrame::GuiFrame(std::string name) :
 	GuiPanelContainer{std::move(name)}
 {
 	//Empty
+}
+
+
+/*
+	Observers
+*/
+
+GuiController* GuiFrame::Owner() const noexcept
+{
+	return static_cast<GuiController*>(owner_);
 }
 
 } //ion::gui
