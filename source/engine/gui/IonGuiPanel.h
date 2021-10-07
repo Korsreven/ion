@@ -13,6 +13,7 @@ File:	IonGuiPanel.h
 #ifndef ION_GUI_PANEL_H
 #define ION_GUI_PANEL_H
 
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -55,6 +56,18 @@ namespace ion::gui
 			{
 				return static_cast<GuiPanelContainer*>(owner_);
 			}
+
+
+			/*
+				Tabulation
+			*/
+
+			//Sets the tab order of this panel to the given order
+			void TabOrder(int order) noexcept;
+
+			//Returns the tab order of this panel
+			//Returns nullopt if this panel has no owner
+			[[nodiscard]] std::optional<int> TabOrder() const noexcept;
 	};
 } //ion::gui
 

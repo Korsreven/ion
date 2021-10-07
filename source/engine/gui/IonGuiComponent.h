@@ -46,9 +46,27 @@ namespace ion::gui
 			void Detach() noexcept;
 
 		protected:
-
+			
+			bool enabled_ = true;
 			GuiComponent *parent_ = nullptr;
-			NonOwningPtr<SceneNode> node_;
+			NonOwningPtr<SceneNode> node_;		
+
+
+			/*
+				Events
+			*/
+
+			//Called right after a component has been enabled
+			virtual void Enabled() noexcept
+			{
+				//Optional to override
+			}
+
+			//Called right after a component has been disabled
+			virtual void Disabled() noexcept
+			{
+				//Optional to override
+			}
 
 		public:
 
@@ -81,6 +99,19 @@ namespace ion::gui
 				Modifiers
 			*/
 
+			//Sets whether or not this component is enabled
+			inline void Enabled(bool enabled) noexcept
+			{
+				if (enabled_ != enabled)
+				{
+					if (enabled_ = enabled)
+						Enabled();
+					else
+						Disabled();
+				}
+			}
+
+
 			//Set the parent of this component
 			void Parent(GuiComponent &parent) noexcept;
 
@@ -94,6 +125,12 @@ namespace ion::gui
 			/*
 				Observers
 			*/
+
+			//Returns true if this component is enabled
+			[[nodiscard]] inline auto Enabled() const noexcept
+			{
+				return enabled_;
+			}
 
 			//Returns a pointer to the parent of this component
 			[[nodiscard]] inline auto Parent() const noexcept

@@ -54,7 +54,7 @@ namespace ion::gui
 			*/
 
 			//Returns a pointer to the owner of this frame
-			GuiController* Owner() const noexcept;
+			[[nodiscard]] GuiController* Owner() const noexcept;
 	};
 } //ion::gui
 

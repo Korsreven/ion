@@ -27,4 +27,23 @@ GuiPanel::GuiPanel(std::string name) :
 	//Empty
 }
 
+
+/*
+	Tabulation
+*/
+
+void GuiPanel::TabOrder(int order) noexcept
+{
+	if (auto owner = Owner(); owner)
+		owner->TabOrder(*this, order);
+}
+
+std::optional<int> GuiPanel::TabOrder() const noexcept
+{
+	if (auto owner = Owner(); owner)
+		return owner->TabOrder(*this);
+	else
+		return std::nullopt;
+}
+
 } //ion::gui

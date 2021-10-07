@@ -13,6 +13,7 @@ File:	IonGuiPanelContainer.h
 #ifndef ION_GUI_PANEL_CONTAINER_H
 #define ION_GUI_PANEL_CONTAINER_H
 
+#include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -37,6 +38,7 @@ namespace ion::gui
 		{
 			using control_pointers = std::vector<controls::GuiControl*>;
 			using panel_pointers = std::vector<GuiPanel*>;
+			using component_pointers = std::vector<GuiComponent*>;
 		} //detail
 	} //gui_panel_container
 
@@ -47,6 +49,7 @@ namespace ion::gui
 
 			gui_panel_container::detail::control_pointers controls_;
 			gui_panel_container::detail::panel_pointers panels_;
+			gui_panel_container::detail::component_pointers ordered_components_;
 
 		protected:
 
@@ -55,12 +58,12 @@ namespace ion::gui
 			*/
 
 			void Created(GuiComponent &component) noexcept override;
-			void Created(controls::GuiControl &control) noexcept;
-			void Created(GuiPanel &panel) noexcept;
+			virtual void Created(controls::GuiControl &control) noexcept;
+			virtual void Created(GuiPanel &panel) noexcept;
 
 			void Removed(GuiComponent &component) noexcept override;
-			void Removed(controls::GuiControl &control) noexcept;
-			void Removed(GuiPanel &panel) noexcept;
+			virtual void Removed(controls::GuiControl &control) noexcept;
+			virtual void Removed(GuiPanel &panel) noexcept;
 
 		public:
 
@@ -101,6 +104,21 @@ namespace ion::gui
 			}
 
 
+			//Returns a mutable range of all components ordered for tabulation
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto OrderedComponents() noexcept
+			{
+				return adaptors::ranges::DereferenceIterable<gui_panel_container::detail::component_pointers&>{ordered_components_};
+			}
+
+			//Returns an immutable range of all components ordered for tabulation
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto OrderedComponents() const noexcept
+			{
+				return adaptors::ranges::DereferenceIterable<const gui_panel_container::detail::component_pointers&>{ordered_components_};
+			}
+
+
 			/*
 				Modifiers
 			*/
@@ -113,6 +131,18 @@ namespace ion::gui
 			*/
 
 
+
+
+			/*
+				Tabulation
+			*/
+
+			//Sets the tab order of the given component to the given order
+			void TabOrder(GuiComponent &component, int order) noexcept;
+
+			//Returns the tab order of the given component
+			//Returns nullopt if the given component could not be found
+			[[nodiscard]] std::optional<int> TabOrder(const GuiComponent &component) const noexcept;
 
 
 			/*

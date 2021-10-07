@@ -35,6 +35,8 @@ namespace gui_panel_container::detail
 
 void GuiPanelContainer::Created(GuiComponent &component) noexcept
 {
+	ordered_components_.push_back(&component);
+
 	if (auto control = dynamic_cast<controls::GuiControl*>(&component); control)
 		Created(*control);
 	else if (auto panel = dynamic_cast<GuiPanel*>(&component); panel)
@@ -54,10 +56,23 @@ void GuiPanelContainer::Created(GuiPanel &panel) noexcept
 
 void GuiPanelContainer::Removed(GuiComponent &component) noexcept
 {
-	if (auto control = dynamic_cast<controls::GuiControl*>(&component); control)
-		Removed(*control);
-	else if (auto panel = dynamic_cast<GuiPanel*>(&component); panel)
-		Removed(*panel);
+	auto iter =
+		std::find_if(std::begin(ordered_components_), std::end(ordered_components_),
+			[&](auto &x) noexcept
+			{
+				return x == &component;
+			});
+
+	//Component found
+	if (iter != std::end(ordered_components_))
+	{
+		ordered_components_.erase(iter);
+
+		if (auto control = dynamic_cast<controls::GuiControl*>(&component); control)
+			Removed(*control);
+		else if (auto panel = dynamic_cast<GuiPanel*>(&component); panel)
+			Removed(*panel);
+	}
 }
 
 void GuiPanelContainer::Removed(controls::GuiControl &control) noexcept
@@ -86,6 +101,40 @@ void GuiPanelContainer::Removed(GuiPanel &panel) noexcept
 	//Panel found
 	if (iter != std::end(panels_))
 		panels_.erase(iter);
+}
+
+
+//Public
+
+/*
+	Tabulation
+*/
+
+void GuiPanelContainer::TabOrder(GuiComponent &component, int order) noexcept
+{
+	auto iter =
+		std::find(std::begin(ordered_components_), std::end(ordered_components_), this);
+
+	//Component found
+	if (iter != std::end(ordered_components_))
+	{
+		ordered_components_.erase(iter);
+		ordered_components_.insert(std::begin(ordered_components_) +
+			std::clamp(order, 0, std::ssize(ordered_components_)), &component);
+	}
+}
+
+std::optional<int> GuiPanelContainer::TabOrder(const GuiComponent &component) const noexcept
+{
+	for (auto order = 0; auto &ordered_component : ordered_components_)
+	{
+		if (ordered_component == &component)
+			return order;
+		else
+			++order;
+	}
+
+	return std::nullopt;
 }
 
 
@@ -214,6 +263,7 @@ void GuiPanelContainer::ClearComponents() noexcept
 {
 	controls_.clear();
 	panels_.clear();
+	ordered_components_.clear();
 	GuiContainer::ClearComponents();
 		//This will go much faster because controls and panels are pre-cleared
 	
@@ -224,6 +274,7 @@ void GuiPanelContainer::ClearComponents() noexcept
 
 	controls_.shrink_to_fit();
 	panels_.shrink_to_fit();
+	ordered_components_.shrink_to_fit();
 }
 
 } //ion::gui
