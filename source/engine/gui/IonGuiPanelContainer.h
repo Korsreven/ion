@@ -25,7 +25,9 @@ File:	IonGuiPanelContainer.h
 
 namespace ion::gui
 {
-	class GuiPanel; //Forward declaration
+	//Forward declarations
+	class GuiFrame;
+	class GuiPanel;
 
 	namespace controls
 	{
@@ -130,7 +132,8 @@ namespace ion::gui
 				Observers
 			*/
 
-
+			//Returns a pointer to the parent frame of this container
+			[[nodiscard]] GuiFrame* ParentFrame() const noexcept;
 
 
 			/*

@@ -111,9 +111,9 @@ namespace ion::gui
 				}
 			}
 
-
 			//Set the parent of this component
 			void Parent(GuiComponent &parent) noexcept;
+
 
 			//Set ownership of this component
 			void Owner(GuiContainer &owner) noexcept;
@@ -142,6 +142,13 @@ namespace ion::gui
 			[[nodiscard]] inline auto Node() const noexcept
 			{
 				return node_;
+			}
+
+
+			//Returns a pointer to the owner of this component
+			[[nodiscard]] inline auto Owner() const noexcept
+			{
+				return owner_;
 			}
 	};
 } //ion::gui

@@ -61,10 +61,13 @@ GuiComponent::~GuiComponent() noexcept
 
 void GuiComponent::Parent(GuiComponent &parent) noexcept
 {
-	if (node_)
-		parent.node_->Adopt(node_->ParentNode()->Orphan(*node_));
+	if (owner_ == parent.Owner())
+	{
+		if (node_)
+			parent.Node()->Adopt(node_->ParentNode()->Orphan(*node_));
 
-	parent_ = &parent;
+		parent_ = &parent;
+	}
 }
 
 void GuiComponent::Owner(GuiContainer &owner) noexcept

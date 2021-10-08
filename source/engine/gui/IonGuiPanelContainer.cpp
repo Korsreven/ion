@@ -15,6 +15,7 @@ File:	IonGuiPanelContainer.cpp
 #include <algorithm>
 #include <utility>
 
+#include "IonGuiFrame.h"
 #include "IonGuiPanel.h"
 #include "controls/IonGuiControl.h"
 
@@ -105,6 +106,21 @@ void GuiPanelContainer::Removed(GuiPanel &panel) noexcept
 
 
 //Public
+
+/*
+	Observers
+*/
+
+GuiFrame* GuiPanelContainer::ParentFrame() const noexcept
+{
+	if (auto frame = dynamic_cast<const GuiFrame*>(this); frame)
+		return const_cast<GuiFrame*>(frame);
+	else if (owner_)
+		return static_cast<GuiPanelContainer*>(owner_)->ParentFrame(); //Recursive
+	else
+		return nullptr;
+}
+
 
 /*
 	Tabulation
