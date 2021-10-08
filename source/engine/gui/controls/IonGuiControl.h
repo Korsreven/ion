@@ -64,7 +64,7 @@ namespace ion::gui::controls
 				Modifiers
 			*/
 
-			//Sets whether or not this control is in focus
+			//Sets whether or not this control is focused
 			inline void Focused(bool focused) noexcept
 			{
 				if (focused_ != focused)
@@ -87,14 +87,14 @@ namespace ion::gui::controls
 				Observers
 			*/
 
-			//Returns true if this control is in focus
-			[[nodiscard]] inline auto Focused() const noexcept
+			//Returns true if this control is focused
+			[[nodiscard]] inline auto IsFocused() const noexcept
 			{
 				return focused_;
 			}
 
 			//Returns true if this control is focusable
-			[[nodiscard]] inline auto Focusable() const noexcept
+			[[nodiscard]] inline auto IsFocusable() const noexcept
 			{
 				return focusable_;
 			}

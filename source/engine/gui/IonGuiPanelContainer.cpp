@@ -113,7 +113,7 @@ void GuiPanelContainer::Removed(GuiPanel &panel) noexcept
 void GuiPanelContainer::TabOrder(GuiComponent &component, int order) noexcept
 {
 	auto iter =
-		std::find(std::begin(ordered_components_), std::end(ordered_components_), this);
+		std::find(std::begin(ordered_components_), std::end(ordered_components_), &component);
 
 	//Component found
 	if (iter != std::end(ordered_components_))

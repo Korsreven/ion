@@ -127,7 +127,7 @@ namespace ion::gui
 			*/
 
 			//Returns true if this component is enabled
-			[[nodiscard]] inline auto Enabled() const noexcept
+			[[nodiscard]] inline auto IsEnabled() const noexcept
 			{
 				return enabled_;
 			}
