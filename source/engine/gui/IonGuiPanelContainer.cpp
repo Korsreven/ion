@@ -105,6 +105,28 @@ void GuiPanelContainer::Removed(GuiPanel &panel) noexcept
 }
 
 
+void GuiPanelContainer::Enabled(GuiComponent &component) noexcept
+{
+	//Optional to override
+}
+
+void GuiPanelContainer::Disabled(GuiComponent &component) noexcept
+{
+	//Optional to override
+}
+
+
+void GuiPanelContainer::Focused(controls::GuiControl &control) noexcept
+{
+	//Optional to override
+}
+
+void GuiPanelContainer::Defocused(controls::GuiControl &control) noexcept
+{
+	//Optional to override
+}
+
+
 //Public
 
 /*
@@ -123,16 +145,67 @@ GuiFrame* GuiPanelContainer::ParentFrame() const noexcept
 
 
 /*
-	Tabulation
+	Enabling / disabling
+*/
+
+
+void GuiPanelContainer::Enabled(GuiComponent &component, bool enabled)
+{
+	if (component.Owner() == this)
+	{
+		if (GuiPanelContainer* frame = ParentFrame(); frame)
+		{
+			if (enabled)
+				frame->Enabled(component);
+			else
+				frame->Disabled(component);
+		}
+	}
+}
+
+std::optional<bool> GuiPanelContainer::IsEnabled(const GuiComponent &component) const noexcept
+{
+	return component.Owner() == this ?
+		std::make_optional(component.IsEnabled()) :
+		std::nullopt;
+}
+
+
+/*
+	Focusing / defocusing
+*/
+
+void GuiPanelContainer::Focused(controls::GuiControl &control, bool enabled)
+{
+	if (control.Owner() == this)
+	{
+		if (GuiPanelContainer* frame = ParentFrame(); frame)
+		{
+			if (enabled)
+				frame->Focused(control);
+			else
+				frame->Defocused(control);
+		}
+	}
+}
+
+std::optional<bool> GuiPanelContainer::IsFocused(const controls::GuiControl &control) const noexcept
+{
+	return control.Owner() == this ?
+		std::make_optional(control.IsFocused()) :
+		std::nullopt;
+}
+
+
+/*
+	Tabulating
 */
 
 void GuiPanelContainer::TabOrder(GuiComponent &component, int order) noexcept
 {
-	auto iter =
-		std::find(std::begin(ordered_components_), std::end(ordered_components_), &component);
-
 	//Component found
-	if (iter != std::end(ordered_components_))
+	if (auto iter = std::find(std::begin(ordered_components_), std::end(ordered_components_), &component);
+		iter != std::end(ordered_components_))
 	{
 		ordered_components_.erase(iter);
 		ordered_components_.insert(std::begin(ordered_components_) +

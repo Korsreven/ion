@@ -39,6 +39,23 @@ void GuiComponent::Detach() noexcept
 }
 
 
+//Protected
+
+/*
+	Events
+*/
+
+void GuiComponent::Enabled() noexcept
+{
+	//Optional to override
+}
+
+void GuiComponent::Disabled() noexcept
+{
+	//Optional to override
+}
+
+
 //Public
 
 GuiComponent::GuiComponent(const GuiComponent &rhs) :

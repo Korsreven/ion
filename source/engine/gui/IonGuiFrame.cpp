@@ -23,6 +23,36 @@ namespace gui_frame::detail
 } //gui_frame::detail
 
 
+//Protected
+
+/*
+	Events
+*/
+
+void GuiFrame::Enabled(GuiComponent &component) noexcept
+{
+
+}
+
+void GuiFrame::Disabled(GuiComponent &component) noexcept
+{
+
+}
+
+
+void GuiFrame::Focused(controls::GuiControl &control) noexcept
+{
+
+}
+
+void GuiFrame::Defocused(controls::GuiControl &control) noexcept
+{
+
+}
+
+
+//Public
+
 GuiFrame::GuiFrame(std::string name) :
 	GuiPanelContainer{std::move(name)}
 {

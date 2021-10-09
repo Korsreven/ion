@@ -59,7 +59,7 @@ namespace ion::gui
 
 
 			/*
-				Tabulation
+				Tabulating
 			*/
 
 			//Sets the tab order of this panel to the given order

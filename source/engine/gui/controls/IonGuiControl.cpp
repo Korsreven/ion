@@ -22,6 +22,45 @@ namespace gui_control::detail
 
 } //gui_control::detail
 
+//Protected
+
+/*
+	Events
+*/
+
+void GuiControl::Enabled() noexcept
+{
+	if (auto owner = Owner(); owner)
+		owner->Enabled(*this, true);
+}
+
+void GuiControl::Disabled() noexcept
+{
+	if (focused_)
+	{
+		focused_ = false;
+		Defocused();
+	}
+
+	if (auto owner = Owner(); owner)
+		owner->Enabled(*this, false);
+}
+
+
+void GuiControl::Focused() noexcept
+{
+	if (auto owner = Owner(); owner)
+		owner->Focused(*this, true);
+}
+
+void GuiControl::Defocused() noexcept
+{
+	if (auto owner = Owner(); owner)
+		owner->Focused(*this, false);
+}
+
+
+//Public
 
 GuiControl::GuiControl(std::string name) :
 	GuiComponent{std::move(name)}
@@ -41,7 +80,7 @@ GuiPanelContainer* GuiControl::Owner() const noexcept
 
 
 /*
-	Tabulation
+	Tabulating
 */
 
 void GuiControl::TabOrder(int order) noexcept

@@ -59,13 +59,29 @@ namespace ion::gui
 				Events
 			*/
 
+			//See ObjectManager::Created for more details
 			void Created(GuiComponent &component) noexcept override;
 			virtual void Created(controls::GuiControl &control) noexcept;
 			virtual void Created(GuiPanel &panel) noexcept;
 
+			//See ObjectManager::Removed for more details
 			void Removed(GuiComponent &component) noexcept override;
 			virtual void Removed(controls::GuiControl &control) noexcept;
 			virtual void Removed(GuiPanel &panel) noexcept;
+
+
+			//See GuiComponent::Enabled for more details
+			virtual void Enabled(GuiComponent &component) noexcept;
+
+			//See GuiComponent::Disabled for more details
+			virtual void Disabled(GuiComponent &component) noexcept;
+
+
+			//See GuiControl::Focused for more details
+			virtual void Focused(controls::GuiControl &control) noexcept;
+
+			//See GuiControl::Defocused for more details
+			virtual void Defocused(controls::GuiControl &control) noexcept;
 
 		public:
 
@@ -106,14 +122,14 @@ namespace ion::gui
 			}
 
 
-			//Returns a mutable range of all components ordered for tabulation
+			//Returns a mutable range of all components ordered for tabulating
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto OrderedComponents() noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<gui_panel_container::detail::component_pointers&>{ordered_components_};
 			}
 
-			//Returns an immutable range of all components ordered for tabulation
+			//Returns an immutable range of all components ordered for tabulating
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto OrderedComponents() const noexcept
 			{
@@ -137,7 +153,31 @@ namespace ion::gui
 
 
 			/*
-				Tabulation
+				Enabling / disabling
+			*/
+
+			//Sets whether or not the given component is enabled
+			void Enabled(GuiComponent &component, bool enabled);
+
+			//Returns true if the given component is enabled
+			//Returns nullopt if the given component could not be found
+			[[nodiscard]] std::optional<bool> IsEnabled(const GuiComponent &component) const noexcept;
+
+
+			/*
+				Focusing / defocusing
+			*/
+
+			//Sets whether or not the given control is focused
+			void Focused(controls::GuiControl &control, bool enabled);
+
+			//Returns true if the given control is focused
+			//Returns nullopt if the given control could not be found
+			[[nodiscard]] std::optional<bool> IsFocused(const controls::GuiControl &control) const noexcept;
+
+
+			/*
+				Tabulating
 			*/
 
 			//Sets the tab order of the given component to the given order

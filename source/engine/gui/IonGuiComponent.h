@@ -57,16 +57,10 @@ namespace ion::gui
 			*/
 
 			//Called right after a component has been enabled
-			virtual void Enabled() noexcept
-			{
-				//Optional to override
-			}
+			virtual void Enabled() noexcept;
 
 			//Called right after a component has been disabled
-			virtual void Disabled() noexcept
-			{
-				//Optional to override
-			}
+			virtual void Disabled() noexcept;
 
 		public:
 
@@ -104,7 +98,7 @@ namespace ion::gui
 			{
 				if (enabled_ != enabled)
 				{
-					if (enabled_ = enabled)
+					if ((enabled_ = enabled) == true) //Suppress W4706
 						Enabled();
 					else
 						Disabled();

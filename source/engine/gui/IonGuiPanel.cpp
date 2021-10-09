@@ -29,7 +29,7 @@ GuiPanel::GuiPanel(std::string name) :
 
 
 /*
-	Tabulation
+	Tabulating
 */
 
 void GuiPanel::TabOrder(int order) noexcept

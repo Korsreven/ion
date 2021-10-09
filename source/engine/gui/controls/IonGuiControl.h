@@ -42,17 +42,18 @@ namespace ion::gui::controls
 				Events
 			*/
 
+			//See GuiComponent::Enabled for more details
+			virtual void Enabled() noexcept override;
+
+			//See GuiComponent::Disabled for more details
+			virtual void Disabled() noexcept override;
+
+
 			//Called right after a control has been focused
-			virtual void Focused() noexcept
-			{
-				//Optional to override
-			}
+			virtual void Focused() noexcept;
 
 			//Called right after a control has been defocused
-			virtual void Defocused() noexcept
-			{
-				//Optional to override
-			}
+			virtual void Defocused() noexcept;
 
 		public:
 
@@ -64,12 +65,19 @@ namespace ion::gui::controls
 				Modifiers
 			*/
 
+			//Sets whether or not this control is enabled
+			inline void Enabled(bool enabled) noexcept
+			{
+				return GuiComponent::Enabled(enabled);
+			}
+
 			//Sets whether or not this control is focused
 			inline void Focused(bool focused) noexcept
 			{
-				if (focused_ != focused)
+				if (focused_ != focused &&
+					enabled_ && focusable_)
 				{
-					if (focused_ = focused)
+					if ((focused_ = focused) == true) //Suppress W4706
 						Focused();
 					else
 						Defocused();
@@ -79,7 +87,14 @@ namespace ion::gui::controls
 			//Sets whether or not this control is focusable
 			inline void Focusable(bool focusable) noexcept
 			{
-				focusable_ = focusable;
+				if (focusable_ != focusable)
+				{
+					if (!(focusable_ = focusable) && focused_)
+					{
+						focused_ = false;
+						Defocused();
+					}
+				}
 			}
 
 
@@ -105,7 +120,7 @@ namespace ion::gui::controls
 
 
 			/*
-				Tabulation
+				Tabulating
 			*/
 
 			//Sets the tab order of this control to the given order

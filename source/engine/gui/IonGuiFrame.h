@@ -36,6 +36,25 @@ namespace ion::gui
 
 
 
+		protected:
+
+			/*
+				Events
+			*/
+
+			//See GuiPanelContainer::Enabled for more details
+			virtual void Enabled(GuiComponent &component) noexcept override;
+
+			//See GuiPanelContainer::Disabled for more details
+			virtual void Disabled(GuiComponent &component) noexcept override;
+
+
+			//See GuiPanelContainer::Focused for more details
+			virtual void Focused(controls::GuiControl &control) noexcept override;
+
+			//See GuiPanelContainer::Defocused for more details
+			virtual void Defocused(controls::GuiControl &control) noexcept override;
+
 		public:
 
 			//Construct a frame with the given name
