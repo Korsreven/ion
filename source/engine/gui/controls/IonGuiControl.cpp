@@ -97,4 +97,64 @@ std::optional<int> GuiControl::TabOrder() const noexcept
 		return std::nullopt;
 }
 
+
+/*
+	Frame events
+*/
+
+void GuiControl::FrameStarted([[maybe_unused]] duration time) noexcept
+{
+	//Optional to override
+}
+
+void GuiControl::FrameEnded([[maybe_unused]] duration time) noexcept
+{
+	//Optional to override
+}
+
+
+/*
+	Key events
+*/
+
+void GuiControl::KeyPressed([[maybe_unused]] KeyButton button) noexcept
+{
+	//Optional to override
+}
+
+void GuiControl::KeyReleased([[maybe_unused]] KeyButton button) noexcept
+{
+	//Optional to override
+}
+
+void GuiControl::CharacterPressed([[maybe_unused]] char character) noexcept
+{
+	//Optional to override
+}
+
+
+/*
+	Mouse events
+*/
+
+void GuiControl::MousePressed([[maybe_unused]] MouseButton button, [[maybe_unused]] Vector2 position) noexcept
+{
+	//Optional to override
+}
+
+void GuiControl::MouseReleased([[maybe_unused]] MouseButton button, [[maybe_unused]] Vector2 position) noexcept
+{
+	//Optional to override
+}
+
+void GuiControl::MouseMoved([[maybe_unused]] Vector2 position) noexcept
+{
+	//Optional to override
+}
+
+void GuiControl::MouseWheelRolled([[maybe_unused]] int delta, [[maybe_unused]] Vector2 position) noexcept
+{
+	//Optional to override
+}
+
 } //ion::gui::controls

@@ -33,22 +33,12 @@ GuiController::GuiController(SceneNode &parent_node)
 	Frame events
 */
 
-bool GuiController::FrameStarted(duration time) noexcept
+void GuiController::FrameStarted(duration time) noexcept
 {
-	return true;
+
 }
 
-bool GuiController::FrameEnded(duration time) noexcept
-{
-	return true;
-}
-
-
-/*
-	Window events
-*/
-
-void GuiController::WindowActionReceived(WindowAction action) noexcept
+void GuiController::FrameEnded(duration time) noexcept
 {
 
 }
@@ -94,6 +84,16 @@ void GuiController::MouseMoved(Vector2 position) noexcept
 }
 
 void GuiController::MouseWheelRolled(int delta, Vector2 position) noexcept
+{
+
+}
+
+
+/*
+	Window events
+*/
+
+void GuiController::WindowActionReceived(WindowAction action) noexcept
 {
 
 }

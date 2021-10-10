@@ -69,4 +69,64 @@ GuiController* GuiFrame::Owner() const noexcept
 	return static_cast<GuiController*>(owner_);
 }
 
+
+/*
+	Frame events
+*/
+
+void GuiFrame::FrameStarted(duration time) noexcept
+{
+
+}
+
+void GuiFrame::FrameEnded(duration time) noexcept
+{
+
+}
+
+
+/*
+	Key events
+*/
+
+void GuiFrame::KeyPressed(KeyButton button) noexcept
+{
+
+}
+
+void GuiFrame::KeyReleased(KeyButton button) noexcept
+{
+
+}
+
+void GuiFrame::CharacterPressed(char character) noexcept
+{
+
+}
+
+
+/*
+	Mouse events
+*/
+
+void GuiFrame::MousePressed(MouseButton button, Vector2 position) noexcept
+{
+
+}
+
+void GuiFrame::MouseReleased(MouseButton button, Vector2 position) noexcept
+{
+
+}
+
+void GuiFrame::MouseMoved(Vector2 position) noexcept
+{
+
+}
+
+void GuiFrame::MouseWheelRolled(int delta, Vector2 position) noexcept
+{
+
+}
+
 } //ion::gui

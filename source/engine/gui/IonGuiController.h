@@ -92,18 +92,10 @@ namespace ion::gui
 			*/
 
 			//Typically called from user code when a frame has started
-			bool FrameStarted(duration time) noexcept;
+			void FrameStarted(duration time) noexcept;
 
 			//Typically called from user code when a frame has ended
-			bool FrameEnded(duration time) noexcept;
-
-
-			/*
-				Window events
-			*/
-
-			//Typically called from user code when a window action has been received
-			void WindowActionReceived(WindowAction action) noexcept;
+			void FrameEnded(duration time) noexcept;
 
 
 			/*
@@ -135,6 +127,14 @@ namespace ion::gui
 
 			//Typically called from user code when the mouse wheel has been rolled
 			void MouseWheelRolled(int delta, Vector2 position) noexcept;
+
+
+			/*
+				Window events
+			*/
+
+			//Typically called from user code when a window action has been received
+			void WindowActionReceived(WindowAction action) noexcept;
 
 
 			/*

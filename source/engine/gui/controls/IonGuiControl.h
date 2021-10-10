@@ -16,6 +16,9 @@ File:	IonGuiControl.h
 #include <optional>
 #include <string>
 
+#include "events/listeners/IonKeyListener.h"
+#include "events/listeners/IonMouseListener.h"
+#include "graphics/utilities/IonVector2.h"
 #include "gui/IonGuiComponent.h"
 
 namespace ion::gui
@@ -25,6 +28,9 @@ namespace ion::gui
 
 namespace ion::gui::controls
 {
+	using namespace events::listeners;
+	using namespace ion::graphics::utilities;
+
 	namespace gui_control::detail
 	{
 	} //gui_control::detail
@@ -129,6 +135,48 @@ namespace ion::gui::controls
 			//Returns the tab order of this control
 			//Returns nullopt if this control has no owner
 			[[nodiscard]] std::optional<int> TabOrder() const noexcept;
+
+
+			/*
+				Frame events
+			*/
+
+			//Called from gui frame when a frame has started
+			virtual void FrameStarted(duration time) noexcept;
+
+			//Called from gui frame when a frame has ended
+			virtual void FrameEnded(duration time) noexcept;
+
+
+			/*
+				Key events
+			*/
+
+			//Called from gui frame when a key button has been pressed
+			virtual void KeyPressed(KeyButton button) noexcept;
+
+			//Called from gui frame when a key button has been released
+			virtual void KeyReleased(KeyButton button) noexcept;
+
+			//Called from gui frame when a character has been pressed
+			virtual void CharacterPressed(char character) noexcept;
+
+
+			/*
+				Mouse events
+			*/
+
+			//Called from gui frame when the mouse button has been pressed
+			virtual void MousePressed(MouseButton button, Vector2 position) noexcept;
+
+			//Called from gui frame when the mouse button has been released
+			virtual void MouseReleased(MouseButton button, Vector2 position) noexcept;
+
+			//Called from gui frame when the mouse has been moved
+			virtual void MouseMoved(Vector2 position) noexcept;
+
+			//Called from gui frame when the mouse wheel has been rolled
+			virtual void MouseWheelRolled(int delta, Vector2 position) noexcept;
 	};
 } //ion::gui::controls
 
