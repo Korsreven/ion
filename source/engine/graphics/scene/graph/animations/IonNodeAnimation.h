@@ -366,6 +366,25 @@ namespace ion::graphics::scene::graph::animations
 			}
 
 
+			//Returns the on start callback
+			[[nodiscard]] inline auto OnStart() const noexcept
+			{
+				return on_start_;
+			}
+
+			//Returns the on finish callback
+			[[nodiscard]] inline auto OnFinish() const noexcept
+			{
+				return on_finish_;
+			}
+
+			//Returns the on finish revert callback
+			[[nodiscard]] inline auto OnFinishRevert() const noexcept
+			{
+				return on_finish_revert_;
+			}
+
+
 			/*
 				Elapse time
 			*/
