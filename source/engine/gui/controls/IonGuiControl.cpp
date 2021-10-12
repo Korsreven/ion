@@ -17,6 +17,8 @@ File:	IonGuiControl.cpp
 namespace ion::gui::controls
 {
 
+using namespace gui_control;
+
 namespace gui_control::detail
 {
 
@@ -32,6 +34,8 @@ void GuiControl::Enabled() noexcept
 {
 	if (auto owner = Owner(); owner)
 		owner->Enabled(*this, true);
+
+	GuiComponent::Enabled(); //Use base functionality
 }
 
 void GuiControl::Disabled() noexcept
@@ -44,19 +48,64 @@ void GuiControl::Disabled() noexcept
 
 	if (auto owner = Owner(); owner)
 		owner->Enabled(*this, false);
+
+	GuiComponent::Disabled(); //Use base functionality
 }
 
+
+void GuiControl::Pressed() noexcept
+{
+	//User callback
+	if (on_press_)
+		(*on_press_)(*this);
+}
+
+void GuiControl::Released() noexcept
+{
+	//User callback
+	if (on_release_)
+		(*on_release_)(*this);
+}
 
 void GuiControl::Focused() noexcept
 {
 	if (auto owner = Owner(); owner)
 		owner->Focused(*this, true);
+
+	//User callback
+	if (on_focus_)
+		(*on_focus_)(*this);
 }
 
 void GuiControl::Defocused() noexcept
 {
 	if (auto owner = Owner(); owner)
 		owner->Focused(*this, false);
+
+	//User callback
+	if (on_defocus_)
+		(*on_defocus_)(*this);
+}
+
+void GuiControl::Changed() noexcept
+{
+	//User callback
+	if (on_change_)
+		(*on_change_)(*this);
+}
+
+void GuiControl::Entered() noexcept
+{
+	//User callback
+	if (on_enter_)
+		(*on_enter_)(*this);
+}
+
+void GuiControl::Exited() noexcept
+{
+	//User callback
+	if (on_exit_)
+		(*on_exit_)(*this);
 }
 
 

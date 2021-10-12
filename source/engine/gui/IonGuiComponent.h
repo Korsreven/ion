@@ -13,9 +13,11 @@ File:	IonGuiComponent.h
 #ifndef ION_GUI_COMPONENT_H
 #define ION_GUI_COMPONENT_H
 
+#include <optional>
 #include <string>
 #include <utility>
 
+#include "events/IonCallback.h"
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
 
@@ -49,7 +51,10 @@ namespace ion::gui
 			
 			bool enabled_ = true;
 			GuiComponent *parent_ = nullptr;
-			NonOwningPtr<SceneNode> node_;		
+			NonOwningPtr<SceneNode> node_;
+
+			std::optional<events::Callback<void, GuiComponent&>> on_enable_;
+			std::optional<events::Callback<void, GuiComponent&>> on_disable_;
 
 
 			/*
@@ -109,6 +114,32 @@ namespace ion::gui
 			void Parent(GuiComponent &parent) noexcept;
 
 
+			//Sets the on enable callback
+			inline void OnEnable(events::Callback<void, GuiComponent&> on_enable) noexcept
+			{
+				on_enable_ = on_enable;
+			}
+
+			//Sets the on enable callback
+			inline void OnEnable(std::nullopt_t) noexcept
+			{
+				on_enable_ = {};
+			}
+
+
+			//Sets the on disable callback
+			inline void OnDisable(events::Callback<void, GuiComponent&> on_disable) noexcept
+			{
+				on_disable_ = on_disable;
+			}
+
+			//Sets the on disable callback
+			inline void OnDisable(std::nullopt_t) noexcept
+			{
+				on_disable_ = {};
+			}
+
+
 			//Set ownership of this component
 			void Owner(GuiContainer &owner) noexcept;
 
@@ -136,6 +167,19 @@ namespace ion::gui
 			[[nodiscard]] inline auto Node() const noexcept
 			{
 				return node_;
+			}
+
+
+			//Returns the on enable callback
+			[[nodiscard]] inline auto OnEnable() const noexcept
+			{
+				return on_enable_;
+			}
+
+			//Returns the on disable callback
+			[[nodiscard]] inline auto OnDisable() const noexcept
+			{
+				return on_disable_;
 			}
 
 

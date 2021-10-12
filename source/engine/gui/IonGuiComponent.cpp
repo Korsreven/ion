@@ -47,12 +47,16 @@ void GuiComponent::Detach() noexcept
 
 void GuiComponent::Enabled() noexcept
 {
-	//Optional to override
+	//User callback
+	if (on_enable_)
+		(*on_enable_)(*this);
 }
 
 void GuiComponent::Disabled() noexcept
 {
-	//Optional to override
+	//User callback
+	if (on_disable_)
+		(*on_disable_)(*this);
 }
 
 
