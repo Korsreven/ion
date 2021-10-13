@@ -32,6 +32,8 @@ namespace gui_control::detail
 
 void GuiControl::Enabled() noexcept
 {
+	SetState(VisualState::Enabled);
+
 	if (auto owner = Owner(); owner)
 		owner->Enabled(*this, true);
 
@@ -40,11 +42,16 @@ void GuiControl::Enabled() noexcept
 
 void GuiControl::Disabled() noexcept
 {
+	if (/*hover*/false)
+		Exited();
+
 	if (focused_)
 	{
 		focused_ = false;
 		Defocused();
 	}
+
+	SetState(VisualState::Disabled);
 
 	if (auto owner = Owner(); owner)
 		owner->Enabled(*this, false);
@@ -53,22 +60,11 @@ void GuiControl::Disabled() noexcept
 }
 
 
-void GuiControl::Pressed() noexcept
-{
-	//User callback
-	if (on_press_)
-		(*on_press_)(*this);
-}
-
-void GuiControl::Released() noexcept
-{
-	//User callback
-	if (on_release_)
-		(*on_release_)(*this);
-}
-
 void GuiControl::Focused() noexcept
 {
+	if (state_ == VisualState::Enabled)
+		SetState(VisualState::Focused);
+
 	if (auto owner = Owner(); owner)
 		owner->Focused(*this, true);
 
@@ -79,12 +75,66 @@ void GuiControl::Focused() noexcept
 
 void GuiControl::Defocused() noexcept
 {
+	if (state_ == VisualState::Focused)
+		SetState(VisualState::Enabled);
+
 	if (auto owner = Owner(); owner)
 		owner->Focused(*this, false);
 
 	//User callback
 	if (on_defocus_)
 		(*on_defocus_)(*this);
+}
+
+void GuiControl::Pressed() noexcept
+{
+	if (!focused_ && focusable_)
+		Focused(true);
+
+	SetState(VisualState::Pressed);
+
+	//User callback
+	if (on_press_)
+		(*on_press_)(*this);
+}
+
+void GuiControl::Released() noexcept
+{
+	if (/*hover*/false)
+		SetState(VisualState::Hover);
+	else if (focused_)
+		SetState(VisualState::Focused);
+	else
+		SetState(VisualState::Enabled);
+
+	//User callback
+	if (on_release_)
+		(*on_release_)(*this);
+}
+
+void GuiControl::Entered() noexcept
+{
+	if (state_ != VisualState::Pressed)
+		SetState(VisualState::Hover);
+
+	//User callback
+	if (on_enter_)
+		(*on_enter_)(*this);
+}
+
+void GuiControl::Exited() noexcept
+{
+	if (state_ != VisualState::Pressed)
+	{
+		if (focused_)
+			SetState(VisualState::Focused);
+		else
+			SetState(VisualState::Enabled);
+	}
+
+	//User callback
+	if (on_exit_)
+		(*on_exit_)(*this);
 }
 
 void GuiControl::Changed() noexcept
@@ -94,18 +144,17 @@ void GuiControl::Changed() noexcept
 		(*on_change_)(*this);
 }
 
-void GuiControl::Entered() noexcept
-{
-	//User callback
-	if (on_enter_)
-		(*on_enter_)(*this);
-}
 
-void GuiControl::Exited() noexcept
+/*
+	States
+*/
+
+void GuiControl::SetState(VisualState state) noexcept
 {
-	//User callback
-	if (on_exit_)
-		(*on_exit_)(*this);
+	if (state_ != state)
+	{
+		state_ = state;
+	}
 }
 
 
