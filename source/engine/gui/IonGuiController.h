@@ -15,6 +15,7 @@ File:	IonGuiController.h
 
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "IonGuiContainer.h"
 #include "IonGuiFrame.h"
@@ -39,6 +40,10 @@ namespace ion::gui
 
 	namespace gui_controller::detail
 	{
+		using frame_pointers = std::vector<GuiFrame*>;
+		using active_frames = std::vector<frame_pointers>;
+			//Only the active frames at the top (back) of the stack are enabled
+			//The rest of the active frames in the stack are disabled (but visible)
 	} //gui_controller::detail
 
 
@@ -46,7 +51,7 @@ namespace ion::gui
 	{
 		private:
 
-			
+			gui_controller::detail::active_frames active_frames_;
 
 		public:
 
