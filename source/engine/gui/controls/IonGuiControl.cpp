@@ -32,7 +32,7 @@ namespace gui_control::detail
 
 void GuiControl::Enabled() noexcept
 {
-	SetState(VisualState::Enabled);
+	SetState(ControlState::Enabled);
 
 	if (auto owner = Owner(); owner)
 		owner->Enabled(*this, true);
@@ -51,7 +51,7 @@ void GuiControl::Disabled() noexcept
 		Defocused();
 	}
 
-	SetState(VisualState::Disabled);
+	SetState(ControlState::Disabled);
 
 	if (auto owner = Owner(); owner)
 		owner->Enabled(*this, false);
@@ -62,8 +62,8 @@ void GuiControl::Disabled() noexcept
 
 void GuiControl::Focused() noexcept
 {
-	if (state_ == VisualState::Enabled)
-		SetState(VisualState::Focused);
+	if (state_ == ControlState::Enabled)
+		SetState(ControlState::Focused);
 
 	if (auto owner = Owner(); owner)
 		owner->Focused(*this, true);
@@ -75,8 +75,8 @@ void GuiControl::Focused() noexcept
 
 void GuiControl::Defocused() noexcept
 {
-	if (state_ == VisualState::Focused)
-		SetState(VisualState::Enabled);
+	if (state_ == ControlState::Focused)
+		SetState(ControlState::Enabled);
 
 	if (auto owner = Owner(); owner)
 		owner->Focused(*this, false);
@@ -91,7 +91,7 @@ void GuiControl::Pressed() noexcept
 	if (!focused_ && focusable_)
 		Focused(true);
 
-	SetState(VisualState::Pressed);
+	SetState(ControlState::Pressed);
 
 	//User callback
 	if (on_press_)
@@ -101,11 +101,11 @@ void GuiControl::Pressed() noexcept
 void GuiControl::Released() noexcept
 {
 	if (/*hover*/false)
-		SetState(VisualState::Hover);
+		SetState(ControlState::Hover);
 	else if (focused_)
-		SetState(VisualState::Focused);
+		SetState(ControlState::Focused);
 	else
-		SetState(VisualState::Enabled);
+		SetState(ControlState::Enabled);
 
 	//User callback
 	if (on_release_)
@@ -114,8 +114,8 @@ void GuiControl::Released() noexcept
 
 void GuiControl::Entered() noexcept
 {
-	if (state_ != VisualState::Pressed)
-		SetState(VisualState::Hover);
+	if (state_ != ControlState::Pressed)
+		SetState(ControlState::Hover);
 
 	//User callback
 	if (on_enter_)
@@ -124,12 +124,12 @@ void GuiControl::Entered() noexcept
 
 void GuiControl::Exited() noexcept
 {
-	if (state_ != VisualState::Pressed)
+	if (state_ != ControlState::Pressed)
 	{
 		if (focused_)
-			SetState(VisualState::Focused);
+			SetState(ControlState::Focused);
 		else
-			SetState(VisualState::Enabled);
+			SetState(ControlState::Enabled);
 	}
 
 	//User callback
@@ -149,7 +149,7 @@ void GuiControl::Changed() noexcept
 	States
 */
 
-void GuiControl::SetState(VisualState state) noexcept
+void GuiControl::SetState(ControlState state) noexcept
 {
 	if (state_ != state)
 	{

@@ -34,7 +34,7 @@ namespace ion::gui::controls
 
 	namespace gui_control
 	{
-		enum class VisualState
+		enum class ControlState
 		{
 			Enabled,
 			Disabled,
@@ -57,7 +57,7 @@ namespace ion::gui::controls
 			
 			bool focused_ = false;
 			bool focusable_ = true;
-			gui_control::VisualState state_ = gui_control::VisualState::Enabled;
+			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
 			std::optional<events::Callback<void, GuiControl&>> on_defocus_;
@@ -107,7 +107,7 @@ namespace ion::gui::controls
 				States
 			*/
 
-			void SetState(gui_control::VisualState state) noexcept;
+			void SetState(gui_control::ControlState state) noexcept;
 
 		public:
 
@@ -257,6 +257,12 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto IsFocusable() const noexcept
 			{
 				return focusable_;
+			}
+
+			//Returns the visual state of this control
+			[[nodiscard]] inline auto VisualState() const noexcept
+			{
+				return state_;
 			}
 
 
