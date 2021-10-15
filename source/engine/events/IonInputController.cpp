@@ -26,7 +26,7 @@ using namespace listeners;
 
 bool InputController::Unsubscribable(Listenable<WindowListener>&) noexcept
 {
-	//Cancel all unsubscribe atempts
+	//Cancel all unsubscribe attempts
 	return false;
 }
 

@@ -17,6 +17,8 @@ File:	IonGuiControl.h
 #include <string>
 
 #include "events/IonCallback.h"
+#include "events/IonEventGenerator.h"
+#include "events/listeners/IonGuiControlListener.h"
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
 #include "graphics/utilities/IonVector2.h"
@@ -51,7 +53,9 @@ namespace ion::gui::controls
 	} //gui_control
 
 
-	class GuiControl : public GuiComponent
+	class GuiControl :
+		public GuiComponent,
+		protected events::EventGenerator<events::listeners::GuiControlListener>
 	{
 		protected:
 			
@@ -62,7 +66,7 @@ namespace ion::gui::controls
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
 			std::optional<events::Callback<void, GuiControl&>> on_defocus_;
 			std::optional<events::Callback<void, GuiControl&>> on_press_;
-			std::optional<events::Callback<void, GuiControl&>> on_release_;		
+			std::optional<events::Callback<void, GuiControl&>> on_release_;
 			std::optional<events::Callback<void, GuiControl&>> on_enter_;
 			std::optional<events::Callback<void, GuiControl&>> on_exit_;
 			std::optional<events::Callback<void, GuiControl&>> on_change_;
@@ -85,11 +89,13 @@ namespace ion::gui::controls
 			//Called right after a control has been defocused
 			virtual void Defocused() noexcept;
 
+
 			//Called right after a control has been pressed
 			virtual void Pressed() noexcept;
 
 			//Called right after a control has been released
 			virtual void Released() noexcept;
+
 
 			//Called right after a control has been entered
 			//Namely when the mouse cursor has entered the control
@@ -99,8 +105,28 @@ namespace ion::gui::controls
 			//Namely when the mouse cursor has exited the control
 			virtual void Exited() noexcept;
 
+
 			//Called right after a control has been changed
 			virtual void Changed() noexcept;
+
+
+			/*
+				Notifying
+			*/
+
+			void NotifyControlEnabled() noexcept;
+			void NotifyControlDisabled() noexcept;
+
+			void NotifyControlFocused() noexcept;
+			void NotifyControlDefocused() noexcept;
+
+			void NotifyControlPressed() noexcept;
+			void NotifyControlReleased() noexcept;
+
+			void NotifyControlEntered() noexcept;
+			void NotifyControlExited() noexcept;
+
+			void NotifyControlChanged() noexcept;
 
 
 			/*

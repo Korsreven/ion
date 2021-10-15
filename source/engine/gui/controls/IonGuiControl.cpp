@@ -12,6 +12,7 @@ File:	IonGuiControl.cpp
 
 #include "IonGuiControl.h"
 
+#include "gui/IonGuiFrame.h"
 #include "gui/IonGuiPanelContainer.h"
 
 namespace ion::gui::controls
@@ -34,9 +35,7 @@ void GuiControl::Enabled() noexcept
 {
 	SetState(ControlState::Enabled);
 
-	if (auto owner = Owner(); owner)
-		owner->Enabled(*this, true);
-
+	NotifyControlEnabled();
 	GuiComponent::Enabled(); //Use base functionality
 }
 
@@ -53,9 +52,7 @@ void GuiControl::Disabled() noexcept
 
 	SetState(ControlState::Disabled);
 
-	if (auto owner = Owner(); owner)
-		owner->Enabled(*this, false);
-
+	NotifyControlDisabled();
 	GuiComponent::Disabled(); //Use base functionality
 }
 
@@ -65,12 +62,7 @@ void GuiControl::Focused() noexcept
 	if (state_ == ControlState::Enabled)
 		SetState(ControlState::Focused);
 
-	if (auto owner = Owner(); owner)
-		owner->Focused(*this, true);
-
-	//User callback
-	if (on_focus_)
-		(*on_focus_)(*this);
+	NotifyControlFocused();
 }
 
 void GuiControl::Defocused() noexcept
@@ -78,13 +70,9 @@ void GuiControl::Defocused() noexcept
 	if (state_ == ControlState::Focused)
 		SetState(ControlState::Enabled);
 
-	if (auto owner = Owner(); owner)
-		owner->Focused(*this, false);
-
-	//User callback
-	if (on_defocus_)
-		(*on_defocus_)(*this);
+	NotifyControlDefocused();
 }
+
 
 void GuiControl::Pressed() noexcept
 {
@@ -92,10 +80,7 @@ void GuiControl::Pressed() noexcept
 		Focused(true);
 
 	SetState(ControlState::Pressed);
-
-	//User callback
-	if (on_press_)
-		(*on_press_)(*this);
+	NotifyControlPressed();
 }
 
 void GuiControl::Released() noexcept
@@ -107,19 +92,16 @@ void GuiControl::Released() noexcept
 	else
 		SetState(ControlState::Enabled);
 
-	//User callback
-	if (on_release_)
-		(*on_release_)(*this);
+	NotifyControlReleased();
 }
+
 
 void GuiControl::Entered() noexcept
 {
 	if (state_ != ControlState::Pressed)
 		SetState(ControlState::Hover);
 
-	//User callback
-	if (on_enter_)
-		(*on_enter_)(*this);
+	NotifyControlEntered();
 }
 
 void GuiControl::Exited() noexcept
@@ -132,13 +114,137 @@ void GuiControl::Exited() noexcept
 			SetState(ControlState::Enabled);
 	}
 
+	NotifyControlExited();
+}
+
+
+void GuiControl::Changed() noexcept
+{
+	NotifyControlChanged();
+}
+
+
+/*
+	Notifying
+*/
+
+void GuiControl::NotifyControlEnabled() noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::Enabled, std::ref(*this));
+	}
+}
+
+void GuiControl::NotifyControlDisabled() noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::Disabled, std::ref(*this));
+	}
+}
+
+
+void GuiControl::NotifyControlFocused() noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::Focused, std::ref(*this));
+	}
+
+	//User callback
+	if (on_focus_)
+		(*on_focus_)(*this);
+}
+
+void GuiControl::NotifyControlDefocused() noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::Defocused, std::ref(*this));
+	}
+
+	//User callback
+	if (on_defocus_)
+		(*on_defocus_)(*this);
+}
+
+
+void GuiControl::NotifyControlPressed() noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::Pressed, std::ref(*this));
+	}
+
+	//User callback
+	if (on_press_)
+		(*on_press_)(*this);
+}
+
+void GuiControl::NotifyControlReleased() noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::Released, std::ref(*this));
+	}
+
+	//User callback
+	if (on_release_)
+		(*on_release_)(*this);
+}
+
+
+void GuiControl::NotifyControlEntered() noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::Entered, std::ref(*this));
+	}
+
+	//User callback
+	if (on_enter_)
+		(*on_enter_)(*this);
+}
+
+void GuiControl::NotifyControlExited() noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::Exited, std::ref(*this));
+	}
+
 	//User callback
 	if (on_exit_)
 		(*on_exit_)(*this);
 }
 
-void GuiControl::Changed() noexcept
+
+void GuiControl::NotifyControlChanged() noexcept
 {
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::Changed, std::ref(*this));
+	}
+
 	//User callback
 	if (on_change_)
 		(*on_change_)(*this);

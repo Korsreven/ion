@@ -105,28 +105,6 @@ void GuiPanelContainer::Removed(GuiPanel &panel) noexcept
 }
 
 
-void GuiPanelContainer::Enabled(GuiComponent &component) noexcept
-{
-	//Optional to override
-}
-
-void GuiPanelContainer::Disabled(GuiComponent &component) noexcept
-{
-	//Optional to override
-}
-
-
-void GuiPanelContainer::Focused(controls::GuiControl &control) noexcept
-{
-	//Optional to override
-}
-
-void GuiPanelContainer::Defocused(controls::GuiControl &control) noexcept
-{
-	//Optional to override
-}
-
-
 //Public
 
 /*
@@ -141,59 +119,6 @@ GuiFrame* GuiPanelContainer::ParentFrame() const noexcept
 		return static_cast<GuiPanelContainer*>(owner_)->ParentFrame(); //Recursive
 	else
 		return nullptr;
-}
-
-
-/*
-	Enabling / disabling
-*/
-
-
-void GuiPanelContainer::Enabled(GuiComponent &component, bool enabled)
-{
-	if (component.Owner() == this)
-	{
-		if (GuiPanelContainer* frame = ParentFrame(); frame)
-		{
-			if (enabled)
-				frame->Enabled(component);
-			else
-				frame->Disabled(component);
-		}
-	}
-}
-
-std::optional<bool> GuiPanelContainer::IsEnabled(const GuiComponent &component) const noexcept
-{
-	return component.Owner() == this ?
-		std::make_optional(component.IsEnabled()) :
-		std::nullopt;
-}
-
-
-/*
-	Focusing / defocusing
-*/
-
-void GuiPanelContainer::Focused(controls::GuiControl &control, bool enabled)
-{
-	if (control.Owner() == this)
-	{
-		if (GuiPanelContainer* frame = ParentFrame(); frame)
-		{
-			if (enabled)
-				frame->Focused(control);
-			else
-				frame->Defocused(control);
-		}
-	}
-}
-
-std::optional<bool> GuiPanelContainer::IsFocused(const controls::GuiControl &control) const noexcept
-{
-	return control.Owner() == this ?
-		std::make_optional(control.IsFocused()) :
-		std::nullopt;
 }
 
 

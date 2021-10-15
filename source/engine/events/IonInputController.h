@@ -39,7 +39,7 @@ namespace ion::events
 			std::vector<listeners::MouseButton> mouse_buttons_;
 
 
-			//See Listener<T>::Unsubscribing for more details
+			//See Listener<T>::Unsubscribable for more details
 			//Make sure that if this input listener is about to unsubscribe from the system window, cancel it
 			bool Unsubscribable(ion::events::Listenable<WindowListener>&) noexcept override final;
 

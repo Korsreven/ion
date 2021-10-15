@@ -19,6 +19,8 @@ File:	IonGuiFrame.h
 #include "IonGuiPanel.h"
 #include "IonGuiPanelContainer.h"
 #include "controls/IonGuiControl.h"
+#include "events/IonListenable.h"
+#include "events/listeners/IonGuiControlListener.h"
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
 #include "graphics/utilities/IonVector2.h"
@@ -37,35 +39,88 @@ namespace ion::gui
 	} //gui_frame::detail
 
 
-	class GuiFrame : public GuiPanelContainer
+	class GuiFrame :
+		public GuiPanelContainer,
+		public events::Listenable<events::listeners::GuiControlListener>,
+		public events::listeners::GuiControlListener
 	{
 		private:
 
-
-
+			using ControlEventsBase = events::Listenable<events::listeners::GuiControlListener>;
+			using ManagedObjectEventsBase = events::Listenable<events::listeners::ManagedObjectListener<GuiComponent, GuiContainer>>;		
+		
 		protected:
 
 			/*
 				Events
 			*/
 
-			//See GuiPanelContainer::Enabled for more details
-			virtual void Enabled(GuiComponent &component) noexcept override;
-
-			//See GuiPanelContainer::Disabled for more details
-			virtual void Disabled(GuiComponent &component) noexcept override;
+			//See Listener<T>::Unsubscribable for more details
+			//Make sure that if this gui control listener is about to unsubscribe from the gui frame, cancel it
+			bool Unsubscribable(Listenable<events::listeners::GuiControlListener>&) noexcept override final;
 
 
-			//See GuiPanelContainer::Focused for more details
+			//See GuiControlListener::Enabled for more details
+			virtual void Enabled(controls::GuiControl &control) noexcept override;
+
+			//See GuiControlListener::Disabled for more details
+			virtual void Disabled(controls::GuiControl &control) noexcept override;
+
+
+			//See GuiControlListener::Focused for more details
 			virtual void Focused(controls::GuiControl &control) noexcept override;
 
-			//See GuiPanelContainer::Defocused for more details
+			//See GuiControlListener::Defocused for more details
 			virtual void Defocused(controls::GuiControl &control) noexcept override;
+
+
+			//See GuiControlListener::Pressed for more details
+			virtual void Pressed(controls::GuiControl &control) noexcept override;
+
+			//See GuiControlListener::Released for more details
+			virtual void Released(controls::GuiControl &control) noexcept override;
+
+
+			//See GuiControlListener::Entered for more details
+			virtual void Entered(controls::GuiControl &control) noexcept override;
+
+			//See GuiControlListener::Exited for more details
+			virtual void Exited(controls::GuiControl &control) noexcept override;
 
 		public:
 
 			//Construct a frame with the given name
 			GuiFrame(std::string name);
+
+
+			/*
+				Events
+			*/
+
+			//Return a mutable reference to the control events of this frame
+			[[nodiscard]] inline auto& ControlEvents() noexcept
+			{
+				return static_cast<ControlEventsBase&>(*this);
+			}
+
+			//Return a immutable reference to the control events of this frame
+			[[nodiscard]] inline auto& ControlEvents() const noexcept
+			{
+				return static_cast<const ControlEventsBase&>(*this);
+			}
+
+
+			//Return a mutable reference to the managed object events of this frame
+			[[nodiscard]] inline auto& ManagedObjectEvents() noexcept
+			{
+				return static_cast<ManagedObjectEventsBase&>(*this);
+			}
+
+			//Return a immutable reference to the managed object events of this frame
+			[[nodiscard]] inline auto& ManagedObjectEvents() const noexcept
+			{
+				return static_cast<const ManagedObjectEventsBase&>(*this);
+			}
 
 
 			/*

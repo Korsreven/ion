@@ -29,12 +29,19 @@ namespace gui_frame::detail
 	Events
 */
 
-void GuiFrame::Enabled(GuiComponent &component) noexcept
+bool GuiFrame::Unsubscribable(Listenable<events::listeners::GuiControlListener>&) noexcept
+{
+	//Cancel all unsubscribe attempts
+	return false;
+}
+
+
+void GuiFrame::Enabled(controls::GuiControl &control) noexcept
 {
 
 }
 
-void GuiFrame::Disabled(GuiComponent &component) noexcept
+void GuiFrame::Disabled(controls::GuiControl &control) noexcept
 {
 
 }
@@ -51,12 +58,34 @@ void GuiFrame::Defocused(controls::GuiControl &control) noexcept
 }
 
 
+void GuiFrame::Pressed(controls::GuiControl &control) noexcept
+{
+
+}
+
+void GuiFrame::Released(controls::GuiControl &control) noexcept
+{
+
+}
+
+
+void GuiFrame::Entered(controls::GuiControl &control) noexcept
+{
+
+}
+
+void GuiFrame::Exited(controls::GuiControl &control) noexcept
+{
+
+}
+
+
 //Public
 
 GuiFrame::GuiFrame(std::string name) :
 	GuiPanelContainer{std::move(name)}
 {
-	//Empty
+	ControlEvents().Subscribe(*this);
 }
 
 

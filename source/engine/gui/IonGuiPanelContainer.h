@@ -69,20 +69,6 @@ namespace ion::gui
 			virtual void Removed(controls::GuiControl &control) noexcept;
 			virtual void Removed(GuiPanel &panel) noexcept;
 
-
-			//See GuiComponent::Enabled for more details
-			virtual void Enabled(GuiComponent &component) noexcept;
-
-			//See GuiComponent::Disabled for more details
-			virtual void Disabled(GuiComponent &component) noexcept;
-
-
-			//See GuiControl::Focused for more details
-			virtual void Focused(controls::GuiControl &control) noexcept;
-
-			//See GuiControl::Defocused for more details
-			virtual void Defocused(controls::GuiControl &control) noexcept;
-
 		public:
 
 			using GuiContainer::GuiContainer;
@@ -150,30 +136,6 @@ namespace ion::gui
 
 			//Returns a pointer to the parent frame of this container
 			[[nodiscard]] GuiFrame* ParentFrame() const noexcept;
-
-
-			/*
-				Enabling / disabling
-			*/
-
-			//Sets whether or not the given component is enabled
-			void Enabled(GuiComponent &component, bool enabled);
-
-			//Returns true if the given component is enabled
-			//Returns nullopt if the given component could not be found
-			[[nodiscard]] std::optional<bool> IsEnabled(const GuiComponent &component) const noexcept;
-
-
-			/*
-				Focusing / defocusing
-			*/
-
-			//Sets whether or not the given control is focused
-			void Focused(controls::GuiControl &control, bool enabled);
-
-			//Returns true if the given control is focused
-			//Returns nullopt if the given control could not be found
-			[[nodiscard]] std::optional<bool> IsFocused(const controls::GuiControl &control) const noexcept;
 
 
 			/*
