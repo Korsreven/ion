@@ -66,14 +66,12 @@ void GuiPanelContainer::Removed(GuiComponent &component) noexcept
 
 	//Component found
 	if (iter != std::end(ordered_components_))
-	{
 		ordered_components_.erase(iter);
 
-		if (auto control = dynamic_cast<controls::GuiControl*>(&component); control)
-			Removed(*control);
-		else if (auto panel = dynamic_cast<GuiPanel*>(&component); panel)
-			Removed(*panel);
-	}
+	if (auto control = dynamic_cast<controls::GuiControl*>(&component); control)
+		Removed(*control);
+	else if (auto panel = dynamic_cast<GuiPanel*>(&component); panel)
+		Removed(*panel);
 }
 
 void GuiPanelContainer::Removed(controls::GuiControl &control) noexcept

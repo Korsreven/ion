@@ -47,13 +47,25 @@ namespace ion::gui
 		private:
 
 			using ControlEventsBase = events::Listenable<events::listeners::GuiControlListener>;
-			using ManagedObjectEventsBase = events::Listenable<events::listeners::ManagedObjectListener<GuiComponent, GuiContainer>>;		
+			using ManagedObjectEventsBase = events::Listenable<events::listeners::ManagedObjectListener<GuiComponent, GuiContainer>>;
 		
 		protected:
+
+			controls::GuiControl *focused_control_ = nullptr;	
+			controls::GuiControl *pressed_control_ = nullptr;
+			controls::GuiControl *hovered_control_ = nullptr;
+
 
 			/*
 				Events
 			*/
+
+			//See GuiPanelContainer::Created for more details
+			virtual void Created(controls::GuiControl &control) noexcept override;
+
+			//See GuiPanelContainer::Removed for more details
+			virtual void Removed(controls::GuiControl &control) noexcept override;
+
 
 			//See Listener<T>::Unsubscribable for more details
 			//Make sure that if this gui control listener is about to unsubscribe from the gui frame, cancel it

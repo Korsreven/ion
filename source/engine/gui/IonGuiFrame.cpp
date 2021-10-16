@@ -29,6 +29,52 @@ namespace gui_frame::detail
 	Events
 */
 
+void GuiFrame::Created(controls::GuiControl &control) noexcept
+{
+	GuiPanelContainer::Created(control); //Use base functionality
+
+	//In case the created control is actually adopted
+
+	if (control.IsFocused())
+	{
+		if (focused_control_)
+			focused_control_->Focused(false);
+
+		focused_control_ = &control;
+	}
+
+	if (control.IsPressed())
+	{
+		//if (pressed_control_)
+		//	pressed_control_->Pressed(false);
+
+		pressed_control_ = &control;
+	}
+
+	if (control.IsHovered())
+	{
+		//if (hovered_control_)
+		//	hovered_control_->Hovered(false);
+
+		hovered_control_ = &control;
+	}
+}
+
+void GuiFrame::Removed(controls::GuiControl &control) noexcept
+{
+	if (focused_control_ == &control)
+		focused_control_ = nullptr;
+
+	if (pressed_control_ == &control)
+		pressed_control_ = nullptr;
+
+	if (hovered_control_ == &control)
+		hovered_control_ = nullptr;
+
+	GuiPanelContainer::Removed(control); //Use base functionality
+}
+
+
 bool GuiFrame::Unsubscribable(Listenable<events::listeners::GuiControlListener>&) noexcept
 {
 	//Cancel all unsubscribe attempts
@@ -49,34 +95,40 @@ void GuiFrame::Disabled(controls::GuiControl &control) noexcept
 
 void GuiFrame::Focused(controls::GuiControl &control) noexcept
 {
-
+	if (control.IsFocused() && !focused_control_)
+		focused_control_ = &control;
 }
 
 void GuiFrame::Defocused(controls::GuiControl &control) noexcept
 {
-
+	if (!control.IsFocused() && focused_control_ == &control)
+		focused_control_ = nullptr;
 }
 
 
 void GuiFrame::Pressed(controls::GuiControl &control) noexcept
 {
-
+	if (control.IsPressed() && !pressed_control_)
+		pressed_control_ = &control;
 }
 
 void GuiFrame::Released(controls::GuiControl &control) noexcept
 {
-
+	if (!control.IsPressed() && pressed_control_ == &control)
+		pressed_control_ = nullptr;
 }
 
 
 void GuiFrame::Entered(controls::GuiControl &control) noexcept
 {
-
+	if (control.IsHovered() && !hovered_control_)
+		hovered_control_ = &control;
 }
 
 void GuiFrame::Exited(controls::GuiControl &control) noexcept
 {
-
+	if (!control.IsHovered() && hovered_control_ == &control)
+		hovered_control_ = nullptr;
 }
 
 

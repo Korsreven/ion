@@ -42,7 +42,7 @@ namespace ion::gui::controls
 			Disabled,
 			Focused,
 			Pressed,
-			Hover
+			Hovered
 		};
 
 
@@ -58,9 +58,11 @@ namespace ion::gui::controls
 		protected events::EventGenerator<events::listeners::GuiControlListener>
 	{
 		protected:
-			
+		
 			bool focused_ = false;
 			bool focusable_ = true;
+			bool pressed_ = false;
+			bool hovered_ = false;			
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
@@ -283,6 +285,18 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto IsFocusable() const noexcept
 			{
 				return focusable_;
+			}
+
+			//Returns true if this control is pressed
+			[[nodiscard]] inline auto IsPressed() const noexcept
+			{
+				return pressed_;
+			}
+
+			//Returns true if this control is hovered
+			[[nodiscard]] inline auto IsHovered() const noexcept
+			{
+				return hovered_;
 			}
 
 			//Returns the visual state of this control

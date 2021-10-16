@@ -41,7 +41,7 @@ void GuiControl::Enabled() noexcept
 
 void GuiControl::Disabled() noexcept
 {
-	if (/*hover*/false)
+	if (hovered_)
 		Exited();
 
 	if (focused_)
@@ -85,8 +85,8 @@ void GuiControl::Pressed() noexcept
 
 void GuiControl::Released() noexcept
 {
-	if (/*hover*/false)
-		SetState(ControlState::Hover);
+	if (hovered_)
+		SetState(ControlState::Hovered);
 	else if (focused_)
 		SetState(ControlState::Focused);
 	else
@@ -99,7 +99,7 @@ void GuiControl::Released() noexcept
 void GuiControl::Entered() noexcept
 {
 	if (state_ != ControlState::Pressed)
-		SetState(ControlState::Hover);
+		SetState(ControlState::Hovered);
 
 	NotifyControlEntered();
 }
