@@ -100,9 +100,9 @@ void GuiComponent::Owner(GuiContainer &owner) noexcept
 	node_ = parent_->Node() ? parent_->Node()->CreateChildNode() : nullptr;
 }
 
-void GuiComponent::Release() noexcept
+void GuiComponent::Owner(std::nullptr_t) noexcept
 {
-	managed::ManagedObject<GuiContainer>::Release();
+	managed::ManagedObject<GuiContainer>::Owner(nullptr);
 	Detach();
 }
 

@@ -78,7 +78,7 @@ namespace ion::managed
 			}
 
 			//Release ownership for this managed object
-			inline void Release() noexcept
+			inline void Owner(std::nullptr_t) noexcept
 			{
 				owner_ = nullptr;
 			}

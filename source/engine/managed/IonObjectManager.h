@@ -467,7 +467,7 @@ namespace ion::managed
 
 				//Release ownership
 				if (object_ptr)
-					object_ptr->Release();
+					object_ptr->Owner(nullptr);
 
 				return object_ptr;
 			}
@@ -480,7 +480,7 @@ namespace ion::managed
 
 				//Release ownership
 				for (auto &object : objects)
-					object->Release();
+					object->Owner(nullptr);
 
 				return objects;
 			}

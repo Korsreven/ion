@@ -144,7 +144,7 @@ namespace ion::gui
 			void Owner(GuiContainer &owner) noexcept;
 
 			//Release ownership for this component
-			void Release() noexcept;
+			void Owner(std::nullptr_t) noexcept;
 
 
 			/*
