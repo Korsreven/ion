@@ -60,15 +60,16 @@ namespace ion::gui::controls
 		protected:
 		
 			bool focused_ = false;
-			bool focusable_ = true;
 			bool pressed_ = false;
-			bool hovered_ = false;			
+			bool hovered_ = false;
+			bool focusable_ = true;
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
 			std::optional<events::Callback<void, GuiControl&>> on_defocus_;
 			std::optional<events::Callback<void, GuiControl&>> on_press_;
 			std::optional<events::Callback<void, GuiControl&>> on_release_;
+			std::optional<events::Callback<void, GuiControl&>> on_click_;
 			std::optional<events::Callback<void, GuiControl&>> on_enter_;
 			std::optional<events::Callback<void, GuiControl&>> on_exit_;
 			std::optional<events::Callback<void, GuiControl&>> on_change_;
@@ -98,6 +99,10 @@ namespace ion::gui::controls
 			//Called right after a control has been released
 			virtual void Released() noexcept;
 
+			//Called right after a control has been clicked
+			//Namely after a complete press and release
+			virtual void Clicked() noexcept;
+
 
 			//Called right after a control has been entered
 			//Namely when the mouse cursor has entered the control
@@ -124,6 +129,7 @@ namespace ion::gui::controls
 
 			void NotifyControlPressed() noexcept;
 			void NotifyControlReleased() noexcept;
+			void NotifyControlClicked() noexcept;
 
 			void NotifyControlEntered() noexcept;
 			void NotifyControlExited() noexcept;
@@ -147,6 +153,77 @@ namespace ion::gui::controls
 				Modifiers
 			*/
 
+			//Focus this control
+			inline void Focus() noexcept
+			{
+				if (!focused_ &&
+					enabled_ && focusable_)
+				{
+					focused_ = true;
+					Focused();
+				}
+			}
+
+			//Defocus this control
+			inline void Defocus() noexcept
+			{
+				if (focused_)
+				{
+					focused_ = false;
+					Defocused();
+				}
+			}
+
+
+			//Press this control
+			inline void Press() noexcept
+			{
+				if (!pressed_ && enabled_)
+				{
+					pressed_ = true;
+					Pressed();
+				}
+			}
+
+			//Release this control
+			inline void Release() noexcept
+			{
+				if (pressed_)
+				{
+					pressed_ = false;
+					Released();
+				}
+			}
+
+			//Click this control
+			inline void Click() noexcept
+			{
+				if (enabled_)
+					Clicked();
+			}
+
+
+			//Enter this control (start hovering)
+			inline void Enter() noexcept
+			{
+				if (!hovered_ && enabled_)
+				{
+					hovered_ = true;
+					Entered();
+				}
+			}
+
+			//Exit this control (stop hovering)
+			inline void Exit() noexcept
+			{
+				if (hovered_)
+				{
+					hovered_ = false;
+					Exited();
+				}
+			}
+
+
 			//Sets whether or not this control is enabled
 			inline void Enabled(bool enabled) noexcept
 			{
@@ -156,14 +233,10 @@ namespace ion::gui::controls
 			//Sets whether or not this control is focused
 			inline void Focused(bool focused) noexcept
 			{
-				if (focused_ != focused &&
-					enabled_ && focusable_)
-				{
-					if ((focused_ = focused) == true) //Suppress W4706
-						Focused();
-					else
-						Defocused();
-				}
+				if (focused)
+					Focus();
+				else
+					Defocus();
 			}
 
 			//Sets whether or not this control is focusable
@@ -172,10 +245,7 @@ namespace ion::gui::controls
 				if (focusable_ != focusable)
 				{
 					if (!(focusable_ = focusable) && focused_)
-					{
-						focused_ = false;
-						Defocused();
-					}
+						Defocus();
 				}
 			}
 
@@ -229,6 +299,19 @@ namespace ion::gui::controls
 			inline void OnRelease(std::nullopt_t) noexcept
 			{
 				on_release_ = {};
+			}
+
+
+			//Sets the on click callback
+			inline void OnClick(events::Callback<void, GuiControl&> on_click) noexcept
+			{
+				on_click_ = on_click;
+			}
+
+			//Sets the on click callback
+			inline void OnClick(std::nullopt_t) noexcept
+			{
+				on_click_ = {};
 			}
 
 

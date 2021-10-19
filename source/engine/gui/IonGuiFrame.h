@@ -92,6 +92,9 @@ namespace ion::gui
 			//See GuiControlListener::Released for more details
 			virtual void Released(controls::GuiControl &control) noexcept override;
 
+			//See GuiControlListener::Clicked for more details
+			virtual void Clicked(controls::GuiControl &control) noexcept override;
+
 
 			//See GuiControlListener::Entered for more details
 			virtual void Entered(controls::GuiControl &control) noexcept override;

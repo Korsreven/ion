@@ -38,23 +38,23 @@ void GuiFrame::Created(controls::GuiControl &control) noexcept
 	if (control.IsFocused())
 	{
 		if (focused_control_)
-			focused_control_->Focused(false);
+			focused_control_->Defocus();
 
 		focused_control_ = &control;
 	}
 
 	if (control.IsPressed())
 	{
-		//if (pressed_control_)
-		//	pressed_control_->Pressed(false);
+		if (pressed_control_)
+			pressed_control_->Release();
 
 		pressed_control_ = &control;
 	}
 
 	if (control.IsHovered())
 	{
-		//if (hovered_control_)
-		//	hovered_control_->Hovered(false);
+		if (hovered_control_)
+			hovered_control_->Exit();
 
 		hovered_control_ = &control;
 	}
@@ -82,14 +82,14 @@ bool GuiFrame::Unsubscribable(Listenable<events::listeners::GuiControlListener>&
 }
 
 
-void GuiFrame::Enabled(controls::GuiControl &control) noexcept
+void GuiFrame::Enabled([[maybe_unused]] controls::GuiControl &control) noexcept
 {
-
+	//Empty
 }
 
-void GuiFrame::Disabled(controls::GuiControl &control) noexcept
+void GuiFrame::Disabled([[maybe_unused]] controls::GuiControl &control) noexcept
 {
-
+	//Empty
 }
 
 
@@ -116,6 +116,11 @@ void GuiFrame::Released(controls::GuiControl &control) noexcept
 {
 	if (!control.IsPressed() && pressed_control_ == &control)
 		pressed_control_ = nullptr;
+}
+
+void GuiFrame::Clicked([[maybe_unused]] controls::GuiControl &control) noexcept
+{
+	//Empty
 }
 
 

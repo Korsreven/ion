@@ -66,6 +66,13 @@ namespace ion::events::listeners
 			//Optional to override
 		}
 
+		//Called right after a gui control has been clicked, with a mutable reference to the control that was clicked
+		//Namely after a complete press and release
+		virtual void Clicked([[maybe_unused]] gui::controls::GuiControl &control) noexcept
+		{
+			//Optional to override
+		}
+
 
 		//Called right after a gui control has been entered, with a mutable reference to the control that was entered
 		//Namely when the mouse cursor has entered the control

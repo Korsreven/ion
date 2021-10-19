@@ -34,24 +34,16 @@ namespace gui_control::detail
 void GuiControl::Enabled() noexcept
 {
 	SetState(ControlState::Enabled);
-
 	NotifyControlEnabled();
 	GuiComponent::Enabled(); //Use base functionality
 }
 
 void GuiControl::Disabled() noexcept
 {
-	if (hovered_)
-		Exited();
-
-	if (focused_)
-	{
-		focused_ = false;
-		Defocused();
-	}
+	Exit();
+	Defocus();
 
 	SetState(ControlState::Disabled);
-
 	NotifyControlDisabled();
 	GuiComponent::Disabled(); //Use base functionality
 }
@@ -76,8 +68,7 @@ void GuiControl::Defocused() noexcept
 
 void GuiControl::Pressed() noexcept
 {
-	if (!focused_ && focusable_)
-		Focused(true);
+	Focus();
 
 	SetState(ControlState::Pressed);
 	NotifyControlPressed();
@@ -93,6 +84,11 @@ void GuiControl::Released() noexcept
 		SetState(ControlState::Enabled);
 
 	NotifyControlReleased();
+}
+
+void GuiControl::Clicked() noexcept
+{
+	NotifyControlClicked();
 }
 
 
@@ -204,6 +200,20 @@ void GuiControl::NotifyControlReleased() noexcept
 	//User callback
 	if (on_release_)
 		(*on_release_)(*this);
+}
+
+void GuiControl::NotifyControlClicked() noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::Clicked, std::ref(*this));
+	}
+
+	//User callback
+	if (on_click_)
+		(*on_click_)(*this);
 }
 
 

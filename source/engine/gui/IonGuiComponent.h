@@ -98,16 +98,34 @@ namespace ion::gui
 				Modifiers
 			*/
 
+			//Enable this component
+			inline void Enable() noexcept
+			{
+				if (!enabled_)
+				{
+					enabled_ = true;
+					Enabled();
+				}
+			}
+
+			//Disable this component
+			inline void Disable() noexcept
+			{
+				if (enabled_)
+				{
+					enabled_ = false;
+					Disabled();
+				}
+			}
+
+
 			//Sets whether or not this component is enabled
 			inline void Enabled(bool enabled) noexcept
 			{
-				if (enabled_ != enabled)
-				{
-					if ((enabled_ = enabled) == true) //Suppress W4706
-						Enabled();
-					else
-						Disabled();
-				}
+				if (enabled)
+					Enable();
+				else
+					Disable();
 			}
 
 			//Set the parent of this component
