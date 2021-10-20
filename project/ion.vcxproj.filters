@@ -1184,5 +1184,8 @@
     <ClInclude Include="..\source\engine\events\listeners\IonGuiControlListener.h">
       <Filter>Header Files\events\listeners</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonGuiFrameListener.h">
+      <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

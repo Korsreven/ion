@@ -1282,8 +1282,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto base_panel = main_frame->CreatePanel("base");
 			auto sub_panel = base_panel->CreatePanel("sub");
 			auto my_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("empty");
+
+			main_frame->Activate();
+			main_frame->Focus();
 			my_control->Focus();
 			my_control->Disable();
+			main_frame->Deactivate();
 
 			//Camera
 			auto cam_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});

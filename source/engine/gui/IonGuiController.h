@@ -19,6 +19,8 @@ File:	IonGuiController.h
 
 #include "IonGuiContainer.h"
 #include "IonGuiFrame.h"
+#include "events/IonListenable.h"
+#include "events/listeners/IonGuiFrameListener.h"
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
 #include "events/listeners/IonWindowListener.h"
@@ -42,21 +44,98 @@ namespace ion::gui
 	{
 		using frame_pointers = std::vector<GuiFrame*>;
 		using active_frames = std::vector<frame_pointers>;
-			//Only the active frames at the top (back) of the stack are enabled
-			//The rest of the active frames in the stack are disabled (but visible)
+			//Only the active frames at the top (back) of the stack are interactive
+			//The rest of the active frames in the stack are non-interactive (but visible)
 	} //gui_controller::detail
 
 
-	class GuiController final : public GuiContainer
+	class GuiController final :
+		public GuiContainer,
+		public events::Listenable<events::listeners::GuiFrameListener>,
+		public events::listeners::GuiFrameListener
 	{
 		private:
 
+			using FrameEventsBase = events::Listenable<events::listeners::GuiFrameListener>;
+			using ManagedObjectEventsBase = events::Listenable<events::listeners::ManagedObjectListener<GuiComponent, GuiContainer>>;
+
+
 			gui_controller::detail::active_frames active_frames_;
+			GuiFrame *focused_frame_ = nullptr;
+
+
+			/*
+				Events
+			*/
+
+			//See ObjectManager::Created for more details
+			void Created(GuiComponent &component) noexcept override final;
+			void Created(GuiFrame &frame) noexcept;
+
+			//See ObjectManager::Removed for more details
+			void Removed(GuiComponent &component) noexcept override final;
+			void Removed(GuiFrame &frame) noexcept;
+
+
+			//See Listener<T>::Unsubscribable for more details
+			//Make sure that if this gui frame listener is about to unsubscribe from the gui controller, cancel it
+			bool Unsubscribable(Listenable<events::listeners::GuiFrameListener>&) noexcept override final;
+
+
+			//See GuiFrameListener::Enabled for more details
+			void Enabled(GuiFrame &frame) noexcept override final;
+
+			//See GuiFrameListener::Disabled for more details
+			void Disabled(GuiFrame &frame) noexcept override final;
+
+
+			//See GuiFrameListener::Activated for more details
+			void Activated(GuiFrame &frame) noexcept override final;
+
+			//See GuiFrameListener::Deactivated for more details
+			void Deactivated(GuiFrame &frame) noexcept override final;
+
+
+			//See GuiFrameListener::Focused for more details
+			void Focused(GuiFrame &frame) noexcept override final;
+
+			//See GuiFrameListener::Defocused for more details
+			void Defocused(GuiFrame &frame) noexcept override final;
 
 		public:
 
 			//Construct a gui controller with the given parent node
 			GuiController(SceneNode &parent_node);
+
+
+			/*
+				Events
+			*/
+
+			//Return a mutable reference to the frame events of this controller
+			[[nodiscard]] inline auto& FrameEvents() noexcept
+			{
+				return static_cast<FrameEventsBase&>(*this);
+			}
+
+			//Return a immutable reference to the frame events of this controller
+			[[nodiscard]] inline auto& FrameEvents() const noexcept
+			{
+				return static_cast<const FrameEventsBase&>(*this);
+			}
+
+
+			//Return a mutable reference to the managed object events of this controller
+			[[nodiscard]] inline auto& ManagedObjectEvents() noexcept
+			{
+				return static_cast<ManagedObjectEventsBase&>(*this);
+			}
+
+			//Return a immutable reference to the managed object events of this controller
+			[[nodiscard]] inline auto& ManagedObjectEvents() const noexcept
+			{
+				return static_cast<const ManagedObjectEventsBase&>(*this);
+			}
 
 
 			/*

@@ -19,8 +19,11 @@ File:	IonGuiFrame.h
 #include "IonGuiPanel.h"
 #include "IonGuiPanelContainer.h"
 #include "controls/IonGuiControl.h"
+#include "events/IonCallback.h"
+#include "events/IonEventGenerator.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonGuiControlListener.h"
+#include "events/listeners/IonGuiFrameListener.h"
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
 #include "graphics/utilities/IonVector2.h"
@@ -42,18 +45,28 @@ namespace ion::gui
 	class GuiFrame :
 		public GuiPanelContainer,
 		public events::Listenable<events::listeners::GuiControlListener>,
-		public events::listeners::GuiControlListener
+		public events::listeners::GuiControlListener,
+		protected events::EventGenerator<events::listeners::GuiFrameListener>
 	{
 		private:
 
 			using ControlEventsBase = events::Listenable<events::listeners::GuiControlListener>;
 			using ManagedObjectEventsBase = events::Listenable<events::listeners::ManagedObjectListener<GuiComponent, GuiContainer>>;
+			using FrameEventsGeneratorBase = events::EventGenerator<events::listeners::GuiFrameListener>;
 		
 		protected:
 
-			controls::GuiControl *focused_control_ = nullptr;	
+			bool activated_ = false;
+			bool focused_ = false;
+
+			controls::GuiControl *focused_control_ = nullptr;
 			controls::GuiControl *pressed_control_ = nullptr;
 			controls::GuiControl *hovered_control_ = nullptr;
+
+			std::optional<events::Callback<void, GuiFrame&>> on_activate_;
+			std::optional<events::Callback<void, GuiFrame&>> on_deactivate_;
+			std::optional<events::Callback<void, GuiFrame&>> on_focus_;
+			std::optional<events::Callback<void, GuiFrame&>> on_defocus_;
 
 
 			/*
@@ -102,6 +115,41 @@ namespace ion::gui
 			//See GuiControlListener::Exited for more details
 			virtual void Exited(controls::GuiControl &control) noexcept override;
 
+
+			//See GuiComponent::Enabled for more details
+			virtual void Enabled() noexcept override;
+
+			//See GuiComponent::Disabled for more details
+			virtual void Disabled() noexcept override;
+
+
+			//Called right after a frame has been activated
+			virtual void Activated() noexcept;
+
+			//Called right after a frame has been deactivated
+			virtual void Deactivated() noexcept;
+
+
+			//Called right after a frame has been focused
+			virtual void Focused() noexcept;
+
+			//Called right after a frame has been defocused
+			virtual void Defocused() noexcept;
+
+
+			/*
+				Notifying
+			*/
+
+			void NotifyFrameEnabled() noexcept;
+			void NotifyFrameDisabled() noexcept;
+
+			void NotifyFrameActivated() noexcept;
+			void NotifyFrameDeactivated() noexcept;
+
+			void NotifyFrameFocused() noexcept;
+			void NotifyFrameDefocused() noexcept;
+
 		public:
 
 			//Construct a frame with the given name
@@ -142,12 +190,168 @@ namespace ion::gui
 				Modifiers
 			*/
 
+			//Activate this frame
+			inline void Activate() noexcept
+			{
+				if (!activated_ && enabled_)
+				{
+					activated_ = true;
+					Activated();
+				}
+			}
 
+			//Deactivate this frame
+			inline void Deactivate() noexcept
+			{
+				if (activated_)
+				{
+					activated_ = false;
+					Deactivated();
+				}
+			}
+
+
+			//Focus this frame
+			inline void Focus() noexcept
+			{
+				if (!focused_ &&
+					enabled_ && activated_)
+				{
+					focused_ = true;
+					Focused();
+				}
+			}
+
+			//Defocus this frame
+			inline void Defocus() noexcept
+			{
+				if (focused_)
+				{
+					focused_ = false;
+					Defocused();
+				}
+			}
+
+
+			//Sets the on activate callback
+			inline void OnActivate(events::Callback<void, GuiFrame&> on_activate) noexcept
+			{
+				on_activate_ = on_activate;
+			}
+
+			//Sets the on activate callback
+			inline void OnActivate(std::nullopt_t) noexcept
+			{
+				on_activate_ = {};
+			}
+
+
+			//Sets the on deactivate callback
+			inline void OnDeactivate(events::Callback<void, GuiFrame&> on_deactivate) noexcept
+			{
+				on_deactivate_ = on_deactivate;
+			}
+
+			//Sets the on deactivate callback
+			inline void OnDeactivate(std::nullopt_t) noexcept
+			{
+				on_deactivate_ = {};
+			}
+
+
+			//Sets the on focus callback
+			inline void OnFocus(events::Callback<void, GuiFrame&> on_focus) noexcept
+			{
+				on_focus_ = on_focus;
+			}
+
+			//Sets the on focus callback
+			inline void OnFocus(std::nullopt_t) noexcept
+			{
+				on_focus_ = {};
+			}
+
+
+			//Sets the on defocus callback
+			inline void OnDefocus(events::Callback<void, GuiFrame&> on_defocus) noexcept
+			{
+				on_defocus_ = on_defocus;
+			}
+
+			//Sets the on defocus callback
+			inline void OnDefocus(std::nullopt_t) noexcept
+			{
+				on_defocus_ = {};
+			}
+
+
+			//Sets whether or not this frame is enabled
+			inline void Enabled(bool enabled) noexcept
+			{
+				return GuiComponent::Enabled(enabled);
+			}
+
+			//Sets whether or not this frame is activated
+			inline void Activated(bool activated) noexcept
+			{
+				if (activated)
+					Activate();
+				else
+					Deactivate();
+			}
+
+			//Sets whether or not this frame is focused
+			inline void Focused(bool focused) noexcept
+			{
+				if (focused)
+					Focus();
+				else
+					Defocus();
+			}
 
 
 			/*
 				Observers
 			*/
+
+			//Returns true if this frame is activated
+			[[nodiscard]] inline auto IsActivated() const noexcept
+			{
+				return activated_;
+			}
+
+			//Returns true if this frame is focused
+			[[nodiscard]] inline auto IsFocused() const noexcept
+			{
+				return focused_;
+			}
+
+
+			//Returns the on activate callback
+			[[nodiscard]] inline auto OnActivate() const noexcept
+			{
+				return on_activate_;
+			}
+
+			//Returns the on deactivate callback
+			[[nodiscard]] inline auto OnDeactivate() const noexcept
+			{
+				return on_deactivate_;
+			}
+
+
+			//Returns the on focus callback
+			[[nodiscard]] inline auto OnFocus() const noexcept
+			{
+				return on_focus_;
+			}
+
+			//Returns the on defocus callback
+			[[nodiscard]] inline auto OnDefocus() const noexcept
+			{
+				return on_defocus_;
+			}
+
 
 			//Returns a pointer to the owner of this frame
 			[[nodiscard]] GuiController* Owner() const noexcept;

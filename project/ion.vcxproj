@@ -317,6 +317,7 @@
     <ClInclude Include="..\source\engine\events\listeners\IonCameraListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonFrameListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonGuiControlListener.h" />
+    <ClInclude Include="..\source\engine\events\listeners\IonGuiFrameListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonKeyListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonListener.h" />
     <ClInclude Include="..\source\engine\events\listeners\IonListenerTraits.h" />

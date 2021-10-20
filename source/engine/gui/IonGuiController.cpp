@@ -23,9 +23,94 @@ namespace gui_controller::detail
 } //gui_controller::detail
 
 
+//Private
+
+/*
+	Events
+*/
+
+
+void GuiController::Created(GuiComponent &component) noexcept
+{
+	if (auto frame = dynamic_cast<GuiFrame*>(&component); frame)
+		Created(*frame);
+}
+
+void GuiController::Created(GuiFrame &frame) noexcept
+{
+	//In case the created frame is actually adopted
+
+	if (frame.IsFocused())
+	{
+		if (focused_frame_)
+			focused_frame_->Defocus();
+
+		focused_frame_ = &frame;
+	}
+}
+
+
+void GuiController::Removed(GuiComponent &component) noexcept
+{
+	if (auto frame = dynamic_cast<GuiFrame*>(&component); frame)
+		Removed(*frame);
+}
+
+void GuiController::Removed(GuiFrame &frame) noexcept
+{
+	if (focused_frame_ == &frame)
+		focused_frame_ = nullptr;
+}
+
+
+bool GuiController::Unsubscribable(Listenable<events::listeners::GuiFrameListener>&) noexcept
+{
+	//Cancel all unsubscribe attempts
+	return false;
+}
+
+
+void GuiController::Enabled([[maybe_unused]] GuiFrame &frame) noexcept
+{
+	//Empty
+}
+
+void GuiController::Disabled([[maybe_unused]] GuiFrame &frame) noexcept
+{
+	//Empty
+}
+
+
+void GuiController::Activated(GuiFrame &frame) noexcept
+{
+
+}
+
+void GuiController::Deactivated(GuiFrame &frame) noexcept
+{
+
+}
+
+
+void GuiController::Focused(GuiFrame &frame) noexcept
+{
+	if (frame.IsFocused() && !focused_frame_)
+		focused_frame_ = &frame;
+}
+
+void GuiController::Defocused(GuiFrame &frame) noexcept
+{
+	if (!frame.IsFocused() && focused_frame_ == &frame)
+		focused_frame_ = nullptr;
+}
+
+
+//Public
+
 GuiController::GuiController(SceneNode &parent_node)
 {
 	node_ = parent_node.CreateChildNode();
+	FrameEvents().Subscribe(*this);
 }
 
 

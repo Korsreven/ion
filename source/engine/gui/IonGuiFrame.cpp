@@ -137,6 +137,110 @@ void GuiFrame::Exited(controls::GuiControl &control) noexcept
 }
 
 
+void GuiFrame::Enabled() noexcept
+{
+	NotifyFrameEnabled();
+	GuiComponent::Enabled(); //Use base functionality
+}
+
+void GuiFrame::Disabled() noexcept
+{
+	Defocus();
+	Deactivate();
+
+	NotifyFrameDisabled();
+	GuiComponent::Enabled(); //Use base functionality
+}
+
+
+void GuiFrame::Activated() noexcept
+{
+	NotifyFrameActivated();
+}
+
+void GuiFrame::Deactivated() noexcept
+{
+	Defocus();
+	NotifyFrameDeactivated();
+}
+
+
+void GuiFrame::Focused() noexcept
+{
+	NotifyFrameFocused();
+}
+
+void GuiFrame::Defocused() noexcept
+{
+	NotifyFrameDefocused();
+}
+
+
+/*
+	Notifying
+*/
+
+void GuiFrame::NotifyFrameEnabled() noexcept
+{
+	if (auto owner = Owner(); owner)
+		FrameEventsGeneratorBase::NotifyAll(owner->FrameEvents().Listeners(),
+			&events::listeners::GuiFrameListener::Enabled, std::ref(*this));
+}
+
+void GuiFrame::NotifyFrameDisabled() noexcept
+{
+	if (auto owner = Owner(); owner)
+		FrameEventsGeneratorBase::NotifyAll(owner->FrameEvents().Listeners(),
+			&events::listeners::GuiFrameListener::Disabled, std::ref(*this));
+}
+
+
+void GuiFrame::NotifyFrameActivated() noexcept
+{
+	if (auto owner = Owner(); owner)
+		FrameEventsGeneratorBase::NotifyAll(owner->FrameEvents().Listeners(),
+			&events::listeners::GuiFrameListener::Activated, std::ref(*this));
+
+	//User callback
+	if (on_activate_)
+		(*on_activate_)(*this);
+}
+
+void GuiFrame::NotifyFrameDeactivated() noexcept
+{
+	if (auto owner = Owner(); owner)
+		FrameEventsGeneratorBase::NotifyAll(owner->FrameEvents().Listeners(),
+			&events::listeners::GuiFrameListener::Deactivated, std::ref(*this));
+
+	//User callback
+	if (on_deactivate_)
+		(*on_deactivate_)(*this);
+}
+
+
+void GuiFrame::NotifyFrameFocused() noexcept
+{
+	if (auto owner = Owner(); owner)
+		FrameEventsGeneratorBase::NotifyAll(owner->FrameEvents().Listeners(),
+			&events::listeners::GuiFrameListener::Focused, std::ref(*this));
+
+	//User callback
+	if (on_focus_)
+		(*on_focus_)(*this);
+}
+
+void GuiFrame::NotifyFrameDefocused() noexcept
+{
+	if (auto owner = Owner(); owner)
+		FrameEventsGeneratorBase::NotifyAll(owner->FrameEvents().Listeners(),
+			&events::listeners::GuiFrameListener::Defocused, std::ref(*this));
+
+	//User callback
+	if (on_defocus_)
+		(*on_defocus_)(*this);
+}
+
+
 //Public
 
 GuiFrame::GuiFrame(std::string name) :
