@@ -43,9 +43,22 @@ namespace ion::gui
 	namespace gui_controller::detail
 	{
 		using frame_pointers = std::vector<GuiFrame*>;
-		using active_frames = std::vector<frame_pointers>;
+
+		struct layer
+		{
+			GuiFrame *current_frame = nullptr;
+			frame_pointers frames;		
+		};
+
+		using frames = std::vector<layer>;
 			//Only the active frames at the top (back) of the stack are interactive
 			//The rest of the active frames in the stack are non-interactive (but visible)
+
+
+		void activate_frame(GuiFrame &frame, frames &to_frames, bool modal) noexcept;
+		void deactive_frame(GuiFrame &frame, frames &from_frames) noexcept;
+
+		bool is_frame_focusable(const GuiFrame &frame, const frames &frames) noexcept;
 	} //gui_controller::detail
 
 
@@ -59,10 +72,9 @@ namespace ion::gui
 			using FrameEventsBase = events::Listenable<events::listeners::GuiFrameListener>;
 			using ManagedObjectEventsBase = events::Listenable<events::listeners::ManagedObjectListener<GuiComponent, GuiContainer>>;
 
-
-			gui_controller::detail::active_frames active_frames_;
+			
 			GuiFrame *focused_frame_ = nullptr;
-
+			gui_controller::detail::frames active_frames_;
 
 			/*
 				Events
@@ -168,7 +180,8 @@ namespace ion::gui
 				Observers
 			*/
 
-
+			//Returns true if the given frame is focusable
+			bool IsFocusable(const GuiFrame &frame) const noexcept;
 
 
 			/*

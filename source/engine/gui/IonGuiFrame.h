@@ -193,7 +193,7 @@ namespace ion::gui
 			//Activate this frame
 			inline void Activate() noexcept
 			{
-				if (!activated_ && enabled_)
+				if (!activated_)
 				{
 					activated_ = true;
 					Activated();
@@ -215,7 +215,8 @@ namespace ion::gui
 			inline void Focus() noexcept
 			{
 				if (!focused_ &&
-					enabled_ && activated_)
+					enabled_ && activated_ &&
+					IsFocusable())
 				{
 					focused_ = true;
 					Focused();
@@ -325,6 +326,9 @@ namespace ion::gui
 			{
 				return focused_;
 			}
+
+			//Returns true if this frame is focusable
+			[[nodiscard]] bool IsFocusable() const noexcept;
 
 
 			//Returns the on activate callback

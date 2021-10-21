@@ -17,8 +17,63 @@ File:	IonGuiController.cpp
 namespace ion::gui
 {
 
+using namespace gui_controller;
+
 namespace gui_controller::detail
 {
+
+void activate_frame(GuiFrame &frame, frames &to_frames, bool modal) noexcept
+{
+	//Push new layer
+	if (modal || std::empty(to_frames))
+		to_frames.emplace_back(&frame).frames.push_back(&frame);
+	//Append to top layer
+	else
+		to_frames.back().frames.push_back(&frame);
+}
+
+void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept
+{
+	//Search through all active frames (from top)
+	for (auto riter = std::rbegin(from_frames),
+		rend = std::rend(from_frames); riter != rend; ++riter)
+	{
+		auto &active_layer = *riter;
+
+		//Search through active layer
+		for (auto iter = std::begin(active_layer.frames),
+			end = std::end(active_layer.frames); iter != end; ++iter)
+		{
+			if (*iter == &frame)
+			{
+				iter = active_layer.frames.erase(iter);
+
+				//No frames left, remove empty layer
+				if (std::empty(active_layer.frames))
+					from_frames.erase(--riter.base());
+
+				//Current frame removed, set new current frame
+				else if (active_layer.current_frame == &frame)
+					active_layer.current_frame =
+						iter != std::end(active_layer.frames) ?
+						*iter :
+						*(iter - 1);
+				
+				return;
+			}
+		}
+	}
+}
+
+
+bool is_frame_focusable(const GuiFrame &frame, const frames &frames) noexcept
+{
+	if (std::empty(frames))
+		return false;
+	else
+		return std::find(std::begin(frames.back().frames), std::end(frames.back().frames), &frame) !=
+			std::end(frames.back().frames);
+}
 
 } //gui_controller::detail
 
@@ -43,9 +98,13 @@ void GuiController::Created(GuiFrame &frame) noexcept
 	if (frame.IsFocused())
 	{
 		if (focused_frame_)
+		{
 			focused_frame_->Defocus();
+			focused_frame_ = nullptr;
+		}
 
-		focused_frame_ = &frame;
+		detail::activate_frame(frame, active_frames_, false);
+		Focused(frame);
 	}
 }
 
@@ -60,6 +119,8 @@ void GuiController::Removed(GuiFrame &frame) noexcept
 {
 	if (focused_frame_ == &frame)
 		focused_frame_ = nullptr;
+
+	detail::deactivate_frame(frame, active_frames_);
 }
 
 
@@ -83,25 +144,36 @@ void GuiController::Disabled([[maybe_unused]] GuiFrame &frame) noexcept
 
 void GuiController::Activated(GuiFrame &frame) noexcept
 {
-
+	detail::activate_frame(frame, active_frames_, false);
 }
 
 void GuiController::Deactivated(GuiFrame &frame) noexcept
 {
-
+	detail::deactivate_frame(frame, active_frames_);
 }
 
 
 void GuiController::Focused(GuiFrame &frame) noexcept
 {
 	if (frame.IsFocused() && !focused_frame_)
+	{
 		focused_frame_ = &frame;
+
+		if (!std::empty(active_frames_))
+			active_frames_.back().current_frame = &frame;
+	}
 }
 
 void GuiController::Defocused(GuiFrame &frame) noexcept
 {
 	if (!frame.IsFocused() && focused_frame_ == &frame)
+	{
 		focused_frame_ = nullptr;
+
+		if (!std::empty(active_frames_) &&
+			active_frames_.back().current_frame == &frame)
+			active_frames_.back().current_frame = nullptr;
+	}
 }
 
 
@@ -111,6 +183,16 @@ GuiController::GuiController(SceneNode &parent_node)
 {
 	node_ = parent_node.CreateChildNode();
 	FrameEvents().Subscribe(*this);
+}
+
+
+/*
+	Observers
+*/
+
+bool GuiController::IsFocusable(const GuiFrame &frame) const noexcept
+{
+	return detail::is_frame_focusable(frame, active_frames_);
 }
 
 
@@ -223,6 +305,8 @@ NonOwningPtr<const GuiFrame> GuiController::GetFrame(std::string_view name) cons
 
 void GuiController::ClearFrames() noexcept
 {
+	active_frames_.clear();
+	active_frames_.shrink_to_fit();
 	ClearComponents();
 }
 

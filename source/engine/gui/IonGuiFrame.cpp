@@ -146,7 +146,6 @@ void GuiFrame::Enabled() noexcept
 void GuiFrame::Disabled() noexcept
 {
 	Defocus();
-	Deactivate();
 
 	NotifyFrameDisabled();
 	GuiComponent::Enabled(); //Use base functionality
@@ -253,6 +252,15 @@ GuiFrame::GuiFrame(std::string name) :
 /*
 	Observers
 */
+
+bool GuiFrame::IsFocusable() const noexcept
+{
+	if (auto owner = Owner(); owner)
+		return owner->IsFocusable(*this);
+	else
+		return false;
+}
+
 
 GuiController* GuiFrame::Owner() const noexcept
 {
