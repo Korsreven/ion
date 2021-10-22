@@ -40,8 +40,9 @@ void GuiControl::Enabled() noexcept
 
 void GuiControl::Disabled() noexcept
 {
-	Exit();
+	Release();
 	Defocus();
+	Exit();
 
 	SetState(ControlState::Disabled);
 	NotifyControlDisabled();
@@ -280,6 +281,83 @@ GuiControl::GuiControl(std::string name) :
 	GuiComponent{std::move(name)}
 {
 	//Empty
+}
+
+
+/*
+	Modifiers
+*/
+
+void GuiControl::Focus() noexcept
+{
+	if (!focused_ &&
+		enabled_ && focusable_)
+	{
+		if (auto owner = Owner(); !owner || owner->IsFocusable())
+		{
+			focused_ = true;
+			Focused();
+		}
+	}
+}
+
+void GuiControl::Defocus() noexcept
+{
+	if (focused_)
+	{
+		focused_ = false;
+		Defocused();
+	}
+}
+
+
+void GuiControl::Press() noexcept
+{
+	if (!pressed_ && enabled_)
+	{
+		if (auto owner = Owner(); !owner || owner->IsFocusable())
+		{
+			pressed_ = true;
+			Pressed();
+		}
+	}
+}
+
+void GuiControl::Release() noexcept
+{
+	if (pressed_)
+	{
+		pressed_ = false;
+		Released();
+	}
+}
+
+void GuiControl::Click() noexcept
+{
+	if (enabled_)
+		Clicked();
+}
+
+
+void GuiControl::Enter() noexcept
+{
+	if (!hovered_ && enabled_)
+	{
+		if (auto owner = Owner(); !owner || owner->IsFocusable())
+		{
+			hovered_ = true;
+			Entered();
+		}
+	}
+}
+
+void GuiControl::Exit() noexcept
+{
+	if (hovered_)
+	{
+		hovered_ = false;
+		Exited();
+	}
 }
 
 

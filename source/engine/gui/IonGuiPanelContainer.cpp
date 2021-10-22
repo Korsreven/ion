@@ -109,6 +109,17 @@ void GuiPanelContainer::Removed(GuiPanel &panel) noexcept
 	Observers
 */
 
+bool GuiPanelContainer::IsFocusable() const noexcept
+{
+	if (auto frame = dynamic_cast<const GuiFrame*>(this); frame)
+		return frame->IsFocusable();
+	else if (owner_)
+		return owner_->IsEnabled() && static_cast<const GuiPanelContainer*>(owner_)->IsFocusable(); //Recursive
+	else
+		return true;
+}
+
+
 GuiFrame* GuiPanelContainer::ParentFrame() const noexcept
 {
 	if (auto frame = dynamic_cast<const GuiFrame*>(this); frame)

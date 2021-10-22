@@ -66,7 +66,7 @@ void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept
 }
 
 
-bool is_frame_focusable(const GuiFrame &frame, const frames &frames) noexcept
+bool is_frame_on_top(const GuiFrame &frame, const frames &frames) noexcept
 {
 	if (std::empty(frames))
 		return false;
@@ -93,19 +93,8 @@ void GuiController::Created(GuiComponent &component) noexcept
 
 void GuiController::Created(GuiFrame &frame) noexcept
 {
-	//In case the created frame is actually adopted
-
-	if (frame.IsFocused())
-	{
-		if (focused_frame_)
-		{
-			focused_frame_->Defocus();
-			focused_frame_ = nullptr;
-		}
-
-		detail::activate_frame(frame, active_frames_, false);
-		Focused(frame);
-	}
+	//If the added frame is adopted
+	frame.Deactivate();
 }
 
 
@@ -117,10 +106,7 @@ void GuiController::Removed(GuiComponent &component) noexcept
 
 void GuiController::Removed(GuiFrame &frame) noexcept
 {
-	if (focused_frame_ == &frame)
-		focused_frame_ = nullptr;
-
-	detail::deactivate_frame(frame, active_frames_);
+	frame.Deactivate();
 }
 
 
@@ -190,9 +176,9 @@ GuiController::GuiController(SceneNode &parent_node)
 	Observers
 */
 
-bool GuiController::IsFocusable(const GuiFrame &frame) const noexcept
+bool GuiController::IsOnTop(const GuiFrame &frame) const noexcept
 {
-	return detail::is_frame_focusable(frame, active_frames_);
+	return detail::is_frame_on_top(frame, active_frames_);
 }
 
 

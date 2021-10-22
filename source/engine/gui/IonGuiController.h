@@ -58,7 +58,7 @@ namespace ion::gui
 		void activate_frame(GuiFrame &frame, frames &to_frames, bool modal) noexcept;
 		void deactive_frame(GuiFrame &frame, frames &from_frames) noexcept;
 
-		bool is_frame_focusable(const GuiFrame &frame, const frames &frames) noexcept;
+		bool is_frame_on_top(const GuiFrame &frame, const frames &frames) noexcept;
 	} //gui_controller::detail
 
 
@@ -180,8 +180,8 @@ namespace ion::gui
 				Observers
 			*/
 
-			//Returns true if the given frame is focusable
-			bool IsFocusable(const GuiFrame &frame) const noexcept;
+			//Returns true if the given frame is on top
+			[[nodiscard]] bool IsOnTop(const GuiFrame &frame) const noexcept;
 
 
 			/*

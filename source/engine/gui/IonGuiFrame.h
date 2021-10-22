@@ -191,46 +191,35 @@ namespace ion::gui
 			*/
 
 			//Activate this frame
-			inline void Activate() noexcept
-			{
-				if (!activated_)
-				{
-					activated_ = true;
-					Activated();
-				}
-			}
+			void Activate() noexcept;
 
 			//Deactivate this frame
-			inline void Deactivate() noexcept
-			{
-				if (activated_)
-				{
-					activated_ = false;
-					Deactivated();
-				}
-			}
+			void Deactivate() noexcept;
 
 
 			//Focus this frame
-			inline void Focus() noexcept
-			{
-				if (!focused_ &&
-					enabled_ && activated_ &&
-					IsFocusable())
-				{
-					focused_ = true;
-					Focused();
-				}
-			}
+			void Focus() noexcept;
 
 			//Defocus this frame
-			inline void Defocus() noexcept
+			void Defocus() noexcept;
+
+
+			//Sets whether or not this frame is activated
+			inline void Activated(bool activated) noexcept
 			{
-				if (focused_)
-				{
-					focused_ = false;
-					Defocused();
-				}
+				if (activated)
+					Activate();
+				else
+					Deactivate();
+			}
+
+			//Sets whether or not this frame is focused
+			inline void Focused(bool focused) noexcept
+			{
+				if (focused)
+					Focus();
+				else
+					Defocus();
 			}
 
 
@@ -292,24 +281,6 @@ namespace ion::gui
 				return GuiComponent::Enabled(enabled);
 			}
 
-			//Sets whether or not this frame is activated
-			inline void Activated(bool activated) noexcept
-			{
-				if (activated)
-					Activate();
-				else
-					Deactivate();
-			}
-
-			//Sets whether or not this frame is focused
-			inline void Focused(bool focused) noexcept
-			{
-				if (focused)
-					Focus();
-				else
-					Defocus();
-			}
-
 
 			/*
 				Observers
@@ -329,6 +300,9 @@ namespace ion::gui
 
 			//Returns true if this frame is focusable
 			[[nodiscard]] bool IsFocusable() const noexcept;
+
+			//Returns true if this frame is on top
+			[[nodiscard]] bool IsOnTop() const noexcept;
 
 
 			//Returns the on activate callback

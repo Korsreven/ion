@@ -154,74 +154,27 @@ namespace ion::gui::controls
 			*/
 
 			//Focus this control
-			inline void Focus() noexcept
-			{
-				if (!focused_ &&
-					enabled_ && focusable_)
-				{
-					focused_ = true;
-					Focused();
-				}
-			}
+			void Focus() noexcept;
 
 			//Defocus this control
-			inline void Defocus() noexcept
-			{
-				if (focused_)
-				{
-					focused_ = false;
-					Defocused();
-				}
-			}
+			void Defocus() noexcept;
 
 
 			//Press this control
-			inline void Press() noexcept
-			{
-				if (!pressed_ && enabled_)
-				{
-					pressed_ = true;
-					Pressed();
-				}
-			}
+			void Press() noexcept;
 
 			//Release this control
-			inline void Release() noexcept
-			{
-				if (pressed_)
-				{
-					pressed_ = false;
-					Released();
-				}
-			}
+			void Release() noexcept;
 
 			//Click this control
-			inline void Click() noexcept
-			{
-				if (enabled_)
-					Clicked();
-			}
+			void Click() noexcept;
 
 
 			//Enter this control (start hovering)
-			inline void Enter() noexcept
-			{
-				if (!hovered_ && enabled_)
-				{
-					hovered_ = true;
-					Entered();
-				}
-			}
+			void Enter() noexcept;
 
 			//Exit this control (stop hovering)
-			inline void Exit() noexcept
-			{
-				if (hovered_)
-				{
-					hovered_ = false;
-					Exited();
-				}
-			}
+			void Exit() noexcept;
 
 
 			//Sets whether or not this control is enabled

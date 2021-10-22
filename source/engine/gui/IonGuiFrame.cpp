@@ -33,43 +33,17 @@ void GuiFrame::Created(controls::GuiControl &control) noexcept
 {
 	GuiPanelContainer::Created(control); //Use base functionality
 
-	//In case the created control is actually adopted
-
-	if (control.IsFocused())
-	{
-		if (focused_control_)
-			focused_control_->Defocus();
-
-		focused_control_ = &control;
-	}
-
-	if (control.IsPressed())
-	{
-		if (pressed_control_)
-			pressed_control_->Release();
-
-		pressed_control_ = &control;
-	}
-
-	if (control.IsHovered())
-	{
-		if (hovered_control_)
-			hovered_control_->Exit();
-
-		hovered_control_ = &control;
-	}
+	//If the added control is adopted
+	control.Release();
+	control.Defocus();
+	control.Exit();
 }
 
 void GuiFrame::Removed(controls::GuiControl &control) noexcept
 {
-	if (focused_control_ == &control)
-		focused_control_ = nullptr;
-
-	if (pressed_control_ == &control)
-		pressed_control_ = nullptr;
-
-	if (hovered_control_ == &control)
-		hovered_control_ = nullptr;
+	control.Release();
+	control.Defocus();
+	control.Exit();
 
 	GuiPanelContainer::Removed(control); //Use base functionality
 }
@@ -96,7 +70,10 @@ void GuiFrame::Disabled([[maybe_unused]] controls::GuiControl &control) noexcept
 void GuiFrame::Focused(controls::GuiControl &control) noexcept
 {
 	if (control.IsFocused() && !focused_control_)
+	{
+		Focus();
 		focused_control_ = &control;
+	}
 }
 
 void GuiFrame::Defocused(controls::GuiControl &control) noexcept
@@ -250,13 +227,73 @@ GuiFrame::GuiFrame(std::string name) :
 
 
 /*
+	Modifiers
+*/
+
+void GuiFrame::Activate() noexcept
+{
+	if (!activated_)
+	{
+		activated_ = true;
+		Activated();
+	}
+}
+
+void GuiFrame::Deactivate() noexcept
+{
+	if (activated_)
+	{
+		activated_ = false;
+		Deactivated();
+	}
+}
+
+
+void GuiFrame::Focus() noexcept
+{
+	if (!focused_ && IsFocusable())
+	{
+		focused_ = true;
+		Focused();
+	}
+}
+
+void GuiFrame::Defocus() noexcept
+{
+	if (focused_)
+	{
+		focused_ = false;
+		Defocused();
+	}
+}
+
+
+/*
 	Observers
 */
 
 bool GuiFrame::IsFocusable() const noexcept
 {
-	if (auto owner = Owner(); owner)
-		return owner->IsFocusable(*this);
+	if (enabled_ && activated_)
+	{
+		if (auto owner = Owner(); owner)
+			return owner->IsEnabled() && owner->IsOnTop(*this);
+		else
+			return true;
+	}
+	else
+		return false;
+}
+
+bool GuiFrame::IsOnTop() const noexcept
+{
+	if (activated_)
+	{
+		if (auto owner = Owner(); owner)
+			return owner->IsOnTop(*this);
+		else
+			return true;
+	}
 	else
 		return false;
 }

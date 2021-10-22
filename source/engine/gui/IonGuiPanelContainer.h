@@ -134,6 +134,10 @@ namespace ion::gui
 				Observers
 			*/
 
+			//Returns true if this container is focusable
+			[[nodiscard]] bool IsFocusable() const noexcept;
+
+
 			//Returns a pointer to the parent frame of this container
 			[[nodiscard]] GuiFrame* ParentFrame() const noexcept;
 

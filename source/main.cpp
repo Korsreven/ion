@@ -1283,8 +1283,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto sub_panel = base_panel->CreatePanel("sub");
 			auto my_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("empty");
 
-			main_frame->Activate();
-			main_frame->Focus();
+			main_frame->Activate();	
 			my_control->Focus();
 			my_control->Disable();
 			main_frame->Deactivate();
