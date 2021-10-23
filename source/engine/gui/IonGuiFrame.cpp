@@ -33,17 +33,14 @@ void GuiFrame::Created(controls::GuiControl &control) noexcept
 {
 	GuiPanelContainer::Created(control); //Use base functionality
 
-	//If the added control is adopted
-	control.Release();
-	control.Defocus();
-	control.Exit();
+	//Added control could be adopted
+	control.Reset();
 }
 
 void GuiFrame::Removed(controls::GuiControl &control) noexcept
 {
-	control.Release();
-	control.Defocus();
-	control.Exit();
+	//Execute opposite events based on its current state
+	control.Reset();
 
 	GuiPanelContainer::Removed(control); //Use base functionality
 }
@@ -123,9 +120,8 @@ void GuiFrame::Enabled() noexcept
 void GuiFrame::Disabled() noexcept
 {
 	Defocus();
-
 	NotifyFrameDisabled();
-	GuiComponent::Enabled(); //Use base functionality
+	GuiComponent::Disabled(); //Use base functionality
 }
 
 
@@ -148,6 +144,15 @@ void GuiFrame::Focused() noexcept
 
 void GuiFrame::Defocused() noexcept
 {
+	if (pressed_control_)
+		pressed_control_->Release();
+
+	if (focused_control_)
+		focused_control_->Defocus();
+
+	if (hovered_control_)
+		hovered_control_->Exit();
+
 	NotifyFrameDefocused();
 }
 

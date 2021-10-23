@@ -40,10 +40,7 @@ void GuiControl::Enabled() noexcept
 
 void GuiControl::Disabled() noexcept
 {
-	Release();
-	Defocus();
-	Exit();
-
+	Reset();
 	SetState(ControlState::Disabled);
 	NotifyControlDisabled();
 	GuiComponent::Disabled(); //Use base functionality
@@ -70,7 +67,6 @@ void GuiControl::Defocused() noexcept
 void GuiControl::Pressed() noexcept
 {
 	Focus();
-
 	SetState(ControlState::Pressed);
 	NotifyControlPressed();
 }
@@ -358,6 +354,14 @@ void GuiControl::Exit() noexcept
 		hovered_ = false;
 		Exited();
 	}
+}
+
+
+void GuiControl::Reset() noexcept
+{
+	Release();
+	Defocus();
+	Exit();
 }
 
 

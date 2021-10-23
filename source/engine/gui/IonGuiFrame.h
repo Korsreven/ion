@@ -305,6 +305,28 @@ namespace ion::gui
 			[[nodiscard]] bool IsOnTop() const noexcept;
 
 
+			//Returns a pointer to the current focused control in this frame
+			//Returns nullptr if there is no currently focused control
+			[[nodiscard]] inline auto FocusedControl() const noexcept
+			{
+				return focused_control_;
+			}
+
+			//Returns a pointer to the current pressed control in this frame
+			//Returns nullptr if there is no currently pressed control
+			[[nodiscard]] inline auto PressedControl() const noexcept
+			{
+				return pressed_control_;
+			}
+
+			//Returns a pointer to the current hovered control in this frame
+			//Returns nullptr if there is no currently hovered control
+			[[nodiscard]] inline auto HoveredControl() const noexcept
+			{
+				return hovered_control_;
+			}
+
+
 			//Returns the on activate callback
 			[[nodiscard]] inline auto OnActivate() const noexcept
 			{

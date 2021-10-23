@@ -177,6 +177,11 @@ namespace ion::gui::controls
 			void Exit() noexcept;
 
 
+			//Reset this control to its enabled/disabled state
+			//Namely by executing release, defocus and exit
+			void Reset() noexcept;
+
+
 			//Sets whether or not this control is enabled
 			inline void Enabled(bool enabled) noexcept
 			{

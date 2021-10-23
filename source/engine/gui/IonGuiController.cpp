@@ -142,24 +142,13 @@ void GuiController::Deactivated(GuiFrame &frame) noexcept
 void GuiController::Focused(GuiFrame &frame) noexcept
 {
 	if (frame.IsFocused() && !focused_frame_)
-	{
 		focused_frame_ = &frame;
-
-		if (!std::empty(active_frames_))
-			active_frames_.back().current_frame = &frame;
-	}
 }
 
 void GuiController::Defocused(GuiFrame &frame) noexcept
 {
 	if (!frame.IsFocused() && focused_frame_ == &frame)
-	{
 		focused_frame_ = nullptr;
-
-		if (!std::empty(active_frames_) &&
-			active_frames_.back().current_frame == &frame)
-			active_frames_.back().current_frame = nullptr;
-	}
 }
 
 

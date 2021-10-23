@@ -29,11 +29,15 @@ namespace ion::graphics::scene::graph
 
 namespace ion::gui
 {
+	//Forward declarations
+	class GuiComponent;
+	struct GuiContainer;
+
 	using namespace graphics::scene::graph;
-	struct GuiContainer; //Forward declaration
 
 	namespace gui_component::detail
 	{
+		bool is_descendant_of(const GuiContainer &owner, const GuiComponent &component) noexcept;
 	} //gui_component::detail
 
 
@@ -99,24 +103,10 @@ namespace ion::gui
 			*/
 
 			//Enable this component
-			inline void Enable() noexcept
-			{
-				if (!enabled_)
-				{
-					enabled_ = true;
-					Enabled();
-				}
-			}
+			void Enable() noexcept;
 
 			//Disable this component
-			inline void Disable() noexcept
-			{
-				if (enabled_)
-				{
-					enabled_ = false;
-					Disabled();
-				}
-			}
+			void Disable() noexcept;
 
 
 			//Sets whether or not this component is enabled
@@ -206,6 +196,9 @@ namespace ion::gui
 			{
 				return owner_;
 			}
+
+			//Returns true if this component is a descendant of the given owner
+			[[nodiscard]] bool IsDescendantOf(const GuiContainer &owner) const noexcept;
 	};
 } //ion::gui
 

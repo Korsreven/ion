@@ -18,8 +18,20 @@ File:	IonGuiComponent.cpp
 namespace ion::gui
 {
 
+using namespace gui_component;
+
 namespace gui_component::detail
 {
+
+bool is_descendant_of(const GuiContainer &owner, const GuiComponent &component) noexcept
+{
+	if (auto component_owner = component.Owner(); component_owner == &owner)
+		return true;
+	else if (component_owner)
+		return is_descendant_of(owner, *component_owner); //Recursive
+	else
+		return false;
+}
 
 } //gui_component::detail
 
@@ -80,6 +92,25 @@ GuiComponent::~GuiComponent() noexcept
 	Modifiers
 */
 
+void GuiComponent::Enable() noexcept
+{
+	if (!enabled_)
+	{
+		enabled_ = true;
+		Enabled();
+	}
+}
+
+void GuiComponent::Disable() noexcept
+{
+	if (enabled_)
+	{
+		enabled_ = false;
+		Disabled();
+	}
+}
+
+
 void GuiComponent::Parent(GuiComponent &parent) noexcept
 {
 	if (owner_ == parent.Owner())
@@ -104,6 +135,16 @@ void GuiComponent::Owner(std::nullptr_t) noexcept
 {
 	managed::ManagedObject<GuiContainer>::Owner(nullptr);
 	Detach();
+}
+
+
+/*
+	Observers
+*/
+
+bool GuiComponent::IsDescendantOf(const GuiContainer &owner) const noexcept
+{
+	return detail::is_descendant_of(owner, *this);
 }
 
 } //ion::gui

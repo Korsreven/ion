@@ -103,6 +103,25 @@ void GuiPanelContainer::Removed(GuiPanel &panel) noexcept
 }
 
 
+void GuiPanelContainer::Enabled() noexcept
+{
+	GuiComponent::Enabled(); //Use base functionality
+}
+
+void GuiPanelContainer::Disabled() noexcept
+{
+	if (auto frame = ParentFrame(); frame)
+	{
+		if (auto control = frame->FocusedControl();
+			control && control->IsDescendantOf(*this))
+
+			control->Reset();
+	}
+
+	GuiComponent::Disabled(); //Use base functionality
+}
+
+
 //Public
 
 /*

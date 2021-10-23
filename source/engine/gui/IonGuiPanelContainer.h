@@ -69,6 +69,13 @@ namespace ion::gui
 			virtual void Removed(controls::GuiControl &control) noexcept;
 			virtual void Removed(GuiPanel &panel) noexcept;
 
+
+			//See GuiComponent::Enabled for more details
+			virtual void Enabled() noexcept override;
+
+			//See GuiComponent::Disabled for more details
+			virtual void Disabled() noexcept override;
+
 		public:
 
 			using GuiContainer::GuiContainer;
