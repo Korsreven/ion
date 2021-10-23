@@ -1280,13 +1280,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::gui::GuiController controller{scene_graph->RootNode()};
 			auto main_frame = controller.CreateFrame("main");
 			auto base_panel = main_frame->CreatePanel("base");
+			auto base_control = base_panel->CreateControl<ion::gui::controls::GuiControl>("control");
 			auto sub_panel = base_panel->CreatePanel("sub");
-			auto my_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("empty");
+			auto sub_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("control");
+			auto leaf_panel = sub_panel->CreatePanel("leaf");
 
 			main_frame->Activate();	
-			my_control->Focus();
-			my_control->Disable();
-			main_frame->Deactivate();
+			base_control->Focus();
+			sub_control->Focus();
+			main_frame->Disable();
 
 			//Camera
 			auto cam_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});

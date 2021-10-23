@@ -66,8 +66,11 @@ void GuiFrame::Disabled([[maybe_unused]] controls::GuiControl &control) noexcept
 
 void GuiFrame::Focused(controls::GuiControl &control) noexcept
 {
-	if (control.IsFocused() && !focused_control_)
+	if (control.IsFocused() && focused_control_ != &control)
 	{
+		if (focused_control_)
+			focused_control_->Defocus();
+
 		Focus();
 		focused_control_ = &control;
 	}
@@ -82,8 +85,13 @@ void GuiFrame::Defocused(controls::GuiControl &control) noexcept
 
 void GuiFrame::Pressed(controls::GuiControl &control) noexcept
 {
-	if (control.IsPressed() && !pressed_control_)
+	if (control.IsPressed() && pressed_control_ != &control)
+	{
+		if (pressed_control_)
+			pressed_control_->Release();
+
 		pressed_control_ = &control;
+	}
 }
 
 void GuiFrame::Released(controls::GuiControl &control) noexcept
@@ -100,8 +108,13 @@ void GuiFrame::Clicked([[maybe_unused]] controls::GuiControl &control) noexcept
 
 void GuiFrame::Entered(controls::GuiControl &control) noexcept
 {
-	if (control.IsHovered() && !hovered_control_)
+	if (control.IsHovered() && hovered_control_ != &control)
+	{
+		if (hovered_control_)
+			hovered_control_->Exit();
+
 		hovered_control_ = &control;
+	}
 }
 
 void GuiFrame::Exited(controls::GuiControl &control) noexcept

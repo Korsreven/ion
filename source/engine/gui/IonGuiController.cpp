@@ -26,7 +26,7 @@ void activate_frame(GuiFrame &frame, frames &to_frames, bool modal) noexcept
 {
 	//Push new layer
 	if (modal || std::empty(to_frames))
-		to_frames.emplace_back(&frame).frames.push_back(&frame);
+		to_frames.emplace_back().frames.push_back(&frame);
 	//Append to top layer
 	else
 		to_frames.back().frames.push_back(&frame);
@@ -130,19 +130,26 @@ void GuiController::Disabled([[maybe_unused]] GuiFrame &frame) noexcept
 
 void GuiController::Activated(GuiFrame &frame) noexcept
 {
-	detail::activate_frame(frame, active_frames_, false);
+	if (frame.IsActivated())
+		detail::activate_frame(frame, active_frames_, false);
 }
 
 void GuiController::Deactivated(GuiFrame &frame) noexcept
 {
-	detail::deactivate_frame(frame, active_frames_);
+	if (!frame.IsActivated())
+		detail::deactivate_frame(frame, active_frames_);
 }
 
 
 void GuiController::Focused(GuiFrame &frame) noexcept
 {
-	if (frame.IsFocused() && !focused_frame_)
+	if (frame.IsFocused() && focused_frame_ != &frame)
+	{
+		if (focused_frame_)
+			focused_frame_->Defocus();
+
 		focused_frame_ = &frame;
+	}
 }
 
 void GuiController::Defocused(GuiFrame &frame) noexcept
