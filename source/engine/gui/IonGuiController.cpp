@@ -57,7 +57,7 @@ void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept
 					active_layer.current_frame =
 						iter != std::end(active_layer.frames) ?
 						*iter :
-						*(iter - 1);
+						nullptr;
 				
 				return;
 			}
@@ -149,6 +149,9 @@ void GuiController::Focused(GuiFrame &frame) noexcept
 			focused_frame_->Defocus();
 
 		focused_frame_ = &frame;
+
+		if (!std::empty(active_frames_))
+			active_frames_.back().current_frame = &frame;
 	}
 }
 
