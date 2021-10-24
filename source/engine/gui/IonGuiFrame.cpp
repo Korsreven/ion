@@ -61,6 +61,77 @@ std::optional<control_pointers::iterator> get_current_control_iterator(control_p
 } //gui_frame::detail
 
 
+//Private
+
+bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
+{
+	auto controls = detail::get_ordered_controls(*this);
+
+	if (auto current_iter = detail::get_current_control_iterator(controls, focused_control_); current_iter)
+	{
+		for (auto iter = detail::get_next_control_iterator(*current_iter, controls);
+			iter != *current_iter; detail::get_next_control_iterator(iter, controls))
+		{
+			//Tab to next frame
+			if (iter == std::begin(controls))
+			{
+				Owner()->TabForward();
+
+				auto found = false;
+				if (auto focused_frame = Owner()->FocusedFrame();
+					focused_frame && focused_frame != &from_frame)
+
+					found = focused_frame->TabForward(from_frame); //Recursive
+
+				if (found || this != &from_frame)
+					return found; //Unwind
+			}
+
+			(*iter)->Focus();
+
+			if ((*iter)->IsFocused())
+				return true;
+		}
+	}
+
+	return false;
+}
+
+bool GuiFrame::TabBackward(GuiFrame &from_frame) noexcept
+{
+	auto controls = detail::get_ordered_controls(*this);
+
+	if (auto current_iter = detail::get_current_control_iterator(controls, focused_control_); current_iter)
+	{
+		for (auto iter = detail::get_previous_control_iterator(*current_iter, controls);
+			iter != *current_iter; detail::get_previous_control_iterator(iter, controls))
+		{
+			//Tab to previous frame
+			if (iter == std::end(controls) - 1)
+			{
+				Owner()->TabBackward();
+
+				auto found = false;
+				if (auto focused_frame = Owner()->FocusedFrame();
+					focused_frame && focused_frame != &from_frame)
+					
+					found = focused_frame->TabBackward(from_frame); //Recursive
+
+				if (found || this != &from_frame)
+					return found; //Unwind
+			}
+
+			(*iter)->Focus();
+
+			if ((*iter)->IsFocused())
+				return true;
+		}
+	}
+
+	return false;
+}
+
+
 //Protected
 
 /*
@@ -367,58 +438,12 @@ GuiController* GuiFrame::Owner() const noexcept
 
 void GuiFrame::TabForward() noexcept
 {
-	auto controls = detail::get_ordered_controls(*this);
-
-	if (auto current_iter = detail::get_current_control_iterator(controls, focused_control_); current_iter)
-	{
-		for (auto iter = detail::get_next_control_iterator(*current_iter, controls);
-			iter != *current_iter; detail::get_next_control_iterator(iter, controls))
-		{
-			if (iter == std::begin(controls))
-			{
-				Owner()->TabForward();
-
-				if (auto focused_frame = Owner()->FocusedFrame(); focused_frame != this)
-				{
-					focused_frame->TabForward(); //Recursive
-					return;
-				}
-			}
-
-			(*iter)->Focus();
-
-			if ((*iter)->IsFocused())
-				break;
-		}
-	}
+	TabForward(*this);
 }
 
 void GuiFrame::TabBackward() noexcept
 {
-	auto controls = detail::get_ordered_controls(*this);
-
-	if (auto current_iter = detail::get_current_control_iterator(controls, focused_control_); current_iter)
-	{
-		for (auto iter = detail::get_previous_control_iterator(*current_iter, controls);
-			iter != *current_iter; detail::get_previous_control_iterator(iter, controls))
-		{
-			if (iter == std::end(controls) - 1)
-			{
-				Owner()->TabBackward();
-				
-				if (auto focused_frame = Owner()->FocusedFrame(); focused_frame != this)
-				{
-					focused_frame->TabBackward(); //Recursive
-					return;
-				}
-			}
-
-			(*iter)->Focus();
-
-			if ((*iter)->IsFocused())
-				break;
-		}
-	}
+	TabBackward(*this);
 }
 
 

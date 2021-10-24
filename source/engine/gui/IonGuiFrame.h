@@ -73,6 +73,10 @@ namespace ion::gui
 			using ControlEventsBase = events::Listenable<events::listeners::GuiControlListener>;
 			using ManagedObjectEventsBase = events::Listenable<events::listeners::ManagedObjectListener<GuiComponent, GuiContainer>>;
 			using FrameEventsGeneratorBase = events::EventGenerator<events::listeners::GuiFrameListener>;
+
+
+			bool TabForward(GuiFrame &from_frame) noexcept;
+			bool TabBackward(GuiFrame &from_frame) noexcept;
 		
 		protected:
 
