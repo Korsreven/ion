@@ -13,6 +13,7 @@ File:	IonGuiFrame.h
 #ifndef ION_GUI_FRAME_H
 #define ION_GUI_FRAME_H
 
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -39,6 +40,25 @@ namespace ion::gui
 
 	namespace gui_frame::detail
 	{
+		using gui_panel_container::detail::control_pointers;
+
+
+		void get_ordered_controls(GuiPanelContainer &owner, control_pointers &controls);
+		control_pointers get_ordered_controls(GuiPanelContainer &owner);
+
+
+		std::optional<control_pointers::iterator> get_current_control_iterator(control_pointers &controls,
+			controls::GuiControl *focused_control) noexcept;
+
+		inline auto get_next_control_iterator(control_pointers::iterator iter, control_pointers &controls) noexcept
+		{
+			return iter != std::end(controls) ? iter + 1 : std::begin(controls);
+		}
+
+		inline auto get_previous_control_iterator(control_pointers::iterator iter, control_pointers &controls) noexcept
+		{
+			return iter != std::begin(controls) ? iter - 1 : std::end(controls) - 1;
+		}
 	} //gui_frame::detail
 
 
