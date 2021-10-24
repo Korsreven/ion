@@ -199,6 +199,14 @@ namespace ion::gui
 			[[nodiscard]] bool IsOnTop(const GuiFrame &frame) const noexcept;
 
 
+			//Returns a pointer to the current focused frame in this controller
+			//Returns nullptr if there is no currently focused frame
+			[[nodiscard]] inline auto FocusedFrame() const noexcept
+			{
+				return focused_frame_;
+			}
+
+
 			/*
 				Tabulating
 			*/
