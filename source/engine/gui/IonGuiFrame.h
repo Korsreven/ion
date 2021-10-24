@@ -358,6 +358,17 @@ namespace ion::gui
 
 
 			/*
+				Tabulating
+			*/
+
+			//Focuses the next focusable control in this frame
+			void TabForward() noexcept;
+
+			//Focuses the previous focusable control in this frame
+			void TabBackward() noexcept;
+
+
+			/*
 				Frame events
 			*/
 

@@ -22,14 +22,43 @@ using namespace gui_controller;
 namespace gui_controller::detail
 {
 
+bool is_frame_on_top(const GuiFrame &frame, const frames &frames) noexcept
+{
+	if (std::empty(frames))
+		return false;
+	else
+		return std::find(std::begin(frames.back().frames), std::end(frames.back().frames), &frame) !=
+			std::end(frames.back().frames);
+}
+
+bool is_frame_activated(const GuiFrame &frame, const frames &frames) noexcept
+{
+	//Search through all active frames
+	for (auto &active_layer : frames)
+	{
+		//Search through active layer
+		for (auto &active_frame : active_layer.frames)
+		{
+			if (active_frame == &frame)
+				return true;
+		}
+	}
+
+	return false;
+}
+
+
 void activate_frame(GuiFrame &frame, frames &to_frames, bool modal) noexcept
 {
-	//Push new layer
-	if (modal || std::empty(to_frames))
-		to_frames.emplace_back().frames.push_back(&frame);
-	//Append to top layer
-	else
-		to_frames.back().frames.push_back(&frame);
+	if (!is_frame_activated(frame, to_frames))
+	{
+		//Push new layer
+		if (modal || std::empty(to_frames))
+			to_frames.emplace_back().frames.push_back(&frame);
+		//Append to top layer
+		else
+			to_frames.back().frames.push_back(&frame);
+	}
 }
 
 void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept
@@ -66,13 +95,20 @@ void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept
 }
 
 
-bool is_frame_on_top(const GuiFrame &frame, const frames &frames) noexcept
+std::optional<frame_pointers::iterator> get_current_frame_iterator(frames &frames) noexcept
 {
 	if (std::empty(frames))
-		return false;
+		return std::nullopt;
+	else if (!frames.back().current_frame)
+		return std::begin(frames.back().frames);
 	else
-		return std::find(std::begin(frames.back().frames), std::end(frames.back().frames), &frame) !=
-			std::end(frames.back().frames);
+	{
+		if (auto iter = std::find(std::begin(frames.back().frames), std::end(frames.back().frames), frames.back().current_frame);
+			iter != std::end(frames.back().frames))
+			return iter;
+		else
+			return std::nullopt;
+	}
 }
 
 } //gui_controller::detail
@@ -178,6 +214,45 @@ GuiController::GuiController(SceneNode &parent_node)
 bool GuiController::IsOnTop(const GuiFrame &frame) const noexcept
 {
 	return detail::is_frame_on_top(frame, active_frames_);
+}
+
+
+/*
+	Tabulating
+*/
+
+void GuiController::TabForward() noexcept
+{
+	if (auto current_iter = detail::get_current_frame_iterator(active_frames_); current_iter)
+	{
+		auto &top_frames = active_frames_.back().frames;
+
+		for (auto iter = detail::get_next_frame_iterator(*current_iter, top_frames);
+			iter != *current_iter; detail::get_next_frame_iterator(iter, top_frames))
+		{
+			(*iter)->Focus();
+
+			if ((*iter)->IsFocused())
+				break;
+		}
+	}
+}
+
+void GuiController::TabBackward() noexcept
+{
+	if (auto current_iter = detail::get_current_frame_iterator(active_frames_); current_iter)
+	{
+		auto &top_frames = active_frames_.back().frames;
+
+		for (auto iter = detail::get_previous_frame_iterator(*current_iter, top_frames);
+			iter != *current_iter; detail::get_previous_frame_iterator(iter, top_frames))
+		{
+			(*iter)->Focus();
+
+			if ((*iter)->IsFocused())
+				break;
+		}
+	}
 }
 
 

@@ -13,6 +13,7 @@ File:	IonGuiController.h
 #ifndef ION_GUI_CONTROLLER_H
 #define ION_GUI_CONTROLLER_H
 
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -55,10 +56,24 @@ namespace ion::gui
 			//The rest of the active frames in the stack are non-interactive (but visible)
 
 
-		void activate_frame(GuiFrame &frame, frames &to_frames, bool modal) noexcept;
-		void deactive_frame(GuiFrame &frame, frames &from_frames) noexcept;
-
 		bool is_frame_on_top(const GuiFrame &frame, const frames &frames) noexcept;
+		bool is_frame_activated(const GuiFrame &frame, const frames &frames) noexcept;
+
+		void activate_frame(GuiFrame &frame, frames &to_frames, bool modal) noexcept;
+		void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept;
+
+
+		std::optional<frame_pointers::iterator> get_current_frame_iterator(frames &frames) noexcept;
+
+		inline auto get_next_frame_iterator(frame_pointers::iterator iter, frame_pointers &frames) noexcept
+		{
+			return iter != std::end(frames) ? iter + 1 : std::begin(frames);
+		}
+
+		inline auto get_previous_frame_iterator(frame_pointers::iterator iter, frame_pointers &frames) noexcept
+		{
+			return iter != std::begin(frames) ? iter - 1 : std::end(frames) - 1;
+		}
 	} //gui_controller::detail
 
 
@@ -182,6 +197,17 @@ namespace ion::gui
 
 			//Returns true if the given frame is on top
 			[[nodiscard]] bool IsOnTop(const GuiFrame &frame) const noexcept;
+
+
+			/*
+				Tabulating
+			*/
+
+			//Focuses the next focusable frame in this controller
+			void TabForward() noexcept;
+
+			//Focuses the previous focusable frame in this controller
+			void TabBackward() noexcept;
 
 
 			/*

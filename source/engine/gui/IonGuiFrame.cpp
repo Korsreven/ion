@@ -324,6 +324,21 @@ GuiController* GuiFrame::Owner() const noexcept
 
 
 /*
+	Tabulating
+*/
+
+void GuiFrame::TabForward() noexcept
+{
+
+}
+
+void GuiFrame::TabBackward() noexcept
+{
+
+}
+
+
+/*
 	Frame events
 */
 
