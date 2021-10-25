@@ -100,7 +100,7 @@ std::optional<frame_pointers::iterator> get_current_frame_iterator(frames &frame
 	if (std::empty(frames))
 		return std::nullopt;
 	else if (!frames.back().current_frame)
-		return std::begin(frames.back().frames);
+		return std::end(frames.back().frames);
 	else
 	{
 		if (auto iter = std::find(std::begin(frames.back().frames), std::end(frames.back().frames), frames.back().current_frame);
@@ -228,8 +228,11 @@ void GuiController::TabForward() noexcept
 		auto &top_frames = active_frames_.back().frames;
 
 		for (auto iter = detail::get_next_frame_iterator(*current_iter, top_frames);
-			iter != *current_iter; detail::get_next_frame_iterator(iter, top_frames))
+			iter != *current_iter; iter = detail::get_next_frame_iterator(iter, top_frames))
 		{
+			if (iter == std::end(top_frames))
+				continue;
+
 			(*iter)->Focus();
 
 			if ((*iter)->IsFocused())
@@ -245,7 +248,7 @@ void GuiController::TabBackward() noexcept
 		auto &top_frames = active_frames_.back().frames;
 
 		for (auto iter = detail::get_previous_frame_iterator(*current_iter, top_frames);
-			iter != *current_iter; detail::get_previous_frame_iterator(iter, top_frames))
+			iter != *current_iter; iter = detail::get_previous_frame_iterator(iter, top_frames))
 		{
 			(*iter)->Focus();
 

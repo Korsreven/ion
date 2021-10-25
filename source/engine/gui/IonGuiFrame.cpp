@@ -47,7 +47,7 @@ std::optional<control_pointers::iterator> get_current_control_iterator(control_p
 	if (std::empty(controls))
 		return std::nullopt;
 	else if (!focused_control)
-		return std::begin(controls);
+		return std::end(controls);
 	else
 	{
 		if (auto iter = std::find(std::begin(controls), std::end(controls), focused_control);
@@ -70,10 +70,10 @@ bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
 	if (auto current_iter = detail::get_current_control_iterator(controls, focused_control_); current_iter)
 	{
 		for (auto iter = detail::get_next_control_iterator(*current_iter, controls);
-			iter != *current_iter; detail::get_next_control_iterator(iter, controls))
+			iter != *current_iter; iter = detail::get_next_control_iterator(iter, controls))
 		{
 			//Tab to next frame
-			if (iter == std::begin(controls))
+			if (iter == std::end(controls))
 			{
 				Owner()->TabForward();
 
@@ -85,6 +85,8 @@ bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
 
 				if (found || this != &from_frame)
 					return found; //Unwind
+
+				continue;
 			}
 
 			(*iter)->Focus();
@@ -104,7 +106,7 @@ bool GuiFrame::TabBackward(GuiFrame &from_frame) noexcept
 	if (auto current_iter = detail::get_current_control_iterator(controls, focused_control_); current_iter)
 	{
 		for (auto iter = detail::get_previous_control_iterator(*current_iter, controls);
-			iter != *current_iter; detail::get_previous_control_iterator(iter, controls))
+			iter != *current_iter; iter = detail::get_previous_control_iterator(iter, controls))
 		{
 			//Tab to previous frame
 			if (iter == std::end(controls) - 1)
