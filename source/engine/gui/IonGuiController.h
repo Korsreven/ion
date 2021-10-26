@@ -91,6 +91,7 @@ namespace ion::gui
 			GuiFrame *focused_frame_ = nullptr;
 			gui_controller::detail::frames active_frames_;
 
+
 			/*
 				Events
 			*/
@@ -211,11 +212,20 @@ namespace ion::gui
 				Tabulating
 			*/
 
-			//Focuses the next focusable frame in this controller
+			//Focuses the next focusable control in the current focused frame in this controller
+			//Automatically focuses the next active frame when focusing past the last control
 			void TabForward() noexcept;
 
-			//Focuses the previous focusable frame in this controller
+			//Focuses the previous focusable control in the current focused frame in this controller
+			//Automatically focuses the previous active frame when focusing after the first control
 			void TabBackward() noexcept;
+
+
+			//Focuses the next focusable frame in this controller
+			void FocusNextFrame() noexcept;
+
+			//Focuses the previous focusable frame in this controller
+			void FocusPreviousFrame() noexcept;
 
 
 			/*

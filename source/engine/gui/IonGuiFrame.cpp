@@ -75,7 +75,7 @@ bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
 			//Tab to next frame
 			if (iter == std::end(controls))
 			{
-				Owner()->TabForward();
+				Owner()->FocusNextFrame();
 
 				auto found = false;
 				if (auto focused_frame = Owner()->FocusedFrame();
@@ -111,7 +111,7 @@ bool GuiFrame::TabBackward(GuiFrame &from_frame) noexcept
 			//Tab to previous frame
 			if (iter == std::end(controls) - 1)
 			{
-				Owner()->TabBackward();
+				Owner()->FocusPreviousFrame();
 
 				auto found = false;
 				if (auto focused_frame = Owner()->FocusedFrame();

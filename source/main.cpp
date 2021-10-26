@@ -1285,19 +1285,24 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto sub_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("control");
 			auto leaf_panel = sub_panel->CreatePanel("leaf");
 
-			/*auto main_frame2 = controller.CreateFrame("main2");
+			auto main_frame2 = controller.CreateFrame("main2");
 			auto base_panel2 = main_frame2->CreatePanel("base");
 			auto base_control2 = base_panel2->CreateControl<ion::gui::controls::GuiControl>("control");
 			auto sub_panel2 = base_panel2->CreatePanel("sub");
 			auto sub_control2 = sub_panel2->CreateControl<ion::gui::controls::GuiControl>("control");
-			auto leaf_panel2 = sub_panel2->CreatePanel("leaf");*/
+			auto leaf_panel2 = sub_panel2->CreatePanel("leaf");
 
 			main_frame->Activate();
-			//main_frame2->Activate();	
-			//base_control->Focus();
+			main_frame2->Activate();
+			main_frame->Disable();
+			main_frame2->Disable();
+
 			main_frame->TabForward();
-			main_frame->TabForward();
-			main_frame->TabForward();
+			controller.TabForward();
+			controller.TabForward();
+			controller.TabForward();
+			controller.TabForward();
+			controller.TabForward();
 
 			//Camera
 			auto cam_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});

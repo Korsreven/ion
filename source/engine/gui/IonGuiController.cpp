@@ -223,6 +223,25 @@ bool GuiController::IsOnTop(const GuiFrame &frame) const noexcept
 
 void GuiController::TabForward() noexcept
 {
+	if (!focused_frame_)
+		FocusNextFrame();
+
+	if (focused_frame_)
+		focused_frame_->TabForward();
+}
+
+void GuiController::TabBackward() noexcept
+{
+	if (!focused_frame_)
+		FocusPreviousFrame();
+
+	if (focused_frame_)
+		focused_frame_->TabBackward();
+}
+
+
+void GuiController::FocusNextFrame() noexcept
+{
 	if (auto current_iter = detail::get_current_frame_iterator(active_frames_); current_iter)
 	{
 		auto &top_frames = active_frames_.back().frames;
@@ -241,7 +260,7 @@ void GuiController::TabForward() noexcept
 	}
 }
 
-void GuiController::TabBackward() noexcept
+void GuiController::FocusPreviousFrame() noexcept
 {
 	if (auto current_iter = detail::get_current_frame_iterator(active_frames_); current_iter)
 	{
