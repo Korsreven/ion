@@ -269,6 +269,9 @@ void GuiController::FocusPreviousFrame() noexcept
 		for (auto iter = detail::get_previous_frame_iterator(*current_iter, top_frames);
 			iter != *current_iter; iter = detail::get_previous_frame_iterator(iter, top_frames))
 		{
+			if (iter == std::end(top_frames))
+				continue;
+
 			(*iter)->Focus();
 
 			if ((*iter)->IsFocused())

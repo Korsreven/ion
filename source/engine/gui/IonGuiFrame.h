@@ -57,7 +57,7 @@ namespace ion::gui
 
 		inline auto get_previous_control_iterator(control_pointers::iterator iter, control_pointers &controls) noexcept
 		{
-			return iter != std::begin(controls) ? iter - 1 : std::end(controls) - 1;
+			return iter != std::begin(controls) ? iter - 1 : std::end(controls);
 		}
 	} //gui_frame::detail
 
@@ -73,6 +73,8 @@ namespace ion::gui
 			using ControlEventsBase = events::Listenable<events::listeners::GuiControlListener>;
 			using ManagedObjectEventsBase = events::Listenable<events::listeners::ManagedObjectListener<GuiComponent, GuiContainer>>;
 			using FrameEventsGeneratorBase = events::EventGenerator<events::listeners::GuiFrameListener>;
+
+			gui_frame::detail::control_pointers ordered_controls_;
 
 
 			bool TabForward(GuiFrame &from_frame) noexcept;
@@ -98,10 +100,15 @@ namespace ion::gui
 			*/
 
 			//See GuiPanelContainer::Created for more details
+			virtual void Created(GuiComponent &component) noexcept override;
 			virtual void Created(controls::GuiControl &control) noexcept override;
 
 			//See GuiPanelContainer::Removed for more details
+			virtual void Removed(GuiComponent &component) noexcept override;
 			virtual void Removed(controls::GuiControl &control) noexcept override;
+
+			//See GuiPanelContainer::TabOrderChanged for more details
+			virtual void TabOrderChanged() noexcept override;
 
 
 			//See Listener<T>::Unsubscribable for more details

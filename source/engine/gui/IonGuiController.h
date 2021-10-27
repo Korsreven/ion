@@ -72,7 +72,7 @@ namespace ion::gui
 
 		inline auto get_previous_frame_iterator(frame_pointers::iterator iter, frame_pointers &frames) noexcept
 		{
-			return iter != std::begin(frames) ? iter - 1 : std::end(frames) - 1;
+			return iter != std::begin(frames) ? iter - 1 : std::end(frames);
 		}
 	} //gui_controller::detail
 

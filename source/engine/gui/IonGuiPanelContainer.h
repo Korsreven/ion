@@ -60,14 +60,17 @@ namespace ion::gui
 			*/
 
 			//See ObjectManager::Created for more details
-			void Created(GuiComponent &component) noexcept override final;
+			virtual void Created(GuiComponent &component) noexcept override;
 			virtual void Created(controls::GuiControl &control) noexcept;
 			virtual void Created(GuiPanel &panel) noexcept;
 
 			//See ObjectManager::Removed for more details
-			void Removed(GuiComponent &component) noexcept override final;
+			virtual void Removed(GuiComponent &component) noexcept override;
 			virtual void Removed(controls::GuiControl &control) noexcept;
 			virtual void Removed(GuiPanel &panel) noexcept;
+
+			//Called right after the tab order has been changed
+			virtual void TabOrderChanged() noexcept;
 
 
 			//See GuiComponent::Enabled for more details

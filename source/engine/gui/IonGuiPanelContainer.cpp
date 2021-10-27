@@ -103,6 +103,12 @@ void GuiPanelContainer::Removed(GuiPanel &panel) noexcept
 }
 
 
+void GuiPanelContainer::TabOrderChanged() noexcept
+{
+	//Optional to override
+}
+
+
 void GuiPanelContainer::Enabled() noexcept
 {
 	GuiComponent::Enabled(); //Use base functionality
@@ -163,6 +169,7 @@ void GuiPanelContainer::TabOrder(GuiComponent &component, int order) noexcept
 		ordered_components_.erase(iter);
 		ordered_components_.insert(std::begin(ordered_components_) +
 			std::clamp(order, 0, std::ssize(ordered_components_)), &component);
+		TabOrderChanged(); //Notify that tab order has been changed
 	}
 }
 
