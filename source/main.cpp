@@ -1294,15 +1294,20 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			main_frame->Activate();
 			main_frame2->Activate();
-			main_frame->Disable();
-			main_frame2->Disable();
+			/*sub_control->Disable();
+			base_control2->Disable();
+			sub_control2->Disable();*/
 
-			main_frame->TabForward();
 			controller.TabForward();
+			assert(base_control->IsFocused());
 			controller.TabForward();
+			assert(sub_control->IsFocused());
 			controller.TabForward();
+			assert(base_control2->IsFocused());
 			controller.TabForward();
+			assert(sub_control2->IsFocused());
 			controller.TabForward();
+			assert(base_control->IsFocused());
 
 			//Camera
 			auto cam_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});

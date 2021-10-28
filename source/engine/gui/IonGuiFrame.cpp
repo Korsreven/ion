@@ -74,27 +74,28 @@ bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
 		for (auto iter = detail::get_next_control_iterator(*current_iter, ordered_controls_);
 			iter != *current_iter; iter = detail::get_next_control_iterator(iter, ordered_controls_))
 		{
-			if (iter != std::end(ordered_controls_))
+			//Tab to next frame
+			if (iter == std::end(ordered_controls_))
+			{
+				auto found = false;
+
+				if (auto owner = Owner(); owner)
+				{
+					if (auto focusable_frame = owner->NextFocusableFrame(this);
+						focusable_frame && focusable_frame != &from_frame)
+
+						found = focusable_frame->TabForward(from_frame); //Recursive
+				}
+
+				if (found || this != &from_frame)
+					return found; //Unwind
+			}
+			else
 			{
 				(*iter)->Focus();
 
 				if ((*iter)->IsFocused())
 					return true;
-			}
-
-			//Tab to next frame
-			if (iter >= std::end(ordered_controls_) - 1)
-			{
-				Owner()->FocusNextFrame();
-
-				auto found = false;
-				if (auto focused_frame = Owner()->FocusedFrame();
-					focused_frame && focused_frame != &from_frame)
-
-					found = focused_frame->TabForward(from_frame); //Recursive
-
-				if (found || this != &from_frame)
-					return found; //Unwind
 			}
 		}
 	}
@@ -113,25 +114,31 @@ bool GuiFrame::TabBackward(GuiFrame &from_frame) noexcept
 		for (auto iter = detail::get_previous_control_iterator(*current_iter, ordered_controls_);
 			iter != *current_iter; iter = detail::get_previous_control_iterator(iter, ordered_controls_))
 		{
-			//Tab to previous frame
-			if (iter == std::end(ordered_controls_) - 1)
+			if (iter != std::end(ordered_controls_))
 			{
-				Owner()->FocusPreviousFrame();
+				(*iter)->Focus();
 
+				if ((*iter)->IsFocused())
+					return true;
+			}
+
+			//Tab to previous frame
+			if (iter == std::begin(ordered_controls_) ||
+				iter == std::end(ordered_controls_))
+			{
 				auto found = false;
-				if (auto focused_frame = Owner()->FocusedFrame();
-					focused_frame && focused_frame != &from_frame)
+
+				if (auto owner = Owner(); owner)
+				{
+					if (auto focusable_frame = owner->PreviousFocusableFrame(this);
+						focusable_frame && focusable_frame != &from_frame)
 					
-					found = focused_frame->TabBackward(from_frame); //Recursive
+						found = focusable_frame->TabBackward(from_frame); //Recursive
+				}
 
 				if (found || this != &from_frame)
 					return found; //Unwind
 			}
-
-			(*iter)->Focus();
-
-			if ((*iter)->IsFocused())
-				return true;
 		}
 	}
 

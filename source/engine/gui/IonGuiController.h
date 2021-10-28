@@ -63,7 +63,7 @@ namespace ion::gui
 		void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept;
 
 
-		std::optional<frame_pointers::iterator> get_current_frame_iterator(frames &frames) noexcept;
+		std::optional<frame_pointers::iterator> get_frame_iterator(frames &frames, GuiFrame *frame) noexcept;
 
 		inline auto get_next_frame_iterator(frame_pointers::iterator iter, frame_pointers &frames) noexcept
 		{
@@ -221,11 +221,13 @@ namespace ion::gui
 			void TabBackward() noexcept;
 
 
-			//Focuses the next focusable frame in this controller
-			void FocusNextFrame() noexcept;
+			//Returns the next focusable frame (optionally from the given frame) in this controller
+			//Returns nullptr if no frames are focusable
+			GuiFrame* NextFocusableFrame(GuiFrame *from_frame = nullptr) noexcept;
 
-			//Focuses the previous focusable frame in this controller
-			void FocusPreviousFrame() noexcept;
+			//Returns the previous focusable frame (optionally from the given frame) in this controller
+			//Returns nullptr if no frames are focusable
+			GuiFrame* PreviousFocusableFrame(GuiFrame *from_frame = nullptr) noexcept;
 
 
 			/*
