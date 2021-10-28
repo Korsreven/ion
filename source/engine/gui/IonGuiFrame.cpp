@@ -73,9 +73,17 @@ bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
 	{
 		for (auto iter = detail::get_next_control_iterator(*current_iter, ordered_controls_);
 			iter != *current_iter; iter = detail::get_next_control_iterator(iter, ordered_controls_))
-		{
+		{		
+			if (iter != std::end(ordered_controls_))
+			{
+				(*iter)->Focus();
+
+				if ((*iter)->IsFocused())
+					return true;
+			}
+
 			//Tab to next frame
-			if (iter == std::end(ordered_controls_))
+			if (iter >= std::end(ordered_controls_) - 1)
 			{
 				auto found = false;
 
@@ -89,13 +97,6 @@ bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
 
 				if (found || this != &from_frame)
 					return found; //Unwind
-			}
-			else
-			{
-				(*iter)->Focus();
-
-				if ((*iter)->IsFocused())
-					return true;
 			}
 		}
 	}

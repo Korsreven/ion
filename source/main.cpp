@@ -1294,9 +1294,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			main_frame->Activate();
 			main_frame2->Activate();
-			/*sub_control->Disable();
-			base_control2->Disable();
-			sub_control2->Disable();*/
 
 			controller.TabForward();
 			assert(base_control->IsFocused());
