@@ -89,7 +89,7 @@ bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
 
 				if (auto owner = Owner(); owner)
 				{
-					if (auto focusable_frame = owner->NextFocusableFrame(this);
+					if (auto focusable_frame = owner->NextFocusableFrame(*this);
 						focusable_frame && focusable_frame != &from_frame)
 
 						found = focusable_frame->TabForward(from_frame); //Recursive
@@ -131,7 +131,7 @@ bool GuiFrame::TabBackward(GuiFrame &from_frame) noexcept
 
 				if (auto owner = Owner(); owner)
 				{
-					if (auto focusable_frame = owner->PreviousFocusableFrame(this);
+					if (auto focusable_frame = owner->PreviousFocusableFrame(*this);
 						focusable_frame && focusable_frame != &from_frame)
 					
 						found = focusable_frame->TabBackward(from_frame); //Recursive

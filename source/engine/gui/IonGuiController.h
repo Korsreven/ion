@@ -92,6 +92,10 @@ namespace ion::gui
 			gui_controller::detail::frames active_frames_;
 
 
+			GuiFrame* NextFocusableFrame(GuiFrame *from_frame) noexcept;
+			GuiFrame* PreviousFocusableFrame(GuiFrame *from_frame) noexcept;
+
+
 			/*
 				Events
 			*/
@@ -221,13 +225,22 @@ namespace ion::gui
 			void TabBackward() noexcept;
 
 
-			//Returns the next focusable frame (optionally from the given frame) in this controller
+			//Returns the next focusable frame in this controller
 			//Returns nullptr if no frames are focusable
-			GuiFrame* NextFocusableFrame(GuiFrame *from_frame = nullptr) noexcept;
+			GuiFrame* NextFocusableFrame() noexcept;
 
-			//Returns the previous focusable frame (optionally from the given frame) in this controller
+			//Returns the previous focusable frame in this controller
 			//Returns nullptr if no frames are focusable
-			GuiFrame* PreviousFocusableFrame(GuiFrame *from_frame = nullptr) noexcept;
+			GuiFrame* PreviousFocusableFrame() noexcept;
+
+
+			//Returns the next focusable frame from the given frame in this controller
+			//Returns nullptr if no frames are focusable
+			GuiFrame* NextFocusableFrame(GuiFrame &from_frame) noexcept;
+
+			//Returns the previous focusable frame from the given frame in this controller
+			//Returns nullptr if no frames are focusable
+			GuiFrame* PreviousFocusableFrame(GuiFrame &from_frame) noexcept;
 
 
 			/*
