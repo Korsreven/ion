@@ -95,7 +95,7 @@ void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept
 }
 
 
-std::optional<frame_pointers::iterator> get_frame_iterator(frames &frames, GuiFrame *frame) noexcept
+std::optional<frame_pointers::const_iterator> get_frame_iterator(const frames &frames, GuiFrame *frame) noexcept
 {
 	if (std::empty(frames))
 		return std::nullopt;
@@ -116,7 +116,7 @@ std::optional<frame_pointers::iterator> get_frame_iterator(frames &frames, GuiFr
 
 //Private
 
-GuiFrame* GuiController::NextFocusableFrame(GuiFrame *from_frame) noexcept
+GuiFrame* GuiController::NextFocusableFrame(GuiFrame *from_frame) const noexcept
 {
 	if (auto current_iter = detail::get_frame_iterator(active_frames_, from_frame); current_iter)
 	{
@@ -134,7 +134,7 @@ GuiFrame* GuiController::NextFocusableFrame(GuiFrame *from_frame) noexcept
 	return nullptr;
 }
 
-GuiFrame* GuiController::PreviousFocusableFrame(GuiFrame *from_frame) noexcept
+GuiFrame* GuiController::PreviousFocusableFrame(GuiFrame *from_frame) const noexcept
 {
 	if (auto current_iter = detail::get_frame_iterator(active_frames_, from_frame); current_iter)
 	{
@@ -275,23 +275,23 @@ void GuiController::TabBackward() noexcept
 }
 
 
-GuiFrame* GuiController::NextFocusableFrame() noexcept
+GuiFrame* GuiController::NextFocusableFrame() const noexcept
 {
 	return NextFocusableFrame(nullptr);
 }
 
-GuiFrame* GuiController::PreviousFocusableFrame() noexcept
+GuiFrame* GuiController::PreviousFocusableFrame() const noexcept
 {
 	return PreviousFocusableFrame(nullptr);
 }
 
 
-GuiFrame* GuiController::NextFocusableFrame(GuiFrame &from_frame) noexcept
+GuiFrame* GuiController::NextFocusableFrame(GuiFrame &from_frame) const noexcept
 {
 	return NextFocusableFrame(&from_frame);
 }
 
-GuiFrame* GuiController::PreviousFocusableFrame(GuiFrame &from_frame) noexcept
+GuiFrame* GuiController::PreviousFocusableFrame(GuiFrame &from_frame) const noexcept
 {
 	return PreviousFocusableFrame(&from_frame);
 }

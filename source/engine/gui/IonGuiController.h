@@ -63,14 +63,14 @@ namespace ion::gui
 		void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept;
 
 
-		std::optional<frame_pointers::iterator> get_frame_iterator(frames &frames, GuiFrame *frame) noexcept;
+		std::optional<frame_pointers::const_iterator> get_frame_iterator(const frames &frames, GuiFrame *frame) noexcept;
 
-		inline auto get_next_frame_iterator(frame_pointers::iterator iter, frame_pointers &frames) noexcept
+		inline auto get_next_frame_iterator(frame_pointers::const_iterator iter, const frame_pointers &frames) noexcept
 		{
 			return iter != std::end(frames) ? iter + 1 : std::begin(frames);
 		}
 
-		inline auto get_previous_frame_iterator(frame_pointers::iterator iter, frame_pointers &frames) noexcept
+		inline auto get_previous_frame_iterator(frame_pointers::const_iterator iter, const frame_pointers &frames) noexcept
 		{
 			return iter != std::begin(frames) ? iter - 1 : std::end(frames);
 		}
@@ -92,8 +92,8 @@ namespace ion::gui
 			gui_controller::detail::frames active_frames_;
 
 
-			GuiFrame* NextFocusableFrame(GuiFrame *from_frame) noexcept;
-			GuiFrame* PreviousFocusableFrame(GuiFrame *from_frame) noexcept;
+			GuiFrame* NextFocusableFrame(GuiFrame *from_frame) const noexcept;
+			GuiFrame* PreviousFocusableFrame(GuiFrame *from_frame) const noexcept;
 
 
 			/*
@@ -227,20 +227,20 @@ namespace ion::gui
 
 			//Returns the next focusable frame in this controller
 			//Returns nullptr if no frames are focusable
-			GuiFrame* NextFocusableFrame() noexcept;
+			GuiFrame* NextFocusableFrame() const noexcept;
 
 			//Returns the previous focusable frame in this controller
 			//Returns nullptr if no frames are focusable
-			GuiFrame* PreviousFocusableFrame() noexcept;
+			GuiFrame* PreviousFocusableFrame() const noexcept;
 
 
 			//Returns the next focusable frame from the given frame in this controller
 			//Returns nullptr if no frames are focusable
-			GuiFrame* NextFocusableFrame(GuiFrame &from_frame) noexcept;
+			GuiFrame* NextFocusableFrame(GuiFrame &from_frame) const noexcept;
 
 			//Returns the previous focusable frame from the given frame in this controller
 			//Returns nullptr if no frames are focusable
-			GuiFrame* PreviousFocusableFrame(GuiFrame &from_frame) noexcept;
+			GuiFrame* PreviousFocusableFrame(GuiFrame &from_frame) const noexcept;
 
 
 			/*
