@@ -52,12 +52,12 @@ namespace ion::gui
 
 		inline auto get_next_control_iterator(control_pointers::iterator iter, control_pointers &controls) noexcept
 		{
-			return iter != std::end(controls) ? iter + 1 : std::begin(controls);
+			return iter >= std::end(controls) - 1 ? std::begin(controls) : iter + 1;
 		}
 
 		inline auto get_previous_control_iterator(control_pointers::iterator iter, control_pointers &controls) noexcept
 		{
-			return iter != std::begin(controls) ? iter - 1 : std::end(controls);
+			return iter == std::begin(controls) ? std::end(controls) - 1 : iter - 1;
 		}
 	} //gui_frame::detail
 

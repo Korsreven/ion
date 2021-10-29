@@ -121,14 +121,16 @@ GuiFrame* GuiController::NextFocusableFrame(GuiFrame *from_frame) const noexcept
 	if (auto current_iter = detail::get_frame_iterator(active_frames_, from_frame); current_iter)
 	{
 		auto &top_frames = active_frames_.back().frames;
+		auto iter = detail::get_next_frame_iterator(*current_iter, top_frames);
 
-		for (auto iter = detail::get_next_frame_iterator(*current_iter, top_frames);
-			iter != *current_iter; iter = detail::get_next_frame_iterator(iter, top_frames))
+		if (*current_iter == std::end(top_frames))
+			*current_iter = iter;
+
+		do
 		{
-			if (iter != std::end(top_frames) &&
-				(*iter)->IsFocusable())
+			if ((*iter)->IsFocusable())
 				return *iter;
-		}
+		} while ((iter = detail::get_next_frame_iterator(iter, top_frames)) != *current_iter);
 	}
 
 	return nullptr;
@@ -139,14 +141,16 @@ GuiFrame* GuiController::PreviousFocusableFrame(GuiFrame *from_frame) const noex
 	if (auto current_iter = detail::get_frame_iterator(active_frames_, from_frame); current_iter)
 	{
 		auto &top_frames = active_frames_.back().frames;
+		auto iter = detail::get_previous_frame_iterator(*current_iter, top_frames);
 
-		for (auto iter = detail::get_previous_frame_iterator(*current_iter, top_frames);
-			iter != *current_iter; iter = detail::get_previous_frame_iterator(iter, top_frames))
+		if (*current_iter == std::end(top_frames))
+			*current_iter = iter;
+
+		do
 		{
-			if (iter != std::end(top_frames) &&
-				(*iter)->IsFocusable())
+			if ((*iter)->IsFocusable())
 				return *iter;
-		}
+		} while ((iter = detail::get_previous_frame_iterator(iter, top_frames)) != *current_iter);
 	}
 
 	return nullptr;
@@ -288,12 +292,12 @@ GuiFrame* GuiController::PreviousFocusableFrame() const noexcept
 
 GuiFrame* GuiController::NextFocusableFrame(GuiFrame &from_frame) const noexcept
 {
-	return NextFocusableFrame(&from_frame);
+	return from_frame.IsActivated() ? NextFocusableFrame(&from_frame) : nullptr;
 }
 
 GuiFrame* GuiController::PreviousFocusableFrame(GuiFrame &from_frame) const noexcept
 {
-	return PreviousFocusableFrame(&from_frame);
+	return from_frame.IsActivated() ? PreviousFocusableFrame(&from_frame) : nullptr;
 }
 
 

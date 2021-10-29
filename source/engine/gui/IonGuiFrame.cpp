@@ -71,10 +71,13 @@ bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
 
 	if (auto current_iter = detail::get_current_control_iterator(ordered_controls_, focused_control_); current_iter)
 	{
-		for (auto iter = detail::get_next_control_iterator(*current_iter, ordered_controls_);
-			iter != *current_iter; iter = detail::get_next_control_iterator(iter, ordered_controls_))
-		{		
-			if (iter != std::end(ordered_controls_))
+		auto iter =
+			*current_iter != std::end(ordered_controls_) ? *current_iter :
+			(*current_iter = detail::get_next_control_iterator(*current_iter, ordered_controls_));
+
+		do
+		{
+			if (!(*iter)->IsFocused())
 			{
 				(*iter)->Focus();
 
@@ -83,7 +86,7 @@ bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
 			}
 
 			//Tab to next frame
-			if (iter >= std::end(ordered_controls_) - 1)
+			if (iter == std::end(ordered_controls_) - 1)
 			{
 				auto found = false;
 
@@ -98,7 +101,7 @@ bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
 				if (found || this != &from_frame)
 					return found; //Unwind
 			}
-		}
+		} while ((iter = detail::get_next_control_iterator(iter, ordered_controls_)) != *current_iter);
 	}
 
 	return false;
@@ -112,10 +115,13 @@ bool GuiFrame::TabBackward(GuiFrame &from_frame) noexcept
 
 	if (auto current_iter = detail::get_current_control_iterator(ordered_controls_, focused_control_); current_iter)
 	{
-		for (auto iter = detail::get_previous_control_iterator(*current_iter, ordered_controls_);
-			iter != *current_iter; iter = detail::get_previous_control_iterator(iter, ordered_controls_))
+		auto iter =
+			*current_iter != std::end(ordered_controls_) ? *current_iter :
+			(*current_iter = detail::get_previous_control_iterator(*current_iter, ordered_controls_));
+
+		do
 		{
-			if (iter != std::end(ordered_controls_))
+			if (!(*iter)->IsFocused())
 			{
 				(*iter)->Focus();
 
@@ -124,8 +130,7 @@ bool GuiFrame::TabBackward(GuiFrame &from_frame) noexcept
 			}
 
 			//Tab to previous frame
-			if (iter == std::begin(ordered_controls_) ||
-				iter == std::end(ordered_controls_))
+			if (iter == std::begin(ordered_controls_))
 			{
 				auto found = false;
 
@@ -133,14 +138,14 @@ bool GuiFrame::TabBackward(GuiFrame &from_frame) noexcept
 				{
 					if (auto focusable_frame = owner->PreviousFocusableFrame(*this);
 						focusable_frame && focusable_frame != &from_frame)
-					
+
 						found = focusable_frame->TabBackward(from_frame); //Recursive
 				}
 
 				if (found || this != &from_frame)
 					return found; //Unwind
 			}
-		}
+		} while ((iter = detail::get_previous_control_iterator(iter, ordered_controls_)) != *current_iter);
 	}
 
 	return false;

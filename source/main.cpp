@@ -1294,7 +1294,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			main_frame->Activate();
 			main_frame2->Activate();
-
+			
 			controller.TabForward();
 			assert(base_control->IsFocused());
 			controller.TabForward();
@@ -1305,6 +1305,17 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			assert(sub_control2->IsFocused());
 			controller.TabForward();
 			assert(base_control->IsFocused());
+			
+			controller.TabBackward();
+			assert(sub_control2->IsFocused());
+			controller.TabBackward();
+			assert(base_control2->IsFocused());
+			controller.TabBackward();
+			assert(sub_control->IsFocused());
+			controller.TabBackward();
+			assert(base_control->IsFocused());
+			controller.TabBackward();
+			assert(sub_control2->IsFocused());
 
 			//Camera
 			auto cam_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});
