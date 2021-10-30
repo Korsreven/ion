@@ -88,6 +88,7 @@ namespace ion::gui
 			controls::GuiControl *focused_control_ = nullptr;
 			controls::GuiControl *pressed_control_ = nullptr;
 			controls::GuiControl *hovered_control_ = nullptr;
+			controls::GuiControl *last_focused_control_ = nullptr;
 
 			std::optional<events::Callback<void, GuiFrame&>> on_activate_;
 			std::optional<events::Callback<void, GuiFrame&>> on_deactivate_;

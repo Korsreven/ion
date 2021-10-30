@@ -69,7 +69,8 @@ bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
 	if (std::empty(ordered_controls_))
 		ordered_controls_ = detail::get_ordered_controls(*this);
 
-	if (auto current_iter = detail::get_current_control_iterator(ordered_controls_, focused_control_); current_iter)
+	if (auto current_iter = detail::get_current_control_iterator(
+		ordered_controls_, this != &from_frame ? focused_control_ : last_focused_control_); current_iter)
 	{
 		auto iter =
 			*current_iter != std::end(ordered_controls_) ? *current_iter :
@@ -113,7 +114,8 @@ bool GuiFrame::TabBackward(GuiFrame &from_frame) noexcept
 	if (std::empty(ordered_controls_))
 		ordered_controls_ = detail::get_ordered_controls(*this);
 
-	if (auto current_iter = detail::get_current_control_iterator(ordered_controls_, focused_control_); current_iter)
+	if (auto current_iter = detail::get_current_control_iterator(
+		ordered_controls_, this != &from_frame ? focused_control_ : last_focused_control_); current_iter)
 	{
 		auto iter =
 			*current_iter != std::end(ordered_controls_) ? *current_iter :
@@ -180,6 +182,10 @@ void GuiFrame::Removed(GuiComponent &component) noexcept
 void GuiFrame::Removed(controls::GuiControl &control) noexcept
 {
 	control.Reset(); //Execute opposite events based on its current state
+
+	if (last_focused_control_ == &control)
+		last_focused_control_ = nullptr;
+
 	GuiPanelContainer::Removed(control); //Use base functionality
 }
 
@@ -217,7 +223,7 @@ void GuiFrame::Focused(controls::GuiControl &control) noexcept
 			focused_control_->Defocus();
 
 		Focus();
-		focused_control_ = &control;
+		last_focused_control_ = focused_control_ = &control;
 	}
 }
 
@@ -291,6 +297,8 @@ void GuiFrame::Activated() noexcept
 void GuiFrame::Deactivated() noexcept
 {
 	Defocus();
+	last_focused_control_ = nullptr;
+
 	NotifyFrameDeactivated();
 }
 
