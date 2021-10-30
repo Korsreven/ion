@@ -497,12 +497,20 @@ void GuiFrame::TabBackward() noexcept
 
 void GuiFrame::FrameStarted(duration time) noexcept
 {
+	for (auto &control : Controls())
+		control.FrameStarted(time);
 
+	for (auto &panel : Panels())
+		panel.FrameStarted(time);
 }
 
 void GuiFrame::FrameEnded(duration time) noexcept
 {
+	for (auto &control : Controls())
+		control.FrameEnded(time);
 
+	for (auto &panel : Panels())
+		panel.FrameEnded(time);
 }
 
 
@@ -510,19 +518,60 @@ void GuiFrame::FrameEnded(duration time) noexcept
 	Key events
 */
 
-void GuiFrame::KeyPressed(KeyButton button) noexcept
+bool GuiFrame::KeyPressed(KeyButton button) noexcept
 {
+	if (!focused_control_ ||
+		!focused_control_->KeyPressed(button)) //Not consumed
+	{
+		switch (button)
+		{
+			case KeyButton::Enter:
+			case KeyButton::Space:
+			{
+				if (focused_control_ && !pressed_control_)
+					focused_control_->Press();
 
+				return true;
+			}
+		}
+
+		return false;
+	}
+	else
+		return true;
 }
 
-void GuiFrame::KeyReleased(KeyButton button) noexcept
+bool GuiFrame::KeyReleased(KeyButton button) noexcept
 {
+	if (!focused_control_ ||
+		!focused_control_->KeyReleased(button)) //Not consumed
+	{
+		switch (button)
+		{
+			case KeyButton::Enter:
+			case KeyButton::Space:
+			{
+				if (pressed_control_)
+				{
+					pressed_control_->Click();
+					pressed_control_->Release();			
+				}
 
+				return true;
+			}
+		}
+
+		return false;
+	}
+	else
+		return true;
 }
 
-void GuiFrame::CharacterPressed(char character) noexcept
+bool GuiFrame::CharacterPressed(char character) noexcept
 {
-
+	return focused_control_ ?
+		focused_control_->CharacterPressed(character) :
+		false;
 }
 
 

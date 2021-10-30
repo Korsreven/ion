@@ -46,4 +46,27 @@ std::optional<int> GuiPanel::TabOrder() const noexcept
 		return std::nullopt;
 }
 
+
+/*
+	Frame events
+*/
+
+void GuiPanel::FrameStarted(duration time) noexcept
+{
+	for (auto &control : Controls())
+		control.FrameStarted(time);
+
+	for (auto &panel : Panels())
+		panel.FrameStarted(time);
+}
+
+void GuiPanel::FrameEnded(duration time) noexcept
+{
+	for (auto &control : Controls())
+		control.FrameEnded(time);
+
+	for (auto &panel : Panels())
+		panel.FrameEnded(time);
+}
+
 } //ion::gui

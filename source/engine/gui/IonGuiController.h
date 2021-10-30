@@ -90,6 +90,7 @@ namespace ion::gui
 			
 			GuiFrame *focused_frame_ = nullptr;
 			gui_controller::detail::frames active_frames_;
+			bool shift_pressed_ = false;
 
 
 			GuiFrame* NextFocusableFrame(GuiFrame *from_frame) const noexcept;
@@ -259,13 +260,16 @@ namespace ion::gui
 			*/
 
 			//Typically called from user code when a key button has been pressed
-			void KeyPressed(KeyButton button) noexcept;
+			//Returns true if the key press event has been consumed by the controller
+			bool KeyPressed(KeyButton button) noexcept;
 
 			//Typically called from user code when a key button has been released
-			void KeyReleased(KeyButton button) noexcept;
+			//Returns true if the key release event has been consumed by the controller
+			bool KeyReleased(KeyButton button) noexcept;
 
 			//Typically called from user code when a character has been pressed
-			void CharacterPressed(char character) noexcept;
+			//Returns true if the character press event has been consumed by the controller
+			bool CharacterPressed(char character) noexcept;
 
 
 			/*

@@ -413,19 +413,22 @@ void GuiControl::FrameEnded([[maybe_unused]] duration time) noexcept
 	Key events
 */
 
-void GuiControl::KeyPressed([[maybe_unused]] KeyButton button) noexcept
+bool GuiControl::KeyPressed([[maybe_unused]] KeyButton button) noexcept
 {
 	//Optional to override
+	return false;
 }
 
-void GuiControl::KeyReleased([[maybe_unused]] KeyButton button) noexcept
+bool GuiControl::KeyReleased([[maybe_unused]] KeyButton button) noexcept
 {
 	//Optional to override
+	return false;
 }
 
-void GuiControl::CharacterPressed([[maybe_unused]] char character) noexcept
+bool GuiControl::CharacterPressed([[maybe_unused]] char character) noexcept
 {
 	//Optional to override
+	return false;
 }
 
 

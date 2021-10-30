@@ -19,10 +19,13 @@ File:	IonGuiPanel.h
 
 #include "IonGuiPanelContainer.h"
 #include "controls/IonGuiControl.h"
-#include "memory/IonNonOwningPtr.h"
+#include "types/IonTypes.h"
 
 namespace ion::gui
 {
+	using namespace events::listeners;
+	using namespace ion::graphics::utilities;
+
 	namespace gui_panel::detail
 	{
 	} //gui_panel::detail
@@ -68,6 +71,17 @@ namespace ion::gui
 			//Returns the tab order of this panel
 			//Returns nullopt if this panel has no owner
 			[[nodiscard]] std::optional<int> TabOrder() const noexcept;
+
+
+			/*
+				Frame events
+			*/
+
+			//Called from gui frame when a frame has started
+			virtual void FrameStarted(duration time) noexcept;
+
+			//Called from gui frame when a frame has ended
+			virtual void FrameEnded(duration time) noexcept;
 	};
 } //ion::gui
 

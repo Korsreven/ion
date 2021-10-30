@@ -416,13 +416,16 @@ namespace ion::gui
 			*/
 
 			//Called from gui controller when a key button has been pressed
-			virtual void KeyPressed(KeyButton button) noexcept;
+			//Returns true if the key press event has been consumed by the frame
+			virtual bool KeyPressed(KeyButton button) noexcept;
 
 			//Called from gui controller when a key button has been released
-			virtual void KeyReleased(KeyButton button) noexcept;
+			//Returns true if the key release event has been consumed by the frame
+			virtual bool KeyReleased(KeyButton button) noexcept;
 
 			//Called from gui controller when a character has been pressed
-			virtual void CharacterPressed(char character) noexcept;
+			//Returns true if the character press event has been consumed by the frame
+			virtual bool CharacterPressed(char character) noexcept;
 
 
 			/*

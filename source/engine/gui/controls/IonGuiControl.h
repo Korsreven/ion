@@ -23,6 +23,7 @@ File:	IonGuiControl.h
 #include "events/listeners/IonMouseListener.h"
 #include "graphics/utilities/IonVector2.h"
 #include "gui/IonGuiComponent.h"
+#include "types/IonTypes.h"
 
 namespace ion::gui
 {
@@ -422,13 +423,16 @@ namespace ion::gui::controls
 			*/
 
 			//Called from gui frame when a key button has been pressed
-			virtual void KeyPressed(KeyButton button) noexcept;
+			//Returns true if the key press event has been consumed by the control
+			virtual bool KeyPressed(KeyButton button) noexcept;
 
 			//Called from gui frame when a key button has been released
-			virtual void KeyReleased(KeyButton button) noexcept;
+			//Returns true if the key release event has been consumed by the control
+			virtual bool KeyReleased(KeyButton button) noexcept;
 
 			//Called from gui frame when a character has been pressed
-			virtual void CharacterPressed(char character) noexcept;
+			//Returns true if the character press event has been consumed by the control
+			virtual bool CharacterPressed(char character) noexcept;
 
 
 			/*

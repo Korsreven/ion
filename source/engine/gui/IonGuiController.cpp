@@ -307,12 +307,14 @@ GuiFrame* GuiController::PreviousFocusableFrame(GuiFrame &from_frame) const noex
 
 void GuiController::FrameStarted(duration time) noexcept
 {
-
+	for (auto &frame : Frames())
+		static_cast<GuiFrame&>(frame).FrameStarted(time);
 }
 
 void GuiController::FrameEnded(duration time) noexcept
 {
-
+	for (auto &frame : Frames())
+		static_cast<GuiFrame&>(frame).FrameEnded(time);
 }
 
 
@@ -320,19 +322,67 @@ void GuiController::FrameEnded(duration time) noexcept
 	Key events
 */
 
-void GuiController::KeyPressed(KeyButton button) noexcept
+bool GuiController::KeyPressed(KeyButton button) noexcept
 {
+	if (!focused_frame_ ||
+		!focused_frame_->KeyPressed(button)) //Not consumed
+	{
+		switch (button)
+		{
+			case KeyButton::Shift:
+			shift_pressed_ = true;
+			return true;
+		}
 
+		return false;
+	}
+	else
+		return true;
 }
 
-void GuiController::KeyReleased(KeyButton button) noexcept
+bool GuiController::KeyReleased(KeyButton button) noexcept
 {
+	if (!focused_frame_ ||
+		!focused_frame_->KeyReleased(button)) //Not consumed
+	{
+		switch (button)
+		{
+			case KeyButton::Shift:
+			shift_pressed_ = false;
+			break;
 
+			case KeyButton::Tab:
+			{
+				if (shift_pressed_)
+					TabBackward();
+				else
+					TabForward();
+
+				return true;
+			}
+
+			case KeyButton::DownArrow:
+			case KeyButton::RightArrow:
+			TabForward();
+			return true;
+
+			case KeyButton::UpArrow:
+			case KeyButton::LeftArrow:
+			TabBackward();
+			return true;
+		}
+
+		return false;
+	}
+	else
+		return true;
 }
 
-void GuiController::CharacterPressed(char character) noexcept
+bool GuiController::CharacterPressed(char character) noexcept
 {
-
+	return focused_frame_ ?
+		focused_frame_->CharacterPressed(character) :
+		false;
 }
 
 
