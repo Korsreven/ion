@@ -59,7 +59,7 @@ namespace ion::gui
 		bool is_frame_on_top(const GuiFrame &frame, const frames &frames) noexcept;
 		bool is_frame_activated(const GuiFrame &frame, const frames &frames) noexcept;
 
-		void activate_frame(GuiFrame &frame, frames &to_frames, bool modal) noexcept;
+		void activate_frame(GuiFrame &frame, frames &to_frames) noexcept;
 		void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept;
 
 

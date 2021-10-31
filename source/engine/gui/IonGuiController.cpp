@@ -48,12 +48,13 @@ bool is_frame_activated(const GuiFrame &frame, const frames &frames) noexcept
 }
 
 
-void activate_frame(GuiFrame &frame, frames &to_frames, bool modal) noexcept
+void activate_frame(GuiFrame &frame, frames &to_frames) noexcept
 {
 	if (!is_frame_activated(frame, to_frames))
 	{
 		//Push new layer
-		if (modal || std::empty(to_frames))
+		if (std::empty(to_frames) ||
+			frame.Mode() == gui_frame::FrameMode::Modal)
 			to_frames.emplace_back().frames.push_back(&frame);
 		//Append to top layer
 		else
@@ -208,13 +209,25 @@ void GuiController::Disabled([[maybe_unused]] GuiFrame &frame) noexcept
 void GuiController::Activated(GuiFrame &frame) noexcept
 {
 	if (frame.IsActivated())
-		detail::activate_frame(frame, active_frames_, false);
+		detail::activate_frame(frame, active_frames_);
 }
 
 void GuiController::Deactivated(GuiFrame &frame) noexcept
 {
 	if (!frame.IsActivated())
+	{
+		//Deactivate all other top frames first
+		if (frame.Mode() == gui_frame::FrameMode::Modal)
+		{
+			for (auto &top_frame : active_frames_.back().frames)
+			{
+				if (top_frame != &frame)
+					detail::deactivate_frame(*top_frame, active_frames_);
+			}
+		}
+
 		detail::deactivate_frame(frame, active_frames_);
+	}
 }
 
 

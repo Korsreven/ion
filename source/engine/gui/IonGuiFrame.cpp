@@ -401,11 +401,12 @@ GuiFrame::GuiFrame(std::string name) :
 	Modifiers
 */
 
-void GuiFrame::Activate() noexcept
+void GuiFrame::Activate(FrameMode mode) noexcept
 {
 	if (!activated_)
 	{
 		activated_ = true;
+		mode_ = mode;
 		Activated();
 	}
 }
@@ -415,6 +416,7 @@ void GuiFrame::Deactivate() noexcept
 	if (activated_)
 	{
 		activated_ = false;
+		mode_ = {};
 		Deactivated();
 	}
 }

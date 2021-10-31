@@ -38,28 +38,37 @@ namespace ion::gui
 
 	class GuiController; //Forward declaration
 
-	namespace gui_frame::detail
+	namespace gui_frame
 	{
-		using gui_panel_container::detail::control_pointers;
-
-
-		void get_ordered_controls(GuiPanelContainer &owner, control_pointers &controls);
-		control_pointers get_ordered_controls(GuiPanelContainer &owner);
-
-
-		std::optional<control_pointers::iterator> get_current_control_iterator(control_pointers &controls,
-			controls::GuiControl *focused_control) noexcept;
-
-		inline auto get_next_control_iterator(control_pointers::iterator iter, control_pointers &controls) noexcept
+		enum class FrameMode : bool
 		{
-			return iter >= std::end(controls) - 1 ? std::begin(controls) : iter + 1;
-		}
+			Modeless,
+			Modal
+		};
 
-		inline auto get_previous_control_iterator(control_pointers::iterator iter, control_pointers &controls) noexcept
+		namespace detail
 		{
-			return iter == std::begin(controls) ? std::end(controls) - 1 : iter - 1;
+			using gui_panel_container::detail::control_pointers;
+
+
+			void get_ordered_controls(GuiPanelContainer &owner, control_pointers &controls);
+			control_pointers get_ordered_controls(GuiPanelContainer &owner);
+
+
+			std::optional<control_pointers::iterator> get_current_control_iterator(control_pointers &controls,
+				controls::GuiControl *focused_control) noexcept;
+
+			inline auto get_next_control_iterator(control_pointers::iterator iter, control_pointers &controls) noexcept
+			{
+				return iter >= std::end(controls) - 1 ? std::begin(controls) : iter + 1;
+			}
+
+			inline auto get_previous_control_iterator(control_pointers::iterator iter, control_pointers &controls) noexcept
+			{
+				return iter == std::begin(controls) ? std::end(controls) - 1 : iter - 1;
+			} //detail
 		}
-	} //gui_frame::detail
+	} //gui_frame
 
 
 	class GuiFrame :
@@ -84,6 +93,7 @@ namespace ion::gui
 
 			bool activated_ = false;
 			bool focused_ = false;
+			std::optional<gui_frame::FrameMode> mode_;
 
 			controls::GuiControl *focused_control_ = nullptr;
 			controls::GuiControl *pressed_control_ = nullptr;
@@ -222,8 +232,8 @@ namespace ion::gui
 				Modifiers
 			*/
 
-			//Activate this frame
-			void Activate() noexcept;
+			//Activate this frame with the given mode
+			void Activate(gui_frame::FrameMode mode = gui_frame::FrameMode::Modeless) noexcept;
 
 			//Deactivate this frame
 			void Deactivate() noexcept;
@@ -328,6 +338,13 @@ namespace ion::gui
 			[[nodiscard]] inline auto IsFocused() const noexcept
 			{
 				return focused_;
+			}
+
+			//Returns the mode of this frame
+			//Returns nullopt if this frame is not activated
+			[[nodiscard]] inline auto Mode() const noexcept
+			{
+				return mode_;
 			}
 
 			//Returns true if this frame is focusable
