@@ -214,7 +214,7 @@ void GuiController::Activated(GuiFrame &frame) noexcept
 
 void GuiController::Deactivated(GuiFrame &frame) noexcept
 {
-	if (!frame.IsActivated())
+	if (!frame.IsActivated() && !std::empty(active_frames_))
 	{
 		//Deactivate all other top frames first
 		if (frame.Mode() == gui_frame::FrameMode::Modal)
@@ -362,7 +362,7 @@ bool GuiController::KeyReleased(KeyButton button) noexcept
 		{
 			case KeyButton::Shift:
 			shift_pressed_ = false;
-			break;
+			return true;
 
 			case KeyButton::Tab:
 			{
@@ -403,24 +403,86 @@ bool GuiController::CharacterPressed(char character) noexcept
 	Mouse events
 */
 
-void GuiController::MousePressed(MouseButton button, Vector2 position) noexcept
+bool GuiController::MousePressed(MouseButton button, Vector2 position) noexcept
 {
+	//Check focused frame first
+	if (focused_frame_ &&
+		focused_frame_->MousePressed(button, position))
+		return true;
 
+	else if (!std::empty(active_frames_))
+	{
+		//Check all other top frames
+		for (auto &top_frame : active_frames_.back().frames)
+		{
+			if (top_frame != focused_frame_ &&
+				static_cast<GuiFrame*>(top_frame)->MousePressed(button, position))
+				return true;
+		}
+	}
+
+	return false;
 }
 
-void GuiController::MouseReleased(MouseButton button, Vector2 position) noexcept
+bool GuiController::MouseReleased(MouseButton button, Vector2 position) noexcept
 {
+	//Check focused frame first
+	if (focused_frame_ &&
+		focused_frame_->MouseReleased(button, position))
+		return true;
 
+	else if (!std::empty(active_frames_))
+	{
+		//Check all other top frames
+		for (auto &top_frame : active_frames_.back().frames)
+		{
+			if (top_frame != focused_frame_ &&
+				static_cast<GuiFrame*>(top_frame)->MouseReleased(button, position))
+				return true;
+		}
+	}
+
+	return false;
 }
 
-void GuiController::MouseMoved(Vector2 position) noexcept
+bool GuiController::MouseMoved(Vector2 position) noexcept
 {
+	//Check focused frame first
+	if (focused_frame_ &&
+		focused_frame_->MouseMoved(position))
+		return true;
 
+	else if (!std::empty(active_frames_))
+	{
+		//Check all other top frames
+		for (auto &top_frame : active_frames_.back().frames)
+		{
+			if (top_frame != focused_frame_ &&
+				static_cast<GuiFrame*>(top_frame)->MouseMoved(position))
+				return true;
+		}
+	}
+
+	return false;
 }
 
-void GuiController::MouseWheelRolled(int delta, Vector2 position) noexcept
+bool GuiController::MouseWheelRolled(int delta, Vector2 position) noexcept
 {
+	//Check focused frame first
+	if (focused_frame_ &&
+		focused_frame_->MouseWheelRolled(delta, position))
+		return true;
 
+	else if (!std::empty(active_frames_))
+	{
+		//Check all other top frames
+		for (auto &top_frame : active_frames_.back().frames)
+		{
+			if (top_frame != focused_frame_ &&
+				static_cast<GuiFrame*>(top_frame)->MouseWheelRolled(delta, position))
+				return true;
+		}
+	}
 }
 
 

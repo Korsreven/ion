@@ -440,16 +440,20 @@ namespace ion::gui::controls
 			*/
 
 			//Called from gui frame when the mouse button has been pressed
-			virtual void MousePressed(MouseButton button, Vector2 position) noexcept;
+			//Returns true if the mouse press event has been consumed by the control
+			virtual bool MousePressed(MouseButton button, Vector2 position) noexcept;
 
 			//Called from gui frame when the mouse button has been released
-			virtual void MouseReleased(MouseButton button, Vector2 position) noexcept;
+			//Returns true if the mouse release event has been consumed by the control
+			virtual bool MouseReleased(MouseButton button, Vector2 position) noexcept;
 
 			//Called from gui frame when the mouse has been moved
-			virtual void MouseMoved(Vector2 position) noexcept;
+			//Returns true if the mouse move event has been consumed by the control
+			virtual bool MouseMoved(Vector2 position) noexcept;
 
 			//Called from gui frame when the mouse wheel has been rolled
-			virtual void MouseWheelRolled(int delta, Vector2 position) noexcept;
+			//Returns true if the mouse wheel roll event has been consumed by the control
+			virtual bool MouseWheelRolled(int delta, Vector2 position) noexcept;
 	};
 } //ion::gui::controls
 

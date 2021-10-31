@@ -531,9 +531,12 @@ bool GuiFrame::KeyPressed(KeyButton button) noexcept
 			case KeyButton::Space:
 			{
 				if (focused_control_ && !pressed_control_)
+				{
 					focused_control_->Press();
+					return true;
+				}
 
-				return true;
+				break;
 			}
 		}
 
@@ -556,10 +559,11 @@ bool GuiFrame::KeyReleased(KeyButton button) noexcept
 				if (pressed_control_)
 				{
 					pressed_control_->Click();
-					pressed_control_->Release();			
+					pressed_control_->Release();
+					return true;
 				}
 
-				return true;
+				break;
 			}
 		}
 
@@ -581,24 +585,69 @@ bool GuiFrame::CharacterPressed(char character) noexcept
 	Mouse events
 */
 
-void GuiFrame::MousePressed(MouseButton button, Vector2 position) noexcept
+bool GuiFrame::MousePressed(MouseButton button, Vector2 position) noexcept
 {
+	if (!hovered_control_ ||
+		!hovered_control_->MousePressed(button, position)) //Not consumed
+	{
+		switch (button)
+		{
+			case MouseButton::Left:
+			{
+				if (hovered_control_ && !pressed_control_)
+				{
+					hovered_control_->Press();
+					return true;
+				}
 
+				break;
+			}
+		}
+
+		return false;
+	}
+	else
+		return true;
 }
 
-void GuiFrame::MouseReleased(MouseButton button, Vector2 position) noexcept
+bool GuiFrame::MouseReleased(MouseButton button, Vector2 position) noexcept
 {
+	if (!pressed_control_ ||
+		!pressed_control_->MouseReleased(button, position)) //Not consumed
+	{
+		switch (button)
+		{
+			case MouseButton::Left:
+			{
+				if (pressed_control_)
+				{
+					if (pressed_control_ == hovered_control_)
+						pressed_control_->Click();
 
+					pressed_control_->Release();
+					return true;
+				}
+
+				break;
+			}
+		}
+
+		return false;
+	}
+	else
+		return true;
 }
 
-void GuiFrame::MouseMoved(Vector2 position) noexcept
+bool GuiFrame::MouseMoved(Vector2 position) noexcept
 {
-
+	return false;
 }
 
-void GuiFrame::MouseWheelRolled(int delta, Vector2 position) noexcept
+bool GuiFrame::MouseWheelRolled(int delta, Vector2 position) noexcept
 {
-
+	return hovered_control_ ?
+		hovered_control_->MouseWheelRolled(delta, position) :
+		false;
 }
 
 } //ion::gui

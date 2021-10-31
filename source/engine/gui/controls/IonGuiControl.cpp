@@ -436,24 +436,28 @@ bool GuiControl::CharacterPressed([[maybe_unused]] char character) noexcept
 	Mouse events
 */
 
-void GuiControl::MousePressed([[maybe_unused]] MouseButton button, [[maybe_unused]] Vector2 position) noexcept
+bool GuiControl::MousePressed([[maybe_unused]] MouseButton button, [[maybe_unused]] Vector2 position) noexcept
 {
 	//Optional to override
+	return false;
 }
 
-void GuiControl::MouseReleased([[maybe_unused]] MouseButton button, [[maybe_unused]] Vector2 position) noexcept
+bool GuiControl::MouseReleased([[maybe_unused]] MouseButton button, [[maybe_unused]] Vector2 position) noexcept
 {
 	//Optional to override
+	return false;
 }
 
-void GuiControl::MouseMoved([[maybe_unused]] Vector2 position) noexcept
+bool GuiControl::MouseMoved([[maybe_unused]] Vector2 position) noexcept
 {
 	//Optional to override
+	return false;
 }
 
-void GuiControl::MouseWheelRolled([[maybe_unused]] int delta, [[maybe_unused]] Vector2 position) noexcept
+bool GuiControl::MouseWheelRolled([[maybe_unused]] int delta, [[maybe_unused]] Vector2 position) noexcept
 {
 	//Optional to override
+	return false;
 }
 
 } //ion::gui::controls

@@ -277,16 +277,20 @@ namespace ion::gui
 			*/
 
 			//Typically called from user code when the mouse button has been pressed
-			void MousePressed(MouseButton button, Vector2 position) noexcept;
+			//Returns true if the mouse press event has been consumed by the controller
+			bool MousePressed(MouseButton button, Vector2 position) noexcept;
 
 			//Typically called from user code when the mouse button has been released
-			void MouseReleased(MouseButton button, Vector2 position) noexcept;
+			//Returns true if the mouse release event has been consumed by the controller
+			bool MouseReleased(MouseButton button, Vector2 position) noexcept;
 
 			//Typically called from user code when the mouse has been moved
-			void MouseMoved(Vector2 position) noexcept;
+			//Returns true if the mouse move event has been consumed by the controller
+			bool MouseMoved(Vector2 position) noexcept;
 
 			//Typically called from user code when the mouse wheel has been rolled
-			void MouseWheelRolled(int delta, Vector2 position) noexcept;
+			//Returns true if the mouse wheel roll event has been consumed by the controller
+			bool MouseWheelRolled(int delta, Vector2 position) noexcept;
 
 
 			/*
