@@ -522,8 +522,11 @@ void GuiFrame::FrameEnded(duration time) noexcept
 
 bool GuiFrame::KeyPressed(KeyButton button) noexcept
 {
-	if (!focused_control_ ||
-		!focused_control_->KeyPressed(button)) //Not consumed
+	if (focused_control_ &&
+		focused_control_->KeyPressed(button))
+		return true; //Consumed
+	
+	else
 	{
 		switch (button)
 		{
@@ -533,7 +536,7 @@ bool GuiFrame::KeyPressed(KeyButton button) noexcept
 				if (focused_control_ && !pressed_control_)
 				{
 					focused_control_->Press();
-					return true;
+					return true; //Consumed
 				}
 
 				break;
@@ -542,14 +545,15 @@ bool GuiFrame::KeyPressed(KeyButton button) noexcept
 
 		return false;
 	}
-	else
-		return true;
 }
 
 bool GuiFrame::KeyReleased(KeyButton button) noexcept
 {
-	if (!focused_control_ ||
-		!focused_control_->KeyReleased(button)) //Not consumed
+	if (focused_control_ &&
+		focused_control_->KeyReleased(button))
+		return true; //Consumed
+	
+	else
 	{
 		switch (button)
 		{
@@ -560,7 +564,7 @@ bool GuiFrame::KeyReleased(KeyButton button) noexcept
 				{
 					pressed_control_->Click();
 					pressed_control_->Release();
-					return true;
+					return true; //Consumed
 				}
 
 				break;
@@ -569,8 +573,6 @@ bool GuiFrame::KeyReleased(KeyButton button) noexcept
 
 		return false;
 	}
-	else
-		return true;
 }
 
 bool GuiFrame::CharacterPressed(char character) noexcept
@@ -587,8 +589,11 @@ bool GuiFrame::CharacterPressed(char character) noexcept
 
 bool GuiFrame::MousePressed(MouseButton button, Vector2 position) noexcept
 {
-	if (!hovered_control_ ||
-		!hovered_control_->MousePressed(button, position)) //Not consumed
+	if (hovered_control_ &&
+		hovered_control_->MousePressed(button, position))
+		return true; //Consumed
+
+	else
 	{
 		switch (button)
 		{
@@ -597,7 +602,7 @@ bool GuiFrame::MousePressed(MouseButton button, Vector2 position) noexcept
 				if (hovered_control_ && !pressed_control_)
 				{
 					hovered_control_->Press();
-					return true;
+					return true; //Consumed
 				}
 
 				break;
@@ -606,14 +611,15 @@ bool GuiFrame::MousePressed(MouseButton button, Vector2 position) noexcept
 
 		return false;
 	}
-	else
-		return true;
 }
 
 bool GuiFrame::MouseReleased(MouseButton button, Vector2 position) noexcept
 {
-	if (!pressed_control_ ||
-		!pressed_control_->MouseReleased(button, position)) //Not consumed
+	if (pressed_control_ &&
+		pressed_control_->MouseReleased(button, position))
+		return true; //Consumed
+
+	else
 	{
 		switch (button)
 		{
@@ -625,7 +631,7 @@ bool GuiFrame::MouseReleased(MouseButton button, Vector2 position) noexcept
 						pressed_control_->Click();
 
 					pressed_control_->Release();
-					return true;
+					return true; //Consumed
 				}
 
 				break;
@@ -634,8 +640,6 @@ bool GuiFrame::MouseReleased(MouseButton button, Vector2 position) noexcept
 
 		return false;
 	}
-	else
-		return true;
 }
 
 bool GuiFrame::MouseMoved(Vector2 position) noexcept

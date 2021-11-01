@@ -337,32 +337,36 @@ void GuiController::FrameEnded(duration time) noexcept
 
 bool GuiController::KeyPressed(KeyButton button) noexcept
 {
-	if (!focused_frame_ ||
-		!focused_frame_->KeyPressed(button)) //Not consumed
+	if (focused_frame_ &&
+		focused_frame_->KeyPressed(button))
+		return true; //Consumed
+	
+	else
 	{
 		switch (button)
 		{
 			case KeyButton::Shift:
 			shift_pressed_ = true;
-			return true;
+			return true; //Consumed
 		}
 
 		return false;
 	}
-	else
-		return true;
 }
 
 bool GuiController::KeyReleased(KeyButton button) noexcept
 {
-	if (!focused_frame_ ||
-		!focused_frame_->KeyReleased(button)) //Not consumed
+	if (focused_frame_ &&
+		focused_frame_->KeyReleased(button))
+		return true; //Consumed
+
+	else
 	{
 		switch (button)
 		{
 			case KeyButton::Shift:
 			shift_pressed_ = false;
-			return true;
+			return true; //Consumed
 
 			case KeyButton::Tab:
 			{
@@ -371,24 +375,22 @@ bool GuiController::KeyReleased(KeyButton button) noexcept
 				else
 					TabForward();
 
-				return true;
+				return true; //Consumed
 			}
 
 			case KeyButton::DownArrow:
 			case KeyButton::RightArrow:
 			TabForward();
-			return true;
+			return true; //Consumed
 
 			case KeyButton::UpArrow:
 			case KeyButton::LeftArrow:
 			TabBackward();
-			return true;
+			return true; //Consumed
 		}
 
 		return false;
 	}
-	else
-		return true;
 }
 
 bool GuiController::CharacterPressed(char character) noexcept
@@ -408,7 +410,7 @@ bool GuiController::MousePressed(MouseButton button, Vector2 position) noexcept
 	//Check focused frame first
 	if (focused_frame_ &&
 		focused_frame_->MousePressed(button, position))
-		return true;
+		return true; //Consumed
 
 	else if (!std::empty(active_frames_))
 	{
@@ -417,7 +419,7 @@ bool GuiController::MousePressed(MouseButton button, Vector2 position) noexcept
 		{
 			if (top_frame != focused_frame_ &&
 				static_cast<GuiFrame*>(top_frame)->MousePressed(button, position))
-				return true;
+				return true; //Consumed
 		}
 	}
 
@@ -429,7 +431,7 @@ bool GuiController::MouseReleased(MouseButton button, Vector2 position) noexcept
 	//Check focused frame first
 	if (focused_frame_ &&
 		focused_frame_->MouseReleased(button, position))
-		return true;
+		return true; //Consumed
 
 	else if (!std::empty(active_frames_))
 	{
@@ -438,7 +440,7 @@ bool GuiController::MouseReleased(MouseButton button, Vector2 position) noexcept
 		{
 			if (top_frame != focused_frame_ &&
 				static_cast<GuiFrame*>(top_frame)->MouseReleased(button, position))
-				return true;
+				return true; //Consumed
 		}
 	}
 
@@ -450,7 +452,7 @@ bool GuiController::MouseMoved(Vector2 position) noexcept
 	//Check focused frame first
 	if (focused_frame_ &&
 		focused_frame_->MouseMoved(position))
-		return true;
+		return true; //Consumed
 
 	else if (!std::empty(active_frames_))
 	{
@@ -459,7 +461,7 @@ bool GuiController::MouseMoved(Vector2 position) noexcept
 		{
 			if (top_frame != focused_frame_ &&
 				static_cast<GuiFrame*>(top_frame)->MouseMoved(position))
-				return true;
+				return true; //Consumed
 		}
 	}
 
@@ -471,7 +473,7 @@ bool GuiController::MouseWheelRolled(int delta, Vector2 position) noexcept
 	//Check focused frame first
 	if (focused_frame_ &&
 		focused_frame_->MouseWheelRolled(delta, position))
-		return true;
+		return true; //Consumed
 
 	else if (!std::empty(active_frames_))
 	{
@@ -480,7 +482,7 @@ bool GuiController::MouseWheelRolled(int delta, Vector2 position) noexcept
 		{
 			if (top_frame != focused_frame_ &&
 				static_cast<GuiFrame*>(top_frame)->MouseWheelRolled(delta, position))
-				return true;
+				return true; //Consumed
 		}
 	}
 }
