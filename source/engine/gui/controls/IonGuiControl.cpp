@@ -12,6 +12,10 @@ File:	IonGuiControl.cpp
 
 #include "IonGuiControl.h"
 
+#include "graphics/scene/graph/IonSceneNode.h"
+#include "graphics/utilities/IonMatrix3.h"
+#include "graphics/utilities/IonMatrix4.h"
+#include "graphics/utilities/IonObb.h"
 #include "gui/IonGuiFrame.h"
 #include "gui/IonGuiPanelContainer.h"
 
@@ -372,6 +376,25 @@ void GuiControl::Reset() noexcept
 GuiPanelContainer* GuiControl::Owner() const noexcept
 {
 	return static_cast<GuiPanelContainer*>(owner_);
+}
+
+
+/*
+	Intersecting
+*/
+
+bool GuiControl::Intersects(const Vector2 &point) const noexcept
+{
+	if (node_)
+	{
+		for (auto &area : areas_)
+		{
+			if (Obb{area}.Transform(node_->FullTransformation()).Intersects(point))
+				return true;
+		}
+	}
+
+	return false;
 }
 
 

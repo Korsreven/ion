@@ -644,7 +644,50 @@ bool GuiFrame::MouseReleased(MouseButton button, Vector2 position) noexcept
 
 bool GuiFrame::MouseMoved(Vector2 position) noexcept
 {
-	return false;
+	if (pressed_control_ &&
+		pressed_control_->MouseMoved(position))
+		return true; //Consumed
+
+	else if (hovered_control_ &&
+		hovered_control_->MouseMoved(position))
+		return true; //Consumed
+
+	else
+	{
+		auto intersected_control =
+			[&]() noexcept -> controls::GuiControl*
+			{
+				//Check hovered control first
+				if (hovered_control_ &&
+					hovered_control_->Intersects(position))
+					return hovered_control_;
+
+				else
+				{
+					//Check all other controls
+					for (auto &control : Controls())
+					{
+						if (&control != hovered_control_ &&
+							control.Intersects(position))
+							return &control;
+					}
+
+					return nullptr;
+				}
+			}();
+
+		if (intersected_control &&
+			intersected_control != hovered_control_)
+		{
+			if (hovered_control_)
+				hovered_control_->Exit();
+
+			intersected_control->Enter();
+			return true; //Consumed
+		}
+
+		return false;
+	}
 }
 
 bool GuiFrame::MouseWheelRolled(int delta, Vector2 position) noexcept

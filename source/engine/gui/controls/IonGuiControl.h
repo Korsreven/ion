@@ -21,6 +21,7 @@ File:	IonGuiControl.h
 #include "events/listeners/IonGuiControlListener.h"
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
+#include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonVector2.h"
 #include "gui/IonGuiComponent.h"
 #include "types/IonTypes.h"
@@ -49,7 +50,7 @@ namespace ion::gui::controls
 
 		namespace detail
 		{
-
+			using bounding_boxes = std::vector<Aabb>;
 		} //detail
 	} //gui_control
 
@@ -65,6 +66,7 @@ namespace ion::gui::controls
 			bool hovered_ = false;
 			bool focusable_ = true;
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
+			gui_control::detail::bounding_boxes areas_;
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
 			std::optional<events::Callback<void, GuiControl&>> on_defocus_;
@@ -393,6 +395,14 @@ namespace ion::gui::controls
 
 			//Returns a pointer to the owner of this control
 			[[nodiscard]] GuiPanelContainer* Owner() const noexcept;
+
+
+			/*
+				Intersecting
+			*/
+
+			//Returns true if the given point intersects with this control
+			[[nodiscard]] bool Intersects(const Vector2 &point) const noexcept;
 
 
 			/*

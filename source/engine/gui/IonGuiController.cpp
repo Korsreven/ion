@@ -485,6 +485,8 @@ bool GuiController::MouseWheelRolled(int delta, Vector2 position) noexcept
 				return true; //Consumed
 		}
 	}
+
+	return false;
 }
 
 
