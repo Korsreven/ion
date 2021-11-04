@@ -15,6 +15,7 @@ File:	IonGuiControl.h
 
 #include <optional>
 #include <string>
+#include <vector>
 
 #include "events/IonCallback.h"
 #include "events/IonEventGenerator.h"
@@ -47,10 +48,11 @@ namespace ion::gui::controls
 			Hovered
 		};
 
+		using Areas = std::vector<Aabb>;
+
 
 		namespace detail
 		{
-			using bounding_boxes = std::vector<Aabb>;
 		} //detail
 	} //gui_control
 
@@ -66,7 +68,7 @@ namespace ion::gui::controls
 			bool hovered_ = false;
 			bool focusable_ = true;
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
-			gui_control::detail::bounding_boxes areas_;
+			gui_control::Areas clickable_areas_;
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
 			std::optional<events::Callback<void, GuiControl&>> on_defocus_;
@@ -151,6 +153,12 @@ namespace ion::gui::controls
 			//Construct a control with the given name
 			GuiControl(std::string name);
 
+			//Construct a control with the given name and clickable size
+			GuiControl(std::string name, const Vector2 &size);
+
+			//Construct a control with the given name and clickable areas
+			GuiControl(std::string name, gui_control::Areas areas);
+
 
 			/*
 				Modifiers
@@ -209,6 +217,16 @@ namespace ion::gui::controls
 						Defocus();
 				}
 			}
+
+
+			//Sets the clickable areas of this control to the given areas
+			inline void ClickableAreas(gui_control::Areas areas) noexcept
+			{
+				clickable_areas_ = std::move(areas);
+			}
+
+			//Sets the clickable size of this control to the given size
+			void ClickableSize(const Vector2 &size) noexcept;
 
 
 			//Sets the on focus callback
@@ -348,6 +366,17 @@ namespace ion::gui::controls
 			{
 				return state_;
 			}
+
+
+			//Returns all of the clickable areas of this control
+			[[nodiscard]] inline auto& ClickableAreas() const noexcept
+			{
+				return clickable_areas_;
+			}
+
+			//Returns the clickable size of this control
+			//If multiple clickable areas, the total merged size is returned
+			[[nodiscard]] Vector2 ClickableSize() const noexcept;
 
 
 			//Returns the on focus callback

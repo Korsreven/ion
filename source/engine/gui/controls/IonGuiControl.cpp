@@ -283,6 +283,22 @@ GuiControl::GuiControl(std::string name) :
 	//Empty
 }
 
+GuiControl::GuiControl(std::string name, const Vector2 &size) :
+
+	GuiComponent{std::move(name)},
+	clickable_areas_{Aabb::Size(size)}
+{
+	//Empty
+}
+
+GuiControl::GuiControl(std::string name, gui_control::Areas areas) :
+
+	GuiComponent{std::move(name)},
+	clickable_areas_{std::move(areas)}
+{
+	//Empty
+}
+
 
 /*
 	Modifiers
@@ -369,9 +385,27 @@ void GuiControl::Reset() noexcept
 }
 
 
+void GuiControl::ClickableSize(const Vector2 &size) noexcept
+{
+	clickable_areas_.clear();
+	clickable_areas_.push_back(Aabb::Size(size));		
+}
+
+
 /*
 	Observers
 */
+
+Vector2 GuiControl::ClickableSize() const noexcept
+{
+	auto merged_area = aabb::Zero;
+
+	for (auto &area : clickable_areas_)
+		merged_area.Merge(area);
+
+	return merged_area.ToSize();
+}
+
 
 GuiPanelContainer* GuiControl::Owner() const noexcept
 {
@@ -387,7 +421,7 @@ bool GuiControl::Intersects(const Vector2 &point) const noexcept
 {
 	if (node_)
 	{
-		for (auto &area : areas_)
+		for (auto &area : clickable_areas_)
 		{
 			if (Obb{area}.Transform(node_->FullTransformation()).Intersects(point))
 				return true;
