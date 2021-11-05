@@ -53,6 +53,8 @@ namespace ion::gui::controls
 
 		namespace detail
 		{
+			void resize_area(Aabb &area, const Vector2 &from_size, const Vector2 &to_size, const Vector2 &position);
+			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size, const Vector2 &position);
 		} //detail
 	} //gui_control
 
@@ -219,14 +221,14 @@ namespace ion::gui::controls
 			}
 
 
+			//Sets the size of the clickable area of this control to the given size
+			void Size(const Vector2 &size) noexcept;
+
 			//Sets the clickable areas of this control to the given areas
 			inline void ClickableAreas(gui_control::Areas areas) noexcept
 			{
 				clickable_areas_ = std::move(areas);
 			}
-
-			//Sets the clickable size of this control to the given size
-			void ClickableSize(const Vector2 &size) noexcept;
 
 
 			//Sets the on focus callback
@@ -368,15 +370,15 @@ namespace ion::gui::controls
 			}
 
 
+			//Returns the size of the clickable area of this control
+			//If multiple clickable areas, the total merged size is returned
+			[[nodiscard]] Vector2 Size() const noexcept;
+
 			//Returns all of the clickable areas of this control
 			[[nodiscard]] inline auto& ClickableAreas() const noexcept
 			{
 				return clickable_areas_;
 			}
-
-			//Returns the clickable size of this control
-			//If multiple clickable areas, the total merged size is returned
-			[[nodiscard]] Vector2 ClickableSize() const noexcept;
 
 
 			//Returns the on focus callback

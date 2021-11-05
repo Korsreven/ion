@@ -15,6 +15,7 @@ File:	IonGuiControl.cpp
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/utilities/IonMatrix3.h"
 #include "graphics/utilities/IonMatrix4.h"
+#include "graphics/utilities/IonVector3.h"
 #include "graphics/utilities/IonObb.h"
 #include "gui/IonGuiFrame.h"
 #include "gui/IonGuiPanelContainer.h"
@@ -26,6 +27,17 @@ using namespace gui_control;
 
 namespace gui_control::detail
 {
+
+void resize_area(Aabb &area, const Vector2 &from_size, const Vector2 &to_size, const Vector2 &position)
+{
+	area.Transform(Matrix3::Transformation(0.0_r, to_size / from_size, position));
+}
+
+void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size, const Vector2 &position)
+{
+	for (auto &area : areas)
+		resize_area(area, from_size, to_size, position);
+}
 
 } //gui_control::detail
 
@@ -385,10 +397,21 @@ void GuiControl::Reset() noexcept
 }
 
 
-void GuiControl::ClickableSize(const Vector2 &size) noexcept
+void GuiControl::Size(const Vector2 &size) noexcept
 {
-	clickable_areas_.clear();
-	clickable_areas_.push_back(Aabb::Size(size));		
+	if (std::empty(clickable_areas_))
+		clickable_areas_.push_back(Aabb::Size(size));
+	else if (std::size(clickable_areas_) == 1)
+		clickable_areas_.back() = Aabb::Size(size);
+
+	//Multiple areas
+	else if (auto current_size = Size(); current_size != size &&
+		current_size.X() > 0.0_r && current_size.Y() > 0.0_r)
+	{
+		detail::resize_areas(clickable_areas_, current_size, size,
+			node_ ? node_->Position() : vector3::Zero);
+		//ControlResized(size);
+	}
 }
 
 
@@ -396,14 +419,22 @@ void GuiControl::ClickableSize(const Vector2 &size) noexcept
 	Observers
 */
 
-Vector2 GuiControl::ClickableSize() const noexcept
+Vector2 GuiControl::Size() const noexcept
 {
-	auto merged_area = aabb::Zero;
+	if (std::empty(clickable_areas_))
+		return vector2::Zero;
+	else if (std::size(clickable_areas_) == 1)
+		return clickable_areas_.back().ToSize();
 
-	for (auto &area : clickable_areas_)
-		merged_area.Merge(area);
+	else //Multiple areas
+	{
+		auto merged_area = aabb::Zero;
 
-	return merged_area.ToSize();
+		for (auto &area : clickable_areas_)
+			merged_area.Merge(area);
+
+		return merged_area.ToSize();
+	}
 }
 
 

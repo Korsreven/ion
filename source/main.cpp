@@ -1280,7 +1280,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::gui::GuiController controller{scene_graph->RootNode()};
 			auto main_frame = controller.CreateFrame("main");
 			auto base_panel = main_frame->CreatePanel("base");
-			auto base_control = base_panel->CreateControl<ion::gui::controls::GuiControl>("control");
+			auto base_control = base_panel->CreateControl<ion::gui::controls::GuiControl>("control",
+				std::vector{Aabb::Size({0.5_r, 0.5_r}, {-0.5_r, 0.5_r}), Aabb::Size({0.5_r, 0.5_r}), Aabb::Size({0.5_r, 0.5_r}, {0.5_r, -0.5_r})});
 			auto sub_panel = base_panel->CreatePanel("sub");
 			auto sub_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("control");
 			auto leaf_panel = sub_panel->CreatePanel("leaf");
@@ -1291,6 +1292,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto sub_panel2 = base_panel2->CreatePanel("sub");
 			auto sub_control2 = sub_panel2->CreateControl<ion::gui::controls::GuiControl>("control");
 			auto leaf_panel2 = sub_panel2->CreatePanel("leaf");
+
+			auto size = base_control->Size();
+			base_control->Size(0.75_r);
+			size = base_control->Size();
+
 
 			main_frame->Activate();
 			main_frame2->Activate();
