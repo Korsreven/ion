@@ -28,15 +28,15 @@ using namespace gui_control;
 namespace gui_control::detail
 {
 
-void resize_area(Aabb &area, const Vector2 &from_size, const Vector2 &to_size, const Vector2 &position)
+void resize_area(Aabb &area, const Vector2 &from_size, const Vector2 &to_size)
 {
-	area.Transform(Matrix3::Transformation(0.0_r, to_size / from_size, position));
+	area.Transform(Matrix3::Transformation(0.0_r, to_size / from_size, vector2::Zero));
 }
 
-void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size, const Vector2 &position)
+void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size)
 {
 	for (auto &area : areas)
-		resize_area(area, from_size, to_size, position);
+		resize_area(area, from_size, to_size);
 }
 
 } //gui_control::detail
@@ -130,6 +130,11 @@ void GuiControl::Exited() noexcept
 void GuiControl::Changed() noexcept
 {
 	NotifyControlChanged();
+}
+
+void GuiControl::Resized() noexcept
+{
+	NotifyControlResized();
 }
 
 
@@ -273,6 +278,20 @@ void GuiControl::NotifyControlChanged() noexcept
 		(*on_change_)(*this);
 }
 
+void GuiControl::NotifyControlResized() noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::Resized, std::ref(*this));
+	}
+
+	//User callback
+	if (on_resize_)
+		(*on_resize_)(*this);
+}
+
 
 /*
 	States
@@ -399,18 +418,25 @@ void GuiControl::Reset() noexcept
 
 void GuiControl::Size(const Vector2 &size) noexcept
 {
-	if (std::empty(clickable_areas_))
-		clickable_areas_.push_back(Aabb::Size(size));
-	else if (std::size(clickable_areas_) == 1)
-		clickable_areas_.back() = Aabb::Size(size);
-
-	//Multiple areas
-	else if (auto current_size = Size(); current_size != size &&
-		current_size.X() > 0.0_r && current_size.Y() > 0.0_r)
+	if (auto current_size = Size(); current_size != size)
 	{
-		detail::resize_areas(clickable_areas_, current_size, size,
-			node_ ? node_->Position() : vector3::Zero);
-		//ControlResized(size);
+		if (std::empty(clickable_areas_))
+		{
+			clickable_areas_.push_back(Aabb::Size(size));
+			Resized();
+		}
+		else if (std::size(clickable_areas_) == 1)
+		{
+			clickable_areas_.back() = Aabb::Size(size);
+			Resized();
+		}
+
+		//Multiple areas
+		else if (current_size.X() != 0.0_r && current_size.Y() != 0.0_r)
+		{
+			detail::resize_areas(clickable_areas_, current_size, size);
+			Resized();
+		}
 	}
 }
 

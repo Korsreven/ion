@@ -94,6 +94,12 @@ namespace ion::events::listeners
 		{
 			//Optional to override
 		}
+
+		//Called right after a gui control has been resized, with a mutable reference to the control that was resized
+		virtual void Resized([[maybe_unused]] gui::controls::GuiControl &control) noexcept
+		{
+			//Optional to override
+		}
 	};
 } //ion::events::listeners
 

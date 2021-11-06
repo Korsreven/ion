@@ -53,8 +53,8 @@ namespace ion::gui::controls
 
 		namespace detail
 		{
-			void resize_area(Aabb &area, const Vector2 &from_size, const Vector2 &to_size, const Vector2 &position);
-			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size, const Vector2 &position);
+			void resize_area(Aabb &area, const Vector2 &from_size, const Vector2 &to_size);
+			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size);
 		} //detail
 	} //gui_control
 
@@ -80,6 +80,7 @@ namespace ion::gui::controls
 			std::optional<events::Callback<void, GuiControl&>> on_enter_;
 			std::optional<events::Callback<void, GuiControl&>> on_exit_;
 			std::optional<events::Callback<void, GuiControl&>> on_change_;
+			std::optional<events::Callback<void, GuiControl&>> on_resize_;
 
 
 			/*
@@ -123,6 +124,9 @@ namespace ion::gui::controls
 			//Called right after a control has been changed
 			virtual void Changed() noexcept;
 
+			//Called right after a control has been resized
+			virtual void Resized() noexcept;
+
 
 			/*
 				Notifying
@@ -142,6 +146,7 @@ namespace ion::gui::controls
 			void NotifyControlExited() noexcept;
 
 			void NotifyControlChanged() noexcept;
+			void NotifyControlResized() noexcept;
 
 
 			/*
@@ -335,6 +340,19 @@ namespace ion::gui::controls
 			}
 
 
+			//Sets the on resize callback
+			inline void OnResize(events::Callback<void, GuiControl&> on_resize) noexcept
+			{
+				on_resize_ = on_resize;
+			}
+
+			//Sets the on resize callback
+			inline void OnResize(std::nullopt_t) noexcept
+			{
+				on_resize_ = {};
+			}
+
+
 			/*
 				Observers
 			*/
@@ -421,6 +439,12 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto OnChange() const noexcept
 			{
 				return on_change_;
+			}
+
+			//Returns the on resize callback
+			[[nodiscard]] inline auto OnResize() const noexcept
+			{
+				return on_resize_;
 			}
 
 
