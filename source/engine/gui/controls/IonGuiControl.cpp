@@ -338,7 +338,7 @@ GuiControl::GuiControl(std::string name, gui_control::Areas areas) :
 void GuiControl::Focus() noexcept
 {
 	if (!focused_ &&
-		enabled_ && focusable_)
+		enabled_ && focusable_ && visible_)
 	{
 		if (auto owner = Owner(); !owner || owner->IsFocusable())
 		{

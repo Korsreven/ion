@@ -69,6 +69,7 @@ namespace ion::gui::controls
 			bool pressed_ = false;
 			bool hovered_ = false;
 			bool focusable_ = true;
+			bool visible_ = true;
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
 			gui_control::Areas clickable_areas_;
 			
@@ -221,6 +222,16 @@ namespace ion::gui::controls
 				if (focusable_ != focusable)
 				{
 					if (!(focusable_ = focusable) && focused_)
+						Defocus();
+				}
+			}
+
+			//Sets whether or not this control is visible
+			inline void Visible(bool visible) noexcept
+			{
+				if (visible_ != visible)
+				{
+					if (!(visible_ = visible) && focused_)
 						Defocus();
 				}
 			}
@@ -379,6 +390,12 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto IsHovered() const noexcept
 			{
 				return hovered_;
+			}
+
+			//Returns true if this control is visible
+			[[nodiscard]] inline auto IsVisible() const noexcept
+			{
+				return visible_;
 			}
 
 			//Returns the visual state of this control
