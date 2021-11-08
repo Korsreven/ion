@@ -297,15 +297,52 @@ void GuiControl::NotifyControlResized() noexcept
 	States
 */
 
+gui_control::detail::control_state_skin& GuiControl::GetStateSkin(gui_control::ControlState state) noexcept
+{
+	if (auto &state_skin = detail::control_state_to_state_skin(state, skin_); state_skin.node)
+		return state_skin;
+
+	//Fallback
+	else 
+	{
+		//Check hovered
+		if (hovered_ && state != ControlState::Hovered)
+		{
+			if (auto &hovered_skin = detail::control_state_to_state_skin(ControlState::Hovered, skin_); hovered_skin.node)
+				return hovered_skin; //Use hovered skin instead
+		}
+
+		//Check focused
+		if (focused_ && state != ControlState::Focused)
+		{
+			if (auto &focused_skin = detail::control_state_to_state_skin(ControlState::Focused, skin_); focused_skin.node)
+				return focused_skin; //Use focused skin instead
+		}
+
+		//Check enabled
+		if (state != ControlState::Enabled)
+		{
+			if (auto &enabled_skin = detail::control_state_to_state_skin(ControlState::Enabled, skin_); enabled_skin.node)
+				return enabled_skin; //Use enabled skin instead
+		}
+
+		//Give up
+		return state_skin;
+	}
+}
+
 void GuiControl::SetState(ControlState state) noexcept
 {
-	//Hide previous state skin
-	if (auto &state_skin = detail::get_state_skin(state_, focused_, skin_); state_skin.node)
-		state_skin.node->Visible(false);
+	if (visible_)
+	{
+		//Hide previous state skin
+		if (auto &state_skin = GetStateSkin(state_); state_skin.node)
+			state_skin.node->Visible(false);
 
-	//Show new state skin
-	if (auto &state_skin = detail::get_state_skin(state, focused_, skin_); state_skin.node)
-		state_skin.node->Visible(true);
+		//Show new state skin
+		if (auto &state_skin = GetStateSkin(state); state_skin.node)
+			state_skin.node->Visible(true);
+	}
 
 	state_ = state;
 }
@@ -420,6 +457,24 @@ void GuiControl::Reset() noexcept
 	Exit();
 }
 
+
+void GuiControl::Visible(bool visible) noexcept
+{
+	if (visible_ != visible)
+	{
+		if (!(visible_ = visible) && focused_)
+			Defocus();
+
+		if (node_)
+			node_->Visible(visible, !visible);
+
+		if (visible)
+		{
+			if (auto &state_skin = GetStateSkin(state_); state_skin.node)
+				state_skin.node->Visible(visible);
+		}
+	}
+}
 
 void GuiControl::Size(const Vector2 &size) noexcept
 {

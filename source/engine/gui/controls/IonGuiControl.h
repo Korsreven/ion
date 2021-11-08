@@ -148,31 +148,6 @@ namespace ion::gui::controls
 					return skin.enabled;
 				}
 			}
-
-			inline auto get_state_skin(ControlState state, bool focused, control_skin &skin) noexcept
-				-> control_state_skin&
-			{
-				if (auto &state_skin = control_state_to_state_skin(state, skin); state_skin.node)
-					return state_skin;
-
-				//Fallback
-				else 
-				{
-					//First try
-					if (focused)
-					{
-						if (auto &focus_skin = control_state_to_state_skin(ControlState::Focused, skin); focus_skin.node)
-							return focus_skin;
-					}
-					
-					//Second try
-					if (auto &enable_skin = control_state_to_state_skin(ControlState::Enabled, skin); enable_skin.node)
-						return enable_skin;
-
-					//Give up
-					return state_skin;
-				}
-			}
 		} //detail
 	} //gui_control
 
@@ -275,6 +250,7 @@ namespace ion::gui::controls
 				States
 			*/
 
+			gui_control::detail::control_state_skin& GetStateSkin(gui_control::ControlState state) noexcept;
 			void SetState(gui_control::ControlState state) noexcept;
 
 		public:
@@ -348,14 +324,7 @@ namespace ion::gui::controls
 			}
 
 			//Sets whether or not this control is visible
-			inline void Visible(bool visible) noexcept
-			{
-				if (visible_ != visible)
-				{
-					if (!(visible_ = visible) && focused_)
-						Defocus();
-				}
-			}
+			void Visible(bool visible) noexcept;
 
 
 			//Sets the size of the clickable area of this control to the given size
