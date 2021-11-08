@@ -25,6 +25,7 @@ File:	IonGuiControl.h
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonVector2.h"
 #include "gui/IonGuiComponent.h"
+#include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
 namespace ion::gui
@@ -53,8 +54,125 @@ namespace ion::gui::controls
 
 		namespace detail
 		{
+			struct control_state_skin_parts
+			{
+				NonOwningPtr<SceneNode> center;
+
+				//Sides
+				NonOwningPtr<SceneNode> top;
+				NonOwningPtr<SceneNode> left;
+				NonOwningPtr<SceneNode> bottom;
+				NonOwningPtr<SceneNode> right;
+
+				//Corners
+				NonOwningPtr<SceneNode> top_left;
+				NonOwningPtr<SceneNode> bottom_left;
+				NonOwningPtr<SceneNode> top_right;
+				NonOwningPtr<SceneNode> bottom_right;
+			};
+
+			struct control_state_skin
+			{
+				NonOwningPtr<SceneNode> node;
+				control_state_skin_parts parts;
+			};
+
+			struct control_skin
+			{
+				control_state_skin enabled;
+				control_state_skin disabled;
+				control_state_skin focused;
+				control_state_skin pressed;
+				control_state_skin hovered;
+			};
+
+			struct control_skin_extra
+			{
+				NonOwningPtr<SceneNode> caption;
+			};
+
+
+			/*
+			struct check_box_skin_extra
+			{
+				NonOwningPtr<SceneNode> check_mark;
+			};
+
+			struct list_box_skin_extra
+			{
+				NonOwningPtr<SceneNode> selection;
+				NonOwningPtr<SceneNode> text;
+			};
+
+			struct progress_bar_skin_extra
+			{
+				NonOwningPtr<SceneNode> bar;
+				NonOwningPtr<SceneNode> bar_precise;
+			};
+
+			struct scroll_bar_skin_extra
+			{
+				NonOwningPtr<SceneNode> bar;
+			};
+
+			struct text_box_skin_extra
+			{
+				NonOwningPtr<SceneNode> cursor;
+				NonOwningPtr<SceneNode> text;
+			};
+			*/
+
+
 			void resize_area(Aabb &area, const Vector2 &from_size, const Vector2 &to_size);
 			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size);
+
+			inline auto control_state_to_state_skin(ControlState state, control_skin &skin) noexcept
+				-> control_state_skin&
+			{
+				switch (state)
+				{
+					case ControlState::Disabled:
+					return skin.disabled;
+
+					case ControlState::Focused:
+					return skin.focused;
+
+					case ControlState::Pressed:
+					return skin.pressed;
+
+					case ControlState::Hovered:
+					return skin.hovered;
+
+					case ControlState::Enabled:
+					default:
+					return skin.enabled;
+				}
+			}
+
+			inline auto get_state_skin(ControlState state, bool focused, control_skin &skin) noexcept
+				-> control_state_skin&
+			{
+				if (auto &state_skin = control_state_to_state_skin(state, skin); state_skin.node)
+					return state_skin;
+
+				//Fallback
+				else 
+				{
+					//First try
+					if (focused)
+					{
+						if (auto &focus_skin = control_state_to_state_skin(ControlState::Focused, skin); focus_skin.node)
+							return focus_skin;
+					}
+					
+					//Second try
+					if (auto &enable_skin = control_state_to_state_skin(ControlState::Enabled, skin); enable_skin.node)
+						return enable_skin;
+
+					//Give up
+					return state_skin;
+				}
+			}
 		} //detail
 	} //gui_control
 
@@ -70,8 +188,11 @@ namespace ion::gui::controls
 			bool hovered_ = false;
 			bool focusable_ = true;
 			bool visible_ = true;
+
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
-			gui_control::Areas clickable_areas_;
+			gui_control::Areas clickable_areas_;			
+			gui_control::detail::control_skin skin_;
+			gui_control::detail::control_skin_extra skin_extra_;
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
 			std::optional<events::Callback<void, GuiControl&>> on_defocus_;

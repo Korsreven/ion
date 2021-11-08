@@ -299,10 +299,15 @@ void GuiControl::NotifyControlResized() noexcept
 
 void GuiControl::SetState(ControlState state) noexcept
 {
-	if (state_ != state)
-	{
-		state_ = state;
-	}
+	//Hide previous state skin
+	if (auto &state_skin = detail::get_state_skin(state_, focused_, skin_); state_skin.node)
+		state_skin.node->Visible(false);
+
+	//Show new state skin
+	if (auto &state_skin = detail::get_state_skin(state, focused_, skin_); state_skin.node)
+		state_skin.node->Visible(true);
+
+	state_ = state;
 }
 
 
