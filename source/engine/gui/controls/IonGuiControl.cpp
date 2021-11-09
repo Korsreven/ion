@@ -297,54 +297,73 @@ void GuiControl::NotifyControlResized() noexcept
 	States
 */
 
-gui_control::detail::control_state_skin& GuiControl::GetStateSkin(gui_control::ControlState state) noexcept
+detail::control_visual_state& GuiControl::GetVisualState(ControlState state) noexcept
 {
-	if (auto &state_skin = detail::control_state_to_state_skin(state, skin_); state_skin.node)
-		return state_skin;
+	auto &visual_state =
+		[&]() noexcept -> detail::control_visual_state&
+		{
+			switch (state)
+			{
+				case ControlState::Disabled:
+				return disabled_state_;
+
+				case ControlState::Focused:
+				return focused_state_;
+
+				case ControlState::Pressed:
+				return pressed_state_;
+
+				case ControlState::Hovered:
+				return hovered_state_;
+
+				case ControlState::Enabled:
+				default:
+				return enabled_state_;
+			}
+		}();
 
 	//Fallback
-	else 
+	if (!visual_state.node)
 	{
 		//Check hovered
 		if (hovered_ && state != ControlState::Hovered)
 		{
-			if (auto &hovered_skin = detail::control_state_to_state_skin(ControlState::Hovered, skin_); hovered_skin.node)
-				return hovered_skin; //Use hovered skin instead
+			if (hovered_state_.node)
+				return hovered_state_; //Display hovered state instead
 		}
 
 		//Check focused
 		if (focused_ && state != ControlState::Focused)
 		{
-			if (auto &focused_skin = detail::control_state_to_state_skin(ControlState::Focused, skin_); focused_skin.node)
-				return focused_skin; //Use focused skin instead
+			if (focused_state_.node)
+				return focused_state_; //Display focused state instead
 		}
 
 		//Check enabled
 		if (state != ControlState::Enabled)
 		{
-			if (auto &enabled_skin = detail::control_state_to_state_skin(ControlState::Enabled, skin_); enabled_skin.node)
-				return enabled_skin; //Use enabled skin instead
+			if (enabled_state_.node)
+				return enabled_state_; //Display enabled state instead
 		}
-
-		//Give up
-		return state_skin;
 	}
+
+	return visual_state;
 }
 
 void GuiControl::SetState(ControlState state) noexcept
-{
-	//Hide previous visible states
+{	
 	if (node_)
 	{
+		//Hide all visual states
 		node_->Visible(false);
 
 		if (visible_)
 		{
 			node_->Visible(true, false);
 
-			//Show new state
-			if (auto &state_skin = GetStateSkin(state); state_skin.node)
-				state_skin.node->Visible(true);
+			//Show new visual state
+			if (auto &visual_state = GetVisualState(state); visual_state.node)
+				visual_state.node->Visible(true);
 		}
 	}
 
@@ -368,7 +387,7 @@ GuiControl::GuiControl(std::string name, const Vector2 &size) :
 	//Empty
 }
 
-GuiControl::GuiControl(std::string name, gui_control::Areas areas) :
+GuiControl::GuiControl(std::string name, Areas areas) :
 
 	GuiComponent{std::move(name)},
 	clickable_areas_{std::move(areas)}

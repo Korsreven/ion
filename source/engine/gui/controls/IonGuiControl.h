@@ -54,7 +54,12 @@ namespace ion::gui::controls
 
 		namespace detail
 		{
-			struct control_state_skin_parts
+			struct control_visual_parts
+			{
+				NonOwningPtr<SceneNode> caption;
+			};
+
+			struct control_visual_state_parts
 			{
 				NonOwningPtr<SceneNode> center;
 
@@ -71,51 +76,37 @@ namespace ion::gui::controls
 				NonOwningPtr<SceneNode> bottom_right;
 			};
 
-			struct control_state_skin
+			struct control_visual_state
 			{
 				NonOwningPtr<SceneNode> node;
-				control_state_skin_parts parts;
-			};
-
-			struct control_skin
-			{
-				control_state_skin enabled;
-				control_state_skin disabled;
-				control_state_skin focused;
-				control_state_skin pressed;
-				control_state_skin hovered;
-			};
-
-			struct control_skin_extra
-			{
-				NonOwningPtr<SceneNode> caption;
+				control_visual_state_parts parts;
 			};
 
 
 			/*
-			struct check_box_skin_extra
+			struct check_box_visual_parts
 			{
 				NonOwningPtr<SceneNode> check_mark;
 			};
 
-			struct list_box_skin_extra
+			struct list_box_visual_parts
 			{
 				NonOwningPtr<SceneNode> selection;
 				NonOwningPtr<SceneNode> text;
 			};
 
-			struct progress_bar_skin_extra
+			struct progress_bar_visual_parts
 			{
 				NonOwningPtr<SceneNode> bar;
 				NonOwningPtr<SceneNode> bar_precise;
 			};
 
-			struct scroll_bar_skin_extra
+			struct scroll_bar_visual_parts
 			{
 				NonOwningPtr<SceneNode> bar;
 			};
 
-			struct text_box_skin_extra
+			struct text_box_visual_parts
 			{
 				NonOwningPtr<SceneNode> cursor;
 				NonOwningPtr<SceneNode> text;
@@ -125,29 +116,6 @@ namespace ion::gui::controls
 
 			void resize_area(Aabb &area, const Vector2 &from_size, const Vector2 &to_size);
 			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size);
-
-			inline auto control_state_to_state_skin(ControlState state, control_skin &skin) noexcept
-				-> control_state_skin&
-			{
-				switch (state)
-				{
-					case ControlState::Disabled:
-					return skin.disabled;
-
-					case ControlState::Focused:
-					return skin.focused;
-
-					case ControlState::Pressed:
-					return skin.pressed;
-
-					case ControlState::Hovered:
-					return skin.hovered;
-
-					case ControlState::Enabled:
-					default:
-					return skin.enabled;
-				}
-			}
 		} //detail
 	} //gui_control
 
@@ -165,9 +133,14 @@ namespace ion::gui::controls
 			bool visible_ = true;
 
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
-			gui_control::Areas clickable_areas_;			
-			gui_control::detail::control_skin skin_;
-			gui_control::detail::control_skin_extra skin_extra_;
+			gui_control::detail::control_visual_state enabled_state_;
+			gui_control::detail::control_visual_state disabled_state_;
+			gui_control::detail::control_visual_state focused_state_;
+			gui_control::detail::control_visual_state pressed_state_;
+			gui_control::detail::control_visual_state hovered_state_;
+			gui_control::detail::control_visual_parts parts_;
+
+			gui_control::Areas clickable_areas_;	
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
 			std::optional<events::Callback<void, GuiControl&>> on_defocus_;
@@ -250,7 +223,7 @@ namespace ion::gui::controls
 				States
 			*/
 
-			gui_control::detail::control_state_skin& GetStateSkin(gui_control::ControlState state) noexcept;
+			gui_control::detail::control_visual_state& GetVisualState(gui_control::ControlState state) noexcept;
 			void SetState(gui_control::ControlState state) noexcept;
 
 		public:
@@ -501,8 +474,8 @@ namespace ion::gui::controls
 				return visible_;
 			}
 
-			//Returns the visual state of this control
-			[[nodiscard]] inline auto VisualState() const noexcept
+			//Returns the current state of this control
+			[[nodiscard]] inline auto State() const noexcept
 			{
 				return state_;
 			}
