@@ -333,15 +333,19 @@ gui_control::detail::control_state_skin& GuiControl::GetStateSkin(gui_control::C
 
 void GuiControl::SetState(ControlState state) noexcept
 {
-	if (visible_)
+	//Hide previous visible states
+	if (node_)
 	{
-		//Hide previous state skin
-		if (auto &state_skin = GetStateSkin(state_); state_skin.node)
-			state_skin.node->Visible(false);
+		node_->Visible(false);
 
-		//Show new state skin
-		if (auto &state_skin = GetStateSkin(state); state_skin.node)
-			state_skin.node->Visible(true);
+		if (visible_)
+		{
+			node_->Visible(true, false);
+
+			//Show new state
+			if (auto &state_skin = GetStateSkin(state); state_skin.node)
+				state_skin.node->Visible(true);
+		}
 	}
 
 	state_ = state;
@@ -457,24 +461,6 @@ void GuiControl::Reset() noexcept
 	Exit();
 }
 
-
-void GuiControl::Visible(bool visible) noexcept
-{
-	if (visible_ != visible)
-	{
-		if (!(visible_ = visible) && focused_)
-			Defocus();
-
-		if (node_)
-			node_->Visible(visible, !visible);
-
-		if (visible)
-		{
-			if (auto &state_skin = GetStateSkin(state_); state_skin.node)
-				state_skin.node->Visible(visible);
-		}
-	}
-}
 
 void GuiControl::Size(const Vector2 &size) noexcept
 {

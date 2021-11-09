@@ -318,13 +318,26 @@ namespace ion::gui::controls
 			{
 				if (focusable_ != focusable)
 				{
-					if (!(focusable_ = focusable) && focused_)
+					focusable_ = focusable;
+
+					if (!focusable && focused_)
 						Defocus();
 				}
 			}
 
 			//Sets whether or not this control is visible
-			void Visible(bool visible) noexcept;
+			inline void Visible(bool visible) noexcept
+			{
+				if (visible_ != visible)
+				{
+					visible_ = visible;
+
+					if (!visible && focused_)
+						Defocus();
+
+					SetState(state_);
+				}
+			}
 
 
 			//Sets the size of the clickable area of this control to the given size
