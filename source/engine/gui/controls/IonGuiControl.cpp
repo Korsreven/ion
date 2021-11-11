@@ -12,6 +12,7 @@ File:	IonGuiControl.cpp
 
 #include "IonGuiControl.h"
 
+#include "graphics/materials/IonMaterial.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/utilities/IonMatrix3.h"
 #include "graphics/utilities/IonMatrix4.h"
@@ -19,6 +20,7 @@ File:	IonGuiControl.cpp
 #include "graphics/utilities/IonObb.h"
 #include "gui/IonGuiFrame.h"
 #include "gui/IonGuiPanelContainer.h"
+#include "types/IonTypeTraits.h"
 
 namespace ion::gui::controls
 {
@@ -297,30 +299,10 @@ void GuiControl::NotifyControlResized() noexcept
 	States
 */
 
-detail::control_visual_state& GuiControl::GetVisualState(ControlState state) noexcept
+detail::control_visual_state_parts& GuiControl::GetVisualState(ControlState state,
+	detail::control_visual_states_with_parts &visual_states) noexcept
 {
-	auto &visual_state =
-		[&]() noexcept -> detail::control_visual_state&
-		{
-			switch (state)
-			{
-				case ControlState::Disabled:
-				return disabled_state_;
-
-				case ControlState::Focused:
-				return focused_state_;
-
-				case ControlState::Pressed:
-				return pressed_state_;
-
-				case ControlState::Hovered:
-				return hovered_state_;
-
-				case ControlState::Enabled:
-				default:
-				return enabled_state_;
-			}
-		}();
+	auto &visual_state = detail::control_state_to_visual_state(state, visual_states);
 
 	//Fallback
 	if (!visual_state.node)
@@ -328,43 +310,152 @@ detail::control_visual_state& GuiControl::GetVisualState(ControlState state) noe
 		//Check hovered
 		if (hovered_ && state != ControlState::Hovered)
 		{
-			if (hovered_state_.node)
-				return hovered_state_; //Display hovered state instead
+			if (visual_states.hovered.node)
+				return visual_states.hovered; //Display hovered state instead
 		}
 
 		//Check focused
 		if (focused_ && state != ControlState::Focused)
 		{
-			if (focused_state_.node)
-				return focused_state_; //Display focused state instead
+			if (visual_states.focused.node)
+				return visual_states.focused; //Display focused state instead
 		}
 
 		//Check enabled
 		if (state != ControlState::Enabled)
 		{
-			if (enabled_state_.node)
-				return enabled_state_; //Display enabled state instead
+			if (visual_states.enabled.node)
+				return visual_states.enabled; //Display enabled state instead
 		}
 	}
 
 	return visual_state;
 }
 
-void GuiControl::SetState(ControlState state) noexcept
+NonOwningPtr<graphics::materials::Material> GuiControl::GetVisualState(gui_control::ControlState state,
+	detail::visual_part_with_states &visual_states) noexcept
+{
+	auto visual_state = detail::control_state_to_visual_state(state, visual_states);
+
+	//Fallback
+	if (!visual_state)
+	{
+		//Check hovered
+		if (hovered_ && state != ControlState::Hovered)
+		{
+			if (visual_states.hovered)
+				return visual_states.hovered; //Display hovered state instead
+		}
+
+		//Check focused
+		if (focused_ && state != ControlState::Focused)
+		{
+			if (visual_states.focused)
+				return visual_states.focused; //Display focused state instead
+		}
+
+		//Check enabled
+		if (state != ControlState::Enabled)
+		{
+			if (visual_states.enabled)
+				return visual_states.enabled; //Display enabled state instead
+		}
+	}
+
+	return visual_state;
+}
+
+
+void GuiControl::SetStateMaterial(NonOwningPtr<graphics::materials::Material> material, SceneNode &node) noexcept
+{
+	//Todo
+}
+
+void GuiControl::SetVisualState(ControlState state, detail::control_visual_states_with_parts &visual_states) noexcept
 {	
 	if (node_)
 	{
-		//Hide all visual states
-		node_->Visible(false);
+		//Hide enabled state
+		if (visual_states.enabled.node)
+			visual_states.enabled.node->Visible(false);
 
-		if (visible_)
-		{
-			node_->Visible(true, false);
+		//Hide disabled state
+		if (visual_states.disabled.node)
+			visual_states.disabled.node->Visible(false);
 
-			//Show new visual state
-			if (auto &visual_state = GetVisualState(state); visual_state.node)
-				visual_state.node->Visible(true);
-		}
+		//Hide focused state
+		if (visual_states.focused.node)
+			visual_states.focused.node->Visible(false);
+
+		//Hide pressed state
+		if (visual_states.pressed.node)
+			visual_states.pressed.node->Visible(false);
+
+		//Hide hovered state
+		if (visual_states.hovered.node)
+			visual_states.hovered.node->Visible(false);
+
+
+		//Show new visual state
+		if (auto &visual_state = GetVisualState(state, visual_states); visual_state.node)
+			visual_state.node->Visible(true);
+	}
+}
+
+void GuiControl::SetVisualState(ControlState state, detail::control_visual_parts_with_states &visual_states) noexcept
+{
+	if (node_)
+	{
+		//Show new center visual state
+		if (auto material = GetVisualState(state, visual_states.parts.center); material)
+			SetStateMaterial(material, *visual_states.parts.center.node);
+
+
+		//Show new top visual state
+		if (auto material = GetVisualState(state, visual_states.parts.top); material)
+			SetStateMaterial(material, *visual_states.parts.top.node);
+
+		//Show new left visual state
+		if (auto material = GetVisualState(state, visual_states.parts.left); material)
+			SetStateMaterial(material, *visual_states.parts.left.node);
+
+		//Show new bottom visual state
+		if (auto material = GetVisualState(state, visual_states.parts.bottom); material)
+			SetStateMaterial(material, *visual_states.parts.bottom.node);
+
+		//Show new right visual state
+		if (auto material = GetVisualState(state, visual_states.parts.right); material)
+			SetStateMaterial(material, *visual_states.parts.right.node);
+
+
+		//Show new top-left visual state
+		if (auto material = GetVisualState(state, visual_states.parts.top_left); material)
+			SetStateMaterial(material, *visual_states.parts.top_left.node);
+
+		//Show new bottom-left visual state
+		if (auto material = GetVisualState(state, visual_states.parts.bottom_left); material)
+			SetStateMaterial(material, *visual_states.parts.bottom_left.node);
+
+		//Show new top-right visual state
+		if (auto material = GetVisualState(state, visual_states.parts.top_right); material)
+			SetStateMaterial(material, *visual_states.parts.top_right.node);
+
+		//Show new bottom-right visual state
+		if (auto material = GetVisualState(state, visual_states.parts.bottom_right); material)
+			SetStateMaterial(material, *visual_states.parts.bottom_right.node);
+	}
+}
+
+
+void GuiControl::SetState(gui_control::ControlState state) noexcept
+{
+	if (visible_)
+	{
+		std::visit(
+			[&](auto &&visual_states) noexcept
+			{
+				SetVisualState(state, visual_states);
+			}, visual_states_);
 	}
 
 	state_ = state;
@@ -478,6 +569,23 @@ void GuiControl::Reset() noexcept
 	Release();
 	Defocus();
 	Exit();
+}
+
+
+void GuiControl::Visible(bool visible) noexcept
+{
+	if (visible_ != visible)
+	{
+		visible_ = visible;
+
+		if (!visible && focused_)
+			Defocus();
+
+		if (node_)
+			node_->Visible(visible, !visible);
+
+		SetState(state_);
+	}
 }
 
 

@@ -15,6 +15,8 @@ File:	IonGuiControl.h
 
 #include <optional>
 #include <string>
+#include <type_traits>
+#include <variant>
 #include <vector>
 
 #include "events/IonCallback.h"
@@ -28,9 +30,17 @@ File:	IonGuiControl.h
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
-namespace ion::gui
+namespace ion
 {
-	class GuiPanelContainer; //Forward declaration
+	namespace gui
+	{
+		class GuiPanelContainer; //Forward declaration
+	}
+
+	namespace graphics::materials
+	{
+		class Material; //Forward declaration
+	}
 }
 
 namespace ion::gui::controls
@@ -54,34 +64,70 @@ namespace ion::gui::controls
 
 		namespace detail
 		{
-			struct control_visual_parts
+			struct visual_part
 			{
-				NonOwningPtr<SceneNode> caption;
+				NonOwningPtr<SceneNode> node;
 			};
+
+			struct visual_part_with_states : visual_part
+			{
+				NonOwningPtr<graphics::materials::Material> enabled;
+				NonOwningPtr<graphics::materials::Material> disabled;
+				NonOwningPtr<graphics::materials::Material> focused;
+				NonOwningPtr<graphics::materials::Material> pressed;
+				NonOwningPtr<graphics::materials::Material> hovered;		
+			};
+
+			template <typename VisualPart>
+			struct visual_parts
+			{
+				static_assert(std::is_base_of_v<visual_part, VisualPart>);
+
+				VisualPart center;
+
+				//Sides
+				VisualPart top;
+				VisualPart left;
+				VisualPart bottom;
+				VisualPart right;
+
+				//Corners
+				VisualPart top_left;
+				VisualPart bottom_left;
+				VisualPart top_right;
+				VisualPart bottom_right;
+			};
+
 
 			struct control_visual_state_parts
 			{
-				NonOwningPtr<SceneNode> center;
-
-				//Sides
-				NonOwningPtr<SceneNode> top;
-				NonOwningPtr<SceneNode> left;
-				NonOwningPtr<SceneNode> bottom;
-				NonOwningPtr<SceneNode> right;
-
-				//Corners
-				NonOwningPtr<SceneNode> top_left;
-				NonOwningPtr<SceneNode> bottom_left;
-				NonOwningPtr<SceneNode> top_right;
-				NonOwningPtr<SceneNode> bottom_right;
+				NonOwningPtr<SceneNode> node;
+				visual_parts<visual_part> parts;
 			};
 
-			struct control_visual_state
+			struct control_visual_parts_with_states
 			{
 				NonOwningPtr<SceneNode> node;
-				control_visual_state_parts parts;
+				visual_parts<visual_part_with_states> parts;
 			};
 
+			struct control_visual_states_with_parts
+			{
+				control_visual_state_parts enabled;
+				control_visual_state_parts disabled;
+				control_visual_state_parts focused;
+				control_visual_state_parts pressed;
+				control_visual_state_parts hovered;
+			};
+
+			using control_visual_states =
+				std::variant<control_visual_parts_with_states, control_visual_states_with_parts>;
+
+
+			struct control_visual_parts
+			{
+				visual_part caption;
+			};
 
 			/*
 			struct check_box_visual_parts
@@ -114,6 +160,51 @@ namespace ion::gui::controls
 			*/
 
 
+			inline auto& control_state_to_visual_state(ControlState state, control_visual_states_with_parts &visual_states) noexcept
+			{
+				switch (state)
+				{
+					case ControlState::Disabled:
+					return visual_states.disabled;
+
+					case ControlState::Focused:
+					return visual_states.focused;
+
+					case ControlState::Pressed:
+					return visual_states.pressed;
+
+					case ControlState::Hovered:
+					return visual_states.hovered;
+
+					case ControlState::Enabled:
+					default:
+					return visual_states.enabled;
+				}
+			}
+
+			inline auto control_state_to_visual_state(ControlState state, visual_part_with_states &visual_states) noexcept
+			{
+				switch (state)
+				{
+					case ControlState::Disabled:
+					return visual_states.disabled;
+
+					case ControlState::Focused:
+					return visual_states.focused;
+
+					case ControlState::Pressed:
+					return visual_states.pressed;
+
+					case ControlState::Hovered:
+					return visual_states.hovered;	
+
+					case ControlState::Enabled:
+					default:
+					return visual_states.enabled;
+				}
+			}
+
+
 			void resize_area(Aabb &area, const Vector2 &from_size, const Vector2 &to_size);
 			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size);
 		} //detail
@@ -133,12 +224,8 @@ namespace ion::gui::controls
 			bool visible_ = true;
 
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
-			gui_control::detail::control_visual_state enabled_state_;
-			gui_control::detail::control_visual_state disabled_state_;
-			gui_control::detail::control_visual_state focused_state_;
-			gui_control::detail::control_visual_state pressed_state_;
-			gui_control::detail::control_visual_state hovered_state_;
-			gui_control::detail::control_visual_parts parts_;
+			gui_control::detail::control_visual_states visual_states_;
+			gui_control::detail::control_visual_parts visual_parts_;
 
 			gui_control::Areas clickable_areas_;	
 			
@@ -223,7 +310,15 @@ namespace ion::gui::controls
 				States
 			*/
 
-			gui_control::detail::control_visual_state& GetVisualState(gui_control::ControlState state) noexcept;
+			gui_control::detail::control_visual_state_parts& GetVisualState(gui_control::ControlState state,
+				gui_control::detail::control_visual_states_with_parts &visual_states) noexcept;
+			NonOwningPtr<graphics::materials::Material> GetVisualState(gui_control::ControlState state,
+				gui_control::detail::visual_part_with_states &visual_states) noexcept;			
+
+			void SetStateMaterial(NonOwningPtr<graphics::materials::Material> material, SceneNode &node) noexcept;
+			void SetVisualState(gui_control::ControlState state, gui_control::detail::control_visual_states_with_parts &visual_states) noexcept;
+			void SetVisualState(gui_control::ControlState state, gui_control::detail::control_visual_parts_with_states &visual_states) noexcept;	
+
 			void SetState(gui_control::ControlState state) noexcept;
 
 		public:
@@ -299,18 +394,7 @@ namespace ion::gui::controls
 			}
 
 			//Sets whether or not this control is visible
-			inline void Visible(bool visible) noexcept
-			{
-				if (visible_ != visible)
-				{
-					visible_ = visible;
-
-					if (!visible && focused_)
-						Defocus();
-
-					SetState(state_);
-				}
-			}
+			void Visible(bool visible) noexcept;
 
 
 			//Sets the size of the clickable area of this control to the given size

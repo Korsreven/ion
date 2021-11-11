@@ -494,7 +494,7 @@ bool GuiController::MouseWheelRolled(int delta, Vector2 position) noexcept
 	Window events
 */
 
-void GuiController::WindowActionReceived(WindowAction action) noexcept
+void GuiController::WindowActionReceived([[maybe_unused]] WindowAction action) noexcept
 {
 
 }
