@@ -15,8 +15,6 @@ File:	IonGuiControl.h
 
 #include <optional>
 #include <string>
-#include <type_traits>
-#include <variant>
 #include <vector>
 
 #include "events/IonCallback.h"
@@ -30,16 +28,31 @@ File:	IonGuiControl.h
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
+//Forward declarations
 namespace ion
 {
 	namespace gui
 	{
-		class GuiPanelContainer; //Forward declaration
+		class GuiPanelContainer;
 	}
 
-	namespace graphics::materials
+	namespace graphics
 	{
-		class Material; //Forward declaration
+		namespace materials
+		{
+			class Material;
+		}
+
+		namespace scene
+		{
+			class DrawableText;
+			class Model;
+
+			namespace shapes
+			{
+				class Mesh;
+			}
+		}
 	}
 }
 
@@ -59,148 +72,119 @@ namespace ion::gui::controls
 			Hovered
 		};
 
+		struct ControlVisualPart final
+		{
+			NonOwningPtr<graphics::scene::shapes::Mesh> Geometry;
+			NonOwningPtr<graphics::materials::Material> EnabledMaterial;
+			NonOwningPtr<graphics::materials::Material> DisabledMaterial;
+			NonOwningPtr<graphics::materials::Material> FocusedMaterial;
+			NonOwningPtr<graphics::materials::Material> PressedMaterial;
+			NonOwningPtr<graphics::materials::Material> HoveredMaterial;
+
+
+			[[nodiscard]] inline operator bool() const noexcept
+			{
+				return !!Geometry;
+			}
+
+			[[nodiscard]] inline auto operator->() const noexcept
+			{
+				return Geometry.get();
+			}
+		};
+
+		struct ControlVisualParts final
+		{
+			NonOwningPtr<graphics::scene::Model> Owner;
+
+			//Center
+			ControlVisualPart Center;
+
+			//Sides
+			ControlVisualPart Top;
+			ControlVisualPart Left;
+			ControlVisualPart Bottom;
+			ControlVisualPart Right;
+
+			//Corners
+			ControlVisualPart TopLeft;
+			ControlVisualPart BottomLeft;
+			ControlVisualPart TopRight;
+			ControlVisualPart BottomRight;
+
+
+			[[nodiscard]] inline operator bool() const noexcept
+			{
+				return !!Owner;
+			}
+
+			[[nodiscard]] inline auto operator->() const noexcept
+			{
+				return Owner.get();
+			}
+		};
+
+		struct ControlSkin final
+		{
+			ControlVisualParts Parts;
+			NonOwningPtr<graphics::scene::DrawableText> Caption;
+		};
+
+		/*
+		struct CheckBoxSkin final
+		{
+			NonOwningPtr<graphics::scene::Model> CheckMark;
+		};
+
+		struct ListBoxSkin final
+		{
+			NonOwningPtr<graphics::scene::Model> Selection;
+			NonOwningPtr<graphics::scene::DrawableText> Text;
+		};
+
+		struct ProgressBarSkin final
+		{
+			NonOwningPtr<graphics::scene::Model> Bar;
+			NonOwningPtr<graphics::scene::Model> BarPrecise;
+		};
+
+		struct ScrollBarSkin final
+		{
+			NonOwningPtr<graphics::scene::Model> Bar;
+		};
+
+		struct TextBoxSkin final
+		{
+			NonOwningPtr<graphics::scene::Model> Cursor;
+			NonOwningPtr<graphics::scene::DrawableText> Text;
+		};
+		*/
+
+
 		using Areas = std::vector<Aabb>;
 
 
 		namespace detail
 		{
-			struct visual_part
-			{
-				NonOwningPtr<SceneNode> node;
-			};
-
-			struct visual_part_with_states : visual_part
-			{
-				NonOwningPtr<graphics::materials::Material> enabled;
-				NonOwningPtr<graphics::materials::Material> disabled;
-				NonOwningPtr<graphics::materials::Material> focused;
-				NonOwningPtr<graphics::materials::Material> pressed;
-				NonOwningPtr<graphics::materials::Material> hovered;		
-			};
-
-			template <typename VisualPart>
-			struct visual_parts
-			{
-				static_assert(std::is_base_of_v<visual_part, VisualPart>);
-
-				VisualPart center;
-
-				//Sides
-				VisualPart top;
-				VisualPart left;
-				VisualPart bottom;
-				VisualPart right;
-
-				//Corners
-				VisualPart top_left;
-				VisualPart bottom_left;
-				VisualPart top_right;
-				VisualPart bottom_right;
-			};
-
-
-			struct control_visual_state_parts
-			{
-				NonOwningPtr<SceneNode> node;
-				visual_parts<visual_part> parts;
-			};
-
-			struct control_visual_parts_with_states
-			{
-				NonOwningPtr<SceneNode> node;
-				visual_parts<visual_part_with_states> parts;
-			};
-
-			struct control_visual_states_with_parts
-			{
-				control_visual_state_parts enabled;
-				control_visual_state_parts disabled;
-				control_visual_state_parts focused;
-				control_visual_state_parts pressed;
-				control_visual_state_parts hovered;
-			};
-
-			using control_visual_states =
-				std::variant<control_visual_parts_with_states, control_visual_states_with_parts>;
-
-
-			struct control_visual_parts
-			{
-				visual_part caption;
-			};
-
-			/*
-			struct check_box_visual_parts
-			{
-				NonOwningPtr<SceneNode> check_mark;
-			};
-
-			struct list_box_visual_parts
-			{
-				NonOwningPtr<SceneNode> selection;
-				NonOwningPtr<SceneNode> text;
-			};
-
-			struct progress_bar_visual_parts
-			{
-				NonOwningPtr<SceneNode> bar;
-				NonOwningPtr<SceneNode> bar_precise;
-			};
-
-			struct scroll_bar_visual_parts
-			{
-				NonOwningPtr<SceneNode> bar;
-			};
-
-			struct text_box_visual_parts
-			{
-				NonOwningPtr<SceneNode> cursor;
-				NonOwningPtr<SceneNode> text;
-			};
-			*/
-
-
-			inline auto& control_state_to_visual_state(ControlState state, control_visual_states_with_parts &visual_states) noexcept
+			inline auto control_state_to_material(ControlState state, ControlVisualPart &part) noexcept
 			{
 				switch (state)
 				{
 					case ControlState::Disabled:
-					return visual_states.disabled;
+					return part.DisabledMaterial;
 
 					case ControlState::Focused:
-					return visual_states.focused;
+					return part.FocusedMaterial;
 
 					case ControlState::Pressed:
-					return visual_states.pressed;
+					return part.PressedMaterial;
 
 					case ControlState::Hovered:
-					return visual_states.hovered;
+					return part.HoveredMaterial;
 
 					case ControlState::Enabled:
 					default:
-					return visual_states.enabled;
-				}
-			}
-
-			inline auto control_state_to_visual_state(ControlState state, visual_part_with_states &visual_states) noexcept
-			{
-				switch (state)
-				{
-					case ControlState::Disabled:
-					return visual_states.disabled;
-
-					case ControlState::Focused:
-					return visual_states.focused;
-
-					case ControlState::Pressed:
-					return visual_states.pressed;
-
-					case ControlState::Hovered:
-					return visual_states.hovered;	
-
-					case ControlState::Enabled:
-					default:
-					return visual_states.enabled;
+					return part.EnabledMaterial;
 				}
 			}
 
@@ -224,9 +208,7 @@ namespace ion::gui::controls
 			bool visible_ = true;
 
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
-			gui_control::detail::control_visual_states visual_states_;
-			gui_control::detail::control_visual_parts visual_parts_;
-
+			gui_control::ControlSkin skin_;
 			gui_control::Areas clickable_areas_;	
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
@@ -238,6 +220,7 @@ namespace ion::gui::controls
 			std::optional<events::Callback<void, GuiControl&>> on_exit_;
 			std::optional<events::Callback<void, GuiControl&>> on_change_;
 			std::optional<events::Callback<void, GuiControl&>> on_resize_;
+			std::optional<events::Callback<void, GuiControl&>> on_state_change_;
 
 
 			/*
@@ -285,6 +268,10 @@ namespace ion::gui::controls
 			virtual void Resized() noexcept;
 
 
+			//Called right after a control has changed state
+			virtual void StateChanged() noexcept;
+
+
 			/*
 				Notifying
 			*/
@@ -305,20 +292,17 @@ namespace ion::gui::controls
 			void NotifyControlChanged() noexcept;
 			void NotifyControlResized() noexcept;
 
+			void NotifyControlStateChanged() noexcept;
+
 
 			/*
 				States
 			*/
 
-			gui_control::detail::control_visual_state_parts& GetVisualState(gui_control::ControlState state,
-				gui_control::detail::control_visual_states_with_parts &visual_states) noexcept;
-			NonOwningPtr<graphics::materials::Material> GetVisualState(gui_control::ControlState state,
-				gui_control::detail::visual_part_with_states &visual_states) noexcept;			
+			NonOwningPtr<graphics::materials::Material> GetStateMaterial(gui_control::ControlState state, gui_control::ControlVisualPart &part) noexcept;
 
-			void SetStateMaterial(NonOwningPtr<graphics::materials::Material> material, SceneNode &node) noexcept;
-			void SetVisualState(gui_control::ControlState state, gui_control::detail::control_visual_states_with_parts &visual_states) noexcept;
-			void SetVisualState(gui_control::ControlState state, gui_control::detail::control_visual_parts_with_states &visual_states) noexcept;	
-
+			void SetPartState(gui_control::ControlState state, gui_control::ControlVisualPart &part) noexcept;
+			void SetSkinState(gui_control::ControlState state, gui_control::ControlSkin &skin) noexcept;
 			void SetState(gui_control::ControlState state) noexcept;
 
 		public:
@@ -524,6 +508,19 @@ namespace ion::gui::controls
 			}
 
 
+			//Sets the on state change callback
+			inline void OnStateChange(events::Callback<void, GuiControl&> on_state_change) noexcept
+			{
+				on_state_change_ = on_state_change;
+			}
+
+			//Sets the on state change callback
+			inline void OnStateChange(std::nullopt_t) noexcept
+			{
+				on_state_change_ = {};
+			}
+
+
 			/*
 				Observers
 			*/
@@ -622,6 +619,12 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto OnResize() const noexcept
 			{
 				return on_resize_;
+			}
+
+			//Returns the on state change callback
+			[[nodiscard]] inline auto OnStateChange() const noexcept
+			{
+				return on_state_change_;
 			}
 
 

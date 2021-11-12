@@ -100,6 +100,13 @@ namespace ion::events::listeners
 		{
 			//Optional to override
 		}
+
+
+		//Called right after a gui control has changed state, with a mutable reference to the control that changed state
+		virtual void StateChanged([[maybe_unused]] gui::controls::GuiControl &control) noexcept
+		{
+			//Optional to override
+		}
 	};
 } //ion::events::listeners
 

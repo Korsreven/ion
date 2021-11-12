@@ -13,6 +13,7 @@ File:	IonGuiControl.cpp
 #include "IonGuiControl.h"
 
 #include "graphics/materials/IonMaterial.h"
+#include "graphics/scene/IonModel.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/utilities/IonMatrix3.h"
 #include "graphics/utilities/IonMatrix4.h"
@@ -137,6 +138,12 @@ void GuiControl::Changed() noexcept
 void GuiControl::Resized() noexcept
 {
 	NotifyControlResized();
+}
+
+
+void GuiControl::StateChanged() noexcept
+{
+	NotifyControlStateChanged();
 }
 
 
@@ -295,170 +302,98 @@ void GuiControl::NotifyControlResized() noexcept
 }
 
 
+void GuiControl::NotifyControlStateChanged() noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::StateChanged, std::ref(*this));
+	}
+
+	//User callback
+	if (on_state_change_)
+		(*on_state_change_)(*this);
+}
+
+
 /*
 	States
 */
 
-detail::control_visual_state_parts& GuiControl::GetVisualState(ControlState state,
-	detail::control_visual_states_with_parts &visual_states) noexcept
+NonOwningPtr<graphics::materials::Material> GuiControl::GetStateMaterial(ControlState state, ControlVisualPart &part) noexcept
 {
-	auto &visual_state = detail::control_state_to_visual_state(state, visual_states);
+	auto material = detail::control_state_to_material(state, part);
 
 	//Fallback
-	if (!visual_state.node)
+	if (!material)
 	{
 		//Check hovered
 		if (hovered_ && state != ControlState::Hovered)
 		{
-			if (visual_states.hovered.node)
-				return visual_states.hovered; //Display hovered state instead
+			if (part.HoveredMaterial)
+				return part.HoveredMaterial; //Display hovered material instead
 		}
 
 		//Check focused
 		if (focused_ && state != ControlState::Focused)
 		{
-			if (visual_states.focused.node)
-				return visual_states.focused; //Display focused state instead
+			if (part.FocusedMaterial)
+				return part.FocusedMaterial; //Display focused material instead
 		}
 
 		//Check enabled
 		if (state != ControlState::Enabled)
 		{
-			if (visual_states.enabled.node)
-				return visual_states.enabled; //Display enabled state instead
+			if (part.EnabledMaterial)
+				return part.EnabledMaterial; //Display enabled material instead
 		}
 	}
 
-	return visual_state;
+	return material;
 }
 
-NonOwningPtr<graphics::materials::Material> GuiControl::GetVisualState(gui_control::ControlState state,
-	detail::visual_part_with_states &visual_states) noexcept
+
+void GuiControl::SetPartState(ControlState state, ControlVisualPart &part) noexcept
 {
-	auto visual_state = detail::control_state_to_visual_state(state, visual_states);
-
-	//Fallback
-	if (!visual_state)
+	if (part)
 	{
-		//Check hovered
-		if (hovered_ && state != ControlState::Hovered)
-		{
-			if (visual_states.hovered)
-				return visual_states.hovered; //Display hovered state instead
-		}
-
-		//Check focused
-		if (focused_ && state != ControlState::Focused)
-		{
-			if (visual_states.focused)
-				return visual_states.focused; //Display focused state instead
-		}
-
-		//Check enabled
-		if (state != ControlState::Enabled)
-		{
-			if (visual_states.enabled)
-				return visual_states.enabled; //Display enabled state instead
-		}
+		if (auto material = GetStateMaterial(state, part); material)
+			part->SurfaceMaterial(material);
 	}
-
-	return visual_state;
 }
 
-
-void GuiControl::SetStateMaterial(NonOwningPtr<graphics::materials::Material> material, SceneNode &node) noexcept
+void GuiControl::SetSkinState(ControlState state, ControlSkin &skin) noexcept
 {
-	//Todo
-}
-
-void GuiControl::SetVisualState(ControlState state, detail::control_visual_states_with_parts &visual_states) noexcept
-{	
-	if (node_)
+	if (skin.Parts)
 	{
-		//Hide enabled state
-		if (visual_states.enabled.node)
-			visual_states.enabled.node->Visible(false);
+		//Center
+		SetPartState(state, skin.Parts.Center);
 
-		//Hide disabled state
-		if (visual_states.disabled.node)
-			visual_states.disabled.node->Visible(false);
+		//Sides
+		SetPartState(state, skin.Parts.Top);
+		SetPartState(state, skin.Parts.Left);
+		SetPartState(state, skin.Parts.Bottom);
+		SetPartState(state, skin.Parts.Right);
 
-		//Hide focused state
-		if (visual_states.focused.node)
-			visual_states.focused.node->Visible(false);
-
-		//Hide pressed state
-		if (visual_states.pressed.node)
-			visual_states.pressed.node->Visible(false);
-
-		//Hide hovered state
-		if (visual_states.hovered.node)
-			visual_states.hovered.node->Visible(false);
-
-
-		//Show new visual state
-		if (auto &visual_state = GetVisualState(state, visual_states); visual_state.node)
-			visual_state.node->Visible(true);
+		//Corners
+		SetPartState(state, skin.Parts.TopLeft);
+		SetPartState(state, skin.Parts.BottomLeft);
+		SetPartState(state, skin.Parts.TopRight);
+		SetPartState(state, skin.Parts.BottomRight);
 	}
 }
 
-void GuiControl::SetVisualState(ControlState state, detail::control_visual_parts_with_states &visual_states) noexcept
-{
-	if (node_)
-	{
-		//Show new center visual state
-		if (auto material = GetVisualState(state, visual_states.parts.center); material)
-			SetStateMaterial(material, *visual_states.parts.center.node);
-
-
-		//Show new top visual state
-		if (auto material = GetVisualState(state, visual_states.parts.top); material)
-			SetStateMaterial(material, *visual_states.parts.top.node);
-
-		//Show new left visual state
-		if (auto material = GetVisualState(state, visual_states.parts.left); material)
-			SetStateMaterial(material, *visual_states.parts.left.node);
-
-		//Show new bottom visual state
-		if (auto material = GetVisualState(state, visual_states.parts.bottom); material)
-			SetStateMaterial(material, *visual_states.parts.bottom.node);
-
-		//Show new right visual state
-		if (auto material = GetVisualState(state, visual_states.parts.right); material)
-			SetStateMaterial(material, *visual_states.parts.right.node);
-
-
-		//Show new top-left visual state
-		if (auto material = GetVisualState(state, visual_states.parts.top_left); material)
-			SetStateMaterial(material, *visual_states.parts.top_left.node);
-
-		//Show new bottom-left visual state
-		if (auto material = GetVisualState(state, visual_states.parts.bottom_left); material)
-			SetStateMaterial(material, *visual_states.parts.bottom_left.node);
-
-		//Show new top-right visual state
-		if (auto material = GetVisualState(state, visual_states.parts.top_right); material)
-			SetStateMaterial(material, *visual_states.parts.top_right.node);
-
-		//Show new bottom-right visual state
-		if (auto material = GetVisualState(state, visual_states.parts.bottom_right); material)
-			SetStateMaterial(material, *visual_states.parts.bottom_right.node);
-	}
-}
-
-
-void GuiControl::SetState(gui_control::ControlState state) noexcept
+void GuiControl::SetState(ControlState state) noexcept
 {
 	if (visible_)
-	{
-		std::visit(
-			[&](auto &&visual_states) noexcept
-			{
-				SetVisualState(state, visual_states);
-			}, visual_states_);
-	}
+		SetSkinState(state, skin_);
 
-	state_ = state;
+	if (state_ != state)
+	{
+		state_ = state;
+		StateChanged();
+	}
 }
 
 
