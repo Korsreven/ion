@@ -13,8 +13,11 @@ File:	IonGuiControl.cpp
 #include "IonGuiControl.h"
 
 #include "graphics/materials/IonMaterial.h"
+#include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
+#include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneNode.h"
+#include "graphics/scene/shapes/IonSprite.h"
 #include "graphics/utilities/IonMatrix3.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector3.h"
@@ -31,15 +34,53 @@ using namespace gui_control;
 namespace gui_control::detail
 {
 
-void resize_area(Aabb &area, const Vector2 &from_size, const Vector2 &to_size)
+
+void resize_part(ControlVisualPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept
 {
-	area.Transform(Matrix3::Transformation(0.0_r, to_size / from_size, vector2::Zero));
+	if (part)
+	{
+		auto position = Vector2{part->Position()};
+		auto direction = (position - center).NormalizeCopy();
+		part->Position(part->Position() + direction * delta_position);
+		part->Size(part->Size() + delta_size);
+	}
 }
 
-void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size)
+void resize_parts(ControlVisualParts &parts, const Vector2 &from_size, const Vector2 &to_size) noexcept
 {
+	auto delta_size = to_size - from_size;
+	auto delta_position = delta_size * 0.5_r;
+	auto &center = parts.Center->Position();
+	auto [delta_width, delta_height] = delta_size.XY();
+
+	//Center
+	resize_part(parts.Center, delta_size, vector2::Zero, center);
+
+	//Sides
+	resize_part(parts.Top, {delta_width, 0.0_r}, delta_position, center);
+	resize_part(parts.Left, {0.0_r, delta_height}, delta_position, center);
+	resize_part(parts.Bottom, {delta_width, 0.0_r}, delta_position, center);
+	resize_part(parts.Right, {0.0_r, delta_height}, delta_position, center);
+
+	//Corners
+	resize_part(parts.TopLeft, vector2::Zero, delta_position, center);
+	resize_part(parts.TopRight, vector2::Zero, delta_position, center);
+	resize_part(parts.BottomLeft, vector2::Zero, delta_position, center);
+	resize_part(parts.BottomRight, vector2::Zero, delta_position, center);
+}
+
+
+void resize_area(Aabb &area, const Vector2 &scaling) noexcept
+{
+	area.Transform(Matrix3::Transformation(0.0_r, scaling, vector2::Zero));
+}
+
+void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size) noexcept
+{
+	auto scaling = to_size / from_size;
+
 	for (auto &area : areas)
-		resize_area(area, from_size, to_size);
+		resize_area(area, scaling);
 }
 
 } //gui_control::detail
@@ -397,6 +438,57 @@ void GuiControl::SetState(ControlState state) noexcept
 }
 
 
+/*
+	Skins
+*/
+
+void GuiControl::AttachSkin(gui_control::ControlSkin skin)
+{
+	DetachSkin();
+
+	if (skin.Parts)
+	{
+		if (skin.Parts->ParentNode())
+			skin.Parts->ParentNode()->DetachObject(*skin.Parts.Owner);
+		
+		if (node_) //Create child node for all parts
+			skin.Parts->ParentNode(node_->CreateChildNode(node_->Visible()).get());
+	}
+
+	if (skin.Caption)
+	{
+		if (skin.Caption->ParentNode())
+			skin.Caption->ParentNode()->DetachObject(*skin.Caption);
+		
+		if (node_) //Create child node for caption
+			skin.Caption->ParentNode(node_->CreateChildNode(node_->Visible()).get());
+	}
+
+	skin_ = std::move(skin);
+}
+
+void GuiControl::DetachSkin() noexcept
+{
+	if (skin_.Parts)
+	{
+		if (auto node = skin_.Parts->ParentNode(); node_ && node)
+			node_->RemoveChildNode(*node); //Remove parts node
+
+		skin_.Parts->Owner()->RemoveModel(*skin_.Parts.Owner); //Remove all parts
+	}
+
+	if (skin_.Caption)
+	{
+		if (auto node = skin_.Caption->ParentNode(); node_ && node)
+			node_->RemoveChildNode(*node); //Remove caption node
+
+		skin_.Caption->Owner()->RemoveText(*skin_.Caption); //Remove caption
+	}
+
+	skin_ = {};
+}
+
+
 //Public
 
 GuiControl::GuiControl(std::string name) :
@@ -419,6 +511,24 @@ GuiControl::GuiControl(std::string name, Areas areas) :
 	clickable_areas_{std::move(areas)}
 {
 	//Empty
+}
+
+GuiControl::GuiControl(std::string name, gui_control::ControlSkin skin) :
+	GuiComponent{std::move(name)}
+{
+	AttachSkin(std::move(skin));
+}
+
+GuiControl::GuiControl(std::string name, gui_control::ControlSkin skin, const Vector2 &size) :
+	GuiComponent{std::move(name)}
+{
+	AttachSkin(std::move(skin));
+	Size(size); //Resize skin to the given size
+}
+
+GuiControl::~GuiControl() noexcept
+{
+	DetachSkin();
 }
 
 
@@ -523,28 +633,64 @@ void GuiControl::Visible(bool visible) noexcept
 	}
 }
 
+void GuiControl::Skin(gui_control::ControlSkin skin) noexcept
+{
+	if (skin_.Parts.Owner != skin.Parts.Owner)
+	{
+		if (skin.Parts)
+		{
+			//A skin is already attached, inherit size
+			if (skin_.Parts)
+				gui_control::detail::resize_parts(skin.Parts,
+					skin_.Parts->AxisAlignedBoundingBox().ToSize(),
+					skin.Parts->AxisAlignedBoundingBox().ToSize());
+
+			else //No skin attached
+				gui_control::detail::resize_parts(skin.Parts,
+					Size(),
+					skin.Parts->AxisAlignedBoundingBox().ToSize());
+		}
+
+		AttachSkin(std::move(skin));
+	}
+}
+
 
 void GuiControl::Size(const Vector2 &size) noexcept
 {
 	if (auto current_size = Size(); current_size != size)
 	{
+		auto resized = false;
+
+		if (skin_.Parts)
+		{
+			detail::resize_parts(skin_.Parts, current_size, size);
+			resized = true;
+		}
+
 		if (std::empty(clickable_areas_))
 		{
-			clickable_areas_.push_back(Aabb::Size(size));
-			Resized();
+			if (!skin_.Parts)
+			{
+				clickable_areas_.push_back(Aabb::Size(size));
+				resized = true;
+			}
 		}
 		else if (std::size(clickable_areas_) == 1)
 		{
 			clickable_areas_.back() = Aabb::Size(size);
-			Resized();
+			resized = true;
 		}
 
 		//Multiple areas
 		else if (current_size.X() != 0.0_r && current_size.Y() != 0.0_r)
 		{
 			detail::resize_areas(clickable_areas_, current_size, size);
-			Resized();
+			resized = true;
 		}
+
+		if (resized)
+			Resized();
 	}
 }
 
@@ -556,19 +702,13 @@ void GuiControl::Size(const Vector2 &size) noexcept
 Vector2 GuiControl::Size() const noexcept
 {
 	if (std::empty(clickable_areas_))
-		return vector2::Zero;
+		return skin_.Parts ?
+			skin_.Parts->AxisAlignedBoundingBox().ToSize() :
+			vector2::Zero;
 	else if (std::size(clickable_areas_) == 1)
 		return clickable_areas_.back().ToSize();
-
 	else //Multiple areas
-	{
-		auto merged_area = aabb::Zero;
-
-		for (auto &area : clickable_areas_)
-			merged_area.Merge(area);
-
-		return merged_area.ToSize();
-	}
+		return Aabb::Enclose(clickable_areas_).ToSize();
 }
 
 
@@ -584,12 +724,21 @@ GuiPanelContainer* GuiControl::Owner() const noexcept
 
 bool GuiControl::Intersects(const Vector2 &point) const noexcept
 {
-	if (node_)
+	if (node_ && visible_)
 	{
-		for (auto &area : clickable_areas_)
+		if (std::empty(clickable_areas_))
 		{
-			if (Obb{area}.Transform(node_->FullTransformation()).Intersects(point))
+			if (skin_.Parts &&
+				skin_.Parts->WorldOrientedBoundingBox().Intersects(point))
 				return true;
+		}
+		else
+		{
+			for (auto &area : clickable_areas_)
+			{
+				if (Obb{area}.Transform(node_->FullTransformation()).Intersects(point))
+					return true;
+			}
 		}
 	}
 

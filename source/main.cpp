@@ -1280,8 +1280,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::gui::GuiController controller{scene_graph->RootNode()};
 			auto main_frame = controller.CreateFrame("main");
 			auto base_panel = main_frame->CreatePanel("base");
-			auto base_control = base_panel->CreateControl<ion::gui::controls::GuiControl>("control",
-				std::vector{Aabb::Size({0.5_r, 0.5_r}, {-0.5_r, 0.5_r}), Aabb::Size({0.5_r, 0.5_r}), Aabb::Size({0.5_r, 0.5_r}, {0.5_r, -0.5_r})});
+			auto base_control = base_panel->CreateControl<ion::gui::controls::GuiControl>("control", ion::gui::controls::gui_control::ControlSkin{});
 			auto sub_panel = base_panel->CreatePanel("sub");
 			auto sub_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("control");
 			auto leaf_panel = sub_panel->CreatePanel("leaf");

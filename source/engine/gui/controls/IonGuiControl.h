@@ -50,7 +50,7 @@ namespace ion
 
 			namespace shapes
 			{
-				class Mesh;
+				class Sprite;
 			}
 		}
 	}
@@ -74,7 +74,7 @@ namespace ion::gui::controls
 
 		struct ControlVisualPart final
 		{
-			NonOwningPtr<graphics::scene::shapes::Mesh> Geometry;
+			NonOwningPtr<graphics::scene::shapes::Sprite> SpriteObject;
 			NonOwningPtr<graphics::materials::Material> EnabledMaterial;
 			NonOwningPtr<graphics::materials::Material> DisabledMaterial;
 			NonOwningPtr<graphics::materials::Material> FocusedMaterial;
@@ -84,12 +84,12 @@ namespace ion::gui::controls
 
 			[[nodiscard]] inline operator bool() const noexcept
 			{
-				return !!Geometry;
+				return !!SpriteObject;
 			}
 
 			[[nodiscard]] inline auto operator->() const noexcept
 			{
-				return Geometry.get();
+				return SpriteObject.get();
 			}
 		};
 
@@ -189,8 +189,11 @@ namespace ion::gui::controls
 			}
 
 
-			void resize_area(Aabb &area, const Vector2 &from_size, const Vector2 &to_size);
-			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size);
+			void resize_part(ControlVisualPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept;
+			void resize_parts(ControlVisualParts &parts, const Vector2 &from_size, const Vector2 &to_size) noexcept;
+
+			void resize_area(Aabb &area, const Vector2 &scaling) noexcept;
+			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 		} //detail
 	} //gui_control
 
@@ -305,6 +308,14 @@ namespace ion::gui::controls
 			void SetSkinState(gui_control::ControlState state, gui_control::ControlSkin &skin) noexcept;
 			void SetState(gui_control::ControlState state) noexcept;
 
+
+			/*
+				Skins
+			*/
+
+			void AttachSkin(gui_control::ControlSkin skin);
+			void DetachSkin() noexcept;
+
 		public:
 
 			//Construct a control with the given name
@@ -315,6 +326,15 @@ namespace ion::gui::controls
 
 			//Construct a control with the given name and clickable areas
 			GuiControl(std::string name, gui_control::Areas areas);
+
+			//Construct a control with the given name and skin
+			GuiControl(std::string name, gui_control::ControlSkin skin);
+
+			//Construct a control with the given name, skin and size
+			GuiControl(std::string name, gui_control::ControlSkin skin, const Vector2 &size);
+
+			//Virtual destructor
+			virtual ~GuiControl() noexcept;
 
 
 			/*
@@ -379,6 +399,9 @@ namespace ion::gui::controls
 
 			//Sets whether or not this control is visible
 			void Visible(bool visible) noexcept;
+
+			//Sets the skin for this control to the given skin
+			void Skin(gui_control::ControlSkin skin) noexcept;
 
 
 			//Sets the size of the clickable area of this control to the given size
@@ -559,6 +582,12 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto State() const noexcept
 			{
 				return state_;
+			}
+
+			//Returns the skin attached to this control
+			[[nodiscard]] inline auto Skin() const noexcept
+			{
+				return skin_;
 			}
 
 
