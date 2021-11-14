@@ -416,4 +416,19 @@ Vector3 Vector3::ScaleCopy(const Vector3 &scaling, const Vector3 &origin) const 
 	return (*this - origin) * scaling + origin;
 }
 
+
+/*
+	Sign
+*/
+
+Vector3& Vector3::Sign() noexcept
+{
+	return *this = SignCopy();
+}
+
+Vector3 Vector3::SignCopy() const noexcept
+{
+	return {static_cast<real>(math::Sign(x_)), static_cast<real>(math::Sign(y_)), static_cast<real>(math::Sign(z_))};
+}
+
 } //ion::graphics::utilities

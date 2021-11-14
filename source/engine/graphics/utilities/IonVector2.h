@@ -514,6 +514,18 @@ namespace ion::graphics::utilities
 			//Scale point by the given scaling vector and origin vector
 			//Returns the result as a copy
 			[[nodiscard]] Vector2 ScaleCopy(const Vector2 &scaling, const Vector2 &origin) const noexcept;
+
+
+			/*
+				Sign
+			*/
+
+			//Sets each component to one, negative one or zero, depending on the signs of the components
+			Vector2& Sign() noexcept;
+
+			//Sets each component to one, negative one or zero, depending on the signs of the components
+			//Returns the result as a copy
+			[[nodiscard]] Vector2 SignCopy() const noexcept;
 	};
 
 

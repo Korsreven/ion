@@ -389,4 +389,19 @@ Vector2 Vector2::ScaleCopy(const Vector2 &scaling, const Vector2 &origin) const 
 	return (*this - origin) * scaling + origin;
 }
 
+
+/*
+	Sign
+*/
+
+Vector2& Vector2::Sign() noexcept
+{
+	return *this = SignCopy();
+}
+
+Vector2 Vector2::SignCopy() const noexcept
+{
+	return {static_cast<real>(math::Sign(x_)), static_cast<real>(math::Sign(y_))};
+}
+
 } //ion::graphics::utilities
