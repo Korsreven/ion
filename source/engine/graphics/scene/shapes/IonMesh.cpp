@@ -321,6 +321,7 @@ MeshBoundingVolumeStatus Mesh::Prepare() noexcept
 				detail::normalize_tex_coords(vertex_data_, vertex_batch_.BatchMaterial().get());
 
 			update_tex_coords_ = false;
+			vertex_batch_.ReloadData();
 		}
 	}
 

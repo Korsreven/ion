@@ -285,7 +285,11 @@ namespace ion::graphics::scene::shapes
 			//Sets the surface material used by this mesh to the given material
 			inline void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
-				vertex_batch_.BatchMaterial(material);
+				if (vertex_batch_.BatchMaterial() != material)
+				{
+					vertex_batch_.BatchMaterial(material);
+					update_tex_coords_ = true;
+				}
 			}
 
 			//Sets the vertex buffer to the given vertex buffer
