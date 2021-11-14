@@ -137,10 +137,24 @@ void GuiComponent::Owner(std::nullptr_t) noexcept
 	Detach();
 }
 
+void GuiComponent::ZOrder(real z) noexcept
+{
+	if (node_)
+	{
+		auto [x, y, _] = node_->Position().XYZ();
+		node_->Position({x, y, z});
+	}
+}
+
 
 /*
 	Observers
 */
+
+real GuiComponent::ZOrder() const noexcept
+{
+	return node_ ? node_->Position().Z() : 0.0_r;
+}
 
 bool GuiComponent::IsDescendantOf(const GuiContainer &owner) const noexcept
 {

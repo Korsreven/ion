@@ -20,6 +20,7 @@ File:	IonGuiComponent.h
 #include "events/IonCallback.h"
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
+#include "types/IonTypes.h"
 
 //Forward declarations
 namespace ion::graphics::scene::graph
@@ -154,6 +155,9 @@ namespace ion::gui
 			//Release ownership for this component
 			void Owner(std::nullptr_t) noexcept;
 
+			//Sets the relative z-order of this component
+			void ZOrder(real z) noexcept;
+
 
 			/*
 				Observers
@@ -196,6 +200,9 @@ namespace ion::gui
 			{
 				return owner_;
 			}
+
+			//Returns the relative z-order of this component
+			[[nodiscard]] real ZOrder() const noexcept;
 
 			//Returns true if this component is a descendant of the given owner
 			[[nodiscard]] bool IsDescendantOf(const GuiContainer &owner) const noexcept;
