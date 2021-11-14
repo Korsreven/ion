@@ -475,6 +475,19 @@ namespace ion::graphics::scene::graph
 			*/
 
 			//Sets the local position of this node to the given position
+			inline void Position(const Vector2 &position) noexcept
+			{
+				auto position3 =
+					Vector3{position.X(), position.Y(), position_.Z()};
+
+				if (position_ != position3)
+				{
+					position_ = position3;
+					NotifyUpdate();
+				}
+			}
+
+			//Sets the local position of this node to the given position
 			inline void Position(const Vector3 &position) noexcept
 			{
 				if (position_ != position)
