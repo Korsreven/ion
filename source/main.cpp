@@ -626,6 +626,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto raindrop_diffuse = textures.CreateTexture("raindrop", "raindrop.png");
 			auto color_spectrum_diffuse = textures.CreateTexture("color_spectrum", "color_spectrum.png");
 
+			//GUI textures
+			auto button_center_enabled_diffuse = textures.CreateTexture("button_center_enabled", "button_center_enabled.png");
+			auto button_top_enabled_diffuse = textures.CreateTexture("button_top_enabled", "button_top_enabled.png");
+			auto button_left_enabled_diffuse = textures.CreateTexture("button_left_enabled", "button_left_enabled.png");
+			auto button_top_left_enabled_diffuse = textures.CreateTexture("button_top_left_enabled", "button_top_left_enabled.png");
+
 			auto cat_first_frame = textures.CreateTexture("cat01", "cat01.png");
 			textures.CreateTexture("cat02", "cat02.png");
 			textures.CreateTexture("cat03", "cat03.png");
@@ -1086,8 +1092,97 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{0.0_r, 0.0_r, 0.0_r},
 					32.0_r, cat_running, nullptr, nullptr);
 
-			using namespace ion::graphics::utilities;
+			//GUI materials
+			auto button_center_enabled =
+				materials.CreateMaterial("button_center_enabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_center_enabled_diffuse, nullptr, nullptr);
+			button_center_enabled->LightingEnabled(false);
+			
+			auto button_top_enabled =
+				materials.CreateMaterial("button_top_enabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_top_enabled_diffuse, nullptr, nullptr);
+			button_top_enabled->LightingEnabled(false);
 
+			auto button_left_enabled =
+				materials.CreateMaterial("button_left_enabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_left_enabled_diffuse, nullptr, nullptr);
+			button_left_enabled->LightingEnabled(false);
+
+			auto button_bottom_enabled =
+				materials.CreateMaterial("button_bottom_enabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_top_enabled_diffuse, nullptr, nullptr);
+			button_bottom_enabled->LightingEnabled(false);
+			button_bottom_enabled->FlipVertical();
+
+			auto button_right_enabled =
+				materials.CreateMaterial("button_right_enabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_left_enabled_diffuse, nullptr, nullptr);
+			button_right_enabled->LightingEnabled(false);
+			button_right_enabled->FlipHorizontal();
+
+
+			auto button_top_left_enabled =
+				materials.CreateMaterial("button_top_left_enabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_top_left_enabled_diffuse, nullptr, nullptr);
+			button_top_left_enabled->LightingEnabled(false);
+
+			auto button_bottom_left_enabled =
+				materials.CreateMaterial("button_bottom_left_enabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_top_left_enabled_diffuse, nullptr, nullptr);
+			button_bottom_left_enabled->LightingEnabled(false);
+			button_bottom_left_enabled->FlipVertical();
+
+			auto button_top_right_enabled =
+				materials.CreateMaterial("button_top_right_enabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_top_left_enabled_diffuse, nullptr, nullptr);
+			button_top_right_enabled->LightingEnabled(false);
+			button_top_right_enabled->FlipHorizontal();
+
+			auto button_bottom_right_enabled =
+				materials.CreateMaterial("button_bottom_right_enabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_top_left_enabled_diffuse, nullptr, nullptr);
+			button_bottom_right_enabled->LightingEnabled(false);
+			button_bottom_right_enabled->FlipHorizontal();
+			button_bottom_right_enabled->FlipVertical();
+
+
+			using namespace ion::graphics::utilities;
 
 			//Particle system
 			ion::graphics::particles::ParticleSystemManager particle_systems;
@@ -1266,6 +1361,30 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			circle2->QueryMask(1 | 2 | 4);
 			//circle2->ShowBoundingVolumes(true);*/
 
+			//GUI models
+			auto button_model = scene.CreateModel();
+			auto button_center = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {0.1_r, 0.1_r}, nullptr}); //Center
+			
+			auto button_top = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.1_r * 0.5_r + 0.025_r * 0.5_r, 0.0_r}, {0.1_r, 0.025_r}, nullptr}); //Top
+			auto button_left = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-0.1_r * 0.5_r + -0.025_r * 0.5_r, 0.0_r, 0.0_r}, {0.025_r, 0.1_r}, nullptr}); //Left
+			auto button_bottom = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, -0.1_r * 0.5_r + -0.025_r * 0.5_r, 0.0_r}, {0.1_r, 0.025_r}, nullptr}); //Bottom
+			auto button_right = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.1_r * 0.5_r + 0.025_r * 0.5_r, 0.0_r, 0.0_r}, {0.025_r, 0.1_r}, nullptr}); //Right
+
+			auto button_top_left = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-0.1_r * 0.5_r + -0.025_r * 0.5_r, 0.1_r * 0.5_r + 0.025_r * 0.5_r, 0.0_r}, {0.025_r, 0.025_r}, nullptr}); //Top left
+			auto button_bottom_left = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-0.1_r * 0.5_r + -0.025_r * 0.5_r, -0.1_r * 0.5_r + -0.025_r * 0.5_r, 0.0_r}, {0.025_r, 0.025_r}, nullptr}); //Bottom left
+			auto button_top_right = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.1_r * 0.5_r + 0.025_r * 0.5_r, 0.1_r * 0.5_r + 0.025_r * 0.5_r, 0.0_r}, {0.025_r, 0.025_r}, nullptr}); //Top right
+			auto button_bottom_right = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.1_r * 0.5_r + 0.025_r * 0.5_r, -0.1_r * 0.5_r + -0.025_r * 0.5_r, 0.0_r}, {0.025_r, 0.025_r}, nullptr}); //Bottom right
+
+			button_model->AddPass(ion::graphics::render::Pass{model_program});
 
 			//Scene graph
 			auto scene_graph = engine.CreateSceneGraph("");
@@ -1276,51 +1395,57 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scene_graph->FogEnabled(false);
 			//scene_graph->LightingEnabled(false);
 
+			//GUI skins
+			ion::gui::controls::gui_control::ControlSkin button_skin;
+			button_skin.Parts.Owner = button_model;
+			button_skin.Parts.Center.SpriteObject = button_center;
+			button_skin.Parts.Top.SpriteObject = button_top;
+			button_skin.Parts.Left.SpriteObject = button_left;
+			button_skin.Parts.Bottom.SpriteObject = button_bottom;
+			button_skin.Parts.Right.SpriteObject = button_right;
+			button_skin.Parts.TopLeft.SpriteObject = button_top_left;
+			button_skin.Parts.BottomLeft.SpriteObject = button_bottom_left;
+			button_skin.Parts.TopRight.SpriteObject = button_top_right;
+			button_skin.Parts.BottomRight.SpriteObject = button_bottom_right;
+
+			button_skin.Parts.Center.EnabledMaterial = button_center_enabled;	
+			button_skin.Parts.Top.EnabledMaterial = button_top_enabled;	
+			button_skin.Parts.Left.EnabledMaterial = button_left_enabled;	
+			button_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
+			button_skin.Parts.Right.EnabledMaterial = button_right_enabled;
+			button_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
+			button_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
+			button_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
+			button_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;		
+
 			//GUI
 			ion::gui::GuiController controller{scene_graph->RootNode()};
+			controller.ZOrder(-2.0_r);
+
 			auto main_frame = controller.CreateFrame("main");
 			auto base_panel = main_frame->CreatePanel("base");
-			auto base_control = base_panel->CreateControl<ion::gui::controls::GuiControl>("control", ion::gui::controls::gui_control::ControlSkin{});
+			base_panel->ZOrder(0.1_r);
+			auto base_control = base_panel->CreateControl<ion::gui::controls::GuiControl>("control");
 			auto sub_panel = base_panel->CreatePanel("sub");
-			auto sub_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("control");
-			auto leaf_panel = sub_panel->CreatePanel("leaf");
+			sub_panel->ZOrder(0.1_r);
+			auto sub_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("control");	
 
 			auto main_frame2 = controller.CreateFrame("main2");
 			auto base_panel2 = main_frame2->CreatePanel("base");
+			base_panel2->ZOrder(0.1_r);
 			auto base_control2 = base_panel2->CreateControl<ion::gui::controls::GuiControl>("control");
 			auto sub_panel2 = base_panel2->CreatePanel("sub");
+			sub_panel2->ZOrder(0.1_r);
 			auto sub_control2 = sub_panel2->CreateControl<ion::gui::controls::GuiControl>("control");
-			auto leaf_panel2 = sub_panel2->CreatePanel("leaf");
 
-			auto size = base_control->Size();
-			base_control->Size(0.75_r);
-			size = base_control->Size();
+			base_control->Node()->Position({0.0_r, 0.5_r});
+			base_control->Skin(std::move(button_skin));
 
-
-			main_frame->Activate();
-			main_frame2->Activate();
-			
-			controller.TabForward();
-			assert(base_control->IsFocused());
-			controller.TabForward();
-			assert(sub_control->IsFocused());
-			controller.TabForward();
-			assert(base_control2->IsFocused());
-			controller.TabForward();
-			assert(sub_control2->IsFocused());
-			controller.TabForward();
-			assert(base_control->IsFocused());
-			
-			controller.TabBackward();
-			assert(sub_control2->IsFocused());
-			controller.TabBackward();
-			assert(base_control2->IsFocused());
-			controller.TabBackward();
-			assert(sub_control->IsFocused());
-			controller.TabBackward();
-			assert(base_control->IsFocused());
-			controller.TabBackward();
-			assert(sub_control2->IsFocused());
+			//auto size = base_control->Size();
+			//base_control->Size(0.3_r);
+			//size = base_control->Size();
+			base_control->Size({0.5_r, 0.1_r});
+			//size = base_control->Size();
 
 			//Camera
 			auto cam_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});
@@ -1370,6 +1495,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto spectrum_node = scene_graph->RootNode().CreateChildNode({1.4_r, -0.6_r, -1.0_r});
 			spectrum_node->AttachObject(*model_spectrum);
+
+			//auto button_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.5_r, -2.0_r});
+			//button_node->AttachObject(*button_model);
 
 			/*auto box_base_node = scene_graph->RootNode().CreateChildNode({-0.40_r, 0.35_r, -2.2_r});
 

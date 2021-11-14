@@ -40,8 +40,8 @@ void resize_part(ControlVisualPart &part, const Vector2 &delta_size, const Vecto
 	if (part)
 	{
 		auto position = Vector2{part->Position()};
-		auto direction = (position - center).NormalizeCopy();
-		part->Position(part->Position() + direction * delta_position);
+		auto sign = (position - center).SignCopy();
+		part->Position(part->Position() + sign * delta_position);
 		part->Size(part->Size() + delta_size);
 	}
 }
@@ -448,23 +448,24 @@ void GuiControl::AttachSkin(gui_control::ControlSkin skin)
 
 	if (skin.Parts)
 	{
-		if (skin.Parts->ParentNode())
-			skin.Parts->ParentNode()->DetachObject(*skin.Parts.Owner);
+		if (auto node = skin.Parts->ParentNode(); node)
+			node->DetachObject(*skin.Parts.Owner);
 		
-		if (node_) //Create child node for all parts
-			skin.Parts->ParentNode(node_->CreateChildNode(node_->Visible()).get());
+		if (node_) //Create node for all parts
+			node_->CreateChildNode(node_->Visible())->AttachObject(*skin.Parts.Owner);
 	}
 
 	if (skin.Caption)
 	{
-		if (skin.Caption->ParentNode())
-			skin.Caption->ParentNode()->DetachObject(*skin.Caption);
+		if (auto node = skin.Caption->ParentNode(); node)
+			node->DetachObject(*skin.Caption);
 		
-		if (node_) //Create child node for caption
-			skin.Caption->ParentNode(node_->CreateChildNode(node_->Visible()).get());
+		if (node_) //Create node for caption
+			node_->CreateChildNode(node_->Visible())->AttachObject(*skin.Caption);
 	}
 
 	skin_ = std::move(skin);
+	SetState(state_);
 }
 
 void GuiControl::DetachSkin() noexcept
@@ -639,16 +640,29 @@ void GuiControl::Skin(gui_control::ControlSkin skin) noexcept
 	{
 		if (skin.Parts)
 		{
-			//A skin is already attached, inherit size
+			//Re-skin, inherit previous size
 			if (skin_.Parts)
-				gui_control::detail::resize_parts(skin.Parts,
-					skin_.Parts->AxisAlignedBoundingBox().ToSize(),
-					skin.Parts->AxisAlignedBoundingBox().ToSize());
+			{		
+				skin.Parts->Prepare();
+				skin_.Parts->Prepare();
 
-			else //No skin attached
-				gui_control::detail::resize_parts(skin.Parts,
-					Size(),
-					skin.Parts->AxisAlignedBoundingBox().ToSize());
+				auto from_size = skin.Parts->AxisAlignedBoundingBox().ToSize();
+				auto to_size = skin_.Parts->AxisAlignedBoundingBox().ToSize();
+
+				if (from_size != to_size)
+					gui_control::detail::resize_parts(skin.Parts, from_size, to_size);
+			}
+			//No skin, inherit area size
+			else if (!std::empty(clickable_areas_))
+			{
+				skin.Parts->Prepare();
+
+				auto from_size = skin.Parts->AxisAlignedBoundingBox().ToSize();
+				auto to_size = Size();
+
+				if (from_size != to_size)
+					gui_control::detail::resize_parts(skin.Parts, from_size, to_size);
+			}
 		}
 
 		AttachSkin(std::move(skin));
@@ -702,9 +716,15 @@ void GuiControl::Size(const Vector2 &size) noexcept
 Vector2 GuiControl::Size() const noexcept
 {
 	if (std::empty(clickable_areas_))
-		return skin_.Parts ?
-			skin_.Parts->AxisAlignedBoundingBox().ToSize() :
-			vector2::Zero;
+	{
+		if (skin_.Parts)
+		{
+			skin_.Parts->Prepare();
+			return skin_.Parts->AxisAlignedBoundingBox().ToSize();
+		}
+		else
+			return vector2::Zero;
+	}
 	else if (std::size(clickable_areas_) == 1)
 		return clickable_areas_.back().ToSize();
 	else //Multiple areas
@@ -728,9 +748,11 @@ bool GuiControl::Intersects(const Vector2 &point) const noexcept
 	{
 		if (std::empty(clickable_areas_))
 		{
-			if (skin_.Parts &&
-				skin_.Parts->WorldOrientedBoundingBox().Intersects(point))
-				return true;
+			if (skin_.Parts)
+			{
+				skin_.Parts->Prepare();
+				return skin_.Parts->WorldOrientedBoundingBox().Intersects(point);
+			}
 		}
 		else
 		{
