@@ -16,7 +16,6 @@ File:	IonSystemInputListener.cpp
 
 #include "graphics/render/IonRenderWindow.h"
 #include "graphics/render/IonViewport.h"
-#include "graphics/scene/IonCamera.h"
 #include "graphics/utilities/IonAabb.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
@@ -239,18 +238,8 @@ Vector2 InputListener::ViewAdjusted(Vector2 position) const noexcept
 			//Adjust coordinates from client to viewport coordinates
 			position -= viewport->Bounds().Min();
 
-			//Has camera connected to viewport
-			if (auto camera = viewport->ConnectedCamera(); camera)
-			{
-				auto viewport_size = viewport->Bounds().ToSize();
-				auto [width, height] = viewport_size.XY();
-				auto [x, y] = position.XY();
-
-				//Adjust coordinates from viewport to camera coordinates
-				auto [left, right, bottom, top, z_near, z_far] = camera->ViewFrustum().ToOrthoBounds(viewport_size);
-				position = {utilities::math::Normalize(x, 0.0_r, width, left, right),
-							utilities::math::Normalize(y, 0.0_r, height, bottom, top)};
-			}
+			//Adjust coordinates from viewport to camera coordinates
+			position = viewport->ViewportToCameraPoint(position);
 		}
 	}
 

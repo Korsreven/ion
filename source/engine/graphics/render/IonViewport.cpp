@@ -16,6 +16,7 @@ File:	IonViewport.cpp
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/scene/IonCamera.h"
 #include "types/IonTypes.h"
+#include "utilities/IonMath.h"
 
 namespace ion::graphics::render
 {
@@ -112,6 +113,40 @@ Vector2 get_adjusted_position(const Vector2 &position, const Vector2 &size, cons
 			}
 		}()
 	};
+}
+
+
+Vector2 viewport_to_camera_ratio(const Vector2 &viewport_size, real left, real right, real bottom, real top) noexcept
+{
+	auto [width, height] = viewport_size.XY();
+	return {(right - left) / width, (top - bottom) / height};
+}
+
+Vector2 camera_to_viewport_ratio(const Vector2 &viewport_size, real left, real right, real bottom, real top) noexcept
+{
+	auto [width, height] = viewport_size.XY();
+	return {width / (right - left), height / (top - bottom)};
+}
+
+
+Vector2 viewport_to_camera_point(const Vector2 &viewport_size, real left, real right, real bottom, real top, const Vector2 &point) noexcept
+{
+	auto [width, height] = viewport_size.XY();
+	auto [x, y] = point.XY();
+
+	using namespace ion::utilities;
+	return {math::Normalize(x, 0.0_r, width, left, right),
+			math::Normalize(y, 0.0_r, height, bottom, top)};
+}
+
+Vector2 camera_to_viewport_point(const Vector2 &viewport_size, real left, real right, real bottom, real top, const Vector2 &point) noexcept
+{
+	auto [width, height] = viewport_size.XY();
+	auto [x, y] = point.XY();
+
+	using namespace ion::utilities;
+	return {math::Normalize(x, left, right, 0.0_r, width),
+			math::Normalize(y, bottom, top, 0.0_r, height)};
 }
 
 
@@ -321,6 +356,60 @@ Viewport Viewport::BottomRightAligned(std::string name, RenderTarget &render_tar
 Viewport Viewport::BottomRightAligned(std::string name, RenderTarget &render_target, real width_percent, real height_percent) noexcept
 {
 	return Aligned(std::move(name), render_target, AlignmentType::BottomRight, width_percent, height_percent);
+}
+
+
+/*
+	Conversions
+*/
+
+Vector2 Viewport::ViewportToCameraRatio() const noexcept
+{
+	if (camera_)
+	{
+		auto viewport_size = Bounds().ToSize();
+		auto [left, right, bottom, top, z_near, z_far] = camera_->ViewFrustum().ToOrthoBounds(viewport_size);
+		return detail::viewport_to_camera_ratio(viewport_size, left, right, bottom, top);
+	}
+	else
+		return utilities::vector2::UnitScale;
+}
+
+Vector2 Viewport::CameraToViewportRatio() const noexcept
+{
+	if (camera_)
+	{
+		auto viewport_size = Bounds().ToSize();
+		auto [left, right, bottom, top, z_near, z_far] = camera_->ViewFrustum().ToOrthoBounds(viewport_size);
+		return detail::camera_to_viewport_ratio(viewport_size, left, right, bottom, top);
+	}
+	else
+		return utilities::vector2::UnitScale;
+}
+
+
+Vector2 Viewport::ViewportToCameraPoint(const Vector2 &point) const noexcept
+{
+	if (camera_)
+	{
+		auto viewport_size = Bounds().ToSize();
+		auto [left, right, bottom, top, z_near, z_far] = camera_->ViewFrustum().ToOrthoBounds(viewport_size);
+		return detail::viewport_to_camera_point(viewport_size, left, right, bottom, top, point);
+	}
+	else
+		return point;
+}
+
+Vector2 Viewport::CameraToViewportPoint(const Vector2 &point) const noexcept
+{
+	if (camera_)
+	{
+		auto viewport_size = Bounds().ToSize();
+		auto [left, right, bottom, top, z_near, z_far] = camera_->ViewFrustum().ToOrthoBounds(viewport_size);
+		return detail::camera_to_viewport_point(viewport_size, left, right, bottom, top, point);
+	}
+	else
+		return point;
 }
 
 

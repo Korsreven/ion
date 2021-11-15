@@ -527,19 +527,9 @@ void DrawableText::PrepareVertexStreams()
 	auto coordinate_scaling = vector2::UnitScale;
 
 	//Has viewport connected to scene
+	//Get scaling factor from viewport to camera coordinates
 	if (auto viewport = Owner()->ConnectedViewport(); viewport)
-	{
-		//Has camera connected to viewport
-		if (auto camera = viewport->ConnectedCamera(); camera)
-		{
-			auto viewport_size = viewport->Bounds().ToSize();
-			auto [width, height] = viewport_size.XY();
-
-			//Get scaling factor from viewport to camera coordinates
-			auto [left, right, bottom, top, z_near, z_far] = camera->ViewFrustum().ToOrthoBounds(viewport_size);
-			coordinate_scaling = {(right - left) / width, (top - bottom) / height};
-		}
-	}
+		coordinate_scaling = viewport->ViewportToCameraRatio();
 
 
 	auto glyph_count = text_->UnformattedDisplayedCharacterCount();

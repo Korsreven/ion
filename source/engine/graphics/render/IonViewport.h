@@ -33,7 +33,6 @@ namespace ion::graphics::scene
 namespace ion::graphics::render
 {
 	class RenderTarget; //Forward declaration
-	class Frustum; //Forward declaration
 
 	using graphics::utilities::Aabb;
 	using graphics::utilities::Color;
@@ -69,6 +68,12 @@ namespace ion::graphics::render
 			Aabb get_aligned_aabb(AlignmentType alignment, const Vector2 &size, const Vector2 &render_target_size) noexcept;
 			Vector2 get_adjusted_position(const Vector2 &position, const Vector2 &size, const Vector2 &new_size,
 				HorizontalAnchorType horizontal_anchor_type, VerticalAnchorType vertical_anchor_type) noexcept;
+
+			Vector2 viewport_to_camera_ratio(const Vector2 &viewport_size, real left, real right, real bottom, real top) noexcept;
+			Vector2 camera_to_viewport_ratio(const Vector2 &viewport_size, real left, real right, real bottom, real top) noexcept;
+
+			Vector2 viewport_to_camera_point(const Vector2 &viewport_size, real left, real right, real bottom, real top, const Vector2 &point) noexcept;
+			Vector2 camera_to_viewport_point(const Vector2 &viewport_size, real left, real right, real bottom, real top, const Vector2 &point) noexcept;
 			
 			void render_to_viewport(const Vector2 &position, const Vector2 &size, const Color &background_color) noexcept;
 		} //detail
@@ -244,25 +249,25 @@ namespace ion::graphics::render
 			//Returns the left anchor of the viewport
 			[[nodiscard]] inline auto LeftAnchor() const noexcept
 			{
-				return left_anchor_ ;
+				return left_anchor_;
 			}
 
 			//Returns the right anchor of the viewport
 			[[nodiscard]] inline auto RightAnchor() const noexcept
 			{
-				return right_anchor_ ;
+				return right_anchor_;
 			}
 
 			//Returns the top anchor of the viewport
 			[[nodiscard]] inline auto TopAnchor() const noexcept
 			{
-				return top_anchor_ ;
+				return top_anchor_;
 			}
 
 			//Returns the bottom anchor of the viewport
 			[[nodiscard]] inline auto BottomAnchor() const noexcept
 			{
-				return bottom_anchor_ ;
+				return bottom_anchor_;
 			}
 
 
@@ -289,6 +294,24 @@ namespace ion::graphics::render
 			{
 				return camera_;
 			}
+
+			
+			/*
+				Conversions
+			*/
+
+			//Returns the ratio (scale factor) between this viewport and the connected camera
+			[[nodiscard]] Vector2 ViewportToCameraRatio() const noexcept;
+			
+			//Returns the ratio (scale factor) between the connected camera and this viewport
+			[[nodiscard]] Vector2 CameraToViewportRatio() const noexcept;
+
+
+			//Returns a new point in camera space from the given point in viewport space
+			[[nodiscard]] Vector2 ViewportToCameraPoint(const Vector2 &point) const noexcept;
+			
+			//Returns a new point in viewport space from the given point in camera space
+			[[nodiscard]] Vector2 CameraToViewportPoint(const Vector2 &point) const noexcept;
 
 
 			/*
