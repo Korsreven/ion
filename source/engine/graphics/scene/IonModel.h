@@ -20,11 +20,11 @@ File:	IonModel.h
 #include "IonDrawableObject.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
 #include "graphics/render/vertex/IonVertexBufferObject.h"
+#include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
 #include "shapes/IonMesh.h"
 #include "shapes/IonShape.h"
 #include "types/IonTypes.h"
-#include "unmanaged/IonObjectFactory.h"
 
 //Forward declarations
 namespace ion::graphics
@@ -49,7 +49,7 @@ namespace ion::graphics::scene
 
 	class Model final :
 		public DrawableObject,
-		protected unmanaged::ObjectFactory<shapes::Mesh>
+		public managed::ObjectManager<shapes::Mesh, Model>
 	{
 		private:
 
@@ -59,7 +59,11 @@ namespace ion::graphics::scene
 			bool update_bounding_volumes_ = false;
 
 
-			void Created(shapes::Mesh &mesh) noexcept;
+			//See ObjectManager<T>::Created for more details
+			void Created(shapes::Mesh &mesh) noexcept override;
+
+			//See ObjectManager<T>::removed for more details
+			void Removed(shapes::Mesh &mesh) noexcept override;
 
 		public:
 
@@ -174,7 +178,6 @@ namespace ion::graphics::scene
 				static_assert(std::is_base_of_v<shapes::Mesh, T>);
 
 				auto ptr = Create<T>(std::forward<Args>(args)...);
-				Created(*ptr);
 				return static_pointer_cast<T>(ptr);
 			}
 
@@ -187,7 +190,6 @@ namespace ion::graphics::scene
 				static_assert(std::is_base_of_v<shapes::Mesh, T>);
 
 				auto ptr = Create(mesh_t);
-				Created(*ptr);
 				return static_pointer_cast<T>(ptr);
 			}
 
@@ -199,7 +201,6 @@ namespace ion::graphics::scene
 				static_assert(std::is_base_of_v<shapes::Mesh, T>);
 
 				auto ptr = Create(std::move(mesh_t));
-				Created(*ptr);
 				return static_pointer_cast<T>(ptr);
 			}
 

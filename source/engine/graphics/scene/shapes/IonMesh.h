@@ -27,6 +27,7 @@ File:	IonMesh.h
 #include "graphics/utilities/IonSphere.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
+#include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
@@ -36,6 +37,11 @@ namespace ion::graphics
 	namespace materials
 	{
 		class Material;
+	}
+
+	namespace scene
+	{
+		class Model;
 	}
 
 	namespace shaders
@@ -147,7 +153,7 @@ namespace ion::graphics::scene::shapes
 
 	//Mesh class that supports any complex shape
 	//This base class must support inheritance (open set of shapes)
-	class Mesh
+	class Mesh : public managed::ManagedObject<scene::Model>
 	{
 		private:
 
