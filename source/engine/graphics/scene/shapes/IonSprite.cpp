@@ -12,13 +12,17 @@ File:	IonSprite.cpp
 
 #include "IonSprite.h"
 
+#include "graphics/render/IonViewport.h"
+#include "graphics/scene/IonModel.h"
+#include "graphics/scene/IonSceneManager.h"
+#include "graphics/textures/IonAnimation.h"
+#include "graphics/textures/IonTexture.h"
 #include "graphics/materials/IonMaterial.h"
 
 namespace ion::graphics::scene::shapes
 {
 
 using namespace sprite;
-using namespace types::type_literals;
 
 namespace sprite::detail
 {
@@ -44,6 +48,23 @@ mesh::Vertices sprite_vertices(const Vector3 &position, real rotation, const Vec
 			{v1, vector3::UnitZ, {ll_s, ur_t}, color}};
 }
 
+
+std::optional<Vector2> get_texture_size(materials::Material &material) noexcept
+{
+	if (auto [animation, texture] = material.DiffuseMap(); animation)
+	{
+		if (auto frame_seq = animation->UnderlyingFrameSequence(); frame_seq)
+		{
+			if (auto frame = frame_seq->FirstFrame(); frame && frame->Extents())
+				return Vector2{static_cast<real>(frame->Extents()->Width), static_cast<real>(frame->Extents()->Height)};
+		}
+	}
+	else if (texture && texture->Extents())
+		return Vector2{static_cast<real>(texture->Extents()->Width), static_cast<real>(texture->Extents()->Height)};
+
+	return std::nullopt;
+}
+
 } //sprite::detail
 
 
@@ -53,6 +74,36 @@ mesh::Vertices Sprite::GetVertices() const noexcept
 {
 	return detail::sprite_vertices(position_, rotation_, size_, color_,
 		lower_left_tex_coord_, upper_right_tex_coord_);
+}
+
+
+std::optional<Vector2> Sprite::GetTextureSize() const noexcept
+{
+	if (auto material = SurfaceMaterial(); material)
+	{
+		if (auto texture_size = detail::get_texture_size(*material); texture_size)
+		{
+			//Adjust texture size from viewport to camera space
+			if (auto model = Owner(); model)
+			{
+				if (auto scene_manager = model->Owner(); scene_manager)
+				{
+					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+						*texture_size *= viewport->ViewportToCameraRatio();
+				}
+			}
+
+			return texture_size;
+		}
+	}
+
+	return std::nullopt;
+}
+
+void Sprite::RecalculateSize() noexcept
+{
+	if (auto texture_size = GetTextureSize(); texture_size)
+		Rectangle::Size(*texture_size);
 }
 
 

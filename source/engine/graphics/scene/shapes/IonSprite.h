@@ -26,12 +26,15 @@ File:	IonSprite.h
 
 namespace ion::graphics::scene::shapes
 {
+	using namespace types::type_literals;
 	using namespace utilities;
 
 	namespace sprite::detail
 	{
 		mesh::Vertices sprite_vertices(const Vector3 &position, real rotation, const Vector2 &size, const Color &color,
 			const Vector2 &lower_left_tex_coord, const Vector2 &upper_right_tex_coord);
+
+		std::optional<Vector2> get_texture_size(materials::Material &material) noexcept;
 	} //sprite::detail
 
 
@@ -39,11 +42,16 @@ namespace ion::graphics::scene::shapes
 	{
 		protected:
 
+			bool auto_size_ = false;
+
 			Vector2 lower_left_tex_coord_ = vector2::Zero;
 			Vector2 upper_right_tex_coord_ = vector2::UnitScale;
 
 
 			virtual mesh::Vertices GetVertices() const noexcept override;
+
+			std::optional<Vector2> GetTextureSize() const noexcept;
+			void RecalculateSize() noexcept;
 
 		public:
 		
@@ -71,6 +79,18 @@ namespace ion::graphics::scene::shapes
 				Modifiers
 			*/
 
+			//Sets the auto size mode of this sprite to the given mode
+			inline void AutoSize(bool auto_size) noexcept
+			{
+				if (auto_size_ != auto_size)
+				{
+					auto_size_ = auto_size;
+
+					if (auto_size)
+						RecalculateSize();
+				}
+			}
+
 			//Sets the lower left and upper right texture coordinates for this sprite to the given coordinates
 			inline void TexCoords(const Vector2 &lower_left, const Vector2 &upper_right) noexcept
 			{
@@ -84,14 +104,72 @@ namespace ion::graphics::scene::shapes
 			}
 
 
+			//Sets the size of this sprite to the given size
+			inline void Size(const Vector2 &size) noexcept
+			{
+				if (size_ != size)
+				{
+					Rectangle::Size(size);
+					auto_size_ = false;
+				}
+			}
+
+			//Sets the width of this sprite to the given width, while keeping the aspect ratio
+			inline void Width(real width) noexcept
+			{
+				if (auto [w, h] = size_.XY(); w != width && w > 0.0_r)
+					Size({width, h * (width / w)});
+			}
+
+			//Sets the height of this sprite to the given height, while keeping the aspect ratio
+			inline void Height(real height) noexcept
+			{
+				if (auto [w, h] = size_.XY(); h != height && h > 0.0_r)
+					Size({w * (height / h), height});
+			}
+
+
+			//Sets the surface material used by this sprite to the given material
+			void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
+			{
+				if (Mesh::SurfaceMaterial() != material)
+				{
+					Mesh::SurfaceMaterial(material);
+					
+					if (auto_size_)
+						RecalculateSize();
+				}
+			}
+
+
 			/*
 				Observers
 			*/
+
+			//Returns the auto size mode for this sprite
+			[[nodiscard]] inline auto AutoSize() const noexcept
+			{
+				return auto_size_;
+			}
 
 			//Returns the lower left and upper right texture coordinates for this sprite
 			[[nodiscard]] inline auto TexCoords() const noexcept
 			{
 				return std::pair{lower_left_tex_coord_, upper_right_tex_coord_};
+			}
+
+
+			//Returns the size of this sprite
+			[[nodiscard]] inline auto& Size() const noexcept
+			{
+				return Rectangle::Size();
+			}
+
+			//Returns a pointer to the material used by this sprite
+			//Returns nullptr if this sprite does not have a material
+			[[nodiscard]] inline auto SurfaceMaterial() const noexcept
+			{
+				return  Mesh::SurfaceMaterial();
 			}
 
 
