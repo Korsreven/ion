@@ -43,6 +43,7 @@ namespace ion::graphics::scene::shapes
 		protected:
 
 			bool auto_size_ = false;
+			bool auto_repeat_ = false;
 
 			Vector2 lower_left_tex_coord_ = vector2::Zero;
 			Vector2 upper_right_tex_coord_ = vector2::UnitScale;
@@ -52,6 +53,7 @@ namespace ion::graphics::scene::shapes
 
 			std::optional<Vector2> GetTextureSize() const noexcept;
 			void RecalculateSize() noexcept;
+			void RecalculateTexCoords() noexcept;
 
 		public:
 		
@@ -79,7 +81,7 @@ namespace ion::graphics::scene::shapes
 				Modifiers
 			*/
 
-			//Sets the auto size mode of this sprite to the given mode
+			//Sets whether or not this sprite should be auto sized
 			inline void AutoSize(bool auto_size) noexcept
 			{
 				if (auto_size_ != auto_size)
@@ -91,6 +93,18 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
+			//Sets whether or not this sprite should be auto repeated
+			inline void AutoRepeat(bool auto_repeat) noexcept
+			{
+				if (auto_repeat_ != auto_repeat)
+				{
+					auto_repeat_ = auto_repeat;
+
+					if (auto_repeat)
+						RecalculateTexCoords();
+				}
+			}
+
 			//Sets the lower left and upper right texture coordinates for this sprite to the given coordinates
 			inline void TexCoords(const Vector2 &lower_left, const Vector2 &upper_right) noexcept
 			{
@@ -99,6 +113,7 @@ namespace ion::graphics::scene::shapes
 					lower_left_tex_coord_ = lower_left;
 					upper_right_tex_coord_ = upper_right;
 
+					auto_repeat_ = false;
 					update_vertices_ = true;
 				}
 			}
@@ -111,6 +126,9 @@ namespace ion::graphics::scene::shapes
 				{
 					Rectangle::Size(size);
 					auto_size_ = false;
+
+					if (auto_repeat_)
+						RecalculateTexCoords();
 				}
 			}
 
@@ -146,10 +164,16 @@ namespace ion::graphics::scene::shapes
 				Observers
 			*/
 
-			//Returns the auto size mode for this sprite
+			//Returns whether or not this sprite is auto sized
 			[[nodiscard]] inline auto AutoSize() const noexcept
 			{
 				return auto_size_;
+			}
+
+			//Returns whether or not this sprite is auto repeated
+			[[nodiscard]] inline auto AutoRepeat() const noexcept
+			{
+				return auto_repeat_;
 			}
 
 			//Returns the lower left and upper right texture coordinates for this sprite
@@ -178,7 +202,13 @@ namespace ion::graphics::scene::shapes
 			*/
 
 			//Crop sprite by the given area, where values are in range [0.0, 1.0]
+			//This operation will discard any repeating previously applied
 			void Crop(const std::optional<Aabb> &area) noexcept;
+
+			//Repeat sprite by the given amount, where values are in range [0.0, oo)
+			//This operation will discard any cropping previously applied
+			void Repeat(const std::optional<Vector2> &amount) noexcept;
+
 
 			//Flip sprite horizontally (mirror)
 			void FlipHorizontal() noexcept;
@@ -189,6 +219,10 @@ namespace ion::graphics::scene::shapes
 
 			//Returns true if this sprite is cropped
 			[[nodiscard]] bool IsCropped() const noexcept;
+
+			//Returns true if this sprite is repeated
+			[[nodiscard]] bool IsRepeated() const noexcept;
+
 
 			//Returns true if this sprite is flipped horizontally
 			[[nodiscard]] bool IsFlippedHorizontally() const noexcept;

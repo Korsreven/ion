@@ -627,9 +627,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto color_spectrum_diffuse = textures.CreateTexture("color_spectrum", "color_spectrum.png");
 
 			//GUI textures
-			auto button_center_enabled_diffuse = textures.CreateTexture("button_center_enabled", "button_center_enabled.png");
-			auto button_top_enabled_diffuse = textures.CreateTexture("button_top_enabled", "button_top_enabled.png");
-			auto button_left_enabled_diffuse = textures.CreateTexture("button_left_enabled", "button_left_enabled.png");
+			auto button_center_enabled_diffuse = textures.CreateTexture("button_center_enabled", "button_center_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto button_top_enabled_diffuse = textures.CreateTexture("button_top_enabled", "button_top_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto button_left_enabled_diffuse = textures.CreateTexture("button_left_enabled", "button_left_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 			auto button_top_left_enabled_diffuse = textures.CreateTexture("button_top_left_enabled", "button_top_left_enabled.png");
 
 			auto cat_first_frame = textures.CreateTexture("cat01", "cat01.png");
@@ -1305,9 +1308,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			model_star->AddPass(ion::graphics::render::Pass{model_program});
 
 			auto model_aura = scene.CreateModel();
-			auto sprite = model_aura->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			auto aura_sprite = model_aura->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.432_r, 0.45_r}, aura});
-			sprite->FillColor(Color{255, 255, 255, 0.75_r});
+			aura_sprite->FillColor(Color{255, 255, 255, 0.75_r});
 			model_aura->AddPass(ion::graphics::render::Pass{model_program});
 
 			auto background = scene.CreateModel();
@@ -1367,22 +1370,28 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{0.0_r, 0.0_r, 0.0_r}, {0.1_r, 0.1_r}, nullptr}); //Center
 			
 			auto button_top = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.1_r * 0.5_r + 0.025_r * 0.5_r, 0.0_r}, {0.1_r, 0.025_r}, nullptr}); //Top
+				{0.0_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.1_r, 0.011_r}, nullptr}); //Top
 			auto button_left = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-0.1_r * 0.5_r + -0.025_r * 0.5_r, 0.0_r, 0.0_r}, {0.025_r, 0.1_r}, nullptr}); //Left
+				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, 0.1_r}, nullptr}); //Left
 			auto button_bottom = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -0.1_r * 0.5_r + -0.025_r * 0.5_r, 0.0_r}, {0.1_r, 0.025_r}, nullptr}); //Bottom
+				{0.0_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.1_r, 0.011_r}, nullptr}); //Bottom
 			auto button_right = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.1_r * 0.5_r + 0.025_r * 0.5_r, 0.0_r, 0.0_r}, {0.025_r, 0.1_r}, nullptr}); //Right
+				{0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, 0.1_r}, nullptr}); //Right
 
 			auto button_top_left = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-0.1_r * 0.5_r + -0.025_r * 0.5_r, 0.1_r * 0.5_r + 0.025_r * 0.5_r, 0.0_r}, {0.025_r, 0.025_r}, nullptr}); //Top left
+				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
 			auto button_bottom_left = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-0.1_r * 0.5_r + -0.025_r * 0.5_r, -0.1_r * 0.5_r + -0.025_r * 0.5_r, 0.0_r}, {0.025_r, 0.025_r}, nullptr}); //Bottom left
+				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
 			auto button_top_right = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.1_r * 0.5_r + 0.025_r * 0.5_r, 0.1_r * 0.5_r + 0.025_r * 0.5_r, 0.0_r}, {0.025_r, 0.025_r}, nullptr}); //Top right
+				{0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
 			auto button_bottom_right = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.1_r * 0.5_r + 0.025_r * 0.5_r, -0.1_r * 0.5_r + -0.025_r * 0.5_r, 0.0_r}, {0.025_r, 0.025_r}, nullptr}); //Bottom right
+				{0.1_r * 0.5_r + 0.011_r * 0.5_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
+
+			button_center->AutoRepeat(true);
+			button_top->AutoRepeat(true);
+			button_left->AutoRepeat(true);
+			button_bottom->AutoRepeat(true);
+			button_right->AutoRepeat(true);
 
 			button_model->AddPass(ion::graphics::render::Pass{model_program});
 

@@ -101,10 +101,11 @@ std::pair<NonOwningPtr<Animation>, NonOwningPtr<Texture>> get_texture_maps(const
 
 NonOwningPtr<Texture> get_texture_map(const texture_map_type &texture_map) noexcept
 {
-	if (auto [animation, texture] = get_texture_maps(texture_map); texture || animation)
-		return animation ? animation->UnderlyingFrameSequence()->FirstFrame() : texture;
+	if (auto [animation, texture] = get_texture_maps(texture_map); animation)
+		return animation->UnderlyingFrameSequence() ?
+			animation->UnderlyingFrameSequence()->FirstFrame() : nullptr;
 	else
-		return nullptr;
+		return texture;
 }
 
 NonOwningPtr<Texture> get_first_texture_map(const texture_map_type &diffuse_map, const texture_map_type &specular_map, const texture_map_type &normal_map) noexcept

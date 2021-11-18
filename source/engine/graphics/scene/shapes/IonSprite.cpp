@@ -17,6 +17,7 @@ File:	IonSprite.cpp
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/textures/IonAnimation.h"
 #include "graphics/textures/IonTexture.h"
+#include "graphics/textures/IonTextureManager.h"
 #include "graphics/materials/IonMaterial.h"
 
 namespace ion::graphics::scene::shapes
@@ -51,17 +52,22 @@ mesh::Vertices sprite_vertices(const Vector3 &position, real rotation, const Vec
 
 std::optional<Vector2> get_texture_size(materials::Material &material) noexcept
 {
-	if (auto [animation, texture] = material.DiffuseMap(); animation)
-	{
-		if (auto frame_seq = animation->UnderlyingFrameSequence(); frame_seq)
+	auto texture =
+		[&]() noexcept
 		{
-			if (auto frame = frame_seq->FirstFrame(); frame && frame->Extents())
-				return Vector2{static_cast<real>(frame->Extents()->Width), static_cast<real>(frame->Extents()->Height)};
-		}
-	}
-	else if (texture && texture->Extents())
-		return Vector2{static_cast<real>(texture->Extents()->Width), static_cast<real>(texture->Extents()->Height)};
+			if (auto [animation, texture] = material.DiffuseMap(); animation)
+				return animation->UnderlyingFrameSequence() ?
+					animation->UnderlyingFrameSequence()->FirstFrame() : nullptr;
+			else
+				return texture;
+		}();
 
+	if (texture)
+	{
+		if (texture->IsLoaded() || (texture->Owner() && texture->Owner()->Load(*texture)))
+			return Vector2{static_cast<real>(texture->Extents()->Width), static_cast<real>(texture->Extents()->Height)};
+	}
+	
 	return std::nullopt;
 }
 
@@ -103,7 +109,30 @@ std::optional<Vector2> Sprite::GetTextureSize() const noexcept
 void Sprite::RecalculateSize() noexcept
 {
 	if (auto texture_size = GetTextureSize(); texture_size)
+	{
 		Rectangle::Size(*texture_size);
+
+		if (auto_repeat_)
+			RecalculateTexCoords();
+	}
+}
+
+void Sprite::RecalculateTexCoords() noexcept
+{
+	if (auto texture_size = GetTextureSize(); texture_size)
+	{
+		auto [lower_left, upper_right] =
+			materials::material::detail::get_unflipped_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_);
+
+		lower_left = vector2::Zero;
+		upper_right = size_ / *texture_size;
+
+		auto [new_lower_left, new_upper_right] =
+			materials::material::detail::get_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_,
+														lower_left, upper_right);
+		lower_left_tex_coord_ = new_lower_left;
+		upper_right_tex_coord_ = new_upper_right;
+	}
 }
 
 
@@ -167,6 +196,8 @@ void Sprite::Crop(const std::optional<Aabb> &area) noexcept
 
 			lower_left_tex_coord_ = lower_left;
 			upper_right_tex_coord_ = upper_right;
+
+			auto_repeat_ = false;
 			update_vertices_ = true;
 		}
 	}
@@ -178,9 +209,43 @@ void Sprite::Crop(const std::optional<Aabb> &area) noexcept
 
 		lower_left_tex_coord_ = lower_left;
 		upper_right_tex_coord_ = upper_right;
+
+		auto_repeat_ = false;
 		update_vertices_ = true;
 	}
 }
+
+void Sprite::Repeat(const std::optional<Vector2> &amount) noexcept
+{
+	//Repeat by amount
+	if (amount)
+	{
+		if (auto max = amount->CeilCopy(vector2::Zero); vector2::Zero < max)
+		{
+			auto [lower_left, upper_right] =
+				materials::material::detail::get_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_, 0.0_r, max);
+
+			lower_left_tex_coord_ = lower_left;
+			upper_right_tex_coord_ = upper_right;
+
+			auto_repeat_ = false;
+			update_vertices_ = true;
+		}
+	}
+	//Un-repeat
+	else if (IsRepeated())
+	{
+		auto [lower_left, upper_right] =
+			materials::material::detail::get_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_, 0.0_r, 1.0_r);
+
+		lower_left_tex_coord_ = lower_left;
+		upper_right_tex_coord_ = upper_right;
+
+		auto_repeat_ = false;
+		update_vertices_ = true;
+	}
+}
+
 
 void Sprite::FlipHorizontal() noexcept
 {
@@ -211,6 +276,14 @@ bool Sprite::IsCropped() const noexcept
 		materials::material::detail::get_unflipped_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_);
 	return materials::material::detail::is_cropped(lower_left, upper_right);
 }
+
+bool Sprite::IsRepeated() const noexcept
+{
+	auto [lower_left, upper_right] =
+		materials::material::detail::get_unflipped_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_);
+	return materials::material::detail::is_repeated(lower_left, upper_right);
+}
+
 
 bool Sprite::IsFlippedHorizontally() const noexcept
 {

@@ -45,8 +45,8 @@ vertex_container get_animation_vertex_data(textures::Animation &animation,
 	auto v3 = (position + Vector2{half_width, -half_height}).RotateCopy(rotation, position);
 	auto v4 = (position + Vector2{half_width, half_height}).RotateCopy(rotation, position);
 
-	auto first_frame =
-		animation.UnderlyingFrameSequence()->FirstFrame();
+	auto first_frame = animation.UnderlyingFrameSequence() ?
+		animation.UnderlyingFrameSequence()->FirstFrame() : nullptr;
 	auto tex_coords = first_frame ?
 		first_frame->TexCoords().value_or(std::pair{vector2::Zero, vector2::UnitScale}) :
 		std::pair{vector2::Zero, vector2::UnitScale};
