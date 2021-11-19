@@ -210,6 +210,13 @@ namespace ion::gui::controls
 			bool focusable_ = true;
 			bool visible_ = true;
 
+			std::optional<std::string> caption_;
+			std::optional<std::string> caption_disabled_;
+			std::optional<std::string> caption_focused_;
+			std::optional<std::string> caption_pressed_;
+			std::optional<std::string> caption_hovered_;
+			std::optional<std::string> tooltip_;
+
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
 			gui_control::ControlSkin skin_;
 			gui_control::Areas clickable_areas_;	
@@ -302,6 +309,7 @@ namespace ion::gui::controls
 				States
 			*/
 
+			std::optional<std::string>& GetStateCaption(gui_control::ControlState state) noexcept;
 			NonOwningPtr<graphics::materials::Material> GetStateMaterial(gui_control::ControlState state, gui_control::ControlVisualPart &part) noexcept;
 
 			void SetPartState(gui_control::ControlState state, gui_control::ControlVisualPart &part) noexcept;
@@ -397,12 +405,49 @@ namespace ion::gui::controls
 				}
 			}
 
+
+			//Sets the caption text for this control to the given text
+			inline void Caption(std::optional<std::string> text) noexcept
+			{
+				caption_ = std::move(text);
+			}
+
+			//Sets the caption text for this control when disabled to the given text
+			inline void CaptionDisabled(std::optional<std::string> text) noexcept
+			{
+				caption_disabled_ = std::move(text);
+			}
+
+			//Sets the caption text for this control when focused to the given text
+			inline void CaptionFocused(std::optional<std::string> text) noexcept
+			{
+				caption_focused_ = std::move(text);
+			}
+
+			//Sets the caption text for this control when pressed to the given text
+			inline void CaptionPressed(std::optional<std::string> text) noexcept
+			{
+				caption_pressed_ = std::move(text);
+			}
+
+			//Sets the caption text for this control when hovered to the given text
+			inline void CaptionHovered(std::optional<std::string> text) noexcept
+			{
+				caption_hovered_ = std::move(text);
+			}
+
+			//Sets the tooltip text (hint) for this control to the given text
+			inline void Tooltip(std::optional<std::string> text) noexcept
+			{
+				tooltip_ = std::move(text);
+			}
+
+
 			//Sets whether or not this control is visible
 			void Visible(bool visible) noexcept;
 
 			//Sets the skin for this control to the given skin
 			void Skin(gui_control::ControlSkin skin) noexcept;
-
 
 			//Sets the size of the clickable area of this control to the given size
 			void Size(const Vector2 &size) noexcept;
@@ -578,6 +623,50 @@ namespace ion::gui::controls
 				return visible_;
 			}
 
+
+			//Returns the caption text for this control
+			//Returns nullopt if this control has no caption
+			[[nodiscard]] inline auto& Caption() const noexcept
+			{
+				return caption_;
+			}
+
+			//Returns the caption text for this control when disabled
+			//Returns nullopt if this control has no disabled caption
+			[[nodiscard]] inline auto& CaptionDisabled() const noexcept
+			{
+				return caption_disabled_;
+			}
+
+			//Returns the caption text for this control when focused
+			//Returns nullopt if this control has no focused caption
+			[[nodiscard]] inline auto& CaptionFocused() const noexcept
+			{
+				return caption_focused_;
+			}
+
+			//Returns the caption text for this control when pressed
+			//Returns nullopt if this control has no pressed caption
+			[[nodiscard]] inline auto& CaptionPressed() const noexcept
+			{
+				return caption_pressed_;
+			}
+
+			//Returns the caption text for this control when hovered
+			//Returns nullopt if this control has no hovered caption
+			[[nodiscard]] inline auto& CaptionHovered() const noexcept
+			{
+				return caption_hovered_;
+			}
+
+			//Returns the tooltip text (hint) for this control
+			//Returns nullopt if this control has no tooltip
+			[[nodiscard]] inline auto& Tooltip() const noexcept
+			{
+				return tooltip_;
+			}
+
+
 			//Returns the current state of this control
 			[[nodiscard]] inline auto State() const noexcept
 			{
@@ -589,7 +678,6 @@ namespace ion::gui::controls
 			{
 				return skin_;
 			}
-
 
 			//Returns the size of the clickable area of this control
 			//If multiple clickable areas, the total merged size is returned

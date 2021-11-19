@@ -362,6 +362,60 @@ void GuiControl::NotifyControlStateChanged() noexcept
 	States
 */
 
+std::optional<std::string>& GuiControl::GetStateCaption(gui_control::ControlState state) noexcept
+{
+	auto &caption =
+		[&]() noexcept -> std::optional<std::string>&
+		{
+			switch (state)
+			{
+				case ControlState::Disabled:
+				return caption_disabled_;
+
+				case ControlState::Focused:
+				return caption_focused_;
+
+				case ControlState::Pressed:
+				return caption_pressed_;
+
+				case ControlState::Hovered:
+				return caption_hovered_;
+
+				case ControlState::Enabled:
+				default:
+				return caption_;
+			}
+		}();
+
+	//Fallback
+	if (!caption)
+	{
+		//Check hovered
+		if (hovered_ && state != ControlState::Hovered)
+		{
+			if (caption_hovered_)
+				return caption_hovered_; //Display hovered caption instead
+		}
+
+		//Check focused
+		if (focused_ && state != ControlState::Focused)
+		{
+			if (caption_focused_)
+				return caption_focused_; //Display focused caption instead
+		}
+
+		//Check enabled
+		if (state != ControlState::Enabled)
+		{
+			if (caption_)
+				return caption_; //Display caption instead
+		}
+	}
+
+	return caption;
+}
+
+
 NonOwningPtr<graphics::materials::Material> GuiControl::GetStateMaterial(ControlState state, ControlVisualPart &part) noexcept
 {
 	auto material = detail::control_state_to_material(state, part);
@@ -668,7 +722,6 @@ void GuiControl::Skin(gui_control::ControlSkin skin) noexcept
 		AttachSkin(std::move(skin));
 	}
 }
-
 
 void GuiControl::Size(const Vector2 &size) noexcept
 {
