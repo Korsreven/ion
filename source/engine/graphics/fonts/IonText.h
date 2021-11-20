@@ -324,7 +324,7 @@ namespace ion::graphics::fonts
 
 			//Sets the default decoration color for the displayed text decoration to the given color
 			//If nullopt is passed, no default decoration color will be used
-			inline void DefaultDecoration(const std::optional<Color> &color) noexcept
+			inline void DefaultDecorationColor(const std::optional<Color> &color) noexcept
 			{
 				default_decoration_color_ = color;
 			}
@@ -437,6 +437,7 @@ namespace ion::graphics::fonts
 			{
 				return default_decoration_color_;
 			}
+
 
 			//Returns a pointer to the type face in this text (used for lettering)
 			//Returns nullptr if this text does not have a type face
