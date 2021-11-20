@@ -22,6 +22,7 @@ File:	IonGuiControl.h
 #include "events/listeners/IonGuiControlListener.h"
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
+#include "graphics/fonts/IonText.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonVector2.h"
 #include "gui/IonGuiComponent.h"
@@ -72,6 +73,25 @@ namespace ion::gui::controls
 			Hovered
 		};
 
+		enum class ControlCaptionAlignment
+		{
+			OutsideLeft,
+			Left,
+			Center,
+			Right,
+			OutsideRight
+		};
+
+		enum class ControlCaptionVerticalAlignment
+		{
+			Top,
+			Middle,
+			Bottom
+		};
+
+		using Areas = std::vector<Aabb>;
+
+
 		struct ControlVisualPart final
 		{
 			NonOwningPtr<graphics::scene::shapes::Sprite> SpriteObject;
@@ -95,7 +115,7 @@ namespace ion::gui::controls
 
 		struct ControlVisualParts final
 		{
-			NonOwningPtr<graphics::scene::Model> Owner;
+			NonOwningPtr<graphics::scene::Model> ModelObject;
 
 			//Center
 			ControlVisualPart Center;
@@ -115,19 +135,41 @@ namespace ion::gui::controls
 
 			[[nodiscard]] inline operator bool() const noexcept
 			{
-				return !!Owner;
+				return !!ModelObject;
 			}
 
 			[[nodiscard]] inline auto operator->() const noexcept
 			{
-				return Owner.get();
+				return ModelObject.get();
 			}
 		};
+
+		struct ControlCaptionPart final
+		{
+			NonOwningPtr<graphics::scene::DrawableText> TextObject;
+			std::optional<graphics::fonts::text::TextBlockStyle> EnabledStyle;
+			std::optional<graphics::fonts::text::TextBlockStyle> DisabledStyle;
+			std::optional<graphics::fonts::text::TextBlockStyle> FocusedStyle;
+			std::optional<graphics::fonts::text::TextBlockStyle> PressedStyle;
+			std::optional<graphics::fonts::text::TextBlockStyle> HoveredStyle;
+
+
+			[[nodiscard]] inline operator bool() const noexcept
+			{
+				return !!TextObject;
+			}
+
+			[[nodiscard]] inline auto operator->() const noexcept
+			{
+				return TextObject.get();
+			}
+		};
+
 
 		struct ControlSkin final
 		{
 			ControlVisualParts Parts;
-			NonOwningPtr<graphics::scene::DrawableText> Caption;
+			ControlCaptionPart Caption;
 		};
 
 		/*
@@ -161,9 +203,6 @@ namespace ion::gui::controls
 		*/
 
 
-		using Areas = std::vector<Aabb>;
-
-
 		namespace detail
 		{
 			inline auto control_state_to_material(ControlState state, ControlVisualPart &part) noexcept
@@ -185,6 +224,28 @@ namespace ion::gui::controls
 					case ControlState::Enabled:
 					default:
 					return part.EnabledMaterial;
+				}
+			}
+
+			inline auto& control_state_to_style(ControlState state, ControlCaptionPart &part) noexcept
+			{
+				switch (state)
+				{
+					case ControlState::Disabled:
+					return part.DisabledStyle;
+
+					case ControlState::Focused:
+					return part.FocusedStyle;
+
+					case ControlState::Pressed:
+					return part.PressedStyle;
+
+					case ControlState::Hovered:
+					return part.HoveredStyle;
+
+					case ControlState::Enabled:
+					default:
+					return part.EnabledStyle;
 				}
 			}
 
@@ -211,15 +272,15 @@ namespace ion::gui::controls
 			bool visible_ = true;
 
 			std::optional<std::string> caption_;
-			std::optional<std::string> caption_disabled_;
-			std::optional<std::string> caption_focused_;
-			std::optional<std::string> caption_pressed_;
-			std::optional<std::string> caption_hovered_;
 			std::optional<std::string> tooltip_;
+
+			std::optional<Vector2> caption_size_;
+			gui_control::ControlCaptionAlignment caption_alignment_ = gui_control::ControlCaptionAlignment::Center;
+			gui_control::ControlCaptionVerticalAlignment caption_vertical_alignment_ = gui_control::ControlCaptionVerticalAlignment::Middle;
 
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
 			gui_control::ControlSkin skin_;
-			gui_control::Areas clickable_areas_;	
+			gui_control::Areas hit_areas_;	
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
 			std::optional<events::Callback<void, GuiControl&>> on_defocus_;
@@ -308,12 +369,14 @@ namespace ion::gui::controls
 			/*
 				States
 			*/
-
-			std::optional<std::string>& GetStateCaption(gui_control::ControlState state) noexcept;
+			
 			NonOwningPtr<graphics::materials::Material> GetStateMaterial(gui_control::ControlState state, gui_control::ControlVisualPart &part) noexcept;
+			std::optional<graphics::fonts::text::TextBlockStyle>& GetStateStyle(gui_control::ControlState state, gui_control::ControlCaptionPart &part) noexcept;
 
 			void SetPartState(gui_control::ControlState state, gui_control::ControlVisualPart &part) noexcept;
+			void SetCaptionState(gui_control::ControlState state, gui_control::ControlCaptionPart &part) noexcept;
 			void SetSkinState(gui_control::ControlState state, gui_control::ControlSkin &skin) noexcept;
+
 			void SetState(gui_control::ControlState state) noexcept;
 
 
@@ -329,10 +392,10 @@ namespace ion::gui::controls
 			//Construct a control with the given name
 			GuiControl(std::string name);
 
-			//Construct a control with the given name and clickable size
+			//Construct a control with the given name and hit size
 			GuiControl(std::string name, const Vector2 &size);
 
-			//Construct a control with the given name and clickable areas
+			//Construct a control with the given name and hit areas
 			GuiControl(std::string name, gui_control::Areas areas);
 
 			//Construct a control with the given name and skin
@@ -405,35 +468,18 @@ namespace ion::gui::controls
 				}
 			}
 
+			//Sets whether or not this control is visible
+			void Visible(bool visible) noexcept;
+
 
 			//Sets the caption text for this control to the given text
 			inline void Caption(std::optional<std::string> text) noexcept
 			{
-				caption_ = std::move(text);
-			}
-
-			//Sets the caption text for this control when disabled to the given text
-			inline void CaptionDisabled(std::optional<std::string> text) noexcept
-			{
-				caption_disabled_ = std::move(text);
-			}
-
-			//Sets the caption text for this control when focused to the given text
-			inline void CaptionFocused(std::optional<std::string> text) noexcept
-			{
-				caption_focused_ = std::move(text);
-			}
-
-			//Sets the caption text for this control when pressed to the given text
-			inline void CaptionPressed(std::optional<std::string> text) noexcept
-			{
-				caption_pressed_ = std::move(text);
-			}
-
-			//Sets the caption text for this control when hovered to the given text
-			inline void CaptionHovered(std::optional<std::string> text) noexcept
-			{
-				caption_hovered_ = std::move(text);
+				if (caption_ != text)
+				{
+					caption_ = std::move(text);
+					//update
+				}
 			}
 
 			//Sets the tooltip text (hint) for this control to the given text
@@ -441,21 +487,49 @@ namespace ion::gui::controls
 			{
 				tooltip_ = std::move(text);
 			}
+			
 
+			//Sets the size of this control to the given size
+			void Size(const Vector2 &size) noexcept;
 
-			//Sets whether or not this control is visible
-			void Visible(bool visible) noexcept;
+			//Sets the caption size for this control to the given size
+			inline void CaptionSize(const std::optional<Vector2> &size) noexcept
+			{
+				if (caption_size_ != size)
+				{
+					caption_size_ = size;
+					//update
+				}
+			}
+
+			//Sets the horizontal caption alignment for this control to the given alignment
+			inline void CaptionAlignment(gui_control::ControlCaptionAlignment alignment) noexcept
+			{
+				if (caption_alignment_ != alignment)
+				{
+					caption_alignment_ = alignment;
+					//update
+				}
+			}
+
+			//Sets the vertical caption alignment for this control to the given alignment
+			inline void CaptionVerticalAlignment(gui_control::ControlCaptionVerticalAlignment vertical_alignment) noexcept
+			{
+				if (caption_vertical_alignment_ != vertical_alignment)
+				{
+					caption_vertical_alignment_ = vertical_alignment;
+					//update
+				}
+			}
+			
 
 			//Sets the skin for this control to the given skin
 			void Skin(gui_control::ControlSkin skin) noexcept;
 
-			//Sets the size of the clickable area of this control to the given size
-			void Size(const Vector2 &size) noexcept;
-
-			//Sets the clickable areas of this control to the given areas
-			inline void ClickableAreas(gui_control::Areas areas) noexcept
+			//Sets the hit areas of this control to the given areas
+			inline void HitAreas(gui_control::Areas areas) noexcept
 			{
-				clickable_areas_ = std::move(areas);
+				hit_areas_ = std::move(areas);
 			}
 
 
@@ -631,39 +705,34 @@ namespace ion::gui::controls
 				return caption_;
 			}
 
-			//Returns the caption text for this control when disabled
-			//Returns nullopt if this control has no disabled caption
-			[[nodiscard]] inline auto& CaptionDisabled() const noexcept
-			{
-				return caption_disabled_;
-			}
-
-			//Returns the caption text for this control when focused
-			//Returns nullopt if this control has no focused caption
-			[[nodiscard]] inline auto& CaptionFocused() const noexcept
-			{
-				return caption_focused_;
-			}
-
-			//Returns the caption text for this control when pressed
-			//Returns nullopt if this control has no pressed caption
-			[[nodiscard]] inline auto& CaptionPressed() const noexcept
-			{
-				return caption_pressed_;
-			}
-
-			//Returns the caption text for this control when hovered
-			//Returns nullopt if this control has no hovered caption
-			[[nodiscard]] inline auto& CaptionHovered() const noexcept
-			{
-				return caption_hovered_;
-			}
-
 			//Returns the tooltip text (hint) for this control
 			//Returns nullopt if this control has no tooltip
 			[[nodiscard]] inline auto& Tooltip() const noexcept
 			{
 				return tooltip_;
+			}
+
+
+			//Returns the size of this control
+			[[nodiscard]] Vector2 Size() const noexcept;
+
+			//Returns the caption size for this control
+			//Returns nullopt if no custom caption size has been set
+			[[nodiscard]] inline auto& CaptionSize() const noexcept
+			{
+				return caption_size_;
+			}
+
+			//Returns the horizontal caption alignment for this control
+			[[nodiscard]] inline auto& CaptionAlignment() const noexcept
+			{
+				return caption_alignment_;
+			}
+
+			//Returns the vertical caption alignment for this control
+			[[nodiscard]] inline auto& CaptionVerticalAlignment() const noexcept
+			{
+				return caption_vertical_alignment_;
 			}
 
 
@@ -674,19 +743,15 @@ namespace ion::gui::controls
 			}
 
 			//Returns the skin attached to this control
-			[[nodiscard]] inline auto Skin() const noexcept
+			[[nodiscard]] inline auto& Skin() const noexcept
 			{
 				return skin_;
 			}
 
-			//Returns the size of the clickable area of this control
-			//If multiple clickable areas, the total merged size is returned
-			[[nodiscard]] Vector2 Size() const noexcept;
-
-			//Returns all of the clickable areas of this control
-			[[nodiscard]] inline auto& ClickableAreas() const noexcept
+			//Returns all of the hit areas of this control
+			[[nodiscard]] inline auto& HitAreas() const noexcept
 			{
-				return clickable_areas_;
+				return hit_areas_;
 			}
 
 

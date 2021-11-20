@@ -362,60 +362,6 @@ void GuiControl::NotifyControlStateChanged() noexcept
 	States
 */
 
-std::optional<std::string>& GuiControl::GetStateCaption(gui_control::ControlState state) noexcept
-{
-	auto &caption =
-		[&]() noexcept -> std::optional<std::string>&
-		{
-			switch (state)
-			{
-				case ControlState::Disabled:
-				return caption_disabled_;
-
-				case ControlState::Focused:
-				return caption_focused_;
-
-				case ControlState::Pressed:
-				return caption_pressed_;
-
-				case ControlState::Hovered:
-				return caption_hovered_;
-
-				case ControlState::Enabled:
-				default:
-				return caption_;
-			}
-		}();
-
-	//Fallback
-	if (!caption)
-	{
-		//Check hovered
-		if (hovered_ && state != ControlState::Hovered)
-		{
-			if (caption_hovered_)
-				return caption_hovered_; //Display hovered caption instead
-		}
-
-		//Check focused
-		if (focused_ && state != ControlState::Focused)
-		{
-			if (caption_focused_)
-				return caption_focused_; //Display focused caption instead
-		}
-
-		//Check enabled
-		if (state != ControlState::Enabled)
-		{
-			if (caption_)
-				return caption_; //Display caption instead
-		}
-	}
-
-	return caption;
-}
-
-
 NonOwningPtr<graphics::materials::Material> GuiControl::GetStateMaterial(ControlState state, ControlVisualPart &part) noexcept
 {
 	auto material = detail::control_state_to_material(state, part);
@@ -448,6 +394,38 @@ NonOwningPtr<graphics::materials::Material> GuiControl::GetStateMaterial(Control
 	return material;
 }
 
+std::optional<graphics::fonts::text::TextBlockStyle>& GuiControl::GetStateStyle(ControlState state, ControlCaptionPart &part) noexcept
+{
+	auto &style = detail::control_state_to_style(state, part);
+
+	//Fallback
+	if (!style)
+	{
+		//Check hovered
+		if (hovered_ && state != ControlState::Hovered)
+		{
+			if (part.HoveredStyle)
+				return part.HoveredStyle; //Display hovered style instead
+		}
+
+		//Check focused
+		if (focused_ && state != ControlState::Focused)
+		{
+			if (part.FocusedStyle)
+				return part.FocusedStyle; //Display focused style instead
+		}
+
+		//Check enabled
+		if (state != ControlState::Enabled)
+		{
+			if (part.EnabledStyle)
+				return part.EnabledStyle; //Display enabled style instead
+		}
+	}
+
+	return style;
+}
+
 
 void GuiControl::SetPartState(ControlState state, ControlVisualPart &part) noexcept
 {
@@ -455,6 +433,39 @@ void GuiControl::SetPartState(ControlState state, ControlVisualPart &part) noexc
 	{
 		if (auto material = GetStateMaterial(state, part); material)
 			part->SurfaceMaterial(material);
+	}
+}
+
+void GuiControl::SetCaptionState(ControlState state, ControlCaptionPart &part) noexcept
+{
+	if (part)
+	{
+		//Get() will not reload vertex streams when called from an immutable reference)
+		if (const auto &c_part = *part.TextObject; c_part.Get())
+		{
+			if (auto &style = GetStateStyle(state, part); style)
+			{
+				if (style->ForegroundColor &&
+					c_part.Get()->DefaultForegroundColor() != *style->ForegroundColor)
+					part->Get()->DefaultForegroundColor(*style->ForegroundColor);
+
+				if (style->BackgroundColor &&
+					c_part.Get()->DefaultBackgroundColor() != *style->BackgroundColor)
+					part->Get()->DefaultBackgroundColor(*style->BackgroundColor);
+
+				if (style->FontStyle &&
+					c_part.Get()->DefaultFontStyle() != *style->FontStyle)
+					part->Get()->DefaultFontStyle(*style->FontStyle);
+
+				if (style->Decoration &&
+					c_part.Get()->DefaultDecoration() != *style->Decoration)
+					part->Get()->DefaultDecoration(*style->Decoration);
+
+				if (style->DecorationColor &&
+					c_part.Get()->DefaultDecorationColor() != *style->DecorationColor)
+					part->Get()->DefaultDecorationColor(*style->DecorationColor);
+			}
+		}
 	}
 }
 
@@ -477,7 +488,11 @@ void GuiControl::SetSkinState(ControlState state, ControlSkin &skin) noexcept
 		SetPartState(state, skin.Parts.TopRight);
 		SetPartState(state, skin.Parts.BottomRight);
 	}
+
+	if (skin.Caption)
+		SetCaptionState(state, skin.Caption);
 }
+
 
 void GuiControl::SetState(ControlState state) noexcept
 {
@@ -496,26 +511,26 @@ void GuiControl::SetState(ControlState state) noexcept
 	Skins
 */
 
-void GuiControl::AttachSkin(gui_control::ControlSkin skin)
+void GuiControl::AttachSkin(ControlSkin skin)
 {
 	DetachSkin();
 
 	if (skin.Parts)
 	{
 		if (auto node = skin.Parts->ParentNode(); node)
-			node->DetachObject(*skin.Parts.Owner);
+			node->DetachObject(*skin.Parts.ModelObject);
 		
 		if (node_) //Create node for all parts
-			node_->CreateChildNode(node_->Visible())->AttachObject(*skin.Parts.Owner);
+			node_->CreateChildNode(node_->Visible())->AttachObject(*skin.Parts.ModelObject);
 	}
 
 	if (skin.Caption)
 	{
 		if (auto node = skin.Caption->ParentNode(); node)
-			node->DetachObject(*skin.Caption);
+			node->DetachObject(*skin.Caption.TextObject);
 		
 		if (node_) //Create node for caption
-			node_->CreateChildNode(node_->Visible())->AttachObject(*skin.Caption);
+			node_->CreateChildNode(node_->Visible())->AttachObject(*skin.Caption.TextObject);
 	}
 
 	skin_ = std::move(skin);
@@ -529,7 +544,7 @@ void GuiControl::DetachSkin() noexcept
 		if (auto node = skin_.Parts->ParentNode(); node_ && node)
 			node_->RemoveChildNode(*node); //Remove parts node
 
-		skin_.Parts->Owner()->RemoveModel(*skin_.Parts.Owner); //Remove all parts
+		skin_.Parts->Owner()->RemoveModel(*skin_.Parts.ModelObject); //Remove all parts
 	}
 
 	if (skin_.Caption)
@@ -537,7 +552,7 @@ void GuiControl::DetachSkin() noexcept
 		if (auto node = skin_.Caption->ParentNode(); node_ && node)
 			node_->RemoveChildNode(*node); //Remove caption node
 
-		skin_.Caption->Owner()->RemoveText(*skin_.Caption); //Remove caption
+		skin_.Caption->Owner()->RemoveText(*skin_.Caption.TextObject); //Remove caption
 	}
 
 	skin_ = {};
@@ -555,7 +570,7 @@ GuiControl::GuiControl(std::string name) :
 GuiControl::GuiControl(std::string name, const Vector2 &size) :
 
 	GuiComponent{std::move(name)},
-	clickable_areas_{Aabb::Size(size)}
+	hit_areas_{Aabb::Size(size)}
 {
 	//Empty
 }
@@ -563,18 +578,18 @@ GuiControl::GuiControl(std::string name, const Vector2 &size) :
 GuiControl::GuiControl(std::string name, Areas areas) :
 
 	GuiComponent{std::move(name)},
-	clickable_areas_{std::move(areas)}
+	hit_areas_{std::move(areas)}
 {
 	//Empty
 }
 
-GuiControl::GuiControl(std::string name, gui_control::ControlSkin skin) :
+GuiControl::GuiControl(std::string name, ControlSkin skin) :
 	GuiComponent{std::move(name)}
 {
 	AttachSkin(std::move(skin));
 }
 
-GuiControl::GuiControl(std::string name, gui_control::ControlSkin skin, const Vector2 &size) :
+GuiControl::GuiControl(std::string name, ControlSkin skin, const Vector2 &size) :
 	GuiComponent{std::move(name)}
 {
 	AttachSkin(std::move(skin));
@@ -688,9 +703,48 @@ void GuiControl::Visible(bool visible) noexcept
 	}
 }
 
-void GuiControl::Skin(gui_control::ControlSkin skin) noexcept
+void GuiControl::Size(const Vector2 &size) noexcept
 {
-	if (skin_.Parts.Owner != skin.Parts.Owner)
+	if (auto current_size = Size(); current_size != size)
+	{
+		auto resized = false;
+
+		if (skin_.Parts)
+		{
+			detail::resize_parts(skin_.Parts, current_size, size);
+			resized = true;
+		}
+
+		if (std::empty(hit_areas_))
+		{
+			if (!skin_.Parts)
+			{
+				hit_areas_.push_back(Aabb::Size(size));
+				resized = true;
+			}
+		}
+		else if (std::size(hit_areas_) == 1)
+		{
+			hit_areas_.back() = Aabb::Size(size);
+			resized = true;
+		}
+
+		//Multiple areas
+		else if (current_size.X() != 0.0_r && current_size.Y() != 0.0_r)
+		{
+			detail::resize_areas(hit_areas_, current_size, size);
+			resized = true;
+		}
+
+		if (resized)
+			Resized();
+	}
+}
+
+void GuiControl::Skin(ControlSkin skin) noexcept
+{
+	if (skin_.Parts.ModelObject != skin.Parts.ModelObject &&
+		skin_.Caption.TextObject != skin.Caption.TextObject)
 	{
 		if (skin.Parts)
 		{
@@ -704,10 +758,10 @@ void GuiControl::Skin(gui_control::ControlSkin skin) noexcept
 				auto to_size = skin_.Parts->AxisAlignedBoundingBox().ToSize();
 
 				if (from_size != to_size)
-					gui_control::detail::resize_parts(skin.Parts, from_size, to_size);
+					detail::resize_parts(skin.Parts, from_size, to_size);
 			}
 			//No skin, inherit area size
-			else if (!std::empty(clickable_areas_))
+			else if (!std::empty(hit_areas_))
 			{
 				skin.Parts->Prepare();
 
@@ -715,49 +769,11 @@ void GuiControl::Skin(gui_control::ControlSkin skin) noexcept
 				auto to_size = Size();
 
 				if (from_size != to_size)
-					gui_control::detail::resize_parts(skin.Parts, from_size, to_size);
+					detail::resize_parts(skin.Parts, from_size, to_size);
 			}
 		}
 
 		AttachSkin(std::move(skin));
-	}
-}
-
-void GuiControl::Size(const Vector2 &size) noexcept
-{
-	if (auto current_size = Size(); current_size != size)
-	{
-		auto resized = false;
-
-		if (skin_.Parts)
-		{
-			detail::resize_parts(skin_.Parts, current_size, size);
-			resized = true;
-		}
-
-		if (std::empty(clickable_areas_))
-		{
-			if (!skin_.Parts)
-			{
-				clickable_areas_.push_back(Aabb::Size(size));
-				resized = true;
-			}
-		}
-		else if (std::size(clickable_areas_) == 1)
-		{
-			clickable_areas_.back() = Aabb::Size(size);
-			resized = true;
-		}
-
-		//Multiple areas
-		else if (current_size.X() != 0.0_r && current_size.Y() != 0.0_r)
-		{
-			detail::resize_areas(clickable_areas_, current_size, size);
-			resized = true;
-		}
-
-		if (resized)
-			Resized();
 	}
 }
 
@@ -768,7 +784,7 @@ void GuiControl::Size(const Vector2 &size) noexcept
 
 Vector2 GuiControl::Size() const noexcept
 {
-	if (std::empty(clickable_areas_))
+	if (std::empty(hit_areas_))
 	{
 		if (skin_.Parts)
 		{
@@ -778,10 +794,10 @@ Vector2 GuiControl::Size() const noexcept
 		else
 			return vector2::Zero;
 	}
-	else if (std::size(clickable_areas_) == 1)
-		return clickable_areas_.back().ToSize();
+	else if (std::size(hit_areas_) == 1)
+		return hit_areas_.back().ToSize();
 	else //Multiple areas
-		return Aabb::Enclose(clickable_areas_).ToSize();
+		return Aabb::Enclose(hit_areas_).ToSize();
 }
 
 
@@ -799,7 +815,7 @@ bool GuiControl::Intersects(const Vector2 &point) const noexcept
 {
 	if (node_ && visible_)
 	{
-		if (std::empty(clickable_areas_))
+		if (std::empty(hit_areas_))
 		{
 			if (skin_.Parts)
 			{
@@ -809,7 +825,7 @@ bool GuiControl::Intersects(const Vector2 &point) const noexcept
 		}
 		else
 		{
-			for (auto &area : clickable_areas_)
+			for (auto &area : hit_areas_)
 			{
 				if (Obb{area}.Transform(node_->FullTransformation()).Intersects(point))
 					return true;

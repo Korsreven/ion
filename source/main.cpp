@@ -1406,7 +1406,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//GUI skins
 			ion::gui::controls::gui_control::ControlSkin button_skin;
-			button_skin.Parts.Owner = button_model;
+			button_skin.Parts.ModelObject = button_model;
 			button_skin.Parts.Center.SpriteObject = button_center;
 			button_skin.Parts.Top.SpriteObject = button_top;
 			button_skin.Parts.Left.SpriteObject = button_left;
