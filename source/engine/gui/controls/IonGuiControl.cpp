@@ -46,27 +46,33 @@ void resize_part(ControlVisualPart &part, const Vector2 &delta_size, const Vecto
 	}
 }
 
-void resize_parts(ControlVisualParts &parts, const Vector2 &from_size, const Vector2 &to_size) noexcept
+void resize_skin(ControlSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept
 {
 	auto delta_size = to_size - from_size;
 	auto delta_position = delta_size * 0.5_r;
-	auto &center = parts.Center->Position();
 	auto [delta_width, delta_height] = delta_size.XY();
 
-	//Center
-	resize_part(parts.Center, delta_size, vector2::Zero, center);
+	if (skin.Parts)
+	{
+		auto &center = skin.Parts.Center ?
+			skin.Parts.Center->Position() :
+			vector3::Zero;
 
-	//Sides
-	resize_part(parts.Top, {delta_width, 0.0_r}, delta_position, center);
-	resize_part(parts.Left, {0.0_r, delta_height}, delta_position, center);
-	resize_part(parts.Bottom, {delta_width, 0.0_r}, delta_position, center);
-	resize_part(parts.Right, {0.0_r, delta_height}, delta_position, center);
+		//Center
+		resize_part(skin.Parts.Center, delta_size, vector2::Zero, center);
 
-	//Corners
-	resize_part(parts.TopLeft, vector2::Zero, delta_position, center);
-	resize_part(parts.TopRight, vector2::Zero, delta_position, center);
-	resize_part(parts.BottomLeft, vector2::Zero, delta_position, center);
-	resize_part(parts.BottomRight, vector2::Zero, delta_position, center);
+		//Sides
+		resize_part(skin.Parts.Top, {delta_width, 0.0_r}, delta_position, center);
+		resize_part(skin.Parts.Left, {0.0_r, delta_height}, delta_position, center);
+		resize_part(skin.Parts.Bottom, {delta_width, 0.0_r}, delta_position, center);
+		resize_part(skin.Parts.Right, {0.0_r, delta_height}, delta_position, center);
+
+		//Corners
+		resize_part(skin.Parts.TopLeft, vector2::Zero, delta_position, center);
+		resize_part(skin.Parts.TopRight, vector2::Zero, delta_position, center);
+		resize_part(skin.Parts.BottomLeft, vector2::Zero, delta_position, center);
+		resize_part(skin.Parts.BottomRight, vector2::Zero, delta_position, center);
+	}
 }
 
 
@@ -559,6 +565,138 @@ void GuiControl::DetachSkin() noexcept
 }
 
 
+void GuiControl::UpdateCaption() noexcept
+{
+	if (skin_.Caption)
+	{
+		if (auto &text = skin_.Caption->Get(); text)
+		{
+			auto visual_area = VisualArea();
+			auto visual_center_area = VisualCenterArea();
+			auto area = visual_center_area.
+				value_or(HitArea().
+				value_or(aabb::Zero));
+
+			auto center = visual_center_area ?
+				visual_center_area->Center() :
+				vector2::Zero;
+			auto left_border_width = visual_center_area ?
+				visual_center_area->Min().X() - visual_area->Min().X() :
+				0.0_r;
+			auto right_border_width = visual_center_area ?
+				visual_area->Max().X() - visual_center_area->Max().X() :
+				0.0_r;
+
+			if (auto size = caption_size_.value_or(area.ToSize()); size != vector2::Zero)
+			{
+				text->AreaSize(size);
+
+				auto [x, y] =
+					[&]() noexcept
+					{
+						switch (caption_layout_)
+						{
+							case ControlCaptionLayout::OutsideLeft:
+							case ControlCaptionLayout::OutsideTopLeft:
+							case ControlCaptionLayout::OutsideBottomLeft:
+							return Vector2{center.X() - size.X() - left_border_width, center.Y()};
+
+							case ControlCaptionLayout::OutsideRight:
+							case ControlCaptionLayout::OutsideTopRight:
+							case ControlCaptionLayout::OutsideBottomRight:
+							return Vector2{center.X() + size.X() + right_border_width, center.Y()};
+
+							default:
+							return center;
+						}
+					}().XY();
+
+				skin_.Caption->Position({x, y, skin_.Caption->Position().Z()});
+			}
+			else
+			{
+				text->AreaSize({});
+
+				auto [x, y] =
+					[&]() noexcept
+					{
+						switch (caption_layout_)
+						{
+							case ControlCaptionLayout::OutsideLeft:
+							case ControlCaptionLayout::OutsideTopLeft:
+							case ControlCaptionLayout::OutsideBottomLeft:
+							return Vector2{center.X() - size.X() - left_border_width, center.Y()};
+
+							case ControlCaptionLayout::OutsideRight:
+							case ControlCaptionLayout::OutsideTopRight:
+							case ControlCaptionLayout::OutsideBottomRight:
+							return Vector2{center.X() + size.X() + right_border_width, center.Y()};
+
+							default:
+							return center;
+						}
+					}().XY();
+
+				skin_.Caption->Position({x, y, skin_.Caption->Position().Z()});
+			}
+
+			text->Alignment(
+				[&]() noexcept
+				{
+					switch (caption_layout_)
+					{
+						case ControlCaptionLayout::Left:
+						case ControlCaptionLayout::TopLeft:
+						case ControlCaptionLayout::BottomLeft:
+						case ControlCaptionLayout::OutsideRight:
+						case ControlCaptionLayout::OutsideTopRight:
+						case ControlCaptionLayout::OutsideBottomRight:
+						return graphics::fonts::text::TextAlignment::Left;
+
+						case ControlCaptionLayout::Right:
+						case ControlCaptionLayout::TopRight:
+						case ControlCaptionLayout::BottomRight:
+						case ControlCaptionLayout::OutsideLeft:
+						case ControlCaptionLayout::OutsideTopLeft:
+						case ControlCaptionLayout::OutsideBottomLeft:
+						return graphics::fonts::text::TextAlignment::Right;
+
+						default:
+						return graphics::fonts::text::TextAlignment::Center;
+					}
+				}());
+
+			text->VerticalAlignment(
+				[&]() noexcept
+				{
+					switch (caption_layout_)
+					{
+						case ControlCaptionLayout::TopLeft:
+						case ControlCaptionLayout::TopCenter:
+						case ControlCaptionLayout::TopRight:
+						case ControlCaptionLayout::OutsideTopLeft:
+						case ControlCaptionLayout::OutsideTopRight:
+						return graphics::fonts::text::TextVerticalAlignment::Top;
+
+						case ControlCaptionLayout::BottomLeft:
+						case ControlCaptionLayout::BottomCenter:
+						case ControlCaptionLayout::BottomRight:
+						case ControlCaptionLayout::OutsideBottomLeft:
+						case ControlCaptionLayout::OutsideBottomRight:
+						return graphics::fonts::text::TextVerticalAlignment::Bottom;
+
+						default:
+						return graphics::fonts::text::TextVerticalAlignment::Middle;
+					}
+				}());
+
+			if (caption_)
+				text->Content(*caption_);
+		}
+	}
+}
+
+
 //Public
 
 GuiControl::GuiControl(std::string name) :
@@ -711,7 +849,7 @@ void GuiControl::Size(const Vector2 &size) noexcept
 
 		if (skin_.Parts)
 		{
-			detail::resize_parts(skin_.Parts, current_size, size);
+			detail::resize_skin(skin_, current_size, size);
 			resized = true;
 		}
 
@@ -758,7 +896,7 @@ void GuiControl::Skin(ControlSkin skin) noexcept
 				auto to_size = skin_.Parts->AxisAlignedBoundingBox().ToSize();
 
 				if (from_size != to_size)
-					detail::resize_parts(skin.Parts, from_size, to_size);
+					detail::resize_skin(skin, from_size, to_size);
 			}
 			//No skin, inherit area size
 			else if (!std::empty(hit_areas_))
@@ -769,7 +907,7 @@ void GuiControl::Skin(ControlSkin skin) noexcept
 				auto to_size = Size();
 
 				if (from_size != to_size)
-					detail::resize_parts(skin.Parts, from_size, to_size);
+					detail::resize_skin(skin, from_size, to_size);
 			}
 		}
 
@@ -784,20 +922,44 @@ void GuiControl::Skin(ControlSkin skin) noexcept
 
 Vector2 GuiControl::Size() const noexcept
 {
+	return HitArea().value_or(aabb::Zero).ToSize();
+}
+
+
+std::optional<Aabb> GuiControl::HitArea() const noexcept
+{
+	//No custom defined hit areas
+	//Use visuals as hit area
 	if (std::empty(hit_areas_))
-	{
-		if (skin_.Parts)
-		{
-			skin_.Parts->Prepare();
-			return skin_.Parts->AxisAlignedBoundingBox().ToSize();
-		}
-		else
-			return vector2::Zero;
-	}
+		return VisualArea();
+
+	//Single hit area
 	else if (std::size(hit_areas_) == 1)
-		return hit_areas_.back().ToSize();
-	else //Multiple areas
-		return Aabb::Enclose(hit_areas_).ToSize();
+		return hit_areas_.back();
+	else //Multiple hit areas
+		return Aabb::Enclose(hit_areas_);
+}
+
+std::optional<Aabb> GuiControl::VisualArea() const noexcept
+{
+	if (skin_.Parts)
+	{
+		skin_.Parts->Prepare();
+		return skin_.Parts->AxisAlignedBoundingBox();
+	}
+	else
+		return std::nullopt;
+}
+
+std::optional<Aabb> GuiControl::VisualCenterArea() const noexcept
+{
+	if (skin_.Parts)
+	{
+		skin_.Parts.Center->Prepare();
+		return skin_.Parts.Center->AxisAlignedBoundingBox();
+	}
+	else
+		return std::nullopt;
 }
 
 

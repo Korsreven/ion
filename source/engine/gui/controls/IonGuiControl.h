@@ -73,20 +73,11 @@ namespace ion::gui::controls
 			Hovered
 		};
 
-		enum class ControlCaptionAlignment
+		enum class ControlCaptionLayout
 		{
-			OutsideLeft,
-			Left,
-			Center,
-			Right,
-			OutsideRight
-		};
-
-		enum class ControlCaptionVerticalAlignment
-		{
-			Top,
-			Middle,
-			Bottom
+			OutsideTopLeft,		TopLeft,	TopCenter,		TopRight,		OutsideTopRight,
+			OutsideLeft,		Left,		Center,			Right,			OutsideRight,
+			OutsideBottomLeft,	BottomLeft, BottomCenter,	BottomRight,	OutsideBottomRight
 		};
 
 		using Areas = std::vector<Aabb>;
@@ -250,8 +241,8 @@ namespace ion::gui::controls
 			}
 
 
-			void resize_part(ControlVisualPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept;
-			void resize_parts(ControlVisualParts &parts, const Vector2 &from_size, const Vector2 &to_size) noexcept;
+			void resize_part(ControlVisualPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept;		
+			void resize_skin(ControlSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 
 			void resize_area(Aabb &area, const Vector2 &scaling) noexcept;
 			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size) noexcept;
@@ -275,8 +266,7 @@ namespace ion::gui::controls
 			std::optional<std::string> tooltip_;
 
 			std::optional<Vector2> caption_size_;
-			gui_control::ControlCaptionAlignment caption_alignment_ = gui_control::ControlCaptionAlignment::Center;
-			gui_control::ControlCaptionVerticalAlignment caption_vertical_alignment_ = gui_control::ControlCaptionVerticalAlignment::Middle;
+			gui_control::ControlCaptionLayout caption_layout_ = gui_control::ControlCaptionLayout::Center;
 
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
 			gui_control::ControlSkin skin_;
@@ -386,6 +376,8 @@ namespace ion::gui::controls
 
 			void AttachSkin(gui_control::ControlSkin skin);
 			void DetachSkin() noexcept;
+
+			void UpdateCaption() noexcept;
 
 		public:
 
@@ -502,22 +494,12 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the horizontal caption alignment for this control to the given alignment
-			inline void CaptionAlignment(gui_control::ControlCaptionAlignment alignment) noexcept
+			//Sets the caption layout for this control to the given layout
+			inline void CaptionLayout(gui_control::ControlCaptionLayout layout) noexcept
 			{
-				if (caption_alignment_ != alignment)
+				if (caption_layout_ != layout)
 				{
-					caption_alignment_ = alignment;
-					//update
-				}
-			}
-
-			//Sets the vertical caption alignment for this control to the given alignment
-			inline void CaptionVerticalAlignment(gui_control::ControlCaptionVerticalAlignment vertical_alignment) noexcept
-			{
-				if (caption_vertical_alignment_ != vertical_alignment)
-				{
-					caption_vertical_alignment_ = vertical_alignment;
+					caption_layout_ = layout;
 					//update
 				}
 			}
@@ -530,6 +512,13 @@ namespace ion::gui::controls
 			inline void HitAreas(gui_control::Areas areas) noexcept
 			{
 				hit_areas_ = std::move(areas);
+			}
+
+			//Sets the hit area of this control to the given area
+			inline void HitArea(const Aabb &area) noexcept
+			{
+				hit_areas_.clear();
+				hit_areas_.push_back(area);
 			}
 
 
@@ -723,16 +712,10 @@ namespace ion::gui::controls
 				return caption_size_;
 			}
 
-			//Returns the horizontal caption alignment for this control
-			[[nodiscard]] inline auto& CaptionAlignment() const noexcept
+			//Returns the caption layout for this control
+			[[nodiscard]] inline auto& CaptionLayout() const noexcept
 			{
-				return caption_alignment_;
-			}
-
-			//Returns the vertical caption alignment for this control
-			[[nodiscard]] inline auto& CaptionVerticalAlignment() const noexcept
-			{
-				return caption_vertical_alignment_;
+				return caption_layout_;
 			}
 
 
@@ -753,6 +736,20 @@ namespace ion::gui::controls
 			{
 				return hit_areas_;
 			}
+
+			//Returns the hit area of this control
+			//Returns nullopt of this control has no hit area
+			[[nodiscard]] std::optional<Aabb> HitArea() const noexcept;
+
+			//Returns the visual area of this control
+			//The returned area includes the center part and border parts
+			//Returns nullopt of this control has no visuals
+			[[nodiscard]] std::optional<Aabb> VisualArea() const noexcept;
+
+			//Returns the visual center area of this control
+			//The returned area includes only the center part (no borders)
+			//Returns nullopt of this control has no visual center part
+			[[nodiscard]] std::optional<Aabb> VisualCenterArea() const noexcept;
 
 
 			//Returns the on focus callback
