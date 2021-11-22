@@ -13,6 +13,7 @@ File:	IonGuiControl.cpp
 #include "IonGuiControl.h"
 
 #include "graphics/materials/IonMaterial.h"
+#include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/IonSceneManager.h"
@@ -540,6 +541,8 @@ void GuiControl::AttachSkin(ControlSkin skin)
 	}
 
 	skin_ = std::move(skin);
+
+	UpdateCaption();
 	SetState(state_);
 }
 
@@ -569,6 +572,7 @@ void GuiControl::UpdateCaption() noexcept
 {
 	if (skin_.Caption)
 	{
+		//Caption text
 		if (auto &text = skin_.Caption->Get(); text)
 		{
 			auto visual_area = VisualArea();
@@ -580,18 +584,27 @@ void GuiControl::UpdateCaption() noexcept
 			auto center = visual_center_area ?
 				visual_center_area->Center() :
 				vector2::Zero;
-			auto left_border_width = visual_center_area ?
-				visual_center_area->Min().X() - visual_area->Min().X() :
-				0.0_r;
-			auto right_border_width = visual_center_area ?
-				visual_area->Max().X() - visual_center_area->Max().X() :
-				0.0_r;
 
+			//Area size
 			if (auto size = caption_size_.value_or(area.ToSize()); size != vector2::Zero)
 			{
+				//Adjust area size from camera to viewport space
+				if (auto scene_manager = skin_.Caption->Owner(); scene_manager)
+				{
+					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+						size *= viewport->CameraToViewportRatio();
+				}
+
 				text->AreaSize(size);
 
-				auto [x, y] =
+				auto left_border_width = visual_center_area ?
+					visual_center_area->Min().X() - visual_area->Min().X() :
+					0.0_r;
+				auto right_border_width = visual_center_area ?
+					visual_area->Max().X() - visual_center_area->Max().X() :
+					0.0_r;
+
+				skin_.Caption->ParentNode()->Position(
 					[&]() noexcept
 					{
 						switch (caption_layout_)
@@ -609,37 +622,18 @@ void GuiControl::UpdateCaption() noexcept
 							default:
 							return center;
 						}
-					}().XY();
-
-				skin_.Caption->Position({x, y, skin_.Caption->Position().Z()});
+					}());
 			}
 			else
 			{
 				text->AreaSize({});
-
-				auto [x, y] =
-					[&]() noexcept
-					{
-						switch (caption_layout_)
-						{
-							case ControlCaptionLayout::OutsideLeft:
-							case ControlCaptionLayout::OutsideTopLeft:
-							case ControlCaptionLayout::OutsideBottomLeft:
-							return Vector2{center.X() - size.X() - left_border_width, center.Y()};
-
-							case ControlCaptionLayout::OutsideRight:
-							case ControlCaptionLayout::OutsideTopRight:
-							case ControlCaptionLayout::OutsideBottomRight:
-							return Vector2{center.X() + size.X() + right_border_width, center.Y()};
-
-							default:
-							return center;
-						}
-					}().XY();
-
-				skin_.Caption->Position({x, y, skin_.Caption->Position().Z()});
+				skin_.Caption->ParentNode()->Position(center);
 			}
 
+			//Padding
+			text->Padding(caption_padding_.value_or(vector2::Zero));
+
+			//Alignment
 			text->Alignment(
 				[&]() noexcept
 				{
@@ -690,8 +684,11 @@ void GuiControl::UpdateCaption() noexcept
 					}
 				}());
 
+			//Content
 			if (caption_)
 				text->Content(*caption_);
+			else
+				text->Content({});
 		}
 	}
 }
@@ -875,7 +872,10 @@ void GuiControl::Size(const Vector2 &size) noexcept
 		}
 
 		if (resized)
+		{
+			UpdateCaption();
 			Resized();
+		}
 	}
 }
 

@@ -266,6 +266,7 @@ namespace ion::gui::controls
 			std::optional<std::string> tooltip_;
 
 			std::optional<Vector2> caption_size_;
+			std::optional<Vector2> caption_padding_;
 			gui_control::ControlCaptionLayout caption_layout_ = gui_control::ControlCaptionLayout::Center;
 
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
@@ -470,7 +471,7 @@ namespace ion::gui::controls
 				if (caption_ != text)
 				{
 					caption_ = std::move(text);
-					//update
+					UpdateCaption();
 				}
 			}
 
@@ -490,7 +491,17 @@ namespace ion::gui::controls
 				if (caption_size_ != size)
 				{
 					caption_size_ = size;
-					//update
+					UpdateCaption();
+				}
+			}
+
+			//Sets the caption padding for this control to the given padding
+			inline void CaptionPadding(const std::optional<Vector2> &padding) noexcept
+			{
+				if (caption_padding_ != padding)
+				{
+					caption_padding_ = padding;
+					UpdateCaption();
 				}
 			}
 
@@ -500,7 +511,7 @@ namespace ion::gui::controls
 				if (caption_layout_ != layout)
 				{
 					caption_layout_ = layout;
-					//update
+					UpdateCaption();
 				}
 			}
 			
@@ -710,6 +721,13 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto& CaptionSize() const noexcept
 			{
 				return caption_size_;
+			}
+
+			//Returns the caption padding size for this control
+			//Returns nullopt if no custom caption padding has been set
+			[[nodiscard]] inline auto& CaptionPadding() const noexcept
+			{
+				return caption_padding_;
 			}
 
 			//Returns the caption layout for this control

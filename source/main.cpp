@@ -1226,6 +1226,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			fps->Formatting(ion::graphics::fonts::text::TextFormatting::None);
 			fps->DefaultForegroundColor(color::White);
 
+			auto caption_text =
+				texts.CreateText(
+					"caption",
+					"",
+					verdana_12);
+
+			caption_text->DefaultForegroundColor(color::White);
+
 
 			using namespace ion::utilities;
 			ion::graphics::scene::SceneManager scene;
@@ -1395,6 +1403,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			button_model->AddPass(ion::graphics::render::Pass{model_program});
 
+			//GUI Caption
+			auto caption = scene.CreateText(caption_text);
+			caption->AddPass(ion::graphics::render::Pass{gui_text_program});
+			
+			ion::graphics::fonts::text::TextBlockStyle enabled_caption_style;
+			enabled_caption_style.ForegroundColor = caption_text->DefaultForegroundColor();
+
+
 			//Scene graph
 			auto scene_graph = engine.CreateSceneGraph("");
 
@@ -1417,15 +1433,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_skin.Parts.TopRight.SpriteObject = button_top_right;
 			button_skin.Parts.BottomRight.SpriteObject = button_bottom_right;
 
-			button_skin.Parts.Center.EnabledMaterial = button_center_enabled;	
-			button_skin.Parts.Top.EnabledMaterial = button_top_enabled;	
-			button_skin.Parts.Left.EnabledMaterial = button_left_enabled;	
+			button_skin.Parts.Center.EnabledMaterial = button_center_enabled;
+			button_skin.Parts.Top.EnabledMaterial = button_top_enabled;
+			button_skin.Parts.Left.EnabledMaterial = button_left_enabled;
 			button_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
 			button_skin.Parts.Right.EnabledMaterial = button_right_enabled;
 			button_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
 			button_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
 			button_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
-			button_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;		
+			button_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
+
+			button_skin.Caption.TextObject = caption;
+			button_skin.Caption.EnabledStyle = enabled_caption_style;
 
 			//GUI
 			ion::gui::GuiController controller{scene_graph->RootNode()};
@@ -1446,15 +1465,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto sub_panel2 = base_panel2->CreatePanel("sub");
 			sub_panel2->ZOrder(0.1_r);
 			auto sub_control2 = sub_panel2->CreateControl<ion::gui::controls::GuiControl>("control");
-
-			base_control->Node()->Position({0.0_r, 0.5_r});
+			
 			base_control->Skin(std::move(button_skin));
-
-			//auto size = base_control->Size();
-			//base_control->Size(0.3_r);
-			//size = base_control->Size();
 			base_control->Size({0.5_r, 0.1_r});
-			//size = base_control->Size();
+			base_control->Caption("My caption");
+			base_control->CaptionPadding(2.0_r);
+			base_control->CaptionLayout(ion::gui::controls::gui_control::ControlCaptionLayout::Center);
+			base_control->Node()->Position({0.0_r, 0.5_r});
 
 			//Camera
 			auto cam_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});
