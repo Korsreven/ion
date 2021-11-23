@@ -75,9 +75,11 @@ namespace ion::gui::controls
 
 		enum class ControlCaptionLayout
 		{
-			OutsideTopLeft,		TopLeft,	TopCenter,		TopRight,		OutsideTopRight,
-			OutsideLeft,		Left,		Center,			Right,			OutsideRight,
-			OutsideBottomLeft,	BottomLeft, BottomCenter,	BottomRight,	OutsideBottomRight
+								OutsideTopLeft,		OutsideTopCenter,		OutsideTopRight,
+			OutsideLeftTop,		TopLeft,			TopCenter,				TopRight,			OutsideRightTop,
+			OutsideLeftCenter,	Left,				Center,					Right,				OutsideRightCenter,
+			OutsideLeftBottom,	BottomLeft,			BottomCenter,			BottomRight,		OutsideRightBottom,
+								OutsideBottomLeft,	OutsideBottomCenter,	OutsideBottomRight
 		};
 
 		using Areas = std::vector<Aabb>;
@@ -196,6 +198,9 @@ namespace ion::gui::controls
 
 		namespace detail
 		{
+			constexpr auto default_caption_padding_size = 2.0_r;
+
+
 			inline auto control_state_to_material(ControlState state, ControlVisualPart &part) noexcept
 			{
 				switch (state)
@@ -246,6 +251,8 @@ namespace ion::gui::controls
 
 			void resize_area(Aabb &area, const Vector2 &scaling) noexcept;
 			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size) noexcept;
+
+			std::optional<Aabb> get_visual_center_area(const ControlSkin &skin) noexcept;
 		} //detail
 	} //gui_control
 
@@ -763,11 +770,6 @@ namespace ion::gui::controls
 			//The returned area includes the center part and border parts
 			//Returns nullopt of this control has no visuals
 			[[nodiscard]] std::optional<Aabb> VisualArea() const noexcept;
-
-			//Returns the visual center area of this control
-			//The returned area includes only the center part (no borders)
-			//Returns nullopt of this control has no visual center part
-			[[nodiscard]] std::optional<Aabb> VisualCenterArea() const noexcept;
 
 
 			//Returns the on focus callback

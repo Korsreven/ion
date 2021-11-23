@@ -1469,7 +1469,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			base_control->Skin(std::move(button_skin));
 			base_control->Size({0.5_r, 0.1_r});
 			base_control->Caption("My caption");
-			base_control->CaptionPadding(2.0_r);
 			base_control->CaptionLayout(ion::gui::controls::gui_control::ControlCaptionLayout::Center);
 			base_control->Node()->Position({0.0_r, 0.5_r});
 

@@ -90,6 +90,18 @@ void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size
 		resize_area(area, scaling);
 }
 
+
+std::optional<Aabb> get_visual_center_area(const ControlSkin &skin) noexcept
+{
+	if (skin.Parts)
+	{
+		skin.Parts.Center->Prepare();
+		return skin.Parts.Center->AxisAlignedBoundingBox();
+	}
+	else
+		return std::nullopt;
+}
+
 } //gui_control::detail
 
 //Protected
@@ -576,7 +588,7 @@ void GuiControl::UpdateCaption() noexcept
 		if (auto &text = skin_.Caption->Get(); text)
 		{
 			auto visual_area = VisualArea();
-			auto visual_center_area = VisualCenterArea();
+			auto visual_center_area = detail::get_visual_center_area(skin_);
 			auto area = visual_center_area.
 				value_or(HitArea().
 				value_or(aabb::Zero));
@@ -597,41 +609,54 @@ void GuiControl::UpdateCaption() noexcept
 
 				text->AreaSize(size);
 
-				auto left_border_width = visual_center_area ?
-					visual_center_area->Min().X() - visual_area->Min().X() :
-					0.0_r;
-				auto right_border_width = visual_center_area ?
-					visual_area->Max().X() - visual_center_area->Max().X() :
-					0.0_r;
+				auto top_right_size = visual_center_area ?
+					visual_area->Max() - visual_center_area->Max() :
+					vector2::Zero;
+				auto bottom_left_size = visual_center_area ?
+					visual_center_area->Min() - visual_area->Min() :
+					vector2::Zero;
 
-				skin_.Caption->ParentNode()->Position(
-					[&]() noexcept
-					{
-						switch (caption_layout_)
+				if (auto node = skin_.Caption->ParentNode(); node)
+					node->Position(
+						[&]() noexcept
 						{
-							case ControlCaptionLayout::OutsideLeft:
-							case ControlCaptionLayout::OutsideTopLeft:
-							case ControlCaptionLayout::OutsideBottomLeft:
-							return Vector2{center.X() - size.X() - left_border_width, center.Y()};
+							switch (caption_layout_)
+							{
+								case ControlCaptionLayout::OutsideLeftTop:
+								case ControlCaptionLayout::OutsideLeftCenter:
+								case ControlCaptionLayout::OutsideLeftBottom:
+								return Vector2{center.X() - size.X() - bottom_left_size.X(), center.Y()};
 
-							case ControlCaptionLayout::OutsideRight:
-							case ControlCaptionLayout::OutsideTopRight:
-							case ControlCaptionLayout::OutsideBottomRight:
-							return Vector2{center.X() + size.X() + right_border_width, center.Y()};
+								case ControlCaptionLayout::OutsideRightTop:
+								case ControlCaptionLayout::OutsideRightCenter:
+								case ControlCaptionLayout::OutsideRightBottom:
+								return Vector2{center.X() + size.X() + top_right_size.X(), center.Y()};
 
-							default:
-							return center;
-						}
-					}());
+								case ControlCaptionLayout::OutsideTopLeft:
+								case ControlCaptionLayout::OutsideTopCenter:
+								case ControlCaptionLayout::OutsideTopRight:
+								return Vector2{center.Y() + size.Y() + top_right_size.Y(), center.Y()};
+
+								case ControlCaptionLayout::OutsideBottomLeft:
+								case ControlCaptionLayout::OutsideBottomCenter:
+								case ControlCaptionLayout::OutsideBottomRight:
+								return Vector2{center.Y() - size.Y() - bottom_left_size.Y(), center.Y()};
+
+								default:
+								return center;
+							}
+						}());
 			}
 			else
 			{
 				text->AreaSize({});
-				skin_.Caption->ParentNode()->Position(center);
+
+				if (auto node = skin_.Caption->ParentNode(); node)
+					node->Position(center);
 			}
 
 			//Padding
-			text->Padding(caption_padding_.value_or(vector2::Zero));
+			text->Padding(caption_padding_.value_or(detail::default_caption_padding_size));
 
 			//Alignment
 			text->Alignment(
@@ -642,17 +667,21 @@ void GuiControl::UpdateCaption() noexcept
 						case ControlCaptionLayout::Left:
 						case ControlCaptionLayout::TopLeft:
 						case ControlCaptionLayout::BottomLeft:
-						case ControlCaptionLayout::OutsideRight:
-						case ControlCaptionLayout::OutsideTopRight:
-						case ControlCaptionLayout::OutsideBottomRight:
+						case ControlCaptionLayout::OutsideRightTop:
+						case ControlCaptionLayout::OutsideRightCenter:
+						case ControlCaptionLayout::OutsideRightBottom:
+						case ControlCaptionLayout::OutsideTopLeft:
+						case ControlCaptionLayout::OutsideBottomLeft:
 						return graphics::fonts::text::TextAlignment::Left;
 
 						case ControlCaptionLayout::Right:
 						case ControlCaptionLayout::TopRight:
 						case ControlCaptionLayout::BottomRight:
-						case ControlCaptionLayout::OutsideLeft:
-						case ControlCaptionLayout::OutsideTopLeft:
-						case ControlCaptionLayout::OutsideBottomLeft:
+						case ControlCaptionLayout::OutsideLeftTop:
+						case ControlCaptionLayout::OutsideLeftCenter:
+						case ControlCaptionLayout::OutsideLeftBottom:
+						case ControlCaptionLayout::OutsideTopRight:
+						case ControlCaptionLayout::OutsideBottomRight:
 						return graphics::fonts::text::TextAlignment::Right;
 
 						default:
@@ -668,15 +697,21 @@ void GuiControl::UpdateCaption() noexcept
 						case ControlCaptionLayout::TopLeft:
 						case ControlCaptionLayout::TopCenter:
 						case ControlCaptionLayout::TopRight:
-						case ControlCaptionLayout::OutsideTopLeft:
-						case ControlCaptionLayout::OutsideTopRight:
+						case ControlCaptionLayout::OutsideLeftTop:
+						case ControlCaptionLayout::OutsideRightTop:
+						case ControlCaptionLayout::OutsideBottomLeft:
+						case ControlCaptionLayout::OutsideBottomCenter:
+						case ControlCaptionLayout::OutsideBottomRight:
 						return graphics::fonts::text::TextVerticalAlignment::Top;
 
 						case ControlCaptionLayout::BottomLeft:
 						case ControlCaptionLayout::BottomCenter:
 						case ControlCaptionLayout::BottomRight:
-						case ControlCaptionLayout::OutsideBottomLeft:
-						case ControlCaptionLayout::OutsideBottomRight:
+						case ControlCaptionLayout::OutsideLeftBottom:
+						case ControlCaptionLayout::OutsideRightBottom:
+						case ControlCaptionLayout::OutsideTopLeft:
+						case ControlCaptionLayout::OutsideTopCenter:
+						case ControlCaptionLayout::OutsideTopRight:
 						return graphics::fonts::text::TextVerticalAlignment::Bottom;
 
 						default:
@@ -946,17 +981,6 @@ std::optional<Aabb> GuiControl::VisualArea() const noexcept
 	{
 		skin_.Parts->Prepare();
 		return skin_.Parts->AxisAlignedBoundingBox();
-	}
-	else
-		return std::nullopt;
-}
-
-std::optional<Aabb> GuiControl::VisualCenterArea() const noexcept
-{
-	if (skin_.Parts)
-	{
-		skin_.Parts.Center->Prepare();
-		return skin_.Parts.Center->AxisAlignedBoundingBox();
 	}
 	else
 		return std::nullopt;
