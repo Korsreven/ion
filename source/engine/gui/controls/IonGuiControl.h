@@ -252,7 +252,7 @@ namespace ion::gui::controls
 			void resize_area(Aabb &area, const Vector2 &scaling) noexcept;
 			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 
-			std::optional<Aabb> get_visual_center_area(const ControlSkin &skin) noexcept;
+			std::optional<Aabb> get_center_area(const ControlSkin &skin) noexcept;
 		} //detail
 	} //gui_control
 

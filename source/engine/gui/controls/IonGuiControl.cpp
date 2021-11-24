@@ -91,15 +91,43 @@ void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size
 }
 
 
-std::optional<Aabb> get_visual_center_area(const ControlSkin &skin) noexcept
+std::optional<Aabb> get_center_area(const ControlSkin &skin) noexcept
 {
 	if (skin.Parts)
 	{
-		skin.Parts.Center->Prepare();
-		return skin.Parts.Center->AxisAlignedBoundingBox();
+		skin.Parts->Prepare();
+
+		//Has center
+		if (skin.Parts.Center)
+			return skin.Parts.Center->AxisAlignedBoundingBox();
+
+		//Use sides to find center
+		else if (skin.Parts.Top && skin.Parts.Bottom)
+		{
+			auto [t_min, t_max] = skin.Parts.Top->AxisAlignedBoundingBox().MinMax();
+			auto [b_min, b_max] = skin.Parts.Bottom->AxisAlignedBoundingBox().MinMax();
+			return Aabb{{b_min.X(), b_max.Y()}, {t_max.X(), t_min.Y()}};
+		}		
+		else if (skin.Parts.Left && skin.Parts.Right)
+		{
+			auto [l_min, l_max] = skin.Parts.Left->AxisAlignedBoundingBox().MinMax();
+			auto [r_min, r_max] = skin.Parts.Right->AxisAlignedBoundingBox().MinMax();
+			return Aabb{{l_max.X(), l_min.Y()}, {r_min.X(), r_max.Y()}};
+		}
+
+		//Use corners to find center
+		else if (skin.Parts.TopLeft && skin.Parts.BottomRight)
+		{
+			auto [tl_min, tl_max] = skin.Parts.TopLeft->AxisAlignedBoundingBox().MinMax();
+			auto [br_min, br_max] = skin.Parts.BottomRight->AxisAlignedBoundingBox().MinMax();
+			return Aabb{{tl_max.X(), br_max.Y()}, {br_min.X(), tl_min.Y()}};
+		}
+		else if (skin.Parts.BottomLeft && skin.Parts.TopRight)
+			return Aabb{skin.Parts.BottomLeft->AxisAlignedBoundingBox().Max(),
+						skin.Parts.TopRight->AxisAlignedBoundingBox().Min()};
 	}
-	else
-		return std::nullopt;
+
+	return std::nullopt;
 }
 
 } //gui_control::detail
@@ -588,13 +616,13 @@ void GuiControl::UpdateCaption() noexcept
 		if (auto &text = skin_.Caption->Get(); text)
 		{
 			auto visual_area = VisualArea();
-			auto visual_center_area = detail::get_visual_center_area(skin_);
-			auto area = visual_center_area.
+			auto center_area = detail::get_center_area(skin_);
+			auto area = center_area.
 				value_or(HitArea().
 				value_or(aabb::Zero));
 
-			auto center = visual_center_area ?
-				visual_center_area->Center() :
+			auto center = center_area ?
+				center_area->Center() :
 				vector2::Zero;
 
 			//Area size
@@ -609,11 +637,11 @@ void GuiControl::UpdateCaption() noexcept
 
 				text->AreaSize(size);
 
-				auto top_right_size = visual_center_area ?
-					visual_area->Max() - visual_center_area->Max() :
+				auto top_right_size = visual_area && center_area ?
+					visual_area->Max() - center_area->Max() :
 					vector2::Zero;
-				auto bottom_left_size = visual_center_area ?
-					visual_center_area->Min() - visual_area->Min() :
+				auto bottom_left_size = visual_area && center_area ?
+					center_area->Min() - visual_area->Min() :
 					vector2::Zero;
 
 				if (auto node = skin_.Caption->ParentNode(); node)
