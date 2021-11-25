@@ -57,6 +57,17 @@ void GuiComponent::Detach() noexcept
 	Events
 */
 
+void GuiComponent::Created() noexcept
+{
+	//Optional to override
+}
+
+void GuiComponent::Removed() noexcept
+{
+	//Optional to override
+}
+
+
 void GuiComponent::Enabled() noexcept
 {
 	//User callback

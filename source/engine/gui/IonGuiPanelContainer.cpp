@@ -36,6 +36,8 @@ namespace gui_panel_container::detail
 
 void GuiPanelContainer::Created(GuiComponent &component) noexcept
 {
+	GuiContainer::Created(component); //Use base functionality
+
 	ordered_components_.push_back(&component);
 
 	if (auto control = dynamic_cast<controls::GuiControl*>(&component); control)
@@ -72,6 +74,8 @@ void GuiPanelContainer::Removed(GuiComponent &component) noexcept
 		Removed(*control);
 	else if (auto panel = dynamic_cast<GuiPanel*>(&component); panel)
 		Removed(*panel);
+
+	GuiContainer::Removed(component); //Use base functionality
 }
 
 void GuiPanelContainer::Removed(controls::GuiControl &control) noexcept

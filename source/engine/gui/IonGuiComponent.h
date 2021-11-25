@@ -32,7 +32,7 @@ namespace ion::gui
 {
 	//Forward declarations
 	class GuiComponent;
-	struct GuiContainer;
+	class GuiContainer;
 
 	using namespace graphics::scene::graph;
 
@@ -44,6 +44,8 @@ namespace ion::gui
 
 	class GuiComponent : public managed::ManagedObject<GuiContainer>
 	{
+		friend GuiContainer;
+
 		private:
 
 			/*
@@ -65,6 +67,13 @@ namespace ion::gui
 			/*
 				Events
 			*/
+
+			//Called right after a component has been created or adopted
+			virtual void Created() noexcept;
+
+			//Called right after a component has been removed or orphaned
+			virtual void Removed() noexcept;
+
 
 			//Called right after a component has been enabled
 			virtual void Enabled() noexcept;

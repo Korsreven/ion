@@ -976,7 +976,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//while (!sounds.Loaded());
 
-			night_runner->Play()->Volume(0.2_r);
+			//night_runner->Play()->Volume(0.2_r);
 
 
 			//Material
@@ -1453,7 +1453,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto main_frame = controller.CreateFrame("main");
 			auto base_panel = main_frame->CreatePanel("base");
 			base_panel->ZOrder(0.1_r);
-			auto base_control = base_panel->CreateControl<ion::gui::controls::GuiControl>("control");
+			auto base_control = base_panel->CreateControl<ion::gui::controls::GuiControl>("control",
+				"My caption", std::move(button_skin), Vector2{0.5_r, 0.1_r});
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);
 			auto sub_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("control");	
@@ -1465,11 +1466,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto sub_panel2 = base_panel2->CreatePanel("sub");
 			sub_panel2->ZOrder(0.1_r);
 			auto sub_control2 = sub_panel2->CreateControl<ion::gui::controls::GuiControl>("control");
-			
-			base_control->Skin(std::move(button_skin));
-			base_control->Size({0.5_r, 0.1_r});
-			base_control->Caption("My caption");
-			base_control->CaptionLayout(ion::gui::controls::gui_control::ControlCaptionLayout::Center);
+
 			base_control->Node()->Position({0.0_r, 0.5_r});
 
 			//Camera

@@ -21,6 +21,25 @@ namespace gui_container::detail
 } //gui_container::detail
 
 
+//Protected
+
+/*
+	Events
+*/
+
+void GuiContainer::Created(GuiComponent &component) noexcept
+{
+	component.Created();
+}
+
+void GuiContainer::Removed(GuiComponent &component) noexcept
+{
+	component.Removed();
+}
+
+
+//Public
+
 /*
 	Components
 	Retrieving

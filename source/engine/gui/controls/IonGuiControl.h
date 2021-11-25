@@ -296,6 +296,13 @@ namespace ion::gui::controls
 				Events
 			*/
 
+			//See GuiComponent::Created for more details
+			virtual void Created() noexcept override;
+
+			//See GuiComponent::Removed for more details
+			virtual void Removed() noexcept override;
+
+
 			//See GuiComponent::Enabled for more details
 			virtual void Enabled() noexcept override;
 
@@ -382,8 +389,9 @@ namespace ion::gui::controls
 				Skins
 			*/
 
-			void AttachSkin(gui_control::ControlSkin skin);
+			void AttachSkin();
 			void DetachSkin() noexcept;
+			void RemoveSkin() noexcept;
 
 			void UpdateCaption() noexcept;
 
@@ -398,11 +406,13 @@ namespace ion::gui::controls
 			//Construct a control with the given name and hit areas
 			GuiControl(std::string name, gui_control::Areas areas);
 
-			//Construct a control with the given name and skin
-			GuiControl(std::string name, gui_control::ControlSkin skin);
 
-			//Construct a control with the given name, skin and size
-			GuiControl(std::string name, gui_control::ControlSkin skin, const Vector2 &size);
+			//Construct a control with the given name, caption and skin
+			GuiControl(std::string name, std::string caption, gui_control::ControlSkin skin);
+
+			//Construct a control with the given name, caption, skin and size
+			GuiControl(std::string name, std::string caption, gui_control::ControlSkin skin, const Vector2 &size);
+
 
 			//Virtual destructor
 			virtual ~GuiControl() noexcept;

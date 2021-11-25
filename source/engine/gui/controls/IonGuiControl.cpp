@@ -138,6 +138,17 @@ std::optional<Aabb> get_center_area(const ControlSkin &skin) noexcept
 	Events
 */
 
+void GuiControl::Created() noexcept
+{
+	AttachSkin();
+}
+
+void GuiControl::Removed() noexcept
+{
+	DetachSkin();
+}
+
+
 void GuiControl::Enabled() noexcept
 {
 	SetState(ControlState::Enabled);
@@ -558,29 +569,25 @@ void GuiControl::SetState(ControlState state) noexcept
 	Skins
 */
 
-void GuiControl::AttachSkin(ControlSkin skin)
+void GuiControl::AttachSkin()
 {
-	DetachSkin();
-
-	if (skin.Parts)
+	if (skin_.Parts)
 	{
-		if (auto node = skin.Parts->ParentNode(); node)
-			node->DetachObject(*skin.Parts.ModelObject);
+		if (auto node = skin_.Parts->ParentNode(); node)
+			node->DetachObject(*skin_.Parts.ModelObject);
 		
 		if (node_) //Create node for all parts
-			node_->CreateChildNode(node_->Visible())->AttachObject(*skin.Parts.ModelObject);
+			node_->CreateChildNode(node_->Visible())->AttachObject(*skin_.Parts.ModelObject);
 	}
 
-	if (skin.Caption)
+	if (skin_.Caption)
 	{
-		if (auto node = skin.Caption->ParentNode(); node)
-			node->DetachObject(*skin.Caption.TextObject);
+		if (auto node = skin_.Caption->ParentNode(); node)
+			node->DetachObject(*skin_.Caption.TextObject);
 		
 		if (node_) //Create node for caption
-			node_->CreateChildNode(node_->Visible())->AttachObject(*skin.Caption.TextObject);
+			node_->CreateChildNode(node_->Visible())->AttachObject(*skin_.Caption.TextObject);
 	}
-
-	skin_ = std::move(skin);
 
 	UpdateCaption();
 	SetState(state_);
@@ -592,17 +599,24 @@ void GuiControl::DetachSkin() noexcept
 	{
 		if (auto node = skin_.Parts->ParentNode(); node_ && node)
 			node_->RemoveChildNode(*node); //Remove parts node
-
-		skin_.Parts->Owner()->RemoveModel(*skin_.Parts.ModelObject); //Remove all parts
 	}
 
 	if (skin_.Caption)
 	{
 		if (auto node = skin_.Caption->ParentNode(); node_ && node)
 			node_->RemoveChildNode(*node); //Remove caption node
-
-		skin_.Caption->Owner()->RemoveText(*skin_.Caption.TextObject); //Remove caption
 	}
+}
+
+void GuiControl::RemoveSkin() noexcept
+{
+	DetachSkin();
+
+	if (skin_.Parts)
+		skin_.Parts->Owner()->RemoveModel(*skin_.Parts.ModelObject); //Remove all parts
+
+	if (skin_.Caption)
+		skin_.Caption->Owner()->RemoveText(*skin_.Caption.TextObject); //Remove caption
 
 	skin_ = {};
 }
@@ -628,14 +642,16 @@ void GuiControl::UpdateCaption() noexcept
 			//Area size
 			if (auto size = caption_size_.value_or(area.ToSize()); size != vector2::Zero)
 			{
+				auto adjusted_size = size;
+
 				//Adjust area size from camera to viewport space
 				if (auto scene_manager = skin_.Caption->Owner(); scene_manager)
 				{
 					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-						size *= viewport->CameraToViewportRatio();
+						adjusted_size *= viewport->CameraToViewportRatio();
 				}
 
-				text->AreaSize(size);
+				text->AreaSize(adjusted_size);
 
 				auto top_right_size = visual_area && center_area ?
 					visual_area->Max() - center_area->Max() :
@@ -663,12 +679,12 @@ void GuiControl::UpdateCaption() noexcept
 								case ControlCaptionLayout::OutsideTopLeft:
 								case ControlCaptionLayout::OutsideTopCenter:
 								case ControlCaptionLayout::OutsideTopRight:
-								return Vector2{center.Y() + size.Y() + top_right_size.Y(), center.Y()};
+								return Vector2{center.X(), center.Y() + size.Y() + top_right_size.Y()};
 
 								case ControlCaptionLayout::OutsideBottomLeft:
 								case ControlCaptionLayout::OutsideBottomCenter:
 								case ControlCaptionLayout::OutsideBottomRight:
-								return Vector2{center.Y() - size.Y() - bottom_left_size.Y(), center.Y()};
+								return Vector2{center.X(), center.Y() - size.Y() - bottom_left_size.Y()};
 
 								default:
 								return center;
@@ -781,22 +797,29 @@ GuiControl::GuiControl(std::string name, Areas areas) :
 	//Empty
 }
 
-GuiControl::GuiControl(std::string name, ControlSkin skin) :
-	GuiComponent{std::move(name)}
+
+GuiControl::GuiControl(std::string name, std::string caption, ControlSkin skin) :
+
+	GuiComponent{std::move(name)},
+	caption_{std::move(caption)},
+	skin_{std::move(skin)}
 {
-	AttachSkin(std::move(skin));
+	//Empty
 }
 
-GuiControl::GuiControl(std::string name, ControlSkin skin, const Vector2 &size) :
-	GuiComponent{std::move(name)}
+GuiControl::GuiControl(std::string name, std::string caption, ControlSkin skin, const Vector2 &size) :
+
+	GuiComponent{std::move(name)},
+	caption_{std::move(caption)},
+	skin_{std::move(skin)}
 {
-	AttachSkin(std::move(skin));
 	Size(size); //Resize skin to the given size
 }
 
+
 GuiControl::~GuiControl() noexcept
 {
-	DetachSkin();
+	RemoveSkin();
 }
 
 
@@ -974,7 +997,9 @@ void GuiControl::Skin(ControlSkin skin) noexcept
 			}
 		}
 
-		AttachSkin(std::move(skin));
+		RemoveSkin();
+		skin_ = std::move(skin);
+		AttachSkin();
 	}
 }
 
