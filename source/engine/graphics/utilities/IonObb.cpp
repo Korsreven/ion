@@ -227,7 +227,8 @@ bool Obb::Intersects(const Obb &obb) const noexcept
 
 bool Obb::Intersects(const Vector2 &point) const noexcept
 {
-	Obb obb{point, point + 1.0_r};
+	auto epsilon = std::numeric_limits<real>::epsilon();
+	Obb obb{point - epsilon, point + epsilon};
 	return intersects_one_way(obb) && obb.intersects_one_way(*this);
 }
 
