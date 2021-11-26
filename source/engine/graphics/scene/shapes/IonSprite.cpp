@@ -132,6 +132,8 @@ void Sprite::RecalculateTexCoords() noexcept
 														lower_left, upper_right);
 		lower_left_tex_coord_ = new_lower_left;
 		upper_right_tex_coord_ = new_upper_right;
+
+		update_vertices_ = true;
 	}
 }
 

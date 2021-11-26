@@ -156,6 +156,8 @@ namespace ion::graphics::scene::shapes
 					
 					if (auto_size_)
 						RecalculateSize();
+					else if (auto_repeat_)
+						RecalculateTexCoords();
 				}
 			}
 
