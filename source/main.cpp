@@ -226,6 +226,7 @@ struct Game :
 {
 	ion::NonOwningPtr<ion::graphics::scene::graph::SceneGraph> scene_graph;
 	ion::NonOwningPtr<ion::graphics::render::Viewport> viewport;
+	ion::gui::GuiController *controller = nullptr;
 	ion::sounds::SoundManager *sound_manager = nullptr;
 
 	ion::NonOwningPtr<ion::graphics::scene::DrawableText> fps;
@@ -315,6 +316,9 @@ struct Game :
 				player_camera->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
 		}
 
+		if (controller)
+			controller->FrameStarted(time);
+
 		return true;
 	}
 
@@ -323,7 +327,9 @@ struct Game :
 		if (sound_manager)
 			sound_manager->Update();
 
-		time;
+		if (controller)
+			controller->FrameEnded(time);
+
 		return true;
 	}
 
@@ -334,7 +340,8 @@ struct Game :
 
 	void WindowActionReceived(ion::events::listeners::WindowAction action) noexcept override
 	{
-		action;
+		if (controller)
+			controller->WindowActionReceived(action);
 	}
 
 
@@ -397,6 +404,9 @@ struct Game :
 			rotate_camera_right = true;
 			break;
 		}
+
+		if (controller)
+			controller->KeyPressed(button);
 	}
 
 	void KeyReleased(ion::events::listeners::KeyButton button) noexcept override
@@ -498,11 +508,15 @@ struct Game :
  				break;
 			}
 		}
+
+		if (controller)
+			controller->KeyReleased(button);
   	}
 
 	void CharacterPressed(char character) noexcept override
 	{
-		character;
+		if (controller)
+			controller->CharacterPressed(character);
 	}
 
 
@@ -512,25 +526,26 @@ struct Game :
 
 	void MousePressed(ion::events::listeners::MouseButton button, ion::graphics::utilities::Vector2 position) noexcept override
 	{
-		button;
-		position;
+		if (controller)
+			controller->MousePressed(button, position);
 	}
 
 	void MouseReleased(ion::events::listeners::MouseButton button, ion::graphics::utilities::Vector2 position) noexcept override
 	{
-		button;
-		position;
+		if (controller)
+			controller->MouseReleased(button, position);
 	}
 
 	void MouseMoved(ion::graphics::utilities::Vector2 position) noexcept override
 	{
-		position;
+		if (controller)
+			controller->MouseMoved(position);
 	}
 
 	void MouseWheelRolled(int delta, ion::graphics::utilities::Vector2 position) noexcept override
 	{
-		delta;
-		position;
+		if (controller)
+			controller->MouseWheelRolled(delta, position);
 	}
 };
 
@@ -628,6 +643,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//GUI textures
 			auto button_center_enabled_diffuse = textures.CreateTexture("button_center_enabled", "button_center_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto button_center_pressed_diffuse = textures.CreateTexture("button_center_pressed", "button_center_pressed.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto button_center_hovered_diffuse = textures.CreateTexture("button_center_hovered", "button_center_hovered.png",
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 			auto button_top_enabled_diffuse = textures.CreateTexture("button_top_enabled", "button_top_enabled.png",
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
@@ -1104,6 +1123,24 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{1.0_r, 1.0_r, 1.0_r},
 					0.0_r, button_center_enabled_diffuse, nullptr, nullptr);
 			button_center_enabled->LightingEnabled(false);
+
+			auto button_center_pressed =
+				materials.CreateMaterial("button_center_pressed",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_center_pressed_diffuse, nullptr, nullptr);
+			button_center_pressed->LightingEnabled(false);
+
+			auto button_center_hovered =
+				materials.CreateMaterial("button_center_hovered",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_center_hovered_diffuse, nullptr, nullptr);
+			button_center_hovered->LightingEnabled(false);
 			
 			auto button_top_enabled =
 				materials.CreateMaterial("button_top_enabled",
@@ -1407,8 +1444,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto caption = scene.CreateText(caption_text);
 			caption->AddPass(ion::graphics::render::Pass{gui_text_program});
 			
-			ion::graphics::fonts::text::TextBlockStyle enabled_caption_style;
-			enabled_caption_style.ForegroundColor = caption_text->DefaultForegroundColor();
+			ion::graphics::fonts::text::TextBlockStyle caption_style_enabled;
+			caption_style_enabled.ForegroundColor = caption_text->DefaultForegroundColor();
+
+			ion::graphics::fonts::text::TextBlockStyle caption_style_hovered;
+			caption_style_hovered.ForegroundColor = caption_text->DefaultForegroundColor();
+			caption_style_hovered.Decoration = ion::graphics::fonts::text::TextDecoration::Underline;
 
 
 			//Scene graph
@@ -1434,6 +1475,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_skin.Parts.BottomRight.SpriteObject = button_bottom_right;
 
 			button_skin.Parts.Center.EnabledMaterial = button_center_enabled;
+			button_skin.Parts.Center.PressedMaterial = button_center_pressed;
+			button_skin.Parts.Center.HoveredMaterial = button_center_hovered;
 			button_skin.Parts.Top.EnabledMaterial = button_top_enabled;
 			button_skin.Parts.Left.EnabledMaterial = button_left_enabled;
 			button_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
@@ -1444,7 +1487,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
 
 			button_skin.Caption.TextObject = caption;
-			button_skin.Caption.EnabledStyle = enabled_caption_style;
+			button_skin.Caption.EnabledStyle = caption_style_enabled;
+			button_skin.Caption.HoveredStyle = caption_style_hovered;
 
 			//GUI
 			ion::gui::GuiController controller{scene_graph->RootNode()};
@@ -1453,8 +1497,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto main_frame = controller.CreateFrame("main");
 			auto base_panel = main_frame->CreatePanel("base");
 			base_panel->ZOrder(0.1_r);
+
 			auto base_control = base_panel->CreateControl<ion::gui::controls::GuiControl>("control",
 				"My caption", std::move(button_skin), Vector2{0.5_r, 0.1_r});
+			base_control->Node()->Position({0.0_r, 0.5_r});
+
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);
 			auto sub_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("control");	
@@ -1466,8 +1513,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto sub_panel2 = base_panel2->CreatePanel("sub");
 			sub_panel2->ZOrder(0.1_r);
 			auto sub_control2 = sub_panel2->CreateControl<ion::gui::controls::GuiControl>("control");
-
-			base_control->Node()->Position({0.0_r, 0.5_r});
+			
+			main_frame->Activate();
+			main_frame->Focus();
 
 			//Camera
 			auto cam_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});
@@ -1577,6 +1625,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Game
 			game.scene_graph = scene_graph;	
 			game.viewport = viewport;
+			game.controller = &controller;
 			game.sound_manager = &sounds;
 			game.fps = text;
 			game.player_node = player_node;

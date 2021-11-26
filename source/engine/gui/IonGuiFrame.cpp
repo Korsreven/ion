@@ -664,25 +664,30 @@ bool GuiFrame::MouseMoved(Vector2 position) noexcept
 
 				else
 				{
+					//Build the correct tab ordering for all controls in this frame
+					if (std::empty(ordered_controls_))
+						ordered_controls_ = detail::get_ordered_controls(*this);
+
 					//Check all other controls
-					for (auto &control : Controls())
+					for (auto &control : ordered_controls_)
 					{
-						if (&control != hovered_control_ &&
-							control.Intersects(position))
-							return &control;
+						if (control != hovered_control_ &&
+							control->Intersects(position))
+							return control;
 					}
 
 					return nullptr;
 				}
 			}();
 
-		if (intersected_control &&
-			intersected_control != hovered_control_)
+		if (intersected_control != hovered_control_)
 		{
 			if (hovered_control_)
 				hovered_control_->Exit();
 
-			intersected_control->Enter();
+			if (intersected_control)
+				intersected_control->Enter();
+
 			return true; //Consumed
 		}
 

@@ -503,25 +503,41 @@ void GuiControl::SetCaptionState(ControlState state, ControlCaptionPart &part) n
 		{
 			if (auto &style = GetStateStyle(state, part); style)
 			{
-				if (style->ForegroundColor &&
-					c_part.Get()->DefaultForegroundColor() != *style->ForegroundColor)
-					part->Get()->DefaultForegroundColor(*style->ForegroundColor);
+				if (style->ForegroundColor)
+				{
+					if (c_part.Get()->DefaultForegroundColor() != *style->ForegroundColor)
+						part->Get()->DefaultForegroundColor(*style->ForegroundColor);
+				}
 
-				if (style->BackgroundColor &&
-					c_part.Get()->DefaultBackgroundColor() != *style->BackgroundColor)
-					part->Get()->DefaultBackgroundColor(*style->BackgroundColor);
+				if (style->BackgroundColor)
+				{
+					if (c_part.Get()->DefaultBackgroundColor() != *style->BackgroundColor)
+						part->Get()->DefaultBackgroundColor(*style->BackgroundColor);
+				}
 
-				if (style->FontStyle &&
-					c_part.Get()->DefaultFontStyle() != *style->FontStyle)
-					part->Get()->DefaultFontStyle(*style->FontStyle);
+				if (style->FontStyle)
+				{
+					if (c_part.Get()->DefaultFontStyle() != *style->FontStyle)
+						part->Get()->DefaultFontStyle(*style->FontStyle);
+				}
+				else if (c_part.Get()->DefaultFontStyle())
+					part->Get()->DefaultFontStyle({});
 
-				if (style->Decoration &&
-					c_part.Get()->DefaultDecoration() != *style->Decoration)
-					part->Get()->DefaultDecoration(*style->Decoration);
+				if (style->Decoration)
+				{
+					if (c_part.Get()->DefaultDecoration() != *style->Decoration)
+						part->Get()->DefaultDecoration(*style->Decoration);
+				}
+				else if (c_part.Get()->DefaultDecoration())
+					part->Get()->DefaultDecoration({});
 
-				if (style->DecorationColor &&
-					c_part.Get()->DefaultDecorationColor() != *style->DecorationColor)
-					part->Get()->DefaultDecorationColor(*style->DecorationColor);
+				if (style->DecorationColor)
+				{
+					if (c_part.Get()->DefaultDecorationColor() != *style->DecorationColor)
+						part->Get()->DefaultDecorationColor(*style->DecorationColor);
+				}
+				else if (c_part.Get()->DefaultDecorationColor())
+					part->Get()->DefaultDecorationColor({});
 			}
 		}
 	}
@@ -588,9 +604,9 @@ void GuiControl::AttachSkin()
 		if (node_) //Create node for caption
 			node_->CreateChildNode(node_->Visible())->AttachObject(*skin_.Caption.TextObject);
 	}
-
-	UpdateCaption();
+	
 	SetState(state_);
+	UpdateCaption();
 }
 
 void GuiControl::DetachSkin() noexcept
