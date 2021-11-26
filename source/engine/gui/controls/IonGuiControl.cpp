@@ -1085,15 +1085,28 @@ bool GuiControl::Intersects(const Vector2 &point) const noexcept
 			if (skin_.Parts)
 			{
 				skin_.Parts->Prepare();
-				return skin_.Parts->WorldOrientedBoundingBox().Intersects(point);
+
+				//Check for intersection
+				if (skin_.Parts->WorldAxisAlignedBoundingBox().Intersects(point))
+				{
+					auto node = skin_.Parts->ParentNode();
+					return !node || node->AxisAligned() ||
+							skin_.Parts->WorldOrientedBoundingBox().Intersects(point);
+				}
 			}
 		}
 		else
 		{
 			for (auto &area : hit_areas_)
 			{
-				if (Obb{area}.Transform(node_->FullTransformation()).Intersects(point))
-					return true;
+				//Check for intersection
+				if (area.TransformCopy(node_->FullTransformation()).Intersects(point))
+				{
+					auto node = skin_.Parts->ParentNode();
+					if (!node || node->AxisAligned() ||
+						Obb{area}.Transform(node_->FullTransformation()).Intersects(point))
+						return true;
+				}
 			}
 		}
 	}
