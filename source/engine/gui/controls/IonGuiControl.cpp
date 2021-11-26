@@ -816,6 +816,16 @@ GuiControl::GuiControl(std::string name, std::string caption, ControlSkin skin, 
 	Size(size); //Resize skin to the given size
 }
 
+GuiControl::GuiControl(std::string name, std::string caption, ControlSkin skin, Areas areas) :
+
+	GuiComponent{std::move(name)},
+	caption_{std::move(caption)},
+	skin_{std::move(skin)}
+{
+	Size(Aabb::Enclose(areas).ToSize()); //Resize skin to the enclosed size of the given areas
+	hit_areas_ = std::move(areas);
+}
+
 
 GuiControl::~GuiControl() noexcept
 {
