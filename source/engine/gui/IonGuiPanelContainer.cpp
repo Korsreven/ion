@@ -132,6 +132,25 @@ void GuiPanelContainer::Disabled() noexcept
 }
 
 
+void GuiPanelContainer::Shown() noexcept
+{
+	GuiComponent::Shown(); //Use base functionality
+}
+
+void GuiPanelContainer::Hidden() noexcept
+{
+	if (auto frame = ParentFrame(); frame)
+	{
+		if (auto control = frame->FocusedControl();
+			control && control->IsDescendantOf(*this))
+
+			control->Reset();
+	}
+
+	GuiComponent::Hidden(); //Use base functionality
+}
+
+
 //Public
 
 /*

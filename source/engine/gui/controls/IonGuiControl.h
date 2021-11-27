@@ -267,7 +267,6 @@ namespace ion::gui::controls
 			bool pressed_ = false;
 			bool hovered_ = false;
 			bool focusable_ = true;
-			bool visible_ = true;
 
 			std::optional<std::string> caption_;
 			std::optional<std::string> tooltip_;
@@ -308,6 +307,13 @@ namespace ion::gui::controls
 
 			//See GuiComponent::Disabled for more details
 			virtual void Disabled() noexcept override;
+
+
+			//See GuiComponent::Shown for more details
+			virtual void Shown() noexcept override;
+
+			//See GuiComponent::Hidden for more details
+			virtual void Hidden() noexcept override;
 
 
 			//Called right after a control has been focused
@@ -354,6 +360,9 @@ namespace ion::gui::controls
 
 			void NotifyControlEnabled() noexcept;
 			void NotifyControlDisabled() noexcept;
+
+			void NotifyControlShown() noexcept;
+			void NotifyControlHidden() noexcept;
 
 			void NotifyControlFocused() noexcept;
 			void NotifyControlDefocused() noexcept;
@@ -425,6 +434,10 @@ namespace ion::gui::controls
 				Modifiers
 			*/
 
+			//Show this control
+			void Show() noexcept;
+
+
 			//Focus this control
 			void Focus() noexcept;
 
@@ -480,9 +493,6 @@ namespace ion::gui::controls
 						Defocus();
 				}
 			}
-
-			//Sets whether or not this control is visible
-			void Visible(bool visible) noexcept;
 
 
 			//Sets the caption text for this control to the given text
@@ -709,12 +719,6 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto IsHovered() const noexcept
 			{
 				return hovered_;
-			}
-
-			//Returns true if this control is visible
-			[[nodiscard]] inline auto IsVisible() const noexcept
-			{
-				return visible_;
 			}
 
 

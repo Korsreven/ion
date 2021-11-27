@@ -83,6 +83,21 @@ void GuiComponent::Disabled() noexcept
 }
 
 
+void GuiComponent::Shown() noexcept
+{
+	//User callback
+	if (on_show_)
+		(*on_show_)(*this);
+}
+
+void GuiComponent::Hidden() noexcept
+{
+	//User callback
+	if (on_hide_)
+		(*on_hide_)(*this);
+}
+
+
 //Public
 
 GuiComponent::GuiComponent(const GuiComponent &rhs) :
@@ -122,6 +137,31 @@ void GuiComponent::Disable() noexcept
 }
 
 
+void GuiComponent::Show() noexcept
+{
+	if (node_)
+		node_->Visible(true, false);
+
+	if (!visible_)
+	{
+		visible_ = true;
+		Shown();
+	}
+}
+
+void GuiComponent::Hide() noexcept
+{
+	if (node_)
+		node_->Visible(false);
+
+	if (visible_)
+	{
+		visible_ = false;
+		Hidden();
+	}
+}
+
+
 void GuiComponent::Parent(GuiComponent &parent) noexcept
 {
 	if (owner_ == parent.Owner())
@@ -139,7 +179,9 @@ void GuiComponent::Owner(GuiContainer &owner) noexcept
 	Detach();
 
 	parent_ = &owner;
-	node_ = parent_->Node() ? parent_->Node()->CreateChildNode() : nullptr;
+	node_ = parent_->Node() ?
+		parent_->Node()->CreateChildNode(parent_->Node()->Visible()) :
+		nullptr;
 }
 
 void GuiComponent::Owner(std::nullptr_t) noexcept

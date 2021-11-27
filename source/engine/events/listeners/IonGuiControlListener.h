@@ -41,6 +41,19 @@ namespace ion::events::listeners
 		}
 
 
+		//Called right after a gui control has been shown, with a mutable reference to the control that was showed
+		virtual void Shown([[maybe_unused]] gui::controls::GuiControl &control) noexcept
+		{
+			//Optional to override
+		}
+
+		//Called right after a gui control has been hidden, with a mutable reference to the control that was hid
+		virtual void Hidden([[maybe_unused]] gui::controls::GuiControl &control) noexcept
+		{
+			//Optional to override
+		}
+
+
 		//Called right after a gui control has been focused, with a mutable reference to the control that was focused
 		virtual void Focused([[maybe_unused]] gui::controls::GuiControl &control) noexcept
 		{

@@ -57,11 +57,14 @@ namespace ion::gui
 		protected:
 			
 			bool enabled_ = true;
+			bool visible_ = true;
 			GuiComponent *parent_ = nullptr;
 			NonOwningPtr<SceneNode> node_;
 
 			std::optional<events::Callback<void, GuiComponent&>> on_enable_;
 			std::optional<events::Callback<void, GuiComponent&>> on_disable_;
+			std::optional<events::Callback<void, GuiComponent&>> on_show_;
+			std::optional<events::Callback<void, GuiComponent&>> on_hide_;
 
 
 			/*
@@ -80,6 +83,13 @@ namespace ion::gui
 
 			//Called right after a component has been disabled
 			virtual void Disabled() noexcept;
+
+
+			//Called right after a component has been shown
+			virtual void Shown() noexcept;
+
+			//Called right after a component has been hidden
+			virtual void Hidden() noexcept;
 
 		public:
 
@@ -119,6 +129,13 @@ namespace ion::gui
 			void Disable() noexcept;
 
 
+			//Show this component
+			void Show() noexcept;
+
+			//Hide this component
+			void Hide() noexcept;
+
+
 			//Sets whether or not this component is enabled
 			inline void Enabled(bool enabled) noexcept
 			{
@@ -127,6 +144,16 @@ namespace ion::gui
 				else
 					Disable();
 			}
+
+			//Sets whether or not this component is visible
+			inline void Visible(bool visible) noexcept
+			{
+				if (visible)
+					Show();
+				else
+					Hide();
+			}
+
 
 			//Set the parent of this component
 			void Parent(GuiComponent &parent) noexcept;
@@ -158,6 +185,32 @@ namespace ion::gui
 			}
 
 
+			//Sets the on show callback
+			inline void OnShow(events::Callback<void, GuiComponent&> on_show) noexcept
+			{
+				on_show_ = on_show;
+			}
+
+			//Sets the on show callback
+			inline void OnShow(std::nullopt_t) noexcept
+			{
+				on_show_ = {};
+			}
+
+
+			//Sets the on hide callback
+			inline void OnHide(events::Callback<void, GuiComponent&> on_hide) noexcept
+			{
+				on_hide_ = on_hide;
+			}
+
+			//Sets the on hide callback
+			inline void OnHide(std::nullopt_t) noexcept
+			{
+				on_hide_ = {};
+			}
+
+
 			//Set ownership of this component
 			void Owner(GuiContainer &owner) noexcept;
 
@@ -177,6 +230,13 @@ namespace ion::gui
 			{
 				return enabled_;
 			}
+
+			//Returns true if this component is visible
+			[[nodiscard]] inline auto IsVisible() const noexcept
+			{
+				return visible_;
+			}
+
 
 			//Returns a pointer to the parent of this component
 			[[nodiscard]] inline auto Parent() const noexcept
@@ -201,6 +261,19 @@ namespace ion::gui
 			[[nodiscard]] inline auto OnDisable() const noexcept
 			{
 				return on_disable_;
+			}
+
+
+			//Returns the on show callback
+			[[nodiscard]] inline auto OnShow() const noexcept
+			{
+				return on_show_;
+			}
+
+			//Returns the on hide callback
+			[[nodiscard]] inline auto OnHide() const noexcept
+			{
+				return on_hide_;
 			}
 
 

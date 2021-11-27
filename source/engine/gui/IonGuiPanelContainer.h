@@ -79,6 +79,13 @@ namespace ion::gui
 			//See GuiComponent::Disabled for more details
 			virtual void Disabled() noexcept override;
 
+
+			//See GuiComponent::Shown for more details
+			virtual void Shown() noexcept override;
+
+			//See GuiComponent::Hidden for more details
+			virtual void Hidden() noexcept override;
+
 		public:
 
 			using GuiContainer::GuiContainer;

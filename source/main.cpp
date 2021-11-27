@@ -1607,7 +1607,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto sub_panel2 = base_panel2->CreatePanel("sub");
 			sub_panel2->ZOrder(0.1_r);
 			auto sub_control2 = sub_panel2->CreateControl<ion::gui::controls::GuiControl>("control");
-			
+
 			main_frame->Activate();
 			main_frame->Focus();
 

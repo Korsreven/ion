@@ -13,6 +13,7 @@ File:	IonGuiFrame.cpp
 #include "IonGuiFrame.h"
 
 #include "IonGuiController.h"
+#include "graphics/scene/graph/IonSceneNode.h"
 
 namespace ion::gui
 {
@@ -63,11 +64,17 @@ std::optional<control_pointers::iterator> get_current_control_iterator(control_p
 
 //Private
 
-bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
+void GuiFrame::GatherControls()
 {
 	//Build the correct tab ordering for all controls in this frame
 	if (std::empty(ordered_controls_))
 		ordered_controls_ = detail::get_ordered_controls(*this);
+}
+
+
+bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
+{
+	GatherControls();
 
 	if (auto current_iter = detail::get_current_control_iterator(
 		ordered_controls_, this != &from_frame ? focused_control_ : last_focused_control_); current_iter)
@@ -110,9 +117,7 @@ bool GuiFrame::TabForward(GuiFrame &from_frame) noexcept
 
 bool GuiFrame::TabBackward(GuiFrame &from_frame) noexcept
 {
-	//Build the correct tab ordering for all controls in this frame
-	if (std::empty(ordered_controls_))
-		ordered_controls_ = detail::get_ordered_controls(*this);
+	GatherControls();
 
 	if (auto current_iter = detail::get_current_control_iterator(
 		ordered_controls_, this != &from_frame ? focused_control_ : last_focused_control_); current_iter)
@@ -215,6 +220,17 @@ void GuiFrame::Disabled([[maybe_unused]] controls::GuiControl &control) noexcept
 }
 
 
+void GuiFrame::Shown([[maybe_unused]] controls::GuiControl &control) noexcept
+{
+	//Empty
+}
+
+void GuiFrame::Hidden([[maybe_unused]] controls::GuiControl &control) noexcept
+{
+	//Empty
+}
+
+
 void GuiFrame::Focused(controls::GuiControl &control) noexcept
 {
 	if (control.IsFocused() && focused_control_ != &control)
@@ -278,14 +294,25 @@ void GuiFrame::Exited(controls::GuiControl &control) noexcept
 void GuiFrame::Enabled() noexcept
 {
 	NotifyFrameEnabled();
-	GuiComponent::Enabled(); //Use base functionality
+	GuiPanelContainer::Enabled(); //Use base functionality
 }
 
 void GuiFrame::Disabled() noexcept
 {
 	Defocus();
 	NotifyFrameDisabled();
-	GuiComponent::Disabled(); //Use base functionality
+	GuiPanelContainer::Disabled(); //Use base functionality
+}
+
+
+void GuiFrame::Shown() noexcept
+{
+	GuiPanelContainer::Shown(); //Use base functionality
+}
+
+void GuiFrame::Hidden() noexcept
+{
+	GuiPanelContainer::Hidden(); //Use base functionality
 }
 
 
@@ -403,6 +430,15 @@ GuiFrame::GuiFrame(std::string name) :
 
 void GuiFrame::Activate(FrameMode mode) noexcept
 {
+	Show();
+
+	//Show all controls that should be visible
+	for (GatherControls(); auto &control : ordered_controls_)
+	{
+		if (control->IsVisible())
+			control->Show();
+	}
+
 	if (!activated_)
 	{
 		activated_ = true;
@@ -413,6 +449,8 @@ void GuiFrame::Activate(FrameMode mode) noexcept
 
 void GuiFrame::Deactivate() noexcept
 {
+	Hide();
+
 	if (activated_)
 	{
 		activated_ = false;
@@ -664,12 +702,8 @@ bool GuiFrame::MouseMoved(Vector2 position) noexcept
 
 				else
 				{
-					//Build the correct tab ordering for all controls in this frame
-					if (std::empty(ordered_controls_))
-						ordered_controls_ = detail::get_ordered_controls(*this);
-
 					//Check all other controls
-					for (auto &control : ordered_controls_)
+					for (GatherControls(); auto &control : ordered_controls_)
 					{
 						if (control != hovered_control_ &&
 							control->Intersects(position))

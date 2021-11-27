@@ -86,6 +86,8 @@ namespace ion::gui
 			gui_frame::detail::control_pointers ordered_controls_;
 
 
+			void GatherControls();
+
 			bool TabForward(GuiFrame &from_frame) noexcept;
 			bool TabBackward(GuiFrame &from_frame) noexcept;
 		
@@ -134,6 +136,13 @@ namespace ion::gui
 			virtual void Disabled(controls::GuiControl &control) noexcept override;
 
 
+			//See GuiControlListener::Enabled for more details
+			virtual void Shown(controls::GuiControl &control) noexcept override;
+
+			//See GuiControlListener::Disabled for more details
+			virtual void Hidden(controls::GuiControl &control) noexcept override;
+
+
 			//See GuiControlListener::Focused for more details
 			virtual void Focused(controls::GuiControl &control) noexcept override;
 
@@ -163,6 +172,13 @@ namespace ion::gui
 
 			//See GuiComponent::Disabled for more details
 			virtual void Disabled() noexcept override;
+
+
+			//See GuiComponent::Shown for more details
+			virtual void Shown() noexcept override;
+
+			//See GuiComponent::Hidden for more details
+			virtual void Hidden() noexcept override;
 
 
 			//Called right after a frame has been activated

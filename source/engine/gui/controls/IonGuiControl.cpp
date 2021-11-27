@@ -165,6 +165,21 @@ void GuiControl::Disabled() noexcept
 }
 
 
+void GuiControl::Shown() noexcept
+{
+	SetState(state_);
+	NotifyControlShown();
+	GuiComponent::Shown(); //Use base functionality
+}
+
+void GuiControl::Hidden() noexcept
+{
+	Reset();
+	NotifyControlHidden();
+	GuiComponent::Hidden(); //Use base functionality
+}
+
+
 void GuiControl::Focused() noexcept
 {
 	if (state_ == ControlState::Enabled)
@@ -267,6 +282,27 @@ void GuiControl::NotifyControlDisabled() noexcept
 		if (auto frame = owner->ParentFrame(); frame)
 			NotifyAll(frame->ControlEvents().Listeners(),
 				&events::listeners::GuiControlListener::Disabled, std::ref(*this));
+	}
+}
+
+
+void GuiControl::NotifyControlShown() noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::Shown, std::ref(*this));
+	}
+}
+
+void GuiControl::NotifyControlHidden() noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::Hidden, std::ref(*this));
 	}
 }
 
@@ -853,6 +889,15 @@ GuiControl::~GuiControl() noexcept
 	Modifiers
 */
 
+void GuiControl::Show() noexcept
+{
+	GuiComponent::Show();
+
+	if (node_)
+		node_->Visible(true);
+}
+
+
 void GuiControl::Focus() noexcept
 {
 	if (!focused_ &&
@@ -933,22 +978,6 @@ void GuiControl::Reset() noexcept
 	Exit();
 }
 
-
-void GuiControl::Visible(bool visible) noexcept
-{
-	if (visible_ != visible)
-	{
-		visible_ = visible;
-
-		if (!visible && focused_)
-			Defocus();
-
-		if (node_)
-			node_->Visible(visible, !visible);
-
-		SetState(state_);
-	}
-}
 
 void GuiControl::Size(const Vector2 &size) noexcept
 {
