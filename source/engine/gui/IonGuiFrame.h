@@ -255,6 +255,13 @@ namespace ion::gui
 			void Deactivate() noexcept;
 
 
+			//Show this frame with the given mode (same as calling Activate)
+			void Show(gui_frame::FrameMode mode = gui_frame::FrameMode::Modeless) noexcept;
+
+			//Hide this frame (same as calling Deactivate)
+			void Hide() noexcept;
+
+
 			//Focus this frame
 			void Focus() noexcept;
 

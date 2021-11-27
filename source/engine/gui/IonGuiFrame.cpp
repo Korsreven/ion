@@ -430,13 +430,20 @@ GuiFrame::GuiFrame(std::string name) :
 
 void GuiFrame::Activate(FrameMode mode) noexcept
 {
-	Show();
+	GuiPanelContainer::Show();
 
 	//Show all controls that should be visible
-	for (GatherControls(); auto &control : ordered_controls_)
+	for (auto &control : Controls())
 	{
-		if (control->IsVisible())
-			control->Show();
+		if (control.IsVisible())
+			control.Show();
+	}
+
+	//Show all panels that should be visible
+	for (auto &panel : Panels())
+	{
+		if (panel.IsVisible())
+			panel.Show();
 	}
 
 	if (!activated_)
@@ -449,7 +456,7 @@ void GuiFrame::Activate(FrameMode mode) noexcept
 
 void GuiFrame::Deactivate() noexcept
 {
-	Hide();
+	GuiPanelContainer::Hide();
 
 	if (activated_)
 	{
@@ -457,6 +464,17 @@ void GuiFrame::Deactivate() noexcept
 		mode_ = {};
 		Deactivated();
 	}
+}
+
+
+void GuiFrame::Show(FrameMode mode) noexcept
+{
+	Activate(mode);
+}
+
+void GuiFrame::Hide() noexcept
+{
+	Deactivate();
 }
 
 

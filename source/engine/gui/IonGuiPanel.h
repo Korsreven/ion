@@ -47,7 +47,8 @@ namespace ion::gui
 				Modifiers
 			*/
 
-
+			//Show this panel
+			void Show() noexcept;
 
 
 			/*

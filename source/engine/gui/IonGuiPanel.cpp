@@ -29,6 +29,30 @@ GuiPanel::GuiPanel(std::string name) :
 
 
 /*
+	Modifiers
+*/
+
+void GuiPanel::Show() noexcept
+{
+	GuiPanelContainer::Show();
+
+	//Show all controls that should be visible
+	for (auto &control : Controls())
+	{
+		if (control.IsVisible())
+			control.Show();
+	}
+
+	//Show all panels that should be visible
+	for (auto &panel : Panels())
+	{
+		if (panel.IsVisible())
+			panel.Show();
+	}
+}
+
+
+/*
 	Tabulating
 */
 
