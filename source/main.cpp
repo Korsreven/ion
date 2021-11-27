@@ -648,11 +648,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 			auto button_center_hovered_diffuse = textures.CreateTexture("button_center_hovered", "button_center_hovered.png",
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+
 			auto button_top_enabled_diffuse = textures.CreateTexture("button_top_enabled", "button_top_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto button_top_focused_diffuse = textures.CreateTexture("button_top_focused", "button_top_focused.png",
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 			auto button_left_enabled_diffuse = textures.CreateTexture("button_left_enabled", "button_left_enabled.png",
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto button_left_focused_diffuse = textures.CreateTexture("button_left_focused", "button_left_focused.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+
 			auto button_top_left_enabled_diffuse = textures.CreateTexture("button_top_left_enabled", "button_top_left_enabled.png");
+			auto button_top_left_focused_diffuse = textures.CreateTexture("button_top_left_focused", "button_top_left_focused.png");
 
 			auto cat_first_frame = textures.CreateTexture("cat01", "cat01.png");
 			textures.CreateTexture("cat02", "cat02.png");
@@ -1142,6 +1149,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					0.0_r, button_center_hovered_diffuse, nullptr, nullptr);
 			button_center_hovered->LightingEnabled(false);
 			
+
 			auto button_top_enabled =
 				materials.CreateMaterial("button_top_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1151,6 +1159,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					0.0_r, button_top_enabled_diffuse, nullptr, nullptr);
 			button_top_enabled->LightingEnabled(false);
 
+			auto button_top_focused =
+				materials.CreateMaterial("button_top_focused",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_top_focused_diffuse, nullptr, nullptr);
+			button_top_focused->LightingEnabled(false);
+
 			auto button_left_enabled =
 				materials.CreateMaterial("button_left_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1159,6 +1176,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{1.0_r, 1.0_r, 1.0_r},
 					0.0_r, button_left_enabled_diffuse, nullptr, nullptr);
 			button_left_enabled->LightingEnabled(false);
+
+			auto button_left_focused =
+				materials.CreateMaterial("button_left_focused",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_left_focused_diffuse, nullptr, nullptr);
+			button_left_focused->LightingEnabled(false);
 
 			auto button_bottom_enabled =
 				materials.CreateMaterial("button_bottom_enabled",
@@ -1170,6 +1196,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_bottom_enabled->LightingEnabled(false);
 			button_bottom_enabled->FlipVertical();
 
+			auto button_bottom_focused =
+				materials.CreateMaterial("button_bottom_focused",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_top_focused_diffuse, nullptr, nullptr);
+			button_bottom_focused->LightingEnabled(false);
+			button_bottom_focused->FlipVertical();
+
 			auto button_right_enabled =
 				materials.CreateMaterial("button_right_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1179,6 +1215,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					0.0_r, button_left_enabled_diffuse, nullptr, nullptr);
 			button_right_enabled->LightingEnabled(false);
 			button_right_enabled->FlipHorizontal();
+
+			auto button_right_focused =
+				materials.CreateMaterial("button_right_focused",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_left_focused_diffuse, nullptr, nullptr);
+			button_right_focused->LightingEnabled(false);
+			button_right_focused->FlipHorizontal();
 
 
 			auto button_top_left_enabled =
@@ -1190,6 +1236,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					0.0_r, button_top_left_enabled_diffuse, nullptr, nullptr);
 			button_top_left_enabled->LightingEnabled(false);
 
+			auto button_top_left_focused =
+				materials.CreateMaterial("button_top_left_focused",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_top_left_focused_diffuse, nullptr, nullptr);
+			button_top_left_focused->LightingEnabled(false);
+
 			auto button_bottom_left_enabled =
 				materials.CreateMaterial("button_bottom_left_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1199,6 +1254,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					0.0_r, button_top_left_enabled_diffuse, nullptr, nullptr);
 			button_bottom_left_enabled->LightingEnabled(false);
 			button_bottom_left_enabled->FlipVertical();
+
+			auto button_bottom_left_focused =
+				materials.CreateMaterial("button_bottom_left_focused",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_top_left_focused_diffuse, nullptr, nullptr);
+			button_bottom_left_focused->LightingEnabled(false);
+			button_bottom_left_focused->FlipVertical();
 
 			auto button_top_right_enabled =
 				materials.CreateMaterial("button_top_right_enabled",
@@ -1210,6 +1275,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_top_right_enabled->LightingEnabled(false);
 			button_top_right_enabled->FlipHorizontal();
 
+			auto button_top_right_focused =
+				materials.CreateMaterial("button_top_right_focused",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_top_left_focused_diffuse, nullptr, nullptr);
+			button_top_right_focused->LightingEnabled(false);
+			button_top_right_focused->FlipHorizontal();
+
 			auto button_bottom_right_enabled =
 				materials.CreateMaterial("button_bottom_right_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1220,6 +1295,17 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_bottom_right_enabled->LightingEnabled(false);
 			button_bottom_right_enabled->FlipHorizontal();
 			button_bottom_right_enabled->FlipVertical();
+
+			auto button_bottom_right_focused =
+				materials.CreateMaterial("button_bottom_right_focused",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_top_left_focused_diffuse, nullptr, nullptr);
+			button_bottom_right_focused->LightingEnabled(false);
+			button_bottom_right_focused->FlipHorizontal();
+			button_bottom_right_focused->FlipVertical();
 
 
 			using namespace ion::graphics::utilities;
@@ -1478,13 +1564,21 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_skin.Parts.Center.PressedMaterial = button_center_pressed;
 			button_skin.Parts.Center.HoveredMaterial = button_center_hovered;
 			button_skin.Parts.Top.EnabledMaterial = button_top_enabled;
+			button_skin.Parts.Top.FocusedMaterial = button_top_focused;
 			button_skin.Parts.Left.EnabledMaterial = button_left_enabled;
+			button_skin.Parts.Left.FocusedMaterial = button_left_focused;
 			button_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
+			button_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
 			button_skin.Parts.Right.EnabledMaterial = button_right_enabled;
+			button_skin.Parts.Right.FocusedMaterial = button_right_focused;
 			button_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
+			button_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
 			button_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
+			button_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
 			button_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
+			button_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
 			button_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
+			button_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
 
 			button_skin.Caption.TextObject = caption;
 			button_skin.Caption.EnabledStyle = caption_style_enabled;

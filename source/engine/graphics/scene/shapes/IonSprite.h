@@ -90,6 +90,8 @@ namespace ion::graphics::scene::shapes
 
 					if (auto_size)
 						RecalculateSize();
+					if (auto_repeat_)
+						RecalculateTexCoords();
 				}
 			}
 
@@ -153,10 +155,11 @@ namespace ion::graphics::scene::shapes
 				if (Mesh::SurfaceMaterial() != material)
 				{
 					Mesh::SurfaceMaterial(material);
-					
+					update_vertices_ = true;
+
 					if (auto_size_)
 						RecalculateSize();
-					else if (auto_repeat_)
+					if (auto_repeat_)
 						RecalculateTexCoords();
 				}
 			}

@@ -109,12 +109,7 @@ std::optional<Vector2> Sprite::GetTextureSize() const noexcept
 void Sprite::RecalculateSize() noexcept
 {
 	if (auto texture_size = GetTextureSize(); texture_size)
-	{
 		Rectangle::Size(*texture_size);
-
-		if (auto_repeat_)
-			RecalculateTexCoords();
-	}
 }
 
 void Sprite::RecalculateTexCoords() noexcept
