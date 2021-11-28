@@ -12,6 +12,8 @@ File:	IonGuiController.cpp
 
 #include "IonGuiController.h"
 
+#include "graphics/scene/IonModel.h"
+#include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 
 namespace ion::gui
@@ -252,12 +254,72 @@ void GuiController::Defocused(GuiFrame &frame) noexcept
 }
 
 
+/*
+	Cursor skin
+*/
+
+void GuiController::AttachCursorSkin()
+{
+	if (cursor_skin_)
+	{
+		if (auto node = cursor_skin_->ParentNode(); node)
+			node->DetachObject(*cursor_skin_.ModelObject);
+		
+		if (node_) //Create node for cursor
+		{
+			auto cursor_node = node_->CreateChildNode();
+			cursor_node->AttachObject(*cursor_skin_.ModelObject);
+			cursor_node->InheritRotation(false);
+		}
+	}
+}
+
+void GuiController::DetachCursorSkin() noexcept
+{
+	if (cursor_skin_)
+	{
+		if (auto node = cursor_skin_->ParentNode(); node_ && node)
+			node_->RemoveChildNode(*node); //Remove cursor node
+	}
+}
+
+void GuiController::RemoveCursorSkin() noexcept
+{
+	DetachCursorSkin();
+
+	if (cursor_skin_)
+		cursor_skin_->Owner()->RemoveModel(*cursor_skin_.ModelObject); //Remove cursor
+
+	cursor_skin_ = {};
+}
+
+
 //Public
 
 GuiController::GuiController(SceneNode &parent_node)
 {
 	node_ = parent_node.CreateChildNode();
 	FrameEvents().Subscribe(*this);
+}
+
+GuiController::~GuiController() noexcept
+{
+	RemoveCursorSkin();
+}
+
+
+/*
+	Modifiers
+*/
+
+void GuiController::CursorSkin(gui_controller::CursorSkin cursor_skin) noexcept
+{
+	if (cursor_skin_.ModelObject != cursor_skin.ModelObject)
+	{
+		RemoveCursorSkin();
+		cursor_skin_ = std::move(cursor_skin);
+		AttachCursorSkin();
+	}
 }
 
 

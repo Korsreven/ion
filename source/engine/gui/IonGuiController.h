@@ -41,40 +41,60 @@ namespace ion::gui
 	using namespace graphics::scene::graph;
 	using namespace ion::graphics::utilities;
 
-	namespace gui_controller::detail
+	namespace gui_controller
 	{
-		using frame_pointers = std::vector<GuiFrame*>;
-
-		struct layer
+		struct CursorSkin final
 		{
-			GuiFrame *current_frame = nullptr;
-			frame_pointers frames;		
+			NonOwningPtr<graphics::scene::Model> ModelObject;
+
+
+			[[nodiscard]] inline operator bool() const noexcept
+			{
+				return !!ModelObject;
+			}
+
+			[[nodiscard]] inline auto operator->() const noexcept
+			{
+				return ModelObject.get();
+			}
 		};
 
-		using frames = std::vector<layer>;
-			//Only the active frames at the top (back) of the stack are interactive
-			//The rest of the active frames in the stack are non-interactive (but visible)
 
-
-		bool is_frame_on_top(const GuiFrame &frame, const frames &frames) noexcept;
-		bool is_frame_activated(const GuiFrame &frame, const frames &frames) noexcept;
-
-		void activate_frame(GuiFrame &frame, frames &to_frames) noexcept;
-		void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept;
-
-
-		std::optional<frame_pointers::const_iterator> get_frame_iterator(const frames &frames, GuiFrame *frame) noexcept;
-
-		inline auto get_next_frame_iterator(frame_pointers::const_iterator iter, const frame_pointers &frames) noexcept
+		namespace detail
 		{
-			return iter >= std::end(frames) - 1 ? std::begin(frames) : iter + 1;
-		}
+			using frame_pointers = std::vector<GuiFrame*>;
 
-		inline auto get_previous_frame_iterator(frame_pointers::const_iterator iter, const frame_pointers &frames) noexcept
-		{
-			return iter == std::begin(frames) ? std::end(frames) - 1 : iter - 1;
-		}
-	} //gui_controller::detail
+			struct layer
+			{
+				GuiFrame *current_frame = nullptr;
+				frame_pointers frames;		
+			};
+
+			using frames = std::vector<layer>;
+				//Only the active frames at the top (back) of the stack are interactive
+				//The rest of the active frames in the stack are non-interactive (but visible)
+
+
+			bool is_frame_on_top(const GuiFrame &frame, const frames &frames) noexcept;
+			bool is_frame_activated(const GuiFrame &frame, const frames &frames) noexcept;
+
+			void activate_frame(GuiFrame &frame, frames &to_frames) noexcept;
+			void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept;
+
+
+			std::optional<frame_pointers::const_iterator> get_frame_iterator(const frames &frames, GuiFrame *frame) noexcept;
+
+			inline auto get_next_frame_iterator(frame_pointers::const_iterator iter, const frame_pointers &frames) noexcept
+			{
+				return iter >= std::end(frames) - 1 ? std::begin(frames) : iter + 1;
+			}
+
+			inline auto get_previous_frame_iterator(frame_pointers::const_iterator iter, const frame_pointers &frames) noexcept
+			{
+				return iter == std::begin(frames) ? std::end(frames) - 1 : iter - 1;
+			}
+		} //detail
+	} //gui_controller
 
 
 	class GuiController final :
@@ -91,6 +111,8 @@ namespace ion::gui
 			GuiFrame *focused_frame_ = nullptr;
 			gui_controller::detail::frames active_frames_;
 			bool shift_pressed_ = false;
+
+			gui_controller::CursorSkin cursor_skin_;
 
 
 			GuiFrame* NextFocusableFrame(GuiFrame *from_frame) const noexcept;
@@ -135,10 +157,22 @@ namespace ion::gui
 			//See GuiFrameListener::Defocused for more details
 			void Defocused(GuiFrame &frame) noexcept override final;
 
+
+			/*
+				Cursor skin
+			*/
+
+			void AttachCursorSkin();
+			void DetachCursorSkin() noexcept;
+			void RemoveCursorSkin() noexcept;
+
 		public:
 
 			//Construct a gui controller with the given parent node
 			GuiController(SceneNode &parent_node);
+
+			//Destructor
+			~GuiController() noexcept;
 
 
 			/*
@@ -194,12 +228,20 @@ namespace ion::gui
 				Modifiers
 			*/
 
-
+			//Sets the cursor skin used by this controller to the given skin
+			void CursorSkin(gui_controller::CursorSkin cursor_skin) noexcept;
 
 
 			/*
 				Observers
 			*/
+
+			//Returns the cursor skin used by this controller
+			[[nodiscard]] inline auto& CursorSkin() const noexcept
+			{
+				return cursor_skin_;
+			}
+
 
 			//Returns true if the given frame is on top
 			[[nodiscard]] bool IsOnTop(const GuiFrame &frame) const noexcept;
