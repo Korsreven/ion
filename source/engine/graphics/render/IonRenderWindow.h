@@ -368,7 +368,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets the window cursore to the given cursor
+			//Sets the window cursor to the given cursor
 			inline void Cursor(render_window::WindowCursor cursor) noexcept
 			{
 				if (cursor_ != cursor)
