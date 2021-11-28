@@ -69,11 +69,14 @@ namespace ion::graphics::render
 			Vector2 get_adjusted_position(const Vector2 &position, const Vector2 &size, const Vector2 &new_size,
 				HorizontalAnchorType horizontal_anchor_type, VerticalAnchorType vertical_anchor_type) noexcept;
 
-			Vector2 viewport_to_camera_ratio(const Vector2 &viewport_size, real left, real right, real bottom, real top) noexcept;
-			Vector2 camera_to_viewport_ratio(const Vector2 &viewport_size, real left, real right, real bottom, real top) noexcept;
+			Vector2 viewport_to_ortho_ratio(const Vector2 &viewport_size, real left, real right, real bottom, real top) noexcept;
+			Vector2 ortho_to_viewport_ratio(const Vector2 &viewport_size, real left, real right, real bottom, real top) noexcept;
 
-			Vector2 viewport_to_camera_point(const Vector2 &viewport_size, real left, real right, real bottom, real top, const Vector2 &point) noexcept;
-			Vector2 camera_to_viewport_point(const Vector2 &viewport_size, real left, real right, real bottom, real top, const Vector2 &point) noexcept;
+			Vector2 viewport_to_ortho_point(const Vector2 &viewport_size, real left, real right, real bottom, real top, const Vector2 &point) noexcept;
+			Vector2 ortho_to_viewport_point(const Vector2 &viewport_size, real left, real right, real bottom, real top, const Vector2 &point) noexcept;
+
+			Vector2 camera_to_ortho_point(scene::Camera &camera, const Vector2 &point) noexcept;
+			Vector2 ortho_to_camera_point(scene::Camera &camera, const Vector2 &point) noexcept;
 			
 			void render_to_viewport(const Vector2 &position, const Vector2 &size, const Color &background_color) noexcept;
 		} //detail
@@ -300,11 +303,11 @@ namespace ion::graphics::render
 				Conversions
 			*/
 
-			//Returns the ratio (scale factor) between this viewport and the connected camera
-			[[nodiscard]] Vector2 ViewportToCameraRatio() const noexcept;
+			//Returns the ratio (scale factor) between this viewport and the connected cameras ortho
+			[[nodiscard]] Vector2 ViewportToOrthoRatio() const noexcept;
 			
-			//Returns the ratio (scale factor) between the connected camera and this viewport
-			[[nodiscard]] Vector2 CameraToViewportRatio() const noexcept;
+			//Returns the ratio (scale factor) between the connected cameras ortho and this viewport
+			[[nodiscard]] Vector2 OrthoToViewportRatio() const noexcept;
 
 
 			//Returns a new point in camera space from the given point in viewport space

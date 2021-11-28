@@ -15,6 +15,8 @@ File:	IonViewport.cpp
 #include "IonRenderTarget.h"
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/scene/IonCamera.h"
+#include "graphics/scene/graph/IonSceneNode.h"
+#include "graphics/utilities/IonMatrix3.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
 
@@ -116,20 +118,20 @@ Vector2 get_adjusted_position(const Vector2 &position, const Vector2 &size, cons
 }
 
 
-Vector2 viewport_to_camera_ratio(const Vector2 &viewport_size, real left, real right, real bottom, real top) noexcept
+Vector2 viewport_to_ortho_ratio(const Vector2 &viewport_size, real left, real right, real bottom, real top) noexcept
 {
 	auto [width, height] = viewport_size.XY();
 	return {(right - left) / width, (top - bottom) / height};
 }
 
-Vector2 camera_to_viewport_ratio(const Vector2 &viewport_size, real left, real right, real bottom, real top) noexcept
+Vector2 ortho_to_viewport_ratio(const Vector2 &viewport_size, real left, real right, real bottom, real top) noexcept
 {
 	auto [width, height] = viewport_size.XY();
 	return {width / (right - left), height / (top - bottom)};
 }
 
 
-Vector2 viewport_to_camera_point(const Vector2 &viewport_size, real left, real right, real bottom, real top, const Vector2 &point) noexcept
+Vector2 viewport_to_ortho_point(const Vector2 &viewport_size, real left, real right, real bottom, real top, const Vector2 &point) noexcept
 {
 	auto [width, height] = viewport_size.XY();
 	auto [x, y] = point.XY();
@@ -139,7 +141,7 @@ Vector2 viewport_to_camera_point(const Vector2 &viewport_size, real left, real r
 			math::Normalize(y, 0.0_r, height, bottom, top)};
 }
 
-Vector2 camera_to_viewport_point(const Vector2 &viewport_size, real left, real right, real bottom, real top, const Vector2 &point) noexcept
+Vector2 ortho_to_viewport_point(const Vector2 &viewport_size, real left, real right, real bottom, real top, const Vector2 &point) noexcept
 {
 	auto [width, height] = viewport_size.XY();
 	auto [x, y] = point.XY();
@@ -147,6 +149,25 @@ Vector2 camera_to_viewport_point(const Vector2 &viewport_size, real left, real r
 	using namespace ion::utilities;
 	return {math::Normalize(x, left, right, 0.0_r, width),
 			math::Normalize(y, bottom, top, 0.0_r, height)};
+}
+
+
+Vector2 camera_to_ortho_point(scene::Camera &camera, const Vector2 &point) noexcept
+{
+	return utilities::Matrix3::Transformation(
+				-(camera.Rotation() + camera.ParentNode()->DerivedRotation()),
+				utilities::vector2::UnitScale / camera.ParentNode()->DerivedScaling(),
+				-(camera.Position() + camera.ParentNode()->DerivedPosition())
+			).TransformPoint(point);
+}
+
+Vector2 ortho_to_camera_point(scene::Camera &camera, const Vector2 &point) noexcept
+{
+	return utilities::Matrix3::Transformation(
+				camera.Rotation() + camera.ParentNode()->DerivedRotation(),
+				camera.ParentNode()->DerivedScaling(),
+				camera.Position() + camera.ParentNode()->DerivedPosition()
+			).TransformPoint(point);
 }
 
 
@@ -363,25 +384,25 @@ Viewport Viewport::BottomRightAligned(std::string name, RenderTarget &render_tar
 	Conversions
 */
 
-Vector2 Viewport::ViewportToCameraRatio() const noexcept
+Vector2 Viewport::ViewportToOrthoRatio() const noexcept
 {
 	if (camera_)
 	{
 		auto viewport_size = Bounds().ToSize();
 		auto [left, right, bottom, top, z_near, z_far] = camera_->ViewFrustum().ToOrthoBounds(viewport_size);
-		return detail::viewport_to_camera_ratio(viewport_size, left, right, bottom, top);
+		return detail::viewport_to_ortho_ratio(viewport_size, left, right, bottom, top);
 	}
 	else
 		return utilities::vector2::UnitScale;
 }
 
-Vector2 Viewport::CameraToViewportRatio() const noexcept
+Vector2 Viewport::OrthoToViewportRatio() const noexcept
 {
 	if (camera_)
 	{
 		auto viewport_size = Bounds().ToSize();
 		auto [left, right, bottom, top, z_near, z_far] = camera_->ViewFrustum().ToOrthoBounds(viewport_size);
-		return detail::camera_to_viewport_ratio(viewport_size, left, right, bottom, top);
+		return detail::ortho_to_viewport_ratio(viewport_size, left, right, bottom, top);
 	}
 	else
 		return utilities::vector2::UnitScale;
@@ -394,7 +415,8 @@ Vector2 Viewport::ViewportToCameraPoint(const Vector2 &point) const noexcept
 	{
 		auto viewport_size = Bounds().ToSize();
 		auto [left, right, bottom, top, z_near, z_far] = camera_->ViewFrustum().ToOrthoBounds(viewport_size);
-		return detail::viewport_to_camera_point(viewport_size, left, right, bottom, top, point);
+		auto ortho_point = detail::viewport_to_ortho_point(viewport_size, left, right, bottom, top, point);	
+		return detail::ortho_to_camera_point(*camera_, ortho_point);
 	}
 	else
 		return point;
@@ -404,9 +426,10 @@ Vector2 Viewport::CameraToViewportPoint(const Vector2 &point) const noexcept
 {
 	if (camera_)
 	{
+		auto ortho_point = detail::camera_to_ortho_point(*camera_, point);
 		auto viewport_size = Bounds().ToSize();
 		auto [left, right, bottom, top, z_near, z_far] = camera_->ViewFrustum().ToOrthoBounds(viewport_size);
-		return detail::camera_to_viewport_point(viewport_size, left, right, bottom, top, point);
+		return detail::ortho_to_viewport_point(viewport_size, left, right, bottom, top, ortho_point);
 	}
 	else
 		return point;

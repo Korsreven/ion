@@ -89,13 +89,13 @@ std::optional<Vector2> Sprite::GetTextureSize() const noexcept
 	{
 		if (auto texture_size = detail::get_texture_size(*material); texture_size)
 		{
-			//Adjust texture size from viewport to camera space
+			//Adjust texture size from viewport to ortho space
 			if (auto model = Owner(); model)
 			{
 				if (auto scene_manager = model->Owner(); scene_manager)
 				{
 					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-						*texture_size *= viewport->ViewportToCameraRatio();
+						*texture_size *= viewport->ViewportToOrthoRatio();
 				}
 			}
 

@@ -527,9 +527,9 @@ void DrawableText::PrepareVertexStreams()
 	auto coordinate_scaling = vector2::UnitScale;
 
 	//Has viewport connected to scene
-	//Get scaling factor from viewport to camera coordinates
+	//Get scaling factor from viewport to ortho coordinates
 	if (auto viewport = Owner()->ConnectedViewport(); viewport)
-		coordinate_scaling = viewport->ViewportToCameraRatio();
+		coordinate_scaling = viewport->ViewportToOrthoRatio();
 
 
 	auto glyph_count = text_->UnformattedDisplayedCharacterCount();

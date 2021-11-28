@@ -696,11 +696,11 @@ void GuiControl::UpdateCaption() noexcept
 			{
 				auto adjusted_size = size;
 
-				//Adjust area size from camera to viewport space
+				//Adjust area size from ortho to viewport space
 				if (auto scene_manager = skin_.Caption->Owner(); scene_manager)
 				{
 					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-						adjusted_size *= viewport->CameraToViewportRatio();
+						adjusted_size *= viewport->OrthoToViewportRatio();
 				}
 
 				text->AreaSize(adjusted_size);
