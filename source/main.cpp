@@ -642,6 +642,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto color_spectrum_diffuse = textures.CreateTexture("color_spectrum", "color_spectrum.png");
 
 			//GUI textures
+			auto mouse_cursor_diffuse = textures.CreateTexture("mouse_cursor_diffuse", "mouse_cursor.png");
+
 			auto button_center_enabled_diffuse = textures.CreateTexture("button_center_enabled", "button_center_enabled.png",
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 			auto button_center_pressed_diffuse = textures.CreateTexture("button_center_pressed", "button_center_pressed.png",
@@ -1122,6 +1124,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					32.0_r, cat_running, nullptr, nullptr);
 
 			//GUI materials
+			auto mouse_cursor =
+				materials.CreateMaterial("mouse_cursor",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, mouse_cursor_diffuse, nullptr, nullptr);
+			mouse_cursor->LightingEnabled(false);
+
+
 			auto button_center_enabled =
 				materials.CreateMaterial("button_center_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1496,6 +1508,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//circle2->ShowBoundingVolumes(true);*/
 
 			//GUI models
+			auto mouse_cursor_model = scene.CreateModel();
+			auto mouse_cursor_sprite = mouse_cursor_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r}, mouse_cursor}); //Mouse cursor
+
 			auto button_model = scene.CreateModel();
 			auto button_center = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.1_r, 0.1_r}, nullptr}); //Center
@@ -1518,12 +1534,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto button_bottom_right = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.1_r * 0.5_r + 0.011_r * 0.5_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
 
+			mouse_cursor_sprite->AutoSize(true);
 			button_center->AutoRepeat(true);
 			button_top->AutoRepeat(true);
 			button_left->AutoRepeat(true);
 			button_bottom->AutoRepeat(true);
 			button_right->AutoRepeat(true);
 
+			mouse_cursor_model->AddPass(ion::graphics::render::Pass{model_program});
 			button_model->AddPass(ion::graphics::render::Pass{model_program});
 
 			//GUI Caption
@@ -1548,6 +1566,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//scene_graph->LightingEnabled(false);
 
 			//GUI skins
+			ion::gui::gui_controller::MouseCursorSkin mouse_cursor_skin;
+			mouse_cursor_skin.ModelObject = mouse_cursor_model;
+
 			ion::gui::controls::gui_control::ControlSkin button_skin;
 			button_skin.Parts.ModelObject = button_model;
 			button_skin.Parts.Center.SpriteObject = button_center;
@@ -1587,6 +1608,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//GUI
 			ion::gui::GuiController controller{scene_graph->RootNode()};
 			controller.ZOrder(-2.0_r);
+			controller.MouseCursorSkin(mouse_cursor_skin, 1.0_r);
+			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
 
 			auto main_frame = controller.CreateFrame("main");
 			auto base_panel = main_frame->CreatePanel("base");
@@ -1657,7 +1680,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto cloud_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, -1.6_r});
 			cloud_node->AttachObject(*clouds);
 
-			auto spectrum_node = scene_graph->RootNode().CreateChildNode({1.4_r, -0.6_r, -1.0_r});
+			auto spectrum_node = scene_graph->RootNode().CreateChildNode({1.4_r, -0.6_r, -1.1_r});
 			spectrum_node->AttachObject(*model_spectrum);
 
 			//auto button_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.5_r, -2.0_r});

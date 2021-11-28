@@ -43,7 +43,7 @@ namespace ion::gui
 
 	namespace gui_controller
 	{
-		struct CursorSkin final
+		struct MouseCursorSkin final
 		{
 			NonOwningPtr<graphics::scene::Model> ModelObject;
 
@@ -112,7 +112,7 @@ namespace ion::gui
 			gui_controller::detail::frames active_frames_;
 			bool shift_pressed_ = false;
 
-			gui_controller::CursorSkin cursor_skin_;
+			gui_controller::MouseCursorSkin mouse_cursor_skin_;
 
 
 			GuiFrame* NextFocusableFrame(GuiFrame *from_frame) const noexcept;
@@ -159,12 +159,12 @@ namespace ion::gui
 
 
 			/*
-				Cursor skin
+				Mouse cursor skin
 			*/
 
-			void AttachCursorSkin();
-			void DetachCursorSkin() noexcept;
-			void RemoveCursorSkin() noexcept;
+			void AttachMouseCursorSkin(real z_order);
+			void DetachMouseCursorSkin() noexcept;
+			void RemoveMouseCursorSkin() noexcept;
 
 		public:
 
@@ -228,18 +228,18 @@ namespace ion::gui
 				Modifiers
 			*/
 
-			//Sets the cursor skin used by this controller to the given skin
-			void CursorSkin(gui_controller::CursorSkin cursor_skin) noexcept;
+			//Sets the mouse cursor skin used by this controller to the given skin with the given z-order
+			void MouseCursorSkin(gui_controller::MouseCursorSkin skin, real z_order) noexcept;
 
 
 			/*
 				Observers
 			*/
 
-			//Returns the cursor skin used by this controller
-			[[nodiscard]] inline auto& CursorSkin() const noexcept
+			//Returns the mouse cursor skin used by this controller
+			[[nodiscard]] inline auto& MouseCursorSkin() const noexcept
 			{
-				return cursor_skin_;
+				return mouse_cursor_skin_;
 			}
 
 

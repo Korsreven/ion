@@ -255,42 +255,42 @@ void GuiController::Defocused(GuiFrame &frame) noexcept
 
 
 /*
-	Cursor skin
+	Mouse cursor skin
 */
 
-void GuiController::AttachCursorSkin()
+void GuiController::AttachMouseCursorSkin(real z_order)
 {
-	if (cursor_skin_)
+	if (mouse_cursor_skin_)
 	{
-		if (auto node = cursor_skin_->ParentNode(); node)
-			node->DetachObject(*cursor_skin_.ModelObject);
+		if (auto node = mouse_cursor_skin_->ParentNode(); node)
+			node->DetachObject(*mouse_cursor_skin_.ModelObject);
 		
 		if (node_) //Create node for cursor
 		{
-			auto cursor_node = node_->CreateChildNode();
-			cursor_node->AttachObject(*cursor_skin_.ModelObject);
-			cursor_node->InheritRotation(false);
+			auto mouse_cursor_node = node_->CreateChildNode({0.0_r, 0.0_r, z_order});
+			mouse_cursor_node->AttachObject(*mouse_cursor_skin_.ModelObject);
+			mouse_cursor_node->InheritRotation(false);
 		}
 	}
 }
 
-void GuiController::DetachCursorSkin() noexcept
+void GuiController::DetachMouseCursorSkin() noexcept
 {
-	if (cursor_skin_)
+	if (mouse_cursor_skin_)
 	{
-		if (auto node = cursor_skin_->ParentNode(); node_ && node)
+		if (auto node = mouse_cursor_skin_->ParentNode(); node_ && node)
 			node_->RemoveChildNode(*node); //Remove cursor node
 	}
 }
 
-void GuiController::RemoveCursorSkin() noexcept
+void GuiController::RemoveMouseCursorSkin() noexcept
 {
-	DetachCursorSkin();
+	DetachMouseCursorSkin();
 
-	if (cursor_skin_)
-		cursor_skin_->Owner()->RemoveModel(*cursor_skin_.ModelObject); //Remove cursor
+	if (mouse_cursor_skin_)
+		mouse_cursor_skin_->Owner()->RemoveModel(*mouse_cursor_skin_.ModelObject); //Remove cursor
 
-	cursor_skin_ = {};
+	mouse_cursor_skin_ = {};
 }
 
 
@@ -304,7 +304,7 @@ GuiController::GuiController(SceneNode &parent_node)
 
 GuiController::~GuiController() noexcept
 {
-	RemoveCursorSkin();
+	RemoveMouseCursorSkin();
 }
 
 
@@ -312,13 +312,13 @@ GuiController::~GuiController() noexcept
 	Modifiers
 */
 
-void GuiController::CursorSkin(gui_controller::CursorSkin cursor_skin) noexcept
+void GuiController::MouseCursorSkin(gui_controller::MouseCursorSkin skin, real z_order) noexcept
 {
-	if (cursor_skin_.ModelObject != cursor_skin.ModelObject)
+	if (mouse_cursor_skin_.ModelObject != skin.ModelObject)
 	{
-		RemoveCursorSkin();
-		cursor_skin_ = std::move(cursor_skin);
-		AttachCursorSkin();
+		RemoveMouseCursorSkin();
+		mouse_cursor_skin_ = std::move(skin);
+		AttachMouseCursorSkin(z_order);
 	}
 }
 
@@ -511,6 +511,9 @@ bool GuiController::MouseReleased(MouseButton button, Vector2 position) noexcept
 
 bool GuiController::MouseMoved(Vector2 position) noexcept
 {
+	if (mouse_cursor_skin_)
+		mouse_cursor_skin_->ParentNode()->Position(position);
+
 	//Check focused frame first
 	if (focused_frame_ &&
 		focused_frame_->MouseMoved(position))
