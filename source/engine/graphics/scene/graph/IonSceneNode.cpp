@@ -538,6 +538,54 @@ void SceneNode::LookAt(const Vector3 &position) noexcept
 }
 
 
+void SceneNode::DerivedPosition(const Vector2 &position) noexcept
+{
+	DerivedPosition({position.X(), position.Y(), DerivedPosition().Z()});
+}
+
+void SceneNode::DerivedPosition(const Vector3 &position) noexcept
+{
+	if (parent_node_)
+	{
+		auto [sx, sy] =
+			parent_node_->DerivedScaling().XY();
+		auto local_position =
+			(position - parent_node_->DerivedPosition()) / Vector3{sx, sy, 1.0_r};
+
+		if (rotation_origin_ == NodeRotationOrigin::Parent)
+			local_position = Matrix3::Rotation(-parent_node_->DerivedRotation()) * local_position;
+
+		Position(local_position);
+	}
+	else
+		Position(position);
+}
+
+void SceneNode::DerivedDirection(const Vector2 &direction) noexcept
+{
+	if (inherit_rotation_ && parent_node_)
+		Rotation(-direction.SignedAngleBetween(parent_node_->DerivedDirection()));
+	else
+		Direction(direction);
+}
+
+void SceneNode::DerivedRotation(real angle) noexcept
+{
+	if (inherit_rotation_ && parent_node_)
+		Rotation(angle - parent_node_->DerivedRotation());
+	else
+		Rotation(angle);
+}
+
+void SceneNode::DerivedScaling(const Vector2 &scaling) noexcept
+{
+	if (inherit_scaling_ && parent_node_)
+		Scaling(scaling / parent_node_->DerivedScaling());
+	else
+		Scaling(scaling);
+}
+
+
 /*
 	Elapse time
 */

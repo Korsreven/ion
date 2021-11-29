@@ -796,6 +796,22 @@ namespace ion::graphics::scene::graph
 			void LookAt(const Vector3 &position) noexcept;
 
 
+			//Sets the derived position of this node to the given position
+			void DerivedPosition(const Vector2 &position) noexcept;
+
+			//Sets the derived position of this node to the given position
+			void DerivedPosition(const Vector3 &position) noexcept;
+
+			//Sets the derived direction of this node to the given direction
+			void DerivedDirection(const Vector2 &direction) noexcept;
+
+			//Sets the derived rotation of this node to the given angle in radians
+			void DerivedRotation(real angle) noexcept;
+
+			//Sets the derived scaling of this node to the given scaling
+			void DerivedScaling(const Vector2 &scaling) noexcept;
+
+
 			/*
 				Elapse time
 			*/
