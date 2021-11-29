@@ -1606,10 +1606,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_skin.Caption.HoveredStyle = caption_style_hovered;
 
 			//GUI
+			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
+
 			ion::gui::GuiController controller{scene_graph->RootNode()};
 			controller.ZOrder(-2.0_r);
 			controller.MouseCursorSkin(mouse_cursor_skin, 1.0_r);
-			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
 
 			auto main_frame = controller.CreateFrame("main");
 			auto base_panel = main_frame->CreatePanel("base");

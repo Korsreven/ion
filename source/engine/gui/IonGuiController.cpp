@@ -270,6 +270,7 @@ void GuiController::AttachMouseCursorSkin(real z_order)
 			auto mouse_cursor_node = node_->CreateChildNode({0.0_r, 0.0_r, z_order});
 			mouse_cursor_node->AttachObject(*mouse_cursor_skin_.ModelObject);
 			mouse_cursor_node->InheritRotation(false);
+			mouse_cursor_node->RotationOrigin(scene_node::NodeRotationOrigin::Local);
 		}
 	}
 }
@@ -512,7 +513,18 @@ bool GuiController::MouseReleased(MouseButton button, Vector2 position) noexcept
 bool GuiController::MouseMoved(Vector2 position) noexcept
 {
 	if (mouse_cursor_skin_)
-		mouse_cursor_skin_->ParentNode()->Position(position);
+	{
+		if (auto node = mouse_cursor_skin_->ParentNode(); node)
+		{
+			auto [half_width, half_height] =
+				mouse_cursor_skin_->AxisAlignedBoundingBox().ToHalfSize().XY();
+			auto top_left_v =
+				Vector2{half_width, -half_height} * node->DerivedScaling();
+				//Adjust from center to top left
+
+			node->DerivedPosition(position + top_left_v);
+		}
+	}
 
 	//Check focused frame first
 	if (focused_frame_ &&
