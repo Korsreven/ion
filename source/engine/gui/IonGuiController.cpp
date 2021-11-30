@@ -295,6 +295,57 @@ void GuiController::RemoveMouseCursorSkin() noexcept
 }
 
 
+void GuiController::UpdateMouseCursor(const Vector2 &position) noexcept
+{
+	if (mouse_cursor_skin_)
+	{
+		if (auto node = mouse_cursor_skin_->ParentNode(); node)
+		{
+			auto [half_width, half_height] =
+				mouse_cursor_skin_->AxisAlignedBoundingBox().ToHalfSize().XY();
+
+			//Adjust from center to hot spot
+			auto hot_spot_off =
+				[&]() noexcept -> Vector2
+				{
+					switch (mouse_cursor_hot_spot_)
+					{
+						case GuiMouseCursorHotSpot::TopLeft:
+						return {half_width, -half_height};
+
+						case GuiMouseCursorHotSpot::TopCenter:
+						return {0.0_r, -half_height};
+
+						case GuiMouseCursorHotSpot::TopRight:
+						return {-half_width, -half_height};
+
+						case GuiMouseCursorHotSpot::Left:
+						return {half_width, 0.0_r};
+
+						case GuiMouseCursorHotSpot::Right:
+						return {-half_width, 0.0_r};
+
+						case GuiMouseCursorHotSpot::BottomLeft:
+						return {half_width, half_height};
+
+						case GuiMouseCursorHotSpot::BottomCenter:
+						return {0.0_r, half_height};
+
+						case GuiMouseCursorHotSpot::BottomRight:
+						return {-half_width, half_height};
+
+
+						default:
+						return vector2::Zero;
+					}
+				}() * node->DerivedScaling();
+
+			node->DerivedPosition(position + hot_spot_off);
+		}
+	}
+}
+
+
 //Public
 
 GuiController::GuiController(SceneNode &parent_node)
@@ -313,7 +364,7 @@ GuiController::~GuiController() noexcept
 	Modifiers
 */
 
-void GuiController::MouseCursorSkin(gui_controller::MouseCursorSkin skin, real z_order) noexcept
+void GuiController::MouseCursorSkin(gui_controller::GuiMouseCursorSkin skin, real z_order) noexcept
 {
 	if (mouse_cursor_skin_.ModelObject != skin.ModelObject)
 	{
@@ -512,19 +563,7 @@ bool GuiController::MouseReleased(MouseButton button, Vector2 position) noexcept
 
 bool GuiController::MouseMoved(Vector2 position) noexcept
 {
-	if (mouse_cursor_skin_)
-	{
-		if (auto node = mouse_cursor_skin_->ParentNode(); node)
-		{
-			auto [half_width, half_height] =
-				mouse_cursor_skin_->AxisAlignedBoundingBox().ToHalfSize().XY();
-			auto top_left_v =
-				Vector2{half_width, -half_height} * node->DerivedScaling();
-				//Adjust from center to top left
-
-			node->DerivedPosition(position + top_left_v);
-		}
-	}
+	UpdateMouseCursor(position);
 
 	//Check focused frame first
 	if (focused_frame_ &&

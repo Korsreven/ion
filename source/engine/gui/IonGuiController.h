@@ -43,7 +43,14 @@ namespace ion::gui
 
 	namespace gui_controller
 	{
-		struct MouseCursorSkin final
+		enum class GuiMouseCursorHotSpot
+		{
+			TopLeft,	TopCenter,		TopRight,
+			Left,		Center,			Right,
+			BottomLeft, BottomCenter,	BottomRight
+		};
+
+		struct GuiMouseCursorSkin final
 		{
 			NonOwningPtr<graphics::scene::Model> ModelObject;
 
@@ -112,7 +119,8 @@ namespace ion::gui
 			gui_controller::detail::frames active_frames_;
 			bool shift_pressed_ = false;
 
-			gui_controller::MouseCursorSkin mouse_cursor_skin_;
+			gui_controller::GuiMouseCursorSkin mouse_cursor_skin_;
+			gui_controller::GuiMouseCursorHotSpot mouse_cursor_hot_spot_ = gui_controller::GuiMouseCursorHotSpot::TopLeft;
 
 
 			GuiFrame* NextFocusableFrame(GuiFrame *from_frame) const noexcept;
@@ -165,6 +173,8 @@ namespace ion::gui
 			void AttachMouseCursorSkin(real z_order);
 			void DetachMouseCursorSkin() noexcept;
 			void RemoveMouseCursorSkin() noexcept;
+
+			void UpdateMouseCursor(const Vector2 &position) noexcept;
 
 		public:
 
@@ -229,7 +239,14 @@ namespace ion::gui
 			*/
 
 			//Sets the mouse cursor skin used by this controller to the given skin with the given z-order
-			void MouseCursorSkin(gui_controller::MouseCursorSkin skin, real z_order) noexcept;
+			void MouseCursorSkin(gui_controller::GuiMouseCursorSkin skin, real z_order) noexcept;
+
+			//Sets the mouse cursor hot spot to the given hot spot
+			//The point in the mouse cursor skin that interacts with other elements on the screen
+			inline void MouseCursorHotSpot(gui_controller::GuiMouseCursorHotSpot hot_spot) noexcept
+			{
+				mouse_cursor_hot_spot_ = hot_spot;
+			}
 
 
 			/*
@@ -240,6 +257,13 @@ namespace ion::gui
 			[[nodiscard]] inline auto& MouseCursorSkin() const noexcept
 			{
 				return mouse_cursor_skin_;
+			}
+
+			//Returns the mouse cursor hot spot
+			//The point in the mouse cursor skin that interacts with other elements on the screen
+			[[nodiscard]] inline auto& MouseCursorHotSpot() const noexcept
+			{
+				return mouse_cursor_hot_spot_;
 			}
 
 

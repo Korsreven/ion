@@ -1566,7 +1566,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//scene_graph->LightingEnabled(false);
 
 			//GUI skins
-			ion::gui::gui_controller::MouseCursorSkin mouse_cursor_skin;
+			ion::gui::gui_controller::GuiMouseCursorSkin mouse_cursor_skin;
 			mouse_cursor_skin.ModelObject = mouse_cursor_model;
 
 			ion::gui::controls::gui_control::ControlSkin button_skin;
