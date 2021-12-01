@@ -146,6 +146,8 @@ File:	main.cpp
 #include "gui/IonGuiPanel.h"
 #include "gui/IonGuiPanelContainer.h"
 #include "gui/controls/IonGuiControl.h"
+#include "gui/controls/IonGuiLabel.h"
+#include "gui/controls/IonGuiTooltip.h"
 
 #include "managed/IonManagedObject.h"
 #include "managed/IonObjectManager.h"

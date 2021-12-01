@@ -612,6 +612,12 @@
     <ClCompile Include="..\source\engine\gui\IonGuiPanelContainer.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\gui\controls\IonGuiLabel.cpp">
+      <Filter>Source Files\gui\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\gui\controls\IonGuiTooltip.cpp">
+      <Filter>Source Files\gui\controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1186,6 +1192,12 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\events\listeners\IonGuiFrameListener.h">
       <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\gui\controls\IonGuiLabel.h">
+      <Filter>Header Files\gui\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\gui\controls\IonGuiTooltip.h">
+      <Filter>Header Files\gui\controls</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
