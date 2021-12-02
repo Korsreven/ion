@@ -277,6 +277,14 @@ void Mesh::SurfaceColor(const Color &color) noexcept
 	vertex_batch_.ReloadData();
 }
 
+void Mesh::Opacity(real percent) noexcept
+{
+	for (auto i = detail::color_offset; i < std::ssize(vertex_data_); i += detail::vertex_components)
+		vertex_data_[i + 3] = percent;
+
+	vertex_batch_.ReloadData();
+}
+
 
 /*
 	Observers
@@ -288,6 +296,14 @@ Color Mesh::SurfaceColor() const noexcept
 		return Color{vertex_data_[i], vertex_data_[i + 1], vertex_data_[i + 2], vertex_data_[i + 3]};
 	else
 		return color::Transparent;
+}
+
+real Mesh::Opacity() const noexcept
+{
+	if (auto i = detail::color_offset; i < std::ssize(vertex_data_))
+		return vertex_data_[i + 3];
+	else
+		return 0.0_r;
 }
 
 

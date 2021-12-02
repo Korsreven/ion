@@ -21,6 +21,7 @@ namespace ion::graphics::scene
 {
 
 using namespace model;
+using namespace types::type_literals;
 
 namespace model::detail
 {
@@ -47,6 +48,44 @@ Model::Model(bool visible) noexcept :
 	DrawableObject{visible}
 {
 	query_type_flags_ |= query::scene_query::QueryType::Model;
+}
+
+
+/*
+	Modifiers
+*/
+
+void Model::SurfaceColor(const Color &color) noexcept
+{
+	for (auto &mesh : Meshes())
+		mesh.SurfaceColor(color);
+}
+
+void Model::Opacity(real percent) noexcept
+{
+	for (auto &mesh : Meshes())
+		mesh.Opacity(percent);
+}
+
+
+/*
+	Observers
+*/
+
+Color Model::SurfaceColor() const noexcept
+{
+	if (auto meshes = Meshes(); !std::empty(meshes))
+		return std::begin(meshes)->SurfaceColor();
+	else
+		return color::Transparent;
+}
+
+real Model::Opacity() const noexcept
+{
+	if (auto meshes = Meshes(); !std::empty(meshes))
+		return std::begin(meshes)->Opacity();
+	else
+		return 0.0_r;
 }
 
 

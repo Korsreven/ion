@@ -288,6 +288,9 @@ namespace ion::graphics::scene::shapes
 			//Sets the surface color of this mesh to the given color
 			void SurfaceColor(const Color &color) noexcept;
 
+			//Sets the opacity of this mesh to the given percent
+			void Opacity(real percent) noexcept;
+
 			//Sets the surface material used by this mesh to the given material
 			inline void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
@@ -367,6 +370,9 @@ namespace ion::graphics::scene::shapes
 
 			//Returns the surface color of this mesh (from first vertex)
 			[[nodiscard]] Color SurfaceColor() const noexcept;
+
+			//Returns the opacity of this mesh (from first vertex)
+			[[nodiscard]] real Opacity() const noexcept;
 
 			//Returns a pointer to the material used by this mesh
 			//Returns nullptr if this mesh does not have a material

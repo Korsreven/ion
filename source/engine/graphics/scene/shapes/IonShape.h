@@ -83,6 +83,16 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
+			//Sets the opacity of this shape to the given percent
+			inline void Opacity(real percent) noexcept
+			{
+				if (color_.A() != percent)
+				{
+					color_.A(percent);
+					update_vertices_ = true;
+				}
+			}
+
 			//Sets if this shape should be shown in wireframe or not
 			inline void ShowWireframe(bool show) noexcept
 			{
@@ -100,10 +110,16 @@ namespace ion::graphics::scene::shapes
 				Observers
 			*/
 
-			//Returns the color of this rectangle
+			//Returns the color of this shape
 			[[nodiscard]] inline auto& FillColor() const noexcept
 			{
 				return color_;
+			}
+
+			//Returns the opacity of this shape
+			[[nodiscard]] inline auto Opacity() const noexcept
+			{
+				return color_.A();
 			}
 
 			//Returns true if this shape is shown in wireframe
