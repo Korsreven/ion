@@ -166,6 +166,20 @@ namespace ion::gui
 			void Defocused(GuiFrame &frame) noexcept override final;
 
 
+			//See GuiComponent::Enabled for more details
+			virtual void Enabled() noexcept override final;
+
+			//See GuiComponent::Disabled for more details
+			virtual void Disabled() noexcept override final;
+
+
+			//See GuiComponent::Shown for more details
+			virtual void Shown() noexcept override final;
+
+			//See GuiComponent::Hidden for more details
+			virtual void Hidden() noexcept override final;
+
+
 			/*
 				Mouse cursor skin
 			*/

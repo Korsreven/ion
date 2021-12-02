@@ -254,6 +254,49 @@ void GuiController::Defocused(GuiFrame &frame) noexcept
 }
 
 
+void GuiController::Enabled() noexcept
+{
+	GuiContainer::Enabled(); //Use base functionality
+}
+
+void GuiController::Disabled() noexcept
+{
+	GuiContainer::Disabled(); //Use base functionality
+}
+
+
+void GuiController::Shown() noexcept
+{
+	if (mouse_cursor_skin_)
+	{
+		if (auto node = mouse_cursor_skin_->ParentNode(); node)
+			node->Visible(true);
+	}
+
+	for (auto &frame : Frames())
+	{
+		if (frame.IsVisible())
+		{
+			frame.Hide(); //Force Show to trigger Shown event
+			frame.Show(); //Calls GuiComponent::Show
+		}
+	}
+
+	GuiContainer::Shown(); //Use base functionality
+}
+
+void GuiController::Hidden() noexcept
+{
+	if (mouse_cursor_skin_)
+	{
+		if (auto node = mouse_cursor_skin_->ParentNode(); node)
+			node->Visible(false);
+	}
+
+	GuiContainer::Hidden(); //Use base functionality
+}
+
+
 /*
 	Mouse cursor skin
 */
@@ -451,6 +494,9 @@ void GuiController::FrameEnded(duration time) noexcept
 
 bool GuiController::KeyPressed(KeyButton button) noexcept
 {
+	if (!enabled_)
+		return false;
+
 	if (focused_frame_ &&
 		focused_frame_->KeyPressed(button))
 		return true; //Consumed
@@ -470,6 +516,9 @@ bool GuiController::KeyPressed(KeyButton button) noexcept
 
 bool GuiController::KeyReleased(KeyButton button) noexcept
 {
+	if (!enabled_)
+		return false;
+
 	if (focused_frame_ &&
 		focused_frame_->KeyReleased(button))
 		return true; //Consumed
@@ -509,6 +558,9 @@ bool GuiController::KeyReleased(KeyButton button) noexcept
 
 bool GuiController::CharacterPressed(char character) noexcept
 {
+	if (!enabled_)
+		return false;
+
 	return focused_frame_ ?
 		focused_frame_->CharacterPressed(character) :
 		false;
@@ -521,6 +573,9 @@ bool GuiController::CharacterPressed(char character) noexcept
 
 bool GuiController::MousePressed(MouseButton button, Vector2 position) noexcept
 {
+	if (!enabled_)
+		return false;
+
 	//Check focused frame first
 	if (focused_frame_ &&
 		focused_frame_->MousePressed(button, position))
@@ -542,6 +597,9 @@ bool GuiController::MousePressed(MouseButton button, Vector2 position) noexcept
 
 bool GuiController::MouseReleased(MouseButton button, Vector2 position) noexcept
 {
+	if (!enabled_)
+		return false;
+
 	//Check focused frame first
 	if (focused_frame_ &&
 		focused_frame_->MouseReleased(button, position))
@@ -565,6 +623,9 @@ bool GuiController::MouseMoved(Vector2 position) noexcept
 {
 	UpdateMouseCursor(position);
 
+	if (!enabled_)
+		return false;
+
 	//Check focused frame first
 	if (focused_frame_ &&
 		focused_frame_->MouseMoved(position))
@@ -586,6 +647,9 @@ bool GuiController::MouseMoved(Vector2 position) noexcept
 
 bool GuiController::MouseWheelRolled(int delta, Vector2 position) noexcept
 {
+	if (!enabled_)
+		return false;
+
 	//Check focused frame first
 	if (focused_frame_ &&
 		focused_frame_->MouseWheelRolled(delta, position))

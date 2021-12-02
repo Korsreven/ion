@@ -162,7 +162,7 @@ bool GuiPanelContainer::IsFocusable() const noexcept
 	if (auto frame = dynamic_cast<const GuiFrame*>(this); frame)
 		return frame->IsFocusable();
 	else if (owner_)
-		return owner_->IsEnabled() && static_cast<const GuiPanelContainer*>(owner_)->IsFocusable(); //Recursive
+		return owner_->IsEnabled() && owner_->IsVisible() && static_cast<const GuiPanelContainer*>(owner_)->IsFocusable(); //Recursive
 	else
 		return true;
 }

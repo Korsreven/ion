@@ -907,7 +907,7 @@ void GuiControl::Show() noexcept
 void GuiControl::Focus() noexcept
 {
 	if (!focused_ &&
-		enabled_ && focusable_ && visible_)
+		enabled_ && visible_ && focusable_)
 	{
 		if (auto owner = Owner(); !owner || owner->IsFocusable())
 		{

@@ -307,6 +307,20 @@ void GuiFrame::Disabled() noexcept
 
 void GuiFrame::Shown() noexcept
 {
+	//Show all controls that should be visible
+	for (auto &control : Controls())
+	{
+		if (control.IsVisible())
+			control.Show();
+	}
+
+	//Show all panels that should be visible
+	for (auto &panel : Panels())
+	{
+		if (panel.IsVisible())
+			panel.Show();
+	}
+
 	GuiPanelContainer::Shown(); //Use base functionality
 }
 
@@ -432,20 +446,6 @@ void GuiFrame::Activate(FrameMode mode) noexcept
 {
 	GuiPanelContainer::Show();
 
-	//Show all controls that should be visible
-	for (auto &control : Controls())
-	{
-		if (control.IsVisible())
-			control.Show();
-	}
-
-	//Show all panels that should be visible
-	for (auto &panel : Panels())
-	{
-		if (panel.IsVisible())
-			panel.Show();
-	}
-
 	if (!activated_)
 	{
 		activated_ = true;
@@ -503,10 +503,10 @@ void GuiFrame::Defocus() noexcept
 
 bool GuiFrame::IsFocusable() const noexcept
 {
-	if (enabled_ && activated_)
+	if (enabled_ && visible_ && activated_)
 	{
 		if (auto owner = Owner(); owner)
-			return owner->IsEnabled() && owner->IsOnTop(*this);
+			return owner->IsEnabled() && owner->IsVisible() && owner->IsOnTop(*this);
 		else
 			return true;
 	}
@@ -578,6 +578,9 @@ void GuiFrame::FrameEnded(duration time) noexcept
 
 bool GuiFrame::KeyPressed(KeyButton button) noexcept
 {
+	if (!enabled_)
+		return false;
+
 	if (focused_control_ &&
 		focused_control_->KeyPressed(button))
 		return true; //Consumed
@@ -605,6 +608,9 @@ bool GuiFrame::KeyPressed(KeyButton button) noexcept
 
 bool GuiFrame::KeyReleased(KeyButton button) noexcept
 {
+	if (!enabled_)
+		return false;
+
 	if (focused_control_ &&
 		focused_control_->KeyReleased(button))
 		return true; //Consumed
@@ -633,6 +639,9 @@ bool GuiFrame::KeyReleased(KeyButton button) noexcept
 
 bool GuiFrame::CharacterPressed(char character) noexcept
 {
+	if (!enabled_)
+		return false;
+
 	return focused_control_ ?
 		focused_control_->CharacterPressed(character) :
 		false;
@@ -645,6 +654,9 @@ bool GuiFrame::CharacterPressed(char character) noexcept
 
 bool GuiFrame::MousePressed(MouseButton button, Vector2 position) noexcept
 {
+	if (!enabled_)
+		return false;
+
 	if (hovered_control_ &&
 		hovered_control_->MousePressed(button, position))
 		return true; //Consumed
@@ -671,6 +683,9 @@ bool GuiFrame::MousePressed(MouseButton button, Vector2 position) noexcept
 
 bool GuiFrame::MouseReleased(MouseButton button, Vector2 position) noexcept
 {
+	if (!enabled_)
+		return false;
+
 	if (pressed_control_ &&
 		pressed_control_->MouseReleased(button, position))
 		return true; //Consumed
@@ -700,6 +715,9 @@ bool GuiFrame::MouseReleased(MouseButton button, Vector2 position) noexcept
 
 bool GuiFrame::MouseMoved(Vector2 position) noexcept
 {
+	if (!enabled_)
+		return false;
+
 	if (pressed_control_ &&
 		pressed_control_->MouseMoved(position))
 		return true; //Consumed
@@ -749,6 +767,9 @@ bool GuiFrame::MouseMoved(Vector2 position) noexcept
 
 bool GuiFrame::MouseWheelRolled(int delta, Vector2 position) noexcept
 {
+	if (!enabled_)
+		return false;
+
 	return hovered_control_ ?
 		hovered_control_->MouseWheelRolled(delta, position) :
 		false;
