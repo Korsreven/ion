@@ -850,28 +850,34 @@ GuiControl::GuiControl(std::string name, Areas areas) :
 }
 
 
-GuiControl::GuiControl(std::string name, std::string caption, ControlSkin skin) :
+GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
+	ControlSkin skin) :
 
 	GuiComponent{std::move(name)},
 	caption_{std::move(caption)},
+	tooltip_{std::move(tooltip)},
 	skin_{std::move(skin)}
 {
 	//Empty
 }
 
-GuiControl::GuiControl(std::string name, std::string caption, ControlSkin skin, const Vector2 &size) :
+GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
+	ControlSkin skin, const Vector2 &size) :
 
 	GuiComponent{std::move(name)},
 	caption_{std::move(caption)},
+	tooltip_{std::move(tooltip)},
 	skin_{std::move(skin)}
 {
 	Size(size); //Resize skin to the given size
 }
 
-GuiControl::GuiControl(std::string name, std::string caption, ControlSkin skin, Areas areas) :
+GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
+	ControlSkin skin, Areas areas) :
 
 	GuiComponent{std::move(name)},
 	caption_{std::move(caption)},
+	tooltip_{std::move(tooltip)},
 	skin_{std::move(skin)}
 {
 	Size(Aabb::Enclose(areas).ToSize()); //Resize skin to the enclosed size of the given areas

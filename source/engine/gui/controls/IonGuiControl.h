@@ -416,14 +416,17 @@ namespace ion::gui::controls
 			GuiControl(std::string name, gui_control::Areas areas);
 
 
-			//Construct a control with the given name, caption and skin
-			GuiControl(std::string name, std::string caption, gui_control::ControlSkin skin);
+			//Construct a control with the given name, caption, tooltip and skin
+			GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
+				gui_control::ControlSkin skin);
 
-			//Construct a control with the given name, caption, skin and size
-			GuiControl(std::string name, std::string caption, gui_control::ControlSkin skin, const Vector2 &size);
+			//Construct a control with the given name, caption, tooltip, skin and size
+			GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
+				gui_control::ControlSkin skin, const Vector2 &size);
 
-			//Construct a control with the given name, caption, skin and hit areas
-			GuiControl(std::string name, std::string caption, gui_control::ControlSkin skin, gui_control::Areas areas);
+			//Construct a control with the given name, caption, tooltip, skin and hit areas
+			GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
+				gui_control::ControlSkin skin, gui_control::Areas areas);
 
 
 			//Virtual destructor

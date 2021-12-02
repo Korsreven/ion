@@ -1619,7 +1619,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			base_panel->ZOrder(0.1_r);
 
 			auto base_control = base_panel->CreateControl<ion::gui::controls::GuiControl>("control",
-				"My caption", std::move(button_skin), Vector2{0.5_r, 0.1_r});
+				"My caption", std::nullopt, std::move(button_skin), Vector2{0.5_r, 0.1_r});
 			base_control->Node()->Position({0.0_r, 0.5_r});
 
 			auto sub_panel = base_panel->CreatePanel("sub");
