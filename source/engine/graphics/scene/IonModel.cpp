@@ -27,7 +27,11 @@ namespace model::detail
 } //model::detail
 
 
-//Private
+//Protected
+
+/*
+	Events
+*/
 
 void Model::Created(shapes::Mesh &mesh) noexcept
 {
@@ -41,33 +45,24 @@ void Model::Removed(shapes::Mesh&) noexcept
 }
 
 
+void Model::OpacityChanged() noexcept
+{
+	for (auto &mesh : Meshes())
+	{
+		if (auto shape = dynamic_cast<shapes::Shape*>(&mesh); shape)
+			shape->Refresh();
+		else
+			mesh.VertexOpacity(Opacity());
+	}
+}
+
+
 //Public
 
 Model::Model(bool visible) noexcept :
 	DrawableObject{visible}
 {
 	query_type_flags_ |= query::scene_query::QueryType::Model;
-}
-
-
-/*
-	Modifiers
-*/
-
-void Model::Opacity(real percent) noexcept
-{
-	if (opacity_ != percent)
-	{
-		opacity_ = percent;
-
-		for (auto &mesh : Meshes())
-		{
-			if (auto shape = dynamic_cast<shapes::Shape*>(&mesh); shape)
-				shape->Refresh();
-			else
-				mesh.VertexOpacity(percent);
-		}
-	}
 }
 
 

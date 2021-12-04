@@ -18,9 +18,12 @@ File:	IonDrawableObject.h
 #include "IonMovableObject.h"
 #include "adaptors/ranges/IonIterable.h"
 #include "graphics/render/IonPass.h"
+#include "types/IonTypes.h"
 
 namespace ion::graphics::scene
 {
+	using namespace types::type_literals;
+
 	namespace drawable_object
 	{
 		using Passes = std::vector<render::Pass>;
@@ -36,7 +39,16 @@ namespace ion::graphics::scene
 	{
 		private:
 
+			real opacity_ = 1.0_r;
 			drawable_object::Passes passes_;
+
+		protected:
+
+			/*
+				Events
+			*/
+
+			virtual void OpacityChanged() noexcept;
 
 		public:
 
@@ -78,6 +90,32 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto Passes() const noexcept
 			{
 				return adaptors::ranges::Iterable<const drawable_object::Passes&>{passes_};
+			}
+
+
+			/*
+				Modifiers
+			*/
+
+			//Sets the opacity of this drawable object to the given percent
+			virtual void Opacity(real percent) noexcept
+			{
+				if (opacity_ != percent)
+				{
+					opacity_ = percent;
+					OpacityChanged();
+				}
+			}
+
+
+			/*
+				Observers
+			*/
+
+			//Returns the opacity of this drawable object
+			[[nodiscard]] inline auto Opacity() const noexcept
+			{
+				return opacity_;
 			}
 
 

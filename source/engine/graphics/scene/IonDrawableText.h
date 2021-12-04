@@ -129,11 +129,11 @@ namespace ion::graphics::scene
 			fonts::text::TextVerticalAlignment vertical_alignment, int font_size, real line_height, int total_lines, const Vector3 &position) noexcept;
 
 		vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
-			const Vector3 &position, real rotation, real opacity, const Vector2 &scaling,
-			const Color &color, const Vector3 &origin, const Vector2 &coordinate_scaling);
+			const Vector3 &position, real rotation, const Vector2 &scaling,
+			const Color &color, real opacity, const Vector3 &origin, const Vector2 &coordinate_scaling);
 		decoration_vertex_container get_decoration_vertex_data(
-			const Vector3 &position, real rotation, real opacity, const Vector2 &size,
-			const Color &color, const Vector3 &origin, const Vector2 &coordinate_scaling);
+			const Vector3 &position, real rotation, const Vector2 &size,
+			const Color &color, real opacity, const Vector3 &origin, const Vector2 &coordinate_scaling);
 
 		void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text,
 			int font_size, int &glyph_count, Vector3 &position, real rotation, real opacity,
@@ -151,7 +151,6 @@ namespace ion::graphics::scene
 
 			Vector3 position_;
 			real rotation_ = 0.0_r;
-			real opacity_ = 1.0_r;
 
 			std::optional<fonts::Text> text_;
 			NonOwningPtr<fonts::Text> initial_text_;
@@ -165,6 +164,14 @@ namespace ion::graphics::scene
 
 
 			void PrepareVertexStreams();
+
+		protected:
+
+			/*
+				Events
+			*/
+
+			void OpacityChanged() noexcept override;
 
 		public:
 
@@ -202,16 +209,6 @@ namespace ion::graphics::scene
 				}
 			}
 
-			//Sets the opacity of this text to the given percent
-			inline void Opacity(real percent) noexcept
-			{
-				if (opacity_ != percent)
-				{
-					opacity_ = percent;
-					reload_vertex_streams_ = true;
-				}
-			}
-
 
 			//Revert to the initial text
 			void Revert();
@@ -231,12 +228,6 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto Rotation() const noexcept
 			{
 				return rotation_;
-			}
-
-			//Returns the opacity of this text
-			[[nodiscard]] inline auto Opacity() const noexcept
-			{
-				return opacity_;
 			}
 
 

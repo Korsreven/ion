@@ -29,6 +29,20 @@ namespace drawable_object::detail
 } //drawable_object::detail
 
 
+//Protected
+
+/*
+	Events
+*/
+
+void DrawableObject::OpacityChanged() noexcept
+{
+	//Empty
+}
+
+
+//Public
+
 DrawableObject::DrawableObject(bool visible) :
 	MovableObject{visible}
 {

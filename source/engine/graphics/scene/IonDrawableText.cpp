@@ -213,8 +213,8 @@ real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const 
 
 
 vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
-	const Vector3 &position, real rotation, real opacity, const Vector2 &scaling,
-	const Color &color, const Vector3 &origin, const Vector2 &coordinate_scaling)
+	const Vector3 &position, real rotation, const Vector2 &scaling,
+	const Color &color, real opacity, const Vector3 &origin, const Vector2 &coordinate_scaling)
 {
 	auto [x, y, z] = position.XYZ();
 	auto [r, g, b, a] = color.RGBA();
@@ -289,8 +289,8 @@ vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 }
 
 decoration_vertex_container get_decoration_vertex_data(
-	const Vector3 &position, real rotation, real opacity, const Vector2 &size,
-	const Color &color, const Vector3 &origin, const Vector2 &coordinate_scaling)
+	const Vector3 &position, real rotation, const Vector2 &size,
+	const Color &color, real opacity, const Vector3 &origin, const Vector2 &coordinate_scaling)
 {
 	auto [x, y, z] = position.XYZ();
 	auto [width, height] = size.XY();
@@ -380,8 +380,8 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 					auto decoration_size = Vector2{text_block.Size->X(), font_size + (line_margin * 4.0_r + line_thickness * 4.0_r)};
 
 					auto vertex_data = get_decoration_vertex_data(
-						decoration_position, rotation, opacity, decoration_size,
-						*background_color, origin, coordinate_scaling);
+						decoration_position, rotation, decoration_size,
+						*background_color, opacity, origin, coordinate_scaling);
 					decoration_stream.back_vertex_data.insert(std::end(decoration_stream.back_vertex_data), std::begin(vertex_data), std::end(vertex_data));
 				}
 				
@@ -409,8 +409,8 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 					auto decoration_size = Vector2{text_block.Size->X(), line_thickness};
 					auto decoration_color = get_text_decoration_color(text_block, text).value_or(foreground_color);
 					auto vertex_data = get_decoration_vertex_data(
-						decoration_position, rotation, opacity, decoration_size,
-						decoration_color, origin, coordinate_scaling);
+						decoration_position, rotation, decoration_size,
+						decoration_color, opacity, origin, coordinate_scaling);
 
 					if (*decoration == fonts::text::TextDecoration::LineThrough)
 						decoration_stream.front_vertex_data.insert(std::end(decoration_stream.front_vertex_data), std::begin(vertex_data), std::end(vertex_data));
@@ -429,8 +429,8 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 						{
 							glyph_streams[glyph_count].vertex_data =
 								get_glyph_vertex_data((*metrics)[glyph_index],
-									position, rotation, opacity, scaling,
-									foreground_color, origin, coordinate_scaling);
+									position, rotation, scaling,
+									foreground_color, opacity, origin, coordinate_scaling);
 							glyph_streams[glyph_count].vertex_batch.VertexData(glyph_streams[glyph_count].vertex_data);
 							glyph_streams[glyph_count].vertex_batch.ReloadData(); //Must reload data even if vertex data view (range) is unchanged
 							glyph_streams[glyph_count].vertex_batch.BatchTexture((*handles)[glyph_index]);
@@ -441,8 +441,8 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 						{
 							glyph_streams.emplace_back(
 								get_glyph_vertex_data((*metrics)[glyph_index],
-									position, rotation, opacity, scaling,
-									foreground_color, origin, coordinate_scaling),
+									position, rotation, scaling,
+									foreground_color, opacity, origin, coordinate_scaling),
 								(*handles)[glyph_index]
 							);
 
@@ -567,7 +567,7 @@ void DrawableText::PrepareVertexStreams()
 	}
 
 
-	detail::get_text_vertex_streams(*text_, position_, rotation_, opacity_,
+	detail::get_text_vertex_streams(*text_, position_, rotation_, Opacity(),
 		coordinate_scaling, glyph_vertex_streams_, decoration_vertex_stream_);
 
 
@@ -590,6 +590,19 @@ void DrawableText::PrepareVertexStreams()
 			reload_vertex_buffer_ = true;
 	}
 }
+
+
+//Protected
+
+/*
+	Events
+*/
+
+void DrawableText::OpacityChanged() noexcept
+{
+	reload_vertex_streams_ = true;
+}
+
 
 //Public
 

@@ -42,8 +42,6 @@ namespace ion::graphics
 
 namespace ion::graphics::scene
 {
-	using namespace types::type_literals;
-
 	namespace model::detail
 	{
 	} //model
@@ -55,18 +53,25 @@ namespace ion::graphics::scene
 	{
 		private:
 
-			real opacity_ = 1.0_r;
 			std::optional<render::vertex::VertexBufferObject> vbo_;
 
 			bool reload_vertex_buffer_ = false;
 			bool update_bounding_volumes_ = false;
 
+		protected:
+
+			/*
+				Events
+			*/
 
 			//See ObjectManager<T>::Created for more details
 			void Created(shapes::Mesh &mesh) noexcept override;
 
 			//See ObjectManager<T>::removed for more details
 			void Removed(shapes::Mesh &mesh) noexcept override;
+
+
+			void OpacityChanged() noexcept override;
 
 		public:
 
@@ -94,24 +99,10 @@ namespace ion::graphics::scene
 
 
 			/*
-				Modifiers
-			*/
-
-			//Sets the opacity of this model to the given percent
-			void Opacity(real percent) noexcept;
-
-
-			/*
 				Observers
 			*/
 
-			//Returns the opacity of this model
-			[[nodiscard]] inline auto Opacity() const noexcept
-			{
-				return opacity_;
-			}
-
-			//Return the vertex buffer this model uses
+			//Returns the vertex buffer this model uses
 			[[nodiscard]] inline auto& VertexBuffer() const noexcept
 			{
 				return vbo_;

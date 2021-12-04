@@ -97,7 +97,7 @@ namespace ion::graphics::scene
 		}
 
 		vertex_container get_animation_vertex_data(textures::Animation &animation,
-			const Vector3 &position, real rotation, const Vector2 &size, const Color &color);
+			const Vector3 &position, real rotation, const Vector2 &size, const Color &color, real opacity);
 	} //drawable_animation::detail
 
 
@@ -122,6 +122,14 @@ namespace ion::graphics::scene
 
 
 			void PrepareVertexStream();
+
+		protected:
+
+			/*
+				Events
+			*/
+
+			void OpacityChanged() noexcept override;
 
 		public:
 		
@@ -189,16 +197,6 @@ namespace ion::graphics::scene
 				}
 			}
 
-			//Sets the opacity of this animation to the given percent
-			inline void Opacity(real percent) noexcept
-			{
-				if (color_.A() != percent)
-				{
-					color_.A(percent);
-					reload_vertex_stream_ = true;
-				}
-			}
-
 
 			//Revert to the initial animation
 			void Revert();
@@ -230,12 +228,6 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto& Tint() const noexcept
 			{
 				return color_;
-			}
-
-			//Returns the opacity of this animation
-			[[nodiscard]] inline auto Opacity() const noexcept
-			{
-				return color_.A();
 			}
 
 

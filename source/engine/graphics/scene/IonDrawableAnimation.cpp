@@ -35,10 +35,11 @@ animation_vertex_stream::animation_vertex_stream() :
 }
 
 vertex_container get_animation_vertex_data(textures::Animation &animation,
-	const Vector3 &position, real rotation, const Vector2 &size, const Color &color)
+	const Vector3 &position, real rotation, const Vector2 &size, const Color &color, real opacity)
 {
 	auto [half_width, half_height] = (size * 0.5_r).XY();
 	auto [r, g, b, a] = color.RGBA();
+	a *= opacity;
 
 	auto v1 = (position + Vector2{-half_width, half_height}).RotateCopy(rotation, position);
 	auto v2 = (position + Vector2{-half_width, -half_height}).RotateCopy(rotation, position);
@@ -103,9 +104,24 @@ void DrawableAnimation::PrepareVertexStream()
 	if (!vbo_)
 		reload_vertex_buffer_ = true;
 
-	vertex_stream_.vertex_data = detail::get_animation_vertex_data(*animation_, position_, rotation_, size_, color_);
+	vertex_stream_.vertex_data =
+		detail::get_animation_vertex_data(*animation_,
+			position_, rotation_, size_, color_, Opacity());
 	vertex_stream_.vertex_batch.VertexData(vertex_stream_.vertex_data);
 }
+
+
+//Protected
+
+/*
+	Events
+*/
+
+void DrawableAnimation::OpacityChanged() noexcept
+{
+	reload_vertex_stream_ = true;
+}
+
 
 //Public
 
