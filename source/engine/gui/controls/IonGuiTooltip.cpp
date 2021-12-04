@@ -22,6 +22,13 @@ namespace gui_tooltip::detail
 } //gui_tooltip::detail
 
 
+GuiTooltip::GuiTooltip(std::string name, std::optional<std::string> caption, gui_control::ControlSkin skin) :
+	GuiLabel{std::move(name), std::move(caption), std::move(skin)}
+{
+	Enabled(false); //Default setup
+}
+
+
 /*
 	Tooltip
 */

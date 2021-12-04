@@ -277,7 +277,7 @@ namespace ion::gui::controls
 
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
 			gui_control::ControlSkin skin_;
-			gui_control::Areas hit_areas_;	
+			gui_control::Areas hit_areas_;
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
 			std::optional<events::Callback<void, GuiControl&>> on_defocus_;

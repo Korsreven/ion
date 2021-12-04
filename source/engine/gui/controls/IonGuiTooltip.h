@@ -13,6 +13,9 @@ File:	IonGuiTooltip.h
 #ifndef ION_GUI_TOOLTIP_H
 #define ION_GUI_TOOLTIP_H
 
+#include <optional>
+#include <string>
+
 #include "IonGuiLabel.h"
 #include "types/IonTypes.h"
 
@@ -52,7 +55,8 @@ namespace ion::gui::controls
 
 		public:
 
-			using GuiLabel::GuiLabel;
+			//Construct a tooltip with the given name, caption and skin
+			GuiTooltip(std::string name, std::optional<std::string> caption, gui_control::ControlSkin skin);
 
 
 			/*
