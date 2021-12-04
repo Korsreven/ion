@@ -42,6 +42,8 @@ namespace ion::graphics
 
 namespace ion::graphics::scene
 {
+	using namespace types::type_literals;
+
 	namespace model::detail
 	{
 	} //model
@@ -53,6 +55,7 @@ namespace ion::graphics::scene
 	{
 		private:
 
+			real opacity_ = 1.0_r;
 			std::optional<render::vertex::VertexBufferObject> vbo_;
 
 			bool reload_vertex_buffer_ = false;
@@ -102,15 +105,17 @@ namespace ion::graphics::scene
 				Observers
 			*/
 
+			//Returns the opacity of this model
+			[[nodiscard]] inline auto Opacity() const noexcept
+			{
+				return opacity_;
+			}
+
 			//Return the vertex buffer this model uses
 			[[nodiscard]] inline auto& VertexBuffer() const noexcept
 			{
 				return vbo_;
 			}
-
-
-			//Returns the opacity of this model (from first mesh)
-			[[nodiscard]] real Opacity() const noexcept;
 
 
 			/*

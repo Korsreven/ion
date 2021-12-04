@@ -21,7 +21,6 @@ namespace ion::graphics::scene
 {
 
 using namespace model;
-using namespace types::type_literals;
 
 namespace model::detail
 {
@@ -57,21 +56,18 @@ Model::Model(bool visible) noexcept :
 
 void Model::Opacity(real percent) noexcept
 {
-	for (auto &mesh : Meshes())
-		mesh.VertexOpacity(percent);
-}
+	if (opacity_ != percent)
+	{
+		opacity_ = percent;
 
-
-/*
-	Observers
-*/
-
-real Model::Opacity() const noexcept
-{
-	if (auto meshes = Meshes(); !std::empty(meshes))
-		return std::begin(meshes)->VertexOpacity();
-	else
-		return 0.0_r;
+		for (auto &mesh : Meshes())
+		{
+			if (auto shape = dynamic_cast<shapes::Shape*>(&mesh); shape)
+				shape->Refresh();
+			else
+				mesh.VertexOpacity(percent);
+		}
+	}
 }
 
 

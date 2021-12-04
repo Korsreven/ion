@@ -166,6 +166,13 @@ namespace ion::graphics::scene::shapes
 				Preparing
 			*/
 
+			//Refresh this shape by generating new vertices
+			inline void Refresh() noexcept
+			{
+				update_vertices_ = true;
+			}
+
+
 			//Prepare this shape such that it is ready to be drawn
 			//This is called once regardless of passes
 			virtual mesh::MeshBoundingVolumeStatus Prepare() noexcept override;

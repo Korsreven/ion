@@ -12,6 +12,8 @@ File:	IonShape.cpp
 
 #include "IonShape.h"
 
+#include "graphics/scene/IonModel.h"
+
 namespace ion::graphics::scene::shapes
 {
 
@@ -85,7 +87,19 @@ mesh::MeshBoundingVolumeStatus Shape::Prepare() noexcept
 {
 	if (update_vertices_)
 	{
-		Mesh::VertexData(GetVertices());
+		auto vertices = GetVertices();
+
+		if (auto model = Owner(); model)
+		{
+			//Adjust alpha with model opacity
+			if (auto opacity = model->Opacity(); opacity != 1.0_r)
+			{
+				for (auto &vertex : vertices)
+					vertex.BaseColor.A(vertex.BaseColor.A() * opacity);
+			}
+		}
+
+		Mesh::VertexData(std::move(vertices));
 		update_vertices_ = false;
 	}
 
