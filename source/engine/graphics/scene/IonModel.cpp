@@ -55,16 +55,10 @@ Model::Model(bool visible) noexcept :
 	Modifiers
 */
 
-void Model::SurfaceColor(const Color &color) noexcept
-{
-	for (auto &mesh : Meshes())
-		mesh.SurfaceColor(color);
-}
-
 void Model::Opacity(real percent) noexcept
 {
 	for (auto &mesh : Meshes())
-		mesh.Opacity(percent);
+		mesh.VertexOpacity(percent);
 }
 
 
@@ -72,18 +66,10 @@ void Model::Opacity(real percent) noexcept
 	Observers
 */
 
-Color Model::SurfaceColor() const noexcept
-{
-	if (auto meshes = Meshes(); !std::empty(meshes))
-		return std::begin(meshes)->SurfaceColor();
-	else
-		return color::Transparent;
-}
-
 real Model::Opacity() const noexcept
 {
 	if (auto meshes = Meshes(); !std::empty(meshes))
-		return std::begin(meshes)->Opacity();
+		return std::begin(meshes)->VertexOpacity();
 	else
 		return 0.0_r;
 }

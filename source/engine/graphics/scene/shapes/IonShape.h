@@ -67,6 +67,14 @@ namespace ion::graphics::scene::shapes
 			//Must be overridden to return the vertices of the derived shape
 			virtual mesh::Vertices GetVertices() const noexcept = 0;
 
+
+			/*
+				Events
+			*/
+
+			virtual void VertexColorChanged() noexcept override;
+			virtual void VertexOpacityChanged() noexcept override;
+
 		public:
 
 			/*
@@ -84,7 +92,7 @@ namespace ion::graphics::scene::shapes
 			}
 
 			//Sets the opacity of this shape to the given percent
-			inline void Opacity(real percent) noexcept
+			inline void FillOpacity(real percent) noexcept
 			{
 				if (color_.A() != percent)
 				{
@@ -117,7 +125,7 @@ namespace ion::graphics::scene::shapes
 			}
 
 			//Returns the opacity of this shape
-			[[nodiscard]] inline auto Opacity() const noexcept
+			[[nodiscard]] inline auto FillOpacity() const noexcept
 			{
 				return color_.A();
 			}

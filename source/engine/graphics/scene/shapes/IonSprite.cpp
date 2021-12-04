@@ -133,6 +133,21 @@ void Sprite::RecalculateTexCoords() noexcept
 }
 
 
+/*
+	Events
+*/
+
+void Sprite::SurfaceMaterialChanged() noexcept
+{
+	update_vertices_ = true;
+
+	if (auto_size_)
+		RecalculateSize();
+	if (auto_repeat_)
+		RecalculateTexCoords();
+}
+
+
 //Public
 
 Sprite::Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible) :

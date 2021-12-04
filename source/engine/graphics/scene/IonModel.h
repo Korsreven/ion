@@ -94,9 +94,6 @@ namespace ion::graphics::scene
 				Modifiers
 			*/
 
-			//Sets the surface color of this model to the given color
-			void SurfaceColor(const Color &color) noexcept;
-
 			//Sets the opacity of this model to the given percent
 			void Opacity(real percent) noexcept;
 
@@ -111,9 +108,6 @@ namespace ion::graphics::scene
 				return vbo_;
 			}
 
-
-			//Returns the surface color of this model (from first mesh)
-			[[nodiscard]] Color SurfaceColor() const noexcept;
 
 			//Returns the opacity of this model (from first mesh)
 			[[nodiscard]] real Opacity() const noexcept;

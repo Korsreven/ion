@@ -21,6 +21,7 @@ namespace shape::detail
 {
 } //shape::detail
 
+//Protected
 
 Shape::Shape(const mesh::Vertices &vertices, const Color &color, bool visible) :
 
@@ -58,6 +59,23 @@ Shape::Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertice
 	//Empty
 }
 
+
+/*
+	Events
+*/
+
+void Shape::VertexColorChanged() noexcept
+{
+	FillColor(VertexColor());
+}
+
+void Shape::VertexOpacityChanged() noexcept
+{
+	FillOpacity(VertexOpacity());
+}
+
+
+//Public
 
 /*
 	Preparing

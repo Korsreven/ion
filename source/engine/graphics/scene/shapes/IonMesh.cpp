@@ -183,6 +183,30 @@ void disable_wire_frames() noexcept
 } //mesh
 
 
+//Protected
+
+/*
+	Events
+*/
+
+void Mesh::VertexColorChanged() noexcept
+{
+	//Empty
+}
+
+void Mesh::VertexOpacityChanged() noexcept
+{
+	//Empty
+}
+
+void Mesh::SurfaceMaterialChanged() noexcept
+{
+	//Empty
+}
+
+
+//Public
+
 Mesh::Mesh(const Vertices &vertices, bool visible) :
 	Mesh{vertex::vertex_batch::VertexDrawMode::Triangles, vertices, visible}
 {
@@ -269,20 +293,22 @@ Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, VertexContainer verte
 	Modifiers
 */
 
-void Mesh::SurfaceColor(const Color &color) noexcept
+void Mesh::VertexColor(const Color &color) noexcept
 {
 	for (auto i = detail::color_offset; i < std::ssize(vertex_data_); i += detail::vertex_components)
 		std::copy(color.Channels(), color.Channels() + detail::color_components, std::begin(vertex_data_) + i);
 
 	vertex_batch_.ReloadData();
+	VertexColorChanged();
 }
 
-void Mesh::Opacity(real percent) noexcept
+void Mesh::VertexOpacity(real percent) noexcept
 {
 	for (auto i = detail::color_offset; i < std::ssize(vertex_data_); i += detail::vertex_components)
 		vertex_data_[i + 3] = percent;
 
 	vertex_batch_.ReloadData();
+	VertexOpacityChanged();
 }
 
 
@@ -290,7 +316,7 @@ void Mesh::Opacity(real percent) noexcept
 	Observers
 */
 
-Color Mesh::SurfaceColor() const noexcept
+Color Mesh::VertexColor() const noexcept
 {
 	if (auto i = detail::color_offset; i < std::ssize(vertex_data_))
 		return Color{vertex_data_[i], vertex_data_[i + 1], vertex_data_[i + 2], vertex_data_[i + 3]};
@@ -298,7 +324,7 @@ Color Mesh::SurfaceColor() const noexcept
 		return color::Transparent;
 }
 
-real Mesh::Opacity() const noexcept
+real Mesh::VertexOpacity() const noexcept
 {
 	if (auto i = detail::color_offset; i < std::ssize(vertex_data_))
 		return vertex_data_[i + 3];

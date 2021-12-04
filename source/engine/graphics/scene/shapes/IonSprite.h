@@ -55,6 +55,13 @@ namespace ion::graphics::scene::shapes
 			void RecalculateSize() noexcept;
 			void RecalculateTexCoords() noexcept;
 
+
+			/*
+				Events
+			*/
+
+			virtual void SurfaceMaterialChanged() noexcept override;
+
 		public:
 		
 			//Construct a new sprite with the given size, material and visibility
@@ -153,15 +160,7 @@ namespace ion::graphics::scene::shapes
 			void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
 				if (Mesh::SurfaceMaterial() != material)
-				{
 					Mesh::SurfaceMaterial(material);
-					update_vertices_ = true;
-
-					if (auto_size_)
-						RecalculateSize();
-					if (auto_repeat_)
-						RecalculateTexCoords();
-				}
 			}
 
 

@@ -171,6 +171,16 @@ namespace ion::graphics::scene::shapes
 			bool update_bounding_volumes_ = false;
 			bool update_tex_coords_ = false;
 
+		protected:
+
+			/*
+				Events
+			*/
+
+			virtual void VertexColorChanged() noexcept;
+			virtual void VertexOpacityChanged() noexcept;
+			virtual void SurfaceMaterialChanged() noexcept;
+
 		public:
 
 			//Construct a new mesh with the given vertices and visibility
@@ -285,11 +295,11 @@ namespace ion::graphics::scene::shapes
 				vertex_batch_.DrawMode(draw_mode);
 			}
 
-			//Sets the surface color of this mesh to the given color
-			void SurfaceColor(const Color &color) noexcept;
+			//Sets the color of all vertices in this mesh to the given color
+			void VertexColor(const Color &color) noexcept;
 
-			//Sets the opacity of this mesh to the given percent
-			void Opacity(real percent) noexcept;
+			//Sets the opacity of all vertices in this mesh to the given percent
+			void VertexOpacity(real percent) noexcept;
 
 			//Sets the surface material used by this mesh to the given material
 			inline void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
@@ -298,6 +308,7 @@ namespace ion::graphics::scene::shapes
 				{
 					vertex_batch_.BatchMaterial(material);
 					update_tex_coords_ = true;
+					SurfaceMaterialChanged();
 				}
 			}
 
@@ -368,11 +379,11 @@ namespace ion::graphics::scene::shapes
 				return vertex_batch_.VertexCount();
 			}
 
-			//Returns the surface color of this mesh (from first vertex)
-			[[nodiscard]] Color SurfaceColor() const noexcept;
+			//Returns the vertex color of this mesh (from first vertex)
+			[[nodiscard]] Color VertexColor() const noexcept;
 
-			//Returns the opacity of this mesh (from first vertex)
-			[[nodiscard]] real Opacity() const noexcept;
+			//Returns the vertex opacity of this mesh (from first vertex)
+			[[nodiscard]] real VertexOpacity() const noexcept;
 
 			//Returns a pointer to the material used by this mesh
 			//Returns nullptr if this mesh does not have a material
