@@ -140,7 +140,7 @@ void GuiComponent::Disable() noexcept
 void GuiComponent::Show() noexcept
 {
 	if (node_)
-		node_->Visible(true, false);
+		node_->Visible(node_->ParentNode()->Visible(), false);
 
 	if (!visible_)
 	{
@@ -180,7 +180,7 @@ void GuiComponent::Owner(GuiContainer &owner) noexcept
 
 	parent_ = &owner;
 	node_ = parent_->Node() ?
-		parent_->Node()->CreateChildNode(parent_->Node()->Visible()) :
+		parent_->Node()->CreateChildNode(visible_ && parent_->Node()->Visible()) :
 		nullptr;
 }
 
