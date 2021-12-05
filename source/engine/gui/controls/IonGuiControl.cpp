@@ -534,7 +534,7 @@ void GuiControl::SetCaptionState(ControlState state, ControlCaptionPart &part) n
 {
 	if (part)
 	{
-		//Get() will not reload vertex streams when called from an immutable reference)
+		//Get() will not reload vertex streams when called from an immutable reference
 		if (const auto &c_part = *part.TextObject; c_part.Get())
 		{
 			if (auto &style = GetStateStyle(state, part); style)

@@ -19,6 +19,7 @@ namespace gui_label::detail
 {
 } //gui_control::detail
 
+
 //Private
 
 void GuiLabel::DefaultSetup() noexcept

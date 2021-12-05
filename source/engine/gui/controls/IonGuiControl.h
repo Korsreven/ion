@@ -60,7 +60,7 @@ namespace ion
 namespace ion::gui::controls
 {
 	using namespace events::listeners;
-	using namespace ion::graphics::utilities;
+	using namespace graphics::utilities;
 
 	namespace gui_control
 	{
@@ -402,7 +402,7 @@ namespace ion::gui::controls
 			void DetachSkin() noexcept;
 			void RemoveSkin() noexcept;
 
-			void UpdateCaption() noexcept;
+			virtual void UpdateCaption() noexcept;
 
 		public:
 

@@ -17,23 +17,28 @@ File:	IonGuiTooltip.h
 #include <string>
 
 #include "IonGuiLabel.h"
+#include "graphics/utilities/IonVector2.h"
+#include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 
 namespace ion::gui::controls
 {
 	using namespace types::type_literals;
+	using namespace graphics::utilities;
 
 	namespace gui_tooltip
 	{
-		enum class TooltipFadeMode : bool
-		{
-			Normally,
-			Immediately
-		};
-
-
 		namespace detail
 		{
+			enum class tooltip_phase
+			{
+				PreFadeIn,
+				FadeIn,
+				Hold,
+				PreFadeOut,
+				FadeOut
+			};
+
 			constexpr auto default_hold_time = 5.0_sec;
 			constexpr auto default_fade_delay = 0.5_sec;
 			constexpr auto default_fade_time = 0.1_sec;
@@ -42,6 +47,10 @@ namespace ion::gui::controls
 
 	class GuiTooltip : public GuiLabel
 	{
+		private:
+
+			void DefaultSetup() noexcept;
+
 		protected:
 
 			bool auto_size_ = true;
@@ -53,10 +62,35 @@ namespace ion::gui::controls
 			duration fade_in_time_ = gui_tooltip::detail::default_fade_time;
 			duration fade_out_time_ = gui_tooltip::detail::default_fade_time;
 
+			gui_tooltip::detail::tooltip_phase phase_ = gui_tooltip::detail::tooltip_phase::PreFadeIn;
+			types::Cumulative<duration> phase_duration_{fade_in_delay_};
+			real opacity_ = 1.0_r;
+
+
+			/*
+				Skins
+			*/
+
+			virtual void UpdateCaption() noexcept override;
+
+
+			/*
+				Phase
+			*/
+
+			void SetPhase(gui_tooltip::detail::tooltip_phase phase) noexcept;
+			void UpdatePhaseDuration() noexcept;
+
+			void SetOpacity(real percent) noexcept;
+			void UpdatePosition(const Vector2 &position) noexcept;
+
 		public:
 
-			//Construct a tooltip with the given name, caption and skin
-			GuiTooltip(std::string name, std::optional<std::string> caption, gui_control::ControlSkin skin);
+			//Construct a tooltip with the given name and skin
+			GuiTooltip(std::string name, gui_control::ControlSkin skin);
+
+			//Construct a tooltip with the given name, tooltip text and skin
+			GuiTooltip(std::string name, std::optional<std::string> text, gui_control::ControlSkin skin);
 
 
 			/*
@@ -79,31 +113,51 @@ namespace ion::gui::controls
 			//Sets the hold time for this tooltip to the given time
 			inline void HoldTime(duration time) noexcept
 			{
-				hold_time_ = time;
+				if (hold_time_ != time && time >= 0.0_sec)
+				{
+					hold_time_ = time;
+					UpdatePhaseDuration();
+				}
 			}
 
 			//Sets the fade in delay for this tooltip to the given time
 			inline void FadeInDelay(duration time) noexcept
 			{
-				fade_in_delay_ = time;
+				if (fade_in_delay_ != time && time >= 0.0_sec)
+				{
+					fade_in_delay_ = time;
+					UpdatePhaseDuration();
+				}
 			}
 
 			//Sets the fade out delay for this tooltip to the given time
 			inline void FadeOutDelay(duration time) noexcept
 			{
-				fade_out_delay_ = time;
+				if (fade_out_delay_ != time && time >= 0.0_sec)
+				{
+					fade_out_delay_ = time;
+					UpdatePhaseDuration();
+				}
 			}
 
 			//Sets the fade in time for this tooltip to the given time
 			inline void FadeInTime(duration time) noexcept
 			{
-				fade_in_time_ = time;
+				if (fade_in_time_ != time && time >= 0.0_sec)
+				{
+					fade_in_time_ = time;
+					UpdatePhaseDuration();
+				}
 			}
 
 			//Sets the fade out time for this tooltip to the given time
 			inline void FadeOutTime(duration time) noexcept
 			{
-				fade_out_time_ = time;
+				if (fade_out_time_ != time && time >= 0.0_sec)
+				{
+					fade_out_time_ = time;
+					UpdatePhaseDuration();
+				}
 			}
 
 
@@ -159,11 +213,31 @@ namespace ion::gui::controls
 				Tooltip
 			*/
 
-			//Shows the given tooltip with the given fade mode
-			void Show(std::string tooltip, gui_tooltip::TooltipFadeMode fade_mode = gui_tooltip::TooltipFadeMode::Normally) noexcept;
+			//Shows this tooltip with the given tooltip text
+			void Show(std::string text) noexcept;
 
-			//Hides the tooltip with the given fade mode
-			void Hide(gui_tooltip::TooltipFadeMode fade_mode = gui_tooltip::TooltipFadeMode::Normally) noexcept;
+			//Shows this tooltip
+			void Show() noexcept;
+
+			//Hides this tooltip
+			void Hide() noexcept;
+
+
+			/*
+				Frame events
+			*/
+
+			//Called from gui control when a frame has started
+			virtual void FrameStarted(duration time) noexcept override;
+
+
+			/*
+				Mouse events
+			*/
+
+			//Called from gui control when the mouse has been moved
+			//Returns true if the mouse move event has been consumed by the tooltip
+			virtual bool MouseMoved(Vector2 position) noexcept override;
 	};
 
 } //ion::gui::controls
