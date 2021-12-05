@@ -39,7 +39,7 @@ namespace ion::gui
 {
 	using namespace events::listeners;
 	using namespace graphics::scene::graph;
-	using namespace ion::graphics::utilities;
+	using namespace graphics::utilities;
 
 	namespace gui_controller
 	{

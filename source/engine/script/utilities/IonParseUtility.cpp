@@ -20,7 +20,7 @@ namespace ion::script::utilities::parse
 {
 
 using namespace ion::utilities;
-using namespace ion::graphics::utilities;
+using namespace graphics::utilities;
 
 namespace detail
 {
