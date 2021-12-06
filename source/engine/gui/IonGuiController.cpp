@@ -12,6 +12,9 @@ File:	IonGuiController.cpp
 
 #include "IonGuiController.h"
 
+#include <algorithm>
+#include <utility>
+
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneNode.h"
@@ -167,14 +170,27 @@ GuiFrame* GuiController::PreviousFocusableFrame(GuiFrame *from_frame) const noex
 
 void GuiController::Created(GuiComponent &component) noexcept
 {
+	GuiContainer::Created(component); //Use base functionality
+
 	if (auto frame = dynamic_cast<GuiFrame*>(&component); frame)
 		Created(*frame);
+	else if (auto tooltip = dynamic_cast<controls::GuiTooltip*>(&component); tooltip)
+		Created(*tooltip);
 }
 
 void GuiController::Created(GuiFrame &frame) noexcept
 {
 	//If the added frame is adopted
 	frame.Deactivate();
+	frames_.push_back(&frame);
+}
+
+void GuiController::Created(controls::GuiTooltip &tooltip) noexcept
+{
+	if (!active_tooltip_)
+		active_tooltip_ = &tooltip;
+
+	tooltips_.push_back(&tooltip);
 }
 
 
@@ -182,11 +198,43 @@ void GuiController::Removed(GuiComponent &component) noexcept
 {
 	if (auto frame = dynamic_cast<GuiFrame*>(&component); frame)
 		Removed(*frame);
+	else if (auto tooltip = dynamic_cast<controls::GuiTooltip*>(&component); tooltip)
+		Removed(*tooltip);
+
+	GuiContainer::Removed(component); //Use base functionality
 }
 
 void GuiController::Removed(GuiFrame &frame) noexcept
 {
 	frame.Deactivate();
+
+	auto iter =
+		std::find_if(std::begin(frames_), std::end(frames_),
+			[&](auto &x) noexcept
+			{
+				return x == &frame;
+			});
+
+	//Frame found
+	if (iter != std::end(frames_))
+		frames_.erase(iter);
+}
+
+void GuiController::Removed(controls::GuiTooltip &tooltip) noexcept
+{
+	if (active_tooltip_ == &tooltip)
+		active_tooltip_ = nullptr;
+
+	auto iter =
+		std::find_if(std::begin(tooltips_), std::end(tooltips_),
+			[&](auto &x) noexcept
+			{
+				return x == &tooltip;
+			});
+
+	//Tooltip found
+	if (iter != std::end(tooltips_))
+		tooltips_.erase(iter);
 }
 
 
@@ -277,8 +325,8 @@ void GuiController::Shown() noexcept
 	{
 		if (frame.IsVisible())
 		{
-			frame.Hide(); //Force Show to trigger Shown event
-			frame.Show(); //Calls GuiComponent::Show
+			frame.GuiComponent::Hide(); //Force Show to trigger Shown event
+			frame.GuiComponent::Show();
 		}
 	}
 
@@ -287,6 +335,9 @@ void GuiController::Shown() noexcept
 
 void GuiController::Hidden() noexcept
 {
+	if (active_tooltip_)
+		active_tooltip_->GuiComponent::Hide(); //Hide immediately
+
 	if (mouse_cursor_skin_)
 	{
 		if (auto node = mouse_cursor_skin_->ParentNode(); node)
@@ -407,6 +458,14 @@ GuiController::~GuiController() noexcept
 	Modifiers
 */
 
+void GuiController::ActiveTooltip(std::string_view name) noexcept
+{
+	if (active_tooltip_)
+		active_tooltip_->GuiComponent::Hide(); //Hide immediately
+
+	active_tooltip_ = GetTooltip(name).get();
+}
+
 void GuiController::MouseCursorSkin(gui_controller::GuiMouseCursorSkin skin, real z_order) noexcept
 {
 	if (mouse_cursor_skin_.ModelObject != skin.ModelObject)
@@ -478,13 +537,16 @@ GuiFrame* GuiController::PreviousFocusableFrame(GuiFrame &from_frame) const noex
 void GuiController::FrameStarted(duration time) noexcept
 {
 	for (auto &frame : Frames())
-		static_cast<GuiFrame&>(frame).FrameStarted(time);
+		frame.FrameStarted(time);
+
+	if (active_tooltip_)
+		active_tooltip_->FrameStarted(time);
 }
 
 void GuiController::FrameEnded(duration time) noexcept
 {
 	for (auto &frame : Frames())
-		static_cast<GuiFrame&>(frame).FrameEnded(time);
+		frame.FrameEnded(time);
 }
 
 
@@ -587,7 +649,7 @@ bool GuiController::MousePressed(MouseButton button, Vector2 position) noexcept
 		for (auto &top_frame : active_frames_.back().frames)
 		{
 			if (top_frame != focused_frame_ &&
-				static_cast<GuiFrame*>(top_frame)->MousePressed(button, position))
+				top_frame->MousePressed(button, position))
 				return true; //Consumed
 		}
 	}
@@ -611,7 +673,7 @@ bool GuiController::MouseReleased(MouseButton button, Vector2 position) noexcept
 		for (auto &top_frame : active_frames_.back().frames)
 		{
 			if (top_frame != focused_frame_ &&
-				static_cast<GuiFrame*>(top_frame)->MouseReleased(button, position))
+				top_frame->MouseReleased(button, position))
 				return true; //Consumed
 		}
 	}
@@ -626,6 +688,9 @@ bool GuiController::MouseMoved(Vector2 position) noexcept
 	if (!enabled_)
 		return false;
 
+	if (active_tooltip_)
+		active_tooltip_->MouseMoved(position);
+
 	//Check focused frame first
 	if (focused_frame_ &&
 		focused_frame_->MouseMoved(position))
@@ -637,7 +702,7 @@ bool GuiController::MouseMoved(Vector2 position) noexcept
 		for (auto &top_frame : active_frames_.back().frames)
 		{
 			if (top_frame != focused_frame_ &&
-				static_cast<GuiFrame*>(top_frame)->MouseMoved(position))
+				top_frame->MouseMoved(position))
 				return true; //Consumed
 		}
 	}
@@ -661,7 +726,7 @@ bool GuiController::MouseWheelRolled(int delta, Vector2 position) noexcept
 		for (auto &top_frame : active_frames_.back().frames)
 		{
 			if (top_frame != focused_frame_ &&
-				static_cast<GuiFrame*>(top_frame)->MouseWheelRolled(delta, position))
+				top_frame->MouseWheelRolled(delta, position))
 				return true; //Consumed
 		}
 	}
@@ -721,7 +786,21 @@ void GuiController::ClearFrames() noexcept
 {
 	active_frames_.clear();
 	active_frames_.shrink_to_fit();
-	ClearComponents();
+
+	auto frames = std::move(frames_);
+
+	for (auto &frame : frames)
+	{
+		if (RemoveFrame(*frame))
+			frame = nullptr;
+	}
+
+	frames.erase(
+		std::remove(std::begin(frames), std::end(frames), nullptr),
+		std::end(frames));
+
+	frames_ = std::move(frames);
+	frames_.shrink_to_fit();
 }
 
 bool GuiController::RemoveFrame(GuiFrame &frame) noexcept
@@ -732,6 +811,97 @@ bool GuiController::RemoveFrame(GuiFrame &frame) noexcept
 bool GuiController::RemoveFrame(std::string_view name) noexcept
 {
 	return RemoveComponent(name);
+}
+
+
+/*
+	Tooltips
+	Creating
+*/
+
+NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(std::string name, controls::gui_control::ControlSkin skin)
+{
+	return CreateComponent<controls::GuiTooltip>(std::move(name), std::move(skin));
+}
+
+NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(controls::GuiTooltip &&tooltip)
+{
+	return CreateComponent<controls::GuiTooltip>(std::move(tooltip));
+}
+
+
+/*
+	Tooltips
+	Retrieving
+*/
+
+NonOwningPtr<controls::GuiTooltip> GuiController::GetTooltip(std::string_view name) noexcept
+{
+	return static_pointer_cast<controls::GuiTooltip>(GetComponent(name));
+}
+
+NonOwningPtr<const controls::GuiTooltip> GuiController::GetTooltip(std::string_view name) const noexcept
+{
+	return static_pointer_cast<const controls::GuiTooltip>(GetComponent(name));
+}
+
+
+/*
+	Tooltips
+	Removing
+*/
+
+void GuiController::ClearTooltips() noexcept
+{
+	auto tooltips = std::move(tooltips_);
+
+	for (auto &tooltip : tooltips)
+	{
+		if (RemoveTooltip(*tooltip))
+			tooltip = nullptr;
+	}
+
+	tooltips.erase(
+		std::remove(std::begin(tooltips), std::end(tooltips), nullptr),
+		std::end(tooltips));
+
+	tooltips_ = std::move(tooltips);
+	tooltips_.shrink_to_fit();
+}
+
+bool GuiController::RemoveTooltip(controls::GuiTooltip &tooltip) noexcept
+{
+	return RemoveComponent(tooltip);
+}
+
+bool GuiController::RemoveTooltip(std::string_view name) noexcept
+{
+	return RemoveComponent(name);
+}
+
+
+/*
+	Components
+	Removing (optimization)
+*/
+
+void GuiController::ClearComponents() noexcept
+{
+	active_frames_.clear();
+	active_frames_.shrink_to_fit();
+
+	frames_.clear();
+	tooltips_.clear();
+	GuiContainer::ClearComponents();
+		//This will go much faster because frames and tooltips are pre-cleared
+	
+	//Non-removable components will still be present
+	//Add them back to the controls/panels containers
+	for (auto &component : Components())
+		Created(component);
+
+	frames_.shrink_to_fit();
+	tooltips_.shrink_to_fit();
 }
 
 } //ion::gui

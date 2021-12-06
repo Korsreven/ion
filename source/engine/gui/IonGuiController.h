@@ -20,6 +20,7 @@ File:	IonGuiController.h
 
 #include "IonGuiContainer.h"
 #include "IonGuiFrame.h"
+#include "controls/IonGuiTooltip.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonGuiFrameListener.h"
 #include "events/listeners/IonKeyListener.h"
@@ -70,6 +71,7 @@ namespace ion::gui
 		namespace detail
 		{
 			using frame_pointers = std::vector<GuiFrame*>;
+			using tooltip_pointers = std::vector<controls::GuiTooltip*>;
 
 			struct layer
 			{
@@ -116,11 +118,15 @@ namespace ion::gui
 
 			
 			GuiFrame *focused_frame_ = nullptr;
+			controls::GuiTooltip *active_tooltip_ = nullptr;
 			gui_controller::detail::frames active_frames_;
 			bool shift_pressed_ = false;
 
 			gui_controller::GuiMouseCursorSkin mouse_cursor_skin_;
 			gui_controller::GuiMouseCursorHotSpot mouse_cursor_hot_spot_ = gui_controller::GuiMouseCursorHotSpot::TopLeft;
+
+			gui_controller::detail::frame_pointers frames_;
+			gui_controller::detail::tooltip_pointers tooltips_;
 
 
 			GuiFrame* NextFocusableFrame(GuiFrame *from_frame) const noexcept;
@@ -134,10 +140,12 @@ namespace ion::gui
 			//See ObjectManager::Created for more details
 			void Created(GuiComponent &component) noexcept override final;
 			void Created(GuiFrame &frame) noexcept;
+			void Created(controls::GuiTooltip &tooltip) noexcept;
 
 			//See ObjectManager::Removed for more details
 			void Removed(GuiComponent &component) noexcept override final;
 			void Removed(GuiFrame &frame) noexcept;
+			void Removed(controls::GuiTooltip &tooltip) noexcept;
 
 
 			//See Listener<T>::Unsubscribable for more details
@@ -237,20 +245,38 @@ namespace ion::gui
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Frames() noexcept
 			{
-				return Components();
+				return adaptors::ranges::DereferenceIterable<gui_controller::detail::frame_pointers&>{frames_};
 			}
 
 			//Returns an immutable range of all frames in this controller
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Frames() const noexcept
 			{
-				return Components();
+				return adaptors::ranges::DereferenceIterable<const gui_controller::detail::frame_pointers&>{frames_};
+			}
+
+
+			//Returns a mutable range of all tooltips in this controller
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Tooltips() noexcept
+			{
+				return adaptors::ranges::DereferenceIterable<gui_controller::detail::tooltip_pointers&>{tooltips_};
+			}
+
+			//Returns an immutable range of all tooltips in this controller
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Tooltips() const noexcept
+			{
+				return adaptors::ranges::DereferenceIterable<const gui_controller::detail::tooltip_pointers&>{tooltips_};
 			}
 
 
 			/*
 				Modifiers
 			*/
+
+			//Sets the tooltip used by this controller to the tooltip with the given name
+			void ActiveTooltip(std::string_view name) noexcept;
 
 			//Sets the mouse cursor skin used by this controller to the given skin with the given z-order
 			void MouseCursorSkin(gui_controller::GuiMouseCursorSkin skin, real z_order) noexcept;
@@ -266,6 +292,12 @@ namespace ion::gui
 			/*
 				Observers
 			*/
+
+			//Returns a pointer to the tooltip used by this controller
+			[[nodiscard]] inline auto& ActiveTooltip() const noexcept
+			{
+				return active_tooltip_;
+			}
 
 			//Returns the mouse cursor skin used by this controller
 			[[nodiscard]] inline auto& MouseCursorSkin() const noexcept
@@ -420,6 +452,56 @@ namespace ion::gui
 
 			//Remove a removable frame with the given name from this controller
 			bool RemoveFrame(std::string_view name) noexcept;
+
+
+			/*
+				Tooltips
+				Creating
+			*/
+
+			//Create a tooltip with the given name and skin
+			NonOwningPtr<controls::GuiTooltip> CreateTooltip(std::string name, controls::gui_control::ControlSkin skin);
+
+			//Create a tooltip by moving the given tooltip
+			NonOwningPtr<controls::GuiTooltip> CreateTooltip(controls::GuiTooltip &&tooltip);
+
+
+			/*
+				Tooltips
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable tooltip with the given name
+			//Returns nullptr if tooltip could not be found
+			[[nodiscard]] NonOwningPtr<controls::GuiTooltip> GetTooltip(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable tooltip with the given name
+			//Returns nullptr if tooltip could not be found
+			[[nodiscard]] NonOwningPtr<const controls::GuiTooltip> GetTooltip(std::string_view name) const noexcept;
+
+
+			/*
+				Tooltips
+				Removing
+			*/
+
+			//Clear all removable tooltips from this controller
+			void ClearTooltips() noexcept;
+
+			//Remove a removable tooltip from this controller
+			bool RemoveTooltip(controls::GuiTooltip &tooltip) noexcept;
+
+			//Remove a removable tooltip with the given name from this controller
+			bool RemoveTooltip(std::string_view name) noexcept;
+
+
+			/*
+				Components
+				Removing (optimization)
+			*/
+
+			//Clear all removable components from this container
+			void ClearComponents() noexcept;
 	};
 } //ion::gui
 

@@ -646,6 +646,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//GUI textures
 			auto mouse_cursor_diffuse = textures.CreateTexture("mouse_cursor_diffuse", "mouse_cursor.png");
 
+			auto tooltip_center_diffuse = textures.CreateTexture("tooltip_center", "tooltip_center.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto tooltip_top_diffuse = textures.CreateTexture("tooltip_top", "tooltip_top.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto tooltip_left_diffuse = textures.CreateTexture("tooltip_left", "tooltip_left.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto tooltip_top_left_diffuse = textures.CreateTexture("tooltip_top_left", "tooltip_top_left.png");
+
 			auto button_center_enabled_diffuse = textures.CreateTexture("button_center_enabled", "button_center_enabled.png",
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 			auto button_center_pressed_diffuse = textures.CreateTexture("button_center_pressed", "button_center_pressed.png",
@@ -1136,6 +1144,96 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			mouse_cursor->LightingEnabled(false);
 
 
+			auto tooltip_center_enabled =
+				materials.CreateMaterial("tooltip_center",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, tooltip_center_diffuse, nullptr, nullptr);
+			tooltip_center_enabled->LightingEnabled(false);
+
+
+			auto tooltip_top_enabled =
+				materials.CreateMaterial("tooltip_top",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, tooltip_top_diffuse, nullptr, nullptr);
+			tooltip_top_enabled->LightingEnabled(false);
+
+			auto tooltip_left_enabled =
+				materials.CreateMaterial("tooltip_left",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, tooltip_left_diffuse, nullptr, nullptr);
+			tooltip_left_enabled->LightingEnabled(false);
+
+			auto tooltip_bottom_enabled =
+				materials.CreateMaterial("tooltip_bottom",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, tooltip_top_diffuse, nullptr, nullptr);
+			tooltip_bottom_enabled->LightingEnabled(false);
+			tooltip_bottom_enabled->FlipVertical();
+
+			auto tooltip_right_enabled =
+				materials.CreateMaterial("tooltip_right",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, tooltip_left_diffuse, nullptr, nullptr);
+			tooltip_right_enabled->LightingEnabled(false);
+			tooltip_right_enabled->FlipHorizontal();
+
+
+			auto tooltip_top_left_enabled =
+				materials.CreateMaterial("tooltip_top_left",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, tooltip_top_left_diffuse, nullptr, nullptr);
+			tooltip_top_left_enabled->LightingEnabled(false);
+
+			auto tooltip_bottom_left_enabled =
+				materials.CreateMaterial("tooltip_bottom_left",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, tooltip_top_left_diffuse, nullptr, nullptr);
+			tooltip_bottom_left_enabled->LightingEnabled(false);
+			tooltip_bottom_left_enabled->FlipVertical();
+
+			auto tooltip_top_right_enabled =
+				materials.CreateMaterial("tooltip_top_right",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, tooltip_top_left_diffuse, nullptr, nullptr);
+			tooltip_top_right_enabled->LightingEnabled(false);
+			tooltip_top_right_enabled->FlipHorizontal();
+
+			auto tooltip_bottom_right_enabled =
+				materials.CreateMaterial("tooltip_bottom_right",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, tooltip_top_left_diffuse, nullptr, nullptr);
+			tooltip_bottom_right_enabled->LightingEnabled(false);
+			tooltip_bottom_right_enabled->FlipHorizontal();
+			tooltip_bottom_right_enabled->FlipVertical();
+
+
 			auto button_center_enabled =
 				materials.CreateMaterial("button_center_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1514,6 +1612,40 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto mouse_cursor_sprite = mouse_cursor_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r}, mouse_cursor}); //Mouse cursor
 
+			mouse_cursor_sprite->AutoSize(true);
+			mouse_cursor_model->AddPass(ion::graphics::render::Pass{model_program});
+
+
+			auto tooltip_model = scene.CreateModel();
+			auto tooltip_center = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {0.1_r, 0.1_r}, nullptr}); //Center
+			
+			auto tooltip_top = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.1_r, 0.011_r}, nullptr}); //Top
+			auto tooltip_left = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, 0.1_r}, nullptr}); //Left
+			auto tooltip_bottom = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.1_r, 0.011_r}, nullptr}); //Bottom
+			auto tooltip_right = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, 0.1_r}, nullptr}); //Right
+
+			auto tooltip_top_left = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
+			auto tooltip_bottom_left = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
+			auto tooltip_top_right = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
+			auto tooltip_bottom_right = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.1_r * 0.5_r + 0.011_r * 0.5_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
+
+			tooltip_center->AutoRepeat(true);
+			tooltip_top->AutoRepeat(true);
+			tooltip_left->AutoRepeat(true);
+			tooltip_bottom->AutoRepeat(true);
+			tooltip_right->AutoRepeat(true);
+			tooltip_model->AddPass(ion::graphics::render::Pass{model_program});
+
+
 			auto button_model = scene.CreateModel();
 			auto button_center = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.1_r, 0.1_r}, nullptr}); //Center
@@ -1536,15 +1668,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto button_bottom_right = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.1_r * 0.5_r + 0.011_r * 0.5_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
 
-			mouse_cursor_sprite->AutoSize(true);
 			button_center->AutoRepeat(true);
 			button_top->AutoRepeat(true);
 			button_left->AutoRepeat(true);
 			button_bottom->AutoRepeat(true);
 			button_right->AutoRepeat(true);
-
-			mouse_cursor_model->AddPass(ion::graphics::render::Pass{model_program});
 			button_model->AddPass(ion::graphics::render::Pass{model_program});
+
 
 			//GUI Caption
 			auto caption = scene.CreateText(caption_text);
@@ -1556,6 +1686,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::graphics::fonts::text::TextBlockStyle caption_style_hovered;
 			caption_style_hovered.ForegroundColor = caption_text->DefaultForegroundColor();
 			caption_style_hovered.Decoration = ion::graphics::fonts::text::TextDecoration::Underline;
+
+
+			auto tooltip_caption = scene.CreateText(caption_text);
+			tooltip_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
 
 
 			//Scene graph
@@ -1570,6 +1704,32 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//GUI skins
 			ion::gui::gui_controller::GuiMouseCursorSkin mouse_cursor_skin;
 			mouse_cursor_skin.ModelObject = mouse_cursor_model;
+
+
+			ion::gui::controls::gui_control::ControlSkin tooltip_skin;
+			tooltip_skin.Parts.ModelObject = tooltip_model;
+			tooltip_skin.Parts.Center.SpriteObject = tooltip_center;
+			tooltip_skin.Parts.Top.SpriteObject = tooltip_top;
+			tooltip_skin.Parts.Left.SpriteObject = tooltip_left;
+			tooltip_skin.Parts.Bottom.SpriteObject = tooltip_bottom;
+			tooltip_skin.Parts.Right.SpriteObject = tooltip_right;
+			tooltip_skin.Parts.TopLeft.SpriteObject = tooltip_top_left;
+			tooltip_skin.Parts.BottomLeft.SpriteObject = tooltip_bottom_left;
+			tooltip_skin.Parts.TopRight.SpriteObject = tooltip_top_right;
+			tooltip_skin.Parts.BottomRight.SpriteObject = tooltip_bottom_right;
+
+			tooltip_skin.Parts.Center.EnabledMaterial = tooltip_center_enabled;
+			tooltip_skin.Parts.Top.EnabledMaterial = tooltip_top_enabled;
+			tooltip_skin.Parts.Left.EnabledMaterial = tooltip_left_enabled;
+			tooltip_skin.Parts.Bottom.EnabledMaterial = tooltip_bottom_enabled;
+			tooltip_skin.Parts.Right.EnabledMaterial = tooltip_right_enabled;
+			tooltip_skin.Parts.TopLeft.EnabledMaterial = tooltip_top_left_enabled;
+			tooltip_skin.Parts.BottomLeft.EnabledMaterial = tooltip_bottom_left_enabled;
+			tooltip_skin.Parts.TopRight.EnabledMaterial = tooltip_top_right_enabled;
+			tooltip_skin.Parts.BottomRight.EnabledMaterial = tooltip_bottom_right_enabled;
+
+			tooltip_skin.Caption.TextObject = tooltip_caption;
+
 
 			ion::gui::controls::gui_control::ControlSkin button_skin;
 			button_skin.Parts.ModelObject = button_model;
@@ -1607,6 +1767,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_skin.Caption.EnabledStyle = caption_style_enabled;
 			button_skin.Caption.HoveredStyle = caption_style_hovered;
 
+
 			//GUI
 			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
 
@@ -1614,12 +1775,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			controller.ZOrder(-2.0_r);
 			controller.MouseCursorSkin(mouse_cursor_skin, 1.0_r);
 
+			auto tooltip = controller.CreateTooltip("default_tooltip", std::move(tooltip_skin));
+			tooltip->ZOrder(0.9_r);		
+
 			auto main_frame = controller.CreateFrame("main");
 			auto base_panel = main_frame->CreatePanel("base");
 			base_panel->ZOrder(0.1_r);
 
 			auto base_control = base_panel->CreateControl<ion::gui::controls::GuiControl>("control",
-				"My caption", std::nullopt, std::move(button_skin), Vector2{0.5_r, 0.1_r});
+				"My caption", "My\ntooltip", std::move(button_skin), Vector2{0.5_r, 0.1_r});
 			base_control->Node()->Position({0.0_r, 0.5_r});
 
 			auto sub_panel = base_panel->CreatePanel("sub");

@@ -13,6 +13,7 @@ File:	IonGuiFrame.cpp
 #include "IonGuiFrame.h"
 
 #include "IonGuiController.h"
+#include "controls/IonGuiTooltip.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 
 namespace ion::gui
@@ -281,13 +282,26 @@ void GuiFrame::Entered(controls::GuiControl &control) noexcept
 			hovered_control_->Exit();
 
 		hovered_control_ = &control;
+
+		//Show tooltip (if any)
+		if (control.Tooltip())
+		{
+			if (auto owner = Owner(); owner && owner->ActiveTooltip())
+				owner->ActiveTooltip()->Show(*control.Tooltip());
+		}
 	}
 }
 
 void GuiFrame::Exited(controls::GuiControl &control) noexcept
 {
 	if (!control.IsHovered() && hovered_control_ == &control)
+	{
 		hovered_control_ = nullptr;
+
+		//Hide tooltip (if any)
+		if (auto owner = Owner(); owner && owner->ActiveTooltip())
+			owner->ActiveTooltip()->Hide();
+	}
 }
 
 

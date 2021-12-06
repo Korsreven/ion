@@ -13,8 +13,10 @@ File:	IonGuiTooltip.cpp
 #include "IonGuiTooltip.h"
 
 #include "graphics/fonts/utilities/IonFontUtility.h"
+#include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
+#include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/utilities/IonAabb.h"
 
@@ -45,6 +47,8 @@ void GuiTooltip::DefaultSetup() noexcept
 
 void GuiTooltip::UpdateCaption() noexcept
 {
+	GuiLabel::UpdateCaption(); //Use base functionality
+
 	if (auto_size_ && skin_.Caption)
 	{
 		//Get() will not reload vertex streams when called from an immutable reference
@@ -52,15 +56,32 @@ void GuiTooltip::UpdateCaption() noexcept
 			c_part.Get() && c_part.Get()->Lettering())
 		{
 			if (auto size = graphics::fonts::utilities::MeasureTextBlocks(
-				c_part.Get()->FormattedBlocks(), *c_part.Get()->Lettering()); size)
+				c_part.Get()->FormattedBlocks(), *c_part.Get()->Lettering());
+				size && *size != vector2::Zero)
 			{
-				Size(*size + caption_padding_.value_or(gui_control::detail::default_caption_padding_size) * 2.0_r);
-				return;
+				*size += caption_padding_.value_or(gui_control::detail::default_caption_padding_size) * 2.0_r;
+
+				//Adjust size from viewport to ortho space
+				if (auto scene_manager = skin_.Caption->Owner(); scene_manager)
+				{
+					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+						*size *= viewport->ViewportToOrthoRatio();
+				}
+
+				auto visual_area = VisualArea();
+				auto center_area = gui_control::detail::get_center_area(skin_);
+
+				auto top_right_size = visual_area && center_area ?
+					visual_area->Max() - center_area->Max() :
+					vector2::Zero;
+				auto bottom_left_size = visual_area && center_area ?
+					center_area->Min() - visual_area->Min() :
+					vector2::Zero;
+
+				Size(*size + top_right_size.CeilCopy(bottom_left_size)); //Error. Recursive in some cases
 			}
 		}
 	}
-
-	GuiLabel::UpdateCaption(); //Use base functionality
 }
 
 
@@ -181,7 +202,7 @@ void GuiTooltip::Show() noexcept
 		}
 	}
 
-	Visible(true);
+	GuiControl::Show();
 }
 
 void GuiTooltip::Hide() noexcept
@@ -218,6 +239,8 @@ void GuiTooltip::FrameStarted(duration time) noexcept
 	{
 		if (phase_duration_ += time)
 		{
+			phase_duration_.ResetWithCarry();
+
 			//Switch to next phase
 			SetPhase(
 				[&]() noexcept
@@ -250,22 +273,20 @@ void GuiTooltip::FrameStarted(duration time) noexcept
 
 				case detail::tooltip_phase::PreFadeIn:
 				SetOpacity(0.0_r);
-				Visible(false);
+				GuiControl::Hide();
 				break;
 			}
 		}
-		else
-		{
-			switch (phase_)
-			{
-				case detail::tooltip_phase::FadeIn:
-				SetOpacity(phase_duration_.Percent());
-				break;
 
-				case detail::tooltip_phase::FadeOut:
-				SetOpacity(1.0_r - phase_duration_.Percent());
-				break;
-			}
+		switch (phase_)
+		{
+			case detail::tooltip_phase::FadeIn:
+			SetOpacity(phase_duration_.Percent());
+			break;
+
+			case detail::tooltip_phase::FadeOut:
+			SetOpacity(1.0_r - phase_duration_.Percent());
+			break;
 		}
 	}
 }
@@ -277,8 +298,8 @@ void GuiTooltip::FrameStarted(duration time) noexcept
 
 bool GuiTooltip::MouseMoved(Vector2 position) noexcept
 {
-	if (follow_mouse_cursor_ ||
-		phase_ == detail::tooltip_phase::PreFadeIn)
+	if (visible_ &&
+		(follow_mouse_cursor_ || phase_ == detail::tooltip_phase::PreFadeIn))
 	{
 		UpdatePosition(position);
 		return true;
