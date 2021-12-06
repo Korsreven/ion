@@ -900,7 +900,7 @@ void GuiControl::Show() noexcept
 	GuiComponent::Show();
 
 	if (node_)
-		node_->Visible(true);
+		node_->Visible(node_->ParentNode()->Visible());
 }
 
 
