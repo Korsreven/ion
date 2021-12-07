@@ -240,6 +240,34 @@ void Text::Lettering(NonOwningPtr<TypeFace> type_face) noexcept
 	Observers
 */
 
+Vector2 Text::MinimumAreaSize() const noexcept
+{
+	using namespace graphics::utilities;
+
+	//One or more lines to display
+	if (auto max_lines = max_lines_.value_or(std::ssize(formatted_lines_));
+		!std::empty(formatted_lines_) &&
+		from_line_ < std::ssize(formatted_lines_) && max_lines > 0)
+	{
+		if (from_line_ + max_lines > std::ssize(formatted_lines_))
+			max_lines = std::ssize(formatted_lines_) - from_line_;
+
+		auto area_size = vector2::Zero;
+
+		for (auto iter = std::begin(formatted_lines_) + from_line_,
+			end = iter + max_lines; iter != end; ++iter)
+			area_size.X(std::max(area_size.X(), iter->Size->X()));
+
+		if (auto line_height = LineHeight();
+			line_height && *line_height > 0.0_r)
+			area_size.Y((max_lines - from_line_) * *line_height);
+
+		return (area_size + padding_ * 2.0_r).CeilCopy(vector2::Zero);
+	}
+	else
+		return vector2::Zero;
+}
+
 std::optional<real> Text::LineHeight() const noexcept
 {
 	if (type_face_ && type_face_->HasRegularFont())

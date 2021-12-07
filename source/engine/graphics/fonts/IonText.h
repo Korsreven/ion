@@ -371,6 +371,9 @@ namespace ion::graphics::fonts
 				return area_size_;
 			}
 
+			//Returns the minimum area size needed to display the content in this text
+			[[nodiscard]] Vector2 MinimumAreaSize() const noexcept;
+
 			//Returns the padding size of the text area in pixels
 			//Padding size is the space between the area border and the displayed text
 			[[nodiscard]] inline auto& Padding() const noexcept
