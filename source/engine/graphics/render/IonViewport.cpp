@@ -263,6 +263,7 @@ Viewport::Viewport(std::string name, RenderTarget &render_target) noexcept :
 		render_target, events::event_channel::SubscriptionContract::NonCancelable},
 
 	bounds_{graphics::utilities::vector2::Zero, render_target.Size()},
+	base_bounds_{bounds_},
 	render_target_size_{render_target.Size()}
 {
 	//Empty
@@ -275,6 +276,7 @@ Viewport::Viewport(std::string name, RenderTarget &render_target, const Aabb &bo
 		render_target, events::event_channel::SubscriptionContract::NonCancelable},
 
 	bounds_{bounds},
+	base_bounds_{bounds_},
 	render_target_size_{render_target.Size()}
 {
 	//Empty
@@ -289,6 +291,7 @@ Viewport::Viewport(std::string name, RenderTarget &render_target, const Aabb &bo
 		render_target, events::event_channel::SubscriptionContract::NonCancelable},
 
 	bounds_{bounds},
+	base_bounds_{bounds_},
 
 	left_anchor_{left_anchor},
 	right_anchor_{right_anchor},
@@ -388,7 +391,7 @@ Vector2 Viewport::ViewportToOrthoRatio() const noexcept
 {
 	if (camera_)
 	{
-		auto viewport_size = Bounds().ToSize();
+		auto viewport_size = BaseBounds().ToSize();
 		auto [left, right, bottom, top, z_near, z_far] = camera_->ViewFrustum().ToOrthoBounds(viewport_size);
 		return detail::viewport_to_ortho_ratio(viewport_size, left, right, bottom, top);
 	}
@@ -400,7 +403,7 @@ Vector2 Viewport::OrthoToViewportRatio() const noexcept
 {
 	if (camera_)
 	{
-		auto viewport_size = Bounds().ToSize();
+		auto viewport_size = BaseBounds().ToSize();
 		auto [left, right, bottom, top, z_near, z_far] = camera_->ViewFrustum().ToOrthoBounds(viewport_size);
 		return detail::ortho_to_viewport_ratio(viewport_size, left, right, bottom, top);
 	}
@@ -426,9 +429,9 @@ Vector2 Viewport::CameraToViewportPoint(const Vector2 &point) const noexcept
 {
 	if (camera_)
 	{
-		auto ortho_point = detail::camera_to_ortho_point(*camera_, point);
-		auto viewport_size = Bounds().ToSize();
+		auto viewport_size = Bounds().ToSize();	
 		auto [left, right, bottom, top, z_near, z_far] = camera_->ViewFrustum().ToOrthoBounds(viewport_size);
+		auto ortho_point = detail::camera_to_ortho_point(*camera_, point);	
 		return detail::ortho_to_viewport_point(viewport_size, left, right, bottom, top, ortho_point);
 	}
 	else

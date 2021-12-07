@@ -91,6 +91,7 @@ namespace ion::graphics::render
 		private:
 
 			Aabb bounds_;
+			Aabb base_bounds_;
 
 			viewport::HorizontalAnchorType left_anchor_ = viewport::HorizontalAnchorType::Percentage;
 			viewport::HorizontalAnchorType right_anchor_ = viewport::HorizontalAnchorType::Percentage;
@@ -246,6 +247,12 @@ namespace ion::graphics::render
 			[[nodiscard]] inline auto& Bounds() const noexcept
 			{
 				return bounds_;
+			}
+
+			//Returns the viewport base bounds (region)
+			[[nodiscard]] inline auto& BaseBounds() const noexcept
+			{
+				return base_bounds_;
 			}
 
 
