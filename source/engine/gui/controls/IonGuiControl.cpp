@@ -1103,7 +1103,7 @@ std::optional<Aabb> GuiControl::VisualArea() const noexcept
 
 GuiPanelContainer* GuiControl::Owner() const noexcept
 {
-	return static_cast<GuiPanelContainer*>(owner_);
+	return dynamic_cast<GuiPanelContainer*>(owner_);
 }
 
 
