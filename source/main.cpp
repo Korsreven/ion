@@ -1765,6 +1765,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::gui::GuiController controller{scene_graph->RootNode()};
 			controller.ZOrder(-2.0_r);
 			controller.MouseCursorSkin(mouse_cursor_skin, 1.0_r);
+			controller.MouseCursorHotSpot(ion::gui::gui_controller::GuiMouseCursorHotSpot::TopLeft);
 
 			auto tooltip = controller.CreateTooltip("default_tooltip", std::move(tooltip_skin));
 			tooltip->ZOrder(0.9_r);

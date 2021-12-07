@@ -19,6 +19,8 @@ File:	IonGuiTooltip.cpp
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/utilities/IonAabb.h"
+#include "gui/IonGuiController.h"
+#include "gui/IonGuiFrame.h"
 
 namespace ion::gui::controls
 {
@@ -98,6 +100,87 @@ void GuiTooltip::UpdateCaption() noexcept
 	GuiLabel::UpdateCaption(); //Use base functionality
 }
 
+void GuiTooltip::UpdatePosition(Vector2 position) noexcept
+{
+	if (node_)
+	{
+		if (auto controller =
+			[&]() noexcept -> GuiController*
+			{
+				if (auto owner = Owner(); owner)
+				{
+					if (auto frame = Owner()->ParentFrame(); frame)
+						return frame->Owner();
+				}
+				else if (auto controller = dynamic_cast<GuiController*>(GuiComponent::Owner()); controller)
+					return controller;
+
+				return nullptr;
+			}(); controller)
+		{
+			if (auto mouse_cursor_skin = controller->MouseCursorSkin(); mouse_cursor_skin)
+			{
+				if (auto cursor_node = mouse_cursor_skin->ParentNode(); cursor_node)
+				{
+					auto [half_width, half_height] =
+						(VisualArea().value_or(aabb::Zero).ToHalfSize() * node_->DerivedScaling()).XY();
+					auto [cursor_width, cursor_height] =
+						(mouse_cursor_skin->AxisAlignedBoundingBox().ToSize() * cursor_node->DerivedScaling()).XY();
+
+					//Adjust tooltip position based on cursor hot spot
+					position +=
+						[&]() noexcept -> Vector2
+						{
+							switch (controller->MouseCursorHotSpot())
+							{
+								case gui_controller::GuiMouseCursorHotSpot::TopLeft:
+								return {half_width, -half_height - cursor_height};
+
+								case gui_controller::GuiMouseCursorHotSpot::TopCenter:
+								return {0.0_r, -half_height - cursor_height};
+
+								case gui_controller::GuiMouseCursorHotSpot::TopRight:
+								return {-half_width, -half_height - cursor_height};
+
+								case gui_controller::GuiMouseCursorHotSpot::Left:
+								return {half_width, -half_height - cursor_height * 0.5_r};
+
+								case gui_controller::GuiMouseCursorHotSpot::Right:
+								return {-half_width, -half_height - cursor_height * 0.5_r};
+
+								case gui_controller::GuiMouseCursorHotSpot::BottomLeft:
+								return {half_width, half_height + cursor_height};
+
+								case gui_controller::GuiMouseCursorHotSpot::BottomCenter:
+								return {0.0_r, half_height + cursor_height};
+
+								case gui_controller::GuiMouseCursorHotSpot::BottomRight:
+								return {-half_width, half_height + cursor_height};
+
+								default:
+								return {0.0_r, -half_height - cursor_height * 0.5_r};
+							}
+						}();
+				}
+			}
+		}
+
+		node_->DerivedPosition(position);
+	}
+}
+
+
+void GuiTooltip::SetOpacity(real percent) noexcept
+{
+	if (skin_.Parts)
+		skin_.Parts->Opacity(percent);
+
+	if (skin_.Caption)
+		skin_.Caption->Opacity(percent);
+
+	opacity_ = percent;
+}
+
 
 /*
 	Phase
@@ -135,31 +218,6 @@ void GuiTooltip::UpdatePhaseDuration() noexcept
 		}();
 
 	phase_duration_.Limit(limit);
-}
-
-
-void GuiTooltip::SetOpacity(real percent) noexcept
-{
-	if (skin_.Parts)
-		skin_.Parts->Opacity(percent);
-
-	if (skin_.Caption)
-		skin_.Caption->Opacity(percent);
-
-	opacity_ = percent;
-}
-
-void GuiTooltip::UpdatePosition(const Vector2 &position) noexcept
-{
-	if (node_)
-	{
-		auto [half_width, half_height] =
-			VisualArea().value_or(aabb::Zero).ToHalfSize().XY();
-		auto top_left_off =
-			Vector2{half_width, -half_height} * node_->DerivedScaling();
-
-		node_->DerivedPosition(position + top_left_off);
-	}
 }
 
 

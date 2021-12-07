@@ -72,6 +72,9 @@ namespace ion::gui::controls
 			*/
 
 			virtual void UpdateCaption() noexcept override;
+			void UpdatePosition(Vector2 position) noexcept;
+
+			void SetOpacity(real percent) noexcept;
 
 
 			/*
@@ -80,9 +83,6 @@ namespace ion::gui::controls
 
 			void SetPhase(gui_tooltip::detail::tooltip_phase phase) noexcept;
 			void UpdatePhaseDuration() noexcept;
-
-			void SetOpacity(real percent) noexcept;
-			void UpdatePosition(const Vector2 &position) noexcept;
 
 		public:
 

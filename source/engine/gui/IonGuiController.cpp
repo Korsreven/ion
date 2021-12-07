@@ -396,7 +396,7 @@ void GuiController::UpdateMouseCursor(const Vector2 &position) noexcept
 		if (auto node = mouse_cursor_skin_->ParentNode(); node)
 		{
 			auto [half_width, half_height] =
-				mouse_cursor_skin_->AxisAlignedBoundingBox().ToHalfSize().XY();
+				(mouse_cursor_skin_->AxisAlignedBoundingBox().ToHalfSize() * node->DerivedScaling()).XY();
 
 			//Adjust from center to hot spot
 			auto hot_spot_off =
@@ -428,11 +428,10 @@ void GuiController::UpdateMouseCursor(const Vector2 &position) noexcept
 						case GuiMouseCursorHotSpot::BottomRight:
 						return {-half_width, half_height};
 
-
 						default:
 						return vector2::Zero;
 					}
-				}() * node->DerivedScaling();
+				}();
 
 			node->DerivedPosition(position + hot_spot_off);
 		}
