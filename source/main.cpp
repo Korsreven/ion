@@ -1483,7 +1483,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				Aabb{-1.0_r, 1.0_r}, 1.0_r, 100.0_r, 16.0_r / 9.0_r);
 			//auto frustum = ion::graphics::render::Frustum::Perspective(
 			//	Aabb{-1.0_r, 1.0_r}, 1.0_r, 100.0_r, 90.0, 16.0_r / 9.0_r);
-			frustum.BaseViewportHeight(viewport->Bounds().ToSize().Y()); //Can this be automated
+			frustum.BaseViewportHeight(viewport->BaseBounds().ToSize().Y());
 
 			//Camera
 			auto camera = scene.CreateCamera("", frustum);
@@ -1618,26 +1618,27 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto tooltip_model = scene.CreateModel();
 			auto tooltip_center = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {0.1_r, 0.1_r}, nullptr}); //Center
+				{0.0_r, 0.0_r, 0.0_r}, {0.1_r, 0.1_r}, tooltip_center_enabled}); //Center
 			
 			auto tooltip_top = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.1_r, 0.011_r}, nullptr}); //Top
+				{0.0_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.1_r, 0.011_r}, tooltip_top_enabled}); //Top
 			auto tooltip_left = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, 0.1_r}, nullptr}); //Left
+				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, 0.1_r}, tooltip_left_enabled}); //Left
 			auto tooltip_bottom = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.1_r, 0.011_r}, nullptr}); //Bottom
+				{0.0_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.1_r, 0.011_r}, tooltip_bottom_enabled}); //Bottom
 			auto tooltip_right = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, 0.1_r}, nullptr}); //Right
+				{0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, 0.1_r}, tooltip_right_enabled}); //Right
 
 			auto tooltip_top_left = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
+				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_top_left_enabled}); //Top left
 			auto tooltip_bottom_left = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
+				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_bottom_left_enabled}); //Bottom left
 			auto tooltip_top_right = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
+				{0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_top_right_enabled}); //Top right
 			auto tooltip_bottom_right = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.1_r * 0.5_r + 0.011_r * 0.5_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
+				{0.1_r * 0.5_r + 0.011_r * 0.5_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_bottom_right_enabled}); //Bottom right
 
+			tooltip_center->FillOpacity(0.9_r);
 			tooltip_center->AutoRepeat(true);
 			tooltip_top->AutoRepeat(true);
 			tooltip_left->AutoRepeat(true);
@@ -1717,16 +1718,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_skin.Parts.BottomLeft.SpriteObject = tooltip_bottom_left;
 			tooltip_skin.Parts.TopRight.SpriteObject = tooltip_top_right;
 			tooltip_skin.Parts.BottomRight.SpriteObject = tooltip_bottom_right;
-
-			tooltip_skin.Parts.Center.EnabledMaterial = tooltip_center_enabled;
-			tooltip_skin.Parts.Top.EnabledMaterial = tooltip_top_enabled;
-			tooltip_skin.Parts.Left.EnabledMaterial = tooltip_left_enabled;
-			tooltip_skin.Parts.Bottom.EnabledMaterial = tooltip_bottom_enabled;
-			tooltip_skin.Parts.Right.EnabledMaterial = tooltip_right_enabled;
-			tooltip_skin.Parts.TopLeft.EnabledMaterial = tooltip_top_left_enabled;
-			tooltip_skin.Parts.BottomLeft.EnabledMaterial = tooltip_bottom_left_enabled;
-			tooltip_skin.Parts.TopRight.EnabledMaterial = tooltip_top_right_enabled;
-			tooltip_skin.Parts.BottomRight.EnabledMaterial = tooltip_bottom_right_enabled;
 
 			tooltip_skin.Caption.TextObject = tooltip_caption;
 

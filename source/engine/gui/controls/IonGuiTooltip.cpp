@@ -78,15 +78,17 @@ void GuiTooltip::UpdateCaption() noexcept
 				auto visual_area = VisualArea();
 				auto center_area = gui_control::detail::get_center_area(skin_);
 
+				//Calculate border size
 				auto top_right_size = visual_area && center_area ?
 					visual_area->Max() - center_area->Max() :
 					vector2::Zero;
 				auto bottom_left_size = visual_area && center_area ?
 					center_area->Min() - visual_area->Min() :
 					vector2::Zero;
+				auto border_size = top_right_size.CeilCopy(bottom_left_size);
 
 				need_update = false;
-				Size(size + top_right_size.CeilCopy(bottom_left_size) * 2.0_r);
+				Size(size + border_size * 2.0_r);
 				need_update = true;
 				return;
 			}
