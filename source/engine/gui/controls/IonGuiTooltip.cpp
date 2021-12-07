@@ -51,29 +51,28 @@ void GuiTooltip::UpdateCaption() noexcept
 
 	if (auto &part = skin_.Caption; auto_size_ && part && need_update)
 	{
-		//Get() will not reload vertex streams when called from an immutable reference
-		if (const auto &c_part = *part.TextObject;
-			c_part.Get() && c_part.Get()->Lettering())
+		//Caption text
+		if (auto &text = part->Get(); text)
 		{
+			//Area size
+			text->AreaSize({});
+
 			//Padding
-			part->Get()->Padding(caption_padding_.value_or(gui_control::detail::default_caption_padding_size));
+			text->Padding(caption_padding_.value_or(gui_control::detail::default_caption_padding_size));
 
 			//Content
 			if (caption_)
-				part->Get()->Content(*caption_);
+				text->Content(*caption_);
 			else
-				part->Get()->Content({});
+				text->Content({});
 
-
-			if (auto size = graphics::fonts::utilities::MeasureTextBlocks(
-				c_part.Get()->FormattedBlocks(), *c_part.Get()->Lettering());
-				size && *size != vector2::Zero)
+			if (auto size = text->MinimumAreaSize(); size != vector2::Zero)
 			{
 				//Adjust size from viewport to ortho space
 				if (auto scene_manager = skin_.Caption->Owner(); scene_manager)
 				{
 					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-						*size *= viewport->ViewportToOrthoRatio();
+						size *= viewport->ViewportToOrthoRatio();
 				}
 
 				auto visual_area = VisualArea();
@@ -87,7 +86,7 @@ void GuiTooltip::UpdateCaption() noexcept
 					vector2::Zero;
 
 				need_update = false;
-				Size(*size + top_right_size.CeilCopy(bottom_left_size) + 0.01_r);
+				Size(size + top_right_size.CeilCopy(bottom_left_size) * 2.0_r);
 				need_update = true;
 				return;
 			}
