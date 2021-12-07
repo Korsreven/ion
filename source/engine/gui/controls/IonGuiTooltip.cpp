@@ -47,20 +47,28 @@ void GuiTooltip::DefaultSetup() noexcept
 
 void GuiTooltip::UpdateCaption() noexcept
 {
-	GuiLabel::UpdateCaption(); //Use base functionality
+	static auto need_update = true;
 
-	if (auto_size_ && skin_.Caption)
+	if (auto &part = skin_.Caption; auto_size_ && part && need_update)
 	{
 		//Get() will not reload vertex streams when called from an immutable reference
-		if (const auto &c_part = *skin_.Caption.TextObject;
+		if (const auto &c_part = *part.TextObject;
 			c_part.Get() && c_part.Get()->Lettering())
 		{
+			//Padding
+			part->Get()->Padding(caption_padding_.value_or(gui_control::detail::default_caption_padding_size));
+
+			//Content
+			if (caption_)
+				part->Get()->Content(*caption_);
+			else
+				part->Get()->Content({});
+
+
 			if (auto size = graphics::fonts::utilities::MeasureTextBlocks(
 				c_part.Get()->FormattedBlocks(), *c_part.Get()->Lettering());
 				size && *size != vector2::Zero)
 			{
-				*size += caption_padding_.value_or(gui_control::detail::default_caption_padding_size) * 2.0_r;
-
 				//Adjust size from viewport to ortho space
 				if (auto scene_manager = skin_.Caption->Owner(); scene_manager)
 				{
@@ -78,10 +86,15 @@ void GuiTooltip::UpdateCaption() noexcept
 					center_area->Min() - visual_area->Min() :
 					vector2::Zero;
 
-				Size(*size + top_right_size.CeilCopy(bottom_left_size)); //Error. Recursive in some cases
+				need_update = false;
+				Size(*size + top_right_size.CeilCopy(bottom_left_size) + 0.01_r);
+				need_update = true;
+				return;
 			}
 		}
 	}
+
+	GuiLabel::UpdateCaption(); //Use base functionality
 }
 
 
@@ -151,14 +164,16 @@ void GuiTooltip::UpdatePosition(const Vector2 &position) noexcept
 
 //Public
 
-GuiTooltip::GuiTooltip(std::string name, gui_control::ControlSkin skin) :
-	GuiLabel{std::move(name), {}, std::move(skin)}
+GuiTooltip::GuiTooltip(std::string name, std::optional<std::string> text, gui_control::ControlSkin skin) :
+	GuiLabel{std::move(name), std::move(text), std::move(skin)}
 {
 	DefaultSetup();
 }
 
-GuiTooltip::GuiTooltip(std::string name, std::optional<std::string> text, gui_control::ControlSkin skin) :
-	GuiLabel{std::move(name), std::move(text), std::move(skin)}
+GuiTooltip::GuiTooltip(std::string name, std::optional<std::string> text, gui_control::ControlSkin skin, const Vector2 &size) :
+
+	GuiLabel{std::move(name), std::move(text), std::move(skin), size},
+	auto_size_{false}
 {
 	DefaultSetup();
 }
@@ -214,10 +229,15 @@ void GuiTooltip::Hide() noexcept
 		{
 			switch (phase_)
 			{
+				case detail::tooltip_phase::PreFadeIn:
+				phase_duration_.Total(0.0_sec);
+				GuiControl::Hide();
+				break;
+
 				case detail::tooltip_phase::FadeIn:
 				SetPhase(detail::tooltip_phase::FadeOut);
 				phase_duration_.Percent(1.0_r - opacity_);
-				break;
+				break;	
 
 				default:
 				SetPhase(detail::tooltip_phase::PreFadeOut);

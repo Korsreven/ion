@@ -1776,7 +1776,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			controller.MouseCursorSkin(mouse_cursor_skin, 1.0_r);
 
 			auto tooltip = controller.CreateTooltip("default_tooltip", std::move(tooltip_skin));
-			tooltip->ZOrder(0.9_r);		
+			tooltip->ZOrder(0.9_r);
 
 			auto main_frame = controller.CreateFrame("main");
 			auto base_panel = main_frame->CreatePanel("base");

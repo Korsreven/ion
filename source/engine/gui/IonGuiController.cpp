@@ -821,7 +821,12 @@ bool GuiController::RemoveFrame(std::string_view name) noexcept
 
 NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(std::string name, controls::gui_control::ControlSkin skin)
 {
-	return CreateComponent<controls::GuiTooltip>(std::move(name), std::move(skin));
+	return CreateComponent<controls::GuiTooltip>(std::move(name), std::nullopt, std::move(skin));
+}
+
+NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(std::string name, controls::gui_control::ControlSkin skin, const Vector2 &size)
+{
+	return CreateComponent<controls::GuiTooltip>(std::move(name), std::nullopt, std::move(skin), size);
 }
 
 NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(controls::GuiTooltip &&tooltip)
