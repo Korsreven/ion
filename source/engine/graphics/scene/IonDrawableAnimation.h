@@ -119,6 +119,7 @@ namespace ion::graphics::scene
 
 			bool reload_vertex_stream_ = false;
 			bool reload_vertex_buffer_ = false;
+			bool update_bounding_volumes_ = false;
 
 
 			void PrepareVertexStream();

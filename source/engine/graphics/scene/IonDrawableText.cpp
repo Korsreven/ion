@@ -67,6 +67,52 @@ decoration_vertex_stream::decoration_vertex_stream() :
 }
 
 
+std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const fonts::Text &text,
+	Vector2 position, real rotation, const Vector2 &pixel_unit_ratio) noexcept
+{
+	auto size = text.MinimumAreaSize() * pixel_unit_ratio;
+
+	if (!text.AreaSize())
+	{
+		auto [x, y] = position.XY();
+		auto [half_width, half_height] = (size * 0.5_r).XY();
+
+		//Adjust x to center
+		switch (text.Alignment())
+		{
+			case fonts::text::TextAlignment::Left:
+			x += half_width;
+			break;
+
+			case fonts::text::TextAlignment::Right:
+			x -= half_width;
+			break;
+		}
+
+		//Adjust y to center
+		switch (text.VerticalAlignment())
+		{
+			case fonts::text::TextVerticalAlignment::Top:
+			y -= half_height;
+			break;
+
+			case fonts::text::TextVerticalAlignment::Bottom:
+			y += half_height;
+			break;
+		}
+
+		position = {x, y};
+	}
+
+	auto aabb = Aabb::Size(size, position).RotateCopy(rotation);
+	return {aabb, aabb, {aabb.ToHalfSize().Max(), aabb.Center()}};
+}
+
+
+/*
+	Rendering
+*/
+
 Color get_foreground_color(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept
 {
 	return text_block.ForegroundColor ? *text_block.ForegroundColor : text.DefaultForegroundColor();
@@ -214,7 +260,7 @@ real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const 
 
 vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 	const Vector3 &position, real rotation, const Vector2 &scaling,
-	const Color &color, real opacity, const Vector3 &origin, const Vector2 &coordinate_scaling)
+	const Color &color, real opacity, const Vector3 &origin, const Vector2 &pixel_unit_ratio)
 {
 	auto [x, y, z] = position.XYZ();
 	auto [r, g, b, a] = color.RGBA();
@@ -235,10 +281,10 @@ vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 	height = std::ceil(height);
 
 	//Scale values from viewport to camera coordinates
-	x *= coordinate_scaling.X();
-	y *= coordinate_scaling.Y();
-	width *= coordinate_scaling.X();
-	height *= coordinate_scaling.Y();
+	x *= pixel_unit_ratio.X();
+	y *= pixel_unit_ratio.Y();
+	width *= pixel_unit_ratio.X();
+	height *= pixel_unit_ratio.Y();
 
 	auto v1 = Vector3{x, y + height, z}.RotateCopy(rotation, origin);
 	auto v2 = Vector3{x, y, z}.RotateCopy(rotation, origin);
@@ -290,7 +336,7 @@ vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 
 decoration_vertex_container get_decoration_vertex_data(
 	const Vector3 &position, real rotation, const Vector2 &size,
-	const Color &color, real opacity, const Vector3 &origin, const Vector2 &coordinate_scaling)
+	const Color &color, real opacity, const Vector3 &origin, const Vector2 &pixel_unit_ratio)
 {
 	auto [x, y, z] = position.XYZ();
 	auto [width, height] = size.XY();
@@ -304,10 +350,10 @@ decoration_vertex_container get_decoration_vertex_data(
 	height = std::ceil(height);
 
 	//Scale values from viewport to camera coordinates
-	x *= coordinate_scaling.X();
-	y *= coordinate_scaling.Y();
-	width *= coordinate_scaling.X();
-	height *= coordinate_scaling.Y();
+	x *= pixel_unit_ratio.X();
+	y *= pixel_unit_ratio.Y();
+	width *= pixel_unit_ratio.X();
+	height *= pixel_unit_ratio.Y();
 
 	auto v1 = Vector3{x, y + height, z}.RotateCopy(rotation, origin);
 	auto v2 = Vector3{x, y, z}.RotateCopy(rotation, origin);
@@ -356,7 +402,7 @@ decoration_vertex_container get_decoration_vertex_data(
 
 void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text,
 	int font_size, int &glyph_count, Vector3 &position, real rotation, real opacity,
-	const Vector3 &origin, const Vector2 &coordinate_scaling,
+	const Vector3 &origin, const Vector2 &pixel_unit_ratio,
 	glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream)
 {
 	if (auto font = get_default_font(text_block, text); font)
@@ -381,7 +427,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 
 					auto vertex_data = get_decoration_vertex_data(
 						decoration_position, rotation, decoration_size,
-						*background_color, opacity, origin, coordinate_scaling);
+						*background_color, opacity, origin, pixel_unit_ratio);
 					decoration_stream.back_vertex_data.insert(std::end(decoration_stream.back_vertex_data), std::begin(vertex_data), std::end(vertex_data));
 				}
 				
@@ -410,7 +456,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 					auto decoration_color = get_text_decoration_color(text_block, text).value_or(foreground_color);
 					auto vertex_data = get_decoration_vertex_data(
 						decoration_position, rotation, decoration_size,
-						decoration_color, opacity, origin, coordinate_scaling);
+						decoration_color, opacity, origin, pixel_unit_ratio);
 
 					if (*decoration == fonts::text::TextDecoration::LineThrough)
 						decoration_stream.front_vertex_data.insert(std::end(decoration_stream.front_vertex_data), std::begin(vertex_data), std::end(vertex_data));
@@ -430,7 +476,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 							glyph_streams[glyph_count].vertex_data =
 								get_glyph_vertex_data((*metrics)[glyph_index],
 									position, rotation, scaling,
-									foreground_color, opacity, origin, coordinate_scaling);
+									foreground_color, opacity, origin, pixel_unit_ratio);
 							glyph_streams[glyph_count].vertex_batch.VertexData(glyph_streams[glyph_count].vertex_data);
 							glyph_streams[glyph_count].vertex_batch.ReloadData(); //Must reload data even if vertex data view (range) is unchanged
 							glyph_streams[glyph_count].vertex_batch.BatchTexture((*handles)[glyph_index]);
@@ -442,7 +488,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 							glyph_streams.emplace_back(
 								get_glyph_vertex_data((*metrics)[glyph_index],
 									position, rotation, scaling,
-									foreground_color, opacity, origin, coordinate_scaling),
+									foreground_color, opacity, origin, pixel_unit_ratio),
 								(*handles)[glyph_index]
 							);
 
@@ -464,7 +510,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 }
 
 void get_text_vertex_streams(const fonts::Text &text, Vector3 position, real rotation, real opacity,
-	const Vector2 &coordinate_scaling, glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream)
+	const Vector2 &pixel_unit_ratio, glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream)
 {
 	auto line_height = text.LineHeight();
 
@@ -495,7 +541,7 @@ void get_text_vertex_streams(const fonts::Text &text, Vector3 position, real rot
 			max_lines = std::ssize(formatted_lines) - from_line;
 		
 		Vector3 origin = position;
-		position /= Vector3{coordinate_scaling.X(), coordinate_scaling.Y(), 1.0_r};
+		position /= Vector3{pixel_unit_ratio.X(), pixel_unit_ratio.Y(), 1.0_r};
 			//Adjust coordinates from viewport to glyph space
 
 		auto glyph_count = 0;
@@ -521,7 +567,7 @@ void get_text_vertex_streams(const fonts::Text &text, Vector3 position, real rot
 			for (auto &block : iter->Blocks)
 				get_block_vertex_streams(block, text,
 					font_size, glyph_count, glyph_position, rotation, opacity,
-					origin, coordinate_scaling,
+					origin, pixel_unit_ratio,
 					glyph_streams, decoration_stream);
 
 			glyph_position.Y(glyph_position.Y() - *line_height); //Next glyph y position
@@ -534,16 +580,8 @@ void get_text_vertex_streams(const fonts::Text &text, Vector3 position, real rot
 
 //Private
 
-void DrawableText::PrepareVertexStreams()
+void DrawableText::PrepareVertexStreams(const Vector2 &pixel_unit_ratio)
 {
-	auto coordinate_scaling = vector2::UnitScale;
-
-	//Has viewport connected to scene
-	//Get scaling factor from viewport to ortho coordinates
-	if (auto viewport = Owner()->ConnectedViewport(); viewport)
-		coordinate_scaling = viewport->ViewportToOrthoRatio();
-
-
 	auto glyph_count = text_->UnformattedDisplayedCharacterCount();
 	auto back_decoration_count = std::ssize(decoration_vertex_stream_.back_vertex_data);
 	auto front_decoration_count = std::ssize(decoration_vertex_stream_.front_vertex_data);
@@ -568,7 +606,7 @@ void DrawableText::PrepareVertexStreams()
 
 
 	detail::get_text_vertex_streams(*text_, position_, rotation_, Opacity(),
-		coordinate_scaling, glyph_vertex_streams_, decoration_vertex_stream_);
+		pixel_unit_ratio, glyph_vertex_streams_, decoration_vertex_stream_);
 
 
 	if (std::ssize(glyph_vertex_streams_) > glyph_count)
@@ -654,10 +692,17 @@ void DrawableText::Prepare() noexcept
 	if (!text_)
 		return;
 
+	auto pixel_unit_ratio = vector2::UnitScale;
+
 	if (reload_vertex_streams_)
 	{
-		PrepareVertexStreams();
+		//Adjust size from viewport to ortho space
+		if (auto viewport = Owner()->ConnectedViewport(); viewport)
+			pixel_unit_ratio = viewport->ViewportToOrthoRatio();
+
+		PrepareVertexStreams(pixel_unit_ratio);
 		reload_vertex_streams_ = false;
+		update_bounding_volumes_ = true;
 	}
 
 	if (reload_vertex_buffer_)
@@ -701,6 +746,17 @@ void DrawableText::Prepare() noexcept
 		stream.vertex_batch.Prepare();
 
 	decoration_vertex_stream_.front_vertex_batch.Prepare();
+
+	if (update_bounding_volumes_)
+	{
+		auto [aabb, obb, sphere] =
+			detail::generate_bounding_volumes(*text_, position_, rotation_, pixel_unit_ratio);
+		aabb_ = aabb;
+		obb_ = obb;
+		sphere_ = sphere;
+
+		update_bounding_volumes_ = false;
+	}
 }
 
 

@@ -198,6 +198,7 @@ void DrawableAnimation::Prepare() noexcept
 	{
 		PrepareVertexStream();
 		reload_vertex_stream_ = false;
+		update_bounding_volumes_ = true;
 	}
 
 	if (reload_vertex_buffer_)
@@ -216,6 +217,15 @@ void DrawableAnimation::Prepare() noexcept
 	}
 
 	vertex_stream_.vertex_batch.Prepare();
+
+	if (update_bounding_volumes_)
+	{
+		aabb_ = Aabb::Size(size_, position_).RotateCopy(rotation_);
+		obb_ = aabb_;
+		sphere_ = {aabb_.ToHalfSize().Max(), aabb_.Center()};
+
+		update_bounding_volumes_ = false;
+	}
 }
 
 void DrawableAnimation::Draw(shaders::ShaderProgram *shader_program) noexcept
