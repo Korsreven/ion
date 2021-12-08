@@ -112,7 +112,7 @@ namespace ion::graphics::scene
 		}
 
 		std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const fonts::Text &text,
-			Vector2 position, real rotation, const Vector2 &pixel_unit_ratio) noexcept;
+			const Vector2 &position, real rotation, const Vector2 &pixel_unit_ratio) noexcept;
 
 
 		/*

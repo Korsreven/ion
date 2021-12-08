@@ -68,43 +68,67 @@ decoration_vertex_stream::decoration_vertex_stream() :
 
 
 std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const fonts::Text &text,
-	Vector2 position, real rotation, const Vector2 &pixel_unit_ratio) noexcept
+	const Vector2 &position, real rotation, const Vector2 &pixel_unit_ratio) noexcept
 {
 	auto size = text.MinimumAreaSize() * pixel_unit_ratio;
+	auto [half_width, half_height] = (size * 0.5_r).XY();
+	auto [x, y] = position.XY();
 
-	if (!text.AreaSize())
+	if (text.AreaSize())
 	{
-		auto [x, y] = position.XY();
-		auto [half_width, half_height] = (size * 0.5_r).XY();
+		auto area_size = *text.AreaSize() * pixel_unit_ratio;
+		auto [area_half_width, area_half_height] = (area_size * 0.5_r).XY();
 
-		//Adjust x to center
+		//Adjust x horizontally
 		switch (text.Alignment())
 		{
 			case fonts::text::TextAlignment::Left:
-			x += half_width;
+			x -= area_half_width;
 			break;
 
 			case fonts::text::TextAlignment::Right:
-			x -= half_width;
+			x += area_half_width;
 			break;
 		}
 
-		//Adjust y to center
+		//Adjust y vertically
 		switch (text.VerticalAlignment())
 		{
 			case fonts::text::TextVerticalAlignment::Top:
-			y -= half_height;
+			y += area_half_height;
 			break;
 
 			case fonts::text::TextVerticalAlignment::Bottom:
-			y += half_height;
+			y -= area_half_height;
 			break;
 		}
-
-		position = {x, y};
 	}
 
-	auto aabb = Aabb::Size(size, position).RotateCopy(rotation);
+	//Adjust x to center
+	switch (text.Alignment())
+	{
+		case fonts::text::TextAlignment::Left:
+		x += half_width;
+		break;
+
+		case fonts::text::TextAlignment::Right:
+		x -= half_width;
+		break;
+	}
+
+	//Adjust y to center
+	switch (text.VerticalAlignment())
+	{
+		case fonts::text::TextVerticalAlignment::Top:
+		y -= half_height;
+		break;
+
+		case fonts::text::TextVerticalAlignment::Bottom:
+		y += half_height;
+		break;
+	}
+
+	auto aabb = Aabb::Size(size, {x, y}).RotateCopy(rotation);
 	return {aabb, aabb, {aabb.ToHalfSize().Max(), aabb.Center()}};
 }
 
