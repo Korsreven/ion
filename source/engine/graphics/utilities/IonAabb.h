@@ -240,6 +240,18 @@ namespace ion::graphics::utilities
 
 
 			/*
+				Rotating
+			*/
+
+			//Rotate aabb by the given angle (radians)
+			Aabb& Rotate(real angle) noexcept;
+
+			//Rotate aabb by the given angle (radians)
+			//Returns the result as a copy
+			[[nodiscard]] Aabb RotateCopy(real angle) const noexcept;
+
+
+			/*
 				Scaling
 			*/
 

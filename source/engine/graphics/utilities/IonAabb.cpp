@@ -305,6 +305,29 @@ Aabb Aabb::MergeCopy(const Vector2 &point) const noexcept
 
 
 /*
+	Rotating
+*/
+
+Aabb& Aabb::Rotate(real angle) noexcept
+{
+	auto center = Center();
+	auto tl = Vector2{min_.X(), max_.Y()}.RotateCopy(angle, center);
+	auto tr = max_.RotateCopy(angle, center);
+	auto bl = min_.RotateCopy(angle, center);
+	auto br = Vector2{max_.X(), min_.Y()}.RotateCopy(angle, center);
+
+	min_ = tl.FloorCopy(tr).FloorCopy(bl).FloorCopy(br);
+	max_ = tl.CeilCopy(tr).CeilCopy(bl).CeilCopy(br);
+	return *this;
+}
+
+Aabb Aabb::RotateCopy(real angle) const noexcept
+{
+	return Aabb(*this).Rotate(angle);
+}
+
+
+/*
 	Scaling
 */
 
