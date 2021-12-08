@@ -1692,6 +1692,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto tooltip_caption = scene.CreateText(caption_text);
 			tooltip_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
 
+			auto label_caption = scene.CreateText(caption_text);
+			label_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
+
 
 			//Scene graph
 			auto scene_graph = engine.CreateSceneGraph("");
@@ -1720,6 +1723,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_skin.Parts.BottomRight.SpriteObject = tooltip_bottom_right;
 
 			tooltip_skin.Caption.TextObject = tooltip_caption;
+
+
+			ion::gui::controls::gui_control::ControlSkin label_skin;
+			label_skin.Caption.TextObject = label_caption;
 
 
 			ion::gui::controls::gui_control::ControlSkin button_skin;
@@ -1774,9 +1781,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto base_panel = main_frame->CreatePanel("base");
 			base_panel->ZOrder(0.1_r);
 
-			auto base_control = base_panel->CreateControl<ion::gui::controls::GuiControl>("control",
+			auto label = base_panel->CreateControl<ion::gui::controls::GuiLabel>("label",
+				"My label", std::move(label_skin));
+			label->Node()->Position({0.0_r, 0.7_r});
+
+			auto button = base_panel->CreateControl<ion::gui::controls::GuiControl>("button",
 				"My caption", "My tooltip", std::move(button_skin), Vector2{0.5_r, 0.1_r});
-			base_control->Node()->Position({0.0_r, 0.5_r});
+			button->Node()->Position({0.0_r, 0.5_r});
 
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);

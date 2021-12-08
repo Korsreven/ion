@@ -462,7 +462,7 @@ namespace ion::gui
 			//Create a tooltip with the given name and skin
 			NonOwningPtr<controls::GuiTooltip> CreateTooltip(std::string name, controls::gui_control::ControlSkin skin);
 
-			//Create a tooltip with the given name and skin
+			//Create a tooltip with the given name, skin and size
 			NonOwningPtr<controls::GuiTooltip> CreateTooltip(std::string name, controls::gui_control::ControlSkin skin, const Vector2 &size);
 
 			//Create a tooltip by moving the given tooltip

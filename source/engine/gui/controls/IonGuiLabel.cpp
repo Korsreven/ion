@@ -25,7 +25,6 @@ namespace gui_label::detail
 void GuiLabel::DefaultSetup() noexcept
 {
 	Focusable(false);
-	CaptionLayout(gui_control::ControlCaptionLayout::TopLeft);
 }
 
 
