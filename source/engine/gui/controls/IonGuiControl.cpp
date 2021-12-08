@@ -1117,16 +1117,27 @@ bool GuiControl::Intersects(const Vector2 &point) const noexcept
 	{
 		if (std::empty(hit_areas_))
 		{
-			if (skin_.Parts)
+			auto object =
+				[&]() noexcept -> graphics::scene::DrawableObject*
+				{
+					if (skin_.Parts)
+						return skin_.Parts.ModelObject.get();
+					else if (skin_.Caption)
+						return skin_.Caption.TextObject.get();
+					else
+						return nullptr;
+				}();
+
+			if (object)
 			{
-				skin_.Parts->Prepare();
+				object->Prepare();
 
 				//Check for intersection
-				if (skin_.Parts->WorldAxisAlignedBoundingBox().Intersects(point))
+				if (object->WorldAxisAlignedBoundingBox().Intersects(point))
 				{
-					auto node = skin_.Parts->ParentNode();
+					auto node = object->ParentNode();
 					return !node || node->AxisAligned() ||
-							skin_.Parts->WorldOrientedBoundingBox().Intersects(point);
+							object->WorldOrientedBoundingBox().Intersects(point);
 				}
 			}
 		}

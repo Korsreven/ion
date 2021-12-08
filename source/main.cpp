@@ -1784,6 +1784,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto label = base_panel->CreateControl<ion::gui::controls::GuiLabel>("label",
 				"My label", std::move(label_skin));
 			label->Node()->Position({0.0_r, 0.7_r});
+			label->Tooltip("A label tooltip!");
 
 			auto button = base_panel->CreateControl<ion::gui::controls::GuiControl>("button",
 				"My caption", "My tooltip", std::move(button_skin), Vector2{0.5_r, 0.1_r});
