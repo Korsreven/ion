@@ -20,6 +20,7 @@ File:	IonCamera.h
 #include "events/listeners/IonCameraListener.h"
 #include "graphics/render/IonFrustum.h"
 #include "graphics/utilities/IonMatrix4.h"
+#include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 #include "types/IonTypes.h"
 
@@ -32,6 +33,7 @@ namespace ion::graphics::scene
 {
 	using namespace types::type_literals;
 	using utilities::Matrix4;
+	using utilities::Vector2;
 	using utilities::Vector3;
 
 	namespace camera
@@ -57,7 +59,10 @@ namespace ion::graphics::scene
 			render::Frustum frustum_;
 
 			Matrix4 view_matrix_;
+			bool update_bounding_volumes_ = true;
 
+
+			void PrepareBoundingVolumes(const Vector2 &viewport_size) noexcept;
 
 			/*
 				Notifying
@@ -85,6 +90,7 @@ namespace ion::graphics::scene
 				if (position_ != position)
 				{
 					position_ = position;
+					update_bounding_volumes_ = true;
 					NotifyCameraMoved(position);
 				}
 			}
@@ -93,13 +99,17 @@ namespace ion::graphics::scene
 			inline void Rotation(real angle) noexcept
 			{
 				if (rotation_ != angle)
+				{
 					rotation_ = angle;
+					update_bounding_volumes_ = true;
+				}
 			}
 
 			//Sets the view frustum of the camera to the given frustum
 			inline void ViewFrustum(const render::Frustum &frustum) noexcept
 			{
 				frustum_ = frustum;
+				update_bounding_volumes_ = true;
 				NotifyCameraFrustumChanged(frustum);
 			}
 

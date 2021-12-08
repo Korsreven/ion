@@ -71,6 +71,17 @@ Matrix4 get_view_matrix(const Vector3 &position, real angle) noexcept
 
 //Private
 
+void Camera::PrepareBoundingVolumes(const Vector2 &viewport_size) noexcept
+{
+	auto [left, right, bottom, top, z_near, z_far] =
+		frustum_.ToOrthoBounds(viewport_size);
+
+	aabb_ = Aabb::Size({right - left, top - bottom}, position_).RotateCopy(rotation_);
+	obb_ = aabb_;
+	sphere_ = {aabb_.ToHalfSize().Max(), aabb_.Center()};
+}
+
+
 /*
 	Notifying
 */
@@ -111,7 +122,8 @@ Camera::Camera(std::string name, const render::Frustum &frustum, bool visible) :
 
 void Camera::CaptureScene(const render::Viewport &viewport) noexcept
 {
-	frustum_.ProjectScene(viewport.Bounds().ToSize());
+	auto viewport_size = viewport.Bounds().ToSize();
+	frustum_.ProjectScene(viewport_size);
 
 	auto position = position_;
 	auto rotation = rotation_;
@@ -125,6 +137,12 @@ void Camera::CaptureScene(const render::Viewport &viewport) noexcept
 	detail::rotate_by(rotation);
 	detail::move_to(position);
 	view_matrix_ = detail::get_view_matrix(position, rotation);
+
+	if (update_bounding_volumes_)
+	{
+		PrepareBoundingVolumes(viewport_size);
+		update_bounding_volumes_ = false;
+	}
 }
 
 } //ion::graphics::scene
