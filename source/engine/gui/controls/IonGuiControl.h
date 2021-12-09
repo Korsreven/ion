@@ -252,7 +252,8 @@ namespace ion::gui::controls
 			void resize_area(Aabb &area, const Vector2 &scaling) noexcept;
 			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 
-			std::optional<Aabb> get_center_area(const ControlSkin &skin) noexcept;
+			std::optional<Aabb> get_visual_area(const ControlSkin &skin, bool include_caption) noexcept;
+			std::optional<Aabb> get_center_area(const ControlSkin &skin, bool include_caption) noexcept;
 		} //detail
 	} //gui_control
 
@@ -787,7 +788,7 @@ namespace ion::gui::controls
 			[[nodiscard]] std::optional<Aabb> HitArea() const noexcept;
 
 			//Returns the visual area of this control
-			//The returned area includes the center part and border parts
+			//The returned area includes the center and border parts (or caption)
 			//Returns nullopt of this control has no visuals
 			[[nodiscard]] std::optional<Aabb> VisualArea() const noexcept;
 

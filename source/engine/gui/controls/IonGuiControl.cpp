@@ -91,7 +91,23 @@ void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size
 }
 
 
-std::optional<Aabb> get_center_area(const ControlSkin &skin) noexcept
+std::optional<Aabb> get_visual_area(const ControlSkin &skin, bool include_caption) noexcept
+{
+	if (skin.Parts)
+	{
+		skin.Parts->Prepare();
+		return skin.Parts->AxisAlignedBoundingBox();
+	}
+	else if (skin.Caption && include_caption)
+	{
+		skin.Caption->Prepare();
+		return skin.Caption->AxisAlignedBoundingBox();
+	}
+	else
+		return {};
+}
+
+std::optional<Aabb> get_center_area(const ControlSkin &skin, bool include_caption) noexcept
 {
 	if (skin.Parts)
 	{
@@ -126,8 +142,14 @@ std::optional<Aabb> get_center_area(const ControlSkin &skin) noexcept
 			return Aabb{skin.Parts.BottomLeft->AxisAlignedBoundingBox().Max(),
 						skin.Parts.TopRight->AxisAlignedBoundingBox().Min()};
 	}
-
-	return std::nullopt;
+	//Use caption as center
+	else if (skin.Caption && include_caption)
+	{
+		skin.Caption->Prepare();
+		return skin.Caption->AxisAlignedBoundingBox();
+	}
+	
+	return {};
 }
 
 } //gui_control::detail
@@ -681,10 +703,12 @@ void GuiControl::UpdateCaption() noexcept
 		//Caption text
 		if (auto &text = skin_.Caption->Get(); text)
 		{
-			auto visual_area = VisualArea();
-			auto center_area = detail::get_center_area(skin_);
+			auto visual_area =
+				detail::get_visual_area(skin_, false);
+			auto center_area =
+				detail::get_center_area(skin_, false);
 			auto area = center_area.
-				value_or(HitArea().
+				value_or(visual_area.
 				value_or(aabb::Zero));
 
 			auto center = center_area ?
@@ -1091,13 +1115,7 @@ std::optional<Aabb> GuiControl::HitArea() const noexcept
 
 std::optional<Aabb> GuiControl::VisualArea() const noexcept
 {
-	if (skin_.Parts)
-	{
-		skin_.Parts->Prepare();
-		return skin_.Parts->AxisAlignedBoundingBox();
-	}
-	else
-		return std::nullopt;
+	return detail::get_visual_area(skin_, true);
 }
 
 
@@ -1117,7 +1135,7 @@ bool GuiControl::Intersects(const Vector2 &point) const noexcept
 	{
 		if (std::empty(hit_areas_))
 		{
-			auto object =
+			if (auto object =
 				[&]() noexcept -> graphics::scene::DrawableObject*
 				{
 					if (skin_.Parts)
@@ -1126,9 +1144,7 @@ bool GuiControl::Intersects(const Vector2 &point) const noexcept
 						return skin_.Caption.TextObject.get();
 					else
 						return nullptr;
-				}();
-
-			if (object)
+				}(); object)
 			{
 				object->Prepare();
 
@@ -1176,7 +1192,7 @@ std::optional<int> GuiControl::TabOrder() const noexcept
 	if (auto owner = Owner(); owner)
 		return owner->TabOrder(*this);
 	else
-		return std::nullopt;
+		return {};
 }
 
 

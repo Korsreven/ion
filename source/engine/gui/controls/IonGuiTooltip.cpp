@@ -77,8 +77,10 @@ void GuiTooltip::UpdateCaption() noexcept
 						size *= viewport->ViewportToOrthoRatio();
 				}
 
-				auto visual_area = VisualArea();
-				auto center_area = gui_control::detail::get_center_area(skin_);
+				auto visual_area =
+					gui_control::detail::get_visual_area(skin_, false);
+				auto center_area =
+					gui_control::detail::get_center_area(skin_, false);
 
 				//Calculate border size
 				auto top_right_size = visual_area && center_area ?
