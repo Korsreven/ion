@@ -71,10 +71,10 @@ Matrix4 get_view_matrix(const Vector3 &position, real angle) noexcept
 
 //Private
 
-void Camera::PrepareBoundingVolumes(const Vector2 &viewport_size) noexcept
+void Camera::PrepareBoundingVolumes() noexcept
 {
 	auto [left, right, bottom, top, z_near, z_far] =
-		frustum_.ToOrthoBounds(viewport_size);
+		frustum_.ToOrthoBounds(viewport_size_);
 
 	aabb_ = Aabb::Size({right - left, top - bottom}, position_).RotateCopy(rotation_);
 	obb_ = aabb_;
@@ -122,8 +122,14 @@ Camera::Camera(std::string name, const render::Frustum &frustum, bool visible) :
 
 void Camera::CaptureScene(const render::Viewport &viewport) noexcept
 {
-	auto viewport_size = viewport.Bounds().ToSize();
-	frustum_.ProjectScene(viewport_size);
+	if (auto viewport_size = viewport.Bounds().ToSize();
+		viewport_size_ != viewport_size)
+	{
+		viewport_size_ = viewport_size;
+		update_bounding_volumes_ = true;
+	}
+	
+	frustum_.ProjectScene(viewport_size_);
 
 	auto position = position_;
 	auto rotation = rotation_;
@@ -140,7 +146,7 @@ void Camera::CaptureScene(const render::Viewport &viewport) noexcept
 
 	if (update_bounding_volumes_)
 	{
-		PrepareBoundingVolumes(viewport_size);
+		PrepareBoundingVolumes();
 		update_bounding_volumes_ = false;
 	}
 }

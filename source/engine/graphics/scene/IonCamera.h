@@ -57,12 +57,13 @@ namespace ion::graphics::scene
 			Vector3 position_;
 			real rotation_ = 0.0_r;
 			render::Frustum frustum_;
-
 			Matrix4 view_matrix_;
+
+			Vector2 viewport_size_;
 			bool update_bounding_volumes_ = true;
 
 
-			void PrepareBoundingVolumes(const Vector2 &viewport_size) noexcept;
+			void PrepareBoundingVolumes() noexcept;
 
 			/*
 				Notifying
@@ -135,7 +136,6 @@ namespace ion::graphics::scene
 			{
 				return frustum_;
 			}
-
 
 			//Returns the view matrix for this camera
 			[[nodiscard]] inline auto& ViewMatrix() const noexcept
