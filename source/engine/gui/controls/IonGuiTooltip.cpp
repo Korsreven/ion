@@ -71,7 +71,7 @@ void GuiTooltip::UpdateCaption() noexcept
 			if (auto size = text->MinimumAreaSize(); size != vector2::Zero)
 			{
 				//Adjust size from viewport to ortho space
-				if (auto scene_manager = skin_.Caption->Owner(); scene_manager)
+				if (auto scene_manager = part->Owner(); scene_manager)
 				{
 					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
 						size *= viewport->ViewportToOrthoRatio();
@@ -118,54 +118,114 @@ void GuiTooltip::UpdatePosition(Vector2 position) noexcept
 				return nullptr;
 			}(); controller)
 		{
-			if (auto mouse_cursor_skin = controller->MouseCursorSkin(); mouse_cursor_skin)
-			{
-				if (auto cursor_node = mouse_cursor_skin->ParentNode(); cursor_node)
+			auto [half_width, half_height] =
+				(VisualArea().value_or(aabb::Zero).ToHalfSize() * node_->DerivedScaling()).XY();
+
+			auto [cursor_width, cursor_height] =
+				[&]() noexcept
 				{
-					auto [half_width, half_height] =
-						(VisualArea().value_or(aabb::Zero).ToHalfSize() * node_->DerivedScaling()).XY();
-					auto [cursor_width, cursor_height] =
-						(mouse_cursor_skin->AxisAlignedBoundingBox().ToSize() * cursor_node->DerivedScaling()).XY();
+					if (auto mouse_cursor_skin = controller->MouseCursorSkin(); mouse_cursor_skin)
+					{
+						if (auto cursor_node = mouse_cursor_skin->ParentNode(); cursor_node)
+							return mouse_cursor_skin->AxisAlignedBoundingBox().ToSize() * cursor_node->DerivedScaling();
+					}
 
-					//Adjust tooltip position based on cursor hot spot
-					position +=
-						[&]() noexcept -> Vector2
-						{
-							switch (controller->MouseCursorHotSpot())
-							{
-								case gui_controller::GuiMouseCursorHotSpot::TopLeft:
-								return {half_width, -half_height - cursor_height};
+					return vector2::Zero; //OS cursor size?
+				}().XY();
 
-								case gui_controller::GuiMouseCursorHotSpot::TopCenter:
-								return {0.0_r, -half_height - cursor_height};
+			//Adjust tooltip position based on cursor hot spot
+			position +=
+				[&]() noexcept -> Vector2
+				{
+					switch (controller->MouseCursorHotSpot())
+					{
+						case gui_controller::GuiMouseCursorHotSpot::TopLeft:
+						return {half_width, -half_height - cursor_height};
 
-								case gui_controller::GuiMouseCursorHotSpot::TopRight:
-								return {-half_width, -half_height - cursor_height};
+						case gui_controller::GuiMouseCursorHotSpot::TopCenter:
+						return {0.0_r, -half_height - cursor_height};
 
-								case gui_controller::GuiMouseCursorHotSpot::Left:
-								return {half_width, -half_height - cursor_height * 0.5_r};
+						case gui_controller::GuiMouseCursorHotSpot::TopRight:
+						return {-half_width, -half_height - cursor_height};
 
-								case gui_controller::GuiMouseCursorHotSpot::Right:
-								return {-half_width, -half_height - cursor_height * 0.5_r};
+						case gui_controller::GuiMouseCursorHotSpot::Left:
+						return {half_width, -half_height - cursor_height * 0.5_r};
 
-								case gui_controller::GuiMouseCursorHotSpot::BottomLeft:
-								return {half_width, half_height + cursor_height};
+						case gui_controller::GuiMouseCursorHotSpot::Right:
+						return {-half_width, -half_height - cursor_height * 0.5_r};
 
-								case gui_controller::GuiMouseCursorHotSpot::BottomCenter:
-								return {0.0_r, half_height + cursor_height};
+						case gui_controller::GuiMouseCursorHotSpot::BottomLeft:
+						return {half_width, half_height + cursor_height};
 
-								case gui_controller::GuiMouseCursorHotSpot::BottomRight:
-								return {-half_width, half_height + cursor_height};
+						case gui_controller::GuiMouseCursorHotSpot::BottomCenter:
+						return {0.0_r, half_height + cursor_height};
 
-								default:
-								return {0.0_r, -half_height - cursor_height * 0.5_r};
-							}
-						}();
-				}
-			}
+						case gui_controller::GuiMouseCursorHotSpot::BottomRight:
+						return {-half_width, half_height + cursor_height};
+
+						default:
+						return {0.0_r, -half_height - cursor_height * 0.5_r};
+					}
+				}();
 		}
 
 		node_->DerivedPosition(position);
+
+		//Make sure tooltip stays within view area
+		if (auto view_area =
+			[&]() noexcept
+			{
+				if (auto scene_manager = skin_.Caption->Owner(); scene_manager)
+				{
+					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+						return viewport->ConnectedCamera()->WorldAxisAlignedBoundingBox();
+				}
+
+				return aabb::Zero;
+			}(); view_area != aabb::Zero)
+		{
+			if (auto tooltip_area =
+				[&]() noexcept
+				{
+					if (skin_.Parts)
+					{
+						skin_.Parts->Prepare();
+						return skin_.Parts->WorldAxisAlignedBoundingBox();
+					}
+					else if (skin_.Caption)
+					{
+						skin_.Caption->Prepare();
+						return skin_.Caption->WorldAxisAlignedBoundingBox();
+					}
+
+					return aabb::Zero;
+				}(); tooltip_area != aabb::Zero)
+			{
+				auto [view_min, view_max] = view_area.MinMax();
+				auto [tooltip_min, tooltip_max] = tooltip_area.MinMax();
+				position = vector2::Zero;
+
+				//Outside right edge, nudge left
+				if (tooltip_max.X() > view_max.X())
+					position.X(view_max.X() - tooltip_max.X());
+
+				//Outside left edge, nudge right
+				if (tooltip_min.X() < view_min.X())
+					position.X(view_min.X() - tooltip_min.X());	
+
+				//Outside bottom edge, nudge up
+				if (tooltip_min.Y() < view_min.Y())
+					position.Y(view_min.Y() - tooltip_min.Y());
+
+				//Outside top edge, nudge down
+				if (tooltip_max.Y() > view_max.Y())
+					position.Y(view_max.Y() - tooltip_max.Y());
+
+				//Adjust inside view area
+				if (position != vector2::Zero)
+					node_->Position(node_->Position() + position);
+			}
+		}
 	}
 }
 
