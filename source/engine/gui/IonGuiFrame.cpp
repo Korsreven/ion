@@ -47,7 +47,7 @@ std::optional<control_pointers::iterator> get_current_control_iterator(control_p
 	controls::GuiControl *focused_control) noexcept
 {
 	if (std::empty(controls))
-		return std::nullopt;
+		return {};
 	else if (!focused_control)
 		return std::end(controls);
 	else
@@ -56,7 +56,7 @@ std::optional<control_pointers::iterator> get_current_control_iterator(control_p
 			iter != std::end(controls))
 			return iter;
 		else
-			return std::nullopt;
+			return {};
 	}
 }
 

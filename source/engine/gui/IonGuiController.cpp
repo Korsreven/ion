@@ -104,7 +104,7 @@ void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept
 std::optional<frame_pointers::const_iterator> get_frame_iterator(const frames &frames, GuiFrame *frame) noexcept
 {
 	if (std::empty(frames))
-		return std::nullopt;
+		return {};
 	else if (!frame && !frames.back().current_frame)
 		return std::end(frames.back().frames);
 	else
@@ -113,7 +113,7 @@ std::optional<frame_pointers::const_iterator> get_frame_iterator(const frames &f
 			frame ? frame : frames.back().current_frame); iter != std::end(frames.back().frames))
 			return iter;
 		else
-			return std::nullopt;
+			return {};
 	}
 }
 

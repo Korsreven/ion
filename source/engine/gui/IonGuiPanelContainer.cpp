@@ -206,7 +206,7 @@ std::optional<int> GuiPanelContainer::TabOrder(const GuiComponent &component) co
 			++order;
 	}
 
-	return std::nullopt;
+	return {};
 }
 
 

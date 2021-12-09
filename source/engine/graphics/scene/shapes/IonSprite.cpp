@@ -68,7 +68,7 @@ std::optional<Vector2> get_texture_size(materials::Material &material) noexcept
 			return Vector2{static_cast<real>(texture->Extents()->Width), static_cast<real>(texture->Extents()->Height)};
 	}
 	
-	return std::nullopt;
+	return {};
 }
 
 } //sprite::detail
@@ -103,7 +103,7 @@ std::optional<Vector2> Sprite::GetTextureSize() const noexcept
 		}
 	}
 
-	return std::nullopt;
+	return {};
 }
 
 void Sprite::RecalculateSize() noexcept

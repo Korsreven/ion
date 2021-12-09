@@ -67,7 +67,7 @@ std::optional<int> GuiPanel::TabOrder() const noexcept
 	if (auto owner = Owner(); owner)
 		return owner->TabOrder(*this);
 	else
-		return std::nullopt;
+		return {};
 }
 
 
