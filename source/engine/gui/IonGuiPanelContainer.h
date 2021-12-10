@@ -269,6 +269,15 @@ namespace ion::gui
 			[[nodiscard]] NonOwningPtr<const controls::GuiControl> GetControl(std::string_view name) const noexcept;
 
 
+			//Searches for a pointer to a mutable control (all child controls) with the given name
+			//Returns nullptr if control could not be found
+			[[nodiscard]] NonOwningPtr<controls::GuiControl> SearchControl(std::string_view name) noexcept;
+
+			//Searches for a pointer to an immutable control (all child controls) with the given name
+			//Returns nullptr if control could not be found
+			[[nodiscard]] NonOwningPtr<const controls::GuiControl> SearchControl(std::string_view name) const noexcept;
+
+
 			//Gets a pointer to a mutable control of type T with the given name
 			//Returns nullptr if a control of type T could not be found
 			template <typename T>
@@ -327,6 +336,15 @@ namespace ion::gui
 			//Gets a pointer to an immutable panel with the given name
 			//Returns nullptr if panel could not be found
 			[[nodiscard]] NonOwningPtr<const GuiPanel> GetPanel(std::string_view name) const noexcept;
+
+
+			//Searches for a pointer to a mutable panel (all child panels) with the given name
+			//Returns nullptr if panel could not be found
+			[[nodiscard]] NonOwningPtr<GuiPanel> SearchPanel(std::string_view name) noexcept;
+
+			//Searches for a pointer to an immutable panel (all child panels) with the given name
+			//Returns nullptr if panel could not be found
+			[[nodiscard]] NonOwningPtr<const GuiPanel> SearchPanel(std::string_view name) const noexcept;
 
 
 			/*

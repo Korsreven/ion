@@ -275,12 +275,41 @@ NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(controls::GuiLab
 
 NonOwningPtr<controls::GuiControl> GuiPanelContainer::GetControl(std::string_view name) noexcept
 {
-	return static_pointer_cast<controls::GuiControl>(GetComponent(name));
+	return dynamic_pointer_cast<controls::GuiControl>(GetComponent(name));
 }
 
 NonOwningPtr<const controls::GuiControl> GuiPanelContainer::GetControl(std::string_view name) const noexcept
 {
-	return static_pointer_cast<const controls::GuiControl>(GetComponent(name));
+	return dynamic_pointer_cast<const controls::GuiControl>(GetComponent(name));
+}
+
+
+NonOwningPtr<controls::GuiControl> GuiPanelContainer::SearchControl(std::string_view name) noexcept
+{
+	if (auto control = GetControl(name); control)
+		return control;
+
+	for (auto &panel : panels_)
+	{
+		if (auto c = panel->SearchControl(name); c) //Recursive
+			return c;
+	}
+
+	return nullptr;
+}
+
+NonOwningPtr<const controls::GuiControl> GuiPanelContainer::SearchControl(std::string_view name) const noexcept
+{
+	if (auto control = GetControl(name); control)
+		return control;
+
+	for (auto &panel : panels_)
+	{
+		if (auto c = panel->SearchControl(name); c) //Recursive
+			return c;
+	}
+
+	return nullptr;
 }
 
 
@@ -341,12 +370,41 @@ NonOwningPtr<GuiPanel> GuiPanelContainer::CreatePanel(GuiPanel &&panel)
 
 NonOwningPtr<GuiPanel> GuiPanelContainer::GetPanel(std::string_view name) noexcept
 {
-	return static_pointer_cast<GuiPanel>(GetComponent(name));
+	return dynamic_pointer_cast<GuiPanel>(GetComponent(name));
 }
 
 NonOwningPtr<const GuiPanel> GuiPanelContainer::GetPanel(std::string_view name) const noexcept
 {
-	return static_pointer_cast<const GuiPanel>(GetComponent(name));
+	return dynamic_pointer_cast<const GuiPanel>(GetComponent(name));
+}
+
+
+NonOwningPtr<GuiPanel> GuiPanelContainer::SearchPanel(std::string_view name) noexcept
+{
+	if (auto panel = GetPanel(name); panel)
+		return panel;
+
+	for (auto &panel : panels_)
+	{
+		if (auto p = panel->SearchPanel(name); p) //Recursive
+			return p;
+	}
+
+	return nullptr;
+}
+
+NonOwningPtr<const GuiPanel> GuiPanelContainer::SearchPanel(std::string_view name) const noexcept
+{
+	if (auto panel = GetPanel(name); panel)
+		return panel;
+
+	for (auto &panel : panels_)
+	{
+		if (auto p = panel->SearchPanel(name); p) //Recursive
+			return p;
+	}
+
+	return nullptr;
 }
 
 

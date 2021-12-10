@@ -767,12 +767,12 @@ NonOwningPtr<GuiFrame> GuiController::CreateFrame(GuiFrame &&frame)
 
 NonOwningPtr<GuiFrame> GuiController::GetFrame(std::string_view name) noexcept
 {
-	return static_pointer_cast<GuiFrame>(GetComponent(name));
+	return dynamic_pointer_cast<GuiFrame>(GetComponent(name));
 }
 
 NonOwningPtr<const GuiFrame> GuiController::GetFrame(std::string_view name) const noexcept
 {
-	return static_pointer_cast<const GuiFrame>(GetComponent(name));
+	return dynamic_pointer_cast<const GuiFrame>(GetComponent(name));
 }
 
 
@@ -841,12 +841,12 @@ NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(controls::GuiToo
 
 NonOwningPtr<controls::GuiTooltip> GuiController::GetTooltip(std::string_view name) noexcept
 {
-	return static_pointer_cast<controls::GuiTooltip>(GetComponent(name));
+	return dynamic_pointer_cast<controls::GuiTooltip>(GetComponent(name));
 }
 
 NonOwningPtr<const controls::GuiTooltip> GuiController::GetTooltip(std::string_view name) const noexcept
 {
-	return static_pointer_cast<const controls::GuiTooltip>(GetComponent(name));
+	return dynamic_pointer_cast<const controls::GuiTooltip>(GetComponent(name));
 }
 
 
