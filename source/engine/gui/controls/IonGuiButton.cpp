@@ -46,6 +46,11 @@ void GuiButton::ExecuteActions() noexcept
 	//Execute actions
 	for (auto &[type, name] : actions_)
 	{
+		auto active_frame = controller->FocusedFrame();
+		if (!active_frame)
+			active_frame = parent_frame;
+
+
 		switch (type)
 		{
 			//Controller actions
@@ -105,54 +110,54 @@ void GuiButton::ExecuteActions() noexcept
 
 			//Panel actions
 			case ButtonActionType::ShowPanel:
-			if (auto panel = parent_frame->GetPanel(name); panel)
+			if (auto panel = active_frame->SearchPanel(name); panel)
 				panel->Show();
 			break;
 
 			case ButtonActionType::HidePanel:
-			if (auto panel = parent_frame->GetPanel(name); panel)
+			if (auto panel = active_frame->SearchPanel(name); panel)
 				panel->Hide();
 			break;
 
 			case ButtonActionType::EnablePanel:
-			if (auto panel = parent_frame->GetPanel(name); panel)
+			if (auto panel = active_frame->SearchPanel(name); panel)
 				panel->Enable();
 			break;
 
 			case ButtonActionType::DisablePanel:
-			if (auto panel = parent_frame->GetPanel(name); panel)
+			if (auto panel = active_frame->SearchPanel(name); panel)
 				panel->Disable();
 			break;
 
 
 			//Control actions
 			case ButtonActionType::ShowControl:
-			if (auto control = owner->GetControl(name); control)
+			if (auto control = active_frame->SearchControl(name); control)
 				control->Show();
 			break;
 
 			case ButtonActionType::HideControl:
-			if (auto control = owner->GetControl(name); control)
+			if (auto control = active_frame->SearchControl(name); control)
 				control->Hide();
 			break;
 
 			case ButtonActionType::EnableControl:
-			if (auto control = owner->GetControl(name); control)
+			if (auto control = active_frame->SearchControl(name); control)
 				control->Enable();
 			break;
 
 			case ButtonActionType::DisableControl:
-			if (auto control = owner->GetControl(name); control)
+			if (auto control = active_frame->SearchControl(name); control)
 				control->Disable();
 			break;
 
 			case ButtonActionType::FocusControl:
-			if (auto control = owner->GetControl(name); control)
+			if (auto control = active_frame->SearchControl(name); control)
 				control->Focus();
 			break;
 
 			case ButtonActionType::DefocusControl:
-			if (auto control = owner->GetControl(name); control)
+			if (auto control = active_frame->SearchControl(name); control)
 				control->Defocus();
 			break;
 		}
