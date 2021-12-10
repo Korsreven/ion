@@ -146,6 +146,7 @@ File:	main.cpp
 #include "gui/IonGuiPanel.h"
 #include "gui/IonGuiPanelContainer.h"
 #include "gui/controls/IonGuiControl.h"
+#include "gui/controls/IonGuiButton.h"
 #include "gui/controls/IonGuiLabel.h"
 #include "gui/controls/IonGuiTooltip.h"
 
@@ -1781,13 +1782,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto base_panel = main_frame->CreatePanel("base");
 			base_panel->ZOrder(0.1_r);
 
-			auto label = base_panel->CreateControl<ion::gui::controls::GuiLabel>("label",
-				"My label", std::move(label_skin));
+			auto label = base_panel->CreateLabel("label", "My label", std::move(label_skin));
 			label->Node()->Position({0.0_r, 0.7_r});
 			label->Tooltip("A label tooltip!");
 
-			auto button = base_panel->CreateControl<ion::gui::controls::GuiControl>("button",
-				"My caption", "My tooltip", std::move(button_skin), Vector2{0.5_r, 0.1_r});
+			auto button = base_panel->CreateButton("button", "My caption", "My tooltip", std::move(button_skin), Vector2{0.5_r, 0.1_r});
 			button->Node()->Position({0.0_r, 0.5_r});
 
 			auto sub_panel = base_panel->CreatePanel("sub");

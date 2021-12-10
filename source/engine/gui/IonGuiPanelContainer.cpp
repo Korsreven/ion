@@ -211,6 +211,64 @@ std::optional<int> GuiPanelContainer::TabOrder(const GuiComponent &component) co
 
 
 /*
+	Buttons
+	Creating
+*/
+
+NonOwningPtr<controls::GuiButton> GuiPanelContainer::CreateButton(std::string name, std::optional<std::string> caption,
+	std::optional<std::string> tooltip, controls::gui_control::ControlSkin skin)
+{
+	return CreateControl<controls::GuiButton>(std::move(name), std::move(caption), std::move(tooltip), std::move(skin));
+}
+
+NonOwningPtr<controls::GuiButton> GuiPanelContainer::CreateButton(std::string name, std::optional<std::string> caption,
+	std::optional<std::string> tooltip, controls::gui_control::ControlSkin skin, const Vector2 &size)
+{
+	return CreateControl<controls::GuiButton>(std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size);
+}
+
+NonOwningPtr<controls::GuiButton> GuiPanelContainer::CreateButton(std::string name, std::optional<std::string> caption,
+	std::optional<std::string> tooltip, controls::gui_control::ControlSkin skin, controls::gui_control::Areas areas)
+{
+	return CreateControl<controls::GuiButton>(std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(areas));
+}
+
+NonOwningPtr<controls::GuiButton> GuiPanelContainer::CreateButton(controls::GuiButton &&button)
+{
+	return CreateControl<controls::GuiButton>(std::move(button));
+}
+
+
+/*
+	Labels
+	Creating
+*/
+
+NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(std::string name, std::optional<std::string> caption,
+	controls::gui_control::ControlSkin skin)
+{
+	return CreateControl<controls::GuiLabel>(std::move(name), std::move(caption), std::move(skin));
+}
+
+NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(std::string name, std::optional<std::string> caption,
+	controls::gui_control::ControlSkin skin, const Vector2 &size)
+{
+	return CreateControl<controls::GuiLabel>(std::move(name), std::move(caption), std::move(skin), size);
+}
+
+NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(std::string name, std::optional<std::string> caption,
+	controls::gui_control::ControlSkin skin, controls::gui_control::Areas areas)
+{
+	return CreateControl<controls::GuiLabel>(std::move(name), std::move(caption), std::move(skin), std::move(areas));
+}
+
+NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(controls::GuiLabel &&label)
+{
+	return CreateControl<controls::GuiLabel>(std::move(label));
+}
+
+
+/*
 	Controls
 	Retrieving
 */

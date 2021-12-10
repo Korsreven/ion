@@ -21,10 +21,15 @@ File:	IonGuiPanelContainer.h
 
 #include "IonGuiContainer.h"
 #include "adaptors/ranges/IonDereferenceIterable.h"
+#include "controls/IonGuiButton.h"
+#include "controls/IonGuiLabel.h"
+#include "graphics/utilities/IonVector2.h"
 #include "memory/IonNonOwningPtr.h"
 
 namespace ion::gui
 {
+	using graphics::utilities::Vector2;
+
 	//Forward declarations
 	class GuiFrame;
 	class GuiPanel;
@@ -206,6 +211,48 @@ namespace ion::gui
 				auto ptr = CreateComponent(std::move(control_t));
 				return static_pointer_cast<T>(ptr);
 			}
+
+
+			/*
+				Buttons
+				Creating
+			*/
+
+			//Create a button with the given name, caption, tooltip and skin
+			NonOwningPtr<controls::GuiButton> CreateButton(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_control::ControlSkin skin);
+
+			//Create a button with the given name, caption, tooltip, skin and size
+			NonOwningPtr<controls::GuiButton> CreateButton(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_control::ControlSkin skin, const Vector2 &size);
+
+			//Create a button with the given name, caption, tooltip, skin and size
+			NonOwningPtr<controls::GuiButton> CreateButton(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_control::ControlSkin skin, controls::gui_control::Areas areas);
+
+			//Create a button by moving the given button
+			NonOwningPtr<controls::GuiButton> CreateButton(controls::GuiButton &&button);
+
+
+			/*
+				Labels
+				Creating
+			*/
+
+			//Create a label with the given name, caption and skin
+			NonOwningPtr<controls::GuiLabel> CreateLabel(std::string name, std::optional<std::string> caption,
+				controls::gui_control::ControlSkin skin);
+
+			//Create a label with the given name, caption, skin and size
+			NonOwningPtr<controls::GuiLabel> CreateLabel(std::string name, std::optional<std::string> caption,
+				controls::gui_control::ControlSkin skin, const Vector2 &size);
+
+			//Create a label with the given name, caption, skin and size
+			NonOwningPtr<controls::GuiLabel> CreateLabel(std::string name, std::optional<std::string> caption,
+				controls::gui_control::ControlSkin skin, controls::gui_control::Areas areas);
+
+			//Create a label by moving the given label
+			NonOwningPtr<controls::GuiLabel> CreateLabel(controls::GuiLabel &&label);
 
 
 			/*

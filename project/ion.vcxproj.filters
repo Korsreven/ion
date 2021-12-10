@@ -618,6 +618,9 @@
     <ClCompile Include="..\source\engine\gui\controls\IonGuiTooltip.cpp">
       <Filter>Source Files\gui\controls</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\gui\controls\IonGuiButton.cpp">
+      <Filter>Source Files\gui\controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1197,6 +1200,9 @@
       <Filter>Header Files\gui\controls</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\gui\controls\IonGuiTooltip.h">
+      <Filter>Header Files\gui\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\gui\controls\IonGuiButton.h">
       <Filter>Header Files\gui\controls</Filter>
     </ClInclude>
   </ItemGroup>
