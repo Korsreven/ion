@@ -20,6 +20,7 @@ File:	IonGuiController.h
 
 #include "IonGuiContainer.h"
 #include "IonGuiFrame.h"
+#include "adaptors/ranges/IonDereferenceIterable.h"
 #include "controls/IonGuiTooltip.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonGuiFrameListener.h"
