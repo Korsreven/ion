@@ -408,7 +408,7 @@ namespace ion::gui::controls
 		public:
 
 			//Construct a control with the given name
-			GuiControl(std::string name);
+			explicit GuiControl(std::string name);
 
 			//Construct a control with the given name and hit size
 			GuiControl(std::string name, const Vector2 &size);

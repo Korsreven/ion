@@ -24,6 +24,7 @@ namespace ion::gui::controls
 	{
 	} //gui_label::detail
 
+
 	class GuiLabel : public GuiControl
 	{
 		private:

@@ -17,7 +17,7 @@ namespace ion::gui::controls
 
 namespace gui_label::detail
 {
-} //gui_control::detail
+} //gui_label::detail
 
 
 //Private

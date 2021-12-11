@@ -211,7 +211,7 @@ namespace ion::gui
 		public:
 
 			//Construct a frame with the given name
-			GuiFrame(std::string name);
+			explicit GuiFrame(std::string name);
 
 
 			/*

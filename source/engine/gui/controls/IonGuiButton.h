@@ -66,6 +66,7 @@ namespace ion::gui::controls
 		} //detail
 	} //gui_button
 
+
 	class GuiButton : public GuiControl
 	{
 		private:

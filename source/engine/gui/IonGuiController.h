@@ -202,7 +202,7 @@ namespace ion::gui
 		public:
 
 			//Construct a gui controller with the given parent node
-			GuiController(SceneNode &parent_node);
+			explicit GuiController(SceneNode &parent_node);
 
 			//Destructor
 			~GuiController() noexcept;

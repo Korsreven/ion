@@ -45,6 +45,7 @@ namespace ion::gui::controls
 		} //detail
 	} //gui_tooltip::detail
 
+
 	class GuiTooltip : public GuiLabel
 	{
 		private:

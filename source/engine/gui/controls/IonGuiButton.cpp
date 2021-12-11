@@ -23,7 +23,7 @@ using namespace gui_button;
 
 namespace gui_button::detail
 {
-} //gui_control::detail
+} //gui_button::detail
 
 
 //Private

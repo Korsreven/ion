@@ -40,7 +40,7 @@ namespace ion::gui
 		public:
 
 			//Construct a panel with the given name
-			GuiPanel(std::string name);
+			explicit GuiPanel(std::string name);
 
 
 			/*
