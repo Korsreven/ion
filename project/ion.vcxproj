@@ -254,6 +254,7 @@
     <ClCompile Include="..\source\engine\graphics\utilities\IonVector2.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonVector3.cpp" />
     <ClCompile Include="..\source\engine\gui\controls\IonGuiButton.cpp" />
+    <ClCompile Include="..\source\engine\gui\controls\IonGuiCheckBox.cpp" />
     <ClCompile Include="..\source\engine\gui\controls\IonGuiControl.cpp" />
     <ClCompile Include="..\source\engine\gui\controls\IonGuiLabel.cpp" />
     <ClCompile Include="..\source\engine\gui\controls\IonGuiTooltip.cpp" />
@@ -425,6 +426,7 @@
     <ClInclude Include="..\source\engine\graphics\utilities\IonVector2.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonVector3.h" />
     <ClInclude Include="..\source\engine\gui\controls\IonGuiButton.h" />
+    <ClInclude Include="..\source\engine\gui\controls\IonGuiCheckBox.h" />
     <ClInclude Include="..\source\engine\gui\controls\IonGuiControl.h" />
     <ClInclude Include="..\source\engine\gui\controls\IonGuiLabel.h" />
     <ClInclude Include="..\source\engine\gui\controls\IonGuiTooltip.h" />

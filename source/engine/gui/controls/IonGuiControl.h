@@ -159,18 +159,13 @@ namespace ion::gui::controls
 		};
 
 
-		struct ControlSkin final
+		struct ControlSkin
 		{
 			ControlVisualParts Parts;
 			ControlCaptionPart Caption;
 		};
 
 		/*
-		struct CheckBoxSkin final
-		{
-			NonOwningPtr<graphics::scene::Model> CheckMark;
-		};
-
 		struct ListBoxSkin final
 		{
 			NonOwningPtr<graphics::scene::Model> Selection;

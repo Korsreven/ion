@@ -145,6 +145,7 @@ File:	main.cpp
 #include "gui/IonGuiFrame.h"
 #include "gui/IonGuiPanel.h"
 #include "gui/IonGuiPanelContainer.h"
+#include "gui/controls/IonGuiCheckBox.h"
 #include "gui/controls/IonGuiControl.h"
 #include "gui/controls/IonGuiButton.h"
 #include "gui/controls/IonGuiLabel.h"

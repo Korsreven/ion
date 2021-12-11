@@ -12,7 +12,6 @@ File:	IonGuiControl.cpp
 
 #include "IonGuiControl.h"
 
-#include "graphics/materials/IonMaterial.h"
 #include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
