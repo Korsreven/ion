@@ -30,10 +30,10 @@ namespace ion::events::listeners
 		*/
 
 		//Called when a scene node is about to begin rendering, with a reference to the scene node
-		virtual void NodeRenderStarted(ion::graphics::scene::graph::SceneNode &node) noexcept = 0;
+		virtual void NodeRenderStarted(graphics::scene::graph::SceneNode &node) noexcept = 0;
 		
 		//Called just after a scene node has been rendered, with a reference to the scene node
-		virtual void NodeRenderEnded(ion::graphics::scene::graph::SceneNode &node) noexcept = 0;
+		virtual void NodeRenderEnded(graphics::scene::graph::SceneNode &node) noexcept = 0;
 	};
 } //ion::events::listeners
 

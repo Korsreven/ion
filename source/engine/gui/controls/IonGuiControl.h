@@ -282,9 +282,9 @@ namespace ion::gui::controls
 			std::optional<events::Callback<void, GuiControl&>> on_click_;
 			std::optional<events::Callback<void, GuiControl&>> on_enter_;
 			std::optional<events::Callback<void, GuiControl&>> on_exit_;
-			std::optional<events::Callback<void, GuiControl&>> on_change_;
-			std::optional<events::Callback<void, GuiControl&>> on_resize_;
+			std::optional<events::Callback<void, GuiControl&>> on_change_;		
 			std::optional<events::Callback<void, GuiControl&>> on_state_change_;
+			std::optional<events::Callback<void, GuiControl&>> on_resize_;
 
 
 			/*
@@ -342,12 +342,12 @@ namespace ion::gui::controls
 			//Called right after a control has been changed
 			virtual void Changed() noexcept;
 
-			//Called right after a control has been resized
-			virtual void Resized() noexcept;
-
-
 			//Called right after a control has changed state
 			virtual void StateChanged() noexcept;
+
+
+			//Called right after a control has been resized with the from and to size
+			virtual void Resized(const Vector2 &from_size, const Vector2 &to_size) noexcept;
 
 
 			/*
@@ -371,9 +371,9 @@ namespace ion::gui::controls
 			void NotifyControlExited() noexcept;
 
 			void NotifyControlChanged() noexcept;
-			void NotifyControlResized() noexcept;
-
 			void NotifyControlStateChanged() noexcept;
+
+			void NotifyControlResized() noexcept;
 
 
 			/*
@@ -394,9 +394,9 @@ namespace ion::gui::controls
 				Skins
 			*/
 
-			void AttachSkin();
-			void DetachSkin() noexcept;
-			void RemoveSkin() noexcept;
+			virtual void AttachSkin();
+			virtual void DetachSkin() noexcept;
+			virtual void RemoveSkin() noexcept;
 
 			virtual void UpdateCaption() noexcept;
 
@@ -666,19 +666,6 @@ namespace ion::gui::controls
 			}
 
 
-			//Sets the on resize callback
-			inline void OnResize(events::Callback<void, GuiControl&> on_resize) noexcept
-			{
-				on_resize_ = on_resize;
-			}
-
-			//Sets the on resize callback
-			inline void OnResize(std::nullopt_t) noexcept
-			{
-				on_resize_ = {};
-			}
-
-
 			//Sets the on state change callback
 			inline void OnStateChange(events::Callback<void, GuiControl&> on_state_change) noexcept
 			{
@@ -689,6 +676,19 @@ namespace ion::gui::controls
 			inline void OnStateChange(std::nullopt_t) noexcept
 			{
 				on_state_change_ = {};
+			}
+
+
+			//Sets the on resize callback
+			inline void OnResize(events::Callback<void, GuiControl&> on_resize) noexcept
+			{
+				on_resize_ = on_resize;
+			}
+
+			//Sets the on resize callback
+			inline void OnResize(std::nullopt_t) noexcept
+			{
+				on_resize_ = {};
 			}
 
 
@@ -830,16 +830,16 @@ namespace ion::gui::controls
 				return on_change_;
 			}
 
-			//Returns the on resize callback
-			[[nodiscard]] inline auto OnResize() const noexcept
-			{
-				return on_resize_;
-			}
-
 			//Returns the on state change callback
 			[[nodiscard]] inline auto OnStateChange() const noexcept
 			{
 				return on_state_change_;
+			}
+
+			//Returns the on resize callback
+			[[nodiscard]] inline auto OnResize() const noexcept
+			{
+				return on_resize_;
 			}
 
 

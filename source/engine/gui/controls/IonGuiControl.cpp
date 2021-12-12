@@ -270,15 +270,15 @@ void GuiControl::Changed() noexcept
 	NotifyControlChanged();
 }
 
-void GuiControl::Resized() noexcept
-{
-	NotifyControlResized();
-}
-
-
 void GuiControl::StateChanged() noexcept
 {
 	NotifyControlStateChanged();
+}
+
+
+void GuiControl::Resized([[maybe_unused]] const Vector2 &from_size, [[maybe_unused]] const Vector2 &to_size) noexcept
+{
+	NotifyControlResized();
 }
 
 
@@ -443,21 +443,6 @@ void GuiControl::NotifyControlChanged() noexcept
 		(*on_change_)(*this);
 }
 
-void GuiControl::NotifyControlResized() noexcept
-{
-	if (auto owner = Owner(); owner)
-	{
-		if (auto frame = owner->ParentFrame(); frame)
-			NotifyAll(frame->ControlEvents().Listeners(),
-				&events::listeners::GuiControlListener::Resized, std::ref(*this));
-	}
-
-	//User callback
-	if (on_resize_)
-		(*on_resize_)(*this);
-}
-
-
 void GuiControl::NotifyControlStateChanged() noexcept
 {
 	if (auto owner = Owner(); owner)
@@ -470,6 +455,21 @@ void GuiControl::NotifyControlStateChanged() noexcept
 	//User callback
 	if (on_state_change_)
 		(*on_state_change_)(*this);
+}
+
+
+void GuiControl::NotifyControlResized() noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = owner->ParentFrame(); frame)
+			NotifyAll(frame->ControlEvents().Listeners(),
+				&events::listeners::GuiControlListener::Resized, std::ref(*this));
+	}
+
+	//User callback
+	if (on_resize_)
+		(*on_resize_)(*this);
 }
 
 
@@ -1044,7 +1044,7 @@ void GuiControl::Size(const Vector2 &size) noexcept
 		if (resized)
 		{
 			UpdateCaption();
-			Resized();
+			Resized(current_size, size);
 		}
 	}
 }
