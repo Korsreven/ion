@@ -12,6 +12,9 @@ File:	IonGuiCheckBox.cpp
 
 #include "IonGuiCheckBox.h"
 
+#include "graphics/scene/IonModel.h"
+#include "graphics/scene/IonSceneManager.h"
+#include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/scene/shapes/IonSprite.h"
 #include "gui/IonGuiController.h"
 #include "gui/IonGuiFrame.h"
@@ -24,7 +27,32 @@ using namespace gui_check_box;
 
 namespace gui_check_box::detail
 {
+
+void resize_skin(CheckBoxSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept
+{
+	auto delta_size = to_size - from_size;
+	auto delta_position = delta_size * 0.5_r;
+	auto [delta_width, delta_height] = delta_size.XY();
+
+	if (skin.ExtraParts)
+	{
+		auto &center = skin.ExtraParts.CheckMark ?
+			skin.ExtraParts.CheckMark->Position() :
+			vector3::Zero;
+		
+		gui_control::detail::resize_part(skin.ExtraParts.CheckMark, delta_size, vector2::Zero, center); //Check mark
+	}
+}
+
 } //gui_check_box::detail
+
+
+//Private
+
+void GuiCheckBox::DefaultSetup() noexcept
+{
+	CaptionLayout(gui_control::ControlCaptionLayout::OutsideRightCenter);
+}
 
 
 //Protected
@@ -40,10 +68,24 @@ void GuiCheckBox::Clicked() noexcept
 	GuiControl::Clicked(); //Use base functionality
 }
 
+void GuiCheckBox::StateChanged() noexcept
+{
+	if (checked_)
+		UpdateState();
+
+	GuiControl::StateChanged(); //Use base functionality
+}
+
+void GuiCheckBox::Resized(const Vector2 &from_size, const Vector2 &to_size) noexcept
+{
+	detail::resize_skin(skin_, from_size, to_size);
+	GuiControl::Resized(from_size, to_size); //Use base functionality
+}
+
 
 void GuiCheckBox::Checked() noexcept
 {
-	SetState(CheckBoxState::Checked);
+	UpdateState();
 
 	//User callback
 	if (on_check_)
@@ -52,7 +94,7 @@ void GuiCheckBox::Checked() noexcept
 
 void GuiCheckBox::Unchecked() noexcept
 {
-	SetState(CheckBoxState::Unchecked);
+	UpdateState();
 
 	//User callback
 	if (on_uncheck_)
@@ -75,16 +117,52 @@ void GuiCheckBox::SetSkinState(gui_control::ControlState state, CheckBoxSkin &sk
 	}
 }
 
-void GuiCheckBox::SetState(CheckBoxState state) noexcept
+void GuiCheckBox::UpdateState() noexcept
 {
 	if (visible_)
 		SetSkinState(GuiControl::state_, skin_);
+}
 
-	if (state_ != state)
+
+/*
+	Skins
+*/
+
+void GuiCheckBox::AttachSkin()
+{
+	GuiControl::AttachSkin(); //Use base functionality
+
+	if (skin_.ExtraParts)
 	{
-		state_ = state;
-		StateChanged();
+		if (auto node = skin_.ExtraParts->ParentNode(); node)
+			node->DetachObject(*skin_.ExtraParts.ModelObject);
+		
+		if (node_) //Create node for all extra parts
+			node_->CreateChildNode(node_->Visible())->AttachObject(*skin_.ExtraParts.ModelObject);
 	}
+
+	UpdateState();
+}
+
+void GuiCheckBox::DetachSkin() noexcept
+{
+	if (skin_.ExtraParts)
+	{
+		if (auto node = skin_.ExtraParts->ParentNode(); node_ && node)
+			node_->RemoveChildNode(*node); //Remove extra parts node
+	}
+
+	GuiControl::DetachSkin(); //Use base functionality
+}
+
+void GuiCheckBox::RemoveSkin() noexcept
+{
+	DetachSkin();
+
+	if (skin_.ExtraParts)
+		skin_.ExtraParts->Owner()->RemoveModel(*skin_.ExtraParts.ModelObject); //Remove all extra parts
+
+	GuiControl::RemoveSkin(); //Use base functionality
 }
 
 
@@ -94,21 +172,21 @@ GuiCheckBox::GuiCheckBox(std::string name, std::optional<std::string> caption, s
 	CheckBoxSkin skin) :
 	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin)}
 {
-	//Empty
+	DefaultSetup();
 }
 
 GuiCheckBox::GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
 	CheckBoxSkin skin, const Vector2 &size) :
 	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size}
 {
-	//Empty
+	DefaultSetup();
 }
 
 GuiCheckBox::GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
 	CheckBoxSkin skin, gui_control::Areas areas) :
 	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(areas)}
 {
-	//Empty
+	DefaultSetup();
 }
 
 

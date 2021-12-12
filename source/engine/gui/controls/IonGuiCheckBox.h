@@ -18,19 +18,15 @@ File:	IonGuiCheckBox.h
 
 #include "IonGuiControl.h"
 #include "events/IonCallback.h"
+#include "graphics/utilities/IonVector2.h"
 #include "memory/IonNonOwningPtr.h"
 
 namespace ion::gui::controls
 {
+	using namespace graphics::utilities;
+
 	namespace gui_check_box
 	{
-		enum class CheckBoxState
-		{
-			Checked,
-			Unchecked
-		};
-
-
 		struct CheckBoxVisualParts final
 		{
 			NonOwningPtr<graphics::scene::Model> ModelObject;
@@ -48,7 +44,6 @@ namespace ion::gui::controls
 			}
 		};
 
-
 		struct CheckBoxSkin : gui_control::ControlSkin
 		{
 			CheckBoxVisualParts ExtraParts;
@@ -57,18 +52,21 @@ namespace ion::gui::controls
 
 		namespace detail
 		{
+			void resize_skin(CheckBoxSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 		} //detail
 	} //gui_check_box
 
 
 	class GuiCheckBox : public GuiControl
 	{
+		private:
+
+			void DefaultSetup() noexcept;
+
 		protected:
 
 			bool checked_ = false;
-
 			gui_check_box::CheckBoxSkin skin_;
-			gui_check_box::CheckBoxState state_ = gui_check_box::CheckBoxState::Unchecked;
 
 			std::optional<events::Callback<void, GuiCheckBox&>> on_check_;
 			std::optional<events::Callback<void, GuiCheckBox&>> on_uncheck_;
@@ -80,6 +78,12 @@ namespace ion::gui::controls
 
 			//See GuiControl::Clicked for more details
 			virtual void Clicked() noexcept override;
+
+			//See GuiControl::StateChanged for more details
+			virtual void StateChanged() noexcept override;
+
+			//See GuiControl::Resized for more details
+			virtual void Resized(const Vector2 &from_size, const Vector2 &to_size) noexcept override;
 
 
 			//Called right after a check box has been checked
@@ -94,7 +98,16 @@ namespace ion::gui::controls
 			*/
 
 			void SetSkinState(gui_control::ControlState state, gui_check_box::CheckBoxSkin &skin) noexcept;
-			void SetState(gui_check_box::CheckBoxState state) noexcept;
+			void UpdateState() noexcept;
+
+
+			/*
+				Skins
+			*/
+
+			virtual void AttachSkin() override;
+			virtual void DetachSkin() noexcept override;
+			virtual void RemoveSkin() noexcept override;
 
 		public:
 
