@@ -308,6 +308,38 @@ NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(controls::GuiLab
 
 
 /*
+	Radio button
+	Creating
+*/
+
+NonOwningPtr<controls::GuiRadioButton> GuiPanelContainer::CreateRadioButton(std::string name, std::optional<std::string> caption,
+	std::optional<std::string> tooltip, controls::gui_radio_button::RadioButtonSkin skin)
+{
+	return CreateControl<controls::GuiRadioButton>(std::move(name), std::move(caption), std::move(tooltip),
+		make_owning<controls::gui_radio_button::RadioButtonSkin>(std::move(skin)));
+}
+
+NonOwningPtr<controls::GuiRadioButton> GuiPanelContainer::CreateRadioButton(std::string name, std::optional<std::string> caption,
+	std::optional<std::string> tooltip, controls::gui_radio_button::RadioButtonSkin skin, const Vector2 &size)
+{
+	return CreateControl<controls::GuiRadioButton>(std::move(name), std::move(caption), std::move(tooltip),
+		make_owning<controls::gui_radio_button::RadioButtonSkin>(std::move(skin)), size);
+}
+
+NonOwningPtr<controls::GuiRadioButton> GuiPanelContainer::CreateRadioButton(std::string name, std::optional<std::string> caption,
+	std::optional<std::string> tooltip, controls::gui_radio_button::RadioButtonSkin skin, controls::gui_control::Areas areas)
+{
+	return CreateControl<controls::GuiRadioButton>(std::move(name), std::move(caption), std::move(tooltip),
+		make_owning<controls::gui_radio_button::RadioButtonSkin>(std::move(skin)), std::move(areas));
+}
+
+NonOwningPtr<controls::GuiRadioButton> GuiPanelContainer::CreateRadioButton(controls::GuiRadioButton &&radio_button)
+{
+	return CreateControl<controls::GuiRadioButton>(std::move(radio_button));
+}
+
+
+/*
 	Controls
 	Retrieving
 */

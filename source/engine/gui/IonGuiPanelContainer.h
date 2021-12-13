@@ -24,6 +24,7 @@ File:	IonGuiPanelContainer.h
 #include "controls/IonGuiButton.h"
 #include "controls/IonGuiCheckBox.h"
 #include "controls/IonGuiLabel.h"
+#include "controls/IonGuiRadioButton.h"
 #include "graphics/utilities/IonVector2.h"
 #include "memory/IonNonOwningPtr.h"
 
@@ -275,6 +276,27 @@ namespace ion::gui
 
 			//Create a label by moving the given label
 			NonOwningPtr<controls::GuiLabel> CreateLabel(controls::GuiLabel &&label);
+
+
+			/*
+				Radio button
+				Creating
+			*/
+
+			//Create a radio button with the given name, caption, tooltip and skin
+			NonOwningPtr<controls::GuiRadioButton> CreateRadioButton(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_radio_button::RadioButtonSkin skin);
+
+			//Create a radio button with the given name, caption, tooltip, skin and size
+			NonOwningPtr<controls::GuiRadioButton> CreateRadioButton(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_radio_button::RadioButtonSkin skin, const Vector2 &size);
+
+			//Create a radio button with the given name, caption, tooltip, skin and size
+			NonOwningPtr<controls::GuiRadioButton> CreateRadioButton(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_radio_button::RadioButtonSkin skin, controls::gui_control::Areas areas);
+
+			//Create a radio button by moving the given radio button
+			NonOwningPtr<controls::GuiRadioButton> CreateRadioButton(controls::GuiRadioButton &&radio_button);
 
 
 			/*

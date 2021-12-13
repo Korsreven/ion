@@ -624,6 +624,9 @@
     <ClCompile Include="..\source\engine\gui\controls\IonGuiCheckBox.cpp">
       <Filter>Source Files\gui\controls</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\gui\controls\IonGuiRadioButton.cpp">
+      <Filter>Source Files\gui\controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1209,6 +1212,9 @@
       <Filter>Header Files\gui\controls</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\gui\controls\IonGuiCheckBox.h">
+      <Filter>Header Files\gui\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\gui\controls\IonGuiRadioButton.h">
       <Filter>Header Files\gui\controls</Filter>
     </ClInclude>
   </ItemGroup>

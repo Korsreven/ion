@@ -62,7 +62,6 @@ void GuiCheckBox::DefaultSetup() noexcept
 void GuiCheckBox::Clicked() noexcept
 {
 	Checked(!checked_);
-	Changed();
 	GuiControl::Clicked(); //Use base functionality
 }
 
@@ -85,6 +84,7 @@ void GuiCheckBox::Resized(const Vector2 &from_size, const Vector2 &to_size) noex
 
 void GuiCheckBox::Checked() noexcept
 {
+	Changed();
 	UpdateState();
 
 	//User callback
@@ -94,6 +94,7 @@ void GuiCheckBox::Checked() noexcept
 
 void GuiCheckBox::Unchecked() noexcept
 {
+	Changed();
 	UpdateState();
 
 	//User callback
