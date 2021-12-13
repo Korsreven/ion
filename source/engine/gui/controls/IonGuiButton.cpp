@@ -183,21 +183,21 @@ void GuiButton::Clicked() noexcept
 //Public
 
 GuiButton::GuiButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	gui_control::ControlSkin skin) :
+	OwningPtr<ButtonSkin> skin) :
 	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin)}
 {
 	//Empty
 }
 
 GuiButton::GuiButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	gui_control::ControlSkin skin, const Vector2 &size) :
+	OwningPtr<ButtonSkin> skin, const Vector2 &size) :
 	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size}
 {
 	//Empty
 }
 
 GuiButton::GuiButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	gui_control::ControlSkin skin, gui_control::Areas areas) :
+	OwningPtr<ButtonSkin> skin, gui_control::Areas areas) :
 	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(areas)}
 {
 	//Empty

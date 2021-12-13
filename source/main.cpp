@@ -1712,7 +1712,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			mouse_cursor_skin.ModelObject = mouse_cursor_model;
 
 
-			ion::gui::controls::gui_control::ControlSkin tooltip_skin;
+			ion::gui::controls::gui_tooltip::TooltipSkin tooltip_skin;
 			tooltip_skin.Parts.ModelObject = tooltip_model;
 			tooltip_skin.Parts.Center.SpriteObject = tooltip_center;
 			tooltip_skin.Parts.Top.SpriteObject = tooltip_top;
@@ -1727,11 +1727,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_skin.Caption.TextObject = tooltip_caption;
 
 
-			ion::gui::controls::gui_control::ControlSkin label_skin;
+			ion::gui::controls::gui_label::LabelSkin label_skin;
 			label_skin.Caption.TextObject = label_caption;
 
 
-			ion::gui::controls::gui_control::ControlSkin button_skin;
+			ion::gui::controls::gui_button::ButtonSkin button_skin;
 			button_skin.Parts.ModelObject = button_model;
 			button_skin.Parts.Center.SpriteObject = button_center;
 			button_skin.Parts.Top.SpriteObject = button_top;

@@ -20,6 +20,7 @@ File:	IonGuiButton.h
 
 #include "IonGuiControl.h"
 #include "adaptors/ranges/IonIterable.h"
+#include "memory/IonOwningPtr.h"
 
 namespace ion::gui::controls
 {
@@ -61,6 +62,12 @@ namespace ion::gui::controls
 		using ButtonActions = std::vector<ButtonAction>;
 
 
+		struct ButtonSkin : gui_control::ControlSkin
+		{
+			//Empty
+		};
+
+
 		namespace detail
 		{
 		} //detail
@@ -89,15 +96,15 @@ namespace ion::gui::controls
 
 			//Construct a button with the given name, caption, tooltip and skin
 			GuiButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				gui_control::ControlSkin skin);
+				OwningPtr<gui_button::ButtonSkin> skin);
 
 			//Construct a button with the given name, caption, tooltip, skin and size
 			GuiButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				gui_control::ControlSkin skin, const Vector2 &size);
+				OwningPtr<gui_button::ButtonSkin> skin, const Vector2 &size);
 
 			//Construct a button with the given name, caption, tooltip, skin and hit areas
 			GuiButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				gui_control::ControlSkin skin, gui_control::Areas areas);
+				OwningPtr<gui_button::ButtonSkin> skin, gui_control::Areas areas);
 
 
 			/*

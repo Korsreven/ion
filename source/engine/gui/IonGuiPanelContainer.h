@@ -22,6 +22,7 @@ File:	IonGuiPanelContainer.h
 #include "IonGuiContainer.h"
 #include "adaptors/ranges/IonDereferenceIterable.h"
 #include "controls/IonGuiButton.h"
+#include "controls/IonGuiCheckBox.h"
 #include "controls/IonGuiLabel.h"
 #include "graphics/utilities/IonVector2.h"
 #include "memory/IonNonOwningPtr.h"
@@ -220,18 +221,39 @@ namespace ion::gui
 
 			//Create a button with the given name, caption, tooltip and skin
 			NonOwningPtr<controls::GuiButton> CreateButton(std::string name, std::optional<std::string> caption,
-				std::optional<std::string> tooltip, controls::gui_control::ControlSkin skin);
+				std::optional<std::string> tooltip, controls::gui_button::ButtonSkin skin);
 
 			//Create a button with the given name, caption, tooltip, skin and size
 			NonOwningPtr<controls::GuiButton> CreateButton(std::string name, std::optional<std::string> caption,
-				std::optional<std::string> tooltip, controls::gui_control::ControlSkin skin, const Vector2 &size);
+				std::optional<std::string> tooltip, controls::gui_button::ButtonSkin skin, const Vector2 &size);
 
 			//Create a button with the given name, caption, tooltip, skin and size
 			NonOwningPtr<controls::GuiButton> CreateButton(std::string name, std::optional<std::string> caption,
-				std::optional<std::string> tooltip, controls::gui_control::ControlSkin skin, controls::gui_control::Areas areas);
+				std::optional<std::string> tooltip, controls::gui_button::ButtonSkin skin, controls::gui_control::Areas areas);
 
 			//Create a button by moving the given button
 			NonOwningPtr<controls::GuiButton> CreateButton(controls::GuiButton &&button);
+
+
+			/*
+				Check box
+				Creating
+			*/
+
+			//Create a check box with the given name, caption, tooltip and skin
+			NonOwningPtr<controls::GuiCheckBox> CreateCheckBox(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_check_box::CheckBoxSkin skin);
+
+			//Create a check box with the given name, caption, tooltip, skin and size
+			NonOwningPtr<controls::GuiCheckBox> CreateCheckBox(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_check_box::CheckBoxSkin skin, const Vector2 &size);
+
+			//Create a check box with the given name, caption, tooltip, skin and size
+			NonOwningPtr<controls::GuiCheckBox> CreateCheckBox(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_check_box::CheckBoxSkin skin, controls::gui_control::Areas areas);
+
+			//Create a check box by moving the given check box
+			NonOwningPtr<controls::GuiCheckBox> CreateCheckBox(controls::GuiCheckBox &&check_box);
 
 
 			/*
@@ -241,15 +263,15 @@ namespace ion::gui
 
 			//Create a label with the given name, caption and skin
 			NonOwningPtr<controls::GuiLabel> CreateLabel(std::string name, std::optional<std::string> caption,
-				controls::gui_control::ControlSkin skin);
+				controls::gui_label::LabelSkin skin);
 
 			//Create a label with the given name, caption, skin and size
 			NonOwningPtr<controls::GuiLabel> CreateLabel(std::string name, std::optional<std::string> caption,
-				controls::gui_control::ControlSkin skin, const Vector2 &size);
+				controls::gui_label::LabelSkin skin, const Vector2 &size);
 
 			//Create a label with the given name, caption, skin and size
 			NonOwningPtr<controls::GuiLabel> CreateLabel(std::string name, std::optional<std::string> caption,
-				controls::gui_control::ControlSkin skin, controls::gui_control::Areas areas);
+				controls::gui_label::LabelSkin skin, controls::gui_control::Areas areas);
 
 			//Create a label by moving the given label
 			NonOwningPtr<controls::GuiLabel> CreateLabel(controls::GuiLabel &&label);

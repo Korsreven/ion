@@ -19,6 +19,7 @@ File:	IonGuiCheckBox.h
 #include "IonGuiControl.h"
 #include "events/IonCallback.h"
 #include "graphics/utilities/IonVector2.h"
+#include "memory/IonOwningPtr.h"
 #include "memory/IonNonOwningPtr.h"
 
 namespace ion::gui::controls
@@ -66,7 +67,6 @@ namespace ion::gui::controls
 		protected:
 
 			bool checked_ = false;
-			gui_check_box::CheckBoxSkin skin_;
 
 			std::optional<events::Callback<void, GuiCheckBox&>> on_check_;
 			std::optional<events::Callback<void, GuiCheckBox&>> on_uncheck_;
@@ -113,15 +113,15 @@ namespace ion::gui::controls
 
 			//Construct a check box with the given name, caption, tooltip and skin
 			GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				gui_check_box::CheckBoxSkin skin);
+				OwningPtr<gui_check_box::CheckBoxSkin> skin);
 
 			//Construct a check box with the given name, caption, tooltip, skin and size
 			GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				gui_check_box::CheckBoxSkin skin, const Vector2 &size);
+				OwningPtr<gui_check_box::CheckBoxSkin> skin, const Vector2 &size);
 
 			//Construct a check box with the given name, caption, tooltip, skin and hit areas
 			GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				gui_check_box::CheckBoxSkin skin, gui_control::Areas areas);
+				OwningPtr<gui_check_box::CheckBoxSkin> skin, gui_control::Areas areas);
 
 
 			/*

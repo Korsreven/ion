@@ -27,6 +27,7 @@ File:	IonGuiControl.h
 #include "graphics/utilities/IonVector2.h"
 #include "gui/IonGuiComponent.h"
 #include "memory/IonNonOwningPtr.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
 
 //Forward declarations
@@ -163,6 +164,9 @@ namespace ion::gui::controls
 		{
 			ControlVisualParts Parts;
 			ControlCaptionPart Caption;
+
+			//Default virtual destructor
+			virtual ~ControlSkin() = default;
 		};
 
 		/*
@@ -272,7 +276,7 @@ namespace ion::gui::controls
 			gui_control::ControlCaptionLayout caption_layout_ = gui_control::ControlCaptionLayout::Center;
 
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
-			gui_control::ControlSkin skin_;
+			OwningPtr<gui_control::ControlSkin> skin_;
 			gui_control::Areas hit_areas_;
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
@@ -414,19 +418,31 @@ namespace ion::gui::controls
 
 			//Construct a control with the given name, caption, tooltip and skin
 			GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				gui_control::ControlSkin skin);
+				OwningPtr<gui_control::ControlSkin> skin);
 
 			//Construct a control with the given name, caption, tooltip, skin and size
 			GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				gui_control::ControlSkin skin, const Vector2 &size);
+				OwningPtr<gui_control::ControlSkin> skin, const Vector2 &size);
 
 			//Construct a control with the given name, caption, tooltip, skin and hit areas
 			GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				gui_control::ControlSkin skin, gui_control::Areas areas);
+				OwningPtr<gui_control::ControlSkin> skin, gui_control::Areas areas);
+
+			
+			//Default move constructor
+			GuiControl(GuiControl&&) = default;
 
 
 			//Virtual destructor
 			virtual ~GuiControl() noexcept;
+
+
+			/*
+				Operators
+			*/
+
+			//Default move assignment
+			GuiControl& operator=(GuiControl&&) = default;
 
 
 			/*
@@ -546,7 +562,7 @@ namespace ion::gui::controls
 			
 
 			//Sets the skin for this control to the given skin
-			void Skin(gui_control::ControlSkin skin) noexcept;
+			void Skin(OwningPtr<gui_control::ControlSkin> skin) noexcept;
 
 			//Sets the hit areas of this control to the given areas
 			inline void HitAreas(gui_control::Areas areas) noexcept
@@ -767,9 +783,10 @@ namespace ion::gui::controls
 			}
 
 			//Returns the skin attached to this control
-			[[nodiscard]] inline auto& Skin() const noexcept
+			//Returns nullptr if no skin is attached
+			[[nodiscard]] inline auto Skin() const noexcept
 			{
-				return skin_;
+				return NonOwningPtr<gui_control::ControlSkin>{skin_};
 			}
 
 			//Returns all of the hit areas of this control

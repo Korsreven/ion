@@ -51,50 +51,53 @@ void GuiTooltip::UpdateCaption() noexcept
 {
 	static auto need_update = true;
 
-	if (auto &part = skin_.Caption; auto_size_ && part && need_update)
+	if (skin_)
 	{
-		//Caption text
-		if (auto &text = part->Get(); text)
+		if (auto &part = skin_->Caption; part && auto_size_ && need_update)
 		{
-			//Area size
-			text->AreaSize({});
-
-			//Padding
-			text->Padding(caption_padding_.value_or(gui_control::detail::default_caption_padding_size));
-
-			//Content
-			if (caption_)
-				text->Content(*caption_);
-			else
-				text->Content({});
-
-			if (auto size = text->MinimumAreaSize(); size != vector2::Zero)
+			//Caption text
+			if (auto &text = part->Get(); text)
 			{
-				//Adjust size from viewport to ortho space
-				if (auto scene_manager = part->Owner(); scene_manager)
+				//Area size
+				text->AreaSize({});
+
+				//Padding
+				text->Padding(caption_padding_.value_or(gui_control::detail::default_caption_padding_size));
+
+				//Content
+				if (caption_)
+					text->Content(*caption_);
+				else
+					text->Content({});
+
+				if (auto size = text->MinimumAreaSize(); size != vector2::Zero)
 				{
-					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-						size *= viewport->ViewportToOrthoRatio();
+					//Adjust size from viewport to ortho space
+					if (auto scene_manager = part->Owner(); scene_manager)
+					{
+						if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+							size *= viewport->ViewportToOrthoRatio();
+					}
+
+					auto visual_area =
+						gui_control::detail::get_visual_area(*skin_, false);
+					auto center_area =
+						gui_control::detail::get_center_area(*skin_, false);
+
+					//Calculate border size
+					auto top_right_size = visual_area && center_area ?
+						visual_area->Max() - center_area->Max() :
+						vector2::Zero;
+					auto bottom_left_size = visual_area && center_area ?
+						center_area->Min() - visual_area->Min() :
+						vector2::Zero;
+					auto border_size = top_right_size.CeilCopy(bottom_left_size);
+
+					need_update = false;
+					Size(size + border_size * 2.0_r);
+					need_update = true;
+					return;
 				}
-
-				auto visual_area =
-					gui_control::detail::get_visual_area(skin_, false);
-				auto center_area =
-					gui_control::detail::get_center_area(skin_, false);
-
-				//Calculate border size
-				auto top_right_size = visual_area && center_area ?
-					visual_area->Max() - center_area->Max() :
-					vector2::Zero;
-				auto bottom_left_size = visual_area && center_area ?
-					center_area->Min() - visual_area->Min() :
-					vector2::Zero;
-				auto border_size = top_right_size.CeilCopy(bottom_left_size);
-
-				need_update = false;
-				Size(size + border_size * 2.0_r);
-				need_update = true;
-				return;
 			}
 		}
 	}
@@ -172,12 +175,19 @@ void GuiTooltip::UpdatePosition(Vector2 position) noexcept
 		}
 
 		node_->DerivedPosition(position);
+		AdjustInView();
+	}
+}
 
+void GuiTooltip::AdjustInView() noexcept
+{
+	if (node_ && skin_)
+	{
 		//Make sure tooltip stays within view area
 		if (auto view_area =
 			[&]() noexcept
 			{
-				if (auto scene_manager = skin_.Caption->Owner(); scene_manager)
+				if (auto scene_manager = skin_->Caption->Owner(); scene_manager)
 				{
 					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
 						return viewport->ConnectedCamera()->WorldAxisAlignedBoundingBox();
@@ -189,15 +199,15 @@ void GuiTooltip::UpdatePosition(Vector2 position) noexcept
 			if (auto tooltip_area =
 				[&]() noexcept
 				{
-					if (skin_.Parts)
+					if (skin_->Parts)
 					{
-						skin_.Parts->Prepare();
-						return skin_.Parts->WorldAxisAlignedBoundingBox();
+						skin_->Parts->Prepare();
+						return skin_->Parts->WorldAxisAlignedBoundingBox();
 					}
-					else if (skin_.Caption)
+					else if (skin_->Caption)
 					{
-						skin_.Caption->Prepare();
-						return skin_.Caption->WorldAxisAlignedBoundingBox();
+						skin_->Caption->Prepare();
+						return skin_->Caption->WorldAxisAlignedBoundingBox();
 					}
 
 					return aabb::Zero;
@@ -205,7 +215,7 @@ void GuiTooltip::UpdatePosition(Vector2 position) noexcept
 			{
 				auto [view_min, view_max] = view_area.MinMax();
 				auto [tooltip_min, tooltip_max] = tooltip_area.MinMax();
-				position = vector2::Zero;
+				auto position = vector2::Zero;
 
 				//Outside right edge, nudge left
 				if (tooltip_max.X() > view_max.X())
@@ -223,6 +233,7 @@ void GuiTooltip::UpdatePosition(Vector2 position) noexcept
 				if (tooltip_max.Y() > view_max.Y())
 					position.Y(view_max.Y() - tooltip_max.Y());
 
+
 				//Adjust inside view area
 				if (position != vector2::Zero)
 					node_->Position(node_->Position() + position);
@@ -234,11 +245,14 @@ void GuiTooltip::UpdatePosition(Vector2 position) noexcept
 
 void GuiTooltip::SetOpacity(real percent) noexcept
 {
-	if (skin_.Parts)
-		skin_.Parts->Opacity(percent);
+	if (skin_)
+	{
+		if (skin_->Parts)
+			skin_->Parts->Opacity(percent);
 
-	if (skin_.Caption)
-		skin_.Caption->Opacity(percent);
+		if (skin_->Caption)
+			skin_->Caption->Opacity(percent);
+	}
 
 	opacity_ = percent;
 }
@@ -285,13 +299,13 @@ void GuiTooltip::UpdatePhaseDuration() noexcept
 
 //Public
 
-GuiTooltip::GuiTooltip(std::string name, std::optional<std::string> text, gui_control::ControlSkin skin) :
+GuiTooltip::GuiTooltip(std::string name, std::optional<std::string> text, OwningPtr<TooltipSkin> skin) :
 	GuiLabel{std::move(name), std::move(text), std::move(skin)}
 {
 	DefaultSetup();
 }
 
-GuiTooltip::GuiTooltip(std::string name, std::optional<std::string> text, gui_control::ControlSkin skin, const Vector2 &size) :
+GuiTooltip::GuiTooltip(std::string name, std::optional<std::string> text, OwningPtr<TooltipSkin> skin, const Vector2 &size) :
 
 	GuiLabel{std::move(name), std::move(text), std::move(skin), size},
 	auto_size_{false}

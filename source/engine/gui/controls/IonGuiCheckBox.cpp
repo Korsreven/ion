@@ -31,8 +31,6 @@ namespace gui_check_box::detail
 void resize_skin(CheckBoxSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept
 {
 	auto delta_size = to_size - from_size;
-	auto delta_position = delta_size * 0.5_r;
-	auto [delta_width, delta_height] = delta_size.XY();
 
 	if (skin.ExtraParts)
 	{
@@ -78,7 +76,9 @@ void GuiCheckBox::StateChanged() noexcept
 
 void GuiCheckBox::Resized(const Vector2 &from_size, const Vector2 &to_size) noexcept
 {
-	detail::resize_skin(skin_, from_size, to_size);
+	if (skin_)
+		detail::resize_skin(static_cast<CheckBoxSkin&>(*skin_), from_size, to_size);
+
 	GuiControl::Resized(from_size, to_size); //Use base functionality
 }
 
@@ -119,8 +119,8 @@ void GuiCheckBox::SetSkinState(gui_control::ControlState state, CheckBoxSkin &sk
 
 void GuiCheckBox::UpdateState() noexcept
 {
-	if (visible_)
-		SetSkinState(GuiControl::state_, skin_);
+	if (visible_ && skin_)
+		SetSkinState(GuiControl::state_, static_cast<CheckBoxSkin&>(*skin_));
 }
 
 
@@ -132,13 +132,16 @@ void GuiCheckBox::AttachSkin()
 {
 	GuiControl::AttachSkin(); //Use base functionality
 
-	if (skin_.ExtraParts)
+	if (auto skin = static_cast<CheckBoxSkin*>(skin_.get()); skin)
 	{
-		if (auto node = skin_.ExtraParts->ParentNode(); node)
-			node->DetachObject(*skin_.ExtraParts.ModelObject);
+		if (skin->ExtraParts)
+		{
+			if (auto node = skin->ExtraParts->ParentNode(); node)
+				node->DetachObject(*skin->ExtraParts.ModelObject);
 		
-		if (node_) //Create node for all extra parts
-			node_->CreateChildNode(node_->Visible())->AttachObject(*skin_.ExtraParts.ModelObject);
+			if (node_) //Create node for all extra parts
+				node_->CreateChildNode(node_->Visible())->AttachObject(*skin->ExtraParts.ModelObject);
+		}
 	}
 
 	UpdateState();
@@ -146,10 +149,13 @@ void GuiCheckBox::AttachSkin()
 
 void GuiCheckBox::DetachSkin() noexcept
 {
-	if (skin_.ExtraParts)
+	if (auto skin = static_cast<CheckBoxSkin*>(skin_.get()); skin)
 	{
-		if (auto node = skin_.ExtraParts->ParentNode(); node_ && node)
-			node_->RemoveChildNode(*node); //Remove extra parts node
+		if (skin->ExtraParts)
+		{
+			if (auto node = skin->ExtraParts->ParentNode(); node_ && node)
+				node_->RemoveChildNode(*node); //Remove extra parts node
+		}
 	}
 
 	GuiControl::DetachSkin(); //Use base functionality
@@ -157,10 +163,13 @@ void GuiCheckBox::DetachSkin() noexcept
 
 void GuiCheckBox::RemoveSkin() noexcept
 {
-	DetachSkin();
+	if (auto skin = static_cast<CheckBoxSkin*>(skin_.get()); skin)
+	{
+		DetachSkin();
 
-	if (skin_.ExtraParts)
-		skin_.ExtraParts->Owner()->RemoveModel(*skin_.ExtraParts.ModelObject); //Remove all extra parts
+		if (skin->ExtraParts)
+			skin->ExtraParts->Owner()->RemoveModel(*skin->ExtraParts.ModelObject); //Remove all extra parts
+	}
 
 	GuiControl::RemoveSkin(); //Use base functionality
 }
@@ -169,21 +178,21 @@ void GuiCheckBox::RemoveSkin() noexcept
 //Public
 
 GuiCheckBox::GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	CheckBoxSkin skin) :
+	OwningPtr<CheckBoxSkin> skin) :
 	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin)}
 {
 	DefaultSetup();
 }
 
 GuiCheckBox::GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	CheckBoxSkin skin, const Vector2 &size) :
+	OwningPtr<CheckBoxSkin> skin, const Vector2 &size) :
 	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size}
 {
 	DefaultSetup();
 }
 
 GuiCheckBox::GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	CheckBoxSkin skin, gui_control::Areas areas) :
+	OwningPtr<CheckBoxSkin> skin, gui_control::Areas areas) :
 	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(areas)}
 {
 	DefaultSetup();

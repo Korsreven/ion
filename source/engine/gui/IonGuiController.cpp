@@ -18,6 +18,7 @@ File:	IonGuiController.cpp
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneNode.h"
+#include "memory/IonOwningPtr.h"
 
 namespace ion::gui
 {
@@ -818,14 +819,16 @@ bool GuiController::RemoveFrame(std::string_view name) noexcept
 	Creating
 */
 
-NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(std::string name, controls::gui_control::ControlSkin skin)
+NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(std::string name, controls::gui_tooltip::TooltipSkin skin)
 {
-	return CreateComponent<controls::GuiTooltip>(std::move(name), std::nullopt, std::move(skin));
+	return CreateComponent<controls::GuiTooltip>(std::move(name), std::nullopt,
+		make_owning<controls::gui_tooltip::TooltipSkin>(std::move(skin)));
 }
 
-NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(std::string name, controls::gui_control::ControlSkin skin, const Vector2 &size)
+NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(std::string name, controls::gui_tooltip::TooltipSkin skin, const Vector2 &size)
 {
-	return CreateComponent<controls::GuiTooltip>(std::move(name), std::nullopt, std::move(skin), size);
+	return CreateComponent<controls::GuiTooltip>(std::move(name), std::nullopt,
+		make_owning<controls::gui_tooltip::TooltipSkin>(std::move(skin)), size);
 }
 
 NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(controls::GuiTooltip &&tooltip)

@@ -15,6 +15,8 @@ File:	IonGuiLabel.cpp
 namespace ion::gui::controls
 {
 
+using namespace gui_label;
+
 namespace gui_label::detail
 {
 } //gui_label::detail
@@ -30,19 +32,19 @@ void GuiLabel::DefaultSetup() noexcept
 
 //Public
 
-GuiLabel::GuiLabel(std::string name, std::optional<std::string> caption, gui_control::ControlSkin skin) :
+GuiLabel::GuiLabel(std::string name, std::optional<std::string> caption, OwningPtr<LabelSkin> skin) :
 	GuiControl{std::move(name), std::move(caption), {}, std::move(skin)}
 {
 	DefaultSetup();
 }
 
-GuiLabel::GuiLabel(std::string name, std::optional<std::string> caption, gui_control::ControlSkin skin, const Vector2 &size) :
+GuiLabel::GuiLabel(std::string name, std::optional<std::string> caption, OwningPtr<LabelSkin> skin, const Vector2 &size) :
 	GuiControl{std::move(name), std::move(caption), {}, std::move(skin), size}
 {
 	DefaultSetup();
 }
 
-GuiLabel::GuiLabel(std::string name, std::optional<std::string> caption, gui_control::ControlSkin skin, gui_control::Areas areas) :
+GuiLabel::GuiLabel(std::string name, std::optional<std::string> caption, OwningPtr<LabelSkin> skin, gui_control::Areas areas) :
 	GuiControl{std::move(name), std::move(caption), {}, std::move(skin), std::move(areas)}
 {
 	DefaultSetup();

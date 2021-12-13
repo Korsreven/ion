@@ -18,6 +18,7 @@ File:	IonGuiTooltip.h
 
 #include "IonGuiLabel.h"
 #include "graphics/utilities/IonVector2.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 
@@ -28,6 +29,12 @@ namespace ion::gui::controls
 
 	namespace gui_tooltip
 	{
+		struct TooltipSkin : gui_label::LabelSkin
+		{
+			//Empty
+		};
+
+
 		namespace detail
 		{
 			enum class tooltip_phase
@@ -43,7 +50,7 @@ namespace ion::gui::controls
 			constexpr auto default_fade_delay = 0.5_sec;
 			constexpr auto default_fade_time = 0.1_sec;
 		} //detail
-	} //gui_tooltip::detail
+	} //gui_tooltip
 
 
 	class GuiTooltip : public GuiLabel
@@ -74,6 +81,7 @@ namespace ion::gui::controls
 
 			virtual void UpdateCaption() noexcept override;
 			void UpdatePosition(Vector2 position) noexcept;
+			void AdjustInView() noexcept;
 
 			void SetOpacity(real percent) noexcept;
 
@@ -88,10 +96,10 @@ namespace ion::gui::controls
 		public:
 
 			//Construct a tooltip with the given name, tooltip text and skin
-			GuiTooltip(std::string name, std::optional<std::string> text, gui_control::ControlSkin skin);
+			GuiTooltip(std::string name, std::optional<std::string> text, OwningPtr<gui_tooltip::TooltipSkin> skin);
 
 			//Construct a tooltip with the given name, tooltip text, skin and size
-			GuiTooltip(std::string name, std::optional<std::string> text, gui_control::ControlSkin skin, const Vector2 &size);
+			GuiTooltip(std::string name, std::optional<std::string> text, OwningPtr<gui_tooltip::TooltipSkin> skin, const Vector2 &size);
 
 
 			/*

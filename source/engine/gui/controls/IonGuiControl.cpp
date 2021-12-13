@@ -627,8 +627,8 @@ void GuiControl::SetSkinState(ControlState state, ControlSkin &skin) noexcept
 
 void GuiControl::SetState(ControlState state) noexcept
 {
-	if (visible_)
-		SetSkinState(state, skin_);
+	if (visible_ && skin_)
+		SetSkinState(state, *skin_);
 
 	if (state_ != state)
 	{
@@ -644,22 +644,25 @@ void GuiControl::SetState(ControlState state) noexcept
 
 void GuiControl::AttachSkin()
 {
-	if (skin_.Parts)
+	if (skin_)
 	{
-		if (auto node = skin_.Parts->ParentNode(); node)
-			node->DetachObject(*skin_.Parts.ModelObject);
+		if (skin_->Parts)
+		{
+			if (auto node = skin_->Parts->ParentNode(); node)
+				node->DetachObject(*skin_->Parts.ModelObject);
 		
-		if (node_) //Create node for all parts
-			node_->CreateChildNode(node_->Visible())->AttachObject(*skin_.Parts.ModelObject);
-	}
+			if (node_) //Create node for all parts
+				node_->CreateChildNode(node_->Visible())->AttachObject(*skin_->Parts.ModelObject);
+		}
 
-	if (skin_.Caption)
-	{
-		if (auto node = skin_.Caption->ParentNode(); node)
-			node->DetachObject(*skin_.Caption.TextObject);
+		if (skin_->Caption)
+		{
+			if (auto node = skin_->Caption->ParentNode(); node)
+				node->DetachObject(*skin_->Caption.TextObject);
 		
-		if (node_) //Create node for caption
-			node_->CreateChildNode(node_->Visible())->AttachObject(*skin_.Caption.TextObject);
+			if (node_) //Create node for caption
+				node_->CreateChildNode(node_->Visible())->AttachObject(*skin_->Caption.TextObject);
+		}
 	}
 	
 	SetState(state_);
@@ -668,44 +671,50 @@ void GuiControl::AttachSkin()
 
 void GuiControl::DetachSkin() noexcept
 {
-	if (skin_.Parts)
+	if (skin_)
 	{
-		if (auto node = skin_.Parts->ParentNode(); node_ && node)
-			node_->RemoveChildNode(*node); //Remove parts node
-	}
+		if (skin_->Parts)
+		{
+			if (auto node = skin_->Parts->ParentNode(); node_ && node)
+				node_->RemoveChildNode(*node); //Remove parts node
+		}
 
-	if (skin_.Caption)
-	{
-		if (auto node = skin_.Caption->ParentNode(); node_ && node)
-			node_->RemoveChildNode(*node); //Remove caption node
+		if (skin_->Caption)
+		{
+			if (auto node = skin_->Caption->ParentNode(); node_ && node)
+				node_->RemoveChildNode(*node); //Remove caption node
+		}
 	}
 }
 
 void GuiControl::RemoveSkin() noexcept
 {
-	DetachSkin();
+	if (skin_)
+	{
+		DetachSkin();
 
-	if (skin_.Parts)
-		skin_.Parts->Owner()->RemoveModel(*skin_.Parts.ModelObject); //Remove all parts
+		if (skin_->Parts)
+			skin_->Parts->Owner()->RemoveModel(*skin_->Parts.ModelObject); //Remove all parts
 
-	if (skin_.Caption)
-		skin_.Caption->Owner()->RemoveText(*skin_.Caption.TextObject); //Remove caption
+		if (skin_->Caption)
+			skin_->Caption->Owner()->RemoveText(*skin_->Caption.TextObject); //Remove caption
 
-	skin_ = {};
+		skin_.reset();
+	}
 }
 
 
 void GuiControl::UpdateCaption() noexcept
 {
-	if (skin_.Caption)
+	if (skin_ && skin_->Caption)
 	{
 		//Caption text
-		if (auto &text = skin_.Caption->Get(); text)
+		if (auto &text = skin_->Caption->Get(); text)
 		{
 			auto visual_area =
-				detail::get_visual_area(skin_, false);
+				detail::get_visual_area(*skin_, false);
 			auto center_area =
-				detail::get_center_area(skin_, false);
+				detail::get_center_area(*skin_, false);
 			auto area = center_area.
 				value_or(visual_area.
 				value_or(aabb::Zero));
@@ -720,7 +729,7 @@ void GuiControl::UpdateCaption() noexcept
 				auto adjusted_size = size;
 
 				//Adjust area size from ortho to viewport space
-				if (auto scene_manager = skin_.Caption->Owner(); scene_manager)
+				if (auto scene_manager = skin_->Caption->Owner(); scene_manager)
 				{
 					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
 						adjusted_size *= viewport->OrthoToViewportRatio();
@@ -735,7 +744,7 @@ void GuiControl::UpdateCaption() noexcept
 					center_area->Min() - visual_area->Min() :
 					vector2::Zero;
 
-				if (auto node = skin_.Caption->ParentNode(); node)
+				if (auto node = skin_->Caption->ParentNode(); node)
 					node->Position(
 						[&]() noexcept
 						{
@@ -770,7 +779,7 @@ void GuiControl::UpdateCaption() noexcept
 			{
 				text->AreaSize({});
 
-				if (auto node = skin_.Caption->ParentNode(); node)
+				if (auto node = skin_->Caption->ParentNode(); node)
 					node->Position(center);
 			}
 
@@ -874,7 +883,7 @@ GuiControl::GuiControl(std::string name, Areas areas) :
 
 
 GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	ControlSkin skin) :
+	OwningPtr<ControlSkin> skin) :
 
 	GuiComponent{std::move(name)},
 	caption_{std::move(caption)},
@@ -885,7 +894,7 @@ GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std
 }
 
 GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	ControlSkin skin, const Vector2 &size) :
+	OwningPtr<ControlSkin> skin, const Vector2 &size) :
 
 	GuiComponent{std::move(name)},
 	caption_{std::move(caption)},
@@ -896,7 +905,7 @@ GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std
 }
 
 GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	ControlSkin skin, Areas areas) :
+	OwningPtr<ControlSkin> skin, Areas areas) :
 
 	GuiComponent{std::move(name)},
 	caption_{std::move(caption)},
@@ -1014,15 +1023,15 @@ void GuiControl::Size(const Vector2 &size) noexcept
 	{
 		auto resized = false;
 
-		if (skin_.Parts)
+		if (skin_ && skin_->Parts)
 		{
-			detail::resize_skin(skin_, current_size, size);
+			detail::resize_skin(*skin_, current_size, size);
 			resized = true;
 		}
 
 		if (std::empty(hit_areas_))
 		{
-			if (!skin_.Parts)
+			if (!skin_ || !skin_->Parts)
 			{
 				hit_areas_.push_back(Aabb::Size(size));
 				resized = true;
@@ -1049,35 +1058,34 @@ void GuiControl::Size(const Vector2 &size) noexcept
 	}
 }
 
-void GuiControl::Skin(ControlSkin skin) noexcept
+void GuiControl::Skin(OwningPtr<ControlSkin> skin) noexcept
 {
-	if (skin_.Parts.ModelObject != skin.Parts.ModelObject &&
-		skin_.Caption.TextObject != skin.Caption.TextObject)
+	if (skin_ != skin)
 	{
-		if (skin.Parts)
+		if (skin && skin->Parts)
 		{
 			//Re-skin, inherit previous size
-			if (skin_.Parts)
+			if (skin_ && skin_->Parts)
 			{		
-				skin.Parts->Prepare();
-				skin_.Parts->Prepare();
+				skin->Parts->Prepare();
+				skin_->Parts->Prepare();
 
-				auto from_size = skin.Parts->AxisAlignedBoundingBox().ToSize();
-				auto to_size = skin_.Parts->AxisAlignedBoundingBox().ToSize();
+				auto from_size = skin->Parts->AxisAlignedBoundingBox().ToSize();
+				auto to_size = skin_->Parts->AxisAlignedBoundingBox().ToSize();
 
 				if (from_size != to_size)
-					detail::resize_skin(skin, from_size, to_size);
+					detail::resize_skin(*skin, from_size, to_size);
 			}
 			//No skin, inherit area size
 			else if (!std::empty(hit_areas_))
 			{
-				skin.Parts->Prepare();
+				skin->Parts->Prepare();
 
-				auto from_size = skin.Parts->AxisAlignedBoundingBox().ToSize();
+				auto from_size = skin->Parts->AxisAlignedBoundingBox().ToSize();
 				auto to_size = Size();
 
 				if (from_size != to_size)
-					detail::resize_skin(skin, from_size, to_size);
+					detail::resize_skin(*skin, from_size, to_size);
 			}
 		}
 
@@ -1114,7 +1122,7 @@ std::optional<Aabb> GuiControl::HitArea() const noexcept
 
 std::optional<Aabb> GuiControl::VisualArea() const noexcept
 {
-	return detail::get_visual_area(skin_, true);
+	return skin_ ? detail::get_visual_area(*skin_, true) : std::nullopt;
 }
 
 
@@ -1137,12 +1145,15 @@ bool GuiControl::Intersects(const Vector2 &point) const noexcept
 			if (auto object =
 				[&]() noexcept -> graphics::scene::DrawableObject*
 				{
-					if (skin_.Parts)
-						return skin_.Parts.ModelObject.get();
-					else if (skin_.Caption)
-						return skin_.Caption.TextObject.get();
-					else
-						return nullptr;
+					if (skin_)
+					{
+						if (skin_->Parts)
+							return skin_->Parts.ModelObject.get();
+						else if (skin_->Caption)
+							return skin_->Caption.TextObject.get();
+					}
+
+					return nullptr;
 				}(); object)
 			{
 				object->Prepare();
@@ -1163,8 +1174,7 @@ bool GuiControl::Intersects(const Vector2 &point) const noexcept
 				//Check for intersection
 				if (area.TransformCopy(node_->FullTransformation()).Intersects(point))
 				{
-					auto node = skin_.Parts->ParentNode();
-					if (!node || node->AxisAligned() ||
+					if (!node_ || node_->AxisAligned() ||
 						Obb{area}.Transform(node_->FullTransformation()).Intersects(point))
 						return true;
 				}
