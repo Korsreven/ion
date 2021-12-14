@@ -151,6 +151,23 @@ std::optional<Aabb> get_center_area(const ControlSkin &skin, bool include_captio
 	return {};
 }
 
+
+std::optional<Vector2> get_visual_size(const ControlSkin &skin, bool include_caption) noexcept
+{
+	if (auto area = get_visual_area(skin, include_caption); area)
+		return area->ToSize();
+	else
+		return std::nullopt;
+}
+
+std::optional<Vector2> get_center_size(const ControlSkin &skin, bool include_caption) noexcept
+{
+	if (auto area = get_center_area(skin, include_caption); area)
+		return area->ToSize();
+	else
+		return std::nullopt;
+}
+
 } //gui_control::detail
 
 //Protected
@@ -162,6 +179,15 @@ std::optional<Aabb> get_center_area(const ControlSkin &skin, bool include_captio
 void GuiControl::Created() noexcept
 {
 	AttachSkin();
+
+	if (skin_)
+	{
+		if (auto to_size = size_; to_size)
+		{
+			size_ = detail::get_visual_size(*skin_, true);
+			Size(*to_size);
+		}
+	}
 }
 
 void GuiControl::Removed() noexcept
@@ -868,7 +894,7 @@ GuiControl::GuiControl(std::string name) :
 GuiControl::GuiControl(std::string name, const Vector2 &size) :
 
 	GuiComponent{std::move(name)},
-	hit_areas_{Aabb::Size(size)}
+	size_{size}
 {
 	//Empty
 }
@@ -876,6 +902,7 @@ GuiControl::GuiControl(std::string name, const Vector2 &size) :
 GuiControl::GuiControl(std::string name, Areas areas) :
 
 	GuiComponent{std::move(name)},
+	size_{Aabb::Enclose(areas).ToSize()},
 	hit_areas_{std::move(areas)}
 {
 	//Empty
@@ -886,6 +913,7 @@ GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std
 	OwningPtr<ControlSkin> skin) :
 
 	GuiComponent{std::move(name)},
+	size_{skin ? detail::get_visual_size(*skin, true) : std::nullopt},
 	caption_{std::move(caption)},
 	tooltip_{std::move(tooltip)},
 	skin_{std::move(skin)}
@@ -897,23 +925,25 @@ GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std
 	OwningPtr<ControlSkin> skin, const Vector2 &size) :
 
 	GuiComponent{std::move(name)},
+	size_{size},
 	caption_{std::move(caption)},
 	tooltip_{std::move(tooltip)},
 	skin_{std::move(skin)}
 {
-	Size(size); //Resize skin to the given size
+	//Empty
 }
 
 GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
 	OwningPtr<ControlSkin> skin, Areas areas) :
 
 	GuiComponent{std::move(name)},
+	size_{Aabb::Enclose(areas).ToSize()},
 	caption_{std::move(caption)},
 	tooltip_{std::move(tooltip)},
-	skin_{std::move(skin)}
+	skin_{std::move(skin)},
+	hit_areas_{std::move(areas)}
 {
-	Size(Aabb::Enclose(areas).ToSize()); //Resize skin to the enclosed size of the given areas
-	hit_areas_ = std::move(areas);
+	//Empty
 }
 
 
@@ -1019,42 +1049,24 @@ void GuiControl::Reset() noexcept
 
 void GuiControl::Size(const Vector2 &size) noexcept
 {
-	if (auto current_size = Size(); current_size != size)
+	if (!size_ || *size_ != size)
 	{
-		auto resized = false;
+		//Resize skin
+		if (size_ && skin_)
+			detail::resize_skin(*skin_, *size_, size);
 
-		if (skin_ && skin_->Parts)
-		{
-			detail::resize_skin(*skin_, current_size, size);
-			resized = true;
-		}
-
-		if (std::empty(hit_areas_))
-		{
-			if (!skin_ || !skin_->Parts)
-			{
-				hit_areas_.push_back(Aabb::Size(size));
-				resized = true;
-			}
-		}
-		else if (std::size(hit_areas_) == 1)
-		{
+		//Single hit area
+		if (std::size(hit_areas_) == 1)
 			hit_areas_.back() = Aabb::Size(size);
-			resized = true;
-		}
+		//Multiple hit areas
+		else if (size_ && !size_->ZeroLength())
+			detail::resize_areas(hit_areas_, *size_, size);
 
-		//Multiple areas
-		else if (current_size.X() != 0.0_r && current_size.Y() != 0.0_r)
-		{
-			detail::resize_areas(hit_areas_, current_size, size);
-			resized = true;
-		}
+		auto from_size = size_;
+		size_ = size;
 
-		if (resized)
-		{
-			UpdateCaption();
-			Resized(current_size, size);
-		}
+		UpdateCaption();
+		Resized(from_size.value_or(size), size);
 	}
 }
 
@@ -1062,35 +1074,20 @@ void GuiControl::Skin(OwningPtr<ControlSkin> skin) noexcept
 {
 	if (skin_ != skin)
 	{
-		if (skin && skin->Parts)
+		RemoveSkin();
+
+		//Re-skin
+		if (skin)
 		{
-			//Re-skin, inherit previous size
-			if (skin_ && skin_->Parts)
-			{		
-				skin->Parts->Prepare();
-				skin_->Parts->Prepare();
+			//Resize new skin
+			if (auto from_size = detail::get_visual_size(*skin, true); from_size && size_)
+				detail::resize_skin(*skin, *from_size, *size_);
+			else
+				size_ = from_size;
 
-				auto from_size = skin->Parts->AxisAlignedBoundingBox().ToSize();
-				auto to_size = skin_->Parts->AxisAlignedBoundingBox().ToSize();
-
-				if (from_size != to_size)
-					detail::resize_skin(*skin, from_size, to_size);
-			}
-			//No skin, inherit area size
-			else if (!std::empty(hit_areas_))
-			{
-				skin->Parts->Prepare();
-
-				auto from_size = skin->Parts->AxisAlignedBoundingBox().ToSize();
-				auto to_size = Size();
-
-				if (from_size != to_size)
-					detail::resize_skin(*skin, from_size, to_size);
-			}
+			skin_ = std::move(skin);	
 		}
 
-		RemoveSkin();
-		skin_ = std::move(skin);
 		AttachSkin();
 	}
 }
@@ -1099,12 +1096,6 @@ void GuiControl::Skin(OwningPtr<ControlSkin> skin) noexcept
 /*
 	Observers
 */
-
-Vector2 GuiControl::Size() const noexcept
-{
-	return HitArea().value_or(aabb::Zero).ToSize();
-}
-
 
 std::optional<Aabb> GuiControl::HitArea() const noexcept
 {
@@ -1122,7 +1113,9 @@ std::optional<Aabb> GuiControl::HitArea() const noexcept
 
 std::optional<Aabb> GuiControl::VisualArea() const noexcept
 {
-	return skin_ ? detail::get_visual_area(*skin_, true) : std::nullopt;
+	return skin_ ?
+		detail::get_visual_area(*skin_, true) :
+		std::nullopt;
 }
 
 

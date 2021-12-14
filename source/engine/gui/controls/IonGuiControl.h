@@ -251,8 +251,12 @@ namespace ion::gui::controls
 			void resize_area(Aabb &area, const Vector2 &scaling) noexcept;
 			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 
+
 			std::optional<Aabb> get_visual_area(const ControlSkin &skin, bool include_caption) noexcept;
 			std::optional<Aabb> get_center_area(const ControlSkin &skin, bool include_caption) noexcept;
+
+			std::optional<Vector2> get_visual_size(const ControlSkin &skin, bool include_caption) noexcept;
+			std::optional<Vector2> get_center_size(const ControlSkin &skin, bool include_caption) noexcept;
 		} //detail
 	} //gui_control
 
@@ -267,10 +271,11 @@ namespace ion::gui::controls
 			bool pressed_ = false;
 			bool hovered_ = false;
 			bool focusable_ = true;
-
+			
+			std::optional<Vector2> size_;
 			std::optional<std::string> caption_;
-			std::optional<std::string> tooltip_;
-
+			std::optional<std::string> tooltip_;	
+			
 			std::optional<Vector2> caption_size_;
 			std::optional<Vector2> caption_padding_;
 			gui_control::ControlCaptionLayout caption_layout_ = gui_control::ControlCaptionLayout::Center;
@@ -391,7 +396,7 @@ namespace ion::gui::controls
 			void SetCaptionState(gui_control::ControlState state, gui_control::ControlCaptionPart &part) noexcept;
 			void SetSkinState(gui_control::ControlState state, gui_control::ControlSkin &skin) noexcept;
 
-			void SetState(gui_control::ControlState state) noexcept;
+			virtual void SetState(gui_control::ControlState state) noexcept;
 
 
 			/*
@@ -510,6 +515,9 @@ namespace ion::gui::controls
 			}
 
 
+			//Sets the size of this control to the given size
+			void Size(const Vector2 &size) noexcept;
+
 			//Sets the caption text for this control to the given text
 			inline void Caption(std::optional<std::string> text) noexcept
 			{
@@ -525,10 +533,7 @@ namespace ion::gui::controls
 			{
 				tooltip_ = std::move(text);
 			}
-			
 
-			//Sets the size of this control to the given size
-			void Size(const Vector2 &size) noexcept;
 
 			//Sets the caption size for this control to the given size
 			inline void CaptionSize(const std::optional<Vector2> &size) noexcept
@@ -737,6 +742,13 @@ namespace ion::gui::controls
 			}
 
 
+			//Returns the size of this control
+			//Returns nullopt if this control has no size
+			[[nodiscard]] inline auto& Size() const noexcept
+			{
+				return size_;
+			}
+
 			//Returns the caption text for this control
 			//Returns nullopt if this control has no caption
 			[[nodiscard]] inline auto& Caption() const noexcept
@@ -751,9 +763,6 @@ namespace ion::gui::controls
 				return tooltip_;
 			}
 
-
-			//Returns the size of this control
-			[[nodiscard]] Vector2 Size() const noexcept;
 
 			//Returns the caption size for this control
 			//Returns nullopt if no custom caption size has been set
