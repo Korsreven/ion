@@ -72,6 +72,8 @@ void GuiTooltip::UpdateCaption() noexcept
 
 				if (auto size = text->MinimumAreaSize(); size != vector2::Zero)
 				{
+					size += 2.0_r; //Make sure there is enough space (rounding error)
+
 					//Adjust size from viewport to ortho space
 					if (auto scene_manager = part->Owner(); scene_manager)
 					{
