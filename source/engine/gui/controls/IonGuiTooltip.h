@@ -74,6 +74,8 @@ namespace ion::gui::controls
 			types::Cumulative<duration> phase_duration_{fade_in_delay_};
 			real opacity_ = 1.0_r;
 
+			bool update_position_ = false;
+
 
 			/*
 				Skins

@@ -354,6 +354,7 @@ void GuiTooltip::Show() noexcept
 		}
 	}
 
+	update_position_ = true;
 	GuiControl::Show();
 }
 
@@ -456,9 +457,10 @@ void GuiTooltip::FrameStarted(duration time) noexcept
 bool GuiTooltip::MouseMoved(Vector2 position) noexcept
 {
 	if (visible_ &&
-		(follow_mouse_cursor_ || phase_ == detail::tooltip_phase::PreFadeIn))
+		(follow_mouse_cursor_ || phase_ == detail::tooltip_phase::PreFadeIn || update_position_))
 	{
 		UpdatePosition(position);
+		update_position_ = false;
 		return true;
 	}
 	else
