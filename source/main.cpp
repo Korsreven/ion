@@ -1852,14 +1852,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_box_model->AddPass(ion::graphics::render::Pass{model_program});
 
 			//Radio button
-			/*w = 0.056_r;
+			w = 0.056_r;
 			h = 0.056_r;
 
 			auto radio_button_model = scene.CreateModel();
 			auto radio_button_center = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
-			auto radio_button_mark = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Check mark
+			auto radio_button_select = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Select
 			
 			auto radio_button_top = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
@@ -1884,7 +1884,42 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			radio_button_left->AutoRepeat(true);
 			radio_button_bottom->AutoRepeat(true);
 			radio_button_right->AutoRepeat(true);
-			radio_button_model->AddPass(ion::graphics::render::Pass{model_program});*/
+			radio_button_model->AddPass(ion::graphics::render::Pass{model_program});
+
+			//Radio button 2
+			w = 0.056_r;
+			h = 0.056_r;
+
+			auto radio_button2_model = scene.CreateModel();
+			auto radio_button2_center = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
+			auto radio_button2_select = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Select
+			
+			auto radio_button2_top = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
+			auto radio_button2_left = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
+			auto radio_button2_bottom = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
+			auto radio_button2_right = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
+
+			auto radio_button2_top_left = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
+			auto radio_button2_bottom_left = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
+			auto radio_button2_top_right = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
+			auto radio_button2_bottom_right = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
+
+			radio_button2_center->AutoRepeat(true);
+			radio_button2_top->AutoRepeat(true);
+			radio_button2_left->AutoRepeat(true);
+			radio_button2_bottom->AutoRepeat(true);
+			radio_button2_right->AutoRepeat(true);
+			radio_button2_model->AddPass(ion::graphics::render::Pass{model_program});
 
 			//GUI Caption
 
@@ -1912,6 +1947,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Check box caption
 			auto check_box_caption = scene.CreateText(caption_text);
 			check_box_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
+
+			//Radio button caption
+			auto radio_button_caption = scene.CreateText(caption_text);
+			radio_button_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
+
+			//Radio button 2 caption
+			auto radio_button2_caption = scene.CreateText(caption_text);
+			radio_button2_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
 
 
 			//Scene graph
@@ -2029,6 +2072,94 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_box_skin.Caption.EnabledStyle = button_caption_style_enabled;
 			check_box_skin.Caption.DisabledStyle = button_caption_style_disabled;
 
+			//Radio button skin
+			ion::gui::controls::gui_radio_button::RadioButtonSkin radio_button_skin;
+			radio_button_skin.Parts.ModelObject = radio_button_model;
+			radio_button_skin.Parts.Center.SpriteObject = radio_button_center;
+			radio_button_skin.Parts.Top.SpriteObject = radio_button_top;
+			radio_button_skin.Parts.Left.SpriteObject = radio_button_left;
+			radio_button_skin.Parts.Bottom.SpriteObject = radio_button_bottom;
+			radio_button_skin.Parts.Right.SpriteObject = radio_button_right;
+			radio_button_skin.Parts.TopLeft.SpriteObject = radio_button_top_left;
+			radio_button_skin.Parts.BottomLeft.SpriteObject = radio_button_bottom_left;
+			radio_button_skin.Parts.TopRight.SpriteObject = radio_button_top_right;
+			radio_button_skin.Parts.BottomRight.SpriteObject = radio_button_bottom_right;
+
+			radio_button_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
+			radio_button_skin.Parts.Center.DisabledMaterial = check_box_center_enabled;
+			radio_button_skin.Parts.Center.PressedMaterial = check_box_center_enabled;
+			radio_button_skin.Parts.Center.HoveredMaterial = check_box_center_hovered;
+			radio_button_skin.Parts.Top.EnabledMaterial = button_top_enabled;
+			radio_button_skin.Parts.Top.FocusedMaterial = button_top_focused;
+			radio_button_skin.Parts.Left.EnabledMaterial = button_left_enabled;
+			radio_button_skin.Parts.Left.FocusedMaterial = button_left_focused;
+			radio_button_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
+			radio_button_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
+			radio_button_skin.Parts.Right.EnabledMaterial = button_right_enabled;
+			radio_button_skin.Parts.Right.FocusedMaterial = button_right_focused;
+			radio_button_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
+			radio_button_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
+			radio_button_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
+			radio_button_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
+			radio_button_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
+			radio_button_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
+			radio_button_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
+			radio_button_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
+
+			radio_button_skin.CheckMark.SpriteObject = radio_button_select;
+			radio_button_skin.CheckMark.EnabledMaterial = radio_button_select_enabled;
+			radio_button_skin.CheckMark.DisabledMaterial = radio_button_select_disabled;
+			radio_button_skin.CheckMark.PressedMaterial = radio_button_select_pressed;
+			radio_button_skin.CheckMark.HoveredMaterial = radio_button_select_hovered;
+
+			radio_button_skin.Caption.TextObject = radio_button_caption;
+			radio_button_skin.Caption.EnabledStyle = button_caption_style_enabled;
+			radio_button_skin.Caption.DisabledStyle = button_caption_style_disabled;
+
+			//Radio button 2 skin
+			ion::gui::controls::gui_radio_button::RadioButtonSkin radio_button2_skin;
+			radio_button2_skin.Parts.ModelObject = radio_button2_model;
+			radio_button2_skin.Parts.Center.SpriteObject = radio_button2_center;
+			radio_button2_skin.Parts.Top.SpriteObject = radio_button2_top;
+			radio_button2_skin.Parts.Left.SpriteObject = radio_button2_left;
+			radio_button2_skin.Parts.Bottom.SpriteObject = radio_button2_bottom;
+			radio_button2_skin.Parts.Right.SpriteObject = radio_button2_right;
+			radio_button2_skin.Parts.TopLeft.SpriteObject = radio_button2_top_left;
+			radio_button2_skin.Parts.BottomLeft.SpriteObject = radio_button2_bottom_left;
+			radio_button2_skin.Parts.TopRight.SpriteObject = radio_button2_top_right;
+			radio_button2_skin.Parts.BottomRight.SpriteObject = radio_button2_bottom_right;
+
+			radio_button2_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
+			radio_button2_skin.Parts.Center.DisabledMaterial = check_box_center_enabled;
+			radio_button2_skin.Parts.Center.PressedMaterial = check_box_center_enabled;
+			radio_button2_skin.Parts.Center.HoveredMaterial = check_box_center_hovered;
+			radio_button2_skin.Parts.Top.EnabledMaterial = button_top_enabled;
+			radio_button2_skin.Parts.Top.FocusedMaterial = button_top_focused;
+			radio_button2_skin.Parts.Left.EnabledMaterial = button_left_enabled;
+			radio_button2_skin.Parts.Left.FocusedMaterial = button_left_focused;
+			radio_button2_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
+			radio_button2_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
+			radio_button2_skin.Parts.Right.EnabledMaterial = button_right_enabled;
+			radio_button2_skin.Parts.Right.FocusedMaterial = button_right_focused;
+			radio_button2_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
+			radio_button2_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
+			radio_button2_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
+			radio_button2_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
+			radio_button2_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
+			radio_button2_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
+			radio_button2_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
+			radio_button2_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
+
+			radio_button2_skin.CheckMark.SpriteObject = radio_button2_select;
+			radio_button2_skin.CheckMark.EnabledMaterial = radio_button_select_enabled;
+			radio_button2_skin.CheckMark.DisabledMaterial = radio_button_select_disabled;
+			radio_button2_skin.CheckMark.PressedMaterial = radio_button_select_pressed;
+			radio_button2_skin.CheckMark.HoveredMaterial = radio_button_select_hovered;
+
+			radio_button2_skin.Caption.TextObject = radio_button2_caption;
+			radio_button2_skin.Caption.EnabledStyle = button_caption_style_enabled;
+			radio_button2_skin.Caption.DisabledStyle = button_caption_style_disabled;
+
 
 			//GUI
 			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
@@ -2047,15 +2178,19 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto label = base_panel->CreateLabel("label", "My label", std::move(label_skin));
 			label->Node()->Position({0.0_r, 0.7_r});
-			label->Tooltip("A label tooltip!");
+			label->Tooltip("My label tooltip");
 
-			auto button = base_panel->CreateButton("button", "My caption", "My tooltip", std::move(button_skin), Vector2{0.5_r, 0.1_r});
+			auto button = base_panel->CreateButton("button", "My button", "My button tooltip", std::move(button_skin), Vector2{0.5_r, 0.1_r});
 			button->Node()->Position({0.0_r, 0.5_r});
-			button->Disable();
 
-			auto check_box = base_panel->CreateCheckBox("check_box", {}, "My check box", std::move(check_box_skin), Vector2{0.1_r, 0.1_r});
+			auto check_box = base_panel->CreateCheckBox("check_box", {}, "My check box tooltip", std::move(check_box_skin));
 			check_box->Node()->Position({0.0_r, 0.3_r});
-			check_box->Disable();
+
+			auto radio_button = base_panel->CreateRadioButton("radio_button", {}, "My radio button tooltip", std::move(radio_button_skin));
+			radio_button->Node()->Position({-0.05_r, 0.2_r});
+
+			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", {}, "My radio button tooltip", std::move(radio_button2_skin));
+			radio_button2->Node()->Position({0.05_r, 0.2_r});
 
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);

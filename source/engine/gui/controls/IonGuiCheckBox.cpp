@@ -74,6 +74,7 @@ void GuiCheckBox::Resized(const Vector2 &from_size, const Vector2 &to_size) noex
 void GuiCheckBox::Checked() noexcept
 {
 	Changed();
+	SetState(state_);
 
 	//User callback
 	if (on_check_)
@@ -83,6 +84,7 @@ void GuiCheckBox::Checked() noexcept
 void GuiCheckBox::Unchecked() noexcept
 {
 	Changed();
+	SetState(state_);
 
 	//User callback
 	if (on_uncheck_)
