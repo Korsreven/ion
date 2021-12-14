@@ -28,26 +28,9 @@ namespace ion::gui::controls
 
 	namespace gui_check_box
 	{
-		struct CheckBoxVisualParts final
-		{
-			NonOwningPtr<graphics::scene::Model> ModelObject;
-			gui_control::ControlVisualPart CheckMark;
-
-
-			[[nodiscard]] inline operator bool() const noexcept
-			{
-				return !!ModelObject;
-			}
-
-			[[nodiscard]] inline auto operator->() const noexcept
-			{
-				return ModelObject.get();
-			}
-		};
-
 		struct CheckBoxSkin : gui_control::ControlSkin
 		{
-			CheckBoxVisualParts ExtraParts;
+			gui_control::ControlVisualPart CheckMark;
 		};
 
 
@@ -79,9 +62,6 @@ namespace ion::gui::controls
 			//See GuiControl::Clicked for more details
 			virtual void Clicked() noexcept override;
 
-			//See GuiControl::StateChanged for more details
-			virtual void StateChanged() noexcept override;
-
 			//See GuiControl::Resized for more details
 			virtual void Resized(const Vector2 &from_size, const Vector2 &to_size) noexcept override;
 
@@ -98,16 +78,7 @@ namespace ion::gui::controls
 			*/
 
 			void SetSkinState(gui_control::ControlState state, gui_check_box::CheckBoxSkin &skin) noexcept;
-			void UpdateState() noexcept;
-
-
-			/*
-				Skins
-			*/
-
-			virtual void AttachSkin() override;
-			virtual void DetachSkin() noexcept override;
-			virtual void RemoveSkin() noexcept override;
+			virtual void SetState(gui_control::ControlState state) noexcept override;
 
 		public:
 

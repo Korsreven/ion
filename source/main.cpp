@@ -649,6 +649,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//GUI textures
 			auto mouse_cursor_diffuse = textures.CreateTexture("mouse_cursor_diffuse", "mouse_cursor.png");
 
+			//Tooltip
 			auto tooltip_center_diffuse = textures.CreateTexture("tooltip_center", "tooltip_center.png",
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 			auto tooltip_top_diffuse = textures.CreateTexture("tooltip_top", "tooltip_top.png",
@@ -657,7 +658,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 			auto tooltip_top_left_diffuse = textures.CreateTexture("tooltip_top_left", "tooltip_top_left.png");
 
+			//Button
 			auto button_center_enabled_diffuse = textures.CreateTexture("button_center_enabled", "button_center_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto button_center_disabled_diffuse = textures.CreateTexture("button_center_disabled", "button_center_disabled.png",
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 			auto button_center_pressed_diffuse = textures.CreateTexture("button_center_pressed", "button_center_pressed.png",
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
@@ -675,6 +679,31 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto button_top_left_enabled_diffuse = textures.CreateTexture("button_top_left_enabled", "button_top_left_enabled.png");
 			auto button_top_left_focused_diffuse = textures.CreateTexture("button_top_left_focused", "button_top_left_focused.png");
+
+			//Check box
+			auto check_box_center_enabled_diffuse = textures.CreateTexture("check_box_center_enabled", "check_box_center_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto check_box_center_hovered_diffuse = textures.CreateTexture("check_box_center_hovered", "check_box_center_hovered.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+
+			auto check_box_mark_enabled_diffuse = textures.CreateTexture("check_box_mark_enabled", "check_box_mark_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto check_box_mark_disabled_diffuse = textures.CreateTexture("check_box_mark_disabled", "check_box_mark_disabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);		
+			auto check_box_mark_pressed_diffuse = textures.CreateTexture("check_box_mark_pressed", "check_box_mark_pressed.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto check_box_mark_hovered_diffuse = textures.CreateTexture("check_box_mark_hovered", "check_box_mark_hovered.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+
+			//Radio button
+			auto radio_button_select_enabled_diffuse = textures.CreateTexture("radio_button_select_enabled", "radio_button_select_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto radio_button_select_disabled_diffuse = textures.CreateTexture("radio_button_select_disabled", "radio_button_select_disabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto radio_button_select_pressed_diffuse = textures.CreateTexture("radio_button_select_pressed", "radio_button_select_pressed.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto radio_button_select_hovered_diffuse = textures.CreateTexture("radio_button_select_hovered", "radio_button_select_hovered.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 
 			auto cat_first_frame = textures.CreateTexture("cat01", "cat01.png");
 			textures.CreateTexture("cat02", "cat02.png");
@@ -1146,7 +1175,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					0.0_r, mouse_cursor_diffuse, nullptr, nullptr);
 			mouse_cursor->LightingEnabled(false);
 
-
+			//Tooltip materials
 			auto tooltip_center_enabled =
 				materials.CreateMaterial("tooltip_center",
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1236,7 +1265,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_bottom_right_enabled->FlipHorizontal();
 			tooltip_bottom_right_enabled->FlipVertical();
 
-
+			//Button materials
 			auto button_center_enabled =
 				materials.CreateMaterial("button_center_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1245,6 +1274,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{1.0_r, 1.0_r, 1.0_r},
 					0.0_r, button_center_enabled_diffuse, nullptr, nullptr);
 			button_center_enabled->LightingEnabled(false);
+
+			auto button_center_disabled =
+				materials.CreateMaterial("button_center_disabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, button_center_disabled_diffuse, nullptr, nullptr);
+			button_center_disabled->LightingEnabled(false);
 
 			auto button_center_pressed =
 				materials.CreateMaterial("button_center_pressed",
@@ -1421,6 +1459,99 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_bottom_right_focused->LightingEnabled(false);
 			button_bottom_right_focused->FlipHorizontal();
 			button_bottom_right_focused->FlipVertical();
+
+			//Check box materials
+			auto check_box_center_enabled =
+				materials.CreateMaterial("check_box_center_enabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, check_box_center_enabled_diffuse, nullptr, nullptr);
+			check_box_center_enabled->LightingEnabled(false);
+
+			auto check_box_center_hovered =
+				materials.CreateMaterial("check_box_center_hovered",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, check_box_center_hovered_diffuse, nullptr, nullptr);
+			check_box_center_hovered->LightingEnabled(false);
+
+
+			auto check_box_mark_enabled =
+				materials.CreateMaterial("check_box_mark_enabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, check_box_mark_enabled_diffuse, nullptr, nullptr);
+			check_box_mark_enabled->LightingEnabled(false);
+
+			auto check_box_mark_disabled =
+				materials.CreateMaterial("check_box_mark_disabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, check_box_mark_disabled_diffuse, nullptr, nullptr);
+			check_box_mark_disabled->LightingEnabled(false);
+
+			auto check_box_mark_pressed =
+				materials.CreateMaterial("check_box_mark_pressed",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, check_box_mark_pressed_diffuse, nullptr, nullptr);
+			check_box_mark_pressed->LightingEnabled(false);
+
+			auto check_box_mark_hovered =
+				materials.CreateMaterial("check_box_mark_hovered",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, check_box_mark_hovered_diffuse, nullptr, nullptr);
+			check_box_mark_hovered->LightingEnabled(false);
+
+			//Radio buttons
+			auto radio_button_select_enabled =
+				materials.CreateMaterial("radio_button_select_enabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, radio_button_select_enabled_diffuse, nullptr, nullptr);
+			radio_button_select_enabled->LightingEnabled(false);
+
+			auto radio_button_select_disabled =
+				materials.CreateMaterial("radio_button_select_disabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, radio_button_select_disabled_diffuse, nullptr, nullptr);
+			radio_button_select_disabled->LightingEnabled(false);
+
+			auto radio_button_select_pressed =
+				materials.CreateMaterial("radio_button_select_pressed",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, radio_button_select_pressed_diffuse, nullptr, nullptr);
+			radio_button_select_pressed->LightingEnabled(false);
+
+			auto radio_button_select_hovered =
+				materials.CreateMaterial("radio_button_select_hovered",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, radio_button_select_hovered_diffuse, nullptr, nullptr);
+			radio_button_select_hovered->LightingEnabled(false);
 
 
 			using namespace ion::graphics::utilities;
@@ -1618,28 +1749,31 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			mouse_cursor_sprite->AutoSize(true);
 			mouse_cursor_model->AddPass(ion::graphics::render::Pass{model_program});
 
+			//Tooltip
+			auto w = 0.1_r;
+			auto h = 0.1_r;
 
 			auto tooltip_model = scene.CreateModel();
 			auto tooltip_center = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {0.1_r, 0.1_r}, tooltip_center_enabled}); //Center
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, tooltip_center_enabled}); //Center
 			
 			auto tooltip_top = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.1_r, 0.011_r}, tooltip_top_enabled}); //Top
+				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, tooltip_top_enabled}); //Top
 			auto tooltip_left = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, 0.1_r}, tooltip_left_enabled}); //Left
+				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, tooltip_left_enabled}); //Left
 			auto tooltip_bottom = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.1_r, 0.011_r}, tooltip_bottom_enabled}); //Bottom
+				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, tooltip_bottom_enabled}); //Bottom
 			auto tooltip_right = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, 0.1_r}, tooltip_right_enabled}); //Right
+				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, tooltip_right_enabled}); //Right
 
 			auto tooltip_top_left = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_top_left_enabled}); //Top left
+				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_top_left_enabled}); //Top left
 			auto tooltip_bottom_left = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_bottom_left_enabled}); //Bottom left
+				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_bottom_left_enabled}); //Bottom left
 			auto tooltip_top_right = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_top_right_enabled}); //Top right
+				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_top_right_enabled}); //Top right
 			auto tooltip_bottom_right = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.1_r * 0.5_r + 0.011_r * 0.5_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_bottom_right_enabled}); //Bottom right
+				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_bottom_right_enabled}); //Bottom right
 
 			tooltip_center->FillOpacity(0.9_r);
 			tooltip_center->AutoRepeat(true);
@@ -1649,28 +1783,31 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_right->AutoRepeat(true);
 			tooltip_model->AddPass(ion::graphics::render::Pass{model_program});
 
+			//Button
+			w = 0.1_r;
+			h = 0.1_r;
 
 			auto button_model = scene.CreateModel();
 			auto button_center = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {0.1_r, 0.1_r}, nullptr}); //Center
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
 			
 			auto button_top = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.1_r, 0.011_r}, nullptr}); //Top
+				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
 			auto button_left = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, 0.1_r}, nullptr}); //Left
+				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
 			auto button_bottom = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.1_r, 0.011_r}, nullptr}); //Bottom
+				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
 			auto button_right = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, 0.1_r}, nullptr}); //Right
+				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
 
 			auto button_top_left = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
+				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
 			auto button_bottom_left = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-0.1_r * 0.5_r + -0.011_r * 0.5_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
+				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
 			auto button_top_right = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.1_r * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
+				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
 			auto button_bottom_right = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.1_r * 0.5_r + 0.011_r * 0.5_r, -0.1_r * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
+				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
 
 			button_center->AutoRepeat(true);
 			button_top->AutoRepeat(true);
@@ -1679,24 +1816,102 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_right->AutoRepeat(true);
 			button_model->AddPass(ion::graphics::render::Pass{model_program});
 
+			//Check box
+			w = 0.056_r;
+			h = 0.056_r;
+
+			auto check_box_model = scene.CreateModel();
+			auto check_box_center = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
+			auto check_box_mark = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Check mark
+			
+			auto check_box_top = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
+			auto check_box_left = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
+			auto check_box_bottom = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
+			auto check_box_right = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
+
+			auto check_box_top_left = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
+			auto check_box_bottom_left = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
+			auto check_box_top_right = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
+			auto check_box_bottom_right = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
+
+			check_box_center->AutoRepeat(true);
+			check_box_top->AutoRepeat(true);
+			check_box_left->AutoRepeat(true);
+			check_box_bottom->AutoRepeat(true);
+			check_box_right->AutoRepeat(true);
+			check_box_model->AddPass(ion::graphics::render::Pass{model_program});
+
+			//Radio button
+			/*w = 0.056_r;
+			h = 0.056_r;
+
+			auto radio_button_model = scene.CreateModel();
+			auto radio_button_center = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
+			auto radio_button_mark = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Check mark
+			
+			auto radio_button_top = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
+			auto radio_button_left = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
+			auto radio_button_bottom = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
+			auto radio_button_right = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
+
+			auto radio_button_top_left = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
+			auto radio_button_bottom_left = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
+			auto radio_button_top_right = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
+			auto radio_button_bottom_right = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
+
+			radio_button_center->AutoRepeat(true);
+			radio_button_top->AutoRepeat(true);
+			radio_button_left->AutoRepeat(true);
+			radio_button_bottom->AutoRepeat(true);
+			radio_button_right->AutoRepeat(true);
+			radio_button_model->AddPass(ion::graphics::render::Pass{model_program});*/
 
 			//GUI Caption
-			auto caption = scene.CreateText(caption_text);
-			caption->AddPass(ion::graphics::render::Pass{gui_text_program});
-			
-			ion::graphics::fonts::text::TextBlockStyle caption_style_enabled;
-			caption_style_enabled.ForegroundColor = caption_text->DefaultForegroundColor();
 
-			ion::graphics::fonts::text::TextBlockStyle caption_style_hovered;
-			caption_style_hovered.ForegroundColor = caption_text->DefaultForegroundColor();
-			caption_style_hovered.Decoration = ion::graphics::fonts::text::TextDecoration::Underline;
-
-
+			//Tooltip caption
 			auto tooltip_caption = scene.CreateText(caption_text);
 			tooltip_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
 
 			auto label_caption = scene.CreateText(caption_text);
 			label_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
+
+			//Button caption
+			auto button_caption = scene.CreateText(caption_text);
+			button_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
+			
+			ion::graphics::fonts::text::TextBlockStyle button_caption_style_enabled;
+			button_caption_style_enabled.ForegroundColor = caption_text->DefaultForegroundColor();
+
+			ion::graphics::fonts::text::TextBlockStyle button_caption_style_disabled;
+			button_caption_style_disabled.ForegroundColor = color::DarkGray;
+
+			ion::graphics::fonts::text::TextBlockStyle button_caption_style_hovered;
+			button_caption_style_hovered.ForegroundColor = caption_text->DefaultForegroundColor();
+			button_caption_style_hovered.Decoration = ion::graphics::fonts::text::TextDecoration::Underline;
+
+			//Check box caption
+			auto check_box_caption = scene.CreateText(caption_text);
+			check_box_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
 
 
 			//Scene graph
@@ -1712,7 +1927,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::gui::gui_controller::GuiMouseCursorSkin mouse_cursor_skin;
 			mouse_cursor_skin.ModelObject = mouse_cursor_model;
 
-
+			//Tooltip skin
 			ion::gui::controls::gui_tooltip::TooltipSkin tooltip_skin;
 			tooltip_skin.Parts.ModelObject = tooltip_model;
 			tooltip_skin.Parts.Center.SpriteObject = tooltip_center;
@@ -1727,11 +1942,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			tooltip_skin.Caption.TextObject = tooltip_caption;
 
-
+			//Label skin
 			ion::gui::controls::gui_label::LabelSkin label_skin;
 			label_skin.Caption.TextObject = label_caption;
 
-
+			//Button skin
 			ion::gui::controls::gui_button::ButtonSkin button_skin;
 			button_skin.Parts.ModelObject = button_model;
 			button_skin.Parts.Center.SpriteObject = button_center;
@@ -1745,6 +1960,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_skin.Parts.BottomRight.SpriteObject = button_bottom_right;
 
 			button_skin.Parts.Center.EnabledMaterial = button_center_enabled;
+			button_skin.Parts.Center.DisabledMaterial = button_center_disabled;
 			button_skin.Parts.Center.PressedMaterial = button_center_pressed;
 			button_skin.Parts.Center.HoveredMaterial = button_center_hovered;
 			button_skin.Parts.Top.EnabledMaterial = button_top_enabled;
@@ -1764,9 +1980,54 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
 			button_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
 
-			button_skin.Caption.TextObject = caption;
-			button_skin.Caption.EnabledStyle = caption_style_enabled;
-			button_skin.Caption.HoveredStyle = caption_style_hovered;
+			button_skin.Caption.TextObject = button_caption;
+			button_skin.Caption.EnabledStyle = button_caption_style_enabled;
+			button_skin.Caption.DisabledStyle = button_caption_style_disabled;
+			button_skin.Caption.HoveredStyle = button_caption_style_hovered;
+
+			//Check box skin
+			ion::gui::controls::gui_check_box::CheckBoxSkin check_box_skin;
+			check_box_skin.Parts.ModelObject = check_box_model;
+			check_box_skin.Parts.Center.SpriteObject = check_box_center;
+			check_box_skin.Parts.Top.SpriteObject = check_box_top;
+			check_box_skin.Parts.Left.SpriteObject = check_box_left;
+			check_box_skin.Parts.Bottom.SpriteObject = check_box_bottom;
+			check_box_skin.Parts.Right.SpriteObject = check_box_right;
+			check_box_skin.Parts.TopLeft.SpriteObject = check_box_top_left;
+			check_box_skin.Parts.BottomLeft.SpriteObject = check_box_bottom_left;
+			check_box_skin.Parts.TopRight.SpriteObject = check_box_top_right;
+			check_box_skin.Parts.BottomRight.SpriteObject = check_box_bottom_right;
+
+			check_box_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
+			check_box_skin.Parts.Center.DisabledMaterial = check_box_center_enabled;
+			check_box_skin.Parts.Center.PressedMaterial = check_box_center_enabled;
+			check_box_skin.Parts.Center.HoveredMaterial = check_box_center_hovered;
+			check_box_skin.Parts.Top.EnabledMaterial = button_top_enabled;
+			check_box_skin.Parts.Top.FocusedMaterial = button_top_focused;
+			check_box_skin.Parts.Left.EnabledMaterial = button_left_enabled;
+			check_box_skin.Parts.Left.FocusedMaterial = button_left_focused;
+			check_box_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
+			check_box_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
+			check_box_skin.Parts.Right.EnabledMaterial = button_right_enabled;
+			check_box_skin.Parts.Right.FocusedMaterial = button_right_focused;
+			check_box_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
+			check_box_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
+			check_box_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
+			check_box_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
+			check_box_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
+			check_box_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
+			check_box_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
+			check_box_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
+
+			check_box_skin.CheckMark.SpriteObject = check_box_mark;
+			check_box_skin.CheckMark.EnabledMaterial = check_box_mark_enabled;
+			check_box_skin.CheckMark.DisabledMaterial = check_box_mark_disabled;
+			check_box_skin.CheckMark.PressedMaterial = check_box_mark_pressed;
+			check_box_skin.CheckMark.HoveredMaterial = check_box_mark_hovered;
+
+			check_box_skin.Caption.TextObject = check_box_caption;
+			check_box_skin.Caption.EnabledStyle = button_caption_style_enabled;
+			check_box_skin.Caption.DisabledStyle = button_caption_style_disabled;
 
 
 			//GUI
@@ -1790,6 +2051,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto button = base_panel->CreateButton("button", "My caption", "My tooltip", std::move(button_skin), Vector2{0.5_r, 0.1_r});
 			button->Node()->Position({0.0_r, 0.5_r});
+			button->Disable();
+
+			auto check_box = base_panel->CreateCheckBox("check_box", {}, "My check box", std::move(check_box_skin), Vector2{0.1_r, 0.1_r});
+			check_box->Node()->Position({0.0_r, 0.3_r});
+			check_box->Disable();
 
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);
