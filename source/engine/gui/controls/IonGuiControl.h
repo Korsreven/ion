@@ -200,6 +200,10 @@ namespace ion::gui::controls
 			constexpr auto default_caption_padding_size = 2.0_r;
 
 
+			/*
+				States
+			*/
+
 			inline auto control_state_to_material(ControlState state, ControlVisualPart &part) noexcept
 			{
 				switch (state)
@@ -245,6 +249,10 @@ namespace ion::gui::controls
 			}
 
 
+			/*
+				Skins
+			*/
+
 			void resize_part(ControlVisualPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept;		
 			void resize_skin(ControlSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 
@@ -257,6 +265,88 @@ namespace ion::gui::controls
 
 			std::optional<Vector2> get_visual_size(const ControlSkin &skin, bool include_caption) noexcept;
 			std::optional<Vector2> get_center_size(const ControlSkin &skin, bool include_caption) noexcept;
+
+
+			inline auto is_caption_outside(ControlCaptionLayout caption_layout) noexcept
+			{
+				switch (caption_layout)
+				{
+					case ControlCaptionLayout::TopLeft:
+					case ControlCaptionLayout::TopCenter:
+					case ControlCaptionLayout::TopRight:
+					case ControlCaptionLayout::Left:
+					case ControlCaptionLayout::Center:
+					case ControlCaptionLayout::Right:
+					case ControlCaptionLayout::BottomLeft:
+					case ControlCaptionLayout::BottomCenter:
+					case ControlCaptionLayout::BottomRight:
+					return false;
+
+					default:
+					return true;
+				}
+			}
+
+			inline auto caption_layout_to_text_alignment(ControlCaptionLayout caption_layout) noexcept
+			{
+				switch (caption_layout)
+				{
+					case ControlCaptionLayout::Left:
+					case ControlCaptionLayout::TopLeft:
+					case ControlCaptionLayout::BottomLeft:
+					case ControlCaptionLayout::OutsideRightTop:
+					case ControlCaptionLayout::OutsideRightCenter:
+					case ControlCaptionLayout::OutsideRightBottom:
+					case ControlCaptionLayout::OutsideTopLeft:
+					case ControlCaptionLayout::OutsideBottomLeft:
+					return graphics::fonts::text::TextAlignment::Left;
+
+					case ControlCaptionLayout::Right:
+					case ControlCaptionLayout::TopRight:
+					case ControlCaptionLayout::BottomRight:
+					case ControlCaptionLayout::OutsideLeftTop:
+					case ControlCaptionLayout::OutsideLeftCenter:
+					case ControlCaptionLayout::OutsideLeftBottom:
+					case ControlCaptionLayout::OutsideTopRight:
+					case ControlCaptionLayout::OutsideBottomRight:
+					return graphics::fonts::text::TextAlignment::Right;
+
+					default:
+					return graphics::fonts::text::TextAlignment::Center;
+				}
+			}
+
+			inline auto caption_layout_to_text_vertical_alignment(ControlCaptionLayout caption_layout) noexcept
+			{
+				switch (caption_layout)
+				{
+					case ControlCaptionLayout::TopLeft:
+					case ControlCaptionLayout::TopCenter:
+					case ControlCaptionLayout::TopRight:
+					case ControlCaptionLayout::OutsideLeftTop:
+					case ControlCaptionLayout::OutsideRightTop:
+					case ControlCaptionLayout::OutsideBottomLeft:
+					case ControlCaptionLayout::OutsideBottomCenter:
+					case ControlCaptionLayout::OutsideBottomRight:
+					return graphics::fonts::text::TextVerticalAlignment::Top;
+
+					case ControlCaptionLayout::BottomLeft:
+					case ControlCaptionLayout::BottomCenter:
+					case ControlCaptionLayout::BottomRight:
+					case ControlCaptionLayout::OutsideLeftBottom:
+					case ControlCaptionLayout::OutsideRightBottom:
+					case ControlCaptionLayout::OutsideTopLeft:
+					case ControlCaptionLayout::OutsideTopCenter:
+					case ControlCaptionLayout::OutsideTopRight:
+					return graphics::fonts::text::TextVerticalAlignment::Bottom;
+
+					default:
+					return graphics::fonts::text::TextVerticalAlignment::Middle;
+				}
+			}
+
+			Vector2 caption_offset(ControlCaptionLayout caption_layout, const Vector2 &size, const Vector2 &border_size) noexcept;
+			Vector2 caption_area_offset(ControlCaptionLayout caption_layout, const Vector2 &size, const Vector2 &border_size) noexcept;
 		} //detail
 	} //gui_control
 

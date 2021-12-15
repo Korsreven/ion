@@ -34,6 +34,9 @@ using namespace gui_control;
 namespace gui_control::detail
 {
 
+/*
+	Skins
+*/
 
 void resize_part(ControlVisualPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept
 {
@@ -166,6 +169,97 @@ std::optional<Vector2> get_center_size(const ControlSkin &skin, bool include_cap
 		return area->ToSize();
 	else
 		return std::nullopt;
+}
+
+
+Vector2 caption_offset(ControlCaptionLayout caption_layout, const Vector2 &size, const Vector2 &border_size) noexcept
+{
+	auto x =
+		[&]() noexcept
+		{
+			switch (caption_layout)
+			{
+				case ControlCaptionLayout::OutsideLeftTop:
+				case ControlCaptionLayout::OutsideLeftCenter:
+				case ControlCaptionLayout::OutsideLeftBottom:
+				return -size.X() - border_size.X();
+
+				case ControlCaptionLayout::OutsideRightTop:
+				case ControlCaptionLayout::OutsideRightCenter:
+				case ControlCaptionLayout::OutsideRightBottom:
+				return size.X() + border_size.X();
+
+				case ControlCaptionLayout::OutsideTopLeft:
+				case ControlCaptionLayout::OutsideBottomLeft:
+				return -size.X();
+
+				case ControlCaptionLayout::OutsideTopRight:
+				case ControlCaptionLayout::OutsideBottomRight:
+				return size.X();
+
+				default:
+				return 0.0_r;
+			}
+		}();
+
+	auto y =
+		[&]() noexcept
+		{
+			switch (caption_layout)
+			{
+				case ControlCaptionLayout::OutsideTopLeft:
+				case ControlCaptionLayout::OutsideTopCenter:
+				case ControlCaptionLayout::OutsideTopRight:
+				return size.Y() + border_size.Y();
+
+				case ControlCaptionLayout::OutsideBottomLeft:
+				case ControlCaptionLayout::OutsideBottomCenter:
+				case ControlCaptionLayout::OutsideBottomRight:
+				return -size.Y() - border_size.Y();
+
+				case ControlCaptionLayout::OutsideLeftTop:
+				case ControlCaptionLayout::OutsideRightTop:				
+				return size.Y();
+
+				case ControlCaptionLayout::OutsideLeftBottom:
+				case ControlCaptionLayout::OutsideRightBottom:
+				return -size.Y();
+
+				default:
+				return 0.0_r;
+			}
+		}();
+
+	return {x, y};
+}
+
+Vector2 caption_area_offset(ControlCaptionLayout caption_layout, const Vector2 &size, const Vector2 &border_size) noexcept
+{
+	switch (caption_layout)
+	{
+		case ControlCaptionLayout::OutsideLeftTop:
+		case ControlCaptionLayout::OutsideLeftCenter:
+		case ControlCaptionLayout::OutsideLeftBottom:
+		return {-size.X() - border_size.X(), 0.0_r};
+
+		case ControlCaptionLayout::OutsideRightTop:
+		case ControlCaptionLayout::OutsideRightCenter:
+		case ControlCaptionLayout::OutsideRightBottom:
+		return {size.X() + border_size.X(), 0.0_r};
+
+		case ControlCaptionLayout::OutsideTopLeft:
+		case ControlCaptionLayout::OutsideTopCenter:
+		case ControlCaptionLayout::OutsideTopRight:
+		return {0.0_r, size.Y() + border_size.Y()};
+
+		case ControlCaptionLayout::OutsideBottomLeft:
+		case ControlCaptionLayout::OutsideBottomCenter:
+		case ControlCaptionLayout::OutsideBottomRight:
+		return {0.0_r, -size.Y() - border_size.Y()};
+
+		default:
+		return vector2::Zero;
+	}
 }
 
 } //gui_control::detail
@@ -745,12 +839,22 @@ void GuiControl::UpdateCaption() noexcept
 				value_or(visual_area.
 				value_or(aabb::Zero));
 
+			auto top_right_size = visual_area && center_area ?
+				visual_area->Max() - center_area->Max() :
+				vector2::Zero;
+			auto bottom_left_size = visual_area && center_area ?
+				center_area->Min() - visual_area->Min() :
+				vector2::Zero;
+			auto border_size = top_right_size.CeilCopy(bottom_left_size);
+
 			auto center = center_area ?
 				center_area->Center() :
 				vector2::Zero;
 
 			//Area size
-			if (auto size = caption_size_.value_or(area.ToSize()); size != vector2::Zero)
+			if (auto size = caption_size_.
+				value_or(detail::is_caption_outside(caption_layout_) ? vector2::Zero : area.ToSize());
+				size != vector2::Zero)
 			{
 				auto adjusted_size = size;
 
@@ -763,115 +867,26 @@ void GuiControl::UpdateCaption() noexcept
 
 				text->AreaSize(adjusted_size);
 
-				auto top_right_size = visual_area && center_area ?
-					visual_area->Max() - center_area->Max() :
-					vector2::Zero;
-				auto bottom_left_size = visual_area && center_area ?
-					center_area->Min() - visual_area->Min() :
-					vector2::Zero;
-
 				if (auto node = skin_->Caption->ParentNode(); node)
-					node->Position(
-						[&]() noexcept
-						{
-							switch (caption_layout_)
-							{
-								case ControlCaptionLayout::OutsideLeftTop:
-								case ControlCaptionLayout::OutsideLeftCenter:
-								case ControlCaptionLayout::OutsideLeftBottom:
-								return Vector2{center.X() - size.X() - bottom_left_size.X(), center.Y()};
-
-								case ControlCaptionLayout::OutsideRightTop:
-								case ControlCaptionLayout::OutsideRightCenter:
-								case ControlCaptionLayout::OutsideRightBottom:
-								return Vector2{center.X() + size.X() + top_right_size.X(), center.Y()};
-
-								case ControlCaptionLayout::OutsideTopLeft:
-								case ControlCaptionLayout::OutsideTopCenter:
-								case ControlCaptionLayout::OutsideTopRight:
-								return Vector2{center.X(), center.Y() + size.Y() + top_right_size.Y()};
-
-								case ControlCaptionLayout::OutsideBottomLeft:
-								case ControlCaptionLayout::OutsideBottomCenter:
-								case ControlCaptionLayout::OutsideBottomRight:
-								return Vector2{center.X(), center.Y() - size.Y() - bottom_left_size.Y()};
-
-								default:
-								return center;
-							}
-						}());
+					node->Position(center + detail::caption_area_offset(caption_layout_, size, border_size));
 			}
 			else
 			{
+				size = area.ToSize();
 				text->AreaSize({});
 
 				if (auto node = skin_->Caption->ParentNode(); node)
-					node->Position(center);
+					node->Position(center + detail::caption_offset(caption_layout_, size, border_size));
 			}
 
 			//Padding
 			text->Padding(caption_padding_.value_or(detail::default_caption_padding_size));
 
 			//Alignment
-			text->Alignment(
-				[&]() noexcept
-				{
-					switch (caption_layout_)
-					{
-						case ControlCaptionLayout::Left:
-						case ControlCaptionLayout::TopLeft:
-						case ControlCaptionLayout::BottomLeft:
-						case ControlCaptionLayout::OutsideRightTop:
-						case ControlCaptionLayout::OutsideRightCenter:
-						case ControlCaptionLayout::OutsideRightBottom:
-						case ControlCaptionLayout::OutsideTopLeft:
-						case ControlCaptionLayout::OutsideBottomLeft:
-						return graphics::fonts::text::TextAlignment::Left;
+			text->Alignment(detail::caption_layout_to_text_alignment(caption_layout_));
 
-						case ControlCaptionLayout::Right:
-						case ControlCaptionLayout::TopRight:
-						case ControlCaptionLayout::BottomRight:
-						case ControlCaptionLayout::OutsideLeftTop:
-						case ControlCaptionLayout::OutsideLeftCenter:
-						case ControlCaptionLayout::OutsideLeftBottom:
-						case ControlCaptionLayout::OutsideTopRight:
-						case ControlCaptionLayout::OutsideBottomRight:
-						return graphics::fonts::text::TextAlignment::Right;
-
-						default:
-						return graphics::fonts::text::TextAlignment::Center;
-					}
-				}());
-
-			text->VerticalAlignment(
-				[&]() noexcept
-				{
-					switch (caption_layout_)
-					{
-						case ControlCaptionLayout::TopLeft:
-						case ControlCaptionLayout::TopCenter:
-						case ControlCaptionLayout::TopRight:
-						case ControlCaptionLayout::OutsideLeftTop:
-						case ControlCaptionLayout::OutsideRightTop:
-						case ControlCaptionLayout::OutsideBottomLeft:
-						case ControlCaptionLayout::OutsideBottomCenter:
-						case ControlCaptionLayout::OutsideBottomRight:
-						return graphics::fonts::text::TextVerticalAlignment::Top;
-
-						case ControlCaptionLayout::BottomLeft:
-						case ControlCaptionLayout::BottomCenter:
-						case ControlCaptionLayout::BottomRight:
-						case ControlCaptionLayout::OutsideLeftBottom:
-						case ControlCaptionLayout::OutsideRightBottom:
-						case ControlCaptionLayout::OutsideTopLeft:
-						case ControlCaptionLayout::OutsideTopCenter:
-						case ControlCaptionLayout::OutsideTopRight:
-						return graphics::fonts::text::TextVerticalAlignment::Bottom;
-
-						default:
-						return graphics::fonts::text::TextVerticalAlignment::Middle;
-					}
-				}());
+			//Vertical alignment
+			text->VerticalAlignment(detail::caption_layout_to_text_vertical_alignment(caption_layout_));
 
 			//Content
 			if (caption_)

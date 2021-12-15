@@ -49,6 +49,9 @@ namespace ion::gui::controls
 			constexpr auto default_hold_time = 5.0_sec;
 			constexpr auto default_fade_delay = 0.5_sec;
 			constexpr auto default_fade_time = 0.1_sec;
+
+
+			Vector2 in_view_offset(const Aabb &tooltip_area, const Aabb &view_area) noexcept;
 		} //detail
 	} //gui_tooltip
 

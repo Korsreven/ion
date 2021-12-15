@@ -29,6 +29,33 @@ using namespace gui_tooltip;
 
 namespace gui_tooltip::detail
 {
+
+Vector2 in_view_offset(const Aabb &tooltip_area, const Aabb &view_area) noexcept
+{
+	auto [tooltip_min, tooltip_max] = tooltip_area.MinMax();
+	auto [view_min, view_max] = view_area.MinMax();
+
+	auto x = 0.0_r;
+	//Outside right edge, nudge left
+	if (tooltip_max.X() > view_max.X())
+		x = view_max.X() - tooltip_max.X();
+
+	//Outside left edge, nudge right
+	if (tooltip_min.X() < view_min.X())
+		x = view_min.X() - tooltip_min.X();
+
+	auto y = 0.0_r;
+	//Outside bottom edge, nudge up
+	if (tooltip_min.Y() < view_min.Y())
+		y = view_min.Y() - tooltip_min.Y();
+
+	//Outside top edge, nudge down
+	if (tooltip_max.Y() > view_max.Y())
+		y = view_max.Y() - tooltip_max.Y();
+
+	return {x, y};
+}
+
 } //gui_tooltip::detail
 
 
@@ -69,6 +96,7 @@ void GuiTooltip::UpdateCaption() noexcept
 					text->Content(*caption_);
 				else
 					text->Content({});
+
 
 				if (auto size = text->MinimumAreaSize(); size != vector2::Zero)
 				{
@@ -125,10 +153,10 @@ void GuiTooltip::UpdatePosition(Vector2 position) noexcept
 				return nullptr;
 			}(); controller)
 		{
-			auto [half_width, half_height] =
-				(VisualArea().value_or(aabb::Zero).ToHalfSize() * node_->DerivedScaling()).XY();
+			auto size =
+				VisualArea().value_or(aabb::Zero).ToSize() * node_->DerivedScaling();
 
-			auto [cursor_width, cursor_height] =
+			auto cursor_size =
 				[&]() noexcept
 				{
 					if (auto mouse_cursor_skin = controller->MouseCursorSkin(); mouse_cursor_skin)
@@ -138,42 +166,10 @@ void GuiTooltip::UpdatePosition(Vector2 position) noexcept
 					}
 
 					return vector2::Zero; //OS cursor size?
-				}().XY();
+				}();
 
 			//Adjust tooltip position based on cursor hot spot
-			position +=
-				[&]() noexcept -> Vector2
-				{
-					switch (controller->MouseCursorHotSpot())
-					{
-						case gui_controller::GuiMouseCursorHotSpot::TopLeft:
-						return {half_width, -half_height - cursor_height};
-
-						case gui_controller::GuiMouseCursorHotSpot::TopCenter:
-						return {0.0_r, -half_height - cursor_height};
-
-						case gui_controller::GuiMouseCursorHotSpot::TopRight:
-						return {-half_width, -half_height - cursor_height};
-
-						case gui_controller::GuiMouseCursorHotSpot::Left:
-						return {half_width, -half_height - cursor_height * 0.5_r};
-
-						case gui_controller::GuiMouseCursorHotSpot::Right:
-						return {-half_width, -half_height - cursor_height * 0.5_r};
-
-						case gui_controller::GuiMouseCursorHotSpot::BottomLeft:
-						return {half_width, half_height + cursor_height};
-
-						case gui_controller::GuiMouseCursorHotSpot::BottomCenter:
-						return {0.0_r, half_height + cursor_height};
-
-						case gui_controller::GuiMouseCursorHotSpot::BottomRight:
-						return {-half_width, half_height + cursor_height};
-
-						default:
-						return {0.0_r, -half_height - cursor_height * 0.5_r};
-					}
-				}();
+			position += gui_controller::detail::tooltip_hot_spot_offset(controller->MouseCursorHotSpot(), size, cursor_size);
 		}
 
 		node_->DerivedPosition(position);
@@ -214,32 +210,8 @@ void GuiTooltip::AdjustInView() noexcept
 
 					return aabb::Zero;
 				}(); tooltip_area != aabb::Zero)
-			{
-				auto [view_min, view_max] = view_area.MinMax();
-				auto [tooltip_min, tooltip_max] = tooltip_area.MinMax();
-				auto position = vector2::Zero;
 
-				//Outside right edge, nudge left
-				if (tooltip_max.X() > view_max.X())
-					position.X(view_max.X() - tooltip_max.X());
-
-				//Outside left edge, nudge right
-				if (tooltip_min.X() < view_min.X())
-					position.X(view_min.X() - tooltip_min.X());	
-
-				//Outside bottom edge, nudge up
-				if (tooltip_min.Y() < view_min.Y())
-					position.Y(view_min.Y() - tooltip_min.Y());
-
-				//Outside top edge, nudge down
-				if (tooltip_max.Y() > view_max.Y())
-					position.Y(view_max.Y() - tooltip_max.Y());
-
-
-				//Adjust inside view area
-				if (position != vector2::Zero)
-					node_->Position(node_->Position() + position);
-			}
+				node_->Position(node_->Position() + detail::in_view_offset(tooltip_area, view_area));
 		}
 	}
 }
