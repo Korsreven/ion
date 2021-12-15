@@ -1656,7 +1656,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Text
 			auto text = scene.CreateText(fps);
-			text->AddPass(ion::graphics::render::Pass{gui_text_program});
+			text->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 
 			//Particle system
 			auto particle_system = scene.CreateParticleSystem(rain);
@@ -1682,7 +1682,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto model_star = scene.CreateModel();
 			model_star->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.05_r, 0.05_r}, star});
-			model_star->AddPass(ion::graphics::render::Pass{model_program});
+			model_star->AddPass(ion::graphics::render::Pass{/*model_program*/});
 
 			auto model_aura = scene.CreateModel();
 			auto aura_sprite = model_aura->CreateMesh(ion::graphics::scene::shapes::Sprite{
@@ -1709,7 +1709,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto model_spectrum = scene.CreateModel();
 			model_spectrum->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.71_r, 0.71_r}, color_spectrum});
-			model_spectrum->AddPass(ion::graphics::render::Pass{model_program});
+			model_spectrum->AddPass(ion::graphics::render::Pass{/*model_program*/});
 
 			/*auto box = scene.CreateModel();
 			box->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.25_r, 0.30_r}, color::DeepPink});
@@ -1742,12 +1742,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//circle2->ShowBoundingVolumes(true);*/
 
 			//GUI models
+			//Cursor
 			auto mouse_cursor_model = scene.CreateModel();
 			auto mouse_cursor_sprite = mouse_cursor_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r}, mouse_cursor}); //Mouse cursor
 
 			mouse_cursor_sprite->AutoSize(true);
-			mouse_cursor_model->AddPass(ion::graphics::render::Pass{model_program});
+			mouse_cursor_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
 
 			//Tooltip
 			auto w = 0.1_r;
@@ -1781,7 +1782,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_left->AutoRepeat(true);
 			tooltip_bottom->AutoRepeat(true);
 			tooltip_right->AutoRepeat(true);
-			tooltip_model->AddPass(ion::graphics::render::Pass{model_program});
+			tooltip_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
 
 			//Button
 			w = 0.1_r;
@@ -1814,7 +1815,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_left->AutoRepeat(true);
 			button_bottom->AutoRepeat(true);
 			button_right->AutoRepeat(true);
-			button_model->AddPass(ion::graphics::render::Pass{model_program});
+			button_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
 
 			//Check box
 			w = 0.056_r;
@@ -1849,7 +1850,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_box_left->AutoRepeat(true);
 			check_box_bottom->AutoRepeat(true);
 			check_box_right->AutoRepeat(true);
-			check_box_model->AddPass(ion::graphics::render::Pass{model_program});
+			check_box_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
 
 			//Radio button
 			w = 0.056_r;
@@ -1884,7 +1885,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			radio_button_left->AutoRepeat(true);
 			radio_button_bottom->AutoRepeat(true);
 			radio_button_right->AutoRepeat(true);
-			radio_button_model->AddPass(ion::graphics::render::Pass{model_program});
+			radio_button_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
 
 			//Radio button 2
 			w = 0.056_r;
@@ -1919,20 +1920,21 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			radio_button2_left->AutoRepeat(true);
 			radio_button2_bottom->AutoRepeat(true);
 			radio_button2_right->AutoRepeat(true);
-			radio_button2_model->AddPass(ion::graphics::render::Pass{model_program});
+			radio_button2_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
 
 			//GUI Caption
 
 			//Tooltip caption
 			auto tooltip_caption = scene.CreateText(caption_text);
-			tooltip_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
+			tooltip_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 
+			//Label caption
 			auto label_caption = scene.CreateText(caption_text);
-			label_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
+			label_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 
 			//Button caption
 			auto button_caption = scene.CreateText(caption_text);
-			button_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
+			button_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 			
 			ion::graphics::fonts::text::TextBlockStyle button_caption_style_enabled;
 			button_caption_style_enabled.ForegroundColor = caption_text->DefaultForegroundColor();
@@ -1946,15 +1948,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Check box caption
 			auto check_box_caption = scene.CreateText(caption_text);
-			check_box_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
+			check_box_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 
 			//Radio button caption
 			auto radio_button_caption = scene.CreateText(caption_text);
-			radio_button_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
+			radio_button_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 
 			//Radio button 2 caption
 			auto radio_button2_caption = scene.CreateText(caption_text);
-			radio_button2_caption->AddPass(ion::graphics::render::Pass{gui_text_program});
+			radio_button2_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 
 
 			//Scene graph
@@ -2183,13 +2185,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto button = base_panel->CreateButton("button", "My button", "My button tooltip", std::move(button_skin), Vector2{0.5_r, 0.1_r});
 			button->Node()->Position({0.0_r, 0.5_r});
 
-			auto check_box = base_panel->CreateCheckBox("check_box", {}, "My check box tooltip", std::move(check_box_skin));
+			auto check_box = base_panel->CreateCheckBox("check_box", "My check box", "My check box tooltip", std::move(check_box_skin));
 			check_box->Node()->Position({0.0_r, 0.3_r});
 
-			auto radio_button = base_panel->CreateRadioButton("radio_button", {}, "My radio button tooltip", std::move(radio_button_skin));
+			auto radio_button = base_panel->CreateRadioButton("radio_button", "My radio button", "My radio button tooltip", std::move(radio_button_skin));
 			radio_button->Node()->Position({-0.05_r, 0.2_r});
+			radio_button->CaptionLayout(ion::gui::controls::gui_control::ControlCaptionLayout::OutsideLeftCenter);
 
-			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", {}, "My radio button tooltip", std::move(radio_button2_skin));
+			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", "My radio button", "My radio button tooltip", std::move(radio_button2_skin));
 			radio_button2->Node()->Position({0.05_r, 0.2_r});
 
 			auto sub_panel = base_panel->CreatePanel("sub");
