@@ -103,6 +103,10 @@ namespace ion::gui
 			{
 				return iter == std::begin(frames) ? std::end(frames) - 1 : iter - 1;
 			}
+
+
+			Vector2 cursor_hot_spot_offset(GuiMouseCursorHotSpot hot_spot, const Vector2 &cursor_size) noexcept;
+			Vector2 tooltip_hot_spot_offset(GuiMouseCursorHotSpot hot_spot, const Vector2 &tooltip_size, const Vector2 &cursor_size) noexcept;
 		} //detail
 	} //gui_controller
 

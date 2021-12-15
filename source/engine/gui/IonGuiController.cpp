@@ -118,6 +118,78 @@ std::optional<frame_pointers::const_iterator> get_frame_iterator(const frames &f
 	}
 }
 
+
+Vector2 cursor_hot_spot_offset(GuiMouseCursorHotSpot hot_spot, const Vector2 &cursor_size) noexcept
+{
+	auto [half_width, half_height] = (cursor_size * 0.5_r).XY();
+
+	switch (hot_spot)
+	{
+		case GuiMouseCursorHotSpot::TopLeft:
+		return {half_width, -half_height};
+
+		case GuiMouseCursorHotSpot::TopCenter:
+		return {0.0_r, -half_height};
+
+		case GuiMouseCursorHotSpot::TopRight:
+		return {-half_width, -half_height};
+
+		case GuiMouseCursorHotSpot::Left:
+		return {half_width, 0.0_r};
+
+		case GuiMouseCursorHotSpot::Right:
+		return {-half_width, 0.0_r};
+
+		case GuiMouseCursorHotSpot::BottomLeft:
+		return {half_width, half_height};
+
+		case GuiMouseCursorHotSpot::BottomCenter:
+		return {0.0_r, half_height};
+
+		case GuiMouseCursorHotSpot::BottomRight:
+		return {-half_width, half_height};
+
+		default:
+		return vector2::Zero;
+	}
+}
+
+Vector2 tooltip_hot_spot_offset(GuiMouseCursorHotSpot hot_spot, const Vector2 &tooltip_size, const Vector2 &cursor_size) noexcept
+{
+	auto [half_width, half_height] = (tooltip_size * 0.5_r).XY();
+	auto [cursor_width, cursor_height] = cursor_size.XY();
+
+	switch (hot_spot)
+	{
+		case gui_controller::GuiMouseCursorHotSpot::TopLeft:
+		return {half_width, -half_height - cursor_height};
+
+		case gui_controller::GuiMouseCursorHotSpot::TopCenter:
+		return {0.0_r, -half_height - cursor_height};
+
+		case gui_controller::GuiMouseCursorHotSpot::TopRight:
+		return {-half_width, -half_height - cursor_height};
+
+		case gui_controller::GuiMouseCursorHotSpot::Left:
+		return {half_width, -half_height - cursor_height * 0.5_r};
+
+		case gui_controller::GuiMouseCursorHotSpot::Right:
+		return {-half_width, -half_height - cursor_height * 0.5_r};
+
+		case gui_controller::GuiMouseCursorHotSpot::BottomLeft:
+		return {half_width, half_height + cursor_height};
+
+		case gui_controller::GuiMouseCursorHotSpot::BottomCenter:
+		return {0.0_r, half_height + cursor_height};
+
+		case gui_controller::GuiMouseCursorHotSpot::BottomRight:
+		return {-half_width, half_height + cursor_height};
+
+		default:
+		return {0.0_r, -half_height - cursor_height * 0.5_r};
+	}
+}
+
 } //gui_controller::detail
 
 
@@ -396,43 +468,12 @@ void GuiController::UpdateMouseCursor(const Vector2 &position) noexcept
 	{
 		if (auto node = mouse_cursor_skin_->ParentNode(); node)
 		{
-			auto [half_width, half_height] =
-				(mouse_cursor_skin_->AxisAlignedBoundingBox().ToHalfSize() * node->DerivedScaling()).XY();
+			auto cursor_size =
+				mouse_cursor_skin_->AxisAlignedBoundingBox().ToSize() * node->DerivedScaling();
 
 			//Adjust from center to hot spot
 			auto hot_spot_off =
-				[&]() noexcept -> Vector2
-				{
-					switch (mouse_cursor_hot_spot_)
-					{
-						case GuiMouseCursorHotSpot::TopLeft:
-						return {half_width, -half_height};
-
-						case GuiMouseCursorHotSpot::TopCenter:
-						return {0.0_r, -half_height};
-
-						case GuiMouseCursorHotSpot::TopRight:
-						return {-half_width, -half_height};
-
-						case GuiMouseCursorHotSpot::Left:
-						return {half_width, 0.0_r};
-
-						case GuiMouseCursorHotSpot::Right:
-						return {-half_width, 0.0_r};
-
-						case GuiMouseCursorHotSpot::BottomLeft:
-						return {half_width, half_height};
-
-						case GuiMouseCursorHotSpot::BottomCenter:
-						return {0.0_r, half_height};
-
-						case GuiMouseCursorHotSpot::BottomRight:
-						return {-half_width, half_height};
-
-						default:
-						return vector2::Zero;
-					}
-				}();
+				detail::cursor_hot_spot_offset(mouse_cursor_hot_spot_, cursor_size);
 
 			node->DerivedPosition(position + hot_spot_off);
 		}
