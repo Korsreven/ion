@@ -340,6 +340,70 @@ NonOwningPtr<controls::GuiRadioButton> GuiPanelContainer::CreateRadioButton(cont
 
 
 /*
+	Scroll bar
+	Creating
+*/
+
+NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(std::string name, std::optional<std::string> caption,
+	std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin)
+{
+	return CreateControl<controls::GuiScrollBar>(std::move(name), std::move(caption), std::move(tooltip),
+		make_owning<controls::gui_scroll_bar::ScrollBarSkin>(std::move(skin)));
+}
+
+NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(std::string name, std::optional<std::string> caption,
+	std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin, const Vector2 &size)
+{
+	return CreateControl<controls::GuiScrollBar>(std::move(name), std::move(caption), std::move(tooltip),
+		make_owning<controls::gui_scroll_bar::ScrollBarSkin>(std::move(skin)), size);
+}
+
+NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(std::string name, std::optional<std::string> caption,
+	std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin, controls::gui_control::Areas areas)
+{
+	return CreateControl<controls::GuiScrollBar>(std::move(name), std::move(caption), std::move(tooltip),
+		make_owning<controls::gui_scroll_bar::ScrollBarSkin>(std::move(skin)), std::move(areas));
+}
+
+NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(controls::GuiScrollBar &&scroll_bar)
+{
+	return CreateControl<controls::GuiScrollBar>(std::move(scroll_bar));
+}
+
+
+/*
+	Slider
+	Creating
+*/
+
+NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(std::string name, std::optional<std::string> caption,
+	std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin)
+{
+	return CreateControl<controls::GuiSlider>(std::move(name), std::move(caption), std::move(tooltip),
+		make_owning<controls::gui_slider::SliderSkin>(std::move(skin)));
+}
+
+NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(std::string name, std::optional<std::string> caption,
+	std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin, const Vector2 &size)
+{
+	return CreateControl<controls::GuiSlider>(std::move(name), std::move(caption), std::move(tooltip),
+		make_owning<controls::gui_slider::SliderSkin>(std::move(skin)), size);
+}
+
+NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(std::string name, std::optional<std::string> caption,
+	std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin, controls::gui_control::Areas areas)
+{
+	return CreateControl<controls::GuiSlider>(std::move(name), std::move(caption), std::move(tooltip),
+		make_owning<controls::gui_slider::SliderSkin>(std::move(skin)), std::move(areas));
+}
+
+NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(controls::GuiSlider &&slider)
+{
+	return CreateControl<controls::GuiSlider>(std::move(slider));
+}
+
+
+/*
 	Controls
 	Retrieving
 */

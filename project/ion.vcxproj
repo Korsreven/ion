@@ -258,6 +258,8 @@
     <ClCompile Include="..\source\engine\gui\controls\IonGuiControl.cpp" />
     <ClCompile Include="..\source\engine\gui\controls\IonGuiLabel.cpp" />
     <ClCompile Include="..\source\engine\gui\controls\IonGuiRadioButton.cpp" />
+    <ClCompile Include="..\source\engine\gui\controls\IonGuiScrollBar.cpp" />
+    <ClCompile Include="..\source\engine\gui\controls\IonGuiSlider.cpp" />
     <ClCompile Include="..\source\engine\gui\controls\IonGuiTooltip.cpp" />
     <ClCompile Include="..\source\engine\gui\IonGuiComponent.cpp" />
     <ClCompile Include="..\source\engine\gui\IonGuiContainer.cpp" />
@@ -431,7 +433,9 @@
     <ClInclude Include="..\source\engine\gui\controls\IonGuiControl.h" />
     <ClInclude Include="..\source\engine\gui\controls\IonGuiLabel.h" />
     <ClInclude Include="..\source\engine\gui\controls\IonGuiRadioButton.h" />
+    <ClInclude Include="..\source\engine\gui\controls\IonGuiSlider.h" />
     <ClInclude Include="..\source\engine\gui\controls\IonGuiTooltip.h" />
+    <ClInclude Include="..\source\engine\gui\controls\IonGuiScrollBar.h" />
     <ClInclude Include="..\source\engine\gui\IonGuiComponent.h" />
     <ClInclude Include="..\source\engine\gui\IonGuiContainer.h" />
     <ClInclude Include="..\source\engine\gui\IonGuiController.h" />

@@ -25,6 +25,8 @@ File:	IonGuiPanelContainer.h
 #include "controls/IonGuiCheckBox.h"
 #include "controls/IonGuiLabel.h"
 #include "controls/IonGuiRadioButton.h"
+#include "controls/IonGuiScrollBar.h"
+#include "controls/IonGuiSlider.h"
 #include "graphics/utilities/IonVector2.h"
 #include "memory/IonNonOwningPtr.h"
 
@@ -297,6 +299,48 @@ namespace ion::gui
 
 			//Create a radio button by moving the given radio button
 			NonOwningPtr<controls::GuiRadioButton> CreateRadioButton(controls::GuiRadioButton &&radio_button);
+
+
+			/*
+				Scroll bar
+				Creating
+			*/
+
+			//Create a scroll bar with the given name, caption, tooltip and skin
+			NonOwningPtr<controls::GuiScrollBar> CreateScrollBar(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin);
+
+			//Create a scroll bar with the given name, caption, tooltip, skin and size
+			NonOwningPtr<controls::GuiScrollBar> CreateScrollBar(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin, const Vector2 &size);
+
+			//Create a scroll bar with the given name, caption, tooltip, skin and size
+			NonOwningPtr<controls::GuiScrollBar> CreateScrollBar(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin, controls::gui_control::Areas areas);
+
+			//Create a scroll bar by moving the given scroll bar
+			NonOwningPtr<controls::GuiScrollBar> CreateScrollBar(controls::GuiScrollBar &&scroll_bar);
+
+
+			/*
+				Slider
+				Creating
+			*/
+
+			//Create a slider with the given name, caption, tooltip and skin
+			NonOwningPtr<controls::GuiSlider> CreateSlider(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin);
+
+			//Create a slider with the given name, caption, tooltip, skin and size
+			NonOwningPtr<controls::GuiSlider> CreateSlider(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin, const Vector2 &size);
+
+			//Create a slider with the given name, caption, tooltip, skin and size
+			NonOwningPtr<controls::GuiSlider> CreateSlider(std::string name, std::optional<std::string> caption,
+				std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin, controls::gui_control::Areas areas);
+
+			//Create a slider by moving the given slider
+			NonOwningPtr<controls::GuiSlider> CreateSlider(controls::GuiSlider &&slider);
 
 
 			/*
