@@ -12,13 +12,7 @@ File:	IonGuiCheckBox.cpp
 
 #include "IonGuiCheckBox.h"
 
-#include "graphics/scene/IonModel.h"
-#include "graphics/scene/IonSceneManager.h"
-#include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/scene/shapes/IonSprite.h"
-#include "gui/IonGuiController.h"
-#include "gui/IonGuiFrame.h"
-#include "gui/IonGuiPanel.h"
 
 namespace ion::gui::controls
 {
@@ -62,7 +56,7 @@ void GuiCheckBox::Clicked() noexcept
 	GuiControl::Clicked(); //Use base functionality
 }
 
-void GuiCheckBox::Resized(const Vector2 &from_size, const Vector2 &to_size) noexcept
+void GuiCheckBox::Resized(Vector2 from_size, Vector2 to_size) noexcept
 {
 	if (skin_)
 		detail::resize_skin(static_cast<CheckBoxSkin&>(*skin_), from_size, to_size);

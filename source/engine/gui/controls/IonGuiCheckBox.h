@@ -62,7 +62,7 @@ namespace ion::gui::controls
 			virtual void Clicked() noexcept override;
 
 			//See GuiControl::Resized for more details
-			virtual void Resized(const Vector2 &from_size, const Vector2 &to_size) noexcept override;
+			virtual void Resized(Vector2 from_size, Vector2 to_size) noexcept override;
 
 
 			//Called right after a check box has been checked

@@ -396,7 +396,7 @@ void GuiControl::StateChanged() noexcept
 }
 
 
-void GuiControl::Resized([[maybe_unused]] const Vector2 &from_size, [[maybe_unused]] const Vector2 &to_size) noexcept
+void GuiControl::Resized([[maybe_unused]] Vector2 from_size, [[maybe_unused]] Vector2 to_size) noexcept
 {
 	NotifyControlResized();
 }

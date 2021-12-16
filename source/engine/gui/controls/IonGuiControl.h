@@ -182,11 +182,6 @@ namespace ion::gui::controls
 			NonOwningPtr<graphics::scene::Model> BarPrecise;
 		};
 
-		struct ScrollBarSkin final
-		{
-			NonOwningPtr<graphics::scene::Model> Bar;
-		};
-
 		struct TextBoxSkin final
 		{
 			NonOwningPtr<graphics::scene::Model> Cursor;
@@ -446,7 +441,7 @@ namespace ion::gui::controls
 
 
 			//Called right after a control has been resized with the from and to size
-			virtual void Resized(const Vector2 &from_size, const Vector2 &to_size) noexcept;
+			virtual void Resized(Vector2 from_size, Vector2 to_size) noexcept;
 
 
 			/*
