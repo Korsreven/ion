@@ -20,7 +20,6 @@ File:	IonGuiCheckBox.h
 #include "events/IonCallback.h"
 #include "graphics/utilities/IonVector2.h"
 #include "memory/IonOwningPtr.h"
-#include "memory/IonNonOwningPtr.h"
 
 namespace ion::gui::controls
 {
