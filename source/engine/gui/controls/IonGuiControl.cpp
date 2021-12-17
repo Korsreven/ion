@@ -174,6 +174,9 @@ std::optional<Vector2> get_center_size(const ControlSkin &skin, bool include_cap
 
 Vector2 caption_offset(ControlCaptionLayout caption_layout, const Vector2 &size, const Vector2 &border_size) noexcept
 {
+	auto half_size = size * 0.5_r;
+	auto margin = border_size;
+
 	auto x =
 		[&]() noexcept
 		{
@@ -182,20 +185,20 @@ Vector2 caption_offset(ControlCaptionLayout caption_layout, const Vector2 &size,
 				case ControlCaptionLayout::OutsideLeftTop:
 				case ControlCaptionLayout::OutsideLeftCenter:
 				case ControlCaptionLayout::OutsideLeftBottom:
-				return -size.X() - border_size.X();
+				return -half_size.X() - border_size.X() - margin.X();
 
 				case ControlCaptionLayout::OutsideRightTop:
 				case ControlCaptionLayout::OutsideRightCenter:
 				case ControlCaptionLayout::OutsideRightBottom:
-				return size.X() + border_size.X();
+				return half_size.X() + border_size.X() + margin.X();
 
 				case ControlCaptionLayout::OutsideTopLeft:
 				case ControlCaptionLayout::OutsideBottomLeft:
-				return -size.X();
+				return -half_size.X();
 
 				case ControlCaptionLayout::OutsideTopRight:
 				case ControlCaptionLayout::OutsideBottomRight:
-				return size.X();
+				return half_size.X();
 
 				default:
 				return 0.0_r;
@@ -210,20 +213,20 @@ Vector2 caption_offset(ControlCaptionLayout caption_layout, const Vector2 &size,
 				case ControlCaptionLayout::OutsideTopLeft:
 				case ControlCaptionLayout::OutsideTopCenter:
 				case ControlCaptionLayout::OutsideTopRight:
-				return size.Y() + border_size.Y();
+				return half_size.Y() + border_size.Y() + margin.Y();
 
 				case ControlCaptionLayout::OutsideBottomLeft:
 				case ControlCaptionLayout::OutsideBottomCenter:
 				case ControlCaptionLayout::OutsideBottomRight:
-				return -size.Y() - border_size.Y();
+				return -half_size.Y() - border_size.Y() - margin.Y();
 
 				case ControlCaptionLayout::OutsideLeftTop:
 				case ControlCaptionLayout::OutsideRightTop:				
-				return size.Y();
+				return half_size.Y();
 
 				case ControlCaptionLayout::OutsideLeftBottom:
 				case ControlCaptionLayout::OutsideRightBottom:
-				return -size.Y();
+				return -half_size.Y();
 
 				default:
 				return 0.0_r;
