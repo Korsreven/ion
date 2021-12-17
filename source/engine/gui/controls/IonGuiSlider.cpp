@@ -21,6 +21,7 @@ namespace ion::gui::controls
 {
 
 using namespace gui_slider;
+using namespace types::type_literals;
 
 namespace gui_slider::detail
 {
@@ -59,18 +60,12 @@ void GuiSlider::Resized(Vector2 from_size, Vector2 to_size) noexcept
 	if (skin_)
 	{
 		//Handle should only resize to keep proportions
-		switch (type_)
-		{
-			case SliderType::Horizontal:
-			to_size.X(from_size.X() + (to_size.Y() - from_size.Y()));
-			break;
+		auto handle_size =
+			type_ == SliderType::Vertical ?
+			Vector2{to_size.X(), from_size.Y() + (to_size.X() - from_size.X())} :
+			Vector2{from_size.X() + (to_size.Y() - from_size.Y()), to_size.Y()};
 
-			case SliderType::Vertical:
-			to_size.Y(from_size.Y() + (to_size.X() - from_size.X()));
-			break;
-		}
-
-		detail::resize_skin(static_cast<SliderSkin&>(*skin_), from_size, to_size);
+		detail::resize_skin(static_cast<SliderSkin&>(*skin_), from_size, handle_size);
 	}
 
 	GuiControl::Resized(from_size, to_size); //Use base functionality
@@ -119,8 +114,6 @@ void GuiSlider::UpdateHandle() noexcept
 				value_or(visual_area.
 				value_or(aabb::Zero)); area != aabb::Zero)
 			{
-				auto percent = Percent();
-
 				auto [min, max] =
 					type_ == SliderType::Vertical ?
 					std::pair{area.Min().Y(), area.Max().Y()} :
@@ -133,8 +126,8 @@ void GuiSlider::UpdateHandle() noexcept
 				
 				auto handle_pos =
 					flipped_ ?
-					math::Lerp(max - handle_half_size, min + handle_half_size, percent) :
-					math::Lerp(min + handle_half_size, max - handle_half_size, percent);
+					math::Lerp(max - handle_half_size, min + handle_half_size, Percent()) :
+					math::Lerp(min + handle_half_size, max - handle_half_size, Percent());
 
 				skin.Handle->Position(
 					type_ == SliderType::Vertical ?
@@ -174,7 +167,18 @@ GuiSlider::GuiSlider(std::string name, std::optional<std::string> caption, std::
 	Modifiers
 */
 
-
+void GuiSlider::Percent(real percent) noexcept
+{
+	using namespace utilities;
+	Position(static_cast<int>(
+		math::Round(
+			math::Lerp(
+				static_cast<real>(progress_.Min()),
+				static_cast<real>(progress_.Max()),
+				percent)
+			)
+		));
+}
 
 
 /*
@@ -220,9 +224,9 @@ bool GuiSlider::KeyReleased([[maybe_unused]] KeyButton button) noexcept
 			case KeyButton::UpArrow:
 			case KeyButton::RightArrow:
 			{
-				if (progress_.Position() < max)
+				if (Position() < max)
 				{
-					Position(progress_.Position() + step_by_);
+					Position(Position() + step_by_amount_);
 					Changed();
 				}
 
@@ -233,9 +237,9 @@ bool GuiSlider::KeyReleased([[maybe_unused]] KeyButton button) noexcept
 			case KeyButton::DownArrow:
 			case KeyButton::LeftArrow:
 			{
-				if (progress_.Position() > min)
+				if (Position() > min)
 				{
-					Position(progress_.Position() - step_by_);
+					Position(Position() - step_by_amount_);
 					Changed();
 				}
 
@@ -265,12 +269,31 @@ bool GuiSlider::MouseReleased(MouseButton button, Vector2 position) noexcept
 	if (button == MouseButton::Left)
 	{
 		if (dragged_)
-		{
 			dragged_ = false;
-			return false;
-		}
 
-		//Todo
+		else if (auto [min, max] = Range(); min != max)
+		{
+			if (skin_)
+			{
+				if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
+				{
+					//Make position relative to handle
+					if (auto node = skin.Parts->ParentNode(); node)
+						position -= node->DerivedPosition();
+
+					auto &handle_pos = skin.Handle->Position();
+					auto delta_position =
+							(type_ == SliderType::Horizontal && position.X() < handle_pos.X()) ||
+							(type_ == SliderType::Vertical && position.Y() < handle_pos.Y()) ?
+							-step_by_amount_ : step_by_amount_;
+
+					if (flipped_)
+						Position(Position() - delta_position);
+					else
+						Position(Position() + delta_position);
+				}
+			}
+		}
 	}
 
 	return false;
@@ -280,13 +303,43 @@ bool GuiSlider::MouseMoved(Vector2 position) noexcept
 {
 	if (auto [min, max] = Range(); min != max && dragged_)
 	{
-		//Todo
+		if (skin_)
+		{
+			if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
+			{
+				//Make position relative to handle
+				if (auto node = skin.Parts->ParentNode(); node)
+					position -= node->DerivedPosition();
+
+				auto visual_area =
+					gui_control::detail::get_visual_area(*skin_, true);
+				auto center_area =
+					gui_control::detail::get_center_area(*skin_, true);
+			
+				//Set handle position
+				if (auto area = center_area.
+					value_or(visual_area.
+					value_or(aabb::Zero)); area != aabb::Zero)
+				{
+					auto size = area.ToSize() - skin.Handle->Size();
+					auto percent =
+						type_ == SliderType::Vertical ?
+							(position.Y() + size.Y() * 0.5_r) / size.Y() :
+							(position.X() + size.X() * 0.5_r) / size.X();
+
+					if (flipped_)
+						Percent(1.0_r - percent);
+					else
+						Percent(percent);
+				}
+			}
+		}
 	}
 
 	return false;
 }
 
-bool GuiSlider::MouseWheelRolled(int delta, Vector2 position) noexcept
+bool GuiSlider::MouseWheelRolled(int delta, [[maybe_unused]] Vector2 position) noexcept
 {
 	//Up or down
 	if (delta != 0)

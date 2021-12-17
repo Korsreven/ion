@@ -28,7 +28,6 @@ namespace ion::gui::controls
 {
 	using namespace events::listeners;
 	using namespace graphics::utilities;
-	using namespace types::type_literals;
 
 	namespace gui_slider
 	{
@@ -98,8 +97,8 @@ namespace ion::gui::controls
 
 			gui_slider::SliderType type_ = gui_slider::SliderType::Horizontal;
 			bool flipped_ = false;
-			types::Progress<real> progress_;
-			real step_by_ = 1.0_r;
+			types::Progress<int> progress_;
+			int step_by_amount_ = 1;
 
 			bool dragged_ = false;
 
@@ -171,17 +170,10 @@ namespace ion::gui::controls
 
 
 			//Sets the position to the given percentage in range [0.0, 1.0]
-			inline void Percent(real percent) noexcept
-			{
-				if (progress_.Percent() != percent)
-				{
-					progress_.Percent(percent);
-					UpdateHandle();
-				}
-			}
+			void Percent(real percent) noexcept;
 
 			//Sets the position of this slider to the given value
-			inline void Position(real position) noexcept
+			inline void Position(int position) noexcept
 			{
 				if (progress_.Position() != position)
 				{
@@ -191,7 +183,7 @@ namespace ion::gui::controls
 			}
 
 			//Sets the range of this slider to the given range
-			inline void Range(real min, real max) noexcept
+			inline void Range(int min, int max) noexcept
 			{
 				if (auto range = std::pair{min, max}; progress_.MinMax() != range)
 				{
@@ -200,10 +192,10 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the step by units of this slider to the given units
-			inline void StepBy(real units) noexcept
+			//Sets the step by amount for this slider to the given amount
+			inline void StepByAmount(int amount) noexcept
 			{
-				step_by_ = units;
+				step_by_amount_ = amount;
 			}
 
 
@@ -238,7 +230,7 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto Position() const noexcept
 			{
 				return progress_.Position();
-			}
+			}		
 
 			//Returns the range of this slider
 			[[nodiscard]] inline auto Range() const noexcept
@@ -246,11 +238,12 @@ namespace ion::gui::controls
 				return progress_.MinMax();
 			}
 
-			//Returns the step by units of this slider
-			[[nodiscard]] inline auto StepBy() const noexcept
+			//Returns the step by amount for this slider
+			[[nodiscard]] inline auto StepByAmount() const noexcept
 			{
-				return step_by_;
+				return step_by_amount_;
 			}
+
 
 			/*
 				Intersecting

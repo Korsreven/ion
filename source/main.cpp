@@ -1924,6 +1924,41 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			radio_button2_right->AutoRepeat(true);
 			radio_button2_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
 
+			//Slider
+			w = 0.056_r;
+			h = 0.056_r;
+
+			auto slider_model = scene.CreateModel();
+			auto slider_center = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
+			auto slider_handle = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Handle
+			
+			auto slider_top = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
+			auto slider_left = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
+			auto slider_bottom = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
+			auto slider_right = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
+
+			auto slider_top_left = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
+			auto slider_bottom_left = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
+			auto slider_top_right = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
+			auto slider_bottom_right = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
+
+			slider_center->AutoRepeat(true);
+			slider_top->AutoRepeat(true);
+			slider_left->AutoRepeat(true);
+			slider_bottom->AutoRepeat(true);
+			slider_right->AutoRepeat(true);
+			slider_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+
 			//GUI Caption
 
 			//Tooltip caption
@@ -1959,6 +1994,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Radio button 2 caption
 			auto radio_button2_caption = scene.CreateText(caption_text);
 			radio_button2_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+
+			//Slider caption
+			auto slider_caption = scene.CreateText(caption_text);
+			slider_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 
 
 			//Scene graph
@@ -2164,6 +2203,50 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			radio_button2_skin.Caption.EnabledStyle = button_caption_style_enabled;
 			radio_button2_skin.Caption.DisabledStyle = button_caption_style_disabled;
 
+			//Slider skin
+			ion::gui::controls::gui_slider::SliderSkin slider_skin;
+			slider_skin.Parts.ModelObject = slider_model;
+			slider_skin.Parts.Center.SpriteObject = slider_center;
+			slider_skin.Parts.Top.SpriteObject = slider_top;
+			slider_skin.Parts.Left.SpriteObject = slider_left;
+			slider_skin.Parts.Bottom.SpriteObject = slider_bottom;
+			slider_skin.Parts.Right.SpriteObject = slider_right;
+			slider_skin.Parts.TopLeft.SpriteObject = slider_top_left;
+			slider_skin.Parts.BottomLeft.SpriteObject = slider_bottom_left;
+			slider_skin.Parts.TopRight.SpriteObject = slider_top_right;
+			slider_skin.Parts.BottomRight.SpriteObject = slider_bottom_right;
+
+			slider_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
+			slider_skin.Parts.Center.DisabledMaterial = check_box_center_enabled;
+			slider_skin.Parts.Center.PressedMaterial = check_box_center_enabled;
+			slider_skin.Parts.Center.HoveredMaterial = check_box_center_hovered;
+			slider_skin.Parts.Top.EnabledMaterial = button_top_enabled;
+			slider_skin.Parts.Top.FocusedMaterial = button_top_focused;
+			slider_skin.Parts.Left.EnabledMaterial = button_left_enabled;
+			slider_skin.Parts.Left.FocusedMaterial = button_left_focused;
+			slider_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
+			slider_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
+			slider_skin.Parts.Right.EnabledMaterial = button_right_enabled;
+			slider_skin.Parts.Right.FocusedMaterial = button_right_focused;
+			slider_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
+			slider_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
+			slider_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
+			slider_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
+			slider_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
+			slider_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
+			slider_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
+			slider_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
+
+			slider_skin.Handle.SpriteObject = slider_handle;
+			slider_skin.Handle.EnabledMaterial = radio_button_select_enabled;
+			slider_skin.Handle.DisabledMaterial = radio_button_select_disabled;
+			slider_skin.Handle.PressedMaterial = radio_button_select_pressed;
+			slider_skin.Handle.HoveredMaterial = radio_button_select_hovered;
+
+			slider_skin.Caption.TextObject = slider_caption;
+			slider_skin.Caption.EnabledStyle = button_caption_style_enabled;
+			slider_skin.Caption.DisabledStyle = button_caption_style_disabled;
+
 
 			//GUI
 			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
@@ -2181,11 +2264,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			base_panel->ZOrder(0.1_r);
 
 			auto label = base_panel->CreateLabel("label", "My label", std::move(label_skin));
-			label->Node()->Position({0.0_r, 0.7_r});
+			label->Node()->Position({0.0_r, 0.5_r});
 			label->Tooltip("My label tooltip");
 
 			auto button = base_panel->CreateButton("button", "My button", "My button tooltip", std::move(button_skin), Vector2{0.5_r, 0.1_r});
-			button->Node()->Position({0.0_r, 0.5_r});
+			button->Node()->Position({0.0_r, 0.4_r});
 
 			auto check_box = base_panel->CreateCheckBox("check_box", "My check box", "My check box tooltip", std::move(check_box_skin));
 			check_box->Node()->Position({0.0_r, 0.3_r});
@@ -2196,6 +2279,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", "My radio button", "My radio button tooltip", std::move(radio_button2_skin));
 			radio_button2->Node()->Position({0.05_r, 0.2_r});
+
+			auto slider = base_panel->CreateSlider("slider", "My slider", "My slider tooltip", std::move(slider_skin), Vector2{0.75_r, 0.067_r});
+			slider->Node()->Position({0.0_r, 0.6_r});
+			//slider->Node()->Position({-1.0_r, 0.2_r});
+			//slider->Type(ion::gui::controls::gui_slider::SliderType::Vertical);
+			slider->Range(0, 20);
+			slider->StepByAmount(5);
 
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);
