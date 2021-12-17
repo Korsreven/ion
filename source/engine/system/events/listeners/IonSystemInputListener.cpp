@@ -184,7 +184,7 @@ bool InputListener::MessageReceived(HWND, UINT message, WPARAM w_param, LPARAM l
 
 		case WM_MOUSEWHEEL:
 		{
-			MouseWheelRolled(static_cast<int>(HIWORD(w_param)), //delta
+			MouseWheelRolled(static_cast<short>(HIWORD(w_param)), //delta
 				ViewAdjusted({static_cast<real>(LOWORD(l_param)), //x
 							  static_cast<real>(HIWORD(l_param))})); //y
 			return true;
