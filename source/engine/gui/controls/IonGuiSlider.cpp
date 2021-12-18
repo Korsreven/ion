@@ -109,24 +109,18 @@ void GuiSlider::SetState(gui_control::ControlState state) noexcept
 	Skins
 */
 
-void GuiSlider::SetType(SliderType type) noexcept
+void GuiSlider::FlipHandle() noexcept
 {
-	if (type_ != type)
+	if (auto size = Size(); size && skin_)
 	{
-		if (auto size = Size(); size)
+		auto [width, height] = size->XY();
+		Resized(*size, {height, width});
+
+		if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
 		{
-			auto [width, height] = size->XY();
-			Resized(*size, {height, width});
-
-			if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
-			{
-				auto [handle_width, handle_height] = skin.Handle->Size().XY();
-				detail::resize_skin(skin, skin.Handle->Size(), {handle_height, handle_width});
-			}
+			auto [handle_width, handle_height] = skin.Handle->Size().XY();
+			detail::resize_skin(skin, skin.Handle->Size(), {handle_height, handle_width});
 		}
-
-		type_ = type;
-		UpdateHandle();
 	}
 }
 
@@ -303,21 +297,21 @@ bool GuiSlider::MouseReleased(MouseButton button, Vector2 position) noexcept
 		if (dragged_)
 			dragged_ = false;
 
-		else if (auto [min, max] = Range(); min != max)
+		else if (auto [min, max] = Range(); min != max && skin_)
 		{
-			if (skin_)
+			if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
 			{
-				if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
+				//Make position relative to handle
+				if (auto node = skin.Parts->ParentNode(); node)
 				{
-					//Make position relative to handle
-					if (auto node = skin.Parts->ParentNode(); node)
-						position -= node->DerivedPosition();
+					auto handle_position =
+						skin.Handle->Position() * node->DerivedScaling();
+					position -= node->DerivedPosition();
 
-					auto &handle_pos = skin.Handle->Position();
 					auto delta_position =
-							(type_ == SliderType::Horizontal && position.X() < handle_pos.X()) ||
-							(type_ == SliderType::Vertical && position.Y() < handle_pos.Y()) ?
-							-step_by_amount_ : step_by_amount_;
+						(type_ == SliderType::Horizontal && position.X() < handle_position.X()) ||
+						(type_ == SliderType::Vertical && position.Y() < handle_position.Y()) ?
+						-step_by_amount_ : step_by_amount_;
 
 					if (flipped_)
 						Position(Position() - delta_position);
@@ -333,16 +327,13 @@ bool GuiSlider::MouseReleased(MouseButton button, Vector2 position) noexcept
 
 bool GuiSlider::MouseMoved(Vector2 position) noexcept
 {
-	if (auto [min, max] = Range(); min != max && dragged_)
+	if (auto [min, max] = Range(); min != max && dragged_ && skin_)
 	{
-		if (skin_)
+		if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
 		{
-			if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
+			//Make position relative to handle
+			if (auto node = skin.Parts->ParentNode(); node)
 			{
-				//Make position relative to handle
-				if (auto node = skin.Parts->ParentNode(); node)
-					position -= node->DerivedPosition();
-
 				auto visual_area =
 					gui_control::detail::get_visual_area(*skin_, true);
 				auto center_area =
@@ -353,11 +344,14 @@ bool GuiSlider::MouseMoved(Vector2 position) noexcept
 					value_or(visual_area.
 					value_or(aabb::Zero)); area != aabb::Zero)
 				{
-					auto size = area.ToSize() - skin.Handle->Size();
+					auto size =
+						(area.ToSize() - skin.Handle->Size()) * node->DerivedScaling();
+					position -= node->DerivedPosition();
+
 					auto percent =
 						type_ == SliderType::Vertical ?
-							(position.Y() + size.Y() * 0.5_r) / size.Y() :
-							(position.X() + size.X() * 0.5_r) / size.X();
+						(position.Y() + size.Y() * 0.5_r) / size.Y() :
+						(position.X() + size.X() * 0.5_r) / size.X();
 
 					if (flipped_)
 						Percent(1.0_r - percent);

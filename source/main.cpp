@@ -1957,7 +1957,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
 
 			auto slider_handle = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w * 2.5_r, h * 0.75_r}, nullptr}); //Handle
+				{0.0_r, 0.0_r, 0.0_r}, {w, h * 2.0_r}, nullptr}); //Handle
 			slider_handle->IncludeBoundingVolumes(false);
 
 			slider_center->AutoRepeat(true);
