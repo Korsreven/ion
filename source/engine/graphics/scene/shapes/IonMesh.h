@@ -230,7 +230,7 @@ namespace ion::graphics::scene::shapes
 				{
 					vertex_data_ = mesh::detail::vertices_to_vertex_data(vertices);
 					vertex_batch_.VertexData(vertex_data_);
-					update_bounding_volumes_ = include_bounding_volumes_;
+					update_bounding_volumes_ = true;
 					update_tex_coords_ = true;
 				}
 			}
@@ -244,7 +244,7 @@ namespace ion::graphics::scene::shapes
 				{
 					vertex_data_ = std::move(vertex_data);
 					vertex_batch_.VertexData(vertex_data_);
-					update_bounding_volumes_ = include_bounding_volumes_;
+					update_bounding_volumes_ = true;
 					update_tex_coords_ = true;
 				}
 			}
@@ -259,20 +259,13 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets if this mesh should include bounding volumes or not
+			//Sets if the bounding volumes from this mesh should be included in the model or not
 			inline void IncludeBoundingVolumes(bool include) noexcept
 			{
 				if (include_bounding_volumes_ != include)
 				{
 					include_bounding_volumes_ = include;
-					update_bounding_volumes_ = include;
-
-					if (!include)
-					{
-						aabb_ = {};
-						obb_ = {};
-						sphere_ = {};
-					}
+					update_bounding_volumes_ = true;
 				}
 			}
 
@@ -329,7 +322,7 @@ namespace ion::graphics::scene::shapes
 				return vertex_data_;
 			}
 
-			//Returns true if this mesh is including bounding volumes
+			//Returns true if the bounding volumes from this mesh should be included in the model
 			[[nodiscard]] inline auto IncludeBoundingVolumes() const noexcept
 			{
 				return include_bounding_volumes_;

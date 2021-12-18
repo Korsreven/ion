@@ -107,7 +107,10 @@ void Model::Prepare() noexcept
 		aabb_ = {};
 
 		for (auto &mesh : Meshes())
-			aabb_.Merge(mesh.AxisAlignedBoundingBox());
+		{
+			if (mesh.IncludeBoundingVolumes())
+				aabb_.Merge(mesh.AxisAlignedBoundingBox());
+		}
 
 		obb_ = aabb_;
 		sphere_ = {aabb_.ToHalfSize().Max(), aabb_.Center()};
