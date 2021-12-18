@@ -12,6 +12,8 @@ File:	IonGuiSlider.cpp
 
 #include "IonGuiSlider.h"
 
+#include <algorithm>
+
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/scene/shapes/IonSprite.h"
@@ -59,13 +61,24 @@ void GuiSlider::Resized(Vector2 from_size, Vector2 to_size) noexcept
 {
 	if (skin_)
 	{
-		//Handle should only resize to keep proportions
-		auto handle_size =
-			type_ == SliderType::Vertical ?
-			Vector2{to_size.X(), from_size.Y() + (to_size.X() - from_size.X())} :
-			Vector2{from_size.X() + (to_size.Y() - from_size.Y()), to_size.Y()};
+		if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
+		{
+			auto [width, height] = skin.Handle->Size().XY();
+			auto delta_size = to_size - from_size;
 
-		detail::resize_skin(static_cast<SliderSkin&>(*skin_), from_size, handle_size);
+			auto aspect_ratio =
+				type_ == SliderType::Vertical ?
+				height / width :
+				width / height;
+
+			//Handle should only resize to keep proportions
+			auto handle_new_size =
+				type_ == SliderType::Vertical ?
+				Vector2{width + delta_size.X(), (width + delta_size.X()) * aspect_ratio} :
+				Vector2{(height + delta_size.Y()) * aspect_ratio, height + delta_size.Y()};
+
+			detail::resize_skin(skin, skin.Handle->Size(), handle_new_size);
+		}
 	}
 
 	GuiControl::Resized(from_size, to_size); //Use base functionality
@@ -95,6 +108,27 @@ void GuiSlider::SetState(gui_control::ControlState state) noexcept
 /*
 	Skins
 */
+
+void GuiSlider::SetType(SliderType type) noexcept
+{
+	if (type_ != type)
+	{
+		if (auto size = Size(); size)
+		{
+			auto [width, height] = size->XY();
+			Resized(*size, {height, width});
+
+			if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
+			{
+				auto [handle_width, handle_height] = skin.Handle->Size().XY();
+				detail::resize_skin(skin, skin.Handle->Size(), {handle_height, handle_width});
+			}
+		}
+
+		type_ = type;
+		UpdateHandle();
+	}
+}
 
 void GuiSlider::UpdateHandle() noexcept
 {
@@ -131,8 +165,8 @@ void GuiSlider::UpdateHandle() noexcept
 
 				skin.Handle->Position(
 					type_ == SliderType::Vertical ?
-					Vector2{skin.Handle->Position().X(), handle_pos} :
-					Vector2{handle_pos, skin.Handle->Position().Y()});
+					Vector2{0.0_r, handle_pos} :
+					Vector2{handle_pos, 0.0_r});
 			}
 		}
 	}
@@ -171,12 +205,10 @@ void GuiSlider::Percent(real percent) noexcept
 {
 	using namespace utilities;
 	Position(static_cast<int>(
-		math::Round(
-			math::Lerp(
-				static_cast<real>(progress_.Min()),
-				static_cast<real>(progress_.Max()),
-				percent)
-			)
+		math::Round(math::Lerp(
+			static_cast<real>(progress_.Min()),
+			static_cast<real>(progress_.Max()),
+			percent))
 		));
 }
 

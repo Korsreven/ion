@@ -123,6 +123,7 @@ namespace ion::gui::controls
 				Skins
 			*/
 
+			void SetType(gui_slider::SliderType type) noexcept;
 			virtual void UpdateHandle() noexcept;
 
 		public:
@@ -149,11 +150,7 @@ namespace ion::gui::controls
 			//Vertical type goes bottom to top
 			inline void Type(gui_slider::SliderType type) noexcept
 			{
-				if (type_ != type)
-				{
-					type_ = type;
-					UpdateHandle();
-				}
+				SetType(type);
 			}
 
 			//Sets whether or not this slider is flipped or not

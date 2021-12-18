@@ -1826,8 +1826,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto check_box_model = scene.CreateModel();
 			auto check_box_center = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
-			auto check_box_mark = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Check mark
 			
 			auto check_box_top = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
@@ -1847,6 +1845,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto check_box_bottom_right = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
 
+			auto check_box_mark = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Check mark
+			check_box_mark->IncludeBoundingVolumes(false);
+
 			check_box_center->AutoRepeat(true);
 			check_box_top->AutoRepeat(true);
 			check_box_left->AutoRepeat(true);
@@ -1860,9 +1862,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto radio_button_model = scene.CreateModel();
 			auto radio_button_center = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
-			auto radio_button_select = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Select
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center			
 			
 			auto radio_button_top = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
@@ -1882,6 +1882,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto radio_button_bottom_right = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
 
+			auto radio_button_select = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Select
+			radio_button_select->IncludeBoundingVolumes(false);
+
 			radio_button_center->AutoRepeat(true);
 			radio_button_top->AutoRepeat(true);
 			radio_button_left->AutoRepeat(true);
@@ -1895,9 +1899,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto radio_button2_model = scene.CreateModel();
 			auto radio_button2_center = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
-			auto radio_button2_select = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Select
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center		
 			
 			auto radio_button2_top = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
@@ -1917,6 +1919,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto radio_button2_bottom_right = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
 
+			auto radio_button2_select = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Select
+			radio_button2_select->IncludeBoundingVolumes(false);
+
 			radio_button2_center->AutoRepeat(true);
 			radio_button2_top->AutoRepeat(true);
 			radio_button2_left->AutoRepeat(true);
@@ -1931,8 +1937,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto slider_model = scene.CreateModel();
 			auto slider_center = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
-			auto slider_handle = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Handle
 			
 			auto slider_top = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
@@ -1951,6 +1955,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
 			auto slider_bottom_right = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
+
+			auto slider_handle = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w * 2.5_r, h * 0.75_r}, nullptr}); //Handle
+			slider_handle->IncludeBoundingVolumes(false);
 
 			slider_center->AutoRepeat(true);
 			slider_top->AutoRepeat(true);
@@ -2280,10 +2288,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", "My radio button", "My radio button tooltip", std::move(radio_button2_skin));
 			radio_button2->Node()->Position({0.05_r, 0.2_r});
 
-			auto slider = base_panel->CreateSlider("slider", "My slider", "My slider tooltip", std::move(slider_skin), Vector2{0.75_r, 0.067_r});
-			slider->Node()->Position({0.0_r, 0.6_r});
-			//slider->Node()->Position({-1.0_r, 0.2_r});
+			auto slider = base_panel->CreateSlider("slider", "My slider", "My slider tooltip", std::move(slider_skin), Vector2{1.0_r, 0.077_r});
+			//slider->Node()->Position({0.0_r, 0.6_r});
+			slider->Node()->Position({-1.0_r, -0.2_r});
 			//slider->Type(ion::gui::controls::gui_slider::SliderType::Vertical);
+			//slider->Size({0.077_r, 1.0_r});
 			slider->Range(0, 20);
 			slider->StepByAmount(5);
 
