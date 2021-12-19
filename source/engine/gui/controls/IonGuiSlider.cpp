@@ -132,20 +132,13 @@ void GuiSlider::UpdateHandle() noexcept
 	{
 		if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
 		{
-			auto visual_area =
-				gui_control::detail::get_visual_area(*skin_, true);
-			auto center_area =
-				gui_control::detail::get_center_area(*skin_, true);
-			
 			//Set handle position
-			if (auto area = center_area.
-				value_or(visual_area.
-				value_or(aabb::Zero)); area != aabb::Zero)
+			if (auto area = InnerArea(); area)
 			{
 				auto [min, max] =
 					type_ == SliderType::Vertical ?
-					std::pair{area.Min().Y(), area.Max().Y()} :
-					std::pair{area.Min().X(), area.Max().X()};
+					std::pair{area->Min().Y(), area->Max().Y()} :
+					std::pair{area->Min().X(), area->Max().X()};
 
 				auto handle_half_size =
 					(type_ == SliderType::Vertical ?
@@ -334,24 +327,16 @@ bool GuiSlider::MouseMoved(Vector2 position) noexcept
 			//Make position relative to handle
 			if (auto node = skin.Parts->ParentNode(); node)
 			{
-				auto visual_area =
-					gui_control::detail::get_visual_area(*skin_, true);
-				auto center_area =
-					gui_control::detail::get_center_area(*skin_, true);
-			
 				//Set handle position
-				if (auto area = center_area.
-					value_or(visual_area.
-					value_or(aabb::Zero)); area != aabb::Zero)
+				if (auto size = InnerSize(); size)
 				{
-					auto size =
-						(area.ToSize() - skin.Handle->Size()) * node->DerivedScaling();
+					size = (*size - skin.Handle->Size()) * node->DerivedScaling();
 					position -= node->DerivedPosition();
 
 					auto percent =
 						type_ == SliderType::Vertical ?
-						(position.Y() + size.Y() * 0.5_r) / size.Y() :
-						(position.X() + size.X() * 0.5_r) / size.X();
+						(position.Y() + size->Y() * 0.5_r) / size->Y() :
+						(position.X() + size->X() * 0.5_r) / size->X();
 
 					if (flipped_)
 						Percent(1.0_r - percent);

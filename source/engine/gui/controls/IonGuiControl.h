@@ -192,6 +192,7 @@ namespace ion::gui::controls
 
 		namespace detail
 		{
+			constexpr auto default_caption_margin_size = 4.0_r;
 			constexpr auto default_caption_padding_size = 2.0_r;
 
 
@@ -255,11 +256,14 @@ namespace ion::gui::controls
 			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 
 
-			std::optional<Aabb> get_visual_area(const ControlSkin &skin, bool include_caption) noexcept;
+			std::optional<Aabb> get_area(const ControlSkin &skin, bool include_caption) noexcept;
 			std::optional<Aabb> get_center_area(const ControlSkin &skin, bool include_caption) noexcept;
+			std::optional<Aabb> get_inner_area(const ControlSkin &skin, bool include_caption) noexcept;
 
-			std::optional<Vector2> get_visual_size(const ControlSkin &skin, bool include_caption) noexcept;
+			std::optional<Vector2> get_size(const ControlSkin &skin, bool include_caption) noexcept;
 			std::optional<Vector2> get_center_size(const ControlSkin &skin, bool include_caption) noexcept;
+			std::optional<Vector2> get_inner_size(const ControlSkin &skin, bool include_caption) noexcept;
+			std::optional<Vector2> get_border_size(const ControlSkin &skin, bool include_caption) noexcept;
 
 
 			inline auto is_caption_outside(ControlCaptionLayout caption_layout) noexcept
@@ -340,7 +344,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			Vector2 caption_offset(ControlCaptionLayout caption_layout, const Vector2 &size, const Vector2 &border_size) noexcept;
+			Vector2 caption_offset(ControlCaptionLayout caption_layout, const Vector2 &size, const Vector2 &border_size, const Vector2 &margin_size) noexcept;
 			Vector2 caption_area_offset(ControlCaptionLayout caption_layout, const Vector2 &size, const Vector2 &border_size) noexcept;
 		} //detail
 	} //gui_control
@@ -362,6 +366,7 @@ namespace ion::gui::controls
 			std::optional<std::string> tooltip_;	
 			
 			std::optional<Vector2> caption_size_;
+			std::optional<Vector2> caption_margin_;
 			std::optional<Vector2> caption_padding_;
 			gui_control::ControlCaptionLayout caption_layout_ = gui_control::ControlCaptionLayout::Center;
 
@@ -630,6 +635,16 @@ namespace ion::gui::controls
 				}
 			}
 
+			//Sets the caption margin for this control to the given margin
+			inline void CaptionMargin(const std::optional<Vector2> &margin) noexcept
+			{
+				if (caption_margin_ != margin)
+				{
+					caption_margin_ = margin;
+					UpdateCaption();
+				}
+			}
+
 			//Sets the caption padding for this control to the given padding
 			inline void CaptionPadding(const std::optional<Vector2> &padding) noexcept
 			{
@@ -828,11 +843,27 @@ namespace ion::gui::controls
 
 
 			//Returns the size of this control
+			//The returned size includes all parts or caption (if no parts)
 			//Returns nullopt if this control has no size
 			[[nodiscard]] inline auto& Size() const noexcept
 			{
 				return size_;
 			}
+
+			//Returns the center size of this control
+			//The returned size includes center part or caption (if no center)
+			//Returns nullopt if this control has no center size
+			[[nodiscard]] std::optional<Vector2> CenterSize() const noexcept;
+
+			//Returns the inner size of this control
+			//The returned size includes center area or area (if no center)
+			//Returns nullopt if this control has no inner size
+			[[nodiscard]] std::optional<Vector2> InnerSize() const noexcept;
+
+			//Returns the border size of this control
+			//Returns nullopt if this control has no border size
+			[[nodiscard]] std::optional<Vector2> BorderSize() const noexcept;
+
 
 			//Returns the caption text for this control
 			//Returns nullopt if this control has no caption
@@ -856,7 +887,14 @@ namespace ion::gui::controls
 				return caption_size_;
 			}
 
-			//Returns the caption padding size for this control
+			//Returns the caption margin for this control
+			//Returns nullopt if no custom caption margin has been set
+			[[nodiscard]] inline auto& CaptionMargin() const noexcept
+			{
+				return caption_margin_;
+			}
+
+			//Returns the caption padding for this control
 			//Returns nullopt if no custom caption padding has been set
 			[[nodiscard]] inline auto& CaptionPadding() const noexcept
 			{
@@ -889,14 +927,25 @@ namespace ion::gui::controls
 				return hit_areas_;
 			}
 
+
+			//Returns the area of this control
+			//The returned area includes all parts or caption (if no parts)
+			//Returns nullopt of this control has no area
+			[[nodiscard]] std::optional<Aabb> Area() const noexcept;
+
+			//Returns the inne area of this control
+			//The returned area includes center part or caption (if no center)
+			//Returns nullopt of this control has no center area
+			[[nodiscard]] std::optional<Aabb> CenterArea() const noexcept;
+
+			//Returns the inne area of this control
+			//The returned area includes center area or area (if no center)
+			//Returns nullopt of this control has no inner area
+			[[nodiscard]] std::optional<Aabb> InnerArea() const noexcept;
+
 			//Returns the hit area of this control
 			//Returns nullopt of this control has no hit area
 			[[nodiscard]] std::optional<Aabb> HitArea() const noexcept;
-
-			//Returns the visual area of this control
-			//The returned area includes the center and border parts (or caption)
-			//Returns nullopt of this control has no visuals
-			[[nodiscard]] std::optional<Aabb> VisualArea() const noexcept;
 
 
 			//Returns the on focus callback

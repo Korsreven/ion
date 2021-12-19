@@ -93,7 +93,7 @@ void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size
 }
 
 
-std::optional<Aabb> get_visual_area(const ControlSkin &skin, bool include_caption) noexcept
+std::optional<Aabb> get_area(const ControlSkin &skin, bool include_caption) noexcept
 {
 	if (skin.Parts)
 	{
@@ -154,13 +154,23 @@ std::optional<Aabb> get_center_area(const ControlSkin &skin, bool include_captio
 	return {};
 }
 
-
-std::optional<Vector2> get_visual_size(const ControlSkin &skin, bool include_caption) noexcept
+std::optional<Aabb> get_inner_area(const ControlSkin &skin, bool include_caption) noexcept
 {
-	if (auto area = get_visual_area(skin, include_caption); area)
+	if (auto center_area = get_center_area(skin, include_caption); center_area)
+		return center_area;
+	else if (auto area = get_area(skin, include_caption); area)
+		return area;
+	else
+		return {};
+}
+
+
+std::optional<Vector2> get_size(const ControlSkin &skin, bool include_caption) noexcept
+{
+	if (auto area = get_area(skin, include_caption); area)
 		return area->ToSize();
 	else
-		return std::nullopt;
+		return {};
 }
 
 std::optional<Vector2> get_center_size(const ControlSkin &skin, bool include_caption) noexcept
@@ -168,14 +178,32 @@ std::optional<Vector2> get_center_size(const ControlSkin &skin, bool include_cap
 	if (auto area = get_center_area(skin, include_caption); area)
 		return area->ToSize();
 	else
-		return std::nullopt;
+		return {};
+}
+
+std::optional<Vector2> get_inner_size(const ControlSkin &skin, bool include_caption) noexcept
+{
+	if (auto area = get_inner_area(skin, include_caption); area)
+		return area->ToSize();
+	else
+		return {};
+}
+
+std::optional<Vector2> get_border_size(const ControlSkin &skin, bool include_caption) noexcept
+{
+	if (auto size = get_size(skin, include_caption); size)
+	{
+		if (auto center_size = get_center_size(skin, include_caption); center_size)
+			return *size - *center_size;
+	}
+
+	return {};
 }
 
 
-Vector2 caption_offset(ControlCaptionLayout caption_layout, const Vector2 &size, const Vector2 &border_size) noexcept
+Vector2 caption_offset(ControlCaptionLayout caption_layout, const Vector2 &size, const Vector2 &border_size, const Vector2 &margin_size) noexcept
 {
 	auto half_size = size * 0.5_r;
-	auto margin = border_size;
 
 	auto x =
 		[&]() noexcept
@@ -185,12 +213,12 @@ Vector2 caption_offset(ControlCaptionLayout caption_layout, const Vector2 &size,
 				case ControlCaptionLayout::OutsideLeftTop:
 				case ControlCaptionLayout::OutsideLeftCenter:
 				case ControlCaptionLayout::OutsideLeftBottom:
-				return -half_size.X() - border_size.X() - margin.X();
+				return -half_size.X() - border_size.X() - margin_size.X();
 
 				case ControlCaptionLayout::OutsideRightTop:
 				case ControlCaptionLayout::OutsideRightCenter:
 				case ControlCaptionLayout::OutsideRightBottom:
-				return half_size.X() + border_size.X() + margin.X();
+				return half_size.X() + border_size.X() + margin_size.X();
 
 				case ControlCaptionLayout::OutsideTopLeft:
 				case ControlCaptionLayout::OutsideBottomLeft:
@@ -213,12 +241,12 @@ Vector2 caption_offset(ControlCaptionLayout caption_layout, const Vector2 &size,
 				case ControlCaptionLayout::OutsideTopLeft:
 				case ControlCaptionLayout::OutsideTopCenter:
 				case ControlCaptionLayout::OutsideTopRight:
-				return half_size.Y() + border_size.Y() + margin.Y();
+				return half_size.Y() + border_size.Y() + margin_size.Y();
 
 				case ControlCaptionLayout::OutsideBottomLeft:
 				case ControlCaptionLayout::OutsideBottomCenter:
 				case ControlCaptionLayout::OutsideBottomRight:
-				return -half_size.Y() - border_size.Y() - margin.Y();
+				return -half_size.Y() - border_size.Y() - margin_size.Y();
 
 				case ControlCaptionLayout::OutsideLeftTop:
 				case ControlCaptionLayout::OutsideRightTop:				
@@ -281,7 +309,7 @@ void GuiControl::Created() noexcept
 	{
 		if (auto to_size = size_; to_size)
 		{
-			size_ = detail::get_visual_size(*skin_, true);
+			size_ = detail::get_size(*skin_, true);
 			Size(*to_size);
 		}
 	}
@@ -834,52 +862,53 @@ void GuiControl::UpdateCaption() noexcept
 		//Caption text
 		if (auto &text = skin_->Caption->Get(); text)
 		{
-			auto visual_area =
-				detail::get_visual_area(*skin_, false);
-			auto center_area =
-				detail::get_center_area(*skin_, false);
-			auto area = center_area.
-				value_or(visual_area.
-				value_or(aabb::Zero));
-
-			auto top_right_size = visual_area && center_area ?
-				visual_area->Max() - center_area->Max() :
-				vector2::Zero;
-			auto bottom_left_size = visual_area && center_area ?
-				center_area->Min() - visual_area->Min() :
-				vector2::Zero;
-			auto border_size = top_right_size.CeilCopy(bottom_left_size);
-
-			auto center = center_area ?
-				center_area->Center() :
-				vector2::Zero;
+			auto area_size = detail::get_inner_size(*skin_, false).value_or(vector2::Zero);
+			auto border_size = detail::get_border_size(*skin_, false).value_or(vector2::Zero);
+			auto center = detail::get_center_area(*skin_, false).value_or(aabb::Zero).Center();
 
 			//Area size
 			if (auto size = caption_size_.
-				value_or(detail::is_caption_outside(caption_layout_) ? vector2::Zero : area.ToSize());
+				value_or(detail::is_caption_outside(caption_layout_) ? vector2::Zero : area_size);
 				size != vector2::Zero)
 			{
-				auto adjusted_size = size;
+				auto ortho_viewport_ratio =
+					[&]() noexcept
+					{
+						//Adjust area size from ortho to viewport space
+						if (auto scene_manager = skin_->Caption->Owner(); scene_manager)
+						{
+							if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+								return viewport->OrthoToViewportRatio();
+						}
 
-				//Adjust area size from ortho to viewport space
-				if (auto scene_manager = skin_->Caption->Owner(); scene_manager)
-				{
-					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-						adjusted_size *= viewport->OrthoToViewportRatio();
-				}
+						return vector2::UnitScale;
+					}();
 
-				text->AreaSize(adjusted_size);
+				text->AreaSize(size * ortho_viewport_ratio);
 
 				if (auto node = skin_->Caption->ParentNode(); node)
 					node->Position(center + detail::caption_area_offset(caption_layout_, size, border_size));
 			}
 			else
 			{
-				size = area.ToSize();
+				auto viewport_ortho_ratio =
+					[&]() noexcept
+					{
+						//Adjust area size from ortho to viewport space
+						if (auto scene_manager = skin_->Caption->Owner(); scene_manager)
+						{
+							if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+								return viewport->ViewportToOrthoRatio();
+						}
+
+						return vector2::UnitScale;
+					}();
+
 				text->AreaSize({});
 
 				if (auto node = skin_->Caption->ParentNode(); node)
-					node->Position(center + detail::caption_offset(caption_layout_, size, border_size));
+					node->Position(center + detail::caption_offset(caption_layout_, area_size, border_size,
+						caption_margin_.value_or(detail::default_caption_margin_size) * viewport_ortho_ratio));
 			}
 
 			//Padding
@@ -931,7 +960,7 @@ GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std
 	OwningPtr<ControlSkin> skin) :
 
 	GuiComponent{std::move(name)},
-	size_{skin ? detail::get_visual_size(*skin, true) : std::nullopt},
+	size_{skin ? detail::get_size(*skin, true) : std::nullopt},
 	caption_{std::move(caption)},
 	tooltip_{std::move(tooltip)},
 	skin_{std::move(skin)}
@@ -1098,7 +1127,7 @@ void GuiControl::Skin(OwningPtr<ControlSkin> skin) noexcept
 		if (skin)
 		{
 			//Resize new skin
-			if (auto from_size = detail::get_visual_size(*skin, true); from_size && size_)
+			if (auto from_size = detail::get_size(*skin, true); from_size && size_)
 				detail::resize_skin(*skin, *from_size, *size_);
 			else
 				size_ = from_size;
@@ -1115,25 +1144,72 @@ void GuiControl::Skin(OwningPtr<ControlSkin> skin) noexcept
 	Observers
 */
 
+std::optional<Vector2> GuiControl::CenterSize() const noexcept
+{
+	if (size_ && skin_)
+		return detail::get_center_size(*skin_, true);
+	else
+		return {};
+}
+
+std::optional<Vector2> GuiControl::InnerSize() const noexcept
+{
+	if (size_ && skin_)
+	{
+		//Faster than calling get_inner_size (because we know the size)
+		if (auto center_size = CenterSize(); center_size)
+			return center_size;
+	}
+	
+	return size_;
+}
+
+std::optional<Vector2> GuiControl::BorderSize() const noexcept
+{
+	if (size_)
+	{
+		//Faster than calling get_border_size (because we know the size)
+		if (auto inner_size = InnerSize(); inner_size)
+			return (*size_ - *inner_size) * 0.5_r;
+	}
+
+	return {};
+}
+
+
+std::optional<Aabb> GuiControl::Area() const noexcept
+{
+	return skin_ ?
+		detail::get_area(*skin_, true) :
+		std::nullopt;
+}
+
+std::optional<Aabb> GuiControl::CenterArea() const noexcept
+{
+	return skin_ ?
+		detail::get_center_area(*skin_, true) :
+		std::nullopt;
+}
+
+std::optional<Aabb> GuiControl::InnerArea() const noexcept
+{
+	return skin_ ?
+		detail::get_inner_area(*skin_, true) :
+		std::nullopt;
+}
+
 std::optional<Aabb> GuiControl::HitArea() const noexcept
 {
 	//No custom defined hit areas
 	//Use visuals as hit area
 	if (std::empty(hit_areas_))
-		return VisualArea();
+		return Area();
 
 	//Single hit area
 	else if (std::size(hit_areas_) == 1)
 		return hit_areas_.back();
 	else //Multiple hit areas
 		return Aabb::Enclose(hit_areas_);
-}
-
-std::optional<Aabb> GuiControl::VisualArea() const noexcept
-{
-	return skin_ ?
-		detail::get_visual_area(*skin_, true) :
-		std::nullopt;
 }
 
 
