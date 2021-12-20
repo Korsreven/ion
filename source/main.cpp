@@ -1846,7 +1846,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
 
 			auto check_box_mark = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Check mark
+				{0.0_r, 0.0_r, 0.0_r}, {w * 1.25_r, h * 1.25_r}, nullptr}); //Check mark
 			check_box_mark->IncludeBoundingVolumes(false);
 
 			check_box_center->AutoRepeat(true);
@@ -1967,6 +1967,43 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			slider_right->AutoRepeat(true);
 			slider_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
 
+			//Scroll bar
+			w = 0.056_r;
+			h = 0.056_r;
+
+			auto scroll_bar_model = scene.CreateModel();
+			auto scroll_bar_center = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
+			
+			auto scroll_bar_top = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
+			auto scroll_bar_left = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
+			auto scroll_bar_bottom = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
+			auto scroll_bar_right = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
+
+			auto scroll_bar_top_left = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
+			auto scroll_bar_bottom_left = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
+			auto scroll_bar_top_right = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
+			auto scroll_bar_bottom_right = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
+
+			auto scroll_bar_handle = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Handle
+			scroll_bar_handle->IncludeBoundingVolumes(false);
+
+			scroll_bar_center->AutoRepeat(true);
+			scroll_bar_top->AutoRepeat(true);
+			scroll_bar_left->AutoRepeat(true);
+			scroll_bar_bottom->AutoRepeat(true);
+			scroll_bar_right->AutoRepeat(true);
+			scroll_bar_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+
 			//GUI Caption
 
 			//Tooltip caption
@@ -2006,6 +2043,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Slider caption
 			auto slider_caption = scene.CreateText(caption_text);
 			slider_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+
+			//Scroll bar caption
+			auto scroll_bar_caption = scene.CreateText(caption_text);
+			scroll_bar_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 
 
 			//Scene graph
@@ -2255,6 +2296,50 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			slider_skin.Caption.EnabledStyle = button_caption_style_enabled;
 			slider_skin.Caption.DisabledStyle = button_caption_style_disabled;
 
+			//Scroll bar skin
+			ion::gui::controls::gui_scroll_bar::ScrollBarSkin scroll_bar_skin;
+			scroll_bar_skin.Parts.ModelObject = scroll_bar_model;
+			scroll_bar_skin.Parts.Center.SpriteObject = scroll_bar_center;
+			scroll_bar_skin.Parts.Top.SpriteObject = scroll_bar_top;
+			scroll_bar_skin.Parts.Left.SpriteObject = scroll_bar_left;
+			scroll_bar_skin.Parts.Bottom.SpriteObject = scroll_bar_bottom;
+			scroll_bar_skin.Parts.Right.SpriteObject = scroll_bar_right;
+			scroll_bar_skin.Parts.TopLeft.SpriteObject = scroll_bar_top_left;
+			scroll_bar_skin.Parts.BottomLeft.SpriteObject = scroll_bar_bottom_left;
+			scroll_bar_skin.Parts.TopRight.SpriteObject = scroll_bar_top_right;
+			scroll_bar_skin.Parts.BottomRight.SpriteObject = scroll_bar_bottom_right;
+
+			scroll_bar_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
+			scroll_bar_skin.Parts.Center.DisabledMaterial = check_box_center_enabled;
+			scroll_bar_skin.Parts.Center.PressedMaterial = check_box_center_enabled;
+			scroll_bar_skin.Parts.Center.HoveredMaterial = check_box_center_hovered;
+			scroll_bar_skin.Parts.Top.EnabledMaterial = button_top_enabled;
+			scroll_bar_skin.Parts.Top.FocusedMaterial = button_top_focused;
+			scroll_bar_skin.Parts.Left.EnabledMaterial = button_left_enabled;
+			scroll_bar_skin.Parts.Left.FocusedMaterial = button_left_focused;
+			scroll_bar_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
+			scroll_bar_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
+			scroll_bar_skin.Parts.Right.EnabledMaterial = button_right_enabled;
+			scroll_bar_skin.Parts.Right.FocusedMaterial = button_right_focused;
+			scroll_bar_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
+			scroll_bar_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
+			scroll_bar_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
+			scroll_bar_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
+			scroll_bar_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
+			scroll_bar_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
+			scroll_bar_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
+			scroll_bar_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
+
+			scroll_bar_skin.Handle.SpriteObject = scroll_bar_handle;
+			scroll_bar_skin.Handle.EnabledMaterial = button_center_enabled;
+			scroll_bar_skin.Handle.DisabledMaterial = button_center_disabled;
+			scroll_bar_skin.Handle.PressedMaterial = button_center_pressed;
+			scroll_bar_skin.Handle.HoveredMaterial = button_center_hovered;
+
+			scroll_bar_skin.Caption.TextObject = scroll_bar_caption;
+			scroll_bar_skin.Caption.EnabledStyle = button_caption_style_enabled;
+			scroll_bar_skin.Caption.DisabledStyle = button_caption_style_disabled;
+
 
 			//GUI
 			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
@@ -2292,6 +2377,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			slider->Node()->Position({0.0_r, 0.6_r});
 			slider->Range(0, 20);
 			slider->StepByAmount(5);
+
+			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", "My scroll bar", "My scroll bar tooltip", std::move(scroll_bar_skin), Vector2{0.077_r, 1.0_r});
+			scroll_bar->Node()->Position({-0.7_r, 0.15_r});
+			scroll_bar->Range(0, 50);
+			scroll_bar->StepByAmount(3);
 
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);

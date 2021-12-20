@@ -37,6 +37,8 @@ namespace ion::gui::controls
 
 		namespace detail
 		{
+			constexpr auto default_handle_size_min_percent = 0.05_r;
+			constexpr auto default_handle_size_max_percent = 1.0_r;
 		} //detail
 	} //gui_scroll_bar
 
@@ -49,7 +51,9 @@ namespace ion::gui::controls
 
 		protected:
 
-			std::pair<real, real> handle_size_ = {0.1_r, 1.0_r};
+			std::pair<real, real> handle_size_ =
+				{gui_scroll_bar::detail::default_handle_size_min_percent,
+				 gui_scroll_bar::detail::default_handle_size_max_percent};
 
 
 			/*
@@ -86,6 +90,7 @@ namespace ion::gui::controls
 				if (auto handle_size = std::pair{min, max}; handle_size_ != handle_size)
 				{
 					handle_size_ = handle_size;
+					UpdateHandle();
 				}
 			}
 
@@ -99,6 +104,15 @@ namespace ion::gui::controls
 			{
 				return handle_size_;
 			}
+
+
+			/*
+				Mouse events
+			*/
+
+			//Called from gui slider when the mouse button has been released
+			//Returns true if the mouse release event has been consumed by the control
+			virtual bool MouseReleased(MouseButton button, Vector2 position) noexcept override;
 	};
 
 } //ion::gui::controls

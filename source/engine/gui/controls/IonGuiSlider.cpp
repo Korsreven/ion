@@ -393,7 +393,7 @@ bool GuiSlider::MouseMoved(Vector2 position) noexcept
 					else
 						Percent(percent);
 
-					if (Position() != current_pos)
+					if (current_pos != Position())
 						Changed();
 				}
 			}
