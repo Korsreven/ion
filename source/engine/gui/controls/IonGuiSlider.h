@@ -81,8 +81,8 @@ namespace ion::gui::controls
 				}
 			}
 
-
-			void resize_skin(SliderSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
+			void resize_handle(SliderSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
+			void resize_skin(SliderSkin &skin, SliderType type, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 		} //detail
 	} //gui_slider
 
@@ -123,7 +123,9 @@ namespace ion::gui::controls
 				Skins
 			*/
 
-			void FlipHandle() noexcept;
+			void RotateHandle() noexcept;
+			void RotateSkin() noexcept;
+
 			virtual void UpdateHandle() noexcept;
 
 		public:
@@ -152,8 +154,9 @@ namespace ion::gui::controls
 			{
 				if (type_ != type)
 				{
-					FlipHandle();
+					RotateHandle();
 					type_ = type;
+					RotateSkin();
 					UpdateHandle();
 				}
 			}

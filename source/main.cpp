@@ -2289,10 +2289,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			radio_button2->Node()->Position({0.05_r, 0.2_r});
 
 			auto slider = base_panel->CreateSlider("slider", "My slider", "My slider tooltip", std::move(slider_skin), Vector2{1.0_r, 0.077_r});
-			//slider->Node()->Position({0.0_r, 0.6_r});
-			slider->Node()->Position({-1.0_r, -0.2_r});
-			//slider->Type(ion::gui::controls::gui_slider::SliderType::Vertical);
-			//slider->Size({0.077_r, 1.0_r});
+			slider->Node()->Position({0.0_r, 0.6_r});
 			slider->Range(0, 20);
 			slider->StepByAmount(5);
 
