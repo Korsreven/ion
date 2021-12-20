@@ -190,9 +190,17 @@ namespace ion::gui::controls
 			//Sets the range of this slider to the given range
 			inline void Range(int min, int max) noexcept
 			{
-				if (auto range = std::pair{min, max}; progress_.MinMax() != range)
+				if (progress_.Min() != min || progress_.Max() != max)
 				{
+					//Go from or to an empty range
+					auto empty_range =
+						progress_.Min() == progress_.Max() || min == max;
+
 					progress_.Extents(min, max);
+
+					if (empty_range)
+						SetState(state_);
+
 					UpdateHandle();
 				}
 			}
@@ -200,7 +208,7 @@ namespace ion::gui::controls
 			//Sets the step by amount for this slider to the given amount
 			inline void StepByAmount(int amount) noexcept
 			{
-				step_by_amount_ = amount;
+				step_by_amount_ = amount > 0 ? amount : 1;
 			}
 
 

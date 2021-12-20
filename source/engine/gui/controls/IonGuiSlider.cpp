@@ -99,7 +99,14 @@ void GuiSlider::Resized(Vector2 from_size, Vector2 to_size) noexcept
 void GuiSlider::SetSkinState(gui_control::ControlState state, SliderSkin &skin) noexcept
 {
 	if (skin.Handle)
-		SetPartState(state, skin.Handle);
+	{
+		auto [min, max] = Range();
+
+		if (min != max)
+			SetPartState(state, skin.Handle);
+
+		skin.Handle->Visible(min != max);
+	}
 }
 
 void GuiSlider::SetState(gui_control::ControlState state) noexcept
@@ -158,7 +165,7 @@ void GuiSlider::UpdateHandle() noexcept
 					skin.Handle->Size().Y() :
 					skin.Handle->Size().X()) * 0.5_r;
 				
-				auto handle_pos =
+				auto handle_position =
 					flipped_ ?
 					math::Lerp(max - handle_half_size, min + handle_half_size, Percent()) :
 					math::Lerp(min + handle_half_size, max - handle_half_size, Percent());
@@ -166,8 +173,8 @@ void GuiSlider::UpdateHandle() noexcept
 				auto center = area->Center();
 				skin.Handle->Position(
 					type_ == SliderType::Vertical ?
-					Vector2{center.X(), handle_pos} :
-					Vector2{handle_pos, center.Y()});
+					Vector2{center.X(), handle_position} :
+					Vector2{handle_position, center.Y()});
 			}
 		}
 	}
@@ -348,6 +355,8 @@ bool GuiSlider::MouseReleased(MouseButton button, Vector2 position) noexcept
 						Position(Position() - delta_position);
 					else
 						Position(Position() + delta_position);
+
+					Changed();
 				}
 			}
 		}
@@ -377,10 +386,15 @@ bool GuiSlider::MouseMoved(Vector2 position) noexcept
 						(position.Y() + size->Y() * 0.5_r) / size->Y() :
 						(position.X() + size->X() * 0.5_r) / size->X();
 
+					auto current_pos = Position();
+
 					if (flipped_)
 						Percent(1.0_r - percent);
 					else
 						Percent(percent);
+
+					if (Position() != current_pos)
+						Changed();
 				}
 			}
 		}
