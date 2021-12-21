@@ -14,9 +14,11 @@ File:	IonGuiScrollBar.cpp
 
 #include <algorithm>
 
+#include "IonGuiScrollable.h"
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/scene/shapes/IonSprite.h"
+#include "gui/IonGuiPanelContainer.h"
 
 namespace ion::gui::controls
 {
@@ -103,10 +105,44 @@ GuiScrollBar::GuiScrollBar(std::string name, std::optional<std::string> caption,
 
 
 /*
-	Modifiers
+	Scrollable
 */
 
+void GuiScrollBar::AttachedScrollable(NonOwningPtr<GuiScrollable> scrollable) noexcept
+{
+	if (scrollable_ != scrollable)
+	{
+		//Attach
+		if (scrollable)
+		{
+			AttachedScrollable(nullptr); //Detach previous (if any)
+			scrollable_ = scrollable;
+			Focusable(false);
 
+			if (auto owner = Owner(); owner)
+				scrollable->AttachedScrollBar(
+					static_pointer_cast<GuiScrollBar>(owner->SearchControl(*Name()))
+				);
+		}
+		
+		else //Detach
+		{
+			auto ptr = scrollable_.get();
+			scrollable_ = nullptr;
+			Focusable(true);
+
+			if (ptr)
+				ptr->AttachedScrollBar(nullptr);
+		}
+
+		UpdateHandle();
+	}
+}
+
+
+/*
+	Mouse events
+*/
 
 bool GuiScrollBar::MouseReleased(MouseButton button, Vector2 position) noexcept
 {

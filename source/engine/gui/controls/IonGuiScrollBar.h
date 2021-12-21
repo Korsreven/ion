@@ -18,7 +18,9 @@ File:	IonGuiScrollBar.h
 #include <utility>
 
 #include "IonGuiSlider.h"
+#include "events/listeners/IonMouseListener.h"
 #include "graphics/utilities/IonVector2.h"
+#include "memory/IonNonOwningPtr.h"
 #include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
 
@@ -26,6 +28,8 @@ namespace ion::gui::controls
 {
 	using namespace graphics::utilities;
 	using namespace types::type_literals;
+
+	class GuiScrollable; //Forward declaration
 
 	namespace gui_scroll_bar
 	{
@@ -54,6 +58,7 @@ namespace ion::gui::controls
 			std::pair<real, real> handle_size_ =
 				{gui_scroll_bar::detail::default_handle_size_min_percent,
 				 gui_scroll_bar::detail::default_handle_size_max_percent};
+			NonOwningPtr<GuiScrollable> scrollable_;
 
 
 			/*
@@ -103,6 +108,21 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto& HandleSize() const noexcept
 			{
 				return handle_size_;
+			}
+
+
+			/*
+				Scrollable
+			*/
+
+			//Sets the scrollable attached to this scroll bar to the given scrollable
+			void AttachedScrollable(NonOwningPtr<GuiScrollable> scrollable) noexcept;
+
+			//Returns a pointer to the scrollable attached to this scroll bar
+			//Returns nullptr if this scroll bar does not have a scrollable attached
+			[[nodiscard]] inline auto AttachedScrollable() const noexcept
+			{
+				return scrollable_;
 			}
 
 
