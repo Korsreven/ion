@@ -371,7 +371,7 @@ namespace ion::gui
 			template <typename T>
 			[[nodiscard]] auto GetControlAs(std::string_view name) noexcept
 			{
-				static_assert(std::is_base_of<controls::GuiControl, T>);
+				static_assert(std::is_base_of_v<controls::GuiControl, T>);
 				return GetComponentAs<T>(name);
 			}
 
@@ -380,7 +380,7 @@ namespace ion::gui
 			template <typename T>
 			[[nodiscard]] auto GetControlAs(std::string_view name) const noexcept
 			{
-				static_assert(std::is_base_of<controls::GuiControl, T>);
+				static_assert(std::is_base_of_v<controls::GuiControl, T>);
 				return GetComponentAs<T>(name);
 			}
 

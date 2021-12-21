@@ -144,7 +144,7 @@ namespace ion::gui
 			template <typename T>
 			[[nodiscard]] auto GetComponentAs(std::string_view name) noexcept
 			{
-				static_assert(std::is_base_of<GuiComponent, T>);
+				static_assert(std::is_base_of_v<GuiComponent, T>);
 				return dynamic_pointer_cast<T>(GetComponent(name));
 			}
 
@@ -153,7 +153,7 @@ namespace ion::gui
 			template <typename T>
 			[[nodiscard]] auto GetComponentAs(std::string_view name) const noexcept
 			{
-				static_assert(std::is_base_of<GuiComponent, T>);
+				static_assert(std::is_base_of_v<GuiComponent, T>);
 				return dynamic_pointer_cast<const T>(GetComponent(name));
 			}
 

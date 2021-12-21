@@ -121,7 +121,7 @@ void GuiScrollBar::AttachedScrollable(NonOwningPtr<GuiScrollable> scrollable) no
 
 			if (auto owner = Owner(); owner)
 				scrollable->AttachedScrollBar(
-					static_pointer_cast<GuiScrollBar>(owner->SearchControl(*Name()))
+					owner->GetControlAs<GuiScrollBar>(*Name())
 				);
 		}
 		
