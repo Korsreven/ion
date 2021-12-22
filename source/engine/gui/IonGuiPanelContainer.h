@@ -23,6 +23,7 @@ File:	IonGuiPanelContainer.h
 #include "adaptors/ranges/IonDereferenceIterable.h"
 #include "controls/IonGuiButton.h"
 #include "controls/IonGuiCheckBox.h"
+#include "controls/IonGuiGroupBox.h"
 #include "controls/IonGuiLabel.h"
 #include "controls/IonGuiRadioButton.h"
 #include "controls/IonGuiScrollBar.h"
@@ -239,7 +240,7 @@ namespace ion::gui
 
 
 			/*
-				Check box
+				Check boxes
 				Creating
 			*/
 
@@ -257,6 +258,27 @@ namespace ion::gui
 
 			//Create a check box by moving the given check box
 			NonOwningPtr<controls::GuiCheckBox> CreateCheckBox(controls::GuiCheckBox &&check_box);
+
+
+			/*
+				Group boxes
+				Creating
+			*/
+
+			//Create a group box with the given name, caption and skin
+			NonOwningPtr<controls::GuiGroupBox> CreateGroupBox(std::string name, std::optional<std::string> caption,
+				controls::gui_group_box::GroupBoxSkin skin);
+
+			//Create a group box with the given name, caption, skin and size
+			NonOwningPtr<controls::GuiGroupBox> CreateGroupBox(std::string name, std::optional<std::string> caption,
+				controls::gui_group_box::GroupBoxSkin skin, const Vector2 &size);
+
+			//Create a group box with the given name, caption, skin and size
+			NonOwningPtr<controls::GuiGroupBox> CreateGroupBox(std::string name, std::optional<std::string> caption,
+				controls::gui_group_box::GroupBoxSkin skin, controls::gui_control::Areas areas);
+
+			//Create a group box by moving the given group box
+			NonOwningPtr<controls::GuiGroupBox> CreateGroupBox(controls::GuiGroupBox &&group_box);
 
 
 			/*
@@ -281,7 +303,7 @@ namespace ion::gui
 
 
 			/*
-				Radio button
+				Radio buttons
 				Creating
 			*/
 
@@ -302,7 +324,7 @@ namespace ion::gui
 
 
 			/*
-				Scroll bar
+				Scroll bars
 				Creating
 			*/
 
@@ -323,7 +345,7 @@ namespace ion::gui
 
 
 			/*
-				Slider
+				Sliders
 				Creating
 			*/
 

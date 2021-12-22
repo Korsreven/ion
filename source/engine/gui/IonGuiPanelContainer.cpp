@@ -244,7 +244,7 @@ NonOwningPtr<controls::GuiButton> GuiPanelContainer::CreateButton(controls::GuiB
 
 
 /*
-	Check box
+	Check boxes
 	Creating
 */
 
@@ -272,6 +272,38 @@ NonOwningPtr<controls::GuiCheckBox> GuiPanelContainer::CreateCheckBox(std::strin
 NonOwningPtr<controls::GuiCheckBox> GuiPanelContainer::CreateCheckBox(controls::GuiCheckBox &&check_box)
 {
 	return CreateControl<controls::GuiCheckBox>(std::move(check_box));
+}
+
+
+/*
+	Group boxes
+	Creating
+*/
+
+NonOwningPtr<controls::GuiGroupBox> GuiPanelContainer::CreateGroupBox(std::string name, std::optional<std::string> caption,
+	controls::gui_group_box::GroupBoxSkin skin)
+{
+	return CreateControl<controls::GuiGroupBox>(std::move(name), std::move(caption),
+		make_owning<controls::gui_group_box::GroupBoxSkin>(std::move(skin)));
+}
+
+NonOwningPtr<controls::GuiGroupBox> GuiPanelContainer::CreateGroupBox(std::string name, std::optional<std::string> caption,
+	controls::gui_group_box::GroupBoxSkin skin, const Vector2 &size)
+{
+	return CreateControl<controls::GuiGroupBox>(std::move(name), std::move(caption),
+		make_owning<controls::gui_group_box::GroupBoxSkin>(std::move(skin)), size);
+}
+
+NonOwningPtr<controls::GuiGroupBox> GuiPanelContainer::CreateGroupBox(std::string name, std::optional<std::string> caption,
+	controls::gui_group_box::GroupBoxSkin skin, controls::gui_control::Areas areas)
+{
+	return CreateControl<controls::GuiGroupBox>(std::move(name), std::move(caption),
+		make_owning<controls::gui_group_box::GroupBoxSkin>(std::move(skin)), std::move(areas));
+}
+
+NonOwningPtr<controls::GuiGroupBox> GuiPanelContainer::CreateGroupBox(controls::GuiGroupBox &&group_box)
+{
+	return CreateControl<controls::GuiGroupBox>(std::move(group_box));
 }
 
 
@@ -308,7 +340,7 @@ NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(controls::GuiLab
 
 
 /*
-	Radio button
+	Radio buttons
 	Creating
 */
 
@@ -340,7 +372,7 @@ NonOwningPtr<controls::GuiRadioButton> GuiPanelContainer::CreateRadioButton(cont
 
 
 /*
-	Scroll bar
+	Scroll bars
 	Creating
 */
 
@@ -372,7 +404,7 @@ NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(controls
 
 
 /*
-	Slider
+	Sliders
 	Creating
 */
 

@@ -636,6 +636,9 @@
     <ClCompile Include="..\source\engine\gui\controls\IonGuiScrollable.cpp">
       <Filter>Source Files\gui\controls</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\gui\controls\IonGuiGroupBox.cpp">
+      <Filter>Source Files\gui\controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1233,6 +1236,9 @@
       <Filter>Header Files\gui\controls</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\gui\controls\IonGuiScrollable.h">
+      <Filter>Header Files\gui\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\gui\controls\IonGuiGroupBox.h">
       <Filter>Header Files\gui\controls</Filter>
     </ClInclude>
   </ItemGroup>
