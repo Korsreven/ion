@@ -62,6 +62,14 @@ namespace ion::gui::controls
 
 
 			/*
+				Events
+			*/
+
+			//See GuiSlider::Slid for more details
+			virtual void Slid(int delta) noexcept override;
+
+
+			/*
 				Skins
 			*/
 
@@ -80,6 +88,22 @@ namespace ion::gui::controls
 			//Construct a scroll bar with the given name, caption, tooltip, skin and hit areas
 			GuiScrollBar(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
 				OwningPtr<gui_scroll_bar::ScrollBarSkin> skin, gui_control::Areas areas);
+
+
+			//Default move constructor
+			GuiScrollBar(GuiScrollBar&&) = default;
+
+
+			//Virtual destructor
+			virtual ~GuiScrollBar() noexcept;
+
+
+			/*
+				Operators
+			*/
+
+			//Default move assignment
+			GuiScrollBar& operator=(GuiScrollBar&&) = default;
 
 
 			/*

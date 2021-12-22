@@ -61,21 +61,14 @@ namespace ion::gui::controls
 				Scroll bar
 			*/
 
-			//Returns the total number of elements
-			virtual int TotalElements() noexcept;
-
-			//Returns the number of elements that is in view
-			virtual int ElementsInView() noexcept;
-
-			//Returns the current scroll position
-			virtual int ScrollPosition() noexcept;
-
-
 			void UpdateScrollBar() noexcept;
 
 		public:
 
 			using GuiControl::GuiControl;
+
+			//Virtual destructor
+			virtual ~GuiScrollable() noexcept;
 
 
 			/*
@@ -85,7 +78,7 @@ namespace ion::gui::controls
 			//Sets the scroll rate of this scrollable to the given rate
 			inline void ScrollRate(int rate) noexcept
 			{
-				scroll_rate_ = rate;
+				scroll_rate_ = rate > 0 ? rate : 1;
 			}
 
 
@@ -104,28 +97,34 @@ namespace ion::gui::controls
 				Scrolling
 			*/
 
+			//Scroll with the given rate
+			inline void Scroll(int rate) noexcept
+			{
+				Scrolled(rate);
+			}
+
 			//Scroll up with the current scroll rate
 			inline void ScrollUp() noexcept
 			{
-				Scrolled(scroll_rate_);
+				Scroll(-scroll_rate_);
 			}
 
 			//Scroll down with the current scroll rate
 			inline void ScrollDown() noexcept
 			{
-				Scrolled(-scroll_rate_);
+				Scroll(scroll_rate_);
 			}
 
 			//Scroll to the top element
 			inline void ScrollToTop() noexcept
 			{
-				Scrolled(std::numeric_limits<int>::min());
+				Scroll(std::numeric_limits<int>::min());
 			}
 
 			//Scroll to the bottom element
 			inline void ScrollToBottom() noexcept
 			{
-				Scrolled(std::numeric_limits<int>::max());
+				Scroll(std::numeric_limits<int>::max());
 			}
 
 
@@ -142,6 +141,16 @@ namespace ion::gui::controls
 			{
 				return scroll_bar_;
 			}
+
+
+			//Returns the total number of elements
+			virtual int TotalElements() noexcept;
+
+			//Returns the number of elements that is in view
+			virtual int ElementsInView() noexcept;
+
+			//Returns the current scroll position
+			virtual int ScrollPosition() noexcept;
 
 
 			/*

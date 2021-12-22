@@ -42,6 +42,19 @@ void GuiScrollBar::DefaultSetup() noexcept
 //Protected
 
 /*
+	Events
+*/
+
+void GuiScrollBar::Slid(int delta) noexcept
+{
+	if (scrollable_)
+		scrollable_->Scroll(delta);
+
+	GuiSlider::Slid(delta); //Use base functionality
+}
+
+
+/*
 	Skins
 */
 
@@ -56,7 +69,7 @@ void GuiScrollBar::UpdateHandle() noexcept
 			{
 				auto [width, height] = size->XY();
 				auto [handle_width, handle_height] = skin.Handle->Size().XY();
-				auto view_count = 16;	
+				auto view_count = scrollable_ ? scrollable_->ElementsInView() : 1;
 
 				if (type_ == gui_slider::SliderType::Vertical)
 				{
@@ -101,6 +114,12 @@ GuiScrollBar::GuiScrollBar(std::string name, std::optional<std::string> caption,
 	GuiSlider{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(areas)}
 {
 	DefaultSetup();
+}
+
+
+GuiScrollBar::~GuiScrollBar() noexcept
+{
+	AttachedScrollable(nullptr); //Detach (if any)
 }
 
 
@@ -177,15 +196,10 @@ bool GuiScrollBar::MouseReleased(MouseButton button, Vector2 position) noexcept
 							(handle_position.Y() + size->Y() * 0.5_r) / size->Y() :
 							(handle_position.X() + size->X() * 0.5_r) / size->X();
 
-						auto current_pos = Position();
-
 						if (flipped_)
 							Percent(1.0_r - percent);
 						else
 							Percent(percent);
-
-						if (current_pos != Position())
-							Changed();
 					}
 				}
 			}

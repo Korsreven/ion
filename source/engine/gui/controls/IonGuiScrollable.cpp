@@ -31,22 +31,6 @@ namespace gui_scrollable::detail
 	Scroll bar
 */
 
-int GuiScrollable::TotalElements() noexcept
-{
-	return 0; //Optional to override
-}
-
-int GuiScrollable::ElementsInView() noexcept
-{
-	return 0; //Optional to override
-}
-
-int GuiScrollable::ScrollPosition() noexcept
-{
-	return 0; //Optional to override
-}
-
-
 void GuiScrollable::UpdateScrollBar() noexcept
 {
 	if (scroll_bar_)
@@ -59,6 +43,12 @@ void GuiScrollable::UpdateScrollBar() noexcept
 
 
 //Public
+
+GuiScrollable::~GuiScrollable() noexcept
+{
+	AttachedScrollBar(nullptr); //Detach (if any)
+}
+
 
 /*
 	Scroll bar
@@ -90,6 +80,22 @@ void GuiScrollable::AttachedScrollBar(NonOwningPtr<GuiScrollBar> scroll_bar) noe
 				ptr->AttachedScrollable(nullptr);
 		}
 	}
+}
+
+
+int GuiScrollable::TotalElements() noexcept
+{
+	return 0; //Optional to override
+}
+
+int GuiScrollable::ElementsInView() noexcept
+{
+	return 0; //Optional to override
+}
+
+int GuiScrollable::ScrollPosition() noexcept
+{
+	return 0; //Optional to override
 }
 
 
