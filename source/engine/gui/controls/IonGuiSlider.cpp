@@ -91,6 +91,11 @@ void GuiSlider::Resized(Vector2 from_size, Vector2 to_size) noexcept
 	GuiControl::Resized(from_size, to_size); //Use base functionality
 }
 
+void GuiSlider::Slid(int delta) noexcept
+{
+	Changed();
+}
+
 
 /*
 	States
@@ -288,10 +293,7 @@ bool GuiSlider::KeyReleased([[maybe_unused]] KeyButton button) noexcept
 			case KeyButton::RightArrow:
 			{
 				if (Position() < max)
-				{
 					Position(Position() + step_by_amount_);
-					Changed();
-				}
 
 				return true;
 			}
@@ -301,10 +303,7 @@ bool GuiSlider::KeyReleased([[maybe_unused]] KeyButton button) noexcept
 			case KeyButton::LeftArrow:
 			{
 				if (Position() > min)
-				{
 					Position(Position() - step_by_amount_);
-					Changed();
-				}
 
 				return true;
 			}
@@ -355,8 +354,6 @@ bool GuiSlider::MouseReleased(MouseButton button, Vector2 position) noexcept
 						Position(Position() - delta_position);
 					else
 						Position(Position() + delta_position);
-
-					Changed();
 				}
 			}
 		}
@@ -386,15 +383,10 @@ bool GuiSlider::MouseMoved(Vector2 position) noexcept
 						(position.Y() + size->Y() * 0.5_r) / size->Y() :
 						(position.X() + size->X() * 0.5_r) / size->X();
 
-					auto current_pos = Position();
-
 					if (flipped_)
 						Percent(1.0_r - percent);
 					else
 						Percent(percent);
-
-					if (current_pos != Position())
-						Changed();
 				}
 			}
 		}

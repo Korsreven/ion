@@ -110,6 +110,9 @@ namespace ion::gui::controls
 			//See GuiControl::Resized for more details
 			virtual void Resized(Vector2 from_size, Vector2 to_size) noexcept override;
 
+			//Called right after a slider has slid
+			virtual void Slid(int delta) noexcept;
+
 
 			/*
 				States
@@ -182,7 +185,9 @@ namespace ion::gui::controls
 			{
 				if (progress_.Position() != position)
 				{
-					progress_.Position(position);
+					auto pos = progress_.Position();
+					progress_.Position(position);		
+					Slid(position - pos);
 					UpdateHandle();
 				}
 			}
