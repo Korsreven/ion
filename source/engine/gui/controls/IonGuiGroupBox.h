@@ -44,7 +44,7 @@ namespace ion::gui::controls
 					std::find_if(std::begin(controls), std::end(controls),
 						[&](auto &control) noexcept
 						{
-							return control->Name() == name;
+							return control && control->Name() == name;
 						});
 
 				return iter != std::end(controls) ? *iter: NonOwningPtr<GuiControl>{};

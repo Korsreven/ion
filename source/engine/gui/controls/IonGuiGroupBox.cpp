@@ -68,9 +68,10 @@ GuiGroupBox::~GuiGroupBox() noexcept
 bool GuiGroupBox::AddControl(NonOwningPtr<controls::GuiControl> control)
 {
 	if (control &&
-		control.get() != this &&
-		control->Owner() == Owner() &&
-		control->Parent() != this)
+		control.get() != this && //Cannot add itself
+		control->Parent() != this && //Cannot add same control twice
+		control->Owner() == Owner() && //Control has same owner
+		control->Parent() == Owner()) //Control can be adopted
 	{
 		control->Parent(*this); //Adopt
 		controls_.push_back(control);
