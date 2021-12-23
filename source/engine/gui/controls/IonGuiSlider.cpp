@@ -91,7 +91,7 @@ void GuiSlider::Resized(Vector2 from_size, Vector2 to_size) noexcept
 	GuiControl::Resized(from_size, to_size); //Use base functionality
 }
 
-void GuiSlider::Slid(int delta) noexcept
+void GuiSlider::Slid([[maybe_unused]] int delta) noexcept
 {
 	Changed();
 }
@@ -189,22 +189,28 @@ void GuiSlider::UpdateHandle() noexcept
 //Public
 
 GuiSlider::GuiSlider(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<SliderSkin> skin) :
-	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin)}
+	OwningPtr<SliderSkin> skin, SliderType type) :
+
+	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin)},
+	type_{type}
 {
 	DefaultSetup();
 }
 
 GuiSlider::GuiSlider(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<SliderSkin> skin, const Vector2 &size) :
-	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size}
+	OwningPtr<SliderSkin> skin, const Vector2 &size, SliderType type) :
+
+	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size},
+	type_{type}
 {
 	DefaultSetup();
 }
 
 GuiSlider::GuiSlider(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<SliderSkin> skin, gui_control::Areas areas) :
-	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(areas)}
+	OwningPtr<SliderSkin> skin, gui_control::Areas areas, SliderType type) :
+
+	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(areas)},
+	type_{type}
 {
 	DefaultSetup();
 }

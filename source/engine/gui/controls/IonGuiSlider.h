@@ -135,15 +135,15 @@ namespace ion::gui::controls
 
 			//Construct a slider with the given name, caption, tooltip and skin
 			GuiSlider(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_slider::SliderSkin> skin);
+				OwningPtr<gui_slider::SliderSkin> skin, gui_slider::SliderType type = gui_slider::SliderType::Horizontal);
 
 			//Construct a slider with the given name, caption, tooltip, skin and size
 			GuiSlider(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_slider::SliderSkin> skin, const Vector2 &size);
+				OwningPtr<gui_slider::SliderSkin> skin, const Vector2 &size, gui_slider::SliderType type = gui_slider::SliderType::Horizontal);
 
 			//Construct a slider with the given name, caption, tooltip, skin and hit areas
 			GuiSlider(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_slider::SliderSkin> skin, gui_control::Areas areas);
+				OwningPtr<gui_slider::SliderSkin> skin, gui_control::Areas areas, gui_slider::SliderType type = gui_slider::SliderType::Horizontal);
 
 
 			/*

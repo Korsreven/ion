@@ -377,24 +377,27 @@ NonOwningPtr<controls::GuiRadioButton> GuiPanelContainer::CreateRadioButton(cont
 */
 
 NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin)
+	std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin,
+	controls::gui_slider::SliderType type)
 {
 	return CreateControl<controls::GuiScrollBar>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_scroll_bar::ScrollBarSkin>(std::move(skin)));
+		make_owning<controls::gui_scroll_bar::ScrollBarSkin>(std::move(skin)), type);
 }
 
 NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin, const Vector2 &size)
+	std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin, const Vector2 &size,
+	controls::gui_slider::SliderType type)
 {
 	return CreateControl<controls::GuiScrollBar>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_scroll_bar::ScrollBarSkin>(std::move(skin)), size);
+		make_owning<controls::gui_scroll_bar::ScrollBarSkin>(std::move(skin)), size, type);
 }
 
 NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin, controls::gui_control::Areas areas)
+	std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin, controls::gui_control::Areas areas,
+	controls::gui_slider::SliderType type)
 {
 	return CreateControl<controls::GuiScrollBar>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_scroll_bar::ScrollBarSkin>(std::move(skin)), std::move(areas));
+		make_owning<controls::gui_scroll_bar::ScrollBarSkin>(std::move(skin)), std::move(areas), type);
 }
 
 NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(controls::GuiScrollBar &&scroll_bar)
@@ -409,24 +412,27 @@ NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(controls
 */
 
 NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin)
+	std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin,
+	controls::gui_slider::SliderType type)
 {
 	return CreateControl<controls::GuiSlider>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_slider::SliderSkin>(std::move(skin)));
+		make_owning<controls::gui_slider::SliderSkin>(std::move(skin)), type);
 }
 
 NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin, const Vector2 &size)
+	std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin, const Vector2 &size,
+	controls::gui_slider::SliderType type)
 {
 	return CreateControl<controls::GuiSlider>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_slider::SliderSkin>(std::move(skin)), size);
+		make_owning<controls::gui_slider::SliderSkin>(std::move(skin)), size, type);
 }
 
 NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin, controls::gui_control::Areas areas)
+	std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin, controls::gui_control::Areas areas,
+	controls::gui_slider::SliderType type)
 {
 	return CreateControl<controls::GuiSlider>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_slider::SliderSkin>(std::move(skin)), std::move(areas));
+		make_owning<controls::gui_slider::SliderSkin>(std::move(skin)), std::move(areas), type);
 }
 
 NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(controls::GuiSlider &&slider)

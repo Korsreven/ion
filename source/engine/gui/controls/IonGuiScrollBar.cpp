@@ -34,8 +34,8 @@ namespace gui_scroll_bar::detail
 
 void GuiScrollBar::DefaultSetup() noexcept
 {
-	type_ = gui_slider::SliderType::Vertical;
-	flipped_ = true;
+	flipped_ =
+		type_ == gui_slider::SliderType::Vertical;
 }
 
 
@@ -96,22 +96,22 @@ void GuiScrollBar::UpdateHandle() noexcept
 //Public
 
 GuiScrollBar::GuiScrollBar(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<ScrollBarSkin> skin) :
-	GuiSlider{std::move(name), std::move(caption), std::move(tooltip), std::move(skin)}
+	OwningPtr<ScrollBarSkin> skin, gui_slider::SliderType type) :
+	GuiSlider{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), type}
 {
 	DefaultSetup();
 }
 
 GuiScrollBar::GuiScrollBar(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<ScrollBarSkin> skin, const Vector2 &size) :
-	GuiSlider{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size}
+	OwningPtr<ScrollBarSkin> skin, const Vector2 &size, gui_slider::SliderType type) :
+	GuiSlider{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size, type}
 {
 	DefaultSetup();
 }
 
 GuiScrollBar::GuiScrollBar(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<ScrollBarSkin> skin, gui_control::Areas areas) :
-	GuiSlider{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(areas)}
+	OwningPtr<ScrollBarSkin> skin, gui_control::Areas areas, gui_slider::SliderType type) :
+	GuiSlider{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(areas), type}
 {
 	DefaultSetup();
 }

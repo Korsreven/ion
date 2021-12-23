@@ -330,15 +330,18 @@ namespace ion::gui
 
 			//Create a scroll bar with the given name, caption, tooltip and skin
 			NonOwningPtr<controls::GuiScrollBar> CreateScrollBar(std::string name, std::optional<std::string> caption,
-				std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin);
+				std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin,
+				controls::gui_slider::SliderType type = controls::gui_slider::SliderType::Vertical);
 
 			//Create a scroll bar with the given name, caption, tooltip, skin and size
 			NonOwningPtr<controls::GuiScrollBar> CreateScrollBar(std::string name, std::optional<std::string> caption,
-				std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin, const Vector2 &size);
+				std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin, const Vector2 &size,
+				controls::gui_slider::SliderType type = controls::gui_slider::SliderType::Vertical);
 
 			//Create a scroll bar with the given name, caption, tooltip, skin and size
 			NonOwningPtr<controls::GuiScrollBar> CreateScrollBar(std::string name, std::optional<std::string> caption,
-				std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin, controls::gui_control::Areas areas);
+				std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin, controls::gui_control::Areas areas,
+				controls::gui_slider::SliderType type = controls::gui_slider::SliderType::Vertical);
 
 			//Create a scroll bar by moving the given scroll bar
 			NonOwningPtr<controls::GuiScrollBar> CreateScrollBar(controls::GuiScrollBar &&scroll_bar);
@@ -351,15 +354,18 @@ namespace ion::gui
 
 			//Create a slider with the given name, caption, tooltip and skin
 			NonOwningPtr<controls::GuiSlider> CreateSlider(std::string name, std::optional<std::string> caption,
-				std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin);
+				std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin,
+				controls::gui_slider::SliderType type = controls::gui_slider::SliderType::Horizontal);
 
 			//Create a slider with the given name, caption, tooltip, skin and size
 			NonOwningPtr<controls::GuiSlider> CreateSlider(std::string name, std::optional<std::string> caption,
-				std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin, const Vector2 &size);
+				std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin, const Vector2 &size,
+				controls::gui_slider::SliderType type = controls::gui_slider::SliderType::Horizontal);
 
 			//Create a slider with the given name, caption, tooltip, skin and size
 			NonOwningPtr<controls::GuiSlider> CreateSlider(std::string name, std::optional<std::string> caption,
-				std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin, controls::gui_control::Areas areas);
+				std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin, controls::gui_control::Areas areas,
+				controls::gui_slider::SliderType type = controls::gui_slider::SliderType::Horizontal);
 
 			//Create a slider by moving the given slider
 			NonOwningPtr<controls::GuiSlider> CreateSlider(controls::GuiSlider &&slider);

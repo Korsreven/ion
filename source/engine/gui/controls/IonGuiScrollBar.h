@@ -79,15 +79,15 @@ namespace ion::gui::controls
 
 			//Construct a scroll bar with the given name, caption, tooltip and skin
 			GuiScrollBar(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_scroll_bar::ScrollBarSkin> skin);
+				OwningPtr<gui_scroll_bar::ScrollBarSkin> skin, gui_slider::SliderType type = gui_slider::SliderType::Vertical);
 
 			//Construct a scroll bar with the given name, caption, tooltip, skin and size
 			GuiScrollBar(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_scroll_bar::ScrollBarSkin> skin, const Vector2 &size);
+				OwningPtr<gui_scroll_bar::ScrollBarSkin> skin, const Vector2 &size, gui_slider::SliderType type = gui_slider::SliderType::Vertical);
 
 			//Construct a scroll bar with the given name, caption, tooltip, skin and hit areas
 			GuiScrollBar(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_scroll_bar::ScrollBarSkin> skin, gui_control::Areas areas);
+				OwningPtr<gui_scroll_bar::ScrollBarSkin> skin, gui_control::Areas areas, gui_slider::SliderType type = gui_slider::SliderType::Vertical);
 
 
 			//Default move constructor
