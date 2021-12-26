@@ -1857,6 +1857,36 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_box_right->AutoRepeat(true);
 			check_box_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
 
+			//Group box
+			w = 0.1_r;
+			h = 0.1_r;
+
+			auto group_box_model = scene.CreateModel();
+
+			auto group_box_top = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
+			auto group_box_left = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
+			auto group_box_bottom = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
+			auto group_box_right = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
+
+			auto group_box_top_left = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
+			auto group_box_bottom_left = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
+			auto group_box_top_right = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
+			auto group_box_bottom_right = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
+
+			group_box_top->AutoRepeat(true);
+			group_box_left->AutoRepeat(true);
+			group_box_bottom->AutoRepeat(true);
+			group_box_right->AutoRepeat(true);
+			group_box_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+
 			//Radio button
 			w = 0.056_r;
 			h = 0.056_r;
@@ -2011,10 +2041,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto tooltip_caption = scene.CreateText(caption_text);
 			tooltip_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 
-			//Label caption
-			auto label_caption = scene.CreateText(caption_text);
-			label_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
-
 			//Button caption
 			auto button_caption = scene.CreateText(caption_text);
 			button_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
@@ -2032,6 +2058,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Check box caption
 			auto check_box_caption = scene.CreateText(caption_text);
 			check_box_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+
+			//Group box caption
+			auto group_box_caption = scene.CreateText(caption_text);
+			group_box_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+
+			//Label caption
+			auto label_caption = scene.CreateText(caption_text);
+			label_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 
 			//Radio button caption
 			auto radio_button_caption = scene.CreateText(caption_text);
@@ -2077,10 +2111,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_skin.Parts.BottomRight.SpriteObject = tooltip_bottom_right;
 
 			tooltip_skin.Caption.TextObject = tooltip_caption;
-
-			//Label skin
-			ion::gui::controls::gui_label::LabelSkin label_skin;
-			label_skin.Caption.TextObject = label_caption;
 
 			//Button skin
 			ion::gui::controls::gui_button::ButtonSkin button_skin;
@@ -2164,6 +2194,35 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_box_skin.Caption.TextObject = check_box_caption;
 			check_box_skin.Caption.EnabledStyle = button_caption_style_enabled;
 			check_box_skin.Caption.DisabledStyle = button_caption_style_disabled;
+
+			//Group box skin
+			ion::gui::controls::gui_group_box::GroupBoxSkin group_box_skin;
+			group_box_skin.Parts.ModelObject = group_box_model;
+			group_box_skin.Parts.Top.SpriteObject = group_box_top;
+			group_box_skin.Parts.Left.SpriteObject = group_box_left;
+			group_box_skin.Parts.Bottom.SpriteObject = group_box_bottom;
+			group_box_skin.Parts.Right.SpriteObject = group_box_right;
+			group_box_skin.Parts.TopLeft.SpriteObject = group_box_top_left;
+			group_box_skin.Parts.BottomLeft.SpriteObject = group_box_bottom_left;
+			group_box_skin.Parts.TopRight.SpriteObject = group_box_top_right;
+			group_box_skin.Parts.BottomRight.SpriteObject = group_box_bottom_right;
+
+			group_box_skin.Parts.Top.EnabledMaterial = button_top_enabled;
+			group_box_skin.Parts.Left.EnabledMaterial = button_left_enabled;
+			group_box_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
+			group_box_skin.Parts.Right.EnabledMaterial = button_right_enabled;
+			group_box_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
+			group_box_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
+			group_box_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
+			group_box_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
+
+			group_box_skin.Caption.TextObject = group_box_caption;
+			group_box_skin.Caption.EnabledStyle = button_caption_style_enabled;
+			group_box_skin.Caption.DisabledStyle = button_caption_style_disabled;
+
+			//Label skin
+			ion::gui::controls::gui_label::LabelSkin label_skin;
+			label_skin.Caption.TextObject = label_caption;
 
 			//Radio button skin
 			ion::gui::controls::gui_radio_button::RadioButtonSkin radio_button_skin;
@@ -2368,11 +2427,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_box->Node()->Position({0.0_r, 0.3_r});
 
 			auto radio_button = base_panel->CreateRadioButton("radio_button", "My radio button", "My radio button tooltip", std::move(radio_button_skin));
-			radio_button->Node()->Position({-0.05_r, 0.2_r});
+			radio_button->Node()->Position({-0.05_r, 0.0_r});
 			radio_button->CaptionLayout(ion::gui::controls::gui_control::ControlCaptionLayout::OutsideLeftCenter);
 
 			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", "My radio button", "My radio button tooltip", std::move(radio_button2_skin));
-			radio_button2->Node()->Position({0.05_r, 0.2_r});
+			radio_button2->Node()->Position({0.05_r, 0.0_r});
 
 			auto slider = base_panel->CreateSlider("slider", "My slider", "My slider tooltip", std::move(slider_skin), Vector2{1.0_r, 0.077_r});
 			slider->Node()->Position({0.0_r, 0.6_r});
@@ -2383,6 +2442,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scroll_bar->Node()->Position({-0.7_r, 0.15_r});
 			scroll_bar->Range(0, 50);
 			scroll_bar->StepByAmount(3);
+
+			auto group_box = base_panel->CreateGroupBox("group_box", "My group box", std::move(group_box_skin), Vector2{1.0_r, 0.15_r});
+			group_box->ZOrder(-0.01_r);
+			group_box->Node()->Position({0.0_r, 0.1_r});
+			group_box->AddControl(radio_button);
+			group_box->AddControl(radio_button2);
+			group_box->ClearControls();
 
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);

@@ -46,7 +46,7 @@ void GuiComponent::Detach() noexcept
 {
 	parent_ = nullptr;
 
-	if (node_)
+	if (node_ && node_->ParentNode())
 		node_->ParentNode()->RemoveChildNode(*node_);
 }
 
@@ -139,7 +139,7 @@ void GuiComponent::Disable() noexcept
 
 void GuiComponent::Show() noexcept
 {
-	if (node_)
+	if (node_ && node_->ParentNode())
 		node_->Visible(node_->ParentNode()->Visible(), false);
 
 	if (!visible_)
@@ -164,9 +164,9 @@ void GuiComponent::Hide() noexcept
 
 void GuiComponent::Parent(GuiComponent &parent) noexcept
 {
-	if (owner_ == parent.Owner())
+	if (owner_ == &parent || owner_ == parent.Owner())
 	{
-		if (node_)
+		if (node_ && node_->ParentNode())
 			parent.Node()->Adopt(node_->ParentNode()->Orphan(*node_));
 
 		parent_ = &parent;
