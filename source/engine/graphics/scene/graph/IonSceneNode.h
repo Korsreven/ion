@@ -108,7 +108,7 @@ namespace ion::graphics::scene::graph
 					first != std::end(from_nodes) && !compare(node, *first)) //Found z-order
 				{
 					//Search for first scene node with greater z-order
-					auto last = std::upper_bound(first, std::end(from_nodes), node, compare);			
+					auto last = std::upper_bound(first, std::end(from_nodes), node, compare);
 
 					//Search for exact scene node in range [first, last)
 					if (first = std::find(first, last, node); first != last) //Found exact
@@ -133,7 +133,7 @@ namespace ion::graphics::scene::graph
 					first != std::end(from_nodes) && !compare(nodes.front(), *first)) //Found z-order
 				{
 					//Search for first scene node with greater z-order
-					auto last = std::upper_bound(first, std::end(from_nodes), nodes.back(), compare);			
+					auto last = std::upper_bound(first, std::end(from_nodes), nodes.back(), compare);
 
 					for (auto iter = first; auto &node : nodes)
 					{
@@ -212,7 +212,7 @@ namespace ion::graphics::scene::graph
 					first != std::end(from_objects) && !compare(objects.front(), *first)) //Found first exact
 				{
 					//Search for first object with greater z-order
-					auto last = std::upper_bound(first, std::end(from_objects), objects.back(), compare);			
+					auto last = std::upper_bound(first, std::end(from_objects), objects.back(), compare);
 
 					for (auto iter = first; auto &object : objects)
 					{

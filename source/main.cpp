@@ -2432,7 +2432,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_box->Node()->Position({0.0_r, 0.3_r});
 
 			auto group_box = base_panel->CreateGroupBox("group_box", "My group box", std::move(group_box_skin), Vector2{1.0_r, 0.15_r});
-			//group_box->ZOrder(-0.01_r);
 			group_box->Node()->Position({0.0_r, 0.1_r});
 			group_box->Tooltip("My group box tooltip");
 

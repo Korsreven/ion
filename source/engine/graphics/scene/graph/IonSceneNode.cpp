@@ -243,6 +243,7 @@ void SceneNode::AttachNode(SceneNode *node)
 	node->MoveLights(node->RootNode().attached_lights_, node->attached_lights_);
 	
 	node->NotifyUpdate();
+	node->NotifyUpdateZ();
 }
 
 void SceneNode::DetachNode(SceneNode *node)
@@ -250,6 +251,7 @@ void SceneNode::DetachNode(SceneNode *node)
 	node->Tidy();
 	node->parent_node_ = nullptr;
 	node->NotifyUpdate();
+	node->NotifyUpdateZ();
 }
 
 
