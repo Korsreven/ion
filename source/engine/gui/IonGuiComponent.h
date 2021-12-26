@@ -217,8 +217,11 @@ namespace ion::gui
 			//Release ownership for this component
 			void Owner(std::nullptr_t) noexcept;
 
-			//Sets the relative z-order of this component
+			//Sets the local z-order of this component
 			void ZOrder(real z) noexcept;
+
+			//Sets the global z-order of this component
+			void GlobalZOrder(real z) noexcept;
 
 
 			/*
@@ -283,8 +286,11 @@ namespace ion::gui
 				return owner_;
 			}
 
-			//Returns the relative z-order of this component
+			//Returns the local z-order of this component
 			[[nodiscard]] real ZOrder() const noexcept;
+
+			//Returns the global z-order of this component
+			[[nodiscard]] real GlobalZOrder() const noexcept;
 
 			//Returns true if this component is a descendant of the given owner
 			[[nodiscard]] bool IsDescendantOf(const GuiContainer &owner) const noexcept;

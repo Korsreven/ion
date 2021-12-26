@@ -2416,6 +2416,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto base_panel = main_frame->CreatePanel("base");
 			base_panel->ZOrder(0.1_r);
 
+			auto slider = base_panel->CreateSlider("slider", "My slider", "My slider tooltip", std::move(slider_skin), Vector2{1.0_r, 0.077_r});
+			slider->Node()->Position({0.0_r, 0.6_r});
+			slider->Range(0, 20);
+			slider->StepByAmount(5);
+
 			auto label = base_panel->CreateLabel("label", "My label", std::move(label_skin));
 			label->Node()->Position({0.0_r, 0.5_r});
 			label->Tooltip("My label tooltip");
@@ -2426,6 +2431,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto check_box = base_panel->CreateCheckBox("check_box", "My check box", "My check box tooltip", std::move(check_box_skin));
 			check_box->Node()->Position({0.0_r, 0.3_r});
 
+			auto group_box = base_panel->CreateGroupBox("group_box", "My group box", std::move(group_box_skin), Vector2{1.0_r, 0.15_r});
+			//group_box->ZOrder(-0.01_r);
+			group_box->Node()->Position({0.0_r, 0.1_r});
+			group_box->Tooltip("My group box tooltip");
+
 			auto radio_button = base_panel->CreateRadioButton("radio_button", "My radio button", "My radio button tooltip", std::move(radio_button_skin));
 			radio_button->Node()->Position({-0.05_r, 0.0_r});
 			radio_button->CaptionLayout(ion::gui::controls::gui_control::ControlCaptionLayout::OutsideLeftCenter);
@@ -2433,22 +2443,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", "My radio button", "My radio button tooltip", std::move(radio_button2_skin));
 			radio_button2->Node()->Position({0.05_r, 0.0_r});
 
-			auto slider = base_panel->CreateSlider("slider", "My slider", "My slider tooltip", std::move(slider_skin), Vector2{1.0_r, 0.077_r});
-			slider->Node()->Position({0.0_r, 0.6_r});
-			slider->Range(0, 20);
-			slider->StepByAmount(5);
-
 			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", "My scroll bar", "My scroll bar tooltip", std::move(scroll_bar_skin), Vector2{0.077_r, 1.0_r});
 			scroll_bar->Node()->Position({-0.7_r, 0.15_r});
 			scroll_bar->Range(0, 50);
 			scroll_bar->StepByAmount(3);
 
-			auto group_box = base_panel->CreateGroupBox("group_box", "My group box", std::move(group_box_skin), Vector2{1.0_r, 0.15_r});
-			group_box->ZOrder(-0.01_r);
-			group_box->Node()->Position({0.0_r, 0.1_r});
 			group_box->AddControl(radio_button);
 			group_box->AddControl(radio_button2);
-			group_box->ClearControls();
+			
 
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);

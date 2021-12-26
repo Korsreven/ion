@@ -208,6 +208,13 @@ namespace ion::gui
 			void NotifyFrameFocused() noexcept;
 			void NotifyFrameDefocused() noexcept;
 
+
+			/*
+				Intersection
+			*/
+
+			controls::GuiControl* IntersectedControl(const Vector2 &position) noexcept;
+
 		public:
 
 			//Construct a frame with the given name

@@ -443,6 +443,28 @@ void GuiFrame::NotifyFrameDefocused() noexcept
 }
 
 
+/*
+	Intersection
+*/
+
+controls::GuiControl* GuiFrame::IntersectedControl(const Vector2 &position) noexcept
+{
+	detail::control_pointers::value_type candidate_control = nullptr;
+
+	//Check all controls in ascending tab order
+	for (GatherControls(); auto &control : ordered_controls_)
+	{
+		if ((!candidate_control ||
+			control->GlobalZOrder() >= candidate_control->GlobalZOrder()) &&
+			control->Intersects(position))
+			//New candidate found that overlaps previous (greater or equal z-order)
+			candidate_control = control;
+	}
+
+	return candidate_control;
+}
+
+
 //Public
 
 GuiFrame::GuiFrame(std::string name) :
@@ -742,29 +764,8 @@ bool GuiFrame::MouseMoved(Vector2 position) noexcept
 
 	else
 	{
-		auto intersected_control =
-			[&]() noexcept -> controls::GuiControl*
-			{
-				//Check hovered control first
-				if (hovered_control_ &&
-					hovered_control_->Intersects(position))
-					return hovered_control_;
-
-				else
-				{
-					//Check all other controls
-					for (GatherControls(); auto &control : ordered_controls_)
-					{
-						if (control != hovered_control_ &&
-							control->Intersects(position))
-							return control;
-					}
-
-					return nullptr;
-				}
-			}();
-
-		if (intersected_control != hovered_control_)
+		if (auto intersected_control = IntersectedControl(position);
+			intersected_control != hovered_control_)
 		{
 			if (hovered_control_)
 				hovered_control_->Exit();

@@ -199,6 +199,18 @@ void GuiComponent::ZOrder(real z) noexcept
 	}
 }
 
+void GuiComponent::GlobalZOrder(real z) noexcept
+{
+	if (node_)
+	{
+		auto [x, y, _] = node_->Position().XYZ();
+		auto parent_z = node_->ParentNode() ?
+			node_->ParentNode()->DerivedPosition().Z() : 0.0_r;
+		node_->Position({x, y, z - parent_z});
+			//Faster than calling DerivedPosition when changing z
+	}
+}
+
 
 /*
 	Observers
@@ -207,6 +219,11 @@ void GuiComponent::ZOrder(real z) noexcept
 real GuiComponent::ZOrder() const noexcept
 {
 	return node_ ? node_->Position().Z() : 0.0_r;
+}
+
+real GuiComponent::GlobalZOrder() const noexcept
+{
+	return node_ ? node_->DerivedPosition().Z() : 0.0_r;
 }
 
 bool GuiComponent::IsDescendantOf(const GuiContainer &owner) const noexcept
