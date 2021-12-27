@@ -79,17 +79,17 @@ void resize_skin(ControlSkin &skin, const Vector2 &from_size, const Vector2 &to_
 }
 
 
-void resize_area(Aabb &area, const Vector2 &scaling) noexcept
+void resize_hit_box(Aabb &hit_box, const Vector2 &scaling) noexcept
 {
-	area.Transform(Matrix3::Transformation(0.0_r, scaling, vector2::Zero));
+	hit_box.Transform(Matrix3::Transformation(0.0_r, scaling, vector2::Zero));
 }
 
-void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size) noexcept
+void resize_hit_boxes(BoundingBoxes &hit_boxes, const Vector2 &from_size, const Vector2 &to_size) noexcept
 {
 	auto scaling = to_size / from_size;
 
-	for (auto &area : areas)
-		resize_area(area, scaling);
+	for (auto &hit_box : hit_boxes)
+		resize_hit_box(hit_box, scaling);
 }
 
 
@@ -946,49 +946,29 @@ GuiControl::GuiControl(std::string name, const Vector2 &size) :
 	//Empty
 }
 
-GuiControl::GuiControl(std::string name, Areas areas) :
-
-	GuiComponent{std::move(name)},
-	size_{Aabb::Enclose(areas).ToSize()},
-	hit_areas_{std::move(areas)}
-{
-	//Empty
-}
-
 
 GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<ControlSkin> skin) :
+	OwningPtr<ControlSkin> skin, BoundingBoxes hit_boxes) :
 
 	GuiComponent{std::move(name)},
 	size_{skin ? detail::get_size(*skin, true) : std::nullopt},
 	caption_{std::move(caption)},
 	tooltip_{std::move(tooltip)},
-	skin_{std::move(skin)}
+	skin_{std::move(skin)},
+	hit_boxes_{std::move(hit_boxes)}
 {
 	//Empty
 }
 
 GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<ControlSkin> skin, const Vector2 &size) :
+	OwningPtr<ControlSkin> skin, const Vector2 &size, BoundingBoxes hit_boxes) :
 
 	GuiComponent{std::move(name)},
 	size_{size},
 	caption_{std::move(caption)},
 	tooltip_{std::move(tooltip)},
-	skin_{std::move(skin)}
-{
-	//Empty
-}
-
-GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<ControlSkin> skin, Areas areas) :
-
-	GuiComponent{std::move(name)},
-	size_{Aabb::Enclose(areas).ToSize()},
-	caption_{std::move(caption)},
-	tooltip_{std::move(tooltip)},
 	skin_{std::move(skin)},
-	hit_areas_{std::move(areas)}
+	hit_boxes_{std::move(hit_boxes)}
 {
 	//Empty
 }
@@ -1098,16 +1078,16 @@ void GuiControl::Size(const Vector2 &size) noexcept
 {
 	if (!size_ || *size_ != size)
 	{
-		//Resize skin
-		if (size_ && skin_)
-			detail::resize_skin(*skin_, *size_, size);
+		if (size_)
+		{
+			//Resize skin
+			if (skin_)
+				detail::resize_skin(*skin_, *size_, size);
 
-		//Single hit area
-		if (std::size(hit_areas_) == 1)
-			hit_areas_.back() = Aabb::Size(size);
-		//Multiple hit areas
-		else if (size_ && !size_->ZeroLength())
-			detail::resize_areas(hit_areas_, *size_, size);
+			//Resize hit boxes
+			if (!std::empty(hit_boxes_) && !size_->ZeroLength())
+				detail::resize_hit_boxes(hit_boxes_, *size_, size);
+		}
 
 		auto from_size = size_;
 		size_ = size;
@@ -1200,16 +1180,16 @@ std::optional<Aabb> GuiControl::InnerArea() const noexcept
 
 std::optional<Aabb> GuiControl::HitArea() const noexcept
 {
-	//No custom defined hit areas
+	//No custom defined hit boxes
 	//Use visuals as hit area
-	if (std::empty(hit_areas_))
+	if (std::empty(hit_boxes_))
 		return Area();
 
-	//Single hit area
-	else if (std::size(hit_areas_) == 1)
-		return hit_areas_.back();
-	else //Multiple hit areas
-		return Aabb::Enclose(hit_areas_);
+	//Single hit box
+	else if (std::size(hit_boxes_) == 1)
+		return hit_boxes_.back();
+	else //Multiple hit boxes
+		return Aabb::Enclose(hit_boxes_);
 }
 
 
@@ -1227,7 +1207,8 @@ bool GuiControl::Intersects(const Vector2 &point) const noexcept
 {
 	if (node_ && visible_)
 	{
-		if (std::empty(hit_areas_))
+		//No custom defined hit boxes
+		if (std::empty(hit_boxes_))
 		{
 			if (auto object =
 				[&]() noexcept -> graphics::scene::DrawableObject*
@@ -1254,15 +1235,15 @@ bool GuiControl::Intersects(const Vector2 &point) const noexcept
 				}
 			}
 		}
-		else
+		else //Custom defined hit boxes
 		{
-			for (auto &area : hit_areas_)
+			for (auto &hit_box : hit_boxes_)
 			{
 				//Check for intersection
-				if (area.TransformCopy(node_->FullTransformation()).Intersects(point))
+				if (hit_box.TransformCopy(node_->FullTransformation()).Intersects(point))
 				{
 					if (!node_ || node_->AxisAligned() ||
-						Obb{area}.Transform(node_->FullTransformation()).Intersects(point))
+						Obb{hit_box}.Transform(node_->FullTransformation()).Intersects(point))
 						return true;
 				}
 			}

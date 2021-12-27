@@ -83,7 +83,7 @@ namespace ion::gui::controls
 								OutsideBottomLeft,	OutsideBottomCenter,	OutsideBottomRight
 		};
 
-		using Areas = std::vector<Aabb>;
+		using BoundingBoxes = std::vector<Aabb>;
 
 
 		struct ControlVisualPart final
@@ -252,8 +252,8 @@ namespace ion::gui::controls
 			void resize_part(ControlVisualPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept;		
 			void resize_skin(ControlSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 
-			void resize_area(Aabb &area, const Vector2 &scaling) noexcept;
-			void resize_areas(Areas &areas, const Vector2 &from_size, const Vector2 &to_size) noexcept;
+			void resize_hit_box(Aabb &hit_box, const Vector2 &scaling) noexcept;
+			void resize_hit_boxes(BoundingBoxes &hit_boxes, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 
 
 			std::optional<Aabb> get_area(const ControlSkin &skin, bool include_caption) noexcept;
@@ -372,7 +372,7 @@ namespace ion::gui::controls
 
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
 			OwningPtr<gui_control::ControlSkin> skin_;
-			gui_control::Areas hit_areas_;
+			gui_control::BoundingBoxes hit_boxes_;
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
 			std::optional<events::Callback<void, GuiControl&>> on_defocus_;
@@ -507,21 +507,14 @@ namespace ion::gui::controls
 			//Construct a control with the given name and hit size
 			GuiControl(std::string name, const Vector2 &size);
 
-			//Construct a control with the given name and hit areas
-			GuiControl(std::string name, gui_control::Areas areas);
 
-
-			//Construct a control with the given name, caption, tooltip and skin
+			//Construct a control with the given name, caption, tooltip, skin and hit boxes
 			GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_control::ControlSkin> skin);
+				OwningPtr<gui_control::ControlSkin> skin, gui_control::BoundingBoxes hit_boxes = {});
 
-			//Construct a control with the given name, caption, tooltip, skin and size
+			//Construct a control with the given name, caption, tooltip, skin, size and hit boxes
 			GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_control::ControlSkin> skin, const Vector2 &size);
-
-			//Construct a control with the given name, caption, tooltip, skin and hit areas
-			GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_control::ControlSkin> skin, gui_control::Areas areas);
+				OwningPtr<gui_control::ControlSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes = {});
 
 			
 			//Default move constructor
@@ -669,17 +662,17 @@ namespace ion::gui::controls
 			//Sets the skin for this control to the given skin
 			void Skin(OwningPtr<gui_control::ControlSkin> skin) noexcept;
 
-			//Sets the hit areas of this control to the given areas
-			inline void HitAreas(gui_control::Areas areas) noexcept
+			//Sets the hit boxes for this control to the given hit boxes
+			inline void HitBoxes(gui_control::BoundingBoxes hit_boxes) noexcept
 			{
-				hit_areas_ = std::move(areas);
+				hit_boxes_ = std::move(hit_boxes);
 			}
 
-			//Sets the hit area of this control to the given area
-			inline void HitArea(const Aabb &area) noexcept
+			//Sets the hit box for this control to the given hit box
+			inline void HitBox(const Aabb &hit_box) noexcept
 			{
-				hit_areas_.clear();
-				hit_areas_.push_back(area);
+				hit_boxes_.clear();
+				hit_boxes_.push_back(hit_box);
 			}
 
 
@@ -921,10 +914,10 @@ namespace ion::gui::controls
 				return NonOwningPtr<gui_control::ControlSkin>{skin_};
 			}
 
-			//Returns all of the hit areas of this control
-			[[nodiscard]] inline auto& HitAreas() const noexcept
+			//Returns the hit boxes for this control
+			[[nodiscard]] inline auto& HitBoxes() const noexcept
 			{
-				return hit_areas_;
+				return hit_boxes_;
 			}
 
 

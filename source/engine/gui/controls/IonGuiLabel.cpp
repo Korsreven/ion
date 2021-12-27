@@ -32,20 +32,16 @@ void GuiLabel::DefaultSetup() noexcept
 
 //Public
 
-GuiLabel::GuiLabel(std::string name, std::optional<std::string> caption, OwningPtr<LabelSkin> skin) :
-	GuiControl{std::move(name), std::move(caption), {}, std::move(skin)}
+GuiLabel::GuiLabel(std::string name, std::optional<std::string> caption,
+	OwningPtr<LabelSkin> skin, gui_control::BoundingBoxes hit_boxes) :
+	GuiControl{std::move(name), std::move(caption), {}, std::move(skin), std::move(hit_boxes)}
 {
 	DefaultSetup();
 }
 
-GuiLabel::GuiLabel(std::string name, std::optional<std::string> caption, OwningPtr<LabelSkin> skin, const Vector2 &size) :
-	GuiControl{std::move(name), std::move(caption), {}, std::move(skin), size}
-{
-	DefaultSetup();
-}
-
-GuiLabel::GuiLabel(std::string name, std::optional<std::string> caption, OwningPtr<LabelSkin> skin, gui_control::Areas areas) :
-	GuiControl{std::move(name), std::move(caption), {}, std::move(skin), std::move(areas)}
+GuiLabel::GuiLabel(std::string name, std::optional<std::string> caption,
+	OwningPtr<LabelSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes) :
+	GuiControl{std::move(name), std::move(caption), {}, std::move(skin), size, std::move(hit_boxes)}
 {
 	DefaultSetup();
 }

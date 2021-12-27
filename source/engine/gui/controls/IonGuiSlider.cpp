@@ -189,27 +189,18 @@ void GuiSlider::UpdateHandle() noexcept
 //Public
 
 GuiSlider::GuiSlider(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<SliderSkin> skin, SliderType type) :
+	OwningPtr<SliderSkin> skin, SliderType type, gui_control::BoundingBoxes hit_boxes) :
 
-	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin)},
+	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(hit_boxes)},
 	type_{type}
 {
 	DefaultSetup();
 }
 
 GuiSlider::GuiSlider(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<SliderSkin> skin, const Vector2 &size, SliderType type) :
+	OwningPtr<SliderSkin> skin, const Vector2 &size, SliderType type, gui_control::BoundingBoxes hit_boxes) :
 
-	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size},
-	type_{type}
-{
-	DefaultSetup();
-}
-
-GuiSlider::GuiSlider(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<SliderSkin> skin, gui_control::Areas areas, SliderType type) :
-
-	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(areas)},
+	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size, std::move(hit_boxes)},
 	type_{type}
 {
 	DefaultSetup();

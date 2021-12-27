@@ -217,24 +217,19 @@ std::optional<int> GuiPanelContainer::TabOrder(const GuiComponent &component) co
 */
 
 NonOwningPtr<controls::GuiButton> GuiPanelContainer::CreateButton(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_button::ButtonSkin skin)
+	std::optional<std::string> tooltip, controls::gui_button::ButtonSkin skin,
+	controls::gui_control::BoundingBoxes hit_boxes)
 {
 	return CreateControl<controls::GuiButton>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_button::ButtonSkin>(std::move(skin)));
+		make_owning<controls::gui_button::ButtonSkin>(std::move(skin)), std::move(hit_boxes));
 }
 
 NonOwningPtr<controls::GuiButton> GuiPanelContainer::CreateButton(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_button::ButtonSkin skin, const Vector2 &size)
+	std::optional<std::string> tooltip, controls::gui_button::ButtonSkin skin, const Vector2 &size,
+	controls::gui_control::BoundingBoxes hit_boxes)
 {
 	return CreateControl<controls::GuiButton>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_button::ButtonSkin>(std::move(skin)), size);
-}
-
-NonOwningPtr<controls::GuiButton> GuiPanelContainer::CreateButton(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_button::ButtonSkin skin, controls::gui_control::Areas areas)
-{
-	return CreateControl<controls::GuiButton>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_button::ButtonSkin>(std::move(skin)), std::move(areas));
+		make_owning<controls::gui_button::ButtonSkin>(std::move(skin)), size, std::move(hit_boxes));
 }
 
 NonOwningPtr<controls::GuiButton> GuiPanelContainer::CreateButton(controls::GuiButton &&button)
@@ -249,24 +244,19 @@ NonOwningPtr<controls::GuiButton> GuiPanelContainer::CreateButton(controls::GuiB
 */
 
 NonOwningPtr<controls::GuiCheckBox> GuiPanelContainer::CreateCheckBox(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_check_box::CheckBoxSkin skin)
+	std::optional<std::string> tooltip, controls::gui_check_box::CheckBoxSkin skin,
+	controls::gui_control::BoundingBoxes hit_boxes)
 {
 	return CreateControl<controls::GuiCheckBox>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_check_box::CheckBoxSkin>(std::move(skin)));
+		make_owning<controls::gui_check_box::CheckBoxSkin>(std::move(skin)), std::move(hit_boxes));
 }
 
 NonOwningPtr<controls::GuiCheckBox> GuiPanelContainer::CreateCheckBox(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_check_box::CheckBoxSkin skin, const Vector2 &size)
+	std::optional<std::string> tooltip, controls::gui_check_box::CheckBoxSkin skin, const Vector2 &size,
+	controls::gui_control::BoundingBoxes hit_boxes)
 {
 	return CreateControl<controls::GuiCheckBox>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_check_box::CheckBoxSkin>(std::move(skin)), size);
-}
-
-NonOwningPtr<controls::GuiCheckBox> GuiPanelContainer::CreateCheckBox(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_check_box::CheckBoxSkin skin, controls::gui_control::Areas areas)
-{
-	return CreateControl<controls::GuiCheckBox>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_check_box::CheckBoxSkin>(std::move(skin)), std::move(areas));
+		make_owning<controls::gui_check_box::CheckBoxSkin>(std::move(skin)), size, std::move(hit_boxes));
 }
 
 NonOwningPtr<controls::GuiCheckBox> GuiPanelContainer::CreateCheckBox(controls::GuiCheckBox &&check_box)
@@ -281,24 +271,17 @@ NonOwningPtr<controls::GuiCheckBox> GuiPanelContainer::CreateCheckBox(controls::
 */
 
 NonOwningPtr<controls::GuiGroupBox> GuiPanelContainer::CreateGroupBox(std::string name, std::optional<std::string> caption,
-	controls::gui_group_box::GroupBoxSkin skin)
+	controls::gui_group_box::GroupBoxSkin skin, controls::gui_control::BoundingBoxes hit_boxes)
 {
 	return CreateControl<controls::GuiGroupBox>(std::move(name), std::move(caption),
-		make_owning<controls::gui_group_box::GroupBoxSkin>(std::move(skin)));
+		make_owning<controls::gui_group_box::GroupBoxSkin>(std::move(skin)), std::move(hit_boxes));
 }
 
 NonOwningPtr<controls::GuiGroupBox> GuiPanelContainer::CreateGroupBox(std::string name, std::optional<std::string> caption,
-	controls::gui_group_box::GroupBoxSkin skin, const Vector2 &size)
+	controls::gui_group_box::GroupBoxSkin skin, const Vector2 &size, controls::gui_control::BoundingBoxes hit_boxes)
 {
 	return CreateControl<controls::GuiGroupBox>(std::move(name), std::move(caption),
-		make_owning<controls::gui_group_box::GroupBoxSkin>(std::move(skin)), size);
-}
-
-NonOwningPtr<controls::GuiGroupBox> GuiPanelContainer::CreateGroupBox(std::string name, std::optional<std::string> caption,
-	controls::gui_group_box::GroupBoxSkin skin, controls::gui_control::Areas areas)
-{
-	return CreateControl<controls::GuiGroupBox>(std::move(name), std::move(caption),
-		make_owning<controls::gui_group_box::GroupBoxSkin>(std::move(skin)), std::move(areas));
+		make_owning<controls::gui_group_box::GroupBoxSkin>(std::move(skin)), size, std::move(hit_boxes));
 }
 
 NonOwningPtr<controls::GuiGroupBox> GuiPanelContainer::CreateGroupBox(controls::GuiGroupBox &&group_box)
@@ -313,24 +296,17 @@ NonOwningPtr<controls::GuiGroupBox> GuiPanelContainer::CreateGroupBox(controls::
 */
 
 NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(std::string name, std::optional<std::string> caption,
-	controls::gui_label::LabelSkin skin)
+	controls::gui_label::LabelSkin skin, controls::gui_control::BoundingBoxes hit_boxes)
 {
 	return CreateControl<controls::GuiLabel>(std::move(name), std::move(caption),
-		make_owning<controls::gui_label::LabelSkin>(std::move(skin)));
+		make_owning<controls::gui_label::LabelSkin>(std::move(skin)), std::move(hit_boxes));
 }
 
 NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(std::string name, std::optional<std::string> caption,
-	controls::gui_label::LabelSkin skin, const Vector2 &size)
+	controls::gui_label::LabelSkin skin, const Vector2 &size, controls::gui_control::BoundingBoxes hit_boxes)
 {
 	return CreateControl<controls::GuiLabel>(std::move(name), std::move(caption),
-		make_owning<controls::gui_label::LabelSkin>(std::move(skin)), size);
-}
-
-NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(std::string name, std::optional<std::string> caption,
-	controls::gui_label::LabelSkin skin, controls::gui_control::Areas areas)
-{
-	return CreateControl<controls::GuiLabel>(std::move(name), std::move(caption),
-		make_owning<controls::gui_label::LabelSkin>(std::move(skin)), std::move(areas));
+		make_owning<controls::gui_label::LabelSkin>(std::move(skin)), size, std::move(hit_boxes));
 }
 
 NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(controls::GuiLabel &&label)
@@ -345,24 +321,19 @@ NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(controls::GuiLab
 */
 
 NonOwningPtr<controls::GuiRadioButton> GuiPanelContainer::CreateRadioButton(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_radio_button::RadioButtonSkin skin)
+	std::optional<std::string> tooltip, controls::gui_radio_button::RadioButtonSkin skin,
+	controls::gui_control::BoundingBoxes hit_boxes)
 {
 	return CreateControl<controls::GuiRadioButton>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_radio_button::RadioButtonSkin>(std::move(skin)));
+		make_owning<controls::gui_radio_button::RadioButtonSkin>(std::move(skin)), std::move(hit_boxes));
 }
 
 NonOwningPtr<controls::GuiRadioButton> GuiPanelContainer::CreateRadioButton(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_radio_button::RadioButtonSkin skin, const Vector2 &size)
+	std::optional<std::string> tooltip, controls::gui_radio_button::RadioButtonSkin skin, const Vector2 &size,
+	controls::gui_control::BoundingBoxes hit_boxes)
 {
 	return CreateControl<controls::GuiRadioButton>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_radio_button::RadioButtonSkin>(std::move(skin)), size);
-}
-
-NonOwningPtr<controls::GuiRadioButton> GuiPanelContainer::CreateRadioButton(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_radio_button::RadioButtonSkin skin, controls::gui_control::Areas areas)
-{
-	return CreateControl<controls::GuiRadioButton>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_radio_button::RadioButtonSkin>(std::move(skin)), std::move(areas));
+		make_owning<controls::gui_radio_button::RadioButtonSkin>(std::move(skin)), size, std::move(hit_boxes));
 }
 
 NonOwningPtr<controls::GuiRadioButton> GuiPanelContainer::CreateRadioButton(controls::GuiRadioButton &&radio_button)
@@ -378,26 +349,18 @@ NonOwningPtr<controls::GuiRadioButton> GuiPanelContainer::CreateRadioButton(cont
 
 NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(std::string name, std::optional<std::string> caption,
 	std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin,
-	controls::gui_slider::SliderType type)
+	controls::gui_slider::SliderType type, controls::gui_control::BoundingBoxes hit_boxes)
 {
 	return CreateControl<controls::GuiScrollBar>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_scroll_bar::ScrollBarSkin>(std::move(skin)), type);
+		make_owning<controls::gui_scroll_bar::ScrollBarSkin>(std::move(skin)), type, std::move(hit_boxes));
 }
 
 NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(std::string name, std::optional<std::string> caption,
 	std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin, const Vector2 &size,
-	controls::gui_slider::SliderType type)
+	controls::gui_slider::SliderType type, controls::gui_control::BoundingBoxes hit_boxes)
 {
 	return CreateControl<controls::GuiScrollBar>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_scroll_bar::ScrollBarSkin>(std::move(skin)), size, type);
-}
-
-NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_scroll_bar::ScrollBarSkin skin, controls::gui_control::Areas areas,
-	controls::gui_slider::SliderType type)
-{
-	return CreateControl<controls::GuiScrollBar>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_scroll_bar::ScrollBarSkin>(std::move(skin)), std::move(areas), type);
+		make_owning<controls::gui_scroll_bar::ScrollBarSkin>(std::move(skin)), size, type, std::move(hit_boxes));
 }
 
 NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(controls::GuiScrollBar &&scroll_bar)
@@ -413,26 +376,18 @@ NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(controls
 
 NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(std::string name, std::optional<std::string> caption,
 	std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin,
-	controls::gui_slider::SliderType type)
+	controls::gui_slider::SliderType type, controls::gui_control::BoundingBoxes hit_boxes)
 {
 	return CreateControl<controls::GuiSlider>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_slider::SliderSkin>(std::move(skin)), type);
+		make_owning<controls::gui_slider::SliderSkin>(std::move(skin)), type, std::move(hit_boxes));
 }
 
 NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(std::string name, std::optional<std::string> caption,
 	std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin, const Vector2 &size,
-	controls::gui_slider::SliderType type)
+	controls::gui_slider::SliderType type, controls::gui_control::BoundingBoxes hit_boxes)
 {
 	return CreateControl<controls::GuiSlider>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_slider::SliderSkin>(std::move(skin)), size, type);
-}
-
-NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(std::string name, std::optional<std::string> caption,
-	std::optional<std::string> tooltip, controls::gui_slider::SliderSkin skin, controls::gui_control::Areas areas,
-	controls::gui_slider::SliderType type)
-{
-	return CreateControl<controls::GuiSlider>(std::move(name), std::move(caption), std::move(tooltip),
-		make_owning<controls::gui_slider::SliderSkin>(std::move(skin)), std::move(areas), type);
+		make_owning<controls::gui_slider::SliderSkin>(std::move(skin)), size, type, std::move(hit_boxes));
 }
 
 NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(controls::GuiSlider &&slider)

@@ -94,17 +94,13 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a button with the given name, caption, tooltip and skin
+			//Construct a button with the given name, caption, tooltip, skin and hit boxes
 			GuiButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_button::ButtonSkin> skin);
+				OwningPtr<gui_button::ButtonSkin> skin, gui_control::BoundingBoxes hit_boxes = {});
 
-			//Construct a button with the given name, caption, tooltip, skin and size
+			//Construct a button with the given name, caption, tooltip, skin, size and hit boxes
 			GuiButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_button::ButtonSkin> skin, const Vector2 &size);
-
-			//Construct a button with the given name, caption, tooltip, skin and hit areas
-			GuiButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_button::ButtonSkin> skin, gui_control::Areas areas);
+				OwningPtr<gui_button::ButtonSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes = {});
 
 
 			/*

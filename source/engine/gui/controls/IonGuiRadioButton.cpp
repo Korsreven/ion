@@ -92,22 +92,15 @@ bool GuiRadioButton::UniqueTag(int tag) const noexcept
 //Public
 
 GuiRadioButton::GuiRadioButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<RadioButtonSkin> skin) :
-	GuiCheckBox{std::move(name), std::move(caption), std::move(tooltip), std::move(skin)}
+	OwningPtr<RadioButtonSkin> skin, gui_control::BoundingBoxes hit_boxes) :
+	GuiCheckBox{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(hit_boxes)}
 {
 	//Empty
 }
 
 GuiRadioButton::GuiRadioButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<RadioButtonSkin> skin, const Vector2 &size) :
-	GuiCheckBox{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size}
-{
-	//Empty
-}
-
-GuiRadioButton::GuiRadioButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<RadioButtonSkin> skin, gui_control::Areas areas) :
-	GuiCheckBox{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(areas)}
+	OwningPtr<RadioButtonSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes) :
+	GuiCheckBox{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size, std::move(hit_boxes)}
 {
 	//Empty
 }

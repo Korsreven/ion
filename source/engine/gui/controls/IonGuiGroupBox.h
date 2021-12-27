@@ -65,14 +65,13 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a group box with the given name, caption and skin
-			GuiGroupBox(std::string name, std::optional<std::string> caption, OwningPtr<gui_group_box::GroupBoxSkin> skin);
+			//Construct a group box with the given name, caption, skin and hit boxes
+			GuiGroupBox(std::string name, std::optional<std::string> caption,
+				OwningPtr<gui_group_box::GroupBoxSkin> skin, gui_control::BoundingBoxes hit_boxes = {});
 
-			//Construct a group box with the given name, caption, skin and size
-			GuiGroupBox(std::string name, std::optional<std::string> caption, OwningPtr<gui_group_box::GroupBoxSkin> skin, const Vector2 &size);
-
-			//Construct a group box with the given name, caption, skin and hit areas
-			GuiGroupBox(std::string name, std::optional<std::string> caption, OwningPtr<gui_group_box::GroupBoxSkin> skin, gui_control::Areas areas);
+			//Construct a group box with the given name, caption, skin, size and hit boxes
+			GuiGroupBox(std::string name, std::optional<std::string> caption,
+				OwningPtr<gui_group_box::GroupBoxSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes = {});
 
 
 			//Default move constructor

@@ -81,17 +81,13 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a check box with the given name, caption, tooltip and skin
+			//Construct a check box with the given name, caption, tooltip, skin and hit boxes
 			GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_check_box::CheckBoxSkin> skin);
+				OwningPtr<gui_check_box::CheckBoxSkin> skin, gui_control::BoundingBoxes hit_boxes = {});
 
-			//Construct a check box with the given name, caption, tooltip, skin and size
+			//Construct a check box with the given name, caption, tooltip, skin, size and hit boxes
 			GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_check_box::CheckBoxSkin> skin, const Vector2 &size);
-
-			//Construct a check box with the given name, caption, tooltip, skin and hit areas
-			GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_check_box::CheckBoxSkin> skin, gui_control::Areas areas);
+				OwningPtr<gui_check_box::CheckBoxSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes = {});
 
 
 			/*

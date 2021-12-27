@@ -133,17 +133,15 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a slider with the given name, caption, tooltip and skin
+			//Construct a slider with the given name, caption, tooltip, skin, type and hit boxes
 			GuiSlider(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_slider::SliderSkin> skin, gui_slider::SliderType type = gui_slider::SliderType::Horizontal);
+				OwningPtr<gui_slider::SliderSkin> skin, gui_slider::SliderType type = gui_slider::SliderType::Horizontal,
+				gui_control::BoundingBoxes hit_boxes = {});
 
-			//Construct a slider with the given name, caption, tooltip, skin and size
+			//Construct a slider with the given name, caption, tooltip, skin, size, type and hit boxes
 			GuiSlider(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_slider::SliderSkin> skin, const Vector2 &size, gui_slider::SliderType type = gui_slider::SliderType::Horizontal);
-
-			//Construct a slider with the given name, caption, tooltip, skin and hit areas
-			GuiSlider(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_slider::SliderSkin> skin, gui_control::Areas areas, gui_slider::SliderType type = gui_slider::SliderType::Horizontal);
+				OwningPtr<gui_slider::SliderSkin> skin, const Vector2 &size, gui_slider::SliderType type = gui_slider::SliderType::Horizontal,
+				gui_control::BoundingBoxes hit_boxes = {});
 
 
 			/*

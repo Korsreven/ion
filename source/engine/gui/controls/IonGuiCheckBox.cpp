@@ -113,22 +113,15 @@ void GuiCheckBox::SetState(gui_control::ControlState state) noexcept
 //Public
 
 GuiCheckBox::GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<CheckBoxSkin> skin) :
-	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin)}
+	OwningPtr<CheckBoxSkin> skin, gui_control::BoundingBoxes hit_boxes) :
+	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(hit_boxes)}
 {
 	DefaultSetup();
 }
 
 GuiCheckBox::GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<CheckBoxSkin> skin, const Vector2 &size) :
-	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size}
-{
-	DefaultSetup();
-}
-
-GuiCheckBox::GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<CheckBoxSkin> skin, gui_control::Areas areas) :
-	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(areas)}
+	OwningPtr<CheckBoxSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes) :
+	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size, std::move(hit_boxes)}
 {
 	DefaultSetup();
 }
