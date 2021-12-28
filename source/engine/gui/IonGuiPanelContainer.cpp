@@ -316,6 +316,31 @@ NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(controls::GuiLab
 
 
 /*
+	Progress bars
+	Creating
+*/
+
+NonOwningPtr<controls::GuiProgressBar> GuiPanelContainer::CreateProgressBar(std::string name, std::optional<std::string> caption,
+	controls::gui_progress_bar::ProgressBarSkin skin, controls::gui_progress_bar::ProgressBarType type)
+{
+	return CreateControl<controls::GuiProgressBar>(std::move(name), std::move(caption),
+		make_owning<controls::gui_progress_bar::ProgressBarSkin>(std::move(skin)), type);
+}
+
+NonOwningPtr<controls::GuiProgressBar> GuiPanelContainer::CreateProgressBar(std::string name, std::optional<std::string> caption,
+	controls::gui_progress_bar::ProgressBarSkin skin, const Vector2 &size, controls::gui_progress_bar::ProgressBarType type)
+{
+	return CreateControl<controls::GuiProgressBar>(std::move(name), std::move(caption),
+		make_owning<controls::gui_progress_bar::ProgressBarSkin>(std::move(skin)), size, type);
+}
+
+NonOwningPtr<controls::GuiProgressBar> GuiPanelContainer::CreateProgressBar(controls::GuiProgressBar &&progress_bar)
+{
+	return CreateControl<controls::GuiProgressBar>(std::move(progress_bar));
+}
+
+
+/*
 	Radio buttons
 	Creating
 */

@@ -25,6 +25,7 @@ File:	IonGuiPanelContainer.h
 #include "controls/IonGuiCheckBox.h"
 #include "controls/IonGuiGroupBox.h"
 #include "controls/IonGuiLabel.h"
+#include "controls/IonGuiProgressBar.h"
 #include "controls/IonGuiRadioButton.h"
 #include "controls/IonGuiScrollBar.h"
 #include "controls/IonGuiSlider.h"
@@ -288,6 +289,25 @@ namespace ion::gui
 
 			//Create a label by moving the given label
 			NonOwningPtr<controls::GuiLabel> CreateLabel(controls::GuiLabel &&label);
+
+
+			/*
+				Progress bars
+				Creating
+			*/
+
+			//Create a progress bar with the given name, caption, skin and type
+			NonOwningPtr<controls::GuiProgressBar> CreateProgressBar(std::string name, std::optional<std::string> caption,
+				controls::gui_progress_bar::ProgressBarSkin skin,
+				controls::gui_progress_bar::ProgressBarType type = controls::gui_progress_bar::ProgressBarType::Horizontal);
+
+			//Create a progress bar with the given name, caption, skin, size and type
+			NonOwningPtr<controls::GuiProgressBar> CreateProgressBar(std::string name, std::optional<std::string> caption,
+				controls::gui_progress_bar::ProgressBarSkin skin, const Vector2 &size,
+				controls::gui_progress_bar::ProgressBarType type = controls::gui_progress_bar::ProgressBarType::Horizontal);
+
+			//Create a progress bar by moving the given progress bar
+			NonOwningPtr<controls::GuiProgressBar> CreateProgressBar(controls::GuiProgressBar &&progress_bar);
 
 
 			/*

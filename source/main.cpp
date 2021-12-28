@@ -150,6 +150,7 @@ File:	main.cpp
 #include "gui/controls/IonGuiControl.h"
 #include "gui/controls/IonGuiGroupBox.h"
 #include "gui/controls/IonGuiLabel.h"
+#include "gui/controls/IonGuiProgressBar.h"
 #include "gui/controls/IonGuiRadioButton.h"
 #include "gui/controls/IonGuiScrollBar.h"
 #include "gui/controls/IonGuiSlider.h"
