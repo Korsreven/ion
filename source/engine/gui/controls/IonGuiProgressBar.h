@@ -81,12 +81,12 @@ namespace ion::gui::controls
 			types::Progress<real> progress_;
 			real snap_interval_ = 1.0_r;
 
-			gui_progress_bar::InterpolationType interpolation_type_ = gui_progress_bar::InterpolationType::Forward;
+			gui_progress_bar::InterpolationType interpolation_type_ = gui_progress_bar::InterpolationType::Bidirectional;
 			duration interpolation_time_ = gui_progress_bar::detail::default_interpolation_time;
 			duration interpolation_delay_ = gui_progress_bar::detail::default_interpolation_delay;
 
 			gui_progress_bar::detail::interpolation_phase phase_ = gui_progress_bar::detail::interpolation_phase::PreInterpolate;
-			types::Cumulative<duration> interpolation_duration_{interpolation_delay_};
+			types::Cumulative<duration> phase_duration_{interpolation_delay_};
 
 
 			/*
@@ -116,6 +116,14 @@ namespace ion::gui::controls
 			void RotateSkin() noexcept;
 
 			virtual void UpdateBars() noexcept;
+
+
+			/*
+				Phase
+			*/
+
+			void SetPhase(gui_progress_bar::detail::interpolation_phase phase) noexcept;
+			void UpdatePhaseDuration() noexcept;
 
 		public:
 
@@ -199,6 +207,27 @@ namespace ion::gui::controls
 			}
 
 
+			//Sets the interpolation time for this progress bar to the given time
+			inline void InterpolationTime(duration time) noexcept
+			{
+				if (interpolation_time_ != time && time >= 0.0_sec)
+				{
+					interpolation_time_ = time;
+					UpdatePhaseDuration();
+				}
+			}
+
+			//Sets the interpolation delay for this progress bar to the given time
+			inline void InterpolationDelay(duration time) noexcept
+			{
+				if (interpolation_delay_ != time && time >= 0.0_sec)
+				{
+					interpolation_delay_ = time;
+					UpdatePhaseDuration();
+				}
+			}
+
+
 			/*
 				Observers
 			*/
@@ -243,6 +272,27 @@ namespace ion::gui::controls
 			{
 				return snap_interval_;
 			}
+
+
+			//Returns the interpolation time for this progress bar to the given time
+			[[nodiscard]] inline auto InterpolationTime() const noexcept
+			{
+				return interpolation_time_;
+			}
+
+			//Returns the interpolation delay for this progress bar to the given time
+			[[nodiscard]] inline auto InterpolationDelay() const noexcept
+			{
+				return interpolation_delay_;
+			}
+
+
+			/*
+				Frame events
+			*/
+
+			//Called from gui control when a frame has started
+			virtual void FrameStarted(duration time) noexcept override;
 	};
 
 } //ion::gui::controls

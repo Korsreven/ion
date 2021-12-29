@@ -167,6 +167,36 @@ void GuiProgressBar::UpdateBars() noexcept
 }
 
 
+/*
+	Phase
+*/
+
+void GuiProgressBar::SetPhase(detail::interpolation_phase phase) noexcept
+{
+	phase_ = phase;
+	UpdatePhaseDuration();
+}
+
+void GuiProgressBar::UpdatePhaseDuration() noexcept
+{
+	auto limit =
+		[&]() noexcept
+		{
+			switch (phase_)
+			{
+				case detail::interpolation_phase::PreInterpolate:
+				return interpolation_delay_;
+
+				case detail::interpolation_phase::Interpolate:
+				default:
+				return interpolation_time_;
+			}
+		}();
+
+	phase_duration_.Limit(limit);
+}
+
+
 //Public
 
 GuiProgressBar::GuiProgressBar(std::string name, std::optional<std::string> caption, OwningPtr<ProgressBarSkin> skin,
@@ -201,6 +231,48 @@ void GuiProgressBar::Percent(real percent) noexcept
 			progress_.Max(),
 			percent))
 		);
+}
+
+
+/*
+	Frame events
+*/
+
+void GuiProgressBar::FrameStarted(duration time) noexcept
+{
+	if (visible_)
+	{
+		if (phase_duration_ += time)
+		{
+			phase_duration_.ResetWithCarry();
+
+			//Switch to next phase
+			SetPhase(
+				[&]() noexcept
+				{
+					switch (phase_)
+					{
+						case detail::interpolation_phase::PreInterpolate:
+						return detail::interpolation_phase::Interpolate;
+
+						case detail::interpolation_phase::Interpolate:
+						default:
+						return detail::interpolation_phase::PreInterpolate;
+					}
+				}());
+		}
+
+		switch (phase_)
+		{
+			case detail::interpolation_phase::PreInterpolate:
+			//Todo
+			break;
+
+			case detail::interpolation_phase::Interpolate:
+			//Todo
+			break;		
+		}
+	}
 }
 
 } //ion::gui::controls
