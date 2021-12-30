@@ -63,7 +63,12 @@ namespace ion::gui::controls
 			constexpr auto default_interpolation_delay = 0.5_sec;
 
 
+			/*
+				Skins
+			*/
+
 			void resize_skin(ProgressBarSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
+			void crop_bar(gui_control::ControlVisualPart &bar, ProgressBarType type, bool flipped, real percent) noexcept;
 		} //detail
 	} //gui_progress_bar
 

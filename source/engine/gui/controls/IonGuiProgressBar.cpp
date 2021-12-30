@@ -27,6 +27,10 @@ using namespace gui_progress_bar;
 namespace gui_progress_bar::detail
 {
 
+/*
+	Skins
+*/
+
 void resize_skin(ProgressBarSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept
 {
 	auto delta_size = to_size - from_size;
@@ -41,6 +45,35 @@ void resize_skin(ProgressBarSkin &skin, const Vector2 &from_size, const Vector2 
 	{
 		auto &center = skin.BarInterpolated->Position();
 		gui_control::detail::resize_part(skin.BarInterpolated, delta_size, vector2::Zero, center);
+	}
+}
+
+void crop_bar(gui_control::ControlVisualPart &bar, ProgressBarType type, bool flipped, real percent) noexcept
+{
+	if (bar.SpriteObject)
+	{
+		switch (type)
+		{
+			case ProgressBarType::Vertical:
+			{
+				if (flipped)
+					bar->Crop(Aabb{{0.0_r, 1.0_r - percent}, {1.0_r, 1.0_r}});
+				else
+					bar->Crop(Aabb{{0.0_r, 0.0_r}, {1.0_r, percent}});
+
+				break;
+			}
+
+			case ProgressBarType::Horizontal:
+			{
+				if (flipped)
+					bar->Crop(Aabb{{1.0_r - percent, 0.0_r}, {1.0_r, 1.0_r}});
+				else
+					bar->Crop(Aabb{{0.0_r, 0.0_r}, {percent, 1.0_r}});
+
+				break;
+			}
+		}
 	}
 }
 
@@ -138,7 +171,28 @@ void GuiProgressBar::UpdateBars() noexcept
 	{
 		if (auto &skin = static_cast<ProgressBarSkin&>(*skin_); skin.Bar)
 		{
-			//Set bar crop sizes
+			auto percent = Percent();
+
+			//Set bar size
+			if (auto size = InnerSize(); size)
+			{
+				auto [width, height] = size->XY();
+				auto [bar_width, bar_height] = skin.Bar->Size().XY();
+
+				if (type_ == ProgressBarType::Vertical)
+					bar_height = height * percent;
+				else
+					bar_width = width * percent;
+
+				if (auto bar_size = Vector2{bar_width, bar_height};
+					bar_size != skin.Bar->Size())
+				{
+					detail::resize_skin(skin, skin.Bar->Size(), bar_size);
+					detail::crop_bar(skin.Bar, type_, flipped_, percent);
+				}
+			}
+
+			//Set bar position
 			if (auto area = InnerArea(); area)
 			{
 				auto [min, max] =
@@ -146,15 +200,15 @@ void GuiProgressBar::UpdateBars() noexcept
 					std::pair{area->Min().Y(), area->Max().Y()} :
 					std::pair{area->Min().X(), area->Max().X()};
 
-				auto handle_half_size =
+				auto bar_half_size =
 					(type_ == ProgressBarType::Vertical ?
 					skin.Bar->Size().Y() :
 					skin.Bar->Size().X()) * 0.5_r;
 				
 				auto bar_position =
 					flipped_ ?
-					math::Lerp(max - handle_half_size, min + handle_half_size, Percent()) :
-					math::Lerp(min + handle_half_size, max - handle_half_size, Percent());
+					math::Lerp(max - bar_half_size, min + bar_half_size, percent) :
+					math::Lerp(min + bar_half_size, max - bar_half_size, percent);
 
 				auto center = area->Center();
 				skin.Bar->Position(
