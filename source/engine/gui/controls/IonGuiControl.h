@@ -169,26 +169,6 @@ namespace ion::gui::controls
 			virtual ~ControlSkin() = default;
 		};
 
-		/*
-		struct ListBoxSkin final
-		{
-			NonOwningPtr<graphics::scene::Model> Selection;
-			NonOwningPtr<graphics::scene::DrawableText> Text;
-		};
-
-		struct ProgressBarSkin final
-		{
-			NonOwningPtr<graphics::scene::Model> Bar;
-			NonOwningPtr<graphics::scene::Model> BarPrecise;
-		};
-
-		struct TextBoxSkin final
-		{
-			NonOwningPtr<graphics::scene::Model> Cursor;
-			NonOwningPtr<graphics::scene::DrawableText> Text;
-		};
-		*/
-
 
 		namespace detail
 		{

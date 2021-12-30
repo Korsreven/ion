@@ -81,6 +81,11 @@ namespace ion::gui::controls
 				}
 			}
 
+
+			/*
+				Skins
+			*/
+
 			void resize_handle(SliderSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 			void resize_skin(SliderSkin &skin, SliderType type, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 		} //detail

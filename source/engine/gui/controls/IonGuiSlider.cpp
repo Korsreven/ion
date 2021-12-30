@@ -28,6 +28,10 @@ using namespace types::type_literals;
 namespace gui_slider::detail
 {
 
+/*
+	Skins
+*/
+
 void resize_handle(SliderSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept
 {
 	auto delta_size = to_size - from_size;
