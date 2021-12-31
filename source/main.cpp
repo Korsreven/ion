@@ -699,6 +699,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto check_box_mark_hovered_diffuse = textures.CreateTexture("check_box_mark_hovered", "check_box_mark_hovered.png",
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 
+			//Progress bar
+			auto progress_bar_bar_enabled_diffuse = textures.CreateTexture("progress_bar_bar_enabled", "progress_bar_bar_enabled.png");
+
 			//Radio button
 			auto radio_button_select_enabled_diffuse = textures.CreateTexture("radio_button_select_enabled", "radio_button_select_enabled.png",
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
@@ -1520,6 +1523,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					0.0_r, check_box_mark_hovered_diffuse, nullptr, nullptr);
 			check_box_mark_hovered->LightingEnabled(false);
 
+			//Progress bar
+			auto progress_bar_bar_enabled =
+				materials.CreateMaterial("progress_bar_bar_enabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, progress_bar_bar_enabled_diffuse, nullptr, nullptr);
+			progress_bar_bar_enabled->LightingEnabled(false);
+
 			//Radio buttons
 			auto radio_button_select_enabled =
 				materials.CreateMaterial("radio_button_select_enabled",
@@ -1888,6 +1901,43 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			group_box_right->AutoRepeat(true);
 			group_box_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
 
+			//Progress bar
+			w = 0.056_r;
+			h = 0.056_r;
+
+			auto progress_bar_model = scene.CreateModel();
+			auto progress_bar_center = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
+			
+			auto progress_bar_top = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
+			auto progress_bar_left = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
+			auto progress_bar_bottom = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
+			auto progress_bar_right = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
+
+			auto progress_bar_top_left = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
+			auto progress_bar_bottom_left = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
+			auto progress_bar_top_right = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
+			auto progress_bar_bottom_right = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
+
+			auto progress_bar_bar = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Bar
+			progress_bar_bar->IncludeBoundingVolumes(false);
+
+			progress_bar_center->AutoRepeat(true);
+			progress_bar_top->AutoRepeat(true);
+			progress_bar_left->AutoRepeat(true);
+			progress_bar_bottom->AutoRepeat(true);
+			progress_bar_right->AutoRepeat(true);
+			progress_bar_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+
 			//Radio button
 			w = 0.056_r;
 			h = 0.056_r;
@@ -2068,6 +2118,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto label_caption = scene.CreateText(caption_text);
 			label_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 
+			//Progress bar caption
+			auto progress_bar_caption = scene.CreateText(caption_text);
+			progress_bar_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+
 			//Radio button caption
 			auto radio_button_caption = scene.CreateText(caption_text);
 			radio_button_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
@@ -2224,6 +2278,36 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Label skin
 			ion::gui::controls::gui_label::LabelSkin label_skin;
 			label_skin.Caption.TextObject = label_caption;
+
+			//Progress bar skin
+			ion::gui::controls::gui_progress_bar::ProgressBarSkin progress_bar_skin;
+			progress_bar_skin.Parts.ModelObject = progress_bar_model;
+			progress_bar_skin.Parts.Center.SpriteObject = progress_bar_center;
+			progress_bar_skin.Parts.Top.SpriteObject = progress_bar_top;
+			progress_bar_skin.Parts.Left.SpriteObject = progress_bar_left;
+			progress_bar_skin.Parts.Bottom.SpriteObject = progress_bar_bottom;
+			progress_bar_skin.Parts.Right.SpriteObject = progress_bar_right;
+			progress_bar_skin.Parts.TopLeft.SpriteObject = progress_bar_top_left;
+			progress_bar_skin.Parts.BottomLeft.SpriteObject = progress_bar_bottom_left;
+			progress_bar_skin.Parts.TopRight.SpriteObject = progress_bar_top_right;
+			progress_bar_skin.Parts.BottomRight.SpriteObject = progress_bar_bottom_right;
+
+			progress_bar_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
+			progress_bar_skin.Parts.Top.EnabledMaterial = button_top_enabled;
+			progress_bar_skin.Parts.Left.EnabledMaterial = button_left_enabled;
+			progress_bar_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
+			progress_bar_skin.Parts.Right.EnabledMaterial = button_right_enabled;
+			progress_bar_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
+			progress_bar_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
+			progress_bar_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
+			progress_bar_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
+
+			progress_bar_skin.Bar.SpriteObject = progress_bar_bar;
+			progress_bar_skin.Bar.EnabledMaterial = progress_bar_bar_enabled;
+
+			progress_bar_skin.Caption.TextObject = progress_bar_caption;
+			progress_bar_skin.Caption.EnabledStyle = button_caption_style_enabled;
+			progress_bar_skin.Caption.DisabledStyle = button_caption_style_disabled;
 
 			//Radio button skin
 			ion::gui::controls::gui_radio_button::RadioButtonSkin radio_button_skin;
@@ -2443,6 +2527,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", "My radio button", "My radio button tooltip", std::move(radio_button2_skin));
 			radio_button2->Node()->Position({0.05_r, 0.0_r});
 
+			auto progress_bar = base_panel->CreateProgressBar("progress_bar", "My progress bar", std::move(progress_bar_skin), Vector2{1.0_r, 0.077_r});
+			progress_bar->Node()->Position({0.0_r, -0.1_r});
+			progress_bar->Tooltip("My progress bar tooltip");
+			progress_bar->Range(0.0_r, 100.0_r);
+			progress_bar->Position(75.0_r);
+
 			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", "My scroll bar", "My scroll bar tooltip", std::move(scroll_bar_skin), Vector2{0.077_r, 1.0_r});
 			scroll_bar->Node()->Position({-0.7_r, 0.15_r});
 			scroll_bar->Range(0, 50);
@@ -2496,7 +2586,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Models
 			auto player_node = scene_graph->RootNode().CreateChildNode({0.0_r, -0.115_r, -1.8_r});
 
-			auto ship_node = player_node->CreateChildNode();
+			auto ship_node = player_node->CreateChildNode({0.0_r, -0.4_r, 0.0_r});
 			ship_node->AttachObject(*model);
 			ship_node->AttachObject(*player_sound_listener);
 

@@ -207,8 +207,8 @@ void GuiProgressBar::UpdateBars() noexcept
 				
 				auto bar_position =
 					flipped_ ?
-					math::Lerp(max - bar_half_size, min + bar_half_size, percent) :
-					math::Lerp(min + bar_half_size, max - bar_half_size, percent);
+					max - bar_half_size :
+					min + bar_half_size;
 
 				auto center = area->Center();
 				skin.Bar->Position(
