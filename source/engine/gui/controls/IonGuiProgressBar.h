@@ -67,8 +67,11 @@ namespace ion::gui::controls
 				Skins
 			*/
 
-			void resize_skin(ProgressBarSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
+			void resize_bar(gui_control::ControlVisualPart &bar, const Vector2 &delta_size) noexcept;
 			void crop_bar(gui_control::ControlVisualPart &bar, ProgressBarType type, bool flipped, real percent) noexcept;
+			void update_bar(gui_control::ControlVisualPart &bar, ProgressBarType type, bool flipped, real percent, const Aabb &area) noexcept;
+
+			void resize_skin(ProgressBarSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 		} //detail
 	} //gui_progress_bar
 
@@ -84,7 +87,6 @@ namespace ion::gui::controls
 			gui_progress_bar::ProgressBarType type_ = gui_progress_bar::ProgressBarType::Horizontal;
 			bool flipped_ = false;
 			types::Progress<real> progress_;
-			real snap_interval_ = 1.0_r;
 
 			gui_progress_bar::InterpolationType interpolation_type_ = gui_progress_bar::InterpolationType::Bidirectional;
 			duration interpolation_time_ = gui_progress_bar::detail::default_interpolation_time;
@@ -92,6 +94,7 @@ namespace ion::gui::controls
 
 			gui_progress_bar::detail::interpolation_phase phase_ = gui_progress_bar::detail::interpolation_phase::PreInterpolate;
 			types::Cumulative<duration> phase_duration_{interpolation_delay_};
+			std::optional<real> interpolated_position_;
 
 
 			/*
@@ -120,7 +123,9 @@ namespace ion::gui::controls
 			void RotateBars() noexcept;
 			void RotateSkin() noexcept;
 
-			virtual void UpdateBars() noexcept;
+			void UpdateBar() noexcept;
+			void UpdateBarInterpolated() noexcept;
+			void UpdateBars() noexcept;
 
 
 			/*
@@ -183,7 +188,7 @@ namespace ion::gui::controls
 					auto pos = progress_.Position();
 					progress_.Position(position);		
 					Progressed(position - pos);
-					UpdateBars();
+					UpdateBar();
 				}
 			}
 
@@ -203,12 +208,6 @@ namespace ion::gui::controls
 
 					UpdateBars();
 				}
-			}
-
-			//Sets the snap by interval for this progress bar to the given interval
-			inline void SnapInterval(real interval) noexcept
-			{
-				snap_interval_ = interval >= 0.0_r ? interval : 0.0_r;
 			}
 
 
@@ -272,12 +271,6 @@ namespace ion::gui::controls
 				return progress_.MinMax();
 			}
 
-			//Returns the snap interval for this progress bar
-			[[nodiscard]] inline auto SnapInterval() const noexcept
-			{
-				return snap_interval_;
-			}
-
 
 			//Returns the interpolation time for this progress bar to the given time
 			[[nodiscard]] inline auto InterpolationTime() const noexcept
@@ -290,6 +283,13 @@ namespace ion::gui::controls
 			{
 				return interpolation_delay_;
 			}
+
+
+			//Returns the interpolated position as a percentage in range [0.0, 1.0]
+			[[nodiscard]] real InterpolatedPercent() const noexcept;
+
+			//Returns the interpolated position of this progress bar
+			[[nodiscard]] real InterpolatedPosition() const noexcept;
 
 
 			/*

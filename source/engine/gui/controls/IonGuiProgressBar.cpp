@@ -31,26 +31,18 @@ namespace gui_progress_bar::detail
 	Skins
 */
 
-void resize_skin(ProgressBarSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept
+void resize_bar(gui_control::ControlVisualPart &bar, const Vector2 &delta_size) noexcept
 {
-	auto delta_size = to_size - from_size;
-
-	if (skin.Bar)
+	if (bar)
 	{
-		auto &center = skin.Bar->Position();
-		gui_control::detail::resize_part(skin.Bar, delta_size, vector2::Zero, center);
-	}
-
-	if (skin.BarInterpolated)
-	{
-		auto &center = skin.BarInterpolated->Position();
-		gui_control::detail::resize_part(skin.BarInterpolated, delta_size, vector2::Zero, center);
+		auto &center = bar->Position();
+		gui_control::detail::resize_part(bar, delta_size, vector2::Zero, center);
 	}
 }
 
 void crop_bar(gui_control::ControlVisualPart &bar, ProgressBarType type, bool flipped, real percent) noexcept
 {
-	if (bar.SpriteObject)
+	if (bar)
 	{
 		switch (type)
 		{
@@ -75,6 +67,58 @@ void crop_bar(gui_control::ControlVisualPart &bar, ProgressBarType type, bool fl
 			}
 		}
 	}
+}
+
+void update_bar(gui_control::ControlVisualPart &bar, ProgressBarType type, bool flipped, real percent, const Aabb &area) noexcept
+{
+	if (bar)
+	{
+		//Set bar size
+		auto [width, height] = area.ToSize().XY();
+		auto [bar_width, bar_height] = bar->Size().XY();
+
+		if (type == ProgressBarType::Vertical)
+			bar_height = height * percent;
+		else
+			bar_width = width * percent;
+
+		if (auto bar_size = Vector2{bar_width, bar_height};
+			bar_size != bar->Size())
+		{
+			detail::resize_bar(bar, bar_size - bar->Size());
+			detail::crop_bar(bar, type, flipped, percent);
+		}
+
+		//Set bar position
+		auto [min, max] =
+			type == ProgressBarType::Vertical ?
+			std::pair{area.Min().Y(), area.Max().Y()} :
+			std::pair{area.Min().X(), area.Max().X()};
+
+		auto bar_half_size =
+			(type == ProgressBarType::Vertical ?
+			bar->Size().Y() :
+			bar->Size().X()) * 0.5_r;
+				
+		auto bar_position =
+			flipped ?
+			max - bar_half_size :
+			min + bar_half_size;
+
+		auto center = area.Center();
+		bar->Position(
+			type == ProgressBarType::Vertical ?
+			Vector2{center.X(), bar_position} :
+			Vector2{bar_position, center.Y()});
+	}
+}
+
+
+void resize_skin(ProgressBarSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept
+{
+	auto delta_size = to_size - from_size;
+	resize_bar(skin.Bar, delta_size);
+	resize_bar(skin.BarInterpolated, delta_size);
 }
 
 } //gui_progress_bar::detail
@@ -163,61 +207,34 @@ void GuiProgressBar::RotateSkin() noexcept
 }
 
 
-void GuiProgressBar::UpdateBars() noexcept
+void GuiProgressBar::UpdateBar() noexcept
 {
-	using namespace utilities;
-
 	if (skin_)
 	{
 		if (auto &skin = static_cast<ProgressBarSkin&>(*skin_); skin.Bar)
 		{
-			auto percent = Percent();
-
-			//Set bar size
-			if (auto size = InnerSize(); size)
-			{
-				auto [width, height] = size->XY();
-				auto [bar_width, bar_height] = skin.Bar->Size().XY();
-
-				if (type_ == ProgressBarType::Vertical)
-					bar_height = height * percent;
-				else
-					bar_width = width * percent;
-
-				if (auto bar_size = Vector2{bar_width, bar_height};
-					bar_size != skin.Bar->Size())
-				{
-					detail::resize_skin(skin, skin.Bar->Size(), bar_size);
-					detail::crop_bar(skin.Bar, type_, flipped_, percent);
-				}
-			}
-
-			//Set bar position
 			if (auto area = InnerArea(); area)
-			{
-				auto [min, max] =
-					type_ == ProgressBarType::Vertical ?
-					std::pair{area->Min().Y(), area->Max().Y()} :
-					std::pair{area->Min().X(), area->Max().X()};
-
-				auto bar_half_size =
-					(type_ == ProgressBarType::Vertical ?
-					skin.Bar->Size().Y() :
-					skin.Bar->Size().X()) * 0.5_r;
-				
-				auto bar_position =
-					flipped_ ?
-					max - bar_half_size :
-					min + bar_half_size;
-
-				auto center = area->Center();
-				skin.Bar->Position(
-					type_ == ProgressBarType::Vertical ?
-					Vector2{center.X(), bar_position} :
-					Vector2{bar_position, center.Y()});
-			}
+				detail::update_bar(skin.Bar, type_, flipped_, Percent(), *area);
 		}
 	}
+}
+
+void GuiProgressBar::UpdateBarInterpolated() noexcept
+{
+	if (skin_ && interpolated_position_)
+	{
+		if (auto &skin = static_cast<ProgressBarSkin&>(*skin_); skin.BarInterpolated)
+		{
+			if (auto area = InnerArea(); area)
+				detail::update_bar(skin.BarInterpolated, type_, flipped_, InterpolatedPercent(), *area);
+		}
+	}
+}
+
+void GuiProgressBar::UpdateBars() noexcept
+{
+	UpdateBar();
+	UpdateBarInterpolated();
 }
 
 
@@ -289,12 +306,38 @@ void GuiProgressBar::Percent(real percent) noexcept
 
 
 /*
+	Observers
+*/
+
+real GuiProgressBar::InterpolatedPercent() const noexcept
+{
+	if (interpolated_position_)
+	{
+		auto [min, max] = Range();
+		return max - min > 0.0_r ?
+			(*interpolated_position_ - min) / (max - min) :
+			1.0_r;
+	}
+	else
+		return Percent();
+}
+
+real GuiProgressBar::InterpolatedPosition() const noexcept
+{
+	if (interpolated_position_)
+		return *interpolated_position_;
+	else
+		return Position();
+}
+
+
+/*
 	Frame events
 */
 
 void GuiProgressBar::FrameStarted(duration time) noexcept
 {
-	if (visible_)
+	if (visible_ && interpolated_position_)
 	{
 		if (phase_duration_ += time)
 		{
@@ -314,17 +357,35 @@ void GuiProgressBar::FrameStarted(duration time) noexcept
 						return detail::interpolation_phase::PreInterpolate;
 					}
 				}());
+
+			switch (phase_)
+			{
+				case detail::interpolation_phase::PreInterpolate:
+				interpolated_position_ = {};
+				break;	
+			}
 		}
 
 		switch (phase_)
 		{
-			case detail::interpolation_phase::PreInterpolate:
-			//Todo
-			break;
-
 			case detail::interpolation_phase::Interpolate:
-			//Todo
-			break;		
+			interpolated_position_ =
+				[&]() noexcept
+				{
+					using namespace utilities;
+
+					//Forward
+					if (interpolated_position_ < Position())
+						return math::Lerp(*interpolated_position_, Position(), phase_duration_.Percent());
+					//Backward
+					else if (interpolated_position_ > Position())
+						return math::Lerp(Position(), *interpolated_position_, phase_duration_.Percent());
+					else
+						return *interpolated_position_;
+				}();
+
+			UpdateBarInterpolated();
+			break;
 		}
 	}
 }
