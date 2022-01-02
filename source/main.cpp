@@ -1929,7 +1929,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto progress_bar_bar = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Bar
+			auto progress_bar_bar_interpolated = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Bar interpolated
+
+			progress_bar_bar->FillOpacity(0.35_r);
 			progress_bar_bar->IncludeBoundingVolumes(false);
+
+			progress_bar_bar_interpolated->FillOpacity(0.65_r);
+			progress_bar_bar_interpolated->IncludeBoundingVolumes(false);
 
 			progress_bar_center->AutoRepeat(true);
 			progress_bar_top->AutoRepeat(true);
@@ -2304,6 +2311,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			progress_bar_skin.Bar.SpriteObject = progress_bar_bar;
 			progress_bar_skin.Bar.EnabledMaterial = progress_bar_bar_enabled;
+
+			progress_bar_skin.BarInterpolated.SpriteObject = progress_bar_bar_interpolated;
+			progress_bar_skin.BarInterpolated.EnabledMaterial = progress_bar_bar_enabled;
 
 			progress_bar_skin.Caption.TextObject = progress_bar_caption;
 			progress_bar_skin.Caption.EnabledStyle = button_caption_style_enabled;

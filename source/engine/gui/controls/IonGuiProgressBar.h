@@ -37,7 +37,7 @@ namespace ion::gui::controls
 			Vertical //Bottom to top
 		};
 
-		enum class InterpolationType
+		enum class BarInterpolationType
 		{
 			Forward,
 			Backward,
@@ -88,13 +88,13 @@ namespace ion::gui::controls
 			bool flipped_ = false;
 			types::Progress<real> progress_;
 
-			gui_progress_bar::InterpolationType interpolation_type_ = gui_progress_bar::InterpolationType::Bidirectional;
+			gui_progress_bar::BarInterpolationType interpolation_type_ = gui_progress_bar::BarInterpolationType::Bidirectional;
 			duration interpolation_time_ = gui_progress_bar::detail::default_interpolation_time;
 			duration interpolation_delay_ = gui_progress_bar::detail::default_interpolation_delay;
 
 			gui_progress_bar::detail::interpolation_phase phase_ = gui_progress_bar::detail::interpolation_phase::PreInterpolate;
 			types::Cumulative<duration> phase_duration_{interpolation_delay_};
-			std::optional<real> interpolated_position_;
+			std::optional<real> interpolated_percent_;
 
 
 			/*
@@ -134,6 +134,8 @@ namespace ion::gui::controls
 
 			void SetPhase(gui_progress_bar::detail::interpolation_phase phase) noexcept;
 			void UpdatePhaseDuration() noexcept;
+
+			void StartInterpolation(real from_percent) noexcept;
 
 		public:
 
@@ -186,9 +188,11 @@ namespace ion::gui::controls
 				if (progress_.Position() != position)
 				{
 					auto pos = progress_.Position();
-					progress_.Position(position);		
+					auto percent = progress_.Percent();
+					progress_.Position(position);
 					Progressed(position - pos);
 					UpdateBar();
+					StartInterpolation(percent);
 				}
 			}
 
@@ -210,6 +214,18 @@ namespace ion::gui::controls
 				}
 			}
 
+
+			//Sets the interpolation type for this progress bar to the given type
+			inline void InterpolationType(gui_progress_bar::BarInterpolationType type) noexcept
+			{
+				if (interpolation_type_ != type)
+				{
+					interpolation_type_ = type;
+
+					if (interpolated_percent_)
+						StartInterpolation(*interpolated_percent_);
+				}
+			}
 
 			//Sets the interpolation time for this progress bar to the given time
 			inline void InterpolationTime(duration time) noexcept
@@ -271,6 +287,12 @@ namespace ion::gui::controls
 				return progress_.MinMax();
 			}
 
+
+			//Returns the interpolation type for this progress bar
+			[[nodiscard]] inline auto InterpolationType() const noexcept
+			{
+				return interpolation_type_;
+			}
 
 			//Returns the interpolation time for this progress bar to the given time
 			[[nodiscard]] inline auto InterpolationTime() const noexcept

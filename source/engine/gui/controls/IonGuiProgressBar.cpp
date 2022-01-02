@@ -221,7 +221,7 @@ void GuiProgressBar::UpdateBar() noexcept
 
 void GuiProgressBar::UpdateBarInterpolated() noexcept
 {
-	if (skin_ && interpolated_position_)
+	if (skin_)
 	{
 		if (auto &skin = static_cast<ProgressBarSkin&>(*skin_); skin.BarInterpolated)
 		{
@@ -250,6 +250,8 @@ void GuiProgressBar::SetPhase(detail::interpolation_phase phase) noexcept
 
 void GuiProgressBar::UpdatePhaseDuration() noexcept
 {
+	using namespace utilities;
+
 	auto limit =
 		[&]() noexcept
 		{
@@ -260,11 +262,37 @@ void GuiProgressBar::UpdatePhaseDuration() noexcept
 
 				case detail::interpolation_phase::Interpolate:
 				default:
-				return interpolation_time_;
+				phase_duration_.Reset();
+				return interpolation_time_ * math::Abs(Percent() - interpolated_percent_.value_or(0.0_r));
 			}
 		}();
 
 	phase_duration_.Limit(limit);
+}
+
+
+void GuiProgressBar::StartInterpolation(real from_percent) noexcept
+{
+	if (skin_)
+	{
+		if (!interpolated_percent_)
+			interpolated_percent_ = from_percent;
+
+		if (auto &skin = static_cast<ProgressBarSkin&>(*skin_); skin.BarInterpolated &&
+			(interpolation_type_ == BarInterpolationType::Bidirectional ||
+			(interpolation_type_ == BarInterpolationType::Forward && *interpolated_percent_ < Percent()) ||
+			(interpolation_type_ == BarInterpolationType::Backward && *interpolated_percent_ > Percent())))
+		{
+			if (phase_ == detail::interpolation_phase::Interpolate)
+				SetPhase(detail::interpolation_phase::Interpolate); //Recalculate duration
+
+			return; //Start interpolation
+		}
+	}
+
+	interpolated_percent_ = {};
+	SetPhase(detail::interpolation_phase::PreInterpolate);
+	UpdateBarInterpolated(); //Do not interpolate
 }
 
 
@@ -296,12 +324,7 @@ GuiProgressBar::GuiProgressBar(std::string name, std::optional<std::string> capt
 void GuiProgressBar::Percent(real percent) noexcept
 {
 	using namespace utilities;
-	Position(
-		math::Round(math::Lerp(
-			progress_.Min(),
-			progress_.Max(),
-			percent))
-		);
+	Position(math::Round(math::Lerp(progress_.Min(), progress_.Max(), percent)));
 }
 
 
@@ -311,21 +334,15 @@ void GuiProgressBar::Percent(real percent) noexcept
 
 real GuiProgressBar::InterpolatedPercent() const noexcept
 {
-	if (interpolated_position_)
-	{
-		auto [min, max] = Range();
-		return max - min > 0.0_r ?
-			(*interpolated_position_ - min) / (max - min) :
-			1.0_r;
-	}
-	else
-		return Percent();
+	return interpolated_percent_.value_or(Percent());
 }
 
 real GuiProgressBar::InterpolatedPosition() const noexcept
 {
-	if (interpolated_position_)
-		return *interpolated_position_;
+	using namespace utilities;
+
+	if (interpolated_percent_)
+		return math::Lerp(progress_.Min(), progress_.Max(), *interpolated_percent_);
 	else
 		return Position();
 }
@@ -337,7 +354,7 @@ real GuiProgressBar::InterpolatedPosition() const noexcept
 
 void GuiProgressBar::FrameStarted(duration time) noexcept
 {
-	if (visible_ && interpolated_position_)
+	if (visible_ && interpolated_percent_)
 	{
 		if (phase_duration_ += time)
 		{
@@ -361,31 +378,36 @@ void GuiProgressBar::FrameStarted(duration time) noexcept
 			switch (phase_)
 			{
 				case detail::interpolation_phase::PreInterpolate:
-				interpolated_position_ = {};
-				break;	
+				interpolated_percent_ = Percent();
+				UpdateBarInterpolated();
+				interpolated_percent_ = {}; //Stop interpolation
+				break;
 			}
 		}
 
 		switch (phase_)
 		{
 			case detail::interpolation_phase::Interpolate:
-			interpolated_position_ =
-				[&]() noexcept
-				{
-					using namespace utilities;
+			{
+				using namespace utilities;
 
-					//Forward
-					if (interpolated_position_ < Position())
-						return math::Lerp(*interpolated_position_, Position(), phase_duration_.Percent());
-					//Backward
-					else if (interpolated_position_ > Position())
-						return math::Lerp(Position(), *interpolated_position_, phase_duration_.Percent());
-					else
-						return *interpolated_position_;
-				}();
+				auto delta_percent =
+					std::clamp(
+						interpolation_time_ > 0.0_sec ?
+						time / interpolation_time_ : 1.0_r,
+						0.0_r, math::Abs(Percent() - *interpolated_percent_)
+					);
 
-			UpdateBarInterpolated();
-			break;
+				//Forward
+				if (interpolated_percent_ < Percent())
+					*interpolated_percent_ += delta_percent;
+				//Backward
+				else if (interpolated_percent_ > Percent())
+					*interpolated_percent_ -= delta_percent;
+
+				UpdateBarInterpolated();
+				break;
+			}
 		}
 	}
 }
