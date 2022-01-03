@@ -642,6 +642,9 @@
     <ClCompile Include="..\source\engine\gui\controls\IonGuiProgressBar.cpp">
       <Filter>Source Files\gui\controls</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\gui\controls\IonGuiListBox.cpp">
+      <Filter>Source Files\gui\controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1245,6 +1248,9 @@
       <Filter>Header Files\gui\controls</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\gui\controls\IonGuiProgressBar.h">
+      <Filter>Header Files\gui\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\gui\controls\IonGuiListBox.h">
       <Filter>Header Files\gui\controls</Filter>
     </ClInclude>
   </ItemGroup>
