@@ -12,7 +12,6 @@ File:	IonGuiTooltip.cpp
 
 #include "IonGuiTooltip.h"
 
-#include "graphics/fonts/utilities/IonFontUtility.h"
 #include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
