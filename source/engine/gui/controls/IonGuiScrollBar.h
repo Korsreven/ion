@@ -126,7 +126,7 @@ namespace ion::gui::controls
 				Observers
 			*/
 
-			//Returns the min/max handle size of this scroll bar
+			//Returns the min/max handle size of this scroll bar (in percentages)
 			[[nodiscard]] inline auto& HandleSize() const noexcept
 			{
 				return handle_size_;
