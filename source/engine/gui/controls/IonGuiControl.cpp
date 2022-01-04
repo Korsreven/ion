@@ -38,15 +38,18 @@ namespace gui_control::detail
 	Skins
 */
 
+void resize_sprite(graphics::scene::shapes::Sprite &sprite, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept
+{
+	auto position = Vector2{sprite.Position()};
+	auto sign = (position - center).SignCopy();
+	sprite.Position(sprite.Position() + sign * delta_position);
+	sprite.Size(sprite.Size() + delta_size);
+}
+
 void resize_part(ControlVisualPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept
 {
 	if (part)
-	{
-		auto position = Vector2{part->Position()};
-		auto sign = (position - center).SignCopy();
-		part->Position(part->Position() + sign * delta_position);
-		part->Size(part->Size() + delta_size);
-	}
+		resize_sprite(*part.SpriteObject, delta_size, delta_position, center);
 }
 
 void resize_skin(ControlSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept

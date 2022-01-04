@@ -40,6 +40,12 @@ void resize_skin(ListBoxSkin &skin, const Vector2 &from_size, const Vector2 &to_
 		auto &center = skin.Selection->Position();
 		gui_control::detail::resize_part(skin.Selection, delta_size, delta_position, center);
 	}
+
+	for (auto &icon : skin.Icons)
+	{
+		if (icon)
+			gui_control::detail::resize_sprite(*icon, delta_size, delta_position, vector2::Zero);
+	}
 }
 
 } //gui_list_box::detail
@@ -64,7 +70,7 @@ void GuiListBox::Resized(Vector2 from_size, Vector2 to_size) noexcept
 	if (skin_)
 	{
 		detail::resize_skin(static_cast<ListBoxSkin&>(*skin_), from_size, to_size);
-		UpdateSelection();
+		UpdateItems();
 	}
 
 	GuiControl::Resized(from_size, to_size); //Use base functionality
@@ -139,7 +145,8 @@ void GuiListBox::UpdateSelection() noexcept
 
 void GuiListBox::UpdateItems() noexcept
 {
-	
+	//Todo
+	UpdateSelection();
 }
 
 
