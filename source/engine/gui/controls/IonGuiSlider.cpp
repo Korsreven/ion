@@ -257,7 +257,7 @@ bool GuiSlider::IntersectsHandle(const Vector2 &point) const noexcept
 	Key events
 */
 
-bool GuiSlider::KeyReleased([[maybe_unused]] KeyButton button) noexcept
+bool GuiSlider::KeyReleased(KeyButton button) noexcept
 {
 	if (auto [min, max] = Range(); min != max)
 	{

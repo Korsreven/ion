@@ -18,6 +18,7 @@ File:	IonGuiListBox.h
 #include <vector>
 
 #include "IonGuiScrollable.h"
+#include "adaptors/ranges/IonIterable.h"
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
 #include "graphics/utilities/IonVector2.h"
@@ -64,6 +65,15 @@ namespace ion::gui::controls
 		};
 
 
+		struct ListBoxItem final
+		{
+			std::string Content;
+			NonOwningPtr<graphics::materials::Material> Icon;
+		};
+
+		using ListBoxItems = std::vector<ListBoxItem>;
+
+
 		struct ListBoxSkin : gui_control::ControlSkin
 		{
 			gui_control::ControlVisualPart Selection;
@@ -76,14 +86,6 @@ namespace ion::gui::controls
 
 		namespace detail
 		{
-			struct item final
-			{
-				std::string content;
-				NonOwningPtr<graphics::materials::Material> icon;
-			};
-			
-			using items = std::vector<item>;
-			
 			constexpr auto default_item_height_factor = 2.0_r;
 			constexpr auto default_icon_column_width_percent = 0.25_r;
 			constexpr auto default_icon_margin = 2.0_r;
@@ -115,7 +117,7 @@ namespace ion::gui::controls
 			std::optional<real> icon_margin_;
 			bool show_icons_ = true;
 
-			gui_list_box::detail::items items_;
+			gui_list_box::ListBoxItems items_;
 
 
 			/*
@@ -170,6 +172,25 @@ namespace ion::gui::controls
 			//Construct a list box with the given name, caption, tooltip, skin, size and hit boxes
 			GuiListBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
 				OwningPtr<gui_list_box::ListBoxSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes = {});
+
+
+			/*
+				Ranges
+			*/
+
+			//Returns a mutable range of all items in this list box
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Items() noexcept
+			{
+				return adaptors::ranges::Iterable<gui_list_box::ListBoxItems&>{items_};
+			}
+
+			//Returns an immutable range of all items in this list box
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Items() const noexcept
+			{
+				return adaptors::ranges::Iterable<const gui_list_box::ListBoxItems&>{items_};
+			}
 
 
 			/*
@@ -298,6 +319,71 @@ namespace ion::gui::controls
 			{
 				return show_icons_;
 			}
+
+
+			/*
+				Items
+				Adding/inserting
+			*/
+
+			//Adds an item to the list box with the given content and icon
+			void AddItem(std::string content, NonOwningPtr<graphics::materials::Material> icon = nullptr);
+
+			//Adds the given item to the list box
+			void AddItem(gui_list_box::ListBoxItem item);
+
+			//Adds the given items to the list box
+			void AddItems(gui_list_box::ListBoxItems items);
+
+
+			//Inserts an item to the list box with the given content and icon, at the given offset
+			void InsertItem(int off, std::string content, NonOwningPtr<graphics::materials::Material> icon = nullptr);
+
+			//Inserts the given item to the list box, at the given offset
+			void InsertItem(int off, gui_list_box::ListBoxItem item);
+
+			//Inserts the given items to the list box, at the given offset
+			void InsertItems(int off, gui_list_box::ListBoxItems items);
+
+
+			/*
+				Items
+				Replacing
+			*/
+
+			//Replaces the item at the given offset, with the given content and icon
+			void ReplaceItem(int off, std::string content, NonOwningPtr<graphics::materials::Material> icon = nullptr);
+
+			//Replaces the item at the given offset, with the given item
+			void ReplaceItem(int off, gui_list_box::ListBoxItem item);
+
+			//Replaces the item at the given offset, with the given items
+			void ReplaceItem(int off, gui_list_box::ListBoxItems items);
+
+
+			//Replaces the items in range [first, last), with the given content and icon
+			void ReplaceItems(int first, int last, std::string content, NonOwningPtr<graphics::materials::Material> icon = nullptr);
+
+			//Replaces the items in range [first, last), with the given item
+			void ReplaceItems(int first, int last, gui_list_box::ListBoxItem item);
+
+			//Replaces the items in range [first, last), with the given items
+			void ReplaceItems(int first, int last, gui_list_box::ListBoxItems items);
+
+
+			/*
+				Items
+				Removing
+			*/
+
+			//Clears all items from this list box
+			void ClearItems() noexcept;
+
+			//Removes the item at the given offset from this list box
+			void RemoveItem(int off) noexcept;
+
+			//Removes all items in range [first, last) from this list box
+			void RemoveItems(int first, int last) noexcept;
 
 
 			/*

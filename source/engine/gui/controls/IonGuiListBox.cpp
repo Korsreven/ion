@@ -12,6 +12,8 @@ File:	IonGuiListBox.cpp
 
 #include "IonGuiListBox.h"
 
+#include <algorithm>
+
 #include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
@@ -168,10 +170,145 @@ GuiListBox::GuiListBox(std::string name, std::optional<std::string> caption, std
 
 
 /*
+	Items
+	Adding/inserting
+*/
+
+void GuiListBox::AddItem(std::string content, NonOwningPtr<graphics::materials::Material> icon)
+{
+	InsertItem(std::ssize(items_), {std::move(content), icon});
+}
+
+void GuiListBox::AddItem(ListBoxItem item)
+{
+	InsertItem(std::ssize(items_), std::move(item));
+}
+
+void GuiListBox::AddItems(ListBoxItems items)
+{
+	InsertItems(std::ssize(items_), std::move(items));
+}
+
+
+void GuiListBox::InsertItem(int off, std::string content, NonOwningPtr<graphics::materials::Material> icon)
+{
+	InsertItem(off, {std::move(content), icon});
+}
+
+void GuiListBox::InsertItem(int off, ListBoxItem item)
+{
+	InsertItems(off, ListBoxItems{item});
+}
+
+void GuiListBox::InsertItems(int off, ListBoxItems items)
+{
+	if (off >= 0)
+	{
+		off = std::clamp(off, 0, std::ssize(items_));
+		items_.insert(std::begin(items_) + off, std::begin(items), std::end(items));
+
+		if (item_index_ && *item_index_ >= off)
+			*item_index_ += std::ssize(items);
+
+		UpdateItems();
+	}
+}
+
+
+/*
+	Items
+	Replacing
+*/
+
+void GuiListBox::ReplaceItem(int off, std::string content, NonOwningPtr<graphics::materials::Material> icon)
+{
+	ReplaceItems(off, off + 1, std::move(content), icon);
+}
+
+void GuiListBox::ReplaceItem(int off, ListBoxItem item)
+{
+	ReplaceItems(off, off + 1, std::move(item));
+}
+
+void GuiListBox::ReplaceItem(int off, ListBoxItems items)
+{
+	ReplaceItems(off, off + 1, std::move(items));
+}
+
+
+void GuiListBox::ReplaceItems(int first, int last, std::string content, NonOwningPtr<graphics::materials::Material> icon)
+{
+	ReplaceItems(first, last, {std::move(content), icon});
+}
+
+void GuiListBox::ReplaceItems(int first, int last, ListBoxItem item)
+{
+	ReplaceItems(first, last, ListBoxItems{item});
+}
+
+void GuiListBox::ReplaceItems(int first, int last, ListBoxItems items)
+{
+	if (first >= 0 && first < last)
+	{
+		RemoveItems(first, last);
+		InsertItems(first, std::move(items));
+		UpdateItems();
+	}
+}
+
+
+/*
+	Items
+	Removing
+*/
+
+void GuiListBox::ClearItems() noexcept
+{
+	items_.clear();
+	items_.shrink_to_fit();
+
+	if (item_index_)
+	{
+		item_index_ = {};
+		ItemDeselected();
+	}
+
+	UpdateItems();
+}
+
+void GuiListBox::RemoveItem(int off) noexcept
+{
+	RemoveItems(off, off + 1);
+}
+
+void GuiListBox::RemoveItems(int first, int last) noexcept
+{
+	if (first >= 0 && first < last)
+	{
+		last = std::clamp(last, first, std::ssize(items_));
+		items_.erase(std::begin(items_) + first, std::begin(items_) + last);
+
+		if (item_index_)
+		{
+			if (*item_index_ >= first && *item_index_ < last)
+			{
+				item_index_ = {}; //Deselect
+				ItemDeselected();
+			}
+			else if (*item_index_ >= last)
+				*item_index_ -= last - first;
+		}
+
+		UpdateItems();
+	}
+}
+
+
+/*
 	Key events
 */
 
-bool GuiListBox::KeyReleased([[maybe_unused]] KeyButton button) noexcept
+bool GuiListBox::KeyReleased(KeyButton button) noexcept
 {
 	return false;
 }
