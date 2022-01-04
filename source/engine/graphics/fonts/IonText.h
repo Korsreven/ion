@@ -146,7 +146,7 @@ namespace ion::graphics::fonts
 
 		namespace detail
 		{
-			constexpr auto default_line_height_factor= 2.0_r;
+			constexpr auto default_line_height_factor = 2.0_r;
 			inline const auto jet_black = Color::RGB(52, 52, 52);
 			
 

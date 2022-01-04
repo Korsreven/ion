@@ -21,8 +21,26 @@ File:	IonGuiListBox.h
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
 #include "graphics/utilities/IonVector2.h"
+#include "memory/IonNonOwningPtr.h"
 #include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
+
+//Forward declarations
+namespace ion
+{
+	namespace graphics
+	{
+		namespace materials
+		{
+			class Material;
+		}
+
+		namespace scene::shapes
+		{
+			class Sprite;
+		}
+	}
+}
 
 namespace ion::gui::controls
 {
@@ -45,17 +63,14 @@ namespace ion::gui::controls
 			Right
 		};
 
-		enum class ListBoxIconPositioning : bool
-		{
-			Fixed,
-			Float
-		};
-
 
 		struct ListBoxSkin : gui_control::ControlSkin
 		{
 			gui_control::ControlVisualPart Selection;
 			gui_control::ControlCaptionPart Items;
+
+			std::vector<NonOwningPtr<graphics::scene::shapes::Sprite>> Icons;
+				//Sprites for each visible icon
 		};
 
 
@@ -64,13 +79,13 @@ namespace ion::gui::controls
 			struct item final
 			{
 				std::string content;
-				//Icon
+				NonOwningPtr<graphics::materials::Material> icon;
 			};
 			
 			using items = std::vector<item>;
 			
-			constexpr auto default_item_height = 2.0_r;
-			constexpr auto default_icon_width_percent = 0.25_r;
+			constexpr auto default_item_height_factor = 2.0_r;
+			constexpr auto default_icon_column_width_percent = 0.25_r;
 			constexpr auto default_icon_margin = 2.0_r;
 
 
@@ -92,11 +107,12 @@ namespace ion::gui::controls
 		protected:
 
 			gui_list_box::ListBoxItemAlignment item_alignment_ = gui_list_box::ListBoxItemAlignment::Left;
+			std::optional<real> item_height_factor_;
 			std::optional<int> item_index_;
 
 			gui_list_box::ListBoxIconLayout icon_layout_ = gui_list_box::ListBoxIconLayout::Left;
-			gui_list_box::ListBoxIconPositioning icon_positioning_ = gui_list_box::ListBoxIconPositioning::Fixed;
-			real icon_width_ = gui_list_box::detail::default_icon_width_percent;
+			std::optional<real> icon_column_width_;
+			std::optional<real> icon_margin_;
 			bool show_icons_ = true;
 
 			gui_list_box::detail::items items_;
@@ -170,6 +186,16 @@ namespace ion::gui::controls
 				}
 			}
 
+			//Sets the item height factor for this list box to the given factor
+			inline void ItemHeightFactor(std::optional<real> factor) noexcept
+			{
+				if (item_height_factor_ != factor)
+				{
+					item_height_factor_ = factor;
+					UpdateItems();
+				}
+			}
+
 			//Sets the item index of this list box to the given index
 			inline void ItemIndex(std::optional<int> index) noexcept
 			{
@@ -191,22 +217,22 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the icon positioning for this list box to the given positioning
-			inline void IconPositioning(gui_list_box::ListBoxIconPositioning positioning) noexcept
+			//Sets the icon column width for this list box to the given width (in percentages)
+			inline void IconColumnWidth(std::optional<real> percent) noexcept
 			{
-				if (icon_positioning_ != positioning)
+				if (icon_column_width_ != percent)
 				{
-					icon_positioning_ = positioning;
+					icon_column_width_ = percent;
 					UpdateItems();
 				}
 			}
 
-			//Sets the icon width of this list box to the given width (in percentages)
-			inline void IconWidth(real percent) noexcept
+			//Sets the icon margin for this list box to the given margin
+			inline void IconMargin(std::optional<real> margin) noexcept
 			{
-				if (icon_width_ != percent)
+				if (icon_margin_ != margin)
 				{
-					icon_width_ = percent;
+					icon_margin_ = margin;
 					UpdateItems();
 				}
 			}
@@ -232,6 +258,13 @@ namespace ion::gui::controls
 				return item_alignment_;
 			}
 
+			//Returns the item height factor for this list box
+			//Returns nullopt if no custom item height factor has been set
+			[[nodiscard]] inline auto ItemHeightFactor() const noexcept
+			{
+				return item_height_factor_;
+			}
+
 			//Returns the item index of this list box
 			//Returns nullopt if no items are selected
 			[[nodiscard]] inline auto ItemIndex() const noexcept
@@ -246,16 +279,18 @@ namespace ion::gui::controls
 				return icon_layout_;
 			}
 
-			//Returns the icon positioning for this list box
-			[[nodiscard]] inline auto IconPositioning() const noexcept
+			//Returns the icon column width for this list box (in percentages)
+			//Returns nullopt if no custom icon column width has been set
+			[[nodiscard]] inline auto IconColumnWidth() const noexcept
 			{
-				return icon_positioning_;
+				return icon_column_width_;
 			}
 
-			//Returns the icon width of this list box (in percentages)
-			[[nodiscard]] inline auto IconWidth() const noexcept
+			//Returns the icon margin for this list box
+			//Returns nullopt if no custom icon margin has been set
+			[[nodiscard]] inline auto IconMargin() const noexcept
 			{
-				return icon_width_;
+				return icon_margin_;
 			}
 
 			//Returns true if this list box is showing icons
