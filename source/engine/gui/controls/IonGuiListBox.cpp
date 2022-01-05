@@ -207,6 +207,7 @@ void GuiListBox::InsertItems(int off, ListBoxItems items)
 		off = std::clamp(off, 0, std::ssize(items_));
 		items_.insert(std::begin(items_) + off, std::begin(items), std::end(items));
 
+		//Adjust item index
 		if (item_index_ && *item_index_ >= off)
 			*item_index_ += std::ssize(items);
 
@@ -250,8 +251,23 @@ void GuiListBox::ReplaceItems(int first, int last, ListBoxItems items)
 {
 	if (first >= 0 && first < last)
 	{
-		RemoveItems(first, last);
-		InsertItems(first, std::move(items));
+		last = std::clamp(last, first, std::ssize(items_));
+		items_.erase(std::begin(items_) + first, std::begin(items_) + last);
+		items_.insert(std::begin(items_) + first, std::begin(items), std::end(items));
+		
+		//Adjust item index
+		if (item_index_)
+		{
+			if (*item_index_ >= first && *item_index_ < last &&
+				*item_index_ - first >= std::ssize(items))
+			{
+				item_index_ = {}; //Deselect
+				ItemDeselected();
+			}
+			else if (*item_index_ >= last)
+				*item_index_ += std::ssize(items) - (last - first);
+		}
+		
 		UpdateItems();
 	}
 }
@@ -288,6 +304,7 @@ void GuiListBox::RemoveItems(int first, int last) noexcept
 		last = std::clamp(last, first, std::ssize(items_));
 		items_.erase(std::begin(items_) + first, std::begin(items_) + last);
 
+		//Adjust item index
 		if (item_index_)
 		{
 			if (*item_index_ >= first && *item_index_ < last)
