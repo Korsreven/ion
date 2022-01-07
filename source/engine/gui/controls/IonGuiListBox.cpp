@@ -19,6 +19,7 @@ File:	IonGuiListBox.cpp
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/scene/shapes/IonSprite.h"
+#include "utilities/IonStringUtility.h"
 
 namespace ion::gui::controls
 {
@@ -152,6 +153,47 @@ void GuiListBox::UpdateItems() noexcept
 }
 
 
+void GuiListBox::InsertLines(int off, const gui_list_box::ListBoxItems &items)
+{
+	using namespace utilities;
+
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Items)
+	{
+		auto content = items.front().Content;
+		for (auto i = 1; i < std::ssize(items); ++i)
+			content += "\n" + string::RemoveNonPrintableCopy(items[i].Content);
+
+		skin->Items->Get()->InsertLine(off, content);
+	}
+}
+
+void GuiListBox::ReplaceLines(int first, int last, const gui_list_box::ListBoxItems &items)
+{
+	using namespace utilities;
+
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Items)
+	{
+		auto content = items.front().Content;
+		for (auto i = 1; i < std::ssize(items); ++i)
+			content += "\n" + string::RemoveNonPrintableCopy(items[i].Content);
+
+		skin->Items->Get()->ReplaceLines(first, last, content);
+	}
+}
+
+void GuiListBox::RemoveLines(int first, int last) noexcept
+{
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Items)
+		skin->Items->Get()->RemoveLines(first, last);
+}
+
+void GuiListBox::ClearLines() noexcept
+{
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Items)
+		skin->Items->Get()->Clear();
+}
+
+
 //Public
 
 GuiListBox::GuiListBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
@@ -211,6 +253,7 @@ void GuiListBox::InsertItems(int off, ListBoxItems items)
 		if (item_index_ && *item_index_ >= off)
 			*item_index_ += std::ssize(items);
 
+		InsertLines(off, items);
 		UpdateItems();
 	}
 }
@@ -254,7 +297,7 @@ void GuiListBox::ReplaceItems(int first, int last, ListBoxItems items)
 		last = std::clamp(last, first, std::ssize(items_));
 		items_.erase(std::begin(items_) + first, std::begin(items_) + last);
 		items_.insert(std::begin(items_) + first, std::begin(items), std::end(items));
-		
+
 		//Adjust item index
 		if (item_index_)
 		{
@@ -268,6 +311,7 @@ void GuiListBox::ReplaceItems(int first, int last, ListBoxItems items)
 				*item_index_ += std::ssize(items) - (last - first);
 		}
 		
+		ReplaceLines(first, last, items);
 		UpdateItems();
 	}
 }
@@ -289,6 +333,7 @@ void GuiListBox::ClearItems() noexcept
 		ItemDeselected();
 	}
 
+	ClearLines();
 	UpdateItems();
 }
 
@@ -316,6 +361,7 @@ void GuiListBox::RemoveItems(int first, int last) noexcept
 				*item_index_ -= last - first;
 		}
 
+		RemoveLines(first, last);
 		UpdateItems();
 	}
 }

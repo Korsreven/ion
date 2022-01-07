@@ -163,6 +163,11 @@ namespace ion::gui::controls
 			virtual void UpdateSelection() noexcept;
 			virtual void UpdateItems() noexcept;
 
+			void InsertLines(int off, const gui_list_box::ListBoxItems &items);
+			void ReplaceLines(int first, int last, const gui_list_box::ListBoxItems &items);
+			void RemoveLines(int first, int last) noexcept;
+			void ClearLines() noexcept;
+
 		public:
 
 			//Construct a list box with the given name, caption, tooltip, skin and hit boxes
