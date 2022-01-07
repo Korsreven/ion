@@ -130,7 +130,8 @@ namespace ion::graphics::fonts
 		struct TextBlock final : TextBlockStyle
 		{
 			std::string Content;
-			std::optional<Vector2> Size;
+			bool HardBreak = false;
+			std::optional<Vector2> Size;	
 		};
 
 		using TextBlocks = std::vector<TextBlock>;
@@ -138,6 +139,7 @@ namespace ion::graphics::fonts
 		struct TextLine final
 		{
 			TextBlocks Blocks;
+			bool Tail = false;
 			std::optional<Vector2> Size;
 		};
 		
@@ -162,11 +164,19 @@ namespace ion::graphics::fonts
 				return static_cast<int>(height / line_height);
 			}
 
+
 			TextBlocks html_to_formatted_blocks(std::string_view content);
 			TextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks,
 				const std::optional<Vector2> &area_size, const Vector2 &padding, TypeFace &type_face);
 
 			int get_character_count(const TextBlocks &text_blocks) noexcept;
+
+
+			std::pair<size_t, size_t> find_new_line(size_t off, std::string_view content, TextFormatting formatting) noexcept;
+			size_t get_content_offset(int line_off, std::string_view content, TextFormatting formatting) noexcept;
+			size_t get_formatted_blocks_offset(int line_off, const TextBlocks &text_blocks) noexcept;
+			size_t get_formatted_lines_offset(int line_off, const TextLines &text_lines) noexcept;
+			int get_line_offset(size_t content_off, std::string_view content, TextFormatting formatting) noexcept;
 		} //detail
 	} //text
 
@@ -238,7 +248,7 @@ namespace ion::graphics::fonts
 				Modifiers
 			*/
 
-			//Sets the (raw) content used by this text to the given content
+			//Sets the (raw) content to the given content
 			//Content can contain HTML tags and CSS code
 			void Content(std::string content);
 
@@ -338,7 +348,7 @@ namespace ion::graphics::fonts
 				Observers
 			*/
 
-			//Returns the (raw) content used by this text
+			//Returns the (raw) content
 			//Content can contain HTML tags and CSS code
 			[[nodiscard]] inline auto& Content() const noexcept
 			{
@@ -449,27 +459,52 @@ namespace ion::graphics::fonts
 				return type_face_;
 			}
 
+			//Returns the line offset at the given offset
+			int LineOffsetAt(int off) const noexcept;
+
 
 			/*
 				Content
 			*/
 
-			//Insert the given content to the back of the (raw) content used by this text
+			//Insert the given content to the back of the (raw) content
 			//This will only parse and format the added content (unlike Text::Content)
 			void AppendContent(std::string_view content);
 
-			//Insert the given content to the front of the (raw) content used by this text
+			//Insert the given content to the front of the (raw) content
 			//This will only parse and format the added content (unlike Text::Content)
 			void PrependContent(std::string_view content);
 
 
-			//Insert the given content as a new line to the back of the (raw) content used by this text
+			//Insert the given content as a new line to the back of the (raw) content
 			//This is an optimization of Text::AppendContent (no changes to existing lines or blocks)
 			void AppendLine(std::string_view content);
 
-			//Insert the given content as a new line to the front of the (raw) content used by this text
+			//Insert the given content as a new line to the front of the (raw) content
 			//This is an optimization of Text::PrependContent (no changes to existing lines or blocks)
 			void PrependLine(std::string_view content);
+
+			//Insert the given content as a new line at the given line offset of the (raw) content
+			//This is an optimization of Text::Content (no changes to existing lines or blocks)
+			void InsertLine(int line_off, std::string_view content);
+
+
+			//Replace the line at the given line offset of the (raw) content, with the given content
+			//This is an optimization of Text::Content (no changes to other lines or blocks)
+			void ReplaceLine(int line_off, std::string_view content);
+
+			//Replace all lines in range [first, last) of the (raw) content, with the given content
+			//This is an optimization of Text::Content (no changes to other lines or blocks)
+			void ReplaceLines(int first_line, int last_line, std::string_view content);
+
+
+			//Remove the line at the given line offset from the (raw) content
+			//This is an optimization of Text::Content (no changes to other lines or blocks)
+			void RemoveLine(int line_off);
+
+			//Removs all lines in range [first, last) from the (raw) content
+			//This is an optimization of Text::Content (no changes to other lines or blocks)
+			void RemoveLines(int first_line, int last_line);
 
 
 			//Clears all content in this text

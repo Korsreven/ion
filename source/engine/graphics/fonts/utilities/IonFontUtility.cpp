@@ -156,7 +156,7 @@ void append_text_block(std::string content, text::TextBlocks &text_blocks,
 	const text::TextBlockStyles &text_block_styles)
 {
 	//Combine with last text block if equal styles
-	if (!std::empty(text_blocks) &&
+	if (!std::empty(text_blocks) && !text_blocks.back().HardBreak &&
 		((!std::empty(text_block_styles) && text_blocks.back() == text_block_styles.back()) ||
 		(std::empty(text_block_styles) && text_blocks.back().IsPlain())))
 
@@ -659,7 +659,16 @@ text::TextBlocks html_to_text_blocks(std::string_view str)
 			}
 		}
 
-		content += c;
+		//Split block if new line
+		if (c == '\n')
+		{
+			if (!std::empty(content))
+				append_text_block(std::move(content), text_blocks, text_block_styles);
+
+			text_blocks.push_back({{}, "\n", true});
+		}
+		else
+			content += c;
 	}
 
 	if (!std::empty(content))
@@ -694,7 +703,7 @@ text::TextLines text_blocks_to_text_lines(text::TextBlocks text_blocks)
 				}
 				
 				if (++i < std::ssize(parts))
-					lines.push_back({std::move(line_text_blocks)});
+					lines.push_back({std::move(line_text_blocks), text_block.HardBreak});
 			}
 		}
 		else
@@ -702,7 +711,7 @@ text::TextLines text_blocks_to_text_lines(text::TextBlocks text_blocks)
 	}
 
 	if (!std::empty(line_text_blocks))
-		lines.push_back({std::move(line_text_blocks)});
+		lines.push_back({std::move(line_text_blocks), true});
 
 	return lines;
 }

@@ -75,6 +75,85 @@ int get_character_count(const TextBlocks &text_blocks) noexcept
 	return count;
 }
 
+
+std::pair<size_t, size_t> find_new_line(size_t off, std::string_view content, TextFormatting formatting) noexcept
+{
+	auto closest = std::pair{content.find('\n', off), 1U};
+
+	if (formatting == TextFormatting::HTML)
+	{
+		if (auto br_off = content.substr(0, closest.first).find("<br>", off); br_off < closest.first)
+			closest = {br_off, 4U};
+	}
+
+	return closest;
+}
+
+size_t get_content_offset(int line_off, std::string_view content, TextFormatting formatting) noexcept
+{
+	if (line_off <= 0)
+		return 0;
+
+	for (auto iter = std::pair{0U, 0U};
+		(iter = find_new_line(iter.first, content, formatting)).first != std::string_view::npos;
+		iter.first += iter.second)
+	{
+		if (--line_off == 0)
+			return iter.first + iter.second;
+	}
+
+	return std::size(content);
+}
+
+size_t get_formatted_blocks_offset(int line_off, const TextBlocks &text_blocks) noexcept
+{
+	if (line_off <= 0)
+		return 0;
+
+	for (auto i = 0; auto &text_block : text_blocks)
+	{
+		if (text_block.HardBreak && --line_off == 0)
+			return i + 1;
+		else
+			++i;
+	}
+
+	return std::size(text_blocks);
+}
+
+size_t get_formatted_lines_offset(int line_off, const TextLines &text_lines) noexcept
+{
+	if (line_off <= 0)
+		return 0;
+
+	for (auto i = 0; auto &text_line : text_lines)
+	{
+		if (text_line.Tail && --line_off == 0)
+			return i + 1;
+		else
+			++i;
+	}
+
+	return std::size(text_lines);
+}
+
+int get_line_offset(size_t content_off, std::string_view content, TextFormatting formatting) noexcept
+{
+	if (content_off == 0)
+		return 0;
+
+	auto line_off = 0;
+	for (auto iter = std::pair{0U, 0U};
+		(iter = find_new_line(iter.first, content, formatting)).first != std::string_view::npos;
+		iter.first += iter.second, ++line_off)
+	{
+		if (iter.first >= content_off)
+			break;
+	}
+
+	return line_off;
+}
+
 } //text::detail
 
 
@@ -280,6 +359,15 @@ std::optional<real> Text::LineHeight() const noexcept
 }
 
 
+int Text::LineOffsetAt(int off) const noexcept
+{
+	if (off >= 0)
+		return detail::get_line_offset(static_cast<size_t>(off), content_, formatting_);
+	else
+		return 0;
+}
+
+
 /*
 	Content
 */
@@ -360,7 +448,7 @@ void Text::AppendLine(std::string_view content)
 	content_ += "\n" + std::string{content};
 	auto formatted_blocks = MakeFormattedBlocks(content);
 	auto formatted_lines = MakeFormattedLines(formatted_blocks, area_size_, padding_, type_face_);
-	formatted_blocks.insert(std::begin(formatted_blocks), {{}, "\n"});
+	formatted_blocks.insert(std::begin(formatted_blocks), {{}, "\n", true});
 
 	std::move(std::begin(formatted_blocks), std::end(formatted_blocks),
 		std::back_inserter(formatted_blocks_));
@@ -379,12 +467,82 @@ void Text::PrependLine(std::string_view content)
 	content_.insert(0, std::string{content} + "\n");
 	auto formatted_blocks = MakeFormattedBlocks(content);
 	auto formatted_lines = MakeFormattedLines(formatted_blocks, area_size_, padding_, type_face_);
-	formatted_blocks.push_back({{}, "\n"});
+	formatted_blocks.push_back({{}, "\n", true});
 
 	std::move(std::begin(formatted_blocks), std::end(formatted_blocks),
 		std::inserter(formatted_blocks_, std::begin(formatted_blocks_)));
 	std::move(std::begin(formatted_lines), std::end(formatted_lines),
 		std::inserter(formatted_lines_, std::begin(formatted_lines_)));
+}
+
+void Text::InsertLine(int line_off, std::string_view content)
+{
+	if (std::empty(content_))
+	{
+		Content(std::string{content});
+		return;
+	}
+	else if (line_off <= 0)
+	{
+		PrependLine(content);
+		return;
+	}
+
+	if (auto off = detail::get_content_offset(line_off, content_, formatting_); off < std::size(content_))
+		content_.insert(off, std::string{content} + "\n");
+	else
+	{
+		AppendLine(content);
+		return;
+	}
+
+	auto formatted_blocks = MakeFormattedBlocks(content);
+	auto formatted_lines = MakeFormattedLines(formatted_blocks, area_size_, padding_, type_face_);
+	formatted_blocks.push_back({{}, "\n", true});
+
+	std::move(std::begin(formatted_blocks), std::end(formatted_blocks),
+		std::inserter(formatted_blocks_, std::begin(formatted_blocks_) +
+		detail::get_formatted_blocks_offset(line_off, formatted_blocks)));
+	std::move(std::begin(formatted_lines), std::end(formatted_lines),
+		std::inserter(formatted_lines_, std::begin(formatted_lines_) +
+		detail::get_formatted_lines_offset(line_off, formatted_lines)));
+}
+
+
+void Text::ReplaceLine(int line_off, std::string_view content)
+{
+	ReplaceLines(line_off, line_off + 1, content);
+}
+
+void Text::ReplaceLines(int first_line, int last_line, std::string_view content)
+{
+	if (first_line >= 0 && first_line < last_line)
+	{
+		RemoveLines(first_line, last_line);
+		InsertLine(first_line, content);
+	}
+}
+
+
+void Text::RemoveLine(int line_off)
+{
+	RemoveLines(line_off, line_off + 1);
+}
+
+void Text::RemoveLines(int first_line, int last_line)
+{
+	if (first_line >= 0 && first_line < last_line)
+	{
+		content_.erase(
+			std::begin(content_) + detail::get_content_offset(first_line, content_, formatting_),
+			std::begin(content_) + detail::get_content_offset(last_line, content_, formatting_));
+		formatted_blocks_.erase(
+			std::begin(formatted_blocks_) + detail::get_formatted_blocks_offset(first_line, formatted_blocks_),
+			std::begin(formatted_blocks_) + detail::get_formatted_blocks_offset(last_line, formatted_blocks_));
+		formatted_lines_.erase(
+			std::begin(formatted_lines_) + detail::get_formatted_lines_offset(first_line, formatted_lines_),
+			std::begin(formatted_lines_) + detail::get_formatted_lines_offset(last_line, formatted_lines_));
+	}
 }
 
 
