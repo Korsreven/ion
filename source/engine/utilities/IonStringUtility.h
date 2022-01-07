@@ -442,6 +442,34 @@ namespace ion::utilities::string
 
 
 	/*
+		Removing
+		Alpha/numeric
+		Non-printable
+	*/
+
+	//Remove all alpha characters from str
+	std::string& RemoveAlpha(std::string &str) noexcept;
+
+	//Remove all numeric characters from str
+	std::string& RemoveNumeric(std::string &str) noexcept;
+
+	//Remove all non-printable characters from str
+	std::string& RemoveNonPrintable(std::string &str) noexcept;
+
+	//Remove all alpha characters from str
+	//Returns the result as a copy
+	[[nodiscard]] std::string RemoveAlphaCopy(std::string str) noexcept;
+
+	//Remove all numeric characters from str
+	//Returns the result as a copy
+	[[nodiscard]] std::string RemoveNumericCopy(std::string str) noexcept;
+
+	//Remove all non-printable characters from str
+	//Returns the result as a copy
+	[[nodiscard]] std::string RemoveNonPrintableCopy(std::string str) noexcept;
+
+
+	/*
 		Replacing
 		Case sensitive/insensitive
 		Inplace or by copying

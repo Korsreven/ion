@@ -523,6 +523,46 @@ std::string PadRightCopy(std::string str, int length, std::string_view character
 
 
 /*
+	Removing
+	Alpha/numeric
+	Non-printable
+*/
+
+std::string& RemoveAlpha(std::string &str) noexcept
+{
+	str.erase(std::remove_if(std::begin(str), std::end(str), [](auto c) { return std::isalpha(c); }), std::end(str));
+	return str;
+}
+
+std::string& RemoveNumeric(std::string &str) noexcept
+{
+	str.erase(std::remove_if(std::begin(str), std::end(str), [](auto c) { return std::isdigit(c); }), std::end(str));
+	return str;
+}
+
+std::string& RemoveNonPrintable(std::string &str) noexcept
+{
+	str.erase(std::remove_if(std::begin(str), std::end(str), [](auto c) { return !std::isprint(c); }), std::end(str));
+	return str;
+}
+
+std::string RemoveAlphaCopy(std::string str) noexcept
+{
+	return RemoveAlpha(str);
+}
+
+std::string RemoveNumericCopy(std::string str) noexcept
+{
+	return RemoveNumeric(str);
+}
+
+std::string RemoveNonPrintableCopy(std::string str) noexcept
+{
+	return RemoveNonPrintable(str);
+}
+
+
+/*
 	Replacing
 	Case sensitive/insensitive
 	Inplace or by copying
