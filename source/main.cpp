@@ -1902,6 +1902,39 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			group_box_right->AutoRepeat(true);
 			group_box_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
 
+			//List box
+			w = 0.056_r;
+			h = 0.056_r;
+
+			auto list_box_model = scene.CreateModel();
+			auto list_box_center = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
+			
+			auto list_box_top = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
+			auto list_box_left = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
+			auto list_box_bottom = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
+			auto list_box_right = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
+
+			auto list_box_top_left = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
+			auto list_box_bottom_left = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
+			auto list_box_top_right = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
+			auto list_box_bottom_right = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
+
+			list_box_center->AutoRepeat(true);
+			list_box_top->AutoRepeat(true);
+			list_box_left->AutoRepeat(true);
+			list_box_bottom->AutoRepeat(true);
+			list_box_right->AutoRepeat(true);
+			list_box_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+
 			//Progress bar
 			w = 0.056_r;
 			h = 0.056_r;
@@ -2126,6 +2159,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto label_caption = scene.CreateText(caption_text);
 			label_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 
+			//List box caption
+			auto list_box_caption = scene.CreateText(caption_text);
+			list_box_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+
+			//List box lines
+			auto list_box_lines = scene.CreateText(caption_text);
+			list_box_lines->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+
 			//Progress bar caption
 			auto progress_bar_caption = scene.CreateText(caption_text);
 			progress_bar_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
@@ -2286,6 +2327,37 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Label skin
 			ion::gui::controls::gui_label::LabelSkin label_skin;
 			label_skin.Caption.TextObject = label_caption;
+
+			//List box skin
+			ion::gui::controls::gui_list_box::ListBoxSkin list_box_skin;
+			list_box_skin.Parts.ModelObject = list_box_model;
+			list_box_skin.Parts.Center.SpriteObject = list_box_center;
+			list_box_skin.Parts.Top.SpriteObject = list_box_top;
+			list_box_skin.Parts.Left.SpriteObject = list_box_left;
+			list_box_skin.Parts.Bottom.SpriteObject = list_box_bottom;
+			list_box_skin.Parts.Right.SpriteObject = list_box_right;
+			list_box_skin.Parts.TopLeft.SpriteObject = list_box_top_left;
+			list_box_skin.Parts.BottomLeft.SpriteObject = list_box_bottom_left;
+			list_box_skin.Parts.TopRight.SpriteObject = list_box_top_right;
+			list_box_skin.Parts.BottomRight.SpriteObject = list_box_bottom_right;
+
+			list_box_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
+			list_box_skin.Parts.Top.EnabledMaterial = button_top_enabled;
+			list_box_skin.Parts.Left.EnabledMaterial = button_left_enabled;
+			list_box_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
+			list_box_skin.Parts.Right.EnabledMaterial = button_right_enabled;
+			list_box_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
+			list_box_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
+			list_box_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
+			list_box_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
+
+			list_box_skin.Lines.TextObject = list_box_lines;
+			list_box_skin.Lines.EnabledStyle = button_caption_style_enabled;
+			list_box_skin.Lines.DisabledStyle = button_caption_style_disabled;
+
+			list_box_skin.Caption.TextObject = list_box_caption;
+			list_box_skin.Caption.EnabledStyle = button_caption_style_enabled;
+			list_box_skin.Caption.DisabledStyle = button_caption_style_disabled;
 
 			//Progress bar skin
 			ion::gui::controls::gui_progress_bar::ProgressBarSkin progress_bar_skin;
@@ -2544,8 +2616,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			progress_bar->Range(0.0_r, 100.0_r);
 			progress_bar->Position(75.0_r);
 
-			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", "My scroll bar", "My scroll bar tooltip", std::move(scroll_bar_skin), Vector2{0.077_r, 1.0_r});
-			scroll_bar->Node()->Position({-0.7_r, 0.15_r});
+			auto list_box = base_panel->CreateListBox("list_box", "My list box", std::move(list_box_skin), Vector2{0.5_r, 0.8_r});
+			list_box->Node()->Position({0.8_r, 0.25_r});
+			list_box->AddItems({
+				{"My <b>first</b> <font color='purple'>item</font>"s},
+				{"My <b>second</b> <font color='purple'>item</font>"s},
+				{"My <b>third</b> <font color='purple'>item</font>"s}
+			});
+
+			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", "My scroll bar", "My scroll bar tooltip", std::move(scroll_bar_skin), Vector2{0.077_r, 0.8_r});
+			scroll_bar->Node()->Position({1.1_r, 0.25_r});
 			scroll_bar->Range(0, 50);
 			scroll_bar->StepByAmount(3);
 

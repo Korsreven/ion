@@ -87,6 +87,8 @@ namespace ion::gui::controls
 		namespace detail
 		{
 			constexpr auto default_item_height_factor = 2.0_r;
+			constexpr auto default_item_padding_size = 2.0_r;
+
 			constexpr auto default_icon_column_width_percent = 0.25_r;
 			constexpr auto default_icon_margin = 2.0_r;
 
@@ -133,14 +135,15 @@ namespace ion::gui::controls
 			void DefaultSetup() noexcept;
 
 		protected:
-
-			gui_list_box::ListBoxItemAlignment item_alignment_ = gui_list_box::ListBoxItemAlignment::Left;
-			std::optional<real> item_height_factor_;
+		
 			std::optional<int> item_index_;
-
-			gui_list_box::ListBoxIconLayout icon_layout_ = gui_list_box::ListBoxIconLayout::Left;
+			std::optional<real> item_height_factor_;
+			std::optional<Vector2> item_padding_;
+			gui_list_box::ListBoxItemAlignment item_alignment_ = gui_list_box::ListBoxItemAlignment::Left;
+			
 			std::optional<real> icon_column_width_;
 			std::optional<real> icon_margin_;
+			gui_list_box::ListBoxIconLayout icon_layout_ = gui_list_box::ListBoxIconLayout::Left;
 			bool show_icons_ = true;
 
 			gui_list_box::ListBoxItems items_;
@@ -185,6 +188,10 @@ namespace ion::gui::controls
 			/*
 				Skins
 			*/
+
+			virtual void AttachSkin() override;
+			virtual void DetachSkin() noexcept override;
+			virtual void RemoveSkin() noexcept override;
 			
 			virtual void UpdateLines() noexcept;
 			virtual void UpdateSelection() noexcept;		
@@ -233,13 +240,13 @@ namespace ion::gui::controls
 				Modifiers
 			*/
 
-			//Sets the item alignment for this list box to the given alignment
-			inline void ItemAlignment(gui_list_box::ListBoxItemAlignment alignment) noexcept
+			//Sets the item index of this list box to the given index
+			inline void ItemIndex(std::optional<int> index) noexcept
 			{
-				if (item_alignment_ != alignment)
+				if (item_index_ != index)
 				{
-					item_alignment_ = alignment;
-					UpdateLines();
+					item_index_ = index;
+					UpdateSelection();
 				}
 			}
 
@@ -253,26 +260,26 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the item index of this list box to the given index
-			inline void ItemIndex(std::optional<int> index) noexcept
+			//Sets the item padding for this list box to the given padding
+			inline void ItemPadding(const std::optional<Vector2> &padding) noexcept
 			{
-				if (item_index_ != index)
+				if (item_padding_ != padding)
 				{
-					item_index_ = index;
-					UpdateSelection();
-				}
-			}
-
-
-			//Sets the icon layout for this list box to the given layout
-			inline void IconLayout(gui_list_box::ListBoxIconLayout layout) noexcept
-			{
-				if (icon_layout_ != layout)
-				{
-					icon_layout_ = layout;
+					item_padding_ = padding;
 					UpdateLines();
 				}
 			}
+
+			//Sets the item alignment for this list box to the given alignment
+			inline void ItemAlignment(gui_list_box::ListBoxItemAlignment alignment) noexcept
+			{
+				if (item_alignment_ != alignment)
+				{
+					item_alignment_ = alignment;
+					UpdateLines();
+				}
+			}
+
 
 			//Sets the icon column width for this list box to the given width (in percentages)
 			inline void IconColumnWidth(std::optional<real> percent) noexcept
@@ -294,6 +301,16 @@ namespace ion::gui::controls
 				}
 			}
 
+			//Sets the icon layout for this list box to the given layout
+			inline void IconLayout(gui_list_box::ListBoxIconLayout layout) noexcept
+			{
+				if (icon_layout_ != layout)
+				{
+					icon_layout_ = layout;
+					UpdateLines();
+				}
+			}
+
 			//Sets whether or not this list box is showing icons
 			inline void ShowIcons(bool show) noexcept
 			{
@@ -309,10 +326,11 @@ namespace ion::gui::controls
 				Observers
 			*/
 
-			//Returns the icon layout for this list box
-			[[nodiscard]] inline auto ItemAlignment() const noexcept
+			//Returns the item index of this list box
+			//Returns nullopt if no items are selected
+			[[nodiscard]] inline auto ItemIndex() const noexcept
 			{
-				return item_alignment_;
+				return item_index_;
 			}
 
 			//Returns the item height factor for this list box
@@ -322,19 +340,19 @@ namespace ion::gui::controls
 				return item_height_factor_;
 			}
 
-			//Returns the item index of this list box
-			//Returns nullopt if no items are selected
-			[[nodiscard]] inline auto ItemIndex() const noexcept
+			//Returns the item padding for this list box
+			//Returns nullopt if no custom item padding has been set
+			[[nodiscard]] inline auto ItemPadding() const noexcept
 			{
-				return item_index_;
+				return item_padding_;
 			}
-
 
 			//Returns the icon layout for this list box
-			[[nodiscard]] inline auto IconLayout() const noexcept
+			[[nodiscard]] inline auto ItemAlignment() const noexcept
 			{
-				return icon_layout_;
+				return item_alignment_;
 			}
+
 
 			//Returns the icon column width for this list box (in percentages)
 			//Returns nullopt if no custom icon column width has been set
@@ -348,6 +366,12 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto IconMargin() const noexcept
 			{
 				return icon_margin_;
+			}
+
+			//Returns the icon layout for this list box
+			[[nodiscard]] inline auto IconLayout() const noexcept
+			{
+				return icon_layout_;
 			}
 
 			//Returns true if this list box is showing icons

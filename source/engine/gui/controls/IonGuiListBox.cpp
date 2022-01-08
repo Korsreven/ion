@@ -193,12 +193,60 @@ void GuiListBox::SetState(gui_control::ControlState state) noexcept
 	Skins
 */
 
+void GuiListBox::AttachSkin()
+{
+	GuiControl::AttachSkin(); //Use base functionality
+
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin)
+	{
+		if (skin->Lines)
+		{
+			if (auto node = skin->Lines->ParentNode(); node)
+				node->DetachObject(*skin->Lines.TextObject);
+		
+			if (node_) //Create node for lines
+				node_->CreateChildNode(node_->Visible())->AttachObject(*skin->Lines.TextObject);
+		}
+	}
+}
+
+void GuiListBox::DetachSkin() noexcept
+{
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin)
+	{
+		if (skin->Lines)
+		{
+			if (auto node = skin->Lines->ParentNode(); node_ && node)
+				node_->RemoveChildNode(*node); //Remove lines node
+		}
+	}
+
+	GuiControl::DetachSkin(); //Use base functionality
+}
+
+void GuiListBox::RemoveSkin() noexcept
+{
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin)
+	{
+		DetachSkin();
+
+		if (skin->Lines)
+		{
+			skin->Lines->Owner()->RemoveText(*skin->Lines.TextObject); //Remove lines
+			skin->Lines = {};
+		}
+	}
+
+	GuiControl::RemoveSkin(); //Use base functionality
+}
+
+
 void GuiListBox::UpdateLines() noexcept
 {
 	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
 		skin && skin->Lines)
 	{
-		//Caption text
+		//Lines text
 		if (auto &lines = skin->Lines->Get(); lines)
 		{
 			auto area_size = gui_control::detail::get_inner_size(*skin_, false).value_or(vector2::Zero);
@@ -223,8 +271,8 @@ void GuiListBox::UpdateLines() noexcept
 
 				lines->AreaSize(area_size * ortho_viewport_ratio);
 
-				if (auto node = skin->Lines->ParentNode(); node)
-					node->Position(center + detail::lines_area_offset(item_alignment_, area_size, border_size));
+				//if (auto node = skin->Lines->ParentNode(); node)
+				//	node->Position(center + detail::lines_area_offset(item_alignment_, area_size, border_size));
 			}
 			else
 			{
@@ -249,6 +297,9 @@ void GuiListBox::UpdateLines() noexcept
 
 			//Line height factor
 			lines->LineHeightFactor(item_height_factor_.value_or(detail::default_item_height_factor));
+
+			//Line height factor
+			lines->Padding(item_padding_.value_or(detail::default_item_padding_size));
 
 			//Alignment
 			lines->Alignment(detail::item_alignment_to_text_alignment(item_alignment_));
