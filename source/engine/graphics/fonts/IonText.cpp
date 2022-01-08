@@ -502,10 +502,10 @@ void Text::InsertLine(int line_off, std::string_view content)
 
 	std::move(std::begin(formatted_blocks), std::end(formatted_blocks),
 		std::inserter(formatted_blocks_, std::begin(formatted_blocks_) +
-		detail::get_formatted_blocks_offset(line_off, formatted_blocks)));
+		detail::get_formatted_blocks_offset(line_off, formatted_blocks_)));
 	std::move(std::begin(formatted_lines), std::end(formatted_lines),
 		std::inserter(formatted_lines_, std::begin(formatted_lines_) +
-		detail::get_formatted_lines_offset(line_off, formatted_lines)));
+		detail::get_formatted_lines_offset(line_off, formatted_lines_)));
 }
 
 
