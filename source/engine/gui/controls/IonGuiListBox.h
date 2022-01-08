@@ -76,8 +76,8 @@ namespace ion::gui::controls
 
 		struct ListBoxSkin : gui_control::ControlSkin
 		{
-			gui_control::ControlVisualPart Selection;
-			gui_control::ControlCaptionPart Items;
+			gui_control::ControlCaptionPart Lines;
+			gui_control::ControlVisualPart Selection;		
 
 			std::vector<NonOwningPtr<graphics::scene::shapes::Sprite>> Icons;
 				//Sprites for each visible icon
@@ -91,11 +91,37 @@ namespace ion::gui::controls
 			constexpr auto default_icon_margin = 2.0_r;
 
 
+			inline auto item_alignment_to_text_alignment(ListBoxItemAlignment item_alignment) noexcept
+			{
+				switch (item_alignment)
+				{
+					case ListBoxItemAlignment::Left:
+					return graphics::fonts::text::TextAlignment::Left;
+
+					case ListBoxItemAlignment::Right:
+					return graphics::fonts::text::TextAlignment::Right;
+
+					default:
+					return graphics::fonts::text::TextAlignment::Center;
+				}
+			}
+
+
 			/*
 				Skins
 			*/
 
 			void resize_skin(ListBoxSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
+
+
+			/*
+				Lines
+			*/
+
+			std::string item_content_to_text_content(const gui_list_box::ListBoxItems &items);
+
+			Vector2 lines_offset(ListBoxItemAlignment item_alignment, const Vector2 &size, const Vector2 &border_size) noexcept;
+			Vector2 lines_area_offset(ListBoxItemAlignment item_alignment, const Vector2 &size, const Vector2 &border_size) noexcept;
 		} //detail
 	} //gui_list_box
 
@@ -160,8 +186,13 @@ namespace ion::gui::controls
 				Skins
 			*/
 			
-			virtual void UpdateSelection() noexcept;
-			virtual void UpdateItems() noexcept;
+			virtual void UpdateLines() noexcept;
+			virtual void UpdateSelection() noexcept;		
+
+
+			/*
+				Lines
+			*/
 
 			void InsertLines(int off, const gui_list_box::ListBoxItems &items);
 			void ReplaceLines(int first, int last, const gui_list_box::ListBoxItems &items);
@@ -208,7 +239,7 @@ namespace ion::gui::controls
 				if (item_alignment_ != alignment)
 				{
 					item_alignment_ = alignment;
-					UpdateItems();
+					UpdateLines();
 				}
 			}
 
@@ -218,7 +249,7 @@ namespace ion::gui::controls
 				if (item_height_factor_ != factor)
 				{
 					item_height_factor_ = factor;
-					UpdateItems();
+					UpdateLines();
 				}
 			}
 
@@ -239,7 +270,7 @@ namespace ion::gui::controls
 				if (icon_layout_ != layout)
 				{
 					icon_layout_ = layout;
-					UpdateItems();
+					UpdateLines();
 				}
 			}
 
@@ -249,7 +280,7 @@ namespace ion::gui::controls
 				if (icon_column_width_ != percent)
 				{
 					icon_column_width_ = percent;
-					UpdateItems();
+					UpdateLines();
 				}
 			}
 
@@ -259,7 +290,7 @@ namespace ion::gui::controls
 				if (icon_margin_ != margin)
 				{
 					icon_margin_ = margin;
-					UpdateItems();
+					UpdateLines();
 				}
 			}
 
@@ -269,7 +300,7 @@ namespace ion::gui::controls
 				if (show_icons_ != show)
 				{
 					show_icons_ = show;
-					UpdateItems();
+					UpdateLines();
 				}
 			}
 

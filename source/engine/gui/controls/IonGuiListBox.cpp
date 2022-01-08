@@ -17,6 +17,7 @@ File:	IonGuiListBox.cpp
 #include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
+#include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/scene/shapes/IonSprite.h"
 #include "utilities/IonStringUtility.h"
@@ -51,6 +52,57 @@ void resize_skin(ListBoxSkin &skin, const Vector2 &from_size, const Vector2 &to_
 	}
 }
 
+
+/*
+	Lines
+*/
+
+std::string item_content_to_text_content(const gui_list_box::ListBoxItems &items)
+{
+	using namespace utilities;
+	auto content = items.front().Content;
+
+	for (auto iter = std::begin(items) + 1, end = std::end(items); iter != end; ++iter)
+		content += "\n" + string::RemoveNonPrintableCopy(iter->Content);
+
+	return content;
+}
+
+
+Vector2 lines_offset(ListBoxItemAlignment item_alignment, const Vector2 &size, const Vector2 &border_size) noexcept
+{
+	auto half_size = size * 0.5_r;
+
+	switch (item_alignment)
+	{
+		case ListBoxItemAlignment::Left:
+		return {-half_size.X() - border_size.X(), 0.0_r};
+
+		case ListBoxItemAlignment::Right:
+		return {half_size.X() + border_size.X(), 0.0_r};
+
+		case ListBoxItemAlignment::Center:
+		default:
+		return vector2::Zero;
+	}
+}
+
+Vector2 lines_area_offset(ListBoxItemAlignment item_alignment, const Vector2 &size, const Vector2 &border_size) noexcept
+{
+	switch (item_alignment)
+	{
+		case ListBoxItemAlignment::Left:
+		return {-size.X() - border_size.X(), 0.0_r};
+
+		case ListBoxItemAlignment::Right:
+		return {size.X() + border_size.X(), 0.0_r};
+
+		case ListBoxItemAlignment::Center:
+		default:
+		return vector2::Zero;
+	}
+}
+
 } //gui_list_box::detail
 
 
@@ -73,7 +125,7 @@ void GuiListBox::Resized(Vector2 from_size, Vector2 to_size) noexcept
 	if (skin_)
 	{
 		detail::resize_skin(static_cast<ListBoxSkin&>(*skin_), from_size, to_size);
-		UpdateItems();
+		UpdateLines();
 	}
 
 	GuiControl::Resized(from_size, to_size); //Use base functionality
@@ -141,56 +193,115 @@ void GuiListBox::SetState(gui_control::ControlState state) noexcept
 	Skins
 */
 
-void GuiListBox::UpdateSelection() noexcept
+void GuiListBox::UpdateLines() noexcept
 {
-	
-}
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+		skin && skin->Lines)
+	{
+		//Caption text
+		if (auto &lines = skin->Lines->Get(); lines)
+		{
+			auto area_size = gui_control::detail::get_inner_size(*skin_, false).value_or(vector2::Zero);
+			auto border_size = gui_control::detail::get_border_size(*skin_, false).value_or(vector2::Zero);
+			auto center = gui_control::detail::get_center_area(*skin_, false).value_or(aabb::Zero).Center();
 
-void GuiListBox::UpdateItems() noexcept
-{
-	//Todo
+			//Area size
+			if (area_size != vector2::Zero)
+			{
+				auto ortho_viewport_ratio =
+					[&]() noexcept
+					{
+						//Adjust area size from ortho to viewport space
+						if (auto scene_manager = skin->Lines->Owner(); scene_manager)
+						{
+							if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+								return viewport->OrthoToViewportRatio();
+						}
+
+						return vector2::UnitScale;
+					}();
+
+				lines->AreaSize(area_size * ortho_viewport_ratio);
+
+				if (auto node = skin->Lines->ParentNode(); node)
+					node->Position(center + detail::lines_area_offset(item_alignment_, area_size, border_size));
+			}
+			else
+			{
+				/*auto viewport_ortho_ratio =
+					[&]() noexcept
+					{
+						//Adjust area size from ortho to viewport space
+						if (auto scene_manager = skin->Lines->Owner(); scene_manager)
+						{
+							if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+								return viewport->ViewportToOrthoRatio();
+						}
+
+						return vector2::UnitScale;
+					}();*/
+
+				lines->AreaSize({});
+
+				if (auto node = skin->Lines->ParentNode(); node)
+					node->Position(center + detail::lines_offset(item_alignment_, area_size, border_size));
+			}
+
+			//Line height factor
+			lines->LineHeightFactor(item_height_factor_.value_or(detail::default_item_height_factor));
+
+			//Alignment
+			lines->Alignment(detail::item_alignment_to_text_alignment(item_alignment_));
+
+			//Content
+			if (std::size(lines->FormattedLines()) != std::size(items_))
+				lines->Content(detail::item_content_to_text_content(items_));
+		}
+	}
+
 	UpdateSelection();
 }
 
+void GuiListBox::UpdateSelection() noexcept
+{
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+		skin && skin->Selection && item_index_)
+	{
+		//Todo
+	}
+}
+
+
+/*
+	Lines
+*/
 
 void GuiListBox::InsertLines(int off, const gui_list_box::ListBoxItems &items)
 {
 	using namespace utilities;
 
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Items)
-	{
-		auto content = items.front().Content;
-		for (auto i = 1; i < std::ssize(items); ++i)
-			content += "\n" + string::RemoveNonPrintableCopy(items[i].Content);
-
-		skin->Items->Get()->InsertLine(off, content);
-	}
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
+		skin->Lines->Get()->InsertLine(off, detail::item_content_to_text_content(items));
 }
 
 void GuiListBox::ReplaceLines(int first, int last, const gui_list_box::ListBoxItems &items)
 {
 	using namespace utilities;
 
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Items)
-	{
-		auto content = items.front().Content;
-		for (auto i = 1; i < std::ssize(items); ++i)
-			content += "\n" + string::RemoveNonPrintableCopy(items[i].Content);
-
-		skin->Items->Get()->ReplaceLines(first, last, content);
-	}
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
+		skin->Lines->Get()->ReplaceLines(first, last, detail::item_content_to_text_content(items));
 }
 
 void GuiListBox::RemoveLines(int first, int last) noexcept
 {
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Items)
-		skin->Items->Get()->RemoveLines(first, last);
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
+		skin->Lines->Get()->RemoveLines(first, last);
 }
 
 void GuiListBox::ClearLines() noexcept
 {
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Items)
-		skin->Items->Get()->Clear();
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
+		skin->Lines->Get()->Clear();
 }
 
 
@@ -254,7 +365,7 @@ void GuiListBox::InsertItems(int off, ListBoxItems items)
 			*item_index_ += std::ssize(items);
 
 		InsertLines(off, items);
-		UpdateItems();
+		UpdateLines();
 	}
 }
 
@@ -312,7 +423,7 @@ void GuiListBox::ReplaceItems(int first, int last, ListBoxItems items)
 		}
 		
 		ReplaceLines(first, last, items);
-		UpdateItems();
+		UpdateLines();
 	}
 }
 
@@ -334,7 +445,7 @@ void GuiListBox::ClearItems() noexcept
 	}
 
 	ClearLines();
-	UpdateItems();
+	UpdateLines();
 }
 
 void GuiListBox::RemoveItem(int off) noexcept
@@ -362,7 +473,7 @@ void GuiListBox::RemoveItems(int first, int last) noexcept
 		}
 
 		RemoveLines(first, last);
-		UpdateItems();
+		UpdateLines();
 	}
 }
 
