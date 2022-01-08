@@ -25,6 +25,7 @@ File:	IonGuiPanelContainer.h
 #include "controls/IonGuiCheckBox.h"
 #include "controls/IonGuiGroupBox.h"
 #include "controls/IonGuiLabel.h"
+#include "controls/IonGuiListBox.h"
 #include "controls/IonGuiProgressBar.h"
 #include "controls/IonGuiRadioButton.h"
 #include "controls/IonGuiScrollBar.h"
@@ -289,6 +290,23 @@ namespace ion::gui
 
 			//Create a label by moving the given label
 			NonOwningPtr<controls::GuiLabel> CreateLabel(controls::GuiLabel &&label);
+
+
+			/*
+				List boxes
+				Creating
+			*/
+
+			//Create a list box with the given name, caption, skin and hit boxes
+			NonOwningPtr<controls::GuiListBox> CreateListBox(std::string name, std::optional<std::string> caption,
+				controls::gui_list_box::ListBoxSkin skin, controls::gui_control::BoundingBoxes hit_boxes = {});
+
+			//Create a list box with the given name, caption, skin, size and hit boxes
+			NonOwningPtr<controls::GuiListBox> CreateListBox(std::string name, std::optional<std::string> caption,
+				controls::gui_list_box::ListBoxSkin skin, const Vector2 &size, controls::gui_control::BoundingBoxes hit_boxes = {});
+
+			//Create a list box by moving the given list box
+			NonOwningPtr<controls::GuiListBox> CreateListBox(controls::GuiListBox &&list_box);
 
 
 			/*

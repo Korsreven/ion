@@ -316,6 +316,31 @@ NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(controls::GuiLab
 
 
 /*
+	List boxes
+	Creating
+*/
+
+NonOwningPtr<controls::GuiListBox> GuiPanelContainer::CreateListBox(std::string name, std::optional<std::string> caption,
+	controls::gui_list_box::ListBoxSkin skin, controls::gui_control::BoundingBoxes hit_boxes)
+{
+	return CreateControl<controls::GuiListBox>(std::move(name), std::move(caption),
+		make_owning<controls::gui_list_box::ListBoxSkin>(std::move(skin)), std::move(hit_boxes));
+}
+
+NonOwningPtr<controls::GuiListBox> GuiPanelContainer::CreateListBox(std::string name, std::optional<std::string> caption,
+	controls::gui_list_box::ListBoxSkin skin, const Vector2 &size, controls::gui_control::BoundingBoxes hit_boxes)
+{
+	return CreateControl<controls::GuiListBox>(std::move(name), std::move(caption),
+		make_owning<controls::gui_list_box::ListBoxSkin>(std::move(skin)), size, std::move(hit_boxes));
+}
+
+NonOwningPtr<controls::GuiListBox> GuiPanelContainer::CreateListBox(controls::GuiListBox &&list_box)
+{
+	return CreateControl<controls::GuiListBox>(std::move(list_box));
+}
+
+
+/*
 	Progress bars
 	Creating
 */

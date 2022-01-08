@@ -67,8 +67,20 @@ namespace ion::gui::controls
 
 			using GuiControl::GuiControl;
 
+			//Default move constructor
+			GuiScrollable(GuiScrollable&&) = default;
+
+
 			//Virtual destructor
 			virtual ~GuiScrollable() noexcept;
+
+
+			/*
+				Operators
+			*/
+
+			//Default move assignment
+			GuiScrollable& operator=(GuiScrollable&&) = default;
 
 
 			/*
