@@ -334,9 +334,21 @@ namespace ion::graphics::fonts::utilities
 			Truncating
 		*/
 
-		std::string truncate_string(std::string str, int max_width, std::string suffix,
+		std::string truncate_string(std::string str, int max_width, std::string_view suffix,
 			const font::GlyphMetrices &metrics);
-		text::TextBlocks truncate_text_blocks(text::TextBlocks text_blocks, int max_width,
+		text::TextBlocks truncate_text_blocks(text::TextBlocks text_blocks, int max_width, std::string_view suffix,
+			const font::GlyphMetrices &regular_metrics,
+			const font::GlyphMetrices *bold_metrics,
+			const font::GlyphMetrices *italic_metrics,
+			const font::GlyphMetrices *bold_italic_metrics);
+
+		/*
+			Word truncating
+		*/
+
+		std::string word_truncate(std::string str, int max_width,
+			const font::GlyphMetrices &metrics);
+		text::TextBlocks word_truncate(text::TextBlocks text_blocks, int max_width,
 			const font::GlyphMetrices &regular_metrics,
 			const font::GlyphMetrices *bold_metrics,
 			const font::GlyphMetrices *italic_metrics,
@@ -349,6 +361,11 @@ namespace ion::graphics::fonts::utilities
 
 		std::string word_wrap(std::string str, int max_width,
 			const font::GlyphMetrices &metrics);
+		text::TextBlocks word_wrap(text::TextBlocks text_blocks, int max_width,
+			const font::GlyphMetrices &regular_metrics,
+			const font::GlyphMetrices *bold_metrics,
+			const font::GlyphMetrices *italic_metrics,
+			const font::GlyphMetrices *bold_italic_metrics);
 		void word_wrap(glyph_rope str, int max_width);
 	} //detail
 
@@ -401,11 +418,17 @@ namespace ion::graphics::fonts::utilities
 	//Truncates the given string if wider than max width, in pixels, when rendered with the given font
 	//If string has been truncated, then the given suffix is appended to the result
 	//Returns nullopt if font could not be loaded properly
-	[[nodiscard]] std::optional<std::string> TruncateString(std::string str, int max_width, std::string suffix, Font &font);
+	[[nodiscard]] std::optional<std::string> TruncateString(std::string str, int max_width, std::string_view suffix, Font &font);
 
 	//Truncates the given text blocks if wider than max width, in pixels, when rendered with the given type face
+	//If string has been truncated, then ... is appended to the result
 	//Returns nullopt if type face fonts could not be loaded properly
 	[[nodiscard]] std::optional<text::TextBlocks> TruncateTextBlocks(text::TextBlocks text_blocks, int max_width, TypeFace &type_face);
+
+	//Truncates the given text blocks if wider than max width, in pixels, when rendered with the given type face
+	//If string has been truncated, then the given suffix is appended to the result
+	//Returns nullopt if type face fonts could not be loaded properly
+	[[nodiscard]] std::optional<text::TextBlocks> TruncateTextBlocks(text::TextBlocks text_blocks, int max_width, std::string_view suffix, TypeFace &type_face);
 
 
 	/*

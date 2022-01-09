@@ -59,6 +59,14 @@ namespace ion::graphics::fonts
 			HTML
 		};
 
+		enum class TextOverflow
+		{
+			Truncate,
+			TruncateEllipsis,
+			WordTruncate,
+			WordWrap
+		};
+
 
 		enum class TextFontStyle
 		{
@@ -166,7 +174,7 @@ namespace ion::graphics::fonts
 
 
 			TextBlocks html_to_formatted_blocks(std::string_view content);
-			TextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks,
+			TextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks, TextOverflow overflow,
 				const std::optional<Vector2> &area_size, const Vector2 &padding, TypeFace &type_face);
 
 			int get_character_count(const TextBlocks &text_blocks) noexcept;
@@ -190,6 +198,7 @@ namespace ion::graphics::fonts
 			text::TextFormatting formatting_ = text::TextFormatting::HTML;
 			text::TextAlignment alignment_ = text::TextAlignment::Left;
 			text::TextVerticalAlignment vertical_alignment_ = text::TextVerticalAlignment::Top;
+			text::TextOverflow overflow_ = text::TextOverflow::WordWrap;
 
 			std::optional<Vector2> area_size_;
 			Vector2 padding_;
@@ -266,6 +275,9 @@ namespace ion::graphics::fonts
 			{
 				vertical_alignment_ = vertical_alignment;
 			}
+
+			//Sets the overflow property of the text to the given overflow
+			void Overflow(text::TextOverflow overflow) noexcept;
 
 
 			//Sets the area size of the text to the given size
@@ -371,6 +383,12 @@ namespace ion::graphics::fonts
 			[[nodiscard]] inline auto VerticalAlignment() const noexcept
 			{
 				return vertical_alignment_;
+			}
+
+			//Returns the overflow property of the text
+			[[nodiscard]] inline auto Overflow() const noexcept
+			{
+				return overflow_;
 			}
 
 

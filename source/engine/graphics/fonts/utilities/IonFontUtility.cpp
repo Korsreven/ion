@@ -784,7 +784,7 @@ std::pair<int,int> text_blocks_size_in_pixels(const text::TextBlocks &text_block
 	Truncating
 */
 
-std::string truncate_string(std::string str, int max_width, std::string suffix,
+std::string truncate_string(std::string str, int max_width, std::string_view suffix,
 	const font::GlyphMetrices &metrics)
 {
 	//Truncate
@@ -796,7 +796,7 @@ std::string truncate_string(std::string str, int max_width, std::string suffix,
 		if (suffix_width > max_width)
 			return "";
 		else if (suffix_width == max_width)
-			return suffix;
+			return std::string{suffix};
 
 		width += suffix_width;
 
@@ -809,40 +809,105 @@ std::string truncate_string(std::string str, int max_width, std::string suffix,
 				break;
 		}
 
-		str += std::move(suffix);
+		str += suffix;
 	}
 
 	return str;
 }
 
-text::TextBlocks truncate_text_blocks(text::TextBlocks text_blocks, int max_width,
+text::TextBlocks truncate_text_blocks(text::TextBlocks text_blocks, int max_width, std::string_view suffix,
 	const font::GlyphMetrices &regular_metrics,
 	const font::GlyphMetrices *bold_metrics,
 	const font::GlyphMetrices *italic_metrics,
 	const font::GlyphMetrices *bold_italic_metrics)
 {
-	//Measure each text block
-	for (auto i = 0, width = 0; auto &text_block : text_blocks)
+	auto width = 0;
+
+	for (auto iter = std::begin(text_blocks); iter != std::end(text_blocks);)
 	{
+		//Hard break, reset width
+		if (iter->HardBreak)
+		{
+			width = 0;
+			++iter;
+			continue;
+		}
+
+		//Measure text block
 		auto [block_width, block_height] =
-			text_block_size_in_pixels(text_block, regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics);
+			text_block_size_in_pixels(*iter, regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics);
 
 		if (width + block_width >= max_width)
 		{
 			//Remove content from last block
 			if (width + block_width > max_width)
 			{
-				auto &metrics = get_text_block_metrics(text_block, regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics);
-				text_block.Content = truncate_string(std::move(text_block.Content), max_width - width, "", metrics);
+				auto &metrics = get_text_block_metrics(*iter, regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics);
+				iter->Content = truncate_string(std::move(iter->Content), max_width - width, suffix, metrics);
 			}
 			
-			text_blocks.erase(std::begin(text_blocks) + (i + 1), std::end(text_blocks));
-			break;
+			//Search for hard break
+			auto hard_iter =
+				std::find_if(iter, std::end(text_blocks), [](auto &text_block) { return text_block.HardBreak; });
+			iter = text_blocks.erase(iter + !std::empty(iter->Content), hard_iter);
 		}
 		else
 		{
 			width += block_width;
-			++i;
+			++iter;
+		}
+	}
+
+	return text_blocks;
+}
+
+
+/*
+	Word truncating
+*/
+
+std::string word_truncate(std::string str, int max_width,
+	const font::GlyphMetrices &metrics)
+{
+	word_wrap(glyph_string{str, metrics}, max_width);
+	return str.substr(0, str.find('\n'));
+}
+
+text::TextBlocks word_truncate(text::TextBlocks text_blocks, int max_width,
+	const font::GlyphMetrices &regular_metrics,
+	const font::GlyphMetrices *bold_metrics,
+	const font::GlyphMetrices *italic_metrics,
+	const font::GlyphMetrices *bold_italic_metrics)
+{
+	word_wrap(
+		make_glyph_rope(text_blocks,
+			regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics),
+		max_width);
+
+	//Remove soft wrapped lines
+	if (auto text_lines = text_blocks_to_text_lines(std::move(text_blocks)); std::size(text_lines) > 1)
+	{
+		for (auto iter = std::begin(text_lines); iter != std::end(text_lines);)
+		{
+			//Head, search for tail
+			if (!iter->Tail)
+			{
+				auto tail_iter =
+					std::find_if(iter, std::end(text_lines), [](auto &text_line) { return text_line.Tail; });
+				iter = text_lines.erase(iter + 1, tail_iter + 1);
+			}
+			else
+				++iter;
+		}
+
+		//Re-build text blocks
+		for (auto i = 0; auto &text_line : text_lines)
+		{
+			std::move(std::begin(text_line.Blocks), std::end(text_line.Blocks),
+				std::back_inserter(text_blocks));
+
+			if (++i < std::ssize(text_lines))
+				text_blocks.push_back({{}, "\n", true});
 		}
 	}
 
@@ -859,6 +924,19 @@ std::string word_wrap(std::string str, int max_width,
 {
 	word_wrap(glyph_string{str, metrics}, max_width);
 	return str;
+}
+
+text::TextBlocks word_wrap(text::TextBlocks text_blocks, int max_width,
+	const font::GlyphMetrices &regular_metrics,
+	const font::GlyphMetrices *bold_metrics,
+	const font::GlyphMetrices *italic_metrics,
+	const font::GlyphMetrices *bold_italic_metrics)
+{
+	word_wrap(
+		make_glyph_rope(text_blocks,
+			regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics),
+		max_width);
+	return text_blocks;
 }
 
 void word_wrap(glyph_rope str, int max_width)
@@ -1032,15 +1110,20 @@ std::optional<std::string> TruncateString(std::string str, int max_width, Font &
 	return TruncateString(std::move(str), max_width, "...", font);
 }
 
-std::optional<std::string> TruncateString(std::string str, int max_width, std::string suffix, Font &font)
+std::optional<std::string> TruncateString(std::string str, int max_width, std::string_view suffix, Font &font)
 {
 	if (auto metrics = detail::get_glyph_metrics(font); metrics)
-		return detail::truncate_string(std::move(str), max_width, std::move(suffix), *metrics);
+		return detail::truncate_string(std::move(str), max_width, suffix, *metrics);
 	else
 		return {};
 }
 
 std::optional<text::TextBlocks> TruncateTextBlocks(text::TextBlocks text_blocks, int max_width, TypeFace &type_face)
+{
+	return TruncateTextBlocks(std::move(text_blocks), max_width, "...", type_face);
+}
+
+std::optional<text::TextBlocks> TruncateTextBlocks(text::TextBlocks text_blocks, int max_width, std::string_view suffix, TypeFace &type_face)
 {
 	if (!type_face.HasRegularFont())
 		return {};
@@ -1054,7 +1137,7 @@ std::optional<text::TextBlocks> TruncateTextBlocks(text::TextBlocks text_blocks,
 		auto bold_italic_metrics = type_face.BoldItalicFont() ?
 			detail::get_glyph_metrics(*type_face.BoldItalicFont()) : nullptr;
 
-		return detail::truncate_text_blocks(std::move(text_blocks), max_width,
+		return detail::truncate_text_blocks(std::move(text_blocks), max_width, suffix,
 			*metrics, bold_metrics, italic_metrics, bold_italic_metrics);
 	}
 	else
@@ -1068,20 +1151,28 @@ std::optional<text::TextBlocks> TruncateTextBlocks(text::TextBlocks text_blocks,
 
 std::optional<std::string> WordTruncate(std::string str, int max_width, Font &font)
 {
-	if (auto result = WordWrap(str, max_width, font); result)
-		return result->substr(0, result->find('\n'));
+	if (auto metrics = detail::get_glyph_metrics(font); metrics)
+		return detail::word_truncate(std::move(str), max_width, *metrics);
 	else
 		return {};
 }
 
 std::optional<text::TextBlocks> WordTruncate(text::TextBlocks text_blocks, int max_width, TypeFace &type_face)
 {
-	if (auto result = WordWrap(std::move(text_blocks), max_width, type_face); result)
+	if (!type_face.HasRegularFont())
+		return {};
+
+	if (auto metrics = detail::get_glyph_metrics(*type_face.RegularFont()); metrics)
 	{
-		if (auto text_lines = SplitTextBlocks(std::move(*result)); !std::empty(text_lines))
-			return text_lines.front().Blocks;
-		else
-			return text_blocks;
+		auto bold_metrics = type_face.BoldFont() ?
+			detail::get_glyph_metrics(*type_face.BoldFont()) : nullptr;
+		auto italic_metrics = type_face.ItalicFont() ?
+			detail::get_glyph_metrics(*type_face.ItalicFont()) : nullptr;
+		auto bold_italic_metrics = type_face.BoldItalicFont() ?
+			detail::get_glyph_metrics(*type_face.BoldItalicFont()) : nullptr;
+
+		return detail::word_truncate(std::move(text_blocks), max_width,
+			*metrics, bold_metrics, italic_metrics, bold_italic_metrics);
 	}
 	else
 		return {};
@@ -1114,11 +1205,8 @@ std::optional<text::TextBlocks> WordWrap(text::TextBlocks text_blocks, int max_w
 		auto bold_italic_metrics = type_face.BoldItalicFont() ?
 			detail::get_glyph_metrics(*type_face.BoldItalicFont()) : nullptr;
 
-		detail::word_wrap(
-			detail::make_glyph_rope(text_blocks,
-				*metrics, bold_metrics, italic_metrics, bold_italic_metrics),
-			max_width);
-		return text_blocks;
+		return detail::word_wrap(std::move(text_blocks), max_width,
+			*metrics, bold_metrics, italic_metrics, bold_italic_metrics);
 	}
 	else
 		return {};

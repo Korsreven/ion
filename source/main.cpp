@@ -1599,9 +1599,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					verdana_12);
 
 			pangram->AppendLine("How <del><font color='olivedrab'>vexingly</font></del> <u>quick</u> <sub>daft</sub> zebras <b>jump</b>!");
+			//pangram->Overflow(ion::graphics::fonts::text::TextOverflow::WordWrap);
 			//pangram->AreaSize(ion::graphics::utilities::Vector2{300.0_r, 100.0_r});
 			pangram->Alignment(ion::graphics::fonts::text::TextAlignment::Left);
-			pangram->VerticalAlignment(ion::graphics::fonts::text::TextVerticalAlignment::Top);
+			pangram->VerticalAlignment(ion::graphics::fonts::text::TextVerticalAlignment::Top);	
 			pangram->DefaultForegroundColor(color::White);
 
 			auto fps =

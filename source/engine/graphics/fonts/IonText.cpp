@@ -29,19 +29,43 @@ TextBlocks html_to_formatted_blocks(std::string_view content)
 	return utilities::HTMLToTextBlocks(content);
 }
 
-TextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks,
+TextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks, TextOverflow overflow,
 	const std::optional<Vector2> &area_size, const Vector2 &padding, TypeFace &type_face)
 {
 	using namespace graphics::utilities;
 
-	//Word wrap text blocks to area size
+	//Overflow text wider than area size
 	if (area_size)
 	{
 		auto max_width = static_cast<int>(text_area_max_size(*area_size, padding).X());
-		text_blocks = std::move(
-			utilities::WordWrap(std::move(text_blocks), max_width, type_face).
-			value_or(TextBlocks{})
-		);
+
+		switch (overflow)
+		{
+			case TextOverflow::Truncate:
+			text_blocks =
+				utilities::TruncateTextBlocks(std::move(text_blocks), max_width, "", type_face).
+				value_or(TextBlocks{});
+			break;
+
+			case TextOverflow::TruncateEllipsis:
+			text_blocks =
+				utilities::TruncateTextBlocks(std::move(text_blocks), max_width, type_face).
+				value_or(TextBlocks{});
+			break;
+
+			case TextOverflow::WordTruncate:
+			text_blocks =
+				utilities::WordTruncate(std::move(text_blocks), max_width, type_face).
+				value_or(TextBlocks{});
+			break;
+
+			case TextOverflow::WordWrap:
+			default:
+			text_blocks =
+				utilities::WordWrap(std::move(text_blocks), max_width, type_face).
+				value_or(TextBlocks{});
+			break;
+		}
 	}
 
 	auto lines = utilities::SplitTextBlocks(std::move(text_blocks));
@@ -172,7 +196,8 @@ text::TextLines Text::MakeFormattedLines(text::TextBlocks text_blocks,
 	NonOwningPtr<TypeFace> type_face) const
 {
 	if (type_face)
-		return detail::formatted_blocks_to_formatted_lines(std::move(text_blocks), area_size, padding, *type_face);
+		return detail::formatted_blocks_to_formatted_lines(
+			std::move(text_blocks), overflow_, area_size, padding, *type_face);
 	else
 		return {};
 }
@@ -268,6 +293,15 @@ void Text::Formatting(text::TextFormatting formatting)
 	{
 		formatting_ = formatting;
 		formatted_blocks_ = MakeFormattedBlocks(content_);
+		formatted_lines_ = MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_);
+	}
+}
+
+void Text::Overflow(text::TextOverflow overflow) noexcept
+{
+	if (overflow_ != overflow)
+	{
+		overflow_ = overflow;
 		formatted_lines_ = MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_);
 	}
 }
