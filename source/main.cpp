@@ -2629,6 +2629,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto list_box = base_panel->CreateListBox("list_box", "My list box", std::move(list_box_skin), Vector2{0.5_r, 0.5_r});
 			list_box->Node()->Position({0.8_r, 0.25_r});
+			list_box->ItemHeightFactor(3.5_r);
 			list_box->AddItems({
 				{"My <b>1st</b> <font color='purple'>item</font>"s},
 				{"My <b>2nd</b> <font color='purple'>item</font>"s},
@@ -2638,7 +2639,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{"My <b>6th</b> <font color='purple'>item</font>"s},
 				{"My <b>7th</b> <font color='purple'>item</font>"s},
 				{"My <b>8th</b> <font color='purple'>item</font>"s},
-				{"My <b>9th</b> <font color='purple'>item</font>"s}
+				{"My <b>9th</b> <font color='purple'>item</font>"s},
+				{"My <b>10th</b> <font color='purple'>item</font>"s}
 			});
 
 			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", "My scroll bar", "My scroll bar tooltip", std::move(scroll_bar_skin), Vector2{0.077_r, 0.5_r});

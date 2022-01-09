@@ -35,7 +35,13 @@ void GuiScrollable::UpdateScrollBar() noexcept
 {
 	if (scroll_bar_)
 	{
-		scroll_bar_->Range(0, TotalElements());
+		auto element_count = TotalElements();
+		auto elements_in_view = ElementsInView();
+		auto max =
+			elements_in_view > 0 && element_count > elements_in_view ?
+			element_count - elements_in_view : 0;
+
+		scroll_bar_->Range(0, max);
 		scroll_bar_->Position(ScrollPosition());
 		scroll_bar_->StepByAmount(scroll_rate_);
 	}

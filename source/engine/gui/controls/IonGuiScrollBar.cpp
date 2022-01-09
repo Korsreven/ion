@@ -69,16 +69,18 @@ void GuiScrollBar::UpdateHandle() noexcept
 			{
 				auto [width, height] = size->XY();
 				auto [handle_width, handle_height] = skin.Handle->Size().XY();
+
+				auto count = scrollable_ ? scrollable_->TotalElements() : max - min;
 				auto view_count = scrollable_ ? scrollable_->ElementsInView() : 1;
 
 				if (type_ == gui_slider::SliderType::Vertical)
 				{
-					handle_height = static_cast<real>(view_count) / (max - min) * height;
+					handle_height = static_cast<real>(view_count) / count * height;
 					handle_height = std::clamp(handle_height, height * handle_size_.first, height * handle_size_.second);
 				}
 				else
 				{
-					handle_width = static_cast<real>(view_count) / (max - min) * width;
+					handle_width = static_cast<real>(view_count) / count * width;
 					handle_width = std::clamp(handle_width, width * handle_size_.first, width * handle_size_.second);
 				}
 

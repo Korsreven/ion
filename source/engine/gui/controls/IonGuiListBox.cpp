@@ -134,8 +134,10 @@ void GuiListBox::Resized(Vector2 from_size, Vector2 to_size) noexcept
 
 void GuiListBox::Scrolled(int delta) noexcept
 {
+	static auto do_scroll = true;
+
 	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
-		skin && skin->Lines)
+		skin && skin->Lines && do_scroll)
 	{
 		//Lines text
 		if (auto &lines = skin->Lines->Get(); lines)
@@ -153,17 +155,19 @@ void GuiListBox::Scrolled(int delta) noexcept
 			else if (delta > 0)
 			{
 				auto line_count = lines->LineCount();
-				auto displayed_line_capacity = lines->DisplayedLineCapacity().value_or(line_count);
+				auto displayed_line_count = lines->DisplayedLineCount();
 				auto max_from_line = 
-					line_count > displayed_line_capacity ?
-					line_count - displayed_line_capacity : 0;
+					line_count > displayed_line_count ?
+					line_count - displayed_line_count : 0;
 
 				lines->FromLine(
 					from_line + delta < max_from_line ?
 					from_line + delta : max_from_line);
 			}
 
+			do_scroll = false;
 			UpdateScrollBar();
+			do_scroll = true;
 		}
 	}
 }
@@ -188,7 +192,7 @@ int GuiListBox::ElementsInView() noexcept
 	{
 		//Get() will not reload vertex streams when called from an immutable reference
 		if (const auto &c_part = *skin->Lines.TextObject; c_part.Get())
-			return c_part.Get()->DisplayedLineCapacity().value_or(c_part.Get()->LineCount());
+			return c_part.Get()->DisplayedLineCount();
 	}
 
 	return 0;
