@@ -269,6 +269,7 @@ void GuiListBox::UpdateLines() noexcept
 						return vector2::UnitScale;
 					}();
 
+				lines->Overflow(graphics::fonts::text::TextOverflow::WordTruncate);
 				lines->AreaSize(area_size * ortho_viewport_ratio);
 
 				//if (auto node = skin->Lines->ParentNode(); node)
