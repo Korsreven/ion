@@ -64,7 +64,8 @@ namespace ion::graphics::fonts
 			Truncate,
 			TruncateEllipsis,
 			WordTruncate,
-			WordWrap
+			WordWrap,
+			Wrap
 		};
 
 

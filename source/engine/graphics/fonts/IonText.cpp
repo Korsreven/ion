@@ -60,9 +60,14 @@ TextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks, TextOverfl
 			break;
 
 			case TextOverflow::WordWrap:
-			default:
 			text_blocks =
 				utilities::WordWrap(std::move(text_blocks), max_width, type_face).
+				value_or(TextBlocks{});
+			break;
+
+			case TextOverflow::Wrap:
+			text_blocks =
+				utilities::Wrap(std::move(text_blocks), max_width, type_face).
 				value_or(TextBlocks{});
 			break;
 		}

@@ -343,6 +343,20 @@ namespace ion::graphics::fonts::utilities
 			const font::GlyphMetrices *bold_italic_metrics);
 
 		/*
+			Wrapping
+		*/
+
+		std::string wrap(std::string str, int max_width,
+			const font::GlyphMetrices &metrics);
+		text::TextBlocks wrap(text::TextBlocks text_blocks, int max_width,
+			const font::GlyphMetrices &regular_metrics,
+			const font::GlyphMetrices *bold_metrics,
+			const font::GlyphMetrices *italic_metrics,
+			const font::GlyphMetrices *bold_italic_metrics);
+		void wrap(glyph_rope str, int max_width);
+
+
+		/*
 			Word truncating
 		*/
 
@@ -429,6 +443,21 @@ namespace ion::graphics::fonts::utilities
 	//If string has been truncated, then the given suffix is appended to the result
 	//Returns nullopt if type face fonts could not be loaded properly
 	[[nodiscard]] std::optional<text::TextBlocks> TruncateTextBlocks(text::TextBlocks text_blocks, int max_width, std::string_view suffix, TypeFace &type_face);
+
+
+	/*
+		Wrapping
+	*/
+
+	//Wraps the given string if wider than max width, in pixels, when rendered with the given font
+	//Cuts exactly where the text is wider than max width, then a '\n' character is inserted
+	//Returns nullopt if font could not be loaded properly
+	[[nodiscard]] std::optional<std::string> Wrap(std::string str, int max_width, Font &font);
+
+	//Wraps the given text blocks if wider than max width, in pixels, when rendered with the given type face
+	//Cuts exactly where the text is wider than max width, then a '\n' character is inserted
+	//Returns nullopt if type face fonts could not be loaded properly
+	[[nodiscard]] std::optional<text::TextBlocks> Wrap(text::TextBlocks text_blocks, int max_width, TypeFace &type_face);
 
 
 	/*

@@ -863,6 +863,78 @@ text::TextBlocks truncate_text_blocks(text::TextBlocks text_blocks, int max_widt
 
 
 /*
+	Wrapping
+*/
+
+std::string wrap(std::string str, int max_width,
+	const font::GlyphMetrices &metrics)
+{
+	wrap(glyph_string{str, metrics}, max_width);
+	return str;
+}
+
+text::TextBlocks wrap(text::TextBlocks text_blocks, int max_width,
+	const font::GlyphMetrices &regular_metrics,
+	const font::GlyphMetrices *bold_metrics,
+	const font::GlyphMetrices *italic_metrics,
+	const font::GlyphMetrices *bold_italic_metrics)
+{
+	wrap(
+		make_glyph_rope(text_blocks,
+			regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics),
+		max_width);
+	return text_blocks;
+}
+
+void wrap(glyph_rope str, int max_width)
+{
+	auto width = 0.0_r;
+
+	for (auto i = 0; i < std::ssize(str); ++i)
+	{
+		switch (str[i])
+		{
+			//New line found
+			case '\n':
+			break;
+
+			default:
+			{
+				auto [char_width, char_height] = character_size_in_pixels(str[i], str.glyph_str(i).metrics);
+				auto c_width = char_width * str.glyph_str(i).scale_factor;
+
+				//Insert new line
+				if (width > 0.0_r && //At least one character
+					static_cast<int>(std::ceil(width + c_width)) > max_width) //Too wide
+				{
+					switch (str[i])
+					{
+						//Space
+						case ' ':
+						str[i] = '\n'; //Replace space with new line
+						break;
+
+						default:
+						str.insert(i, 1, '\n'); //Insert new line
+						break;
+					}
+				}
+				else
+				{
+					width += c_width;
+					continue;
+				}
+				
+				break;
+			}
+		}
+
+		width = 0.0_r;
+	}
+}
+
+
+/*
 	Word truncating
 */
 
@@ -1138,6 +1210,40 @@ std::optional<text::TextBlocks> TruncateTextBlocks(text::TextBlocks text_blocks,
 			detail::get_glyph_metrics(*type_face.BoldItalicFont()) : nullptr;
 
 		return detail::truncate_text_blocks(std::move(text_blocks), max_width, suffix,
+			*metrics, bold_metrics, italic_metrics, bold_italic_metrics);
+	}
+	else
+		return {};
+}
+
+
+/*
+	Wrapping
+*/
+
+std::optional<std::string> Wrap(std::string str, int max_width, Font &font)
+{
+	if (auto metrics = detail::get_glyph_metrics(font); metrics)
+		return detail::wrap(std::move(str), max_width, *metrics);
+	else
+		return {};
+}
+
+std::optional<text::TextBlocks> Wrap(text::TextBlocks text_blocks, int max_width, TypeFace &type_face)
+{
+	if (!type_face.HasRegularFont())
+		return {};
+
+	if (auto metrics = detail::get_glyph_metrics(*type_face.RegularFont()); metrics)
+	{
+		auto bold_metrics = type_face.BoldFont() ?
+			detail::get_glyph_metrics(*type_face.BoldFont()) : nullptr;
+		auto italic_metrics = type_face.ItalicFont() ?
+			detail::get_glyph_metrics(*type_face.ItalicFont()) : nullptr;
+		auto bold_italic_metrics = type_face.BoldItalicFont() ?
+			detail::get_glyph_metrics(*type_face.BoldItalicFont()) : nullptr;
+
+		return detail::wrap(std::move(text_blocks), max_width,
 			*metrics, bold_metrics, italic_metrics, bold_italic_metrics);
 	}
 	else
