@@ -478,6 +478,17 @@ namespace ion::graphics::fonts
 				return type_face_;
 			}
 
+
+			//Return the number of lines in this text
+			int LineCount() const noexcept;
+
+			//Return the number of lines that are being displayed in this text
+			int DisplayedLineCount() const noexcept;
+
+			//Return the number of line that can be displayed in this text
+			//Returns nullopt if no area size or maximum lines has been specified
+			std::optional<int> DisplayedLineCapacity() const noexcept;
+
 			//Returns the line offset at the given offset
 			int LineOffsetAt(int off) const noexcept;
 

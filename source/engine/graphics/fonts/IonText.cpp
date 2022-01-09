@@ -398,6 +398,39 @@ std::optional<real> Text::LineHeight() const noexcept
 }
 
 
+int Text::LineCount() const noexcept
+{
+	return std::ssize(formatted_lines_);
+}
+
+int Text::DisplayedLineCount() const noexcept
+{
+	auto line_count = std::ssize(formatted_lines_) - from_line_;
+
+	if (line_count < 0)
+		line_count = 0;
+
+	if (auto line_capacity = DisplayedLineCapacity(); line_capacity)
+		return std::min(line_count, *line_capacity);
+	else
+		return line_count;
+}
+
+std::optional<int> Text::DisplayedLineCapacity() const noexcept
+{
+	if (area_size_)
+	{
+		if (auto line_height = LineHeight();
+			line_height && *line_height > 0.0_r)
+		{
+			auto area_max_lines = detail::text_area_max_lines(*area_size_, padding_, *line_height);
+			return max_lines_ ? std::min(*max_lines_, area_max_lines) : area_max_lines;
+		}
+	}
+
+	return max_lines_;
+}
+
 int Text::LineOffsetAt(int off) const noexcept
 {
 	if (off >= 0)
