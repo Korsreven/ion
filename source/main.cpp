@@ -2343,14 +2343,24 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			list_box_skin.Parts.BottomRight.SpriteObject = list_box_bottom_right;
 
 			list_box_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
+			list_box_skin.Parts.Center.DisabledMaterial = check_box_center_enabled;
+			list_box_skin.Parts.Center.HoveredMaterial = check_box_center_hovered;
 			list_box_skin.Parts.Top.EnabledMaterial = button_top_enabled;
+			list_box_skin.Parts.Top.FocusedMaterial = button_top_focused;
 			list_box_skin.Parts.Left.EnabledMaterial = button_left_enabled;
+			list_box_skin.Parts.Left.FocusedMaterial = button_left_focused;
 			list_box_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
+			list_box_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
 			list_box_skin.Parts.Right.EnabledMaterial = button_right_enabled;
+			list_box_skin.Parts.Right.FocusedMaterial = button_right_focused;
 			list_box_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
+			list_box_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
 			list_box_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
+			list_box_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
 			list_box_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
+			list_box_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
 			list_box_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
+			list_box_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
 
 			list_box_skin.Lines.TextObject = list_box_lines;
 			list_box_skin.Lines.EnabledStyle = button_caption_style_enabled;
@@ -2617,18 +2627,25 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			progress_bar->Range(0.0_r, 100.0_r);
 			progress_bar->Position(75.0_r);
 
-			auto list_box = base_panel->CreateListBox("list_box", "My list box", std::move(list_box_skin), Vector2{0.5_r, 0.8_r});
+			auto list_box = base_panel->CreateListBox("list_box", "My list box", std::move(list_box_skin), Vector2{0.5_r, 0.5_r});
 			list_box->Node()->Position({0.8_r, 0.25_r});
 			list_box->AddItems({
-				{"My <b>first</b> <font color='purple'>item</font>"s},
-				{"My <b>second</b> <font color='purple'>item</font>"s},
-				{"My <b>third</b> <font color='purple'>item</font>"s}
+				{"My <b>1st</b> <font color='purple'>item</font>"s},
+				{"My <b>2nd</b> <font color='purple'>item</font>"s},
+				{"My <b>3rd</b> <font color='purple'>item</font>"s},
+				{"My <b>4th</b> <font color='purple'>item</font>"s},
+				{"My <b>5th</b> <font color='purple'>item</font>"s},
+				{"My <b>6th</b> <font color='purple'>item</font>"s},
+				{"My <b>7th</b> <font color='purple'>item</font>"s},
+				{"My <b>8th</b> <font color='purple'>item</font>"s},
+				{"My <b>9th</b> <font color='purple'>item</font>"s}
 			});
 
-			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", "My scroll bar", "My scroll bar tooltip", std::move(scroll_bar_skin), Vector2{0.077_r, 0.8_r});
+			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", "My scroll bar", "My scroll bar tooltip", std::move(scroll_bar_skin), Vector2{0.077_r, 0.5_r});
 			scroll_bar->Node()->Position({1.1_r, 0.25_r});
 			scroll_bar->Range(0, 50);
 			scroll_bar->StepByAmount(3);
+			scroll_bar->AttachedScrollable(list_box);
 
 			group_box->AddControl(radio_button);
 			group_box->AddControl(radio_button2);

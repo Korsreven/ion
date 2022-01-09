@@ -134,22 +134,77 @@ void GuiListBox::Resized(Vector2 from_size, Vector2 to_size) noexcept
 
 void GuiListBox::Scrolled(int delta) noexcept
 {
-	//Todo
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+		skin && skin->Lines)
+	{
+		//Lines text
+		if (auto &lines = skin->Lines->Get(); lines)
+		{
+			auto from_line = lines->FromLine();
+
+			//Scrolled up
+			if (delta < 0)
+			{
+				lines->FromLine(
+					from_line > delta ?
+					from_line + delta : 0);
+			}
+			//Scrolled down
+			else if (delta > 0)
+			{
+				auto line_count = lines->LineCount();
+				auto displayed_line_capacity = lines->DisplayedLineCapacity().value_or(line_count);
+				auto max_from_line = 
+					line_count > displayed_line_capacity ?
+					line_count - displayed_line_capacity : 0;
+
+				lines->FromLine(
+					from_line + delta < max_from_line ?
+					from_line + delta : max_from_line);
+			}
+
+			UpdateScrollBar();
+		}
+	}
 }
 
 int GuiListBox::TotalElements() noexcept
 {
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+		skin && skin->Lines)
+	{
+		//Get() will not reload vertex streams when called from an immutable reference
+		if (const auto &c_part = *skin->Lines.TextObject; c_part.Get())
+			return c_part.Get()->LineCount();
+	}
+
 	return 0;
 }
 
 int GuiListBox::ElementsInView() noexcept
 {
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+		skin && skin->Lines)
+	{
+		//Get() will not reload vertex streams when called from an immutable reference
+		if (const auto &c_part = *skin->Lines.TextObject; c_part.Get())
+			return c_part.Get()->DisplayedLineCapacity().value_or(c_part.Get()->LineCount());
+	}
+
 	return 0;
 }
 
 
 int GuiListBox::ScrollPosition() noexcept
 {
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+		skin && skin->Lines)
+	{
+		//Get() will not reload vertex streams when called from an immutable reference
+		if (const auto &c_part = *skin->Lines.TextObject; c_part.Get())
+			return c_part.Get()->FromLine();
+	}
+
 	return 0;
 }
 
@@ -545,11 +600,6 @@ bool GuiListBox::KeyReleased(KeyButton button) noexcept
 */
 
 bool GuiListBox::MouseReleased(MouseButton button, Vector2 position) noexcept
-{
-	return false;
-}
-
-bool GuiListBox::MouseWheelRolled(int delta, [[maybe_unused]] Vector2 position) noexcept
 {
 	return false;
 }
