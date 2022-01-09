@@ -2695,9 +2695,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			particle_node->AttachObject(*particle_system);
 
 			//Models
-			auto player_node = scene_graph->RootNode().CreateChildNode({0.0_r, -0.115_r, -1.8_r});
+			auto player_node = scene_graph->RootNode().CreateChildNode({0.0_r, -0.5_r, -1.8_r});
 
-			auto ship_node = player_node->CreateChildNode({0.0_r, -0.4_r, 0.0_r});
+			auto ship_node = player_node->CreateChildNode({0.0_r, 0.0_r, 0.0_r});
 			ship_node->AttachObject(*model);
 			ship_node->AttachObject(*player_sound_listener);
 
