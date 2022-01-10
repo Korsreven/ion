@@ -1929,6 +1929,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto list_box_bottom_right = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
 
+			auto list_box_selection = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Selection
+
+			list_box_selection->AutoRepeat(true);
+			list_box_selection->FillOpacity(0.5_r);
+			list_box_selection->IncludeBoundingVolumes(false);
+
 			list_box_center->AutoRepeat(true);
 			list_box_top->AutoRepeat(true);
 			list_box_left->AutoRepeat(true);
@@ -1967,9 +1974,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto progress_bar_bar_interpolated = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Bar interpolated
 
+			progress_bar_bar->AutoRepeat(true);
 			progress_bar_bar->FillOpacity(0.35_r);
 			progress_bar_bar->IncludeBoundingVolumes(false);
 
+			progress_bar_bar_interpolated->AutoRepeat(true);
 			progress_bar_bar_interpolated->FillOpacity(0.65_r);
 			progress_bar_bar_interpolated->IncludeBoundingVolumes(false);
 
@@ -2366,6 +2375,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			list_box_skin.Lines.EnabledStyle = button_caption_style_enabled;
 			list_box_skin.Lines.DisabledStyle = button_caption_style_disabled;
 
+			list_box_skin.Selection.SpriteObject = list_box_selection;
+			list_box_skin.Selection.EnabledMaterial = button_center_hovered;
+
 			list_box_skin.Caption.TextObject = list_box_caption;
 			list_box_skin.Caption.EnabledStyle = button_caption_style_enabled;
 			list_box_skin.Caption.DisabledStyle = button_caption_style_disabled;
@@ -2642,6 +2654,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{"My <b>9th</b> <font color='purple'>item</font>"s},
 				{"My <b>10th</b> <font color='purple'>item</font>"s}
 			});
+			list_box->ItemIndex(4);
 
 			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", "My scroll bar", "My scroll bar tooltip", std::move(scroll_bar_skin), Vector2{0.077_r, 0.5_r});
 			scroll_bar->Node()->Position({1.1_r, 0.25_r});

@@ -165,6 +165,8 @@ void GuiListBox::Scrolled(int delta) noexcept
 					from_line + delta : max_from_line);
 			}
 
+			UpdateSelection();
+
 			do_scroll = false;
 			UpdateScrollBar();
 			do_scroll = true;
@@ -230,12 +232,15 @@ void GuiListBox::ItemDeselected() noexcept
 
 void GuiListBox::SetSkinState(gui_control::ControlState state, ListBoxSkin &skin) noexcept
 {
+	if (skin.Lines)
+		SetCaptionState(state, skin.Lines);
+
 	if (skin.Selection)
 	{
 		if (item_index_)
 			SetPartState(state, skin.Selection);
-
-		skin.Selection->Visible(item_index_.has_value());
+		else
+			skin.Selection->Visible(false);
 	}
 }
 
@@ -365,7 +370,7 @@ void GuiListBox::UpdateLines() noexcept
 			lines->Alignment(detail::item_alignment_to_text_alignment(item_alignment_));
 
 			//Content
-			if (std::size(lines->FormattedLines()) != std::size(items_))
+			if (lines->LineCount() != std::ssize(items_))
 				lines->Content(detail::item_content_to_text_content(items_));
 		}
 	}
@@ -376,9 +381,53 @@ void GuiListBox::UpdateLines() noexcept
 void GuiListBox::UpdateSelection() noexcept
 {
 	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
-		skin && skin->Selection && item_index_)
+		skin && skin->Selection)
 	{
-		//Todo
+		auto show_selection = false;
+
+		if (skin->Lines && item_index_)
+		{
+			//Get() will not reload vertex streams when called from an immutable reference
+			if (const auto &c_part = *skin->Lines.TextObject;
+				c_part.Get() && c_part.Get()->LineHeight())
+			{
+				//Selected item is in view
+				if (auto item_off = *item_index_ - c_part.Get()->FromLine();
+					item_off >= 0 && item_off < c_part.Get()->DisplayedLineCount())
+				{
+					if (auto size = InnerSize(); size)
+					{
+						auto [width, height] = size->XY();
+						auto viewport_ortho_ratio =
+							[&]() noexcept
+							{
+								//Adjust area size from ortho to viewport space
+								if (auto scene_manager = skin->Lines->Owner(); scene_manager)
+								{
+									if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+										return viewport->ViewportToOrthoRatio();
+								}
+
+								return vector2::UnitScale;
+							}();
+
+						auto item_height = *c_part.Get()->LineHeight() * viewport_ortho_ratio.Y();
+						auto item_padding = c_part.Get()->Padding().Y() * viewport_ortho_ratio.Y();
+
+						skin->Selection->Size({width, item_height});
+						skin->Selection->Position({
+							skin->Lines->Position().X(),
+							height * 0.5_r - item_padding - item_height * 0.5_r - item_height * item_off,
+							skin->Selection->Position().Z()}
+						);
+						
+						show_selection = true;
+					}
+				}
+			}
+		}
+		
+		skin->Selection->Visible(show_selection);
 	}
 }
 

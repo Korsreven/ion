@@ -245,7 +245,15 @@ namespace ion::gui::controls
 			{
 				if (item_index_ != index)
 				{
+					//Go from or to an empty selection
+					auto empty_selection =
+						!item_index_ || !index;
+
 					item_index_ = index;
+
+					if (empty_selection)
+						SetState(state_);
+
 					UpdateSelection();
 				}
 			}
