@@ -114,11 +114,11 @@ bool GuiScrollable::KeyReleased(KeyButton button) noexcept
 	switch (button)
 	{
 		case KeyButton::PageUp:
-		Scrolled(ElementsInView());
+		Scrolled(-ElementsInView());
 		return true;
 
 		case KeyButton::PageDown:
-		Scrolled(-ElementsInView());
+		Scrolled(ElementsInView());
 		return true;
 
 		default:
