@@ -914,13 +914,8 @@ void GuiControl::UpdateCaption() noexcept
 						caption_margin_.value_or(detail::default_caption_margin_size) * viewport_ortho_ratio));
 			}
 
-			//Padding
 			text->Padding(caption_padding_.value_or(detail::default_caption_padding_size));
-
-			//Alignment
 			text->Alignment(detail::caption_layout_to_text_alignment(caption_layout_));
-
-			//Vertical alignment
 			text->VerticalAlignment(detail::caption_layout_to_text_vertical_alignment(caption_layout_));
 
 			//Content

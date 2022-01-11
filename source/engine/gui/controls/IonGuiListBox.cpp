@@ -20,6 +20,7 @@ File:	IonGuiListBox.cpp
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/scene/shapes/IonSprite.h"
+#include "utilities/IonMath.h"
 #include "utilities/IonStringUtility.h"
 
 namespace ion::gui::controls
@@ -66,41 +67,6 @@ std::string item_content_to_text_content(const gui_list_box::ListBoxItems &items
 		content += "\n" + string::RemoveNonPrintableCopy(iter->Content);
 
 	return content;
-}
-
-
-Vector2 lines_offset(ListBoxItemAlignment item_alignment, const Vector2 &size, const Vector2 &border_size) noexcept
-{
-	auto half_size = size * 0.5_r;
-
-	switch (item_alignment)
-	{
-		case ListBoxItemAlignment::Left:
-		return {-half_size.X() - border_size.X(), 0.0_r};
-
-		case ListBoxItemAlignment::Right:
-		return {half_size.X() + border_size.X(), 0.0_r};
-
-		case ListBoxItemAlignment::Center:
-		default:
-		return vector2::Zero;
-	}
-}
-
-Vector2 lines_area_offset(ListBoxItemAlignment item_alignment, const Vector2 &size, const Vector2 &border_size) noexcept
-{
-	switch (item_alignment)
-	{
-		case ListBoxItemAlignment::Left:
-		return {-size.X() - border_size.X(), 0.0_r};
-
-		case ListBoxItemAlignment::Right:
-		return {size.X() + border_size.X(), 0.0_r};
-
-		case ListBoxItemAlignment::Center:
-		default:
-		return vector2::Zero;
-	}
 }
 
 } //gui_list_box::detail
@@ -335,43 +301,14 @@ void GuiListBox::UpdateLines() noexcept
 
 				lines->Overflow(graphics::fonts::text::TextOverflow::WordTruncate);
 				lines->AreaSize(area_size * ortho_viewport_ratio);
+				lines->LineHeightFactor(item_height_factor_.value_or(detail::default_item_height_factor));
+				lines->Padding(item_padding_.value_or(detail::default_item_padding_size));
+				lines->Alignment(detail::item_alignment_to_text_alignment(item_alignment_));
 
-				//if (auto node = skin->Lines->ParentNode(); node)
-				//	node->Position(center + detail::lines_area_offset(item_alignment_, area_size, border_size));
+				//Content
+				if (lines->LineCount() != std::ssize(items_))
+					lines->Content(detail::item_content_to_text_content(items_));
 			}
-			else
-			{
-				/*auto viewport_ortho_ratio =
-					[&]() noexcept
-					{
-						//Adjust area size from ortho to viewport space
-						if (auto scene_manager = skin->Lines->Owner(); scene_manager)
-						{
-							if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-								return viewport->ViewportToOrthoRatio();
-						}
-
-						return vector2::UnitScale;
-					}();*/
-
-				lines->AreaSize({});
-
-				if (auto node = skin->Lines->ParentNode(); node)
-					node->Position(center + detail::lines_offset(item_alignment_, area_size, border_size));
-			}
-
-			//Line height factor
-			lines->LineHeightFactor(item_height_factor_.value_or(detail::default_item_height_factor));
-
-			//Line height factor
-			lines->Padding(item_padding_.value_or(detail::default_item_padding_size));
-
-			//Alignment
-			lines->Alignment(detail::item_alignment_to_text_alignment(item_alignment_));
-
-			//Content
-			if (lines->LineCount() != std::ssize(items_))
-				lines->Content(detail::item_content_to_text_content(items_));
 		}
 	}
 
@@ -483,6 +420,41 @@ GuiListBox::GuiListBox(std::string name, std::optional<std::string> caption,
 
 
 /*
+	Modifiers
+*/
+
+void GuiListBox::ItemIndex(std::optional<int> index) noexcept
+{
+	if (index)
+	{
+		if (*index < 0 || std::empty(items_))
+			index = {};
+		else
+			index = std::clamp(*index, 0, std::ssize(items_) - 1);
+	}
+
+	if (item_index_ != index)
+	{
+		//Go from or to an empty selection
+		auto empty_selection =
+			!item_index_ || !index;
+
+		item_index_ = index;
+
+		if (item_index_)
+			ItemSelected();
+		else
+			ItemDeselected();
+
+		if (empty_selection)
+			SetState(state_);
+
+		UpdateSelection();
+	}
+}
+
+
+/*
 	Items
 	Adding/inserting
 */
@@ -522,7 +494,7 @@ void GuiListBox::InsertItems(int off, ListBoxItems items)
 
 		//Adjust item index
 		if (item_index_ && *item_index_ >= off)
-			*item_index_ += std::ssize(items);
+			ItemIndex(*item_index_ + std::ssize(items));
 
 		InsertLines(off, items);
 		UpdateLines();
@@ -574,12 +546,9 @@ void GuiListBox::ReplaceItems(int first, int last, ListBoxItems items)
 		{
 			if (*item_index_ >= first && *item_index_ < last &&
 				*item_index_ - first >= std::ssize(items))
-			{
-				item_index_ = {}; //Deselect
-				ItemDeselected();
-			}
+				ItemIndex({}); //Deselect
 			else if (*item_index_ >= last)
-				*item_index_ += std::ssize(items) - (last - first);
+				ItemIndex(*item_index_ + (std::ssize(items) - (last - first)));
 		}
 		
 		ReplaceLines(first, last, items);
@@ -599,10 +568,7 @@ void GuiListBox::ClearItems() noexcept
 	items_.shrink_to_fit();
 
 	if (item_index_)
-	{
-		item_index_ = {};
-		ItemDeselected();
-	}
+		ItemIndex({}); //Deselect
 
 	ClearLines();
 	UpdateLines();
@@ -624,12 +590,9 @@ void GuiListBox::RemoveItems(int first, int last) noexcept
 		if (item_index_)
 		{
 			if (*item_index_ >= first && *item_index_ < last)
-			{
-				item_index_ = {}; //Deselect
-				ItemDeselected();
-			}
+				ItemIndex({}); //Deselect
 			else if (*item_index_ >= last)
-				*item_index_ -= last - first;
+				ItemIndex(*item_index_ - (last - first));
 		}
 
 		RemoveLines(first, last);
@@ -644,7 +607,75 @@ void GuiListBox::RemoveItems(int first, int last) noexcept
 
 bool GuiListBox::KeyReleased(KeyButton button) noexcept
 {
-	return false;
+	auto update_selection =
+		[&]() noexcept
+		{
+			switch (button)
+			{
+				//Move selection up
+				case KeyButton::UpArrow:
+				case KeyButton::LeftArrow:
+				{
+					if (!item_index_)
+						ItemIndex(0);
+					else if (*item_index_ > 0)
+						ItemIndex(*item_index_ - 1);
+
+					return true;
+				}
+
+				//Move selection down
+				case KeyButton::DownArrow:
+				case KeyButton::RightArrow:
+				{
+					if (!item_index_)
+						ItemIndex(0);
+					else if (*item_index_ + 1 < std::ssize(items_))
+						ItemIndex(*item_index_ + 1);
+
+					return true;
+				}
+
+				//Move selection to top
+				case KeyButton::Home:
+				{
+					if (!std::empty(items_))
+						ItemIndex(0);
+
+					return true;
+				}
+
+				//Move selection to bottom
+				case KeyButton::End:
+				{
+					if (!std::empty(items_))
+						ItemIndex(std::ssize(items_) - 1);
+
+					return true;
+				}
+
+				default:
+				return false;
+			}
+		}();
+
+	if (update_selection)
+	{
+		if (item_index_)
+		{
+			auto first = ScrollPosition();
+			auto view_count = ElementsInView();
+
+			if (*item_index_ < first)
+				Scrolled(*item_index_ - first);
+			else if (*item_index_ > first + view_count - 1)
+				Scrolled(*item_index_ - (first + view_count - 1));
+		}
+
+		return true;
+	}
+	
+	return GuiScrollable::KeyReleased(button); //Use base functionality
 }
 
 
@@ -654,6 +685,63 @@ bool GuiListBox::KeyReleased(KeyButton button) noexcept
 
 bool GuiListBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 {
+	using namespace utilities;
+
+	if (button == MouseButton::Left)
+	{
+		if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+			skin && skin->Selection)
+		{
+			if (skin->Lines)
+			{
+				//Get() will not reload vertex streams when called from an immutable reference
+				if (const auto &c_part = *skin->Lines.TextObject;
+					c_part.Get() && c_part.Get()->LineHeight())
+				{
+					if (auto size = InnerSize(); size)
+					{
+						auto [width, height] = size->XY();
+						auto viewport_ortho_ratio =
+							[&]() noexcept
+							{
+								//Adjust area size from ortho to viewport space
+								if (auto scene_manager = skin->Lines->Owner(); scene_manager)
+								{
+									if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+										return viewport->ViewportToOrthoRatio();
+								}
+
+								return vector2::UnitScale;
+							}();
+
+						auto item_height = *c_part.Get()->LineHeight() * viewport_ortho_ratio.Y();
+						auto item_padding = c_part.Get()->Padding().Y() * viewport_ortho_ratio.Y();
+
+						//Make position relative to lines
+						if (auto node = skin->Lines->ParentNode(); node)
+						{
+							position = (position - node->DerivedPosition()).
+								RotateCopy(-node->DerivedRotation(), vector2::Zero);
+						
+							height *= node->DerivedScaling().Y();
+							item_height *= node->DerivedScaling().Y();
+							item_padding *= node->DerivedScaling().Y();
+						}
+
+						auto y = -position.Y() + height * 0.5_r - item_padding - item_height * 0.5_r;
+						auto clicked_item_off = static_cast<int>(math::Round(y / item_height)) + c_part.Get()->FromLine();
+
+						//Clicked item is in view
+						if (auto item_off = clicked_item_off - c_part.Get()->FromLine();
+							item_off >= 0 && item_off < c_part.Get()->DisplayedLineCount())
+
+							ItemIndex(clicked_item_off); //Select item
+					}
+				}
+			}
+		}
+	}
+
 	return false;
 }
 

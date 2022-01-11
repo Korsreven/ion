@@ -121,9 +121,6 @@ namespace ion::gui::controls
 			*/
 
 			std::string item_content_to_text_content(const gui_list_box::ListBoxItems &items);
-
-			Vector2 lines_offset(ListBoxItemAlignment item_alignment, const Vector2 &size, const Vector2 &border_size) noexcept;
-			Vector2 lines_area_offset(ListBoxItemAlignment item_alignment, const Vector2 &size, const Vector2 &border_size) noexcept;
 		} //detail
 	} //gui_list_box
 
@@ -241,22 +238,7 @@ namespace ion::gui::controls
 			*/
 
 			//Sets the item index of this list box to the given index
-			inline void ItemIndex(std::optional<int> index) noexcept
-			{
-				if (item_index_ != index)
-				{
-					//Go from or to an empty selection
-					auto empty_selection =
-						!item_index_ || !index;
-
-					item_index_ = index;
-
-					if (empty_selection)
-						SetState(state_);
-
-					UpdateSelection();
-				}
-			}
+			void ItemIndex(std::optional<int> index) noexcept;
 
 			//Sets the item height factor for this list box to the given factor
 			inline void ItemHeightFactor(std::optional<real> factor) noexcept

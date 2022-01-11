@@ -2654,7 +2654,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{"My <b>9th</b> <font color='purple'>item</font>"s},
 				{"My <b>10th</b> <font color='purple'>item</font>"s}
 			});
-			list_box->ItemIndex(4);
 
 			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", "My scroll bar", "My scroll bar tooltip", std::move(scroll_bar_skin), Vector2{0.077_r, 0.5_r});
 			scroll_bar->Node()->Position({1.1_r, 0.25_r});
