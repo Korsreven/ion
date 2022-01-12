@@ -2642,6 +2642,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto list_box = base_panel->CreateListBox("list_box", "My list box", std::move(list_box_skin), Vector2{0.5_r, 0.5_r});
 			list_box->Node()->Position({0.8_r, 0.25_r});
 			list_box->ItemHeightFactor(3.5_r);
+			list_box->ItemLayout(ion::gui::controls::gui_list_box::ListBoxItemLayout::Left);
+			list_box->IconLayout(ion::gui::controls::gui_list_box::ListBoxIconLayout::Left);
+			list_box->ShowIcons(true);
 			list_box->AddItems({
 				{"My <b>1st</b> <font color='purple'>item</font>"s},
 				{"My <b>2nd</b> <font color='purple'>item</font>"s},

@@ -51,7 +51,7 @@ namespace ion::gui::controls
 
 	namespace gui_list_box
 	{
-		enum class ListBoxItemAlignment
+		enum class ListBoxItemLayout
 		{
 			Left,
 			Center,
@@ -88,19 +88,20 @@ namespace ion::gui::controls
 		{
 			constexpr auto default_item_height_factor = 2.0_r;
 			constexpr auto default_item_padding_size = 2.0_r;
+			constexpr auto default_selection_padding_size = 0.0_r;
 
 			constexpr auto default_icon_column_width_percent = 0.25_r;
-			constexpr auto default_icon_margin = 2.0_r;
+			constexpr auto default_icon_padding = 2.0_r;
 
 
-			inline auto item_alignment_to_text_alignment(ListBoxItemAlignment item_alignment) noexcept
+			inline auto item_layout_to_text_alignment(ListBoxItemLayout item_alignment) noexcept
 			{
 				switch (item_alignment)
 				{
-					case ListBoxItemAlignment::Left:
+					case ListBoxItemLayout::Left:
 					return graphics::fonts::text::TextAlignment::Left;
 
-					case ListBoxItemAlignment::Right:
+					case ListBoxItemLayout::Right:
 					return graphics::fonts::text::TextAlignment::Right;
 
 					default:
@@ -121,6 +122,7 @@ namespace ion::gui::controls
 			*/
 
 			std::string item_content_to_text_content(const gui_list_box::ListBoxItems &items);
+			Vector2 lines_area_offset(ListBoxIconLayout icon_layout, const Vector2 &icon_column_size) noexcept;
 		} //detail
 	} //gui_list_box
 
@@ -136,12 +138,13 @@ namespace ion::gui::controls
 			std::optional<int> item_index_;
 			std::optional<real> item_height_factor_;
 			std::optional<Vector2> item_padding_;
-			gui_list_box::ListBoxItemAlignment item_alignment_ = gui_list_box::ListBoxItemAlignment::Left;
+			gui_list_box::ListBoxItemLayout item_layout_ = gui_list_box::ListBoxItemLayout::Left;
+			std::optional<Vector2> selection_padding_;
 			
 			std::optional<real> icon_column_width_;
-			std::optional<real> icon_margin_;
+			std::optional<Vector2> icon_padding_;
 			gui_list_box::ListBoxIconLayout icon_layout_ = gui_list_box::ListBoxIconLayout::Left;
-			bool show_icons_ = true;
+			bool show_icons_ = false;
 
 			gui_list_box::ListBoxItems items_;
 
@@ -260,13 +263,23 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the item alignment for this list box to the given alignment
-			inline void ItemAlignment(gui_list_box::ListBoxItemAlignment alignment) noexcept
+			//Sets the item layout for this list box to the given layout
+			inline void ItemLayout(gui_list_box::ListBoxItemLayout layout) noexcept
 			{
-				if (item_alignment_ != alignment)
+				if (item_layout_ != layout)
 				{
-					item_alignment_ = alignment;
+					item_layout_ = layout;
 					UpdateLines();
+				}
+			}
+
+			//Sets the selection padding for this list box to the given padding
+			inline void SelectionPadding(const std::optional<Vector2> &padding) noexcept
+			{
+				if (selection_padding_ != padding)
+				{
+					selection_padding_ = padding;
+					UpdateSelection();
 				}
 			}
 
@@ -281,12 +294,12 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the icon margin for this list box to the given margin
-			inline void IconMargin(std::optional<real> margin) noexcept
+			//Sets the icon padding for this list box to the given padding
+			inline void IconPadding(const std::optional<Vector2> &padding) noexcept
 			{
-				if (icon_margin_ != margin)
+				if (icon_padding_ != padding)
 				{
-					icon_margin_ = margin;
+					icon_padding_ = padding;
 					UpdateLines();
 				}
 			}
@@ -337,10 +350,17 @@ namespace ion::gui::controls
 				return item_padding_;
 			}
 
-			//Returns the icon layout for this list box
-			[[nodiscard]] inline auto ItemAlignment() const noexcept
+			//Returns the item layout for this list box
+			[[nodiscard]] inline auto ItemLayout() const noexcept
 			{
-				return item_alignment_;
+				return item_layout_;
+			}
+
+			//Returns the selection padding for this list box
+			//Returns nullopt if no custom selection padding has been set
+			[[nodiscard]] inline auto SelectionPadding() const noexcept
+			{
+				return selection_padding_;
 			}
 
 
@@ -351,11 +371,11 @@ namespace ion::gui::controls
 				return icon_column_width_;
 			}
 
-			//Returns the icon margin for this list box
-			//Returns nullopt if no custom icon margin has been set
-			[[nodiscard]] inline auto IconMargin() const noexcept
+			//Returns the icon padding for this list box
+			//Returns nullopt if no custom icon padding has been set
+			[[nodiscard]] inline auto IconPadding() const noexcept
 			{
-				return icon_margin_;
+				return icon_padding_;
 			}
 
 			//Returns the icon layout for this list box

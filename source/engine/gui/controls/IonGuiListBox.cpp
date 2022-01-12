@@ -69,6 +69,23 @@ std::string item_content_to_text_content(const gui_list_box::ListBoxItems &items
 	return content;
 }
 
+Vector2 lines_area_offset(ListBoxIconLayout icon_layout, const Vector2 &icon_column_size) noexcept
+{
+	auto half_size = icon_column_size * 0.5_r;
+
+	switch (icon_layout)
+	{
+		case ListBoxIconLayout::Left:
+		return {half_size.X(), 0.0_r};
+
+		case ListBoxIconLayout::Right:
+		return {-half_size.X(), 0.0_r};
+		
+		default:
+		return {0.0_r, 0.0_r};
+	}
+}
+
 } //gui_list_box::detail
 
 
@@ -299,15 +316,22 @@ void GuiListBox::UpdateLines() noexcept
 						return vector2::UnitScale;
 					}();
 
+				auto icon_column_size = show_icons_ ?
+					area_size * Vector2{icon_column_width_.value_or(detail::default_icon_column_width_percent), 0.0_r} :
+					vector2::Zero;
+
 				lines->Overflow(graphics::fonts::text::TextOverflow::WordTruncate);
-				lines->AreaSize(area_size * ortho_viewport_ratio);
+				lines->AreaSize((area_size - icon_column_size) * ortho_viewport_ratio);
 				lines->LineHeightFactor(item_height_factor_.value_or(detail::default_item_height_factor));
 				lines->Padding(item_padding_.value_or(detail::default_item_padding_size));
-				lines->Alignment(detail::item_alignment_to_text_alignment(item_alignment_));
+				lines->Alignment(detail::item_layout_to_text_alignment(item_layout_));
 
 				//Content
 				if (lines->LineCount() != std::ssize(items_))
 					lines->Content(detail::item_content_to_text_content(items_));
+
+				if (auto node = skin->Lines->ParentNode(); node)
+					node->Position(center + detail::lines_area_offset(icon_layout_, icon_column_size));
 			}
 		}
 	}
@@ -350,8 +374,13 @@ void GuiListBox::UpdateSelection() noexcept
 
 						auto item_height = *c_part.Get()->LineHeight() * viewport_ortho_ratio.Y();
 						auto item_padding = c_part.Get()->Padding().Y() * viewport_ortho_ratio.Y();
+						auto item_selection_padding = selection_padding_.
+							value_or(detail::default_selection_padding_size) * viewport_ortho_ratio;
 
-						skin->Selection->Size({width, item_height});
+						skin->Selection->Size(
+							(Vector2{width, item_height} - item_selection_padding * 2.0_r).
+							CeilCopy(vector2::Zero)
+						);
 						skin->Selection->Position({
 							skin->Lines->Position().X(),
 							height * 0.5_r - item_padding - item_height * 0.5_r - item_height * item_off,
