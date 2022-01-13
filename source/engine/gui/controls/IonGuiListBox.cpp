@@ -296,12 +296,7 @@ void GuiListBox::UpdateLines() noexcept
 		//Lines text
 		if (auto &lines = skin->Lines->Get(); lines)
 		{
-			auto area_size = gui_control::detail::get_inner_size(*skin_, false).value_or(vector2::Zero);
-			auto border_size = gui_control::detail::get_border_size(*skin_, false).value_or(vector2::Zero);
-			auto center = gui_control::detail::get_center_area(*skin_, false).value_or(aabb::Zero).Center();
-
-			//Area size
-			if (area_size != vector2::Zero)
+			if (auto size = InnerSize(); size)
 			{
 				auto ortho_viewport_ratio =
 					[&]() noexcept
@@ -317,11 +312,11 @@ void GuiListBox::UpdateLines() noexcept
 					}();
 
 				auto icon_column_size = show_icons_ ?
-					area_size * Vector2{icon_column_width_.value_or(detail::default_icon_column_width_percent), 0.0_r} :
+					*size * Vector2{icon_column_width_.value_or(detail::default_icon_column_width_percent), 0.0_r} :
 					vector2::Zero;
 
 				lines->Overflow(graphics::fonts::text::TextOverflow::WordTruncate);
-				lines->AreaSize((area_size - icon_column_size) * ortho_viewport_ratio);
+				lines->AreaSize((*size - icon_column_size) * ortho_viewport_ratio);
 				lines->LineHeightFactor(item_height_factor_.value_or(detail::default_item_height_factor));
 				lines->Padding(item_padding_.value_or(detail::default_item_padding_size));
 				lines->Alignment(detail::item_layout_to_text_alignment(item_layout_));
@@ -331,12 +326,91 @@ void GuiListBox::UpdateLines() noexcept
 					lines->Content(detail::item_content_to_text_content(items_));
 
 				if (auto node = skin->Lines->ParentNode(); node)
+				{
+					auto center = gui_control::detail::get_center_area(*skin_, false).value_or(aabb::Zero).Center();
 					node->Position(center + detail::lines_area_offset(icon_layout_, icon_column_size));
+				}
 			}
 		}
 	}
 
+	UpdateIcons();
 	UpdateSelection();
+}
+
+void GuiListBox::UpdateIcons() noexcept
+{
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+		skin && skin->Lines)
+	{
+		//Get() will not reload vertex streams when called from an immutable reference
+		if (const auto &c_part = *skin->Lines.TextObject;
+			c_part.Get() && c_part.Get()->LineHeight())
+		{
+			if (auto size = InnerSize(); size)
+			{
+				auto [width, height] = size->XY();
+				auto viewport_ortho_ratio =
+					[&]() noexcept
+					{
+						//Adjust area size from ortho to viewport space
+						if (auto scene_manager = skin->Lines->Owner(); scene_manager)
+						{
+							if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+								return viewport->ViewportToOrthoRatio();
+						}
+
+						return vector2::UnitScale;
+					}();
+
+				auto item_height = *c_part.Get()->LineHeight() * viewport_ortho_ratio.Y();
+				auto item_padding = c_part.Get()->Padding().Y() * viewport_ortho_ratio.Y();
+				auto icon_padding =
+					icon_padding_.value_or(detail::default_icon_padding_size) * viewport_ortho_ratio.Y();
+				auto icon_max_size =
+					 (Vector2{width * icon_column_width_.value_or(detail::default_icon_column_width_percent), item_height} -
+					 icon_padding * 2.0_r).CeilCopy(vector2::Zero);
+
+				auto item_count = show_icons_ ? c_part.Get()->DisplayedLineCount() : 0;
+
+				//Show all icons in view
+				for (auto item_off = c_part.Get()->FromLine(), icon_off = 0;
+					item_off < item_count; ++item_off, ++icon_off)
+				{
+					//Create icon sprite (if missing)
+					if (icon_off == std::ssize(skin->Icons))
+						skin->Icons.push_back(CreateIcon(items_[item_off].Icon));
+					else if (!skin->Icons[icon_off])
+						skin->Icons[icon_off] = CreateIcon(items_[item_off].Icon);
+
+					//Item has icon
+					if (items_[item_off].Icon)
+					{
+						//Todo
+
+						skin->Icons[icon_off]->Size(
+							icon_max_size
+						);
+						skin->Icons[icon_off]->Position({
+							skin->Lines->Position().X(), //Todo
+							height * 0.5_r - item_padding - item_height * 0.5_r - item_height * icon_off,
+							skin->Icons[icon_off]->Position().Z()}
+						);
+					}
+					
+					skin->Icons[icon_off]->Visible(!!items_[item_off].Icon);
+				}
+
+				//Hide all icons out of view
+				for (auto iter = std::begin(skin->Icons) + item_count,
+					end = std::end(skin->Icons); iter != end; ++iter)
+				{
+					if (*iter)
+						(*iter)->Visible(false);
+				}
+			}
+		}
+	}
 }
 
 void GuiListBox::UpdateSelection() noexcept
@@ -428,6 +502,39 @@ void GuiListBox::ClearLines() noexcept
 {
 	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
 		skin->Lines->Get()->Clear();
+}
+
+
+/*
+	Icons
+*/
+
+NonOwningPtr<graphics::scene::shapes::Sprite> GuiListBox::CreateIcon(NonOwningPtr<graphics::materials::Material> material)
+{
+	if (skin_)
+	{
+		auto sprite = skin_->Parts->CreateMesh<graphics::scene::shapes::Sprite>(vector2::Zero, material);
+		sprite->IncludeBoundingVolumes(false);
+		sprite->AutoSize(true);
+		return sprite;
+	}
+	else
+		return nullptr;
+}
+
+void GuiListBox::RemoveIcons() noexcept
+{
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin)
+	{
+		for (auto &icon : skin->Icons)
+		{
+			if (icon)
+				icon->Owner()->RemoveMesh(*icon); //Remove icon
+		}
+
+		skin->Icons.clear();
+		skin->Icons.shrink_to_fit();
+	}
 }
 
 
@@ -600,6 +707,7 @@ void GuiListBox::ClearItems() noexcept
 		ItemIndex({}); //Deselect
 
 	ClearLines();
+	RemoveIcons();
 	UpdateLines();
 }
 

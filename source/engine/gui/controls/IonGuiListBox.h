@@ -91,7 +91,7 @@ namespace ion::gui::controls
 			constexpr auto default_selection_padding_size = 0.0_r;
 
 			constexpr auto default_icon_column_width_percent = 0.25_r;
-			constexpr auto default_icon_padding = 2.0_r;
+			constexpr auto default_icon_padding_size = 2.0_r;
 
 
 			inline auto item_layout_to_text_alignment(ListBoxItemLayout item_alignment) noexcept
@@ -194,7 +194,8 @@ namespace ion::gui::controls
 			virtual void RemoveSkin() noexcept override;
 			
 			virtual void UpdateLines() noexcept;
-			virtual void UpdateSelection() noexcept;		
+			virtual void UpdateIcons() noexcept;
+			virtual void UpdateSelection() noexcept;
 
 
 			/*
@@ -205,6 +206,14 @@ namespace ion::gui::controls
 			void ReplaceLines(int first, int last, const gui_list_box::ListBoxItems &items);
 			void RemoveLines(int first, int last) noexcept;
 			void ClearLines() noexcept;
+
+
+			/*
+				Icons
+			*/
+
+			NonOwningPtr<graphics::scene::shapes::Sprite> CreateIcon(NonOwningPtr<graphics::materials::Material> material);
+			void RemoveIcons() noexcept;
 
 		public:
 
@@ -300,7 +309,7 @@ namespace ion::gui::controls
 				if (icon_padding_ != padding)
 				{
 					icon_padding_ = padding;
-					UpdateLines();
+					UpdateIcons();
 				}
 			}
 
