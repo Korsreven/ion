@@ -167,8 +167,9 @@ namespace ion::graphics::render::vertex
 				{
 					vertex_data_ = vertex_data;
 					vertex_count_ = vertex_batch::detail::get_vertex_count(vertex_declaration_, vertex_data);
-					reload_vertex_data_ = reload_data;
 				}
+
+				reload_vertex_data_ |= reload_data;
 			}
 
 			//Sets the material used by this vertex batch to the given material
@@ -227,9 +228,10 @@ namespace ion::graphics::render::vertex
 				if (vbo_ != vertex_buffer)
 				{
 					vbo_ = vertex_buffer;
-					reload_vertex_data_ = reload_data;
 					rebind_vertex_attributes_ = use_vao_;
 				}
+
+				reload_vertex_data_ |= reload_data;
 			}
 
 

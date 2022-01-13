@@ -101,7 +101,6 @@ void DrawableParticleSystem::PrepareVertexStreams()
 				vertex_streams_[off].emitter = particle_system_->GetEmitter(*emitter.Name());
 
 			vertex_streams_[off].vertex_batch.VertexData({std::data(emitter.Particles()), std::ssize(emitter.Particles())});
-			vertex_streams_[off].vertex_batch.ReloadData(); //Must reload data even if vertex data view (range) is unchanged
 			vertex_streams_[off].vertex_batch.BatchMaterial(emitter.ParticleMaterial());
 		}
 

@@ -502,7 +502,6 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 									position, rotation, scaling,
 									foreground_color, opacity, origin, pixel_unit_ratio);
 							glyph_streams[glyph_count].vertex_batch.VertexData(glyph_streams[glyph_count].vertex_data);
-							glyph_streams[glyph_count].vertex_batch.ReloadData(); //Must reload data even if vertex data view (range) is unchanged
 							glyph_streams[glyph_count].vertex_batch.BatchTexture((*handles)[glyph_index]);
 						}
 
