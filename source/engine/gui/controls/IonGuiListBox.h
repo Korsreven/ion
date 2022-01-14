@@ -142,6 +142,7 @@ namespace ion::gui::controls
 			std::optional<Vector2> selection_padding_;
 			
 			std::optional<real> icon_column_width_;
+			std::optional<Vector2> icon_max_size_;
 			std::optional<Vector2> icon_padding_;
 			gui_list_box::ListBoxIconLayout icon_layout_ = gui_list_box::ListBoxIconLayout::Left;
 			bool show_icons_ = false;
@@ -299,7 +300,21 @@ namespace ion::gui::controls
 				if (icon_column_width_ != percent)
 				{
 					icon_column_width_ = percent;
-					UpdateLines();
+
+					if (show_icons_)
+						UpdateLines();
+				}
+			}
+
+			//Sets the icon max size for this list box to the given size
+			inline void IconMaxSize(const std::optional<Vector2> &size) noexcept
+			{
+				if (icon_max_size_ != size)
+				{
+					icon_max_size_ = size;
+
+					if (show_icons_)
+						UpdateIcons();
 				}
 			}
 
@@ -309,7 +324,9 @@ namespace ion::gui::controls
 				if (icon_padding_ != padding)
 				{
 					icon_padding_ = padding;
-					UpdateIcons();
+
+					if (show_icons_)
+						UpdateIcons();
 				}
 			}
 
@@ -319,7 +336,9 @@ namespace ion::gui::controls
 				if (icon_layout_ != layout)
 				{
 					icon_layout_ = layout;
-					UpdateLines();
+
+					if (show_icons_)
+						UpdateLines();
 				}
 			}
 
@@ -378,6 +397,13 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto IconColumnWidth() const noexcept
 			{
 				return icon_column_width_;
+			}
+
+			//Returns the icon max size for this list box
+			//Returns nullopt if no icon max size has been set
+			[[nodiscard]] inline auto IconMaxSize() const noexcept
+			{
+				return icon_max_size_;
 			}
 
 			//Returns the icon padding for this list box

@@ -131,7 +131,7 @@ void GuiListBox::Scrolled(int delta) noexcept
 			if (delta < 0)
 			{
 				lines->FromLine(
-					from_line > delta ?
+					from_line > -delta ?
 					from_line + delta : 0);
 			}
 			//Scrolled down
@@ -148,6 +148,7 @@ void GuiListBox::Scrolled(int delta) noexcept
 					from_line + delta : max_from_line);
 			}
 
+			UpdateIcons();
 			UpdateSelection();
 
 			do_scroll = false;
@@ -365,34 +366,37 @@ void GuiListBox::UpdateIcons() noexcept
 
 				auto item_height = *c_part.Get()->LineHeight() * viewport_ortho_ratio.Y();
 				auto item_padding = c_part.Get()->Padding().Y() * viewport_ortho_ratio.Y();
-				auto icon_padding =
-					icon_padding_.value_or(detail::default_icon_padding_size) * viewport_ortho_ratio.Y();
-				auto icon_max_size =
-					 (Vector2{width * icon_column_width_.value_or(detail::default_icon_column_width_percent), item_height} -
-					 icon_padding * 2.0_r).CeilCopy(vector2::Zero);
+				auto icon_padding = icon_padding_.value_or(detail::default_icon_padding_size) * viewport_ortho_ratio.Y();
+
+				auto icon_column_percent = icon_column_width_.value_or(detail::default_icon_column_width_percent);
+				auto icon_column_width = width * icon_column_percent;
+				auto icon_max_size = Vector2{icon_column_width, item_height} - icon_padding * 2.0_r;
+				icon_max_size.Floor(icon_max_size_.value_or(icon_max_size)).Ceil(vector2::Zero);
 
 				auto item_count = show_icons_ ? c_part.Get()->DisplayedLineCount() : 0;
 
 				//Show all icons in view
 				for (auto item_off = c_part.Get()->FromLine(), icon_off = 0;
-					item_off < item_count; ++item_off, ++icon_off)
+					icon_off < item_count; ++item_off, ++icon_off)
 				{
 					//Create icon sprite (if missing)
 					if (icon_off == std::ssize(skin->Icons))
 						skin->Icons.push_back(CreateIcon(items_[item_off].Icon));
 					else if (!skin->Icons[icon_off])
 						skin->Icons[icon_off] = CreateIcon(items_[item_off].Icon);
+					else
+						skin->Icons[icon_off]->SurfaceMaterial(items_[item_off].Icon);
 
 					//Item has icon
 					if (items_[item_off].Icon)
 					{
-						//Todo
+						skin->Icons[icon_off]->AutoSize(true);
+						skin->Icons[icon_off]->ResizeToFit(icon_max_size);
 
-						skin->Icons[icon_off]->Size(
-							icon_max_size
-						);
 						skin->Icons[icon_off]->Position({
-							skin->Lines->Position().X(), //Todo
+							icon_layout_ == ListBoxIconLayout::Right ?
+							skin->Lines->Position().X() + width * 0.5_r - icon_column_width * 0.5_r : //Right
+							skin->Lines->Position().X() - width * 0.5_r + icon_column_width * 0.5_r,  //Left
 							height * 0.5_r - item_padding - item_height * 0.5_r - item_height * icon_off,
 							skin->Icons[icon_off]->Position().Z()}
 						);
@@ -480,7 +484,9 @@ void GuiListBox::InsertLines(int off, const gui_list_box::ListBoxItems &items)
 {
 	using namespace utilities;
 
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+		skin && skin->Lines && skin->Lines->Get())
+
 		skin->Lines->Get()->InsertLine(off, detail::item_content_to_text_content(items));
 }
 
@@ -488,20 +494,44 @@ void GuiListBox::ReplaceLines(int first, int last, const gui_list_box::ListBoxIt
 {
 	using namespace utilities;
 
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+		skin && skin->Lines && skin->Lines->Get())
+	{
 		skin->Lines->Get()->ReplaceLines(first, last, detail::item_content_to_text_content(items));
+
+		auto count = skin->Lines->Get()->LineCount();
+		auto view_count = skin->Lines->Get()->DisplayedLineCount();
+		auto view_capacity = skin->Lines->Get()->DisplayedLineCapacity().value_or(0);
+
+		if (count > view_count && view_count < view_capacity)
+			Scrolled(view_count - view_capacity);
+	}
 }
 
 void GuiListBox::RemoveLines(int first, int last) noexcept
 {
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+		skin && skin->Lines && skin->Lines->Get())
+	{
 		skin->Lines->Get()->RemoveLines(first, last);
+
+		auto count = skin->Lines->Get()->LineCount();
+		auto view_count = skin->Lines->Get()->DisplayedLineCount();
+		auto view_capacity = skin->Lines->Get()->DisplayedLineCapacity().value_or(0);
+
+		if (count > view_count && view_count < view_capacity)
+			Scrolled(view_count - view_capacity);
+	}
 }
 
 void GuiListBox::ClearLines() noexcept
 {
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+		skin && skin->Lines && skin->Lines->Get())
+	{
 		skin->Lines->Get()->Clear();
+		skin->Lines->Get()->FromLine(0);
+	}
 }
 
 
@@ -515,7 +545,6 @@ NonOwningPtr<graphics::scene::shapes::Sprite> GuiListBox::CreateIcon(NonOwningPt
 	{
 		auto sprite = skin_->Parts->CreateMesh<graphics::scene::shapes::Sprite>(vector2::Zero, material);
 		sprite->IncludeBoundingVolumes(false);
-		sprite->AutoSize(true);
 		return sprite;
 	}
 	else

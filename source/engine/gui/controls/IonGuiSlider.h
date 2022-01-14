@@ -189,7 +189,7 @@ namespace ion::gui::controls
 				if (progress_.Position() != position)
 				{
 					auto pos = progress_.Position();
-					progress_.Position(position);		
+					progress_.Position(position);
 					Slid(position - pos);
 					UpdateHandle();
 				}

@@ -2646,16 +2646,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			list_box->IconLayout(ion::gui::controls::gui_list_box::ListBoxIconLayout::Left);
 			list_box->ShowIcons(true);
 			list_box->AddItems({
-				{"My <b>1st</b> <font color='purple'>item</font>"s},
-				{"My <b>2nd</b> <font color='purple'>item</font>"s},
-				{"My <b>3rd</b> <font color='purple'>item</font>"s},
-				{"My <b>4th</b> <font color='purple'>item</font>"s},
-				{"My <b>5th</b> <font color='purple'>item</font>"s},
-				{"My <b>6th</b> <font color='purple'>item</font>"s},
-				{"My <b>7th</b> <font color='purple'>item</font>"s},
-				{"My <b>8th</b> <font color='purple'>item</font>"s},
-				{"My <b>9th</b> <font color='purple'>item</font>"s},
-				{"My <b>10th</b> <font color='purple'>item</font>"s}
+				{"My <b>1st</b> <font color='purple'>item</font>"s, asteroid},
+				{"My <b>2nd</b> <font color='purple'>item</font>"s, ship},
+				{"My <b>3rd</b> <font color='purple'>item</font>"s, asteroid},
+				{"My <b>4th</b> <font color='purple'>item</font>"s, star},
+				{"My <b>5th</b> <font color='purple'>item</font>"s, asteroid},
+				{"My <b>6th</b> <font color='purple'>item</font>"s, aura},
+				{"My <b>7th</b> <font color='purple'>item</font>"s, asteroid},
+				{"My <b>8th</b> <font color='purple'>item</font>"s, star},
+				{"My <b>9th</b> <font color='purple'>item</font>"s, asteroid},
+				{"My <b>10th</b> <font color='purple'>item</font>"s, ship}
 			});
 
 			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", "My scroll bar", "My scroll bar tooltip", std::move(scroll_bar_skin), Vector2{0.077_r, 0.5_r});
@@ -2666,7 +2666,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			group_box->AddControl(radio_button);
 			group_box->AddControl(radio_button2);
-			
 
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);

@@ -922,7 +922,7 @@ void GuiControl::UpdateCaption() noexcept
 			if (caption_)
 				text->Content(*caption_);
 			else
-				text->Content({});
+				text->Clear();
 		}
 	}
 }
