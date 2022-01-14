@@ -13,12 +13,17 @@ File:	IonRectangle.h
 #ifndef ION_RECTANGLE_H
 #define ION_RECTANGLE_H
 
+#include <utility>
+
 #include "IonShape.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
+
+#undef min
+#undef max
 
 namespace ion::graphics::scene::shapes
 {
@@ -27,6 +32,21 @@ namespace ion::graphics::scene::shapes
 
 	namespace rectangle::detail
 	{
+		inline auto scale_to_fill(const Vector2 &size, const Vector2 &fill_size)
+		{
+			auto [x, y] = size.XY();
+			auto [dst_x, dst_y] = fill_size.XY();
+			return size * std::max(dst_x / x, dst_y / y);
+		}
+
+		inline auto scale_to_fit(const Vector2 &size, const Vector2 &fit_size)
+		{
+			auto [x, y] = size.XY();
+			auto [dst_x, dst_y] = fit_size.XY();
+			return size * std::min(dst_x / x, dst_y / y);
+		}
+
+
 		mesh::Vertices rectangle_vertices(const Vector3 &position, real rotation, const Vector2 &size, const Color &color);
 	} //rectangle::detail
 
@@ -120,6 +140,38 @@ namespace ion::graphics::scene::shapes
 			[[nodiscard]] inline auto& Size() const noexcept
 			{
 				return size_;
+			}
+
+
+			/*
+				Keep aspect ratio
+			*/
+
+			//Sets the width of this rectangle to the given width, while keeping the aspect ratio
+			inline void Width(real width) noexcept
+			{
+				if (auto [w, h] = size_.XY(); w != width && w > 0.0_r)
+					Size({width, h * (width / w)});
+			}
+
+			//Sets the height of this rectangle to the given height, while keeping the aspect ratio
+			inline void Height(real height) noexcept
+			{
+				if (auto [w, h] = size_.XY(); h != height && h > 0.0_r)
+					Size({w * (height / h), height});
+			}
+
+
+			//Resizes this rectangle to fill out the given size, while keeping the aspect ratio
+			inline void ResizeToFill(const Vector2 &size)
+			{
+				Size(rectangle::detail::scale_to_fill(size_, size));
+			}
+
+			//Resizes this rectangle to fit in the given size, while keeping the aspect ratio
+			inline void ResizeToFit(const Vector2 &size)
+			{
+				Size(rectangle::detail::scale_to_fit(size_, size));
 			}
 	};
 } //ion::graphics::scene::shapes

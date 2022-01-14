@@ -141,21 +141,6 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the width of this sprite to the given width, while keeping the aspect ratio
-			inline void Width(real width) noexcept
-			{
-				if (auto [w, h] = size_.XY(); w != width && w > 0.0_r)
-					Size({width, h * (width / w)});
-			}
-
-			//Sets the height of this sprite to the given height, while keeping the aspect ratio
-			inline void Height(real height) noexcept
-			{
-				if (auto [w, h] = size_.XY(); h != height && h > 0.0_r)
-					Size({w * (height / h), height});
-			}
-
-
 			//Sets the surface material used by this sprite to the given material
 			void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
@@ -198,6 +183,50 @@ namespace ion::graphics::scene::shapes
 			[[nodiscard]] inline auto SurfaceMaterial() const noexcept
 			{
 				return  Mesh::SurfaceMaterial();
+			}
+
+
+			/*
+				Keep aspect ratio
+			*/
+
+			//Sets the width of this sprite to the given width, while keeping the aspect ratio
+			inline void Width(real width) noexcept
+			{
+				if (auto [w, h] = size_.XY(); w != width && w > 0.0_r)
+				{
+					Rectangle::Width(width);
+					auto_size_ = false;
+
+					if (auto_repeat_)
+						RecalculateTexCoords();
+				}
+			}
+
+			//Sets the height of this sprite to the given height, while keeping the aspect ratio
+			inline void Height(real height) noexcept
+			{
+				if (auto [w, h] = size_.XY(); h != height && h > 0.0_r)
+				{
+					Rectangle::Height(height);
+					auto_size_ = false;
+
+					if (auto_repeat_)
+						RecalculateTexCoords();
+				}
+			}
+
+
+			//Resizes this sprite to fill out the given size, while keeping the aspect ratio
+			inline void ResizeToFill(const Vector2 &size)
+			{
+				Size(rectangle::detail::scale_to_fill(size_, size));
+			}
+
+			//Resizes this sprite to fit in the given size, while keeping the aspect ratio
+			inline void ResizeToFit(const Vector2 &size)
+			{
+				Size(rectangle::detail::scale_to_fit(size_, size));
 			}
 
 
