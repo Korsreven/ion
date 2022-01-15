@@ -244,6 +244,12 @@ namespace ion::graphics::scene
 				return animation_;
 			}
 
+			//Returns an immutable reference to the animation
+			[[nodiscard]] auto& GetImmutable() const noexcept
+			{
+				return animation_;
+			}
+
 
 			/*
 				Preparing / drawing

@@ -137,6 +137,12 @@ namespace ion::graphics::scene
 				return particle_system_;
 			}
 
+			//Returns an immutable reference to the particle system
+			[[nodiscard]] auto& GetImmutable() const noexcept
+			{
+				return particle_system_;
+			}
+
 
 			//Return the vertex buffer this particle system uses
 			[[nodiscard]] inline auto& VertexBuffer() const noexcept

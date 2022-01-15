@@ -249,6 +249,12 @@ namespace ion::graphics::scene
 				return text_;
 			}
 
+			//Returns an immutable reference to the text
+			[[nodiscard]] auto& GetImmutable() const noexcept
+			{
+				return text_;
+			}
+
 
 			//Return the vertex buffer this text uses
 			[[nodiscard]] inline auto& VertexBuffer() const noexcept
