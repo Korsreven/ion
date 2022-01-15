@@ -38,7 +38,7 @@ namespace gui_control::detail
 	Skins
 */
 
-void resize_sprite(graphics::scene::shapes::Sprite &sprite, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept
+void resize_part(graphics::scene::shapes::Sprite &sprite, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept
 {
 	auto position = Vector2{sprite.Position()};
 	auto sign = (position - center).SignCopy();
@@ -49,7 +49,7 @@ void resize_sprite(graphics::scene::shapes::Sprite &sprite, const Vector2 &delta
 void resize_part(ControlVisualPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept
 {
 	if (part)
-		resize_sprite(*part.SpriteObject, delta_size, delta_position, center);
+		resize_part(*part.SpriteObject, delta_size, delta_position, center);
 }
 
 void resize_skin(ControlSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept
@@ -709,45 +709,45 @@ void GuiControl::SetCaptionState(ControlState state, ControlCaptionPart &part) n
 {
 	if (part)
 	{
-		//Get() will not reload vertex streams when called from an immutable reference
-		if (const auto &c_part = *part.TextObject; c_part.Get())
+		//Caption text
+		if (auto &text = part->GetImmutable(); text)
 		{
 			if (auto &style = GetStateStyle(state, part); style)
 			{
 				if (style->ForegroundColor)
 				{
-					if (c_part.Get()->DefaultForegroundColor() != *style->ForegroundColor)
+					if (text->DefaultForegroundColor() != *style->ForegroundColor)
 						part->Get()->DefaultForegroundColor(*style->ForegroundColor);
 				}
 
 				if (style->BackgroundColor)
 				{
-					if (c_part.Get()->DefaultBackgroundColor() != *style->BackgroundColor)
+					if (text->DefaultBackgroundColor() != *style->BackgroundColor)
 						part->Get()->DefaultBackgroundColor(*style->BackgroundColor);
 				}
 
 				if (style->FontStyle)
 				{
-					if (c_part.Get()->DefaultFontStyle() != *style->FontStyle)
+					if (text->DefaultFontStyle() != *style->FontStyle)
 						part->Get()->DefaultFontStyle(*style->FontStyle);
 				}
-				else if (c_part.Get()->DefaultFontStyle())
+				else if (text->DefaultFontStyle())
 					part->Get()->DefaultFontStyle({});
 
 				if (style->Decoration)
 				{
-					if (c_part.Get()->DefaultDecoration() != *style->Decoration)
+					if (text->DefaultDecoration() != *style->Decoration)
 						part->Get()->DefaultDecoration(*style->Decoration);
 				}
-				else if (c_part.Get()->DefaultDecoration())
+				else if (text->DefaultDecoration())
 					part->Get()->DefaultDecoration({});
 
 				if (style->DecorationColor)
 				{
-					if (c_part.Get()->DefaultDecorationColor() != *style->DecorationColor)
+					if (text->DefaultDecorationColor() != *style->DecorationColor)
 						part->Get()->DefaultDecorationColor(*style->DecorationColor);
 				}
-				else if (c_part.Get()->DefaultDecorationColor())
+				else if (text->DefaultDecorationColor())
 					part->Get()->DefaultDecorationColor({});
 			}
 		}
@@ -798,24 +798,29 @@ void GuiControl::SetState(ControlState state) noexcept
 
 void GuiControl::AttachSkin()
 {
-	if (skin_)
+	if (skin_ && node_)
 	{
+		//Create skin node
+		skin_node_ = node_->CreateChildNode(node_->Visible());
+		
 		if (skin_->Parts)
 		{
+			//Detach from previous parent (if any)
 			if (auto node = skin_->Parts->ParentNode(); node)
 				node->DetachObject(*skin_->Parts.ModelObject);
-		
-			if (node_) //Create node for all parts
-				node_->CreateChildNode(node_->Visible())->AttachObject(*skin_->Parts.ModelObject);
+			
+			//Attach parts model
+			skin_node_->AttachObject(*skin_->Parts.ModelObject);
 		}
 
 		if (skin_->Caption)
 		{
+			//Detach from previous parent (if any)
 			if (auto node = skin_->Caption->ParentNode(); node)
 				node->DetachObject(*skin_->Caption.TextObject);
-		
-			if (node_) //Create node for caption
-				node_->CreateChildNode(node_->Visible())->AttachObject(*skin_->Caption.TextObject);
+
+			//Attach caption text
+			skin_node_->AttachObject(*skin_->Caption.TextObject);
 		}
 	}
 	
@@ -825,18 +830,12 @@ void GuiControl::AttachSkin()
 
 void GuiControl::DetachSkin() noexcept
 {
-	if (skin_)
+	if (skin_ && skin_node_)
 	{
-		if (skin_->Parts)
+		if (auto node = skin_node_->ParentNode(); node)
 		{
-			if (auto node = skin_->Parts->ParentNode(); node_ && node)
-				node_->RemoveChildNode(*node); //Remove parts node
-		}
-
-		if (skin_->Caption)
-		{
-			if (auto node = skin_->Caption->ParentNode(); node_ && node)
-				node_->RemoveChildNode(*node); //Remove caption node
+			node->RemoveChildNode(*skin_node_);
+			skin_node_ = nullptr;
 		}
 	}
 }
@@ -847,11 +846,11 @@ void GuiControl::RemoveSkin() noexcept
 	{
 		DetachSkin();
 
-		if (skin_->Parts)
-			skin_->Parts->Owner()->RemoveModel(*skin_->Parts.ModelObject); //Remove all parts
+		if (skin_->Parts && skin_->Parts->Owner())
+			skin_->Parts->Owner()->RemoveModel(*skin_->Parts.ModelObject); //Remove parts model
 
-		if (skin_->Caption)
-			skin_->Caption->Owner()->RemoveText(*skin_->Caption.TextObject); //Remove caption
+		if (skin_->Caption && skin_->Caption->Owner())
+			skin_->Caption->Owner()->RemoveText(*skin_->Caption.TextObject); //Remove caption text
 
 		skin_.reset();
 	}
@@ -888,9 +887,7 @@ void GuiControl::UpdateCaption() noexcept
 					}();
 
 				text->AreaSize(size * ortho_viewport_ratio);
-
-				if (auto node = skin_->Caption->ParentNode(); node)
-					node->Position(center + detail::caption_area_offset(caption_layout_, size, border_size));
+				skin_->Caption->Position(center + detail::caption_area_offset(caption_layout_, size, border_size));
 			}
 			else
 			{
@@ -908,10 +905,8 @@ void GuiControl::UpdateCaption() noexcept
 					}();
 
 				text->AreaSize({});
-
-				if (auto node = skin_->Caption->ParentNode(); node)
-					node->Position(center + detail::caption_offset(caption_layout_, area_size, border_size,
-						caption_margin_.value_or(detail::default_caption_margin_size) * viewport_ortho_ratio));
+				skin_->Caption->Position(center + detail::caption_offset(caption_layout_, area_size, border_size,
+					caption_margin_.value_or(detail::default_caption_margin_size) * viewport_ortho_ratio));
 			}
 
 			text->Padding(caption_padding_.value_or(detail::default_caption_padding_size));

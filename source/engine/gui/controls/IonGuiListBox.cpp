@@ -49,7 +49,7 @@ void resize_skin(ListBoxSkin &skin, const Vector2 &from_size, const Vector2 &to_
 	for (auto &icon : skin.Icons)
 	{
 		if (icon)
-			gui_control::detail::resize_sprite(*icon, delta_size, delta_position, vector2::Zero);
+			gui_control::detail::resize_part(*icon, delta_size, delta_position, vector2::Zero);
 	}
 }
 
@@ -160,42 +160,27 @@ void GuiListBox::Scrolled(int delta) noexcept
 
 int GuiListBox::TotalElements() noexcept
 {
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
-		skin && skin->Lines)
-	{
-		//Get() will not reload vertex streams when called from an immutable reference
-		if (const auto &c_part = *skin->Lines.TextObject; c_part.Get())
-			return c_part.Get()->LineCount();
-	}
-
-	return 0;
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
+		return skin->Lines->GetImmutable()->LineCount();
+	else
+		return 0;
 }
 
 int GuiListBox::ElementsInView() noexcept
 {
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
-		skin && skin->Lines)
-	{
-		//Get() will not reload vertex streams when called from an immutable reference
-		if (const auto &c_part = *skin->Lines.TextObject; c_part.Get())
-			return c_part.Get()->DisplayedLineCount();
-	}
-
-	return 0;
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
+		return skin->Lines->GetImmutable()->DisplayedLineCount();
+	else
+		return 0;
 }
 
 
 int GuiListBox::ScrollPosition() noexcept
 {
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
-		skin && skin->Lines)
-	{
-		//Get() will not reload vertex streams when called from an immutable reference
-		if (const auto &c_part = *skin->Lines.TextObject; c_part.Get())
-			return c_part.Get()->FromLine();
-	}
-
-	return 0;
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
+		return skin->Lines->GetImmutable()->FromLine();
+	else
+		return 0;
 }
 
 
@@ -245,30 +230,22 @@ void GuiListBox::AttachSkin()
 {
 	GuiControl::AttachSkin(); //Use base functionality
 
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin)
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin_node_)
 	{
 		if (skin->Lines)
 		{
+			//Detach from previous parent (if any)
 			if (auto node = skin->Lines->ParentNode(); node)
 				node->DetachObject(*skin->Lines.TextObject);
 		
-			if (node_) //Create node for lines
-				node_->CreateChildNode(node_->Visible())->AttachObject(*skin->Lines.TextObject);
+			//Attach lines text
+			skin_node_->AttachObject(*skin->Lines.TextObject);
 		}
 	}
 }
 
 void GuiListBox::DetachSkin() noexcept
 {
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin)
-	{
-		if (skin->Lines)
-		{
-			if (auto node = skin->Lines->ParentNode(); node_ && node)
-				node_->RemoveChildNode(*node); //Remove lines node
-		}
-	}
-
 	GuiControl::DetachSkin(); //Use base functionality
 }
 
@@ -278,11 +255,8 @@ void GuiListBox::RemoveSkin() noexcept
 	{
 		DetachSkin();
 
-		if (skin->Lines)
-		{
-			skin->Lines->Owner()->RemoveText(*skin->Lines.TextObject); //Remove lines
-			skin->Lines = {};
-		}
+		if (skin->Lines && skin->Lines->Owner())
+			skin->Lines->Owner()->RemoveText(*skin->Lines.TextObject); //Remove lines text
 	}
 
 	GuiControl::RemoveSkin(); //Use base functionality
@@ -295,10 +269,12 @@ void GuiListBox::UpdateLines() noexcept
 		skin && skin->Lines)
 	{
 		//Lines text
-		if (auto &lines = skin->Lines->Get(); lines)
+		if (auto &text = skin->Lines->Get(); text)
 		{
 			if (auto size = InnerSize(); size)
 			{
+				auto center = CenterArea().value_or(aabb::Zero).Center();
+
 				auto ortho_viewport_ratio =
 					[&]() noexcept
 					{
@@ -316,21 +292,17 @@ void GuiListBox::UpdateLines() noexcept
 					*size * Vector2{icon_column_width_.value_or(detail::default_icon_column_width_percent), 0.0_r} :
 					vector2::Zero;
 
-				lines->Overflow(graphics::fonts::text::TextOverflow::WordTruncate);
-				lines->AreaSize((*size - icon_column_size) * ortho_viewport_ratio);
-				lines->LineHeightFactor(item_height_factor_.value_or(detail::default_item_height_factor));
-				lines->Padding(item_padding_.value_or(detail::default_item_padding_size));
-				lines->Alignment(detail::item_layout_to_text_alignment(item_layout_));
+				text->Overflow(graphics::fonts::text::TextOverflow::WordTruncate);
+				text->AreaSize((*size - icon_column_size) * ortho_viewport_ratio);
+				text->LineHeightFactor(item_height_factor_.value_or(detail::default_item_height_factor));
+				text->Padding(item_padding_.value_or(detail::default_item_padding_size));
+				text->Alignment(detail::item_layout_to_text_alignment(item_layout_));
 
 				//Content
-				if (lines->LineCount() != std::ssize(items_))
-					lines->Content(detail::item_content_to_text_content(items_));
+				if (text->LineCount() != std::ssize(items_))
+					text->Content(detail::item_content_to_text_content(items_));
 
-				if (auto node = skin->Lines->ParentNode(); node)
-				{
-					auto center = gui_control::detail::get_center_area(*skin_, false).value_or(aabb::Zero).Center();
-					node->Position(center + detail::lines_area_offset(icon_layout_, icon_column_size));
-				}
+				skin->Lines->Position(center + detail::lines_area_offset(icon_layout_, icon_column_size));
 			}
 		}
 	}
@@ -344,13 +316,15 @@ void GuiListBox::UpdateIcons() noexcept
 	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
 		skin && skin->Lines)
 	{
-		//Get() will not reload vertex streams when called from an immutable reference
-		if (const auto &c_part = *skin->Lines.TextObject;
-			c_part.Get() && c_part.Get()->LineHeight())
+		//Lines text
+		if (auto &text = skin->Lines->GetImmutable();
+			text && text->LineHeight())
 		{
 			if (auto size = InnerSize(); size)
 			{
 				auto [width, height] = size->XY();
+				auto center = CenterArea().value_or(aabb::Zero).Center();
+
 				auto viewport_ortho_ratio =
 					[&]() noexcept
 					{
@@ -364,8 +338,8 @@ void GuiListBox::UpdateIcons() noexcept
 						return vector2::UnitScale;
 					}();
 
-				auto item_height = *c_part.Get()->LineHeight() * viewport_ortho_ratio.Y();
-				auto item_padding = c_part.Get()->Padding().Y() * viewport_ortho_ratio.Y();
+				auto item_height = *text->LineHeight() * viewport_ortho_ratio.Y();
+				auto item_padding = text->Padding().Y() * viewport_ortho_ratio.Y();
 				auto icon_padding = icon_padding_.value_or(detail::default_icon_padding_size) * viewport_ortho_ratio.Y();
 
 				auto icon_column_percent = icon_column_width_.value_or(detail::default_icon_column_width_percent);
@@ -373,10 +347,10 @@ void GuiListBox::UpdateIcons() noexcept
 				auto icon_max_size = Vector2{icon_column_width, item_height} - icon_padding * 2.0_r;
 				icon_max_size.Floor(icon_max_size_.value_or(icon_max_size)).Ceil(vector2::Zero);
 
-				auto item_count = show_icons_ ? c_part.Get()->DisplayedLineCount() : 0;
+				auto item_count = show_icons_ ? text->DisplayedLineCount() : 0;
 
 				//Show all icons in view
-				for (auto item_off = c_part.Get()->FromLine(), icon_off = 0;
+				for (auto item_off = text->FromLine(), icon_off = 0;
 					icon_off < item_count; ++item_off, ++icon_off)
 				{
 					//Create icon sprite (if missing)
@@ -392,11 +366,11 @@ void GuiListBox::UpdateIcons() noexcept
 					{
 						skin->Icons[icon_off]->AutoSize(true);
 						skin->Icons[icon_off]->ResizeToFit(icon_max_size);
-
+						
 						skin->Icons[icon_off]->Position({
 							icon_layout_ == ListBoxIconLayout::Right ?
-							skin->Lines->Position().X() + width * 0.5_r - icon_column_width * 0.5_r : //Right
-							skin->Lines->Position().X() - width * 0.5_r + icon_column_width * 0.5_r,  //Left
+							center.X() + width * 0.5_r - icon_column_width * 0.5_r : //Right
+							center.X() - width * 0.5_r + icon_column_width * 0.5_r,  //Left
 							height * 0.5_r - item_padding - item_height * 0.5_r - item_height * icon_off,
 							skin->Icons[icon_off]->Position().Z()}
 						);
@@ -426,17 +400,19 @@ void GuiListBox::UpdateSelection() noexcept
 
 		if (skin->Lines && item_index_)
 		{
-			//Get() will not reload vertex streams when called from an immutable reference
-			if (const auto &c_part = *skin->Lines.TextObject;
-				c_part.Get() && c_part.Get()->LineHeight())
+			//Lines text
+			if (auto &text = skin->Lines->GetImmutable();
+				text && text->LineHeight())
 			{
 				//Selected item is in view
-				if (auto item_off = *item_index_ - c_part.Get()->FromLine();
-					item_off >= 0 && item_off < c_part.Get()->DisplayedLineCount())
+				if (auto item_off = *item_index_ - text->FromLine();
+					item_off >= 0 && item_off < text->DisplayedLineCount())
 				{
 					if (auto size = InnerSize(); size)
 					{
 						auto [width, height] = size->XY();
+						auto center = CenterArea().value_or(aabb::Zero).Center();
+
 						auto viewport_ortho_ratio =
 							[&]() noexcept
 							{
@@ -450,8 +426,8 @@ void GuiListBox::UpdateSelection() noexcept
 								return vector2::UnitScale;
 							}();
 
-						auto item_height = *c_part.Get()->LineHeight() * viewport_ortho_ratio.Y();
-						auto item_padding = c_part.Get()->Padding().Y() * viewport_ortho_ratio.Y();
+						auto item_height = *text->LineHeight() * viewport_ortho_ratio.Y();
+						auto item_padding = text->Padding().Y() * viewport_ortho_ratio.Y();
 						auto item_selection_padding = selection_padding_.
 							value_or(detail::default_selection_padding_size) * viewport_ortho_ratio;
 
@@ -460,7 +436,7 @@ void GuiListBox::UpdateSelection() noexcept
 							CeilCopy(vector2::Zero)
 						);
 						skin->Selection->Position({
-							skin->Lines->Position().X(),
+							center.X(),
 							height * 0.5_r - item_padding - item_height * 0.5_r - item_height * item_off,
 							skin->Selection->Position().Z()}
 						);
@@ -856,53 +832,50 @@ bool GuiListBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 	if (button == MouseButton::Left)
 	{
 		if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
-			skin && skin->Selection)
+			skin && skin->Lines && skin->Selection)
 		{
-			if (skin->Lines)
+			//Lines text
+			if (auto &text = skin->Lines->GetImmutable();
+				text && text->LineHeight())
 			{
-				//Get() will not reload vertex streams when called from an immutable reference
-				if (const auto &c_part = *skin->Lines.TextObject;
-					c_part.Get() && c_part.Get()->LineHeight())
+				if (auto size = InnerSize(); size)
 				{
-					if (auto size = InnerSize(); size)
-					{
-						auto [width, height] = size->XY();
-						auto viewport_ortho_ratio =
-							[&]() noexcept
-							{
-								//Adjust area size from ortho to viewport space
-								if (auto scene_manager = skin->Lines->Owner(); scene_manager)
-								{
-									if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-										return viewport->ViewportToOrthoRatio();
-								}
-
-								return vector2::UnitScale;
-							}();
-
-						auto item_height = *c_part.Get()->LineHeight() * viewport_ortho_ratio.Y();
-						auto item_padding = c_part.Get()->Padding().Y() * viewport_ortho_ratio.Y();
-
-						//Make position relative to lines
-						if (auto node = skin->Lines->ParentNode(); node)
+					auto [width, height] = size->XY();
+					auto viewport_ortho_ratio =
+						[&]() noexcept
 						{
-							position = (position - node->DerivedPosition()).
-								RotateCopy(-node->DerivedRotation(), vector2::Zero);
+							//Adjust area size from ortho to viewport space
+							if (auto scene_manager = skin->Lines->Owner(); scene_manager)
+							{
+								if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+									return viewport->ViewportToOrthoRatio();
+							}
+
+							return vector2::UnitScale;
+						}();
+
+					auto item_height = *text->LineHeight() * viewport_ortho_ratio.Y();
+					auto item_padding = text->Padding().Y() * viewport_ortho_ratio.Y();
 						
-							height *= node->DerivedScaling().Y();
-							item_height *= node->DerivedScaling().Y();
-							item_padding *= node->DerivedScaling().Y();
-						}
+					if (skin_node_)
+					{
+						position = //Make position relative to lines
+							(position - (skin_node_->DerivedPosition() + skin->Lines->Position())).
+							RotateCopy(-skin_node_->DerivedRotation(), vector2::Zero);
 
-						auto y = -position.Y() + height * 0.5_r - item_padding - item_height * 0.5_r;
-						auto clicked_item_off = static_cast<int>(math::Round(y / item_height)) + c_part.Get()->FromLine();
-
-						//Clicked item is in view
-						if (auto item_off = clicked_item_off - c_part.Get()->FromLine();
-							item_off >= 0 && item_off < c_part.Get()->DisplayedLineCount())
-
-							ItemIndex(clicked_item_off); //Select item
+						height *= skin_node_->DerivedScaling().Y();
+						item_height *= skin_node_->DerivedScaling().Y();
+						item_padding *= skin_node_->DerivedScaling().Y();
 					}
+
+					auto y = -position.Y() + height * 0.5_r - item_padding - item_height * 0.5_r;
+					auto clicked_item_off = static_cast<int>(math::Round(y / item_height)) + text->FromLine();
+
+					//Clicked item is in view
+					if (auto item_off = clicked_item_off - text->FromLine();
+						item_off >= 0 && item_off < text->DisplayedLineCount())
+
+						ItemIndex(clicked_item_off); //Select item
 				}
 			}
 		}

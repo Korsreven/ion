@@ -237,14 +237,14 @@ bool GuiSlider::IntersectsHandle(const Vector2 &point) const noexcept
 	{
 		if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
 		{
-			if (auto node = skin.Parts->ParentNode(); node)
+			if (skin_node_)
 			{
 				skin.Handle->Prepare();
 
 				//Check for intersection
-				if (skin.Handle->AxisAlignedBoundingBox().TransformCopy(node->FullTransformation()).Intersects(point))
-					return node->AxisAligned() ||
-						skin.Handle->OrientedBoundingBox().TransformCopy(node->FullTransformation()).Intersects(point);
+				if (skin.Handle->AxisAlignedBoundingBox().TransformCopy(skin_node_->FullTransformation()).Intersects(point))
+					return skin_node_->AxisAligned() ||
+						skin.Handle->OrientedBoundingBox().TransformCopy(skin_node_->FullTransformation()).Intersects(point);
 			}
 		}
 	}
@@ -338,24 +338,25 @@ bool GuiSlider::MouseReleased(MouseButton button, Vector2 position) noexcept
 		{
 			if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
 			{
-				//Make position relative to handle
-				if (auto node = skin.Parts->ParentNode(); node)
+				auto handle_position = skin.Handle->Position();
+
+				if (skin_node_)
 				{
-					auto handle_position =
-						skin.Handle->Position() * node->DerivedScaling();
-					position = (position - node->DerivedPosition()).
-						RotateCopy(-node->DerivedRotation(), vector2::Zero);
-
-					auto delta_position =
-						(type_ == SliderType::Horizontal && position.X() < handle_position.X()) ||
-						(type_ == SliderType::Vertical && position.Y() < handle_position.Y()) ?
-						-step_by_amount_ : step_by_amount_;
-
-					if (flipped_)
-						Position(Position() - delta_position);
-					else
-						Position(Position() + delta_position);
+					position = //Make position relative to skin
+						(position - skin_node_->DerivedPosition()).
+						RotateCopy(-skin_node_->DerivedRotation(), vector2::Zero);
+					handle_position *= skin_node_->DerivedScaling();
 				}
+
+				auto delta_position =
+					(type_ == SliderType::Horizontal && position.X() < handle_position.X()) ||
+					(type_ == SliderType::Vertical && position.Y() < handle_position.Y()) ?
+					-step_by_amount_ : step_by_amount_;
+
+				if (flipped_)
+					Position(Position() - delta_position);
+				else
+					Position(Position() + delta_position);
 			}
 		}
 	}
@@ -369,26 +370,25 @@ bool GuiSlider::MouseMoved(Vector2 position) noexcept
 	{
 		if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
 		{
-			//Make position relative to handle
-			if (auto node = skin.Parts->ParentNode(); node)
+			if (auto size = InnerSize(); size)
 			{
-				//Set handle position
-				if (auto size = InnerSize(); size)
+				if (skin_node_)
 				{
-					size = (*size - skin.Handle->Size()) * node->DerivedScaling();
-					position = (position - node->DerivedPosition()).
-						RotateCopy(-node->DerivedRotation(), vector2::Zero);
-
-					auto percent =
-						type_ == SliderType::Vertical ?
-						(position.Y() + size->Y() * 0.5_r) / size->Y() :
-						(position.X() + size->X() * 0.5_r) / size->X();
-
-					if (flipped_)
-						Percent(1.0_r - percent);
-					else
-						Percent(percent);
+					position = //Make position relative to skin
+						(position - skin_node_->DerivedPosition()).
+						RotateCopy(-skin_node_->DerivedRotation(), vector2::Zero);
+					size = (*size - skin.Handle->Size()) * skin_node_->DerivedScaling();
 				}
+
+				auto percent =
+					type_ == SliderType::Vertical ?
+					(position.Y() + size->Y() * 0.5_r) / size->Y() :
+					(position.X() + size->X() * 0.5_r) / size->X();
+
+				if (flipped_)
+					Percent(1.0_r - percent);
+				else
+					Percent(percent);
 			}
 		}
 	}

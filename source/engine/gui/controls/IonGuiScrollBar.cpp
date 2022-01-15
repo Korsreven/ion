@@ -169,33 +169,36 @@ bool GuiScrollBar::MouseReleased(MouseButton button, Vector2 position) noexcept
 		{
 			if (auto &skin = static_cast<ScrollBarSkin&>(*skin_); skin.Handle)
 			{
-				//Make position relative to handle
-				if (auto node = skin.Parts->ParentNode(); node)
+				if (auto size = InnerSize(); size)
 				{
-					//Set handle position
-					if (auto size = InnerSize(); size)
+					auto handle_size = skin.Handle->Size();
+					auto handle_position = skin.Handle->Position();
+
+					if (skin_node_)
 					{
-						auto handle_size = skin.Handle->Size() * node->DerivedScaling();
-						auto handle_position = skin.Handle->Position() * node->DerivedScaling();
+						position = //Make position relative to skin
+							(position - skin_node_->DerivedPosition()).
+							RotateCopy(-skin_node_->DerivedRotation(), vector2::Zero);
+						size = (*size - skin.Handle->Size()) * skin_node_->DerivedScaling();
 
-						size = (*size - skin.Handle->Size()) * node->DerivedScaling();
-						position = (position - node->DerivedPosition()).
-							RotateCopy(-node->DerivedRotation(), vector2::Zero);
-						handle_position +=
-							(type_ == gui_slider::SliderType::Horizontal && position.X() < handle_position.X()) ||
-							(type_ == gui_slider::SliderType::Vertical && position.Y() < handle_position.Y()) ?
-							-handle_size : handle_size;
-
-						auto percent =
-							type_ == gui_slider::SliderType::Vertical ?
-							(handle_position.Y() + size->Y() * 0.5_r) / size->Y() :
-							(handle_position.X() + size->X() * 0.5_r) / size->X();
-
-						if (flipped_)
-							Percent(1.0_r - percent);
-						else
-							Percent(percent);
+						handle_size *= skin_node_->DerivedScaling();
+						handle_position *= skin_node_->DerivedScaling();
 					}
+
+					handle_position +=
+						(type_ == gui_slider::SliderType::Horizontal && position.X() < handle_position.X()) ||
+						(type_ == gui_slider::SliderType::Vertical && position.Y() < handle_position.Y()) ?
+						-handle_size : handle_size;
+
+					auto percent =
+						type_ == gui_slider::SliderType::Vertical ?
+						(handle_position.Y() + size->Y() * 0.5_r) / size->Y() :
+						(handle_position.X() + size->X() * 0.5_r) / size->X();
+
+					if (flipped_)
+						Percent(1.0_r - percent);
+					else
+						Percent(percent);
 				}
 			}
 		}

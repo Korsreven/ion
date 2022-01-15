@@ -229,7 +229,7 @@ namespace ion::gui::controls
 				Skins
 			*/
 
-			void resize_sprite(graphics::scene::shapes::Sprite &sprite, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept;
+			void resize_part(graphics::scene::shapes::Sprite &sprite, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept;
 			void resize_part(ControlVisualPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept;		
 			void resize_skin(ControlSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 
@@ -353,6 +353,7 @@ namespace ion::gui::controls
 
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
 			OwningPtr<gui_control::ControlSkin> skin_;
+			NonOwningPtr<SceneNode> skin_node_;
 			gui_control::BoundingBoxes hit_boxes_;
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
