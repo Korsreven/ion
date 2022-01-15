@@ -35,7 +35,7 @@ UniformVariable::UniformVariable(std::string name, uniform_variable::VariableTyp
 
 UniformVariable& UniformVariable::operator[](int off) noexcept
 {
-	return const_cast<UniformVariable&>(const_cast<const UniformVariable&>(*this)[off]);
+	return const_cast<UniformVariable&>(static_cast<const UniformVariable&>(*this)[off]);
 }
 
 const UniformVariable& UniformVariable::operator[](int off) const noexcept
