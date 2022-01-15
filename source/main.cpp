@@ -1863,7 +1863,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
 
 			auto check_box_mark = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w * 1.25_r, h * 1.25_r}, nullptr}); //Check mark
+				{0.0_r, 0.0_r, 0.0_r}, {w * 1.5_r, h * 1.5_r}, nullptr}); //Check mark
 			check_box_mark->IncludeBoundingVolumes(false);
 
 			check_box_center->AutoRepeat(true);
@@ -2016,7 +2016,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
 
 			auto radio_button_select = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Select
+				{0.0_r, 0.0_r, 0.0_r}, {w * 1.25_r, h * 1.25_r}, nullptr}); //Select
 			radio_button_select->IncludeBoundingVolumes(false);
 
 			radio_button_center->AutoRepeat(true);
@@ -2053,7 +2053,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
 
 			auto radio_button2_select = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Select
+				{0.0_r, 0.0_r, 0.0_r}, {w * 1.25_r, h * 1.25_r}, nullptr}); //Select
 			radio_button2_select->IncludeBoundingVolumes(false);
 
 			radio_button2_center->AutoRepeat(true);
