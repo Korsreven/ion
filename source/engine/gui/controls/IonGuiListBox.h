@@ -77,7 +77,7 @@ namespace ion::gui::controls
 		struct ListBoxSkin : gui_control::ControlSkin
 		{
 			gui_control::ControlCaptionPart Lines;
-			gui_control::ControlVisualPart Selection;		
+			gui_control::ControlVisualPart Selection;
 
 			std::vector<NonOwningPtr<graphics::scene::shapes::Sprite>> Icons;
 				//Sprites for each visible icon
@@ -118,10 +118,13 @@ namespace ion::gui::controls
 
 
 			/*
-				Lines
+				Items/lines
 			*/
 
-			std::string item_content_to_text_content(const gui_list_box::ListBoxItems &items);
+			void trim_item(gui_list_box::ListBoxItem &item) noexcept;
+			void trim_items(gui_list_box::ListBoxItems &items) noexcept;			
+			std::string items_to_text_content(const gui_list_box::ListBoxItems &items);
+
 			Vector2 lines_area_offset(ListBoxIconLayout icon_layout, const Vector2 &icon_column_size) noexcept;
 		} //detail
 	} //gui_list_box

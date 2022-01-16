@@ -55,19 +55,33 @@ void resize_skin(ListBoxSkin &skin, const Vector2 &from_size, const Vector2 &to_
 
 
 /*
-	Lines
+	Items/lines
 */
 
-std::string item_content_to_text_content(const gui_list_box::ListBoxItems &items)
+void trim_item(gui_list_box::ListBoxItem &item) noexcept
+{
+	using namespace utilities;
+	string::ReplaceAll(item.Content, "<br>", "\n");
+	string::RemoveNonPrintable(item.Content);
+}
+
+void trim_items(gui_list_box::ListBoxItems &items) noexcept
+{
+	for (auto &item : items)
+		trim_item(item);
+}
+
+std::string items_to_text_content(const gui_list_box::ListBoxItems &items)
 {
 	using namespace utilities;
 	auto content = items.front().Content;
 
 	for (auto iter = std::begin(items) + 1, end = std::end(items); iter != end; ++iter)
-		content += "\n" + string::RemoveNonPrintableCopy(iter->Content);
+		content += "\n" + iter->Content;
 
 	return content;
 }
+
 
 Vector2 lines_area_offset(ListBoxIconLayout icon_layout, const Vector2 &icon_column_size) noexcept
 {
@@ -300,7 +314,7 @@ void GuiListBox::UpdateLines() noexcept
 
 				//Content
 				if (text->LineCount() != std::ssize(items_))
-					text->Content(detail::item_content_to_text_content(items_));
+					text->Content(detail::items_to_text_content(items_));
 
 				skin->Lines->Position(center + detail::lines_area_offset(icon_layout_, icon_column_size));
 			}
@@ -463,7 +477,7 @@ void GuiListBox::InsertLines(int off, const gui_list_box::ListBoxItems &items)
 	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
 		skin && skin->Lines && skin->Lines->Get())
 
-		skin->Lines->Get()->InsertLine(off, detail::item_content_to_text_content(items));
+		skin->Lines->Get()->InsertLine(off, detail::items_to_text_content(items));
 }
 
 void GuiListBox::ReplaceLines(int first, int last, const gui_list_box::ListBoxItems &items)
@@ -473,7 +487,7 @@ void GuiListBox::ReplaceLines(int first, int last, const gui_list_box::ListBoxIt
 	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
 		skin && skin->Lines && skin->Lines->Get())
 	{
-		skin->Lines->Get()->ReplaceLines(first, last, detail::item_content_to_text_content(items));
+		skin->Lines->Get()->ReplaceLines(first, last, detail::items_to_text_content(items));
 
 		auto count = skin->Lines->Get()->LineCount();
 		auto view_count = skin->Lines->Get()->DisplayedLineCount();
@@ -630,6 +644,8 @@ void GuiListBox::InsertItems(int off, ListBoxItems items)
 {
 	if (off >= 0)
 	{
+		detail::trim_items(items);
+
 		off = std::clamp(off, 0, std::ssize(items_));
 		items_.insert(std::begin(items_) + off, std::begin(items), std::end(items));
 
@@ -678,6 +694,8 @@ void GuiListBox::ReplaceItems(int first, int last, ListBoxItems items)
 {
 	if (first >= 0 && first < last)
 	{
+		detail::trim_items(items);
+
 		last = std::clamp(last, first, std::ssize(items_));
 		items_.erase(std::begin(items_) + first, std::begin(items_) + last);
 		items_.insert(std::begin(items_) + first, std::begin(items), std::end(items));
