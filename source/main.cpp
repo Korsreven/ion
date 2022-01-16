@@ -155,6 +155,7 @@ File:	main.cpp
 #include "gui/controls/IonGuiRadioButton.h"
 #include "gui/controls/IonGuiScrollBar.h"
 #include "gui/controls/IonGuiSlider.h"
+#include "gui/controls/IonGuiTextBox.h"
 #include "gui/controls/IonGuiTooltip.h"
 
 #include "managed/IonManagedObject.h"

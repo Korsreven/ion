@@ -30,6 +30,7 @@ File:	IonGuiPanelContainer.h
 #include "controls/IonGuiRadioButton.h"
 #include "controls/IonGuiScrollBar.h"
 #include "controls/IonGuiSlider.h"
+#include "controls/IonGuiTextBox.h"
 #include "graphics/utilities/IonVector2.h"
 #include "memory/IonNonOwningPtr.h"
 
@@ -387,6 +388,23 @@ namespace ion::gui
 
 			//Create a slider by moving the given slider
 			NonOwningPtr<controls::GuiSlider> CreateSlider(controls::GuiSlider &&slider);
+
+
+			/*
+				Text boxes
+				Creating
+			*/
+
+			//Create a text box with the given name, caption, skin and hit boxes
+			NonOwningPtr<controls::GuiTextBox> CreateTextBox(std::string name, std::optional<std::string> caption,
+				controls::gui_text_box::TextBoxSkin skin, controls::gui_control::BoundingBoxes hit_boxes = {});
+
+			//Create a text box with the given name, caption, skin, size and hit boxes
+			NonOwningPtr<controls::GuiTextBox> CreateTextBox(std::string name, std::optional<std::string> caption,
+				controls::gui_text_box::TextBoxSkin skin, const Vector2 &size, controls::gui_control::BoundingBoxes hit_boxes = {});
+
+			//Create a text box by moving the given text box
+			NonOwningPtr<controls::GuiTextBox> CreateTextBox(controls::GuiTextBox &&text_box);
 
 
 			/*

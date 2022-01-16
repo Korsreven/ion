@@ -447,6 +447,31 @@ NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(controls::GuiS
 
 
 /*
+	Text boxes
+	Creating
+*/
+
+NonOwningPtr<controls::GuiTextBox> GuiPanelContainer::CreateTextBox(std::string name, std::optional<std::string> caption,
+	controls::gui_text_box::TextBoxSkin skin, controls::gui_control::BoundingBoxes hit_boxes)
+{
+	return CreateControl<controls::GuiTextBox>(std::move(name), std::move(caption),
+		make_owning<controls::gui_text_box::TextBoxSkin>(std::move(skin)), std::move(hit_boxes));
+}
+
+NonOwningPtr<controls::GuiTextBox> GuiPanelContainer::CreateTextBox(std::string name, std::optional<std::string> caption,
+	controls::gui_text_box::TextBoxSkin skin, const Vector2 &size, controls::gui_control::BoundingBoxes hit_boxes)
+{
+	return CreateControl<controls::GuiTextBox>(std::move(name), std::move(caption),
+		make_owning<controls::gui_text_box::TextBoxSkin>(std::move(skin)), size, std::move(hit_boxes));
+}
+
+NonOwningPtr<controls::GuiTextBox> GuiPanelContainer::CreateTextBox(controls::GuiTextBox &&text_box)
+{
+	return CreateControl<controls::GuiTextBox>(std::move(text_box));
+}
+
+
+/*
 	Controls
 	Retrieving
 */
