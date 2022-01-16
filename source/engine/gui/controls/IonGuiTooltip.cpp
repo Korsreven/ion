@@ -94,7 +94,7 @@ void GuiTooltip::UpdateCaption() noexcept
 				if (caption_)
 					text->Content(*caption_);
 				else
-					text->Content({});
+					text->Clear();
 
 
 				if (auto size = text->MinimumAreaSize(); size != vector2::Zero)
