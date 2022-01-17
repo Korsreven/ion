@@ -222,6 +222,7 @@ namespace ion::graphics::fonts::utilities
 			Measuring
 		*/
 
+		Font* get_font(const TypeFace &type_face, const std::optional<text::TextFontStyle> &font_style) noexcept;
 		const font::GlyphMetrices* get_glyph_metrics(Font &font);
 
 		inline auto& get_text_block_metrics(

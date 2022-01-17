@@ -731,6 +731,38 @@ std::string text_blocks_to_string(const text::TextBlocks &text_blocks)
 	Measuring
 */
 
+Font* get_font(const TypeFace &type_face, const std::optional<text::TextFontStyle> &font_style) noexcept
+{
+	if (font_style)
+	{
+		switch (*font_style)
+		{
+			case fonts::text::TextFontStyle::Bold:
+			{
+				if (type_face.BoldFont())
+					return type_face.BoldFont().get();
+				break;
+			}
+
+			case fonts::text::TextFontStyle::Italic:
+			{
+				if (type_face.ItalicFont())
+					return type_face.ItalicFont().get();
+				break;
+			}
+
+			case fonts::text::TextFontStyle::BoldItalic:
+			{
+				if (type_face.BoldItalicFont())
+					return type_face.BoldItalicFont().get();
+				break;
+			}
+		}
+	}
+
+	return type_face.RegularFont().get();
+}
+
 const font::GlyphMetrices* get_glyph_metrics(Font &font)
 {
 	if (font.IsLoaded() || (font.Owner() && font.Owner()->Load(font)))

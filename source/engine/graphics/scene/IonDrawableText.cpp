@@ -166,36 +166,7 @@ std::optional<Color> get_text_decoration_color(const fonts::text::TextBlock &tex
 fonts::Font* get_default_font(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept
 {
 	if (auto type_face = text.Lettering(); type_face)
-	{
-		if (auto font_style = get_font_style(text_block, text); font_style)
-		{
-			switch (*font_style)
-			{
-				case fonts::text::TextFontStyle::Bold:
-				{
-					if (type_face->BoldFont())
-						return type_face->BoldFont().get();
-					break;
-				}
-
-				case fonts::text::TextFontStyle::Italic:
-				{
-					if (type_face->ItalicFont())
-						return type_face->ItalicFont().get();
-					break;
-				}
-
-				case fonts::text::TextFontStyle::BoldItalic:
-				{
-					if (type_face->BoldItalicFont())
-						return type_face->BoldItalicFont().get();
-					break;
-				}
-			}
-		}
-
-		return type_face->RegularFont().get();
-	}
+		return fonts::utilities::detail::get_font(*type_face, get_font_style(text_block, text));
 	else
 		return nullptr;
 }
