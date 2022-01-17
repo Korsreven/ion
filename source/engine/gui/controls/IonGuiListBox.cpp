@@ -73,7 +73,6 @@ void trim_items(gui_list_box::ListBoxItems &items) noexcept
 
 std::string items_to_text_content(const gui_list_box::ListBoxItems &items)
 {
-	using namespace utilities;
 	auto content = items.front().Content;
 
 	for (auto iter = std::begin(items) + 1, end = std::end(items); iter != end; ++iter)
@@ -174,7 +173,8 @@ void GuiListBox::Scrolled(int delta) noexcept
 
 int GuiListBox::TotalElements() noexcept
 {
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+		skin && skin->Lines && skin->Lines->GetImmutable())
 		return skin->Lines->GetImmutable()->LineCount();
 	else
 		return 0;
@@ -182,7 +182,8 @@ int GuiListBox::TotalElements() noexcept
 
 int GuiListBox::ElementsInView() noexcept
 {
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+		skin && skin->Lines && skin->Lines->GetImmutable())
 		return skin->Lines->GetImmutable()->DisplayedLineCount();
 	else
 		return 0;
@@ -191,7 +192,8 @@ int GuiListBox::ElementsInView() noexcept
 
 int GuiListBox::ScrollPosition() noexcept
 {
-	if (auto skin = static_cast<ListBoxSkin*>(skin_.get()); skin && skin->Lines)
+	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
+		skin && skin->Lines && skin->Lines->GetImmutable())
 		return skin->Lines->GetImmutable()->FromLine();
 	else
 		return 0;
@@ -312,7 +314,7 @@ void GuiListBox::UpdateLines() noexcept
 				text->Padding(item_padding_.value_or(detail::default_item_padding_size));
 				text->Alignment(detail::item_layout_to_text_alignment(item_layout_));
 
-				//Content
+				//Refresh content
 				if (text->LineCount() != std::ssize(items_))
 					text->Content(detail::items_to_text_content(items_));
 
@@ -472,45 +474,52 @@ void GuiListBox::UpdateSelection() noexcept
 
 void GuiListBox::InsertLines(int off, const gui_list_box::ListBoxItems &items)
 {
-	using namespace utilities;
-
 	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
-		skin && skin->Lines && skin->Lines->Get())
-
-		skin->Lines->Get()->InsertLine(off, detail::items_to_text_content(items));
+		skin && skin->Lines)
+	{
+		//Lines text
+		if (auto &text = skin->Lines->Get(); text)
+			text->InsertLine(off, detail::items_to_text_content(items));
+	}
 }
 
 void GuiListBox::ReplaceLines(int first, int last, const gui_list_box::ListBoxItems &items)
 {
-	using namespace utilities;
-
 	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
-		skin && skin->Lines && skin->Lines->Get())
+		skin && skin->Lines)
 	{
-		skin->Lines->Get()->ReplaceLines(first, last, detail::items_to_text_content(items));
+		//Lines text
+		if (auto &text = skin->Lines->Get(); text)
+		{
+			text->ReplaceLines(first, last, detail::items_to_text_content(items));
 
-		auto count = skin->Lines->Get()->LineCount();
-		auto view_count = skin->Lines->Get()->DisplayedLineCount();
-		auto view_capacity = skin->Lines->Get()->DisplayedLineCapacity().value_or(0);
+			auto count = text->LineCount();
+			auto view_count = text->DisplayedLineCount();
+			auto view_capacity = text->DisplayedLineCapacity().value_or(0);
 
-		if (count > view_count && view_count < view_capacity)
-			Scrolled(view_count - view_capacity);
+			if (count > view_count && view_count < view_capacity)
+				Scrolled(view_count - view_capacity);
+		}
 	}
 }
 
 void GuiListBox::RemoveLines(int first, int last) noexcept
 {
 	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
-		skin && skin->Lines && skin->Lines->Get())
+		skin && skin->Lines)
 	{
-		skin->Lines->Get()->RemoveLines(first, last);
+		//Lines text
+		if (auto &text = skin->Lines->Get(); text)
+		{
+			text->RemoveLines(first, last);
 
-		auto count = skin->Lines->Get()->LineCount();
-		auto view_count = skin->Lines->Get()->DisplayedLineCount();
-		auto view_capacity = skin->Lines->Get()->DisplayedLineCapacity().value_or(0);
+			auto count = text->LineCount();
+			auto view_count = text->DisplayedLineCount();
+			auto view_capacity = text->DisplayedLineCapacity().value_or(0);
 
-		if (count > view_count && view_count < view_capacity)
-			Scrolled(view_count - view_capacity);
+			if (count > view_count && view_count < view_capacity)
+				Scrolled(view_count - view_capacity);
+		}
 	}
 }
 
@@ -519,8 +528,12 @@ void GuiListBox::ClearLines() noexcept
 	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
 		skin && skin->Lines && skin->Lines->Get())
 	{
-		skin->Lines->Get()->Clear();
-		skin->Lines->Get()->FromLine(0);
+		//Lines text
+		if (auto &text = skin->Lines->Get(); text)
+		{
+			text->Clear();
+			text->FromLine(0);
+		}
 	}
 }
 
