@@ -12,6 +12,9 @@ File:	IonGuiTextBox.cpp
 
 #include "IonGuiTextBox.h"
 
+#include <algorithm>
+
+#include "graphics/fonts/utilities/IonFontUtility.h"
 #include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
@@ -53,6 +56,27 @@ std::string truncate_content(std::string content, int max_characters) noexcept
 		return content.substr(0, max_characters);
 	else
 		return content;
+}
+
+std::string truncate_content(std::string content, const Vector2 &area_size, const Vector2 &padding, const TextBoxSkin &skin) noexcept
+{
+	if (skin.Text)
+	{
+		//Text
+		if (auto &text = skin.Text->GetImmutable(); text)
+		{
+			if (auto type_face = text->Lettering(); type_face)
+			{
+				if (auto font = graphics::fonts::utilities::detail::get_font(*type_face, text->DefaultFontStyle()); font)
+					content = graphics::fonts::utilities::TruncateString(
+						std::move(content),
+						graphics::fonts::text::detail::text_area_max_size(area_size, padding).X(),
+						*font).value_or("");
+			}
+		}
+	}
+
+	return content;
 }
 
 std::string mask_content(std::string content, char mask) noexcept
@@ -131,7 +155,8 @@ void GuiTextBox::Scrolled(int delta) noexcept
 
 int GuiTextBox::TotalElements() noexcept
 {
-	if (auto skin = static_cast<TextBoxSkin*>(skin_.get()); skin && skin->Text)
+	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
+		skin && skin->Text && skin->Text->GetImmutable())
 		return skin->Text->GetImmutable()->LineCount();
 	else
 		return 0;
@@ -139,7 +164,8 @@ int GuiTextBox::TotalElements() noexcept
 
 int GuiTextBox::ElementsInView() noexcept
 {
-	if (auto skin = static_cast<TextBoxSkin*>(skin_.get()); skin && skin->Text)
+	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
+		skin && skin->Text && skin->Text->GetImmutable())
 		return skin->Text->GetImmutable()->DisplayedLineCount();
 	else
 		return 0;
@@ -148,7 +174,8 @@ int GuiTextBox::ElementsInView() noexcept
 
 int GuiTextBox::ScrollPosition() noexcept
 {
-	if (auto skin = static_cast<TextBoxSkin*>(skin_.get()); skin && skin->Text)
+	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
+		skin && skin->Text && skin->Text->GetImmutable())
 		return skin->Text->GetImmutable()->FromLine();
 	else
 		return 0;
@@ -246,10 +273,14 @@ void GuiTextBox::UpdateText() noexcept
 				text->Padding(text_padding_.value_or(detail::default_text_padding_size));
 				text->Alignment(detail::text_layout_to_text_alignment(text_layout_));
 
-				if (mask_)
-					text->Content(detail::mask_content(content_, *mask_));
-				else
-					text->Content(content_);
+				//Refresh content
+				if (std::ssize(text->Content()) != std::ssize(content_))
+				{
+					if (mask_)
+						text->Content(detail::mask_content(content_, *mask_));
+					else
+						text->Content(content_);
+				}
 
 				skin->Text->Position(center);
 			}
@@ -262,6 +293,104 @@ void GuiTextBox::UpdateText() noexcept
 void GuiTextBox::UpdateCursor() noexcept
 {
 	//Todo
+}
+
+
+/*
+	Content
+*/
+
+void GuiTextBox::InsertTextContent(int off, std::string content)
+{
+	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
+		skin && skin->Text && skin->Text->Get())
+	{
+		//Text
+		if (auto &text = skin->Text->Get(); text)
+		{
+			if (off == 0)
+			{
+				if (mask_)
+					text->PrependContent(detail::mask_content(content_, *mask_));
+				else
+					text->PrependContent(content_);
+			}
+			else if (off == std::ssize(content))
+			{
+				if (mask_)
+					text->AppendContent(detail::mask_content(content_, *mask_));
+				else
+					text->AppendContent(content_);
+			}
+			else
+			{
+				if (mask_)
+					text->Content(detail::mask_content(content_, *mask_));
+				else
+					text->Content(content_); //No optimization yet
+			}
+		}
+	}
+}
+
+void GuiTextBox::ReplaceTextContent(int first, int last, std::string content)
+{
+	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
+		skin && skin->Text && skin->Text->Get())
+	{
+		//Text
+		if (auto &text = skin->Text->Get(); text)
+		{
+			if (mask_)
+				text->Content(detail::mask_content(content_, *mask_));
+			else
+				text->Content(content_); //No optimization yet
+
+			auto count = text->LineCount();
+			auto view_count = text->DisplayedLineCount();
+			auto view_capacity = text->DisplayedLineCapacity().value_or(0);
+
+			if (count > view_count && view_count < view_capacity)
+				Scrolled(view_count - view_capacity);
+		}
+	}
+}
+
+void GuiTextBox::RemoveTextContent(int first, int last) noexcept
+{
+	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
+		skin && skin->Text && skin->Text->Get())
+	{
+		//Text
+		if (auto &text = skin->Text->Get(); text)
+		{
+			if (mask_)
+				text->Content(detail::mask_content(content_, *mask_));
+			else
+				text->Content(content_); //No optimization yet
+
+			auto count = text->LineCount();
+			auto view_count = text->DisplayedLineCount();
+			auto view_capacity = text->DisplayedLineCapacity().value_or(0);
+
+			if (count > view_count && view_count < view_capacity)
+				Scrolled(view_count - view_capacity);
+		}
+	}
+}
+
+void GuiTextBox::ClearTextContent() noexcept
+{
+	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
+		skin && skin->Text && skin->Text->Get())
+	{
+		//Text
+		if (auto &text = skin->Text->Get(); text)
+		{
+			text->Clear();
+			text->FromLine(0);
+		}
+	}
 }
 
 
@@ -279,6 +408,111 @@ GuiTextBox::GuiTextBox(std::string name, std::optional<std::string> caption,
 	GuiScrollable{std::move(name), std::move(caption), {}, std::move(skin), size, std::move(hit_boxes)}
 {
 	DefaultSetup();
+}
+
+
+/*
+	Content
+	Adding/inserting
+*/
+
+void GuiTextBox::AddContent(std::string content)
+{
+	InsertContent(std::ssize(content_), std::move(content));
+}
+
+void GuiTextBox::InsertContent(int off, std::string content)
+{
+	if (off >= 0)
+	{
+		content = gui_text_box::detail::trim_content(std::move(content), text_mode_);
+
+		if (max_characters_)
+			content = gui_text_box::detail::truncate_content(std::move(content),
+				*max_characters_ - std::ssize(content_));
+
+		off = std::clamp(off, 0, std::ssize(content));
+		content_.insert(std::begin(content_) + off, std::begin(content), std::end(content));
+
+		//Adjust cursor position
+		if (cursor_position_ >= off)
+			CursorPosition(cursor_position_ + std::ssize(content));
+
+		InsertTextContent(off, std::move(content));
+		UpdateText();
+	}
+}
+
+
+/*
+	Content
+	Replacing
+*/
+
+void GuiTextBox::ReplaceContent(int off, std::string content)
+{
+	ReplaceContent(off, off + 1, std::move(content));
+}
+
+void GuiTextBox::ReplaceContent(int first, int last, std::string content)
+{
+	if (first >= 0 && first < last)
+	{
+		content = gui_text_box::detail::trim_content(std::move(content), text_mode_);
+
+		if (max_characters_ && std::ssize(content) > last - first)
+			content = gui_text_box::detail::truncate_content(std::move(content),
+				*max_characters_ - (std::ssize(content_) - (last - first)));
+
+		last = std::clamp(last, first, std::ssize(content_));
+		content_.erase(std::begin(content_) + first, std::begin(content_) + last);
+		content_.insert(std::begin(content_) + first, std::begin(content), std::end(content));
+
+		//Adjust cursor position
+		if (cursor_position_ >= first && cursor_position_ < last &&
+			cursor_position_ - first >= std::ssize(content))
+			CursorPosition(0);
+		else if (cursor_position_ >= last)
+			CursorPosition(cursor_position_ + (std::ssize(content) - (last - first)));
+
+		ReplaceTextContent(first, last, std::move(content));
+		UpdateText();
+	}
+}
+
+
+/*
+	Content
+	Removing
+*/
+
+void GuiTextBox::ClearContent() noexcept
+{
+	content_.clear();
+	content_.shrink_to_fit();
+
+	CursorPosition(0);
+
+	ClearTextContent();
+	UpdateText();
+}
+
+void GuiTextBox::RemoveContent(int first, int last) noexcept
+{
+	if (first >= 0 && first < last)
+	{
+		last = std::clamp(last, first, std::ssize(content_));
+		content_.erase(std::begin(content_) + first, std::begin(content_) + last);
+
+		//Adjust cursor position
+		if (cursor_position_ >= first && cursor_position_ < last)
+			CursorPosition(0);
+		else if (cursor_position_ >= last)
+			CursorPosition(cursor_position_ - (last - first));
+
+		RemoveTextContent(first, last);
+		UpdateText();
+	}
 }
 
 

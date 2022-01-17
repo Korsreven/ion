@@ -93,6 +93,7 @@ namespace ion::gui::controls
 
 			std::string trim_content(std::string content, TextBoxTextMode text_mode) noexcept;
 			std::string truncate_content(std::string content, int max_characters) noexcept;
+			std::string truncate_content(std::string content, const Vector2 &area_size, const Vector2 &padding, const TextBoxSkin &skin) noexcept;
 			std::string mask_content(std::string content, char mask) noexcept;
 		} //detail
 	} //gui_text_box
@@ -157,6 +158,16 @@ namespace ion::gui::controls
 			
 			virtual void UpdateText() noexcept;
 			virtual void UpdateCursor() noexcept;
+
+
+			/*
+				Text content
+			*/
+
+			void InsertTextContent(int off, std::string content);
+			void ReplaceTextContent(int first, int last, std::string content);
+			void RemoveTextContent(int first, int last) noexcept;
+			void ClearTextContent() noexcept;
 
 		public:
 
@@ -325,6 +336,42 @@ namespace ion::gui::controls
 			{
 				return reveal_distance_;
 			}
+
+
+			/*
+				Content
+				Adding/inserting
+			*/
+
+			//Adds the given content in the text box
+			void AddContent(std::string content);
+
+			//Inserts the given content, at the given offset in the text box
+			void InsertContent(int off, std::string content);
+
+
+			/*
+				Content
+				Replacing
+			*/
+
+			//Replaces the content at the given offset, with the given content
+			void ReplaceContent(int off, std::string content);
+
+			//Replaces the content in range [first, last), with the given content
+			void ReplaceContent(int first, int last, std::string content);
+
+
+			/*
+				Content
+				Removing
+			*/
+
+			//Clears all content in this text box
+			void ClearContent() noexcept;
+
+			//Removes all content in range [first, last) in this text box
+			void RemoveContent(int first, int last) noexcept;
 
 
 			/*
