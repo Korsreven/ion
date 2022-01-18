@@ -21,6 +21,7 @@ File:	IonGuiListBox.h
 #include "adaptors/ranges/IonIterable.h"
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
+#include "graphics/fonts/IonText.h"
 #include "graphics/utilities/IonVector2.h"
 #include "memory/IonNonOwningPtr.h"
 #include "memory/IonOwningPtr.h"
