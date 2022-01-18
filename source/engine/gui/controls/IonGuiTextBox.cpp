@@ -12,8 +12,6 @@ File:	IonGuiTextBox.cpp
 
 #include "IonGuiTextBox.h"
 
-#include <algorithm>
-
 #include "graphics/fonts/utilities/IonFontUtility.h"
 #include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonDrawableText.h"
@@ -58,33 +56,41 @@ std::string truncate_content(std::string content, int max_characters) noexcept
 		return content;
 }
 
-std::string truncate_content(std::string content, const Vector2 &area_size, const Vector2 &padding, const TextBoxSkin &skin) noexcept
-{
-	if (skin.Text)
-	{
-		//Text
-		if (auto &text = skin.Text->GetImmutable(); text)
-		{
-			if (auto type_face = text->Lettering(); type_face)
-			{
-				if (auto font = graphics::fonts::utilities::detail::get_font(*type_face, text->DefaultFontStyle()); font)
-					content = graphics::fonts::utilities::TruncateString(
-						std::move(content),
-						graphics::fonts::text::detail::text_area_max_size(area_size, padding).X(),
-						*font).value_or("");
-			}
-		}
-	}
-
-	return content;
-}
-
 std::string mask_content(std::string content, char mask) noexcept
 {
 	for (auto &c : content)
 		c = mask;
 
 	return content;
+}
+
+
+std::pair<int, int> get_content_view(const std::string &content, int cursor_position, std::pair<int, int> content_view,
+	const graphics::fonts::Text &text) noexcept
+{
+	if (auto area_size = text.AreaSize(); area_size)
+	{
+		if (auto type_face = text.Lettering(); type_face)
+		{
+			/*if (auto font = graphics::fonts::utilities::detail::get_font(*type_face, text.DefaultFontStyle()); font)
+				graphics::fonts::utilities::TruncateString(
+					std::move(content),
+					graphics::fonts::text::detail::text_area_max_size(*area_size, text.Padding()).X(),
+					*font).value_or("");*/
+		}
+	}
+
+	return {};
+}
+
+std::string get_viewed_content(const std::string &content, std::pair<int, int> content_view, std::optional<char> mask)
+{
+	auto str = content.substr(content_view.first, content_view.second - content_view.first);
+
+	if (mask)
+		return mask_content(std::move(str), *mask);
+	else
+		return str;
 }
 
 } //gui_text_box::detail
@@ -273,13 +279,15 @@ void GuiTextBox::UpdateText() noexcept
 				text->Padding(text_padding_.value_or(detail::default_text_padding_size));
 				text->Alignment(detail::text_layout_to_text_alignment(text_layout_));
 
-				//Refresh content
-				if (std::ssize(text->Content()) != std::ssize(content_))
+				if (!std::empty(content_))
 				{
-					if (mask_)
-						text->Content(detail::mask_content(content_, *mask_));
-					else
-						text->Content(content_);
+					content_view_ = detail::get_content_view(content_, cursor_position_, content_view_, *text);
+					text->Content(detail::get_viewed_content(content_, content_view_, mask_));
+				}
+				else
+				{
+					content_view_ = {};
+					text->Clear();
 				}
 
 				skin->Text->Position(center);
@@ -305,31 +313,7 @@ void GuiTextBox::InsertTextContent(int off, std::string content)
 	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
 		skin && skin->Text && skin->Text->Get())
 	{
-		//Text
-		if (auto &text = skin->Text->Get(); text)
-		{
-			if (off == 0)
-			{
-				if (mask_)
-					text->PrependContent(detail::mask_content(content_, *mask_));
-				else
-					text->PrependContent(content_);
-			}
-			else if (off == std::ssize(content))
-			{
-				if (mask_)
-					text->AppendContent(detail::mask_content(content_, *mask_));
-				else
-					text->AppendContent(content_);
-			}
-			else
-			{
-				if (mask_)
-					text->Content(detail::mask_content(content_, *mask_));
-				else
-					text->Content(content_); //No optimization yet
-			}
-		}
+		//Empty
 	}
 }
 
@@ -341,11 +325,6 @@ void GuiTextBox::ReplaceTextContent(int first, int last, std::string content)
 		//Text
 		if (auto &text = skin->Text->Get(); text)
 		{
-			if (mask_)
-				text->Content(detail::mask_content(content_, *mask_));
-			else
-				text->Content(content_); //No optimization yet
-
 			auto count = text->LineCount();
 			auto view_count = text->DisplayedLineCount();
 			auto view_capacity = text->DisplayedLineCapacity().value_or(0);
@@ -364,11 +343,6 @@ void GuiTextBox::RemoveTextContent(int first, int last) noexcept
 		//Text
 		if (auto &text = skin->Text->Get(); text)
 		{
-			if (mask_)
-				text->Content(detail::mask_content(content_, *mask_));
-			else
-				text->Content(content_); //No optimization yet
-
 			auto count = text->LineCount();
 			auto view_count = text->DisplayedLineCount();
 			auto view_capacity = text->DisplayedLineCapacity().value_or(0);
@@ -469,10 +443,9 @@ void GuiTextBox::ReplaceContent(int first, int last, std::string content)
 		content_.insert(std::begin(content_) + first, std::begin(content), std::end(content));
 
 		//Adjust cursor position
-		if (cursor_position_ >= first && cursor_position_ < last &&
-			cursor_position_ - first >= std::ssize(content))
-			CursorPosition(0);
-		else if (cursor_position_ >= last)
+		if (cursor_position_ >= first && cursor_position_ <= last)
+			CursorPosition(first + std::ssize(content));
+		else if (cursor_position_ > last)
 			CursorPosition(cursor_position_ + (std::ssize(content) - (last - first)));
 
 		ReplaceTextContent(first, last, std::move(content));
@@ -505,9 +478,9 @@ void GuiTextBox::RemoveContent(int first, int last) noexcept
 		content_.erase(std::begin(content_) + first, std::begin(content_) + last);
 
 		//Adjust cursor position
-		if (cursor_position_ >= first && cursor_position_ < last)
-			CursorPosition(0);
-		else if (cursor_position_ >= last)
+		if (cursor_position_ > first && cursor_position_ <= last)
+			CursorPosition(first);
+		else if (cursor_position_ > last)
 			CursorPosition(cursor_position_ - (last - first));
 
 		RemoveTextContent(first, last);

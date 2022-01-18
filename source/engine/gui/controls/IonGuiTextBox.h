@@ -13,13 +13,16 @@ File:	IonGuiTextBox.h
 #ifndef ION_GUI_TEXT_BOX_H
 #define ION_GUI_TEXT_BOX_H
 
+#include <algorithm>
 #include <cctype>
 #include <optional>
 #include <string>
+#include <utility>
 
 #include "IonGuiScrollable.h"
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
+#include "graphics/fonts/IonText.h"
 #include "graphics/utilities/IonVector2.h"
 #include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
@@ -93,8 +96,11 @@ namespace ion::gui::controls
 
 			std::string trim_content(std::string content, TextBoxTextMode text_mode) noexcept;
 			std::string truncate_content(std::string content, int max_characters) noexcept;
-			std::string truncate_content(std::string content, const Vector2 &area_size, const Vector2 &padding, const TextBoxSkin &skin) noexcept;
 			std::string mask_content(std::string content, char mask) noexcept;
+
+			std::pair<int, int> get_content_view(const std::string &content, int cursor_position, std::pair<int, int> content_view,
+				const graphics::fonts::Text &text) noexcept;
+			std::string get_viewed_content(const std::string &content, std::pair<int, int> content_view, std::optional<char> mask);
 		} //detail
 	} //gui_text_box
 
@@ -111,12 +117,13 @@ namespace ion::gui::controls
 			std::optional<int> max_characters_;
 			std::optional<char> mask_;
 
-			int cursor_position_ = 0;
-			int reveal_distance_ = 0;
-
 			std::optional<Vector2> text_padding_;
 			gui_text_box::TextBoxTextMode text_mode_ = gui_text_box::TextBoxTextMode::AlphaNumeric;
 			gui_text_box::TextBoxTextLayout text_layout_ = gui_text_box::TextBoxTextLayout::Left;
+
+			int cursor_position_ = 0;
+			int reveal_distance_ = 0;
+			std::pair<int, int> content_view_;
 
 
 			/*
@@ -266,6 +273,8 @@ namespace ion::gui::controls
 			//Sets the cursor position for this text box to the given position
 			inline void CursorPosition(int position) noexcept
 			{
+				position = std::clamp(position, 0, std::ssize(content_));
+
 				if (cursor_position_ != position)
 				{
 					cursor_position_ = position;
