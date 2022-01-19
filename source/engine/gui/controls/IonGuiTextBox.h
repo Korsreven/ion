@@ -17,6 +17,7 @@ File:	IonGuiTextBox.h
 #include <cctype>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "IonGuiScrollable.h"
@@ -77,6 +78,7 @@ namespace ion::gui::controls
 		namespace detail
 		{
 			constexpr auto default_text_padding_size = 2.0_r;
+			constexpr auto default_reveal_count_ = 10;
 
 
 			inline auto text_layout_to_text_alignment(TextBoxTextLayout text_layout) noexcept
@@ -98,8 +100,9 @@ namespace ion::gui::controls
 			std::string truncate_content(std::string content, int max_characters) noexcept;
 			std::string mask_content(std::string content, char mask) noexcept;
 
-			std::pair<int, int> get_content_view(const std::string &content, int cursor_position, std::pair<int, int> content_view,
-				const graphics::fonts::Text &text) noexcept;
+			bool reveal_character(char c, real &width, int max_width, graphics::fonts::Font &font) noexcept;
+			std::pair<int, int> get_content_view(std::string_view content, int cursor_position, std::pair<int, int> content_view,
+				std::optional<char> mask, int reveal_count, const graphics::fonts::Text &text) noexcept;
 			std::string get_viewed_content(const std::string &content, std::pair<int, int> content_view, std::optional<char> mask);
 		} //detail
 	} //gui_text_box
@@ -114,6 +117,7 @@ namespace ion::gui::controls
 		protected:
 
 			std::string content_;
+			std::optional<std::string> placeholder_content_;
 			std::optional<int> max_characters_;
 			std::optional<char> mask_;
 
@@ -122,13 +126,19 @@ namespace ion::gui::controls
 			gui_text_box::TextBoxTextLayout text_layout_ = gui_text_box::TextBoxTextLayout::Left;
 
 			int cursor_position_ = 0;
-			int reveal_distance_ = 0;
+			std::optional<int> reveal_count_;
 			std::pair<int, int> content_view_;
 
 
 			/*
 				Events
 			*/
+
+			//See GuiControl::Focused for more details
+			virtual void Focused() noexcept override;
+
+			//See GuiControl::Defocused for more details
+			virtual void Defocused() noexcept override;
 
 			//See GuiControl::Resized for more details
 			virtual void Resized(Vector2 from_size, Vector2 to_size) noexcept override;
@@ -203,6 +213,21 @@ namespace ion::gui::controls
 				{
 					content_ = content;
 					UpdateText();
+				}
+			}
+
+			//Sets the placeholder content for this text box to the given content
+			inline void PlaceholderContent(std::optional<std::string> content) noexcept
+			{
+				if (content)
+					content = gui_text_box::detail::trim_content(std::move(*content), text_mode_);
+
+				if (placeholder_content_ != content)
+				{
+					placeholder_content_ = content;
+
+					if (std::empty(content_) && !focused_)
+						UpdateText();
 				}
 			}
 
@@ -282,10 +307,10 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the reveal distance for this text box to the given distance
-			inline void RevealDistance(int distance) noexcept
+			//Sets the reveal count for this text box to the given count
+			inline void RevealCount(std::optional<int> count) noexcept
 			{
-				reveal_distance_ = distance;
+				reveal_count_ = count;
 			}
 
 
@@ -297,6 +322,13 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto Content() const noexcept
 			{
 				return content_;
+			}
+
+			//Returns the placeholder content for this text box
+			//Returns nullopt if no custom placeholder content has been set
+			[[nodiscard]] inline auto PlaceholderContent() const noexcept
+			{
+				return placeholder_content_;
 			}
 
 			//Returns the max characters for this text box
@@ -340,10 +372,11 @@ namespace ion::gui::controls
 				return cursor_position_;
 			}
 
-			//Returns the reveal distance for this text box
-			[[nodiscard]] inline auto RevealDistance() const noexcept
+			//Returns the reveal count for this text box
+			//Returns nullopt if no custom reveal count has been set
+			[[nodiscard]] inline auto RevealCount() const noexcept
 			{
-				return reveal_distance_;
+				return reveal_count_;
 			}
 
 

@@ -12,6 +12,8 @@ File:	IonGuiTextBox.cpp
 
 #include "IonGuiTextBox.h"
 
+#include <cmath>
+
 #include "graphics/fonts/utilities/IonFontUtility.h"
 #include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonDrawableText.h"
@@ -65,18 +67,88 @@ std::string mask_content(std::string content, char mask) noexcept
 }
 
 
-std::pair<int, int> get_content_view(const std::string &content, int cursor_position, std::pair<int, int> content_view,
-	const graphics::fonts::Text &text) noexcept
+bool reveal_character(char c, real &width, int max_width, graphics::fonts::Font &font) noexcept
+{
+	if (auto c_width = graphics::fonts::utilities::MeasureCharacter(c, font).value_or(0.0_r).X();
+		static_cast<int>(std::ceil(width + c_width)) > max_width) //Too wide
+		return false;
+	else
+	{
+		width += c_width;
+		return true;
+	}
+}
+
+std::pair<int, int> get_content_view(std::string_view content, int cursor_position, std::pair<int, int> content_view,
+	std::optional<char> mask, int reveal_count, const graphics::fonts::Text &text) noexcept
 {
 	if (auto area_size = text.AreaSize(); area_size)
 	{
 		if (auto type_face = text.Lettering(); type_face)
 		{
-			/*if (auto font = graphics::fonts::utilities::detail::get_font(*type_face, text.DefaultFontStyle()); font)
-				graphics::fonts::utilities::TruncateString(
-					std::move(content),
-					graphics::fonts::text::detail::text_area_max_size(*area_size, text.Padding()).X(),
-					*font).value_or("");*/
+			if (auto font = graphics::fonts::utilities::detail::get_font(*type_face, text.DefaultFontStyle()); font)
+			{
+				auto max_width = static_cast<int>(
+					graphics::fonts::text::detail::text_area_max_size(*area_size, text.Padding()).X()
+				);
+				auto width = 0.0_r;
+
+				//Move left
+				if (cursor_position < content_view.first)
+				{
+					content_view = {cursor_position, cursor_position};
+
+					//Reveal left (by reveal count)
+					for (auto off = cursor_position;
+						off > 0 && cursor_position - off <= reveal_count; --off)
+					{
+						if (reveal_character(mask ? *mask : content[off], width, max_width, *font))
+							content_view.first = off;
+						else
+							break;
+					}
+
+					//Reveal right
+					for (auto off = cursor_position + 1; off < std::ssize(content); ++off)
+					{
+						if (reveal_character(mask ? *mask : content[off], width, max_width, *font))
+							content_view.second = off;
+						else
+							break;
+					}
+				}
+				//Move right
+				else if (cursor_position > content_view.second)
+				{
+					content_view = {cursor_position, cursor_position};
+
+					//Reveal right (by reveal count)
+					for (auto off = cursor_position;
+						off < std::ssize(content) && off - cursor_position <= reveal_count; ++off)
+					{
+						if (reveal_character(mask ? *mask : content[off], width, max_width, *font))
+							content_view.second = off;
+						else
+							break;
+					}
+
+					//Reveal left
+					for (auto off = cursor_position - 1; off > 0; --off)
+					{
+						if (reveal_character(mask ? *mask : content[off], width, max_width, *font))
+							content_view.first = off;
+						else
+							break;
+					}
+				}
+				//In view, refresh
+				else
+				{
+					//Todo
+				}
+
+				return content_view;
+			}
 		}
 	}
 
@@ -109,6 +181,22 @@ void GuiTextBox::DefaultSetup() noexcept
 /*
 	Events
 */
+
+void GuiTextBox::Focused() noexcept
+{
+	if (std::empty(content_) && placeholder_content_)
+		UpdateText();
+
+	GuiControl::Focused(); //Use base functionality
+}
+
+void GuiTextBox::Defocused() noexcept
+{
+	if (std::empty(content_) && placeholder_content_)
+		UpdateText();
+
+	GuiControl::Defocused(); //Use base functionality
+}
 
 void GuiTextBox::Resized(Vector2 from_size, Vector2 to_size) noexcept
 {
@@ -274,20 +362,26 @@ void GuiTextBox::UpdateText() noexcept
 					}();
 
 				text->Formatting(graphics::fonts::text::TextFormatting::None);
-				text->Overflow(graphics::fonts::text::TextOverflow::Truncate);
+				text->Overflow(graphics::fonts::text::TextOverflow::TruncateEllipsis); //For placeholder content (if any)
 				text->AreaSize(*size * ortho_viewport_ratio);
 				text->Padding(text_padding_.value_or(detail::default_text_padding_size));
 				text->Alignment(detail::text_layout_to_text_alignment(text_layout_));
 
 				if (!std::empty(content_))
 				{
-					content_view_ = detail::get_content_view(content_, cursor_position_, content_view_, *text);
+					content_view_ =
+						detail::get_content_view(content_, cursor_position_, content_view_,
+							mask_, reveal_count_.value_or(detail::default_reveal_count_), *text);
 					text->Content(detail::get_viewed_content(content_, content_view_, mask_));
 				}
 				else
 				{
 					content_view_ = {};
-					text->Clear();
+
+					if (!focused_ && placeholder_content_)
+						text->Content(*placeholder_content_);
+					else
+						text->Clear();
 				}
 
 				skin->Text->Position(center);
@@ -308,7 +402,7 @@ void GuiTextBox::UpdateCursor() noexcept
 	Content
 */
 
-void GuiTextBox::InsertTextContent(int off, std::string content)
+void GuiTextBox::InsertTextContent([[maybe_unused]] int off, std::string content)
 {
 	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
 		skin && skin->Text && skin->Text->Get())
@@ -317,7 +411,7 @@ void GuiTextBox::InsertTextContent(int off, std::string content)
 	}
 }
 
-void GuiTextBox::ReplaceTextContent(int first, int last, std::string content)
+void GuiTextBox::ReplaceTextContent([[maybe_unused]] int first, [[maybe_unused]] int last, std::string content)
 {
 	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
 		skin && skin->Text && skin->Text->Get())
@@ -335,7 +429,7 @@ void GuiTextBox::ReplaceTextContent(int first, int last, std::string content)
 	}
 }
 
-void GuiTextBox::RemoveTextContent(int first, int last) noexcept
+void GuiTextBox::RemoveTextContent([[maybe_unused]] int first, [[maybe_unused]] int last) noexcept
 {
 	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
 		skin && skin->Text && skin->Text->Get())
