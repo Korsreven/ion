@@ -192,31 +192,31 @@ namespace ion::gui::controls
 			}
 
 
-			//Returns the hold time for this tooltip to the given time
+			//Returns the hold time for this tooltip
 			[[nodiscard]] inline auto HoldTime() const noexcept
 			{
 				return hold_time_;
 			}
 
-			//Returns the fade in delay for this tooltip to the given time
+			//Returns the fade in delay for this tooltip
 			[[nodiscard]] inline auto FadeInDelay() const noexcept
 			{
 				return fade_in_delay_;
 			}
 
-			//Returns the fade out delay for this tooltip to the given time
+			//Returns the fade out delay for this tooltip
 			[[nodiscard]] inline auto FadeOutDelay() const noexcept
 			{
 				return fade_out_delay_;
 			}
 
-			//Returns the fade in time for this tooltip to the given time
+			//Returns the fade in time for this tooltip
 			[[nodiscard]] inline auto FadeInTime() const noexcept
 			{
 				return fade_in_time_;
 			}
 
-			//Returns the fade out time for this tooltip to the given time
+			//Returns the fade out time for this tooltip
 			[[nodiscard]] inline auto FadeOutTime() const noexcept
 			{
 				return fade_out_time_;
