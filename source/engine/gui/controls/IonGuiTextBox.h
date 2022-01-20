@@ -26,6 +26,7 @@ File:	IonGuiTextBox.h
 #include "graphics/fonts/IonText.h"
 #include "graphics/utilities/IonVector2.h"
 #include "memory/IonOwningPtr.h"
+#include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 
 //Forward declarations
@@ -78,7 +79,12 @@ namespace ion::gui::controls
 		namespace detail
 		{
 			constexpr auto default_text_padding_size = 2.0_r;
-			constexpr auto default_reveal_count_ = 10;
+			constexpr auto default_reveal_count = 10;
+
+			constexpr auto default_cursor_blink_rate = 1.0_sec;
+			constexpr auto default_cursor_hold_time = 0.7_sec;
+			constexpr auto default_key_repeat_rate = 0.03_sec;
+			constexpr auto default_key_repeat_delay = 0.5_sec;
 
 
 			inline auto text_layout_to_text_alignment(TextBoxTextLayout text_layout) noexcept
@@ -100,7 +106,11 @@ namespace ion::gui::controls
 			std::string truncate_content(std::string content, int max_characters) noexcept;
 			std::string mask_content(std::string content, char mask) noexcept;
 
+			real char_width(char c, graphics::fonts::Font &font) noexcept;
+			real string_width(std::string_view str, graphics::fonts::Font &font) noexcept;
 			bool reveal_character(char c, real &width, int max_width, graphics::fonts::Font &font) noexcept;
+			bool trim_character(char c, real &width, int max_width, graphics::fonts::Font &font) noexcept;
+
 			std::pair<int, int> get_content_view(std::string_view content, int cursor_position, std::pair<int, int> content_view,
 				std::optional<char> mask, int reveal_count, const graphics::fonts::Text &text) noexcept;
 			std::string get_viewed_content(const std::string &content, std::pair<int, int> content_view, std::optional<char> mask);
@@ -128,6 +138,15 @@ namespace ion::gui::controls
 			int cursor_position_ = 0;
 			std::optional<int> reveal_count_;
 			std::pair<int, int> content_view_;
+			
+			duration cursor_blink_rate_ = gui_text_box::detail::default_cursor_blink_rate;
+			duration cursor_hold_time_ = gui_text_box::detail::default_cursor_hold_time;
+			duration key_repeat_rate_ = gui_text_box::detail::default_key_repeat_rate;
+			duration key_repeat_delay_ = gui_text_box::detail::default_key_repeat_delay;
+
+			types::Cumulative<duration> blink_duration_{cursor_hold_time_};
+			types::Cumulative<duration> repeat_duration_{key_repeat_delay_};
+			std::optional<KeyButton> repeat_key_;
 
 
 			/*
@@ -314,6 +333,47 @@ namespace ion::gui::controls
 			}
 
 
+			//Sets the cursor blink rate for this text box to the given time
+			inline void CursorBlinkRate(duration time) noexcept
+			{
+				if (cursor_blink_rate_ != time && time >= 0.0_sec)
+				{
+					cursor_blink_rate_ = time;
+					//UpdateBlinkDuration();
+				}
+			}
+
+			//Sets the cursor hold time for this text box to the given time
+			inline void CursorHoldTime(duration time) noexcept
+			{
+				if (cursor_hold_time_ != time && time >= 0.0_sec)
+				{
+					cursor_hold_time_ = time;
+					//UpdateBlinkDuration();
+				}
+			}
+
+			//Sets the key repeat rate for this text box to the given time
+			inline void KeyRepeatRate(duration time) noexcept
+			{
+				if (key_repeat_rate_ != time && time >= 0.0_sec)
+				{
+					key_repeat_rate_ = time;
+					//UpdateRepeatDuration();
+				}
+			}
+
+			//Sets the key repeat delay for this text box to the given time
+			inline void KeyRepeatDelay(duration time) noexcept
+			{
+				if (key_repeat_delay_ != time && time >= 0.0_sec)
+				{
+					key_repeat_delay_ = time;
+					//UpdateRepeatDuration();
+				}
+			}
+
+
 			/*
 				Observers
 			*/
@@ -377,6 +437,31 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto RevealCount() const noexcept
 			{
 				return reveal_count_;
+			}
+
+
+			//Returns the cursor blink rate for this text box
+			[[nodiscard]] inline auto CursorBlinkRate() const noexcept
+			{
+				return cursor_blink_rate_;
+			}
+
+			//Returns the cursor hold time for this text box
+			[[nodiscard]] inline auto CursorHoldTime() const noexcept
+			{
+				return cursor_hold_time_;
+			}
+
+			//Returns the key repeat rate for this text box
+			[[nodiscard]] inline auto KeyRepeatRate() const noexcept
+			{
+				return key_repeat_rate_;
+			}
+
+			//Returns the key repeat delay for this text box
+			[[nodiscard]] inline auto KeyRepeatDelay() const noexcept
+			{
+				return key_repeat_delay_;
 			}
 
 

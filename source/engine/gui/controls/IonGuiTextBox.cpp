@@ -67,9 +67,19 @@ std::string mask_content(std::string content, char mask) noexcept
 }
 
 
+real char_width(char c, graphics::fonts::Font &font) noexcept
+{
+	return graphics::fonts::utilities::MeasureCharacter(c, font).value_or(0.0_r).X();
+}
+
+real string_width(std::string_view str, graphics::fonts::Font &font) noexcept
+{
+	return graphics::fonts::utilities::MeasureString(str, font).value_or(0.0_r).X();
+}
+
 bool reveal_character(char c, real &width, int max_width, graphics::fonts::Font &font) noexcept
 {
-	if (auto c_width = graphics::fonts::utilities::MeasureCharacter(c, font).value_or(0.0_r).X();
+	if (auto c_width = char_width(c, font);
 		static_cast<int>(std::ceil(width + c_width)) > max_width) //Too wide
 		return false;
 	else
@@ -78,6 +88,14 @@ bool reveal_character(char c, real &width, int max_width, graphics::fonts::Font 
 		return true;
 	}
 }
+
+bool trim_character(char c, real &width, int max_width, graphics::fonts::Font &font) noexcept
+{
+	auto c_width = char_width(c, font);
+	width -= c_width;
+	return static_cast<int>(std::ceil(width - c_width)) < max_width;
+}
+
 
 std::pair<int, int> get_content_view(std::string_view content, int cursor_position, std::pair<int, int> content_view,
 	std::optional<char> mask, int reveal_count, const graphics::fonts::Text &text) noexcept
@@ -144,7 +162,50 @@ std::pair<int, int> get_content_view(std::string_view content, int cursor_positi
 				//In view, refresh
 				else
 				{
-					//Todo
+					width =
+						string_width(content.substr(content_view.first, content_view.second - content_view.first), *font);
+
+					//Too wide, trim from left, then right
+					if (static_cast<int>(std::ceil(width)) > max_width)
+					{
+						auto fits = false;
+
+						//Trim from left
+						for (auto off = content_view.first; !fits && off < cursor_position; ++off)
+						{
+							fits = trim_character(mask ? *mask : content[off], width, max_width, *font);
+							content_view.first = off + 1;
+						}
+
+						//Trim from right
+						for (auto off = content_view.second; !fits && off > cursor_position; --off)
+						{
+							fits = trim_character(mask ? *mask : content[off], width, max_width, *font);
+							content_view.second = off - 1;
+						}
+					}
+
+					//Could be more space, reveal right, then left
+					if (static_cast<int>(std::ceil(width)) < max_width)
+					{
+						//Reveal right
+						for (auto off = content_view.second + 1; off < std::ssize(content); ++off)
+						{
+							if (reveal_character(mask ? *mask : content[off], width, max_width, *font))
+								content_view.second = off;
+							else
+								break;
+						}
+
+						//Reveal left
+						for (auto off = content_view.first - 1; off > 0; --off)
+						{
+							if (reveal_character(mask ? *mask : content[off], width, max_width, *font))
+								content_view.first = off;
+							else
+								break;
+						}
+					}
 				}
 
 				return content_view;
@@ -371,7 +432,7 @@ void GuiTextBox::UpdateText() noexcept
 				{
 					content_view_ =
 						detail::get_content_view(content_, cursor_position_, content_view_,
-							mask_, reveal_count_.value_or(detail::default_reveal_count_), *text);
+							mask_, reveal_count_.value_or(detail::default_reveal_count), *text);
 					text->Content(detail::get_viewed_content(content_, content_view_, mask_));
 				}
 				else
@@ -589,16 +650,41 @@ void GuiTextBox::RemoveContent(int first, int last) noexcept
 
 bool GuiTextBox::KeyPressed(KeyButton button) noexcept
 {
+	repeat_key_ = button;
 	return false;
 }
 
 bool GuiTextBox::KeyReleased(KeyButton button) noexcept
 {
+	repeat_key_ = {};
 	return GuiScrollable::KeyReleased(button); //Use base functionality
 }
 
 bool GuiTextBox::CharacterPressed(char character) noexcept
 {
+	if (!max_characters_ ||
+		*max_characters_ > std::ssize(content_))
+	{
+		if (auto compatible =
+			[&]() noexcept
+			{
+				switch (text_mode_)
+				{
+					case TextBoxTextMode::Alpha:
+					return character < '0' || character > '9';
+
+					case TextBoxTextMode::Numeric:
+					return character >= '0' && character <= '9';
+
+					case TextBoxTextMode::AlphaNumeric:
+					default:
+					return true;
+				}
+			}(); compatible)
+
+			InsertContent(cursor_position_, {1, character});
+	}
+
 	return false;
 }
 
