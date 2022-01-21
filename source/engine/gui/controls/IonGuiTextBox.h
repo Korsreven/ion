@@ -205,6 +205,8 @@ namespace ion::gui::controls
 			void RemoveTextContent(int first, int last) noexcept;
 			void ClearTextContent() noexcept;
 
+			void MoveContentView(int delta) noexcept;
+
 		public:
 
 			//Construct a text box with the given name, caption, tooltip, skin and hit boxes
@@ -322,7 +324,13 @@ namespace ion::gui::controls
 				if (cursor_position_ != position)
 				{
 					cursor_position_ = position;
-					UpdateCursor();
+
+					//Out of view
+					if (position < content_view_.first ||
+						position > content_view_.second)
+						UpdateText();
+					else
+						UpdateCursor();
 				}
 			}
 
@@ -496,6 +504,9 @@ namespace ion::gui::controls
 
 			//Clears all content in this text box
 			void ClearContent() noexcept;
+
+			//Removes content at the given offset in this text box
+			void RemoveContent(int off) noexcept;
 
 			//Removes all content in range [first, last) in this text box
 			void RemoveContent(int first, int last) noexcept;

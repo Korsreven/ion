@@ -93,7 +93,7 @@ bool trim_character(char c, real &width, int max_width, graphics::fonts::Font &f
 {
 	auto c_width = char_width(c, font);
 	width -= c_width;
-	return static_cast<int>(std::ceil(width - c_width)) < max_width;
+	return static_cast<int>(std::ceil(width)) < max_width;
 }
 
 
@@ -523,6 +523,13 @@ void GuiTextBox::ClearTextContent() noexcept
 }
 
 
+void GuiTextBox::MoveContentView(int delta) noexcept
+{
+	content_view_.first = std::clamp(content_view_.first + delta, 0, std::ssize(content_));
+	content_view_.second = std::clamp(content_view_.second + delta, content_view_.first, std::ssize(content_));
+}
+
+
 //Public
 
 GuiTextBox::GuiTextBox(std::string name, std::optional<std::string> caption,
@@ -565,7 +572,10 @@ void GuiTextBox::InsertContent(int off, std::string content)
 
 		//Adjust cursor position
 		if (cursor_position_ >= off)
+		{
 			CursorPosition(cursor_position_ + std::ssize(content));
+			MoveContentView(std::ssize(content));
+		}
 
 		InsertTextContent(off, std::move(content));
 		UpdateText();
@@ -599,9 +609,16 @@ void GuiTextBox::ReplaceContent(int first, int last, std::string content)
 
 		//Adjust cursor position
 		if (cursor_position_ >= first && cursor_position_ <= last)
+		{
+			auto cursor_pos = cursor_position_;
 			CursorPosition(first + std::ssize(content));
+			MoveContentView(cursor_position_ - cursor_pos);
+		}
 		else if (cursor_position_ > last)
+		{
 			CursorPosition(cursor_position_ + (std::ssize(content) - (last - first)));
+			MoveContentView(std::ssize(content) - (last - first));
+		}
 
 		ReplaceTextContent(first, last, std::move(content));
 		UpdateText();
@@ -625,6 +642,11 @@ void GuiTextBox::ClearContent() noexcept
 	UpdateText();
 }
 
+void GuiTextBox::RemoveContent(int off) noexcept
+{
+	RemoveContent(off, off + 1);
+}
+
 void GuiTextBox::RemoveContent(int first, int last) noexcept
 {
 	if (first >= 0 && first < last)
@@ -634,9 +656,16 @@ void GuiTextBox::RemoveContent(int first, int last) noexcept
 
 		//Adjust cursor position
 		if (cursor_position_ > first && cursor_position_ <= last)
+		{
+			auto cursor_pos = cursor_position_;
 			CursorPosition(first);
+			MoveContentView(cursor_position_ - cursor_pos);
+		}
 		else if (cursor_position_ > last)
+		{
 			CursorPosition(cursor_position_ - (last - first));
+			MoveContentView(-(last - first));
+		}
 
 		RemoveTextContent(first, last);
 		UpdateText();
@@ -650,42 +679,58 @@ void GuiTextBox::RemoveContent(int first, int last) noexcept
 
 bool GuiTextBox::KeyPressed(KeyButton button) noexcept
 {
-	repeat_key_ = button;
+	switch (button)
+	{
+		case KeyButton::LeftArrow:
+		CursorPosition(cursor_position_ - 1);
+		repeat_key_ = button;
+		return true;
+
+		case KeyButton::RightArrow:
+		CursorPosition(cursor_position_ + 1);
+		repeat_key_ = button;
+		return true;
+
+		case KeyButton::Backspace:
+		RemoveContent(cursor_position_ - 1);
+		repeat_key_ = button;
+		return true;
+
+		case KeyButton::Delete:
+		RemoveContent(cursor_position_);
+		repeat_key_ = button;
+		return true;
+	}
+
 	return false;
 }
 
 bool GuiTextBox::KeyReleased(KeyButton button) noexcept
 {
+	switch (button)
+	{
+		case KeyButton::Home:
+		CursorPosition(0);
+		return true;
+
+		case KeyButton::End:
+		CursorPosition(std::ssize(content_));
+		return true;
+	}
+
 	repeat_key_ = {};
 	return GuiScrollable::KeyReleased(button); //Use base functionality
 }
 
 bool GuiTextBox::CharacterPressed(char character) noexcept
 {
-	if (!max_characters_ ||
-		*max_characters_ > std::ssize(content_))
+	if (character != '\b' && character != '\x7f')
 	{
-		if (auto compatible =
-			[&]() noexcept
-			{
-				switch (text_mode_)
-				{
-					case TextBoxTextMode::Alpha:
-					return character < '0' || character > '9';
-
-					case TextBoxTextMode::Numeric:
-					return character >= '0' && character <= '9';
-
-					case TextBoxTextMode::AlphaNumeric:
-					default:
-					return true;
-				}
-			}(); compatible)
-
-			InsertContent(cursor_position_, {1, character});
+		InsertContent(cursor_position_, {1, character});
+		return true;
 	}
-
-	return false;
+	else
+		return false;
 }
 
 
