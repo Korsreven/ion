@@ -78,11 +78,25 @@ namespace ion::gui::controls
 
 		namespace detail
 		{
+			enum class cursor_blink_phase
+			{
+				FadeIn,
+				Hold,
+				FadeOut
+			};
+
+			enum class key_repeat_phase : bool
+			{
+				PreRepeat,
+				Repeat
+			};
+
+
 			constexpr auto default_text_padding_size = 2.0_r;
 			constexpr auto default_reveal_count = 10;
 
 			constexpr auto default_cursor_blink_rate = 1.0_sec;
-			constexpr auto default_cursor_hold_time = 0.7_sec;
+			constexpr auto default_cursor_hold_percent = 0.7_r;
 			constexpr auto default_key_repeat_rate = 0.03_sec;
 			constexpr auto default_key_repeat_delay = 0.5_sec;
 
@@ -102,6 +116,13 @@ namespace ion::gui::controls
 				}
 			}
 
+			Vector2 cursor_offset(real width, real line_width, real cursor_distance, TextBoxTextLayout text_layout) noexcept;
+
+
+			/*
+				Content
+			*/
+
 			std::string trim_content(std::string content, TextBoxTextMode text_mode) noexcept;
 			std::string truncate_content(std::string content, int max_characters) noexcept;
 			std::string mask_content(std::string content, char mask) noexcept;
@@ -111,6 +132,7 @@ namespace ion::gui::controls
 			bool reveal_character(char c, real &width, int max_width, graphics::fonts::Font &font) noexcept;
 			bool trim_character(char c, real &width, int max_width, graphics::fonts::Font &font) noexcept;
 
+			graphics::fonts::Font* get_font(const graphics::fonts::Text &text) noexcept;
 			std::pair<int, int> get_content_view(std::string_view content, int cursor_position, std::pair<int, int> content_view,
 				std::optional<char> mask, int reveal_count, const graphics::fonts::Text &text) noexcept;
 			std::string get_viewed_content(const std::string &content, std::pair<int, int> content_view, std::optional<char> mask);
@@ -140,13 +162,18 @@ namespace ion::gui::controls
 			std::pair<int, int> content_view_;
 			
 			duration cursor_blink_rate_ = gui_text_box::detail::default_cursor_blink_rate;
-			duration cursor_hold_time_ = gui_text_box::detail::default_cursor_hold_time;
+			real cursor_hold_percent_ = gui_text_box::detail::default_cursor_hold_percent;
 			duration key_repeat_rate_ = gui_text_box::detail::default_key_repeat_rate;
 			duration key_repeat_delay_ = gui_text_box::detail::default_key_repeat_delay;
 
-			types::Cumulative<duration> blink_duration_{cursor_hold_time_};
-			types::Cumulative<duration> repeat_duration_{key_repeat_delay_};
+			gui_text_box::detail::cursor_blink_phase blink_phase_ = gui_text_box::detail::cursor_blink_phase::Hold;
+			gui_text_box::detail::key_repeat_phase repeat_phase_ = gui_text_box::detail::key_repeat_phase::PreRepeat;
+			types::Cumulative<duration> blink_phase_duration_{cursor_blink_rate_ * cursor_hold_percent_};
+			types::Cumulative<duration> repeat_phase_duration_{key_repeat_delay_};
+
+			real cursor_opacity_ = 1.0_r;
 			std::optional<KeyButton> repeat_key_;
+			std::optional<char> repeat_char_;
 
 
 			/*
@@ -195,9 +222,21 @@ namespace ion::gui::controls
 			virtual void UpdateText() noexcept;
 			virtual void UpdateCursor() noexcept;
 
+			void SetCursorOpacity(real percent) noexcept;
+
 
 			/*
-				Text content
+				Phase
+			*/
+
+			void SetBlinkPhase(gui_text_box::detail::cursor_blink_phase phase) noexcept;
+			void SetRepeatPhase(gui_text_box::detail::key_repeat_phase phase) noexcept;
+			void UpdateBlinkPhaseDuration() noexcept;
+			void UpdateRepeatPhaseDuration() noexcept;
+
+
+			/*
+				Content
 			*/
 
 			void InsertTextContent(int off, std::string content);
@@ -347,17 +386,19 @@ namespace ion::gui::controls
 				if (cursor_blink_rate_ != time && time >= 0.0_sec)
 				{
 					cursor_blink_rate_ = time;
-					//UpdateBlinkDuration();
+					UpdateBlinkPhaseDuration();
 				}
 			}
 
-			//Sets the cursor hold time for this text box to the given time
-			inline void CursorHoldTime(duration time) noexcept
+			//Sets the cursor hold percent for this text box to the given percentage
+			inline void CursorHoldPercent(real percent) noexcept
 			{
-				if (cursor_hold_time_ != time && time >= 0.0_sec)
+				percent = std::clamp(percent, 0.0_r, 1.0_r);
+
+				if (cursor_hold_percent_ != percent)
 				{
-					cursor_hold_time_ = time;
-					//UpdateBlinkDuration();
+					cursor_hold_percent_ = percent;
+					UpdateBlinkPhaseDuration();
 				}
 			}
 
@@ -367,7 +408,7 @@ namespace ion::gui::controls
 				if (key_repeat_rate_ != time && time >= 0.0_sec)
 				{
 					key_repeat_rate_ = time;
-					//UpdateRepeatDuration();
+					UpdateRepeatPhaseDuration();
 				}
 			}
 
@@ -377,7 +418,7 @@ namespace ion::gui::controls
 				if (key_repeat_delay_ != time && time >= 0.0_sec)
 				{
 					key_repeat_delay_ = time;
-					//UpdateRepeatDuration();
+					UpdateRepeatPhaseDuration();
 				}
 			}
 
@@ -454,10 +495,10 @@ namespace ion::gui::controls
 				return cursor_blink_rate_;
 			}
 
-			//Returns the cursor hold time for this text box
-			[[nodiscard]] inline auto CursorHoldTime() const noexcept
+			//Returns the cursor hold percent for this text box
+			[[nodiscard]] inline auto CursorHoldPercent() const noexcept
 			{
-				return cursor_hold_time_;
+				return cursor_hold_percent_;
 			}
 
 			//Returns the key repeat rate for this text box
@@ -510,6 +551,14 @@ namespace ion::gui::controls
 
 			//Removes all content in range [first, last) in this text box
 			void RemoveContent(int first, int last) noexcept;
+
+
+			/*
+				Frame events
+			*/
+
+			//Called from gui control when a frame has started
+			virtual void FrameStarted(duration time) noexcept override;
 
 
 			/*
