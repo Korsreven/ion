@@ -57,7 +57,7 @@ void resize_skin(SliderSkin &skin, SliderType type, const Vector2 &from_size, co
 			height / width :
 			width / height;
 
-		//Handle should only resize to keep proportions
+		//Handle should keep proportions when resized
 		auto handle_new_size =
 			type == SliderType::Vertical ?
 			Vector2{width + delta_size.X(), (width + delta_size.X()) * aspect_ratio} :
