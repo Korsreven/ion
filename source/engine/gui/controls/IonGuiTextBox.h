@@ -168,7 +168,7 @@ namespace ion::gui::controls
 
 			gui_text_box::detail::cursor_blink_phase blink_phase_ = gui_text_box::detail::cursor_blink_phase::Hold;
 			gui_text_box::detail::key_repeat_phase repeat_phase_ = gui_text_box::detail::key_repeat_phase::PreRepeat;
-			types::Cumulative<duration> blink_phase_duration_{cursor_blink_rate_ * cursor_hold_percent_};
+			types::Cumulative<duration> blink_phase_duration_{cursor_blink_rate_ * cursor_hold_percent_ * 0.5_r};
 			types::Cumulative<duration> repeat_phase_duration_{key_repeat_delay_};
 
 			real cursor_opacity_ = 1.0_r;

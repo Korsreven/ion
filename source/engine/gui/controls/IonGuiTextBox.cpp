@@ -390,6 +390,9 @@ void GuiTextBox::SetSkinState(gui_control::ControlState state, TextBoxSkin &skin
 {
 	if (skin.Text)
 		SetCaptionState(state, skin.Text);
+
+	if (skin.Cursor)
+		SetPartState(state, skin.Cursor);
 }
 
 void GuiTextBox::SetState(gui_control::ControlState state) noexcept
