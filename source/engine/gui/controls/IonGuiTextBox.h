@@ -72,6 +72,7 @@ namespace ion::gui::controls
 		struct TextBoxSkin : gui_control::ControlSkin
 		{
 			gui_control::ControlCaptionPart Text;
+			gui_control::ControlCaptionPart PlaceholderText;
 			gui_control::ControlVisualPart Cursor;
 		};
 
@@ -126,6 +127,7 @@ namespace ion::gui::controls
 			std::string trim_content(std::string content, TextBoxTextMode text_mode) noexcept;
 			std::string truncate_content(std::string content, int max_characters) noexcept;
 			std::string mask_content(std::string content, char mask) noexcept;
+			std::string trim_placeholder_content(std::string content) noexcept;
 
 			real char_width(char c, graphics::fonts::Font &font) noexcept;
 			real string_width(std::string_view str, graphics::fonts::Font &font) noexcept;
@@ -280,7 +282,7 @@ namespace ion::gui::controls
 			inline void PlaceholderContent(std::optional<std::string> content) noexcept
 			{
 				if (content)
-					content = gui_text_box::detail::trim_content(std::move(*content), text_mode_);
+					content = gui_text_box::detail::trim_placeholder_content(std::move(*content));
 
 				if (placeholder_content_ != content)
 				{

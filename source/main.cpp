@@ -714,6 +714,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto radio_button_select_hovered_diffuse = textures.CreateTexture("radio_button_select_hovered", "radio_button_select_hovered.png",
 				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 
+			//Text box
+			auto text_box_cursor_enabled_diffuse = textures.CreateTexture("text_box_cursor_enabled", "text_box_cursor_enabled.png");
+
+
 			auto cat_first_frame = textures.CreateTexture("cat01", "cat01.png");
 			textures.CreateTexture("cat02", "cat02.png");
 			textures.CreateTexture("cat03", "cat03.png");
@@ -1572,6 +1576,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					0.0_r, radio_button_select_hovered_diffuse, nullptr, nullptr);
 			radio_button_select_hovered->LightingEnabled(false);
 
+			//Text box
+			auto text_box_cursor_enabled =
+				materials.CreateMaterial("text_box_cursor_enabled",
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					{1.0_r, 1.0_r, 1.0_r},
+					0.0_r, text_box_cursor_enabled_diffuse, nullptr, nullptr);
+			text_box_cursor_enabled->LightingEnabled(false);
+
 
 			using namespace ion::graphics::utilities;
 
@@ -2138,6 +2152,46 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scroll_bar_right->AutoRepeat(true);
 			scroll_bar_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
 
+			//Text box
+			w = 0.056_r;
+			h = 0.056_r;
+
+			auto text_box_model = scene.CreateModel();
+			auto text_box_center = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
+			
+			auto text_box_top = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
+			auto text_box_left = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
+			auto text_box_bottom = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
+			auto text_box_right = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
+
+			auto text_box_top_left = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
+			auto text_box_bottom_left = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
+			auto text_box_top_right = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
+			auto text_box_bottom_right = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
+
+			auto text_box_cursor = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Cursor
+
+			text_box_cursor->AutoSize(true);
+			text_box_cursor->IncludeBoundingVolumes(false);
+
+			text_box_center->AutoRepeat(true);
+			text_box_top->AutoRepeat(true);
+			text_box_left->AutoRepeat(true);
+			text_box_bottom->AutoRepeat(true);
+			text_box_right->AutoRepeat(true);
+			text_box_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+
+
 			//GUI Caption
 
 			//Tooltip caption
@@ -2197,6 +2251,26 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Scroll bar caption
 			auto scroll_bar_caption = scene.CreateText(caption_text);
 			scroll_bar_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+
+			//Text box caption
+			auto text_box_caption = scene.CreateText(caption_text);
+			text_box_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+
+			//Text box text
+			auto text_box_text = scene.CreateText(caption_text);
+			text_box_text->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+
+			//Text box placeholder text
+			auto text_box_placeholder_text = scene.CreateText(caption_text);
+			text_box_placeholder_text->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+
+			ion::graphics::fonts::text::TextBlockStyle text_box_placeholder_style_enabled;
+			text_box_placeholder_style_enabled.ForegroundColor = color::Gray;
+			text_box_placeholder_style_enabled.FontStyle = ion::graphics::fonts::text::TextFontStyle::Italic;
+
+			ion::graphics::fonts::text::TextBlockStyle text_box_placeholder_style_disabled;
+			text_box_placeholder_style_disabled.ForegroundColor = color::DarkGray;
+			text_box_placeholder_style_disabled.FontStyle = ion::graphics::fonts::text::TextFontStyle::Italic;
 
 
 			//Scene graph
@@ -2592,6 +2666,54 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scroll_bar_skin.Caption.EnabledStyle = button_caption_style_enabled;
 			scroll_bar_skin.Caption.DisabledStyle = button_caption_style_disabled;
 
+			//Text box skin
+			ion::gui::controls::gui_text_box::TextBoxSkin text_box_skin;
+			text_box_skin.Parts.ModelObject = text_box_model;
+			text_box_skin.Parts.Center.SpriteObject = text_box_center;
+			text_box_skin.Parts.Top.SpriteObject = text_box_top;
+			text_box_skin.Parts.Left.SpriteObject = text_box_left;
+			text_box_skin.Parts.Bottom.SpriteObject = text_box_bottom;
+			text_box_skin.Parts.Right.SpriteObject = text_box_right;
+			text_box_skin.Parts.TopLeft.SpriteObject = text_box_top_left;
+			text_box_skin.Parts.BottomLeft.SpriteObject = text_box_bottom_left;
+			text_box_skin.Parts.TopRight.SpriteObject = text_box_top_right;
+			text_box_skin.Parts.BottomRight.SpriteObject = text_box_bottom_right;
+
+			text_box_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
+			text_box_skin.Parts.Center.DisabledMaterial = check_box_center_enabled;
+			text_box_skin.Parts.Center.HoveredMaterial = check_box_center_hovered;
+			text_box_skin.Parts.Top.EnabledMaterial = button_top_enabled;
+			text_box_skin.Parts.Top.FocusedMaterial = button_top_focused;
+			text_box_skin.Parts.Left.EnabledMaterial = button_left_enabled;
+			text_box_skin.Parts.Left.FocusedMaterial = button_left_focused;
+			text_box_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
+			text_box_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
+			text_box_skin.Parts.Right.EnabledMaterial = button_right_enabled;
+			text_box_skin.Parts.Right.FocusedMaterial = button_right_focused;
+			text_box_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
+			text_box_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
+			text_box_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
+			text_box_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
+			text_box_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
+			text_box_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
+			text_box_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
+			text_box_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
+
+			text_box_skin.Text.TextObject = text_box_text;
+			text_box_skin.Text.EnabledStyle = button_caption_style_enabled;
+			text_box_skin.Text.DisabledStyle = button_caption_style_disabled;
+
+			text_box_skin.PlaceholderText.TextObject = text_box_placeholder_text;
+			text_box_skin.PlaceholderText.EnabledStyle = text_box_placeholder_style_enabled;
+			text_box_skin.PlaceholderText.DisabledStyle = text_box_placeholder_style_disabled;
+
+			text_box_skin.Cursor.SpriteObject = text_box_cursor;
+			text_box_skin.Cursor.EnabledMaterial = text_box_cursor_enabled;
+
+			text_box_skin.Caption.TextObject = text_box_caption;
+			text_box_skin.Caption.EnabledStyle = button_caption_style_enabled;
+			text_box_skin.Caption.DisabledStyle = button_caption_style_disabled;
+
 
 			//GUI
 			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
@@ -2634,6 +2756,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", "My radio button", "My radio button tooltip", std::move(radio_button2_skin));
 			radio_button2->Node()->Position({0.05_r, 0.0_r});
 
+			group_box->AddControl(radio_button);
+			group_box->AddControl(radio_button2);
+
 			auto progress_bar = base_panel->CreateProgressBar("progress_bar", "My progress bar", std::move(progress_bar_skin), Vector2{1.0_r, 0.077_r});
 			progress_bar->Node()->Position({0.0_r, -0.1_r});
 			progress_bar->Tooltip("My progress bar tooltip");
@@ -2642,6 +2767,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto list_box = base_panel->CreateListBox("list_box", "My list box", std::move(list_box_skin), Vector2{0.5_r, 0.5_r});
 			list_box->Node()->Position({0.8_r, 0.25_r});
+			list_box->Tooltip("My list box tooltip");
 			list_box->ItemHeightFactor(3.5_r);
 			list_box->ItemLayout(ion::gui::controls::gui_list_box::ListBoxItemLayout::Left);
 			list_box->IconLayout(ion::gui::controls::gui_list_box::ListBoxIconLayout::Left);
@@ -2665,8 +2791,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scroll_bar->StepByAmount(3);
 			scroll_bar->AttachedScrollable(list_box);
 
-			group_box->AddControl(radio_button);
-			group_box->AddControl(radio_button2);
+			auto text_box = base_panel->CreateTextBox("text_box", "My text box", std::move(text_box_skin), Vector2{0.5_r, 0.1_r});		
+			text_box->Node()->Position({0.0_r, -0.3_r});
+			text_box->Tooltip("My text box tooltip");
+			text_box->PlaceholderContent("<i><b>Type</b></i> something...");
 
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);
@@ -2710,7 +2838,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			particle_node->AttachObject(*particle_system);
 
 			//Models
-			auto player_node = scene_graph->RootNode().CreateChildNode({0.0_r, -0.5_r, -1.8_r});
+			auto player_node = scene_graph->RootNode().CreateChildNode({0.0_r, -0.65_r, -1.8_r});
 
 			auto ship_node = player_node->CreateChildNode({0.0_r, 0.0_r, 0.0_r});
 			ship_node->AttachObject(*model);

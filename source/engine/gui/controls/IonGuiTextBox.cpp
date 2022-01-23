@@ -87,6 +87,14 @@ std::string mask_content(std::string content, char mask) noexcept
 	return content;
 }
 
+std::string trim_placeholder_content(std::string content) noexcept
+{
+	using namespace utilities;
+	string::ReplaceAll(content, "<br>", "\n");
+	string::RemoveNonPrintable(content);
+	return content;
+}
+
 
 real char_width(char c, graphics::fonts::Font &font) noexcept
 {
@@ -391,8 +399,14 @@ void GuiTextBox::SetSkinState(gui_control::ControlState state, TextBoxSkin &skin
 	if (skin.Text)
 		SetCaptionState(state, skin.Text);
 
+	if (skin.PlaceholderText)
+		SetCaptionState(state, skin.PlaceholderText);
+
 	if (skin.Cursor)
+	{
 		SetPartState(state, skin.Cursor);
+		skin.Cursor->Visible(focused_);
+	}
 }
 
 void GuiTextBox::SetState(gui_control::ControlState state) noexcept
@@ -423,6 +437,16 @@ void GuiTextBox::AttachSkin()
 			//Attach text
 			skin_node_->AttachObject(*skin->Text.TextObject);
 		}
+
+		if (skin->PlaceholderText)
+		{
+			//Detach from previous parent (if any)
+			if (auto node = skin->PlaceholderText->ParentNode(); node)
+				node->DetachObject(*skin->PlaceholderText.TextObject);
+		
+			//Attach placeholder text
+			skin_node_->AttachObject(*skin->PlaceholderText.TextObject);
+		}
 	}
 }
 
@@ -439,6 +463,9 @@ void GuiTextBox::RemoveSkin() noexcept
 
 		if (skin->Text && skin->Text->Owner())
 			skin->Text->Owner()->RemoveText(*skin->Text.TextObject); //Remove text
+
+		if (skin->PlaceholderText && skin->PlaceholderText->Owner())
+			skin->PlaceholderText->Owner()->RemoveText(*skin->PlaceholderText.TextObject); //Remove placeholder text
 	}
 
 	GuiControl::RemoveSkin(); //Use base functionality
@@ -471,7 +498,7 @@ void GuiTextBox::UpdateText() noexcept
 					}();
 
 				text->Formatting(graphics::fonts::text::TextFormatting::None);
-				text->Overflow(graphics::fonts::text::TextOverflow::TruncateEllipsis); //For placeholder content (if any)
+				text->Overflow(graphics::fonts::text::TextOverflow::Truncate);
 				text->AreaSize(*size * ortho_viewport_ratio);
 				text->Padding(text_padding_.value_or(detail::default_text_padding_size));
 				text->Alignment(detail::text_layout_to_text_alignment(text_layout_));
@@ -486,11 +513,23 @@ void GuiTextBox::UpdateText() noexcept
 				else
 				{
 					content_view_ = {};
+					text->Clear();
 
-					if (!focused_ && placeholder_content_)
-						text->Content(*placeholder_content_);
-					else
-						text->Clear();
+					//Placeholder text
+					if (auto &placeholder_text = skin->PlaceholderText->Get(); placeholder_text)
+					{
+						if (!focused_ && placeholder_content_)
+						{
+							placeholder_text->Overflow(graphics::fonts::text::TextOverflow::TruncateEllipsis);
+							placeholder_text->AreaSize(*size * ortho_viewport_ratio);
+							placeholder_text->Padding(text_padding_.value_or(detail::default_text_padding_size));
+							placeholder_text->Alignment(detail::text_layout_to_text_alignment(text_layout_));
+							placeholder_text->Content(*placeholder_content_);
+							skin->PlaceholderText->Visible(true);
+						}
+						else
+							skin->PlaceholderText->Visible(false);
+					}
 				}
 
 				skin->Text->Position(center);
