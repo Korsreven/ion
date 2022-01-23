@@ -31,15 +31,15 @@ using namespace gui_text_box;
 namespace gui_text_box::detail
 {
 
-Vector2 cursor_offset(real width, real line_width, real cursor_distance, TextBoxTextLayout text_layout) noexcept
+Vector2 cursor_offset(real width, real line_width, real cursor_width, real cursor_distance, TextBoxTextLayout text_layout) noexcept
 {
 	switch (text_layout)
 	{
 		case TextBoxTextLayout::Left:
-		return {-width * 0.5_r + cursor_distance, 0.0_r};
+		return {-width * 0.5_r + cursor_distance + cursor_width * 0.5_r, 0.0_r};
 
 		case TextBoxTextLayout::Right:
-		return {width * 0.5_r - (line_width - cursor_distance), 0.0_r};
+		return {width * 0.5_r - (line_width - cursor_distance) - cursor_width * 0.5_r, 0.0_r};
 		
 		case TextBoxTextLayout::Center:
 		default:
@@ -149,11 +149,11 @@ std::pair<int, int> get_content_view(std::string_view content, int cursor_positi
 			//Move left
 			if (cursor_position < content_view.first)
 			{
-				content_view = {cursor_position, cursor_position};
+				content_view = {cursor_position + 1, cursor_position + 1};
 
 				//Reveal left (by reveal count)
 				for (auto off = cursor_position;
-					off > 0 && cursor_position - off <= reveal_count; --off)
+					off >= 0 && cursor_position - off <= reveal_count; --off)
 				{
 					if (reveal_character(mask ? *mask : content[off], width, max_width, *font))
 						content_view.first = off;
@@ -165,7 +165,7 @@ std::pair<int, int> get_content_view(std::string_view content, int cursor_positi
 				for (auto off = cursor_position + 1; off < std::ssize(content); ++off)
 				{
 					if (reveal_character(mask ? *mask : content[off], width, max_width, *font))
-						content_view.second = off;
+						content_view.second = off + 1;
 					else
 						break;
 				}
@@ -173,6 +173,7 @@ std::pair<int, int> get_content_view(std::string_view content, int cursor_positi
 			//Move right
 			else if (cursor_position > content_view.second)
 			{
+				--cursor_position;
 				content_view = {cursor_position, cursor_position};
 
 				//Reveal right (by reveal count)
@@ -180,13 +181,13 @@ std::pair<int, int> get_content_view(std::string_view content, int cursor_positi
 					off < std::ssize(content) && off - cursor_position <= reveal_count; ++off)
 				{
 					if (reveal_character(mask ? *mask : content[off], width, max_width, *font))
-						content_view.second = off;
+						content_view.second = off + 1;
 					else
 						break;
 				}
 
 				//Reveal left
-				for (auto off = cursor_position - 1; off > 0; --off)
+				for (auto off = cursor_position - 1; off >= 0; --off)
 				{
 					if (reveal_character(mask ? *mask : content[off], width, max_width, *font))
 						content_view.first = off;
@@ -197,7 +198,11 @@ std::pair<int, int> get_content_view(std::string_view content, int cursor_positi
 			//In view, refresh
 			else
 			{
-				width =
+				if (content_view.first == content_view.second)
+					content_view = {0, std::ssize(content)};
+
+				width = mask ?
+					char_width(*mask, *font) * (content_view.second - content_view.first) :
 					string_width(content.substr(content_view.first, content_view.second - content_view.first), *font);
 
 				//Too wide, trim from left, then right
@@ -213,10 +218,10 @@ std::pair<int, int> get_content_view(std::string_view content, int cursor_positi
 					}
 
 					//Trim from right
-					for (auto off = content_view.second; !fits && off > cursor_position; --off)
+					for (auto off = content_view.second - 1; !fits && off > cursor_position; --off)
 					{
 						fits = trim_character(mask ? *mask : content[off], width, max_width, *font);
-						content_view.second = off - 1;
+						content_view.second = off;
 					}
 				}
 
@@ -224,16 +229,16 @@ std::pair<int, int> get_content_view(std::string_view content, int cursor_positi
 				if (static_cast<int>(std::ceil(width)) < max_width)
 				{
 					//Reveal right
-					for (auto off = content_view.second + 1; off < std::ssize(content); ++off)
+					for (auto off = content_view.second; off < std::ssize(content); ++off)
 					{
 						if (reveal_character(mask ? *mask : content[off], width, max_width, *font))
-							content_view.second = off;
+							content_view.second = off + 1;
 						else
 							break;
 					}
 
 					//Reveal left
-					for (auto off = content_view.first - 1; off > 0; --off)
+					for (auto off = content_view.first - 1; off >= 0; --off)
 					{
 						if (reveal_character(mask ? *mask : content[off], width, max_width, *font))
 							content_view.first = off;
@@ -503,6 +508,9 @@ void GuiTextBox::UpdateText() noexcept
 				text->Padding(text_padding_.value_or(detail::default_text_padding_size));
 				text->Alignment(detail::text_layout_to_text_alignment(text_layout_));
 
+				if (skin->PlaceholderText)
+					skin->PlaceholderText->Visible(false);
+
 				if (!std::empty(content_))
 				{
 					content_view_ =
@@ -515,10 +523,11 @@ void GuiTextBox::UpdateText() noexcept
 					content_view_ = {};
 					text->Clear();
 
-					//Placeholder text
-					if (auto &placeholder_text = skin->PlaceholderText->Get(); placeholder_text)
+					if (skin->PlaceholderText &&
+						!focused_ && placeholder_content_)
 					{
-						if (!focused_ && placeholder_content_)
+						//Placeholder text
+						if (auto &placeholder_text = skin->PlaceholderText->Get(); placeholder_text)
 						{
 							placeholder_text->Overflow(graphics::fonts::text::TextOverflow::TruncateEllipsis);
 							placeholder_text->AreaSize(*size * ortho_viewport_ratio);
@@ -527,8 +536,8 @@ void GuiTextBox::UpdateText() noexcept
 							placeholder_text->Content(*placeholder_content_);
 							skin->PlaceholderText->Visible(true);
 						}
-						else
-							skin->PlaceholderText->Visible(false);
+
+						skin->PlaceholderText->Position(center);
 					}
 				}
 
@@ -581,15 +590,17 @@ void GuiTextBox::UpdateCursor() noexcept
 				);
 
 				auto cursor_distance = detail::string_width(
-					detail::get_viewed_content(content_, {content_view_.first, cursor_position_}, mask_), *font);
+					detail::get_viewed_content(content_, {content_view_.first, cursor_position_}, mask_), *font) *
+					viewport_ortho_ratio.Y();
 				auto line_width = cursor_distance + detail::string_width(
-					detail::get_viewed_content(content_, {cursor_position_, content_view_.second}, mask_), *font);
+					detail::get_viewed_content(content_, {cursor_position_, content_view_.second}, mask_), *font) *
+					viewport_ortho_ratio.Y();
 
 				skin->Cursor->Position(Vector3{
 					center.X(),
 					height * 0.5_r - line_padding - line_height * 0.5_r,
 					skin->Cursor->Position().Z()} +
-					detail::cursor_offset(width, line_width, cursor_distance, text_layout_)
+					detail::cursor_offset(width, line_width, skin->Cursor->Size().X(), cursor_distance, text_layout_)
 				);
 			}
 		}
@@ -726,10 +737,10 @@ void GuiTextBox::ClearTextContent() noexcept
 }
 
 
-void GuiTextBox::MoveContentView(int delta) noexcept
+void GuiTextBox::ClampContentView() noexcept
 {
-	content_view_.first = std::clamp(content_view_.first + delta, 0, std::ssize(content_));
-	content_view_.second = std::clamp(content_view_.second + delta, content_view_.first, std::ssize(content_));
+	content_view_.first = std::clamp(content_view_.first, 0, std::ssize(content_));
+	content_view_.second = std::clamp(content_view_.second, content_view_.first, std::ssize(content_));
 }
 
 
@@ -770,15 +781,12 @@ void GuiTextBox::InsertContent(int off, std::string content)
 			content = gui_text_box::detail::truncate_content(std::move(content),
 				*max_characters_ - std::ssize(content_));
 
-		off = std::clamp(off, 0, std::ssize(content));
+		off = std::clamp(off, 0, std::ssize(content_));
 		content_.insert(std::begin(content_) + off, std::begin(content), std::end(content));
 
 		//Adjust cursor position
 		if (cursor_position_ >= off)
-		{
 			CursorPosition(cursor_position_ + std::ssize(content));
-			MoveContentView(std::ssize(content));
-		}
 
 		InsertTextContent(off, std::move(content));
 		UpdateText();
@@ -809,19 +817,13 @@ void GuiTextBox::ReplaceContent(int first, int last, std::string content)
 		last = std::clamp(last, first, std::ssize(content_));
 		content_.erase(std::begin(content_) + first, std::begin(content_) + last);
 		content_.insert(std::begin(content_) + first, std::begin(content), std::end(content));
+		ClampContentView();
 
 		//Adjust cursor position
 		if (cursor_position_ >= first && cursor_position_ <= last)
-		{
-			auto cursor_pos = cursor_position_;
 			CursorPosition(first + std::ssize(content));
-			MoveContentView(cursor_position_ - cursor_pos);
-		}
 		else if (cursor_position_ > last)
-		{
 			CursorPosition(cursor_position_ + (std::ssize(content) - (last - first)));
-			MoveContentView(std::ssize(content) - (last - first));
-		}
 
 		ReplaceTextContent(first, last, std::move(content));
 		UpdateText();
@@ -838,6 +840,7 @@ void GuiTextBox::ClearContent() noexcept
 {
 	content_.clear();
 	content_.shrink_to_fit();
+	content_view_ = {};
 
 	CursorPosition(0);
 
@@ -856,19 +859,13 @@ void GuiTextBox::RemoveContent(int first, int last) noexcept
 	{
 		last = std::clamp(last, first, std::ssize(content_));
 		content_.erase(std::begin(content_) + first, std::begin(content_) + last);
+		ClampContentView();
 
 		//Adjust cursor position
 		if (cursor_position_ > first && cursor_position_ <= last)
-		{
-			auto cursor_pos = cursor_position_;
 			CursorPosition(first);
-			MoveContentView(cursor_position_ - cursor_pos);
-		}
 		else if (cursor_position_ > last)
-		{
 			CursorPosition(cursor_position_ - (last - first));
-			MoveContentView(-(last - first));
-		}
 
 		RemoveTextContent(first, last);
 		UpdateText();
@@ -976,13 +973,17 @@ bool GuiTextBox::KeyPressed(KeyButton button) noexcept
 {
 	switch (button)
 	{
+		//Move cursor left	
 		case KeyButton::LeftArrow:
+		case KeyButton::DownArrow:
 		CursorPosition(cursor_position_ - 1);
 		repeat_char_ = {};
 		repeat_key_ = button;
 		return true;
 
+		//Move cursor right
 		case KeyButton::RightArrow:
+		case KeyButton::UpArrow:
 		CursorPosition(cursor_position_ + 1);
 		repeat_char_ = {};
 		repeat_key_ = button;
@@ -1006,6 +1007,14 @@ bool GuiTextBox::KeyPressed(KeyButton button) noexcept
 
 bool GuiTextBox::KeyReleased(KeyButton button) noexcept
 {
+	if (repeat_key_ || repeat_char_)
+	{
+		SetRepeatPhase(detail::key_repeat_phase::PreRepeat);
+		repeat_phase_duration_.Total(0.0_sec);
+		repeat_key_ = {};
+		repeat_char_ = {};
+	}
+
 	switch (button)
 	{
 		case KeyButton::Home:
@@ -1015,14 +1024,14 @@ bool GuiTextBox::KeyReleased(KeyButton button) noexcept
 		case KeyButton::End:
 		CursorPosition(std::ssize(content_));
 		return true;
-	}
 
-	if (repeat_key_ || repeat_char_)
-	{
-		SetRepeatPhase(detail::key_repeat_phase::PreRepeat);
-		repeat_phase_duration_.Total(0.0_sec);
-		repeat_key_ = {};
-		repeat_char_ = {};
+		case KeyButton::LeftArrow:
+		case KeyButton::DownArrow:
+		case KeyButton::RightArrow:
+		case KeyButton::UpArrow:
+		case KeyButton::Backspace:
+		case KeyButton::Delete:
+		return true;
 	}
 
 	return GuiScrollable::KeyReleased(button); //Use base functionality
@@ -1034,7 +1043,7 @@ bool GuiTextBox::CharacterPressed(char character) noexcept
 	{
 		if (!repeat_char_ || *repeat_char_ != character)
 		{
-			InsertContent(cursor_position_, {1, character});
+			InsertContent(cursor_position_, std::string(1, character));
 			repeat_key_ = {};
 			repeat_char_ = character;
 		}

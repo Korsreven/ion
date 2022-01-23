@@ -364,7 +364,7 @@ struct Game :
 	{
 		using namespace ion::graphics::utilities;
 
-		switch (button)
+		/*switch (button)
 		{
 			case ion::events::listeners::KeyButton::W:
 			move_model.Y(move_model.Y() + 1.0_r);
@@ -414,7 +414,7 @@ struct Game :
 			case ion::events::listeners::KeyButton::Add:
 			rotate_camera_right = true;
 			break;
-		}
+		}*/
 
 		if (controller)
 			controller->KeyPressed(button);
@@ -424,7 +424,7 @@ struct Game :
 	{
 		using namespace ion::graphics::utilities;
 
-		switch (button)
+		/*switch (button)
 		{
 			case ion::events::listeners::KeyButton::W:
 			move_model.Y(move_model.Y() - 1.0_r);
@@ -518,7 +518,7 @@ struct Game :
 
  				break;
 			}
-		}
+		}*/
 
 		if (controller)
 			controller->KeyReleased(button);
@@ -2795,6 +2795,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			text_box->Node()->Position({0.0_r, -0.3_r});
 			text_box->Tooltip("My text box tooltip");
 			text_box->PlaceholderContent("<i><b>Type</b></i> something...");
+			text_box->TextMode(ion::gui::controls::gui_text_box::TextBoxTextMode::AlphaNumeric);
+			text_box->TextLayout(ion::gui::controls::gui_text_box::TextBoxTextLayout::Left);
 
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);

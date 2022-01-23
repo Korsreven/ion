@@ -117,7 +117,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			Vector2 cursor_offset(real width, real line_width, real cursor_distance, TextBoxTextLayout text_layout) noexcept;
+			Vector2 cursor_offset(real width, real line_width, real cursor_width, real cursor_distance, TextBoxTextLayout text_layout) noexcept;
 
 
 			/*
@@ -246,7 +246,7 @@ namespace ion::gui::controls
 			void RemoveTextContent(int first, int last) noexcept;
 			void ClearTextContent() noexcept;
 
-			void MoveContentView(int delta) noexcept;
+			void ClampContentView() noexcept;
 
 		public:
 
@@ -274,6 +274,8 @@ namespace ion::gui::controls
 				if (content_ != content)
 				{
 					content_ = content;
+					cursor_position_ = std::ssize(content);
+					ClampContentView();
 					UpdateText();
 				}
 			}
@@ -306,6 +308,7 @@ namespace ion::gui::controls
 					if (max && *max < std::ssize(content_))
 					{
 						content_ = gui_text_box::detail::truncate_content(std::move(content_), *max);
+						ClampContentView();
 						UpdateText();
 					}
 				}
@@ -342,7 +345,13 @@ namespace ion::gui::controls
 				if (text_mode_ != mode)
 				{
 					text_mode_ = mode;
-					UpdateText();
+
+					if (mode != gui_text_box::TextBoxTextMode::AlphaNumeric)
+					{
+						content_ = gui_text_box::detail::trim_content(std::move(content_), text_mode_);
+						ClampContentView();
+						UpdateText();
+					}
 				}
 			}
 
