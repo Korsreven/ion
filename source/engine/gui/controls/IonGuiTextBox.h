@@ -205,6 +205,10 @@ namespace ion::gui::controls
 			virtual int ScrollPosition() noexcept override;
 
 
+			//Called right after cursor has been moved
+			virtual void CursorMoved() noexcept;
+
+
 			/*
 				States
 			*/
@@ -246,8 +250,6 @@ namespace ion::gui::controls
 			void RemoveTextContent(int first, int last) noexcept;
 			void ClearTextContent() noexcept;
 
-			void ClampContentView() noexcept;
-
 		public:
 
 			//Construct a text box with the given name, caption, tooltip, skin and hit boxes
@@ -274,9 +276,9 @@ namespace ion::gui::controls
 				if (content_ != content)
 				{
 					content_ = content;
-					cursor_position_ = std::ssize(content);
-					ClampContentView();
+					CursorPosition(std::ssize(content));
 					UpdateText();
+					Changed();
 				}
 			}
 
@@ -308,8 +310,9 @@ namespace ion::gui::controls
 					if (max && *max < std::ssize(content_))
 					{
 						content_ = gui_text_box::detail::truncate_content(std::move(content_), *max);
-						ClampContentView();
+						CursorPosition(cursor_position_);
 						UpdateText();
+						Changed();
 					}
 				}
 			}
@@ -348,9 +351,15 @@ namespace ion::gui::controls
 
 					if (mode != gui_text_box::TextBoxTextMode::AlphaNumeric)
 					{
+						auto size = std::size(content_);
 						content_ = gui_text_box::detail::trim_content(std::move(content_), text_mode_);
-						ClampContentView();
-						UpdateText();
+
+						if (size != std::size(content_))
+						{
+							CursorPosition(cursor_position_);
+							UpdateText();
+							Changed();
+						}
 					}
 				}
 			}
@@ -381,6 +390,8 @@ namespace ion::gui::controls
 						UpdateText();
 					else
 						UpdateCursor();
+
+					CursorMoved();
 				}
 			}
 

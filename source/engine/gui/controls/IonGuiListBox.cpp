@@ -189,7 +189,6 @@ int GuiListBox::ElementsInView() noexcept
 		return 0;
 }
 
-
 int GuiListBox::ScrollPosition() noexcept
 {
 	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
@@ -207,7 +206,7 @@ void GuiListBox::ItemSelected() noexcept
 
 void GuiListBox::ItemDeselected() noexcept
 {
-	//Empty
+	//Optional to override
 }
 
 
@@ -659,15 +658,18 @@ void GuiListBox::InsertItems(int off, ListBoxItems items)
 	{
 		detail::trim_items(items);
 
-		off = std::clamp(off, 0, std::ssize(items_));
-		items_.insert(std::begin(items_) + off, std::begin(items), std::end(items));
+		if (!std::empty(items))
+		{
+			off = std::clamp(off, 0, std::ssize(items_));
+			items_.insert(std::begin(items_) + off, std::begin(items), std::end(items));
 
-		//Adjust item index
-		if (item_index_ && *item_index_ >= off)
-			ItemIndex(*item_index_ + std::ssize(items));
+			//Adjust item index
+			if (item_index_ && *item_index_ >= off)
+				ItemIndex(*item_index_ + std::ssize(items));
 
-		InsertLines(off, items);
-		UpdateLines();
+			InsertLines(off, items);
+			UpdateLines();
+		}
 	}
 }
 
@@ -736,15 +738,19 @@ void GuiListBox::ReplaceItems(int first, int last, ListBoxItems items)
 
 void GuiListBox::ClearItems() noexcept
 {
-	items_.clear();
+	if (!std::empty(items_))
+	{
+		items_.clear();
+
+		if (item_index_)
+			ItemIndex({}); //Deselect
+
+		ClearLines();
+		RemoveIcons();
+		UpdateLines();
+	}
+
 	items_.shrink_to_fit();
-
-	if (item_index_)
-		ItemIndex({}); //Deselect
-
-	ClearLines();
-	RemoveIcons();
-	UpdateLines();
 }
 
 void GuiListBox::RemoveItem(int off) noexcept

@@ -384,7 +384,6 @@ int GuiTextBox::ElementsInView() noexcept
 		return 0;
 }
 
-
 int GuiTextBox::ScrollPosition() noexcept
 {
 	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
@@ -392,6 +391,12 @@ int GuiTextBox::ScrollPosition() noexcept
 		return skin->Text->GetImmutable()->FromLine();
 	else
 		return 0;
+}
+
+
+void GuiTextBox::CursorMoved() noexcept
+{
+	//Optional to override
 }
 
 
@@ -513,6 +518,12 @@ void GuiTextBox::UpdateText() noexcept
 
 				if (!std::empty(content_))
 				{
+					//Clamp
+					content_view_ = {
+						std::clamp(content_view_.first, 0, std::ssize(content_)),
+						std::clamp(content_view_.second, content_view_.first, std::ssize(content_))
+					};
+
 					content_view_ =
 						detail::get_content_view(content_, cursor_position_, content_view_,
 							mask_, reveal_count_.value_or(detail::default_reveal_count), *text);
@@ -737,13 +748,6 @@ void GuiTextBox::ClearTextContent() noexcept
 }
 
 
-void GuiTextBox::ClampContentView() noexcept
-{
-	content_view_.first = std::clamp(content_view_.first, 0, std::ssize(content_));
-	content_view_.second = std::clamp(content_view_.second, content_view_.first, std::ssize(content_));
-}
-
-
 //Public
 
 GuiTextBox::GuiTextBox(std::string name, std::optional<std::string> caption,
@@ -781,15 +785,19 @@ void GuiTextBox::InsertContent(int off, std::string content)
 			content = gui_text_box::detail::truncate_content(std::move(content),
 				*max_characters_ - std::ssize(content_));
 
-		off = std::clamp(off, 0, std::ssize(content_));
-		content_.insert(std::begin(content_) + off, std::begin(content), std::end(content));
+		if (!std::empty(content))
+		{
+			off = std::clamp(off, 0, std::ssize(content_));
+			content_.insert(std::begin(content_) + off, std::begin(content), std::end(content));
 
-		//Adjust cursor position
-		if (cursor_position_ >= off)
-			CursorPosition(cursor_position_ + std::ssize(content));
+			//Adjust cursor position
+			if (cursor_position_ >= off)
+				CursorPosition(cursor_position_ + std::ssize(content));
 
-		InsertTextContent(off, std::move(content));
-		UpdateText();
+			InsertTextContent(off, std::move(content));
+			UpdateText();
+			Changed();
+		}
 	}
 }
 
@@ -817,7 +825,6 @@ void GuiTextBox::ReplaceContent(int first, int last, std::string content)
 		last = std::clamp(last, first, std::ssize(content_));
 		content_.erase(std::begin(content_) + first, std::begin(content_) + last);
 		content_.insert(std::begin(content_) + first, std::begin(content), std::end(content));
-		ClampContentView();
 
 		//Adjust cursor position
 		if (cursor_position_ >= first && cursor_position_ <= last)
@@ -827,6 +834,7 @@ void GuiTextBox::ReplaceContent(int first, int last, std::string content)
 
 		ReplaceTextContent(first, last, std::move(content));
 		UpdateText();
+		Changed();
 	}
 }
 
@@ -838,14 +846,17 @@ void GuiTextBox::ReplaceContent(int first, int last, std::string content)
 
 void GuiTextBox::ClearContent() noexcept
 {
-	content_.clear();
+	if (!std::empty(content_))
+	{
+		content_.clear();
+
+		CursorPosition(0);
+		ClearTextContent();
+		UpdateText();
+		Changed();
+	}
+
 	content_.shrink_to_fit();
-	content_view_ = {};
-
-	CursorPosition(0);
-
-	ClearTextContent();
-	UpdateText();
 }
 
 void GuiTextBox::RemoveContent(int off) noexcept
@@ -859,7 +870,6 @@ void GuiTextBox::RemoveContent(int first, int last) noexcept
 	{
 		last = std::clamp(last, first, std::ssize(content_));
 		content_.erase(std::begin(content_) + first, std::begin(content_) + last);
-		ClampContentView();
 
 		//Adjust cursor position
 		if (cursor_position_ > first && cursor_position_ <= last)
@@ -869,6 +879,7 @@ void GuiTextBox::RemoveContent(int first, int last) noexcept
 
 		RemoveTextContent(first, last);
 		UpdateText();
+		Changed();
 	}
 }
 
