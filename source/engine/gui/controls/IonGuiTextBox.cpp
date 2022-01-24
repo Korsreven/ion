@@ -22,6 +22,7 @@ File:	IonGuiTextBox.cpp
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/scene/shapes/IonSprite.h"
 #include "utilities/IonStringUtility.h"
+#include "system/IonSystemUtility.h"
 
 namespace ion::gui::controls
 {
@@ -881,6 +882,79 @@ void GuiTextBox::RemoveContent(int first, int last) noexcept
 		UpdateText();
 		Changed();
 	}
+}
+
+
+/*
+	Content
+	Clipboard
+*/
+
+bool GuiTextBox::CopyContent() noexcept
+{
+	return system::utilities::Clipboard(content_);
+}
+
+bool GuiTextBox::CopyContent(int first, int last) noexcept
+{
+	return system::utilities::Clipboard(std::string_view{content_}.substr(first, last));
+}
+
+
+bool GuiTextBox::CutContent() noexcept
+{
+	if (CopyContent())
+	{
+		ClearContent();
+		return true;
+	}
+	else
+		return false;
+}
+
+bool GuiTextBox::CutContent(int first, int last) noexcept
+{
+	if (CopyContent(first, last))
+	{
+		RemoveContent(first, last);
+		return true;
+	}
+	else
+		return false;
+}
+
+
+bool GuiTextBox::PasteContent()
+{
+	if (auto str = system::utilities::Clipboard(); str)
+	{
+		AddContent(std::move(*str));
+		return true;
+	}
+	else
+		return false;
+}
+
+bool GuiTextBox::PasteContent(int off)
+{
+	if (auto str = system::utilities::Clipboard(); str)
+	{
+		InsertContent(off, std::move(*str));
+		return true;
+	}
+	else
+		return false;
+}
+
+bool GuiTextBox::PasteContent(int first, int last)
+{
+	if (auto str = system::utilities::Clipboard(); str)
+	{
+		ReplaceContent(first, last, std::move(*str));
+		return true;
+	}
+	else
+		return false;
 }
 
 

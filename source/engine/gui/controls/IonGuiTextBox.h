@@ -576,6 +576,35 @@ namespace ion::gui::controls
 
 
 			/*
+				Content
+				Clipboard
+			*/
+
+			//Copies all content from this text box to the clipboard
+			bool CopyContent() noexcept;
+
+			//Copies all content in range [first, last) from this text box to the clipboard
+			bool CopyContent(int first, int last) noexcept;
+
+
+			//Cuts all content from this text box to the clipboard
+			bool CutContent() noexcept;
+
+			//Cuts all content in range [first, last) from this text box to the clipboard
+			bool CutContent(int first, int last) noexcept;
+
+
+			//Paste text from the clipboard and adds it to this text box
+			bool PasteContent();
+
+			//Paste text from the clipboard and inserts it at the given offset in this text box
+			bool PasteContent(int off);
+
+			//Paste text from the clipboard and replaces it in range [fist, last) in this text box
+			bool PasteContent(int first, int last);
+
+
+			/*
 				Frame events
 			*/
 
