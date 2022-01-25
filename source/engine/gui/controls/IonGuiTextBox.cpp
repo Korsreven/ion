@@ -21,6 +21,7 @@ File:	IonGuiTextBox.cpp
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/scene/shapes/IonSprite.h"
+#include "utilities/IonMath.h"
 #include "utilities/IonStringUtility.h"
 #include "system/IonSystemUtility.h"
 
@@ -264,6 +265,30 @@ std::string get_viewed_content(const std::string &content, std::pair<int, int> c
 		return mask_content(std::move(str), *mask);
 	else
 		return str;
+}
+
+
+int get_cursor_position(const Vector2 &position, const Vector2 &scaling, std::string_view str, graphics::fonts::Font &font) noexcept
+{
+	using namespace utilities;
+	auto cursor_position = 0;
+
+	if (auto x = position.X(); x > 0.0_r)
+	{
+		for (auto width = 0.0_r; auto &c : str)
+		{
+			if (auto c_width = char_width(c, font) * scaling.X(); width + c_width >= x)
+				//x is in range (width, width + c_width]
+				return cursor_position + static_cast<int>(math::Round((x - width) / c_width));
+			else
+			{
+				width += c_width;
+				++cursor_position;
+			}
+		}
+	}
+
+	return cursor_position;
 }
 
 } //gui_text_box::detail
@@ -515,6 +540,7 @@ void GuiTextBox::UpdateText() noexcept
 				text->AreaSize(*size * ortho_viewport_ratio);
 				text->Padding(text_padding_.value_or(detail::default_text_padding_size));
 				text->Alignment(detail::text_layout_to_text_alignment(text_layout_));
+				text->VerticalAlignment(graphics::fonts::text::TextVerticalAlignment::Middle);
 
 				if (skin->PlaceholderText)
 					skin->PlaceholderText->Visible(false);
@@ -547,6 +573,7 @@ void GuiTextBox::UpdateText() noexcept
 							placeholder_text->AreaSize(*size * ortho_viewport_ratio);
 							placeholder_text->Padding(text_padding_.value_or(detail::default_text_padding_size));
 							placeholder_text->Alignment(detail::text_layout_to_text_alignment(text_layout_));
+							placeholder_text->VerticalAlignment(graphics::fonts::text::TextVerticalAlignment::Middle);
 							placeholder_text->Content(*placeholder_content_);
 							skin->PlaceholderText->Visible(true);
 						}
@@ -593,7 +620,7 @@ void GuiTextBox::UpdateCursor() noexcept
 					}();
 
 				auto line_height = *text->LineHeight() * viewport_ortho_ratio.Y();
-				auto line_padding = text->Padding().Y() * viewport_ortho_ratio.Y();
+				auto text_padding = text->Padding().Y() * viewport_ortho_ratio.Y();
 
 				auto [cursor_width, cursor_height] = skin->Cursor->Size().XY();
 				auto aspect_ratio = cursor_width / cursor_height;
@@ -610,10 +637,8 @@ void GuiTextBox::UpdateCursor() noexcept
 					detail::get_viewed_content(content_, {cursor_position_, content_view_.second}, mask_), *font) *
 					viewport_ortho_ratio.Y();
 
-				skin->Cursor->Position(Vector3{
-					center.X(),
-					height * 0.5_r - line_padding - line_height * 0.5_r,
-					skin->Cursor->Position().Z()} +
+				skin->Cursor->Position(
+					Vector3{center.X(), center.Y(), skin->Cursor->Position().Z()} +
 					detail::cursor_offset(width, line_width, skin->Cursor->Size().X(), cursor_distance, text_layout_)
 				);
 			}
@@ -1188,6 +1213,63 @@ bool GuiTextBox::CharacterPressed(char character) noexcept
 
 bool GuiTextBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 {
+	using namespace utilities;
+
+	if (button == MouseButton::Left)
+	{
+		if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
+			skin && skin->Cursor && skin->Text)
+		{
+			//Text
+			if (auto &text = skin->Text->GetImmutable(); text)
+			{
+				auto font = detail::get_font(*text);
+
+				if (auto size = InnerSize(); size && font)
+				{
+					auto [width, height] = size->XY();
+					auto [viewport_ortho_ratio, ortho_viewport_ratio] =
+						[&]() noexcept
+						{
+							//Adjust area size from ortho to viewport space
+							if (auto scene_manager = skin->Text->Owner(); scene_manager)
+							{
+								if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+									return std::pair{viewport->ViewportToOrthoRatio(), viewport->OrthoToViewportRatio()};
+							}
+
+							return std::pair{vector2::UnitScale, vector2::UnitScale};
+						}();
+					
+					auto line_width = detail::string_width(
+						detail::get_viewed_content(content_, {content_view_.first, content_view_.second}, mask_), *font) *
+						viewport_ortho_ratio.Y();
+					auto [cursor_width, cursor_height] = skin->Cursor->Size().XY();
+					auto scaling = vector2::UnitScale;
+					
+					if (skin_node_)
+					{
+						position = //Make position relative to text
+							(position - (skin_node_->DerivedPosition() + skin->Text->Position())).
+							RotateCopy(-skin_node_->DerivedRotation(), vector2::Zero);
+						
+						width *= skin_node_->DerivedScaling().X();
+						line_width *= skin_node_->DerivedScaling().X();
+						cursor_width *= skin_node_->DerivedScaling().X();
+						scaling *= skin_node_->DerivedScaling();
+					}
+
+					CursorPosition(
+						content_view_.first +
+						detail::get_cursor_position((position -
+							detail::cursor_offset(width, line_width, cursor_width, 0.0_r, text_layout_)) * ortho_viewport_ratio,
+							scaling, detail::get_viewed_content(content_, content_view_, mask_), *font)
+						);
+				}
+			}
+		}
+	}
+
 	return false;
 }
 

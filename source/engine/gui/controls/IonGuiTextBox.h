@@ -138,6 +138,8 @@ namespace ion::gui::controls
 			std::pair<int, int> get_content_view(std::string_view content, int cursor_position, std::pair<int, int> content_view,
 				std::optional<char> mask, int reveal_count, const graphics::fonts::Text &text) noexcept;
 			std::string get_viewed_content(const std::string &content, std::pair<int, int> content_view, std::optional<char> mask);
+
+			int get_cursor_position(const Vector2 &position, const Vector2 &scaling, std::string_view str, graphics::fonts::Font &font) noexcept;
 		} //detail
 	} //gui_text_box
 
