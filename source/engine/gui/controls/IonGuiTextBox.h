@@ -176,6 +176,7 @@ namespace ion::gui::controls
 			real cursor_opacity_ = 1.0_r;
 			std::optional<KeyButton> repeat_key_;
 			std::optional<char> repeat_char_;
+			bool ctrl_pressed_ = false;
 
 
 			/*

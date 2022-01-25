@@ -304,6 +304,8 @@ void GuiTextBox::Defocused() noexcept
 		repeat_char_ = {};
 	}
 
+	ctrl_pressed_ = false;
+
 	if (auto skin = static_cast<TextBoxSkin*>(skin_.get()); skin && skin->Cursor)
 	{
 		SetBlinkPhase(detail::cursor_blink_phase::Hold);
@@ -892,12 +894,19 @@ void GuiTextBox::RemoveContent(int first, int last) noexcept
 
 bool GuiTextBox::CopyContent() noexcept
 {
-	return system::utilities::Clipboard(content_);
+	return system::utilities::Clipboard(
+		detail::get_viewed_content(content_, {0, std::ssize(content_)}, mask_)
+	);
 }
 
 bool GuiTextBox::CopyContent(int first, int last) noexcept
 {
-	return system::utilities::Clipboard(std::string_view{content_}.substr(first, last));
+	first = std::clamp(first, 0, std::ssize(content_));
+	last = std::clamp(last, first, std::ssize(content_));
+
+	return system::utilities::Clipboard(
+		detail::get_viewed_content(content_, {first, last}, mask_)
+	);
 }
 
 
@@ -1085,6 +1094,35 @@ bool GuiTextBox::KeyPressed(KeyButton button) noexcept
 		repeat_char_ = {};
 		repeat_key_ = button;
 		return true;
+
+
+		case KeyButton::Ctrl:
+		ctrl_pressed_ = true;
+		return true;
+
+		case KeyButton::C:
+		{
+			if (ctrl_pressed_)
+				CopyContent();
+
+			return true;
+		}
+
+		case KeyButton::X:
+		{
+			if (ctrl_pressed_)
+				CutContent();
+
+			return true;
+		}
+
+		case KeyButton::V:
+		{
+			if (ctrl_pressed_)
+				PasteContent(cursor_position_);
+
+			return true;
+		}
 	}
 
 	return false;
@@ -1116,6 +1154,10 @@ bool GuiTextBox::KeyReleased(KeyButton button) noexcept
 		case KeyButton::UpArrow:
 		case KeyButton::Backspace:
 		case KeyButton::Delete:
+		return true;
+
+		case KeyButton::Ctrl:
+		ctrl_pressed_ = false;
 		return true;
 	}
 
