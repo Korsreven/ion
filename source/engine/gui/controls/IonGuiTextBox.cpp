@@ -33,15 +33,15 @@ using namespace gui_text_box;
 namespace gui_text_box::detail
 {
 
-Vector2 cursor_offset(real width, real line_width, real cursor_width, real cursor_distance, TextBoxTextLayout text_layout) noexcept
+Vector2 cursor_offset(real width, real line_width, real line_padding, real cursor_distance, TextBoxTextLayout text_layout) noexcept
 {
 	switch (text_layout)
 	{
 		case TextBoxTextLayout::Left:
-		return {-width * 0.5_r + cursor_distance + cursor_width * 0.5_r, 0.0_r};
+		return {-width * 0.5_r + line_padding + cursor_distance, 0.0_r};
 
 		case TextBoxTextLayout::Right:
-		return {width * 0.5_r - (line_width - cursor_distance) - cursor_width * 0.5_r, 0.0_r};
+		return {width * 0.5_r - line_padding - (line_width - cursor_distance), 0.0_r};
 		
 		case TextBoxTextLayout::Center:
 		default:
@@ -620,7 +620,7 @@ void GuiTextBox::UpdateCursor() noexcept
 					}();
 
 				auto line_height = *text->LineHeight() * viewport_ortho_ratio.Y();
-				auto text_padding = text->Padding().Y() * viewport_ortho_ratio.Y();
+				auto line_padding = text->Padding().X() * viewport_ortho_ratio.X();
 
 				auto [cursor_width, cursor_height] = skin->Cursor->Size().XY();
 				auto aspect_ratio = cursor_width / cursor_height;
@@ -632,14 +632,14 @@ void GuiTextBox::UpdateCursor() noexcept
 
 				auto cursor_distance = detail::string_width(
 					detail::get_viewed_content(content_, {content_view_.first, cursor_position_}, mask_), *font) *
-					viewport_ortho_ratio.Y();
+					viewport_ortho_ratio.X();
 				auto line_width = cursor_distance + detail::string_width(
 					detail::get_viewed_content(content_, {cursor_position_, content_view_.second}, mask_), *font) *
-					viewport_ortho_ratio.Y();
+					viewport_ortho_ratio.X();
 
 				skin->Cursor->Position(
 					Vector3{center.X(), center.Y(), skin->Cursor->Position().Z()} +
-					detail::cursor_offset(width, line_width, skin->Cursor->Size().X(), cursor_distance, text_layout_)
+					detail::cursor_offset(width, line_width, line_padding, cursor_distance, text_layout_)
 				);
 			}
 		}
@@ -1243,8 +1243,8 @@ bool GuiTextBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 					
 					auto line_width = detail::string_width(
 						detail::get_viewed_content(content_, {content_view_.first, content_view_.second}, mask_), *font) *
-						viewport_ortho_ratio.Y();
-					auto [cursor_width, cursor_height] = skin->Cursor->Size().XY();
+						viewport_ortho_ratio.X();
+					auto line_padding = text->Padding().X() * viewport_ortho_ratio.X();
 					auto scaling = vector2::UnitScale;
 					
 					if (skin_node_)
@@ -1255,14 +1255,14 @@ bool GuiTextBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 						
 						width *= skin_node_->DerivedScaling().X();
 						line_width *= skin_node_->DerivedScaling().X();
-						cursor_width *= skin_node_->DerivedScaling().X();
+						line_padding *= skin_node_->DerivedScaling().X();
 						scaling *= skin_node_->DerivedScaling();
 					}
 
 					CursorPosition(
 						content_view_.first +
 						detail::get_cursor_position((position -
-							detail::cursor_offset(width, line_width, cursor_width, 0.0_r, text_layout_)) * ortho_viewport_ratio,
+							detail::cursor_offset(width, line_width, line_padding, 0.0_r, text_layout_)) * ortho_viewport_ratio,
 							scaling, detail::get_viewed_content(content_, content_view_, mask_), *font)
 						);
 				}

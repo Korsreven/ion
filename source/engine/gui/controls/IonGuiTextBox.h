@@ -117,7 +117,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			Vector2 cursor_offset(real width, real line_width, real cursor_width, real cursor_distance, TextBoxTextLayout text_layout) noexcept;
+			Vector2 cursor_offset(real width, real line_width, real line_padding, real cursor_distance, TextBoxTextLayout text_layout) noexcept;
 
 
 			/*
