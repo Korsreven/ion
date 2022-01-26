@@ -878,6 +878,8 @@ bool GuiListBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 				if (auto size = InnerSize(); size)
 				{
 					auto [width, height] = size->XY();
+					auto center = CenterArea().value_or(aabb::Zero).Center();
+
 					auto viewport_ortho_ratio =
 						[&]() noexcept
 						{
@@ -893,11 +895,11 @@ bool GuiListBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 
 					auto item_height = *text->LineHeight() * viewport_ortho_ratio.Y();
 					auto item_padding = text->Padding().Y() * viewport_ortho_ratio.Y();
-						
+					
 					if (skin_node_)
 					{
 						position = //Make position relative to lines
-							(position - (skin_node_->DerivedPosition() + skin->Lines->Position())).
+							(position - (skin_node_->DerivedPosition() + center)).
 							RotateCopy(-skin_node_->DerivedRotation(), vector2::Zero);
 
 						height *= skin_node_->DerivedScaling().Y();

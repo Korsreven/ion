@@ -1235,6 +1235,8 @@ bool GuiTextBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 				if (auto size = InnerSize(); size && font)
 				{
 					auto [width, height] = size->XY();
+					auto center = CenterArea().value_or(aabb::Zero).Center();
+
 					auto [viewport_ortho_ratio, ortho_viewport_ratio] =
 						[&]() noexcept
 						{
@@ -1257,7 +1259,7 @@ bool GuiTextBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 					if (skin_node_)
 					{
 						position = //Make position relative to text
-							(position - (skin_node_->DerivedPosition() + skin->Text->Position())).
+							(position - (skin_node_->DerivedPosition() + center)).
 							RotateCopy(-skin_node_->DerivedRotation(), vector2::Zero);
 						
 						width *= skin_node_->DerivedScaling().X();
