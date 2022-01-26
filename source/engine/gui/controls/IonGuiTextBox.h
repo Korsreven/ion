@@ -54,6 +54,13 @@ namespace ion::gui::controls
 
 	namespace gui_text_box
 	{
+		enum class TextBoxTextLayout
+		{
+			Left,
+			Center,
+			Right
+		};
+
 		enum class TextBoxTextMode
 		{
 			AlphaNumeric,
@@ -61,11 +68,10 @@ namespace ion::gui::controls
 			Numeric
 		};
 
-		enum class TextBoxTextLayout
+		enum class TextBoxCharacterSet : bool
 		{
-			Left,
-			Center,
-			Right
+			ASCII,
+			ExtendedASCII
 		};
 
 
@@ -124,7 +130,7 @@ namespace ion::gui::controls
 				Content
 			*/
 
-			std::string trim_content(std::string content, TextBoxTextMode text_mode) noexcept;
+			std::string trim_content(std::string content, TextBoxTextMode text_mode, TextBoxCharacterSet character_set) noexcept;
 			std::string truncate_content(std::string content, int max_characters) noexcept;
 			std::string mask_content(std::string content, char mask) noexcept;
 			std::string trim_placeholder_content(std::string content) noexcept;
@@ -158,8 +164,9 @@ namespace ion::gui::controls
 			std::optional<char> mask_;
 
 			std::optional<Vector2> text_padding_;
-			gui_text_box::TextBoxTextMode text_mode_ = gui_text_box::TextBoxTextMode::AlphaNumeric;
 			gui_text_box::TextBoxTextLayout text_layout_ = gui_text_box::TextBoxTextLayout::Left;
+			gui_text_box::TextBoxTextMode text_mode_ = gui_text_box::TextBoxTextMode::AlphaNumeric;	
+			gui_text_box::TextBoxCharacterSet character_set_ = gui_text_box::TextBoxCharacterSet::ASCII;
 
 			int cursor_position_ = 0;
 			std::optional<int> reveal_count_;
@@ -271,7 +278,7 @@ namespace ion::gui::controls
 			//Sets the content for this text box to the given content
 			inline void Content(std::string content) noexcept
 			{
-				content = gui_text_box::detail::trim_content(std::move(content), text_mode_);
+				content = gui_text_box::detail::trim_content(std::move(content), text_mode_, character_set_);
 
 				if (max_characters_)
 					content = gui_text_box::detail::truncate_content(std::move(content), *max_characters_);
@@ -324,7 +331,7 @@ namespace ion::gui::controls
 			//The character given must be a graphical character
 			inline void Mask(std::optional<char> character) noexcept
 			{
-				if (!character || std::isgraph(*character))
+				if (!character || std::isgraph(static_cast<unsigned char>(*character)))
 				{
 					if (mask_ != character)
 					{
@@ -345,6 +352,16 @@ namespace ion::gui::controls
 				}
 			}
 
+			//Sets the text layout for this text box to the given layout
+			inline void TextLayout(gui_text_box::TextBoxTextLayout layout) noexcept
+			{
+				if (text_layout_ != layout)
+				{
+					text_layout_ = layout;
+					UpdateText();
+				}
+			}
+
 			//Sets the text mode for this text box to the given mode
 			inline void TextMode(gui_text_box::TextBoxTextMode mode) noexcept
 			{
@@ -355,7 +372,7 @@ namespace ion::gui::controls
 					if (mode != gui_text_box::TextBoxTextMode::AlphaNumeric)
 					{
 						auto size = std::size(content_);
-						content_ = gui_text_box::detail::trim_content(std::move(content_), text_mode_);
+						content_ = gui_text_box::detail::trim_content(std::move(content_), mode, character_set_);
 
 						if (size != std::size(content_))
 						{
@@ -367,13 +384,25 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the text layout for this text box to the given layout
-			inline void TextLayout(gui_text_box::TextBoxTextLayout layout) noexcept
+			//Sets the allowed character set for this text box to the given set
+			inline void CharacterSet(gui_text_box::TextBoxCharacterSet set) noexcept
 			{
-				if (text_layout_ != layout)
+				if (character_set_ != set)
 				{
-					text_layout_ = layout;
-					UpdateText();
+					character_set_ = set;
+					
+					if (set != gui_text_box::TextBoxCharacterSet::ExtendedASCII)
+					{
+						auto size = std::size(content_);
+						content_ = gui_text_box::detail::trim_content(std::move(content_), text_mode_, character_set_);
+
+						if (size != std::size(content_))
+						{
+							CursorPosition(cursor_position_);
+							UpdateText();
+							Changed();
+						}
+					}
 				}
 			}
 
@@ -487,16 +516,22 @@ namespace ion::gui::controls
 				return text_padding_;
 			}
 
+			//Returns the text layout for this text box
+			[[nodiscard]] inline auto TextLayout() const noexcept
+			{
+				return text_layout_;
+			}
+
 			//Returns the text mode for this text box
 			[[nodiscard]] inline auto TextMode() const noexcept
 			{
 				return text_mode_;
 			}
 
-			//Returns the text layout for this text box
-			[[nodiscard]] inline auto TextLayout() const noexcept
+			//Returns the allowed character set for this text box
+			[[nodiscard]] inline auto CharacterSet() const noexcept
 			{
-				return text_layout_;
+				return character_set_;
 			}
 
 

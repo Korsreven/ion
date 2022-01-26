@@ -54,10 +54,17 @@ Vector2 cursor_offset(real width, real line_width, real line_padding, real curso
 	Content
 */
 
-std::string trim_content(std::string content, TextBoxTextMode text_mode) noexcept
+std::string trim_content(std::string content, TextBoxTextMode text_mode, TextBoxCharacterSet character_set) noexcept
 {
 	using namespace utilities;
 	string::RemoveNonPrintable(content);
+
+	if (character_set == TextBoxCharacterSet::ASCII)
+		content.erase(std::remove_if(std::begin(content), std::end(content),
+			[](unsigned char c)
+			{
+				return c >= static_cast<unsigned char>(graphics::fonts::font::CharacterEncoding::ASCII);
+			}), std::end(content));
 
 	switch (text_mode)
 	{
@@ -807,7 +814,7 @@ void GuiTextBox::InsertContent(int off, std::string content)
 {
 	if (off >= 0)
 	{
-		content = gui_text_box::detail::trim_content(std::move(content), text_mode_);
+		content = gui_text_box::detail::trim_content(std::move(content), text_mode_, character_set_);
 
 		if (max_characters_)
 			content = gui_text_box::detail::truncate_content(std::move(content),
@@ -844,7 +851,7 @@ void GuiTextBox::ReplaceContent(int first, int last, std::string content)
 {
 	if (first >= 0 && first < last)
 	{
-		content = gui_text_box::detail::trim_content(std::move(content), text_mode_);
+		content = gui_text_box::detail::trim_content(std::move(content), text_mode_, character_set_);
 
 		if (max_characters_ && std::ssize(content) > last - first)
 			content = gui_text_box::detail::truncate_content(std::move(content),
