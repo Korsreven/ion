@@ -61,6 +61,43 @@ namespace ion::utilities::string
 		constexpr auto format_exponent = 'e';
 
 
+		constexpr auto is_ascii(char c) noexcept
+		{
+			return c >= '\0' && c <= '\x7F';
+		}
+
+		constexpr auto is_extended_ascii(char c) noexcept
+		{
+			return !is_ascii(c);
+		}
+
+		constexpr auto is_non_printable(char c) noexcept
+		{
+			return (c >= '\0' && c < ' ') || c == '\x7F';
+		}
+
+		constexpr auto is_printable(char c) noexcept
+		{
+			return !is_non_printable(c);
+				//Returns true for extended ASCII
+		}
+
+		constexpr auto is_alpha(char c) noexcept
+		{
+			return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+		}
+
+		constexpr auto is_numeric(char c) noexcept
+		{
+			return c >= '0' && c <= '9';
+		}
+
+		constexpr auto is_alpha_numeric(char c) noexcept
+		{
+			return is_alpha(c) || is_numeric(c);
+		}
+
+
 		constexpr auto is_lower(char c) noexcept
 		{
 			return c >= 'a' && c <= 'z';
@@ -447,22 +484,36 @@ namespace ion::utilities::string
 		Non-printable
 	*/
 
-	//Remove all alpha characters from str
-	std::string& RemoveAlpha(std::string &str) noexcept;
+	//Remove all non-ascii characters from str
+	std::string& RemoveNonAscii(std::string &str) noexcept;
 
-	//Remove all numeric characters from str
-	std::string& RemoveNumeric(std::string &str) noexcept;
+	//Remove all non-alpha characters from str
+	std::string& RemoveNonAlpha(std::string &str) noexcept;
+
+	//Remove all non-numeric characters from str
+	std::string& RemoveNonNumeric(std::string &str) noexcept;
+
+	//Remove all non- alpha numeric characters from str
+	std::string& RemoveNonAlphaNumeric(std::string &str) noexcept;
 
 	//Remove all non-printable characters from str
 	std::string& RemoveNonPrintable(std::string &str) noexcept;
 
-	//Remove all alpha characters from str
+	//Remove all non-ascii characters from str
 	//Returns the result as a copy
-	[[nodiscard]] std::string RemoveAlphaCopy(std::string str) noexcept;
+	[[nodiscard]] std::string RemoveNonAsciiCopy(std::string str) noexcept;
 
-	//Remove all numeric characters from str
+	//Remove all non-alpha characters from str
 	//Returns the result as a copy
-	[[nodiscard]] std::string RemoveNumericCopy(std::string str) noexcept;
+	[[nodiscard]] std::string RemoveNonAlphaCopy(std::string str) noexcept;
+
+	//Remove all non-numeric characters from str
+	//Returns the result as a copy
+	[[nodiscard]] std::string RemoveNonNumericCopy(std::string str) noexcept;
+
+	//Remove all non- alpha numeric characters from str
+	//Returns the result as a copy
+	[[nodiscard]] std::string RemoveNonAlphaNumericCopy(std::string str) noexcept;
 
 	//Remove all non-printable characters from str
 	//Returns the result as a copy

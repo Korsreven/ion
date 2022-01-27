@@ -63,6 +63,7 @@ namespace ion::gui::controls
 
 		enum class TextBoxTextMode
 		{
+			Printable,
 			AlphaNumeric,
 			Alpha,
 			Numeric
@@ -165,7 +166,7 @@ namespace ion::gui::controls
 
 			std::optional<Vector2> text_padding_;
 			gui_text_box::TextBoxTextLayout text_layout_ = gui_text_box::TextBoxTextLayout::Left;
-			gui_text_box::TextBoxTextMode text_mode_ = gui_text_box::TextBoxTextMode::AlphaNumeric;	
+			gui_text_box::TextBoxTextMode text_mode_ = gui_text_box::TextBoxTextMode::Printable;	
 			gui_text_box::TextBoxCharacterSet character_set_ = gui_text_box::TextBoxCharacterSet::ASCII;
 
 			int cursor_position_ = 0;
@@ -369,7 +370,7 @@ namespace ion::gui::controls
 				{
 					text_mode_ = mode;
 
-					if (mode != gui_text_box::TextBoxTextMode::AlphaNumeric)
+					if (mode != gui_text_box::TextBoxTextMode::Printable)
 					{
 						auto size = std::size(content_);
 						content_ = gui_text_box::detail::trim_content(std::move(content_), mode, character_set_);

@@ -57,26 +57,26 @@ Vector2 cursor_offset(real width, real line_width, real line_padding, real curso
 std::string trim_content(std::string content, TextBoxTextMode text_mode, TextBoxCharacterSet character_set) noexcept
 {
 	using namespace utilities;
-	string::RemoveNonPrintable(content);
-
-	if (character_set == TextBoxCharacterSet::ASCII)
-		content.erase(std::remove_if(std::begin(content), std::end(content),
-			[](unsigned char c)
-			{
-				return c >= static_cast<unsigned char>(graphics::fonts::font::CharacterEncoding::ASCII);
-			}), std::end(content));
 
 	switch (text_mode)
 	{
 		case TextBoxTextMode::Alpha:
-		return string::RemoveNumericCopy(std::move(content));
+		return string::RemoveNonAlphaCopy(std::move(content));
 
 		case TextBoxTextMode::Numeric:
-		return string::RemoveAlphaCopy(std::move(content));
+		return string::RemoveNonNumericCopy(std::move(content));
 
 		case TextBoxTextMode::AlphaNumeric:
+		return string::RemoveNonAlphaNumericCopy(std::move(content));
+
+		case TextBoxTextMode::Printable:
 		default:
-		return content;
+		{
+			if (character_set == TextBoxCharacterSet::ASCII)
+				string::RemoveNonAscii(content);
+
+			return string::RemoveNonPrintableCopy(std::move(content));
+		}
 	}
 }
 
@@ -1130,6 +1130,10 @@ bool GuiTextBox::KeyPressed(KeyButton button) noexcept
 
 		case KeyButton::Ctrl:
 		ctrl_pressed_ = true;
+		return true;
+
+		case KeyButton::Alt:
+		ctrl_pressed_ = false;
 		return true;
 
 		case KeyButton::C:

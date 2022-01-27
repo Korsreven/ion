@@ -528,32 +528,54 @@ std::string PadRightCopy(std::string str, int length, std::string_view character
 	Non-printable
 */
 
-std::string& RemoveAlpha(std::string &str) noexcept
+std::string& RemoveNonAscii(std::string &str) noexcept
 {
-	str.erase(std::remove_if(std::begin(str), std::end(str), [](unsigned char c) { return std::isalpha(c); }), std::end(str));
+	str.erase(std::remove_if(std::begin(str), std::end(str), detail::is_extended_ascii), std::end(str));
 	return str;
 }
 
-std::string& RemoveNumeric(std::string &str) noexcept
+std::string& RemoveNonAlpha(std::string &str) noexcept
 {
-	str.erase(std::remove_if(std::begin(str), std::end(str), [](unsigned char c) { return std::isdigit(c); }), std::end(str));
+	str.erase(std::remove_if(std::begin(str), std::end(str), [](auto c) { return !detail::is_alpha(c); }), std::end(str));
+	return str;
+}
+
+std::string& RemoveNonNumeric(std::string &str) noexcept
+{
+	str.erase(std::remove_if(std::begin(str), std::end(str), [](auto c) { return !detail::is_numeric(c); }), std::end(str));
+	return str;
+}
+
+std::string& RemoveNonAlphaNumeric(std::string &str) noexcept
+{
+	str.erase(std::remove_if(std::begin(str), std::end(str), [](auto c) { return !detail::is_alpha_numeric(c); }), std::end(str));
 	return str;
 }
 
 std::string& RemoveNonPrintable(std::string &str) noexcept
 {
-	str.erase(std::remove_if(std::begin(str), std::end(str), [](unsigned char c) { return !std::isprint(c); }), std::end(str));
+	str.erase(std::remove_if(std::begin(str), std::end(str), detail::is_non_printable), std::end(str));
 	return str;
 }
 
-std::string RemoveAlphaCopy(std::string str) noexcept
+std::string RemoveNonAsciiCopy(std::string str) noexcept
 {
-	return RemoveAlpha(str);
+	return RemoveNonAscii(str);
 }
 
-std::string RemoveNumericCopy(std::string str) noexcept
+std::string RemoveNonAlphaCopy(std::string str) noexcept
 {
-	return RemoveNumeric(str);
+	return RemoveNonAlpha(str);
+}
+
+std::string RemoveNonNumericCopy(std::string str) noexcept
+{
+	return RemoveNonNumeric(str);
+}
+
+std::string RemoveNonAlphaNumericCopy(std::string str) noexcept
+{
+	return RemoveNonAlphaNumeric(str);
 }
 
 std::string RemoveNonPrintableCopy(std::string str) noexcept

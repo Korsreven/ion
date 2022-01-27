@@ -2794,9 +2794,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto text_box = base_panel->CreateTextBox("text_box", "My text box", std::move(text_box_skin), Vector2{0.5_r, 0.1_r});		
 			text_box->Node()->Position({0.0_r, -0.3_r});
 			text_box->Tooltip("My text box tooltip");
-			text_box->PlaceholderContent("<i><b>Type</b></i> something...");
-			text_box->TextMode(ion::gui::controls::gui_text_box::TextBoxTextMode::AlphaNumeric);
+			text_box->PlaceholderContent("<i><b>Type</b></i> something...");	
 			text_box->TextLayout(ion::gui::controls::gui_text_box::TextBoxTextLayout::Left);
+			text_box->TextMode(ion::gui::controls::gui_text_box::TextBoxTextMode::Printable);
+			text_box->CharacterSet(ion::gui::controls::gui_text_box::TextBoxCharacterSet::ASCII);
 
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);
