@@ -79,12 +79,11 @@ namespace ion::utilities::string
 		constexpr auto is_printable(char c) noexcept
 		{
 			return !is_non_printable(c);
-				//Returns true for extended ASCII
 		}
 
 		constexpr auto is_alpha(char c) noexcept
 		{
-			return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+			return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || is_extended_ascii(c);
 		}
 
 		constexpr auto is_numeric(char c) noexcept

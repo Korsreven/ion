@@ -58,6 +58,9 @@ std::string trim_content(std::string content, TextBoxTextMode text_mode, TextBox
 {
 	using namespace utilities;
 
+	if (character_set == TextBoxCharacterSet::ASCII)
+		string::RemoveNonAscii(content);
+
 	switch (text_mode)
 	{
 		case TextBoxTextMode::Alpha:
@@ -71,12 +74,7 @@ std::string trim_content(std::string content, TextBoxTextMode text_mode, TextBox
 
 		case TextBoxTextMode::Printable:
 		default:
-		{
-			if (character_set == TextBoxCharacterSet::ASCII)
-				string::RemoveNonAscii(content);
-
-			return string::RemoveNonPrintableCopy(std::move(content));
-		}
+		return string::RemoveNonPrintableCopy(std::move(content));
 	}
 }
 
