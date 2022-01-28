@@ -747,13 +747,15 @@ bool Window::ProcessMessage(HWND handle, UINT message, WPARAM w_param, LPARAM l_
 						ExitFullScreen();
 					else
 						EnterFullScreen(GetFullScreenSize());
-
-					return true;
 				}
 			}
 
-			break;
+			[[fallthrough]];
 		}
+
+		case WM_SYSKEYUP:
+		case WM_SYSCHAR:
+		return true; //Return true from this
 		
 		case WM_MOVE: //Client position
 		{
