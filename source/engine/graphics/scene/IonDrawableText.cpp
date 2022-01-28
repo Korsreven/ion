@@ -462,7 +462,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 				//For each character
 				for (auto c : text_block.Content)
 				{
-					if (auto glyph_index = static_cast<unsigned char>(c);
+					if (auto glyph_index = fonts::utilities::detail::get_glyph_index(c, *metrics);
 						glyph_index < std::size(*metrics))
 					{
 						//Update existing stream

@@ -291,10 +291,20 @@ namespace ion::graphics::fonts::utilities
 		}
 
 
+		inline auto get_glyph_index(char c,
+			const font::GlyphMetrices &metrics) noexcept
+		{
+			if (auto glyph_index = static_cast<unsigned char>(c);
+				glyph_index >= std::size(metrics)) //Glyph is missing
+				return static_cast<unsigned char>('?'); //Use question mark
+			else
+				return glyph_index;
+		}
+
 		inline auto character_size_in_pixels(char c,
 			const font::GlyphMetrices &metrics) noexcept
 		{
-			auto glyph_index = static_cast<unsigned char>(c);
+			auto glyph_index = get_glyph_index(c, metrics);
 
 			if (glyph_index < std::size(metrics))
 				return std::pair{metrics[glyph_index].Advance, metrics[glyph_index].Height};
