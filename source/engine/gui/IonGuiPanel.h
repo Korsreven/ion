@@ -70,6 +70,7 @@ namespace ion::gui
 				detail::control_pointers controls_;
 				NonOwningPtr<SceneNode> node_;
 
+
 				void Adopt(SceneNode &node);
 				void Orphan(SceneNode &node);
 
@@ -272,25 +273,6 @@ namespace ion::gui
 
 
 			/*
-				Operators
-			*/
-
-			//Returns a mutable reference to the grid cell at the given offset
-			[[nodiscard]] auto& operator[](std::pair<int, int> off) noexcept
-			{
-				assert(grid_.has_value());
-				return (*grid_)[off];
-			}
-				
-			//Returns an immutable reference to the grid cell at the given offset
-			[[nodiscard]] auto& operator[](std::pair<int, int> off) const noexcept
-			{
-				assert(grid_.has_value());
-				return (*grid_)[off];
-			}
-
-
-			/*
 				Modifiers
 			*/
 
@@ -301,7 +283,7 @@ namespace ion::gui
 			//Sets the grid layout for this gui panel to the given size, rows and columns
 			void GridLayout(const Vector2 &size, int rows, int columns);
 
-			//Unsets the grid layout for this gui panel
+			//Clears the grid layout for this gui panel
 			void GridLayout(std::nullopt_t) noexcept;
 
 
@@ -309,16 +291,16 @@ namespace ion::gui
 				Observers
 			*/
 
-			//Returns a mutable reference to the grid layout for this gui panel
-			//Returns nullopt if this gui panel has no grid layout
-			[[nodiscard]] inline auto& GridLayout() noexcept
+			//Returns a mutable reference to the grid defined for this gui panel
+			//Returns nullopt if this gui panel has no grid
+			[[nodiscard]] inline auto& Grid() noexcept
 			{
 				return grid_;
 			}
 
-			//Returns an immutable reference to the grid layout for this gui panel
-			//Returns nullopt if this gui panel has no grid layout
-			[[nodiscard]] inline auto& GridLayout() const noexcept
+			//Returns an immutable reference to the grid defined for this gui panel
+			//Returns nullopt if this gui panel has no grid
+			[[nodiscard]] inline auto& Grid() const noexcept
 			{
 				return grid_;
 			}
