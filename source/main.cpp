@@ -2801,7 +2801,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);
-			auto sub_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("control");	
+			sub_panel->GridLayout({3.54_r, 2.0_r}, 3, 3);
+			auto &grid = *sub_panel->Grid();
+			auto pos10 = grid[{1, 0}].Position();
+			auto pos11 = grid[{1, 1}].Position();
+			auto pos12 = grid[{1, 2}].Position();
+			sub_panel->GridLayout(std::nullopt);
+			auto sub_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("control");
 
 			auto main_frame2 = controller.CreateFrame("main2");
 			auto base_panel2 = main_frame2->CreatePanel("base");

@@ -151,32 +151,32 @@ Vector2 GridCell::Position() const noexcept
 		if (auto panel = grid->Owner(); panel)
 		{
 			auto [grid_width, grid_height] = grid->Size().XY();
-			auto cell_size = Size();
+			auto [cell_width, cell_height] = Size().XY();
 			auto [row, column] = Offset();
 
-			auto position = panel->Node()->Position() -
-				Vector2{grid_width * 0.5_r, -grid_height * 0.5_r} - cell_size * 0.5_r +
-				cell_size * Vector2{static_cast<real>(row + 1), static_cast<real>(column + 1)};
+			auto position = panel->Node()->Position() +
+				Vector2{-grid_width * 0.5_r + cell_width * 0.5_r, grid_height * 0.5_r - cell_height * 0.5_r} +
+				Vector2{cell_width, -cell_height} * Vector2{static_cast<real>(column), static_cast<real>(row)};
 
 			switch (alignment_)
 			{
 				case GridCellAlignment::Left:
-				position.X(position.X() - cell_size.X() * 0.5_r);
+				position.X(position.X() - cell_width * 0.5_r);
 				break;
 
 				case GridCellAlignment::Right:
-				position.X(position.X() + cell_size.X() * 0.5_r);
+				position.X(position.X() + cell_width * 0.5_r);
 				break;
 			}
 
 			switch (vertical_alignment_)
 			{
 				case GridCellVerticalAlignment::Top:
-				position.Y(position.Y() + cell_size.Y() * 0.5_r);
+				position.Y(position.Y() + cell_height * 0.5_r);
 				break;
 
 				case GridCellVerticalAlignment::Bottom:
-				position.Y(position.Y() - cell_size.Y() * 0.5_r);
+				position.Y(position.Y() - cell_height * 0.5_r);
 				break;
 			}
 
