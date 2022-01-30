@@ -30,7 +30,7 @@ void GridCell::Adopt(SceneNode &node)
 		if (auto panel = grid->Owner(); panel)
 		{
 			if (!node_)
-				node_ = panel->Node()->CreateChildNode(panel->Node()->Visible());
+				node_ = panel->Node()->CreateChildNode(Position(), vector2::UnitY, panel->Node()->Visible());
 
 			node_->Adopt(panel->Node()->Orphan(node));
 		}
@@ -66,6 +66,104 @@ GridCell::GridCell(PanelGrid &owner) noexcept :
 GridCell::~GridCell() noexcept
 {
 	DetachAll();
+}
+
+
+/*
+	Modifiers
+*/
+
+void GridCell::Alignment(GridCellAlignment alignment) noexcept
+{
+	if (alignment_ != alignment)
+	{
+		alignment_ = alignment;
+
+		if (node_)
+			node_->Position(Position());
+	}
+}
+
+void GridCell::VerticalAlignment(GridCellVerticalAlignment vertical_alignment) noexcept
+{
+	if (vertical_alignment_ != vertical_alignment)
+	{
+		vertical_alignment_ = vertical_alignment;
+
+		if (node_)
+			node_->Position(Position());
+	}
+}
+
+
+/*
+	Observers
+*/
+
+Vector2 GridCell::Position() const noexcept
+{
+	if (auto grid = Owner(); grid)
+	{
+		if (auto panel = grid->Owner(); panel)
+		{
+			auto [grid_width, grid_height] = grid->Size().XY();
+			auto cell_size = Size();
+			auto [row, column] = Offset();
+
+			auto position = panel->Node()->Position() -
+				Vector2{grid_width * 0.5_r, -grid_height * 0.5_r} - cell_size * 0.5_r +
+				cell_size * Vector2{static_cast<real>(row + 1), static_cast<real>(column + 1)};
+
+			switch (alignment_)
+			{
+				case GridCellAlignment::Left:
+				position.X(position.X() - cell_size.X() * 0.5_r);
+				break;
+
+				case GridCellAlignment::Right:
+				position.X(position.X() + cell_size.X() * 0.5_r);
+				break;
+			}
+
+			switch (vertical_alignment_)
+			{
+				case GridCellVerticalAlignment::Top:
+				position.Y(position.Y() + cell_size.Y() * 0.5_r);
+				break;
+
+				case GridCellVerticalAlignment::Bottom:
+				position.Y(position.Y() - cell_size.Y() * 0.5_r);
+				break;
+			}
+
+			return position;
+		}
+	}
+
+	return vector2::Zero;
+}
+
+Vector2 GridCell::Size() const noexcept
+{
+	if (auto grid = Owner(); grid)
+		return grid->Size() /
+			Vector2{static_cast<real>(grid->Rows()), static_cast<real>(grid->Columns())};
+	else
+		return vector2::Zero;
+}
+
+std::pair<int, int> GridCell::Offset() const noexcept
+{
+	if (auto grid = Owner(); grid)
+	{
+		for (auto &[off, cell] : grid->Cells())
+		{
+			if (this == &cell)
+				return off;
+		}
+	}
+
+	return std::pair{0, 0};
 }
 
 

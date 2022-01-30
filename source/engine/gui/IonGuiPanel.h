@@ -107,22 +107,10 @@ namespace ion::gui
 				*/
 
 				//Sets the horizontal alignment for this grid cells attached controls to the given alignment
-				inline void Alignment(GridCellAlignment alignment) noexcept
-				{
-					if (alignment_ != alignment)
-					{
-						alignment_ = alignment;
-					}
-				}
+				void Alignment(GridCellAlignment alignment) noexcept;
 
 				//Sets the vertical alignment for this grid cells attached controls to the given alignment
-				inline void VerticalAlignment(GridCellVerticalAlignment vertical_alignment) noexcept
-				{
-					if (vertical_alignment_ != vertical_alignment)
-					{
-						vertical_alignment_ = vertical_alignment;
-					}
-				}
+				void VerticalAlignment(GridCellVerticalAlignment vertical_alignment) noexcept;
 
 
 				/*
@@ -146,6 +134,16 @@ namespace ion::gui
 				{
 					return owner_;
 				}
+
+
+				//Returns the position of this grid cell
+				[[nodiscard]] Vector2 Position() const noexcept;
+
+				//Returns the size of this grid cell
+				[[nodiscard]] Vector2 Size() const noexcept;
+
+				//Returns the offset of this grid cell
+				[[nodiscard]] std::pair<int, int> Offset() const noexcept;
 
 
 				/*
@@ -204,7 +202,7 @@ namespace ion::gui
 				*/
 
 				//Returns a mutable reference to the grid cell at the given offset
-				[[nodiscard]] auto& operator[](std::pair<int, int> off) noexcept
+				[[nodiscard]] inline auto& operator[](std::pair<int, int> off) noexcept
 				{
 					assert(off.first >= 0 && off.first < rows_ &&
 						   off.second >= 0 && off.second < columns_);
@@ -216,7 +214,7 @@ namespace ion::gui
 				}
 				
 				//Returns an immutable reference to the grid cell at the given offset
-				[[nodiscard]] auto& operator[](std::pair<int, int> off) const noexcept
+				[[nodiscard]] inline auto& operator[](std::pair<int, int> off) const noexcept
 				{
 					assert(off.first >= 0 && off.first < rows_ &&
 						   off.second >= 0 && off.second < columns_);
