@@ -12,6 +12,7 @@ File:	IonGuiGroupBox.cpp
 
 #include "IonGuiGroupBox.h"
 
+#include "graphics/scene/graph/IonSceneNode.h"
 #include "gui/IonGuiPanelContainer.h"
 
 namespace ion::gui::controls
@@ -63,11 +64,13 @@ GuiGroupBox::~GuiGroupBox() noexcept
 
 bool GuiGroupBox::AddControl(NonOwningPtr<controls::GuiControl> control)
 {
-	if (control &&
+	if (control && control->Node() &&
 		control.get() != this && //Cannot add itself
 		control->Parent() != this && //Cannot add same control twice
-		control->Owner() == Owner() && //Control has same owner
-		control->Parent() == Owner()) //Control can be adopted
+		control->Owner() == Owner() && //Control and group box has same owner
+		control->Parent() == Owner() && //Parent of the control is the owner of the group box
+		control->Node()->ParentNode() == Owner()->Node().get())
+			//Parent node of the control is the node of the owner of the group box
 	{
 		control->Parent(*this); //Adopt
 		controls_.push_back(control);
