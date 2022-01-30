@@ -55,6 +55,40 @@ void GridCell::Orphan(SceneNode &node)
 }
 
 
+void GridCell::Align(controls::GuiControl &control) noexcept
+{
+	if (auto size = control.Size(); size && node_)
+	{	
+		auto [x, y, z] = node_->Position().XYZ();
+		auto position = vector2::Zero;
+
+		switch (alignment_)
+		{
+			case GridCellAlignment::Left:
+			position.X(x + size->X() * 0.5_r);
+			break;
+
+			case GridCellAlignment::Right:
+			position.X(x - size->X() * 0.5_r);
+			break;
+		}
+
+		switch (vertical_alignment_)
+		{
+			case GridCellVerticalAlignment::Top:
+			position.Y(y - size->Y() * 0.5_r);
+			break;
+
+			case GridCellVerticalAlignment::Bottom:
+			position.Y(y + size->Y() * 0.5_r);
+			break;
+		}
+
+		control.Node()->Position(position);
+	}
+}
+
+
 //Public
 
 GridCell::GridCell(PanelGrid &owner) noexcept :
@@ -92,6 +126,16 @@ void GridCell::VerticalAlignment(GridCellVerticalAlignment vertical_alignment) n
 
 		if (node_)
 			node_->Position(Position());
+	}
+}
+
+
+void GridCell::Realign() noexcept
+{
+	for (auto &control : Controls())
+	{
+		if (control)
+			Align(*control);
 	}
 }
 
@@ -174,13 +218,14 @@ std::pair<int, int> GridCell::Offset() const noexcept
 
 bool GridCell::Attach(NonOwningPtr<controls::GuiControl> control)
 {
-	if (auto owner = Owner();
-		owner && control && control->Node() &&
-		control->Owner() == owner->Owner() && //Control has same owner
-		control->Parent() == owner->Owner() && //Control can be attached
-		control->Node()->ParentNode() == owner->Owner()->Node().get()) //Cannot attach same control twice
+	if (auto grid = Owner(); grid && control && control->Node() &&
+		control->Owner() == grid->Owner() && //Control and grid has same owner
+		control->Parent() == grid->Owner() && //Parent of the control is the owner of the grid
+		control->Node()->ParentNode() == grid->Owner()->Node().get())
+			//Parent node of the control is the node of the owner of the grid
 	{
 		Adopt(*control->Node()); //Adopt
+		Align(*control);
 		controls_.push_back(control);
 		return true;
 	}
@@ -231,6 +276,17 @@ PanelGrid::PanelGrid(GuiPanel &owner, const Vector2 &size, int rows, int columns
 	owner_{&owner}
 {
 	//Empty
+}
+
+
+/*
+	Modifiers
+*/
+
+void PanelGrid::Realign() noexcept
+{
+	for (auto &[off, cell] : Cells())
+		cell.Realign();
 }
 
 } //gui_panel

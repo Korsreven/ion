@@ -74,6 +74,8 @@ namespace ion::gui
 				void Adopt(SceneNode &node);
 				void Orphan(SceneNode &node);
 
+				void Align(controls::GuiControl &control) noexcept;
+
 			public:
 			
 				//Construct a grid cell with the given owner
@@ -111,6 +113,10 @@ namespace ion::gui
 
 				//Sets the vertical alignment for this grid cells attached controls to the given alignment
 				void VerticalAlignment(GridCellVerticalAlignment vertical_alignment) noexcept;
+
+
+				//Realigns all controls attached to this cell
+				void Realign() noexcept;
 
 
 				/*
@@ -220,6 +226,14 @@ namespace ion::gui
 						   off.second >= 0 && off.second < columns_);
 					return cells_.at(off);
 				}
+
+
+				/*
+					Modifiers
+				*/
+
+				//Realigns all controls attached to this grid
+				void Realign() noexcept;
 
 
 				/*
