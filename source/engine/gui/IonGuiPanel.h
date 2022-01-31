@@ -109,14 +109,36 @@ namespace ion::gui
 				*/
 
 				//Sets the horizontal alignment for this grid cells attached controls to the given alignment
-				void Alignment(GridCellAlignment alignment) noexcept;
+				inline void Alignment(GridCellAlignment alignment) noexcept
+				{
+					if (alignment_ != alignment)
+					{
+						alignment_ = alignment;
+						Reposition();
+						Realign();
+					}
+				}
 
 				//Sets the vertical alignment for this grid cells attached controls to the given alignment
-				void VerticalAlignment(GridCellVerticalAlignment vertical_alignment) noexcept;
+				inline void VerticalAlignment(GridCellVerticalAlignment vertical_alignment) noexcept
+				{
+					if (vertical_alignment_ != vertical_alignment)
+					{
+						vertical_alignment_ = vertical_alignment;
+						Reposition();
+						Realign();
+					}
+				}
 
 
-				//Realigns all controls attached to this cell
+				//Show this grid cell
+				void Show() noexcept;
+
+				//Realigns all controls attached to this grid cell
 				void Realign() noexcept;
+
+				//Reposition the node for this grid cell
+				void Reposition() noexcept;
 
 
 				/*
@@ -158,13 +180,13 @@ namespace ion::gui
 				*/
 
 				//Attaches the given control to this grid cell
-				bool Attach(NonOwningPtr<controls::GuiControl> control);
+				bool AttachControl(NonOwningPtr<controls::GuiControl> control);
 
 				//Detaches the given control from this grid cell
-				bool Detach(controls::GuiControl &control) noexcept;
+				bool DetachControl(controls::GuiControl &control) noexcept;
 
 				//Detaches all controls attached to this grid cell
-				void DetachAll() noexcept;
+				void DetachAllControls() noexcept;
 		};
 
 		class PanelGrid final
@@ -232,8 +254,25 @@ namespace ion::gui
 					Modifiers
 				*/
 
-				//Realigns all controls attached to this grid
+				//Sets the size of this panel grid to the given size
+				inline void Size(const Vector2 &size) noexcept
+				{
+					if (size_ != size)
+					{
+						size_ = size;
+						Reposition();
+					}
+				}
+
+
+				//Show this panel grid
+				void Show() noexcept;
+
+				//Realigns all controls attached to this panel grid
 				void Realign() noexcept;
+
+				//Reposition all cells in this panel grid
+				void Reposition() noexcept;
 
 
 				/*
@@ -241,7 +280,7 @@ namespace ion::gui
 				*/
 
 				//Returns the size of this panel grid
-				[[nodiscard]] inline auto Size() const noexcept
+				[[nodiscard]] inline auto& Size() const noexcept
 				{
 					return size_;
 				}
@@ -293,7 +332,7 @@ namespace ion::gui
 
 
 			//Sets the grid layout for this gui panel to the given size, rows and columns
-			void GridLayout(const Vector2 &size, int rows, int columns);
+			gui_panel::PanelGrid& GridLayout(const Vector2 &size, int rows, int columns);
 
 			//Clears the grid layout for this gui panel
 			void GridLayout(std::nullopt_t) noexcept;

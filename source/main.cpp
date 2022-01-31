@@ -2735,9 +2735,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			slider->Range(0, 20);
 			slider->StepByAmount(5);
 
-			auto label = base_panel->CreateLabel("label", "My label", std::move(label_skin));
+			/*auto label = base_panel->CreateLabel("label", "My label", std::move(label_skin));
 			label->Node()->Position({0.0_r, 0.5_r});
-			label->Tooltip("My label tooltip");
+			label->Tooltip("My label tooltip");*/
 
 			auto button = base_panel->CreateButton("button", "My button", "My button tooltip", std::move(button_skin), Vector2{0.5_r, 0.1_r});
 			button->Node()->Position({0.0_r, 0.4_r});
@@ -2801,13 +2801,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);
-			sub_panel->GridLayout({3.54_r, 2.0_r}, 3, 3);
-			auto &grid = *sub_panel->Grid();
-			auto pos10 = grid[{1, 0}].Position();
-			auto pos11 = grid[{1, 1}].Position();
-			auto pos12 = grid[{1, 2}].Position();
-			sub_panel->GridLayout(std::nullopt);
-			auto sub_control = sub_panel->CreateControl<ion::gui::controls::GuiControl>("control");
+			auto &grid = sub_panel->GridLayout({3.54_r, 2.0_r}, 3, 3);
+			grid[{2, 0}].Alignment(ion::gui::gui_panel::GridCellAlignment::Left);
+			grid[{2, 0}].VerticalAlignment(ion::gui::gui_panel::GridCellVerticalAlignment::Bottom);
+			
+			auto label = sub_panel->CreateLabel("label", "My label", std::move(label_skin));		
+			grid[{2, 0}].AttachControl(label);		
+			label->Tooltip("My label tooltip");
 
 			auto main_frame2 = controller.CreateFrame("main2");
 			auto base_panel2 = main_frame2->CreatePanel("base");

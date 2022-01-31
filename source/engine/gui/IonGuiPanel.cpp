@@ -17,6 +17,8 @@ File:	IonGuiPanel.cpp
 namespace ion::gui
 {
 
+using namespace gui_panel;
+
 namespace gui_panel
 {
 
@@ -59,28 +61,27 @@ void GridCell::Align(controls::GuiControl &control) noexcept
 {
 	if (auto size = control.Size(); size && node_)
 	{	
-		auto [x, y, z] = node_->Position().XYZ();
 		auto position = vector2::Zero;
 
 		switch (alignment_)
 		{
 			case GridCellAlignment::Left:
-			position.X(x + size->X() * 0.5_r);
+			position.X(size->X() * 0.5_r);
 			break;
 
 			case GridCellAlignment::Right:
-			position.X(x - size->X() * 0.5_r);
+			position.X(-size->X() * 0.5_r);
 			break;
 		}
 
 		switch (vertical_alignment_)
 		{
 			case GridCellVerticalAlignment::Top:
-			position.Y(y - size->Y() * 0.5_r);
+			position.Y(-size->Y() * 0.5_r);
 			break;
 
 			case GridCellVerticalAlignment::Bottom:
-			position.Y(y + size->Y() * 0.5_r);
+			position.Y(size->Y() * 0.5_r);
 			break;
 		}
 
@@ -99,7 +100,7 @@ GridCell::GridCell(PanelGrid &owner) noexcept :
 
 GridCell::~GridCell() noexcept
 {
-	DetachAll();
+	DetachAllControls();
 }
 
 
@@ -107,28 +108,11 @@ GridCell::~GridCell() noexcept
 	Modifiers
 */
 
-void GridCell::Alignment(GridCellAlignment alignment) noexcept
+void GridCell::Show() noexcept
 {
-	if (alignment_ != alignment)
-	{
-		alignment_ = alignment;
-
-		if (node_)
-			node_->Position(Position());
-	}
+	if (node_ && node_->ParentNode())
+		node_->Visible(node_->ParentNode()->Visible(), false);
 }
-
-void GridCell::VerticalAlignment(GridCellVerticalAlignment vertical_alignment) noexcept
-{
-	if (vertical_alignment_ != vertical_alignment)
-	{
-		vertical_alignment_ = vertical_alignment;
-
-		if (node_)
-			node_->Position(Position());
-	}
-}
-
 
 void GridCell::Realign() noexcept
 {
@@ -137,6 +121,12 @@ void GridCell::Realign() noexcept
 		if (control)
 			Align(*control);
 	}
+}
+
+void GridCell::Reposition() noexcept
+{
+	if (node_)
+		node_->Position(Position());
 }
 
 
@@ -216,7 +206,7 @@ std::pair<int, int> GridCell::Offset() const noexcept
 	Attaching/detaching
 */
 
-bool GridCell::Attach(NonOwningPtr<controls::GuiControl> control)
+bool GridCell::AttachControl(NonOwningPtr<controls::GuiControl> control)
 {
 	if (auto grid = Owner(); grid && control && control->Node() &&
 		control->Owner() == grid->Owner() && //Control and grid has same owner
@@ -233,7 +223,7 @@ bool GridCell::Attach(NonOwningPtr<controls::GuiControl> control)
 		return false;
 }
 
-bool GridCell::Detach(controls::GuiControl &control) noexcept
+bool GridCell::DetachControl(controls::GuiControl &control) noexcept
 {
 	auto iter =
 		std::find_if(std::begin(controls_), std::end(controls_),
@@ -253,7 +243,7 @@ bool GridCell::Detach(controls::GuiControl &control) noexcept
 		return false;
 }
 
-void GridCell::DetachAll() noexcept
+void GridCell::DetachAllControls() noexcept
 {
 	for (auto &control : controls_)
 	{
@@ -283,10 +273,22 @@ PanelGrid::PanelGrid(GuiPanel &owner, const Vector2 &size, int rows, int columns
 	Modifiers
 */
 
+void PanelGrid::Show() noexcept
+{
+	for (auto &[off, cell] : Cells())
+		cell.Show();
+}
+
 void PanelGrid::Realign() noexcept
 {
 	for (auto &[off, cell] : Cells())
 		cell.Realign();
+}
+
+void PanelGrid::Reposition() noexcept
+{
+	for (auto &[off, cell] : Cells())
+		cell.Reposition();
 }
 
 } //gui_panel
@@ -307,6 +309,9 @@ void GuiPanel::Show() noexcept
 {
 	GuiPanelContainer::Show();
 
+	if (grid_)
+		grid_->Show();
+
 	//Show all controls that should be visible
 	for (auto &control : Controls())
 	{
@@ -323,12 +328,18 @@ void GuiPanel::Show() noexcept
 }
 
 
-void GuiPanel::GridLayout(const Vector2 &size, int rows, int columns)
+PanelGrid& GuiPanel::GridLayout(const Vector2 &size, int rows, int columns)
 {
+	if (rows < 1)
+		rows = 1;
+	if (columns < 1)
+		columns = 1;
+
 	if (grid_)
 		GridLayout(std::nullopt);
 
-	grid_ = {*this, size, rows, columns};
+	grid_.emplace(*this, size, rows, columns);
+	return *grid_;
 }
 
 void GuiPanel::GridLayout(std::nullopt_t) noexcept
