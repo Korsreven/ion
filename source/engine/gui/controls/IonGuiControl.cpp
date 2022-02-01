@@ -313,6 +313,11 @@ void GuiControl::Created() noexcept
 		if (auto to_size = size_; to_size)
 		{
 			size_ = detail::get_size(*skin_, true);
+
+			//Caption only (exception)
+			if (!skin_->Parts && *to_size == vector2::Zero)
+				to_size = size_;
+
 			Size(*to_size);
 		}
 	}

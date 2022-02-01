@@ -2802,11 +2802,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto sub_panel = base_panel->CreatePanel("sub");
 			sub_panel->ZOrder(0.1_r);
 			auto &grid = sub_panel->GridLayout({3.54_r, 2.0_r}, 3, 3);
-			grid[{2, 0}].Alignment(ion::gui::gui_panel::GridCellAlignment::Left);
-			grid[{2, 0}].VerticalAlignment(ion::gui::gui_panel::GridCellVerticalAlignment::Bottom);
+			auto &cell = grid[{2, 0}];
+			cell.Alignment(ion::gui::gui_panel::GridCellAlignment::Left);
+			cell.VerticalAlignment(ion::gui::gui_panel::GridCellVerticalAlignment::Bottom);
 			
 			auto label = sub_panel->CreateLabel("label", "My label", std::move(label_skin));		
-			grid[{2, 0}].AttachControl(label);		
+			cell.AttachControl(label);		
 			label->Tooltip("My label tooltip");
 
 			auto main_frame2 = controller.CreateFrame("main2");
