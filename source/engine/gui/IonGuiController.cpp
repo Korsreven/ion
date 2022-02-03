@@ -952,4 +952,57 @@ void GuiController::ClearComponents() noexcept
 	tooltips_.shrink_to_fit();
 }
 
+
+/*
+	Themes
+	Creating
+*/
+
+NonOwningPtr<skins::GuiTheme> GuiController::CreateTheme(std::string name)
+{
+	return ThemeBase::Create<skins::GuiTheme>(std::move(name));
+}
+
+NonOwningPtr<skins::GuiTheme> GuiController::CreateTheme(skins::GuiTheme &&theme)
+{
+	return ThemeBase::Create(std::move(theme));
+}
+
+
+/*
+	Themes
+	Retrieving
+*/
+
+NonOwningPtr<skins::GuiTheme> GuiController::GetTheme(std::string_view name) noexcept
+{
+	return ThemeBase::Get(name);
+}
+
+NonOwningPtr<const skins::GuiTheme> GuiController::GetTheme(std::string_view name) const noexcept
+{
+	return ThemeBase::Get(name);
+}
+
+
+/*
+	Themes
+	Removing
+*/
+
+void GuiController::ClearThemes() noexcept
+{
+	ThemeBase::Clear();
+}
+
+bool GuiController::RemoveTheme(skins::GuiTheme &theme) noexcept
+{
+	return ThemeBase::Remove(theme);
+}
+
+bool GuiController::RemoveTheme(std::string_view name) noexcept
+{
+	return ThemeBase::Remove(name);
+}
+
 } //ion::gui

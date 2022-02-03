@@ -157,6 +157,8 @@ File:	main.cpp
 #include "gui/controls/IonGuiSlider.h"
 #include "gui/controls/IonGuiTextBox.h"
 #include "gui/controls/IonGuiTooltip.h"
+#include "gui/skins/IonGuiSkin.h"
+#include "gui/skins/IonGuiTheme.h"
 
 #include "managed/IonManagedObject.h"
 #include "managed/IonObjectManager.h"

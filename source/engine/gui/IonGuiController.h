@@ -28,7 +28,9 @@ File:	IonGuiController.h
 #include "events/listeners/IonMouseListener.h"
 #include "events/listeners/IonWindowListener.h"
 #include "graphics/utilities/IonVector2.h"
+#include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
+#include "skins/IonGuiTheme.h"
 #include "types/IonTypes.h"
 
 //Forward declarations
@@ -114,12 +116,14 @@ namespace ion::gui
 	class GuiController final :
 		public GuiContainer,
 		public events::Listenable<events::listeners::GuiFrameListener>,
-		public events::listeners::GuiFrameListener
+		public events::listeners::GuiFrameListener,
+		public managed::ObjectManager<skins::GuiTheme, GuiController>
 	{
 		private:
 
 			using FrameEventsBase = events::Listenable<events::listeners::GuiFrameListener>;
 			using ManagedObjectEventsBase = events::Listenable<events::listeners::ManagedObjectListener<GuiComponent, GuiContainer>>;
+			using ThemeBase = managed::ObjectManager<skins::GuiTheme, GuiController>;
 
 			
 			GuiFrame *focused_frame_ = nullptr;
@@ -273,6 +277,21 @@ namespace ion::gui
 			[[nodiscard]] inline auto Tooltips() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const gui_controller::detail::tooltip_pointers&>{tooltips_};
+			}
+
+
+			//Returns a mutable range of all themes in this controller
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Themes() noexcept
+			{
+				return ThemeBase::Objects();
+			}
+
+			//Returns an immutable range of all themes in this controller
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Themes() const noexcept
+			{
+				return ThemeBase::Objects();
 			}
 
 
@@ -510,6 +529,47 @@ namespace ion::gui
 
 			//Clear all removable components from this container
 			void ClearComponents() noexcept;
+
+
+			/*
+				Themes
+				Creating
+			*/
+
+			//Create a theme with the given name
+			NonOwningPtr<skins::GuiTheme> CreateTheme(std::string name);
+
+			//Create a theme by moving the given theme
+			NonOwningPtr<skins::GuiTheme> CreateTheme(skins::GuiTheme &&theme);
+
+
+			/*
+				Themes
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable theme with the given name
+			//Returns nullptr if theme could not be found
+			[[nodiscard]] NonOwningPtr<skins::GuiTheme> GetTheme(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable theme with the given name
+			//Returns nullptr if theme could not be found
+			[[nodiscard]] NonOwningPtr<const skins::GuiTheme> GetTheme(std::string_view name) const noexcept;
+
+
+			/*
+				Themes
+				Removing
+			*/
+
+			//Clear all removable themes from this theme
+			void ClearThemes() noexcept;
+
+			//Remove a removable theme from this theme
+			bool RemoveTheme(skins::GuiTheme &theme) noexcept;
+
+			//Remove a removable theme with the given name from this theme
+			bool RemoveTheme(std::string_view name) noexcept;
 	};
 } //ion::gui
 

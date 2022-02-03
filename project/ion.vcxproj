@@ -272,6 +272,8 @@
     <ClCompile Include="..\source\engine\gui\IonGuiFrame.cpp" />
     <ClCompile Include="..\source\engine\gui\IonGuiPanel.cpp" />
     <ClCompile Include="..\source\engine\gui\IonGuiPanelContainer.cpp" />
+    <ClCompile Include="..\source\engine\gui\skins\IonGuiSkin.cpp" />
+    <ClCompile Include="..\source\engine\gui\skins\IonGuiTheme.cpp" />
     <ClCompile Include="..\source\engine\IonEngine.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptBuilder.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptCompiler.cpp" />
@@ -452,6 +454,8 @@
     <ClInclude Include="..\source\engine\gui\IonGuiFrame.h" />
     <ClInclude Include="..\source\engine\gui\IonGuiPanel.h" />
     <ClInclude Include="..\source\engine\gui\IonGuiPanelContainer.h" />
+    <ClInclude Include="..\source\engine\gui\skins\IonGuiSkin.h" />
+    <ClInclude Include="..\source\engine\gui\skins\IonGuiTheme.h" />
     <ClInclude Include="..\source\engine\IonEngine.h" />
     <ClInclude Include="..\source\engine\managed\IonManagedObject.h" />
     <ClInclude Include="..\source\engine\managed\IonObjectManager.h" />
