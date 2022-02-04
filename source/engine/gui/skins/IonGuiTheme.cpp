@@ -23,6 +23,15 @@ namespace gui_theme::detail
 } //gui_theme::detail
 
 
+GuiTheme::GuiTheme(std::string name, NonOwningPtr<graphics::scene::SceneManager> scene_manager) noexcept :
+
+	ManagedObject<GuiController>{std::move(name)},
+	scene_manager_{scene_manager}
+{
+	//Empty
+}
+
+
 /*
 	Skins
 	Creating

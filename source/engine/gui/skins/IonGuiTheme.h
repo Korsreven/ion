@@ -19,10 +19,18 @@ File:	IonGuiTheme.h
 #include "managed/IonManagedObject.h"
 #include "managed/IonObjectManager.h"
 
-namespace ion::gui
+//Forward declarations
+namespace ion
 {
-	//Forward declarations
-	class GuiController;
+	namespace graphics::scene
+	{
+		class SceneManager;
+	}
+
+	namespace gui
+	{
+		class GuiController;
+	}
 }
 
 namespace ion::gui::skins
@@ -38,11 +46,12 @@ namespace ion::gui::skins
 	{
 		private:
 
-
+			NonOwningPtr<graphics::scene::SceneManager> scene_manager_;
 
 		public:
 
-			using managed::ManagedObject<GuiController>::ManagedObject;
+			//Construct a gui theme with the given scene manager
+			GuiTheme(std::string name, NonOwningPtr<graphics::scene::SceneManager> scene_manager) noexcept;
 
 
 			/*
@@ -68,14 +77,22 @@ namespace ion::gui::skins
 				Modifiers
 			*/
 
-
+			//Sets the scene manager connected to this theme to the given scene manager
+			inline void ConnectedSceneManager(NonOwningPtr<graphics::scene::SceneManager> scene_manager) noexcept
+			{
+				scene_manager_ = scene_manager;
+			}
 
 
 			/*
 				Observers
 			*/
 
-			
+			//Returns the scene manager connected to this theme
+			[[nodiscard]] inline auto ConnectedSceneManager() const noexcept
+			{
+				return scene_manager_;
+			}
 
 
 			/*

@@ -34,9 +34,14 @@ File:	IonGuiController.h
 #include "types/IonTypes.h"
 
 //Forward declarations
-namespace ion::graphics::scene::graph
+namespace ion::graphics::scene
 {
-	class SceneNode;
+	class SceneManager;
+
+	namespace graph
+	{
+		class SceneNode;
+	}
 }
 
 namespace ion::gui
@@ -537,7 +542,7 @@ namespace ion::gui
 			*/
 
 			//Create a theme with the given name
-			NonOwningPtr<skins::GuiTheme> CreateTheme(std::string name);
+			NonOwningPtr<skins::GuiTheme> CreateTheme(std::string name, NonOwningPtr<graphics::scene::SceneManager> scene_manager);
 
 			//Create a theme by moving the given theme
 			NonOwningPtr<skins::GuiTheme> CreateTheme(skins::GuiTheme &&theme);

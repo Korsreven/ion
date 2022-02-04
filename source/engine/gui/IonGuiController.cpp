@@ -958,9 +958,9 @@ void GuiController::ClearComponents() noexcept
 	Creating
 */
 
-NonOwningPtr<skins::GuiTheme> GuiController::CreateTheme(std::string name)
+NonOwningPtr<skins::GuiTheme> GuiController::CreateTheme(std::string name, NonOwningPtr<graphics::scene::SceneManager> scene_manager)
 {
-	return ThemeBase::Create<skins::GuiTheme>(std::move(name));
+	return ThemeBase::Create<skins::GuiTheme>(std::move(name), scene_manager);
 }
 
 NonOwningPtr<skins::GuiTheme> GuiController::CreateTheme(skins::GuiTheme &&theme)
