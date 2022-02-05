@@ -59,12 +59,13 @@ namespace ion::gui::skins
 
 			[[nodiscard]] inline operator bool() const noexcept
 			{
-				return Enabled || Disabled || Focused || Pressed || Hovered;
+				return !!Enabled; //Required
 			}
 		};
 
 		struct SkinTextPart
 		{
+			NonOwningPtr<graphics::fonts::Text> Template;
 			std::optional<graphics::fonts::text::TextBlockStyle> Enabled;
 			std::optional<graphics::fonts::text::TextBlockStyle> Disabled;
 			std::optional<graphics::fonts::text::TextBlockStyle> Focused;
@@ -73,7 +74,7 @@ namespace ion::gui::skins
 
 			[[nodiscard]] inline operator bool() const noexcept
 			{
-				return Enabled || Disabled || Focused || Pressed || Hovered;
+				return Template && Enabled; //Required
 			}
 		};
 
