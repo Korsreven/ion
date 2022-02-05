@@ -17,22 +17,31 @@ File:	IonGuiSkin.cpp
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/shapes/IonSprite.h"
+#include "gui/controls/IonGuiButton.h"
+#include "gui/controls/IonGuiCheckBox.h"
+#include "gui/controls/IonGuiGroupBox.h"
+#include "gui/controls/IonGuiLabel.h"
+#include "gui/controls/IonGuiListBox.h"
+#include "gui/controls/IonGuiProgressBar.h"
+#include "gui/controls/IonGuiRadioButton.h"
+#include "gui/controls/IonGuiScrollBar.h"
+#include "gui/controls/IonGuiSlider.h"
+#include "gui/controls/IonGuiTextBox.h"
+#include "gui/controls/IonGuiTooltip.h"
 
 namespace ion::gui::skins
 {
 
 using namespace gui_skin;
 
-namespace gui_skin
-{
-
-namespace detail
+namespace gui_skin::detail
 {
 
 controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
 {
 	return {};
 }
+
 
 OwningPtr<controls::gui_control::ControlSkin> make_button_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
 {
@@ -89,35 +98,42 @@ OwningPtr<controls::gui_control::ControlSkin> make_tooltip_skin(const SkinPartMa
 	return nullptr;
 }
 
-} //detail
+} //gui_skin::detail
 
+//Private
 
-void SkinFactory::Register(std::string name, SkinMaker skin_maker)
+adaptors::FlatMap<std::type_index, std::string> GuiSkin::registered_skins_{};
+adaptors::FlatMap<std::string, gui_skin::SkinBuilder> GuiSkin::registered_skin_builders_{};
+
+void GuiSkin::RegisterDefaultSkins()
 {
-	//Instance().skin_makers_[std::move(name)] = skin_maker;
+	RegisterSkin<controls::GuiButton>("GuiButton", detail::make_button_skin);
+	RegisterSkin<controls::GuiCheckBox>("GuiCheckBox", detail::make_check_box_skin);
+	RegisterSkin<controls::GuiGroupBox>("GuiGroupBox", detail::make_group_box_skin);
+	RegisterSkin<controls::GuiLabel>("GuiLabel", detail::make_label_skin);
+	RegisterSkin<controls::GuiListBox>("GuiListBox", detail::make_list_box_skin);
+	RegisterSkin<controls::GuiProgressBar>("GuiProgressBar", detail::make_progress_bar_skin);
+	RegisterSkin<controls::GuiRadioButton>("GuiRadioButton", detail::make_radio_button_skin);
+	RegisterSkin<controls::GuiScrollBar>("GuiScrollBar", detail::make_scroll_bar_skin);
+	RegisterSkin<controls::GuiSlider>("GuiSlider", detail::make_slider_skin);
+	RegisterSkin<controls::GuiTextBox>("GuiTextBox", detail::make_text_box_skin);
+	RegisterSkin<controls::GuiTooltip>("GuiTooltip", detail::make_tooltip_skin);
 }
 
-OwningPtr<controls::gui_control::ControlSkin> SkinFactory::Make(std::string_view name,
-	const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
-{
-	if (auto iter = Instance().skin_makers_.find(name); iter != std::end(Instance().skin_makers_))
-		return iter->second(parts, text_parts, scene_manager);
-	else
-		return nullptr;
-}
 
-} //gui_skin
-
+//Public
 
 GuiSkin::GuiSkin(std::string name) :
 	managed::ManagedObject<GuiTheme>{std::move(name)}
 {
-	//Empty
+	RegisterDefaultSkins();
 }
 
 GuiSkin::GuiSkin(std::string name, const SkinParts &parts, const SkinTextPart &caption) :
 	managed::ManagedObject<GuiTheme>{std::move(name)}
 {
+	RegisterDefaultSkins();
+
 	if (parts.Center)
 		parts_["center"] = parts.Center;
 
@@ -186,7 +202,11 @@ OwningPtr<controls::gui_control::ControlSkin> GuiSkin::Instantiate() const
 	if (owner_)
 	{
 		if (auto scene_manager = owner_->ConnectedSceneManager(); scene_manager)
-			return SkinFactory::Make(*name_, parts_, text_parts_, *scene_manager);
+		{
+			if (auto iter = registered_skin_builders_.find(*name_);
+				iter != std::end(registered_skin_builders_))
+				return iter->second(parts_, text_parts_, *scene_manager);
+		}
 	}
 
 	return nullptr;

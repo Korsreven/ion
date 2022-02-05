@@ -16,6 +16,9 @@ File:	IonGuiSkin.h
 #include <optional>
 #include <string>
 #include <string_view>
+#include <typeindex>
+#include <typeinfo>
+#include <type_traits>
 
 #include "adaptors/IonFlatMap.h"
 #include "events/IonCallback.h"
@@ -24,7 +27,6 @@ File:	IonGuiSkin.h
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
 #include "memory/IonOwningPtr.h"
-#include "types/IonSingleton.h"
 
 //Forward declarations
 namespace ion::graphics
@@ -126,9 +128,7 @@ namespace ion::gui::skins
 
 		using SkinPartMap = adaptors::FlatMap<std::string, SkinPart>;
 		using SkinTextPartMap = adaptors::FlatMap<std::string, SkinTextPart>;
-
-		using SkinMaker = events::Callback<OwningPtr<controls::gui_control::ControlSkin>, const SkinPartMap&, const SkinTextPartMap&, graphics::scene::SceneManager&>;
-		using SkinMakerMap = adaptors::FlatMap<std::string, SkinMaker>;
+		using SkinBuilder = events::Callback<OwningPtr<controls::gui_control::ControlSkin>, const SkinPartMap&, const SkinTextPartMap&, graphics::scene::SceneManager&>;
 
 
 		namespace detail
@@ -147,20 +147,6 @@ namespace ion::gui::skins
 			OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
 			OwningPtr<controls::gui_control::ControlSkin> make_tooltip_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
 		} //detail
-
-
-		class SkinFactory final : types::Singleton<SkinFactory>
-		{
-			private:
-
-				SkinMakerMap skin_makers_;
-
-			public:
-
-				static void Register(std::string name, SkinMaker skin_maker);
-				static OwningPtr<controls::gui_control::ControlSkin> Make(std::string_view name,
-					const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
-		};
 	} //gui_skin
 
 
@@ -170,6 +156,11 @@ namespace ion::gui::skins
 
 			gui_skin::SkinPartMap parts_;
 			gui_skin::SkinTextPartMap text_parts_;
+
+			static adaptors::FlatMap<std::type_index, std::string> registered_skins_;
+			static adaptors::FlatMap<std::string, gui_skin::SkinBuilder> registered_skin_builders_;
+
+			static void RegisterDefaultSkins();
 
 		public:
 
@@ -211,14 +202,14 @@ namespace ion::gui::skins
 			}
 
 
-			//Returns a mutable range of all parts in this skin
+			//Returns a mutable range of all text parts in this skin
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto TextParts() noexcept
 			{
 				return text_parts_.Elements();
 			}
 
-			//Returns an immutable range of all parts in this skin
+			//Returns an immutable range of all text parts in this skin
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto TextParts() const noexcept
 			{
@@ -289,6 +280,30 @@ namespace ion::gui::skins
 
 			//Remove a text part with the given name from this skin
 			bool RemoveTextPart(std::string_view name) noexcept;
+
+
+			/*
+				Skins
+				Registering/retrieving
+			*/
+
+			template <typename T>
+			static void RegisterSkin(std::string name, gui_skin::SkinBuilder builder)
+			{
+				static_assert(std::is_base_of_v<controls::GuiControl, T>);
+				registered_skins_[std::type_index{typeid(T)}] = name;
+				//registered_skin_builders_[std::move(name)] = builder;
+			}
+
+			template <typename T>
+			static std::optional<std::string_view> SkinName() noexcept
+			{
+				if (auto iter = registered_skins_.find(std::type_index{typeid(T)});
+					iter != std::end(registered_skins_))
+					return iter->second;
+				else
+					return {};
+			}
 	};
 } //ion::gui::skins
 
