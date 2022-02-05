@@ -45,6 +45,8 @@ namespace ion::events
 
 		public:
 
+			Callback() = default;
+
 			Callback(functor_type functor) noexcept :
 				functor_(std::move(functor))
 			{

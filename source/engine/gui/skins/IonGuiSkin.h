@@ -292,7 +292,7 @@ namespace ion::gui::skins
 			{
 				static_assert(std::is_base_of_v<controls::GuiControl, T>);
 				registered_skins_[std::type_index{typeid(T)}] = name;
-				//registered_skin_builders_[std::move(name)] = builder;
+				registered_skin_builders_[std::move(name)] = builder;
 			}
 
 			template <typename T>
