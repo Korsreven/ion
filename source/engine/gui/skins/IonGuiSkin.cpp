@@ -77,7 +77,6 @@ controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, c
 		iter = parts.find("bottom-right");
 		auto bottom_right_part = iter != std::end(parts) ? &iter->second : nullptr;
 
-
 		//Minimum required parts
 		if (center_part ||
 			(top_part && bottom_part) || (left_part && right_part) ||
@@ -317,7 +316,26 @@ OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const SkinPart
 	static_cast<controls::gui_control::ControlSkin&>(*check_box_skin) =
 		make_control_skin(parts, text_parts, scene_manager);
 
-	//Todo
+	if (!std::empty(parts))
+	{
+		auto iter = parts.find("check-mark");
+		auto check_mark_part = iter != std::end(parts) ? &iter->second : nullptr;
+
+		//Check mark part
+		if (check_mark_part && *check_mark_part)
+		{
+			auto sprite = check_box_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, check_mark_part->Enabled});
+			sprite->AutoSize(true);
+			sprite->AutoRepeat(true);
+
+			check_box_skin->CheckMark.SpriteObject = sprite;
+			check_box_skin->CheckMark.EnabledMaterial = check_mark_part->Enabled;
+			check_box_skin->CheckMark.DisabledMaterial = check_mark_part->Disabled;
+			check_box_skin->CheckMark.FocusedMaterial = check_mark_part->Focused;
+			check_box_skin->CheckMark.PressedMaterial = check_mark_part->Pressed;
+			check_box_skin->CheckMark.HoveredMaterial = check_mark_part->Hovered;
+		}
+	}
 
 	return check_box_skin;
 }
@@ -344,7 +362,46 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const SkinPartM
 	static_cast<controls::gui_control::ControlSkin&>(*list_box_skin) =
 		make_control_skin(parts, text_parts, scene_manager);
 
-	//Todo
+	if (!std::empty(parts))
+	{
+		auto iter = parts.find("selection");
+		auto selection_part = iter != std::end(parts) ? &iter->second : nullptr;
+
+		//Selection part
+		if (selection_part && *selection_part)
+		{
+			auto sprite = list_box_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, selection_part->Enabled});
+			sprite->AutoSize(true);
+			sprite->AutoRepeat(true);
+
+			list_box_skin->Selection.SpriteObject = sprite;
+			list_box_skin->Selection.EnabledMaterial = selection_part->Enabled;
+			list_box_skin->Selection.DisabledMaterial = selection_part->Disabled;
+			list_box_skin->Selection.FocusedMaterial = selection_part->Focused;
+			list_box_skin->Selection.PressedMaterial = selection_part->Pressed;
+			list_box_skin->Selection.HoveredMaterial = selection_part->Hovered;
+		}
+	}
+
+	if (!std::empty(text_parts))
+	{
+		auto iter = text_parts.find("lines");
+		auto lines_part = iter != std::end(text_parts) ? &iter->second : nullptr;
+
+		//Lines part
+		if (lines_part && *lines_part)
+		{
+			auto text = scene_manager.CreateText(lines_part->Template);
+			text->AddPass(graphics::render::Pass{});
+
+			list_box_skin->Lines.TextObject = text;
+			list_box_skin->Lines.EnabledStyle = lines_part->Enabled;
+			list_box_skin->Lines.DisabledStyle = lines_part->Disabled;
+			list_box_skin->Lines.FocusedStyle = lines_part->Focused;
+			list_box_skin->Lines.PressedStyle = lines_part->Pressed;
+			list_box_skin->Lines.HoveredStyle = lines_part->Hovered;
+		}
+	}
 
 	return list_box_skin;
 }
@@ -355,7 +412,44 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const SkinP
 	static_cast<controls::gui_control::ControlSkin&>(*progress_bar_skin) =
 		make_control_skin(parts, text_parts, scene_manager);
 
-	//Todo
+	if (!std::empty(parts))
+	{
+		auto iter = parts.find("bar");
+		auto bar_part = iter != std::end(parts) ? &iter->second : nullptr;
+
+		iter = parts.find("bar-interpolated");
+		auto bar_interpolated_part = iter != std::end(parts) ? &iter->second : nullptr;
+
+		//Bar part
+		if (bar_part && *bar_part)
+		{
+			auto sprite = progress_bar_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, bar_part->Enabled});
+			sprite->AutoSize(true);
+			sprite->AutoRepeat(true);
+
+			progress_bar_skin->Bar.SpriteObject = sprite;
+			progress_bar_skin->Bar.EnabledMaterial = bar_part->Enabled;
+			progress_bar_skin->Bar.DisabledMaterial = bar_part->Disabled;
+			progress_bar_skin->Bar.FocusedMaterial = bar_part->Focused;
+			progress_bar_skin->Bar.PressedMaterial = bar_part->Pressed;
+			progress_bar_skin->Bar.HoveredMaterial = bar_part->Hovered;
+		}
+
+		//Bar interpolated part
+		if (bar_interpolated_part && *bar_interpolated_part)
+		{
+			auto sprite = progress_bar_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, bar_interpolated_part->Enabled});
+			sprite->AutoSize(true);
+			sprite->AutoRepeat(true);
+
+			progress_bar_skin->BarInterpolated.SpriteObject = sprite;
+			progress_bar_skin->BarInterpolated.EnabledMaterial = bar_interpolated_part->Enabled;
+			progress_bar_skin->BarInterpolated.DisabledMaterial = bar_interpolated_part->Disabled;
+			progress_bar_skin->BarInterpolated.FocusedMaterial = bar_interpolated_part->Focused;
+			progress_bar_skin->BarInterpolated.PressedMaterial = bar_interpolated_part->Pressed;
+			progress_bar_skin->BarInterpolated.HoveredMaterial = bar_interpolated_part->Hovered;
+		}
+	}
 
 	return progress_bar_skin;
 }
@@ -366,7 +460,26 @@ OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const SkinP
 	static_cast<controls::gui_control::ControlSkin&>(*radio_button_skin) =
 		make_control_skin(parts, text_parts, scene_manager);
 
-	//Todo
+	if (!std::empty(parts))
+	{
+		auto iter = parts.find("check-mark");
+		auto check_mark_part = iter != std::end(parts) ? &iter->second : nullptr;
+
+		//Check mark part
+		if (check_mark_part && *check_mark_part)
+		{
+			auto sprite = radio_button_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, check_mark_part->Enabled});
+			sprite->AutoSize(true);
+			sprite->AutoRepeat(true);
+
+			radio_button_skin->CheckMark.SpriteObject = sprite;
+			radio_button_skin->CheckMark.EnabledMaterial = check_mark_part->Enabled;
+			radio_button_skin->CheckMark.DisabledMaterial = check_mark_part->Disabled;
+			radio_button_skin->CheckMark.FocusedMaterial = check_mark_part->Focused;
+			radio_button_skin->CheckMark.PressedMaterial = check_mark_part->Pressed;
+			radio_button_skin->CheckMark.HoveredMaterial = check_mark_part->Hovered;
+		}
+	}
 
 	return radio_button_skin;
 }
@@ -377,7 +490,26 @@ OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const SkinPar
 	static_cast<controls::gui_control::ControlSkin&>(*scroll_bar_skin) =
 		make_control_skin(parts, text_parts, scene_manager);
 
-	//Todo
+	if (!std::empty(parts))
+	{
+		auto iter = parts.find("handle");
+		auto handle_part = iter != std::end(parts) ? &iter->second : nullptr;
+
+		//Handle part
+		if (handle_part && *handle_part)
+		{
+			auto sprite = scroll_bar_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, handle_part->Enabled});
+			sprite->AutoSize(true);
+			sprite->AutoRepeat(true);
+
+			scroll_bar_skin->Handle.SpriteObject = sprite;
+			scroll_bar_skin->Handle.EnabledMaterial = handle_part->Enabled;
+			scroll_bar_skin->Handle.DisabledMaterial = handle_part->Disabled;
+			scroll_bar_skin->Handle.FocusedMaterial = handle_part->Focused;
+			scroll_bar_skin->Handle.PressedMaterial = handle_part->Pressed;
+			scroll_bar_skin->Handle.HoveredMaterial = handle_part->Hovered;
+		}
+	}
 
 	return scroll_bar_skin;
 }
@@ -388,7 +520,26 @@ OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const SkinPartMap
 	static_cast<controls::gui_control::ControlSkin&>(*slider_skin) =
 		make_control_skin(parts, text_parts, scene_manager);
 
-	//Todo
+	if (!std::empty(parts))
+	{
+		auto iter = parts.find("handle");
+		auto handle_part = iter != std::end(parts) ? &iter->second : nullptr;
+
+		//Handle part
+		if (handle_part && *handle_part)
+		{
+			auto sprite = slider_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, handle_part->Enabled});
+			sprite->AutoSize(true);
+			sprite->AutoRepeat(true);
+
+			slider_skin->Handle.SpriteObject = sprite;
+			slider_skin->Handle.EnabledMaterial = handle_part->Enabled;
+			slider_skin->Handle.DisabledMaterial = handle_part->Disabled;
+			slider_skin->Handle.FocusedMaterial = handle_part->Focused;
+			slider_skin->Handle.PressedMaterial = handle_part->Pressed;
+			slider_skin->Handle.HoveredMaterial = handle_part->Hovered;
+		}
+	}
 
 	return slider_skin;
 }
@@ -399,7 +550,63 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const SkinPartM
 	static_cast<controls::gui_control::ControlSkin&>(*text_box_skin) =
 		make_control_skin(parts, text_parts, scene_manager);
 
-	//Todo
+	if (!std::empty(parts))
+	{
+		auto iter = parts.find("cursor");
+		auto cursor_part = iter != std::end(parts) ? &iter->second : nullptr;
+
+		//Cursor part
+		if (cursor_part && *cursor_part)
+		{
+			auto sprite = text_box_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, cursor_part->Enabled});
+			sprite->AutoSize(true);
+			sprite->AutoRepeat(true);
+
+			text_box_skin->Cursor.SpriteObject = sprite;
+			text_box_skin->Cursor.EnabledMaterial = cursor_part->Enabled;
+			text_box_skin->Cursor.DisabledMaterial = cursor_part->Disabled;
+			text_box_skin->Cursor.FocusedMaterial = cursor_part->Focused;
+			text_box_skin->Cursor.PressedMaterial = cursor_part->Pressed;
+			text_box_skin->Cursor.HoveredMaterial = cursor_part->Hovered;
+		}
+	}
+
+	if (!std::empty(text_parts))
+	{
+		auto iter = text_parts.find("text");
+		auto text_part = iter != std::end(text_parts) ? &iter->second : nullptr;
+
+		iter = text_parts.find("placeholder-text");
+		auto placeholder_text_part = iter != std::end(text_parts) ? &iter->second : nullptr;
+
+		//Text part
+		if (text_part && *text_part)
+		{
+			auto text = scene_manager.CreateText(text_part->Template);
+			text->AddPass(graphics::render::Pass{});
+
+			text_box_skin->Text.TextObject = text;
+			text_box_skin->Text.EnabledStyle = text_part->Enabled;
+			text_box_skin->Text.DisabledStyle = text_part->Disabled;
+			text_box_skin->Text.FocusedStyle = text_part->Focused;
+			text_box_skin->Text.PressedStyle = text_part->Pressed;
+			text_box_skin->Text.HoveredStyle = text_part->Hovered;
+		}
+
+		//Placeholder text part
+		if (placeholder_text_part && *placeholder_text_part)
+		{
+			auto text = scene_manager.CreateText(placeholder_text_part->Template);
+			text->AddPass(graphics::render::Pass{});
+
+			text_box_skin->PlaceholderText.TextObject = text;
+			text_box_skin->PlaceholderText.EnabledStyle = placeholder_text_part->Enabled;
+			text_box_skin->PlaceholderText.DisabledStyle = placeholder_text_part->Disabled;
+			text_box_skin->PlaceholderText.FocusedStyle = placeholder_text_part->Focused;
+			text_box_skin->PlaceholderText.PressedStyle = placeholder_text_part->Pressed;
+			text_box_skin->PlaceholderText.HoveredStyle = placeholder_text_part->Hovered;
+		}
+	}
 
 	return text_box_skin;
 }
