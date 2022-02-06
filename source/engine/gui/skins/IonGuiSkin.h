@@ -21,8 +21,12 @@ File:	IonGuiSkin.h
 #include <type_traits>
 
 #include "adaptors/IonFlatMap.h"
+#include "adaptors/ranges/IonIterable.h"
 #include "events/IonCallback.h"
 #include "graphics/fonts/IonText.h"
+#include "graphics/render/IonPass.h"
+#include "graphics/scene/IonDrawableObject.h"
+#include "graphics/utilities/IonColor.h"
 #include "gui/controls/IonGuiControl.h"
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
@@ -45,6 +49,7 @@ namespace ion::graphics
 namespace ion::gui::skins
 {
 	//Forward declarations
+	class GuiSkin;
 	class GuiTheme;
 
 	namespace gui_skin
@@ -56,6 +61,7 @@ namespace ion::gui::skins
 			NonOwningPtr<graphics::materials::Material> Focused;
 			NonOwningPtr<graphics::materials::Material> Pressed;
 			NonOwningPtr<graphics::materials::Material> Hovered;
+			graphics::utilities::Color FillColor = graphics::utilities::color::White;
 
 			[[nodiscard]] inline operator bool() const noexcept
 			{
@@ -129,24 +135,24 @@ namespace ion::gui::skins
 
 		using SkinPartMap = adaptors::FlatMap<std::string, SkinPart>;
 		using SkinTextPartMap = adaptors::FlatMap<std::string, SkinTextPart>;
-		using SkinBuilder = events::Callback<OwningPtr<controls::gui_control::ControlSkin>, const SkinPartMap&, const SkinTextPartMap&, graphics::scene::SceneManager&>;
+		using SkinBuilder = events::Callback<OwningPtr<controls::gui_control::ControlSkin>, const GuiSkin&, graphics::scene::SceneManager&>;
 
 
 		namespace detail
 		{
-			controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
+			controls::gui_control::ControlSkin make_control_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
 
-			OwningPtr<controls::gui_control::ControlSkin> make_button_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
-			OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
-			OwningPtr<controls::gui_control::ControlSkin> make_group_box_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
-			OwningPtr<controls::gui_control::ControlSkin> make_label_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
-			OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
-			OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
-			OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
-			OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
-			OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
-			OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
-			OwningPtr<controls::gui_control::ControlSkin> make_tooltip_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager);
+			OwningPtr<controls::gui_control::ControlSkin> make_button_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
+			OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
+			OwningPtr<controls::gui_control::ControlSkin> make_group_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
+			OwningPtr<controls::gui_control::ControlSkin> make_label_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
+			OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
+			OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
+			OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
+			OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
+			OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
+			OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
+			OwningPtr<controls::gui_control::ControlSkin> make_tooltip_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
 		} //detail
 	} //gui_skin
 
@@ -157,6 +163,10 @@ namespace ion::gui::skins
 
 			gui_skin::SkinPartMap parts_;
 			gui_skin::SkinTextPartMap text_parts_;
+
+			graphics::scene::drawable_object::Passes passes_;
+			graphics::scene::drawable_object::Passes text_passes_;
+
 
 			static adaptors::FlatMap<std::type_index, std::string> registered_skins_;
 			static adaptors::FlatMap<std::string, gui_skin::SkinBuilder> registered_skin_builders_;
@@ -216,6 +226,36 @@ namespace ion::gui::skins
 			{
 				return text_parts_.Elements();
 			}
+
+
+			//Returns a mutable range of all passes in this skin
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Passes() noexcept
+			{
+				return adaptors::ranges::Iterable<graphics::scene::drawable_object::Passes&>{passes_};
+			}
+
+			//Returns an immutable range of all passes in this skin
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Passes() const noexcept
+			{
+				return adaptors::ranges::Iterable<const graphics::scene::drawable_object::Passes&>{passes_};
+			}
+
+
+			//Returns a mutable range of all text passes in this skin
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto TextPasses() noexcept
+			{
+				return adaptors::ranges::Iterable<graphics::scene::drawable_object::Passes&>{text_passes_};
+			}
+
+			//Returns an immutable range of all text passes in this skin
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto TextPasses() const noexcept
+			{
+				return adaptors::ranges::Iterable<const graphics::scene::drawable_object::Passes&>{text_passes_};
+			}
 			
 
 			/*
@@ -257,11 +297,13 @@ namespace ion::gui::skins
 				Retrieving
 			*/
 
-			//Gets a copy of the part with the given name
-			gui_skin::SkinPart GetPart(std::string_view name) const;
+			//Gets a pointer to the part with the given name
+			//Returns nullptr if no part is found with the given name
+			const gui_skin::SkinPart* GetPart(std::string_view name) const noexcept;
 
-			//Gets a copy of the text part with the given name
-			gui_skin::SkinTextPart GetTextPart(std::string_view name) const;
+			//Gets a pointer to the text part with the given name
+			//Returns nullptr if no text part is found with the given name
+			const gui_skin::SkinTextPart* GetTextPart(std::string_view name) const noexcept;
 
 
 			/*
@@ -281,6 +323,49 @@ namespace ion::gui::skins
 
 			//Remove a text part with the given name from this skin
 			bool RemoveTextPart(std::string_view name) noexcept;
+
+
+			/*
+				Passes
+				Adding
+			*/
+
+			//Adds a pass to this skin
+			void AddPass(graphics::render::Pass pass);
+
+			//Adds passes to this skin
+			void AddPasses(graphics::scene::drawable_object::Passes passes);
+
+
+			//Adds a text pass to this skin
+			void AddTextPass(graphics::render::Pass pass);
+
+			//Adds text passes to this skin
+			void AddTextPasses(graphics::scene::drawable_object::Passes passes);
+
+
+			/*
+				Passes
+				Retrieving
+			*/
+
+			//Gets an immutable reference to all passes in this skin
+			const graphics::scene::drawable_object::Passes& GetPasses() const noexcept;
+
+			//Gets an immutable reference to all text passes in this skin
+			const graphics::scene::drawable_object::Passes& GetTextPasses() const noexcept;
+
+
+			/*
+				Passes
+				Removing
+			*/
+
+			//Clear all passes from this skin
+			void ClearPasses() noexcept;
+
+			//Clear all text passes from this skin
+			void ClearTextPasses() noexcept;
 
 
 			/*

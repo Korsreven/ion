@@ -42,40 +42,25 @@ using namespace types::type_literals;
 namespace gui_skin::detail
 {
 
-controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
+controls::gui_control::ControlSkin make_control_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	controls::gui_control::ControlSkin control_skin;
 
-	if (!std::empty(parts))
+	if (!std::empty(skin.Parts()))
 	{
-		auto iter = parts.find("center");
-		auto center_part = iter != std::end(parts) ? &iter->second : nullptr;
+		auto center_part = skin.GetPart("center");
 
 		//Sides
-		iter = parts.find("top");
-		auto top_part = iter != std::end(parts) ? &iter->second : nullptr;
-
-		iter = parts.find("bottom");
-		auto bottom_part = iter != std::end(parts) ? &iter->second : nullptr;
-
-		iter = parts.find("left");
-		auto left_part = iter != std::end(parts) ? &iter->second : nullptr;
-
-		iter = parts.find("right");
-		auto right_part = iter != std::end(parts) ? &iter->second : nullptr;
+		auto top_part = skin.GetPart("top");
+		auto bottom_part = skin.GetPart("bottom");
+		auto left_part = skin.GetPart("left");
+		auto right_part = skin.GetPart("right");
 
 		//Corners
-		iter = parts.find("top-left");
-		auto top_left_part = iter != std::end(parts) ? &iter->second : nullptr;
-
-		iter = parts.find("top-right");
-		auto top_right_part = iter != std::end(parts) ? &iter->second : nullptr;
-
-		iter = parts.find("bottom-left");
-		auto bottom_left_part = iter != std::end(parts) ? &iter->second : nullptr;
-
-		iter = parts.find("bottom-right");
-		auto bottom_right_part = iter != std::end(parts) ? &iter->second : nullptr;
+		auto top_left_part = skin.GetPart("top-left");
+		auto top_right_part = skin.GetPart("top-right");
+		auto bottom_left_part = skin.GetPart("bottom-left");
+		auto bottom_right_part = skin.GetPart("bottom-right");
 
 		//Minimum required parts
 		if (center_part ||
@@ -83,15 +68,21 @@ controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, c
 			(top_left_part && bottom_right_part) || (bottom_left_part && top_right_part))
 		{
 			auto model = scene_manager.CreateModel();
-			model->AddPass(graphics::render::Pass{});
+
+			if (std::empty(skin.Passes()))
+				model->AddPass(graphics::render::Pass{});
+			else
+				model->AddPasses(skin.GetPasses());
+
 			control_skin.Parts.ModelObject = model;
 
 			//Center part
 			if (center_part && *center_part)
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, center_part->Enabled});
+				sprite->FillColor(center_part->FillColor);
 				sprite->AutoSize(true);
-				sprite->AutoRepeat(true);
+				sprite->AutoRepeat(true);	
 
 				control_skin.Parts.Center.SpriteObject = sprite;
 				control_skin.Parts.Center.EnabledMaterial = center_part->Enabled;
@@ -106,8 +97,9 @@ controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, c
 			if (top_part && *top_part)
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, top_part->Enabled});
+				sprite->FillColor(top_part->FillColor);
 				sprite->AutoSize(true);
-				sprite->AutoRepeat(true);
+				sprite->AutoRepeat(true);			
 
 				control_skin.Parts.Top.SpriteObject = sprite;
 				control_skin.Parts.Top.EnabledMaterial = top_part->Enabled;
@@ -121,6 +113,7 @@ controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, c
 			if (bottom_part && *bottom_part)
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, bottom_part->Enabled});
+				sprite->FillColor(bottom_part->FillColor);
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);
 
@@ -136,6 +129,7 @@ controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, c
 			if (left_part && *left_part)
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, left_part->Enabled});
+				sprite->FillColor(left_part->FillColor);
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);
 
@@ -151,6 +145,7 @@ controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, c
 			if (right_part && *right_part)
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, right_part->Enabled});
+				sprite->FillColor(right_part->FillColor);
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);
 
@@ -167,6 +162,7 @@ controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, c
 			if (top_left_part && *top_left_part)
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, top_left_part->Enabled});
+				sprite->FillColor(top_left_part->FillColor);
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);
 
@@ -182,6 +178,7 @@ controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, c
 			if (top_right_part && *top_right_part)
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, top_right_part->Enabled});
+				sprite->FillColor(top_right_part->FillColor);
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);
 
@@ -197,6 +194,7 @@ controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, c
 			if (bottom_left_part && *bottom_left_part)
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, bottom_left_part->Enabled});
+				sprite->FillColor(bottom_left_part->FillColor);
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);
 
@@ -212,6 +210,7 @@ controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, c
 			if (bottom_right_part && *bottom_right_part)
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, bottom_right_part->Enabled});
+				sprite->FillColor(bottom_right_part->FillColor);
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);
 
@@ -336,16 +335,19 @@ controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, c
 		}
 	}
 
-	if (!std::empty(text_parts))
+	if (!std::empty(skin.TextParts()))
 	{
-		auto iter = text_parts.find("caption");
-		auto caption_part = iter != std::end(text_parts) ? &iter->second : nullptr;
+		auto caption_part = skin.GetTextPart("caption");
 
 		//Caption part
 		if (caption_part && *caption_part)
 		{
 			auto text = scene_manager.CreateText(caption_part->Template);
-			text->AddPass(graphics::render::Pass{});
+
+			if (std::empty(skin.TextPasses()))
+				text->AddPass(graphics::render::Pass{});
+			else
+				text->AddPasses(skin.GetTextPasses());
 
 			control_skin.Caption.TextObject = text;
 			control_skin.Caption.EnabledStyle = caption_part->Enabled;
@@ -360,31 +362,29 @@ controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, c
 }
 
 
-OwningPtr<controls::gui_control::ControlSkin> make_button_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
+OwningPtr<controls::gui_control::ControlSkin> make_button_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto button_skin = make_owning<controls::gui_button::ButtonSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*button_skin) =
-		make_control_skin(parts, text_parts, scene_manager);
+	static_cast<controls::gui_control::ControlSkin&>(*button_skin) = make_control_skin(skin, scene_manager);
 	return button_skin;
 }
 
-OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
+OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto check_box_skin = make_owning<controls::gui_check_box::CheckBoxSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*check_box_skin) =
-		make_control_skin(parts, text_parts, scene_manager);
+	static_cast<controls::gui_control::ControlSkin&>(*check_box_skin) = make_control_skin(skin, scene_manager);
 
-	if (!std::empty(parts))
+	if (!std::empty(skin.Parts()))
 	{
-		auto iter = parts.find("check-mark");
-		auto check_mark_part = iter != std::end(parts) ? &iter->second : nullptr;
+		auto check_mark_part = skin.GetPart("check-mark");
 
 		//Check mark part
 		if (check_mark_part && *check_mark_part)
 		{
 			auto sprite = check_box_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, check_mark_part->Enabled});
+			sprite->FillColor(check_mark_part->FillColor);
 			sprite->AutoSize(true);
-			sprite->AutoRepeat(true);
+			sprite->IncludeBoundingVolumes(false);
 
 			check_box_skin->CheckMark.SpriteObject = sprite;
 			check_box_skin->CheckMark.EnabledMaterial = check_mark_part->Enabled;
@@ -398,39 +398,37 @@ OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const SkinPart
 	return check_box_skin;
 }
 
-OwningPtr<controls::gui_control::ControlSkin> make_group_box_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
+OwningPtr<controls::gui_control::ControlSkin> make_group_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto group_box_skin = make_owning<controls::gui_group_box::GroupBoxSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*group_box_skin) =
-		make_control_skin(parts, text_parts, scene_manager);
+	static_cast<controls::gui_control::ControlSkin&>(*group_box_skin) = make_control_skin(skin, scene_manager);
 	return group_box_skin;
 }
 
-OwningPtr<controls::gui_control::ControlSkin> make_label_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
+OwningPtr<controls::gui_control::ControlSkin> make_label_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto label_skin = make_owning<controls::gui_label::LabelSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*label_skin) =
-		make_control_skin(parts, text_parts, scene_manager);
+	static_cast<controls::gui_control::ControlSkin&>(*label_skin) = make_control_skin(skin, scene_manager);
 	return label_skin;
 }
 
-OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
+OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto list_box_skin = make_owning<controls::gui_list_box::ListBoxSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*list_box_skin) =
-		make_control_skin(parts, text_parts, scene_manager);
+	static_cast<controls::gui_control::ControlSkin&>(*list_box_skin) = make_control_skin(skin, scene_manager);
 
-	if (!std::empty(parts))
+	if (!std::empty(skin.Parts()))
 	{
-		auto iter = parts.find("selection");
-		auto selection_part = iter != std::end(parts) ? &iter->second : nullptr;
+		auto selection_part = skin.GetPart("selection");
 
 		//Selection part
 		if (selection_part && *selection_part)
 		{
 			auto sprite = list_box_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, selection_part->Enabled});
+			sprite->FillColor(selection_part->FillColor);
 			sprite->AutoSize(true);
 			sprite->AutoRepeat(true);
+			sprite->IncludeBoundingVolumes(false);
 
 			list_box_skin->Selection.SpriteObject = sprite;
 			list_box_skin->Selection.EnabledMaterial = selection_part->Enabled;
@@ -441,16 +439,19 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const SkinPartM
 		}
 	}
 
-	if (!std::empty(text_parts))
+	if (!std::empty(skin.TextParts()))
 	{
-		auto iter = text_parts.find("lines");
-		auto lines_part = iter != std::end(text_parts) ? &iter->second : nullptr;
+		auto lines_part = skin.GetTextPart("lines");
 
 		//Lines part
 		if (lines_part && *lines_part)
 		{
 			auto text = scene_manager.CreateText(lines_part->Template);
-			text->AddPass(graphics::render::Pass{});
+
+			if (std::empty(skin.TextPasses()))
+				text->AddPass(graphics::render::Pass{});
+			else
+				text->AddPasses(skin.GetTextPasses());
 
 			list_box_skin->Lines.TextObject = text;
 			list_box_skin->Lines.EnabledStyle = lines_part->Enabled;
@@ -464,26 +465,24 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const SkinPartM
 	return list_box_skin;
 }
 
-OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
+OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto progress_bar_skin = make_owning<controls::gui_progress_bar::ProgressBarSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*progress_bar_skin) =
-		make_control_skin(parts, text_parts, scene_manager);
+	static_cast<controls::gui_control::ControlSkin&>(*progress_bar_skin) = make_control_skin(skin, scene_manager);
 
-	if (!std::empty(parts))
+	if (!std::empty(skin.Parts()))
 	{
-		auto iter = parts.find("bar");
-		auto bar_part = iter != std::end(parts) ? &iter->second : nullptr;
-
-		iter = parts.find("bar-interpolated");
-		auto bar_interpolated_part = iter != std::end(parts) ? &iter->second : nullptr;
+		auto bar_part = skin.GetPart("bar");
+		auto bar_interpolated_part = skin.GetPart("bar-interpolated");
 
 		//Bar part
 		if (bar_part && *bar_part)
 		{
 			auto sprite = progress_bar_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, bar_part->Enabled});
+			sprite->FillColor(bar_part->FillColor);
 			sprite->AutoSize(true);
 			sprite->AutoRepeat(true);
+			sprite->IncludeBoundingVolumes(false);
 
 			progress_bar_skin->Bar.SpriteObject = sprite;
 			progress_bar_skin->Bar.EnabledMaterial = bar_part->Enabled;
@@ -497,8 +496,10 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const SkinP
 		if (bar_interpolated_part && *bar_interpolated_part)
 		{
 			auto sprite = progress_bar_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, bar_interpolated_part->Enabled});
+			sprite->FillColor(bar_interpolated_part->FillColor);
 			sprite->AutoSize(true);
 			sprite->AutoRepeat(true);
+			sprite->IncludeBoundingVolumes(false);
 
 			progress_bar_skin->BarInterpolated.SpriteObject = sprite;
 			progress_bar_skin->BarInterpolated.EnabledMaterial = bar_interpolated_part->Enabled;
@@ -512,23 +513,22 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const SkinP
 	return progress_bar_skin;
 }
 
-OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
+OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto radio_button_skin = make_owning<controls::gui_radio_button::RadioButtonSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*radio_button_skin) =
-		make_control_skin(parts, text_parts, scene_manager);
+	static_cast<controls::gui_control::ControlSkin&>(*radio_button_skin) = make_control_skin(skin, scene_manager);
 
-	if (!std::empty(parts))
+	if (!std::empty(skin.Parts()))
 	{
-		auto iter = parts.find("check-mark");
-		auto check_mark_part = iter != std::end(parts) ? &iter->second : nullptr;
+		auto check_mark_part = skin.GetPart("check-mark");
 
 		//Check mark part
 		if (check_mark_part && *check_mark_part)
 		{
 			auto sprite = radio_button_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, check_mark_part->Enabled});
+			sprite->FillColor(check_mark_part->FillColor);
 			sprite->AutoSize(true);
-			sprite->AutoRepeat(true);
+			sprite->IncludeBoundingVolumes(false);
 
 			radio_button_skin->CheckMark.SpriteObject = sprite;
 			radio_button_skin->CheckMark.EnabledMaterial = check_mark_part->Enabled;
@@ -542,23 +542,22 @@ OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const SkinP
 	return radio_button_skin;
 }
 
-OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
+OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto scroll_bar_skin = make_owning<controls::gui_scroll_bar::ScrollBarSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*scroll_bar_skin) =
-		make_control_skin(parts, text_parts, scene_manager);
+	static_cast<controls::gui_control::ControlSkin&>(*scroll_bar_skin) = make_control_skin(skin, scene_manager);
 
-	if (!std::empty(parts))
+	if (!std::empty(skin.Parts()))
 	{
-		auto iter = parts.find("handle");
-		auto handle_part = iter != std::end(parts) ? &iter->second : nullptr;
+		auto handle_part = skin.GetPart("handle");
 
 		//Handle part
 		if (handle_part && *handle_part)
 		{
 			auto sprite = scroll_bar_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, handle_part->Enabled});
+			sprite->FillColor(handle_part->FillColor);
 			sprite->AutoSize(true);
-			sprite->AutoRepeat(true);
+			sprite->IncludeBoundingVolumes(false);
 
 			scroll_bar_skin->Handle.SpriteObject = sprite;
 			scroll_bar_skin->Handle.EnabledMaterial = handle_part->Enabled;
@@ -572,23 +571,22 @@ OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const SkinPar
 	return scroll_bar_skin;
 }
 
-OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
+OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto slider_skin = make_owning<controls::gui_slider::SliderSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*slider_skin) =
-		make_control_skin(parts, text_parts, scene_manager);
+	static_cast<controls::gui_control::ControlSkin&>(*slider_skin) = make_control_skin(skin, scene_manager);
 
-	if (!std::empty(parts))
+	if (!std::empty(skin.Parts()))
 	{
-		auto iter = parts.find("handle");
-		auto handle_part = iter != std::end(parts) ? &iter->second : nullptr;
+		auto handle_part = skin.GetPart("handle");
 
 		//Handle part
 		if (handle_part && *handle_part)
 		{
 			auto sprite = slider_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, handle_part->Enabled});
+			sprite->FillColor(handle_part->FillColor);
 			sprite->AutoSize(true);
-			sprite->AutoRepeat(true);
+			sprite->IncludeBoundingVolumes(false);
 
 			slider_skin->Handle.SpriteObject = sprite;
 			slider_skin->Handle.EnabledMaterial = handle_part->Enabled;
@@ -602,23 +600,22 @@ OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const SkinPartMap
 	return slider_skin;
 }
 
-OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
+OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto text_box_skin = make_owning<controls::gui_text_box::TextBoxSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*text_box_skin) =
-		make_control_skin(parts, text_parts, scene_manager);
+	static_cast<controls::gui_control::ControlSkin&>(*text_box_skin) = make_control_skin(skin, scene_manager);
 
-	if (!std::empty(parts))
+	if (!std::empty(skin.Parts()))
 	{
-		auto iter = parts.find("cursor");
-		auto cursor_part = iter != std::end(parts) ? &iter->second : nullptr;
+		auto cursor_part = skin.GetPart("cursor");
 
 		//Cursor part
 		if (cursor_part && *cursor_part)
 		{
 			auto sprite = text_box_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{vector2::Zero, cursor_part->Enabled});
+			sprite->FillColor(cursor_part->FillColor);
 			sprite->AutoSize(true);
-			sprite->AutoRepeat(true);
+			sprite->IncludeBoundingVolumes(false);
 
 			text_box_skin->Cursor.SpriteObject = sprite;
 			text_box_skin->Cursor.EnabledMaterial = cursor_part->Enabled;
@@ -629,19 +626,20 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const SkinPartM
 		}
 	}
 
-	if (!std::empty(text_parts))
+	if (!std::empty(skin.TextParts()))
 	{
-		auto iter = text_parts.find("text");
-		auto text_part = iter != std::end(text_parts) ? &iter->second : nullptr;
-
-		iter = text_parts.find("placeholder-text");
-		auto placeholder_text_part = iter != std::end(text_parts) ? &iter->second : nullptr;
+		auto text_part = skin.GetTextPart("text");
+		auto placeholder_text_part = skin.GetTextPart("placeholder-text");
 
 		//Text part
 		if (text_part && *text_part)
 		{
 			auto text = scene_manager.CreateText(text_part->Template);
-			text->AddPass(graphics::render::Pass{});
+
+			if (std::empty(skin.TextPasses()))
+				text->AddPass(graphics::render::Pass{});
+			else
+				text->AddPasses(skin.GetTextPasses());
 
 			text_box_skin->Text.TextObject = text;
 			text_box_skin->Text.EnabledStyle = text_part->Enabled;
@@ -655,7 +653,11 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const SkinPartM
 		if (placeholder_text_part && *placeholder_text_part)
 		{
 			auto text = scene_manager.CreateText(placeholder_text_part->Template);
-			text->AddPass(graphics::render::Pass{});
+
+			if (std::empty(skin.TextPasses()))
+				text->AddPass(graphics::render::Pass{});
+			else
+				text->AddPasses(skin.GetTextPasses());
 
 			text_box_skin->PlaceholderText.TextObject = text;
 			text_box_skin->PlaceholderText.EnabledStyle = placeholder_text_part->Enabled;
@@ -669,11 +671,10 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const SkinPartM
 	return text_box_skin;
 }
 
-OwningPtr<controls::gui_control::ControlSkin> make_tooltip_skin(const SkinPartMap &parts, const SkinTextPartMap &text_parts, graphics::scene::SceneManager &scene_manager)
+OwningPtr<controls::gui_control::ControlSkin> make_tooltip_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto tooltip_skin = make_owning<controls::gui_tooltip::TooltipSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*tooltip_skin) =
-		make_control_skin(parts, text_parts, scene_manager);
+	static_cast<controls::gui_control::ControlSkin&>(*tooltip_skin) = make_control_skin(skin, scene_manager);
 	return tooltip_skin;
 }
 
@@ -784,7 +785,7 @@ OwningPtr<controls::gui_control::ControlSkin> GuiSkin::Instantiate() const
 		{
 			if (auto iter = registered_skin_builders_.find(*name_);
 				iter != std::end(registered_skin_builders_))
-				return iter->second(parts_, text_parts_, *scene_manager);
+				return iter->second(*this, *scene_manager);
 		}
 	}
 
@@ -813,20 +814,20 @@ void GuiSkin::AddTextPart(std::string name, const SkinTextPart &text_part)
 	Retrieving
 */
 
-gui_skin::SkinPart GuiSkin::GetPart(std::string_view name) const
+const gui_skin::SkinPart* GuiSkin::GetPart(std::string_view name) const noexcept
 {
 	if (auto iter = parts_.find(name); iter != std::end(parts_))
-		return iter->second;
+		return &iter->second;
 	else
-		return {};
+		return nullptr;
 }
 
-gui_skin::SkinTextPart GuiSkin::GetTextPart(std::string_view name) const
+const gui_skin::SkinTextPart* GuiSkin::GetTextPart(std::string_view name) const noexcept
 {
 	if (auto iter = text_parts_.find(name); iter != std::end(text_parts_))
-		return iter->second;
+		return &iter->second;
 	else
-		return {};
+		return nullptr;
 }
 
 
@@ -856,6 +857,73 @@ void GuiSkin::ClearTextParts() noexcept
 bool GuiSkin::RemoveTextPart(std::string_view name) noexcept
 {
 	return text_parts_.erase(name);
+}
+
+
+/*
+	Passes
+	Adding
+*/
+
+void GuiSkin::AddPass(graphics::render::Pass pass)
+{
+	passes_.push_back(std::move(pass));
+}
+
+void GuiSkin::AddPasses(graphics::scene::drawable_object::Passes passes)
+{
+	if (std::empty(passes_))
+		passes_ = std::move(passes);
+	else
+		std::move(std::begin(passes), std::end(passes), std::back_inserter(passes_));
+}
+
+
+void GuiSkin::AddTextPass(graphics::render::Pass pass)
+{
+	text_passes_.push_back(std::move(pass));
+}
+
+void GuiSkin::AddTextPasses(graphics::scene::drawable_object::Passes passes)
+{
+	if (std::empty(text_passes_))
+		text_passes_ = std::move(passes);
+	else
+		std::move(std::begin(passes), std::end(passes), std::back_inserter(text_passes_));
+}
+
+
+/*
+	Passes
+	Retrieving
+*/
+
+const graphics::scene::drawable_object::Passes& GuiSkin::GetPasses() const noexcept
+{
+	return passes_;
+}
+
+const graphics::scene::drawable_object::Passes& GuiSkin::GetTextPasses() const noexcept
+{
+	return text_passes_;
+}
+
+
+/*
+	Passes
+	Removing
+*/
+
+void GuiSkin::ClearPasses() noexcept
+{
+	passes_.clear();
+	passes_.shrink_to_fit();
+}
+
+void GuiSkin::ClearTextPasses() noexcept
+{
+	text_passes_.clear();
+	text_passes_.shrink_to_fit();
 }
 
 } //ion::gui::skins
