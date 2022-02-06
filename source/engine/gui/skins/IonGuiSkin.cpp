@@ -231,49 +231,107 @@ controls::gui_control::ControlSkin make_control_skin(const SkinPartMap &parts, c
 				if (control_skin.Parts.Center)
 					control_skin.Parts.Top->Position(
 						{0.0_r, control_skin.Parts.Center->Size().Y() * 0.5_r + control_skin.Parts.Top->Size().Y() * 0.5_r, 0.0_r});
+				else if (control_skin.Parts.Left)
+					control_skin.Parts.Top->Position(
+						{0.0_r, control_skin.Parts.Left->Size().Y() * 0.5_r + control_skin.Parts.Top->Size().Y() * 0.5_r, 0.0_r});
+				else if (control_skin.Parts.Right)
+					control_skin.Parts.Top->Position(
+						{0.0_r, control_skin.Parts.Right->Size().Y() * 0.5_r + control_skin.Parts.Top->Size().Y() * 0.5_r, 0.0_r});
 			}
 
 			//Bottom part (position)
 			if (control_skin.Parts.Bottom)
 			{
-				control_skin.Parts.Bottom->Position({});
+				if (control_skin.Parts.Center)
+					control_skin.Parts.Bottom->Position(
+						{0.0_r, -control_skin.Parts.Center->Size().Y() * 0.5_r - control_skin.Parts.Bottom->Size().Y() * 0.5_r, 0.0_r});
+				else if (control_skin.Parts.Left)
+					control_skin.Parts.Bottom->Position(
+						{0.0_r, -control_skin.Parts.Left->Size().Y() * 0.5_r - control_skin.Parts.Bottom->Size().Y() * 0.5_r, 0.0_r});
+				else if (control_skin.Parts.Right)
+					control_skin.Parts.Bottom->Position(
+						{0.0_r, -control_skin.Parts.Right->Size().Y() * 0.5_r - control_skin.Parts.Bottom->Size().Y() * 0.5_r, 0.0_r});
 			}
 
 			//Left part (position)
 			if (control_skin.Parts.Left)
 			{
-				control_skin.Parts.Left->Position({});
+				if (control_skin.Parts.Center)
+					control_skin.Parts.Left->Position(
+						{-control_skin.Parts.Center->Size().X() * 0.5_r - control_skin.Parts.Left->Size().X() * 0.5_r, 0.0_r, 0.0_r});
+				else if (control_skin.Parts.Top)
+					control_skin.Parts.Left->Position(
+						{-control_skin.Parts.Top->Size().X() * 0.5_r - control_skin.Parts.Left->Size().X() * 0.5_r, 0.0_r, 0.0_r});
+				else if (control_skin.Parts.Bottom)
+					control_skin.Parts.Left->Position(
+						{-control_skin.Parts.Bottom->Size().X() * 0.5_r - control_skin.Parts.Left->Size().X() * 0.5_r, 0.0_r, 0.0_r});
 			}
 
 			//Right part (position)
 			if (control_skin.Parts.Right)
 			{
-				control_skin.Parts.Right->Position({});
+				if (control_skin.Parts.Center)
+					control_skin.Parts.Right->Position(
+						{control_skin.Parts.Center->Size().X() * 0.5_r + control_skin.Parts.Right->Size().X() * 0.5_r, 0.0_r, 0.0_r});
+				else if (control_skin.Parts.Top)
+					control_skin.Parts.Right->Position(
+						{control_skin.Parts.Top->Size().X() * 0.5_r + control_skin.Parts.Right->Size().X() * 0.5_r, 0.0_r, 0.0_r});
+				else if (control_skin.Parts.Bottom)
+					control_skin.Parts.Right->Position(
+						{control_skin.Parts.Bottom->Size().X() * 0.5_r + control_skin.Parts.Right->Size().X() * 0.5_r, 0.0_r, 0.0_r});
 			}
 
 			//Corners
 			//Top-left part (position)
 			if (control_skin.Parts.TopLeft)
 			{
-				control_skin.Parts.TopLeft->Position({});
+				if (control_skin.Parts.Center)
+					control_skin.Parts.TopLeft->Position(
+						{-control_skin.Parts.Center->Size().X() * 0.5_r - control_skin.Parts.TopLeft->Size().X() * 0.5_r,
+						control_skin.Parts.Center->Size().Y() * 0.5_r + control_skin.Parts.TopLeft->Size().Y() * 0.5_r, 0.0_r});
+				else if (control_skin.Parts.Top && control_skin.Parts.Left)
+					control_skin.Parts.TopLeft->Position(
+						{-control_skin.Parts.Top->Size().X() * 0.5_r - control_skin.Parts.TopLeft->Size().X() * 0.5_r,
+						control_skin.Parts.Left->Size().Y() * 0.5_r + control_skin.Parts.TopLeft->Size().Y() * 0.5_r, 0.0_r});
 			}
 
 			//Top-right part (position)
 			if (control_skin.Parts.TopRight)
 			{
-				control_skin.Parts.TopRight->Position({});
+				if (control_skin.Parts.Center)
+					control_skin.Parts.TopRight->Position(
+						{control_skin.Parts.Center->Size().X() * 0.5_r + control_skin.Parts.TopRight->Size().X() * 0.5_r,
+						control_skin.Parts.Center->Size().Y() * 0.5_r + control_skin.Parts.TopRight->Size().Y() * 0.5_r, 0.0_r});
+				else if (control_skin.Parts.Top && control_skin.Parts.Right)
+					control_skin.Parts.TopRight->Position(
+						{control_skin.Parts.Top->Size().X() * 0.5_r - control_skin.Parts.TopRight->Size().X() * 0.5_r,
+						control_skin.Parts.Right->Size().Y() * 0.5_r + control_skin.Parts.TopRight->Size().Y() * 0.5_r, 0.0_r});
 			}
 
 			//Bottom-left part (position)
 			if (control_skin.Parts.BottomLeft)
 			{
-				control_skin.Parts.BottomLeft->Position({});
+				if (control_skin.Parts.Center)
+					control_skin.Parts.BottomLeft->Position(
+						{-control_skin.Parts.Center->Size().X() * 0.5_r - control_skin.Parts.BottomLeft->Size().X() * 0.5_r,
+						-control_skin.Parts.Center->Size().Y() * 0.5_r - control_skin.Parts.BottomLeft->Size().Y() * 0.5_r, 0.0_r});
+				else if (control_skin.Parts.Bottom && control_skin.Parts.Left)
+					control_skin.Parts.BottomLeft->Position(
+						{-control_skin.Parts.Bottom->Size().X() * 0.5_r - control_skin.Parts.BottomLeft->Size().X() * 0.5_r,
+						-control_skin.Parts.Left->Size().Y() * 0.5_r - control_skin.Parts.BottomLeft->Size().Y() * 0.5_r, 0.0_r});
 			}
 
 			//Bottom-right part (position)
 			if (control_skin.Parts.BottomRight)
 			{
-				control_skin.Parts.BottomRight->Position({});
+				if (control_skin.Parts.Center)
+					control_skin.Parts.BottomRight->Position(
+						{control_skin.Parts.Center->Size().X() * 0.5_r + control_skin.Parts.BottomRight->Size().X() * 0.5_r,
+						-control_skin.Parts.Center->Size().Y() * 0.5_r - control_skin.Parts.BottomRight->Size().Y() * 0.5_r, 0.0_r});
+				else if (control_skin.Parts.Bottom && control_skin.Parts.Right)
+					control_skin.Parts.BottomRight->Position(
+						{control_skin.Parts.Bottom->Size().X() * 0.5_r + control_skin.Parts.BottomRight->Size().X() * 0.5_r,
+						-control_skin.Parts.Right->Size().Y() * 0.5_r - control_skin.Parts.BottomRight->Size().Y() * 0.5_r, 0.0_r});
 			}
 		}
 	}
