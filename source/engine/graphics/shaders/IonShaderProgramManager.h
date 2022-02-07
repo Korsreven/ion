@@ -259,7 +259,7 @@ namespace ion::graphics::shaders
 			std::optional<shader_program_manager::InfoLogLevel> log_level_;
 
 
-			inline static auto active_shader_program_handle_ = 0;
+			static inline auto active_shader_program_handle_ = 0;
 				//Only one shader program can be in use at any given time
 
 			static void ActivateShaderProgram(int handle) noexcept;
