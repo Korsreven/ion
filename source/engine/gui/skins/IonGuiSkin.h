@@ -168,8 +168,8 @@ namespace ion::gui::skins
 			graphics::scene::drawable_object::Passes text_passes_;
 
 
-			static adaptors::FlatMap<std::type_index, std::string> registered_skins_;
-			static adaptors::FlatMap<std::string, gui_skin::SkinBuilder> registered_skin_builders_;
+			static inline adaptors::FlatMap<std::type_index, std::string> registered_skins_;
+			static inline adaptors::FlatMap<std::string, gui_skin::SkinBuilder> registered_skin_builders_;
 
 			static void RegisterDefaultSkins();
 
@@ -374,7 +374,7 @@ namespace ion::gui::skins
 			*/
 
 			template <typename T>
-			static void RegisterSkin(std::string name, gui_skin::SkinBuilder builder)
+			static inline void RegisterSkin(std::string name, gui_skin::SkinBuilder builder)
 			{
 				static_assert(std::is_base_of_v<controls::GuiControl, T>);
 				registered_skins_[std::type_index{typeid(T)}] = name;
@@ -382,8 +382,10 @@ namespace ion::gui::skins
 			}
 
 			template <typename T>
-			static std::optional<std::string_view> SkinName() noexcept
+			static inline std::optional<std::string_view> SkinName() noexcept
 			{
+				RegisterDefaultSkins();
+
 				if (auto iter = registered_skins_.find(std::type_index{typeid(T)});
 					iter != std::end(registered_skins_))
 					return iter->second;

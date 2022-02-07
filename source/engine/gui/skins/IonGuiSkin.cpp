@@ -682,22 +682,25 @@ OwningPtr<controls::gui_control::ControlSkin> make_tooltip_skin(const GuiSkin &s
 
 //Private
 
-adaptors::FlatMap<std::type_index, std::string> GuiSkin::registered_skins_{};
-adaptors::FlatMap<std::string, gui_skin::SkinBuilder> GuiSkin::registered_skin_builders_{};
-
 void GuiSkin::RegisterDefaultSkins()
 {
-	RegisterSkin<controls::GuiButton>("GuiButton", detail::make_button_skin);
-	RegisterSkin<controls::GuiCheckBox>("GuiCheckBox", detail::make_check_box_skin);
-	RegisterSkin<controls::GuiGroupBox>("GuiGroupBox", detail::make_group_box_skin);
-	RegisterSkin<controls::GuiLabel>("GuiLabel", detail::make_label_skin);
-	RegisterSkin<controls::GuiListBox>("GuiListBox", detail::make_list_box_skin);
-	RegisterSkin<controls::GuiProgressBar>("GuiProgressBar", detail::make_progress_bar_skin);
-	RegisterSkin<controls::GuiRadioButton>("GuiRadioButton", detail::make_radio_button_skin);
-	RegisterSkin<controls::GuiScrollBar>("GuiScrollBar", detail::make_scroll_bar_skin);
-	RegisterSkin<controls::GuiSlider>("GuiSlider", detail::make_slider_skin);
-	RegisterSkin<controls::GuiTextBox>("GuiTextBox", detail::make_text_box_skin);
-	RegisterSkin<controls::GuiTooltip>("GuiTooltip", detail::make_tooltip_skin);
+	static auto registered = false;
+
+	if (!registered)
+	{
+		RegisterSkin<controls::GuiButton>("GuiButton", detail::make_button_skin);
+		RegisterSkin<controls::GuiCheckBox>("GuiCheckBox", detail::make_check_box_skin);
+		RegisterSkin<controls::GuiGroupBox>("GuiGroupBox", detail::make_group_box_skin);
+		RegisterSkin<controls::GuiLabel>("GuiLabel", detail::make_label_skin);
+		RegisterSkin<controls::GuiListBox>("GuiListBox", detail::make_list_box_skin);
+		RegisterSkin<controls::GuiProgressBar>("GuiProgressBar", detail::make_progress_bar_skin);
+		RegisterSkin<controls::GuiRadioButton>("GuiRadioButton", detail::make_radio_button_skin);
+		RegisterSkin<controls::GuiScrollBar>("GuiScrollBar", detail::make_scroll_bar_skin);
+		RegisterSkin<controls::GuiSlider>("GuiSlider", detail::make_slider_skin);
+		RegisterSkin<controls::GuiTextBox>("GuiTextBox", detail::make_text_box_skin);
+		RegisterSkin<controls::GuiTooltip>("GuiTooltip", detail::make_tooltip_skin);
+		registered = true;
+	}
 }
 
 
@@ -706,14 +709,12 @@ void GuiSkin::RegisterDefaultSkins()
 GuiSkin::GuiSkin(std::string name) :
 	managed::ManagedObject<GuiTheme>{std::move(name)}
 {
-	RegisterDefaultSkins();
+	//Empty
 }
 
 GuiSkin::GuiSkin(std::string name, const SkinParts &parts, const SkinTextPart &caption) :
 	managed::ManagedObject<GuiTheme>{std::move(name)}
 {
-	RegisterDefaultSkins();
-
 	if (parts.Center)
 		parts_["center"] = parts.Center;
 
@@ -783,6 +784,8 @@ OwningPtr<controls::gui_control::ControlSkin> GuiSkin::Instantiate() const
 	{
 		if (auto scene_manager = owner_->ConnectedSceneManager(); scene_manager)
 		{
+			RegisterDefaultSkins();
+
 			if (auto iter = registered_skin_builders_.find(*name_);
 				iter != std::end(registered_skin_builders_))
 				return iter->second(*this, *scene_manager);
