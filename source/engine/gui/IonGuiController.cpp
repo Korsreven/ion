@@ -266,6 +266,12 @@ void GuiController::Created(controls::GuiTooltip &tooltip) noexcept
 	tooltips_.push_back(&tooltip);
 }
 
+void GuiController::Created(skins::GuiTheme &theme) noexcept
+{
+	if (!active_theme_)
+		active_theme_ = &theme;
+}
+
 
 void GuiController::Removed(GuiComponent &component) noexcept
 {
@@ -308,6 +314,12 @@ void GuiController::Removed(controls::GuiTooltip &tooltip) noexcept
 	//Tooltip found
 	if (iter != std::end(tooltips_))
 		tooltips_.erase(iter);
+}
+
+void GuiController::Removed(skins::GuiTheme &theme) noexcept
+{
+	if (active_theme_ == &theme)
+		active_theme_ = nullptr;
 }
 
 
@@ -506,6 +518,12 @@ void GuiController::ActiveTooltip(std::string_view name) noexcept
 
 	active_tooltip_ = GetTooltip(name).get();
 }
+
+void GuiController::ActiveTheme(std::string_view name) noexcept
+{
+	active_theme_ = GetTheme(name).get();
+}
+
 
 void GuiController::MouseCursorSkin(gui_controller::GuiMouseCursorSkin skin, real z_order) noexcept
 {

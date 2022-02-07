@@ -133,6 +133,7 @@ namespace ion::gui
 			
 			GuiFrame *focused_frame_ = nullptr;
 			controls::GuiTooltip *active_tooltip_ = nullptr;
+			skins::GuiTheme *active_theme_ = nullptr;
 			gui_controller::detail::frames active_frames_;
 			bool shift_pressed_ = false;
 
@@ -155,11 +156,13 @@ namespace ion::gui
 			void Created(GuiComponent &component) noexcept override final;
 			void Created(GuiFrame &frame) noexcept;
 			void Created(controls::GuiTooltip &tooltip) noexcept;
+			void Created(skins::GuiTheme &theme) noexcept;
 
 			//See ObjectManager::Removed for more details
 			void Removed(GuiComponent &component) noexcept override final;
 			void Removed(GuiFrame &frame) noexcept;
 			void Removed(controls::GuiTooltip &tooltip) noexcept;
+			void Removed(skins::GuiTheme &theme) noexcept;
 
 
 			//See Listener<T>::Unsubscribable for more details
@@ -307,6 +310,10 @@ namespace ion::gui
 			//Sets the tooltip used by this controller to the tooltip with the given name
 			void ActiveTooltip(std::string_view name) noexcept;
 
+			//Sets the theme used by this controller to the theme with the given name
+			void ActiveTheme(std::string_view name) noexcept;
+
+
 			//Sets the mouse cursor skin used by this controller to the given skin with the given z-order
 			void MouseCursorSkin(gui_controller::GuiMouseCursorSkin skin, real z_order) noexcept;
 
@@ -323,10 +330,19 @@ namespace ion::gui
 			*/
 
 			//Returns a pointer to the tooltip used by this controller
-			[[nodiscard]] inline auto& ActiveTooltip() const noexcept
+			//Returns nullptr if there is no tooltip in use
+			[[nodiscard]] inline auto ActiveTooltip() const noexcept
 			{
 				return active_tooltip_;
 			}
+
+			//Returns a pointer to the theme used by this controller
+			//Returns nullptr if there is no theme in use
+			[[nodiscard]] inline auto ActiveTheme() const noexcept
+			{
+				return active_theme_;
+			}
+
 
 			//Returns the mouse cursor skin used by this controller
 			[[nodiscard]] inline auto& MouseCursorSkin() const noexcept

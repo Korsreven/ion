@@ -38,6 +38,11 @@ namespace ion::gui
 
 	class GuiController; //Forward declaration
 
+	namespace skins
+	{
+		class GuiTheme; //Forward declaration
+	}
+
 	namespace gui_frame
 	{
 		enum class FrameMode : bool
@@ -106,6 +111,8 @@ namespace ion::gui
 			std::optional<events::Callback<void, GuiFrame&>> on_deactivate_;
 			std::optional<events::Callback<void, GuiFrame&>> on_focus_;
 			std::optional<events::Callback<void, GuiFrame&>> on_defocus_;
+
+			NonOwningPtr<skins::GuiTheme> active_theme_;
 
 
 			/*
@@ -347,6 +354,9 @@ namespace ion::gui
 			}
 
 
+			//Sets the theme used by this frame to the theme with the given name
+			void ActiveTheme(std::string_view name) noexcept;
+
 			//Sets whether or not this frame is enabled
 			inline void Enabled(bool enabled) noexcept
 			{
@@ -431,6 +441,13 @@ namespace ion::gui
 				return on_defocus_;
 			}
 
+
+			//Returns a pointer to the theme used by this frame
+			//Returns nullptr if there is no theme in use
+			[[nodiscard]] inline auto ActiveTheme() const noexcept
+			{
+				return active_theme_.get();
+			}
 
 			//Returns a pointer to the owner of this frame
 			[[nodiscard]] GuiController* Owner() const noexcept;

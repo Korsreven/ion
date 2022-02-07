@@ -533,6 +533,13 @@ void GuiFrame::Defocus() noexcept
 }
 
 
+void GuiFrame::ActiveTheme(std::string_view name) noexcept
+{
+	if (auto owner = Owner(); owner)
+		active_theme_ = owner->GetTheme(name);
+}
+
+
 /*
 	Observers
 */
