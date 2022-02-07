@@ -712,7 +712,7 @@ GuiSkin::GuiSkin(std::string name) :
 	//Empty
 }
 
-GuiSkin::GuiSkin(std::string name, const SkinParts &parts, const SkinTextPart &caption) :
+GuiSkin::GuiSkin(std::string name, const SkinParts &parts, const SkinTextPart &caption_part) :
 	managed::ManagedObject<GuiTheme>{std::move(name)}
 {
 	if (parts.Center)
@@ -745,30 +745,30 @@ GuiSkin::GuiSkin(std::string name, const SkinParts &parts, const SkinTextPart &c
 		parts_["bottom-right"] = parts.Border.Corners.BottomRight;
 
 	//Caption
-	if (caption)
-		text_parts_["caption"] = caption;
+	if (caption_part)
+		text_parts_["caption"] = caption_part;
 }
 
-GuiSkin::GuiSkin(std::string name, const SkinBorderParts &border_parts, const SkinTextPart &caption) :
-	GuiSkin{std::move(name), SkinParts{{}, border_parts}, caption}
+GuiSkin::GuiSkin(std::string name, const SkinBorderParts &border_parts, const SkinTextPart &caption_part) :
+	GuiSkin{std::move(name), SkinParts{{}, border_parts}, caption_part}
 {
 	//Empty
 }
 
-GuiSkin::GuiSkin(std::string name, const SkinSideParts &side_parts, const SkinTextPart &caption) :
-	GuiSkin{std::move(name), SkinParts{{}, {side_parts, {}}}, caption}
+GuiSkin::GuiSkin(std::string name, const SkinSideParts &side_parts, const SkinTextPart &caption_part) :
+	GuiSkin{std::move(name), SkinParts{{}, {side_parts, {}}}, caption_part}
 {
 	//Empty
 }
 
-GuiSkin::GuiSkin(std::string name, const SkinPart &center, const SkinTextPart &caption) :
-	GuiSkin{std::move(name), SkinParts{center}, caption}
+GuiSkin::GuiSkin(std::string name, const SkinPart &center_part, const SkinTextPart &caption_part) :
+	GuiSkin{std::move(name), SkinParts{center_part}, caption_part}
 {
 	//Empty
 }
 
-GuiSkin::GuiSkin(std::string name, const SkinTextPart &caption) :
-	GuiSkin{std::move(name), SkinParts{}, caption}
+GuiSkin::GuiSkin(std::string name, const SkinTextPart &caption_part) :
+	GuiSkin{std::move(name), SkinParts{}, caption_part}
 {
 	//Empty
 }
@@ -893,22 +893,6 @@ void GuiSkin::AddTextPasses(graphics::scene::drawable_object::Passes passes)
 		text_passes_ = std::move(passes);
 	else
 		std::move(std::begin(passes), std::end(passes), std::back_inserter(text_passes_));
-}
-
-
-/*
-	Passes
-	Retrieving
-*/
-
-const graphics::scene::drawable_object::Passes& GuiSkin::GetPasses() const noexcept
-{
-	return passes_;
-}
-
-const graphics::scene::drawable_object::Passes& GuiSkin::GetTextPasses() const noexcept
-{
-	return text_passes_;
 }
 
 

@@ -178,20 +178,20 @@ namespace ion::gui::skins
 			//Construct a skin with the given name
 			explicit GuiSkin(std::string name);
 			
-			//Construct a skin with the given name, parts and caption
-			GuiSkin(std::string name, const gui_skin::SkinParts &parts, const gui_skin::SkinTextPart &caption = {});
+			//Construct a skin with the given name, parts and caption part
+			GuiSkin(std::string name, const gui_skin::SkinParts &parts, const gui_skin::SkinTextPart &caption_part = {});
 
-			//Construct a skin with the given name, border parts and caption
-			GuiSkin(std::string name, const gui_skin::SkinBorderParts &border_parts, const gui_skin::SkinTextPart &caption = {});
+			//Construct a skin with the given name, border parts and caption part
+			GuiSkin(std::string name, const gui_skin::SkinBorderParts &border_parts, const gui_skin::SkinTextPart &caption_part = {});
 
-			//Construct a skin with the given name, side parts and caption
-			GuiSkin(std::string name, const gui_skin::SkinSideParts &side_parts, const gui_skin::SkinTextPart &caption = {});
+			//Construct a skin with the given name, side parts and caption part
+			GuiSkin(std::string name, const gui_skin::SkinSideParts &side_parts, const gui_skin::SkinTextPart &caption_part = {});
 
-			//Construct a skin with the given name, center part and caption
-			GuiSkin(std::string name, const gui_skin::SkinPart &center, const gui_skin::SkinTextPart &caption = {});
+			//Construct a skin with the given name, center part and caption part
+			GuiSkin(std::string name, const gui_skin::SkinPart &center_part, const gui_skin::SkinTextPart &caption_part = {});
 
-			//Construct a skin with the given name and caption
-			GuiSkin(std::string name, const gui_skin::SkinTextPart &caption);
+			//Construct a skin with the given name and caption part
+			GuiSkin(std::string name, const gui_skin::SkinTextPart &caption_part);
 
 
 			/*
@@ -256,20 +256,23 @@ namespace ion::gui::skins
 			{
 				return adaptors::ranges::Iterable<const graphics::scene::drawable_object::Passes&>{text_passes_};
 			}
-			
-
-			/*
-				Modifiers
-			*/
-
-
 
 
 			/*
 				Observers
 			*/
 
+			//Gets an immutable reference to all passes in this skin
+			[[nodiscard]] inline auto& GetPasses() const noexcept
+			{
+				return passes_;
+			}
 
+			//Gets an immutable reference to all text passes in this skin
+			[[nodiscard]] inline auto& GetTextPasses() const noexcept
+			{
+				return text_passes_;
+			}
 
 
 			/*
@@ -299,11 +302,11 @@ namespace ion::gui::skins
 
 			//Gets a pointer to the part with the given name
 			//Returns nullptr if no part is found with the given name
-			const gui_skin::SkinPart* GetPart(std::string_view name) const noexcept;
+			[[nodiscard]] const gui_skin::SkinPart* GetPart(std::string_view name) const noexcept;
 
 			//Gets a pointer to the text part with the given name
 			//Returns nullptr if no text part is found with the given name
-			const gui_skin::SkinTextPart* GetTextPart(std::string_view name) const noexcept;
+			[[nodiscard]] const gui_skin::SkinTextPart* GetTextPart(std::string_view name) const noexcept;
 
 
 			/*
@@ -346,18 +349,6 @@ namespace ion::gui::skins
 
 			/*
 				Passes
-				Retrieving
-			*/
-
-			//Gets an immutable reference to all passes in this skin
-			const graphics::scene::drawable_object::Passes& GetPasses() const noexcept;
-
-			//Gets an immutable reference to all text passes in this skin
-			const graphics::scene::drawable_object::Passes& GetTextPasses() const noexcept;
-
-
-			/*
-				Passes
 				Removing
 			*/
 
@@ -382,7 +373,7 @@ namespace ion::gui::skins
 			}
 
 			template <typename T>
-			static inline std::optional<std::string_view> SkinName() noexcept
+			[[nodiscard]] static inline std::optional<std::string_view> SkinName() noexcept
 			{
 				RegisterDefaultSkins();
 

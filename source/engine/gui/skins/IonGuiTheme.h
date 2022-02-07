@@ -103,6 +103,22 @@ namespace ion::gui::skins
 			//Create a skin with the given name
 			NonOwningPtr<GuiSkin> CreateSkin(std::string name);
 
+			//Create a skin with the given name, parts and caption part
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinParts &parts, const gui_skin::SkinTextPart &caption_part = {});
+
+			//Create a skin with the given name, border parts and caption part
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinBorderParts &border_parts, const gui_skin::SkinTextPart &caption_part = {});
+
+			//Create a skin with the given name, side parts and caption part
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinSideParts &side_parts, const gui_skin::SkinTextPart &caption_part = {});
+
+			//Create a skin with the given name, center part and caption part
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinPart &center_part, const gui_skin::SkinTextPart &caption_part = {});
+
+			//Create a skin with the given name and caption part
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinTextPart &caption_part);
+
+
 			//Create a skin by copying the given skin
 			NonOwningPtr<GuiSkin> CreateSkin(const GuiSkin &skin);
 
