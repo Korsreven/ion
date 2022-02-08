@@ -180,6 +180,24 @@ void GuiButton::Clicked() noexcept
 }
 
 
+/*
+	Skins
+*/
+
+OwningPtr<gui_control::ControlSkin> GuiButton::AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const
+{
+	//Not fully compatible
+	if (skin && !dynamic_cast<ButtonSkin*>(skin.get()))
+	{
+		auto button_skin = make_owning<ButtonSkin>();
+		button_skin->Assign(*skin);
+		return button_skin;
+	}
+	else
+		return skin;
+}
+
+
 //Public
 
 GuiButton::GuiButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,

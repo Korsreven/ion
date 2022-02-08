@@ -365,14 +365,14 @@ controls::gui_control::ControlSkin make_control_skin(const GuiSkin &skin, graphi
 OwningPtr<controls::gui_control::ControlSkin> make_button_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto button_skin = make_owning<controls::gui_button::ButtonSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*button_skin) = make_control_skin(skin, scene_manager);
+	button_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
 	return button_skin;
 }
 
 OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto check_box_skin = make_owning<controls::gui_check_box::CheckBoxSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*check_box_skin) = make_control_skin(skin, scene_manager);
+	check_box_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
 
 	if (!std::empty(skin.Parts()))
 	{
@@ -401,21 +401,21 @@ OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const GuiSkin 
 OwningPtr<controls::gui_control::ControlSkin> make_group_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto group_box_skin = make_owning<controls::gui_group_box::GroupBoxSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*group_box_skin) = make_control_skin(skin, scene_manager);
+	group_box_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
 	return group_box_skin;
 }
 
 OwningPtr<controls::gui_control::ControlSkin> make_label_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto label_skin = make_owning<controls::gui_label::LabelSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*label_skin) = make_control_skin(skin, scene_manager);
+	label_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
 	return label_skin;
 }
 
 OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto list_box_skin = make_owning<controls::gui_list_box::ListBoxSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*list_box_skin) = make_control_skin(skin, scene_manager);
+	list_box_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
 
 	if (!std::empty(skin.Parts()))
 	{
@@ -468,7 +468,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &
 OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto progress_bar_skin = make_owning<controls::gui_progress_bar::ProgressBarSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*progress_bar_skin) = make_control_skin(skin, scene_manager);
+	progress_bar_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
 
 	if (!std::empty(skin.Parts()))
 	{
@@ -516,7 +516,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSk
 OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto radio_button_skin = make_owning<controls::gui_radio_button::RadioButtonSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*radio_button_skin) = make_control_skin(skin, scene_manager);
+	radio_button_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
 
 	if (!std::empty(skin.Parts()))
 	{
@@ -545,7 +545,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const GuiSk
 OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto scroll_bar_skin = make_owning<controls::gui_scroll_bar::ScrollBarSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*scroll_bar_skin) = make_control_skin(skin, scene_manager);
+	scroll_bar_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
 
 	if (!std::empty(skin.Parts()))
 	{
@@ -574,7 +574,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const GuiSkin
 OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto slider_skin = make_owning<controls::gui_slider::SliderSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*slider_skin) = make_control_skin(skin, scene_manager);
+	slider_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
 
 	if (!std::empty(skin.Parts()))
 	{
@@ -603,7 +603,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const GuiSkin &sk
 OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto text_box_skin = make_owning<controls::gui_text_box::TextBoxSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*text_box_skin) = make_control_skin(skin, scene_manager);
+	text_box_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
 
 	if (!std::empty(skin.Parts()))
 	{
@@ -674,7 +674,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 OwningPtr<controls::gui_control::ControlSkin> make_tooltip_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto tooltip_skin = make_owning<controls::gui_tooltip::TooltipSkin>();
-	static_cast<controls::gui_control::ControlSkin&>(*tooltip_skin) = make_control_skin(skin, scene_manager);
+	tooltip_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
 	return tooltip_skin;
 }
 

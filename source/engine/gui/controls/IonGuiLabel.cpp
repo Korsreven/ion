@@ -30,6 +30,26 @@ void GuiLabel::DefaultSetup() noexcept
 }
 
 
+//Protected
+
+/*
+	Skins
+*/
+
+OwningPtr<gui_control::ControlSkin> GuiLabel::AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const
+{
+	//Not fully compatible
+	if (skin && !dynamic_cast<LabelSkin*>(skin.get()))
+	{
+		auto label_skin = make_owning<LabelSkin>();
+		label_skin->Assign(*skin);
+		return label_skin;
+	}
+	else
+		return skin;
+}
+
+
 //Public
 
 GuiLabel::GuiLabel(std::string name, std::optional<std::string> caption,

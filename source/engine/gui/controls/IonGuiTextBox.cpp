@@ -465,6 +465,20 @@ void GuiTextBox::SetState(gui_control::ControlState state) noexcept
 	Skins
 */
 
+OwningPtr<gui_control::ControlSkin> GuiTextBox::AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const
+{
+	//Not fully compatible
+	if (skin && !dynamic_cast<TextBoxSkin*>(skin.get()))
+	{
+		auto text_box_skin = make_owning<TextBoxSkin>();
+		text_box_skin->Assign(*skin);
+		return text_box_skin;
+	}
+	else
+		return skin;
+}
+
+
 void GuiTextBox::AttachSkin()
 {
 	GuiControl::AttachSkin(); //Use base functionality

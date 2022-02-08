@@ -306,6 +306,7 @@ Vector2 caption_area_offset(ControlCaptionLayout caption_layout, const Vector2 &
 
 void GuiControl::Created() noexcept
 {
+	skin_ = AttuneSkin(std::move(skin_));
 	AttachSkin();
 
 	if (skin_)
@@ -801,6 +802,12 @@ void GuiControl::SetState(ControlState state) noexcept
 	Skins
 */
 
+OwningPtr<ControlSkin> GuiControl::AttuneSkin(OwningPtr<ControlSkin> skin) const
+{
+	return skin;
+}
+
+
 void GuiControl::AttachSkin()
 {
 	if (skin_ && node_)
@@ -1110,7 +1117,7 @@ void GuiControl::Skin(OwningPtr<ControlSkin> skin) noexcept
 			else
 				size_ = from_size;
 
-			skin_ = std::move(skin);	
+			skin_ = AttuneSkin(std::move(skin));
 		}
 
 		AttachSkin();

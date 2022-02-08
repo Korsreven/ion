@@ -73,6 +73,20 @@ void GuiTooltip::DefaultSetup() noexcept
 	Skins
 */
 
+OwningPtr<gui_control::ControlSkin> GuiTooltip::AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const
+{
+	//Not fully compatible
+	if (skin && !dynamic_cast<TooltipSkin*>(skin.get()))
+	{
+		auto tooltip_skin = make_owning<TooltipSkin>();
+		tooltip_skin->Assign(*skin);
+		return tooltip_skin;
+	}
+	else
+		return skin;
+}
+
+
 void GuiTooltip::UpdateCaption() noexcept
 {
 	static auto need_update = true;

@@ -92,6 +92,13 @@ namespace ion::gui::controls
 			//See GuiControl::Clicked for more details
 			virtual void Clicked() noexcept override;
 
+
+			/*
+				Skins
+			*/
+
+			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
+
 		public:
 
 			//Construct a button with the given name, caption, tooltip, skin and hit boxes

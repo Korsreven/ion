@@ -84,6 +84,8 @@ namespace ion::gui::controls
 				Skins
 			*/
 
+			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
+
 			virtual void UpdateCaption() noexcept override;
 			void UpdatePosition(Vector2 position) noexcept;
 			void AdjustInView() noexcept;

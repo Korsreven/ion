@@ -44,6 +44,24 @@ void GuiRadioButton::Unchecked() noexcept
 
 
 /*
+	Skins
+*/
+
+OwningPtr<gui_control::ControlSkin> GuiRadioButton::AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const
+{
+	//Not fully compatible
+	if (skin && !dynamic_cast<RadioButtonSkin*>(skin.get()))
+	{
+		auto radio_button_skin = make_owning<RadioButtonSkin>();
+		radio_button_skin->Assign(*skin);
+		return radio_button_skin;
+	}
+	else
+		return skin;
+}
+
+
+/*
 	Tags
 */
 

@@ -63,6 +63,13 @@ namespace ion::gui::controls
 
 			gui_group_box::detail::control_pointers controls_;
 
+
+			/*
+				Skins
+			*/
+
+			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
+
 		public:
 
 			//Construct a group box with the given name, caption, skin and hit boxes

@@ -82,6 +82,15 @@ namespace ion::gui::controls
 
 			std::vector<NonOwningPtr<graphics::scene::shapes::Sprite>> Icons;
 				//Sprites for each visible icon
+
+			//Copy from most derived
+			virtual void Assign(const ControlSkin &control_skin) noexcept
+			{
+				if (auto skin = dynamic_cast<const ListBoxSkin*>(&control_skin); skin)
+					*this = *skin;
+				else //Try less derived
+					return ControlSkin::Assign(control_skin);
+			}
 		};
 
 
@@ -193,6 +202,8 @@ namespace ion::gui::controls
 			/*
 				Skins
 			*/
+
+			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
 
 			virtual void AttachSkin() override;
 			virtual void DetachSkin() noexcept override;

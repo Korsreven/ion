@@ -81,6 +81,15 @@ namespace ion::gui::controls
 			gui_control::ControlCaptionPart Text;
 			gui_control::ControlCaptionPart PlaceholderText;
 			gui_control::ControlVisualPart Cursor;
+
+			//Copy from most derived
+			virtual void Assign(const ControlSkin &control_skin) noexcept
+			{
+				if (auto skin = dynamic_cast<const TextBoxSkin*>(&control_skin); skin)
+					*this = *skin;
+				else //Try less derived
+					return ControlSkin::Assign(control_skin);
+			}
 		};
 
 
@@ -231,6 +240,8 @@ namespace ion::gui::controls
 			/*
 				Skins
 			*/
+
+			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
 
 			virtual void AttachSkin() override;
 			virtual void DetachSkin() noexcept override;

@@ -241,6 +241,20 @@ void GuiListBox::SetState(gui_control::ControlState state) noexcept
 	Skins
 */
 
+OwningPtr<gui_control::ControlSkin> GuiListBox::AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const
+{
+	//Not fully compatible
+	if (skin && !dynamic_cast<ListBoxSkin*>(skin.get()))
+	{
+		auto list_box_skin = make_owning<ListBoxSkin>();
+		list_box_skin->Assign(*skin);
+		return list_box_skin;
+	}
+	else
+		return skin;
+}
+
+
 void GuiListBox::AttachSkin()
 {
 	GuiControl::AttachSkin(); //Use base functionality

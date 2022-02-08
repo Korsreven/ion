@@ -57,6 +57,13 @@ namespace ion::gui::controls
 
 
 			/*
+				Skins
+			*/
+
+			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
+
+
+			/*
 				Tags
 			*/
 

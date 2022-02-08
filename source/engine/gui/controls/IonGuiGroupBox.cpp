@@ -34,6 +34,26 @@ void GuiGroupBox::DefaultSetup() noexcept
 }
 
 
+//Protected
+
+/*
+	Skins
+*/
+
+OwningPtr<gui_control::ControlSkin> GuiGroupBox::AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const
+{
+	//Not fully compatible
+	if (skin && !dynamic_cast<GroupBoxSkin*>(skin.get()))
+	{
+		auto group_box_skin = make_owning<GroupBoxSkin>();
+		group_box_skin->Assign(*skin);
+		return group_box_skin;
+	}
+	else
+		return skin;
+}
+
+
 //Public
 
 GuiGroupBox::GuiGroupBox(std::string name, std::optional<std::string> caption,

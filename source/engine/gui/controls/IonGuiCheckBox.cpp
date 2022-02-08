@@ -110,6 +110,24 @@ void GuiCheckBox::SetState(gui_control::ControlState state) noexcept
 }
 
 
+/*
+	Skins
+*/
+
+OwningPtr<gui_control::ControlSkin> GuiCheckBox::AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const
+{
+	//Not fully compatible
+	if (skin && !dynamic_cast<CheckBoxSkin*>(skin.get()))
+	{
+		auto check_box_skin = make_owning<CheckBoxSkin>();
+		check_box_skin->Assign(*skin);
+		return check_box_skin;
+	}
+	else
+		return skin;
+}
+
+
 //Public
 
 GuiCheckBox::GuiCheckBox(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,

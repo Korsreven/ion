@@ -131,6 +131,20 @@ void GuiSlider::SetState(gui_control::ControlState state) noexcept
 	Skins
 */
 
+OwningPtr<gui_control::ControlSkin> GuiSlider::AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const
+{
+	//Not fully compatible
+	if (skin && !dynamic_cast<SliderSkin*>(skin.get()))
+	{
+		auto slider_skin = make_owning<SliderSkin>();
+		slider_skin->Assign(*skin);
+		return slider_skin;
+	}
+	else
+		return skin;
+}
+
+
 void GuiSlider::RotateHandle() noexcept
 {
 	if (size_ && skin_)

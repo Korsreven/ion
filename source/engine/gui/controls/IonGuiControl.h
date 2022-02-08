@@ -167,6 +167,12 @@ namespace ion::gui::controls
 
 			//Default virtual destructor
 			virtual ~ControlSkin() = default;
+
+			//Copy from most derived
+			virtual void Assign(const ControlSkin &control_skin) noexcept
+			{
+				*this = control_skin;
+			}
 		};
 
 
@@ -474,6 +480,8 @@ namespace ion::gui::controls
 			/*
 				Skins
 			*/
+
+			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const;
 
 			virtual void AttachSkin();
 			virtual void DetachSkin() noexcept;

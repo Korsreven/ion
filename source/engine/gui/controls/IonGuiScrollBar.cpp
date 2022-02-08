@@ -58,6 +58,19 @@ void GuiScrollBar::Slid(int delta) noexcept
 	Skins
 */
 
+OwningPtr<gui_control::ControlSkin> GuiScrollBar::AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const
+{
+	//Not fully compatible
+	if (skin && !dynamic_cast<ScrollBarSkin*>(skin.get()))
+	{
+		auto scroll_bar_skin = make_owning<ScrollBarSkin>();
+		scroll_bar_skin->Assign(*skin);
+		return scroll_bar_skin;
+	}
+	else
+		return skin;
+}
+
 void GuiScrollBar::UpdateHandle() noexcept
 {
 	if (auto [min, max] = Range(); min != max)

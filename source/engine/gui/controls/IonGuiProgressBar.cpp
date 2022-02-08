@@ -191,6 +191,20 @@ void GuiProgressBar::SetState(gui_control::ControlState state) noexcept
 	Skins
 */
 
+OwningPtr<gui_control::ControlSkin> GuiProgressBar::AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const
+{
+	//Not fully compatible
+	if (skin && !dynamic_cast<ProgressBarSkin*>(skin.get()))
+	{
+		auto progress_bar_skin = make_owning<ProgressBarSkin>();
+		progress_bar_skin->Assign(*skin);
+		return progress_bar_skin;
+	}
+	else
+		return skin;
+}
+
+
 void GuiProgressBar::RotateBars() noexcept
 {
 	if (size_ && skin_)

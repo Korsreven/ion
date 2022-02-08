@@ -43,7 +43,11 @@ namespace ion::gui::controls
 
 		protected:
 
-			//Empty
+			/*
+				Skins
+			*/
+
+			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
 
 		public:
 
