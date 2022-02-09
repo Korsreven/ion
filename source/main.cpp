@@ -2725,6 +2725,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			controller.MouseCursorSkin(mouse_cursor_skin, 1.0_r);
 			controller.MouseCursorHotSpot(ion::gui::gui_controller::GuiMouseCursorHotSpot::TopLeft);
 
+			auto scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
+			auto theme = controller.CreateTheme("default", scene_manager);
+			auto skin = theme->CreateSkin<ion::gui::controls::GuiButton>("GuiButton");
+			auto control_skin = skin->Instantiate();
+
 			auto tooltip = controller.CreateTooltip("default_tooltip", std::move(tooltip_skin));
 			tooltip->ZOrder(0.9_r);
 

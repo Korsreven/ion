@@ -37,37 +37,6 @@ GuiTheme::GuiTheme(std::string name, NonOwningPtr<graphics::scene::SceneManager>
 	Creating
 */
 
-NonOwningPtr<GuiSkin> GuiTheme::CreateSkin(std::string name)
-{
-	return Create<GuiSkin>(std::move(name));
-}
-
-NonOwningPtr<GuiSkin> GuiTheme::CreateSkin(std::string name, const gui_skin::SkinParts &parts, const gui_skin::SkinTextPart &caption_part)
-{
-	return Create<GuiSkin>(std::move(name), parts, caption_part);
-}
-
-NonOwningPtr<GuiSkin> GuiTheme::CreateSkin(std::string name, const gui_skin::SkinBorderParts &border_parts, const gui_skin::SkinTextPart &caption_part)
-{
-	return Create<GuiSkin>(std::move(name), border_parts, caption_part);
-}
-
-NonOwningPtr<GuiSkin> GuiTheme::CreateSkin(std::string name, const gui_skin::SkinSideParts &side_parts, const gui_skin::SkinTextPart &caption_part)
-{
-	return Create<GuiSkin>(std::move(name), side_parts, caption_part);
-}
-
-NonOwningPtr<GuiSkin> GuiTheme::CreateSkin(std::string name, const gui_skin::SkinPart &center_part, const gui_skin::SkinTextPart &caption_part)
-{
-	return Create<GuiSkin>(std::move(name), center_part, caption_part);
-}
-
-NonOwningPtr<GuiSkin> GuiTheme::CreateSkin(std::string name, const gui_skin::SkinTextPart &caption_part)
-{
-	return Create<GuiSkin>(std::move(name), caption_part);
-}
-
-
 NonOwningPtr<GuiSkin> GuiTheme::CreateSkin(const GuiSkin &skin)
 {
 	return Create(skin);

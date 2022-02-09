@@ -19,6 +19,7 @@ File:	IonGuiSkin.h
 #include <typeindex>
 #include <typeinfo>
 #include <type_traits>
+#include <utility>
 
 #include "adaptors/IonFlatMap.h"
 #include "adaptors/ranges/IonIterable.h"
@@ -71,7 +72,7 @@ namespace ion::gui::skins
 
 		struct SkinTextPart
 		{
-			NonOwningPtr<graphics::fonts::Text> Template;
+			NonOwningPtr<graphics::fonts::Text> Base;
 			std::optional<graphics::fonts::text::TextBlockStyle> Enabled;
 			std::optional<graphics::fonts::text::TextBlockStyle> Disabled;
 			std::optional<graphics::fonts::text::TextBlockStyle> Focused;
@@ -80,7 +81,7 @@ namespace ion::gui::skins
 
 			[[nodiscard]] inline operator bool() const noexcept
 			{
-				return Template && Enabled; //Required
+				return Base && Enabled; //Required
 			}
 		};
 
@@ -140,8 +141,9 @@ namespace ion::gui::skins
 
 		namespace detail
 		{
-			controls::gui_control::ControlSkin make_control_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
+			controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
 
+			OwningPtr<controls::gui_control::ControlSkin> make_control_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
 			OwningPtr<controls::gui_control::ControlSkin> make_button_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
 			OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
 			OwningPtr<controls::gui_control::ControlSkin> make_group_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
@@ -167,31 +169,33 @@ namespace ion::gui::skins
 			graphics::scene::drawable_object::Passes passes_;
 			graphics::scene::drawable_object::Passes text_passes_;
 
+			gui_skin::SkinBuilder skin_builder_ = gui_skin::detail::make_control_skin;
 
-			static inline adaptors::FlatMap<std::type_index, std::string> registered_skins_;
-			static inline adaptors::FlatMap<std::string, gui_skin::SkinBuilder> registered_skin_builders_;
 
-			static void RegisterDefaultSkins();
+			static inline adaptors::FlatMap<std::type_index, std::pair<std::string, gui_skin::SkinBuilder>> registered_controls_;
+			static void RegisterBuiltInControls();
+
+			void AddDefaultParts(const gui_skin::SkinParts &parts, const gui_skin::SkinTextPart &caption_part);
 
 		public:
 
-			//Construct a skin with the given name
-			explicit GuiSkin(std::string name);
+			//Construct a skin with the given name and type
+			explicit GuiSkin(std::string name, std::type_index type);
 			
-			//Construct a skin with the given name, parts and caption part
-			GuiSkin(std::string name, const gui_skin::SkinParts &parts, const gui_skin::SkinTextPart &caption_part = {});
+			//Construct a skin with the given name, type, parts and caption part
+			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinParts &parts, const gui_skin::SkinTextPart &caption_part = {});
 
-			//Construct a skin with the given name, border parts and caption part
-			GuiSkin(std::string name, const gui_skin::SkinBorderParts &border_parts, const gui_skin::SkinTextPart &caption_part = {});
+			//Construct a skin with the given name, type, border parts and caption part
+			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinBorderParts &border_parts, const gui_skin::SkinTextPart &caption_part = {});
 
-			//Construct a skin with the given name, side parts and caption part
-			GuiSkin(std::string name, const gui_skin::SkinSideParts &side_parts, const gui_skin::SkinTextPart &caption_part = {});
+			//Construct a skin with the given name, type, side parts and caption part
+			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinSideParts &side_parts, const gui_skin::SkinTextPart &caption_part = {});
 
-			//Construct a skin with the given name, center part and caption part
-			GuiSkin(std::string name, const gui_skin::SkinPart &center_part, const gui_skin::SkinTextPart &caption_part = {});
+			//Construct a skin with the given name, type, center part and caption part
+			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinPart &center_part, const gui_skin::SkinTextPart &caption_part = {});
 
-			//Construct a skin with the given name and caption part
-			GuiSkin(std::string name, const gui_skin::SkinTextPart &caption_part);
+			//Construct a skin with the given name, type and caption part
+			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinTextPart &caption_part);
 
 
 			/*
@@ -255,23 +259,6 @@ namespace ion::gui::skins
 			[[nodiscard]] inline auto TextPasses() const noexcept
 			{
 				return adaptors::ranges::Iterable<const graphics::scene::drawable_object::Passes&>{text_passes_};
-			}
-
-
-			/*
-				Observers
-			*/
-
-			//Gets an immutable reference to all passes in this skin
-			[[nodiscard]] inline auto& GetPasses() const noexcept
-			{
-				return passes_;
-			}
-
-			//Gets an immutable reference to all text passes in this skin
-			[[nodiscard]] inline auto& GetTextPasses() const noexcept
-			{
-				return text_passes_;
 			}
 
 
@@ -349,6 +336,24 @@ namespace ion::gui::skins
 
 			/*
 				Passes
+				Retrieving
+			*/
+
+			//Gets an immutable reference to all passes in this skin
+			[[nodiscard]] inline auto& GetPasses() const noexcept
+			{
+				return passes_;
+			}
+
+			//Gets an immutable reference to all text passes in this skin
+			[[nodiscard]] inline auto& GetTextPasses() const noexcept
+			{
+				return text_passes_;
+			}
+
+
+			/*
+				Passes
 				Removing
 			*/
 
@@ -360,28 +365,43 @@ namespace ion::gui::skins
 
 
 			/*
-				Skins
-				Registering/retrieving
+				Static
+				Registering
 			*/
 
+			//Register a gui control of type T, with the given default skin name and skin builder
 			template <typename T>
-			static inline void RegisterSkin(std::string name, gui_skin::SkinBuilder builder)
+			static inline void RegisterControl(std::string default_skin_name, gui_skin::SkinBuilder skin_builder)
 			{
 				static_assert(std::is_base_of_v<controls::GuiControl, T>);
-				registered_skins_[std::type_index{typeid(T)}] = name;
-				registered_skin_builders_[std::move(name)] = builder;
+				registered_controls_[typeid(T)] = std::pair{std::move(default_skin_name), skin_builder};
 			}
 
-			template <typename T>
-			[[nodiscard]] static inline std::optional<std::string_view> SkinName() noexcept
-			{
-				RegisterDefaultSkins();
 
-				if (auto iter = registered_skins_.find(std::type_index{typeid(T)});
-					iter != std::end(registered_skins_))
-					return iter->second;
-				else
-					return {};
+			/*
+				Static
+				Retrieving
+			*/
+
+			//Returns the default skin name registered with the given type
+			[[nodiscard]] static std::optional<std::string_view> GetDefaultSkinName(std::type_index type) noexcept;
+
+			//Returns the default skin name registered with the given gui control of type T
+			template <typename T>
+			[[nodiscard]] static inline auto GetDefaultSkinName() noexcept
+			{
+				return GetDefaultSkinName(typeid(T));
+			}
+
+
+			//Returns the skin builder registered with the given type
+			[[nodiscard]] static std::optional<gui_skin::SkinBuilder> GetSkinBuilder(std::type_index type) noexcept;
+
+			//Returns the skin builder registered with the given gui control of type T
+			template <typename T>
+			[[nodiscard]] static inline auto GetSkinBuilder() noexcept
+			{
+				return GetSkinBuilder(typeid(T));
 			}
 	};
 } //ion::gui::skins

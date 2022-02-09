@@ -13,11 +13,16 @@ File:	IonGuiTheme.h
 #ifndef ION_GUI_THEME_H
 #define ION_GUI_THEME_H
 
+#include <string>
 #include <string_view>
+#include <typeinfo>
+#include <type_traits>
 
 #include "IonGuiSkin.h"
+#include "gui/controls/IonGuiControl.h"
 #include "managed/IonManagedObject.h"
 #include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 
 //Forward declarations
 namespace ion
@@ -101,22 +106,52 @@ namespace ion::gui::skins
 			*/
 
 			//Create a skin with the given name
-			NonOwningPtr<GuiSkin> CreateSkin(std::string name);
+			template <typename T>
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name)
+			{
+				static_assert(std::is_base_of_v<controls::GuiControl, T>);
+				return Create<GuiSkin>(std::move(name), typeid(T));
+			}
 
 			//Create a skin with the given name, parts and caption part
-			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinParts &parts, const gui_skin::SkinTextPart &caption_part = {});
+			template <typename T>
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinParts &parts, const gui_skin::SkinTextPart &caption_part = {})
+			{
+				static_assert(std::is_base_of_v<controls::GuiControl, T>);
+				return Create<GuiSkin>(std::move(name), typeid(T), parts, caption_part);
+			}
 
 			//Create a skin with the given name, border parts and caption part
-			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinBorderParts &border_parts, const gui_skin::SkinTextPart &caption_part = {});
+			template <typename T>
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinBorderParts &border_parts, const gui_skin::SkinTextPart &caption_part = {})
+			{
+				static_assert(std::is_base_of_v<controls::GuiControl, T>);
+				return Create<GuiSkin>(std::move(name), typeid(T), border_parts, caption_part);
+			}
 
 			//Create a skin with the given name, side parts and caption part
-			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinSideParts &side_parts, const gui_skin::SkinTextPart &caption_part = {});
+			template <typename T>
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinSideParts &side_parts, const gui_skin::SkinTextPart &caption_part = {})
+			{
+				static_assert(std::is_base_of_v<controls::GuiControl, T>);
+				return Create<GuiSkin>(std::move(name), typeid(T), side_parts, caption_part);
+			}
 
 			//Create a skin with the given name, center part and caption part
-			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinPart &center_part, const gui_skin::SkinTextPart &caption_part = {});
+			template <typename T>
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinPart &center_part, const gui_skin::SkinTextPart &caption_part = {})
+			{
+				static_assert(std::is_base_of_v<controls::GuiControl, T>);
+				return Create<GuiSkin>(std::move(name), typeid(T), center_part, caption_part);
+			}
 
 			//Create a skin with the given name and caption part
-			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinTextPart &caption_part);
+			template <typename T>
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinTextPart &caption_part)
+			{
+				static_assert(std::is_base_of_v<controls::GuiControl, T>);
+				return Create<GuiSkin>(std::move(name), typeid(T), caption_part);
+			}
 
 
 			//Create a skin by copying the given skin

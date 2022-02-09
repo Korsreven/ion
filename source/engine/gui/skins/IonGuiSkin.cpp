@@ -42,7 +42,7 @@ using namespace types::type_literals;
 namespace gui_skin::detail
 {
 
-controls::gui_control::ControlSkin make_control_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
+controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	controls::gui_control::ControlSkin control_skin;
 
@@ -342,7 +342,7 @@ controls::gui_control::ControlSkin make_control_skin(const GuiSkin &skin, graphi
 		//Caption part
 		if (caption_part && *caption_part)
 		{
-			auto text = scene_manager.CreateText(caption_part->Template);
+			auto text = scene_manager.CreateText(caption_part->Base);
 
 			if (std::empty(skin.TextPasses()))
 				text->AddPass(graphics::render::Pass{});
@@ -362,17 +362,24 @@ controls::gui_control::ControlSkin make_control_skin(const GuiSkin &skin, graphi
 }
 
 
+OwningPtr<controls::gui_control::ControlSkin> make_control_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
+{
+	auto control_skin = make_owning<controls::gui_control::ControlSkin>();
+	control_skin->Assign(make_skin_base(skin, scene_manager));
+	return control_skin;
+}
+
 OwningPtr<controls::gui_control::ControlSkin> make_button_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto button_skin = make_owning<controls::gui_button::ButtonSkin>();
-	button_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
+	button_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 	return button_skin;
 }
 
 OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto check_box_skin = make_owning<controls::gui_check_box::CheckBoxSkin>();
-	check_box_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
+	check_box_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 
 	if (!std::empty(skin.Parts()))
 	{
@@ -401,21 +408,21 @@ OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const GuiSkin 
 OwningPtr<controls::gui_control::ControlSkin> make_group_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto group_box_skin = make_owning<controls::gui_group_box::GroupBoxSkin>();
-	group_box_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
+	group_box_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 	return group_box_skin;
 }
 
 OwningPtr<controls::gui_control::ControlSkin> make_label_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto label_skin = make_owning<controls::gui_label::LabelSkin>();
-	label_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
+	label_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 	return label_skin;
 }
 
 OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto list_box_skin = make_owning<controls::gui_list_box::ListBoxSkin>();
-	list_box_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
+	list_box_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 
 	if (!std::empty(skin.Parts()))
 	{
@@ -446,7 +453,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &
 		//Lines part
 		if (lines_part && *lines_part)
 		{
-			auto text = scene_manager.CreateText(lines_part->Template);
+			auto text = scene_manager.CreateText(lines_part->Base);
 
 			if (std::empty(skin.TextPasses()))
 				text->AddPass(graphics::render::Pass{});
@@ -468,7 +475,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &
 OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto progress_bar_skin = make_owning<controls::gui_progress_bar::ProgressBarSkin>();
-	progress_bar_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
+	progress_bar_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 
 	if (!std::empty(skin.Parts()))
 	{
@@ -516,7 +523,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSk
 OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto radio_button_skin = make_owning<controls::gui_radio_button::RadioButtonSkin>();
-	radio_button_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
+	radio_button_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 
 	if (!std::empty(skin.Parts()))
 	{
@@ -545,7 +552,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const GuiSk
 OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto scroll_bar_skin = make_owning<controls::gui_scroll_bar::ScrollBarSkin>();
-	scroll_bar_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
+	scroll_bar_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 
 	if (!std::empty(skin.Parts()))
 	{
@@ -574,7 +581,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const GuiSkin
 OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto slider_skin = make_owning<controls::gui_slider::SliderSkin>();
-	slider_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
+	slider_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 
 	if (!std::empty(skin.Parts()))
 	{
@@ -603,7 +610,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const GuiSkin &sk
 OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto text_box_skin = make_owning<controls::gui_text_box::TextBoxSkin>();
-	text_box_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
+	text_box_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 
 	if (!std::empty(skin.Parts()))
 	{
@@ -634,7 +641,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 		//Text part
 		if (text_part && *text_part)
 		{
-			auto text = scene_manager.CreateText(text_part->Template);
+			auto text = scene_manager.CreateText(text_part->Base);
 
 			if (std::empty(skin.TextPasses()))
 				text->AddPass(graphics::render::Pass{});
@@ -652,7 +659,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 		//Placeholder text part
 		if (placeholder_text_part && *placeholder_text_part)
 		{
-			auto text = scene_manager.CreateText(placeholder_text_part->Template);
+			auto text = scene_manager.CreateText(placeholder_text_part->Base);
 
 			if (std::empty(skin.TextPasses()))
 				text->AddPass(graphics::render::Pass{});
@@ -674,7 +681,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 OwningPtr<controls::gui_control::ControlSkin> make_tooltip_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto tooltip_skin = make_owning<controls::gui_tooltip::TooltipSkin>();
-	tooltip_skin->controls::gui_control::ControlSkin::Assign(make_control_skin(skin, scene_manager));
+	tooltip_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 	return tooltip_skin;
 }
 
@@ -682,38 +689,29 @@ OwningPtr<controls::gui_control::ControlSkin> make_tooltip_skin(const GuiSkin &s
 
 //Private
 
-void GuiSkin::RegisterDefaultSkins()
+void GuiSkin::RegisterBuiltInControls()
 {
 	static auto registered = false;
 
 	if (!registered)
 	{
-		RegisterSkin<controls::GuiButton>("GuiButton", detail::make_button_skin);
-		RegisterSkin<controls::GuiCheckBox>("GuiCheckBox", detail::make_check_box_skin);
-		RegisterSkin<controls::GuiGroupBox>("GuiGroupBox", detail::make_group_box_skin);
-		RegisterSkin<controls::GuiLabel>("GuiLabel", detail::make_label_skin);
-		RegisterSkin<controls::GuiListBox>("GuiListBox", detail::make_list_box_skin);
-		RegisterSkin<controls::GuiProgressBar>("GuiProgressBar", detail::make_progress_bar_skin);
-		RegisterSkin<controls::GuiRadioButton>("GuiRadioButton", detail::make_radio_button_skin);
-		RegisterSkin<controls::GuiScrollBar>("GuiScrollBar", detail::make_scroll_bar_skin);
-		RegisterSkin<controls::GuiSlider>("GuiSlider", detail::make_slider_skin);
-		RegisterSkin<controls::GuiTextBox>("GuiTextBox", detail::make_text_box_skin);
-		RegisterSkin<controls::GuiTooltip>("GuiTooltip", detail::make_tooltip_skin);
+		RegisterControl<controls::GuiButton>("GuiButton", detail::make_button_skin);
+		RegisterControl<controls::GuiCheckBox>("GuiCheckBox", detail::make_check_box_skin);
+		RegisterControl<controls::GuiGroupBox>("GuiGroupBox", detail::make_group_box_skin);
+		RegisterControl<controls::GuiLabel>("GuiLabel", detail::make_label_skin);
+		RegisterControl<controls::GuiListBox>("GuiListBox", detail::make_list_box_skin);
+		RegisterControl<controls::GuiProgressBar>("GuiProgressBar", detail::make_progress_bar_skin);
+		RegisterControl<controls::GuiRadioButton>("GuiRadioButton", detail::make_radio_button_skin);
+		RegisterControl<controls::GuiScrollBar>("GuiScrollBar", detail::make_scroll_bar_skin);
+		RegisterControl<controls::GuiSlider>("GuiSlider", detail::make_slider_skin);
+		RegisterControl<controls::GuiTextBox>("GuiTextBox", detail::make_text_box_skin);
+		RegisterControl<controls::GuiTooltip>("GuiTooltip", detail::make_tooltip_skin);
 		registered = true;
 	}
 }
 
 
-//Public
-
-GuiSkin::GuiSkin(std::string name) :
-	managed::ManagedObject<GuiTheme>{std::move(name)}
-{
-	//Empty
-}
-
-GuiSkin::GuiSkin(std::string name, const SkinParts &parts, const SkinTextPart &caption_part) :
-	managed::ManagedObject<GuiTheme>{std::move(name)}
+void GuiSkin::AddDefaultParts(const SkinParts &parts, const SkinTextPart &caption_part)
 {
 	if (parts.Center)
 		parts_["center"] = parts.Center;
@@ -749,26 +747,45 @@ GuiSkin::GuiSkin(std::string name, const SkinParts &parts, const SkinTextPart &c
 		text_parts_["caption"] = caption_part;
 }
 
-GuiSkin::GuiSkin(std::string name, const SkinBorderParts &border_parts, const SkinTextPart &caption_part) :
-	GuiSkin{std::move(name), SkinParts{{}, border_parts}, caption_part}
+
+//Public
+
+GuiSkin::GuiSkin(std::string name, std::type_index type) :
+
+	managed::ManagedObject<GuiTheme>{std::move(name)},
+	skin_builder_{GetSkinBuilder(type).value_or(detail::make_control_skin)}
 {
 	//Empty
 }
 
-GuiSkin::GuiSkin(std::string name, const SkinSideParts &side_parts, const SkinTextPart &caption_part) :
-	GuiSkin{std::move(name), SkinParts{{}, {side_parts, {}}}, caption_part}
+GuiSkin::GuiSkin(std::string name, std::type_index type, const SkinParts &parts, const SkinTextPart &caption_part) :
+
+	managed::ManagedObject<GuiTheme>{std::move(name)},
+	skin_builder_{GetSkinBuilder(type).value_or(detail::make_control_skin)}
+{
+	AddDefaultParts(parts, caption_part);
+}
+
+GuiSkin::GuiSkin(std::string name, std::type_index type, const SkinBorderParts &border_parts, const SkinTextPart &caption_part) :
+	GuiSkin{std::move(name), type, SkinParts{{}, border_parts}, caption_part}
 {
 	//Empty
 }
 
-GuiSkin::GuiSkin(std::string name, const SkinPart &center_part, const SkinTextPart &caption_part) :
-	GuiSkin{std::move(name), SkinParts{center_part}, caption_part}
+GuiSkin::GuiSkin(std::string name, std::type_index type, const SkinSideParts &side_parts, const SkinTextPart &caption_part) :
+	GuiSkin{std::move(name), type, SkinParts{{}, {side_parts, {}}}, caption_part}
 {
 	//Empty
 }
 
-GuiSkin::GuiSkin(std::string name, const SkinTextPart &caption_part) :
-	GuiSkin{std::move(name), SkinParts{}, caption_part}
+GuiSkin::GuiSkin(std::string name, std::type_index type, const SkinPart &center_part, const SkinTextPart &caption_part) :
+	GuiSkin{std::move(name), type, SkinParts{center_part}, caption_part}
+{
+	//Empty
+}
+
+GuiSkin::GuiSkin(std::string name, std::type_index type, const SkinTextPart &caption_part) :
+	GuiSkin{std::move(name), type, SkinParts{}, caption_part}
 {
 	//Empty
 }
@@ -783,13 +800,7 @@ OwningPtr<controls::gui_control::ControlSkin> GuiSkin::Instantiate() const
 	if (owner_)
 	{
 		if (auto scene_manager = owner_->ConnectedSceneManager(); scene_manager)
-		{
-			RegisterDefaultSkins();
-
-			if (auto iter = registered_skin_builders_.find(*name_);
-				iter != std::end(registered_skin_builders_))
-				return iter->second(*this, *scene_manager);
-		}
+			return skin_builder_(*this, *scene_manager);
 	}
 
 	return nullptr;
@@ -817,7 +828,7 @@ void GuiSkin::AddTextPart(std::string name, const SkinTextPart &text_part)
 	Retrieving
 */
 
-const gui_skin::SkinPart* GuiSkin::GetPart(std::string_view name) const noexcept
+const SkinPart* GuiSkin::GetPart(std::string_view name) const noexcept
 {
 	if (auto iter = parts_.find(name); iter != std::end(parts_))
 		return &iter->second;
@@ -825,7 +836,7 @@ const gui_skin::SkinPart* GuiSkin::GetPart(std::string_view name) const noexcept
 		return nullptr;
 }
 
-const gui_skin::SkinTextPart* GuiSkin::GetTextPart(std::string_view name) const noexcept
+const SkinTextPart* GuiSkin::GetTextPart(std::string_view name) const noexcept
 {
 	if (auto iter = text_parts_.find(name); iter != std::end(text_parts_))
 		return &iter->second;
@@ -911,6 +922,34 @@ void GuiSkin::ClearTextPasses() noexcept
 {
 	text_passes_.clear();
 	text_passes_.shrink_to_fit();
+}
+
+
+/*
+	Static
+	Retrieving
+*/
+
+std::optional<std::string_view> GuiSkin::GetDefaultSkinName(std::type_index type) noexcept
+{
+	RegisterBuiltInControls();
+
+	if (auto iter = registered_controls_.find(type);
+		iter != std::end(registered_controls_))
+		return iter->second.first;
+	else
+		return {};
+}
+
+std::optional<SkinBuilder> GuiSkin::GetSkinBuilder(std::type_index type) noexcept
+{
+	RegisterBuiltInControls();
+
+	if (auto iter = registered_controls_.find(type);
+		iter != std::end(registered_controls_))
+		return iter->second.second;
+	else
+		return {};
 }
 
 } //ion::gui::skins
