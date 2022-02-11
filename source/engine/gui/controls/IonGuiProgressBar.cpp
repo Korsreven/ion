@@ -312,19 +312,19 @@ void GuiProgressBar::StartInterpolation(real from_percent) noexcept
 
 //Public
 
-GuiProgressBar::GuiProgressBar(std::string name, std::optional<std::string> caption, OwningPtr<ProgressBarSkin> skin,
-	ProgressBarType type) :
+GuiProgressBar::GuiProgressBar(std::string name, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, ProgressBarType type) :
 
-	GuiControl{std::move(name), std::move(caption), {}, std::move(skin)},
+	GuiControl{std::move(name), size, std::move(caption), {}},
 	type_{type}
 {
 	DefaultSetup();
 }
 
-GuiProgressBar::GuiProgressBar(std::string name, std::optional<std::string> caption, OwningPtr<ProgressBarSkin> skin, const Vector2 &size,
-	ProgressBarType type) :
+GuiProgressBar::GuiProgressBar(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, ProgressBarType type) :
 
-	GuiControl{std::move(name), std::move(caption), {}, std::move(skin), size},
+	GuiControl{std::move(name), skin, size, std::move(caption), {}},
 	type_{type}
 {
 	DefaultSetup();

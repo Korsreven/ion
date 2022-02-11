@@ -585,16 +585,16 @@ void GuiListBox::RemoveIcons() noexcept
 
 //Public
 
-GuiListBox::GuiListBox(std::string name, std::optional<std::string> caption,
-	OwningPtr<ListBoxSkin> skin, gui_control::BoundingBoxes hit_boxes) :
-	GuiScrollable{std::move(name), std::move(caption), {}, std::move(skin), std::move(hit_boxes)}
+GuiListBox::GuiListBox(std::string name, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes) :
+	GuiScrollable{std::move(name), size, std::move(caption), {}, std::move(hit_boxes)}
 {
 	DefaultSetup();
 }
 
-GuiListBox::GuiListBox(std::string name, std::optional<std::string> caption,
-	OwningPtr<ListBoxSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes) :
-	GuiScrollable{std::move(name), std::move(caption), {}, std::move(skin), size, std::move(hit_boxes)}
+GuiListBox::GuiListBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes) :
+	GuiScrollable{std::move(name), skin, size, std::move(caption), {}, std::move(hit_boxes)}
 {
 	DefaultSetup();
 }

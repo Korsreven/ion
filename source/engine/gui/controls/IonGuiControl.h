@@ -36,6 +36,11 @@ namespace ion
 	namespace gui
 	{
 		class GuiPanelContainer;
+
+		namespace skins
+		{
+			class GuiSkin;
+		}
 	}
 
 	namespace graphics
@@ -346,21 +351,21 @@ namespace ion::gui::controls
 			bool focused_ = false;
 			bool pressed_ = false;
 			bool hovered_ = false;
-			bool focusable_ = true;
+			bool focusable_ = true;	
 			
+			OwningPtr<gui_control::ControlSkin> skin_;
 			std::optional<Vector2> size_;
+
 			std::optional<std::string> caption_;
-			std::optional<std::string> tooltip_;	
-			
+			std::optional<std::string> tooltip_;		
 			std::optional<Vector2> caption_size_;
 			std::optional<Vector2> caption_margin_;
 			std::optional<Vector2> caption_padding_;
 			gui_control::ControlCaptionLayout caption_layout_ = gui_control::ControlCaptionLayout::Center;
 
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
-			OwningPtr<gui_control::ControlSkin> skin_;
+			gui_control::BoundingBoxes hit_boxes_;		
 			NonOwningPtr<SceneNode> skin_node_;
-			gui_control::BoundingBoxes hit_boxes_;
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
 			std::optional<events::Callback<void, GuiControl&>> on_defocus_;
@@ -498,13 +503,13 @@ namespace ion::gui::controls
 			GuiControl(std::string name, const Vector2 &size);
 
 
-			//Construct a control with the given name, caption, tooltip, skin and hit boxes
-			GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_control::ControlSkin> skin, gui_control::BoundingBoxes hit_boxes = {});
+			//Construct a control with the given name, size, caption, tooltip and hit boxes
+			GuiControl(std::string name, const std::optional<Vector2> &size,
+				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {});
 
-			//Construct a control with the given name, caption, tooltip, skin, size and hit boxes
-			GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_control::ControlSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes = {});
+			//Construct a control with the given name, skin, size, caption, tooltip and hit boxes
+			GuiControl(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
+				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {});
 
 			
 			//Default move constructor
@@ -588,8 +593,12 @@ namespace ion::gui::controls
 			}
 
 
+			//Sets the skin for this control to the given skin
+			void Skin(const skins::GuiSkin &skin) noexcept;
+
 			//Sets the size of this control to the given size
 			void Size(const Vector2 &size) noexcept;
+
 
 			//Sets the caption text for this control to the given text
 			inline void Caption(std::optional<std::string> text) noexcept
@@ -647,10 +656,7 @@ namespace ion::gui::controls
 					UpdateCaption();
 				}
 			}
-			
 
-			//Sets the skin for this control to the given skin
-			void Skin(OwningPtr<gui_control::ControlSkin> skin) noexcept;
 
 			//Sets the hit boxes for this control to the given hit boxes
 			inline void HitBoxes(gui_control::BoundingBoxes hit_boxes) noexcept
@@ -825,6 +831,13 @@ namespace ion::gui::controls
 			}
 
 
+			//Returns the skin attached to this control
+			//Returns nullptr if no skin is attached
+			[[nodiscard]] inline auto Skin() const noexcept
+			{
+				return NonOwningPtr<gui_control::ControlSkin>{skin_};
+			}
+
 			//Returns the size of this control
 			//The returned size includes all parts or caption (if no parts)
 			//Returns nullopt if this control has no size
@@ -895,13 +908,6 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto State() const noexcept
 			{
 				return state_;
-			}
-
-			//Returns the skin attached to this control
-			//Returns nullptr if no skin is attached
-			[[nodiscard]] inline auto Skin() const noexcept
-			{
-				return NonOwningPtr<gui_control::ControlSkin>{skin_};
 			}
 
 			//Returns the hit boxes for this control

@@ -51,13 +51,13 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a label with the given name, caption, skin and hit boxes
-			GuiLabel(std::string name, std::optional<std::string> caption,
-				OwningPtr<gui_label::LabelSkin> skin, gui_control::BoundingBoxes hit_boxes = {});
+			//Construct a label with the given name, size, caption and hit boxes
+			GuiLabel(std::string name, const std::optional<Vector2> &size,
+				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {});
 
-			//Construct a label with the given name, caption, skin, size and hit boxes
-			GuiLabel(std::string name, std::optional<std::string> caption,
-				OwningPtr<gui_label::LabelSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes = {});
+			//Construct a label with the given name, skin, size, caption and hit boxes
+			GuiLabel(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
+				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {});
 
 
 			/*

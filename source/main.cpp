@@ -1639,14 +1639,34 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			caption_text->DefaultForegroundColor(color::White);
 
+			//GUI styles
+
+			ion::graphics::fonts::text::TextBlockStyle caption_style_enabled;
+			caption_style_enabled.ForegroundColor = caption_text->DefaultForegroundColor();
+
+			ion::graphics::fonts::text::TextBlockStyle caption_style_disabled;
+			caption_style_disabled.ForegroundColor = color::DarkGray;
+
+			ion::graphics::fonts::text::TextBlockStyle caption_style_hovered;
+			caption_style_hovered.ForegroundColor = caption_text->DefaultForegroundColor();
+			caption_style_hovered.Decoration = ion::graphics::fonts::text::TextDecoration::Underline;
+
+			ion::graphics::fonts::text::TextBlockStyle placeholder_text_style_enabled;
+			placeholder_text_style_enabled.ForegroundColor = color::Gray;
+			placeholder_text_style_enabled.FontStyle = ion::graphics::fonts::text::TextFontStyle::Italic;
+
+			ion::graphics::fonts::text::TextBlockStyle placeholder_text_style_disabled;
+			placeholder_text_style_disabled.ForegroundColor = color::DarkGray;
+			placeholder_text_style_disabled.FontStyle = ion::graphics::fonts::text::TextFontStyle::Italic;
+
 
 			using namespace ion::utilities;
-			ion::graphics::scene::SceneManager scene;
+			auto scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
 
 
 			//Viewport
 			auto viewport = engine.Target()->GetViewport("");
-			scene.ConnectedViewport(viewport); //Temp, should not be necessary
+			scene_manager->ConnectedViewport(viewport); //Temp, should not be necessary
 
 			//Frustum
 			auto frustum = ion::graphics::render::Frustum::Orthographic(
@@ -1656,13 +1676,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			frustum.BaseViewportHeight(viewport->BaseBounds().ToSize().Y());
 
 			//Camera
-			auto camera = scene.CreateCamera("", frustum);
+			auto camera = scene_manager->CreateCamera("", frustum);
 			viewport->ConnectedCamera(camera);
 
-			auto player_camera = scene.CreateCamera("player", frustum);
+			auto player_camera = scene_manager->CreateCamera("player", frustum);
 
 			//Lights
-			auto head_light = scene.CreateLight();
+			auto head_light = scene_manager->CreateLight();
 			head_light->Type(ion::graphics::scene::light::LightType::Spotlight);
 			head_light->Direction(Vector3{0.0_r, 0.6_r, -0.4_r});
 			head_light->AmbientColor(color::Transparent);
@@ -1671,7 +1691,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			head_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
 			head_light->Cutoff(math::ToRadians(20.0_r), math::ToRadians(30.0_r));
 
-			auto red_light = scene.CreateLight();
+			auto red_light = scene_manager->CreateLight();
 			red_light->Type(ion::graphics::scene::light::LightType::Point);
 			red_light->Direction({0.0_r, 0.0_r, -1.0_r});
 			red_light->AmbientColor(color::Transparent);
@@ -1680,7 +1700,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			red_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
 			red_light->Cutoff(math::ToRadians(45.0_r), math::ToRadians(55.0_r));
 
-			auto green_light = scene.CreateLight();
+			auto green_light = scene_manager->CreateLight();
 			green_light->Type(ion::graphics::scene::light::LightType::Point);
 			green_light->Direction({0.0_r, 0.0_r, -1.0_r});
 			green_light->AmbientColor(color::Transparent);
@@ -1691,22 +1711,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//Text
-			auto text = scene.CreateText(fps);
+			auto text = scene_manager->CreateText(fps);
 			text->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 
 			//Particle system
-			auto particle_system = scene.CreateParticleSystem(rain);
+			auto particle_system = scene_manager->CreateParticleSystem(rain);
 			particle_system->AddPass(ion::graphics::render::Pass{particle_program});
 			particle_system->Get()->StartAll();
 
 			//Sound
-			auto player_sound_listener = scene.CreateSoundListener(sound_listener);
-			auto red_lamp_flicker = scene.CreateSound(flicker);
-			auto green_lamp_flicker = scene.CreateSound(flicker);
+			auto player_sound_listener = scene_manager->CreateSoundListener(sound_listener);
+			auto red_lamp_flicker = scene_manager->CreateSound(flicker);
+			auto green_lamp_flicker = scene_manager->CreateSound(flicker);
 
 
 			//Model
-			auto model = scene.CreateModel();
+			auto model = scene_manager->CreateModel();
 			model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.3671875_r, 0.5_r}, ship});
 			model->AddPass(ion::graphics::render::Pass{model_program});
@@ -1715,18 +1735,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			model->QueryMask(2 | 4);
 			//model->ShowBoundingVolumes(true);
 
-			auto model_star = scene.CreateModel();
+			auto model_star = scene_manager->CreateModel();
 			model_star->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.05_r, 0.05_r}, star});
-			model_star->AddPass(ion::graphics::render::Pass{/*model_program*/});
+			model_star->AddPass(ion::graphics::render::Pass{});
 
-			auto model_aura = scene.CreateModel();
+			auto model_aura = scene_manager->CreateModel();
 			auto aura_sprite = model_aura->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.432_r, 0.45_r}, aura});
 			aura_sprite->FillColor(Color{255, 255, 255, 0.75_r});
 			model_aura->AddPass(ion::graphics::render::Pass{model_program});
 
-			auto background = scene.CreateModel();
+			auto background = scene_manager->CreateModel();
 			background->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Center
 			background->CreateMesh(ion::graphics::scene::shapes::Sprite{
@@ -1735,33 +1755,33 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Right
 			background->AddPass(ion::graphics::render::Pass{model_program});
 
-			auto clouds = scene.CreateModel();
+			auto clouds = scene_manager->CreateModel();
 			clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{-1.0_r, 0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Left
 			clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{1.0_r, -0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Right
 			clouds->AddPass(ion::graphics::render::Pass{model_program});
 
-			auto model_spectrum = scene.CreateModel();
+			auto model_spectrum = scene_manager->CreateModel();
 			model_spectrum->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.71_r, 0.71_r}, color_spectrum});
-			model_spectrum->AddPass(ion::graphics::render::Pass{/*model_program*/});
+			model_spectrum->AddPass(ion::graphics::render::Pass{});
 
-			/*auto box = scene.CreateModel();
+			/*auto box = scene_manager->CreateModel();
 			box->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.25_r, 0.30_r}, color::DeepPink});
 			box->AddPass(ion::graphics::render::Pass{model_program});
 			box->QueryFlags(2);
 			box->QueryMask(1 | 2 | 4);
 			//box->ShowBoundingVolumes(true);
 
-			auto box2 = scene.CreateModel();
+			auto box2 = scene_manager->CreateModel();
 			box2->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.30_r, 0.25_r}, color::DarkViolet});
 			box2->AddPass(ion::graphics::render::Pass{model_program});
 			box2->QueryFlags(2);
 			box2->QueryMask(1 | 2 | 4);
 			//box2->ShowBoundingVolumes(true);
 
-			auto circle = scene.CreateModel();
+			auto circle = scene_manager->CreateModel();
 			circle->CreateMesh(ion::graphics::scene::shapes::Ellipse{0.25_r, color::Khaki});
 			circle->AddPass(ion::graphics::render::Pass{model_program});
 			circle->PreferredBoundingVolume(ion::graphics::scene::movable_object::PreferredBoundingVolumeType::BoundingSphere);
@@ -1769,7 +1789,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			circle->QueryMask(1 | 2 | 4);
 			//circle->ShowBoundingVolumes(true);
 
-			auto circle2 = scene.CreateModel();
+			auto circle2 = scene_manager->CreateModel();
 			circle2->CreateMesh(ion::graphics::scene::shapes::Ellipse{0.30_r, color::Orchid});
 			circle2->AddPass(ion::graphics::render::Pass{model_program});
 			circle2->PreferredBoundingVolume(ion::graphics::scene::movable_object::PreferredBoundingVolumeType::BoundingSphere);
@@ -1779,18 +1799,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//GUI models
 			//Cursor
-			auto mouse_cursor_model = scene.CreateModel();
+			auto mouse_cursor_model = scene_manager->CreateModel();
 			auto mouse_cursor_sprite = mouse_cursor_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r}, mouse_cursor}); //Mouse cursor
 
 			mouse_cursor_sprite->AutoSize(true);
-			mouse_cursor_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+			mouse_cursor_model->AddPass(ion::graphics::render::Pass{});
 
 			//Tooltip
-			auto w = 0.1_r;
+			/*auto w = 0.1_r;
 			auto h = 0.1_r;
 
-			auto tooltip_model = scene.CreateModel();
+			auto tooltip_model = scene_manager->CreateModel();
 			auto tooltip_center = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, tooltip_center_enabled}); //Center
 			
@@ -1818,13 +1838,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_left->AutoRepeat(true);
 			tooltip_bottom->AutoRepeat(true);
 			tooltip_right->AutoRepeat(true);
-			tooltip_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+			tooltip_model->AddPass(ion::graphics::render::Pass{});
 
 			//Button
 			w = 0.1_r;
 			h = 0.1_r;
 
-			auto button_model = scene.CreateModel();
+			auto button_model = scene_manager->CreateModel();
 			auto button_center = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
 			
@@ -1851,13 +1871,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_left->AutoRepeat(true);
 			button_bottom->AutoRepeat(true);
 			button_right->AutoRepeat(true);
-			button_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+			button_model->AddPass(ion::graphics::render::Pass{});
 
 			//Check box
 			w = 0.056_r;
 			h = 0.056_r;
 
-			auto check_box_model = scene.CreateModel();
+			auto check_box_model = scene_manager->CreateModel();
 			auto check_box_center = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
 			
@@ -1888,13 +1908,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_box_left->AutoRepeat(true);
 			check_box_bottom->AutoRepeat(true);
 			check_box_right->AutoRepeat(true);
-			check_box_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+			check_box_model->AddPass(ion::graphics::render::Pass{});
 
 			//Group box
 			w = 0.1_r;
 			h = 0.1_r;
 
-			auto group_box_model = scene.CreateModel();
+			auto group_box_model = scene_manager->CreateModel();
 
 			auto group_box_top = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
@@ -1918,13 +1938,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			group_box_left->AutoRepeat(true);
 			group_box_bottom->AutoRepeat(true);
 			group_box_right->AutoRepeat(true);
-			group_box_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+			group_box_model->AddPass(ion::graphics::render::Pass{});
 
 			//List box
 			w = 0.056_r;
 			h = 0.056_r;
 
-			auto list_box_model = scene.CreateModel();
+			auto list_box_model = scene_manager->CreateModel();
 			auto list_box_center = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
 			
@@ -1958,13 +1978,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			list_box_left->AutoRepeat(true);
 			list_box_bottom->AutoRepeat(true);
 			list_box_right->AutoRepeat(true);
-			list_box_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+			list_box_model->AddPass(ion::graphics::render::Pass{});
 
 			//Progress bar
 			w = 0.056_r;
 			h = 0.056_r;
 
-			auto progress_bar_model = scene.CreateModel();
+			auto progress_bar_model = scene_manager->CreateModel();
 			auto progress_bar_center = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
 			
@@ -2004,13 +2024,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			progress_bar_left->AutoRepeat(true);
 			progress_bar_bottom->AutoRepeat(true);
 			progress_bar_right->AutoRepeat(true);
-			progress_bar_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+			progress_bar_model->AddPass(ion::graphics::render::Pass{});
 
 			//Radio button
 			w = 0.056_r;
 			h = 0.056_r;
 
-			auto radio_button_model = scene.CreateModel();
+			auto radio_button_model = scene_manager->CreateModel();
 			auto radio_button_center = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center			
 			
@@ -2041,13 +2061,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			radio_button_left->AutoRepeat(true);
 			radio_button_bottom->AutoRepeat(true);
 			radio_button_right->AutoRepeat(true);
-			radio_button_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+			radio_button_model->AddPass(ion::graphics::render::Pass{});
 
 			//Radio button 2
 			w = 0.056_r;
 			h = 0.056_r;
 
-			auto radio_button2_model = scene.CreateModel();
+			auto radio_button2_model = scene_manager->CreateModel();
 			auto radio_button2_center = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center		
 			
@@ -2078,13 +2098,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			radio_button2_left->AutoRepeat(true);
 			radio_button2_bottom->AutoRepeat(true);
 			radio_button2_right->AutoRepeat(true);
-			radio_button2_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+			radio_button2_model->AddPass(ion::graphics::render::Pass{});
 
 			//Slider
 			w = 0.056_r;
 			h = 0.056_r;
 
-			auto slider_model = scene.CreateModel();
+			auto slider_model = scene_manager->CreateModel();
 			auto slider_center = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
 			
@@ -2115,13 +2135,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			slider_left->AutoRepeat(true);
 			slider_bottom->AutoRepeat(true);
 			slider_right->AutoRepeat(true);
-			slider_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+			slider_model->AddPass(ion::graphics::render::Pass{});
 
 			//Scroll bar
 			w = 0.056_r;
 			h = 0.056_r;
 
-			auto scroll_bar_model = scene.CreateModel();
+			auto scroll_bar_model = scene_manager->CreateModel();
 			auto scroll_bar_center = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
 			
@@ -2152,13 +2172,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scroll_bar_left->AutoRepeat(true);
 			scroll_bar_bottom->AutoRepeat(true);
 			scroll_bar_right->AutoRepeat(true);
-			scroll_bar_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+			scroll_bar_model->AddPass(ion::graphics::render::Pass{});
 
 			//Text box
 			w = 0.056_r;
 			h = 0.056_r;
 
-			auto text_box_model = scene.CreateModel();
+			auto text_box_model = scene_manager->CreateModel();
 			auto text_box_center = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
 			
@@ -2191,88 +2211,72 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			text_box_left->AutoRepeat(true);
 			text_box_bottom->AutoRepeat(true);
 			text_box_right->AutoRepeat(true);
-			text_box_model->AddPass(ion::graphics::render::Pass{/*model_program*/});
+			text_box_model->AddPass(ion::graphics::render::Pass{});
 
 
 			//GUI Caption
 
 			//Tooltip caption
-			auto tooltip_caption = scene.CreateText(caption_text);
-			tooltip_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			auto tooltip_caption = scene_manager->CreateText(caption_text);
+			tooltip_caption->AddPass(ion::graphics::render::Pass{});
 
 			//Button caption
-			auto button_caption = scene.CreateText(caption_text);
-			button_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			auto button_caption = scene_manager->CreateText(caption_text);
+			button_caption->AddPass(ion::graphics::render::Pass{});
 			
-			ion::graphics::fonts::text::TextBlockStyle button_caption_style_enabled;
-			button_caption_style_enabled.ForegroundColor = caption_text->DefaultForegroundColor();
-
-			ion::graphics::fonts::text::TextBlockStyle button_caption_style_disabled;
-			button_caption_style_disabled.ForegroundColor = color::DarkGray;
-
-			ion::graphics::fonts::text::TextBlockStyle button_caption_style_hovered;
-			button_caption_style_hovered.ForegroundColor = caption_text->DefaultForegroundColor();
-			button_caption_style_hovered.Decoration = ion::graphics::fonts::text::TextDecoration::Underline;
+			
 
 			//Check box caption
-			auto check_box_caption = scene.CreateText(caption_text);
-			check_box_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			auto check_box_caption = scene_manager->CreateText(caption_text);
+			check_box_caption->AddPass(ion::graphics::render::Pass{});
 
 			//Group box caption
-			auto group_box_caption = scene.CreateText(caption_text);
-			group_box_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			auto group_box_caption = scene_manager->CreateText(caption_text);
+			group_box_caption->AddPass(ion::graphics::render::Pass{});
 
 			//Label caption
-			auto label_caption = scene.CreateText(caption_text);
-			label_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			auto label_caption = scene_manager->CreateText(caption_text);
+			label_caption->AddPass(ion::graphics::render::Pass{});
 
 			//List box caption
-			auto list_box_caption = scene.CreateText(caption_text);
-			list_box_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			auto list_box_caption = scene_manager->CreateText(caption_text);
+			list_box_caption->AddPass(ion::graphics::render::Pass{});
 
 			//List box lines
-			auto list_box_lines = scene.CreateText(caption_text);
-			list_box_lines->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			auto list_box_lines = scene_manager->CreateText(caption_text);
+			list_box_lines->AddPass(ion::graphics::render::Pass{});
 
 			//Progress bar caption
-			auto progress_bar_caption = scene.CreateText(caption_text);
-			progress_bar_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			auto progress_bar_caption = scene_manager->CreateText(caption_text);
+			progress_bar_caption->AddPass(ion::graphics::render::Pass{});
 
 			//Radio button caption
-			auto radio_button_caption = scene.CreateText(caption_text);
-			radio_button_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			auto radio_button_caption = scene_manager->CreateText(caption_text);
+			radio_button_caption->AddPass(ion::graphics::render::Pass{});
 
 			//Radio button 2 caption
-			auto radio_button2_caption = scene.CreateText(caption_text);
-			radio_button2_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			auto radio_button2_caption = scene_manager->CreateText(caption_text);
+			radio_button2_caption->AddPass(ion::graphics::render::Pass{});
 
 			//Slider caption
-			auto slider_caption = scene.CreateText(caption_text);
-			slider_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			auto slider_caption = scene_manager->CreateText(caption_text);
+			slider_caption->AddPass(ion::graphics::render::Pass{});
 
 			//Scroll bar caption
-			auto scroll_bar_caption = scene.CreateText(caption_text);
-			scroll_bar_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			auto scroll_bar_caption = scene_manager->CreateText(caption_text);
+			scroll_bar_caption->AddPass(ion::graphics::render::Pass{});
 
 			//Text box caption
-			auto text_box_caption = scene.CreateText(caption_text);
-			text_box_caption->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			auto text_box_caption = scene_manager->CreateText(caption_text);
+			text_box_caption->AddPass(ion::graphics::render::Pass{});
 
 			//Text box text
-			auto text_box_text = scene.CreateText(caption_text);
-			text_box_text->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			auto text_box_text = scene_manager->CreateText(caption_text);
+			text_box_text->AddPass(ion::graphics::render::Pass{});
 
 			//Text box placeholder text
-			auto text_box_placeholder_text = scene.CreateText(caption_text);
-			text_box_placeholder_text->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
-
-			ion::graphics::fonts::text::TextBlockStyle text_box_placeholder_style_enabled;
-			text_box_placeholder_style_enabled.ForegroundColor = color::Gray;
-			text_box_placeholder_style_enabled.FontStyle = ion::graphics::fonts::text::TextFontStyle::Italic;
-
-			ion::graphics::fonts::text::TextBlockStyle text_box_placeholder_style_disabled;
-			text_box_placeholder_style_disabled.ForegroundColor = color::DarkGray;
-			text_box_placeholder_style_disabled.FontStyle = ion::graphics::fonts::text::TextFontStyle::Italic;
+			auto text_box_placeholder_text = scene_manager->CreateText(caption_text);
+			text_box_placeholder_text->AddPass(ion::graphics::render::Pass{});*/
 
 
 			//Scene graph
@@ -2284,12 +2288,23 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scene_graph->FogEnabled(false);
 			//scene_graph->LightingEnabled(false);
 
-			//GUI skins
+
+			//GUI
+			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
+
+			ion::gui::GuiController controller{scene_graph->RootNode()};
+			controller.ZOrder(-2.0_r);
+			controller.MouseCursorHotSpot(ion::gui::gui_controller::GuiMouseCursorHotSpot::TopLeft);
+
+			//GUI theme
+			auto theme = controller.CreateTheme("default", scene_manager);
+
+			//Mouse cursor (TEMP)
 			ion::gui::gui_controller::GuiMouseCursorSkin mouse_cursor_skin;
 			mouse_cursor_skin.ModelObject = mouse_cursor_model;
 
 			//Tooltip skin
-			ion::gui::controls::gui_tooltip::TooltipSkin tooltip_skin;
+			/*ion::gui::controls::gui_tooltip::TooltipSkin tooltip_skin;
 			tooltip_skin.Parts.ModelObject = tooltip_model;
 			tooltip_skin.Parts.Center.SpriteObject = tooltip_center;
 			tooltip_skin.Parts.Top.SpriteObject = tooltip_top;
@@ -2301,10 +2316,27 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_skin.Parts.TopRight.SpriteObject = tooltip_top_right;
 			tooltip_skin.Parts.BottomRight.SpriteObject = tooltip_bottom_right;
 
-			tooltip_skin.Caption.TextObject = tooltip_caption;
+			tooltip_skin.Caption.TextObject = tooltip_caption;*/
+
+			ion::gui::skins::gui_skin::SkinParts parts;
+			parts.Center.Enabled = tooltip_center_enabled;
+			parts.Center.FillColor.A(0.9_r);
+			parts.Border.Sides.Top.Enabled = tooltip_top_enabled;
+			parts.Border.Sides.Bottom.Enabled = tooltip_bottom_enabled;
+			parts.Border.Sides.Left.Enabled = tooltip_left_enabled;
+			parts.Border.Sides.Right.Enabled = tooltip_right_enabled;
+			parts.Border.Corners.TopLeft.Enabled = tooltip_top_left_enabled;
+			parts.Border.Corners.TopRight.Enabled = tooltip_top_right_enabled;
+			parts.Border.Corners.BottomLeft.Enabled = tooltip_bottom_left_enabled;
+			parts.Border.Corners.BottomRight.Enabled = tooltip_bottom_right_enabled;
+			
+			ion::gui::skins::gui_skin::SkinTextPart caption_part;
+			caption_part.Base = caption_text;
+
+			auto tooltip_skin = theme->CreateSkin<ion::gui::controls::GuiTooltip>("GuiTooltip", parts, caption_part);
 
 			//Button skin
-			ion::gui::controls::gui_button::ButtonSkin button_skin;
+			/*ion::gui::controls::gui_button::ButtonSkin button_skin;
 			button_skin.Parts.ModelObject = button_model;
 			button_skin.Parts.Center.SpriteObject = button_center;
 			button_skin.Parts.Top.SpriteObject = button_top;
@@ -2338,12 +2370,42 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
 
 			button_skin.Caption.TextObject = button_caption;
-			button_skin.Caption.EnabledStyle = button_caption_style_enabled;
-			button_skin.Caption.DisabledStyle = button_caption_style_disabled;
-			button_skin.Caption.HoveredStyle = button_caption_style_hovered;
+			button_skin.Caption.EnabledStyle = caption_style_enabled;
+			button_skin.Caption.DisabledStyle = caption_style_disabled;
+			button_skin.Caption.HoveredStyle = caption_style_hovered;*/
+
+			parts = {};
+			parts.Center.Enabled = button_center_enabled;
+			parts.Center.Disabled = button_center_disabled;
+			parts.Center.Pressed = button_center_pressed;
+			parts.Center.Hovered = button_center_hovered;
+			parts.Border.Sides.Top.Enabled = button_top_enabled;
+			parts.Border.Sides.Top.Focused = button_top_focused;
+			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
+			parts.Border.Sides.Bottom.Focused = button_bottom_focused;
+			parts.Border.Sides.Left.Enabled = button_left_enabled;
+			parts.Border.Sides.Left.Focused = button_left_focused;
+			parts.Border.Sides.Right.Enabled = button_right_enabled;
+			parts.Border.Sides.Right.Focused = button_right_focused;
+			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopLeft.Focused = button_top_left_focused;
+			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
+			parts.Border.Corners.TopRight.Focused = button_top_right_focused;
+			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
+			parts.Border.Corners.BottomLeft.Focused = button_bottom_left_focused;
+			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
+			parts.Border.Corners.BottomRight.Focused = button_bottom_right_focused;
+			
+			caption_part = {};
+			caption_part.Base = caption_text;
+			caption_part.Enabled = caption_style_enabled;
+			caption_part.Disabled = caption_style_disabled;
+			caption_part.Hovered = caption_style_hovered;
+
+			auto button_skin = theme->CreateSkin<ion::gui::controls::GuiButton>("GuiButton", parts, caption_part);
 
 			//Check box skin
-			ion::gui::controls::gui_check_box::CheckBoxSkin check_box_skin;
+			/*ion::gui::controls::gui_check_box::CheckBoxSkin check_box_skin;
 			check_box_skin.Parts.ModelObject = check_box_model;
 			check_box_skin.Parts.Center.SpriteObject = check_box_center;
 			check_box_skin.Parts.Top.SpriteObject = check_box_top;
@@ -2383,11 +2445,47 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_box_skin.CheckMark.HoveredMaterial = check_box_mark_hovered;
 
 			check_box_skin.Caption.TextObject = check_box_caption;
-			check_box_skin.Caption.EnabledStyle = button_caption_style_enabled;
-			check_box_skin.Caption.DisabledStyle = button_caption_style_disabled;
+			check_box_skin.Caption.EnabledStyle = caption_style_enabled;
+			check_box_skin.Caption.DisabledStyle = caption_style_disabled;*/
+
+			parts = {};
+			parts.Center.Enabled = check_box_center_enabled;
+			parts.Center.Disabled = check_box_center_enabled;
+			parts.Center.Pressed = check_box_center_enabled;
+			parts.Center.Hovered = check_box_center_hovered;
+			parts.Border.Sides.Top.Enabled = button_top_enabled;
+			parts.Border.Sides.Top.Focused = button_top_focused;
+			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
+			parts.Border.Sides.Bottom.Focused = button_bottom_focused;
+			parts.Border.Sides.Left.Enabled = button_left_enabled;
+			parts.Border.Sides.Left.Focused = button_left_focused;
+			parts.Border.Sides.Right.Enabled = button_right_enabled;
+			parts.Border.Sides.Right.Focused = button_right_focused;
+			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopLeft.Focused = button_top_left_focused;
+			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
+			parts.Border.Corners.TopRight.Focused = button_top_right_focused;
+			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
+			parts.Border.Corners.BottomLeft.Focused = button_bottom_left_focused;
+			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
+			parts.Border.Corners.BottomRight.Focused = button_bottom_right_focused;
+			
+			caption_part = {};
+			caption_part.Base = caption_text;
+			caption_part.Enabled = caption_style_enabled;
+			caption_part.Disabled = caption_style_disabled;
+
+			ion::gui::skins::gui_skin::SkinPart check_mark_part;
+			check_mark_part.Enabled = check_box_mark_enabled;
+			check_mark_part.Disabled = check_box_mark_disabled;
+			check_mark_part.Pressed = check_box_mark_pressed;
+			check_mark_part.Hovered = check_box_mark_hovered;
+
+			auto check_box_skin = theme->CreateSkin<ion::gui::controls::GuiCheckBox>("GuiCheckBox", parts, caption_part);
+			check_box_skin->AddPart("check-mark", check_mark_part); //Additional
 
 			//Group box skin
-			ion::gui::controls::gui_group_box::GroupBoxSkin group_box_skin;
+			/*ion::gui::controls::gui_group_box::GroupBoxSkin group_box_skin;
 			group_box_skin.Parts.ModelObject = group_box_model;
 			group_box_skin.Parts.Top.SpriteObject = group_box_top;
 			group_box_skin.Parts.Left.SpriteObject = group_box_left;
@@ -2408,15 +2506,37 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			group_box_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
 
 			group_box_skin.Caption.TextObject = group_box_caption;
-			group_box_skin.Caption.EnabledStyle = button_caption_style_enabled;
-			group_box_skin.Caption.DisabledStyle = button_caption_style_disabled;
+			group_box_skin.Caption.EnabledStyle = caption_style_enabled;
+			group_box_skin.Caption.DisabledStyle = caption_style_disabled;*/
+
+			parts = {};
+			parts.Border.Sides.Top.Enabled = button_top_enabled;
+			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
+			parts.Border.Sides.Left.Enabled = button_left_enabled;
+			parts.Border.Sides.Right.Enabled = button_right_enabled;
+			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
+			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
+			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
+			
+			caption_part = {};
+			caption_part.Base = caption_text;
+			caption_part.Enabled = caption_style_enabled;
+			caption_part.Disabled = caption_style_disabled;
+
+			auto group_box_skin = theme->CreateSkin<ion::gui::controls::GuiGroupBox>("GuiGroupBox", parts, caption_part);
 
 			//Label skin
-			ion::gui::controls::gui_label::LabelSkin label_skin;
-			label_skin.Caption.TextObject = label_caption;
+			/*ion::gui::controls::gui_label::LabelSkin label_skin;
+			label_skin.Caption.TextObject = label_caption;*/
+
+			caption_part = {};
+			caption_part.Base = caption_text;
+
+			auto label_skin = theme->CreateSkin<ion::gui::controls::GuiLabel>("GuiLabel", caption_part);
 
 			//List box skin
-			ion::gui::controls::gui_list_box::ListBoxSkin list_box_skin;
+			/*ion::gui::controls::gui_list_box::ListBoxSkin list_box_skin;
 			list_box_skin.Parts.ModelObject = list_box_model;
 			list_box_skin.Parts.Center.SpriteObject = list_box_center;
 			list_box_skin.Parts.Top.SpriteObject = list_box_top;
@@ -2449,18 +2569,55 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			list_box_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
 
 			list_box_skin.Lines.TextObject = list_box_lines;
-			list_box_skin.Lines.EnabledStyle = button_caption_style_enabled;
-			list_box_skin.Lines.DisabledStyle = button_caption_style_disabled;
+			list_box_skin.Lines.EnabledStyle = caption_style_enabled;
+			list_box_skin.Lines.DisabledStyle = caption_style_disabled;
 
 			list_box_skin.Selection.SpriteObject = list_box_selection;
 			list_box_skin.Selection.EnabledMaterial = button_center_hovered;
 
 			list_box_skin.Caption.TextObject = list_box_caption;
-			list_box_skin.Caption.EnabledStyle = button_caption_style_enabled;
-			list_box_skin.Caption.DisabledStyle = button_caption_style_disabled;
+			list_box_skin.Caption.EnabledStyle = caption_style_enabled;
+			list_box_skin.Caption.DisabledStyle = caption_style_disabled;*/
+
+			parts = {};
+			parts.Center.Enabled = check_box_center_enabled;
+			parts.Center.Hovered = check_box_center_hovered;
+			parts.Border.Sides.Top.Enabled = button_top_enabled;
+			parts.Border.Sides.Top.Focused = button_top_focused;
+			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
+			parts.Border.Sides.Bottom.Focused = button_bottom_focused;
+			parts.Border.Sides.Left.Enabled = button_left_enabled;
+			parts.Border.Sides.Left.Focused = button_left_focused;
+			parts.Border.Sides.Right.Enabled = button_right_enabled;
+			parts.Border.Sides.Right.Focused = button_right_focused;
+			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopLeft.Focused = button_top_left_focused;
+			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
+			parts.Border.Corners.TopRight.Focused = button_top_right_focused;
+			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
+			parts.Border.Corners.BottomLeft.Focused = button_bottom_left_focused;
+			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
+			parts.Border.Corners.BottomRight.Focused = button_bottom_right_focused;
+			
+			caption_part = {};
+			caption_part.Base = caption_text;
+			caption_part.Enabled = caption_style_enabled;
+			caption_part.Disabled = caption_style_disabled;
+
+			ion::gui::skins::gui_skin::SkinPart selection_part;
+			selection_part.Enabled = button_center_hovered;
+			selection_part.FillColor.A(0.5_r);
+
+			ion::gui::skins::gui_skin::SkinTextPart lines_part;
+			lines_part.Enabled = caption_style_enabled;
+			lines_part.Disabled = caption_style_disabled;
+
+			auto list_box_skin = theme->CreateSkin<ion::gui::controls::GuiListBox>("GuiListBox", parts, caption_part);
+			list_box_skin->AddPart("selection", selection_part); //Additional
+			list_box_skin->AddTextPart("lines", lines_part); //Additional
 
 			//Progress bar skin
-			ion::gui::controls::gui_progress_bar::ProgressBarSkin progress_bar_skin;
+			/*ion::gui::controls::gui_progress_bar::ProgressBarSkin progress_bar_skin;
 			progress_bar_skin.Parts.ModelObject = progress_bar_model;
 			progress_bar_skin.Parts.Center.SpriteObject = progress_bar_center;
 			progress_bar_skin.Parts.Top.SpriteObject = progress_bar_top;
@@ -2489,11 +2646,39 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			progress_bar_skin.BarInterpolated.EnabledMaterial = progress_bar_bar_enabled;
 
 			progress_bar_skin.Caption.TextObject = progress_bar_caption;
-			progress_bar_skin.Caption.EnabledStyle = button_caption_style_enabled;
-			progress_bar_skin.Caption.DisabledStyle = button_caption_style_disabled;
+			progress_bar_skin.Caption.EnabledStyle = caption_style_enabled;
+			progress_bar_skin.Caption.DisabledStyle = caption_style_disabled;*/
+
+			parts = {};
+			parts.Center.Enabled = check_box_center_enabled;
+			parts.Border.Sides.Top.Enabled = button_top_enabled;
+			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
+			parts.Border.Sides.Left.Enabled = button_left_enabled;
+			parts.Border.Sides.Right.Enabled = button_right_enabled;
+			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
+			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
+			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
+			
+			caption_part = {};
+			caption_part.Base = caption_text;
+			caption_part.Enabled = caption_style_enabled;
+			caption_part.Disabled = caption_style_disabled;
+
+			ion::gui::skins::gui_skin::SkinPart bar_part;
+			bar_part.Enabled = progress_bar_bar_enabled;
+			bar_part.FillColor.A(0.35_r);
+
+			ion::gui::skins::gui_skin::SkinPart bar_interpolated_part;
+			bar_interpolated_part.Enabled = progress_bar_bar_enabled;
+			bar_interpolated_part.FillColor.A(0.65_r);
+
+			auto progress_bar_skin = theme->CreateSkin<ion::gui::controls::GuiProgressBar>("GuiProgressBar", parts, caption_part);
+			progress_bar_skin->AddPart("bar", bar_part); //Additional
+			progress_bar_skin->AddPart("bar-interpolated", bar_interpolated_part); //Additional
 
 			//Radio button skin
-			ion::gui::controls::gui_radio_button::RadioButtonSkin radio_button_skin;
+			/*ion::gui::controls::gui_radio_button::RadioButtonSkin radio_button_skin;
 			radio_button_skin.Parts.ModelObject = radio_button_model;
 			radio_button_skin.Parts.Center.SpriteObject = radio_button_center;
 			radio_button_skin.Parts.Top.SpriteObject = radio_button_top;
@@ -2533,55 +2718,47 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			radio_button_skin.CheckMark.HoveredMaterial = radio_button_select_hovered;
 
 			radio_button_skin.Caption.TextObject = radio_button_caption;
-			radio_button_skin.Caption.EnabledStyle = button_caption_style_enabled;
-			radio_button_skin.Caption.DisabledStyle = button_caption_style_disabled;
+			radio_button_skin.Caption.EnabledStyle = caption_style_enabled;
+			radio_button_skin.Caption.DisabledStyle = caption_style_disabled;*/
 
-			//Radio button 2 skin
-			ion::gui::controls::gui_radio_button::RadioButtonSkin radio_button2_skin;
-			radio_button2_skin.Parts.ModelObject = radio_button2_model;
-			radio_button2_skin.Parts.Center.SpriteObject = radio_button2_center;
-			radio_button2_skin.Parts.Top.SpriteObject = radio_button2_top;
-			radio_button2_skin.Parts.Left.SpriteObject = radio_button2_left;
-			radio_button2_skin.Parts.Bottom.SpriteObject = radio_button2_bottom;
-			radio_button2_skin.Parts.Right.SpriteObject = radio_button2_right;
-			radio_button2_skin.Parts.TopLeft.SpriteObject = radio_button2_top_left;
-			radio_button2_skin.Parts.BottomLeft.SpriteObject = radio_button2_bottom_left;
-			radio_button2_skin.Parts.TopRight.SpriteObject = radio_button2_top_right;
-			radio_button2_skin.Parts.BottomRight.SpriteObject = radio_button2_bottom_right;
+			parts = {};
+			parts.Center.Enabled = check_box_center_enabled;
+			parts.Center.Disabled = check_box_center_enabled;
+			parts.Center.Pressed = check_box_center_enabled;
+			parts.Center.Hovered = check_box_center_hovered;
+			parts.Border.Sides.Top.Enabled = button_top_enabled;
+			parts.Border.Sides.Top.Focused = button_top_focused;
+			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
+			parts.Border.Sides.Bottom.Focused = button_bottom_focused;
+			parts.Border.Sides.Left.Enabled = button_left_enabled;
+			parts.Border.Sides.Left.Focused = button_left_focused;
+			parts.Border.Sides.Right.Enabled = button_right_enabled;
+			parts.Border.Sides.Right.Focused = button_right_focused;
+			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopLeft.Focused = button_top_left_focused;
+			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
+			parts.Border.Corners.TopRight.Focused = button_top_right_focused;
+			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
+			parts.Border.Corners.BottomLeft.Focused = button_bottom_left_focused;
+			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
+			parts.Border.Corners.BottomRight.Focused = button_bottom_right_focused;
+			
+			caption_part = {};
+			caption_part.Base = caption_text;
+			caption_part.Enabled = caption_style_enabled;
+			caption_part.Disabled = caption_style_disabled;
 
-			radio_button2_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
-			radio_button2_skin.Parts.Center.DisabledMaterial = check_box_center_enabled;
-			radio_button2_skin.Parts.Center.PressedMaterial = check_box_center_enabled;
-			radio_button2_skin.Parts.Center.HoveredMaterial = check_box_center_hovered;
-			radio_button2_skin.Parts.Top.EnabledMaterial = button_top_enabled;
-			radio_button2_skin.Parts.Top.FocusedMaterial = button_top_focused;
-			radio_button2_skin.Parts.Left.EnabledMaterial = button_left_enabled;
-			radio_button2_skin.Parts.Left.FocusedMaterial = button_left_focused;
-			radio_button2_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
-			radio_button2_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
-			radio_button2_skin.Parts.Right.EnabledMaterial = button_right_enabled;
-			radio_button2_skin.Parts.Right.FocusedMaterial = button_right_focused;
-			radio_button2_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
-			radio_button2_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
-			radio_button2_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
-			radio_button2_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
-			radio_button2_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
-			radio_button2_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
-			radio_button2_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
-			radio_button2_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
+			check_mark_part = {};
+			check_mark_part.Enabled = radio_button_select_enabled;
+			check_mark_part.Disabled = radio_button_select_disabled;
+			check_mark_part.Pressed = radio_button_select_pressed;
+			check_mark_part.Hovered = radio_button_select_hovered;
 
-			radio_button2_skin.CheckMark.SpriteObject = radio_button2_select;
-			radio_button2_skin.CheckMark.EnabledMaterial = radio_button_select_enabled;
-			radio_button2_skin.CheckMark.DisabledMaterial = radio_button_select_disabled;
-			radio_button2_skin.CheckMark.PressedMaterial = radio_button_select_pressed;
-			radio_button2_skin.CheckMark.HoveredMaterial = radio_button_select_hovered;
-
-			radio_button2_skin.Caption.TextObject = radio_button2_caption;
-			radio_button2_skin.Caption.EnabledStyle = button_caption_style_enabled;
-			radio_button2_skin.Caption.DisabledStyle = button_caption_style_disabled;
+			auto radio_button_skin = theme->CreateSkin<ion::gui::controls::GuiRadioButton>("GuiRadioButton", parts, caption_part);
+			radio_button_skin->AddPart("check-mark", check_mark_part); //Additional
 
 			//Slider skin
-			ion::gui::controls::gui_slider::SliderSkin slider_skin;
+			/*ion::gui::controls::gui_slider::SliderSkin slider_skin;
 			slider_skin.Parts.ModelObject = slider_model;
 			slider_skin.Parts.Center.SpriteObject = slider_center;
 			slider_skin.Parts.Top.SpriteObject = slider_top;
@@ -2621,11 +2798,48 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			slider_skin.Handle.HoveredMaterial = radio_button_select_hovered;
 
 			slider_skin.Caption.TextObject = slider_caption;
-			slider_skin.Caption.EnabledStyle = button_caption_style_enabled;
-			slider_skin.Caption.DisabledStyle = button_caption_style_disabled;
+			slider_skin.Caption.EnabledStyle = caption_style_enabled;
+			slider_skin.Caption.DisabledStyle = caption_style_disabled;*/
+
+
+			parts = {};
+			parts.Center.Enabled = check_box_center_enabled;
+			parts.Center.Disabled = check_box_center_enabled;
+			parts.Center.Pressed = check_box_center_enabled;
+			parts.Center.Hovered = check_box_center_hovered;
+			parts.Border.Sides.Top.Enabled = button_top_enabled;
+			parts.Border.Sides.Top.Focused = button_top_focused;
+			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
+			parts.Border.Sides.Bottom.Focused = button_bottom_focused;
+			parts.Border.Sides.Left.Enabled = button_left_enabled;
+			parts.Border.Sides.Left.Focused = button_left_focused;
+			parts.Border.Sides.Right.Enabled = button_right_enabled;
+			parts.Border.Sides.Right.Focused = button_right_focused;
+			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopLeft.Focused = button_top_left_focused;
+			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
+			parts.Border.Corners.TopRight.Focused = button_top_right_focused;
+			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
+			parts.Border.Corners.BottomLeft.Focused = button_bottom_left_focused;
+			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
+			parts.Border.Corners.BottomRight.Focused = button_bottom_right_focused;
+			
+			caption_part = {};
+			caption_part.Base = caption_text;
+			caption_part.Enabled = caption_style_enabled;
+			caption_part.Disabled = caption_style_disabled;
+
+			ion::gui::skins::gui_skin::SkinPart handle_part;
+			handle_part.Enabled = radio_button_select_enabled;
+			handle_part.Disabled = radio_button_select_disabled;
+			handle_part.Pressed = radio_button_select_pressed;
+			handle_part.Hovered = radio_button_select_hovered;
+
+			auto slider_skin = theme->CreateSkin<ion::gui::controls::GuiSlider>("GuiSlider", parts, caption_part);
+			slider_skin->AddPart("handle", handle_part); //Additional
 
 			//Scroll bar skin
-			ion::gui::controls::gui_scroll_bar::ScrollBarSkin scroll_bar_skin;
+			/*ion::gui::controls::gui_scroll_bar::ScrollBarSkin scroll_bar_skin;
 			scroll_bar_skin.Parts.ModelObject = scroll_bar_model;
 			scroll_bar_skin.Parts.Center.SpriteObject = scroll_bar_center;
 			scroll_bar_skin.Parts.Top.SpriteObject = scroll_bar_top;
@@ -2665,11 +2879,47 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scroll_bar_skin.Handle.HoveredMaterial = button_center_hovered;
 
 			scroll_bar_skin.Caption.TextObject = scroll_bar_caption;
-			scroll_bar_skin.Caption.EnabledStyle = button_caption_style_enabled;
-			scroll_bar_skin.Caption.DisabledStyle = button_caption_style_disabled;
+			scroll_bar_skin.Caption.EnabledStyle = caption_style_enabled;
+			scroll_bar_skin.Caption.DisabledStyle = caption_style_disabled;*/
+
+			parts = {};
+			parts.Center.Enabled = check_box_center_enabled;
+			parts.Center.Disabled = check_box_center_enabled;
+			parts.Center.Pressed = check_box_center_enabled;
+			parts.Center.Hovered = check_box_center_hovered;
+			parts.Border.Sides.Top.Enabled = button_top_enabled;
+			parts.Border.Sides.Top.Focused = button_top_focused;
+			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
+			parts.Border.Sides.Bottom.Focused = button_bottom_focused;
+			parts.Border.Sides.Left.Enabled = button_left_enabled;
+			parts.Border.Sides.Left.Focused = button_left_focused;
+			parts.Border.Sides.Right.Enabled = button_right_enabled;
+			parts.Border.Sides.Right.Focused = button_right_focused;
+			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopLeft.Focused = button_top_left_focused;
+			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
+			parts.Border.Corners.TopRight.Focused = button_top_right_focused;
+			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
+			parts.Border.Corners.BottomLeft.Focused = button_bottom_left_focused;
+			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
+			parts.Border.Corners.BottomRight.Focused = button_bottom_right_focused;
+			
+			caption_part = {};
+			caption_part.Base = caption_text;
+			caption_part.Enabled = caption_style_enabled;
+			caption_part.Disabled = caption_style_disabled;
+
+			handle_part = {};
+			handle_part.Enabled = button_center_enabled;
+			handle_part.Disabled = button_center_disabled;
+			handle_part.Pressed = button_center_pressed;
+			handle_part.Hovered = button_center_hovered;
+
+			auto scroll_bar_skin = theme->CreateSkin<ion::gui::controls::GuiScrollBar>("GuiScrollBar", parts, caption_part);
+			scroll_bar_skin->AddPart("handle", handle_part); //Additional
 
 			//Text box skin
-			ion::gui::controls::gui_text_box::TextBoxSkin text_box_skin;
+			/*ion::gui::controls::gui_text_box::TextBoxSkin text_box_skin;
 			text_box_skin.Parts.ModelObject = text_box_model;
 			text_box_skin.Parts.Center.SpriteObject = text_box_center;
 			text_box_skin.Parts.Top.SpriteObject = text_box_top;
@@ -2702,8 +2952,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			text_box_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
 
 			text_box_skin.Text.TextObject = text_box_text;
-			text_box_skin.Text.EnabledStyle = button_caption_style_enabled;
-			text_box_skin.Text.DisabledStyle = button_caption_style_disabled;
+			text_box_skin.Text.EnabledStyle = caption_style_enabled;
+			text_box_skin.Text.DisabledStyle = caption_style_disabled;
 
 			text_box_skin.PlaceholderText.TextObject = text_box_placeholder_text;
 			text_box_skin.PlaceholderText.EnabledStyle = text_box_placeholder_style_enabled;
@@ -2713,66 +2963,99 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			text_box_skin.Cursor.EnabledMaterial = text_box_cursor_enabled;
 
 			text_box_skin.Caption.TextObject = text_box_caption;
-			text_box_skin.Caption.EnabledStyle = button_caption_style_enabled;
-			text_box_skin.Caption.DisabledStyle = button_caption_style_disabled;
+			text_box_skin.Caption.EnabledStyle = caption_style_enabled;
+			text_box_skin.Caption.DisabledStyle = caption_style_disabled;*/
+
+			parts = {};
+			parts.Center.Enabled = check_box_center_enabled;
+			parts.Center.Disabled = check_box_center_enabled;
+			parts.Center.Hovered = check_box_center_hovered;
+			parts.Border.Sides.Top.Enabled = button_top_enabled;
+			parts.Border.Sides.Top.Focused = button_top_focused;
+			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
+			parts.Border.Sides.Bottom.Focused = button_bottom_focused;
+			parts.Border.Sides.Left.Enabled = button_left_enabled;
+			parts.Border.Sides.Left.Focused = button_left_focused;
+			parts.Border.Sides.Right.Enabled = button_right_enabled;
+			parts.Border.Sides.Right.Focused = button_right_focused;
+			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopLeft.Focused = button_top_left_focused;
+			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
+			parts.Border.Corners.TopRight.Focused = button_top_right_focused;
+			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
+			parts.Border.Corners.BottomLeft.Focused = button_bottom_left_focused;
+			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
+			parts.Border.Corners.BottomRight.Focused = button_bottom_right_focused;
+			
+			caption_part = {};
+			caption_part.Base = caption_text;
+			caption_part.Enabled = caption_style_enabled;
+			caption_part.Disabled = caption_style_disabled;
+
+			ion::gui::skins::gui_skin::SkinPart cursor_part;
+			cursor_part.Enabled = text_box_cursor_enabled;
+
+			ion::gui::skins::gui_skin::SkinTextPart text_part;
+			text_part.Enabled = caption_style_enabled;
+			text_part.Disabled = caption_style_disabled;
+
+			ion::gui::skins::gui_skin::SkinTextPart placeholder_text_part;
+			placeholder_text_part.Enabled = placeholder_text_style_enabled;
+			placeholder_text_part.Disabled = placeholder_text_style_disabled;
+
+			auto text_box_skin = theme->CreateSkin<ion::gui::controls::GuiTextBox>("GuiTextBox", parts, caption_part);
+			text_box_skin->AddPart("cursor", cursor_part); //Additional
+			text_box_skin->AddTextPart("text", text_part); //Additional
+			text_box_skin->AddTextPart("placeholder-text", placeholder_text_part); //Additional
 
 
-			//GUI
-			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
+			//GUI controls
 
-			ion::gui::GuiController controller{scene_graph->RootNode()};
-			controller.ZOrder(-2.0_r);
 			controller.MouseCursorSkin(mouse_cursor_skin, 1.0_r);
-			controller.MouseCursorHotSpot(ion::gui::gui_controller::GuiMouseCursorHotSpot::TopLeft);
 
-			auto scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
-			auto theme = controller.CreateTheme("default", scene_manager);
-			auto skin = theme->CreateSkin<ion::gui::controls::GuiButton>("GuiButton");
-			auto control_skin = skin->Instantiate();
-
-			auto tooltip = controller.CreateTooltip("default_tooltip", std::move(tooltip_skin));
+			auto tooltip = controller.CreateTooltip("default_tooltip", *tooltip_skin, {});
 			tooltip->ZOrder(0.9_r);
 
 			auto main_frame = controller.CreateFrame("main");
 			auto base_panel = main_frame->CreatePanel("base");
 			base_panel->ZOrder(0.1_r);
 
-			auto slider = base_panel->CreateSlider("slider", "My slider", "My slider tooltip", std::move(slider_skin), Vector2{1.0_r, 0.077_r});
+			auto slider = base_panel->CreateSlider("slider", *slider_skin, Vector2{1.0_r, 0.077_r}, "My slider", "My slider tooltip");
 			slider->Node()->Position({0.0_r, 0.6_r});
 			slider->Range(0, 20);
 			slider->StepByAmount(5);
 
-			/*auto label = base_panel->CreateLabel("label", "My label", std::move(label_skin));
+			/*auto label = base_panel->CreateLabel("label", *label_skin, {}, "My label");
 			label->Node()->Position({0.0_r, 0.5_r});
 			label->Tooltip("My label tooltip");*/
 
-			auto button = base_panel->CreateButton("button", "My button", "My button tooltip", std::move(button_skin), Vector2{0.5_r, 0.1_r});
+			auto button = base_panel->CreateButton("button", *button_skin, Vector2{0.5_r, 0.1_r}, "My button", "My button tooltip");
 			button->Node()->Position({0.0_r, 0.4_r});
 
-			auto check_box = base_panel->CreateCheckBox("check_box", "My check box", "My check box tooltip", std::move(check_box_skin));
+			auto check_box = base_panel->CreateCheckBox("check_box", *check_box_skin, {}, "My check box", "My check box tooltip");
 			check_box->Node()->Position({0.0_r, 0.3_r});
 
-			auto group_box = base_panel->CreateGroupBox("group_box", "My group box", std::move(group_box_skin), Vector2{1.0_r, 0.15_r});
+			auto group_box = base_panel->CreateGroupBox("group_box", *group_box_skin, Vector2{1.0_r, 0.15_r}, "My group box");
 			group_box->Node()->Position({0.0_r, 0.1_r});
 			group_box->Tooltip("My group box tooltip");
 
-			auto radio_button = base_panel->CreateRadioButton("radio_button", "My radio button", "My radio button tooltip", std::move(radio_button_skin));
+			auto radio_button = base_panel->CreateRadioButton("radio_button", *radio_button_skin, {}, "My radio button", "My radio button tooltip");
 			radio_button->Node()->Position({-0.05_r, 0.0_r});
 			radio_button->CaptionLayout(ion::gui::controls::gui_control::ControlCaptionLayout::OutsideLeftCenter);
 
-			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", "My radio button", "My radio button tooltip", std::move(radio_button2_skin));
+			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", *radio_button_skin, {}, "My radio button", "My radio button tooltip");
 			radio_button2->Node()->Position({0.05_r, 0.0_r});
 
 			group_box->AddControl(radio_button);
 			group_box->AddControl(radio_button2);
 
-			auto progress_bar = base_panel->CreateProgressBar("progress_bar", "My progress bar", std::move(progress_bar_skin), Vector2{1.0_r, 0.077_r});
+			auto progress_bar = base_panel->CreateProgressBar("progress_bar", *progress_bar_skin, Vector2{1.0_r, 0.077_r}, "My progress bar");
 			progress_bar->Node()->Position({0.0_r, -0.1_r});
 			progress_bar->Tooltip("My progress bar tooltip");
 			progress_bar->Range(0.0_r, 100.0_r);
 			progress_bar->Position(75.0_r);
 
-			auto list_box = base_panel->CreateListBox("list_box", "My list box", std::move(list_box_skin), Vector2{0.5_r, 0.5_r});
+			auto list_box = base_panel->CreateListBox("list_box", *list_box_skin, Vector2{0.5_r, 0.5_r}, "My list box");
 			list_box->Node()->Position({0.8_r, 0.25_r});
 			list_box->Tooltip("My list box tooltip");
 			list_box->ItemHeightFactor(3.5_r);
@@ -2792,13 +3075,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{"My <b>10th</b> <font color='purple'>item</font>"s, ship}
 			});
 
-			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", "My scroll bar", "My scroll bar tooltip", std::move(scroll_bar_skin), Vector2{0.077_r, 0.5_r});
+			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", *scroll_bar_skin, Vector2{0.077_r, 0.5_r}, "My scroll bar");
 			scroll_bar->Node()->Position({1.1_r, 0.25_r});
+			scroll_bar->Tooltip("My scroll bar tooltip");
 			scroll_bar->Range(0, 50);
 			scroll_bar->StepByAmount(3);
 			scroll_bar->AttachedScrollable(list_box);
 
-			auto text_box = base_panel->CreateTextBox("text_box", "My text box", std::move(text_box_skin), Vector2{0.5_r, 0.1_r});		
+			auto text_box = base_panel->CreateTextBox("text_box", *text_box_skin, Vector2{0.5_r, 0.1_r}, "My text box");		
 			text_box->Node()->Position({0.0_r, -0.3_r});
 			text_box->Tooltip("My text box tooltip");
 			text_box->PlaceholderContent("<i><b>Type</b></i> something...");	
@@ -2813,7 +3097,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			cell.Alignment(ion::gui::gui_panel::GridCellAlignment::Left);
 			cell.VerticalAlignment(ion::gui::gui_panel::GridCellVerticalAlignment::Bottom);
 			
-			auto label = sub_panel->CreateLabel("label", "My label", std::move(label_skin));		
+			auto label = sub_panel->CreateLabel("label", *label_skin, {}, "My label");		
 			cell.AttachControl(label);		
 			label->Tooltip("My label tooltip");
 

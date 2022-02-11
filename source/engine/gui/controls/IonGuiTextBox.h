@@ -274,13 +274,13 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a text box with the given name, caption, tooltip, skin and hit boxes
-			GuiTextBox(std::string name, std::optional<std::string> caption,
-				OwningPtr<gui_text_box::TextBoxSkin> skin, gui_control::BoundingBoxes hit_boxes = {});
+			//Construct a text box with the given name, size, caption, tooltip and hit boxes
+			GuiTextBox(std::string name, const std::optional<Vector2> &size,
+				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {});
 
-			//Construct a text box with the given name, caption, tooltip, skin, size and hit boxes
-			GuiTextBox(std::string name, std::optional<std::string> caption,
-				OwningPtr<gui_text_box::TextBoxSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes = {});
+			//Construct a text box with the given name, skin, size, caption, tooltip and hit boxes
+			GuiTextBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
+				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {});
 
 
 			/*

@@ -236,6 +236,15 @@ GuiFrame* GuiController::PreviousFocusableFrame(GuiFrame *from_frame) const noex
 }
 
 
+const skins::GuiSkin* GuiController::GetSkin(std::string_view name) const noexcept
+{
+	if (auto theme = ActiveTheme(); theme)
+		return theme->GetSkin(name).get();
+	else
+		return nullptr;
+}
+
+
 /*
 	Events
 */
@@ -878,16 +887,21 @@ bool GuiController::RemoveFrame(std::string_view name) noexcept
 	Creating
 */
 
-NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(std::string name, controls::gui_tooltip::TooltipSkin skin)
+NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(std::string name, const std::optional<Vector2> &size)
 {
-	return CreateComponent<controls::GuiTooltip>(std::move(name), std::nullopt,
-		make_owning<controls::gui_tooltip::TooltipSkin>(std::move(skin)));
+	//Find the default skin for gui tooltip
+	if (auto skin_name = skins::GuiSkin::GetDefaultSkinName<controls::GuiTooltip>(); skin_name)
+	{
+		if (auto skin = GetSkin(*skin_name); skin)
+			return CreateTooltip(std::move(name), *skin, size);
+	}
+
+	return CreateComponent<controls::GuiTooltip>(std::move(name), size, std::nullopt);
 }
 
-NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(std::string name, controls::gui_tooltip::TooltipSkin skin, const Vector2 &size)
+NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size)
 {
-	return CreateComponent<controls::GuiTooltip>(std::move(name), std::nullopt,
-		make_owning<controls::gui_tooltip::TooltipSkin>(std::move(skin)), size);
+	return CreateComponent<controls::GuiTooltip>(std::move(name), skin, size, std::nullopt);
 }
 
 NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(controls::GuiTooltip &&tooltip)

@@ -56,16 +56,16 @@ OwningPtr<gui_control::ControlSkin> GuiGroupBox::AttuneSkin(OwningPtr<gui_contro
 
 //Public
 
-GuiGroupBox::GuiGroupBox(std::string name, std::optional<std::string> caption,
-	OwningPtr<GroupBoxSkin> skin, gui_control::BoundingBoxes hit_boxes) :
-	GuiControl{std::move(name), std::move(caption), {}, std::move(skin), std::move(hit_boxes)}
+GuiGroupBox::GuiGroupBox(std::string name, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes) :
+	GuiControl{std::move(name), size, std::move(caption), {}, std::move(hit_boxes)}
 {
 	DefaultSetup();
 }
 
-GuiGroupBox::GuiGroupBox(std::string name, std::optional<std::string> caption,
-	OwningPtr<GroupBoxSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes) :
-	GuiControl{std::move(name), std::move(caption), {}, std::move(skin), size, std::move(hit_boxes)}
+GuiGroupBox::GuiGroupBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes) :
+	GuiControl{std::move(name), skin, size, std::move(caption), {}, std::move(hit_boxes)}
 {
 	DefaultSetup();
 }

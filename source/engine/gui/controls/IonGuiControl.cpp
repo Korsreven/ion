@@ -24,6 +24,7 @@ File:	IonGuiControl.cpp
 #include "graphics/utilities/IonObb.h"
 #include "gui/IonGuiFrame.h"
 #include "gui/IonGuiPanelContainer.h"
+#include "gui/skins/IonGuiSkin.h"
 #include "types/IonTypeTraits.h"
 
 namespace ion::gui::controls
@@ -952,27 +953,26 @@ GuiControl::GuiControl(std::string name, const Vector2 &size) :
 }
 
 
-GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<ControlSkin> skin, BoundingBoxes hit_boxes) :
-
-	GuiComponent{std::move(name)},
-	size_{skin ? detail::get_size(*skin, true) : std::nullopt},
-	caption_{std::move(caption)},
-	tooltip_{std::move(tooltip)},
-	skin_{std::move(skin)},
-	hit_boxes_{std::move(hit_boxes)}
-{
-	//Empty
-}
-
-GuiControl::GuiControl(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<ControlSkin> skin, const Vector2 &size, BoundingBoxes hit_boxes) :
+GuiControl::GuiControl(std::string name, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, std::optional<std::string> tooltip, BoundingBoxes hit_boxes) :
 
 	GuiComponent{std::move(name)},
 	size_{size},
 	caption_{std::move(caption)},
 	tooltip_{std::move(tooltip)},
-	skin_{std::move(skin)},
+	hit_boxes_{std::move(hit_boxes)}
+{
+	//Empty
+}
+
+GuiControl::GuiControl(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, std::optional<std::string> tooltip, BoundingBoxes hit_boxes) :
+
+	GuiComponent{std::move(name)},
+	skin_{skin.Instantiate()},
+	size_{size ? size : (skin_ ? detail::get_size(*skin_, true) : std::nullopt)},
+	caption_{std::move(caption)},
+	tooltip_{std::move(tooltip)},
 	hit_boxes_{std::move(hit_boxes)}
 {
 	//Empty
@@ -1079,6 +1079,26 @@ void GuiControl::Reset() noexcept
 }
 
 
+void GuiControl::Skin(const skins::GuiSkin &skin) noexcept
+{
+	auto new_skin = skin.Instantiate();
+	RemoveSkin();
+
+	//Re-skin
+	if (new_skin)
+	{
+		//Resize new skin
+		if (auto from_size = detail::get_size(*new_skin, true); from_size && size_)
+			detail::resize_skin(*new_skin, *from_size, *size_);
+		else
+			size_ = from_size;
+
+		skin_ = AttuneSkin(std::move(new_skin));
+	}
+
+	AttachSkin();
+}
+
 void GuiControl::Size(const Vector2 &size) noexcept
 {
 	if (!size_ || *size_ != size)
@@ -1099,28 +1119,6 @@ void GuiControl::Size(const Vector2 &size) noexcept
 
 		UpdateCaption();
 		Resized(from_size.value_or(size), size);
-	}
-}
-
-void GuiControl::Skin(OwningPtr<ControlSkin> skin) noexcept
-{
-	if (skin_ != skin)
-	{
-		RemoveSkin();
-
-		//Re-skin
-		if (skin)
-		{
-			//Resize new skin
-			if (auto from_size = detail::get_size(*skin, true); from_size && size_)
-				detail::resize_skin(*skin, *from_size, *size_);
-			else
-				size_ = from_size;
-
-			skin_ = AttuneSkin(std::move(skin));
-		}
-
-		AttachSkin();
 	}
 }
 

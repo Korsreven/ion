@@ -275,16 +275,18 @@ void GuiTooltip::UpdatePhaseDuration() noexcept
 
 //Public
 
-GuiTooltip::GuiTooltip(std::string name, std::optional<std::string> text, OwningPtr<TooltipSkin> skin) :
-	GuiLabel{std::move(name), std::move(text), std::move(skin)}
+GuiTooltip::GuiTooltip(std::string name, const std::optional<Vector2> &size, std::optional<std::string> text) :
+
+	GuiLabel{std::move(name), size, std::move(text)},
+	auto_size_{!size}
 {
 	DefaultSetup();
 }
 
-GuiTooltip::GuiTooltip(std::string name, std::optional<std::string> text, OwningPtr<TooltipSkin> skin, const Vector2 &size) :
+GuiTooltip::GuiTooltip(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size, std::optional<std::string> text) :
 
-	GuiLabel{std::move(name), std::move(text), std::move(skin), size},
-	auto_size_{false}
+	GuiLabel{std::move(name), skin, size, std::move(text)},
+	auto_size_{!size}
 {
 	DefaultSetup();
 }

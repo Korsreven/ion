@@ -200,16 +200,16 @@ OwningPtr<gui_control::ControlSkin> GuiButton::AttuneSkin(OwningPtr<gui_control:
 
 //Public
 
-GuiButton::GuiButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<ButtonSkin> skin, gui_control::BoundingBoxes hit_boxes) :
-	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), std::move(hit_boxes)}
+GuiButton::GuiButton(std::string name, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes) :
+	GuiControl{std::move(name), size, std::move(caption), std::move(tooltip), std::move(hit_boxes)}
 {
 	//Empty
 }
 
-GuiButton::GuiButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<ButtonSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes) :
-	GuiControl{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size, std::move(hit_boxes)}
+GuiButton::GuiButton(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes) :
+	GuiControl{std::move(name), skin, size, std::move(caption), std::move(tooltip), std::move(hit_boxes)}
 {
 	//Empty
 }

@@ -73,13 +73,13 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a radio button with the given name, caption, tooltip, skin and hit boxes
-			GuiRadioButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_radio_button::RadioButtonSkin> skin, gui_control::BoundingBoxes hit_boxes = {});
+			//Construct a radio button with the given name, size, caption, tooltip and hit boxes
+			GuiRadioButton(std::string name, const std::optional<Vector2> &size,
+				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {});
 
-			//Construct a radio button with the given name, caption, tooltip, skin, size and hit boxes
-			GuiRadioButton(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_radio_button::RadioButtonSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes = {});
+			//Construct a radio button with the given name, skin, size, caption, tooltip and hit boxes
+			GuiRadioButton(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
+				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {});
 
 
 			/*

@@ -110,16 +110,16 @@ void GuiScrollBar::UpdateHandle() noexcept
 
 //Public
 
-GuiScrollBar::GuiScrollBar(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<ScrollBarSkin> skin, gui_slider::SliderType type, gui_control::BoundingBoxes hit_boxes) :
-	GuiSlider{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), type, std::move(hit_boxes)}
+GuiScrollBar::GuiScrollBar(std::string name, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, gui_slider::SliderType type, gui_control::BoundingBoxes hit_boxes) :
+	GuiSlider{std::move(name), size, std::move(caption), {}, type, std::move(hit_boxes)}
 {
 	DefaultSetup();
 }
 
-GuiScrollBar::GuiScrollBar(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-	OwningPtr<ScrollBarSkin> skin, const Vector2 &size, gui_slider::SliderType type, gui_control::BoundingBoxes hit_boxes) :
-	GuiSlider{std::move(name), std::move(caption), std::move(tooltip), std::move(skin), size, type, std::move(hit_boxes)}
+GuiScrollBar::GuiScrollBar(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, gui_slider::SliderType type, gui_control::BoundingBoxes hit_boxes) :
+	GuiSlider{std::move(name), skin, size, std::move(caption), {}, type, std::move(hit_boxes)}
 {
 	DefaultSetup();
 }

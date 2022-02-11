@@ -78,14 +78,14 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a scroll bar with the given name, caption, tooltip, skin, type and hit boxes
-			GuiScrollBar(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_scroll_bar::ScrollBarSkin> skin, gui_slider::SliderType type = gui_slider::SliderType::Vertical,
+			//Construct a scroll bar with the given name, size, caption, type and hit boxes
+			GuiScrollBar(std::string name, const std::optional<Vector2> &size,
+				std::optional<std::string> caption, gui_slider::SliderType type = gui_slider::SliderType::Vertical,
 				gui_control::BoundingBoxes hit_boxes = {});
 
-			//Construct a scroll bar with the given name, caption, tooltip, skin, size, type and hit boxes
-			GuiScrollBar(std::string name, std::optional<std::string> caption, std::optional<std::string> tooltip,
-				OwningPtr<gui_scroll_bar::ScrollBarSkin> skin, const Vector2 &size, gui_slider::SliderType type = gui_slider::SliderType::Vertical,
+			//Construct a scroll bar with the given name, skin, size, caption, type and hit boxes
+			GuiScrollBar(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
+				std::optional<std::string> caption, gui_slider::SliderType type = gui_slider::SliderType::Vertical,
 				gui_control::BoundingBoxes hit_boxes = {});
 
 

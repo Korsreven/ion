@@ -52,16 +52,16 @@ OwningPtr<gui_control::ControlSkin> GuiLabel::AttuneSkin(OwningPtr<gui_control::
 
 //Public
 
-GuiLabel::GuiLabel(std::string name, std::optional<std::string> caption,
-	OwningPtr<LabelSkin> skin, gui_control::BoundingBoxes hit_boxes) :
-	GuiControl{std::move(name), std::move(caption), {}, std::move(skin), std::move(hit_boxes)}
+GuiLabel::GuiLabel(std::string name, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes) :
+	GuiControl{std::move(name), size, std::move(caption), {}, std::move(hit_boxes)}
 {
 	DefaultSetup();
 }
 
-GuiLabel::GuiLabel(std::string name, std::optional<std::string> caption,
-	OwningPtr<LabelSkin> skin, const Vector2 &size, gui_control::BoundingBoxes hit_boxes) :
-	GuiControl{std::move(name), std::move(caption), {}, std::move(skin), size, std::move(hit_boxes)}
+GuiLabel::GuiLabel(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes) :
+	GuiControl{std::move(name), skin, size, std::move(caption), {}, std::move(hit_boxes)}
 {
 	DefaultSetup();
 }

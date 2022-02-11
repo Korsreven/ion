@@ -30,6 +30,7 @@ File:	IonGuiController.h
 #include "graphics/utilities/IonVector2.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
+#include "skins/IonGuiSkin.h"
 #include "skins/IonGuiTheme.h"
 #include "types/IonTypes.h"
 
@@ -146,6 +147,8 @@ namespace ion::gui
 
 			GuiFrame* NextFocusableFrame(GuiFrame *from_frame) const noexcept;
 			GuiFrame* PreviousFocusableFrame(GuiFrame *from_frame) const noexcept;
+
+			const skins::GuiSkin* GetSkin(std::string_view name) const noexcept;
 
 
 			/*
@@ -504,11 +507,11 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a tooltip with the given name and skin
-			NonOwningPtr<controls::GuiTooltip> CreateTooltip(std::string name, controls::gui_tooltip::TooltipSkin skin);
+			//Create a tooltip with the given name and size
+			NonOwningPtr<controls::GuiTooltip> CreateTooltip(std::string name, const std::optional<Vector2> &size);
 
 			//Create a tooltip with the given name, skin and size
-			NonOwningPtr<controls::GuiTooltip> CreateTooltip(std::string name, controls::gui_tooltip::TooltipSkin skin, const Vector2 &size);
+			NonOwningPtr<controls::GuiTooltip> CreateTooltip(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size);
 
 			//Create a tooltip by moving the given tooltip
 			NonOwningPtr<controls::GuiTooltip> CreateTooltip(controls::GuiTooltip &&tooltip);
