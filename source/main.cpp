@@ -1797,487 +1797,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			circle2->QueryMask(1 | 2 | 4);
 			//circle2->ShowBoundingVolumes(true);*/
 
-			//GUI models
-			//Cursor
-			auto mouse_cursor_model = scene_manager->CreateModel();
-			auto mouse_cursor_sprite = mouse_cursor_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r}, mouse_cursor}); //Mouse cursor
-
-			mouse_cursor_sprite->AutoSize(true);
-			mouse_cursor_model->AddPass(ion::graphics::render::Pass{});
-
-			//Tooltip
-			/*auto w = 0.1_r;
-			auto h = 0.1_r;
-
-			auto tooltip_model = scene_manager->CreateModel();
-			auto tooltip_center = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, tooltip_center_enabled}); //Center
-			
-			auto tooltip_top = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, tooltip_top_enabled}); //Top
-			auto tooltip_left = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, tooltip_left_enabled}); //Left
-			auto tooltip_bottom = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, tooltip_bottom_enabled}); //Bottom
-			auto tooltip_right = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, tooltip_right_enabled}); //Right
-
-			auto tooltip_top_left = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_top_left_enabled}); //Top left
-			auto tooltip_bottom_left = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_bottom_left_enabled}); //Bottom left
-			auto tooltip_top_right = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_top_right_enabled}); //Top right
-			auto tooltip_bottom_right = tooltip_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, tooltip_bottom_right_enabled}); //Bottom right
-
-			tooltip_center->FillOpacity(0.9_r);
-			tooltip_center->AutoRepeat(true);
-			tooltip_top->AutoRepeat(true);
-			tooltip_left->AutoRepeat(true);
-			tooltip_bottom->AutoRepeat(true);
-			tooltip_right->AutoRepeat(true);
-			tooltip_model->AddPass(ion::graphics::render::Pass{});
-
-			//Button
-			w = 0.1_r;
-			h = 0.1_r;
-
-			auto button_model = scene_manager->CreateModel();
-			auto button_center = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
-			
-			auto button_top = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
-			auto button_left = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
-			auto button_bottom = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
-			auto button_right = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
-
-			auto button_top_left = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
-			auto button_bottom_left = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
-			auto button_top_right = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
-			auto button_bottom_right = button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
-
-			button_center->AutoRepeat(true);
-			button_top->AutoRepeat(true);
-			button_left->AutoRepeat(true);
-			button_bottom->AutoRepeat(true);
-			button_right->AutoRepeat(true);
-			button_model->AddPass(ion::graphics::render::Pass{});
-
-			//Check box
-			w = 0.056_r;
-			h = 0.056_r;
-
-			auto check_box_model = scene_manager->CreateModel();
-			auto check_box_center = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
-			
-			auto check_box_top = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
-			auto check_box_left = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
-			auto check_box_bottom = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
-			auto check_box_right = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
-
-			auto check_box_top_left = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
-			auto check_box_bottom_left = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
-			auto check_box_top_right = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
-			auto check_box_bottom_right = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
-
-			auto check_box_mark = check_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w * 1.5_r, h * 1.5_r}, nullptr}); //Check mark
-			check_box_mark->IncludeBoundingVolumes(false);
-
-			check_box_center->AutoRepeat(true);
-			check_box_top->AutoRepeat(true);
-			check_box_left->AutoRepeat(true);
-			check_box_bottom->AutoRepeat(true);
-			check_box_right->AutoRepeat(true);
-			check_box_model->AddPass(ion::graphics::render::Pass{});
-
-			//Group box
-			w = 0.1_r;
-			h = 0.1_r;
-
-			auto group_box_model = scene_manager->CreateModel();
-
-			auto group_box_top = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
-			auto group_box_left = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
-			auto group_box_bottom = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
-			auto group_box_right = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
-
-			auto group_box_top_left = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
-			auto group_box_bottom_left = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
-			auto group_box_top_right = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
-			auto group_box_bottom_right = group_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
-
-			group_box_top->AutoRepeat(true);
-			group_box_left->AutoRepeat(true);
-			group_box_bottom->AutoRepeat(true);
-			group_box_right->AutoRepeat(true);
-			group_box_model->AddPass(ion::graphics::render::Pass{});
-
-			//List box
-			w = 0.056_r;
-			h = 0.056_r;
-
-			auto list_box_model = scene_manager->CreateModel();
-			auto list_box_center = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
-			
-			auto list_box_top = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
-			auto list_box_left = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
-			auto list_box_bottom = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
-			auto list_box_right = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
-
-			auto list_box_top_left = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
-			auto list_box_bottom_left = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
-			auto list_box_top_right = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
-			auto list_box_bottom_right = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
-
-			auto list_box_selection = list_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Selection
-
-			list_box_selection->AutoRepeat(true);
-			list_box_selection->FillOpacity(0.5_r);
-			list_box_selection->IncludeBoundingVolumes(false);
-
-			list_box_center->AutoRepeat(true);
-			list_box_top->AutoRepeat(true);
-			list_box_left->AutoRepeat(true);
-			list_box_bottom->AutoRepeat(true);
-			list_box_right->AutoRepeat(true);
-			list_box_model->AddPass(ion::graphics::render::Pass{});
-
-			//Progress bar
-			w = 0.056_r;
-			h = 0.056_r;
-
-			auto progress_bar_model = scene_manager->CreateModel();
-			auto progress_bar_center = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
-			
-			auto progress_bar_top = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
-			auto progress_bar_left = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
-			auto progress_bar_bottom = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
-			auto progress_bar_right = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
-
-			auto progress_bar_top_left = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
-			auto progress_bar_bottom_left = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
-			auto progress_bar_top_right = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
-			auto progress_bar_bottom_right = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
-
-			auto progress_bar_bar = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Bar
-			auto progress_bar_bar_interpolated = progress_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Bar interpolated
-
-			progress_bar_bar->AutoRepeat(true);
-			progress_bar_bar->FillOpacity(0.35_r);
-			progress_bar_bar->IncludeBoundingVolumes(false);
-
-			progress_bar_bar_interpolated->AutoRepeat(true);
-			progress_bar_bar_interpolated->FillOpacity(0.65_r);
-			progress_bar_bar_interpolated->IncludeBoundingVolumes(false);
-
-			progress_bar_center->AutoRepeat(true);
-			progress_bar_top->AutoRepeat(true);
-			progress_bar_left->AutoRepeat(true);
-			progress_bar_bottom->AutoRepeat(true);
-			progress_bar_right->AutoRepeat(true);
-			progress_bar_model->AddPass(ion::graphics::render::Pass{});
-
-			//Radio button
-			w = 0.056_r;
-			h = 0.056_r;
-
-			auto radio_button_model = scene_manager->CreateModel();
-			auto radio_button_center = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center			
-			
-			auto radio_button_top = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
-			auto radio_button_left = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
-			auto radio_button_bottom = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
-			auto radio_button_right = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
-
-			auto radio_button_top_left = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
-			auto radio_button_bottom_left = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
-			auto radio_button_top_right = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
-			auto radio_button_bottom_right = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
-
-			auto radio_button_select = radio_button_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w * 1.25_r, h * 1.25_r}, nullptr}); //Select
-			radio_button_select->IncludeBoundingVolumes(false);
-
-			radio_button_center->AutoRepeat(true);
-			radio_button_top->AutoRepeat(true);
-			radio_button_left->AutoRepeat(true);
-			radio_button_bottom->AutoRepeat(true);
-			radio_button_right->AutoRepeat(true);
-			radio_button_model->AddPass(ion::graphics::render::Pass{});
-
-			//Radio button 2
-			w = 0.056_r;
-			h = 0.056_r;
-
-			auto radio_button2_model = scene_manager->CreateModel();
-			auto radio_button2_center = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center		
-			
-			auto radio_button2_top = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
-			auto radio_button2_left = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
-			auto radio_button2_bottom = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
-			auto radio_button2_right = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
-
-			auto radio_button2_top_left = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
-			auto radio_button2_bottom_left = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
-			auto radio_button2_top_right = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
-			auto radio_button2_bottom_right = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
-
-			auto radio_button2_select = radio_button2_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w * 1.25_r, h * 1.25_r}, nullptr}); //Select
-			radio_button2_select->IncludeBoundingVolumes(false);
-
-			radio_button2_center->AutoRepeat(true);
-			radio_button2_top->AutoRepeat(true);
-			radio_button2_left->AutoRepeat(true);
-			radio_button2_bottom->AutoRepeat(true);
-			radio_button2_right->AutoRepeat(true);
-			radio_button2_model->AddPass(ion::graphics::render::Pass{});
-
-			//Slider
-			w = 0.056_r;
-			h = 0.056_r;
-
-			auto slider_model = scene_manager->CreateModel();
-			auto slider_center = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
-			
-			auto slider_top = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
-			auto slider_left = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
-			auto slider_bottom = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
-			auto slider_right = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
-
-			auto slider_top_left = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
-			auto slider_bottom_left = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
-			auto slider_top_right = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
-			auto slider_bottom_right = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
-
-			auto slider_handle = slider_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h * 2.0_r}, nullptr}); //Handle
-			slider_handle->IncludeBoundingVolumes(false);
-
-			slider_center->AutoRepeat(true);
-			slider_top->AutoRepeat(true);
-			slider_left->AutoRepeat(true);
-			slider_bottom->AutoRepeat(true);
-			slider_right->AutoRepeat(true);
-			slider_model->AddPass(ion::graphics::render::Pass{});
-
-			//Scroll bar
-			w = 0.056_r;
-			h = 0.056_r;
-
-			auto scroll_bar_model = scene_manager->CreateModel();
-			auto scroll_bar_center = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
-			
-			auto scroll_bar_top = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
-			auto scroll_bar_left = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
-			auto scroll_bar_bottom = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
-			auto scroll_bar_right = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
-
-			auto scroll_bar_top_left = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
-			auto scroll_bar_bottom_left = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
-			auto scroll_bar_top_right = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
-			auto scroll_bar_bottom_right = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
-
-			auto scroll_bar_handle = scroll_bar_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Handle
-			scroll_bar_handle->IncludeBoundingVolumes(false);
-
-			scroll_bar_center->AutoRepeat(true);
-			scroll_bar_top->AutoRepeat(true);
-			scroll_bar_left->AutoRepeat(true);
-			scroll_bar_bottom->AutoRepeat(true);
-			scroll_bar_right->AutoRepeat(true);
-			scroll_bar_model->AddPass(ion::graphics::render::Pass{});
-
-			//Text box
-			w = 0.056_r;
-			h = 0.056_r;
-
-			auto text_box_model = scene_manager->CreateModel();
-			auto text_box_center = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Center
-			
-			auto text_box_top = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Top
-			auto text_box_left = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Left
-			auto text_box_bottom = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {w, 0.011_r}, nullptr}); //Bottom
-			auto text_box_right = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, 0.0_r, 0.0_r}, {0.011_r, h}, nullptr}); //Right
-
-			auto text_box_top_left = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top left
-			auto text_box_bottom_left = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{-w * 0.5_r + -0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom left
-			auto text_box_top_right = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, h * 0.5_r + 0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Top right
-			auto text_box_bottom_right = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{w * 0.5_r + 0.011_r * 0.5_r, -h * 0.5_r + -0.011_r * 0.5_r, 0.0_r}, {0.011_r, 0.011_r}, nullptr}); //Bottom right
-
-			auto text_box_cursor = text_box_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {w, h}, nullptr}); //Cursor
-
-			text_box_cursor->AutoSize(true);
-			text_box_cursor->IncludeBoundingVolumes(false);
-
-			text_box_center->AutoRepeat(true);
-			text_box_top->AutoRepeat(true);
-			text_box_left->AutoRepeat(true);
-			text_box_bottom->AutoRepeat(true);
-			text_box_right->AutoRepeat(true);
-			text_box_model->AddPass(ion::graphics::render::Pass{});
-
-
-			//GUI Caption
-
-			//Tooltip caption
-			auto tooltip_caption = scene_manager->CreateText(caption_text);
-			tooltip_caption->AddPass(ion::graphics::render::Pass{});
-
-			//Button caption
-			auto button_caption = scene_manager->CreateText(caption_text);
-			button_caption->AddPass(ion::graphics::render::Pass{});
-			
-			
-
-			//Check box caption
-			auto check_box_caption = scene_manager->CreateText(caption_text);
-			check_box_caption->AddPass(ion::graphics::render::Pass{});
-
-			//Group box caption
-			auto group_box_caption = scene_manager->CreateText(caption_text);
-			group_box_caption->AddPass(ion::graphics::render::Pass{});
-
-			//Label caption
-			auto label_caption = scene_manager->CreateText(caption_text);
-			label_caption->AddPass(ion::graphics::render::Pass{});
-
-			//List box caption
-			auto list_box_caption = scene_manager->CreateText(caption_text);
-			list_box_caption->AddPass(ion::graphics::render::Pass{});
-
-			//List box lines
-			auto list_box_lines = scene_manager->CreateText(caption_text);
-			list_box_lines->AddPass(ion::graphics::render::Pass{});
-
-			//Progress bar caption
-			auto progress_bar_caption = scene_manager->CreateText(caption_text);
-			progress_bar_caption->AddPass(ion::graphics::render::Pass{});
-
-			//Radio button caption
-			auto radio_button_caption = scene_manager->CreateText(caption_text);
-			radio_button_caption->AddPass(ion::graphics::render::Pass{});
-
-			//Radio button 2 caption
-			auto radio_button2_caption = scene_manager->CreateText(caption_text);
-			radio_button2_caption->AddPass(ion::graphics::render::Pass{});
-
-			//Slider caption
-			auto slider_caption = scene_manager->CreateText(caption_text);
-			slider_caption->AddPass(ion::graphics::render::Pass{});
-
-			//Scroll bar caption
-			auto scroll_bar_caption = scene_manager->CreateText(caption_text);
-			scroll_bar_caption->AddPass(ion::graphics::render::Pass{});
-
-			//Text box caption
-			auto text_box_caption = scene_manager->CreateText(caption_text);
-			text_box_caption->AddPass(ion::graphics::render::Pass{});
-
-			//Text box text
-			auto text_box_text = scene_manager->CreateText(caption_text);
-			text_box_text->AddPass(ion::graphics::render::Pass{});
-
-			//Text box placeholder text
-			auto text_box_placeholder_text = scene_manager->CreateText(caption_text);
-			text_box_placeholder_text->AddPass(ion::graphics::render::Pass{});*/
-
 
 			//Scene graph
 			auto scene_graph = engine.CreateSceneGraph("");
@@ -2299,25 +1818,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//GUI theme
 			auto theme = controller.CreateTheme("default", scene_manager);
 
-			//Mouse cursor (TEMP)
+			//Mouse cursor skin (TODO)
+			auto mouse_cursor_model = scene_manager->CreateModel();
+			auto mouse_cursor_sprite = mouse_cursor_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+				{0.0_r, 0.0_r}, mouse_cursor}); //Mouse cursor
+
+			mouse_cursor_sprite->AutoSize(true);
+			mouse_cursor_model->AddPass(ion::graphics::render::Pass{});
+
 			ion::gui::gui_controller::GuiMouseCursorSkin mouse_cursor_skin;
 			mouse_cursor_skin.ModelObject = mouse_cursor_model;
 
 			//Tooltip skin
-			/*ion::gui::controls::gui_tooltip::TooltipSkin tooltip_skin;
-			tooltip_skin.Parts.ModelObject = tooltip_model;
-			tooltip_skin.Parts.Center.SpriteObject = tooltip_center;
-			tooltip_skin.Parts.Top.SpriteObject = tooltip_top;
-			tooltip_skin.Parts.Left.SpriteObject = tooltip_left;
-			tooltip_skin.Parts.Bottom.SpriteObject = tooltip_bottom;
-			tooltip_skin.Parts.Right.SpriteObject = tooltip_right;
-			tooltip_skin.Parts.TopLeft.SpriteObject = tooltip_top_left;
-			tooltip_skin.Parts.BottomLeft.SpriteObject = tooltip_bottom_left;
-			tooltip_skin.Parts.TopRight.SpriteObject = tooltip_top_right;
-			tooltip_skin.Parts.BottomRight.SpriteObject = tooltip_bottom_right;
-
-			tooltip_skin.Caption.TextObject = tooltip_caption;*/
-
 			ion::gui::skins::gui_skin::SkinParts parts;
 			parts.Center.Enabled = tooltip_center_enabled;
 			parts.Center.FillColor.A(0.9_r);
@@ -2336,44 +1848,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto tooltip_skin = theme->CreateSkin<ion::gui::controls::GuiTooltip>(parts, caption_part);
 
 			//Button skin
-			/*ion::gui::controls::gui_button::ButtonSkin button_skin;
-			button_skin.Parts.ModelObject = button_model;
-			button_skin.Parts.Center.SpriteObject = button_center;
-			button_skin.Parts.Top.SpriteObject = button_top;
-			button_skin.Parts.Left.SpriteObject = button_left;
-			button_skin.Parts.Bottom.SpriteObject = button_bottom;
-			button_skin.Parts.Right.SpriteObject = button_right;
-			button_skin.Parts.TopLeft.SpriteObject = button_top_left;
-			button_skin.Parts.BottomLeft.SpriteObject = button_bottom_left;
-			button_skin.Parts.TopRight.SpriteObject = button_top_right;
-			button_skin.Parts.BottomRight.SpriteObject = button_bottom_right;
-
-			button_skin.Parts.Center.EnabledMaterial = button_center_enabled;
-			button_skin.Parts.Center.DisabledMaterial = button_center_disabled;
-			button_skin.Parts.Center.PressedMaterial = button_center_pressed;
-			button_skin.Parts.Center.HoveredMaterial = button_center_hovered;
-			button_skin.Parts.Top.EnabledMaterial = button_top_enabled;
-			button_skin.Parts.Top.FocusedMaterial = button_top_focused;
-			button_skin.Parts.Left.EnabledMaterial = button_left_enabled;
-			button_skin.Parts.Left.FocusedMaterial = button_left_focused;
-			button_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
-			button_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
-			button_skin.Parts.Right.EnabledMaterial = button_right_enabled;
-			button_skin.Parts.Right.FocusedMaterial = button_right_focused;
-			button_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
-			button_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
-			button_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
-			button_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
-			button_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
-			button_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
-			button_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
-			button_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
-
-			button_skin.Caption.TextObject = button_caption;
-			button_skin.Caption.EnabledStyle = caption_style_enabled;
-			button_skin.Caption.DisabledStyle = caption_style_disabled;
-			button_skin.Caption.HoveredStyle = caption_style_hovered;*/
-
 			parts = {};
 			parts.Center.Enabled = button_center_enabled;
 			parts.Center.Disabled = button_center_disabled;
@@ -2400,54 +1874,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			caption_part.Base = caption_text;
 			caption_part.Enabled = caption_style_enabled;
 			caption_part.Disabled = caption_style_disabled;
-			caption_part.Hovered = caption_style_hovered;
 
 			auto button_skin = theme->CreateSkin<ion::gui::controls::GuiButton>(parts, caption_part);
 
 			//Check box skin
-			/*ion::gui::controls::gui_check_box::CheckBoxSkin check_box_skin;
-			check_box_skin.Parts.ModelObject = check_box_model;
-			check_box_skin.Parts.Center.SpriteObject = check_box_center;
-			check_box_skin.Parts.Top.SpriteObject = check_box_top;
-			check_box_skin.Parts.Left.SpriteObject = check_box_left;
-			check_box_skin.Parts.Bottom.SpriteObject = check_box_bottom;
-			check_box_skin.Parts.Right.SpriteObject = check_box_right;
-			check_box_skin.Parts.TopLeft.SpriteObject = check_box_top_left;
-			check_box_skin.Parts.BottomLeft.SpriteObject = check_box_bottom_left;
-			check_box_skin.Parts.TopRight.SpriteObject = check_box_top_right;
-			check_box_skin.Parts.BottomRight.SpriteObject = check_box_bottom_right;
-
-			check_box_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
-			check_box_skin.Parts.Center.DisabledMaterial = check_box_center_enabled;
-			check_box_skin.Parts.Center.PressedMaterial = check_box_center_enabled;
-			check_box_skin.Parts.Center.HoveredMaterial = check_box_center_hovered;
-			check_box_skin.Parts.Top.EnabledMaterial = button_top_enabled;
-			check_box_skin.Parts.Top.FocusedMaterial = button_top_focused;
-			check_box_skin.Parts.Left.EnabledMaterial = button_left_enabled;
-			check_box_skin.Parts.Left.FocusedMaterial = button_left_focused;
-			check_box_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
-			check_box_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
-			check_box_skin.Parts.Right.EnabledMaterial = button_right_enabled;
-			check_box_skin.Parts.Right.FocusedMaterial = button_right_focused;
-			check_box_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
-			check_box_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
-			check_box_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
-			check_box_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
-			check_box_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
-			check_box_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
-			check_box_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
-			check_box_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
-
-			check_box_skin.CheckMark.SpriteObject = check_box_mark;
-			check_box_skin.CheckMark.EnabledMaterial = check_box_mark_enabled;
-			check_box_skin.CheckMark.DisabledMaterial = check_box_mark_disabled;
-			check_box_skin.CheckMark.PressedMaterial = check_box_mark_pressed;
-			check_box_skin.CheckMark.HoveredMaterial = check_box_mark_hovered;
-
-			check_box_skin.Caption.TextObject = check_box_caption;
-			check_box_skin.Caption.EnabledStyle = caption_style_enabled;
-			check_box_skin.Caption.DisabledStyle = caption_style_disabled;*/
-
 			parts = {};
 			parts.Center.Enabled = check_box_center_enabled;
 			parts.Center.Disabled = check_box_center_enabled;
@@ -2485,30 +1915,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_box_skin->AddPart("check-mark", check_mark_part); //Additional
 
 			//Group box skin
-			/*ion::gui::controls::gui_group_box::GroupBoxSkin group_box_skin;
-			group_box_skin.Parts.ModelObject = group_box_model;
-			group_box_skin.Parts.Top.SpriteObject = group_box_top;
-			group_box_skin.Parts.Left.SpriteObject = group_box_left;
-			group_box_skin.Parts.Bottom.SpriteObject = group_box_bottom;
-			group_box_skin.Parts.Right.SpriteObject = group_box_right;
-			group_box_skin.Parts.TopLeft.SpriteObject = group_box_top_left;
-			group_box_skin.Parts.BottomLeft.SpriteObject = group_box_bottom_left;
-			group_box_skin.Parts.TopRight.SpriteObject = group_box_top_right;
-			group_box_skin.Parts.BottomRight.SpriteObject = group_box_bottom_right;
-
-			group_box_skin.Parts.Top.EnabledMaterial = button_top_enabled;
-			group_box_skin.Parts.Left.EnabledMaterial = button_left_enabled;
-			group_box_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
-			group_box_skin.Parts.Right.EnabledMaterial = button_right_enabled;
-			group_box_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
-			group_box_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
-			group_box_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
-			group_box_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
-
-			group_box_skin.Caption.TextObject = group_box_caption;
-			group_box_skin.Caption.EnabledStyle = caption_style_enabled;
-			group_box_skin.Caption.DisabledStyle = caption_style_disabled;*/
-
 			parts = {};
 			parts.Border.Sides.Top.Enabled = button_top_enabled;
 			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
@@ -2527,58 +1933,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto group_box_skin = theme->CreateSkin<ion::gui::controls::GuiGroupBox>(parts, caption_part);
 
 			//Label skin
-			/*ion::gui::controls::gui_label::LabelSkin label_skin;
-			label_skin.Caption.TextObject = label_caption;*/
-
 			caption_part = {};
 			caption_part.Base = caption_text;
+			caption_part.Enabled = caption_style_enabled;
+			caption_part.Hovered = caption_style_hovered;
 
 			auto label_skin = theme->CreateSkin<ion::gui::controls::GuiLabel>(caption_part);
 
 			//List box skin
-			/*ion::gui::controls::gui_list_box::ListBoxSkin list_box_skin;
-			list_box_skin.Parts.ModelObject = list_box_model;
-			list_box_skin.Parts.Center.SpriteObject = list_box_center;
-			list_box_skin.Parts.Top.SpriteObject = list_box_top;
-			list_box_skin.Parts.Left.SpriteObject = list_box_left;
-			list_box_skin.Parts.Bottom.SpriteObject = list_box_bottom;
-			list_box_skin.Parts.Right.SpriteObject = list_box_right;
-			list_box_skin.Parts.TopLeft.SpriteObject = list_box_top_left;
-			list_box_skin.Parts.BottomLeft.SpriteObject = list_box_bottom_left;
-			list_box_skin.Parts.TopRight.SpriteObject = list_box_top_right;
-			list_box_skin.Parts.BottomRight.SpriteObject = list_box_bottom_right;
-
-			list_box_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
-			list_box_skin.Parts.Center.DisabledMaterial = check_box_center_enabled;
-			list_box_skin.Parts.Center.HoveredMaterial = check_box_center_hovered;
-			list_box_skin.Parts.Top.EnabledMaterial = button_top_enabled;
-			list_box_skin.Parts.Top.FocusedMaterial = button_top_focused;
-			list_box_skin.Parts.Left.EnabledMaterial = button_left_enabled;
-			list_box_skin.Parts.Left.FocusedMaterial = button_left_focused;
-			list_box_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
-			list_box_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
-			list_box_skin.Parts.Right.EnabledMaterial = button_right_enabled;
-			list_box_skin.Parts.Right.FocusedMaterial = button_right_focused;
-			list_box_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
-			list_box_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
-			list_box_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
-			list_box_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
-			list_box_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
-			list_box_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
-			list_box_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
-			list_box_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
-
-			list_box_skin.Lines.TextObject = list_box_lines;
-			list_box_skin.Lines.EnabledStyle = caption_style_enabled;
-			list_box_skin.Lines.DisabledStyle = caption_style_disabled;
-
-			list_box_skin.Selection.SpriteObject = list_box_selection;
-			list_box_skin.Selection.EnabledMaterial = button_center_hovered;
-
-			list_box_skin.Caption.TextObject = list_box_caption;
-			list_box_skin.Caption.EnabledStyle = caption_style_enabled;
-			list_box_skin.Caption.DisabledStyle = caption_style_disabled;*/
-
 			parts = {};
 			parts.Center.Enabled = check_box_center_enabled;
 			parts.Center.Hovered = check_box_center_hovered;
@@ -2609,6 +1971,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			selection_part.FillColor.A(0.5_r);
 
 			ion::gui::skins::gui_skin::SkinTextPart lines_part;
+			lines_part.Base = caption_text;
 			lines_part.Enabled = caption_style_enabled;
 			lines_part.Disabled = caption_style_disabled;
 
@@ -2617,38 +1980,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			list_box_skin->AddTextPart("lines", lines_part); //Additional
 
 			//Progress bar skin
-			/*ion::gui::controls::gui_progress_bar::ProgressBarSkin progress_bar_skin;
-			progress_bar_skin.Parts.ModelObject = progress_bar_model;
-			progress_bar_skin.Parts.Center.SpriteObject = progress_bar_center;
-			progress_bar_skin.Parts.Top.SpriteObject = progress_bar_top;
-			progress_bar_skin.Parts.Left.SpriteObject = progress_bar_left;
-			progress_bar_skin.Parts.Bottom.SpriteObject = progress_bar_bottom;
-			progress_bar_skin.Parts.Right.SpriteObject = progress_bar_right;
-			progress_bar_skin.Parts.TopLeft.SpriteObject = progress_bar_top_left;
-			progress_bar_skin.Parts.BottomLeft.SpriteObject = progress_bar_bottom_left;
-			progress_bar_skin.Parts.TopRight.SpriteObject = progress_bar_top_right;
-			progress_bar_skin.Parts.BottomRight.SpriteObject = progress_bar_bottom_right;
-
-			progress_bar_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
-			progress_bar_skin.Parts.Top.EnabledMaterial = button_top_enabled;
-			progress_bar_skin.Parts.Left.EnabledMaterial = button_left_enabled;
-			progress_bar_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
-			progress_bar_skin.Parts.Right.EnabledMaterial = button_right_enabled;
-			progress_bar_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
-			progress_bar_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
-			progress_bar_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
-			progress_bar_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
-
-			progress_bar_skin.Bar.SpriteObject = progress_bar_bar;
-			progress_bar_skin.Bar.EnabledMaterial = progress_bar_bar_enabled;
-
-			progress_bar_skin.BarInterpolated.SpriteObject = progress_bar_bar_interpolated;
-			progress_bar_skin.BarInterpolated.EnabledMaterial = progress_bar_bar_enabled;
-
-			progress_bar_skin.Caption.TextObject = progress_bar_caption;
-			progress_bar_skin.Caption.EnabledStyle = caption_style_enabled;
-			progress_bar_skin.Caption.DisabledStyle = caption_style_disabled;*/
-
 			parts = {};
 			parts.Center.Enabled = check_box_center_enabled;
 			parts.Border.Sides.Top.Enabled = button_top_enabled;
@@ -2678,52 +2009,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			progress_bar_skin->AddPart("bar-interpolated", bar_interpolated_part); //Additional
 
 			//Radio button skin
-			/*ion::gui::controls::gui_radio_button::RadioButtonSkin radio_button_skin;
-			radio_button_skin.Parts.ModelObject = radio_button_model;
-			radio_button_skin.Parts.Center.SpriteObject = radio_button_center;
-			radio_button_skin.Parts.Top.SpriteObject = radio_button_top;
-			radio_button_skin.Parts.Left.SpriteObject = radio_button_left;
-			radio_button_skin.Parts.Bottom.SpriteObject = radio_button_bottom;
-			radio_button_skin.Parts.Right.SpriteObject = radio_button_right;
-			radio_button_skin.Parts.TopLeft.SpriteObject = radio_button_top_left;
-			radio_button_skin.Parts.BottomLeft.SpriteObject = radio_button_bottom_left;
-			radio_button_skin.Parts.TopRight.SpriteObject = radio_button_top_right;
-			radio_button_skin.Parts.BottomRight.SpriteObject = radio_button_bottom_right;
-
-			radio_button_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
-			radio_button_skin.Parts.Center.DisabledMaterial = check_box_center_enabled;
-			radio_button_skin.Parts.Center.PressedMaterial = check_box_center_enabled;
-			radio_button_skin.Parts.Center.HoveredMaterial = check_box_center_hovered;
-			radio_button_skin.Parts.Top.EnabledMaterial = button_top_enabled;
-			radio_button_skin.Parts.Top.FocusedMaterial = button_top_focused;
-			radio_button_skin.Parts.Left.EnabledMaterial = button_left_enabled;
-			radio_button_skin.Parts.Left.FocusedMaterial = button_left_focused;
-			radio_button_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
-			radio_button_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
-			radio_button_skin.Parts.Right.EnabledMaterial = button_right_enabled;
-			radio_button_skin.Parts.Right.FocusedMaterial = button_right_focused;
-			radio_button_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
-			radio_button_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
-			radio_button_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
-			radio_button_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
-			radio_button_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
-			radio_button_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
-			radio_button_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
-			radio_button_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
-
-			radio_button_skin.CheckMark.SpriteObject = radio_button_select;
-			radio_button_skin.CheckMark.EnabledMaterial = radio_button_select_enabled;
-			radio_button_skin.CheckMark.DisabledMaterial = radio_button_select_disabled;
-			radio_button_skin.CheckMark.PressedMaterial = radio_button_select_pressed;
-			radio_button_skin.CheckMark.HoveredMaterial = radio_button_select_hovered;
-
-			radio_button_skin.Caption.TextObject = radio_button_caption;
-			radio_button_skin.Caption.EnabledStyle = caption_style_enabled;
-			radio_button_skin.Caption.DisabledStyle = caption_style_disabled;*/
-
 			parts = {};
 			parts.Center.Enabled = check_box_center_enabled;
-			parts.Center.Disabled = check_box_center_enabled;
 			parts.Center.Pressed = check_box_center_enabled;
 			parts.Center.Hovered = check_box_center_hovered;
 			parts.Border.Sides.Top.Enabled = button_top_enabled;
@@ -2758,50 +2045,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			radio_button_skin->AddPart("check-mark", check_mark_part); //Additional
 
 			//Slider skin
-			/*ion::gui::controls::gui_slider::SliderSkin slider_skin;
-			slider_skin.Parts.ModelObject = slider_model;
-			slider_skin.Parts.Center.SpriteObject = slider_center;
-			slider_skin.Parts.Top.SpriteObject = slider_top;
-			slider_skin.Parts.Left.SpriteObject = slider_left;
-			slider_skin.Parts.Bottom.SpriteObject = slider_bottom;
-			slider_skin.Parts.Right.SpriteObject = slider_right;
-			slider_skin.Parts.TopLeft.SpriteObject = slider_top_left;
-			slider_skin.Parts.BottomLeft.SpriteObject = slider_bottom_left;
-			slider_skin.Parts.TopRight.SpriteObject = slider_top_right;
-			slider_skin.Parts.BottomRight.SpriteObject = slider_bottom_right;
-
-			slider_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
-			slider_skin.Parts.Center.DisabledMaterial = check_box_center_enabled;
-			slider_skin.Parts.Center.PressedMaterial = check_box_center_enabled;
-			slider_skin.Parts.Center.HoveredMaterial = check_box_center_hovered;
-			slider_skin.Parts.Top.EnabledMaterial = button_top_enabled;
-			slider_skin.Parts.Top.FocusedMaterial = button_top_focused;
-			slider_skin.Parts.Left.EnabledMaterial = button_left_enabled;
-			slider_skin.Parts.Left.FocusedMaterial = button_left_focused;
-			slider_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
-			slider_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
-			slider_skin.Parts.Right.EnabledMaterial = button_right_enabled;
-			slider_skin.Parts.Right.FocusedMaterial = button_right_focused;
-			slider_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
-			slider_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
-			slider_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
-			slider_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
-			slider_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
-			slider_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
-			slider_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
-			slider_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
-
-			slider_skin.Handle.SpriteObject = slider_handle;
-			slider_skin.Handle.EnabledMaterial = radio_button_select_enabled;
-			slider_skin.Handle.DisabledMaterial = radio_button_select_disabled;
-			slider_skin.Handle.PressedMaterial = radio_button_select_pressed;
-			slider_skin.Handle.HoveredMaterial = radio_button_select_hovered;
-
-			slider_skin.Caption.TextObject = slider_caption;
-			slider_skin.Caption.EnabledStyle = caption_style_enabled;
-			slider_skin.Caption.DisabledStyle = caption_style_disabled;*/
-
-
 			parts = {};
 			parts.Center.Enabled = check_box_center_enabled;
 			parts.Center.Disabled = check_box_center_enabled;
@@ -2839,49 +2082,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			slider_skin->AddPart("handle", handle_part); //Additional
 
 			//Scroll bar skin
-			/*ion::gui::controls::gui_scroll_bar::ScrollBarSkin scroll_bar_skin;
-			scroll_bar_skin.Parts.ModelObject = scroll_bar_model;
-			scroll_bar_skin.Parts.Center.SpriteObject = scroll_bar_center;
-			scroll_bar_skin.Parts.Top.SpriteObject = scroll_bar_top;
-			scroll_bar_skin.Parts.Left.SpriteObject = scroll_bar_left;
-			scroll_bar_skin.Parts.Bottom.SpriteObject = scroll_bar_bottom;
-			scroll_bar_skin.Parts.Right.SpriteObject = scroll_bar_right;
-			scroll_bar_skin.Parts.TopLeft.SpriteObject = scroll_bar_top_left;
-			scroll_bar_skin.Parts.BottomLeft.SpriteObject = scroll_bar_bottom_left;
-			scroll_bar_skin.Parts.TopRight.SpriteObject = scroll_bar_top_right;
-			scroll_bar_skin.Parts.BottomRight.SpriteObject = scroll_bar_bottom_right;
-
-			scroll_bar_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
-			scroll_bar_skin.Parts.Center.DisabledMaterial = check_box_center_enabled;
-			scroll_bar_skin.Parts.Center.PressedMaterial = check_box_center_enabled;
-			scroll_bar_skin.Parts.Center.HoveredMaterial = check_box_center_hovered;
-			scroll_bar_skin.Parts.Top.EnabledMaterial = button_top_enabled;
-			scroll_bar_skin.Parts.Top.FocusedMaterial = button_top_focused;
-			scroll_bar_skin.Parts.Left.EnabledMaterial = button_left_enabled;
-			scroll_bar_skin.Parts.Left.FocusedMaterial = button_left_focused;
-			scroll_bar_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
-			scroll_bar_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
-			scroll_bar_skin.Parts.Right.EnabledMaterial = button_right_enabled;
-			scroll_bar_skin.Parts.Right.FocusedMaterial = button_right_focused;
-			scroll_bar_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
-			scroll_bar_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
-			scroll_bar_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
-			scroll_bar_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
-			scroll_bar_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
-			scroll_bar_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
-			scroll_bar_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
-			scroll_bar_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
-
-			scroll_bar_skin.Handle.SpriteObject = scroll_bar_handle;
-			scroll_bar_skin.Handle.EnabledMaterial = button_center_enabled;
-			scroll_bar_skin.Handle.DisabledMaterial = button_center_disabled;
-			scroll_bar_skin.Handle.PressedMaterial = button_center_pressed;
-			scroll_bar_skin.Handle.HoveredMaterial = button_center_hovered;
-
-			scroll_bar_skin.Caption.TextObject = scroll_bar_caption;
-			scroll_bar_skin.Caption.EnabledStyle = caption_style_enabled;
-			scroll_bar_skin.Caption.DisabledStyle = caption_style_disabled;*/
-
 			parts = {};
 			parts.Center.Enabled = check_box_center_enabled;
 			parts.Center.Disabled = check_box_center_enabled;
@@ -2919,53 +2119,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scroll_bar_skin->AddPart("handle", handle_part); //Additional
 
 			//Text box skin
-			/*ion::gui::controls::gui_text_box::TextBoxSkin text_box_skin;
-			text_box_skin.Parts.ModelObject = text_box_model;
-			text_box_skin.Parts.Center.SpriteObject = text_box_center;
-			text_box_skin.Parts.Top.SpriteObject = text_box_top;
-			text_box_skin.Parts.Left.SpriteObject = text_box_left;
-			text_box_skin.Parts.Bottom.SpriteObject = text_box_bottom;
-			text_box_skin.Parts.Right.SpriteObject = text_box_right;
-			text_box_skin.Parts.TopLeft.SpriteObject = text_box_top_left;
-			text_box_skin.Parts.BottomLeft.SpriteObject = text_box_bottom_left;
-			text_box_skin.Parts.TopRight.SpriteObject = text_box_top_right;
-			text_box_skin.Parts.BottomRight.SpriteObject = text_box_bottom_right;
-
-			text_box_skin.Parts.Center.EnabledMaterial = check_box_center_enabled;
-			text_box_skin.Parts.Center.DisabledMaterial = check_box_center_enabled;
-			text_box_skin.Parts.Center.HoveredMaterial = check_box_center_hovered;
-			text_box_skin.Parts.Top.EnabledMaterial = button_top_enabled;
-			text_box_skin.Parts.Top.FocusedMaterial = button_top_focused;
-			text_box_skin.Parts.Left.EnabledMaterial = button_left_enabled;
-			text_box_skin.Parts.Left.FocusedMaterial = button_left_focused;
-			text_box_skin.Parts.Bottom.EnabledMaterial = button_bottom_enabled;
-			text_box_skin.Parts.Bottom.FocusedMaterial = button_bottom_focused;
-			text_box_skin.Parts.Right.EnabledMaterial = button_right_enabled;
-			text_box_skin.Parts.Right.FocusedMaterial = button_right_focused;
-			text_box_skin.Parts.TopLeft.EnabledMaterial = button_top_left_enabled;
-			text_box_skin.Parts.TopLeft.FocusedMaterial = button_top_left_focused;
-			text_box_skin.Parts.BottomLeft.EnabledMaterial = button_bottom_left_enabled;
-			text_box_skin.Parts.BottomLeft.FocusedMaterial = button_bottom_left_focused;
-			text_box_skin.Parts.TopRight.EnabledMaterial = button_top_right_enabled;
-			text_box_skin.Parts.TopRight.FocusedMaterial = button_top_right_focused;
-			text_box_skin.Parts.BottomRight.EnabledMaterial = button_bottom_right_enabled;
-			text_box_skin.Parts.BottomRight.FocusedMaterial = button_bottom_right_focused;
-
-			text_box_skin.Text.TextObject = text_box_text;
-			text_box_skin.Text.EnabledStyle = caption_style_enabled;
-			text_box_skin.Text.DisabledStyle = caption_style_disabled;
-
-			text_box_skin.PlaceholderText.TextObject = text_box_placeholder_text;
-			text_box_skin.PlaceholderText.EnabledStyle = text_box_placeholder_style_enabled;
-			text_box_skin.PlaceholderText.DisabledStyle = text_box_placeholder_style_disabled;
-
-			text_box_skin.Cursor.SpriteObject = text_box_cursor;
-			text_box_skin.Cursor.EnabledMaterial = text_box_cursor_enabled;
-
-			text_box_skin.Caption.TextObject = text_box_caption;
-			text_box_skin.Caption.EnabledStyle = caption_style_enabled;
-			text_box_skin.Caption.DisabledStyle = caption_style_disabled;*/
-
 			parts = {};
 			parts.Center.Enabled = check_box_center_enabled;
 			parts.Center.Disabled = check_box_center_enabled;
@@ -2996,10 +2149,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			cursor_part.Enabled = text_box_cursor_enabled;
 
 			ion::gui::skins::gui_skin::SkinTextPart text_part;
+			text_part.Base = caption_text;
 			text_part.Enabled = caption_style_enabled;
 			text_part.Disabled = caption_style_disabled;
 
 			ion::gui::skins::gui_skin::SkinTextPart placeholder_text_part;
+			placeholder_text_part.Base = caption_text;
 			placeholder_text_part.Enabled = placeholder_text_style_enabled;
 			placeholder_text_part.Disabled = placeholder_text_style_disabled;
 
@@ -3010,52 +2165,51 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//GUI controls
+			controller.MouseCursorSkin(mouse_cursor_skin, 1.0_r); //TEMP
 
-			controller.MouseCursorSkin(mouse_cursor_skin, 1.0_r);
-
-			auto tooltip = controller.CreateTooltip("default_tooltip", *tooltip_skin, {});
+			auto tooltip = controller.CreateTooltip("default_tooltip", {});
 			tooltip->ZOrder(0.9_r);
 
 			auto main_frame = controller.CreateFrame("main");
 			auto base_panel = main_frame->CreatePanel("base");
 			base_panel->ZOrder(0.1_r);
 
-			auto slider = base_panel->CreateSlider("slider", *slider_skin, Vector2{1.0_r, 0.077_r}, "My slider", "My slider tooltip");
+			auto slider = base_panel->CreateSlider("slider", Vector2{1.0_r, 0.077_r}, "My slider", "My slider tooltip");
 			slider->Node()->Position({0.0_r, 0.6_r});
 			slider->Range(0, 20);
 			slider->StepByAmount(5);
 
-			/*auto label = base_panel->CreateLabel("label", *label_skin, {}, "My label");
+			auto label = base_panel->CreateLabel("label", {}, "My label");
 			label->Node()->Position({0.0_r, 0.5_r});
-			label->Tooltip("My label tooltip");*/
+			label->Tooltip("My label tooltip");
 
-			auto button = base_panel->CreateButton("button", *button_skin, Vector2{0.5_r, 0.1_r}, "My button", "My button tooltip");
+			auto button = base_panel->CreateButton("button", Vector2{0.5_r, 0.11_r}, "My button", "My button tooltip");
 			button->Node()->Position({0.0_r, 0.4_r});
 
-			auto check_box = base_panel->CreateCheckBox("check_box", *check_box_skin, {}, "My check box", "My check box tooltip");
+			auto check_box = base_panel->CreateCheckBox("check_box", Vector2{0.065_r, 0.065_r}, "My check box", "My check box tooltip");
 			check_box->Node()->Position({0.0_r, 0.3_r});
 
-			auto group_box = base_panel->CreateGroupBox("group_box", *group_box_skin, Vector2{1.0_r, 0.15_r}, "My group box");
+			auto group_box = base_panel->CreateGroupBox("group_box", Vector2{1.0_r, 0.15_r}, "My group box");
 			group_box->Node()->Position({0.0_r, 0.1_r});
 			group_box->Tooltip("My group box tooltip");
 
-			auto radio_button = base_panel->CreateRadioButton("radio_button", *radio_button_skin, {}, "My radio button", "My radio button tooltip");
+			auto radio_button = base_panel->CreateRadioButton("radio_button", Vector2{0.065_r, 0.065_r}, "My radio button", "My radio button tooltip");
 			radio_button->Node()->Position({-0.05_r, 0.0_r});
 			radio_button->CaptionLayout(ion::gui::controls::gui_control::ControlCaptionLayout::OutsideLeftCenter);
 
-			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", *radio_button_skin, {}, "My radio button", "My radio button tooltip");
+			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", Vector2{0.065_r, 0.065_r}, "My radio button", "My radio button tooltip");
 			radio_button2->Node()->Position({0.05_r, 0.0_r});
 
 			group_box->AddControl(radio_button);
 			group_box->AddControl(radio_button2);
 
-			auto progress_bar = base_panel->CreateProgressBar("progress_bar", *progress_bar_skin, Vector2{1.0_r, 0.077_r}, "My progress bar");
+			auto progress_bar = base_panel->CreateProgressBar("progress_bar", Vector2{1.0_r, 0.077_r}, "My progress bar");
 			progress_bar->Node()->Position({0.0_r, -0.1_r});
 			progress_bar->Tooltip("My progress bar tooltip");
 			progress_bar->Range(0.0_r, 100.0_r);
 			progress_bar->Position(75.0_r);
 
-			auto list_box = base_panel->CreateListBox("list_box", *list_box_skin, Vector2{0.5_r, 0.5_r}, "My list box");
+			auto list_box = base_panel->CreateListBox("list_box", Vector2{0.5_r, 0.5_r}, "My list box");
 			list_box->Node()->Position({0.8_r, 0.25_r});
 			list_box->Tooltip("My list box tooltip");
 			list_box->ItemHeightFactor(3.5_r);
@@ -3075,14 +2229,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{"My <b>10th</b> <font color='purple'>item</font>"s, ship}
 			});
 
-			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", *scroll_bar_skin, Vector2{0.077_r, 0.5_r}, "My scroll bar");
+			auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", Vector2{0.077_r, 0.5_r}, "My scroll bar");
 			scroll_bar->Node()->Position({1.1_r, 0.25_r});
 			scroll_bar->Tooltip("My scroll bar tooltip");
 			scroll_bar->Range(0, 50);
 			scroll_bar->StepByAmount(3);
 			scroll_bar->AttachedScrollable(list_box);
 
-			auto text_box = base_panel->CreateTextBox("text_box", *text_box_skin, Vector2{0.5_r, 0.1_r}, "My text box");		
+			auto text_box = base_panel->CreateTextBox("text_box", Vector2{0.5_r, 0.11_r}, "My text box");		
 			text_box->Node()->Position({0.0_r, -0.3_r});
 			text_box->Tooltip("My text box tooltip");
 			text_box->PlaceholderContent("<i><b>Type</b></i> something...");	
@@ -3097,9 +2251,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			cell.Alignment(ion::gui::gui_panel::GridCellAlignment::Left);
 			cell.VerticalAlignment(ion::gui::gui_panel::GridCellVerticalAlignment::Bottom);
 			
-			auto label = sub_panel->CreateLabel("label", *label_skin, {}, "My label");		
-			cell.AttachControl(label);		
-			label->Tooltip("My label tooltip");
+			auto label2 = sub_panel->CreateLabel("label", {}, "My label");		
+			cell.AttachControl(label2);		
+			label2->Tooltip("My label tooltip");
 
 			auto main_frame2 = controller.CreateFrame("main2");
 			auto base_panel2 = main_frame2->CreatePanel("base");
@@ -3111,6 +2265,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			main_frame->Activate();
 			main_frame->Focus();
+
 
 			//Camera
 			auto cam_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});

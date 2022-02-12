@@ -81,7 +81,7 @@ namespace ion::gui::skins
 
 			[[nodiscard]] inline operator bool() const noexcept
 			{
-				return Base && Enabled; //Required
+				return !!Base; //Required
 			}
 		};
 
