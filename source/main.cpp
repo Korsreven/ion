@@ -2333,7 +2333,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::gui::skins::gui_skin::SkinTextPart caption_part;
 			caption_part.Base = caption_text;
 
-			auto tooltip_skin = theme->CreateSkin<ion::gui::controls::GuiTooltip>("GuiTooltip", parts, caption_part);
+			auto tooltip_skin = theme->CreateSkin<ion::gui::controls::GuiTooltip>(parts, caption_part);
 
 			//Button skin
 			/*ion::gui::controls::gui_button::ButtonSkin button_skin;
@@ -2402,7 +2402,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			caption_part.Disabled = caption_style_disabled;
 			caption_part.Hovered = caption_style_hovered;
 
-			auto button_skin = theme->CreateSkin<ion::gui::controls::GuiButton>("GuiButton", parts, caption_part);
+			auto button_skin = theme->CreateSkin<ion::gui::controls::GuiButton>(parts, caption_part);
 
 			//Check box skin
 			/*ion::gui::controls::gui_check_box::CheckBoxSkin check_box_skin;
@@ -2481,7 +2481,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_mark_part.Pressed = check_box_mark_pressed;
 			check_mark_part.Hovered = check_box_mark_hovered;
 
-			auto check_box_skin = theme->CreateSkin<ion::gui::controls::GuiCheckBox>("GuiCheckBox", parts, caption_part);
+			auto check_box_skin = theme->CreateSkin<ion::gui::controls::GuiCheckBox>(parts, caption_part);
 			check_box_skin->AddPart("check-mark", check_mark_part); //Additional
 
 			//Group box skin
@@ -2524,7 +2524,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			caption_part.Enabled = caption_style_enabled;
 			caption_part.Disabled = caption_style_disabled;
 
-			auto group_box_skin = theme->CreateSkin<ion::gui::controls::GuiGroupBox>("GuiGroupBox", parts, caption_part);
+			auto group_box_skin = theme->CreateSkin<ion::gui::controls::GuiGroupBox>(parts, caption_part);
 
 			//Label skin
 			/*ion::gui::controls::gui_label::LabelSkin label_skin;
@@ -2533,7 +2533,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			caption_part = {};
 			caption_part.Base = caption_text;
 
-			auto label_skin = theme->CreateSkin<ion::gui::controls::GuiLabel>("GuiLabel", caption_part);
+			auto label_skin = theme->CreateSkin<ion::gui::controls::GuiLabel>(caption_part);
 
 			//List box skin
 			/*ion::gui::controls::gui_list_box::ListBoxSkin list_box_skin;
@@ -2612,7 +2612,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			lines_part.Enabled = caption_style_enabled;
 			lines_part.Disabled = caption_style_disabled;
 
-			auto list_box_skin = theme->CreateSkin<ion::gui::controls::GuiListBox>("GuiListBox", parts, caption_part);
+			auto list_box_skin = theme->CreateSkin<ion::gui::controls::GuiListBox>(parts, caption_part);
 			list_box_skin->AddPart("selection", selection_part); //Additional
 			list_box_skin->AddTextPart("lines", lines_part); //Additional
 
@@ -2673,7 +2673,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			bar_interpolated_part.Enabled = progress_bar_bar_enabled;
 			bar_interpolated_part.FillColor.A(0.65_r);
 
-			auto progress_bar_skin = theme->CreateSkin<ion::gui::controls::GuiProgressBar>("GuiProgressBar", parts, caption_part);
+			auto progress_bar_skin = theme->CreateSkin<ion::gui::controls::GuiProgressBar>(parts, caption_part);
 			progress_bar_skin->AddPart("bar", bar_part); //Additional
 			progress_bar_skin->AddPart("bar-interpolated", bar_interpolated_part); //Additional
 
@@ -2754,7 +2754,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_mark_part.Pressed = radio_button_select_pressed;
 			check_mark_part.Hovered = radio_button_select_hovered;
 
-			auto radio_button_skin = theme->CreateSkin<ion::gui::controls::GuiRadioButton>("GuiRadioButton", parts, caption_part);
+			auto radio_button_skin = theme->CreateSkin<ion::gui::controls::GuiRadioButton>(parts, caption_part);
 			radio_button_skin->AddPart("check-mark", check_mark_part); //Additional
 
 			//Slider skin
@@ -2835,7 +2835,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			handle_part.Pressed = radio_button_select_pressed;
 			handle_part.Hovered = radio_button_select_hovered;
 
-			auto slider_skin = theme->CreateSkin<ion::gui::controls::GuiSlider>("GuiSlider", parts, caption_part);
+			auto slider_skin = theme->CreateSkin<ion::gui::controls::GuiSlider>(parts, caption_part);
 			slider_skin->AddPart("handle", handle_part); //Additional
 
 			//Scroll bar skin
@@ -2915,7 +2915,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			handle_part.Pressed = button_center_pressed;
 			handle_part.Hovered = button_center_hovered;
 
-			auto scroll_bar_skin = theme->CreateSkin<ion::gui::controls::GuiScrollBar>("GuiScrollBar", parts, caption_part);
+			auto scroll_bar_skin = theme->CreateSkin<ion::gui::controls::GuiScrollBar>(parts, caption_part);
 			scroll_bar_skin->AddPart("handle", handle_part); //Additional
 
 			//Text box skin
@@ -3003,7 +3003,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			placeholder_text_part.Enabled = placeholder_text_style_enabled;
 			placeholder_text_part.Disabled = placeholder_text_style_disabled;
 
-			auto text_box_skin = theme->CreateSkin<ion::gui::controls::GuiTextBox>("GuiTextBox", parts, caption_part);
+			auto text_box_skin = theme->CreateSkin<ion::gui::controls::GuiTextBox>(parts, caption_part);
 			text_box_skin->AddPart("cursor", cursor_part); //Additional
 			text_box_skin->AddTextPart("text", text_part); //Additional
 			text_box_skin->AddTextPart("placeholder-text", placeholder_text_part); //Additional
