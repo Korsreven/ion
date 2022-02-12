@@ -18,7 +18,6 @@ File:	IonGuiController.cpp
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneNode.h"
-#include "memory/IonOwningPtr.h"
 
 namespace ion::gui
 {
@@ -267,6 +266,14 @@ void GuiController::Created(GuiFrame &frame) noexcept
 	frames_.push_back(&frame);
 }
 
+void GuiController::Created(controls::GuiMouseCursor &mouse_cursor) noexcept
+{
+	if (!active_mouse_cursor_)
+		active_mouse_cursor_ = &mouse_cursor;
+
+	mouse_cursors_.push_back(&mouse_cursor);
+}
+
 void GuiController::Created(controls::GuiTooltip &tooltip) noexcept
 {
 	if (!active_tooltip_)
@@ -306,6 +313,23 @@ void GuiController::Removed(GuiFrame &frame) noexcept
 	//Frame found
 	if (iter != std::end(frames_))
 		frames_.erase(iter);
+}
+
+void GuiController::Removed(controls::GuiMouseCursor &mouse_cursor) noexcept
+{
+	if (active_mouse_cursor_ == &mouse_cursor)
+		active_mouse_cursor_ = nullptr;
+
+	auto iter =
+		std::find_if(std::begin(mouse_cursors_), std::end(mouse_cursors_),
+			[&](auto &x) noexcept
+			{
+				return x == &mouse_cursor;
+			});
+
+	//Mouse cursor found
+	if (iter != std::end(mouse_cursors_))
+		mouse_cursors_.erase(iter);
 }
 
 void GuiController::Removed(controls::GuiTooltip &tooltip) noexcept
@@ -519,6 +543,14 @@ GuiController::~GuiController() noexcept
 /*
 	Modifiers
 */
+
+void GuiController::ActiveMouseCursor(std::string_view name) noexcept
+{
+	if (active_mouse_cursor_)
+		active_mouse_cursor_->GuiComponent::Hide(); //Hide immediately
+
+	active_mouse_cursor_ = GetMouseCursor(name).get();
+}
 
 void GuiController::ActiveTooltip(std::string_view name) noexcept
 {
@@ -877,6 +909,84 @@ bool GuiController::RemoveFrame(GuiFrame &frame) noexcept
 }
 
 bool GuiController::RemoveFrame(std::string_view name) noexcept
+{
+	return RemoveComponent(name);
+}
+
+
+/*
+	Mouse cursors
+	Creating
+*/
+
+NonOwningPtr<controls::GuiMouseCursor> GuiController::CreateMouseCursor(std::string name, const std::optional<Vector2> &size)
+{
+	//Find the default skin for gui mouse cursor
+	if (auto skin_name = skins::GuiSkin::GetDefaultSkinName<controls::GuiMouseCursor>(); skin_name)
+	{
+		if (auto skin = GetSkin(*skin_name); skin)
+			return CreateMouseCursor(std::move(name), *skin, size);
+	}
+
+	return CreateComponent<controls::GuiMouseCursor>(std::move(name), size);
+}
+
+NonOwningPtr<controls::GuiMouseCursor> GuiController::CreateMouseCursor(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size)
+{
+	return CreateComponent<controls::GuiMouseCursor>(std::move(name), skin, size);
+}
+
+NonOwningPtr<controls::GuiMouseCursor> GuiController::CreateMouseCursor(controls::GuiMouseCursor &&mouse_cursor)
+{
+	return CreateComponent<controls::GuiMouseCursor>(std::move(mouse_cursor));
+}
+
+
+/*
+	Mouse cursors
+	Retrieving
+*/
+
+[[nodiscard]] NonOwningPtr<controls::GuiMouseCursor> GuiController::GetMouseCursor(std::string_view name) noexcept
+{
+	return dynamic_pointer_cast<controls::GuiMouseCursor>(GetComponent(name));
+}
+
+[[nodiscard]] NonOwningPtr<const controls::GuiMouseCursor> GuiController::GetMouseCursor(std::string_view name) const noexcept
+{
+	return dynamic_pointer_cast<const controls::GuiMouseCursor>(GetComponent(name));
+}
+
+
+/*
+	Mouse cursors
+	Removing
+*/
+
+void GuiController::ClearMouseCursors() noexcept
+{
+	auto mouse_cursors = std::move(mouse_cursors_);
+
+	for (auto &mouse_cursor : mouse_cursors)
+	{
+		if (RemoveMouseCursor(*mouse_cursor))
+			mouse_cursor = nullptr;
+	}
+
+	mouse_cursors.erase(
+		std::remove(std::begin(mouse_cursors), std::end(mouse_cursors), nullptr),
+		std::end(mouse_cursors));
+
+	mouse_cursors_ = std::move(mouse_cursors);
+	mouse_cursors_.shrink_to_fit();
+}
+
+bool GuiController::RemoveMouseCursor(controls::GuiMouseCursor &mouse_cursor) noexcept
+{
+	return RemoveComponent(mouse_cursor);
+}
+
+bool GuiController::RemoveMouseCursor(std::string_view name) noexcept
 {
 	return RemoveComponent(name);
 }

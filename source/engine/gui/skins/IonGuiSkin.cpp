@@ -24,6 +24,7 @@ File:	IonGuiSkin.cpp
 #include "gui/controls/IonGuiGroupBox.h"
 #include "gui/controls/IonGuiLabel.h"
 #include "gui/controls/IonGuiListBox.h"
+#include "gui/controls/IonGuiMouseCursor.h"
 #include "gui/controls/IonGuiProgressBar.h"
 #include "gui/controls/IonGuiRadioButton.h"
 #include "gui/controls/IonGuiScrollBar.h"
@@ -472,6 +473,13 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &
 	return list_box_skin;
 }
 
+OwningPtr<controls::gui_control::ControlSkin> make_mouse_cursor_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
+{
+	auto mouse_cursor_skin = make_owning<controls::gui_mouse_cursor::MouseCursorSkin>();
+	mouse_cursor_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
+	return mouse_cursor_skin;
+}
+
 OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto progress_bar_skin = make_owning<controls::gui_progress_bar::ProgressBarSkin>();
@@ -700,6 +708,7 @@ void GuiSkin::RegisterBuiltInControls()
 		RegisterControl<controls::GuiGroupBox>("GuiGroupBox", detail::make_group_box_skin);
 		RegisterControl<controls::GuiLabel>("GuiLabel", detail::make_label_skin);
 		RegisterControl<controls::GuiListBox>("GuiListBox", detail::make_list_box_skin);
+		RegisterControl<controls::GuiMouseCursor>("GuiMouseCursor", detail::make_mouse_cursor_skin);
 		RegisterControl<controls::GuiProgressBar>("GuiProgressBar", detail::make_progress_bar_skin);
 		RegisterControl<controls::GuiRadioButton>("GuiRadioButton", detail::make_radio_button_skin);
 		RegisterControl<controls::GuiScrollBar>("GuiScrollBar", detail::make_scroll_bar_skin);

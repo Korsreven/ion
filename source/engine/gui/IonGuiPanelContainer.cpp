@@ -19,7 +19,6 @@ File:	IonGuiPanelContainer.cpp
 #include "IonGuiFrame.h"
 #include "IonGuiPanel.h"
 #include "controls/IonGuiControl.h"
-#include "memory/IonOwningPtr.h"
 #include "skins/IonGuiTheme.h"
 
 namespace ion::gui
