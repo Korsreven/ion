@@ -209,9 +209,9 @@ namespace ion::gui
 				return static_pointer_cast<T>(ptr);
 			}
 
-			//Create an control of type T with the given name, size and arguments
+			//Create an control of type T with the given name and arguments
 			template <typename T, typename... Args>
-			auto CreateControl(std::string name, const std::optional<Vector2> &size, Args &&...args)
+			auto CreateControl(std::string name, Args &&...args)
 			{
 				static_assert(std::is_base_of_v<controls::GuiControl, T>);
 
@@ -219,20 +219,20 @@ namespace ion::gui
 				if (auto skin_name = skins::GuiSkin::GetDefaultSkinName<T>(); skin_name)
 				{
 					if (auto skin = GetSkin(*skin_name); skin)
-						return CreateControl<T>(std::move(name), *skin, size, std::forward<Args>(args)...);
+						return CreateControl<T>(std::move(name), *skin, std::forward<Args>(args)...);
 				}
 
-				auto ptr = CreateComponent<T>(std::move(name), size, std::forward<Args>(args)...);
+				auto ptr = CreateComponent<T>(std::move(name), std::forward<Args>(args)...);
 				return static_pointer_cast<T>(ptr);
 			}
 
-			//Create an control of type T with the given name and arguments
+			//Create an control of type T with the given name
 			template <typename T, typename... Args>
-			auto CreateControl(std::string name, Args &&...args)
+			auto CreateControl(std::string name)
 			{
 				static_assert(std::is_base_of_v<controls::GuiControl, T>);
 
-				auto ptr = CreateComponent<T>(std::move(name), std::forward<Args>(args)...);
+				auto ptr = CreateComponent<T>(std::move(name));
 				return static_pointer_cast<T>(ptr);
 			}
 

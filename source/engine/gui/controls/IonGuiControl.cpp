@@ -944,10 +944,19 @@ GuiControl::GuiControl(std::string name) :
 	//Empty
 }
 
-GuiControl::GuiControl(std::string name, const Vector2 &size) :
+GuiControl::GuiControl(std::string name, const std::optional<Vector2> &size) :
 
 	GuiComponent{std::move(name)},
 	size_{size}
+{
+	//Empty
+}
+
+GuiControl::GuiControl(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size) :
+
+	GuiComponent{std::move(name)},
+	skin_{skin.Instantiate()},
+	size_{size ? size : (skin_ ? detail::get_size(*skin_, true) : std::nullopt)}
 {
 	//Empty
 }

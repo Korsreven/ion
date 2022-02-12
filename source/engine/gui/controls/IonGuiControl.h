@@ -499,8 +499,11 @@ namespace ion::gui::controls
 			//Construct a control with the given name
 			explicit GuiControl(std::string name);
 
-			//Construct a control with the given name and hit size
-			GuiControl(std::string name, const Vector2 &size);
+			//Construct a control with the given name and size
+			GuiControl(std::string name, const std::optional<Vector2> &size);
+
+			//Construct a control with the given name, skin and size
+			GuiControl(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size);
 
 
 			//Construct a control with the given name, size, caption, tooltip and hit boxes
