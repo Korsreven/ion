@@ -78,9 +78,15 @@ void update_bar(gui_control::ControlVisualPart &bar, ProgressBarType type, bool 
 		auto [bar_width, bar_height] = bar->Size().XY();
 
 		if (type == ProgressBarType::Vertical)
+		{
+			bar_width = width;
 			bar_height = height * percent;
+		}
 		else
+		{
 			bar_width = width * percent;
+			bar_height = height;
+		}
 
 		if (auto bar_size = Vector2{bar_width, bar_height};
 			bar_size != bar->Size())
