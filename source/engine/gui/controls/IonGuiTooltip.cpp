@@ -55,6 +55,42 @@ Vector2 in_view_offset(const Aabb &tooltip_area, const Aabb &view_area) noexcept
 	return {x, y};
 }
 
+Vector2 hot_spot_offset(gui_mouse_cursor::MouseCursorHotSpot hot_spot, const Vector2 &tooltip_size, const Vector2 &cursor_size) noexcept
+{
+	auto [half_width, half_height] = (tooltip_size * 0.5_r).XY();
+	auto [cursor_width, cursor_height] = cursor_size.XY();
+
+	switch (hot_spot)
+	{
+		case gui_mouse_cursor::MouseCursorHotSpot::TopLeft:
+		return {half_width, -half_height - cursor_height};
+
+		case gui_mouse_cursor::MouseCursorHotSpot::TopCenter:
+		return {0.0_r, -half_height - cursor_height};
+
+		case gui_mouse_cursor::MouseCursorHotSpot::TopRight:
+		return {-half_width, -half_height - cursor_height};
+
+		case gui_mouse_cursor::MouseCursorHotSpot::Left:
+		return {half_width, -half_height - cursor_height * 0.5_r};
+
+		case gui_mouse_cursor::MouseCursorHotSpot::Right:
+		return {-half_width, -half_height - cursor_height * 0.5_r};
+
+		case gui_mouse_cursor::MouseCursorHotSpot::BottomLeft:
+		return {half_width, half_height + cursor_height};
+
+		case gui_mouse_cursor::MouseCursorHotSpot::BottomCenter:
+		return {0.0_r, half_height + cursor_height};
+
+		case gui_mouse_cursor::MouseCursorHotSpot::BottomRight:
+		return {-half_width, half_height + cursor_height};
+
+		default:
+		return {0.0_r, -half_height - cursor_height * 0.5_r};
+	}
+}
+
 } //gui_tooltip::detail
 
 
@@ -158,20 +194,25 @@ void GuiTooltip::UpdatePosition(Vector2 position) noexcept
 			auto size =
 				size_.value_or(vector2::Zero) * node_->DerivedScaling();
 
-			auto cursor_size =
-				[&]() noexcept
+			//Custom cursor
+			if (auto mouse_cursor = controller->ActiveMouseCursor(); mouse_cursor)
+			{
+				if (auto mouse_cursor_node = mouse_cursor->Node(); mouse_cursor_node)
 				{
-					if (auto mouse_cursor_skin = controller->MouseCursorSkin(); mouse_cursor_skin)
-					{
-						if (auto cursor_node = mouse_cursor_skin->ParentNode(); cursor_node)
-							return mouse_cursor_skin->AxisAlignedBoundingBox().ToSize() * cursor_node->DerivedScaling();
-					}
+					auto cursor_size =
+						mouse_cursor->Size().value_or(vector2::Zero) * mouse_cursor_node->DerivedScaling();
+					
+					//Adjust tooltip position based on cursor hot spot
+					position += detail::hot_spot_offset(mouse_cursor->HotSpot(), size, cursor_size);
+				}
+			}
+			else //OS cursor
+			{
+				auto cursor_size = vector2::Zero; //OS cursor size?
 
-					return vector2::Zero; //OS cursor size?
-				}();
-
-			//Adjust tooltip position based on cursor hot spot
-			position += gui_controller::detail::tooltip_hot_spot_offset(controller->MouseCursorHotSpot(), size, cursor_size);
+				//Adjust tooltip position based on cursor hot spot
+				position += detail::hot_spot_offset(gui_mouse_cursor::MouseCursorHotSpot::TopLeft, size, cursor_size);
+			}
 		}
 
 		node_->DerivedPosition(position);

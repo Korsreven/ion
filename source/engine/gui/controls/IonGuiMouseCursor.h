@@ -17,10 +17,13 @@ File:	IonGuiMouseCursor.h
 #include <string>
 
 #include "IonGuiControl.h"
+#include "graphics/utilities/IonVector2.h"
 #include "memory/IonOwningPtr.h"
 
 namespace ion::gui::controls
 {
+	using namespace graphics::utilities;
+
 	namespace gui_mouse_cursor
 	{
 		enum class MouseCursorHotSpot
@@ -39,6 +42,7 @@ namespace ion::gui::controls
 
 		namespace detail
 		{
+			Vector2 hot_spot_offset(MouseCursorHotSpot hot_spot, const Vector2 &cursor_size) noexcept;
 		} //detail
 	} //gui_mouse_cursor
 
@@ -59,6 +63,9 @@ namespace ion::gui::controls
 			*/
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
+
+			virtual void AttachSkin() override;
+			void UpdatePosition(Vector2 position) noexcept;
 
 		public:
 
@@ -91,6 +98,15 @@ namespace ion::gui::controls
 			{
 				return hot_spot_;
 			}
+
+
+			/*
+				Mouse events
+			*/
+
+			//Called from gui control when the mouse has been moved
+			//Returns true if the mouse move event has been consumed by the mouse cursor
+			virtual bool MouseMoved(Vector2 position) noexcept override;
 	};
 
 } //ion::gui::controls

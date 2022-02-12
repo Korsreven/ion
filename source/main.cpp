@@ -655,7 +655,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto raindrop_diffuse = textures.CreateTexture("raindrop", "raindrop.png");
 			auto color_spectrum_diffuse = textures.CreateTexture("color_spectrum", "color_spectrum.png");
 
-			//GUI textures
+			//GUI
+			//Mouse cursor
 			auto mouse_cursor_diffuse = textures.CreateTexture("mouse_cursor_diffuse", "mouse_cursor.png");
 
 			//Tooltip
@@ -1181,15 +1182,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{0.0_r, 0.0_r, 0.0_r},
 					32.0_r, cat_running, nullptr, nullptr);
 
-			//GUI materials
-			auto mouse_cursor =
+			//GUI
+			//Mouse cursor materials
+			auto mouse_cursor_enabled =
 				materials.CreateMaterial("mouse_cursor",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					0.0_r, mouse_cursor_diffuse, nullptr, nullptr);
-			mouse_cursor->LightingEnabled(false);
+			mouse_cursor_enabled->LightingEnabled(false);
 
 			//Tooltip materials
 			auto tooltip_center_enabled =
@@ -1814,24 +1816,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			ion::gui::GuiController controller{scene_graph->RootNode()};
 			controller.ZOrder(-2.0_r);
-			controller.MouseCursorHotSpot(ion::gui::gui_controller::GuiMouseCursorHotSpot::TopLeft);
 
-			//GUI theme
+			//Theme
 			auto theme = controller.CreateTheme("default", scene_manager);
 
-			//Mouse cursor skin (TODO)
-			auto mouse_cursor_model = scene_manager->CreateModel();
-			auto mouse_cursor_sprite = mouse_cursor_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r}, mouse_cursor}); //Mouse cursor
+			//Mouse cursor skin
+			ion::gui::skins::gui_skin::SkinParts parts;
+			parts.Center.Enabled = mouse_cursor_enabled;
 
-			mouse_cursor_sprite->AutoSize(true);
-			mouse_cursor_model->AddPass(ion::graphics::render::Pass{});
-
-			ion::gui::gui_controller::GuiMouseCursorSkin mouse_cursor_skin;
-			mouse_cursor_skin.ModelObject = mouse_cursor_model;
+			auto mouse_cursor_skin = theme->CreateSkin<ion::gui::controls::GuiMouseCursor>(parts);
 
 			//Tooltip skin
-			ion::gui::skins::gui_skin::SkinParts parts;
+			parts = {};
 			parts.Center.Enabled = tooltip_center_enabled;
 			parts.Center.FillColor.A(0.9_r);
 			parts.Border.Sides.Top.Enabled = tooltip_top_enabled;
@@ -2165,10 +2161,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			text_box_skin->AddTextPart("placeholder-text", placeholder_text_part); //Additional
 
 
-			//GUI controls
-			controller.MouseCursorSkin(mouse_cursor_skin, 1.0_r); //TEMP
+			//Controls
+			auto mouse_cursor = controller.CreateMouseCursor("mouse_cursor", {});
+			mouse_cursor->ZOrder(1.0_r);
 
-			auto tooltip = controller.CreateTooltip("default_tooltip", {});
+			auto tooltip = controller.CreateTooltip("tooltip", {});
 			tooltip->ZOrder(0.9_r);
 
 			auto main_frame = controller.CreateFrame("main");

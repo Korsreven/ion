@@ -52,73 +52,42 @@ namespace ion::gui
 	using namespace graphics::scene::graph;
 	using namespace graphics::utilities;
 
-	namespace gui_controller
+	namespace gui_controller::detail
 	{
-		enum class GuiMouseCursorHotSpot
+		using frame_pointers = std::vector<GuiFrame*>;
+		using mouse_cursor_pointers = std::vector<controls::GuiMouseCursor*>;
+		using tooltip_pointers = std::vector<controls::GuiTooltip*>;
+
+		struct layer
 		{
-			TopLeft,	TopCenter,		TopRight,
-			Left,		Center,			Right,
-			BottomLeft, BottomCenter,	BottomRight
+			GuiFrame *current_frame = nullptr;
+			frame_pointers frames;		
 		};
 
-		struct GuiMouseCursorSkin final
+		using frames = std::vector<layer>;
+			//Only the active frames at the top (back) of the stack are interactive
+			//The rest of the active frames in the stack are non-interactive (but visible)
+
+
+		bool is_frame_on_top(const GuiFrame &frame, const frames &frames) noexcept;
+		bool is_frame_activated(const GuiFrame &frame, const frames &frames) noexcept;
+
+		void activate_frame(GuiFrame &frame, frames &to_frames) noexcept;
+		void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept;
+
+
+		std::optional<frame_pointers::const_iterator> get_frame_iterator(const frames &frames, GuiFrame *frame) noexcept;
+
+		inline auto get_next_frame_iterator(frame_pointers::const_iterator iter, const frame_pointers &frames) noexcept
 		{
-			NonOwningPtr<graphics::scene::Model> ModelObject;
+			return iter >= std::end(frames) - 1 ? std::begin(frames) : iter + 1;
+		}
 
-
-			[[nodiscard]] inline operator bool() const noexcept
-			{
-				return !!ModelObject;
-			}
-
-			[[nodiscard]] inline auto operator->() const noexcept
-			{
-				return ModelObject.get();
-			}
-		};
-
-
-		namespace detail
+		inline auto get_previous_frame_iterator(frame_pointers::const_iterator iter, const frame_pointers &frames) noexcept
 		{
-			using frame_pointers = std::vector<GuiFrame*>;
-			using mouse_cursor_pointers = std::vector<controls::GuiMouseCursor*>;
-			using tooltip_pointers = std::vector<controls::GuiTooltip*>;
-
-			struct layer
-			{
-				GuiFrame *current_frame = nullptr;
-				frame_pointers frames;		
-			};
-
-			using frames = std::vector<layer>;
-				//Only the active frames at the top (back) of the stack are interactive
-				//The rest of the active frames in the stack are non-interactive (but visible)
-
-
-			bool is_frame_on_top(const GuiFrame &frame, const frames &frames) noexcept;
-			bool is_frame_activated(const GuiFrame &frame, const frames &frames) noexcept;
-
-			void activate_frame(GuiFrame &frame, frames &to_frames) noexcept;
-			void deactivate_frame(GuiFrame &frame, frames &from_frames) noexcept;
-
-
-			std::optional<frame_pointers::const_iterator> get_frame_iterator(const frames &frames, GuiFrame *frame) noexcept;
-
-			inline auto get_next_frame_iterator(frame_pointers::const_iterator iter, const frame_pointers &frames) noexcept
-			{
-				return iter >= std::end(frames) - 1 ? std::begin(frames) : iter + 1;
-			}
-
-			inline auto get_previous_frame_iterator(frame_pointers::const_iterator iter, const frame_pointers &frames) noexcept
-			{
-				return iter == std::begin(frames) ? std::end(frames) - 1 : iter - 1;
-			}
-
-
-			Vector2 cursor_hot_spot_offset(GuiMouseCursorHotSpot hot_spot, const Vector2 &cursor_size) noexcept;
-			Vector2 tooltip_hot_spot_offset(GuiMouseCursorHotSpot hot_spot, const Vector2 &tooltip_size, const Vector2 &cursor_size) noexcept;
-		} //detail
-	} //gui_controller
+			return iter == std::begin(frames) ? std::end(frames) - 1 : iter - 1;
+		}
+	} //gui_controller::detail
 
 
 	class GuiController final :
@@ -140,9 +109,6 @@ namespace ion::gui
 			skins::GuiTheme *active_theme_ = nullptr;
 			gui_controller::detail::frames active_frames_;
 			bool shift_pressed_ = false;
-
-			gui_controller::GuiMouseCursorSkin mouse_cursor_skin_;
-			gui_controller::GuiMouseCursorHotSpot mouse_cursor_hot_spot_ = gui_controller::GuiMouseCursorHotSpot::TopLeft;
 
 			gui_controller::detail::frame_pointers frames_;
 			gui_controller::detail::mouse_cursor_pointers mouse_cursors_;
@@ -213,24 +179,10 @@ namespace ion::gui
 			//See GuiComponent::Hidden for more details
 			virtual void Hidden() noexcept override final;
 
-
-			/*
-				Mouse cursor skin
-			*/
-
-			void AttachMouseCursorSkin(real z_order);
-			void DetachMouseCursorSkin() noexcept;
-			void RemoveMouseCursorSkin() noexcept;
-
-			void UpdateMouseCursor(const Vector2 &position) noexcept;
-
 		public:
 
 			//Construct a gui controller with the given parent node
 			explicit GuiController(SceneNode &parent_node);
-
-			//Destructor
-			~GuiController() noexcept;
 
 
 			/*
@@ -341,17 +293,6 @@ namespace ion::gui
 			void ActiveTheme(std::string_view name) noexcept;
 
 
-			//Sets the mouse cursor skin used by this controller to the given skin with the given z-order
-			void MouseCursorSkin(gui_controller::GuiMouseCursorSkin skin, real z_order) noexcept;
-
-			//Sets the mouse cursor hot spot to the given hot spot
-			//The point in the mouse cursor skin that interacts with other elements on the screen
-			inline void MouseCursorHotSpot(gui_controller::GuiMouseCursorHotSpot hot_spot) noexcept
-			{
-				mouse_cursor_hot_spot_ = hot_spot;
-			}
-
-
 			/*
 				Observers
 			*/
@@ -375,20 +316,6 @@ namespace ion::gui
 			[[nodiscard]] inline auto ActiveTheme() const noexcept
 			{
 				return active_theme_;
-			}
-
-
-			//Returns the mouse cursor skin used by this controller
-			[[nodiscard]] inline auto& MouseCursorSkin() const noexcept
-			{
-				return mouse_cursor_skin_;
-			}
-
-			//Returns the mouse cursor hot spot
-			//The point in the mouse cursor skin that interacts with other elements on the screen
-			[[nodiscard]] inline auto& MouseCursorHotSpot() const noexcept
-			{
-				return mouse_cursor_hot_spot_;
 			}
 
 

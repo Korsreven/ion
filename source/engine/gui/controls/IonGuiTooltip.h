@@ -17,6 +17,7 @@ File:	IonGuiTooltip.h
 #include <string>
 
 #include "IonGuiLabel.h"
+#include "IonGuiMouseCursor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "memory/IonOwningPtr.h"
 #include "types/IonCumulative.h"
@@ -52,6 +53,7 @@ namespace ion::gui::controls
 
 
 			Vector2 in_view_offset(const Aabb &tooltip_area, const Aabb &view_area) noexcept;
+			Vector2 hot_spot_offset(gui_mouse_cursor::MouseCursorHotSpot hot_spot, const Vector2 &tooltip_size, const Vector2 &cursor_size) noexcept;
 		} //detail
 	} //gui_tooltip
 

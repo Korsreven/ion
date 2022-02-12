@@ -117,78 +117,6 @@ std::optional<frame_pointers::const_iterator> get_frame_iterator(const frames &f
 	}
 }
 
-
-Vector2 cursor_hot_spot_offset(GuiMouseCursorHotSpot hot_spot, const Vector2 &cursor_size) noexcept
-{
-	auto [half_width, half_height] = (cursor_size * 0.5_r).XY();
-
-	switch (hot_spot)
-	{
-		case GuiMouseCursorHotSpot::TopLeft:
-		return {half_width, -half_height};
-
-		case GuiMouseCursorHotSpot::TopCenter:
-		return {0.0_r, -half_height};
-
-		case GuiMouseCursorHotSpot::TopRight:
-		return {-half_width, -half_height};
-
-		case GuiMouseCursorHotSpot::Left:
-		return {half_width, 0.0_r};
-
-		case GuiMouseCursorHotSpot::Right:
-		return {-half_width, 0.0_r};
-
-		case GuiMouseCursorHotSpot::BottomLeft:
-		return {half_width, half_height};
-
-		case GuiMouseCursorHotSpot::BottomCenter:
-		return {0.0_r, half_height};
-
-		case GuiMouseCursorHotSpot::BottomRight:
-		return {-half_width, half_height};
-
-		default:
-		return vector2::Zero;
-	}
-}
-
-Vector2 tooltip_hot_spot_offset(GuiMouseCursorHotSpot hot_spot, const Vector2 &tooltip_size, const Vector2 &cursor_size) noexcept
-{
-	auto [half_width, half_height] = (tooltip_size * 0.5_r).XY();
-	auto [cursor_width, cursor_height] = cursor_size.XY();
-
-	switch (hot_spot)
-	{
-		case gui_controller::GuiMouseCursorHotSpot::TopLeft:
-		return {half_width, -half_height - cursor_height};
-
-		case gui_controller::GuiMouseCursorHotSpot::TopCenter:
-		return {0.0_r, -half_height - cursor_height};
-
-		case gui_controller::GuiMouseCursorHotSpot::TopRight:
-		return {-half_width, -half_height - cursor_height};
-
-		case gui_controller::GuiMouseCursorHotSpot::Left:
-		return {half_width, -half_height - cursor_height * 0.5_r};
-
-		case gui_controller::GuiMouseCursorHotSpot::Right:
-		return {-half_width, -half_height - cursor_height * 0.5_r};
-
-		case gui_controller::GuiMouseCursorHotSpot::BottomLeft:
-		return {half_width, half_height + cursor_height};
-
-		case gui_controller::GuiMouseCursorHotSpot::BottomCenter:
-		return {0.0_r, half_height + cursor_height};
-
-		case gui_controller::GuiMouseCursorHotSpot::BottomRight:
-		return {-half_width, half_height + cursor_height};
-
-		default:
-		return {0.0_r, -half_height - cursor_height * 0.5_r};
-	}
-}
-
 } //gui_controller::detail
 
 
@@ -255,6 +183,8 @@ void GuiController::Created(GuiComponent &component) noexcept
 
 	if (auto frame = dynamic_cast<GuiFrame*>(&component); frame)
 		Created(*frame);
+	else if (auto mouse_cursor = dynamic_cast<controls::GuiMouseCursor*>(&component); mouse_cursor)
+		Created(*mouse_cursor);
 	else if (auto tooltip = dynamic_cast<controls::GuiTooltip*>(&component); tooltip)
 		Created(*tooltip);
 }
@@ -293,6 +223,8 @@ void GuiController::Removed(GuiComponent &component) noexcept
 {
 	if (auto frame = dynamic_cast<GuiFrame*>(&component); frame)
 		Removed(*frame);
+	else if (auto mouse_cursor = dynamic_cast<controls::GuiMouseCursor*>(&component); mouse_cursor)
+		Removed(*mouse_cursor);
 	else if (auto tooltip = dynamic_cast<controls::GuiTooltip*>(&component); tooltip)
 		Removed(*tooltip);
 
@@ -433,11 +365,8 @@ void GuiController::Disabled() noexcept
 
 void GuiController::Shown() noexcept
 {
-	if (mouse_cursor_skin_)
-	{
-		if (auto node = mouse_cursor_skin_->ParentNode(); node)
-			node->Visible(true);
-	}
+	if (active_mouse_cursor_)
+		active_mouse_cursor_->Show(); //Show immediately
 
 	for (auto &frame : Frames())
 	{
@@ -453,76 +382,13 @@ void GuiController::Shown() noexcept
 
 void GuiController::Hidden() noexcept
 {
+	if (active_mouse_cursor_)
+		active_mouse_cursor_->Hide(); //Hide immediately
+
 	if (active_tooltip_)
 		active_tooltip_->GuiComponent::Hide(); //Hide immediately
 
-	if (mouse_cursor_skin_)
-	{
-		if (auto node = mouse_cursor_skin_->ParentNode(); node)
-			node->Visible(false);
-	}
-
 	GuiContainer::Hidden(); //Use base functionality
-}
-
-
-/*
-	Mouse cursor skin
-*/
-
-void GuiController::AttachMouseCursorSkin(real z_order)
-{
-	if (mouse_cursor_skin_)
-	{
-		if (auto node = mouse_cursor_skin_->ParentNode(); node)
-			node->DetachObject(*mouse_cursor_skin_.ModelObject);
-		
-		if (node_) //Create node for cursor
-		{
-			auto mouse_cursor_node = node_->CreateChildNode({0.0_r, 0.0_r, z_order});
-			mouse_cursor_node->AttachObject(*mouse_cursor_skin_.ModelObject);
-			mouse_cursor_node->InheritRotation(false);
-			mouse_cursor_node->RotationOrigin(scene_node::NodeRotationOrigin::Local);
-		}
-	}
-}
-
-void GuiController::DetachMouseCursorSkin() noexcept
-{
-	if (mouse_cursor_skin_)
-	{
-		if (auto node = mouse_cursor_skin_->ParentNode(); node_ && node)
-			node_->RemoveChildNode(*node); //Remove cursor node
-	}
-}
-
-void GuiController::RemoveMouseCursorSkin() noexcept
-{
-	DetachMouseCursorSkin();
-
-	if (mouse_cursor_skin_)
-		mouse_cursor_skin_->Owner()->RemoveModel(*mouse_cursor_skin_.ModelObject); //Remove cursor
-
-	mouse_cursor_skin_ = {};
-}
-
-
-void GuiController::UpdateMouseCursor(const Vector2 &position) noexcept
-{
-	if (mouse_cursor_skin_)
-	{
-		if (auto node = mouse_cursor_skin_->ParentNode(); node)
-		{
-			auto cursor_size =
-				mouse_cursor_skin_->AxisAlignedBoundingBox().ToSize() * node->DerivedScaling();
-
-			//Adjust from center to hot spot
-			auto hot_spot_off =
-				detail::cursor_hot_spot_offset(mouse_cursor_hot_spot_, cursor_size);
-
-			node->DerivedPosition(position + hot_spot_off);
-		}
-	}
 }
 
 
@@ -534,11 +400,6 @@ GuiController::GuiController(SceneNode &parent_node)
 	FrameEvents().Subscribe(*this);
 }
 
-GuiController::~GuiController() noexcept
-{
-	RemoveMouseCursorSkin();
-}
-
 
 /*
 	Modifiers
@@ -547,7 +408,7 @@ GuiController::~GuiController() noexcept
 void GuiController::ActiveMouseCursor(std::string_view name) noexcept
 {
 	if (active_mouse_cursor_)
-		active_mouse_cursor_->GuiComponent::Hide(); //Hide immediately
+		active_mouse_cursor_->Hide(); //Hide immediately
 
 	active_mouse_cursor_ = GetMouseCursor(name).get();
 }
@@ -563,17 +424,6 @@ void GuiController::ActiveTooltip(std::string_view name) noexcept
 void GuiController::ActiveTheme(std::string_view name) noexcept
 {
 	active_theme_ = GetTheme(name).get();
-}
-
-
-void GuiController::MouseCursorSkin(gui_controller::GuiMouseCursorSkin skin, real z_order) noexcept
-{
-	if (mouse_cursor_skin_.ModelObject != skin.ModelObject)
-	{
-		RemoveMouseCursorSkin();
-		mouse_cursor_skin_ = std::move(skin);
-		AttachMouseCursorSkin(z_order);
-	}
 }
 
 
@@ -783,7 +633,8 @@ bool GuiController::MouseReleased(MouseButton button, Vector2 position) noexcept
 
 bool GuiController::MouseMoved(Vector2 position) noexcept
 {
-	UpdateMouseCursor(position);
+	if (active_mouse_cursor_)
+		active_mouse_cursor_->MouseMoved(position);
 
 	if (!enabled_)
 		return false;
@@ -1081,9 +932,10 @@ void GuiController::ClearComponents() noexcept
 	active_frames_.shrink_to_fit();
 
 	frames_.clear();
+	mouse_cursors_.clear();
 	tooltips_.clear();
 	GuiContainer::ClearComponents();
-		//This will go much faster because frames and tooltips are pre-cleared
+		//This will go much faster because frames, mouse cursors and tooltips are pre-cleared
 	
 	//Non-removable components will still be present
 	//Add them back to the controls/panels containers
@@ -1091,6 +943,7 @@ void GuiController::ClearComponents() noexcept
 		Created(component);
 
 	frames_.shrink_to_fit();
+	mouse_cursors_.shrink_to_fit();
 	tooltips_.shrink_to_fit();
 }
 
