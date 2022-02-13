@@ -1812,8 +1812,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//GUI
-			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
-
 			ion::gui::GuiController controller{scene_graph->RootNode()};
 			controller.ZOrder(-2.0_r);
 
@@ -2162,6 +2160,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//Controls
+			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
 			auto mouse_cursor = controller.CreateMouseCursor("mouse_cursor", {});
 			mouse_cursor->ZOrder(1.0_r);
 

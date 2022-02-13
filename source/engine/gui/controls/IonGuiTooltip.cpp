@@ -208,7 +208,24 @@ void GuiTooltip::UpdatePosition(Vector2 position) noexcept
 			}
 			else //OS cursor
 			{
-				auto cursor_size = vector2::Zero; //OS cursor size?
+				auto cursor_size =
+					[&]() noexcept
+					{
+						if (skin_ && skin_->Parts)
+						{
+							//Adjust cursor size from viewport to ortho space
+							if (auto scene_manager = skin_->Parts->Owner(); scene_manager)
+							{
+								if (auto viewport = scene_manager->ConnectedViewport(); viewport)
+								{
+									auto cursor_size = Vector2{20.0_r, 20.0_r}; //OS cursor size?
+									return cursor_size * viewport->ViewportToOrthoRatio();
+								}
+							}
+						}
+
+						return vector2::Zero;
+					}();
 
 				//Adjust tooltip position based on cursor hot spot
 				position += detail::hot_spot_offset(gui_mouse_cursor::MouseCursorHotSpot::TopLeft, size, cursor_size);
