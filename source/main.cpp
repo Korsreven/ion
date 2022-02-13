@@ -1905,6 +1905,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_mark_part.Disabled = check_box_mark_disabled;
 			check_mark_part.Pressed = check_box_mark_pressed;
 			check_mark_part.Hovered = check_box_mark_hovered;
+			check_mark_part.Scaling = 0.6_r;
 
 			auto check_box_skin = theme->CreateSkin<ion::gui::controls::GuiCheckBox>(parts, caption_part);
 			check_box_skin->AddPart("check-mark", check_mark_part); //Additional
@@ -2035,6 +2036,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_mark_part.Disabled = radio_button_select_disabled;
 			check_mark_part.Pressed = radio_button_select_pressed;
 			check_mark_part.Hovered = radio_button_select_hovered;
+			check_mark_part.Scaling = 0.6_r;
 
 			auto radio_button_skin = theme->CreateSkin<ion::gui::controls::GuiRadioButton>(parts, caption_part);
 			radio_button_skin->AddPart("check-mark", check_mark_part); //Additional
@@ -2072,6 +2074,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			handle_part.Disabled = radio_button_select_disabled;
 			handle_part.Pressed = radio_button_select_pressed;
 			handle_part.Hovered = radio_button_select_hovered;
+			handle_part.Scaling = {0.75_r, 1.5_r};
 
 			auto slider_skin = theme->CreateSkin<ion::gui::controls::GuiSlider>(parts, caption_part);
 			slider_skin->AddPart("handle", handle_part); //Additional
@@ -2183,18 +2186,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto button = base_panel->CreateButton("button", Vector2{0.5_r, 0.11_r}, "My button", "My button tooltip");
 			button->Node()->Position({0.0_r, 0.4_r});
 
-			auto check_box = base_panel->CreateCheckBox("check_box", Vector2{0.065_r, 0.065_r}, "My check box", "My check box tooltip");
+			auto check_box = base_panel->CreateCheckBox("check_box", Vector2{0.077_r, 0.077_r}, "My check box", "My check box tooltip");
 			check_box->Node()->Position({0.0_r, 0.3_r});
 
 			auto group_box = base_panel->CreateGroupBox("group_box", Vector2{1.0_r, 0.15_r}, "My group box");
 			group_box->Node()->Position({0.0_r, 0.1_r});
 			group_box->Tooltip("My group box tooltip");
 
-			auto radio_button = base_panel->CreateRadioButton("radio_button", Vector2{0.065_r, 0.065_r}, "My radio button", "My radio button tooltip");
+			auto radio_button = base_panel->CreateRadioButton("radio_button", Vector2{0.077_r, 0.077_r}, "My radio button", "My radio button tooltip");
 			radio_button->Node()->Position({-0.05_r, 0.0_r});
 			radio_button->CaptionLayout(ion::gui::controls::gui_control::ControlCaptionLayout::OutsideLeftCenter);
 
-			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", Vector2{0.065_r, 0.065_r}, "My radio button", "My radio button tooltip");
+			auto radio_button2 = base_panel->CreateRadioButton("radio_button2", Vector2{0.077_r, 0.077_r}, "My radio button", "My radio button tooltip");
 			radio_button2->Node()->Position({0.05_r, 0.0_r});
 
 			group_box->AddControl(radio_button);

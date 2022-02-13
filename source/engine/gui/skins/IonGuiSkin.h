@@ -28,6 +28,7 @@ File:	IonGuiSkin.h
 #include "graphics/render/IonPass.h"
 #include "graphics/scene/IonDrawableObject.h"
 #include "graphics/utilities/IonColor.h"
+#include "graphics/utilities/IonVector2.h"
 #include "gui/controls/IonGuiControl.h"
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
@@ -62,6 +63,8 @@ namespace ion::gui::skins
 			NonOwningPtr<graphics::materials::Material> Focused;
 			NonOwningPtr<graphics::materials::Material> Pressed;
 			NonOwningPtr<graphics::materials::Material> Hovered;
+
+			graphics::utilities::Vector2 Scaling = graphics::utilities::vector2::UnitScale;
 			graphics::utilities::Color FillColor = graphics::utilities::color::White;
 
 			[[nodiscard]] inline operator bool() const noexcept
