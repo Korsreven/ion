@@ -39,7 +39,7 @@ namespace ion::gui::controls
 
 		struct SliderSkin : gui_control::ControlSkin
 		{
-			gui_control::ControlVisualPart Handle;
+			gui_control::ControlSkinPart Handle;
 
 			//Copy from most derived
 			virtual void Assign(const ControlSkin &control_skin) noexcept

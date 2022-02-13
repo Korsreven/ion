@@ -489,20 +489,20 @@ void GuiTextBox::AttachSkin()
 		{
 			//Detach from previous parent (if any)
 			if (auto node = skin->Text->ParentNode(); node)
-				node->DetachObject(*skin->Text.TextObject);
+				node->DetachObject(*skin->Text.Object);
 		
 			//Attach text
-			skin_node_->AttachObject(*skin->Text.TextObject);
+			skin_node_->AttachObject(*skin->Text.Object);
 		}
 
 		if (skin->PlaceholderText)
 		{
 			//Detach from previous parent (if any)
 			if (auto node = skin->PlaceholderText->ParentNode(); node)
-				node->DetachObject(*skin->PlaceholderText.TextObject);
+				node->DetachObject(*skin->PlaceholderText.Object);
 		
 			//Attach placeholder text
-			skin_node_->AttachObject(*skin->PlaceholderText.TextObject);
+			skin_node_->AttachObject(*skin->PlaceholderText.Object);
 		}
 	}
 }
@@ -519,10 +519,10 @@ void GuiTextBox::RemoveSkin() noexcept
 		DetachSkin();
 
 		if (skin->Text && skin->Text->Owner())
-			skin->Text->Owner()->RemoveText(*skin->Text.TextObject); //Remove text
+			skin->Text->Owner()->RemoveText(*skin->Text.Object); //Remove text
 
 		if (skin->PlaceholderText && skin->PlaceholderText->Owner())
-			skin->PlaceholderText->Owner()->RemoveText(*skin->PlaceholderText.TextObject); //Remove placeholder text
+			skin->PlaceholderText->Owner()->RemoveText(*skin->PlaceholderText.Object); //Remove placeholder text
 	}
 
 	GuiControl::RemoveSkin(); //Use base functionality

@@ -29,7 +29,7 @@ namespace ion::gui::controls
 	{
 		struct CheckBoxSkin : gui_control::ControlSkin
 		{
-			gui_control::ControlVisualPart CheckMark;
+			gui_control::ControlSkinPart CheckMark;
 
 			//Copy from most derived
 			virtual void Assign(const ControlSkin &control_skin) noexcept

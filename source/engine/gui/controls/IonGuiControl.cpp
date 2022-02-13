@@ -47,10 +47,10 @@ void resize_part(graphics::scene::shapes::Sprite &sprite, const Vector2 &delta_s
 	sprite.Size(sprite.Size() + delta_size);
 }
 
-void resize_part(ControlVisualPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept
+void resize_part(ControlSkinPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept
 {
 	if (part)
-		resize_part(*part.SpriteObject, delta_size, delta_position, center);
+		resize_part(*part.Object, delta_size, delta_position, center);
 }
 
 void resize_skin(ControlSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept
@@ -638,7 +638,7 @@ void GuiControl::NotifyControlResized() noexcept
 	States
 */
 
-NonOwningPtr<graphics::materials::Material> GuiControl::GetStateMaterial(ControlState state, ControlVisualPart &part) noexcept
+NonOwningPtr<graphics::materials::Material> GuiControl::GetStateMaterial(ControlState state, ControlSkinPart &part) noexcept
 {
 	auto material = detail::control_state_to_material(state, part);
 
@@ -648,29 +648,29 @@ NonOwningPtr<graphics::materials::Material> GuiControl::GetStateMaterial(Control
 		//Check hovered
 		if (hovered_ && state != ControlState::Hovered)
 		{
-			if (part.HoveredMaterial)
-				return part.HoveredMaterial; //Display hovered material instead
+			if (part.Hovered)
+				return part.Hovered; //Display hovered material instead
 		}
 
 		//Check focused
 		if (focused_ && state != ControlState::Focused)
 		{
-			if (part.FocusedMaterial)
-				return part.FocusedMaterial; //Display focused material instead
+			if (part.Focused)
+				return part.Focused; //Display focused material instead
 		}
 
 		//Check enabled
 		if (state != ControlState::Enabled)
 		{
-			if (part.EnabledMaterial)
-				return part.EnabledMaterial; //Display enabled material instead
+			if (part.Enabled)
+				return part.Enabled; //Display enabled material instead
 		}
 	}
 
 	return material;
 }
 
-std::optional<graphics::fonts::text::TextBlockStyle>& GuiControl::GetStateStyle(ControlState state, ControlCaptionPart &part) noexcept
+std::optional<graphics::fonts::text::TextBlockStyle>& GuiControl::GetStateStyle(ControlState state, ControlSkinTextPart &part) noexcept
 {
 	auto &style = detail::control_state_to_style(state, part);
 
@@ -680,22 +680,22 @@ std::optional<graphics::fonts::text::TextBlockStyle>& GuiControl::GetStateStyle(
 		//Check hovered
 		if (hovered_ && state != ControlState::Hovered)
 		{
-			if (part.HoveredStyle)
-				return part.HoveredStyle; //Display hovered style instead
+			if (part.Hovered)
+				return part.Hovered; //Display hovered style instead
 		}
 
 		//Check focused
 		if (focused_ && state != ControlState::Focused)
 		{
-			if (part.FocusedStyle)
-				return part.FocusedStyle; //Display focused style instead
+			if (part.Focused)
+				return part.Focused; //Display focused style instead
 		}
 
 		//Check enabled
 		if (state != ControlState::Enabled)
 		{
-			if (part.EnabledStyle)
-				return part.EnabledStyle; //Display enabled style instead
+			if (part.Enabled)
+				return part.Enabled; //Display enabled style instead
 		}
 	}
 
@@ -703,7 +703,7 @@ std::optional<graphics::fonts::text::TextBlockStyle>& GuiControl::GetStateStyle(
 }
 
 
-void GuiControl::SetPartState(ControlState state, ControlVisualPart &part) noexcept
+void GuiControl::SetPartState(ControlState state, ControlSkinPart &part) noexcept
 {
 	if (part)
 	{
@@ -712,7 +712,7 @@ void GuiControl::SetPartState(ControlState state, ControlVisualPart &part) noexc
 	}
 }
 
-void GuiControl::SetCaptionState(ControlState state, ControlCaptionPart &part) noexcept
+void GuiControl::SetCaptionState(ControlState state, ControlSkinTextPart &part) noexcept
 {
 	if (part)
 	{
@@ -820,20 +820,20 @@ void GuiControl::AttachSkin()
 		{
 			//Detach from previous parent (if any)
 			if (auto node = skin_->Parts->ParentNode(); node)
-				node->DetachObject(*skin_->Parts.ModelObject);
+				node->DetachObject(*skin_->Parts.Object);
 			
 			//Attach parts model
-			skin_node_->AttachObject(*skin_->Parts.ModelObject);
+			skin_node_->AttachObject(*skin_->Parts.Object);
 		}
 
 		if (skin_->Caption)
 		{
 			//Detach from previous parent (if any)
 			if (auto node = skin_->Caption->ParentNode(); node)
-				node->DetachObject(*skin_->Caption.TextObject);
+				node->DetachObject(*skin_->Caption.Object);
 
 			//Attach caption text
-			skin_node_->AttachObject(*skin_->Caption.TextObject);
+			skin_node_->AttachObject(*skin_->Caption.Object);
 		}
 	}
 	
@@ -860,10 +860,10 @@ void GuiControl::RemoveSkin() noexcept
 		DetachSkin();
 
 		if (skin_->Parts && skin_->Parts->Owner())
-			skin_->Parts->Owner()->RemoveModel(*skin_->Parts.ModelObject); //Remove parts model
+			skin_->Parts->Owner()->RemoveModel(*skin_->Parts.Object); //Remove parts model
 
 		if (skin_->Caption && skin_->Caption->Owner())
-			skin_->Caption->Owner()->RemoveText(*skin_->Caption.TextObject); //Remove caption text
+			skin_->Caption->Owner()->RemoveText(*skin_->Caption.Object); //Remove caption text
 
 		skin_.reset();
 	}
@@ -1228,9 +1228,9 @@ bool GuiControl::Intersects(const Vector2 &point) const noexcept
 					if (skin_)
 					{
 						if (skin_->Parts)
-							return skin_->Parts.ModelObject.get();
+							return skin_->Parts.Object.get();
 						else if (skin_->Caption)
-							return skin_->Caption.TextObject.get();
+							return skin_->Caption.Object.get();
 					}
 
 					return nullptr;

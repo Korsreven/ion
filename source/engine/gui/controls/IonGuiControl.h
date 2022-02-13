@@ -91,84 +91,84 @@ namespace ion::gui::controls
 		using BoundingBoxes = std::vector<Aabb>;
 
 
-		struct ControlVisualPart final
+		struct ControlSkinPart final
 		{
-			NonOwningPtr<graphics::scene::shapes::Sprite> SpriteObject;
-			NonOwningPtr<graphics::materials::Material> EnabledMaterial;
-			NonOwningPtr<graphics::materials::Material> DisabledMaterial;
-			NonOwningPtr<graphics::materials::Material> FocusedMaterial;
-			NonOwningPtr<graphics::materials::Material> PressedMaterial;
-			NonOwningPtr<graphics::materials::Material> HoveredMaterial;
+			NonOwningPtr<graphics::scene::shapes::Sprite> Object;
+			NonOwningPtr<graphics::materials::Material> Enabled;
+			NonOwningPtr<graphics::materials::Material> Disabled;
+			NonOwningPtr<graphics::materials::Material> Focused;
+			NonOwningPtr<graphics::materials::Material> Pressed;
+			NonOwningPtr<graphics::materials::Material> Hovered;
 
 
 			[[nodiscard]] inline operator bool() const noexcept
 			{
-				return !!SpriteObject;
+				return !!Object;
 			}
 
 			[[nodiscard]] inline auto operator->() const noexcept
 			{
-				return SpriteObject.get();
+				return Object.get();
 			}
 		};
 
-		struct ControlVisualParts final
+		struct ControlSkinParts final
 		{
-			NonOwningPtr<graphics::scene::Model> ModelObject;
+			NonOwningPtr<graphics::scene::Model> Object;
 
 			//Center
-			ControlVisualPart Center;
+			ControlSkinPart Center;
 
 			//Sides
-			ControlVisualPart Top;
-			ControlVisualPart Left;
-			ControlVisualPart Bottom;
-			ControlVisualPart Right;
+			ControlSkinPart Top;
+			ControlSkinPart Left;
+			ControlSkinPart Bottom;
+			ControlSkinPart Right;
 
 			//Corners
-			ControlVisualPart TopLeft;
-			ControlVisualPart BottomLeft;
-			ControlVisualPart TopRight;
-			ControlVisualPart BottomRight;
+			ControlSkinPart TopLeft;
+			ControlSkinPart BottomLeft;
+			ControlSkinPart TopRight;
+			ControlSkinPart BottomRight;
 
 
 			[[nodiscard]] inline operator bool() const noexcept
 			{
-				return !!ModelObject;
+				return !!Object;
 			}
 
 			[[nodiscard]] inline auto operator->() const noexcept
 			{
-				return ModelObject.get();
+				return Object.get();
 			}
 		};
 
-		struct ControlCaptionPart final
+		struct ControlSkinTextPart final
 		{
-			NonOwningPtr<graphics::scene::DrawableText> TextObject;
-			std::optional<graphics::fonts::text::TextBlockStyle> EnabledStyle;
-			std::optional<graphics::fonts::text::TextBlockStyle> DisabledStyle;
-			std::optional<graphics::fonts::text::TextBlockStyle> FocusedStyle;
-			std::optional<graphics::fonts::text::TextBlockStyle> PressedStyle;
-			std::optional<graphics::fonts::text::TextBlockStyle> HoveredStyle;
+			NonOwningPtr<graphics::scene::DrawableText> Object;
+			std::optional<graphics::fonts::text::TextBlockStyle> Enabled;
+			std::optional<graphics::fonts::text::TextBlockStyle> Disabled;
+			std::optional<graphics::fonts::text::TextBlockStyle> Focused;
+			std::optional<graphics::fonts::text::TextBlockStyle> Pressed;
+			std::optional<graphics::fonts::text::TextBlockStyle> Hovered;
 
 
 			[[nodiscard]] inline operator bool() const noexcept
 			{
-				return !!TextObject;
+				return !!Object;
 			}
 
 			[[nodiscard]] inline auto operator->() const noexcept
 			{
-				return TextObject.get();
+				return Object.get();
 			}
 		};
 
 
 		struct ControlSkin
 		{
-			ControlVisualParts Parts;
-			ControlCaptionPart Caption;
+			ControlSkinParts Parts;
+			ControlSkinTextPart Caption;
 
 			//Default virtual destructor
 			virtual ~ControlSkin() = default;
@@ -191,47 +191,47 @@ namespace ion::gui::controls
 				States
 			*/
 
-			inline auto control_state_to_material(ControlState state, ControlVisualPart &part) noexcept
+			inline auto control_state_to_material(ControlState state, ControlSkinPart &part) noexcept
 			{
 				switch (state)
 				{
 					case ControlState::Disabled:
-					return part.DisabledMaterial;
+					return part.Disabled;
 
 					case ControlState::Focused:
-					return part.FocusedMaterial;
+					return part.Focused;
 
 					case ControlState::Pressed:
-					return part.PressedMaterial;
+					return part.Pressed;
 
 					case ControlState::Hovered:
-					return part.HoveredMaterial;
+					return part.Hovered;
 
 					case ControlState::Enabled:
 					default:
-					return part.EnabledMaterial;
+					return part.Enabled;
 				}
 			}
 
-			inline auto& control_state_to_style(ControlState state, ControlCaptionPart &part) noexcept
+			inline auto& control_state_to_style(ControlState state, ControlSkinTextPart &part) noexcept
 			{
 				switch (state)
 				{
 					case ControlState::Disabled:
-					return part.DisabledStyle;
+					return part.Disabled;
 
 					case ControlState::Focused:
-					return part.FocusedStyle;
+					return part.Focused;
 
 					case ControlState::Pressed:
-					return part.PressedStyle;
+					return part.Pressed;
 
 					case ControlState::Hovered:
-					return part.HoveredStyle;
+					return part.Hovered;
 
 					case ControlState::Enabled:
 					default:
-					return part.EnabledStyle;
+					return part.Enabled;
 				}
 			}
 
@@ -241,7 +241,7 @@ namespace ion::gui::controls
 			*/
 
 			void resize_part(graphics::scene::shapes::Sprite &sprite, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept;
-			void resize_part(ControlVisualPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept;		
+			void resize_part(ControlSkinPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept;		
 			void resize_skin(ControlSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 
 			void resize_hit_box(Aabb &hit_box, const Vector2 &scaling) noexcept;
@@ -472,11 +472,11 @@ namespace ion::gui::controls
 				States
 			*/
 			
-			NonOwningPtr<graphics::materials::Material> GetStateMaterial(gui_control::ControlState state, gui_control::ControlVisualPart &part) noexcept;
-			std::optional<graphics::fonts::text::TextBlockStyle>& GetStateStyle(gui_control::ControlState state, gui_control::ControlCaptionPart &part) noexcept;
+			NonOwningPtr<graphics::materials::Material> GetStateMaterial(gui_control::ControlState state, gui_control::ControlSkinPart &part) noexcept;
+			std::optional<graphics::fonts::text::TextBlockStyle>& GetStateStyle(gui_control::ControlState state, gui_control::ControlSkinTextPart &part) noexcept;
 
-			void SetPartState(gui_control::ControlState state, gui_control::ControlVisualPart &part) noexcept;
-			void SetCaptionState(gui_control::ControlState state, gui_control::ControlCaptionPart &part) noexcept;
+			void SetPartState(gui_control::ControlState state, gui_control::ControlSkinPart &part) noexcept;
+			void SetCaptionState(gui_control::ControlState state, gui_control::ControlSkinTextPart &part) noexcept;
 			void SetSkinState(gui_control::ControlState state, gui_control::ControlSkin &skin) noexcept;
 
 			virtual void SetState(gui_control::ControlState state) noexcept;

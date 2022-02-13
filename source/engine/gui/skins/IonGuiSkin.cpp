@@ -75,7 +75,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			else
 				model->AddPasses(skin.GetPasses());
 
-			control_skin.Parts.ModelObject = model;
+			control_skin.Parts.Object = model;
 
 			//Center part
 			if (center_part && *center_part)
@@ -85,12 +85,12 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);	
 
-				control_skin.Parts.Center.SpriteObject = sprite;
-				control_skin.Parts.Center.EnabledMaterial = center_part->Enabled;
-				control_skin.Parts.Center.DisabledMaterial = center_part->Disabled;
-				control_skin.Parts.Center.FocusedMaterial = center_part->Focused;
-				control_skin.Parts.Center.PressedMaterial = center_part->Pressed;
-				control_skin.Parts.Center.HoveredMaterial = center_part->Hovered;
+				control_skin.Parts.Center.Object = sprite;
+				control_skin.Parts.Center.Enabled = center_part->Enabled;
+				control_skin.Parts.Center.Disabled = center_part->Disabled;
+				control_skin.Parts.Center.Focused = center_part->Focused;
+				control_skin.Parts.Center.Pressed = center_part->Pressed;
+				control_skin.Parts.Center.Hovered = center_part->Hovered;
 			}
 
 			//Sides
@@ -102,12 +102,12 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);			
 
-				control_skin.Parts.Top.SpriteObject = sprite;
-				control_skin.Parts.Top.EnabledMaterial = top_part->Enabled;
-				control_skin.Parts.Top.DisabledMaterial = top_part->Disabled;
-				control_skin.Parts.Top.FocusedMaterial = top_part->Focused;
-				control_skin.Parts.Top.PressedMaterial = top_part->Pressed;
-				control_skin.Parts.Top.HoveredMaterial = top_part->Hovered;
+				control_skin.Parts.Top.Object = sprite;
+				control_skin.Parts.Top.Enabled = top_part->Enabled;
+				control_skin.Parts.Top.Disabled = top_part->Disabled;
+				control_skin.Parts.Top.Focused = top_part->Focused;
+				control_skin.Parts.Top.Pressed = top_part->Pressed;
+				control_skin.Parts.Top.Hovered = top_part->Hovered;
 			}
 
 			//Bottom part
@@ -118,12 +118,12 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);
 
-				control_skin.Parts.Bottom.SpriteObject = sprite;
-				control_skin.Parts.Bottom.EnabledMaterial = bottom_part->Enabled;
-				control_skin.Parts.Bottom.DisabledMaterial = bottom_part->Disabled;
-				control_skin.Parts.Bottom.FocusedMaterial = bottom_part->Focused;
-				control_skin.Parts.Bottom.PressedMaterial = bottom_part->Pressed;
-				control_skin.Parts.Bottom.HoveredMaterial = bottom_part->Hovered;
+				control_skin.Parts.Bottom.Object = sprite;
+				control_skin.Parts.Bottom.Enabled = bottom_part->Enabled;
+				control_skin.Parts.Bottom.Disabled = bottom_part->Disabled;
+				control_skin.Parts.Bottom.Focused = bottom_part->Focused;
+				control_skin.Parts.Bottom.Pressed = bottom_part->Pressed;
+				control_skin.Parts.Bottom.Hovered = bottom_part->Hovered;
 			}
 
 			//Left part
@@ -134,12 +134,12 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);
 
-				control_skin.Parts.Left.SpriteObject = sprite;
-				control_skin.Parts.Left.EnabledMaterial = left_part->Enabled;
-				control_skin.Parts.Left.DisabledMaterial = left_part->Disabled;
-				control_skin.Parts.Left.FocusedMaterial = left_part->Focused;
-				control_skin.Parts.Left.PressedMaterial = left_part->Pressed;
-				control_skin.Parts.Left.HoveredMaterial = left_part->Hovered;
+				control_skin.Parts.Left.Object = sprite;
+				control_skin.Parts.Left.Enabled = left_part->Enabled;
+				control_skin.Parts.Left.Disabled = left_part->Disabled;
+				control_skin.Parts.Left.Focused = left_part->Focused;
+				control_skin.Parts.Left.Pressed = left_part->Pressed;
+				control_skin.Parts.Left.Hovered = left_part->Hovered;
 			}
 
 			//Right part
@@ -150,12 +150,12 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);
 
-				control_skin.Parts.Right.SpriteObject = sprite;
-				control_skin.Parts.Right.EnabledMaterial = right_part->Enabled;
-				control_skin.Parts.Right.DisabledMaterial = right_part->Disabled;
-				control_skin.Parts.Right.FocusedMaterial = right_part->Focused;
-				control_skin.Parts.Right.PressedMaterial = right_part->Pressed;
-				control_skin.Parts.Right.HoveredMaterial = right_part->Hovered;
+				control_skin.Parts.Right.Object = sprite;
+				control_skin.Parts.Right.Enabled = right_part->Enabled;
+				control_skin.Parts.Right.Disabled = right_part->Disabled;
+				control_skin.Parts.Right.Focused = right_part->Focused;
+				control_skin.Parts.Right.Pressed = right_part->Pressed;
+				control_skin.Parts.Right.Hovered = right_part->Hovered;
 			}
 
 			//Corners
@@ -167,12 +167,12 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);
 
-				control_skin.Parts.TopLeft.SpriteObject = sprite;
-				control_skin.Parts.TopLeft.EnabledMaterial = top_left_part->Enabled;
-				control_skin.Parts.TopLeft.DisabledMaterial = top_left_part->Disabled;
-				control_skin.Parts.TopLeft.FocusedMaterial = top_left_part->Focused;
-				control_skin.Parts.TopLeft.PressedMaterial = top_left_part->Pressed;
-				control_skin.Parts.TopLeft.HoveredMaterial = top_left_part->Hovered;
+				control_skin.Parts.TopLeft.Object = sprite;
+				control_skin.Parts.TopLeft.Enabled = top_left_part->Enabled;
+				control_skin.Parts.TopLeft.Disabled = top_left_part->Disabled;
+				control_skin.Parts.TopLeft.Focused = top_left_part->Focused;
+				control_skin.Parts.TopLeft.Pressed = top_left_part->Pressed;
+				control_skin.Parts.TopLeft.Hovered = top_left_part->Hovered;
 			}
 
 			//Top-right part
@@ -183,12 +183,12 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);
 
-				control_skin.Parts.TopRight.SpriteObject = sprite;
-				control_skin.Parts.TopRight.EnabledMaterial = top_right_part->Enabled;
-				control_skin.Parts.TopRight.DisabledMaterial = top_right_part->Disabled;
-				control_skin.Parts.TopRight.FocusedMaterial = top_right_part->Focused;
-				control_skin.Parts.TopRight.PressedMaterial = top_right_part->Pressed;
-				control_skin.Parts.TopRight.HoveredMaterial = top_right_part->Hovered;
+				control_skin.Parts.TopRight.Object = sprite;
+				control_skin.Parts.TopRight.Enabled = top_right_part->Enabled;
+				control_skin.Parts.TopRight.Disabled = top_right_part->Disabled;
+				control_skin.Parts.TopRight.Focused = top_right_part->Focused;
+				control_skin.Parts.TopRight.Pressed = top_right_part->Pressed;
+				control_skin.Parts.TopRight.Hovered = top_right_part->Hovered;
 			}
 
 			//Bottom-left part
@@ -199,12 +199,12 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);
 
-				control_skin.Parts.BottomLeft.SpriteObject = sprite;
-				control_skin.Parts.BottomLeft.EnabledMaterial = bottom_left_part->Enabled;
-				control_skin.Parts.BottomLeft.DisabledMaterial = bottom_left_part->Disabled;
-				control_skin.Parts.BottomLeft.FocusedMaterial = bottom_left_part->Focused;
-				control_skin.Parts.BottomLeft.PressedMaterial = bottom_left_part->Pressed;
-				control_skin.Parts.BottomLeft.HoveredMaterial = bottom_left_part->Hovered;
+				control_skin.Parts.BottomLeft.Object = sprite;
+				control_skin.Parts.BottomLeft.Enabled = bottom_left_part->Enabled;
+				control_skin.Parts.BottomLeft.Disabled = bottom_left_part->Disabled;
+				control_skin.Parts.BottomLeft.Focused = bottom_left_part->Focused;
+				control_skin.Parts.BottomLeft.Pressed = bottom_left_part->Pressed;
+				control_skin.Parts.BottomLeft.Hovered = bottom_left_part->Hovered;
 			}
 
 			//Bottom-right part
@@ -215,12 +215,12 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 				sprite->AutoSize(true);
 				sprite->AutoRepeat(true);
 
-				control_skin.Parts.BottomRight.SpriteObject = sprite;
-				control_skin.Parts.BottomRight.EnabledMaterial = bottom_right_part->Enabled;
-				control_skin.Parts.BottomRight.DisabledMaterial = bottom_right_part->Disabled;
-				control_skin.Parts.BottomRight.FocusedMaterial = bottom_right_part->Focused;
-				control_skin.Parts.BottomRight.PressedMaterial = bottom_right_part->Pressed;
-				control_skin.Parts.BottomRight.HoveredMaterial = bottom_right_part->Hovered;
+				control_skin.Parts.BottomRight.Object = sprite;
+				control_skin.Parts.BottomRight.Enabled = bottom_right_part->Enabled;
+				control_skin.Parts.BottomRight.Disabled = bottom_right_part->Disabled;
+				control_skin.Parts.BottomRight.Focused = bottom_right_part->Focused;
+				control_skin.Parts.BottomRight.Pressed = bottom_right_part->Pressed;
+				control_skin.Parts.BottomRight.Hovered = bottom_right_part->Hovered;
 			}
 
 
@@ -350,12 +350,12 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			else
 				text->AddPasses(skin.GetTextPasses());
 
-			control_skin.Caption.TextObject = text;
-			control_skin.Caption.EnabledStyle = caption_part->Enabled;
-			control_skin.Caption.DisabledStyle = caption_part->Disabled;
-			control_skin.Caption.FocusedStyle = caption_part->Focused;
-			control_skin.Caption.PressedStyle = caption_part->Pressed;
-			control_skin.Caption.HoveredStyle = caption_part->Hovered;
+			control_skin.Caption.Object = text;
+			control_skin.Caption.Enabled = caption_part->Enabled;
+			control_skin.Caption.Disabled = caption_part->Disabled;
+			control_skin.Caption.Focused = caption_part->Focused;
+			control_skin.Caption.Pressed = caption_part->Pressed;
+			control_skin.Caption.Hovered = caption_part->Hovered;
 		}
 	}
 
@@ -394,12 +394,12 @@ OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const GuiSkin 
 			sprite->AutoSize(true);
 			sprite->IncludeBoundingVolumes(false);
 
-			check_box_skin->CheckMark.SpriteObject = sprite;
-			check_box_skin->CheckMark.EnabledMaterial = check_mark_part->Enabled;
-			check_box_skin->CheckMark.DisabledMaterial = check_mark_part->Disabled;
-			check_box_skin->CheckMark.FocusedMaterial = check_mark_part->Focused;
-			check_box_skin->CheckMark.PressedMaterial = check_mark_part->Pressed;
-			check_box_skin->CheckMark.HoveredMaterial = check_mark_part->Hovered;
+			check_box_skin->CheckMark.Object = sprite;
+			check_box_skin->CheckMark.Enabled = check_mark_part->Enabled;
+			check_box_skin->CheckMark.Disabled = check_mark_part->Disabled;
+			check_box_skin->CheckMark.Focused = check_mark_part->Focused;
+			check_box_skin->CheckMark.Pressed = check_mark_part->Pressed;
+			check_box_skin->CheckMark.Hovered = check_mark_part->Hovered;
 		}
 	}
 
@@ -438,12 +438,12 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &
 			sprite->AutoRepeat(true);
 			sprite->IncludeBoundingVolumes(false);
 
-			list_box_skin->Selection.SpriteObject = sprite;
-			list_box_skin->Selection.EnabledMaterial = selection_part->Enabled;
-			list_box_skin->Selection.DisabledMaterial = selection_part->Disabled;
-			list_box_skin->Selection.FocusedMaterial = selection_part->Focused;
-			list_box_skin->Selection.PressedMaterial = selection_part->Pressed;
-			list_box_skin->Selection.HoveredMaterial = selection_part->Hovered;
+			list_box_skin->Selection.Object = sprite;
+			list_box_skin->Selection.Enabled = selection_part->Enabled;
+			list_box_skin->Selection.Disabled = selection_part->Disabled;
+			list_box_skin->Selection.Focused = selection_part->Focused;
+			list_box_skin->Selection.Pressed = selection_part->Pressed;
+			list_box_skin->Selection.Hovered = selection_part->Hovered;
 		}
 	}
 
@@ -461,12 +461,12 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &
 			else
 				text->AddPasses(skin.GetTextPasses());
 
-			list_box_skin->Lines.TextObject = text;
-			list_box_skin->Lines.EnabledStyle = lines_part->Enabled;
-			list_box_skin->Lines.DisabledStyle = lines_part->Disabled;
-			list_box_skin->Lines.FocusedStyle = lines_part->Focused;
-			list_box_skin->Lines.PressedStyle = lines_part->Pressed;
-			list_box_skin->Lines.HoveredStyle = lines_part->Hovered;
+			list_box_skin->Lines.Object = text;
+			list_box_skin->Lines.Enabled = lines_part->Enabled;
+			list_box_skin->Lines.Disabled = lines_part->Disabled;
+			list_box_skin->Lines.Focused = lines_part->Focused;
+			list_box_skin->Lines.Pressed = lines_part->Pressed;
+			list_box_skin->Lines.Hovered = lines_part->Hovered;
 		}
 	}
 
@@ -499,12 +499,12 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSk
 			sprite->AutoRepeat(true);
 			sprite->IncludeBoundingVolumes(false);
 
-			progress_bar_skin->Bar.SpriteObject = sprite;
-			progress_bar_skin->Bar.EnabledMaterial = bar_part->Enabled;
-			progress_bar_skin->Bar.DisabledMaterial = bar_part->Disabled;
-			progress_bar_skin->Bar.FocusedMaterial = bar_part->Focused;
-			progress_bar_skin->Bar.PressedMaterial = bar_part->Pressed;
-			progress_bar_skin->Bar.HoveredMaterial = bar_part->Hovered;
+			progress_bar_skin->Bar.Object = sprite;
+			progress_bar_skin->Bar.Enabled = bar_part->Enabled;
+			progress_bar_skin->Bar.Disabled = bar_part->Disabled;
+			progress_bar_skin->Bar.Focused = bar_part->Focused;
+			progress_bar_skin->Bar.Pressed = bar_part->Pressed;
+			progress_bar_skin->Bar.Hovered = bar_part->Hovered;
 		}
 
 		//Bar interpolated part
@@ -516,12 +516,12 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSk
 			sprite->AutoRepeat(true);
 			sprite->IncludeBoundingVolumes(false);
 
-			progress_bar_skin->BarInterpolated.SpriteObject = sprite;
-			progress_bar_skin->BarInterpolated.EnabledMaterial = bar_interpolated_part->Enabled;
-			progress_bar_skin->BarInterpolated.DisabledMaterial = bar_interpolated_part->Disabled;
-			progress_bar_skin->BarInterpolated.FocusedMaterial = bar_interpolated_part->Focused;
-			progress_bar_skin->BarInterpolated.PressedMaterial = bar_interpolated_part->Pressed;
-			progress_bar_skin->BarInterpolated.HoveredMaterial = bar_interpolated_part->Hovered;
+			progress_bar_skin->BarInterpolated.Object = sprite;
+			progress_bar_skin->BarInterpolated.Enabled = bar_interpolated_part->Enabled;
+			progress_bar_skin->BarInterpolated.Disabled = bar_interpolated_part->Disabled;
+			progress_bar_skin->BarInterpolated.Focused = bar_interpolated_part->Focused;
+			progress_bar_skin->BarInterpolated.Pressed = bar_interpolated_part->Pressed;
+			progress_bar_skin->BarInterpolated.Hovered = bar_interpolated_part->Hovered;
 		}
 	}
 
@@ -545,12 +545,12 @@ OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const GuiSk
 			sprite->AutoSize(true);
 			sprite->IncludeBoundingVolumes(false);
 
-			radio_button_skin->CheckMark.SpriteObject = sprite;
-			radio_button_skin->CheckMark.EnabledMaterial = check_mark_part->Enabled;
-			radio_button_skin->CheckMark.DisabledMaterial = check_mark_part->Disabled;
-			radio_button_skin->CheckMark.FocusedMaterial = check_mark_part->Focused;
-			radio_button_skin->CheckMark.PressedMaterial = check_mark_part->Pressed;
-			radio_button_skin->CheckMark.HoveredMaterial = check_mark_part->Hovered;
+			radio_button_skin->CheckMark.Object = sprite;
+			radio_button_skin->CheckMark.Enabled = check_mark_part->Enabled;
+			radio_button_skin->CheckMark.Disabled = check_mark_part->Disabled;
+			radio_button_skin->CheckMark.Focused = check_mark_part->Focused;
+			radio_button_skin->CheckMark.Pressed = check_mark_part->Pressed;
+			radio_button_skin->CheckMark.Hovered = check_mark_part->Hovered;
 		}
 	}
 
@@ -574,12 +574,12 @@ OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const GuiSkin
 			sprite->AutoSize(true);
 			sprite->IncludeBoundingVolumes(false);
 
-			scroll_bar_skin->Handle.SpriteObject = sprite;
-			scroll_bar_skin->Handle.EnabledMaterial = handle_part->Enabled;
-			scroll_bar_skin->Handle.DisabledMaterial = handle_part->Disabled;
-			scroll_bar_skin->Handle.FocusedMaterial = handle_part->Focused;
-			scroll_bar_skin->Handle.PressedMaterial = handle_part->Pressed;
-			scroll_bar_skin->Handle.HoveredMaterial = handle_part->Hovered;
+			scroll_bar_skin->Handle.Object = sprite;
+			scroll_bar_skin->Handle.Enabled = handle_part->Enabled;
+			scroll_bar_skin->Handle.Disabled = handle_part->Disabled;
+			scroll_bar_skin->Handle.Focused = handle_part->Focused;
+			scroll_bar_skin->Handle.Pressed = handle_part->Pressed;
+			scroll_bar_skin->Handle.Hovered = handle_part->Hovered;
 		}
 	}
 
@@ -603,12 +603,12 @@ OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const GuiSkin &sk
 			sprite->AutoSize(true);
 			sprite->IncludeBoundingVolumes(false);
 
-			slider_skin->Handle.SpriteObject = sprite;
-			slider_skin->Handle.EnabledMaterial = handle_part->Enabled;
-			slider_skin->Handle.DisabledMaterial = handle_part->Disabled;
-			slider_skin->Handle.FocusedMaterial = handle_part->Focused;
-			slider_skin->Handle.PressedMaterial = handle_part->Pressed;
-			slider_skin->Handle.HoveredMaterial = handle_part->Hovered;
+			slider_skin->Handle.Object = sprite;
+			slider_skin->Handle.Enabled = handle_part->Enabled;
+			slider_skin->Handle.Disabled = handle_part->Disabled;
+			slider_skin->Handle.Focused = handle_part->Focused;
+			slider_skin->Handle.Pressed = handle_part->Pressed;
+			slider_skin->Handle.Hovered = handle_part->Hovered;
 		}
 	}
 
@@ -632,12 +632,12 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 			sprite->AutoSize(true);
 			sprite->IncludeBoundingVolumes(false);
 
-			text_box_skin->Cursor.SpriteObject = sprite;
-			text_box_skin->Cursor.EnabledMaterial = cursor_part->Enabled;
-			text_box_skin->Cursor.DisabledMaterial = cursor_part->Disabled;
-			text_box_skin->Cursor.FocusedMaterial = cursor_part->Focused;
-			text_box_skin->Cursor.PressedMaterial = cursor_part->Pressed;
-			text_box_skin->Cursor.HoveredMaterial = cursor_part->Hovered;
+			text_box_skin->Cursor.Object = sprite;
+			text_box_skin->Cursor.Enabled = cursor_part->Enabled;
+			text_box_skin->Cursor.Disabled = cursor_part->Disabled;
+			text_box_skin->Cursor.Focused = cursor_part->Focused;
+			text_box_skin->Cursor.Pressed = cursor_part->Pressed;
+			text_box_skin->Cursor.Hovered = cursor_part->Hovered;
 		}
 	}
 
@@ -656,12 +656,12 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 			else
 				text->AddPasses(skin.GetTextPasses());
 
-			text_box_skin->Text.TextObject = text;
-			text_box_skin->Text.EnabledStyle = text_part->Enabled;
-			text_box_skin->Text.DisabledStyle = text_part->Disabled;
-			text_box_skin->Text.FocusedStyle = text_part->Focused;
-			text_box_skin->Text.PressedStyle = text_part->Pressed;
-			text_box_skin->Text.HoveredStyle = text_part->Hovered;
+			text_box_skin->Text.Object = text;
+			text_box_skin->Text.Enabled = text_part->Enabled;
+			text_box_skin->Text.Disabled = text_part->Disabled;
+			text_box_skin->Text.Focused = text_part->Focused;
+			text_box_skin->Text.Pressed = text_part->Pressed;
+			text_box_skin->Text.Hovered = text_part->Hovered;
 		}
 
 		//Placeholder text part
@@ -674,12 +674,12 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 			else
 				text->AddPasses(skin.GetTextPasses());
 
-			text_box_skin->PlaceholderText.TextObject = text;
-			text_box_skin->PlaceholderText.EnabledStyle = placeholder_text_part->Enabled;
-			text_box_skin->PlaceholderText.DisabledStyle = placeholder_text_part->Disabled;
-			text_box_skin->PlaceholderText.FocusedStyle = placeholder_text_part->Focused;
-			text_box_skin->PlaceholderText.PressedStyle = placeholder_text_part->Pressed;
-			text_box_skin->PlaceholderText.HoveredStyle = placeholder_text_part->Hovered;
+			text_box_skin->PlaceholderText.Object = text;
+			text_box_skin->PlaceholderText.Enabled = placeholder_text_part->Enabled;
+			text_box_skin->PlaceholderText.Disabled = placeholder_text_part->Disabled;
+			text_box_skin->PlaceholderText.Focused = placeholder_text_part->Focused;
+			text_box_skin->PlaceholderText.Pressed = placeholder_text_part->Pressed;
+			text_box_skin->PlaceholderText.Hovered = placeholder_text_part->Hovered;
 		}
 	}
 

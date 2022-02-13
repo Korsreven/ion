@@ -31,7 +31,7 @@ namespace gui_progress_bar::detail
 	Skins
 */
 
-void resize_bar(gui_control::ControlVisualPart &bar, const Vector2 &delta_size) noexcept
+void resize_bar(gui_control::ControlSkinPart &bar, const Vector2 &delta_size) noexcept
 {
 	if (bar)
 	{
@@ -40,7 +40,7 @@ void resize_bar(gui_control::ControlVisualPart &bar, const Vector2 &delta_size) 
 	}
 }
 
-void crop_bar(gui_control::ControlVisualPart &bar, ProgressBarType type, bool flipped, real percent) noexcept
+void crop_bar(gui_control::ControlSkinPart &bar, ProgressBarType type, bool flipped, real percent) noexcept
 {
 	if (bar)
 	{
@@ -69,7 +69,7 @@ void crop_bar(gui_control::ControlVisualPart &bar, ProgressBarType type, bool fl
 	}
 }
 
-void update_bar(gui_control::ControlVisualPart &bar, ProgressBarType type, bool flipped, real percent, const Aabb &area) noexcept
+void update_bar(gui_control::ControlSkinPart &bar, ProgressBarType type, bool flipped, real percent, const Aabb &area) noexcept
 {
 	if (bar)
 	{

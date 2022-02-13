@@ -46,8 +46,8 @@ namespace ion::gui::controls
 
 		struct ProgressBarSkin : gui_control::ControlSkin
 		{
-			gui_control::ControlVisualPart Bar;
-			gui_control::ControlVisualPart BarInterpolated;
+			gui_control::ControlSkinPart Bar;
+			gui_control::ControlSkinPart BarInterpolated;
 
 			//Copy from most derived
 			virtual void Assign(const ControlSkin &control_skin) noexcept
@@ -76,9 +76,9 @@ namespace ion::gui::controls
 				Skins
 			*/
 
-			void resize_bar(gui_control::ControlVisualPart &bar, const Vector2 &delta_size) noexcept;
-			void crop_bar(gui_control::ControlVisualPart &bar, ProgressBarType type, bool flipped, real percent) noexcept;
-			void update_bar(gui_control::ControlVisualPart &bar, ProgressBarType type, bool flipped, real percent, const Aabb &area) noexcept;
+			void resize_bar(gui_control::ControlSkinPart &bar, const Vector2 &delta_size) noexcept;
+			void crop_bar(gui_control::ControlSkinPart &bar, ProgressBarType type, bool flipped, real percent) noexcept;
+			void update_bar(gui_control::ControlSkinPart &bar, ProgressBarType type, bool flipped, real percent, const Aabb &area) noexcept;
 
 			void resize_skin(ProgressBarSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 		} //detail

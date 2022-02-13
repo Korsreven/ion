@@ -77,8 +77,8 @@ namespace ion::gui::controls
 
 		struct ListBoxSkin : gui_control::ControlSkin
 		{
-			gui_control::ControlCaptionPart Lines;
-			gui_control::ControlVisualPart Selection;
+			gui_control::ControlSkinTextPart Lines;
+			gui_control::ControlSkinPart Selection;
 
 			std::vector<NonOwningPtr<graphics::scene::shapes::Sprite>> Icons;
 				//Sprites for each visible icon

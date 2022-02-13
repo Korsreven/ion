@@ -78,9 +78,9 @@ namespace ion::gui::controls
 
 		struct TextBoxSkin : gui_control::ControlSkin
 		{
-			gui_control::ControlCaptionPart Text;
-			gui_control::ControlCaptionPart PlaceholderText;
-			gui_control::ControlVisualPart Cursor;
+			gui_control::ControlSkinTextPart Text;
+			gui_control::ControlSkinTextPart PlaceholderText;
+			gui_control::ControlSkinPart Cursor;
 
 			//Copy from most derived
 			virtual void Assign(const ControlSkin &control_skin) noexcept

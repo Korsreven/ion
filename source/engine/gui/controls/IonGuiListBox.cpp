@@ -265,10 +265,10 @@ void GuiListBox::AttachSkin()
 		{
 			//Detach from previous parent (if any)
 			if (auto node = skin->Lines->ParentNode(); node)
-				node->DetachObject(*skin->Lines.TextObject);
+				node->DetachObject(*skin->Lines.Object);
 		
 			//Attach lines text
-			skin_node_->AttachObject(*skin->Lines.TextObject);
+			skin_node_->AttachObject(*skin->Lines.Object);
 		}
 	}
 }
@@ -285,7 +285,7 @@ void GuiListBox::RemoveSkin() noexcept
 		DetachSkin();
 
 		if (skin->Lines && skin->Lines->Owner())
-			skin->Lines->Owner()->RemoveText(*skin->Lines.TextObject); //Remove lines text
+			skin->Lines->Owner()->RemoveText(*skin->Lines.Object); //Remove lines text
 	}
 
 	GuiControl::RemoveSkin(); //Use base functionality
