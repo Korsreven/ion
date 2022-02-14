@@ -29,6 +29,8 @@ File:	IonGuiSkin.cpp
 #include "gui/controls/IonGuiSlider.h"
 #include "gui/controls/IonGuiTextBox.h"
 #include "gui/controls/IonGuiTooltip.h"
+#include "sounds/IonSound.h"
+#include "sounds/IonSoundChannel.h"
 #include "types/IonTypes.h"
 
 namespace ion::gui::skins
@@ -364,6 +366,50 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			control_skin.Caption.Pressed = caption_part->Pressed;
 			control_skin.Caption.Hovered = caption_part->Hovered;
 		}
+	}
+
+	if (!std::empty(skin.SoundParts()))
+	{
+		auto focused_part = skin.GetSoundPart("focused");
+		auto defocused_part = skin.GetSoundPart("defocused");
+		auto pressed_part = skin.GetSoundPart("pressed");
+		auto released_part = skin.GetSoundPart("released");
+		auto clicked_part = skin.GetSoundPart("clicked");
+		auto entered_part = skin.GetSoundPart("entered");
+		auto exited_part = skin.GetSoundPart("exited");
+		auto changed_part = skin.GetSoundPart("changed");
+
+		//Focused part
+		if (focused_part && *focused_part)
+			control_skin.Sounds.Focused.Object = focused_part->Base->Play(true);
+
+		//Defocused part
+		if (defocused_part && *defocused_part)
+			control_skin.Sounds.Defocused.Object = defocused_part->Base->Play(true);
+
+		//Pressed part
+		if (pressed_part && *pressed_part)
+			control_skin.Sounds.Pressed.Object = pressed_part->Base->Play(true);
+
+		//Released part
+		if (released_part && *released_part)
+			control_skin.Sounds.Released.Object = released_part->Base->Play(true);
+
+		//Clicked part
+		if (clicked_part && *clicked_part)
+			control_skin.Sounds.Clicked.Object = clicked_part->Base->Play(true);
+
+		//Entered part
+		if (entered_part && *entered_part)
+			control_skin.Sounds.Entered.Object = entered_part->Base->Play(true);
+
+		//Exited part
+		if (exited_part && *exited_part)
+			control_skin.Sounds.Exited.Object = exited_part->Base->Play(true);
+
+		//Changed part
+		if (changed_part && *changed_part)
+			control_skin.Sounds.Changed.Object = changed_part->Base->Play(true);
 	}
 
 	return control_skin;
@@ -735,7 +781,8 @@ void GuiSkin::RegisterBuiltInControls()
 }
 
 
-void GuiSkin::AddDefaultParts(const SkinParts &parts, const SkinTextPart &caption_part)
+void GuiSkin::AddStandardParts(const SkinParts &parts,
+	const SkinTextPart &caption_part, const SkinSoundParts &sound_parts)
 {
 	if (parts.Center)
 		parts_["center"] = parts.Center;
@@ -769,6 +816,31 @@ void GuiSkin::AddDefaultParts(const SkinParts &parts, const SkinTextPart &captio
 	//Caption
 	if (caption_part)
 		text_parts_["caption"] = caption_part;
+
+	//Sounds
+	if (sound_parts.Focused)
+		sound_parts_["focused"] = sound_parts.Focused;
+
+	if (sound_parts.Defocused)
+		sound_parts_["defocused"] = sound_parts.Defocused;
+
+	if (sound_parts.Pressed)
+		sound_parts_["pressed"] = sound_parts.Pressed;
+
+	if (sound_parts.Released)
+		sound_parts_["released"] = sound_parts.Released;
+
+	if (sound_parts.Clicked)
+		sound_parts_["clicked"] = sound_parts.Clicked;
+
+	if (sound_parts.Entered)
+		sound_parts_["entered"] = sound_parts.Entered;
+
+	if (sound_parts.Exited)
+		sound_parts_["exited"] = sound_parts.Exited;
+
+	if (sound_parts.Changed)
+		sound_parts_["changed"] = sound_parts.Changed;
 }
 
 
@@ -782,34 +854,39 @@ GuiSkin::GuiSkin(std::string name, std::type_index type) :
 	//Empty
 }
 
-GuiSkin::GuiSkin(std::string name, std::type_index type, const SkinParts &parts, const SkinTextPart &caption_part) :
+GuiSkin::GuiSkin(std::string name, std::type_index type, const SkinParts &parts,
+	const SkinTextPart &caption_part, const SkinSoundParts &sound_parts) :
 
 	managed::ManagedObject<GuiTheme>{std::move(name)},
 	skin_builder_{GetSkinBuilder(type).value_or(detail::make_control_skin)}
 {
-	AddDefaultParts(parts, caption_part);
+	AddStandardParts(parts, caption_part, sound_parts);
 }
 
-GuiSkin::GuiSkin(std::string name, std::type_index type, const SkinBorderParts &border_parts, const SkinTextPart &caption_part) :
-	GuiSkin{std::move(name), type, SkinParts{{}, border_parts}, caption_part}
+GuiSkin::GuiSkin(std::string name, std::type_index type, const SkinBorderParts &border_parts,
+	const SkinTextPart &caption_part, const SkinSoundParts &sound_parts) :
+	GuiSkin{std::move(name), type, SkinParts{{}, border_parts}, caption_part, sound_parts}
 {
 	//Empty
 }
 
-GuiSkin::GuiSkin(std::string name, std::type_index type, const SkinSideParts &side_parts, const SkinTextPart &caption_part) :
-	GuiSkin{std::move(name), type, SkinParts{{}, {side_parts, {}}}, caption_part}
+GuiSkin::GuiSkin(std::string name, std::type_index type, const SkinSideParts &side_parts,
+	const SkinTextPart &caption_part, const SkinSoundParts &sound_parts) :
+	GuiSkin{std::move(name), type, SkinParts{{}, {side_parts, {}}}, caption_part, sound_parts}
 {
 	//Empty
 }
 
-GuiSkin::GuiSkin(std::string name, std::type_index type, const SkinPart &center_part, const SkinTextPart &caption_part) :
-	GuiSkin{std::move(name), type, SkinParts{center_part}, caption_part}
+GuiSkin::GuiSkin(std::string name, std::type_index type, const SkinPart &center_part,
+	const SkinTextPart &caption_part, const SkinSoundParts &sound_parts) :
+	GuiSkin{std::move(name), type, SkinParts{center_part}, caption_part, sound_parts}
 {
 	//Empty
 }
 
-GuiSkin::GuiSkin(std::string name, std::type_index type, const SkinTextPart &caption_part) :
-	GuiSkin{std::move(name), type, SkinParts{}, caption_part}
+GuiSkin::GuiSkin(std::string name, std::type_index type,
+	const SkinTextPart &caption_part, const SkinSoundParts &sound_parts) :
+	GuiSkin{std::move(name), type, SkinParts{}, caption_part, sound_parts}
 {
 	//Empty
 }
@@ -846,6 +923,11 @@ void GuiSkin::AddTextPart(std::string name, const SkinTextPart &text_part)
 	text_parts_[std::move(name)] = text_part;
 }
 
+void GuiSkin::AddSoundPart(std::string name, const SkinSoundPart &sound_part)
+{
+	sound_parts_[std::move(name)] = sound_part;
+}
+
 
 /*
 	Parts
@@ -863,6 +945,14 @@ const SkinPart* GuiSkin::GetPart(std::string_view name) const noexcept
 const SkinTextPart* GuiSkin::GetTextPart(std::string_view name) const noexcept
 {
 	if (auto iter = text_parts_.find(name); iter != std::end(text_parts_))
+		return &iter->second;
+	else
+		return nullptr;
+}
+
+const SkinSoundPart* GuiSkin::GetSoundPart(std::string_view name) const noexcept
+{
+	if (auto iter = sound_parts_.find(name); iter != std::end(sound_parts_))
 		return &iter->second;
 	else
 		return nullptr;
@@ -895,6 +985,18 @@ void GuiSkin::ClearTextParts() noexcept
 bool GuiSkin::RemoveTextPart(std::string_view name) noexcept
 {
 	return text_parts_.erase(name);
+}
+
+
+void GuiSkin::ClearSoundParts() noexcept
+{
+	sound_parts_.clear();
+	sound_parts_.shrink_to_fit();
+}
+
+bool GuiSkin::RemoveSoundPart(std::string_view name) noexcept
+{
+	return sound_parts_.erase(name);
 }
 
 

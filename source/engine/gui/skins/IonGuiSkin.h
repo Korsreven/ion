@@ -35,16 +35,24 @@ File:	IonGuiSkin.h
 #include "memory/IonOwningPtr.h"
 
 //Forward declarations
-namespace ion::graphics
+namespace ion
 {
-	namespace materials
+	namespace graphics
 	{
-		class Material;
+		namespace materials
+		{
+			class Material;
+		}
+
+		namespace scene
+		{
+			class SceneManager;
+		}
 	}
 
-	namespace scene
+	namespace sounds
 	{
-		class SceneManager;
+		class Sound;
 	}
 }
 
@@ -56,7 +64,7 @@ namespace ion::gui::skins
 
 	namespace gui_skin
 	{
-		struct SkinPart
+		struct SkinPart final
 		{
 			NonOwningPtr<graphics::materials::Material> Enabled;
 			NonOwningPtr<graphics::materials::Material> Disabled;
@@ -73,7 +81,7 @@ namespace ion::gui::skins
 			}
 		};
 
-		struct SkinTextPart
+		struct SkinTextPart final
 		{
 			NonOwningPtr<graphics::fonts::Text> Base;
 			std::optional<graphics::fonts::text::TextBlockStyle> Enabled;
@@ -88,7 +96,18 @@ namespace ion::gui::skins
 			}
 		};
 
-		struct SkinSideParts
+		struct SkinSoundPart final
+		{
+			NonOwningPtr<sounds::Sound> Base;
+
+			[[nodiscard]] inline operator bool() const noexcept
+			{
+				return !!Base; //Required
+			}
+		};
+
+
+		struct SkinSideParts final
 		{
 			SkinPart Top;
 			SkinPart Bottom;
@@ -101,7 +120,7 @@ namespace ion::gui::skins
 			}
 		};
 
-		struct SkinCornerParts
+		struct SkinCornerParts final
 		{
 			SkinPart TopLeft;
 			SkinPart TopRight;
@@ -114,7 +133,7 @@ namespace ion::gui::skins
 			}
 		};
 
-		struct SkinBorderParts
+		struct SkinBorderParts final
 		{
 			SkinSideParts Sides;
 			SkinCornerParts Corners;
@@ -123,9 +142,9 @@ namespace ion::gui::skins
 			{
 				return Sides || Corners;
 			}
-		};
+		};	
 
-		struct SkinParts
+		struct SkinParts final
 		{
 			SkinPart Center;
 			SkinBorderParts Border;
@@ -136,9 +155,27 @@ namespace ion::gui::skins
 			}
 		};
 
+		struct SkinSoundParts final
+		{
+			SkinSoundPart Focused;
+			SkinSoundPart Defocused;
+			SkinSoundPart Pressed;
+			SkinSoundPart Released;
+			SkinSoundPart Clicked;
+			SkinSoundPart Entered;
+			SkinSoundPart Exited;
+			SkinSoundPart Changed;
+
+			[[nodiscard]] inline operator bool() const noexcept
+			{
+				return Focused || Defocused || Pressed || Released || Clicked || Entered || Exited || Changed;
+			}
+		};
+
 
 		using SkinPartMap = adaptors::FlatMap<std::string, SkinPart>;
 		using SkinTextPartMap = adaptors::FlatMap<std::string, SkinTextPart>;
+		using SkinSoundPartMap = adaptors::FlatMap<std::string, SkinSoundPart>;
 		using SkinBuilder = events::Callback<OwningPtr<controls::gui_control::ControlSkin>, const GuiSkin&, graphics::scene::SceneManager&>;
 
 
@@ -169,6 +206,7 @@ namespace ion::gui::skins
 
 			gui_skin::SkinPartMap parts_;
 			gui_skin::SkinTextPartMap text_parts_;
+			gui_skin::SkinSoundPartMap sound_parts_;
 
 			graphics::scene::drawable_object::Passes passes_;
 			graphics::scene::drawable_object::Passes text_passes_;
@@ -179,27 +217,33 @@ namespace ion::gui::skins
 			static inline adaptors::FlatMap<std::type_index, std::pair<std::string, gui_skin::SkinBuilder>> registered_controls_;
 			static void RegisterBuiltInControls();
 
-			void AddDefaultParts(const gui_skin::SkinParts &parts, const gui_skin::SkinTextPart &caption_part);
+			void AddStandardParts(const gui_skin::SkinParts &parts,
+				const gui_skin::SkinTextPart &caption_part, const gui_skin::SkinSoundParts &sound_parts);
 
 		public:
 
 			//Construct a skin with the given name and type
 			explicit GuiSkin(std::string name, std::type_index type);
 			
-			//Construct a skin with the given name, type, parts and caption part
-			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinParts &parts, const gui_skin::SkinTextPart &caption_part = {});
+			//Construct a skin with the given name, type, parts, caption part and sound parts
+			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinParts &parts,
+				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {});
 
-			//Construct a skin with the given name, type, border parts and caption part
-			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinBorderParts &border_parts, const gui_skin::SkinTextPart &caption_part = {});
+			//Construct a skin with the given name, type, border parts, caption part and sound parts
+			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinBorderParts &border_parts,
+				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {});
 
-			//Construct a skin with the given name, type, side parts and caption part
-			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinSideParts &side_parts, const gui_skin::SkinTextPart &caption_part = {});
+			//Construct a skin with the given name, type, side parts, caption part and sound parts
+			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinSideParts &side_parts,
+				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {});
 
-			//Construct a skin with the given name, type, center part and caption part
-			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinPart &center_part, const gui_skin::SkinTextPart &caption_part = {});
+			//Construct a skin with the given name, type, center part, caption part and sound parts
+			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinPart &center_part,
+				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {});
 
-			//Construct a skin with the given name, type and caption part
-			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinTextPart &caption_part);
+			//Construct a skin with the given name, type, caption part and sound parts
+			GuiSkin(std::string name, std::type_index type,
+				const gui_skin::SkinTextPart &caption_part, const gui_skin::SkinSoundParts &sound_parts = {});
 
 
 			/*
@@ -233,6 +277,21 @@ namespace ion::gui::skins
 			[[nodiscard]] inline auto TextParts() const noexcept
 			{
 				return text_parts_.Elements();
+			}
+
+
+			//Returns a mutable range of all sound parts in this skin
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SoundParts() noexcept
+			{
+				return sound_parts_.Elements();
+			}
+
+			//Returns an immutable range of all sound parts in this skin
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SoundParts() const noexcept
+			{
+				return sound_parts_.Elements();
 			}
 
 
@@ -285,6 +344,9 @@ namespace ion::gui::skins
 			//Adds a text part to this skin with the given name
 			void AddTextPart(std::string name, const gui_skin::SkinTextPart &text_part);
 
+			//Adds a sound part to this skin with the given name
+			void AddSoundPart(std::string name, const gui_skin::SkinSoundPart &sound_part);
+
 
 			/*
 				Parts
@@ -298,6 +360,10 @@ namespace ion::gui::skins
 			//Gets a pointer to the text part with the given name
 			//Returns nullptr if no text part is found with the given name
 			[[nodiscard]] const gui_skin::SkinTextPart* GetTextPart(std::string_view name) const noexcept;
+
+			//Gets a pointer to the sound part with the given name
+			//Returns nullptr if no sound part is found with the given name
+			[[nodiscard]] const gui_skin::SkinSoundPart* GetSoundPart(std::string_view name) const noexcept;
 
 
 			/*
@@ -317,6 +383,13 @@ namespace ion::gui::skins
 
 			//Remove a text part with the given name from this skin
 			bool RemoveTextPart(std::string_view name) noexcept;
+
+
+			//Clear all sound parts from this skin
+			void ClearSoundParts() noexcept;
+
+			//Remove a sound part with the given name from this skin
+			bool RemoveSoundPart(std::string_view name) noexcept;
 
 
 			/*

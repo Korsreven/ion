@@ -25,6 +25,7 @@ File:	IonGuiControl.cpp
 #include "gui/IonGuiFrame.h"
 #include "gui/IonGuiPanelContainer.h"
 #include "gui/skins/IonGuiSkin.h"
+#include "sounds/IonSoundChannel.h"
 #include "types/IonTypeTraits.h"
 
 namespace ion::gui::controls
@@ -367,6 +368,9 @@ void GuiControl::Focused() noexcept
 	if (state_ == ControlState::Enabled)
 		SetState(ControlState::Focused);
 
+	if (skin_ && skin_->Sounds.Focused)
+		skin_->Sounds.Focused->Resume();
+
 	NotifyControlFocused();
 }
 
@@ -374,6 +378,9 @@ void GuiControl::Defocused() noexcept
 {
 	if (state_ == ControlState::Focused)
 		SetState(ControlState::Enabled);
+
+	if (skin_ && skin_->Sounds.Defocused)
+		skin_->Sounds.Defocused->Resume();
 
 	NotifyControlDefocused();
 }
@@ -383,6 +390,10 @@ void GuiControl::Pressed() noexcept
 {
 	Focus();
 	SetState(ControlState::Pressed);
+
+	if (skin_ && skin_->Sounds.Pressed)
+		skin_->Sounds.Pressed->Resume();
+
 	NotifyControlPressed();
 }
 
@@ -395,11 +406,17 @@ void GuiControl::Released() noexcept
 	else
 		SetState(ControlState::Enabled);
 
+	if (skin_ && skin_->Sounds.Released)
+		skin_->Sounds.Released->Resume();
+
 	NotifyControlReleased();
 }
 
 void GuiControl::Clicked() noexcept
 {
+	if (skin_ && skin_->Sounds.Clicked)
+		skin_->Sounds.Clicked->Resume();
+
 	NotifyControlClicked();
 }
 
@@ -408,6 +425,9 @@ void GuiControl::Entered() noexcept
 {
 	if (state_ != ControlState::Pressed)
 		SetState(ControlState::Hovered);
+
+	if (skin_ && skin_->Sounds.Entered)
+		skin_->Sounds.Entered->Resume();
 
 	NotifyControlEntered();
 }
@@ -422,12 +442,18 @@ void GuiControl::Exited() noexcept
 			SetState(ControlState::Enabled);
 	}
 
+	if (skin_ && skin_->Sounds.Exited)
+		skin_->Sounds.Exited->Resume();
+
 	NotifyControlExited();
 }
 
 
 void GuiControl::Changed() noexcept
 {
+	if (skin_ && skin_->Sounds.Changed)
+		skin_->Sounds.Changed->Resume();
+
 	NotifyControlChanged();
 }
 

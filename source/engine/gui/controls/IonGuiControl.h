@@ -61,6 +61,12 @@ namespace ion
 			}
 		}
 	}
+
+	namespace sounds
+	{
+		class Sound;
+		class SoundChannel;
+	}
 }
 
 namespace ion::gui::controls
@@ -100,38 +106,6 @@ namespace ion::gui::controls
 			NonOwningPtr<graphics::materials::Material> Pressed;
 			NonOwningPtr<graphics::materials::Material> Hovered;
 
-
-			[[nodiscard]] inline operator bool() const noexcept
-			{
-				return !!Object;
-			}
-
-			[[nodiscard]] inline auto operator->() const noexcept
-			{
-				return Object.get();
-			}
-		};
-
-		struct ControlSkinParts final
-		{
-			NonOwningPtr<graphics::scene::Model> Object;
-
-			//Center
-			ControlSkinPart Center;
-
-			//Sides
-			ControlSkinPart Top;
-			ControlSkinPart Left;
-			ControlSkinPart Bottom;
-			ControlSkinPart Right;
-
-			//Corners
-			ControlSkinPart TopLeft;
-			ControlSkinPart BottomLeft;
-			ControlSkinPart TopRight;
-			ControlSkinPart BottomRight;
-
-
 			[[nodiscard]] inline operator bool() const noexcept
 			{
 				return !!Object;
@@ -152,6 +126,20 @@ namespace ion::gui::controls
 			std::optional<graphics::fonts::text::TextBlockStyle> Pressed;
 			std::optional<graphics::fonts::text::TextBlockStyle> Hovered;
 
+			[[nodiscard]] inline operator bool() const noexcept
+			{
+				return !!Object;
+			}
+
+			[[nodiscard]] inline auto operator->() const noexcept
+			{
+				return Object.get();
+			}
+		};
+
+		struct ControlSkinSoundPart final
+		{
+			NonOwningPtr<sounds::SoundChannel> Object;
 
 			[[nodiscard]] inline operator bool() const noexcept
 			{
@@ -165,10 +153,59 @@ namespace ion::gui::controls
 		};
 
 
+		struct ControlSkinParts final
+		{
+			NonOwningPtr<graphics::scene::Model> Object;
+
+			//Center
+			ControlSkinPart Center;
+
+			//Sides
+			ControlSkinPart Top;
+			ControlSkinPart Left;
+			ControlSkinPart Bottom;
+			ControlSkinPart Right;
+
+			//Corners
+			ControlSkinPart TopLeft;
+			ControlSkinPart BottomLeft;
+			ControlSkinPart TopRight;
+			ControlSkinPart BottomRight;
+
+			[[nodiscard]] inline operator bool() const noexcept
+			{
+				return !!Object;
+			}
+
+			[[nodiscard]] inline auto operator->() const noexcept
+			{
+				return Object.get();
+			}
+		};
+
+		struct ControlSkinSoundParts final
+		{
+			ControlSkinSoundPart Focused;
+			ControlSkinSoundPart Defocused;
+			ControlSkinSoundPart Pressed;
+			ControlSkinSoundPart Released;
+			ControlSkinSoundPart Clicked;
+			ControlSkinSoundPart Entered;
+			ControlSkinSoundPart Exited;
+			ControlSkinSoundPart Changed;
+
+			[[nodiscard]] inline operator bool() const noexcept
+			{
+				return Focused || Defocused || Pressed || Released || Clicked || Entered || Exited || Changed;
+			}
+		};
+
+
 		struct ControlSkin
 		{
 			ControlSkinParts Parts;
 			ControlSkinTextPart Caption;
+			ControlSkinSoundParts Sounds;
 
 			//Default virtual destructor
 			virtual ~ControlSkin() = default;

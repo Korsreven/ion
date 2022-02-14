@@ -133,39 +133,43 @@ namespace ion::gui::skins
 				return CreateDefaultSkin<T>();
 			}
 
-			//Create a default skin with the given parts and caption part
+			//Create a default skin with the given parts, caption part and sound parts
 			template <typename T>
-			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinParts &parts, const gui_skin::SkinTextPart &caption_part = {})
+			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinParts &parts,
+				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
 			{
-				return CreateDefaultSkin<T>(parts, caption_part);
+				return CreateDefaultSkin<T>(parts, caption_part, sound_parts);
 			}
 
-			//Create a default skin with the given border parts and caption part
+			//Create a default skin with the given border parts, caption part and sound parts
 			template <typename T>
-			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinBorderParts &border_parts, const gui_skin::SkinTextPart &caption_part = {})
+			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinBorderParts &border_parts,
+				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
 			{
-				return CreateDefaultSkin<T>(border_parts, caption_part);
+				return CreateDefaultSkin<T>(border_parts, caption_part, sound_parts);
 			}
 
-			//Create a default skin with the given side parts and caption part
+			//Create a default skin with the given side parts, caption part and sound parts
 			template <typename T>
-			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinSideParts &side_parts, const gui_skin::SkinTextPart &caption_part = {})
+			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinSideParts &side_parts,
+				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
 			{
-				return CreateDefaultSkin<T>(side_parts, caption_part);
+				return CreateDefaultSkin<T>(side_parts, caption_part, sound_parts);
 			}
 
-			//Create a default skin with the given center part and caption part
+			//Create a default skin with the given center part, caption part and sound parts
 			template <typename T>
-			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinPart &center_part, const gui_skin::SkinTextPart &caption_part = {})
+			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinPart &center_part,
+				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
 			{
-				return CreateDefaultSkin<T>(center_part, caption_part);
+				return CreateDefaultSkin<T>(center_part, caption_part, sound_parts);
 			}
 
-			//Create a default skin with the given caption part
+			//Create a default skin with the given caption part and sound parts
 			template <typename T>
-			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinTextPart &caption_part)
+			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinTextPart &caption_part, const gui_skin::SkinSoundParts &sound_parts = {})
 			{
-				return CreateDefaultSkin<T>(caption_part);
+				return CreateDefaultSkin<T>(caption_part, sound_parts);
 			}
 
 
@@ -176,39 +180,44 @@ namespace ion::gui::skins
 				return CreateNamedSkin<T>(std::move(name));
 			}
 
-			//Create a skin with the given name, parts and caption part
+			//Create a skin with the given name, parts, caption part and sound parts
 			template <typename T>
-			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinParts &parts, const gui_skin::SkinTextPart &caption_part = {})
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinParts &parts,
+				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
 			{
-				return CreateNamedSkin<T>(std::move(name), parts, caption_part);
+				return CreateNamedSkin<T>(std::move(name), parts, caption_part, sound_parts);
 			}
 
-			//Create a skin with the given name, border parts and caption part
+			//Create a skin with the given name, border parts, caption part and sound parts
 			template <typename T>
-			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinBorderParts &border_parts, const gui_skin::SkinTextPart &caption_part = {})
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinBorderParts &border_parts,
+				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
 			{
-				return CreateNamedSkin<T>(std::move(name), border_parts, caption_part);
+				return CreateNamedSkin<T>(std::move(name), border_parts, caption_part, sound_parts);
 			}
 
-			//Create a skin with the given name, side parts and caption part
+			//Create a skin with the given name, side parts, caption part and sound parts
 			template <typename T>
-			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinSideParts &side_parts, const gui_skin::SkinTextPart &caption_part = {})
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinSideParts &side_parts,
+				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
 			{
-				return CreateNamedSkin<T>(std::move(name), side_parts, caption_part);
+				return CreateNamedSkin<T>(std::move(name), side_parts, caption_part, sound_parts);
 			}
 
-			//Create a skin with the given name, center part and caption part
+			//Create a skin with the given name, center part, caption part and sound parts
 			template <typename T>
-			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinPart &center_part, const gui_skin::SkinTextPart &caption_part = {})
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinPart &center_part,
+				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
 			{
-				return CreateNamedSkin<T>(std::move(name), center_part, caption_part);
+				return CreateNamedSkin<T>(std::move(name), center_part, caption_part, sound_parts);
 			}
 
-			//Create a skin with the given name and caption part
+			//Create a skin with the given name, caption part and sound parts
 			template <typename T>
-			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinTextPart &caption_part)
+			NonOwningPtr<GuiSkin> CreateSkin(std::string name,
+				const gui_skin::SkinTextPart &caption_part, const gui_skin::SkinSoundParts &sound_parts = {})
 			{
-				return CreateNamedSkin<T>(std::move(name), caption_part);
+				return CreateNamedSkin<T>(std::move(name), caption_part, sound_parts);
 			}
 
 
