@@ -25,6 +25,7 @@ File:	IonGuiControl.cpp
 #include "gui/IonGuiFrame.h"
 #include "gui/IonGuiPanelContainer.h"
 #include "gui/skins/IonGuiSkin.h"
+#include "sounds/IonSound.h"
 #include "sounds/IonSoundChannel.h"
 #include "types/IonTypeTraits.h"
 
@@ -369,7 +370,7 @@ void GuiControl::Focused() noexcept
 		SetState(ControlState::Focused);
 
 	if (skin_ && skin_->Sounds.Focused)
-		skin_->Sounds.Focused->Resume();
+		skin_->Sounds.Object = skin_->Sounds.Focused->Play(skin_->Sounds.Object);
 
 	NotifyControlFocused();
 }
@@ -380,7 +381,7 @@ void GuiControl::Defocused() noexcept
 		SetState(ControlState::Enabled);
 
 	if (skin_ && skin_->Sounds.Defocused)
-		skin_->Sounds.Defocused->Resume();
+		skin_->Sounds.Object = skin_->Sounds.Defocused->Play(skin_->Sounds.Object);
 
 	NotifyControlDefocused();
 }
@@ -392,7 +393,7 @@ void GuiControl::Pressed() noexcept
 	SetState(ControlState::Pressed);
 
 	if (skin_ && skin_->Sounds.Pressed)
-		skin_->Sounds.Pressed->Resume();
+		skin_->Sounds.Object = skin_->Sounds.Pressed->Play(skin_->Sounds.Object);
 
 	NotifyControlPressed();
 }
@@ -407,7 +408,7 @@ void GuiControl::Released() noexcept
 		SetState(ControlState::Enabled);
 
 	if (skin_ && skin_->Sounds.Released)
-		skin_->Sounds.Released->Resume();
+		skin_->Sounds.Object = skin_->Sounds.Released->Play(skin_->Sounds.Object);
 
 	NotifyControlReleased();
 }
@@ -415,7 +416,7 @@ void GuiControl::Released() noexcept
 void GuiControl::Clicked() noexcept
 {
 	if (skin_ && skin_->Sounds.Clicked)
-		skin_->Sounds.Clicked->Resume();
+		skin_->Sounds.Object = skin_->Sounds.Clicked->Play(skin_->Sounds.Object);
 
 	NotifyControlClicked();
 }
@@ -427,7 +428,7 @@ void GuiControl::Entered() noexcept
 		SetState(ControlState::Hovered);
 
 	if (skin_ && skin_->Sounds.Entered)
-		skin_->Sounds.Entered->Resume();
+		skin_->Sounds.Object = skin_->Sounds.Entered->Play(skin_->Sounds.Object);
 
 	NotifyControlEntered();
 }
@@ -443,7 +444,7 @@ void GuiControl::Exited() noexcept
 	}
 
 	if (skin_ && skin_->Sounds.Exited)
-		skin_->Sounds.Exited->Resume();
+		skin_->Sounds.Object = skin_->Sounds.Exited->Play(skin_->Sounds.Object);
 
 	NotifyControlExited();
 }
@@ -452,7 +453,7 @@ void GuiControl::Exited() noexcept
 void GuiControl::Changed() noexcept
 {
 	if (skin_ && skin_->Sounds.Changed)
-		skin_->Sounds.Changed->Resume();
+		skin_->Sounds.Object = skin_->Sounds.Changed->Play(skin_->Sounds.Object);
 
 	NotifyControlChanged();
 }
@@ -890,6 +891,9 @@ void GuiControl::RemoveSkin() noexcept
 
 		if (skin_->Caption && skin_->Caption->Owner())
 			skin_->Caption->Owner()->RemoveText(*skin_->Caption.Object); //Remove caption text
+
+		if (skin_->Sounds && skin_->Sounds->Owner())
+			skin_->Sounds->Owner()->RemoveSoundChannel(*skin_->Sounds.Object); //Remove sound channel
 
 		skin_.reset();
 	}

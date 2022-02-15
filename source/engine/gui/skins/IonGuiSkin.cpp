@@ -29,8 +29,6 @@ File:	IonGuiSkin.cpp
 #include "gui/controls/IonGuiSlider.h"
 #include "gui/controls/IonGuiTextBox.h"
 #include "gui/controls/IonGuiTooltip.h"
-#include "sounds/IonSound.h"
-#include "sounds/IonSoundChannel.h"
 #include "types/IonTypes.h"
 
 namespace ion::gui::skins
@@ -381,35 +379,35 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 
 		//Focused part
 		if (focused_part && *focused_part)
-			control_skin.Sounds.Focused.Object = focused_part->Base->Play(true);
+			control_skin.Sounds.Focused.Object = focused_part->Base;
 
 		//Defocused part
 		if (defocused_part && *defocused_part)
-			control_skin.Sounds.Defocused.Object = defocused_part->Base->Play(true);
+			control_skin.Sounds.Defocused.Object = defocused_part->Base;
 
 		//Pressed part
 		if (pressed_part && *pressed_part)
-			control_skin.Sounds.Pressed.Object = pressed_part->Base->Play(true);
+			control_skin.Sounds.Pressed.Object = pressed_part->Base;
 
 		//Released part
 		if (released_part && *released_part)
-			control_skin.Sounds.Released.Object = released_part->Base->Play(true);
+			control_skin.Sounds.Released.Object = released_part->Base;
 
 		//Clicked part
 		if (clicked_part && *clicked_part)
-			control_skin.Sounds.Clicked.Object = clicked_part->Base->Play(true);
+			control_skin.Sounds.Clicked.Object = clicked_part->Base;
 
 		//Entered part
 		if (entered_part && *entered_part)
-			control_skin.Sounds.Entered.Object = entered_part->Base->Play(true);
+			control_skin.Sounds.Entered.Object = entered_part->Base;
 
 		//Exited part
 		if (exited_part && *exited_part)
-			control_skin.Sounds.Exited.Object = exited_part->Base->Play(true);
+			control_skin.Sounds.Exited.Object = exited_part->Base;
 
 		//Changed part
 		if (changed_part && *changed_part)
-			control_skin.Sounds.Changed.Object = changed_part->Base->Play(true);
+			control_skin.Sounds.Changed.Object = changed_part->Base;
 	}
 
 	return control_skin;

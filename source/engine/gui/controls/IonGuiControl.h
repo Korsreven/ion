@@ -139,7 +139,7 @@ namespace ion::gui::controls
 
 		struct ControlSkinSoundPart final
 		{
-			NonOwningPtr<sounds::SoundChannel> Object;
+			NonOwningPtr<sounds::Sound> Object;
 
 			[[nodiscard]] inline operator bool() const noexcept
 			{
@@ -185,6 +185,9 @@ namespace ion::gui::controls
 
 		struct ControlSkinSoundParts final
 		{
+			NonOwningPtr<sounds::SoundChannel> Object;
+
+			//Events
 			ControlSkinSoundPart Focused;
 			ControlSkinSoundPart Defocused;
 			ControlSkinSoundPart Pressed;
@@ -196,7 +199,12 @@ namespace ion::gui::controls
 
 			[[nodiscard]] inline operator bool() const noexcept
 			{
-				return Focused || Defocused || Pressed || Released || Clicked || Entered || Exited || Changed;
+				return !!Object;
+			}
+
+			[[nodiscard]] inline auto operator->() const noexcept
+			{
+				return Object.get();
 			}
 		};
 
