@@ -539,6 +539,8 @@ namespace ion::gui::controls
 
 			virtual void UpdateCaption() noexcept;
 
+			void PlaySound(gui_control::ControlSkinSoundPart &part);
+
 		public:
 
 			//Construct a control with the given name

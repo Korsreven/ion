@@ -36,13 +36,21 @@ File:	IonGuiController.h
 #include "types/IonTypes.h"
 
 //Forward declarations
-namespace ion::graphics::scene
+namespace ion
 {
-	class SceneManager;
-
-	namespace graph
+	namespace graphics::scene
 	{
-		class SceneNode;
+		class SceneManager;
+
+		namespace graph
+		{
+			class SceneNode;
+		}
+	}
+
+	namespace sounds
+	{
+		class SoundChannelGroup;
 	}
 }
 
@@ -108,6 +116,7 @@ namespace ion::gui
 			controls::GuiTooltip *active_tooltip_ = nullptr;
 			skins::GuiTheme *active_theme_ = nullptr;
 			gui_controller::detail::frames active_frames_;
+			NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group_;
 			bool shift_pressed_ = false;
 
 			gui_controller::detail::frame_pointers frames_;
@@ -181,8 +190,8 @@ namespace ion::gui
 
 		public:
 
-			//Construct a gui controller with the given parent node
-			explicit GuiController(SceneNode &parent_node);
+			//Construct a gui controller with the given parent node and sound channel group
+			GuiController(SceneNode &parent_node, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group = nullptr);
 
 
 			/*
@@ -328,6 +337,13 @@ namespace ion::gui
 			[[nodiscard]] inline auto FocusedFrame() const noexcept
 			{
 				return focused_frame_;
+			}
+
+			//Returns a pointer to the sound channel group connected to this controller
+			//Returns nullptr if this viewport does not have a sound channel group connected
+			[[nodiscard]] inline auto ConnectedSoundChannelGroup() const noexcept
+			{
+				return sound_channel_group_;
 			}
 
 
