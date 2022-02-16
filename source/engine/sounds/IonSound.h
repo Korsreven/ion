@@ -275,7 +275,6 @@ namespace ion::sounds
 			//Play this sound, by creating a sound channel outputting to the given channel group
 			NonOwningPtr<SoundChannel> Play(NonOwningPtr<SoundChannelGroup> sound_channel_group, bool paused = false) noexcept;
 
-
 			//Play this sound, by reusing the given sound channel
 			NonOwningPtr<SoundChannel> Play(NonOwningPtr<SoundChannel> sound_channel, bool paused = false) noexcept;
 

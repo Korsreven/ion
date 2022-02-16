@@ -151,25 +151,27 @@ std::optional<std::pair<real, real>> Sound::Distance() const noexcept
 
 NonOwningPtr<SoundChannel> Sound::Play(bool paused) noexcept
 {
-	return Sound::Play(Create(), paused);
+	return Play(Create(), paused);
 }
 
 NonOwningPtr<SoundChannel> Sound::Play(NonOwningPtr<SoundChannelGroup> sound_channel_group, bool paused) noexcept
 {
-	return Sound::Play(Create(sound_channel_group), paused);
+	return Play(Create(sound_channel_group), paused);
 }
-
 
 NonOwningPtr<SoundChannel> Sound::Play(NonOwningPtr<SoundChannel> sound_channel, bool paused) noexcept
 {
+	if (!sound_channel)
+		return Play(paused);
+
 	if (handle_)
 	{
 		if (auto system = sound_manager::detail::get_system(*handle_); system)
 			sound_channel->Handle(
 				sound_manager::detail::play_sound(
 					*system, *handle_,
-					sound_channel && sound_channel->CurrentChannelGroup() ? sound_channel->CurrentChannelGroup()->Handle() : nullptr,
-					sound_channel ? sound_channel->Handle() : nullptr,
+					sound_channel->CurrentChannelGroup() ? sound_channel->CurrentChannelGroup()->Handle() : nullptr,
+					sound_channel->Handle(),
 					paused)
 			);
 	}
