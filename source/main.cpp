@@ -1059,6 +1059,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			flicker->Distance(0.4_r); //Min distance of 10 meters
 			auto night_runner = sounds.CreateSound("night_runner", "night_runner.mp3",
 				ion::sounds::sound::SoundType::Stream, ion::sounds::sound::SoundLoopingMode::Forward);
+			auto click = sounds.CreateSound("click", "click.wav", ion::sounds::sound::SoundType::Sample);
 			sounds.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!sounds.Loaded());
@@ -1870,7 +1871,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			caption_part.Enabled = caption_style_enabled;
 			caption_part.Disabled = caption_style_disabled;
 
-			auto button_skin = theme->CreateSkin<ion::gui::controls::GuiButton>(parts, caption_part);
+			ion::gui::skins::gui_skin::SkinSoundParts sound_parts;
+			sound_parts.Clicked.Base = click;
+
+			auto button_skin = theme->CreateSkin<ion::gui::controls::GuiButton>(parts, caption_part, sound_parts);
 
 			//Check box skin
 			parts = {};
@@ -1900,6 +1904,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			caption_part.Enabled = caption_style_enabled;
 			caption_part.Disabled = caption_style_disabled;
 
+			sound_parts = {};
+			sound_parts.Clicked.Base = click;
+
 			ion::gui::skins::gui_skin::SkinPart check_mark_part;
 			check_mark_part.Enabled = check_box_mark_enabled;
 			check_mark_part.Disabled = check_box_mark_disabled;
@@ -1907,7 +1914,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_mark_part.Hovered = check_box_mark_hovered;
 			check_mark_part.Scaling = 0.6_r;
 
-			auto check_box_skin = theme->CreateSkin<ion::gui::controls::GuiCheckBox>(parts, caption_part);
+			auto check_box_skin = theme->CreateSkin<ion::gui::controls::GuiCheckBox>(parts, caption_part, sound_parts);
 			check_box_skin->AddPart("check-mark", check_mark_part); //Additional
 
 			//Group box skin
@@ -1962,6 +1969,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			caption_part.Enabled = caption_style_enabled;
 			caption_part.Disabled = caption_style_disabled;
 
+			sound_parts = {};
+			sound_parts.Changed.Base = click;
+
 			ion::gui::skins::gui_skin::SkinPart selection_part;
 			selection_part.Enabled = button_center_hovered;
 			selection_part.FillColor.A(0.5_r);
@@ -1971,7 +1981,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			lines_part.Enabled = caption_style_enabled;
 			lines_part.Disabled = caption_style_disabled;
 
-			auto list_box_skin = theme->CreateSkin<ion::gui::controls::GuiListBox>(parts, caption_part);
+			auto list_box_skin = theme->CreateSkin<ion::gui::controls::GuiListBox>(parts, caption_part, sound_parts);
 			list_box_skin->AddPart("selection", selection_part); //Additional
 			list_box_skin->AddTextPart("lines", lines_part); //Additional
 
@@ -2031,6 +2041,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			caption_part.Enabled = caption_style_enabled;
 			caption_part.Disabled = caption_style_disabled;
 
+			sound_parts = {};
+			sound_parts.Clicked.Base = click;
+
 			check_mark_part = {};
 			check_mark_part.Enabled = radio_button_select_enabled;
 			check_mark_part.Disabled = radio_button_select_disabled;
@@ -2038,7 +2051,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_mark_part.Hovered = radio_button_select_hovered;
 			check_mark_part.Scaling = 0.6_r;
 
-			auto radio_button_skin = theme->CreateSkin<ion::gui::controls::GuiRadioButton>(parts, caption_part);
+			auto radio_button_skin = theme->CreateSkin<ion::gui::controls::GuiRadioButton>(parts, caption_part, sound_parts);
 			radio_button_skin->AddPart("check-mark", check_mark_part); //Additional
 
 			//Slider skin
@@ -2069,6 +2082,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			caption_part.Enabled = caption_style_enabled;
 			caption_part.Disabled = caption_style_disabled;
 
+			sound_parts = {};
+			sound_parts.Changed.Base = click;
+
 			ion::gui::skins::gui_skin::SkinPart handle_part;
 			handle_part.Enabled = radio_button_select_enabled;
 			handle_part.Disabled = radio_button_select_disabled;
@@ -2076,7 +2092,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			handle_part.Hovered = radio_button_select_hovered;
 			handle_part.Scaling = {0.75_r, 1.5_r};
 
-			auto slider_skin = theme->CreateSkin<ion::gui::controls::GuiSlider>(parts, caption_part);
+			auto slider_skin = theme->CreateSkin<ion::gui::controls::GuiSlider>(parts, caption_part, sound_parts);
 			slider_skin->AddPart("handle", handle_part); //Additional
 
 			//Scroll bar skin
