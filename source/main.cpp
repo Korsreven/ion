@@ -1054,12 +1054,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			sounds.CreateRepository(std::move(audio_repository));
 			auto sound_listener = sounds.CreateSoundListener("listener");
+			auto gui_sound_channel_group = sounds.CreateSoundChannelGroup("gui");
+			gui_sound_channel_group->Volume(0.2_r);
+
 			auto flicker = sounds.CreateSound(ion::sounds::Sound::Positional("flicker", "flicker.wav",
 				ion::sounds::sound::SoundType::Sample, ion::sounds::sound::SoundLoopingMode::Forward));
 			flicker->Distance(0.4_r); //Min distance of 10 meters
 			auto night_runner = sounds.CreateSound("night_runner", "night_runner.mp3",
 				ion::sounds::sound::SoundType::Stream, ion::sounds::sound::SoundLoopingMode::Forward);
-			auto click = sounds.CreateSound("click", "click.wav", ion::sounds::sound::SoundType::Sample);
+			auto click = sounds.CreateSound("click", "click.wav", ion::sounds::sound::SoundType::Sample);	
 			sounds.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!sounds.Loaded());
@@ -1813,7 +1816,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//GUI
-			ion::gui::GuiController controller{scene_graph->RootNode()};
+			ion::gui::GuiController controller{scene_graph->RootNode(), gui_sound_channel_group};
 			controller.ZOrder(-2.0_r);
 
 			//Theme
