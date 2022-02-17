@@ -970,21 +970,30 @@ void GuiControl::PlaySound(ControlSkinSoundPart &part)
 {
 	if (skin_ && part)
 	{
-		if (auto owner = Owner(); owner && !skin_->Sounds)
+		//No sound channel created yet
+		//Check if a sound channel group exists
+		if (!skin_->Sounds)
 		{
-			if (auto frame = owner->ParentFrame(); frame)
+			if (auto owner = Owner(); owner)
 			{
-				if (auto controller = frame->Owner();
-					controller && controller->ConnectedSoundChannelGroup())
+				if (auto frame = owner->ParentFrame(); frame)
 				{
-					skin_->Sounds.Object = part->Play(controller->ConnectedSoundChannelGroup());
-					return; //Get sound channel from sound channel group (first time)
+					if (auto controller = frame->Owner(); controller)
+					{
+						if (auto channel_group = controller->ConnectedSoundChannelGroup(); channel_group)
+						{
+							//Play sound through the given sound channel group
+							skin_->Sounds.Object = part->Play(channel_group);
+							return;
+						}
+					}
 				}
 			}
 		}
 
-		skin_->Sounds.Object = part->Play(skin_->Sounds.Object);
-			//Get sound channel from sound (first time)
+		//Play sound by reusing the sound channel
+		if (!skin_->Sounds.Object || !skin_->Sounds.Object->IsPlaying())
+			skin_->Sounds.Object = part->Play(skin_->Sounds.Object);
 	}
 }
 
