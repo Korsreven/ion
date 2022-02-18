@@ -1668,8 +1668,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			using namespace ion::utilities;
-			auto scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
 
+			//Scene manager
+			auto scene_manager = engine.CreateSceneManager("");
 
 			//Viewport
 			auto viewport = engine.Target()->GetViewport("");

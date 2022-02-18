@@ -30,9 +30,15 @@ File:	IonSceneManager.h
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
-namespace ion::graphics::render
+//Forward declarations
+namespace ion
 {
-	class Viewport; //Forward declaration
+	class Engine;
+
+	namespace graphics::render
+	{
+		class Viewport;
+	}
 }
 
 namespace ion::graphics::scene
@@ -42,7 +48,8 @@ namespace ion::graphics::scene
 	} //scene_manager::detail
 
 
-	class SceneManager :
+	class SceneManager final :
+		public managed::ManagedObject<Engine>,
 		public managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>,
 		public managed::ObjectManager<Light, SceneManager>,
 		public managed::ObjectManager<Model, SceneManager>,
@@ -70,17 +77,7 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Default constructor
-			SceneManager() = default;
-
-			//Deleted copy constructor
-			SceneManager(const SceneManager&) = delete;
-
-			//Default move constructor
-			SceneManager(SceneManager&&) = default;
-
-			//Default destructor
-			~SceneManager() = default;
+			using managed::ManagedObject<Engine>::ManagedObject;
 
 
 			/*

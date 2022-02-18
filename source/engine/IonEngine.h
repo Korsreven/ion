@@ -19,6 +19,7 @@ File:	IonEngine.h
 #include "events/IonListenable.h"
 #include "events/listeners/IonFrameListener.h"
 #include "graphics/render/IonRenderWindow.h"
+#include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneGraph.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
@@ -42,12 +43,15 @@ namespace ion
 
 
 	class Engine final :
-		protected events::Listenable<events::listeners::FrameListener>,
+		protected events::Listenable<events::listeners::FrameListener>,	
+		public managed::ObjectManager<graphics::scene::SceneManager, Engine>,
 		public managed::ObjectManager<graphics::scene::graph::SceneGraph, Engine>
 	{
 		private:
 
-			using FrameEventsBase = events::Listenable<events::listeners::FrameListener>;
+			using FrameEventsBase = events::Listenable<events::listeners::FrameListener>;		
+			using SceneManagerBase = managed::ObjectManager<graphics::scene::SceneManager, Engine>;
+			using SceneGraphBase = managed::ObjectManager<graphics::scene::graph::SceneGraph, Engine>;
 
 
 			bool initialized_ = false;
@@ -96,18 +100,33 @@ namespace ion
 				Ranges
 			*/
 
+			//Returns a mutable range of all scene managers in the engine
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SceneManagers() noexcept
+			{
+				return SceneManagerBase::Objects();
+			}
+
+			//Returns an immutable range of all scene managers in the engine
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SceneManagers() const noexcept
+			{
+				return SceneManagerBase::Objects();
+			}
+
+
 			//Returns a mutable range of all scene graphs in the engine
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto SceneGraphs() noexcept
 			{
-				return Objects();
+				return SceneGraphBase::Objects();
 			}
 
 			//Returns an immutable range of all scene graphs in the engine
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto SceneGraphs() const noexcept
 			{
-				return Objects();
+				return SceneGraphBase::Objects();
 			}
 
 
@@ -223,6 +242,44 @@ namespace ion
 
 			//Render to the given render window, and create a default viewport
 			graphics::render::RenderWindow& RenderTo(graphics::render::RenderWindow &&render_window) noexcept;
+
+
+			/*
+				Scene managers
+				Creating
+			*/
+
+			//Create a scene manager with the given name
+			NonOwningPtr<graphics::scene::SceneManager> CreateSceneManager(std::string name);
+
+
+			/*
+				Scene managers
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable scene manager with the given name
+			//Returns nullptr if scene manager could not be found
+			[[nodiscard]] NonOwningPtr<graphics::scene::SceneManager> GetSceneManager(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable scene manager with the given name
+			//Returns nullptr if scene manager could not be found
+			[[nodiscard]] NonOwningPtr<const graphics::scene::SceneManager> GetSceneManager(std::string_view name) const noexcept;
+
+
+			/*
+				Scene managers
+				Removing
+			*/
+
+			//Clear all removable scene managers from the engine
+			void ClearSceneManagers() noexcept;
+
+			//Remove a removable scene manager from the engine
+			bool RemoveSceneManager(graphics::scene::SceneManager &scene_manager) noexcept;
+
+			//Remove a removable scene manager with the given name from the engine
+			bool RemoveSceneManager(std::string_view name) noexcept;
 
 
 			/*
