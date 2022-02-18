@@ -12,6 +12,7 @@ File:	IonSoundManager.cpp
 
 #include "IonSoundManager.h"
 
+#include "IonEngine.h"
 #include "Fmod/fmod.hpp"
 #include "types/IonTypes.h"
 
@@ -29,8 +30,10 @@ FMOD::System* init_sound_system() noexcept
 	if (FMOD::System *system = nullptr;
 		FMOD::System_Create(&system) == FMOD_OK &&
 		system->init(max_sound_channels, FMOD_INIT_NORMAL, nullptr) == FMOD_OK)
-		
+	{
+		set_settings(*system, 1.0_r, Engine::UnitsPerMeter(), 1.0_r);
 		return system;
+	}
 	else
 	{
 		release_sound_system(system);

@@ -20,7 +20,6 @@ namespace ion
 {
 
 using namespace engine;
-using namespace types::type_literals;
 
 namespace engine::detail
 {

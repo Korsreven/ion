@@ -29,10 +29,16 @@ File:	IonEngine.h
 
 namespace ion
 {
+	using namespace types::type_literals;
+
 	namespace engine
 	{
 		namespace detail
 		{
+			constexpr auto meters_to_feet_factor = 3.28084_r;
+			constexpr auto feet_to_meters_factor = 0.3048_r;
+
+
 			bool init_file_system() noexcept;
 			bool init_graphics() noexcept;
 
@@ -49,19 +55,23 @@ namespace ion
 	{
 		private:
 
-			using FrameEventsBase = events::Listenable<events::listeners::FrameListener>;		
+			using FrameEventsBase = events::Listenable<events::listeners::FrameListener>;
 			using SceneManagerBase = managed::ObjectManager<graphics::scene::SceneManager, Engine>;
 			using SceneGraphBase = managed::ObjectManager<graphics::scene::graph::SceneGraph, Engine>;
 
 
 			bool initialized_ = false;
-			bool syncronize_ = false;		
+			bool syncronize_ = false;
 			timers::Stopwatch frame_stopwatch_;
 			timers::Stopwatch total_stopwatch_;
 
 			std::optional<graphics::render::RenderWindow> render_window_;
 			std::optional<events::InputController> input_controller_;
 			timers::TimerManager timer_manager_;
+
+
+			static inline auto pixels_per_unit_ = 1.0_r;
+			static inline auto units_per_meter_ = 1.0_r;
 
 
 			/*
@@ -155,6 +165,29 @@ namespace ion
 			void VerticalSync(bool vsync) noexcept;
 
 
+			//Sets the pixels per unit (PPU) the engine should use (default is 1.0)
+			static inline void PixelsPerUnit(real pixels) noexcept
+			{
+				if (pixels > 0.0_r)
+					pixels_per_unit_ = pixels;
+			}
+
+			//Sets the units per meter the engine should use for distance measurements (default is 1.0)
+			//This is mostly used when initializing the sound system (to set distance factor)
+			static inline void UnitsPerMeter(real units) noexcept
+			{
+				if (units > 0.0_r)
+					units_per_meter_ = units;
+			}
+
+			//Sets the units per foot the engine should use for distance measurements (default is 0.3048)
+			//This is mostly used when initializing the sound system (to set distance factor)
+			static inline void UnitsPerFoot(real units) noexcept
+			{
+				UnitsPerMeter(units * engine::detail::meters_to_feet_factor);
+			}
+
+
 			/*
 				Observers
 			*/
@@ -203,6 +236,27 @@ namespace ion
 			[[nodiscard]] inline auto& SyncedTimers() const noexcept
 			{
 				return timer_manager_;
+			}
+
+
+			//Returns the pixels per unit (PPU) the engine should use (default is 1.0)
+			[[nodiscard]] static inline auto PixelsPerUnit() noexcept
+			{
+				return pixels_per_unit_;
+			}
+
+			//Returns the units per meter the engine should use for distance measurements (default is 1.0)
+			//This is mostly used when initializing the sound system (to set distance factor)
+			[[nodiscard]] static inline auto UnitsPerMeter() noexcept
+			{
+				return units_per_meter_;
+			}
+
+			//Returns the units per foot the engine should use for distance measurements (default is 0.3048)
+			//This is mostly used when initializing the sound system (to set distance factor)
+			[[nodiscard]] static inline auto UnitsPerFoot() noexcept
+			{
+				return units_per_meter_ * engine::detail::feet_to_meters_factor;
 			}
 
 

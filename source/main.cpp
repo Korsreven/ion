@@ -583,6 +583,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	auto exit_code = 0;
 	{	
 		ion::Engine engine;
+		engine.PixelsPerUnit(360.0_r);
+		engine.UnitsPerMeter(0.04_r);
 
 		auto &window = engine.RenderTo(
 			ion::graphics::render::RenderWindow::Resizable("ION engine", {1280.0_r, 720.0_r}));
@@ -1048,10 +1050,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Sound
 			ion::sounds::SoundManager sounds;
-			sounds.Settings(1.0_r, 0.04_r, 1.0_r);
-				//2 game units = 50 meters
-				//2 / 50m = 0.04 distance factor
-
 			sounds.CreateRepository(std::move(audio_repository));
 			auto sound_listener = sounds.CreateSoundListener("listener");
 			auto gui_sound_channel_group = sounds.CreateSoundChannelGroup("gui");
