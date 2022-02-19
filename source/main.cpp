@@ -1672,7 +1672,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Viewport
 			auto viewport = engine.Target()->GetViewport("");
-			scene_manager->ConnectedViewport(viewport); //Temp, should not be necessary
 
 			//Frustum
 			auto frustum = ion::graphics::render::Frustum::Orthographic(

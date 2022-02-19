@@ -12,9 +12,8 @@ File:	IonSprite.cpp
 
 #include "IonSprite.h"
 
-#include "graphics/render/IonViewport.h"
+#include "IonEngine.h"
 #include "graphics/scene/IonModel.h"
-#include "graphics/scene/IonSceneManager.h"
 #include "graphics/textures/IonAnimation.h"
 #include "graphics/textures/IonTexture.h"
 #include "graphics/textures/IonTextureManager.h"
@@ -89,17 +88,8 @@ std::optional<Vector2> Sprite::GetTextureSize() const noexcept
 	{
 		if (auto texture_size = detail::get_texture_size(*material); texture_size)
 		{
-			//Adjust texture size from viewport to ortho space
-			if (auto model = Owner(); model)
-			{
-				if (auto scene_manager = model->Owner(); scene_manager)
-				{
-					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-						*texture_size *= viewport->ViewportToOrthoRatio();
-				}
-			}
-
-			return texture_size;
+			auto ppu = Engine::PixelsPerUnit();
+			return *texture_size /= ppu;
 		}
 	}
 

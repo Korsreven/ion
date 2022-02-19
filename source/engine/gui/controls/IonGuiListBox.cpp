@@ -14,7 +14,7 @@ File:	IonGuiListBox.cpp
 
 #include <algorithm>
 
-#include "graphics/render/IonViewport.h"
+#include "IonEngine.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/IonSceneManager.h"
@@ -303,26 +303,13 @@ void GuiListBox::UpdateLines() noexcept
 			if (auto size = InnerSize(); size)
 			{
 				auto center = CenterArea().value_or(aabb::Zero).Center();
-
-				auto ortho_viewport_ratio =
-					[&]() noexcept
-					{
-						//Adjust area size from ortho to viewport space
-						if (auto scene_manager = skin->Lines->Owner(); scene_manager)
-						{
-							if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-								return viewport->OrthoToViewportRatio();
-						}
-
-						return vector2::UnitScale;
-					}();
-
 				auto icon_column_size = show_icons_ ?
 					*size * Vector2{icon_column_width_.value_or(detail::default_icon_column_width_percent), 0.0_r} :
 					vector2::Zero;
 
+				auto ppu = Engine::PixelsPerUnit();
 				text->Overflow(graphics::fonts::text::TextOverflow::WordTruncate);
-				text->AreaSize((*size - icon_column_size) * ortho_viewport_ratio);
+				text->AreaSize((*size - icon_column_size) * ppu);
 				text->LineHeightFactor(item_height_factor_.value_or(detail::default_item_height_factor));
 				text->Padding(item_padding_.value_or(detail::default_item_padding_size));
 				text->Alignment(detail::item_layout_to_text_alignment(item_layout_));
@@ -330,7 +317,7 @@ void GuiListBox::UpdateLines() noexcept
 				//Refresh content
 				if (text->LineCount() != std::ssize(items_))
 					text->Content(detail::items_to_text_content(items_));
-
+				
 				skin->Lines->Position(center + detail::lines_area_offset(icon_layout_, icon_column_size));
 			}
 		}
@@ -354,22 +341,10 @@ void GuiListBox::UpdateIcons() noexcept
 				auto [width, height] = size->XY();
 				auto center = CenterArea().value_or(aabb::Zero).Center();
 
-				auto viewport_ortho_ratio =
-					[&]() noexcept
-					{
-						//Adjust area size from ortho to viewport space
-						if (auto scene_manager = skin->Lines->Owner(); scene_manager)
-						{
-							if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-								return viewport->ViewportToOrthoRatio();
-						}
-
-						return vector2::UnitScale;
-					}();
-
-				auto item_height = *text->LineHeight() * viewport_ortho_ratio.Y();
-				auto item_padding = text->Padding().Y() * viewport_ortho_ratio.Y();
-				auto icon_padding = icon_padding_.value_or(detail::default_icon_padding_size) * viewport_ortho_ratio.Y();
+				auto ppu = Engine::PixelsPerUnit();
+				auto item_height = *text->LineHeight() / ppu;
+				auto item_padding = text->Padding().Y() / ppu;
+				auto icon_padding = icon_padding_.value_or(detail::default_icon_padding_size) / ppu;
 
 				auto icon_column_percent = icon_column_width_.value_or(detail::default_icon_column_width_percent);
 				auto icon_column_width = width * icon_column_percent;
@@ -442,23 +417,11 @@ void GuiListBox::UpdateSelection() noexcept
 						auto [width, height] = size->XY();
 						auto center = CenterArea().value_or(aabb::Zero).Center();
 
-						auto viewport_ortho_ratio =
-							[&]() noexcept
-							{
-								//Adjust area size from ortho to viewport space
-								if (auto scene_manager = skin->Lines->Owner(); scene_manager)
-								{
-									if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-										return viewport->ViewportToOrthoRatio();
-								}
-
-								return vector2::UnitScale;
-							}();
-
-						auto item_height = *text->LineHeight() * viewport_ortho_ratio.Y();
-						auto item_padding = text->Padding().Y() * viewport_ortho_ratio.Y();
+						auto ppu = Engine::PixelsPerUnit();
+						auto item_height = *text->LineHeight() / ppu;
+						auto item_padding = text->Padding().Y() / ppu;
 						auto item_selection_padding = selection_padding_.
-							value_or(detail::default_selection_padding_size) * viewport_ortho_ratio;
+							value_or(detail::default_selection_padding_size) / ppu;
 
 						skin->Selection->Size(
 							(Vector2{width, item_height} - item_selection_padding * 2.0_r).
@@ -894,21 +857,9 @@ bool GuiListBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 					auto [width, height] = size->XY();
 					auto center = CenterArea().value_or(aabb::Zero).Center();
 
-					auto viewport_ortho_ratio =
-						[&]() noexcept
-						{
-							//Adjust area size from ortho to viewport space
-							if (auto scene_manager = skin->Lines->Owner(); scene_manager)
-							{
-								if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-									return viewport->ViewportToOrthoRatio();
-							}
-
-							return vector2::UnitScale;
-						}();
-
-					auto item_height = *text->LineHeight() * viewport_ortho_ratio.Y();
-					auto item_padding = text->Padding().Y() * viewport_ortho_ratio.Y();
+					auto ppu = Engine::PixelsPerUnit();
+					auto item_height = *text->LineHeight() / ppu;
+					auto item_padding = text->Padding().Y() / ppu;
 					
 					if (skin_node_)
 					{

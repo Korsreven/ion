@@ -12,7 +12,7 @@ File:	IonGuiTooltip.cpp
 
 #include "IonGuiTooltip.h"
 
-#include "graphics/render/IonViewport.h"
+#include "IonEngine.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/IonSceneManager.h"
@@ -150,13 +150,9 @@ void GuiTooltip::UpdateCaption() noexcept
 				if (auto size = text->MinimumAreaSize(); size != vector2::Zero)
 				{
 					size += 2.0_r; //Make sure there is enough space (rounding error)
-
-					//Adjust size from viewport to ortho space
-					if (auto scene_manager = part->Owner(); scene_manager)
-					{
-						if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-							size *= viewport->ViewportToOrthoRatio();
-					}
+					
+					auto ppu = Engine::PixelsPerUnit();
+					size /= ppu;
 
 					auto border_size =
 						gui_control::detail::get_border_size(*skin_, false).value_or(vector2::Zero);
@@ -213,18 +209,12 @@ void GuiTooltip::UpdatePosition(Vector2 position) noexcept
 					{
 						if (skin_ && skin_->Parts)
 						{
-							//Adjust cursor size from viewport to ortho space
-							if (auto scene_manager = skin_->Parts->Owner(); scene_manager)
-							{
-								if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-								{
-									auto cursor_size = Vector2{20.0_r, 20.0_r}; //OS cursor size?
-									return cursor_size * viewport->ViewportToOrthoRatio();
-								}
-							}
+							auto cursor_size = Vector2{20.0_r, 20.0_r}; //OS cursor size?
+							auto ppu = Engine::PixelsPerUnit();
+							return cursor_size / ppu;
 						}
-
-						return vector2::Zero;
+						else
+							return vector2::Zero;
 					}();
 
 				//Adjust tooltip position based on cursor hot spot
@@ -247,8 +237,10 @@ void GuiTooltip::AdjustInView() noexcept
 			{
 				if (auto scene_manager = skin_->Caption->Owner(); scene_manager)
 				{
-					if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-						return viewport->ConnectedCamera()->WorldAxisAlignedBoundingBox();
+					//Get bounding box from the first camera in scene manager
+					//The first camera is considered to be the main camera
+					if (!std::empty(scene_manager->Cameras()))
+						return std::begin(scene_manager->Cameras())->WorldAxisAlignedBoundingBox();
 				}
 
 				return aabb::Zero;

@@ -30,15 +30,9 @@ File:	IonSceneManager.h
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
-//Forward declarations
 namespace ion
 {
-	class Engine;
-
-	namespace graphics::render
-	{
-		class Viewport;
-	}
+	class Engine; //Forward declaration
 }
 
 namespace ion::graphics::scene
@@ -71,9 +65,6 @@ namespace ion::graphics::scene
 			using SoundListenerBase = managed::ObjectManager<MovableSoundListener, SceneManager>;
 
 			using CameraEventsBase = events::Listenable<events::listeners::CameraListener>;
-
-
-			NonOwningPtr<render::Viewport> viewport_;
 
 		public:
 
@@ -478,24 +469,6 @@ namespace ion::graphics::scene
 
 			//Remove a removable sound listener from this manager
 			bool RemoveSoundListener(MovableSoundListener &sound_listener) noexcept;
-
-
-			/*
-				Viewport
-			*/
-
-			//Sets the viewport connected to this scene manager to the given viewport
-			inline void ConnectedViewport(NonOwningPtr<graphics::render::Viewport> viewport) noexcept
-			{
-				viewport_ = viewport;
-			}
-
-			//Returns a pointer to the viewport connected to this scene manager
-			//Returns nullptr if this scene manager does not have a viewport connected
-			[[nodiscard]] inline auto ConnectedViewport() const noexcept
-			{
-				return viewport_;
-			}
 	};
 } //ion::graphics::scene
 

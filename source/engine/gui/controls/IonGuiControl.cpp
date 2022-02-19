@@ -12,7 +12,7 @@ File:	IonGuiControl.cpp
 
 #include "IonGuiControl.h"
 
-#include "graphics/render/IonViewport.h"
+#include "IonEngine.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/IonSceneManager.h"
@@ -912,45 +912,21 @@ void GuiControl::UpdateCaption() noexcept
 			auto border_size = detail::get_border_size(*skin_, false).value_or(vector2::Zero);
 			auto center = detail::get_center_area(*skin_, false).value_or(aabb::Zero).Center();
 
+			auto ppu = Engine::PixelsPerUnit();
+
 			//Area size
 			if (auto size = caption_size_.
 				value_or(detail::is_caption_outside(caption_layout_) ? vector2::Zero : area_size);
 				size != vector2::Zero)
 			{
-				auto ortho_viewport_ratio =
-					[&]() noexcept
-					{
-						//Adjust area size from ortho to viewport space
-						if (auto scene_manager = skin_->Caption->Owner(); scene_manager)
-						{
-							if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-								return viewport->OrthoToViewportRatio();
-						}
-
-						return vector2::UnitScale;
-					}();
-
-				text->AreaSize(size * ortho_viewport_ratio);
+				text->AreaSize(size * ppu);
 				skin_->Caption->Position(center + detail::caption_area_offset(caption_layout_, size, border_size));
 			}
 			else
 			{
-				auto viewport_ortho_ratio =
-					[&]() noexcept
-					{
-						//Adjust area size from ortho to viewport space
-						if (auto scene_manager = skin_->Caption->Owner(); scene_manager)
-						{
-							if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-								return viewport->ViewportToOrthoRatio();
-						}
-
-						return vector2::UnitScale;
-					}();
-
 				text->AreaSize({});
 				skin_->Caption->Position(center + detail::caption_offset(caption_layout_, area_size, border_size,
-					caption_margin_.value_or(detail::default_caption_margin_size) * viewport_ortho_ratio));
+					caption_margin_.value_or(detail::default_caption_margin_size) / ppu));
 			}
 
 			text->Padding(caption_padding_.value_or(detail::default_caption_padding_size));

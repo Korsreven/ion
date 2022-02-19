@@ -112,7 +112,7 @@ namespace ion::graphics::scene
 		}
 
 		std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const fonts::Text &text,
-			const Vector2 &position, real rotation, const Vector2 &pixel_unit_ratio) noexcept;
+			const Vector2 &position, real rotation) noexcept;
 
 
 		/*
@@ -134,17 +134,16 @@ namespace ion::graphics::scene
 
 		vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 			const Vector3 &position, real rotation, const Vector2 &scaling,
-			const Color &color, real opacity, const Vector3 &origin, const Vector2 &pixel_unit_ratio);
+			const Color &color, real opacity, const Vector3 &origin);
 		decoration_vertex_container get_decoration_vertex_data(
 			const Vector3 &position, real rotation, const Vector2 &size,
-			const Color &color, real opacity, const Vector3 &origin, const Vector2 &pixel_unit_ratio);
+			const Color &color, real opacity, const Vector3 &origin);
 
 		void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text,
-			int font_size, int &glyph_count, Vector3 &position, real rotation, real opacity,
-			const Vector3 &origin, const Vector2 &pixel_unit_ratio,
+			int font_size, int &glyph_count, Vector3 &position, real rotation, real opacity, const Vector3 &origin,
 			glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream);
 		void get_text_vertex_streams(const fonts::Text &text, Vector3 position, real rotation, real opacity,
-			const Vector2 &pixel_unit_ratio, glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream);
+			glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream);
 	} //drawable_text::detail
 
 
@@ -168,7 +167,7 @@ namespace ion::graphics::scene
 			bool update_bounding_volumes_ = false;
 
 
-			void PrepareVertexStreams(const Vector2 &pixel_unit_ratio);
+			void PrepareVertexStreams();
 
 		protected:
 

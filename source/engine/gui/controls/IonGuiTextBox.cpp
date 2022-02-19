@@ -14,8 +14,8 @@ File:	IonGuiTextBox.cpp
 
 #include <cmath>
 
+#include "IonEngine.h"
 #include "graphics/fonts/utilities/IonFontUtility.h"
-#include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/IonSceneManager.h"
@@ -541,22 +541,10 @@ void GuiTextBox::UpdateText() noexcept
 			{
 				auto center = CenterArea().value_or(aabb::Zero).Center();
 
-				auto ortho_viewport_ratio =
-					[&]() noexcept
-					{
-						//Adjust area size from ortho to viewport space
-						if (auto scene_manager = skin->Text->Owner(); scene_manager)
-						{
-							if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-								return viewport->OrthoToViewportRatio();
-						}
-
-						return vector2::UnitScale;
-					}();
-
+				auto ppu = Engine::PixelsPerUnit();
 				text->Formatting(graphics::fonts::text::TextFormatting::None);
 				text->Overflow(graphics::fonts::text::TextOverflow::Truncate);
-				text->AreaSize(*size * ortho_viewport_ratio);
+				text->AreaSize(*size * ppu);
 				text->Padding(text_padding_.value_or(detail::default_text_padding_size));
 				text->Alignment(detail::text_layout_to_text_alignment(text_layout_));
 				text->VerticalAlignment(graphics::fonts::text::TextVerticalAlignment::Middle);
@@ -589,7 +577,7 @@ void GuiTextBox::UpdateText() noexcept
 						if (auto &placeholder_text = skin->PlaceholderText->Get(); placeholder_text)
 						{
 							placeholder_text->Overflow(graphics::fonts::text::TextOverflow::TruncateEllipsis);
-							placeholder_text->AreaSize(*size * ortho_viewport_ratio);
+							placeholder_text->AreaSize(*size * ppu);
 							placeholder_text->Padding(text_padding_.value_or(detail::default_text_padding_size));
 							placeholder_text->Alignment(detail::text_layout_to_text_alignment(text_layout_));
 							placeholder_text->VerticalAlignment(graphics::fonts::text::TextVerticalAlignment::Middle);
@@ -625,21 +613,9 @@ void GuiTextBox::UpdateCursor() noexcept
 				auto [width, height] = size->XY();
 				auto center = CenterArea().value_or(aabb::Zero).Center();
 
-				auto viewport_ortho_ratio =
-					[&]() noexcept
-					{
-						//Adjust area size from ortho to viewport space
-						if (auto scene_manager = skin->Text->Owner(); scene_manager)
-						{
-							if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-								return viewport->ViewportToOrthoRatio();
-						}
-
-						return vector2::UnitScale;
-					}();
-
-				auto line_height = *text->LineHeight() * viewport_ortho_ratio.Y();
-				auto line_padding = text->Padding().X() * viewport_ortho_ratio.X();
+				auto ppu = Engine::PixelsPerUnit();
+				auto line_height = *text->LineHeight() / ppu;
+				auto line_padding = text->Padding().X() / ppu;
 
 				auto [cursor_width, cursor_height] = skin->Cursor->Size().XY();
 				auto aspect_ratio = cursor_width / cursor_height;
@@ -650,11 +626,9 @@ void GuiTextBox::UpdateCursor() noexcept
 				);
 
 				auto cursor_distance = detail::string_width(
-					detail::get_viewed_content(content_, {content_view_.first, cursor_position_}, mask_), *font) *
-					viewport_ortho_ratio.X();
+					detail::get_viewed_content(content_, {content_view_.first, cursor_position_}, mask_), *font) / ppu;
 				auto line_width = cursor_distance + detail::string_width(
-					detail::get_viewed_content(content_, {cursor_position_, content_view_.second}, mask_), *font) *
-					viewport_ortho_ratio.X();
+					detail::get_viewed_content(content_, {cursor_position_, content_view_.second}, mask_), *font) / ppu;
 
 				skin->Cursor->Position(
 					Vector3{center.X(), center.Y(), skin->Cursor->Position().Z()} +
@@ -1253,23 +1227,10 @@ bool GuiTextBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 					auto [width, height] = size->XY();
 					auto center = CenterArea().value_or(aabb::Zero).Center();
 
-					auto [viewport_ortho_ratio, ortho_viewport_ratio] =
-						[&]() noexcept
-						{
-							//Adjust area size from ortho to viewport space
-							if (auto scene_manager = skin->Text->Owner(); scene_manager)
-							{
-								if (auto viewport = scene_manager->ConnectedViewport(); viewport)
-									return std::pair{viewport->ViewportToOrthoRatio(), viewport->OrthoToViewportRatio()};
-							}
-
-							return std::pair{vector2::UnitScale, vector2::UnitScale};
-						}();
-					
+					auto ppu = Engine::PixelsPerUnit();
 					auto line_width = detail::string_width(
-						detail::get_viewed_content(content_, {content_view_.first, content_view_.second}, mask_), *font) *
-						viewport_ortho_ratio.X();
-					auto line_padding = text->Padding().X() * viewport_ortho_ratio.X();
+						detail::get_viewed_content(content_, {content_view_.first, content_view_.second}, mask_), *font) / ppu;
+					auto line_padding = text->Padding().X() / ppu;
 					auto scaling = vector2::UnitScale;
 					
 					if (skin_node_)
@@ -1287,7 +1248,7 @@ bool GuiTextBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 					CursorPosition(
 						content_view_.first +
 						detail::get_cursor_position((position -
-							detail::cursor_offset(width, line_width, line_padding, 0.0_r, text_layout_)) * ortho_viewport_ratio,
+							detail::cursor_offset(width, line_width, line_padding, 0.0_r, text_layout_)) * ppu,
 							scaling, detail::get_viewed_content(content_, content_view_, mask_), *font)
 						);
 				}
