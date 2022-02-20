@@ -26,6 +26,39 @@ using namespace types::type_literals;
 namespace drawable_particle_system::detail
 {
 
+std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const particles::ParticleSystem &particle_system) noexcept
+{
+	auto aabb = aabb::Zero;
+
+	for (auto &emitter : particle_system.Emitters())
+	{
+		if (!emitter.HasActiveParticles())
+			continue;
+
+		auto first = std::begin(emitter.Particles());
+		auto last = std::end(emitter.Particles());
+
+		auto min = Vector2{first->Position()};
+		auto max = min;
+
+		while (++first != last)
+		{
+			auto [x, y, z] = first->Position().XYZ();
+
+			if (x < min.X()) min.X(x);
+			else if (x > max.X()) max.X(x);
+
+			if (y < min.Y()) min.Y(y);
+			else if (y > max.Y()) max.Y(y);
+		}
+
+		aabb.Merge(Aabb{min, max});
+	}
+
+	return {aabb, aabb, {aabb.ToHalfSize().Max(), aabb.Center()}};
+}
+
+
 /*
 	Graphics API
 */
@@ -162,6 +195,7 @@ void DrawableParticleSystem::Prepare() noexcept
 		return;
 
 	PrepareVertexStreams();
+	update_bounding_volumes_ = true;
 
 	if (reload_vertex_buffer_)
 	{
@@ -192,6 +226,17 @@ void DrawableParticleSystem::Prepare() noexcept
 
 	for (auto &stream : vertex_streams_)
 		stream.vertex_batch.Prepare();
+
+	if (update_bounding_volumes_)
+	{
+		auto [aabb, obb, sphere] =
+			detail::generate_bounding_volumes(*particle_system_);
+		aabb_ = aabb;
+		obb_ = obb;
+		sphere_ = sphere;
+
+		update_bounding_volumes_ = false;
+	}
 }
 
 

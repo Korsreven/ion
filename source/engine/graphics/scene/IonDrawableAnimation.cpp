@@ -34,6 +34,19 @@ animation_vertex_stream::animation_vertex_stream() :
 	//Empty
 }
 
+
+std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const Vector2 &size,
+	const Vector2 &position, real rotation) noexcept
+{
+	auto aabb = Aabb::Size(size, position).RotateCopy(rotation);
+	return {aabb, aabb, {aabb.ToHalfSize().Max(), aabb.Center()}};
+}
+
+
+/*
+	Rendering
+*/
+
 vertex_container get_animation_vertex_data(textures::Animation &animation,
 	const Vector3 &position, real rotation, const Vector2 &size, const Color &color, real opacity)
 {
@@ -220,9 +233,11 @@ void DrawableAnimation::Prepare() noexcept
 
 	if (update_bounding_volumes_)
 	{
-		aabb_ = Aabb::Size(size_, position_).RotateCopy(rotation_);
-		obb_ = aabb_;
-		sphere_ = {aabb_.ToHalfSize().Max(), aabb_.Center()};
+		auto [aabb, obb, sphere] =
+			detail::generate_bounding_volumes(size_, position_, rotation_);
+		aabb_ = aabb;
+		obb_ = obb;
+		sphere_ = sphere;
 
 		update_bounding_volumes_ = false;
 	}

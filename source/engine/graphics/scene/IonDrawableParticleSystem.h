@@ -15,6 +15,7 @@ File:	IonDrawableParticleSystem.h
 
 #include <cstddef>
 #include <optional>
+#include <tuple>
 #include <vector>
 
 #include "IonDrawableObject.h"
@@ -79,6 +80,8 @@ namespace ion::graphics::scene
 				};
 		}
 
+		std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const particles::ParticleSystem &particle_system) noexcept;
+
 
 		/*
 			Graphics API
@@ -103,6 +106,7 @@ namespace ion::graphics::scene
 			std::optional<render::vertex::VertexBufferObject> vbo_;
 
 			bool reload_vertex_buffer_ = false;
+			bool update_bounding_volumes_ = false;
 
 
 			void PrepareVertexStreams();

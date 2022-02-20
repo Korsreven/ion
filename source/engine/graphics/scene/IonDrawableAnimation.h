@@ -15,6 +15,7 @@ File:	IonDrawableAnimation.h
 
 #include <array>
 #include <optional>
+#include <tuple>
 
 #include "IonDrawableObject.h"
 #include "graphics/textures/IonAnimation.h"
@@ -95,6 +96,14 @@ namespace ion::graphics::scene
 					}
 				};
 		}
+
+		std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const Vector2 &size,
+			const Vector2 &position, real rotation) noexcept;
+
+
+		/*
+			Rendering
+		*/
 
 		vertex_container get_animation_vertex_data(textures::Animation &animation,
 			const Vector3 &position, real rotation, const Vector2 &size, const Color &color, real opacity);

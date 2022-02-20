@@ -330,7 +330,7 @@ struct Game :
 				player_camera->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
 		}
 
-		if (controller)
+		if (controller && controller->IsVisible())
 			controller->FrameStarted(time);
 
 		return true;
@@ -341,7 +341,7 @@ struct Game :
 		if (sound_manager)
 			sound_manager->Update();
 
-		if (controller)
+		if (controller && controller->IsVisible())
 			controller->FrameEnded(time);
 
 		return true;
@@ -354,7 +354,7 @@ struct Game :
 
 	void WindowActionReceived(ion::events::listeners::WindowAction action) noexcept override
 	{
-		if (controller)
+		if (controller && controller->IsVisible())
 			controller->WindowActionReceived(action);
 	}
 
@@ -367,59 +367,62 @@ struct Game :
 	{
 		using namespace ion::graphics::utilities;
 
-		/*switch (button)
+		if (!controller || !controller->IsVisible())
 		{
-			case ion::events::listeners::KeyButton::W:
-			move_model.Y(move_model.Y() + 1.0_r);
-			break;
+			switch (button)
+			{
+				case ion::events::listeners::KeyButton::W:
+				move_model.Y(move_model.Y() + 1.0_r);
+				break;
 
-			case ion::events::listeners::KeyButton::A:
-			move_model.X(move_model.X() - 1.0_r);
-			break;
+				case ion::events::listeners::KeyButton::A:
+				move_model.X(move_model.X() - 1.0_r);
+				break;
 
-			case ion::events::listeners::KeyButton::S:
-			move_model.Y(move_model.Y() - 1.0_r);
-			break;
+				case ion::events::listeners::KeyButton::S:
+				move_model.Y(move_model.Y() - 1.0_r);
+				break;
 
-			case ion::events::listeners::KeyButton::D:
-			move_model.X(move_model.X() + 1.0_r);
-			break;
+				case ion::events::listeners::KeyButton::D:
+				move_model.X(move_model.X() + 1.0_r);
+				break;
 
-			case ion::events::listeners::KeyButton::Q:
-			rotate_model_left = true;
-			break;
+				case ion::events::listeners::KeyButton::Q:
+				rotate_model_left = true;
+				break;
 
-			case ion::events::listeners::KeyButton::E:
-			rotate_model_right = true;
-			break;
+				case ion::events::listeners::KeyButton::E:
+				rotate_model_right = true;
+				break;
 
 
-			case ion::events::listeners::KeyButton::UpArrow:
-			move_camera.Y(move_camera.Y() + 1.0_r);
-			break;
+				case ion::events::listeners::KeyButton::UpArrow:
+				move_camera.Y(move_camera.Y() + 1.0_r);
+				break;
 
-			case ion::events::listeners::KeyButton::LeftArrow:
-			move_camera.X(move_camera.X() - 1.0_r);
-			break;
+				case ion::events::listeners::KeyButton::LeftArrow:
+				move_camera.X(move_camera.X() - 1.0_r);
+				break;
 
-			case ion::events::listeners::KeyButton::DownArrow:
-			move_camera.Y(move_camera.Y() - 1.0_r);
-			break;
+				case ion::events::listeners::KeyButton::DownArrow:
+				move_camera.Y(move_camera.Y() - 1.0_r);
+				break;
 
-			case ion::events::listeners::KeyButton::RightArrow:
-			move_camera.X(move_camera.X() + 1.0_r);
-			break;
+				case ion::events::listeners::KeyButton::RightArrow:
+				move_camera.X(move_camera.X() + 1.0_r);
+				break;
 
-			case ion::events::listeners::KeyButton::Subtract:
-			rotate_camera_left = true;
-			break;
+				case ion::events::listeners::KeyButton::Subtract:
+				rotate_camera_left = true;
+				break;
 
-			case ion::events::listeners::KeyButton::Add:
-			rotate_camera_right = true;
-			break;
-		}*/
+				case ion::events::listeners::KeyButton::Add:
+				rotate_camera_right = true;
+				break;
+			}
+		}
 
-		if (controller)
+		if (controller && controller->IsVisible())
 			controller->KeyPressed(button);
 	}
 
@@ -427,109 +430,122 @@ struct Game :
 	{
 		using namespace ion::graphics::utilities;
 
-		/*switch (button)
+		if (!controller || !controller->IsVisible())
 		{
-			case ion::events::listeners::KeyButton::W:
-			move_model.Y(move_model.Y() - 1.0_r);
-			break;
-
-			case ion::events::listeners::KeyButton::A:
-			move_model.X(move_model.X() + 1.0_r);
-			break;
-
-			case ion::events::listeners::KeyButton::S:
-			move_model.Y(move_model.Y() + 1.0_r);
-			break;
-
-			case ion::events::listeners::KeyButton::D:
-			move_model.X(move_model.X() - 1.0_r);
-			break;
-
-			case ion::events::listeners::KeyButton::Q:
-			rotate_model_left = false;
-			break;
-
-			case ion::events::listeners::KeyButton::E:
-			rotate_model_right = false;
-			break;
-
-
-			case ion::events::listeners::KeyButton::UpArrow:
-			move_camera.Y(move_camera.Y() - 1.0_r);
-			break;
-
-			case ion::events::listeners::KeyButton::LeftArrow:
-			move_camera.X(move_camera.X() + 1.0_r);
-			break;
-
-			case ion::events::listeners::KeyButton::DownArrow:
-			move_camera.Y(move_camera.Y() + 1.0_r);
-			break;
-
-			case ion::events::listeners::KeyButton::RightArrow:
-			move_camera.X(move_camera.X() - 1.0_r);
-			break;
-
-			case ion::events::listeners::KeyButton::Subtract:
-			rotate_camera_left = false;
-			break;
-
-			case ion::events::listeners::KeyButton::Add:
-			rotate_camera_right = false;
-			break;
-
-
-			case ion::events::listeners::KeyButton::C:
+			switch (button)
 			{
-				if (viewport && camera && player_camera)
+				case ion::events::listeners::KeyButton::W:
+				move_model.Y(move_model.Y() - 1.0_r);
+				break;
+
+				case ion::events::listeners::KeyButton::A:
+				move_model.X(move_model.X() + 1.0_r);
+				break;
+
+				case ion::events::listeners::KeyButton::S:
+				move_model.Y(move_model.Y() + 1.0_r);
+				break;
+
+				case ion::events::listeners::KeyButton::D:
+				move_model.X(move_model.X() - 1.0_r);
+				break;
+
+				case ion::events::listeners::KeyButton::Q:
+				rotate_model_left = false;
+				break;
+
+				case ion::events::listeners::KeyButton::E:
+				rotate_model_right = false;
+				break;
+
+
+				case ion::events::listeners::KeyButton::UpArrow:
+				move_camera.Y(move_camera.Y() - 1.0_r);
+				break;
+
+				case ion::events::listeners::KeyButton::LeftArrow:
+				move_camera.X(move_camera.X() + 1.0_r);
+				break;
+
+				case ion::events::listeners::KeyButton::DownArrow:
+				move_camera.Y(move_camera.Y() + 1.0_r);
+				break;
+
+				case ion::events::listeners::KeyButton::RightArrow:
+				move_camera.X(move_camera.X() - 1.0_r);
+				break;
+
+				case ion::events::listeners::KeyButton::Subtract:
+				rotate_camera_left = false;
+				break;
+
+				case ion::events::listeners::KeyButton::Add:
+				rotate_camera_right = false;
+				break;
+
+
+				case ion::events::listeners::KeyButton::C:
 				{
-					if (viewport->ConnectedCamera() == camera)
-						viewport->ConnectedCamera(player_camera);
-					else if (viewport->ConnectedCamera() == player_camera)
-						viewport->ConnectedCamera(camera);
+					if (viewport && camera && player_camera)
+					{
+						if (viewport->ConnectedCamera() == camera)
+							viewport->ConnectedCamera(player_camera);
+						else if (viewport->ConnectedCamera() == player_camera)
+							viewport->ConnectedCamera(camera);
+					}
+
+					break;
 				}
 
-				break;
+				case ion::events::listeners::KeyButton::F:
+				{
+					if (scene_graph)
+						scene_graph->FogEnabled(!scene_graph->FogEnabled());
+					break;
+				}
+
+				case ion::events::listeners::KeyButton::L:
+				{
+					if (light_node)
+						light_node->Visible(!light_node->Visible());
+					break;
+				}
+
+				case ion::events::listeners::KeyButton::Space:
+				{
+					//Intersection scene query
+					ion::graphics::scene::query::IntersectionSceneQuery scene_query{scene_graph};
+					scene_query.QueryMask(1 | 2 | 4);
+					[[maybe_unused]] auto result = scene_query.Execute();
+
+					//Ray scene query
+					ion::graphics::scene::query::RaySceneQuery ray_scene_query{scene_graph,
+						{player_node->DerivedPosition(), player_node->DerivedDirection()}};
+					ray_scene_query.QueryMask(2 | 4);
+					[[maybe_unused]] auto ray_result = ray_scene_query.Execute();
+
+ 					break;
+				}
 			}
-
-			case ion::events::listeners::KeyButton::F:
-			{
-				if (scene_graph)
-					scene_graph->FogEnabled(!scene_graph->FogEnabled());
-				break;
-			}
-
-			case ion::events::listeners::KeyButton::L:
-			{
-				if (light_node)
-					light_node->Visible(!light_node->Visible());
-				break;
-			}
-
-			case ion::events::listeners::KeyButton::Space:
-			{
-				//Intersection scene query
-				ion::graphics::scene::query::IntersectionSceneQuery scene_query{scene_graph};
-				scene_query.QueryMask(1 | 2 | 4);
-				[[maybe_unused]] auto result = scene_query.Execute();
-
-				//Ray scene query
-				ion::graphics::scene::query::RaySceneQuery ray_scene_query{scene_graph,
-					{player_node->DerivedPosition(), player_node->DerivedDirection()}};
-				ray_scene_query.QueryMask(2 | 4);
-				[[maybe_unused]] auto ray_result = ray_scene_query.Execute();
-
- 				break;
-			}
-		}*/
+		}
 
 		if (controller)
-			controller->KeyReleased(button);
+		{
+			switch (button)
+			{
+				case ion::events::listeners::KeyButton::Escape:
+				controller->Visible(!controller->IsVisible());
+				break;
+			}
+
+			if (controller->IsVisible())
+				controller->KeyReleased(button);
+		}
   	}
 
 	void CharacterPressed(char character) noexcept override
 	{
-		if (controller)
+		if (controller && controller->IsVisible())
 			controller->CharacterPressed(character);
 	}
 
@@ -540,25 +556,25 @@ struct Game :
 
 	void MousePressed(ion::events::listeners::MouseButton button, ion::graphics::utilities::Vector2 position) noexcept override
 	{
-		if (controller)
+		if (controller && controller->IsVisible())
 			controller->MousePressed(button, position);
 	}
 
 	void MouseReleased(ion::events::listeners::MouseButton button, ion::graphics::utilities::Vector2 position) noexcept override
 	{
-		if (controller)
+		if (controller && controller->IsVisible())
 			controller->MouseReleased(button, position);
 	}
 
 	void MouseMoved(ion::graphics::utilities::Vector2 position) noexcept override
 	{
-		if (controller)
+		if (controller && controller->IsVisible())
 			controller->MouseMoved(position);
 	}
 
 	void MouseWheelRolled(int delta, ion::graphics::utilities::Vector2 position) noexcept override
 	{
-		if (controller)
+		if (controller && controller->IsVisible())
 			controller->MouseWheelRolled(delta, position);
 	}
 };
