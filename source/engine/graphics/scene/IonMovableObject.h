@@ -81,9 +81,9 @@ namespace ion::graphics::scene
 				Bounding volumes
 			*/
 
-			Aabb DeriveWorldAxisAlignedBoundingBox(Aabb aabb) const noexcept;
-			Obb DeriveWorldOrientedBoundingBox(Obb obb, Aabb aabb) const noexcept;
-			Sphere DeriveWorldBoundingSphere(Sphere sphere, Aabb aabb) const noexcept;
+			Aabb DeriveWorldAxisAlignedBoundingBox(Aabb aabb, bool apply_extent = true) const noexcept;
+			Obb DeriveWorldOrientedBoundingBox(Obb obb, Aabb aabb, bool apply_extent = true) const noexcept;
+			Sphere DeriveWorldBoundingSphere(Sphere sphere, Aabb aabb, bool apply_extent = true) const noexcept;
 
 			void DrawBoundingVolumes(const Aabb &aabb, const Obb &obb, const Sphere &sphere,
 				const Color &aabb_color, const Color &obb_color, const Color &sphere_color) const noexcept;
@@ -351,28 +351,28 @@ namespace ion::graphics::scene
 
 
 			//Returns the world axis-aligned bounding box (AABB) for this movable object
-			[[nodiscard]] inline auto& WorldAxisAlignedBoundingBox(bool derive = true) const noexcept
+			[[nodiscard]] inline auto& WorldAxisAlignedBoundingBox(bool derive = true, bool apply_extent = true) const noexcept
 			{
 				if (derive)
-					world_aabb_ = DeriveWorldAxisAlignedBoundingBox(aabb_);
+					world_aabb_ = DeriveWorldAxisAlignedBoundingBox(aabb_, apply_extent);
 
 				return world_aabb_;
 			}
 
 			//Returns the world oriented bounding box (OBB) for this movable object
-			[[nodiscard]] inline auto& WorldOrientedBoundingBox(bool derive = true) const noexcept
+			[[nodiscard]] inline auto& WorldOrientedBoundingBox(bool derive = true, bool apply_extent = true) const noexcept
 			{
 				if (derive)
-					world_obb_ = DeriveWorldOrientedBoundingBox(obb_, aabb_);
+					world_obb_ = DeriveWorldOrientedBoundingBox(obb_, aabb_, apply_extent);
 
 				return world_obb_;
 			}
 
 			//Returns the world bounding sphere for this movable object
-			[[nodiscard]] inline auto& WorldBoundingSphere(bool derive = true) const noexcept
+			[[nodiscard]] inline auto& WorldBoundingSphere(bool derive = true, bool apply_extent = true) const noexcept
 			{
 				if (derive)
-					world_sphere_ = DeriveWorldBoundingSphere(sphere_, aabb_);
+					world_sphere_ = DeriveWorldBoundingSphere(sphere_, aabb_, apply_extent);
 
 				return world_sphere_;
 			}

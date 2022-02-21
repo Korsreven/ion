@@ -36,16 +36,19 @@ namespace movable_object::detail
 	Bounding volumes
 */
 
-Aabb MovableObject::DeriveWorldAxisAlignedBoundingBox(Aabb aabb) const noexcept
+Aabb MovableObject::DeriveWorldAxisAlignedBoundingBox(Aabb aabb, bool apply_extent) const noexcept
 {
 	if (parent_node_ && !aabb.Empty())
 	{
-		if (auto [min, max] = bounding_volume_extent_.MinMax();
-			min != vector2::Zero || max != vector2::UnitScale)
+		if (apply_extent)
 		{
-			auto size = aabb.ToSize();
-			aabb = Aabb{aabb.Min() + min * size,
-						aabb.Max() + (max - vector2::UnitScale) * size};
+			if (auto [min, max] = bounding_volume_extent_.MinMax();
+				min != vector2::Zero || max != vector2::UnitScale)
+			{
+				auto size = aabb.ToSize();
+				aabb = Aabb{aabb.Min() + min * size,
+							aabb.Max() + (max - vector2::UnitScale) * size};
+			}
 		}
 
 		aabb.Transform(parent_node_->FullTransformation());
@@ -54,17 +57,20 @@ Aabb MovableObject::DeriveWorldAxisAlignedBoundingBox(Aabb aabb) const noexcept
 	return aabb;
 }
 
-Obb MovableObject::DeriveWorldOrientedBoundingBox(Obb obb, Aabb aabb) const noexcept
+Obb MovableObject::DeriveWorldOrientedBoundingBox(Obb obb, Aabb aabb, bool apply_extent) const noexcept
 {
 	if (parent_node_ && !obb.Empty())
 	{
-		if (auto [min, max] = bounding_volume_extent_.MinMax();
-			min != vector2::Zero || max != vector2::UnitScale)
+		if (apply_extent)
 		{
-			auto size = aabb.ToSize();
-			aabb = Aabb{aabb.Min() + min * size,
-						aabb.Max() + (max - vector2::UnitScale) * size};
-			obb = aabb;
+			if (auto [min, max] = bounding_volume_extent_.MinMax();
+				min != vector2::Zero || max != vector2::UnitScale)
+			{
+				auto size = aabb.ToSize();
+				aabb = Aabb{aabb.Min() + min * size,
+							aabb.Max() + (max - vector2::UnitScale) * size};
+				obb = aabb;
+			}
 		}
 
 		obb.Transform(parent_node_->FullTransformation());
@@ -73,17 +79,20 @@ Obb MovableObject::DeriveWorldOrientedBoundingBox(Obb obb, Aabb aabb) const noex
 	return obb;
 }
 
-Sphere MovableObject::DeriveWorldBoundingSphere(Sphere sphere, Aabb aabb) const noexcept
+Sphere MovableObject::DeriveWorldBoundingSphere(Sphere sphere, Aabb aabb, bool apply_extent) const noexcept
 {
 	if (parent_node_ && !sphere.Empty())
 	{
-		if (auto [min, max] = bounding_volume_extent_.MinMax();
-			min != vector2::Zero || max != vector2::UnitScale)
+		if (apply_extent)
 		{
-			auto size = aabb.ToSize();
-			aabb = Aabb{aabb.Min() + min * size,
-						aabb.Max() + (max - vector2::UnitScale) * size};
-			sphere = {aabb.ToHalfSize().Max(), aabb.Center()};
+			if (auto [min, max] = bounding_volume_extent_.MinMax();
+				min != vector2::Zero || max != vector2::UnitScale)
+			{
+				auto size = aabb.ToSize();
+				aabb = Aabb{aabb.Min() + min * size,
+							aabb.Max() + (max - vector2::UnitScale) * size};
+				sphere = {aabb.ToHalfSize().Max(), aabb.Center()};
+			}
 		}
 
 		sphere.Transform(parent_node_->FullTransformation());
