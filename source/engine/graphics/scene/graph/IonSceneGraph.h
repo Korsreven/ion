@@ -97,7 +97,7 @@ namespace ion::graphics::scene::graph
 
 			using NodeEventsBase = events::Listenable<events::listeners::SceneNodeListener>;
 
-
+			bool enable_ = true;
 			real gamma_ = 1.0_r; //100% gamma
 			Color ambient_color_ = color::White; //No ambient
 			std::optional<render::Fog> fog_; //No fog
@@ -158,6 +158,19 @@ namespace ion::graphics::scene::graph
 				Modifiers
 			*/
 
+			//Enable the scene graph rendering
+			inline void Enable() noexcept
+			{
+				enable_ = true;
+			}
+
+			//Disable the scene graph rendering
+			inline void Disable() noexcept
+			{
+				enable_ = false;
+			}
+
+
 			//Sets the gamma of the scene to the given percent
 			inline void Gamma(real percent) noexcept
 			{
@@ -193,6 +206,12 @@ namespace ion::graphics::scene::graph
 			/*
 				Observers
 			*/
+
+			//Returns true if the scene graph rendering is enabled
+			[[nodiscard]] inline auto IsEnabled() const noexcept
+			{
+				return enable_;
+			}
 
 			//Returns the gamma of this scene
 			[[nodiscard]] inline auto Gamma() const noexcept
