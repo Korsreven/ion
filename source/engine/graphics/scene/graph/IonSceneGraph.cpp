@@ -320,7 +320,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 		camera->Visible() && camera->ParentNode()->Visible())
 	{
 		camera->CaptureScene(viewport);
-		[[maybe_unused]] auto &aabb = camera->WorldAxisAlignedBoundingBox(true, false);
+		[[maybe_unused]] auto &aabb = camera->WorldAxisAlignedBoundingBox(true);
 			//Cache camera bounding box
 	}
 	else
@@ -389,7 +389,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 
 					//Update uniforms and render object
 					if (object->Visible() &&
-						(object->WorldAxisAlignedBoundingBox(true, false).Empty() ||
+						(object->WorldAxisAlignedBoundingBox(true, false).Empty() || //Cull based on actual geometry
 						 object->WorldAxisAlignedBoundingBox(false).Intersects(camera->WorldAxisAlignedBoundingBox(false))))
 					{
 						//For each shader program
