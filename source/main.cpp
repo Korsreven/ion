@@ -1694,7 +1694,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				Aabb{-1.0_r, 1.0_r}, 1.0_r, 100.0_r, 16.0_r / 9.0_r);
 			//auto frustum = ion::graphics::render::Frustum::Perspective(
 			//	Aabb{-1.0_r, 1.0_r}, 1.0_r, 100.0_r, 90.0, 16.0_r / 9.0_r);
-			frustum.BaseViewportHeight(viewport->BaseBounds().ToSize().Y());
 
 			//Camera
 			auto camera = scene_manager->CreateCamera("", frustum);

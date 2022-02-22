@@ -293,10 +293,7 @@ namespace ion::graphics::render
 			*/
 
 			//Sets the camera connected to this viewport to the given camera
-			inline void ConnectedCamera(NonOwningPtr<scene::Camera> camera) noexcept
-			{
-				camera_ = camera;
-			}
+			void ConnectedCamera(NonOwningPtr<scene::Camera> camera) noexcept;
 
 			//Returns a pointer to the camera connected to this viewport
 			//Returns nullptr if this viewport does not have a camera connected

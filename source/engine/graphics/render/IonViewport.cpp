@@ -384,6 +384,19 @@ Viewport Viewport::BottomRightAligned(std::string name, RenderTarget &render_tar
 
 
 /*
+	Camera
+*/
+
+void Viewport::ConnectedCamera(NonOwningPtr<scene::Camera> camera) noexcept
+{
+	camera_ = camera;
+
+	if (camera)
+		camera->BaseViewportHeight(base_bounds_.ToSize().Y());
+}
+
+
+/*
 	Conversions
 */
 

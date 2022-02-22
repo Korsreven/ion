@@ -115,6 +115,13 @@ namespace ion::graphics::scene
 			}
 
 
+			//See Frustum::BaseViewportHeight for more details
+			inline void BaseViewportHeight(real height) noexcept
+			{
+				frustum_.BaseViewportHeight(height);
+			}
+
+
 			/*
 				Observers
 			*/
