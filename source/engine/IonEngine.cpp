@@ -261,7 +261,7 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 
 	//Create render window, viewport and input controller
 	render_window_.emplace(std::move(render_window));
-	render_window_->CreateViewport("", *render_window_);
+	render_window_->CreateViewport("main", *render_window_);
 	input_controller_.emplace(*render_window_);
 
 	return *render_window_;

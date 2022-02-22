@@ -1684,10 +1684,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			using namespace ion::utilities;
 
 			//Scene manager
-			auto scene_manager = engine.CreateSceneManager("");
+			auto scene_manager = engine.CreateSceneManager("main");
 
 			//Viewport
-			auto viewport = engine.Target()->GetViewport("");
+			auto viewport = engine.Target()->GetViewport("main");
 
 			//Frustum
 			auto frustum = ion::graphics::render::Frustum::Orthographic(
@@ -1696,7 +1696,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//	Aabb{-1.0_r, 1.0_r}, 1.0_r, 100.0_r, 90.0, 16.0_r / 9.0_r);
 
 			//Camera
-			auto camera = scene_manager->CreateCamera("", frustum);
+			auto camera = scene_manager->CreateCamera("main", frustum);
 			viewport->ConnectedCamera(camera);
 
 			auto player_camera = scene_manager->CreateCamera("player", frustum);
@@ -1819,7 +1819,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//Scene graph
-			auto scene_graph = engine.CreateSceneGraph("");
+			auto scene_graph = engine.CreateSceneGraph("main");
 
 			scene_graph->Gamma(1.0_r);
 			scene_graph->AmbientColor(Color::RGB(50, 50, 50));
