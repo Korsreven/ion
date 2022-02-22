@@ -70,6 +70,10 @@ void DrawableObject::Render() noexcept
 {
 	Prepare();
 
+	//No passes added, add default pass
+	if (std::empty(passes_))
+		AddPass(render::Pass{});
+
 	static NonOwningPtr<shaders::ShaderProgram> active_shader_program = nullptr;
 
 	for (auto &pass : passes_)
