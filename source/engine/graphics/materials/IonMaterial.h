@@ -249,9 +249,9 @@ namespace ion::graphics::materials
 			}
 
 			//Sets if this material has lighting enabled or not
-			inline void LightingEnabled(bool enable) noexcept
+			inline void LightingEnabled(bool enabled) noexcept
 			{
-				lighting_enabled_ = enable;
+				lighting_enabled_ = enabled;
 			}
 
 			//Sets if this material receives shadows or not

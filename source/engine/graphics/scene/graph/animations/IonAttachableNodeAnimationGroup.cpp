@@ -37,13 +37,13 @@ void AttachableNodeAnimationGroup::NotifyUpdate() noexcept
 //Public
 
 AttachableNodeAnimationGroup::AttachableNodeAnimationGroup(NonOwningPtr<NodeAnimationGroup> node_animation_group,
-	duration start_time, bool enable) noexcept :
+	duration start_time, bool enabled) noexcept :
 
 	node_animation_group_{node_animation_group ? std::make_optional(*node_animation_group) : std::nullopt},
 	initial_node_animation_group_{node_animation_group},
 
 	start_time_{start_time},
-	enable_{enable}
+	enabled_{enabled}
 {
 	//Empty
 }

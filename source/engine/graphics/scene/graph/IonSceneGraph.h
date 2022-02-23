@@ -97,7 +97,7 @@ namespace ion::graphics::scene::graph
 
 			using NodeEventsBase = events::Listenable<events::listeners::SceneNodeListener>;
 
-			bool enable_ = true;
+			bool enabled_ = true;
 			real gamma_ = 1.0_r; //100% gamma
 			Color ambient_color_ = color::White; //No ambient
 			std::optional<render::Fog> fog_; //No fog
@@ -161,13 +161,22 @@ namespace ion::graphics::scene::graph
 			//Enable the scene graph rendering
 			inline void Enable() noexcept
 			{
-				enable_ = true;
+				enabled_ = true;
 			}
 
 			//Disable the scene graph rendering
 			inline void Disable() noexcept
 			{
-				enable_ = false;
+				enabled_ = false;
+			}
+
+			//Sets whether or not the scene graph rendering is enabled
+			inline void Enabled(bool enabled) noexcept
+			{
+				if (enabled)
+					Enable();
+				else
+					Disable();
 			}
 
 
@@ -191,15 +200,15 @@ namespace ion::graphics::scene::graph
 			}
 
 			//Sets whether or not this scene has fog effect enabled
-			inline void FogEnabled(bool enable) noexcept
+			inline void FogEnabled(bool enabled) noexcept
 			{
-				fog_enabled_ = enable;
+				fog_enabled_ = enabled;
 			}
 
 			//Sets whether or not this scene has lighting enabled
-			inline void LightingEnabled(bool enable) noexcept
+			inline void LightingEnabled(bool enabled) noexcept
 			{
-				lighting_enabled_ = enable;
+				lighting_enabled_ = enabled;
 			}
 
 
@@ -210,7 +219,7 @@ namespace ion::graphics::scene::graph
 			//Returns true if the scene graph rendering is enabled
 			[[nodiscard]] inline auto IsEnabled() const noexcept
 			{
-				return enable_;
+				return enabled_;
 			}
 
 			//Returns the gamma of this scene

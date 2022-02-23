@@ -42,7 +42,7 @@ namespace ion::graphics::particles::affectors
 	{
 		private:
 
-			bool enable_ = true;
+			bool enabled_ = true;
 
 		protected:
 
@@ -97,13 +97,22 @@ namespace ion::graphics::particles::affectors
 			//Enable the affector
 			inline void Enable() noexcept
 			{
-				enable_ = true;
+				enabled_ = true;
 			}
 
 			//Disable the affector
 			inline void Disable() noexcept
 			{
-				enable_ = false;
+				enabled_ = false;
+			}
+
+			//Sets whether or not the affector is enabled
+			inline void Enabled(bool enabled) noexcept
+			{
+				if (enabled)
+					Enable();
+				else
+					Disable();
 			}
 
 
@@ -114,7 +123,7 @@ namespace ion::graphics::particles::affectors
 			//Returns true if the affector is enabled
 			[[nodiscard]] inline auto IsEnabled() const noexcept
 			{
-				return enable_;
+				return enabled_;
 			}
 
 

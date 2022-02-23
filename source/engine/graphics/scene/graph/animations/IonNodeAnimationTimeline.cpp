@@ -209,9 +209,9 @@ void NodeAnimationTimeline::Revert(duration total_duration)
 */
 
 NonOwningPtr<AttachableNodeAnimation> NodeAnimationTimeline::Attach(NonOwningPtr<NodeAnimation> node_animation,
-	duration start_time, bool enable)
+	duration start_time, bool enabled)
 {
-	auto ptr = NodeAnimationBase::Create(node_animation, start_time, enable);
+	auto ptr = NodeAnimationBase::Create(node_animation, start_time, enabled);
 	total_duration_ = std::max(total_duration_, ptr->StartTime() +
 		(node_animation ? node_animation->TotalDuration() : 0.0_sec));
 	return ptr;
@@ -258,9 +258,9 @@ bool NodeAnimationTimeline::DetachAnimation(AttachableNodeAnimation &node_animat
 */
 
 NonOwningPtr<AttachableNodeAnimationGroup> NodeAnimationTimeline::Attach(NonOwningPtr<NodeAnimationGroup> node_animation_group,
-	duration start_time, bool enable)
+	duration start_time, bool enabled)
 {
-	auto ptr = NodeAnimationGroupBase::Create(node_animation_group, start_time, enable);
+	auto ptr = NodeAnimationGroupBase::Create(node_animation_group, start_time, enabled);
 	total_duration_ = std::max(total_duration_, ptr->StartTime() +
 		(node_animation_group ? node_animation_group->TotalDuration() : 0.0_sec));
 	return ptr;

@@ -308,7 +308,7 @@ void SceneGraph::NotifyNodeRenderEnded(SceneNode &node) noexcept
 
 void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 {
-	if (!enable_)
+	if (!enabled_)
 		return;
 
 	/*

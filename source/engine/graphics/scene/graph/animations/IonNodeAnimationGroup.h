@@ -104,7 +104,7 @@ namespace ion::graphics::scene::graph::animations
 			*/
 
 			//Add the given node animation to this node animation group
-			void Add(NonOwningPtr<NodeAnimation> node_animation, duration start_time = 0.0_sec, bool enable = true);
+			void Add(NonOwningPtr<NodeAnimation> node_animation, duration start_time = 0.0_sec, bool enabled = true);
 
 			//Clear all node animations from this node animation group
 			void Clear() noexcept;

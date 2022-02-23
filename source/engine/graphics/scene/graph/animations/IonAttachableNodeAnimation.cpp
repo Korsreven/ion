@@ -37,13 +37,13 @@ void AttachableNodeAnimation::NotifyUpdate() noexcept
 //Public
 
 AttachableNodeAnimation::AttachableNodeAnimation(NonOwningPtr<NodeAnimation> node_animation,
-	duration start_time, bool enable) noexcept :
+	duration start_time, bool enabled) noexcept :
 
 	node_animation_{node_animation ? std::make_optional(*node_animation) : std::nullopt},
 	initial_node_animation_{node_animation},
 
 	start_time_{start_time},
-	enable_{enable}
+	enabled_{enabled}
 {
 	//Empty
 }
@@ -75,7 +75,7 @@ void AttachableNodeAnimation::Revert()
 
 void AttachableNodeAnimation::Elapse(duration time, duration current_time, duration start_time) noexcept
 {
-	if (enable_ && node_animation_ && initial_node_animation_)
+	if (enabled_ && node_animation_ && initial_node_animation_)
 		node_animation_->Elapse(*initial_node_animation_, time, current_time, start_time + start_time_);
 }
 

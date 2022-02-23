@@ -67,11 +67,11 @@ NonOwningPtr<NodeAnimationTimeline> NodeAnimationGroup::Start(real playback_rate
 	Node animations
 */
 
-void NodeAnimationGroup::Add(NonOwningPtr<NodeAnimation> node_animation, duration start_time, bool enable)
+void NodeAnimationGroup::Add(NonOwningPtr<NodeAnimation> node_animation, duration start_time, bool enabled)
 {
 	if (node_animation)
 	{
-		animations_.emplace_back(node_animation, start_time, enable);
+		animations_.emplace_back(node_animation, start_time, enabled);
 		total_duration_ = std::max(total_duration_, start_time + node_animation->TotalDuration());
 	}
 }
