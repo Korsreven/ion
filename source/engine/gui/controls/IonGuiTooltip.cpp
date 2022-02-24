@@ -12,6 +12,7 @@ File:	IonGuiTooltip.cpp
 
 #include "IonGuiTooltip.h"
 
+#include <cmath>
 #include "IonEngine.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
@@ -149,7 +150,10 @@ void GuiTooltip::UpdateCaption() noexcept
 
 				if (auto size = text->MinimumAreaSize(); size != vector2::Zero)
 				{
-					size += 2.0_r; //Make sure there is enough space (rounding error)
+					//Make sure there is enough space (rounding errors)
+					//Round up so both width and height are even				
+					size.X(size.X() + (std::fmod(size.X(), 2.0_r) == 0.0_r ? 2.0_r : 1.0_r));
+					size.Y(size.Y() + (std::fmod(size.Y(), 2.0_r) == 0.0_r ? 2.0_r : 1.0_r));
 					
 					auto ppu = Engine::PixelsPerUnit();
 					size /= ppu;

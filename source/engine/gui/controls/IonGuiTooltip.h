@@ -48,7 +48,8 @@ namespace ion::gui::controls
 			};
 
 			constexpr auto default_hold_time = 5.0_sec;
-			constexpr auto default_fade_delay = 0.5_sec;
+			constexpr auto default_fade_in_delay = 0.5_sec;
+			constexpr auto default_fade_out_delay = 0.1_sec;
 			constexpr auto default_fade_time = 0.1_sec;
 
 
@@ -70,8 +71,8 @@ namespace ion::gui::controls
 			bool follow_mouse_cursor_ = false;
 
 			duration hold_time_ = gui_tooltip::detail::default_hold_time;
-			duration fade_in_delay_ = gui_tooltip::detail::default_fade_delay;
-			duration fade_out_delay_ = gui_tooltip::detail::default_fade_delay;
+			duration fade_in_delay_ = gui_tooltip::detail::default_fade_in_delay;
+			duration fade_out_delay_ = gui_tooltip::detail::default_fade_out_delay;
 			duration fade_in_time_ = gui_tooltip::detail::default_fade_time;
 			duration fade_out_time_ = gui_tooltip::detail::default_fade_time;
 
