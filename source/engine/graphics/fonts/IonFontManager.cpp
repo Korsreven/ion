@@ -31,7 +31,7 @@ namespace font_manager::detail
 {
 
 std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, int>> prepare_font(
-	const std::string &file_data, int size, int face_index, font::CharacterEncoding encoding)
+	const std::string &file_data, int size, int face_index, font::FontCharacterSet character_set)
 {
 	FT_Library library = nullptr;
 	if (FT_Init_FreeType(&library) != 0)
@@ -47,7 +47,7 @@ std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, int>> prepa
 
 	FT_Set_Char_Size(face, size * 64, size * 64, 96, 96);
 
-	auto glyph_count = static_cast<int>(encoding);
+	auto glyph_count = static_cast<int>(character_set);
 	font::GlyphBitmapData glyph_data(glyph_count);
 	font::GlyphMetrices glyph_metrics(glyph_count);
 	auto glyph_max_height = 0;
@@ -108,7 +108,7 @@ std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, int>> prepa
 std::optional<font::GlyphTextureHandles> load_font(
 	const font::GlyphBitmapData &glyph_data,
 	const font::GlyphMetrices &glyph_metrics,
-	font::GlyphFilter min_filter, font::GlyphFilter mag_filter) noexcept
+	font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter) noexcept
 {
 	auto glyph_count = std::ssize(glyph_data);
 	font::GlyphTextureHandles glyph_handles(glyph_count);
@@ -121,11 +121,11 @@ std::optional<font::GlyphTextureHandles> load_font(
 
 		//Minification filter
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-			min_filter == font::GlyphFilter::NearestNeighbor ? GL_NEAREST : GL_LINEAR);
+			min_filter == font::FontGlyphFilter::NearestNeighbor ? GL_NEAREST : GL_LINEAR);
 
 		//Magnification filter
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-			mag_filter == font::GlyphFilter::NearestNeighbor ? GL_NEAREST : GL_LINEAR);
+			mag_filter == font::FontGlyphFilter::NearestNeighbor ? GL_NEAREST : GL_LINEAR);
 
 		//Texture wrap
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -161,7 +161,7 @@ bool FontManager::PrepareResource(Font &font) noexcept
 	if (FileResourceManager::PrepareResource(font))
 	{
 		if (auto font_data = detail::prepare_font(*font.FileData(),
-			font.Size(), font.FaceIndex(), font.CharacterEncoding()); font_data)
+			font.Size(), font.FaceIndex(), font.CharacterSet()); font_data)
 		{
 			auto &[glyph_data, glyph_metrics, glyph_max_height] = *font_data;
 			font.GlyphData(std::move(glyph_data), std::move(glyph_metrics), glyph_max_height);
@@ -233,27 +233,27 @@ FontManager::~FontManager() noexcept
 */
 
 NonOwningPtr<Font> FontManager::CreateFont(std::string name, std::string asset_name, int size, int face_index,
-	font::CharacterEncoding encoding, font::GlyphFilter min_filter, font::GlyphFilter mag_filter)
+	font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter)
 {
-	return CreateResource(std::move(name), std::move(asset_name), size, face_index, encoding, min_filter, mag_filter);
+	return CreateResource(std::move(name), std::move(asset_name), size, face_index, character_set, min_filter, mag_filter);
 }
 
 NonOwningPtr<Font> FontManager::CreateFont(std::string name, std::string asset_name, int size,
-	font::CharacterEncoding encoding, font::GlyphFilter min_filter, font::GlyphFilter mag_filter)
+	font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter)
 {
-	return CreateResource(std::move(name), std::move(asset_name), size, encoding, min_filter, mag_filter);
+	return CreateResource(std::move(name), std::move(asset_name), size, character_set, min_filter, mag_filter);
 }
 
 NonOwningPtr<Font> FontManager::CreateFont(std::string name, std::string asset_name, int size,
-	font::CharacterEncoding encoding, font::GlyphFilter filter)
+	font::FontCharacterSet character_set, font::FontGlyphFilter filter)
 {
-	return CreateResource(std::move(name), std::move(asset_name), size, encoding, filter);
+	return CreateResource(std::move(name), std::move(asset_name), size, character_set, filter);
 }
 
 NonOwningPtr<Font> FontManager::CreateFont(std::string name, std::string asset_name, int size,
-	font::CharacterEncoding encoding)
+	font::FontCharacterSet character_set)
 {
-	return CreateResource(std::move(name), std::move(asset_name), size, encoding);
+	return CreateResource(std::move(name), std::move(asset_name), size, character_set);
 }
 
 NonOwningPtr<Font> FontManager::CreateFont(std::string name, std::string asset_name, int size)
