@@ -19,8 +19,8 @@ File:	IonTexture.h
 #include <utility>
 
 #include "graphics/utilities/IonVector2.h"
+#include "memory/IonNonOwningPtr.h"
 #include "resources/IonFileResource.h"
-#include "types/IonTypes.h"
 
 namespace ion::graphics::textures
 {
@@ -56,7 +56,7 @@ namespace ion::graphics::textures
 		};
 	} //texture
 
-	class Texture final : public resources::FileResource<TextureManager>
+	class Texture : public resources::FileResource<TextureManager>
 	{
 		private:
 
@@ -79,38 +79,16 @@ namespace ion::graphics::textures
 			//Construct a new texture with the given name, asset_name, texture filter for min/mag, mip filter and texture wrap mode for s/t
 			Texture(std::string name, std::string asset_name,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
-				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode) :
-
-				FileResource{std::move(name), std::move(asset_name)},
-
-				min_filter_{min_filter},
-				mag_filter_{mag_filter},
-				mip_filter_{mip_filter},
-
-				s_wrap_mode_{s_wrap_mode},
-				t_wrap_mode_{t_wrap_mode}
-			{
-				//Empty
-			}
+				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode);
 
 			//Construct a new texture with the given name, asset name, texture filter, mip filter and texture wrap mode
 			Texture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::MipmapFilter mip_filter,
-				texture::TextureWrapMode wrap_mode) :
-
-				Texture{std::move(name), std::move(asset_name), filter, filter, mip_filter, wrap_mode, wrap_mode}
-			{
-				//Empty
-			}
+				texture::TextureWrapMode wrap_mode);
 
 			//Construct a new texture with the given name, asset name, texture filter and texture wrap mode (no mipmap)
 			Texture(std::string name, std::string asset_name,
-				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode) :
-
-				Texture{std::move(name), std::move(asset_name), filter, filter, {}, wrap_mode, wrap_mode}
-			{
-				//Empty
-			}
+				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode);
 
 
 			/*
@@ -215,34 +193,11 @@ namespace ion::graphics::textures
 			//Returns the lower left and upper right texture coordinates for the texture
 			//This is important if one or both of the texture sides are NPOT
 			//Returns nullopt if the texture is missing extents (not loaded)
-			[[nodiscard]] inline auto TexCoords() const noexcept
-				-> std::optional<std::pair<Vector2, Vector2>>
-			{
-				using namespace types::type_literals;
-
-				if (extents_)
-				{
-					auto delta_x = (1.0_r - static_cast<real>(extents_->Width) / extents_->ActualWidth) * 0.5_r;
-					auto delta_y = (1.0_r - static_cast<real>(extents_->Height) / extents_->ActualHeight) * 0.5_r;
-					return std::pair{Vector2{delta_x, delta_y}, Vector2{1.0_r - delta_x, 1.0_r - delta_y}};
-				}
-				else
-					return {};
-			}
+			[[nodiscard]] std::optional<std::pair<Vector2, Vector2>> TexCoords() const noexcept;
 
 			//Returns a pair of true/false to indicate which texture axis is repeatable
 			//Returns nullopt if the texture is missing extents (not loaded)
-			[[nodiscard]] inline auto IsRepeatable() const noexcept
-				-> std::optional<std::pair<bool, bool>>
-			{
-				if (extents_)
-					return std::pair{s_wrap_mode_ == texture::TextureWrapMode::Repeat &&
-										extents_->Width == extents_->ActualWidth,
-									 t_wrap_mode_ == texture::TextureWrapMode::Repeat &&
-										extents_->Height == extents_->ActualHeight};
-				else
-					return {};
-			}
+			[[nodiscard]] std::optional<std::pair<bool, bool>> IsRepeatable() const noexcept;
 	};
 } //ion::graphics::textures
 

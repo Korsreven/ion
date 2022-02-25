@@ -26,13 +26,13 @@ namespace ion::graphics::fonts
 
 	namespace font
 	{
-		enum class CharacterEncoding : int
+		enum class FontCharacterSet : int
 		{
 			ASCII = 128,
 			ExtendedASCII = 256
 		};
 
-		enum class GlyphFilter : bool
+		enum class FontGlyphFilter : bool
 		{
 			NearestNeighbor,	//Nearest
 			Bilinear			//Linear
@@ -58,10 +58,10 @@ namespace ion::graphics::fonts
 
 			int size_ = 0;
 			int face_index_ = 0;
-			font::CharacterEncoding character_encoding_ = font::CharacterEncoding::ASCII;
+			font::FontCharacterSet character_set_ = font::FontCharacterSet::ASCII;
 
-			font::GlyphFilter glyph_min_filter_ = font::GlyphFilter::Bilinear;
-			font::GlyphFilter glyph_mag_filter_ = font::GlyphFilter::Bilinear;
+			font::FontGlyphFilter glyph_min_filter_ = font::FontGlyphFilter::Bilinear;
+			font::FontGlyphFilter glyph_mag_filter_ = font::FontGlyphFilter::Bilinear;
 
 			std::optional<font::GlyphTextureHandles> glyph_handles_;
 
@@ -71,59 +71,23 @@ namespace ion::graphics::fonts
 
 		public:
 
-			//Construct a new font with the given name, asset name, size, face index, character encoding and glyph filter for min/mag
-			Font(std::string name, std::string asset_name, int size, int face_index, font::CharacterEncoding encoding,
-				font::GlyphFilter min_filter, font::GlyphFilter mag_filter) :
+			//Construct a new font with the given name, asset name, size, face index, character set and glyph filter for min/mag
+			Font(std::string name, std::string asset_name, int size, int face_index, font::FontCharacterSet character_set,
+				font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter);
 
-				FileResource{std::move(name), std::move(asset_name)},
+			//Construct a new font with the given name, asset name, size, character set and glyph filter for min/mag
+			Font(std::string name, std::string asset_name, int size, font::FontCharacterSet character_set,
+				font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter);
 
-				size_{size},
-				face_index_{face_index},
-				character_encoding_{encoding},
+			//Construct a new font with the given name, asset name, size, character set and glyph filter
+			Font(std::string name, std::string asset_name, int size, font::FontCharacterSet character_set,
+				font::FontGlyphFilter filter);
 
-				glyph_min_filter_{min_filter},
-				glyph_mag_filter_{mag_filter}
-			{
-				//Empty
-			}
-
-			//Construct a new font with the given name, asset name, size, character encoding and glyph filter for min/mag
-			Font(std::string name, std::string asset_name, int size, font::CharacterEncoding encoding,
-				font::GlyphFilter min_filter, font::GlyphFilter mag_filter) :
-
-				Font{std::move(name), std::move(asset_name), size, 0, encoding, min_filter, mag_filter}
-			{
-				//Empty
-			}
-
-			//Construct a new font with the given name, asset name, size, character encoding and glyph filter
-			Font(std::string name, std::string asset_name, int size, font::CharacterEncoding encoding,
-				font::GlyphFilter filter) :
-
-				Font{std::move(name), std::move(asset_name), size, encoding, filter, filter}
-			{
-				//Empty
-			}
-
-			//Construct a new font with the given name, asset name, size and character encoding
-			Font(std::string name, std::string asset_name, int size, font::CharacterEncoding encoding) :
-
-				FileResource{std::move(name), std::move(asset_name)},
-
-				size_{size},
-				character_encoding_{encoding}
-			{
-				//Empty
-			}
+			//Construct a new font with the given name, asset name, size and character set
+			Font(std::string name, std::string asset_name, int size, font::FontCharacterSet character_set);
 
 			//Construct a new font with the given name, asset name and size
-			Font(std::string name, std::string asset_name, int size) :
-
-				FileResource{std::move(name), std::move(asset_name)},
-				size_{size}
-			{
-				//Empty
-			}
+			Font(std::string name, std::string asset_name, int size);
 
 
 			/*
@@ -198,10 +162,10 @@ namespace ion::graphics::fonts
 				return face_index_;
 			}
 
-			//Returns the character encoding for the font
-			[[nodiscard]] inline auto CharacterEncoding() const noexcept
+			//Returns the character set for the font
+			[[nodiscard]] inline auto CharacterSet() const noexcept
 			{
-				return character_encoding_;
+				return character_set_;
 			}
 
 
