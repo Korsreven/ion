@@ -298,6 +298,100 @@ void unload_texture(int texture_handle) noexcept
 	glDeleteTextures(1, reinterpret_cast<unsigned int*>(&texture_handle));
 }
 
+
+/*
+	Sub textures
+*/
+
+void next_sub_texture_position(std::pair<int, int> &position, int rows, int columns,
+	texture_atlas::AtlasSubTextureOrder sub_texture_order) noexcept
+{
+	switch (sub_texture_order)
+	{
+		case texture_atlas::AtlasSubTextureOrder::ColumnMajor:
+		{
+			if (position.first % rows == 0)
+			{
+				position.first = 1;
+				++position.second;
+			}
+			else
+				++position.first;
+
+			break;
+		}
+
+		case texture_atlas::AtlasSubTextureOrder::RowMajor:
+		default:
+		{
+			if (position.second % columns == 0)
+			{
+				position.second = 1;
+				++position.first;
+			}
+			else
+				++position.second;
+
+			break;
+		}
+	}
+}
+
+std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_texture(
+	const TextureAtlas &texture_atlas, const std::pair<int, int> &position,
+	std::optional<NpotScale> npot_scale) noexcept
+{
+	auto &atlas_extents = *texture_atlas.Extents();
+
+	texture::TextureExtents sub_extents;
+	sub_extents.Width = atlas_extents.Width / texture_atlas.Columns();
+	sub_extents.Height = atlas_extents.Height / texture_atlas.Rows();
+
+	//Invalid sub extents
+	if (sub_extents.Width < 1 || sub_extents.Height < 1)
+		return {};
+
+	//Make sure sub texture is power of two
+	if (npot_scale || !has_support_for_non_power_of_two_textures())
+	{
+		sub_extents.ActualWidth = upper_power_of_two(sub_extents.Width);
+		sub_extents.ActualHeight = upper_power_of_two(sub_extents.Height);
+	}
+	else
+	{
+		sub_extents.ActualWidth = sub_extents.Width;
+		sub_extents.ActualHeight = sub_extents.Height;
+	}
+
+	sub_extents.BitDepth = atlas_extents.BitDepth;
+
+	std::string atlas_pixel_data(atlas_extents.ActualWidth * atlas_extents.ActualHeight * (atlas_extents.BitDepth / 8), '\0');
+	glBindTexture(GL_TEXTURE_2D, *texture_atlas.Handle());
+	glGetTexImage(GL_TEXTURE_2D, 0, atlas_extents.BitDepth == 32 ? GL_RGBA : GL_RGB,
+		GL_UNSIGNED_BYTE, std::data(atlas_pixel_data));
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	auto atlas_actual_width_bytes = atlas_extents.ActualWidth * (atlas_extents.BitDepth / 8);
+	auto sub_width_bytes = sub_extents.Width * (sub_extents.BitDepth / 8);
+	auto sub_height_bytes = sub_extents.Height * (sub_extents.BitDepth / 8);
+	auto sub_actual_width_bytes = sub_extents.ActualWidth * (sub_extents.BitDepth / 8);
+
+	std::string sub_pixel_data(sub_extents.ActualWidth * sub_extents.ActualHeight * (sub_extents.BitDepth / 8), '\0');
+
+	for (auto ai = atlas_actual_width_bytes * sub_height_bytes * (position.first - 1) +
+				   sub_width_bytes * (position.second - 1), si = 0,
+		size = std::ssize(sub_pixel_data); si < size;
+		ai += atlas_actual_width_bytes, si += sub_actual_width_bytes)
+
+		std::copy(
+			std::begin(atlas_pixel_data) + ai,
+			std::begin(atlas_pixel_data) + ai + sub_width_bytes,
+			std::begin(sub_pixel_data) + si
+		);
+
+	return std::pair{std::move(sub_pixel_data), sub_extents};
+}
+
 } //texture_manager::detail
 
 
@@ -309,6 +403,10 @@ void unload_texture(int texture_handle) noexcept
 
 bool TextureManager::PrepareResource(Texture &texture) noexcept
 {
+	//Texture is a sub texture
+	if (auto &atlas_region = texture.AtlasRegion(); atlas_region)
+		return !!atlas_region->Atlas;
+
 	if (FileResourceManager::PrepareResource(texture))
 	{
 		if (auto texture_data =
@@ -330,6 +428,28 @@ bool TextureManager::PrepareResource(Texture &texture) noexcept
 
 bool TextureManager::LoadResource(Texture &texture) noexcept
 {
+	//Texture is a sub texture
+	if (auto &atlas_region = texture.AtlasRegion(); atlas_region && atlas_region->Atlas)
+	{
+		//Make sure texture atlas has been loaded first
+		if (auto loaded = Load(*atlas_region->Atlas); loaded)
+		{
+			if (auto texture_data =
+				detail::prepare_sub_texture(
+					*atlas_region->Atlas, atlas_region->Position,
+					texture_npot_scale_); texture_data)
+			{
+				auto &[pixel_data, extents] = *texture_data;
+				texture.PixelData(std::move(pixel_data), extents);
+
+				if (!texture.PixelData().has_value())
+					return false;
+			}
+		}
+		else
+			return false;
+	}
+
 	auto &pixel_data = texture.PixelData();
 	auto &extents = texture.Extents();
 	auto [min_filter, mag_filter, mip_filter] = texture.Filter();
@@ -407,8 +527,7 @@ NonOwningPtr<Texture> TextureManager::CreateTexture(std::string name, std::strin
 }
 
 NonOwningPtr<Texture> TextureManager::CreateTexture(std::string name, std::string asset_name,
-	texture::TextureFilter filter, texture::MipmapFilter mip_filter,
-	texture::TextureWrapMode wrap_mode)
+	texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode)
 {
 	return CreateResource(std::move(name), std::move(asset_name), filter, mip_filter, wrap_mode);
 }
@@ -428,6 +547,48 @@ NonOwningPtr<Texture> TextureManager::CreateTexture(const Texture &texture)
 NonOwningPtr<Texture> TextureManager::CreateTexture(Texture &&texture)
 {
 	return CreateResource(std::move(texture));
+}
+
+
+/*
+	Texture atlases
+	Creating
+*/
+
+NonOwningPtr<TextureAtlas> TextureManager::CreateTextureAtlas(std::string name, std::string asset_name,
+	int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order)
+{
+	auto ptr = CreateResource<TextureAtlas>(std::move(name), std::move(asset_name), rows, columns, sub_textures, sub_texture_order);
+	CreateSubTextures(ptr);
+	return ptr;
+}
+
+NonOwningPtr<TextureAtlas> TextureManager::CreateTextureAtlas(std::string name, std::string asset_name,
+	texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
+	texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode,
+	int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order)
+{
+	auto ptr = CreateResource<TextureAtlas>(std::move(name), std::move(asset_name), rows, columns, sub_textures, sub_texture_order);
+	CreateSubTextures(ptr, min_filter, mag_filter, mip_filter, s_wrap_mode, t_wrap_mode);
+	return ptr;
+}
+
+NonOwningPtr<TextureAtlas> TextureManager::CreateTextureAtlas(std::string name, std::string asset_name,
+	texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode,
+	int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order)
+{
+	auto ptr = CreateResource<TextureAtlas>(std::move(name), std::move(asset_name), rows, columns, sub_textures, sub_texture_order);
+	CreateSubTextures(ptr, filter, mip_filter, wrap_mode);
+	return ptr;
+}
+
+NonOwningPtr<TextureAtlas> TextureManager::CreateTextureAtlas(std::string name, std::string asset_name,
+	texture::TextureFilter filter, texture::TextureWrapMode wrap_mode,
+	int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order)
+{
+	auto ptr = CreateResource<TextureAtlas>(std::move(name), std::move(asset_name), rows, columns, sub_textures, sub_texture_order);
+	CreateSubTextures(ptr, filter, wrap_mode);
+	return ptr;
 }
 
 

@@ -663,6 +663,9 @@
     <ClCompile Include="..\source\engine\graphics\fonts\IonFont.cpp">
       <Filter>Source Files\graphics\fonts</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\textures\IonTextureAtlas.cpp">
+      <Filter>Source Files\graphics\textures</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1282,6 +1285,9 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\gui\controls\IonGuiMouseCursor.h">
       <Filter>Header Files\gui\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\textures\IonTextureAtlas.h">
+      <Filter>Header Files\graphics\textures</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

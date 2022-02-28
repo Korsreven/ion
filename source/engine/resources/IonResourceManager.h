@@ -22,6 +22,7 @@ File:	IonResourceManager.h
 #include "events/IonListenable.h"
 #include "events/listeners/IonResourceListener.h"
 #include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 #include "parallel/IonWorkerPool.h"
 #include "types/IonProgress.h"
 #include "types/IonTypes.h"
@@ -809,6 +810,16 @@ namespace ion::resources
 			auto CreateResource(Args &&...args)
 			{
 				return this->Create(std::forward<Args>(args)...);
+			}
+
+			//Create a resource of type T with the given arguments
+			template <typename T, typename... Args>
+			auto CreateResource(Args &&...args)
+			{
+				static_assert(std::is_base_of_v<ResourceT, T>);
+
+				auto ptr = this->Create<T>(std::forward<Args>(args)...);
+				return static_pointer_cast<T>(ptr);
 			}
 
 

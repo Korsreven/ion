@@ -127,6 +127,7 @@ File:	main.cpp
 #include "graphics/textures/IonFrameSequence.h"
 #include "graphics/textures/IonFrameSequenceManager.h"
 #include "graphics/textures/IonTexture.h"
+#include "graphics/textures/IonTextureAtlas.h"
 #include "graphics/textures/IonTextureManager.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"

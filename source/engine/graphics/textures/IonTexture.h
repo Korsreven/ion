@@ -24,7 +24,9 @@ File:	IonTexture.h
 
 namespace ion::graphics::textures
 {
+	class TextureAtlas; //Forward declaration
 	class TextureManager; //Forward declaration
+
 	using graphics::utilities::Vector2;
 
 	namespace texture
@@ -54,6 +56,12 @@ namespace ion::graphics::textures
 			int ActualWidth = 0, ActualHeight = 0;
 			int BitDepth = 0;
 		};
+
+		struct TextureAtlasRegion
+		{
+			NonOwningPtr<TextureAtlas> Atlas;
+			std::pair<int, int> Position; //Row and column
+		};
 	} //texture
 
 	class Texture : public resources::FileResource<TextureManager>
@@ -71,24 +79,62 @@ namespace ion::graphics::textures
 
 			std::optional<std::string> pixel_data_;
 			std::optional<texture::TextureExtents> extents_;
+			std::optional<texture::TextureAtlasRegion> atlas_region_;
 
 		public:
 
 			using resources::FileResource<TextureManager>::FileResource;
 
-			//Construct a new texture with the given name, asset_name, texture filter for min/mag, mip filter and texture wrap mode for s/t
+			//Construct a new texture with the given name, asset name, texture filter for min/mag, mip filter and texture wrap mode for s/t
 			Texture(std::string name, std::string asset_name,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode);
 
 			//Construct a new texture with the given name, asset name, texture filter, mip filter and texture wrap mode
 			Texture(std::string name, std::string asset_name,
-				texture::TextureFilter filter, texture::MipmapFilter mip_filter,
-				texture::TextureWrapMode wrap_mode);
+				texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode);
 
 			//Construct a new texture with the given name, asset name, texture filter and texture wrap mode (no mipmap)
 			Texture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode);
+
+
+			//Construct a new sub texture with the given name, asset name and atlas region
+			Texture(std::string name, std::string asset_name, const texture::TextureAtlasRegion &atlas_region);
+
+			//Construct a new sub texture with the given name, asset name, atlas region, texture filter for min/mag, mip filter and texture wrap mode for s/t
+			Texture(std::string name, std::string asset_name, const texture::TextureAtlasRegion &atlas_region,
+				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
+				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode);
+
+			//Construct a new sub texture with the given name, asset name, atlas region, texture filter, mip filter and texture wrap mode
+			Texture(std::string name, std::string asset_name, const texture::TextureAtlasRegion &atlas_region,
+				texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode);
+
+			//Construct a new sub texture with the given name, asset name, atlas region, texture filter and texture wrap mode (no mipmap)
+			Texture(std::string name, std::string asset_name, const texture::TextureAtlasRegion &atlas_region,
+				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode);
+
+
+			//Default copy constructor
+			Texture(const Texture&) = default;
+
+			//Default move constructor
+			Texture(Texture&&) = default;
+
+			//Virtual destructor
+			virtual ~Texture() = default;
+
+
+			/*
+				Operators
+			*/
+
+			//Default copy assignment
+			Texture& operator=(const Texture&) = default;
+
+			//Default move assignment
+			Texture& operator=(Texture&&) = default;
 
 
 			/*
@@ -138,6 +184,13 @@ namespace ion::graphics::textures
 			[[nodiscard]] inline auto& Extents() const noexcept
 			{
 				return extents_;
+			}
+
+			//Returns the atlas region of the texture
+			//Returns nullopt if the texture is not a sub texture
+			[[nodiscard]] inline auto& AtlasRegion() const noexcept
+			{
+				return atlas_region_;
 			}
 
 

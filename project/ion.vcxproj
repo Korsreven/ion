@@ -244,6 +244,7 @@
     <ClCompile Include="..\source\engine\graphics\textures\IonFrameSequence.cpp" />
     <ClCompile Include="..\source\engine\graphics\textures\IonFrameSequenceManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\textures\IonTexture.cpp" />
+    <ClCompile Include="..\source\engine\graphics\textures\IonTextureAtlas.cpp" />
     <ClCompile Include="..\source\engine\graphics\textures\IonTextureManager.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonAabb.cpp" />
     <ClCompile Include="..\source\engine\graphics\utilities\IonColor.cpp" />
@@ -427,6 +428,7 @@
     <ClInclude Include="..\source\engine\graphics\textures\IonFrameSequence.h" />
     <ClInclude Include="..\source\engine\graphics\textures\IonFrameSequenceManager.h" />
     <ClInclude Include="..\source\engine\graphics\textures\IonTexture.h" />
+    <ClInclude Include="..\source\engine\graphics\textures\IonTextureAtlas.h" />
     <ClInclude Include="..\source\engine\graphics\textures\IonTextureManager.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonAabb.h" />
     <ClInclude Include="..\source\engine\graphics\utilities\IonColor.h" />

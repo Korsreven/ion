@@ -22,10 +22,12 @@ File:	IonTextureManager.h
 #include <utility>
 
 #include "IonTexture.h"
+#include "IonTextureAtlas.h"
 #include "assets/repositories/IonImageRepository.h"
 #include "memory/IonNonOwningPtr.h"
 #include "resources/IonFileResourceManager.h"
 #include "types/IonTypes.h"
+#include "utilities/IonStringUtility.h"
 
 #undef max
 
@@ -182,6 +184,18 @@ namespace ion::graphics::textures
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode) noexcept;
 			void unload_texture(int texture_handle) noexcept;
+
+
+			/*
+				Sub textures
+			*/
+
+			void next_sub_texture_position(std::pair<int, int> &position, int rows, int columns,
+				texture_atlas::AtlasSubTextureOrder sub_texture_order) noexcept;
+
+			std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_texture(
+				const TextureAtlas &texture_atlas, const std::pair<int, int> &position,
+				std::optional<NpotScale> npot_scale) noexcept;
 		} //detail
 	} //texture_manager
 
@@ -194,7 +208,30 @@ namespace ion::graphics::textures
 			std::optional<texture_manager::NpotScale> texture_npot_scale_ = texture_manager::NpotScale::ToNearest;
 			std::optional<texture_manager::NpotScaleFit> texture_npot_scale_fit_;
 			texture_manager::NpotScaleResampling texture_npot_scale_resampling_ = texture_manager::NpotScaleResampling::Bilinear;
-			
+
+
+			template <typename... Args>
+			void CreateSubTextures(NonOwningPtr<TextureAtlas> texture_atlas, Args &&...args)
+			{
+				using namespace ion::utilities;
+
+				if (texture_atlas)
+				{
+					auto &name = *texture_atlas->Name();
+
+					texture::TextureAtlasRegion atlas_region;
+					atlas_region.Atlas = texture_atlas;
+					atlas_region.Position = {1, 1};
+
+					for (auto i = 0; i < texture_atlas->SubTextures(); ++i)
+					{
+						CreateResource(string::Concat(name, "_", i + 1), texture_atlas->AssetName(), atlas_region,
+							std::forward<Args>(args)...);
+						texture_manager::detail::next_sub_texture_position(atlas_region.Position,
+							texture_atlas->Rows(), texture_atlas->Columns(), texture_atlas->SubTextureOrder());
+					}
+				}
+			}		
 
 		protected:
 
@@ -322,8 +359,7 @@ namespace ion::graphics::textures
 
 			//Create a texture with the given name, asset name, texture filter, mip filter and texture wrap
 			NonOwningPtr<Texture> CreateTexture(std::string name, std::string asset_name,
-				texture::TextureFilter filter, texture::MipmapFilter mip_filter,
-				texture::TextureWrapMode wrap_mode);
+				texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode);
 
 			//Create a texture with the given name, asset name, texture filter and texture wrap (no mipmap)
 			NonOwningPtr<Texture> CreateTexture(std::string name, std::string asset_name,
@@ -335,6 +371,39 @@ namespace ion::graphics::textures
 
 			//Create a texture by moving the given texture
 			NonOwningPtr<Texture> CreateTexture(Texture &&texture);
+
+
+			/*
+				Texture atlases
+				Creating
+			*/
+
+			//Create a texture atlas with the given name, asset name, number of rows, columns, sub textures and sub texture order
+			//Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
+			NonOwningPtr<TextureAtlas> CreateTextureAtlas(std::string name, std::string asset_name,
+				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor);
+
+			//Create a texture atlas with the given name, asset name, texture filter for min/mag, mip filter, texture wrap for s/t,
+			//number of rows, columns, sub textures and sub texture order
+			//Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
+			NonOwningPtr<TextureAtlas> CreateTextureAtlas(std::string name, std::string asset_name,
+				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
+				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode,
+				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor);
+
+			//Create a texture atlas with the given name, asset name, texture filter, mip filter, texture wrap,
+			//number of rows, columns, sub textures and sub texture order
+			//Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
+			NonOwningPtr<TextureAtlas> CreateTextureAtlas(std::string name, std::string asset_name,
+				texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode,
+				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor);
+
+			//Create a texture atlas with the given name, asset name, texture filter, texture wrap (no mipmap),
+			//number of rows, columns, sub textures and sub texture order
+			//Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
+			NonOwningPtr<TextureAtlas> CreateTextureAtlas(std::string name, std::string asset_name,
+				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode,
+				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor);
 
 
 			/*
