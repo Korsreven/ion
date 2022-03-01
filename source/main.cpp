@@ -654,6 +654,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::graphics::textures::TextureManager textures;
 			textures.CreateRepository(std::move(image_repository));
 
+			auto ground = textures.CreateTextureAtlas("ground", "atlas_pot.jpg", 2, 2, 4,
+				ion::graphics::textures::texture_atlas::AtlasSubTextureOrder::RowMajor);
+
 			auto asteroid_diffuse = textures.CreateTexture("asteroid_diffuse", "asteroid_diffuse.png");
 			auto asteroid_normal = textures.CreateTexture("asteroid_normal", "asteroid_normal.png");
 			auto asteroid_specular = textures.CreateTexture("asteroid_specular", "asteroid_specular.png");
@@ -1190,7 +1193,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, color_spectrum_diffuse, nullptr, nullptr);
+					0.0_r, /*color_spectrum_diffuse*/textures.GetTexture("ground_1"), nullptr, nullptr);
 			color_spectrum->LightingEnabled(false);
 
 			auto cat =

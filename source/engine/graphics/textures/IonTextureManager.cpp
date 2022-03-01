@@ -378,7 +378,8 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 
 	std::string sub_pixel_data(sub_extents.ActualWidth * sub_extents.ActualHeight * (sub_extents.BitDepth / 8), '\0');
 
-	for (auto ai = atlas_actual_width_bytes * sub_height_bytes * (position.first - 1) +
+	for (auto ai = atlas_extents.ActualWidth *
+				   sub_height_bytes * (position.first - 1) +
 				   sub_width_bytes * (position.second - 1), si = 0,
 		size = std::ssize(sub_pixel_data); si < size;
 		ai += atlas_actual_width_bytes, si += sub_actual_width_bytes)
@@ -432,7 +433,7 @@ bool TextureManager::LoadResource(Texture &texture) noexcept
 	if (auto &atlas_region = texture.AtlasRegion(); atlas_region && atlas_region->Atlas)
 	{
 		//Make sure texture atlas has been loaded first
-		if (auto loaded = Load(*atlas_region->Atlas); loaded)
+		if (atlas_region->Atlas->IsLoaded() || Load(*atlas_region->Atlas))
 		{
 			if (auto texture_data =
 				detail::prepare_sub_texture(
