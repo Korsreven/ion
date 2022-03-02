@@ -273,7 +273,7 @@ std::optional<int> load_texture(const std::string &pixel_data, const texture::Te
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
 		t_wrap_mode == texture::TextureWrapMode::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
 
-	//Upload image to gl
+	//Unpack image from memory to gl
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); //May increase transfer speed for NPOT
 	glTexImage2D(GL_TEXTURE_2D, 0,
 		extents.BitDepth == 32 ? GL_RGBA : GL_RGB, extents.ActualWidth, extents.ActualHeight, 0,
@@ -342,6 +342,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 	std::optional<NpotScale> npot_scale) noexcept
 {
 	auto &atlas_extents = *texture_atlas.Extents();
+	auto color_bytes = atlas_extents.BitDepth / 8;
 
 	texture::TextureExtents sub_extents;
 	sub_extents.Width = atlas_extents.Width / texture_atlas.Columns();
@@ -365,30 +366,56 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 
 	sub_extents.BitDepth = atlas_extents.BitDepth;
 
-	std::string atlas_pixel_data(atlas_extents.ActualWidth * atlas_extents.ActualHeight * (atlas_extents.BitDepth / 8), '\0');
-	glBindTexture(GL_TEXTURE_2D, *texture_atlas.Handle());
-	glGetTexImage(GL_TEXTURE_2D, 0, atlas_extents.BitDepth == 32 ? GL_RGBA : GL_RGB,
-		GL_UNSIGNED_BYTE, std::data(atlas_pixel_data));
-	glBindTexture(GL_TEXTURE_2D, 0);
+	//Allocate required bytes for the sub texture
+	std::string sub_pixel_data(sub_extents.ActualWidth * sub_extents.ActualHeight * color_bytes, '\0');
+	auto x = sub_extents.Width * (position.second - 1);
+	auto y = sub_extents.Height * (texture_atlas.Rows() - position.first);
 
-	auto atlas_actual_width_bytes = atlas_extents.ActualWidth * (atlas_extents.BitDepth / 8);
-	auto sub_width_bytes = sub_extents.Width * (sub_extents.BitDepth / 8);
-	auto sub_height_bytes = sub_extents.Height * (sub_extents.BitDepth / 8);
-	auto sub_actual_width_bytes = sub_extents.ActualWidth * (sub_extents.BitDepth / 8);
+	if (gl::HasGL(gl::Version::v4_5))
+	{
+		//Pack image from gl to memory
+		glPixelStorei(GL_PACK_ALIGNMENT, 1); //May increase transfer speed for NPOT
+		glGetTextureSubImage(*texture_atlas.Handle(), 0,
+			x, y, 0, sub_extents.Width, sub_extents.Height, 1,
+				[&]() noexcept
+				{
+					if (FreeImage_IsLittleEndian())
+						return atlas_extents.BitDepth == 32 ? GL_BGRA : GL_BGR;
+					else
+						return atlas_extents.BitDepth == 32 ? GL_RGBA : GL_RGB;
+				}(),
+			GL_UNSIGNED_BYTE, std::size(sub_pixel_data), std::data(sub_pixel_data));
+	}
+	else
+	{
+		//Allocate required bytes for the texture atlas
+		std::string atlas_pixel_data(atlas_extents.ActualWidth * atlas_extents.ActualHeight * color_bytes, '\0');
 
-	std::string sub_pixel_data(sub_extents.ActualWidth * sub_extents.ActualHeight * (sub_extents.BitDepth / 8), '\0');
+		//Pack image from gl to memory
+		glBindTexture(GL_TEXTURE_2D, *texture_atlas.Handle());
+		glPixelStorei(GL_PACK_ALIGNMENT, 1); //May increase transfer speed for NPOT
+		glGetTexImage(GL_TEXTURE_2D, 0,
+				[&]() noexcept
+				{
+					if (FreeImage_IsLittleEndian())
+						return atlas_extents.BitDepth == 32 ? GL_BGRA : GL_BGR;
+					else
+						return atlas_extents.BitDepth == 32 ? GL_RGBA : GL_RGB;
+				}(),
+			GL_UNSIGNED_BYTE, std::data(atlas_pixel_data));
+		glBindTexture(GL_TEXTURE_2D, 0);
 
-	for (auto ai = atlas_extents.ActualWidth *
-				   sub_height_bytes * (position.first - 1) +
-				   sub_width_bytes * (position.second - 1), si = 0,
-		size = std::ssize(sub_pixel_data); si < size;
-		ai += atlas_actual_width_bytes, si += sub_actual_width_bytes)
+		//Copy sub texture bytes from texture atlas at the given position
+		for (auto ai = x * color_bytes + y * color_bytes * atlas_extents.ActualWidth,
+			si = 0, size = std::ssize(sub_pixel_data); si < size;
+			ai += atlas_extents.ActualWidth * color_bytes, si += sub_extents.ActualWidth * color_bytes)
 
-		std::copy(
-			std::begin(atlas_pixel_data) + ai,
-			std::begin(atlas_pixel_data) + ai + sub_width_bytes,
-			std::begin(sub_pixel_data) + si
-		);
+			std::copy(
+				std::begin(atlas_pixel_data) + ai,
+				std::begin(atlas_pixel_data) + ai + sub_extents.Width * color_bytes,
+				std::begin(sub_pixel_data) + si
+			);
+	}
 
 	return std::pair{std::move(sub_pixel_data), sub_extents};
 }

@@ -1193,7 +1193,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, /*color_spectrum_diffuse*/textures.GetTexture("ground_1"), nullptr, nullptr);
+					0.0_r, color_spectrum_diffuse, nullptr, nullptr);
 			color_spectrum->LightingEnabled(false);
 
 			auto cat =
