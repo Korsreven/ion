@@ -173,6 +173,30 @@ namespace ion::graphics::textures
 				return std::pair{width, height};
 			}
 
+			inline auto power_of_two_padding(int width, int height) noexcept
+			{
+				if (auto is_width_pot = is_power_of_two(width),
+						 is_height_pot = is_power_of_two(height); !is_width_pot || !is_height_pot)
+				{
+					//Pad left and right
+					if (!is_width_pot)
+					{
+						auto padding_width = static_cast<int>(upper_power_of_two(width)) - width;
+						auto padding_half_width = padding_width / 2;
+						return std::tuple{padding_half_width, 0, padding_half_width + padding_width % 2, 0};
+					}
+					//Pad top and bottom
+					else
+					{
+						auto padding_height = static_cast<int>(upper_power_of_two(height)) - height;
+						auto padding_half_height = padding_height / 2;
+						return std::tuple{0, padding_half_height, 0, padding_half_height + padding_height % 2};
+					}
+				}
+				else
+					return std::tuple{0, 0, 0, 0};
+			}
+
 
 			std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 				const std::string &file_data, const std::filesystem::path &file_path,

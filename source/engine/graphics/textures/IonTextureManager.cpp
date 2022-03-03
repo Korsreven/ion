@@ -140,28 +140,9 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 		}
 
 		//Enlarge canvas is needed (one dimension is npot)
-		if (auto is_width_pot = is_power_of_two(new_width),
-				 is_height_pot = is_power_of_two(new_height); !is_width_pot || !is_height_pot)
+		if (auto [left, top, right, bottom] = detail::power_of_two_padding(new_width, new_height);
+			left + top + right + bottom > 0)
 		{
-			auto [left, top, right, bottom] =
-				[&]() noexcept
-				{
-					//Enlarge width
-					if (!is_width_pot)
-					{
-						auto padding_width = static_cast<int>(upper_power_of_two(new_width)) - new_width;
-						auto padding_half_width = padding_width / 2;
-						return std::tuple{padding_half_width, 0, padding_half_width + padding_width % 2, 0};
-					}
-					//Enlarge height
-					else
-					{
-						auto padding_height = static_cast<int>(upper_power_of_two(new_height)) - new_height;
-						auto padding_half_height = padding_height / 2;
-						return std::tuple{0, padding_half_height, 0, padding_half_height + padding_height % 2};
-					}
-				}();
-			
 			//Enlarge canvas
 			{
 				auto color = RGBQUAD{0xFF, 0xFF, 0xFF, 0x00};
@@ -368,15 +349,20 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 
 	//Allocate required bytes for the sub texture
 	std::string sub_pixel_data(sub_extents.ActualWidth * sub_extents.ActualHeight * color_bytes, '\0');
-	auto x = sub_extents.Width * (position.second - 1);
-	auto y = sub_extents.Height * (texture_atlas.Rows() - position.first);
+	
+	auto [left, top, right, bottom] =
+		npot_scale || !has_support_for_non_power_of_two_textures() ?
+		detail::power_of_two_padding(sub_extents.Width, sub_extents.Height) :
+		std::tuple{0, 0, 0, 0};
+	auto x = sub_extents.Width * (position.second - 1) + left;
+	auto y = sub_extents.Height * (texture_atlas.Rows() - position.first) + bottom;
 
 	if (gl::HasGL(gl::Version::v4_5))
 	{
 		//Pack image from gl to memory
 		glPixelStorei(GL_PACK_ALIGNMENT, 1); //May increase transfer speed for NPOT
 		glGetTextureSubImage(*texture_atlas.Handle(), 0,
-			x, y, 0, sub_extents.Width, sub_extents.Height, 1,
+			x, y, 0, sub_extents.ActualWidth, sub_extents.ActualHeight, 1,
 				[&]() noexcept
 				{
 					if (FreeImage_IsLittleEndian())
@@ -412,7 +398,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 
 			std::copy(
 				std::begin(atlas_pixel_data) + ai,
-				std::begin(atlas_pixel_data) + ai + sub_extents.Width * color_bytes,
+				std::begin(atlas_pixel_data) + ai + sub_extents.ActualWidth * color_bytes,
 				std::begin(sub_pixel_data) + si
 			);
 	}
