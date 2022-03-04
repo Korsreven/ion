@@ -31,7 +31,8 @@ namespace font_manager::detail
 {
 
 std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, int>> prepare_font(
-	const std::string &file_data, int size, int face_index, font::FontCharacterSet character_set)
+	const std::string &file_data, int size, int face_index,
+	int character_spacing, font::FontCharacterSet character_set)
 {
 	FT_Library library = nullptr;
 	if (FT_Init_FreeType(&library) != 0)
@@ -69,7 +70,7 @@ std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, int>> prepa
 		metric.Height = static_cast<int>(face->glyph->bitmap.rows);
 		metric.ActualWidth = static_cast<int>(textures::texture_manager::detail::upper_power_of_two(metric.Width));
 		metric.ActualHeight = static_cast<int>(textures::texture_manager::detail::upper_power_of_two(metric.Height));
-		metric.Advance = face->glyph->advance.x / 64;
+		metric.Advance = face->glyph->advance.x / 64 + character_spacing;
 
 		//Update max glyph height if higher than current max
 		if (glyph_max_height < metric.Height)
@@ -161,7 +162,7 @@ bool FontManager::PrepareResource(Font &font) noexcept
 	if (FileResourceManager::PrepareResource(font))
 	{
 		if (auto font_data = detail::prepare_font(*font.FileData(),
-			font.Size(), font.FaceIndex(), font.CharacterSet()); font_data)
+			font.Size(), font.FaceIndex(), font.CharacterSpacing(), font.CharacterSet()); font_data)
 		{
 			auto &[glyph_data, glyph_metrics, glyph_max_height] = *font_data;
 			font.GlyphData(std::move(glyph_data), std::move(glyph_metrics), glyph_max_height);
@@ -233,32 +234,38 @@ FontManager::~FontManager() noexcept
 */
 
 NonOwningPtr<Font> FontManager::CreateFont(std::string name, std::string asset_name, int size, int face_index,
-	font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter)
+	int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter)
 {
-	return CreateResource(std::move(name), std::move(asset_name), size, face_index, character_set, min_filter, mag_filter);
+	return CreateResource(std::move(name), std::move(asset_name), size, face_index,
+		character_spacing, character_set, min_filter, mag_filter);
 }
 
 NonOwningPtr<Font> FontManager::CreateFont(std::string name, std::string asset_name, int size,
-	font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter)
+	int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter)
 {
-	return CreateResource(std::move(name), std::move(asset_name), size, character_set, min_filter, mag_filter);
+	return CreateResource(std::move(name), std::move(asset_name), size,
+		character_spacing, character_set, min_filter, mag_filter);
 }
 
 NonOwningPtr<Font> FontManager::CreateFont(std::string name, std::string asset_name, int size,
-	font::FontCharacterSet character_set, font::FontGlyphFilter filter)
+	int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter filter)
 {
-	return CreateResource(std::move(name), std::move(asset_name), size, character_set, filter);
+	return CreateResource(std::move(name), std::move(asset_name), size,
+		character_spacing, character_set, filter);
 }
 
 NonOwningPtr<Font> FontManager::CreateFont(std::string name, std::string asset_name, int size,
-	font::FontCharacterSet character_set)
+	int character_spacing, font::FontCharacterSet character_set)
 {
-	return CreateResource(std::move(name), std::move(asset_name), size, character_set);
+	return CreateResource(std::move(name), std::move(asset_name), size,
+		character_spacing, character_set);
 }
 
-NonOwningPtr<Font> FontManager::CreateFont(std::string name, std::string asset_name, int size)
+NonOwningPtr<Font> FontManager::CreateFont(std::string name, std::string asset_name, int size,
+	int character_spacing)
 {
-	return CreateResource(std::move(name), std::move(asset_name), size);
+	return CreateResource(std::move(name), std::move(asset_name), size,
+		character_spacing);
 }
 
 

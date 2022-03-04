@@ -58,6 +58,7 @@ namespace ion::graphics::fonts
 
 			int size_ = 0;
 			int face_index_ = 0;
+			int character_spacing_ = 0;
 			font::FontCharacterSet character_set_ = font::FontCharacterSet::ASCII;
 
 			font::FontGlyphFilter glyph_min_filter_ = font::FontGlyphFilter::Bilinear;
@@ -71,23 +72,25 @@ namespace ion::graphics::fonts
 
 		public:
 
-			//Construct a new font with the given name, asset name, size, face index, character set and glyph filter for min/mag
-			Font(std::string name, std::string asset_name, int size, int face_index, font::FontCharacterSet character_set,
-				font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter);
+			//Construct a new font with the given name, asset name, size, face index, character spacing, character set and glyph filter for min/mag
+			Font(std::string name, std::string asset_name, int size, int face_index,
+				int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter);
 
-			//Construct a new font with the given name, asset name, size, character set and glyph filter for min/mag
-			Font(std::string name, std::string asset_name, int size, font::FontCharacterSet character_set,
-				font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter);
+			//Construct a new font with the given name, asset name, size, character spacing, character set and glyph filter for min/mag
+			Font(std::string name, std::string asset_name, int size,
+				int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter);
 
-			//Construct a new font with the given name, asset name, size, character set and glyph filter
-			Font(std::string name, std::string asset_name, int size, font::FontCharacterSet character_set,
-				font::FontGlyphFilter filter);
+			//Construct a new font with the given name, asset name, size, character spacing, character set and glyph filter
+			Font(std::string name, std::string asset_name, int size,
+				int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter filter);
 
-			//Construct a new font with the given name, asset name, size and character set
-			Font(std::string name, std::string asset_name, int size, font::FontCharacterSet character_set);
+			//Construct a new font with the given name, asset name, size, character spacing and character set
+			Font(std::string name, std::string asset_name, int size,
+				int character_spacing, font::FontCharacterSet character_set);
 
-			//Construct a new font with the given name, asset name and size
-			Font(std::string name, std::string asset_name, int size);
+			//Construct a new font with the given name, asset name, size and character spacing
+			Font(std::string name, std::string asset_name, int size,
+				int character_spacing = 0);
 
 
 			/*
@@ -160,6 +163,12 @@ namespace ion::graphics::fonts
 			[[nodiscard]] inline auto FaceIndex() const noexcept
 			{
 				return face_index_;
+			}
+
+			//Returns the character spacing for the font
+			[[nodiscard]] inline auto CharacterSpacing() const noexcept
+			{
+				return character_spacing_;
 			}
 
 			//Returns the character set for the font

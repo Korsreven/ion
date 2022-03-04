@@ -34,7 +34,8 @@ namespace ion::graphics::fonts
 		namespace detail
 		{
 			std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, int>> prepare_font(
-				const std::string &file_data, int size, int face_index, font::FontCharacterSet character_set);
+				const std::string &file_data, int size, int face_index,
+				int character_spacing, font::FontCharacterSet character_set);
 
 			std::optional<font::GlyphTextureHandles> load_font(
 				const font::GlyphBitmapData &glyph_data,
@@ -118,24 +119,25 @@ namespace ion::graphics::fonts
 				Creating
 			*/
 
-			//Create a font with the given name, asset name, size, face index, character set and glyph min/mag filter
+			//Create a font with the given name, asset name, size, face index, character spacing, character set and glyph min/mag filter
 			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size, int face_index,
-				font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter);
+				int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter);
 
-			//Create a font with the given name, asset name, size, character set and glyph min/mag filter
+			//Create a font with the given name, asset name, size, character spacing, character set and glyph min/mag filter
 			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size,
-				font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter);
+				int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter);
 
-			//Create a font with the given name, asset name, size, character set and glyph filter
+			//Create a font with the given name, asset name, size, character spacing, character set and glyph filter
 			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size,
-				font::FontCharacterSet character_set, font::FontGlyphFilter filter);
+				int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter filter);
 
-			//Create a font with the given name, asset name, size and character set
+			//Create a font with the given name, asset name, size, character spacing and character set
 			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size,
-				font::FontCharacterSet character_set);
+				int character_spacing, font::FontCharacterSet character_set);
 
-			//Create a font with the given name, asset name and size
-			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size);
+			//Create a font with the given name, asset name, size and character spacing
+			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size,
+				int character_spacing = 0);
 
 
 			//Create a font as a copy of the given font

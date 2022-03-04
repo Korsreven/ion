@@ -24,13 +24,14 @@ namespace font::detail
 
 //Public
 
-Font::Font(std::string name, std::string asset_name, int size, int face_index, FontCharacterSet character_set,
-	FontGlyphFilter min_filter, FontGlyphFilter mag_filter) :
+Font::Font(std::string name, std::string asset_name, int size, int face_index,
+	int character_spacing, FontCharacterSet character_set, FontGlyphFilter min_filter, FontGlyphFilter mag_filter) :
 
 	FileResource{std::move(name), std::move(asset_name)},
 
 	size_{size},
 	face_index_{face_index},
+	character_spacing_{character_spacing},
 	character_set_{character_set},
 
 	glyph_min_filter_{min_filter},
@@ -39,36 +40,41 @@ Font::Font(std::string name, std::string asset_name, int size, int face_index, F
 	//Empty
 }
 
-Font::Font(std::string name, std::string asset_name, int size, FontCharacterSet character_set,
-	FontGlyphFilter min_filter, FontGlyphFilter mag_filter) :
+Font::Font(std::string name, std::string asset_name, int size,
+	int character_spacing, FontCharacterSet character_set, FontGlyphFilter min_filter, FontGlyphFilter mag_filter) :
 
-	Font{std::move(name), std::move(asset_name), size, 0, character_set, min_filter, mag_filter}
+	Font{std::move(name), std::move(asset_name), size, 0, character_spacing, character_set, min_filter, mag_filter}
 {
 	//Empty
 }
 
-Font::Font(std::string name, std::string asset_name, int size, FontCharacterSet character_set,
-	FontGlyphFilter filter) :
+Font::Font(std::string name, std::string asset_name, int size,
+	int character_spacing, FontCharacterSet character_set, FontGlyphFilter filter) :
 
-	Font{std::move(name), std::move(asset_name), size, character_set, filter, filter}
+	Font{std::move(name), std::move(asset_name), size, character_spacing, character_set, filter, filter}
 {
 	//Empty
 }
 
-Font::Font(std::string name, std::string asset_name, int size, FontCharacterSet character_set) :
+Font::Font(std::string name, std::string asset_name, int size,
+	int character_spacing, FontCharacterSet character_set) :
 
 	FileResource{std::move(name), std::move(asset_name)},
 
 	size_{size},
+	character_spacing_{character_spacing},
 	character_set_{character_set}
 {
 	//Empty
 }
 
-Font::Font(std::string name, std::string asset_name, int size) :
+Font::Font(std::string name, std::string asset_name, int size,
+	int character_spacing) :
 
 	FileResource{std::move(name), std::move(asset_name)},
-	size_{size}
+
+	size_{size},
+	character_spacing_{character_spacing}
 {
 	//Empty
 }
