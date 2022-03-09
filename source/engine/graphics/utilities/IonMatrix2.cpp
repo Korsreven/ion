@@ -137,16 +137,8 @@ Matrix2 Matrix2::Transformation(real rotation, const Vector2 &scaling) noexcept
 
 Matrix2& Matrix2::operator=(const Matrix3 &matrix) noexcept
 {
-	#ifdef ION_ROW_MAJOR
-	//Row-major layout (Direct3D)
 	m_[0][0] = matrix.M00();		m_[0][1] = matrix.M01();
 	m_[1][0] = matrix.M10();		m_[1][1] = matrix.M11();
-	#else
-	//Column-major layout (OpenGL)
-	m_[0][0] = matrix.M00();		m_[0][1] = matrix.M01();
-	m_[1][0] = matrix.M10();		m_[1][1] = matrix.M11();
-	#endif
-
 	return *this;
 }
 

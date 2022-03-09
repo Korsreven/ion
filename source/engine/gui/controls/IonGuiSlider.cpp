@@ -256,9 +256,11 @@ bool GuiSlider::IntersectsHandle(const Vector2 &point) const noexcept
 				skin.Handle->Prepare();
 
 				//Check for intersection
-				if (skin.Handle->AxisAlignedBoundingBox().TransformCopy(skin_node_->FullTransformation()).Intersects(point))
+				if (skin.Handle->AxisAlignedBoundingBox().TransformCopy(
+					Matrix3::Transformation(skin_node_->FullTransformation())).Intersects(point))
 					return skin_node_->AxisAligned() ||
-						skin.Handle->OrientedBoundingBox().TransformCopy(skin_node_->FullTransformation()).Intersects(point);
+						skin.Handle->OrientedBoundingBox().TransformCopy(
+						Matrix3::Transformation(skin_node_->FullTransformation())).Intersects(point);
 			}
 		}
 	}

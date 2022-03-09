@@ -1290,10 +1290,10 @@ bool GuiControl::Intersects(const Vector2 &point) const noexcept
 			for (auto &hit_box : hit_boxes_)
 			{
 				//Check for intersection
-				if (hit_box.TransformCopy(node_->FullTransformation()).Intersects(point))
+				if (hit_box.TransformCopy(Matrix3::Transformation(node_->FullTransformation())).Intersects(point))
 				{
 					if (!node_ || node_->AxisAligned() ||
-						Obb{hit_box}.Transform(node_->FullTransformation()).Intersects(point))
+						Obb{hit_box}.Transform(Matrix3::Transformation(node_->FullTransformation())).Intersects(point))
 						return true;
 				}
 			}

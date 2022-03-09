@@ -475,7 +475,7 @@ const Obb& SceneNode::WorldOrientedBoundingBox(bool derive) const noexcept
 		}
 
 		world_obb_ = aabb_;
-		world_obb_.Transform(FullTransformation());
+		world_obb_.Transform(Matrix3::Transformation(FullTransformation()));
 	}
 
 	return world_obb_;

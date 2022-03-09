@@ -51,7 +51,7 @@ Aabb MovableObject::DeriveWorldAxisAlignedBoundingBox(Aabb aabb, bool apply_exte
 			}
 		}
 
-		aabb.Transform(parent_node_->FullTransformation());
+		aabb.Transform(Matrix3::Transformation(parent_node_->FullTransformation()));
 	}
 
 	return aabb;
@@ -73,7 +73,7 @@ Obb MovableObject::DeriveWorldOrientedBoundingBox(Obb obb, Aabb aabb, bool apply
 			}
 		}
 
-		obb.Transform(parent_node_->FullTransformation());
+		obb.Transform(Matrix3::Transformation(parent_node_->FullTransformation()));
 	}
 
 	return obb;
@@ -95,7 +95,7 @@ Sphere MovableObject::DeriveWorldBoundingSphere(Sphere sphere, Aabb aabb, bool a
 			}
 		}
 
-		sphere.Transform(parent_node_->FullTransformation());
+		sphere.Transform(Matrix3::Transformation(parent_node_->FullTransformation()));
 	}
 
 	return sphere;

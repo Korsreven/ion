@@ -70,15 +70,15 @@ Matrix4::Matrix4(real m00, real m01, real m02, real m03,
 Matrix4::Matrix4(const Matrix3 &matrix) noexcept :
 	#ifdef ION_ROW_MAJOR
 	//Row-major layout (Direct3D)
-	Matrix4{matrix.M00(), matrix.M01(), 0.0_r,
-			matrix.M10(), matrix.M11(), 0.0_r,
-			0.0_r, 0.0_r, 1.0_r,
-			matrix.M20(), matrix.M21(), 0.0_r}
+	Matrix4{matrix.M00(), matrix.M01(), matrix.M()[0][2],
+			matrix.M10(), matrix.M11(), matrix.M()[1][2],
+			matrix.M20(), matrix.M21(), matrix.M()[2][2],
+			0.0_r, 0.0_r, 0.0_r}
 	#else
 	//Column-major layout (OpenGL)
-	Matrix4{matrix.M00(), matrix.M01(), 0.0_r, matrix.M02(),
-			matrix.M10(), matrix.M11(), 0.0_r, matrix.M12(),
-			0.0_r, 0.0_r, 1.0_r, 0.0_r}
+	Matrix4{matrix.M00(), matrix.M01(), matrix.M02(), 0.0_r,
+			matrix.M10(), matrix.M11(), matrix.M12(), 0.0_r,
+			matrix.M()[2][0], matrix.M()[2][1], matrix.M()[2][2], 0.0_r}
 	#endif
 {
 	//Empty
@@ -217,6 +217,22 @@ Matrix4 Matrix4::Transformation(real rotation, const Vector3 &scaling, const Vec
 	#endif
 }
 
+Matrix4 Matrix4::Transformation(const Matrix3 &matrix) noexcept
+{
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+	return {matrix.M00(), matrix.M01(), 0.0_r,
+			matrix.M10(), matrix.M11(), 0.0_r,
+			0.0_r, 0.0_r, 1.0_r,
+			matrix.M20(), matrix.M21(), 0.0_r};
+	#else
+	//Column-major layout (OpenGL)
+	return {matrix.M00(), matrix.M01(), 0.0_r, matrix.M02(),
+			matrix.M10(), matrix.M11(), 0.0_r, matrix.M12(),
+			0.0_r, 0.0_r, 1.0_r, 0.0_r};
+	#endif
+}
+
 
 /*
 	Operators
@@ -226,15 +242,15 @@ Matrix4& Matrix4::operator=(const Matrix3 &matrix) noexcept
 {
 	#ifdef ION_ROW_MAJOR
 	//Row-major layout (Direct3D)
-	m_[0][0] = matrix.M00();		m_[0][1] = matrix.M01();		m_[0][2] = 0.0_r;				m_[0][3] = 0.0_r;
-	m_[1][0] = matrix.M10();		m_[1][1] = matrix.M11();		m_[1][2] = 0.0_r;				m_[1][3] = 0.0_r;
-	m_[2][0] = 0.0_r;				m_[2][1] = 0.0_r;				m_[2][2] = 1.0_r;				m_[2][3] = 0.0_r;
-	m_[3][0] = matrix.M20();		m_[3][1] = matrix.M21();		m_[3][2] = 0.0_r;				m_[3][3] = 1.0_r;
+	m_[0][0] = matrix.M00();		m_[0][1] = matrix.M01();		m_[0][2] = matrix.M()[0][2];	m_[0][3] = 0.0_r;
+	m_[1][0] = matrix.M10();		m_[1][1] = matrix.M11();		m_[1][2] = matrix.M()[1][2];	m_[1][3] = 0.0_r;
+	m_[2][0] = matrix.M20()			m_[2][1] = matrix.M21();		m_[2][2] = matrix.M()[2][2];	m_[2][3] = 0.0_r;
+	m_[3][0] = 0.0_r;				m_[3][1] = 0.0_r;				m_[3][2] = 0.0_r;				m_[3][3] = 1.0_r;
 	#else
 	//Column-major layout (OpenGL)
-	m_[0][0] = matrix.M00();		m_[0][1] = matrix.M01();		m_[0][2] = 0.0_r;				m_[0][3] = matrix.M02();
-	m_[1][0] = matrix.M10();		m_[1][1] = matrix.M11();		m_[1][2] = 0.0_r;				m_[1][3] = matrix.M12();
-	m_[2][0] = 0.0_r;				m_[2][1] = 0.0_r;				m_[2][2] = 1.0_r;				m_[2][3] = 0.0_r;
+	m_[0][0] = matrix.M00();		m_[0][1] = matrix.M01();		m_[0][2] = matrix.M02();		m_[0][3] = 0.0_r;
+	m_[1][0] = matrix.M10();		m_[1][1] = matrix.M11();		m_[1][2] = matrix.M12();		m_[1][3] = 0.0_r;
+	m_[2][0] = matrix.M()[2][0];	m_[2][1] = matrix.M()[2][1];	m_[2][2] = matrix.M()[2][2];	m_[2][3] = 0.0_r;
 	m_[3][0] = 0.0_r;				m_[3][1] = 0.0_r;				m_[3][2] = 0.0_r;				m_[3][3] = 1.0_r;
 	#endif
 

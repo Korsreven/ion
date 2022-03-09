@@ -98,6 +98,9 @@ namespace ion::graphics::utilities
 			//Returns a new transformation matrix from the given rotation angle (radians), scaling and translation
 			[[nodiscard]] static Matrix4 Transformation(real rotation, const Vector3 &scaling, const Vector3 &translation) noexcept;
 
+			//Returns a new transformation matrix from the given 3x3 matrix
+			[[nodiscard]] static Matrix4 Transformation(const Matrix3 &matrix) noexcept;
+
 
 			/*
 				Operators
