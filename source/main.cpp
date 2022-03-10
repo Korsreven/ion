@@ -818,6 +818,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				matrix_struct->CreateUniform<glsl::mat4>("model_view");
 				matrix_struct->CreateUniform<glsl::mat4>("projection");
 				matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
+				matrix_struct->CreateUniform<glsl::mat3>("normal");
 
 				//Scene
 				scene_struct->CreateUniform<glsl::vec4>("ambient");
@@ -892,6 +893,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				matrix_struct->CreateUniform<glsl::mat4>("model_view");
 				matrix_struct->CreateUniform<glsl::mat4>("projection");
 				matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
+				matrix_struct->CreateUniform<glsl::mat3>("normal");
 
 				//Scene
 				scene_struct->CreateUniform<glsl::vec4>("ambient");

@@ -170,6 +170,13 @@ void set_matrix_uniforms(const Matrix4 &projection_mat, const Matrix4 &model_vie
 		#else
 		model_view_projection->Get<glsl::mat4>() = (projection_mat * model_view_mat).TransposeCopy();
 		#endif
+	
+	if (auto normal = shader_program.GetUniform(shaders::shader_layout::UniformName::Matrix_Normal); normal)
+		#ifdef ION_ROW_MAJOR
+		normal->Get<glsl::mat3>() = Matrix3{model_view_mat}.Inverse().Transpose();
+		#else
+		normal->Get<glsl::mat3>() = Matrix3{model_view_mat.TransposeCopy()}.Inverse().Transpose();
+		#endif
 }
 
 void set_node_uniforms(const SceneNode &node, shaders::ShaderProgram &shader_program) noexcept
