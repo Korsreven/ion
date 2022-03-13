@@ -168,7 +168,7 @@ void set_matrix_uniforms(const Matrix4 &projection_mat, const Matrix4 &model_vie
 		#ifdef ION_ROW_MAJOR
 		model_view_projection->Get<glsl::mat4>() = projection_mat * model_view_mat;
 		#else
-		model_view_projection->Get<glsl::mat4>() = (projection_mat * model_view_mat).TransposeCopy();
+		model_view_projection->Get<glsl::mat4>() = (projection_mat * model_view_mat).Transpose();
 		#endif
 	
 	if (auto normal = shader_program.GetUniform(shaders::shader_layout::UniformName::Matrix_Normal); normal)

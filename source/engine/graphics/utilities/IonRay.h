@@ -82,13 +82,13 @@ namespace ion::graphics::utilities
 			*/
 
 			//Returns the origin of the ray
-			[[nodiscard]] inline auto Origin() const noexcept
+			[[nodiscard]] inline auto& Origin() const noexcept
 			{
 				return origin_;
 			}
 
 			//Returns the direction of the ray
-			[[nodiscard]] inline auto Direction() const noexcept
+			[[nodiscard]] inline auto& Direction() const noexcept
 			{
 				return direction_;
 			}

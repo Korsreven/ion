@@ -177,7 +177,7 @@ namespace ion::graphics::utilities
 			*/
 
 			//Returns the radius of the sphere
-			[[nodiscard]] inline auto Center() const noexcept
+			[[nodiscard]] inline auto& Center() const noexcept
 			{
 				return center_;
 			}

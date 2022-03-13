@@ -153,13 +153,13 @@ namespace ion::graphics::utilities
 			*/
 
 			//Returns the max vector (top right point)
-			[[nodiscard]] inline auto Max() const noexcept
+			[[nodiscard]] inline auto& Max() const noexcept
 			{
 				return max_;
 			}
 
 			//Returns the min vector (bottom left point)
-			[[nodiscard]] inline auto Min() const noexcept
+			[[nodiscard]] inline auto& Min() const noexcept
 			{
 				return min_;
 			}
