@@ -229,6 +229,12 @@
     <Filter Include="Header Files\gui\skins">
       <UniqueIdentifier>{edf2bc06-abf8-4fea-92cd-1360ef111d38}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\script\interfaces">
+      <UniqueIdentifier>{b984d09f-7647-44e4-b9b9-5a9f3f002927}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\script\interfaces">
+      <UniqueIdentifier>{0f2b64b3-9f58-4243-abad-3ebd09f45c39}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -665,6 +671,12 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\textures\IonTextureAtlas.cpp">
       <Filter>Source Files\graphics\textures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\script\interfaces\IonScriptInterface.cpp">
+      <Filter>Source Files\script\interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\script\interfaces\IonParticleSystemScriptInterface.cpp">
+      <Filter>Source Files\script\interfaces</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1288,6 +1300,12 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\textures\IonTextureAtlas.h">
       <Filter>Header Files\graphics\textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\script\interfaces\IonScriptInterface.h">
+      <Filter>Header Files\script\interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\script\interfaces\IonParticleSystemScriptInterface.h">
+      <Filter>Header Files\script\interfaces</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
