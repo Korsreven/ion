@@ -12,6 +12,8 @@ File:	IonScriptInterface.cpp
 
 #include "IonScriptInterface.h"
 
+#include "resources/IonFileResourceManager.h"
+
 namespace ion::script::interfaces
 {
 
@@ -22,6 +24,32 @@ namespace script_interface::detail
 
 } //script_interface::detail
 
+
+//Script interface
+//Protected
+
+bool ScriptInterface::Execute(std::string_view name)
+{
+	//Build from script (if found in script repository)
+	if (auto repository = detail::repository_from_resource_name(ScriptRepositories(), name); repository)
+	{
+		builder_.Compiler().BuildRepository(*repository);
+		//builder_.Validator(std::move(validator));
+		return builder_.Build(name);
+	}
+
+	//Deserialize from object file (if found in file repository)
+	if (auto data = detail::file_data_from_resource_name(FileRepositories(), name); data)
+	{
+		tree_ = ion::script::ScriptTree::Deserialize(*data);
+		return tree_.has_value();
+	}
+	else
+		return false;
+}
+
+
+//Public
 
 /*
 	Script repositories

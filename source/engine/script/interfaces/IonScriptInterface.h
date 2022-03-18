@@ -14,6 +14,8 @@ File:	IonScriptInterface.h
 #define ION_SCRIPT_INTERFACE_H
 
 #include <optional>
+#include <string>
+#include <string_view>
 
 #include "assets/repositories/IonFileRepository.h"
 #include "assets/repositories/IonScriptRepository.h"
@@ -28,6 +30,31 @@ namespace ion::script::interfaces
 {
 	namespace script_interface::detail
 	{
+		template <typename RepositoriesT>
+		inline auto repository_from_resource_name(const RepositoriesT &repositories, std::string_view resource_name) noexcept ->
+			typename RepositoriesT::value_type::pointer
+		{
+			for (auto &repository : repositories)
+			{
+				if (auto file = repository.File(resource_name); file)
+					return const_cast<typename RepositoriesT::value_type::pointer>(&repository);
+			}
+
+			return nullptr;
+		}
+
+		template <typename RepositoriesT>
+		inline auto file_data_from_resource_name(const RepositoriesT &repositories, std::string_view resource_name) noexcept ->
+			std::optional<std::string>
+		{
+			for (auto &repository : repositories)
+			{
+				if (auto file_data = repository.FileData(resource_name); file_data)
+					return std::move(*file_data);
+			}
+
+			return {};
+		}
 	} //script_interface::detail
 
 
@@ -43,7 +70,9 @@ namespace ion::script::interfaces
 		protected:
 		
 			ScriptBuilder builder_;
-			std::optional<assets::repositories::ScriptRepository> repository_;
+			std::optional<ScriptTree> tree_;
+
+			bool Execute(std::string_view name);
 
 		public:
 
