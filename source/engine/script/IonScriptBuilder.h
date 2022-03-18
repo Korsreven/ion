@@ -70,11 +70,8 @@ namespace ion::script
 
 		public:
 
-			//Construct a new script builder without a repository
+			//Default constructor
 			ScriptBuilder() = default;
-
-			//Construct a new script builder with the given repository
-			ScriptBuilder(const assets::repositories::ScriptRepository &repository);
 
 
 			/*

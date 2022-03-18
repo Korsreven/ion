@@ -2445,13 +2445,6 @@ std::string print_output(duration compile_time, const std::vector<CompileError> 
 
 //ScriptCompiler
 
-ScriptCompiler::ScriptCompiler(const assets::repositories::ScriptRepository &repository) :
-	repository_{&repository}
-{
-	//Empty
-}
-
-
 /*
 	Compiling
 */
@@ -2461,9 +2454,9 @@ std::optional<ScriptTree> ScriptCompiler::Compile(std::string_view name, Compile
 	compile_errors_.clear();
 	compile_time_ = {}; //Reset
 
-	if (repository_)
+	if (build_repository_)
 	{
-		script_compiler::detail::build_system system{*repository_};
+		script_compiler::detail::build_system system{*build_repository_};
 		script_compiler::detail::file_trace trace;
 
 		//File path needs to be a valid file

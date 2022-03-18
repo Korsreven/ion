@@ -571,7 +571,7 @@ namespace ion::script
 	{
 		private:
 		
-			const assets::repositories::ScriptRepository *repository_ = nullptr;	
+			const assets::repositories::ScriptRepository *build_repository_ = nullptr;	
 			std::optional<int> max_build_processes_;
 
 			std::vector<CompileError> compile_errors_;
@@ -579,16 +579,25 @@ namespace ion::script
 
 		public:
 
-			//Construct a new script compiler without a repository
+			//Default constructor
 			ScriptCompiler() = default;
-
-			//Construct a new script compiler with the given repository
-			ScriptCompiler(const assets::repositories::ScriptRepository &repository);
 
 
 			/*
 				Modifiers
 			*/
+
+			//Set the build repository the compiler has access to when compiling
+			inline void BuildRepository(const assets::repositories::ScriptRepository &repository) noexcept
+			{
+				build_repository_ = &repository;
+			}
+
+			//Set the build repository the compiler has access to when compiling
+			inline void BuildRepository(std::nullptr_t) noexcept
+			{
+				build_repository_ = nullptr;
+			}
 
 			//Set the max number of build processes the compiler is allowed to use
 			//If nullopt is passed, a default number of build processes will be used (based on your system)
@@ -616,6 +625,13 @@ namespace ion::script
 				return compile_time_;
 			}
 
+
+			//Returns the build repository the compiler has access to when compiling
+			//Returns nullptr if the compiler has no build repository
+			[[nodiscard]] inline auto BuildRepository() const noexcept
+			{
+				return build_repository_;
+			}
 
 			//Returns the max number of build processes the compiler is allowed to use
 			//If nullopt is returned, a default number of build processes is being used (based on your system)

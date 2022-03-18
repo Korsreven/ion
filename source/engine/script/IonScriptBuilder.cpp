@@ -93,13 +93,6 @@ void ScriptBuilder::SaveOutput() noexcept
 
 //Public
 
-ScriptBuilder::ScriptBuilder(const assets::repositories::ScriptRepository &repository) :
-	compiler_{repository}
-{
-	//Empty
-}
-
-
 /*
 	Building
 */
