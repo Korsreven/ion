@@ -28,25 +28,29 @@ namespace script_interface::detail
 //Script interface
 //Protected
 
-bool ScriptInterface::Execute(std::string_view name)
+bool ScriptInterface::Execute(std::string_view asset_name)
 {
 	//Build from script (if found in script repository)
-	if (auto repository = detail::repository_from_resource_name(ScriptRepositories(), name); repository)
+	if (auto repository = detail::repository_from_resource_name(ScriptRepositories(), asset_name); repository)
 	{
 		builder_.Compiler().BuildRepository(*repository);
-		//builder_.Validator(std::move(validator));
-		return builder_.Build(name);
+		builder_.Validator(GetValidator());
+		return builder_.Build(asset_name);
 	}
 
 	//Deserialize from object file (if found in file repository)
-	if (auto data = detail::file_data_from_resource_name(FileRepositories(), name); data)
+	if (auto data = detail::file_data_from_resource_name(FileRepositories(), asset_name); data)
 	{
 		tree_ = ion::script::ScriptTree::Deserialize(*data);
+		//Should already be validated
 		return tree_.has_value();
 	}
 	else
 		return false;
 }
+
+
+//Protected
 
 
 //Public

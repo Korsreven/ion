@@ -72,7 +72,9 @@ namespace ion::script::interfaces
 			ScriptBuilder builder_;
 			std::optional<ScriptTree> tree_;
 
-			bool Execute(std::string_view name);
+
+			virtual ScriptValidator GetValidator() const = 0;
+			bool Execute(std::string_view asset_name);
 
 		public:
 
