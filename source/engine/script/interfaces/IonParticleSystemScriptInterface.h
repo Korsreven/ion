@@ -41,14 +41,24 @@ namespace ion::script::interfaces
 			Classes
 		*/
 
+		script_validator::ClassDefinition get_affector_class();
+		script_validator::ClassDefinition get_emitter_class();
+		script_validator::ClassDefinition get_particle_system_class();
 
+		script_validator::ClassDefinition get_color_fader_class();
+		script_validator::ClassDefinition get_direction_randomizer_class();
+		script_validator::ClassDefinition get_graviation_class();
+		script_validator::ClassDefinition get_linear_force_class();
+		script_validator::ClassDefinition get_scaler_class();
+		script_validator::ClassDefinition get_sine_force_class();
+		script_validator::ClassDefinition get_velocity_randomizer_class();
 
 
 		/*
 			Validators
 		*/
 
-		ScriptValidator get_validator();
+		ScriptValidator get_particle_system_validator();
 	} //particle_system_script_interface::detail
 
 
