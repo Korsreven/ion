@@ -13,13 +13,42 @@ File:	IonParticleSystemScriptInterface.h
 #ifndef ION_PARTICLE_SYSTEM_SCRIPT_INTERFACE_H
 #define ION_PARTICLE_SYSTEM_SCRIPT_INTERFACE_H
 
+#include <string_view>
+
 #include "IonScriptInterface.h"
 #include "assets/repositories/IonScriptRepository.h"
+#include "script/IonScriptValidator.h"
+
+//Forward declarations
+namespace ion::graphics
+{
+	namespace materials
+	{
+		struct MaterialManager;
+	}
+
+	namespace particles
+	{
+		struct ParticleSystemManager;
+	}
+}
 
 namespace ion::script::interfaces
 {
 	namespace particle_system_script_interface::detail
 	{
+		/*
+			Classes
+		*/
+
+
+
+
+		/*
+			Validators
+		*/
+
+		ScriptValidator get_validator();
 	} //particle_system_script_interface::detail
 
 
@@ -27,7 +56,7 @@ namespace ion::script::interfaces
 	{
 		private:
 
-			
+			ScriptValidator GetValidator() const override;
 
 		public:
 
@@ -36,17 +65,13 @@ namespace ion::script::interfaces
 
 
 			/*
-				Modifiers
+				Particle systems
+				Creating from script
 			*/
 
-
-
-
-			/*
-				Observers
-			*/
-
-
+			//Create particle systems from a script (or object file) with the given asset name
+			void CreateParticleSystems(std::string_view asset_name,
+				graphics::particles::ParticleSystemManager &particle_system_manager, graphics::materials::MaterialManager &material_manager);
 	};
 } //ion::script::interfaces
 
