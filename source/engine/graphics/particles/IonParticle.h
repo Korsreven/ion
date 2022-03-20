@@ -44,7 +44,7 @@ namespace ion::graphics::particles
 			Vector2 size_;
 			real mass_ = 0.0_r;
 			Color color_;
-			Cumulative<duration> life_time_;
+			Cumulative<duration> lifetime_;
 
 			Vector2 initial_direction_;
 
@@ -55,7 +55,7 @@ namespace ion::graphics::particles
 			//Constructs a new particle from the given initial values
 			Particle(const Vector3 &position, const Vector2 &direction,
 					 const Vector2 &size, real mass, const Color &color,
-					 duration life_time, const Vector2 &initial_direction) noexcept;
+					 duration lifetime, const Vector2 &initial_direction) noexcept;
 
 
 			/*
@@ -101,10 +101,10 @@ namespace ion::graphics::particles
 				color_ = color;
 			}
 
-			//Sets the life time of the particle to the given duration
-			inline void LifeTime(duration life_time) noexcept
+			//Sets the lifetime of the particle to the given duration
+			inline void Lifetime(duration lifetime) noexcept
 			{
-				life_time_.Limit(life_time);
+				lifetime_.Limit(lifetime);
 			}
 
 
@@ -155,16 +155,16 @@ namespace ion::graphics::particles
 				return color_;
 			}
 
-			//Returns the life time of the particle
-			[[nodiscard]] inline auto LifeTime() const noexcept
+			//Returns the lifetime of the particle
+			[[nodiscard]] inline auto Lifetime() const noexcept
 			{
-				return life_time_.Limit();
+				return lifetime_.Limit();
 			}
 
-			//Returns the life time percent of the particle in range [0.0, 1.0]
-			[[nodiscard]] inline auto LifeTimePercent() const noexcept
+			//Returns the lifetime percent of the particle in range [0.0, 1.0]
+			[[nodiscard]] inline auto LifetimePercent() const noexcept
 			{
-				return life_time_.Percent();
+				return lifetime_.Percent();
 			}
 
 
@@ -176,7 +176,7 @@ namespace ion::graphics::particles
 			//This function is typically called each frame, with the time in seconds since last frame
 			inline auto Evolve(duration time) noexcept
 			{
-				if (life_time_ += time)
+				if (lifetime_ += time)
 					return false;
 				else
 				{

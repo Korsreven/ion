@@ -275,13 +275,13 @@ std::optional<const PowerStatus> power_status() noexcept
 		if (system_power_status.BatteryLifePercent != 255)
 			status.BatteryPercent = system_power_status.BatteryLifePercent / 100.0_r;
 
-		//Battery life time is known
+		//Battery lifetime is known
 		if (system_power_status.BatteryLifeTime != static_cast<DWORD>(-1))
-			status.BatteryLifeTime = std::chrono::seconds{system_power_status.BatteryLifeTime}; //Seconds
+			status.BatteryLifetime = std::chrono::seconds{system_power_status.BatteryLifeTime}; //Seconds
 
-		//Battery full life time is known
+		//Battery full lifetime is known
 		if (system_power_status.BatteryFullLifeTime != static_cast<DWORD>(-1))
-			status.BatteryFullLifeTime = std::chrono::seconds{system_power_status.BatteryFullLifeTime}; //Seconds
+			status.BatteryFullLifetime = std::chrono::seconds{system_power_status.BatteryFullLifeTime}; //Seconds
 
 		//Battery flag is known
 		if (system_power_status.BatteryFlag != 255)

@@ -17,7 +17,7 @@ namespace ion::graphics::particles
 
 Particle::Particle(const Vector3 &position, const Vector2 &direction,
 				   const Vector2 &size, real mass, const Color &color,
-				   duration life_time, const Vector2 &initial_direction) noexcept :
+				   duration lifetime, const Vector2 &initial_direction) noexcept :
 
 	position_{position},
 	direction_{direction},
@@ -25,7 +25,7 @@ Particle::Particle(const Vector3 &position, const Vector2 &direction,
 	size_{size},
 	mass_{mass},
 	color_{color},
-	life_time_{life_time},
+	lifetime_{lifetime},
 
 	initial_direction_{initial_direction}
 {

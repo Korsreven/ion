@@ -148,9 +148,9 @@ namespace ion::graphics::particles
 				return from_color.MixCopy(to_color, ion::utilities::random::Number());
 			}
 
-			inline auto particle_life_time(duration min_life_time, duration max_life_time)
+			inline auto particle_lifetime(duration min_lifetime, duration max_lifetime)
 			{
-				return duration{ion::utilities::random::Number(min_life_time.count(), max_life_time.count())};
+				return duration{ion::utilities::random::Number(min_lifetime.count(), max_lifetime.count())};
 			}
 
 
@@ -189,7 +189,7 @@ namespace ion::graphics::particles
 			std::pair<Vector2, Vector2> particle_size_;		
 			std::pair<real, real> particle_mass_;
 			std::pair<Color, Color> particle_color_;
-			std::pair<duration, duration> particle_life_time_;
+			std::pair<duration, duration> particle_lifetime_;
 			NonOwningPtr<materials::Material> particle_material_;
 
 		public:
@@ -439,16 +439,16 @@ namespace ion::graphics::particles
 				particle_color_ = std::pair(from_color, to_color); //minmax not needed
 			}
 
-			//Sets the life time of each new particle to the given value
-			inline void ParticleLifeTime(duration life_time) noexcept
+			//Sets the lifetime of each new particle to the given value
+			inline void ParticleLifetime(duration lifetime) noexcept
 			{
-				particle_life_time_ = std::pair(life_time, life_time);
+				particle_lifetime_ = std::pair(lifetime, lifetime);
 			}
 
-			//Sets the life time range of each new particle to the given range
-			inline void ParticleLifeTime(duration min_life_time, duration max_life_time) noexcept
+			//Sets the lifetime range of each new particle to the given range
+			inline void ParticleLifetime(duration min_lifetime, duration max_lifetime) noexcept
 			{
-				particle_life_time_ = std::minmax(min_life_time, max_life_time);
+				particle_lifetime_ = std::minmax(min_lifetime, max_lifetime);
 			}
 
 			//Sets the material of each new particle to the given material
@@ -486,10 +486,10 @@ namespace ion::graphics::particles
 				return particle_color_;
 			}
 
-			//Returns the life time of each new particle in range [min, max]
-			[[nodiscard]] inline auto& ParticleLifeTime() const noexcept
+			//Returns the lifetime of each new particle in range [min, max]
+			[[nodiscard]] inline auto& ParticleLifetime() const noexcept
 			{
-				return particle_life_time_;
+				return particle_lifetime_;
 			}
 
 			//Returns the material of each new particle

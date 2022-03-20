@@ -28,7 +28,7 @@ void evolve_particles(container_type<Particle> &particles, duration time) noexce
 
 	for (auto iter = std::begin(particles); iter != last;)
 	{
-		//Particle life time has ended
+		//Particle lifetime has ended
 		if (!iter->Evolve(time))
 			*iter = std::move(*--last); //Move last active particle
 		else
@@ -116,7 +116,7 @@ OwningPtr<Emitter> Emitter::Clone() const
 	emitter->particle_size_ = particle_size_;		
 	emitter->particle_mass_ = particle_mass_;
 	emitter->particle_color_ = particle_color_;
-	emitter->particle_life_time_ = particle_life_time_;
+	emitter->particle_lifetime_ = particle_lifetime_;
 	emitter->particle_material_ = particle_material_;
 
 	//Clone local affectors
@@ -201,7 +201,7 @@ void Emitter::Emit(int particle_count) noexcept
 			detail::particle_size(particle_size_.first, particle_size_.second), //Size
 			detail::particle_mass(particle_mass_.first, particle_mass_.second), //Mass
 			detail::particle_color(particle_color_.first, particle_color_.second), //Color
-			detail::particle_life_time(particle_life_time_.first, particle_life_time_.second), //Life time
+			detail::particle_lifetime(particle_lifetime_.first, particle_lifetime_.second), //Lifetime
 			direction_ //Initial direction
 		);
 }

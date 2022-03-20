@@ -1633,7 +1633,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			emitter->ParticleSize(8.0_r, 24.0_r);
 			emitter->ParticleMass(1.0_r, 1.0_r);
 			emitter->ParticleColor(Color{255, 255, 255, 0.75_r}, color::White);
-			emitter->ParticleLifeTime(1.4_sec, 1.4_sec);
+			emitter->ParticleLifetime(1.4_sec, 1.4_sec);
 			emitter->ParticleMaterial(raindrop);
 
 			//Text

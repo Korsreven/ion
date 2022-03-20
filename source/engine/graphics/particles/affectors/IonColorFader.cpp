@@ -99,7 +99,7 @@ void affect_particles(affector::detail::particle_range particles, const color_st
 
 	for (auto &particle : particles)
 	{
-		auto percent = particle.LifeTimePercent();
+		auto percent = particle.LifetimePercent();
 		auto [from, to] =
 			[&]() noexcept
 			{

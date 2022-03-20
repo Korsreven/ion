@@ -38,8 +38,8 @@ namespace ion::system::utilities
 		std::optional<bool> BatteryRunning;
 		std::optional<bool> BatteryCharging;
 		std::optional<real> BatteryPercent;
-		std::optional<std::chrono::seconds> BatteryLifeTime;
-		std::optional<std::chrono::seconds> BatteryFullLifeTime;
+		std::optional<std::chrono::seconds> BatteryLifetime;
+		std::optional<std::chrono::seconds> BatteryFullLifetime;
 	};
 
 	namespace detail
