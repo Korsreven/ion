@@ -20,6 +20,7 @@ namespace ion::script::interfaces
 {
 
 using namespace std::string_literals;
+using namespace script_validator;
 using namespace particle_system_script_interface;
 
 namespace particle_system_script_interface::detail
@@ -29,16 +30,16 @@ namespace particle_system_script_interface::detail
 	Classes
 */
 
-script_validator::ClassDefinition get_affector_class()
+ClassDefinition get_affector_class()
 {
-	return script_validator::ClassDefinition::Create("affector")
-		.AddRequiredProperty("name", script_validator::ParameterType::String)
-		.AddProperty("enabled", script_validator::ParameterType::Boolean);
+	return ClassDefinition::Create("affector")
+		.AddRequiredProperty("name", ParameterType::String)
+		.AddProperty("enabled", ParameterType::Boolean);
 }
 
-script_validator::ClassDefinition get_emitter_class()
+ClassDefinition get_emitter_class()
 {
-	return script_validator::ClassDefinition::Create("emitter")
+	return ClassDefinition::Create("emitter")
 		.AddClass("color-fader")
 		.AddClass("direction-randomizer")
 		.AddClass("gravitation")
@@ -47,27 +48,27 @@ script_validator::ClassDefinition get_emitter_class()
 		.AddClass("sine-force")
 		.AddClass("velocity-randomizer")
 
-		.AddRequiredProperty("name", script_validator::ParameterType::String)
-		.AddProperty("direction", script_validator::ParameterType::Vector2)
-		.AddProperty("emission-angle", script_validator::ParameterType::FloatingPoint)
-		.AddProperty("emission-duration", script_validator::ParameterType::FloatingPoint)
-		.AddProperty("emission-rate", script_validator::ParameterType::FloatingPoint)	
-		.AddProperty("inner-size", script_validator::ParameterType::Vector2)
-		.AddProperty("particle-color", {script_validator::ParameterType::Color, script_validator::ParameterType::Color}, 1)
-		.AddProperty("particle-lifetime", {script_validator::ParameterType::FloatingPoint, script_validator::ParameterType::FloatingPoint}, 1)
-		.AddProperty("particle-mass", {script_validator::ParameterType::FloatingPoint, script_validator::ParameterType::FloatingPoint}, 1)
-		.AddProperty("particle-material", script_validator::ParameterType::String)
-		.AddProperty("particle-size", {script_validator::ParameterType::Vector2, script_validator::ParameterType::Vector2}, 1)
-		.AddProperty("particle-velocity", {script_validator::ParameterType::FloatingPoint, script_validator::ParameterType::FloatingPoint}, 1)
-		.AddProperty("particle-quota", script_validator::ParameterType::Integer)
-		.AddProperty("position", script_validator::ParameterType::Vector2)
-		.AddProperty("size", script_validator::ParameterType::Vector2)
+		.AddRequiredProperty("name", ParameterType::String)
+		.AddProperty("direction", ParameterType::Vector2)
+		.AddProperty("emission-angle", ParameterType::FloatingPoint)
+		.AddProperty("emission-duration", ParameterType::FloatingPoint)
+		.AddProperty("emission-rate", ParameterType::FloatingPoint)	
+		.AddProperty("inner-size", ParameterType::Vector2)
+		.AddProperty("particle-color", {ParameterType::Color, ParameterType::Color}, 1)
+		.AddProperty("particle-lifetime", {ParameterType::FloatingPoint, ParameterType::FloatingPoint}, 1)
+		.AddProperty("particle-mass", {ParameterType::FloatingPoint, ParameterType::FloatingPoint}, 1)
+		.AddProperty("particle-material", ParameterType::String)
+		.AddProperty("particle-size", {ParameterType::Vector2, ParameterType::Vector2}, 1)
+		.AddProperty("particle-velocity", {ParameterType::FloatingPoint, ParameterType::FloatingPoint}, 1)
+		.AddProperty("particle-quota", ParameterType::Integer)
+		.AddProperty("position", ParameterType::Vector2)
+		.AddProperty("size", ParameterType::Vector2)
 		.AddProperty("type", {"point"s, "box"s, "ring"s});
 }
 
-script_validator::ClassDefinition get_particle_system_class()
+ClassDefinition get_particle_system_class()
 {
-	return script_validator::ClassDefinition::Create("particle-system")
+	return ClassDefinition::Create("particle-system")
 		.AddClass(get_emitter_class())
 		.AddClass(get_color_fader_class())
 		.AddClass(get_direction_randomizer_class())
@@ -77,65 +78,65 @@ script_validator::ClassDefinition get_particle_system_class()
 		.AddClass(get_sine_force_class())
 		.AddClass(get_velocity_randomizer_class())
 
-		.AddRequiredProperty("name", script_validator::ParameterType::String)
+		.AddRequiredProperty("name", ParameterType::String)
 		.AddProperty("render-primitive", {"point"s, "rectangle"s});
 }
 
 
-script_validator::ClassDefinition get_color_fader_class()
+ClassDefinition get_color_fader_class()
 {
-	auto step = script_validator::ClassDefinition::Create("step")
-		.AddRequiredProperty("percent", script_validator::ParameterType::FloatingPoint)
-		.AddProperty("color", script_validator::ParameterType::Color);
+	auto step = ClassDefinition::Create("step")
+		.AddRequiredProperty("percent", ParameterType::FloatingPoint)
+		.AddProperty("color", ParameterType::Color);
 
-	return script_validator::ClassDefinition::Create("color-fader", "affector")
+	return ClassDefinition::Create("color-fader", "affector")
 		.AddClass(std::move(step));
 }
 
-script_validator::ClassDefinition get_direction_randomizer_class()
+ClassDefinition get_direction_randomizer_class()
 {
-	return script_validator::ClassDefinition::Create("direction-randomizer", "affector")
-		.AddProperty("angle", script_validator::ParameterType::FloatingPoint)
-		.AddProperty("scope", script_validator::ParameterType::FloatingPoint);
+	return ClassDefinition::Create("direction-randomizer", "affector")
+		.AddProperty("angle", ParameterType::FloatingPoint)
+		.AddProperty("scope", ParameterType::FloatingPoint);
 }
 
-script_validator::ClassDefinition get_graviation_class()
+ClassDefinition get_graviation_class()
 {
-	return script_validator::ClassDefinition::Create("gravitation", "affector")
-		.AddProperty("gravity", script_validator::ParameterType::FloatingPoint)
-		.AddProperty("mass", script_validator::ParameterType::FloatingPoint)
-		.AddProperty("position", script_validator::ParameterType::Vector2);
+	return ClassDefinition::Create("gravitation", "affector")
+		.AddProperty("gravity", ParameterType::FloatingPoint)
+		.AddProperty("mass", ParameterType::FloatingPoint)
+		.AddProperty("position", ParameterType::Vector2);
 }
 
-script_validator::ClassDefinition get_linear_force_class()
+ClassDefinition get_linear_force_class()
 {
-	return script_validator::ClassDefinition::Create("linear-force", "affector")
-		.AddProperty("force", script_validator::ParameterType::Vector2)
+	return ClassDefinition::Create("linear-force", "affector")
+		.AddProperty("force", ParameterType::Vector2)
 		.AddProperty("type", {"add"s, "average"s});
 }
 
-script_validator::ClassDefinition get_scaler_class()
+ClassDefinition get_scaler_class()
 {
-	auto step = script_validator::ClassDefinition::Create("step")
-		.AddRequiredProperty("percent", script_validator::ParameterType::FloatingPoint)
-		.AddProperty("size", script_validator::ParameterType::Vector2);
+	auto step = ClassDefinition::Create("step")
+		.AddRequiredProperty("percent", ParameterType::FloatingPoint)
+		.AddProperty("size", ParameterType::Vector2);
 
-	return script_validator::ClassDefinition::Create("scaler", "affector")
+	return ClassDefinition::Create("scaler", "affector")
 		.AddClass(std::move(step));
 }
 
-script_validator::ClassDefinition get_sine_force_class()
+ClassDefinition get_sine_force_class()
 {
-	return script_validator::ClassDefinition::Create("sine-force", "affector")
-		.AddProperty("force", script_validator::ParameterType::Vector2)
+	return ClassDefinition::Create("sine-force", "affector")
+		.AddProperty("force", ParameterType::Vector2)
 		.AddProperty("type", {"add"s, "average"s});
 }
 
-script_validator::ClassDefinition get_velocity_randomizer_class()
+ClassDefinition get_velocity_randomizer_class()
 {
-	return script_validator::ClassDefinition::Create("velocity-randomizer", "affector")
-		.AddProperty("scope", script_validator::ParameterType::FloatingPoint)
-		.AddProperty("velocity", {script_validator::ParameterType::FloatingPoint, script_validator::ParameterType::FloatingPoint}, 1);
+	return ClassDefinition::Create("velocity-randomizer", "affector")
+		.AddProperty("scope", ParameterType::FloatingPoint)
+		.AddProperty("velocity", {ParameterType::FloatingPoint, ParameterType::FloatingPoint}, 1);
 }
 
 
@@ -167,13 +168,13 @@ ScriptValidator ParticleSystemScriptInterface::GetValidator() const
 */
 
 void ParticleSystemScriptInterface::CreateParticleSystems(std::string_view asset_name,
-	graphics::particles::ParticleSystemManager &particle_system_manager, graphics::materials::MaterialManager &material_manager)
+	graphics::particles::ParticleSystemManager &particle_system_manager,
+	const graphics::materials::MaterialManager &material_manager)
 {
-	if (Execute(asset_name))
+	if (Load(asset_name))
 	{
-		auto &tree = builder_.Tree();
 		auto name =
-			tree->Find("particle-system")
+			tree_->Find("particle-system")
 				.Property("name")[0]
 				.Get<ScriptType::String>()
 				.value_or(""s)
