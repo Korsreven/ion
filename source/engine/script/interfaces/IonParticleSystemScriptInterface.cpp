@@ -14,7 +14,6 @@ File:	IonParticleSystemScriptInterface.cpp
 
 #include <string>
 #include "graphics/materials/IonMaterialManager.h"
-#include "graphics/particles/IonParticleSystemManager.h"
 
 namespace ion::script::interfaces
 {
@@ -27,7 +26,7 @@ namespace particle_system_script_interface::detail
 {
 
 /*
-	Classes
+	Validator classes
 */
 
 ClassDefinition get_affector_class()
@@ -140,15 +139,277 @@ ClassDefinition get_velocity_randomizer_class()
 }
 
 
-/*
-	Validators
-*/
-
 ScriptValidator get_particle_system_validator()
 {
 	return ScriptValidator::Create()
 		.AddAbstractClass(get_affector_class())
 		.AddRequiredClass(get_particle_system_class());
+}
+
+
+/*
+	Tree parsing
+*/
+
+NonOwningPtr<graphics::particles::Emitter> create_emitter(const script_tree::ObjectNode &object,
+	graphics::particles::ParticleSystem &particle_system)
+{
+	auto &name =
+		object
+			.Property("name")[0]
+			.Get<ScriptType::String>()
+			.value_or(""s)
+			.Get();
+
+	auto emitter = particle_system.CreateEmitter(name);
+
+	if (emitter)
+	{
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "");
+		}
+
+		for (auto &obj : object.Objects())
+		{
+			if (obj.Name() == "color-fader")
+				detail::create_color_fader(obj, *emitter);
+			else if (obj.Name() == "direction-randomizer")
+				detail::create_direction_randomizer(obj, *emitter);
+			else if (obj.Name() == "graviation")
+				detail::create_graviation(obj, *emitter);
+			else if (obj.Name() == "linear-force")
+				detail::create_linear_force(obj, *emitter);
+			else if (obj.Name() == "scaler")
+				detail::create_scaler(obj, *emitter);
+			else if (obj.Name() == "sine-force")
+				detail::create_sine_force(obj, *emitter);
+			else if (obj.Name() == "velocity-randomizer")
+				detail::create_velocity_randomizer(obj, *emitter);
+		}
+	}
+
+	return emitter;
+}
+
+NonOwningPtr<graphics::particles::ParticleSystem> create_particle_system(const script_tree::ObjectNode &object,
+	graphics::particles::ParticleSystemManager &particle_system_manager)
+{
+	auto &name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()
+		.value_or(""s)
+		.Get();
+
+	auto particle_system = particle_system_manager.CreateParticleSystem(name);
+
+	if (particle_system)
+	{
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "");
+		}
+
+		for (auto &obj : object.Objects())
+		{
+			if (obj.Name() == "emitter")
+				detail::create_emitter(obj, *particle_system);
+
+			else if (obj.Name() == "color-fader")
+				detail::create_color_fader(obj, *particle_system);
+			else if (obj.Name() == "direction-randomizer")
+				detail::create_direction_randomizer(obj, *particle_system);
+			else if (obj.Name() == "graviation")
+				detail::create_graviation(obj, *particle_system);
+			else if (obj.Name() == "linear-force")
+				detail::create_linear_force(obj, *particle_system);
+			else if (obj.Name() == "scaler")
+				detail::create_scaler(obj, *particle_system);
+			else if (obj.Name() == "sine-force")
+				detail::create_sine_force(obj, *particle_system);
+			else if (obj.Name() == "velocity-randomizer")
+				detail::create_velocity_randomizer(obj, *particle_system);
+		}
+	}
+
+	return particle_system;
+}
+
+
+NonOwningPtr<graphics::particles::affectors::ColorFader> create_color_fader(const script_tree::ObjectNode &object,
+	graphics::particles::affectors::AffectorManager &affector_manager)
+{
+	auto &name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()
+		.value_or(""s)
+		.Get();
+
+	auto color_fader = affector_manager.CreateAffector<graphics::particles::affectors::ColorFader>(name);
+
+	if (color_fader)
+	{
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "");
+		}
+
+		for (auto &obj : object.Objects())
+		{
+			if (obj.Name() == "step")
+			{
+				for (auto &property : obj.Properties())
+				{
+					if (property.Name() == "");
+				}
+			}
+		}
+	}
+
+	return color_fader;
+}
+
+NonOwningPtr<graphics::particles::affectors::DirectionRandomizer> create_direction_randomizer(const script_tree::ObjectNode &object,
+	graphics::particles::affectors::AffectorManager &affector_manager)
+{
+	auto &name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()
+		.value_or(""s)
+		.Get();
+
+	auto direction_randomizer = affector_manager.CreateAffector<graphics::particles::affectors::DirectionRandomizer>(name);
+
+	if (direction_randomizer)
+	{
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "");
+		}
+	}
+
+	return direction_randomizer;
+}
+
+NonOwningPtr<graphics::particles::affectors::Gravitation> create_graviation(const script_tree::ObjectNode &object,
+	graphics::particles::affectors::AffectorManager &affector_manager)
+{
+	auto &name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()
+		.value_or(""s)
+		.Get();
+
+	auto gravitation = affector_manager.CreateAffector<graphics::particles::affectors::Gravitation>(name);
+
+	if (gravitation)
+	{
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "");
+		}
+	}
+
+	return gravitation;
+}
+
+NonOwningPtr<graphics::particles::affectors::LinearForce> create_linear_force(const script_tree::ObjectNode &object,
+	graphics::particles::affectors::AffectorManager &affector_manager)
+{
+	auto &name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()
+		.value_or(""s)
+		.Get();
+
+	auto linear_force = affector_manager.CreateAffector<graphics::particles::affectors::LinearForce>(name);
+
+	if (linear_force)
+	{
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "");
+		}
+	}
+
+	return linear_force;
+}
+
+NonOwningPtr<graphics::particles::affectors::Scaler> create_scaler(const script_tree::ObjectNode &object,
+	graphics::particles::affectors::AffectorManager &affector_manager)
+{
+	auto &name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()
+		.value_or(""s)
+		.Get();
+
+	auto scaler = affector_manager.CreateAffector<graphics::particles::affectors::Scaler>(name);
+
+	if (scaler)
+	{
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "");
+		}
+
+		for (auto &obj : object.Objects())
+		{
+			if (obj.Name() == "step")
+			{
+				for (auto &property : obj.Properties())
+				{
+					if (property.Name() == "");
+				}
+			}
+		}
+	}
+
+	return scaler;
+}
+
+NonOwningPtr<graphics::particles::affectors::SineForce> create_sine_force(const script_tree::ObjectNode &object,
+	graphics::particles::affectors::AffectorManager &affector_manager)
+{
+	auto &name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()
+		.value_or(""s)
+		.Get();
+
+	auto sine_force = affector_manager.CreateAffector<graphics::particles::affectors::SineForce>(name);
+
+	if (sine_force)
+	{
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "");
+		}
+	}
+
+	return sine_force;
+}
+
+NonOwningPtr<graphics::particles::affectors::VelocityRandomizer> create_velocity_randomizer(const script_tree::ObjectNode &object,
+	graphics::particles::affectors::AffectorManager &affector_manager)
+{
+	auto &name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()
+		.value_or(""s)
+		.Get();
+
+	auto velocity_randomizer = affector_manager.CreateAffector<graphics::particles::affectors::VelocityRandomizer>(name);
+
+	if (velocity_randomizer)
+	{
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "");
+		}
+	}
+
+	return velocity_randomizer;
 }
 
 } //particle_system_script_interface::detail
@@ -173,14 +434,8 @@ void ParticleSystemScriptInterface::CreateParticleSystems(std::string_view asset
 {
 	if (Load(asset_name))
 	{
-		auto name =
-			tree_->Find("particle-system")
-				.Property("name")[0]
-				.Get<ScriptType::String>()
-				.value_or(""s)
-				.Get();
-
-		particle_system_manager.CreateParticleSystem(std::move(name));
+		for (auto &object : tree_->Objects())
+			detail::create_particle_system(object, particle_system_manager);
 	}
 }
 
