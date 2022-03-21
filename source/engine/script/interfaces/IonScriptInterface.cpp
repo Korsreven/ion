@@ -28,14 +28,20 @@ namespace script_interface::detail
 //Script interface
 //Protected
 
-bool ScriptInterface::Execute(std::string_view asset_name)
+bool ScriptInterface::Load(std::string_view asset_name)
 {
 	//Build from script (if found in script repository)
 	if (auto repository = detail::repository_from_resource_name(ScriptRepositories(), asset_name); repository)
 	{
 		builder_.Compiler().BuildRepository(*repository);
 		builder_.Validator(GetValidator());
-		return builder_.Build(asset_name);
+		
+		//Built and validated successfully
+		if (builder_.Build(asset_name))
+		{
+			tree_ = builder_.Tree();
+			return tree_.has_value();
+		}
 	}
 
 	//Deserialize from object file (if found in file repository)
@@ -46,7 +52,10 @@ bool ScriptInterface::Execute(std::string_view asset_name)
 		return tree_.has_value();
 	}
 	else
+	{
+		tree_ = {};
 		return false;
+	}
 }
 
 

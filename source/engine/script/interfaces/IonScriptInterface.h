@@ -74,7 +74,7 @@ namespace ion::script::interfaces
 
 
 			virtual ScriptValidator GetValidator() const = 0;
-			bool Execute(std::string_view asset_name);
+			bool Load(std::string_view asset_name);
 
 		public:
 
@@ -120,29 +120,37 @@ namespace ion::script::interfaces
 				Modifiers
 			*/
 
-			//Sets output options for the script interface
-			//Pass nullopt or {} to turn off any script interface output
+			//Set the max number of build processes the compiler is allowed to use
+			//If nullopt is passed, a default number of build processes will be used (based on your system)
+			inline void MaxBuildProcesses(std::optional<int> max_build_processes) noexcept
+			{
+				builder_.Compiler().MaxBuildProcesses(max_build_processes);
+			}
+
+
+			//Sets output options for the builder
+			//Pass nullopt or {} to turn off any builder output
 			inline void Output(std::optional<script_builder::OutputOptions> output_options) noexcept
 			{
 				builder_.Output(output_options);
 			}
 
-			//Sets output options for the script interface compiler
-			//Pass nullopt or {} to turn off any script interface compiler output
+			//Sets output options for the compiler
+			//Pass nullopt or {} to turn off any compiler output
 			inline void CompilerOutput(std::optional<script_compiler::OutputOptions> output_options) noexcept
 			{
 				builder_.CompilerOutput(output_options);
 			}
 
-			//Sets output options for the script interface validator
-			//Pass nullopt or {} to turn off any script interface validator output
+			//Sets output options for the validator
+			//Pass nullopt or {} to turn off any validator output
 			inline void ValidatorOutput(std::optional<script_validator::OutputOptions> output_options) noexcept
 			{
 				builder_.ValidatorOutput(output_options);
 			}
 
-			//Sets output options for the script interface tree
-			//Pass nullopt or {} to turn off any script interface tree output
+			//Sets output options for the tree
+			//Pass nullopt or {} to turn off any tree output
 			inline void TreeOutput(std::optional<script_tree::PrintOptions> print_options) noexcept
 			{
 				builder_.TreeOutput(print_options);
