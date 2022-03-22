@@ -21,6 +21,7 @@ namespace ion::script::interfaces
 using namespace std::string_literals;
 using namespace script_validator;
 using namespace particle_system_script_interface;
+using namespace graphics::particles;
 
 namespace particle_system_script_interface::detail
 {
@@ -151,15 +152,13 @@ ScriptValidator get_particle_system_validator()
 	Tree parsing
 */
 
-NonOwningPtr<graphics::particles::Emitter> create_emitter(const script_tree::ObjectNode &object,
-	graphics::particles::ParticleSystem &particle_system)
+NonOwningPtr<Emitter> create_emitter(const script_tree::ObjectNode &object,
+	ParticleSystem &particle_system,
+	graphics::materials::MaterialManager &material_manager)
 {
-	auto &name =
-		object
-			.Property("name")[0]
-			.Get<ScriptType::String>()
-			.value_or(""s)
-			.Get();
+	auto &name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()->Get();
 
 	auto emitter = particle_system.CreateEmitter(name);
 
@@ -167,7 +166,73 @@ NonOwningPtr<graphics::particles::Emitter> create_emitter(const script_tree::Obj
 	{
 		for (auto &property : object.Properties())
 		{
-			if (property.Name() == "");
+			if (property.Name() == "direction")
+				emitter->Direction(property[0].Get<ScriptType::Vector2>()->Get());
+			else if (property.Name() == "emission-angle")
+				emitter->EmissionAngle(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			else if (property.Name() == "emission-duration")
+				emitter->EmissionDuration(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+			else if (property.Name() == "emission-rate")
+				emitter->EmissionRate(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			else if (property.Name() == "inner-size")
+				emitter->InnerSize(property[0].Get<ScriptType::Vector2>()->Get());
+			else if (property.Name() == "particle-color")
+			{
+				if (property.NumberOfArguments() == 2)
+					emitter->ParticleColor(property[0].Get<ScriptType::Color>()->Get(),
+										   property[1].Get<ScriptType::Color>()->Get());
+				else
+					emitter->ParticleColor(property[0].Get<ScriptType::Color>()->Get());
+			}
+			else if (property.Name() == "particle-lifetime")
+			{
+				if (property.NumberOfArguments() == 2)
+					emitter->ParticleLifetime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()},
+											  duration{property[1].Get<ScriptType::FloatingPoint>()->As<real>()});
+				else
+					emitter->ParticleLifetime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+			}
+			else if (property.Name() == "particle-mass")
+			{
+				if (property.NumberOfArguments() == 2)
+					emitter->ParticleMass(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+										  property[1].Get<ScriptType::FloatingPoint>()->As<real>());
+				else
+					emitter->ParticleMass(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			}
+			else if (property.Name() == "particle-material")
+				emitter->ParticleMaterial(material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get()));
+			else if (property.Name() == "particle-size")
+			{
+				if (property.NumberOfArguments() == 2)
+					emitter->ParticleSize(property[0].Get<ScriptType::Vector2>()->Get(),
+										  property[1].Get<ScriptType::Vector2>()->Get());
+				else
+					emitter->ParticleSize(property[0].Get<ScriptType::Vector2>()->Get());
+			}
+			else if (property.Name() == "particle-velocity")
+			{
+				if (property.NumberOfArguments() == 2)
+					emitter->ParticleVelocity(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+											  property[1].Get<ScriptType::FloatingPoint>()->As<real>());
+				else
+					emitter->ParticleVelocity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			}
+			else if (property.Name() == "particle-quota")
+				emitter->ParticleQuota(property[0].Get<ScriptType::Integer>()->As<int>());
+			else if (property.Name() == "position")
+				emitter->Position(property[0].Get<ScriptType::Vector2>()->Get());
+			else if (property.Name() == "size")
+				emitter->Size(property[0].Get<ScriptType::Vector2>()->Get());
+			else if (property.Name() == "type")
+			{
+				if (property[0].Get<ScriptType::Enumerable>()->Get() == "point")
+					emitter->Type(emitter::EmitterType::Point);
+				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "box")
+					emitter->Type(emitter::EmitterType::Box);
+				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "ring")
+					emitter->Type(emitter::EmitterType::Ring);
+			}
 		}
 
 		for (auto &obj : object.Objects())
@@ -192,14 +257,13 @@ NonOwningPtr<graphics::particles::Emitter> create_emitter(const script_tree::Obj
 	return emitter;
 }
 
-NonOwningPtr<graphics::particles::ParticleSystem> create_particle_system(const script_tree::ObjectNode &object,
-	graphics::particles::ParticleSystemManager &particle_system_manager)
+NonOwningPtr<ParticleSystem> create_particle_system(const script_tree::ObjectNode &object,
+	ParticleSystemManager &particle_system_manager,
+	graphics::materials::MaterialManager &material_manager)
 {
 	auto &name = object
 		.Property("name")[0]
-		.Get<ScriptType::String>()
-		.value_or(""s)
-		.Get();
+		.Get<ScriptType::String>()->Get();
 
 	auto particle_system = particle_system_manager.CreateParticleSystem(name);
 
@@ -207,13 +271,19 @@ NonOwningPtr<graphics::particles::ParticleSystem> create_particle_system(const s
 	{
 		for (auto &property : object.Properties())
 		{
-			if (property.Name() == "");
+			if (property.Name() == "render-primitive")
+			{
+				if (property[0].Get<ScriptType::Enumerable>()->Get() == "point")
+					particle_system->RenderPrimitive(particle_system::ParticlePrimitive::Point);
+				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "rectangle")
+					particle_system->RenderPrimitive(particle_system::ParticlePrimitive::Rectangle);
+			}
 		}
 
 		for (auto &obj : object.Objects())
 		{
 			if (obj.Name() == "emitter")
-				detail::create_emitter(obj, *particle_system);
+				detail::create_emitter(obj, *particle_system, material_manager);
 
 			else if (obj.Name() == "color-fader")
 				detail::create_color_fader(obj, *particle_system);
@@ -236,16 +306,14 @@ NonOwningPtr<graphics::particles::ParticleSystem> create_particle_system(const s
 }
 
 
-NonOwningPtr<graphics::particles::affectors::ColorFader> create_color_fader(const script_tree::ObjectNode &object,
-	graphics::particles::affectors::AffectorManager &affector_manager)
+NonOwningPtr<affectors::ColorFader> create_color_fader(const script_tree::ObjectNode &object,
+	affectors::AffectorManager &affector_manager)
 {
 	auto &name = object
 		.Property("name")[0]
-		.Get<ScriptType::String>()
-		.value_or(""s)
-		.Get();
+		.Get<ScriptType::String>()->Get();
 
-	auto color_fader = affector_manager.CreateAffector<graphics::particles::affectors::ColorFader>(name);
+	auto color_fader = affector_manager.CreateAffector<affectors::ColorFader>(name);
 
 	if (color_fader)
 	{
@@ -269,16 +337,14 @@ NonOwningPtr<graphics::particles::affectors::ColorFader> create_color_fader(cons
 	return color_fader;
 }
 
-NonOwningPtr<graphics::particles::affectors::DirectionRandomizer> create_direction_randomizer(const script_tree::ObjectNode &object,
-	graphics::particles::affectors::AffectorManager &affector_manager)
+NonOwningPtr<affectors::DirectionRandomizer> create_direction_randomizer(const script_tree::ObjectNode &object,
+	affectors::AffectorManager &affector_manager)
 {
 	auto &name = object
 		.Property("name")[0]
-		.Get<ScriptType::String>()
-		.value_or(""s)
-		.Get();
+		.Get<ScriptType::String>()->Get();
 
-	auto direction_randomizer = affector_manager.CreateAffector<graphics::particles::affectors::DirectionRandomizer>(name);
+	auto direction_randomizer = affector_manager.CreateAffector<affectors::DirectionRandomizer>(name);
 
 	if (direction_randomizer)
 	{
@@ -291,16 +357,14 @@ NonOwningPtr<graphics::particles::affectors::DirectionRandomizer> create_directi
 	return direction_randomizer;
 }
 
-NonOwningPtr<graphics::particles::affectors::Gravitation> create_graviation(const script_tree::ObjectNode &object,
-	graphics::particles::affectors::AffectorManager &affector_manager)
+NonOwningPtr<affectors::Gravitation> create_graviation(const script_tree::ObjectNode &object,
+	affectors::AffectorManager &affector_manager)
 {
 	auto &name = object
 		.Property("name")[0]
-		.Get<ScriptType::String>()
-		.value_or(""s)
-		.Get();
+		.Get<ScriptType::String>()->Get();
 
-	auto gravitation = affector_manager.CreateAffector<graphics::particles::affectors::Gravitation>(name);
+	auto gravitation = affector_manager.CreateAffector<affectors::Gravitation>(name);
 
 	if (gravitation)
 	{
@@ -313,16 +377,14 @@ NonOwningPtr<graphics::particles::affectors::Gravitation> create_graviation(cons
 	return gravitation;
 }
 
-NonOwningPtr<graphics::particles::affectors::LinearForce> create_linear_force(const script_tree::ObjectNode &object,
-	graphics::particles::affectors::AffectorManager &affector_manager)
+NonOwningPtr<affectors::LinearForce> create_linear_force(const script_tree::ObjectNode &object,
+	affectors::AffectorManager &affector_manager)
 {
 	auto &name = object
 		.Property("name")[0]
-		.Get<ScriptType::String>()
-		.value_or(""s)
-		.Get();
+		.Get<ScriptType::String>()->Get();
 
-	auto linear_force = affector_manager.CreateAffector<graphics::particles::affectors::LinearForce>(name);
+	auto linear_force = affector_manager.CreateAffector<affectors::LinearForce>(name);
 
 	if (linear_force)
 	{
@@ -335,16 +397,14 @@ NonOwningPtr<graphics::particles::affectors::LinearForce> create_linear_force(co
 	return linear_force;
 }
 
-NonOwningPtr<graphics::particles::affectors::Scaler> create_scaler(const script_tree::ObjectNode &object,
-	graphics::particles::affectors::AffectorManager &affector_manager)
+NonOwningPtr<affectors::Scaler> create_scaler(const script_tree::ObjectNode &object,
+	affectors::AffectorManager &affector_manager)
 {
 	auto &name = object
 		.Property("name")[0]
-		.Get<ScriptType::String>()
-		.value_or(""s)
-		.Get();
+		.Get<ScriptType::String>()->Get();
 
-	auto scaler = affector_manager.CreateAffector<graphics::particles::affectors::Scaler>(name);
+	auto scaler = affector_manager.CreateAffector<affectors::Scaler>(name);
 
 	if (scaler)
 	{
@@ -368,16 +428,14 @@ NonOwningPtr<graphics::particles::affectors::Scaler> create_scaler(const script_
 	return scaler;
 }
 
-NonOwningPtr<graphics::particles::affectors::SineForce> create_sine_force(const script_tree::ObjectNode &object,
-	graphics::particles::affectors::AffectorManager &affector_manager)
+NonOwningPtr<affectors::SineForce> create_sine_force(const script_tree::ObjectNode &object,
+	affectors::AffectorManager &affector_manager)
 {
 	auto &name = object
 		.Property("name")[0]
-		.Get<ScriptType::String>()
-		.value_or(""s)
-		.Get();
+		.Get<ScriptType::String>()->Get();
 
-	auto sine_force = affector_manager.CreateAffector<graphics::particles::affectors::SineForce>(name);
+	auto sine_force = affector_manager.CreateAffector<affectors::SineForce>(name);
 
 	if (sine_force)
 	{
@@ -390,16 +448,14 @@ NonOwningPtr<graphics::particles::affectors::SineForce> create_sine_force(const 
 	return sine_force;
 }
 
-NonOwningPtr<graphics::particles::affectors::VelocityRandomizer> create_velocity_randomizer(const script_tree::ObjectNode &object,
-	graphics::particles::affectors::AffectorManager &affector_manager)
+NonOwningPtr<affectors::VelocityRandomizer> create_velocity_randomizer(const script_tree::ObjectNode &object,
+	affectors::AffectorManager &affector_manager)
 {
 	auto &name = object
 		.Property("name")[0]
-		.Get<ScriptType::String>()
-		.value_or(""s)
-		.Get();
+		.Get<ScriptType::String>()->Get();
 
-	auto velocity_randomizer = affector_manager.CreateAffector<graphics::particles::affectors::VelocityRandomizer>(name);
+	auto velocity_randomizer = affector_manager.CreateAffector<affectors::VelocityRandomizer>(name);
 
 	if (velocity_randomizer)
 	{
@@ -429,13 +485,13 @@ ScriptValidator ParticleSystemScriptInterface::GetValidator() const
 */
 
 void ParticleSystemScriptInterface::CreateParticleSystems(std::string_view asset_name,
-	graphics::particles::ParticleSystemManager &particle_system_manager,
-	const graphics::materials::MaterialManager &material_manager)
+	ParticleSystemManager &particle_system_manager,
+	graphics::materials::MaterialManager &material_manager)
 {
 	if (Load(asset_name))
 	{
 		for (auto &object : tree_->Objects())
-			detail::create_particle_system(object, particle_system_manager);
+			detail::create_particle_system(object, particle_system_manager, material_manager);
 	}
 }
 

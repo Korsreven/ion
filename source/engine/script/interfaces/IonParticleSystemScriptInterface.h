@@ -68,11 +68,13 @@ namespace ion::script::interfaces
 		/*
 			Tree parsing
 		*/
-		
+
 		NonOwningPtr<graphics::particles::Emitter> create_emitter(const script_tree::ObjectNode &object,
-			graphics::particles::ParticleSystem &particle_system);
+			graphics::particles::ParticleSystem &particle_system,
+			graphics::materials::MaterialManager &material_manager);
 		NonOwningPtr<graphics::particles::ParticleSystem> create_particle_system(const script_tree::ObjectNode &object,
-			graphics::particles::ParticleSystemManager &particle_system_manager);
+			graphics::particles::ParticleSystemManager &particle_system_manager,
+			graphics::materials::MaterialManager &material_manager);
 
 		NonOwningPtr<graphics::particles::affectors::ColorFader> create_color_fader(const script_tree::ObjectNode &object,
 			graphics::particles::affectors::AffectorManager &affector_manager);
@@ -111,7 +113,7 @@ namespace ion::script::interfaces
 			//Create particle systems from a script (or object file) with the given asset name
 			void CreateParticleSystems(std::string_view asset_name,
 				graphics::particles::ParticleSystemManager &particle_system_manager,
-				const graphics::materials::MaterialManager &material_manager);
+				graphics::materials::MaterialManager &material_manager);
 	};
 } //ion::script::interfaces
 
