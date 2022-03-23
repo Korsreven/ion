@@ -52,7 +52,8 @@ ClassDefinition get_emitter_class()
 		.AddProperty("direction", ParameterType::Vector2)
 		.AddProperty("emission-angle", ParameterType::FloatingPoint)
 		.AddProperty("emission-duration", ParameterType::FloatingPoint)
-		.AddProperty("emission-rate", ParameterType::FloatingPoint)	
+		.AddProperty("emission-rate", ParameterType::FloatingPoint)
+		.AddProperty("emitting", ParameterType::Boolean)
 		.AddProperty("inner-size", ParameterType::Vector2)
 		.AddProperty("particle-color", {ParameterType::Color, ParameterType::Color}, 1)
 		.AddProperty("particle-lifetime", {ParameterType::FloatingPoint, ParameterType::FloatingPoint}, 1)
@@ -174,6 +175,13 @@ NonOwningPtr<Emitter> create_emitter(const script_tree::ObjectNode &object,
 				emitter->EmissionDuration(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
 			else if (property.Name() == "emission-rate")
 				emitter->EmissionRate(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			else if (property.Name() == "emitting")
+			{
+				if (property[0].Get<ScriptType::Boolean>()->Get())
+					emitter->Start();
+				else
+					emitter->Stop();
+			}
 			else if (property.Name() == "inner-size")
 				emitter->InnerSize(property[0].Get<ScriptType::Vector2>()->Get());
 			else if (property.Name() == "particle-color")
@@ -319,17 +327,26 @@ NonOwningPtr<affectors::ColorFader> create_color_fader(const script_tree::Object
 	{
 		for (auto &property : object.Properties())
 		{
-			if (property.Name() == "");
+			if (property.Name() == "enabled")
+				color_fader->Enabled(property[0].Get<ScriptType::Boolean>()->Get());
 		}
 
 		for (auto &obj : object.Objects())
 		{
 			if (obj.Name() == "step")
 			{
+				auto percent = obj
+					.Property("percent")[0]
+					.Get<ScriptType::FloatingPoint>()->As<real>();
+				auto color = std::optional<graphics::utilities::Color>{};
+
 				for (auto &property : obj.Properties())
 				{
-					if (property.Name() == "");
+					if (property.Name() == "color")
+						color = property[0].Get<ScriptType::Color>()->Get();
 				}
+
+				color_fader->AddStep(percent, color);
 			}
 		}
 	}
@@ -350,7 +367,12 @@ NonOwningPtr<affectors::DirectionRandomizer> create_direction_randomizer(const s
 	{
 		for (auto &property : object.Properties())
 		{
-			if (property.Name() == "");
+			if (property.Name() == "angle")
+				direction_randomizer->Angle(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			else if (property.Name() == "enabled")
+				direction_randomizer->Enabled(property[0].Get<ScriptType::Boolean>()->Get());
+			else if (property.Name() == "scope")
+				direction_randomizer->Scope(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		}
 	}
 
@@ -370,7 +392,14 @@ NonOwningPtr<affectors::Gravitation> create_graviation(const script_tree::Object
 	{
 		for (auto &property : object.Properties())
 		{
-			if (property.Name() == "");
+			if (property.Name() == "enabled")
+				gravitation->Enabled(property[0].Get<ScriptType::Boolean>()->Get());
+			else if (property.Name() == "gravity")
+				gravitation->Gravity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			else if (property.Name() == "mass")
+				gravitation->Mass(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			else if (property.Name() == "position")
+				gravitation->Position(property[0].Get<ScriptType::Vector2>()->Get());
 		}
 	}
 
@@ -390,7 +419,17 @@ NonOwningPtr<affectors::LinearForce> create_linear_force(const script_tree::Obje
 	{
 		for (auto &property : object.Properties())
 		{
-			if (property.Name() == "");
+			if (property.Name() == "enabled")
+				linear_force->Enabled(property[0].Get<ScriptType::Boolean>()->Get());
+			else if (property.Name() == "force")
+				linear_force->Force(property[0].Get<ScriptType::Vector2>()->Get());
+			else if (property.Name() == "type")
+			{
+				if (property[0].Get<ScriptType::Enumerable>()->Get() == "add")
+					linear_force->Type(affectors::linear_force::ForceType::Add);
+				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "average")
+					linear_force->Type(affectors::linear_force::ForceType::Average);
+			}
 		}
 	}
 
@@ -410,17 +449,26 @@ NonOwningPtr<affectors::Scaler> create_scaler(const script_tree::ObjectNode &obj
 	{
 		for (auto &property : object.Properties())
 		{
-			if (property.Name() == "");
+			if (property.Name() == "enabled")
+				scaler->Enabled(property[0].Get<ScriptType::Boolean>()->Get());
 		}
 
 		for (auto &obj : object.Objects())
 		{
 			if (obj.Name() == "step")
 			{
+				auto percent = obj
+					.Property("percent")[0]
+					.Get<ScriptType::FloatingPoint>()->As<real>();
+				auto size = std::optional<graphics::utilities::Vector2>{};
+
 				for (auto &property : obj.Properties())
 				{
-					if (property.Name() == "");
+					if (property.Name() == "size")
+						size = property[0].Get<ScriptType::Vector2>()->Get();
 				}
+
+				scaler->AddStep(percent, size);
 			}
 		}
 	}
@@ -441,7 +489,17 @@ NonOwningPtr<affectors::SineForce> create_sine_force(const script_tree::ObjectNo
 	{
 		for (auto &property : object.Properties())
 		{
-			if (property.Name() == "");
+			if (property.Name() == "enabled")
+				sine_force->Enabled(property[0].Get<ScriptType::Boolean>()->Get());
+			else if (property.Name() == "force")
+				sine_force->Force(property[0].Get<ScriptType::Vector2>()->Get());
+			else if (property.Name() == "type")
+			{
+				if (property[0].Get<ScriptType::Enumerable>()->Get() == "add")
+					sine_force->Type(affectors::sine_force::ForceType::Add);
+				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "average")
+					sine_force->Type(affectors::sine_force::ForceType::Average);
+			}
 		}
 	}
 
@@ -461,7 +519,18 @@ NonOwningPtr<affectors::VelocityRandomizer> create_velocity_randomizer(const scr
 	{
 		for (auto &property : object.Properties())
 		{
-			if (property.Name() == "");
+			if (property.Name() == "enabled")
+				velocity_randomizer->Enabled(property[0].Get<ScriptType::Boolean>()->Get());
+			else if (property.Name() == "scope")
+				velocity_randomizer->Scope(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			else if (property.Name() == "velocity")
+			{
+				if (property.NumberOfArguments() == 2)
+					velocity_randomizer->Velocity(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+												  property[1].Get<ScriptType::FloatingPoint>()->As<real>());
+				else
+					velocity_randomizer->Velocity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			}
 		}
 	}
 
