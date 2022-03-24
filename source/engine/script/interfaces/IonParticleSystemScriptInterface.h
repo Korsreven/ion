@@ -16,7 +16,6 @@ File:	IonParticleSystemScriptInterface.h
 #include <string_view>
 
 #include "IonScriptInterface.h"
-#include "assets/repositories/IonScriptRepository.h"
 #include "graphics/particles/IonEmitter.h"
 #include "graphics/particles/IonEmitterManager.h"
 #include "graphics/particles/IonParticleSystem.h"
