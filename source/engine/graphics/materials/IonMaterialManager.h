@@ -79,6 +79,9 @@ namespace ion::graphics::materials
 			Creating
 		*/
 
+		//Constructs a new material with the given name
+		NonOwningPtr<Material> CreateMaterial(std::string name);
+
 		//Constructs a new material with the given name, ambient, diffuse, specular and emissive color + shininess and receive shadows
 		NonOwningPtr<Material> CreateMaterial(std::string name,
 				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,

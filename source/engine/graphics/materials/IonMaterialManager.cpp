@@ -30,6 +30,11 @@ namespace material_manager::detail
 	Creating
 */
 
+NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name)
+{
+	return Create(std::move(name));
+}
+
 NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name,
 	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
 	bool receive_shadows)

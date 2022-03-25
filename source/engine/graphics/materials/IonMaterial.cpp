@@ -144,6 +144,12 @@ std::pair<bool, bool> is_texture_map_repeatable(const Texture &texture,
 
 //Public
 
+Material::Material(std::string name) :
+	managed::ManagedObject<MaterialManager>{std::move(name)}
+{
+	//Empty
+}
+
 Material::Material(std::string name,
 	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
 	bool receive_shadows) :

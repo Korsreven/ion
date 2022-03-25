@@ -15,6 +15,7 @@ File:	IonMaterialScriptInterface.cpp
 #include <string>
 #include "graphics/textures/IonAnimationManager.h"
 #include "graphics/textures/IonTextureManager.h"
+#include "graphics/utilities/IonAabb.h"
 
 namespace ion::script::interfaces
 {
@@ -72,13 +73,63 @@ NonOwningPtr<Material> create_material(const script_tree::ObjectNode &object,
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto material = material_manager.CreateMaterial(name, {}, {}, {}, {}, 0.0_r);
+	auto material = material_manager.CreateMaterial(name);
 
 	if (material)
 	{
 		for (auto &property : object.Properties())
 		{
-			if (property.Name() == "");
+			if (property.Name() == "ambient-color")
+				material->AmbientColor(property[0].Get<ScriptType::Color>()->Get());
+			else if (property.Name() == "crop")
+				material->Crop(graphics::utilities::Aabb{property[0].Get<ScriptType::Vector2>()->Get(), property[1].Get<ScriptType::Vector2>()->Get()});
+			else if (property.Name() == "diffuse-color")
+				material->DiffuseColor(property[0].Get<ScriptType::Color>()->Get());
+			else if (property.Name() == "diffuse-map")
+			{
+				if (auto texture = texture_manager.GetTexture(property[0].Get<ScriptType::String>()->Get()); texture)
+					material->DiffuseMap(texture);
+				else if (auto animation = animation_manager.GetAnimation(property[0].Get<ScriptType::String>()->Get()); animation)
+					material->DiffuseMap(animation);
+			}
+			else if (property.Name() == "emissive-color")
+				material->EmissiveColor(property[0].Get<ScriptType::Color>()->Get());
+			else if (property.Name() == "flip-horizontal")
+			{
+				if (property[0].Get<ScriptType::Boolean>()->Get())
+					material->FlipHorizontal();
+			}
+			else if (property.Name() == "flip-vertical")
+			{
+				if (property[0].Get<ScriptType::Boolean>()->Get())
+					material->FlipVertical();
+			}
+			else if (property.Name() == "lighting-enabled")
+				material->LightingEnabled(property[0].Get<ScriptType::Boolean>()->Get());
+			else if (property.Name() == "normal-map")
+			{
+				if (auto texture = texture_manager.GetTexture(property[0].Get<ScriptType::String>()->Get()); texture)
+					material->NormalMap(texture);
+				else if (auto animation = animation_manager.GetAnimation(property[0].Get<ScriptType::String>()->Get()); animation)
+					material->NormalMap(animation);
+			}
+			else if (property.Name() == "receive-shadows")
+				material->ReceiveShadows(property[0].Get<ScriptType::Boolean>()->Get());
+			else if (property.Name() == "repeat")
+				material->Repeat(property[0].Get<ScriptType::Vector2>()->Get());
+			else if (property.Name() == "shininess")
+				material->Shininess(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			else if (property.Name() == "specular-color")
+				material->SpecularColor(property[0].Get<ScriptType::Color>()->Get());
+			else if (property.Name() == "specular-map")
+			{
+				if (auto texture = texture_manager.GetTexture(property[0].Get<ScriptType::String>()->Get()); texture)
+					material->SpecularMap(texture);
+				else if (auto animation = animation_manager.GetAnimation(property[0].Get<ScriptType::String>()->Get()); animation)
+					material->SpecularMap(animation);
+			}
+			else if (property.Name() == "tex-coords")
+				material->TexCoords(property[0].Get<ScriptType::Vector2>()->Get(), property[1].Get<ScriptType::Vector2>()->Get());
 		}
 	}
 

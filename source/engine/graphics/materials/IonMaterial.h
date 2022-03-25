@@ -129,6 +129,9 @@ namespace ion::graphics::materials
 
 		public:
 
+			//Constructs a new material with the given name
+			explicit Material(std::string name);
+
 			//Constructs a new material with the given name, ambient, diffuse, specular and emissive color + shininess and receive shadows
 			Material(std::string name,
 				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
