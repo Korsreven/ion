@@ -148,7 +148,7 @@ ScriptValidator MaterialScriptInterface::GetValidator() const
 
 
 /*
-	Particle systems
+	Materials
 	Creating from script
 */
 

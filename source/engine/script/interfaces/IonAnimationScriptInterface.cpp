@@ -131,7 +131,7 @@ ScriptValidator AnimationScriptInterface::GetValidator() const
 
 
 /*
-	Particle systems
+	Animations
 	Creating from script
 */
 
