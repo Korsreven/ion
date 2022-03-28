@@ -33,9 +33,24 @@ namespace shader_program_script_interface::detail
 ClassDefinition get_shader_program_class()
 {
 	return ClassDefinition::Create("shader-program")
+		.AddClass(get_shader_struct_class())
+
 		.AddRequiredProperty("name", ParameterType::String)
-		.AddProperty("", ParameterType::FloatingPoint);
+		.AddProperty("attribute", {glsl_data_types, ParameterType::String, ParameterType::Integer}, 2)
+		.AddProperty("fragment-shader", ParameterType::String)
+		.AddProperty("shader-layout", ParameterType::String)
+		.AddProperty("uniform", {glsl_data_types, ParameterType::String, ParameterType::Integer}, 2)
+		.AddProperty("vertex-shader", ParameterType::String);
 }
+
+ClassDefinition get_shader_struct_class()
+{
+	return ClassDefinition::Create("struct")
+		.AddRequiredProperty("name", ParameterType::String)
+		.AddProperty("size", ParameterType::Integer)
+		.AddProperty("uniform", {glsl_data_types, ParameterType::String, ParameterType::Integer}, 2);
+}
+
 
 ScriptValidator get_shader_program_validator()
 {
