@@ -69,6 +69,17 @@ NonOwningPtr<ShaderProgram> create_shader_program(const script_tree::ObjectNode 
 	return shader_program;
 }
 
+void create_shader_programs(const ScriptTree &tree,
+	ShaderProgramManager &shader_program_manager,
+	ShaderManager &shader_manager)
+{
+	for (auto &object : tree.Objects())
+	{
+		if (object.Name() == "shader-program")
+			create_shader_program(object, shader_program_manager, shader_manager);
+	}
+}
+
 } //shader_program_script_interface::detail
 
 
@@ -90,10 +101,7 @@ void ShaderProgramScriptInterface::CreateShaderPrograms(std::string_view asset_n
 	ShaderManager &shader_manager)
 {
 	if (Load(asset_name))
-	{
-		for (auto &object : tree_->Objects())
-			detail::create_shader_program(object, shader_program_manager, shader_manager);
-	}
+		detail::create_shader_programs(*tree_, shader_program_manager, shader_manager);
 }
 
 } //ion::script::interfaces

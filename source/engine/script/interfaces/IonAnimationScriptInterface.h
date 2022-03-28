@@ -50,6 +50,10 @@ namespace ion::script::interfaces
 		NonOwningPtr<graphics::textures::Animation> create_animation(const script_tree::ObjectNode &object,
 			graphics::textures::AnimationManager &animation_manager,
 			graphics::textures::FrameSequenceManager &frame_sequence_manager);
+
+		void create_animations(const ScriptTree &tree,
+			graphics::textures::AnimationManager &animation_manager,
+			graphics::textures::FrameSequenceManager &frame_sequence_manager);
 	} //animation_script_interface::detail
 
 

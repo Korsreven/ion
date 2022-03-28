@@ -89,6 +89,10 @@ namespace ion::script::interfaces
 			graphics::particles::affectors::AffectorManager &affector_manager);
 		NonOwningPtr<graphics::particles::affectors::VelocityRandomizer> create_velocity_randomizer(const script_tree::ObjectNode &object,
 			graphics::particles::affectors::AffectorManager &affector_manager);
+
+		void create_particle_systems(const ScriptTree &tree,
+			graphics::particles::ParticleSystemManager &particle_system_manager,
+			graphics::materials::MaterialManager &material_manager);
 	} //particle_system_script_interface::detail
 
 

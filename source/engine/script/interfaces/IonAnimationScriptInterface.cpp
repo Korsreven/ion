@@ -119,6 +119,17 @@ NonOwningPtr<Animation> create_animation(const script_tree::ObjectNode &object,
 	return animation;
 }
 
+void create_animations(const ScriptTree &tree,
+	AnimationManager &animation_manager,
+	FrameSequenceManager &frame_sequence_manager)
+{
+	for (auto &object : tree.Objects())
+	{
+		if (object.Name() == "animation")
+			create_animation(object, animation_manager, frame_sequence_manager);
+	}
+}
+
 } //animation_script_interface::detail
 
 
@@ -140,10 +151,7 @@ void AnimationScriptInterface::CreateAnimations(std::string_view asset_name,
 	FrameSequenceManager &frame_sequence_manager)
 {
 	if (Load(asset_name))
-	{
-		for (auto &object : tree_->Objects())
-			detail::create_animation(object, animation_manager, frame_sequence_manager);
-	}
+		detail::create_animations(*tree_, animation_manager, frame_sequence_manager);
 }
 
 } //ion::script::interfaces

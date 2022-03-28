@@ -52,6 +52,11 @@ namespace ion::script::interfaces
 			graphics::materials::MaterialManager &material_manager,
 			graphics::textures::AnimationManager &animation_manager,
 			graphics::textures::TextureManager &texture_manager);
+
+		void create_materials(const ScriptTree &tree,
+			graphics::materials::MaterialManager &material_manager,
+			graphics::textures::AnimationManager &animation_manager,
+			graphics::textures::TextureManager &texture_manager);
 	} //material_script_interface::detail
 
 

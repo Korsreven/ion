@@ -136,6 +136,18 @@ NonOwningPtr<Material> create_material(const script_tree::ObjectNode &object,
 	return material;
 }
 
+void create_materials(const ScriptTree &tree,
+	MaterialManager &material_manager,
+	graphics::textures::AnimationManager &animation_manager,
+	graphics::textures::TextureManager &texture_manager)
+{
+	for (auto &object : tree.Objects())
+	{
+		if (object.Name() == "material")
+			create_material(object, material_manager, animation_manager, texture_manager);
+	}
+}
+
 } //material_script_interface::detail
 
 
@@ -158,10 +170,7 @@ void MaterialScriptInterface::CreateMaterials(std::string_view asset_name,
 	graphics::textures::TextureManager &texture_manager)
 {
 	if (Load(asset_name))
-	{
-		for (auto &object : tree_->Objects())
-			detail::create_material(object, material_manager, animation_manager, texture_manager);
-	}
+		detail::create_materials(*tree_, material_manager, animation_manager, texture_manager);
 }
 
 } //ion::script::interfaces

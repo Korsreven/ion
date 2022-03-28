@@ -50,6 +50,10 @@ namespace ion::script::interfaces
 		NonOwningPtr<graphics::shaders::ShaderProgram> create_shader_program(const script_tree::ObjectNode &object,
 			graphics::shaders::ShaderProgramManager &shader_program_manager,
 			graphics::shaders::ShaderManager &shader_manager);
+
+		void create_shader_programs(const ScriptTree &tree,
+			graphics::shaders::ShaderProgramManager &shader_program_manager,
+			graphics::shaders::ShaderManager &shader_manager);
 	} //shader_program_script_interface::detail
 
 

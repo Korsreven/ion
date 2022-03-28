@@ -537,6 +537,18 @@ NonOwningPtr<affectors::VelocityRandomizer> create_velocity_randomizer(const scr
 	return velocity_randomizer;
 }
 
+
+void create_particle_systems(const ScriptTree &tree,
+	ParticleSystemManager &particle_system_manager,
+	graphics::materials::MaterialManager &material_manager)
+{
+	for (auto &object : tree.Objects())
+	{
+		if (object.Name() == "particle-system")
+			create_particle_system(object, particle_system_manager, material_manager);
+	}
+}
+
 } //particle_system_script_interface::detail
 
 
@@ -558,10 +570,7 @@ void ParticleSystemScriptInterface::CreateParticleSystems(std::string_view asset
 	graphics::materials::MaterialManager &material_manager)
 {
 	if (Load(asset_name))
-	{
-		for (auto &object : tree_->Objects())
-			detail::create_particle_system(object, particle_system_manager, material_manager);
-	}
+		detail::create_particle_systems(*tree_, particle_system_manager, material_manager);
 }
 
 } //ion::script::interfaces
