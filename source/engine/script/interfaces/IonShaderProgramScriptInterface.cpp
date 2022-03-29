@@ -70,19 +70,64 @@ NonOwningPtr<ShaderProgram> create_shader_program(const script_tree::ObjectNode 
 	auto &name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
+	auto &vertex_shader_name = object
+		.Property("vertex-shader")[0]
+		.Get<ScriptType::String>().value_or(""s).Get();
+	auto &fragment_shader_name = object
+		.Property("fragment-shader")[0]
+		.Get<ScriptType::String>().value_or(""s).Get();
+	auto &shader_layout_name = object
+		.Property("shader-layout")[0]
+		.Get<ScriptType::String>().value_or(""s).Get();
 
-	auto shader_program = shader_program_manager.CreateShaderProgram(name, {}, {}, {});
+	auto shader_program = shader_program_manager.CreateShaderProgram(name,
+		shader_manager.GetShader(vertex_shader_name), shader_manager.GetShader(fragment_shader_name),
+		shader_program_manager.GetShaderLayout(shader_layout_name));
 
 	if (shader_program)
 	{
 		for (auto &property : object.Properties())
 		{
-			if (property.Name() == "");
+			if (property.Name() == "attribute")
+			{
+				//Todo
+			}
+			else if (property.Name() == "uniform")
+			{
+				//Todo
+			}
 		}
 	}
 
 	return shader_program;
 }
+
+NonOwningPtr<graphics::shaders::ShaderStruct> create_shader_struct(const script_tree::ObjectNode &object,
+	ShaderProgram &shader_program)
+{
+	auto &name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()->Get();
+	auto size = object
+		.Property("size")[0]
+		.Get<ScriptType::Integer>().value_or(1).As<int>();
+
+	auto shader_struct = shader_program.CreateStruct(name, size);
+
+	if (shader_struct)
+	{
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "uniform")
+			{
+				//Todo
+			}
+		}
+	}
+
+	return shader_struct;
+}
+
 
 void create_shader_programs(const ScriptTree &tree,
 	ShaderProgramManager &shader_program_manager,

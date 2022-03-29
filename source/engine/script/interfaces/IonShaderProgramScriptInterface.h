@@ -16,6 +16,7 @@ File:	IonShaderProgramScriptInterface.h
 #include <string_view>
 
 #include "IonScriptInterface.h"
+#include "graphics/shaders/IonShaderStruct.h"
 #include "graphics/shaders/IonShaderProgram.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
 #include "memory/IonNonOwningPtr.h"
@@ -79,6 +80,8 @@ namespace ion::script::interfaces
 		NonOwningPtr<graphics::shaders::ShaderProgram> create_shader_program(const script_tree::ObjectNode &object,
 			graphics::shaders::ShaderProgramManager &shader_program_manager,
 			graphics::shaders::ShaderManager &shader_manager);
+		NonOwningPtr<graphics::shaders::ShaderStruct> create_shader_struct(const script_tree::ObjectNode &object,
+			graphics::shaders::ShaderProgram &shader_program);
 
 		void create_shader_programs(const ScriptTree &tree,
 			graphics::shaders::ShaderProgramManager &shader_program_manager,
