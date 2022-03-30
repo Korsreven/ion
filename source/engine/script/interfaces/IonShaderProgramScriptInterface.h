@@ -37,7 +37,29 @@ namespace ion::script::interfaces
 {
 	namespace shader_program_script_interface::detail
 	{
-		inline static const Strings glsl_data_types
+		inline static const Strings attribute_data_types
+		{
+			//Basic types
+			"bool", "int", "uint", "float", "double",
+
+			//Vector types
+			"bvec2", "ivec2", "uvec2", "vec2", "dvec2",
+			"bvec3", "ivec3", "uvec3", "vec3", "dvec3",
+			"bvec4", "ivec4", "uvec4", "vec4", "dvec4",
+
+			//Matrix types
+			"mat2x2", "dmat2x2", "mat2", "dmat2",
+			"mat2x3", "dmat2x3",
+			"mat2x4", "dmat2x4",
+			"mat3x2", "dmat3x2",
+			"mat3x3", "dmat3x3", "mat3", "dmat3",
+			"mat3x4", "dmat3x4",
+			"mat4x2", "dmat4x2",
+			"mat4x3", "dmat4x3",
+			"mat4x4", "dmat4x4", "mat4", "dmat4"
+		};
+
+		inline static const Strings uniform_data_types
 		{
 			//Basic types
 			"bool", "int", "uint", "float", "double",
@@ -59,7 +81,7 @@ namespace ion::script::interfaces
 			"mat4x4", "dmat4x4", "mat4", "dmat4",
 
 			//Sampler types
-			"isampler2D", "usampler2D", "sampler2d"
+			"isampler2D", "usampler2D", "sampler2D"
 		};
 
 
@@ -76,6 +98,13 @@ namespace ion::script::interfaces
 		/*
 			Tree parsing
 		*/
+
+		void create_attribute(const script_tree::PropertyNode &property,
+			graphics::shaders::ShaderProgram &shader_program);
+		void create_uniform(const script_tree::PropertyNode &property,
+			graphics::shaders::ShaderProgram &shader_program);
+		void create_uniform(const script_tree::PropertyNode &property,
+			graphics::shaders::ShaderStruct &shader_struct);
 
 		NonOwningPtr<graphics::shaders::ShaderProgram> create_shader_program(const script_tree::ObjectNode &object,
 			graphics::shaders::ShaderProgramManager &shader_program_manager,
