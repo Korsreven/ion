@@ -687,6 +687,9 @@
     <ClCompile Include="..\source\engine\script\interfaces\IonShaderProgramScriptInterface.cpp">
       <Filter>Source Files\script\interfaces</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\script\interfaces\IonShaderLayoutScriptInterface.cpp">
+      <Filter>Source Files\script\interfaces</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1323,6 +1326,9 @@
       <Filter>Header Files\script\interfaces</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\script\interfaces\IonShaderProgramScriptInterface.h">
+      <Filter>Header Files\script\interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\script\interfaces\IonShaderLayoutScriptInterface.h">
       <Filter>Header Files\script\interfaces</Filter>
     </ClInclude>
   </ItemGroup>
