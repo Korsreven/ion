@@ -84,9 +84,9 @@ namespace ion::script::interfaces
 			"material-specular",
 			"material-emissive",
 			"material-shininess",
-			"material-diffuseMap",
-			"material-specularMap",
-			"material-normalMap",
+			"material-diffuse-map",
+			"material-specular-map",
+			"material-normal-map",
 			"material-has-diffuse-map",
 			"material-has-specular-map",
 			"material-has-normal-map",
@@ -125,6 +125,14 @@ namespace ion::script::interfaces
 		/*
 			Tree parsing
 		*/
+
+		void bind_struct(const script_tree::PropertyNode &property,
+			graphics::shaders::ShaderLayout &shader_layout);
+		void bind_attribute(const script_tree::PropertyNode &property,
+			graphics::shaders::ShaderLayout &shader_layout);	
+		void bind_uniform(const script_tree::PropertyNode &property,
+			graphics::shaders::ShaderLayout &shader_layout);
+
 
 		NonOwningPtr<graphics::shaders::ShaderLayout> create_shader_layout(const script_tree::ObjectNode &object,
 			graphics::shaders::ShaderProgramManager &shader_program_manager);
