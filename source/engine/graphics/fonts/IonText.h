@@ -233,7 +233,7 @@ namespace ion::graphics::fonts
 			//Construct a new (unbounded) text with the given name, content and a type face
 			Text(std::string name, std::string content, NonOwningPtr<TypeFace> type_face);
 
-			//Construct a new text with the given name, content, formatting,
+			//Construct a new text (area) with the given name, content, formatting,
 			//horizontal and vertical alignment, area size, padding, line height factor and a type face
 			Text(std::string name, std::string content, text::TextFormatting formatting,
 				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
