@@ -72,7 +72,7 @@ void create_attribute(const script_tree::PropertyNode &property,
 	using namespace variables;
 
 	auto &type = property[0]
-		.Get<ScriptType::String>()->Get();
+		.Get<ScriptType::Enumerable>()->Get();
 	auto &name = property[1]
 		.Get<ScriptType::String>()->Get();
 
@@ -165,7 +165,7 @@ void create_uniform(const script_tree::PropertyNode &property,
 	using namespace variables;
 
 	auto &type = property[0]
-		.Get<ScriptType::String>()->Get();
+		.Get<ScriptType::Enumerable>()->Get();
 	auto &name = property[1]
 		.Get<ScriptType::String>()->Get();
 	auto size = property[2]
@@ -268,7 +268,7 @@ void create_uniform(const script_tree::PropertyNode &property,
 	using namespace variables;
 
 	auto &type = property[0]
-		.Get<ScriptType::String>()->Get();
+		.Get<ScriptType::Enumerable>()->Get();
 	auto &name = property[1]
 		.Get<ScriptType::String>()->Get();
 	auto size = property[2]

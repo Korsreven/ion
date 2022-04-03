@@ -53,7 +53,7 @@ void bind_struct(const script_tree::PropertyNode &property,
 	ShaderLayout &shader_layout)
 {
 	auto &name = property[0]
-		.Get<ScriptType::String>()->Get();
+		.Get<ScriptType::Enumerable>()->Get();
 	auto &struct_name = property[1]
 		.Get<ScriptType::String>()->Get();
 
@@ -79,7 +79,7 @@ void bind_attribute(const script_tree::PropertyNode &property,
 	ShaderLayout &shader_layout)
 {
 	auto &name = property[0]
-		.Get<ScriptType::String>()->Get();
+		.Get<ScriptType::Enumerable>()->Get();
 	auto &decl_name = property[1]
 		.Get<ScriptType::String>()->Get();
 
@@ -110,7 +110,7 @@ void bind_uniform(const script_tree::PropertyNode &property,
 	ShaderLayout &shader_layout)
 {
 	auto &name = property[0]
-		.Get<ScriptType::String>()->Get();
+		.Get<ScriptType::Enumerable>()->Get();
 	auto &decl_name = property[1]
 		.Get<ScriptType::String>()->Get();
 
