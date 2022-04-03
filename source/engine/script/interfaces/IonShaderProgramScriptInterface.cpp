@@ -15,7 +15,7 @@ File:	IonShaderProgramScriptInterface.cpp
 #include <string>
 #include "graphics/shaders/IonShaderManager.h"
 #include "graphics/shaders/variables/IonShaderAttribute.h"
-#include "graphics/shaders/variables/IonShaderTypes.h""
+#include "graphics/shaders/variables/IonShaderTypes.h"
 #include "graphics/shaders/variables/IonShaderUniform.h"
 
 namespace ion::script::interfaces
