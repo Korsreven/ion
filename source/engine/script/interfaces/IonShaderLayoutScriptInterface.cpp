@@ -6,7 +6,7 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	script/interfaces
-File:	IonShaderProgramScriptInterface.cpp
+File:	IonShaderLayoutScriptInterface.cpp
 -------------------------------------------
 */
 
