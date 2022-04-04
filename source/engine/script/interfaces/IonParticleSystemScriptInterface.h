@@ -33,12 +33,9 @@ File:	IonParticleSystemScriptInterface.h
 #include "script/IonScriptValidator.h"
 
 //Forward declarations
-namespace ion::graphics
+namespace ion::graphics::materials
 {
-	namespace materials
-	{
-		struct MaterialManager;
-	}
+	struct MaterialManager;
 }
 
 namespace ion::script::interfaces

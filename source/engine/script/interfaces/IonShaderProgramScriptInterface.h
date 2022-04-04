@@ -25,12 +25,9 @@ File:	IonShaderProgramScriptInterface.h
 #include "types/IonTypes.h"
 
 //Forward declarations
-namespace ion::graphics
+namespace ion::graphics::shader
 {
-	namespace shader
-	{
-		class ShaderManager;
-	}
+	class ShaderManager;
 }
 
 namespace ion::script::interfaces

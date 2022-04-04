@@ -23,12 +23,9 @@ File:	IonTextScriptInterface.h
 #include "script/IonScriptValidator.h"
 
 //Forward declarations
-namespace ion::graphics
+namespace ion::graphics::fonts
 {
-	namespace fonts
-	{
-		struct TypeFaceManager;
-	}
+	struct TypeFaceManager;
 }
 
 namespace ion::script::interfaces

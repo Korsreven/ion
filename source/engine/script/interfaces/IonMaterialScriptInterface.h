@@ -23,13 +23,10 @@ File:	IonMaterialScriptInterface.h
 #include "script/IonScriptValidator.h"
 
 //Forward declarations
-namespace ion::graphics
+namespace ion::graphics::textures
 {
-	namespace textures
-	{
-		struct AnimationManager;
-		class TextureManager;
-	}
+	struct AnimationManager;
+	class TextureManager;
 }
 
 namespace ion::script::interfaces

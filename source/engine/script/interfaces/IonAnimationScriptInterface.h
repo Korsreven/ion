@@ -23,12 +23,9 @@ File:	IonAnimationScriptInterface.h
 #include "script/IonScriptValidator.h"
 
 //Forward declarations
-namespace ion::graphics
+namespace ion::graphics::textures
 {
-	namespace textures
-	{
-		struct FrameSequenceManager;
-	}
+	struct FrameSequenceManager;
 }
 
 namespace ion::script::interfaces
