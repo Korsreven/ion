@@ -287,6 +287,7 @@
     <ClCompile Include="..\source\engine\script\interfaces\IonShaderProgramScriptInterface.cpp" />
     <ClCompile Include="..\source\engine\script\interfaces\IonShaderScriptInterface.cpp" />
     <ClCompile Include="..\source\engine\script\interfaces\IonTextScriptInterface.cpp" />
+    <ClCompile Include="..\source\engine\script\interfaces\IonTypeFaceScriptInterface.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptBuilder.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptCompiler.cpp" />
     <ClCompile Include="..\source\engine\script\IonScriptError.cpp" />
@@ -491,6 +492,7 @@
     <ClInclude Include="..\source\engine\script\interfaces\IonShaderProgramScriptInterface.h" />
     <ClInclude Include="..\source\engine\script\interfaces\IonShaderScriptInterface.h" />
     <ClInclude Include="..\source\engine\script\interfaces\IonTextScriptInterface.h" />
+    <ClInclude Include="..\source\engine\script\interfaces\IonTypeFaceScriptInterface.h" />
     <ClInclude Include="..\source\engine\script\IonScriptBuilder.h" />
     <ClInclude Include="..\source\engine\script\IonScriptCompiler.h" />
     <ClInclude Include="..\source\engine\script\IonScriptError.h" />
