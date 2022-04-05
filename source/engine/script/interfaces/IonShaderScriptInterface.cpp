@@ -32,8 +32,8 @@ namespace shader_script_interface::detail
 ClassDefinition get_shader_class()
 {
 	return ClassDefinition::Create("shader")
-		.AddRequiredProperty("name", ParameterType::String)
-		.AddRequiredProperty("asset-name", ParameterType::String);
+		.AddRequiredProperty("asset-name", ParameterType::String)
+		.AddRequiredProperty("name", ParameterType::String);
 }
 
 ScriptValidator get_shader_validator()
