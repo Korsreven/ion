@@ -13,7 +13,6 @@ File:	IonFontScriptInterface.cpp
 #include "IonFontScriptInterface.h"
 
 #include <string>
-#include "graphics/fonts/IonFontManager.h"
 
 namespace ion::script::interfaces
 {

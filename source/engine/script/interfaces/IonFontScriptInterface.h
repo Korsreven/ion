@@ -23,12 +23,6 @@ File:	IonFontScriptInterface.h
 #include "script/IonScriptValidator.h"
 #include "types/IonTypes.h"
 
-//Forward declarations
-namespace graphics::fonts
-{
-	class FontManager;
-}
-
 namespace ion::script::interfaces
 {
 	namespace font_script_interface::detail
