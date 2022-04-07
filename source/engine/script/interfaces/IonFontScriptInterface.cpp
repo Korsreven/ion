@@ -72,32 +72,32 @@ NonOwningPtr<Font> create_font(const script_tree::ObjectNode &object,
 	auto character_spacing = object
 		.Property("character-spacing")[0]
 		.Get<ScriptType::Integer>().value_or(0).As<int>();
-	auto &character_set_type = object
+	auto &character_set_name = object
 		.Property("character-set")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &filter_type = object
+	auto &filter_name = object
 		.Property("filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &min_filter_type = object
+	auto &min_filter_name = object
 		.Property("min-filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &mag_filter_type = object
+	auto &mag_filter_name = object
 		.Property("mag-filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
 
 	font::FontCharacterSet character_set = font::FontCharacterSet::ASCII;	
 	
-	if (character_set_type == "extended-ascii")
+	if (character_set_name == "extended-ascii")
 		character_set = font::FontCharacterSet::ExtendedASCII;
 
 	font::FontGlyphFilter min_filter = font::FontGlyphFilter::Bilinear;
 	font::FontGlyphFilter mag_filter = font::FontGlyphFilter::Bilinear;
 
-	if (filter_type == "nearest-neighbor")
+	if (filter_name == "nearest-neighbor")
 		min_filter = mag_filter = font::FontGlyphFilter::NearestNeighbor;
-	if (min_filter_type == "nearest-neighbor")
+	if (min_filter_name == "nearest-neighbor")
 		min_filter = font::FontGlyphFilter::NearestNeighbor;
-	if (mag_filter_type == "nearest-neighbor")
+	if (mag_filter_name == "nearest-neighbor")
 		mag_filter = font::FontGlyphFilter::NearestNeighbor;
 
 	return font_manager.CreateFont(name, asset_name, size, face_index, character_spacing, character_set, min_filter, mag_filter);

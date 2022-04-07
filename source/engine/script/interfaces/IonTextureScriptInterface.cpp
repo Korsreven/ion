@@ -64,53 +64,53 @@ NonOwningPtr<Texture> create_texture(const script_tree::ObjectNode &object,
 	auto &asset_name = object
 		.Property("asset-name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &filter_type = object
+	auto &filter_name = object
 		.Property("filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &min_filter_type = object
+	auto &min_filter_name = object
 		.Property("min-filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &mag_filter_type = object
+	auto &mag_filter_name = object
 		.Property("mag-filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &mip_filter_type = object
+	auto &mip_filter_name = object
 		.Property("mip-filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &wrap_mode_type = object
+	auto &wrap_mode_name = object
 		.Property("wrap")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &s_wrap_mode_type = object
+	auto &s_wrap_mode_name = object
 		.Property("s-wrap")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &t_wrap_mode_type = object
+	auto &t_wrap_mode_name = object
 		.Property("t-wrap")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
 
 	texture::TextureFilter min_filter = texture::TextureFilter::Bilinear;
 	texture::TextureFilter mag_filter = texture::TextureFilter::Bilinear;
 
-	if (filter_type == "nearest-neighbor")
+	if (filter_name == "nearest-neighbor")
 		min_filter = mag_filter = texture::TextureFilter::NearestNeighbor;
-	if (min_filter_type == "nearest-neighbor")
+	if (min_filter_name == "nearest-neighbor")
 		min_filter = texture::TextureFilter::NearestNeighbor;
-	if (mag_filter_type == "nearest-neighbor")
+	if (mag_filter_name == "nearest-neighbor")
 		mag_filter = texture::TextureFilter::NearestNeighbor;
 
 	std::optional<texture::MipmapFilter> mip_filter;
 
-	if (mip_filter_type == "closest-match")
+	if (mip_filter_name == "closest-match")
 		mip_filter = texture::MipmapFilter::ClosestMatch;
-	else if (mip_filter_type == "weighted-average")
+	else if (mip_filter_name == "weighted-average")
 		mip_filter = texture::MipmapFilter::WeightedAverage;
 	
 	texture::TextureWrapMode s_wrap_mode = texture::TextureWrapMode::Clamp;
 	texture::TextureWrapMode t_wrap_mode = texture::TextureWrapMode::Clamp;
 
-	if (wrap_mode_type == "repeat")
+	if (wrap_mode_name == "repeat")
 		s_wrap_mode = t_wrap_mode = texture::TextureWrapMode::Repeat;
-	if (s_wrap_mode_type == "repeat")
+	if (s_wrap_mode_name == "repeat")
 		s_wrap_mode = texture::TextureWrapMode::Repeat;
-	if (t_wrap_mode_type == "repeat")
+	if (t_wrap_mode_name == "repeat")
 		t_wrap_mode = texture::TextureWrapMode::Repeat;
 
 	return texture_manager.CreateTexture(name, asset_name, min_filter, mag_filter, mip_filter, s_wrap_mode, t_wrap_mode);
