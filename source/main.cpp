@@ -191,6 +191,7 @@ File:	main.cpp
 #include "script/interfaces/IonShaderScriptInterface.h"
 #include "script/interfaces/IonShaderLayoutScriptInterface.h"
 #include "script/interfaces/IonShaderProgramScriptInterface.h"
+#include "script/interfaces/IonSoundScriptInterface.h"
 #include "script/interfaces/IonTextScriptInterface.h"
 #include "script/interfaces/IonTextureScriptInterface.h"
 #include "script/interfaces/IonTypeFaceScriptInterface.h"
