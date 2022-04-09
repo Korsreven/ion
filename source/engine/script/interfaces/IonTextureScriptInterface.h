@@ -17,6 +17,7 @@ File:	IonTextureScriptInterface.h
 
 #include "IonScriptInterface.h"
 #include "graphics/textures/IonTexture.h"
+#include "graphics/textures/IonTextureAtlas.h"
 #include "graphics/textures/IonTextureManager.h"
 #include "memory/IonNonOwningPtr.h"
 #include "script/IonScriptTree.h"
@@ -32,6 +33,8 @@ namespace ion::script::interfaces
 		*/
 
 		script_validator::ClassDefinition get_texture_class();
+		script_validator::ClassDefinition get_texture_atlas_class();
+
 		ScriptValidator get_texture_validator();
 
 
@@ -40,6 +43,8 @@ namespace ion::script::interfaces
 		*/
 
 		NonOwningPtr<graphics::textures::Texture> create_texture(const script_tree::ObjectNode &object,
+			graphics::textures::TextureManager &texture_manager);
+		NonOwningPtr<graphics::textures::TextureAtlas> create_texture_atlas(const script_tree::ObjectNode &object,
 			graphics::textures::TextureManager &texture_manager);
 
 		void create_textures(const ScriptTree &tree,
