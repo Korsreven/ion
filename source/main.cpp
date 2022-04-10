@@ -185,6 +185,7 @@ File:	main.cpp
 #include "script/IonScriptValidator.h"
 #include "script/interfaces/IonAnimationScriptInterface.h"
 #include "script/interfaces/IonFontScriptInterface.h"
+#include "script/interfaces/IonFrameSequenceScriptInterface.h"
 #include "script/interfaces/IonMaterialScriptInterface.h"
 #include "script/interfaces/IonParticleSystemScriptInterface.h"
 #include "script/interfaces/IonScriptInterface.h"
