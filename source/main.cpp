@@ -667,6 +667,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::graphics::textures::TextureManager textures;
 			textures.CreateRepository(std::move(image_repository));
 
+			ion::script::interfaces::TextureScriptInterface texture_script;
+			texture_script.CreateScriptRepository(script_repository);
+			texture_script.CreateTextures("textures.ion", textures);
+
+
 			auto ground = textures.CreateTextureAtlas("ground", "atlas_pot.jpg", 2, 2, 4,
 				ion::graphics::textures::texture_atlas::AtlasSubTextureOrder::RowMajor);
 
