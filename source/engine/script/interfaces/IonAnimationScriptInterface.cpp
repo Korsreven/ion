@@ -63,10 +63,10 @@ NonOwningPtr<Animation> create_animation(const script_tree::ObjectNode &object,
 	AnimationManager &animation_manager,
 	FrameSequenceManager &frame_sequence_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &frame_sequence_name = object
+	auto frame_sequence_name = object
 		.Property("frame-sequence")[0]
 		.Get<ScriptType::String>()->Get();
 	auto cycle_duration = duration{object

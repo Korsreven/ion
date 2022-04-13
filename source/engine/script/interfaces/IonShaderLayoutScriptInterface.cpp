@@ -52,9 +52,9 @@ ScriptValidator get_shader_layout_validator()
 void bind_struct(const script_tree::PropertyNode &property,
 	ShaderLayout &shader_layout)
 {
-	auto &name = property[0]
+	auto name = property[0]
 		.Get<ScriptType::Enumerable>()->Get();
-	auto &struct_name = property[1]
+	auto struct_name = property[1]
 		.Get<ScriptType::String>()->Get();
 
 	if (name == "matrix")
@@ -78,9 +78,9 @@ void bind_struct(const script_tree::PropertyNode &property,
 void bind_attribute(const script_tree::PropertyNode &property,
 	ShaderLayout &shader_layout)
 {
-	auto &name = property[0]
+	auto name = property[0]
 		.Get<ScriptType::Enumerable>()->Get();
-	auto &decl_name = property[1]
+	auto decl_name = property[1]
 		.Get<ScriptType::String>()->Get();
 
 	auto declaration =
@@ -109,9 +109,9 @@ void bind_attribute(const script_tree::PropertyNode &property,
 void bind_uniform(const script_tree::PropertyNode &property,
 	ShaderLayout &shader_layout)
 {
-	auto &name = property[0]
+	auto name = property[0]
 		.Get<ScriptType::Enumerable>()->Get();
-	auto &decl_name = property[1]
+	auto decl_name = property[1]
 		.Get<ScriptType::String>()->Get();
 
 	auto declaration =
@@ -234,7 +234,7 @@ void bind_uniform(const script_tree::PropertyNode &property,
 NonOwningPtr<ShaderLayout> create_shader_layout(const script_tree::ObjectNode &object,
 	ShaderProgramManager &shader_program_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 

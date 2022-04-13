@@ -71,9 +71,9 @@ void create_attribute(const script_tree::PropertyNode &property,
 {
 	using namespace variables;
 
-	auto &type = property[0]
+	auto type = property[0]
 		.Get<ScriptType::Enumerable>()->Get();
-	auto &name = property[1]
+	auto name = property[1]
 		.Get<ScriptType::String>()->Get();
 
 	//Basic types
@@ -164,9 +164,9 @@ void create_uniform(const script_tree::PropertyNode &property,
 {
 	using namespace variables;
 
-	auto &type = property[0]
+	auto type = property[0]
 		.Get<ScriptType::Enumerable>()->Get();
-	auto &name = property[1]
+	auto name = property[1]
 		.Get<ScriptType::String>()->Get();
 	auto size = property[2]
 		.Get<ScriptType::Integer>().value_or(1).As<int>();
@@ -267,9 +267,9 @@ void create_uniform(const script_tree::PropertyNode &property,
 {
 	using namespace variables;
 
-	auto &type = property[0]
+	auto type = property[0]
 		.Get<ScriptType::Enumerable>()->Get();
-	auto &name = property[1]
+	auto name = property[1]
 		.Get<ScriptType::String>()->Get();
 	auto size = property[2]
 		.Get<ScriptType::Integer>().value_or(1).As<int>();
@@ -370,16 +370,16 @@ NonOwningPtr<ShaderProgram> create_shader_program(const script_tree::ObjectNode 
 	ShaderProgramManager &shader_program_manager,
 	ShaderManager &shader_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &vertex_shader_name = object
+	auto vertex_shader_name = object
 		.Property("vertex-shader")[0]
 		.Get<ScriptType::String>().value_or(""s).Get();
-	auto &fragment_shader_name = object
+	auto fragment_shader_name = object
 		.Property("fragment-shader")[0]
 		.Get<ScriptType::String>().value_or(""s).Get();
-	auto &shader_layout_name = object
+	auto shader_layout_name = object
 		.Property("shader-layout")[0]
 		.Get<ScriptType::String>().value_or(""s).Get();
 
@@ -404,7 +404,7 @@ NonOwningPtr<ShaderProgram> create_shader_program(const script_tree::ObjectNode 
 NonOwningPtr<ShaderStruct> create_shader_struct(const script_tree::ObjectNode &object,
 	ShaderProgram &shader_program)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 	auto size = object

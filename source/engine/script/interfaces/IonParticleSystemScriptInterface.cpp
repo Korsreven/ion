@@ -157,7 +157,7 @@ NonOwningPtr<Emitter> create_emitter(const script_tree::ObjectNode &object,
 	ParticleSystem &particle_system,
 	graphics::materials::MaterialManager &material_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
@@ -269,7 +269,7 @@ NonOwningPtr<ParticleSystem> create_particle_system(const script_tree::ObjectNod
 	ParticleSystemManager &particle_system_manager,
 	graphics::materials::MaterialManager &material_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
@@ -317,7 +317,7 @@ NonOwningPtr<ParticleSystem> create_particle_system(const script_tree::ObjectNod
 NonOwningPtr<affectors::ColorFader> create_color_fader(const script_tree::ObjectNode &object,
 	affectors::AffectorManager &affector_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
@@ -357,7 +357,7 @@ NonOwningPtr<affectors::ColorFader> create_color_fader(const script_tree::Object
 NonOwningPtr<affectors::DirectionRandomizer> create_direction_randomizer(const script_tree::ObjectNode &object,
 	affectors::AffectorManager &affector_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
@@ -382,7 +382,7 @@ NonOwningPtr<affectors::DirectionRandomizer> create_direction_randomizer(const s
 NonOwningPtr<affectors::Gravitation> create_graviation(const script_tree::ObjectNode &object,
 	affectors::AffectorManager &affector_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
@@ -409,7 +409,7 @@ NonOwningPtr<affectors::Gravitation> create_graviation(const script_tree::Object
 NonOwningPtr<affectors::LinearForce> create_linear_force(const script_tree::ObjectNode &object,
 	affectors::AffectorManager &affector_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
@@ -439,7 +439,7 @@ NonOwningPtr<affectors::LinearForce> create_linear_force(const script_tree::Obje
 NonOwningPtr<affectors::Scaler> create_scaler(const script_tree::ObjectNode &object,
 	affectors::AffectorManager &affector_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
@@ -479,7 +479,7 @@ NonOwningPtr<affectors::Scaler> create_scaler(const script_tree::ObjectNode &obj
 NonOwningPtr<affectors::SineForce> create_sine_force(const script_tree::ObjectNode &object,
 	affectors::AffectorManager &affector_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
@@ -509,7 +509,7 @@ NonOwningPtr<affectors::SineForce> create_sine_force(const script_tree::ObjectNo
 NonOwningPtr<affectors::VelocityRandomizer> create_velocity_randomizer(const script_tree::ObjectNode &object,
 	affectors::AffectorManager &affector_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 

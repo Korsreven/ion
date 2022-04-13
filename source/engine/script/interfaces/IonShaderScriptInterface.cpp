@@ -50,10 +50,10 @@ ScriptValidator get_shader_validator()
 NonOwningPtr<Shader> create_shader(const script_tree::ObjectNode &object,
 	ShaderManager &shader_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &asset_name = object
+	auto asset_name = object
 		.Property("asset-name")[0]
 		.Get<ScriptType::String>()->Get();
 

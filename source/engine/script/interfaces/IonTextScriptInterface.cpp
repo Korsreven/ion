@@ -68,13 +68,13 @@ NonOwningPtr<Text> create_text(const script_tree::ObjectNode &object,
 	TextManager &text_manager,
 	TypeFaceManager &type_face_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &content = object
+	auto content = object
 		.Property("content")[0]
 		.Get<ScriptType::String>().value_or(""s).Get();
-	auto &type_face_name = object
+	auto type_face_name = object
 		.Property("type-face")[0]
 		.Get<ScriptType::String>()->Get();
 

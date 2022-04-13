@@ -53,10 +53,10 @@ NonOwningPtr<FrameSequence> create_frame_sequence(const script_tree::ObjectNode 
 	FrameSequenceManager &frame_sequence_manager,
 	TextureManager &texture_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &first_frame_name = object
+	auto first_frame_name = object
 		.Property("frames")[0]
 		.Get<ScriptType::String>().value_or(""s).Get();
 	auto total_frames = object

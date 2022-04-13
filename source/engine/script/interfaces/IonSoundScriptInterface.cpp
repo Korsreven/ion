@@ -56,25 +56,25 @@ ScriptValidator get_sound_validator()
 NonOwningPtr<Sound> create_sound(const script_tree::ObjectNode &object,
 	SoundManager &sound_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &asset_name = object
+	auto asset_name = object
 		.Property("asset-name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &type_name = object
+	auto type_name = object
 		.Property("type")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &processing_mode_name = object
+	auto processing_mode_name = object
 		.Property("processing-mode")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &orientation_mode_name = object
+	auto orientation_mode_name = object
 		.Property("orientation-mode")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &rolloff_mode_name = object
+	auto rolloff_mode_name = object
 		.Property("rolloff-mode")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &looping_mode_name = object
+	auto looping_mode_name = object
 		.Property("looping-mode")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
 

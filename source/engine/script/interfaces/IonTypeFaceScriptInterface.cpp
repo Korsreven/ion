@@ -55,19 +55,19 @@ NonOwningPtr<TypeFace> create_type_face(const script_tree::ObjectNode &object,
 	TypeFaceManager &type_face_manager,
 	FontManager &font_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &regular_name = object
+	auto regular_name = object
 		.Property("regular")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &bold_name = object
+	auto bold_name = object
 		.Property("bold")[0]
 		.Get<ScriptType::String>().value_or(""s).Get();
-	auto &italic_name = object
+	auto italic_name = object
 		.Property("italic")[0]
 		.Get<ScriptType::String>().value_or(""s).Get();
-	auto &bold_italic_name = object
+	auto bold_italic_name = object
 		.Property("bold-italic")[0]
 		.Get<ScriptType::String>().value_or(""s).Get();
 

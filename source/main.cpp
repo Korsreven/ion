@@ -667,9 +667,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::graphics::textures::TextureManager textures;
 			textures.CreateRepository(std::move(image_repository));
 
-			ion::script::interfaces::TextureScriptInterface texture_script;
+			/*ion::script::interfaces::TextureScriptInterface texture_script;
 			texture_script.CreateScriptRepository(script_repository);
-			texture_script.CreateTextures("textures.ion", textures);
+			texture_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			texture_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			texture_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			texture_script.CreateTextures("textures.ion", textures);*/
 
 
 			auto ground = textures.CreateTextureAtlas("ground", "atlas_pot.jpg", 2, 2, 4,

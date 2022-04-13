@@ -69,31 +69,31 @@ ScriptValidator get_texture_validator()
 NonOwningPtr<Texture> create_texture(const script_tree::ObjectNode &object,
 	TextureManager &texture_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &asset_name = object
+	auto asset_name = object
 		.Property("asset-name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &filter_name = object
+	auto filter_name = object
 		.Property("filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &min_filter_name = object
+	auto min_filter_name = object
 		.Property("min-filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &mag_filter_name = object
+	auto mag_filter_name = object
 		.Property("mag-filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &mip_filter_name = object
+	auto mip_filter_name = object
 		.Property("mip-filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &wrap_mode_name = object
+	auto wrap_mode_name = object
 		.Property("wrap")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &s_wrap_mode_name = object
+	auto s_wrap_mode_name = object
 		.Property("s-wrap")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &t_wrap_mode_name = object
+	auto t_wrap_mode_name = object
 		.Property("t-wrap")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
 
@@ -130,31 +130,31 @@ NonOwningPtr<Texture> create_texture(const script_tree::ObjectNode &object,
 NonOwningPtr<TextureAtlas> create_texture_atlas(const script_tree::ObjectNode &object,
 	TextureManager &texture_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &asset_name = object
+	auto asset_name = object
 		.Property("asset-name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &filter_name = object
+	auto filter_name = object
 		.Property("filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &min_filter_name = object
+	auto min_filter_name = object
 		.Property("min-filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &mag_filter_name = object
+	auto mag_filter_name = object
 		.Property("mag-filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &mip_filter_name = object
+	auto mip_filter_name = object
 		.Property("mip-filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &wrap_mode_name = object
+	auto wrap_mode_name = object
 		.Property("wrap")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &s_wrap_mode_name = object
+	auto s_wrap_mode_name = object
 		.Property("s-wrap")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &t_wrap_mode_name = object
+	auto t_wrap_mode_name = object
 		.Property("t-wrap")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
 
@@ -167,7 +167,7 @@ NonOwningPtr<TextureAtlas> create_texture_atlas(const script_tree::ObjectNode &o
 	auto sub_textures = object
 		.Property("sub-textures")[0]
 		.Get<ScriptType::Integer>().value_or(rows * columns).As<int>();
-	auto &sub_texture_order_name = object
+	auto sub_texture_order_name = object
 		.Property("texture-order")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
 

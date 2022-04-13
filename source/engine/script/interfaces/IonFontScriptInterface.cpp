@@ -57,10 +57,10 @@ ScriptValidator get_font_validator()
 NonOwningPtr<Font> create_font(const script_tree::ObjectNode &object,
 	FontManager &font_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto &asset_name = object
+	auto asset_name = object
 		.Property("asset-name")[0]
 		.Get<ScriptType::String>()->Get();
 	auto size = object
@@ -72,16 +72,16 @@ NonOwningPtr<Font> create_font(const script_tree::ObjectNode &object,
 	auto character_spacing = object
 		.Property("character-spacing")[0]
 		.Get<ScriptType::Integer>().value_or(0).As<int>();
-	auto &character_set_name = object
+	auto character_set_name = object
 		.Property("character-set")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &filter_name = object
+	auto filter_name = object
 		.Property("filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &min_filter_name = object
+	auto min_filter_name = object
 		.Property("min-filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
-	auto &mag_filter_name = object
+	auto mag_filter_name = object
 		.Property("mag-filter")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
 

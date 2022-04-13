@@ -69,7 +69,7 @@ NonOwningPtr<Material> create_material(const script_tree::ObjectNode &object,
 	graphics::textures::AnimationManager &animation_manager,
 	graphics::textures::TextureManager &texture_manager)
 {
-	auto &name = object
+	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
