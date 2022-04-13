@@ -89,7 +89,7 @@ void create_frame_sequences(const ScriptTree &tree,
 {
 	for (auto &object : tree.Objects())
 	{
-		if (object.Name() == "frame_sequence")
+		if (object.Name() == "frame-sequence")
 			create_frame_sequence(object, frame_sequence_manager, texture_manage);
 	}
 }
