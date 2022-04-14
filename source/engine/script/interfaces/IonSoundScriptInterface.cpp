@@ -111,7 +111,8 @@ NonOwningPtr<Sound> create_sound(const script_tree::ObjectNode &object,
 	else if (looping_mode_name == "bidirectional")
 		looping_mode = sound::SoundLoopingMode::Bidirectional;
 
-	return sound_manager.CreateSound(name, asset_name, type, processing_mode, orientation_mode, rolloff_mode, looping_mode);
+	return sound_manager.CreateSound(std::move(name), std::move(asset_name),
+		type, processing_mode, orientation_mode, rolloff_mode, looping_mode);
 }
 
 void create_sounds(const ScriptTree &tree,

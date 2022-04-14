@@ -124,7 +124,8 @@ NonOwningPtr<Texture> create_texture(const script_tree::ObjectNode &object,
 	if (t_wrap_mode_name == "repeat")
 		t_wrap_mode = texture::TextureWrapMode::Repeat;
 
-	return texture_manager.CreateTexture(name, asset_name, min_filter, mag_filter, mip_filter, s_wrap_mode, t_wrap_mode);
+	return texture_manager.CreateTexture(std::move(name), std::move(asset_name),
+		min_filter, mag_filter, mip_filter, s_wrap_mode, t_wrap_mode);
 }
 
 NonOwningPtr<TextureAtlas> create_texture_atlas(const script_tree::ObjectNode &object,
@@ -203,7 +204,8 @@ NonOwningPtr<TextureAtlas> create_texture_atlas(const script_tree::ObjectNode &o
 	if (sub_texture_order_name == "column-major")
 		sub_texture_order = texture_atlas::AtlasSubTextureOrder::ColumnMajor;
 
-	return texture_manager.CreateTextureAtlas(name, asset_name, min_filter, mag_filter, mip_filter, s_wrap_mode, t_wrap_mode,
+	return texture_manager.CreateTextureAtlas(std::move(name), std::move(asset_name),
+		min_filter, mag_filter, mip_filter, s_wrap_mode, t_wrap_mode,
 		rows, columns, sub_textures, sub_texture_order);
 }
 

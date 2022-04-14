@@ -73,7 +73,7 @@ NonOwningPtr<Material> create_material(const script_tree::ObjectNode &object,
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto material = material_manager.CreateMaterial(name);
+	auto material = material_manager.CreateMaterial(std::move(name));
 
 	if (material)
 	{

@@ -58,21 +58,21 @@ void bind_struct(const script_tree::PropertyNode &property,
 		.Get<ScriptType::String>()->Get();
 
 	if (name == "matrix")
-		shader_layout.BindStruct(shader_layout::StructName::Matrix, struct_name);
+		shader_layout.BindStruct(shader_layout::StructName::Matrix, std::move(struct_name));
 	else if (name == "scene")
-		shader_layout.BindStruct(shader_layout::StructName::Scene, struct_name);
+		shader_layout.BindStruct(shader_layout::StructName::Scene, std::move(struct_name));
 	else if (name == "camera")
-		shader_layout.BindStruct(shader_layout::StructName::Camera, struct_name);
+		shader_layout.BindStruct(shader_layout::StructName::Camera, std::move(struct_name));
 	else if (name == "node")
-		shader_layout.BindStruct(shader_layout::StructName::Node, struct_name);
+		shader_layout.BindStruct(shader_layout::StructName::Node, std::move(struct_name));
 	else if (name == "primitive")
-		shader_layout.BindStruct(shader_layout::StructName::Primitive, struct_name);
+		shader_layout.BindStruct(shader_layout::StructName::Primitive, std::move(struct_name));
 	else if (name == "material")
-		shader_layout.BindStruct(shader_layout::StructName::Material, struct_name);
+		shader_layout.BindStruct(shader_layout::StructName::Material, std::move(struct_name));
 	else if (name == "fog")
-		shader_layout.BindStruct(shader_layout::StructName::Fog, struct_name);
+		shader_layout.BindStruct(shader_layout::StructName::Fog, std::move(struct_name));
 	else if (name == "light")
-		shader_layout.BindStruct(shader_layout::StructName::Light, struct_name);
+		shader_layout.BindStruct(shader_layout::StructName::Light, std::move(struct_name));
 }
 
 void bind_attribute(const script_tree::PropertyNode &property,
@@ -84,12 +84,12 @@ void bind_attribute(const script_tree::PropertyNode &property,
 		.Get<ScriptType::String>()->Get();
 
 	auto declaration =
-		[&]() noexcept -> shader_layout::VariableDeclaration
+		[&]() noexcept
 		{
 			if (auto location = property[2].Get<ScriptType::Integer>(); location)
-				return {decl_name, location->As<int>()};
+				return shader_layout::VariableDeclaration{std::move(decl_name), location->As<int>()};
 			else
-				return {decl_name};
+				return shader_layout::VariableDeclaration{std::move(decl_name)};
 		}();
 
 	if (name == "vertex-position")
@@ -115,12 +115,12 @@ void bind_uniform(const script_tree::PropertyNode &property,
 		.Get<ScriptType::String>()->Get();
 
 	auto declaration =
-		[&]() noexcept -> shader_layout::VariableDeclaration
+		[&]() noexcept
 		{
 			if (auto location = property[2].Get<ScriptType::Integer>(); location)
-				return {decl_name, location->As<int>()};
+				return shader_layout::VariableDeclaration{std::move(decl_name), location->As<int>()};
 			else
-				return {decl_name};
+				return shader_layout::VariableDeclaration{std::move(decl_name)};
 		}();
 
 	//Matrix
@@ -238,7 +238,7 @@ NonOwningPtr<ShaderLayout> create_shader_layout(const script_tree::ObjectNode &o
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto shader_layout = shader_program_manager.CreateShaderLayout(name);
+	auto shader_layout = shader_program_manager.CreateShaderLayout(std::move(name));
 
 	if (shader_layout)
 	{

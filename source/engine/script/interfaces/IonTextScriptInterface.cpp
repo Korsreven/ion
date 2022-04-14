@@ -78,7 +78,7 @@ NonOwningPtr<Text> create_text(const script_tree::ObjectNode &object,
 		.Property("type-face")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto text = text_manager.CreateText(name, content, type_face_manager.GetTypeFace(type_face_name));
+	auto text = text_manager.CreateText(std::move(name), std::move(content), type_face_manager.GetTypeFace(type_face_name));
 
 	if (text)
 	{

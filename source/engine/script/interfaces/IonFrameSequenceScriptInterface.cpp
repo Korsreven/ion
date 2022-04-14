@@ -65,7 +65,8 @@ NonOwningPtr<FrameSequence> create_frame_sequence(const script_tree::ObjectNode 
 
 	//Construct from first frame and total frames
 	if (total_frames > 0)
-		return frame_sequence_manager.CreateFrameSequence(name, texture_manager.GetTexture(first_frame_name), total_frames);
+		return frame_sequence_manager.CreateFrameSequence(std::move(name),
+			texture_manager.GetTexture(first_frame_name), total_frames);
 	else //Construct from one or more given frame
 	{
 		frame_sequence::detail::container_type frames;
@@ -77,7 +78,7 @@ NonOwningPtr<FrameSequence> create_frame_sequence(const script_tree::ObjectNode 
 		}
 
 		if (!std::empty(frames))
-			return frame_sequence_manager.CreateFrameSequence(name, frames);
+			return frame_sequence_manager.CreateFrameSequence(std::move(name), frames);
 	}
 	
 	return nullptr;

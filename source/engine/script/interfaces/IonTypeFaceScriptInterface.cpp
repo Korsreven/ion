@@ -71,7 +71,7 @@ NonOwningPtr<TypeFace> create_type_face(const script_tree::ObjectNode &object,
 		.Property("bold-italic")[0]
 		.Get<ScriptType::String>().value_or(""s).Get();
 
-	return type_face_manager.CreateTypeFace(name, font_manager.GetFont(regular_name),
+	return type_face_manager.CreateTypeFace(std::move(name), font_manager.GetFont(regular_name),
 		font_manager.GetFont(bold_name), font_manager.GetFont(italic_name), font_manager.GetFont(bold_italic_name));
 }
 

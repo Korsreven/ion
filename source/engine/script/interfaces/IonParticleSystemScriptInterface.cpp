@@ -161,7 +161,7 @@ NonOwningPtr<Emitter> create_emitter(const script_tree::ObjectNode &object,
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto emitter = particle_system.CreateEmitter(name);
+	auto emitter = particle_system.CreateEmitter(std::move(name));
 
 	if (emitter)
 	{
@@ -273,7 +273,7 @@ NonOwningPtr<ParticleSystem> create_particle_system(const script_tree::ObjectNod
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto particle_system = particle_system_manager.CreateParticleSystem(name);
+	auto particle_system = particle_system_manager.CreateParticleSystem(std::move(name));
 
 	if (particle_system)
 	{
@@ -321,7 +321,7 @@ NonOwningPtr<affectors::ColorFader> create_color_fader(const script_tree::Object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto color_fader = affector_manager.CreateAffector<affectors::ColorFader>(name);
+	auto color_fader = affector_manager.CreateAffector<affectors::ColorFader>(std::move(name));
 
 	if (color_fader)
 	{
@@ -361,7 +361,7 @@ NonOwningPtr<affectors::DirectionRandomizer> create_direction_randomizer(const s
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto direction_randomizer = affector_manager.CreateAffector<affectors::DirectionRandomizer>(name);
+	auto direction_randomizer = affector_manager.CreateAffector<affectors::DirectionRandomizer>(std::move(name));
 
 	if (direction_randomizer)
 	{
@@ -386,7 +386,7 @@ NonOwningPtr<affectors::Gravitation> create_graviation(const script_tree::Object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto gravitation = affector_manager.CreateAffector<affectors::Gravitation>(name);
+	auto gravitation = affector_manager.CreateAffector<affectors::Gravitation>(std::move(name));
 
 	if (gravitation)
 	{
@@ -413,7 +413,7 @@ NonOwningPtr<affectors::LinearForce> create_linear_force(const script_tree::Obje
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto linear_force = affector_manager.CreateAffector<affectors::LinearForce>(name);
+	auto linear_force = affector_manager.CreateAffector<affectors::LinearForce>(std::move(name));
 
 	if (linear_force)
 	{
@@ -443,7 +443,7 @@ NonOwningPtr<affectors::Scaler> create_scaler(const script_tree::ObjectNode &obj
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto scaler = affector_manager.CreateAffector<affectors::Scaler>(name);
+	auto scaler = affector_manager.CreateAffector<affectors::Scaler>(std::move(name));
 
 	if (scaler)
 	{
@@ -483,7 +483,7 @@ NonOwningPtr<affectors::SineForce> create_sine_force(const script_tree::ObjectNo
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto sine_force = affector_manager.CreateAffector<affectors::SineForce>(name);
+	auto sine_force = affector_manager.CreateAffector<affectors::SineForce>(std::move(name));
 
 	if (sine_force)
 	{
@@ -513,7 +513,7 @@ NonOwningPtr<affectors::VelocityRandomizer> create_velocity_randomizer(const scr
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto velocity_randomizer = affector_manager.CreateAffector<affectors::VelocityRandomizer>(name);
+	auto velocity_randomizer = affector_manager.CreateAffector<affectors::VelocityRandomizer>(std::move(name));
 
 	if (velocity_randomizer)
 	{

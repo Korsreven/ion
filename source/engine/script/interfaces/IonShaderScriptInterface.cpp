@@ -57,7 +57,7 @@ NonOwningPtr<Shader> create_shader(const script_tree::ObjectNode &object,
 		.Property("asset-name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	return shader_manager.CreateShader(name, asset_name);
+	return shader_manager.CreateShader(std::move(name), asset_name);
 }
 
 void create_shaders(const ScriptTree &tree,

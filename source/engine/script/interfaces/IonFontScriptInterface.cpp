@@ -100,7 +100,8 @@ NonOwningPtr<Font> create_font(const script_tree::ObjectNode &object,
 	if (mag_filter_name == "nearest-neighbor")
 		mag_filter = font::FontGlyphFilter::NearestNeighbor;
 
-	return font_manager.CreateFont(name, asset_name, size, face_index, character_spacing, character_set, min_filter, mag_filter);
+	return font_manager.CreateFont(std::move(name), std::move(asset_name),
+		size, face_index, character_spacing, character_set, min_filter, mag_filter);
 }
 
 void create_fonts(const ScriptTree &tree,

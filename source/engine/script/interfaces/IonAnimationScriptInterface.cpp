@@ -73,7 +73,8 @@ NonOwningPtr<Animation> create_animation(const script_tree::ObjectNode &object,
 		.Property("cycle-duration")[0]
 		.Get<ScriptType::FloatingPoint>()->As<real>()};
 
-	auto animation = animation_manager.CreateAnimation(name, frame_sequence_manager.GetFrameSequence(frame_sequence_name), cycle_duration);
+	auto animation = animation_manager.CreateAnimation(std::move(name),
+		frame_sequence_manager.GetFrameSequence(frame_sequence_name), cycle_duration);
 
 	if (animation)
 	{
