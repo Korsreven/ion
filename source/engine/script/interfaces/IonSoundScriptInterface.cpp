@@ -35,6 +35,7 @@ ClassDefinition get_sound_class()
 	return ClassDefinition::Create("sound")
 		.AddRequiredProperty("asset-name", ParameterType::String)
 		.AddRequiredProperty("name", ParameterType::String)
+		.AddProperty("distance", {ParameterType::FloatingPoint, ParameterType::FloatingPoint}, 1)
 		.AddProperty("looping-mode", {"forward"s, "bidirectional"s})
 		.AddProperty("orientation-mode", {"head"s, "world"s})
 		.AddProperty("processing-mode", {"two-dimensional"s, "three-dimensional"s})
@@ -111,8 +112,25 @@ NonOwningPtr<Sound> create_sound(const script_tree::ObjectNode &object,
 	else if (looping_mode_name == "bidirectional")
 		looping_mode = sound::SoundLoopingMode::Bidirectional;
 
-	return sound_manager.CreateSound(std::move(name), std::move(asset_name),
+	auto sound = sound_manager.CreateSound(std::move(name), std::move(asset_name),
 		type, processing_mode, orientation_mode, rolloff_mode, looping_mode);
+
+	if (sound)
+	{
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "distance")
+			{
+				if (property.NumberOfArguments() == 2)
+					sound->Distance(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+									property[1].Get<ScriptType::FloatingPoint>()->As<real>());
+				else
+					sound->Distance(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			}
+		}
+	}
+
+	return sound;
 }
 
 void create_sounds(const ScriptTree &tree,
