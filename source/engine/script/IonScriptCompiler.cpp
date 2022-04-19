@@ -423,8 +423,9 @@ std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, buil
 					//Boolean literal
 					else if (is_boolean_literal(lexeme))
 						return token_name::BooleanLiteral;
-					//Function
-					else if (is_function(lexeme))
+					//Function, identifier right before an open parenthesis
+					else if (is_function(lexeme) &&
+						off + std::size(lexeme) < std::size(str) && str.substr(off + std::size(lexeme), 1) == "(")
 						return token_name::Function;
 					//Identifier
 					else
