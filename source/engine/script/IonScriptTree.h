@@ -113,15 +113,15 @@ namespace ion::script
 				Serializing
 			*/
 
-			template <typename VariantType, typename T, size_t Index = 0>
-			constexpr std::size_t variant_index() noexcept
+			template <typename VariantT, typename T, size_t Index = 0>
+			constexpr size_t variant_index() noexcept
 			{
-				if constexpr (Index == std::variant_size_v<VariantType>)
-					static_assert(false);
-				else if constexpr (std::is_same_v<std::variant_alternative_t<Index, VariantType>, T>)
+				static_assert(Index < std::variant_size_v<VariantT>);
+				
+				if constexpr (std::is_same_v<std::variant_alternative_t<Index, VariantT>, T>)
 					return Index;
 				else
-					return variant_index<VariantType, T, Index + 1>();
+					return variant_index<VariantT, T, Index + 1>();
 			}
 
 
