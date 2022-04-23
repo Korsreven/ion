@@ -86,12 +86,12 @@ NonOwningPtr<FrameSequence> create_frame_sequence(const script_tree::ObjectNode 
 
 void create_frame_sequences(const ScriptTree &tree,
 	FrameSequenceManager &frame_sequence_manager,
-	TextureManager &texture_manage)
+	TextureManager &texture_manager)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "frame-sequence")
-			create_frame_sequence(object, frame_sequence_manager, texture_manage);
+			create_frame_sequence(object, frame_sequence_manager, texture_manager);
 	}
 }
 
@@ -113,10 +113,10 @@ ScriptValidator FrameSequenceScriptInterface::GetValidator() const
 
 void FrameSequenceScriptInterface::CreateFrameSequences(std::string_view asset_name,
 	FrameSequenceManager &frame_sequence_manager,
-	TextureManager &texture_manage)
+	TextureManager &texture_manager)
 {
 	if (Load(asset_name))
-		detail::create_frame_sequences(*tree_, frame_sequence_manager, texture_manage);
+		detail::create_frame_sequences(*tree_, frame_sequence_manager, texture_manager);
 }
 
 } //ion::script::interfaces
