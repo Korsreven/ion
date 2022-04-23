@@ -711,6 +711,9 @@
     <ClCompile Include="..\source\engine\script\interfaces\IonFrameSequenceScriptInterface.cpp">
       <Filter>Source Files\script\interfaces</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\script\interfaces\IonGuiThemeScriptInterface.cpp">
+      <Filter>Source Files\script\interfaces</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1371,6 +1374,9 @@
       <Filter>Header Files\script\interfaces</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\script\interfaces\IonFrameSequenceScriptInterface.h">
+      <Filter>Header Files\script\interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\script\interfaces\IonGuiThemeScriptInterface.h">
       <Filter>Header Files\script\interfaces</Filter>
     </ClInclude>
   </ItemGroup>

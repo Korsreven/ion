@@ -186,6 +186,7 @@ File:	main.cpp
 #include "script/interfaces/IonAnimationScriptInterface.h"
 #include "script/interfaces/IonFontScriptInterface.h"
 #include "script/interfaces/IonFrameSequenceScriptInterface.h"
+#include "script/interfaces/IonGuiThemeScriptInterface.h"
 #include "script/interfaces/IonMaterialScriptInterface.h"
 #include "script/interfaces/IonParticleSystemScriptInterface.h"
 #include "script/interfaces/IonScriptInterface.h"
@@ -780,17 +781,41 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Frame sequences
 			ion::graphics::textures::FrameSequenceManager frame_sequences;
+
+			/*ion::script::interfaces::FrameSequenceScriptInterface frame_sequence_script;
+			frame_sequence_script.CreateScriptRepository(script_repository);
+			frame_sequence_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			frame_sequence_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			frame_sequence_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			frame_sequence_script.CreateFrameSequences("frame_sequences.ion", frame_sequences, textures);*/
+
 			auto cat_sequence = frame_sequences.CreateFrameSequence("cat_sequence", cat_first_frame, 8);
 
 			//Animation
 			ion::graphics::textures::AnimationManager animations;
+
+			/*ion::script::interfaces::AnimationScriptInterface animation_script;
+			animation_script.CreateScriptRepository(script_repository);
+			animation_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			animation_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			animation_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			animation_script.CreateAnimations("animations.ion", animations, frame_sequences);*/
+
 			auto cat_running = animations.CreateAnimation(
 				ion::graphics::textures::Animation::Looping("cat_running", cat_sequence, 0.8_sec));
 
 			//Shaders
 			ion::graphics::shaders::ShaderManager shaders;
 			shaders.CreateRepository(std::move(shader_repository));
-			shaders.LogLevel(ion::graphics::shaders::shader_manager::InfoLogLevel::Error);		
+			shaders.LogLevel(ion::graphics::shaders::shader_manager::InfoLogLevel::Error);	
+			
+			/*ion::script::interfaces::ShaderScriptInterface shader_script;
+			shader_script.CreateScriptRepository(script_repository);
+			shader_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			shader_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			shader_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			shader_script.CreateShaders("shaders.ion", shaders);*/
+
 			auto model_vert_shader = shaders.CreateShader("default_model_vert", "default_model.vert");
 			auto model_frag_shader = shaders.CreateShader("default_model_frag", "default_model.frag");
 			auto particle_vert_shader = shaders.CreateShader("default_particle_vert", "default_particle.vert");
@@ -805,6 +830,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Shader programs
 			ion::graphics::shaders::ShaderProgramManager shader_programs;
+
+			/*ion::script::interfaces::ShaderProgramScriptInterface shader_program_script;
+			shader_program_script.CreateScriptRepository(script_repository);
+			shader_program_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			shader_program_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			shader_program_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			shader_program_script.CreateShaderPrograms("shader_programs.ion", shader_programs, shaders);*/
+
 			shader_programs.LogLevel(ion::graphics::shaders::shader_program_manager::InfoLogLevel::Error);
 			auto model_program = shader_programs.CreateShaderProgram("default_model_prog", model_vert_shader, model_frag_shader);
 			auto particle_program = shader_programs.CreateShaderProgram("default_particle_prog", particle_vert_shader, particle_frag_shader);
@@ -1061,6 +1094,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Font
 			ion::graphics::fonts::FontManager fonts;
 			fonts.CreateRepository(std::move(font_repository));
+
+			/*ion::script::interfaces::FontScriptInterface font_script;
+			font_script.CreateScriptRepository(script_repository);
+			font_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			font_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			font_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			font_script.CreateFonts("fonts.ion", fonts);*/
+
 			auto verdana_regular_12 = fonts.CreateFont("verdana_regular_12", "verdana.ttf", 12);
 			auto verdana_bold_12 = fonts.CreateFont("verdana_bold_12", "verdanab.ttf", 12);
 			auto verdana_italic_12 = fonts.CreateFont("verdana_italic_12", "verdanai.ttf", 12);
@@ -1075,6 +1116,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Type face
 			ion::graphics::fonts::TypeFaceManager type_faces;
+
+			/*ion::script::interfaces::TypeFaceScriptInterface type_face_script;
+			type_face_script.CreateScriptRepository(script_repository);
+			type_face_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			type_face_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			type_face_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			type_face_script.CreateTypeFaces("type_faces.ion", type_faces, fonts);*/
+
 			auto verdana_12 = 
 				type_faces.CreateTypeFace(
 					"verdana_12",
@@ -1094,6 +1143,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Sound
 			ion::sounds::SoundManager sounds;
 			sounds.CreateRepository(std::move(audio_repository));
+
+			/*ion::script::interfaces::SoundScriptInterface sound_script;
+			sound_script.CreateScriptRepository(script_repository);
+			sound_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			sound_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			sound_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			sound_script.CreateSounds("sounds.ion", sounds);*/
+
 			auto sound_listener = sounds.CreateSoundListener("listener");
 			auto gui_sound_channel_group = sounds.CreateSoundChannelGroup("gui");
 			gui_sound_channel_group->Volume(0.2_r);
@@ -1113,6 +1170,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Material
 			ion::graphics::materials::MaterialManager materials;
+
+			/*ion::script::interfaces::MaterialScriptInterface material_script;
+			material_script.CreateScriptRepository(script_repository);
+			material_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			material_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			material_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			material_script.CreateMaterials("materials.ion", materials, animations, textures);*/
+
 			auto asteroid =
 				materials.CreateMaterial("asteroid",
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1641,6 +1706,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Particle system
 			ion::graphics::particles::ParticleSystemManager particle_systems;
+
+			/*ion::script::interfaces::ParticleSystemScriptInterface particle_system_script;
+			particle_system_script.CreateScriptRepository(script_repository);
+			particle_system_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			particle_system_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			particle_system_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			particle_system_script.CreateParticleSystems("particle_systems.ion", particle_systems, materials);*/
+
 			auto rain = particle_systems.CreateParticleSystem("rain");
 
 			auto emitter = rain->CreateEmitter(
@@ -1657,7 +1730,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Text
 			ion::graphics::fonts::TextManager texts;
-			auto pangram =
+
+			/*ion::script::interfaces::TextScriptInterface text_script;
+			text_script.CreateScriptRepository(script_repository);
+			text_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			text_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			text_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			text_script.CreateTexts("texts.ion", texts, type_faces);*/
+
+			/*auto pangram =
 				texts.CreateText(
 					"pangram",
 					"The <i>quick</i> <del><font color='saddlebrown'>brown</font></del> fox <b>jumps</b> <sup>over</sup> the <i>lazy</i> dog",
@@ -1668,7 +1749,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//pangram->AreaSize(ion::graphics::utilities::Vector2{300.0_r, 100.0_r});
 			pangram->Alignment(ion::graphics::fonts::text::TextAlignment::Left);
 			pangram->VerticalAlignment(ion::graphics::fonts::text::TextVerticalAlignment::Top);	
-			pangram->DefaultForegroundColor(color::White);
+			pangram->DefaultForegroundColor(color::White);*/
 
 			auto fps =
 				texts.CreateText(
