@@ -84,13 +84,13 @@ namespace ion::graphics::fonts
 		};
 
 
-		enum TextBlockFontSize : bool
+		enum class TextBlockFontSize : bool
 		{
 			Smaller,
 			Larger
 		};
 
-		enum TextBlockVerticalAlign : bool
+		enum class TextBlockVerticalAlign : bool
 		{
 			Subscript,
 			Superscript
