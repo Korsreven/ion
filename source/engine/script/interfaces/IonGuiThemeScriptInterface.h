@@ -16,6 +16,8 @@ File:	IonGuiThemeScriptInterface.h
 #include <string_view>
 
 #include "IonScriptInterface.h"
+#include "graphics/fonts/IonText.h"
+#include "graphics/render/IonPass.h"
 #include "gui/IonGuiController.h"
 #include "gui/skins/IonGuiSkin.h"
 #include "gui/skins/IonGuiTheme.h"
@@ -40,6 +42,11 @@ namespace ion::graphics
 	{
 		class SceneManager;
 	}
+
+	namespace shaders
+	{
+		class ShaderProgramManager;
+	}
 }
 
 //Forward declarations
@@ -52,9 +59,50 @@ namespace ion::script::interfaces
 {
 	namespace gui_theme_script_interface::detail
 	{
+		inline static const Strings pass_blend_factors
+		{
+			"zero",
+			"one",
+
+			"source-color",
+			"one-minus-source-color",
+			"destination-color",
+			"one-minus-destination-color",
+
+			"source-alpha",
+			"one-minus-source-alpha",
+			"destination-alpha",
+			"one-minus-destination-alpha",
+
+			"constant-color",
+			"one-minus-constant-color",
+			"constant-alpha",
+			"one-minus-constant-alpha",
+
+			"source-one-color",
+			"one-minus-source-one-color",
+			"source-one-alpha",
+			"one-minus-source-one-alpha",
+
+			"source-alpha-saturate"
+		};
+
+		inline static const Strings pass_blend_equation_modes
+		{
+			"add",
+			"subtract",
+			"reverse-subtract",
+			"min",
+			"max"
+		};
+
+
 		/*
 			Validator classes
 		*/
+
+		script_validator::ClassDefinition get_text_style_class();
+		script_validator::ClassDefinition get_pass_class();
 
 		script_validator::ClassDefinition get_gui_skin_class();
 		script_validator::ClassDefinition get_gui_theme_class();		
@@ -66,21 +114,29 @@ namespace ion::script::interfaces
 			Tree parsing
 		*/
 
+		graphics::fonts::text::TextBlockStyle create_text_style(const script_tree::ObjectNode &object);
+		graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
+			graphics::shaders::ShaderProgramManager &shader_program_manager);
+		
+
 		NonOwningPtr<gui::skins::GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 			gui::skins::GuiTheme &theme,
 			graphics::materials::MaterialManager &material_manager,
 			graphics::fonts::TextManager &text_manager,
+			graphics::shaders::ShaderProgramManager &shader_program_manager,
 			sounds::SoundManager &sound_manager);
 		NonOwningPtr<gui::skins::GuiTheme> create_gui_theme(const script_tree::ObjectNode &object,
 			gui::GuiController &gui_controller, NonOwningPtr<graphics::scene::SceneManager> scene_manager,
 			graphics::materials::MaterialManager &material_manager,
 			graphics::fonts::TextManager &text_manager,
+			graphics::shaders::ShaderProgramManager &shader_program_manager,
 			sounds::SoundManager &sound_manager);
 
 		void create_gui_themes(const ScriptTree &tree,
 			gui::GuiController &gui_controller, NonOwningPtr<graphics::scene::SceneManager> scene_manager,
 			graphics::materials::MaterialManager &material_manager,
 			graphics::fonts::TextManager &text_manager,
+			graphics::shaders::ShaderProgramManager &shader_program_manager,
 			sounds::SoundManager &sound_manager);
 	} //gui_theme_script_interface::detail
 
@@ -107,6 +163,7 @@ namespace ion::script::interfaces
 				gui::GuiController &gui_controller, NonOwningPtr<graphics::scene::SceneManager> scene_manager,
 				graphics::materials::MaterialManager &material_manager,
 				graphics::fonts::TextManager &text_manager,
+				graphics::shaders::ShaderProgramManager &shader_program_manager,
 				sounds::SoundManager &sound_manager);
 	};
 } //ion::script::interfaces

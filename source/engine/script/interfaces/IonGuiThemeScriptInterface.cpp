@@ -16,6 +16,7 @@ File:	IonGuiThemeScriptInterface.cpp
 
 #include "graphics/fonts/IonTextManager.h"
 #include "graphics/materials/IonMaterialManager.h"
+#include "graphics/shaders/IonShaderProgramManager.h"
 #include "gui/controls/IonGuiButton.h"
 #include "gui/controls/IonGuiCheckBox.h"
 #include "gui/controls/IonGuiGroupBox.h"
@@ -46,56 +47,76 @@ namespace gui_theme_script_interface::detail
 	Validator classes
 */
 
+script_validator::ClassDefinition get_text_style_class()
+{
+	return ClassDefinition::Create("text-style")
+		.AddProperty("background-color", ParameterType::Color)
+		.AddProperty("decoration", {"underline"s, "line-through"s, "overline"s})
+		.AddProperty("decoration-color", ParameterType::Color)
+		.AddProperty("foreground-color", ParameterType::Color)
+		.AddProperty("font-size", {"smaller"s, "larger"s})
+		.AddProperty("font-style", {"bold"s, "italic"s, "bold-italic"s})
+		.AddProperty("vertical-align", {"subscript"s, "superscript"s});
+}
+
+script_validator::ClassDefinition get_pass_class()
+{
+	return ClassDefinition::Create("pass")
+		.AddProperty("iterations", ParameterType::Integer)
+		.AddProperty("shader-program", ParameterType::String)
+		.AddProperty("blend-destination-factor", pass_blend_factors)
+		.AddProperty("blend-destination-factor-alpha", pass_blend_factors)
+		.AddProperty("blend-equation-mode", pass_blend_equation_modes)
+		.AddProperty("blend-equation-mode-alpha", pass_blend_equation_modes)
+		.AddProperty("blend-source-factor", pass_blend_factors)
+		.AddProperty("blend-source-factor-alpha", pass_blend_factors);
+}
+
+
 ClassDefinition get_gui_skin_class()
 {
-	auto text_state = ClassDefinition::Create("style")
-		.AddRequiredProperty("state", {"enabled"s, "disabled"s, "focused"s, "pressed"s, "hovered"s})
-		.AddProperty("foreground-color", ParameterType::Color)
-		.AddProperty("background-color", ParameterType::Color)
-		.AddProperty("font-style", {"bold"s, "italic"s, "bold-italic"s})
-		.AddProperty("decoration", {"underline"s, "line-through"s, "overline"s})
-		.AddProperty("decoration-color", ParameterType::Color)
-		.AddProperty("font-size", {"smaller"s, "larger"s})
-		.AddProperty("vertical-align", {"subscript"s, "superscript"s});
+	auto disabled_style = ClassDefinition::Create("disabled", "text-style");
+	auto enabled_style = ClassDefinition::Create("enabled", "text-style");
+	auto focused_style = ClassDefinition::Create("focused", "text-style");
+	auto hovered_style = ClassDefinition::Create("hovered", "text-style");
+	auto pressed_style = ClassDefinition::Create("pressed", "text-style");
+
+	auto text_pass = ClassDefinition::Create("text-pass", "pass");
+
 
 	auto part = ClassDefinition::Create("part")
-		.AddRequiredProperty("name", ParameterType::String)
-		.AddProperty("enabled", ParameterType::String)
+		.AddRequiredProperty("name", ParameterType::String)	
 		.AddProperty("disabled", ParameterType::String)
+		.AddProperty("enabled", ParameterType::String)
+		.AddProperty("fill-color", ParameterType::Color)
 		.AddProperty("focused", ParameterType::String)
-		.AddProperty("pressed", ParameterType::String)
 		.AddProperty("hovered", ParameterType::String)
-		.AddProperty("scaling", ParameterType::Vector2)
-		.AddProperty("fill-color", ParameterType::Color);
-
-	auto text_part = ClassDefinition::Create("text-part")
-		.AddRequiredProperty("name", ParameterType::String)
-		.AddRequiredProperty("text", ParameterType::String)
-		.AddProperty("foreground-color", ParameterType::Color)
-		.AddProperty("background-color", ParameterType::Color)
-		.AddProperty("font-style", {"bold"s, "italic"s, "bold-italic"s})
-		.AddProperty("decoration", {"underline"s, "line-through"s, "overline"s})
-		.AddProperty("decoration-color", ParameterType::Color)
-		.AddProperty("font-size", {"smaller"s, "larger"s})
-		.AddProperty("vertical-align", {"subscript"s, "superscript"s});
+		.AddProperty("pressed", ParameterType::String)
+		.AddProperty("scaling", ParameterType::Vector2);
 
 	auto sound_part = ClassDefinition::Create("sound-part")
 		.AddRequiredProperty("name", ParameterType::String)
-		.AddRequiredProperty("focused", ParameterType::String)
-		.AddRequiredProperty("defocused", ParameterType::String)
-		.AddRequiredProperty("pressed", ParameterType::String)
-		.AddRequiredProperty("released", ParameterType::String)
-		.AddRequiredProperty("clicked", ParameterType::String)
-		.AddRequiredProperty("entered", ParameterType::String)
-		.AddRequiredProperty("exited", ParameterType::String)
-		.AddRequiredProperty("changed", ParameterType::String);
+		.AddRequiredProperty("sound", ParameterType::String);
+
+	auto text_part = ClassDefinition::Create("text-part")
+		.AddAbstractClass(std::move(get_text_style_class()))
+		.AddClass(std::move(disabled_style))
+		.AddClass(std::move(enabled_style))
+		.AddClass(std::move(focused_style))
+		.AddClass(std::move(hovered_style))
+		.AddClass(std::move(pressed_style))
+
+		.AddRequiredProperty("name", ParameterType::String)
+		.AddRequiredProperty("text", ParameterType::String);
 
 	return ClassDefinition::Create("skin")
 		.AddClass(std::move(part))
-		.AddClass(std::move(text_part))
+		.AddClass(std::move(get_pass_class()))
 		.AddClass(std::move(sound_part))
+		.AddClass(std::move(text_part))
+		.AddClass(std::move(text_pass))
 
-		.AddRequiredProperty("control",
+		.AddRequiredProperty("type",
 			{"button"s, "check-box"s, "group-box"s, "label"s,
 			 "list-box"s, "mouse-cursor"s, "progress-bar"s, "radio-button"s,
 			 "scroll-bar"s, "slider"s, "text-box"s, "tooltip"s})
@@ -105,6 +126,7 @@ ClassDefinition get_gui_skin_class()
 ClassDefinition get_gui_theme_class()
 {
 	return ClassDefinition::Create("theme")
+		.AddClass(get_gui_skin_class())
 		.AddRequiredProperty("name", ParameterType::String);
 }
 
@@ -119,14 +141,77 @@ ScriptValidator get_gui_theme_validator()
 	Tree parsing
 */
 
+graphics::fonts::text::TextBlockStyle create_text_style(const script_tree::ObjectNode &object)
+{
+	graphics::fonts::text::TextBlockStyle style;
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "background-color")
+			style.BackgroundColor = property[0].Get<ScriptType::Color>()->Get();
+		else if (property.Name() == "decoration")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "underline")
+				style.Decoration = graphics::fonts::text::TextDecoration::Underline;
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "line-through")
+				style.Decoration = graphics::fonts::text::TextDecoration::LineThrough;
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "overline")
+				style.Decoration = graphics::fonts::text::TextDecoration::Overline;
+		}
+		else if (property.Name() == "decoration-color")
+			style.DecorationColor = property[0].Get<ScriptType::Color>()->Get();
+		else if (property.Name() == "foreground-color")
+			style.ForegroundColor = property[0].Get<ScriptType::Color>()->Get();
+		else if (property.Name() == "font-size")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "smaller")
+				style.FontSize = graphics::fonts::text::TextBlockFontSize::Smaller;
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "larger")
+				style.FontSize = graphics::fonts::text::TextBlockFontSize::Larger;
+		}
+		else if (property.Name() == "font-style")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "bold")
+				style.FontStyle = graphics::fonts::text::TextFontStyle::Bold;
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "italic")
+				style.FontStyle = graphics::fonts::text::TextFontStyle::Italic;
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "bold-italic")
+				style.FontStyle = graphics::fonts::text::TextFontStyle::BoldItalic;
+		}
+		else if (property.Name() == "vertical-align")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "subscript")
+				style.VerticalAlign = graphics::fonts::text::TextBlockVerticalAlign::Subscript;
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "superscript")
+				style.VerticalAlign = graphics::fonts::text::TextBlockVerticalAlign::Superscript;
+		}
+	}
+
+	return style;
+}
+
+graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
+{
+	graphics::render::Pass pass;
+
+	for (auto &property : object.Properties())
+	{
+	}
+
+	return pass;
+}
+
+
 NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 	GuiTheme &theme,
 	graphics::materials::MaterialManager &material_manager,
 	graphics::fonts::TextManager &text_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager,
 	sounds::SoundManager &sound_manager)
 {
-	auto control_name = object
-		.Property("control")[0]
+	auto type_name = object
+		.Property("type")[0]
 		.Get<ScriptType::Enumerable>()->Get();
 	auto name = object
 		.Property("name")[0]
@@ -138,56 +223,56 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 			//Default skin
 			if (std::empty(name))
 			{
-				if (control_name == "button")
+				if (type_name == "button")
 					return theme.CreateSkin<controls::GuiButton>();
-				else if (control_name == "check-box")
+				else if (type_name == "check-box")
 					return theme.CreateSkin<controls::GuiCheckBox>();
-				else if (control_name == "group-box")
+				else if (type_name == "group-box")
 					return theme.CreateSkin<controls::GuiGroupBox>();
-				else if (control_name == "label")
+				else if (type_name == "label")
 					return theme.CreateSkin<controls::GuiLabel>();
-				else if (control_name == "list-box")
+				else if (type_name == "list-box")
 					return theme.CreateSkin<controls::GuiListBox>();
-				else if (control_name == "mouse-cursor")
+				else if (type_name == "mouse-cursor")
 					return theme.CreateSkin<controls::GuiMouseCursor>();
-				else if (control_name == "progress-bar")
+				else if (type_name == "progress-bar")
 					return theme.CreateSkin<controls::GuiProgressBar>();
-				else if (control_name == "radio-button")
+				else if (type_name == "radio-button")
 					return theme.CreateSkin<controls::GuiRadioButton>();
-				else if (control_name == "scroll-bar")
+				else if (type_name == "scroll-bar")
 					return theme.CreateSkin<controls::GuiScrollBar>();
-				else if (control_name == "slider")
+				else if (type_name == "slider")
 					return theme.CreateSkin<controls::GuiSlider>();
-				else if (control_name == "text-box")
+				else if (type_name == "text-box")
 					return theme.CreateSkin<controls::GuiTextBox>();
-				else if (control_name == "tooltip")
+				else if (type_name == "tooltip")
 					return theme.CreateSkin<controls::GuiTooltip>();
 			}
 			else //Named skin
 			{
-				if (control_name == "button")
+				if (type_name == "button")
 					return theme.CreateSkin<controls::GuiButton>(std::move(name));
-				else if (control_name == "check-box")
+				else if (type_name == "check-box")
 					return theme.CreateSkin<controls::GuiCheckBox>(std::move(name));
-				else if (control_name == "group-box")
+				else if (type_name == "group-box")
 					return theme.CreateSkin<controls::GuiGroupBox>(std::move(name));
-				else if (control_name == "label")
+				else if (type_name == "label")
 					return theme.CreateSkin<controls::GuiLabel>(std::move(name));
-				else if (control_name == "list-box")
+				else if (type_name == "list-box")
 					return theme.CreateSkin<controls::GuiListBox>(std::move(name));
-				else if (control_name == "mouse-cursor")
+				else if (type_name == "mouse-cursor")
 					return theme.CreateSkin<controls::GuiMouseCursor>(std::move(name));
-				else if (control_name == "progress-bar")
+				else if (type_name == "progress-bar")
 					return theme.CreateSkin<controls::GuiProgressBar>(std::move(name));
-				else if (control_name == "radio-button")
+				else if (type_name == "radio-button")
 					return theme.CreateSkin<controls::GuiRadioButton>(std::move(name));
-				else if (control_name == "scroll-bar")
+				else if (type_name == "scroll-bar")
 					return theme.CreateSkin<controls::GuiScrollBar>(std::move(name));
-				else if (control_name == "slider")
+				else if (type_name == "slider")
 					return theme.CreateSkin<controls::GuiSlider>(std::move(name));
-				else if (control_name == "text-box")
+				else if (type_name == "text-box")
 					return theme.CreateSkin<controls::GuiTextBox>(std::move(name));
-				else if (control_name == "tooltip")
+				else if (type_name == "tooltip")
 					return theme.CreateSkin<controls::GuiTooltip>(std::move(name));
 			}
 
@@ -196,8 +281,82 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 
 	if (skin)
 	{
-		for (auto &property : object.Properties())
+		for (auto &obj : object.Objects())
 		{
+			if (obj.Name() == "part")
+			{
+				auto part_name = obj
+					.Property("name")[0]
+					.Get<ScriptType::String>()->Get();
+
+				skins::gui_skin::SkinPart part;
+
+				for (auto &property : obj.Properties())
+				{
+					if (property.Name() == "disabled")
+						part.Disabled = material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get());
+					else if (property.Name() == "enabled")
+						part.Enabled = material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get());
+					else if (property.Name() == "fill-color")
+						part.FillColor = property[0].Get<ScriptType::Color>()->Get();
+					else if (property.Name() == "focused")
+						part.Focused = material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get());
+					else if (property.Name() == "hovered")
+						part.Hovered = material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get());
+					else if (property.Name() == "pressed")
+						part.Pressed = material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get());
+					else if (property.Name() == "scaling")
+						part.Scaling = property[0].Get<ScriptType::Vector2>()->Get();
+				}
+
+				skin->AddPart(std::move(part_name), part);
+			}
+			else if (obj.Name() == "pass")
+				skin->AddPass(create_pass(obj, shader_program_manager));
+			else if (obj.Name() == "sound-part")
+			{
+				auto part_name = obj
+					.Property("name")[0]
+					.Get<ScriptType::String>()->Get();
+				auto sound_name = obj
+					.Property("sound")[0]
+					.Get<ScriptType::String>()->Get();
+
+				skins::gui_skin::SkinSoundPart sound_part;
+				sound_part.Base = sound_manager.GetSound(sound_name);
+
+				skin->AddSoundPart(std::move(part_name), sound_part);
+			}
+			else if (obj.Name() == "text-part")
+			{
+				auto part_name = obj
+					.Property("name")[0]
+					.Get<ScriptType::String>()->Get();
+				auto text_name = obj
+					.Property("text")[0]
+					.Get<ScriptType::String>()->Get();
+
+				skins::gui_skin::SkinTextPart text_part;
+				text_part.Base = text_manager.GetText(text_name);
+
+				for (auto &obj2 : obj.Objects())
+				{
+					if (obj2.Name() == "disabled")
+						text_part.Disabled = create_text_style(obj2);
+					else if (obj2.Name() == "enabled")
+						text_part.Enabled = create_text_style(obj2);
+					else if (obj2.Name() == "focused")
+						text_part.Focused = create_text_style(obj2);
+					else if (obj2.Name() == "hovered")
+						text_part.Hovered = create_text_style(obj2);
+					else if (obj2.Name() == "pressed")
+						text_part.Pressed = create_text_style(obj2);
+				}
+
+				skin->AddTextPart(std::move(part_name), text_part);
+			}
+			else if (obj.Name() == "text-pass")
+				skin->AddTextPass(create_pass(obj, shader_program_manager));
 		}
 	}
 
@@ -208,6 +367,7 @@ NonOwningPtr<GuiTheme> create_gui_theme(const script_tree::ObjectNode &object,
 	GuiController &gui_controller, NonOwningPtr<graphics::scene::SceneManager> scene_manager,
 	graphics::materials::MaterialManager &material_manager,
 	graphics::fonts::TextManager &text_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager,
 	sounds::SoundManager &sound_manager)
 {
 	auto name = object
@@ -222,7 +382,7 @@ NonOwningPtr<GuiTheme> create_gui_theme(const script_tree::ObjectNode &object,
 		{
 			if (obj.Name() == "skin")
 				detail::create_gui_skin(obj, *theme,
-					material_manager, text_manager, sound_manager);
+					material_manager, text_manager, shader_program_manager, sound_manager);
 		}
 	}
 
@@ -233,13 +393,14 @@ void create_gui_themes(const ScriptTree &tree,
 	GuiController &gui_controller, NonOwningPtr<graphics::scene::SceneManager> scene_manager,
 	graphics::materials::MaterialManager &material_manager,
 	graphics::fonts::TextManager &text_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager,
 	sounds::SoundManager &sound_manager)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "gui-theme")
 			create_gui_theme(object, gui_controller, scene_manager,
-				material_manager, text_manager, sound_manager);
+				material_manager, text_manager, shader_program_manager, sound_manager);
 	}
 }
 
@@ -265,11 +426,12 @@ void GuiThemeScriptInterface::CreateGuiThemes(std::string_view asset_name,
 	GuiController &gui_controller, NonOwningPtr<graphics::scene::SceneManager> scene_manager,
 	graphics::materials::MaterialManager &material_manager,
 	graphics::fonts::TextManager &text_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager,
 	sounds::SoundManager &sound_manager)
 {
 	if (Load(asset_name))
 		detail::create_gui_themes(*tree_, gui_controller, scene_manager,
-			material_manager, text_manager, sound_manager);
+			material_manager, text_manager, shader_program_manager, sound_manager);
 }
 
 } //ion::script::interfaces
