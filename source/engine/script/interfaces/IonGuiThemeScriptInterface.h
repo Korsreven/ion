@@ -97,6 +97,10 @@ namespace ion::script::interfaces
 		};
 
 
+		graphics::render::pass::BlendFactor get_pass_blend_factor(const script_tree::ArgumentNode &arg);
+		graphics::render::pass::BlendEquationMode get_pass_blend_equation_mode(const script_tree::ArgumentNode &arg);
+
+
 		/*
 			Validator classes
 		*/
