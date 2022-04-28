@@ -1940,6 +1940,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::gui::GuiController controller{scene_graph->RootNode(), gui_sound_channel_group};
 			controller.ZOrder(-2.0_r);
 
+			/*ion::script::interfaces::GuiThemeScriptInterface gui_theme_script;
+			gui_theme_script.CreateScriptRepository(script_repository);
+			gui_theme_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			gui_theme_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			gui_theme_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			gui_theme_script.CreateGuiThemes("gui_themes.ion", controller, scene_manager, materials, texts, shader_programs, sounds);*/
+
 			//Theme
 			auto theme = controller.CreateTheme("default", scene_manager);
 
