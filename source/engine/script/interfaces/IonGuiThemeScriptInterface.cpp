@@ -481,7 +481,7 @@ void create_gui_themes(const ScriptTree &tree,
 {
 	for (auto &object : tree.Objects())
 	{
-		if (object.Name() == "gui-theme")
+		if (object.Name() == "theme")
 			create_gui_theme(object, gui_controller, scene_manager,
 				material_manager, text_manager, shader_program_manager, sound_manager);
 	}
@@ -501,7 +501,7 @@ ScriptValidator GuiThemeScriptInterface::GetValidator() const
 //Public
 
 /*
-	Frame sequences
+	Gui themes
 	Creating from script
 */
 
