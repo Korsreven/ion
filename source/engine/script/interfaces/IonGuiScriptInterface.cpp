@@ -30,15 +30,125 @@ namespace gui_script_interface::detail
 	Validator classes
 */
 
-ClassDefinition get_gui_frame_class()
+ClassDefinition get_gui_component_class()
 {
-	return ClassDefinition::Create("frame")
+	return ClassDefinition::Create("component")
 		.AddRequiredProperty("name", ParameterType::String);
 }
+
+ClassDefinition get_gui_frame_class()
+{
+	return ClassDefinition::Create("frame", "panel-container")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_panel_class()
+{
+	return ClassDefinition::Create("panel", "panel-container")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_panel_container_class()
+{
+	return ClassDefinition::Create("panel-container", "component")
+		.AddClass(get_gui_panel_class())
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+
+ClassDefinition get_gui_button_class()
+{
+	return ClassDefinition::Create("button", "control")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_check_box_class()
+{
+	return ClassDefinition::Create("check-box", "control")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_control_class()
+{
+	return ClassDefinition::Create("control", "component")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_group_box_class()
+{
+	return ClassDefinition::Create("group-box", "control")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_label_class()
+{
+	return ClassDefinition::Create("label", "control")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_list_box_class()
+{
+	return ClassDefinition::Create("list-box", "scrollable")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_mouse_cursor_class()
+{
+	return ClassDefinition::Create("mouse-cursor", "control")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_progress_bar_class()
+{
+	return ClassDefinition::Create("progress-bar", "control")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_radio_button_class()
+{
+	return ClassDefinition::Create("radio-button", "check-box")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_scrollable_class()
+{
+	return ClassDefinition::Create("scrollable", "control")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_scroll_bar_class()
+{
+	return ClassDefinition::Create("scroll-bar", "slider")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_slider_class()
+{
+	return ClassDefinition::Create("slider", "control")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_text_box_class()
+{
+	return ClassDefinition::Create("text-box", "scrollable")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
+ClassDefinition get_gui_tooltip_class()
+{
+	return ClassDefinition::Create("tooltip", "label")
+		.AddRequiredProperty("name", ParameterType::String);
+}
+
 
 ScriptValidator get_gui_validator()
 {
 	return ScriptValidator::Create()
+		.AddAbstractClass(get_gui_component_class())
+		.AddAbstractClass(get_gui_control_class())
+		.AddAbstractClass(get_gui_panel_container_class())
+		.AddAbstractClass(get_gui_scrollable_class())
+
 		.AddRequiredClass(get_gui_frame_class());
 }
 

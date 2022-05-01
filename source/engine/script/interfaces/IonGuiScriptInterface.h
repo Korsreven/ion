@@ -43,7 +43,25 @@ namespace ion::script::interfaces
 			Validator classes
 		*/
 
+		script_validator::ClassDefinition get_gui_component_class();
 		script_validator::ClassDefinition get_gui_frame_class();
+		script_validator::ClassDefinition get_gui_panel_class();
+		script_validator::ClassDefinition get_gui_panel_container_class();
+
+		script_validator::ClassDefinition get_gui_button_class();
+		script_validator::ClassDefinition get_gui_check_box_class();
+		script_validator::ClassDefinition get_gui_control_class();
+		script_validator::ClassDefinition get_gui_group_box_class();
+		script_validator::ClassDefinition get_gui_label_class();
+		script_validator::ClassDefinition get_gui_list_box_class();
+		script_validator::ClassDefinition get_gui_mouse_cursor_class();
+		script_validator::ClassDefinition get_gui_progress_bar_class();
+		script_validator::ClassDefinition get_gui_radio_button_class();
+		script_validator::ClassDefinition get_gui_scrollable_class();
+		script_validator::ClassDefinition get_gui_scroll_bar_class();
+		script_validator::ClassDefinition get_gui_slider_class();
+		script_validator::ClassDefinition get_gui_text_box_class();
+		script_validator::ClassDefinition get_gui_tooltip_class();
 
 		ScriptValidator get_gui_validator();
 
