@@ -35,10 +35,23 @@ File:	IonGuiScriptInterface.h
 #include "script/IonScriptTree.h"
 #include "script/IonScriptValidator.h"
 
+namespace gui::skins
+{
+	class GuiSkin;
+	class GuiTheme;
+}
+
 namespace ion::script::interfaces
 {
 	namespace gui_script_interface::detail
 	{
+		const gui::skins::GuiTheme* get_theme(gui::GuiController &gui_controller) noexcept;
+		const gui::skins::GuiSkin* get_skin(gui::GuiController &gui_controller, std::string_view name) noexcept;
+
+		const gui::skins::GuiTheme* get_theme(gui::GuiPanelContainer &container) noexcept;
+		const gui::skins::GuiSkin* get_skin(gui::GuiPanelContainer &container, std::string_view name) noexcept;
+
+
 		/*
 			Validator classes
 		*/
@@ -71,6 +84,33 @@ namespace ion::script::interfaces
 		*/
 
 		NonOwningPtr<gui::GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
+			gui::GuiController &gui_controller);
+		NonOwningPtr<gui::GuiPanel> create_gui_panel(const script_tree::ObjectNode &object,
+			gui::GuiFrame &frame);
+
+		NonOwningPtr<gui::controls::GuiButton> create_gui_button(const script_tree::ObjectNode &object,
+			gui::GuiPanelContainer &container);
+		NonOwningPtr<gui::controls::GuiCheckBox> create_gui_check_box(const script_tree::ObjectNode &object,
+			gui::GuiPanelContainer &container);
+		NonOwningPtr<gui::controls::GuiGroupBox> create_gui_group_box(const script_tree::ObjectNode &object,
+			gui::GuiPanelContainer &container);
+		NonOwningPtr<gui::controls::GuiLabel> create_gui_label(const script_tree::ObjectNode &object,
+			gui::GuiPanelContainer &container);
+		NonOwningPtr<gui::controls::GuiListBox> create_gui_list_box(const script_tree::ObjectNode &object,
+			gui::GuiPanelContainer &container);
+		NonOwningPtr<gui::controls::GuiMouseCursor> create_gui_mouse_cursor(const script_tree::ObjectNode &object,
+			gui::GuiController &gui_controller);
+		NonOwningPtr<gui::controls::GuiProgressBar> create_gui_progress_bar(const script_tree::ObjectNode &object,
+			gui::GuiPanelContainer &container);
+		NonOwningPtr<gui::controls::GuiRadioButton> create_gui_radio_button(const script_tree::ObjectNode &object,
+			gui::GuiPanelContainer &container);
+		NonOwningPtr<gui::controls::GuiScrollBar> create_scroll_bar(const script_tree::ObjectNode &object,
+			gui::GuiPanelContainer &container);
+		NonOwningPtr<gui::controls::GuiSlider> create_gui_slider(const script_tree::ObjectNode &object,
+			gui::GuiPanelContainer &container);
+		NonOwningPtr<gui::controls::GuiTextBox> create_gui_text_box(const script_tree::ObjectNode &object,
+			gui::GuiPanelContainer &container);
+		NonOwningPtr<gui::controls::GuiTooltip> create_gui_tooltip(const script_tree::ObjectNode &object,
 			gui::GuiController &gui_controller);
 
 		void create_gui(const ScriptTree &tree,
