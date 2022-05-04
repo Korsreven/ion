@@ -29,7 +29,7 @@ using namespace gui;
 namespace gui_script_interface::detail
 {
 
-const gui::skins::GuiTheme* get_theme(GuiController &gui_controller) noexcept
+const gui::skins::GuiTheme* get_active_theme(GuiController &gui_controller) noexcept
 {
 	if (auto theme = gui_controller.ActiveTheme(); theme)
 		return theme;
@@ -39,14 +39,30 @@ const gui::skins::GuiTheme* get_theme(GuiController &gui_controller) noexcept
 
 const gui::skins::GuiSkin* get_skin(GuiController &gui_controller, std::string_view name) noexcept
 {
-	if (auto theme = get_theme(gui_controller); theme)
-		return theme->GetSkin(name).get();
-	else
-		return nullptr;
+	auto active_theme = get_active_theme(gui_controller);
+
+	//Check active theme first
+	if (active_theme)
+	{
+		if (auto skin = active_theme->GetSkin(name); skin)
+			return skin.get();
+	}
+	
+	//Check all other themes (if any)
+	for (auto &theme : gui_controller.Themes())
+	{
+		if (&theme != active_theme)
+		{
+			if (auto skin = theme.GetSkin(name); skin)
+				return skin.get();
+		}
+	}
+
+	return nullptr;
 }
 
 
-const skins::GuiTheme* get_theme(GuiPanelContainer &container) noexcept
+const skins::GuiTheme* get_active_theme(GuiPanelContainer &container) noexcept
 {
 	if (auto frame = container.ParentFrame(); frame)
 	{
@@ -61,10 +77,32 @@ const skins::GuiTheme* get_theme(GuiPanelContainer &container) noexcept
 
 const skins::GuiSkin* get_skin(GuiPanelContainer &container, std::string_view name) noexcept
 {
-	if (auto theme = get_theme(container); theme)
-		return theme->GetSkin(name).get();
-	else
-		return nullptr;
+	auto active_theme = get_active_theme(container);
+
+	//Check active theme first
+	if (active_theme)
+	{
+		if (auto skin = active_theme->GetSkin(name); skin)
+			return skin.get();
+	}
+
+	//Check all other themes (if any)
+	if (auto frame = container.ParentFrame(); frame)
+	{
+		if (auto owner = frame->Owner(); owner)
+		{
+			for (auto &theme : owner->Themes())
+			{
+				if (&theme != active_theme)
+				{
+					if (auto skin = theme.GetSkin(name); skin)
+						return skin.get();
+				}
+			}
+		}
+	}
+	
+	return nullptr;
 }
 
 
