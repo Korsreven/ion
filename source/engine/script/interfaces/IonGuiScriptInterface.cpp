@@ -89,7 +89,11 @@ const skins::GuiSkin* get_skin(GuiPanelContainer &container, std::string_view na
 ClassDefinition get_gui_component_class()
 {
 	return ClassDefinition::Create("component")
-		.AddRequiredProperty("name", ParameterType::String);
+		.AddRequiredProperty("name", ParameterType::String)
+		.AddProperty("enabled", ParameterType::Boolean)
+		.AddProperty("global-z-order", ParameterType::FloatingPoint)
+		.AddProperty("visible", ParameterType::Boolean)
+		.AddProperty("z-order", ParameterType::FloatingPoint);
 }
 
 ClassDefinition get_gui_frame_class()
@@ -123,6 +127,12 @@ ClassDefinition get_gui_control_class()
 {
 	return ClassDefinition::Create("control", "component")
 		.AddProperty("caption", ParameterType::String)
+		.AddProperty("caption-margin", ParameterType::Vector2)
+		.AddProperty("caption-padding", ParameterType::Vector2)
+		.AddProperty("caption-size", ParameterType::Vector2)
+		.AddProperty("enabled", ParameterType::Boolean)
+		.AddProperty("focusable", ParameterType::Boolean)
+		.AddProperty("focused", ParameterType::Boolean)
 		.AddProperty("hit-box", {ParameterType::Vector2, ParameterType::Vector2})
 		.AddProperty("size", ParameterType::Vector2)
 		.AddProperty("skin", ParameterType::String)
@@ -202,6 +212,49 @@ ScriptValidator get_gui_validator()
 /*
 	Tree parsing
 */
+
+void set_component_properties(const script_tree::ObjectNode &object,
+	gui::GuiComponent &component)
+{
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "enabled")
+			component.Enabled(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "global-z-order")
+			component.GlobalZOrder(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "visible")
+			component.Visible(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "z-order")
+			component.ZOrder(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+	}
+}
+
+void set_control_properties(const script_tree::ObjectNode &object,
+	gui::controls::GuiControl &control)
+{
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "caption")
+			control.Caption(property[0].Get<ScriptType::String>()->Get());
+		else if (property.Name() == "caption-margin")
+			control.CaptionMargin(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "caption-padding")
+			control.CaptionPadding(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "caption-size")
+			control.CaptionSize(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "enabled")
+			control.Enabled(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "focusable")
+			control.Focusable(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "focused")
+			control.Focused(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "size")
+			control.Size(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "tooltip")
+			control.Tooltip(property[0].Get<ScriptType::String>()->Get());
+	}
+}
+
 
 NonOwningPtr<GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
 	GuiController &gui_controller)

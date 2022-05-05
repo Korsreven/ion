@@ -80,6 +80,10 @@ namespace ion::script::interfaces
 			Tree parsing
 		*/
 
+		void set_component_properties(const script_tree::ObjectNode &object, gui::GuiComponent &component);
+		void set_control_properties(const script_tree::ObjectNode &object, gui::controls::GuiControl &control);
+
+
 		NonOwningPtr<gui::GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
 			gui::GuiController &gui_controller);
 		NonOwningPtr<gui::GuiPanel> create_gui_panel(const script_tree::ObjectNode &object,
