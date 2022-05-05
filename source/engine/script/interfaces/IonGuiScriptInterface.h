@@ -45,10 +45,7 @@ namespace ion::script::interfaces
 {
 	namespace gui_script_interface::detail
 	{
-		const gui::skins::GuiTheme* get_active_theme(gui::GuiController &gui_controller) noexcept;
-		const gui::skins::GuiSkin* get_skin(gui::GuiController &gui_controller, std::string_view name) noexcept;
-
-		const gui::skins::GuiTheme* get_active_theme(gui::GuiPanelContainer &container) noexcept;
+		const gui::skins::GuiSkin* get_skin(gui::GuiController &gui_controller, std::string_view name) noexcept;	
 		const gui::skins::GuiSkin* get_skin(gui::GuiPanelContainer &container, std::string_view name) noexcept;
 
 

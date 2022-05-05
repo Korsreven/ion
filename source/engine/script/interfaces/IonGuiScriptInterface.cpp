@@ -29,17 +29,9 @@ using namespace gui;
 namespace gui_script_interface::detail
 {
 
-const gui::skins::GuiTheme* get_active_theme(GuiController &gui_controller) noexcept
-{
-	if (auto theme = gui_controller.ActiveTheme(); theme)
-		return theme;
-	else
-		return nullptr;
-}
-
 const gui::skins::GuiSkin* get_skin(GuiController &gui_controller, std::string_view name) noexcept
 {
-	auto active_theme = get_active_theme(gui_controller);
+	auto active_theme = gui_controller.ActiveTheme();
 
 	//Check active theme first
 	if (active_theme)
@@ -61,23 +53,16 @@ const gui::skins::GuiSkin* get_skin(GuiController &gui_controller, std::string_v
 	return nullptr;
 }
 
-
-const skins::GuiTheme* get_active_theme(GuiPanelContainer &container) noexcept
-{
-	if (auto frame = container.ParentFrame(); frame)
-	{
-		if (auto theme = frame->ActiveTheme(); theme)
-			return theme;
-		else if (auto owner = frame->Owner(); owner)
-			return owner->ActiveTheme();
-	}
-
-	return nullptr;
-}
-
 const skins::GuiSkin* get_skin(GuiPanelContainer &container, std::string_view name) noexcept
 {
-	auto active_theme = get_active_theme(container);
+	auto active_theme =
+		[&]() -> skins::GuiTheme*
+		{
+			if (auto frame = container.ParentFrame(); frame)
+				return frame->ActiveTheme();
+			else
+				return nullptr;
+		}();
 
 	//Check active theme first
 	if (active_theme)
@@ -86,20 +71,11 @@ const skins::GuiSkin* get_skin(GuiPanelContainer &container, std::string_view na
 			return skin.get();
 	}
 
-	//Check all other themes (if any)
+	//Check gui controller themes
 	if (auto frame = container.ParentFrame(); frame)
 	{
 		if (auto owner = frame->Owner(); owner)
-		{
-			for (auto &theme : owner->Themes())
-			{
-				if (&theme != active_theme)
-				{
-					if (auto skin = theme.GetSkin(name); skin)
-						return skin.get();
-				}
-			}
-		}
+			return get_skin(*owner, name);
 	}
 	
 	return nullptr;
