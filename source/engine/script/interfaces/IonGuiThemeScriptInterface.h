@@ -24,6 +24,7 @@ File:	IonGuiThemeScriptInterface.h
 #include "memory/IonNonOwningPtr.h"
 #include "script/IonScriptTree.h"
 #include "script/IonScriptValidator.h"
+#include "types/IonTypes.h"
 
 //Forward declarations
 namespace ion::graphics

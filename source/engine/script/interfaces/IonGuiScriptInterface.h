@@ -34,6 +34,7 @@ File:	IonGuiScriptInterface.h
 #include "memory/IonNonOwningPtr.h"
 #include "script/IonScriptTree.h"
 #include "script/IonScriptValidator.h"
+#include "types/IonTypes.h"
 
 namespace gui::skins
 {
@@ -45,6 +46,15 @@ namespace ion::script::interfaces
 {
 	namespace gui_script_interface::detail
 	{
+		inline static const Strings caption_layouts
+		{
+									"outside-top-left",		"outside-top-center",		"outside-top-right",
+			"outside-left-top",		"top-left",				"top-center",				"top-right",			"outside-right-top",
+			"outside-left-center",	"left",					"center",					"right",				"outside-right-center",
+			"outside-left-bottom",	"bottom-left",			"bottom-center",			"bottom-right",			"outside-right-bottom",
+									"outside-bottom-left",	"outside-bottom-center",	"outside-bottom-right"
+		};
+
 		const gui::skins::GuiSkin* get_skin(gui::GuiController &gui_controller, std::string_view name) noexcept;	
 		const gui::skins::GuiSkin* get_skin(gui::GuiPanelContainer &container, std::string_view name) noexcept;
 

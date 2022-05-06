@@ -127,6 +127,7 @@ ClassDefinition get_gui_control_class()
 {
 	return ClassDefinition::Create("control", "component")
 		.AddProperty("caption", ParameterType::String)
+		.AddProperty("caption-layout", caption_layouts)
 		.AddProperty("caption-margin", ParameterType::Vector2)
 		.AddProperty("caption-padding", ParameterType::Vector2)
 		.AddProperty("caption-size", ParameterType::Vector2)
@@ -232,10 +233,60 @@ void set_component_properties(const script_tree::ObjectNode &object,
 void set_control_properties(const script_tree::ObjectNode &object,
 	gui::controls::GuiControl &control)
 {
+	auto hit_boxes = controls::gui_control::BoundingBoxes{};
+
 	for (auto &property : object.Properties())
 	{
 		if (property.Name() == "caption")
 			control.Caption(property[0].Get<ScriptType::String>()->Get());
+		else if (property.Name() == "caption-layout")
+		{
+			auto layout = property[0]
+				.Get<ScriptType::Enumerable>()->Get();
+
+			if (layout == "outside-top-left")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::OutsideTopLeft);
+			else if (layout == "outside-top-center")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::OutsideTopCenter);
+			else if (layout == "outside-top-right")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::OutsideTopRight);
+			else if (layout == "outside-left-top")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::OutsideLeftTop);
+			else if (layout == "top-left")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::TopLeft);
+			else if (layout == "top-center")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::TopCenter);
+			else if (layout == "top-right")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::TopRight);
+			else if (layout == "outside-right-top")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::OutsideRightTop);
+			else if (layout == "outside-left-center")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::OutsideLeftCenter);
+			else if (layout == "left")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::Left);
+			else if (layout == "center")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::Center);
+			else if (layout == "right")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::Right);
+			else if (layout == "outside-right-center")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::OutsideRightCenter);
+			else if (layout == "outside-left-bottom")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::OutsideLeftBottom);
+			else if (layout == "bottom-left")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::BottomLeft);
+			else if (layout == "bottom-center")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::BottomCenter);
+			else if (layout == "bottom-right")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::BottomRight);
+			else if (layout == "outside-right-bottom")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::OutsideRightBottom);
+			else if (layout == "outside-bottom-left")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::OutsideBottomLeft);
+			else if (layout == "outside-bottom-center")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::OutsideBottomCenter);
+			else if (layout == "outside-bottom-right")
+				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::OutsideBottomRight);
+		}
 		else if (property.Name() == "caption-margin")
 			control.CaptionMargin(property[0].Get<ScriptType::Vector2>()->Get());
 		else if (property.Name() == "caption-padding")
@@ -248,11 +299,26 @@ void set_control_properties(const script_tree::ObjectNode &object,
 			control.Focusable(property[0].Get<ScriptType::Boolean>()->Get());
 		else if (property.Name() == "focused")
 			control.Focused(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "hit-box")
+				hit_boxes.push_back({
+					property[0].Get<ScriptType::Vector2>()->Get(),
+					property[1].Get<ScriptType::Vector2>()->Get()});
 		else if (property.Name() == "size")
 			control.Size(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "skin")
+		{
+			if (auto owner = control.Owner(); owner)
+			{
+				if (auto skin = get_skin(*owner, property[0].Get<ScriptType::String>()->Get()); skin)
+					control.Skin(*skin);
+			}
+		}
 		else if (property.Name() == "tooltip")
 			control.Tooltip(property[0].Get<ScriptType::String>()->Get());
 	}
+
+	if (!std::empty(hit_boxes))
+		control.HitBoxes(std::move(hit_boxes));
 }
 
 
