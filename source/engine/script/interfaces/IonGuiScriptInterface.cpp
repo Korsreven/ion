@@ -98,18 +98,38 @@ ClassDefinition get_gui_component_class()
 
 ClassDefinition get_gui_frame_class()
 {
-	return ClassDefinition::Create("frame", "panel-container");
+	return ClassDefinition::Create("frame", "panel-container")
+		.AddClass(get_gui_mouse_cursor_class())
+		.AddClass(get_gui_tooltip_class())
+
+		.AddProperty("activated", ParameterType::Boolean)
+		.AddProperty("active-theme", ParameterType::String)
+		.AddProperty("focused", ParameterType::Boolean)
+		.AddProperty("show", {"modeless"s, "modal"s});
 }
 
 ClassDefinition get_gui_panel_class()
 {
-	return ClassDefinition::Create("panel", "panel-container");
+	return ClassDefinition::Create("panel", "panel-container")
+		.AddProperty("grid-layout", {ParameterType::Vector2, ParameterType::Integer, ParameterType::Integer})
+		.AddProperty("tab-order", ParameterType::Integer);
 }
 
 ClassDefinition get_gui_panel_container_class()
 {
 	return ClassDefinition::Create("panel-container", "component")
-		.AddClass(get_gui_panel_class());
+		.AddClass(get_gui_panel_class())
+
+		.AddClass(get_gui_button_class())
+		.AddClass(get_gui_check_box_class())
+		.AddClass(get_gui_group_box_class())
+		.AddClass(get_gui_label_class())
+		.AddClass(get_gui_list_box_class())
+		.AddClass(get_gui_progress_bar_class())
+		.AddClass(get_gui_radio_button_class())
+		.AddClass(get_gui_scroll_bar_class())
+		.AddClass(get_gui_slider_class())
+		.AddClass(get_gui_text_box_class());
 }
 
 
@@ -137,6 +157,7 @@ ClassDefinition get_gui_control_class()
 		.AddProperty("hit-box", {ParameterType::Vector2, ParameterType::Vector2})
 		.AddProperty("size", ParameterType::Vector2)
 		.AddProperty("skin", ParameterType::String)
+		.AddProperty("tab-order", ParameterType::Integer)
 		.AddProperty("tooltip", ParameterType::String);
 }
 
@@ -317,6 +338,8 @@ void set_control_properties(const script_tree::ObjectNode &object,
 					control.Skin(*skin);
 			}
 		}
+		else if (property.Name() == "tab-order")
+			control.TabOrder(property[0].Get<ScriptType::Integer>()->As<int>());
 		else if (property.Name() == "tooltip")
 			control.Tooltip(property[0].Get<ScriptType::String>()->Get());
 	}
