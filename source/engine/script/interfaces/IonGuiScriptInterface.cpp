@@ -234,6 +234,7 @@ void set_control_properties(const script_tree::ObjectNode &object,
 	gui::controls::GuiControl &control)
 {
 	auto hit_boxes = controls::gui_control::BoundingBoxes{};
+	auto has_hit_boxes = !std::empty(control.HitBoxes());
 
 	for (auto &property : object.Properties())
 	{
@@ -300,9 +301,12 @@ void set_control_properties(const script_tree::ObjectNode &object,
 		else if (property.Name() == "focused")
 			control.Focused(property[0].Get<ScriptType::Boolean>()->Get());
 		else if (property.Name() == "hit-box")
+		{
+			if (!has_hit_boxes)
 				hit_boxes.push_back({
 					property[0].Get<ScriptType::Vector2>()->Get(),
 					property[1].Get<ScriptType::Vector2>()->Get()});
+		}
 		else if (property.Name() == "size")
 			control.Size(property[0].Get<ScriptType::Vector2>()->Get());
 		else if (property.Name() == "skin")
