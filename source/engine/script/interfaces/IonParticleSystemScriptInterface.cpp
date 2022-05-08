@@ -168,19 +168,19 @@ NonOwningPtr<Emitter> create_emitter(const script_tree::ObjectNode &object,
 		for (auto &obj : object.Objects())
 		{
 			if (obj.Name() == "color-fader")
-				detail::create_color_fader(obj, *emitter);
+				create_color_fader(obj, *emitter);
 			else if (obj.Name() == "direction-randomizer")
-				detail::create_direction_randomizer(obj, *emitter);
+				create_direction_randomizer(obj, *emitter);
 			else if (obj.Name() == "graviation")
-				detail::create_graviation(obj, *emitter);
+				create_graviation(obj, *emitter);
 			else if (obj.Name() == "linear-force")
-				detail::create_linear_force(obj, *emitter);
+				create_linear_force(obj, *emitter);
 			else if (obj.Name() == "scaler")
-				detail::create_scaler(obj, *emitter);
+				create_scaler(obj, *emitter);
 			else if (obj.Name() == "sine-force")
-				detail::create_sine_force(obj, *emitter);
+				create_sine_force(obj, *emitter);
 			else if (obj.Name() == "velocity-randomizer")
-				detail::create_velocity_randomizer(obj, *emitter);
+				create_velocity_randomizer(obj, *emitter);
 		}
 
 		for (auto &property : object.Properties())
@@ -280,22 +280,22 @@ NonOwningPtr<ParticleSystem> create_particle_system(const script_tree::ObjectNod
 		for (auto &obj : object.Objects())
 		{
 			if (obj.Name() == "emitter")
-				detail::create_emitter(obj, *particle_system, material_manager);
+				create_emitter(obj, *particle_system, material_manager);
 
 			else if (obj.Name() == "color-fader")
-				detail::create_color_fader(obj, *particle_system);
+				create_color_fader(obj, *particle_system);
 			else if (obj.Name() == "direction-randomizer")
-				detail::create_direction_randomizer(obj, *particle_system);
+				create_direction_randomizer(obj, *particle_system);
 			else if (obj.Name() == "graviation")
-				detail::create_graviation(obj, *particle_system);
+				create_graviation(obj, *particle_system);
 			else if (obj.Name() == "linear-force")
-				detail::create_linear_force(obj, *particle_system);
+				create_linear_force(obj, *particle_system);
 			else if (obj.Name() == "scaler")
-				detail::create_scaler(obj, *particle_system);
+				create_scaler(obj, *particle_system);
 			else if (obj.Name() == "sine-force")
-				detail::create_sine_force(obj, *particle_system);
+				create_sine_force(obj, *particle_system);
 			else if (obj.Name() == "velocity-randomizer")
-				detail::create_velocity_randomizer(obj, *particle_system);
+				create_velocity_randomizer(obj, *particle_system);
 		}
 
 		for (auto &property : object.Properties())

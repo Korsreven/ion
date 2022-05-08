@@ -464,7 +464,7 @@ NonOwningPtr<GuiTheme> create_gui_theme(const script_tree::ObjectNode &object,
 		for (auto &obj : object.Objects())
 		{
 			if (obj.Name() == "skin")
-				detail::create_gui_skin(obj, *theme,
+				create_gui_skin(obj, *theme,
 					material_manager, text_manager, shader_program_manager, sound_manager);
 		}
 	}
