@@ -165,6 +165,24 @@ NonOwningPtr<Emitter> create_emitter(const script_tree::ObjectNode &object,
 
 	if (emitter)
 	{
+		for (auto &obj : object.Objects())
+		{
+			if (obj.Name() == "color-fader")
+				detail::create_color_fader(obj, *emitter);
+			else if (obj.Name() == "direction-randomizer")
+				detail::create_direction_randomizer(obj, *emitter);
+			else if (obj.Name() == "graviation")
+				detail::create_graviation(obj, *emitter);
+			else if (obj.Name() == "linear-force")
+				detail::create_linear_force(obj, *emitter);
+			else if (obj.Name() == "scaler")
+				detail::create_scaler(obj, *emitter);
+			else if (obj.Name() == "sine-force")
+				detail::create_sine_force(obj, *emitter);
+			else if (obj.Name() == "velocity-randomizer")
+				detail::create_velocity_randomizer(obj, *emitter);
+		}
+
 		for (auto &property : object.Properties())
 		{
 			if (property.Name() == "direction")
@@ -242,24 +260,6 @@ NonOwningPtr<Emitter> create_emitter(const script_tree::ObjectNode &object,
 					emitter->Type(emitter::EmitterType::Ring);
 			}
 		}
-
-		for (auto &obj : object.Objects())
-		{
-			if (obj.Name() == "color-fader")
-				detail::create_color_fader(obj, *emitter);
-			else if (obj.Name() == "direction-randomizer")
-				detail::create_direction_randomizer(obj, *emitter);
-			else if (obj.Name() == "graviation")
-				detail::create_graviation(obj, *emitter);
-			else if (obj.Name() == "linear-force")
-				detail::create_linear_force(obj, *emitter);
-			else if (obj.Name() == "scaler")
-				detail::create_scaler(obj, *emitter);
-			else if (obj.Name() == "sine-force")
-				detail::create_sine_force(obj, *emitter);
-			else if (obj.Name() == "velocity-randomizer")
-				detail::create_velocity_randomizer(obj, *emitter);
-		}
 	}
 
 	return emitter;
@@ -277,17 +277,6 @@ NonOwningPtr<ParticleSystem> create_particle_system(const script_tree::ObjectNod
 
 	if (particle_system)
 	{
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "render-primitive")
-			{
-				if (property[0].Get<ScriptType::Enumerable>()->Get() == "point")
-					particle_system->RenderPrimitive(particle_system::ParticlePrimitive::Point);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "rectangle")
-					particle_system->RenderPrimitive(particle_system::ParticlePrimitive::Rectangle);
-			}
-		}
-
 		for (auto &obj : object.Objects())
 		{
 			if (obj.Name() == "emitter")
@@ -308,6 +297,17 @@ NonOwningPtr<ParticleSystem> create_particle_system(const script_tree::ObjectNod
 			else if (obj.Name() == "velocity-randomizer")
 				detail::create_velocity_randomizer(obj, *particle_system);
 		}
+
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "render-primitive")
+			{
+				if (property[0].Get<ScriptType::Enumerable>()->Get() == "point")
+					particle_system->RenderPrimitive(particle_system::ParticlePrimitive::Point);
+				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "rectangle")
+					particle_system->RenderPrimitive(particle_system::ParticlePrimitive::Rectangle);
+			}
+		}
 	}
 
 	return particle_system;
@@ -325,12 +325,6 @@ NonOwningPtr<affectors::ColorFader> create_color_fader(const script_tree::Object
 
 	if (color_fader)
 	{
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "enabled")
-				color_fader->Enabled(property[0].Get<ScriptType::Boolean>()->Get());
-		}
-
 		for (auto &obj : object.Objects())
 		{
 			if (obj.Name() == "step")
@@ -348,6 +342,12 @@ NonOwningPtr<affectors::ColorFader> create_color_fader(const script_tree::Object
 
 				color_fader->AddStep(percent, color);
 			}
+		}
+
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "enabled")
+				color_fader->Enabled(property[0].Get<ScriptType::Boolean>()->Get());
 		}
 	}
 
@@ -447,12 +447,6 @@ NonOwningPtr<affectors::Scaler> create_scaler(const script_tree::ObjectNode &obj
 
 	if (scaler)
 	{
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "enabled")
-				scaler->Enabled(property[0].Get<ScriptType::Boolean>()->Get());
-		}
-
 		for (auto &obj : object.Objects())
 		{
 			if (obj.Name() == "step")
@@ -470,6 +464,12 @@ NonOwningPtr<affectors::Scaler> create_scaler(const script_tree::ObjectNode &obj
 
 				scaler->AddStep(percent, size);
 			}
+		}
+
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "enabled")
+				scaler->Enabled(property[0].Get<ScriptType::Boolean>()->Get());
 		}
 	}
 
