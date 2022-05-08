@@ -55,7 +55,7 @@ namespace ion::script::interfaces
 									"outside-bottom-left",	"outside-bottom-center",	"outside-bottom-right"
 		};
 
-		const gui::skins::GuiSkin* get_skin(gui::GuiController &gui_controller, std::string_view name) noexcept;	
+		const gui::skins::GuiSkin* get_skin(gui::GuiController &gui_controller, std::string_view name) noexcept;
 		const gui::skins::GuiSkin* get_skin(gui::GuiPanelContainer &container, std::string_view name) noexcept;
 
 
@@ -63,6 +63,7 @@ namespace ion::script::interfaces
 			Validator classes
 		*/
 
+		script_validator::ClassDefinition get_gui_class();
 		script_validator::ClassDefinition get_gui_component_class();
 		script_validator::ClassDefinition get_gui_frame_class();
 		script_validator::ClassDefinition get_gui_panel_class();
@@ -90,10 +91,11 @@ namespace ion::script::interfaces
 			Tree parsing
 		*/
 
+		void set_gui_properties(const script_tree::ObjectNode &object, gui::GuiController &gui_controller);
 		void set_component_properties(const script_tree::ObjectNode &object, gui::GuiComponent &component);
 		void set_control_properties(const script_tree::ObjectNode &object, gui::controls::GuiControl &control);
-
-
+		void set_panel_container_properties(const script_tree::ObjectNode &object, gui::GuiPanelContainer &container);
+		
 		NonOwningPtr<gui::GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
 			gui::GuiController &gui_controller);
 		NonOwningPtr<gui::GuiPanel> create_gui_panel(const script_tree::ObjectNode &object,
@@ -115,7 +117,7 @@ namespace ion::script::interfaces
 			gui::GuiPanelContainer &container);
 		NonOwningPtr<gui::controls::GuiRadioButton> create_gui_radio_button(const script_tree::ObjectNode &object,
 			gui::GuiPanelContainer &container);
-		NonOwningPtr<gui::controls::GuiScrollBar> create_scroll_bar(const script_tree::ObjectNode &object,
+		NonOwningPtr<gui::controls::GuiScrollBar> create_gui_scroll_bar(const script_tree::ObjectNode &object,
 			gui::GuiPanelContainer &container);
 		NonOwningPtr<gui::controls::GuiSlider> create_gui_slider(const script_tree::ObjectNode &object,
 			gui::GuiPanelContainer &container);

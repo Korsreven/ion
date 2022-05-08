@@ -29,7 +29,7 @@ using namespace gui;
 namespace gui_script_interface::detail
 {
 
-const gui::skins::GuiSkin* get_skin(GuiController &gui_controller, std::string_view name) noexcept
+const skins::GuiSkin* get_skin(GuiController &gui_controller, std::string_view name) noexcept
 {
 	auto active_theme = gui_controller.ActiveTheme();
 
@@ -86,6 +86,18 @@ const skins::GuiSkin* get_skin(GuiPanelContainer &container, std::string_view na
 	Validator classes
 */
 
+ClassDefinition get_gui_class()
+{
+	return ClassDefinition::Create("gui", "component")
+		.AddClass(get_gui_frame_class())
+		.AddClass(get_gui_mouse_cursor_class())
+		.AddClass(get_gui_tooltip_class())
+
+		.AddProperty("active-mouse-cursor", ParameterType::String)
+		.AddProperty("active-theme", ParameterType::String)
+		.AddProperty("active-tooltip", ParameterType::String);
+}
+
 ClassDefinition get_gui_component_class()
 {
 	return ClassDefinition::Create("component")
@@ -99,9 +111,6 @@ ClassDefinition get_gui_component_class()
 ClassDefinition get_gui_frame_class()
 {
 	return ClassDefinition::Create("frame", "panel-container")
-		.AddClass(get_gui_mouse_cursor_class())
-		.AddClass(get_gui_tooltip_class())
-
 		.AddProperty("activated", ParameterType::Boolean)
 		.AddProperty("active-theme", ParameterType::String)
 		.AddProperty("focused", ParameterType::Boolean)
@@ -227,7 +236,7 @@ ScriptValidator get_gui_validator()
 		.AddAbstractClass(get_gui_panel_container_class())
 		.AddAbstractClass(get_gui_scrollable_class())
 
-		.AddRequiredClass(get_gui_frame_class());
+		.AddRequiredClass(get_gui_class());
 }
 
 
@@ -235,8 +244,32 @@ ScriptValidator get_gui_validator()
 	Tree parsing
 */
 
-void set_component_properties(const script_tree::ObjectNode &object,
-	gui::GuiComponent &component)
+void set_gui_properties(const script_tree::ObjectNode &object, GuiController &gui_controller)
+{
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "frame")
+			create_gui_frame(obj, gui_controller);
+		else if (obj.Name() == "mouse-cursor")
+			create_gui_mouse_cursor(obj, gui_controller);
+		else if (obj.Name() == "tooltip")
+			create_gui_tooltip(obj, gui_controller);
+	}
+
+	set_component_properties(object, gui_controller);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "active-mouse-cursor")
+			gui_controller.ActiveMouseCursor(property[0].Get<ScriptType::String>()->Get());
+		else if (property.Name() == "active-theme")
+			gui_controller.ActiveTheme(property[0].Get<ScriptType::String>()->Get());
+		else if (property.Name() == "active-tooltip")
+			gui_controller.ActiveTooltip(property[0].Get<ScriptType::String>()->Get());
+	}
+}
+
+void set_component_properties(const script_tree::ObjectNode &object, GuiComponent &component)
 {
 	for (auto &property : object.Properties())
 	{
@@ -251,9 +284,10 @@ void set_component_properties(const script_tree::ObjectNode &object,
 	}
 }
 
-void set_control_properties(const script_tree::ObjectNode &object,
-	gui::controls::GuiControl &control)
+void set_control_properties(const script_tree::ObjectNode &object, controls::GuiControl &control)
 {
+	set_component_properties(object, control);
+
 	auto hit_boxes = controls::gui_control::BoundingBoxes{};
 	auto has_hit_boxes = !std::empty(control.HitBoxes());
 
@@ -348,6 +382,35 @@ void set_control_properties(const script_tree::ObjectNode &object,
 		control.HitBoxes(std::move(hit_boxes));
 }
 
+void set_panel_container_properties(const script_tree::ObjectNode &object, GuiPanelContainer &container)
+{
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "button")
+			create_gui_button(obj, container);
+		else if (obj.Name() == "check-box")
+			create_gui_check_box(obj, container);
+		else if (obj.Name() == "group-box")
+			create_gui_group_box(obj, container);
+		else if (obj.Name() == "label")
+			create_gui_label(obj, container);
+		else if (obj.Name() == "list-box")
+			create_gui_list_box(obj, container);
+		else if (obj.Name() == "progress-bar")
+			create_gui_progress_bar(obj, container);
+		else if (obj.Name() == "radio-button")
+			create_gui_radio_button(obj, container);
+		else if (obj.Name() == "scroll-bar")
+			create_gui_scroll_bar(obj, container);
+		else if (obj.Name() == "slider")
+			create_gui_slider(obj, container);
+		else if (obj.Name() == "text-box")
+			create_gui_text_box(obj, container);
+	}
+
+	set_component_properties(object, container);
+}
+
 
 NonOwningPtr<GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
 	GuiController &gui_controller)
@@ -360,7 +423,24 @@ NonOwningPtr<GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
 
 	if (frame)
 	{
-		//Todo
+		set_panel_container_properties(object, *frame);
+
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "activated")
+				frame->Activated(property[0].Get<ScriptType::Boolean>()->Get());
+			else if (property.Name() == "active-theme")
+				frame->ActiveTheme(property[0].Get<ScriptType::String>()->Get());
+			else if (property.Name() == "focused")
+				frame->Focused(property[0].Get<ScriptType::Boolean>()->Get());
+			else if (property.Name() == "show")
+			{
+				if (property[0].Get<ScriptType::Enumerable>()->Get() == "modeless")
+					frame->Show(gui_frame::FrameMode::Modeless);
+				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "modal")
+					frame->Show(gui_frame::FrameMode::Modal);
+			}
+		}
 	}
 
 	return frame;
@@ -377,7 +457,13 @@ NonOwningPtr<GuiPanel> create_gui_panel(const script_tree::ObjectNode &object,
 
 	if (panel)
 	{
-		//Todo
+		set_panel_container_properties(object, *panel);
+
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "tab-order")
+				panel->TabOrder(property[0].Get<ScriptType::Integer>()->As<int>());
+		}
 	}
 
 	return panel;
@@ -433,7 +519,7 @@ NonOwningPtr<controls::GuiButton> create_gui_button(const script_tree::ObjectNod
 
 	if (button)
 	{
-		//set_control_properties(object, *button);
+		set_control_properties(object, *button);
 	}
 
 	return button;
@@ -488,7 +574,7 @@ NonOwningPtr<controls::GuiCheckBox> create_gui_check_box(const script_tree::Obje
 
 	if (check_box)
 	{
-		//set_control_properties(object, *check_box);
+		set_control_properties(object, *check_box);
 	}
 
 	return check_box;
@@ -537,13 +623,7 @@ NonOwningPtr<controls::GuiGroupBox> create_gui_group_box(const script_tree::Obje
 
 	if (group_box)
 	{
-		//set_control_properties(object, *group_box);
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "tooltip")
-				group_box->Tooltip(property[0].Get<ScriptType::String>()->Get());
-		}
+		set_control_properties(object, *group_box);
 	}
 
 	return group_box;
@@ -592,13 +672,7 @@ NonOwningPtr<controls::GuiLabel> create_gui_label(const script_tree::ObjectNode 
 
 	if (label)
 	{
-		//set_control_properties(object, *label);
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "tooltip")
-				label->Tooltip(property[0].Get<ScriptType::String>()->Get());
-		}
+		set_control_properties(object, *label);
 	}
 
 	return label;
@@ -647,13 +721,7 @@ NonOwningPtr<controls::GuiListBox> create_gui_list_box(const script_tree::Object
 
 	if (list_box)
 	{
-		//set_control_properties(object, *list_box);
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "tooltip")
-				list_box->Tooltip(property[0].Get<ScriptType::String>()->Get());
-		}
+		set_control_properties(object, *list_box);
 	}
 
 	return list_box;
@@ -693,26 +761,7 @@ NonOwningPtr<controls::GuiMouseCursor> create_gui_mouse_cursor(const script_tree
 
 	if (mouse_cursor)
 	{
-		//set_control_properties(object, *mouse_cursor);
-
-		auto hit_boxes = controls::gui_control::BoundingBoxes{};
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "caption")
-				mouse_cursor->Caption(property[0].Get<ScriptType::String>()->Get());
-			else if (property.Name() == "hit-box")
-				hit_boxes.push_back({
-					property[0].Get<ScriptType::Vector2>()->Get(),
-					property[1].Get<ScriptType::Vector2>()->Get()});
-			else if (property.Name() == "size")
-				mouse_cursor->Size(property[0].Get<ScriptType::Vector2>()->Get());
-			else if (property.Name() == "tooltip")
-				mouse_cursor->Tooltip(property[0].Get<ScriptType::String>()->Get());
-		}
-
-		if (!std::empty(hit_boxes))
-			mouse_cursor->HitBoxes(std::move(hit_boxes));
+		set_control_properties(object, *mouse_cursor);
 	}
 
 	return mouse_cursor;
@@ -761,22 +810,7 @@ NonOwningPtr<controls::GuiProgressBar> create_gui_progress_bar(const script_tree
 
 	if (progress_bar)
 	{
-		//set_control_properties(object, *progress_bar);
-
-		auto hit_boxes = controls::gui_control::BoundingBoxes{};
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "hit-box")
-				hit_boxes.push_back({
-					property[0].Get<ScriptType::Vector2>()->Get(),
-					property[1].Get<ScriptType::Vector2>()->Get()});
-			else if (property.Name() == "tooltip")
-				progress_bar->Tooltip(property[0].Get<ScriptType::String>()->Get());
-		}
-
-		if (!std::empty(hit_boxes))
-			progress_bar->HitBoxes(std::move(hit_boxes));
+		set_control_properties(object, *progress_bar);
 	}
 
 	return progress_bar;
@@ -831,13 +865,13 @@ NonOwningPtr<controls::GuiRadioButton> create_gui_radio_button(const script_tree
 
 	if (radio_button)
 	{
-		//set_control_properties(object, *radio_button);
+		set_control_properties(object, *radio_button);
 	}
 
 	return radio_button;
 }
 
-NonOwningPtr<controls::GuiScrollBar> create_scroll_bar(const script_tree::ObjectNode &object,
+NonOwningPtr<controls::GuiScrollBar> create_gui_scroll_bar(const script_tree::ObjectNode &object,
 	GuiPanelContainer &container)
 {
 	auto name = object
@@ -889,13 +923,7 @@ NonOwningPtr<controls::GuiScrollBar> create_scroll_bar(const script_tree::Object
 
 	if (scroll_bar)
 	{
-		//set_control_properties(object, *scroll_bar);
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "tooltip")
-				scroll_bar->Tooltip(property[0].Get<ScriptType::String>()->Get());
-		}
+		set_control_properties(object, *scroll_bar);
 	}
 
 	return scroll_bar;
@@ -959,7 +987,7 @@ NonOwningPtr<controls::GuiSlider> create_gui_slider(const script_tree::ObjectNod
 
 	if (slider)
 	{
-		//set_control_properties(object, *slider);
+		set_control_properties(object, *slider);
 	}
 
 	return slider;
@@ -1008,13 +1036,7 @@ NonOwningPtr<controls::GuiTextBox> create_gui_text_box(const script_tree::Object
 
 	if (text_box)
 	{
-		//set_control_properties(object, *text_box);
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "tooltip")
-				text_box->Tooltip(property[0].Get<ScriptType::String>()->Get());
-		}
+		set_control_properties(object, *text_box);
 	}
 
 	return text_box;
@@ -1054,26 +1076,7 @@ NonOwningPtr<controls::GuiTooltip> create_gui_tooltip(const script_tree::ObjectN
 
 	if (tooltip)
 	{
-		//set_control_properties(object, *tooltip);
-
-		auto hit_boxes = controls::gui_control::BoundingBoxes{};
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "caption")
-				tooltip->Caption(property[0].Get<ScriptType::String>()->Get());
-			else if (property.Name() == "hit-box")
-				hit_boxes.push_back({
-					property[0].Get<ScriptType::Vector2>()->Get(),
-					property[1].Get<ScriptType::Vector2>()->Get()});
-			else if (property.Name() == "size")
-				tooltip->Size(property[0].Get<ScriptType::Vector2>()->Get());
-			else if (property.Name() == "tooltip")
-				tooltip->Tooltip(property[0].Get<ScriptType::String>()->Get());
-		}
-
-		if (!std::empty(hit_boxes))
-			tooltip->HitBoxes(std::move(hit_boxes));
+		set_control_properties(object, *tooltip);
 	}
 
 	return tooltip;
@@ -1085,8 +1088,8 @@ void create_gui(const ScriptTree &tree,
 {
 	for (auto &object : tree.Objects())
 	{
-		if (object.Name() == "frame")
-			create_gui_frame(object, gui_controller);
+		if (object.Name() == "gui")
+			set_gui_properties(object, gui_controller);
 	}
 }
 
