@@ -93,8 +93,13 @@ namespace ion::script::interfaces
 
 		void set_gui_properties(const script_tree::ObjectNode &object, gui::GuiController &gui_controller);
 		void set_component_properties(const script_tree::ObjectNode &object, gui::GuiComponent &component);
-		void set_control_properties(const script_tree::ObjectNode &object, gui::controls::GuiControl &control);
 		void set_panel_container_properties(const script_tree::ObjectNode &object, gui::GuiPanelContainer &container);
+
+		void set_control_properties(const script_tree::ObjectNode &object, gui::controls::GuiControl &control);
+		void set_label_properties(const script_tree::ObjectNode &object, gui::controls::GuiLabel &label);
+		void set_scrollable_properties(const script_tree::ObjectNode &object, gui::controls::GuiScrollable &scrollable);
+		void set_slider_properties(const script_tree::ObjectNode &object, gui::controls::GuiSlider &slider);
+
 		
 		NonOwningPtr<gui::GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
 			gui::GuiController &gui_controller);

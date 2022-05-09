@@ -203,7 +203,10 @@ ClassDefinition get_gui_radio_button_class()
 
 ClassDefinition get_gui_scrollable_class()
 {
-	return ClassDefinition::Create("scrollable", "control");
+	return ClassDefinition::Create("scrollable", "control")
+		.AddProperty("scroll", ParameterType::Integer)
+		.AddProperty("scroll-bar", ParameterType::String)
+		.AddProperty("scroll-rate", ParameterType::Integer);
 }
 
 ClassDefinition get_gui_scroll_bar_class()
@@ -214,6 +217,11 @@ ClassDefinition get_gui_scroll_bar_class()
 ClassDefinition get_gui_slider_class()
 {
 	return ClassDefinition::Create("slider", "control")
+		.AddProperty("flipped", ParameterType::Boolean)
+		.AddProperty("percent", ParameterType::FloatingPoint)
+		.AddProperty("position", ParameterType::Integer)
+		.AddProperty("range", {ParameterType::Integer, ParameterType::Integer})
+		.AddProperty("step-by-amount", ParameterType::Integer)
 		.AddProperty("type", {"horizontal"s, "vertical"s});
 }
 
@@ -283,6 +291,36 @@ void set_component_properties(const script_tree::ObjectNode &object, GuiComponen
 			component.ZOrder(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 	}
 }
+
+void set_panel_container_properties(const script_tree::ObjectNode &object, GuiPanelContainer &container)
+{
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "button")
+			create_gui_button(obj, container);
+		else if (obj.Name() == "check-box")
+			create_gui_check_box(obj, container);
+		else if (obj.Name() == "group-box")
+			create_gui_group_box(obj, container);
+		else if (obj.Name() == "label")
+			create_gui_label(obj, container);
+		else if (obj.Name() == "list-box")
+			create_gui_list_box(obj, container);
+		else if (obj.Name() == "progress-bar")
+			create_gui_progress_bar(obj, container);
+		else if (obj.Name() == "radio-button")
+			create_gui_radio_button(obj, container);
+		else if (obj.Name() == "scroll-bar")
+			create_gui_scroll_bar(obj, container);
+		else if (obj.Name() == "slider")
+			create_gui_slider(obj, container);
+		else if (obj.Name() == "text-box")
+			create_gui_text_box(obj, container);
+	}
+
+	set_component_properties(object, container);
+}
+
 
 void set_control_properties(const script_tree::ObjectNode &object, controls::GuiControl &control)
 {
@@ -382,33 +420,55 @@ void set_control_properties(const script_tree::ObjectNode &object, controls::Gui
 		control.HitBoxes(std::move(hit_boxes));
 }
 
-void set_panel_container_properties(const script_tree::ObjectNode &object, GuiPanelContainer &container)
+void set_label_properties(const script_tree::ObjectNode &object, controls::GuiLabel &label)
 {
-	for (auto &obj : object.Objects())
-	{
-		if (obj.Name() == "button")
-			create_gui_button(obj, container);
-		else if (obj.Name() == "check-box")
-			create_gui_check_box(obj, container);
-		else if (obj.Name() == "group-box")
-			create_gui_group_box(obj, container);
-		else if (obj.Name() == "label")
-			create_gui_label(obj, container);
-		else if (obj.Name() == "list-box")
-			create_gui_list_box(obj, container);
-		else if (obj.Name() == "progress-bar")
-			create_gui_progress_bar(obj, container);
-		else if (obj.Name() == "radio-button")
-			create_gui_radio_button(obj, container);
-		else if (obj.Name() == "scroll-bar")
-			create_gui_scroll_bar(obj, container);
-		else if (obj.Name() == "slider")
-			create_gui_slider(obj, container);
-		else if (obj.Name() == "text-box")
-			create_gui_text_box(obj, container);
-	}
+	set_control_properties(object, label);
+	//No label specific properties yet
+}
 
-	set_component_properties(object, container);
+void set_scrollable_properties(const script_tree::ObjectNode &object, controls::GuiScrollable &scrollable)
+{
+	set_control_properties(object, scrollable);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "scroll")
+			scrollable.Scroll(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "scroll-bar")
+		{
+			if (auto owner = scrollable.Owner(); owner)
+				scrollable.AttachedScrollBar(owner->GetControlAs<controls::GuiScrollBar>(property[0].Get<ScriptType::String>()->Get()));
+		}
+		else if (property.Name() == "scroll-rate")
+			scrollable.ScrollRate(property[0].Get<ScriptType::Integer>()->As<int>());
+	}
+}
+
+void set_slider_properties(const script_tree::ObjectNode &object, controls::GuiSlider &slider)
+{
+	set_control_properties(object, slider);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "flipped")
+			slider.Flipped(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "percent")
+			slider.Percent(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "position")
+			slider.Position(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "range")
+			slider.Range(property[0].Get<ScriptType::Integer>()->As<int>(),
+						 property[1].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "step-by-amount")
+			slider.StepByAmount(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "type")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "horizontal")
+				slider.Type(controls::gui_slider::SliderType::Horizontal);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "vertical")
+				slider.Type(controls::gui_slider::SliderType::Vertical);
+		}
+	}
 }
 
 
@@ -672,7 +732,7 @@ NonOwningPtr<controls::GuiLabel> create_gui_label(const script_tree::ObjectNode 
 
 	if (label)
 	{
-		set_control_properties(object, *label);
+		set_label_properties(object, *label);
 	}
 
 	return label;
@@ -721,7 +781,7 @@ NonOwningPtr<controls::GuiListBox> create_gui_list_box(const script_tree::Object
 
 	if (list_box)
 	{
-		set_control_properties(object, *list_box);
+		set_scrollable_properties(object, *list_box);
 	}
 
 	return list_box;
@@ -923,7 +983,7 @@ NonOwningPtr<controls::GuiScrollBar> create_gui_scroll_bar(const script_tree::Ob
 
 	if (scroll_bar)
 	{
-		set_control_properties(object, *scroll_bar);
+		set_slider_properties(object, *scroll_bar);
 	}
 
 	return scroll_bar;
@@ -987,7 +1047,7 @@ NonOwningPtr<controls::GuiSlider> create_gui_slider(const script_tree::ObjectNod
 
 	if (slider)
 	{
-		set_control_properties(object, *slider);
+		set_slider_properties(object, *slider);
 	}
 
 	return slider;
@@ -1036,7 +1096,7 @@ NonOwningPtr<controls::GuiTextBox> create_gui_text_box(const script_tree::Object
 
 	if (text_box)
 	{
-		set_control_properties(object, *text_box);
+		set_scrollable_properties(object, *text_box);
 	}
 
 	return text_box;
@@ -1076,7 +1136,7 @@ NonOwningPtr<controls::GuiTooltip> create_gui_tooltip(const script_tree::ObjectN
 
 	if (tooltip)
 	{
-		set_control_properties(object, *tooltip);
+		set_label_properties(object, *tooltip);
 	}
 
 	return tooltip;
