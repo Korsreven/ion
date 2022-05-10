@@ -93,12 +93,24 @@ namespace ion::script::interfaces
 
 		void set_gui_properties(const script_tree::ObjectNode &object, gui::GuiController &gui_controller);
 		void set_component_properties(const script_tree::ObjectNode &object, gui::GuiComponent &component);
+		void set_frame_properties(const script_tree::ObjectNode &object, gui::GuiFrame &frame);
+		void set_panel_properties(const script_tree::ObjectNode &object, gui::GuiPanel &panel);
 		void set_panel_container_properties(const script_tree::ObjectNode &object, gui::GuiPanelContainer &container);
 
+		void set_button_properties(const script_tree::ObjectNode &object, gui::controls::GuiButton &button);
+		void set_check_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiCheckBox &check_box);
 		void set_control_properties(const script_tree::ObjectNode &object, gui::controls::GuiControl &control);
+		void set_group_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiGroupBox &group_box);
 		void set_label_properties(const script_tree::ObjectNode &object, gui::controls::GuiLabel &label);
+		void set_list_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiListBox &list_box);
+		void set_mouse_cursor_properties(const script_tree::ObjectNode &object, gui::controls::GuiMouseCursor &mouse_cursor);
+		void set_progress_bar_properties(const script_tree::ObjectNode &object, gui::controls::GuiProgressBar &progress_bar);
+		void set_radio_button_properties(const script_tree::ObjectNode &object, gui::controls::GuiRadioButton &radio_button);
 		void set_scrollable_properties(const script_tree::ObjectNode &object, gui::controls::GuiScrollable &scrollable);
+		void set_scroll_bar_properties(const script_tree::ObjectNode &object, gui::controls::GuiScrollBar &scroll_bar);
 		void set_slider_properties(const script_tree::ObjectNode &object, gui::controls::GuiSlider &slider);
+		void set_text_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiTextBox &text_box);
+		void set_tooltip_properties(const script_tree::ObjectNode &object, gui::controls::GuiTooltip &tooltip);
 
 		
 		NonOwningPtr<gui::GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,

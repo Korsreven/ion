@@ -292,6 +292,39 @@ void set_component_properties(const script_tree::ObjectNode &object, GuiComponen
 	}
 }
 
+void set_frame_properties(const script_tree::ObjectNode &object, GuiFrame &frame)
+{
+	set_panel_container_properties(object, frame);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "activated")
+			frame.Activated(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "active-theme")
+			frame.ActiveTheme(property[0].Get<ScriptType::String>()->Get());
+		else if (property.Name() == "focused")
+			frame.Focused(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "show")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "modeless")
+				frame.Show(gui_frame::FrameMode::Modeless);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "modal")
+				frame.Show(gui_frame::FrameMode::Modal);
+		}
+	}
+}
+
+void set_panel_properties(const script_tree::ObjectNode &object, GuiPanel &panel)
+{
+	set_panel_container_properties(object, panel);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "tab-order")
+			panel.TabOrder(property[0].Get<ScriptType::Integer>()->As<int>());
+	}
+}
+
 void set_panel_container_properties(const script_tree::ObjectNode &object, GuiPanelContainer &container)
 {
 	for (auto &obj : object.Objects())
@@ -321,6 +354,16 @@ void set_panel_container_properties(const script_tree::ObjectNode &object, GuiPa
 	set_component_properties(object, container);
 }
 
+
+void set_button_properties(const script_tree::ObjectNode &object, controls::GuiButton &button)
+{
+	set_control_properties(object, button);
+}
+
+void set_check_box_properties(const script_tree::ObjectNode &object, controls::GuiCheckBox &check_box)
+{
+	set_control_properties(object, check_box);
+}
 
 void set_control_properties(const script_tree::ObjectNode &object, controls::GuiControl &control)
 {
@@ -420,10 +463,35 @@ void set_control_properties(const script_tree::ObjectNode &object, controls::Gui
 		control.HitBoxes(std::move(hit_boxes));
 }
 
+void set_group_box_properties(const script_tree::ObjectNode &object, controls::GuiGroupBox &group_box)
+{
+	set_control_properties(object, group_box);
+}
+
 void set_label_properties(const script_tree::ObjectNode &object, controls::GuiLabel &label)
 {
 	set_control_properties(object, label);
 	//No label specific properties yet
+}
+
+void set_list_box_properties(const script_tree::ObjectNode &object, controls::GuiListBox &list_box)
+{
+	set_scrollable_properties(object, list_box);
+}
+
+void set_mouse_cursor_properties(const script_tree::ObjectNode &object, controls::GuiMouseCursor &mouse_cursor)
+{
+	set_control_properties(object, mouse_cursor);
+}
+
+void set_progress_bar_properties(const script_tree::ObjectNode &object, controls::GuiProgressBar &progress_bar)
+{
+	set_control_properties(object, progress_bar);
+}
+
+void set_radio_button_properties(const script_tree::ObjectNode &object, controls::GuiRadioButton &radio_button)
+{
+	set_check_box_properties(object, radio_button);
 }
 
 void set_scrollable_properties(const script_tree::ObjectNode &object, controls::GuiScrollable &scrollable)
@@ -442,6 +510,11 @@ void set_scrollable_properties(const script_tree::ObjectNode &object, controls::
 		else if (property.Name() == "scroll-rate")
 			scrollable.ScrollRate(property[0].Get<ScriptType::Integer>()->As<int>());
 	}
+}
+
+void set_scroll_bar_properties(const script_tree::ObjectNode &object, controls::GuiScrollBar &scroll_bar)
+{
+	set_slider_properties(object, scroll_bar);
 }
 
 void set_slider_properties(const script_tree::ObjectNode &object, controls::GuiSlider &slider)
@@ -471,6 +544,16 @@ void set_slider_properties(const script_tree::ObjectNode &object, controls::GuiS
 	}
 }
 
+void set_text_box_properties(const script_tree::ObjectNode &object, controls::GuiTextBox &text_box)
+{
+	set_scrollable_properties(object, text_box);
+}
+
+void set_tooltip_properties(const script_tree::ObjectNode &object, controls::GuiTooltip &tooltip)
+{
+	set_control_properties(object, tooltip);
+}
+
 
 NonOwningPtr<GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
 	GuiController &gui_controller)
@@ -482,26 +565,7 @@ NonOwningPtr<GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
 	auto frame = gui_controller.CreateFrame(std::move(name));
 
 	if (frame)
-	{
-		set_panel_container_properties(object, *frame);
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "activated")
-				frame->Activated(property[0].Get<ScriptType::Boolean>()->Get());
-			else if (property.Name() == "active-theme")
-				frame->ActiveTheme(property[0].Get<ScriptType::String>()->Get());
-			else if (property.Name() == "focused")
-				frame->Focused(property[0].Get<ScriptType::Boolean>()->Get());
-			else if (property.Name() == "show")
-			{
-				if (property[0].Get<ScriptType::Enumerable>()->Get() == "modeless")
-					frame->Show(gui_frame::FrameMode::Modeless);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "modal")
-					frame->Show(gui_frame::FrameMode::Modal);
-			}
-		}
-	}
+		set_frame_properties(object, *frame);
 
 	return frame;
 }
@@ -516,15 +580,7 @@ NonOwningPtr<GuiPanel> create_gui_panel(const script_tree::ObjectNode &object,
 	auto panel = frame.CreatePanel(std::move(name));
 
 	if (panel)
-	{
-		set_panel_container_properties(object, *panel);
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "tab-order")
-				panel->TabOrder(property[0].Get<ScriptType::Integer>()->As<int>());
-		}
-	}
+		set_panel_properties(object, *panel);
 
 	return panel;
 }
@@ -578,9 +634,7 @@ NonOwningPtr<controls::GuiButton> create_gui_button(const script_tree::ObjectNod
 		}();
 
 	if (button)
-	{
-		set_control_properties(object, *button);
-	}
+		set_button_properties(object, *button);
 
 	return button;
 }
@@ -633,9 +687,7 @@ NonOwningPtr<controls::GuiCheckBox> create_gui_check_box(const script_tree::Obje
 		}();
 
 	if (check_box)
-	{
-		set_control_properties(object, *check_box);
-	}
+		set_check_box_properties(object, *check_box);
 
 	return check_box;
 }
@@ -682,9 +734,7 @@ NonOwningPtr<controls::GuiGroupBox> create_gui_group_box(const script_tree::Obje
 		}();
 
 	if (group_box)
-	{
-		set_control_properties(object, *group_box);
-	}
+		set_group_box_properties(object, *group_box);
 
 	return group_box;
 }
@@ -731,9 +781,7 @@ NonOwningPtr<controls::GuiLabel> create_gui_label(const script_tree::ObjectNode 
 		}();
 
 	if (label)
-	{
 		set_label_properties(object, *label);
-	}
 
 	return label;
 }
@@ -780,9 +828,7 @@ NonOwningPtr<controls::GuiListBox> create_gui_list_box(const script_tree::Object
 		}();
 
 	if (list_box)
-	{
-		set_scrollable_properties(object, *list_box);
-	}
+		set_list_box_properties(object, *list_box);
 
 	return list_box;
 }
@@ -820,9 +866,7 @@ NonOwningPtr<controls::GuiMouseCursor> create_gui_mouse_cursor(const script_tree
 		}();
 
 	if (mouse_cursor)
-	{
-		set_control_properties(object, *mouse_cursor);
-	}
+		set_mouse_cursor_properties(object, *mouse_cursor);
 
 	return mouse_cursor;
 }
@@ -869,9 +913,7 @@ NonOwningPtr<controls::GuiProgressBar> create_gui_progress_bar(const script_tree
 		}();
 
 	if (progress_bar)
-	{
-		set_control_properties(object, *progress_bar);
-	}
+		set_progress_bar_properties(object, *progress_bar);
 
 	return progress_bar;
 }
@@ -924,9 +966,7 @@ NonOwningPtr<controls::GuiRadioButton> create_gui_radio_button(const script_tree
 		}();
 
 	if (radio_button)
-	{
-		set_control_properties(object, *radio_button);
-	}
+		set_radio_button_properties(object, *radio_button);
 
 	return radio_button;
 }
@@ -982,9 +1022,7 @@ NonOwningPtr<controls::GuiScrollBar> create_gui_scroll_bar(const script_tree::Ob
 		}();
 
 	if (scroll_bar)
-	{
-		set_slider_properties(object, *scroll_bar);
-	}
+		set_scroll_bar_properties(object, *scroll_bar);
 
 	return scroll_bar;
 }
@@ -1046,9 +1084,7 @@ NonOwningPtr<controls::GuiSlider> create_gui_slider(const script_tree::ObjectNod
 		}();
 
 	if (slider)
-	{
 		set_slider_properties(object, *slider);
-	}
 
 	return slider;
 }
@@ -1095,9 +1131,7 @@ NonOwningPtr<controls::GuiTextBox> create_gui_text_box(const script_tree::Object
 		}();
 
 	if (text_box)
-	{
-		set_scrollable_properties(object, *text_box);
-	}
+		set_text_box_properties(object, *text_box);
 
 	return text_box;
 }
@@ -1135,9 +1169,7 @@ NonOwningPtr<controls::GuiTooltip> create_gui_tooltip(const script_tree::ObjectN
 		}();
 
 	if (tooltip)
-	{
-		set_label_properties(object, *tooltip);
-	}
+		set_tooltip_properties(object, *tooltip);
 
 	return tooltip;
 }
