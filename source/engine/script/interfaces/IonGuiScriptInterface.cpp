@@ -144,12 +144,14 @@ ClassDefinition get_gui_panel_container_class()
 
 ClassDefinition get_gui_button_class()
 {
-	return ClassDefinition::Create("button", "control");
+	return ClassDefinition::Create("button", "control")
+		.AddProperty("action", {action_types, ParameterType::String});
 }
 
 ClassDefinition get_gui_check_box_class()
 {
-	return ClassDefinition::Create("check-box", "control");
+	return ClassDefinition::Create("check-box", "control")
+		.AddProperty("checked", ParameterType::Boolean);
 }
 
 ClassDefinition get_gui_control_class()
@@ -198,7 +200,8 @@ ClassDefinition get_gui_progress_bar_class()
 
 ClassDefinition get_gui_radio_button_class()
 {
-	return ClassDefinition::Create("radio-button", "check-box");
+	return ClassDefinition::Create("radio-button", "check-box")
+		.AddProperty("tag", ParameterType::Integer);
 }
 
 ClassDefinition get_gui_scrollable_class()
@@ -358,11 +361,69 @@ void set_panel_container_properties(const script_tree::ObjectNode &object, GuiPa
 void set_button_properties(const script_tree::ObjectNode &object, controls::GuiButton &button)
 {
 	set_control_properties(object, button);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "action")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "show-gui")
+				button.AddAction({controls::gui_button::ButtonActionType::ShowGui, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "hide-gui")
+				button.AddAction({controls::gui_button::ButtonActionType::HideGui, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "enable-gui")
+				button.AddAction({controls::gui_button::ButtonActionType::EnableGui, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "disable-gui")
+				button.AddAction({controls::gui_button::ButtonActionType::DisableGui, property[1].Get<ScriptType::String>()->Get()});
+
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "show-frame")
+				button.AddAction({controls::gui_button::ButtonActionType::ShowFrame, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "show-frame-modal")
+				button.AddAction({controls::gui_button::ButtonActionType::ShowFrameModal, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "hide-frame")
+				button.AddAction({controls::gui_button::ButtonActionType::HideFrame, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "enable-frame")
+				button.AddAction({controls::gui_button::ButtonActionType::EnableFrame, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "disable-frame")
+				button.AddAction({controls::gui_button::ButtonActionType::DisableFrame, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "focus-frame")
+				button.AddAction({controls::gui_button::ButtonActionType::FocusFrame, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "defocus-frame")
+				button.AddAction({controls::gui_button::ButtonActionType::DefocusFrame, property[1].Get<ScriptType::String>()->Get()});
+
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "show-panel")
+				button.AddAction({controls::gui_button::ButtonActionType::ShowPanel, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "hide-panel")
+				button.AddAction({controls::gui_button::ButtonActionType::HidePanel, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "enable-panel")
+				button.AddAction({controls::gui_button::ButtonActionType::EnablePanel, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "disable-panel")
+				button.AddAction({controls::gui_button::ButtonActionType::DisablePanel, property[1].Get<ScriptType::String>()->Get()});
+
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "show-control")
+				button.AddAction({controls::gui_button::ButtonActionType::ShowControl, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "hide-control")
+				button.AddAction({controls::gui_button::ButtonActionType::HideControl, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "enable-control")
+				button.AddAction({controls::gui_button::ButtonActionType::EnableControl, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "disable-control")
+				button.AddAction({controls::gui_button::ButtonActionType::DisableControl, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "focus-control")
+				button.AddAction({controls::gui_button::ButtonActionType::FocusControl, property[1].Get<ScriptType::String>()->Get()});
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "defocus-control")
+				button.AddAction({controls::gui_button::ButtonActionType::DefocusControl, property[1].Get<ScriptType::String>()->Get()});
+		}
+	}
 }
 
 void set_check_box_properties(const script_tree::ObjectNode &object, controls::GuiCheckBox &check_box)
 {
 	set_control_properties(object, check_box);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "checked")
+			check_box.Checked(property[0].Get<ScriptType::Boolean>()->Get());
+	}
 }
 
 void set_control_properties(const script_tree::ObjectNode &object, controls::GuiControl &control)
@@ -492,6 +553,12 @@ void set_progress_bar_properties(const script_tree::ObjectNode &object, controls
 void set_radio_button_properties(const script_tree::ObjectNode &object, controls::GuiRadioButton &radio_button)
 {
 	set_check_box_properties(object, radio_button);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "tag")
+			radio_button.Tag(property[0].Get<ScriptType::Integer>()->As<int>());
+	}
 }
 
 void set_scrollable_properties(const script_tree::ObjectNode &object, controls::GuiScrollable &scrollable)

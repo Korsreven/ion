@@ -46,6 +46,38 @@ namespace ion::script::interfaces
 {
 	namespace gui_script_interface::detail
 	{
+		inline static const Strings action_types
+		{
+			//Controller actions
+			"show-gui",
+			"hide-gui",
+			"enable-gui",
+			"disable-gui",
+
+			//Frame actions
+			"show-frame",
+			"show-frame-modal",
+			"hide-frame",
+			"enable-frame",
+			"disable-frame",
+			"focus-frame",
+			"defocus-frame",
+
+			//Panel actions
+			"show-panel",
+			"hide-panel",
+			"enable-panel",
+			"disable-panel",
+
+			//Control actions
+			"show-control",
+			"hide-control",
+			"enable-control",
+			"disable-control",
+			"focus-control",
+			"defocus-control"
+		};
+
 		inline static const Strings caption_layouts
 		{
 									"outside-top-left",		"outside-top-center",		"outside-top-right",
