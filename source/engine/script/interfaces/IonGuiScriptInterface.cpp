@@ -145,7 +145,7 @@ ClassDefinition get_gui_panel_container_class()
 ClassDefinition get_gui_button_class()
 {
 	return ClassDefinition::Create("button", "control")
-		.AddProperty("action", {action_types, ParameterType::String});
+		.AddProperty("action", {button_action_types, ParameterType::String});
 }
 
 ClassDefinition get_gui_check_box_class()
@@ -158,7 +158,7 @@ ClassDefinition get_gui_control_class()
 {
 	return ClassDefinition::Create("control", "component")
 		.AddProperty("caption", ParameterType::String)
-		.AddProperty("caption-layout", caption_layouts)
+		.AddProperty("caption-layout", control_caption_layouts)
 		.AddProperty("caption-margin", ParameterType::Vector2)
 		.AddProperty("caption-padding", ParameterType::Vector2)
 		.AddProperty("caption-size", ParameterType::Vector2)
@@ -174,7 +174,8 @@ ClassDefinition get_gui_control_class()
 
 ClassDefinition get_gui_group_box_class()
 {
-	return ClassDefinition::Create("group-box", "control");
+	return ClassDefinition::Create("group-box", "control")
+		.AddProperty("control");
 }
 
 ClassDefinition get_gui_label_class()
@@ -189,12 +190,20 @@ ClassDefinition get_gui_list_box_class()
 
 ClassDefinition get_gui_mouse_cursor_class()
 {
-	return ClassDefinition::Create("mouse-cursor", "control");
+	return ClassDefinition::Create("mouse-cursor", "control")
+		.AddProperty("hot-spot", mouse_cursor_hot_spots);
 }
 
 ClassDefinition get_gui_progress_bar_class()
 {
 	return ClassDefinition::Create("progress-bar", "control")
+		.AddProperty("flipped", ParameterType::Boolean)
+		.AddProperty("interpolation-delay", ParameterType::FloatingPoint)
+		.AddProperty("interpolation-time", ParameterType::FloatingPoint)
+		.AddProperty("interpolation-type", {"forward"s, "backward"s, "bidirectional"s})
+		.AddProperty("percent", ParameterType::FloatingPoint)
+		.AddProperty("position", ParameterType::FloatingPoint)
+		.AddProperty("range", {ParameterType::FloatingPoint, ParameterType::FloatingPoint})
 		.AddProperty("type", {"horizontal"s, "vertical"s});
 }
 
@@ -366,50 +375,53 @@ void set_button_properties(const script_tree::ObjectNode &object, controls::GuiB
 	{
 		if (property.Name() == "action")
 		{
-			if (property[0].Get<ScriptType::Enumerable>()->Get() == "show-gui")
+			auto action = property[0]
+				.Get<ScriptType::Enumerable>()->Get();
+
+			if (action == "show-gui")
 				button.AddAction({controls::gui_button::ButtonActionType::ShowGui, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "hide-gui")
+			else if (action == "hide-gui")
 				button.AddAction({controls::gui_button::ButtonActionType::HideGui, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "enable-gui")
+			else if (action == "enable-gui")
 				button.AddAction({controls::gui_button::ButtonActionType::EnableGui, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "disable-gui")
+			else if (action == "disable-gui")
 				button.AddAction({controls::gui_button::ButtonActionType::DisableGui, property[1].Get<ScriptType::String>()->Get()});
 
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "show-frame")
+			else if (action == "show-frame")
 				button.AddAction({controls::gui_button::ButtonActionType::ShowFrame, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "show-frame-modal")
+			else if (action == "show-frame-modal")
 				button.AddAction({controls::gui_button::ButtonActionType::ShowFrameModal, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "hide-frame")
+			else if (action == "hide-frame")
 				button.AddAction({controls::gui_button::ButtonActionType::HideFrame, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "enable-frame")
+			else if (action == "enable-frame")
 				button.AddAction({controls::gui_button::ButtonActionType::EnableFrame, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "disable-frame")
+			else if (action == "disable-frame")
 				button.AddAction({controls::gui_button::ButtonActionType::DisableFrame, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "focus-frame")
+			else if (action == "focus-frame")
 				button.AddAction({controls::gui_button::ButtonActionType::FocusFrame, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "defocus-frame")
+			else if (action == "defocus-frame")
 				button.AddAction({controls::gui_button::ButtonActionType::DefocusFrame, property[1].Get<ScriptType::String>()->Get()});
 
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "show-panel")
+			else if (action == "show-panel")
 				button.AddAction({controls::gui_button::ButtonActionType::ShowPanel, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "hide-panel")
+			else if (action == "hide-panel")
 				button.AddAction({controls::gui_button::ButtonActionType::HidePanel, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "enable-panel")
+			else if (action == "enable-panel")
 				button.AddAction({controls::gui_button::ButtonActionType::EnablePanel, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "disable-panel")
+			else if (action == "disable-panel")
 				button.AddAction({controls::gui_button::ButtonActionType::DisablePanel, property[1].Get<ScriptType::String>()->Get()});
 
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "show-control")
+			else if (action == "show-control")
 				button.AddAction({controls::gui_button::ButtonActionType::ShowControl, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "hide-control")
+			else if (action == "hide-control")
 				button.AddAction({controls::gui_button::ButtonActionType::HideControl, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "enable-control")
+			else if (action == "enable-control")
 				button.AddAction({controls::gui_button::ButtonActionType::EnableControl, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "disable-control")
+			else if (action == "disable-control")
 				button.AddAction({controls::gui_button::ButtonActionType::DisableControl, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "focus-control")
+			else if (action == "focus-control")
 				button.AddAction({controls::gui_button::ButtonActionType::FocusControl, property[1].Get<ScriptType::String>()->Get()});
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "defocus-control")
+			else if (action == "defocus-control")
 				button.AddAction({controls::gui_button::ButtonActionType::DefocusControl, property[1].Get<ScriptType::String>()->Get()});
 		}
 	}
@@ -527,6 +539,12 @@ void set_control_properties(const script_tree::ObjectNode &object, controls::Gui
 void set_group_box_properties(const script_tree::ObjectNode &object, controls::GuiGroupBox &group_box)
 {
 	set_control_properties(object, group_box);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "control")
+			group_box.AddControl(property[0].Get<ScriptType::String>()->Get());
+	}
 }
 
 void set_label_properties(const script_tree::ObjectNode &object, controls::GuiLabel &label)
@@ -543,11 +561,72 @@ void set_list_box_properties(const script_tree::ObjectNode &object, controls::Gu
 void set_mouse_cursor_properties(const script_tree::ObjectNode &object, controls::GuiMouseCursor &mouse_cursor)
 {
 	set_control_properties(object, mouse_cursor);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "hot-spot")
+		{
+			auto hot_spot = property[0]
+				.Get<ScriptType::Enumerable>()->Get();
+
+			if (hot_spot == "top-left")
+				mouse_cursor.HotSpot(controls::gui_mouse_cursor::MouseCursorHotSpot::TopLeft);
+			else if (hot_spot == "top-center")
+				mouse_cursor.HotSpot(controls::gui_mouse_cursor::MouseCursorHotSpot::TopCenter);
+			else if (hot_spot == "top-right")
+				mouse_cursor.HotSpot(controls::gui_mouse_cursor::MouseCursorHotSpot::TopRight);
+			else if (hot_spot == "left")
+				mouse_cursor.HotSpot(controls::gui_mouse_cursor::MouseCursorHotSpot::Left);
+			else if (hot_spot == "center")
+				mouse_cursor.HotSpot(controls::gui_mouse_cursor::MouseCursorHotSpot::Center);
+			else if (hot_spot == "right")
+				mouse_cursor.HotSpot(controls::gui_mouse_cursor::MouseCursorHotSpot::Right);
+			else if (hot_spot == "bottom-left")
+				mouse_cursor.HotSpot(controls::gui_mouse_cursor::MouseCursorHotSpot::BottomLeft);
+			else if (hot_spot == "bottom-center")
+				mouse_cursor.HotSpot(controls::gui_mouse_cursor::MouseCursorHotSpot::BottomCenter);
+			else if (hot_spot == "bottom-right")
+				mouse_cursor.HotSpot(controls::gui_mouse_cursor::MouseCursorHotSpot::BottomRight);
+		}
+	}
 }
 
 void set_progress_bar_properties(const script_tree::ObjectNode &object, controls::GuiProgressBar &progress_bar)
 {
 	set_control_properties(object, progress_bar);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "flipped")
+			progress_bar.Flipped(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "interpolation-delay")
+			progress_bar.InterpolationDelay(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "interpolation-time")
+			progress_bar.InterpolationTime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "interpolation-type")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "forward")
+				progress_bar.InterpolationType(controls::gui_progress_bar::BarInterpolationType::Forward);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "backward")
+				progress_bar.InterpolationType(controls::gui_progress_bar::BarInterpolationType::Backward);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "bidirectional")
+				progress_bar.InterpolationType(controls::gui_progress_bar::BarInterpolationType::Bidirectional);
+		}
+		else if (property.Name() == "percent")
+			progress_bar.Percent(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "position")
+			progress_bar.Position(property[0].Get<ScriptType::Integer>()->As<real>());
+		else if (property.Name() == "range")
+			progress_bar.Range(property[0].Get<ScriptType::Integer>()->As<real>(),
+							   property[1].Get<ScriptType::Integer>()->As<real>());
+		else if (property.Name() == "type")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "horizontal")
+				progress_bar.Type(controls::gui_progress_bar::ProgressBarType::Horizontal);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "vertical")
+				progress_bar.Type(controls::gui_progress_bar::ProgressBarType::Vertical);
+		}
+	}
 }
 
 void set_radio_button_properties(const script_tree::ObjectNode &object, controls::GuiRadioButton &radio_button)

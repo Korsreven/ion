@@ -46,7 +46,7 @@ namespace ion::script::interfaces
 {
 	namespace gui_script_interface::detail
 	{
-		inline static const Strings action_types
+		inline static const Strings button_action_types
 		{
 			//Controller actions
 			"show-gui",
@@ -78,13 +78,20 @@ namespace ion::script::interfaces
 			"defocus-control"
 		};
 
-		inline static const Strings caption_layouts
+		inline static const Strings control_caption_layouts
 		{
 									"outside-top-left",		"outside-top-center",		"outside-top-right",
 			"outside-left-top",		"top-left",				"top-center",				"top-right",			"outside-right-top",
 			"outside-left-center",	"left",					"center",					"right",				"outside-right-center",
 			"outside-left-bottom",	"bottom-left",			"bottom-center",			"bottom-right",			"outside-right-bottom",
 									"outside-bottom-left",	"outside-bottom-center",	"outside-bottom-right"
+		};
+
+		inline static const Strings mouse_cursor_hot_spots
+		{
+			"top-left",		"top-center",		"top-right",
+			"left",			"center",			"right",
+			"bottom-left",	"bottom-center",	"bottom-right"
 		};
 
 		const gui::skins::GuiSkin* get_skin(gui::GuiController &gui_controller, std::string_view name) noexcept;
