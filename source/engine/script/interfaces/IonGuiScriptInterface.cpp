@@ -185,7 +185,17 @@ ClassDefinition get_gui_label_class()
 
 ClassDefinition get_gui_list_box_class()
 {
-	return ClassDefinition::Create("list-box", "scrollable");
+	return ClassDefinition::Create("list-box", "scrollable")
+		.AddProperty("icon-column-width", ParameterType::FloatingPoint)
+		.AddProperty("icon-layout", {"left"s, "right"s})
+		.AddProperty("icon-max-size", ParameterType::Vector2)
+		.AddProperty("icon-padding", ParameterType::Vector2)
+		.AddProperty("item-height-factor", ParameterType::FloatingPoint)
+		.AddProperty("item-index", ParameterType::Integer)
+		.AddProperty("item-layout", {"left"s, "center"s, "right"s})
+		.AddProperty("item-padding", ParameterType::Vector2)
+		.AddProperty("selection-padding", ParameterType::Vector2)
+		.AddProperty("show-icons", ParameterType::Boolean);
 }
 
 ClassDefinition get_gui_mouse_cursor_class()
@@ -566,6 +576,42 @@ void set_label_properties(const script_tree::ObjectNode &object, controls::GuiLa
 void set_list_box_properties(const script_tree::ObjectNode &object, controls::GuiListBox &list_box)
 {
 	set_scrollable_properties(object, list_box);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "icon-column-width")
+			list_box.IconColumnWidth(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "icon-layout")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "left")
+				list_box.IconLayout(controls::gui_list_box::ListBoxIconLayout::Left);	
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "right")
+				list_box.IconLayout(controls::gui_list_box::ListBoxIconLayout::Right);
+		}
+		else if (property.Name() == "icon-max-size")
+			list_box.IconMaxSize(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "icon-padding")
+			list_box.IconPadding(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "item-height-factor")
+			list_box.ItemHeightFactor(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "item-index")
+			list_box.ItemIndex(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "item-layout")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "left")
+				list_box.ItemLayout(controls::gui_list_box::ListBoxItemLayout::Left);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "center")
+				list_box.ItemLayout(controls::gui_list_box::ListBoxItemLayout::Center);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "right")
+				list_box.ItemLayout(controls::gui_list_box::ListBoxItemLayout::Right);
+		}
+		else if (property.Name() == "item-padding")
+			list_box.ItemPadding(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "selection-padding")
+			list_box.SelectionPadding(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "show-icons")
+			list_box.ShowIcons(property[0].Get<ScriptType::Boolean>()->Get());
+	}
 }
 
 void set_mouse_cursor_properties(const script_tree::ObjectNode &object, controls::GuiMouseCursor &mouse_cursor)
