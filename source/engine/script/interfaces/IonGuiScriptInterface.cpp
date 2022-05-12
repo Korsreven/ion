@@ -223,7 +223,9 @@ ClassDefinition get_gui_scrollable_class()
 
 ClassDefinition get_gui_scroll_bar_class()
 {
-	return ClassDefinition::Create("scroll-bar", "slider");
+	return ClassDefinition::Create("scroll-bar", "slider")
+		.AddProperty("handle-size", {ParameterType::FloatingPoint, ParameterType::FloatingPoint})
+		.AddProperty("scrollable", ParameterType::String);
 }
 
 ClassDefinition get_gui_slider_class()
@@ -244,7 +246,15 @@ ClassDefinition get_gui_text_box_class()
 
 ClassDefinition get_gui_tooltip_class()
 {
-	return ClassDefinition::Create("tooltip", "label");
+	return ClassDefinition::Create("tooltip", "label")
+		.AddProperty("auto-size", ParameterType::Boolean)
+		.AddProperty("fade-in-delay", ParameterType::FloatingPoint)
+		.AddProperty("fade-in-time", ParameterType::FloatingPoint)
+		.AddProperty("fade-out-delay", ParameterType::FloatingPoint)
+		.AddProperty("fade-out-time", ParameterType::FloatingPoint)
+		.AddProperty("follow-mouse-cursor", ParameterType::Boolean)
+		.AddProperty("hold-time", ParameterType::FloatingPoint)
+		.AddProperty("show", ParameterType::String);
 }
 
 
@@ -661,6 +671,18 @@ void set_scrollable_properties(const script_tree::ObjectNode &object, controls::
 void set_scroll_bar_properties(const script_tree::ObjectNode &object, controls::GuiScrollBar &scroll_bar)
 {
 	set_slider_properties(object, scroll_bar);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "handle-size")
+			scroll_bar.HandleSize(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+								  property[1].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "scrollable")
+		{
+			if (auto owner = scroll_bar.Owner(); owner)
+				scroll_bar.AttachedScrollable(owner->GetControlAs<controls::GuiScrollable>(property[0].Get<ScriptType::String>()->Get()));
+		}
+	}
 }
 
 void set_slider_properties(const script_tree::ObjectNode &object, controls::GuiSlider &slider)
@@ -698,6 +720,26 @@ void set_text_box_properties(const script_tree::ObjectNode &object, controls::Gu
 void set_tooltip_properties(const script_tree::ObjectNode &object, controls::GuiTooltip &tooltip)
 {
 	set_control_properties(object, tooltip);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "auto-size")
+			tooltip.AutoSize(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "fade-in-delay")
+			tooltip.FadeInDelay(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "fade-in-time")
+			tooltip.FadeInTime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "fade-out-delay")
+			tooltip.FadeOutDelay(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "fade-out-time")
+			tooltip.FadeOutTime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "follow-mouse-cursor")
+			tooltip.FollowMouseCursor(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "hold-time")
+			tooltip.HoldTime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "show")
+			tooltip.Show(property[0].Get<ScriptType::String>()->Get());
+	}
 }
 
 
