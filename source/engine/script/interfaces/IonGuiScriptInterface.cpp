@@ -251,7 +251,21 @@ ClassDefinition get_gui_slider_class()
 
 ClassDefinition get_gui_text_box_class()
 {
-	return ClassDefinition::Create("text-box", "scrollable");
+	return ClassDefinition::Create("text-box", "scrollable")
+		.AddProperty("character-set", {"ascii"s, "extended-ascii"s})
+		.AddProperty("content", ParameterType::String)
+		.AddProperty("cursor-blink-rate", ParameterType::FloatingPoint)
+		.AddProperty("cursor-hold-percent", ParameterType::FloatingPoint)
+		.AddProperty("cursor-position", ParameterType::Integer)
+		.AddProperty("key-repeat-delay", ParameterType::FloatingPoint)
+		.AddProperty("key-repeat-rate", ParameterType::FloatingPoint)
+		.AddProperty("mask", ParameterType::String)
+		.AddProperty("max-characters", ParameterType::Integer)
+		.AddProperty("placeholder-content", ParameterType::String)
+		.AddProperty("reveal-count", ParameterType::Integer)
+		.AddProperty("text-layout", {"left"s, "center"s, "right"s})
+		.AddProperty("text-mode", {"printable"s, "alpha-numeric"s, "alpha"s, "numeric"s})
+		.AddProperty("text-padding", ParameterType::Vector2);
 }
 
 ClassDefinition get_gui_tooltip_class()
@@ -761,6 +775,62 @@ void set_slider_properties(const script_tree::ObjectNode &object, controls::GuiS
 void set_text_box_properties(const script_tree::ObjectNode &object, controls::GuiTextBox &text_box)
 {
 	set_scrollable_properties(object, text_box);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "character-set")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "ascii")
+				text_box.CharacterSet(controls::gui_text_box::TextBoxCharacterSet::ASCII);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "extended-ascii")
+				text_box.CharacterSet(controls::gui_text_box::TextBoxCharacterSet::ExtendedASCII);
+		}
+		else if (property.Name() == "content")
+			text_box.Content(property[0].Get<ScriptType::String>()->Get());
+		else if (property.Name() == "cursor-blink-rate")
+			text_box.CursorBlinkRate(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "cursor-hold-percent")
+			text_box.CursorHoldPercent(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "cursor-position")
+			text_box.CursorPosition(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "key-repeat-delay")
+			text_box.KeyRepeatDelay(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "key-repeat-rate")
+			text_box.KeyRepeatRate(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "mask")
+		{
+			if (auto mask = property[0].Get<ScriptType::String>()->Get(); !std::empty(mask))
+				text_box.Mask(mask.front());
+		}
+		else if (property.Name() == "max-characters")
+			text_box.MaxCharacters(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "placeholder-content")
+			text_box.PlaceholderContent(property[0].Get<ScriptType::String>()->Get());
+		else if (property.Name() == "reveal-count")
+			text_box.RevealCount(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "text-layout")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "left")
+				text_box.TextLayout(controls::gui_text_box::TextBoxTextLayout::Left);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "center")
+				text_box.TextLayout(controls::gui_text_box::TextBoxTextLayout::Center);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "right")
+				text_box.TextLayout(controls::gui_text_box::TextBoxTextLayout::Right);
+		}
+		else if (property.Name() == "text-mode")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "printable")
+				text_box.TextMode(controls::gui_text_box::TextBoxTextMode::Printable);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "alpha-numeric")
+				text_box.TextMode(controls::gui_text_box::TextBoxTextMode::AlphaNumeric);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "alpha")
+				text_box.TextMode(controls::gui_text_box::TextBoxTextMode::Alpha);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "numeric")
+				text_box.TextMode(controls::gui_text_box::TextBoxTextMode::Numeric);
+		}
+		else if (property.Name() == "text-padding")
+			text_box.TextPadding(property[0].Get<ScriptType::Vector2>()->Get());
+	}
 }
 
 void set_tooltip_properties(const script_tree::ObjectNode &object, controls::GuiTooltip &tooltip)
