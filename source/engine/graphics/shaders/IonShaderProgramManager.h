@@ -88,13 +88,13 @@ namespace ion::graphics::shaders
 					template <typename T>
 					inline void operator()(const glsl::attribute<T> &value) const noexcept
 					{
-						if constexpr (std::is_same_v<glsl::attribute<T>::basic_type, int32>)
+						if constexpr (std::is_same_v<typename glsl::attribute<T>::basic_type, int32>)
 							set_vertex_ipointer(location_, value.Components(), value.Normalized(), value.Stride(), value.Pointer(), int32{});
-						else if constexpr (std::is_same_v<glsl::attribute<T>::basic_type, uint32>)
+						else if constexpr (std::is_same_v<typename glsl::attribute<T>::basic_type, uint32>)
 							set_vertex_ipointer(location_, value.Components(), value.Normalized(), value.Stride(), value.Pointer(), uint32{});
-						else if constexpr (std::is_same_v<glsl::attribute<T>::basic_type, float32>)
+						else if constexpr (std::is_same_v<typename glsl::attribute<T>::basic_type, float32>)
 							set_vertex_pointer(location_, value.Components(), value.Normalized(), value.Stride(), value.Pointer(), real{});
-						else if constexpr (std::is_same_v<glsl::attribute<T>::basic_type, float64>)
+						else if constexpr (std::is_same_v<typename glsl::attribute<T>::basic_type, float64>)
 							set_vertex_lpointer(location_, value.Components(), value.Normalized(), value.Stride(), value.Pointer());
 					}
 

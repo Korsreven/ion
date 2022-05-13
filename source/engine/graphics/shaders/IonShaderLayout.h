@@ -271,7 +271,7 @@ namespace ion::graphics::shaders
 								   x.second.Name() == y.second.Name();
 						}), std::end(variable_bindings));
 
-				return adaptors::FlatMap<T::value_type::first_type, T::value_type::second_type>{std::move(variable_bindings)};
+				return adaptors::FlatMap<typename T::value_type::first_type, typename T::value_type::second_type>{std::move(variable_bindings)};
 			}
 
 

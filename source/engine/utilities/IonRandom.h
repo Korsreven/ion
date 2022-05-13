@@ -68,7 +68,7 @@ namespace ion::utilities::random
 				template <typename T, decltype(T::state_size) N = T::state_size>
 				static auto SeedEngine32() noexcept
 				{
-					std::array<T::result_type, N> data;
+					std::array<typename T::result_type, N> data;
 
 					std::random_device device;
 					std::generate(std::begin(data), std::end(data),
@@ -85,7 +85,7 @@ namespace ion::utilities::random
 				template <typename T, decltype(T::state_size) N = T::state_size>
 				static auto SeedEngine64() noexcept
 				{
-					std::array<T::result_type, N> data;
+					std::array<typename T::result_type, N> data;
 
 					std::random_device device;
 					std::generate(std::begin(data), std::end(data),
