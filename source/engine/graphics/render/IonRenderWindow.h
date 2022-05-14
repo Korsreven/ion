@@ -361,8 +361,8 @@ namespace ion::graphics::render
 						break;
 
 						case render_window::WindowBorderStyle::Sizeable:
-						SizeableBorderStyle();
 						default:
+						SizeableBorderStyle();			
 						break;
 					}
 				}

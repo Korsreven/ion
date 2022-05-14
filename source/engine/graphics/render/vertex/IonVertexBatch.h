@@ -156,7 +156,7 @@ namespace ion::graphics::render::vertex
 			inline void Declaration(VertexDeclaration vertex_declaration) noexcept
 			{
 				vertex_declaration_ = std::move(vertex_declaration);
-				vertex_count_ = vertex_batch::detail::get_vertex_count(vertex_declaration, vertex_data_);
+				vertex_count_ = vertex_batch::detail::get_vertex_count(vertex_declaration_, vertex_data_);
 				rebind_vertex_attributes_ = use_vao_;
 			}
 
