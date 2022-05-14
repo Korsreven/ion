@@ -119,7 +119,16 @@ ClassDefinition get_gui_frame_class()
 
 ClassDefinition get_gui_panel_class()
 {
+	auto grid_cell = ClassDefinition::Create("grid-cell")
+		.AddRequiredProperty("column", ParameterType::Integer)
+		.AddRequiredProperty("row", ParameterType::Integer)
+		.AddProperty("alignment", {"left"s, "center"s, "right"s})
+		.AddProperty("control", ParameterType::String)
+		.AddProperty("vertical-alignment", {"top"s, "middle"s, "bottom"s});
+
 	return ClassDefinition::Create("panel", "panel-container")
+		.AddClass(std::move(grid_cell))
+
 		.AddProperty("grid-layout", {ParameterType::Vector2, ParameterType::Integer, ParameterType::Integer})
 		.AddProperty("tab-order", ParameterType::Integer);
 }
@@ -366,8 +375,56 @@ void set_panel_properties(const script_tree::ObjectNode &object, GuiPanel &panel
 
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "tab-order")
+		if (property.Name() == "grid-layout")
+			panel.GridLayout(property[0].Get<ScriptType::Vector2>()->Get(),
+				property[1].Get<ScriptType::Integer>()->As<int>(), property[2].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "tab-order")
 			panel.TabOrder(property[0].Get<ScriptType::Integer>()->As<int>());
+	}
+
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "grid-cell")
+		{
+			auto row = object
+				.Property("row")[0]
+				.Get<ScriptType::Integer>()->Get();
+			auto column = object
+				.Property("column")[0]
+				.Get<ScriptType::Integer>()->Get();
+
+			if (auto &grid = panel.Grid(); grid)
+			{
+				auto &cell = (*grid)[{row, column}];
+
+				for (auto &prop : obj.Properties())
+				{
+					if (prop.Name() == "aligment")
+					{
+						if (prop[0].Get<ScriptType::Enumerable>()->Get() == "left")
+							cell.Alignment(gui_panel::GridCellAlignment::Left);
+						else if (prop[1].Get<ScriptType::Enumerable>()->Get() == "center")
+							cell.Alignment(gui_panel::GridCellAlignment::Center);
+						else if (prop[2].Get<ScriptType::Enumerable>()->Get() == "right")
+							cell.Alignment(gui_panel::GridCellAlignment::Right);
+					}
+					else if (prop.Name() == "control")
+					{
+						if (auto control = panel.GetControl(prop[0].Get<ScriptType::String>()->Get()); control)
+							cell.AttachControl(control);
+					}
+					else if (prop.Name() == "vertical-alignment")
+					{
+						if (prop[0].Get<ScriptType::Enumerable>()->Get() == "top")
+							cell.VerticalAlignment(gui_panel::GridCellVerticalAlignment::Top);
+						else if (prop[1].Get<ScriptType::Enumerable>()->Get() == "middle")
+							cell.VerticalAlignment(gui_panel::GridCellVerticalAlignment::Middle);
+						else if (prop[2].Get<ScriptType::Enumerable>()->Get() == "bottom")
+							cell.VerticalAlignment(gui_panel::GridCellVerticalAlignment::Bottom);
+					}
+				}
+			}
+		}
 	}
 }
 
