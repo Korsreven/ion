@@ -93,6 +93,7 @@ ClassDefinition get_gui_class()
 		.AddClass(get_gui_mouse_cursor_class())
 		.AddClass(get_gui_tooltip_class())
 
+		.AddProperty("name", ParameterType::String) //Not required
 		.AddProperty("active-mouse-cursor", ParameterType::String)
 		.AddProperty("active-theme", ParameterType::String)
 		.AddProperty("active-tooltip", ParameterType::String);
@@ -123,7 +124,7 @@ ClassDefinition get_gui_panel_class()
 		.AddRequiredProperty("column", ParameterType::Integer)
 		.AddRequiredProperty("row", ParameterType::Integer)
 		.AddProperty("alignment", {"left"s, "center"s, "right"s})
-		.AddProperty("control", ParameterType::String)
+		.AddProperty("attach", ParameterType::String)
 		.AddProperty("vertical-alignment", {"top"s, "middle"s, "bottom"s});
 
 	return ClassDefinition::Create("panel", "panel-container")
@@ -184,7 +185,7 @@ ClassDefinition get_gui_control_class()
 ClassDefinition get_gui_group_box_class()
 {
 	return ClassDefinition::Create("group-box", "control")
-		.AddProperty("control");
+		.AddProperty("attach");
 }
 
 ClassDefinition get_gui_label_class()
@@ -235,16 +236,16 @@ ClassDefinition get_gui_radio_button_class()
 ClassDefinition get_gui_scrollable_class()
 {
 	return ClassDefinition::Create("scrollable", "control")
+		.AddProperty("attach", ParameterType::String)
 		.AddProperty("scroll", ParameterType::Integer)
-		.AddProperty("scroll-bar", ParameterType::String)
 		.AddProperty("scroll-rate", ParameterType::Integer);
 }
 
 ClassDefinition get_gui_scroll_bar_class()
 {
 	return ClassDefinition::Create("scroll-bar", "slider")
-		.AddProperty("handle-size", {ParameterType::FloatingPoint, ParameterType::FloatingPoint})
-		.AddProperty("scrollable", ParameterType::String);
+		.AddProperty("attach", ParameterType::String)
+		.AddProperty("handle-size", {ParameterType::FloatingPoint, ParameterType::FloatingPoint});
 }
 
 ClassDefinition get_gui_slider_class()
@@ -408,7 +409,7 @@ void set_panel_properties(const script_tree::ObjectNode &object, GuiPanel &panel
 						else if (prop[2].Get<ScriptType::Enumerable>()->Get() == "right")
 							cell.Alignment(gui_panel::GridCellAlignment::Right);
 					}
-					else if (prop.Name() == "control")
+					else if (prop.Name() == "attach")
 					{
 						if (auto control = panel.GetControl(prop[0].Get<ScriptType::String>()->Get()); control)
 							cell.AttachControl(control);
@@ -633,7 +634,7 @@ void set_group_box_properties(const script_tree::ObjectNode &object, controls::G
 
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "control")
+		if (property.Name() == "attach")
 			group_box.AddControl(property[0].Get<ScriptType::String>()->Get());
 	}
 }
@@ -773,13 +774,14 @@ void set_scrollable_properties(const script_tree::ObjectNode &object, controls::
 
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "scroll")
-			scrollable.Scroll(property[0].Get<ScriptType::Integer>()->As<int>());
-		else if (property.Name() == "scroll-bar")
+		if (property.Name() == "attach")
 		{
 			if (auto owner = scrollable.Owner(); owner)
 				scrollable.AttachedScrollBar(owner->GetControlAs<controls::GuiScrollBar>(property[0].Get<ScriptType::String>()->Get()));
 		}
+		else if (property.Name() == "scroll")
+			scrollable.Scroll(property[0].Get<ScriptType::Integer>()->As<int>());
+		
 		else if (property.Name() == "scroll-rate")
 			scrollable.ScrollRate(property[0].Get<ScriptType::Integer>()->As<int>());
 	}
@@ -791,14 +793,14 @@ void set_scroll_bar_properties(const script_tree::ObjectNode &object, controls::
 
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "handle-size")
-			scroll_bar.HandleSize(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
-								  property[1].Get<ScriptType::FloatingPoint>()->As<real>());
-		else if (property.Name() == "scrollable")
+		if (property.Name() == "attach")
 		{
 			if (auto owner = scroll_bar.Owner(); owner)
 				scroll_bar.AttachedScrollable(owner->GetControlAs<controls::GuiScrollable>(property[0].Get<ScriptType::String>()->Get()));
 		}
+		else if (property.Name() == "handle-size")
+			scroll_bar.HandleSize(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+								  property[1].Get<ScriptType::FloatingPoint>()->As<real>());
 	}
 }
 

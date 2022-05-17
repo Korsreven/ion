@@ -2310,6 +2310,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			text_box_skin->AddTextPart("placeholder-text", placeholder_text_part); //Additional
 
 
+			ion::script::interfaces::GuiScriptInterface gui_script;
+			gui_script.CreateScriptRepository(script_repository);
+			gui_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			gui_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			gui_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			gui_script.CreateGui("gui.ion", controller);
+
 			//Controls
 			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
 			auto mouse_cursor = controller.CreateMouseCursor("mouse_cursor", {});
