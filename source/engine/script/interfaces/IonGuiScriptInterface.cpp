@@ -15,6 +15,7 @@ File:	IonGuiScriptInterface.cpp
 #include <optional>
 #include <string>
 
+#include "graphics/materials/IonMaterialManager.h"
 #include "gui/skins/IonGuiSkin.h"
 #include "gui/skins/IonGuiTheme.h"
 
@@ -200,6 +201,7 @@ ClassDefinition get_gui_list_box_class()
 		.AddProperty("icon-layout", {"left"s, "right"s})
 		.AddProperty("icon-max-size", ParameterType::Vector2)
 		.AddProperty("icon-padding", ParameterType::Vector2)
+		.AddProperty("item", {ParameterType::String, ParameterType::String}, 1)
 		.AddProperty("item-height-factor", ParameterType::FloatingPoint)
 		.AddProperty("item-index", ParameterType::Integer)
 		.AddProperty("item-layout", {"left"s, "center"s, "right"s})
@@ -308,12 +310,13 @@ ScriptValidator get_gui_validator()
 	Tree parsing
 */
 
-void set_gui_properties(const script_tree::ObjectNode &object, GuiController &gui_controller)
+void set_gui_properties(const script_tree::ObjectNode &object, GuiController &gui_controller,
+	graphics::materials::MaterialManager &material_manager)
 {
 	for (auto &obj : object.Objects())
 	{
 		if (obj.Name() == "frame")
-			create_gui_frame(obj, gui_controller);
+			create_gui_frame(obj, gui_controller, material_manager);
 		else if (obj.Name() == "mouse-cursor")
 			create_gui_mouse_cursor(obj, gui_controller);
 		else if (obj.Name() == "tooltip")
@@ -348,9 +351,10 @@ void set_component_properties(const script_tree::ObjectNode &object, GuiComponen
 	}
 }
 
-void set_frame_properties(const script_tree::ObjectNode &object, GuiFrame &frame)
+void set_frame_properties(const script_tree::ObjectNode &object, GuiFrame &frame,
+	graphics::materials::MaterialManager &material_manager)
 {
-	set_panel_container_properties(object, frame);
+	set_panel_container_properties(object, frame, material_manager);
 
 	for (auto &property : object.Properties())
 	{
@@ -370,9 +374,10 @@ void set_frame_properties(const script_tree::ObjectNode &object, GuiFrame &frame
 	}
 }
 
-void set_panel_properties(const script_tree::ObjectNode &object, GuiPanel &panel)
+void set_panel_properties(const script_tree::ObjectNode &object, GuiPanel &panel,
+	graphics::materials::MaterialManager &material_manager)
 {
-	set_panel_container_properties(object, panel);
+	set_panel_container_properties(object, panel, material_manager);
 
 	for (auto &property : object.Properties())
 	{
@@ -429,7 +434,8 @@ void set_panel_properties(const script_tree::ObjectNode &object, GuiPanel &panel
 	}
 }
 
-void set_panel_container_properties(const script_tree::ObjectNode &object, GuiPanelContainer &container)
+void set_panel_container_properties(const script_tree::ObjectNode &object, GuiPanelContainer &container,
+	graphics::materials::MaterialManager &material_manager)
 {
 	for (auto &obj : object.Objects())
 	{
@@ -442,7 +448,7 @@ void set_panel_container_properties(const script_tree::ObjectNode &object, GuiPa
 		else if (obj.Name() == "label")
 			create_gui_label(obj, container);
 		else if (obj.Name() == "list-box")
-			create_gui_list_box(obj, container);
+			create_gui_list_box(obj, container, material_manager);
 		else if (obj.Name() == "progress-bar")
 			create_gui_progress_bar(obj, container);
 		else if (obj.Name() == "radio-button")
@@ -645,7 +651,8 @@ void set_label_properties(const script_tree::ObjectNode &object, controls::GuiLa
 	//No label specific properties yet
 }
 
-void set_list_box_properties(const script_tree::ObjectNode &object, controls::GuiListBox &list_box)
+void set_list_box_properties(const script_tree::ObjectNode &object, controls::GuiListBox &list_box,
+	graphics::materials::MaterialManager &material_manager)
 {
 	set_scrollable_properties(object, list_box);
 
@@ -664,6 +671,14 @@ void set_list_box_properties(const script_tree::ObjectNode &object, controls::Gu
 			list_box.IconMaxSize(property[0].Get<ScriptType::Vector2>()->Get());
 		else if (property.Name() == "icon-padding")
 			list_box.IconPadding(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "item")
+		{
+			if (property.NumberOfArguments() == 2)
+				list_box.AddItem(property[0].Get<ScriptType::String>()->Get(),
+								 material_manager.GetMaterial(property[1].Get<ScriptType::String>()->Get()));
+			else
+				list_box.AddItem(property[0].Get<ScriptType::String>()->Get());
+		}
 		else if (property.Name() == "item-height-factor")
 			list_box.ItemHeightFactor(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "item-index")
@@ -919,7 +934,8 @@ void set_tooltip_properties(const script_tree::ObjectNode &object, controls::Gui
 
 
 NonOwningPtr<GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
-	GuiController &gui_controller)
+	GuiController &gui_controller,
+	graphics::materials::MaterialManager &material_manager)
 {
 	auto name = object
 		.Property("name")[0]
@@ -928,13 +944,14 @@ NonOwningPtr<GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
 	auto frame = gui_controller.CreateFrame(std::move(name));
 
 	if (frame)
-		set_frame_properties(object, *frame);
+		set_frame_properties(object, *frame, material_manager);
 
 	return frame;
 }
 
 NonOwningPtr<GuiPanel> create_gui_panel(const script_tree::ObjectNode &object,
-	GuiFrame &frame)
+	GuiFrame &frame,
+	graphics::materials::MaterialManager &material_manager)
 {
 	auto name = object
 		.Property("name")[0]
@@ -943,7 +960,7 @@ NonOwningPtr<GuiPanel> create_gui_panel(const script_tree::ObjectNode &object,
 	auto panel = frame.CreatePanel(std::move(name));
 
 	if (panel)
-		set_panel_properties(object, *panel);
+		set_panel_properties(object, *panel, material_manager);
 
 	return panel;
 }
@@ -1150,7 +1167,8 @@ NonOwningPtr<controls::GuiLabel> create_gui_label(const script_tree::ObjectNode 
 }
 
 NonOwningPtr<controls::GuiListBox> create_gui_list_box(const script_tree::ObjectNode &object,
-	GuiPanelContainer &container)
+	GuiPanelContainer &container,
+	graphics::materials::MaterialManager &material_manager)
 {
 	auto name = object
 		.Property("name")[0]
@@ -1191,7 +1209,7 @@ NonOwningPtr<controls::GuiListBox> create_gui_list_box(const script_tree::Object
 		}();
 
 	if (list_box)
-		set_list_box_properties(object, *list_box);
+		set_list_box_properties(object, *list_box, material_manager);
 
 	return list_box;
 }
@@ -1539,12 +1557,13 @@ NonOwningPtr<controls::GuiTooltip> create_gui_tooltip(const script_tree::ObjectN
 
 
 void create_gui(const ScriptTree &tree,
-	GuiController &gui_controller)
+	GuiController &gui_controller,
+	graphics::materials::MaterialManager &material_manager)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "gui")
-			set_gui_properties(object, gui_controller);
+			set_gui_properties(object, gui_controller, material_manager);
 	}
 }
 
@@ -1567,10 +1586,11 @@ ScriptValidator GuiScriptInterface::GetValidator() const
 */
 
 void GuiScriptInterface::CreateGui(std::string_view asset_name,
-	GuiController &gui_controller)
+	GuiController &gui_controller,
+	graphics::materials::MaterialManager &material_manager)
 {
 	if (Load(asset_name))
-		detail::create_gui(*tree_, gui_controller);
+		detail::create_gui(*tree_, gui_controller, material_manager);
 }
 
 } //ion::script::interfaces

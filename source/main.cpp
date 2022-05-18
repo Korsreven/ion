@@ -2315,7 +2315,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			gui_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			gui_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			gui_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			gui_script.CreateGui("gui.ion", controller);
+			gui_script.CreateGui("gui.ion", controller, materials);
 
 			//Controls
 			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);

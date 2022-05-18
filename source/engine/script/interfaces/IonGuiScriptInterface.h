@@ -36,6 +36,16 @@ File:	IonGuiScriptInterface.h
 #include "script/IonScriptValidator.h"
 #include "types/IonTypes.h"
 
+//Forward declarations
+namespace ion::graphics
+{
+	namespace materials
+	{
+		struct MaterialManager;
+	}
+}
+
+//Forward declarations
 namespace gui::skins
 {
 	class GuiSkin;
@@ -130,18 +140,23 @@ namespace ion::script::interfaces
 			Tree parsing
 		*/
 
-		void set_gui_properties(const script_tree::ObjectNode &object, gui::GuiController &gui_controller);
+		void set_gui_properties(const script_tree::ObjectNode &object, gui::GuiController &gui_controller,
+			graphics::materials::MaterialManager &material_manager);
 		void set_component_properties(const script_tree::ObjectNode &object, gui::GuiComponent &component);
-		void set_frame_properties(const script_tree::ObjectNode &object, gui::GuiFrame &frame);
-		void set_panel_properties(const script_tree::ObjectNode &object, gui::GuiPanel &panel);
-		void set_panel_container_properties(const script_tree::ObjectNode &object, gui::GuiPanelContainer &container);
+		void set_frame_properties(const script_tree::ObjectNode &object, gui::GuiFrame &frame,
+			graphics::materials::MaterialManager &material_manager);
+		void set_panel_properties(const script_tree::ObjectNode &object, gui::GuiPanel &panel,
+			graphics::materials::MaterialManager &material_manager);
+		void set_panel_container_properties(const script_tree::ObjectNode &object, gui::GuiPanelContainer &container,
+			graphics::materials::MaterialManager &material_manager);
 
 		void set_button_properties(const script_tree::ObjectNode &object, gui::controls::GuiButton &button);
 		void set_check_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiCheckBox &check_box);
 		void set_control_properties(const script_tree::ObjectNode &object, gui::controls::GuiControl &control);
 		void set_group_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiGroupBox &group_box);
 		void set_label_properties(const script_tree::ObjectNode &object, gui::controls::GuiLabel &label);
-		void set_list_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiListBox &list_box);
+		void set_list_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiListBox &list_box,
+			graphics::materials::MaterialManager &material_manager);
 		void set_mouse_cursor_properties(const script_tree::ObjectNode &object, gui::controls::GuiMouseCursor &mouse_cursor);
 		void set_progress_bar_properties(const script_tree::ObjectNode &object, gui::controls::GuiProgressBar &progress_bar);
 		void set_radio_button_properties(const script_tree::ObjectNode &object, gui::controls::GuiRadioButton &radio_button);
@@ -153,9 +168,11 @@ namespace ion::script::interfaces
 
 		
 		NonOwningPtr<gui::GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
-			gui::GuiController &gui_controller);
+			gui::GuiController &gui_controller,
+			graphics::materials::MaterialManager &material_manager);
 		NonOwningPtr<gui::GuiPanel> create_gui_panel(const script_tree::ObjectNode &object,
-			gui::GuiFrame &frame);
+			gui::GuiFrame &frame,
+			graphics::materials::MaterialManager &material_manager);
 
 		NonOwningPtr<gui::controls::GuiButton> create_gui_button(const script_tree::ObjectNode &object,
 			gui::GuiPanelContainer &container);
@@ -166,7 +183,8 @@ namespace ion::script::interfaces
 		NonOwningPtr<gui::controls::GuiLabel> create_gui_label(const script_tree::ObjectNode &object,
 			gui::GuiPanelContainer &container);
 		NonOwningPtr<gui::controls::GuiListBox> create_gui_list_box(const script_tree::ObjectNode &object,
-			gui::GuiPanelContainer &container);
+			gui::GuiPanelContainer &container,
+			graphics::materials::MaterialManager &material_manager);
 		NonOwningPtr<gui::controls::GuiMouseCursor> create_gui_mouse_cursor(const script_tree::ObjectNode &object,
 			gui::GuiController &gui_controller);
 		NonOwningPtr<gui::controls::GuiProgressBar> create_gui_progress_bar(const script_tree::ObjectNode &object,
@@ -183,7 +201,8 @@ namespace ion::script::interfaces
 			gui::GuiController &gui_controller);
 
 		void create_gui(const ScriptTree &tree,
-			gui::GuiController &gui_controller);
+			gui::GuiController &gui_controller,
+			graphics::materials::MaterialManager &material_manager);
 	} //gui_theme_script_interface::detail
 
 
@@ -206,7 +225,8 @@ namespace ion::script::interfaces
 
 			//Create gui from a script (or object file) with the given asset name
 			void CreateGui(std::string_view asset_name,
-				gui::GuiController &gui_controller);
+				gui::GuiController &gui_controller,
+				graphics::materials::MaterialManager &material_manager);
 	};
 } //ion::script::interfaces
 
