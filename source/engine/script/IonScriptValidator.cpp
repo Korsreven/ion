@@ -791,9 +791,9 @@ ClassDefinition::ClassDefinition(std::string name, std::initializer_list<EntityT
 	for (auto &base_class : base_classes)
 	{
 		if (std::holds_alternative<ClassDefinition>(base_class))
-			base_classes_.emplace(std::move(std::get<ClassDefinition>(base_class)), Ordinality::Optional, ClassType::Abstract);
+			base_classes_.emplace(std::get<ClassDefinition>(base_class), Ordinality::Optional, ClassType::Abstract);
 		else
-			base_classes_.emplace(std::move(std::get<std::string>(base_class)), Ordinality::Optional, ClassType::Abstract);
+			base_classes_.emplace(std::get<std::string>(base_class), Ordinality::Optional, ClassType::Abstract);
 	}
 }
 

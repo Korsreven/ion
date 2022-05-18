@@ -575,7 +575,7 @@ namespace ion::script
 			std::optional<int> max_build_processes_;
 
 			std::vector<CompileError> compile_errors_;
-			duration compile_time_;
+			duration compile_time_{};
 
 		public:
 

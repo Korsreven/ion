@@ -584,7 +584,7 @@ namespace ion::script
 			script_validator::ClassDefinition root_{{}};
 
 			std::vector<ValidateError> validate_errors_;
-			duration validate_time_;
+			duration validate_time_{};
     
 		public:
 

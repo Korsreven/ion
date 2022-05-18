@@ -864,7 +864,7 @@ namespace ion::graphics::shaders::variables::glsl
 			}
 
 			//Move constructor
-			UniformValue(UniformValue &&rhs) :
+			UniformValue(UniformValue &&rhs) noexcept :
 
 				size_{rhs.size_},
 				stack_values_{std::move(rhs.stack_values_)},
