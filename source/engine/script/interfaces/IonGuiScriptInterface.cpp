@@ -282,7 +282,7 @@ ClassDefinition get_gui_text_box_class()
 
 ClassDefinition get_gui_tooltip_class()
 {
-	return ClassDefinition::Create("tooltip", "label")
+	return ClassDefinition::Create("tooltip", "control")
 		.AddProperty("auto-size", ParameterType::Boolean)
 		.AddProperty("fade-in-delay", ParameterType::FloatingPoint)
 		.AddProperty("fade-in-time", ParameterType::FloatingPoint)
@@ -392,12 +392,12 @@ void set_panel_properties(const script_tree::ObjectNode &object, GuiPanel &panel
 	{
 		if (obj.Name() == "grid-cell")
 		{
-			auto row = object
+			auto row = obj
 				.Property("row")[0]
-				.Get<ScriptType::Integer>()->Get();
-			auto column = object
+				.Get<ScriptType::Integer>()->As<int>();
+			auto column = obj
 				.Property("column")[0]
-				.Get<ScriptType::Integer>()->Get();
+				.Get<ScriptType::Integer>()->As<int>();
 
 			if (auto &grid = panel.Grid(); grid)
 			{
@@ -405,13 +405,13 @@ void set_panel_properties(const script_tree::ObjectNode &object, GuiPanel &panel
 
 				for (auto &prop : obj.Properties())
 				{
-					if (prop.Name() == "aligment")
+					if (prop.Name() == "alignment")
 					{
 						if (prop[0].Get<ScriptType::Enumerable>()->Get() == "left")
 							cell.Alignment(gui_panel::GridCellAlignment::Left);
-						else if (prop[1].Get<ScriptType::Enumerable>()->Get() == "center")
+						else if (prop[0].Get<ScriptType::Enumerable>()->Get() == "center")
 							cell.Alignment(gui_panel::GridCellAlignment::Center);
-						else if (prop[2].Get<ScriptType::Enumerable>()->Get() == "right")
+						else if (prop[0].Get<ScriptType::Enumerable>()->Get() == "right")
 							cell.Alignment(gui_panel::GridCellAlignment::Right);
 					}
 					else if (prop.Name() == "attach")
@@ -423,9 +423,9 @@ void set_panel_properties(const script_tree::ObjectNode &object, GuiPanel &panel
 					{
 						if (prop[0].Get<ScriptType::Enumerable>()->Get() == "top")
 							cell.VerticalAlignment(gui_panel::GridCellVerticalAlignment::Top);
-						else if (prop[1].Get<ScriptType::Enumerable>()->Get() == "middle")
+						else if (prop[0].Get<ScriptType::Enumerable>()->Get() == "middle")
 							cell.VerticalAlignment(gui_panel::GridCellVerticalAlignment::Middle);
-						else if (prop[2].Get<ScriptType::Enumerable>()->Get() == "bottom")
+						else if (prop[0].Get<ScriptType::Enumerable>()->Get() == "bottom")
 							cell.VerticalAlignment(gui_panel::GridCellVerticalAlignment::Bottom);
 					}
 				}
@@ -439,7 +439,11 @@ void set_panel_container_properties(const script_tree::ObjectNode &object, GuiPa
 {
 	for (auto &obj : object.Objects())
 	{
-		if (obj.Name() == "button")
+		if (obj.Name() == "panel")
+			create_gui_panel(obj, container, material_manager);
+
+		//Controls
+		else if (obj.Name() == "button")
 			create_gui_button(obj, container);
 		else if (obj.Name() == "check-box")
 			create_gui_check_box(obj, container);
@@ -758,10 +762,10 @@ void set_progress_bar_properties(const script_tree::ObjectNode &object, controls
 		else if (property.Name() == "percent")
 			progress_bar.Percent(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "position")
-			progress_bar.Position(property[0].Get<ScriptType::Integer>()->As<real>());
+			progress_bar.Position(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "range")
-			progress_bar.Range(property[0].Get<ScriptType::Integer>()->As<real>(),
-							   property[1].Get<ScriptType::Integer>()->As<real>());
+			progress_bar.Range(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+							   property[1].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "type")
 		{
 			if (property[0].Get<ScriptType::Enumerable>()->Get() == "horizontal")
@@ -950,14 +954,14 @@ NonOwningPtr<GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
 }
 
 NonOwningPtr<GuiPanel> create_gui_panel(const script_tree::ObjectNode &object,
-	GuiFrame &frame,
+	GuiPanelContainer &container,
 	graphics::materials::MaterialManager &material_manager)
 {
 	auto name = object
 		.Property("name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto panel = frame.CreatePanel(std::move(name));
+	auto panel = container.CreatePanel(std::move(name));
 
 	if (panel)
 		set_panel_properties(object, *panel, material_manager);

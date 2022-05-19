@@ -171,7 +171,7 @@ namespace ion::script::interfaces
 			gui::GuiController &gui_controller,
 			graphics::materials::MaterialManager &material_manager);
 		NonOwningPtr<gui::GuiPanel> create_gui_panel(const script_tree::ObjectNode &object,
-			gui::GuiFrame &frame,
+			gui::GuiPanelContainer &container,
 			graphics::materials::MaterialManager &material_manager);
 
 		NonOwningPtr<gui::controls::GuiButton> create_gui_button(const script_tree::ObjectNode &object,
