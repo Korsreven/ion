@@ -1571,7 +1571,7 @@ void create_gui(const ScriptTree &tree,
 	}
 }
 
-} //gui_theme_script_interface::detail
+} //gui_script_interface::detail
 
 
 //Private

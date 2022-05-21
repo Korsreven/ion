@@ -203,7 +203,7 @@ namespace ion::script::interfaces
 		void create_gui(const ScriptTree &tree,
 			gui::GuiController &gui_controller,
 			graphics::materials::MaterialManager &material_manager);
-	} //gui_theme_script_interface::detail
+	} //gui_script_interface::detail
 
 
 	class GuiScriptInterface final : public ScriptInterface
