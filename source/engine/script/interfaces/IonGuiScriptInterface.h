@@ -1,8 +1,8 @@
 /*
 -------------------------------------------
 This source file is part of Ion Engine
-- A fast and lightweight 2D game engine
-- Written in C++ using OpenGL
+	- A fast and lightweight 2D game engine
+	- Written in C++ using OpenGL
 
 Author:	Jan Ivar Goli
 Area:	script/interfaces
