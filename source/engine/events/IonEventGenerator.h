@@ -101,7 +101,7 @@ namespace ion::events
 					listeners_to_notify.push_back(&listener);
 
 				for (auto &listener : listeners_to_notify)
-					Notify(std::forward<Event>(event), *listener, std::forward<Args>(args)...);
+					Notify(event, *listener, args...);
 						//The actual notify call could be modifying 'listeners', but not the 'listeners_to_notify' copy
 						//This will make sure that all listeners at the time of the event, will be notified
 			}
