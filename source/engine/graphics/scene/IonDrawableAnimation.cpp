@@ -138,40 +138,46 @@ void DrawableAnimation::OpacityChanged() noexcept
 
 //Public
 
-DrawableAnimation::DrawableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible) :
-	DrawableAnimation{vector3::Zero, size, animation, visible}
+DrawableAnimation::DrawableAnimation(std::optional<std::string> name, const Vector2 &size,
+	NonOwningPtr<textures::Animation> animation, bool visible) :
+	DrawableAnimation{std::move(name), vector3::Zero, size, animation, visible}
 {
 	//Empty
 }
 
-DrawableAnimation::DrawableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible) :
-	DrawableAnimation{position, 0.0_r, size, animation, visible}
+DrawableAnimation::DrawableAnimation(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+	NonOwningPtr<textures::Animation> animation, bool visible) :
+	DrawableAnimation{std::move(name), position, 0.0_r, size, animation, visible}
 {
 	//Empty
 }
 
-DrawableAnimation::DrawableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible) :
-	DrawableAnimation{position, rotation, size, animation, color::White, visible}
+DrawableAnimation::DrawableAnimation(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+	NonOwningPtr<textures::Animation> animation, bool visible) :
+	DrawableAnimation{std::move(name), position, rotation, size, animation, color::White, visible}
 {
 	//Empty
 }
 
 
-DrawableAnimation::DrawableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
-	DrawableAnimation{vector3::Zero, size, animation, color, visible}
+DrawableAnimation::DrawableAnimation(std::optional<std::string> name, const Vector2 &size,
+	NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
+	DrawableAnimation{std::move(name), vector3::Zero, size, animation, color, visible}
 {
 	//Empty
 }
 
-DrawableAnimation::DrawableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
-	DrawableAnimation{position, 0.0_r, size, animation, color, visible}
+DrawableAnimation::DrawableAnimation(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+	NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
+	DrawableAnimation{std::move(name), position, 0.0_r, size, animation, color, visible}
 {
 	//Empty
 }
 
-DrawableAnimation::DrawableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
+DrawableAnimation::DrawableAnimation(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+	NonOwningPtr<textures::Animation> animation, const Color &color, bool visible) :
 	
-	DrawableObject{visible},
+	DrawableObject{std::move(name), visible},
 
 	position_{position},
 	rotation_{rotation},

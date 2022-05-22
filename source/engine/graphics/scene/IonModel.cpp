@@ -59,8 +59,8 @@ void Model::OpacityChanged() noexcept
 
 //Public
 
-Model::Model(bool visible) noexcept :
-	DrawableObject{visible}
+Model::Model(std::optional<std::string> name, bool visible) noexcept :
+	DrawableObject{std::move(name), visible}
 {
 	query_type_flags_ |= query::scene_query::QueryType::Model;
 }

@@ -15,6 +15,7 @@ File:	IonMovableObject.h
 
 #include <any>
 #include <optional>
+#include <string>
 #include <tuple>
 #include <vector>
 
@@ -117,11 +118,8 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a movable object with the given visibility
-			explicit MovableObject(bool visible = true);
-
 			//Construct a movable object with the given name and visibility
-			explicit MovableObject(std::string name, bool visible = true);
+			explicit MovableObject(std::optional<std::string> name, bool visible = true);
 
 			//Copy constructor
 			MovableObject(const MovableObject &rhs) noexcept;

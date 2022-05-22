@@ -164,9 +164,10 @@ void DrawableParticleSystem::PrepareVertexStreams()
 
 //Public
 
-DrawableParticleSystem::DrawableParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible) :
+DrawableParticleSystem::DrawableParticleSystem(std::optional<std::string> name,
+	NonOwningPtr<particles::ParticleSystem> particle_system, bool visible) :
 	
-	DrawableObject{visible},
+	DrawableObject{std::move(name), visible},
 	particle_system_{particle_system ? std::make_optional(particle_system->Clone()) : std::nullopt},
 	initial_particle_system_{particle_system}
 {

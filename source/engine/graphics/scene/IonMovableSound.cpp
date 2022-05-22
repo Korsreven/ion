@@ -27,14 +27,17 @@ namespace movable_sound::detail
 } //movable_sound::detail
 
 
-MovableSound::MovableSound(NonOwningPtr<sounds::Sound> sound, bool paused) :
-	MovableSound{vector3::Zero, sound, paused}
+MovableSound::MovableSound(std::optional<std::string> name,
+	NonOwningPtr<sounds::Sound> sound, bool paused) :
+	MovableSound{std::move(name), vector3::Zero, sound, paused}
 {
 	//Empty
 }
 
-MovableSound::MovableSound(const Vector3 &position, NonOwningPtr<sounds::Sound> sound, bool paused) :
+MovableSound::MovableSound(std::optional<std::string> name, const Vector3 &position,
+	NonOwningPtr<sounds::Sound> sound, bool paused) :
 
+	MovableObject{std::move(name)},
 	position_{position},
 	sound_channel_{sound ? sound->Play(paused) : nullptr},
 	initial_sound_{sound}
@@ -43,14 +46,17 @@ MovableSound::MovableSound(const Vector3 &position, NonOwningPtr<sounds::Sound> 
 }
 
 
-MovableSound::MovableSound(NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused) :
-	MovableSound{vector3::Zero, sound, sound_channel_group, paused}
+MovableSound::MovableSound(std::optional<std::string> name,
+	NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused) :
+	MovableSound{std::move(name), vector3::Zero, sound, sound_channel_group, paused}
 {
 	//Empty
 }
 
-MovableSound::MovableSound(const Vector3 &position, NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused) :
+MovableSound::MovableSound(std::optional<std::string> name, const Vector3 &position,
+	NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused) :
 
+	MovableObject{std::move(name)},
 	position_{position},
 	sound_channel_{sound ? sound->Play(sound_channel_group, paused) : nullptr},
 	initial_sound_{sound}

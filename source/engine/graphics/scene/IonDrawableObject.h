@@ -13,6 +13,7 @@ File:	IonDrawableObject.h
 #ifndef ION_DRAWABLE_OBJECT_H
 #define ION_DRAWABLE_OBJECT_H
 
+#include <string>
 #include <vector>
 
 #include "IonMovableObject.h"
@@ -52,11 +53,8 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a drawable object with the given visibility
-			explicit DrawableObject(bool visible = true);
-
 			//Construct a drawable object with the given name and visibility
-			explicit DrawableObject(std::string name, bool visible = true);
+			explicit DrawableObject(std::optional<std::string> name, bool visible = true);
 
 			//Copy constructor
 			DrawableObject(const DrawableObject &rhs) noexcept;

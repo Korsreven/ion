@@ -43,13 +43,7 @@ void DrawableObject::OpacityChanged() noexcept
 
 //Public
 
-DrawableObject::DrawableObject(bool visible) :
-	MovableObject{visible}
-{
-	query_type_flags_ |= query::scene_query::QueryType::Drawable;
-}
-
-DrawableObject::DrawableObject(std::string name, bool visible) :
+DrawableObject::DrawableObject(std::optional<std::string> name, bool visible) :
 	MovableObject{std::move(name), visible}
 {
 	query_type_flags_ |= query::scene_query::QueryType::Drawable;

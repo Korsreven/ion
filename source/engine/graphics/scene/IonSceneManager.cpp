@@ -29,12 +29,12 @@ namespace scene_manager::detail
 	Creating
 */
 
-NonOwningPtr<Camera> SceneManager::CreateCamera(std::string name)
+NonOwningPtr<Camera> SceneManager::CreateCamera(std::optional<std::string> name)
 {
 	return CameraBase::Create(std::move(name));
 }
 
-NonOwningPtr<Camera> SceneManager::CreateCamera(std::string name, const render::Frustum &frustum)
+NonOwningPtr<Camera> SceneManager::CreateCamera(std::optional<std::string> name, const render::Frustum &frustum)
 {
 	return CameraBase::Create(std::move(name), frustum);
 }
@@ -93,19 +93,19 @@ bool SceneManager::RemoveCamera(std::string_view name) noexcept
 	Creating
 */
 
-NonOwningPtr<Light> SceneManager::CreateLight()
+NonOwningPtr<Light> SceneManager::CreateLight(std::optional<std::string> name, bool visible)
 {
-	return LightBase::Create();
+	return LightBase::Create(std::move(name), visible);
 }
 
-NonOwningPtr<Light> SceneManager::CreateLight(light::LightType type,
+NonOwningPtr<Light> SceneManager::CreateLight(std::optional<std::string> name, light::LightType type,
 	const Vector3 &position, const Vector3 &direction,
 	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 	real cutoff_angle, real outer_cutoff_angle,
 	bool cast_shadows)
 {
-	return LightBase::Create(type,
+	return LightBase::Create(std::move(name), type,
 		position, direction,
 		ambient, diffuse, specular,
 		attenuation_constant, attenuation_linear, attenuation_quadratic,
@@ -127,6 +127,22 @@ NonOwningPtr<Light> SceneManager::CreateLight(Light &&light)
 
 /*
 	Lights
+	Retrieving
+*/
+
+NonOwningPtr<Light> SceneManager::GetLight(std::string_view name) noexcept
+{
+	return LightBase::Get(name);
+}
+
+NonOwningPtr<const Light> SceneManager::GetLight(std::string_view name) const noexcept
+{
+	return LightBase::Get(name);
+}
+
+
+/*
+	Lights
 	Removing
 */
 
@@ -140,20 +156,36 @@ bool SceneManager::RemoveLight(Light &light) noexcept
 	return LightBase::Remove(light);
 }
 
+bool SceneManager::RemoveLight(std::string_view name) noexcept
+{
+	return LightBase::Remove(name);
+}
+
 
 /*
 	Models
 	Creating
 */
 
-NonOwningPtr<Model> SceneManager::CreateModel()
+NonOwningPtr<Model> SceneManager::CreateModel(std::optional<std::string> name, bool visible)
 {
-	return ModelBase::Create();
+	return ModelBase::Create(std::move(name), visible);
 }
 
-NonOwningPtr<Model> SceneManager::CreateModel(bool visible)
+
+/*
+	Models
+	Retrieving
+*/
+
+NonOwningPtr<Model> SceneManager::GetModel(std::string_view name) noexcept
 {
-	return ModelBase::Create(visible);
+	return ModelBase::Get(name);
+}
+
+NonOwningPtr<const Model> SceneManager::GetModel(std::string_view name) const noexcept
+{
+	return ModelBase::Get(name);
 }
 
 
@@ -172,41 +204,68 @@ bool SceneManager::RemoveModel(Model &model) noexcept
 	return ModelBase::Remove(model);
 }
 
+bool SceneManager::RemoveModel(std::string_view name) noexcept
+{
+	return ModelBase::Remove(name);
+}
+
 
 /*
 	Animations
 	Creating
 */
 
-NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible)
+NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(std::optional<std::string> name, const Vector2 &size,
+	NonOwningPtr<textures::Animation> animation, bool visible)
 {
-	return AnimationBase::Create(size, animation, visible);
+	return AnimationBase::Create(std::move(name), size, animation, visible);
 }
 
-NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible)
+NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+	NonOwningPtr<textures::Animation> animation, bool visible)
 {
-	return AnimationBase::Create(position, size, animation, visible);
+	return AnimationBase::Create(std::move(name), position, size, animation, visible);
 }
 
-NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible)
+NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+	NonOwningPtr<textures::Animation> animation, bool visible)
 {
-	return AnimationBase::Create(position, rotation, size, animation, visible);
+	return AnimationBase::Create(std::move(name), position, rotation, size, animation, visible);
 }
 
 
-NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
+NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(std::optional<std::string> name, const Vector2 &size,
+	NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
 {
-	return AnimationBase::Create(size, animation, color, visible);
+	return AnimationBase::Create(std::move(name), size, animation, color, visible);
 }
 
-NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
+NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+	NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
 {
-	return AnimationBase::Create(position, size, animation, color, visible);
+	return AnimationBase::Create(std::move(name), position, size, animation, color, visible);
 }
 
-NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
+NonOwningPtr<DrawableAnimation> SceneManager::CreateAnimation(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+	NonOwningPtr<textures::Animation> animation, const Color &color, bool visible)
 {
-	return AnimationBase::Create(position, rotation, size, animation, color, visible);
+	return AnimationBase::Create(std::move(name), position, rotation, size, animation, color, visible);
+}
+
+
+/*
+	Animations
+	Retrieving
+*/
+
+NonOwningPtr<DrawableAnimation> SceneManager::GetAnimation(std::string_view name) noexcept
+{
+	return AnimationBase::Get(name);
+}
+
+NonOwningPtr<const DrawableAnimation> SceneManager::GetAnimation(std::string_view name) const noexcept
+{
+	return AnimationBase::Get(name);
 }
 
 
@@ -225,15 +284,37 @@ bool SceneManager::RemoveAnimation(DrawableAnimation &animation) noexcept
 	return AnimationBase::Remove(animation);
 }
 
+bool SceneManager::RemoveAnimation(std::string_view name) noexcept
+{
+	return AnimationBase::Remove(name);
+}
+
 
 /*
 	Particle systems
 	Creating
 */
 
-NonOwningPtr<DrawableParticleSystem> SceneManager::CreateParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible)
+NonOwningPtr<DrawableParticleSystem> SceneManager::CreateParticleSystem(std::optional<std::string> name,
+	NonOwningPtr<particles::ParticleSystem> particle_system, bool visible)
 {
-	return ParticleSystemBase::Create(particle_system, visible);
+	return ParticleSystemBase::Create(std::move(name), particle_system, visible);
+}
+
+
+/*
+	Particle systems
+	Retrieving
+*/
+
+NonOwningPtr<DrawableParticleSystem> SceneManager::GetParticleSystem(std::string_view name) noexcept
+{
+	return ParticleSystemBase::Get(name);
+}
+
+NonOwningPtr<const DrawableParticleSystem> SceneManager::GetParticleSystem(std::string_view name) const noexcept
+{
+	return ParticleSystemBase::Get(name);
 }
 
 
@@ -252,30 +333,54 @@ bool SceneManager::RemoveParticleSystem(DrawableParticleSystem &particle_system)
 	return ParticleSystemBase::Remove(particle_system);
 }
 
+bool SceneManager::RemoveParticleSystem(std::string_view name) noexcept
+{
+	return ParticleSystemBase::Remove(name);
+}
+
 
 /*
-	Text
+	Texts
 	Creating
 */
 
-NonOwningPtr<DrawableText> SceneManager::CreateText(NonOwningPtr<fonts::Text> text, bool visible)
+NonOwningPtr<DrawableText> SceneManager::CreateText(std::optional<std::string> name,
+	NonOwningPtr<fonts::Text> text, bool visible)
 {
-	return TextBase::Create(text, visible);
+	return TextBase::Create(std::move(name), text, visible);
 }
 
-NonOwningPtr<DrawableText> SceneManager::CreateText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible)
+NonOwningPtr<DrawableText> SceneManager::CreateText(std::optional<std::string> name, const Vector3 &position,
+	NonOwningPtr<fonts::Text> text, bool visible)
 {
-	return TextBase::Create(position, text, visible);
+	return TextBase::Create(std::move(name), position, text, visible);
 }
 
-NonOwningPtr<DrawableText> SceneManager::CreateText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible)
+NonOwningPtr<DrawableText> SceneManager::CreateText(std::optional<std::string> name, const Vector3 &position, real rotation,
+	NonOwningPtr<fonts::Text> text, bool visible)
 {
-	return TextBase::Create(position, rotation, text, visible);
+	return TextBase::Create(std::move(name), position, rotation, text, visible);
 }
 
 
 /*
-	Text
+	Texts
+	Retrieving
+*/
+
+NonOwningPtr<DrawableText> SceneManager::GetText(std::string_view name) noexcept
+{
+	return TextBase::Get(name);
+}
+
+NonOwningPtr<const DrawableText> SceneManager::GetText(std::string_view name) const noexcept
+{
+	return TextBase::Get(name);
+}
+
+
+/*
+	Texts
 	Removing
 */
 
@@ -289,36 +394,61 @@ bool SceneManager::RemoveText(DrawableText &text) noexcept
 	return TextBase::Remove(text);
 }
 
+bool SceneManager::RemoveText(std::string_view name) noexcept
+{
+	return TextBase::Remove(name);
+}
+
 
 /*
-	Sound
+	Sounds
 	Creating
 */
 
-NonOwningPtr<MovableSound> SceneManager::CreateSound(NonOwningPtr<sounds::Sound> sound, bool paused)
+NonOwningPtr<MovableSound> SceneManager::CreateSound(std::optional<std::string> name,
+	NonOwningPtr<sounds::Sound> sound, bool paused)
 {
-	return SoundBase::Create(sound, paused);
+	return SoundBase::Create(std::move(name), sound, paused);
 }
 
-NonOwningPtr<MovableSound> SceneManager::CreateSound(const Vector3 &position, NonOwningPtr<sounds::Sound> sound, bool paused)
+NonOwningPtr<MovableSound> SceneManager::CreateSound(std::optional<std::string> name, const Vector3 &position,
+	NonOwningPtr<sounds::Sound> sound, bool paused)
 {
-	return SoundBase::Create(position, sound, paused);
+	return SoundBase::Create(std::move(name), position, sound, paused);
 }
 
 
-NonOwningPtr<MovableSound> SceneManager::CreateSound(NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused)
+NonOwningPtr<MovableSound> SceneManager::CreateSound(std::optional<std::string> name,
+	NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused)
 {
-	return SoundBase::Create(sound, sound_channel_group, paused);
+	return SoundBase::Create(std::move(name), sound, sound_channel_group, paused);
 }
 
-NonOwningPtr<MovableSound> SceneManager::CreateSound(const Vector3 &position, NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused)
+NonOwningPtr<MovableSound> SceneManager::CreateSound(std::optional<std::string> name, const Vector3 &position,
+	NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused)
 {
-	return SoundBase::Create(position, sound, sound_channel_group, paused);
+	return SoundBase::Create(std::move(name), position, sound, sound_channel_group, paused);
 }
 
 
 /*
-	Sound
+	Sounds
+	Retrieving
+*/
+
+NonOwningPtr<MovableSound> SceneManager::GetSound(std::string_view name) noexcept
+{
+	return SoundBase::Get(name);
+}
+
+NonOwningPtr<const MovableSound> SceneManager::GetSound(std::string_view name) const noexcept
+{
+	return SoundBase::Get(name);
+}
+
+
+/*
+	Sounds
 	Removing
 */
 
@@ -332,25 +462,48 @@ bool SceneManager::RemoveSound(MovableSound &sound) noexcept
 	return SoundBase::Remove(sound);
 }
 
+bool SceneManager::RemoveSound(std::string_view name) noexcept
+{
+	return SoundBase::Remove(name);
+}
+
 
 /*
-	Sound listener
+	Sound listeners
 	Creating
 */
 
-NonOwningPtr<MovableSoundListener> SceneManager::CreateSoundListener(NonOwningPtr<sounds::SoundListener> sound_listener)
+NonOwningPtr<MovableSoundListener> SceneManager::CreateSoundListener(std::optional<std::string> name,
+	NonOwningPtr<sounds::SoundListener> sound_listener)
 {
-	return SoundListenerBase::Create(sound_listener);
+	return SoundListenerBase::Create(std::move(name), sound_listener);
 }
 
-NonOwningPtr<MovableSoundListener> SceneManager::CreateSoundListener(const Vector3 &position, NonOwningPtr<sounds::SoundListener> sound_listener)
+NonOwningPtr<MovableSoundListener> SceneManager::CreateSoundListener(std::optional<std::string> name, const Vector3 &position,
+	NonOwningPtr<sounds::SoundListener> sound_listener)
 {
-	return SoundListenerBase::Create(position, sound_listener);
+	return SoundListenerBase::Create(std::move(name), position, sound_listener);
 }
 
 
 /*
-	Sound listener
+	Sound listeners
+	Retrieving
+*/
+
+NonOwningPtr<MovableSoundListener> SceneManager::GetSoundListener(std::string_view name) noexcept
+{
+	return SoundListenerBase::Get(name);
+}
+
+NonOwningPtr<const MovableSoundListener> SceneManager::GetSoundListener(std::string_view name) const noexcept
+{
+	return SoundListenerBase::Get(name);
+}
+
+
+/*
+	Sound listeners
 	Removing
 */
 
@@ -362,6 +515,11 @@ void SceneManager::ClearSoundListeners() noexcept
 bool SceneManager::RemoveSoundListener(MovableSoundListener &sound_listener) noexcept
 {
 	return SoundListenerBase::Remove(sound_listener);
+}
+
+bool SceneManager::RemoveSoundListener(std::string_view name) noexcept
+{
+	return SoundListenerBase::Remove(name);
 }
 
 } //ion::graphics::scene

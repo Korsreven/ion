@@ -14,6 +14,7 @@ File:	IonModel.h
 #define ION_MODEL_H
 
 #include <optional>
+#include <string>
 #include <type_traits>
 #include <vector>
 
@@ -75,8 +76,8 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new model with the given visibility
-			explicit Model(bool visible = true) noexcept;
+			//Construct a new model with the given name and visibility
+			explicit Model(std::optional<std::string> name, bool visible = true) noexcept;
 
 
 			/*

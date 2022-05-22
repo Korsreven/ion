@@ -28,14 +28,19 @@ namespace movable_sound_listener::detail
 } //movable_sound_listener::detail
 
 
-MovableSoundListener::MovableSoundListener(NonOwningPtr<sounds::SoundListener> sound_listener) :
+MovableSoundListener::MovableSoundListener(std::optional<std::string> name,
+	NonOwningPtr<sounds::SoundListener> sound_listener) :
+
+	MovableObject{std::move(name)},
 	sound_listener_{sound_listener}
 {
 	query_type_flags_ |= query::scene_query::QueryType::SoundListener;
 }
 
-MovableSoundListener::MovableSoundListener(const Vector3 &position, NonOwningPtr<sounds::SoundListener> sound_listener) :
+MovableSoundListener::MovableSoundListener(std::optional<std::string> name, const Vector3 &position,
+	NonOwningPtr<sounds::SoundListener> sound_listener) :
 
+	MovableObject{std::move(name)},
 	position_{position},
 	sound_listener_{sound_listener}
 {

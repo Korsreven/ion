@@ -15,6 +15,7 @@ File:	IonDrawableAnimation.h
 
 #include <array>
 #include <optional>
+#include <string>
 #include <tuple>
 
 #include "IonDrawableObject.h"
@@ -69,7 +70,7 @@ namespace ion::graphics::scene
 
 		struct animation_vertex_stream
 		{
-			vertex_container vertex_data;
+			vertex_container vertex_data{};
 			render::vertex::VertexBatch vertex_batch;
 
 			animation_vertex_stream();
@@ -143,24 +144,30 @@ namespace ion::graphics::scene
 
 		public:
 		
-			//Construct a new drawable animation with the given size, animation and visibility
-			DrawableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+			//Construct a new drawable animation with the given name, size, animation and visibility
+			DrawableAnimation(std::optional<std::string> name, const Vector2 &size,
+				NonOwningPtr<textures::Animation> animation, bool visible = true);
 
-			//Construct a new drawable animation with the given position, size, animation and visibility
-			DrawableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+			//Construct a new drawable animation with the given name, position, size, animation and visibility
+			DrawableAnimation(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+				NonOwningPtr<textures::Animation> animation, bool visible = true);
 
-			//Construct a new drawable animation with the given position, rotation, size, animation and visibility
-			DrawableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+			//Construct a new drawable animation with the given name, position, rotation, size, animation and visibility
+			DrawableAnimation(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+				NonOwningPtr<textures::Animation> animation, bool visible = true);
 
 
-			//Construct a new drawable animation with the given size, animation, color and visibility
-			DrawableAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+			//Construct a new drawable animation with the given name, size, animation, color and visibility
+			DrawableAnimation(std::optional<std::string> name, const Vector2 &size,
+				NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
 
-			//Construct a new drawable animation with the given position, size, animation, color and visibility
-			DrawableAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+			//Construct a new drawable animation with the given name, position, size, animation, color and visibility
+			DrawableAnimation(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+				NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
 
-			//Construct a new drawable animation with the given position, rotation, size, animation, color and visibility
-			DrawableAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+			//Construct a new drawable animation with the given name, position, rotation, size, animation, color and visibility
+			DrawableAnimation(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+				NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
 
 
 			/*

@@ -16,6 +16,7 @@ File:	IonDrawableText.h
 #include <array>
 #include <cstddef>
 #include <optional>
+#include <string>
 #include <tuple>
 #include <vector>
 
@@ -179,14 +180,17 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new drawable text with the given text and visibility
-			explicit DrawableText(NonOwningPtr<fonts::Text> text, bool visible = true);
+			//Construct a new drawable text with the given name, text and visibility
+			DrawableText(std::optional<std::string> name,
+				NonOwningPtr<fonts::Text> text, bool visible = true);
 
-			//Construct a new drawable text with the given position, text and visibility
-			DrawableText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible = true);
+			//Construct a new drawable text with the given name, position, text and visibility
+			DrawableText(std::optional<std::string> name, const Vector3 &position,
+				NonOwningPtr<fonts::Text> text, bool visible = true);
 
-			//Construct a new drawable text with the given position, rotation, text and visibility
-			DrawableText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible = true);
+			//Construct a new drawable text with the given name, position, rotation, text and visibility
+			DrawableText(std::optional<std::string> name, const Vector3 &position, real rotation,
+				NonOwningPtr<fonts::Text> text, bool visible = true);
 
 
 			/*

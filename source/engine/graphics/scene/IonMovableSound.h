@@ -14,6 +14,7 @@ File:	IonMovableSound.h
 #define ION_MOVABLE_SOUND_H
 
 #include <optional>
+#include <string>
 
 #include "IonMovableObject.h"
 #include "graphics/utilities/IonVector3.h"
@@ -54,18 +55,22 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new movable sound with the given sound and pause state
-			explicit MovableSound(NonOwningPtr<sounds::Sound> sound, bool paused = false);
+			//Construct a new movable sound with the given name, sound and pause state
+			MovableSound(std::optional<std::string> name,
+				NonOwningPtr<sounds::Sound> sound, bool paused = false);
 
-			//Construct a new movable sound with the given podition, sound and pause state
-			MovableSound(const Vector3 &position, NonOwningPtr<sounds::Sound> sound, bool paused = false);
+			//Construct a new movable sound with the given name, position, sound and pause state
+			MovableSound(std::optional<std::string> name, const Vector3 &position,
+				NonOwningPtr<sounds::Sound> sound, bool paused = false);
 
 
-			//Construct a new movable sound with the given sound, sound channel group and pause state
-			MovableSound(NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
+			//Construct a new movable sound with the given name, sound, sound channel group and pause state
+			MovableSound(std::optional<std::string> name,
+				NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
 
-			//Construct a new movable sound with the given position, sound, sound channel group and pause state
-			MovableSound(const Vector3 &position, NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
+			//Construct a new movable sound with the given name, position, sound, sound channel group and pause state
+			MovableSound(std::optional<std::string> name, const Vector3 &position,
+				NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
 
 
 			/*

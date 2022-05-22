@@ -1812,7 +1812,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto player_camera = scene_manager->CreateCamera("player", frustum);
 
 			//Lights
-			auto head_light = scene_manager->CreateLight();
+			auto head_light = scene_manager->CreateLight({});
 			head_light->Type(ion::graphics::scene::light::LightType::Spotlight);
 			head_light->Direction(Vector3{0.0_r, 0.6_r, -0.4_r});
 			head_light->AmbientColor(color::Transparent);
@@ -1821,7 +1821,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			head_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
 			head_light->Cutoff(math::ToRadians(20.0_r), math::ToRadians(30.0_r));
 
-			auto red_light = scene_manager->CreateLight();
+			auto red_light = scene_manager->CreateLight({});
 			red_light->Type(ion::graphics::scene::light::LightType::Point);
 			red_light->Direction({0.0_r, 0.0_r, -1.0_r});
 			red_light->AmbientColor(color::Transparent);
@@ -1830,7 +1830,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			red_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
 			red_light->Cutoff(math::ToRadians(45.0_r), math::ToRadians(55.0_r));
 
-			auto green_light = scene_manager->CreateLight();
+			auto green_light = scene_manager->CreateLight({});
 			green_light->Type(ion::graphics::scene::light::LightType::Point);
 			green_light->Direction({0.0_r, 0.0_r, -1.0_r});
 			green_light->AmbientColor(color::Transparent);
@@ -1841,22 +1841,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//Text
-			auto text = scene_manager->CreateText(fps);
+			auto text = scene_manager->CreateText({}, fps);
 			text->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
 
 			//Particle system
-			auto particle_system = scene_manager->CreateParticleSystem(rain);
+			auto particle_system = scene_manager->CreateParticleSystem({}, rain);
 			particle_system->AddPass(ion::graphics::render::Pass{particle_program});
 			particle_system->Get()->StartAll();
 
 			//Sound
-			auto player_sound_listener = scene_manager->CreateSoundListener(sound_listener);
-			auto red_lamp_flicker = scene_manager->CreateSound(flicker);
-			auto green_lamp_flicker = scene_manager->CreateSound(flicker);
+			auto player_sound_listener = scene_manager->CreateSoundListener({}, sound_listener);
+			auto red_lamp_flicker = scene_manager->CreateSound({}, flicker);
+			auto green_lamp_flicker = scene_manager->CreateSound({}, flicker);
 
 
 			//Model
-			auto model = scene_manager->CreateModel();
+			auto model = scene_manager->CreateModel({});
 			model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.3671875_r, 0.5_r}, ship});
 			model->AddPass(ion::graphics::render::Pass{model_program});
@@ -1865,18 +1865,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			model->QueryMask(2 | 4);
 			//model->ShowBoundingVolumes(true);
 
-			auto model_star = scene_manager->CreateModel();
+			auto model_star = scene_manager->CreateModel({});
 			model_star->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.05_r, 0.05_r}, star});
 			model_star->AddPass(ion::graphics::render::Pass{});
 
-			auto model_aura = scene_manager->CreateModel();
+			auto model_aura = scene_manager->CreateModel({});
 			auto aura_sprite = model_aura->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.432_r, 0.45_r}, aura});
 			aura_sprite->FillColor(Color{255, 255, 255, 0.75_r});
 			model_aura->AddPass(ion::graphics::render::Pass{model_program});
 
-			auto background = scene_manager->CreateModel();
+			auto background = scene_manager->CreateModel({});
 			background->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Center
 			background->CreateMesh(ion::graphics::scene::shapes::Sprite{
@@ -1885,14 +1885,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Right
 			background->AddPass(ion::graphics::render::Pass{model_program});
 
-			auto clouds = scene_manager->CreateModel();
+			auto clouds = scene_manager->CreateModel({});
 			clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{-1.0_r, 0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Left
 			clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{1.0_r, -0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Right
 			clouds->AddPass(ion::graphics::render::Pass{model_program});
 
-			auto model_spectrum = scene_manager->CreateModel();
+			auto model_spectrum = scene_manager->CreateModel({});
 			model_spectrum->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.71_r, 0.71_r}, color_spectrum});
 			model_spectrum->AddPass(ion::graphics::render::Pass{});

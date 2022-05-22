@@ -14,6 +14,7 @@ File:	IonMovableSoundListener.h
 #define ION_MOVABLE_SOUND_LISTENER_H
 
 #include <optional>
+#include <string>
 
 #include "IonMovableObject.h"
 #include "graphics/utilities/IonVector3.h"
@@ -50,11 +51,13 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new movable sound listener with the given sound listener
-			explicit MovableSoundListener(NonOwningPtr<sounds::SoundListener> sound_listener);
+			//Construct a new movable sound listener with the given name and sound listener
+			MovableSoundListener(std::optional<std::string> name,
+				NonOwningPtr<sounds::SoundListener> sound_listener);
 
-			//Construct a new movable sound listener with the given position and sound listener
-			MovableSoundListener(const Vector3 &position, NonOwningPtr<sounds::SoundListener> sound_listener);
+			//Construct a new movable sound listener with the given name, position and sound listener
+			MovableSoundListener(std::optional<std::string> name, const Vector3 &position,
+				NonOwningPtr<sounds::SoundListener> sound_listener);
 
 
 			/*

@@ -14,6 +14,8 @@ File:	IonLight.h
 #define ION_LIGHT_H
 
 #include <cmath>
+#include <optional>
+#include <string>
 #include <tuple>
 #include <utility>
 
@@ -82,11 +84,11 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new light with the given visibility
-			explicit Light(bool visible = true) noexcept;
+			//Construct a new light with the given name and visibility
+			explicit Light(std::optional<std::string> name, bool visible = true) noexcept;
 
-			//Construct a new light with the given values
-			Light(light::LightType type,
+			//Construct a new light with the given name and values
+			Light(std::optional<std::string> name, light::LightType type,
 				const Vector3 &position, const Vector3 &direction,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
@@ -98,19 +100,22 @@ namespace ion::graphics::scene
 				Static light conversions
 			*/
 
-			//Returns a new point light from the given values
-			[[nodiscard]] static Light Point(const Vector3 &position,
+			//Returns a new point light from the given name and values
+			[[nodiscard]] static Light Point(std::optional<std::string> name,
+				const Vector3 &position,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				bool cast_shadows = true) noexcept;
 
-			//Returns a new directional light from the given values
-			[[nodiscard]] static Light Directional(const Vector3 &direction,
+			//Returns a new directional light from the given name and values
+			[[nodiscard]] static Light Directional(std::optional<std::string> name,
+				const Vector3 &direction,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				bool cast_shadows = true) noexcept;
 
-			//Returns a new spotlight from the given values
-			[[nodiscard]] static Light Spotlight(const Vector3 &position, const Vector3 &direction,
+			//Returns a new spotlight from the given name and values
+			[[nodiscard]] static Light Spotlight(std::optional<std::string> name,
+				const Vector3 &position, const Vector3 &direction,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				real cutoff_angle, real outer_cutoff_angle,

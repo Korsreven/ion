@@ -66,7 +66,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			(top_part && bottom_part) || (left_part && right_part) ||
 			(top_left_part && bottom_right_part) || (bottom_left_part && top_right_part))
 		{
-			auto model = scene_manager.CreateModel();
+			auto model = scene_manager.CreateModel({});
 
 			if (std::empty(skin.Passes()))
 				model->AddPass(graphics::render::Pass{});
@@ -350,7 +350,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 		//Caption part
 		if (caption_part && *caption_part)
 		{
-			auto text = scene_manager.CreateText(caption_part->Base);
+			auto text = scene_manager.CreateText({}, caption_part->Base);
 
 			if (std::empty(skin.TextPasses()))
 				text->AddPass(graphics::render::Pass{});
@@ -507,7 +507,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &
 		//Lines part
 		if (lines_part && *lines_part)
 		{
-			auto text = scene_manager.CreateText(lines_part->Base);
+			auto text = scene_manager.CreateText({}, lines_part->Base);
 
 			if (std::empty(skin.TextPasses()))
 				text->AddPass(graphics::render::Pass{});
@@ -708,7 +708,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 		//Text part
 		if (text_part && *text_part)
 		{
-			auto text = scene_manager.CreateText(text_part->Base);
+			auto text = scene_manager.CreateText({}, text_part->Base);
 
 			if (std::empty(skin.TextPasses()))
 				text->AddPass(graphics::render::Pass{});
@@ -726,7 +726,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 		//Placeholder text part
 		if (placeholder_text_part && *placeholder_text_part)
 		{
-			auto text = scene_manager.CreateText(placeholder_text_part->Base);
+			auto text = scene_manager.CreateText({}, placeholder_text_part->Base);
 
 			if (std::empty(skin.TextPasses()))
 				text->AddPass(graphics::render::Pass{});

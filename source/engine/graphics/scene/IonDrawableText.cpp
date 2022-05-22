@@ -637,21 +637,24 @@ void DrawableText::OpacityChanged() noexcept
 
 //Public
 
-DrawableText::DrawableText(NonOwningPtr<fonts::Text> text, bool visible) :
-	DrawableText{vector3::Zero, 0.0_r, text, visible}
+DrawableText::DrawableText(std::optional<std::string> name,
+	NonOwningPtr<fonts::Text> text, bool visible) :
+	DrawableText{std::move(name), vector3::Zero, 0.0_r, text, visible}
 {
 	//Empty
 }
 
-DrawableText::DrawableText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible) :
-	DrawableText{position, 0.0_r, text, visible}
+DrawableText::DrawableText(std::optional<std::string> name, const Vector3 &position,
+	NonOwningPtr<fonts::Text> text, bool visible) :
+	DrawableText{std::move(name), position, 0.0_r, text, visible}
 {
 	//Empty
 }
 
-DrawableText::DrawableText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible) :
+DrawableText::DrawableText(std::optional<std::string> name, const Vector3 &position, real rotation,
+	NonOwningPtr<fonts::Text> text, bool visible) :
 	
-	DrawableObject{visible},
+	DrawableObject{std::move(name), visible},
 
 	position_{position},
 	rotation_{rotation},

@@ -13,6 +13,7 @@ File:	IonSceneManager.h
 #ifndef ION_SCENE_MANAGER_H
 #define ION_SCENE_MANAGER_H
 
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -229,10 +230,10 @@ namespace ion::graphics::scene
 			*/
 
 			//Create a camera with the given name
-			NonOwningPtr<Camera> CreateCamera(std::string name);
+			NonOwningPtr<Camera> CreateCamera(std::optional<std::string> name);
 
 			//Create a camera with the given name and a custom frustum
-			NonOwningPtr<Camera> CreateCamera(std::string name, const render::Frustum &frustum);
+			NonOwningPtr<Camera> CreateCamera(std::optional<std::string> name, const render::Frustum &frustum);
 
 
 			//Create a camera as a copy of the given camera
@@ -276,11 +277,11 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a light
-			NonOwningPtr<Light> CreateLight();
+			//Create a light with the given name and visibility
+			NonOwningPtr<Light> CreateLight(std::optional<std::string> name, bool visible = true);
 
-			//Create a light with the given values
-			NonOwningPtr<Light> CreateLight(light::LightType type,
+			//Create a light with the given name and values
+			NonOwningPtr<Light> CreateLight(std::optional<std::string> name, light::LightType type,
 				const Vector3 &position, const Vector3 &direction,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
@@ -297,6 +298,20 @@ namespace ion::graphics::scene
 
 			/*
 				Lights
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable light with the given name
+			//Returns nullptr if light could not be found
+			[[nodiscard]] NonOwningPtr<Light> GetLight(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable light with the given name
+			//Returns nullptr if light could not be found
+			[[nodiscard]] NonOwningPtr<const Light> GetLight(std::string_view name) const noexcept;
+
+
+			/*
+				Lights
 				Removing
 			*/
 
@@ -306,17 +321,31 @@ namespace ion::graphics::scene
 			//Remove a removable light from this manager
 			bool RemoveLight(Light &light) noexcept;
 
+			//Remove a removable light with the given name from this manager
+			bool RemoveLight(std::string_view name) noexcept;
+
 
 			/*
 				Models
 				Creating
 			*/
 
-			//Create a model
-			NonOwningPtr<Model> CreateModel();
+			//Create a model with the given name and visibility
+			NonOwningPtr<Model> CreateModel(std::optional<std::string> name, bool visible = true);
 
-			//Create a model with the given vertex buffer usage pattern and visibility
-			NonOwningPtr<Model> CreateModel(bool visible);
+
+			/*
+				Models
+				Retrieving
+			*/
+			
+			//Gets a pointer to a mutable model with the given name
+			//Returns nullptr if model could not be found
+			[[nodiscard]] NonOwningPtr<Model> GetModel(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable model with the given name
+			//Returns nullptr if model could not be found
+			[[nodiscard]] NonOwningPtr<const Model> GetModel(std::string_view name) const noexcept;
 
 
 			/*
@@ -330,30 +359,53 @@ namespace ion::graphics::scene
 			//Remove a removable model from this manager
 			bool RemoveModel(Model &model) noexcept;
 
+			//Remove a removable model with the given name from this manager
+			bool RemoveModel(std::string_view name) noexcept;
+
 
 			/*
 				Animations
 				Creating
 			*/
 
-			//Create a drawable animation with the given size, animation and visibility
-			NonOwningPtr<DrawableAnimation> CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+			//Create a drawable animation with the given name, size, animation and visibility
+			NonOwningPtr<DrawableAnimation> CreateAnimation(std::optional<std::string> name, const Vector2 &size,
+				NonOwningPtr<textures::Animation> animation, bool visible = true);
 
-			//Create a drawable animation with the given position, size, animation and visibility
-			NonOwningPtr<DrawableAnimation> CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+			//Create a drawable animation with the given name, position, size, animation and visibility
+			NonOwningPtr<DrawableAnimation> CreateAnimation(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+				NonOwningPtr<textures::Animation> animation, bool visible = true);
 
-			//Create a drawable animation with the given position, rotation, size, animation and visibility
-			NonOwningPtr<DrawableAnimation> CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, bool visible = true);
+			//Create a drawable animation with the given name, position, rotation, size, animation and visibility
+			NonOwningPtr<DrawableAnimation> CreateAnimation(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+				NonOwningPtr<textures::Animation> animation, bool visible = true);
 
 
-			//Create a drawable animation with the given size, animation, color and visibility
-			NonOwningPtr<DrawableAnimation> CreateAnimation(const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+			//Create a drawable animation with the given name, size, animation, color and visibility
+			NonOwningPtr<DrawableAnimation> CreateAnimation(std::optional<std::string> name, const Vector2 &size,
+				NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
 
-			//Create a drawable animation with the given position, size, animation, color and visibility
-			NonOwningPtr<DrawableAnimation> CreateAnimation(const Vector3 &position, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+			//Create a drawable animation with the given name, position, size, animation, color and visibility
+			NonOwningPtr<DrawableAnimation> CreateAnimation(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+				NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
 
-			//Create a drawable animation with the given position, rotation, size, animation, color and visibility
-			NonOwningPtr<DrawableAnimation> CreateAnimation(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+			//Create a drawable animation with the given name, position, rotation, size, animation, color and visibility
+			NonOwningPtr<DrawableAnimation> CreateAnimation(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+				NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
+
+
+			/*
+				Animations
+				Retrieving
+			*/
+			
+			//Gets a pointer to a mutable animation with the given name
+			//Returns nullptr if animation could not be found
+			[[nodiscard]] NonOwningPtr<DrawableAnimation> GetAnimation(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable animation with the given name
+			//Returns nullptr if animation could not be found
+			[[nodiscard]] NonOwningPtr<const DrawableAnimation> GetAnimation(std::string_view name) const noexcept;
 
 
 			/*
@@ -367,14 +419,32 @@ namespace ion::graphics::scene
 			//Remove a removable animation from this manager
 			bool RemoveAnimation(DrawableAnimation &animation) noexcept;
 
+			//Remove a removable animation with the given name from this manager
+			bool RemoveAnimation(std::string_view name) noexcept;
+
 
 			/*
 				Particle systems
 				Creating
 			*/
 
-			//Create a drawable particle system with the given particle system and visibility
-			NonOwningPtr<DrawableParticleSystem> CreateParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible = true);
+			//Create a drawable particle system with the given name, particle system and visibility
+			NonOwningPtr<DrawableParticleSystem> CreateParticleSystem(std::optional<std::string> name,
+				NonOwningPtr<particles::ParticleSystem> particle_system, bool visible = true);
+
+
+			/*
+				Particle systems
+				Retrieving
+			*/
+			
+			//Gets a pointer to a mutable particle system with the given name
+			//Returns nullptr if particle system could not be found
+			[[nodiscard]] NonOwningPtr<DrawableParticleSystem> GetParticleSystem(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable particle system with the given name
+			//Returns nullptr if particle system could not be found
+			[[nodiscard]] NonOwningPtr<const DrawableParticleSystem> GetParticleSystem(std::string_view name) const noexcept;
 
 
 			/*
@@ -388,24 +458,44 @@ namespace ion::graphics::scene
 			//Remove a removable particle system from this manager
 			bool RemoveParticleSystem(DrawableParticleSystem &particle_system) noexcept;
 
+			//Remove a removable particle system with the given name from this manager
+			bool RemoveParticleSystem(std::string_view name) noexcept;
+
 
 			/*
-				Text
+				Texts
 				Creating
 			*/
 
-			//Create a drawable text with the given text and visibility
-			NonOwningPtr<DrawableText> CreateText(NonOwningPtr<fonts::Text> text, bool visible = true);
+			//Create a drawable text with the given name, text and visibility
+			NonOwningPtr<DrawableText> CreateText(std::optional<std::string> name,
+				NonOwningPtr<fonts::Text> text, bool visible = true);
 
-			//Create a drawable text with the given position, text and visibility
-			NonOwningPtr<DrawableText> CreateText(const Vector3 &position, NonOwningPtr<fonts::Text> text, bool visible = true);
+			//Create a drawable text with the given name, position, text and visibility
+			NonOwningPtr<DrawableText> CreateText(std::optional<std::string> name, const Vector3 &position,
+				NonOwningPtr<fonts::Text> text, bool visible = true);
 
-			//Create a drawable text with the given position, rotation, text and visibility
-			NonOwningPtr<DrawableText> CreateText(const Vector3 &position, real rotation, NonOwningPtr<fonts::Text> text, bool visible = true);
+			//Create a drawable text with the given name, position, rotation, text and visibility
+			NonOwningPtr<DrawableText> CreateText(std::optional<std::string> name, const Vector3 &position, real rotation,
+				NonOwningPtr<fonts::Text> text, bool visible = true);
 
 
 			/*
-				Text
+				Texts
+				Retrieving
+			*/
+			
+			//Gets a pointer to a mutable text with the given name
+			//Returns nullptr if text could not be found
+			[[nodiscard]] NonOwningPtr<DrawableText> GetText(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable text with the given name
+			//Returns nullptr if text could not be found
+			[[nodiscard]] NonOwningPtr<const DrawableText> GetText(std::string_view name) const noexcept;
+
+
+			/*
+				Texts
 				Removing
 			*/
 
@@ -415,28 +505,49 @@ namespace ion::graphics::scene
 			//Remove a removable text from this manager
 			bool RemoveText(DrawableText &text) noexcept;
 
+			//Remove a removable text with the given name from this manager
+			bool RemoveText(std::string_view name) noexcept;
+
 
 			/*
-				Sound
+				Sounds
 				Creating
 			*/
 
-			//Create a movable sound with the given sound and pause state
-			NonOwningPtr<MovableSound> CreateSound(NonOwningPtr<sounds::Sound> sound, bool paused = false);
+			//Create a movable sound with the given name, sound and pause state
+			NonOwningPtr<MovableSound> CreateSound(std::optional<std::string> name,
+				NonOwningPtr<sounds::Sound> sound, bool paused = false);
 
-			//Create a movable sound with the given podition, sound and pause state
-			NonOwningPtr<MovableSound> CreateSound(const Vector3 &position, NonOwningPtr<sounds::Sound> sound, bool paused = false);
+			//Create a movable sound with the given name, podition, sound and pause state
+			NonOwningPtr<MovableSound> CreateSound(std::optional<std::string> name, const Vector3 &position,
+				NonOwningPtr<sounds::Sound> sound, bool paused = false);
 
 
-			//Create a movable sound with the given sound, sound channel group and pause state
-			NonOwningPtr<MovableSound> CreateSound(NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
+			//Create a movable sound with the given name, sound, sound channel group and pause state
+			NonOwningPtr<MovableSound> CreateSound(std::optional<std::string> name,
+				NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
 
-			//Create a movable sound with the given position, sound, sound channel group and pause state
-			NonOwningPtr<MovableSound> CreateSound(const Vector3 &position, NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
+			//Create a movable sound with the given name, position, sound, sound channel group and pause state
+			NonOwningPtr<MovableSound> CreateSound(std::optional<std::string> name, const Vector3 &position,
+				NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
 
 
 			/*
-				Sound
+				Sounds
+				Retrieving
+			*/
+			
+			//Gets a pointer to a mutable sound with the given name
+			//Returns nullptr if sound could not be found
+			[[nodiscard]] NonOwningPtr<MovableSound> GetSound(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable sound with the given name
+			//Returns nullptr if sound could not be found
+			[[nodiscard]] NonOwningPtr<const MovableSound> GetSound(std::string_view name) const noexcept;
+
+
+			/*
+				Sounds
 				Removing
 			*/
 
@@ -446,21 +557,40 @@ namespace ion::graphics::scene
 			//Remove a removable sound from this manager
 			bool RemoveSound(MovableSound &sound) noexcept;
 
+			//Remove a removable sound with the given name from this manager
+			bool RemoveSound(std::string_view name) noexcept;
+
 
 			/*
-				Sound listener
+				Sound listeners
 				Creating
 			*/
 
-			//Create a movable sound listener with the given sound listener
-			NonOwningPtr<MovableSoundListener> CreateSoundListener(NonOwningPtr<sounds::SoundListener> sound_listener);
+			//Create a movable sound listener with the given name and sound listener
+			NonOwningPtr<MovableSoundListener> CreateSoundListener(std::optional<std::string> name,
+				NonOwningPtr<sounds::SoundListener> sound_listener);
 
-			//Create a movable sound listener with the given position and sound listener
-			NonOwningPtr<MovableSoundListener> CreateSoundListener(const Vector3 &position, NonOwningPtr<sounds::SoundListener> sound_listener);
+			//Create a movable sound listener with the given name, position and sound listener
+			NonOwningPtr<MovableSoundListener> CreateSoundListener(std::optional<std::string> name, const Vector3 &position,
+				NonOwningPtr<sounds::SoundListener> sound_listener);
 
 
 			/*
-				Sound listener
+				Sound listeners
+				Retrieving
+			*/
+			
+			//Gets a pointer to a mutable sound listener with the given name
+			//Returns nullptr if sound listener could not be found
+			[[nodiscard]] NonOwningPtr<MovableSoundListener> GetSoundListener(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable sound listener with the given name
+			//Returns nullptr if sound listener could not be found
+			[[nodiscard]] NonOwningPtr<const MovableSoundListener> GetSoundListener(std::string_view name) const noexcept;
+
+
+			/*
+				Sound listeners
 				Removing
 			*/
 
@@ -469,6 +599,9 @@ namespace ion::graphics::scene
 
 			//Remove a removable sound listener from this manager
 			bool RemoveSoundListener(MovableSoundListener &sound_listener) noexcept;
+
+			//Remove a removable sound listener with the given name from this manager
+			bool RemoveSoundListener(std::string_view name) noexcept;
 	};
 } //ion::graphics::scene
 

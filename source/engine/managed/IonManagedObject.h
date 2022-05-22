@@ -42,6 +42,13 @@ namespace ion::managed
 				//Empty
 			}
 
+			//Construct a new managed object with the given name
+			explicit ManagedObject(std::optional<std::string> name) :
+				name_{std::move(name)}
+			{
+				//Empty
+			}
+
 			//Copy constructor
 			ManagedObject(const ManagedObject &rhs) :
 				name_{rhs.name_}, owner_{nullptr} //A copy of a managed object has no owner

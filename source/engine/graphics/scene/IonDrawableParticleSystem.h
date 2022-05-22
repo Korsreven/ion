@@ -15,6 +15,7 @@ File:	IonDrawableParticleSystem.h
 
 #include <cstddef>
 #include <optional>
+#include <string>
 #include <tuple>
 #include <vector>
 
@@ -113,8 +114,9 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new drawable particle system with the given particle system and visibility
-			explicit DrawableParticleSystem(NonOwningPtr<particles::ParticleSystem> particle_system, bool visible = true);
+			//Construct a new drawable particle system with the given name, particle system and visibility
+			DrawableParticleSystem(std::optional<std::string> name,
+				NonOwningPtr<particles::ParticleSystem> particle_system, bool visible = true);
 
 
 			/*

@@ -163,15 +163,7 @@ void MovableObject::Detach() noexcept
 
 //Public
 
-MovableObject::MovableObject(bool visible) :
-
-	query_type_flags_{query::scene_query::QueryType::Movable},
-	visible_{visible}
-{
-	//Empty
-}
-
-MovableObject::MovableObject(std::string name, bool visible) :
+MovableObject::MovableObject(std::optional<std::string> name, bool visible) :
 
 	managed::ManagedObject<SceneManager>{std::move(name)},
 	query_type_flags_{query::scene_query::QueryType::Movable},
