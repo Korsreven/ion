@@ -15,6 +15,7 @@ File:	IonObjectManager.h
 
 #include <algorithm>
 #include <cassert>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -223,6 +224,22 @@ namespace ion::managed
 					return ptr;
 				else
 					return Emplace<std::remove_cvref_t<T>>(std::move(name), std::forward<Args>(args)...);
+			}
+
+			//Create an object with the given name and arguments
+			template <typename T = ObjectT, typename... Args,
+				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
+			auto Create(std::optional<std::string> name, Args &&...args)
+			{
+				//Object has name
+				if (name)
+				{
+					//Check if an object with that name already exists
+					if (auto ptr = object_manager::detail::get_object_by_name(*name, objects_); ptr)
+						return ptr;
+				}
+
+				return Emplace<std::remove_cvref_t<T>>(std::move(name), std::forward<Args>(args)...);
 			}
 
 			//Create an object by copying/moving the given object
