@@ -15,6 +15,9 @@ File:	IonSceneNode.h
 
 #include <algorithm>
 #include <any>
+#include <optional>
+#include <string>
+#include <string_view>
 #include <variant>
 #include <vector>
 
@@ -54,6 +57,18 @@ namespace ion::graphics::scene::graph
 			Local
 		};
 
+		enum class SearchStrategy : bool
+		{
+			DepthFirst,
+			BreadthFirst
+		};
+
+		enum class DepthFirstTraversal : bool
+		{
+			PreOrder,
+			PostOrder
+		};
+
 		using SceneNodes = std::vector<OwningPtr<SceneNode>>;
 		using AttachableObject = std::variant<MovableObject*, Camera*, Light*>;
 
@@ -63,6 +78,11 @@ namespace ion::graphics::scene::graph
 			using object_container = std::vector<AttachableObject>;
 			using camera_container = std::vector<Camera*>;
 			using light_container = std::vector<Light*>;
+
+
+			/*
+				Nodes
+			*/
 
 			struct node_comparator
 			{
@@ -158,6 +178,10 @@ namespace ion::graphics::scene::graph
 			}
 
 
+			/*
+				Objects
+			*/
+
 			template <typename Container, typename Compare = std::less<>>
 			inline void add_object(Container &dest_objects, typename Container::value_type object, Compare compare = Compare{})
 			{
@@ -237,6 +261,22 @@ namespace ion::graphics::scene::graph
 			}
 
 
+			/*
+				Searching
+			*/
+
+			void breadth_first_search_impl(node_container &result, size_t off);
+			void depth_first_search_post_order_impl(node_container &result, SceneNode &node);
+			void depth_first_search_pre_order_impl(node_container &result, SceneNode &node);
+
+			node_container breadth_first_search(SceneNode &node);
+			node_container depth_first_search(SceneNode &node, DepthFirstTraversal traversal);
+
+
+			/*
+				Transformation
+			*/
+
 			inline auto to_scaling3(const Vector2 &scaling) noexcept
 			{
 				auto [x, y] = scaling.XY();
@@ -251,6 +291,8 @@ namespace ion::graphics::scene::graph
 	class SceneNode final : public animations::NodeAnimationManager
 	{
 		private:
+
+			std::optional<std::string> name_;
 
 			Vector3 position_;
 			Vector2 direction_ = vector2::UnitY;
@@ -614,6 +656,15 @@ namespace ion::graphics::scene::graph
 				Observers
 			*/
 
+			//Returns the name of this node
+			//A name must be unique among named nodes with the same parent
+			//Returns nullopt if this node has no name
+			[[nodiscard]] inline auto& Name() const noexcept
+			{
+				return name_;
+			}
+
+
 			//Returns the local position of this node
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
@@ -870,6 +921,29 @@ namespace ion::graphics::scene::graph
 
 			/*
 				Child nodes
+				Retrieving
+			*/
+			
+			//Gets a pointer to a mutable child node with the given name
+			//Returns nullptr if child node could not be found
+			[[nodiscard]] NonOwningPtr<SceneNode> GetChildNode(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable child node with the given name
+			//Returns nullptr if child node could not be found
+			[[nodiscard]] NonOwningPtr<const SceneNode> GetChildNode(std::string_view name) const noexcept;
+
+
+			//Gets a pointer to a mutable descendant node with the given name using the given search strategy
+			//Returns nullptr if a descendant node could not be found
+			[[nodiscard]] NonOwningPtr<SceneNode> GetDescendantNode(std::string_view name, scene_node::SearchStrategy strategy = scene_node::SearchStrategy::BreadthFirst) noexcept;
+
+			//Gets a pointer to an immutable descendant node with the given name using the given search strategy
+			//Returns nullptr if a descendant node could not be found
+			[[nodiscard]] NonOwningPtr<const SceneNode> GetDescendantNode(std::string_view name, scene_node::SearchStrategy strategy = scene_node::SearchStrategy::BreadthFirst) const noexcept;
+
+
+			/*
+				Child nodes
 				Removing
 			*/
 
@@ -879,6 +953,10 @@ namespace ion::graphics::scene::graph
 			//Remove the given child node from this scene node
 			//Returns true if the given child node was removed
 			bool RemoveChildNode(SceneNode &child_node) noexcept;
+
+			//Remove a child node with the given name from this scene node
+			//Returns true if a child node with the given name was removed
+			bool RemoveChildNode(std::string_view name) noexcept;
 
 
 			/*

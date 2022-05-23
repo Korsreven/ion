@@ -31,11 +31,88 @@ using namespace ion::utilities;
 namespace scene_node::detail
 {
 
+/*
+	Nodes
+*/
+
 bool node_comparator::operator()(const SceneNode *x, const SceneNode *y) const noexcept
 {
 	return *x < *y;
 }
 
+
+/*
+	Searching
+*/
+
+void breadth_first_search_impl(node_container &result, size_t off)
+{
+	auto last = std::size(result);
+
+	if (last - off > 0)
+	{
+		for (; off < last; ++off)
+		{
+			for (auto &child_node : result[off]->ChildNodes())
+				result.push_back(&child_node);
+		}
+
+		breadth_first_search_impl(result, last);
+	}
+}
+
+void depth_first_search_post_order_impl(node_container &result, SceneNode &node)
+{
+	for (auto &child_node : node.ChildNodes())
+		depth_first_search_post_order_impl(result, child_node);
+
+	result.push_back(&node);
+}
+
+void depth_first_search_pre_order_impl(node_container &result, SceneNode &node)
+{
+	result.push_back(&node);
+
+	for (auto &child_node : node.ChildNodes())
+		depth_first_search_pre_order_impl(result, child_node);
+}
+
+
+node_container breadth_first_search(SceneNode &node)
+{
+	node_container result;
+
+	for (auto &child_node : node.ChildNodes())
+		result.push_back(&child_node);
+
+	breadth_first_search_impl(result, 0);
+	return result;
+}
+
+node_container depth_first_search(SceneNode &node, DepthFirstTraversal traversal)
+{
+	node_container result;
+
+	//Post-order
+	if (traversal == DepthFirstTraversal::PostOrder)
+	{
+		for (auto &child_node : node.ChildNodes())
+			depth_first_search_post_order_impl(result, child_node);
+	}
+	//Pre-order
+	else
+	{
+		for (auto &child_node : node.ChildNodes())
+			depth_first_search_pre_order_impl(result, child_node);
+	}
+
+	return result;
+}
+
+
+/*
+	Transformation
+*/
 
 Matrix4 make_transformation(const Vector3 &position, real rotation, const Vector2 &scaling) noexcept
 {
@@ -307,10 +384,10 @@ bool SceneNode::DetachObject(AttachableObject object) noexcept
 {
 	auto iter =
 		std::find_if(std::begin(attached_objects_), std::end(attached_objects_),
-			[&](auto &x) noexcept
+			[&](auto &obj) noexcept
 			{
 				return
-					std::visit([](auto &&x) noexcept -> MovableObject* { return x; }, x)
+					std::visit([](auto &&obj) noexcept -> MovableObject* { return obj; }, obj)
 					==
 					std::visit([](auto &&object) noexcept -> MovableObject* { return object; }, object);
 			});
@@ -664,9 +741,9 @@ OwningPtr<SceneNode> SceneNode::Orphan(SceneNode &child_node) noexcept
 {
 	auto iter =
 		std::find_if(std::begin(child_nodes_), std::end(child_nodes_),
-			[&](auto &x) noexcept
+			[&](auto &node) noexcept
 			{
-				return x.get() == &child_node;
+				return node.get() == &child_node;
 			});
 
 	//Child node found
@@ -701,6 +778,64 @@ SceneNodes SceneNode::OrphanAll() noexcept
 
 /*
 	Child nodes
+	Retrieving
+*/
+			
+NonOwningPtr<SceneNode> SceneNode::GetChildNode(std::string_view name) noexcept
+{
+	auto iter =
+		std::find_if(std::begin(child_nodes_), std::end(child_nodes_),
+			[&](auto &node) noexcept
+			{
+				if (auto node_name = node->Name(); node_name)
+					return *node_name == name;
+				else
+					return false;
+			});
+
+	return iter != std::end(child_nodes_) ? *iter : NonOwningPtr<SceneNode>{};
+}
+
+NonOwningPtr<const SceneNode> SceneNode::GetChildNode(std::string_view name) const noexcept
+{
+	return const_cast<SceneNode&>(*this).GetChildNode(name);
+}
+
+
+NonOwningPtr<SceneNode> SceneNode::GetDescendantNode(std::string_view name, SearchStrategy strategy) noexcept
+{
+	auto nodes =
+		[&]()
+		{
+			if (strategy == SearchStrategy::BreadthFirst)
+				return detail::breadth_first_search(*this);
+			else if (strategy == SearchStrategy::DepthFirst)
+				return detail::depth_first_search(*this, DepthFirstTraversal::PreOrder);
+			else
+				return detail::node_container{};
+		}();
+
+	auto iter =
+		std::find_if(std::begin(nodes), std::end(nodes),
+			[&](auto &node) noexcept
+			{
+				if (auto node_name = node->Name(); node_name)
+					return *node_name == name;
+				else
+					return false;
+			});
+
+	return iter != std::end(nodes) ? (*iter)->ParentNode()->GetChildNode(name) : NonOwningPtr<SceneNode>{};
+}
+
+NonOwningPtr<const SceneNode> SceneNode::GetDescendantNode(std::string_view name, SearchStrategy strategy) const noexcept
+{
+	return const_cast<SceneNode&>(*this).GetDescendantNode(name, strategy);
+}
+
+
+/*
+	Child nodes
 	Removing
 */
 
@@ -714,9 +849,31 @@ bool SceneNode::RemoveChildNode(SceneNode &child_node) noexcept
 {
 	auto iter =
 		std::find_if(std::begin(child_nodes_), std::end(child_nodes_),
-			[&](auto &x) noexcept
+			[&](auto &node) noexcept
 			{
-				return x.get() == &child_node;
+				return node.get() == &child_node;
+			});
+
+	//Child node found
+	if (iter != std::end(child_nodes_))
+	{
+		child_nodes_.erase(iter);	
+		return true;
+	}
+	else
+		return false;
+}
+
+bool SceneNode::RemoveChildNode(std::string_view name) noexcept
+{
+	auto iter =
+		std::find_if(std::begin(child_nodes_), std::end(child_nodes_),
+			[&](auto &node) noexcept
+			{
+				if (auto node_name = node->Name(); node_name)
+					return *node_name == name;
+				else
+					return false;
 			});
 
 	//Child node found
