@@ -266,11 +266,11 @@ namespace ion::graphics::scene::graph
 			*/
 
 			void breadth_first_search_impl(node_container &result, size_t off);
-			void depth_first_search_post_order_impl(node_container &result, SceneNode &node);
-			void depth_first_search_pre_order_impl(node_container &result, SceneNode &node);
+			void depth_first_search_post_order_impl(node_container &result, const SceneNode &node);
+			void depth_first_search_pre_order_impl(node_container &result, const SceneNode &node);
 
-			node_container breadth_first_search(SceneNode &node);
-			node_container depth_first_search(SceneNode &node, DepthFirstTraversal traversal);
+			node_container breadth_first_search(const SceneNode &node);
+			node_container depth_first_search(const SceneNode &node, DepthFirstTraversal traversal);
 
 
 			/*
@@ -459,6 +459,35 @@ namespace ion::graphics::scene::graph
 			[[nodiscard]] inline auto AttachedObjects() const noexcept
 			{
 				return adaptors::ranges::Iterable<const scene_node::detail::object_container&>{attached_objects_};
+			}
+
+
+			//Returns a mutable (BFS) range of all descendant nodes of this node
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto BreadthFirstSearch()
+			{
+				return adaptors::ranges::DereferenceIterable<scene_node::detail::node_container>{scene_node::detail::breadth_first_search(*this)};
+			}
+
+			//Returns an immutable (BFS) range of all descendant nodes of this node
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto BreadthFirstSearch() const
+			{
+				return adaptors::ranges::DereferenceIterable<const scene_node::detail::node_container>{scene_node::detail::breadth_first_search(*this)};
+			}
+
+			//Returns a mutable (DFS) range of all descendant nodes of this node
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto DepthFirstSearch(scene_node::DepthFirstTraversal traversal = scene_node::DepthFirstTraversal::PreOrder)
+			{
+				return adaptors::ranges::DereferenceIterable<scene_node::detail::node_container>{scene_node::detail::depth_first_search(*this, traversal)};
+			}
+
+			//Returns an immutable (DFS) range of all descendant nodes of this node
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto DepthFirstSearch(scene_node::DepthFirstTraversal traversal = scene_node::DepthFirstTraversal::PreOrder) const
+			{
+				return adaptors::ranges::DereferenceIterable<const scene_node::detail::node_container>{scene_node::detail::depth_first_search(*this, traversal)};
 			}
 
 

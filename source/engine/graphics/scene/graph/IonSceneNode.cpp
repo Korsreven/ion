@@ -61,35 +61,35 @@ void breadth_first_search_impl(node_container &result, size_t off)
 	}
 }
 
-void depth_first_search_post_order_impl(node_container &result, SceneNode &node)
+void depth_first_search_post_order_impl(node_container &result, const SceneNode &node)
 {
 	for (auto &child_node : node.ChildNodes())
 		depth_first_search_post_order_impl(result, child_node);
 
-	result.push_back(&node);
+	result.push_back(&const_cast<SceneNode&>(node));
 }
 
-void depth_first_search_pre_order_impl(node_container &result, SceneNode &node)
+void depth_first_search_pre_order_impl(node_container &result, const SceneNode &node)
 {
-	result.push_back(&node);
+	result.push_back(&const_cast<SceneNode&>(node));
 
 	for (auto &child_node : node.ChildNodes())
 		depth_first_search_pre_order_impl(result, child_node);
 }
 
 
-node_container breadth_first_search(SceneNode &node)
+node_container breadth_first_search(const SceneNode &node)
 {
 	node_container result;
 
 	for (auto &child_node : node.ChildNodes())
-		result.push_back(&child_node);
+		result.push_back(&const_cast<SceneNode&>(child_node));
 
 	breadth_first_search_impl(result, 0);
 	return result;
 }
 
-node_container depth_first_search(SceneNode &node, DepthFirstTraversal traversal)
+node_container depth_first_search(const SceneNode &node, DepthFirstTraversal traversal)
 {
 	node_container result;
 
@@ -361,7 +361,7 @@ void SceneNode::DetachObjectFromNode(AttachableObject object, bool tidy) noexcep
 	std::visit([](auto &&object) noexcept { object->ParentNode(nullptr); }, object);
 }
 
-void SceneNode::DetachObjectsFromNode(scene_node::detail::object_container &objects, bool tidy) noexcept
+void SceneNode::DetachObjectsFromNode(detail::object_container &objects, bool tidy) noexcept
 {
 	for (auto &object : objects)
 		DetachObjectFromNode(object, tidy);
@@ -807,12 +807,12 @@ NonOwningPtr<SceneNode> SceneNode::GetDescendantNode(std::string_view name, Sear
 	auto nodes =
 		[&]()
 		{
-			if (strategy == SearchStrategy::BreadthFirst)
-				return detail::breadth_first_search(*this);
-			else if (strategy == SearchStrategy::DepthFirst)
+			//DFS
+			if (strategy == SearchStrategy::DepthFirst)
 				return detail::depth_first_search(*this, DepthFirstTraversal::PreOrder);
+			//BFS
 			else
-				return detail::node_container{};
+				return detail::breadth_first_search(*this);
 		}();
 
 	auto iter =
