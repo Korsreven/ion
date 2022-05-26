@@ -32,7 +32,7 @@ void GridCell::Adopt(SceneNode &node)
 		if (auto panel = grid->Owner(); panel)
 		{
 			if (!node_)
-				node_ = panel->Node()->CreateChildNode(Position(), vector2::UnitY, panel->Node()->Visible());
+				node_ = panel->Node()->CreateChildNode({}, Position(), vector2::UnitY, panel->Node()->Visible());
 
 			node_->Adopt(panel->Node()->Orphan(node));
 		}

@@ -2424,52 +2424,52 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//Camera
-			auto cam_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, 0.0_r});
+			auto cam_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 0.0_r, 0.0_r});
 			cam_node->AttachObject(*camera);
 
 			//Lights
-			auto red_light_node = scene_graph->RootNode().CreateChildNode({-1.5_r, -0.75_r, -1.0_r});
+			auto red_light_node = scene_graph->RootNode().CreateChildNode({}, {-1.5_r, -0.75_r, -1.0_r});
 			red_light_node->AttachObject(*red_light);
 
-			auto red_lamp_node = red_light_node->CreateChildNode({0.0_r, 0.0_r, -0.8_r});
+			auto red_lamp_node = red_light_node->CreateChildNode({}, {0.0_r, 0.0_r, -0.8_r});
 			red_lamp_node->AttachObject(*red_lamp_flicker);
 
-			auto green_light_node = scene_graph->RootNode().CreateChildNode({1.5_r, 0.75_r, -1.0_r});
+			auto green_light_node = scene_graph->RootNode().CreateChildNode({}, {1.5_r, 0.75_r, -1.0_r});
 			green_light_node->AttachObject(*green_light);
 
-			auto green_lamp_node = green_light_node->CreateChildNode({0.0_r, 0.0_r, -0.8_r});
+			auto green_lamp_node = green_light_node->CreateChildNode({}, {0.0_r, 0.0_r, -0.8_r});
 			green_lamp_node->AttachObject(*green_lamp_flicker);
 
 			//Text
-			auto fps_node = scene_graph->RootNode().CreateChildNode({-1.75_r, 0.98_r, -1.5_r});
+			auto fps_node = scene_graph->RootNode().CreateChildNode({}, {-1.75_r, 0.98_r, -1.5_r});
 			fps_node->Scale({-0.5_r, -0.5_r});
 			fps_node->AttachObject(*text);
 
 			//Particles
-			auto particle_node = scene_graph->RootNode().CreateChildNode({0.0_r, 1.0_r, -1.75_r}, vector2::NegativeUnitY);
+			auto particle_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 1.0_r, -1.75_r}, vector2::NegativeUnitY);
 			particle_node->AttachObject(*particle_system);
 
 			//Models
-			auto player_node = scene_graph->RootNode().CreateChildNode({0.0_r, -0.65_r, -1.8_r});
+			auto player_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, -0.65_r, -1.8_r});
 
-			auto ship_node = player_node->CreateChildNode({0.0_r, 0.0_r, 0.0_r});
+			auto ship_node = player_node->CreateChildNode({}, {0.0_r, 0.0_r, 0.0_r});
 			ship_node->AttachObject(*model);
 			ship_node->AttachObject(*player_sound_listener);
 
-			auto star_node = ship_node->CreateChildNode({0.15_r, 0.2_r, 0.1_r});
+			auto star_node = ship_node->CreateChildNode({}, {0.15_r, 0.2_r, 0.1_r});
 			star_node->AttachObject(*model_star);
 
-			auto aura_node = ship_node->CreateChildNode({0.0_r, -0.05_r, -0.1_r});
+			auto aura_node = ship_node->CreateChildNode({}, {0.0_r, -0.05_r, -0.1_r});
 			aura_node->InheritRotation(false);
 			aura_node->AttachObject(*model_aura);
 
-			auto background_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, -2.25_r});
+			auto background_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 0.0_r, -2.25_r});
 			background_node->AttachObject(*background);
 
-			auto cloud_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.0_r, -1.6_r});
+			auto cloud_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 0.0_r, -1.6_r});
 			cloud_node->AttachObject(*clouds);
 
-			auto spectrum_node = scene_graph->RootNode().CreateChildNode({1.4_r, -0.6_r, -1.1_r});
+			auto spectrum_node = scene_graph->RootNode().CreateChildNode({}, {1.4_r, -0.6_r, -1.1_r});
 			spectrum_node->AttachObject(*model_spectrum);
 
 			//auto button_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.5_r, -2.0_r});
@@ -2490,11 +2490,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			circle2_node->AttachObject(*circle2);*/
 
 			//Head light
-			auto light_node = ship_node->CreateChildNode({0.0_r, -0.15_r, -0.05_r}, vector2::UnitY, false);
+			auto light_node = ship_node->CreateChildNode({}, {0.0_r, -0.15_r, -0.05_r}, vector2::UnitY, false);
 			light_node->AttachObject(*head_light);
 
 			//Player camera
-			auto player_cam_node = player_node->CreateChildNode({0.0_r, 0.0_r, 1.8_r});
+			auto player_cam_node = player_node->CreateChildNode({}, {0.0_r, 0.0_r, 1.8_r});
 			player_cam_node->AttachObject(*player_camera);
 
 

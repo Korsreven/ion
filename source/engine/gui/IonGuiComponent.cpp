@@ -180,7 +180,7 @@ void GuiComponent::Owner(GuiContainer &owner) noexcept
 
 	parent_ = &owner;
 	node_ = parent_->Node() ?
-		parent_->Node()->CreateChildNode(visible_ && parent_->Node()->Visible()) :
+		parent_->Node()->CreateChildNode({}, visible_ && parent_->Node()->Visible()) :
 		nullptr;
 }
 

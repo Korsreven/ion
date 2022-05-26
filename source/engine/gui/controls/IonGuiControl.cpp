@@ -842,7 +842,7 @@ void GuiControl::AttachSkin()
 	if (skin_ && node_)
 	{
 		//Create skin node
-		skin_node_ = node_->CreateChildNode(node_->Visible());
+		skin_node_ = node_->CreateChildNode({}, node_->Visible());
 		
 		if (skin_->Parts)
 		{

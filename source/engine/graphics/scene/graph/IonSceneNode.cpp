@@ -422,29 +422,23 @@ void SceneNode::Tidy()
 
 //Public
 
-SceneNode::SceneNode(bool visible) noexcept :
-
-	NodeAnimationManager{*this},
-	visible_{visible}
+SceneNode::SceneNode(std::optional<std::string> name, bool visible) noexcept :
+	SceneNode{std::move(name), vector3::Zero, vector2::UnitY, visible}
 {
-	AddNode(ordered_nodes_, this);
+	//Empty
 }
 
-SceneNode::SceneNode(const Vector2 &initial_direction, bool visible) noexcept :
-
-	NodeAnimationManager{*this},
-
-	direction_{initial_direction},
-	initial_direction_{initial_direction},
-	visible_{visible}
+SceneNode::SceneNode(std::optional<std::string> name, const Vector2 &initial_direction, bool visible) noexcept :
+	SceneNode{std::move(name), vector3::Zero, initial_direction, visible}
 {
-	AddNode(ordered_nodes_, this);
+	//Empty
 }
 
-SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept :
+SceneNode::SceneNode(std::optional<std::string> name, const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept :
 
 	NodeAnimationManager{*this},
 
+	name_{std::move(name)},
 	position_{position},
 	direction_{initial_direction},
 	initial_direction_{initial_direction},
@@ -454,32 +448,23 @@ SceneNode::SceneNode(const Vector3 &position, const Vector2 &initial_direction, 
 }
 
 
-SceneNode::SceneNode(SceneNode &parent_node, bool visible) noexcept :
-
-	NodeAnimationManager{*this},
-
-	visible_{visible},
-	parent_node_{&parent_node}
+SceneNode::SceneNode(std::optional<std::string> name, SceneNode &parent_node, bool visible) noexcept :
+	SceneNode{std::move(name), parent_node, vector3::Zero, vector2::UnitY, visible}
 {
-	AddNode(RootNode().ordered_nodes_, this);
+	//Empty
 }
 
-SceneNode::SceneNode(SceneNode &parent_node, const Vector2 &initial_direction, bool visible) noexcept :
-
-	NodeAnimationManager{*this},
-
-	direction_{initial_direction},
-	initial_direction_{initial_direction},
-	visible_{visible},
-	parent_node_{&parent_node}
+SceneNode::SceneNode(std::optional<std::string> name, SceneNode &parent_node, const Vector2 &initial_direction, bool visible) noexcept :
+	SceneNode{std::move(name), parent_node, vector3::Zero, initial_direction, visible}
 {
-	AddNode(RootNode().ordered_nodes_, this);
+	//Empty
 }
 
-SceneNode::SceneNode(SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept :
+SceneNode::SceneNode(std::optional<std::string> name, SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept :
 
 	NodeAnimationManager{*this},
 
+	name_{std::move(name)},
 	position_{position},
 	direction_{initial_direction},
 	initial_direction_{initial_direction},
@@ -680,19 +665,19 @@ void SceneNode::Elapse(duration time) noexcept
 	Creating
 */
 
-NonOwningPtr<SceneNode> SceneNode::CreateChildNode(bool visible)
+NonOwningPtr<SceneNode> SceneNode::CreateChildNode(std::optional<std::string> name, bool visible)
 {
-	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), visible));
+	return child_nodes_.emplace_back(make_owning<SceneNode>(std::move(name), std::ref(*this), visible));
 }
 
-NonOwningPtr<SceneNode> SceneNode::CreateChildNode(const Vector2 &initial_direction, bool visible)
+NonOwningPtr<SceneNode> SceneNode::CreateChildNode(std::optional<std::string> name, const Vector2 &initial_direction, bool visible)
 {
-	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), initial_direction, visible));
+	return child_nodes_.emplace_back(make_owning<SceneNode>(std::move(name), std::ref(*this), initial_direction, visible));
 }
 
-NonOwningPtr<SceneNode> SceneNode::CreateChildNode(const Vector3 &position, const Vector2 &initial_direction, bool visible)
+NonOwningPtr<SceneNode> SceneNode::CreateChildNode(std::optional<std::string> name, const Vector3 &position, const Vector2 &initial_direction, bool visible)
 {
-	return child_nodes_.emplace_back(make_owning<SceneNode>(std::ref(*this), position, initial_direction, visible));
+	return child_nodes_.emplace_back(make_owning<SceneNode>(std::move(name), std::ref(*this), position, initial_direction, visible));
 }
 
 

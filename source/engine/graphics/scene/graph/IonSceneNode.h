@@ -386,24 +386,24 @@ namespace ion::graphics::scene::graph
 
 		public:
 
-			//Construct a scene node as the root with the given visibility
-			explicit SceneNode(bool visible = true) noexcept;
+			//Construct a scene node as the root with the given name and visibility
+			explicit SceneNode(std::optional<std::string> name = {}, bool visible = true) noexcept;
 
-			//Construct a scene node as the root with the given initial direction and visibility
-			explicit SceneNode(const Vector2 &initial_direction, bool visible = true) noexcept;
+			//Construct a scene node as the root with the given name, initial direction and visibility
+			SceneNode(std::optional<std::string> name, const Vector2 &initial_direction, bool visible = true) noexcept;
 
-			//Construct a scene node as the root with the given position, initial direction and visibility
-			explicit SceneNode(const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true) noexcept;
+			//Construct a scene node as the root with the given name, position, initial direction and visibility
+			SceneNode(std::optional<std::string> name, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true) noexcept;
 
 
-			//Construct a scene node as a child with the given parent and visibility
-			explicit SceneNode(SceneNode &parent_node, bool visible = true) noexcept;
+			//Construct a scene node as a child with the given name, parent and visibility
+			SceneNode(std::optional<std::string> name, SceneNode &parent_node, bool visible = true) noexcept;
 
-			//Construct a scene node as a child with the given parent, initial direction and visibility
-			SceneNode(SceneNode &parent_node, const Vector2 &initial_direction, bool visible = true) noexcept;
+			//Construct a scene node as a child with the given name, parent, initial direction and visibility
+			SceneNode(std::optional<std::string> name, SceneNode &parent_node, const Vector2 &initial_direction, bool visible = true) noexcept;
 
-			//Construct a scene node as a child with the given parent, position, initial direction and visibility
-			SceneNode(SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true) noexcept;
+			//Construct a scene node as a child with the given name, parent, position, initial direction and visibility
+			SceneNode(std::optional<std::string> name, SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true) noexcept;
 
 
 			//Virtual destructor
@@ -906,14 +906,14 @@ namespace ion::graphics::scene::graph
 				Creating
 			*/
 
-			//Create a new scene node as a child of this node with the given visibility
-			NonOwningPtr<SceneNode> CreateChildNode(bool visible = true);
+			//Create a new scene node as a child of this node with the given name and visibility
+			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name = {}, bool visible = true);
 
-			//Create a new scene node as a child of this node with the given initial direction and visibility
-			NonOwningPtr<SceneNode> CreateChildNode(const Vector2 &initial_direction, bool visible = true);
+			//Create a new scene node as a child of this node with the given name, initial direction and visibility
+			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name, const Vector2 &initial_direction, bool visible = true);
 
-			//Create a new scene node as a child of this node with the given position, initial direction and visibility
-			NonOwningPtr<SceneNode> CreateChildNode(const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true);
+			//Create a new scene node as a child of this node with the given name, position, initial direction and visibility
+			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true);
 
 
 			/*
