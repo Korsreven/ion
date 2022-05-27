@@ -85,7 +85,7 @@ namespace ion::graphics::scene
 		public:
 
 			//Construct a new light with the given name and visibility
-			explicit Light(std::optional<std::string> name, bool visible = true) noexcept;
+			explicit Light(std::optional<std::string> name = {}, bool visible = true) noexcept;
 
 			//Construct a new light with the given name and values
 			Light(std::optional<std::string> name, light::LightType type,

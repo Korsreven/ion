@@ -54,7 +54,7 @@ namespace ion::graphics::scene
 		public:
 
 			//Construct a drawable object with the given name and visibility
-			explicit DrawableObject(std::optional<std::string> name, bool visible = true);
+			explicit DrawableObject(std::optional<std::string> name = {}, bool visible = true);
 
 			//Copy constructor
 			DrawableObject(const DrawableObject &rhs) noexcept;

@@ -77,7 +77,7 @@ namespace ion::graphics::scene
 		public:
 
 			//Construct a new model with the given name and visibility
-			explicit Model(std::optional<std::string> name, bool visible = true) noexcept;
+			explicit Model(std::optional<std::string> name = {}, bool visible = true) noexcept;
 
 
 			/*

@@ -66,7 +66,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			(top_part && bottom_part) || (left_part && right_part) ||
 			(top_left_part && bottom_right_part) || (bottom_left_part && top_right_part))
 		{
-			auto model = scene_manager.CreateModel({});
+			auto model = scene_manager.CreateModel();
 
 			if (std::empty(skin.Passes()))
 				model->AddPass(graphics::render::Pass{});

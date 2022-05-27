@@ -29,14 +29,14 @@ namespace scene_manager::detail
 	Creating
 */
 
-NonOwningPtr<Camera> SceneManager::CreateCamera(std::optional<std::string> name)
+NonOwningPtr<Camera> SceneManager::CreateCamera(std::optional<std::string> name, bool visible)
 {
-	return CameraBase::Create(std::move(name));
+	return CameraBase::Create(std::move(name), visible);
 }
 
-NonOwningPtr<Camera> SceneManager::CreateCamera(std::optional<std::string> name, const render::Frustum &frustum)
+NonOwningPtr<Camera> SceneManager::CreateCamera(std::optional<std::string> name, const render::Frustum &frustum, bool visible)
 {
-	return CameraBase::Create(std::move(name), frustum);
+	return CameraBase::Create(std::move(name), frustum, visible);
 }
 
 

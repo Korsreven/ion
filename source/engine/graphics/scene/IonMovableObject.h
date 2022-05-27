@@ -119,7 +119,7 @@ namespace ion::graphics::scene
 		public:
 
 			//Construct a movable object with the given name and visibility
-			explicit MovableObject(std::optional<std::string> name, bool visible = true);
+			explicit MovableObject(std::optional<std::string> name = {}, bool visible = true);
 
 			//Copy constructor
 			MovableObject(const MovableObject &rhs) noexcept;

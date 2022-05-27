@@ -230,10 +230,10 @@ namespace ion::graphics::scene
 			*/
 
 			//Create a camera with the given name
-			NonOwningPtr<Camera> CreateCamera(std::optional<std::string> name);
+			NonOwningPtr<Camera> CreateCamera(std::optional<std::string> name = {}, bool visible = true);
 
 			//Create a camera with the given name and a custom frustum
-			NonOwningPtr<Camera> CreateCamera(std::optional<std::string> name, const render::Frustum &frustum);
+			NonOwningPtr<Camera> CreateCamera(std::optional<std::string> name, const render::Frustum &frustum, bool visible = true);
 
 
 			//Create a camera as a copy of the given camera
@@ -278,7 +278,7 @@ namespace ion::graphics::scene
 			*/
 
 			//Create a light with the given name and visibility
-			NonOwningPtr<Light> CreateLight(std::optional<std::string> name, bool visible = true);
+			NonOwningPtr<Light> CreateLight(std::optional<std::string> name = {}, bool visible = true);
 
 			//Create a light with the given name and values
 			NonOwningPtr<Light> CreateLight(std::optional<std::string> name, light::LightType type,
@@ -331,7 +331,7 @@ namespace ion::graphics::scene
 			*/
 
 			//Create a model with the given name and visibility
-			NonOwningPtr<Model> CreateModel(std::optional<std::string> name, bool visible = true);
+			NonOwningPtr<Model> CreateModel(std::optional<std::string> name = {}, bool visible = true);
 
 
 			/*

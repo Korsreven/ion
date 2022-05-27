@@ -75,7 +75,7 @@ namespace ion::graphics::scene
 		public:
 
 			//Construct a new camera with the given name and visibility
-			explicit Camera(std::optional<std::string> name, bool visible = true);
+			explicit Camera(std::optional<std::string> name = {}, bool visible = true);
 
 			//Construct a new camera with the given name, a custom frustum and visibility
 			Camera(std::optional<std::string> name, const render::Frustum &frustum, bool visible = true);
