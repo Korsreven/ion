@@ -448,6 +448,25 @@ SceneNode::SceneNode(std::optional<std::string> name, const Vector3 &position, c
 }
 
 
+SceneNode::SceneNode(std::optional<std::string> name, SceneNode &parent_node) noexcept :
+	SceneNode{std::move(name), parent_node, vector3::Zero, vector2::UnitY}
+{
+	//Empty
+}
+
+SceneNode::SceneNode(std::optional<std::string> name, SceneNode &parent_node, const Vector2 &initial_direction) noexcept :
+	SceneNode{std::move(name), parent_node, vector3::Zero, initial_direction}
+{
+	//Empty
+}
+
+SceneNode::SceneNode(std::optional<std::string> name, SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction) noexcept :
+	SceneNode{std::move(name), parent_node, position, initial_direction, parent_node.Visible()}
+{
+	//Empty
+}
+
+
 SceneNode::SceneNode(std::optional<std::string> name, SceneNode &parent_node, bool visible) noexcept :
 	SceneNode{std::move(name), parent_node, vector3::Zero, vector2::UnitY, visible}
 {
@@ -664,6 +683,22 @@ void SceneNode::Elapse(duration time) noexcept
 	Child nodes
 	Creating
 */
+
+NonOwningPtr<SceneNode> SceneNode::CreateChildNode(std::optional<std::string> name)
+{
+	return child_nodes_.emplace_back(make_owning<SceneNode>(std::move(name), std::ref(*this)));
+}
+
+NonOwningPtr<SceneNode> SceneNode::CreateChildNode(std::optional<std::string> name, const Vector2 &initial_direction)
+{
+	return child_nodes_.emplace_back(make_owning<SceneNode>(std::move(name), std::ref(*this), initial_direction));
+}
+
+NonOwningPtr<SceneNode> SceneNode::CreateChildNode(std::optional<std::string> name, const Vector3 &position, const Vector2 &initial_direction)
+{
+	return child_nodes_.emplace_back(make_owning<SceneNode>(std::move(name), std::ref(*this), position, initial_direction));
+}
+
 
 NonOwningPtr<SceneNode> SceneNode::CreateChildNode(std::optional<std::string> name, bool visible)
 {
