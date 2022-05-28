@@ -60,54 +60,11 @@ namespace ion::script::interfaces
 {
 	namespace gui_theme_script_interface::detail
 	{
-		inline static const Strings pass_blend_factors
-		{
-			"zero",
-			"one",
-
-			"source-color",
-			"one-minus-source-color",
-			"destination-color",
-			"one-minus-destination-color",
-
-			"source-alpha",
-			"one-minus-source-alpha",
-			"destination-alpha",
-			"one-minus-destination-alpha",
-
-			"constant-color",
-			"one-minus-constant-color",
-			"constant-alpha",
-			"one-minus-constant-alpha",
-
-			"source-one-color",
-			"one-minus-source-one-color",
-			"source-one-alpha",
-			"one-minus-source-one-alpha",
-
-			"source-alpha-saturate"
-		};
-
-		inline static const Strings pass_blend_equation_modes
-		{
-			"add",
-			"subtract",
-			"reverse-subtract",
-			"min",
-			"max"
-		};
-
-
-		graphics::render::pass::BlendFactor get_pass_blend_factor(const script_tree::ArgumentNode &arg);
-		graphics::render::pass::BlendEquationMode get_pass_blend_equation_mode(const script_tree::ArgumentNode &arg);
-
-
 		/*
 			Validator classes
 		*/
 
 		script_validator::ClassDefinition get_text_style_class();
-		script_validator::ClassDefinition get_pass_class();
 
 		script_validator::ClassDefinition get_gui_skin_class();
 		script_validator::ClassDefinition get_gui_theme_class();		

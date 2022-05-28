@@ -16,6 +16,7 @@ File:	IonSceneScriptInterface.h
 #include <string_view>
 
 #include "IonScriptInterface.h"
+#include "graphics/render/IonPass.h"
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonDrawableAnimation.h"
 #include "graphics/scene/IonDrawableObject.h"
@@ -48,15 +49,64 @@ namespace ion::graphics
 	{
 		class SceneManager;
 	}
+
+	namespace shaders
+	{
+		class ShaderProgramManager;
+	}
 }
 
 namespace ion::script::interfaces
 {
 	namespace scene_script_interface::detail
 	{
+		inline static const Strings pass_blend_factors
+		{
+			"zero",
+			"one",
+
+			"source-color",
+			"one-minus-source-color",
+			"destination-color",
+			"one-minus-destination-color",
+
+			"source-alpha",
+			"one-minus-source-alpha",
+			"destination-alpha",
+			"one-minus-destination-alpha",
+
+			"constant-color",
+			"one-minus-constant-color",
+			"constant-alpha",
+			"one-minus-constant-alpha",
+
+			"source-one-color",
+			"one-minus-source-one-color",
+			"source-one-alpha",
+			"one-minus-source-one-alpha",
+
+			"source-alpha-saturate"
+		};
+
+		inline static const Strings pass_blend_equation_modes
+		{
+			"add",
+			"subtract",
+			"reverse-subtract",
+			"min",
+			"max"
+		};
+
+
+		graphics::render::pass::BlendFactor get_pass_blend_factor(const script_tree::ArgumentNode &arg);
+		graphics::render::pass::BlendEquationMode get_pass_blend_equation_mode(const script_tree::ArgumentNode &arg);
+
+
 		/*
 			Validator classes
 		*/
+
+		script_validator::ClassDefinition get_pass_class();
 
 		script_validator::ClassDefinition get_node_animation_class();
 		script_validator::ClassDefinition get_node_animation_group_class();
@@ -81,6 +131,9 @@ namespace ion::script::interfaces
 			Tree parsing
 		*/
 		
+		void set_pass_properties(const script_tree::ObjectNode &object, graphics::render::Pass &pass,
+			graphics::shaders::ShaderProgramManager &shader_program_manager);
+
 		void set_node_animation_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::NodeAnimation &animation);
 		void set_node_animation_group_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::NodeAnimationGroup &animation_group);
 		void set_node_animation_timeline_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::NodeAnimationTimeline &timeline);
