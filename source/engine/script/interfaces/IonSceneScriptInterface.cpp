@@ -103,13 +103,134 @@ graphics::render::pass::BlendEquationMode get_pass_blend_equation_mode(const scr
 	Validator classes
 */
 
+ClassDefinition get_frustum_class()
+{
+	return ClassDefinition::Create("frustum")
+		.AddProperty("aspect-format", {"pan-and-scan"s, "letterbox"s, "windowbox"s})
+		.AddProperty("aspect-ratio", ParameterType::FloatingPoint)
+		.AddProperty("base-viewport-height", ParameterType::FloatingPoint)
+		.AddProperty("clip-plane", {ParameterType::Vector2, ParameterType::Vector2})
+		.AddProperty("far-clip-distance", ParameterType::FloatingPoint)
+		.AddProperty("field-of-view", ParameterType::FloatingPoint)
+		.AddProperty("near-clip-distance", ParameterType::FloatingPoint)
+		.AddProperty("projection", {"orthographic"s, "perspective"s});
+}
+
 ClassDefinition get_pass_class()
 {
-	return ClassDefinition::Create("pass")	
+	return ClassDefinition::Create("pass")
 		.AddProperty("blending-factor", {pass_blend_factors, pass_blend_factors, pass_blend_factors, pass_blend_factors}, 2)
 		.AddProperty("blending-equation-mode", {pass_blend_equation_modes, pass_blend_equation_modes}, 1)
 		.AddProperty("iterations", ParameterType::Integer)
 		.AddProperty("shader-program", ParameterType::String);
+}
+
+
+ClassDefinition get_border_class()
+{
+	return ClassDefinition::Create("border", "rectangle")
+		.AddRequiredProperty("border-size", ParameterType::Vector2)
+		.AddRequiredProperty("size", ParameterType::Vector2)
+		.AddProperty("border-color", ParameterType::Color)
+		.AddProperty("corner-color", {ParameterType::Color, ParameterType::Color, ParameterType::Color, ParameterType::Color}, 1)
+		.AddProperty("corner-style", {"none"s, "square"s, "oblique"s})
+		.AddProperty("side-color", {ParameterType::Color, ParameterType::Color, ParameterType::Color, ParameterType::Color}, 1);
+}
+
+ClassDefinition get_curve_class()
+{
+	return ClassDefinition::Create("curve", "shape")
+		.AddRequiredProperty("control-point", ParameterType::Vector3)
+		.AddProperty("smoothness", ParameterType::Integer)
+		.AddProperty("thickness", ParameterType::FloatingPoint);
+}
+
+ClassDefinition get_ellipse_class()
+{
+	return ClassDefinition::Create("ellipse", "shape")
+		.AddRequiredProperty("size", ParameterType::Vector2)
+		.AddProperty("diameter", ParameterType::FloatingPoint)
+		.AddProperty("position", ParameterType::Vector3)
+		.AddProperty("radius", ParameterType::FloatingPoint)
+		.AddProperty("rotation", ParameterType::FloatingPoint)
+		.AddProperty("sides", ParameterType::Integer);
+}
+
+ClassDefinition get_line_class()
+{
+	return ClassDefinition::Create("line", "shape")
+		.AddRequiredProperty("a", ParameterType::Vector3)
+		.AddRequiredProperty("b", ParameterType::Vector3)
+		.AddProperty("thickness", ParameterType::FloatingPoint);
+}
+
+ClassDefinition get_mesh_class()
+{
+	auto vertex = ClassDefinition::Create("vertex")
+		.AddRequiredProperty("position", ParameterType::Vector3)
+		.AddProperty("color", ParameterType::Color)
+		.AddProperty("normal", ParameterType::Vector3)
+		.AddProperty("tex-coord", ParameterType::Vector2);
+
+	auto vertices = ClassDefinition::Create("vertices")
+		.AddRequiredClass(std::move(vertex));
+
+	return ClassDefinition::Create("mesh")
+		.AddRequiredClass(std::move(vertices))
+
+		.AddProperty("color", ParameterType::Color)
+		.AddProperty("draw-mode", {"points"s, "lines"s, "line-loop"s, "line-strip"s, "triangles"s, "triangle-fan"s, "triangle-strip"s, "quads"s, "polygon"s})
+		.AddProperty("include-bounding-volumes", ParameterType::Boolean)
+		.AddProperty("material", ParameterType::String)
+		.AddProperty("opacity", ParameterType::FloatingPoint)
+		.AddProperty("show-wireframe", ParameterType::Boolean)
+		.AddProperty("surface-material", ParameterType::String)
+		.AddProperty("tex-coord-mode", {"manual"s, "auto"s})
+		.AddProperty("vertex-color", ParameterType::Color)
+		.AddProperty("vertex-opacity", ParameterType::FloatingPoint)
+		.AddProperty("visible", ParameterType::Boolean);
+}
+
+ClassDefinition get_rectangle_class()
+{
+	return ClassDefinition::Create("rectangle", "shape")
+		.AddRequiredProperty("size", ParameterType::Vector2)
+		.AddProperty("height", ParameterType::FloatingPoint)
+		.AddProperty("position", ParameterType::Vector3)
+		.AddProperty("resize-to-fill", ParameterType::Vector2)
+		.AddProperty("resize-to-fit", ParameterType::Vector2)
+		.AddProperty("rotation", ParameterType::FloatingPoint)
+		.AddProperty("width", ParameterType::FloatingPoint);
+}
+
+ClassDefinition get_shape_class()
+{
+	return ClassDefinition::Create("shape", "mesh")
+		.AddRequiredProperty("color", ParameterType::Color)
+		.AddProperty("fill-color", ParameterType::Color)
+		.AddProperty("fill-opacity", ParameterType::FloatingPoint);
+}
+
+ClassDefinition get_sprite_class()
+{
+	return ClassDefinition::Create("sprite", "rectangle")
+		.AddRequiredProperty("material", ParameterType::String)
+		.AddProperty("auto-repeat", ParameterType::Boolean)
+		.AddProperty("auto-size", ParameterType::Boolean)
+		.AddProperty("color", ParameterType::Color)
+		.AddProperty("crop", {ParameterType::Vector2, ParameterType::Vector2})
+		.AddProperty("flip-horizontal", ParameterType::Boolean)
+		.AddProperty("flip-vertical", ParameterType::Boolean)
+		.AddProperty("repeat", ParameterType::Vector2)
+		.AddProperty("tex-coords", {ParameterType::Vector2, ParameterType::Vector2});
+}
+
+ClassDefinition get_triangle_class()
+{
+	return ClassDefinition::Create("triangle", "shape")
+		.AddRequiredProperty("a", ParameterType::Vector3)
+		.AddRequiredProperty("b", ParameterType::Vector3)
+		.AddRequiredProperty("c", ParameterType::Vector3);
 }
 
 
@@ -136,17 +257,22 @@ ClassDefinition get_scene_node_class()
 
 ClassDefinition get_camera_class()
 {
-	return ClassDefinition::Create("camera", "movable-object");
+	return ClassDefinition::Create("camera", "movable-object")
+		.AddClass(get_frustum_class())
+
+		.AddProperty("base-viewport-height", ParameterType::FloatingPoint)
+		.AddProperty("position", ParameterType::Vector3)
+		.AddProperty("rotation", ParameterType::FloatingPoint);
 }
 
 ClassDefinition get_drawable_animation_class()
 {
 	return ClassDefinition::Create("animation", "drawable-object")
+		.AddRequiredProperty("animation", ParameterType::String)
 		.AddRequiredProperty("size", ParameterType::Vector2)
 		.AddProperty("color", ParameterType::Color)
 		.AddProperty("position", ParameterType::Vector3)
-		.AddProperty("rotation", ParameterType::FloatingPoint)
-		.AddProperty("animation", ParameterType::String);
+		.AddProperty("rotation", ParameterType::FloatingPoint);
 }
 
 ClassDefinition get_drawable_object_class()
@@ -159,25 +285,43 @@ ClassDefinition get_drawable_object_class()
 ClassDefinition get_drawable_particle_system_class()
 {
 	return ClassDefinition::Create("particle-system", "drawable-object")
-		.AddProperty("particle-system", ParameterType::String);
+		.AddRequiredProperty("particle-system", ParameterType::String);
 }
 
 ClassDefinition get_drawable_text_class()
 {
 	return ClassDefinition::Create("text", "drawable-object")
+		.AddRequiredProperty("text", ParameterType::String)
 		.AddProperty("position", ParameterType::Vector3)
-		.AddProperty("rotation", ParameterType::FloatingPoint)
-		.AddProperty("text", ParameterType::String);
+		.AddProperty("rotation", ParameterType::FloatingPoint);
 }
 
 ClassDefinition get_light_class()
 {
-	return ClassDefinition::Create("light", "movable-object");
+	return ClassDefinition::Create("light", "movable-object")
+		.AddProperty("ambient-color", ParameterType::Color)
+		.AddProperty("attenuation", {ParameterType::FloatingPoint, ParameterType::FloatingPoint, ParameterType::FloatingPoint})
+		.AddProperty("cast-shadows", ParameterType::Boolean)
+		.AddProperty("cutoff", {ParameterType::FloatingPoint, ParameterType::FloatingPoint})
+		.AddProperty("diffuse-color", ParameterType::Color)
+		.AddProperty("direction", ParameterType::Vector3)
+		.AddProperty("position", ParameterType::Vector3)
+		.AddProperty("specular-color", ParameterType::Color)
+		.AddProperty("type", {"point"s, "directional"s, "spotlight"s});
 }
 
 ClassDefinition get_model_class()
 {
-	return ClassDefinition::Create("model", "drawable-object");
+	return ClassDefinition::Create("model", "drawable-object")
+		.AddAbstractClass(get_shape_class())
+		.AddClass(get_border_class())
+		.AddClass(get_curve_class())
+		.AddClass(get_ellipse_class())
+		.AddClass(get_line_class())
+		.AddClass(get_mesh_class())
+		.AddClass(get_rectangle_class())
+		.AddClass(get_sprite_class())
+		.AddClass(get_triangle_class());
 }
 
 ClassDefinition get_movable_object_class()
@@ -196,24 +340,38 @@ ClassDefinition get_movable_object_class()
 
 ClassDefinition get_movable_sound_class()
 {
-	return ClassDefinition::Create("sound", "movable-object");
+	return ClassDefinition::Create("sound", "movable-object")
+		.AddRequiredProperty("sound", ParameterType::String)
+		.AddProperty("paused", ParameterType::Boolean)
+		.AddProperty("position", ParameterType::Vector3)
+		.AddProperty("sound-channel-group", ParameterType::String);
 }
 
 ClassDefinition get_movable_sound_listener_class()
 {
-	return ClassDefinition::Create("sound-listener", "movable-object");
+	return ClassDefinition::Create("sound-listener", "movable-object")
+		.AddRequiredProperty("sound-listener", ParameterType::String)
+		.AddProperty("position", ParameterType::Vector3);
 }
 
 
 ScriptValidator get_scene_validator()
 {
-	return ScriptValidator::Create();
+	return ScriptValidator::Create()
+		.AddClass(get_scene_node_class());
 }
 
 
 /*
 	Tree parsing
 */
+
+void set_frustum_properties(const script_tree::ObjectNode &object, graphics::render::Frustum &frustum)
+{
+	for (auto &property : object.Properties())
+	{
+	}
+}
 
 void set_pass_properties(const script_tree::ObjectNode &object, graphics::render::Pass &pass,
 	graphics::shaders::ShaderProgramManager &shader_program_manager)
@@ -314,6 +472,22 @@ void set_movable_sound_listener_properties(const script_tree::ObjectNode &object
 
 }
 
+
+graphics::render::Frustum create_frustum(const script_tree::ObjectNode &object)
+{
+	graphics::render::Frustum frustum;
+	set_frustum_properties(object, frustum);
+	return frustum;
+}
+
+graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
+{
+	graphics::render::Pass pass;
+	set_pass_properties(object, pass, shader_program_manager);
+	return pass;
+}
+
 		
 NonOwningPtr<graph::SceneNode> create_scene_node(const script_tree::ObjectNode &object,
 	graph::SceneNode &scene_node,
@@ -396,7 +570,11 @@ void create_scene(const ScriptTree &tree,
 	SceneManager &scene_manager,
 	graphics::materials::MaterialManager &material_manager)
 {
-
+	for (auto &object : tree.Objects())
+	{
+		if (object.Name() == "scene-node")
+			create_scene_node(object, scene_node, material_manager);
+	}
 }
 
 } //scene_script_interface::detail

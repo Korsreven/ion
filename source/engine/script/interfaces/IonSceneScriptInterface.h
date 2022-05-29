@@ -16,6 +16,7 @@ File:	IonSceneScriptInterface.h
 #include <string_view>
 
 #include "IonScriptInterface.h"
+#include "graphics/render/IonFrustum.h"
 #include "graphics/render/IonPass.h"
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonDrawableAnimation.h"
@@ -106,7 +107,18 @@ namespace ion::script::interfaces
 			Validator classes
 		*/
 
+		script_validator::ClassDefinition get_frustum_class();
 		script_validator::ClassDefinition get_pass_class();
+
+		script_validator::ClassDefinition get_border_class();
+		script_validator::ClassDefinition get_curve_class();
+		script_validator::ClassDefinition get_ellipse_class();
+		script_validator::ClassDefinition get_line_class();
+		script_validator::ClassDefinition get_mesh_class();
+		script_validator::ClassDefinition get_rectangle_class();
+		script_validator::ClassDefinition get_shape_class();
+		script_validator::ClassDefinition get_sprite_class();
+		script_validator::ClassDefinition get_triangle_class();
 
 		script_validator::ClassDefinition get_node_animation_class();
 		script_validator::ClassDefinition get_node_animation_group_class();
@@ -131,6 +143,7 @@ namespace ion::script::interfaces
 			Tree parsing
 		*/
 		
+		void set_frustum_properties(const script_tree::ObjectNode &object, graphics::render::Frustum &frustum);
 		void set_pass_properties(const script_tree::ObjectNode &object, graphics::render::Pass &pass,
 			graphics::shaders::ShaderProgramManager &shader_program_manager);
 
@@ -151,6 +164,10 @@ namespace ion::script::interfaces
 		void set_movable_sound_listener_properties(const script_tree::ObjectNode &object, graphics::scene::MovableSoundListener &sound_listener);
 
 		
+		graphics::render::Frustum create_frustum(const script_tree::ObjectNode &object);
+		graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
+			graphics::shaders::ShaderProgramManager &shader_program_manager);
+
 		NonOwningPtr<graphics::scene::graph::SceneNode> create_scene_node(const script_tree::ObjectNode &object,
 			graphics::scene::graph::SceneNode &scene_node,
 			graphics::materials::MaterialManager &material_manager);
