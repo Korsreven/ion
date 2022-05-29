@@ -43,10 +43,29 @@ ClassDefinition get_sound_class()
 		.AddProperty("type", {"sample"s, "compressed-sample"s, "stream"s});
 }
 
+ClassDefinition get_sound_channel_group_class()
+{
+	return ClassDefinition::Create("sound-channel-group")
+		.AddRequiredProperty("name", ParameterType::String)
+		.AddProperty("mute", ParameterType::Boolean)
+		.AddProperty("pitch", ParameterType::FloatingPoint)
+		.AddProperty("volume", ParameterType::FloatingPoint);
+}
+
+ClassDefinition get_sound_listener_class()
+{
+	return ClassDefinition::Create("sound-listener")
+		.AddRequiredProperty("name", ParameterType::String)
+		.AddProperty("attributes", {ParameterType::Vector3, ParameterType::Vector3});
+}
+
+
 ScriptValidator get_sound_validator()
 {
 	return ScriptValidator::Create()
-		.AddRequiredClass(get_sound_class());
+		.AddClass(get_sound_class())
+		.AddClass(get_sound_channel_group_class())
+		.AddClass(get_sound_listener_class());
 }
 
 
@@ -133,6 +152,54 @@ NonOwningPtr<Sound> create_sound(const script_tree::ObjectNode &object,
 	return sound;
 }
 
+NonOwningPtr<SoundChannelGroup> create_sound_channel_group(const script_tree::ObjectNode &object,
+	SoundManager &sound_manager)
+{
+	auto name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()->Get();
+
+	auto sound_channel_group = sound_manager.CreateSoundChannelGroup(std::move(name));
+
+	if (sound_channel_group)
+	{
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "mute")
+				sound_channel_group->Mute(property[0].Get<ScriptType::Boolean>()->Get());
+			else if (property.Name() == "pitch")
+				sound_channel_group->Pitch(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			else if (property.Name() == "volume")
+				sound_channel_group->Volume(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		}
+	}
+
+	return sound_channel_group;
+}
+
+NonOwningPtr<SoundListener> create_sound_listener(const script_tree::ObjectNode &object,
+	SoundManager &sound_manager)
+{
+	auto name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()->Get();
+
+	auto sound_listener = sound_manager.CreateSoundListener(std::move(name));
+
+	if (sound_listener)
+	{
+		for (auto &property : object.Properties())
+		{
+			if (property.Name() == "attributes")
+				sound_listener->Attributes(property[0].Get<ScriptType::Vector3>()->Get(),
+										   property[1].Get<ScriptType::Vector3>()->Get());
+		}
+	}
+
+	return sound_listener;
+}
+
+
 void create_sounds(const ScriptTree &tree,
 	SoundManager &sound_manager)
 {
@@ -140,6 +207,10 @@ void create_sounds(const ScriptTree &tree,
 	{
 		if (object.Name() == "sound")
 			create_sound(object, sound_manager);
+		else if (object.Name() == "sound-channel-group")
+			create_sound_channel_group(object, sound_manager);
+		else if (object.Name() == "sound-listener")
+			create_sound_listener(object, sound_manager);
 	}
 }
 
