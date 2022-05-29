@@ -209,6 +209,7 @@ NonOwningPtr<TextureAtlas> create_texture_atlas(const script_tree::ObjectNode &o
 		rows, columns, sub_textures, sub_texture_order);
 }
 
+
 void create_textures(const ScriptTree &tree,
 	TextureManager &texture_manager)
 {
