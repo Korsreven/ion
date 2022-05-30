@@ -403,73 +403,133 @@ void set_pass_properties(const script_tree::ObjectNode &object, graphics::render
 
 void set_node_animation_properties(const script_tree::ObjectNode &object, graph::animations::NodeAnimation &animation)
 {
-
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "");
+	}
 }
 
 void set_node_animation_group_properties(const script_tree::ObjectNode &object, graph::animations::NodeAnimationGroup &animation_group)
 {
-
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "");
+	}
 }
 
 void set_node_animation_timeline_properties(const script_tree::ObjectNode &object, graph::animations::NodeAnimationTimeline &timeline)
 {
-
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "");
+	}
 }
 
 void set_scene_node_properties(const script_tree::ObjectNode &object, graph::SceneNode &scene_node)
 {
-
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "");
+	}
 }
 
 
 void set_camera_properties(const script_tree::ObjectNode &object, Camera &camera)
 {
+	set_movable_object_properties(object, camera);
 
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "");
+	}
 }
 
 void set_drawable_animation_properties(const script_tree::ObjectNode &object, DrawableAnimation &animation)
 {
+	set_drawable_object_properties(object, animation);
 
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "");
+	}
 }
 
 void set_drawable_object_properties(const script_tree::ObjectNode &object, DrawableObject &drawable_object)
 {
+	set_movable_object_properties(object, drawable_object);
 
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "");
+	}
 }
 
 void set_drawable_particle_system_properties(const script_tree::ObjectNode &object, DrawableParticleSystem &particle_system)
 {
+	set_drawable_object_properties(object, particle_system);
 
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "");
+	}
 }
 
 void set_drawable_text_properties(const script_tree::ObjectNode &object, DrawableText &text)
 {
+	set_drawable_object_properties(object, text);
 
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "");
+	}
 }
 
 void set_light_properties(const script_tree::ObjectNode &object, Light &light)
 {
+	set_movable_object_properties(object, light);
 
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "");
+	}
 }
 
 void set_model_properties(const script_tree::ObjectNode &object, Model &model)
 {
+	set_drawable_object_properties(object, model);
 
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "");
+	}
 }
 
 void set_movable_object_properties(const script_tree::ObjectNode &object, MovableObject &movable_object)
 {
-
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "");
+	}
 }
 
 void set_movable_sound_properties(const script_tree::ObjectNode &object, MovableSound &sound)
 {
+	set_movable_object_properties(object, sound);
 
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "");
+	}
 }
 
 void set_movable_sound_listener_properties(const script_tree::ObjectNode &object, MovableSoundListener &sound_listener)
 {
+	set_movable_object_properties(object, sound_listener);
 
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "");
+	}
 }
 
 
