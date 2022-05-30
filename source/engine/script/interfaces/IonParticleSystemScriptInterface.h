@@ -20,6 +20,7 @@ File:	IonParticleSystemScriptInterface.h
 #include "graphics/particles/IonEmitterManager.h"
 #include "graphics/particles/IonParticleSystem.h"
 #include "graphics/particles/IonParticleSystemManager.h"
+#include "graphics/particles/affectors/IonAffector.h"
 #include "graphics/particles/affectors/IonAffectorManager.h"
 #include "graphics/particles/affectors/IonColorFader.h"
 #include "graphics/particles/affectors/IonDirectionRandomizer.h"
@@ -64,6 +65,9 @@ namespace ion::script::interfaces
 		/*
 			Tree parsing
 		*/
+
+		void set_affector_properties(const script_tree::ObjectNode &object, graphics::particles::affectors::Affector &affector);
+
 
 		NonOwningPtr<graphics::particles::Emitter> create_emitter(const script_tree::ObjectNode &object,
 			graphics::particles::ParticleSystem &particle_system,
