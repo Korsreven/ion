@@ -251,7 +251,44 @@ ClassDefinition get_node_animation_timeline_class()
 
 ClassDefinition get_scene_node_class()
 {
-	return ClassDefinition::Create("scene-node");
+	return ClassDefinition::Create("scene-node")
+
+		//Class definitions already added to scene script validator
+		//Classes could have been forward declared, but scene node is also used from GUI script interface
+		.AddAbstractClass(get_drawable_object_class())
+		.AddAbstractClass(get_movable_object_class())
+		.AddClass(get_camera_class())
+		.AddClass(get_drawable_animation_class())
+		.AddClass(get_drawable_particle_system_class())
+		.AddClass(get_drawable_text_class())
+		.AddClass(get_light_class())
+		.AddClass(get_model_class())
+		.AddClass(get_movable_sound_class())
+		.AddClass(get_movable_sound_listener_class())
+
+		.AddClass(get_node_animation_class())
+		.AddClass(get_node_animation_group_class())
+		.AddClass(get_node_animation_timeline_class())
+		.AddClass("scene-node")
+		
+		.AddProperty("attach", ParameterType::String)
+		.AddProperty("derived-position", ParameterType::Vector3)
+		.AddProperty("derived-rotation", ParameterType::FloatingPoint)
+		.AddProperty("derived-scaling", ParameterType::Vector2)
+		.AddProperty("direction", ParameterType::Vector2)
+		.AddProperty("flip-visibility", {ParameterType::Boolean, ParameterType::Boolean}, 1)
+		.AddProperty("inherit-rotation", ParameterType::Boolean)
+		.AddProperty("inherit-scaling", ParameterType::Boolean)
+		.AddProperty("initial-direction", ParameterType::Vector2)
+		.AddProperty("name", ParameterType::String)
+		.AddProperty("position", ParameterType::Vector3)
+		.AddProperty("rotate", ParameterType::FloatingPoint)
+		.AddProperty("rotation", ParameterType::FloatingPoint)
+		.AddProperty("rotation-origin", {"parent"s, "local"s})
+		.AddProperty("scale", ParameterType::Vector2)
+		.AddProperty("scaling", ParameterType::Vector2)
+		.AddProperty("translate", ParameterType::Vector3)
+		.AddProperty("visible", {ParameterType::Boolean, ParameterType::Boolean}, 1);
 }
 
 
@@ -267,7 +304,7 @@ ClassDefinition get_camera_class()
 
 ClassDefinition get_drawable_animation_class()
 {
-	return ClassDefinition::Create("animation", "drawable-object")
+	return ClassDefinition::Create("drawable-animation", "drawable-object")
 		.AddRequiredProperty("animation", ParameterType::String)
 		.AddRequiredProperty("size", ParameterType::Vector2)
 		.AddProperty("color", ParameterType::Color)
@@ -284,13 +321,13 @@ ClassDefinition get_drawable_object_class()
 
 ClassDefinition get_drawable_particle_system_class()
 {
-	return ClassDefinition::Create("particle-system", "drawable-object")
+	return ClassDefinition::Create("drawable-particle-system", "drawable-object")
 		.AddRequiredProperty("particle-system", ParameterType::String);
 }
 
 ClassDefinition get_drawable_text_class()
 {
-	return ClassDefinition::Create("text", "drawable-object")
+	return ClassDefinition::Create("drawable-text", "drawable-object")
 		.AddRequiredProperty("text", ParameterType::String)
 		.AddProperty("position", ParameterType::Vector3)
 		.AddProperty("rotation", ParameterType::FloatingPoint);
@@ -340,7 +377,7 @@ ClassDefinition get_movable_object_class()
 
 ClassDefinition get_movable_sound_class()
 {
-	return ClassDefinition::Create("sound", "movable-object")
+	return ClassDefinition::Create("movable-sound", "movable-object")
 		.AddRequiredProperty("sound", ParameterType::String)
 		.AddProperty("paused", ParameterType::Boolean)
 		.AddProperty("position", ParameterType::Vector3)
@@ -349,7 +386,7 @@ ClassDefinition get_movable_sound_class()
 
 ClassDefinition get_movable_sound_listener_class()
 {
-	return ClassDefinition::Create("sound-listener", "movable-object")
+	return ClassDefinition::Create("movable-sound-listener", "movable-object")
 		.AddRequiredProperty("sound-listener", ParameterType::String)
 		.AddProperty("position", ParameterType::Vector3);
 }
@@ -358,6 +395,17 @@ ClassDefinition get_movable_sound_listener_class()
 ScriptValidator get_scene_validator()
 {
 	return ScriptValidator::Create()
+		.AddAbstractClass(get_drawable_object_class())
+		.AddAbstractClass(get_movable_object_class())
+		.AddClass(get_camera_class())
+		.AddClass(get_drawable_animation_class())
+		.AddClass(get_drawable_particle_system_class())
+		.AddClass(get_drawable_text_class())
+		.AddClass(get_light_class())
+		.AddClass(get_model_class())
+		.AddClass(get_movable_sound_class())
+		.AddClass(get_movable_sound_listener_class())
+
 		.AddClass(get_scene_node_class());
 }
 
@@ -425,7 +473,7 @@ void set_node_animation_timeline_properties(const script_tree::ObjectNode &objec
 	}
 }
 
-void set_scene_node_properties(const script_tree::ObjectNode &object, graph::SceneNode &scene_node)
+void set_scene_node_properties(const script_tree::ObjectNode &object, graph::SceneNode &parent_node)
 {
 	for (auto &property : object.Properties())
 	{
@@ -550,26 +598,63 @@ graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
 
 		
 NonOwningPtr<graph::SceneNode> create_scene_node(const script_tree::ObjectNode &object,
-	graph::SceneNode &scene_node,
+	graph::SceneNode &parent_node,
+	graphics::scene::SceneManager &scene_manager,
 	graphics::materials::MaterialManager &material_manager)
 {
-	return nullptr;
+	auto node = parent_node.CreateChildNode();
+
+	if (node)
+	{
+		for (auto &obj : object.Objects())
+		{
+			if (obj.Name() == "camera")
+				create_camera(obj, scene_manager);
+			else if (obj.Name() == "drawable-animation")
+				create_drawable_animation(obj, scene_manager);
+			else if (obj.Name() == "drawable-particle-system")
+				create_drawable_particle_system(obj, scene_manager);
+			else if (obj.Name() == "drawable-text")
+				create_drawable_text(obj, scene_manager);
+			else if (obj.Name() == "light")
+				create_light(obj, scene_manager);
+			else if (obj.Name() == "model")
+				create_model(obj, scene_manager, material_manager);
+			else if (obj.Name() == "movable-sound")
+				create_movable_sound(obj, scene_manager);
+			else if (obj.Name() == "movable-sound-listener")
+				create_movable_sound_listener(obj, scene_manager);
+
+			else if (obj.Name() == "node-animation")
+				create_node_animation(obj, *node);
+			else if (obj.Name() == "node-animation-group")
+				create_node_animation_group(obj, *node);
+			else if (obj.Name() == "node-animation-timeline")
+				create_node_animation_timeline(obj, *node);
+			else if (obj.Name() == "scene-node")
+				create_scene_node(obj, *node, scene_manager, material_manager);
+		}
+
+		set_scene_node_properties(object, *node);
+	}
+
+	return node;
 }
 
 NonOwningPtr<graph::animations::NodeAnimation> create_node_animation(const script_tree::ObjectNode &object,
-	graph::SceneNode &scene_node)
+	graph::SceneNode &parent_node)
 {
 	return nullptr;
 }
 
 NonOwningPtr<graph::animations::NodeAnimationGroup> create_node_animation_group(const script_tree::ObjectNode &object,
-	graph::SceneNode &scene_node)
+	graph::SceneNode &parent_node)
 {
 	return nullptr;
 }
 
 NonOwningPtr<graph::animations::NodeAnimationTimeline> create_node_animation_timeline(const script_tree::ObjectNode &object,
-	graph::SceneNode &scene_node)
+	graph::SceneNode &parent_node)
 {
 	return nullptr;
 }
@@ -626,14 +711,31 @@ NonOwningPtr<MovableSoundListener> create_movable_sound_listener(const script_tr
 
 
 void create_scene(const ScriptTree &tree,
-	graph::SceneNode &scene_node,
+	graph::SceneNode &parent_node,
 	SceneManager &scene_manager,
 	graphics::materials::MaterialManager &material_manager)
 {
 	for (auto &object : tree.Objects())
 	{
-		if (object.Name() == "scene-node")
-			create_scene_node(object, scene_node, material_manager);
+		if (object.Name() == "camera")
+			create_camera(object, scene_manager);
+		else if (object.Name() == "drawable-animation")
+			create_drawable_animation(object, scene_manager);
+		else if (object.Name() == "drawable-particle-system")
+			create_drawable_particle_system(object, scene_manager);
+		else if (object.Name() == "drawable-text")
+			create_drawable_text(object, scene_manager);
+		else if (object.Name() == "light")
+			create_light(object, scene_manager);
+		else if (object.Name() == "model")
+			create_model(object, scene_manager, material_manager);
+		else if (object.Name() == "movable-sound")
+			create_movable_sound(object, scene_manager);
+		else if (object.Name() == "movable-sound-listener")
+			create_movable_sound_listener(object, scene_manager);
+
+		else if (object.Name() == "scene-node")
+			create_scene_node(object, parent_node, scene_manager, material_manager);
 	}
 }
 
@@ -656,12 +758,12 @@ ScriptValidator SceneScriptInterface::GetValidator() const
 */
 
 void SceneScriptInterface::CreateScene(std::string_view asset_name,
-	graph::SceneNode &scene_node,
+	graph::SceneNode &parent_node,
 	SceneManager &scene_manager,
 	graphics::materials::MaterialManager &material_manager)
 {
 	if (Load(asset_name))
-		detail::create_scene(*tree_, scene_node, scene_manager, material_manager);
+		detail::create_scene(*tree_, parent_node, scene_manager, material_manager);
 }
 
 } //ion::script::interfaces

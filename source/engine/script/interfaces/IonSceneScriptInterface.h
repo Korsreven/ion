@@ -169,14 +169,15 @@ namespace ion::script::interfaces
 			graphics::shaders::ShaderProgramManager &shader_program_manager);
 
 		NonOwningPtr<graphics::scene::graph::SceneNode> create_scene_node(const script_tree::ObjectNode &object,
-			graphics::scene::graph::SceneNode &scene_node,
+			graphics::scene::graph::SceneNode &parent_node,
+			graphics::scene::SceneManager &scene_manager,
 			graphics::materials::MaterialManager &material_manager);
 		NonOwningPtr<graphics::scene::graph::animations::NodeAnimation> create_node_animation(const script_tree::ObjectNode &object,
-			graphics::scene::graph::SceneNode &scene_node);
+			graphics::scene::graph::SceneNode &parent_node);
 		NonOwningPtr<graphics::scene::graph::animations::NodeAnimationGroup> create_node_animation_group(const script_tree::ObjectNode &object,
-			graphics::scene::graph::SceneNode &scene_node);
+			graphics::scene::graph::SceneNode &parent_node);
 		NonOwningPtr<graphics::scene::graph::animations::NodeAnimationTimeline> create_node_animation_timeline(const script_tree::ObjectNode &object,
-			graphics::scene::graph::SceneNode &scene_node);
+			graphics::scene::graph::SceneNode &parent_node);
 
 		NonOwningPtr<graphics::scene::Camera> create_camera(const script_tree::ObjectNode &object,
 			graphics::scene::SceneManager &scene_manager);
@@ -197,7 +198,7 @@ namespace ion::script::interfaces
 			graphics::scene::SceneManager &scene_manager);
 
 		void create_scene(const ScriptTree &tree,
-			graphics::scene::graph::SceneNode &scene_node,
+			graphics::scene::graph::SceneNode &parent_node,
 			graphics::scene::SceneManager &scene_manager,
 			graphics::materials::MaterialManager &material_manager);
 	} //scene_script_interface::detail
@@ -222,7 +223,7 @@ namespace ion::script::interfaces
 
 			//Create scene from a script (or object file) with the given asset name
 			void CreateScene(std::string_view asset_name,
-				graphics::scene::graph::SceneNode &scene_node,
+				graphics::scene::graph::SceneNode &parent_node,
 				graphics::scene::SceneManager &scene_manager,
 				graphics::materials::MaterialManager &material_manager);
 	};
