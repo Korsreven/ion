@@ -61,6 +61,17 @@ namespace ion::script::interfaces
 {
 	namespace scene_script_interface::detail
 	{
+		inline static const Strings motion_technique_types
+		{
+			"cubic",
+			"exponential",
+			"linear",
+			"logarithmic",
+			"sigmoid",
+			"sinh",
+			"tanh"
+		};
+
 		inline static const Strings pass_blend_factors
 		{
 			"zero",
@@ -99,6 +110,7 @@ namespace ion::script::interfaces
 		};
 
 
+		graphics::scene::graph::animations::node_animation::MotionTechniqueType get_motion_technique_type(const script_tree::ArgumentNode &arg);
 		graphics::render::pass::BlendFactor get_pass_blend_factor(const script_tree::ArgumentNode &arg);
 		graphics::render::pass::BlendEquationMode get_pass_blend_equation_mode(const script_tree::ArgumentNode &arg);
 
@@ -107,8 +119,12 @@ namespace ion::script::interfaces
 			Validator classes
 		*/
 
+		script_validator::ClassDefinition get_action_class();
 		script_validator::ClassDefinition get_frustum_class();
 		script_validator::ClassDefinition get_pass_class();
+		script_validator::ClassDefinition get_rotation_class();
+		script_validator::ClassDefinition get_scaling_class();
+		script_validator::ClassDefinition get_translation_class();
 
 		script_validator::ClassDefinition get_border_class();
 		script_validator::ClassDefinition get_curve_class();

@@ -31,6 +31,27 @@ using namespace graphics::scene;
 namespace scene_script_interface::detail
 {
 
+graphics::scene::graph::animations::node_animation::MotionTechniqueType get_motion_technique_type(const script_tree::ArgumentNode &arg)
+{
+	auto name = arg
+		.Get<ScriptType::Enumerable>()->Get();
+
+	if (name == "cubic")
+		return graphics::scene::graph::animations::node_animation::MotionTechniqueType::Cubic;
+	else if (name == "exponential")
+		return graphics::scene::graph::animations::node_animation::MotionTechniqueType::Exponential;
+	else if (name == "linear")
+		return graphics::scene::graph::animations::node_animation::MotionTechniqueType::Linear;
+	else if (name == "logarithmic")
+		return graphics::scene::graph::animations::node_animation::MotionTechniqueType::Logarithmic;
+	else if (name == "sigmoid")
+		return graphics::scene::graph::animations::node_animation::MotionTechniqueType::Sigmoid;
+	else if (name == "sinh")
+		return graphics::scene::graph::animations::node_animation::MotionTechniqueType::Sinh;
+	else //if (name == "tanh")
+		return graphics::scene::graph::animations::node_animation::MotionTechniqueType::Tanh;
+}
+
 graphics::render::pass::BlendFactor get_pass_blend_factor(const script_tree::ArgumentNode &arg)
 {
 	auto name = arg
@@ -103,6 +124,14 @@ graphics::render::pass::BlendEquationMode get_pass_blend_equation_mode(const scr
 	Validator classes
 */
 
+ClassDefinition get_action_class()
+{
+	return ClassDefinition::Create("action")
+		.AddRequiredProperty("duration", ParameterType::FloatingPoint)
+		.AddRequiredProperty("type", {"flip-visibility"s, "flip-visibility-cascading"s, "show"s, "show-cascading"s, "hide"s, "hide-cascading"s,
+							  "inherit-rotation"s, "inherit-scaling"s, "disinherit-rotation"s, "disinherit-scaling"s});
+}
+
 ClassDefinition get_frustum_class()
 {
 	return ClassDefinition::Create("frustum")
@@ -123,6 +152,33 @@ ClassDefinition get_pass_class()
 		.AddProperty("blending-equation-mode", {pass_blend_equation_modes, pass_blend_equation_modes}, 1)
 		.AddProperty("iterations", ParameterType::Integer)
 		.AddProperty("shader-program", ParameterType::String);
+}
+
+ClassDefinition get_rotation_class()
+{
+	return ClassDefinition::Create("rotation")
+		.AddRequiredProperty("angle", ParameterType::FloatingPoint)
+		.AddRequiredProperty("total-duration", ParameterType::FloatingPoint)
+		.AddProperty("motion-technique", motion_technique_types)
+		.AddProperty("start-time", ParameterType::FloatingPoint);
+}
+
+ClassDefinition get_scaling_class()
+{
+	return ClassDefinition::Create("scaling")
+		.AddRequiredProperty("total-duration", ParameterType::FloatingPoint)
+		.AddRequiredProperty("unit", ParameterType::Vector2)
+		.AddProperty("motion-technique", {motion_technique_types, motion_technique_types}, 1)
+		.AddProperty("start-time", ParameterType::FloatingPoint);
+}
+
+ClassDefinition get_translation_class()
+{
+	return ClassDefinition::Create("translation")
+		.AddRequiredProperty("total-duration", ParameterType::FloatingPoint)
+		.AddRequiredProperty("unit", ParameterType::Vector3)
+		.AddProperty("motion-technique", {motion_technique_types, motion_technique_types, motion_technique_types}, 1)
+		.AddProperty("start-time", ParameterType::FloatingPoint);
 }
 
 
@@ -236,17 +292,31 @@ ClassDefinition get_triangle_class()
 
 ClassDefinition get_node_animation_class()
 {
-	return ClassDefinition::Create("node-animation");
+	return ClassDefinition::Create("node-animation")
+		.AddClass(get_action_class())
+		.AddClass(get_rotation_class())
+		.AddClass(get_scaling_class())
+		.AddClass(get_translation_class())
+		.AddRequiredProperty("name", ParameterType::String);
 }
 
 ClassDefinition get_node_animation_group_class()
 {
-	return ClassDefinition::Create("node-animation-group");
+	return ClassDefinition::Create("node-animation-group")
+		.AddRequiredProperty("name", ParameterType::String)
+		.AddProperty("add", {ParameterType::String, ParameterType::FloatingPoint, ParameterType::Boolean}, 1);
 }
 
 ClassDefinition get_node_animation_timeline_class()
 {
-	return ClassDefinition::Create("node-animation-timeline");
+	return ClassDefinition::Create("node-animation-timeline")
+		.AddProperty("attach", {ParameterType::String, ParameterType::FloatingPoint, ParameterType::Boolean}, 1)
+		.AddProperty("attach-animation", {ParameterType::String, ParameterType::FloatingPoint, ParameterType::Boolean}, 1)
+		.AddProperty("attach-animation-group", {ParameterType::String, ParameterType::FloatingPoint, ParameterType::Boolean}, 1)
+		.AddProperty("name", ParameterType::String)
+		.AddProperty("playback-rate", ParameterType::FloatingPoint)
+		.AddProperty("repeat-count", ParameterType::Integer)
+		.AddProperty("running", ParameterType::Boolean);
 }
 
 ClassDefinition get_scene_node_class()
