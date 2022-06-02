@@ -19,6 +19,7 @@ File:	IonSceneScriptInterface.cpp
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/animations/IonNodeAnimationManager.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
+#include "graphics/utilities/IonAabb.h"
 
 namespace ion::script::interfaces
 {
@@ -31,25 +32,25 @@ using namespace graphics::scene;
 namespace scene_script_interface::detail
 {
 
-graphics::scene::graph::animations::node_animation::MotionTechniqueType get_motion_technique_type(const script_tree::ArgumentNode &arg)
+graph::animations::node_animation::MotionTechniqueType get_motion_technique_type(const script_tree::ArgumentNode &arg)
 {
 	auto name = arg
 		.Get<ScriptType::Enumerable>()->Get();
 
 	if (name == "cubic")
-		return graphics::scene::graph::animations::node_animation::MotionTechniqueType::Cubic;
+		return graph::animations::node_animation::MotionTechniqueType::Cubic;
 	else if (name == "exponential")
-		return graphics::scene::graph::animations::node_animation::MotionTechniqueType::Exponential;
+		return graph::animations::node_animation::MotionTechniqueType::Exponential;
 	else if (name == "linear")
-		return graphics::scene::graph::animations::node_animation::MotionTechniqueType::Linear;
+		return graph::animations::node_animation::MotionTechniqueType::Linear;
 	else if (name == "logarithmic")
-		return graphics::scene::graph::animations::node_animation::MotionTechniqueType::Logarithmic;
+		return graph::animations::node_animation::MotionTechniqueType::Logarithmic;
 	else if (name == "sigmoid")
-		return graphics::scene::graph::animations::node_animation::MotionTechniqueType::Sigmoid;
+		return graph::animations::node_animation::MotionTechniqueType::Sigmoid;
 	else if (name == "sinh")
-		return graphics::scene::graph::animations::node_animation::MotionTechniqueType::Sinh;
+		return graph::animations::node_animation::MotionTechniqueType::Sinh;
 	else //if (name == "tanh")
-		return graphics::scene::graph::animations::node_animation::MotionTechniqueType::Tanh;
+		return graph::animations::node_animation::MotionTechniqueType::Tanh;
 }
 
 graphics::render::pass::BlendFactor get_pass_blend_factor(const script_tree::ArgumentNode &arg)
@@ -136,7 +137,7 @@ ClassDefinition get_frustum_class()
 {
 	return ClassDefinition::Create("frustum")
 		.AddProperty("aspect-format", {"pan-and-scan"s, "letterbox"s, "windowbox"s})
-		.AddProperty("aspect-ratio", ParameterType::FloatingPoint)
+		.AddProperty("aspect-ratio", {ParameterType::FloatingPoint, ParameterType::FloatingPoint}, 1)
 		.AddProperty("base-viewport-height", ParameterType::FloatingPoint)
 		.AddProperty("clip-plane", {ParameterType::Vector2, ParameterType::Vector2})
 		.AddProperty("far-clip-distance", ParameterType::FloatingPoint)
@@ -154,7 +155,7 @@ ClassDefinition get_pass_class()
 		.AddProperty("shader-program", ParameterType::String);
 }
 
-ClassDefinition get_rotation_class()
+ClassDefinition get_rotating_class()
 {
 	return ClassDefinition::Create("rotation")
 		.AddRequiredProperty("angle", ParameterType::FloatingPoint)
@@ -172,7 +173,7 @@ ClassDefinition get_scaling_class()
 		.AddProperty("start-time", ParameterType::FloatingPoint);
 }
 
-ClassDefinition get_translation_class()
+ClassDefinition get_translating_class()
 {
 	return ClassDefinition::Create("translation")
 		.AddRequiredProperty("total-duration", ParameterType::FloatingPoint)
@@ -294,9 +295,9 @@ ClassDefinition get_node_animation_class()
 {
 	return ClassDefinition::Create("node-animation")
 		.AddClass(get_action_class())
-		.AddClass(get_rotation_class())
+		.AddClass(get_rotating_class())
 		.AddClass(get_scaling_class())
-		.AddClass(get_translation_class())
+		.AddClass(get_translating_class())
 		.AddRequiredProperty("name", ParameterType::String);
 }
 
@@ -437,7 +438,6 @@ ClassDefinition get_movable_object_class()
 		.AddProperty("bounding-volume-colors", {ParameterType::Color, ParameterType::Color, ParameterType::Color})
 		.AddProperty("bounding-volume-extent", {ParameterType::Vector2, ParameterType::Vector2})
 		.AddProperty("name", ParameterType::String)
-		.AddProperty("parent-node", ParameterType::String)
 		.AddProperty("prefered-bounding-volume", {"bounding-box"s, "bounding-sphere"s})
 		.AddProperty("query-flags", ParameterType::Integer)
 		.AddProperty("query-mask", ParameterType::Integer)
@@ -488,6 +488,40 @@ void set_frustum_properties(const script_tree::ObjectNode &object, graphics::ren
 {
 	for (auto &property : object.Properties())
 	{
+		if (property.Name() == "aspect-format")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "pan-and-scan")
+				frustum.AspectFormat(graphics::render::frustum::AspectRatioFormat::PanAndScan);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "letterbox")
+				frustum.AspectFormat(graphics::render::frustum::AspectRatioFormat::Letterbox);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "windowbox")
+				frustum.AspectFormat(graphics::render::frustum::AspectRatioFormat::Windowbox);
+		}
+		else if (property.Name() == "aspect-ratio")
+		{
+			if (property.NumberOfArguments() == 2)
+				frustum.AspectRatio(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+									property[1].Get<ScriptType::FloatingPoint>()->As<real>());
+			else
+				frustum.AspectRatio(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		}
+		else if (property.Name() == "base-viewport-height")
+			frustum.BaseViewportHeight(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "clip-plane")
+			frustum.ClipPlane(graphics::utilities::Aabb{property[0].Get<ScriptType::Vector2>()->Get(), property[1].Get<ScriptType::Vector2>()->Get()});
+		else if (property.Name() == "far-clip-distance")
+			frustum.FarClipDistance(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "field-of-view")
+			frustum.FieldOfView(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "near-clip-distance")
+			frustum.NearClipDistance(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "projection")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "orthographic")
+				frustum.Projection(graphics::render::frustum::ProjectionType::Orthographic);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "perspective")
+				frustum.Projection(graphics::render::frustum::ProjectionType::Perspective);
+		}
 	}
 }
 
@@ -518,6 +552,76 @@ void set_pass_properties(const script_tree::ObjectNode &object, graphics::render
 	}
 }
 
+void set_rotating_properties(const script_tree::ObjectNode &object, graph::animations::node_animation::detail::rotating_motion &rotating)
+{
+
+}
+
+void set_scaling_properties(const script_tree::ObjectNode &object, graph::animations::node_animation::detail::scaling_motion &scaling)
+{
+
+}
+
+void set_translating_properties(const script_tree::ObjectNode &object, graph::animations::node_animation::detail::translating_motion &translating)
+{
+
+}
+
+
+void set_border_properties(const script_tree::ObjectNode &object, shapes::Border &border,
+	graphics::materials::MaterialManager &material_manager)
+{
+	set_shape_properties(object, border, material_manager);
+}
+
+void set_curve_properties(const script_tree::ObjectNode &object, shapes::Curve &curve,
+	graphics::materials::MaterialManager &material_manager)
+{
+	set_shape_properties(object, curve, material_manager);
+}
+
+void set_ellipse_properties(const script_tree::ObjectNode &object, shapes::Ellipse &ellipse,
+	graphics::materials::MaterialManager &material_manager)
+{
+	set_shape_properties(object, ellipse, material_manager);
+}
+
+void set_line_properties(const script_tree::ObjectNode &object, shapes::Line &line,
+	graphics::materials::MaterialManager &material_manager)
+{
+	set_shape_properties(object, line, material_manager);
+}
+
+void set_mesh_properties(const script_tree::ObjectNode &object, shapes::Mesh &mesh,
+	graphics::materials::MaterialManager &material_manager)
+{
+	
+}
+
+void set_rectangle_properties(const script_tree::ObjectNode &object, shapes::Rectangle &rectangle,
+	graphics::materials::MaterialManager &material_manager)
+{
+	set_shape_properties(object, rectangle, material_manager);
+}
+
+void set_shape_properties(const script_tree::ObjectNode &object, shapes::Shape &shape,
+	graphics::materials::MaterialManager &material_manager)
+{
+	set_mesh_properties(object, shape, material_manager);
+}
+
+void set_sprite_properties(const script_tree::ObjectNode &object, shapes::Sprite &sprite,
+	graphics::materials::MaterialManager &material_manager)
+{
+	set_shape_properties(object, sprite, material_manager);
+}
+
+void set_triangle_properties(const script_tree::ObjectNode &object, shapes::Triangle &triangle,
+	graphics::materials::MaterialManager &material_manager)
+{
+	set_shape_properties(object, triangle, material_manager);
+}
+
 
 void set_node_animation_properties(const script_tree::ObjectNode &object, graph::animations::NodeAnimation &animation)
 {
@@ -543,11 +647,43 @@ void set_node_animation_timeline_properties(const script_tree::ObjectNode &objec
 	}
 }
 
-void set_scene_node_properties(const script_tree::ObjectNode &object, graph::SceneNode &parent_node)
+void set_scene_node_properties(const script_tree::ObjectNode &object, graph::SceneNode &scene_node,
+	SceneManager &scene_manager,
+	graphics::materials::MaterialManager &material_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
 	for (auto &property : object.Properties())
 	{
 		if (property.Name() == "");
+	}
+
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "camera")
+			create_camera(obj, scene_manager);
+		else if (obj.Name() == "drawable-animation")
+			create_drawable_animation(obj, scene_manager, shader_program_manager);
+		else if (obj.Name() == "drawable-particle-system")
+			create_drawable_particle_system(obj, scene_manager, shader_program_manager);
+		else if (obj.Name() == "drawable-text")
+			create_drawable_text(obj, scene_manager, shader_program_manager);
+		else if (obj.Name() == "light")
+			create_light(obj, scene_manager);
+		else if (obj.Name() == "model")
+			create_model(obj, scene_manager, material_manager, shader_program_manager);
+		else if (obj.Name() == "movable-sound")
+			create_movable_sound(obj, scene_manager);
+		else if (obj.Name() == "movable-sound-listener")
+			create_movable_sound_listener(obj, scene_manager);
+
+		else if (obj.Name() == "node-animation")
+			create_node_animation(obj, scene_node);
+		else if (obj.Name() == "node-animation-group")
+			create_node_animation_group(obj, scene_node);
+		else if (obj.Name() == "node-animation-timeline")
+			create_node_animation_timeline(obj, scene_node);
+		else if (obj.Name() == "scene-node")
+			create_scene_node(obj, scene_node, scene_manager, material_manager, shader_program_manager);
 	}
 }
 
@@ -562,9 +698,10 @@ void set_camera_properties(const script_tree::ObjectNode &object, Camera &camera
 	}
 }
 
-void set_drawable_animation_properties(const script_tree::ObjectNode &object, DrawableAnimation &animation)
+void set_drawable_animation_properties(const script_tree::ObjectNode &object, DrawableAnimation &animation,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
-	set_drawable_object_properties(object, animation);
+	set_drawable_object_properties(object, animation, shader_program_manager);
 
 	for (auto &property : object.Properties())
 	{
@@ -572,29 +709,39 @@ void set_drawable_animation_properties(const script_tree::ObjectNode &object, Dr
 	}
 }
 
-void set_drawable_object_properties(const script_tree::ObjectNode &object, DrawableObject &drawable_object)
+void set_drawable_object_properties(const script_tree::ObjectNode &object, DrawableObject &drawable_object,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
 	set_movable_object_properties(object, drawable_object);
 
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "pass")
+			drawable_object.AddPass(create_pass(obj, shader_program_manager));
+	}
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "opacity")
+			drawable_object.Opacity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+	}
+}
+
+void set_drawable_particle_system_properties(const script_tree::ObjectNode &object, DrawableParticleSystem &particle_system,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
+{
+	set_drawable_object_properties(object, particle_system, shader_program_manager);
+
 	for (auto &property : object.Properties())
 	{
 		if (property.Name() == "");
 	}
 }
 
-void set_drawable_particle_system_properties(const script_tree::ObjectNode &object, DrawableParticleSystem &particle_system)
+void set_drawable_text_properties(const script_tree::ObjectNode &object, DrawableText &text,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
-	set_drawable_object_properties(object, particle_system);
-
-	for (auto &property : object.Properties())
-	{
-		if (property.Name() == "");
-	}
-}
-
-void set_drawable_text_properties(const script_tree::ObjectNode &object, DrawableText &text)
-{
-	set_drawable_object_properties(object, text);
+	set_drawable_object_properties(object, text, shader_program_manager);
 
 	for (auto &property : object.Properties())
 	{
@@ -612,13 +759,35 @@ void set_light_properties(const script_tree::ObjectNode &object, Light &light)
 	}
 }
 
-void set_model_properties(const script_tree::ObjectNode &object, Model &model)
+void set_model_properties(const script_tree::ObjectNode &object, Model &model,
+	graphics::materials::MaterialManager &material_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
-	set_drawable_object_properties(object, model);
+	set_drawable_object_properties(object, model, shader_program_manager);
 
 	for (auto &property : object.Properties())
 	{
 		if (property.Name() == "");
+	}
+
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "border")
+			create_border(obj, model, material_manager);
+		else if (obj.Name() == "curve")
+			create_curve(obj, model, material_manager);
+		else if (obj.Name() == "ellipse")
+			create_ellipse(obj, model, material_manager);
+		else if (obj.Name() == "line")
+			create_line(obj, model, material_manager);
+		else if (obj.Name() == "mesh")
+			create_mesh(obj, model, material_manager);
+		else if (obj.Name() == "rectangle")
+			create_rectangle(obj, model, material_manager);
+		else if (obj.Name() == "sprite")
+			create_sprite(obj, model, material_manager);
+		else if (obj.Name() == "triangle")
+			create_triangle(obj, model, material_manager);
 	}
 }
 
@@ -626,7 +795,27 @@ void set_movable_object_properties(const script_tree::ObjectNode &object, Movabl
 {
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "");
+		if (property.Name() == "bounding-volume-colors")
+			movable_object.BoundingVolumeColors(property[0].Get<ScriptType::Color>()->Get(),
+												property[1].Get<ScriptType::Color>()->Get(),
+												property[2].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "bounding-volume-extent")
+			movable_object.BoundingVolumeExtent(graphics::utilities::Aabb{property[0].Get<ScriptType::Vector2>()->Get(), property[1].Get<ScriptType::Vector2>()->Get()});
+		else if (property.Name() == "prefered-bounding-volume")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "bounding-box")
+				movable_object.PreferredBoundingVolume(movable_object::PreferredBoundingVolumeType::BoundingBox);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "bounding-sphere")
+				movable_object.PreferredBoundingVolume(movable_object::PreferredBoundingVolumeType::BoundingSphere);
+		}
+		else if (property.Name() == "query-flags")
+			movable_object.AddQueryFlags(property[0].Get<ScriptType::Integer>()->As<uint32>());
+		else if (property.Name() == "query-mask")
+			movable_object.AddQueryMask(property[0].Get<ScriptType::Integer>()->As<uint32>());
+		else if (property.Name() == "show-bounding-volumes")
+			movable_object.ShowBoundingVolumes(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "visible")
+			movable_object.Visible(property[0].Get<ScriptType::Boolean>()->Get());
 	}
 }
 
@@ -666,47 +855,114 @@ graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
 	return pass;
 }
 
-		
+
+NonOwningPtr<shapes::Border> create_border(const script_tree::ObjectNode &object,
+	Model &model,
+	graphics::materials::MaterialManager &material_manager)
+{
+	auto border = model.CreateMesh<shapes::Border>(graphics::utilities::Vector2{}, graphics::utilities::Vector2{}, graphics::utilities::Color{});
+
+	if (border)
+		set_border_properties(object, *border, material_manager);
+
+	return border;
+}
+
+NonOwningPtr<shapes::Curve> create_curve(const script_tree::ObjectNode &object,
+	Model &model,
+	graphics::materials::MaterialManager &material_manager)
+{
+	auto curve = model.CreateMesh<shapes::Curve>(shapes::curve::ControlPoints{}, graphics::utilities::Color{});
+
+	if (curve)
+		set_curve_properties(object, *curve, material_manager);
+
+	return curve;
+}
+
+NonOwningPtr<shapes::Ellipse> create_ellipse(const script_tree::ObjectNode &object,
+	Model &model,
+	graphics::materials::MaterialManager &material_manager)
+{
+	auto ellipse = model.CreateMesh<shapes::Ellipse>(graphics::utilities::Vector2{}, graphics::utilities::Color{});
+
+	if (ellipse)
+		set_ellipse_properties(object, *ellipse, material_manager);
+
+	return ellipse;
+}
+
+NonOwningPtr<shapes::Line> create_line(const script_tree::ObjectNode &object,
+	Model &model,
+	graphics::materials::MaterialManager &material_manager)
+{
+	auto line = model.CreateMesh<shapes::Line>(graphics::utilities::Vector3{}, graphics::utilities::Vector3{}, graphics::utilities::Color{});
+
+	if (line)
+		set_line_properties(object, *line, material_manager);
+
+	return line;
+}
+
+NonOwningPtr<shapes::Mesh> create_mesh(const script_tree::ObjectNode &object,
+	Model &model,
+	graphics::materials::MaterialManager &material_manager)
+{
+	auto mesh = model.CreateMesh(shapes::mesh::Vertices{});
+
+	if (mesh)
+		set_mesh_properties(object, *mesh, material_manager);
+
+	return mesh;
+}
+
+NonOwningPtr<shapes::Rectangle> create_rectangle(const script_tree::ObjectNode &object,
+	Model &model,
+	graphics::materials::MaterialManager &material_manager)
+{
+	auto rectangle = model.CreateMesh<shapes::Rectangle>(graphics::utilities::Vector2{}, graphics::utilities::Color{});
+
+	if (rectangle)
+		set_rectangle_properties(object, *rectangle, material_manager);
+
+	return rectangle;
+}
+
+NonOwningPtr<shapes::Sprite> create_sprite(const script_tree::ObjectNode &object,
+	Model &model,
+	graphics::materials::MaterialManager &material_manager)
+{
+	auto sprite = model.CreateMesh<shapes::Sprite>(graphics::utilities::Vector2{}, nullptr);
+
+	if (sprite)
+		set_sprite_properties(object, *sprite, material_manager);
+
+	return sprite;
+}
+
+NonOwningPtr<shapes::Triangle> create_triangle(const script_tree::ObjectNode &object,
+	Model &model,
+	graphics::materials::MaterialManager &material_manager)
+{
+	auto triangle = model.CreateMesh<shapes::Triangle>(graphics::utilities::Vector3{}, graphics::utilities::Vector3{}, graphics::utilities::Vector3{}, graphics::utilities::Color{});
+
+	if (triangle)
+		set_triangle_properties(object, *triangle, material_manager);
+
+	return triangle;
+}
+
+
 NonOwningPtr<graph::SceneNode> create_scene_node(const script_tree::ObjectNode &object,
 	graph::SceneNode &parent_node,
-	graphics::scene::SceneManager &scene_manager,
-	graphics::materials::MaterialManager &material_manager)
+	SceneManager &scene_manager,
+	graphics::materials::MaterialManager &material_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
 	auto node = parent_node.CreateChildNode();
 
 	if (node)
-	{
-		for (auto &obj : object.Objects())
-		{
-			if (obj.Name() == "camera")
-				create_camera(obj, scene_manager);
-			else if (obj.Name() == "drawable-animation")
-				create_drawable_animation(obj, scene_manager);
-			else if (obj.Name() == "drawable-particle-system")
-				create_drawable_particle_system(obj, scene_manager);
-			else if (obj.Name() == "drawable-text")
-				create_drawable_text(obj, scene_manager);
-			else if (obj.Name() == "light")
-				create_light(obj, scene_manager);
-			else if (obj.Name() == "model")
-				create_model(obj, scene_manager, material_manager);
-			else if (obj.Name() == "movable-sound")
-				create_movable_sound(obj, scene_manager);
-			else if (obj.Name() == "movable-sound-listener")
-				create_movable_sound_listener(obj, scene_manager);
-
-			else if (obj.Name() == "node-animation")
-				create_node_animation(obj, *node);
-			else if (obj.Name() == "node-animation-group")
-				create_node_animation_group(obj, *node);
-			else if (obj.Name() == "node-animation-timeline")
-				create_node_animation_timeline(obj, *node);
-			else if (obj.Name() == "scene-node")
-				create_scene_node(obj, *node, scene_manager, material_manager);
-		}
-
-		set_scene_node_properties(object, *node);
-	}
+		set_scene_node_properties(object, *node, scene_manager, material_manager, shader_program_manager);
 
 	return node;
 }
@@ -714,42 +970,65 @@ NonOwningPtr<graph::SceneNode> create_scene_node(const script_tree::ObjectNode &
 NonOwningPtr<graph::animations::NodeAnimation> create_node_animation(const script_tree::ObjectNode &object,
 	graph::SceneNode &parent_node)
 {
-	return nullptr;
+	auto node_animation = parent_node.CreateAnimation("");
+
+	if (node_animation)
+		set_node_animation_properties(object, *node_animation);
+
+	return node_animation;
 }
 
 NonOwningPtr<graph::animations::NodeAnimationGroup> create_node_animation_group(const script_tree::ObjectNode &object,
 	graph::SceneNode &parent_node)
 {
-	return nullptr;
+	auto node_animation_group = parent_node.CreateAnimationGroup("");
+
+	if (node_animation_group)
+		set_node_animation_group_properties(object, *node_animation_group);
+
+	return node_animation_group;
 }
 
 NonOwningPtr<graph::animations::NodeAnimationTimeline> create_node_animation_timeline(const script_tree::ObjectNode &object,
 	graph::SceneNode &parent_node)
 {
-	return nullptr;
+	auto node_animation_timeline = parent_node.CreateTimeline();
+
+	if (node_animation_timeline)
+		set_node_animation_timeline_properties(object, *node_animation_timeline);
+
+	return node_animation_timeline;
 }
 
 
 NonOwningPtr<Camera> create_camera(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager)
 {
-	return nullptr;
+	auto camera = scene_manager.CreateCamera();
+
+	if (camera)
+		set_camera_properties(object, *camera);
+
+	return camera;
 }
 
 NonOwningPtr<DrawableAnimation> create_drawable_animation(const script_tree::ObjectNode &object,
-	SceneManager &scene_manager)
+	SceneManager &scene_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
 	return nullptr;
 }
 
 NonOwningPtr<DrawableParticleSystem> create_drawable_particle_system(const script_tree::ObjectNode &object,
-	SceneManager &scene_manager)
+	SceneManager &scene_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
 	return nullptr;
 }
 
 NonOwningPtr<DrawableText> create_drawable_text(const script_tree::ObjectNode &object,
-	SceneManager &scene_manager)
+	SceneManager &scene_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
 	return nullptr;
 }
@@ -757,55 +1036,77 @@ NonOwningPtr<DrawableText> create_drawable_text(const script_tree::ObjectNode &o
 NonOwningPtr<Light> create_light(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager)
 {
-	return nullptr;
+	auto light = scene_manager.CreateLight();
+
+	if (light)
+		set_light_properties(object, *light);
+
+	return light;
 }
 
 NonOwningPtr<Model> create_model(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager,
-	graphics::materials::MaterialManager &material_manager)
+	graphics::materials::MaterialManager &material_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
-	return nullptr;
+	auto model = scene_manager.CreateModel();
+
+	if (model)
+		set_model_properties(object, *model, material_manager, shader_program_manager);
+
+	return model;
 }
 
 NonOwningPtr<MovableSound> create_movable_sound(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager)
 {
-	return nullptr;
+	auto movable_sound = scene_manager.CreateSound("", nullptr);
+
+	if (movable_sound)
+		set_movable_sound_properties(object, *movable_sound);
+
+	return movable_sound;
 }
 
 NonOwningPtr<MovableSoundListener> create_movable_sound_listener(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager)
 {
-	return nullptr;
+	auto movable_sound_listener = scene_manager.CreateSoundListener("", nullptr);
+
+	if (movable_sound_listener)
+		set_movable_sound_listener_properties(object, *movable_sound_listener);
+
+	return movable_sound_listener;
 }
 
 
 void create_scene(const ScriptTree &tree,
 	graph::SceneNode &parent_node,
 	SceneManager &scene_manager,
-	graphics::materials::MaterialManager &material_manager)
+	graphics::materials::MaterialManager &material_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "camera")
 			create_camera(object, scene_manager);
 		else if (object.Name() == "drawable-animation")
-			create_drawable_animation(object, scene_manager);
+			create_drawable_animation(object, scene_manager, shader_program_manager);
 		else if (object.Name() == "drawable-particle-system")
-			create_drawable_particle_system(object, scene_manager);
+			create_drawable_particle_system(object, scene_manager, shader_program_manager);
 		else if (object.Name() == "drawable-text")
-			create_drawable_text(object, scene_manager);
+			create_drawable_text(object, scene_manager, shader_program_manager);
 		else if (object.Name() == "light")
 			create_light(object, scene_manager);
 		else if (object.Name() == "model")
-			create_model(object, scene_manager, material_manager);
+			create_model(object, scene_manager, material_manager, shader_program_manager);
 		else if (object.Name() == "movable-sound")
 			create_movable_sound(object, scene_manager);
 		else if (object.Name() == "movable-sound-listener")
 			create_movable_sound_listener(object, scene_manager);
 
 		else if (object.Name() == "scene-node")
-			create_scene_node(object, parent_node, scene_manager, material_manager);
+			create_scene_node(object, parent_node, scene_manager, material_manager, shader_program_manager);
 	}
 }
 
@@ -830,10 +1131,11 @@ ScriptValidator SceneScriptInterface::GetValidator() const
 void SceneScriptInterface::CreateScene(std::string_view asset_name,
 	graph::SceneNode &parent_node,
 	SceneManager &scene_manager,
-	graphics::materials::MaterialManager &material_manager)
+	graphics::materials::MaterialManager &material_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
 	if (Load(asset_name))
-		detail::create_scene(*tree_, parent_node, scene_manager, material_manager);
+		detail::create_scene(*tree_, parent_node, scene_manager, material_manager, shader_program_manager);
 }
 
 } //ion::script::interfaces
