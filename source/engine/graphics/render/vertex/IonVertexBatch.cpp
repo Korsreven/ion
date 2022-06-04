@@ -89,7 +89,7 @@ std::optional<int> get_texture_handle(const texture_type &some_texture, duration
 {
 	if (auto [animation, texture, texture_handle] = get_textures(some_texture); animation)
 	{
-		if (auto frame = animation->FrameAt(time); frame)
+		if (auto frame = animation->Owner() ? animation->FrameAt(time) : animation->CurrentFrame(); frame)
 			return frame->Handle();
 		else
 			return {};

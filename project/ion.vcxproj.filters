@@ -522,9 +522,6 @@
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonCurve.cpp">
       <Filter>Source Files\graphics\scene\shapes</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\engine\graphics\scene\IonDrawableAnimation.cpp">
-      <Filter>Source Files\graphics\scene</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonBorder.cpp">
       <Filter>Source Files\graphics\scene\shapes</Filter>
     </ClCompile>
@@ -719,6 +716,9 @@
     </ClCompile>
     <ClCompile Include="..\source\engine\script\interfaces\IonSceneScriptInterface.cpp">
       <Filter>Source Files\script\interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\scene\shapes\IonAnimatedSprite.cpp">
+      <Filter>Source Files\graphics\scene\shapes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1187,9 +1187,6 @@
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonCurve.h">
       <Filter>Header Files\graphics\scene\shapes</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\graphics\scene\IonDrawableAnimation.h">
-      <Filter>Header Files\graphics\scene</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonBorder.h">
       <Filter>Header Files\graphics\scene\shapes</Filter>
     </ClInclude>
@@ -1390,6 +1387,9 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\script\interfaces\IonSceneScriptInterface.h">
       <Filter>Header Files\script\interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\scene\shapes\IonAnimatedSprite.h">
+      <Filter>Header Files\graphics\scene\shapes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

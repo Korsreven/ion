@@ -18,7 +18,6 @@ File:	IonSceneManager.h
 #include <string_view>
 
 #include "IonCamera.h"
-#include "IonDrawableAnimation.h"
 #include "IonDrawableParticleSystem.h"
 #include "IonDrawableText.h"
 #include "IonLight.h"
@@ -48,7 +47,6 @@ namespace ion::graphics::scene
 		public managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>,
 		public managed::ObjectManager<Light, SceneManager>,
 		public managed::ObjectManager<Model, SceneManager>,
-		public managed::ObjectManager<DrawableAnimation, SceneManager>,
 		public managed::ObjectManager<DrawableParticleSystem, SceneManager>,
 		public managed::ObjectManager<DrawableText, SceneManager>,
 		public managed::ObjectManager<MovableSound, SceneManager>,
@@ -59,7 +57,6 @@ namespace ion::graphics::scene
 			using CameraBase = managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>;
 			using LightBase = managed::ObjectManager<Light, SceneManager>;
 			using ModelBase = managed::ObjectManager<Model, SceneManager>;
-			using AnimationBase = managed::ObjectManager<DrawableAnimation, SceneManager>;
 			using ParticleSystemBase = managed::ObjectManager<DrawableParticleSystem, SceneManager>;
 			using TextBase = managed::ObjectManager<DrawableText, SceneManager>;
 			using SoundBase = managed::ObjectManager<MovableSound, SceneManager>;
@@ -146,21 +143,6 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto Models() const noexcept
 			{
 				return ModelBase::Objects();
-			}
-
-
-			//Returns a mutable range of all animations in this scene manager
-			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto Animations() noexcept
-			{
-				return AnimationBase::Objects();
-			}
-
-			//Returns an immutable range of all animations in this scene manager
-			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto Animations() const noexcept
-			{
-				return AnimationBase::Objects();
 			}
 
 
@@ -361,66 +343,6 @@ namespace ion::graphics::scene
 
 			//Remove a removable model with the given name from this manager
 			bool RemoveModel(std::string_view name) noexcept;
-
-
-			/*
-				Animations
-				Creating
-			*/
-
-			//Create a drawable animation with the given name, size, animation and visibility
-			NonOwningPtr<DrawableAnimation> CreateAnimation(std::optional<std::string> name, const Vector2 &size,
-				NonOwningPtr<textures::Animation> animation, bool visible = true);
-
-			//Create a drawable animation with the given name, position, size, animation and visibility
-			NonOwningPtr<DrawableAnimation> CreateAnimation(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
-				NonOwningPtr<textures::Animation> animation, bool visible = true);
-
-			//Create a drawable animation with the given name, position, rotation, size, animation and visibility
-			NonOwningPtr<DrawableAnimation> CreateAnimation(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
-				NonOwningPtr<textures::Animation> animation, bool visible = true);
-
-
-			//Create a drawable animation with the given name, size, animation, color and visibility
-			NonOwningPtr<DrawableAnimation> CreateAnimation(std::optional<std::string> name, const Vector2 &size,
-				NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
-
-			//Create a drawable animation with the given name, position, size, animation, color and visibility
-			NonOwningPtr<DrawableAnimation> CreateAnimation(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
-				NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
-
-			//Create a drawable animation with the given name, position, rotation, size, animation, color and visibility
-			NonOwningPtr<DrawableAnimation> CreateAnimation(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
-				NonOwningPtr<textures::Animation> animation, const Color &color, bool visible = true);
-
-
-			/*
-				Animations
-				Retrieving
-			*/
-			
-			//Gets a pointer to a mutable animation with the given name
-			//Returns nullptr if animation could not be found
-			[[nodiscard]] NonOwningPtr<DrawableAnimation> GetAnimation(std::string_view name) noexcept;
-
-			//Gets a pointer to an immutable animation with the given name
-			//Returns nullptr if animation could not be found
-			[[nodiscard]] NonOwningPtr<const DrawableAnimation> GetAnimation(std::string_view name) const noexcept;
-
-
-			/*
-				Animations
-				Removing
-			*/
-
-			//Clear all removable animations from this manager
-			void ClearAnimations() noexcept;
-
-			//Remove a removable animation from this manager
-			bool RemoveAnimation(DrawableAnimation &animation) noexcept;
-
-			//Remove a removable animation with the given name from this manager
-			bool RemoveAnimation(std::string_view name) noexcept;
 
 
 			/*

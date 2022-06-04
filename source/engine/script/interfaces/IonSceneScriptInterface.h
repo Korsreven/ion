@@ -19,7 +19,6 @@ File:	IonSceneScriptInterface.h
 #include "graphics/render/IonFrustum.h"
 #include "graphics/render/IonPass.h"
 #include "graphics/scene/IonCamera.h"
-#include "graphics/scene/IonDrawableAnimation.h"
 #include "graphics/scene/IonDrawableObject.h"
 #include "graphics/scene/IonDrawableParticleSystem.h"
 #include "graphics/scene/IonDrawableText.h"
@@ -33,6 +32,7 @@ File:	IonSceneScriptInterface.h
 #include "graphics/scene/graph/animations/IonNodeAnimation.h"
 #include "graphics/scene/graph/animations/IonNodeAnimationGroup.h"
 #include "graphics/scene/graph/animations/IonNodeAnimationTimeline.h"
+#include "graphics/scene/shapes/IonAnimatedSprite.h"
 #include "graphics/scene/shapes/IonBorder.h"
 #include "graphics/scene/shapes/IonCurve.h"
 #include "graphics/scene/shapes/IonEllipse.h"
@@ -135,6 +135,7 @@ namespace ion::script::interfaces
 		script_validator::ClassDefinition get_scaling_class();
 		script_validator::ClassDefinition get_translating_class();
 
+		script_validator::ClassDefinition get_animated_sprite_class();
 		script_validator::ClassDefinition get_border_class();
 		script_validator::ClassDefinition get_curve_class();
 		script_validator::ClassDefinition get_ellipse_class();
@@ -151,7 +152,6 @@ namespace ion::script::interfaces
 		script_validator::ClassDefinition get_scene_node_class();
 
 		script_validator::ClassDefinition get_camera_class();
-		script_validator::ClassDefinition get_drawable_animation_class();
 		script_validator::ClassDefinition get_drawable_object_class();
 		script_validator::ClassDefinition get_drawable_particle_system_class();
 		script_validator::ClassDefinition get_drawable_text_class();
@@ -175,6 +175,8 @@ namespace ion::script::interfaces
 		void set_scaling_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::node_animation::detail::scaling_motion &scaling);
 		void set_translating_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::node_animation::detail::translating_motion &translating);
 
+		void set_animated_sprite_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::AnimatedSprite &aniamted_sprite,
+			graphics::materials::MaterialManager &material_manager);
 		void set_border_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::Border &border,
 			graphics::materials::MaterialManager &material_manager);
 		void set_curve_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::Curve &curve,
@@ -203,8 +205,6 @@ namespace ion::script::interfaces
 			graphics::shaders::ShaderProgramManager &shader_program_manager);
 
 		void set_camera_properties(const script_tree::ObjectNode &object, graphics::scene::Camera &camera);
-		void set_drawable_animation_properties(const script_tree::ObjectNode &object, graphics::scene::DrawableAnimation &animation,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
 		void set_drawable_object_properties(const script_tree::ObjectNode &object, graphics::scene::DrawableObject &drawable,
 			graphics::shaders::ShaderProgramManager &shader_program_manager);
 		void set_drawable_particle_system_properties(const script_tree::ObjectNode &object, graphics::scene::DrawableParticleSystem &particle_system,
@@ -224,6 +224,9 @@ namespace ion::script::interfaces
 		graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
 			graphics::shaders::ShaderProgramManager &shader_program_manager);
 
+		NonOwningPtr<graphics::scene::shapes::AnimatedSprite> create_animated_sprite(const script_tree::ObjectNode &object,
+			graphics::scene::Model &model,
+			graphics::materials::MaterialManager &material_manager);
 		NonOwningPtr<graphics::scene::shapes::Border> create_border(const script_tree::ObjectNode &object,
 			graphics::scene::Model &model,
 			graphics::materials::MaterialManager &material_manager);
@@ -263,9 +266,6 @@ namespace ion::script::interfaces
 
 		NonOwningPtr<graphics::scene::Camera> create_camera(const script_tree::ObjectNode &object,
 			graphics::scene::SceneManager &scene_manager);
-		NonOwningPtr<graphics::scene::DrawableAnimation> create_drawable_animation(const script_tree::ObjectNode &object,
-			graphics::scene::SceneManager &scene_manager,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
 		NonOwningPtr<graphics::scene::DrawableParticleSystem> create_drawable_particle_system(const script_tree::ObjectNode &object,
 			graphics::scene::SceneManager &scene_manager,
 			graphics::shaders::ShaderProgramManager &shader_program_manager);

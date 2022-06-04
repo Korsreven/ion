@@ -219,7 +219,12 @@ Material::Material(std::string name,
 NonOwningPtr<Texture> Material::DiffuseMap(duration time) const noexcept
 {
 	if (auto [animation, texture] = DiffuseMap(); animation)
-		return animation->FrameAt(time);
+	{
+		if (animation->Owner())
+			return animation->FrameAt(time);
+		else
+			return animation->CurrentFrame();
+	}
 	else if (texture)
 		return texture;
 	else
@@ -229,7 +234,12 @@ NonOwningPtr<Texture> Material::DiffuseMap(duration time) const noexcept
 NonOwningPtr<Texture> Material::SpecularMap(duration time) const noexcept
 {
 	if (auto [animation, texture] = SpecularMap(); animation)
-		return animation->FrameAt(time);
+	{
+		if (animation->Owner())
+			return animation->FrameAt(time);
+		else
+			return animation->CurrentFrame();
+	}
 	else if (texture)
 		return texture;
 	else
@@ -239,7 +249,12 @@ NonOwningPtr<Texture> Material::SpecularMap(duration time) const noexcept
 NonOwningPtr<Texture> Material::NormalMap(duration time) const noexcept
 {
 	if (auto [animation, texture] = NormalMap(); animation)
-		return animation->FrameAt(time);
+	{
+		if (animation->Owner())
+			return animation->FrameAt(time);
+		else
+			return animation->CurrentFrame();
+	}
 	else if (texture)
 		return texture;
 	else

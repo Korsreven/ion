@@ -183,6 +183,11 @@ ClassDefinition get_translating_class()
 }
 
 
+ClassDefinition get_animated_sprite_class()
+{
+	return ClassDefinition::Create("animated-sprite", "sprite");
+}
+
 ClassDefinition get_border_class()
 {
 	return ClassDefinition::Create("border", "rectangle")
@@ -323,13 +328,9 @@ ClassDefinition get_node_animation_timeline_class()
 ClassDefinition get_scene_node_class()
 {
 	return ClassDefinition::Create("scene-node")
-
-		//Class definitions already added to scene script validator
-		//Classes could have been forward declared, but scene node is also used from GUI script interface
 		.AddAbstractClass(get_drawable_object_class())
 		.AddAbstractClass(get_movable_object_class())
 		.AddClass(get_camera_class())
-		.AddClass(get_drawable_animation_class())
 		.AddClass(get_drawable_particle_system_class())
 		.AddClass(get_drawable_text_class())
 		.AddClass(get_light_class())
@@ -341,8 +342,7 @@ ClassDefinition get_scene_node_class()
 		.AddClass(get_node_animation_group_class())
 		.AddClass(get_node_animation_timeline_class())
 		.AddClass("scene-node")
-		
-		.AddProperty("attach", ParameterType::String)
+
 		.AddProperty("derived-position", ParameterType::Vector3)
 		.AddProperty("derived-rotation", ParameterType::FloatingPoint)
 		.AddProperty("derived-scaling", ParameterType::Vector2)
@@ -369,16 +369,6 @@ ClassDefinition get_camera_class()
 		.AddClass(get_frustum_class())
 
 		.AddProperty("base-viewport-height", ParameterType::FloatingPoint)
-		.AddProperty("position", ParameterType::Vector3)
-		.AddProperty("rotation", ParameterType::FloatingPoint);
-}
-
-ClassDefinition get_drawable_animation_class()
-{
-	return ClassDefinition::Create("drawable-animation", "drawable-object")
-		.AddRequiredProperty("animation", ParameterType::String)
-		.AddRequiredProperty("size", ParameterType::Vector2)
-		.AddProperty("color", ParameterType::Color)
 		.AddProperty("position", ParameterType::Vector3)
 		.AddProperty("rotation", ParameterType::FloatingPoint);
 }
@@ -422,6 +412,7 @@ ClassDefinition get_model_class()
 {
 	return ClassDefinition::Create("model", "drawable-object")
 		.AddAbstractClass(get_shape_class())
+		.AddClass(get_animated_sprite_class())
 		.AddClass(get_border_class())
 		.AddClass(get_curve_class())
 		.AddClass(get_ellipse_class())
@@ -465,18 +456,7 @@ ClassDefinition get_movable_sound_listener_class()
 ScriptValidator get_scene_validator()
 {
 	return ScriptValidator::Create()
-		.AddAbstractClass(get_drawable_object_class())
-		.AddAbstractClass(get_movable_object_class())
-		.AddClass(get_camera_class())
-		.AddClass(get_drawable_animation_class())
-		.AddClass(get_drawable_particle_system_class())
-		.AddClass(get_drawable_text_class())
-		.AddClass(get_light_class())
-		.AddClass(get_model_class())
-		.AddClass(get_movable_sound_class())
-		.AddClass(get_movable_sound_listener_class())
-
-		.AddClass(get_scene_node_class());
+		.AddRequiredClass(get_scene_node_class());
 }
 
 
@@ -568,10 +548,16 @@ void set_translating_properties(const script_tree::ObjectNode &object, graph::an
 }
 
 
+void set_animated_sprite_properties(const script_tree::ObjectNode &object, shapes::AnimatedSprite &animated_sprite,
+	graphics::materials::MaterialManager &material_manager)
+{
+	set_sprite_properties(object, animated_sprite, material_manager);
+}
+
 void set_border_properties(const script_tree::ObjectNode &object, shapes::Border &border,
 	graphics::materials::MaterialManager &material_manager)
 {
-	set_shape_properties(object, border, material_manager);
+	set_rectangle_properties(object, border, material_manager);
 }
 
 void set_curve_properties(const script_tree::ObjectNode &object, shapes::Curve &curve,
@@ -613,7 +599,7 @@ void set_shape_properties(const script_tree::ObjectNode &object, shapes::Shape &
 void set_sprite_properties(const script_tree::ObjectNode &object, shapes::Sprite &sprite,
 	graphics::materials::MaterialManager &material_manager)
 {
-	set_shape_properties(object, sprite, material_manager);
+	set_rectangle_properties(object, sprite, material_manager);
 }
 
 void set_triangle_properties(const script_tree::ObjectNode &object, shapes::Triangle &triangle,
@@ -661,8 +647,6 @@ void set_scene_node_properties(const script_tree::ObjectNode &object, graph::Sce
 	{
 		if (obj.Name() == "camera")
 			create_camera(obj, scene_manager);
-		else if (obj.Name() == "drawable-animation")
-			create_drawable_animation(obj, scene_manager, shader_program_manager);
 		else if (obj.Name() == "drawable-particle-system")
 			create_drawable_particle_system(obj, scene_manager, shader_program_manager);
 		else if (obj.Name() == "drawable-text")
@@ -691,17 +675,6 @@ void set_scene_node_properties(const script_tree::ObjectNode &object, graph::Sce
 void set_camera_properties(const script_tree::ObjectNode &object, Camera &camera)
 {
 	set_movable_object_properties(object, camera);
-
-	for (auto &property : object.Properties())
-	{
-		if (property.Name() == "");
-	}
-}
-
-void set_drawable_animation_properties(const script_tree::ObjectNode &object, DrawableAnimation &animation,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
-{
-	set_drawable_object_properties(object, animation, shader_program_manager);
 
 	for (auto &property : object.Properties())
 	{
@@ -772,7 +745,9 @@ void set_model_properties(const script_tree::ObjectNode &object, Model &model,
 
 	for (auto &obj : object.Objects())
 	{
-		if (obj.Name() == "border")
+		if (obj.Name() == "animated-sprite")
+			create_animated_sprite(obj, model, material_manager);
+		else if (obj.Name() == "border")
 			create_border(obj, model, material_manager);
 		else if (obj.Name() == "curve")
 			create_curve(obj, model, material_manager);
@@ -855,6 +830,18 @@ graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
 	return pass;
 }
 
+
+NonOwningPtr<shapes::AnimatedSprite> create_animated_sprite(const script_tree::ObjectNode &object,
+	Model &model,
+	graphics::materials::MaterialManager &material_manager)
+{
+	auto animated_sprite = model.CreateMesh<shapes::AnimatedSprite>(graphics::utilities::Vector2{}, nullptr);
+
+	if (animated_sprite)
+		set_animated_sprite_properties(object, *animated_sprite, material_manager);
+
+	return animated_sprite;
+}
 
 NonOwningPtr<shapes::Border> create_border(const script_tree::ObjectNode &object,
 	Model &model,
@@ -1012,13 +999,6 @@ NonOwningPtr<Camera> create_camera(const script_tree::ObjectNode &object,
 	return camera;
 }
 
-NonOwningPtr<DrawableAnimation> create_drawable_animation(const script_tree::ObjectNode &object,
-	SceneManager &scene_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
-{
-	return nullptr;
-}
-
 NonOwningPtr<DrawableParticleSystem> create_drawable_particle_system(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager,
 	graphics::shaders::ShaderProgramManager &shader_program_manager)
@@ -1088,24 +1068,7 @@ void create_scene(const ScriptTree &tree,
 {
 	for (auto &object : tree.Objects())
 	{
-		if (object.Name() == "camera")
-			create_camera(object, scene_manager);
-		else if (object.Name() == "drawable-animation")
-			create_drawable_animation(object, scene_manager, shader_program_manager);
-		else if (object.Name() == "drawable-particle-system")
-			create_drawable_particle_system(object, scene_manager, shader_program_manager);
-		else if (object.Name() == "drawable-text")
-			create_drawable_text(object, scene_manager, shader_program_manager);
-		else if (object.Name() == "light")
-			create_light(object, scene_manager);
-		else if (object.Name() == "model")
-			create_model(object, scene_manager, material_manager, shader_program_manager);
-		else if (object.Name() == "movable-sound")
-			create_movable_sound(object, scene_manager);
-		else if (object.Name() == "movable-sound-listener")
-			create_movable_sound_listener(object, scene_manager);
-
-		else if (object.Name() == "scene-node")
+		if (object.Name() == "scene-node")
 			create_scene_node(object, parent_node, scene_manager, material_manager, shader_program_manager);
 	}
 }
