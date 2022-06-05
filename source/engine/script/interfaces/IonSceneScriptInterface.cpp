@@ -20,6 +20,7 @@ File:	IonSceneScriptInterface.cpp
 #include "graphics/scene/graph/animations/IonNodeAnimationManager.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
 #include "graphics/utilities/IonAabb.h"
+#include "utilities/IonMath.h"
 
 namespace ion::script::interfaces
 {
@@ -350,7 +351,7 @@ ClassDefinition get_scene_node_class()
 		.AddProperty("derived-rotation", ParameterType::FloatingPoint)
 		.AddProperty("derived-scaling", ParameterType::Vector2)
 		.AddProperty("direction", ParameterType::Vector2)
-		.AddProperty("flip-visibility", {ParameterType::Boolean, ParameterType::Boolean}, 1)
+		.AddProperty("flip-visibility", ParameterType::Boolean)
 		.AddProperty("inherit-rotation", ParameterType::Boolean)
 		.AddProperty("inherit-scaling", ParameterType::Boolean)
 		.AddProperty("initial-direction", ParameterType::Vector2)
@@ -632,7 +633,7 @@ void set_ellipse_properties(const script_tree::ObjectNode &object, shapes::Ellip
 		else if (property.Name() == "radius")
 			ellipse.Radius(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "rotation")
-			ellipse.Rotation(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			ellipse.Rotation(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
 		else if (property.Name() == "size")
 			ellipse.Size(property[0].Get<ScriptType::Vector2>()->Get());
 	}
@@ -718,7 +719,7 @@ void set_rectangle_properties(const script_tree::ObjectNode &object, shapes::Rec
 		else if (property.Name() == "resize-to-fit")
 			rectangle.ResizeToFit(property[0].Get<ScriptType::Vector2>()->Get());
 		else if (property.Name() == "rotation")
-			rectangle.Rotation(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			rectangle.Rotation(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
 		else if (property.Name() == "size")
 			rectangle.Size(property[0].Get<ScriptType::Vector2>()->Get());
 		else if (property.Name() == "width")
@@ -818,7 +819,46 @@ void set_scene_node_properties(const script_tree::ObjectNode &object, graph::Sce
 {
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "");
+		if (property.Name() == "derived-position")
+			scene_node.DerivedPosition(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "derived-rotation")
+			scene_node.DerivedRotation(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
+		else if (property.Name() == "derived-scaling")
+			scene_node.DerivedScaling(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "direction")
+			scene_node.Direction(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "flip-visibility")
+			scene_node.FlipVisibility(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "inherit-rotation")
+			scene_node.InheritRotation(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "inherit-scaling")
+			scene_node.InheritScaling(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "position")
+			scene_node.Position(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "rotate")
+			scene_node.Rotate(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
+		else if (property.Name() == "rotation")
+			scene_node.Rotation(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
+		else if (property.Name() == "rotation-origin")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "parent")
+				scene_node.RotationOrigin(graph::scene_node::NodeRotationOrigin::Parent);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "local")
+				scene_node.RotationOrigin(graph::scene_node::NodeRotationOrigin::Local);
+		}
+		else if (property.Name() == "scale")
+			scene_node.Scale(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "scaling")
+			scene_node.Scaling(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "translate")
+			scene_node.Translate(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "visible")
+		{
+			if (property.NumberOfArguments() == 2)
+				scene_node.Visible(property[0].Get<ScriptType::Boolean>()->Get(), property[1].Get<ScriptType::Boolean>()->Get());
+			else
+				scene_node.Visible(property[0].Get<ScriptType::Boolean>()->Get());
+		}
 	}
 
 	for (auto &obj : object.Objects())

@@ -14,6 +14,7 @@ File:	IonParticleSystemScriptInterface.cpp
 
 #include <string>
 #include "graphics/materials/IonMaterialManager.h"
+#include "utilities/IonMath.h"
 
 namespace ion::script::interfaces
 {
@@ -198,7 +199,7 @@ NonOwningPtr<Emitter> create_emitter(const script_tree::ObjectNode &object,
 			if (property.Name() == "direction")
 				emitter->Direction(property[0].Get<ScriptType::Vector2>()->Get());
 			else if (property.Name() == "emission-angle")
-				emitter->EmissionAngle(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+				emitter->EmissionAngle(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
 			else if (property.Name() == "emission-duration")
 				emitter->EmissionDuration(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
 			else if (property.Name() == "emission-rate")
@@ -376,7 +377,7 @@ NonOwningPtr<affectors::DirectionRandomizer> create_direction_randomizer(const s
 		for (auto &property : object.Properties())
 		{
 			if (property.Name() == "angle")
-				direction_randomizer->Angle(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+				direction_randomizer->Angle(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
 			else if (property.Name() == "scope")
 				direction_randomizer->Scope(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		}
