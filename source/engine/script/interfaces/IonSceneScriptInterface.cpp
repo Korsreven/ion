@@ -185,14 +185,16 @@ ClassDefinition get_translating_class()
 
 ClassDefinition get_animated_sprite_class()
 {
-	return ClassDefinition::Create("animated-sprite", "sprite");
+	return ClassDefinition::Create("animated-sprite", "sprite")
+		.AddProperty("jump-backward", ParameterType::FloatingPoint)
+		.AddProperty("jump-forward", ParameterType::FloatingPoint)
+		.AddProperty("running", ParameterType::Boolean);
 }
 
 ClassDefinition get_border_class()
 {
 	return ClassDefinition::Create("border", "rectangle")
 		.AddRequiredProperty("border-size", ParameterType::Vector2)
-		.AddRequiredProperty("size", ParameterType::Vector2)
 		.AddProperty("border-color", ParameterType::Color)
 		.AddProperty("corner-color", {ParameterType::Color, ParameterType::Color, ParameterType::Color, ParameterType::Color}, 1)
 		.AddProperty("corner-style", {"none"s, "square"s, "oblique"s})
@@ -203,6 +205,7 @@ ClassDefinition get_curve_class()
 {
 	return ClassDefinition::Create("curve", "shape")
 		.AddRequiredProperty("control-point", ParameterType::Vector3)
+		.AddProperty("p", {ParameterType::Integer, ParameterType::Vector3})
 		.AddProperty("smoothness", ParameterType::Integer)
 		.AddProperty("thickness", ParameterType::FloatingPoint);
 }
@@ -268,7 +271,7 @@ ClassDefinition get_rectangle_class()
 ClassDefinition get_shape_class()
 {
 	return ClassDefinition::Create("shape", "mesh")
-		.AddRequiredProperty("color", ParameterType::Color)
+		.AddRequiredProperty("color", ParameterType::Color) //Make color required
 		.AddProperty("fill-color", ParameterType::Color)
 		.AddProperty("fill-opacity", ParameterType::FloatingPoint);
 }
@@ -279,7 +282,7 @@ ClassDefinition get_sprite_class()
 		.AddRequiredProperty("material", ParameterType::String)
 		.AddProperty("auto-repeat", ParameterType::Boolean)
 		.AddProperty("auto-size", ParameterType::Boolean)
-		.AddProperty("color", ParameterType::Color)
+		.AddProperty("color", ParameterType::Color) //Make color optional
 		.AddProperty("crop", {ParameterType::Vector2, ParameterType::Vector2})
 		.AddProperty("flip-horizontal", ParameterType::Boolean)
 		.AddProperty("flip-vertical", ParameterType::Boolean)
@@ -534,17 +537,17 @@ void set_pass_properties(const script_tree::ObjectNode &object, graphics::render
 
 void set_rotating_properties(const script_tree::ObjectNode &object, graph::animations::node_animation::detail::rotating_motion &rotating)
 {
-
+	//Empty
 }
 
 void set_scaling_properties(const script_tree::ObjectNode &object, graph::animations::node_animation::detail::scaling_motion &scaling)
 {
-
+	//Empty
 }
 
 void set_translating_properties(const script_tree::ObjectNode &object, graph::animations::node_animation::detail::translating_motion &translating)
 {
-
+	//Empty
 }
 
 
@@ -552,60 +555,235 @@ void set_animated_sprite_properties(const script_tree::ObjectNode &object, shape
 	graphics::materials::MaterialManager &material_manager)
 {
 	set_sprite_properties(object, animated_sprite, material_manager);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "running")
+		{
+			if (property[0].Get<ScriptType::Boolean>()->Get())
+				animated_sprite.Start();
+			else
+				animated_sprite.Stop();
+		}
+		else if (property.Name() == "jump-backward")
+			animated_sprite.JumpBackward(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "jump-forward")
+			animated_sprite.JumpForward(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+	}
 }
 
 void set_border_properties(const script_tree::ObjectNode &object, shapes::Border &border,
 	graphics::materials::MaterialManager &material_manager)
 {
 	set_rectangle_properties(object, border, material_manager);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "border-color")
+			border.BorderColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "corner-color")
+		{
+			if (property.NumberOfArguments() == 4)
+				border.CornerColor(property[0].Get<ScriptType::Color>()->Get(),
+								   property[1].Get<ScriptType::Color>()->Get(),
+								   property[2].Get<ScriptType::Color>()->Get(),
+								   property[3].Get<ScriptType::Color>()->Get());
+			else
+				border.CornerColor(property[0].Get<ScriptType::Color>()->Get());
+		}
+		else if (property.Name() == "side-color")
+		{
+			if (property.NumberOfArguments() == 4)
+				border.SideColor(property[0].Get<ScriptType::Color>()->Get(),
+								 property[1].Get<ScriptType::Color>()->Get(),
+								 property[2].Get<ScriptType::Color>()->Get(),
+								 property[3].Get<ScriptType::Color>()->Get());
+			else
+				border.SideColor(property[0].Get<ScriptType::Color>()->Get());
+		}
+	}
 }
 
 void set_curve_properties(const script_tree::ObjectNode &object, shapes::Curve &curve,
 	graphics::materials::MaterialManager &material_manager)
 {
 	set_shape_properties(object, curve, material_manager);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "p")
+			curve.P(property[0].Get<ScriptType::Integer>()->As<int>(), property[1].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "thickness")
+			curve.Thickness(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+	}
 }
 
 void set_ellipse_properties(const script_tree::ObjectNode &object, shapes::Ellipse &ellipse,
 	graphics::materials::MaterialManager &material_manager)
 {
 	set_shape_properties(object, ellipse, material_manager);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "diameter")
+			ellipse.Diameter(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "position")
+			ellipse.Position(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "radius")
+			ellipse.Radius(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "rotation")
+			ellipse.Rotation(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "size")
+			ellipse.Size(property[0].Get<ScriptType::Vector2>()->Get());
+	}
 }
 
 void set_line_properties(const script_tree::ObjectNode &object, shapes::Line &line,
 	graphics::materials::MaterialManager &material_manager)
 {
 	set_shape_properties(object, line, material_manager);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "a")
+			line.A(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "b")
+			line.B(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "thickness")
+			line.Thickness(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+	}
 }
 
 void set_mesh_properties(const script_tree::ObjectNode &object, shapes::Mesh &mesh,
 	graphics::materials::MaterialManager &material_manager)
 {
-	
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "color" || property.Name() == "vertex-color")
+			mesh.VertexColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "draw-mode")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "points")
+				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::Points);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "lines")
+				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::Lines);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "line-loop")
+				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::LineLoop);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "line-strip")
+				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::LineStrip);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "triangles")
+				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::Triangles);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "triangle-fan")
+				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::TriangleFan);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "triangle-strip")
+				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::TriangleStrip);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "quads")
+				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::Quads);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "polygon")
+				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::Polygon);
+		}
+		else if (property.Name() == "include-bounding-volumes")
+			mesh.IncludeBoundingVolumes(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "material" || property.Name() == "surface-material")
+			mesh.SurfaceMaterial(material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get()));
+		else if (property.Name() == "opacity" || property.Name() == "vertex-opacity")
+			mesh.VertexOpacity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "show-wireframe")
+			mesh.ShowWireframe(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "draw-mode")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "manual")
+				mesh.TexCoordMode(shapes::mesh::MeshTexCoordMode::Manual);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "auto")
+				mesh.TexCoordMode(shapes::mesh::MeshTexCoordMode::Auto);
+		}
+		else if (property.Name() == "visible")
+			mesh.Visible(property[0].Get<ScriptType::Boolean>()->Get());
+	}
 }
 
 void set_rectangle_properties(const script_tree::ObjectNode &object, shapes::Rectangle &rectangle,
 	graphics::materials::MaterialManager &material_manager)
 {
 	set_shape_properties(object, rectangle, material_manager);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "height")
+			rectangle.Height(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "position")
+			rectangle.Position(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "resize-to-fill")
+			rectangle.ResizeToFill(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "resize-to-fit")
+			rectangle.ResizeToFit(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "rotation")
+			rectangle.Rotation(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "size")
+			rectangle.Size(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "width")
+			rectangle.Width(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+	}
 }
 
 void set_shape_properties(const script_tree::ObjectNode &object, shapes::Shape &shape,
 	graphics::materials::MaterialManager &material_manager)
 {
 	set_mesh_properties(object, shape, material_manager);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "fill-color")
+			shape.FillColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "fill-opacity")
+			shape.FillOpacity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+	}
 }
 
 void set_sprite_properties(const script_tree::ObjectNode &object, shapes::Sprite &sprite,
 	graphics::materials::MaterialManager &material_manager)
 {
 	set_rectangle_properties(object, sprite, material_manager);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "auto-repeat")
+			sprite.AutoRepeat(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "auto-size")
+			sprite.AutoSize(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "crop")
+			sprite.Crop(Aabb{property[0].Get<ScriptType::Vector2>()->Get(), property[1].Get<ScriptType::Vector2>()->Get()});
+		else if (property.Name() == "flip-horizontal")
+		{
+			if (property[0].Get<ScriptType::Boolean>()->Get())
+				sprite.FlipHorizontal();
+		}
+		else if (property.Name() == "flip-vertical")
+		{
+			if (property[0].Get<ScriptType::Boolean>()->Get())
+				sprite.FlipVertical();
+		}
+		else if (property.Name() == "repeat")
+			sprite.Repeat(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "tex-coords")
+			sprite.TexCoords(property[0].Get<ScriptType::Vector2>()->Get(), property[1].Get<ScriptType::Vector2>()->Get());
+	}
 }
 
 void set_triangle_properties(const script_tree::ObjectNode &object, shapes::Triangle &triangle,
 	graphics::materials::MaterialManager &material_manager)
 {
 	set_shape_properties(object, triangle, material_manager);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "a")
+			triangle.A(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "b")
+			triangle.B(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "c")
+			triangle.C(property[0].Get<ScriptType::Vector3>()->Get());
+	}
 }
 
 

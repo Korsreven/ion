@@ -14,6 +14,7 @@ File:	IonAnimationScriptInterface.cpp
 
 #include <string>
 #include "graphics/textures/IonFrameSequenceManager.h"
+#include "types/IonTypes.h"
 
 namespace ion::script::interfaces
 {
@@ -40,6 +41,8 @@ ClassDefinition get_animation_class()
 		.AddProperty("cycle-time", ParameterType::FloatingPoint)
 		.AddProperty("direction", {"normal"s, "reverse"s, "alternate"s, "alternate-reverse"s})
 		.AddProperty("frame-rate", ParameterType::FloatingPoint)
+		.AddProperty("jump-backward", ParameterType::FloatingPoint)
+		.AddProperty("jump-forward", ParameterType::FloatingPoint)
 		.AddProperty("playback-rate", ParameterType::FloatingPoint)
 		.AddProperty("repeat-count", ParameterType::Integer)
 		.AddProperty("running", ParameterType::Boolean)
@@ -97,6 +100,10 @@ NonOwningPtr<Animation> create_animation(const script_tree::ObjectNode &object,
 			}
 			else if (property.Name() == "frame-rate")
 				animation->FrameRate(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+			else if (property.Name() == "jump-backward")
+				animation->JumpBackward(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+			else if (property.Name() == "jump-forward")
+				animation->JumpForward(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
 			else if (property.Name() == "playback-rate")
 				animation->PlaybackRate(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 			else if (property.Name() == "repeat-count")
