@@ -1079,7 +1079,8 @@ void set_movable_sound_properties(const script_tree::ObjectNode &object, Movable
 
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "");
+		if (property.Name() == "position")
+			sound.Position(property[0].Get<ScriptType::Vector3>()->Get());
 	}
 }
 
@@ -1089,7 +1090,8 @@ void set_movable_sound_listener_properties(const script_tree::ObjectNode &object
 
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "");
+		if (property.Name() == "position")
+			sound_listener.Position(property[0].Get<ScriptType::Vector3>()->Get());
 	}
 }
 
@@ -1403,14 +1405,24 @@ NonOwningPtr<DrawableParticleSystem> create_drawable_particle_system(const scrip
 	SceneManager &scene_manager,
 	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
-	return nullptr;
+	auto particle_system = scene_manager.CreateParticleSystem({}, nullptr);
+
+	if (particle_system)
+		set_drawable_particle_system_properties(object, *particle_system, shader_program_manager);
+
+	return particle_system;
 }
 
 NonOwningPtr<DrawableText> create_drawable_text(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager,
 	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
-	return nullptr;
+	auto text = scene_manager.CreateText({}, nullptr);
+
+	if (text)
+		set_drawable_text_properties(object, *text, shader_program_manager);
+
+	return text;
 }
 
 NonOwningPtr<Light> create_light(const script_tree::ObjectNode &object,
@@ -1440,7 +1452,7 @@ NonOwningPtr<Model> create_model(const script_tree::ObjectNode &object,
 NonOwningPtr<MovableSound> create_movable_sound(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager)
 {
-	auto movable_sound = scene_manager.CreateSound("", nullptr);
+	auto movable_sound = scene_manager.CreateSound({}, nullptr);
 
 	if (movable_sound)
 		set_movable_sound_properties(object, *movable_sound);
@@ -1451,7 +1463,7 @@ NonOwningPtr<MovableSound> create_movable_sound(const script_tree::ObjectNode &o
 NonOwningPtr<MovableSoundListener> create_movable_sound_listener(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager)
 {
-	auto movable_sound_listener = scene_manager.CreateSoundListener("", nullptr);
+	auto movable_sound_listener = scene_manager.CreateSoundListener({}, nullptr);
 
 	if (movable_sound_listener)
 		set_movable_sound_listener_properties(object, *movable_sound_listener);
