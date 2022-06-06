@@ -171,9 +171,6 @@ namespace ion::script::interfaces
 		void set_frustum_properties(const script_tree::ObjectNode &object, graphics::render::Frustum &frustum);
 		void set_pass_properties(const script_tree::ObjectNode &object, graphics::render::Pass &pass,
 			graphics::shaders::ShaderProgramManager &shader_program_manager);
-		void set_rotating_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::node_animation::detail::rotating_motion &rotating);
-		void set_scaling_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::node_animation::detail::scaling_motion &scaling);
-		void set_translating_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::node_animation::detail::translating_motion &translating);
 
 		void set_animated_sprite_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::AnimatedSprite &aniamted_sprite,
 			graphics::materials::MaterialManager &material_manager);
@@ -224,6 +221,15 @@ namespace ion::script::interfaces
 		graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
 			graphics::shaders::ShaderProgramManager &shader_program_manager);
 
+		void create_action(const script_tree::ObjectNode &object,
+			graphics::scene::graph::animations::NodeAnimation &animation);
+		void create_rotating_motion(const script_tree::ObjectNode &object,
+			graphics::scene::graph::animations::NodeAnimation &animation);
+		void create_scaling_motion(const script_tree::ObjectNode &object,
+			graphics::scene::graph::animations::NodeAnimation &animation);
+		void create_translating_motion(const script_tree::ObjectNode &object,
+			graphics::scene::graph::animations::NodeAnimation &animation);
+
 		NonOwningPtr<graphics::scene::shapes::AnimatedSprite> create_animated_sprite(const script_tree::ObjectNode &object,
 			graphics::scene::Model &model,
 			graphics::materials::MaterialManager &material_manager);
@@ -251,18 +257,18 @@ namespace ion::script::interfaces
 		NonOwningPtr<graphics::scene::shapes::Triangle> create_triangle(const script_tree::ObjectNode &object,
 			graphics::scene::Model &model,
 			graphics::materials::MaterialManager &material_manager);
-
-		NonOwningPtr<graphics::scene::graph::SceneNode> create_scene_node(const script_tree::ObjectNode &object,
-			graphics::scene::graph::SceneNode &parent_node,
-			graphics::scene::SceneManager &scene_manager,
-			graphics::materials::MaterialManager &material_manager,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
+		
 		NonOwningPtr<graphics::scene::graph::animations::NodeAnimation> create_node_animation(const script_tree::ObjectNode &object,
 			graphics::scene::graph::SceneNode &parent_node);
 		NonOwningPtr<graphics::scene::graph::animations::NodeAnimationGroup> create_node_animation_group(const script_tree::ObjectNode &object,
 			graphics::scene::graph::SceneNode &parent_node);
 		NonOwningPtr<graphics::scene::graph::animations::NodeAnimationTimeline> create_node_animation_timeline(const script_tree::ObjectNode &object,
 			graphics::scene::graph::SceneNode &parent_node);
+		NonOwningPtr<graphics::scene::graph::SceneNode> create_scene_node(const script_tree::ObjectNode &object,
+			graphics::scene::graph::SceneNode &parent_node,
+			graphics::scene::SceneManager &scene_manager,
+			graphics::materials::MaterialManager &material_manager,
+			graphics::shaders::ShaderProgramManager &shader_program_manager);
 
 		NonOwningPtr<graphics::scene::Camera> create_camera(const script_tree::ObjectNode &object,
 			graphics::scene::SceneManager &scene_manager);

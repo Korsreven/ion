@@ -39,7 +39,7 @@ namespace ion::graphics::scene
 		{
 			Point,
 			Directional,
-			Spotlight
+			Spot
 		};
 
 		namespace detail
@@ -113,8 +113,8 @@ namespace ion::graphics::scene
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				bool cast_shadows = true) noexcept;
 
-			//Returns a new spotlight from the given name and values
-			[[nodiscard]] static Light Spotlight(std::optional<std::string> name,
+			//Returns a new spot light from the given name and values
+			[[nodiscard]] static Light Spot(std::optional<std::string> name,
 				const Vector3 &position, const Vector3 &direction,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
@@ -175,7 +175,7 @@ namespace ion::graphics::scene
 			}
 
 			//Sets the inner and outer cutoff values of the light to the given angles (radians)
-			//These values only applies for lights of type spotlight
+			//These values only applies for lights of type spot light
 			inline void Cutoff(real inner_angle, real outer_angle) noexcept
 			{
 				cutoff_ = light::detail::angle_to_cutoff(inner_angle);
@@ -241,7 +241,7 @@ namespace ion::graphics::scene
 			}
 
 			//Returns the inner and outer cutoff angle (radians) of the light
-			//These values only applies for lights of type spotlight
+			//These values only applies for lights of type spot
 			[[nodiscard]] inline auto Cutoff() const noexcept
 			{
 				return std::pair{light::detail::cutoff_to_angle(cutoff_),

@@ -87,14 +87,14 @@ Light Light::Directional(std::optional<std::string> name,
 			cast_shadows};
 }
 
-Light Light::Spotlight(std::optional<std::string> name,
+Light Light::Spot(std::optional<std::string> name,
 	const Vector3 &position, const Vector3 &direction,
 	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 	real cutoff_angle, real outer_cutoff_angle,
 	bool cast_shadows) noexcept
 {
-	return {std::move(name), LightType::Spotlight,
+	return {std::move(name), LightType::Spot,
 			position, direction,
 			ambient, diffuse, specular,
 			attenuation_constant, attenuation_linear, attenuation_quadratic,

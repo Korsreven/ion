@@ -1813,7 +1813,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Lights
 			auto head_light = scene_manager->CreateLight();
-			head_light->Type(ion::graphics::scene::light::LightType::Spotlight);
+			head_light->Type(ion::graphics::scene::light::LightType::Spot);
 			head_light->Direction(Vector3{0.0_r, 0.6_r, -0.4_r});
 			head_light->AmbientColor(color::Transparent);
 			head_light->DiffuseColor(color::White);

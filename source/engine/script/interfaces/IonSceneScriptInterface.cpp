@@ -129,7 +129,7 @@ graphics::render::pass::BlendEquationMode get_pass_blend_equation_mode(const scr
 ClassDefinition get_action_class()
 {
 	return ClassDefinition::Create("action")
-		.AddRequiredProperty("duration", ParameterType::FloatingPoint)
+		.AddRequiredProperty("time", ParameterType::FloatingPoint)
 		.AddRequiredProperty("type", {"flip-visibility"s, "flip-visibility-cascading"s, "show"s, "show-cascading"s, "hide"s, "hide-cascading"s,
 							  "inherit-rotation"s, "inherit-scaling"s, "disinherit-rotation"s, "disinherit-scaling"s});
 }
@@ -409,7 +409,7 @@ ClassDefinition get_light_class()
 		.AddProperty("direction", ParameterType::Vector3)
 		.AddProperty("position", ParameterType::Vector3)
 		.AddProperty("specular-color", ParameterType::Color)
-		.AddProperty("type", {"point"s, "directional"s, "spotlight"s});
+		.AddProperty("type", {"point"s, "directional"s, "spot"s});
 }
 
 ClassDefinition get_model_class()
@@ -534,21 +534,6 @@ void set_pass_properties(const script_tree::ObjectNode &object, graphics::render
 		else if (property.Name() == "shader-program")
 			pass.RenderProgram(shader_program_manager.GetShaderProgram(property[0].Get<ScriptType::String>()->Get()));
 	}
-}
-
-void set_rotating_properties(const script_tree::ObjectNode &object, graph::animations::node_animation::detail::rotating_motion &rotating)
-{
-	//Empty
-}
-
-void set_scaling_properties(const script_tree::ObjectNode &object, graph::animations::node_animation::detail::scaling_motion &scaling)
-{
-	//Empty
-}
-
-void set_translating_properties(const script_tree::ObjectNode &object, graph::animations::node_animation::detail::translating_motion &translating)
-{
-	//Empty
 }
 
 
@@ -790,9 +775,16 @@ void set_triangle_properties(const script_tree::ObjectNode &object, shapes::Tria
 
 void set_node_animation_properties(const script_tree::ObjectNode &object, graph::animations::NodeAnimation &animation)
 {
-	for (auto &property : object.Properties())
+	for (auto &obj : object.Objects())
 	{
-		if (property.Name() == "");
+		if (obj.Name() == "action")
+			create_action(obj, animation);
+		else if (obj.Name() == "rotation")
+			create_rotating_motion(obj, animation);
+		else if (obj.Name() == "scaling")
+			create_scaling_motion(obj, animation);
+		else if (obj.Name() == "translation")
+			create_translating_motion(obj, animation);
 	}
 }
 
@@ -800,7 +792,15 @@ void set_node_animation_group_properties(const script_tree::ObjectNode &object, 
 {
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "");
+		if (property.Name() == "add")
+		{
+			if (property.NumberOfArguments() == 3)
+				/*animation_group.Add(property[0].Get<ScriptType::String>()->Get(),
+									  property[1].Get<ScriptType::FloatingPoint>()->As<real>(),
+									  property[2].Get<ScriptType::Boolean>()->Get())*/;
+			else
+				/*animation_group.Add(property[0].Get<ScriptType::String>()->Get())*/;
+		}
 	}
 }
 
@@ -808,7 +808,44 @@ void set_node_animation_timeline_properties(const script_tree::ObjectNode &objec
 {
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "");
+		if (property.Name() == "attach")
+		{
+			if (property.NumberOfArguments() == 3)
+				/*timeline.Attach(property[0].Get<ScriptType::String>()->Get(),
+								  property[1].Get<ScriptType::FloatingPoint>()->As<real>(),
+								  property[2].Get<ScriptType::Boolean>()->Get())*/;
+			else
+				/*timeline.Attach(property[0].Get<ScriptType::String>()->Get())*/;
+		}
+		else if (property.Name() == "attach-animation")
+		{
+			if (property.NumberOfArguments() == 3)
+				/*timeline.Attach(property[0].Get<ScriptType::String>()->Get(),
+								  property[1].Get<ScriptType::FloatingPoint>()->As<real>(),
+								  property[2].Get<ScriptType::Boolean>()->Get())*/;
+			else
+				/*timeline.Attach(property[0].Get<ScriptType::String>()->Get())*/;
+		}
+		else if (property.Name() == "attach-animation-group")
+		{
+			if (property.NumberOfArguments() == 3)
+				/*timeline.Attach(property[0].Get<ScriptType::String>()->Get(),
+								  property[1].Get<ScriptType::FloatingPoint>()->As<real>(),
+								  property[2].Get<ScriptType::Boolean>()->Get())*/;
+			else
+				/*timeline.Attach(property[0].Get<ScriptType::String>()->Get())*/;
+		}
+		else if (property.Name() == "playback-rate")
+			timeline.PlaybackRate(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "repeat-count")
+			timeline.RepeatCount(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "running")
+		{
+			if (property[0].Get<ScriptType::Boolean>()->Get())
+				timeline.Start();
+			else
+				timeline.Stop();
+		}
 	}
 }
 
@@ -896,7 +933,12 @@ void set_camera_properties(const script_tree::ObjectNode &object, Camera &camera
 
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "");
+		if (property.Name() == "base-viewport-height")
+			camera.BaseViewportHeight(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "position")
+			camera.Position(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "rotation")
+			camera.Rotation(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
 	}
 }
 
@@ -922,11 +964,6 @@ void set_drawable_particle_system_properties(const script_tree::ObjectNode &obje
 	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
 	set_drawable_object_properties(object, particle_system, shader_program_manager);
-
-	for (auto &property : object.Properties())
-	{
-		if (property.Name() == "");
-	}
 }
 
 void set_drawable_text_properties(const script_tree::ObjectNode &object, DrawableText &text,
@@ -936,7 +973,10 @@ void set_drawable_text_properties(const script_tree::ObjectNode &object, Drawabl
 
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "");
+		if (property.Name() == "position")
+			text.Position(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "rotation")
+			text.Rotation(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
 	}
 }
 
@@ -946,7 +986,33 @@ void set_light_properties(const script_tree::ObjectNode &object, Light &light)
 
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "");
+		if (property.Name() == "ambient-color")
+			light.AmbientColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "attenuation")
+			light.Attenuation(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+							  property[1].Get<ScriptType::FloatingPoint>()->As<real>(),
+							  property[2].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "cast-shadows")
+			light.CastShadows(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "cutoff")
+			light.Cutoff(property[0].Get<ScriptType::FloatingPoint>()->As<real>(), property[1].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "diffuse-color")
+			light.DiffuseColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "direction")
+			light.Direction(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "position")
+			light.Position(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "specular-color")
+			light.SpecularColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "type")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "point")
+				light.Type(light::LightType::Point);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "directional")
+				light.Type(light::LightType::Directional);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "spot")
+				light.Type(light::LightType::Spot);
+		}
 	}
 }
 
@@ -955,11 +1021,6 @@ void set_model_properties(const script_tree::ObjectNode &object, Model &model,
 	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
 	set_drawable_object_properties(object, model, shader_program_manager);
-
-	for (auto &property : object.Properties())
-	{
-		if (property.Name() == "");
-	}
 
 	for (auto &obj : object.Objects())
 	{
@@ -1046,6 +1107,127 @@ graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
 	graphics::render::Pass pass;
 	set_pass_properties(object, pass, shader_program_manager);
 	return pass;
+}
+
+
+void create_action(const script_tree::ObjectNode &object,
+	graph::animations::NodeAnimation &animation)
+{
+	auto type_name = object
+		.Property("type")[0]
+		.Get<ScriptType::Enumerable>()->Get();
+	auto time = duration{object
+		.Property("time")[1]
+		.Get<ScriptType::FloatingPoint>()->As<real>()};
+
+	auto type =
+		[&]() noexcept
+		{
+			if (type_name == "flip-visibility")
+				return graph::animations::node_animation::NodeActionType::FlipVisibility;
+			else if (type_name == "flip-visibility-cascading")
+				return graph::animations::node_animation::NodeActionType::FlipVisibilityCascading;
+			else if (type_name == "show")
+				return graph::animations::node_animation::NodeActionType::Show;
+			else if (type_name == "show-cascading")
+				return graph::animations::node_animation::NodeActionType::ShowCascading;
+			else if (type_name == "hide")
+				return graph::animations::node_animation::NodeActionType::Hide;
+			else if (type_name == "hide-cascading")
+				return graph::animations::node_animation::NodeActionType::HideCascading;
+
+			else if (type_name == "inherit-rotation")
+				return graph::animations::node_animation::NodeActionType::InheritRotation;
+			else if (type_name == "inherit-scaling")
+				return graph::animations::node_animation::NodeActionType::InheritScaling;
+			else if (type_name == "disinherit-rotation")
+				return graph::animations::node_animation::NodeActionType::DisinheritRotation;
+			else //if (type_name == "disinherit-scaling")
+				return graph::animations::node_animation::NodeActionType::DisinheritScaling;
+		}();
+
+	animation.AddAction(type, time);
+}
+
+void create_rotating_motion(const script_tree::ObjectNode &object,
+	graph::animations::NodeAnimation &animation)
+{
+	auto angle = utilities::math::ToRadians(object
+		.Property("angle")[0]
+		.Get<ScriptType::FloatingPoint>()->As<real>());
+	auto total_duration = duration{object
+		.Property("total-duration")[1]
+		.Get<ScriptType::FloatingPoint>()->As<real>()};
+	auto start_time = duration{object
+		.Property("start-time")[2]
+		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>()};
+	auto technique_name = object
+		.Property("motion-technique")[3];
+
+	auto technique = technique_name ?
+		get_motion_technique_type(technique_name) :
+		graph::animations::node_animation::MotionTechniqueType::Linear;
+
+	animation.AddRotation(angle, total_duration, start_time, technique);
+}
+
+void create_scaling_motion(const script_tree::ObjectNode &object,
+	graph::animations::NodeAnimation &animation)
+{
+	auto unit = object
+		.Property("unit")[0]
+		.Get<ScriptType::Vector2>()->Get();
+	auto total_duration = duration{object
+		.Property("total-duration")[1]
+		.Get<ScriptType::FloatingPoint>()->As<real>()};
+	auto start_time = duration{object
+		.Property("start-time")[2]
+		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>()};
+	auto technique_name_x = object
+		.Property("motion-technique")[3];
+	auto technique_name_y = object
+		.Property("motion-technique")[4];
+
+	auto technique_x = technique_name_x ?
+		get_motion_technique_type(technique_name_x) :
+		graph::animations::node_animation::MotionTechniqueType::Linear;
+	auto technique_y = technique_name_y ?
+		get_motion_technique_type(technique_name_y) :
+		graph::animations::node_animation::MotionTechniqueType::Linear;
+
+	animation.AddScaling(unit, total_duration, start_time, technique_x, technique_y);
+}
+
+void create_translating_motion(const script_tree::ObjectNode &object,
+	graph::animations::NodeAnimation &animation)
+{
+	auto unit = object
+		.Property("unit")[0]
+		.Get<ScriptType::Vector3>()->Get();
+	auto total_duration = duration{object
+		.Property("total-duration")[1]
+		.Get<ScriptType::FloatingPoint>()->As<real>()};
+	auto start_time = duration{object
+		.Property("start-time")[2]
+		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>()};
+	auto technique_name_x = object
+		.Property("motion-technique")[3];
+	auto technique_name_y = object
+		.Property("motion-technique")[4];
+	auto technique_name_z = object
+		.Property("motion-technique")[5];
+
+	auto technique_x = technique_name_x ?
+		get_motion_technique_type(technique_name_x) :
+		graph::animations::node_animation::MotionTechniqueType::Linear;
+	auto technique_y = technique_name_y ?
+		get_motion_technique_type(technique_name_y) :
+		graph::animations::node_animation::MotionTechniqueType::Linear;
+	auto technique_z = technique_name_z ?
+		get_motion_technique_type(technique_name_z) :
+		graph::animations::node_animation::MotionTechniqueType::Linear;
+
+	animation.AddTranslation(unit, total_duration, start_time, technique_x, technique_y, technique_z);
 }
 
 
@@ -1158,20 +1340,6 @@ NonOwningPtr<shapes::Triangle> create_triangle(const script_tree::ObjectNode &ob
 }
 
 
-NonOwningPtr<graph::SceneNode> create_scene_node(const script_tree::ObjectNode &object,
-	graph::SceneNode &parent_node,
-	SceneManager &scene_manager,
-	graphics::materials::MaterialManager &material_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
-{
-	auto node = parent_node.CreateChildNode();
-
-	if (node)
-		set_scene_node_properties(object, *node, scene_manager, material_manager, shader_program_manager);
-
-	return node;
-}
-
 NonOwningPtr<graph::animations::NodeAnimation> create_node_animation(const script_tree::ObjectNode &object,
 	graph::SceneNode &parent_node)
 {
@@ -1203,6 +1371,20 @@ NonOwningPtr<graph::animations::NodeAnimationTimeline> create_node_animation_tim
 		set_node_animation_timeline_properties(object, *node_animation_timeline);
 
 	return node_animation_timeline;
+}
+
+NonOwningPtr<graph::SceneNode> create_scene_node(const script_tree::ObjectNode &object,
+	graph::SceneNode &parent_node,
+	SceneManager &scene_manager,
+	graphics::materials::MaterialManager &material_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager)
+{
+	auto node = parent_node.CreateChildNode();
+
+	if (node)
+		set_scene_node_properties(object, *node, scene_manager, material_manager, shader_program_manager);
+
+	return node;
 }
 
 
