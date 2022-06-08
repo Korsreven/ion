@@ -122,6 +122,41 @@ graphics::render::pass::BlendEquationMode get_pass_blend_equation_mode(const scr
 }
 
 
+NonOwningPtr<graph::animations::NodeAnimation> get_node_animation(std::string_view name,
+	graph::SceneNode &parent_node) noexcept
+{
+	if (auto node_animation = parent_node.GetAnimation(name); node_animation)
+		return node_animation;
+	else
+	{
+		for (auto &child_node : parent_node.BreadthFirstSearch())
+		{
+			if (node_animation = child_node.GetAnimation(name); node_animation)
+				return node_animation;
+		}
+
+		return nullptr;
+	}
+}
+
+NonOwningPtr<graph::animations::NodeAnimationGroup> get_node_animation_group(std::string_view name,
+	graph::SceneNode &parent_node) noexcept
+{
+	if (auto node_animation_group = parent_node.GetAnimationGroup(name); node_animation_group)
+		return node_animation_group;
+	else
+	{
+		for (auto &child_node : parent_node.BreadthFirstSearch())
+		{
+			if (node_animation_group = child_node.GetAnimationGroup(name); node_animation_group)
+				return node_animation_group;
+		}
+
+		return nullptr;
+	}
+}
+
+
 /*
 	Validator classes
 */
@@ -320,7 +355,6 @@ ClassDefinition get_node_animation_group_class()
 ClassDefinition get_node_animation_timeline_class()
 {
 	return ClassDefinition::Create("node-animation-timeline")
-		.AddProperty("attach", {ParameterType::String, ParameterType::FloatingPoint, ParameterType::Boolean}, 1)
 		.AddProperty("attach-animation", {ParameterType::String, ParameterType::FloatingPoint, ParameterType::Boolean}, 1)
 		.AddProperty("attach-animation-group", {ParameterType::String, ParameterType::FloatingPoint, ParameterType::Boolean}, 1)
 		.AddProperty("name", ParameterType::String)
@@ -788,52 +822,54 @@ void set_node_animation_properties(const script_tree::ObjectNode &object, graph:
 	}
 }
 
-void set_node_animation_group_properties(const script_tree::ObjectNode &object, graph::animations::NodeAnimationGroup &animation_group)
+void set_node_animation_group_properties(const script_tree::ObjectNode &object, graph::animations::NodeAnimationGroup &animation_group,
+	graph::SceneNode &parent_node)
 {
 	for (auto &property : object.Properties())
 	{
 		if (property.Name() == "add")
 		{
+			auto node_animation =
+				get_node_animation(property[0].Get<ScriptType::String>()->Get(), parent_node);
+
 			if (property.NumberOfArguments() == 3)
-				/*animation_group.Add(property[0].Get<ScriptType::String>()->Get(),
-									  property[1].Get<ScriptType::FloatingPoint>()->As<real>(),
-									  property[2].Get<ScriptType::Boolean>()->Get())*/;
+				animation_group.Add(node_animation,
+									duration{property[1].Get<ScriptType::FloatingPoint>()->As<real>()},
+									property[2].Get<ScriptType::Boolean>()->Get());
 			else
-				/*animation_group.Add(property[0].Get<ScriptType::String>()->Get())*/;
+				animation_group.Add(node_animation);
 		}
 	}
 }
 
-void set_node_animation_timeline_properties(const script_tree::ObjectNode &object, graph::animations::NodeAnimationTimeline &timeline)
+void set_node_animation_timeline_properties(const script_tree::ObjectNode &object, graph::animations::NodeAnimationTimeline &timeline,
+	graph::SceneNode &parent_node)
 {
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "attach")
+		if (property.Name() == "attach-animation")
 		{
+			auto node_animation =
+				get_node_animation(property[0].Get<ScriptType::String>()->Get(), parent_node);
+
 			if (property.NumberOfArguments() == 3)
-				/*timeline.Attach(property[0].Get<ScriptType::String>()->Get(),
-								  property[1].Get<ScriptType::FloatingPoint>()->As<real>(),
-								  property[2].Get<ScriptType::Boolean>()->Get())*/;
+				timeline.Attach(node_animation,
+								duration{property[1].Get<ScriptType::FloatingPoint>()->As<real>()},
+								property[2].Get<ScriptType::Boolean>()->Get());
 			else
-				/*timeline.Attach(property[0].Get<ScriptType::String>()->Get())*/;
-		}
-		else if (property.Name() == "attach-animation")
-		{
-			if (property.NumberOfArguments() == 3)
-				/*timeline.Attach(property[0].Get<ScriptType::String>()->Get(),
-								  property[1].Get<ScriptType::FloatingPoint>()->As<real>(),
-								  property[2].Get<ScriptType::Boolean>()->Get())*/;
-			else
-				/*timeline.Attach(property[0].Get<ScriptType::String>()->Get())*/;
+				timeline.Attach(node_animation);
 		}
 		else if (property.Name() == "attach-animation-group")
 		{
+			auto node_animation_group =
+				get_node_animation_group(property[0].Get<ScriptType::String>()->Get(), parent_node);
+
 			if (property.NumberOfArguments() == 3)
-				/*timeline.Attach(property[0].Get<ScriptType::String>()->Get(),
-								  property[1].Get<ScriptType::FloatingPoint>()->As<real>(),
-								  property[2].Get<ScriptType::Boolean>()->Get())*/;
+				timeline.Attach(node_animation_group,
+								duration{property[1].Get<ScriptType::FloatingPoint>()->As<real>()},
+								property[2].Get<ScriptType::Boolean>()->Get());
 			else
-				/*timeline.Attach(property[0].Get<ScriptType::String>()->Get())*/;
+				timeline.Attach(node_animation_group);
 		}
 		else if (property.Name() == "playback-rate")
 			timeline.PlaybackRate(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
@@ -1359,7 +1395,7 @@ NonOwningPtr<graph::animations::NodeAnimationGroup> create_node_animation_group(
 	auto node_animation_group = parent_node.CreateAnimationGroup("");
 
 	if (node_animation_group)
-		set_node_animation_group_properties(object, *node_animation_group);
+		set_node_animation_group_properties(object, *node_animation_group, parent_node);
 
 	return node_animation_group;
 }
@@ -1370,7 +1406,7 @@ NonOwningPtr<graph::animations::NodeAnimationTimeline> create_node_animation_tim
 	auto node_animation_timeline = parent_node.CreateTimeline();
 
 	if (node_animation_timeline)
-		set_node_animation_timeline_properties(object, *node_animation_timeline);
+		set_node_animation_timeline_properties(object, *node_animation_timeline, parent_node);
 
 	return node_animation_timeline;
 }

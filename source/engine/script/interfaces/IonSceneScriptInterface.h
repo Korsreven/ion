@@ -118,10 +118,14 @@ namespace ion::script::interfaces
 			"max"
 		};
 
-
 		graphics::scene::graph::animations::node_animation::MotionTechniqueType get_motion_technique_type(const script_tree::ArgumentNode &arg);
 		graphics::render::pass::BlendFactor get_pass_blend_factor(const script_tree::ArgumentNode &arg);
 		graphics::render::pass::BlendEquationMode get_pass_blend_equation_mode(const script_tree::ArgumentNode &arg);
+
+		NonOwningPtr<graphics::scene::graph::animations::NodeAnimation> get_node_animation(std::string_view name,
+			graphics::scene::graph::SceneNode &parent_node) noexcept;
+		NonOwningPtr<graphics::scene::graph::animations::NodeAnimationGroup> get_node_animation_group(std::string_view name,
+			graphics::scene::graph::SceneNode &parent_node) noexcept;
 
 
 		/*
@@ -194,8 +198,10 @@ namespace ion::script::interfaces
 			graphics::materials::MaterialManager &material_manager);
 
 		void set_node_animation_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::NodeAnimation &animation);
-		void set_node_animation_group_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::NodeAnimationGroup &animation_group);
-		void set_node_animation_timeline_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::NodeAnimationTimeline &timeline);
+		void set_node_animation_group_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::NodeAnimationGroup &animation_group,
+			graphics::scene::graph::SceneNode &parent_node);
+		void set_node_animation_timeline_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::NodeAnimationTimeline &timeline,
+			graphics::scene::graph::SceneNode &parent_node);
 		void set_scene_node_properties(const script_tree::ObjectNode &object, graphics::scene::graph::SceneNode &scene_node,
 			graphics::scene::SceneManager &scene_manager,
 			graphics::materials::MaterialManager &material_manager,
