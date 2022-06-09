@@ -1273,7 +1273,27 @@ NonOwningPtr<shapes::AnimatedSprite> create_animated_sprite(const script_tree::O
 	Model &model,
 	graphics::materials::MaterialManager &material_manager)
 {
-	auto animated_sprite = model.CreateMesh<shapes::AnimatedSprite>(graphics::utilities::Vector2{}, nullptr);
+	auto position = object
+		.Property("position")[0]
+		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
+	auto rotation = object
+		.Property("rotation")[0]
+		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>();
+	auto size = object
+		.Property("size")[0]
+		.Get<ScriptType::Vector2>()->Get();
+	auto material_name = object
+		.Property("material")[0]
+		.Get<ScriptType::String>()->Get();
+	auto color = object
+		.Property("color")[0]
+		.Get<ScriptType::Color>().value_or(color::White).Get();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto animated_sprite = model.CreateMesh<shapes::AnimatedSprite>(position, rotation, size,
+		material_manager.GetMaterial(material_name), color, visible);
 
 	if (animated_sprite)
 		set_animated_sprite_properties(object, *animated_sprite, material_manager);
@@ -1285,7 +1305,40 @@ NonOwningPtr<shapes::Border> create_border(const script_tree::ObjectNode &object
 	Model &model,
 	graphics::materials::MaterialManager &material_manager)
 {
-	auto border = model.CreateMesh<shapes::Border>(graphics::utilities::Vector2{}, graphics::utilities::Vector2{}, graphics::utilities::Color{});
+	auto position = object
+		.Property("position")[0]
+		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
+	auto rotation = utilities::math::ToRadians(object
+		.Property("rotation")[0]
+		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>());
+	auto size = object
+		.Property("size")[0]
+		.Get<ScriptType::Vector2>()->Get();
+	auto border_size = object
+		.Property("boder-size")[0]
+		.Get<ScriptType::Vector2>()->Get();
+	auto corner_style_name = object
+		.Property("corner-style")[0]
+		.Get<ScriptType::Enumerable>().value_or(""s).Get();
+	auto color = object
+		.Property("color")[0]
+		.Get<ScriptType::Color>()->Get();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto corner_style =
+		[&]() noexcept
+		{
+			if (corner_style_name == "square")
+				return shapes::border::BorderCornerStyle::Square;
+			else if (corner_style_name == "oblique")
+				return shapes::border::BorderCornerStyle::Oblique;
+			else
+				return shapes::border::BorderCornerStyle::None;
+		}();
+
+	auto border = model.CreateMesh<shapes::Border>(position, rotation, size, border_size, corner_style, color, visible);
 
 	if (border)
 		set_border_properties(object, *border, material_manager);
@@ -1297,7 +1350,28 @@ NonOwningPtr<shapes::Curve> create_curve(const script_tree::ObjectNode &object,
 	Model &model,
 	graphics::materials::MaterialManager &material_manager)
 {
-	auto curve = model.CreateMesh<shapes::Curve>(shapes::curve::ControlPoints{}, graphics::utilities::Color{});
+	auto color = object
+		.Property("color")[0]
+		.Get<ScriptType::Color>()->Get();
+	auto thickness = object
+		.Property("thickness")[0]
+		.Get<ScriptType::FloatingPoint>().value_or(1.0).As<real>();
+	auto smoothness = object
+		.Property("smoothness")[0]
+		.Get<ScriptType::Integer>().value_or(shapes::curve::detail::default_curve_smoothness).As<int>();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto control_points = shapes::curve::ControlPoints{};
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "control-point")
+			control_points.push_back(property[0].Get<ScriptType::Vector3>()->Get());
+	}
+
+	auto curve = model.CreateMesh<shapes::Curve>(std::move(control_points), color, thickness, smoothness, visible);
 
 	if (curve)
 		set_curve_properties(object, *curve, material_manager);
@@ -1309,7 +1383,26 @@ NonOwningPtr<shapes::Ellipse> create_ellipse(const script_tree::ObjectNode &obje
 	Model &model,
 	graphics::materials::MaterialManager &material_manager)
 {
-	auto ellipse = model.CreateMesh<shapes::Ellipse>(graphics::utilities::Vector2{}, graphics::utilities::Color{});
+	auto position = object
+		.Property("position")[0]
+		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
+	auto rotation = utilities::math::ToRadians(object
+		.Property("rotation")[0]
+		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>());
+	auto size = object
+		.Property("size")[0]
+		.Get<ScriptType::Vector2>()->Get();
+	auto color = object
+		.Property("color")[0]
+		.Get<ScriptType::Color>()->Get();
+	auto sides = object
+		.Property("sides")[0]
+		.Get<ScriptType::Integer>().value_or(shapes::ellipse::detail::default_ellipse_sides).As<int>();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto ellipse = model.CreateMesh<shapes::Ellipse>(position, rotation, size, color, sides, visible);
 
 	if (ellipse)
 		set_ellipse_properties(object, *ellipse, material_manager);
@@ -1321,7 +1414,23 @@ NonOwningPtr<shapes::Line> create_line(const script_tree::ObjectNode &object,
 	Model &model,
 	graphics::materials::MaterialManager &material_manager)
 {
-	auto line = model.CreateMesh<shapes::Line>(graphics::utilities::Vector3{}, graphics::utilities::Vector3{}, graphics::utilities::Color{});
+	auto a = object
+		.Property("a")[0]
+		.Get<ScriptType::Vector3>()->Get();
+	auto b = object
+		.Property("b")[0]
+		.Get<ScriptType::Vector3>()->Get();
+	auto color = object
+		.Property("color")[0]
+		.Get<ScriptType::Color>()->Get();
+	auto thickness = object
+		.Property("thickness")[0]
+		.Get<ScriptType::FloatingPoint>().value_or(1.0).As<real>();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto line = model.CreateMesh<shapes::Line>(a, b, color, thickness, visible);
 
 	if (line)
 		set_line_properties(object, *line, material_manager);
@@ -1345,7 +1454,23 @@ NonOwningPtr<shapes::Rectangle> create_rectangle(const script_tree::ObjectNode &
 	Model &model,
 	graphics::materials::MaterialManager &material_manager)
 {
-	auto rectangle = model.CreateMesh<shapes::Rectangle>(graphics::utilities::Vector2{}, graphics::utilities::Color{});
+	auto position = object
+		.Property("position")[0]
+		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
+	auto rotation = utilities::math::ToRadians(object
+		.Property("rotation")[0]
+		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>());
+	auto size = object
+		.Property("size")[0]
+		.Get<ScriptType::Vector2>()->Get();
+	auto color = object
+		.Property("color")[0]
+		.Get<ScriptType::Color>()->Get();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto rectangle = model.CreateMesh<shapes::Rectangle>(position, rotation, size, color, visible);
 
 	if (rectangle)
 		set_rectangle_properties(object, *rectangle, material_manager);
@@ -1357,7 +1482,27 @@ NonOwningPtr<shapes::Sprite> create_sprite(const script_tree::ObjectNode &object
 	Model &model,
 	graphics::materials::MaterialManager &material_manager)
 {
-	auto sprite = model.CreateMesh<shapes::Sprite>(graphics::utilities::Vector2{}, nullptr);
+	auto position = object
+		.Property("position")[0]
+		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
+	auto rotation = utilities::math::ToRadians(object
+		.Property("rotation")[0]
+		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>());
+	auto size = object
+		.Property("size")[0]
+		.Get<ScriptType::Vector2>()->Get();
+	auto material_name = object
+		.Property("material")[0]
+		.Get<ScriptType::String>()->Get();
+	auto color = object
+		.Property("color")[0]
+		.Get<ScriptType::Color>().value_or(color::White).Get();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto sprite = model.CreateMesh<shapes::Sprite>(position, rotation, size,
+		material_manager.GetMaterial(material_name), color, visible);
 
 	if (sprite)
 		set_sprite_properties(object, *sprite, material_manager);
@@ -1369,7 +1514,23 @@ NonOwningPtr<shapes::Triangle> create_triangle(const script_tree::ObjectNode &ob
 	Model &model,
 	graphics::materials::MaterialManager &material_manager)
 {
-	auto triangle = model.CreateMesh<shapes::Triangle>(graphics::utilities::Vector3{}, graphics::utilities::Vector3{}, graphics::utilities::Vector3{}, graphics::utilities::Color{});
+	auto a = object
+		.Property("a")[0]
+		.Get<ScriptType::Vector3>()->Get();
+	auto b = object
+		.Property("b")[0]
+		.Get<ScriptType::Vector3>()->Get();
+	auto c = object
+		.Property("c")[0]
+		.Get<ScriptType::Vector3>()->Get();
+	auto color = object
+		.Property("color")[0]
+		.Get<ScriptType::Color>()->Get();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto triangle = model.CreateMesh<shapes::Triangle>(a, b, c, color, visible);
 
 	if (triangle)
 		set_triangle_properties(object, *triangle, material_manager);
