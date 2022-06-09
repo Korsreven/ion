@@ -1155,7 +1155,7 @@ void create_action(const script_tree::ObjectNode &object,
 		.Property("type")[0]
 		.Get<ScriptType::Enumerable>()->Get();
 	auto time = duration{object
-		.Property("time")[1]
+		.Property("time")[0]
 		.Get<ScriptType::FloatingPoint>()->As<real>()};
 
 	auto type =
@@ -1194,13 +1194,13 @@ void create_rotating_motion(const script_tree::ObjectNode &object,
 		.Property("angle")[0]
 		.Get<ScriptType::FloatingPoint>()->As<real>());
 	auto total_duration = duration{object
-		.Property("total-duration")[1]
+		.Property("total-duration")[0]
 		.Get<ScriptType::FloatingPoint>()->As<real>()};
 	auto start_time = duration{object
-		.Property("start-time")[2]
+		.Property("start-time")[0]
 		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>()};
 	auto technique_name = object
-		.Property("motion-technique")[3];
+		.Property("motion-technique")[0];
 
 	auto technique = technique_name ?
 		get_motion_technique_type(technique_name) :
@@ -1216,22 +1216,22 @@ void create_scaling_motion(const script_tree::ObjectNode &object,
 		.Property("unit")[0]
 		.Get<ScriptType::Vector2>()->Get();
 	auto total_duration = duration{object
-		.Property("total-duration")[1]
+		.Property("total-duration")[0]
 		.Get<ScriptType::FloatingPoint>()->As<real>()};
 	auto start_time = duration{object
-		.Property("start-time")[2]
+		.Property("start-time")[0]
 		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>()};
 	auto technique_name_x = object
-		.Property("motion-technique")[3];
+		.Property("motion-technique")[0];
 	auto technique_name_y = object
-		.Property("motion-technique")[4];
+		.Property("motion-technique")[1];
 
 	auto technique_x = technique_name_x ?
 		get_motion_technique_type(technique_name_x) :
 		graph::animations::node_animation::MotionTechniqueType::Linear;
 	auto technique_y = technique_name_y ?
 		get_motion_technique_type(technique_name_y) :
-		graph::animations::node_animation::MotionTechniqueType::Linear;
+		technique_x;
 
 	animation.AddScaling(unit, total_duration, start_time, technique_x, technique_y);
 }
@@ -1243,27 +1243,27 @@ void create_translating_motion(const script_tree::ObjectNode &object,
 		.Property("unit")[0]
 		.Get<ScriptType::Vector3>()->Get();
 	auto total_duration = duration{object
-		.Property("total-duration")[1]
+		.Property("total-duration")[0]
 		.Get<ScriptType::FloatingPoint>()->As<real>()};
 	auto start_time = duration{object
-		.Property("start-time")[2]
+		.Property("start-time")[0]
 		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>()};
 	auto technique_name_x = object
-		.Property("motion-technique")[3];
+		.Property("motion-technique")[0];
 	auto technique_name_y = object
-		.Property("motion-technique")[4];
+		.Property("motion-technique")[1];
 	auto technique_name_z = object
-		.Property("motion-technique")[5];
+		.Property("motion-technique")[2];
 
 	auto technique_x = technique_name_x ?
 		get_motion_technique_type(technique_name_x) :
 		graph::animations::node_animation::MotionTechniqueType::Linear;
 	auto technique_y = technique_name_y ?
 		get_motion_technique_type(technique_name_y) :
-		graph::animations::node_animation::MotionTechniqueType::Linear;
+		technique_x;
 	auto technique_z = technique_name_z ?
 		get_motion_technique_type(technique_name_z) :
-		graph::animations::node_animation::MotionTechniqueType::Linear;
+		technique_x;
 
 	animation.AddTranslation(unit, total_duration, start_time, technique_x, technique_y, technique_z);
 }
