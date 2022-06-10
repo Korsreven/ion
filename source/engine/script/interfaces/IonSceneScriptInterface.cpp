@@ -1334,7 +1334,7 @@ NonOwningPtr<shapes::Border> create_border(const script_tree::ObjectNode &object
 				return shapes::border::BorderCornerStyle::Square;
 			else if (corner_style_name == "oblique")
 				return shapes::border::BorderCornerStyle::Oblique;
-			else
+			else //if (corner_style_name == "none")
 				return shapes::border::BorderCornerStyle::None;
 		}();
 
@@ -1442,7 +1442,84 @@ NonOwningPtr<shapes::Mesh> create_mesh(const script_tree::ObjectNode &object,
 	Model &model,
 	graphics::materials::MaterialManager &material_manager)
 {
-	auto mesh = model.CreateMesh(shapes::mesh::Vertices{});
+	auto draw_mode_name = object
+		.Property("draw-mode")[0]
+		.Get<ScriptType::Enumerable>().value_or(""s).Get();
+	auto material_name = object
+		.Property("material")[0]
+		.Get<ScriptType::String>().value_or(""s).Get();
+	auto tex_coord_mode_name = object
+		.Property("tex-coord-mode")[0]
+		.Get<ScriptType::Enumerable>().value_or(""s).Get();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto draw_mode =
+		[&]() noexcept
+		{
+			//"points"s, "lines"s, "line-loop"s, "line-strip"s, "triangles"s, "triangle-fan"s, "triangle-strip"s, "quads"s, "polygon"s
+
+			if (draw_mode_name == "points")
+				return graphics::render::vertex::vertex_batch::VertexDrawMode::Points;
+			else if (draw_mode_name == "lines")
+				return graphics::render::vertex::vertex_batch::VertexDrawMode::Lines;
+			else if (draw_mode_name == "line-loop")
+				return graphics::render::vertex::vertex_batch::VertexDrawMode::LineLoop;
+			else if (draw_mode_name == "line-strip")
+				return graphics::render::vertex::vertex_batch::VertexDrawMode::LineStrip;
+			else if (draw_mode_name == "triangle-fan")
+				return graphics::render::vertex::vertex_batch::VertexDrawMode::TriangleFan;
+			else if (draw_mode_name == "triangle-strip")
+				return graphics::render::vertex::vertex_batch::VertexDrawMode::TriangleStrip;
+			else if (draw_mode_name == "quads")
+				return graphics::render::vertex::vertex_batch::VertexDrawMode::Quads;
+			else if (draw_mode_name == "polygon")
+				return graphics::render::vertex::vertex_batch::VertexDrawMode::Polygon;
+			else //if (draw_mode_name == "triangles")
+				return graphics::render::vertex::vertex_batch::VertexDrawMode::Triangles;
+		}();
+
+	auto vertices = shapes::mesh::Vertices{};
+
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "vertices")
+		{
+			for (auto &o : obj.Objects())
+			{
+				if (o.Name() == "vertex")
+				{
+					auto position = o
+						.Property("position")[0]
+						.Get<ScriptType::Vector3>()->Get();
+					auto normal = o
+						.Property("normal")[0]
+						.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();			
+					auto tex_coord = o
+						.Property("tex-coord")[0]
+						.Get<ScriptType::Vector2>().value_or(vector2::Zero).Get();
+					auto color = o
+						.Property("color")[0]
+						.Get<ScriptType::Color>().value_or(color::White).Get();	
+
+					vertices.emplace_back(position, normal, tex_coord, color);
+				}
+			}
+		}
+	}
+
+	auto tex_coord_mode =
+		[&]() noexcept
+		{
+			if (tex_coord_mode_name == "manual")
+				return shapes::mesh::MeshTexCoordMode::Manual;
+			else //if (tex_coord_mode_name == "auto")
+				return shapes::mesh::MeshTexCoordMode::Auto;
+		}();
+
+	auto mesh = model.CreateMesh(draw_mode, vertices,
+		material_manager.GetMaterial(material_name), tex_coord_mode, visible);
 
 	if (mesh)
 		set_mesh_properties(object, *mesh, material_manager);

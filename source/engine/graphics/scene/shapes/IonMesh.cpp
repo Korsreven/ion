@@ -29,8 +29,9 @@ using namespace mesh;
 namespace mesh
 {
 
-Vertex::Vertex(const Vector3 &position) noexcept :
-	Position{position}
+Vertex::Vertex(const Vector3 &position, const Color &base_color) noexcept :
+	Position{position},
+	BaseColor{base_color}
 {
 	//Empty
 }

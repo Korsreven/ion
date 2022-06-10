@@ -78,8 +78,8 @@ namespace ion::graphics::scene::shapes
 			Vector2 TexCoord;
 
 
-			//Construct a new vertex with the given position
-			Vertex(const Vector3 &position) noexcept;
+			//Construct a new vertex with the given position and base color
+			explicit Vertex(const Vector3 &position, const Color &base_color = color::White) noexcept;
 
 			//Construct a new vertex with the given position, normal and base color (default white)
 			Vertex(const Vector3 &position, const Vector3 &normal, const Color &base_color = color::White) noexcept;
