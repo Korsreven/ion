@@ -1619,7 +1619,11 @@ NonOwningPtr<shapes::Triangle> create_triangle(const script_tree::ObjectNode &ob
 NonOwningPtr<graph::animations::NodeAnimation> create_node_animation(const script_tree::ObjectNode &object,
 	graph::SceneNode &parent_node)
 {
-	auto node_animation = parent_node.CreateAnimation("");
+	auto name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()->Get();
+
+	auto node_animation = parent_node.CreateAnimation(std::move(name));
 
 	if (node_animation)
 		set_node_animation_properties(object, *node_animation);
@@ -1630,7 +1634,11 @@ NonOwningPtr<graph::animations::NodeAnimation> create_node_animation(const scrip
 NonOwningPtr<graph::animations::NodeAnimationGroup> create_node_animation_group(const script_tree::ObjectNode &object,
 	graph::SceneNode &parent_node)
 {
-	auto node_animation_group = parent_node.CreateAnimationGroup("");
+	auto name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()->Get();
+
+	auto node_animation_group = parent_node.CreateAnimationGroup(std::move(name));
 
 	if (node_animation_group)
 		set_node_animation_group_properties(object, *node_animation_group, parent_node);
@@ -1641,7 +1649,21 @@ NonOwningPtr<graph::animations::NodeAnimationGroup> create_node_animation_group(
 NonOwningPtr<graph::animations::NodeAnimationTimeline> create_node_animation_timeline(const script_tree::ObjectNode &object,
 	graph::SceneNode &parent_node)
 {
-	auto node_animation_timeline = parent_node.CreateTimeline();
+	auto playback_rate = object
+		.Property("playback-rate")[0]
+		.Get<ScriptType::FloatingPoint>().value_or(1.0).As<real>();
+	auto running = object
+		.Property("running")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto node_animation_timeline =
+		[&]() noexcept
+		{
+			if (auto &property = object.Property("name"); property)
+				return parent_node.CreateTimeline(property[0].Get<ScriptType::String>()->Get(), playback_rate, running);
+			else
+				return parent_node.CreateTimeline(playback_rate, running);
+		}();
 
 	if (node_animation_timeline)
 		set_node_animation_timeline_properties(object, *node_animation_timeline, parent_node);
@@ -1655,7 +1677,25 @@ NonOwningPtr<graph::SceneNode> create_scene_node(const script_tree::ObjectNode &
 	graphics::materials::MaterialManager &material_manager,
 	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
-	auto node = parent_node.CreateChildNode();
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
+	auto position = object
+		.Property("position")[0]
+		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
+	auto initial_direction = object
+		.Property("initial-direction")[0]
+		.Get<ScriptType::Vector2>().value_or(vector2::Zero).Get();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(parent_node.Visible()).Get();
+
+	auto node = parent_node.CreateChildNode(std::move(name), position, initial_direction, visible);
 
 	if (node)
 		set_scene_node_properties(object, *node, scene_manager, material_manager, shader_program_manager);
@@ -1667,7 +1707,27 @@ NonOwningPtr<graph::SceneNode> create_scene_node(const script_tree::ObjectNode &
 NonOwningPtr<Camera> create_camera(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager)
 {
-	auto camera = scene_manager.CreateCamera();
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto frustum = graphics::render::Frustum{};
+
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "frustum")
+			set_frustum_properties(obj, frustum);
+	}
+
+	auto camera = scene_manager.CreateCamera(std::move(name), frustum, visible);
 
 	if (camera)
 		set_camera_properties(object, *camera);
@@ -1679,7 +1739,23 @@ NonOwningPtr<DrawableParticleSystem> create_drawable_particle_system(const scrip
 	SceneManager &scene_manager,
 	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
-	auto particle_system = scene_manager.CreateParticleSystem({}, nullptr);
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
+	auto particle_system_name = object
+		.Property("particle-system")[0]
+		.Get<ScriptType::String>().value_or(""s).Get();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto particle_system = scene_manager.CreateParticleSystem(std::move(name),
+		/*particle_system_manager.GetParticleSystem(particle_system_name)*/nullptr, visible);
 
 	if (particle_system)
 		set_drawable_particle_system_properties(object, *particle_system, shader_program_manager);
@@ -1691,7 +1767,29 @@ NonOwningPtr<DrawableText> create_drawable_text(const script_tree::ObjectNode &o
 	SceneManager &scene_manager,
 	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
-	auto text = scene_manager.CreateText({}, nullptr);
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
+	auto position = object
+		.Property("position")[0]
+		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
+	auto rotation = utilities::math::ToRadians(object
+		.Property("rotation")[0]
+		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>());
+	auto text_name = object
+		.Property("text")[0]
+		.Get<ScriptType::String>().value_or(""s).Get();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto text = scene_manager.CreateText(std::move(name), position, rotation,
+		/*text_manager.GetText(text_name)*/nullptr, visible);
 
 	if (text)
 		set_drawable_text_properties(object, *text, shader_program_manager);
@@ -1702,7 +1800,19 @@ NonOwningPtr<DrawableText> create_drawable_text(const script_tree::ObjectNode &o
 NonOwningPtr<Light> create_light(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager)
 {
-	auto light = scene_manager.CreateLight();
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto light = scene_manager.CreateLight(std::move(name), visible);
 
 	if (light)
 		set_light_properties(object, *light);
@@ -1715,7 +1825,19 @@ NonOwningPtr<Model> create_model(const script_tree::ObjectNode &object,
 	graphics::materials::MaterialManager &material_manager,
 	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
-	auto model = scene_manager.CreateModel();
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
+	auto visible = object
+		.Property("visible")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto model = scene_manager.CreateModel(std::move(name), visible);
 
 	if (model)
 		set_model_properties(object, *model, material_manager, shader_program_manager);
@@ -1726,7 +1848,31 @@ NonOwningPtr<Model> create_model(const script_tree::ObjectNode &object,
 NonOwningPtr<MovableSound> create_movable_sound(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager)
 {
-	auto movable_sound = scene_manager.CreateSound({}, nullptr);
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
+	auto position = object
+		.Property("position")[0]
+		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
+	auto sound_name = object
+		.Property("sound")[0]
+		.Get<ScriptType::String>().value_or(""s).Get();
+	auto sound_channel_group_name = object
+		.Property("sound-channel-group")[0]
+		.Get<ScriptType::String>().value_or(""s).Get();
+	auto paused = object
+		.Property("paused")[0]
+		.Get<ScriptType::Boolean>().value_or(true).Get();
+
+	auto movable_sound = scene_manager.CreateSound(std::move(name), position,
+		/*sound_manager.GetSound(sound_name)*/nullptr,
+		/*sound_manager.GetSoundChannelGroup(sound_channel_group_name)*/nullptr,
+		paused);
 
 	if (movable_sound)
 		set_movable_sound_properties(object, *movable_sound);
@@ -1737,7 +1883,23 @@ NonOwningPtr<MovableSound> create_movable_sound(const script_tree::ObjectNode &o
 NonOwningPtr<MovableSoundListener> create_movable_sound_listener(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager)
 {
-	auto movable_sound_listener = scene_manager.CreateSoundListener({}, nullptr);
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
+	auto position = object
+		.Property("position")[0]
+		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
+	auto sound_listener_name = object
+		.Property("sound-listener")[0]
+		.Get<ScriptType::String>().value_or(""s).Get();
+
+	auto movable_sound_listener = scene_manager.CreateSoundListener(std::move(name), position,
+		/*sound_manager.GetSoundListener(sound_listener_name)*/nullptr);
 
 	if (movable_sound_listener)
 		set_movable_sound_listener_properties(object, *movable_sound_listener);
