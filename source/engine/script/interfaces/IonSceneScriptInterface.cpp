@@ -16,10 +16,13 @@ File:	IonSceneScriptInterface.cpp
 #include <string>
 
 #include "graphics/materials/IonMaterialManager.h"
+#include "graphics/fonts/IonTextManager.h"
+#include "graphics/particles/IonParticleSystemManager.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/animations/IonNodeAnimationManager.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
 #include "graphics/utilities/IonAabb.h"
+#include "sounds/IonSoundManager.h"
 #include "utilities/IonMath.h"
 
 namespace ion::script::interfaces
@@ -888,7 +891,10 @@ void set_node_animation_timeline_properties(const script_tree::ObjectNode &objec
 void set_scene_node_properties(const script_tree::ObjectNode &object, graph::SceneNode &scene_node,
 	SceneManager &scene_manager,
 	graphics::materials::MaterialManager &material_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
+	graphics::particles::ParticleSystemManager &particle_system_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager,
+	graphics::fonts::TextManager &text_manager,
+	sounds::SoundManager &sound_manager)
 {
 	for (auto &property : object.Properties())
 	{
@@ -939,17 +945,17 @@ void set_scene_node_properties(const script_tree::ObjectNode &object, graph::Sce
 		if (obj.Name() == "camera")
 			create_camera(obj, scene_manager);
 		else if (obj.Name() == "drawable-particle-system")
-			create_drawable_particle_system(obj, scene_manager, shader_program_manager);
+			create_drawable_particle_system(obj, scene_manager, particle_system_manager, shader_program_manager);
 		else if (obj.Name() == "drawable-text")
-			create_drawable_text(obj, scene_manager, shader_program_manager);
+			create_drawable_text(obj, scene_manager, shader_program_manager, text_manager);
 		else if (obj.Name() == "light")
 			create_light(obj, scene_manager);
 		else if (obj.Name() == "model")
 			create_model(obj, scene_manager, material_manager, shader_program_manager);
 		else if (obj.Name() == "movable-sound")
-			create_movable_sound(obj, scene_manager);
+			create_movable_sound(obj, scene_manager, sound_manager);
 		else if (obj.Name() == "movable-sound-listener")
-			create_movable_sound_listener(obj, scene_manager);
+			create_movable_sound_listener(obj, scene_manager, sound_manager);
 
 		else if (obj.Name() == "node-animation")
 			create_node_animation(obj, scene_node);
@@ -958,7 +964,12 @@ void set_scene_node_properties(const script_tree::ObjectNode &object, graph::Sce
 		else if (obj.Name() == "node-animation-timeline")
 			create_node_animation_timeline(obj, scene_node);
 		else if (obj.Name() == "scene-node")
-			create_scene_node(obj, scene_node, scene_manager, material_manager, shader_program_manager);
+			create_scene_node(obj, scene_node, scene_manager,
+				material_manager,
+				particle_system_manager,
+				shader_program_manager,
+				text_manager,
+				sound_manager);
 	}
 }
 
@@ -1675,7 +1686,10 @@ NonOwningPtr<graph::SceneNode> create_scene_node(const script_tree::ObjectNode &
 	graph::SceneNode &parent_node,
 	SceneManager &scene_manager,
 	graphics::materials::MaterialManager &material_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
+	graphics::particles::ParticleSystemManager &particle_system_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager,
+	graphics::fonts::TextManager &text_manager,
+	sounds::SoundManager &sound_manager)
 {
 	auto name =
 		[&]() noexcept -> std::optional<std::string>
@@ -1698,7 +1712,12 @@ NonOwningPtr<graph::SceneNode> create_scene_node(const script_tree::ObjectNode &
 	auto node = parent_node.CreateChildNode(std::move(name), position, initial_direction, visible);
 
 	if (node)
-		set_scene_node_properties(object, *node, scene_manager, material_manager, shader_program_manager);
+		set_scene_node_properties(object, *node, scene_manager,
+			material_manager,
+			particle_system_manager,
+			shader_program_manager,
+			text_manager,
+			sound_manager);
 
 	return node;
 }
@@ -1737,6 +1756,7 @@ NonOwningPtr<Camera> create_camera(const script_tree::ObjectNode &object,
 
 NonOwningPtr<DrawableParticleSystem> create_drawable_particle_system(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager,
+	graphics::particles::ParticleSystemManager &particle_system_manager,
 	graphics::shaders::ShaderProgramManager &shader_program_manager)
 {
 	auto name =
@@ -1755,7 +1775,7 @@ NonOwningPtr<DrawableParticleSystem> create_drawable_particle_system(const scrip
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
 	auto particle_system = scene_manager.CreateParticleSystem(std::move(name),
-		/*particle_system_manager.GetParticleSystem(particle_system_name)*/nullptr, visible);
+		particle_system_manager.GetParticleSystem(particle_system_name), visible);
 
 	if (particle_system)
 		set_drawable_particle_system_properties(object, *particle_system, shader_program_manager);
@@ -1765,7 +1785,8 @@ NonOwningPtr<DrawableParticleSystem> create_drawable_particle_system(const scrip
 
 NonOwningPtr<DrawableText> create_drawable_text(const script_tree::ObjectNode &object,
 	SceneManager &scene_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
+	graphics::shaders::ShaderProgramManager &shader_program_manager,
+	graphics::fonts::TextManager &text_manager)
 {
 	auto name =
 		[&]() noexcept -> std::optional<std::string>
@@ -1789,7 +1810,7 @@ NonOwningPtr<DrawableText> create_drawable_text(const script_tree::ObjectNode &o
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
 	auto text = scene_manager.CreateText(std::move(name), position, rotation,
-		/*text_manager.GetText(text_name)*/nullptr, visible);
+		text_manager.GetText(text_name), visible);
 
 	if (text)
 		set_drawable_text_properties(object, *text, shader_program_manager);
@@ -1846,7 +1867,8 @@ NonOwningPtr<Model> create_model(const script_tree::ObjectNode &object,
 }
 
 NonOwningPtr<MovableSound> create_movable_sound(const script_tree::ObjectNode &object,
-	SceneManager &scene_manager)
+	SceneManager &scene_manager,
+	sounds::SoundManager &sound_manager)
 {
 	auto name =
 		[&]() noexcept -> std::optional<std::string>
@@ -1870,8 +1892,8 @@ NonOwningPtr<MovableSound> create_movable_sound(const script_tree::ObjectNode &o
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
 	auto movable_sound = scene_manager.CreateSound(std::move(name), position,
-		/*sound_manager.GetSound(sound_name)*/nullptr,
-		/*sound_manager.GetSoundChannelGroup(sound_channel_group_name)*/nullptr,
+		sound_manager.GetSound(sound_name),
+		sound_manager.GetSoundChannelGroup(sound_channel_group_name),
 		paused);
 
 	if (movable_sound)
@@ -1881,7 +1903,8 @@ NonOwningPtr<MovableSound> create_movable_sound(const script_tree::ObjectNode &o
 }
 
 NonOwningPtr<MovableSoundListener> create_movable_sound_listener(const script_tree::ObjectNode &object,
-	SceneManager &scene_manager)
+	SceneManager &scene_manager,
+	sounds::SoundManager &sound_manager)
 {
 	auto name =
 		[&]() noexcept -> std::optional<std::string>
@@ -1899,7 +1922,7 @@ NonOwningPtr<MovableSoundListener> create_movable_sound_listener(const script_tr
 		.Get<ScriptType::String>().value_or(""s).Get();
 
 	auto movable_sound_listener = scene_manager.CreateSoundListener(std::move(name), position,
-		/*sound_manager.GetSoundListener(sound_listener_name)*/nullptr);
+		sound_manager.GetSoundListener(sound_listener_name));
 
 	if (movable_sound_listener)
 		set_movable_sound_listener_properties(object, *movable_sound_listener);
@@ -1912,12 +1935,20 @@ void create_scene(const ScriptTree &tree,
 	graph::SceneNode &parent_node,
 	SceneManager &scene_manager,
 	graphics::materials::MaterialManager &material_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
+	graphics::particles::ParticleSystemManager &particle_system_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager,
+	graphics::fonts::TextManager &text_manager,
+	sounds::SoundManager &sound_manager)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "scene-node")
-			create_scene_node(object, parent_node, scene_manager, material_manager, shader_program_manager);
+			create_scene_node(object, parent_node, scene_manager,
+				material_manager,
+				particle_system_manager,
+				shader_program_manager,
+				text_manager,
+				sound_manager);
 	}
 }
 
@@ -1943,10 +1974,18 @@ void SceneScriptInterface::CreateScene(std::string_view asset_name,
 	graph::SceneNode &parent_node,
 	SceneManager &scene_manager,
 	graphics::materials::MaterialManager &material_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
+	graphics::particles::ParticleSystemManager &particle_system_manager,
+	graphics::shaders::ShaderProgramManager &shader_program_manager,
+	graphics::fonts::TextManager &text_manager,
+	sounds::SoundManager &sound_manager)
 {
 	if (Load(asset_name))
-		detail::create_scene(*tree_, parent_node, scene_manager, material_manager, shader_program_manager);
+		detail::create_scene(*tree_, parent_node, scene_manager,
+			material_manager,
+			particle_system_manager,
+			shader_program_manager,
+			text_manager,
+			sound_manager);
 }
 
 } //ion::script::interfaces

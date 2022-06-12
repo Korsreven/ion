@@ -50,9 +50,19 @@ File:	IonSceneScriptInterface.h
 //Forward declarations
 namespace ion::graphics
 {
+	namespace fonts
+	{
+		struct TextManager;
+	}
+
 	namespace materials
 	{
 		struct MaterialManager;
+	}
+
+	namespace particles
+	{
+		struct ParticleSystemManager;
 	}
 
 	namespace scene
@@ -64,6 +74,12 @@ namespace ion::graphics
 	{
 		class ShaderProgramManager;
 	}
+}
+
+//Forward declarations
+namespace ion::sounds
+{
+	class SoundManager;
 }
 
 namespace ion::script::interfaces
@@ -205,7 +221,10 @@ namespace ion::script::interfaces
 		void set_scene_node_properties(const script_tree::ObjectNode &object, graphics::scene::graph::SceneNode &scene_node,
 			graphics::scene::SceneManager &scene_manager,
 			graphics::materials::MaterialManager &material_manager,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
+			graphics::particles::ParticleSystemManager &particle_system_manager,
+			graphics::shaders::ShaderProgramManager &shader_program_manager,
+			graphics::fonts::TextManager &text_manager,
+			sounds::SoundManager &sound_manager);
 
 		void set_camera_properties(const script_tree::ObjectNode &object, graphics::scene::Camera &camera);
 		void set_drawable_object_properties(const script_tree::ObjectNode &object, graphics::scene::DrawableObject &drawable,
@@ -274,16 +293,21 @@ namespace ion::script::interfaces
 			graphics::scene::graph::SceneNode &parent_node,
 			graphics::scene::SceneManager &scene_manager,
 			graphics::materials::MaterialManager &material_manager,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
+			graphics::particles::ParticleSystemManager &particle_system_manager,
+			graphics::shaders::ShaderProgramManager &shader_program_manager,
+			graphics::fonts::TextManager &text_manager,
+			sounds::SoundManager &sound_manager);
 
 		NonOwningPtr<graphics::scene::Camera> create_camera(const script_tree::ObjectNode &object,
 			graphics::scene::SceneManager &scene_manager);
 		NonOwningPtr<graphics::scene::DrawableParticleSystem> create_drawable_particle_system(const script_tree::ObjectNode &object,
 			graphics::scene::SceneManager &scene_manager,
+			graphics::particles::ParticleSystemManager &particle_system_manager,
 			graphics::shaders::ShaderProgramManager &shader_program_manager);
 		NonOwningPtr<graphics::scene::DrawableText> create_drawable_text(const script_tree::ObjectNode &object,
 			graphics::scene::SceneManager &scene_manager,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
+			graphics::shaders::ShaderProgramManager &shader_program_manager,
+			graphics::fonts::TextManager &text_manager);
 		NonOwningPtr<graphics::scene::Light> create_light(const script_tree::ObjectNode &object,
 			graphics::scene::SceneManager &scene_manager);
 		NonOwningPtr<graphics::scene::Model> create_model(const script_tree::ObjectNode &object,
@@ -291,15 +315,20 @@ namespace ion::script::interfaces
 			graphics::materials::MaterialManager &material_manager,
 			graphics::shaders::ShaderProgramManager &shader_program_manager);
 		NonOwningPtr<graphics::scene::MovableSound> create_movable_sound(const script_tree::ObjectNode &object,
-			graphics::scene::SceneManager &scene_manager);
+			graphics::scene::SceneManager &scene_manager,
+			sounds::SoundManager &sound_manager);
 		NonOwningPtr<graphics::scene::MovableSoundListener> create_movable_sound_listener(const script_tree::ObjectNode &object,
-			graphics::scene::SceneManager &scene_manager);
+			graphics::scene::SceneManager &scene_manager,
+			sounds::SoundManager &sound_manager);
 
 		void create_scene(const ScriptTree &tree,
 			graphics::scene::graph::SceneNode &parent_node,
 			graphics::scene::SceneManager &scene_manager,
 			graphics::materials::MaterialManager &material_manager,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
+			graphics::particles::ParticleSystemManager &particle_system_manager,
+			graphics::shaders::ShaderProgramManager &shader_program_manager,
+			graphics::fonts::TextManager &text_manager,
+			sounds::SoundManager &sound_manager);
 	} //scene_script_interface::detail
 
 
@@ -325,7 +354,10 @@ namespace ion::script::interfaces
 				graphics::scene::graph::SceneNode &parent_node,
 				graphics::scene::SceneManager &scene_manager,
 				graphics::materials::MaterialManager &material_manager,
-				graphics::shaders::ShaderProgramManager &shader_program_manager);
+				graphics::particles::ParticleSystemManager &particle_system_manager,
+				graphics::shaders::ShaderProgramManager &shader_program_manager,
+				graphics::fonts::TextManager &text_manager,
+				sounds::SoundManager &sound_manager);
 	};
 } //ion::script::interfaces
 
