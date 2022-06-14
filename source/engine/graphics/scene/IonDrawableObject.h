@@ -56,21 +56,6 @@ namespace ion::graphics::scene
 			//Construct a drawable object with the given name and visibility
 			explicit DrawableObject(std::optional<std::string> name = {}, bool visible = true);
 
-			//Copy constructor
-			DrawableObject(const DrawableObject &rhs) noexcept;
-
-
-			/*
-				Operators
-			*/
-
-			//Copy assignment
-			inline auto& operator=(const MovableObject &rhs) noexcept
-			{
-				MovableObject::operator=(rhs);
-				return *this;
-			}
-
 
 			/*
 				Ranges

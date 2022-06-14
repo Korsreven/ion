@@ -49,12 +49,6 @@ DrawableObject::DrawableObject(std::optional<std::string> name, bool visible) :
 	query_type_flags_ |= query::scene_query::QueryType::Drawable;
 }
 
-DrawableObject::DrawableObject(const DrawableObject &rhs) noexcept :
-	MovableObject{rhs}
-{
-	//Empty
-}
-
 
 /*
 	Rendering
