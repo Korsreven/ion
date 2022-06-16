@@ -223,8 +223,8 @@ namespace ion::script::interfaces
 			graphics::materials::MaterialManager &material_manager,
 			graphics::particles::ParticleSystemManager &particle_system_manager,
 			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			graphics::fonts::TextManager &text_manager,
-			sounds::SoundManager &sound_manager);
+			sounds::SoundManager &sound_manager,
+			graphics::fonts::TextManager &text_manager);
 
 		void set_camera_properties(const script_tree::ObjectNode &object, graphics::scene::Camera &camera);
 		void set_drawable_object_properties(const script_tree::ObjectNode &object, graphics::scene::DrawableObject &drawable,
@@ -295,8 +295,8 @@ namespace ion::script::interfaces
 			graphics::materials::MaterialManager &material_manager,
 			graphics::particles::ParticleSystemManager &particle_system_manager,
 			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			graphics::fonts::TextManager &text_manager,
-			sounds::SoundManager &sound_manager);
+			sounds::SoundManager &sound_manager,
+			graphics::fonts::TextManager &text_manager);
 
 		NonOwningPtr<graphics::scene::Camera> create_camera(const script_tree::ObjectNode &object,
 			graphics::scene::SceneManager &scene_manager);
@@ -327,8 +327,8 @@ namespace ion::script::interfaces
 			graphics::materials::MaterialManager &material_manager,
 			graphics::particles::ParticleSystemManager &particle_system_manager,
 			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			graphics::fonts::TextManager &text_manager,
-			sounds::SoundManager &sound_manager);
+			sounds::SoundManager &sound_manager,
+			graphics::fonts::TextManager &text_manager);
 	} //scene_script_interface::detail
 
 
@@ -355,9 +355,9 @@ namespace ion::script::interfaces
 				graphics::scene::SceneManager &scene_manager,
 				graphics::materials::MaterialManager &material_manager,
 				graphics::particles::ParticleSystemManager &particle_system_manager,
-				graphics::shaders::ShaderProgramManager &shader_program_manager,
-				graphics::fonts::TextManager &text_manager,
-				sounds::SoundManager &sound_manager);
+				graphics::shaders::ShaderProgramManager &shader_program_manager,			
+				sounds::SoundManager &sound_manager,
+				graphics::fonts::TextManager &text_manager);
 	};
 } //ion::script::interfaces
 

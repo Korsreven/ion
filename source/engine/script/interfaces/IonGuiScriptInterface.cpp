@@ -15,6 +15,7 @@ File:	IonGuiScriptInterface.cpp
 #include <optional>
 #include <string>
 
+#include "IonSceneScriptInterface.h"
 #include "graphics/materials/IonMaterialManager.h"
 #include "gui/skins/IonGuiSkin.h"
 #include "gui/skins/IonGuiTheme.h"
@@ -103,6 +104,8 @@ ClassDefinition get_gui_class()
 ClassDefinition get_gui_component_class()
 {
 	return ClassDefinition::Create("component")
+		.AddClass(scene_script_interface::detail::get_scene_node_class())
+
 		.AddRequiredProperty("name", ParameterType::String)
 		.AddProperty("enabled", ParameterType::Boolean)
 		.AddProperty("global-z-order", ParameterType::FloatingPoint)
@@ -348,6 +351,16 @@ void set_component_properties(const script_tree::ObjectNode &object, GuiComponen
 			component.Visible(property[0].Get<ScriptType::Boolean>()->Get());
 		else if (property.Name() == "z-order")
 			component.ZOrder(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+	}
+
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "scene-node")
+		{
+			if (auto node = component.Node(); node)
+				/*scene_script_interface::detail::set_scene_node_properties(object, *node,
+					scene_manager, material_manager, particle_system_manager, shader_program_manager, sound_manager, text_manager)*/;
+		}
 	}
 }
 

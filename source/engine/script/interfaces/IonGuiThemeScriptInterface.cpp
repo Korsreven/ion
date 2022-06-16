@@ -87,7 +87,7 @@ ClassDefinition get_gui_skin_class()
 		.AddRequiredProperty("sound", ParameterType::String);
 
 	auto text_part = ClassDefinition::Create("text-part")
-		.AddAbstractClass(std::move(get_text_style_class()))
+		.AddAbstractClass(get_text_style_class())
 		.AddClass(std::move(disabled_style))
 		.AddClass(std::move(enabled_style))
 		.AddClass(std::move(focused_style))
@@ -99,7 +99,7 @@ ClassDefinition get_gui_skin_class()
 
 	return ClassDefinition::Create("skin")
 		.AddClass(std::move(part))
-		.AddClass(std::move(scene_script_interface::detail::get_pass_class()))
+		.AddClass(scene_script_interface::detail::get_pass_class())
 		.AddClass(std::move(sound_part))
 		.AddClass(std::move(text_part))
 		.AddClass(std::move(text_pass))
@@ -190,9 +190,9 @@ graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
 NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 	GuiTheme &theme,
 	graphics::materials::MaterialManager &material_manager,
-	graphics::fonts::TextManager &text_manager,
 	graphics::shaders::ShaderProgramManager &shader_program_manager,
-	sounds::SoundManager &sound_manager)
+	sounds::SoundManager &sound_manager,
+	graphics::fonts::TextManager &text_manager)
 {
 	auto type_name = object
 		.Property("type")[0]
@@ -348,11 +348,12 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 }
 
 NonOwningPtr<GuiTheme> create_gui_theme(const script_tree::ObjectNode &object,
-	GuiController &gui_controller, NonOwningPtr<graphics::scene::SceneManager> scene_manager,
+	GuiController &gui_controller,
+	NonOwningPtr<graphics::scene::SceneManager> scene_manager,
 	graphics::materials::MaterialManager &material_manager,
-	graphics::fonts::TextManager &text_manager,
 	graphics::shaders::ShaderProgramManager &shader_program_manager,
-	sounds::SoundManager &sound_manager)
+	sounds::SoundManager &sound_manager,
+	graphics::fonts::TextManager &text_manager)
 {
 	auto name = object
 		.Property("name")[0]
@@ -366,7 +367,7 @@ NonOwningPtr<GuiTheme> create_gui_theme(const script_tree::ObjectNode &object,
 		{
 			if (obj.Name() == "skin")
 				create_gui_skin(obj, *theme,
-					material_manager, text_manager, shader_program_manager, sound_manager);
+					material_manager, shader_program_manager, sound_manager, text_manager);
 		}
 	}
 
@@ -374,17 +375,18 @@ NonOwningPtr<GuiTheme> create_gui_theme(const script_tree::ObjectNode &object,
 }
 
 void create_gui_themes(const ScriptTree &tree,
-	GuiController &gui_controller, NonOwningPtr<graphics::scene::SceneManager> scene_manager,
+	GuiController &gui_controller,
+	NonOwningPtr<graphics::scene::SceneManager> scene_manager,
 	graphics::materials::MaterialManager &material_manager,
-	graphics::fonts::TextManager &text_manager,
 	graphics::shaders::ShaderProgramManager &shader_program_manager,
-	sounds::SoundManager &sound_manager)
+	sounds::SoundManager &sound_manager,
+	graphics::fonts::TextManager &text_manager)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "theme")
-			create_gui_theme(object, gui_controller, scene_manager,
-				material_manager, text_manager, shader_program_manager, sound_manager);
+			create_gui_theme(object, gui_controller,
+				scene_manager, material_manager, shader_program_manager, sound_manager, text_manager);
 	}
 }
 
@@ -407,15 +409,16 @@ ScriptValidator GuiThemeScriptInterface::GetValidator() const
 */
 
 void GuiThemeScriptInterface::CreateGuiThemes(std::string_view asset_name,
-	GuiController &gui_controller, NonOwningPtr<graphics::scene::SceneManager> scene_manager,
+	GuiController &gui_controller,
+	NonOwningPtr<graphics::scene::SceneManager> scene_manager,
 	graphics::materials::MaterialManager &material_manager,
-	graphics::fonts::TextManager &text_manager,
 	graphics::shaders::ShaderProgramManager &shader_program_manager,
-	sounds::SoundManager &sound_manager)
+	sounds::SoundManager &sound_manager,
+	graphics::fonts::TextManager &text_manager)
 {
 	if (Load(asset_name))
-		detail::create_gui_themes(*tree_, gui_controller, scene_manager,
-			material_manager, text_manager, shader_program_manager, sound_manager);
+		detail::create_gui_themes(*tree_, gui_controller,
+			scene_manager, material_manager, shader_program_manager, sound_manager, text_manager);
 }
 
 } //ion::script::interfaces

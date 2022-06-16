@@ -1947,7 +1947,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			gui_theme_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			gui_theme_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			gui_theme_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			gui_theme_script.CreateGuiThemes("gui_themes.ion", controller, scene_manager, materials, texts, shader_programs, sounds);*/
+			gui_theme_script.CreateGuiThemes("gui_themes.ion", controller, scene_manager, materials, shader_programs, sounds, texts);*/
 
 			//Theme
 			auto theme = controller.CreateTheme("default", scene_manager);

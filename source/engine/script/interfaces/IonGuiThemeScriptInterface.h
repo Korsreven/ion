@@ -83,23 +83,25 @@ namespace ion::script::interfaces
 
 		NonOwningPtr<gui::skins::GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 			gui::skins::GuiTheme &theme,
-			graphics::materials::MaterialManager &material_manager,
-			graphics::fonts::TextManager &text_manager,
+			graphics::materials::MaterialManager &material_manager,		
 			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			sounds::SoundManager &sound_manager);
+			sounds::SoundManager &sound_manager,
+			graphics::fonts::TextManager &text_manager);
 		NonOwningPtr<gui::skins::GuiTheme> create_gui_theme(const script_tree::ObjectNode &object,
-			gui::GuiController &gui_controller, NonOwningPtr<graphics::scene::SceneManager> scene_manager,
-			graphics::materials::MaterialManager &material_manager,
-			graphics::fonts::TextManager &text_manager,
+			gui::GuiController &gui_controller,
+			NonOwningPtr<graphics::scene::SceneManager> scene_manager,
+			graphics::materials::MaterialManager &material_manager,	
 			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			sounds::SoundManager &sound_manager);
+			sounds::SoundManager &sound_manager,
+			graphics::fonts::TextManager &text_manager);
 
 		void create_gui_themes(const ScriptTree &tree,
-			gui::GuiController &gui_controller, NonOwningPtr<graphics::scene::SceneManager> scene_manager,
+			gui::GuiController &gui_controller,
+			NonOwningPtr<graphics::scene::SceneManager> scene_manager,
 			graphics::materials::MaterialManager &material_manager,
-			graphics::fonts::TextManager &text_manager,
 			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			sounds::SoundManager &sound_manager);
+			sounds::SoundManager &sound_manager,
+			graphics::fonts::TextManager &text_manager);
 	} //gui_theme_script_interface::detail
 
 
@@ -122,11 +124,12 @@ namespace ion::script::interfaces
 
 			//Create gui themes from a script (or object file) with the given asset name
 			void CreateGuiThemes(std::string_view asset_name,
-				gui::GuiController &gui_controller, NonOwningPtr<graphics::scene::SceneManager> scene_manager,
+				gui::GuiController &gui_controller,
+				NonOwningPtr<graphics::scene::SceneManager> scene_manager,
 				graphics::materials::MaterialManager &material_manager,
-				graphics::fonts::TextManager &text_manager,
 				graphics::shaders::ShaderProgramManager &shader_program_manager,
-				sounds::SoundManager &sound_manager);
+				sounds::SoundManager &sound_manager,
+				graphics::fonts::TextManager &text_manager);
 	};
 } //ion::script::interfaces
 
