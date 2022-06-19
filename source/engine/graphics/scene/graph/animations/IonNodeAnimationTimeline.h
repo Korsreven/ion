@@ -111,9 +111,6 @@ namespace ion::graphics::scene::graph::animations
 			//Default move constructor
 			NodeAnimationTimeline(NodeAnimationTimeline&&) = default;
 
-			//Destructor
-			~NodeAnimationTimeline() = default;
-
 
 			/*
 				Operators
