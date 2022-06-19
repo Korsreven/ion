@@ -417,21 +417,6 @@ namespace ion::script
 					Ranges
 				*/
 
-				//Returns an immutable (BFS) range of all child objects in this object
-				//This can be used directly with a range-based for loop
-				[[nodiscard]] inline auto BreadthFirstSearch() const
-				{
-					return adaptors::ranges::Iterable<const detail::search_result>{detail::breadth_first_search(objects_)};
-				}
-
-				//Returns an immutable (DFS) range of all child objects in this object
-				//This can be used directly with a range-based for loop
-				[[nodiscard]] inline auto DepthFirstSearch(DepthFirstTraversal traversal = DepthFirstTraversal::PreOrder) const
-				{
-					return adaptors::ranges::Iterable<const detail::search_result>{detail::depth_first_search(objects_, traversal)};
-				}
-
-
 				//Returns a mutable range of all top-level child objects in this object
 				//This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto Objects() noexcept
@@ -458,6 +443,35 @@ namespace ion::script
 				[[nodiscard]] inline auto Properties() const noexcept
 				{
 					return adaptors::ranges::Iterable<const PropertyNodes&>{properties_};
+				}
+
+
+				//Returns a mutable (BFS) range of all child objects in this object
+				//This can be used directly with a range-based for loop
+				[[nodiscard]] inline auto BreadthFirstSearch()
+				{
+					return adaptors::ranges::Iterable<detail::search_result>{detail::breadth_first_search(objects_)};
+				}
+
+				//Returns an immutable (BFS) range of all child objects in this object
+				//This can be used directly with a range-based for loop
+				[[nodiscard]] inline auto BreadthFirstSearch() const
+				{
+					return adaptors::ranges::Iterable<const detail::search_result&>{detail::breadth_first_search(objects_)};
+				}
+
+				//Returns a mutable (DFS) range of all child objects in this object
+				//This can be used directly with a range-based for loop
+				[[nodiscard]] inline auto DepthFirstSearch(DepthFirstTraversal traversal = DepthFirstTraversal::PreOrder)
+				{
+					return adaptors::ranges::Iterable<detail::search_result>{detail::depth_first_search(objects_, traversal)};
+				}
+
+				//Returns an immutable (DFS) range of all child objects in this object
+				//This can be used directly with a range-based for loop
+				[[nodiscard]] inline auto DepthFirstSearch(DepthFirstTraversal traversal = DepthFirstTraversal::PreOrder) const
+				{
+					return adaptors::ranges::Iterable<const detail::search_result&>{detail::depth_first_search(objects_, traversal)};
 				}
 		};
 
@@ -693,26 +707,11 @@ namespace ion::script
 				Ranges
 			*/
 
-			//Returns an immutable (BFS) range of all objects in this script tree
-			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto BreadthFirstSearch() const
-			{
-				return adaptors::ranges::Iterable<const script_tree::detail::search_result>{script_tree::detail::breadth_first_search(objects_)};
-			}
-
-			//Returns an immutable (DFS) range of all objects in this script tree
-			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto DepthFirstSearch(script_tree::DepthFirstTraversal traversal = script_tree::DepthFirstTraversal::PreOrder) const
-			{
-				return adaptors::ranges::Iterable<const script_tree::detail::search_result>{script_tree::detail::depth_first_search(objects_, traversal)};
-			}
-
-
 			//Returns a mutable range of all top-level objects in this script tree
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Objects() noexcept
 			{
-				return adaptors::ranges::Iterable<script_tree::ObjectNodes>{objects_};
+				return adaptors::ranges::Iterable<script_tree::ObjectNodes&>{objects_};
 			}
 
 			//Returns an immutable range of all top-level objects in this script tree
@@ -720,6 +719,35 @@ namespace ion::script
 			[[nodiscard]] inline auto Objects() const noexcept
 			{
 				return adaptors::ranges::Iterable<const script_tree::ObjectNodes&>{objects_};
+			}
+
+
+			//Returns a mutable (BFS) range of all objects in this script tree
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto BreadthFirstSearch()
+			{
+				return adaptors::ranges::Iterable<script_tree::detail::search_result>{script_tree::detail::breadth_first_search(objects_)};
+			}
+
+			//Returns an immutable (BFS) range of all objects in this script tree
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto BreadthFirstSearch() const
+			{
+				return adaptors::ranges::Iterable<const script_tree::detail::search_result&>{script_tree::detail::breadth_first_search(objects_)};
+			}
+
+			//Returns an mutable (DFS) range of all objects in this script tree
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto DepthFirstSearch(script_tree::DepthFirstTraversal traversal = script_tree::DepthFirstTraversal::PreOrder)
+			{
+				return adaptors::ranges::Iterable<script_tree::detail::search_result>{script_tree::detail::depth_first_search(objects_, traversal)};
+			}
+
+			//Returns an immutable (DFS) range of all objects in this script tree
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto DepthFirstSearch(script_tree::DepthFirstTraversal traversal = script_tree::DepthFirstTraversal::PreOrder) const
+			{
+				return adaptors::ranges::Iterable<const script_tree::detail::search_result&>{script_tree::detail::depth_first_search(objects_, traversal)};
 			}
 
 
