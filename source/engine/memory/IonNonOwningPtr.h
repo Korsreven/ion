@@ -224,7 +224,7 @@ namespace ion::memory
 			//Checks if there is an associated watched object
 			[[nodiscard]] explicit operator bool() const noexcept
 			{
-				return ctrl_block_ && ctrl_block_->ptr;
+				return ctrl_block_ && !ctrl_block_->expired;
 			}
 
 			//Returns a pointer to the watched object
@@ -266,9 +266,7 @@ namespace ion::memory
 			//Returns nullptr if the watched object has expired
 			[[nodiscard]] auto get() const noexcept
 			{
-				return ctrl_block_ ?
-					static_cast<pointer>(ctrl_block_->ptr) :
-					static_cast<pointer>(nullptr);
+				return *this ? ptr_ : nullptr;
 			}
 
 			//Checks whether the watched object was already deleted

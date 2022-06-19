@@ -29,8 +29,8 @@ namespace ion::memory
 
 		struct ControlBlock
 		{
-			void *ptr = nullptr;
 			int ref_count = 1;
+			bool expired = false;
 		};
 	} //owning_ptr::detail
 
@@ -63,7 +63,7 @@ namespace ion::memory
 			//Construct a new owning ptr with the given raw ptr
 			explicit OwningPtr(pointer ptr) noexcept :
 				ptr_{ptr},
-				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock{ptr_.get()} : nullptr}
+				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock{} : nullptr}
 			{
 				//Empty
 			}
@@ -78,7 +78,7 @@ namespace ion::memory
 			//Construct a new owning ptr with the given unique ptr
 			OwningPtr(std::unique_ptr<T> &&ptr) noexcept :
 				ptr_{std::move(ptr)},
-				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock{ptr_.get()} : nullptr}
+				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock{} : nullptr}
 			{
 				//Empty
 			}
@@ -87,7 +87,7 @@ namespace ion::memory
 			template <typename U, typename = std::enable_if_t<std::is_convertible_v<typename std::unique_ptr<U>::pointer, pointer>>>
 			OwningPtr(std::unique_ptr<U> &&ptr) noexcept :
 				ptr_{std::move(ptr)},
-				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock{ptr_.get()} : nullptr}
+				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock{} : nullptr}
 			{
 				//Empty
 			}
@@ -120,7 +120,7 @@ namespace ion::memory
 					if (--ctrl_block_->ref_count == 0)
 						delete ctrl_block_;
 					else
-						ctrl_block_->ptr = nullptr;
+						ctrl_block_->expired = true;
 				}
 			}
 
