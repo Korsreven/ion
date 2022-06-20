@@ -43,7 +43,6 @@ namespace ion::graphics::scene
 
 
 	class SceneManager final :
-		public managed::ManagedObject<Engine>,
 		public managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>,
 		public managed::ObjectManager<Light, SceneManager>,
 		public managed::ObjectManager<Model, SceneManager>,
@@ -66,7 +65,17 @@ namespace ion::graphics::scene
 
 		public:
 
-			using managed::ManagedObject<Engine>::ManagedObject;
+			//Default constructor
+			SceneManager() = default;
+
+			//Deleted copy constructor
+			SceneManager(const SceneManager&) = delete;
+
+			//Default move constructor
+			SceneManager(SceneManager&&) = default;
+
+			//Destructor
+			~SceneManager() = default;
 
 
 			/*
@@ -90,7 +99,7 @@ namespace ion::graphics::scene
 				return static_cast<CameraEventsBase&>(*this);
 			}
 
-			//Return a immutable reference to the camera events of this scene manager
+			//Return an immutable reference to the camera events of this scene manager
 			[[nodiscard]] inline auto& CameraEvents() const noexcept
 			{
 				return static_cast<const CameraEventsBase&>(*this);

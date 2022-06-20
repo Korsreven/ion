@@ -269,54 +269,6 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 
 
 /*
-	Scene managers
-	Creating
-*/
-
-NonOwningPtr<graphics::scene::SceneManager> Engine::CreateSceneManager(std::string name)
-{
-	return SceneManagerBase::Create(std::move(name));
-}
-
-
-/*
-	Scene managers
-	Retrieving
-*/
-
-NonOwningPtr<graphics::scene::SceneManager> Engine::GetSceneManager(std::string_view name) noexcept
-{
-	return SceneManagerBase::Get(name);
-}
-
-NonOwningPtr<const graphics::scene::SceneManager> Engine::GetSceneManager(std::string_view name) const noexcept
-{
-	return SceneManagerBase::Get(name);
-}
-
-
-/*
-	Scene managers
-	Removing
-*/
-
-void Engine::ClearSceneManagers() noexcept
-{
-	SceneManagerBase::Clear();
-}
-
-bool Engine::RemoveSceneManager(graphics::scene::SceneManager &scene_manager) noexcept
-{
-	return SceneManagerBase::Remove(scene_manager);
-}
-
-bool Engine::RemoveSceneManager(std::string_view name) noexcept
-{
-	return SceneManagerBase::Remove(name);
-}
-
-
-/*
 	Scene graphs
 	Creating
 */

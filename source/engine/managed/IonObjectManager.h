@@ -55,8 +55,14 @@ namespace ion::managed
 	} //object_manager::detail
 
 
+	struct ObjectManagerBase
+	{
+		//Default virtual destructor
+		virtual ~ObjectManagerBase() = default;
+	};
+
 	template <typename ObjectT, typename OwnerT, typename ListenerT = events::listeners::ManagedObjectListener<ObjectT, OwnerT>>
-	class ObjectManager : public events::Listenable<ListenerT>
+	class ObjectManager : virtual public ObjectManagerBase, public events::Listenable<ListenerT>
 	{
 		static_assert(std::is_base_of_v<ManagedObject<OwnerT>, ObjectT>);
 
@@ -348,8 +354,8 @@ namespace ion::managed
 				NotifyMovedAll(objects_);
 			}
 
-			//Destructor
-			~ObjectManager() noexcept
+			//Virtual destructor
+			virtual ~ObjectManager() noexcept
 			{
 				Tidy();
 			}

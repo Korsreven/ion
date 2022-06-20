@@ -164,6 +164,7 @@ File:	main.cpp
 
 #include "managed/IonManagedObject.h"
 #include "managed/IonObjectManager.h"
+#include "managed/IonObjectRegister.h"
 #include "managed/IonObjectObserver.h"
 #include "managed/IonObservedObject.h"
 
@@ -1794,7 +1795,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			using namespace ion::utilities;
 
 			//Scene manager
-			auto scene_manager = engine.CreateSceneManager("main");
+			auto scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
 
 			//Viewport
 			auto viewport = engine.Target()->GetViewport("main");

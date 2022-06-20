@@ -1391,5 +1391,8 @@
     <ClInclude Include="..\source\engine\graphics\scene\shapes\IonAnimatedSprite.h">
       <Filter>Header Files\graphics\scene\shapes</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\engine\managed\IonObjectRegister.h">
+      <Filter>Header Files\managed</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
