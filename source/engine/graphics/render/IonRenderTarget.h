@@ -95,7 +95,7 @@ namespace ion::graphics::render
 				return static_cast<RenderTargetEventsBase&>(*this);
 			}
 
-			//Return a immutable reference to the render target events of this render target
+			//Return an immutable reference to the render target events of this render target
 			[[nodiscard]] inline auto& Events() const noexcept
 			{
 				return static_cast<const RenderTargetEventsBase&>(*this);
@@ -108,7 +108,7 @@ namespace ion::graphics::render
 				return static_cast<ViewportEventsBase&>(*this);
 			}
 
-			//Return a immutable reference to the viewport events of this render target
+			//Return an immutable reference to the viewport events of this render target
 			[[nodiscard]] inline auto& ViewportEvents() const noexcept
 			{
 				return static_cast<const ViewportEventsBase&>(*this);

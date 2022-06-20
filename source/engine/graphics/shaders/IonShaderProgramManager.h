@@ -314,7 +314,7 @@ namespace ion::graphics::shaders
 				return static_cast<ShaderLayoutBase&>(*this);
 			}
 
-			//Return a immutable reference to the shader layout manager of this shader program manager
+			//Return an immutable reference to the shader layout manager of this shader program manager
 			[[nodiscard]] inline auto& ShaderLayoutManager() const noexcept
 			{
 				return static_cast<const ShaderLayoutBase&>(*this);

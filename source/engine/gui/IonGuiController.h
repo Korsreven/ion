@@ -204,7 +204,7 @@ namespace ion::gui
 				return static_cast<FrameEventsBase&>(*this);
 			}
 
-			//Return a immutable reference to the frame events of this controller
+			//Return an immutable reference to the frame events of this controller
 			[[nodiscard]] inline auto& FrameEvents() const noexcept
 			{
 				return static_cast<const FrameEventsBase&>(*this);
@@ -217,7 +217,7 @@ namespace ion::gui
 				return static_cast<ManagedObjectEventsBase&>(*this);
 			}
 
-			//Return a immutable reference to the managed object events of this controller
+			//Return an immutable reference to the managed object events of this controller
 			[[nodiscard]] inline auto& ManagedObjectEvents() const noexcept
 			{
 				return static_cast<const ManagedObjectEventsBase&>(*this);

@@ -56,7 +56,7 @@ namespace ion::script::interfaces
 {
 	namespace gui_script_interface::detail
 	{
-		inline static const Strings button_action_types
+		static inline const Strings button_action_types
 		{
 			//Controller actions
 			"show-gui",
@@ -88,7 +88,7 @@ namespace ion::script::interfaces
 			"defocus-control"
 		};
 
-		inline static const Strings control_caption_layouts
+		static inline const Strings control_caption_layouts
 		{
 									"outside-top-left",		"outside-top-center",		"outside-top-right",
 			"outside-left-top",		"top-left",				"top-center",				"top-right",			"outside-right-top",
@@ -97,7 +97,7 @@ namespace ion::script::interfaces
 									"outside-bottom-left",	"outside-bottom-center",	"outside-bottom-right"
 		};
 
-		inline static const Strings mouse_cursor_hot_spots
+		static inline const Strings mouse_cursor_hot_spots
 		{
 			"top-left",		"top-center",		"top-right",
 			"left",			"center",			"right",

@@ -205,7 +205,7 @@ namespace ion::graphics::render
 				return static_cast<WindowEventsBase&>(*this);
 			}
 
-			//Return a immutable reference to the window events of this render window
+			//Return an immutable reference to the window events of this render window
 			[[nodiscard]] inline auto& Events() const noexcept
 			{
 				return static_cast<const WindowEventsBase&>(*this);
@@ -218,7 +218,7 @@ namespace ion::graphics::render
 				return static_cast<RenderTargetEventsBase&>(*this);
 			}
 
-			//Return a immutable reference to the render target events of this render window
+			//Return an immutable reference to the render target events of this render window
 			[[nodiscard]] inline auto& RenderTargetEvents() const noexcept
 			{
 				return static_cast<const RenderTargetEventsBase&>(*this);
@@ -231,7 +231,7 @@ namespace ion::graphics::render
 				return static_cast<MessageEventsBase&>(*this);
 			}
 
-			//Return a immutable reference to the message events of this render window
+			//Return an immutable reference to the message events of this render window
 			[[nodiscard]] inline auto& MessageEvents() const noexcept
 			{
 				return static_cast<const MessageEventsBase&>(*this);

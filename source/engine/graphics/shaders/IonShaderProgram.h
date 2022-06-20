@@ -132,7 +132,7 @@ namespace ion::graphics::shaders
 				return static_cast<ShaderStructBase&>(*this);
 			}
 
-			//Return a immutable reference to the struct manager of this shader program
+			//Return an immutable reference to the struct manager of this shader program
 			[[nodiscard]] inline auto& StructManager() const noexcept
 			{
 				return static_cast<const ShaderStructBase&>(*this);
@@ -145,7 +145,7 @@ namespace ion::graphics::shaders
 				return static_cast<AttributeVariablesBase&>(*this);
 			}
 
-			//Return a immutable reference to the attribute variable manager of this shader program
+			//Return an immutable reference to the attribute variable manager of this shader program
 			[[nodiscard]] inline auto& AttributeVariableManager() const noexcept
 			{
 				return static_cast<const AttributeVariablesBase&>(*this);
@@ -158,7 +158,7 @@ namespace ion::graphics::shaders
 				return static_cast<UniformVariablesBase&>(*this);
 			}
 
-			//Return a immutable reference to the uniform variable manager of this shader program
+			//Return an immutable reference to the uniform variable manager of this shader program
 			[[nodiscard]] inline auto& UniformVariableManager() const noexcept
 			{
 				return static_cast<const UniformVariablesBase&>(*this);

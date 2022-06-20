@@ -736,7 +736,7 @@ namespace ion::script
 				return adaptors::ranges::Iterable<const script_tree::detail::search_result&>{script_tree::detail::breadth_first_search(objects_)};
 			}
 
-			//Returns an mutable (DFS) range of all objects in this script tree
+			//Returns a mutable (DFS) range of all objects in this script tree
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto DepthFirstSearch(script_tree::DepthFirstTraversal traversal = script_tree::DepthFirstTraversal::PreOrder)
 			{

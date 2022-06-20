@@ -152,7 +152,7 @@ namespace ion::system::events::listeners
 				return static_cast<KeyEventsBase&>(*this);
 			}
 
-			//Return a immutable reference to the key base of this input listener
+			//Return an immutable reference to the key base of this input listener
 			[[nodiscard]] inline auto& KeyEvents() const noexcept
 			{
 				return static_cast<const KeyEventsBase&>(*this);
@@ -165,7 +165,7 @@ namespace ion::system::events::listeners
 				return static_cast<MouseEventsBase&>(*this);
 			}
 
-			//Return a immutable reference to the mouse base of this input listener
+			//Return an immutable reference to the mouse base of this input listener
 			[[nodiscard]] inline auto& MouseEvents() const noexcept
 			{
 				return static_cast<const MouseEventsBase&>(*this);

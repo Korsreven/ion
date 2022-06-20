@@ -34,7 +34,7 @@ namespace ion::script::interfaces
 {
 	namespace shader_program_script_interface::detail
 	{
-		inline static const Strings attribute_data_types
+		static inline const Strings attribute_data_types
 		{
 			//Basic types
 			"bool", "int", "uint", "float", "double",
@@ -56,7 +56,7 @@ namespace ion::script::interfaces
 			"mat4x4", "dmat4x4", "mat4", "dmat4"
 		};
 
-		inline static const Strings uniform_data_types
+		static inline const Strings uniform_data_types
 		{
 			//Basic types
 			"bool", "int", "uint", "float", "double",

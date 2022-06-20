@@ -27,7 +27,7 @@ namespace ion::script::interfaces
 {
 	namespace shader_layout_script_interface::detail
 	{
-		inline static const Strings struct_names
+		static inline const Strings struct_names
 		{
 			"matrix",
 			"scene",
@@ -39,7 +39,7 @@ namespace ion::script::interfaces
 			"light"
 		};
 
-		inline static const Strings attribute_names
+		static inline const Strings attribute_names
 		{
 			"vertex-position",
 			"vertex-normal",
@@ -49,7 +49,7 @@ namespace ion::script::interfaces
 			"vertex-point-size"
 		};
 
-		inline static const Strings uniform_names
+		static inline const Strings uniform_names
 		{
 			//Matrix
 			"matrix-model-view",

@@ -147,7 +147,7 @@ namespace ion::graphics::scene::graph
 				return static_cast<NodeEventsBase&>(*this);
 			}
 
-			//Return a immutable reference to the node events of this scene graph
+			//Return an immutable reference to the node events of this scene graph
 			[[nodiscard]] inline auto& NodeEvents() const noexcept
 			{
 				return static_cast<const NodeEventsBase&>(*this);

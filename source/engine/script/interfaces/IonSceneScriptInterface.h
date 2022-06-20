@@ -86,7 +86,7 @@ namespace ion::script::interfaces
 {
 	namespace scene_script_interface::detail
 	{
-		inline static const Strings motion_technique_types
+		static inline const Strings motion_technique_types
 		{
 			"cubic",
 			"exponential",
@@ -97,7 +97,7 @@ namespace ion::script::interfaces
 			"tanh"
 		};
 
-		inline static const Strings pass_blend_factors
+		static inline const Strings pass_blend_factors
 		{
 			"zero",
 			"one",
@@ -125,7 +125,7 @@ namespace ion::script::interfaces
 			"source-alpha-saturate"
 		};
 
-		inline static const Strings pass_blend_equation_modes
+		static inline const Strings pass_blend_equation_modes
 		{
 			"add",
 			"subtract",
