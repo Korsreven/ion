@@ -21,7 +21,6 @@ File:	IonEngine.h
 #include "graphics/render/IonRenderWindow.h"
 #include "graphics/scene/graph/IonSceneGraph.h"
 #include "managed/IonObjectManager.h"
-#include "managed/IonObjectRegister.h"
 #include "memory/IonNonOwningPtr.h"
 #include "timers/IonStopwatch.h"
 #include "timers/IonTimerManager.h"
@@ -69,7 +68,6 @@ namespace ion
 
 			static inline auto pixels_per_unit_ = 1.0_r;
 			static inline auto units_per_meter_ = 1.0_r;
-			static managed::ObjectRegister<managed::ObjectManagerBase> manager_register_;
 
 
 			/*
@@ -137,17 +135,6 @@ namespace ion
 			[[nodiscard]] inline auto& FrameEvents() const noexcept
 			{
 				return static_cast<const FrameEventsBase&>(*this);
-			}
-
-
-			/*
-				Managers
-			*/
-
-			//Return a reference to the static manager register
-			[[nodiscard]] static inline auto& Managers() noexcept
-			{
-				return manager_register_;
 			}
 
 

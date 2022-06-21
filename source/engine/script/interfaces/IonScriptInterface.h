@@ -19,6 +19,8 @@ File:	IonScriptInterface.h
 
 #include "assets/repositories/IonFileRepository.h"
 #include "assets/repositories/IonScriptRepository.h"
+#include "managed/IonObjectManager.h"
+#include "managed/IonObjectRegister.h"
 #include "memory/IonNonOwningPtr.h"
 #include "script/IonScriptBuilder.h"
 #include "script/IonScriptCompiler.h"
@@ -28,6 +30,9 @@ File:	IonScriptInterface.h
 
 namespace ion::script::interfaces
 {
+	using ManagerRegister = managed::ObjectRegister<managed::ObjectManagerBase>;
+
+
 	namespace script_interface::detail
 	{
 		template <typename RepositoriesT>
@@ -72,6 +77,8 @@ namespace ion::script::interfaces
 			ScriptBuilder builder_;
 			std::optional<ScriptTree> tree_;
 
+			static inline ManagerRegister manager_register_;
+
 
 			virtual ScriptValidator GetValidator() const = 0;
 			bool Load(std::string_view asset_name);
@@ -113,6 +120,17 @@ namespace ion::script::interfaces
 			[[nodiscard]] inline auto FileRepositories() const noexcept
 			{
 				return FileRepositoryBase::Objects();
+			}
+
+
+			/*
+				Managers
+			*/
+
+			//Return a reference to the static manager register for all script interfaces
+			[[nodiscard]] static inline auto& Managers() noexcept
+			{
+				return manager_register_;
 			}
 
 
