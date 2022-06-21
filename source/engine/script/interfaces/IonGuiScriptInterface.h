@@ -39,9 +39,9 @@ File:	IonGuiScriptInterface.h
 //Forward declarations
 namespace ion::graphics
 {
-	namespace materials
+	namespace scene
 	{
-		struct MaterialManager;
+		class SceneManager;
 	}
 }
 
@@ -104,6 +104,9 @@ namespace ion::script::interfaces
 			"bottom-left",	"bottom-center",	"bottom-right"
 		};
 
+
+		NonOwningPtr<graphics::materials::Material> get_material(std::string_view name, const ManagerRegister &managers) noexcept;
+
 		const gui::skins::GuiSkin* get_skin(gui::GuiController &gui_controller, std::string_view name) noexcept;
 		const gui::skins::GuiSkin* get_skin(gui::GuiPanelContainer &container, std::string_view name) noexcept;
 
@@ -141,68 +144,78 @@ namespace ion::script::interfaces
 		*/
 
 		void set_gui_properties(const script_tree::ObjectNode &object, gui::GuiController &gui_controller,
-			graphics::materials::MaterialManager &material_manager);
-		void set_component_properties(const script_tree::ObjectNode &object, gui::GuiComponent &component);
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		void set_component_properties(const script_tree::ObjectNode &object, gui::GuiComponent &component,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		void set_frame_properties(const script_tree::ObjectNode &object, gui::GuiFrame &frame,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		void set_panel_properties(const script_tree::ObjectNode &object, gui::GuiPanel &panel,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		void set_panel_container_properties(const script_tree::ObjectNode &object, gui::GuiPanelContainer &container,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 
-		void set_button_properties(const script_tree::ObjectNode &object, gui::controls::GuiButton &button);
-		void set_check_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiCheckBox &check_box);
-		void set_control_properties(const script_tree::ObjectNode &object, gui::controls::GuiControl &control);
-		void set_group_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiGroupBox &group_box);
-		void set_label_properties(const script_tree::ObjectNode &object, gui::controls::GuiLabel &label);
+		void set_button_properties(const script_tree::ObjectNode &object, gui::controls::GuiButton &button,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		void set_check_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiCheckBox &check_box,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		void set_control_properties(const script_tree::ObjectNode &object, gui::controls::GuiControl &control,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		void set_group_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiGroupBox &group_box,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		void set_label_properties(const script_tree::ObjectNode &object, gui::controls::GuiLabel &label,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		void set_list_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiListBox &list_box,
-			graphics::materials::MaterialManager &material_manager);
-		void set_mouse_cursor_properties(const script_tree::ObjectNode &object, gui::controls::GuiMouseCursor &mouse_cursor);
-		void set_progress_bar_properties(const script_tree::ObjectNode &object, gui::controls::GuiProgressBar &progress_bar);
-		void set_radio_button_properties(const script_tree::ObjectNode &object, gui::controls::GuiRadioButton &radio_button);
-		void set_scrollable_properties(const script_tree::ObjectNode &object, gui::controls::GuiScrollable &scrollable);
-		void set_scroll_bar_properties(const script_tree::ObjectNode &object, gui::controls::GuiScrollBar &scroll_bar);
-		void set_slider_properties(const script_tree::ObjectNode &object, gui::controls::GuiSlider &slider);
-		void set_text_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiTextBox &text_box);
-		void set_tooltip_properties(const script_tree::ObjectNode &object, gui::controls::GuiTooltip &tooltip);
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		void set_mouse_cursor_properties(const script_tree::ObjectNode &object, gui::controls::GuiMouseCursor &mouse_cursor,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		void set_progress_bar_properties(const script_tree::ObjectNode &object, gui::controls::GuiProgressBar &progress_bar,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		void set_radio_button_properties(const script_tree::ObjectNode &object, gui::controls::GuiRadioButton &radio_button,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		void set_scrollable_properties(const script_tree::ObjectNode &object, gui::controls::GuiScrollable &scrollable,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		void set_scroll_bar_properties(const script_tree::ObjectNode &object, gui::controls::GuiScrollBar &scroll_bar,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		void set_slider_properties(const script_tree::ObjectNode &object, gui::controls::GuiSlider &slider,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		void set_text_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiTextBox &text_box,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		void set_tooltip_properties(const script_tree::ObjectNode &object, gui::controls::GuiTooltip &tooltip,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 
 		
 		NonOwningPtr<gui::GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
-			gui::GuiController &gui_controller,
-			graphics::materials::MaterialManager &material_manager);
+			gui::GuiController &gui_controller, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<gui::GuiPanel> create_gui_panel(const script_tree::ObjectNode &object,
-			gui::GuiPanelContainer &container,
-			graphics::materials::MaterialManager &material_manager);
+			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 
 		NonOwningPtr<gui::controls::GuiButton> create_gui_button(const script_tree::ObjectNode &object,
-			gui::GuiPanelContainer &container);
+			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<gui::controls::GuiCheckBox> create_gui_check_box(const script_tree::ObjectNode &object,
-			gui::GuiPanelContainer &container);
+			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<gui::controls::GuiGroupBox> create_gui_group_box(const script_tree::ObjectNode &object,
-			gui::GuiPanelContainer &container);
+			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<gui::controls::GuiLabel> create_gui_label(const script_tree::ObjectNode &object,
-			gui::GuiPanelContainer &container);
+			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<gui::controls::GuiListBox> create_gui_list_box(const script_tree::ObjectNode &object,
-			gui::GuiPanelContainer &container,
-			graphics::materials::MaterialManager &material_manager);
+			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<gui::controls::GuiMouseCursor> create_gui_mouse_cursor(const script_tree::ObjectNode &object,
-			gui::GuiController &gui_controller);
+			gui::GuiController &gui_controller, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<gui::controls::GuiProgressBar> create_gui_progress_bar(const script_tree::ObjectNode &object,
-			gui::GuiPanelContainer &container);
+			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<gui::controls::GuiRadioButton> create_gui_radio_button(const script_tree::ObjectNode &object,
-			gui::GuiPanelContainer &container);
+			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<gui::controls::GuiScrollBar> create_gui_scroll_bar(const script_tree::ObjectNode &object,
-			gui::GuiPanelContainer &container);
+			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<gui::controls::GuiSlider> create_gui_slider(const script_tree::ObjectNode &object,
-			gui::GuiPanelContainer &container);
+			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<gui::controls::GuiTextBox> create_gui_text_box(const script_tree::ObjectNode &object,
-			gui::GuiPanelContainer &container);
+			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<gui::controls::GuiTooltip> create_gui_tooltip(const script_tree::ObjectNode &object,
-			gui::GuiController &gui_controller);
+			gui::GuiController &gui_controller, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 
-		void create_gui(const ScriptTree &tree,
-			gui::GuiController &gui_controller,
-			graphics::materials::MaterialManager &material_manager);
+		void create_gui(const ScriptTree &tree, gui::GuiController &gui_controller,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 	} //gui_script_interface::detail
 
 
@@ -224,9 +237,12 @@ namespace ion::script::interfaces
 			*/
 
 			//Create gui from a script (or object file) with the given asset name
-			void CreateGui(std::string_view asset_name,
-				gui::GuiController &gui_controller,
-				graphics::materials::MaterialManager &material_manager);
+			void CreateGui(std::string_view asset_name, gui::GuiController &gui_controller,
+				graphics::scene::SceneManager &scene_manager);
+
+			//Create gui from a script (or object file) with the given asset name
+			void CreateGui(std::string_view asset_name, gui::GuiController &gui_controller,
+				graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 	};
 } //ion::script::interfaces
 

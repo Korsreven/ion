@@ -29,37 +29,21 @@ File:	IonGuiThemeScriptInterface.h
 //Forward declarations
 namespace ion::graphics
 {
-	namespace fonts
-	{
-		struct TextManager;
-	}
-
-	namespace materials
-	{
-		struct MaterialManager;
-	}
-
 	namespace scene
 	{
 		class SceneManager;
 	}
-
-	namespace shaders
-	{
-		class ShaderProgramManager;
-	}
-}
-
-//Forward declarations
-namespace ion::sounds
-{
-	class SoundManager;
 }
 
 namespace ion::script::interfaces
 {
 	namespace gui_theme_script_interface::detail
 	{
+		NonOwningPtr<graphics::materials::Material> get_material(std::string_view name, const ManagerRegister &managers) noexcept;
+		NonOwningPtr<sounds::Sound> get_sound(std::string_view name, const ManagerRegister &managers) noexcept;
+		NonOwningPtr<graphics::fonts::Text> get_text(std::string_view name, const ManagerRegister &managers) noexcept;
+
+
 		/*
 			Validator classes
 		*/
@@ -78,30 +62,16 @@ namespace ion::script::interfaces
 
 		graphics::fonts::text::TextBlockStyle create_text_style(const script_tree::ObjectNode &object);
 		graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
+			const ManagerRegister &managers);
 		
 
 		NonOwningPtr<gui::skins::GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
-			gui::skins::GuiTheme &theme,
-			graphics::materials::MaterialManager &material_manager,		
-			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			sounds::SoundManager &sound_manager,
-			graphics::fonts::TextManager &text_manager);
+			gui::skins::GuiTheme &theme, const ManagerRegister &managers);
 		NonOwningPtr<gui::skins::GuiTheme> create_gui_theme(const script_tree::ObjectNode &object,
-			gui::GuiController &gui_controller,
-			NonOwningPtr<graphics::scene::SceneManager> scene_manager,
-			graphics::materials::MaterialManager &material_manager,	
-			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			sounds::SoundManager &sound_manager,
-			graphics::fonts::TextManager &text_manager);
+			gui::GuiController &gui_controller, NonOwningPtr<graphics::scene::SceneManager> scene_manager, const ManagerRegister &managers);
 
-		void create_gui_themes(const ScriptTree &tree,
-			gui::GuiController &gui_controller,
-			NonOwningPtr<graphics::scene::SceneManager> scene_manager,
-			graphics::materials::MaterialManager &material_manager,
-			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			sounds::SoundManager &sound_manager,
-			graphics::fonts::TextManager &text_manager);
+		void create_gui_themes(const ScriptTree &tree, gui::GuiController &gui_controller,
+			NonOwningPtr<graphics::scene::SceneManager> scene_manager, const ManagerRegister &managers);
 	} //gui_theme_script_interface::detail
 
 
@@ -123,13 +93,12 @@ namespace ion::script::interfaces
 			*/
 
 			//Create gui themes from a script (or object file) with the given asset name
-			void CreateGuiThemes(std::string_view asset_name,
-				gui::GuiController &gui_controller,
-				NonOwningPtr<graphics::scene::SceneManager> scene_manager,
-				graphics::materials::MaterialManager &material_manager,
-				graphics::shaders::ShaderProgramManager &shader_program_manager,
-				sounds::SoundManager &sound_manager,
-				graphics::fonts::TextManager &text_manager);
+			void CreateGuiThemes(std::string_view asset_name, gui::GuiController &gui_controller,
+				NonOwningPtr<graphics::scene::SceneManager> scene_manager);
+
+			//Create gui themes from a script (or object file) with the given asset name
+			void CreateGuiThemes(std::string_view asset_name, gui::GuiController &gui_controller,
+				NonOwningPtr<graphics::scene::SceneManager> scene_manager, const ManagerRegister &managers);
 	};
 } //ion::script::interfaces
 

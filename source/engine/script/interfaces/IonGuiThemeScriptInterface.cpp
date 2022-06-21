@@ -17,7 +17,6 @@ File:	IonGuiThemeScriptInterface.cpp
 #include "IonSceneScriptInterface.h"
 #include "graphics/fonts/IonTextManager.h"
 #include "graphics/materials/IonMaterialManager.h"
-#include "graphics/shaders/IonShaderProgramManager.h"
 #include "gui/controls/IonGuiButton.h"
 #include "gui/controls/IonGuiCheckBox.h"
 #include "gui/controls/IonGuiGroupBox.h"
@@ -43,6 +42,49 @@ using namespace gui::skins;
 
 namespace gui_theme_script_interface::detail
 {
+
+NonOwningPtr<graphics::materials::Material> get_material(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &material_manager : managers.ObjectsOf<graphics::materials::MaterialManager>())
+	{
+		if (material_manager)
+		{
+			if (auto material = material_manager->GetMaterial(name); material)
+				return material;
+		}
+	}
+
+	return nullptr;
+}
+
+NonOwningPtr<sounds::Sound> get_sound(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &sound_manager : managers.ObjectsOf<sounds::SoundManager>())
+	{
+		if (sound_manager)
+		{
+			if (auto sound = sound_manager->GetSound(name); sound)
+				return sound;
+		}
+	}
+
+	return nullptr;
+}
+
+NonOwningPtr<graphics::fonts::Text> get_text(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &text_manager : managers.ObjectsOf<graphics::fonts::TextManager>())
+	{
+		if (text_manager)
+		{
+			if (auto text = text_manager->GetText(name); text)
+				return text;
+		}
+	}
+
+	return nullptr;
+}
+
 
 /*
 	Validator classes
@@ -179,20 +221,16 @@ graphics::fonts::text::TextBlockStyle create_text_style(const script_tree::Objec
 }
 
 graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
+	const ManagerRegister &managers)
 {
 	graphics::render::Pass pass;
-	scene_script_interface::detail::set_pass_properties(object, pass, shader_program_manager);
+	scene_script_interface::detail::set_pass_properties(object, pass, managers);
 	return pass;
 }
 
 
 NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
-	GuiTheme &theme,
-	graphics::materials::MaterialManager &material_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager,
-	sounds::SoundManager &sound_manager,
-	graphics::fonts::TextManager &text_manager)
+	GuiTheme &theme, const ManagerRegister &managers)
 {
 	auto type_name = object
 		.Property("type")[0]
@@ -278,17 +316,17 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 				for (auto &property : obj.Properties())
 				{
 					if (property.Name() == "disabled")
-						part.Disabled = material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get());
+						part.Disabled = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
 					else if (property.Name() == "enabled")
-						part.Enabled = material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get());
+						part.Enabled = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
 					else if (property.Name() == "fill-color")
 						part.FillColor = property[0].Get<ScriptType::Color>()->Get();
 					else if (property.Name() == "focused")
-						part.Focused = material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get());
+						part.Focused = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
 					else if (property.Name() == "hovered")
-						part.Hovered = material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get());
+						part.Hovered = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
 					else if (property.Name() == "pressed")
-						part.Pressed = material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get());
+						part.Pressed = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
 					else if (property.Name() == "scaling")
 						part.Scaling = property[0].Get<ScriptType::Vector2>()->Get();
 				}
@@ -296,7 +334,7 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 				skin->AddPart(std::move(part_name), part);
 			}
 			else if (obj.Name() == "pass")
-				skin->AddPass(create_pass(obj, shader_program_manager));
+				skin->AddPass(create_pass(obj, managers));
 			else if (obj.Name() == "sound-part")
 			{
 				auto part_name = obj
@@ -307,7 +345,7 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 					.Get<ScriptType::String>()->Get();
 
 				skins::gui_skin::SkinSoundPart sound_part;
-				sound_part.Base = sound_manager.GetSound(sound_name);
+				sound_part.Base = get_sound(sound_name, managers);
 
 				skin->AddSoundPart(std::move(part_name), sound_part);
 			}
@@ -321,7 +359,7 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 					.Get<ScriptType::String>()->Get();
 
 				skins::gui_skin::SkinTextPart text_part;
-				text_part.Base = text_manager.GetText(text_name);
+				text_part.Base = get_text(text_name, managers);
 
 				for (auto &obj2 : obj.Objects())
 				{
@@ -340,7 +378,7 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 				skin->AddTextPart(std::move(part_name), text_part);
 			}
 			else if (obj.Name() == "text-pass")
-				skin->AddTextPass(create_pass(obj, shader_program_manager));
+				skin->AddTextPass(create_pass(obj, managers));
 		}
 	}
 
@@ -348,12 +386,7 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 }
 
 NonOwningPtr<GuiTheme> create_gui_theme(const script_tree::ObjectNode &object,
-	GuiController &gui_controller,
-	NonOwningPtr<graphics::scene::SceneManager> scene_manager,
-	graphics::materials::MaterialManager &material_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager,
-	sounds::SoundManager &sound_manager,
-	graphics::fonts::TextManager &text_manager)
+	GuiController &gui_controller, NonOwningPtr<graphics::scene::SceneManager> scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -366,27 +399,20 @@ NonOwningPtr<GuiTheme> create_gui_theme(const script_tree::ObjectNode &object,
 		for (auto &obj : object.Objects())
 		{
 			if (obj.Name() == "skin")
-				create_gui_skin(obj, *theme,
-					material_manager, shader_program_manager, sound_manager, text_manager);
+				create_gui_skin(obj, *theme, managers);
 		}
 	}
 
 	return theme;
 }
 
-void create_gui_themes(const ScriptTree &tree,
-	GuiController &gui_controller,
-	NonOwningPtr<graphics::scene::SceneManager> scene_manager,
-	graphics::materials::MaterialManager &material_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager,
-	sounds::SoundManager &sound_manager,
-	graphics::fonts::TextManager &text_manager)
+void create_gui_themes(const ScriptTree &tree, GuiController &gui_controller,
+	NonOwningPtr<graphics::scene::SceneManager> scene_manager, const ManagerRegister &managers)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "theme")
-			create_gui_theme(object, gui_controller,
-				scene_manager, material_manager, shader_program_manager, sound_manager, text_manager);
+			create_gui_theme(object, gui_controller, scene_manager, managers);
 	}
 }
 
@@ -408,17 +434,18 @@ ScriptValidator GuiThemeScriptInterface::GetValidator() const
 	Creating from script
 */
 
-void GuiThemeScriptInterface::CreateGuiThemes(std::string_view asset_name,
-	GuiController &gui_controller,
-	NonOwningPtr<graphics::scene::SceneManager> scene_manager,
-	graphics::materials::MaterialManager &material_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager,
-	sounds::SoundManager &sound_manager,
-	graphics::fonts::TextManager &text_manager)
+void GuiThemeScriptInterface::CreateGuiThemes(std::string_view asset_name, GuiController &gui_controller,
+	NonOwningPtr<graphics::scene::SceneManager> scene_manager)
 {
 	if (Load(asset_name))
-		detail::create_gui_themes(*tree_, gui_controller,
-			scene_manager, material_manager, shader_program_manager, sound_manager, text_manager);
+		detail::create_gui_themes(*tree_, gui_controller, scene_manager, Managers());
+}
+
+void GuiThemeScriptInterface::CreateGuiThemes(std::string_view asset_name, GuiController &gui_controller,
+	NonOwningPtr<graphics::scene::SceneManager> scene_manager, const ManagerRegister &managers)
+{
+	if (Load(asset_name))
+		detail::create_gui_themes(*tree_, gui_controller, scene_manager, managers);
 }
 
 } //ion::script::interfaces

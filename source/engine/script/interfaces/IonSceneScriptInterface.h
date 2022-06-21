@@ -50,36 +50,10 @@ File:	IonSceneScriptInterface.h
 //Forward declarations
 namespace ion::graphics
 {
-	namespace fonts
-	{
-		struct TextManager;
-	}
-
-	namespace materials
-	{
-		struct MaterialManager;
-	}
-
-	namespace particles
-	{
-		struct ParticleSystemManager;
-	}
-
 	namespace scene
 	{
 		class SceneManager;
 	}
-
-	namespace shaders
-	{
-		class ShaderProgramManager;
-	}
-}
-
-//Forward declarations
-namespace ion::sounds
-{
-	class SoundManager;
 }
 
 namespace ion::script::interfaces
@@ -133,6 +107,15 @@ namespace ion::script::interfaces
 			"min",
 			"max"
 		};
+
+
+		NonOwningPtr<graphics::materials::Material> get_material(std::string_view name, const ManagerRegister &managers) noexcept;
+		NonOwningPtr<graphics::particles::ParticleSystem> get_particle_system(std::string_view name, const ManagerRegister &managers) noexcept;
+		NonOwningPtr<graphics::shaders::ShaderProgram> get_shader_program(std::string_view name, const ManagerRegister &managers) noexcept;
+		NonOwningPtr<sounds::Sound> get_sound(std::string_view name, const ManagerRegister &managers) noexcept;
+		NonOwningPtr<sounds::SoundChannelGroup> get_sound_channel_group(std::string_view name, const ManagerRegister &managers) noexcept;
+		NonOwningPtr<sounds::SoundListener> get_sound_listener(std::string_view name, const ManagerRegister &managers) noexcept;
+		NonOwningPtr<graphics::fonts::Text> get_text(std::string_view name, const ManagerRegister &managers) noexcept;
 
 		graphics::scene::graph::animations::node_animation::MotionTechniqueType get_motion_technique_type(const script_tree::ArgumentNode &arg);
 		graphics::render::pass::BlendFactor get_pass_blend_factor(const script_tree::ArgumentNode &arg);
@@ -190,28 +173,28 @@ namespace ion::script::interfaces
 		
 		void set_frustum_properties(const script_tree::ObjectNode &object, graphics::render::Frustum &frustum);
 		void set_pass_properties(const script_tree::ObjectNode &object, graphics::render::Pass &pass,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
+			const ManagerRegister &managers);
 
 		void set_animated_sprite_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::AnimatedSprite &aniamted_sprite,
-			graphics::materials::MaterialManager &material_manager);
+			const ManagerRegister &managers);
 		void set_border_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::Border &border,
-			graphics::materials::MaterialManager &material_manager);
+			const ManagerRegister &managers);
 		void set_curve_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::Curve &curve,
-			graphics::materials::MaterialManager &material_manager);
+			const ManagerRegister &managers);
 		void set_ellipse_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::Ellipse &ellipse,
-			graphics::materials::MaterialManager &material_manager);
+			const ManagerRegister &managers);
 		void set_line_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::Line &line,
-			graphics::materials::MaterialManager &material_manager);
+			const ManagerRegister &managers);
 		void set_mesh_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::Mesh &mesh,
-			graphics::materials::MaterialManager &material_manager);
+			const ManagerRegister &managers);
 		void set_rectangle_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::Rectangle &rectangle,
-			graphics::materials::MaterialManager &material_manager);
+			const ManagerRegister &managers);
 		void set_shape_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::Shape &shape,
-			graphics::materials::MaterialManager &material_manager);
+			const ManagerRegister &managers);
 		void set_sprite_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::Sprite &sprite,
-			graphics::materials::MaterialManager &material_manager);
+			const ManagerRegister &managers);
 		void set_triangle_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::Triangle &triangle,
-			graphics::materials::MaterialManager &material_manager);
+			const ManagerRegister &managers);
 
 		void set_node_animation_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::NodeAnimation &animation);
 		void set_node_animation_group_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::NodeAnimationGroup &animation_group,
@@ -219,24 +202,18 @@ namespace ion::script::interfaces
 		void set_node_animation_timeline_properties(const script_tree::ObjectNode &object, graphics::scene::graph::animations::NodeAnimationTimeline &timeline,
 			graphics::scene::graph::SceneNode &parent_node);
 		void set_scene_node_properties(const script_tree::ObjectNode &object, graphics::scene::graph::SceneNode &scene_node,
-			graphics::scene::SceneManager &scene_manager,
-			graphics::materials::MaterialManager &material_manager,
-			graphics::particles::ParticleSystemManager &particle_system_manager,
-			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			sounds::SoundManager &sound_manager,
-			graphics::fonts::TextManager &text_manager);
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 
 		void set_camera_properties(const script_tree::ObjectNode &object, graphics::scene::Camera &camera);
 		void set_drawable_object_properties(const script_tree::ObjectNode &object, graphics::scene::DrawableObject &drawable,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
+			const ManagerRegister &managers);
 		void set_drawable_particle_system_properties(const script_tree::ObjectNode &object, graphics::scene::DrawableParticleSystem &particle_system,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
+			const ManagerRegister &managers);
 		void set_drawable_text_properties(const script_tree::ObjectNode &object, graphics::scene::DrawableText &text,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
+			const ManagerRegister &managers);
 		void set_light_properties(const script_tree::ObjectNode &object, graphics::scene::Light &light);
 		void set_model_properties(const script_tree::ObjectNode &object, graphics::scene::Model &model,
-			graphics::materials::MaterialManager &material_manager,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
+			const ManagerRegister &managers);
 		void set_movable_object_properties(const script_tree::ObjectNode &object, graphics::scene::MovableObject &movable);
 		void set_movable_sound_properties(const script_tree::ObjectNode &object, graphics::scene::MovableSound &sound);
 		void set_movable_sound_listener_properties(const script_tree::ObjectNode &object, graphics::scene::MovableSoundListener &sound_listener);
@@ -244,7 +221,7 @@ namespace ion::script::interfaces
 		
 		graphics::render::Frustum create_frustum(const script_tree::ObjectNode &object);
 		graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
+			const ManagerRegister &managers);
 
 		void create_action(const script_tree::ObjectNode &object,
 			graphics::scene::graph::animations::NodeAnimation &animation);
@@ -256,32 +233,23 @@ namespace ion::script::interfaces
 			graphics::scene::graph::animations::NodeAnimation &animation);
 
 		NonOwningPtr<graphics::scene::shapes::AnimatedSprite> create_animated_sprite(const script_tree::ObjectNode &object,
-			graphics::scene::Model &model,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::scene::Model &model, const ManagerRegister &managers);
 		NonOwningPtr<graphics::scene::shapes::Border> create_border(const script_tree::ObjectNode &object,
-			graphics::scene::Model &model,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::scene::Model &model, const ManagerRegister &managers);
 		NonOwningPtr<graphics::scene::shapes::Curve> create_curve(const script_tree::ObjectNode &object,
-			graphics::scene::Model &model,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::scene::Model &model, const ManagerRegister &managers);
 		NonOwningPtr<graphics::scene::shapes::Ellipse> create_ellipse(const script_tree::ObjectNode &object,
-			graphics::scene::Model &model,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::scene::Model &model, const ManagerRegister &managers);
 		NonOwningPtr<graphics::scene::shapes::Line> create_line(const script_tree::ObjectNode &object,
-			graphics::scene::Model &model,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::scene::Model &model, const ManagerRegister &managers);
 		NonOwningPtr<graphics::scene::shapes::Mesh> create_mesh(const script_tree::ObjectNode &object,
-			graphics::scene::Model &model,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::scene::Model &model, const ManagerRegister &managers);
 		NonOwningPtr<graphics::scene::shapes::Rectangle> create_rectangle(const script_tree::ObjectNode &object,
-			graphics::scene::Model &model,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::scene::Model &model, const ManagerRegister &managers);
 		NonOwningPtr<graphics::scene::shapes::Sprite> create_sprite(const script_tree::ObjectNode &object,
-			graphics::scene::Model &model,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::scene::Model &model, const ManagerRegister &managers);
 		NonOwningPtr<graphics::scene::shapes::Triangle> create_triangle(const script_tree::ObjectNode &object,
-			graphics::scene::Model &model,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::scene::Model &model, const ManagerRegister &managers);
 		
 		NonOwningPtr<graphics::scene::graph::animations::NodeAnimation> create_node_animation(const script_tree::ObjectNode &object,
 			graphics::scene::graph::SceneNode &parent_node);
@@ -290,45 +258,25 @@ namespace ion::script::interfaces
 		NonOwningPtr<graphics::scene::graph::animations::NodeAnimationTimeline> create_node_animation_timeline(const script_tree::ObjectNode &object,
 			graphics::scene::graph::SceneNode &parent_node);
 		NonOwningPtr<graphics::scene::graph::SceneNode> create_scene_node(const script_tree::ObjectNode &object,
-			graphics::scene::graph::SceneNode &parent_node,
-			graphics::scene::SceneManager &scene_manager,
-			graphics::materials::MaterialManager &material_manager,
-			graphics::particles::ParticleSystemManager &particle_system_manager,
-			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			sounds::SoundManager &sound_manager,
-			graphics::fonts::TextManager &text_manager);
+			graphics::scene::graph::SceneNode &parent_node, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 
 		NonOwningPtr<graphics::scene::Camera> create_camera(const script_tree::ObjectNode &object,
 			graphics::scene::SceneManager &scene_manager);
 		NonOwningPtr<graphics::scene::DrawableParticleSystem> create_drawable_particle_system(const script_tree::ObjectNode &object,
-			graphics::scene::SceneManager &scene_manager,
-			graphics::particles::ParticleSystemManager &particle_system_manager,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<graphics::scene::DrawableText> create_drawable_text(const script_tree::ObjectNode &object,
-			graphics::scene::SceneManager &scene_manager,
-			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			graphics::fonts::TextManager &text_manager);
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<graphics::scene::Light> create_light(const script_tree::ObjectNode &object,
 			graphics::scene::SceneManager &scene_manager);
 		NonOwningPtr<graphics::scene::Model> create_model(const script_tree::ObjectNode &object,
-			graphics::scene::SceneManager &scene_manager,
-			graphics::materials::MaterialManager &material_manager,
-			graphics::shaders::ShaderProgramManager &shader_program_manager);
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<graphics::scene::MovableSound> create_movable_sound(const script_tree::ObjectNode &object,
-			graphics::scene::SceneManager &scene_manager,
-			sounds::SoundManager &sound_manager);
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<graphics::scene::MovableSoundListener> create_movable_sound_listener(const script_tree::ObjectNode &object,
-			graphics::scene::SceneManager &scene_manager,
-			sounds::SoundManager &sound_manager);
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 
-		void create_scene(const ScriptTree &tree,
-			graphics::scene::graph::SceneNode &parent_node,
-			graphics::scene::SceneManager &scene_manager,
-			graphics::materials::MaterialManager &material_manager,
-			graphics::particles::ParticleSystemManager &particle_system_manager,
-			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			sounds::SoundManager &sound_manager,
-			graphics::fonts::TextManager &text_manager);
+		void create_scene(const ScriptTree &tree, graphics::scene::graph::SceneNode &parent_node,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 	} //scene_script_interface::detail
 
 
@@ -350,14 +298,12 @@ namespace ion::script::interfaces
 			*/
 
 			//Create scene from a script (or object file) with the given asset name
-			void CreateScene(std::string_view asset_name,
-				graphics::scene::graph::SceneNode &parent_node,
-				graphics::scene::SceneManager &scene_manager,
-				graphics::materials::MaterialManager &material_manager,
-				graphics::particles::ParticleSystemManager &particle_system_manager,
-				graphics::shaders::ShaderProgramManager &shader_program_manager,			
-				sounds::SoundManager &sound_manager,
-				graphics::fonts::TextManager &text_manager);
+			void CreateScene(std::string_view asset_name, graphics::scene::graph::SceneNode &parent_node,
+				graphics::scene::SceneManager &scene_manager);
+
+			//Create scene from a script (or object file) with the given asset name
+			void CreateScene(std::string_view asset_name, graphics::scene::graph::SceneNode &parent_node,
+				graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 	};
 } //ion::script::interfaces
 

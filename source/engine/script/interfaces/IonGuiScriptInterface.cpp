@@ -31,6 +31,21 @@ using namespace gui;
 namespace gui_script_interface::detail
 {
 
+NonOwningPtr<graphics::materials::Material> get_material(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &material_manager : managers.ObjectsOf<graphics::materials::MaterialManager>())
+	{
+		if (material_manager)
+		{
+			if (auto material = material_manager->GetMaterial(name); material)
+				return material;
+		}
+	}
+
+	return nullptr;
+}
+
+
 const skins::GuiSkin* get_skin(GuiController &gui_controller, std::string_view name) noexcept
 {
 	auto active_theme = gui_controller.ActiveTheme();
@@ -314,19 +329,19 @@ ScriptValidator get_gui_validator()
 */
 
 void set_gui_properties(const script_tree::ObjectNode &object, GuiController &gui_controller,
-	graphics::materials::MaterialManager &material_manager)
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	for (auto &obj : object.Objects())
 	{
 		if (obj.Name() == "frame")
-			create_gui_frame(obj, gui_controller, material_manager);
+			create_gui_frame(obj, gui_controller, scene_manager, managers);
 		else if (obj.Name() == "mouse-cursor")
-			create_gui_mouse_cursor(obj, gui_controller);
+			create_gui_mouse_cursor(obj, gui_controller, scene_manager, managers);
 		else if (obj.Name() == "tooltip")
-			create_gui_tooltip(obj, gui_controller);
+			create_gui_tooltip(obj, gui_controller, scene_manager, managers);
 	}
 
-	set_component_properties(object, gui_controller);
+	set_component_properties(object, gui_controller, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -339,7 +354,8 @@ void set_gui_properties(const script_tree::ObjectNode &object, GuiController &gu
 	}
 }
 
-void set_component_properties(const script_tree::ObjectNode &object, GuiComponent &component)
+void set_component_properties(const script_tree::ObjectNode &object, GuiComponent &component,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	for (auto &property : object.Properties())
 	{
@@ -358,16 +374,15 @@ void set_component_properties(const script_tree::ObjectNode &object, GuiComponen
 		if (obj.Name() == "scene-node")
 		{
 			if (auto node = component.Node(); node)
-				/*scene_script_interface::detail::set_scene_node_properties(object, *node,
-					scene_manager, material_manager, particle_system_manager, shader_program_manager, sound_manager, text_manager)*/;
+				scene_script_interface::detail::set_scene_node_properties(object, *node, scene_manager, managers);
 		}
 	}
 }
 
 void set_frame_properties(const script_tree::ObjectNode &object, GuiFrame &frame,
-	graphics::materials::MaterialManager &material_manager)
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_panel_container_properties(object, frame, material_manager);
+	set_panel_container_properties(object, frame, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -388,9 +403,9 @@ void set_frame_properties(const script_tree::ObjectNode &object, GuiFrame &frame
 }
 
 void set_panel_properties(const script_tree::ObjectNode &object, GuiPanel &panel,
-	graphics::materials::MaterialManager &material_manager)
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_panel_container_properties(object, panel, material_manager);
+	set_panel_container_properties(object, panel, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -448,43 +463,44 @@ void set_panel_properties(const script_tree::ObjectNode &object, GuiPanel &panel
 }
 
 void set_panel_container_properties(const script_tree::ObjectNode &object, GuiPanelContainer &container,
-	graphics::materials::MaterialManager &material_manager)
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	for (auto &obj : object.Objects())
 	{
 		if (obj.Name() == "panel")
-			create_gui_panel(obj, container, material_manager);
+			create_gui_panel(obj, container, scene_manager, managers);
 
 		//Controls
 		else if (obj.Name() == "button")
-			create_gui_button(obj, container);
+			create_gui_button(obj, container, scene_manager, managers);
 		else if (obj.Name() == "check-box")
-			create_gui_check_box(obj, container);
+			create_gui_check_box(obj, container, scene_manager, managers);
 		else if (obj.Name() == "group-box")
-			create_gui_group_box(obj, container);
+			create_gui_group_box(obj, container, scene_manager, managers);
 		else if (obj.Name() == "label")
-			create_gui_label(obj, container);
+			create_gui_label(obj, container, scene_manager, managers);
 		else if (obj.Name() == "list-box")
-			create_gui_list_box(obj, container, material_manager);
+			create_gui_list_box(obj, container, scene_manager, managers);
 		else if (obj.Name() == "progress-bar")
-			create_gui_progress_bar(obj, container);
+			create_gui_progress_bar(obj, container, scene_manager, managers);
 		else if (obj.Name() == "radio-button")
-			create_gui_radio_button(obj, container);
+			create_gui_radio_button(obj, container, scene_manager, managers);
 		else if (obj.Name() == "scroll-bar")
-			create_gui_scroll_bar(obj, container);
+			create_gui_scroll_bar(obj, container, scene_manager, managers);
 		else if (obj.Name() == "slider")
-			create_gui_slider(obj, container);
+			create_gui_slider(obj, container, scene_manager, managers);
 		else if (obj.Name() == "text-box")
-			create_gui_text_box(obj, container);
+			create_gui_text_box(obj, container, scene_manager, managers);
 	}
 
-	set_component_properties(object, container);
+	set_component_properties(object, container, scene_manager, managers);
 }
 
 
-void set_button_properties(const script_tree::ObjectNode &object, controls::GuiButton &button)
+void set_button_properties(const script_tree::ObjectNode &object, controls::GuiButton &button,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_control_properties(object, button);
+	set_control_properties(object, button, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -542,9 +558,10 @@ void set_button_properties(const script_tree::ObjectNode &object, controls::GuiB
 	}
 }
 
-void set_check_box_properties(const script_tree::ObjectNode &object, controls::GuiCheckBox &check_box)
+void set_check_box_properties(const script_tree::ObjectNode &object, controls::GuiCheckBox &check_box,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_control_properties(object, check_box);
+	set_control_properties(object, check_box, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -553,9 +570,10 @@ void set_check_box_properties(const script_tree::ObjectNode &object, controls::G
 	}
 }
 
-void set_control_properties(const script_tree::ObjectNode &object, controls::GuiControl &control)
+void set_control_properties(const script_tree::ObjectNode &object, controls::GuiControl &control,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_component_properties(object, control);
+	set_component_properties(object, control, scene_manager, managers);
 
 	auto hit_boxes = controls::gui_control::BoundingBoxes{};
 	auto has_hit_boxes = !std::empty(control.HitBoxes());
@@ -651,9 +669,10 @@ void set_control_properties(const script_tree::ObjectNode &object, controls::Gui
 		control.HitBoxes(std::move(hit_boxes));
 }
 
-void set_group_box_properties(const script_tree::ObjectNode &object, controls::GuiGroupBox &group_box)
+void set_group_box_properties(const script_tree::ObjectNode &object, controls::GuiGroupBox &group_box,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_control_properties(object, group_box);
+	set_control_properties(object, group_box, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -662,16 +681,17 @@ void set_group_box_properties(const script_tree::ObjectNode &object, controls::G
 	}
 }
 
-void set_label_properties(const script_tree::ObjectNode &object, controls::GuiLabel &label)
+void set_label_properties(const script_tree::ObjectNode &object, controls::GuiLabel &label,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_control_properties(object, label);
+	set_control_properties(object, label, scene_manager, managers);
 	//No label specific properties yet
 }
 
 void set_list_box_properties(const script_tree::ObjectNode &object, controls::GuiListBox &list_box,
-	graphics::materials::MaterialManager &material_manager)
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_scrollable_properties(object, list_box);
+	set_scrollable_properties(object, list_box, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -692,7 +712,7 @@ void set_list_box_properties(const script_tree::ObjectNode &object, controls::Gu
 		{
 			if (property.NumberOfArguments() == 2)
 				list_box.AddItem(property[0].Get<ScriptType::String>()->Get(),
-								 material_manager.GetMaterial(property[1].Get<ScriptType::String>()->Get()));
+								 get_material(property[1].Get<ScriptType::String>()->Get(), managers));
 			else
 				list_box.AddItem(property[0].Get<ScriptType::String>()->Get());
 		}
@@ -718,9 +738,10 @@ void set_list_box_properties(const script_tree::ObjectNode &object, controls::Gu
 	}
 }
 
-void set_mouse_cursor_properties(const script_tree::ObjectNode &object, controls::GuiMouseCursor &mouse_cursor)
+void set_mouse_cursor_properties(const script_tree::ObjectNode &object, controls::GuiMouseCursor &mouse_cursor,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_control_properties(object, mouse_cursor);
+	set_control_properties(object, mouse_cursor, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -751,9 +772,10 @@ void set_mouse_cursor_properties(const script_tree::ObjectNode &object, controls
 	}
 }
 
-void set_progress_bar_properties(const script_tree::ObjectNode &object, controls::GuiProgressBar &progress_bar)
+void set_progress_bar_properties(const script_tree::ObjectNode &object, controls::GuiProgressBar &progress_bar,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_control_properties(object, progress_bar);
+	set_control_properties(object, progress_bar, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -789,9 +811,10 @@ void set_progress_bar_properties(const script_tree::ObjectNode &object, controls
 	}
 }
 
-void set_radio_button_properties(const script_tree::ObjectNode &object, controls::GuiRadioButton &radio_button)
+void set_radio_button_properties(const script_tree::ObjectNode &object, controls::GuiRadioButton &radio_button,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_check_box_properties(object, radio_button);
+	set_check_box_properties(object, radio_button, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -800,9 +823,10 @@ void set_radio_button_properties(const script_tree::ObjectNode &object, controls
 	}
 }
 
-void set_scrollable_properties(const script_tree::ObjectNode &object, controls::GuiScrollable &scrollable)
+void set_scrollable_properties(const script_tree::ObjectNode &object, controls::GuiScrollable &scrollable,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_control_properties(object, scrollable);
+	set_control_properties(object, scrollable, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -819,9 +843,10 @@ void set_scrollable_properties(const script_tree::ObjectNode &object, controls::
 	}
 }
 
-void set_scroll_bar_properties(const script_tree::ObjectNode &object, controls::GuiScrollBar &scroll_bar)
+void set_scroll_bar_properties(const script_tree::ObjectNode &object, controls::GuiScrollBar &scroll_bar,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_slider_properties(object, scroll_bar);
+	set_slider_properties(object, scroll_bar, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -836,9 +861,10 @@ void set_scroll_bar_properties(const script_tree::ObjectNode &object, controls::
 	}
 }
 
-void set_slider_properties(const script_tree::ObjectNode &object, controls::GuiSlider &slider)
+void set_slider_properties(const script_tree::ObjectNode &object, controls::GuiSlider &slider,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_control_properties(object, slider);
+	set_control_properties(object, slider, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -863,9 +889,10 @@ void set_slider_properties(const script_tree::ObjectNode &object, controls::GuiS
 	}
 }
 
-void set_text_box_properties(const script_tree::ObjectNode &object, controls::GuiTextBox &text_box)
+void set_text_box_properties(const script_tree::ObjectNode &object, controls::GuiTextBox &text_box,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_scrollable_properties(object, text_box);
+	set_scrollable_properties(object, text_box, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -924,9 +951,10 @@ void set_text_box_properties(const script_tree::ObjectNode &object, controls::Gu
 	}
 }
 
-void set_tooltip_properties(const script_tree::ObjectNode &object, controls::GuiTooltip &tooltip)
+void set_tooltip_properties(const script_tree::ObjectNode &object, controls::GuiTooltip &tooltip,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
-	set_control_properties(object, tooltip);
+	set_control_properties(object, tooltip, scene_manager, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -951,8 +979,7 @@ void set_tooltip_properties(const script_tree::ObjectNode &object, controls::Gui
 
 
 NonOwningPtr<GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
-	GuiController &gui_controller,
-	graphics::materials::MaterialManager &material_manager)
+	GuiController &gui_controller, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -961,14 +988,13 @@ NonOwningPtr<GuiFrame> create_gui_frame(const script_tree::ObjectNode &object,
 	auto frame = gui_controller.CreateFrame(std::move(name));
 
 	if (frame)
-		set_frame_properties(object, *frame, material_manager);
+		set_frame_properties(object, *frame, scene_manager, managers);
 
 	return frame;
 }
 
 NonOwningPtr<GuiPanel> create_gui_panel(const script_tree::ObjectNode &object,
-	GuiPanelContainer &container,
-	graphics::materials::MaterialManager &material_manager)
+	GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -977,14 +1003,14 @@ NonOwningPtr<GuiPanel> create_gui_panel(const script_tree::ObjectNode &object,
 	auto panel = container.CreatePanel(std::move(name));
 
 	if (panel)
-		set_panel_properties(object, *panel, material_manager);
+		set_panel_properties(object, *panel, scene_manager, managers);
 
 	return panel;
 }
 
 
 NonOwningPtr<controls::GuiButton> create_gui_button(const script_tree::ObjectNode &object,
-	GuiPanelContainer &container)
+	GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -1031,13 +1057,13 @@ NonOwningPtr<controls::GuiButton> create_gui_button(const script_tree::ObjectNod
 		}();
 
 	if (button)
-		set_button_properties(object, *button);
+		set_button_properties(object, *button, scene_manager, managers);
 
 	return button;
 }
 
 NonOwningPtr<controls::GuiCheckBox> create_gui_check_box(const script_tree::ObjectNode &object,
-	GuiPanelContainer &container)
+	GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -1084,13 +1110,13 @@ NonOwningPtr<controls::GuiCheckBox> create_gui_check_box(const script_tree::Obje
 		}();
 
 	if (check_box)
-		set_check_box_properties(object, *check_box);
+		set_check_box_properties(object, *check_box, scene_manager, managers);
 
 	return check_box;
 }
 
 NonOwningPtr<controls::GuiGroupBox> create_gui_group_box(const script_tree::ObjectNode &object,
-	GuiPanelContainer &container)
+	GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -1131,13 +1157,13 @@ NonOwningPtr<controls::GuiGroupBox> create_gui_group_box(const script_tree::Obje
 		}();
 
 	if (group_box)
-		set_group_box_properties(object, *group_box);
+		set_group_box_properties(object, *group_box, scene_manager, managers);
 
 	return group_box;
 }
 
 NonOwningPtr<controls::GuiLabel> create_gui_label(const script_tree::ObjectNode &object,
-	GuiPanelContainer &container)
+	GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -1178,14 +1204,13 @@ NonOwningPtr<controls::GuiLabel> create_gui_label(const script_tree::ObjectNode 
 		}();
 
 	if (label)
-		set_label_properties(object, *label);
+		set_label_properties(object, *label, scene_manager, managers);
 
 	return label;
 }
 
 NonOwningPtr<controls::GuiListBox> create_gui_list_box(const script_tree::ObjectNode &object,
-	GuiPanelContainer &container,
-	graphics::materials::MaterialManager &material_manager)
+	GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -1226,13 +1251,13 @@ NonOwningPtr<controls::GuiListBox> create_gui_list_box(const script_tree::Object
 		}();
 
 	if (list_box)
-		set_list_box_properties(object, *list_box, material_manager);
+		set_list_box_properties(object, *list_box, scene_manager, managers);
 
 	return list_box;
 }
 
 NonOwningPtr<controls::GuiMouseCursor> create_gui_mouse_cursor(const script_tree::ObjectNode &object,
-	GuiController &gui_controller)
+	GuiController &gui_controller, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -1264,13 +1289,13 @@ NonOwningPtr<controls::GuiMouseCursor> create_gui_mouse_cursor(const script_tree
 		}();
 
 	if (mouse_cursor)
-		set_mouse_cursor_properties(object, *mouse_cursor);
+		set_mouse_cursor_properties(object, *mouse_cursor, scene_manager, managers);
 
 	return mouse_cursor;
 }
 
 NonOwningPtr<controls::GuiProgressBar> create_gui_progress_bar(const script_tree::ObjectNode &object,
-	GuiPanelContainer &container)
+	GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -1311,13 +1336,13 @@ NonOwningPtr<controls::GuiProgressBar> create_gui_progress_bar(const script_tree
 		}();
 
 	if (progress_bar)
-		set_progress_bar_properties(object, *progress_bar);
+		set_progress_bar_properties(object, *progress_bar, scene_manager, managers);
 
 	return progress_bar;
 }
 
 NonOwningPtr<controls::GuiRadioButton> create_gui_radio_button(const script_tree::ObjectNode &object,
-	GuiPanelContainer &container)
+	GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -1364,13 +1389,13 @@ NonOwningPtr<controls::GuiRadioButton> create_gui_radio_button(const script_tree
 		}();
 
 	if (radio_button)
-		set_radio_button_properties(object, *radio_button);
+		set_radio_button_properties(object, *radio_button, scene_manager, managers);
 
 	return radio_button;
 }
 
 NonOwningPtr<controls::GuiScrollBar> create_gui_scroll_bar(const script_tree::ObjectNode &object,
-	GuiPanelContainer &container)
+	GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -1420,13 +1445,13 @@ NonOwningPtr<controls::GuiScrollBar> create_gui_scroll_bar(const script_tree::Ob
 		}();
 
 	if (scroll_bar)
-		set_scroll_bar_properties(object, *scroll_bar);
+		set_scroll_bar_properties(object, *scroll_bar, scene_manager, managers);
 
 	return scroll_bar;
 }
 
 NonOwningPtr<controls::GuiSlider> create_gui_slider(const script_tree::ObjectNode &object,
-	GuiPanelContainer &container)
+	GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -1482,13 +1507,13 @@ NonOwningPtr<controls::GuiSlider> create_gui_slider(const script_tree::ObjectNod
 		}();
 
 	if (slider)
-		set_slider_properties(object, *slider);
+		set_slider_properties(object, *slider, scene_manager, managers);
 
 	return slider;
 }
 
 NonOwningPtr<controls::GuiTextBox> create_gui_text_box(const script_tree::ObjectNode &object,
-	GuiPanelContainer &container)
+	GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -1529,13 +1554,13 @@ NonOwningPtr<controls::GuiTextBox> create_gui_text_box(const script_tree::Object
 		}();
 
 	if (text_box)
-		set_text_box_properties(object, *text_box);
+		set_text_box_properties(object, *text_box, scene_manager, managers);
 
 	return text_box;
 }
 
 NonOwningPtr<controls::GuiTooltip> create_gui_tooltip(const script_tree::ObjectNode &object,
-	GuiController &gui_controller)
+	GuiController &gui_controller, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -1567,20 +1592,19 @@ NonOwningPtr<controls::GuiTooltip> create_gui_tooltip(const script_tree::ObjectN
 		}();
 
 	if (tooltip)
-		set_tooltip_properties(object, *tooltip);
+		set_tooltip_properties(object, *tooltip, scene_manager, managers);
 
 	return tooltip;
 }
 
 
-void create_gui(const ScriptTree &tree,
-	GuiController &gui_controller,
-	graphics::materials::MaterialManager &material_manager)
+void create_gui(const ScriptTree &tree, GuiController &gui_controller,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "gui")
-			set_gui_properties(object, gui_controller, material_manager);
+			set_gui_properties(object, gui_controller, scene_manager, managers);
 	}
 }
 
@@ -1602,12 +1626,18 @@ ScriptValidator GuiScriptInterface::GetValidator() const
 	Creating from script
 */
 
-void GuiScriptInterface::CreateGui(std::string_view asset_name,
-	GuiController &gui_controller,
-	graphics::materials::MaterialManager &material_manager)
+void GuiScriptInterface::CreateGui(std::string_view asset_name, GuiController &gui_controller,
+	graphics::scene::SceneManager &scene_manager)
 {
 	if (Load(asset_name))
-		detail::create_gui(*tree_, gui_controller, material_manager);
+		detail::create_gui(*tree_, gui_controller, scene_manager, Managers());
+}
+
+void GuiScriptInterface::CreateGui(std::string_view asset_name, GuiController &gui_controller,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
+{
+	if (Load(asset_name))
+		detail::create_gui(*tree_, gui_controller, scene_manager, managers);
 }
 
 } //ion::script::interfaces

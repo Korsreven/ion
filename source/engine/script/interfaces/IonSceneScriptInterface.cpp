@@ -36,6 +36,105 @@ using namespace graphics::scene;
 namespace scene_script_interface::detail
 {
 
+NonOwningPtr<graphics::materials::Material> get_material(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &material_manager : managers.ObjectsOf<graphics::materials::MaterialManager>())
+	{
+		if (material_manager)
+		{
+			if (auto material = material_manager->GetMaterial(name); material)
+				return material;
+		}
+	}
+
+	return nullptr;
+}
+
+NonOwningPtr<graphics::particles::ParticleSystem> get_particle_system(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &particle_system_manager : managers.ObjectsOf<graphics::particles::ParticleSystemManager>())
+	{
+		if (particle_system_manager)
+		{
+			if (auto particle_system = particle_system_manager->GetParticleSystem(name); particle_system)
+				return particle_system;
+		}
+	}
+
+	return nullptr;
+}
+
+NonOwningPtr<graphics::shaders::ShaderProgram> get_shader_program(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &shader_program_manager : managers.ObjectsOf<graphics::shaders::ShaderProgramManager>())
+	{
+		if (shader_program_manager)
+		{
+			if (auto shader_program = shader_program_manager->GetShaderProgram(name); shader_program)
+				return shader_program;
+		}
+	}
+
+	return nullptr;
+}
+
+NonOwningPtr<sounds::Sound> get_sound(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &sound_manager : managers.ObjectsOf<sounds::SoundManager>())
+	{
+		if (sound_manager)
+		{
+			if (auto sound = sound_manager->GetSound(name); sound)
+				return sound;
+		}
+	}
+
+	return nullptr;
+}
+
+NonOwningPtr<sounds::SoundChannelGroup> get_sound_channel_group(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &sound_manager : managers.ObjectsOf<sounds::SoundManager>())
+	{
+		if (sound_manager)
+		{
+			if (auto sound_channel_group = sound_manager->GetSoundChannelGroup(name); sound_channel_group)
+				return sound_channel_group;
+		}
+	}
+
+	return nullptr;
+}
+
+NonOwningPtr<sounds::SoundListener> get_sound_listener(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &sound_manager : managers.ObjectsOf<sounds::SoundManager>())
+	{
+		if (sound_manager)
+		{
+			if (auto sound_listener = sound_manager->GetSoundListener(name); sound_listener)
+				return sound_listener;
+		}
+	}
+
+	return nullptr;
+}
+
+NonOwningPtr<graphics::fonts::Text> get_text(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &text_manager : managers.ObjectsOf<graphics::fonts::TextManager>())
+	{
+		if (text_manager)
+		{
+			if (auto text = text_manager->GetText(name); text)
+				return text;
+		}
+	}
+
+	return nullptr;
+}
+
+
 graph::animations::node_animation::MotionTechniqueType get_motion_technique_type(const script_tree::ArgumentNode &arg)
 {
 	auto name = arg
@@ -547,7 +646,7 @@ void set_frustum_properties(const script_tree::ObjectNode &object, graphics::ren
 }
 
 void set_pass_properties(const script_tree::ObjectNode &object, graphics::render::Pass &pass,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
+	const ManagerRegister &managers)
 {
 	for (auto &property : object.Properties())
 	{
@@ -569,15 +668,15 @@ void set_pass_properties(const script_tree::ObjectNode &object, graphics::render
 		else if (property.Name() == "iterations")
 			pass.Iterations(property[0].Get<ScriptType::Integer>()->As<int>());
 		else if (property.Name() == "shader-program")
-			pass.RenderProgram(shader_program_manager.GetShaderProgram(property[0].Get<ScriptType::String>()->Get()));
+			pass.RenderProgram(get_shader_program(property[0].Get<ScriptType::String>()->Get(), managers));
 	}
 }
 
 
 void set_animated_sprite_properties(const script_tree::ObjectNode &object, shapes::AnimatedSprite &animated_sprite,
-	graphics::materials::MaterialManager &material_manager)
+	const ManagerRegister &managers)
 {
-	set_sprite_properties(object, animated_sprite, material_manager);
+	set_sprite_properties(object, animated_sprite, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -596,9 +695,9 @@ void set_animated_sprite_properties(const script_tree::ObjectNode &object, shape
 }
 
 void set_border_properties(const script_tree::ObjectNode &object, shapes::Border &border,
-	graphics::materials::MaterialManager &material_manager)
+	const ManagerRegister &managers)
 {
-	set_rectangle_properties(object, border, material_manager);
+	set_rectangle_properties(object, border, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -628,9 +727,9 @@ void set_border_properties(const script_tree::ObjectNode &object, shapes::Border
 }
 
 void set_curve_properties(const script_tree::ObjectNode &object, shapes::Curve &curve,
-	graphics::materials::MaterialManager &material_manager)
+	const ManagerRegister &managers)
 {
-	set_shape_properties(object, curve, material_manager);
+	set_shape_properties(object, curve, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -642,9 +741,9 @@ void set_curve_properties(const script_tree::ObjectNode &object, shapes::Curve &
 }
 
 void set_ellipse_properties(const script_tree::ObjectNode &object, shapes::Ellipse &ellipse,
-	graphics::materials::MaterialManager &material_manager)
+	const ManagerRegister &managers)
 {
-	set_shape_properties(object, ellipse, material_manager);
+	set_shape_properties(object, ellipse, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -662,9 +761,9 @@ void set_ellipse_properties(const script_tree::ObjectNode &object, shapes::Ellip
 }
 
 void set_line_properties(const script_tree::ObjectNode &object, shapes::Line &line,
-	graphics::materials::MaterialManager &material_manager)
+	const ManagerRegister &managers)
 {
-	set_shape_properties(object, line, material_manager);
+	set_shape_properties(object, line, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -678,7 +777,7 @@ void set_line_properties(const script_tree::ObjectNode &object, shapes::Line &li
 }
 
 void set_mesh_properties(const script_tree::ObjectNode &object, shapes::Mesh &mesh,
-	graphics::materials::MaterialManager &material_manager)
+	const ManagerRegister &managers)
 {
 	for (auto &property : object.Properties())
 	{
@@ -708,7 +807,7 @@ void set_mesh_properties(const script_tree::ObjectNode &object, shapes::Mesh &me
 		else if (property.Name() == "include-bounding-volumes")
 			mesh.IncludeBoundingVolumes(property[0].Get<ScriptType::Boolean>()->Get());
 		else if (property.Name() == "material" || property.Name() == "surface-material")
-			mesh.SurfaceMaterial(material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get()));
+			mesh.SurfaceMaterial(get_material(property[0].Get<ScriptType::String>()->Get(), managers));
 		else if (property.Name() == "opacity" || property.Name() == "vertex-opacity")
 			mesh.VertexOpacity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "show-wireframe")
@@ -726,9 +825,9 @@ void set_mesh_properties(const script_tree::ObjectNode &object, shapes::Mesh &me
 }
 
 void set_rectangle_properties(const script_tree::ObjectNode &object, shapes::Rectangle &rectangle,
-	graphics::materials::MaterialManager &material_manager)
+	const ManagerRegister &managers)
 {
-	set_shape_properties(object, rectangle, material_manager);
+	set_shape_properties(object, rectangle, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -750,9 +849,9 @@ void set_rectangle_properties(const script_tree::ObjectNode &object, shapes::Rec
 }
 
 void set_shape_properties(const script_tree::ObjectNode &object, shapes::Shape &shape,
-	graphics::materials::MaterialManager &material_manager)
+	const ManagerRegister &managers)
 {
-	set_mesh_properties(object, shape, material_manager);
+	set_mesh_properties(object, shape, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -764,9 +863,9 @@ void set_shape_properties(const script_tree::ObjectNode &object, shapes::Shape &
 }
 
 void set_sprite_properties(const script_tree::ObjectNode &object, shapes::Sprite &sprite,
-	graphics::materials::MaterialManager &material_manager)
+	const ManagerRegister &managers)
 {
-	set_rectangle_properties(object, sprite, material_manager);
+	set_rectangle_properties(object, sprite, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -794,9 +893,9 @@ void set_sprite_properties(const script_tree::ObjectNode &object, shapes::Sprite
 }
 
 void set_triangle_properties(const script_tree::ObjectNode &object, shapes::Triangle &triangle,
-	graphics::materials::MaterialManager &material_manager)
+	const ManagerRegister &managers)
 {
-	set_shape_properties(object, triangle, material_manager);
+	set_shape_properties(object, triangle, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -889,12 +988,7 @@ void set_node_animation_timeline_properties(const script_tree::ObjectNode &objec
 }
 
 void set_scene_node_properties(const script_tree::ObjectNode &object, graph::SceneNode &scene_node,
-	SceneManager &scene_manager,
-	graphics::materials::MaterialManager &material_manager,
-	graphics::particles::ParticleSystemManager &particle_system_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager,
-	sounds::SoundManager &sound_manager,
-	graphics::fonts::TextManager &text_manager)
+	SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	for (auto &property : object.Properties())
 	{
@@ -945,17 +1039,17 @@ void set_scene_node_properties(const script_tree::ObjectNode &object, graph::Sce
 		if (obj.Name() == "camera")
 			create_camera(obj, scene_manager);
 		else if (obj.Name() == "drawable-particle-system")
-			create_drawable_particle_system(obj, scene_manager, particle_system_manager, shader_program_manager);
+			create_drawable_particle_system(obj, scene_manager, managers);
 		else if (obj.Name() == "drawable-text")
-			create_drawable_text(obj, scene_manager, shader_program_manager, text_manager);
+			create_drawable_text(obj, scene_manager, managers);
 		else if (obj.Name() == "light")
 			create_light(obj, scene_manager);
 		else if (obj.Name() == "model")
-			create_model(obj, scene_manager, material_manager, shader_program_manager);
+			create_model(obj, scene_manager, managers);
 		else if (obj.Name() == "movable-sound")
-			create_movable_sound(obj, scene_manager, sound_manager);
+			create_movable_sound(obj, scene_manager, managers);
 		else if (obj.Name() == "movable-sound-listener")
-			create_movable_sound_listener(obj, scene_manager, sound_manager);
+			create_movable_sound_listener(obj, scene_manager, managers);
 
 		else if (obj.Name() == "node-animation")
 			create_node_animation(obj, scene_node);
@@ -964,8 +1058,7 @@ void set_scene_node_properties(const script_tree::ObjectNode &object, graph::Sce
 		else if (obj.Name() == "node-animation-timeline")
 			create_node_animation_timeline(obj, scene_node);
 		else if (obj.Name() == "scene-node")
-			create_scene_node(obj, scene_node,
-				scene_manager, material_manager, particle_system_manager, shader_program_manager, sound_manager, text_manager);
+			create_scene_node(obj, scene_node, scene_manager, managers);
 	}
 }
 
@@ -986,14 +1079,14 @@ void set_camera_properties(const script_tree::ObjectNode &object, Camera &camera
 }
 
 void set_drawable_object_properties(const script_tree::ObjectNode &object, DrawableObject &drawable_object,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
+	const ManagerRegister &managers)
 {
 	set_movable_object_properties(object, drawable_object);
 
 	for (auto &obj : object.Objects())
 	{
 		if (obj.Name() == "pass")
-			drawable_object.AddPass(create_pass(obj, shader_program_manager));
+			drawable_object.AddPass(create_pass(obj, managers));
 	}
 
 	for (auto &property : object.Properties())
@@ -1004,15 +1097,15 @@ void set_drawable_object_properties(const script_tree::ObjectNode &object, Drawa
 }
 
 void set_drawable_particle_system_properties(const script_tree::ObjectNode &object, DrawableParticleSystem &particle_system,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
+	const ManagerRegister &managers)
 {
-	set_drawable_object_properties(object, particle_system, shader_program_manager);
+	set_drawable_object_properties(object, particle_system, managers);
 }
 
 void set_drawable_text_properties(const script_tree::ObjectNode &object, DrawableText &text,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
+	const ManagerRegister &managers)
 {
-	set_drawable_object_properties(object, text, shader_program_manager);
+	set_drawable_object_properties(object, text, managers);
 
 	for (auto &property : object.Properties())
 	{
@@ -1060,31 +1153,30 @@ void set_light_properties(const script_tree::ObjectNode &object, Light &light)
 }
 
 void set_model_properties(const script_tree::ObjectNode &object, Model &model,
-	graphics::materials::MaterialManager &material_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
+	const ManagerRegister &managers)
 {
-	set_drawable_object_properties(object, model, shader_program_manager);
+	set_drawable_object_properties(object, model, managers);
 
 	for (auto &obj : object.Objects())
 	{
 		if (obj.Name() == "animated-sprite")
-			create_animated_sprite(obj, model, material_manager);
+			create_animated_sprite(obj, model, managers);
 		else if (obj.Name() == "border")
-			create_border(obj, model, material_manager);
+			create_border(obj, model, managers);
 		else if (obj.Name() == "curve")
-			create_curve(obj, model, material_manager);
+			create_curve(obj, model, managers);
 		else if (obj.Name() == "ellipse")
-			create_ellipse(obj, model, material_manager);
+			create_ellipse(obj, model, managers);
 		else if (obj.Name() == "line")
-			create_line(obj, model, material_manager);
+			create_line(obj, model, managers);
 		else if (obj.Name() == "mesh")
-			create_mesh(obj, model, material_manager);
+			create_mesh(obj, model, managers);
 		else if (obj.Name() == "rectangle")
-			create_rectangle(obj, model, material_manager);
+			create_rectangle(obj, model, managers);
 		else if (obj.Name() == "sprite")
-			create_sprite(obj, model, material_manager);
+			create_sprite(obj, model, managers);
 		else if (obj.Name() == "triangle")
-			create_triangle(obj, model, material_manager);
+			create_triangle(obj, model, managers);
 	}
 }
 
@@ -1147,10 +1239,10 @@ graphics::render::Frustum create_frustum(const script_tree::ObjectNode &object)
 }
 
 graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
+	const ManagerRegister &managers)
 {
 	graphics::render::Pass pass;
-	set_pass_properties(object, pass, shader_program_manager);
+	set_pass_properties(object, pass, managers);
 	return pass;
 }
 
@@ -1277,8 +1369,7 @@ void create_translating_motion(const script_tree::ObjectNode &object,
 
 
 NonOwningPtr<shapes::AnimatedSprite> create_animated_sprite(const script_tree::ObjectNode &object,
-	Model &model,
-	graphics::materials::MaterialManager &material_manager)
+	Model &model, const ManagerRegister &managers)
 {
 	auto position = object
 		.Property("position")[0]
@@ -1300,17 +1391,16 @@ NonOwningPtr<shapes::AnimatedSprite> create_animated_sprite(const script_tree::O
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
 	auto animated_sprite = model.CreateMesh<shapes::AnimatedSprite>(position, rotation, size,
-		material_manager.GetMaterial(material_name), color, visible);
+		get_material(material_name, managers), color, visible);
 
 	if (animated_sprite)
-		set_animated_sprite_properties(object, *animated_sprite, material_manager);
+		set_animated_sprite_properties(object, *animated_sprite, managers);
 
 	return animated_sprite;
 }
 
 NonOwningPtr<shapes::Border> create_border(const script_tree::ObjectNode &object,
-	Model &model,
-	graphics::materials::MaterialManager &material_manager)
+	Model &model, const ManagerRegister &managers)
 {
 	auto position = object
 		.Property("position")[0]
@@ -1348,14 +1438,13 @@ NonOwningPtr<shapes::Border> create_border(const script_tree::ObjectNode &object
 	auto border = model.CreateMesh<shapes::Border>(position, rotation, size, border_size, corner_style, color, visible);
 
 	if (border)
-		set_border_properties(object, *border, material_manager);
+		set_border_properties(object, *border, managers);
 
 	return border;
 }
 
 NonOwningPtr<shapes::Curve> create_curve(const script_tree::ObjectNode &object,
-	Model &model,
-	graphics::materials::MaterialManager &material_manager)
+	Model &model, const ManagerRegister &managers)
 {
 	auto color = object
 		.Property("color")[0]
@@ -1381,14 +1470,13 @@ NonOwningPtr<shapes::Curve> create_curve(const script_tree::ObjectNode &object,
 	auto curve = model.CreateMesh<shapes::Curve>(std::move(control_points), color, thickness, smoothness, visible);
 
 	if (curve)
-		set_curve_properties(object, *curve, material_manager);
+		set_curve_properties(object, *curve, managers);
 
 	return curve;
 }
 
 NonOwningPtr<shapes::Ellipse> create_ellipse(const script_tree::ObjectNode &object,
-	Model &model,
-	graphics::materials::MaterialManager &material_manager)
+	Model &model, const ManagerRegister &managers)
 {
 	auto position = object
 		.Property("position")[0]
@@ -1412,14 +1500,13 @@ NonOwningPtr<shapes::Ellipse> create_ellipse(const script_tree::ObjectNode &obje
 	auto ellipse = model.CreateMesh<shapes::Ellipse>(position, rotation, size, color, sides, visible);
 
 	if (ellipse)
-		set_ellipse_properties(object, *ellipse, material_manager);
+		set_ellipse_properties(object, *ellipse, managers);
 
 	return ellipse;
 }
 
 NonOwningPtr<shapes::Line> create_line(const script_tree::ObjectNode &object,
-	Model &model,
-	graphics::materials::MaterialManager &material_manager)
+	Model &model, const ManagerRegister &managers)
 {
 	auto a = object
 		.Property("a")[0]
@@ -1440,14 +1527,13 @@ NonOwningPtr<shapes::Line> create_line(const script_tree::ObjectNode &object,
 	auto line = model.CreateMesh<shapes::Line>(a, b, color, thickness, visible);
 
 	if (line)
-		set_line_properties(object, *line, material_manager);
+		set_line_properties(object, *line, managers);
 
 	return line;
 }
 
 NonOwningPtr<shapes::Mesh> create_mesh(const script_tree::ObjectNode &object,
-	Model &model,
-	graphics::materials::MaterialManager &material_manager)
+	Model &model, const ManagerRegister &managers)
 {
 	auto draw_mode_name = object
 		.Property("draw-mode")[0]
@@ -1526,17 +1612,16 @@ NonOwningPtr<shapes::Mesh> create_mesh(const script_tree::ObjectNode &object,
 		}();
 
 	auto mesh = model.CreateMesh(draw_mode, vertices,
-		material_manager.GetMaterial(material_name), tex_coord_mode, visible);
+		get_material(material_name, managers), tex_coord_mode, visible);
 
 	if (mesh)
-		set_mesh_properties(object, *mesh, material_manager);
+		set_mesh_properties(object, *mesh, managers);
 
 	return mesh;
 }
 
 NonOwningPtr<shapes::Rectangle> create_rectangle(const script_tree::ObjectNode &object,
-	Model &model,
-	graphics::materials::MaterialManager &material_manager)
+	Model &model, const ManagerRegister &managers)
 {
 	auto position = object
 		.Property("position")[0]
@@ -1557,14 +1642,13 @@ NonOwningPtr<shapes::Rectangle> create_rectangle(const script_tree::ObjectNode &
 	auto rectangle = model.CreateMesh<shapes::Rectangle>(position, rotation, size, color, visible);
 
 	if (rectangle)
-		set_rectangle_properties(object, *rectangle, material_manager);
+		set_rectangle_properties(object, *rectangle, managers);
 
 	return rectangle;
 }
 
 NonOwningPtr<shapes::Sprite> create_sprite(const script_tree::ObjectNode &object,
-	Model &model,
-	graphics::materials::MaterialManager &material_manager)
+	Model &model, const ManagerRegister &managers)
 {
 	auto position = object
 		.Property("position")[0]
@@ -1586,17 +1670,16 @@ NonOwningPtr<shapes::Sprite> create_sprite(const script_tree::ObjectNode &object
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
 	auto sprite = model.CreateMesh<shapes::Sprite>(position, rotation, size,
-		material_manager.GetMaterial(material_name), color, visible);
+		get_material(material_name, managers), color, visible);
 
 	if (sprite)
-		set_sprite_properties(object, *sprite, material_manager);
+		set_sprite_properties(object, *sprite, managers);
 
 	return sprite;
 }
 
 NonOwningPtr<shapes::Triangle> create_triangle(const script_tree::ObjectNode &object,
-	Model &model,
-	graphics::materials::MaterialManager &material_manager)
+	Model &model, const ManagerRegister &managers)
 {
 	auto a = object
 		.Property("a")[0]
@@ -1617,7 +1700,7 @@ NonOwningPtr<shapes::Triangle> create_triangle(const script_tree::ObjectNode &ob
 	auto triangle = model.CreateMesh<shapes::Triangle>(a, b, c, color, visible);
 
 	if (triangle)
-		set_triangle_properties(object, *triangle, material_manager);
+		set_triangle_properties(object, *triangle, managers);
 
 	return triangle;
 }
@@ -1679,13 +1762,7 @@ NonOwningPtr<graph::animations::NodeAnimationTimeline> create_node_animation_tim
 }
 
 NonOwningPtr<graph::SceneNode> create_scene_node(const script_tree::ObjectNode &object,
-	graph::SceneNode &parent_node,
-	SceneManager &scene_manager,
-	graphics::materials::MaterialManager &material_manager,
-	graphics::particles::ParticleSystemManager &particle_system_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager,
-	sounds::SoundManager &sound_manager,
-	graphics::fonts::TextManager &text_manager)
+	graph::SceneNode &parent_node, SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name =
 		[&]() noexcept -> std::optional<std::string>
@@ -1708,15 +1785,14 @@ NonOwningPtr<graph::SceneNode> create_scene_node(const script_tree::ObjectNode &
 	auto node = parent_node.CreateChildNode(std::move(name), position, initial_direction, visible);
 
 	if (node)
-		set_scene_node_properties(object, *node,
-			scene_manager, material_manager, particle_system_manager, shader_program_manager, sound_manager, text_manager);
+		set_scene_node_properties(object, *node, scene_manager, managers);
 
 	return node;
 }
 
 
 NonOwningPtr<Camera> create_camera(const script_tree::ObjectNode &object,
-	SceneManager &scene_manager)
+	graphics::scene::SceneManager &scene_manager)
 {
 	auto name =
 		[&]() noexcept -> std::optional<std::string>
@@ -1747,9 +1823,7 @@ NonOwningPtr<Camera> create_camera(const script_tree::ObjectNode &object,
 }
 
 NonOwningPtr<DrawableParticleSystem> create_drawable_particle_system(const script_tree::ObjectNode &object,
-	SceneManager &scene_manager,
-	graphics::particles::ParticleSystemManager &particle_system_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
+	SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name =
 		[&]() noexcept -> std::optional<std::string>
@@ -1761,24 +1835,22 @@ NonOwningPtr<DrawableParticleSystem> create_drawable_particle_system(const scrip
 		}();
 	auto particle_system_name = object
 		.Property("particle-system")[0]
-		.Get<ScriptType::String>().value_or(""s).Get();
+		.Get<ScriptType::String>()->Get();
 	auto visible = object
 		.Property("visible")[0]
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
-	auto particle_system = scene_manager.CreateParticleSystem(std::move(name),
-		particle_system_manager.GetParticleSystem(particle_system_name), visible);
+	auto drawable_particle_system = scene_manager.CreateParticleSystem(std::move(name),
+		get_particle_system(particle_system_name, managers), visible);
 
-	if (particle_system)
-		set_drawable_particle_system_properties(object, *particle_system, shader_program_manager);
+	if (drawable_particle_system)
+		set_drawable_particle_system_properties(object, *drawable_particle_system, managers);
 
-	return particle_system;
+	return drawable_particle_system;
 }
 
 NonOwningPtr<DrawableText> create_drawable_text(const script_tree::ObjectNode &object,
-	SceneManager &scene_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager,
-	graphics::fonts::TextManager &text_manager)
+	SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name =
 		[&]() noexcept -> std::optional<std::string>
@@ -1796,18 +1868,18 @@ NonOwningPtr<DrawableText> create_drawable_text(const script_tree::ObjectNode &o
 		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>());
 	auto text_name = object
 		.Property("text")[0]
-		.Get<ScriptType::String>().value_or(""s).Get();
+		.Get<ScriptType::String>()->Get();
 	auto visible = object
 		.Property("visible")[0]
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
-	auto text = scene_manager.CreateText(std::move(name), position, rotation,
-		text_manager.GetText(text_name), visible);
+	auto drawable_text = scene_manager.CreateText(std::move(name), position, rotation,
+		get_text(text_name, managers), visible);
 
-	if (text)
-		set_drawable_text_properties(object, *text, shader_program_manager);
+	if (drawable_text)
+		set_drawable_text_properties(object, *drawable_text, managers);
 
-	return text;
+	return drawable_text;
 }
 
 NonOwningPtr<Light> create_light(const script_tree::ObjectNode &object,
@@ -1834,9 +1906,7 @@ NonOwningPtr<Light> create_light(const script_tree::ObjectNode &object,
 }
 
 NonOwningPtr<Model> create_model(const script_tree::ObjectNode &object,
-	SceneManager &scene_manager,
-	graphics::materials::MaterialManager &material_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager)
+	SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name =
 		[&]() noexcept -> std::optional<std::string>
@@ -1853,14 +1923,13 @@ NonOwningPtr<Model> create_model(const script_tree::ObjectNode &object,
 	auto model = scene_manager.CreateModel(std::move(name), visible);
 
 	if (model)
-		set_model_properties(object, *model, material_manager, shader_program_manager);
+		set_model_properties(object, *model, managers);
 
 	return model;
 }
 
 NonOwningPtr<MovableSound> create_movable_sound(const script_tree::ObjectNode &object,
-	SceneManager &scene_manager,
-	sounds::SoundManager &sound_manager)
+	SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name =
 		[&]() noexcept -> std::optional<std::string>
@@ -1875,7 +1944,7 @@ NonOwningPtr<MovableSound> create_movable_sound(const script_tree::ObjectNode &o
 		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
 	auto sound_name = object
 		.Property("sound")[0]
-		.Get<ScriptType::String>().value_or(""s).Get();
+		.Get<ScriptType::String>()->Get();
 	auto sound_channel_group_name = object
 		.Property("sound-channel-group")[0]
 		.Get<ScriptType::String>().value_or(""s).Get();
@@ -1884,9 +1953,7 @@ NonOwningPtr<MovableSound> create_movable_sound(const script_tree::ObjectNode &o
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
 	auto movable_sound = scene_manager.CreateSound(std::move(name), position,
-		sound_manager.GetSound(sound_name),
-		sound_manager.GetSoundChannelGroup(sound_channel_group_name),
-		paused);
+		get_sound(sound_name, managers), get_sound_channel_group(sound_channel_group_name, managers), paused);
 
 	if (movable_sound)
 		set_movable_sound_properties(object, *movable_sound);
@@ -1895,8 +1962,7 @@ NonOwningPtr<MovableSound> create_movable_sound(const script_tree::ObjectNode &o
 }
 
 NonOwningPtr<MovableSoundListener> create_movable_sound_listener(const script_tree::ObjectNode &object,
-	SceneManager &scene_manager,
-	sounds::SoundManager &sound_manager)
+	SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	auto name =
 		[&]() noexcept -> std::optional<std::string>
@@ -1911,10 +1977,10 @@ NonOwningPtr<MovableSoundListener> create_movable_sound_listener(const script_tr
 		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
 	auto sound_listener_name = object
 		.Property("sound-listener")[0]
-		.Get<ScriptType::String>().value_or(""s).Get();
+		.Get<ScriptType::String>()->Get();
 
 	auto movable_sound_listener = scene_manager.CreateSoundListener(std::move(name), position,
-		sound_manager.GetSoundListener(sound_listener_name));
+		get_sound_listener(sound_listener_name, managers));
 
 	if (movable_sound_listener)
 		set_movable_sound_listener_properties(object, *movable_sound_listener);
@@ -1923,20 +1989,13 @@ NonOwningPtr<MovableSoundListener> create_movable_sound_listener(const script_tr
 }
 
 
-void create_scene(const ScriptTree &tree,
-	graph::SceneNode &parent_node,
-	SceneManager &scene_manager,
-	graphics::materials::MaterialManager &material_manager,
-	graphics::particles::ParticleSystemManager &particle_system_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager,
-	sounds::SoundManager &sound_manager,
-	graphics::fonts::TextManager &text_manager)
+void create_scene(const ScriptTree &tree, graph::SceneNode &parent_node,
+	SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "scene-node")
-			create_scene_node(object, parent_node,
-				scene_manager, material_manager, particle_system_manager, shader_program_manager, sound_manager, text_manager);
+			create_scene_node(object, parent_node, scene_manager, managers);
 	}
 }
 
@@ -1958,18 +2017,18 @@ ScriptValidator SceneScriptInterface::GetValidator() const
 	Creating from script
 */
 
-void SceneScriptInterface::CreateScene(std::string_view asset_name,
-	graph::SceneNode &parent_node,
-	SceneManager &scene_manager,
-	graphics::materials::MaterialManager &material_manager,
-	graphics::particles::ParticleSystemManager &particle_system_manager,
-	graphics::shaders::ShaderProgramManager &shader_program_manager,
-	sounds::SoundManager &sound_manager,
-	graphics::fonts::TextManager &text_manager)
+void SceneScriptInterface::CreateScene(std::string_view asset_name, graph::SceneNode &parent_node,
+	SceneManager &scene_manager)
 {
 	if (Load(asset_name))
-		detail::create_scene(*tree_, parent_node,
-			scene_manager, material_manager, particle_system_manager, shader_program_manager, sound_manager, text_manager);
+		detail::create_scene(*tree_, parent_node, scene_manager, Managers());
+}
+
+void SceneScriptInterface::CreateScene(std::string_view asset_name, graph::SceneNode &parent_node,
+	SceneManager &scene_manager, const ManagerRegister &managers)
+{
+	if (Load(asset_name))
+		detail::create_scene(*tree_, parent_node, scene_manager, managers);
 }
 
 } //ion::script::interfaces
