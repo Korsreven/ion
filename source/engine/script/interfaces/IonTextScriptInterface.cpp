@@ -64,6 +64,87 @@ ScriptValidator get_text_validator()
 	Tree parsing
 */
 
+void set_text_properties(const script_tree::ObjectNode &object, Text &text)
+{
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "alignment")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "left")
+				text.Alignment(text::TextAlignment::Left);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "center")
+				text.Alignment(text::TextAlignment::Center);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "right")
+				text.Alignment(text::TextAlignment::Right);
+		}
+		else if (property.Name() == "area-size")
+			text.AreaSize(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "default-background-color")
+			text.DefaultBackgroundColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "default-decoration")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "overline")
+				text.DefaultDecoration(text::TextDecoration::Overline);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "line-through")
+				text.DefaultDecoration(text::TextDecoration::LineThrough);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "underline")
+				text.DefaultDecoration(text::TextDecoration::Underline);
+		}
+		else if (property.Name() == "default-decoration-color")
+			text.DefaultDecorationColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "default-font-style")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "bold")
+				text.DefaultFontStyle(text::TextFontStyle::Bold);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "italic")
+				text.DefaultFontStyle(text::TextFontStyle::Italic);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "bold-italic")
+				text.DefaultFontStyle(text::TextFontStyle::BoldItalic);
+		}
+		else if (property.Name() == "default-foreground-color")
+			text.DefaultForegroundColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "from-line")
+			text.FromLine(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "formatting")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "none")
+				text.Formatting(text::TextFormatting::None);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "html")
+				text.Formatting(text::TextFormatting::HTML);
+		}
+		else if (property.Name() == "line-height")
+			text.LineHeight(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "line-height-factor")
+			text.LineHeightFactor(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "max-lines")
+			text.MaxLines(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "overflow")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "truncate")
+				text.Overflow(text::TextOverflow::Truncate);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "truncate-ellipsis")
+				text.Overflow(text::TextOverflow::TruncateEllipsis);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "word-truncate")
+				text.Overflow(text::TextOverflow::WordTruncate);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "word-wrap")
+				text.Overflow(text::TextOverflow::WordWrap);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "wrap")
+				text.Overflow(text::TextOverflow::Wrap);
+		}
+		else if (property.Name() == "padding")
+			text.Padding(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "vertical-alignment")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "top")
+				text.VerticalAlignment(text::TextVerticalAlignment::Top);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "middle")
+				text.VerticalAlignment(text::TextVerticalAlignment::Middle);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "bottom")
+				text.VerticalAlignment(text::TextVerticalAlignment::Bottom);
+		}
+	}
+}
+
 NonOwningPtr<Text> create_text(const script_tree::ObjectNode &object,
 	TextManager &text_manager,
 	TypeFaceManager &type_face_manager)
@@ -81,85 +162,7 @@ NonOwningPtr<Text> create_text(const script_tree::ObjectNode &object,
 	auto text = text_manager.CreateText(std::move(name), std::move(content), type_face_manager.GetTypeFace(type_face_name));
 
 	if (text)
-	{
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "alignment")
-			{
-				if (property[0].Get<ScriptType::Enumerable>()->Get() == "left")
-					text->Alignment(text::TextAlignment::Left);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "center")
-					text->Alignment(text::TextAlignment::Center);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "right")
-					text->Alignment(text::TextAlignment::Right);
-			}
-			else if (property.Name() == "area-size")
-				text->AreaSize(property[0].Get<ScriptType::Vector2>()->Get());
-			else if (property.Name() == "default-background-color")
-				text->DefaultBackgroundColor(property[0].Get<ScriptType::Color>()->Get());
-			else if (property.Name() == "default-decoration")
-			{
-				if (property[0].Get<ScriptType::Enumerable>()->Get() == "overline")
-					text->DefaultDecoration(text::TextDecoration::Overline);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "line-through")
-					text->DefaultDecoration(text::TextDecoration::LineThrough);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "underline")
-					text->DefaultDecoration(text::TextDecoration::Underline);
-			}
-			else if (property.Name() == "default-decoration-color")
-				text->DefaultDecorationColor(property[0].Get<ScriptType::Color>()->Get());
-			else if (property.Name() == "default-font-style")
-			{
-				if (property[0].Get<ScriptType::Enumerable>()->Get() == "bold")
-					text->DefaultFontStyle(text::TextFontStyle::Bold);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "italic")
-					text->DefaultFontStyle(text::TextFontStyle::Italic);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "bold-italic")
-					text->DefaultFontStyle(text::TextFontStyle::BoldItalic);
-			}
-			else if (property.Name() == "default-foreground-color")
-				text->DefaultForegroundColor(property[0].Get<ScriptType::Color>()->Get());
-			else if (property.Name() == "from-line")
-				text->FromLine(property[0].Get<ScriptType::Integer>()->As<int>());
-			else if (property.Name() == "formatting")
-			{
-				if (property[0].Get<ScriptType::Enumerable>()->Get() == "none")
-					text->Formatting(text::TextFormatting::None);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "html")
-					text->Formatting(text::TextFormatting::HTML);
-			}
-			else if (property.Name() == "line-height")
-				text->LineHeight(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			else if (property.Name() == "line-height-factor")
-				text->LineHeightFactor(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			else if (property.Name() == "max-lines")
-				text->MaxLines(property[0].Get<ScriptType::Integer>()->As<int>());
-			else if (property.Name() == "overflow")
-			{
-				if (property[0].Get<ScriptType::Enumerable>()->Get() == "truncate")
-					text->Overflow(text::TextOverflow::Truncate);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "truncate-ellipsis")
-					text->Overflow(text::TextOverflow::TruncateEllipsis);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "word-truncate")
-					text->Overflow(text::TextOverflow::WordTruncate);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "word-wrap")
-					text->Overflow(text::TextOverflow::WordWrap);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "wrap")
-					text->Overflow(text::TextOverflow::Wrap);
-			}
-			else if (property.Name() == "padding")
-				text->Padding(property[0].Get<ScriptType::Vector2>()->Get());
-			else if (property.Name() == "vertical-alignment")
-			{
-				if (property[0].Get<ScriptType::Enumerable>()->Get() == "top")
-					text->VerticalAlignment(text::TextVerticalAlignment::Top);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "middle")
-					text->VerticalAlignment(text::TextVerticalAlignment::Middle);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "bottom")
-					text->VerticalAlignment(text::TextVerticalAlignment::Bottom);
-			}
-		}
-	}
+		set_text_properties(object, *text);
 
 	return text;
 }

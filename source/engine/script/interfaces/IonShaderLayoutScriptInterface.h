@@ -134,6 +134,9 @@ namespace ion::script::interfaces
 			graphics::shaders::ShaderLayout &shader_layout);
 
 
+		void set_shader_layout_properties(const script_tree::ObjectNode &object, graphics::shaders::ShaderLayout &shader_layout);
+
+
 		NonOwningPtr<graphics::shaders::ShaderLayout> create_shader_layout(const script_tree::ObjectNode &object,
 			graphics::shaders::ShaderProgramManager &shader_program_manager);
 

@@ -366,6 +366,27 @@ void create_uniform(const script_tree::PropertyNode &property,
 }
 
 
+void set_shader_program_properties(const script_tree::ObjectNode &object, ShaderProgram &shader_program)
+{
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "attribute")
+			create_attribute(property, shader_program);
+		else if (property.Name() == "uniform")
+			create_uniform(property, shader_program);
+	}
+}
+
+void set_shader_struct_properties(const script_tree::ObjectNode &object, ShaderStruct &shader_struct)
+{
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "uniform")
+			create_uniform(property, shader_struct);
+	}
+}
+
+
 NonOwningPtr<ShaderProgram> create_shader_program(const script_tree::ObjectNode &object,
 	ShaderProgramManager &shader_program_manager,
 	ShaderManager &shader_manager)
@@ -388,15 +409,7 @@ NonOwningPtr<ShaderProgram> create_shader_program(const script_tree::ObjectNode 
 		shader_program_manager.GetShaderLayout(shader_layout_name));
 
 	if (shader_program)
-	{
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "attribute")
-				create_attribute(property, *shader_program);
-			else if (property.Name() == "uniform")
-				create_uniform(property, *shader_program);
-		}
-	}
+		set_shader_program_properties(object, *shader_program);
 
 	return shader_program;
 }
@@ -414,13 +427,7 @@ NonOwningPtr<ShaderStruct> create_shader_struct(const script_tree::ObjectNode &o
 	auto shader_struct = shader_program.CreateStruct(std::move(name), size);
 
 	if (shader_struct)
-	{
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "uniform")
-				create_uniform(property, *shader_struct);
-		}
-	}
+		set_shader_struct_properties(object, *shader_struct);
 
 	return shader_struct;
 }

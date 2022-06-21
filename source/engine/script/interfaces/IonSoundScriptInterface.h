@@ -44,6 +44,11 @@ namespace ion::script::interfaces
 			Tree parsing
 		*/
 
+		void set_sound_properties(const script_tree::ObjectNode &object, sounds::Sound &sound);
+		void set_sound_channel_group_properties(const script_tree::ObjectNode &object, sounds::SoundChannelGroup &sound_channel_group);
+		void set_sound_listener_properties(const script_tree::ObjectNode &object, sounds::SoundListener &sound_listener);
+
+
 		NonOwningPtr<sounds::Sound> create_sound(const script_tree::ObjectNode &object,
 			sounds::SoundManager &sound_manager);
 		NonOwningPtr<sounds::SoundChannelGroup> create_sound_channel_group(const script_tree::ObjectNode &object,

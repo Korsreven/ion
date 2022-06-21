@@ -45,6 +45,10 @@ namespace ion::script::interfaces
 			Tree parsing
 		*/
 
+		void set_material_properties(const script_tree::ObjectNode &object, graphics::materials::Material &material,
+			graphics::textures::AnimationManager &animation_manager, graphics::textures::TextureManager &texture_manager);
+
+
 		NonOwningPtr<graphics::materials::Material> create_material(const script_tree::ObjectNode &object,
 			graphics::materials::MaterialManager &material_manager,
 			graphics::textures::AnimationManager &animation_manager,

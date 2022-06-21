@@ -231,6 +231,20 @@ void bind_uniform(const script_tree::PropertyNode &property,
 }
 
 
+void set_shader_layout_properties(const script_tree::ObjectNode &object, ShaderLayout &shader_layout)
+{
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "bind-attribute")
+			bind_attribute(property, shader_layout);
+		else if (property.Name() == "bind-struct")
+			bind_struct(property, shader_layout);
+		else if (property.Name() == "bind-uniform")
+			bind_uniform(property, shader_layout);
+	}
+}
+
+
 NonOwningPtr<ShaderLayout> create_shader_layout(const script_tree::ObjectNode &object,
 	ShaderProgramManager &shader_program_manager)
 {
@@ -241,17 +255,7 @@ NonOwningPtr<ShaderLayout> create_shader_layout(const script_tree::ObjectNode &o
 	auto shader_layout = shader_program_manager.CreateShaderLayout(std::move(name));
 
 	if (shader_layout)
-	{
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "bind-attribute")
-				bind_attribute(property, *shader_layout);
-			else if (property.Name() == "bind-struct")
-				bind_struct(property, *shader_layout);
-			else if (property.Name() == "bind-uniform")
-				bind_uniform(property, *shader_layout);
-		}
-	}
+		set_shader_layout_properties(object, *shader_layout);
 
 	return shader_layout;
 }

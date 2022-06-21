@@ -66,7 +66,19 @@ namespace ion::script::interfaces
 			Tree parsing
 		*/
 
+		void set_emitter_properties(const script_tree::ObjectNode &object, graphics::particles::Emitter &emitter,
+			graphics::materials::MaterialManager &material_manager);
+		void set_particle_system_properties(const script_tree::ObjectNode &object, graphics::particles::ParticleSystem &particle_system,
+			graphics::materials::MaterialManager &material_manager);
+
 		void set_affector_properties(const script_tree::ObjectNode &object, graphics::particles::affectors::Affector &affector);
+		void set_color_fader_properties(const script_tree::ObjectNode &object, graphics::particles::affectors::ColorFader &color_fader);
+		void set_direction_randomizer_properties(const script_tree::ObjectNode &object, graphics::particles::affectors::DirectionRandomizer &direction_randomizer);
+		void set_gravitation_properties(const script_tree::ObjectNode &object, graphics::particles::affectors::Gravitation &gravitation);
+		void set_linear_force_properties(const script_tree::ObjectNode &object, graphics::particles::affectors::LinearForce &linear_force);
+		void set_scaler_properties(const script_tree::ObjectNode &object, graphics::particles::affectors::Scaler &scaler);
+		void set_sine_force_properties(const script_tree::ObjectNode &object, graphics::particles::affectors::SineForce &sine_force);
+		void set_velocity_randomizer_properties(const script_tree::ObjectNode &object, graphics::particles::affectors::VelocityRandomizer &velocity_randomizer);
 
 
 		NonOwningPtr<graphics::particles::Emitter> create_emitter(const script_tree::ObjectNode &object,

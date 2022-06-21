@@ -44,6 +44,9 @@ namespace ion::script::interfaces
 			Tree parsing
 		*/
 
+		void set_animation_properties(const script_tree::ObjectNode &object, graphics::textures::Animation &animation);
+
+
 		NonOwningPtr<graphics::textures::Animation> create_animation(const script_tree::ObjectNode &object,
 			graphics::textures::AnimationManager &animation_manager,
 			graphics::textures::FrameSequenceManager &frame_sequence_manager);

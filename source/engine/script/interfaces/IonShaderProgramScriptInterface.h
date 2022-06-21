@@ -103,6 +103,11 @@ namespace ion::script::interfaces
 		void create_uniform(const script_tree::PropertyNode &property,
 			graphics::shaders::ShaderStruct &shader_struct);
 
+
+		void set_shader_program_properties(const script_tree::ObjectNode &object, graphics::shaders::ShaderProgram &shader_program);
+		void set_shader_struct_properties(const script_tree::ObjectNode &object, graphics::shaders::ShaderStruct &shader_struct);
+
+
 		NonOwningPtr<graphics::shaders::ShaderProgram> create_shader_program(const script_tree::ObjectNode &object,
 			graphics::shaders::ShaderProgramManager &shader_program_manager,
 			graphics::shaders::ShaderManager &shader_manager);

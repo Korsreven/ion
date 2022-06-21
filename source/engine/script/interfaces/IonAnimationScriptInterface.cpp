@@ -62,6 +62,52 @@ ScriptValidator get_animation_validator()
 	Tree parsing
 */
 
+void set_animation_properties(const script_tree::ObjectNode &object, Animation &animation)
+{
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "cycle-percent")
+			animation.CyclePercent(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "cycle-time")
+			animation.CycleTime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "direction")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "normal")
+				animation.Direction(animation::PlaybackDirection::Normal);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "reverse")
+				animation.Direction(animation::PlaybackDirection::Reverse);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "alternate")
+				animation.Direction(animation::PlaybackDirection::Alternate);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "alternate-reverse")
+				animation.Direction(animation::PlaybackDirection::AlternateReverse);
+		}
+		else if (property.Name() == "frame-rate")
+			animation.FrameRate(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "jump-backward")
+			animation.JumpBackward(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "jump-forward")
+			animation.JumpForward(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "playback-rate")
+			animation.PlaybackRate(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "repeat-count")
+			animation.RepeatCount(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "running")
+		{
+			if (property[0].Get<ScriptType::Boolean>()->Get())
+				animation.Start();
+			else
+				animation.Stop();
+		}
+		else if (property.Name() == "total-duration")
+			animation.TotalDuration(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "total-percent")
+			animation.TotalPercent(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "total-time")
+			animation.TotalTime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+	}
+}
+
+
 NonOwningPtr<Animation> create_animation(const script_tree::ObjectNode &object,
 	AnimationManager &animation_manager,
 	FrameSequenceManager &frame_sequence_manager)
@@ -80,49 +126,7 @@ NonOwningPtr<Animation> create_animation(const script_tree::ObjectNode &object,
 		frame_sequence_manager.GetFrameSequence(frame_sequence_name), cycle_duration);
 
 	if (animation)
-	{
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "cycle-percent")
-				animation->CyclePercent(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			else if (property.Name() == "cycle-time")
-				animation->CycleTime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
-			else if (property.Name() == "direction")
-			{
-				if (property[0].Get<ScriptType::Enumerable>()->Get() == "normal")
-					animation->Direction(animation::PlaybackDirection::Normal);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "reverse")
-					animation->Direction(animation::PlaybackDirection::Reverse);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "alternate")
-					animation->Direction(animation::PlaybackDirection::Alternate);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "alternate-reverse")
-					animation->Direction(animation::PlaybackDirection::AlternateReverse);
-			}
-			else if (property.Name() == "frame-rate")
-				animation->FrameRate(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			else if (property.Name() == "jump-backward")
-				animation->JumpBackward(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
-			else if (property.Name() == "jump-forward")
-				animation->JumpForward(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
-			else if (property.Name() == "playback-rate")
-				animation->PlaybackRate(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			else if (property.Name() == "repeat-count")
-				animation->RepeatCount(property[0].Get<ScriptType::Integer>()->As<int>());
-			else if (property.Name() == "running")
-			{
-				if (property[0].Get<ScriptType::Boolean>()->Get())
-					animation->Start();
-				else
-					animation->Stop();
-			}
-			else if (property.Name() == "total-duration")
-				animation->TotalDuration(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
-			else if (property.Name() == "total-percent")
-				animation->TotalPercent(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			else if (property.Name() == "total-time")
-				animation->TotalTime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
-		}
-	}
+		set_animation_properties(object, *animation);
 
 	return animation;
 }

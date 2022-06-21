@@ -73,6 +73,45 @@ ScriptValidator get_sound_validator()
 	Tree parsing
 */
 
+void set_sound_properties(const script_tree::ObjectNode &object, Sound &sound)
+{
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "distance")
+		{
+			if (property.NumberOfArguments() == 2)
+				sound.Distance(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+							   property[1].Get<ScriptType::FloatingPoint>()->As<real>());
+			else
+				sound.Distance(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		}
+	}
+}
+
+void set_sound_channel_group_properties(const script_tree::ObjectNode &object, SoundChannelGroup &sound_channel_group)
+{
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "mute")
+			sound_channel_group.Mute(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "pitch")
+			sound_channel_group.Pitch(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "volume")
+			sound_channel_group.Volume(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+	}
+}
+
+void set_sound_listener_properties(const script_tree::ObjectNode &object, SoundListener &sound_listener)
+{
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "attributes")
+			sound_listener.Attributes(property[0].Get<ScriptType::Vector3>()->Get(),
+									  property[1].Get<ScriptType::Vector3>()->Get());
+	}
+}
+
+
 NonOwningPtr<Sound> create_sound(const script_tree::ObjectNode &object,
 	SoundManager &sound_manager)
 {
@@ -135,19 +174,7 @@ NonOwningPtr<Sound> create_sound(const script_tree::ObjectNode &object,
 		type, processing_mode, orientation_mode, rolloff_mode, looping_mode);
 
 	if (sound)
-	{
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "distance")
-			{
-				if (property.NumberOfArguments() == 2)
-					sound->Distance(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
-									property[1].Get<ScriptType::FloatingPoint>()->As<real>());
-				else
-					sound->Distance(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			}
-		}
-	}
+		set_sound_properties(object, *sound);
 
 	return sound;
 }
@@ -162,17 +189,7 @@ NonOwningPtr<SoundChannelGroup> create_sound_channel_group(const script_tree::Ob
 	auto sound_channel_group = sound_manager.CreateSoundChannelGroup(std::move(name));
 
 	if (sound_channel_group)
-	{
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "mute")
-				sound_channel_group->Mute(property[0].Get<ScriptType::Boolean>()->Get());
-			else if (property.Name() == "pitch")
-				sound_channel_group->Pitch(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			else if (property.Name() == "volume")
-				sound_channel_group->Volume(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-		}
-	}
+		set_sound_channel_group_properties(object, *sound_channel_group);
 
 	return sound_channel_group;
 }
@@ -187,14 +204,7 @@ NonOwningPtr<SoundListener> create_sound_listener(const script_tree::ObjectNode 
 	auto sound_listener = sound_manager.CreateSoundListener(std::move(name));
 
 	if (sound_listener)
-	{
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "attributes")
-				sound_listener->Attributes(property[0].Get<ScriptType::Vector3>()->Get(),
-										   property[1].Get<ScriptType::Vector3>()->Get());
-		}
-	}
+		set_sound_listener_properties(object, *sound_listener);
 
 	return sound_listener;
 }

@@ -44,6 +44,9 @@ namespace ion::script::interfaces
 			Tree parsing
 		*/
 
+		void set_text_properties(const script_tree::ObjectNode &object, graphics::fonts::Text &text);
+
+
 		NonOwningPtr<graphics::fonts::Text> create_text(const script_tree::ObjectNode &object,
 			graphics::fonts::TextManager &text_manager,
 			graphics::fonts::TypeFaceManager &type_face_manager);

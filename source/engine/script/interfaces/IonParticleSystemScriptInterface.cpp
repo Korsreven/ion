@@ -154,7 +154,144 @@ ScriptValidator get_particle_system_validator()
 	Tree parsing
 */
 
-void set_affector_properties(const script_tree::ObjectNode &object, graphics::particles::affectors::Affector &affector)
+void set_emitter_properties(const script_tree::ObjectNode &object, Emitter &emitter,
+	graphics::materials::MaterialManager &material_manager)
+{
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "color-fader")
+			create_color_fader(obj, emitter);
+		else if (obj.Name() == "direction-randomizer")
+			create_direction_randomizer(obj, emitter);
+		else if (obj.Name() == "graviation")
+			create_graviation(obj, emitter);
+		else if (obj.Name() == "linear-force")
+			create_linear_force(obj, emitter);
+		else if (obj.Name() == "scaler")
+			create_scaler(obj, emitter);
+		else if (obj.Name() == "sine-force")
+			create_sine_force(obj, emitter);
+		else if (obj.Name() == "velocity-randomizer")
+			create_velocity_randomizer(obj, emitter);
+	}
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "direction")
+			emitter.Direction(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "emission-angle")
+			emitter.EmissionAngle(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
+		else if (property.Name() == "emission-duration")
+			emitter.EmissionDuration(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		else if (property.Name() == "emission-rate")
+			emitter.EmissionRate(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "emitting")
+		{
+			if (property[0].Get<ScriptType::Boolean>()->Get())
+				emitter.Start();
+			else
+				emitter.Stop();
+		}
+		else if (property.Name() == "inner-size")
+			emitter.InnerSize(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "particle-color")
+		{
+			if (property.NumberOfArguments() == 2)
+				emitter.ParticleColor(property[0].Get<ScriptType::Color>()->Get(),
+									  property[1].Get<ScriptType::Color>()->Get());
+			else
+				emitter.ParticleColor(property[0].Get<ScriptType::Color>()->Get());
+		}
+		else if (property.Name() == "particle-lifetime")
+		{
+			if (property.NumberOfArguments() == 2)
+				emitter.ParticleLifetime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()},
+										 duration{property[1].Get<ScriptType::FloatingPoint>()->As<real>()});
+			else
+				emitter.ParticleLifetime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
+		}
+		else if (property.Name() == "particle-mass")
+		{
+			if (property.NumberOfArguments() == 2)
+				emitter.ParticleMass(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+									 property[1].Get<ScriptType::FloatingPoint>()->As<real>());
+			else
+				emitter.ParticleMass(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		}
+		else if (property.Name() == "particle-material")
+			emitter.ParticleMaterial(material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get()));
+		else if (property.Name() == "particle-size")
+		{
+			if (property.NumberOfArguments() == 2)
+				emitter.ParticleSize(property[0].Get<ScriptType::Vector2>()->Get(),
+									 property[1].Get<ScriptType::Vector2>()->Get());
+			else
+				emitter.ParticleSize(property[0].Get<ScriptType::Vector2>()->Get());
+		}
+		else if (property.Name() == "particle-velocity")
+		{
+			if (property.NumberOfArguments() == 2)
+				emitter.ParticleVelocity(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+										 property[1].Get<ScriptType::FloatingPoint>()->As<real>());
+			else
+				emitter.ParticleVelocity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		}
+		else if (property.Name() == "particle-quota")
+			emitter.ParticleQuota(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "position")
+			emitter.Position(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "size")
+			emitter.Size(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "type")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "point")
+				emitter.Type(emitter::EmitterType::Point);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "box")
+				emitter.Type(emitter::EmitterType::Box);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "ring")
+				emitter.Type(emitter::EmitterType::Ring);
+		}
+	}
+}
+
+void set_particle_system_properties(const script_tree::ObjectNode &object, ParticleSystem &particle_system,
+	graphics::materials::MaterialManager &material_manager)
+{
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "emitter")
+			create_emitter(obj, particle_system, material_manager);
+
+		else if (obj.Name() == "color-fader")
+			create_color_fader(obj, particle_system);
+		else if (obj.Name() == "direction-randomizer")
+			create_direction_randomizer(obj, particle_system);
+		else if (obj.Name() == "graviation")
+			create_graviation(obj, particle_system);
+		else if (obj.Name() == "linear-force")
+			create_linear_force(obj, particle_system);
+		else if (obj.Name() == "scaler")
+			create_scaler(obj, particle_system);
+		else if (obj.Name() == "sine-force")
+			create_sine_force(obj, particle_system);
+		else if (obj.Name() == "velocity-randomizer")
+			create_velocity_randomizer(obj, particle_system);
+	}
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "render-primitive")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "point")
+				particle_system.RenderPrimitive(particle_system::ParticlePrimitive::Point);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "rectangle")
+				particle_system.RenderPrimitive(particle_system::ParticlePrimitive::Rectangle);
+		}
+	}
+}
+
+
+void set_affector_properties(const script_tree::ObjectNode &object, affectors::Affector &affector)
 {
 	for (auto &property : object.Properties())
 	{
@@ -162,6 +299,138 @@ void set_affector_properties(const script_tree::ObjectNode &object, graphics::pa
 			affector.Enabled(property[0].Get<ScriptType::Boolean>()->Get());
 	}
 }
+
+void set_color_fader_properties(const script_tree::ObjectNode &object, affectors::ColorFader &color_fader)
+{
+	set_affector_properties(object, color_fader);
+
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "step")
+		{
+			auto percent = obj
+				.Property("percent")[0]
+				.Get<ScriptType::FloatingPoint>()->As<real>();
+			auto color = std::optional<graphics::utilities::Color>{};
+
+			for (auto &property : obj.Properties())
+			{
+				if (property.Name() == "color")
+					color = property[0].Get<ScriptType::Color>()->Get();
+			}
+
+			color_fader.AddStep(percent, color);
+		}
+	}
+}
+
+void set_direction_randomizer_properties(const script_tree::ObjectNode &object, affectors::DirectionRandomizer &direction_randomizer)
+{
+	set_affector_properties(object, direction_randomizer);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "angle")
+			direction_randomizer.Angle(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
+		else if (property.Name() == "scope")
+			direction_randomizer.Scope(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+	}
+}
+
+void set_gravitation_properties(const script_tree::ObjectNode &object, affectors::Gravitation &gravitation)
+{
+	set_affector_properties(object, gravitation);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "gravity")
+			gravitation.Gravity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "mass")
+			gravitation.Mass(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "position")
+			gravitation.Position(property[0].Get<ScriptType::Vector2>()->Get());
+	}
+}
+
+void set_linear_force_properties(const script_tree::ObjectNode &object, affectors::LinearForce &linear_force)
+{
+	set_affector_properties(object, linear_force);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "force")
+			linear_force.Force(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "type")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "add")
+				linear_force.Type(affectors::linear_force::ForceType::Add);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "average")
+				linear_force.Type(affectors::linear_force::ForceType::Average);
+		}
+	}
+}
+
+void set_scaler_properties(const script_tree::ObjectNode &object, affectors::Scaler &scaler)
+{
+	set_affector_properties(object, scaler);
+
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "step")
+		{
+			auto percent = obj
+				.Property("percent")[0]
+				.Get<ScriptType::FloatingPoint>()->As<real>();
+			auto size = std::optional<graphics::utilities::Vector2>{};
+
+			for (auto &property : obj.Properties())
+			{
+				if (property.Name() == "size")
+					size = property[0].Get<ScriptType::Vector2>()->Get();
+			}
+
+			scaler.AddStep(percent, size);
+		}
+	}
+}
+
+void set_sine_force_properties(const script_tree::ObjectNode &object, affectors::SineForce &sine_force)
+{
+	set_affector_properties(object, sine_force);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "force")
+			sine_force.Force(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "type")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "add")
+				sine_force.Type(affectors::sine_force::ForceType::Add);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "average")
+				sine_force.Type(affectors::sine_force::ForceType::Average);
+		}
+	}
+}
+
+void set_velocity_randomizer_properties(const script_tree::ObjectNode &object, affectors::VelocityRandomizer &velocity_randomizer)
+{
+	set_affector_properties(object, velocity_randomizer);
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "scope")
+			velocity_randomizer.Scope(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "velocity")
+		{
+			if (property.NumberOfArguments() == 2)
+				velocity_randomizer.Velocity(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+											 property[1].Get<ScriptType::FloatingPoint>()->As<real>());
+			else
+				velocity_randomizer.Velocity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		}
+	}
+}
+
 
 
 NonOwningPtr<Emitter> create_emitter(const script_tree::ObjectNode &object,
@@ -175,103 +444,7 @@ NonOwningPtr<Emitter> create_emitter(const script_tree::ObjectNode &object,
 	auto emitter = particle_system.CreateEmitter(std::move(name));
 
 	if (emitter)
-	{
-		for (auto &obj : object.Objects())
-		{
-			if (obj.Name() == "color-fader")
-				create_color_fader(obj, *emitter);
-			else if (obj.Name() == "direction-randomizer")
-				create_direction_randomizer(obj, *emitter);
-			else if (obj.Name() == "graviation")
-				create_graviation(obj, *emitter);
-			else if (obj.Name() == "linear-force")
-				create_linear_force(obj, *emitter);
-			else if (obj.Name() == "scaler")
-				create_scaler(obj, *emitter);
-			else if (obj.Name() == "sine-force")
-				create_sine_force(obj, *emitter);
-			else if (obj.Name() == "velocity-randomizer")
-				create_velocity_randomizer(obj, *emitter);
-		}
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "direction")
-				emitter->Direction(property[0].Get<ScriptType::Vector2>()->Get());
-			else if (property.Name() == "emission-angle")
-				emitter->EmissionAngle(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
-			else if (property.Name() == "emission-duration")
-				emitter->EmissionDuration(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
-			else if (property.Name() == "emission-rate")
-				emitter->EmissionRate(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			else if (property.Name() == "emitting")
-			{
-				if (property[0].Get<ScriptType::Boolean>()->Get())
-					emitter->Start();
-				else
-					emitter->Stop();
-			}
-			else if (property.Name() == "inner-size")
-				emitter->InnerSize(property[0].Get<ScriptType::Vector2>()->Get());
-			else if (property.Name() == "particle-color")
-			{
-				if (property.NumberOfArguments() == 2)
-					emitter->ParticleColor(property[0].Get<ScriptType::Color>()->Get(),
-										   property[1].Get<ScriptType::Color>()->Get());
-				else
-					emitter->ParticleColor(property[0].Get<ScriptType::Color>()->Get());
-			}
-			else if (property.Name() == "particle-lifetime")
-			{
-				if (property.NumberOfArguments() == 2)
-					emitter->ParticleLifetime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()},
-											  duration{property[1].Get<ScriptType::FloatingPoint>()->As<real>()});
-				else
-					emitter->ParticleLifetime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
-			}
-			else if (property.Name() == "particle-mass")
-			{
-				if (property.NumberOfArguments() == 2)
-					emitter->ParticleMass(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
-										  property[1].Get<ScriptType::FloatingPoint>()->As<real>());
-				else
-					emitter->ParticleMass(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			}
-			else if (property.Name() == "particle-material")
-				emitter->ParticleMaterial(material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get()));
-			else if (property.Name() == "particle-size")
-			{
-				if (property.NumberOfArguments() == 2)
-					emitter->ParticleSize(property[0].Get<ScriptType::Vector2>()->Get(),
-										  property[1].Get<ScriptType::Vector2>()->Get());
-				else
-					emitter->ParticleSize(property[0].Get<ScriptType::Vector2>()->Get());
-			}
-			else if (property.Name() == "particle-velocity")
-			{
-				if (property.NumberOfArguments() == 2)
-					emitter->ParticleVelocity(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
-											  property[1].Get<ScriptType::FloatingPoint>()->As<real>());
-				else
-					emitter->ParticleVelocity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			}
-			else if (property.Name() == "particle-quota")
-				emitter->ParticleQuota(property[0].Get<ScriptType::Integer>()->As<int>());
-			else if (property.Name() == "position")
-				emitter->Position(property[0].Get<ScriptType::Vector2>()->Get());
-			else if (property.Name() == "size")
-				emitter->Size(property[0].Get<ScriptType::Vector2>()->Get());
-			else if (property.Name() == "type")
-			{
-				if (property[0].Get<ScriptType::Enumerable>()->Get() == "point")
-					emitter->Type(emitter::EmitterType::Point);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "box")
-					emitter->Type(emitter::EmitterType::Box);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "ring")
-					emitter->Type(emitter::EmitterType::Ring);
-			}
-		}
-	}
+		set_emitter_properties(object, *emitter, material_manager);
 
 	return emitter;
 }
@@ -287,39 +460,7 @@ NonOwningPtr<ParticleSystem> create_particle_system(const script_tree::ObjectNod
 	auto particle_system = particle_system_manager.CreateParticleSystem(std::move(name));
 
 	if (particle_system)
-	{
-		for (auto &obj : object.Objects())
-		{
-			if (obj.Name() == "emitter")
-				create_emitter(obj, *particle_system, material_manager);
-
-			else if (obj.Name() == "color-fader")
-				create_color_fader(obj, *particle_system);
-			else if (obj.Name() == "direction-randomizer")
-				create_direction_randomizer(obj, *particle_system);
-			else if (obj.Name() == "graviation")
-				create_graviation(obj, *particle_system);
-			else if (obj.Name() == "linear-force")
-				create_linear_force(obj, *particle_system);
-			else if (obj.Name() == "scaler")
-				create_scaler(obj, *particle_system);
-			else if (obj.Name() == "sine-force")
-				create_sine_force(obj, *particle_system);
-			else if (obj.Name() == "velocity-randomizer")
-				create_velocity_randomizer(obj, *particle_system);
-		}
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "render-primitive")
-			{
-				if (property[0].Get<ScriptType::Enumerable>()->Get() == "point")
-					particle_system->RenderPrimitive(particle_system::ParticlePrimitive::Point);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "rectangle")
-					particle_system->RenderPrimitive(particle_system::ParticlePrimitive::Rectangle);
-			}
-		}
-	}
+		set_particle_system_properties(object, *particle_system, material_manager);
 
 	return particle_system;
 }
@@ -335,28 +476,7 @@ NonOwningPtr<affectors::ColorFader> create_color_fader(const script_tree::Object
 	auto color_fader = affector_manager.CreateAffector<affectors::ColorFader>(std::move(name));
 
 	if (color_fader)
-	{
-		for (auto &obj : object.Objects())
-		{
-			if (obj.Name() == "step")
-			{
-				auto percent = obj
-					.Property("percent")[0]
-					.Get<ScriptType::FloatingPoint>()->As<real>();
-				auto color = std::optional<graphics::utilities::Color>{};
-
-				for (auto &property : obj.Properties())
-				{
-					if (property.Name() == "color")
-						color = property[0].Get<ScriptType::Color>()->Get();
-				}
-
-				color_fader->AddStep(percent, color);
-			}
-		}
-
-		set_affector_properties(object, *color_fader);
-	}
+		set_color_fader_properties(object, *color_fader);
 
 	return color_fader;
 }
@@ -371,17 +491,7 @@ NonOwningPtr<affectors::DirectionRandomizer> create_direction_randomizer(const s
 	auto direction_randomizer = affector_manager.CreateAffector<affectors::DirectionRandomizer>(std::move(name));
 
 	if (direction_randomizer)
-	{
-		set_affector_properties(object, *direction_randomizer);
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "angle")
-				direction_randomizer->Angle(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
-			else if (property.Name() == "scope")
-				direction_randomizer->Scope(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-		}
-	}
+		set_direction_randomizer_properties(object, *direction_randomizer);
 
 	return direction_randomizer;
 }
@@ -396,19 +506,7 @@ NonOwningPtr<affectors::Gravitation> create_graviation(const script_tree::Object
 	auto gravitation = affector_manager.CreateAffector<affectors::Gravitation>(std::move(name));
 
 	if (gravitation)
-	{
-		set_affector_properties(object, *gravitation);
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "gravity")
-				gravitation->Gravity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			else if (property.Name() == "mass")
-				gravitation->Mass(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			else if (property.Name() == "position")
-				gravitation->Position(property[0].Get<ScriptType::Vector2>()->Get());
-		}
-	}
+		set_gravitation_properties(object, *gravitation);
 
 	return gravitation;
 }
@@ -423,22 +521,7 @@ NonOwningPtr<affectors::LinearForce> create_linear_force(const script_tree::Obje
 	auto linear_force = affector_manager.CreateAffector<affectors::LinearForce>(std::move(name));
 
 	if (linear_force)
-	{
-		set_affector_properties(object, *linear_force);
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "force")
-				linear_force->Force(property[0].Get<ScriptType::Vector2>()->Get());
-			else if (property.Name() == "type")
-			{
-				if (property[0].Get<ScriptType::Enumerable>()->Get() == "add")
-					linear_force->Type(affectors::linear_force::ForceType::Add);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "average")
-					linear_force->Type(affectors::linear_force::ForceType::Average);
-			}
-		}
-	}
+		set_linear_force_properties(object, *linear_force);
 
 	return linear_force;
 }
@@ -453,28 +536,7 @@ NonOwningPtr<affectors::Scaler> create_scaler(const script_tree::ObjectNode &obj
 	auto scaler = affector_manager.CreateAffector<affectors::Scaler>(std::move(name));
 
 	if (scaler)
-	{
-		for (auto &obj : object.Objects())
-		{
-			if (obj.Name() == "step")
-			{
-				auto percent = obj
-					.Property("percent")[0]
-					.Get<ScriptType::FloatingPoint>()->As<real>();
-				auto size = std::optional<graphics::utilities::Vector2>{};
-
-				for (auto &property : obj.Properties())
-				{
-					if (property.Name() == "size")
-						size = property[0].Get<ScriptType::Vector2>()->Get();
-				}
-
-				scaler->AddStep(percent, size);
-			}
-		}
-
-		set_affector_properties(object, *scaler);
-	}
+		set_scaler_properties(object, *scaler);
 
 	return scaler;
 }
@@ -489,22 +551,7 @@ NonOwningPtr<affectors::SineForce> create_sine_force(const script_tree::ObjectNo
 	auto sine_force = affector_manager.CreateAffector<affectors::SineForce>(std::move(name));
 
 	if (sine_force)
-	{
-		set_affector_properties(object, *sine_force);
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "force")
-				sine_force->Force(property[0].Get<ScriptType::Vector2>()->Get());
-			else if (property.Name() == "type")
-			{
-				if (property[0].Get<ScriptType::Enumerable>()->Get() == "add")
-					sine_force->Type(affectors::sine_force::ForceType::Add);
-				else if (property[0].Get<ScriptType::Enumerable>()->Get() == "average")
-					sine_force->Type(affectors::sine_force::ForceType::Average);
-			}
-		}
-	}
+		set_sine_force_properties(object, *sine_force);
 
 	return sine_force;
 }
@@ -519,23 +566,7 @@ NonOwningPtr<affectors::VelocityRandomizer> create_velocity_randomizer(const scr
 	auto velocity_randomizer = affector_manager.CreateAffector<affectors::VelocityRandomizer>(std::move(name));
 
 	if (velocity_randomizer)
-	{
-		set_affector_properties(object, *velocity_randomizer);
-
-		for (auto &property : object.Properties())
-		{
-			if (property.Name() == "scope")
-				velocity_randomizer->Scope(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			else if (property.Name() == "velocity")
-			{
-				if (property.NumberOfArguments() == 2)
-					velocity_randomizer->Velocity(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
-												  property[1].Get<ScriptType::FloatingPoint>()->As<real>());
-				else
-					velocity_randomizer->Velocity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-			}
-		}
-	}
+		set_velocity_randomizer_properties(object, *velocity_randomizer);
 
 	return velocity_randomizer;
 }
