@@ -29,6 +29,21 @@ using namespace graphics::shaders;
 namespace shader_program_script_interface::detail
 {
 
+NonOwningPtr<Shader> get_shader(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &shader_manager : managers.ObjectsOf<ShaderManager>())
+	{
+		if (shader_manager)
+		{
+			if (auto shader = shader_manager->GetShader(name); shader)
+				return shader;
+		}
+	}
+
+	return nullptr;
+}
+
+
 /*
 	Validator classes
 */
@@ -388,8 +403,7 @@ void set_shader_struct_properties(const script_tree::ObjectNode &object, ShaderS
 
 
 NonOwningPtr<ShaderProgram> create_shader_program(const script_tree::ObjectNode &object,
-	ShaderProgramManager &shader_program_manager,
-	ShaderManager &shader_manager)
+	ShaderProgramManager &shader_program_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -405,7 +419,7 @@ NonOwningPtr<ShaderProgram> create_shader_program(const script_tree::ObjectNode 
 		.Get<ScriptType::String>().value_or(""s).Get();
 
 	auto shader_program = shader_program_manager.CreateShaderProgram(std::move(name),
-		shader_manager.GetShader(vertex_shader_name), shader_manager.GetShader(fragment_shader_name),
+		get_shader(vertex_shader_name, managers), get_shader(fragment_shader_name, managers),
 		shader_program_manager.GetShaderLayout(shader_layout_name));
 
 	if (shader_program)
@@ -434,13 +448,12 @@ NonOwningPtr<ShaderStruct> create_shader_struct(const script_tree::ObjectNode &o
 
 
 void create_shader_programs(const ScriptTree &tree,
-	ShaderProgramManager &shader_program_manager,
-	ShaderManager &shader_manager)
+	ShaderProgramManager &shader_program_manager, const ManagerRegister &managers)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "shader-program")
-			create_shader_program(object, shader_program_manager, shader_manager);
+			create_shader_program(object, shader_program_manager, managers);
 	}
 }
 
@@ -461,11 +474,17 @@ ScriptValidator ShaderProgramScriptInterface::GetValidator() const
 */
 
 void ShaderProgramScriptInterface::CreateShaderPrograms(std::string_view asset_name,
-	ShaderProgramManager &shader_program_manager,
-	ShaderManager &shader_manager)
+	ShaderProgramManager &shader_program_manager)
 {
 	if (Load(asset_name))
-		detail::create_shader_programs(*tree_, shader_program_manager, shader_manager);
+		detail::create_shader_programs(*tree_, shader_program_manager, Managers());
+}
+
+void ShaderProgramScriptInterface::CreateShaderPrograms(std::string_view asset_name,
+	ShaderProgramManager &shader_program_manager, const ManagerRegister &managers)
+{
+	if (Load(asset_name))
+		detail::create_shader_programs(*tree_, shader_program_manager, managers);
 }
 
 } //ion::script::interfaces

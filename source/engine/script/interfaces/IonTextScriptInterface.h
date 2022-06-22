@@ -22,16 +22,13 @@ File:	IonTextScriptInterface.h
 #include "script/IonScriptTree.h"
 #include "script/IonScriptValidator.h"
 
-//Forward declarations
-namespace ion::graphics::fonts
-{
-	struct TypeFaceManager;
-}
-
 namespace ion::script::interfaces
 {
 	namespace text_script_interface::detail
 	{
+		NonOwningPtr<graphics::fonts::TypeFace> get_type_face(std::string_view name, const ManagerRegister &managers) noexcept;
+
+
 		/*
 			Validator classes
 		*/
@@ -48,12 +45,10 @@ namespace ion::script::interfaces
 
 
 		NonOwningPtr<graphics::fonts::Text> create_text(const script_tree::ObjectNode &object,
-			graphics::fonts::TextManager &text_manager,
-			graphics::fonts::TypeFaceManager &type_face_manager);
+			graphics::fonts::TextManager &text_manager, const ManagerRegister &managers);
 
 		void create_texts(const ScriptTree &tree,
-			graphics::fonts::TextManager &text_manager,
-			graphics::fonts::TypeFaceManager &type_face_manager);
+			graphics::fonts::TextManager &text_manager, const ManagerRegister &managers);
 	} //text_script_interface::detail
 
 
@@ -76,8 +71,11 @@ namespace ion::script::interfaces
 
 			//Create texts from a script (or object file) with the given asset name
 			void CreateTexts(std::string_view asset_name,
-				graphics::fonts::TextManager &text_manager,
-				graphics::fonts::TypeFaceManager &type_face_manager);
+				graphics::fonts::TextManager &text_manager);
+
+			//Create texts from a script (or object file) with the given asset name
+			void CreateTexts(std::string_view asset_name,
+				graphics::fonts::TextManager &text_manager, const ManagerRegister &managers);
 	};
 } //ion::script::interfaces
 

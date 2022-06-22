@@ -27,6 +27,21 @@ using namespace graphics::particles;
 namespace particle_system_script_interface::detail
 {
 
+NonOwningPtr<graphics::materials::Material> get_material(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &material_manager : managers.ObjectsOf<graphics::materials::MaterialManager>())
+	{
+		if (material_manager)
+		{
+			if (auto material = material_manager->GetMaterial(name); material)
+				return material;
+		}
+	}
+
+	return nullptr;
+}
+
+
 /*
 	Validator classes
 */
@@ -155,7 +170,7 @@ ScriptValidator get_particle_system_validator()
 */
 
 void set_emitter_properties(const script_tree::ObjectNode &object, Emitter &emitter,
-	graphics::materials::MaterialManager &material_manager)
+	const ManagerRegister &managers)
 {
 	for (auto &obj : object.Objects())
 	{
@@ -219,7 +234,7 @@ void set_emitter_properties(const script_tree::ObjectNode &object, Emitter &emit
 				emitter.ParticleMass(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		}
 		else if (property.Name() == "particle-material")
-			emitter.ParticleMaterial(material_manager.GetMaterial(property[0].Get<ScriptType::String>()->Get()));
+			emitter.ParticleMaterial(get_material(property[0].Get<ScriptType::String>()->Get(), managers));
 		else if (property.Name() == "particle-size")
 		{
 			if (property.NumberOfArguments() == 2)
@@ -255,12 +270,12 @@ void set_emitter_properties(const script_tree::ObjectNode &object, Emitter &emit
 }
 
 void set_particle_system_properties(const script_tree::ObjectNode &object, ParticleSystem &particle_system,
-	graphics::materials::MaterialManager &material_manager)
+	const ManagerRegister &managers)
 {
 	for (auto &obj : object.Objects())
 	{
 		if (obj.Name() == "emitter")
-			create_emitter(obj, particle_system, material_manager);
+			create_emitter(obj, particle_system, managers);
 
 		else if (obj.Name() == "color-fader")
 			create_color_fader(obj, particle_system);
@@ -434,8 +449,7 @@ void set_velocity_randomizer_properties(const script_tree::ObjectNode &object, a
 
 
 NonOwningPtr<Emitter> create_emitter(const script_tree::ObjectNode &object,
-	ParticleSystem &particle_system,
-	graphics::materials::MaterialManager &material_manager)
+	ParticleSystem &particle_system, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -444,14 +458,13 @@ NonOwningPtr<Emitter> create_emitter(const script_tree::ObjectNode &object,
 	auto emitter = particle_system.CreateEmitter(std::move(name));
 
 	if (emitter)
-		set_emitter_properties(object, *emitter, material_manager);
+		set_emitter_properties(object, *emitter, managers);
 
 	return emitter;
 }
 
 NonOwningPtr<ParticleSystem> create_particle_system(const script_tree::ObjectNode &object,
-	ParticleSystemManager &particle_system_manager,
-	graphics::materials::MaterialManager &material_manager)
+	ParticleSystemManager &particle_system_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -460,7 +473,7 @@ NonOwningPtr<ParticleSystem> create_particle_system(const script_tree::ObjectNod
 	auto particle_system = particle_system_manager.CreateParticleSystem(std::move(name));
 
 	if (particle_system)
-		set_particle_system_properties(object, *particle_system, material_manager);
+		set_particle_system_properties(object, *particle_system, managers);
 
 	return particle_system;
 }
@@ -573,13 +586,12 @@ NonOwningPtr<affectors::VelocityRandomizer> create_velocity_randomizer(const scr
 
 
 void create_particle_systems(const ScriptTree &tree,
-	ParticleSystemManager &particle_system_manager,
-	graphics::materials::MaterialManager &material_manager)
+	ParticleSystemManager &particle_system_manager, const ManagerRegister &managers)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "particle-system")
-			create_particle_system(object, particle_system_manager, material_manager);
+			create_particle_system(object, particle_system_manager, managers);
 	}
 }
 
@@ -600,11 +612,17 @@ ScriptValidator ParticleSystemScriptInterface::GetValidator() const
 */
 
 void ParticleSystemScriptInterface::CreateParticleSystems(std::string_view asset_name,
-	ParticleSystemManager &particle_system_manager,
-	graphics::materials::MaterialManager &material_manager)
+	ParticleSystemManager &particle_system_manager)
 {
 	if (Load(asset_name))
-		detail::create_particle_systems(*tree_, particle_system_manager, material_manager);
+		detail::create_particle_systems(*tree_, particle_system_manager, Managers());
+}
+
+void ParticleSystemScriptInterface::CreateParticleSystems(std::string_view asset_name,
+	ParticleSystemManager &particle_system_manager, const ManagerRegister &managers)
+{
+	if (Load(asset_name))
+		detail::create_particle_systems(*tree_, particle_system_manager, managers);
 }
 
 } //ion::script::interfaces

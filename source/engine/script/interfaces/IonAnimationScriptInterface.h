@@ -22,16 +22,13 @@ File:	IonAnimationScriptInterface.h
 #include "script/IonScriptTree.h"
 #include "script/IonScriptValidator.h"
 
-//Forward declarations
-namespace ion::graphics::textures
-{
-	struct FrameSequenceManager;
-}
-
 namespace ion::script::interfaces
 {
 	namespace animation_script_interface::detail
 	{
+		NonOwningPtr<graphics::textures::FrameSequence> get_frame_sequence(std::string_view name, const ManagerRegister &managers) noexcept;
+
+
 		/*
 			Validator classes
 		*/
@@ -48,12 +45,10 @@ namespace ion::script::interfaces
 
 
 		NonOwningPtr<graphics::textures::Animation> create_animation(const script_tree::ObjectNode &object,
-			graphics::textures::AnimationManager &animation_manager,
-			graphics::textures::FrameSequenceManager &frame_sequence_manager);
+			graphics::textures::AnimationManager &animation_manager, const ManagerRegister &managers);
 
 		void create_animations(const ScriptTree &tree,
-			graphics::textures::AnimationManager &animation_manager,
-			graphics::textures::FrameSequenceManager &frame_sequence_manager);
+			graphics::textures::AnimationManager &animation_manager, const ManagerRegister &managers);
 	} //animation_script_interface::detail
 
 
@@ -76,8 +71,11 @@ namespace ion::script::interfaces
 
 			//Create animations from a script (or object file) with the given asset name
 			void CreateAnimations(std::string_view asset_name,
-				graphics::textures::AnimationManager &animation_manager,
-				graphics::textures::FrameSequenceManager &frame_sequence_manager);
+				graphics::textures::AnimationManager &animation_manager);
+
+			//Create animations from a script (or object file) with the given asset name
+			void CreateAnimations(std::string_view asset_name,
+				graphics::textures::AnimationManager &animation_manager, const ManagerRegister &managers);
 	};
 } //ion::script::interfaces
 

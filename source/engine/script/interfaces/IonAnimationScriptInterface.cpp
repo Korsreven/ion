@@ -27,6 +27,21 @@ using namespace graphics::textures;
 namespace animation_script_interface::detail
 {
 
+NonOwningPtr<FrameSequence> get_frame_sequence(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &frame_sequence_manager : managers.ObjectsOf<FrameSequenceManager>())
+	{
+		if (frame_sequence_manager)
+		{
+			if (auto frame_sequence = frame_sequence_manager->GetFrameSequence(name); frame_sequence)
+				return frame_sequence;
+		}
+	}
+
+	return nullptr;
+}
+
+
 /*
 	Validator classes
 */
@@ -109,8 +124,7 @@ void set_animation_properties(const script_tree::ObjectNode &object, Animation &
 
 
 NonOwningPtr<Animation> create_animation(const script_tree::ObjectNode &object,
-	AnimationManager &animation_manager,
-	FrameSequenceManager &frame_sequence_manager)
+	AnimationManager &animation_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -123,7 +137,7 @@ NonOwningPtr<Animation> create_animation(const script_tree::ObjectNode &object,
 		.Get<ScriptType::FloatingPoint>()->As<real>()};
 
 	auto animation = animation_manager.CreateAnimation(std::move(name),
-		frame_sequence_manager.GetFrameSequence(frame_sequence_name), cycle_duration);
+		get_frame_sequence(frame_sequence_name, managers), cycle_duration);
 
 	if (animation)
 		set_animation_properties(object, *animation);
@@ -132,13 +146,12 @@ NonOwningPtr<Animation> create_animation(const script_tree::ObjectNode &object,
 }
 
 void create_animations(const ScriptTree &tree,
-	AnimationManager &animation_manager,
-	FrameSequenceManager &frame_sequence_manager)
+	AnimationManager &animation_manager, const ManagerRegister &managers)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "animation")
-			create_animation(object, animation_manager, frame_sequence_manager);
+			create_animation(object, animation_manager, managers);
 	}
 }
 
@@ -159,11 +172,17 @@ ScriptValidator AnimationScriptInterface::GetValidator() const
 */
 
 void AnimationScriptInterface::CreateAnimations(std::string_view asset_name,
-	AnimationManager &animation_manager,
-	FrameSequenceManager &frame_sequence_manager)
+	AnimationManager &animation_manager)
 {
 	if (Load(asset_name))
-		detail::create_animations(*tree_, animation_manager, frame_sequence_manager);
+		detail::create_animations(*tree_, animation_manager, Managers());
+}
+
+void AnimationScriptInterface::CreateAnimations(std::string_view asset_name,
+	AnimationManager &animation_manager, const ManagerRegister &managers)
+{
+	if (Load(asset_name))
+		detail::create_animations(*tree_, animation_manager, managers);
 }
 
 } //ion::script::interfaces

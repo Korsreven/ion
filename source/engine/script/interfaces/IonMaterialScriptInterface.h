@@ -22,17 +22,14 @@ File:	IonMaterialScriptInterface.h
 #include "script/IonScriptTree.h"
 #include "script/IonScriptValidator.h"
 
-//Forward declarations
-namespace ion::graphics::textures
-{
-	struct AnimationManager;
-	class TextureManager;
-}
-
 namespace ion::script::interfaces
 {
 	namespace material_script_interface::detail
 	{
+		NonOwningPtr<graphics::textures::Animation> get_animation(std::string_view name, const ManagerRegister &managers) noexcept;
+		NonOwningPtr<graphics::textures::Texture> get_texture(std::string_view name, const ManagerRegister &managers) noexcept;
+
+
 		/*
 			Validator classes
 		*/
@@ -46,18 +43,14 @@ namespace ion::script::interfaces
 		*/
 
 		void set_material_properties(const script_tree::ObjectNode &object, graphics::materials::Material &material,
-			graphics::textures::AnimationManager &animation_manager, graphics::textures::TextureManager &texture_manager);
+			const ManagerRegister &managersr);
 
 
 		NonOwningPtr<graphics::materials::Material> create_material(const script_tree::ObjectNode &object,
-			graphics::materials::MaterialManager &material_manager,
-			graphics::textures::AnimationManager &animation_manager,
-			graphics::textures::TextureManager &texture_manager);
+			graphics::materials::MaterialManager &material_manager, const ManagerRegister &managers);
 
 		void create_materials(const ScriptTree &tree,
-			graphics::materials::MaterialManager &material_manager,
-			graphics::textures::AnimationManager &animation_manager,
-			graphics::textures::TextureManager &texture_manager);
+			graphics::materials::MaterialManager &material_manager, const ManagerRegister &managers);
 	} //material_script_interface::detail
 
 
@@ -80,9 +73,11 @@ namespace ion::script::interfaces
 
 			//Create materials from a script (or object file) with the given asset name
 			void CreateMaterials(std::string_view asset_name,
-				graphics::materials::MaterialManager &material_manager,
-				graphics::textures::AnimationManager &animation_manager,
-				graphics::textures::TextureManager &texture_manager);
+				graphics::materials::MaterialManager &material_manager);
+
+			//Create materials from a script (or object file) with the given asset name
+			void CreateMaterials(std::string_view asset_name,
+				graphics::materials::MaterialManager &material_manager, const ManagerRegister &managers);
 	};
 } //ion::script::interfaces
 

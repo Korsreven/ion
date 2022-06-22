@@ -28,6 +28,35 @@ using namespace graphics::materials;
 namespace material_script_interface::detail
 {
 
+NonOwningPtr<graphics::textures::Animation> get_animation(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &animation_manager : managers.ObjectsOf<graphics::textures::AnimationManager>())
+	{
+		if (animation_manager)
+		{
+			if (auto animation = animation_manager->GetAnimation(name); animation)
+				return animation;
+		}
+	}
+
+	return nullptr;
+}
+
+NonOwningPtr<graphics::textures::Texture> get_texture(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &texture_manager : managers.ObjectsOf<graphics::textures::TextureManager>())
+	{
+		if (texture_manager)
+		{
+			if (auto texture = texture_manager->GetTexture(name); texture)
+				return texture;
+		}
+	}
+
+	return nullptr;
+}
+
+
 /*
 	Validator classes
 */
@@ -65,7 +94,7 @@ ScriptValidator get_material_validator()
 */
 
 void set_material_properties(const script_tree::ObjectNode &object, Material &material,
-	graphics::textures::AnimationManager &animation_manager, graphics::textures::TextureManager &texture_manager)
+	const ManagerRegister &managers)
 {
 	for (auto &property : object.Properties())
 	{
@@ -77,9 +106,9 @@ void set_material_properties(const script_tree::ObjectNode &object, Material &ma
 			material.DiffuseColor(property[0].Get<ScriptType::Color>()->Get());
 		else if (property.Name() == "diffuse-map")
 		{
-			if (auto texture = texture_manager.GetTexture(property[0].Get<ScriptType::String>()->Get()); texture)
+			if (auto texture = get_texture(property[0].Get<ScriptType::String>()->Get(), managers); texture)
 				material.DiffuseMap(texture);
-			else if (auto animation = animation_manager.GetAnimation(property[0].Get<ScriptType::String>()->Get()); animation)
+			else if (auto animation = get_animation(property[0].Get<ScriptType::String>()->Get(), managers); animation)
 				material.DiffuseMap(animation);
 		}
 		else if (property.Name() == "emissive-color")
@@ -98,9 +127,9 @@ void set_material_properties(const script_tree::ObjectNode &object, Material &ma
 			material.LightingEnabled(property[0].Get<ScriptType::Boolean>()->Get());
 		else if (property.Name() == "normal-map")
 		{
-			if (auto texture = texture_manager.GetTexture(property[0].Get<ScriptType::String>()->Get()); texture)
+			if (auto texture = get_texture(property[0].Get<ScriptType::String>()->Get(), managers); texture)
 				material.NormalMap(texture);
-			else if (auto animation = animation_manager.GetAnimation(property[0].Get<ScriptType::String>()->Get()); animation)
+			else if (auto animation = get_animation(property[0].Get<ScriptType::String>()->Get(), managers); animation)
 				material.NormalMap(animation);
 		}
 		else if (property.Name() == "receive-shadows")
@@ -113,9 +142,9 @@ void set_material_properties(const script_tree::ObjectNode &object, Material &ma
 			material.SpecularColor(property[0].Get<ScriptType::Color>()->Get());
 		else if (property.Name() == "specular-map")
 		{
-			if (auto texture = texture_manager.GetTexture(property[0].Get<ScriptType::String>()->Get()); texture)
+			if (auto texture = get_texture(property[0].Get<ScriptType::String>()->Get(), managers); texture)
 				material.SpecularMap(texture);
-			else if (auto animation = animation_manager.GetAnimation(property[0].Get<ScriptType::String>()->Get()); animation)
+			else if (auto animation = get_animation(property[0].Get<ScriptType::String>()->Get(), managers); animation)
 				material.SpecularMap(animation);
 		}
 		else if (property.Name() == "tex-coords")
@@ -125,9 +154,7 @@ void set_material_properties(const script_tree::ObjectNode &object, Material &ma
 
 
 NonOwningPtr<Material> create_material(const script_tree::ObjectNode &object,
-	MaterialManager &material_manager,
-	graphics::textures::AnimationManager &animation_manager,
-	graphics::textures::TextureManager &texture_manager)
+	MaterialManager &material_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -136,20 +163,18 @@ NonOwningPtr<Material> create_material(const script_tree::ObjectNode &object,
 	auto material = material_manager.CreateMaterial(std::move(name));
 
 	if (material)
-		set_material_properties(object, *material, animation_manager, texture_manager);
+		set_material_properties(object, *material, managers);
 
 	return material;
 }
 
 void create_materials(const ScriptTree &tree,
-	MaterialManager &material_manager,
-	graphics::textures::AnimationManager &animation_manager,
-	graphics::textures::TextureManager &texture_manager)
+	MaterialManager &material_manager, const ManagerRegister &managers)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "material")
-			create_material(object, material_manager, animation_manager, texture_manager);
+			create_material(object, material_manager, managers);
 	}
 }
 
@@ -170,12 +195,17 @@ ScriptValidator MaterialScriptInterface::GetValidator() const
 */
 
 void MaterialScriptInterface::CreateMaterials(std::string_view asset_name,
-	MaterialManager &material_manager,
-	graphics::textures::AnimationManager &animation_manager,
-	graphics::textures::TextureManager &texture_manager)
+	MaterialManager &material_manager)
 {
 	if (Load(asset_name))
-		detail::create_materials(*tree_, material_manager, animation_manager, texture_manager);
+		detail::create_materials(*tree_, material_manager, Managers());
+}
+
+void MaterialScriptInterface::CreateMaterials(std::string_view asset_name,
+	MaterialManager &material_manager, const ManagerRegister &managers)
+{
+	if (Load(asset_name))
+		detail::create_materials(*tree_, material_manager, managers);
 }
 
 } //ion::script::interfaces

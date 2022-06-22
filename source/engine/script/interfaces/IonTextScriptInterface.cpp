@@ -26,6 +26,21 @@ using namespace graphics::fonts;
 namespace text_script_interface::detail
 {
 
+NonOwningPtr<TypeFace> get_type_face(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &type_face_manager : managers.ObjectsOf<TypeFaceManager>())
+	{
+		if (type_face_manager)
+		{
+			if (auto type_face = type_face_manager->GetTypeFace(name); type_face)
+				return type_face;
+		}
+	}
+
+	return nullptr;
+}
+
+
 /*
 	Validator classes
 */
@@ -146,8 +161,7 @@ void set_text_properties(const script_tree::ObjectNode &object, Text &text)
 }
 
 NonOwningPtr<Text> create_text(const script_tree::ObjectNode &object,
-	TextManager &text_manager,
-	TypeFaceManager &type_face_manager)
+	TextManager &text_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -159,7 +173,8 @@ NonOwningPtr<Text> create_text(const script_tree::ObjectNode &object,
 		.Property("type-face")[0]
 		.Get<ScriptType::String>()->Get();
 
-	auto text = text_manager.CreateText(std::move(name), std::move(content), type_face_manager.GetTypeFace(type_face_name));
+	auto text = text_manager.CreateText(std::move(name), std::move(content),
+		get_type_face(type_face_name, managers));
 
 	if (text)
 		set_text_properties(object, *text);
@@ -168,13 +183,12 @@ NonOwningPtr<Text> create_text(const script_tree::ObjectNode &object,
 }
 
 void create_texts(const ScriptTree &tree,
-	TextManager &text_manager,
-	TypeFaceManager &type_face_manager)
+	TextManager &text_manager, const ManagerRegister &managers)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "text")
-			create_text(object, text_manager, type_face_manager);
+			create_text(object, text_manager, managers);
 	}
 }
 
@@ -195,11 +209,17 @@ ScriptValidator TextScriptInterface::GetValidator() const
 */
 
 void TextScriptInterface::CreateTexts(std::string_view asset_name,
-	TextManager &text_manager,
-	TypeFaceManager &type_face_manager)
+	TextManager &text_manager)
 {
 	if (Load(asset_name))
-		detail::create_texts(*tree_, text_manager, type_face_manager);
+		detail::create_texts(*tree_, text_manager, Managers());
+}
+
+void TextScriptInterface::CreateTexts(std::string_view asset_name,
+	TextManager &text_manager, const ManagerRegister &managers)
+{
+	if (Load(asset_name))
+		detail::create_texts(*tree_, text_manager, managers);
 }
 
 } //ion::script::interfaces

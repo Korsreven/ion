@@ -24,12 +24,6 @@ File:	IonShaderProgramScriptInterface.h
 #include "script/IonScriptValidator.h"
 #include "types/IonTypes.h"
 
-//Forward declarations
-namespace ion::graphics::shader
-{
-	class ShaderManager;
-}
-
 namespace ion::script::interfaces
 {
 	namespace shader_program_script_interface::detail
@@ -82,6 +76,9 @@ namespace ion::script::interfaces
 		};
 
 
+		NonOwningPtr<graphics::shaders::Shader> get_shader(std::string_view name, const ManagerRegister &managers) noexcept;
+
+
 		/*
 			Validator classes
 		*/
@@ -109,14 +106,12 @@ namespace ion::script::interfaces
 
 
 		NonOwningPtr<graphics::shaders::ShaderProgram> create_shader_program(const script_tree::ObjectNode &object,
-			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			graphics::shaders::ShaderManager &shader_manager);
+			graphics::shaders::ShaderProgramManager &shader_program_manager, const ManagerRegister &managers);
 		NonOwningPtr<graphics::shaders::ShaderStruct> create_shader_struct(const script_tree::ObjectNode &object,
 			graphics::shaders::ShaderProgram &shader_program);
 
 		void create_shader_programs(const ScriptTree &tree,
-			graphics::shaders::ShaderProgramManager &shader_program_manager,
-			graphics::shaders::ShaderManager &shader_manager);
+			graphics::shaders::ShaderProgramManager &shader_program_manager, const ManagerRegister &managers);
 	} //shader_program_script_interface::detail
 
 
@@ -139,8 +134,11 @@ namespace ion::script::interfaces
 
 			//Create shader programs from a script (or object file) with the given asset name
 			void CreateShaderPrograms(std::string_view asset_name,
-				graphics::shaders::ShaderProgramManager &shader_program_manager,
-				graphics::shaders::ShaderManager &shader_manager);
+				graphics::shaders::ShaderProgramManager &shader_program_manager);
+
+			//Create shader programs from a script (or object file) with the given asset name
+			void CreateShaderPrograms(std::string_view asset_name,
+				graphics::shaders::ShaderProgramManager &shader_program_manager, const ManagerRegister &managers);
 	};
 } //ion::script::interfaces
 

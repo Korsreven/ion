@@ -22,16 +22,13 @@ File:	IonFrameSequenceScriptInterface.h
 #include "script/IonScriptTree.h"
 #include "script/IonScriptValidator.h"
 
-//Forward declarations
-namespace ion::graphics::textures
-{
-	class TextureManager;
-}
-
 namespace ion::script::interfaces
 {
 	namespace frame_sequence_script_interface::detail
 	{
+		NonOwningPtr<graphics::textures::Texture> get_texture(std::string_view name, const ManagerRegister &managers) noexcept;
+
+
 		/*
 			Validator classes
 		*/
@@ -45,12 +42,10 @@ namespace ion::script::interfaces
 		*/
 
 		NonOwningPtr<graphics::textures::FrameSequence> create_frame_sequence(const script_tree::ObjectNode &object,
-			graphics::textures::FrameSequenceManager &frame_sequence_manager,
-			graphics::textures::TextureManager &texture_manager);
+			graphics::textures::FrameSequenceManager &frame_sequence_manager, const ManagerRegister &managers);
 
 		void create_frame_sequences(const ScriptTree &tree,
-			graphics::textures::FrameSequenceManager &frame_sequence_manager,
-			graphics::textures::TextureManager &texture_manager);
+			graphics::textures::FrameSequenceManager &frame_sequence_manager, const ManagerRegister &managers);
 	} //frame_sequence_script_interface::detail
 
 
@@ -73,8 +68,11 @@ namespace ion::script::interfaces
 
 			//Create frame sequences from a script (or object file) with the given asset name
 			void CreateFrameSequences(std::string_view asset_name,
-				graphics::textures::FrameSequenceManager &frame_sequence_manager,
-				graphics::textures::TextureManager &texture_manager);
+				graphics::textures::FrameSequenceManager &frame_sequence_manager);
+
+			//Create frame sequences from a script (or object file) with the given asset name
+			void CreateFrameSequences(std::string_view asset_name,
+				graphics::textures::FrameSequenceManager &frame_sequence_manager, const ManagerRegister &managers);
 	};
 } //ion::script::interfaces
 

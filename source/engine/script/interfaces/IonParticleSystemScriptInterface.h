@@ -33,16 +33,13 @@ File:	IonParticleSystemScriptInterface.h
 #include "script/IonScriptTree.h"
 #include "script/IonScriptValidator.h"
 
-//Forward declarations
-namespace ion::graphics::materials
-{
-	struct MaterialManager;
-}
-
 namespace ion::script::interfaces
 {
 	namespace particle_system_script_interface::detail
 	{
+		NonOwningPtr<graphics::materials::Material> get_material(std::string_view name, const ManagerRegister &managers) noexcept;
+
+
 		/*
 			Validator classes
 		*/
@@ -67,9 +64,9 @@ namespace ion::script::interfaces
 		*/
 
 		void set_emitter_properties(const script_tree::ObjectNode &object, graphics::particles::Emitter &emitter,
-			graphics::materials::MaterialManager &material_manager);
+			const ManagerRegister &managers);
 		void set_particle_system_properties(const script_tree::ObjectNode &object, graphics::particles::ParticleSystem &particle_system,
-			graphics::materials::MaterialManager &material_manager);
+			const ManagerRegister &managers);
 
 		void set_affector_properties(const script_tree::ObjectNode &object, graphics::particles::affectors::Affector &affector);
 		void set_color_fader_properties(const script_tree::ObjectNode &object, graphics::particles::affectors::ColorFader &color_fader);
@@ -82,11 +79,9 @@ namespace ion::script::interfaces
 
 
 		NonOwningPtr<graphics::particles::Emitter> create_emitter(const script_tree::ObjectNode &object,
-			graphics::particles::ParticleSystem &particle_system,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::particles::ParticleSystem &particle_system, const ManagerRegister &managers);
 		NonOwningPtr<graphics::particles::ParticleSystem> create_particle_system(const script_tree::ObjectNode &object,
-			graphics::particles::ParticleSystemManager &particle_system_manager,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::particles::ParticleSystemManager &particle_system_manager, const ManagerRegister &managers);
 
 		NonOwningPtr<graphics::particles::affectors::ColorFader> create_color_fader(const script_tree::ObjectNode &object,
 			graphics::particles::affectors::AffectorManager &affector_manager);
@@ -104,8 +99,7 @@ namespace ion::script::interfaces
 			graphics::particles::affectors::AffectorManager &affector_manager);
 
 		void create_particle_systems(const ScriptTree &tree,
-			graphics::particles::ParticleSystemManager &particle_system_manager,
-			graphics::materials::MaterialManager &material_manager);
+			graphics::particles::ParticleSystemManager &particle_system_manager, const ManagerRegister &managers);
 	} //particle_system_script_interface::detail
 
 
@@ -128,8 +122,11 @@ namespace ion::script::interfaces
 
 			//Create particle systems from a script (or object file) with the given asset name
 			void CreateParticleSystems(std::string_view asset_name,
-				graphics::particles::ParticleSystemManager &particle_system_manager,
-				graphics::materials::MaterialManager &material_manager);
+				graphics::particles::ParticleSystemManager &particle_system_manager);
+
+			//Create particle systems from a script (or object file) with the given asset name
+			void CreateParticleSystems(std::string_view asset_name,
+				graphics::particles::ParticleSystemManager &particle_system_manager, const ManagerRegister &managers);
 	};
 } //ion::script::interfaces
 

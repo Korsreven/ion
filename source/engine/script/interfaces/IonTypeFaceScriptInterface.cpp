@@ -26,6 +26,21 @@ using namespace graphics::fonts;
 namespace type_face_script_interface::detail
 {
 
+NonOwningPtr<Font> get_font(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &font_manager : managers.ObjectsOf<FontManager>())
+	{
+		if (font_manager)
+		{
+			if (auto font = font_manager->GetFont(name); font)
+				return font;
+		}
+	}
+
+	return nullptr;
+}
+
+
 /*
 	Validator classes
 */
@@ -52,8 +67,7 @@ ScriptValidator get_type_face_validator()
 */
 
 NonOwningPtr<TypeFace> create_type_face(const script_tree::ObjectNode &object,
-	TypeFaceManager &type_face_manager,
-	FontManager &font_manager)
+	TypeFaceManager &type_face_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -71,18 +85,17 @@ NonOwningPtr<TypeFace> create_type_face(const script_tree::ObjectNode &object,
 		.Property("bold-italic")[0]
 		.Get<ScriptType::String>().value_or(""s).Get();
 
-	return type_face_manager.CreateTypeFace(std::move(name), font_manager.GetFont(regular_name),
-		font_manager.GetFont(bold_name), font_manager.GetFont(italic_name), font_manager.GetFont(bold_italic_name));
+	return type_face_manager.CreateTypeFace(std::move(name), get_font(regular_name, managers),
+		get_font(bold_name, managers), get_font(italic_name, managers), get_font(bold_italic_name, managers));
 }
 
 void create_type_faces(const ScriptTree &tree,
-	TypeFaceManager &type_face_manager,
-	FontManager &font_manager)
+	TypeFaceManager &type_face_manager, const ManagerRegister &managers)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "type-face")
-			create_type_face(object, type_face_manager, font_manager);
+			create_type_face(object, type_face_manager, managers);
 	}
 }
 
@@ -103,11 +116,17 @@ ScriptValidator TypeFaceScriptInterface::GetValidator() const
 */
 
 void TypeFaceScriptInterface::CreateTypeFaces(std::string_view asset_name,
-	TypeFaceManager &type_face_manager,
-	FontManager &font_manager)
+	TypeFaceManager &type_face_manager)
 {
 	if (Load(asset_name))
-		detail::create_type_faces(*tree_, type_face_manager, font_manager);
+		detail::create_type_faces(*tree_, type_face_manager, Managers());
+}
+
+void TypeFaceScriptInterface::CreateTypeFaces(std::string_view asset_name,
+	TypeFaceManager &type_face_manager, const ManagerRegister &managers)
+{
+	if (Load(asset_name))
+		detail::create_type_faces(*tree_, type_face_manager, managers);
 }
 
 } //ion::script::interfaces

@@ -26,6 +26,21 @@ using namespace graphics::textures;
 namespace frame_sequence_script_interface::detail
 {
 
+NonOwningPtr<Texture> get_texture(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &texture_manager : managers.ObjectsOf<TextureManager>())
+	{
+		if (texture_manager)
+		{
+			if (auto texture = texture_manager->GetTexture(name); texture)
+				return texture;
+		}
+	}
+
+	return nullptr;
+}
+
+
 /*
 	Validator classes
 */
@@ -50,8 +65,7 @@ ScriptValidator get_frame_sequence_validator()
 */
 
 NonOwningPtr<FrameSequence> create_frame_sequence(const script_tree::ObjectNode &object,
-	FrameSequenceManager &frame_sequence_manager,
-	TextureManager &texture_manager)
+	FrameSequenceManager &frame_sequence_manager, const ManagerRegister &managers)
 {
 	auto name = object
 		.Property("name")[0]
@@ -66,7 +80,7 @@ NonOwningPtr<FrameSequence> create_frame_sequence(const script_tree::ObjectNode 
 	//Construct from first frame and total frames
 	if (total_frames > 0)
 		return frame_sequence_manager.CreateFrameSequence(std::move(name),
-			texture_manager.GetTexture(first_frame_name), total_frames);
+			get_texture(first_frame_name, managers), total_frames);
 	else //Construct from one or more given frame
 	{
 		frame_sequence::detail::container_type frames;
@@ -74,7 +88,7 @@ NonOwningPtr<FrameSequence> create_frame_sequence(const script_tree::ObjectNode 
 		for (auto &property : object.Properties())
 		{
 			if (property.Name() == "frame")
-				frames.push_back(texture_manager.GetTexture(property[0].Get<ScriptType::String>()->Get()));
+				frames.push_back(get_texture(property[0].Get<ScriptType::String>()->Get(), managers));
 		}
 
 		if (!std::empty(frames))
@@ -85,13 +99,12 @@ NonOwningPtr<FrameSequence> create_frame_sequence(const script_tree::ObjectNode 
 }
 
 void create_frame_sequences(const ScriptTree &tree,
-	FrameSequenceManager &frame_sequence_manager,
-	TextureManager &texture_manager)
+	FrameSequenceManager &frame_sequence_manager, const ManagerRegister &managers)
 {
 	for (auto &object : tree.Objects())
 	{
 		if (object.Name() == "frame-sequence")
-			create_frame_sequence(object, frame_sequence_manager, texture_manager);
+			create_frame_sequence(object, frame_sequence_manager, managers);
 	}
 }
 
@@ -112,11 +125,17 @@ ScriptValidator FrameSequenceScriptInterface::GetValidator() const
 */
 
 void FrameSequenceScriptInterface::CreateFrameSequences(std::string_view asset_name,
-	FrameSequenceManager &frame_sequence_manager,
-	TextureManager &texture_manager)
+	FrameSequenceManager &frame_sequence_manager)
 {
 	if (Load(asset_name))
-		detail::create_frame_sequences(*tree_, frame_sequence_manager, texture_manager);
+		detail::create_frame_sequences(*tree_, frame_sequence_manager, Managers());
+}
+
+void FrameSequenceScriptInterface::CreateFrameSequences(std::string_view asset_name,
+	FrameSequenceManager &frame_sequence_manager, const ManagerRegister &managers)
+{
+	if (Load(asset_name))
+		detail::create_frame_sequences(*tree_, frame_sequence_manager, managers);
 }
 
 } //ion::script::interfaces
