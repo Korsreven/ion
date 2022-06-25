@@ -623,6 +623,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		auto &window = engine.RenderTo(
 			ion::graphics::render::RenderWindow::Resizable("ION engine", {1280.0_r, 720.0_r}));
 		window.MinSize(ion::graphics::utilities::Vector2{640.0_r, 360.0_r});
+		window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
 
 		if (engine.Initialize())
 		{
@@ -665,188 +666,292 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//asset_loader.CompileDataFile("bin/resources.dat");
 
 
-			ion::types::Progress<int> progress;
+			//Managers
+			auto textures = ion::make_owning<ion::graphics::textures::TextureManager>();
+			textures->CreateRepository(std::move(image_repository));
 
-			//Textures
-			ion::graphics::textures::TextureManager textures;
-			textures.CreateRepository(std::move(image_repository));
+			auto shaders = ion::make_owning<ion::graphics::shaders::ShaderManager>();
+			shaders->CreateRepository(std::move(shader_repository));
+			shaders->LogLevel(ion::graphics::shaders::shader_manager::InfoLogLevel::Error);	
 
-			/*ion::script::interfaces::TextureScriptInterface texture_script;
+			auto fonts = ion::make_owning<ion::graphics::fonts::FontManager>();
+			fonts->CreateRepository(std::move(font_repository));
+
+			auto sounds = ion::make_owning<ion::sounds::SoundManager>();
+			sounds->CreateRepository(std::move(audio_repository));
+
+			auto frame_sequences = ion::make_owning<ion::graphics::textures::FrameSequenceManager>();
+			auto animations = ion::make_owning<ion::graphics::textures::AnimationManager>();
+			auto materials = ion::make_owning<ion::graphics::materials::MaterialManager>();
+
+			auto shader_programs = ion::make_owning<ion::graphics::shaders::ShaderProgramManager>();
+			shader_programs->LogLevel(ion::graphics::shaders::shader_program_manager::InfoLogLevel::Error);
+
+			auto type_faces = ion::make_owning<ion::graphics::fonts::TypeFaceManager>();
+			auto texts = ion::make_owning<ion::graphics::fonts::TextManager>();
+			auto particle_systems = ion::make_owning<ion::graphics::particles::ParticleSystemManager>();
+
+			auto &script_managers = ion::script::interfaces::ScriptInterface::Managers();
+			script_managers.Register(textures);
+			script_managers.Register(shaders);
+			script_managers.Register(fonts);
+			script_managers.Register(sounds);
+			script_managers.Register(frame_sequences);
+			script_managers.Register(animations);
+			script_managers.Register(materials);
+			script_managers.Register(shader_programs);
+			script_managers.Register(type_faces);
+			script_managers.Register(texts);
+			script_managers.Register(particle_systems);
+
+
+			//Load scripts
+			ion::script::interfaces::TextureScriptInterface texture_script;
 			texture_script.CreateScriptRepository(script_repository);
 			texture_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			texture_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			texture_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			texture_script.CreateTextures("textures.ion", textures);*/
+			texture_script.CreateTextures("textures.ion", *textures);
 
+			ion::script::interfaces::FontScriptInterface font_script;
+			font_script.CreateScriptRepository(script_repository);
+			font_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			font_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			font_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			font_script.CreateFonts("fonts.ion", *fonts);
 
-			auto ground = textures.CreateTextureAtlas("ground", "atlas_pot.jpg", 2, 2, 4,
-				ion::graphics::textures::texture_atlas::AtlasSubTextureOrder::RowMajor);
-
-			auto asteroid_diffuse = textures.CreateTexture("asteroid_diffuse", "asteroid_diffuse.png");
-			auto asteroid_normal = textures.CreateTexture("asteroid_normal", "asteroid_normal.png");
-			auto asteroid_specular = textures.CreateTexture("asteroid_specular", "asteroid_specular.png");
-			
-			auto brick_wall_diffuse = textures.CreateTexture("brick_wall_diffuse", "brick_wall_diffuse.jpg");
-			auto brick_wall_normal = textures.CreateTexture("brick_wall_normal", "brick_wall_normal.jpg");
-			auto brick_wall_specular = textures.CreateTexture("brick_wall_specular", "brick_wall_specular.jpg");
-			
-			auto pebbles_diffuse = textures.CreateTexture("pebbles_diffuse", "pebbles_diffuse.jpg");
-			auto pebbles_normal = textures.CreateTexture("pebbles_normal", "pebbles_normal.jpg");
-			auto pebbles_specular = textures.CreateTexture("pebbles_specular", "pebbles_specular.jpg");
-
-			auto tifa_diffuse = textures.CreateTexture("tifa", "tifa.png");
-			auto cloud_diffuse = textures.CreateTexture("cloud", "cloud.png");
-			auto star_diffuse = textures.CreateTexture("star", "star.png");
-			auto ship_diffuse = textures.CreateTexture("ship", "ship.png");
-			auto aura_diffuse = textures.CreateTexture("aura", "aura.png");
-			auto raindrop_diffuse = textures.CreateTexture("raindrop", "raindrop.png");
-			auto color_spectrum_diffuse = textures.CreateTexture("color_spectrum", "color_spectrum.png");
-
-			//GUI
-			//Mouse cursor
-			auto mouse_cursor_diffuse = textures.CreateTexture("mouse_cursor_diffuse", "mouse_cursor.png");
-
-			//Tooltip
-			auto tooltip_center_diffuse = textures.CreateTexture("tooltip_center", "tooltip_center.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto tooltip_top_diffuse = textures.CreateTexture("tooltip_top", "tooltip_top.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto tooltip_left_diffuse = textures.CreateTexture("tooltip_left", "tooltip_left.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto tooltip_top_left_diffuse = textures.CreateTexture("tooltip_top_left", "tooltip_top_left.png");
-
-			//Button
-			auto button_center_enabled_diffuse = textures.CreateTexture("button_center_enabled", "button_center_enabled.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto button_center_disabled_diffuse = textures.CreateTexture("button_center_disabled", "button_center_disabled.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto button_center_pressed_diffuse = textures.CreateTexture("button_center_pressed", "button_center_pressed.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto button_center_hovered_diffuse = textures.CreateTexture("button_center_hovered", "button_center_hovered.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-
-			auto button_top_enabled_diffuse = textures.CreateTexture("button_top_enabled", "button_top_enabled.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto button_top_focused_diffuse = textures.CreateTexture("button_top_focused", "button_top_focused.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto button_left_enabled_diffuse = textures.CreateTexture("button_left_enabled", "button_left_enabled.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto button_left_focused_diffuse = textures.CreateTexture("button_left_focused", "button_left_focused.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-
-			auto button_top_left_enabled_diffuse = textures.CreateTexture("button_top_left_enabled", "button_top_left_enabled.png");
-			auto button_top_left_focused_diffuse = textures.CreateTexture("button_top_left_focused", "button_top_left_focused.png");
-
-			//Check box
-			auto check_box_center_enabled_diffuse = textures.CreateTexture("check_box_center_enabled", "check_box_center_enabled.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto check_box_center_hovered_diffuse = textures.CreateTexture("check_box_center_hovered", "check_box_center_hovered.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-
-			auto check_box_mark_enabled_diffuse = textures.CreateTexture("check_box_mark_enabled", "check_box_mark_enabled.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto check_box_mark_disabled_diffuse = textures.CreateTexture("check_box_mark_disabled", "check_box_mark_disabled.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);		
-			auto check_box_mark_pressed_diffuse = textures.CreateTexture("check_box_mark_pressed", "check_box_mark_pressed.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto check_box_mark_hovered_diffuse = textures.CreateTexture("check_box_mark_hovered", "check_box_mark_hovered.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-
-			//Progress bar
-			auto progress_bar_bar_enabled_diffuse = textures.CreateTexture("progress_bar_bar_enabled", "progress_bar_bar_enabled.png");
-
-			//Radio button
-			auto radio_button_select_enabled_diffuse = textures.CreateTexture("radio_button_select_enabled", "radio_button_select_enabled.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto radio_button_select_disabled_diffuse = textures.CreateTexture("radio_button_select_disabled", "radio_button_select_disabled.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto radio_button_select_pressed_diffuse = textures.CreateTexture("radio_button_select_pressed", "radio_button_select_pressed.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-			auto radio_button_select_hovered_diffuse = textures.CreateTexture("radio_button_select_hovered", "radio_button_select_hovered.png",
-				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-
-			//Text box
-			auto text_box_cursor_enabled_diffuse = textures.CreateTexture("text_box_cursor_enabled", "text_box_cursor_enabled.png");
-
-
-			auto cat_first_frame = textures.CreateTexture("cat01", "cat01.png");
-			textures.CreateTexture("cat02", "cat02.png");
-			textures.CreateTexture("cat03", "cat03.png");
-			textures.CreateTexture("cat04", "cat04.png");
-			textures.CreateTexture("cat05", "cat05.png");
-			textures.CreateTexture("cat06", "cat06.png");
-			textures.CreateTexture("cat07", "cat07.png");
-			textures.CreateTexture("cat08", "cat08.png");
-			
-			textures.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
-
-			//while (!textures.Loaded());
-
-			//Frame sequences
-			ion::graphics::textures::FrameSequenceManager frame_sequences;
-
-			/*ion::script::interfaces::FrameSequenceScriptInterface frame_sequence_script;
+			ion::script::interfaces::FrameSequenceScriptInterface frame_sequence_script;
 			frame_sequence_script.CreateScriptRepository(script_repository);
 			frame_sequence_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			frame_sequence_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			frame_sequence_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			frame_sequence_script.CreateFrameSequences("frame_sequences.ion", frame_sequences, textures);*/
+			frame_sequence_script.CreateFrameSequences("frame_sequences.ion", *frame_sequences);
 
-			auto cat_sequence = frame_sequences.CreateFrameSequence("cat_sequence", cat_first_frame, 8);
-
-			//Animation
-			ion::graphics::textures::AnimationManager animations;
-
-			/*ion::script::interfaces::AnimationScriptInterface animation_script;
+			ion::script::interfaces::AnimationScriptInterface animation_script;
 			animation_script.CreateScriptRepository(script_repository);
 			animation_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			animation_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			animation_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			animation_script.CreateAnimations("animations.ion", animations, frame_sequences);*/
+			animation_script.CreateAnimations("animations.ion", *animations);
 
-			auto cat_running = animations.CreateAnimation(
-				ion::graphics::textures::Animation::Looping("cat_running", cat_sequence, 0.8_sec));
-
-			//Shaders
-			ion::graphics::shaders::ShaderManager shaders;
-			shaders.CreateRepository(std::move(shader_repository));
-			shaders.LogLevel(ion::graphics::shaders::shader_manager::InfoLogLevel::Error);	
-			
-			/*ion::script::interfaces::ShaderScriptInterface shader_script;
+			ion::script::interfaces::ShaderScriptInterface shader_script;
 			shader_script.CreateScriptRepository(script_repository);
 			shader_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			shader_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			shader_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			shader_script.CreateShaders("shaders.ion", shaders);*/
+			shader_script.CreateShaders("shaders.ion", *shaders);
 
-			auto model_vert_shader = shaders.CreateShader("default_model_vert", "default_model.vert");
-			auto model_frag_shader = shaders.CreateShader("default_model_frag", "default_model.frag");
-			auto particle_vert_shader = shaders.CreateShader("default_particle_vert", "default_particle.vert");
-			auto particle_frag_shader = shaders.CreateShader("default_particle_frag", "default_particle.frag");
-			auto text_vert_shader = shaders.CreateShader("default_text_vert", "default_text.vert");
-			auto text_frag_shader = shaders.CreateShader("default_text_frag", "default_text.frag");
-			auto gui_text_vert_shader = shaders.CreateShader("default_gui_text_vert", "default_gui_text.vert");
-			auto gui_text_frag_shader = shaders.CreateShader("default_gui_text_frag", "default_gui_text.frag");
-			shaders.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
-
-			//while (!shaders.Loaded());
-
-			//Shader programs
-			ion::graphics::shaders::ShaderProgramManager shader_programs;
-
-			/*ion::script::interfaces::ShaderProgramScriptInterface shader_program_script;
+			ion::script::interfaces::ShaderProgramScriptInterface shader_program_script;
 			shader_program_script.CreateScriptRepository(script_repository);
 			shader_program_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			shader_program_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			shader_program_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			shader_program_script.CreateShaderPrograms("shader_programs.ion", shader_programs, shaders);*/
+			shader_program_script.CreateShaderPrograms("shader_programs.ion", *shader_programs);
 
-			shader_programs.LogLevel(ion::graphics::shaders::shader_program_manager::InfoLogLevel::Error);
-			auto model_program = shader_programs.CreateShaderProgram("default_model_prog", model_vert_shader, model_frag_shader);
-			auto particle_program = shader_programs.CreateShaderProgram("default_particle_prog", particle_vert_shader, particle_frag_shader);
-			auto text_program = shader_programs.CreateShaderProgram("default_text_prog", text_vert_shader, text_frag_shader);
-			auto gui_text_program = shader_programs.CreateShaderProgram("default_gui_text_prog", gui_text_vert_shader, gui_text_frag_shader);
-			shader_programs.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
+			ion::script::interfaces::TypeFaceScriptInterface type_face_script;
+			type_face_script.CreateScriptRepository(script_repository);
+			type_face_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			type_face_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			type_face_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			type_face_script.CreateTypeFaces("type_faces.ion", *type_faces);
+
+			ion::script::interfaces::SoundScriptInterface sound_script;
+			sound_script.CreateScriptRepository(script_repository);
+			sound_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			sound_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			sound_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			sound_script.CreateSounds("sounds.ion", *sounds);
+
+			ion::script::interfaces::ParticleSystemScriptInterface particle_system_script;
+			particle_system_script.CreateScriptRepository(script_repository);
+			particle_system_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			particle_system_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			particle_system_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			particle_system_script.CreateParticleSystems("particle_systems.ion", *particle_systems);
+
+			ion::script::interfaces::MaterialScriptInterface material_script;
+			material_script.CreateScriptRepository(script_repository);
+			material_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			material_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			material_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			material_script.CreateMaterials("materials.ion", *materials);
+
+			ion::script::interfaces::TextScriptInterface text_script;
+			text_script.CreateScriptRepository(script_repository);
+			text_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			text_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			text_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			text_script.CreateTexts("texts.ion", *texts);
+
+
+			//Scene
+			auto scene_graph = engine.CreateSceneGraph("main");
+			scene_graph->Gamma(1.0_r);
+			scene_graph->AmbientColor(ion::graphics::utilities::Color::RGB(50, 50, 50));
+			scene_graph->FogEffect(ion::graphics::render::Fog::Linear(0.0_r, 2.25_r));
+			scene_graph->FogEnabled(false);
+			//scene_graph->LightingEnabled(false);
+
+			auto scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
+
+			//GUI
+			ion::gui::GuiController controller{scene_graph->RootNode(), sounds->GetSoundChannelGroup("gui")};
+			controller.ZOrder(-2.0_r);
+
+
+			//Load scripts
+			ion::script::interfaces::SceneScriptInterface scene_script;
+			scene_script.CreateScriptRepository(script_repository);
+			scene_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			scene_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			scene_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			scene_script.CreateScene("scene.ion", scene_graph->RootNode(), *scene_manager);
+
+			ion::script::interfaces::GuiThemeScriptInterface gui_theme_script;
+			gui_theme_script.CreateScriptRepository(script_repository);
+			gui_theme_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			gui_theme_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			gui_theme_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			gui_theme_script.CreateGuiThemes("gui_themes.ion", controller, scene_manager);
+
+			ion::script::interfaces::GuiScriptInterface gui_script;
+			gui_script.CreateScriptRepository(script_repository);
+			gui_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			gui_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			gui_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			gui_script.CreateGui("gui.ion", controller, *scene_manager);
+
+
+			//Textures
+			auto ground = textures->CreateTextureAtlas("ground", "atlas_pot.jpg", 2, 2, 4,
+				ion::graphics::textures::texture_atlas::AtlasSubTextureOrder::RowMajor);
+
+			auto asteroid_diffuse = textures->CreateTexture("asteroid_diffuse", "asteroid_diffuse.png");
+			auto asteroid_normal = textures->CreateTexture("asteroid_normal", "asteroid_normal.png");
+			auto asteroid_specular = textures->CreateTexture("asteroid_specular", "asteroid_specular.png");
+			
+			auto brick_wall_diffuse = textures->CreateTexture("brick_wall_diffuse", "brick_wall_diffuse.jpg");
+			auto brick_wall_normal = textures->CreateTexture("brick_wall_normal", "brick_wall_normal.jpg");
+			auto brick_wall_specular = textures->CreateTexture("brick_wall_specular", "brick_wall_specular.jpg");
+			
+			auto pebbles_diffuse = textures->CreateTexture("pebbles_diffuse", "pebbles_diffuse.jpg");
+			auto pebbles_normal = textures->CreateTexture("pebbles_normal", "pebbles_normal.jpg");
+			auto pebbles_specular = textures->CreateTexture("pebbles_specular", "pebbles_specular.jpg");
+
+			auto tifa_diffuse = textures->CreateTexture("tifa", "tifa.png");
+			auto cloud_diffuse = textures->CreateTexture("cloud", "cloud.png");
+			auto star_diffuse = textures->CreateTexture("star", "star.png");
+			auto ship_diffuse = textures->CreateTexture("ship", "ship.png");
+			auto aura_diffuse = textures->CreateTexture("aura", "aura.png");
+			auto raindrop_diffuse = textures->CreateTexture("raindrop", "raindrop.png");
+			auto color_spectrum_diffuse = textures->CreateTexture("color_spectrum", "color_spectrum.png");
+
+			//GUI
+			//Mouse cursor
+			auto mouse_cursor_diffuse = textures->CreateTexture("mouse_cursor_diffuse", "mouse_cursor.png");
+
+			//Tooltip
+			auto tooltip_center_diffuse = textures->CreateTexture("tooltip_center", "tooltip_center.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto tooltip_top_diffuse = textures->CreateTexture("tooltip_top", "tooltip_top.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto tooltip_left_diffuse = textures->CreateTexture("tooltip_left", "tooltip_left.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto tooltip_top_left_diffuse = textures->CreateTexture("tooltip_top_left", "tooltip_top_left.png");
+
+			//Button
+			auto button_center_enabled_diffuse = textures->CreateTexture("button_center_enabled", "button_center_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto button_center_disabled_diffuse = textures->CreateTexture("button_center_disabled", "button_center_disabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto button_center_pressed_diffuse = textures->CreateTexture("button_center_pressed", "button_center_pressed.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto button_center_hovered_diffuse = textures->CreateTexture("button_center_hovered", "button_center_hovered.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+
+			auto button_top_enabled_diffuse = textures->CreateTexture("button_top_enabled", "button_top_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto button_top_focused_diffuse = textures->CreateTexture("button_top_focused", "button_top_focused.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto button_left_enabled_diffuse = textures->CreateTexture("button_left_enabled", "button_left_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto button_left_focused_diffuse = textures->CreateTexture("button_left_focused", "button_left_focused.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+
+			auto button_top_left_enabled_diffuse = textures->CreateTexture("button_top_left_enabled", "button_top_left_enabled.png");
+			auto button_top_left_focused_diffuse = textures->CreateTexture("button_top_left_focused", "button_top_left_focused.png");
+
+			//Check box
+			auto check_box_center_enabled_diffuse = textures->CreateTexture("check_box_center_enabled", "check_box_center_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto check_box_center_hovered_diffuse = textures->CreateTexture("check_box_center_hovered", "check_box_center_hovered.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+
+			auto check_box_mark_enabled_diffuse = textures->CreateTexture("check_box_mark_enabled", "check_box_mark_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto check_box_mark_disabled_diffuse = textures->CreateTexture("check_box_mark_disabled", "check_box_mark_disabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);		
+			auto check_box_mark_pressed_diffuse = textures->CreateTexture("check_box_mark_pressed", "check_box_mark_pressed.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto check_box_mark_hovered_diffuse = textures->CreateTexture("check_box_mark_hovered", "check_box_mark_hovered.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+
+			//Progress bar
+			auto progress_bar_bar_enabled_diffuse = textures->CreateTexture("progress_bar_bar_enabled", "progress_bar_bar_enabled.png");
+
+			//Radio button
+			auto radio_button_select_enabled_diffuse = textures->CreateTexture("radio_button_select_enabled", "radio_button_select_enabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto radio_button_select_disabled_diffuse = textures->CreateTexture("radio_button_select_disabled", "radio_button_select_disabled.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto radio_button_select_pressed_diffuse = textures->CreateTexture("radio_button_select_pressed", "radio_button_select_pressed.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+			auto radio_button_select_hovered_diffuse = textures->CreateTexture("radio_button_select_hovered", "radio_button_select_hovered.png",
+				ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+
+			//Text box
+			auto text_box_cursor_enabled_diffuse = textures->CreateTexture("text_box_cursor_enabled", "text_box_cursor_enabled.png");
+
+
+			auto cat_first_frame = textures->CreateTexture("cat01", "cat01.png");
+			textures->CreateTexture("cat02", "cat02.png");
+			textures->CreateTexture("cat03", "cat03.png");
+			textures->CreateTexture("cat04", "cat04.png");
+			textures->CreateTexture("cat05", "cat05.png");
+			textures->CreateTexture("cat06", "cat06.png");
+			textures->CreateTexture("cat07", "cat07.png");
+			textures->CreateTexture("cat08", "cat08.png");
+			
+			textures->LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
+
+			//while (!textures->Loaded());
+
+			//Frame sequences
+			auto cat_sequence = frame_sequences->CreateFrameSequence("cat_sequence", cat_first_frame, 8);
+
+			//Animation
+			auto cat_running = animations->CreateAnimation(
+				ion::graphics::textures::Animation::Looping("cat_running", cat_sequence, 0.8_sec));
+
+			//Shaders
+			auto model_vert_shader = shaders->CreateShader("default_model_vert", "default_model.vert");
+			auto model_frag_shader = shaders->CreateShader("default_model_frag", "default_model.frag");
+			auto particle_vert_shader = shaders->CreateShader("default_particle_vert", "default_particle.vert");
+			auto particle_frag_shader = shaders->CreateShader("default_particle_frag", "default_particle.frag");
+			auto text_vert_shader = shaders->CreateShader("default_text_vert", "default_text.vert");
+			auto text_frag_shader = shaders->CreateShader("default_text_frag", "default_text.frag");
+			auto gui_text_vert_shader = shaders->CreateShader("default_gui_text_vert", "default_gui_text.vert");
+			auto gui_text_frag_shader = shaders->CreateShader("default_gui_text_frag", "default_gui_text.frag");
+			shaders->LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
+
+			//while (!shaders->Loaded());
+
+			//Shader programs
+			auto model_program = shader_programs->CreateShaderProgram("default_model_prog", model_vert_shader, model_frag_shader);
+			auto particle_program = shader_programs->CreateShaderProgram("default_particle_prog", particle_vert_shader, particle_frag_shader);
+			auto text_program = shader_programs->CreateShaderProgram("default_text_prog", text_vert_shader, text_frag_shader);
+			auto gui_text_program = shader_programs->CreateShaderProgram("default_gui_text_prog", gui_text_vert_shader, gui_text_frag_shader);
+			shader_programs->LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!shader_programs.Loaded());
 
@@ -923,7 +1028,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				light_struct->CreateUniform<float>("cutoff");
 				light_struct->CreateUniform<float>("outer_cutoff");
 
-				shader_programs.LoadShaderVariableLocations(*model_program);
+				shader_programs->LoadShaderVariableLocations(*model_program);
 			}
 
 			//Particle program
@@ -1003,7 +1108,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				light_struct->CreateUniform<float>("cutoff");
 				light_struct->CreateUniform<float>("outer_cutoff");
 
-				shader_programs.LoadShaderVariableLocations(*particle_program);
+				shader_programs->LoadShaderVariableLocations(*particle_program);
 			}
 
 			//Text program
@@ -1061,7 +1166,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				light_struct->CreateUniform<float>("cutoff");
 				light_struct->CreateUniform<float>("outer_cutoff");
 
-				shader_programs.LoadShaderVariableLocations(*text_program);
+				shader_programs->LoadShaderVariableLocations(*text_program);
 			}
 
 			//GUI text program
@@ -1090,45 +1195,28 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				primitive_struct->CreateUniform<glsl::sampler2D>("texture");
 				primitive_struct->CreateUniform<bool>("has_texture");
 
-				shader_programs.LoadShaderVariableLocations(*gui_text_program);
+				shader_programs->LoadShaderVariableLocations(*gui_text_program);
 			}
 
 
 			//Font
-			ion::graphics::fonts::FontManager fonts;
-			fonts.CreateRepository(std::move(font_repository));
+			
 
-			/*ion::script::interfaces::FontScriptInterface font_script;
-			font_script.CreateScriptRepository(script_repository);
-			font_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
-			font_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
-			font_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			font_script.CreateFonts("fonts.ion", fonts);*/
-
-			auto verdana_regular_12 = fonts.CreateFont("verdana_regular_12", "verdana.ttf", 12);
-			auto verdana_bold_12 = fonts.CreateFont("verdana_bold_12", "verdanab.ttf", 12);
-			auto verdana_italic_12 = fonts.CreateFont("verdana_italic_12", "verdanai.ttf", 12);
-			auto verdana_bold_italic_12 = fonts.CreateFont("verdana_bold_italic_12", "verdanaz.ttf", 12);
-			auto verdana_regular_36 = fonts.CreateFont("verdana_regular_36", "verdana.ttf", 36);
-			auto verdana_bold_36 = fonts.CreateFont("verdana_bold_36", "verdanab.ttf", 36);
-			auto verdana_italic_36 = fonts.CreateFont("verdana_italic_36", "verdanai.ttf", 36);
-			auto verdana_bold_italic_36 = fonts.CreateFont("verdana_bold_italic_36", "verdanaz.ttf", 36);
-			fonts.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
+			auto verdana_regular_12 = fonts->CreateFont("verdana_regular_12", "verdana.ttf", 12);
+			auto verdana_bold_12 = fonts->CreateFont("verdana_bold_12", "verdanab.ttf", 12);
+			auto verdana_italic_12 = fonts->CreateFont("verdana_italic_12", "verdanai.ttf", 12);
+			auto verdana_bold_italic_12 = fonts->CreateFont("verdana_bold_italic_12", "verdanaz.ttf", 12);
+			auto verdana_regular_36 = fonts->CreateFont("verdana_regular_36", "verdana.ttf", 36);
+			auto verdana_bold_36 = fonts->CreateFont("verdana_bold_36", "verdanab.ttf", 36);
+			auto verdana_italic_36 = fonts->CreateFont("verdana_italic_36", "verdanai.ttf", 36);
+			auto verdana_bold_italic_36 = fonts->CreateFont("verdana_bold_italic_36", "verdanaz.ttf", 36);
+			fonts->LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
 			//while (!fonts.Loaded());
 
 			//Type face
-			ion::graphics::fonts::TypeFaceManager type_faces;
-
-			/*ion::script::interfaces::TypeFaceScriptInterface type_face_script;
-			type_face_script.CreateScriptRepository(script_repository);
-			type_face_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
-			type_face_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
-			type_face_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			type_face_script.CreateTypeFaces("type_faces.ion", type_faces, fonts);*/
-
 			auto verdana_12 = 
-				type_faces.CreateTypeFace(
+				type_faces->CreateTypeFace(
 					"verdana_12",
 					verdana_regular_12,
 					verdana_bold_12,
@@ -1136,7 +1224,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					verdana_bold_italic_12);
 
 			auto verdana_36 = 
-				type_faces.CreateTypeFace(
+				type_faces->CreateTypeFace(
 					"verdana_36",
 					verdana_regular_36,
 					verdana_bold_36,
@@ -1144,45 +1232,28 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					verdana_bold_italic_36);
 
 			//Sound
-			ion::sounds::SoundManager sounds;
-			sounds.CreateRepository(std::move(audio_repository));
+			
 
-			/*ion::script::interfaces::SoundScriptInterface sound_script;
-			sound_script.CreateScriptRepository(script_repository);
-			sound_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
-			sound_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
-			sound_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			sound_script.CreateSounds("sounds.ion", sounds);*/
-
-			auto sound_listener = sounds.CreateSoundListener("listener");
-			auto gui_sound_channel_group = sounds.CreateSoundChannelGroup("gui");
+			auto sound_listener = sounds->CreateSoundListener("listener");
+			auto gui_sound_channel_group = sounds->CreateSoundChannelGroup("gui");
 			gui_sound_channel_group->Volume(0.2_r);
 
-			auto flicker = sounds.CreateSound(ion::sounds::Sound::Positional("flicker", "flicker.wav",
+			auto flicker = sounds->CreateSound(ion::sounds::Sound::Positional("flicker", "flicker.wav",
 				ion::sounds::sound::SoundType::Sample, ion::sounds::sound::SoundLoopingMode::Forward));
 			flicker->Distance(0.4_r); //Min distance of 10 meters
-			auto night_runner = sounds.CreateSound("night_runner", "night_runner.mp3",
+			auto night_runner = sounds->CreateSound("night_runner", "night_runner.mp3",
 				ion::sounds::sound::SoundType::Stream, ion::sounds::sound::SoundLoopingMode::Forward);
-			auto click = sounds.CreateSound("click", "click.wav", ion::sounds::sound::SoundType::Sample);	
-			sounds.LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
+			auto click = sounds->CreateSound("click", "click.wav", ion::sounds::sound::SoundType::Sample);	
+			sounds->LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
-			//while (!sounds.Loaded());
+			//while (!sounds->Loaded());
 
 			//night_runner->Play()->Volume(0.2_r);
 
 
 			//Material
-			ion::graphics::materials::MaterialManager materials;
-
-			/*ion::script::interfaces::MaterialScriptInterface material_script;
-			material_script.CreateScriptRepository(script_repository);
-			material_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
-			material_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
-			material_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			material_script.CreateMaterials("materials.ion", materials, animations, textures);*/
-
 			auto asteroid =
-				materials.CreateMaterial("asteroid",
+				materials->CreateMaterial("asteroid",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.0_r, 0.0_r, 0.0_r},
@@ -1190,7 +1261,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					32.0_r, asteroid_diffuse, asteroid_specular, asteroid_normal);
 
 			auto brick =
-				materials.CreateMaterial("brick",
+				materials->CreateMaterial("brick",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.0_r, 0.0_r, 0.0_r},
@@ -1198,7 +1269,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					32.0_r, brick_wall_diffuse, brick_wall_specular, brick_wall_normal);
 
 			auto pebbles =
-				materials.CreateMaterial("pebbles",
+				materials->CreateMaterial("pebbles",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.6_r, 0.6_r, 0.6_r},
@@ -1206,7 +1277,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					32.0_r, pebbles_diffuse, pebbles_specular, pebbles_normal);
 			
 			auto ruby =
-				materials.CreateMaterial("ruby",
+				materials->CreateMaterial("ruby",
 					{1.0_r, 0.0_r, 0.0_r},
 					{1.0_r, 0.0_r, 0.0_r},
 					{0.0_r, 0.0_r, 0.0_r},
@@ -1214,7 +1285,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					32.0_r);
 
 			auto emerald =
-				materials.CreateMaterial("emerald",
+				materials->CreateMaterial("emerald",
 					{0.0_r, 1.0_r, 0.0_r},
 					{0.0_r, 1.0_r, 0.0_r},
 					{0.0_r, 0.0_r, 0.0_r},
@@ -1222,7 +1293,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					32.0_r);
 
 			auto sapphire =
-				materials.CreateMaterial("sapphire",
+				materials->CreateMaterial("sapphire",
 					{0.0_r, 0.0_r, 1.0_r},
 					{0.0_r, 0.0_r, 1.0_r},
 					{0.0_r, 0.0_r, 0.0_r},
@@ -1230,7 +1301,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					32.0_r);
 
 			auto tifa =
-				materials.CreateMaterial("tifa",
+				materials->CreateMaterial("tifa",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.6_r, 0.6_r, 0.6_r},
@@ -1238,7 +1309,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					32.0_r, tifa_diffuse, nullptr, nullptr);
 
 			auto cloud =
-				materials.CreateMaterial("cloud",
+				materials->CreateMaterial("cloud",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.6_r, 0.6_r, 0.6_r},
@@ -1246,7 +1317,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					32.0_r, cloud_diffuse, nullptr, nullptr);
 
 			auto star =
-				materials.CreateMaterial("star",
+				materials->CreateMaterial("star",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1255,7 +1326,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			star->LightingEnabled(false);
 
 			auto ship =
-				materials.CreateMaterial("ship",
+				materials->CreateMaterial("ship",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.6_r, 0.6_r, 0.6_r},
@@ -1263,7 +1334,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					32.0_r, ship_diffuse, nullptr, nullptr);
 
 			auto aura =
-				materials.CreateMaterial("aura",
+				materials->CreateMaterial("aura",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.6_r, 0.6_r, 0.6_r},
@@ -1271,7 +1342,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					32.0_r, aura_diffuse, nullptr, nullptr);
 
 			auto raindrop =
-				materials.CreateMaterial("raindrop",
+				materials->CreateMaterial("raindrop",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.6_r, 0.6_r, 0.6_r},
@@ -1279,7 +1350,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					32.0_r, raindrop_diffuse, nullptr, nullptr);
 			
 			auto color_spectrum =
-				materials.CreateMaterial("color_spectrum",
+				materials->CreateMaterial("color_spectrum",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1288,7 +1359,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			color_spectrum->LightingEnabled(false);
 
 			auto cat =
-				materials.CreateMaterial("cat",
+				materials->CreateMaterial("cat",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.6_r, 0.6_r, 0.6_r},
@@ -1298,7 +1369,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//GUI
 			//Mouse cursor materials
 			auto mouse_cursor_enabled =
-				materials.CreateMaterial("mouse_cursor",
+				materials->CreateMaterial("mouse_cursor",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1308,7 +1379,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Tooltip materials
 			auto tooltip_center_enabled =
-				materials.CreateMaterial("tooltip_center",
+				materials->CreateMaterial("tooltip_center",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1318,7 +1389,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			auto tooltip_top_enabled =
-				materials.CreateMaterial("tooltip_top",
+				materials->CreateMaterial("tooltip_top",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1327,7 +1398,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_top_enabled->LightingEnabled(false);
 
 			auto tooltip_left_enabled =
-				materials.CreateMaterial("tooltip_left",
+				materials->CreateMaterial("tooltip_left",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1336,7 +1407,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_left_enabled->LightingEnabled(false);
 
 			auto tooltip_bottom_enabled =
-				materials.CreateMaterial("tooltip_bottom",
+				materials->CreateMaterial("tooltip_bottom",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1346,7 +1417,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_bottom_enabled->FlipVertical();
 
 			auto tooltip_right_enabled =
-				materials.CreateMaterial("tooltip_right",
+				materials->CreateMaterial("tooltip_right",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1357,7 +1428,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			auto tooltip_top_left_enabled =
-				materials.CreateMaterial("tooltip_top_left",
+				materials->CreateMaterial("tooltip_top_left",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1366,7 +1437,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_top_left_enabled->LightingEnabled(false);
 
 			auto tooltip_bottom_left_enabled =
-				materials.CreateMaterial("tooltip_bottom_left",
+				materials->CreateMaterial("tooltip_bottom_left",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1376,7 +1447,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_bottom_left_enabled->FlipVertical();
 
 			auto tooltip_top_right_enabled =
-				materials.CreateMaterial("tooltip_top_right",
+				materials->CreateMaterial("tooltip_top_right",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1386,7 +1457,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			tooltip_top_right_enabled->FlipHorizontal();
 
 			auto tooltip_bottom_right_enabled =
-				materials.CreateMaterial("tooltip_bottom_right",
+				materials->CreateMaterial("tooltip_bottom_right",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1398,7 +1469,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Button materials
 			auto button_center_enabled =
-				materials.CreateMaterial("button_center_enabled",
+				materials->CreateMaterial("button_center_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1407,7 +1478,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_center_enabled->LightingEnabled(false);
 
 			auto button_center_disabled =
-				materials.CreateMaterial("button_center_disabled",
+				materials->CreateMaterial("button_center_disabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1416,7 +1487,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_center_disabled->LightingEnabled(false);
 
 			auto button_center_pressed =
-				materials.CreateMaterial("button_center_pressed",
+				materials->CreateMaterial("button_center_pressed",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1425,7 +1496,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_center_pressed->LightingEnabled(false);
 
 			auto button_center_hovered =
-				materials.CreateMaterial("button_center_hovered",
+				materials->CreateMaterial("button_center_hovered",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1435,7 +1506,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			
 
 			auto button_top_enabled =
-				materials.CreateMaterial("button_top_enabled",
+				materials->CreateMaterial("button_top_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1444,7 +1515,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_top_enabled->LightingEnabled(false);
 
 			auto button_top_focused =
-				materials.CreateMaterial("button_top_focused",
+				materials->CreateMaterial("button_top_focused",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1453,7 +1524,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_top_focused->LightingEnabled(false);
 
 			auto button_left_enabled =
-				materials.CreateMaterial("button_left_enabled",
+				materials->CreateMaterial("button_left_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1462,7 +1533,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_left_enabled->LightingEnabled(false);
 
 			auto button_left_focused =
-				materials.CreateMaterial("button_left_focused",
+				materials->CreateMaterial("button_left_focused",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1471,7 +1542,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_left_focused->LightingEnabled(false);
 
 			auto button_bottom_enabled =
-				materials.CreateMaterial("button_bottom_enabled",
+				materials->CreateMaterial("button_bottom_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1481,7 +1552,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_bottom_enabled->FlipVertical();
 
 			auto button_bottom_focused =
-				materials.CreateMaterial("button_bottom_focused",
+				materials->CreateMaterial("button_bottom_focused",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1491,7 +1562,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_bottom_focused->FlipVertical();
 
 			auto button_right_enabled =
-				materials.CreateMaterial("button_right_enabled",
+				materials->CreateMaterial("button_right_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1501,7 +1572,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_right_enabled->FlipHorizontal();
 
 			auto button_right_focused =
-				materials.CreateMaterial("button_right_focused",
+				materials->CreateMaterial("button_right_focused",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1512,7 +1583,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			auto button_top_left_enabled =
-				materials.CreateMaterial("button_top_left_enabled",
+				materials->CreateMaterial("button_top_left_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1521,7 +1592,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_top_left_enabled->LightingEnabled(false);
 
 			auto button_top_left_focused =
-				materials.CreateMaterial("button_top_left_focused",
+				materials->CreateMaterial("button_top_left_focused",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1530,7 +1601,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_top_left_focused->LightingEnabled(false);
 
 			auto button_bottom_left_enabled =
-				materials.CreateMaterial("button_bottom_left_enabled",
+				materials->CreateMaterial("button_bottom_left_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1540,7 +1611,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_bottom_left_enabled->FlipVertical();
 
 			auto button_bottom_left_focused =
-				materials.CreateMaterial("button_bottom_left_focused",
+				materials->CreateMaterial("button_bottom_left_focused",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1550,7 +1621,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_bottom_left_focused->FlipVertical();
 
 			auto button_top_right_enabled =
-				materials.CreateMaterial("button_top_right_enabled",
+				materials->CreateMaterial("button_top_right_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1560,7 +1631,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_top_right_enabled->FlipHorizontal();
 
 			auto button_top_right_focused =
-				materials.CreateMaterial("button_top_right_focused",
+				materials->CreateMaterial("button_top_right_focused",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1570,7 +1641,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_top_right_focused->FlipHorizontal();
 
 			auto button_bottom_right_enabled =
-				materials.CreateMaterial("button_bottom_right_enabled",
+				materials->CreateMaterial("button_bottom_right_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1581,7 +1652,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			button_bottom_right_enabled->FlipVertical();
 
 			auto button_bottom_right_focused =
-				materials.CreateMaterial("button_bottom_right_focused",
+				materials->CreateMaterial("button_bottom_right_focused",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1593,7 +1664,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Check box materials
 			auto check_box_center_enabled =
-				materials.CreateMaterial("check_box_center_enabled",
+				materials->CreateMaterial("check_box_center_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1602,7 +1673,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_box_center_enabled->LightingEnabled(false);
 
 			auto check_box_center_hovered =
-				materials.CreateMaterial("check_box_center_hovered",
+				materials->CreateMaterial("check_box_center_hovered",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1612,7 +1683,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			auto check_box_mark_enabled =
-				materials.CreateMaterial("check_box_mark_enabled",
+				materials->CreateMaterial("check_box_mark_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1621,7 +1692,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_box_mark_enabled->LightingEnabled(false);
 
 			auto check_box_mark_disabled =
-				materials.CreateMaterial("check_box_mark_disabled",
+				materials->CreateMaterial("check_box_mark_disabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1630,7 +1701,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_box_mark_disabled->LightingEnabled(false);
 
 			auto check_box_mark_pressed =
-				materials.CreateMaterial("check_box_mark_pressed",
+				materials->CreateMaterial("check_box_mark_pressed",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1639,7 +1710,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			check_box_mark_pressed->LightingEnabled(false);
 
 			auto check_box_mark_hovered =
-				materials.CreateMaterial("check_box_mark_hovered",
+				materials->CreateMaterial("check_box_mark_hovered",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1649,7 +1720,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Progress bar
 			auto progress_bar_bar_enabled =
-				materials.CreateMaterial("progress_bar_bar_enabled",
+				materials->CreateMaterial("progress_bar_bar_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1659,7 +1730,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Radio buttons
 			auto radio_button_select_enabled =
-				materials.CreateMaterial("radio_button_select_enabled",
+				materials->CreateMaterial("radio_button_select_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1668,7 +1739,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			radio_button_select_enabled->LightingEnabled(false);
 
 			auto radio_button_select_disabled =
-				materials.CreateMaterial("radio_button_select_disabled",
+				materials->CreateMaterial("radio_button_select_disabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1677,7 +1748,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			radio_button_select_disabled->LightingEnabled(false);
 
 			auto radio_button_select_pressed =
-				materials.CreateMaterial("radio_button_select_pressed",
+				materials->CreateMaterial("radio_button_select_pressed",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1686,7 +1757,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			radio_button_select_pressed->LightingEnabled(false);
 
 			auto radio_button_select_hovered =
-				materials.CreateMaterial("radio_button_select_hovered",
+				materials->CreateMaterial("radio_button_select_hovered",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1696,7 +1767,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Text box
 			auto text_box_cursor_enabled =
-				materials.CreateMaterial("text_box_cursor_enabled",
+				materials->CreateMaterial("text_box_cursor_enabled",
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
@@ -1708,16 +1779,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			using namespace ion::graphics::utilities;
 
 			//Particle system
-			ion::graphics::particles::ParticleSystemManager particle_systems;
-
-			/*ion::script::interfaces::ParticleSystemScriptInterface particle_system_script;
-			particle_system_script.CreateScriptRepository(script_repository);
-			particle_system_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
-			particle_system_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
-			particle_system_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			particle_system_script.CreateParticleSystems("particle_systems.ion", particle_systems, materials);*/
-
-			auto rain = particle_systems.CreateParticleSystem("rain");
+			auto rain = particle_systems->CreateParticleSystem("rain");
 
 			auto emitter = rain->CreateEmitter(
 				ion::graphics::particles::Emitter::Box(
@@ -1732,15 +1794,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			emitter->ParticleMaterial(raindrop);
 
 			//Text
-			ion::graphics::fonts::TextManager texts;
-
-			/*ion::script::interfaces::TextScriptInterface text_script;
-			text_script.CreateScriptRepository(script_repository);
-			text_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
-			text_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
-			text_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			text_script.CreateTexts("texts.ion", texts, type_faces);*/
-
 			/*auto pangram =
 				texts.CreateText(
 					"pangram",
@@ -1755,7 +1808,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			pangram->DefaultForegroundColor(color::White);*/
 
 			auto fps =
-				texts.CreateText(
+				texts->CreateText(
 					"fps",
 					"",
 					verdana_36);
@@ -1764,7 +1817,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			fps->DefaultForegroundColor(color::White);
 
 			auto caption_text =
-				texts.CreateText(
+				texts->CreateText(
 					"caption",
 					"",
 					verdana_12);
@@ -1793,9 +1846,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			using namespace ion::utilities;
-
-			//Scene manager
-			auto scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
 
 			//Viewport
 			auto viewport = engine.Target()->GetViewport("main");
@@ -1929,27 +1979,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//circle2->ShowBoundingVolumes(true);*/
 
 
-			//Scene graph
-			auto scene_graph = engine.CreateSceneGraph("main");
-
-			scene_graph->Gamma(1.0_r);
-			scene_graph->AmbientColor(Color::RGB(50, 50, 50));
-			scene_graph->FogEffect(ion::graphics::render::Fog::Linear(0.0_r, 2.25_r));
-			scene_graph->FogEnabled(false);
-			//scene_graph->LightingEnabled(false);
-
-
 			//GUI
-			ion::gui::GuiController controller{scene_graph->RootNode(), gui_sound_channel_group};
-			controller.ZOrder(-2.0_r);
-
-			/*ion::script::interfaces::GuiThemeScriptInterface gui_theme_script;
-			gui_theme_script.CreateScriptRepository(script_repository);
-			gui_theme_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
-			gui_theme_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
-			gui_theme_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			gui_theme_script.CreateGuiThemes("gui_themes.ion", controller, scene_manager, materials, shader_programs, sounds, texts);*/
-
 			//Theme
 			auto theme = controller.CreateTheme("default", scene_manager);
 
@@ -2312,15 +2342,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			text_box_skin->AddTextPart("placeholder-text", placeholder_text_part); //Additional
 
 
-			/*ion::script::interfaces::GuiScriptInterface gui_script;
-			gui_script.CreateScriptRepository(script_repository);
-			gui_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
-			gui_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
-			gui_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			gui_script.CreateGui("gui.ion", controller, materials);*/
-
 			//Controls
-			window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
 			auto mouse_cursor = controller.CreateMouseCursor("mouse_cursor", {});
 			mouse_cursor->ZOrder(1.0_r);
 
@@ -2533,7 +2555,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			game.scene_graph = scene_graph;	
 			game.viewport = viewport;
 			game.controller = &controller;
-			game.sound_manager = &sounds;
+			game.sound_manager = sounds.get();
 			game.fps = text;
 			game.player_node = player_node;
 			game.light_node = light_node;
