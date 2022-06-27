@@ -61,23 +61,26 @@ bool init_graphics() noexcept
 }
 
 
-void set_swap_interval(bool vsync) noexcept
+void set_swap_interval(int interval) noexcept
 {
 	#ifdef ION_WIN_GLEW
 	if (wglSwapIntervalEXT)
-		wglSwapIntervalEXT((int)vsync);
+		wglSwapIntervalEXT(interval);
 	#else
 
 	#endif
 }
 
-bool get_swap_interval() noexcept
+std::optional<int> get_swap_interval() noexcept
 {
 	#ifdef ION_WIN_GLEW
-	return wglGetSwapIntervalEXT && wglGetSwapIntervalEXT() != 0;
+	if (wglSwapIntervalEXT)
+		return wglGetSwapIntervalEXT();
 	#else
-	return false;
+	
 	#endif
+
+	return {};
 }
 
 } //engine::detail
@@ -147,7 +150,29 @@ bool Engine::UpdateFrame() noexcept
 
 void Engine::VerticalSync(bool vsync) noexcept
 {
-	detail::set_swap_interval(vsync);
+	VerticalSync(vsync ? VSyncMode::On : VSyncMode::Off);
+}
+
+void Engine::VerticalSync(VSyncMode mode) noexcept
+{
+	switch (mode)
+	{
+		case VSyncMode::On:
+		detail::set_swap_interval(1);
+		break;
+
+		case VSyncMode::Off:
+		detail::set_swap_interval(0);
+		break;
+
+		case VSyncMode::Adaptive:
+		detail::set_swap_interval(-1);
+		break;
+
+		case VSyncMode::AdaptiveHalfRate:
+		detail::set_swap_interval(-2);
+		break;
+	}
 }
 
 
@@ -155,9 +180,27 @@ void Engine::VerticalSync(bool vsync) noexcept
 	Observers
 */
 
-bool Engine::VerticalSync() const noexcept
+std::optional<engine::VSyncMode> Engine::VerticalSync() const noexcept
 {
-	return detail::get_swap_interval();
+	if (auto interval = detail::get_swap_interval(); interval)
+	{
+		switch (*interval)
+		{
+			case 1:
+			return VSyncMode::On;
+
+			case 0:
+			return VSyncMode::Off;
+
+			case -1:
+			return VSyncMode::Adaptive;
+
+			case -2:
+			return VSyncMode::AdaptiveHalfRate;
+		}
+	}
+
+	return std::nullopt;
 }
 
 
@@ -199,7 +242,7 @@ int Engine::Start() noexcept
 	if (render_window_)
 		render_window_->Show();
 
-	syncronize_ = VerticalSync();
+	syncronize_ = VerticalSync().value_or(VSyncMode::On) != VSyncMode::Off;
 	total_stopwatch_.Restart();
 
 	//Main loop

@@ -32,6 +32,14 @@ namespace ion
 
 	namespace engine
 	{
+		enum class VSyncMode
+		{
+			On,
+			Off,
+			Adaptive,
+			AdaptiveHalfRate
+		};
+
 		namespace detail
 		{
 			constexpr auto meters_to_feet_factor = 3.28084_r;
@@ -41,8 +49,8 @@ namespace ion
 			bool init_file_system() noexcept;
 			bool init_graphics() noexcept;
 
-			void set_swap_interval(bool vsync) noexcept;
-			bool get_swap_interval() noexcept;
+			void set_swap_interval(int mode) noexcept;
+			std::optional<int> get_swap_interval() noexcept;
 		} //detail
 	} //engine
 
@@ -145,6 +153,9 @@ namespace ion
 			//Sets if the engine should use vertical sync or not by the given value
 			void VerticalSync(bool vsync) noexcept;
 
+			//Sets the kind of vertical sync the engine should use to the given mode
+			void VerticalSync(engine::VSyncMode mode) noexcept;
+
 
 			//Sets the pixels per unit (PPU) the engine should use (default is 1.0)
 			static inline void PixelsPerUnit(real pixels) noexcept
@@ -173,8 +184,9 @@ namespace ion
 				Observers
 			*/
 
-			//Returns true if the engine is using vertical sync
-			[[nodiscard]] bool VerticalSync() const noexcept;
+			//Returns the kind of vertical sync the engine is using
+			//Returns nullopt if vertical sync mode is unknown
+			[[nodiscard]] std::optional<engine::VSyncMode> VerticalSync() const noexcept;
 
 
 			//Returns a pointer to a mutable render window
