@@ -483,7 +483,7 @@ namespace ion::graphics::scene::graph
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto BreadthFirstSearch() const
 			{
-				return adaptors::ranges::DereferenceIterable<const scene_node::detail::node_container&>{scene_node::detail::breadth_first_search(*this)};
+				return adaptors::ranges::DereferenceIterable<const scene_node::detail::node_container>{scene_node::detail::breadth_first_search(*this)};
 			}
 
 			//Returns a mutable (DFS) range of all descendant nodes of this node
@@ -497,7 +497,7 @@ namespace ion::graphics::scene::graph
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto DepthFirstSearch(scene_node::DepthFirstTraversal traversal = scene_node::DepthFirstTraversal::PreOrder) const
 			{
-				return adaptors::ranges::DereferenceIterable<const scene_node::detail::node_container&>{scene_node::detail::depth_first_search(*this, traversal)};
+				return adaptors::ranges::DereferenceIterable<const scene_node::detail::node_container>{scene_node::detail::depth_first_search(*this, traversal)};
 			}
 
 
