@@ -2524,28 +2524,28 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			aura_rotator->AddRotation(math::ToRadians(-90.0_r), 1.0_sec);
 			aura_rotator->Start();
 
-			auto scaler = cloud_node->CreateAnimation("scaler");
-			scaler->AddScaling(0.25_r, 10.0_sec, 0.0_sec, node_animation::MotionTechniqueType::Sigmoid);
-			scaler->AddScaling(-0.25_r, 10.0_sec, 10.0_sec, node_animation::MotionTechniqueType::Sigmoid);
-			scaler->Start();
+			auto cloud_scaler = cloud_node->CreateAnimation("cloud_scaler");
+			cloud_scaler->AddScaling(0.25_r, 10.0_sec, 0.0_sec, node_animation::MotionTechniqueType::Sigmoid);
+			cloud_scaler->AddScaling(-0.25_r, 10.0_sec, 10.0_sec, node_animation::MotionTechniqueType::Sigmoid);
+			cloud_scaler->Start();
 
-			auto mover = ship_node->CreateAnimation("mover");
-			mover->AddTranslation({0.0_r, 0.02_r, 0.0_r}, 2.0_sec);
-			mover->AddTranslation({0.02_r, -0.02_r, 0.0_r}, 2.0_sec, 2.0_sec);
-			mover->AddTranslation({-0.02_r, -0.02_r, 0.0_r}, 2.0_sec, 4.0_sec);
-			mover->AddTranslation({-0.02_r, 0.02_r, 0.0_r}, 2.0_sec, 6.0_sec);
-			mover->AddTranslation({0.02_r, 0.02_r, 0.0_r}, 2.0_sec, 8.0_sec);
-			mover->AddTranslation({0.0_r, -0.02_r, 0.0_r}, 2.0_sec, 10.0_sec);
+			auto idle_mover = ship_node->CreateAnimation("idle_mover");
+			idle_mover->AddTranslation({0.0_r, 0.02_r, 0.0_r}, 2.0_sec);
+			idle_mover->AddTranslation({0.02_r, -0.02_r, 0.0_r}, 2.0_sec, 2.0_sec);
+			idle_mover->AddTranslation({-0.02_r, -0.02_r, 0.0_r}, 2.0_sec, 4.0_sec);
+			idle_mover->AddTranslation({-0.02_r, 0.02_r, 0.0_r}, 2.0_sec, 6.0_sec);
+			idle_mover->AddTranslation({0.02_r, 0.02_r, 0.0_r}, 2.0_sec, 8.0_sec);
+			idle_mover->AddTranslation({0.0_r, -0.02_r, 0.0_r}, 2.0_sec, 10.0_sec);
 
-			auto rotator = ship_node->CreateAnimation("rotator");
-			rotator->AddRotation(math::ToRadians(-2.5_r), 2.0_sec, 2.0_sec);
-			rotator->AddRotation(math::ToRadians(2.5_r), 2.0_sec, 4.0_sec);
-			rotator->AddRotation(math::ToRadians(2.5_r), 2.0_sec, 6.0_sec);
-			rotator->AddRotation(math::ToRadians(-2.5_r), 2.0_sec, 8.0_sec);
+			auto idle_rotator = ship_node->CreateAnimation("idle_rotator");
+			idle_rotator->AddRotation(math::ToRadians(-2.5_r), 2.0_sec, 2.0_sec);
+			idle_rotator->AddRotation(math::ToRadians(2.5_r), 2.0_sec, 4.0_sec);
+			idle_rotator->AddRotation(math::ToRadians(2.5_r), 2.0_sec, 6.0_sec);
+			idle_rotator->AddRotation(math::ToRadians(-2.5_r), 2.0_sec, 8.0_sec);
 
 			auto idle = ship_node->CreateAnimationGroup("idle");
-			idle->Add(mover);
-			idle->Add(rotator);
+			idle->Add(idle_mover);
+			idle->Add(idle_rotator);
 
 			auto timeline = ship_node->CreateTimeline(1.0_r, false);
 			timeline->Attach(idle);

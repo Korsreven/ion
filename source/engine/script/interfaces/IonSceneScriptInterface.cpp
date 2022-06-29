@@ -444,14 +444,17 @@ ClassDefinition get_node_animation_class()
 		.AddClass(get_rotating_class())
 		.AddClass(get_scaling_class())
 		.AddClass(get_translating_class())
-		.AddRequiredProperty("name", ParameterType::String);
+
+		.AddRequiredProperty("name", ParameterType::String)
+		.AddProperty("start", ParameterType::FloatingPoint);
 }
 
 ClassDefinition get_node_animation_group_class()
 {
 	return ClassDefinition::Create("node-animation-group")
 		.AddRequiredProperty("name", ParameterType::String)
-		.AddProperty("add", {ParameterType::String, ParameterType::FloatingPoint, ParameterType::Boolean}, 1);
+		.AddProperty("add", {ParameterType::String, ParameterType::FloatingPoint, ParameterType::Boolean}, 1)
+		.AddProperty("start", ParameterType::FloatingPoint);
 }
 
 ClassDefinition get_node_animation_timeline_class()
@@ -922,6 +925,12 @@ void set_node_animation_properties(const script_tree::ObjectNode &object, graph:
 		else if (obj.Name() == "translation")
 			create_translating_motion(obj, animation);
 	}
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "start")
+			animation.Start(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+	}
 }
 
 void set_node_animation_group_properties(const script_tree::ObjectNode &object, graph::animations::NodeAnimationGroup &animation_group,
@@ -941,6 +950,8 @@ void set_node_animation_group_properties(const script_tree::ObjectNode &object, 
 			else
 				animation_group.Add(node_animation);
 		}
+		else if (property.Name() == "start")
+			animation_group.Start(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 	}
 }
 
