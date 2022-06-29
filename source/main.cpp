@@ -266,7 +266,6 @@ struct Game :
 
 	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> player_node;
 	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> light_node;
-	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> aura_node;
 	ion::graphics::utilities::Vector2 move_model;
 	bool rotate_model_left = false;
 	bool rotate_model_right = false;
@@ -323,9 +322,6 @@ struct Game :
 				}
 			}	
 		}
-
-		if (aura_node)
-			aura_node->Rotate(math::ToRadians(-90.0_r) * time.count());
 
 		if (camera && viewport &&
 			viewport->ConnectedCamera() == camera)
@@ -2524,6 +2520,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Node animations
 			using namespace ion::graphics::scene::graph::animations;
 
+			auto aura_rotator = aura_node->CreateAnimation("aura_rotator");
+			aura_rotator->AddRotation(math::ToRadians(-90.0_r), 1.0_sec);
+			aura_rotator->Start();
+
 			auto scaler = cloud_node->CreateAnimation("scaler");
 			scaler->AddScaling(0.25_r, 10.0_sec, 0.0_sec, node_animation::MotionTechniqueType::Sigmoid);
 			scaler->AddScaling(-0.25_r, 10.0_sec, 10.0_sec, node_animation::MotionTechniqueType::Sigmoid);
@@ -2559,7 +2559,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			game.fps = text;
 			game.player_node = player_node;
 			game.light_node = light_node;
-			game.aura_node = aura_node;
 			game.camera = camera;
 			game.player_camera = player_camera;
 			game.idle = timeline;
