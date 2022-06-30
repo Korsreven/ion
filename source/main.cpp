@@ -2547,7 +2547,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			idle->Add(idle_mover);
 			idle->Add(idle_rotator);
 
-			auto timeline = ship_node->CreateTimeline(1.0_r, false);
+			auto timeline = ship_node->CreateTimeline({}, 1.0_r, false);
 			timeline->Attach(idle);
 
 

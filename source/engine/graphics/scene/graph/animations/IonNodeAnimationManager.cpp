@@ -36,7 +36,7 @@ NodeAnimationManager::NodeAnimationManager(SceneNode &scene_node) noexcept :
 	Creating
 */
 
-NonOwningPtr<NodeAnimation> NodeAnimationManager::CreateAnimation(std::string name)
+NonOwningPtr<NodeAnimation> NodeAnimationManager::CreateAnimation(std::optional<std::string> name)
 {
 	return NodeAnimationBase::Create(std::move(name));
 }
@@ -95,7 +95,7 @@ bool NodeAnimationManager::RemoveAnimation(std::string_view name) noexcept
 	Creating
 */
 
-NonOwningPtr<NodeAnimationGroup> NodeAnimationManager::CreateAnimationGroup(std::string name)
+NonOwningPtr<NodeAnimationGroup> NodeAnimationManager::CreateAnimationGroup(std::optional<std::string> name)
 {
 	return NodeAnimationGroupBase::Create(std::move(name));
 }
@@ -154,22 +154,7 @@ bool NodeAnimationManager::RemoveAnimationGroup(std::string_view name) noexcept
 	Creating
 */
 
-NonOwningPtr<NodeAnimationTimeline> NodeAnimationManager::CreateTimeline()
-{
-	return NodeAnimationTimelineBase::Create();
-}
-
-NonOwningPtr<NodeAnimationTimeline> NodeAnimationManager::CreateTimeline(std::string name)
-{
-	return NodeAnimationTimelineBase::Create(std::move(name));
-}
-
-NonOwningPtr<NodeAnimationTimeline> NodeAnimationManager::CreateTimeline(real playback_rate, bool running)
-{
-	return NodeAnimationTimelineBase::Create(playback_rate, running);
-}
-
-NonOwningPtr<NodeAnimationTimeline> NodeAnimationManager::CreateTimeline(std::string name, real playback_rate, bool running)
+NonOwningPtr<NodeAnimationTimeline> NodeAnimationManager::CreateTimeline(std::optional<std::string> name, real playback_rate, bool running)
 {
 	return NodeAnimationTimelineBase::Create(std::move(name), playback_rate, running);
 }

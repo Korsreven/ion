@@ -445,15 +445,15 @@ ClassDefinition get_node_animation_class()
 		.AddClass(get_scaling_class())
 		.AddClass(get_translating_class())
 
-		.AddRequiredProperty("name", ParameterType::String)
+		.AddProperty("name", ParameterType::String)
 		.AddProperty("start", ParameterType::FloatingPoint);
 }
 
 ClassDefinition get_node_animation_group_class()
 {
 	return ClassDefinition::Create("node-animation-group")
-		.AddRequiredProperty("name", ParameterType::String)
 		.AddProperty("add", {ParameterType::String, ParameterType::FloatingPoint, ParameterType::Boolean}, 1)
+		.AddProperty("name", ParameterType::String)
 		.AddProperty("start", ParameterType::FloatingPoint);
 }
 
@@ -1720,9 +1720,14 @@ NonOwningPtr<shapes::Triangle> create_triangle(const script_tree::ObjectNode &ob
 NonOwningPtr<graph::animations::NodeAnimation> create_node_animation(const script_tree::ObjectNode &object,
 	graph::SceneNode &parent_node)
 {
-	auto name = object
-		.Property("name")[0]
-		.Get<ScriptType::String>()->Get();
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
 
 	auto node_animation = parent_node.CreateAnimation(std::move(name));
 
@@ -1735,9 +1740,14 @@ NonOwningPtr<graph::animations::NodeAnimation> create_node_animation(const scrip
 NonOwningPtr<graph::animations::NodeAnimationGroup> create_node_animation_group(const script_tree::ObjectNode &object,
 	graph::SceneNode &parent_node)
 {
-	auto name = object
-		.Property("name")[0]
-		.Get<ScriptType::String>()->Get();
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
 
 	auto node_animation_group = parent_node.CreateAnimationGroup(std::move(name));
 
@@ -1750,6 +1760,14 @@ NonOwningPtr<graph::animations::NodeAnimationGroup> create_node_animation_group(
 NonOwningPtr<graph::animations::NodeAnimationTimeline> create_node_animation_timeline(const script_tree::ObjectNode &object,
 	graph::SceneNode &parent_node)
 {
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
 	auto playback_rate = object
 		.Property("playback-rate")[0]
 		.Get<ScriptType::FloatingPoint>().value_or(1.0).As<real>();
@@ -1757,14 +1775,7 @@ NonOwningPtr<graph::animations::NodeAnimationTimeline> create_node_animation_tim
 		.Property("running")[0]
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
-	auto node_animation_timeline =
-		[&]() noexcept
-		{
-			if (auto &property = object.Property("name"); property)
-				return parent_node.CreateTimeline(property[0].Get<ScriptType::String>()->Get(), playback_rate, running);
-			else
-				return parent_node.CreateTimeline(playback_rate, running);
-		}();
+	auto node_animation_timeline = parent_node.CreateTimeline(std::move(name), playback_rate, running);
 
 	if (node_animation_timeline)
 		set_node_animation_timeline_properties(object, *node_animation_timeline, parent_node);

@@ -13,6 +13,7 @@ File:	IonNodeAnimationManager.h
 #ifndef ION_NODE_ANIMATION_MANAGER_H
 #define ION_NODE_ANIMATION_MANAGER_H
 
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -146,7 +147,7 @@ namespace ion::graphics::scene::graph::animations
 			*/
 
 			//Create a node animation with the given name
-			NonOwningPtr<NodeAnimation> CreateAnimation(std::string name);
+			NonOwningPtr<NodeAnimation> CreateAnimation(std::optional<std::string> name = {});
 
 
 			//Create a node animation as a copy of the given node animation
@@ -191,7 +192,7 @@ namespace ion::graphics::scene::graph::animations
 			*/
 
 			//Create a node animation group with the given name
-			NonOwningPtr<NodeAnimationGroup> CreateAnimationGroup(std::string name);
+			NonOwningPtr<NodeAnimationGroup> CreateAnimationGroup(std::optional<std::string> name = {});
 
 
 			//Create a node animation group as a copy of the given node animation group
@@ -235,17 +236,8 @@ namespace ion::graphics::scene::graph::animations
 				Creating
 			*/
 
-			//Create a node animation timeline
-			NonOwningPtr<NodeAnimationTimeline> CreateTimeline();
-
-			//Create a node animation timeline with the given name
-			NonOwningPtr<NodeAnimationTimeline> CreateTimeline(std::string name);
-
-			//Create a node animation timeline with the given playback rate and whether it is running or not
-			NonOwningPtr<NodeAnimationTimeline> CreateTimeline(real playback_rate, bool running = true);
-
 			//Create a node animation timeline with the given name, playback rate and whether it is running or not
-			NonOwningPtr<NodeAnimationTimeline> CreateTimeline(std::string name, real playback_rate, bool running = true);
+			NonOwningPtr<NodeAnimationTimeline> CreateTimeline(std::optional<std::string> name = {}, real playback_rate = 1.0_r, bool running = true);
 
 
 			/*

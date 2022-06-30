@@ -16,7 +16,6 @@ File:	IonNodeAnimation.h
 #include <any>
 #include <cmath>
 #include <optional>
-#include <string>
 #include <variant>
 #include <vector>
 
@@ -303,9 +302,6 @@ namespace ion::graphics::scene::graph::animations
 		public:
 
 			using managed::ManagedObject<NodeAnimationManager>::ManagedObject;
-
-			//Construct a new node animation with the given name
-			NodeAnimation(std::string name) noexcept;
 
 
 			/*

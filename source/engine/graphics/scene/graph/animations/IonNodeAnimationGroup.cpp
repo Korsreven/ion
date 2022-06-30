@@ -28,13 +28,6 @@ namespace node_animation_group::detail
 } //node_animation_group::detail
 
 
-NodeAnimationGroup::NodeAnimationGroup(std::string name) noexcept :
-	ManagedObject{std::move(name)}
-{
-	//Empty
-}
-
-
 /*
 	Modifiers
 */
@@ -54,7 +47,7 @@ NonOwningPtr<NodeAnimationTimeline> NodeAnimationGroup::Start(real playback_rate
 {
 	if (auto owner = Owner(); owner)
 	{
-		auto timeline = owner->CreateTimeline(playback_rate, running);
+		auto timeline = owner->CreateTimeline({}, playback_rate, running);
 		timeline->Attach(owner->GetAnimationGroup(*Name()));
 		return timeline;
 	}

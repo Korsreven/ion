@@ -266,13 +266,6 @@ duration NodeAnimation::RetrieveTotalDuration() const noexcept
 
 //Public
 
-NodeAnimation::NodeAnimation(std::string name) noexcept :
-	ManagedObject{std::move(name)}
-{
-	//Empty
-}
-
-
 /*
 	Modifiers
 */
@@ -350,7 +343,7 @@ NonOwningPtr<NodeAnimationTimeline> NodeAnimation::Start(real playback_rate, boo
 {
 	if (auto owner = Owner(); owner)
 	{
-		auto timeline = owner->CreateTimeline(playback_rate, running);
+		auto timeline = owner->CreateTimeline({}, playback_rate, running);
 		timeline->Attach(owner->GetAnimation(*Name()));
 		return timeline;
 	}

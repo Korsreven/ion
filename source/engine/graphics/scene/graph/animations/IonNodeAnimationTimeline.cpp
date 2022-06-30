@@ -110,17 +110,10 @@ void NodeAnimationTimeline::Removed(AttachableNodeAnimationGroup &animation_grou
 
 //Public
 
-NodeAnimationTimeline::NodeAnimationTimeline(real playback_rate, bool running) noexcept :
+NodeAnimationTimeline::NodeAnimationTimeline(std::optional<std::string> name, real playback_rate, bool running) noexcept :
 	
-	playback_rate_{playback_rate},
-	running_{running}
-{
-	//Empty
-}
-
-NodeAnimationTimeline::NodeAnimationTimeline(std::string name, real playback_rate, bool running) noexcept :
-
 	managed::ManagedObject<NodeAnimationManager>{std::move(name)},
+
 	playback_rate_{playback_rate},
 	running_{running}
 {

@@ -13,7 +13,6 @@ File:	IonNodeAnimationGroup.h
 #ifndef ION_NODE_ANIMATION_GROUP_H
 #define ION_NODE_ANIMATION_GROUP_H
 
-#include <string>
 #include <vector>
 
 #include "IonAttachableNodeAnimation.h"
@@ -48,9 +47,6 @@ namespace ion::graphics::scene::graph::animations
 		public:
 
 			using managed::ManagedObject<NodeAnimationManager>::ManagedObject;
-
-			//Construct a new node animation group with the given name
-			NodeAnimationGroup(std::string name) noexcept;
 
 
 			/*
