@@ -439,7 +439,7 @@ ClassDefinition get_triangle_class()
 
 ClassDefinition get_node_animation_class()
 {
-	return ClassDefinition::Create("node-animation")
+	return ClassDefinition::Create("animation")
 		.AddClass(get_action_class())
 		.AddClass(get_rotating_class())
 		.AddClass(get_scaling_class())
@@ -451,7 +451,7 @@ ClassDefinition get_node_animation_class()
 
 ClassDefinition get_node_animation_group_class()
 {
-	return ClassDefinition::Create("node-animation-group")
+	return ClassDefinition::Create("animation-group")
 		.AddProperty("add", {ParameterType::String, ParameterType::FloatingPoint, ParameterType::Boolean}, 1)
 		.AddProperty("name", ParameterType::String)
 		.AddProperty("start", ParameterType::FloatingPoint);
@@ -459,7 +459,7 @@ ClassDefinition get_node_animation_group_class()
 
 ClassDefinition get_node_animation_timeline_class()
 {
-	return ClassDefinition::Create("node-animation-timeline")
+	return ClassDefinition::Create("animation-timeline")
 		.AddProperty("attach-animation", {ParameterType::String, ParameterType::FloatingPoint, ParameterType::Boolean}, 1)
 		.AddProperty("attach-animation-group", {ParameterType::String, ParameterType::FloatingPoint, ParameterType::Boolean}, 1)
 		.AddProperty("name", ParameterType::String)
@@ -1062,11 +1062,11 @@ void set_scene_node_properties(const script_tree::ObjectNode &object, graph::Sce
 		else if (obj.Name() == "movable-sound-listener")
 			create_movable_sound_listener(obj, scene_manager, managers);
 
-		else if (obj.Name() == "node-animation")
+		else if (obj.Name() == "animation")
 			create_node_animation(obj, scene_node);
-		else if (obj.Name() == "node-animation-group")
+		else if (obj.Name() == "animation-group")
 			create_node_animation_group(obj, scene_node);
-		else if (obj.Name() == "node-animation-timeline")
+		else if (obj.Name() == "animation-timeline")
 			create_node_animation_timeline(obj, scene_node);
 		else if (obj.Name() == "scene-node")
 			create_scene_node(obj, scene_node, scene_manager, managers);
