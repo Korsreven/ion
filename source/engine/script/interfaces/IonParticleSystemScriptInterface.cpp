@@ -96,6 +96,7 @@ ClassDefinition get_particle_system_class()
 		.AddClass(get_velocity_randomizer_class())
 
 		.AddRequiredProperty("name", ParameterType::String)
+		.AddProperty("emitting", ParameterType::Boolean)
 		.AddProperty("render-primitive", {"point"s, "rectangle"s});
 }
 
@@ -295,7 +296,14 @@ void set_particle_system_properties(const script_tree::ObjectNode &object, Parti
 
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "render-primitive")
+		if (property.Name() == "emitting")
+		{
+			if (property[0].Get<ScriptType::Boolean>()->Get())
+				particle_system.StartAll();
+			else
+				particle_system.StopAll();
+		}
+		else if (property.Name() == "render-primitive")
 		{
 			if (property[0].Get<ScriptType::Enumerable>()->Get() == "point")
 				particle_system.RenderPrimitive(particle_system::ParticlePrimitive::Point);
