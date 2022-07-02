@@ -145,7 +145,7 @@ namespace ion::managed
 			[[nodiscard]] inline auto ObjectsOf() const noexcept
 			{
 				static_assert(std::is_base_of_v<T, U>);
-				return adaptors::ranges::Iterable<const object_register::detail::object_pointers<U>&>{
+				return adaptors::ranges::Iterable<const object_register::detail::object_pointers<U>>{
 					object_register::detail::get_objects_as<T, U>(objects_)};
 			}
 
