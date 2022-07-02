@@ -374,7 +374,7 @@ void set_component_properties(const script_tree::ObjectNode &object, GuiComponen
 		if (obj.Name() == "scene-node")
 		{
 			if (auto node = component.Node(); node)
-				scene_script_interface::detail::set_scene_node_properties(object, *node, scene_manager, managers);
+				scene_script_interface::detail::set_scene_node_properties(obj, *node, scene_manager, managers);
 		}
 	}
 }

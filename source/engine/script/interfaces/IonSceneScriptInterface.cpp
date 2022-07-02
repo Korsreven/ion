@@ -379,7 +379,7 @@ ClassDefinition get_mesh_class()
 		.AddRequiredClass(std::move(vertex));
 
 	return ClassDefinition::Create("mesh")
-		.AddRequiredClass(std::move(vertices))
+		.AddClass(std::move(vertices))
 
 		.AddProperty("color", ParameterType::Color)
 		.AddProperty("draw-mode", {"points"s, "lines"s, "line-loop"s, "line-strip"s, "triangles"s, "triangle-fan"s, "triangle-strip"s, "quads"s, "polygon"s})
