@@ -43,6 +43,16 @@ ClassDefinition get_sound_class()
 		.AddProperty("type", {"sample"s, "compressed-sample"s, "stream"s});
 }
 
+ClassDefinition get_sound_channel_class()
+{
+	return ClassDefinition::Create("sound-channel")
+		.AddProperty("attributes", {ParameterType::Vector3, ParameterType::Vector3})
+		.AddProperty("distance", {ParameterType::FloatingPoint, ParameterType::FloatingPoint}, 1)
+		.AddProperty("mute", ParameterType::Boolean)
+		.AddProperty("pitch", ParameterType::FloatingPoint)
+		.AddProperty("volume", ParameterType::FloatingPoint);
+}
+
 ClassDefinition get_sound_channel_group_class()
 {
 	return ClassDefinition::Create("sound-channel-group")
@@ -85,6 +95,30 @@ void set_sound_properties(const script_tree::ObjectNode &object, Sound &sound)
 			else
 				sound.Distance(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		}
+	}
+}
+
+void set_sound_channel_properties(const script_tree::ObjectNode &object, SoundChannel &sound_channel)
+{
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "attributes")
+			sound_channel.Attributes(property[0].Get<ScriptType::Vector3>()->Get(),
+									 property[1].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "distance")
+		{
+			if (property.NumberOfArguments() == 2)
+				sound_channel.Distance(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
+									   property[1].Get<ScriptType::FloatingPoint>()->As<real>());
+			else
+				sound_channel.Distance(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		}
+		else if (property.Name() == "mute")
+			sound_channel.Mute(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "pitch")
+			sound_channel.Pitch(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "volume")
+			sound_channel.Volume(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 	}
 }
 

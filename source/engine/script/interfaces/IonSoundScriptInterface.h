@@ -17,6 +17,7 @@ File:	IonSoundScriptInterface.h
 
 #include "IonScriptInterface.h"
 #include "sounds/IonSound.h"
+#include "sounds/IonSoundChannel.h"
 #include "sounds/IonSoundChannelGroup.h"
 #include "sounds/IonSoundListener.h"
 #include "sounds/IonSoundManager.h"
@@ -34,6 +35,7 @@ namespace ion::script::interfaces
 		*/
 
 		script_validator::ClassDefinition get_sound_class();
+		script_validator::ClassDefinition get_sound_channel_class();
 		script_validator::ClassDefinition get_sound_channel_group_class();
 		script_validator::ClassDefinition get_sound_listener_class();
 
@@ -45,6 +47,7 @@ namespace ion::script::interfaces
 		*/
 
 		void set_sound_properties(const script_tree::ObjectNode &object, sounds::Sound &sound);
+		void set_sound_channel_properties(const script_tree::ObjectNode &object, sounds::SoundChannel &sound_channel);
 		void set_sound_channel_group_properties(const script_tree::ObjectNode &object, sounds::SoundChannelGroup &sound_channel_group);
 		void set_sound_listener_properties(const script_tree::ObjectNode &object, sounds::SoundListener &sound_listener);
 
