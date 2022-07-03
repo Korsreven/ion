@@ -33,6 +33,8 @@ namespace sound_script_interface::detail
 ClassDefinition get_sound_class()
 {
 	return ClassDefinition::Create("sound")
+		.AddClass(get_sound_channel_class())
+
 		.AddRequiredProperty("asset-name", ParameterType::String)
 		.AddRequiredProperty("name", ParameterType::String)
 		.AddProperty("distance", {ParameterType::FloatingPoint, ParameterType::FloatingPoint}, 1)
@@ -49,7 +51,9 @@ ClassDefinition get_sound_channel_class()
 		.AddProperty("attributes", {ParameterType::Vector3, ParameterType::Vector3})
 		.AddProperty("distance", {ParameterType::FloatingPoint, ParameterType::FloatingPoint}, 1)
 		.AddProperty("mute", ParameterType::Boolean)
+		.AddProperty("paused", ParameterType::Boolean)
 		.AddProperty("pitch", ParameterType::FloatingPoint)
+		.AddProperty("sound-channel-group", ParameterType::String)
 		.AddProperty("volume", ParameterType::FloatingPoint);
 }
 
@@ -94,6 +98,30 @@ void set_sound_properties(const script_tree::ObjectNode &object, Sound &sound)
 							   property[1].Get<ScriptType::FloatingPoint>()->As<real>());
 			else
 				sound.Distance(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		}
+	}
+
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "sound-channel")
+		{
+			auto sound_channel_group_name = obj
+				.Property("sound-channel-group")[0]
+				.Get<ScriptType::String>().value_or(""s).Get();
+			auto paused = obj
+				.Property("paused")[0]
+				.Get<ScriptType::Boolean>().value_or(false).Get();
+
+			if (auto sound_channel =
+				[&]() noexcept
+				{
+					if (auto owner = sound.Owner(); owner)
+						return sound.Play(owner->GetSoundChannelGroup(sound_channel_group_name), paused);
+					else
+						return sound.Play(paused);
+				}(); sound_channel)
+
+				set_sound_channel_properties(obj, *sound_channel);
 		}
 	}
 }
