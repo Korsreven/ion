@@ -534,8 +534,11 @@ ClassDefinition get_drawable_particle_system_class()
 
 ClassDefinition get_drawable_text_class()
 {
+	auto text = ClassDefinition::Create("text", text_script_interface::detail::get_text_class())
+		.AddProperty("type-face", ParameterType::String); //Make type-face optional
+
 	return ClassDefinition::Create("drawable-text", "drawable-object")
-		.AddRequiredClass(text_script_interface::detail::get_text_class())
+		.AddRequiredClass(std::move(text))
 
 		.AddProperty("position", ParameterType::Vector3)
 		.AddProperty("rotation", ParameterType::FloatingPoint);
@@ -585,8 +588,7 @@ ClassDefinition get_movable_object_class()
 
 ClassDefinition get_movable_sound_class()
 {
-	auto sound = ClassDefinition::Create("sound")
-		.AddClass(sound_script_interface::detail::get_sound_channel_class())
+	auto sound = ClassDefinition::Create("sound", sound_script_interface::detail::get_sound_channel_class())
 		.AddRequiredProperty("name", ParameterType::String);
 
 	return ClassDefinition::Create("movable-sound", "movable-object")
@@ -1254,14 +1256,8 @@ void set_movable_sound_properties(const script_tree::ObjectNode &object, Movable
 	{
 		if (obj.Name() == "sound")
 		{
-			for (auto &o : obj.Objects())
-			{
-				if (o.Name() == "sound-channel")
-				{
-					if (auto &sound_channel = sound.Get(); sound_channel)
-						sound_script_interface::detail::set_sound_channel_properties(o, *sound_channel);
-				}
-			}
+			if (auto &sound_channel = sound.Get(); sound_channel)
+				sound_script_interface::detail::set_sound_channel_properties(obj, *sound_channel);
 		}
 	}
 
