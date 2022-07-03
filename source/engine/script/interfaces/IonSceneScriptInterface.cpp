@@ -2043,7 +2043,7 @@ NonOwningPtr<MovableSound> create_movable_sound(const script_tree::ObjectNode &o
 		.Get<ScriptType::String>().value_or(""s).Get();
 	auto paused = object
 		.Property("paused")[0]
-		.Get<ScriptType::Boolean>().value_or(true).Get();
+		.Get<ScriptType::Boolean>().value_or(false).Get();
 
 	auto movable_sound = scene_manager.CreateSound(std::move(name), position,
 		get_sound(sound_name, managers), get_sound_channel_group(sound_channel_group_name, managers), paused);
