@@ -15,6 +15,9 @@ File:	IonSceneScriptInterface.cpp
 #include <optional>
 #include <string>
 
+#include "IonParticleSystemScriptInterface.h"
+#include "IonSoundScriptInterface.h"
+#include "IonTextScriptInterface.h"
 #include "graphics/materials/IonMaterialManager.h"
 #include "graphics/fonts/IonTextManager.h"
 #include "graphics/particles/IonParticleSystemManager.h"
@@ -526,13 +529,14 @@ ClassDefinition get_drawable_object_class()
 ClassDefinition get_drawable_particle_system_class()
 {
 	return ClassDefinition::Create("drawable-particle-system", "drawable-object")
-		.AddRequiredProperty("particle-system", ParameterType::String);
+		.AddRequiredClass(particle_system_script_interface::detail::get_particle_system_class());
 }
 
 ClassDefinition get_drawable_text_class()
 {
 	return ClassDefinition::Create("drawable-text", "drawable-object")
-		.AddRequiredProperty("text", ParameterType::String)
+		.AddRequiredClass(text_script_interface::detail::get_text_class())
+
 		.AddProperty("position", ParameterType::Vector3)
 		.AddProperty("rotation", ParameterType::FloatingPoint);
 }
@@ -581,8 +585,13 @@ ClassDefinition get_movable_object_class()
 
 ClassDefinition get_movable_sound_class()
 {
+	auto sound = ClassDefinition::Create("sound")
+		.AddClass(sound_script_interface::detail::get_sound_channel_class())
+		.AddRequiredProperty("name", ParameterType::String);
+
 	return ClassDefinition::Create("movable-sound", "movable-object")
-		.AddRequiredProperty("sound", ParameterType::String)
+		.AddRequiredClass(std::move(sound))
+
 		.AddProperty("paused", ParameterType::Boolean)
 		.AddProperty("position", ParameterType::Vector3)
 		.AddProperty("sound-channel-group", ParameterType::String);
@@ -591,7 +600,7 @@ ClassDefinition get_movable_sound_class()
 ClassDefinition get_movable_sound_listener_class()
 {
 	return ClassDefinition::Create("movable-sound-listener", "movable-object")
-		.AddRequiredProperty("sound-listener", ParameterType::String)
+		.AddRequiredClass(sound_script_interface::detail::get_sound_listener_class())
 		.AddProperty("position", ParameterType::Vector3);
 }
 
@@ -1111,12 +1120,30 @@ void set_drawable_particle_system_properties(const script_tree::ObjectNode &obje
 	const ManagerRegister &managers)
 {
 	set_drawable_object_properties(object, particle_system, managers);
+
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "particle-system")
+		{
+			if (auto &psys = particle_system.Get(); psys)
+				particle_system_script_interface::detail::set_particle_system_properties(obj, *psys, managers);
+		}
+	}
 }
 
 void set_drawable_text_properties(const script_tree::ObjectNode &object, DrawableText &text,
 	const ManagerRegister &managers)
 {
 	set_drawable_object_properties(object, text, managers);
+
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "text")
+		{
+			if (auto &txt = text.Get(); txt)
+				text_script_interface::detail::set_text_properties(obj, *txt);
+		}
+	}
 
 	for (auto &property : object.Properties())
 	{
@@ -1223,6 +1250,21 @@ void set_movable_sound_properties(const script_tree::ObjectNode &object, Movable
 {
 	set_movable_object_properties(object, sound);
 
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "sound")
+		{
+			for (auto &o : obj.Objects())
+			{
+				if (o.Name() == "sound-channel")
+				{
+					if (auto &sound_channel = sound.Get(); sound_channel)
+						sound_script_interface::detail::set_sound_channel_properties(o, *sound_channel);
+				}
+			}
+		}
+	}
+
 	for (auto &property : object.Properties())
 	{
 		if (property.Name() == "position")
@@ -1233,6 +1275,15 @@ void set_movable_sound_properties(const script_tree::ObjectNode &object, Movable
 void set_movable_sound_listener_properties(const script_tree::ObjectNode &object, MovableSoundListener &sound_listener)
 {
 	set_movable_object_properties(object, sound_listener);
+
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "sound-listener")
+		{
+			if (auto &listener = sound_listener.Get(); listener)
+				sound_script_interface::detail::set_sound_listener_properties(obj, *listener);
+		}
+	}
 
 	for (auto &property : object.Properties())
 	{
@@ -1855,9 +1906,17 @@ NonOwningPtr<DrawableParticleSystem> create_drawable_particle_system(const scrip
 			else
 				return {};
 		}();
-	auto particle_system_name = object
-		.Property("particle-system")[0]
-		.Get<ScriptType::String>()->Get();
+	auto particle_system_name =
+		[&]() noexcept
+		{
+			for (auto &obj : object.Objects())
+			{
+				if (obj.Name() == "particle-system")
+					return obj.Property("name")[0].Get<ScriptType::String>()->Get();
+			}
+
+			return ""s;
+		}();
 	auto visible = object
 		.Property("visible")[0]
 		.Get<ScriptType::Boolean>().value_or(true).Get();
@@ -1888,9 +1947,17 @@ NonOwningPtr<DrawableText> create_drawable_text(const script_tree::ObjectNode &o
 	auto rotation = utilities::math::ToRadians(object
 		.Property("rotation")[0]
 		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>());
-	auto text_name = object
-		.Property("text")[0]
-		.Get<ScriptType::String>()->Get();
+	auto text_name =
+		[&]() noexcept
+		{
+			for (auto &obj : object.Objects())
+			{
+				if (obj.Name() == "text")
+					return obj.Property("name")[0].Get<ScriptType::String>()->Get();
+			}
+
+			return ""s;
+		}();
 	auto visible = object
 		.Property("visible")[0]
 		.Get<ScriptType::Boolean>().value_or(true).Get();
@@ -1964,9 +2031,17 @@ NonOwningPtr<MovableSound> create_movable_sound(const script_tree::ObjectNode &o
 	auto position = object
 		.Property("position")[0]
 		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
-	auto sound_name = object
-		.Property("sound")[0]
-		.Get<ScriptType::String>()->Get();
+	auto sound_name =
+		[&]() noexcept
+		{
+			for (auto &obj : object.Objects())
+			{
+				if (obj.Name() == "sound")
+					return obj.Property("name")[0].Get<ScriptType::String>()->Get();
+			}
+
+			return ""s;
+		}();
 	auto sound_channel_group_name = object
 		.Property("sound-channel-group")[0]
 		.Get<ScriptType::String>().value_or(""s).Get();
@@ -1997,9 +2072,17 @@ NonOwningPtr<MovableSoundListener> create_movable_sound_listener(const script_tr
 	auto position = object
 		.Property("position")[0]
 		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
-	auto sound_listener_name = object
-		.Property("sound-listener")[0]
-		.Get<ScriptType::String>()->Get();
+	auto sound_listener_name =
+		[&]() noexcept
+		{
+			for (auto &obj : object.Objects())
+			{
+				if (obj.Name() == "sound-listener")
+					return obj.Property("name")[0].Get<ScriptType::String>()->Get();
+			}
+
+			return ""s;
+		}();
 
 	auto movable_sound_listener = scene_manager.CreateSoundListener(std::move(name), position,
 		get_sound_listener(sound_listener_name, managers));
