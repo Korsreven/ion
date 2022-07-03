@@ -133,11 +133,7 @@ bool Engine::UpdateFrame() noexcept
 			scene_graph.Render(viewport, time);
 	}
 
-	if (syncronize_)
-		glFinish();
-	else
-		glFlush();
-
+	//glFlush() or glFinish() calls are being handled by SwapBuffers
 	return NotifyFrameEnded(time);
 }
 
@@ -242,7 +238,6 @@ int Engine::Start() noexcept
 	if (render_window_)
 		render_window_->Show();
 
-	syncronize_ = VerticalSync().value_or(VSyncMode::On) != VSyncMode::Off;
 	total_stopwatch_.Restart();
 
 	//Main loop
