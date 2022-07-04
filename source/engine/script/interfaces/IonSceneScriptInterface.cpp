@@ -1192,7 +1192,8 @@ void set_light_properties(const script_tree::ObjectNode &object, Light &light)
 		else if (property.Name() == "cast-shadows")
 			light.CastShadows(property[0].Get<ScriptType::Boolean>()->Get());
 		else if (property.Name() == "cutoff")
-			light.Cutoff(property[0].Get<ScriptType::FloatingPoint>()->As<real>(), property[1].Get<ScriptType::FloatingPoint>()->As<real>());
+			light.Cutoff(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()),
+						 utilities::math::ToRadians(property[1].Get<ScriptType::FloatingPoint>()->As<real>()));
 		else if (property.Name() == "diffuse-color")
 			light.DiffuseColor(property[0].Get<ScriptType::Color>()->Get());
 		else if (property.Name() == "direction")
