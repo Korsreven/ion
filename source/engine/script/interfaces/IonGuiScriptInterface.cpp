@@ -693,6 +693,8 @@ void set_list_box_properties(const script_tree::ObjectNode &object, controls::Gu
 {
 	set_scrollable_properties(object, list_box, scene_manager, managers);
 
+	controls::gui_list_box::ListBoxItems items;
+
 	for (auto &property : object.Properties())
 	{
 		if (property.Name() == "icon-column-width")
@@ -711,10 +713,10 @@ void set_list_box_properties(const script_tree::ObjectNode &object, controls::Gu
 		else if (property.Name() == "item")
 		{
 			if (property.NumberOfArguments() == 2)
-				list_box.AddItem(property[0].Get<ScriptType::String>()->Get(),
-								 get_material(property[1].Get<ScriptType::String>()->Get(), managers));
+				items.emplace_back(property[0].Get<ScriptType::String>()->Get(),
+								   get_material(property[1].Get<ScriptType::String>()->Get(), managers));
 			else
-				list_box.AddItem(property[0].Get<ScriptType::String>()->Get());
+				items.emplace_back(property[0].Get<ScriptType::String>()->Get());
 		}
 		else if (property.Name() == "item-height-factor")
 			list_box.ItemHeightFactor(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
@@ -736,6 +738,9 @@ void set_list_box_properties(const script_tree::ObjectNode &object, controls::Gu
 		else if (property.Name() == "show-icons")
 			list_box.ShowIcons(property[0].Get<ScriptType::Boolean>()->Get());
 	}
+
+	if (!std::empty(items))
+		list_box.AddItems(std::move(items));
 }
 
 void set_mouse_cursor_properties(const script_tree::ObjectNode &object, controls::GuiMouseCursor &mouse_cursor,
@@ -1420,7 +1425,7 @@ NonOwningPtr<controls::GuiScrollBar> create_gui_scroll_bar(const script_tree::Ob
 		.Property("type")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
 
-	controls::gui_slider::SliderType type = controls::gui_slider::SliderType::Horizontal;
+	controls::gui_slider::SliderType type = controls::gui_slider::SliderType::Vertical;
 
 	auto hit_boxes = controls::gui_control::BoundingBoxes{};
 	for (auto &property : object.Properties())
@@ -1431,8 +1436,8 @@ NonOwningPtr<controls::GuiScrollBar> create_gui_scroll_bar(const script_tree::Ob
 				property[1].Get<ScriptType::Vector2>()->Get()});
 	}
 
-	if (type_name == "vertical")
-		type = controls::gui_slider::SliderType::Vertical;
+	if (type_name == "horizontal")
+		type = controls::gui_slider::SliderType::Horizontal;
 
 	auto scroll_bar =
 		[&]() noexcept -> NonOwningPtr<controls::GuiScrollBar>
