@@ -154,20 +154,34 @@ Vector2 ortho_to_viewport_point(const Vector2 &viewport_size, real left, real ri
 
 Vector2 camera_to_ortho_point(scene::Camera &camera, const Vector2 &point) noexcept
 {
-	return utilities::Matrix3::Transformation(
-				-(camera.Rotation() + camera.ParentNode()->DerivedRotation()),
-				utilities::vector2::UnitScale / camera.ParentNode()->DerivedScaling(),
-				-(camera.Position() + camera.ParentNode()->DerivedPosition())
-			).TransformPoint(point);
+	if (auto parent_node = camera.ParentNode(); parent_node)
+		return utilities::Matrix3::Transformation(
+					-(camera.Rotation() + parent_node->DerivedRotation()),
+					utilities::vector2::UnitScale / parent_node->DerivedScaling(),
+					-(camera.Position() + parent_node->DerivedPosition())
+				).TransformPoint(point);
+	else
+		return utilities::Matrix3::Transformation(
+					-camera.Rotation(),
+					utilities::vector2::UnitScale,
+					-camera.Position()
+				).TransformPoint(point);
 }
 
 Vector2 ortho_to_camera_point(scene::Camera &camera, const Vector2 &point) noexcept
 {
-	return utilities::Matrix3::Transformation(
-				camera.Rotation() + camera.ParentNode()->DerivedRotation(),
-				camera.ParentNode()->DerivedScaling(),
-				camera.Position() + camera.ParentNode()->DerivedPosition()
-			).TransformPoint(point);
+	if (auto parent_node = camera.ParentNode(); parent_node)
+		return utilities::Matrix3::Transformation(
+					camera.Rotation() + parent_node->DerivedRotation(),
+					parent_node->DerivedScaling(),
+					camera.Position() + parent_node->DerivedPosition()
+				).TransformPoint(point);
+	else
+		return utilities::Matrix3::Transformation(
+					camera.Rotation(),
+					utilities::vector2::UnitScale,
+					camera.Position()
+				).TransformPoint(point);
 }
 
 
