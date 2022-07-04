@@ -1059,19 +1059,40 @@ void set_scene_node_properties(const script_tree::ObjectNode &object, graph::Sce
 	for (auto &obj : object.Objects())
 	{
 		if (obj.Name() == "camera")
-			create_camera(obj, scene_manager);
+		{
+			if (auto camera = create_camera(obj, scene_manager); camera)
+				scene_node.AttachObject(*camera);
+		}
 		else if (obj.Name() == "drawable-particle-system")
-			create_drawable_particle_system(obj, scene_manager, managers);
+		{
+			if (auto particle_system = create_drawable_particle_system(obj, scene_manager, managers); particle_system)
+				scene_node.AttachObject(*particle_system);
+		}
 		else if (obj.Name() == "drawable-text")
-			create_drawable_text(obj, scene_manager, managers);
+		{
+			if (auto text = create_drawable_text(obj, scene_manager, managers); text)
+				scene_node.AttachObject(*text);
+		}
 		else if (obj.Name() == "light")
-			create_light(obj, scene_manager);
+		{
+			if (auto light = create_light(obj, scene_manager); light)
+				scene_node.AttachObject(*light);
+		}
 		else if (obj.Name() == "model")
-			create_model(obj, scene_manager, managers);
+		{
+			if (auto model = create_model(obj, scene_manager, managers); model)
+				scene_node.AttachObject(*model);
+		}
 		else if (obj.Name() == "movable-sound")
-			create_movable_sound(obj, scene_manager, managers);
+		{
+			if (auto sound = create_movable_sound(obj, scene_manager, managers); sound)
+				scene_node.AttachObject(*sound);
+		}
 		else if (obj.Name() == "movable-sound-listener")
-			create_movable_sound_listener(obj, scene_manager, managers);
+		{
+			if (auto sound_listener = create_movable_sound_listener(obj, scene_manager, managers); sound_listener)
+				scene_node.AttachObject(*sound_listener);
+		}
 
 		else if (obj.Name() == "animation")
 			create_node_animation(obj, scene_node);
