@@ -176,7 +176,7 @@ namespace ion::graphics::particles
 			real emission_angle_ = 0.0_r;
 			std::optional<Cumulative<duration>> emission_duration_;			
 
-			int particle_quota_ = 0;
+			int particle_quota_ = 100;
 			bool emitting_ = false;
 			Cumulative<real> emission_amount_{1.0_r};
 
