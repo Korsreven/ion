@@ -383,6 +383,12 @@ void create_uniform(const script_tree::PropertyNode &property,
 
 void set_shader_program_properties(const script_tree::ObjectNode &object, ShaderProgram &shader_program)
 {
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "struct")
+			create_shader_struct(obj, shader_program);
+	}
+
 	for (auto &property : object.Properties())
 	{
 		if (property.Name() == "attribute")
