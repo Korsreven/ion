@@ -102,10 +102,13 @@ bool GuiGroupBox::AddControl(NonOwningPtr<controls::GuiControl> control)
 
 bool GuiGroupBox::AddControl(std::string_view name)
 {
-	if (auto control = GetControl(name); control)
-		return AddControl(control);
-	else
-		return false;
+	if (auto owner = Owner(); owner)
+	{
+		if (auto control = owner->GetControl(name); control)
+			return AddControl(control);
+	}
+	
+	return false;
 }
 
 
