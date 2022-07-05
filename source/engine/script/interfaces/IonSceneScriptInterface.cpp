@@ -1868,7 +1868,7 @@ NonOwningPtr<graph::SceneNode> create_scene_node(const script_tree::ObjectNode &
 		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
 	auto initial_direction = object
 		.Property("initial-direction")[0]
-		.Get<ScriptType::Vector2>().value_or(vector2::Zero).Get();
+		.Get<ScriptType::Vector2>().value_or(vector2::UnitY).Get();
 	auto visible = object
 		.Property("visible")[0]
 		.Get<ScriptType::Boolean>().value_or(parent_node.Visible()).Get();
