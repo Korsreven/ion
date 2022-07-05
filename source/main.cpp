@@ -708,6 +708,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			texture_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			texture_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
 			texture_script.CreateTextures("textures.ion", *textures);
+			textures->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 
 			ion::script::interfaces::FontScriptInterface font_script;
 			font_script.CreateScriptRepository(script_repository);
@@ -715,6 +716,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			font_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			font_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
 			font_script.CreateFonts("fonts.ion", *fonts);
+			fonts->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 
 			ion::script::interfaces::FrameSequenceScriptInterface frame_sequence_script;
 			frame_sequence_script.CreateScriptRepository(script_repository);
@@ -736,6 +738,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			shader_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			shader_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
 			shader_script.CreateShaders("shaders.ion", *shaders);
+			shaders->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 
 			ion::script::interfaces::ShaderProgramScriptInterface shader_program_script;
 			shader_program_script.CreateScriptRepository(script_repository);
@@ -743,6 +746,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			shader_program_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			shader_program_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
 			shader_program_script.CreateShaderPrograms("shader_programs.ion", *shader_programs);
+			shader_programs->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 
 			ion::script::interfaces::TypeFaceScriptInterface type_face_script;
 			type_face_script.CreateScriptRepository(script_repository);
@@ -757,13 +761,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			sound_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			sound_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
 			sound_script.CreateSounds("sounds.ion", *sounds);
-
-			ion::script::interfaces::ParticleSystemScriptInterface particle_system_script;
-			particle_system_script.CreateScriptRepository(script_repository);
-			particle_system_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
-			particle_system_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
-			particle_system_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			particle_system_script.CreateParticleSystems("particle_systems.ion", *particle_systems);
+			sounds->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 
 			ion::script::interfaces::MaterialScriptInterface material_script;
 			material_script.CreateScriptRepository(script_repository);
@@ -771,6 +769,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			material_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			material_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
 			material_script.CreateMaterials("materials.ion", *materials);
+
+			ion::script::interfaces::ParticleSystemScriptInterface particle_system_script;
+			particle_system_script.CreateScriptRepository(script_repository);
+			particle_system_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
+			particle_system_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
+			particle_system_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
+			particle_system_script.CreateParticleSystems("particle_systems.ion", *particle_systems);
 
 			ion::script::interfaces::TextScriptInterface text_script;
 			text_script.CreateScriptRepository(script_repository);
@@ -819,7 +824,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//Textures
-			auto ground = textures->CreateTextureAtlas("ground", "atlas_pot.jpg", 2, 2, 4,
+			/*auto ground = textures->CreateTextureAtlas("ground", "atlas_pot.jpg", 2, 2, 4,
 				ion::graphics::textures::texture_atlas::AtlasSubTextureOrder::RowMajor);
 
 			auto asteroid_diffuse = textures->CreateTexture("asteroid_diffuse", "asteroid_diffuse.png");
@@ -917,9 +922,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			textures->CreateTexture("cat06", "cat06.png");
 			textures->CreateTexture("cat07", "cat07.png");
 			textures->CreateTexture("cat08", "cat08.png");
-			
-			textures->LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
+			textures->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 			//while (!textures->Loaded());
 
 			//Frame sequences
@@ -938,8 +942,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto text_frag_shader = shaders->CreateShader("default_text_frag", "default_text.frag");
 			auto gui_text_vert_shader = shaders->CreateShader("default_gui_text_vert", "default_gui_text.vert");
 			auto gui_text_frag_shader = shaders->CreateShader("default_gui_text_frag", "default_gui_text.frag");
-			shaders->LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
-
+			
+			shaders->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 			//while (!shaders->Loaded());
 
 			//Shader programs
@@ -947,8 +951,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto particle_program = shader_programs->CreateShaderProgram("default_particle_prog", particle_vert_shader, particle_frag_shader);
 			auto text_program = shader_programs->CreateShaderProgram("default_text_prog", text_vert_shader, text_frag_shader);
 			auto gui_text_program = shader_programs->CreateShaderProgram("default_gui_text_prog", gui_text_vert_shader, gui_text_frag_shader);
-			shader_programs->LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
+			shader_programs->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 			//while (!shader_programs.Loaded());
 
 			using namespace ion::graphics::shaders::variables;
@@ -1206,8 +1210,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto verdana_bold_36 = fonts->CreateFont("verdana_bold_36", "verdanab.ttf", 36);
 			auto verdana_italic_36 = fonts->CreateFont("verdana_italic_36", "verdanai.ttf", 36);
 			auto verdana_bold_italic_36 = fonts->CreateFont("verdana_bold_italic_36", "verdanaz.ttf", 36);
-			fonts->LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
 
+			fonts->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 			//while (!fonts.Loaded());
 
 			//Type face
@@ -1240,8 +1244,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto night_runner = sounds->CreateSound("night_runner", "night_runner.mp3",
 				ion::sounds::sound::SoundType::Stream, ion::sounds::sound::SoundLoopingMode::Forward);
 			auto click = sounds->CreateSound("click", "click.wav", ion::sounds::sound::SoundType::Sample);	
-			sounds->LoadAll(/*ion::resources::resource_manager::EvaluationStrategy::Lazy*/);
-
+			
+			sounds->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 			//while (!sounds->Loaded());
 
 			//night_runner->Play()->Volume(0.2_r);
@@ -1790,18 +1794,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			emitter->ParticleMaterial(raindrop);
 
 			//Text
-			/*auto pangram =
-				texts.CreateText(
-					"pangram",
-					"The <i>quick</i> <del><font color='saddlebrown'>brown</font></del> fox <b>jumps</b> <sup>over</sup> the <i>lazy</i> dog",
-					verdana_12);
+			//auto pangram =
+			//	texts.CreateText(
+			//		"pangram",
+			//		"The <i>quick</i> <del><font color='saddlebrown'>brown</font></del> fox <b>jumps</b> <sup>over</sup> the <i>lazy</i> dog",
+			//		verdana_12);
 
-			pangram->AppendLine("How <del><font color='olivedrab'>vexingly</font></del> <u>quick</u> <sub>daft</sub> zebras <b>jump</b>!");
+			//pangram->AppendLine("How <del><font color='olivedrab'>vexingly</font></del> <u>quick</u> <sub>daft</sub> zebras <b>jump</b>!");
 			//pangram->Overflow(ion::graphics::fonts::text::TextOverflow::WordWrap);
 			//pangram->AreaSize(ion::graphics::utilities::Vector2{300.0_r, 100.0_r});
-			pangram->Alignment(ion::graphics::fonts::text::TextAlignment::Left);
-			pangram->VerticalAlignment(ion::graphics::fonts::text::TextVerticalAlignment::Top);	
-			pangram->DefaultForegroundColor(color::White);*/
+			//pangram->Alignment(ion::graphics::fonts::text::TextAlignment::Left);
+			//pangram->VerticalAlignment(ion::graphics::fonts::text::TextVerticalAlignment::Top);	
+			//pangram->DefaultForegroundColor(color::White);
 
 			auto fps =
 				texts->CreateText(
@@ -1889,7 +1893,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Text
 			auto text = scene_manager->CreateText({}, fps);
-			text->AddPass(ion::graphics::render::Pass{/*gui_text_program*/});
+			text->AddPass(ion::graphics::render::Pass{});
 
 			//Particle system
 			auto particle_system = scene_manager->CreateParticleSystem({}, rain);
@@ -1944,35 +1948,35 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{0.0_r, 0.0_r, 0.0_r}, {0.71_r, 0.71_r}, color_spectrum});
 			model_spectrum->AddPass(ion::graphics::render::Pass{});
 
-			/*auto box = scene_manager->CreateModel();
-			box->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.25_r, 0.30_r}, color::DeepPink});
-			box->AddPass(ion::graphics::render::Pass{model_program});
-			box->QueryFlags(2);
-			box->QueryMask(1 | 2 | 4);
+			//auto box = scene_manager->CreateModel();
+			//box->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.25_r, 0.30_r}, color::DeepPink});
+			//box->AddPass(ion::graphics::render::Pass{model_program});
+			//box->QueryFlags(2);
+			//box->QueryMask(1 | 2 | 4);
 			//box->ShowBoundingVolumes(true);
 
-			auto box2 = scene_manager->CreateModel();
-			box2->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.30_r, 0.25_r}, color::DarkViolet});
-			box2->AddPass(ion::graphics::render::Pass{model_program});
-			box2->QueryFlags(2);
-			box2->QueryMask(1 | 2 | 4);
+			//auto box2 = scene_manager->CreateModel();
+			//box2->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.30_r, 0.25_r}, color::DarkViolet});
+			//box2->AddPass(ion::graphics::render::Pass{model_program});
+			//box2->QueryFlags(2);
+			//box2->QueryMask(1 | 2 | 4);
 			//box2->ShowBoundingVolumes(true);
 
-			auto circle = scene_manager->CreateModel();
-			circle->CreateMesh(ion::graphics::scene::shapes::Ellipse{0.25_r, color::Khaki});
-			circle->AddPass(ion::graphics::render::Pass{model_program});
-			circle->PreferredBoundingVolume(ion::graphics::scene::movable_object::PreferredBoundingVolumeType::BoundingSphere);
-			circle->QueryFlags(4);
-			circle->QueryMask(1 | 2 | 4);
+			//auto circle = scene_manager->CreateModel();
+			//circle->CreateMesh(ion::graphics::scene::shapes::Ellipse{0.25_r, color::Khaki});
+			//circle->AddPass(ion::graphics::render::Pass{model_program});
+			//circle->PreferredBoundingVolume(ion::graphics::scene::movable_object::PreferredBoundingVolumeType::BoundingSphere);
+			//circle->QueryFlags(4);
+			//circle->QueryMask(1 | 2 | 4);
 			//circle->ShowBoundingVolumes(true);
 
-			auto circle2 = scene_manager->CreateModel();
-			circle2->CreateMesh(ion::graphics::scene::shapes::Ellipse{0.30_r, color::Orchid});
-			circle2->AddPass(ion::graphics::render::Pass{model_program});
-			circle2->PreferredBoundingVolume(ion::graphics::scene::movable_object::PreferredBoundingVolumeType::BoundingSphere);
-			circle2->QueryFlags(4);
-			circle2->QueryMask(1 | 2 | 4);
-			//circle2->ShowBoundingVolumes(true);*/
+			//auto circle2 = scene_manager->CreateModel();
+			//circle2->CreateMesh(ion::graphics::scene::shapes::Ellipse{0.30_r, color::Orchid});
+			//circle2->AddPass(ion::graphics::render::Pass{model_program});
+			//circle2->PreferredBoundingVolume(ion::graphics::scene::movable_object::PreferredBoundingVolumeType::BoundingSphere);
+			//circle2->QueryFlags(4);
+			//circle2->QueryMask(1 | 2 | 4);
+			//circle2->ShowBoundingVolumes(true);
 
 
 			//GUI
@@ -2494,19 +2498,21 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//auto button_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.5_r, -2.0_r});
 			//button_node->AttachObject(*button_model);
 
-			/*auto box_base_node = scene_graph->RootNode().CreateChildNode({-0.40_r, 0.35_r, -2.2_r});
 
-			auto box_node = box_base_node->CreateChildNode({-0.05_r, -0.10_r, 0.0});
-			box_node->AttachObject(*box);
+			//auto box_base_node = scene_graph->RootNode().CreateChildNode({-0.40_r, 0.35_r, -2.2_r});
 
-			auto box2_node = box_base_node->CreateChildNode({0.05_r, 0.10_r, 0.0});
-			box2_node->AttachObject(*box2);
+			//auto box_node = box_base_node->CreateChildNode({-0.05_r, -0.10_r, 0.0});
+			//box_node->AttachObject(*box);
 
-			auto circle_node = scene_graph->RootNode().CreateChildNode({0.35_r, 0.25_r, -2.2_r});
-			circle_node->AttachObject(*circle);
+			//auto box2_node = box_base_node->CreateChildNode({0.05_r, 0.10_r, 0.0});
+			//box2_node->AttachObject(*box2);
 
-			auto circle2_node = scene_graph->RootNode().CreateChildNode({0.45_r, 0.45_r, -2.2_r});
-			circle2_node->AttachObject(*circle2);*/
+			//auto circle_node = scene_graph->RootNode().CreateChildNode({0.35_r, 0.25_r, -2.2_r});
+			//circle_node->AttachObject(*circle);
+
+			//auto circle2_node = scene_graph->RootNode().CreateChildNode({0.45_r, 0.45_r, -2.2_r});
+			//circle2_node->AttachObject(*circle2);
+
 
 			//Head light
 			auto light_node = ship_node->CreateChildNode({}, {0.0_r, -0.15_r, -0.05_r}, vector2::UnitY, false);
@@ -2548,7 +2554,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			idle->Add(idle_rotator);
 
 			auto timeline = ship_node->CreateTimeline({}, 1.0_r, false);
-			timeline->Attach(idle);
+			timeline->Attach(idle);*/
+
+
+			//Pointers
+			auto viewport = engine.Target()->GetViewport("main");
+			auto camera = scene_manager->GetCamera("main_camera");
+			auto player_camera = scene_manager->GetCamera("player_camera");
+
+			if (viewport && camera)
+				viewport->ConnectedCamera(camera);
+
+			auto text = scene_manager->GetText("fps");
+			auto player_node = scene_graph->RootNode().GetDescendantNode("player_node");
+			auto ship_node = player_node->GetChildNode("ship_node");
+			auto light_node = ship_node->GetChildNode("ship_light_node");
+			auto timeline = ship_node->GetTimeline("ship_idle_timeline");
 
 
 			//Game
