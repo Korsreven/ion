@@ -989,7 +989,7 @@ text::TextBlocks word_truncate(text::TextBlocks text_blocks, int max_width,
 		max_width);
 
 	//Remove soft wrapped lines
-	if (auto text_lines = text_blocks_to_text_lines(std::move(text_blocks)); std::size(text_lines) > 1)
+	if (auto text_lines = text_blocks_to_text_lines(std::move(text_blocks)); !std::empty(text_lines))
 	{
 		for (auto iter = std::begin(text_lines); iter != std::end(text_lines);)
 		{
