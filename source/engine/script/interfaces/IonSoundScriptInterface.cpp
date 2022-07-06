@@ -115,7 +115,9 @@ void set_sound_properties(const script_tree::ObjectNode &object, Sound &sound)
 			if (auto sound_channel =
 				[&]() noexcept
 				{
-					if (auto owner = sound.Owner(); owner)
+					if (auto owner = sound.Owner(); owner &&
+						(sound.IsLoaded() || owner->Load(sound)))
+
 						return sound.Play(owner->GetSoundChannelGroup(sound_channel_group_name), paused);
 					else
 						return sound.Play(paused);
