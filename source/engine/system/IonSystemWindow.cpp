@@ -740,7 +740,7 @@ bool Window::ProcessMessage(HWND handle, UINT message, WPARAM w_param, LPARAM l_
 			//Don't register repeated key down
 			if ((l_param & 0x40000000) == 0)
 			{
-				//Alt + Enter (change dispaly mode)
+				//Alt + Enter (change display mode)
 				if (w_param == VK_RETURN)
 				{
 					if (InFullScreen())
@@ -1049,14 +1049,12 @@ bool Window::ProcessNextMessage(bool &quit) noexcept
 	#ifdef ION_WIN32
 	if (MSG msg; PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) != 0)
 	{
-		if (msg.message == WM_QUIT)
-		{
-			quit = true;
-			return false;
-		}
-
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+
+		if (msg.message == WM_QUIT)
+			quit = true;
+
 		return true;
 	}
 	#endif
