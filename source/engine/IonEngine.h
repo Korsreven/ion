@@ -156,7 +156,7 @@ namespace ion
 			//Sets the target FPS (frames per second) the engine should use
 			inline void TargetFPS(std::optional<int> fps) noexcept
 			{
-				if (fps && fps > 0)
+				if (fps && *fps > 0)
 					target_frame_time_ = 1.0_sec / *fps;
 				else
 					target_frame_time_ = {};
