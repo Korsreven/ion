@@ -12,6 +12,9 @@ File:	IonEngine.cpp
 
 #include "IonEngine.h"
 
+#include <cmath>
+#include <thread>
+
 #include "graphics/IonGraphicsAPI.h"
 #include "system/IonSystemUtility.h"
 #include "utilities/IonFileUtility.h"
@@ -83,6 +86,39 @@ std::optional<int> get_swap_interval() noexcept
 	return {};
 }
 
+
+void wait_for(duration seconds) noexcept
+{
+	using namespace std::chrono_literals;
+
+	static auto estimate = 0.005_r; //5ms
+	static auto mean = estimate;
+	static auto m2 = 0.0_r;
+	static auto count = 1LL;
+
+	while (estimate < seconds.count())
+	{
+		auto start = std::chrono::high_resolution_clock::now();
+		std::this_thread::sleep_for(1ms); //Measure actual time passed
+		auto stop = std::chrono::high_resolution_clock::now();
+
+		auto observed = duration{stop - start};
+		seconds -= observed;
+
+		//Welford's algorithm
+		++count;
+		auto delta = observed.count() - mean;
+		mean += delta / count;
+		m2 += delta * (observed.count() - mean);
+		auto std_dev = std::sqrt(m2 / (count - 1LL));
+		estimate = mean + std_dev;
+	}
+
+	//Spin lock for the remaining time
+	auto start = std::chrono::high_resolution_clock::now();
+	while (std::chrono::high_resolution_clock::now() - start < seconds);
+}
+
 } //engine::detail
 
 
@@ -115,11 +151,8 @@ bool Engine::NotifyFrameEnded(duration time) noexcept
 }
 
 
-bool Engine::UpdateFrame() noexcept
+bool Engine::UpdateFrame(duration time) noexcept
 {
-	auto time = frame_stopwatch_.Restart();
-		//Time should always be 0.0 sec on first frame
-
 	timer_manager_.Elapse(time);
 
 	if (!NotifyFrameStarted(time))
@@ -133,7 +166,6 @@ bool Engine::UpdateFrame() noexcept
 			scene_graph.Render(viewport, time);
 	}
 
-	//glFlush() or glFinish() calls are being handled by SwapBuffers
 	return NotifyFrameEnded(time);
 }
 
@@ -241,8 +273,23 @@ int Engine::Start() noexcept
 	total_stopwatch_.Restart();
 
 	//Main loop
-	while (render_window_ && render_window_->ProcessMessages() && UpdateFrame())
+	while (render_window_ && render_window_->ProcessMessages())
+	{
+		auto time = frame_stopwatch_.Restart();
+			//Time should always be 0.0 sec on first frame
+
+		if (!UpdateFrame(time))
+			break;
+
 		render_window_->SwapBuffers();
+			//glFlush() or glFinish() calls are being handled by SwapBuffers
+
+		if (target_frame_time_)
+		{
+			if (auto seconds = *target_frame_time_ - frame_stopwatch_.Elapsed(); seconds > 0.0_sec)
+				detail::wait_for(seconds);
+		}
+	}
 
 	frame_stopwatch_.Reset();
 	total_stopwatch_.Stop(); //Total time could be retrieved later

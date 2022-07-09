@@ -2595,6 +2595,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				input->MouseEvents().Subscribe(game);
 			}
 
+			engine.TargetFPS({});
 			engine.VerticalSync(ion::engine::VSyncMode::Off);
 			exit_code = engine.Start();
 		}

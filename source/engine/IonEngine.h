@@ -25,6 +25,7 @@ File:	IonEngine.h
 #include "timers/IonStopwatch.h"
 #include "timers/IonTimerManager.h"
 #include "types/IonTypes.h"
+#include "utilities/IonMath.h"
 
 namespace ion
 {
@@ -51,6 +52,8 @@ namespace ion
 
 			void set_swap_interval(int mode) noexcept;
 			std::optional<int> get_swap_interval() noexcept;
+
+			void wait_for(duration seconds) noexcept;
 		} //detail
 	} //engine
 
@@ -68,6 +71,7 @@ namespace ion
 			bool initialized_ = false;
 			timers::Stopwatch frame_stopwatch_;
 			timers::Stopwatch total_stopwatch_;
+			std::optional<duration> target_frame_time_;
 
 			std::optional<graphics::render::RenderWindow> render_window_;
 			std::optional<events::InputController> input_controller_;
@@ -84,7 +88,7 @@ namespace ion
 			bool NotifyFrameStarted(duration time) noexcept;
 			bool NotifyFrameEnded(duration time) noexcept;
 
-			bool UpdateFrame() noexcept;
+			bool UpdateFrame(duration time) noexcept;
 
 		public:
 
@@ -149,6 +153,15 @@ namespace ion
 				Modifiers
 			*/
 
+			//Sets the target FPS (frames per second) the engine should use
+			inline void TargetFPS(std::optional<int> fps) noexcept
+			{
+				if (fps && fps > 0)
+					target_frame_time_ = 1.0_sec / *fps;
+				else
+					target_frame_time_ = {};
+			}
+
 			//Sets if the engine should use vertical sync or not by the given value
 			void VerticalSync(bool vsync) noexcept;
 
@@ -182,6 +195,16 @@ namespace ion
 			/*
 				Observers
 			*/
+
+			//Returns the target FPS (frames per second) the engine is using
+			//Returns nullopt if no target FPS has been set
+			[[nodiscard]] inline auto TargetFPS() const noexcept -> std::optional<int>
+			{
+				if (target_frame_time_)
+					return static_cast<int>(utilities::math::Round(1.0_sec / *target_frame_time_));
+				else
+					return {};
+			}
 
 			//Returns the kind of vertical sync the engine is using
 			//Returns nullopt if vertical sync mode is unknown
