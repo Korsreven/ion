@@ -37,7 +37,7 @@ void SceneManager::AddDefaultShaderProgram(uint32 type_mask, NonOwningPtr<shader
 	if (std::find_if(std::begin(default_shader_programs_), std::end(default_shader_programs_),
 		[&](auto &def_shader_program) noexcept
 		{
-			return def_shader_program.type_mask = type_mask;
+			return def_shader_program.type_mask == type_mask;
 		}) == std::end(default_shader_programs_))
 
 		default_shader_programs_.emplace_back(type_mask, shader_program);

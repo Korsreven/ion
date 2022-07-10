@@ -794,6 +794,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//scene_graph->LightingEnabled(false);
 
 			auto scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
+			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
+				shader_programs->GetShaderProgram("default_model_prog"));
+			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
+				shader_programs->GetShaderProgram("default_particle_prog"));
+			//scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
+			//	shader_programs->GetShaderProgram("default_text_prog"));
 
 			//GUI
 			ion::gui::GuiController controller{scene_graph->RootNode(), sounds->GetSoundChannelGroup("gui")};
