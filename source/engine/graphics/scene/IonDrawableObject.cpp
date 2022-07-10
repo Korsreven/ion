@@ -15,6 +15,7 @@ File:	IonDrawableObject.cpp
 #include <algorithm>
 #include <cassert>
 
+#include "graphics/scene/IonSceneManager.h"
 #include "graphics/shaders/IonShaderProgram.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
 #include "query/IonSceneQuery.h"
@@ -58,9 +59,20 @@ void DrawableObject::Render() noexcept
 {
 	Prepare();
 
-	//No passes added, add default pass
+	//No passes added, add pass with default shader program (if any)
 	if (std::empty(passes_))
-		AddPass(render::Pass{});
+	{
+		auto default_shader_program =
+			[&]() noexcept -> NonOwningPtr<shaders::ShaderProgram>
+			{
+				if (auto owner = Owner(); owner)
+					return owner->GetDefaultShaderProgram(query_type_flags_);
+				else
+					return nullptr;
+			}();
+
+		AddPass(render::Pass{default_shader_program});
+	}
 
 	static NonOwningPtr<shaders::ShaderProgram> active_shader_program = nullptr;
 

@@ -24,21 +24,52 @@ File:	IonSceneManager.h
 #include "IonModel.h"
 #include "IonMovableSound.h"
 #include "IonMovableSoundListener.h"
+#include "adaptors/ranges/IonIterable.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonCameraListener.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
-namespace ion
+//Forward declarations
+namespace ion::graphics
 {
-	class Engine; //Forward declaration
+	namespace shaders
+	{
+		class ShaderProgram;
+	}
 }
 
 namespace ion::graphics::scene
 {
-	namespace scene_manager::detail
+	using namespace types::type_literals;
+
+	namespace scene_manager
 	{
+		namespace detail
+		{
+			struct default_shader_program
+			{
+				uint32 type_mask = 0_ui32;
+				NonOwningPtr<shaders::ShaderProgram> shader_program;
+			};
+
+			using default_shader_programs = std::vector<default_shader_program>;	
+
+
+			inline auto get_default_shader_programs_by_type(uint32 type_flags, const default_shader_programs &def_shader_programs)
+			{
+				default_shader_programs matches;
+
+				for (auto &def_shader_program : def_shader_programs)
+				{
+					if (def_shader_program.type_mask & type_flags)
+						matches.push_back(def_shader_program);
+				}
+
+				return matches;
+			}
+		}
 	} //scene_manager::detail
 
 
@@ -62,6 +93,9 @@ namespace ion::graphics::scene
 			using SoundListenerBase = managed::ObjectManager<MovableSoundListener, SceneManager>;
 
 			using CameraEventsBase = events::Listenable<events::listeners::CameraListener>;
+
+
+			scene_manager::detail::default_shader_programs default_shader_programs_;
 
 		public:
 
@@ -109,6 +143,38 @@ namespace ion::graphics::scene
 			/*
 				Ranges
 			*/
+
+			//Returns a mutable range of all default shader programs in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto DefaultShaderPrograms() noexcept
+			{
+				return adaptors::ranges::Iterable<scene_manager::detail::default_shader_programs&>{default_shader_programs_};
+			}
+
+			//Returns an immutable range of all default shader programs in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto DefaultShaderPrograms() const noexcept
+			{
+				return adaptors::ranges::Iterable<const scene_manager::detail::default_shader_programs&>{default_shader_programs_};
+			}
+
+
+			//Returns a mutable range of all default shader programs that matches the given type flags in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto DefaultShaderPrograms(uint32 type_flags) noexcept
+			{
+				return adaptors::ranges::Iterable<scene_manager::detail::default_shader_programs>{
+					get_default_shader_programs_by_type(type_flags, default_shader_programs_)};
+			}
+
+			//Returns an immutable range of all default shader programs that matches the given type flags in this scene manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto DefaultShaderPrograms(uint32 type_flags) const noexcept
+			{
+				return adaptors::ranges::Iterable<const scene_manager::detail::default_shader_programs>{
+					get_default_shader_programs_by_type(type_flags, default_shader_programs_)};
+			}
+
 
 			//Returns a mutable range of all cameras in this scene manager
 			//This can be used directly with a range-based for loop
@@ -213,6 +279,40 @@ namespace ion::graphics::scene
 			{
 				return SoundListenerBase::Objects();
 			}
+
+
+			/*
+				Default shader program
+				Adding
+			*/
+
+			//Adds a default shader program with the given type mask and shader program
+			void AddDefaultShaderProgram(uint32 type_mask, NonOwningPtr<shaders::ShaderProgram> shader_program);
+
+
+			/*
+				Default shader program
+				Retrieving
+			*/
+
+			//Gets a pointer to the first default shader program that matches with the given type flags
+			//Returns nullptr if the default shader program could not be found
+			NonOwningPtr<shaders::ShaderProgram> GetDefaultShaderProgram(uint32 type_flags) const noexcept;
+
+
+			/*
+				Default shader program
+				Removing
+			*/
+
+			//Clears all default shader programs from this manager
+			void ClearDefaultShaderPrograms() noexcept;
+
+			//Removes the first default shader program that matches with the given type flags from this manager
+			void RemoveDefaultShaderProgram(uint32 type_flags) noexcept;
+
+			//Removes all default shader programs that matches with the given type flags from this manager
+			void RemoveAllDefaultShaderPrograms(uint32 type_flags) noexcept;
 
 
 			/*

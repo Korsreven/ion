@@ -12,6 +12,9 @@ File:	IonSceneManager.cpp
 
 #include "IonSceneManager.h"
 
+#include <algorithm>
+#include <utility>
+
 namespace ion::graphics::scene
 {
 
@@ -23,6 +26,75 @@ namespace scene_manager::detail
 
 
 //Public
+
+/*
+	Default shader program
+	Adding
+*/
+
+void SceneManager::AddDefaultShaderProgram(uint32 type_mask, NonOwningPtr<shaders::ShaderProgram> shader_program)
+{
+	if (std::find_if(std::begin(default_shader_programs_), std::end(default_shader_programs_),
+		[&](auto &def_shader_program) noexcept
+		{
+			return def_shader_program.type_mask = type_mask;
+		}) == std::end(default_shader_programs_))
+
+		default_shader_programs_.emplace_back(type_mask, shader_program);
+}
+
+
+/*
+	Default shader program
+	Retrieving
+*/
+
+NonOwningPtr<shaders::ShaderProgram> SceneManager::GetDefaultShaderProgram(uint32 type_flags) const noexcept
+{
+	if (auto iter = std::find_if(std::begin(default_shader_programs_), std::end(default_shader_programs_),
+		[&](auto &def_shader_program) noexcept
+		{
+			return def_shader_program.type_mask & type_flags;
+		}); iter != std::end(default_shader_programs_))
+
+		return iter->shader_program;
+
+	else
+		return nullptr;
+}
+
+
+/*
+	Default shader program
+	Removing
+*/
+
+void SceneManager::ClearDefaultShaderPrograms() noexcept
+{
+	default_shader_programs_.clear();
+	default_shader_programs_.shrink_to_fit();
+}
+
+void SceneManager::RemoveDefaultShaderProgram(uint32 type_flags) noexcept
+{
+	if (auto iter = std::find_if(std::begin(default_shader_programs_), std::end(default_shader_programs_),
+		[&](auto &def_shader_program) noexcept
+		{
+			return def_shader_program.type_mask & type_flags;
+		}); iter != std::end(default_shader_programs_))
+
+		default_shader_programs_.erase(iter);
+}
+
+void SceneManager::RemoveAllDefaultShaderPrograms(uint32 type_flags) noexcept
+{
+	std::erase_if(default_shader_programs_,
+		[&](auto &def_shader_program) noexcept
+		{
+			return def_shader_program.type_mask & type_flags;
+		});
+}
+
 
 /*
 	Cameras
