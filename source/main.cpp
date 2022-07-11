@@ -1260,27 +1260,30 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Material
 			auto asteroid =
 				materials->CreateMaterial("asteroid",
+					asteroid_diffuse, asteroid_normal, asteroid_specular,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.0_r, 0.0_r, 0.0_r},
 					{0.0_r, 0.0_r, 0.0_r},
-					32.0_r, asteroid_diffuse, asteroid_specular, asteroid_normal);
+					32.0_r);
 
 			auto brick =
 				materials->CreateMaterial("brick",
+					brick_wall_diffuse, brick_wall_normal, brick_wall_specular,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.0_r, 0.0_r, 0.0_r},
 					{0.0_r, 0.0_r, 0.0_r},
-					32.0_r, brick_wall_diffuse, brick_wall_specular, brick_wall_normal);
+					32.0_r);
 
 			auto pebbles =
 				materials->CreateMaterial("pebbles",
+					pebbles_diffuse, pebbles_normal, pebbles_specular,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.6_r, 0.6_r, 0.6_r},
 					{0.0_r, 0.0_r, 0.0_r},
-					32.0_r, pebbles_diffuse, pebbles_specular, pebbles_normal);
+					32.0_r);
 			
 			auto ruby =
 				materials->CreateMaterial("ruby",
@@ -1308,167 +1311,185 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto tifa =
 				materials->CreateMaterial("tifa",
+					tifa_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.6_r, 0.6_r, 0.6_r},
 					{0.0_r, 0.0_r, 0.0_r},
-					32.0_r, tifa_diffuse, nullptr, nullptr);
+					32.0_r);
 
 			auto cloud =
 				materials->CreateMaterial("cloud",
+					cloud_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.6_r, 0.6_r, 0.6_r},
 					{0.0_r, 0.0_r, 0.0_r},
-					32.0_r, cloud_diffuse, nullptr, nullptr);
+					32.0_r);
 
 			auto star =
 				materials->CreateMaterial("star",
+					star_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, star_diffuse, nullptr, nullptr);
+					0.0_r);
 			star->LightingEnabled(false);
 
 			auto ship =
 				materials->CreateMaterial("ship",
+					ship_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.6_r, 0.6_r, 0.6_r},
 					{0.0_r, 0.0_r, 0.0_r},
-					32.0_r, ship_diffuse, nullptr, nullptr);
+					32.0_r);
 
 			auto aura =
 				materials->CreateMaterial("aura",
+					aura_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.6_r, 0.6_r, 0.6_r},
 					{0.0_r, 0.0_r, 0.0_r},
-					32.0_r, aura_diffuse, nullptr, nullptr);
+					32.0_r);
 
 			auto raindrop =
 				materials->CreateMaterial("raindrop",
+					raindrop_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.6_r, 0.6_r, 0.6_r},
 					{0.0_r, 0.0_r, 0.0_r},
-					32.0_r, raindrop_diffuse, nullptr, nullptr);
+					32.0_r);
 			
 			auto color_spectrum =
 				materials->CreateMaterial("color_spectrum",
+					color_spectrum_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, color_spectrum_diffuse, nullptr, nullptr);
+					0.0_r);
 			color_spectrum->LightingEnabled(false);
 
 			auto cat =
 				materials->CreateMaterial("cat",
+					cat_running, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{0.6_r, 0.6_r, 0.6_r},
 					{0.0_r, 0.0_r, 0.0_r},
-					32.0_r, cat_running, nullptr, nullptr);
+					32.0_r);
 
 			//GUI
 			//Mouse cursor materials
 			auto mouse_cursor_enabled =
 				materials->CreateMaterial("mouse_cursor",
+					mouse_cursor_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, mouse_cursor_diffuse, nullptr, nullptr);
+					0.0_r);
 			mouse_cursor_enabled->LightingEnabled(false);
 
 			//Tooltip materials
 			auto tooltip_center_enabled =
 				materials->CreateMaterial("tooltip_center",
+					tooltip_center_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, tooltip_center_diffuse, nullptr, nullptr);
+					0.0_r);
 			tooltip_center_enabled->LightingEnabled(false);
 
 
 			auto tooltip_top_enabled =
 				materials->CreateMaterial("tooltip_top",
+					tooltip_top_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, tooltip_top_diffuse, nullptr, nullptr);
+					0.0_r);
 			tooltip_top_enabled->LightingEnabled(false);
 
 			auto tooltip_left_enabled =
 				materials->CreateMaterial("tooltip_left",
+					tooltip_left_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, tooltip_left_diffuse, nullptr, nullptr);
+					0.0_r);
 			tooltip_left_enabled->LightingEnabled(false);
 
 			auto tooltip_bottom_enabled =
 				materials->CreateMaterial("tooltip_bottom",
+					tooltip_top_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, tooltip_top_diffuse, nullptr, nullptr);
+					0.0_r);
 			tooltip_bottom_enabled->LightingEnabled(false);
 			tooltip_bottom_enabled->FlipVertical();
 
 			auto tooltip_right_enabled =
 				materials->CreateMaterial("tooltip_right",
+					tooltip_left_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, tooltip_left_diffuse, nullptr, nullptr);
+					0.0_r);
 			tooltip_right_enabled->LightingEnabled(false);
 			tooltip_right_enabled->FlipHorizontal();
 
 
 			auto tooltip_top_left_enabled =
 				materials->CreateMaterial("tooltip_top_left",
+					tooltip_top_left_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, tooltip_top_left_diffuse, nullptr, nullptr);
+					0.0_r);
 			tooltip_top_left_enabled->LightingEnabled(false);
 
 			auto tooltip_bottom_left_enabled =
 				materials->CreateMaterial("tooltip_bottom_left",
+					tooltip_top_left_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, tooltip_top_left_diffuse, nullptr, nullptr);
+					0.0_r);
 			tooltip_bottom_left_enabled->LightingEnabled(false);
 			tooltip_bottom_left_enabled->FlipVertical();
 
 			auto tooltip_top_right_enabled =
 				materials->CreateMaterial("tooltip_top_right",
+					tooltip_top_left_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, tooltip_top_left_diffuse, nullptr, nullptr);
+					0.0_r);
 			tooltip_top_right_enabled->LightingEnabled(false);
 			tooltip_top_right_enabled->FlipHorizontal();
 
 			auto tooltip_bottom_right_enabled =
 				materials->CreateMaterial("tooltip_bottom_right",
+					tooltip_top_left_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, tooltip_top_left_diffuse, nullptr, nullptr);
+					0.0_r);
 			tooltip_bottom_right_enabled->LightingEnabled(false);
 			tooltip_bottom_right_enabled->FlipHorizontal();
 			tooltip_bottom_right_enabled->FlipVertical();
@@ -1476,194 +1497,214 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Button materials
 			auto button_center_enabled =
 				materials->CreateMaterial("button_center_enabled",
+					button_center_enabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_center_enabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_center_enabled->LightingEnabled(false);
 
 			auto button_center_disabled =
 				materials->CreateMaterial("button_center_disabled",
+					button_center_disabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_center_disabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_center_disabled->LightingEnabled(false);
 
 			auto button_center_pressed =
 				materials->CreateMaterial("button_center_pressed",
+					button_center_pressed_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_center_pressed_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_center_pressed->LightingEnabled(false);
 
 			auto button_center_hovered =
 				materials->CreateMaterial("button_center_hovered",
+					button_center_hovered_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_center_hovered_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_center_hovered->LightingEnabled(false);
 			
 
 			auto button_top_enabled =
 				materials->CreateMaterial("button_top_enabled",
+					button_top_enabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_top_enabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_top_enabled->LightingEnabled(false);
 
 			auto button_top_focused =
 				materials->CreateMaterial("button_top_focused",
+					button_top_focused_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_top_focused_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_top_focused->LightingEnabled(false);
 
 			auto button_left_enabled =
 				materials->CreateMaterial("button_left_enabled",
+					button_left_enabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_left_enabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_left_enabled->LightingEnabled(false);
 
 			auto button_left_focused =
 				materials->CreateMaterial("button_left_focused",
+					button_left_focused_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_left_focused_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_left_focused->LightingEnabled(false);
 
 			auto button_bottom_enabled =
 				materials->CreateMaterial("button_bottom_enabled",
+					button_top_enabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_top_enabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_bottom_enabled->LightingEnabled(false);
 			button_bottom_enabled->FlipVertical();
 
 			auto button_bottom_focused =
 				materials->CreateMaterial("button_bottom_focused",
+					button_top_focused_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_top_focused_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_bottom_focused->LightingEnabled(false);
 			button_bottom_focused->FlipVertical();
 
 			auto button_right_enabled =
 				materials->CreateMaterial("button_right_enabled",
+					button_left_enabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_left_enabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_right_enabled->LightingEnabled(false);
 			button_right_enabled->FlipHorizontal();
 
 			auto button_right_focused =
 				materials->CreateMaterial("button_right_focused",
+					button_left_focused_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_left_focused_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_right_focused->LightingEnabled(false);
 			button_right_focused->FlipHorizontal();
 
 
 			auto button_top_left_enabled =
 				materials->CreateMaterial("button_top_left_enabled",
+					button_top_left_enabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_top_left_enabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_top_left_enabled->LightingEnabled(false);
 
 			auto button_top_left_focused =
 				materials->CreateMaterial("button_top_left_focused",
+					button_top_left_focused_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_top_left_focused_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_top_left_focused->LightingEnabled(false);
 
 			auto button_bottom_left_enabled =
 				materials->CreateMaterial("button_bottom_left_enabled",
+					button_top_left_enabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_top_left_enabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_bottom_left_enabled->LightingEnabled(false);
 			button_bottom_left_enabled->FlipVertical();
 
 			auto button_bottom_left_focused =
 				materials->CreateMaterial("button_bottom_left_focused",
+					button_top_left_focused_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_top_left_focused_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_bottom_left_focused->LightingEnabled(false);
 			button_bottom_left_focused->FlipVertical();
 
 			auto button_top_right_enabled =
 				materials->CreateMaterial("button_top_right_enabled",
+					button_top_left_enabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_top_left_enabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_top_right_enabled->LightingEnabled(false);
 			button_top_right_enabled->FlipHorizontal();
 
 			auto button_top_right_focused =
 				materials->CreateMaterial("button_top_right_focused",
+					button_top_left_focused_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_top_left_focused_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_top_right_focused->LightingEnabled(false);
 			button_top_right_focused->FlipHorizontal();
 
 			auto button_bottom_right_enabled =
 				materials->CreateMaterial("button_bottom_right_enabled",
+					button_top_left_enabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_top_left_enabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_bottom_right_enabled->LightingEnabled(false);
 			button_bottom_right_enabled->FlipHorizontal();
 			button_bottom_right_enabled->FlipVertical();
 
 			auto button_bottom_right_focused =
 				materials->CreateMaterial("button_bottom_right_focused",
+					button_top_left_focused_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, button_top_left_focused_diffuse, nullptr, nullptr);
+					0.0_r);
 			button_bottom_right_focused->LightingEnabled(false);
 			button_bottom_right_focused->FlipHorizontal();
 			button_bottom_right_focused->FlipVertical();
@@ -1671,114 +1712,126 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Check box materials
 			auto check_box_center_enabled =
 				materials->CreateMaterial("check_box_center_enabled",
+					check_box_center_enabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, check_box_center_enabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			check_box_center_enabled->LightingEnabled(false);
 
 			auto check_box_center_hovered =
 				materials->CreateMaterial("check_box_center_hovered",
+					check_box_center_hovered_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, check_box_center_hovered_diffuse, nullptr, nullptr);
+					0.0_r);
 			check_box_center_hovered->LightingEnabled(false);
 
 
 			auto check_box_mark_enabled =
 				materials->CreateMaterial("check_box_mark_enabled",
+					check_box_mark_enabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, check_box_mark_enabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			check_box_mark_enabled->LightingEnabled(false);
 
 			auto check_box_mark_disabled =
 				materials->CreateMaterial("check_box_mark_disabled",
+					check_box_mark_disabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, check_box_mark_disabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			check_box_mark_disabled->LightingEnabled(false);
 
 			auto check_box_mark_pressed =
 				materials->CreateMaterial("check_box_mark_pressed",
+					check_box_mark_pressed_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, check_box_mark_pressed_diffuse, nullptr, nullptr);
+					0.0_r);
 			check_box_mark_pressed->LightingEnabled(false);
 
 			auto check_box_mark_hovered =
 				materials->CreateMaterial("check_box_mark_hovered",
+					check_box_mark_hovered_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, check_box_mark_hovered_diffuse, nullptr, nullptr);
+					0.0_r);
 			check_box_mark_hovered->LightingEnabled(false);
 
 			//Progress bar
 			auto progress_bar_bar_enabled =
 				materials->CreateMaterial("progress_bar_bar_enabled",
+					progress_bar_bar_enabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, progress_bar_bar_enabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			progress_bar_bar_enabled->LightingEnabled(false);
 
 			//Radio buttons
 			auto radio_button_select_enabled =
 				materials->CreateMaterial("radio_button_select_enabled",
+					radio_button_select_enabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, radio_button_select_enabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			radio_button_select_enabled->LightingEnabled(false);
 
 			auto radio_button_select_disabled =
 				materials->CreateMaterial("radio_button_select_disabled",
+					radio_button_select_disabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, radio_button_select_disabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			radio_button_select_disabled->LightingEnabled(false);
 
 			auto radio_button_select_pressed =
 				materials->CreateMaterial("radio_button_select_pressed",
+					radio_button_select_pressed_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, radio_button_select_pressed_diffuse, nullptr, nullptr);
+					0.0_r);
 			radio_button_select_pressed->LightingEnabled(false);
 
 			auto radio_button_select_hovered =
 				materials->CreateMaterial("radio_button_select_hovered",
+					radio_button_select_hovered_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, radio_button_select_hovered_diffuse, nullptr, nullptr);
+					0.0_r);
 			radio_button_select_hovered->LightingEnabled(false);
 
 			//Text box
 			auto text_box_cursor_enabled =
 				materials->CreateMaterial("text_box_cursor_enabled",
+					text_box_cursor_enabled_diffuse, nullptr, nullptr,
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
 					{1.0_r, 1.0_r, 1.0_r},
-					0.0_r, text_box_cursor_enabled_diffuse, nullptr, nullptr);
+					0.0_r);
 			text_box_cursor_enabled->LightingEnabled(false);
 
 
