@@ -1007,11 +1007,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				material_struct->CreateUniform<glsl::vec4>("emissive");
 				material_struct->CreateUniform<float>("shininess");
 				material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");
-				material_struct->CreateUniform<glsl::sampler2D>("specular_map");
 				material_struct->CreateUniform<glsl::sampler2D>("normal_map");
+				material_struct->CreateUniform<glsl::sampler2D>("specular_map");
 				material_struct->CreateUniform<bool>("has_diffuse_map");
-				material_struct->CreateUniform<bool>("has_specular_map");
 				material_struct->CreateUniform<bool>("has_normal_map");
+				material_struct->CreateUniform<bool>("has_specular_map");
 				material_struct->CreateUniform<bool>("lighting_enabled");
 
 				//Fog
@@ -1086,12 +1086,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				material_struct->CreateUniform<glsl::vec4>("specular");
 				material_struct->CreateUniform<glsl::vec4>("emissive");
 				material_struct->CreateUniform<float>("shininess");
-				material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");	
-				material_struct->CreateUniform<glsl::sampler2D>("specular_map");
+				material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");
 				material_struct->CreateUniform<glsl::sampler2D>("normal_map");
+				material_struct->CreateUniform<glsl::sampler2D>("specular_map");
 				material_struct->CreateUniform<bool>("has_diffuse_map");
-				material_struct->CreateUniform<bool>("has_specular_map");
 				material_struct->CreateUniform<bool>("has_normal_map");
+				material_struct->CreateUniform<bool>("has_specular_map");		
 				material_struct->CreateUniform<bool>("lighting_enabled");
 
 				//Fog

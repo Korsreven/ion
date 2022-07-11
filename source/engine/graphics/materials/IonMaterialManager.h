@@ -18,11 +18,16 @@ File:	IonMaterialManager.h
 #include <string_view>
 
 #include "IonMaterial.h"
+#include "graphics/utilities/IonColor.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
+#include "types/IonTypes.h"
 
 namespace ion::graphics::materials
 {
+	using namespace types::type_literals;
+	using namespace utilities;
+
 	namespace material_manager::detail
 	{
 	} //material_manager::detail
@@ -82,24 +87,32 @@ namespace ion::graphics::materials
 		//Constructs a new material with the given name
 		NonOwningPtr<Material> CreateMaterial(std::string name);
 
-		//Constructs a new material with the given name, ambient, diffuse, specular and emissive color + shininess and receive shadows
-		NonOwningPtr<Material> CreateMaterial(std::string name,
-				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
-				bool receive_shadows = true);
+		//Constructs a new material with the given name and diffuse color
+		NonOwningPtr<Material> CreateMaterial(std::string name, const Color &diffuse);
 
-		//Constructs a new material with the given name, ambient, diffuse, specular and emissive color + shininess,
-		//diffuse, specular and normal map as animations + receive shadows
+		//Constructs a new material with the given name, ambient color, diffuse color, specular color, emissive color and shininess
 		NonOwningPtr<Material> CreateMaterial(std::string name,
-				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
-				NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> normal_map,
-				bool receive_shadows = true);
+			const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess = 0.0_r);
 
-		//Constructs a new material with the given name, ambient, diffuse, specular and emissive color + shininess,
-		//diffuse, specular and normal map as textures + receive shadows
+
+		//Constructs a new material with the given name, diffuse map and diffuse color
+		NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Animation> diffuse_map, const Color &diffuse = color::White);
+
+		//Constructs a new material with the given name, diffuse map and diffuse color
+		NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Texture> diffuse_map, const Color &diffuse = color::White);
+
+
+		//Constructs a new material with the given name, diffuse map, normal map, specular map,
+		//ambient color, diffuse color, specular color, emissive color and shininess
 		NonOwningPtr<Material> CreateMaterial(std::string name,
-				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
-				NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> normal_map,
-				bool receive_shadows = true);
+			NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map,
+			const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess = 0.0_r);
+
+		//Constructs a new material with the given name, diffuse map, normal map, specular map,
+		//ambient color, diffuse color, specular color, emissive color and shininess
+		NonOwningPtr<Material> CreateMaterial(std::string name,
+			NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map,
+			const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess = 0.0_r);
 
 
 		//Create a material as a copy of the given material

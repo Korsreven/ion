@@ -35,35 +35,46 @@ NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name)
 	return Create(std::move(name));
 }
 
-NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name,
-	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
-	bool receive_shadows)
+NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name, const Color &diffuse)
 {
-	return Create(std::move(name),
-				  ambient, diffuse, specular, emissive, shininess,
-				  receive_shadows);
+	return Create(std::move(name), diffuse);
 }
 
 NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name,
-	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
-	NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> normal_map,
-	bool receive_shadows)
+	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess)
 {
 	return Create(std::move(name),
-				  ambient, diffuse, specular, emissive, shininess,
-				  diffuse_map, specular_map, normal_map,
-				  receive_shadows);
+				  ambient, diffuse, specular, emissive, shininess);
+}
+
+
+NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name, NonOwningPtr<Animation> diffuse_map, const Color &diffuse)
+{
+	return Create(std::move(name), diffuse_map, diffuse);
+}
+
+NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name, NonOwningPtr<Texture> diffuse_map, const Color &diffuse)
+{
+	return Create(std::move(name), diffuse_map, diffuse);
+}
+
+
+NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name,
+	NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map,
+	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess)
+{
+	return Create(std::move(name),
+				  diffuse_map, normal_map, specular_map,
+				  ambient, diffuse, specular, emissive, shininess);
 }
 
 NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name,
-	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
-	NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> normal_map,
-	bool receive_shadows)
+	NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map,
+	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess)
 {
 	return Create(std::move(name),
-				  ambient, diffuse, specular, emissive, shininess,
-				  diffuse_map, specular_map, normal_map,
-				  receive_shadows);
+				  diffuse_map, normal_map, specular_map,
+				  ambient, diffuse, specular, emissive, shininess);
 }
 
 

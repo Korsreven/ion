@@ -100,7 +100,7 @@ namespace ion::graphics::materials
 
 		std::pair<NonOwningPtr<Animation>, NonOwningPtr<Texture>> get_texture_maps(const texture_map_type &texture_map) noexcept;
 		NonOwningPtr<Texture> get_texture_map(const texture_map_type &texture_map) noexcept;
-		NonOwningPtr<Texture> get_first_texture_map(const texture_map_type &diffuse_map, const texture_map_type &specular_map, const texture_map_type &normal_map) noexcept;
+		NonOwningPtr<Texture> get_first_texture_map(const texture_map_type &diffuse_map, const texture_map_type &normal_map, const texture_map_type &specular_map) noexcept;
 
 		std::pair<bool, bool> is_texture_map_repeatable(const Texture &texture,
 			const Vector2 &lower_left, const Vector2 &upper_right) noexcept;
@@ -111,15 +111,15 @@ namespace ion::graphics::materials
 	{
 		private:
 
-			Color ambient_color_;
-			Color diffuse_color_;
-			Color specular_color_;
-			Color emissive_color_;
+			Color ambient_color_ = color::White;
+			Color diffuse_color_ = color::White;
+			Color specular_color_ = color::Black;
+			Color emissive_color_ = color::Black;
 			real shininess_ = 0.0_r;
 
 			material::detail::texture_map_type diffuse_map_;
-			material::detail::texture_map_type specular_map_;
 			material::detail::texture_map_type normal_map_;
+			material::detail::texture_map_type specular_map_;
 
 			Vector2 lower_left_tex_coord_ = vector2::Zero;
 			Vector2 upper_right_tex_coord_ = vector2::UnitScale;
@@ -132,24 +132,32 @@ namespace ion::graphics::materials
 			//Constructs a new material with the given name
 			explicit Material(std::string name);
 
-			//Constructs a new material with the given name, ambient, diffuse, specular and emissive color + shininess and receive shadows
-			Material(std::string name,
-				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
-				bool receive_shadows = true);
+			//Constructs a new material with the given name and diffuse color
+			Material(std::string name, const Color &diffuse);
 
-			//Constructs a new material with the given name, ambient, diffuse, specular and emissive color + shininess,
-			//diffuse, specular and normal map as animations + receive shadows
+			//Constructs a new material with the given name, ambient color, diffuse color, specular color, emissive color and shininess
 			Material(std::string name,
-				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
-				NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> normal_map,
-				bool receive_shadows = true);
+				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess = 0.0_r);
 
-			//Constructs a new material with the given name, ambient, diffuse, specular and emissive color + shininess,
-			//diffuse, specular and normal map as textures + receive shadows
+
+			//Constructs a new material with the given name, diffuse map and diffuse color
+			Material(std::string name, NonOwningPtr<Animation> diffuse_map, const Color &diffuse = color::White);
+
+			//Constructs a new material with the given name, diffuse map and diffuse color
+			Material(std::string name, NonOwningPtr<Texture> diffuse_map, const Color &diffuse = color::White);
+
+
+			//Constructs a new material with the given name, diffuse map, normal map, specular map,
+			//ambient color, diffuse color, specular color, emissive color and shininess
 			Material(std::string name,
-				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess,
-				NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> normal_map,
-				bool receive_shadows = true);
+				NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map,
+				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess = 0.0_r);
+
+			//Constructs a new material with the given name, diffuse map, normal map, specular map,
+			//ambient color, diffuse color, specular color, emissive color and shininess
+			Material(std::string name,
+				NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map,
+				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess = 0.0_r);
 
 
 			/*
@@ -206,25 +214,6 @@ namespace ion::graphics::materials
 			}
 
 
-			//Attach the given animation as a specular map for the material
-			inline void SpecularMap(NonOwningPtr<Animation> animation) noexcept
-			{
-				specular_map_ = animation;
-			}
-
-			//Attach the given texture as a specular map for the material
-			inline void SpecularMap(NonOwningPtr<Texture> texture) noexcept
-			{
-				specular_map_ = texture;
-			}
-
-			//Detach the specular map from the material
-			inline void SpecularMap(std::nullptr_t) noexcept
-			{
-				specular_map_ = std::monostate{};
-			}
-
-
 			//Attach the given animation as a normal map for the material
 			inline void NormalMap(NonOwningPtr<Animation> animation) noexcept
 			{
@@ -241,6 +230,25 @@ namespace ion::graphics::materials
 			inline void NormalMap(std::nullptr_t) noexcept
 			{
 				normal_map_ = std::monostate{};
+			}
+
+
+			//Attach the given animation as a specular map for the material
+			inline void SpecularMap(NonOwningPtr<Animation> animation) noexcept
+			{
+				specular_map_ = animation;
+			}
+
+			//Attach the given texture as a specular map for the material
+			inline void SpecularMap(NonOwningPtr<Texture> texture) noexcept
+			{
+				specular_map_ = texture;
+			}
+
+			//Detach the specular map from the material
+			inline void SpecularMap(std::nullptr_t) noexcept
+			{
+				specular_map_ = std::monostate{};
 			}
 
 

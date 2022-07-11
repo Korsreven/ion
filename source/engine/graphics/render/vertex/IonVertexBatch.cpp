@@ -328,8 +328,8 @@ void set_material_uniforms(materials::Material *material, duration time, shaders
 
 
 	auto diffuse_map_activated = false;
-	auto specular_map_activated = false;
 	auto normal_map_activated = false;
+	auto specular_map_activated = false;
 	
 	if (auto diffuse_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_DiffuseMap); diffuse_map)
 	{
@@ -339,18 +339,6 @@ void set_material_uniforms(materials::Material *material, duration time, shaders
 			{
 				bind_texture(*texture->Handle(), texture_unit);
 				diffuse_map_activated = true;
-			}
-		}
-	}
-
-	if (auto specular_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_SpecularMap); specular_map)
-	{
-		if (auto texture = material->SpecularMap(time); texture && texture->Handle())
-		{
-			if (auto texture_unit = specular_map->Get<glsl::sampler2D>(); texture_unit >= 0)
-			{
-				bind_texture(*texture->Handle(), texture_unit);
-				specular_map_activated = true;
 			}
 		}
 	}
@@ -367,15 +355,27 @@ void set_material_uniforms(materials::Material *material, duration time, shaders
 		}
 	}
 
+	if (auto specular_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_SpecularMap); specular_map)
+	{
+		if (auto texture = material->SpecularMap(time); texture && texture->Handle())
+		{
+			if (auto texture_unit = specular_map->Get<glsl::sampler2D>(); texture_unit >= 0)
+			{
+				bind_texture(*texture->Handle(), texture_unit);
+				specular_map_activated = true;
+			}
+		}
+	}
+
 
 	if (auto has_diffuse_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasDiffuseMap); has_diffuse_map)
 		has_diffuse_map->Get<bool>() = diffuse_map_activated;
 
-	if (auto has_specular_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasSpecularMap); has_specular_map)
-		has_specular_map->Get<bool>() = specular_map_activated;
-
 	if (auto has_normal_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasNormalMap); has_normal_map)
 		has_normal_map->Get<bool>() = normal_map_activated;
+
+	if (auto has_specular_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasSpecularMap); has_specular_map)
+		has_specular_map->Get<bool>() = specular_map_activated;
 
 
 	if (auto lighting_enabled = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_LightingEnabled); lighting_enabled)
