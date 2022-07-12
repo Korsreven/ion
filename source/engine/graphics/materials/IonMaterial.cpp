@@ -153,12 +153,33 @@ Material::Material(std::string name) :
 Material::Material(std::string name, const Color &diffuse) :
 	
 	managed::ManagedObject<MaterialManager>{std::move(name)},
-
-	diffuse_color_{diffuse},
-	lighting_enabled_{false}
+	diffuse_color_{diffuse}
 {
 	//Empty
 }
+
+Material::Material(std::string name, NonOwningPtr<Animation> diffuse_map, const Color &diffuse) :
+
+	managed::ManagedObject<MaterialManager>{std::move(name)},
+
+	ambient_color_{diffuse},
+	diffuse_color_{diffuse},
+	diffuse_map_{diffuse_map}
+{
+	//Empty
+}
+
+Material::Material(std::string name, NonOwningPtr<Texture> diffuse_map, const Color &diffuse) :
+
+	managed::ManagedObject<MaterialManager>{std::move(name)},
+
+	ambient_color_{diffuse},
+	diffuse_color_{diffuse},
+	diffuse_map_{diffuse_map}
+{
+	//Empty
+}
+
 
 Material::Material(std::string name,
 	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess) :
@@ -174,33 +195,39 @@ Material::Material(std::string name,
 	//Empty
 }
 
+Material::Material(std::string name,
+	NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map,
+	const Color &diffuse, real shininess) :
+	
+	managed::ManagedObject<MaterialManager>{std::move(name)},
 
-Material::Material(std::string name, NonOwningPtr<Animation> diffuse_map, const Color &diffuse) :
+	ambient_color_{diffuse},
+	diffuse_color_{diffuse},
+	shininess_{shininess},
+
+	diffuse_map_{diffuse_map},
+	normal_map_{normal_map},
+	specular_map_{specular_map}
+{
+	//Empty
+}
+
+Material::Material(std::string name,
+	NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map,
+	const Color &diffuse, real shininess) :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
 
 	ambient_color_{diffuse},
 	diffuse_color_{diffuse},
+	shininess_{shininess},
 
 	diffuse_map_{diffuse_map},
-	lighting_enabled_{false}
+	normal_map_{normal_map},
+	specular_map_{specular_map}
 {
 	//Empty
 }
-
-Material::Material(std::string name, NonOwningPtr<Texture> diffuse_map, const Color &diffuse) :
-
-	managed::ManagedObject<MaterialManager>{std::move(name)},
-
-	ambient_color_{diffuse},
-	diffuse_color_{diffuse},
-
-	diffuse_map_{diffuse_map},
-	lighting_enabled_{false}
-{
-	//Empty
-}
-
 
 Material::Material(std::string name,
 	NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map,
