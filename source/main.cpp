@@ -687,6 +687,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto texts = ion::make_owning<ion::graphics::fonts::TextManager>();
 			auto particle_systems = ion::make_owning<ion::graphics::particles::ParticleSystemManager>();
 
+
 			auto &script_managers = ion::script::interfaces::ScriptInterface::Managers();
 			script_managers.Register(textures);
 			script_managers.Register(shaders);
@@ -794,12 +795,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//scene_graph->LightingEnabled(false);
 
 			auto scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
-			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
-				shader_programs->GetShaderProgram("default_model_prog"));
-			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
-				shader_programs->GetShaderProgram("default_particle_prog"));
-			//scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
-			//	shader_programs->GetShaderProgram("default_text_prog"));
 
 			//GUI
 			ion::gui::GuiController controller{scene_graph->RootNode(), sounds->GetSoundChannelGroup("gui")};
@@ -1563,7 +1558,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Particle system
 			auto particle_system = scene_manager->CreateParticleSystem({}, rain);
-			particle_system->AddPass(ion::graphics::render::Pass{particle_program});
 			particle_system->Get()->StartAll();
 
 			//Sound
@@ -1576,7 +1570,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto model = scene_manager->CreateModel();
 			model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.3671875_r, 0.5_r}, ship});
-			model->AddPass(ion::graphics::render::Pass{model_program});
 			model->BoundingVolumeExtent({{0.3_r, 0.2_r}, {0.7_r, 0.8_r}});
 			model->QueryFlags(1);
 			model->QueryMask(2 | 4);
@@ -1591,7 +1584,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto aura_sprite = model_aura->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.432_r, 0.45_r}, aura});
 			aura_sprite->FillColor(Color{255, 255, 255, 0.75_r});
-			model_aura->AddPass(ion::graphics::render::Pass{model_program});
 
 			auto background = scene_manager->CreateModel();
 			background->CreateMesh(ion::graphics::scene::shapes::Sprite{
@@ -1600,14 +1592,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				{-1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Left
 			background->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Right
-			background->AddPass(ion::graphics::render::Pass{model_program});
 
 			auto clouds = scene_manager->CreateModel();
 			clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{-1.0_r, 0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Left
 			clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{1.0_r, -0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Right
-			clouds->AddPass(ion::graphics::render::Pass{model_program});
 
 			auto model_spectrum = scene_manager->CreateModel();
 			model_spectrum->CreateMesh(ion::graphics::scene::shapes::Sprite{
@@ -1616,21 +1606,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//auto box = scene_manager->CreateModel();
 			//box->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.25_r, 0.30_r}, color::DeepPink});
-			//box->AddPass(ion::graphics::render::Pass{model_program});
 			//box->QueryFlags(2);
 			//box->QueryMask(1 | 2 | 4);
 			//box->ShowBoundingVolumes(true);
 
 			//auto box2 = scene_manager->CreateModel();
 			//box2->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.30_r, 0.25_r}, color::DarkViolet});
-			//box2->AddPass(ion::graphics::render::Pass{model_program});
 			//box2->QueryFlags(2);
 			//box2->QueryMask(1 | 2 | 4);
 			//box2->ShowBoundingVolumes(true);
 
 			//auto circle = scene_manager->CreateModel();
 			//circle->CreateMesh(ion::graphics::scene::shapes::Ellipse{0.25_r, color::Khaki});
-			//circle->AddPass(ion::graphics::render::Pass{model_program});
 			//circle->PreferredBoundingVolume(ion::graphics::scene::movable_object::PreferredBoundingVolumeType::BoundingSphere);
 			//circle->QueryFlags(4);
 			//circle->QueryMask(1 | 2 | 4);
@@ -1638,7 +1625,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//auto circle2 = scene_manager->CreateModel();
 			//circle2->CreateMesh(ion::graphics::scene::shapes::Ellipse{0.30_r, color::Orchid});
-			//circle2->AddPass(ion::graphics::render::Pass{model_program});
 			//circle2->PreferredBoundingVolume(ion::graphics::scene::movable_object::PreferredBoundingVolumeType::BoundingSphere);
 			//circle2->QueryFlags(4);
 			//circle2->QueryMask(1 | 2 | 4);
@@ -2223,6 +2209,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			timeline->Attach(idle);*/
 
 
+			//Default shader programs
+			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
+				shader_programs->GetShaderProgram("default_model_prog"));
+			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
+				shader_programs->GetShaderProgram("default_particle_prog"));
+			//scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
+			//	shader_programs->GetShaderProgram("default_text_prog"));
+
+
 			//Pointers
 			auto viewport = engine.Target()->GetViewport("main");
 			auto camera = scene_manager->GetCamera("main_camera");
@@ -2235,7 +2230,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto player_node = scene_graph->RootNode().GetDescendantNode("player_node");
 			auto ship_node = player_node->GetChildNode("ship_node");
 			auto light_node = ship_node->GetChildNode("ship_light_node");
-			auto timeline = ship_node->GetTimeline("ship_idle_timeline");
+			auto timeline = ship_node->GetTimeline("ship_idle_timeline");	
 
 
 			//Game
