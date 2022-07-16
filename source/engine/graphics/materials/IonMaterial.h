@@ -116,7 +116,7 @@ namespace ion::graphics::materials
 
 			Color ambient_color_ = color::White;
 			Color diffuse_color_ = color::White;
-			Color specular_color_ = color::Black;
+			Color specular_color_ = color::DarkGray;
 			Color emissive_color_ = color::Black;
 			real shininess_ = material::detail::default_shininess;
 
@@ -186,8 +186,12 @@ namespace ion::graphics::materials
 			}
 			
 			//Sets the diffuse color of this material to the given color
+			//Also sets the ambient color if equal to the diffuse color
 			inline void DiffuseColor(const Color &diffuse) noexcept
 			{
+				if (diffuse_color_ == ambient_color_)
+					ambient_color_ = diffuse;
+
 				diffuse_color_ = diffuse;
 			}
 			

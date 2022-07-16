@@ -26,12 +26,25 @@ Light::Light(std::optional<std::string> name, bool visible) noexcept :
 	query_type_flags_ |= query::scene_query::QueryType::Light;
 }
 
+Light::Light(std::optional<std::string> name, light::LightType type,
+	const Vector3 &position, const Vector3 &direction, const Color &diffuse,
+	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
+	real cutoff_angle, real outer_cutoff_angle, bool visible) noexcept :
+
+	Light{std::move(name), type,
+		  position, direction,
+		  diffuse, diffuse, color::DarkGray,
+		  attenuation_constant, attenuation_linear, attenuation_quadratic,
+		  cutoff_angle, outer_cutoff_angle, visible}
+{
+	//Empty
+}
+
 Light::Light(std::optional<std::string> name, LightType type,
 	const Vector3 &position, const Vector3 &direction,
 	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
-	real cutoff_angle, real outer_cutoff_angle,
-	bool cast_shadows, bool visible) noexcept :
+	real cutoff_angle, real outer_cutoff_angle, bool visible) noexcept :
 
 	MovableObject{std::move(name), visible},
 
@@ -48,9 +61,7 @@ Light::Light(std::optional<std::string> name, LightType type,
 	attenuation_quadratic_{attenuation_quadratic},
 
 	cutoff_{detail::angle_to_cutoff(cutoff_angle)},
-	outer_cutoff_{detail::angle_to_cutoff(outer_cutoff_angle)},
-
-	cast_shadows_{cast_shadows}
+	outer_cutoff_{detail::angle_to_cutoff(outer_cutoff_angle)}
 {
 	query_type_flags_ |= query::scene_query::QueryType::Light;
 }
@@ -61,45 +72,76 @@ Light::Light(std::optional<std::string> name, LightType type,
 */
 
 Light Light::Point(std::optional<std::string> name,
+	const Vector3 &position, const Color &diffuse,
+	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
+	bool visible) noexcept
+{
+	return {std::move(name), LightType::Point,
+			position, vector3::Zero, diffuse,
+			attenuation_constant, attenuation_linear, attenuation_quadratic,
+			0.0_r, 0.0_r, visible};
+}
+
+Light Light::Point(std::optional<std::string> name,
 	const Vector3 &position,
 	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
-	bool cast_shadows) noexcept
+	bool visible) noexcept
 {
 	return {std::move(name), LightType::Point,
 			position, vector3::Zero,
 			ambient, diffuse, specular,
 			attenuation_constant, attenuation_linear, attenuation_quadratic,
-			0.0_r, 0.0_r,
-			cast_shadows};
+			0.0_r, 0.0_r, visible};
+}
+
+
+Light Light::Directional(std::optional<std::string> name,
+	const Vector3 &direction, const Color &diffuse, bool visible) noexcept
+{
+	return {std::move(name), LightType::Directional,
+			vector3::Zero, direction,
+			diffuse,
+			1.0_r, 0.0_r, 0.0_r,
+			0.0_r, 0.0_r, visible};
 }
 
 Light Light::Directional(std::optional<std::string> name,
 	const Vector3 &direction,
 	const Color &ambient, const Color &diffuse, const Color &specular,
-	bool cast_shadows) noexcept
+	bool visible) noexcept
 {
 	return {std::move(name), LightType::Directional,
 			vector3::Zero, direction,
 			ambient, diffuse, specular,
 			1.0_r, 0.0_r, 0.0_r,
-			0.0_r, 0.0_r,
-			cast_shadows};
+			0.0_r, 0.0_r, visible};
+}
+
+
+Light Light::Spot(std::optional<std::string> name,
+	const Vector3 &position, const Vector3 &direction, const Color &diffuse,
+	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
+	real cutoff_angle, real outer_cutoff_angle, bool visible) noexcept
+{
+	return {std::move(name), LightType::Spot,
+			position, direction,
+			diffuse,
+			attenuation_constant, attenuation_linear, attenuation_quadratic,
+			cutoff_angle, outer_cutoff_angle, visible};
 }
 
 Light Light::Spot(std::optional<std::string> name,
 	const Vector3 &position, const Vector3 &direction,
 	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
-	real cutoff_angle, real outer_cutoff_angle,
-	bool cast_shadows) noexcept
+	real cutoff_angle, real outer_cutoff_angle, bool visible) noexcept
 {
 	return {std::move(name), LightType::Spot,
 			position, direction,
 			ambient, diffuse, specular,
 			attenuation_constant, attenuation_linear, attenuation_quadratic,
-			cutoff_angle, outer_cutoff_angle,
-			cast_shadows};
+			cutoff_angle, outer_cutoff_angle, visible};
 }
 
 } //ion::graphics::scene

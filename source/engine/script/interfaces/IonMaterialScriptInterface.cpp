@@ -103,13 +103,7 @@ void set_material_properties(const script_tree::ObjectNode &object, Material &ma
 		else if (property.Name() == "crop")
 			material.Crop(graphics::utilities::Aabb{property[0].Get<ScriptType::Vector2>()->Get(), property[1].Get<ScriptType::Vector2>()->Get()});
 		else if (property.Name() == "diffuse-color")
-		{
 			material.DiffuseColor(property[0].Get<ScriptType::Color>()->Get());
-
-			//No explicitly given ambient color, set to diffuse color
-			if (!object.Find("ambient-color"))
-				material.AmbientColor(material.DiffuseColor());
-		}
 		else if (property.Name() == "diffuse-map")
 		{
 			if (auto texture = get_texture(property[0].Get<ScriptType::String>()->Get(), managers); texture)

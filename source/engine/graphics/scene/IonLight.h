@@ -69,9 +69,9 @@ namespace ion::graphics::scene
 			Vector3 position_;
 			Vector3 direction_;
 
-			Color ambient_color_;
-			Color diffuse_color_;
-			Color specular_color_;
+			Color ambient_color_ = color::White;
+			Color diffuse_color_ = color::White;
+			Color specular_color_ = color::DarkGray;
 
 			real attenuation_constant_ = 1.0_r;
 			real attenuation_linear_ = 0.0_r;
@@ -89,11 +89,16 @@ namespace ion::graphics::scene
 
 			//Construct a new light with the given name and values
 			Light(std::optional<std::string> name, light::LightType type,
+				const Vector3 &position, const Vector3 &direction, const Color &diffuse,
+				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
+				real cutoff_angle, real outer_cutoff_angle, bool visible = true) noexcept;
+
+			//Construct a new light with the given name and values
+			Light(std::optional<std::string> name, light::LightType type,
 				const Vector3 &position, const Vector3 &direction,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
-				real cutoff_angle, real outer_cutoff_angle,
-				bool cast_shadows = true, bool visible = true) noexcept;
+				real cutoff_angle, real outer_cutoff_angle, bool visible = true) noexcept;
 
 
 			/*
@@ -102,24 +107,41 @@ namespace ion::graphics::scene
 
 			//Returns a new point light from the given name and values
 			[[nodiscard]] static Light Point(std::optional<std::string> name,
+				const Vector3 &position, const Color &diffuse,
+				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
+				bool visible = true) noexcept;
+
+			//Returns a new point light from the given name and values
+			[[nodiscard]] static Light Point(std::optional<std::string> name,
 				const Vector3 &position,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
-				bool cast_shadows = true) noexcept;
+				bool visible = true) noexcept;
+
+
+			//Returns a new directional light from the given name and values
+			[[nodiscard]] static Light Directional(std::optional<std::string> name,
+				const Vector3 &direction, const Color &diffuse, bool visible = true) noexcept;
 
 			//Returns a new directional light from the given name and values
 			[[nodiscard]] static Light Directional(std::optional<std::string> name,
 				const Vector3 &direction,
 				const Color &ambient, const Color &diffuse, const Color &specular,
-				bool cast_shadows = true) noexcept;
+				bool visible = true) noexcept;
+
+
+			//Returns a new spot light from the given name and values
+			[[nodiscard]] static Light Spot(std::optional<std::string> name,
+				const Vector3 &position, const Vector3 &direction, const Color &diffuse,
+				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
+				real cutoff_angle, real outer_cutoff_angle, bool visible = true) noexcept;
 
 			//Returns a new spot light from the given name and values
 			[[nodiscard]] static Light Spot(std::optional<std::string> name,
 				const Vector3 &position, const Vector3 &direction,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
-				real cutoff_angle, real outer_cutoff_angle,
-				bool cast_shadows = true) noexcept;
+				real cutoff_angle, real outer_cutoff_angle, bool visible = true) noexcept;
 
 
 			/*
@@ -154,8 +176,12 @@ namespace ion::graphics::scene
 			}
 			
 			//Sets the color of the diffuse light given off by this light source to the given color
+			//Also sets the ambient color if equal to the diffuse color
 			inline void DiffuseColor(const Color &diffuse) noexcept
 			{
+				if (diffuse_color_ == ambient_color_)
+					ambient_color_ = diffuse;
+
 				diffuse_color_ = diffuse;
 			}
 			

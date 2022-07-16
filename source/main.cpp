@@ -1527,7 +1527,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto head_light = scene_manager->CreateLight();
 			head_light->Type(ion::graphics::scene::light::LightType::Spot);
 			head_light->Direction(Vector3{0.0_r, 0.6_r, -0.4_r});
-			head_light->AmbientColor(color::Transparent);
+			head_light->AmbientColor(color::Black);
 			head_light->DiffuseColor(color::White);
 			head_light->SpecularColor(color::White);
 			head_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
@@ -1536,7 +1536,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto red_light = scene_manager->CreateLight();
 			red_light->Type(ion::graphics::scene::light::LightType::Point);
 			red_light->Direction({0.0_r, 0.0_r, -1.0_r});
-			red_light->AmbientColor(color::Transparent);
+			red_light->AmbientColor(color::Black);
 			red_light->DiffuseColor(color::Red);
 			red_light->SpecularColor(color::Red);
 			red_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
@@ -1545,7 +1545,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto green_light = scene_manager->CreateLight();
 			green_light->Type(ion::graphics::scene::light::LightType::Point);
 			green_light->Direction({0.0_r, 0.0_r, -1.0_r});
-			green_light->AmbientColor(color::Transparent);
+			green_light->AmbientColor(color::Black);
 			green_light->DiffuseColor(color::Green);
 			green_light->SpecularColor(color::Green);
 			green_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
