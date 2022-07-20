@@ -35,12 +35,14 @@ namespace ion::graphics::shaders
 		{
 			inline auto shader_type(std::string_view name) noexcept -> std::optional<ShaderType>
 			{
-				if (ion::utilities::string::EndsWith(name, ".vs", ion::utilities::string::StringCase::Insensitive) ||
-					ion::utilities::string::EndsWith(name, ".vert", ion::utilities::string::StringCase::Insensitive))
+				if (ion::utilities::string::EndsWith(name, ".vert", ion::utilities::string::StringCase::Insensitive) ||
+					ion::utilities::string::EndsWith(name, ".vs", ion::utilities::string::StringCase::Insensitive) ||
+					ion::utilities::string::EndsWith(name, ".glslv", ion::utilities::string::StringCase::Insensitive))
 					return ShaderType::Vertex;
 
-				else if (ion::utilities::string::EndsWith(name, ".fs", ion::utilities::string::StringCase::Insensitive) ||
-						 ion::utilities::string::EndsWith(name, ".frag", ion::utilities::string::StringCase::Insensitive))
+				else if (ion::utilities::string::EndsWith(name, ".frag", ion::utilities::string::StringCase::Insensitive) ||
+						 ion::utilities::string::EndsWith(name, ".fs", ion::utilities::string::StringCase::Insensitive) ||
+						 ion::utilities::string::EndsWith(name, ".glslf", ion::utilities::string::StringCase::Insensitive))
 					return ShaderType::Fragment;
 
 				else
