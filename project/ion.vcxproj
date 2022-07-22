@@ -547,6 +547,16 @@
     <ClInclude Include="..\source\engine\utilities\IonRandom.h" />
     <ClInclude Include="..\source\engine\utilities\IonStringUtility.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatTextShader.frag" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatTextShader.vert" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonModelShader.frag" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonModelShader.vert" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonParticleShader.frag" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonParticleShader.vert" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonTextShader.frag" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonTextShader.vert" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

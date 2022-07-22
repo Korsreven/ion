@@ -235,6 +235,9 @@
     <Filter Include="Source Files\script\interfaces">
       <UniqueIdentifier>{0f2b64b3-9f58-4243-abad-3ebd09f45c39}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\graphics\shaders\glsl">
+      <UniqueIdentifier>{71890b4b-8d03-405b-ba71-8c04f0a92168}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.cpp">
@@ -1394,5 +1397,31 @@
     <ClInclude Include="..\source\engine\managed\IonObjectRegister.h">
       <Filter>Header Files\managed</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatTextShader.frag">
+      <Filter>Header Files\graphics\shaders\glsl</Filter>
+    </None>
+    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatTextShader.vert">
+      <Filter>Header Files\graphics\shaders\glsl</Filter>
+    </None>
+    <None Include="..\source\engine\graphics\shaders\glsl\IonModelShader.frag">
+      <Filter>Header Files\graphics\shaders\glsl</Filter>
+    </None>
+    <None Include="..\source\engine\graphics\shaders\glsl\IonModelShader.vert">
+      <Filter>Header Files\graphics\shaders\glsl</Filter>
+    </None>
+    <None Include="..\source\engine\graphics\shaders\glsl\IonParticleShader.frag">
+      <Filter>Header Files\graphics\shaders\glsl</Filter>
+    </None>
+    <None Include="..\source\engine\graphics\shaders\glsl\IonParticleShader.vert">
+      <Filter>Header Files\graphics\shaders\glsl</Filter>
+    </None>
+    <None Include="..\source\engine\graphics\shaders\glsl\IonTextShader.frag">
+      <Filter>Header Files\graphics\shaders\glsl</Filter>
+    </None>
+    <None Include="..\source\engine\graphics\shaders\glsl\IonTextShader.vert">
+      <Filter>Header Files\graphics\shaders\glsl</Filter>
+    </None>
   </ItemGroup>
 </Project>
