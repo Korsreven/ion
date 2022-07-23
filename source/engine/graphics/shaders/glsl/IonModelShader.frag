@@ -127,16 +127,16 @@ vec3 calc_point_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec
     float distance = length(light[i].position - vert_position);
     float attenuation = 1.0 / (light[i].constant + light[i].linear * distance + light[i].quadratic * (distance * distance));    
 
-	//Ambient, diffuse and specular color
-	vec4 ambient = ambient_color * light[i].ambient;
-	vec4 diffuse = diffuse_color * light[i].diffuse;
-	vec4 specular = specular_color * light[i].specular;
+	//Combine ambient, diffuse and specular color
+	ambient_color *= light[i].ambient;
+	diffuse_color *= light[i].diffuse;
+	specular_color *= light[i].specular;
 
-	ambient.rgb *= ambient.a * attenuation;
-	diffuse.rgb *= diffuse.a * diff * attenuation;
-	specular.rgb *= specular.a * spec;
+	ambient_color.rgb *= ambient_color.a * attenuation;
+	diffuse_color.rgb *= diffuse_color.a * diff * attenuation;
+	specular_color.rgb *= specular_color.a * spec * attenuation;
 
-    return ambient.rgb + diffuse.rgb + specular.rgb;
+	return ambient_color.rgb + diffuse_color.rgb + specular_color.rgb;
 }
 
 vec3 calc_directional_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
@@ -149,16 +149,16 @@ vec3 calc_directional_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_colo
     vec3 reflect_dir = reflect(-light_dir, normal);
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), shininess);
 	
-	//Ambient, diffuse and specular color
-	vec4 ambient = ambient_color * light[i].ambient;
-	vec4 diffuse = diffuse_color * light[i].diffuse;
-	vec4 specular = specular_color * light[i].specular;
+	//Combine ambient, diffuse and specular color
+	ambient_color *= light[i].ambient;
+	diffuse_color *= light[i].diffuse;
+	specular_color *= light[i].specular;
 
-	ambient.rgb *= ambient.a;
-	diffuse.rgb *= diffuse.a * diff;
-	specular.rgb *= specular.a * spec;
+	ambient_color.rgb *= ambient_color.a;
+	diffuse_color.rgb *= diffuse_color.a * diff;
+	specular_color.rgb *= specular_color.a * spec;
 
-    return ambient.rgb + diffuse.rgb + specular.rgb;
+	return ambient_color.rgb + diffuse_color.rgb + specular_color.rgb;
 }
 
 vec3 calc_spot_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
@@ -179,16 +179,16 @@ vec3 calc_spot_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4
     float epsilon = light[i].cutoff - light[i].outer_cutoff;
     float intensity = clamp((theta - light[i].outer_cutoff) / epsilon, 0.0, 1.0);
 
-    //Ambient, diffuse and specular color
-	vec4 ambient = ambient_color * light[i].ambient;
-	vec4 diffuse = diffuse_color * light[i].diffuse;
-	vec4 specular = specular_color * light[i].specular;
+    //Combine ambient, diffuse and specular color
+	ambient_color *= light[i].ambient;
+	diffuse_color *= light[i].diffuse;
+	specular_color *= light[i].specular;
 
-	ambient.rgb *= ambient.a * attenuation * intensity;
-	diffuse.rgb *= diffuse.a * diff * attenuation * intensity;
-	specular.rgb *= specular.a * spec;
+	ambient_color.rgb *= ambient_color.a * attenuation * intensity;
+	diffuse_color.rgb *= diffuse_color.a * diff * attenuation * intensity;
+	specular_color.rgb *= specular_color.a * spec * attenuation * intensity;
 
-    return ambient.rgb + diffuse.rgb + specular.rgb;
+	return ambient_color.rgb + diffuse_color.rgb + specular_color.rgb;
 }
 
 
