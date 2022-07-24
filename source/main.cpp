@@ -795,6 +795,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//scene_graph->LightingEnabled(false);
 
 			auto scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
+			auto gui_scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
 
 			//GUI
 			ion::gui::GuiController controller{scene_graph->RootNode(), sounds->GetSoundChannelGroup("gui")};
@@ -814,14 +815,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			gui_theme_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			gui_theme_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			gui_theme_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			gui_theme_script.CreateGuiThemes("gui_themes.ion", controller, scene_manager);
+			gui_theme_script.CreateGuiThemes("gui_themes.ion", controller, gui_scene_manager);
 
 			ion::script::interfaces::GuiScriptInterface gui_script;
 			gui_script.CreateScriptRepository(script_repository);
 			gui_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			gui_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			gui_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			gui_script.CreateGui("gui.ion", controller, *scene_manager);
+			gui_script.CreateGui("gui.ion", controller, *gui_scene_manager);
 
 
 			//Textures
@@ -1707,7 +1708,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//GUI
 			//Theme
-			auto theme = controller.CreateTheme("default", scene_manager);
+			auto theme = controller.CreateTheme("default", gui_scene_manager);
 
 			//Mouse cursor skin
 			ion::gui::skins::gui_skin::SkinParts parts;
@@ -2290,6 +2291,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				shader_programs->GetShaderProgram("default_particle_prog"));
 			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
 				shader_programs->GetShaderProgram("default_flat_text_prog"));
+
+			//gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
+			//	shader_programs->GetShaderProgram("default_flat_model_prog"));
+			//gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
+			//	shader_programs->GetShaderProgram("default_flat_particle_prog"));
+			//gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
+			//	shader_programs->GetShaderProgram("default_flat_text_prog"));
 
 
 			//Pointers
