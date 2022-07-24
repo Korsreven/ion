@@ -15,7 +15,6 @@ File:	IonTextShader.vert
 struct Matrix
 {
     mat4 model_view;
-    mat4 projection;
     mat4 model_view_projection;
 };
 

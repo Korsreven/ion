@@ -548,6 +548,10 @@
     <ClInclude Include="..\source\engine\utilities\IonStringUtility.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatModelShader.frag" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatModelShader.vert" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatParticleShader.frag" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatParticleShader.vert" />
     <None Include="..\source\engine\graphics\shaders\glsl\IonFlatTextShader.frag" />
     <None Include="..\source\engine\graphics\shaders\glsl\IonFlatTextShader.vert" />
     <None Include="..\source\engine\graphics\shaders\glsl\IonModelShader.frag" />

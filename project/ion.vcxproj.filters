@@ -1423,5 +1423,17 @@
     <None Include="..\source\engine\graphics\shaders\glsl\IonTextShader.vert">
       <Filter>Header Files\graphics\shaders\glsl</Filter>
     </None>
+    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatModelShader.frag">
+      <Filter>Header Files\graphics\shaders\glsl</Filter>
+    </None>
+    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatModelShader.vert">
+      <Filter>Header Files\graphics\shaders\glsl</Filter>
+    </None>
+    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatParticleShader.frag">
+      <Filter>Header Files\graphics\shaders\glsl</Filter>
+    </None>
+    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatParticleShader.vert">
+      <Filter>Header Files\graphics\shaders\glsl</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -941,8 +941,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto particle_frag_shader = shaders->CreateShader("default_particle_frag", "default_particle.frag");
 			auto text_vert_shader = shaders->CreateShader("default_text_vert", "default_text.vert");
 			auto text_frag_shader = shaders->CreateShader("default_text_frag", "default_text.frag");
-			auto gui_text_vert_shader = shaders->CreateShader("default_gui_text_vert", "default_gui_text.vert");
-			auto gui_text_frag_shader = shaders->CreateShader("default_gui_text_frag", "default_gui_text.frag");
+
+			auto flat_model_vert_shader = shaders->CreateShader("default_flat_model_vert", "default_flat_model.vert");
+			auto flat_model_frag_shader = shaders->CreateShader("default_flat_model_frag", "default_flat_model.frag");
+			auto flat_particle_vert_shader = shaders->CreateShader("default_flat_particle_vert", "default_flat_particle.vert");
+			auto flat_particle_frag_shader = shaders->CreateShader("default_flat_particle_frag", "default_flat_particle.frag");
+			auto flat_text_vert_shader = shaders->CreateShader("default_flat_text_vert", "default_flat_text.vert");
+			auto flat_text_frag_shader = shaders->CreateShader("default_flat_text_frag", "default_flat_text.frag");
 			
 			shaders->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 			//while (!shaders->Loaded());
@@ -951,7 +956,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto model_program = shader_programs->CreateShaderProgram("default_model_prog", model_vert_shader, model_frag_shader);
 			auto particle_program = shader_programs->CreateShaderProgram("default_particle_prog", particle_vert_shader, particle_frag_shader);
 			auto text_program = shader_programs->CreateShaderProgram("default_text_prog", text_vert_shader, text_frag_shader);
-			auto gui_text_program = shader_programs->CreateShaderProgram("default_gui_text_prog", gui_text_vert_shader, gui_text_frag_shader);
+
+			auto flat_model_program = shader_programs->CreateShaderProgram("default_flat_model_prog", flat_model_vert_shader, flat_model_frag_shader);
+			auto flat_particle_program = shader_programs->CreateShaderProgram("default_flat_particle_prog", flat_particle_vert_shader, flat_particle_frag_shader);
+			auto flat_text_program = shader_programs->CreateShaderProgram("default_flat_text_prog", flat_text_vert_shader, flat_text_frag_shader);
 
 			shader_programs->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 			//while (!shader_programs.Loaded());
@@ -979,7 +987,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 				//Matrices			
 				matrix_struct->CreateUniform<glsl::mat4>("model_view");
-				matrix_struct->CreateUniform<glsl::mat4>("projection");
 				matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
 				matrix_struct->CreateUniform<glsl::mat3>("normal");
 
@@ -995,7 +1002,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				//Primitive
 				primitive_struct->CreateUniform<bool>("has_material");
 
-				//Material			
+				//Material
 				material_struct->CreateUniform<glsl::vec4>("ambient");
 				material_struct->CreateUniform<glsl::vec4>("diffuse");
 				material_struct->CreateUniform<glsl::vec4>("specular");
@@ -1052,9 +1059,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				particle_program->CreateAttribute<float>("vertex_point_size");
 				particle_program->CreateAttribute<glsl::vec4>("vertex_color");
 
-				//Matrices			
+				//Matrices
 				matrix_struct->CreateUniform<glsl::mat4>("model_view");
-				matrix_struct->CreateUniform<glsl::mat4>("projection");
 				matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
 				matrix_struct->CreateUniform<glsl::mat3>("normal");
 
@@ -1075,7 +1081,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				//Primitive
 				primitive_struct->CreateUniform<bool>("has_material");
 
-				//Material			
+				//Material
 				material_struct->CreateUniform<glsl::vec4>("ambient");
 				material_struct->CreateUniform<glsl::vec4>("diffuse");
 				material_struct->CreateUniform<glsl::vec4>("specular");
@@ -1086,7 +1092,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				material_struct->CreateUniform<glsl::sampler2D>("specular_map");
 				material_struct->CreateUniform<bool>("has_diffuse_map");
 				material_struct->CreateUniform<bool>("has_normal_map");
-				material_struct->CreateUniform<bool>("has_specular_map");		
+				material_struct->CreateUniform<bool>("has_specular_map");
 				material_struct->CreateUniform<bool>("lighting_enabled");
 
 				//Fog
@@ -1129,9 +1135,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				text_program->CreateAttribute<glsl::vec4>("vertex_color");
 				text_program->CreateAttribute<glsl::vec2>("vertex_tex_coord");
 
-				//Matrices			
+				//Matrices
 				matrix_struct->CreateUniform<glsl::mat4>("model_view");
-				matrix_struct->CreateUniform<glsl::mat4>("projection");
 				matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
 
 				//Scene
@@ -1170,23 +1175,97 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				shader_programs->LoadShaderVariableLocations(*text_program);
 			}
 
-			//GUI text program
+
+			//Flat model program
 			{
 				//Shader structs
-				auto matrix_struct = gui_text_program->CreateStruct("matrix");
-				auto scene_struct = gui_text_program->CreateStruct("scene");
-				auto primitive_struct = gui_text_program->CreateStruct("primitive");
+				auto matrix_struct = flat_model_program->CreateStruct("matrix");
+				auto scene_struct = flat_model_program->CreateStruct("scene");
+				auto primitive_struct = flat_model_program->CreateStruct("primitive");
+				auto material_struct = flat_model_program->CreateStruct("material");
 
 
 				//Shader variables
 				//Vertex
-				gui_text_program->CreateAttribute<glsl::vec3>("vertex_position");
-				gui_text_program->CreateAttribute<glsl::vec4>("vertex_color");
-				gui_text_program->CreateAttribute<glsl::vec2>("vertex_tex_coord");
+				flat_model_program->CreateAttribute<glsl::vec3>("vertex_position");
+				flat_model_program->CreateAttribute<glsl::vec3>("vertex_normal");
+				flat_model_program->CreateAttribute<glsl::vec4>("vertex_color");
+				flat_model_program->CreateAttribute<glsl::vec2>("vertex_tex_coord");
 
-				//Matrices			
-				matrix_struct->CreateUniform<glsl::mat4>("model_view");
-				matrix_struct->CreateUniform<glsl::mat4>("projection");
+				//Matrices
+				matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
+
+				//Scene
+				scene_struct->CreateUniform<float>("gamma");
+
+				//Primitive
+				primitive_struct->CreateUniform<bool>("has_material");
+
+				//Material
+				material_struct->CreateUniform<glsl::vec4>("diffuse");
+				material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");
+				material_struct->CreateUniform<bool>("has_diffuse_map");
+
+				shader_programs->LoadShaderVariableLocations(*flat_model_program);
+			}
+
+			//Flat particle program
+			{
+				//Shader structs
+				auto matrix_struct = flat_particle_program->CreateStruct("matrix");
+				auto scene_struct = flat_particle_program->CreateStruct("scene");
+				auto camera_struct = flat_particle_program->CreateStruct("camera");
+				auto node_struct = flat_particle_program->CreateStruct("node");
+				auto primitive_struct = flat_particle_program->CreateStruct("primitive");
+				auto material_struct = flat_particle_program->CreateStruct("material");
+
+
+				//Shader variables
+				//Vertex
+				flat_particle_program->CreateAttribute<glsl::vec3>("vertex_position");
+				flat_particle_program->CreateAttribute<float>("vertex_rotation");
+				flat_particle_program->CreateAttribute<float>("vertex_point_size");
+				flat_particle_program->CreateAttribute<glsl::vec4>("vertex_color");
+
+				//Matrices
+				matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
+
+				//Scene
+				scene_struct->CreateUniform<float>("gamma");
+
+				//Camera
+				camera_struct->CreateUniform<float>("rotation");
+
+				//Node
+				node_struct->CreateUniform<float>("rotation");
+				node_struct->CreateUniform<glsl::vec2>("scaling");
+
+				//Primitive
+				primitive_struct->CreateUniform<bool>("has_material");
+
+				//Material
+				material_struct->CreateUniform<glsl::vec4>("diffuse");
+				material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");
+				material_struct->CreateUniform<bool>("has_diffuse_map");
+
+				shader_programs->LoadShaderVariableLocations(*flat_particle_program);
+			}
+
+			//Flat text program
+			{
+				//Shader structs
+				auto matrix_struct = flat_text_program->CreateStruct("matrix");
+				auto scene_struct = flat_text_program->CreateStruct("scene");
+				auto primitive_struct = flat_text_program->CreateStruct("primitive");
+
+
+				//Shader variables
+				//Vertex
+				flat_text_program->CreateAttribute<glsl::vec3>("vertex_position");
+				flat_text_program->CreateAttribute<glsl::vec4>("vertex_color");
+				flat_text_program->CreateAttribute<glsl::vec2>("vertex_tex_coord");
+
+				//Matrices
 				matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
 
 				//Scene
@@ -1196,13 +1275,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				primitive_struct->CreateUniform<glsl::sampler2D>("texture");
 				primitive_struct->CreateUniform<bool>("has_texture");
 
-				shader_programs->LoadShaderVariableLocations(*gui_text_program);
+				shader_programs->LoadShaderVariableLocations(*flat_text_program);
 			}
 
 
 			//Font
-			
-
 			auto verdana_regular_12 = fonts->CreateFont("verdana_regular_12", "verdana.ttf", 12);
 			auto verdana_bold_12 = fonts->CreateFont("verdana_bold_12", "verdanab.ttf", 12);
 			auto verdana_italic_12 = fonts->CreateFont("verdana_italic_12", "verdanai.ttf", 12);
@@ -1233,8 +1310,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 					verdana_bold_italic_36);
 
 			//Sound
-			
-
 			auto sound_listener = sounds->CreateSoundListener("listener");
 			auto gui_sound_channel_group = sounds->CreateSoundChannelGroup("gui");
 			gui_sound_channel_group->Volume(0.2_r);
@@ -1554,7 +1629,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Text
 			auto text = scene_manager->CreateText({}, fps);
-			text->AddPass(ion::graphics::render::Pass{});
 
 			//Particle system
 			auto particle_system = scene_manager->CreateParticleSystem({}, rain);
@@ -2214,8 +2288,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				shader_programs->GetShaderProgram("default_model_prog"));
 			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
 				shader_programs->GetShaderProgram("default_particle_prog"));
-			//scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
-			//	shader_programs->GetShaderProgram("default_text_prog"));
+			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
+				shader_programs->GetShaderProgram("default_flat_text_prog"));
 
 
 			//Pointers
@@ -2230,7 +2304,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto player_node = scene_graph->RootNode().GetDescendantNode("player_node");
 			auto ship_node = player_node->GetChildNode("ship_node");
 			auto light_node = ship_node->GetChildNode("ship_light_node");
-			auto timeline = ship_node->GetTimeline("ship_idle_timeline");	
+			auto timeline = ship_node->GetTimeline("ship_idle_timeline");
 
 
 			//Game

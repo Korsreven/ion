@@ -15,7 +15,6 @@ File:	IonModelShader.vert
 struct Matrix
 {
     mat4 model_view;
-    mat4 projection;
     mat4 model_view_projection;
     mat3 normal;
 };

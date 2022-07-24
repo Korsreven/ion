@@ -6,7 +6,7 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/shaders/glsl
-File:	IonFlatTextShader.vert
+File:	IonFlatModelShader.vert
 -------------------------------------------
 */
 
@@ -19,8 +19,9 @@ struct Matrix
 
 
 layout (location = 0) in vec3 vertex_position;
-layout (location = 1) in vec4 vertex_color;
-layout (location = 2) in vec2 vertex_tex_coord;
+layout (location = 1) in vec3 vertex_normal;
+layout (location = 2) in vec4 vertex_color;
+layout (location = 3) in vec2 vertex_tex_coord;
 
 out vec4 vert_color;
 out vec2 vert_tex_coord;
