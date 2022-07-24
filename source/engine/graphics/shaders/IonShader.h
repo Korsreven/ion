@@ -37,11 +37,15 @@ namespace ion::graphics::shaders
 			{
 				if (ion::utilities::string::EndsWith(name, ".vert", ion::utilities::string::StringCase::Insensitive) ||
 					ion::utilities::string::EndsWith(name, ".vs", ion::utilities::string::StringCase::Insensitive) ||
+					ion::utilities::string::EndsWith(name, ".vsh", ion::utilities::string::StringCase::Insensitive) ||
+					ion::utilities::string::EndsWith(name, ".vshader", ion::utilities::string::StringCase::Insensitive) ||
 					ion::utilities::string::EndsWith(name, ".glslv", ion::utilities::string::StringCase::Insensitive))
 					return ShaderType::Vertex;
 
 				else if (ion::utilities::string::EndsWith(name, ".frag", ion::utilities::string::StringCase::Insensitive) ||
 						 ion::utilities::string::EndsWith(name, ".fs", ion::utilities::string::StringCase::Insensitive) ||
+						 ion::utilities::string::EndsWith(name, ".fsh", ion::utilities::string::StringCase::Insensitive) ||
+						 ion::utilities::string::EndsWith(name, ".fshader", ion::utilities::string::StringCase::Insensitive) ||
 						 ion::utilities::string::EndsWith(name, ".glslf", ion::utilities::string::StringCase::Insensitive))
 					return ShaderType::Fragment;
 

@@ -22,7 +22,7 @@ namespace ion::assets::repositories
 
 	namespace shader_repository::detail
 	{
-		constexpr auto file_extensions = ".frag/.fs/.glsl/.glslf/.glslv/.vert/.vs"sv;
+		constexpr auto file_extensions = ".frag/.fs/.fsh/.fshader/.glsl/.glslf/.glslv/.vert/.vs/.vsh/.vshader"sv;
 	} //shader_repository::detail
 
 
