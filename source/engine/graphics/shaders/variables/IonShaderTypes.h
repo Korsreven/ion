@@ -67,11 +67,16 @@ namespace ion::graphics::shaders::variables::glsl
 
 
 	/*
-		Basic sampler type
+		Basic sampler types
 	*/
 
 	template <typename T = float32>
 	struct Sampler2D final
+	{
+	};
+
+	template <typename T = float32>
+	struct Sampler2DArray final
 	{
 	};
 
@@ -141,6 +146,11 @@ namespace ion::graphics::shaders::variables::glsl
 
 		template <typename T>
 		struct basic_type_impl<Sampler2D<T>> : basic_scalar_type_impl<int32> //Texture unit is always int
+		{
+		};
+
+		template <typename T>
+		struct basic_type_impl<Sampler2DArray<T>> : basic_scalar_type_impl<int32> //Texture unit is always int
 		{
 		};
 
@@ -979,6 +989,10 @@ namespace ion::graphics::shaders::variables::glsl
 	using isampler2D = Sampler2D<int32>;
 	using usampler2D = Sampler2D<uint32>;
 	using sampler2D = Sampler2D<>;
+
+	using isampler2DArray = Sampler2DArray<int32>;
+	using usampler2DArray = Sampler2DArray<uint32>;
+	using sampler2DArray = Sampler2DArray<>;
 
 
 	/*

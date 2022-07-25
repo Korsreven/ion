@@ -103,7 +103,11 @@ namespace ion::graphics::shaders::variables
 				//2D sampler types
 				glsl::uniform<glsl::isampler2D>,
 				glsl::uniform<glsl::usampler2D>,
-				glsl::uniform<glsl::sampler2D>>;
+				glsl::uniform<glsl::sampler2D>,
+				
+				glsl::uniform<glsl::isampler2DArray>,
+				glsl::uniform<glsl::usampler2DArray>,
+				glsl::uniform<glsl::sampler2DArray>>;
 
 		namespace detail
 		{

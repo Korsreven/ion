@@ -112,6 +112,19 @@ void ShaderProgram::Created(variables::UniformVariable &uniform_variable) noexce
 		{
 			sampler = detail::get_next_texture_unit(next_texture_unit_);
 		},
+
+		[&](variables::glsl::uniform<variables::glsl::isampler2DArray> &sampler)
+		{
+			sampler = detail::get_next_texture_unit(next_texture_unit_);
+		},
+		[&](variables::glsl::uniform<variables::glsl::usampler2DArray> &sampler)
+		{
+			sampler = detail::get_next_texture_unit(next_texture_unit_);
+		},
+		[&](variables::glsl::uniform<variables::glsl::sampler2DArray> &sampler)
+		{
+			sampler = detail::get_next_texture_unit(next_texture_unit_);
+		},
 		[](auto&&) {}
 	);
 }

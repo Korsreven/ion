@@ -265,6 +265,18 @@ namespace ion::graphics::gl
 			return Extension::None;
 	}
 
+	[[nodiscard]] inline auto TextureArray_Support() noexcept
+	{
+		if (HasGL(Version::v3_0))
+			return Extension::Core;
+		#ifdef ION_GLEW
+		else if (GLEW_EXT_texture_array)
+			return Extension::EXT;
+		#endif
+		else
+			return Extension::None;
+	}
+
 	[[nodiscard]] inline auto TextureNonPowerOfTwo_Support() noexcept
 	{
 		if (HasGL(Version::v2_0))

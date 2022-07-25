@@ -275,6 +275,12 @@ void create_uniform(const script_tree::PropertyNode &property,
 		shader_program.CreateUniform<glsl::usampler2D>(std::move(name), size);
 	else if (type == "sampler2D")
 		shader_program.CreateUniform<glsl::sampler2D>(std::move(name), size);
+	else if (type == "isampler2DArray")
+		shader_program.CreateUniform<glsl::isampler2DArray>(std::move(name), size);
+	else if (type == "usampler2DArray")
+		shader_program.CreateUniform<glsl::usampler2DArray>(std::move(name), size);
+	else if (type == "sampler2DArray")
+		shader_program.CreateUniform<glsl::sampler2DArray>(std::move(name), size);
 }
 
 void create_uniform(const script_tree::PropertyNode &property,
@@ -378,6 +384,12 @@ void create_uniform(const script_tree::PropertyNode &property,
 		shader_struct.CreateUniform<glsl::usampler2D>(std::move(name), size);
 	else if (type == "sampler2D")
 		shader_struct.CreateUniform<glsl::sampler2D>(std::move(name), size);
+	else if (type == "isampler2DArray")
+		shader_struct.CreateUniform<glsl::isampler2DArray>(std::move(name), size);
+	else if (type == "usampler2DArray")
+		shader_struct.CreateUniform<glsl::usampler2DArray>(std::move(name), size);
+	else if (type == "sampler2DArray")
+		shader_struct.CreateUniform<glsl::sampler2DArray>(std::move(name), size);
 }
 
 
