@@ -373,6 +373,24 @@ namespace ion::graphics::gl
 
 		return max_texture_units;
 	}
-} //ion::graphics::api
+
+	[[nodiscard]] inline auto MaxArrayTextureLayers() noexcept
+	{
+		auto max_arrray_texture_layers = 0;
+
+		switch (TextureArray_Support())
+		{
+			case Extension::Core:
+			glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_arrray_texture_layers);
+			break;
+
+			case Extension::EXT:
+			glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS_EXT, &max_arrray_texture_layers);
+			break;
+		}
+
+		return max_arrray_texture_layers;
+	}
+} //ion::graphics::gl
 
 #endif
