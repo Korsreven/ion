@@ -191,6 +191,18 @@ namespace ion::graphics::gl
 	}
 
 
+	[[nodiscard]] inline auto ArrayTexture_Support() noexcept
+	{
+		if (HasGL(Version::v3_0))
+			return Extension::Core;
+		#ifdef ION_GLEW
+		else if (GLEW_EXT_texture_array)
+			return Extension::EXT;
+		#endif
+		else
+			return Extension::None;
+	}
+
 	[[nodiscard]] inline auto BlendEquationSeparate_Support() noexcept
 	{
 		if (HasGL(Version::v2_0))
@@ -265,17 +277,6 @@ namespace ion::graphics::gl
 			return Extension::None;
 	}
 
-	[[nodiscard]] inline auto TextureArray_Support() noexcept
-	{
-		if (HasGL(Version::v3_0))
-			return Extension::Core;
-		#ifdef ION_GLEW
-		else if (GLEW_EXT_texture_array)
-			return Extension::EXT;
-		#endif
-		else
-			return Extension::None;
-	}
 
 	[[nodiscard]] inline auto TextureNonPowerOfTwo_Support() noexcept
 	{
@@ -376,20 +377,20 @@ namespace ion::graphics::gl
 
 	[[nodiscard]] inline auto MaxArrayTextureLayers() noexcept
 	{
-		auto max_arrray_texture_layers = 0;
+		auto max_array_texture_layers = 0;
 
-		switch (TextureArray_Support())
+		switch (ArrayTexture_Support())
 		{
 			case Extension::Core:
-			glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_arrray_texture_layers);
+			glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_array_texture_layers);
 			break;
 
 			case Extension::EXT:
-			glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS_EXT, &max_arrray_texture_layers);
+			glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS_EXT, &max_array_texture_layers);
 			break;
 		}
 
-		return max_arrray_texture_layers;
+		return max_array_texture_layers;
 	}
 } //ion::graphics::gl
 
