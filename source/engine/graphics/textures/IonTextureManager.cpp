@@ -170,13 +170,13 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 	return std::pair{std::move(pixel_data), extents};
 }
 
-std::optional<int> load_texture(const std::string &pixel_data, const texture::TextureExtents &extents,
+std::optional<texture::TextureHandle> load_texture(const std::string &pixel_data, const texture::TextureExtents &extents,
 	texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 	texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode) noexcept
 {
-	auto texture_handle = 0;
-	glGenTextures(1, reinterpret_cast<unsigned int*>(&texture_handle));
-	glBindTexture(GL_TEXTURE_2D, texture_handle);
+	texture::TextureHandle texture_handle;
+	glGenTextures(1, reinterpret_cast<unsigned int*>(&texture_handle.Id));
+	glBindTexture(GL_TEXTURE_2D, texture_handle.Id);
 
 	auto has_latest_generate_mipmap =
 		gl::HasGL(gl::Version::v3_0) ||
@@ -274,9 +274,9 @@ std::optional<int> load_texture(const std::string &pixel_data, const texture::Te
 	return texture_handle;
 }
 
-void unload_texture(int texture_handle) noexcept
+void unload_texture(texture::TextureHandle texture_handle) noexcept
 {
-	glDeleteTextures(1, reinterpret_cast<unsigned int*>(&texture_handle));
+	glDeleteTextures(1, reinterpret_cast<unsigned int*>(&texture_handle.Id));
 }
 
 
@@ -361,7 +361,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 	{
 		//Pack image from gl to memory
 		glPixelStorei(GL_PACK_ALIGNMENT, 1); //May increase transfer speed for NPOT
-		glGetTextureSubImage(*texture_atlas.Handle(), 0,
+		glGetTextureSubImage(texture_atlas.Handle()->Id, 0,
 			x, y, 0, sub_extents.ActualWidth, sub_extents.ActualHeight, 1,
 				[&]() noexcept
 				{
@@ -378,7 +378,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 		std::string atlas_pixel_data(atlas_extents.ActualWidth * atlas_extents.ActualHeight * color_bytes, '\0');
 
 		//Pack image from gl to memory
-		glBindTexture(GL_TEXTURE_2D, *texture_atlas.Handle());
+		glBindTexture(GL_TEXTURE_2D, texture_atlas.Handle()->Id);
 		glPixelStorei(GL_PACK_ALIGNMENT, 1); //May increase transfer speed for NPOT
 		glGetTexImage(GL_TEXTURE_2D, 0,
 				[&]() noexcept

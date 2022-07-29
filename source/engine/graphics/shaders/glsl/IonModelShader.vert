@@ -23,7 +23,7 @@ struct Matrix
 layout (location = 0) in vec3 vertex_position;
 layout (location = 1) in vec3 vertex_normal;
 layout (location = 2) in vec4 vertex_color;
-layout (location = 3) in vec2 vertex_tex_coord;
+layout (location = 3) in vec3 vertex_tex_coord;
 
 out vec3 vert_position;
 out vec3 vert_normal;
@@ -39,7 +39,7 @@ void main()
     vert_position = (matrix.model_view * vec4(vertex_position, 1.0)).xyz;
     vert_normal = vertex_normal;
     vert_color = vertex_color;
-    vert_tex_coord = vertex_tex_coord;
+    vert_tex_coord = vertex_tex_coord.st;
     normal_matrix = matrix.normal;
     
     gl_Position = matrix.model_view_projection * vec4(vertex_position, 1.0);

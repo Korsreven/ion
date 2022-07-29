@@ -26,6 +26,7 @@ File:	IonDrawableText.h
 #include "graphics/render/vertex/IonVertexBufferObject.h"
 #include "graphics/render/vertex/IonVertexDeclaration.h"
 #include "graphics/shaders/IonShaderLayout.h"
+#include "graphics/textures/IonTexture.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector3.h"
 #include "memory/IonNonOwningPtr.h"
@@ -57,7 +58,7 @@ namespace ion::graphics::scene
 	{
 		constexpr auto position_components = 3; //x,y,z
 		constexpr auto color_components = 4; //r,g,b,a
-		constexpr auto tex_coord_components = 2; //s,t
+		constexpr auto tex_coord_components = 3; //s,t,u
 
 		constexpr auto position_offset = 0;
 		constexpr auto color_offset = position_offset + position_components;
@@ -75,7 +76,7 @@ namespace ion::graphics::scene
 			vertex_container vertex_data;
 			render::vertex::VertexBatch vertex_batch;
 
-			glyph_vertex_stream(vertex_container vertex_data, int texture_handle);
+			glyph_vertex_stream(vertex_container vertex_data, textures::texture::TextureHandle texture_handle);
 		};
 
 		struct decoration_vertex_stream
@@ -106,7 +107,7 @@ namespace ion::graphics::scene
 							color_offset * sizeof(real), vertex_components * sizeof(real)},
 
 						{shaders::shader_layout::AttributeName::Vertex_TexCoord,
-							render::vertex::vertex_declaration::VertexElementType::Float2,
+							render::vertex::vertex_declaration::VertexElementType::Float3,
 							tex_coord_offset * sizeof(real), vertex_components * sizeof(real)}
 					}
 				};

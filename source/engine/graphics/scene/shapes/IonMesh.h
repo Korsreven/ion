@@ -75,7 +75,7 @@ namespace ion::graphics::scene::shapes
 			Vector3 Position;
 			Vector3 Normal;
 			Color BaseColor;
-			Vector2 TexCoord;
+			Vector3 TexCoord;
 
 
 			//Construct a new vertex with the given position and base color
@@ -97,7 +97,7 @@ namespace ion::graphics::scene::shapes
 			constexpr auto position_components = 3; //x,y,z
 			constexpr auto normal_components = 3; //x,y,z
 			constexpr auto color_components = 4; //r,g,b,a
-			constexpr auto tex_coord_components = 2; //s,t
+			constexpr auto tex_coord_components = 3; //s,t,u
 
 			constexpr auto position_offset = 0;
 			constexpr auto normal_offset = position_offset + position_components;
@@ -127,7 +127,7 @@ namespace ion::graphics::scene::shapes
 								color_offset * sizeof(real), vertex_components * sizeof(real)},
 
 							{shaders::shader_layout::AttributeName::Vertex_TexCoord,
-								vertex::vertex_declaration::VertexElementType::Float2,
+								vertex::vertex_declaration::VertexElementType::Float3,
 								tex_coord_offset * sizeof(real), vertex_components * sizeof(real)}
 						}
 					};

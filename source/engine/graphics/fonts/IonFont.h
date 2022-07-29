@@ -13,11 +13,13 @@ File:	IonFont.h
 #ifndef ION_FONT_H
 #define ION_FONT_H
 
+#include <cassert>
 #include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "graphics/textures/IonTexture.h"
 #include "resources/IonFileResource.h"
 
 namespace ion::graphics::fonts
@@ -39,15 +41,33 @@ namespace ion::graphics::fonts
 		};
 
 
-		struct GlyphMetric
+		struct GlyphTextureHandle final
+		{
+			std::vector<int> Ids;
+			textures::texture::TextureType Type = textures::texture::TextureType::Texture2D;
+
+			inline auto Get(int glyph_index) const noexcept
+				-> textures::texture::TextureHandle
+			{
+				assert(!std::empty(Ids));
+				return {Ids[glyph_index < std::ssize(Ids) ? glyph_index : 0], Type};
+			}
+		};
+
+		struct GlyphMetric final
 		{
 			int Left = 0, Top = 0;
 			int Width = 0, Height = 0;
 			int ActualWidth = 0, ActualHeight = 0;
 			int Advance = 0;
 		};
-		
-		using GlyphTextureHandles = std::vector<int>;
+
+		struct GlyphMaxMetric final
+		{
+			int Width = 0, Height = 0;
+			int ActualWidth = 0, ActualHeight = 0;
+		};
+
 		using GlyphBitmapData = std::vector<std::string>;
 		using GlyphMetrices = std::vector<GlyphMetric>;
 	} //font
@@ -64,11 +84,11 @@ namespace ion::graphics::fonts
 			font::FontGlyphFilter glyph_min_filter_ = font::FontGlyphFilter::Bilinear;
 			font::FontGlyphFilter glyph_mag_filter_ = font::FontGlyphFilter::Bilinear;
 
-			std::optional<font::GlyphTextureHandles> glyph_handles_;
+			std::optional<font::GlyphTextureHandle> glyph_handle_;
 
 			std::optional<font::GlyphBitmapData> glyph_data_;
 			std::optional<font::GlyphMetrices> glyph_metrics_;
-			std::optional<int> glyph_max_height_;
+			std::optional<font::GlyphMaxMetric> glyph_max_metrics_;
 
 		public:
 
@@ -97,19 +117,25 @@ namespace ion::graphics::fonts
 				Modifiers
 			*/
 
-			//Sets the handle for the font to the given value
-			inline void GlyphHandles(std::optional<font::GlyphTextureHandles> handles)
+			//Sets the handle for the glyphs to the given handle
+			inline void GlyphHandle(std::optional<font::GlyphTextureHandle> handle)
 			{
-				glyph_handles_ = std::move(handles);
+				glyph_handle_ = std::move(handle);
 			}
 
 
 			//Sets the glyph data of the font to the given data
-			inline void GlyphData(font::GlyphBitmapData data, font::GlyphMetrices glyph_metrics, int max_height)
+			inline void GlyphData(font::GlyphBitmapData data, font::GlyphMetrices glyph_metrics, font::GlyphMaxMetric glyph_max_metrics)
 			{
 				glyph_data_ = std::move(data);
 				glyph_metrics_ = std::move(glyph_metrics);
-				glyph_max_height_ = max_height;
+				glyph_max_metrics_ = std::move(glyph_max_metrics);
+			}
+
+			//Sets the glyph metrics of the font to the given metrics
+			inline void GlyphMetrics(font::GlyphMetrices glyph_metrics)
+			{
+				glyph_metrics_ = std::move(glyph_metrics);
 			}
 
 			//Resets the glyph data to save some memory (if not needed anymore)
@@ -125,9 +151,9 @@ namespace ion::graphics::fonts
 
 			//Returns the handle for each of the glyphs in the font
 			//Returns nullopt if the font is not loaded
-			[[nodiscard]] inline auto& GlyphHandles() const noexcept
+			[[nodiscard]] inline auto& GlyphHandle() const noexcept
 			{
-				return glyph_handles_;
+				return glyph_handle_;
 			}
 
 
@@ -145,11 +171,11 @@ namespace ion::graphics::fonts
 				return glyph_metrics_;
 			}
 
-			//Returns the max glyph height for the font
+			//Returns the glyph max metrics for the font
 			//Returns nullopt if the font has not been prepared yet
-			[[nodiscard]] inline auto GlyphMaxHeight() const noexcept
+			[[nodiscard]] inline auto& GlyphMaxMetrics() const noexcept
 			{
-				return glyph_max_height_;
+				return glyph_max_metrics_;
 			}
 
 

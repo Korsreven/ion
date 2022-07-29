@@ -984,7 +984,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				model_program->CreateAttribute<glsl::vec3>("vertex_position");
 				model_program->CreateAttribute<glsl::vec3>("vertex_normal");
 				model_program->CreateAttribute<glsl::vec4>("vertex_color");
-				model_program->CreateAttribute<glsl::vec2>("vertex_tex_coord");
+				model_program->CreateAttribute<glsl::vec3>("vertex_tex_coord");
 
 				//Matrices			
 				matrix_struct->CreateUniform<glsl::mat4>("model_view");
@@ -1134,7 +1134,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				//Vertex
 				text_program->CreateAttribute<glsl::vec3>("vertex_position");
 				text_program->CreateAttribute<glsl::vec4>("vertex_color");
-				text_program->CreateAttribute<glsl::vec2>("vertex_tex_coord");
+				text_program->CreateAttribute<glsl::vec3>("vertex_tex_coord");
 
 				//Matrices
 				matrix_struct->CreateUniform<glsl::mat4>("model_view");
@@ -1191,7 +1191,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				flat_model_program->CreateAttribute<glsl::vec3>("vertex_position");
 				flat_model_program->CreateAttribute<glsl::vec3>("vertex_normal");
 				flat_model_program->CreateAttribute<glsl::vec4>("vertex_color");
-				flat_model_program->CreateAttribute<glsl::vec2>("vertex_tex_coord");
+				flat_model_program->CreateAttribute<glsl::vec3>("vertex_tex_coord");
 
 				//Matrices
 				matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
@@ -1264,7 +1264,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				//Vertex
 				flat_text_program->CreateAttribute<glsl::vec3>("vertex_position");
 				flat_text_program->CreateAttribute<glsl::vec4>("vertex_color");
-				flat_text_program->CreateAttribute<glsl::vec2>("vertex_tex_coord");
+				flat_text_program->CreateAttribute<glsl::vec3>("vertex_tex_coord");
 
 				//Matrices
 				matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");

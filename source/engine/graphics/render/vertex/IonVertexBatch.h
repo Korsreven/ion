@@ -21,6 +21,7 @@ File:	IonVertexBatch.h
 #include "IonVertexBufferObject.h"
 #include "IonVertexDataView.h"
 #include "IonVertexDeclaration.h"
+#include "graphics/textures/IonTexture.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
@@ -40,7 +41,6 @@ namespace ion::graphics
 	namespace textures
 	{
 		class Animation;
-		class Texture;
 	}
 }
 
@@ -70,14 +70,15 @@ namespace ion::graphics::render::vertex
 				std::monostate,
 				NonOwningPtr<textures::Animation>,
 				NonOwningPtr<textures::Texture>,
-				int>; //Texture handle
+				textures::texture::TextureHandle>;
 
 
 			int vertex_draw_mode_to_gl_draw_mode(VertexDrawMode draw_mode) noexcept;
 			int get_vertex_count(const VertexDeclaration &vertex_declaration, const VertexDataView &vertex_data) noexcept;
 
-			std::tuple<NonOwningPtr<textures::Animation>, NonOwningPtr<textures::Texture>, std::optional<int>> get_textures(const texture_type &some_texture) noexcept;
-			std::optional<int> get_texture_handle(const texture_type &some_texture, duration time) noexcept;
+			std::tuple<NonOwningPtr<textures::Animation>, NonOwningPtr<textures::Texture>, std::optional<textures::texture::TextureHandle>>
+				get_textures(const texture_type &some_texture) noexcept;
+			std::optional<textures::texture::TextureHandle> get_texture_handle(const texture_type &some_texture, duration time) noexcept;
 
 
 			/*
@@ -92,8 +93,9 @@ namespace ion::graphics::render::vertex
 			void set_vertex_pointers(const VertexDeclaration &vertex_declaration, const void *data) noexcept;
 			void disable_vertex_pointers(const VertexDeclaration &vertex_declaration) noexcept;
 
-			void bind_texture(int texture_handle) noexcept;
-			void bind_texture(int texture_handle, int texture_unit) noexcept;
+			void bind_texture(textures::texture::TextureHandle texture_handle) noexcept;
+			void bind_texture(textures::texture::TextureHandle texture_handle, int texture_unit) noexcept;
+			void unbind_textures() noexcept;
 
 			void set_material_uniforms(materials::Material *material, duration time, shaders::ShaderProgram &shader_program) noexcept;
 			void set_texture_uniforms(texture_type &some_texture, duration time, shaders::ShaderProgram &shader_program) noexcept;
@@ -139,7 +141,7 @@ namespace ion::graphics::render::vertex
 
 			//Construct a new vertex batch with the given draw mode, vertex declaration, vertex data and a texture handle
 			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
-				const VertexDataView &vertex_data, int texture_handle) noexcept;
+				const VertexDataView &vertex_data, textures::texture::TextureHandle texture_handle) noexcept;
 
 
 			/*
@@ -191,7 +193,7 @@ namespace ion::graphics::render::vertex
 			}
 
 			//Sets the texture used by this vertex batch to the given texture handle
-			inline void BatchTexture(int texture_handle) noexcept
+			inline void BatchTexture(textures::texture::TextureHandle texture_handle) noexcept
 			{
 				texture_ = texture_handle;
 			}

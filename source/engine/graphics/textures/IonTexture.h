@@ -31,6 +31,12 @@ namespace ion::graphics::textures
 
 	namespace texture
 	{
+		enum class TextureType : bool
+		{
+			Texture2D,
+			ArrayTexture2D
+		};
+
 		enum class TextureFilter : bool
 		{
 			NearestNeighbor,	//Nearest
@@ -50,18 +56,30 @@ namespace ion::graphics::textures
 		};
 
 
-		struct TextureExtents
+		struct TextureHandle final
+		{
+			int Id = 0;
+			TextureType Type = TextureType::Texture2D;
+		};
+
+		struct TextureExtents final
 		{
 			int Width = 0, Height = 0;
 			int ActualWidth = 0, ActualHeight = 0;
 			int BitDepth = 0;
 		};
 
-		struct TextureAtlasRegion
+		struct TextureAtlasRegion final
 		{
 			NonOwningPtr<TextureAtlas> Atlas;
 			std::pair<int, int> Position; //Row and column
 		};
+
+
+		namespace detail
+		{
+			int texture_type_to_gl_texture_type(TextureType texture_type) noexcept;
+		} //detail
 	} //texture
 
 	class Texture : public resources::FileResource<TextureManager>
@@ -75,7 +93,7 @@ namespace ion::graphics::textures
 			texture::TextureWrapMode s_wrap_mode_ = texture::TextureWrapMode::Clamp;
 			texture::TextureWrapMode t_wrap_mode_ = texture::TextureWrapMode::Clamp;
 
-			std::optional<int> handle_;
+			std::optional<texture::TextureHandle> handle_;
 
 			std::optional<std::string> pixel_data_;
 			std::optional<texture::TextureExtents> extents_;
@@ -141,8 +159,8 @@ namespace ion::graphics::textures
 				Modifiers
 			*/
 
-			//Sets the handle for the texture to the given value
-			inline void Handle(std::optional<int> handle) noexcept
+			//Sets the handle for the texture to the given handle
+			inline void Handle(std::optional<texture::TextureHandle> handle) noexcept
 			{
 				handle_ = handle;
 			}

@@ -12,6 +12,7 @@ File:	IonTexture.cpp
 
 #include "IonTexture.h"
 
+#include "graphics/IonGraphicsAPI.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::textures
@@ -22,6 +23,20 @@ using namespace types::type_literals;
 
 namespace texture::detail
 {
+
+int texture_type_to_gl_texture_type(TextureType texture_type) noexcept
+{
+	switch (texture_type)
+	{
+		case TextureType::ArrayTexture2D:
+		return GL_TEXTURE_2D_ARRAY;
+
+		case TextureType::Texture2D:
+		default:
+		return GL_TEXTURE_2D;
+	}
+}
+
 } //texture::detail
 
 

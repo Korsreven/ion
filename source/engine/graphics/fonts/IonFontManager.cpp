@@ -30,7 +30,20 @@ using namespace font_manager;
 namespace font_manager::detail
 {
 
-std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, int>> prepare_font(
+bool has_support_for_array_texture() noexcept
+{
+	static const auto has_support_for_array_texture = gl::ArrayTexture_Support() != gl::Extension::None;
+	return has_support_for_array_texture;
+}
+
+int max_array_texture_layers() noexcept
+{
+	static const auto max_array_texture_layers = gl::MaxArrayTextureLayers();
+	return max_array_texture_layers;
+}
+
+
+std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, font::GlyphMaxMetric>> prepare_font(
 	const std::string &file_data, int size, int face_index,
 	int character_spacing, font::FontCharacterSet character_set)
 {
@@ -51,7 +64,7 @@ std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, int>> prepa
 	auto glyph_count = static_cast<int>(character_set);
 	font::GlyphBitmapData glyph_data(glyph_count);
 	font::GlyphMetrices glyph_metrics(glyph_count);
-	auto glyph_max_height = 0;
+	font::GlyphMaxMetric glyph_max_metrics;
 	
 	for (auto i = 0; i < glyph_count; ++i)
 	{
@@ -72,11 +85,19 @@ std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, int>> prepa
 		metric.ActualHeight = static_cast<int>(textures::texture_manager::detail::upper_power_of_two(metric.Height));
 		metric.Advance = face->glyph->advance.x / 64 + character_spacing;
 
-		//Update max glyph height if higher than current max
-		if (glyph_max_height < metric.Height)
-			glyph_max_height = metric.Height;
-
 		glyph_metrics[i] = metric;
+
+		//Update max glyph metrics if higher than current max
+		if (glyph_max_metrics.Width < metric.Width)
+			glyph_max_metrics.Width = metric.Width;
+		if (glyph_max_metrics.Height < metric.Height)
+			glyph_max_metrics.Height = metric.Height;
+
+		if (glyph_max_metrics.ActualWidth < metric.ActualWidth)
+			glyph_max_metrics.ActualWidth = metric.ActualWidth;
+		if (glyph_max_metrics.ActualHeight < metric.ActualHeight)
+			glyph_max_metrics.ActualHeight = metric.ActualHeight;
+
 		glyph_data[i].assign(metric.ActualWidth * metric.ActualHeight * 2, '\0');
 
 		//Convert FreeType bitmap data to OpenGL texture data
@@ -98,54 +119,117 @@ std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, int>> prepa
 	}
 
 	//Use default font size if no visual glyphs found
-	if (glyph_max_height == 0)
-		glyph_max_height = size;
+	if (glyph_max_metrics.Width == 0)
+		glyph_max_metrics.Width = size;
+	if (glyph_max_metrics.Height == 0)
+		glyph_max_metrics.Height = size;
+
+	if (glyph_max_metrics.ActualWidth == 0)
+		glyph_max_metrics.ActualWidth = size;
+	if (glyph_max_metrics.ActualHeight == 0)
+		glyph_max_metrics.ActualHeight = size;
 
 	FT_Done_Face(face);
 	FT_Done_FreeType(library);
-	return std::tuple{std::move(glyph_data), std::move(glyph_metrics), glyph_max_height};
+	return std::tuple{std::move(glyph_data), std::move(glyph_metrics), std::move(glyph_max_metrics)};
 }
 
-std::optional<font::GlyphTextureHandles> load_font(
+std::optional<font::GlyphTextureHandle> load_font(
 	const font::GlyphBitmapData &glyph_data,
 	const font::GlyphMetrices &glyph_metrics,
-	font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter) noexcept
+	const font::GlyphMaxMetric &glyph_max_metrics,
+	font::FontGlyphFilter glyph_min_filter, font::FontGlyphFilter glyph_mag_filter,
+	GlyphTextureType glyph_texture_type) noexcept
 {
+	if (!detail::has_support_for_array_texture())
+		glyph_texture_type = GlyphTextureType::Texture2D;
+
 	auto glyph_count = std::ssize(glyph_data);
-	font::GlyphTextureHandles glyph_handles(glyph_count);
+	font::GlyphTextureHandle glyph_handle;
+	glyph_handle.Ids.assign(
+		glyph_texture_type == GlyphTextureType::Texture2D ?
+		glyph_count : 1, 0);
 
-	glGenTextures(glyph_count, reinterpret_cast<unsigned int*>(std::data(glyph_handles)));
-
-	for (auto i = 0; i < glyph_count; ++i)
+	switch (glyph_texture_type)
 	{
-		glBindTexture(GL_TEXTURE_2D, glyph_handles[i]);
+		case GlyphTextureType::ArrayTexture2D:
+		glyph_handle.Type = textures::texture::TextureType::ArrayTexture2D;
+		break;
 
-		//Minification filter
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-			min_filter == font::FontGlyphFilter::NearestNeighbor ? GL_NEAREST : GL_LINEAR);
-
-		//Magnification filter
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-			mag_filter == font::FontGlyphFilter::NearestNeighbor ? GL_NEAREST : GL_LINEAR);
-
-		//Texture wrap
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		//Upload image to gl (always POT)
-		glTexImage2D(GL_TEXTURE_2D, 0,
-			GL_RGBA, glyph_metrics[i].ActualWidth, glyph_metrics[i].ActualHeight, 0, GL_LUMINANCE_ALPHA,
-			GL_UNSIGNED_BYTE, std::data(glyph_data[i]));
-
-		glBindTexture(GL_TEXTURE_2D, 0);
+		case GlyphTextureType::Texture2D:
+		default:
+		glyph_handle.Type = textures::texture::TextureType::Texture2D;
+		break;
 	}
 
-	return glyph_handles;
+	glGenTextures(std::ssize(glyph_handle.Ids), reinterpret_cast<unsigned int*>(std::data(glyph_handle.Ids)));
+
+	if (glyph_texture_type == GlyphTextureType::ArrayTexture2D)
+	{
+		glBindTexture(GL_TEXTURE_2D_ARRAY, glyph_handle.Ids.front());
+
+		//Minification filter
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER,
+			glyph_min_filter == font::FontGlyphFilter::NearestNeighbor ? GL_NEAREST : GL_LINEAR);
+
+		//Magnification filter
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER,
+			glyph_mag_filter == font::FontGlyphFilter::NearestNeighbor ? GL_NEAREST : GL_LINEAR);
+
+		//Texture wrap
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		if (auto max_glyphs = max_array_texture_layers(); glyph_count > max_glyphs)
+			glyph_count = max_glyphs;
+
+		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0,
+			GL_RGBA, glyph_max_metrics.ActualWidth, glyph_max_metrics.ActualHeight, glyph_count,
+			0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, nullptr);
+		
+		for (auto i = 0; i < glyph_count; ++i)
+		{
+			//Upload image to gl (always POT)
+			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i,
+				glyph_metrics[i].ActualWidth, glyph_metrics[i].ActualHeight, 1,
+				GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, std::data(glyph_data[i]));
+		}
+
+		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+	}
+	else
+	{
+		for (auto i = 0; i < glyph_count; ++i)
+		{
+			glBindTexture(GL_TEXTURE_2D, glyph_handle.Ids[i]);
+
+			//Minification filter
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+				glyph_min_filter == font::FontGlyphFilter::NearestNeighbor ? GL_NEAREST : GL_LINEAR);
+
+			//Magnification filter
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+				glyph_mag_filter == font::FontGlyphFilter::NearestNeighbor ? GL_NEAREST : GL_LINEAR);
+
+			//Texture wrap
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+			//Upload image to gl (always POT)
+			glTexImage2D(GL_TEXTURE_2D, 0,
+				GL_RGBA, glyph_metrics[i].ActualWidth, glyph_metrics[i].ActualHeight,
+				0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, std::data(glyph_data[i]));
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+	}
+
+	return std::move(glyph_handle);
 }
 
-void unload_font(const font::GlyphTextureHandles &glyph_handles) noexcept
+void unload_font(const font::GlyphTextureHandle &glyph_handle) noexcept
 {
-	glDeleteTextures(std::ssize(glyph_handles), reinterpret_cast<const unsigned int*>(std::data(glyph_handles)));
+	glDeleteTextures(std::ssize(glyph_handle.Ids), reinterpret_cast<const unsigned int*>(std::data(glyph_handle.Ids)));
 }
 
 } //font_manager::detail
@@ -164,8 +248,8 @@ bool FontManager::PrepareResource(Font &font) noexcept
 		if (auto font_data = detail::prepare_font(*font.FileData(),
 			font.Size(), font.FaceIndex(), font.CharacterSpacing(), font.CharacterSet()); font_data)
 		{
-			auto &[glyph_data, glyph_metrics, glyph_max_height] = *font_data;
-			font.GlyphData(std::move(glyph_data), std::move(glyph_metrics), glyph_max_height);
+			auto &[glyph_data, glyph_metrics, glyph_max_metrics] = *font_data;
+			font.GlyphData(std::move(glyph_data), std::move(glyph_metrics), std::move(glyph_max_metrics));
 		}
 
 		return font.GlyphData().has_value();
@@ -178,13 +262,32 @@ bool FontManager::LoadResource(Font &font) noexcept
 {
 	auto &glyph_data = font.GlyphData();
 	auto &glyph_metrics = font.GlyphMetrics();
-	auto [glyph_min_filter, glyph_mag_filter] = font.GlyphFilter();
+	auto &glyph_max_metrics = font.GlyphMaxMetrics();
 
-	if (glyph_data && glyph_metrics)
+	if (glyph_data && glyph_metrics && glyph_max_metrics)
 	{
-		auto glyph_handles = detail::load_font(*glyph_data, *glyph_metrics, glyph_min_filter, glyph_mag_filter);
-		font.GlyphHandles(std::move(glyph_handles));
-		return font.GlyphHandles().has_value();
+		auto [glyph_min_filter, glyph_mag_filter] = font.GlyphFilter();
+
+		if (auto glyph_handle = detail::load_font(*glyph_data,
+			*glyph_metrics, *glyph_max_metrics, glyph_min_filter, glyph_mag_filter, glyph_texture_type_); glyph_handle)
+		{
+			//Update glyph metrics with glyph max metrics
+			if (glyph_handle->Type == textures::texture::TextureType::ArrayTexture2D)
+			{
+				auto new_glyph_metrics = *glyph_metrics; //Make copy
+				for (auto &glyph_metric : new_glyph_metrics)
+				{
+					glyph_metric.ActualWidth = glyph_max_metrics->ActualWidth;
+					glyph_metric.ActualHeight = glyph_max_metrics->ActualHeight;
+				}
+
+				font.GlyphMetrics(std::move(new_glyph_metrics));
+			}
+
+			font.GlyphHandle(std::move(glyph_handle));
+		}
+
+		return font.GlyphHandle().has_value();
 	}
 	else
 		return false;
@@ -192,10 +295,10 @@ bool FontManager::LoadResource(Font &font) noexcept
 
 bool FontManager::UnloadResource(Font &font) noexcept
 {
-	if (auto &glyph_handles = font.GlyphHandles(); glyph_handles)
+	if (auto &glyph_handle = font.GlyphHandle(); glyph_handle)
 	{
-		detail::unload_font(*glyph_handles);
-		font.GlyphHandles({});
+		detail::unload_font(*glyph_handle);
+		font.GlyphHandle({});
 		return true;
 	}
 	else
@@ -219,6 +322,13 @@ void FontManager::ResourceFailed(Font &font) noexcept
 
 
 //Public
+
+FontManager::FontManager() noexcept
+{
+	//Initialize once
+	detail::has_support_for_array_texture();
+	detail::max_array_texture_layers();
+}
 
 FontManager::~FontManager() noexcept
 {

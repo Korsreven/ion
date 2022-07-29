@@ -204,10 +204,10 @@ namespace ion::graphics::textures
 				std::optional<NpotScale> npot_scale, std::optional<NpotScaleFit> npot_scale_fit,
 				NpotScaleResampling npot_scale_resampling);
 
-			std::optional<int> load_texture(const std::string &pixel_data, const texture::TextureExtents &extents,
+			std::optional<texture::TextureHandle> load_texture(const std::string &pixel_data, const texture::TextureExtents &extents,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode) noexcept;
-			void unload_texture(int texture_handle) noexcept;
+			void unload_texture(texture::TextureHandle texture_handle) noexcept;
 
 
 			/*

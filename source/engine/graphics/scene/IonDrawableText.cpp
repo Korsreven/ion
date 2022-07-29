@@ -35,7 +35,7 @@ using namespace graphics::utilities;
 namespace drawable_text::detail
 {
 
-glyph_vertex_stream::glyph_vertex_stream(vertex_container vertex_data, int texture_handle) :
+glyph_vertex_stream::glyph_vertex_stream(vertex_container vertex_data, textures::texture::TextureHandle texture_handle) :
 
 	vertex_data{std::move(vertex_data)},
 	vertex_batch
@@ -293,39 +293,39 @@ vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 	//Vertex format:
 	//x, y, z
 	//r, g, b, a
-	//s, t
+	//s, t, u
 
 	return
 		{
 			//Vertex #1
 			v1.X(), v1.Y(), v1.Z(),
 			r, g, b, a,
-			0.0_r, 0.0_r,
+			0.0_r, 0.0_r, 0.0_r,
 
 			//Vertex #2
 			v2.X(), v2.Y(), v2.Z(),
 			r, g, b, a,
-			0.0_r, t,
+			0.0_r, t, 0.0_r,
 
 			//Vertex #3
 			v3.X(), v3.Y(), v3.Z(),
 			r, g, b, a,
-			s, t,
+			s, t, 0.0_r,
 
 			//Vertex #4
 			v3.X(), v3.Y(), v3.Z(),
 			r, g, b, a,
-			s, t,
+			s, t, 0.0_r,
 
 			//Vertex #5
 			v4.X(), v4.Y(), v4.Z(),
 			r, g, b, a,
-			s, 0.0_r,
+			s, 0.0_r, 0.0_r,
 
 			//Vertex #6
 			v1.X(), v1.Y(), v1.Z(),
 			r, g, b, a,
-			0.0_r, 0.0_r
+			0.0_r, 0.0_r, 0.0_r
 		};
 }
 
@@ -358,39 +358,39 @@ decoration_vertex_container get_decoration_vertex_data(
 	//Vertex format:
 	//x, y, z
 	//r, g, b, a
-	//s, t
+	//s, t, u
 
 	return
 		{
 			//Vertex #1
 			v1.X(), v1.Y(), v1.Z(),
 			r, g, b, a,
-			0.0_r, 0.0_r,
+			0.0_r, 0.0_r, 0.0_r,
 
 			//Vertex #2
 			v2.X(), v2.Y(), v2.Z(),
 			r, g, b, a,
-			0.0_r, 1.0_r,
+			0.0_r, 1.0_r, 0.0_r,
 
 			//Vertex #3
 			v3.X(), v3.Y(), v3.Z(),
 			r, g, b, a,
-			1.0_r, 1.0_r,
+			1.0_r, 1.0_r, 0.0_r,
 
 			//Vertex #4
 			v3.X(), v3.Y(), v3.Z(),
 			r, g, b, a,
-			1.0_r, 1.0_r,
+			1.0_r, 1.0_r, 0.0_r,
 
 			//Vertex #5
 			v4.X(), v4.Y(), v4.Z(),
 			r, g, b, a,
-			1.0_r, 0.0_r,
+			1.0_r, 0.0_r, 0.0_r,
 
 			//Vertex #6
 			v1.X(), v1.Y(), v1.Z(),
 			r, g, b, a,
-			0.0_r, 0.0_r
+			0.0_r, 0.0_r, 0.0_r
 		};
 }
 
@@ -401,7 +401,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 {
 	if (auto font = get_default_font(text_block, text); font)
 	{
-		if (auto &handles = font->GlyphHandles(); handles)
+		if (auto &handle = font->GlyphHandle(); handle)
 		{
 			if (auto &metrics = font->GlyphMetrics(); metrics)
 			{
@@ -472,7 +472,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 									position, rotation, scaling,
 									foreground_color, opacity, origin);
 							glyph_streams[glyph_count].vertex_batch.VertexData(glyph_streams[glyph_count].vertex_data);
-							glyph_streams[glyph_count].vertex_batch.BatchTexture((*handles)[glyph_index]);
+							glyph_streams[glyph_count].vertex_batch.BatchTexture((*handle).Get(glyph_index));
 						}
 
 						//New stream
@@ -482,7 +482,7 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 								get_glyph_vertex_data((*metrics)[glyph_index],
 									position, rotation, scaling,
 									foreground_color, opacity, origin),
-								(*handles)[glyph_index]
+								(*handle).Get(glyph_index)
 							);
 
 							glyph_streams.back().vertex_batch.UseVertexArray(false);

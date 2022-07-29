@@ -20,7 +20,6 @@ File:	IonVertexBatch.cpp
 #include "graphics/shaders/IonShaderProgram.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
 #include "graphics/textures/IonAnimation.h"
-#include "graphics/textures/IonTexture.h"
 #include "types/IonTypeTraits.h"
 
 namespace ion::graphics::render::vertex
@@ -73,19 +72,20 @@ int get_vertex_count(const VertexDeclaration &vertex_declaration, const VertexDa
 }
 
 
-std::tuple<NonOwningPtr<textures::Animation>, NonOwningPtr<textures::Texture>, std::optional<int>> get_textures(const texture_type &some_texture) noexcept
+std::tuple<NonOwningPtr<textures::Animation>, NonOwningPtr<textures::Texture>, std::optional<textures::texture::TextureHandle>>
+	get_textures(const texture_type &some_texture) noexcept
 {
-	using tuple_type = std::tuple<NonOwningPtr<textures::Animation>, NonOwningPtr<textures::Texture>, std::optional<int>>;
+	using tuple_type = std::tuple<NonOwningPtr<textures::Animation>, NonOwningPtr<textures::Texture>, std::optional<textures::texture::TextureHandle>>;
 
 	return std::visit(types::overloaded{
 		[](std::monostate) { return tuple_type{nullptr, nullptr, std::nullopt}; },
 		[](NonOwningPtr<textures::Animation> animation) { return tuple_type{animation, nullptr, std::nullopt}; },
 		[](NonOwningPtr<textures::Texture> texture) { return tuple_type{nullptr, texture, std::nullopt}; },
-		[](int texture_handle) { return tuple_type{nullptr, nullptr, texture_handle}; }
+		[](textures::texture::TextureHandle texture_handle) { return tuple_type{nullptr, nullptr, texture_handle}; }
 	}, some_texture);
 }
 
-std::optional<int> get_texture_handle(const texture_type &some_texture, duration time) noexcept
+std::optional<textures::texture::TextureHandle> get_texture_handle(const texture_type &some_texture, duration time) noexcept
 {
 	if (auto [animation, texture, texture_handle] = get_textures(some_texture); animation)
 	{
@@ -273,18 +273,28 @@ void disable_vertex_pointers(const VertexDeclaration &vertex_declaration) noexce
 }
 
 
-void bind_texture(int texture_handle) noexcept
+void bind_texture(textures::texture::TextureHandle texture_handle) noexcept
 {
-	if (texture_handle > 0)
-		glEnable(GL_TEXTURE_2D);
-	else
-		glDisable(GL_TEXTURE_2D);
+	auto gl_texture_type = textures::texture::detail::texture_type_to_gl_texture_type(texture_handle.Type);
 
-	glBindTexture(GL_TEXTURE_2D, texture_handle);
+	switch (texture_handle.Type)
+	{
+		case textures::texture::TextureType::Texture2D:
+		{
+			if (texture_handle.Id > 0)
+				glEnable(gl_texture_type);
+			else
+				glDisable(gl_texture_type);
+		}
+	}
+
+	glBindTexture(gl_texture_type, texture_handle.Id);
 }
 
-void bind_texture(int texture_handle, int texture_unit) noexcept
+void bind_texture(textures::texture::TextureHandle texture_handle, int texture_unit) noexcept
 {
+	auto gl_texture_type = textures::texture::detail::texture_type_to_gl_texture_type(texture_handle.Type);
+
 	switch (gl::MultiTexture_Support())
 	{
 		case gl::Extension::Core:
@@ -296,7 +306,25 @@ void bind_texture(int texture_handle, int texture_unit) noexcept
 		break;
 	}
 
-	glBindTexture(GL_TEXTURE_2D, texture_handle);
+	glBindTexture(gl_texture_type, texture_handle.Id);
+}
+
+void unbind_textures() noexcept
+{
+	switch (gl::MultiTexture_Support())
+	{
+		case gl::Extension::Core:
+		glActiveTexture(GL_TEXTURE0);
+		break;
+
+		case gl::Extension::ARB:
+		glActiveTextureARB(GL_TEXTURE0_ARB);
+		break;
+	}
+
+	glDisable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 }
 
 
@@ -455,7 +483,7 @@ VertexBatch::VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclarati
 }
 
 VertexBatch::VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
-	const VertexDataView &vertex_data, int texture_handle) noexcept :
+	const VertexDataView &vertex_data, textures::texture::TextureHandle texture_handle) noexcept :
 
 	draw_mode_{draw_mode},
 	vertex_declaration_{std::move(vertex_declaration)},
@@ -619,10 +647,6 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 
 		if (!shader_in_use)
 			shader_program->Owner()->DeactivateShaderProgram(*shader_program);
-
-		//Has material or texture
-		if (material_ || texture_.index() > 0)
-			detail::bind_texture(0, 0);
 	}
 	else //Fixed-function pipeline
 	{
@@ -634,11 +658,11 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 			if (use_vbo)
 				vbo_->Unbind();
 		}
-
-		//Has material or texture
-		if (material_ || texture_.index() > 0)
-			detail::bind_texture(0);
 	}
+
+	//Has material or texture
+	if (material_ || texture_.index() > 0)
+		detail::unbind_textures();
 }
 
 
