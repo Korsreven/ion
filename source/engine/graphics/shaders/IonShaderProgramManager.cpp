@@ -761,28 +761,20 @@ void set_uniform_value::operator()(const glsl::uniform<glsl::sampler2D> &value) 
 
 void set_uniform_value::operator()(const glsl::uniform<glsl::isampler2DArray> &value) const noexcept
 {
-	if (gl::HasGL(gl::Version::v3_0))
+	if (gl::ArrayTexture_Support() != gl::Extension::None)
 		glUniform1iv(location_, value.Size(), value.Values()); //Use glUniform1iv (texture unit is passed as int)
 }
 
 void set_uniform_value::operator()(const glsl::uniform<glsl::usampler2DArray> &value) const noexcept
 {
-	if (gl::HasGL(gl::Version::v3_0))
+	if (gl::ArrayTexture_Support() != gl::Extension::None)
 		glUniform1iv(location_, value.Size(), value.Values()); //Use glUniform1iv (texture unit is passed as int)
 }
 
 void set_uniform_value::operator()(const glsl::uniform<glsl::sampler2DArray> &value) const noexcept
 {
-	switch (gl::Shader_Support())
-	{
-		case gl::Extension::Core:
+	if (gl::ArrayTexture_Support() != gl::Extension::None)
 		glUniform1iv(location_, value.Size(), value.Values()); //Use glUniform1iv (texture unit is passed as int)
-		break;
-
-		case gl::Extension::ARB:
-		glUniform1ivARB(location_, value.Size(), value.Values()); //Use glUniform1iv (texture unit is passed as int)
-		break;
-	}
 }
 
 } //shader_manager::detail
