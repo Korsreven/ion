@@ -95,7 +95,6 @@ namespace ion::graphics::render::vertex
 
 			void bind_texture(textures::texture::TextureHandle texture_handle) noexcept;
 			void bind_texture(textures::texture::TextureHandle texture_handle, int texture_unit) noexcept;
-			void unbind_textures() noexcept;
 
 			void set_material_uniforms(materials::Material *material, duration time, shaders::ShaderProgram &shader_program) noexcept;
 			void set_texture_uniforms(texture_type &some_texture, duration time, shaders::ShaderProgram &shader_program) noexcept;

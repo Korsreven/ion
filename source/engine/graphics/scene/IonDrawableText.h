@@ -67,8 +67,8 @@ namespace ion::graphics::scene
 		constexpr auto vertex_components =
 			position_components + color_components + tex_coord_components;
 
-		using vertex_container = std::array<real, vertex_components * 6>;
-		using decoration_vertex_container = std::vector<real>;	
+		using fixed_vertex_container = std::array<real, vertex_components * 6>;
+		using vertex_container = std::vector<real>;
 
 
 		struct glyph_vertex_stream
@@ -81,8 +81,8 @@ namespace ion::graphics::scene
 
 		struct decoration_vertex_stream
 		{
-			decoration_vertex_container back_vertex_data;
-			decoration_vertex_container front_vertex_data;
+			vertex_container back_vertex_data;
+			vertex_container front_vertex_data;
 			render::vertex::VertexBatch back_vertex_batch;
 			render::vertex::VertexBatch front_vertex_batch;
 
@@ -121,12 +121,15 @@ namespace ion::graphics::scene
 			Rendering
 		*/
 
+		int get_glyph_vertex_count(const glyph_vertex_streams &glyph_streams) noexcept;
+
 		Color get_foreground_color(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
 		std::optional<Color> get_background_color(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
 		std::optional<fonts::text::TextFontStyle> get_font_style(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
 		std::optional<fonts::text::TextDecoration> get_text_decoration(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
 		std::optional<Color> get_text_decoration_color(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
 
+		fonts::Font* get_default_font(const fonts::Text &text) noexcept;
 		fonts::Font* get_default_font(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
 		
 		real get_glyph_horizontal_position(const std::optional<Vector2> &area_size, const Vector2 &padding,
@@ -134,10 +137,10 @@ namespace ion::graphics::scene
 		real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const Vector2 &padding,
 			fonts::text::TextVerticalAlignment vertical_alignment, int font_size, real line_height, int total_lines, const Vector3 &position) noexcept;
 
-		vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
+		fixed_vertex_container get_glyph_vertex_data(real glyph_index, const fonts::font::GlyphMetric &metric,
 			const Vector3 &position, real rotation, const Vector2 &scaling,
 			const Color &color, real opacity, const Vector3 &origin);
-		decoration_vertex_container get_decoration_vertex_data(
+		fixed_vertex_container get_decoration_vertex_data(
 			const Vector3 &position, real rotation, const Vector2 &size,
 			const Color &color, real opacity, const Vector3 &origin);
 

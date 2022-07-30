@@ -46,7 +46,8 @@ namespace ion::graphics::fonts
 			std::vector<int> Ids;
 			textures::texture::TextureType Type = textures::texture::TextureType::Texture2D;
 
-			inline auto Get(int glyph_index) const noexcept
+
+			inline auto operator[](int glyph_index) const noexcept
 				-> textures::texture::TextureHandle
 			{
 				assert(!std::empty(Ids));

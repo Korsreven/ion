@@ -27,7 +27,7 @@ struct Camera
 
 struct Primitive
 {
-	sampler2D texture;
+	sampler2DArray texture;
 	bool has_texture;
 };
 
@@ -62,6 +62,7 @@ struct Light
 in vec3 vert_position;
 in vec4 vert_color;
 in vec2 vert_tex_coord;
+flat in int vert_tex_layer;
 
 out vec4 frag_color;
 
@@ -186,7 +187,7 @@ void main()
 
 	if (primitive.has_texture)
 	{
-		vec4 texture_color = texture(primitive.texture, vert_tex_coord);
+		vec4 texture_color = texture(primitive.texture, vec3(vert_tex_coord, vert_tex_layer));
 		ambient_color *= texture_color;
 		diffuse_color *= texture_color;
 		specular_color = texture_color;

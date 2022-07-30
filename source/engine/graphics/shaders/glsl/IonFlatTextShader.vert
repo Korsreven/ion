@@ -24,6 +24,7 @@ layout (location = 2) in vec3 vertex_tex_coord;
 
 out vec4 vert_color;
 out vec2 vert_tex_coord;
+flat out int vert_tex_layer;
 
 uniform Matrix matrix;
 
@@ -32,6 +33,7 @@ void main()
 {
     vert_color = vertex_color;
     vert_tex_coord = vertex_tex_coord.st;
+    vert_tex_layer = int(floor(vertex_tex_coord.p + 0.5));
 
     gl_Position = matrix.model_view_projection * vec4(vertex_position, 1.0);
 }

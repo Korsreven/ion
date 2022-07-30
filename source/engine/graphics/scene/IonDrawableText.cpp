@@ -137,6 +137,15 @@ std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const fonts::Text &text,
 	Rendering
 */
 
+int get_glyph_vertex_count(const glyph_vertex_streams &glyph_streams) noexcept
+{
+	auto count = 0;
+	for (auto &stream : glyph_streams)
+		count += std::ssize(stream.vertex_data);
+	return count;
+}
+
+
 Color get_foreground_color(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept
 {
 	return text_block.ForegroundColor ? *text_block.ForegroundColor : text.DefaultForegroundColor();
@@ -162,6 +171,14 @@ std::optional<Color> get_text_decoration_color(const fonts::text::TextBlock &tex
 	return text_block.DecorationColor ? text_block.DecorationColor : text.DefaultDecorationColor();
 }
 
+
+fonts::Font* get_default_font(const fonts::Text &text) noexcept
+{
+	if (auto type_face = text.Lettering(); type_face)
+		return fonts::utilities::detail::get_font(*type_face, {});
+	else
+		return nullptr;
+}
 
 fonts::Font* get_default_font(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept
 {
@@ -253,7 +270,7 @@ real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const 
 }
 
 
-vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
+fixed_vertex_container get_glyph_vertex_data(real glyph_index, const fonts::font::GlyphMetric &metric,
 	const Vector3 &position, real rotation, const Vector2 &scaling,
 	const Color &color, real opacity, const Vector3 &origin)
 {
@@ -300,36 +317,36 @@ vertex_container get_glyph_vertex_data(const fonts::font::GlyphMetric &metric,
 			//Vertex #1
 			v1.X(), v1.Y(), v1.Z(),
 			r, g, b, a,
-			0.0_r, 0.0_r, 0.0_r,
+			0.0_r, 0.0_r, glyph_index,
 
 			//Vertex #2
 			v2.X(), v2.Y(), v2.Z(),
 			r, g, b, a,
-			0.0_r, t, 0.0_r,
+			0.0_r, t, glyph_index,
 
 			//Vertex #3
 			v3.X(), v3.Y(), v3.Z(),
 			r, g, b, a,
-			s, t, 0.0_r,
+			s, t, glyph_index,
 
 			//Vertex #4
 			v3.X(), v3.Y(), v3.Z(),
 			r, g, b, a,
-			s, t, 0.0_r,
+			s, t, glyph_index,
 
 			//Vertex #5
 			v4.X(), v4.Y(), v4.Z(),
 			r, g, b, a,
-			s, 0.0_r, 0.0_r,
+			s, 0.0_r, glyph_index,
 
 			//Vertex #6
 			v1.X(), v1.Y(), v1.Z(),
 			r, g, b, a,
-			0.0_r, 0.0_r, 0.0_r
+			0.0_r, 0.0_r, glyph_index
 		};
 }
 
-decoration_vertex_container get_decoration_vertex_data(
+fixed_vertex_container get_decoration_vertex_data(
 	const Vector3 &position, real rotation, const Vector2 &size,
 	const Color &color, real opacity, const Vector3 &origin)
 {
@@ -464,36 +481,56 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 					if (auto glyph_index = fonts::utilities::detail::get_glyph_index(c, *metrics);
 						glyph_index < std::size(*metrics))
 					{
-						//Update existing stream
-						if (glyph_count < std::ssize(glyph_streams))
-						{
-							glyph_streams[glyph_count].vertex_data =
-								get_glyph_vertex_data((*metrics)[glyph_index],
-									position, rotation, scaling,
-									foreground_color, opacity, origin);
-							glyph_streams[glyph_count].vertex_batch.VertexData(glyph_streams[glyph_count].vertex_data);
-							glyph_streams[glyph_count].vertex_batch.BatchTexture((*handle).Get(glyph_index));
-						}
+						auto vertex_data =
+							get_glyph_vertex_data(glyph_index, (*metrics)[glyph_index],
+								position, rotation, scaling,
+								foreground_color, opacity, origin);
 
-						//New stream
+						if (handle->Type == textures::texture::TextureType::ArrayTexture2D)
+						{
+							//New stream
+							if (std::empty(glyph_streams))
+							{
+								glyph_streams.emplace_back(vertex_container{}, (*handle)[0]);
+								glyph_streams.back().vertex_data.reserve(glyph_count * std::size(vertex_data));
+							}
+
+							glyph_streams.back().vertex_data.insert(std::end(glyph_streams.back().vertex_data),
+								std::begin(vertex_data), std::end(vertex_data));
+						}
 						else
 						{
-							glyph_streams.emplace_back(
-								get_glyph_vertex_data((*metrics)[glyph_index],
-									position, rotation, scaling,
-									foreground_color, opacity, origin),
-								(*handle).Get(glyph_index)
-							);
+							//Update existing stream
+							if (glyph_count < std::ssize(glyph_streams))
+							{
+								glyph_streams[glyph_count].vertex_data.clear();
+								glyph_streams[glyph_count].vertex_batch.BatchTexture((*handle)[glyph_index]);
+							}
 
-							glyph_streams.back().vertex_batch.UseVertexArray(false);
-								//Turn off vertex array object (VAO) for each glyph
-								//There could be a lot of glyphs in a text,
-								//so keep hardware VAOs for other geometry
+							//New stream
+							else
+							{
+								glyph_streams.emplace_back(vertex_container{}, (*handle)[glyph_index]);
+								glyph_streams.back().vertex_data.reserve(std::size(vertex_data));
+								glyph_streams.back().vertex_batch.UseVertexArray(false);
+									//Turn off vertex array object (VAO) for each glyph (when using Texture2D)
+									//There could be a lot of glyphs in a text, so keep hardware VAOs for other geometry
+							}
+
+							glyph_streams[glyph_count].vertex_data.insert(std::end(glyph_streams[glyph_count].vertex_data),
+								std::begin(vertex_data), std::end(vertex_data));
+							glyph_streams[glyph_count].vertex_batch.VertexData(glyph_streams[glyph_count].vertex_data);
 						}
 
 						position.X(position.X() + (*metrics)[glyph_index].Advance * scaling);
 						++glyph_count;
 					}
+				}
+
+				if (handle->Type == textures::texture::TextureType::ArrayTexture2D)
+				{
+					if (!std::empty(glyph_streams))
+						glyph_streams.back().vertex_batch.VertexData(glyph_streams.back().vertex_data);
 				}
 
 				position.Y(base_y);
@@ -575,23 +612,26 @@ void get_text_vertex_streams(const fonts::Text &text, Vector3 position, real rot
 
 void DrawableText::PrepareVertexStreams()
 {
-	auto glyph_count = text_->UnformattedDisplayedCharacterCount();
-	auto back_decoration_count = std::ssize(decoration_vertex_stream_.back_vertex_data);
-	auto front_decoration_count = std::ssize(decoration_vertex_stream_.front_vertex_data);
+	auto glyph_vertex_count = detail::get_glyph_vertex_count(glyph_vertex_streams_);
+	auto back_decoration_vertex_count = std::ssize(decoration_vertex_stream_.back_vertex_data);
+	auto front_decoration_vertex_count = std::ssize(decoration_vertex_stream_.front_vertex_data);
 
-	if (glyph_count > static_cast<int>(glyph_vertex_streams_.capacity()))
+	//Glyphs
+	if (glyph_vertex_count > 0)
 	{
-		glyph_vertex_streams_.reserve(glyph_count);
-		reload_vertex_buffer_ = true;
+		for (auto &stream : glyph_vertex_streams_)
+			stream.vertex_data.clear();
 	}
 
-	if (front_decoration_count > 0)
+	//Front decoration
+	if (front_decoration_vertex_count > 0)
 	{
 		decoration_vertex_stream_.front_vertex_data.clear();
 		decoration_vertex_stream_.front_vertex_batch.VertexData(decoration_vertex_stream_.front_vertex_data);
 	}
 
-	if (back_decoration_count > 0)
+	//Back decoration
+	if (back_decoration_vertex_count > 0)
 	{
 		decoration_vertex_stream_.back_vertex_data.clear();
 		decoration_vertex_stream_.back_vertex_batch.VertexData(decoration_vertex_stream_.back_vertex_data);
@@ -602,22 +642,28 @@ void DrawableText::PrepareVertexStreams()
 		glyph_vertex_streams_, decoration_vertex_stream_);
 
 
-	if (std::ssize(glyph_vertex_streams_) > glyph_count)
-		glyph_vertex_streams_.erase(std::begin(glyph_vertex_streams_) + glyph_count, std::end(glyph_vertex_streams_));
+	//Glyphs
+	if (!std::empty(glyph_vertex_streams_))
+	{
+		if (detail::get_glyph_vertex_count(glyph_vertex_streams_) > glyph_vertex_count)
+			reload_vertex_buffer_ = true;
+	}
 
+	//Front decoration
 	if (!std::empty(decoration_vertex_stream_.front_vertex_data))
 	{
 		decoration_vertex_stream_.front_vertex_batch.VertexData(decoration_vertex_stream_.front_vertex_data);
 
-		if (std::ssize(decoration_vertex_stream_.front_vertex_data) > front_decoration_count)
+		if (std::ssize(decoration_vertex_stream_.front_vertex_data) > front_decoration_vertex_count)
 			reload_vertex_buffer_ = true;
 	}
 
+	//Back decoration
 	if (!std::empty(decoration_vertex_stream_.back_vertex_data))
 	{
 		decoration_vertex_stream_.back_vertex_batch.VertexData(decoration_vertex_stream_.back_vertex_data);
 
-		if (std::ssize(decoration_vertex_stream_.back_vertex_data) > back_decoration_count)
+		if (std::ssize(decoration_vertex_stream_.back_vertex_data) > back_decoration_vertex_count)
 			reload_vertex_buffer_ = true;
 	}
 }
@@ -704,7 +750,7 @@ void DrawableText::Prepare() noexcept
 		{
 			if (!std::empty(glyph_vertex_streams_))
 			{
-				auto glyph_size = detail::vertex_components * 6;
+				auto glyph_size = detail::get_glyph_vertex_count(glyph_vertex_streams_);
 				auto back_decoration_size = std::ssize(decoration_vertex_stream_.back_vertex_data);
 				auto front_decoration_size = std::ssize(decoration_vertex_stream_.front_vertex_data);
 
@@ -748,7 +794,6 @@ void DrawableText::Prepare() noexcept
 		update_bounding_volumes_ = false;
 	}
 }
-
 
 void DrawableText::Draw(shaders::ShaderProgram *shader_program) noexcept
 {

@@ -672,6 +672,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto fonts = ion::make_owning<ion::graphics::fonts::FontManager>();
 			fonts->CreateRepository(std::move(font_repository));
+			fonts->FontGlyphTextureType(ion::graphics::fonts::font_manager::GlyphTextureType::ArrayTexture2D);
 
 			auto sounds = ion::make_owning<ion::sounds::SoundManager>();
 			sounds->CreateRepository(std::move(audio_repository));
@@ -810,7 +811,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scene_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
 			scene_script.CreateScene("scene.ion", scene_graph->RootNode(), *scene_manager);
 
-			ion::script::interfaces::GuiThemeScriptInterface gui_theme_script;
+			/*ion::script::interfaces::GuiThemeScriptInterface gui_theme_script;
 			gui_theme_script.CreateScriptRepository(script_repository);
 			gui_theme_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			gui_theme_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
@@ -822,7 +823,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			gui_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			gui_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			gui_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			gui_script.CreateGui("gui.ion", controller, *gui_scene_manager);
+			gui_script.CreateGui("gui.ion", controller, *gui_scene_manager);*/
 
 
 			//Textures
@@ -1150,7 +1151,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				camera_struct->CreateUniform<glsl::vec3>("position");	
 
 				//Primitive
-				primitive_struct->CreateUniform<glsl::sampler2D>("texture");
+				primitive_struct->CreateUniform<glsl::sampler2DArray>("texture");
 				primitive_struct->CreateUniform<bool>("has_texture");
 
 				//Fog
@@ -1273,7 +1274,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				scene_struct->CreateUniform<float>("gamma");
 
 				//Primitive
-				primitive_struct->CreateUniform<glsl::sampler2D>("texture");
+				primitive_struct->CreateUniform<glsl::sampler2DArray>("texture");
 				primitive_struct->CreateUniform<bool>("has_texture");
 
 				shader_programs->LoadShaderVariableLocations(*flat_text_program);
@@ -2309,11 +2310,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				viewport->ConnectedCamera(camera);
 
 			auto text = scene_manager->GetText("fps");
+			auto text2 = scene_manager->GetText("pangram");
 			auto player_node = scene_graph->RootNode().GetDescendantNode("player_node");
-			auto ship_node = player_node->GetChildNode("ship_node");
-			auto light_node = ship_node->GetChildNode("ship_light_node");
-			auto timeline = ship_node->GetTimeline("ship_idle_timeline");
+			auto ship_node = player_node ? player_node->GetChildNode("ship_node") : nullptr;
+			auto light_node = ship_node ? ship_node->GetChildNode("ship_light_node") : nullptr;
+			auto timeline = ship_node ? ship_node->GetTimeline("ship_idle_timeline"): nullptr;
 
+			controller.Visible(false);
 
 			//Game
 			game.scene_graph = scene_graph;	

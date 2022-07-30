@@ -19,13 +19,14 @@ struct Scene
 
 struct Primitive
 {
-	sampler2D texture;
+	sampler2DArray texture;
 	bool has_texture;
 };
 
 
 in vec4 vert_color;
 in vec2 vert_tex_coord;
+flat in int vert_tex_layer;
 
 out vec4 frag_color;
 
@@ -39,7 +40,7 @@ void main()
 	vec4 color = vert_color;
 
 	if (primitive.has_texture)
-		color *= texture(primitive.texture, vert_tex_coord);
+		color *= texture(primitive.texture, vec3(vert_tex_coord, vert_tex_layer));
 	
 	
 	//Gamma correction

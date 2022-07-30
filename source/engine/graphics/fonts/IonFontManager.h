@@ -65,7 +65,7 @@ namespace ion::graphics::fonts
 	{
 		private:
 			
-			font_manager::GlyphTextureType glyph_texture_type_ = font_manager::GlyphTextureType::Texture2D;
+			font_manager::GlyphTextureType glyph_texture_type_ = font_manager::GlyphTextureType::ArrayTexture2D;
 
 		protected:
 

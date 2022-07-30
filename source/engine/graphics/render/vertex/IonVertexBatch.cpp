@@ -309,24 +309,6 @@ void bind_texture(textures::texture::TextureHandle texture_handle, int texture_u
 	glBindTexture(gl_texture_type, texture_handle.Id);
 }
 
-void unbind_textures() noexcept
-{
-	switch (gl::MultiTexture_Support())
-	{
-		case gl::Extension::Core:
-		glActiveTexture(GL_TEXTURE0);
-		break;
-
-		case gl::Extension::ARB:
-		glActiveTextureARB(GL_TEXTURE0_ARB);
-		break;
-	}
-
-	glDisable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-}
-
 
 void set_material_uniforms(materials::Material *material, duration time, shaders::ShaderProgram &shader_program) noexcept
 {
@@ -419,10 +401,21 @@ void set_texture_uniforms(texture_type &some_texture, duration time, shaders::Sh
 	{
 		if (auto texture_handle = get_texture_handle(some_texture, time); texture_handle)
 		{
-			if (auto texture_unit = texture->Get<glsl::sampler2D>(); texture_unit >= 0)
+			if (texture_handle->Type == textures::texture::TextureType::ArrayTexture2D)
 			{
-				bind_texture(*texture_handle, texture_unit);
-				texture_activated = true;
+				if (auto texture_unit = texture->Get<glsl::sampler2DArray>(); texture_unit >= 0)
+				{
+					bind_texture(*texture_handle, texture_unit);
+					texture_activated = true;
+				}
+			}
+			else
+			{
+				if (auto texture_unit = texture->Get<glsl::sampler2D>(); texture_unit >= 0)
+				{
+					bind_texture(*texture_handle, texture_unit);
+					texture_activated = true;
+				}
 			}
 		}
 	}
@@ -647,6 +640,13 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 
 		if (!shader_in_use)
 			shader_program->Owner()->DeactivateShaderProgram(*shader_program);
+
+		//Has material or texture
+		if (material_ || texture_.index() > 0)
+		{
+			detail::bind_texture({0}, 0);
+			detail::bind_texture({0, textures::texture::TextureType::ArrayTexture2D}, 0);
+		}
 	}
 	else //Fixed-function pipeline
 	{
@@ -658,11 +658,11 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 			if (use_vbo)
 				vbo_->Unbind();
 		}
-	}
 
-	//Has material or texture
-	if (material_ || texture_.index() > 0)
-		detail::unbind_textures();
+		//Has material or texture
+		if (material_ || texture_.index() > 0)
+			detail::bind_texture({0});
+	}
 }
 
 
