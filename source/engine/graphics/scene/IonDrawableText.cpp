@@ -613,7 +613,10 @@ void DrawableText::PrepareVertexStreams()
 
 	//Glyphs
 	if (glyph_vertex_count > 0)
-		glyph_vertex_streams_.clear();
+	{
+		for (auto &stream : glyph_vertex_streams_)
+			stream.second.vertex_data.clear();
+	}
 
 	//Front decoration
 	if (front_decoration_vertex_count > 0)
@@ -637,6 +640,12 @@ void DrawableText::PrepareVertexStreams()
 	//Glyphs
 	if (!std::empty(glyph_vertex_streams_))
 	{
+		glyph_vertex_streams_.erase_if(
+			[](auto &stream) noexcept
+			{
+				return std::empty(stream.second.vertex_data);
+			});
+
 		if (detail::get_glyph_vertex_count(glyph_vertex_streams_) > glyph_vertex_count)
 			reload_vertex_buffer_ = true;
 	}

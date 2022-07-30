@@ -810,7 +810,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scene_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
 			scene_script.CreateScene("scene.ion", scene_graph->RootNode(), *scene_manager);
 
-			/*ion::script::interfaces::GuiThemeScriptInterface gui_theme_script;
+			ion::script::interfaces::GuiThemeScriptInterface gui_theme_script;
 			gui_theme_script.CreateScriptRepository(script_repository);
 			gui_theme_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			gui_theme_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
@@ -822,7 +822,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			gui_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			gui_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			gui_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			gui_script.CreateGui("gui.ion", controller, *gui_scene_manager);*/
+			gui_script.CreateGui("gui.ion", controller, *gui_scene_manager);
 
 
 			//Textures
