@@ -672,7 +672,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto fonts = ion::make_owning<ion::graphics::fonts::FontManager>();
 			fonts->CreateRepository(std::move(font_repository));
-			fonts->FontGlyphTextureType(ion::graphics::fonts::font_manager::GlyphTextureType::ArrayTexture2D);
 
 			auto sounds = ion::make_owning<ion::sounds::SoundManager>();
 			sounds->CreateRepository(std::move(audio_repository));
@@ -2297,8 +2296,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//	shader_programs->GetShaderProgram("default_flat_model_prog"));
 			//gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
 			//	shader_programs->GetShaderProgram("default_flat_particle_prog"));
-			//gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
-			//	shader_programs->GetShaderProgram("default_flat_text_prog"));
+			gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
+				shader_programs->GetShaderProgram("default_flat_text_prog"));
 
 
 			//Pointers

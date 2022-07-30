@@ -21,6 +21,7 @@ File:	IonDrawableText.h
 #include <vector>
 
 #include "IonDrawableObject.h"
+#include "adaptors/IonFlatMap.h"
 #include "graphics/fonts/IonText.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
 #include "graphics/render/vertex/IonVertexBufferObject.h"
@@ -71,7 +72,7 @@ namespace ion::graphics::scene
 		using vertex_container = std::vector<real>;
 
 
-		struct glyph_vertex_stream
+		struct glyph_vertex_stream final
 		{
 			vertex_container vertex_data;
 			render::vertex::VertexBatch vertex_batch;
@@ -79,7 +80,7 @@ namespace ion::graphics::scene
 			glyph_vertex_stream(vertex_container vertex_data, textures::texture::TextureHandle texture_handle);
 		};
 
-		struct decoration_vertex_stream
+		struct decoration_vertex_stream final
 		{
 			vertex_container back_vertex_data;
 			vertex_container front_vertex_data;
@@ -89,7 +90,15 @@ namespace ion::graphics::scene
 			decoration_vertex_stream();
 		};
 
-		using glyph_vertex_streams = std::vector<glyph_vertex_stream>;
+		struct glyph_vertex_stream_key final
+		{
+			const fonts::Font *font = nullptr;
+			int glyph_index = 0;
+
+			bool operator<(const glyph_vertex_stream_key &key) const noexcept;
+		};
+
+		using glyph_vertex_streams = adaptors::FlatMap<glyph_vertex_stream_key, glyph_vertex_stream>;
 
 
 		inline auto get_vertex_declaration() noexcept

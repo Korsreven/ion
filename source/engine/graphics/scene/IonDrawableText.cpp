@@ -14,6 +14,7 @@ File:	IonDrawableText.cpp
 
 #include <algorithm>
 #include <cmath>
+#include <utility>
 
 #include "IonEngine.h"
 #include "graphics/IonGraphicsAPI.h"
@@ -63,6 +64,11 @@ decoration_vertex_stream::decoration_vertex_stream() :
 	}
 {
 	//Empty
+}
+
+bool glyph_vertex_stream_key::operator<(const glyph_vertex_stream_key &key) const noexcept
+{
+	return std::pair{font, glyph_index} < std::pair{key.font, key.glyph_index};
 }
 
 
@@ -141,7 +147,7 @@ int get_glyph_vertex_count(const glyph_vertex_streams &glyph_streams) noexcept
 {
 	auto count = 0;
 	for (auto &stream : glyph_streams)
-		count += std::ssize(stream.vertex_data);
+		count += std::ssize(stream.second.vertex_data);
 	return count;
 }
 
@@ -485,53 +491,42 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 							get_glyph_vertex_data(glyph_index, (*metrics)[glyph_index],
 								position, rotation, scaling,
 								foreground_color, opacity, origin);
+						auto iter = std::end(glyph_streams);
 
 						if (handle->Type == textures::texture::TextureType::ArrayTexture2D)
 						{
-							//New stream
-							if (std::empty(glyph_streams))
-							{
-								glyph_streams.emplace_back(vertex_container{}, (*handle)[0]);
-								glyph_streams.back().vertex_data.reserve(glyph_count * std::size(vertex_data));
-							}
+							auto key = glyph_vertex_stream_key{font};
+								//Group on font
 
-							glyph_streams.back().vertex_data.insert(std::end(glyph_streams.back().vertex_data),
-								std::begin(vertex_data), std::end(vertex_data));
+							//New stream
+							if (iter = glyph_streams.find(key); iter == std::end(glyph_streams))
+								iter = glyph_streams.emplace(std::make_pair(key, glyph_vertex_stream{vertex_container{}, (*handle)[0]})).first;
 						}
 						else
 						{
-							//Update existing stream
-							if (glyph_count < std::ssize(glyph_streams))
-							{
-								glyph_streams[glyph_count].vertex_data.clear();
-								glyph_streams[glyph_count].vertex_batch.BatchTexture((*handle)[glyph_index]);
-							}
+							auto key = glyph_vertex_stream_key{font, glyph_index};
+								//Group on font and glyph index
 
 							//New stream
-							else
+							if (iter = glyph_streams.find(key); iter == std::end(glyph_streams))
 							{
-								glyph_streams.emplace_back(vertex_container{}, (*handle)[glyph_index]);
-								glyph_streams.back().vertex_data.reserve(std::size(vertex_data));
-								glyph_streams.back().vertex_batch.UseVertexArray(false);
+								iter = glyph_streams.emplace(std::make_pair(key, glyph_vertex_stream{vertex_container{}, (*handle)[glyph_index]})).first;
+								iter->second.vertex_batch.UseVertexArray(false);
 									//Turn off vertex array object (VAO) for each glyph (when using Texture2D)
 									//There could be a lot of glyphs in a text, so keep hardware VAOs for other geometry
 							}
-
-							glyph_streams[glyph_count].vertex_data.insert(std::end(glyph_streams[glyph_count].vertex_data),
-								std::begin(vertex_data), std::end(vertex_data));
-							glyph_streams[glyph_count].vertex_batch.VertexData(glyph_streams[glyph_count].vertex_data);
 						}
+
+						iter->second.vertex_data.insert(std::end(iter->second.vertex_data),
+							std::begin(vertex_data), std::end(vertex_data));
 
 						position.X(position.X() + (*metrics)[glyph_index].Advance * scaling);
 						++glyph_count;
 					}
 				}
 
-				if (handle->Type == textures::texture::TextureType::ArrayTexture2D)
-				{
-					if (!std::empty(glyph_streams))
-						glyph_streams.back().vertex_batch.VertexData(glyph_streams.back().vertex_data);
-				}
+				for (auto &glyph_stream : glyph_streams)
+					glyph_stream.second.vertex_batch.VertexData(glyph_stream.second.vertex_data);
 
 				position.Y(base_y);
 			}
@@ -618,10 +613,7 @@ void DrawableText::PrepareVertexStreams()
 
 	//Glyphs
 	if (glyph_vertex_count > 0)
-	{
-		for (auto &stream : glyph_vertex_streams_)
-			stream.vertex_data.clear();
-	}
+		glyph_vertex_streams_.clear();
 
 	//Front decoration
 	if (front_decoration_vertex_count > 0)
@@ -764,7 +756,7 @@ void DrawableText::Prepare() noexcept
 
 					for (auto &stream : glyph_vertex_streams_)
 					{
-						stream.vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), glyph_size * sizeof(real)));
+						stream.second.vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), glyph_size * sizeof(real)));
 						offset += glyph_size;
 					}
 					
@@ -779,7 +771,7 @@ void DrawableText::Prepare() noexcept
 	decoration_vertex_stream_.back_vertex_batch.Prepare();
 
 	for (auto &stream : glyph_vertex_streams_)
-		stream.vertex_batch.Prepare();
+		stream.second.vertex_batch.Prepare();
 
 	decoration_vertex_stream_.front_vertex_batch.Prepare();
 
@@ -809,7 +801,7 @@ void DrawableText::Draw(shaders::ShaderProgram *shader_program) noexcept
 			//Draw back decorations before character glyphs
 
 		for (auto &stream : glyph_vertex_streams_)
-			stream.vertex_batch.Draw(shader_program);
+			stream.second.vertex_batch.Draw(shader_program);
 
 		decoration_vertex_stream_.front_vertex_batch.Draw(shader_program);
 			//Draw front decorations after character glyphs
@@ -831,7 +823,7 @@ void DrawableText::Elapse(duration time) noexcept
 		decoration_vertex_stream_.back_vertex_batch.Elapse(time);
 
 		for (auto &stream : glyph_vertex_streams_)
-			stream.vertex_batch.Elapse(time);
+			stream.second.vertex_batch.Elapse(time);
 
 		decoration_vertex_stream_.front_vertex_batch.Elapse(time);
 	}
