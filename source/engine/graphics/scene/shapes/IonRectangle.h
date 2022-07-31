@@ -110,7 +110,7 @@ namespace ion::graphics::scene::shapes
 			}
 
 			//Sets the size of this rectangle to the given size
-			inline void Size(const Vector2 &size) noexcept
+			inline virtual void Size(const Vector2 &size) noexcept
 			{
 				if (size_ != size)
 				{
@@ -163,13 +163,13 @@ namespace ion::graphics::scene::shapes
 
 
 			//Resizes this rectangle to fill out the given size, while keeping the aspect ratio
-			inline void ResizeToFill(const Vector2 &size)
+			inline void ResizeToFill(const Vector2 &size) noexcept
 			{
 				Size(rectangle::detail::scale_to_fill(size_, size));
 			}
 
 			//Resizes this rectangle to fit in the given size, while keeping the aspect ratio
-			inline void ResizeToFit(const Vector2 &size)
+			inline void ResizeToFit(const Vector2 &size) noexcept
 			{
 				Size(rectangle::detail::scale_to_fit(size_, size));
 			}

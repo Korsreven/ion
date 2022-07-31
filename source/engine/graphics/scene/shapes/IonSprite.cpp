@@ -140,6 +140,12 @@ void Sprite::SurfaceMaterialChanged() noexcept
 
 //Public
 
+Sprite::Sprite(NonOwningPtr<materials::Material> material, bool visible) :
+	Sprite{vector3::Zero, vector2::Zero, material, visible}
+{
+	//Empty
+}
+
 Sprite::Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible) :
 	Sprite{vector3::Zero, size, material, visible}
 {
@@ -159,6 +165,12 @@ Sprite::Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonO
 }
 
 
+Sprite::Sprite(NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
+	Sprite{vector3::Zero, vector2::Zero, material, color, visible}
+{
+	//Empty
+}
+
 Sprite::Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
 	Sprite{vector3::Zero, size, material, color, visible}
 {
@@ -175,7 +187,8 @@ Sprite::Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonO
 	Rectangle{rectangle::detail::rectangle_vertices(position, rotation, size, color),
 			  position, rotation, size, material, color, visible}
 {
-	//Empty
+	if (size == vector2::Zero)
+		AutoSize(true);
 }
 
 

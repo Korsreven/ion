@@ -428,6 +428,7 @@ ClassDefinition get_sprite_class()
 		.AddProperty("flip-horizontal", ParameterType::Boolean)
 		.AddProperty("flip-vertical", ParameterType::Boolean)
 		.AddProperty("repeat", ParameterType::Vector2)
+		.AddProperty("size", ParameterType::Vector2) //Make size optional
 		.AddProperty("tex-coords", {ParameterType::Vector2, ParameterType::Vector2});
 }
 
@@ -1459,7 +1460,7 @@ NonOwningPtr<shapes::AnimatedSprite> create_animated_sprite(const script_tree::O
 		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>();
 	auto size = object
 		.Property("size")[0]
-		.Get<ScriptType::Vector2>()->Get();
+		.Get<ScriptType::Vector2>().value_or(vector2::Zero).Get();
 	auto material_name = object
 		.Property("material")[0]
 		.Get<ScriptType::String>()->Get();
@@ -1738,7 +1739,7 @@ NonOwningPtr<shapes::Sprite> create_sprite(const script_tree::ObjectNode &object
 		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>());
 	auto size = object
 		.Property("size")[0]
-		.Get<ScriptType::Vector2>()->Get();
+		.Get<ScriptType::Vector2>().value_or(vector2::Zero).Get();
 	auto material_name = object
 		.Property("material")[0]
 		.Get<ScriptType::String>()->Get();

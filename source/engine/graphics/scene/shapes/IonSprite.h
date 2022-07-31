@@ -64,6 +64,9 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
+			//Construct a new sprite with the given material and visibility
+			explicit Sprite(NonOwningPtr<materials::Material> material, bool visible = true);
+
 			//Construct a new sprite with the given size, material and visibility
 			Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
@@ -73,6 +76,9 @@ namespace ion::graphics::scene::shapes
 			//Construct a new sprite with the given position, rotation, size, material and visibility
 			Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
+
+			//Construct a new sprite with the given material, color and visibility
+			Sprite(NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
 			//Construct a new sprite with the given size, material, color and visibility
 			Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
@@ -129,7 +135,7 @@ namespace ion::graphics::scene::shapes
 
 
 			//Sets the size of this sprite to the given size
-			inline void Size(const Vector2 &size) noexcept
+			inline void Size(const Vector2 &size) noexcept override
 			{
 				if (size_ != size)
 				{
@@ -183,50 +189,6 @@ namespace ion::graphics::scene::shapes
 			[[nodiscard]] inline auto SurfaceMaterial() const noexcept
 			{
 				return  Mesh::SurfaceMaterial();
-			}
-
-
-			/*
-				Keep aspect ratio
-			*/
-
-			//Sets the width of this sprite to the given width, while keeping the aspect ratio
-			inline void Width(real width) noexcept
-			{
-				if (auto [w, h] = size_.XY(); w != width && w > 0.0_r)
-				{
-					Rectangle::Width(width);
-					auto_size_ = false;
-
-					if (auto_repeat_)
-						RecalculateTexCoords();
-				}
-			}
-
-			//Sets the height of this sprite to the given height, while keeping the aspect ratio
-			inline void Height(real height) noexcept
-			{
-				if (auto [w, h] = size_.XY(); h != height && h > 0.0_r)
-				{
-					Rectangle::Height(height);
-					auto_size_ = false;
-
-					if (auto_repeat_)
-						RecalculateTexCoords();
-				}
-			}
-
-
-			//Resizes this sprite to fill out the given size, while keeping the aspect ratio
-			inline void ResizeToFill(const Vector2 &size)
-			{
-				Size(rectangle::detail::scale_to_fill(size_, size));
-			}
-
-			//Resizes this sprite to fit in the given size, while keeping the aspect ratio
-			inline void ResizeToFit(const Vector2 &size)
-			{
-				Size(rectangle::detail::scale_to_fit(size_, size));
 			}
 
 
