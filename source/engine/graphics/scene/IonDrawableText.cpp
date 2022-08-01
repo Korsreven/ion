@@ -525,8 +525,8 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 					}
 				}
 
-				for (auto &glyph_stream : glyph_streams)
-					glyph_stream.second.vertex_batch.VertexData(glyph_stream.second.vertex_data);
+				for (auto &stream : glyph_streams)
+					stream.second.vertex_batch.VertexData(stream.second.vertex_data);
 
 				position.Y(base_y);
 			}
@@ -751,25 +751,26 @@ void DrawableText::Prepare() noexcept
 		{
 			if (!std::empty(glyph_vertex_streams_))
 			{
-				auto glyph_size = detail::get_glyph_vertex_count(glyph_vertex_streams_);
-				auto back_decoration_size = std::ssize(decoration_vertex_stream_.back_vertex_data);
-				auto front_decoration_size = std::ssize(decoration_vertex_stream_.front_vertex_data);
+				auto glyph_vertex_count = detail::get_glyph_vertex_count(glyph_vertex_streams_);
+				auto back_decoration_vertex_count = std::ssize(decoration_vertex_stream_.back_vertex_data);
+				auto front_decoration_vertex_count = std::ssize(decoration_vertex_stream_.front_vertex_data);
 
-				vbo_->Reserve((std::ssize(glyph_vertex_streams_) * glyph_size + back_decoration_size + front_decoration_size) * sizeof(real));
+				vbo_->Reserve((glyph_vertex_count + back_decoration_vertex_count + front_decoration_vertex_count) * sizeof(real));
 
 				{
 					auto offset = 0;
 
-					decoration_vertex_stream_.back_vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), back_decoration_size * sizeof(real)));
-					offset += back_decoration_size;
+					decoration_vertex_stream_.back_vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), back_decoration_vertex_count * sizeof(real)));
+					offset += back_decoration_vertex_count;
 
 					for (auto &stream : glyph_vertex_streams_)
 					{
-						stream.second.vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), glyph_size * sizeof(real)));
-						offset += glyph_size;
+						glyph_vertex_count = std::ssize(stream.second.vertex_data);
+						stream.second.vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), glyph_vertex_count * sizeof(real)));
+						offset += glyph_vertex_count;
 					}
 					
-					decoration_vertex_stream_.front_vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), front_decoration_size * sizeof(real)));
+					decoration_vertex_stream_.front_vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), front_decoration_vertex_count * sizeof(real)));
 				}
 			}
 		}
