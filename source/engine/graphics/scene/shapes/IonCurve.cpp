@@ -13,8 +13,9 @@ File:	IonCurve.cpp
 #include "IonCurve.h"
 
 #include <cmath>
+
+#include "IonLine.h"
 #include "utilities/IonMath.h"
-#include "graphics/IonGraphicsAPI.h"
 
 namespace ion::graphics::scene::shapes
 {
@@ -134,11 +135,16 @@ Curve::Curve(ControlPoints control_points, const Color &color, real thickness, i
 	Drawing
 */
 
-void Curve::Draw(shaders::ShaderProgram *shader_program) noexcept
+void Curve::DrawStarted() noexcept
 {
-	glLineWidth(static_cast<float>(thickness_));
-	Mesh::Draw(shader_program);
-	glLineWidth(1.0f);
+	line::detail::set_line_width(thickness_);
+	Shape::DrawStarted();
+}
+
+void Curve::DrawEnded() noexcept
+{
+	Shape::DrawEnded();
+	line::detail::set_line_width(1.0_r);
 }
 
 } //ion::graphics::scene::shapes

@@ -28,6 +28,16 @@ mesh::Vertices line_vertices(const Vector3 &a, const Vector3 &b, const Color &co
 			{b, vector3::UnitZ, color}};
 }
 
+
+/*
+	Graphics API
+*/
+
+void set_line_width(real thickness) noexcept
+{
+	glLineWidth(static_cast<float>(thickness));
+}
+
 } //line::detail
 
 
@@ -67,11 +77,16 @@ Line::Line(const Vector3 &a, const Vector3 &b, const Color &color, real thicknes
 	Drawing
 */
 
-void Line::Draw(shaders::ShaderProgram *shader_program) noexcept
+void Line::DrawStarted() noexcept
 {
-	glLineWidth(static_cast<float>(thickness_));
-	Mesh::Draw(shader_program);
-	glLineWidth(1.0f);
+	detail::set_line_width(thickness_);
+	Shape::DrawStarted();
+}
+
+void Line::DrawEnded() noexcept
+{
+	Shape::DrawEnded();
+	detail::set_line_width(1.0_r);
 }
 
 } //ion::graphics::scene::shapes

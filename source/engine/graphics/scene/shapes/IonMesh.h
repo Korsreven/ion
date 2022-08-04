@@ -157,19 +157,22 @@ namespace ion::graphics::scene::shapes
 	{
 		private:
 
+			vertex::vertex_batch::VertexDrawMode draw_mode_ = vertex::vertex_batch::VertexDrawMode::Triangles;
 			mesh::VertexContainer vertex_data_;
+			NonOwningPtr<materials::Material> material_;
 			mesh::MeshTexCoordMode tex_coord_mode_ = mesh::MeshTexCoordMode::Auto;
-			bool include_bounding_volumes_ = true;
 			bool show_wireframe_ = false;
+			bool include_bounding_volumes_ = true;
 			bool visible_ = true;
 			
 			Aabb aabb_;
 			Obb obb_;
 			Sphere sphere_;
 
-			vertex::VertexBatch vertex_batch_;
 			bool update_bounding_volumes_ = false;
 			bool update_tex_coords_ = false;
+			bool update_vertex_data_ = false;
+			bool reload_ = false;
 
 		protected:
 
@@ -221,31 +224,56 @@ namespace ion::graphics::scene::shapes
 				Modifiers
 			*/
 
+			//Sets the draw mode of this mesh to the given mode
+			inline void DrawMode(vertex::vertex_batch::VertexDrawMode draw_mode) noexcept
+			{
+				if (draw_mode_ != draw_mode)
+				{
+					draw_mode_ = draw_mode;
+					reload_ = true;
+				}
+			}
+
 			//Sets the vertex data of this mesh to the given vertices
 			inline void VertexData(const mesh::Vertices &vertices) noexcept
 			{
-				//Check if vertex buffer has enough allocated space for the new vertex data
-				if (auto vbo = vertex_batch_.VertexBuffer();
-					!vbo || vbo->Size() <= std::ssize(vertices) * mesh::detail::vertex_components * static_cast<int>(sizeof(real)))
-				{
-					vertex_data_ = mesh::detail::vertices_to_vertex_data(vertices);
-					vertex_batch_.VertexData(vertex_data_);
-					update_bounding_volumes_ = true;
-					update_tex_coords_ = true;
-				}
+				auto size = std::size(vertex_data_);
+				vertex_data_ = mesh::detail::vertices_to_vertex_data(vertices);
+				update_bounding_volumes_ = true;
+				update_tex_coords_ = true;
+				
+				if (size != std::size(vertex_data_))
+					reload_ = true;
 			}
 
 			//Sets the vertex data of this mesh to the given raw vertex data
 			inline void VertexData(mesh::VertexContainer vertex_data) noexcept
 			{
-				//Check if vertex buffer has enough allocated space for the new vertex data
-				if (auto vbo = vertex_batch_.VertexBuffer();
-					!vbo || vbo->Size() <= std::ssize(vertex_data) * static_cast<int>(sizeof(real)))
+				auto size = std::size(vertex_data_);
+				vertex_data_ = std::move(vertex_data);
+				update_bounding_volumes_ = true;
+				update_tex_coords_ = true;
+
+				if (size != std::size(vertex_data_))
+					reload_ = true;
+			}
+
+			//Sets the color of all vertices in this mesh to the given color
+			void VertexColor(const Color &color) noexcept;
+
+			//Sets the opacity of all vertices in this mesh to the given percent
+			void VertexOpacity(real percent) noexcept;
+
+
+			//Sets the surface material used by this mesh to the given material
+			inline void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
+			{
+				if (material_ != material)
 				{
-					vertex_data_ = std::move(vertex_data);
-					vertex_batch_.VertexData(vertex_data_);
-					update_bounding_volumes_ = true;
+					material_ = material;
 					update_tex_coords_ = true;
+					reload_ = true;
+					SurfaceMaterialChanged();
 				}
 			}
 
@@ -259,6 +287,13 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
+
+			//Sets if this mesh should be shown in wireframe or not
+			inline void ShowWireframe(bool show) noexcept
+			{
+				show_wireframe_ = show;
+			}
+
 			//Sets if the bounding volumes from this mesh should be included in the model or not
 			inline void IncludeBoundingVolumes(bool include) noexcept
 			{
@@ -269,46 +304,14 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets if this mesh should be shown in wireframe or not
-			inline void ShowWireframe(bool show) noexcept
-			{
-				show_wireframe_ = show;
-			}
-
 			//Sets the visibility of this mesh to the given value
 			inline void Visible(bool visible) noexcept
 			{
-				visible_ = visible;
-			}
-
-
-			//Sets the draw mode of this mesh to the given mode
-			inline void DrawMode(vertex::vertex_batch::VertexDrawMode draw_mode) noexcept
-			{
-				vertex_batch_.DrawMode(draw_mode);
-			}
-
-			//Sets the color of all vertices in this mesh to the given color
-			void VertexColor(const Color &color) noexcept;
-
-			//Sets the opacity of all vertices in this mesh to the given percent
-			void VertexOpacity(real percent) noexcept;
-
-			//Sets the surface material used by this mesh to the given material
-			inline void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
-			{
-				if (vertex_batch_.BatchMaterial() != material)
+				if (visible_ != visible)
 				{
-					vertex_batch_.BatchMaterial(material);
-					update_tex_coords_ = true;
-					SurfaceMaterialChanged();
+					visible_ = visible;
+					reload_ = true;
 				}
-			}
-
-			//Sets the vertex buffer to the given vertex buffer
-			inline void VertexBuffer(vertex::VertexBufferView vertex_buffer, bool reload_data = true) noexcept
-			{
-				vertex_batch_.VertexBuffer(vertex_buffer, reload_data);
 			}
 
 
@@ -316,22 +319,55 @@ namespace ion::graphics::scene::shapes
 				Observers
 			*/
 
+			//Returns the draw mode of this mesh
+			[[nodiscard]] inline auto DrawMode() const noexcept
+			{
+				return draw_mode_;
+			}
+
 			//Returns all of the vertex data from this mesh
 			[[nodiscard]] inline auto& VertexData() const noexcept
 			{
 				return vertex_data_;
 			}
 
-			//Returns true if the bounding volumes from this mesh should be included in the model
-			[[nodiscard]] inline auto IncludeBoundingVolumes() const noexcept
+			//Returns the vertex color of this mesh (from first vertex)
+			[[nodiscard]] Color VertexColor() const noexcept;
+
+			//Returns the vertex opacity of this mesh (from first vertex)
+			[[nodiscard]] real VertexOpacity() const noexcept;
+
+
+			//Returns a pointer to the material used by this mesh
+			//Returns nullptr if this mesh does not have a material
+			[[nodiscard]] inline auto SurfaceMaterial() const noexcept
 			{
-				return include_bounding_volumes_;
+				return material_;
 			}
+
+			//Returns the tex coord mode of this mesh
+			[[nodiscard]] inline auto TexCoordMode() const noexcept
+			{
+				return tex_coord_mode_;
+			}
+
 
 			//Returns true if this mesh is shown in wireframe
 			[[nodiscard]] inline auto ShowWireframe() const noexcept
 			{
 				return show_wireframe_;
+			}
+
+			//Returns the thickness of this mesh (only for lines/curves)
+			[[nodiscard]] inline virtual real Thickness() const noexcept
+			{
+				return 0.0_r;
+			}
+
+			//Returns true if the bounding volumes from this mesh should be included in the model
+			[[nodiscard]] inline auto IncludeBoundingVolumes() const noexcept
+			{
+				return include_bounding_volumes_;
 			}
 
 			//Returns true if this mesh is visible
@@ -360,32 +396,6 @@ namespace ion::graphics::scene::shapes
 			}
 
 
-			//Returns the draw mode of this mesh
-			[[nodiscard]] inline auto DrawMode() const noexcept
-			{
-				return vertex_batch_.DrawMode();
-			}		
-
-			//Returns the vertex count of this mesh
-			[[nodiscard]] inline auto VertexCount() const noexcept
-			{
-				return vertex_batch_.VertexCount();
-			}
-
-			//Returns the vertex color of this mesh (from first vertex)
-			[[nodiscard]] Color VertexColor() const noexcept;
-
-			//Returns the vertex opacity of this mesh (from first vertex)
-			[[nodiscard]] real VertexOpacity() const noexcept;
-
-			//Returns a pointer to the material used by this mesh
-			//Returns nullptr if this mesh does not have a material
-			[[nodiscard]] inline auto SurfaceMaterial() const noexcept
-			{
-				return vertex_batch_.BatchMaterial();
-			}
-
-
 			/*
 				Preparing / drawing
 			*/
@@ -394,9 +404,14 @@ namespace ion::graphics::scene::shapes
 			//This is called once regardless of passes
 			virtual mesh::MeshBoundingVolumeStatus Prepare() noexcept;
 
-			//Draw this mesh with the given shader program (optional)
+
+			//Called just before this mesh will be drawn
 			//This can be called multiple times if more than one pass
-			virtual void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept;
+			virtual void DrawStarted() noexcept;
+
+			//Called just after this mesh has been drawn
+			//This can be called multiple times if more than one pass
+			virtual void DrawEnded() noexcept;
 
 
 			/*

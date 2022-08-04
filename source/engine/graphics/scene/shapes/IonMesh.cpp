@@ -18,6 +18,7 @@ File:	IonMesh.cpp
 
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/materials/IonMaterial.h"
+#include "graphics/scene/IonModel.h"
 #include "graphics/shaders/IonShaderProgram.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
 
@@ -224,10 +225,10 @@ Mesh::Mesh(const Vertices &vertices, NonOwningPtr<materials::Material> material,
 
 Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const Vertices &vertices, bool visible) :
 
+	draw_mode_{draw_mode},
 	vertex_data_{detail::vertices_to_vertex_data(vertices)},
 	visible_{visible},
 
-	vertex_batch_{draw_mode, detail::get_vertex_declaration(), vertex_data_},
 	update_bounding_volumes_{true},
 	update_tex_coords_{true}
 {
@@ -237,11 +238,11 @@ Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const Vertices &verti
 Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const Vertices &vertices, NonOwningPtr<materials::Material> material,
 	MeshTexCoordMode tex_coord_mode, bool visible) :
 	
+	draw_mode_{draw_mode},
 	vertex_data_{detail::vertices_to_vertex_data(vertices)},
 	tex_coord_mode_{tex_coord_mode},
 	visible_{visible},
 
-	vertex_batch_{draw_mode, detail::get_vertex_declaration(), vertex_data_, material},
 	update_bounding_volumes_{true},
 	update_tex_coords_{true}
 {
@@ -265,10 +266,10 @@ Mesh::Mesh(VertexContainer vertex_data, NonOwningPtr<materials::Material> materi
 
 Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, VertexContainer vertex_data, bool visible) :
 
+	draw_mode_{draw_mode},
 	vertex_data_{std::move(vertex_data)},
 	visible_{visible},
 
-	vertex_batch_{draw_mode, detail::get_vertex_declaration(), vertex_data_},
 	update_bounding_volumes_{true},
 	update_tex_coords_{true}
 {
@@ -278,11 +279,11 @@ Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, VertexContainer verte
 Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
 	MeshTexCoordMode tex_coord_mode, bool visible) :
 
+	draw_mode_{draw_mode},
 	vertex_data_{std::move(vertex_data)},
 	tex_coord_mode_{tex_coord_mode},
 	visible_{visible},
 
-	vertex_batch_{draw_mode, detail::get_vertex_declaration(), vertex_data_, material},
 	update_bounding_volumes_{true},
 	update_tex_coords_{true}
 {
@@ -299,7 +300,7 @@ void Mesh::VertexColor(const Color &color) noexcept
 	for (auto i = detail::color_offset; i < std::ssize(vertex_data_); i += detail::vertex_components)
 		std::copy(color.Channels(), color.Channels() + detail::color_components, std::begin(vertex_data_) + i);
 
-	vertex_batch_.ReloadData();
+	update_vertex_data_ = true;
 	VertexColorChanged();
 }
 
@@ -308,7 +309,7 @@ void Mesh::VertexOpacity(real percent) noexcept
 	for (auto i = detail::color_offset; i < std::ssize(vertex_data_); i += detail::vertex_components)
 		vertex_data_[i + 3] = percent;
 
-	vertex_batch_.ReloadData();
+	update_vertex_data_ = true;
 	VertexOpacityChanged();
 }
 
@@ -340,14 +341,9 @@ real Mesh::VertexOpacity() const noexcept
 
 MeshBoundingVolumeStatus Mesh::Prepare() noexcept
 {
-	//Make sure, if vertex data view has been initialized, that it is viewing the correct vertex data
-	//Could happen if vertex data has been reallocated post init
-	if (vertex_batch_.VertexData() && vertex_batch_.VertexData() != vertex_data_)
-		vertex_batch_.VertexData(vertex_data_);
-
 	auto bounding_volume_status = MeshBoundingVolumeStatus::Unchanged;
 
-	if (vertex_batch_.VertexCount() > 0)
+	if (!std::empty(vertex_data_))
 	{
 		if (update_bounding_volumes_)
 		{
@@ -367,30 +363,43 @@ MeshBoundingVolumeStatus Mesh::Prepare() noexcept
 				detail::generate_tex_coords(vertex_data_, aabb_);
 
 			//Normalize tex coords
-			if (tex_coord_mode_ == mesh::MeshTexCoordMode::Manual || vertex_batch_.BatchMaterial())
-				detail::normalize_tex_coords(vertex_data_, vertex_batch_.BatchMaterial().get());
+			if (tex_coord_mode_ == mesh::MeshTexCoordMode::Manual || material_)
+				detail::normalize_tex_coords(vertex_data_, material_.get());
 
 			update_tex_coords_ = false;
-			vertex_batch_.ReloadData();
+			update_vertex_data_ = true;
+		}
+
+		if (reload_)
+		{
+			if (auto owner = Owner(); owner)
+				owner->NotifyMeshReloadAll(*this);
+
+			update_vertex_data_ = reload_ = false;
+		}
+		else if (update_vertex_data_)
+		{
+			if (auto owner = Owner(); owner)
+				owner->NotifyMeshReload(*this);
+
+			update_vertex_data_ = false;
 		}
 	}
 
-	vertex_batch_.Prepare();
 	return bounding_volume_status;
 }
 
-void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
+
+void Mesh::DrawStarted() noexcept
 {
-	if (visible_)
-	{
-		if (show_wireframe_)
-			detail::enable_wire_frames();
+	if (show_wireframe_)
+		detail::enable_wire_frames();
+}
 
-		vertex_batch_.Draw(shader_program);
-
-		if (show_wireframe_)
-			detail::disable_wire_frames();
-	}
+void Mesh::DrawEnded() noexcept
+{
+	if (show_wireframe_)
+		detail::disable_wire_frames();
 }
 
 
@@ -398,9 +407,9 @@ void Mesh::Draw(shaders::ShaderProgram *shader_program) noexcept
 	Elapse time
 */
 
-void Mesh::Elapse(duration time) noexcept
+void Mesh::Elapse([[maybe_unused]] duration time) noexcept
 {
-	vertex_batch_.Elapse(time);
+	//Optional to override
 }
 
 } //ion::graphics::scene::shapes

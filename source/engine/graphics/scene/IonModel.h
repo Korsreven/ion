@@ -45,7 +45,29 @@ namespace ion::graphics::scene
 {
 	namespace model::detail
 	{
-	} //model
+		using mesh_pointers = std::vector<shapes::Mesh*>;
+
+		struct mesh_vertex_stream final
+		{
+			shapes::mesh::VertexContainer vertex_data;
+			render::vertex::VertexBatch vertex_batch;
+			mesh_pointers meshes;
+			bool reload_vertex_data = false;
+
+			mesh_vertex_stream(shapes::mesh::VertexContainer vertex_data, render::vertex::vertex_batch::VertexDrawMode draw_mode,
+				NonOwningPtr<materials::Material> material = nullptr);
+		};
+
+		using mesh_vertex_streams = std::vector<mesh_vertex_stream>;
+
+
+		struct mesh_group_comparator final
+		{
+			bool operator()(const shapes::Mesh &mesh, const shapes::Mesh &mesh2) const noexcept;
+		};
+
+		int get_mesh_vertex_count(const mesh_vertex_streams &mesh_streams) noexcept;
+	} //model::detail
 
 
 	class Model final :
@@ -54,10 +76,16 @@ namespace ion::graphics::scene
 	{
 		private:
 
+			model::detail::mesh_vertex_streams mesh_vertex_streams_;
 			std::optional<render::vertex::VertexBufferObject> vbo_;
 
+			bool reload_vertex_streams_ = false;
 			bool reload_vertex_buffer_ = false;
 			bool update_bounding_volumes_ = false;
+
+
+			void ReloadVertexStreams();
+			void PrepareVertexStreams();
 
 		protected:
 
@@ -108,6 +136,17 @@ namespace ion::graphics::scene
 			{
 				return vbo_;
 			}
+
+
+			/*
+				Notifying
+			*/
+
+			//Called when there are changes to the given mesh that requires a reload of one stream
+			void NotifyMeshReload(const shapes::Mesh &mesh) noexcept;
+
+			//Called when there are changes to the given mesh that requires a reload of all streams
+			void NotifyMeshReloadAll(const shapes::Mesh &mesh) noexcept;
 
 
 			/*

@@ -112,7 +112,7 @@ namespace ion::graphics::scene::shapes
 			}
 
 			//Returns the thickness of this curve
-			[[nodiscard]] inline auto Thickness() const noexcept
+			[[nodiscard]] inline virtual real Thickness() const noexcept override
 			{
 				return thickness_;
 			}
@@ -128,9 +128,13 @@ namespace ion::graphics::scene::shapes
 				Drawing
 			*/
 
-			//Draw this curve with the given shader program (optional)
+			//Called just before this curve will be drawn
 			//This can be called multiple times if more than one pass
-			virtual void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept override;
+			virtual void DrawStarted() noexcept override;
+
+			//Called just after this curve has been drawn
+			//This can be called multiple times if more than one pass
+			virtual void DrawEnded() noexcept override;
 	};
 } //ion::graphics::scene::shapes
 
