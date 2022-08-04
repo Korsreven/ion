@@ -114,7 +114,7 @@ void disable_point_sprites() noexcept
 
 //Private
 
-void DrawableParticleSystem::PrepareVertexStreams()
+void DrawableParticleSystem::ReloadVertexStreams()
 {
 	if (std::size(particle_system_->Emitters()) > vertex_streams_.capacity())
 		vertex_streams_.reserve(std::size(particle_system_->Emitters()));
@@ -195,7 +195,7 @@ void DrawableParticleSystem::Prepare() noexcept
 	if (!particle_system_)
 		return;
 
-	PrepareVertexStreams();
+	ReloadVertexStreams();
 	update_bounding_volumes_ = true;
 
 	if (reload_vertex_buffer_)

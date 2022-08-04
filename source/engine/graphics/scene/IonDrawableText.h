@@ -181,7 +181,7 @@ namespace ion::graphics::scene
 			bool update_bounding_volumes_ = false;
 
 
-			void PrepareVertexStreams();
+			void ReloadVertexStreams();
 
 		protected:
 

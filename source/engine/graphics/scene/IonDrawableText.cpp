@@ -605,7 +605,7 @@ void get_text_vertex_streams(const fonts::Text &text, Vector3 position, real rot
 
 //Private
 
-void DrawableText::PrepareVertexStreams()
+void DrawableText::ReloadVertexStreams()
 {
 	auto glyph_vertex_count = detail::get_glyph_vertex_count(glyph_vertex_streams_);
 	auto back_decoration_vertex_count = std::ssize(decoration_vertex_stream_.back_vertex_data);
@@ -737,7 +737,7 @@ void DrawableText::Prepare() noexcept
 
 	if (reload_vertex_streams_)
 	{
-		PrepareVertexStreams();
+		ReloadVertexStreams();
 		reload_vertex_streams_ = false;
 		update_bounding_volumes_ = true;
 	}
