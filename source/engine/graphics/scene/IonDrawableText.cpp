@@ -646,7 +646,7 @@ void DrawableText::ReloadVertexStreams()
 				return std::empty(stream.second.vertex_data);
 			});
 
-		if (detail::get_glyph_vertex_count(glyph_vertex_streams_) > glyph_vertex_count)
+		if (glyph_vertex_count < detail::get_glyph_vertex_count(glyph_vertex_streams_))
 			reload_vertex_buffer_ = true;
 	}
 
@@ -655,7 +655,7 @@ void DrawableText::ReloadVertexStreams()
 	{
 		decoration_vertex_stream_.front_vertex_batch.VertexData(decoration_vertex_stream_.front_vertex_data);
 
-		if (std::ssize(decoration_vertex_stream_.front_vertex_data) > front_decoration_vertex_count)
+		if (front_decoration_vertex_count < std::ssize(decoration_vertex_stream_.front_vertex_data))
 			reload_vertex_buffer_ = true;
 	}
 
@@ -664,7 +664,7 @@ void DrawableText::ReloadVertexStreams()
 	{
 		decoration_vertex_stream_.back_vertex_batch.VertexData(decoration_vertex_stream_.back_vertex_data);
 
-		if (std::ssize(decoration_vertex_stream_.back_vertex_data) > back_decoration_vertex_count)
+		if (back_decoration_vertex_count < std::ssize(decoration_vertex_stream_.back_vertex_data))
 			reload_vertex_buffer_ = true;
 	}
 }
