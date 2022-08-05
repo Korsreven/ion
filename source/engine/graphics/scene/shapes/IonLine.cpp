@@ -12,8 +12,6 @@ File:	IonLine.cpp
 
 #include "IonLine.h"
 
-#include "graphics/IonGraphicsAPI.h"
-
 namespace ion::graphics::scene::shapes
 {
 
@@ -26,16 +24,6 @@ mesh::Vertices line_vertices(const Vector3 &a, const Vector3 &b, const Color &co
 {
 	return {{a, vector3::UnitZ, color},
 			{b, vector3::UnitZ, color}};
-}
-
-
-/*
-	Graphics API
-*/
-
-void set_line_width(real thickness) noexcept
-{
-	glLineWidth(static_cast<float>(thickness));
 }
 
 } //line::detail
@@ -66,27 +54,9 @@ Line::Line(const Vector3 &a, const Vector3 &b, const Color &color, real thicknes
 	Shape{vertex::vertex_batch::VertexDrawMode::Lines, detail::line_vertices(a, b, color), color, visible},
 
 	a_{a},
-	b_{b},
-	thickness_{thickness}
+	b_{b}
 {
-	//Empty
-}
-
-
-/*
-	Drawing
-*/
-
-void Line::DrawStarted() noexcept
-{
-	detail::set_line_width(thickness_);
-	Shape::DrawStarted();
-}
-
-void Line::DrawEnded() noexcept
-{
-	Shape::DrawEnded();
-	detail::set_line_width(1.0_r);
+	Thickness(thickness);
 }
 
 } //ion::graphics::scene::shapes

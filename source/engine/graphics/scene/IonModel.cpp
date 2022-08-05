@@ -46,8 +46,8 @@ bool mesh_group_comparator::operator()(const shapes::Mesh &mesh, const shapes::M
 {
 	return mesh.DrawMode() == mesh2.DrawMode() &&
 		   mesh.SurfaceMaterial() == mesh2.SurfaceMaterial() &&
-		   mesh.ShowWireframe() == mesh2.ShowWireframe() &&
-		   mesh.Thickness() == mesh2.Thickness(); //Only for lines/curves
+		   mesh.LineThickness() == mesh2.LineThickness() &&
+		   mesh.ShowWireframe() == mesh2.ShowWireframe();
 }
 
 int get_mesh_vertex_count(const mesh_vertex_streams &mesh_streams) noexcept
@@ -66,18 +66,20 @@ int get_mesh_vertex_count(const mesh_vertex_streams &mesh_streams) noexcept
 void Model::ReloadVertexStreams()
 {
 	auto vertex_count = detail::get_mesh_vertex_count(mesh_vertex_streams_);
+	auto z_offset = shapes::mesh::detail::position_offset + 2;
 	mesh_vertex_streams_.clear();
 
 	detail::mesh_pointers meshes;
 	for (auto &mesh : Meshes())
 	{
-		if (mesh.Visible() && !std::empty(mesh.VertexData()))
+		if (mesh.Visible() &&
+			std::ssize(mesh.VertexData()) > z_offset)
 			meshes.push_back(&mesh);
 	}
 
 	//Order all meshes by z (from first vertex)
 	std::stable_sort(std::begin(meshes), std::end(meshes),
-		[z_offset = shapes::mesh::detail::position_offset + 2](auto &mesh, auto &mesh2) noexcept
+		[&](auto &mesh, auto &mesh2) noexcept
 		{
 			return mesh->VertexData()[z_offset] < mesh2->VertexData()[z_offset];
 		});
@@ -130,8 +132,7 @@ void Model::PrepareVertexStreams()
 
 void Model::Created(shapes::Mesh &mesh) noexcept
 {
-	reload_vertex_streams_ |= !std::empty(mesh.VertexData());
-	update_bounding_volumes_ |= reload_vertex_streams_;
+	update_bounding_volumes_ |= !std::empty(mesh.VertexData());
 }
 
 void Model::Removed(shapes::Mesh&) noexcept

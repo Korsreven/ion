@@ -31,6 +31,7 @@ namespace mesh
 {
 
 Vertex::Vertex(const Vector3 &position, const Color &base_color) noexcept :
+
 	Position{position},
 	BaseColor{base_color}
 {
@@ -38,6 +39,7 @@ Vertex::Vertex(const Vector3 &position, const Color &base_color) noexcept :
 }
 
 Vertex::Vertex(const Vector3 &position, const Vector3 &normal, const Color &base_color) noexcept :
+
 	Position{position},
 	Normal{normal},
 	BaseColor{base_color}
@@ -46,6 +48,7 @@ Vertex::Vertex(const Vector3 &position, const Vector3 &normal, const Color &base
 }
 
 Vertex::Vertex(const Vector3 &position, const Vector3 &normal, const Vector2 &tex_coord, const Color &base_color) noexcept :
+
 	Position{position},
 	Normal{normal},
 	TexCoord{tex_coord},
@@ -171,6 +174,12 @@ void normalize_tex_coords(VertexContainer &vertex_data, const materials::Materia
 	Graphics API
 */
 
+void set_line_width(real width) noexcept
+{
+	glLineWidth(static_cast<float>(width));
+}
+
+
 void enable_wire_frames() noexcept
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -229,8 +238,7 @@ Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const Vertices &verti
 	vertex_data_{detail::vertices_to_vertex_data(vertices)},
 	visible_{visible},
 
-	update_bounding_volumes_{true},
-	update_tex_coords_{true}
+	reload_all_{visible}
 {
 	//Empty
 }
@@ -240,11 +248,11 @@ Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const Vertices &verti
 	
 	draw_mode_{draw_mode},
 	vertex_data_{detail::vertices_to_vertex_data(vertices)},
+	material_{material},
 	tex_coord_mode_{tex_coord_mode},
 	visible_{visible},
 
-	update_bounding_volumes_{true},
-	update_tex_coords_{true}
+	reload_all_{visible}
 {
 	//Empty
 }
@@ -270,8 +278,7 @@ Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, VertexContainer verte
 	vertex_data_{std::move(vertex_data)},
 	visible_{visible},
 
-	update_bounding_volumes_{true},
-	update_tex_coords_{true}
+	reload_all_{visible}
 {
 	//Empty
 }
@@ -281,11 +288,11 @@ Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, VertexContainer verte
 
 	draw_mode_{draw_mode},
 	vertex_data_{std::move(vertex_data)},
+	material_{material},
 	tex_coord_mode_{tex_coord_mode},
 	visible_{visible},
 
-	update_bounding_volumes_{true},
-	update_tex_coords_{true}
+	reload_all_{visible}
 {
 	//Empty
 }
@@ -295,12 +302,35 @@ Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, VertexContainer verte
 	Modifiers
 */
 
+void Mesh::VertexData(mesh::VertexContainer vertex_data) noexcept
+{
+	auto size = std::ssize(vertex_data_);
+	auto z_offset = shapes::mesh::detail::position_offset + 2;
+	auto z = size > z_offset ? vertex_data_[z_offset] : 0.0_r;
+
+	vertex_data_ = std::move(vertex_data);
+	update_tex_coords_ = true;
+	update_bounding_volumes_ = true;
+
+	//Size has changed
+	if (size != std::ssize(vertex_data_))
+		reload_all_ |= visible_;
+	else
+	{
+		//Z-order has changed
+		if (z != (size > z_offset ? vertex_data_[z_offset] : 0.0_r))
+			reload_all_ |= visible_;
+	}
+
+	reload_ |= !reload_all_ && visible_;
+}
+
 void Mesh::VertexColor(const Color &color) noexcept
 {
 	for (auto i = detail::color_offset; i < std::ssize(vertex_data_); i += detail::vertex_components)
 		std::copy(color.Channels(), color.Channels() + detail::color_components, std::begin(vertex_data_) + i);
 
-	update_vertex_data_ = true;
+	reload_ |= visible_;
 	VertexColorChanged();
 }
 
@@ -309,7 +339,7 @@ void Mesh::VertexOpacity(real percent) noexcept
 	for (auto i = detail::color_offset; i < std::ssize(vertex_data_); i += detail::vertex_components)
 		vertex_data_[i + 3] = percent;
 
-	update_vertex_data_ = true;
+	reload_ |= visible_;
 	VertexOpacityChanged();
 }
 
@@ -367,22 +397,21 @@ MeshBoundingVolumeStatus Mesh::Prepare() noexcept
 				detail::normalize_tex_coords(vertex_data_, material_.get());
 
 			update_tex_coords_ = false;
-			update_vertex_data_ = true;
 		}
 
-		if (reload_)
+		if (reload_all_)
 		{
 			if (auto owner = Owner(); owner)
 				owner->NotifyMeshReloadAll(*this);
 
-			update_vertex_data_ = reload_ = false;
+			reload_ = reload_all_ = false;
 		}
-		else if (update_vertex_data_)
+		else if (reload_)
 		{
 			if (auto owner = Owner(); owner)
 				owner->NotifyMeshReload(*this);
 
-			update_vertex_data_ = false;
+			reload_ = false;
 		}
 	}
 
@@ -392,6 +421,9 @@ MeshBoundingVolumeStatus Mesh::Prepare() noexcept
 
 void Mesh::DrawStarted() noexcept
 {
+	if (line_thickness_ != 1.0_r)
+		detail::set_line_width(line_thickness_);
+
 	if (show_wireframe_)
 		detail::enable_wire_frames();
 }
@@ -400,6 +432,9 @@ void Mesh::DrawEnded() noexcept
 {
 	if (show_wireframe_)
 		detail::disable_wire_frames();
+
+	if (line_thickness_ != 1.0_r)
+		detail::set_line_width(1.0_r);
 }
 
 

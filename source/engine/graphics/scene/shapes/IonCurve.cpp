@@ -100,10 +100,9 @@ Curve::Curve(ControlPoints control_points, const Color &color, real thickness, b
 	Shape{vertex::vertex_batch::VertexDrawMode::LineStrip,
 		  detail::curve_vertices(control_points, color, detail::default_curve_smoothness), color, visible},
 
-	control_points_{std::move(control_points)},
-	thickness_{thickness}
+	control_points_{std::move(control_points)}
 {
-	//Empty
+	Thickness(thickness);
 }
 
 
@@ -124,27 +123,9 @@ Curve::Curve(ControlPoints control_points, const Color &color, real thickness, i
 		  detail::curve_vertices(control_points, color, detail::curve_smoothness(smoothness)), color, visible},
 
 	control_points_{std::move(control_points)},
-	thickness_{thickness},
 	smoothness_{detail::curve_smoothness(smoothness)}
 {
-	//Empty
-}
-
-
-/*
-	Drawing
-*/
-
-void Curve::DrawStarted() noexcept
-{
-	line::detail::set_line_width(thickness_);
-	Shape::DrawStarted();
-}
-
-void Curve::DrawEnded() noexcept
-{
-	Shape::DrawEnded();
-	line::detail::set_line_width(1.0_r);
+	Thickness(thickness);
 }
 
 } //ion::graphics::scene::shapes

@@ -145,6 +145,8 @@ namespace ion::graphics::scene::shapes
 				Graphics API
 			*/
 
+			void set_line_width(real width) noexcept;
+
 			void enable_wire_frames() noexcept;
 			void disable_wire_frames() noexcept;
 		} //detail
@@ -161,6 +163,7 @@ namespace ion::graphics::scene::shapes
 			mesh::VertexContainer vertex_data_;
 			NonOwningPtr<materials::Material> material_;
 			mesh::MeshTexCoordMode tex_coord_mode_ = mesh::MeshTexCoordMode::Auto;
+			real line_thickness_ = 1.0_r;
 			bool show_wireframe_ = false;
 			bool include_bounding_volumes_ = true;
 			bool visible_ = true;
@@ -168,11 +171,11 @@ namespace ion::graphics::scene::shapes
 			Aabb aabb_;
 			Obb obb_;
 			Sphere sphere_;
-
-			bool update_bounding_volumes_ = false;
-			bool update_tex_coords_ = false;
-			bool update_vertex_data_ = false;
+			
+			bool update_tex_coords_ = true;
+			bool update_bounding_volumes_ = true;
 			bool reload_ = false;
+			bool reload_all_ = false;
 
 		protected:
 
@@ -230,32 +233,17 @@ namespace ion::graphics::scene::shapes
 				if (draw_mode_ != draw_mode)
 				{
 					draw_mode_ = draw_mode;
-					reload_ = true;
+					reload_all_ |= visible_;
 				}
 			}
+
+			//Sets the vertex data of this mesh to the given raw vertex data
+			void VertexData(mesh::VertexContainer vertex_data) noexcept;
 
 			//Sets the vertex data of this mesh to the given vertices
 			inline void VertexData(const mesh::Vertices &vertices) noexcept
 			{
-				auto size = std::size(vertex_data_);
-				vertex_data_ = mesh::detail::vertices_to_vertex_data(vertices);
-				update_bounding_volumes_ = true;
-				update_tex_coords_ = true;
-				
-				if (size != std::size(vertex_data_))
-					reload_ = true;
-			}
-
-			//Sets the vertex data of this mesh to the given raw vertex data
-			inline void VertexData(mesh::VertexContainer vertex_data) noexcept
-			{
-				auto size = std::size(vertex_data_);
-				vertex_data_ = std::move(vertex_data);
-				update_bounding_volumes_ = true;
-				update_tex_coords_ = true;
-
-				if (size != std::size(vertex_data_))
-					reload_ = true;
+				VertexData(mesh::detail::vertices_to_vertex_data(vertices));
 			}
 
 			//Sets the color of all vertices in this mesh to the given color
@@ -272,7 +260,7 @@ namespace ion::graphics::scene::shapes
 				{
 					material_ = material;
 					update_tex_coords_ = true;
-					reload_ = true;
+					reload_all_ |= visible_;
 					SurfaceMaterialChanged();
 				}
 			}
@@ -284,14 +272,29 @@ namespace ion::graphics::scene::shapes
 				{
 					tex_coord_mode_ = tex_coord_mode;
 					update_tex_coords_ = true;
+					reload_ |= visible_;
 				}
 			}
 
 
+			//Sets the line thickness of this mesh to the given value
+			inline void LineThickness(real thickness) noexcept
+			{
+				if (line_thickness_ != thickness)
+				{
+					line_thickness_ = thickness;
+					reload_all_ |= visible_;
+				}
+			}
+
 			//Sets if this mesh should be shown in wireframe or not
 			inline void ShowWireframe(bool show) noexcept
 			{
-				show_wireframe_ = show;
+				if (show_wireframe_ != show)
+				{
+					show_wireframe_ = show;
+					reload_all_ |= visible_;
+				}
 			}
 
 			//Sets if the bounding volumes from this mesh should be included in the model or not
@@ -310,7 +313,7 @@ namespace ion::graphics::scene::shapes
 				if (visible_ != visible)
 				{
 					visible_ = visible;
-					reload_ = true;
+					reload_all_ = true;
 				}
 			}
 
@@ -358,10 +361,10 @@ namespace ion::graphics::scene::shapes
 				return show_wireframe_;
 			}
 
-			//Returns the thickness of this mesh (only for lines/curves)
-			[[nodiscard]] inline virtual real Thickness() const noexcept
+			//Returns the line thickness of this mesh
+			[[nodiscard]] inline auto LineThickness() const noexcept
 			{
-				return 0.0_r;
+				return line_thickness_;
 			}
 
 			//Returns true if the bounding volumes from this mesh should be included in the model

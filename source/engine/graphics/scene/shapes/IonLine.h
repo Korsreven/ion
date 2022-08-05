@@ -28,13 +28,6 @@ namespace ion::graphics::scene::shapes
 	namespace line::detail
 	{
 		mesh::Vertices line_vertices(const Vector3 &a, const Vector3 &b, const Color &color);
-
-
-		/*
-			Graphics API
-		*/
-
-		void set_line_width(real thickness) noexcept;
 	} //line::detail
 
 
@@ -44,7 +37,6 @@ namespace ion::graphics::scene::shapes
 
 			Vector3 a_;
 			Vector3 b_;
-			real thickness_ = 1.0_r;
 
 
 			virtual mesh::Vertices GetVertices() const noexcept override;
@@ -96,7 +88,7 @@ namespace ion::graphics::scene::shapes
 			//Sets the thickness of this line
 			inline void Thickness(real thickness) noexcept
 			{
-				thickness_ = thickness;
+				LineThickness(thickness);
 			}
 
 
@@ -123,23 +115,10 @@ namespace ion::graphics::scene::shapes
 			}
 
 			//Returns the thickness of this line
-			[[nodiscard]] inline virtual real Thickness() const noexcept override
+			[[nodiscard]] inline auto Thickness() const noexcept
 			{
-				return thickness_;
+				return LineThickness();
 			}
-
-
-			/*
-				Drawing
-			*/
-
-			//Called just before this line will be drawn
-			//This can be called multiple times if more than one pass
-			virtual void DrawStarted() noexcept override;
-
-			//Called just after this line has been drawn
-			//This can be called multiple times if more than one pass
-			virtual void DrawEnded() noexcept override;
 	};
 } //ion::graphics::scene::shapes
 

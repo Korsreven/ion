@@ -55,7 +55,6 @@ namespace ion::graphics::scene::shapes
 		protected:
 
 			curve::ControlPoints control_points_;
-			real thickness_ = 1.0_r;
 			int smoothness_ = curve::detail::default_curve_smoothness;
 
 
@@ -96,7 +95,7 @@ namespace ion::graphics::scene::shapes
 			//Sets the thickness of this curve
 			inline void Thickness(real thickness) noexcept
 			{
-				thickness_ = thickness;
+				LineThickness(thickness);
 			}
 
 
@@ -112,9 +111,9 @@ namespace ion::graphics::scene::shapes
 			}
 
 			//Returns the thickness of this curve
-			[[nodiscard]] inline virtual real Thickness() const noexcept override
+			[[nodiscard]] inline auto Thickness() const noexcept
 			{
-				return thickness_;
+				return LineThickness();
 			}
 
 			//Returns the smoothness of this curve
@@ -122,19 +121,6 @@ namespace ion::graphics::scene::shapes
 			{
 				return smoothness_;
 			}
-
-
-			/*
-				Drawing
-			*/
-
-			//Called just before this curve will be drawn
-			//This can be called multiple times if more than one pass
-			virtual void DrawStarted() noexcept override;
-
-			//Called just after this curve has been drawn
-			//This can be called multiple times if more than one pass
-			virtual void DrawEnded() noexcept override;
 	};
 } //ion::graphics::scene::shapes
 
