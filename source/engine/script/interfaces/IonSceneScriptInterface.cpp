@@ -387,6 +387,7 @@ ClassDefinition get_mesh_class()
 		.AddProperty("color", ParameterType::Color)
 		.AddProperty("draw-mode", {"points"s, "lines"s, "line-loop"s, "line-strip"s, "triangles"s, "triangle-fan"s, "triangle-strip"s, "quads"s, "polygon"s})
 		.AddProperty("include-bounding-volumes", ParameterType::Boolean)
+		.AddProperty("line-thickness", ParameterType::FloatingPoint)
 		.AddProperty("material", ParameterType::String)
 		.AddProperty("opacity", ParameterType::FloatingPoint)
 		.AddProperty("show-wireframe", ParameterType::Boolean)
@@ -821,6 +822,8 @@ void set_mesh_properties(const script_tree::ObjectNode &object, shapes::Mesh &me
 		}
 		else if (property.Name() == "include-bounding-volumes")
 			mesh.IncludeBoundingVolumes(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "line-thickness")
+			mesh.LineThickness(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "material" || property.Name() == "surface-material")
 			mesh.SurfaceMaterial(get_material(property[0].Get<ScriptType::String>()->Get(), managers));
 		else if (property.Name() == "opacity" || property.Name() == "vertex-opacity")
