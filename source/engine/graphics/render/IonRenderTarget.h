@@ -209,6 +209,15 @@ namespace ion::graphics::render
 			[[nodiscard]] NonOwningPtr<const Viewport> GetViewport(const Vector2 &position) const noexcept;
 
 
+			//Gets a pointer to the default viewport as mutable
+			//Returns nullptr if viewport could not be found
+			[[nodiscard]] NonOwningPtr<Viewport> GetDefaultViewport() noexcept;
+
+			//Gets a pointer to the default viewport as immutable
+			//Returns nullptr if viewport could not be found
+			[[nodiscard]] NonOwningPtr<const Viewport> GetDefaultViewport() const noexcept;
+
+
 			/*
 				Viewports
 				Removing

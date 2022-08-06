@@ -1585,7 +1585,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			using namespace ion::utilities;
 
 			//Viewport
-			auto viewport = engine.Target()->GetViewport("main");
+			auto viewport = engine.Target()->GetDefaultViewport();
 
 			//Frustum
 			auto frustum = ion::graphics::render::Frustum::Orthographic(
@@ -2301,7 +2301,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//Pointers
-			auto viewport = engine.Target()->GetViewport("main");
+			auto viewport = engine.Target()->GetDefaultViewport();
 			auto camera = scene_manager->GetCamera("main_camera");
 			auto player_camera = scene_manager->GetCamera("player_camera");
 
