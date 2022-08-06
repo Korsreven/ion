@@ -38,13 +38,21 @@ File:	IonGuiController.h
 //Forward declarations
 namespace ion
 {
-	namespace graphics::scene
+	namespace graphics
 	{
-		class SceneManager;
-
-		namespace graph
+		namespace render
 		{
-			class SceneNode;
+			class Viewport;
+		}
+
+		namespace scene
+		{
+			class SceneManager;
+
+			namespace graph
+			{
+				class SceneNode;
+			}
 		}
 	}
 
@@ -115,13 +123,15 @@ namespace ion::gui
 			controls::GuiMouseCursor *active_mouse_cursor_ = nullptr;
 			controls::GuiTooltip *active_tooltip_ = nullptr;
 			skins::GuiTheme *active_theme_ = nullptr;
-			gui_controller::detail::frames active_frames_;
-			NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group_;
-			bool shift_pressed_ = false;
 
+			gui_controller::detail::frames active_frames_;
 			gui_controller::detail::frame_pointers frames_;
 			gui_controller::detail::mouse_cursor_pointers mouse_cursors_;
 			gui_controller::detail::tooltip_pointers tooltips_;
+
+			NonOwningPtr<graphics::render::Viewport> default_viewport_;
+			NonOwningPtr<sounds::SoundChannelGroup> default_sound_channel_group_;	
+			bool shift_pressed_ = false;
 
 
 			GuiFrame* NextFocusableFrame(GuiFrame *from_frame) const noexcept;
@@ -190,8 +200,9 @@ namespace ion::gui
 
 		public:
 
-			//Construct a gui controller with the given parent node and sound channel group
-			GuiController(SceneNode &parent_node, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group = nullptr);
+			//Construct a gui controller with the given parent node, default viewport and default sound channel group
+			GuiController(SceneNode &parent_node, NonOwningPtr<graphics::render::Viewport> default_camera = nullptr,
+				NonOwningPtr<sounds::SoundChannelGroup> default_sound_channel_group = nullptr);
 
 
 			/*
@@ -339,11 +350,19 @@ namespace ion::gui
 				return focused_frame_;
 			}
 
-			//Returns a pointer to the sound channel group connected to this controller
-			//Returns nullptr if this viewport does not have a sound channel group connected
-			[[nodiscard]] inline auto ConnectedSoundChannelGroup() const noexcept
+
+			//Returns the default viewport for this controller
+			//Returns nullptr if this controller does not have a default viewport
+			[[nodiscard]] inline auto DefaultViewport() const noexcept
 			{
-				return sound_channel_group_;
+				return default_viewport_;
+			}
+
+			//Returns a pointer to the default sound channel group for this controller
+			//Returns nullptr if this controller does not have a default sound channel group
+			[[nodiscard]] inline auto DefaultSoundChannelGroup() const noexcept
+			{
+				return default_sound_channel_group_;
 			}
 
 

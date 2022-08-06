@@ -23,6 +23,11 @@ File:	IonGuiTooltip.h
 #include "types/IonCumulative.h"
 #include "types/IonTypes.h"
 
+namespace ion::gui
+{
+	class GuiController; //Forward declaration
+}
+
 namespace ion::gui::controls
 {
 	using namespace types::type_literals;
@@ -81,6 +86,9 @@ namespace ion::gui::controls
 			real opacity_ = 1.0_r;
 
 			bool update_position_ = false;
+
+
+			GuiController* GetController() const noexcept;
 
 
 			/*

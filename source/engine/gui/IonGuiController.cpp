@@ -394,8 +394,11 @@ void GuiController::Hidden() noexcept
 
 //Public
 
-GuiController::GuiController(SceneNode &parent_node, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group) :
-	sound_channel_group_{sound_channel_group}
+GuiController::GuiController(SceneNode &parent_node, NonOwningPtr<graphics::render::Viewport> default_viewport,
+	NonOwningPtr<sounds::SoundChannelGroup> default_sound_channel_group) :
+
+	default_viewport_{default_viewport},
+	default_sound_channel_group_{default_sound_channel_group}
 {
 	node_ = parent_node.CreateChildNode();
 	FrameEvents().Subscribe(*this);

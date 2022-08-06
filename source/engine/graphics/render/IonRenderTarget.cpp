@@ -113,17 +113,6 @@ NonOwningPtr<const Viewport> RenderTarget::GetViewport(const Vector2 &position) 
 }
 
 
-NonOwningPtr<Viewport> RenderTarget::GetDefaultViewport() noexcept
-{
-	return GetViewport("");
-}
-
-NonOwningPtr<const Viewport> RenderTarget::GetDefaultViewport() const noexcept
-{
-	return GetViewport("");
-}
-
-
 /*
 	Viewports
 	Removing

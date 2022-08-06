@@ -956,7 +956,7 @@ void GuiControl::PlaySound(ControlSkinSoundPart &part)
 				{
 					if (auto controller = frame->Owner(); controller)
 					{
-						if (auto channel_group = controller->ConnectedSoundChannelGroup(); channel_group)
+						if (auto channel_group = controller->DefaultSoundChannelGroup(); channel_group)
 						{
 							//Play sound through the given sound channel group
 							skin_->Sounds.Object = part->Play(channel_group);

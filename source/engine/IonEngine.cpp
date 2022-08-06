@@ -400,4 +400,26 @@ bool Engine::RemoveSceneGraph(std::string_view name) noexcept
 	return SceneGraphBase::Remove(name);
 }
 
+
+/*
+	Viewport
+	Retrieving
+*/
+
+NonOwningPtr<graphics::render::Viewport> Engine::GetDefaultViewport() noexcept
+{
+	if (render_window_)
+		return render_window_->GetViewport("");
+	else
+		return nullptr;
+}
+
+NonOwningPtr<const graphics::render::Viewport> Engine::GetDefaultViewport() const noexcept
+{
+	if (render_window_)
+		return render_window_->GetViewport("");
+	else
+		return nullptr;
+}
+
 } //ion

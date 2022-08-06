@@ -349,6 +349,20 @@ namespace ion
 
 			//Remove a removable scene graph with the given name from the engine
 			bool RemoveSceneGraph(std::string_view name) noexcept;
+
+
+			/*
+				Viewport
+				Retrieving
+			*/
+
+			//Gets a pointer to the default viewport used by the engine
+			//Returns nullptr if no default viewport could be found
+			[[nodiscard]] NonOwningPtr<graphics::render::Viewport> GetDefaultViewport() noexcept;
+
+			//Gets a pointer to the default viewport used by the engine
+			//Returns nullptr if no default viewport could be found
+			[[nodiscard]] NonOwningPtr<const graphics::render::Viewport> GetDefaultViewport() const noexcept;
 	};
 } //ion
 #endif

@@ -14,6 +14,8 @@ File:	IonGuiTooltip.cpp
 
 #include <cmath>
 #include "IonEngine.h"
+#include "graphics/render/IonViewport.h"
+#include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/IonSceneManager.h"
@@ -106,6 +108,20 @@ void GuiTooltip::DefaultSetup() noexcept
 
 //Protected
 
+GuiController* GuiTooltip::GetController() const noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = Owner()->ParentFrame(); frame)
+			return frame->Owner();
+	}
+	else if (auto controller = dynamic_cast<GuiController*>(GuiComponent::Owner()); controller)
+		return controller;
+	
+	return nullptr;
+}
+
+
 /*
 	Skins
 */
@@ -177,19 +193,7 @@ void GuiTooltip::UpdatePosition(Vector2 position) noexcept
 {
 	if (node_)
 	{
-		if (auto controller =
-			[&]() noexcept -> GuiController*
-			{
-				if (auto owner = Owner(); owner)
-				{
-					if (auto frame = Owner()->ParentFrame(); frame)
-						return frame->Owner();
-				}
-				else if (auto controller = dynamic_cast<GuiController*>(GuiComponent::Owner()); controller)
-					return controller;
-
-				return nullptr;
-			}(); controller)
+		if (auto controller = GetController(); controller)
 		{
 			auto size =
 				size_.value_or(vector2::Zero) * node_->DerivedScaling();
@@ -239,14 +243,16 @@ void GuiTooltip::AdjustInView() noexcept
 		if (auto view_area =
 			[&]() noexcept
 			{
-				if (auto scene_manager = skin_->Caption->Owner(); scene_manager)
+				//Get bounding box from the default viewport camera
+				if (auto controller = GetController(); controller)
 				{
-					//Get bounding box from the first camera in scene manager
-					//The first camera is considered to be the main camera
-					if (!std::empty(scene_manager->Cameras()))
-						return std::begin(scene_manager->Cameras())->WorldAxisAlignedBoundingBox();
+					if (auto viewport = controller->DefaultViewport(); viewport)
+					{
+						if (auto camera = viewport->ConnectedCamera(); camera)
+							return camera->WorldAxisAlignedBoundingBox();
+					}
 				}
-
+				
 				return aabb::Zero;
 			}(); view_area != aabb::Zero)
 		{

@@ -258,7 +258,7 @@ struct Game :
 {
 	ion::NonOwningPtr<ion::graphics::scene::graph::SceneGraph> scene_graph;
 	ion::NonOwningPtr<ion::graphics::render::Viewport> viewport;
-	ion::gui::GuiController *controller = nullptr;
+	ion::gui::GuiController *gui_controller = nullptr;
 	ion::sounds::SoundManager *sound_manager = nullptr;
 
 	ion::NonOwningPtr<ion::graphics::scene::DrawableText> fps;
@@ -344,8 +344,8 @@ struct Game :
 				player_camera->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
 		}
 
-		if (controller && controller->IsVisible())
-			controller->FrameStarted(time);
+		if (gui_controller && gui_controller->IsVisible())
+			gui_controller->FrameStarted(time);
 
 		return true;
 	}
@@ -355,8 +355,8 @@ struct Game :
 		if (sound_manager)
 			sound_manager->Update();
 
-		if (controller && controller->IsVisible())
-			controller->FrameEnded(time);
+		if (gui_controller && gui_controller->IsVisible())
+			gui_controller->FrameEnded(time);
 
 		return true;
 	}
@@ -368,8 +368,8 @@ struct Game :
 
 	void WindowActionReceived(ion::events::listeners::WindowAction action) noexcept override
 	{
-		if (controller && controller->IsVisible())
-			controller->WindowActionReceived(action);
+		if (gui_controller && gui_controller->IsVisible())
+			gui_controller->WindowActionReceived(action);
 	}
 
 
@@ -381,7 +381,7 @@ struct Game :
 	{
 		using namespace ion::graphics::utilities;
 
-		if (!controller || !controller->IsVisible())
+		if (!gui_controller || !gui_controller->IsVisible())
 		{
 			switch (button)
 			{
@@ -436,15 +436,15 @@ struct Game :
 			}
 		}
 
-		if (controller && controller->IsVisible())
-			controller->KeyPressed(button);
+		if (gui_controller && gui_controller->IsVisible())
+			gui_controller->KeyPressed(button);
 	}
 
 	void KeyReleased(ion::events::listeners::KeyButton button) noexcept override
 	{
 		using namespace ion::graphics::utilities;
 
-		if (!controller || !controller->IsVisible())
+		if (!gui_controller || !gui_controller->IsVisible())
 		{
 			switch (button)
 			{
@@ -543,24 +543,24 @@ struct Game :
 			}
 		}
 
-		if (controller)
+		if (gui_controller)
 		{
 			switch (button)
 			{
 				case ion::events::listeners::KeyButton::Escape:
-				controller->Visible(!controller->IsVisible());
+				gui_controller->Visible(!gui_controller->IsVisible());
 				break;
 			}
 
-			if (controller->IsVisible())
-				controller->KeyReleased(button);
+			if (gui_controller->IsVisible())
+				gui_controller->KeyReleased(button);
 		}
   	}
 
 	void CharacterPressed(char character) noexcept override
 	{
-		if (controller && controller->IsVisible())
-			controller->CharacterPressed(character);
+		if (gui_controller && gui_controller->IsVisible())
+			gui_controller->CharacterPressed(character);
 	}
 
 
@@ -570,26 +570,26 @@ struct Game :
 
 	void MousePressed(ion::events::listeners::MouseButton button, ion::graphics::utilities::Vector2 position) noexcept override
 	{
-		if (controller && controller->IsVisible())
-			controller->MousePressed(button, position);
+		if (gui_controller && gui_controller->IsVisible())
+			gui_controller->MousePressed(button, position);
 	}
 
 	void MouseReleased(ion::events::listeners::MouseButton button, ion::graphics::utilities::Vector2 position) noexcept override
 	{
-		if (controller && controller->IsVisible())
-			controller->MouseReleased(button, position);
+		if (gui_controller && gui_controller->IsVisible())
+			gui_controller->MouseReleased(button, position);
 	}
 
 	void MouseMoved(ion::graphics::utilities::Vector2 position) noexcept override
 	{
-		if (controller && controller->IsVisible())
-			controller->MouseMoved(position);
+		if (gui_controller && gui_controller->IsVisible())
+			gui_controller->MouseMoved(position);
 	}
 
 	void MouseWheelRolled(int delta, ion::graphics::utilities::Vector2 position) noexcept override
 	{
-		if (controller && controller->IsVisible())
-			controller->MouseWheelRolled(delta, position);
+		if (gui_controller && gui_controller->IsVisible())
+			gui_controller->MouseWheelRolled(delta, position);
 	}
 };
 
@@ -640,6 +640,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				[[maybe_unused]] auto max_texture_units = ion::graphics::gl::MaxTextureUnits();
 				[[maybe_unused]] auto break_point = false;
 			}
+
+			//Viewport
+			auto viewport = engine.GetDefaultViewport();
 
 
 			//Repositories
@@ -794,13 +797,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scene_graph->FogEnabled(false);
 			//scene_graph->LightingEnabled(false);
 
-			auto scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
-			auto gui_scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
-
-			//GUI
-			ion::gui::GuiController controller{scene_graph->RootNode(), sounds->GetSoundChannelGroup("gui")};
-			controller.ZOrder(-2.0_r);
-
+			auto scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();	
 
 			//Load scripts
 			ion::script::interfaces::SceneScriptInterface scene_script;
@@ -810,19 +807,28 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scene_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
 			scene_script.CreateScene("scene.ion", scene_graph->RootNode(), *scene_manager);
 
+
+			//GUI
+			ion::gui::GuiController gui_controller{scene_graph->RootNode(),
+				viewport, sounds->GetSoundChannelGroup("gui")};
+			gui_controller.ZOrder(-2.0_r);
+
+			auto gui_scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
+
+			//Load scripts
 			ion::script::interfaces::GuiThemeScriptInterface gui_theme_script;
 			gui_theme_script.CreateScriptRepository(script_repository);
 			gui_theme_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			gui_theme_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			gui_theme_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			gui_theme_script.CreateGuiThemes("gui_themes.ion", controller, gui_scene_manager);
+			gui_theme_script.CreateGuiThemes("gui_themes.ion", gui_controller, gui_scene_manager);
 
 			ion::script::interfaces::GuiScriptInterface gui_script;
 			gui_script.CreateScriptRepository(script_repository);
 			gui_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 			gui_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 			gui_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-			gui_script.CreateGui("gui.ion", controller, *gui_scene_manager);
+			gui_script.CreateGui("gui.ion", gui_controller, *gui_scene_manager);
 
 
 			//Textures
@@ -1584,9 +1590,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			using namespace ion::utilities;
 
-			//Viewport
-			auto viewport = engine.Target()->GetDefaultViewport();
-
 			//Frustum
 			auto frustum = ion::graphics::render::Frustum::Orthographic(
 				Aabb{-1.0_r, 1.0_r}, 1.0_r, 100.0_r, 16.0_r / 9.0_r);
@@ -1708,7 +1711,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//GUI
 			//Theme
-			auto theme = controller.CreateTheme("default", gui_scene_manager);
+			auto theme = gui_controller.CreateTheme("default", gui_scene_manager);
 
 			//Mouse cursor skin
 			ion::gui::skins::gui_skin::SkinParts parts;
@@ -2070,13 +2073,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//Controls
-			auto mouse_cursor = controller.CreateMouseCursor("mouse_cursor", {});
+			auto mouse_cursor = gui_controller.CreateMouseCursor("mouse_cursor", {});
 			mouse_cursor->ZOrder(1.0_r);
 
-			auto tooltip = controller.CreateTooltip("tooltip", {});
+			auto tooltip = gui_controller.CreateTooltip("tooltip", {});
 			tooltip->ZOrder(0.9_r);
 
-			auto main_frame = controller.CreateFrame("main");
+			auto main_frame = gui_controller.CreateFrame("main");
 			auto base_panel = main_frame->CreatePanel("base");
 			base_panel->ZOrder(0.1_r);
 
@@ -2161,7 +2164,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			cell.AttachControl(label2);		
 			label2->Tooltip("My label tooltip");
 
-			auto main_frame2 = controller.CreateFrame("main2");
+			auto main_frame2 = gui_controller.CreateFrame("main2");
 			auto base_panel2 = main_frame2->CreatePanel("base");
 			base_panel2->ZOrder(0.1_r);
 			auto base_control2 = base_panel2->CreateControl<ion::gui::controls::GuiControl>("control");
@@ -2301,7 +2304,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//Pointers
-			auto viewport = engine.Target()->GetDefaultViewport();
 			auto camera = scene_manager->GetCamera("main_camera");
 			auto player_camera = scene_manager->GetCamera("player_camera");
 
@@ -2315,12 +2317,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto light_node = ship_node ? ship_node->GetChildNode("ship_light_node") : nullptr;
 			auto timeline = ship_node ? ship_node->GetTimeline("ship_idle_timeline"): nullptr;
 
-			controller.Visible(false);
+			gui_controller.Visible(false);
 
 			//Game
 			game.scene_graph = scene_graph;	
 			game.viewport = viewport;
-			game.controller = &controller;
+			game.gui_controller = &gui_controller;
 			game.sound_manager = sounds.get();
 			game.fps = text;
 			game.player_node = player_node;
