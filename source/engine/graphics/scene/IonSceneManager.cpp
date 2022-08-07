@@ -171,25 +171,26 @@ NonOwningPtr<Light> SceneManager::CreateLight(std::optional<std::string> name, b
 }
 
 NonOwningPtr<Light> SceneManager::CreateLight(std::optional<std::string> name, light::LightType type,
-	const Vector3 &position, const Vector3 &direction, const Color &diffuse,
+	const Vector3 &position, const Vector3 &direction, real radius,
+	const Color &diffuse,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 	real cutoff_angle, real outer_cutoff_angle, bool visible)
 {
 	return LightBase::Create(std::move(name), type,
-		position, direction,
+		position, direction, radius,
 		diffuse,
 		attenuation_constant, attenuation_linear, attenuation_quadratic,
 		cutoff_angle, outer_cutoff_angle, visible);
 }
 
 NonOwningPtr<Light> SceneManager::CreateLight(std::optional<std::string> name, light::LightType type,
-	const Vector3 &position, const Vector3 &direction,
+	const Vector3 &position, const Vector3 &direction, real radius,
 	const Color &ambient, const Color &diffuse, const Color &specular,
 	real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 	real cutoff_angle, real outer_cutoff_angle, bool visible)
 {
 	return LightBase::Create(std::move(name), type,
-		position, direction,
+		position, direction, radius,
 		ambient, diffuse, specular,
 		attenuation_constant, attenuation_linear, attenuation_quadratic,
 		cutoff_angle, outer_cutoff_angle, visible);

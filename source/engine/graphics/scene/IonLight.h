@@ -68,6 +68,7 @@ namespace ion::graphics::scene
 			light::LightType type_ = light::LightType::Point;
 			Vector3 position_;
 			Vector3 direction_;
+			real radius_ = 0.0_r;
 
 			Color ambient_color_ = color::White;
 			Color diffuse_color_ = color::White;
@@ -76,11 +77,15 @@ namespace ion::graphics::scene
 			real attenuation_constant_ = 1.0_r;
 			real attenuation_linear_ = 0.0_r;
 			real attenuation_quadratic_ = 0.0_r;
-
+			
 			real cutoff_ = light::detail::angle_to_cutoff(light::detail::default_cutoff_angle);
-			real outer_cutoff_ = light::detail::angle_to_cutoff(light::detail::default_outer_cutoff_angle);
+			real outer_cutoff_ = light::detail::angle_to_cutoff(light::detail::default_outer_cutoff_angle);	
 
 			bool cast_shadows_ = true;
+			bool update_bounding_volumes_ = true;
+
+
+			void PrepareBoundingVolumes() noexcept;
 
 		public:
 
@@ -89,13 +94,14 @@ namespace ion::graphics::scene
 
 			//Construct a new light with the given name and values
 			Light(std::optional<std::string> name, light::LightType type,
-				const Vector3 &position, const Vector3 &direction, const Color &diffuse,
+				const Vector3 &position, const Vector3 &direction, real radius,
+				const Color &diffuse,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				real cutoff_angle, real outer_cutoff_angle, bool visible = true) noexcept;
 
 			//Construct a new light with the given name and values
 			Light(std::optional<std::string> name, light::LightType type,
-				const Vector3 &position, const Vector3 &direction,
+				const Vector3 &position, const Vector3 &direction, real radius,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				real cutoff_angle, real outer_cutoff_angle, bool visible = true) noexcept;
@@ -107,13 +113,18 @@ namespace ion::graphics::scene
 
 			//Returns a new point light from the given name and values
 			[[nodiscard]] static Light Point(std::optional<std::string> name,
-				const Vector3 &position, const Color &diffuse,
+				const Vector3 &position, real radius, const Color &diffuse,
+				bool visible = true) noexcept;
+
+			//Returns a new point light from the given name and values
+			[[nodiscard]] static Light Point(std::optional<std::string> name,
+				const Vector3 &position, real radius, const Color &diffuse,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				bool visible = true) noexcept;
 
 			//Returns a new point light from the given name and values
 			[[nodiscard]] static Light Point(std::optional<std::string> name,
-				const Vector3 &position,
+				const Vector3 &position, real radius,
 				const Color &ambient, const Color &diffuse, const Color &specular,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				bool visible = true) noexcept;
@@ -155,17 +166,25 @@ namespace ion::graphics::scene
 			}
 
 			//Sets the position of the light to the given position
-			//This value only applies for lights of type point
+			//This value only applies for lights of type point and spot light
 			inline void Position(const Vector3 &position) noexcept
 			{
 				position_ = position;
 			}
 
 			//Sets the direction of the light to the given direction
-			//This value only applies for lights of type directional
+			//This value only applies for lights of type directional light
 			inline void Direction(const Vector3 &direction) noexcept
 			{
 				direction_ = direction;
+			}
+
+			//Sets the radius of the light to the given value
+			//A radius of 0 indicates an unlimited radius
+			//These values only applies for lights of type point light
+			inline void Radius(real radius) noexcept
+			{
+				radius_ = radius;
 			}
 
 
@@ -193,6 +212,7 @@ namespace ion::graphics::scene
 
 
 			//Sets the attenuation to the given values
+			//These values only applies for lights of type point and spot light
 			inline void Attenuation(real constant, real linear, real quadratic) noexcept
 			{
 				attenuation_constant_ = constant;
@@ -227,17 +247,25 @@ namespace ion::graphics::scene
 			}
 
 			//Returns the position of the light
-			//This value only applies for lights of type point
+			//This value only applies for lights of type point and spot light
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}
 
 			//Returns the direction of the light
-			//This value only applies for lights of type directional
+			//This value only applies for lights of type directional light
 			[[nodiscard]] inline auto& Direction() const noexcept
 			{
 				return direction_;
+			}
+
+			//Returns the radius of the light
+			//A radius of 0 indicates an unlimited radius
+			//These values only applies for lights of type point light
+			[[nodiscard]] inline auto Radius() const noexcept
+			{
+				return radius_;
 			}
 
 
@@ -261,13 +289,14 @@ namespace ion::graphics::scene
 
 
 			//Returns the constant, linear and quadratic attenuation values
+			//These values only applies for lights of type point and spot light
 			[[nodiscard]] inline auto Attenuation() const noexcept
 			{
 				return std::tuple{attenuation_constant_, attenuation_linear_, attenuation_quadratic_};
 			}
 
 			//Returns the inner and outer cutoff angle (radians) of the light
-			//These values only applies for lights of type spot
+			//These values only applies for lights of type spot light
 			[[nodiscard]] inline auto Cutoff() const noexcept
 			{
 				return std::pair{light::detail::cutoff_to_angle(cutoff_),
@@ -280,6 +309,24 @@ namespace ion::graphics::scene
 			{
 				return cast_shadows_;
 			}
+
+
+			/*
+				Rendering
+			*/
+
+			//Render this light
+			//This is called once from a scene graph render queue
+			void Render() noexcept override;
+
+
+			/*
+				Preparing
+			*/
+
+			//Prepare this light
+			//This is called once regardless of passes
+			void Prepare() noexcept;
 	};
 } //ion::graphics::scene
 

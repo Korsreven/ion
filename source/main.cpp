@@ -1034,6 +1034,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				light_struct->CreateUniform<int>("type");
 				light_struct->CreateUniform<glsl::vec3>("position");
 				light_struct->CreateUniform<glsl::vec3>("direction");
+				light_struct->CreateUniform<float>("radius");
 				light_struct->CreateUniform<glsl::vec4>("ambient");
 				light_struct->CreateUniform<glsl::vec4>("diffuse");
 				light_struct->CreateUniform<glsl::vec4>("specular");
@@ -1113,6 +1114,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				light_struct->CreateUniform<int>("type");
 				light_struct->CreateUniform<glsl::vec3>("position");
 				light_struct->CreateUniform<glsl::vec3>("direction");
+				light_struct->CreateUniform<float>("radius");
 				light_struct->CreateUniform<glsl::vec4>("ambient");
 				light_struct->CreateUniform<glsl::vec4>("diffuse");
 				light_struct->CreateUniform<glsl::vec4>("specular");
@@ -1170,6 +1172,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				light_struct->CreateUniform<int>("type");
 				light_struct->CreateUniform<glsl::vec3>("position");
 				light_struct->CreateUniform<glsl::vec3>("direction");
+				light_struct->CreateUniform<float>("radius");
 				light_struct->CreateUniform<glsl::vec4>("ambient");
 				light_struct->CreateUniform<glsl::vec4>("diffuse");
 				light_struct->CreateUniform<glsl::vec4>("specular");

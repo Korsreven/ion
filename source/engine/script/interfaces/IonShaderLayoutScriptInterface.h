@@ -103,6 +103,7 @@ namespace ion::script::interfaces
 			"light-type",
 			"light-position",
 			"light-direction",
+			"light-radius",
 			"light-ambient",
 			"light-diffuse",
 			"light-specular",

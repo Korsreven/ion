@@ -212,6 +212,8 @@ void bind_uniform(const script_tree::PropertyNode &property,
 		shader_layout.BindUniform(shader_layout::UniformName::Light_Position, std::move(declaration));
 	else if (name == "light-direction")
 		shader_layout.BindUniform(shader_layout::UniformName::Light_Direction, std::move(declaration));
+	else if (name == "light-radius")
+		shader_layout.BindUniform(shader_layout::UniformName::Light_Radius, std::move(declaration));
 	else if (name == "light-ambient")
 		shader_layout.BindUniform(shader_layout::UniformName::Light_Ambient, std::move(declaration));
 	else if (name == "light-diffuse")

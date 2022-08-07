@@ -97,6 +97,7 @@ namespace ion::graphics::shaders
 			Light_Type,
 			Light_Position,
 			Light_Direction,
+			Light_Radius,
 			Light_Ambient,
 			Light_Diffuse,
 			Light_Specular,
@@ -212,14 +213,15 @@ namespace ion::graphics::shaders
 				{UniformName::Light_Type,					{"light[0].type",					34}},
 				{UniformName::Light_Position,				{"light[0].position",				35}},
 				{UniformName::Light_Direction,				{"light[0].direction",				36}},
-				{UniformName::Light_Ambient,				{"light[0].ambient",				37}},
-				{UniformName::Light_Diffuse,				{"light[0].diffuse",				38}},
-				{UniformName::Light_Specular,				{"light[0].specular",				39}},
-				{UniformName::Light_Constant,				{"light[0].constant",				40}},
-				{UniformName::Light_Linear,					{"light[0].linear",					41}},
-				{UniformName::Light_Quadratic,				{"light[0].quadratic",				42}},
-				{UniformName::Light_Cutoff,					{"light[0].cutoff",					43}},
-				{UniformName::Light_OuterCutoff,			{"light[0].outer_cutoff",			44}}
+				{UniformName::Light_Radius,					{"light[0].radius",					37}},
+				{UniformName::Light_Ambient,				{"light[0].ambient",				38}},
+				{UniformName::Light_Diffuse,				{"light[0].diffuse",				39}},
+				{UniformName::Light_Specular,				{"light[0].specular",				40}},
+				{UniformName::Light_Constant,				{"light[0].constant",				41}},
+				{UniformName::Light_Linear,					{"light[0].linear",					42}},
+				{UniformName::Light_Quadratic,				{"light[0].quadratic",				43}},
+				{UniformName::Light_Cutoff,					{"light[0].cutoff",					44}},
+				{UniformName::Light_OuterCutoff,			{"light[0].outer_cutoff",			45}}
 			};
 
 		namespace detail

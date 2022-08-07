@@ -82,6 +82,7 @@ void set_light_uniforms(const light_container &lights, int light_count, const Ca
 	auto type = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Type);
 	auto position = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Position);
 	auto direction = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Direction);
+	auto radius = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Radius);
 
 	auto ambient = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Ambient);
 	auto diffuse = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Diffuse);
@@ -105,8 +106,12 @@ void set_light_uniforms(const light_container &lights, int light_count, const Ca
 				camera.ViewMatrix() * (lights[i]->Position() + lights[i]->ParentNode()->DerivedPosition());
 
 		if (direction)
-			(*direction)[i].Get<glsl::vec3>() = lights[i]->Direction().Deviant(lights[i]->ParentNode()->DerivedRotation() -
-												(camera.Rotation() + camera.ParentNode()->DerivedRotation())); //View adjusted
+			(*direction)[i].Get<glsl::vec3>() =
+				lights[i]->Direction().Deviant(lights[i]->ParentNode()->DerivedRotation() -
+				(camera.Rotation() + camera.ParentNode()->DerivedRotation())); //View adjusted
+
+		if (radius)
+			(*radius)[i].Get<float>() = static_cast<float>(lights[i]->Radius()); //Using 'real' could make this uniform double
 
 
 		if (ambient)

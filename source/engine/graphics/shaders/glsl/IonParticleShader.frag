@@ -63,6 +63,7 @@ struct Light
 	int type;
 	vec3 position;
 	vec3 direction;
+	float radius;
 
 	vec4 ambient;
 	vec4 diffuse;
