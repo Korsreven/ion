@@ -65,6 +65,7 @@ namespace ion::graphics::scene
 
 			void PrepareBoundingVolumes() noexcept;
 
+
 			/*
 				Notifying
 			*/
