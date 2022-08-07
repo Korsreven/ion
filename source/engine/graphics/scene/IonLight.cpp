@@ -101,7 +101,7 @@ Light Light::Point(std::optional<std::string> name,
 	return {std::move(name), LightType::Point,
 			position, vector3::Zero, radius,
 			diffuse,
-			0.0_r, 0.0_r, 0.0_r,
+			1.0_r, 0.0_r, 0.0_r,
 			0.0_r, 0.0_r, visible};
 }
 
