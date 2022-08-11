@@ -146,6 +146,34 @@ void set_light_uniforms(const light_container &lights, int light_count, const Ca
 	}
 }
 
+void set_emissive_light_uniforms(const light_container &lights, int light_count, const Camera &camera, shaders::ShaderProgram &shader_program) noexcept
+{
+	using namespace shaders::variables;
+	using namespace ion::utilities;
+
+	if (light_count == 0)
+		return; //Nothing to set
+
+
+	auto position = shader_program.GetUniform(shaders::shader_layout::UniformName::EmissiveLight_Position);
+	auto radius = shader_program.GetUniform(shaders::shader_layout::UniformName::EmissiveLight_Radius);
+	auto color = shader_program.GetUniform(shaders::shader_layout::UniformName::EmissiveLight_Color);
+
+
+	for (auto i = 0; i < light_count; ++i)
+	{
+		if (position)
+			(*position)[i].Get<glsl::vec3>() =
+				camera.ViewMatrix() * (lights[i]->Position() + lights[i]->ParentNode()->DerivedPosition());
+
+		if (radius)
+			(*radius)[i].Get<float>() = static_cast<float>(lights[i]->Radius()); //Using 'real' could make this uniform double
+
+		if (color)
+			(*color)[i].Get<glsl::vec4>() = lights[i]->DiffuseColor();
+	}
+}
+
 void set_matrix_uniforms(const Matrix4 &projection_mat, shaders::ShaderProgram &shader_program) noexcept
 {
 	using namespace shaders::variables;
@@ -201,7 +229,7 @@ void set_node_uniforms(const SceneNode &node, shaders::ShaderProgram &shader_pro
 		scaling->Get<glsl::vec2>() = node.DerivedScaling();
 }
 
-void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, shaders::ShaderProgram &shader_program) noexcept
+void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, int emissive_light_count, shaders::ShaderProgram &shader_program) noexcept
 {
 	using namespace shaders::variables;
 
@@ -213,6 +241,9 @@ void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, 
 
 	if (auto count = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_LightCount); count)
 		count->Get<int>() = light_count;
+
+	if (auto count = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_EmissiveLightCount); count)
+		count->Get<int>() = emissive_light_count;
 }
 
 
@@ -345,11 +376,13 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	const auto &view_mat = camera->ViewMatrix();
 	detail::set_gl_model_view_matrix(view_mat);
 
+
 	/*
 		Lights
 	*/
 	
 	auto active_light_count = 0;
+	auto active_emissive_light_count = 0;
 
 	if (lighting_enabled_)
 	{
@@ -364,6 +397,18 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 					break;
 			}
 		}
+
+		//For each visible emissive light
+		/*for (auto &light : root_node_.AttachedLights())
+		{
+			if (light->Visible() && light->ParentNode()->Visible())
+			{
+				active_emissive_lights_[active_emissive_light_count++] = light;
+
+				if (active_emissive_light_count == detail::max_light_count)
+					break;
+			}
+		}*/
 	}
 
 
@@ -418,8 +463,9 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 								detail::set_camera_uniforms(*camera, *shader_program);
 								detail::set_fog_uniforms(fog_enabled_ ? fog_ : std::optional<render::Fog>{}, *shader_program);
 								detail::set_light_uniforms(active_lights_, active_light_count, *camera, *shader_program);
+								detail::set_emissive_light_uniforms(active_emissive_lights_, active_emissive_light_count, *camera, *shader_program);
 								detail::set_matrix_uniforms(projection_mat, *shader_program);
-								detail::set_scene_uniforms(gamma_, ambient_color_, active_light_count, *shader_program);
+								detail::set_scene_uniforms(gamma_, ambient_color_, active_light_count, active_emissive_light_count, *shader_program);
 								shader_programs_.push_back(shader_program); //Only distinct
 							}
 

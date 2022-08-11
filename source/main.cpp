@@ -983,6 +983,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				auto material_struct = model_program->CreateStruct("material");
 				auto fog_struct = model_program->CreateStruct("fog");
 				auto light_struct = model_program->CreateStruct("light", 8);
+				auto emissive_light_struct = model_program->CreateStruct("emissive_light", 8);
 
 
 				//Shader variables
@@ -1002,6 +1003,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				scene_struct->CreateUniform<float>("gamma");
 				scene_struct->CreateUniform<bool>("has_fog");
 				scene_struct->CreateUniform<int>("light_count");
+				scene_struct->CreateUniform<int>("emissive_light_count");
 
 				//Camera
 				camera_struct->CreateUniform<glsl::vec3>("position");
@@ -1044,6 +1046,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				light_struct->CreateUniform<float>("cutoff");
 				light_struct->CreateUniform<float>("outer_cutoff");
 
+				//Emissive light
+				emissive_light_struct->CreateUniform<glsl::vec3>("position");
+				emissive_light_struct->CreateUniform<float>("radius");
+				emissive_light_struct->CreateUniform<glsl::vec4>("color");
+
 				shader_programs->LoadShaderVariableLocations(*model_program);
 			}
 
@@ -1058,6 +1065,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				auto material_struct = particle_program->CreateStruct("material");
 				auto fog_struct = particle_program->CreateStruct("fog");
 				auto light_struct = particle_program->CreateStruct("light", 8);
+				auto emissive_light_struct = model_program->CreateStruct("emissive_light", 8);
 
 
 				//Shader variables
@@ -1077,6 +1085,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				scene_struct->CreateUniform<float>("gamma");
 				scene_struct->CreateUniform<bool>("has_fog");
 				scene_struct->CreateUniform<int>("light_count");
+				scene_struct->CreateUniform<int>("emissive_light_count");
 
 				//Camera
 				camera_struct->CreateUniform<glsl::vec3>("position");
@@ -1124,6 +1133,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				light_struct->CreateUniform<float>("cutoff");
 				light_struct->CreateUniform<float>("outer_cutoff");
 
+				//Emissive light
+				emissive_light_struct->CreateUniform<glsl::vec3>("position");
+				emissive_light_struct->CreateUniform<float>("radius");
+				emissive_light_struct->CreateUniform<glsl::vec4>("color");
+
 				shader_programs->LoadShaderVariableLocations(*particle_program);
 			}
 
@@ -1136,6 +1150,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				auto primitive_struct = text_program->CreateStruct("primitive");
 				auto fog_struct = text_program->CreateStruct("fog");
 				auto light_struct = text_program->CreateStruct("light", 8);
+				auto emissive_light_struct = model_program->CreateStruct("emissive_light", 8);
 
 
 				//Shader variables
@@ -1153,6 +1168,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				scene_struct->CreateUniform<float>("gamma");
 				scene_struct->CreateUniform<bool>("has_fog");
 				scene_struct->CreateUniform<int>("light_count");
+				scene_struct->CreateUniform<int>("emissive_light_count");
 
 				//Camera
 				camera_struct->CreateUniform<glsl::vec3>("position");	
@@ -1181,6 +1197,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				light_struct->CreateUniform<float>("quadratic");
 				light_struct->CreateUniform<float>("cutoff");
 				light_struct->CreateUniform<float>("outer_cutoff");
+
+				//Emissive light
+				emissive_light_struct->CreateUniform<glsl::vec3>("position");
+				emissive_light_struct->CreateUniform<float>("radius");
+				emissive_light_struct->CreateUniform<glsl::vec4>("color");
 
 				shader_programs->LoadShaderVariableLocations(*text_program);
 			}

@@ -36,7 +36,8 @@ namespace ion::script::interfaces
 			"primitive",
 			"material",
 			"fog",
-			"light"
+			"light",
+			"emissive_light"
 		};
 
 		static inline const Strings attribute_names
@@ -62,6 +63,7 @@ namespace ion::script::interfaces
 			"scene-gamma",
 			"scene-has-fog",
 			"scene-light-count",
+			"scene-emissive-light-count",
 
 			//Camera
 			"camera-position",
@@ -111,7 +113,12 @@ namespace ion::script::interfaces
 			"light-linear",
 			"light-quadratic",
 			"light-cutoff",
-			"light-outer-cutoff"
+			"light-outer-cutoff",
+
+			//Emissive light
+			"emissive-light-position",
+			"emissive-light-radius",
+			"emissive-light-color"
 		};
 
 

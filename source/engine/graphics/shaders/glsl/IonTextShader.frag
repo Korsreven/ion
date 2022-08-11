@@ -18,6 +18,7 @@ struct Scene
 	float gamma;
 	bool has_fog;
 	int light_count;
+	int emissive_light_count;
 };
 
 struct Camera
@@ -59,6 +60,13 @@ struct Light
 	float outer_cutoff;
 };
 
+struct EmissiveLight
+{
+	vec3 position;
+	float radius;
+	vec4 color;
+};
+
 
 in vec3 vert_position;
 in vec4 vert_color;
@@ -72,6 +80,7 @@ uniform Camera camera;
 uniform Primitive primitive;
 uniform Fog fog;
 uniform Light light[8];
+uniform EmissiveLight emissive_light[8];
 
 
 const float log2e = 1.442695;
@@ -173,6 +182,11 @@ vec3 calc_spot_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4
 	return ambient_color.rgb + diffuse_color.rgb + specular_color.rgb;
 }
 
+vec3 calc_emissive_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
+{
+	return vec3(0.0);
+}
+
 
 void main()
 {
@@ -217,7 +231,7 @@ void main()
 
 	
 	//Lighting
-	if (scene.light_count > 0)
+	if (scene.light_count + scene.emissive_light_count > 0)
 	{
 		vec3 light_color = vec3(0.0); //Black
 		vec3 view_dir = normalize(camera.position - vert_position);
@@ -237,6 +251,10 @@ void main()
 			else if (light[i].type == 2)
 				light_color += calc_spot_light(i, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 		}
+
+		//Accumulate each emissive light
+		for (int i = 0; i < scene.emissive_light_count; ++i)
+			light_color += calc_emissive_light(i, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 
 		color.rgb += light_color;
 	}

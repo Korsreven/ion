@@ -38,7 +38,8 @@ namespace ion::graphics::shaders
 			Primitive,
 			Material,
 			Fog,
-			Light
+			Light,
+			EmissiveLight
 		};
 
 		enum class AttributeName
@@ -62,6 +63,7 @@ namespace ion::graphics::shaders
 			Scene_Gamma,
 			Scene_HasFog,
 			Scene_LightCount,
+			Scene_EmissiveLightCount,
 
 			Camera_Position,
 			Camera_Rotation,
@@ -105,7 +107,11 @@ namespace ion::graphics::shaders
 			Light_Linear,
 			Light_Quadratic,
 			Light_Cutoff,
-			Light_OuterCutoff
+			Light_OuterCutoff,
+
+			EmissiveLight_Position,
+			EmissiveLight_Radius,
+			EmissiveLight_Color
 		};
 
 
@@ -145,14 +151,15 @@ namespace ion::graphics::shaders
 		inline const auto DefaultStructBindings =
 			StructBindings
 			{
-				{StructName::Matrix,	"matrix"},
-				{StructName::Scene,		"scene"},
-				{StructName::Camera,	"camera"},
-				{StructName::Node,		"node"},
-				{StructName::Primitive,	"primitive"},
-				{StructName::Material,	"material"},
-				{StructName::Fog,		"fog"},
-				{StructName::Light,		"light"}
+				{StructName::Matrix,		"matrix"},
+				{StructName::Scene,			"scene"},
+				{StructName::Camera,		"camera"},
+				{StructName::Node,			"node"},
+				{StructName::Primitive,		"primitive"},
+				{StructName::Material,		"material"},
+				{StructName::Fog,			"fog"},
+				{StructName::Light,			"light"},
+				{StructName::EmissiveLight,	"emissive_light"}
 			};
 
 		inline const auto DefaultAttributeBindings =
@@ -178,57 +185,62 @@ namespace ion::graphics::shaders
 				{UniformName::Scene_Gamma,					{"scene.gamma",						5}},
 				{UniformName::Scene_HasFog,					{"scene.has_fog",					6}},
 				{UniformName::Scene_LightCount,				{"scene.light_count",				7}},
+				{UniformName::Scene_EmissiveLightCount,		{"scene.emissive_light_count",		8}},
 
-				{UniformName::Camera_Position,				{"camera.position",					8}},
-				{UniformName::Camera_Rotation,				{"camera.rotation",					9}},
+				{UniformName::Camera_Position,				{"camera.position",					9}},
+				{UniformName::Camera_Rotation,				{"camera.rotation",					10}},
 
-				{UniformName::Node_Position,				{"node.position",					10}},
-				{UniformName::Node_Direction,				{"node.direction",					11}},
-				{UniformName::Node_Rotation,				{"node.rotation",					12}},
-				{UniformName::Node_Scaling,					{"node.scaling",					13}},
+				{UniformName::Node_Position,				{"node.position",					11}},
+				{UniformName::Node_Direction,				{"node.direction",					12}},
+				{UniformName::Node_Rotation,				{"node.rotation",					13}},
+				{UniformName::Node_Scaling,					{"node.scaling",					14}},
 
-				{UniformName::Primitive_Texture,			{"primitive.texture",				14}},
-				{UniformName::Primitive_HasTexture,			{"primitive.has_texture",			15}},
-				{UniformName::Primitive_HasMaterial,		{"primitive.has_material",			16}},
+				{UniformName::Primitive_Texture,			{"primitive.texture",				15}},
+				{UniformName::Primitive_HasTexture,			{"primitive.has_texture",			16}},
+				{UniformName::Primitive_HasMaterial,		{"primitive.has_material",			17}},
 
-				{UniformName::Material_Ambient,				{"material.ambient",				17}},
-				{UniformName::Material_Diffuse,				{"material.diffuse",				18}},
-				{UniformName::Material_Specular,			{"material.specular",				19}},
-				{UniformName::Material_Emissive,			{"material.emissive",				20}},
-				{UniformName::Material_Shininess,			{"material.shininess",				21}},
-				{UniformName::Material_DiffuseMap,			{"material.diffuse_map",			22}},
-				{UniformName::Material_NormalMap,			{"material.normal_map",				23}},
-				{UniformName::Material_SpecularMap,			{"material.specular_map",			24}},	
-				{UniformName::Material_HasDiffuseMap,		{"material.has_diffuse_map",		25}},
-				{UniformName::Material_HasNormalMap,		{"material.has_normal_map",			26}},
-				{UniformName::Material_HasSpecularMap,		{"material.has_specular_map",		27}},		
-				{UniformName::Material_LightingEnabled,		{"material.lighting_enabled",		28}},
+				{UniformName::Material_Ambient,				{"material.ambient",				18}},
+				{UniformName::Material_Diffuse,				{"material.diffuse",				19}},
+				{UniformName::Material_Specular,			{"material.specular",				20}},
+				{UniformName::Material_Emissive,			{"material.emissive",				21}},
+				{UniformName::Material_Shininess,			{"material.shininess",				22}},
+				{UniformName::Material_DiffuseMap,			{"material.diffuse_map",			23}},
+				{UniformName::Material_NormalMap,			{"material.normal_map",				24}},
+				{UniformName::Material_SpecularMap,			{"material.specular_map",			25}},	
+				{UniformName::Material_HasDiffuseMap,		{"material.has_diffuse_map",		26}},
+				{UniformName::Material_HasNormalMap,		{"material.has_normal_map",			27}},
+				{UniformName::Material_HasSpecularMap,		{"material.has_specular_map",		28}},		
+				{UniformName::Material_LightingEnabled,		{"material.lighting_enabled",		29}},
 
-				{UniformName::Fog_Mode,						{"fog.mode",						29}},
-				{UniformName::Fog_Density,					{"fog.density",						30}},
-				{UniformName::Fog_Near,						{"fog.near",						31}},
-				{UniformName::Fog_Far,						{"fog.far",							32}},
-				{UniformName::Fog_Color,					{"fog.color",						33}},
+				{UniformName::Fog_Mode,						{"fog.mode",						30}},
+				{UniformName::Fog_Density,					{"fog.density",						31}},
+				{UniformName::Fog_Near,						{"fog.near",						32}},
+				{UniformName::Fog_Far,						{"fog.far",							33}},
+				{UniformName::Fog_Color,					{"fog.color",						34}},
 
-				{UniformName::Light_Type,					{"light[0].type",					34}},
-				{UniformName::Light_Position,				{"light[0].position",				35}},
-				{UniformName::Light_Direction,				{"light[0].direction",				36}},
-				{UniformName::Light_Radius,					{"light[0].radius",					37}},
-				{UniformName::Light_Ambient,				{"light[0].ambient",				38}},
-				{UniformName::Light_Diffuse,				{"light[0].diffuse",				39}},
-				{UniformName::Light_Specular,				{"light[0].specular",				40}},
-				{UniformName::Light_Constant,				{"light[0].constant",				41}},
-				{UniformName::Light_Linear,					{"light[0].linear",					42}},
-				{UniformName::Light_Quadratic,				{"light[0].quadratic",				43}},
-				{UniformName::Light_Cutoff,					{"light[0].cutoff",					44}},
-				{UniformName::Light_OuterCutoff,			{"light[0].outer_cutoff",			45}}
+				{UniformName::Light_Type,					{"light[0].type",					35}},
+				{UniformName::Light_Position,				{"light[0].position",				36}},
+				{UniformName::Light_Direction,				{"light[0].direction",				37}},
+				{UniformName::Light_Radius,					{"light[0].radius",					38}},
+				{UniformName::Light_Ambient,				{"light[0].ambient",				39}},
+				{UniformName::Light_Diffuse,				{"light[0].diffuse",				40}},
+				{UniformName::Light_Specular,				{"light[0].specular",				41}},
+				{UniformName::Light_Constant,				{"light[0].constant",				42}},
+				{UniformName::Light_Linear,					{"light[0].linear",					43}},
+				{UniformName::Light_Quadratic,				{"light[0].quadratic",				44}},
+				{UniformName::Light_Cutoff,					{"light[0].cutoff",					45}},
+				{UniformName::Light_OuterCutoff,			{"light[0].outer_cutoff",			46}},
+
+				{UniformName::EmissiveLight_Position,		{"emissive_light[0].position",		47}},
+				{UniformName::EmissiveLight_Radius,			{"emissive_light[0].radius",		48}},
+				{UniformName::EmissiveLight_Color,			{"emissive_light[0].color",			49}}
 			};
 
 		namespace detail
 		{
-			constexpr auto struct_name_count = static_cast<int>(StructName::Light) + 1;
+			constexpr auto struct_name_count = static_cast<int>(StructName::EmissiveLight) + 1;
 			constexpr auto attribute_name_count = static_cast<int>(AttributeName::Vertex_PointSize) + 1;
-			constexpr auto uniform_name_count = static_cast<int>(UniformName::Light_OuterCutoff) + 1;
+			constexpr auto uniform_name_count = static_cast<int>(UniformName::EmissiveLight_Color) + 1;
 
 			using struct_binding_map = adaptors::FlatMap<StructName, std::string>;
 			using attribute_binding_map = adaptors::FlatMap<AttributeName, shader_layout::VariableDeclaration>;

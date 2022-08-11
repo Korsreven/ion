@@ -73,6 +73,8 @@ void bind_struct(const script_tree::PropertyNode &property,
 		shader_layout.BindStruct(shader_layout::StructName::Fog, std::move(struct_name));
 	else if (name == "light")
 		shader_layout.BindStruct(shader_layout::StructName::Light, std::move(struct_name));
+	else if (name == "emissive-light")
+		shader_layout.BindStruct(shader_layout::StructName::EmissiveLight, std::move(struct_name));
 }
 
 void bind_attribute(const script_tree::PropertyNode &property,
@@ -142,6 +144,8 @@ void bind_uniform(const script_tree::PropertyNode &property,
 		shader_layout.BindUniform(shader_layout::UniformName::Scene_HasFog, std::move(declaration));
 	else if (name == "scene-light-count")
 		shader_layout.BindUniform(shader_layout::UniformName::Scene_LightCount, std::move(declaration));
+	else if (name == "scene-emissive-light-count")
+		shader_layout.BindUniform(shader_layout::UniformName::Scene_EmissiveLightCount, std::move(declaration));
 
 	//Camera
 	else if (name == "camera-position")
@@ -230,6 +234,14 @@ void bind_uniform(const script_tree::PropertyNode &property,
 		shader_layout.BindUniform(shader_layout::UniformName::Light_Cutoff, std::move(declaration));
 	else if (name == "light-outer-cutoff")
 		shader_layout.BindUniform(shader_layout::UniformName::Light_OuterCutoff, std::move(declaration));
+
+	//Emissive light
+	else if (name == "emissive-light-position")
+		shader_layout.BindUniform(shader_layout::UniformName::EmissiveLight_Position, std::move(declaration));
+	else if (name == "emissive-light-radius")
+		shader_layout.BindUniform(shader_layout::UniformName::EmissiveLight_Radius, std::move(declaration));
+	else if (name == "emissive-light-color")
+		shader_layout.BindUniform(shader_layout::UniformName::EmissiveLight_Color, std::move(declaration));
 }
 
 

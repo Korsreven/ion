@@ -74,11 +74,12 @@ namespace ion::graphics::scene::graph
 
 			void set_camera_uniforms(const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &shader_program) noexcept;
-			void set_light_uniforms(const light_container &lights, int light_count, const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;	
+			void set_light_uniforms(const light_container &lights, int light_count, const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
+			void set_emissive_light_uniforms(const light_container &lights, int light_count, const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_matrix_uniforms(const Matrix4 &projection_mat, shaders::ShaderProgram &shader_program) noexcept;
 			void set_matrix_uniforms(const Matrix4 &projection_mat, const Matrix4 &model_view_mat, shaders::ShaderProgram &shader_program) noexcept;
 			void set_node_uniforms(const SceneNode &node, shaders::ShaderProgram &shader_program) noexcept;
-			void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, shaders::ShaderProgram &shader_program) noexcept;
+			void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, int emissive_light_count, shaders::ShaderProgram &shader_program) noexcept;
 
 			void set_gl_model_view_matrix(const Matrix4 &model_view_mat) noexcept;
 			void mult_gl_model_view_matrix(const Matrix4 &model_view_mat) noexcept;
@@ -108,6 +109,7 @@ namespace ion::graphics::scene::graph
 
 
 			scene_graph::detail::light_container active_lights_;
+			scene_graph::detail::light_container active_emissive_lights_;
 
 			scene_graph::detail::shader_program_container shader_programs_;
 			scene_graph::detail::shader_program_container shader_programs_node_;

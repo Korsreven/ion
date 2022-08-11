@@ -310,17 +310,6 @@ namespace ion::graphics::scene
 				return cast_shadows_;
 			}
 
-			//Returns true if this light is a simple point light
-			//Requires that the light is of type point with only position, diffuse color and radius
-			//A simple point light can be sent to the shader using less uniforms than a full point light
-			[[nodiscard]] inline auto IsSimplePointLight() const noexcept
-			{
-				return type_ == light::LightType::Point &&
-					   ambient_color_ == diffuse_color_ &&
-					   specular_color_ == color::DarkGray &&
-					   Attenuation() == std::tuple{1.0_r, 0.0_r, 0.0_r};
-			}
-
 
 			/*
 				Rendering
