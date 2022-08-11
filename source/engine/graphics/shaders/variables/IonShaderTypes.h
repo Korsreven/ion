@@ -71,6 +71,16 @@ namespace ion::graphics::shaders::variables::glsl
 	*/
 
 	template <typename T = float32>
+	struct Sampler1D final
+	{
+	};
+
+	template <typename T = float32>
+	struct Sampler1DArray final
+	{
+	};
+
+	template <typename T = float32>
 	struct Sampler2D final
 	{
 	};
@@ -141,6 +151,17 @@ namespace ion::graphics::shaders::variables::glsl
 
 		template <typename T, int N, int M>
 		struct basic_type_impl<Mat<N, M, T>> : basic_scalar_type_impl<T>
+		{
+		};
+
+
+		template <typename T>
+		struct basic_type_impl<Sampler1D<T>> : basic_scalar_type_impl<int32> //Texture unit is always int
+		{
+		};
+
+		template <typename T>
+		struct basic_type_impl<Sampler1DArray<T>> : basic_scalar_type_impl<int32> //Texture unit is always int
 		{
 		};
 
@@ -985,6 +1006,14 @@ namespace ion::graphics::shaders::variables::glsl
 
 	using mat4x4 = Mat<4, 4>;
 	using dmat4x4 = Mat<4, 4, float64>;
+
+	using isampler1D = Sampler1D<int32>;
+	using usampler1D = Sampler1D<uint32>;
+	using sampler1D = Sampler1D<>;
+
+	using isampler1DArray = Sampler1DArray<int32>;
+	using usampler1DArray = Sampler1DArray<uint32>;
+	using sampler1DArray = Sampler1DArray<>;
 
 	using isampler2D = Sampler2D<int32>;
 	using usampler2D = Sampler2D<uint32>;

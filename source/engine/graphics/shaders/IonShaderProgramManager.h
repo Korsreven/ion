@@ -239,6 +239,15 @@ namespace ion::graphics::shaders
 
 					//Samplers
 
+					void operator()(const glsl::uniform<glsl::isampler1D> &value) const noexcept;
+					void operator()(const glsl::uniform<glsl::usampler1D> &value) const noexcept;
+					void operator()(const glsl::uniform<glsl::sampler1D> &value) const noexcept;
+
+					void operator()(const glsl::uniform<glsl::isampler1DArray> &value) const noexcept;
+					void operator()(const glsl::uniform<glsl::usampler1DArray> &value) const noexcept;
+					void operator()(const glsl::uniform<glsl::sampler1DArray> &value) const noexcept;
+
+
 					void operator()(const glsl::uniform<glsl::isampler2D> &value) const noexcept;
 					void operator()(const glsl::uniform<glsl::usampler2D> &value) const noexcept;
 					void operator()(const glsl::uniform<glsl::sampler2D> &value) const noexcept;

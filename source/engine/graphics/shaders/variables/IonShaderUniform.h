@@ -99,6 +99,15 @@ namespace ion::graphics::shaders::variables
 				//4x4 matrix types
 				glsl::uniform<glsl::mat4x4>,
 				glsl::uniform<glsl::dmat4x4>,
+
+				//1D sampler types
+				glsl::uniform<glsl::isampler1D>,
+				glsl::uniform<glsl::usampler1D>,
+				glsl::uniform<glsl::sampler1D>,
+				
+				glsl::uniform<glsl::isampler1DArray>,
+				glsl::uniform<glsl::usampler1DArray>,
+				glsl::uniform<glsl::sampler1DArray>,
 				
 				//2D sampler types
 				glsl::uniform<glsl::isampler2D>,

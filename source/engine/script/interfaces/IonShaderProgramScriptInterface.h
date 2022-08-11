@@ -70,8 +70,10 @@ namespace ion::script::interfaces
 			"mat4x2", "dmat4x2",
 			"mat4x3", "dmat4x3",
 			"mat4x4", "dmat4x4", "mat4", "dmat4",
-
+			
 			//Sampler types
+			"isampler1D", "usampler1D", "sampler1D",
+			"isampler1DArray", "usampler1DArray", "sampler1DArray",
 			"isampler2D", "usampler2D", "sampler2D",
 			"isampler2DArray", "usampler2DArray", "sampler2DArray"
 		};

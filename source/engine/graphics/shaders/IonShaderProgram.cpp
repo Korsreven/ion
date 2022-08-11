@@ -99,7 +99,34 @@ void ShaderProgram::Created(variables::UniformVariable &uniform_variable) noexce
 		detail::remap_uniform(
 			uniform_variable.Owner()->GetUniform(*uniform_variable.Name()), *shader_layout_, mapped_uniforms_);
 
-	uniform_variable.Visit(
+	uniform_variable.Visit(	
+		//1D sampler types
+		[&](variables::glsl::uniform<variables::glsl::isampler1D> &sampler)
+		{
+			sampler = detail::get_next_texture_unit(next_texture_unit_);
+		},
+		[&](variables::glsl::uniform<variables::glsl::usampler1D> &sampler)
+		{
+			sampler = detail::get_next_texture_unit(next_texture_unit_);
+		},
+		[&](variables::glsl::uniform<variables::glsl::sampler1D> &sampler)
+		{
+			sampler = detail::get_next_texture_unit(next_texture_unit_);
+		},
+		[&](variables::glsl::uniform<variables::glsl::isampler1DArray> &sampler)
+		{
+			sampler = detail::get_next_texture_unit(next_texture_unit_);
+		},
+		[&](variables::glsl::uniform<variables::glsl::usampler1DArray> &sampler)
+		{
+			sampler = detail::get_next_texture_unit(next_texture_unit_);
+		},
+		[&](variables::glsl::uniform<variables::glsl::sampler1DArray> &sampler)
+		{
+			sampler = detail::get_next_texture_unit(next_texture_unit_);
+		},
+
+		//2D sampler types
 		[&](variables::glsl::uniform<variables::glsl::isampler2D> &sampler)
 		{
 			sampler = detail::get_next_texture_unit(next_texture_unit_);
@@ -112,7 +139,6 @@ void ShaderProgram::Created(variables::UniformVariable &uniform_variable) noexce
 		{
 			sampler = detail::get_next_texture_unit(next_texture_unit_);
 		},
-
 		[&](variables::glsl::uniform<variables::glsl::isampler2DArray> &sampler)
 		{
 			sampler = detail::get_next_texture_unit(next_texture_unit_);
