@@ -282,7 +282,11 @@ const movable_object::Lights& Model::EmissiveLights(bool derive) const
 		emissive_lights_.clear();
 
 		for (auto &[mesh, light] : emissive_meshes_)
-			emissive_lights_.push_back(const_cast<Light*>(&light));
+		{
+			auto &mutable_light = const_cast<Light&>(light);
+			mutable_light.ParentNode(ParentNode());
+			emissive_lights_.push_back(&mutable_light);
+		}
 
 		update_emissive_lights_ = false;
 	}
