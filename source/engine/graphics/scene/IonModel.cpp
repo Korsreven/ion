@@ -181,7 +181,7 @@ void Model::ReloadVertexStreams()
 	if (vertex_count < get_mesh_vertex_count(mesh_vertex_streams_))
 		reload_vertex_buffer_ = true;
 
-	update_emissive_lights_ = true;
+	update_emissive_lights_ = !std::empty(emissive_meshes_);
 }
 
 void Model::PrepareVertexStreams()
@@ -284,7 +284,7 @@ const movable_object::Lights& Model::EmissiveLights(bool derive) const
 		for (auto &[mesh, light] : emissive_meshes_)
 			emissive_lights_.push_back(const_cast<Light*>(&light));
 
-		update_emissive_lights_ = true;
+		update_emissive_lights_ = false;
 	}
 
 	return emissive_lights_;
