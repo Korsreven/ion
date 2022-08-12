@@ -281,8 +281,8 @@ const movable_object::Lights& Model::EmissiveLights(bool derive) const
 	{
 		emissive_lights_.clear();
 
-		for (auto &em_mesh : emissive_meshes_)
-			emissive_lights_.push_back(const_cast<Light*>(&em_mesh.second));
+		for (auto &[mesh, light] : emissive_meshes_)
+			emissive_lights_.push_back(const_cast<Light*>(&light));
 
 		update_emissive_lights_ = true;
 	}
@@ -340,6 +340,10 @@ void Model::Prepare() noexcept
 	//Prepare all mesh vertex streams
 	for (auto &stream : mesh_vertex_streams_)
 		stream.vertex_batch.Prepare();
+
+	//Prepare all emissive lights
+	for (auto &[mesh, light] : emissive_meshes_)
+		light.Prepare();
 
 	if (update_bounding_volumes_)
 	{

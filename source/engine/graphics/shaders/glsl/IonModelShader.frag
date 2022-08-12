@@ -135,7 +135,7 @@ vec3 calc_point_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec
 
     //Attenuation
     float distance = length(light[i].position - vert_position);
-    float attenuation = 1.0 / (light[i].constant + light[i].linear * distance + light[i].quadratic * (distance * distance));    
+    float attenuation = 1.0 / (light[i].constant + light[i].linear * distance + light[i].quadratic * (distance * distance));
 
 	//Combine ambient, diffuse and specular color
 	ambient_color *= light[i].ambient;
@@ -183,9 +183,9 @@ vec3 calc_spot_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4
 
     //Attenuation
     float distance = length(light[i].position - vert_position);
-    float attenuation = 1.0 / (light[i].constant + light[i].linear * distance + light[i].quadratic * (distance * distance));    
+    float attenuation = 1.0 / (light[i].constant + light[i].linear * distance + light[i].quadratic * (distance * distance));
     //Intensity
-    float theta = dot(light_dir, normalize(-light[i].direction)); 
+    float theta = dot(light_dir, normalize(-light[i].direction));
     float epsilon = light[i].cutoff - light[i].outer_cutoff;
     float intensity = clamp((theta - light[i].outer_cutoff) / epsilon, 0.0, 1.0);
 
@@ -203,7 +203,28 @@ vec3 calc_spot_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4
 
 vec3 calc_emissive_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
 {
-	return vec3(0.0);
+	vec3 light_dir = normalize(emissive_light[i].position - vert_position);
+
+	//Diffuse shading
+    float diff = max(dot(normal, light_dir), 0.0);
+    //Specular shading
+    vec3 reflect_dir = reflect(-light_dir, normal);
+    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), shininess);
+
+    //Attenuation
+    float distance = length(emissive_light[i].position - vert_position);
+    float attenuation = 1.0 / (distance / emissive_light[i].radius);
+
+	//Combine ambient, diffuse and specular color
+	ambient_color *= emissive_light[i].color;
+	diffuse_color *= emissive_light[i].color;
+	specular_color *= emissive_light[i].color;
+
+	ambient_color.rgb *= ambient_color.a * attenuation;
+	diffuse_color.rgb *= diffuse_color.a * diff * attenuation;
+	specular_color.rgb *= specular_color.a * spec * attenuation;
+
+	return ambient_color.rgb + diffuse_color.rgb + specular_color.rgb;
 }
 
 

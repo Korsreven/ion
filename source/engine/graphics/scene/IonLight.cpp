@@ -194,7 +194,7 @@ void Light::Render() noexcept
 	Preparing
 */
 
-void  Light::Prepare() noexcept
+void Light::Prepare() noexcept
 {
 	if (update_bounding_volumes_)
 	{

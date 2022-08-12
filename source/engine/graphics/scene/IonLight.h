@@ -162,7 +162,11 @@ namespace ion::graphics::scene
 			//Sets the type of light given off by this light source to the given type
 			inline void Type(light::LightType type) noexcept
 			{
-				type_ = type;
+				if (type_ != type)
+				{
+					type_ = type;
+					update_bounding_volumes_ = true;
+				}
 			}
 
 			//Sets the position of the light to the given position
@@ -184,7 +188,11 @@ namespace ion::graphics::scene
 			//These values only applies for lights of type point light
 			inline void Radius(real radius) noexcept
 			{
-				radius_ = radius;
+				if (radius_ != radius)
+				{
+					radius_ = radius;
+					update_bounding_volumes_ = true;
+				}
 			}
 
 
