@@ -111,7 +111,10 @@ void set_light_uniforms(const light_container &lights, int light_count, const Ca
 				(camera.Rotation() + camera.ParentNode()->DerivedRotation())); //View adjusted
 
 		if (radius)
-			(*radius)[i].Get<float>() = static_cast<float>(lights[i]->Radius()); //Using 'real' could make this uniform double
+		{
+			auto [sx, sy] = lights[i]->ParentNode()->DerivedScaling().XY();
+			(*radius)[i].Get<float>() = static_cast<float>(lights[i]->Radius() * ((sx + sy) * 0.5_r)); //Using 'real' could make this uniform double
+		}
 
 
 		if (ambient)
@@ -167,7 +170,10 @@ void set_emissive_light_uniforms(const light_container &lights, int light_count,
 				camera.ViewMatrix() * (lights[i]->Position() + lights[i]->ParentNode()->DerivedPosition());
 
 		if (radius)
-			(*radius)[i].Get<float>() = static_cast<float>(lights[i]->Radius()); //Using 'real' could make this uniform double
+		{
+			auto [sx, sy] = lights[i]->ParentNode()->DerivedScaling().XY();
+			(*radius)[i].Get<float>() = static_cast<float>(lights[i]->Radius() * ((sx + sy) * 0.5_r)); //Using 'real' could make this uniform double
+		}
 
 		if (color)
 			(*color)[i].Get<glsl::vec4>() = lights[i]->DiffuseColor();
