@@ -200,6 +200,13 @@ void MovableObject::Render() noexcept
 			aabb_color_, obb_color_, sphere_color_);
 }
 
+
+const movable_object::Lights& MovableObject::EmissiveLights([[maybe_unused]] bool derive) const
+{
+	//Optional to override
+	return emissive_lights_;
+}
+
 const ShaderPrograms& MovableObject::RenderPrograms([[maybe_unused]] bool derive) const
 {
 	//Optional to override

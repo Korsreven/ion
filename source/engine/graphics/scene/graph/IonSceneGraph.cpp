@@ -398,17 +398,38 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 			}
 		}
 
-		//For each visible emissive light
-		/*for (auto &light : root_node_.AttachedLights())
+		//For each visible node
+		for (auto &node : root_node_.OrderedSceneNodes())
 		{
-			if (light->Visible() && light->ParentNode()->Visible())
+			if (node.Visible())
 			{
-				active_emissive_lights_[active_emissive_light_count++] = light;
+				//For each attached object
+				for (auto &attached_object : node.AttachedObjects())
+				{
+					auto object =
+						std::visit(
+							[=](auto &&object) noexcept -> MovableObject*
+							{
+								return object;
+							}, attached_object);
 
-				if (active_emissive_light_count == detail::max_light_count)
-					break;
+					if (object->Visible())
+					{
+						//For each visible emissive light
+						for (auto &light : object->EmissiveLights(false))
+						{
+							if (light->Visible())
+							{
+								active_emissive_lights_[active_emissive_light_count++] = light;
+
+								if (active_emissive_light_count == detail::max_light_count)
+									break;
+							}
+						}
+					}
+				}
 			}
-		}*/
+		}
 	}
 
 

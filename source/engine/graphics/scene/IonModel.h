@@ -16,6 +16,7 @@ File:	IonModel.h
 #include <optional>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include "IonDrawableObject.h"
@@ -43,9 +44,13 @@ namespace ion::graphics
 
 namespace ion::graphics::scene
 {
+	class Light; //Forward declaration
+
 	namespace model::detail
 	{
 		using mesh_pointers = std::vector<shapes::Mesh*>;
+		using emissive_mesh = std::pair<shapes::Mesh*,Light>;
+		using emissive_meshes = std::vector<emissive_mesh>;
 
 		struct mesh_vertex_stream final
 		{
@@ -60,13 +65,21 @@ namespace ion::graphics::scene
 
 		using mesh_vertex_streams = std::vector<mesh_vertex_stream>;
 
-
 		struct mesh_group_comparator final
 		{
 			bool operator()(const shapes::Mesh &mesh, const shapes::Mesh &mesh2) const noexcept;
 		};
 
+
 		int get_mesh_vertex_count(const mesh_vertex_streams &mesh_streams) noexcept;
+		mesh_vertex_stream* get_mesh_stream(const shapes::Mesh &mesh, mesh_vertex_streams &mesh_streams) noexcept;
+
+		emissive_mesh* get_emissive_mesh(const shapes::Mesh &mesh, emissive_meshes &meshes) noexcept;
+		Light get_emissive_light(const shapes::Mesh &mesh) noexcept;
+		void add_emissive_mesh(shapes::Mesh &mesh, emissive_meshes &meshes);
+		void remove_emissive_mesh(const shapes::Mesh &mesh, emissive_meshes &meshes) noexcept;
+		void update_emissive_mesh(emissive_mesh &em_mesh) noexcept;
+		bool is_mesh_emissive(const shapes::Mesh &mesh) noexcept;
 	} //model::detail
 
 
@@ -77,11 +90,13 @@ namespace ion::graphics::scene
 		private:
 
 			model::detail::mesh_vertex_streams mesh_vertex_streams_;
+			model::detail::emissive_meshes emissive_meshes_;
 			std::optional<render::vertex::VertexBufferObject> vbo_;
 
 			bool reload_vertex_streams_ = false;
 			bool reload_vertex_buffer_ = false;
 			bool update_bounding_volumes_ = false;
+			mutable bool update_emissive_lights_ = false;
 
 
 			void ReloadVertexStreams();
@@ -150,6 +165,14 @@ namespace ion::graphics::scene
 
 
 			/*
+				Rendering
+			*/
+
+			//Returns all emissive lights in this model
+			[[nodiscard]] const movable_object::Lights& EmissiveLights(bool derive = true) const;
+
+
+			/*
 				Preparing / drawing
 			*/
 
@@ -159,7 +182,7 @@ namespace ion::graphics::scene
 
 			//Draw this model with the given shader program (optional)
 			//This can be called multiple times if more than one pass
-			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept override;
+			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept override;	
 
 
 			/*

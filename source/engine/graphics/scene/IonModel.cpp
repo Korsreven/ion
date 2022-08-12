@@ -12,17 +12,21 @@ File:	IonModel.cpp
 
 #include "IonModel.h"
 
-#include <utility>
-
+#include "IonLight.h"
 #include "graphics/IonGraphicsAPI.h"
+#include "graphics/materials/IonMaterial.h"
 #include "graphics/shaders/IonShaderProgram.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
+#include "graphics/utilities/IonColor.h"
 #include "query/IonSceneQuery.h"
+
+#undef RGB
 
 namespace ion::graphics::scene
 {
 
 using namespace model;
+using namespace graphics::utilities;
 
 namespace model::detail
 {
@@ -50,12 +54,79 @@ bool mesh_group_comparator::operator()(const shapes::Mesh &mesh, const shapes::M
 		   mesh.ShowWireframe() == mesh2.ShowWireframe();
 }
 
+
 int get_mesh_vertex_count(const mesh_vertex_streams &mesh_streams) noexcept
 {
 	auto count = 0;
 	for (auto &stream : mesh_streams)
 		count += std::ssize(stream.vertex_data);
 	return count;
+}
+
+mesh_vertex_stream* get_mesh_stream(const shapes::Mesh &mesh, mesh_vertex_streams &mesh_streams) noexcept
+{
+	for (auto &stream : mesh_streams)
+	{
+		if (std::find(std::begin(stream.meshes), std::end(stream.meshes), &mesh) != std::end(stream.meshes))
+			return &stream;
+	}
+
+	return nullptr;
+}
+
+
+emissive_mesh* get_emissive_mesh(const shapes::Mesh &mesh, emissive_meshes &meshes) noexcept
+{
+	if (auto iter = std::find_if(std::begin(meshes), std::end(meshes),
+		[&](auto &x) noexcept
+		{
+			return x.first == &mesh;
+		}); iter != std::end(meshes))
+		
+		return &*iter;
+	else
+		return nullptr;
+}
+
+Light get_emissive_light(const shapes::Mesh &mesh) noexcept
+{
+	if (auto material = mesh.SurfaceMaterial(); material)
+	{
+		auto &sphere = mesh.BoundingSphere();
+		return Light::Point({}, sphere.Center(), sphere.Radius(), material->EmissiveColor());
+	}
+	else
+		return Light{};
+}
+
+void add_emissive_mesh(shapes::Mesh &mesh, emissive_meshes &meshes)
+{
+	meshes.push_back({&mesh, get_emissive_light(mesh)});
+}
+
+void remove_emissive_mesh(const shapes::Mesh &mesh, emissive_meshes &meshes) noexcept
+{
+	if (auto iter = std::find_if(std::begin(meshes), std::end(meshes),
+		[&](auto &x) noexcept
+		{
+			return x.first == &mesh;
+		}); iter != std::end(meshes))
+
+		meshes.erase(iter);
+}
+
+void update_emissive_mesh(emissive_mesh &em_mesh) noexcept
+{
+	if (auto mesh = em_mesh.first; mesh)
+		em_mesh.second = get_emissive_light(*mesh);
+}
+
+bool is_mesh_emissive(const shapes::Mesh &mesh) noexcept
+{
+	if (auto material = mesh.SurfaceMaterial(); material)
+		return material->EmissiveColor().RGB() != color::Black.RGB();
+	else
+		return false;
 }
 
 } //model::detail
@@ -67,7 +138,9 @@ void Model::ReloadVertexStreams()
 {
 	auto vertex_count = detail::get_mesh_vertex_count(mesh_vertex_streams_);
 	auto z_offset = shapes::mesh::detail::position_offset + 2;
+
 	mesh_vertex_streams_.clear();
+	emissive_meshes_.clear();
 
 	detail::mesh_pointers meshes;
 	for (auto &mesh : Meshes())
@@ -94,6 +167,10 @@ void Model::ReloadVertexStreams()
 		mesh_vertex_streams_.back().vertex_data.insert(std::end(mesh_vertex_streams_.back().vertex_data),
 			std::begin(mesh->VertexData()), std::end(mesh->VertexData()));
 		mesh_vertex_streams_.back().meshes.push_back(mesh);
+		
+		//Add emissive mesh
+		if (detail::is_mesh_emissive(*mesh))
+			detail::add_emissive_mesh(*mesh, emissive_meshes_);
 
 		previous_mesh = mesh;
 	}
@@ -103,6 +180,8 @@ void Model::ReloadVertexStreams()
 
 	if (vertex_count < get_mesh_vertex_count(mesh_vertex_streams_))
 		reload_vertex_buffer_ = true;
+
+	update_emissive_lights_ = true;
 }
 
 void Model::PrepareVertexStreams()
@@ -112,11 +191,17 @@ void Model::PrepareVertexStreams()
 		if (stream.reload_vertex_data)
 		{
 			stream.vertex_data.clear();
-
-			//Update vertex data
+			
 			for (auto &mesh : stream.meshes)
+			{
+				//Update vertex data
 				stream.vertex_data.insert(std::end(stream.vertex_data),
 					std::begin(mesh->VertexData()), std::end(mesh->VertexData()));
+
+				//Update emissive mesh
+				if (auto em_mesh = detail::get_emissive_mesh(*mesh, emissive_meshes_); em_mesh)
+					detail::update_emissive_mesh(*em_mesh);
+			}
 
 			stream.vertex_batch.VertexData(stream.vertex_data);
 		}
@@ -135,9 +220,13 @@ void Model::Created(shapes::Mesh &mesh) noexcept
 	update_bounding_volumes_ |= !std::empty(mesh.VertexData());
 }
 
-void Model::Removed(shapes::Mesh&) noexcept
+void Model::Removed(shapes::Mesh &mesh) noexcept
 {
+	reload_vertex_streams_ = true;
 	update_bounding_volumes_ = true;
+
+	//Remove emissive mesh
+	detail::remove_emissive_mesh(mesh, emissive_meshes_);
 }
 
 
@@ -170,14 +259,8 @@ void Model::NotifyMeshReload(const shapes::Mesh &mesh) noexcept
 {
 	if (mesh.Owner() == this && !reload_vertex_streams_)
 	{
-		for (auto &stream : mesh_vertex_streams_)
-		{
-			if (std::find(std::begin(stream.meshes), std::end(stream.meshes), &mesh) != std::end(stream.meshes))
-			{
-				stream.reload_vertex_data = true;
-				break;
-			}
-		}
+		if (auto stream = detail::get_mesh_stream(mesh, mesh_vertex_streams_); stream)
+			stream->reload_vertex_data = true;
 	}
 }
 
@@ -185,6 +268,26 @@ void Model::NotifyMeshReloadAll(const shapes::Mesh &mesh) noexcept
 {
 	if (mesh.Owner() == this)
 		reload_vertex_streams_ = true;
+}
+
+
+/*
+	Rendering
+*/
+
+const movable_object::Lights& Model::EmissiveLights(bool derive) const
+{
+	if (derive || update_emissive_lights_)
+	{
+		emissive_lights_.clear();
+
+		for (auto &em_mesh : emissive_meshes_)
+			emissive_lights_.push_back(const_cast<Light*>(&em_mesh.second));
+
+		update_emissive_lights_ = true;
+	}
+
+	return emissive_lights_;
 }
 
 

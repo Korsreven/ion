@@ -36,7 +36,9 @@ namespace ion::graphics
 
 namespace ion::graphics::scene
 {
-	class SceneManager; //Forward declaration
+	//Forward declarations
+	class Light;
+	class SceneManager;
 
 	namespace graph
 	{
@@ -54,7 +56,8 @@ namespace ion::graphics::scene
 			BoundingSphere
 		};
 
-		using ShaderPrograms = std::vector<shaders::ShaderProgram*>;
+		using Lights = std::vector<Light*>;
+		using ShaderPrograms = std::vector<shaders::ShaderProgram*>;		
 
 
 		namespace detail
@@ -75,7 +78,8 @@ namespace ion::graphics::scene
 			Obb obb_;
 			Sphere sphere_;
 
-			mutable movable_object::ShaderPrograms shader_programs_;
+			mutable movable_object::Lights emissive_lights_;
+			mutable movable_object::ShaderPrograms shader_programs_;		
 
 
 			/*
@@ -384,8 +388,12 @@ namespace ion::graphics::scene
 			//This is called once from a scene graph render queue
 			virtual void Render() noexcept;
 
+
+			//Returns all emissive lights in this movable object
+			[[nodiscard]] virtual const movable_object::Lights& EmissiveLights(bool derive = true) const;
+
 			//Returns all (distinct) shader programs used to render this movable object
-			[[nodiscard]] virtual const movable_object::ShaderPrograms& RenderPrograms(bool derive = true) const;
+			[[nodiscard]] virtual const movable_object::ShaderPrograms& RenderPrograms(bool derive = true) const;	
 
 
 			/*
