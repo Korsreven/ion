@@ -102,7 +102,10 @@ uniform Light light[8];
 uniform EmissiveLight emissive_light[8];
 
 
+const vec4 black = vec4(0.0, 0.0, 0.0, 1.0);
+const vec4 dark_gray = vec4(0.66, 0.66, 0.66, 1.0);
 const float log2e = 1.442695;
+
 float fog_frag_coord = abs(vert_position.z);
 float fog_scale = 1.0 / (fog.far - fog.near);
 
@@ -218,7 +221,7 @@ vec3 calc_emissive_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, 
 	//Combine ambient, diffuse and specular color
 	ambient_color *= emissive_light[i].color;
 	diffuse_color *= emissive_light[i].color;
-	specular_color *= emissive_light[i].color;
+	specular_color *= dark_gray;
 
 	ambient_color.rgb *= ambient_color.a * attenuation;
 	diffuse_color.rgb *= diffuse_color.a * diff * attenuation;
@@ -233,8 +236,8 @@ void main()
 	//Ambient, diffuse, specular and emissive color
 	vec4 ambient_color = scene.ambient * vert_color;
 	vec4 diffuse_color = vert_color;
-	vec4 specular_color = vec4(0.66, 0.66, 0.66, 1.0); //DarkGray
-	vec4 emissive_color = vec4(0.0, 0.0, 0.0, 1.0); //Black
+	vec4 specular_color = dark_gray;
+	vec4 emissive_color = black;
 	float shininess = 32.0;
 
 	//Normal/bump mapping
@@ -297,7 +300,7 @@ void main()
 	if (scene.light_count + scene.emissive_light_count > 0 &&
 		(!primitive.has_material || material.lighting_enabled))
 	{
-		vec3 light_color = vec3(0.0); //Black
+		vec3 light_color = black.rgb;
 		vec3 view_dir = normalize(camera.position - vert_position);
 
 		//Accumulate each light
