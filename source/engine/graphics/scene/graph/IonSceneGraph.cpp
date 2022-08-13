@@ -13,6 +13,7 @@ File:	IonSceneGraph.cpp
 #include "IonSceneGraph.h"
 
 #include <algorithm>
+#include <utility>
 #include <variant>
 
 #include "graphics/IonGraphicsAPI.h"
@@ -113,7 +114,7 @@ void set_light_uniforms(const light_container &lights, int light_count, const Ca
 		if (radius)
 		{
 			auto [sx, sy] = lights[i]->ParentNode()->DerivedScaling().XY();
-			(*radius)[i].Get<float>() = static_cast<float>(lights[i]->Radius() * ((sx + sy) * 0.5_r)); //Using 'real' could make this uniform double
+			(*radius)[i].Get<float>() = static_cast<float>(lights[i]->Radius() * std::max(sx, sy)); //Using 'real' could make this uniform double
 		}
 
 
@@ -172,7 +173,7 @@ void set_emissive_light_uniforms(const light_container &lights, int light_count,
 		if (radius)
 		{
 			auto [sx, sy] = lights[i]->ParentNode()->DerivedScaling().XY();
-			(*radius)[i].Get<float>() = static_cast<float>(lights[i]->Radius() * ((sx + sy) * 0.5_r)); //Using 'real' could make this uniform double
+			(*radius)[i].Get<float>() = static_cast<float>(lights[i]->Radius() * std::max(sx, sy)); //Using 'real' could make this uniform double
 		}
 
 		if (color)
