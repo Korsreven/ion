@@ -18,11 +18,13 @@ File:	IonSceneGraph.cpp
 
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/render/IonViewport.h"
+#include "graphics/render/vertex/IonVertexBatch.h"
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonLight.h"
 #include "graphics/scene/IonMovableObject.h"
 #include "graphics/shaders/IonShaderLayout.h"
 #include "graphics/shaders/IonShaderProgram.h"
+#include "graphics/textures/IonTextureManager.h"
 #include "utilities/IonMath.h"
 
 namespace ion::graphics::scene::graph
@@ -71,113 +73,151 @@ void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &sh
 		color->Get<glsl::vec4>() = fog->Tint();
 }
 
-void set_light_uniforms(const light_container &lights, int light_count, const Camera &camera, shaders::ShaderProgram &shader_program) noexcept
+void set_light_uniforms(const light_pointers &lights, std::optional<textures::texture::TextureHandle> &texture_handle,
+	const Camera &camera, shaders::ShaderProgram &shader_program) noexcept
 {
 	using namespace shaders::variables;
 	using namespace ion::utilities;
 
-	if (light_count == 0)
+	if (std::empty(lights))
 		return; //Nothing to set
 
 
-	auto type = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Type);
-	auto position = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Position);
-	auto direction = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Direction);
-	auto radius = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Radius);
-
-	auto ambient = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Ambient);
-	auto diffuse = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Diffuse);
-	auto specular = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Specular);
-
-	auto constant = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Constant);
-	auto linear = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Linear);
-	auto quadratic = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Quadratic);
-
-	auto cutoff = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Cutoff);
-	auto outer_cutoff = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_OuterCutoff);
-
-
-	for (auto i = 0; i < light_count; ++i)
+	if (auto scene_lights = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_Lights); scene_lights)
 	{
-		if (type)
-			(*type)[i].Get<int>() = static_cast<int>(lights[i]->Type());
-
-		if (position)
-			(*position)[i].Get<glsl::vec3>() =
-				camera.ViewMatrix() * (lights[i]->Position() + lights[i]->ParentNode()->DerivedPosition());
-
-		if (direction)
-			(*direction)[i].Get<glsl::vec3>() =
-				lights[i]->Direction().Deviant(lights[i]->ParentNode()->DerivedRotation() -
-				(camera.Rotation() + camera.ParentNode()->DerivedRotation())); //View adjusted
-
-		if (radius)
+		if (texture_handle = light::detail::upload_light_data(texture_handle, lights); texture_handle)
 		{
-			auto [sx, sy] = lights[i]->ParentNode()->DerivedScaling().XY();
-			(*radius)[i].Get<float>() = static_cast<float>(lights[i]->Radius() * std::max(sx, sy)); //Using 'real' could make this uniform double
+			if (auto texture_unit = scene_lights->Get<glsl::sampler1DArray>(); texture_unit >= 0)
+				render::vertex::vertex_batch::detail::bind_texture(*texture_handle, texture_unit);
 		}
+	}
+	else
+	{
+		auto type = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Type);
+		auto position = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Position);
+		auto direction = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Direction);
+		auto radius = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Radius);
+
+		auto ambient = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Ambient);
+		auto diffuse = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Diffuse);
+		auto specular = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Specular);
+
+		auto constant = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Constant);
+		auto linear = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Linear);
+		auto quadratic = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Quadratic);
+
+		auto cutoff = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Cutoff);
+		auto outer_cutoff = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_OuterCutoff);
 
 
-		if (ambient)
-			(*ambient)[i].Get<glsl::vec4>() = lights[i]->AmbientColor();
-
-		if (diffuse)
-			(*diffuse)[i].Get<glsl::vec4>() = lights[i]->DiffuseColor();
-
-		if (specular)
-			(*specular)[i].Get<glsl::vec4>() = lights[i]->SpecularColor();
+		for (auto i = 0; auto &light : lights)
+		{
+			if (i == max_light_count)
+				break;
 
 
-		auto [constant_attenuation, linear_attenuation, quadratic_attenuation] = lights[i]->Attenuation();
+			if (type)
+				(*type)[i].Get<int>() = static_cast<int>(light->Type());
 
-		if (constant)
-			(*constant)[i].Get<float>() = static_cast<float>(constant_attenuation); //Using 'real' could make this uniform double
+			if (position)
+				(*position)[i].Get<glsl::vec3>() =
+					camera.ViewMatrix() * (light->Position() + light->ParentNode()->DerivedPosition());
 
-		if (linear)
-			(*linear)[i].Get<float>() = static_cast<float>(linear_attenuation); //Using 'real' could make this uniform double
+			if (direction)
+				(*direction)[i].Get<glsl::vec3>() =
+					light->Direction().Deviant(light->ParentNode()->DerivedRotation() -
+					(camera.Rotation() + camera.ParentNode()->DerivedRotation())); //View adjusted
 
-		if (quadratic)
-			(*quadratic)[i].Get<float>() = static_cast<float>(quadratic_attenuation); //Using 'real' could make this uniform double
+			if (radius)
+			{
+				auto [sx, sy] = light->ParentNode()->DerivedScaling().XY();
+				(*radius)[i].Get<float>() = static_cast<float>(light->Radius() * std::max(sx, sy)); //Using 'real' could make this uniform double
+			}
 
 
-		auto [cutoff_angle, outer_cutoff_angle] = lights[i]->Cutoff();
+			if (ambient)
+				(*ambient)[i].Get<glsl::vec4>() = light->AmbientColor();
 
-		if (cutoff)
-			(*cutoff)[i].Get<float>() = static_cast<float>(math::Cos(cutoff_angle)); //Using 'real' could make this uniform double
+			if (diffuse)
+				(*diffuse)[i].Get<glsl::vec4>() = light->DiffuseColor();
 
-		if (outer_cutoff)
-			(*outer_cutoff)[i].Get<float>() = static_cast<float>(math::Cos(outer_cutoff_angle)); //Using 'real' could make this uniform double
+			if (specular)
+				(*specular)[i].Get<glsl::vec4>() = light->SpecularColor();
+
+
+			auto [constant_attenuation, linear_attenuation, quadratic_attenuation] = light->Attenuation();
+
+			if (constant)
+				(*constant)[i].Get<float>() = static_cast<float>(constant_attenuation); //Using 'real' could make this uniform double
+
+			if (linear)
+				(*linear)[i].Get<float>() = static_cast<float>(linear_attenuation); //Using 'real' could make this uniform double
+
+			if (quadratic)
+				(*quadratic)[i].Get<float>() = static_cast<float>(quadratic_attenuation); //Using 'real' could make this uniform double
+
+
+			auto [cutoff_angle, outer_cutoff_angle] = light->Cutoff();
+
+			if (cutoff)
+				(*cutoff)[i].Get<float>() = static_cast<float>(math::Cos(cutoff_angle)); //Using 'real' could make this uniform double
+
+			if (outer_cutoff)
+				(*outer_cutoff)[i].Get<float>() = static_cast<float>(math::Cos(outer_cutoff_angle)); //Using 'real' could make this uniform double
+
+
+			++i; //Increase light index
+		}
 	}
 }
 
-void set_emissive_light_uniforms(const light_container &lights, int light_count, const Camera &camera, shaders::ShaderProgram &shader_program) noexcept
+void set_emissive_light_uniforms(const light_pointers &lights, std::optional<textures::texture::TextureHandle> &texture_handle,
+	const Camera &camera, shaders::ShaderProgram &shader_program) noexcept
 {
 	using namespace shaders::variables;
 	using namespace ion::utilities;
 
-	if (light_count == 0)
+	if (std::empty(lights))
 		return; //Nothing to set
 
 
-	auto position = shader_program.GetUniform(shaders::shader_layout::UniformName::EmissiveLight_Position);
-	auto radius = shader_program.GetUniform(shaders::shader_layout::UniformName::EmissiveLight_Radius);
-	auto color = shader_program.GetUniform(shaders::shader_layout::UniformName::EmissiveLight_Color);
-
-
-	for (auto i = 0; i < light_count; ++i)
+	if (auto scene_lights = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_EmissiveLights); scene_lights)
 	{
-		if (position)
-			(*position)[i].Get<glsl::vec3>() =
-				camera.ViewMatrix() * (lights[i]->Position() + lights[i]->ParentNode()->DerivedPosition());
-
-		if (radius)
+		if (texture_handle = light::detail::upload_emissive_light_data(texture_handle, lights); texture_handle)
 		{
-			auto [sx, sy] = lights[i]->ParentNode()->DerivedScaling().XY();
-			(*radius)[i].Get<float>() = static_cast<float>(lights[i]->Radius() * std::max(sx, sy)); //Using 'real' could make this uniform double
+			if (auto texture_unit = scene_lights->Get<glsl::sampler1DArray>(); texture_unit >= 0)
+				render::vertex::vertex_batch::detail::bind_texture(*texture_handle, texture_unit);
 		}
+	}
+	else
+	{
+		auto position = shader_program.GetUniform(shaders::shader_layout::UniformName::EmissiveLight_Position);
+		auto radius = shader_program.GetUniform(shaders::shader_layout::UniformName::EmissiveLight_Radius);
+		auto color = shader_program.GetUniform(shaders::shader_layout::UniformName::EmissiveLight_Color);
 
-		if (color)
-			(*color)[i].Get<glsl::vec4>() = lights[i]->DiffuseColor();
+
+		for (auto i = 0; auto &light : lights)
+		{
+			if (i == max_light_count)
+				break;
+
+
+			if (position)
+				(*position)[i].Get<glsl::vec3>() =
+					camera.ViewMatrix() * (light->Position() + light->ParentNode()->DerivedPosition());
+
+			if (radius)
+			{
+				auto [sx, sy] = light->ParentNode()->DerivedScaling().XY();
+				(*radius)[i].Get<float>() = static_cast<float>(light->Radius() * std::max(sx, sy)); //Using 'real' could make this uniform double
+			}
+
+			if (color)
+				(*color)[i].Get<glsl::vec4>() = light->DiffuseColor();
+
+
+			++i; //Increase light index
+		}
 	}
 }
 
@@ -352,6 +392,16 @@ void SceneGraph::NotifyNodeRenderEnded(SceneNode &node) noexcept
 
 //Public
 
+SceneGraph::~SceneGraph() noexcept
+{
+	if (light_texture_handle_)
+		textures::texture_manager::detail::unload_texture(*light_texture_handle_);
+
+	if (emissive_light_texture_handle_)
+		textures::texture_manager::detail::unload_texture(*emissive_light_texture_handle_);
+}
+
+
 /*
 	Rendering
 */
@@ -387,9 +437,9 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	/*
 		Lights
 	*/
-	
-	auto active_light_count = 0;
-	auto active_emissive_light_count = 0;
+
+	lights_.clear();
+	emissive_lights_.clear();
 
 	if (lighting_enabled_)
 	{
@@ -397,12 +447,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 		for (auto &light : root_node_.AttachedLights())
 		{
 			if (light->Visible() && light->ParentNode()->Visible())
-			{
-				active_lights_[active_light_count++] = light;
-
-				if (active_light_count == detail::max_light_count)
-					break;
-			}
+				lights_.push_back(light);
 		}
 
 		//For each visible node
@@ -426,12 +471,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 						for (auto &light : object->EmissiveLights(false))
 						{
 							if (light->Visible())
-							{
-								active_emissive_lights_[active_emissive_light_count++] = light;
-
-								if (active_emissive_light_count == detail::max_light_count)
-									break;
-							}
+								emissive_lights_.push_back(light);
 						}
 					}
 				}
@@ -490,10 +530,10 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 							{
 								detail::set_camera_uniforms(*camera, *shader_program);
 								detail::set_fog_uniforms(fog_enabled_ ? fog_ : std::optional<render::Fog>{}, *shader_program);
-								detail::set_light_uniforms(active_lights_, active_light_count, *camera, *shader_program);
-								detail::set_emissive_light_uniforms(active_emissive_lights_, active_emissive_light_count, *camera, *shader_program);
+								detail::set_light_uniforms(lights_, light_texture_handle_, *camera, *shader_program);
+								detail::set_emissive_light_uniforms(emissive_lights_, emissive_light_texture_handle_, *camera, *shader_program);
 								detail::set_matrix_uniforms(projection_mat, *shader_program);
-								detail::set_scene_uniforms(gamma_, ambient_color_, active_light_count, active_emissive_light_count, *shader_program);
+								detail::set_scene_uniforms(gamma_, ambient_color_, std::ssize(lights_), std::ssize(emissive_lights_), *shader_program);
 								shader_programs_.push_back(shader_program); //Only distinct
 							}
 

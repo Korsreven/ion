@@ -52,7 +52,7 @@ namespace ion::graphics::scene
 
 			constexpr auto light_float_components = 25;
 			constexpr auto emissive_light_float_components = 8;
-			constexpr auto float_components = 4;
+			constexpr auto min_texture_depth = 8;
 
 			constexpr auto default_cutoff_angle = math::ToRadians(45.0_r);
 			constexpr auto default_outer_cutoff_angle = math::ToRadians(55.0_r);
@@ -70,13 +70,13 @@ namespace ion::graphics::scene
 
 
 			std::optional<textures::texture::TextureHandle> create_texture(int width, int depth) noexcept;
-			std::optional<textures::texture::TextureHandle> create_light_texture(light_pointers lights) noexcept;
-			std::optional<textures::texture::TextureHandle> create_emissive_light_texture(light_pointers lights) noexcept;
+			std::optional<textures::texture::TextureHandle> create_light_texture(const light_pointers &lights) noexcept;
+			std::optional<textures::texture::TextureHandle> create_emissive_light_texture(const light_pointers &lights) noexcept;
 
 			std::optional<textures::texture::TextureHandle> upload_light_data(
-				std::optional<textures::texture::TextureHandle> texture_handle, light_pointers lights) noexcept;
+				std::optional<textures::texture::TextureHandle> texture_handle, const light_pointers &lights) noexcept;
 			std::optional<textures::texture::TextureHandle> upload_emissive_light_data(
-				std::optional<textures::texture::TextureHandle> texture_handle, light_pointers lights) noexcept;
+				std::optional<textures::texture::TextureHandle> texture_handle, const light_pointers &lights) noexcept;
 		} //detail
 	} //light
 

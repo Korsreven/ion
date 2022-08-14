@@ -20,6 +20,7 @@ File:	IonSceneGraph.h
 #include "events/IonListenable.h"
 #include "events/listeners/IonSceneNodeListener.h"
 #include "graphics/render/IonFog.h"
+#include "graphics/textures/IonTexture.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector3.h"
@@ -64,8 +65,8 @@ namespace ion::graphics::scene::graph
 				//Warning: This value must be less or equal to the actual array size used for lights (in the fragment shader)
 				//If scene graph contains more visible lights, then only the lights nearest to the geometry should be rendered
 
-			using light_container = std::array<Light*, max_light_count>;
-			using shader_program_container = std::vector<shaders::ShaderProgram*>;
+			using light_pointers = std::vector<Light*>;
+			using shader_program_pointers = std::vector<shaders::ShaderProgram*>;
 
 
 			/*
@@ -74,8 +75,10 @@ namespace ion::graphics::scene::graph
 
 			void set_camera_uniforms(const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &shader_program) noexcept;
-			void set_light_uniforms(const light_container &lights, int light_count, const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
-			void set_emissive_light_uniforms(const light_container &lights, int light_count, const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
+			void set_light_uniforms(const light_pointers &lights, std::optional<textures::texture::TextureHandle> &texture_handle,
+				const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
+			void set_emissive_light_uniforms(const light_pointers &lights, std::optional<textures::texture::TextureHandle> &texture_handle,
+				const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_matrix_uniforms(const Matrix4 &projection_mat, shaders::ShaderProgram &shader_program) noexcept;
 			void set_matrix_uniforms(const Matrix4 &projection_mat, const Matrix4 &model_view_mat, shaders::ShaderProgram &shader_program) noexcept;
 			void set_node_uniforms(const SceneNode &node, shaders::ShaderProgram &shader_program) noexcept;
@@ -108,12 +111,15 @@ namespace ion::graphics::scene::graph
 			SceneNode root_node_;
 
 
-			scene_graph::detail::light_container active_lights_;
-			scene_graph::detail::light_container active_emissive_lights_;
+			scene_graph::detail::light_pointers lights_;
+			scene_graph::detail::light_pointers emissive_lights_;
 
-			scene_graph::detail::shader_program_container shader_programs_;
-			scene_graph::detail::shader_program_container shader_programs_node_;
+			scene_graph::detail::shader_program_pointers shader_programs_;
+			scene_graph::detail::shader_program_pointers shader_programs_node_;
 				//Keep these as members so we don't have to reallocate storage for each render call
+
+			std::optional<textures::texture::TextureHandle> light_texture_handle_;
+			std::optional<textures::texture::TextureHandle> emissive_light_texture_handle_;
 
 
 			/*
@@ -126,6 +132,9 @@ namespace ion::graphics::scene::graph
 		public:
 
 			using managed::ManagedObject<Engine>::ManagedObject;
+
+			//Destructor
+			~SceneGraph() noexcept;
 
 
 			/*
