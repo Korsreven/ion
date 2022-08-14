@@ -13,6 +13,7 @@ File:	IonStringUtility.h
 #ifndef ION_STRING_UTILITY_H
 #define ION_STRING_UTILITY_H
 
+#include <array>
 #include <cstddef>
 #include <memory>
 #include <optional>

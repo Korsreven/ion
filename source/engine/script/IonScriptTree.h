@@ -13,6 +13,7 @@ File:	IonScriptTree.h
 #ifndef ION_SCRIPT_TREE_H
 #define ION_SCRIPT_TREE_H
 
+#include <array>
 #include <cassert>
 #include <optional>
 #include <string>

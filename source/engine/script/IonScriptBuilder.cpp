@@ -12,6 +12,7 @@ File:	IonScriptBuilder.cpp
 
 #include "IonScriptBuilder.h"
 
+#include <array>
 #include <ctime>
 
 #include "utilities/IonFileUtility.h"

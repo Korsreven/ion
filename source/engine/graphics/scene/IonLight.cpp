@@ -12,6 +12,7 @@ File:	IonLight.cpp
 
 #include "IonLight.h"
 
+#include <array>
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/textures/IonTextureManager.h"
 #include "query/IonSceneQuery.h"
