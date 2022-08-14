@@ -30,19 +30,6 @@ using namespace font_manager;
 namespace font_manager::detail
 {
 
-bool has_support_for_array_texture() noexcept
-{
-	static const auto has_support_for_array_texture = gl::ArrayTexture_Support() != gl::Extension::None;
-	return has_support_for_array_texture;
-}
-
-int max_array_texture_layers() noexcept
-{
-	static const auto max_array_texture_layers = gl::MaxArrayTextureLayers();
-	return max_array_texture_layers;
-}
-
-
 std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, font::GlyphMaxMetric>> prepare_font(
 	const std::string &file_data, int size, int face_index,
 	int character_spacing, font::FontCharacterSet character_set)
@@ -141,7 +128,7 @@ std::optional<font::GlyphTextureHandle> load_font(
 	font::FontGlyphFilter glyph_min_filter, font::FontGlyphFilter glyph_mag_filter,
 	GlyphTextureType glyph_texture_type) noexcept
 {
-	if (!detail::has_support_for_array_texture())
+	if (!textures::texture_manager::detail::has_support_for_array_texture())
 		glyph_texture_type = GlyphTextureType::Texture2D;
 
 	auto glyph_count = std::ssize(glyph_data);
@@ -180,7 +167,7 @@ std::optional<font::GlyphTextureHandle> load_font(
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		if (auto max_glyphs = max_array_texture_layers(); glyph_count > max_glyphs)
+		if (auto max_glyphs = textures::texture_manager::detail::max_array_texture_layers(); glyph_count > max_glyphs)
 			glyph_count = max_glyphs;
 
 		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0,
@@ -322,13 +309,6 @@ void FontManager::ResourceFailed(Font &font) noexcept
 
 
 //Public
-
-FontManager::FontManager() noexcept
-{
-	//Initialize once
-	detail::has_support_for_array_texture();
-	detail::max_array_texture_layers();
-}
 
 FontManager::~FontManager() noexcept
 {

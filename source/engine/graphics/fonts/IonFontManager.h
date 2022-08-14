@@ -41,10 +41,6 @@ namespace ion::graphics::fonts
 
 		namespace detail
 		{
-			bool has_support_for_array_texture() noexcept;
-			int max_array_texture_layers() noexcept;
-
-
 			std::optional<std::tuple<font::GlyphBitmapData, font::GlyphMetrices, font::GlyphMaxMetric>> prepare_font(
 				const std::string &file_data, int size, int face_index,
 				int character_spacing, font::FontCharacterSet character_set);
@@ -87,7 +83,7 @@ namespace ion::graphics::fonts
 		public:
 
 			//Default constructor
-			FontManager() noexcept;
+			FontManager() = default;
 
 			//Deleted copy constructor
 			FontManager(const FontManager&) = delete;

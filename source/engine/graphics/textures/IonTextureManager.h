@@ -58,7 +58,10 @@ namespace ion::graphics::textures
 		namespace detail
 		{
 			bool has_support_for_non_power_of_two_textures() noexcept;
+			bool has_support_for_array_texture() noexcept;
+
 			int max_texture_size() noexcept;
+			int max_array_texture_layers() noexcept;
 
 
 			constexpr auto is_power_of_two(uint32 x) noexcept

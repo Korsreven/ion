@@ -1002,6 +1002,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				scene_struct->CreateUniform<glsl::vec4>("ambient");
 				scene_struct->CreateUniform<float>("gamma");
 				scene_struct->CreateUniform<bool>("has_fog");
+				scene_struct->CreateUniform<glsl::sampler1DArray>("lights");
+				scene_struct->CreateUniform<glsl::sampler1DArray>("emissive_lights");
 				scene_struct->CreateUniform<int>("light_count");
 				scene_struct->CreateUniform<int>("emissive_light_count");
 
@@ -1084,6 +1086,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				scene_struct->CreateUniform<glsl::vec4>("ambient");
 				scene_struct->CreateUniform<float>("gamma");
 				scene_struct->CreateUniform<bool>("has_fog");
+				scene_struct->CreateUniform<glsl::sampler1DArray>("lights");
+				scene_struct->CreateUniform<glsl::sampler1DArray>("emissive_lights");
 				scene_struct->CreateUniform<int>("light_count");
 				scene_struct->CreateUniform<int>("emissive_light_count");
 
@@ -1167,6 +1171,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				scene_struct->CreateUniform<glsl::vec4>("ambient");
 				scene_struct->CreateUniform<float>("gamma");
 				scene_struct->CreateUniform<bool>("has_fog");
+				scene_struct->CreateUniform<glsl::sampler1DArray>("lights");
+				scene_struct->CreateUniform<glsl::sampler1DArray>("emissive_lights");
 				scene_struct->CreateUniform<int>("light_count");
 				scene_struct->CreateUniform<int>("emissive_light_count");
 

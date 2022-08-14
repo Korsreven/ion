@@ -32,10 +32,22 @@ bool has_support_for_non_power_of_two_textures() noexcept
 	return has_support_for_non_power_of_two_textures;
 }
 
+bool has_support_for_array_texture() noexcept
+{
+	static const auto has_support_for_array_texture = gl::ArrayTexture_Support() != gl::Extension::None;
+	return has_support_for_array_texture;
+}
+
 int max_texture_size() noexcept
 {
 	static const auto max_texture_size = gl::MaxTextureSize();
 	return max_texture_size;
+}
+
+int max_array_texture_layers() noexcept
+{
+	static const auto max_array_texture_layers = gl::MaxArrayTextureLayers();
+	return max_array_texture_layers;
 }
 
 
@@ -512,7 +524,9 @@ TextureManager::TextureManager() noexcept
 {
 	//Initialize once
 	detail::has_support_for_non_power_of_two_textures();
+	detail::has_support_for_array_texture();
 	detail::max_texture_size();
+	detail::max_array_texture_layers();
 }
 
 TextureManager::~TextureManager() noexcept

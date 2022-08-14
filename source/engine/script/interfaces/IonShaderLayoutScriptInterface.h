@@ -62,6 +62,8 @@ namespace ion::script::interfaces
 			"scene-ambient",
 			"scene-gamma",
 			"scene-has-fog",
+			"scene-lights",
+			"scene-emissive-lights",
 			"scene-light-count",
 			"scene-emissive-light-count",
 

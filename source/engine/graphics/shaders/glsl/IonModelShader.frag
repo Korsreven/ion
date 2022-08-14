@@ -17,6 +17,8 @@ struct Scene
 	vec4 ambient;
 	float gamma;
 	bool has_fog;
+	sampler1DArray lights;
+    sampler1DArray emissive_lights;
 	int light_count;
 	int emissive_light_count;
 };

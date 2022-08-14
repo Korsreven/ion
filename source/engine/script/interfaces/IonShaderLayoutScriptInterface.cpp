@@ -142,6 +142,10 @@ void bind_uniform(const script_tree::PropertyNode &property,
 		shader_layout.BindUniform(shader_layout::UniformName::Scene_Gamma, std::move(declaration));
 	else if (name == "scene-has-fog")
 		shader_layout.BindUniform(shader_layout::UniformName::Scene_HasFog, std::move(declaration));
+	else if (name == "scene-lights")
+		shader_layout.BindUniform(shader_layout::UniformName::Scene_Lights, std::move(declaration));
+	else if (name == "scene-emissive-lights")
+		shader_layout.BindUniform(shader_layout::UniformName::Scene_EmissiveLights, std::move(declaration));
 	else if (name == "scene-light-count")
 		shader_layout.BindUniform(shader_layout::UniformName::Scene_LightCount, std::move(declaration));
 	else if (name == "scene-emissive-light-count")
