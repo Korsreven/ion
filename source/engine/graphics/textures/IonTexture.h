@@ -31,9 +31,11 @@ namespace ion::graphics::textures
 
 	namespace texture
 	{
-		enum class TextureType : bool
+		enum class TextureType
 		{
+			Texture1D,
 			Texture2D,
+			ArrayTexture1D,
 			ArrayTexture2D
 		};
 

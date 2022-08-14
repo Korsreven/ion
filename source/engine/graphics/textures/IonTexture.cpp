@@ -28,6 +28,12 @@ int texture_type_to_gl_texture_type(TextureType texture_type) noexcept
 {
 	switch (texture_type)
 	{
+		case TextureType::Texture1D:
+		return GL_TEXTURE_1D;
+
+		case TextureType::ArrayTexture1D:
+		return GL_TEXTURE_1D_ARRAY;
+
 		case TextureType::ArrayTexture2D:
 		return GL_TEXTURE_2D_ARRAY;
 

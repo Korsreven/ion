@@ -279,6 +279,7 @@ void bind_texture(textures::texture::TextureHandle texture_handle) noexcept
 
 	switch (texture_handle.Type)
 	{
+		case textures::texture::TextureType::Texture1D:
 		case textures::texture::TextureType::Texture2D:
 		{
 			if (texture_handle.Id > 0)
