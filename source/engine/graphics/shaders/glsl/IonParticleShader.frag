@@ -100,8 +100,6 @@ uniform Camera camera;
 uniform Primitive primitive;
 uniform Material material;
 uniform Fog fog;
-uniform Light light[8];
-uniform EmissiveLight emissive_light[8];
 
 
 const vec4 black = vec4(0.0, 0.0, 0.0, 1.0);
@@ -111,6 +109,9 @@ const float log2e = 1.442695;
 vec2 tex_coord = (rotation_matrix * (gl_PointCoord - 0.5)).xy + 0.5;
 float fog_frag_coord = abs(vert_position.z);
 float fog_scale = 1.0 / (fog.far - fog.near);
+
+Light light;
+EmissiveLight emissive_light;
 
 
 float linear_fog()
@@ -129,9 +130,49 @@ float exp2_fog()
 }
 
 
-vec3 calc_point_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
+void fetch_light(int i)
 {
-	vec3 light_dir = normalize(light[i].position - vert_position);
+	vec4 texel1 = texelFetch(scene.lights, ivec2(0, i), 0);
+	vec4 texel2 = texelFetch(scene.lights, ivec2(4, i), 0);
+	vec4 texel3 = texelFetch(scene.lights, ivec2(8, i), 0);
+	vec4 texel4 = texelFetch(scene.lights, ivec2(12, i), 0);
+	vec4 texel5 = texelFetch(scene.lights, ivec2(16, i), 0);
+	vec4 texel6 = texelFetch(scene.lights, ivec2(20, i), 0);
+	vec4 texel7 = texelFetch(scene.lights, ivec2(24, i), 0);
+
+	//Set light
+	light.type = int(texel1.x);
+	light.position = texel1.yzw;
+	light.direction = texel2.xyz;
+	light.radius = texel2.w;
+
+	light.ambient = texel3.rgba;
+	light.diffuse = texel4.rgba;
+	light.specular = texel5.rgba;
+
+	light.constant = texel6.x;
+	light.linear = texel6.y;
+	light.quadratic = texel6.z;
+
+	light.cutoff = texel7.x;
+	light.outer_cutoff = texel7.y;
+}
+
+void fetch_emissive_light(int i)
+{
+	vec4 texel1 = texelFetch(scene.emissive_lights, ivec2(0, i), 0);
+	vec4 texel2 = texelFetch(scene.emissive_lights, ivec2(4, i), 0);
+
+	//Set emissive light
+	emissive_light.position = texel1.xyz;
+	emissive_light.radius = texel1.w;
+	emissive_light.color = texel2.rgba;
+}
+
+
+vec3 calc_point_light(vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
+{
+	vec3 light_dir = normalize(light.position - vert_position);
 
 	//Diffuse shading
     float diff = max(dot(normal, light_dir), 0.0);
@@ -140,13 +181,13 @@ vec3 calc_point_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), shininess);
 
     //Attenuation
-    float distance = length(light[i].position - vert_position);
-    float attenuation = 1.0 / (light[i].constant + light[i].linear * distance + light[i].quadratic * (distance * distance));
+    float distance = length(light.position - vert_position);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
 	//Combine ambient, diffuse and specular color
-	ambient_color *= light[i].ambient;
-	diffuse_color *= light[i].diffuse;
-	specular_color *= light[i].specular;
+	ambient_color *= light.ambient;
+	diffuse_color *= light.diffuse;
+	specular_color *= light.specular;
 
 	ambient_color.rgb *= ambient_color.a * attenuation;
 	diffuse_color.rgb *= diffuse_color.a * diff * attenuation;
@@ -155,9 +196,9 @@ vec3 calc_point_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec
 	return ambient_color.rgb + diffuse_color.rgb + specular_color.rgb;
 }
 
-vec3 calc_directional_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
+vec3 calc_directional_light(vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
 {
-	vec3 light_dir = normalize(-light[i].direction);
+	vec3 light_dir = normalize(-light.direction);
 
 	//Diffuse shading
     float diff = max(dot(normal, light_dir), 0.0);
@@ -166,9 +207,9 @@ vec3 calc_directional_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_colo
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), shininess);
 	
 	//Combine ambient, diffuse and specular color
-	ambient_color *= light[i].ambient;
-	diffuse_color *= light[i].diffuse;
-	specular_color *= light[i].specular;
+	ambient_color *= light.ambient;
+	diffuse_color *= light.diffuse;
+	specular_color *= light.specular;
 
 	ambient_color.rgb *= ambient_color.a;
 	diffuse_color.rgb *= diffuse_color.a * diff;
@@ -177,9 +218,9 @@ vec3 calc_directional_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_colo
 	return ambient_color.rgb + diffuse_color.rgb + specular_color.rgb;
 }
 
-vec3 calc_spot_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
+vec3 calc_spot_light(vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
 {
-	vec3 light_dir = normalize(light[i].position - vert_position);
+	vec3 light_dir = normalize(light.position - vert_position);
 
 	//Diffuse shading
     float diff = max(dot(normal, light_dir), 0.0);
@@ -188,17 +229,17 @@ vec3 calc_spot_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), shininess);
 
     //Attenuation
-    float distance = length(light[i].position - vert_position);
-    float attenuation = 1.0 / (light[i].constant + light[i].linear * distance + light[i].quadratic * (distance * distance));
+    float distance = length(light.position - vert_position);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
     //Intensity
-    float theta = dot(light_dir, normalize(-light[i].direction));
-    float epsilon = light[i].cutoff - light[i].outer_cutoff;
-    float intensity = clamp((theta - light[i].outer_cutoff) / epsilon, 0.0, 1.0);
+    float theta = dot(light_dir, normalize(-light.direction));
+    float epsilon = light.cutoff - light.outer_cutoff;
+    float intensity = clamp((theta - light.outer_cutoff) / epsilon, 0.0, 1.0);
 
     //Combine ambient, diffuse and specular color
-	ambient_color *= light[i].ambient;
-	diffuse_color *= light[i].diffuse;
-	specular_color *= light[i].specular;
+	ambient_color *= light.ambient;
+	diffuse_color *= light.diffuse;
+	specular_color *= light.specular;
 
 	ambient_color.rgb *= ambient_color.a * attenuation * intensity;
 	diffuse_color.rgb *= diffuse_color.a * diff * attenuation * intensity;
@@ -207,9 +248,9 @@ vec3 calc_spot_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4
 	return ambient_color.rgb + diffuse_color.rgb + specular_color.rgb;
 }
 
-vec3 calc_emissive_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
+vec3 calc_emissive_light(vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
 {
-	vec3 light_dir = normalize(emissive_light[i].position - vert_position);
+	vec3 light_dir = normalize(emissive_light.position - vert_position);
 
 	//Diffuse shading
     float diff = max(dot(normal, light_dir), 0.0);
@@ -218,12 +259,12 @@ vec3 calc_emissive_light(int i, vec3 normal, vec3 view_dir, vec4 ambient_color, 
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), shininess);
 
     //Attenuation
-    float distance = length(emissive_light[i].position - vert_position);
-    float attenuation = 1.0 / (distance / emissive_light[i].radius);
+    float distance = length(emissive_light.position - vert_position);
+    float attenuation = 1.0 / (distance / emissive_light.radius);
 
 	//Combine ambient, diffuse and specular color
-	ambient_color *= emissive_light[i].color;
-	diffuse_color *= emissive_light[i].color;
+	ambient_color *= emissive_light.color;
+	diffuse_color *= emissive_light.color;
 	specular_color *= dark_gray;
 
 	ambient_color.rgb *= ambient_color.a * attenuation;
@@ -309,22 +350,27 @@ void main()
 		//Accumulate each light
 		for (int i = 0; i < scene.light_count; ++i)
 		{
+			fetch_light(i);
+
 			//Point light
-			if (light[i].type == 0)
-				light_color += calc_point_light(i, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+			if (light.type == 0)
+				light_color += calc_point_light(normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 			
 			//Directional light
-			else if (light[i].type == 1)
-				light_color += calc_directional_light(i, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+			else if (light.type == 1)
+				light_color += calc_directional_light(normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 			
 			//Spot light
-			else if (light[i].type == 2)
-				light_color += calc_spot_light(i, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+			else if (light.type == 2)
+				light_color += calc_spot_light(normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 		}
 
 		//Accumulate each emissive light
 		for (int i = 0; i < scene.emissive_light_count; ++i)
-			light_color += calc_emissive_light(i, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+		{
+			fetch_emissive_light(i);
+			light_color += calc_emissive_light(normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+		}
 
 		color.rgb += light_color;
 	}

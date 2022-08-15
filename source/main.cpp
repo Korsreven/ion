@@ -982,8 +982,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				auto primitive_struct = model_program->CreateStruct("primitive");
 				auto material_struct = model_program->CreateStruct("material");
 				auto fog_struct = model_program->CreateStruct("fog");
-				auto light_struct = model_program->CreateStruct("light", 8);
-				auto emissive_light_struct = model_program->CreateStruct("emissive_light", 8);
 
 
 				//Shader variables
@@ -1034,25 +1032,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				fog_struct->CreateUniform<float>("far");
 				fog_struct->CreateUniform<glsl::vec4>("color");
 
-				//Light
-				light_struct->CreateUniform<int>("type");
-				light_struct->CreateUniform<glsl::vec3>("position");
-				light_struct->CreateUniform<glsl::vec3>("direction");
-				light_struct->CreateUniform<float>("radius");
-				light_struct->CreateUniform<glsl::vec4>("ambient");
-				light_struct->CreateUniform<glsl::vec4>("diffuse");
-				light_struct->CreateUniform<glsl::vec4>("specular");
-				light_struct->CreateUniform<float>("constant");
-				light_struct->CreateUniform<float>("linear");
-				light_struct->CreateUniform<float>("quadratic");
-				light_struct->CreateUniform<float>("cutoff");
-				light_struct->CreateUniform<float>("outer_cutoff");
-
-				//Emissive light
-				emissive_light_struct->CreateUniform<glsl::vec3>("position");
-				emissive_light_struct->CreateUniform<float>("radius");
-				emissive_light_struct->CreateUniform<glsl::vec4>("color");
-
 				shader_programs->LoadShaderVariableLocations(*model_program);
 			}
 
@@ -1066,8 +1045,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				auto primitive_struct = particle_program->CreateStruct("primitive");
 				auto material_struct = particle_program->CreateStruct("material");
 				auto fog_struct = particle_program->CreateStruct("fog");
-				auto light_struct = particle_program->CreateStruct("light", 8);
-				auto emissive_light_struct = model_program->CreateStruct("emissive_light", 8);
 
 
 				//Shader variables
@@ -1123,25 +1100,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				fog_struct->CreateUniform<float>("far");
 				fog_struct->CreateUniform<glsl::vec4>("color");
 
-				//Light
-				light_struct->CreateUniform<int>("type");
-				light_struct->CreateUniform<glsl::vec3>("position");
-				light_struct->CreateUniform<glsl::vec3>("direction");
-				light_struct->CreateUniform<float>("radius");
-				light_struct->CreateUniform<glsl::vec4>("ambient");
-				light_struct->CreateUniform<glsl::vec4>("diffuse");
-				light_struct->CreateUniform<glsl::vec4>("specular");
-				light_struct->CreateUniform<float>("constant");
-				light_struct->CreateUniform<float>("linear");
-				light_struct->CreateUniform<float>("quadratic");
-				light_struct->CreateUniform<float>("cutoff");
-				light_struct->CreateUniform<float>("outer_cutoff");
-
-				//Emissive light
-				emissive_light_struct->CreateUniform<glsl::vec3>("position");
-				emissive_light_struct->CreateUniform<float>("radius");
-				emissive_light_struct->CreateUniform<glsl::vec4>("color");
-
 				shader_programs->LoadShaderVariableLocations(*particle_program);
 			}
 
@@ -1153,8 +1111,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				auto camera_struct = text_program->CreateStruct("camera");
 				auto primitive_struct = text_program->CreateStruct("primitive");
 				auto fog_struct = text_program->CreateStruct("fog");
-				auto light_struct = text_program->CreateStruct("light", 8);
-				auto emissive_light_struct = model_program->CreateStruct("emissive_light", 8);
 
 
 				//Shader variables
@@ -1189,25 +1145,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				fog_struct->CreateUniform<float>("near");
 				fog_struct->CreateUniform<float>("far");
 				fog_struct->CreateUniform<glsl::vec4>("color");
-
-				//Light
-				light_struct->CreateUniform<int>("type");
-				light_struct->CreateUniform<glsl::vec3>("position");
-				light_struct->CreateUniform<glsl::vec3>("direction");
-				light_struct->CreateUniform<float>("radius");
-				light_struct->CreateUniform<glsl::vec4>("ambient");
-				light_struct->CreateUniform<glsl::vec4>("diffuse");
-				light_struct->CreateUniform<glsl::vec4>("specular");
-				light_struct->CreateUniform<float>("constant");
-				light_struct->CreateUniform<float>("linear");
-				light_struct->CreateUniform<float>("quadratic");
-				light_struct->CreateUniform<float>("cutoff");
-				light_struct->CreateUniform<float>("outer_cutoff");
-
-				//Emissive light
-				emissive_light_struct->CreateUniform<glsl::vec3>("position");
-				emissive_light_struct->CreateUniform<float>("radius");
-				emissive_light_struct->CreateUniform<glsl::vec4>("color");
 
 				shader_programs->LoadShaderVariableLocations(*text_program);
 			}
