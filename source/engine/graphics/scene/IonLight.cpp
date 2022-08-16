@@ -26,6 +26,12 @@ using namespace utilities;
 namespace light::detail
 {
 
+constexpr auto light_texture_width =
+	std::max(static_cast<int>(textures::texture_manager::detail::upper_power_of_two(light_float_components)), 4) / 4;
+constexpr auto emissive_light_texture_width =
+	std::max(static_cast<int>(textures::texture_manager::detail::upper_power_of_two(emissive_light_float_components)), 4) / 4;
+
+
 std::optional<textures::texture::TextureHandle> create_texture(int width, int depth) noexcept
 {
 	if (!textures::texture_manager::detail::has_support_for_array_texture())
@@ -41,8 +47,9 @@ std::optional<textures::texture::TextureHandle> create_texture(int width, int de
 		depth = max_lights;
 
 	//Create gl texture (POT)
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexImage2D(GL_TEXTURE_1D_ARRAY, 0,
-		GL_RGBA, width, depth,
+		GL_RGBA32F, width, depth,
 		0, GL_RGBA, GL_FLOAT, nullptr);
 
 	glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
@@ -51,16 +58,14 @@ std::optional<textures::texture::TextureHandle> create_texture(int width, int de
 
 std::optional<textures::texture::TextureHandle> create_light_texture(const light_pointers &lights) noexcept
 {
-	constexpr auto width = static_cast<int>(textures::texture_manager::detail::upper_power_of_two(light_float_components));
 	auto depth = static_cast<int>(textures::texture_manager::detail::upper_power_of_two(std::size(lights)));
-	return create_texture(width, std::max(depth, min_texture_depth));
+	return create_texture(light_texture_width, std::max(depth, min_texture_depth));
 }
 
 std::optional<textures::texture::TextureHandle> create_emissive_light_texture(const light_pointers &lights) noexcept
 {
-	constexpr auto width = static_cast<int>(textures::texture_manager::detail::upper_power_of_two(emissive_light_float_components));
 	auto depth = static_cast<int>(textures::texture_manager::detail::upper_power_of_two(std::size(lights)));
-	return create_texture(width, std::max(depth, min_texture_depth));
+	return create_texture(emissive_light_texture_width, std::max(depth, min_texture_depth));
 }
 
 
@@ -72,7 +77,7 @@ std::optional<textures::texture::TextureHandle> upload_light_data(
 	if (texture_handle)
 	{
 		glBindTexture(GL_TEXTURE_1D_ARRAY, texture_handle->Id);
-		glGetTexLevelParameteriv(GL_TEXTURE_1D_ARRAY, 0, GL_TEXTURE_DEPTH, &depth);
+		glGetTexLevelParameteriv(GL_TEXTURE_1D_ARRAY, 0, GL_TEXTURE_HEIGHT, &depth);
 		glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
 	}
 
@@ -87,7 +92,7 @@ std::optional<textures::texture::TextureHandle> upload_light_data(
 	
 	if (texture_handle)
 	{
-		std::array<float, light_float_components> light_data{};
+		std::array<float, light_texture_width * 4> light_data{};
 		glBindTexture(GL_TEXTURE_1D_ARRAY, texture_handle->Id);
 
 		for (auto i = 0; auto &light : lights)
@@ -145,7 +150,7 @@ std::optional<textures::texture::TextureHandle> upload_light_data(
 
 			//Upload light data to gl
 			glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
-				0, i++, std::ssize(light_data), 1,
+				0, i++, light_texture_width, 1,
 				GL_RGBA, GL_FLOAT, std::data(light_data));
 		}
 
@@ -163,7 +168,7 @@ std::optional<textures::texture::TextureHandle> upload_emissive_light_data(
 	if (texture_handle)
 	{
 		glBindTexture(GL_TEXTURE_1D_ARRAY, texture_handle->Id);
-		glGetTexLevelParameteriv(GL_TEXTURE_1D_ARRAY, 0, GL_TEXTURE_DEPTH, &depth);
+		glGetTexLevelParameteriv(GL_TEXTURE_1D_ARRAY, 0, GL_TEXTURE_HEIGHT, &depth);
 		glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
 	}
 
@@ -178,7 +183,7 @@ std::optional<textures::texture::TextureHandle> upload_emissive_light_data(
 	
 	if (texture_handle)
 	{
-		std::array<float, emissive_light_float_components> light_data{};
+		std::array<float, emissive_light_texture_width * 4> light_data{};
 		glBindTexture(GL_TEXTURE_1D_ARRAY, texture_handle->Id);
 
 		for (auto i = 0; auto &light : lights)
@@ -198,7 +203,7 @@ std::optional<textures::texture::TextureHandle> upload_emissive_light_data(
 
 			//Upload light data to gl
 			glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
-				0, i++, std::ssize(light_data), 1,
+				0, i++, emissive_light_texture_width, 1,
 				GL_RGBA, GL_FLOAT, std::data(light_data));
 		}
 
