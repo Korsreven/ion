@@ -35,7 +35,9 @@ namespace ion::graphics::scene
 	using utilities::Color;
 	using utilities::Vector3;
 
-	class Light; //Forward declaration
+	//Forward declarations
+	class Camera;
+	class Light;
 
 	namespace light
 	{
@@ -73,10 +75,10 @@ namespace ion::graphics::scene
 			std::optional<textures::texture::TextureHandle> create_light_texture(const light_pointers &lights) noexcept;
 			std::optional<textures::texture::TextureHandle> create_emissive_light_texture(const light_pointers &lights) noexcept;
 
-			std::optional<textures::texture::TextureHandle> upload_light_data(
-				std::optional<textures::texture::TextureHandle> texture_handle, const light_pointers &lights) noexcept;
-			std::optional<textures::texture::TextureHandle> upload_emissive_light_data(
-				std::optional<textures::texture::TextureHandle> texture_handle, const light_pointers &lights) noexcept;
+			std::optional<textures::texture::TextureHandle> upload_light_data(std::optional<textures::texture::TextureHandle> texture_handle,
+				const light_pointers &lights, const Camera &camera) noexcept;
+			std::optional<textures::texture::TextureHandle> upload_emissive_light_data(std::optional<textures::texture::TextureHandle> texture_handle,
+				const light_pointers &lights, const Camera &camera) noexcept;
 		} //detail
 	} //light
 

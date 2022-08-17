@@ -85,7 +85,7 @@ void set_light_uniforms(const light_pointers &lights, std::optional<textures::te
 
 	if (auto scene_lights = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_Lights); scene_lights)
 	{
-		if (texture_handle = light::detail::upload_light_data(texture_handle, lights); texture_handle)
+		if (texture_handle = light::detail::upload_light_data(texture_handle, lights, camera); texture_handle)
 		{
 			if (auto texture_unit = scene_lights->Get<glsl::sampler1DArray>(); texture_unit >= 0)
 				render::vertex::vertex_batch::detail::bind_texture(*texture_handle, texture_unit);
@@ -121,7 +121,7 @@ void set_light_uniforms(const light_pointers &lights, std::optional<textures::te
 
 			if (position)
 				(*position)[i].Get<glsl::vec3>() =
-					camera.ViewMatrix() * (light->Position() + light->ParentNode()->DerivedPosition());
+					camera.ViewMatrix() * (light->Position() + light->ParentNode()->DerivedPosition()); //View adjusted
 
 			if (direction)
 				(*direction)[i].Get<glsl::vec3>() =
@@ -183,7 +183,7 @@ void set_emissive_light_uniforms(const light_pointers &lights, std::optional<tex
 
 	if (auto scene_lights = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_EmissiveLights); scene_lights)
 	{
-		if (texture_handle = light::detail::upload_emissive_light_data(texture_handle, lights); texture_handle)
+		if (texture_handle = light::detail::upload_emissive_light_data(texture_handle, lights, camera); texture_handle)
 		{
 			if (auto texture_unit = scene_lights->Get<glsl::sampler1DArray>(); texture_unit >= 0)
 				render::vertex::vertex_batch::detail::bind_texture(*texture_handle, texture_unit);
@@ -204,7 +204,7 @@ void set_emissive_light_uniforms(const light_pointers &lights, std::optional<tex
 
 			if (position)
 				(*position)[i].Get<glsl::vec3>() =
-					camera.ViewMatrix() * (light->Position() + light->ParentNode()->DerivedPosition());
+					camera.ViewMatrix() * (light->Position() + light->ParentNode()->DerivedPosition()); //View adjusted
 
 			if (radius)
 			{

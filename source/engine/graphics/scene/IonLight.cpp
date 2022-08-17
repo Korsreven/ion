@@ -14,6 +14,8 @@ File:	IonLight.cpp
 
 #include <array>
 #include "graphics/IonGraphicsAPI.h"
+#include "graphics/scene/IonCamera.h"
+#include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/textures/IonTextureManager.h"
 #include "query/IonSceneQuery.h"
 
@@ -37,14 +39,19 @@ std::optional<textures::texture::TextureHandle> create_texture(int width, int de
 	if (!textures::texture_manager::detail::has_support_for_array_texture())
 		return {};
 
+	if (auto max_lights = textures::texture_manager::detail::max_array_texture_layers(); depth > max_lights)
+		depth = max_lights;
+
 	auto texture_handle =
 		textures::texture::TextureHandle{0, textures::texture::TextureType::ArrayTexture1D};
 
 	glGenTextures(1, reinterpret_cast<unsigned int*>(&texture_handle));
 	glBindTexture(GL_TEXTURE_1D_ARRAY, texture_handle.Id);
 
-	if (auto max_lights = textures::texture_manager::detail::max_array_texture_layers(); depth > max_lights)
-		depth = max_lights;
+	glTexParameteri(GL_TEXTURE_1D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_1D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_1D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_1D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	//Create gl texture (POT)
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -69,8 +76,8 @@ std::optional<textures::texture::TextureHandle> create_emissive_light_texture(co
 }
 
 
-std::optional<textures::texture::TextureHandle> upload_light_data(
-	std::optional<textures::texture::TextureHandle> texture_handle, const light_pointers &lights) noexcept
+std::optional<textures::texture::TextureHandle> upload_light_data(std::optional<textures::texture::TextureHandle> texture_handle,
+	const light_pointers &lights, const Camera &camera) noexcept
 {
 	auto depth = 0;
 
@@ -100,20 +107,24 @@ std::optional<textures::texture::TextureHandle> upload_light_data(
 			light_data[0] = static_cast<float>(light->Type());
 
 			{
-				auto [x, y, z] = light->Position().XYZ();
+				auto [x, y, z] =
+					(camera.ViewMatrix() * (light->Position() + light->ParentNode()->DerivedPosition())).XYZ(); //View adjusted
 				light_data[1] = static_cast<float>(x);
 				light_data[2] = static_cast<float>(y);
 				light_data[3] = static_cast<float>(z);
 			}
 
 			{
-				auto [x, y, z] = light->Direction().XYZ();
+				auto [x, y, z] =
+					(light->Direction().Deviant(light->ParentNode()->DerivedRotation() -
+					(camera.Rotation() + camera.ParentNode()->DerivedRotation()))).XYZ(); //View adjusted
 				light_data[4] = static_cast<float>(x);
 				light_data[5] = static_cast<float>(y);
 				light_data[6] = static_cast<float>(z);
 			}
 
-			light_data[7] = static_cast<float>(light->Radius());
+			auto [sx, sy] = light->ParentNode()->DerivedScaling().XY();
+			light_data[7] = static_cast<float>(light->Radius() * std::max(sx, sy));
 
 			{
 				auto [r, g, b, a] = light->AmbientColor().RGBA();
@@ -144,9 +155,9 @@ std::optional<textures::texture::TextureHandle> upload_light_data(
 			light_data[21] = static_cast<float>(linear);
 			light_data[22] = static_cast<float>(quadratic);
 
-			auto [inner_cutoff, outer_cutoff] = light->Cutoff();
-			light_data[23] = static_cast<float>(inner_cutoff);
-			light_data[24] = static_cast<float>(outer_cutoff);
+			auto [cutoff_angle, outer_cutoff_angle] = light->Cutoff();
+			light_data[24] = static_cast<float>(math::Cos(cutoff_angle));
+			light_data[25] = static_cast<float>(math::Cos(outer_cutoff_angle));
 
 			//Upload light data to gl
 			glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
@@ -160,8 +171,8 @@ std::optional<textures::texture::TextureHandle> upload_light_data(
 	return texture_handle;
 }
 
-std::optional<textures::texture::TextureHandle> upload_emissive_light_data(
-	std::optional<textures::texture::TextureHandle> texture_handle, const light_pointers &lights) noexcept
+std::optional<textures::texture::TextureHandle> upload_emissive_light_data(std::optional<textures::texture::TextureHandle> texture_handle,
+	const light_pointers &lights, const Camera &camera) noexcept
 {
 	auto depth = 0;
 
@@ -188,12 +199,14 @@ std::optional<textures::texture::TextureHandle> upload_emissive_light_data(
 
 		for (auto i = 0; auto &light : lights)
 		{
-			auto [x, y, z] = light->Position().XYZ();
+			auto [x, y, z] =
+				(camera.ViewMatrix() * (light->Position() + light->ParentNode()->DerivedPosition())).XYZ(); //View adjusted
 			light_data[0] = static_cast<float>(x);
 			light_data[1] = static_cast<float>(y);
 			light_data[2] = static_cast<float>(z);
 
-			light_data[3] = static_cast<float>(light->Radius());
+			auto [sx, sy] = light->ParentNode()->DerivedScaling().XY();
+			light_data[3] = static_cast<float>(light->Radius() * std::max(sx, sy));
 
 			auto [r, g, b, a] = light->DiffuseColor().RGBA();
 			light_data[4] = static_cast<float>(r);

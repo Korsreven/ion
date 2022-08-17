@@ -18,7 +18,7 @@ struct Scene
 	float gamma;
 	bool has_fog;
 	sampler1DArray lights;
-    sampler1DArray emissive_lights;
+	sampler1DArray emissive_lights;
 	int light_count;
 	int emissive_light_count;
 };
@@ -90,9 +90,6 @@ const float log2e = 1.442695;
 float fog_frag_coord = abs(vert_position.z);
 float fog_scale = 1.0 / (fog.far - fog.near);
 
-Light light;
-EmissiveLight emissive_light;
-
 
 float linear_fog()
 {
@@ -110,18 +107,19 @@ float exp2_fog()
 }
 
 
-void fetch_light(int i)
+Light fetch_light(int i)
 {
 	vec4 texel1 = texelFetch(scene.lights, ivec2(0, i), 0);
-	vec4 texel2 = texelFetch(scene.lights, ivec2(4, i), 0);
-	vec4 texel3 = texelFetch(scene.lights, ivec2(8, i), 0);
-	vec4 texel4 = texelFetch(scene.lights, ivec2(12, i), 0);
-	vec4 texel5 = texelFetch(scene.lights, ivec2(16, i), 0);
-	vec4 texel6 = texelFetch(scene.lights, ivec2(20, i), 0);
-	vec4 texel7 = texelFetch(scene.lights, ivec2(24, i), 0);
+	vec4 texel2 = texelFetch(scene.lights, ivec2(1, i), 0);
+	vec4 texel3 = texelFetch(scene.lights, ivec2(2, i), 0);
+	vec4 texel4 = texelFetch(scene.lights, ivec2(3, i), 0);
+	vec4 texel5 = texelFetch(scene.lights, ivec2(4, i), 0);
+	vec4 texel6 = texelFetch(scene.lights, ivec2(5, i), 0);
+	vec4 texel7 = texelFetch(scene.lights, ivec2(6, i), 0);
 
-	//Set light
-	light.type = int(texel1.x);
+	//Create light from texels
+	Light light;
+	light.type = int(floor(texel1.x + 0.5));
 	light.position = texel1.yzw;
 	light.direction = texel2.xyz;
 	light.radius = texel2.w;
@@ -136,21 +134,24 @@ void fetch_light(int i)
 
 	light.cutoff = texel7.x;
 	light.outer_cutoff = texel7.y;
+	return light;
 }
 
-void fetch_emissive_light(int i)
+EmissiveLight fetch_emissive_light(int i)
 {
 	vec4 texel1 = texelFetch(scene.emissive_lights, ivec2(0, i), 0);
-	vec4 texel2 = texelFetch(scene.emissive_lights, ivec2(4, i), 0);
+	vec4 texel2 = texelFetch(scene.emissive_lights, ivec2(1, i), 0);
 
-	//Set emissive light
+	//Create emissive light from texels
+	EmissiveLight emissive_light;
 	emissive_light.position = texel1.xyz;
 	emissive_light.radius = texel1.w;
 	emissive_light.color = texel2.rgba;
+	return emissive_light;
 }
 
 
-vec3 calc_point_light(vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
+vec3 calc_point_light(Light light, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
 {
 	vec3 light_dir = normalize(light.position - vert_position);
 
@@ -176,7 +177,7 @@ vec3 calc_point_light(vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffu
 	return ambient_color.rgb + diffuse_color.rgb + specular_color.rgb;
 }
 
-vec3 calc_directional_light(vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
+vec3 calc_directional_light(Light light, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
 {
 	vec3 light_dir = normalize(-light.direction);
 
@@ -198,7 +199,7 @@ vec3 calc_directional_light(vec3 normal, vec3 view_dir, vec4 ambient_color, vec4
 	return ambient_color.rgb + diffuse_color.rgb + specular_color.rgb;
 }
 
-vec3 calc_spot_light(vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
+vec3 calc_spot_light(Light light, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
 {
 	vec3 light_dir = normalize(light.position - vert_position);
 
@@ -228,7 +229,7 @@ vec3 calc_spot_light(vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffus
 	return ambient_color.rgb + diffuse_color.rgb + specular_color.rgb;
 }
 
-vec3 calc_emissive_light(vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
+vec3 calc_emissive_light(EmissiveLight emissive_light, vec3 normal, vec3 view_dir, vec4 ambient_color, vec4 diffuse_color, vec4 specular_color, float shininess)
 {
 	vec3 light_dir = normalize(emissive_light.position - vert_position);
 
@@ -306,26 +307,26 @@ void main()
 		//Accumulate each light
 		for (int i = 0; i < scene.light_count; ++i)
 		{
-			fetch_light(i);
+			Light light = fetch_light(i);
 
 			//Point light
 			if (light.type == 0)
-				light_color += calc_point_light(normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+				light_color += calc_point_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 			
 			//Directional light
 			else if (light.type == 1)
-				light_color += calc_directional_light(normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+				light_color += calc_directional_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 			
 			//Spot light
 			else if (light.type == 2)
-				light_color += calc_spot_light(normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+				light_color += calc_spot_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 		}
 
 		//Accumulate each emissive light
 		for (int i = 0; i < scene.emissive_light_count; ++i)
 		{
-			fetch_emissive_light(i);
-			light_color += calc_emissive_light(normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+			EmissiveLight emissive_light = fetch_emissive_light(i);
+			light_color += calc_emissive_light(emissive_light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 		}
 
 		color.rgb += light_color;
