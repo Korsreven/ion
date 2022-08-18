@@ -14,6 +14,7 @@ File:	IonVertexBatch.cpp
 
 #include <cstddef>
 
+#include "IonEngine.h"
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/materials/IonMaterial.h"
 #include "graphics/shaders/IonShaderLayout.h"
@@ -311,6 +312,35 @@ void bind_texture(textures::texture::TextureHandle texture_handle, int texture_u
 }
 
 
+void set_light_texture_uniforms(shaders::ShaderProgram &shader_program) noexcept
+{
+	using namespace shaders::variables;
+
+	auto active_scene_graph = Engine::GetActiveSceneGraph();
+
+	if (!active_scene_graph)
+		return; //Nothing more to set
+
+
+	if (auto scene_lights = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_Lights); scene_lights)
+	{
+		if (auto texture_handle = active_scene_graph->LightTextureHandle(); texture_handle)
+		{
+			if (auto texture_unit = scene_lights->Get<glsl::sampler1DArray>(); texture_unit >= 0)
+				bind_texture(*texture_handle, texture_unit);
+		}
+	}
+
+	if (auto scene_lights = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_EmissiveLights); scene_lights)
+	{
+		if (auto texture_handle = active_scene_graph->EmissiveLightTextureHandle(); texture_handle)
+		{
+			if (auto texture_unit = scene_lights->Get<glsl::sampler1DArray>(); texture_unit >= 0)
+				bind_texture(*texture_handle, texture_unit);
+		}
+	}
+}
+
 void set_material_uniforms(materials::Material *material, duration time, shaders::ShaderProgram &shader_program) noexcept
 {
 	using namespace shaders::variables;
@@ -579,6 +609,7 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 			shader_program->Owner()->SendAttributeValues(*shader_program);
 		}
 
+		detail::set_light_texture_uniforms(*shader_program);
 		detail::set_material_uniforms(material_.get(), time_, *shader_program);
 		detail::set_texture_uniforms(texture_, time_, *shader_program);
 

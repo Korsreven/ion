@@ -265,16 +265,31 @@ namespace ion::graphics::scene::graph
 			}
 
 
-			//Return a mutable reference to the root node of this scene graph
+			//Returns a mutable reference to the root node of this scene graph
 			[[nodiscard]] inline auto& RootNode() noexcept
 			{
 				return root_node_;
 			}
 
-			//Return an immutable reference to the root node of this scene graph
+			//Returns an immutable reference to the root node of this scene graph
 			[[nodiscard]] inline auto& RootNode() const noexcept
 			{
 				return root_node_;
+			}
+
+
+			//Returns a texture handle to the lights in this scene
+			//Returns nullopt if this scene does not use a texture for the lights
+			[[nodiscard]] inline auto LightTextureHandle() const noexcept
+			{
+				return light_texture_handle_;
+			}
+
+			//Returns a texture handle to the emissive lights in this scene
+			//Returns nullopt if this scene does not use a texture for the emissive lights
+			[[nodiscard]] inline auto EmissiveLightTextureHandle() const noexcept
+			{
+				return emissive_light_texture_handle_;
 			}
 
 

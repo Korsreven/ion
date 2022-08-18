@@ -80,6 +80,8 @@ namespace ion
 			static inline auto pixels_per_unit_ = 1.0_r;
 			static inline auto units_per_meter_ = 1.0_r;
 
+			static inline graphics::scene::graph::SceneGraph *active_scene_graph_ = nullptr;
+
 
 			/*
 				Notifying
@@ -334,6 +336,14 @@ namespace ion
 			//Gets a pointer to an immutable scene graph with the given name
 			//Returns nullptr if scene graph could not be found
 			[[nodiscard]] NonOwningPtr<const graphics::scene::graph::SceneGraph> GetSceneGraph(std::string_view name) const noexcept;
+
+
+			//Gets a pointer to the currently active scene graph
+			//Returns nullptr if there is no currently active scene graph
+			[[nodiscard]] static inline auto GetActiveSceneGraph() noexcept
+			{
+				return active_scene_graph_;
+			}
 
 
 			/*

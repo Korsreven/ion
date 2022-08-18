@@ -163,7 +163,12 @@ bool Engine::UpdateFrame(duration time) noexcept
 		viewport.RenderTo();
 
 		for (auto &scene_graph : SceneGraphs())
+		{
+			active_scene_graph_ = &scene_graph;
 			scene_graph.Render(viewport, time);
+		}
+
+		active_scene_graph_ = nullptr;
 	}
 
 	return NotifyFrameEnded(time);
