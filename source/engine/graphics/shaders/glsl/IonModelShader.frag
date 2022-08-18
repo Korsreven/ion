@@ -312,6 +312,12 @@ void main()
 			specular_color *= specular_map_color;
 		}
 
+		if (material.has_emissive_map)
+		{
+			vec4 emissive_map_color = texture(material.emissive_map, vert_tex_coord);
+			emissive_color *= emissive_map_color;
+		}
+
 		if (material.has_normal_map)
 		{
 			normal = texture(material.normal_map, vert_tex_coord).rgb;
