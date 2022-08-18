@@ -371,6 +371,7 @@ void set_material_uniforms(materials::Material *material, duration time, shaders
 	auto diffuse_map_activated = false;
 	auto normal_map_activated = false;
 	auto specular_map_activated = false;
+	auto emissive_map_activated = false;
 	
 	if (auto diffuse_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_DiffuseMap); diffuse_map)
 	{
@@ -408,6 +409,18 @@ void set_material_uniforms(materials::Material *material, duration time, shaders
 		}
 	}
 
+	if (auto emissive_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_EmissiveMap); emissive_map)
+	{
+		if (auto texture = material->EmissiveMap(time); texture && texture->Handle())
+		{
+			if (auto texture_unit = emissive_map->Get<glsl::sampler2D>(); texture_unit >= 0)
+			{
+				bind_texture(*texture->Handle(), texture_unit);
+				emissive_map_activated = true;
+			}
+		}
+	}
+
 
 	if (auto has_diffuse_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasDiffuseMap); has_diffuse_map)
 		has_diffuse_map->Get<bool>() = diffuse_map_activated;
@@ -417,6 +430,9 @@ void set_material_uniforms(materials::Material *material, duration time, shaders
 
 	if (auto has_specular_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasSpecularMap); has_specular_map)
 		has_specular_map->Get<bool>() = specular_map_activated;
+
+	if (auto has_emissive_map = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_HasEmissiveMap); has_emissive_map)
+		has_emissive_map->Get<bool>() = emissive_map_activated;
 
 
 	if (auto lighting_enabled = shader_program.GetUniform(shaders::shader_layout::UniformName::Material_LightingEnabled); lighting_enabled)

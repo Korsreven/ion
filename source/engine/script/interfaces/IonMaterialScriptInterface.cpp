@@ -70,6 +70,7 @@ ClassDefinition get_material_class()
 		.AddProperty("diffuse-color", ParameterType::Color)
 		.AddProperty("diffuse-map", ParameterType::String)
 		.AddProperty("emissive-color", ParameterType::Color)
+		.AddProperty("emissive-map", ParameterType::String)
 		.AddProperty("flip-horizontal", ParameterType::Boolean)
 		.AddProperty("flip-vertical", ParameterType::Boolean)
 		.AddProperty("lighting-enabled", ParameterType::Boolean)
@@ -113,6 +114,13 @@ void set_material_properties(const script_tree::ObjectNode &object, Material &ma
 		}
 		else if (property.Name() == "emissive-color")
 			material.EmissiveColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "emissive-map")
+		{
+			if (auto texture = get_texture(property[0].Get<ScriptType::String>()->Get(), managers); texture)
+				material.EmissiveMap(texture);
+			else if (auto animation = get_animation(property[0].Get<ScriptType::String>()->Get(), managers); animation)
+				material.EmissiveMap(animation);
+		}
 		else if (property.Name() == "flip-horizontal")
 		{
 			if (property[0].Get<ScriptType::Boolean>()->Get())

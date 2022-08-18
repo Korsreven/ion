@@ -188,16 +188,20 @@ void bind_uniform(const script_tree::PropertyNode &property,
 		shader_layout.BindUniform(shader_layout::UniformName::Material_Shininess, std::move(declaration));
 	else if (name == "material-diffuse-map")
 		shader_layout.BindUniform(shader_layout::UniformName::Material_DiffuseMap, std::move(declaration));
-	else if (name == "material-specular-map")
-		shader_layout.BindUniform(shader_layout::UniformName::Material_SpecularMap, std::move(declaration));
 	else if (name == "material-normal-map")
 		shader_layout.BindUniform(shader_layout::UniformName::Material_NormalMap, std::move(declaration));
+	else if (name == "material-specular-map")
+		shader_layout.BindUniform(shader_layout::UniformName::Material_SpecularMap, std::move(declaration));
+	else if (name == "material-emissive-map")
+		shader_layout.BindUniform(shader_layout::UniformName::Material_EmissiveMap, std::move(declaration));
 	else if (name == "material-has-diffuse-map")
 		shader_layout.BindUniform(shader_layout::UniformName::Material_HasDiffuseMap, std::move(declaration));
-	else if (name == "material-has-specular-map")
-		shader_layout.BindUniform(shader_layout::UniformName::Material_HasSpecularMap, std::move(declaration));
 	else if (name == "material-has-normal-map")
 		shader_layout.BindUniform(shader_layout::UniformName::Material_HasNormalMap, std::move(declaration));
+	else if (name == "material-has-specular-map")
+		shader_layout.BindUniform(shader_layout::UniformName::Material_HasSpecularMap, std::move(declaration));
+	else if (name == "material-has-emissive-map")
+		shader_layout.BindUniform(shader_layout::UniformName::Material_HasEmissiveMap, std::move(declaration));
 	else if (name == "material-lighting-enabled")
 		shader_layout.BindUniform(shader_layout::UniformName::Material_LightingEnabled, std::move(declaration));
 

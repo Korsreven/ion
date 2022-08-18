@@ -43,12 +43,14 @@ struct Material
 	float shininess;
 
 	sampler2D diffuse_map;
-	sampler2D specular_map;
 	sampler2D normal_map;
+	sampler2D specular_map;
+	sampler2D emissive_map;
 
 	bool has_diffuse_map;
-	bool has_specular_map;
 	bool has_normal_map;
+	bool has_specular_map;
+	bool has_emissive_map;
 	bool lighting_enabled;
 };
 

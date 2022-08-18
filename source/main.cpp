@@ -851,7 +851,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto cloud_diffuse = textures->CreateTexture("cloud", "cloud.png");
 			auto star_diffuse = textures->CreateTexture("star", "star.png");
 			auto ship_diffuse = textures->CreateTexture("ship", "ship.png");
-			auto aura_diffuse = textures->CreateTexture("aura", "aura.png");
+			auto aura_diffuse = textures->CreateTexture("aura_diffuse", "aura_diffuse.png");
+			auto aura_emissive = textures->CreateTexture("aura_emissive", "aura_emissive.png");
 			auto raindrop_diffuse = textures->CreateTexture("raindrop", "raindrop.png");
 			auto color_spectrum_diffuse = textures->CreateTexture("color_spectrum", "color_spectrum.png");
 
@@ -1020,9 +1021,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");
 				material_struct->CreateUniform<glsl::sampler2D>("normal_map");
 				material_struct->CreateUniform<glsl::sampler2D>("specular_map");
+				material_struct->CreateUniform<glsl::sampler2D>("emissive_map");
 				material_struct->CreateUniform<bool>("has_diffuse_map");
 				material_struct->CreateUniform<bool>("has_normal_map");
 				material_struct->CreateUniform<bool>("has_specular_map");
+				material_struct->CreateUniform<bool>("has_emissive_map");
 				material_struct->CreateUniform<bool>("lighting_enabled");
 
 				//Fog
@@ -1088,9 +1091,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");
 				material_struct->CreateUniform<glsl::sampler2D>("normal_map");
 				material_struct->CreateUniform<glsl::sampler2D>("specular_map");
+				material_struct->CreateUniform<glsl::sampler2D>("emissive_map");
 				material_struct->CreateUniform<bool>("has_diffuse_map");
 				material_struct->CreateUniform<bool>("has_normal_map");
 				material_struct->CreateUniform<bool>("has_specular_map");
+				material_struct->CreateUniform<bool>("has_emissive_map");
 				material_struct->CreateUniform<bool>("lighting_enabled");
 
 				//Fog
@@ -1303,13 +1308,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			//Material
 			auto asteroid = materials->CreateMaterial("asteroid",
-				asteroid_diffuse, asteroid_normal, asteroid_specular);
+				asteroid_diffuse, asteroid_normal, asteroid_specular, nullptr);
 
 			auto brick = materials->CreateMaterial("brick",
-				brick_wall_diffuse, brick_wall_normal, brick_wall_specular);
+				brick_wall_diffuse, brick_wall_normal, brick_wall_specular, nullptr);
 
 			auto pebbles = materials->CreateMaterial("pebbles",
-				pebbles_diffuse, pebbles_normal, pebbles_specular);
+				pebbles_diffuse, pebbles_normal, pebbles_specular, nullptr);
 			
 			auto ruby = materials->CreateMaterial("ruby", {1.0_r, 0.0_r, 0.0_r});
 			auto emerald = materials->CreateMaterial("emerald", {0.0_r, 1.0_r, 0.0_r});
@@ -1318,7 +1323,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto tifa = materials->CreateMaterial("tifa", tifa_diffuse);
 			auto cloud = materials->CreateMaterial("cloud", cloud_diffuse);
 			auto ship = materials->CreateMaterial("ship", ship_diffuse);
-			auto aura = materials->CreateMaterial("aura", aura_diffuse);
+			auto aura = materials->CreateMaterial("aura",
+				aura_diffuse, nullptr, nullptr, aura_emissive);
+			aura->EmissiveColor(ion::graphics::utilities::color::Pink);
 			auto raindrop = materials->CreateMaterial("raindrop", raindrop_diffuse);
 
 			auto star = materials->CreateMaterial("star", star_diffuse);

@@ -108,7 +108,8 @@ NonOwningPtr<Texture> get_texture_map(const texture_map_type &texture_map) noexc
 		return texture;
 }
 
-NonOwningPtr<Texture> get_first_texture_map(const texture_map_type &diffuse_map, const texture_map_type &normal_map, const texture_map_type &specular_map) noexcept
+NonOwningPtr<Texture> get_first_texture_map(const texture_map_type &diffuse_map, const texture_map_type &normal_map,
+	const texture_map_type &specular_map, const texture_map_type &emissive_map) noexcept
 {
 	if (auto texture = get_texture_map(diffuse_map); texture)
 		return texture;
@@ -117,6 +118,9 @@ NonOwningPtr<Texture> get_first_texture_map(const texture_map_type &diffuse_map,
 		return texture;
 
 	if (auto texture = get_texture_map(specular_map); texture)
+		return texture;
+
+	if (auto texture = get_texture_map(emissive_map); texture)
 		return texture;
 
 	return nullptr;
@@ -195,8 +199,8 @@ Material::Material(std::string name,
 	//Empty
 }
 
-Material::Material(std::string name,
-	NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map,
+Material::Material(std::string name, NonOwningPtr<Animation> diffuse_map,
+	NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> emissive_map,
 	const Color &diffuse, real shininess) :
 	
 	managed::ManagedObject<MaterialManager>{std::move(name)},
@@ -212,8 +216,8 @@ Material::Material(std::string name,
 	//Empty
 }
 
-Material::Material(std::string name,
-	NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map,
+Material::Material(std::string name, NonOwningPtr<Texture> diffuse_map,
+	NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> emissive_map,
 	const Color &diffuse, real shininess) :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
@@ -229,8 +233,8 @@ Material::Material(std::string name,
 	//Empty
 }
 
-Material::Material(std::string name,
-	NonOwningPtr<Animation> diffuse_map, NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map,
+Material::Material(std::string name, NonOwningPtr<Animation> diffuse_map,
+	NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> emissive_map,
 	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess) :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
@@ -248,8 +252,8 @@ Material::Material(std::string name,
 	//Empty
 }
 
-Material::Material(std::string name,
-	NonOwningPtr<Texture> diffuse_map, NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map,
+Material::Material(std::string name, NonOwningPtr<Texture> diffuse_map,
+	NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> emissive_map,
 	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess) :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
@@ -287,6 +291,21 @@ NonOwningPtr<Texture> Material::DiffuseMap(duration time) const noexcept
 		return nullptr;
 }
 
+NonOwningPtr<Texture> Material::NormalMap(duration time) const noexcept
+{
+	if (auto [animation, texture] = NormalMap(); animation)
+	{
+		if (animation->Owner())
+			return animation->FrameAt(time);
+		else
+			return animation->CurrentFrame();
+	}
+	else if (texture)
+		return texture;
+	else
+		return nullptr;
+}
+
 NonOwningPtr<Texture> Material::SpecularMap(duration time) const noexcept
 {
 	if (auto [animation, texture] = SpecularMap(); animation)
@@ -302,9 +321,9 @@ NonOwningPtr<Texture> Material::SpecularMap(duration time) const noexcept
 		return nullptr;
 }
 
-NonOwningPtr<Texture> Material::NormalMap(duration time) const noexcept
+NonOwningPtr<Texture> Material::EmissiveMap(duration time) const noexcept
 {
-	if (auto [animation, texture] = NormalMap(); animation)
+	if (auto [animation, texture] = EmissiveMap(); animation)
 	{
 		if (animation->Owner())
 			return animation->FrameAt(time);
@@ -411,7 +430,7 @@ bool Material::IsRepeated() const noexcept
 
 std::pair<bool, bool> Material::IsRepeatable() const noexcept
 {
-	if (auto texture = detail::get_first_texture_map(diffuse_map_, normal_map_, specular_map_); texture)
+	if (auto texture = detail::get_first_texture_map(diffuse_map_, normal_map_, specular_map_, emissive_map_); texture)
 	{
 		auto [lower_left, upper_right] =
 			detail::get_unflipped_tex_coords(lower_left_tex_coord_, upper_right_tex_coord_);
@@ -435,7 +454,7 @@ bool Material::IsFlippedVertically() const noexcept
 
 std::pair<Vector2, Vector2> Material::WorldTexCoords() const noexcept
 {
-	if (auto texture = detail::get_first_texture_map(diffuse_map_, normal_map_, specular_map_); texture)
+	if (auto texture = detail::get_first_texture_map(diffuse_map_, normal_map_, specular_map_, emissive_map_); texture)
 	{
 		//Use local tex coords relative to world tex coords
 		if (auto world_tex_coords = texture->TexCoords(); world_tex_coords)

@@ -89,11 +89,13 @@ namespace ion::script::interfaces
 			"material-emissive",
 			"material-shininess",
 			"material-diffuse-map",
-			"material-specular-map",
 			"material-normal-map",
+			"material-specular-map",
+			"material-emissive-map",
 			"material-has-diffuse-map",
-			"material-has-specular-map",
 			"material-has-normal-map",
+			"material-has-specular-map",
+			"material-has-emissive-map",
 			"material-lighting-enabled",
 
 			//Fog
