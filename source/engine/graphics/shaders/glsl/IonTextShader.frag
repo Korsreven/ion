@@ -241,7 +241,10 @@ vec3 calc_emissive_light(EmissiveLight emissive_light, vec3 normal, vec3 view_di
 
     //Attenuation
     float distance = length(emissive_light.position - vert_position);
-    float attenuation = 1.0 / (distance / emissive_light.radius);
+    float attenuation = 1.0 - (distance / emissive_light.radius);
+
+	if (attenuation < 0.0)
+		attenuation = 0.0;
 
 	//Combine ambient, diffuse and specular color
 	ambient_color *= emissive_light.color;
