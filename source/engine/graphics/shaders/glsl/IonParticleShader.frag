@@ -315,7 +315,7 @@ void main()
 
 		if (material.has_emissive_map)
 		{
-			vec4 emissive_map_color = texture(material.emissive_map, vert_tex_coord);
+			vec4 emissive_map_color = texture(material.emissive_map, tex_coord);
 			emissive_color *= emissive_map_color;
 		}
 
