@@ -269,7 +269,7 @@ std::optional<texture::TextureHandle> load_texture(const std::string &pixel_data
 	//Unpack image from memory to gl
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); //May increase transfer speed for NPOT
 	glTexImage2D(GL_TEXTURE_2D, 0,
-		extents.BitDepth == 32 ? GL_RGBA : GL_RGB, extents.ActualWidth, extents.ActualHeight, 0,
+		extents.BitDepth == 32 ? GL_RGBA8 : GL_RGB8, extents.ActualWidth, extents.ActualHeight, 0,
 			[&]() noexcept
 			{
 				if (FreeImage_IsLittleEndian())

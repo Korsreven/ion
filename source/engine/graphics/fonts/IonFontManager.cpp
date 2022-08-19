@@ -171,7 +171,7 @@ std::optional<font::GlyphTextureHandle> load_font(
 			glyph_count = max_glyphs;
 
 		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0,
-			GL_RGBA, glyph_max_metrics.ActualWidth, glyph_max_metrics.ActualHeight, glyph_count,
+			GL_RGBA8, glyph_max_metrics.ActualWidth, glyph_max_metrics.ActualHeight, glyph_count,
 			0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, nullptr);
 		
 		for (auto i = 0; i < glyph_count; ++i)
@@ -204,7 +204,7 @@ std::optional<font::GlyphTextureHandle> load_font(
 
 			//Upload image to gl (always POT)
 			glTexImage2D(GL_TEXTURE_2D, 0,
-				GL_RGBA, glyph_metrics[i].ActualWidth, glyph_metrics[i].ActualHeight,
+				GL_RGBA8, glyph_metrics[i].ActualWidth, glyph_metrics[i].ActualHeight,
 				0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, std::data(glyph_data[i]));
 
 			glBindTexture(GL_TEXTURE_2D, 0);
