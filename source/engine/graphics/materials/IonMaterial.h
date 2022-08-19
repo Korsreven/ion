@@ -129,6 +129,7 @@ namespace ion::graphics::materials
 			Vector2 lower_left_tex_coord_ = vector2::Zero;
 			Vector2 upper_right_tex_coord_ = vector2::UnitScale;
 
+			std::optional<real> emissive_light_radius_;
 			bool lighting_enabled_ = true;
 			bool receive_shadows_ = true;
 
@@ -302,6 +303,13 @@ namespace ion::graphics::materials
 				upper_right_tex_coord_ = upper_right;
 			}
 
+
+			//Sets the emissive light radius of the material to the given value
+			inline void EmissiveLightRadius(std::optional<real> radius) noexcept
+			{
+				emissive_light_radius_ = radius;
+			}
+
 			//Sets if this material has lighting enabled or not
 			inline void LightingEnabled(bool enabled) noexcept
 			{
@@ -400,6 +408,14 @@ namespace ion::graphics::materials
 			[[nodiscard]] inline auto TexCoords() const noexcept
 			{
 				return std::pair{lower_left_tex_coord_, upper_right_tex_coord_};
+			}
+
+
+			//Returns the emissive light radius of the material
+			//Returns nullopt if light radius is automatic
+			[[nodiscard]] inline auto EmissiveLightRadius() const noexcept
+			{
+				return emissive_light_radius_;
 			}
 
 			//Returns true if this material has lighting enabled

@@ -93,7 +93,8 @@ Light get_emissive_light(const shapes::Mesh &mesh) noexcept
 	if (auto material = mesh.SurfaceMaterial(); material)
 	{
 		auto &sphere = mesh.BoundingSphere();
-		return Light::Point({}, sphere.Center(), sphere.Radius(), material->EmissiveColor());
+		auto light_radius = material->EmissiveLightRadius().value_or(sphere.Radius());
+		return Light::Point({}, sphere.Center(), light_radius, material->EmissiveColor());
 	}
 	else
 		return Light{};
@@ -124,7 +125,8 @@ void update_emissive_mesh(emissive_mesh &em_mesh) noexcept
 bool is_mesh_emissive(const shapes::Mesh &mesh) noexcept
 {
 	if (auto material = mesh.SurfaceMaterial(); material)
-		return material->EmissiveColor().RGB() != color::Black.RGB();
+		return material->EmissiveColor().RGB() != color::Black.RGB() &&
+			   material->EmissiveLightRadius().value_or(1.0_r) > 0.0_r;
 	else
 		return false;
 }
