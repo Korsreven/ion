@@ -236,6 +236,14 @@ namespace ion::graphics::scene
 			}
 
 			//Sets the colors of the bounding volumes to the given colors
+			inline void BoundingVolumeColors(const Color &color) noexcept
+			{
+				aabb_color_ = color;
+				obb_color_ = color;
+				sphere_color_ = color;
+			}
+
+			//Sets the colors of each of the bounding volumes to the given colors
 			//Use color::Transparent to hide certain bounding volumes from showing
 			inline void BoundingVolumeColors(const Color &aabb_color, const Color &obb_color, const Color &sphere_color) noexcept
 			{
