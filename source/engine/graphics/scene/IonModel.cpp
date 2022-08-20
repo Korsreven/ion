@@ -93,7 +93,9 @@ Light get_emissive_light(const shapes::Mesh &mesh) noexcept
 	if (auto material = mesh.SurfaceMaterial(); material)
 	{
 		auto &sphere = mesh.BoundingSphere();
-		auto light_radius = material->EmissiveLightRadius().value_or(sphere.Radius());
+		auto light_radius = material->EmissiveLightRadius().value_or(sphere.Radius() * 2.0_r);
+			//Increase default light radius by two times the sphere radius
+
 		return Light::Point({}, sphere.Center(), light_radius, material->EmissiveColor());
 	}
 	else
