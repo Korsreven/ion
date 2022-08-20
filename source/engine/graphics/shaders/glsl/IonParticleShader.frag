@@ -184,8 +184,16 @@ vec3 calc_point_light(Light light, vec3 normal, vec3 view_dir, vec4 ambient_colo
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), shininess);
 
     //Attenuation
-    float distance = length(light.position - vert_position);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+	if (light.radius > 0.0)
+		light.position.z = vert_position.z; //Discard z
+	
+	float dist = length(light.position - vert_position);
+	float attenuation = light.radius > 0.0 ?
+		1.0 - (dist / light.radius) :
+		1.0 / (light.constant + light.linear * dist + light.quadratic * (dist * dist));
+	
+	if (light.radius > 0.0 && attenuation < 0.0)
+		attenuation = 0.0;
 
 	//Combine ambient, diffuse and specular color
 	ambient_color *= light.ambient;
@@ -232,8 +240,8 @@ vec3 calc_spot_light(Light light, vec3 normal, vec3 view_dir, vec4 ambient_color
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), shininess);
 
     //Attenuation
-    float distance = length(light.position - vert_position);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+    float dist = length(light.position - vert_position);
+    float attenuation = 1.0 / (light.constant + light.linear * dist + light.quadratic * (dist * dist));
     //Intensity
     float theta = dot(light_dir, normalize(-light.direction));
     float epsilon = light.cutoff - light.outer_cutoff;
@@ -262,8 +270,9 @@ vec3 calc_emissive_light(EmissiveLight emissive_light, vec3 normal, vec3 view_di
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), shininess);
 
     //Attenuation
-    float distance = length(emissive_light.position - vert_position);
-    float attenuation = 1.0 - (distance / emissive_light.radius);
+	emissive_light.position.z = vert_position.z; //Discard z
+    float dist = length(emissive_light.position - vert_position);
+    float attenuation = 1.0 - (dist / emissive_light.radius);
 
 	if (attenuation < 0.0)
 		attenuation = 0.0;
