@@ -280,18 +280,27 @@ namespace ion::graphics::materials
 			//Attach the given animation as a emissive map for the material
 			inline void EmissiveMap(NonOwningPtr<Animation> animation) noexcept
 			{
+				if (emissive_map_.index() == 0 && animation && emissive_color_ == color::Black)
+					emissive_color_ = color::White;
+
 				emissive_map_ = animation;
 			}
 
 			//Attach the given texture as a emissive map for the material
 			inline void EmissiveMap(NonOwningPtr<Texture> texture) noexcept
 			{
+				if (emissive_map_.index() == 0 && texture && emissive_color_ == color::Black)
+					emissive_color_ = color::White;
+
 				emissive_map_ = texture;
 			}
 
 			//Detach the emissive map from the material
 			inline void EmissiveMap(std::nullptr_t) noexcept
 			{
+				if (emissive_map_.index() > 0 && emissive_color_ == color::White)
+					emissive_color_ = color::Black;
+
 				emissive_map_ = std::monostate{};
 			}
 
