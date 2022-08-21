@@ -579,7 +579,7 @@ ClassDefinition get_model_class()
 ClassDefinition get_movable_object_class()
 {
 	return ClassDefinition::Create("movable-object")
-		.AddProperty("bounding-volume-colors", {ParameterType::Color, ParameterType::Color, ParameterType::Color})
+		.AddProperty("bounding-volume-colors", {ParameterType::Color, ParameterType::Color, ParameterType::Color}, 1)
 		.AddProperty("bounding-volume-extent", {ParameterType::Vector2, ParameterType::Vector2})
 		.AddProperty("name", ParameterType::String)
 		.AddProperty("prefered-bounding-volume", {"bounding-box"s, "bounding-sphere"s})
@@ -1254,9 +1254,14 @@ void set_movable_object_properties(const script_tree::ObjectNode &object, Movabl
 	for (auto &property : object.Properties())
 	{
 		if (property.Name() == "bounding-volume-colors")
-			movable_object.BoundingVolumeColors(property[0].Get<ScriptType::Color>()->Get(),
-												property[1].Get<ScriptType::Color>()->Get(),
-												property[2].Get<ScriptType::Color>()->Get());
+		{
+			if (property.NumberOfArguments() == 3)
+				movable_object.BoundingVolumeColors(property[0].Get<ScriptType::Color>()->Get(),
+													property[1].Get<ScriptType::Color>()->Get(),
+													property[2].Get<ScriptType::Color>()->Get());
+			else
+				movable_object.BoundingVolumeColors(property[0].Get<ScriptType::Color>()->Get());
+		}
 		else if (property.Name() == "bounding-volume-extent")
 			movable_object.BoundingVolumeExtent(graphics::utilities::Aabb{property[0].Get<ScriptType::Vector2>()->Get(), property[1].Get<ScriptType::Vector2>()->Get()});
 		else if (property.Name() == "prefered-bounding-volume")
