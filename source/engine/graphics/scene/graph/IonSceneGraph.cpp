@@ -79,6 +79,9 @@ void set_light_uniforms(const light_pointers &lights, std::optional<textures::te
 	using namespace shaders::variables;
 	using namespace ion::utilities;
 
+	if (auto count = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_LightCount); count)
+		count->Get<int>() = std::ssize(lights);
+
 	if (std::empty(lights))
 		return; //Nothing to set
 
@@ -170,6 +173,9 @@ void set_emissive_light_uniforms(const light_pointers &lights, std::optional<tex
 {
 	using namespace shaders::variables;
 	using namespace ion::utilities;
+	
+	if (auto count = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_EmissiveLightCount); count)
+		count->Get<int>() = std::ssize(lights);
 
 	if (std::empty(lights))
 		return; //Nothing to set
@@ -264,7 +270,7 @@ void set_node_uniforms(const SceneNode &node, shaders::ShaderProgram &shader_pro
 		scaling->Get<glsl::vec2>() = node.DerivedScaling();
 }
 
-void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, int emissive_light_count, shaders::ShaderProgram &shader_program) noexcept
+void set_scene_uniforms(real gamma_value, Color ambient_color, shaders::ShaderProgram &shader_program) noexcept
 {
 	using namespace shaders::variables;
 
@@ -273,12 +279,6 @@ void set_scene_uniforms(real gamma_value, Color ambient_color, int light_count, 
 
 	if (auto ambient = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_Ambient); ambient)
 		ambient->Get<glsl::vec4>() = ambient_color;
-
-	if (auto count = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_LightCount); count)
-		count->Get<int>() = light_count;
-
-	if (auto count = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_EmissiveLightCount); count)
-		count->Get<int>() = emissive_light_count;
 }
 
 
@@ -503,12 +503,12 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 							}, attached_object);
 					object->Elapse(time);
 
-					//Update uniforms and render object
+					//Render visible objects in view
 					if (object->Visible() &&
 						(object->WorldAxisAlignedBoundingBox(true, false).Empty() || //Cull based on actual geometry
 						 object->WorldAxisAlignedBoundingBox(false).Intersects(camera->WorldAxisAlignedBoundingBox(false))))
 					{
-						//For each shader program
+						//For each shader program update uniforms
 						for (auto &shader_program : object->RenderPrograms())
 						{
 							//There is probably <= 10 distinct shader programs per scene
@@ -521,7 +521,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 								detail::set_light_uniforms(lights_, light_texture_handle_, *camera, *shader_program);
 								detail::set_emissive_light_uniforms(emissive_lights_, emissive_light_texture_handle_, *camera, *shader_program);
 								detail::set_matrix_uniforms(projection_mat, *shader_program);
-								detail::set_scene_uniforms(gamma_, ambient_color_, std::ssize(lights_), std::ssize(emissive_lights_), *shader_program);
+								detail::set_scene_uniforms(gamma_, ambient_color_, *shader_program);
 								shader_programs_.push_back(shader_program); //Only distinct
 							}
 
