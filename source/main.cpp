@@ -1651,10 +1651,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{1.0_r, -0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Right
 
-			auto model_spectrum = scene_manager->CreateModel();
-			model_spectrum->CreateMesh(ion::graphics::scene::shapes::Sprite{
-				{0.0_r, 0.0_r, 0.0_r}, {0.71_r, 0.71_r}, color_spectrum});
-			model_spectrum->AddPass(ion::graphics::render::Pass{});
+			//auto model_spectrum = scene_manager->CreateModel();
+			//model_spectrum->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			//	{0.0_r, 0.0_r, 0.0_r}, {0.71_r, 0.71_r}, color_spectrum});
+			//model_spectrum->AddPass(ion::graphics::render::Pass{});
 
 			//auto box = scene_manager->CreateModel();
 			//box->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.25_r, 0.30_r}, color::DeepPink});
@@ -2196,8 +2196,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto cloud_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 0.0_r, -1.6_r});
 			cloud_node->AttachObject(*clouds);
 
-			auto spectrum_node = scene_graph->RootNode().CreateChildNode({}, {1.4_r, -0.6_r, -1.1_r});
-			spectrum_node->AttachObject(*model_spectrum);
+			//auto spectrum_node = scene_graph->RootNode().CreateChildNode({}, {1.4_r, -0.6_r, -1.1_r});
+			//spectrum_node->AttachObject(*model_spectrum);
 
 			//auto button_node = scene_graph->RootNode().CreateChildNode({0.0_r, 0.5_r, -2.0_r});
 			//button_node->AttachObject(*button_model);
