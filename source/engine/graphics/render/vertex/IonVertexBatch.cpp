@@ -312,14 +312,14 @@ void bind_texture(textures::texture::TextureHandle texture_handle, int texture_u
 }
 
 
-void set_light_texture_uniforms(shaders::ShaderProgram &shader_program) noexcept
+void set_light_uniforms(shaders::ShaderProgram &shader_program) noexcept
 {
 	using namespace shaders::variables;
 
 	auto active_scene_graph = Engine::GetActiveSceneGraph();
 
 	if (!active_scene_graph)
-		return; //Nothing more to set
+		return; //Nothing to set
 
 
 	if (auto scene_lights = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_Lights); scene_lights)
@@ -625,7 +625,7 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 			shader_program->Owner()->SendAttributeValues(*shader_program);
 		}
 
-		detail::set_light_texture_uniforms(*shader_program);
+		detail::set_light_uniforms(*shader_program);
 		detail::set_material_uniforms(material_.get(), time_, *shader_program);
 		detail::set_texture_uniforms(texture_, time_, *shader_program);
 
@@ -693,6 +693,7 @@ void VertexBatch::Draw(shaders::ShaderProgram *shader_program) noexcept
 		if (material_ || texture_.index() > 0)
 		{
 			detail::bind_texture({0}, 0);
+			detail::bind_texture({0, textures::texture::TextureType::ArrayTexture1D}, 0);
 			detail::bind_texture({0, textures::texture::TextureType::ArrayTexture2D}, 0);
 		}
 	}
