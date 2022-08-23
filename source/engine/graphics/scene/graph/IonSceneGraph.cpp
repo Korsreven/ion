@@ -73,6 +73,17 @@ void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &sh
 		color->Get<glsl::vec4>() = fog->Tint();
 }
 
+void set_light_uniforms(const uvec4 &light_mask, const uvec4 &emissive_light_mask, shaders::ShaderProgram &shader_program) noexcept
+{
+	using namespace shaders::variables;
+
+	if (auto mask = shader_program.GetUniform(shaders::shader_layout::UniformName::Primitive_LightMask); mask)
+		mask->Get<glsl::uvec4>().XYZW(light_mask[0], light_mask[1], light_mask[2], light_mask[3]);
+
+	if (auto mask = shader_program.GetUniform(shaders::shader_layout::UniformName::Primitive_EmissiveLightMask); mask)
+		mask->Get<glsl::uvec4>().XYZW(emissive_light_mask[0], emissive_light_mask[1], emissive_light_mask[2], emissive_light_mask[3]);
+}
+
 void set_light_uniforms(const light_pointers &lights, std::optional<textures::texture::TextureHandle> &texture_handle,
 	const Camera &camera, shaders::ShaderProgram &shader_program) noexcept
 {
@@ -428,6 +439,8 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 
 	lights_.clear();
 	emissive_lights_.clear();
+	detail::uvec4 light_mask{};
+	detail::uvec4 emissive_light_mask{};
 
 	if (lighting_enabled_)
 	{
@@ -508,6 +521,38 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 						(object->WorldAxisAlignedBoundingBox(true, false).Empty() || //Cull based on actual geometry
 						 object->WorldAxisAlignedBoundingBox(false).Intersects(camera->WorldAxisAlignedBoundingBox(false))))
 					{
+						//Render only lights that illuminates object
+						light_mask.fill(0_ui32);
+						for (auto i = 0_ui32; auto &light : lights_)
+						{
+							if (i == detail::max_lights_in_mask)
+								break;
+
+							if (object->WorldAxisAlignedBoundingBox(false).Empty() ||
+								light->WorldBoundingSphere(true, false).Empty() || //Cull based on actual attenuation
+								light->WorldBoundingSphere(false).Intersects(object->WorldAxisAlignedBoundingBox(false)))
+								
+								light_mask[i / 32_ui32] |= i + 1_ui32; //Set light in mask
+
+							++i;
+						}
+
+						//Render only emissive lights that illuminates object
+						emissive_light_mask.fill(0_ui32);
+						for (auto i = 0_ui32; auto &light : emissive_lights_)
+						{
+							if (i == detail::max_lights_in_mask)
+								break;
+
+							if (object->WorldAxisAlignedBoundingBox(false).Empty() ||
+								light->WorldBoundingSphere(true, false).Empty() || //Cull based on actual attenuation
+								light->WorldBoundingSphere(false).Intersects(object->WorldAxisAlignedBoundingBox(false)))
+
+								emissive_light_mask[i / 32_ui32] |= i + 1_ui32; //Set light in mask
+
+							++i;
+						}
+
 						//For each shader program update uniforms
 						for (auto &shader_program : object->RenderPrograms())
 						{
@@ -534,6 +579,9 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 								detail::set_node_uniforms(node, *shader_program);
 								shader_programs_node_.push_back(shader_program); //Only distinct
 							}
+
+							//One time per program per object
+							detail::set_light_uniforms(light_mask, emissive_light_mask, *shader_program);
 						}
 
 						object->Render();

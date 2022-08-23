@@ -32,6 +32,8 @@ struct Camera
 struct Primitive
 {
 	bool has_material;
+	uvec4 light_mask;
+	uvec4 emissive_light_mask;
 };
 
 struct Material

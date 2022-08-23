@@ -32,6 +32,8 @@ struct Primitive
 {
 	sampler2DArray texture;
 	bool has_texture;
+	uvec4 light_mask;
+	uvec4 emissive_light_mask;
 };
 
 struct Fog
