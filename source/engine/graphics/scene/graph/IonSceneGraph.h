@@ -76,13 +76,23 @@ namespace ion::graphics::scene::graph
 			using uvec4 = std::array<uint32, 4>;
 
 
+			void cache_bounding_boxes(const SceneNode &node) noexcept;
+
+			void get_lights(const SceneNode &node, const Camera &camera, light_pointers &lights);
+			void get_emissive_lights(const SceneNode &node, const Camera &camera, light_pointers &lights);
+			void get_light_mask(const light_pointers &lights, const MovableObject &object, uvec4 &light_mask) noexcept;
+
+
 			/*
-				Graphics API
+				Uniforms
 			*/
 
 			void set_camera_uniforms(const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &shader_program) noexcept;
-			void set_light_uniforms(const uvec4 &light_mask, const uvec4 &emissive_light_mask, shaders::ShaderProgram &shader_program) noexcept;
+			void set_light_uniforms(const light_pointers &lights, const MovableObject &object, uvec4 &light_mask,
+				shaders::ShaderProgram &shader_program) noexcept;
+			void set_emissive_light_uniforms(const light_pointers &lights, const MovableObject &object, uvec4 &light_mask,
+				shaders::ShaderProgram &shader_program) noexcept;
 			void set_light_uniforms(const light_pointers &lights, std::optional<textures::texture::TextureHandle> &texture_handle,
 				const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_emissive_light_uniforms(const light_pointers &lights, std::optional<textures::texture::TextureHandle> &texture_handle,
@@ -91,6 +101,11 @@ namespace ion::graphics::scene::graph
 			void set_matrix_uniforms(const Matrix4 &projection_mat, const Matrix4 &model_view_mat, shaders::ShaderProgram &shader_program) noexcept;
 			void set_node_uniforms(const SceneNode &node, shaders::ShaderProgram &shader_program) noexcept;
 			void set_scene_uniforms(real gamma_value, Color ambient_color, shaders::ShaderProgram &shader_program) noexcept;
+
+
+			/*
+				Graphics API
+			*/
 
 			void set_gl_model_view_matrix(const Matrix4 &model_view_mat) noexcept;
 			void mult_gl_model_view_matrix(const Matrix4 &model_view_mat) noexcept;
@@ -121,6 +136,8 @@ namespace ion::graphics::scene::graph
 
 			scene_graph::detail::light_pointers lights_;
 			scene_graph::detail::light_pointers emissive_lights_;
+			scene_graph::detail::uvec4 light_mask_{};
+			scene_graph::detail::uvec4 emissive_light_mask_{};
 
 			scene_graph::detail::shader_program_pointers shader_programs_;
 			scene_graph::detail::shader_program_pointers shader_programs_node_;

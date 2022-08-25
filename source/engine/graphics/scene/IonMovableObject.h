@@ -17,6 +17,7 @@ File:	IonMovableObject.h
 #include <optional>
 #include <string>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 #include "graphics/utilities/IonAabb.h"
@@ -109,9 +110,9 @@ namespace ion::graphics::scene
 			graph::SceneNode *parent_node_ = nullptr;		
 			std::any user_data_;
 
-			mutable Aabb world_aabb_;
-			mutable Obb world_obb_;
-			mutable Sphere world_sphere_;
+			mutable std::pair<Aabb, Aabb> world_aabb_;
+			mutable std::pair<Obb, Obb> world_obb_;
+			mutable std::pair<Sphere, Sphere> world_sphere_;
 
 
 			/*
@@ -364,27 +365,33 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto& WorldAxisAlignedBoundingBox(bool derive = true, bool apply_extent = true) const noexcept
 			{
 				if (derive)
-					world_aabb_ = DeriveWorldAxisAlignedBoundingBox(aabb_, apply_extent);
+					apply_extent ?
+					(world_aabb_.first = DeriveWorldAxisAlignedBoundingBox(aabb_, apply_extent)) :
+					(world_aabb_.second = DeriveWorldAxisAlignedBoundingBox(aabb_, apply_extent));
 
-				return world_aabb_;
+				return apply_extent ? world_aabb_.first : world_aabb_.second;
 			}
 
 			//Returns the world oriented bounding box (OBB) for this movable object
 			[[nodiscard]] inline auto& WorldOrientedBoundingBox(bool derive = true, bool apply_extent = true) const noexcept
 			{
 				if (derive)
-					world_obb_ = DeriveWorldOrientedBoundingBox(obb_, aabb_, apply_extent);
+					apply_extent ?
+					(world_obb_.first = DeriveWorldOrientedBoundingBox(obb_, aabb_, apply_extent)) :
+					(world_obb_.second = DeriveWorldOrientedBoundingBox(obb_, aabb_, apply_extent));
 
-				return world_obb_;
+				return apply_extent ? world_obb_.first : world_obb_.second;
 			}
 
 			//Returns the world bounding sphere for this movable object
 			[[nodiscard]] inline auto& WorldBoundingSphere(bool derive = true, bool apply_extent = true) const noexcept
 			{
 				if (derive)
-					world_sphere_ = DeriveWorldBoundingSphere(sphere_, aabb_, apply_extent);
+					apply_extent ?
+					(world_sphere_.first = DeriveWorldBoundingSphere(sphere_, aabb_, apply_extent)) :
+					(world_sphere_.second = DeriveWorldBoundingSphere(sphere_, aabb_, apply_extent));
 
-				return world_sphere_;
+				return apply_extent ? world_sphere_.first : world_sphere_.second;
 			}
 
 
