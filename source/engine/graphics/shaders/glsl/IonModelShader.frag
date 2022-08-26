@@ -372,26 +372,34 @@ void main()
 		//Accumulate each light
 		for (int i = 0; i < scene.light_count; ++i)
 		{
-			Light light = fetch_light(i);
+			//Light illuminates fragments
+			if ((primitive.light_mask[uint(i) / 32u] & (uint(i) % 32u + 1u)) != 0u)
+			{
+				Light light = fetch_light(i);
 
-			//Point light
-			if (light.type == 0)
-				light_color += calc_point_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+				//Point light
+				if (light.type == 0)
+					light_color += calc_point_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 			
-			//Directional light
-			else if (light.type == 1)
-				light_color += calc_directional_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+				//Directional light
+				else if (light.type == 1)
+					light_color += calc_directional_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 			
-			//Spot light
-			else if (light.type == 2)
-				light_color += calc_spot_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+				//Spot light
+				else if (light.type == 2)
+					light_color += calc_spot_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+			}
 		}
 
 		//Accumulate each emissive light
 		for (int i = 0; i < scene.emissive_light_count; ++i)
 		{
-			EmissiveLight emissive_light = fetch_emissive_light(i);
-			light_color += calc_emissive_light(emissive_light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+			//Emissive light illuminates fragments
+			if ((primitive.emissive_light_mask[uint(i) / 32u] & (uint(i) % 32u + 1u)) != 0u)
+			{
+				EmissiveLight emissive_light = fetch_emissive_light(i);
+				light_color += calc_emissive_light(emissive_light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+			}
 		}
 
 		color.rgb += light_color;
