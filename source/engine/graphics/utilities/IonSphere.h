@@ -103,6 +103,7 @@ namespace ion::graphics::utilities
 	} //sphere::detail
 
 
+	//A class representing a two-dimensional bounding sphere
 	class Sphere final
 	{
 		private:

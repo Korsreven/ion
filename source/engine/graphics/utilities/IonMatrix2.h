@@ -26,9 +26,9 @@ namespace ion::graphics::utilities
 	} //matrix2::detail
 
 
-	//A 2x2 column-major matrix class with right hand rotation
+	//A class representing a 2x2 column-major matrix with right hand rotation
 	//Follows the OpenGL matrix convention by default
-	//Define ION_ROW_MAJOR to use this class with Direct3D
+	//Define ION_ROW_MAJOR and ION_LEFT_HANDED to use this class with Direct3D
 	class Matrix2 final
 	{
 		private:

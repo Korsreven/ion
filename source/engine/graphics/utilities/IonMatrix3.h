@@ -27,9 +27,9 @@ namespace ion::graphics::utilities
 	} //matrix3::detail
 
 
-	//A 3x3 column-major matrix class with right hand rotation
+	//A class representing a 3x3 column-major matrix with right hand rotation
 	//Follows the OpenGL matrix convention by default
-	//Define ION_ROW_MAJOR to use this class with Direct3D
+	//Define ION_ROW_MAJOR and ION_LEFT_HANDED to use this class with Direct3D
 	class Matrix3 final
 	{
 		private:

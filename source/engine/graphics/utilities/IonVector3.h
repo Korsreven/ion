@@ -30,6 +30,7 @@ namespace ion::graphics::utilities
 	} //vector3::detail
 
 
+	//A class representing a three-component vector (x,y,z)
 	class Vector3 final
 	{
 		private:

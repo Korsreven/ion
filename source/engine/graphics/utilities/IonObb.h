@@ -35,7 +35,7 @@ namespace ion::graphics::utilities
 	} //obb::detail
 
 
-	//Oriented bounding box (OBB)
+	//A class representing a two-dimensional oriented bounding box (OBB)
 	class Obb final
 	{
 		private:

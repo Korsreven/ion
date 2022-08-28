@@ -122,6 +122,7 @@ namespace ion::graphics::utilities
 	} //color::detail
 
 
+	//A class representing a four-channel RGBA32 color model
 	class Color final
 	{
 		private:

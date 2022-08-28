@@ -28,6 +28,7 @@ namespace ion::graphics::utilities
 	} //ray::detail
 
 
+	//A class representing a two-dimensional ray
 	class Ray final
 	{
 		private:

@@ -30,6 +30,7 @@ namespace ion::graphics::utilities
 	} //vector2::detail
 
 
+	//A class representing a two-component vector (x,y)
 	class Vector2 final
 	{
 		private:

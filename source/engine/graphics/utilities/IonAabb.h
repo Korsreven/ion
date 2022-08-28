@@ -57,7 +57,7 @@ namespace ion::graphics::utilities
 	} //aabb::detail
 
 
-	//Axis-aligned bounding box (AABB)
+	//A class representing a two-dimensional axis-aligned bounding box (AABB)
 	class Aabb final
 	{
 		private:
