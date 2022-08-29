@@ -26,6 +26,7 @@ File:	IonMath.h
 #include "adaptors/IonFlatMap.h"
 #include "types/IonTypes.h"
 
+//Namespace containing commonly used (optimized) mathematical functions for games and graphics
 namespace ion::utilities::math
 {
 	using namespace types::type_literals;

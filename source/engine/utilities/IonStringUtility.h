@@ -26,6 +26,7 @@ File:	IonStringUtility.h
 #include "IonConvert.h"
 #include "types/IonTypes.h"
 
+//Namespace containing commonly used (optimized) string functions for manipulating and formatting strings
 namespace ion::utilities::string
 {
 	using namespace std::string_view_literals;

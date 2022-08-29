@@ -19,6 +19,7 @@ File:	IonCrypto.h
 
 #include "types/IonTypes.h"
 
+//Namespace containing safe cryptographic hashing functions like SHA3, SHAKE and Keccac variants
 namespace ion::utilities::crypto
 {
 	namespace detail

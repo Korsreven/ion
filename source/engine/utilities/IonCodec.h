@@ -25,6 +25,7 @@ File:	IonCodec.h
 #include "IonMath.h"
 #include "IonStringUtility.h"
 
+//Namespace containing functions for encoding and decoding different bases
 namespace ion::utilities::codec
 {
 	namespace detail

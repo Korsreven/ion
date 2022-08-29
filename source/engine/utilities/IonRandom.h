@@ -20,6 +20,7 @@ File:	IonRandom.h
 
 #include "types/IonTypes.h"
 
+//Namespace containing commonly used functions for generating random numbers in different ranges
 namespace ion::utilities::random
 {
 	namespace detail

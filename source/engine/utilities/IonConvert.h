@@ -24,6 +24,7 @@ File:	IonConvert.h
 #undef min
 #undef max
 
+//Namespace containing functions for converting a string to a number and vice versa
 namespace ion::utilities::convert
 {
 	namespace detail

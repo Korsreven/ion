@@ -26,6 +26,7 @@ File:	IonFileUtility.h
 #undef CreateDirectory
 #endif
 
+//Namespace containing commonly used file system functions for manipulating files and directories
 namespace ion::utilities::file
 {
 	/*
