@@ -18,12 +18,14 @@ File:	IonIterable.h
 
 namespace ion::adaptors::ranges
 {
+	//A class that provides functionality for a forward iterable range
 	template <typename Container>
 	struct Iterable : BasicIterable<Container>
 	{
 		using BasicIterable<Container>::BasicIterable;
 	};
 
+	//A class that provides functionality for an reverse iterable range
 	template <typename Container>
 	struct ReverseIterable : BasicReverseIterable<Container>
 	{

@@ -31,6 +31,7 @@ namespace ion::adaptors
 	} //flat_map::detail
 
 
+	//An adaptor class that provides flat map functionality to any flat container
 	template <typename Key, typename T, typename Compare = std::less<>, //Transparent as default
 		template <typename...> typename Container = std::vector, typename... Types>
 	struct FlatMap final :

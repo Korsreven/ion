@@ -57,6 +57,7 @@ namespace ion::adaptors::iterators
 	} //flat_map_iterator::detail
 
 
+	//A const iterator adaptor class for flat map, that makes the dereferenced first value of the pair const
 	template <typename Iterator>
 	struct ConstFlatMapIterator : Iterator
 	{
@@ -181,6 +182,7 @@ namespace ion::adaptors::iterators
 	};
 
 
+	//An iterator adaptor class for flat map, that makes the dereferenced first value of the pair const
 	template <typename Iterator>
 	struct FlatMapIterator final : ConstFlatMapIterator<Iterator>
 	{

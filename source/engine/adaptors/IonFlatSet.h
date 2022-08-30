@@ -23,6 +23,7 @@ File:	IonFlatSet.h
 
 namespace ion::adaptors
 {
+	//An adaptor class that provides flat set functionality to any flat container
 	template <typename Key, typename Compare = std::less<>, //Transparent as default
 		template <typename...> typename Container = std::vector, typename... Types>
 	struct FlatSet final :

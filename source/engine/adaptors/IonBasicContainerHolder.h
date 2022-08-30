@@ -17,6 +17,7 @@ File:	IonBasicContainerHolder.h
 
 namespace ion::adaptors
 {
+	//A class that can hold any container by value
 	template <typename Container>
 	class BasicHolder
 	{
@@ -51,6 +52,8 @@ namespace ion::adaptors
 			}
 	};
 
+
+	//A class that can hold any container by reference
 	template <typename Container>
 	class BasicHolder<Container&>
 	{

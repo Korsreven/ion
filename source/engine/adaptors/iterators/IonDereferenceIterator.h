@@ -52,6 +52,7 @@ namespace ion::adaptors::iterators
 	} //dereference_iterator::detail
 
 
+	//A const iterator adaptor class that automatically dereferences the iterator value
 	template <typename Iterator>
 	struct ConstDereferenceIterator : Iterator
 	{
@@ -173,6 +174,7 @@ namespace ion::adaptors::iterators
 	};
 
 
+	//An iterator adaptor class that automatically dereferences the iterator value
 	template <typename Iterator>
 	struct DereferenceIterator final : ConstDereferenceIterator<Iterator>
 	{

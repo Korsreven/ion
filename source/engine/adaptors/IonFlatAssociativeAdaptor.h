@@ -175,6 +175,7 @@ namespace ion::adaptors
 	} //flat_associative_adaptor::detail
 
 
+	//An adaptor class that provides associative functionality to any flat container
 	template <typename Container, typename Key, typename Compare,
 		template <typename...> typename IteratorAdaptor = types::identity>
 	struct FlatAssociativeAdaptor : ranges::BasicIterable<Container, IteratorAdaptor>

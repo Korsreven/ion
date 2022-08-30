@@ -19,6 +19,7 @@ File:	IonDereferenceIterable.h
 
 namespace ion::adaptors::ranges
 {
+	//A class that provides functionality for a forward dereference iterable range
 	template <typename Container>
 	struct DereferenceIterable :
 		BasicIterable<Container, adaptors::iterators::dereference_iterator::detail::get_dereference_iterator>
@@ -26,6 +27,7 @@ namespace ion::adaptors::ranges
 		using BasicIterable<Container, adaptors::iterators::dereference_iterator::detail::get_dereference_iterator>::BasicIterable;
 	};
 
+	//A class that provides functionality for an reverse dereference iterable range
 	template <typename Container>
 	struct ReverseDereferenceIterable :
 		BasicReverseIterable<Container, adaptors::iterators::dereference_iterator::detail::get_dereference_iterator>

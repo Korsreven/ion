@@ -20,6 +20,7 @@ File:	IonBasicIterable.h
 
 namespace ion::adaptors::ranges
 {
+	//A class that provides a basic interface for a forward iterable range
 	template <typename Container,
 		template <typename...> typename IteratorAdaptor = types::identity>
 	struct BasicIterable : Holder<Container>

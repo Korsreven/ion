@@ -20,6 +20,7 @@ File:	IonContainerHolder.h
 
 namespace ion::adaptors
 {
+	//A class that provides a basic interface on top of a wrapped container
 	template <typename Container>
 	struct Holder : BasicHolder<Container>
 	{

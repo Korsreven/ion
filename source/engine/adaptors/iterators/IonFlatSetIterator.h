@@ -49,7 +49,8 @@ namespace ion::adaptors::iterators
 		using get_flat_set_iterator_t = typename get_flat_set_iterator<Iterator>::type;
 	} //flat_set_iterator::detail
 
-
+	
+	//A const iterator adaptor class for flat set, that makes the dereferenced value const
 	template <typename Iterator>
 	struct ConstFlatSetIterator : Iterator
 	{
@@ -171,6 +172,7 @@ namespace ion::adaptors::iterators
 	};
 
 
+	//An iterator adaptor class for flat set, that makes the dereferenced value const
 	template <typename Iterator>
 	struct FlatSetIterator final : ConstFlatSetIterator<Iterator>
 	{
