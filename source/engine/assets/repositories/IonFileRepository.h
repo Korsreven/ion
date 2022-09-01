@@ -107,6 +107,7 @@ namespace ion::assets::repositories
 	} //file_repository
 
 
+	//A repository base class for storing physical files, files within a data file and supported file extensions
 	class FileRepository
 	{
 		private:

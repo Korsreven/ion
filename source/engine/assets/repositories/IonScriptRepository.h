@@ -26,6 +26,7 @@ namespace ion::assets::repositories
 	} //script_repository::detail
 
 
+	//A repository class for categorizing and storing all supported script files
 	struct ScriptRepository : FileRepository
 	{
 		//Default construct a script repository

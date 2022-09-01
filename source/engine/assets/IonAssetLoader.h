@@ -90,6 +90,9 @@ namespace ion::assets
 	} //asset_loader
 
 
+	//A class that loads and categorizes assets into all attached repositories
+	//Files are automatically stored in the repositories that supports the given file extension
+	//All files stored in the attached repositories can also be compiled into a single data file
 	class AssetLoader final
 	{
 		private:

@@ -26,6 +26,7 @@ namespace ion::assets::repositories
 	} //audio_repository::detail
 
 
+	//A repository class for categorizing and storing all supported audio files
 	struct AudioRepository : FileRepository
 	{
 		//Default construct an audio repository

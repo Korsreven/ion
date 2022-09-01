@@ -26,6 +26,7 @@ namespace ion::assets::repositories
 	} //video_repository::detail
 
 
+	//A repository class for categorizing and storing all supported video files
 	struct VideoRepository : FileRepository
 	{
 		//Default construct a video repository

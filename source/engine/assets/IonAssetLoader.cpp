@@ -358,7 +358,7 @@ bool AssetLoader::LoadFile(const std::filesystem::path &file_path)
 			ExtractDataFile(data_files.front());
 	}
 
-	return LoadFile({std::move(file_path), std::nullopt});
+	return LoadFile({file_path, std::nullopt});
 }
 
 bool AssetLoader::LoadFile(file_repository::FileEntry file)

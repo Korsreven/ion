@@ -26,6 +26,7 @@ namespace ion::assets::repositories
 	} //font_repository::detail
 
 
+	//A repository class for categorizing and storing all supported font files
 	struct FontRepository : FileRepository
 	{
 		//Default construct a font repository
