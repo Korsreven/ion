@@ -58,6 +58,7 @@ namespace ion
 	} //engine
 
 
+	//The class that creates the render window with a default viewport and starts the rendering loop
 	class Engine final :
 		protected events::Listenable<events::listeners::FrameListener>,	
 		public managed::ObjectManager<graphics::scene::graph::SceneGraph, Engine>
