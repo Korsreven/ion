@@ -28,6 +28,8 @@ namespace ion::timers
 	} //async_timer_manager::detail
 
 
+	//A manager class that contains async timers (not in sync with the engine)
+	//All timers are updated using a recurring callback with a minimum time resolution
 	class AsyncTimerManager final : public TimerManager
 	{
 		private:

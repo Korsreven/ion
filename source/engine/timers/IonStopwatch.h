@@ -18,6 +18,7 @@ File:	IonStopwatch.h
 
 namespace ion::timers
 {
+	//A class representing a stopwatch that can be used to measure elapsed time
 	class Stopwatch final
 	{
 		private:

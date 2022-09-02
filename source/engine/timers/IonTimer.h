@@ -35,6 +35,9 @@ namespace ion::timers
 		}
 	} //timer::detail
 
+
+	//A class representing a controllable timer with an interval
+	//The timer can be queried manually or by providing a callback
 	class Timer final : public managed::ManagedObject<TimerManager>
 	{
 		private:
