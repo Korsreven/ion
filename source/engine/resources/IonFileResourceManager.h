@@ -44,6 +44,8 @@ namespace ion::resources
 		}
 	} //file_resource_manager::detail
 
+
+	//A class that manages and prepares file resources from its own repositories
 	template <typename ResourceT, typename OwnerT, typename RepositoryT>
 	class FileResourceManager :
 		public ResourceManager<ResourceT, OwnerT>,

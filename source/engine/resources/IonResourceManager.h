@@ -45,6 +45,7 @@ namespace ion::resources
 	} //resource_manager
 
 
+	//A class that manages, prepares, loads and unloads resources
 	template <typename ResourceT, typename OwnerT>
 	class ResourceManager : public managed::ObjectManager<ResourceT, OwnerT, events::listeners::ResourceListener<ResourceT, OwnerT>>
 	{

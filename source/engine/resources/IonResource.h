@@ -49,6 +49,7 @@ namespace ion::resources
 	} //resource
 
 
+	//A class that represents a general resource that can be prepared, loaded and unloaded
 	template <typename T>
 	class Resource : public managed::ManagedObject<T>
 	{
