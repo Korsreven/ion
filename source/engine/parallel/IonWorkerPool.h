@@ -89,6 +89,8 @@ namespace ion::parallel
 	} //worker_pool
 
 
+	//A class representing a pool of workers (with an optional worker id)
+	//Each worker runs in parallel and returns the results when done
 	//This is the master class defined by the master/slave model
 	template <typename Ret, typename Id = void>
 	class WorkerPool final

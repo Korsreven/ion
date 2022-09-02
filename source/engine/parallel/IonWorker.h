@@ -25,6 +25,8 @@ namespace ion::parallel
 	} //worker::detail
 
 
+	//A class representing an async waitable worker
+	//The worker starts on a given task and returns the result when queried
 	//This is the slave class defined by the master/slave model
 	template <typename Ret>
 	class Worker final
