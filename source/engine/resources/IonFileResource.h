@@ -21,7 +21,7 @@ File:	IonFileResource.h
 
 namespace ion::resources
 {
-	//A class that represents a file resource (usually a physical file asset)
+	//A class representing a file resource (usually a physical file asset)
 	template <typename T>
 	class FileResource : public Resource<T>
 	{
