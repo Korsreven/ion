@@ -15,6 +15,8 @@ File:	IonStrongType.h
 
 namespace ion::types
 {
+	//A class representing a strong type of any native type T
+	//Different strong types can not be mixed, even if their native types are the same
 	template <typename T, typename Tag>
 	class StrongType
 	{

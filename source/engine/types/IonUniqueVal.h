@@ -20,7 +20,7 @@ File:	IonUniqueVal.h
 
 namespace ion::types
 {
-	//Unique value
+	//A class representing a unique value
 	//Tag class members as UniqueVal to disable copying of its value
 	//An object containing one or more tagged members can still be copied normally
 	//A member tagged as UniqueVal will be default constructed when the copy constructor is called

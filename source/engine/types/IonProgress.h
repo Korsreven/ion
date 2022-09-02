@@ -37,7 +37,7 @@ namespace ion::types
 	} //progress::detail
 	
 
-	//Progress in range [min, max]
+	//A class representing a progress in range [min, max]
 	template <typename T>
 	class Progress
 	{

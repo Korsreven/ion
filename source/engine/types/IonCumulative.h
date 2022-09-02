@@ -37,7 +37,7 @@ namespace ion::types
 	} //cumulative::detail
 	
 
-	//Cumulative sum (running total) in range [0, limit]
+	//A class representing a cumulative sum (running total) in range [0, limit]
 	//Total is allowed to accumulate higher than the limit (before resetting)
 	template <typename T>
 	class Cumulative
