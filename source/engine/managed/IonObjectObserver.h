@@ -34,6 +34,9 @@ namespace ion::managed
 	} //object_observer::detail
 
 
+	//A class representing multiple observed (managed) objects
+	//An object observer can be optional or mandatory, meaning if the observed objects are removable or not
+	//When an observed object is removed, or all are removed at once, it will notify the user by the given callback
 	template <typename T,
 		typename = std::enable_if_t<observed_object::detail::has_owner_type_v<T>>>
 	class ObjectObserver final :

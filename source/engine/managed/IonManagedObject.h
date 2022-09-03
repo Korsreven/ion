@@ -18,6 +18,8 @@ File:	IonManagedObject.h
 
 namespace ion::managed
 {
+	//A class representing a managed object with an optional name and owner (usually an object manager)
+	//Manually created objects or orphaned objects are ownerless, meaning their lifetimes are managed by the user
 	template <typename T>
 	class ManagedObject
 	{

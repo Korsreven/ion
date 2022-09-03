@@ -55,12 +55,18 @@ namespace ion::managed
 	} //object_manager::detail
 
 
+	//A non-templated base class for all object managers
+	//This class is needed to store different types of object managers in a single object register
 	struct ObjectManagerBase
 	{
 		//Default virtual destructor
 		virtual ~ObjectManagerBase() = default;
 	};
 
+
+	//A class representing an owning manager that can create and store multiple objects of a single type
+	//The created objects can be of any type, but must be derived from managed object
+	//This class must be derived from to be able to create objects
 	template <typename ObjectT, typename OwnerT, typename ListenerT = events::listeners::ManagedObjectListener<ObjectT, OwnerT>>
 	class ObjectManager : virtual public ObjectManagerBase, public events::Listenable<ListenerT>
 	{

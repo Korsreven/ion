@@ -97,6 +97,9 @@ namespace ion::managed
 	} //object_register::detail
 
 
+	//A class representing a non-owning register of objects that all shares a single common type
+	//When registering an object, it can be given a name (optional) to make it easier to be retrieved later on
+	//An object register of type foo can register foo objects but also objects that derives from foo
 	template <typename T>
 	class ObjectRegister
 	{
