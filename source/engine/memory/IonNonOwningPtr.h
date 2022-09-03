@@ -30,6 +30,10 @@ namespace ion::memory
 	} //non_owning_ptr::detail
 
 
+	//A class representing a pointer that has non-ownership to some data
+	//Internally this class uses a raw pointer + a pointer to the control block
+	//A non-owning pointer becomes nullptr when the owned data has expired
+	//Use raw pointers when you know that the owned data has not expired yet!
 	template <typename T>
 	class NonOwningPtr final
 	{

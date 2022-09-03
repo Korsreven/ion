@@ -35,6 +35,10 @@ namespace ion::memory
 	} //owning_ptr::detail
 
 
+	//A class representing a pointer that has ownership to some data
+	//Internally this class uses std::unique_ptr + a control block
+	//Semantically this class is a faster, non-thread safe version of std::shared_ptr
+	//Use std::shared_ptr in environments where thread safety is important!
 	template <typename T>
 	class OwningPtr final
 	{
