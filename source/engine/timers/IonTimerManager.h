@@ -28,7 +28,7 @@ namespace ion::timers
 
 
 	//A manager class that contains timers (usually in sync with the engine)
-	//All timers are updated when elapse is called with the time provided
+	//All timers are updated when elapse is called, with the time provided
 	struct TimerManager : managed::ObjectManager<Timer, TimerManager>
 	{
 		//Default constructor

@@ -29,7 +29,7 @@ namespace ion::unmanaged
 	} //object_factory::detail
 
 
-	//A factory class that can create and store multiple objects of a single type
+	//A class representing an owning factory that can create and store multiple objects of a single type
 	//The created objects can be of any type, and does not need to have any knowledge about the factory
 	//This class must be derived from to be able to create objects
 	template <typename ObjectT>
