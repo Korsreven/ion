@@ -23,6 +23,9 @@ namespace ion::events
 
 namespace ion::events::listeners
 {
+	//A base class representing something that can listen to a listenable
+	//Listeners can be subscribe to listenables, to receive events
+	//When not listening, no events will be received
 	template <typename T>
 	class Listener
 	{

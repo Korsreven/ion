@@ -22,6 +22,7 @@ namespace ion::gui::controls
 
 namespace ion::events::listeners
 {
+	//A class representing a listener that listens to events from a GUI control
 	struct GuiControlListener : Listener<GuiControlListener>
 	{
 		/*

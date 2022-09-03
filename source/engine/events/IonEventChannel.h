@@ -63,6 +63,8 @@ namespace ion::events
 	} //event_channel
 
 
+	//A class representing a channel that can listen and push events from a subscribed publisher (listenable) to a derived object
+	//Can be used instead of directly subscribing to a listenable, if a subscription contract is needed
 	template <typename ListenableT, typename PublisherT = ListenableT,
 		typename = std::enable_if_t<event_channel::detail::has_listener_type_v<ListenableT>>>
 	class EventChannel : public ListenableT::listener_type

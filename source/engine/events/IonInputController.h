@@ -28,6 +28,8 @@ namespace ion::events
 	} //input_controller::detail
 
 
+	//A class representing a controller that listens to window inputs and manages those events
+	//When an input event has been processed, it generates either a key or mouse event that can be listened to
 	class InputController final :
 		private listeners::WindowListener,
 		public system::events::listeners::InputListener

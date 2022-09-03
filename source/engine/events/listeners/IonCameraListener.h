@@ -25,6 +25,7 @@ namespace ion::graphics::scene
 
 namespace ion::events::listeners
 {
+	//A class representing a listener that listens to camera events
 	struct CameraListener : ManagedObjectListener<graphics::scene::Camera, graphics::scene::SceneManager, CameraListener>
 	{
 		/*

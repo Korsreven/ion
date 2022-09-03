@@ -28,6 +28,8 @@ namespace ion::events::listeners
 		X2
 	};
 
+
+	//A class representing a listener that listens to mouse events
 	struct MouseListener : Listener<MouseListener>
 	{
 		/*

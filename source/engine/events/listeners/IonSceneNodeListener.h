@@ -23,6 +23,7 @@ namespace ion::graphics::scene::graph
 
 namespace ion::events::listeners
 {
+	//A class representing a listener that listens to scene node events
 	struct SceneNodeListener : Listener<SceneNodeListener>
 	{
 		/*

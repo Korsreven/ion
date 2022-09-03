@@ -34,6 +34,8 @@ namespace ion::events::listeners
 		Resize
 	};
 
+
+	//A class representing a listener that listens to window events
 	struct WindowListener : Listener<WindowListener>
 	{
 		/*

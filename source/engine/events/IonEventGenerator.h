@@ -74,6 +74,7 @@ namespace ion::events
 	} //event_generator::detail
 
 
+	//A class representing a generator that can notify one or more listeners about events
 	template <typename T>
 	struct EventGenerator
 	{

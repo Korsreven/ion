@@ -18,6 +18,7 @@ File:	IonRenderTargetListener.h
 
 namespace ion::events::listeners
 {
+	//A class representing a listener that listens to render target events
 	struct RenderTargetListener : Listener<RenderTargetListener>
 	{
 		/*

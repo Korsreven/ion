@@ -18,6 +18,7 @@ File:	IonResourceListener.h
 
 namespace ion::events::listeners
 {
+	//A class representing a listener that listens to resource events
 	template <typename ResourceT, typename OwnerT, typename ListenerT = void>
 	struct ResourceListener :
 		ManagedObjectListener<ResourceT, OwnerT, std::conditional_t<std::is_same_v<ListenerT, void>, ResourceListener<ResourceT, OwnerT>, ListenerT>>

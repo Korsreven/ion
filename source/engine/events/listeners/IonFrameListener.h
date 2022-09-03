@@ -18,6 +18,7 @@ File:	IonFrameListener.h
 
 namespace ion::events::listeners
 {
+	//A class representing a listener that listens to frame events
 	struct FrameListener : Listener<FrameListener>
 	{
 		/*

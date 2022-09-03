@@ -26,6 +26,8 @@ namespace ion::events
 	} //recurring_callback::detail
 
 
+	//A class representing a recurring callback, meaning it's called repeatedly when running
+	//A callback is anything invocable, like a free function, member function, lambda or an object with a call operator
 	class RecurringCallback : public Callback<bool>
 		//Restrict recurring callbacks to no parameters and bool return type
 	{

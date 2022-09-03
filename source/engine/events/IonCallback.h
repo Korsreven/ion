@@ -32,6 +32,8 @@ namespace ion::events
 	} //callback::detail
 
 
+	//A class representing a callback that matches the given signature
+	//A callback is anything invocable, like a free function, member function, lambda or an object with a call operator
 	template <typename Ret = void, typename... Args>
 	class Callback
 	{

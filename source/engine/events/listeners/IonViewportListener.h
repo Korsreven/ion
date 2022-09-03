@@ -24,6 +24,7 @@ namespace ion::graphics::render
 
 namespace ion::events::listeners
 {
+	//A class representing a listener that listens to viewport events
 	struct ViewportListener : ManagedObjectListener<graphics::render::Viewport, graphics::render::RenderTarget, ViewportListener>
 	{
 		/*

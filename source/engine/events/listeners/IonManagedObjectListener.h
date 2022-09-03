@@ -18,6 +18,7 @@ File:	IonManagedObjectListener.h
 
 namespace ion::events::listeners
 {
+	//A class representing a listener that listens to managed object events
 	template <typename ObjectT, typename OwnerT, typename ListenerT = void>
 	struct ManagedObjectListener :
 		Listener<std::conditional_t<std::is_same_v<ListenerT, void>, ManagedObjectListener<ObjectT, OwnerT>, ListenerT>>

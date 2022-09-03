@@ -147,6 +147,8 @@ namespace ion::events::listeners
 		OEMClear
 	};
 
+
+	//A class representing a listener that listens to key events
 	struct KeyListener : Listener<KeyListener>
 	{
 		/*
