@@ -33,6 +33,8 @@ namespace ion::sounds
 	} //sound_channel_group
 
 
+	//A class representing a sound channel group that can be used to group sound channels together
+	//A sound channel group can adjust pitch and volume relative to the master channel
 	class SoundChannelGroup final : public managed::ManagedObject<SoundManager>
 	{
 		private:

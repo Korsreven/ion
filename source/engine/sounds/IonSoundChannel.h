@@ -42,6 +42,8 @@ namespace ion::sounds
 	} //sound_channel
 
 
+	//A class representing a sound channel that can be part of a group or not
+	//A sound channel is an instance of a sound, and is created when a sound is played
 	class SoundChannel final : public managed::ManagedObject<Sound>
 	{
 		private:

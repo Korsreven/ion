@@ -105,6 +105,7 @@ namespace ion::sounds
 	} //sound_manager
 
 
+	//A class that manages sounds, sound channels, sound listeners and audio repositories
 	class SoundManager final :
 		public resources::FileResourceManager<Sound, SoundManager, assets::repositories::AudioRepository>,
 		public managed::ObjectManager<SoundChannelGroup, SoundManager>,

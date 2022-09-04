@@ -37,6 +37,10 @@ namespace ion::sounds
 	} //sound_listener
 
 
+	//A class representing a sound listener (not to be confused with events::listeners)
+	//A sound listener represent the ears in a scene, with a position and velocity (doppler effect)
+	//Sounds that are three-dimensional will be heared from the sound listeners location
+	//A scene will typically only have one active sound listener at once
 	class SoundListener final : public managed::ManagedObject<SoundManager>
 	{
 		private:

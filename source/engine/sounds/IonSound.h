@@ -76,6 +76,8 @@ namespace ion::sounds
 	} //sound
 
 
+	//A class representing a sound resource (usually from a physical file)
+	//A sound can be a sample or stream, two or three-dimensional, as well as other properties
 	class Sound final :
 		public resources::FileResource<SoundManager>,
 		public managed::ObjectManager<SoundChannel, Sound>
