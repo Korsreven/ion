@@ -25,6 +25,9 @@ namespace ion::system::events::listeners
 	#endif
 
 
+	//A class representing a listener that listens to system specific messages
+	//Functions, classes and class members may need different implementation based on the underlying OS
+	//System specific code should have its own define directive
 	struct MessageListener : ion::events::listeners::Listener<MessageListener>
 	{
 		/*

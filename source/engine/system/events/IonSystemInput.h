@@ -31,6 +31,9 @@ File:	IonSystemInput.h
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
 
+//Namespace containing key and mouse input mappings that are system specific
+//Functions, classes and class members may need different implementation based on the underlying OS
+//System specific code should have its own define directive
 namespace ion::system::events
 {
 	using ion::events::listeners::KeyButton;

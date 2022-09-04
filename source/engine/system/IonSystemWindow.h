@@ -247,6 +247,9 @@ namespace ion::system
 	} //window
 
 
+	//A class representing a system specific window (window for messages, inputs and OpenGL rendering)
+	//Functions, classes and class members may need different implementation based on the underlying OS
+	//System specific code should have its own define directive
 	class Window :
 		public ion::events::Listenable<events::listeners::MessageListener>
 	{

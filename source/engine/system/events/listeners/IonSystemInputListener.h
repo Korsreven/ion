@@ -33,6 +33,10 @@ namespace ion::system::events::listeners
 	} //input_listener::detail
 
 
+	//A class representing an input listener that listens to system specific inputs
+	//When an input event has been processed, it generates either a key or mouse event that can be listened to
+	//Functions, classes and class members may need different implementation based on the underlying OS
+	//System specific code should have its own define directive
 	class InputListener :
 		private MessageListener,
 		protected ion::events::Listenable<ion::events::listeners::KeyListener>,
