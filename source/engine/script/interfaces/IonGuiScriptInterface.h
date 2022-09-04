@@ -219,6 +219,8 @@ namespace ion::script::interfaces
 	} //gui_script_interface::detail
 
 
+	//A class representing an interface to a GUI script with a complete validation scheme
+	//A GUI script can load GUI components from a script file into a GUI controller
 	class GuiScriptInterface final : public ScriptInterface
 	{
 		private:

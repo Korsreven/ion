@@ -54,6 +54,8 @@ namespace ion::script::interfaces
 	} //material_script_interface::detail
 
 
+	//A class representing an interface to a material script with a complete validation scheme
+	//A material script can load materials from a script file into a material manager
 	class MaterialScriptInterface final : public ScriptInterface
 	{
 		private:

@@ -75,6 +75,8 @@ namespace ion::script::interfaces
 	} //gui_theme_script_interface::detail
 
 
+	//A class representing an interface to a GUI theme script with a complete validation scheme
+	//A GUI theme script can load GUI themes from a script file into a GUI controller
 	class GuiThemeScriptInterface final : public ScriptInterface
 	{
 		private:

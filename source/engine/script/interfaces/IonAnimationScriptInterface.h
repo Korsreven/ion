@@ -52,6 +52,8 @@ namespace ion::script::interfaces
 	} //animation_script_interface::detail
 
 
+	//A class representing an interface to an animation script with a complete validation scheme
+	//An animation script can load animations from a script file into an animation manager
 	class AnimationScriptInterface final : public ScriptInterface
 	{
 		private:

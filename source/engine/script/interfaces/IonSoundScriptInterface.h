@@ -64,6 +64,8 @@ namespace ion::script::interfaces
 	} //sound_script_interface::detail
 
 
+	//A class representing an interface to a sound script with a complete validation scheme
+	//A sound script can load sounds from a script file into a sound manager
 	class SoundScriptInterface final : public ScriptInterface
 	{
 		private:

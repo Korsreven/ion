@@ -24,6 +24,7 @@ File:	IonParseUtility.h
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 
+//Namespace containing functions for parsing script data types
 namespace ion::script::utilities::parse
 {
 	namespace detail

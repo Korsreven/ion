@@ -567,6 +567,8 @@ namespace ion::script
 		} //detail
 	} //script_compiler
 
+
+	//A class that lexes, parses, links and compiles ION script code (.ion files) to a tree structure
 	class ScriptCompiler final
 	{
 		private:

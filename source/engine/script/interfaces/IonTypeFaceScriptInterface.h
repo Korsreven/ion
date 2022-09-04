@@ -50,6 +50,8 @@ namespace ion::script::interfaces
 	} //type_face_script_interface::detail
 
 
+	//A class representing an interface to a type face script with a complete validation scheme
+	//A type face script can load type faces from a script file into a type face manager
 	class TypeFaceScriptInterface final : public ScriptInterface
 	{
 		private:

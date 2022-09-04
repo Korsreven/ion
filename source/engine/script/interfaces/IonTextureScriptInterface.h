@@ -52,6 +52,8 @@ namespace ion::script::interfaces
 	} //texture_script_interface::detail
 
 
+	//A class representing an interface to a texture script with a complete validation scheme
+	//A texture script can load textures from a script file into a texture manager
 	class TextureScriptInterface final : public ScriptInterface
 	{
 		private:

@@ -280,6 +280,8 @@ namespace ion::script::interfaces
 	} //scene_script_interface::detail
 
 
+	//A class representing an interface to a scene script with a complete validation scheme
+	//A scene script can load scene nodes (with attached objects) from a script file into a scene graph (and associated scene manager)
 	class SceneScriptInterface final : public ScriptInterface
 	{
 		private:

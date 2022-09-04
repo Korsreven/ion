@@ -159,6 +159,8 @@ namespace ion::script::interfaces
 	} //shader_layout_script_interface::detail
 
 
+	//A class representing an interface to a shader layout script with a complete validation scheme
+	//A shader layout script can load shader layouts from a script file into a shader program manager
 	class ShaderLayoutScriptInterface final : public ScriptInterface
 	{
 		private:

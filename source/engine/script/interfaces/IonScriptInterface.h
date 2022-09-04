@@ -63,6 +63,8 @@ namespace ion::script::interfaces
 	} //script_interface::detail
 
 
+	//A base class representing a complete script interface for loading, building and validating a particular script setup
+	//All script interfaces shares a register of managers needed to fully load scriptet objects into managers or other game objects
 	class ScriptInterface :
 		protected unmanaged::ObjectFactory<assets::repositories::ScriptRepository>,
 		protected unmanaged::ObjectFactory<assets::repositories::FileRepository>

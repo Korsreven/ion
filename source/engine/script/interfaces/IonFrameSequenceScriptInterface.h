@@ -49,6 +49,8 @@ namespace ion::script::interfaces
 	} //frame_sequence_script_interface::detail
 
 
+	//A class representing an interface to a frame sequence script with a complete validation scheme
+	//A frame sequence script can load frame sequences from a script file into a frame sequence manager
 	class FrameSequenceScriptInterface final : public ScriptInterface
 	{
 		private:

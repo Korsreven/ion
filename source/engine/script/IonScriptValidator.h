@@ -276,6 +276,8 @@ namespace ion::script
 		} //detail
 
 
+		//A class representing a parameter definition in the validation scheme
+		//The parameter (data) type, defines the rules for validating a particular parameter
 		class ParameterDefinition final
 		{
 			private:
@@ -327,6 +329,8 @@ namespace ion::script
 				}
 		};
 
+		//A class representing a property definition in the validation scheme
+		//The name, parameters and required parameter combined, defines the rules for validating a particular property
 		class PropertyDefinition final
 		{
 			private:
@@ -376,6 +380,8 @@ namespace ion::script
 				}
 		};
 
+		//A class representing a class definition in the validation scheme
+		//The name, properties, base and inner classes combined, defines the rules for validating a particular class
 		class ClassDefinition final
 		{
 			private:
@@ -540,13 +546,15 @@ namespace ion::script
 		};
 
 
-		
-
+		//A class representing a property declaration of a particular property definition
+		//Definition and ordinality combined, defines the rules for validating a particular declaration
 		struct PropertyDeclaration final : detail::declaration<PropertyDefinition>
 		{
 			using detail::declaration<PropertyDefinition>::declaration;
 		};
 
+		//A class representing a class declaration of a particular class definition
+		//Definition, ordinality and class type combined, defines the rules for validating a particular declaration
 		class ClassDeclaration final : public detail::declaration<ClassDefinition>
 		{
 			private:
@@ -575,8 +583,9 @@ namespace ion::script
 	} //script_validator
 
 
-	class ScriptTree;
-
+	//A class that validates a compiled tree structure against a defined validation scheme
+	//The validation scheme is defined by adding classes (with inheritance) and properties (with arguments)
+	//The classes and properties combined, defines the rules for validating a particular script
 	class ScriptValidator final
 	{
 		private:

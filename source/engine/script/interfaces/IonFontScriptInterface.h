@@ -47,6 +47,8 @@ namespace ion::script::interfaces
 	} //font_script_interface::detail
 
 
+	//A class representing an interface to a font script with a complete validation scheme
+	//A font script can load fonts from a script file into a font manager
 	class FontScriptInterface final : public ScriptInterface
 	{
 		private:

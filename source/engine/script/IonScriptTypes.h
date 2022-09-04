@@ -57,50 +57,59 @@ namespace ion::script
 	} //script_types::detail
 
 
+	//A class representing different script types
 	struct ScriptType
 	{
+		//A script type representing a boolean with an underlying type bool
 		struct Boolean final :
 			script_types::detail::arithmetic_type<bool, Boolean>
 		{
 			using arithmetic_type::arithmetic_type;
 		};
 
+		//A script type representing a color with an underlying type Color
 		struct Color final :
 			script_types::detail::script_type<graphics::utilities::Color, Color>
 		{
 			using script_type::script_type;
 		};
 
+		//A script type representing an enumerable with an underlying type std::string
 		struct Enumerable final :
 			script_types::detail::script_type<std::string, Enumerable>
 		{
 			using script_type::script_type;
 		};
 
+		//A script type representing a floating-point with an underlying type float80
 		struct FloatingPoint final :
 			script_types::detail::arithmetic_type<float80, FloatingPoint>
 		{
 			using arithmetic_type::arithmetic_type;
 		};
 
+		//A script type representing an integer with an underlying type int64
 		struct Integer final :
 			script_types::detail::arithmetic_type<int64, Integer>
 		{
 			using arithmetic_type::arithmetic_type;
 		};
 
+		//A script type representing a string with an underlying type std::string
 		struct String final :
 			script_types::detail::script_type<std::string, String>
 		{
 			using script_type::script_type;
 		};
 
+		//A script type representing a vector2 with an underlying type Vector2
 		struct Vector2 final :
 			script_types::detail::script_type<graphics::utilities::Vector2, Vector2>
 		{
 			using script_type::script_type;
 		};
 
+		//A script type representing a vector3 with an underlying type Vector3
 		struct Vector3 final :
 			script_types::detail::script_type<graphics::utilities::Vector3, Vector3>
 		{

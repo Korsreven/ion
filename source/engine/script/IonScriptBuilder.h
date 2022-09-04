@@ -43,6 +43,7 @@ namespace ion::script
 	} //script_builder
 
 
+	//A class that builds (lexes, parses, links and compiles) and validates the compiled tree structure
 	class ScriptBuilder final
 	{
 		private:

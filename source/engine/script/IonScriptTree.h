@@ -298,8 +298,9 @@ namespace ion::script
 
 		/*
 			Node types
-		*/
+		*/	
 
+		//A base class representing a tree node
 		struct TreeNode final
 		{
 			const ObjectNode &Object;
@@ -313,6 +314,8 @@ namespace ion::script
 			TreeNode(const ObjectNode &object, const ObjectNode &parent, int depth) noexcept;
 		};
 
+		//A class representing an object node in the tree
+		//An object node is child of another object node and the parent of property nodes and other object nodes
 		class ObjectNode final
 		{
 			private:
@@ -476,6 +479,8 @@ namespace ion::script
 				}
 		};
 
+		//A class representing a property node in the tree
+		//A property node is child of an object node and the parent of argument nodes
 		class PropertyNode final
 		{
 			private:
@@ -561,6 +566,8 @@ namespace ion::script
 				}
 		};
 
+		//A class representing an argument node in the tree
+		//An argument node is child of a property node and contains a value with an associated unit
 		class ArgumentNode final
 		{
 			private:
@@ -632,6 +639,10 @@ namespace ion::script
 	} //script_tree
 
 
+	//A class representing a tree structure with object, property and argument nodes
+	//The tree and nodes are created during compilation of one or more translation units
+	//A script tree needs to be validated against a validation scheme for it to be considered correct
+	//A script tree can be validated then serialized, to later be deserialized without the need to be validated again
 	class ScriptTree final
 	{
 		private:

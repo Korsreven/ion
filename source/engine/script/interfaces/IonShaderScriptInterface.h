@@ -47,6 +47,8 @@ namespace ion::script::interfaces
 	} //shader_script_interface::detail
 
 
+	//A class representing an interface to a shader script with a complete validation scheme
+	//A shader script can load shaders from a script file into a shader manager
 	class ShaderScriptInterface final : public ScriptInterface
 	{
 		private:

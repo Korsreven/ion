@@ -52,6 +52,8 @@ namespace ion::script::interfaces
 	} //text_script_interface::detail
 
 
+	//A class representing an interface to a text script with a complete validation scheme
+	//A text script can load texts from a script file into a text manager
 	class TextScriptInterface final : public ScriptInterface
 	{
 		private:

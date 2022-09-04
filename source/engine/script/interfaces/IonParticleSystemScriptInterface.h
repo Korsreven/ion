@@ -103,6 +103,8 @@ namespace ion::script::interfaces
 	} //particle_system_script_interface::detail
 
 
+	//A class representing an interface to a particle system script with a complete validation scheme
+	//A particle system script can load particle systems from a script file into a particle system manager
 	class ParticleSystemScriptInterface final : public ScriptInterface
 	{
 		private:
