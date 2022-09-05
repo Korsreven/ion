@@ -64,6 +64,8 @@ namespace ion::gui
 	} //gui_panel_container
 
 
+	//A base class representing a container that can hold multiple controls and panels
+	//All components are also stored in a tab ordered sequence
 	class GuiPanelContainer : public GuiContainer
 	{
 		private:

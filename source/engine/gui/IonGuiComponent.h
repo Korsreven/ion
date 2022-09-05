@@ -42,6 +42,9 @@ namespace ion::gui
 	} //gui_component::detail
 
 
+	//A class representing a general GUI component, the base class of all GUI objects
+	//The owner and parent of a component is usually the same, but they can differ
+	//A component is always relative to its parent component and can be enabled/disabled and shown/hidden
 	class GuiComponent : public managed::ManagedObject<GuiContainer>
 	{
 		friend GuiContainer;

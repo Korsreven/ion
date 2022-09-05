@@ -46,6 +46,8 @@ namespace ion::gui::skins
 	} //gui_theme::detail
 
 
+	//A class representing a theme for a collection of GUI control skins
+	//A theme can have default and alternative skins for each GUI control
 	class GuiTheme final :
 		public managed::ManagedObject<GuiController>,
 		public managed::ObjectManager<GuiSkin, GuiTheme>

@@ -106,6 +106,9 @@ namespace ion::gui
 	} //gui_controller::detail
 
 
+	//A class representing a GUI controller that can create and store multiple GUI frames and GUI themes
+	//A controller can also create and store different kinds of mouse cursors and tooltips
+	//A controller can be seen as a GUI manager, and is the link between the scene graph and the rest of the GUI system
 	class GuiController final :
 		public GuiContainer,
 		public events::Listenable<events::listeners::GuiFrameListener>,
@@ -201,7 +204,7 @@ namespace ion::gui
 		public:
 
 			//Construct a gui controller with the given parent node, default viewport and default sound channel group
-			GuiController(SceneNode &parent_node, NonOwningPtr<graphics::render::Viewport> default_camera = nullptr,
+			GuiController(SceneNode &parent_node, NonOwningPtr<graphics::render::Viewport> default_viewport = nullptr,
 				NonOwningPtr<sounds::SoundChannelGroup> default_sound_channel_group = nullptr);
 
 

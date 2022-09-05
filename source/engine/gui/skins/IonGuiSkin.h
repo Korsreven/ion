@@ -200,6 +200,8 @@ namespace ion::gui::skins
 	} //gui_skin
 
 
+	//A class representing a skin for a particular GUI control
+	//A skin consists of (sprite) parts, text parts and sound parts
 	class GuiSkin final : public managed::ManagedObject<GuiTheme>
 	{
 		private:

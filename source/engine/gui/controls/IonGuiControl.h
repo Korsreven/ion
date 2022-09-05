@@ -387,6 +387,8 @@ namespace ion::gui::controls
 	} //gui_control
 
 
+	//A class representing a general GUI control, the base class of all GUI controls
+	//A control can be focused/defocused, clicked/pressed/released, entered/exited and resized
 	class GuiControl :
 		public GuiComponent,
 		protected events::EventGenerator<events::listeners::GuiControlListener>

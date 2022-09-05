@@ -28,6 +28,8 @@ namespace ion::gui
 	} //gui_container::detail
 
 
+	//A class representing an owning GUI container that can create and store multiple GUI components
+	//A container is itself a component, and is therefore both the owner and the parent of a newly create component
 	class GuiContainer :
 		public GuiComponent,
 		public managed::ObjectManager<GuiComponent, GuiContainer>

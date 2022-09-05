@@ -311,6 +311,8 @@ namespace ion::gui
 	} //gui_panel
 
 
+	//A class representing a GUI panel that can create and store multiple GUI controls and GUI panels
+	//A panel can contain multiple rows/columns in a grid layout to easier position different controls
 	class GuiPanel : public GuiPanelContainer
 	{
 		private:

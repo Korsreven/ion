@@ -76,6 +76,9 @@ namespace ion::gui
 	} //gui_frame
 
 
+	//A class representing a GUI frame that can create and store multiple GUI controls and GUI panels
+	//A frame without an active theme will automatically use the active theme from its parent controller
+	//A frame can be modeless/modal, activated/deactivated and focused/defocused
 	class GuiFrame :
 		public GuiPanelContainer,
 		public events::Listenable<events::listeners::GuiControlListener>,
