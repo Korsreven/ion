@@ -53,6 +53,9 @@ namespace ion::gui::controls
 	} //gui_group_box
 
 
+	//A class representing a GUI group box that can contain other GUI controls
+	//When a control has been added (adopted) it will be positioned relative to the group box
+	//When a control has been removed (orphaned) it will automatically be adopted by its owner
 	class GuiGroupBox : public GuiControl
 	{
 		private:

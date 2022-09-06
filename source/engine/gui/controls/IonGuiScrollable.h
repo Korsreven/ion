@@ -40,6 +40,7 @@ namespace ion::gui::controls
 	} //gui_scrollable
 
 
+	//A class representing a GUI scrollable that can be attached to a GUI scroll bar and vice versa
 	class GuiScrollable : public GuiControl
 	{
 		protected:

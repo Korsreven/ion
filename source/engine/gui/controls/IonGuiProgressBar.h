@@ -85,6 +85,8 @@ namespace ion::gui::controls
 	} //gui_progress_bar
 
 
+	//A class representing a GUI progress bar that can be horizontal or vertical, flipped or not
+	//A progress bar can contain two bars, the normal bar, and a bar which can be interpolated forward, backward or bidirectional
 	class GuiProgressBar : public GuiControl
 	{
 		private:

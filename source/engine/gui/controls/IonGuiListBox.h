@@ -140,6 +140,8 @@ namespace ion::gui::controls
 	} //gui_list_box
 
 
+	//A class representing a GUI list box with items that can be left, center or right aligned
+	//List box items can have associated icons shown, that are either left or right aligned
 	class GuiListBox : public GuiScrollable
 	{
 		private:

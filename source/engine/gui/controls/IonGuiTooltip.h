@@ -64,6 +64,8 @@ namespace ion::gui::controls
 	} //gui_tooltip
 
 
+	//A class representing a GUI tooltip that will automatically show the tooltip caption of an hovered GUI control
+	//A tooltip can be of a fixed sized, or auto sized based on the length of the current tooltip caption shown
 	class GuiTooltip : public GuiLabel
 	{
 		private:

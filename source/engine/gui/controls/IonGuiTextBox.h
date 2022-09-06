@@ -160,6 +160,8 @@ namespace ion::gui::controls
 	} //gui_text_box
 
 
+	//A class representing a GUI text box that can be left, center or right aligned
+	//Text box content can be character filtered/limited and masked for use with passwords
 	class GuiTextBox : public GuiScrollable
 	{
 		private:

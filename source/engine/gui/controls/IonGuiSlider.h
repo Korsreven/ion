@@ -101,6 +101,8 @@ namespace ion::gui::controls
 	} //gui_slider
 
 
+	//A class representing a GUI slider that can be horizontal or vertical, flipped or not
+	//The slider handle can be dragged with the mouse cursor to change position
 	class GuiSlider : public GuiControl
 	{
 		private:

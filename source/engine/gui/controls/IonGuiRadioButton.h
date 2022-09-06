@@ -38,6 +38,9 @@ namespace ion::gui::controls
 	} //gui_radio_button
 
 
+	//A class representing a GUI radio button
+	//A radio button can only be selected (checked) never directly unselected (unchecked)
+	//When selected, all other radio buttons in the same group (same tag value) gets unselected
 	class GuiRadioButton : public GuiCheckBox
 	{
 		protected:

@@ -49,6 +49,8 @@ namespace ion::gui::controls
 	} //gui_check_box
 
 
+	//A class representing a GUI check box
+	//A check box can be checked/unchecked
 	class GuiCheckBox : public GuiControl
 	{
 		private:

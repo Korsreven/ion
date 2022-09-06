@@ -59,6 +59,7 @@ namespace ion::gui
 
 		class PanelGrid; //Forward declaration
 
+		//A class representing a grid cell that can attach and align GUI controls
 		class GridCell final
 		{
 			private:
@@ -189,6 +190,8 @@ namespace ion::gui
 				void DetachAllControls() noexcept;
 		};
 
+		//A class representing a panel grid with size, rows and columns
+		//A panel grid can contain multiple (rows * columns) grid cells
 		class PanelGrid final
 		{
 			private:
@@ -312,7 +315,7 @@ namespace ion::gui
 
 
 	//A class representing a GUI panel that can create and store multiple GUI controls and GUI panels
-	//A panel can contain multiple rows/columns in a grid layout to easier position different controls
+	//A panel can contain multiple rows/columns in a grid layout to easier position and align attached controls
 	class GuiPanel : public GuiPanelContainer
 	{
 		private:

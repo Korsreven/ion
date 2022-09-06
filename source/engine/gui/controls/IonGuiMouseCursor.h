@@ -47,6 +47,7 @@ namespace ion::gui::controls
 	} //gui_mouse_cursor
 
 
+	//A class representing a GUI mouse cursor that can be skinned and change hot spot
 	class GuiMouseCursor : public GuiControl
 	{
 		private:

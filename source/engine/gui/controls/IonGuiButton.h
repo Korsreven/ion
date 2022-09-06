@@ -74,6 +74,8 @@ namespace ion::gui::controls
 	} //gui_button
 
 
+	//A class representing a GUI button
+	//A button can have predefined actions executed when clicked as well as custom callbacks
 	class GuiButton : public GuiControl
 	{
 		private:

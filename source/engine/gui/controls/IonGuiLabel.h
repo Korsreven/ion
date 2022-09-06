@@ -35,6 +35,7 @@ namespace ion::gui::controls
 	} //gui_label
 
 
+	//A class representing a GUI label with a caption
 	class GuiLabel : public GuiControl
 	{
 		private:
