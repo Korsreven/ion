@@ -111,6 +111,7 @@ namespace ion::graphics::materials
 	} //material::detail
 
 
+	//A class representing a material with ambient, diffuse, specular, emissive and shininess properties
 	class Material final : public managed::ManagedObject<MaterialManager>
 	{
 		private:

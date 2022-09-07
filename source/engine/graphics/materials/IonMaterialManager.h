@@ -33,6 +33,7 @@ namespace ion::graphics::materials
 	} //material_manager::detail
 
 
+	//A class that manages and stores materials
 	struct MaterialManager final :
 		managed::ObjectManager<Material, MaterialManager>
 	{
