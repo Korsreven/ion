@@ -28,6 +28,7 @@ File:	IonFontUtility.h
 
 #undef max
 
+//Namespace containing functions for measuring, truncating, word wrapping and parsing HTML formatted texts
 namespace ion::graphics::fonts::utilities
 {
 	using graphics::utilities::Color;
