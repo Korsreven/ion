@@ -130,6 +130,21 @@ float exp2_fog()
 }
 
 
+bool include_light(int i, uvec4 light_mask)
+{
+	int mask_off = i / 32;
+	uint light_bit = uint(i) % 32u + 1u;
+
+	switch (mask_off)
+	{
+		case 0: return (light_mask.x & light_bit) != 0u;
+		case 1: return (light_mask.y & light_bit) != 0u;
+		case 2: return (light_mask.z & light_bit) != 0u;
+		case 3: return (light_mask.w & light_bit) != 0u;
+		default: return false;
+	}
+}
+
 Light fetch_light(int i)
 {
 	vec4 texel1 = texelFetch(scene.lights, ivec2(0, i), 0);
@@ -373,7 +388,7 @@ void main()
 		for (int i = 0; i < scene.light_count; ++i)
 		{
 			//Light illuminates fragments
-			if ((primitive.light_mask[uint(i) / 32u] & (uint(i) % 32u + 1u)) != 0u)
+			if (include_light(i, primitive.light_mask))
 			{
 				Light light = fetch_light(i);
 
@@ -395,7 +410,7 @@ void main()
 		for (int i = 0; i < scene.emissive_light_count; ++i)
 		{
 			//Emissive light illuminates fragments
-			if ((primitive.emissive_light_mask[uint(i) / 32u] & (uint(i) % 32u + 1u)) != 0u)
+			if (include_light(i, primitive.emissive_light_mask))
 			{
 				EmissiveLight emissive_light = fetch_emissive_light(i);
 				light_color += calc_emissive_light(emissive_light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
