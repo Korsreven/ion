@@ -23,7 +23,7 @@ File:	IonGraphicsAPI.h
 	#endif
 #endif
 
-
+//Namespace containing functions for querying the available GL version and checking which extensions are supported by the driver/hardware
 namespace ion::graphics::gl
 {
 	enum class Extension
