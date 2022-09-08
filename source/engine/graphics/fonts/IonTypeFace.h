@@ -30,7 +30,7 @@ namespace ion::graphics::fonts
 	} //type_face::detail
 
 
-	//A type face class that can contain a regular, bold, italic and bold italic font
+	//A class representing a type face that can contain a regular, bold, italic and bold italic font
 	class TypeFace final :
 		public managed::ManagedObject<TypeFaceManager>
 	{

@@ -56,6 +56,7 @@ namespace ion::graphics::fonts
 	} //font_manager
 
 
+	//A class that manages and stores fonts
 	class FontManager final :
 		public resources::FileResourceManager<Font, FontManager, assets::repositories::FontRepository>
 	{

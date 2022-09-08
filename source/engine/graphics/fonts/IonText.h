@@ -190,7 +190,7 @@ namespace ion::graphics::fonts
 	} //text
 
 
-	//A text class that contains a typeface and some content
+	//A class representing a text that contains a typeface and some content that can be HTML formatted
 	class Text final : public managed::ManagedObject<TextManager>
 	{
 		private:

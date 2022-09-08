@@ -73,6 +73,9 @@ namespace ion::graphics::fonts
 		using GlyphMetrices = std::vector<GlyphMetric>;
 	} //font
 
+
+	//A class representing a font (with a fixed size) that contains multiple glyphs
+	//Only ASCII and ExtendedASCII character sets are supported for now
 	class Font final : public resources::FileResource<FontManager>
 	{
 		private:

@@ -27,6 +27,7 @@ namespace ion::graphics::fonts
 	} //type_face_manager::detail
 
 
+	//A class that manages and stores type faces
 	struct TypeFaceManager final :
 		managed::ObjectManager<TypeFace, TypeFaceManager>
 	{

@@ -30,6 +30,7 @@ namespace ion::graphics::fonts
 	} //text_manager::detail
 
 
+	//A class that manages and stores texts
 	struct TextManager final :
 		managed::ObjectManager<Text, TextManager>
 	{
