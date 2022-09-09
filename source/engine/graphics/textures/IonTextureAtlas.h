@@ -30,6 +30,9 @@ namespace ion::graphics::textures
 		} //detail
 	} //texture_atlas
 
+
+	//A class representing a texture atlas with rows and columns
+	//A texture atlas is itself a texture that contains multiple (sub) textures
 	class TextureAtlas final : public Texture
 	{
 		private:

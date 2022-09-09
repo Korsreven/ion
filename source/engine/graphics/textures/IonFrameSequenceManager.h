@@ -28,6 +28,7 @@ namespace ion::graphics::textures
 	} //frame_sequence_manager::detail
 
 
+	//A class that manages and stores frame sequences
 	struct FrameSequenceManager final :
 		managed::ObjectManager<FrameSequence, FrameSequenceManager>
 	{

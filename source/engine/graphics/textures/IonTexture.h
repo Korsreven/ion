@@ -84,6 +84,9 @@ namespace ion::graphics::textures
 		} //detail
 	} //texture
 
+
+	//A class representing a texture with min, mag and mip filters that can be clamped or repeated
+	//A texture can be a single file, or part of an texture atlas
 	class Texture : public resources::FileResource<TextureManager>
 	{
 		private:

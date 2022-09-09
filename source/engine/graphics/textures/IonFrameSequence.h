@@ -32,7 +32,7 @@ namespace ion::graphics::textures
 	} //frame_sequence::detail
 
 
-	//A frame sequence class that contains one or more frames (textures)
+	//A class representing a frame sequence that contains one or more frames (textures)
 	class FrameSequence final : public managed::ManagedObject<FrameSequenceManager>
 	{
 		private:

@@ -227,6 +227,7 @@ namespace ion::graphics::textures
 	} //texture_manager
 
 
+	//A class that manages and stores textures and texture atlases
 	class TextureManager final :
 		public resources::FileResourceManager<Texture, TextureManager, assets::repositories::ImageRepository>
 	{

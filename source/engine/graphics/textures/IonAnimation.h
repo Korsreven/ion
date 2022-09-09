@@ -73,7 +73,7 @@ namespace ion::graphics::textures
 	} //animation
 
 
-	//An animation class that contains one or more frames (textures)
+	//A class representing an animation that contains a sequence of frames
 	class Animation final : public managed::ManagedObject<AnimationManager>
 	{
 		private:

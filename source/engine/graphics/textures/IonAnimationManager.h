@@ -27,6 +27,7 @@ namespace ion::graphics::textures
 	} //animation_manager::detail
 
 
+	//A class that manages and stores animations
 	struct AnimationManager final :
 		managed::ObjectManager<Animation, AnimationManager>
 	{
