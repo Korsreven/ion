@@ -28,6 +28,7 @@ File:	IonShaderTypes.h
 #include "graphics/utilities/IonVector3.h"
 #include "types/IonTypes.h"
 
+//Namespace containing all supported GLSL types, from basic types, to vector, matrix and sampler types
 namespace ion::graphics::shaders::variables::glsl
 {
 	using utilities::Color;

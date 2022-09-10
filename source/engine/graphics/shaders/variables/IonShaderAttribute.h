@@ -108,6 +108,7 @@ namespace ion::graphics::shaders::variables
 	} //attribute_variable
 
 
+	//A class representing an attribute variable
 	class AttributeVariable : public ShaderVariable
 	{
 		protected:

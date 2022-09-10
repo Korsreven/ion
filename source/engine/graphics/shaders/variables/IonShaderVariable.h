@@ -31,6 +31,7 @@ namespace ion::graphics::shaders::variables
 	} //shader_variable::detail
 	
 
+	//A base class representing a shader variable with a specific location
 	class ShaderVariable : public managed::ManagedObject<ShaderProgram>
 	{
 		private:

@@ -56,6 +56,7 @@ namespace ion::graphics::shaders
 	} //shader
 
 
+	//A class representing a vertex or fragment shader
 	class Shader final : public resources::FileResource<ShaderManager>
 	{
 		private:

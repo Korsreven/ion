@@ -137,6 +137,7 @@ namespace ion::graphics::shaders::variables
 	} //uniform_variable
 
 
+	//A class representing a uniform variable
 	class UniformVariable : public ShaderVariable
 	{
 		private:

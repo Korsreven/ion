@@ -44,6 +44,7 @@ namespace ion::graphics::shaders
 	} //shader_manager
 
 
+	//A class that manages and stores shaders
 	class ShaderManager final :
 		public resources::FileResourceManager<Shader, ShaderManager, assets::repositories::ShaderRepository>
 	{

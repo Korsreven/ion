@@ -46,6 +46,8 @@ namespace ion::graphics::shaders
 	} //shader_program::detail
 
 
+	//A class representing a shader program that contains a vertex and fragment shader
+	//A shader program also contains attribute and uniform variables, as well as a shader layout
 	class ShaderProgram final :
 		public resources::Resource<ShaderProgramManager>,
 		public managed::ObjectManager<ShaderStruct, ShaderProgram>,

@@ -334,6 +334,9 @@ namespace ion::graphics::shaders
 	} //shader_layout
 
 
+	//A class representing an attribute and uniform binding layout for a shader program to follow
+	//By using the same pre-defined attribute/uniform names, the engine will automatically send those values to the associated variabels
+	//If no shader layout is specified for a shader program, a default layout will be used
 	class ShaderLayout final : public managed::ManagedObject<ShaderProgramManager>
 	{
 		private:

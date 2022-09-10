@@ -260,6 +260,7 @@ namespace ion::graphics::shaders
 	} //shader_manager
 
 
+	//A class that manages and stores shader programs and shader layouts
 	class ShaderProgramManager final :
 		public resources::ResourceManager<ShaderProgram, ShaderProgramManager>,
 		public managed::ObjectManager<ShaderLayout, ShaderProgramManager>

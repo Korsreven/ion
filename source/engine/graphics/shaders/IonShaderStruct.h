@@ -35,6 +35,7 @@ namespace ion::graphics::shaders
 	} //shader_struct::detail
 
 
+	//A class representing a shader struct that can contain multiple uniform variables (members)
 	class ShaderStruct final :
 		public managed::ManagedObject<ShaderProgram>,
 		public managed::ObjectManager<variables::UniformVariable, ShaderProgram>
