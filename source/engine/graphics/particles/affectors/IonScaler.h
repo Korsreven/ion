@@ -90,6 +90,7 @@ namespace ion::graphics::particles::affectors
 	} //scaler
 
 
+	//A class representing an affector that can scale single particles
 	class Scaler final : public Affector
 	{
 		private:

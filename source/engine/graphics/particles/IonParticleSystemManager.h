@@ -27,6 +27,7 @@ namespace ion::graphics::particles
 	} //particle_system_manager::detail
 
 
+	//A class that manages and stores particle systems
 	struct ParticleSystemManager final :
 		managed::ObjectManager<ParticleSystem, ParticleSystemManager>
 	{

@@ -159,7 +159,7 @@ namespace ion::graphics::particles
 	} //emitter
 
 
-	//An emitter class that can emit multiple particles
+	//A class representing an emitter that can emit multiple particles and contain multiple affectors
 	class Emitter final :
 		public managed::ManagedObject<EmitterManager>,
 		public affectors::AffectorManager

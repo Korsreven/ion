@@ -36,7 +36,7 @@ namespace ion::graphics::particles::affectors
 	} //affector::detail
 
 
-	//Affector class that can affect single particles
+	//A class representing a generic affector that can affect single particles
 	//This base class must support inheritance (open set of affectors)
 	class Affector : public managed::ManagedObject<AffectorManager>
 	{

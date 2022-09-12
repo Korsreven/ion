@@ -90,6 +90,7 @@ namespace ion::graphics::particles::affectors
 	} //color_fader
 
 
+	//A class representing an affector that can color fade single particles
 	class ColorFader final : public Affector
 	{
 		private:

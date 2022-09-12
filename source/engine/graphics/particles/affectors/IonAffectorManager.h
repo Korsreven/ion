@@ -24,6 +24,7 @@ namespace ion::graphics::particles::affectors
 	} //affector_manager::detail
 
 
+	//A class that manages and stores affectors
 	class AffectorManager : public managed::ObjectManager<Affector, AffectorManager>
 	{
 		protected:

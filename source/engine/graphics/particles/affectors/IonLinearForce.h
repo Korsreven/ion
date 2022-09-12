@@ -41,6 +41,7 @@ namespace ion::graphics::particles::affectors
 	} //linear_force
 
 
+	//A class representing an affector that can add a linear force to single particles
 	class LinearForce final : public Affector
 	{
 		private:

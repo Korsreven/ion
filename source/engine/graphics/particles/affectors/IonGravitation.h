@@ -34,6 +34,7 @@ namespace ion::graphics::particles::affectors
 	} //gravitation::detail
 
 
+	//A class representing an affector that can act as graviation on single particles
 	class Gravitation final : public Affector
 	{
 		private:

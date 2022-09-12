@@ -47,6 +47,7 @@ namespace ion::graphics::particles::affectors
 	} //sine_force
 
 
+	//A class representing an affector that can add a sine force to single particles
 	class SineForce final : public Affector
 	{
 		private:

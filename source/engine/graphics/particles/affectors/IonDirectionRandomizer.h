@@ -31,6 +31,7 @@ namespace ion::graphics::particles::affectors
 	} //direction_randomizer::detail
 
 
+	//A class representing an affector that can add random direction to single particles
 	class DirectionRandomizer final : public Affector
 	{
 		private:

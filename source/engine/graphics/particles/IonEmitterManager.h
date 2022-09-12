@@ -24,6 +24,7 @@ namespace ion::graphics::particles
 	} //emitter_manager::detail
 
 
+	//A class that manages and stores emitters
 	class EmitterManager : public managed::ObjectManager<Emitter, EmitterManager>
 	{
 		protected:

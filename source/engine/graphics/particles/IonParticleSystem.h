@@ -35,7 +35,7 @@ namespace ion::graphics::particles
 	} //particle_system
 
 
-	//A particle system class that can contain one ore more emitters and affectors
+	//A class representing a particle system that can contain multiple emitters and affectors
 	class ParticleSystem final :
 		public managed::ManagedObject<ParticleSystemManager>,
 		public EmitterManager,

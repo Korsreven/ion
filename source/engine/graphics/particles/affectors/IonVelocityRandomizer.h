@@ -31,6 +31,7 @@ namespace ion::graphics::particles::affectors
 	} //velocity_randomizer::detail
 
 
+	//A class representing an affector that can add random velocity to single particles
 	class VelocityRandomizer final : public Affector
 	{
 		private:
