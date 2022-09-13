@@ -35,6 +35,8 @@ namespace ion::graphics::scene::shapes
 	} //shape::detail
 
 
+	//A class representing any kind of predefined shape
+	//This base class must support inheritance (open set of shapes)
 	class Shape : public Mesh
 	{
 		protected:

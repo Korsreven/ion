@@ -49,7 +49,7 @@ namespace ion::graphics::scene::shapes
 	} //curve
 
 
-	//A Bezier curve class that supports up to 35 control points
+	//A class representing a bezier curve that supports up to 35 control points
 	class Curve : public Shape
 	{
 		protected:

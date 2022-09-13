@@ -29,6 +29,7 @@ namespace ion::graphics::scene::shapes
 	} //animated_sprite::detail
 
 
+	//A class representing a texturized rectangle that can animate
 	class AnimatedSprite final : public Sprite
 	{
 		protected:

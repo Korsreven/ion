@@ -39,6 +39,7 @@ namespace ion::graphics::scene::shapes
 	} //ellipse::detail
 
 
+	//A class representing an ellipse shape (or circle)
 	class Ellipse : public Shape
 	{
 		protected:

@@ -31,6 +31,7 @@ namespace ion::graphics::scene::shapes
 	} //line::detail
 
 
+	//A class representing a line shape
 	class Line : public Shape
 	{
 		protected:

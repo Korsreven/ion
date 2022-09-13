@@ -51,6 +51,7 @@ namespace ion::graphics::scene::shapes
 	} //rectangle::detail
 
 
+	//A class representing a rectangle shape
 	class Rectangle : public Shape
 	{
 		protected:

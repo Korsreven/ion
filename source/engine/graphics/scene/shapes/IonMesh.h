@@ -153,7 +153,7 @@ namespace ion::graphics::scene::shapes
 	} //mesh
 
 
-	//Mesh class that supports any complex shape
+	//A class representing a mesh that supports any complex shape
 	//This base class must support inheritance (open set of shapes)
 	class Mesh : public managed::ManagedObject<scene::Model>
 	{

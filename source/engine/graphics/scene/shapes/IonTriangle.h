@@ -29,6 +29,7 @@ namespace ion::graphics::scene::shapes
 	} //triangle::detail
 
 
+	//A class representing a triangle shape
 	class Triangle : public Shape
 	{
 		protected:

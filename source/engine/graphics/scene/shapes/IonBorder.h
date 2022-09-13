@@ -54,7 +54,8 @@ namespace ion::graphics::scene::shapes
 	} //border
 
 
-	//A border class where the width and height is the exclusive size without the borders
+	//A class representing a border where the width and height is the exclusive size without the borders
+	//A border can have square corners, oblique corners or no corners at all (just sides)
 	class Border : public Rectangle
 	{
 		protected:

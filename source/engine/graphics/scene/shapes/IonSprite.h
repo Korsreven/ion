@@ -38,6 +38,7 @@ namespace ion::graphics::scene::shapes
 	} //sprite::detail
 
 
+	//A class representing a texturized rectangle
 	class Sprite : public Rectangle
 	{
 		protected:
