@@ -37,6 +37,8 @@ namespace ion::graphics::scene::graph::animations
 	} //node_animation_group
 
 
+	//A class representing a node animation group that can contain multiple node animations
+	//A node animation group can be seen as a timeline where the total duration is calculated from all of the added node animations
 	class NodeAnimationGroup final : public managed::ManagedObject<NodeAnimationManager>
 	{
 		private:

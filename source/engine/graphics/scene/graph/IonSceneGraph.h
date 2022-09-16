@@ -116,6 +116,8 @@ namespace ion::graphics::scene::graph
 	} //scene_graph
 
 
+	//A class that manages the scene and stores scene nodes in a tree structure (from the root node)
+	//The scene graph is responsible for updating nodes, shader programs, camera, lights and movable objects
 	class SceneGraph final :
 		public managed::ManagedObject<Engine>,
 		protected events::Listenable<events::listeners::SceneNodeListener>

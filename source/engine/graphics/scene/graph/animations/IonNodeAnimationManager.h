@@ -35,6 +35,7 @@ namespace ion::graphics::scene::graph::animations
 	} //node_animation_manager::detail
 
 
+	//A class that manages and stores node animations, animations groups and timelines
 	class NodeAnimationManager :
 		public managed::ObjectManager<NodeAnimation, NodeAnimationManager>,
 		public managed::ObjectManager<NodeAnimationGroup, NodeAnimationManager>,

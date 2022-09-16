@@ -284,6 +284,8 @@ namespace ion::graphics::scene::graph::animations
 	} //node_animation
 
 
+	//A class representing a node animation that can contain both actions and motions
+	//A node animation can be seen as a timeline where the total duration is calculated from all of the added action/motions
 	class NodeAnimation final : public managed::ManagedObject<NodeAnimationManager>
 	{
 		private:

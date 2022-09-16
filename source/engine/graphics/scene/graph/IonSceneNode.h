@@ -288,6 +288,9 @@ namespace ion::graphics::scene::graph
 	} //scene_node
 
 
+	//A class representing a transformable scene node in a scene graph
+	//A scene node can contain multiple attached movable objects, as well as node animations
+	//All transformations are relative to the parent node
 	class SceneNode final : public animations::NodeAnimationManager
 	{
 		private:

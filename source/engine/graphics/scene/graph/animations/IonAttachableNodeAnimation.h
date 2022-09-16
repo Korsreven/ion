@@ -33,6 +33,7 @@ namespace ion::graphics::scene::graph::animations
 	} //attachable_node_animation
 
 
+	//A class representing an instantiation of a node animation, meaning an animation that is attached to a timeline
 	class AttachableNodeAnimation final : public managed::ManagedObject<NodeAnimationTimeline>
 	{
 		private:
