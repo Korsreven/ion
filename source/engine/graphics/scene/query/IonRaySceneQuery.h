@@ -38,6 +38,9 @@ namespace ion::graphics::scene::query
 	} //ray_scene_query
 
 
+	//A class representing an intersection scene query that queries object in a scene or inside a specific region
+	//Queries objects only if a bitwise AND operation between the query mask and the object query flags is non-zero
+	//A vector of intersected objects, with distance, are returned in the result type
 	class RaySceneQuery final : public SceneQuery<ray_scene_query::ResultType>
 	{
 		private:

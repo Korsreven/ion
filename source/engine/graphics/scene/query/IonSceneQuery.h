@@ -136,6 +136,8 @@ namespace ion::graphics::scene::query
 	} //scene_query
 
 
+	//A class representing a generic scene query that queries object in a scene or inside a specific region
+	//Queries objects only if a bitwise AND operation between the query mask and the object query flags is non-zero
 	template <typename ResultT>
 	class SceneQuery
 	{
