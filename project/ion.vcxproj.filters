@@ -723,6 +723,12 @@
     <ClCompile Include="..\source\engine\graphics\scene\shapes\IonAnimatedSprite.cpp">
       <Filter>Source Files\graphics\scene\shapes</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\render\IonRenderer.cpp">
+      <Filter>Source Files\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\engine\graphics\render\IonRenderPrimitive.cpp">
+      <Filter>Source Files\graphics\render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1396,6 +1402,12 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\managed\IonObjectRegister.h">
       <Filter>Header Files\managed</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\render\IonRenderer.h">
+      <Filter>Header Files\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\graphics\render\IonRenderPrimitive.h">
+      <Filter>Header Files\graphics\render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

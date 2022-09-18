@@ -73,6 +73,8 @@ File:	main.cpp
 #include "graphics/render/IonFog.h"
 #include "graphics/render/IonFrustum.h"
 #include "graphics/render/IonPass.h"
+#include "graphics/render/IonRenderer.h"
+#include "graphics/render/IonRenderPrimitive.h"
 #include "graphics/render/IonRenderTarget.h"
 #include "graphics/render/IonRenderWindow.h"
 #include "graphics/render/IonViewport.h"
@@ -640,6 +642,71 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				[[maybe_unused]] auto max_texture_units = ion::graphics::gl::MaxTextureUnits();
 				[[maybe_unused]] auto break_point = false;
 			}
+
+
+			//Testing
+
+			//Primitive #1
+			ion::graphics::render::RenderPrimitive primitive{
+				ion::graphics::render::vertex::vertex_batch::VertexDrawMode::Triangles,
+				ion::graphics::scene::shapes::mesh::detail::get_vertex_declaration()
+			};
+			primitive.LocalVertexData(
+				{1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, //v1
+				 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, //v2
+				 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, //v3
+				 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, //v4
+				 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, //v5
+				 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r} //v6
+			);
+			primitive.ModelMatrix(
+				ion::graphics::utilities::Matrix4::Transformation(0.0_r, {1.0_r, 1.0_r, 1.0_r}, {2.0_r, 1.0_r, 0.0_r})
+			);
+
+			//Primitive #2
+			ion::graphics::render::RenderPrimitive primitive2{
+				ion::graphics::render::vertex::vertex_batch::VertexDrawMode::Triangles,
+				ion::graphics::scene::shapes::mesh::detail::get_vertex_declaration()
+			};
+			primitive2.LocalVertexData(
+				{2.0_r, 2.0_r, 1.0_r,  2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, //v1
+				 2.0_r, 2.0_r, 1.0_r,  2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, //v2
+				 2.0_r, 2.0_r, 1.0_r,  2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, //v3
+				 2.0_r, 2.0_r, 1.0_r,  2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, //v4
+				 2.0_r, 2.0_r, 1.0_r,  2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, //v5
+				 2.0_r, 2.0_r, 1.0_r,  2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r} //v6
+			);
+			primitive2.ModelMatrix(
+				ion::graphics::utilities::Matrix4::Transformation(0.0_r, {1.0_r, 1.0_r, 1.0_r}, {1.0_r, 2.0_r, 0.0_r})
+			);
+
+			//Primitive #3
+			ion::graphics::render::RenderPrimitive primitive3{
+				ion::graphics::render::vertex::vertex_batch::VertexDrawMode::Triangles,
+				ion::graphics::scene::shapes::mesh::detail::get_vertex_declaration()
+			};
+			primitive3.LocalVertexData(
+				{3.0_r, 3.0_r, 1.0_r,  3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, //v1
+				 3.0_r, 3.0_r, 1.0_r,  3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, //v2
+				 3.0_r, 3.0_r, 1.0_r,  3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, //v3
+				 3.0_r, 3.0_r, 1.0_r,  3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, //v4
+				 3.0_r, 3.0_r, 1.0_r,  3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, //v5
+				 3.0_r, 3.0_r, 1.0_r,  3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r} //v6
+			);
+			primitive3.ModelMatrix(
+				ion::graphics::utilities::Matrix4::Transformation(0.0_r, {1.0_r, 1.0_r, 1.0_r}, {2.0_r, 2.0_r, 0.0_r})
+			);
+
+			primitive.Visible(true);
+			primitive2.Visible(true);
+			primitive3.Visible(true);
+			
+			ion::graphics::render::Renderer renderer;
+			renderer.AddPrimitive(primitive);
+			renderer.AddPrimitive(primitive2);
+			renderer.AddPrimitive(primitive3);
+			renderer.Prepare();
+
 
 			//Viewport
 			auto viewport = engine.GetDefaultViewport();
