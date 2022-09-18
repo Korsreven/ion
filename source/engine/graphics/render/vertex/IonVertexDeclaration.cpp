@@ -51,6 +51,31 @@ VertexDeclaration::VertexDeclaration(vertex_declaration::VertexElements vertex_e
 
 
 /*
+	Operators
+*/
+
+bool VertexDeclaration::operator==(const VertexDeclaration &rhs) const noexcept
+{
+	if (std::size(vertex_elements_) != std::size(rhs.vertex_elements_))
+		return false;
+
+	for (auto iter = std::begin(vertex_elements_), iter2 = std::begin(rhs.vertex_elements_),
+		end = std::end(vertex_elements_); iter != end; ++iter, ++iter2)
+	{
+		if (*iter != *iter2)
+			return false;
+	}
+
+	return true;
+}
+
+bool VertexDeclaration::operator!=(const VertexDeclaration &rhs) const noexcept
+{
+	return !(*this == rhs);
+}
+
+
+/*
 	Observers
 */
 

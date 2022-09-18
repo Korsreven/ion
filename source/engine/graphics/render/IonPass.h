@@ -130,6 +130,30 @@ namespace ion::graphics::render
 
 
 			/*
+				Operators
+			*/
+
+			//Checks if two passes are equal (all members are equal)
+			[[nodiscard]] inline auto operator==(const Pass &rhs) const noexcept
+			{
+				return shader_program_ == rhs.shader_program_ && //Check first
+					   iterations_ == rhs.iterations_ &&
+					   blend_source_factor_ == rhs.blend_source_factor_ &&
+					   blend_destination_factor_ == rhs.blend_source_factor_ &&
+					   blend_source_factor_alpha_ == rhs.blend_source_factor_ &&
+					   blend_destination_factor_alpha_ == rhs.blend_source_factor_ &&
+					   blend_equation_mode_ == rhs.blend_equation_mode_ &&
+					   blend_equation_mode_alpha_ == rhs.blend_equation_mode_;
+			}
+
+			//Checks if two passes are different (one or more members are different)
+			[[nodiscard]] inline auto operator!=(const Pass &rhs) const noexcept
+			{
+				return !(*this == rhs);
+			}
+
+
+			/*
 				Modifiers
 			*/
 
@@ -241,7 +265,7 @@ namespace ion::graphics::render
 			*/
 
 			//Set up and enable blending before this render pass
-			void Blend() noexcept;
+			void Blend() const noexcept;
 	};
 } //ion::graphics::render
 

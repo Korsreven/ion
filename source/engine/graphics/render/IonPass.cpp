@@ -247,7 +247,7 @@ Pass::Pass(pass::BlendFactor blend_source_factor, pass::BlendFactor blend_destin
 	Blending
 */
 
-void Pass::Blend() noexcept
+void Pass::Blend() const noexcept
 {
 	if (blend_source_factor_alpha_ && blend_destination_factor_alpha_)
 		detail::blend_separate(blend_source_factor_, blend_destination_factor_,

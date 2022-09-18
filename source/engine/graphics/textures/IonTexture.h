@@ -62,6 +62,24 @@ namespace ion::graphics::textures
 		{
 			int Id = 0;
 			TextureType Type = TextureType::Texture2D;
+
+
+			/*
+				Operators
+			*/
+
+			//Checks if two texture handles are equal (all members are equal)
+			[[nodiscard]] inline auto operator==(const TextureHandle &rhs) const noexcept
+			{
+				return Id == rhs.Id &&
+					   Type == rhs.Type;
+			}
+
+			//Checks if two texture handles are different (one or more members are different)
+			[[nodiscard]] inline auto operator!=(const TextureHandle &rhs) const noexcept
+			{
+				return !(*this == rhs);
+			}
 		};
 
 		struct TextureExtents final

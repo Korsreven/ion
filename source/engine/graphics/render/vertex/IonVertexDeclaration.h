@@ -45,6 +45,26 @@ namespace ion::graphics::render::vertex
 
 
 			/*
+				Operators
+			*/
+
+			//Checks if two vertex elements are equal (all members are equal)
+			[[nodiscard]] inline auto operator==(const VertexElement &rhs) const noexcept
+			{
+				return Name == rhs.Name &&
+					   Type == rhs.Type &&
+					   Offset == rhs.Offset &&
+					   Stride == rhs.Stride;
+			}
+
+			//Checks if two vertex elements are different (one or more members are different)
+			[[nodiscard]] inline auto operator!=(const VertexElement &rhs) const noexcept
+			{
+				return !(*this == rhs);
+			}
+
+
+			/*
 				Observer
 			*/
 
@@ -130,6 +150,17 @@ namespace ion::graphics::render::vertex
 
 
 			/*
+				Operators
+			*/
+
+			//Checks if two vertex declarations are equal (all elements are equal)
+			[[nodiscard]] bool operator==(const VertexDeclaration &rhs) const noexcept;
+
+			//Checks if two vertex declarations are different (one or more elements are different)
+			[[nodiscard]] bool operator!=(const VertexDeclaration &rhs) const noexcept;
+
+
+			/*
 				Modifiers
 			*/
 
@@ -151,7 +182,7 @@ namespace ion::graphics::render::vertex
 			//Returns the size of one vertex for this vertex declaration
 			[[nodiscard]] inline auto VertexSize() const noexcept
 			{
-				return vertex_size_ ? *vertex_size_ : Components() * sizeof(real);
+				return vertex_size_ ? *vertex_size_ : Components() * static_cast<int>(sizeof(real));
 			}
 
 
