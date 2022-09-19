@@ -95,7 +95,7 @@ namespace ion::graphics::scene
 	} //drawable_particle_system::detail
 
 
-	//A drawable particle system that can be attached to a scene node
+	//A class representing a drawable particle system that can be attached to a scene node
 	class DrawableParticleSystem final : public DrawableObject
 	{
 		private:

@@ -161,7 +161,7 @@ namespace ion::graphics::scene
 	} //drawable_text::detail
 
 
-	//A drawable text that can be attached to a scene node
+	//A class representing a drawable text that can be attached to a scene node
 	class DrawableText final : public DrawableObject
 	{
 		private:

@@ -67,7 +67,7 @@ namespace ion::graphics::scene
 	} //movable_object
 
 
-	//A movable object with bounding volumes, that can be attached to a scene node
+	//A class representing a movable object with bounding volumes, that can be attached to a scene node
 	class MovableObject : public managed::ManagedObject<SceneManager>
 	{
 		protected:

@@ -83,6 +83,8 @@ namespace ion::graphics::scene
 	} //light
 
 
+	//A class representing a light that can be attached to a scene node
+	//Each light is rendered with a fragment shader using the 'phong' lighting model
 	class Light final : public MovableObject
 	{
 		private:

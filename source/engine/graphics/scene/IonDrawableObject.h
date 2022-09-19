@@ -35,7 +35,7 @@ namespace ion::graphics::scene
 	} //drawable_object
 
 
-	//A drawable object that can be prepared and drawn with one or more passes
+	//A class representing a drawable object that can be prepared and drawn with one or more passes
 	class DrawableObject : public MovableObject
 	{
 		private:

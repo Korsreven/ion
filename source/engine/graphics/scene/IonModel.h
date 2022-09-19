@@ -83,6 +83,8 @@ namespace ion::graphics::scene
 	} //model::detail
 
 
+	//A class representing a model that can be attached to a scene node
+	//A model can contain multiple meshes where each mesh is relative to the parent model
 	class Model final :
 		public DrawableObject,
 		public managed::ObjectManager<shapes::Mesh, Model>

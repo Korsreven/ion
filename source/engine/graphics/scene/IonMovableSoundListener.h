@@ -39,7 +39,7 @@ namespace ion::graphics::scene
 	} //movable_sound_listener
 
 
-	//A movable sound listener that can be attached to a scene node
+	//A class representing a movable sound listener that can be attached to a scene node
 	class MovableSoundListener final : public MovableObject
 	{
 		private:

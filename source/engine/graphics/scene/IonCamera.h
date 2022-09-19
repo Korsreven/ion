@@ -48,6 +48,7 @@ namespace ion::graphics::scene
 	} //camera
 
 
+	//A class representing a camera that can be attached to a scene node
 	class Camera final :
 		public MovableObject,
 		protected events::EventGenerator<events::listeners::CameraListener>

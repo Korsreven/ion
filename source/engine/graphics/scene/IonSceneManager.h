@@ -73,6 +73,8 @@ namespace ion::graphics::scene
 	} //scene_manager::detail
 
 
+	//A class that manages and stores everything scene related
+	//A scene manager manages cameras, lights, models, particle systems, texts, sounds and sound listeners
 	class SceneManager final :
 		public managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>,
 		public managed::ObjectManager<Light, SceneManager>,

@@ -42,7 +42,7 @@ namespace ion::graphics::scene
 	} //movable_sound
 
 
-	//A movable (positional 3D) sound that can be attached to a scene node
+	//A class representing a movable (positional 3D) sound that can be attached to a scene node
 	class MovableSound final : public MovableObject
 	{
 		private:
