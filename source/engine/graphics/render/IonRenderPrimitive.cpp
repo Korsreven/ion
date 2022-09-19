@@ -121,31 +121,29 @@ bool are_passes_equal(const render_passes &passes, const render_passes &passes2)
 void RenderPrimitive::UpdateWorldVertexData()
 {
 	//Local data or model matrix has changed
-	if (local_data_changed_ ||
-		std::memcmp(current_model_matrix_.M(), applied_model_matrix_.M(), 16 * sizeof(real)) != 0)
+	if (local_data_changed_ || model_matrix_changed_)
 	{
 		world_vertex_data_ = local_vertex_data_;
-		detail::transform_positions(vertex_metrics_, current_model_matrix_, world_vertex_data_);
-		applied_model_matrix_ = current_model_matrix_;
+		detail::transform_positions(vertex_metrics_, model_matrix_, world_vertex_data_);
 
 		local_data_changed_ = false;
 		world_data_changed_ = true;
+		model_matrix_changed_ = false;
 	}
 }
 
 void RenderPrimitive::UpdateWorldZ() noexcept
 {
 	//Local data or model matrix has changed
-	if (local_data_changed_ ||
-		std::memcmp(current_model_matrix_.M(), applied_model_matrix_.M(), 16 * sizeof(real)) != 0)
+	if (local_data_changed_ || model_matrix_changed_)
 	{
 		auto z = detail::get_position_z(vertex_metrics_, local_vertex_data_);
 
 		//Check if position z has changed for first vertex
-		if (z = (current_model_matrix_ * Vector3{0.0_r, 0.0_r, z}).Z(); z != world_z_)
+		if (z = (model_matrix_ * Vector3{0.0_r, 0.0_r, z}).Z(); world_z_ != z)
 		{
 			world_z_ = z;
-			need_refresh_ = true;
+			need_refresh_ |= visible_;
 		}
 	}
 }
@@ -166,6 +164,71 @@ RenderPrimitive::~RenderPrimitive() noexcept
 {
 	if (parent_renderer_)
 		parent_renderer_->RemovePrimitive(*this);
+}
+
+/*
+	Modifiers
+*/
+
+void RenderPrimitive::LocalVertexData(render_primitive::vertex_data data) noexcept
+{
+	if (std::size(local_vertex_data_) != std::size(data))
+		need_refresh_ |= visible_;
+
+	local_vertex_data_ = std::move(data);
+
+	local_data_changed_ = true;
+	world_data_changed_ = false; //Discard world changes
+}
+
+void RenderPrimitive::LocalVertexData(render_primitive::vertex_data data, const Matrix4 &model_matrix) noexcept
+{
+	LocalVertexData(std::move(data));
+	ModelMatrix(model_matrix);
+}
+
+void RenderPrimitive::WorldVertexData(render_primitive::vertex_data data, const Matrix4 &applied_model_matrix) noexcept
+{
+	if (std::size(world_vertex_data_) != std::size(data))
+		need_refresh_ |= visible_;
+
+	world_vertex_data_ = std::move(data);
+	local_vertex_data_ = world_vertex_data_;
+	model_matrix_ = applied_model_matrix;
+	world_z_ = render_primitive::detail::get_position_z(vertex_metrics_, world_vertex_data_);
+
+	local_data_changed_ = false; //Discard local changes
+	world_data_changed_ = true;
+	model_matrix_changed_ = false; //Discard matrix changes
+}
+
+void RenderPrimitive::ModelMatrix(const Matrix4 &model_matrix) noexcept
+{
+	if (std::memcmp(model_matrix_.M(), model_matrix.M(), 16 * sizeof(real)) != 0)
+	{
+		model_matrix_ = model_matrix;
+		model_matrix_changed_ = true;
+	}
+}
+
+
+/*
+	Observers
+*/
+
+bool RenderPrimitive::IsGroupable(const RenderPrimitive &primitive) const noexcept
+{
+	return draw_mode_ == primitive.draw_mode_ &&
+		   world_z_ == primitive.world_z_ &&
+		   current_material_ == primitive.current_material_ &&
+		   texture_handle_ == primitive.texture_handle_ &&
+		   point_size_ == primitive.point_size_ &&
+		   line_thickness_ == primitive.line_thickness_ &&
+		   wire_frame_ == primitive.wire_frame_ &&
+
+		   //Check slowest equalities last
+		   vertex_declaration_ == primitive.vertex_declaration_ &&
+		   render_primitive::detail::are_passes_equal(passes_, primitive.passes_);
 }
 
 
@@ -195,6 +258,7 @@ void RenderPrimitive::Refresh()
 {
 	UpdateWorldZ();
 
+	//Check if current material has changed externally
 	if (current_material_.get() != applied_material_)
 	{
 		applied_material_ = current_material_.get();

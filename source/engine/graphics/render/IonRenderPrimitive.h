@@ -74,8 +74,7 @@ namespace ion::graphics::render
 
 			render_primitive::vertex_data local_vertex_data_; //Local space
 			render_primitive::vertex_data world_vertex_data_; //World space
-			Matrix4 current_model_matrix_;
-			Matrix4 applied_model_matrix_;
+			Matrix4 model_matrix_;
 			real world_z_ = 0.0_r;
 
 			render_primitive::render_passes passes_;
@@ -89,6 +88,7 @@ namespace ion::graphics::render
 
 			bool local_data_changed_ = false;
 			bool world_data_changed_ = false;
+			bool model_matrix_changed_ = false;
 			bool need_refresh_ = false;
 			Renderer *parent_renderer_ = nullptr;
 
@@ -111,43 +111,16 @@ namespace ion::graphics::render
 			*/
 
 			//
-			inline void LocalVertexData(render_primitive::vertex_data data) noexcept
-			{
-				if (std::size(local_vertex_data_) != std::size(data))
-					need_refresh_ = visible_;
-
-				local_vertex_data_ = std::move(data);
-				local_data_changed_ = true;
-				world_data_changed_ = false; //Discard world changes
-			}
+			void LocalVertexData(render_primitive::vertex_data data) noexcept;
 
 			//
-			inline void LocalVertexData(render_primitive::vertex_data data, const Matrix4 &model_matrix) noexcept
-			{
-				LocalVertexData(std::move(data));
-				ModelMatrix(model_matrix);
-			}
+			void LocalVertexData(render_primitive::vertex_data data, const Matrix4 &model_matrix) noexcept;
 
 			//
-			inline void WorldVertexData(render_primitive::vertex_data data, const Matrix4 &applied_model_matrix) noexcept
-			{
-				if (std::size(world_vertex_data_) != std::size(data))
-					need_refresh_ = visible_;
-
-				world_vertex_data_ = std::move(data);
-				local_vertex_data_ = world_vertex_data_;
-				ModelMatrix(applied_model_matrix);
-				applied_model_matrix_ = applied_model_matrix;
-				world_z_ = render_primitive::detail::get_position_z(vertex_metrics_, world_vertex_data_);
-				local_data_changed_ = false; //Discard local changes
-				world_data_changed_ = true;
-			}
+			void WorldVertexData(render_primitive::vertex_data data, const Matrix4 &applied_model_matrix) noexcept;
 		
 			//
-			inline void ModelMatrix(const Matrix4 &model_matrix) noexcept
-			{
-				current_model_matrix_ = model_matrix;
-			}
+			void ModelMatrix(const Matrix4 &model_matrix) noexcept;
 
 
 			//
@@ -156,7 +129,7 @@ namespace ion::graphics::render
 				if (!render_primitive::detail::are_passes_equal(passes_, passes))
 				{
 					passes_ = std::move(passes);
-					need_refresh_ = visible_;
+					need_refresh_ |= visible_;
 				}
 			}
 		
@@ -167,7 +140,7 @@ namespace ion::graphics::render
 				{
 					current_material_ = material;
 					applied_material_ = material.get();
-					need_refresh_ = visible_;
+					need_refresh_ |= visible_;
 				}
 			}
 
@@ -177,7 +150,7 @@ namespace ion::graphics::render
 				if (texture_handle_ != texture_handle)
 				{
 					texture_handle_ = texture_handle;
-					need_refresh_ = visible_;
+					need_refresh_ |= visible_;
 				}
 			}
 
@@ -187,7 +160,7 @@ namespace ion::graphics::render
 				if (point_size_ != size)
 				{
 					point_size_ = size;
-					need_refresh_ = visible_;
+					need_refresh_ |= visible_;
 				}
 			}
 
@@ -197,7 +170,7 @@ namespace ion::graphics::render
 				if (line_thickness_ != thickness)
 				{
 					line_thickness_ = thickness;
-					need_refresh_ = visible_;
+					need_refresh_ |= visible_;
 				}
 			}
 
@@ -207,7 +180,7 @@ namespace ion::graphics::render
 				if (wire_frame_ != enable)
 				{
 					wire_frame_ = enable;
-					need_refresh_ = visible_;
+					need_refresh_ |= visible_;
 				}
 			}
 
@@ -258,16 +231,11 @@ namespace ion::graphics::render
 			}
 
 			//
-			[[nodiscard]] inline auto& CurrentModelMatrix() const noexcept
+			[[nodiscard]] inline auto& ModelMatrix() const noexcept
 			{
-				return current_model_matrix_;
+				return model_matrix_;
 			}
 
-			//
-			[[nodiscard]] inline auto& AppliedModelMatrix() const noexcept
-			{
-				return applied_model_matrix_;
-			}
 
 			//
 			[[nodiscard]] inline auto WorldZ() const noexcept
@@ -338,15 +306,7 @@ namespace ion::graphics::render
 
 
 			//		
-			[[nodiscard]] inline auto IsGroupable(const RenderPrimitive &primitive) const noexcept
-			{
-				return draw_mode_ == primitive.draw_mode_ && world_z_ == primitive.world_z_ &&
-					   current_material_ == primitive.current_material_ && texture_handle_ == primitive.texture_handle_ &&
-					   line_thickness_ == primitive.line_thickness_ && wire_frame_ == primitive.wire_frame_ &&
-					   //Check slowest equalities last
-					   vertex_declaration_ == primitive.vertex_declaration_ &&
-					   render_primitive::detail::are_passes_equal(passes_, primitive.passes_);
-			}
+			[[nodiscard]] bool IsGroupable(const RenderPrimitive &primitive) const noexcept;
 
 
 			/*
