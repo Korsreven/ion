@@ -335,9 +335,9 @@ void RenderPrimitive::BaseColor(const Color &color) noexcept
 		{
 			detail::apply_color(vertex_metrics_, color, world_vertex_data_);
 
-			//No other opacity changes, apply opacity directly
+			//No other opacity changes, apply opacity again
 			if (!opacity_changed_ && opacity_ != 1.0_r)
-				detail::apply_opacity(vertex_metrics_, opacity_, local_vertex_data_, world_vertex_data_);
+				opacity_changed_ = true;
 
 			world_data_changed_ = true;
 		}
