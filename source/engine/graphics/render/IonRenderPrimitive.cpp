@@ -240,6 +240,7 @@ void RenderPrimitive::UpdateWorldVertexData()
 	{
 		detail::apply_opacity(vertex_metrics_, opacity_, local_vertex_data_, world_vertex_data_);
 		world_data_changed_ = true;
+		opacity_changed_ = false;
 	}
 }
 
@@ -333,6 +334,11 @@ void RenderPrimitive::BaseColor(const Color &color) noexcept
 		if (!local_data_changed_)
 		{
 			detail::apply_color(vertex_metrics_, color, world_vertex_data_);
+
+			//No other opacity changes, apply opacity directly
+			if (!opacity_changed_ && opacity_ != 1.0_r)
+				detail::apply_opacity(vertex_metrics_, opacity_, local_vertex_data_, world_vertex_data_);
+
 			world_data_changed_ = true;
 		}
 	}
