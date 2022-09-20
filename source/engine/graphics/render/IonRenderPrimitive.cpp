@@ -26,23 +26,33 @@ using namespace render_primitive;
 namespace render_primitive::detail
 {
 
-int get_vertex_count(const vertex::VertexDeclaration &vertex_declaration, const vertex::VertexDataView &vertex_data) noexcept
+int get_vertex_count(const vertex::VertexDeclaration &vertex_declaration, const vertex::VertexDataView &data_view) noexcept
 {
 	auto vertex_size = vertex_declaration.VertexSize();
-	return vertex_size > 0 ? vertex_data.Size() / vertex_size : 0;
+	return vertex_size > 0 ? data_view.Size() / vertex_size : 0;
 }
 
 vertex_metrics get_vertex_metrics(const vertex::VertexDeclaration &vertex_declaration) noexcept
 {
+	auto metrics = vertex_metrics{};
+
 	for (auto &element : vertex_declaration.Elements())
 	{
 		if (element.Name == shaders::shader_layout::AttributeName::Vertex_Position)
-			return {element.Components(),
-					element.Offset / static_cast<int>(sizeof(real)),
-					element.Stride / static_cast<int>(sizeof(real))};
+		{
+			metrics.position_components = element.Components();
+			metrics.position_offset = element.Offset / static_cast<int>(sizeof(real));
+			metrics.position_stride = element.Stride / static_cast<int>(sizeof(real));
+		}
+		else if (element.Name == shaders::shader_layout::AttributeName::Vertex_Color)
+		{
+			metrics.color_components = element.Components();
+			metrics.color_offset = element.Offset / static_cast<int>(sizeof(real));
+			metrics.color_stride = element.Stride / static_cast<int>(sizeof(real));
+		}
 	}
 
-	return {};
+	return metrics;
 }
 
 
@@ -56,7 +66,7 @@ void transform_positions(const vertex_metrics &metrics, const Matrix4 &model_mat
 		//Two-components (x, y)
 		case 2:
 		{
-			for (auto off = metrics.position_offset; off + 2 <= size; off += stride)
+			for (auto off = metrics.position_offset; off + 1 < size; off += stride)
 			{
 				auto [x, y] = (Matrix3::Transformation(model_matrix) * Vector2{data[off + 0], data[off + 1]}).XY();
 				data[off + 0] = x;
@@ -70,7 +80,7 @@ void transform_positions(const vertex_metrics &metrics, const Matrix4 &model_mat
 		case 3:
 		case 4: //w is left as is
 		{
-			for (auto off = metrics.position_offset; off + 3 <= size; off += stride)
+			for (auto off = metrics.position_offset; off + 2 < size; off += stride)
 			{
 				auto [x, y, z] = (model_matrix * Vector3{data[off + 0], data[off + 1], data[off + 2]}).XYZ();
 				data[off + 0] = x;
@@ -83,6 +93,63 @@ void transform_positions(const vertex_metrics &metrics, const Matrix4 &model_mat
 	}
 }
 
+void apply_color(const vertex_metrics &metrics, const Color &color, vertex_data &data) noexcept
+{
+	auto size = std::ssize(data);
+	auto stride = std::max(metrics.color_components, metrics.color_stride);
+
+	switch (metrics.color_components)
+	{
+		//Three-channels (r, g, b)
+		case 3:
+		{
+			for (auto off = metrics.color_offset; off + 2 < size; off += stride)
+			{
+				auto [r, g, b] = color.RGB();
+				data[off + 0] = r;
+				data[off + 1] = g;
+				data[off + 2] = b;
+			}
+
+			break;
+		}
+
+		//Four-channels (r, g, b, a)
+		case 4:
+		{
+			for (auto off = metrics.color_offset; off + 3 < size; off += stride)
+			{
+				auto [r, g, b, a] = color.RGBA();
+				data[off + 0] = r;
+				data[off + 1] = g;
+				data[off + 2] = b;
+				data[off + 3] = a;
+			}
+
+			break;
+		}
+	}
+}
+
+void apply_opacity(const vertex_metrics &metrics, real opacity, const vertex_data &source_data, vertex_data &data) noexcept
+{
+	auto size = std::ssize(data);
+	auto stride = std::max(metrics.color_components, metrics.color_stride);
+
+	switch (metrics.color_components)
+	{
+		//Four-channels (r, g, b, a)
+		case 4: //Need alpha channel
+		{
+			for (auto off = metrics.color_offset; off + 3 < size; off += stride)
+				data[off + 3] = source_data[off + 3] * opacity;
+
+			break;
+		}
+	}
+}
+
+
 real get_position_z(const vertex_metrics &metrics, const vertex_data &data) noexcept
 {
 	switch (metrics.position_components)
@@ -90,15 +157,52 @@ real get_position_z(const vertex_metrics &metrics, const vertex_data &data) noex
 		//Three-components (x, y, z)
 		case 3:
 		case 4:
-		return metrics.position_offset + 2 < std::ssize(data) ?
-			data[metrics.position_offset + 2] : 0.0_r;
+		{
+			if (metrics.position_offset + 2 < std::ssize(data))
+				return data[metrics.position_offset + 2];
+		}
 	}
 
 	return 0.0_r;
 }
 
+Color get_color(const vertex_metrics &metrics, const vertex_data &data) noexcept
+{
+	switch (metrics.color_components)
+	{
+		//Three-channels (r, g, b)
+		case 3:
+		{
+			if (metrics.color_offset + 2 < std::ssize(data))
+				return Color{
+					data[metrics.color_offset + 0],
+					data[metrics.color_offset + 1],
+					data[metrics.color_offset + 2]
+				};
 
-bool are_passes_equal(const render_passes &passes, const render_passes &passes2) noexcept
+			break;
+		}
+
+		//Four-channels (r, g, b, a)
+		case 4:
+		{
+			if (metrics.color_offset + 3 < std::ssize(data))
+				return Color{
+					data[metrics.color_offset + 0],
+					data[metrics.color_offset + 1],
+					data[metrics.color_offset + 2],
+					data[metrics.color_offset + 3]
+				};
+
+			break;
+		}
+	}
+
+	return {};
+}
+
+
+bool all_passes_equal(const render_passes &passes, const render_passes &passes2) noexcept
 {
 	if (std::size(passes) != std::size(passes2))
 		return false;
@@ -129,6 +233,13 @@ void RenderPrimitive::UpdateWorldVertexData()
 		local_data_changed_ = false;
 		world_data_changed_ = true;
 		model_matrix_changed_ = false;
+	}
+
+	//Opacity has changed
+	if (opacity_changed_)
+	{
+		detail::apply_opacity(vertex_metrics_, opacity_, local_vertex_data_, world_vertex_data_);
+		world_data_changed_ = true;
 	}
 }
 
@@ -212,6 +323,22 @@ void RenderPrimitive::ModelMatrix(const Matrix4 &model_matrix) noexcept
 }
 
 
+void RenderPrimitive::BaseColor(const Color &color) noexcept
+{
+	if (detail::get_color(vertex_metrics_, local_vertex_data_) != color)
+	{
+		detail::apply_color(vertex_metrics_, color, local_vertex_data_);
+
+		//No other local changes, apply directly to world
+		if (!local_data_changed_)
+		{
+			detail::apply_color(vertex_metrics_, color, world_vertex_data_);
+			world_data_changed_ = true;
+		}
+	}
+}
+
+
 /*
 	Observers
 */
@@ -228,7 +355,7 @@ bool RenderPrimitive::IsGroupable(const RenderPrimitive &primitive) const noexce
 
 		   //Check slowest equalities last
 		   vertex_declaration_ == primitive.vertex_declaration_ &&
-		   render_primitive::detail::are_passes_equal(passes_, primitive.passes_);
+		   render_primitive::detail::all_passes_equal(passes_, primitive.passes_);
 }
 
 
