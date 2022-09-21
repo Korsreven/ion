@@ -13,12 +13,12 @@ File:	IonRenderPrimitive.h
 #ifndef ION_RENDER_PRIMITIVE_H
 #define ION_RENDER_PRIMITIVE_H
 
-#include <cstring>
 #include <optional>
 #include <vector>
 
 #include "IonPass.h"
 #include "graphics/textures/IonTexture.h"
+#include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "memory/IonNonOwningPtr.h"
@@ -67,6 +67,7 @@ namespace ion::graphics::render
 
 			real get_position_z(const vertex_metrics &metrics, const vertex_data &data) noexcept;
 			Color get_color(const vertex_metrics &metrics, const vertex_data &data) noexcept;
+			Aabb get_aabb(const vertex_metrics &metrics, const vertex_data &data) noexcept;
 
 			bool all_passes_equal(const render_passes &passes, const render_passes &passes2) noexcept;
 		} //detail
@@ -85,6 +86,7 @@ namespace ion::graphics::render
 			render_primitive::vertex_data world_vertex_data_; //World space
 			Matrix4 model_matrix_;
 			real world_z_ = 0.0_r;
+			Aabb aabb_;
 
 			render_primitive::render_passes passes_;
 			NonOwningPtr<materials::Material> current_material_;
@@ -264,6 +266,18 @@ namespace ion::graphics::render
 
 
 			//
+			[[nodiscard]] inline auto VertexCount() const noexcept
+			{
+				return render_primitive::detail::get_vertex_count(vertex_declaration_, local_vertex_data_);
+			}
+
+			//
+			[[nodiscard]] inline auto VertexDataSize() const noexcept
+			{
+				return std::ssize(local_vertex_data_);
+			}
+
+			//
 			[[nodiscard]] inline auto LocalZ() const noexcept
 			{
 				return render_primitive::detail::get_position_z(vertex_metrics_, local_vertex_data_);
@@ -276,15 +290,9 @@ namespace ion::graphics::render
 			}
 
 			//
-			[[nodiscard]] inline auto VertexCount() const noexcept
+			[[nodiscard]] inline auto& AxisAlignedBoundingBox() const noexcept
 			{
-				return render_primitive::detail::get_vertex_count(vertex_declaration_, local_vertex_data_);
-			}
-
-			//
-			[[nodiscard]] inline auto VertexDataSize() const noexcept
-			{
-				return std::ssize(local_vertex_data_);
+				return aabb_;
 			}
 
 

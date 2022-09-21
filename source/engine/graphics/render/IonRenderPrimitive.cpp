@@ -12,11 +12,13 @@ File:	IonRenderPrimitive.cpp
 
 #include "IonRenderPrimitive.h"
 
+#include <cstring>
 #include <utility>
 
 #include "IonRenderer.h"
 #include "graphics/shaders/IonShaderLayout.h"
 #include "graphics/utilities/IonMatrix3.h"
+#include "graphics/utilities/IonVector2.h"
 
 namespace ion::graphics::render
 {
@@ -201,6 +203,46 @@ Color get_color(const vertex_metrics &metrics, const vertex_data &data) noexcept
 	return {};
 }
 
+Aabb get_aabb(const vertex_metrics &metrics, const vertex_data &data) noexcept
+{
+	auto size = std::ssize(data);
+	auto stride = std::max(metrics.position_components, metrics.position_stride);
+
+	auto min = vector2::Zero;
+	auto max = vector2::Zero;
+
+	switch (metrics.position_components)
+	{
+		case 2: //Two-components (x, y)
+		case 3: //z is left as is
+		case 4: //w is left as is
+		{
+			//Initial min/max
+			if (metrics.position_offset + 1 < size)
+			{
+				min = max =
+					Vector2{data[metrics.position_offset], data[metrics.position_offset + 1]};
+
+				//Find min/max for each vertex position
+				for (auto off = metrics.position_offset + stride; off + 1 < size; off += stride)
+				{
+					auto x = data[off];
+					auto y = data[off + 1];
+					auto [min_x, min_y] = min.XY();
+					auto [max_x, max_y] = max.XY();
+
+					min.X(std::min(min_x, x));
+					min.Y(std::min(min_y, y));
+					max.X(std::max(max_x, x));
+					max.Y(std::max(max_y, y));
+				}
+			}
+		}
+	}
+
+	return {min, max};
+}
+
 
 bool all_passes_equal(const render_passes &passes, const render_passes &passes2) noexcept
 {
@@ -288,6 +330,7 @@ void RenderPrimitive::LocalVertexData(render_primitive::vertex_data data) noexce
 		need_refresh_ |= visible_;
 
 	local_vertex_data_ = std::move(data);
+	aabb_ = detail::get_aabb(vertex_metrics_, local_vertex_data_);
 
 	local_data_changed_ = true;
 	world_data_changed_ = false; //Discard world changes
