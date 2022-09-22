@@ -34,6 +34,7 @@ namespace ion::graphics::render
 	} //render_target::detail
 
 
+	//A class representing a render target that manages viewports
 	class RenderTarget :
 		public events::Listenable<events::listeners::RenderTargetListener>,
 		public managed::ObjectManager<Viewport, RenderTarget, events::listeners::ViewportListener>

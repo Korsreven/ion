@@ -83,6 +83,8 @@ namespace ion::graphics::render
 	} //viewport
 
 
+	//A class representing a viewport that can be aligned and anchored to a specific location
+	//A viewport is connected to a camera, and displays everything being rendered through the camera
 	class Viewport final :
 		public managed::ManagedObject<RenderTarget>,
 		protected events::EventGenerator<events::listeners::ViewportListener>,

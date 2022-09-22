@@ -63,6 +63,8 @@ namespace ion::graphics::render
 	} //render_window
 
 
+	//A class representing a general render window (OS independent), which derives from a system specific window (OS dependant)
+	//A render window is also a render target containing viewports
 	class RenderWindow final :	
 		public RenderTarget,
 		public events::Listenable<events::listeners::WindowListener>,

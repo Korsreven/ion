@@ -97,6 +97,8 @@ namespace ion::graphics::render
 	} //frustum
 
 
+	//A class representing a viewing frustum which can either be an orthographic or perspective view
+	//The scene is viewed through the camera's frustum, and the perspective matrix is calculated from it
 	class Frustum final
 	{
 		private:

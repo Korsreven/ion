@@ -85,6 +85,8 @@ namespace ion::graphics::render
 	} //pass
 
 
+	//A class representing a render pass which contains a shader program and blending factors
+	//If a render pass has not specified a shader program, the pass will be rendered using the fixed-function pipeline
 	class Pass final
 	{
 		private:

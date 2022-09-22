@@ -40,6 +40,8 @@ namespace ion::graphics::render
 	} //fog
 
 
+	//A class representing fog which can be linear, exponential or exponential2
+	//Fog is rendered with a fragment shader if enabled in the scene
 	class Fog final
 	{
 		private:
