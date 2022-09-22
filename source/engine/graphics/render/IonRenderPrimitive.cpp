@@ -351,6 +351,7 @@ void RenderPrimitive::WorldVertexData(render_primitive::vertex_data data, const 
 	local_vertex_data_ = world_vertex_data_;
 	model_matrix_ = applied_model_matrix;
 	world_z_ = render_primitive::detail::get_position_z(vertex_metrics_, world_vertex_data_);
+	aabb_ = detail::get_aabb(vertex_metrics_, world_vertex_data_);
 
 	local_data_changed_ = false; //Discard local changes
 	world_data_changed_ = true;
