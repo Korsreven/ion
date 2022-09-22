@@ -19,7 +19,7 @@ File:	IonParticleSystem.h
 
 namespace ion::graphics::particles
 {
-	struct ParticleSystemManager; //Forward declaration
+	class ParticleSystemManager; //Forward declaration
 
 	namespace particle_system
 	{

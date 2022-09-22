@@ -34,136 +34,138 @@ namespace ion::graphics::materials
 
 
 	//A class that manages and stores materials
-	struct MaterialManager final :
-		managed::ObjectManager<Material, MaterialManager>
+	class MaterialManager final :
+		public managed::ObjectManager<Material, MaterialManager>
 	{
-		//Default constructor
-		MaterialManager() = default;
+		public:
 
-		//Deleted copy constructor
-		MaterialManager(const MaterialManager&) = delete;
+			//Default constructor
+			MaterialManager() = default;
 
-		//Default move constructor
-		MaterialManager(MaterialManager&&) = default;
+			//Deleted copy constructor
+			MaterialManager(const MaterialManager&) = delete;
 
-		//Destructor
-		~MaterialManager() = default;
+			//Default move constructor
+			MaterialManager(MaterialManager&&) = default;
 
-
-		/*
-			Operators
-		*/
-
-		//Deleted copy assignment
-		MaterialManager& operator=(const MaterialManager&) = delete;
-
-		//Move assignment
-		MaterialManager& operator=(MaterialManager&&) = default;
+			//Destructor
+			~MaterialManager() = default;
 
 
-		/*
-			Ranges
-		*/
+			/*
+				Operators
+			*/
 
-		//Returns a mutable range of all materials in this manager
-		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline auto Materials() noexcept
-		{
-			return Objects();
-		}
+			//Deleted copy assignment
+			MaterialManager& operator=(const MaterialManager&) = delete;
 
-		//Returns an immutable range of all materials in this manager
-		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline auto Materials() const noexcept
-		{
-			return Objects();
-		}
+			//Move assignment
+			MaterialManager& operator=(MaterialManager&&) = default;
 
 
-		/*
-			Materials
-			Creating
-		*/
+			/*
+				Ranges
+			*/
 
-		//Create a material with the given name
-		NonOwningPtr<Material> CreateMaterial(std::string name);
+			//Returns a mutable range of all materials in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Materials() noexcept
+			{
+				return Objects();
+			}
 
-		//Create a material with the given name and diffuse color
-		NonOwningPtr<Material> CreateMaterial(std::string name, const Color &diffuse);
-
-		//Create a material with the given name, diffuse map and diffuse color
-		NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Animation> diffuse_map, const Color &diffuse = color::White);
-
-		//Create a material with the given name, diffuse map and diffuse color
-		NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Texture> diffuse_map, const Color &diffuse = color::White);
-
-
-		//Create a material with the given name, ambient color, diffuse color, specular color, emissive color and shininess
-		NonOwningPtr<Material> CreateMaterial(std::string name,
-			const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive,
-			real shininess = material::detail::default_shininess);
-
-		//Create a material with the given name, diffuse map, normal map, specular map, emissive map,
-		//diffuse color and shininess
-		NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Animation> diffuse_map,
-			NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> emissive_map,
-			const Color &diffuse = color::White, real shininess = material::detail::default_shininess);
-
-		//Create a material with the given name, diffuse map, normal map, specular map, emissive map,
-		//diffuse color and shininess
-		NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Texture> diffuse_map,
-			NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> emissive_map,
-			const Color &diffuse = color::White, real shininess = material::detail::default_shininess);
-
-		//Create a material with the given name, diffuse map, normal map, specular map, emissive map,
-		//ambient color, diffuse color, specular color, emissive color and shininess
-		NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Animation> diffuse_map,
-			NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> emissive_map,
-			const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive,
-			real shininess = material::detail::default_shininess);
-
-		//Create a material with the given name, diffuse map, normal map, specular map, emissive map,
-		//ambient color, diffuse color, specular color, emissive color and shininess
-		NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Texture> diffuse_map,
-			NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> emissive_map,
-			const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive,
-			real shininess = material::detail::default_shininess);
+			//Returns an immutable range of all materials in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Materials() const noexcept
+			{
+				return Objects();
+			}
 
 
-		//Create a material as a copy of the given material
-		NonOwningPtr<Material> CreateMaterial(const Material &material);
+			/*
+				Materials
+				Creating
+			*/
 
-		//Create a material by moving the given material
-		NonOwningPtr<Material> CreateMaterial(Material &&material);
+			//Create a material with the given name
+			NonOwningPtr<Material> CreateMaterial(std::string name);
 
+			//Create a material with the given name and diffuse color
+			NonOwningPtr<Material> CreateMaterial(std::string name, const Color &diffuse);
 
-		/*
-			Materials
-			Retrieving
-		*/
+			//Create a material with the given name, diffuse map and diffuse color
+			NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Animation> diffuse_map, const Color &diffuse = color::White);
 
-		//Gets a pointer to a mutable material with the given name
-		//Returns nullptr if material could not be found
-		[[nodiscard]] NonOwningPtr<Material> GetMaterial(std::string_view name) noexcept;
-
-		//Gets a pointer to an immutable material with the given name
-		//Returns nullptr if material could not be found
-		[[nodiscard]] NonOwningPtr<const Material> GetMaterial(std::string_view name) const noexcept;
+			//Create a material with the given name, diffuse map and diffuse color
+			NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Texture> diffuse_map, const Color &diffuse = color::White);
 
 
-		/*
-			Materials
-			Removing
-		*/
+			//Create a material with the given name, ambient color, diffuse color, specular color, emissive color and shininess
+			NonOwningPtr<Material> CreateMaterial(std::string name,
+				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive,
+				real shininess = material::detail::default_shininess);
 
-		//Clear all removable materials from this manager
-		void ClearMaterials() noexcept;
+			//Create a material with the given name, diffuse map, normal map, specular map, emissive map,
+			//diffuse color and shininess
+			NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Animation> diffuse_map,
+				NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> emissive_map,
+				const Color &diffuse = color::White, real shininess = material::detail::default_shininess);
 
-		//Remove a removable material from this manager
-		bool RemoveMaterial(Material &material) noexcept;
+			//Create a material with the given name, diffuse map, normal map, specular map, emissive map,
+			//diffuse color and shininess
+			NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Texture> diffuse_map,
+				NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> emissive_map,
+				const Color &diffuse = color::White, real shininess = material::detail::default_shininess);
 
-		//Remove a removable material with the given name from this manager
-		bool RemoveMaterial(std::string_view name) noexcept;
+			//Create a material with the given name, diffuse map, normal map, specular map, emissive map,
+			//ambient color, diffuse color, specular color, emissive color and shininess
+			NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Animation> diffuse_map,
+				NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> emissive_map,
+				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive,
+				real shininess = material::detail::default_shininess);
+
+			//Create a material with the given name, diffuse map, normal map, specular map, emissive map,
+			//ambient color, diffuse color, specular color, emissive color and shininess
+			NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Texture> diffuse_map,
+				NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> emissive_map,
+				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive,
+				real shininess = material::detail::default_shininess);
+
+
+			//Create a material as a copy of the given material
+			NonOwningPtr<Material> CreateMaterial(const Material &material);
+
+			//Create a material by moving the given material
+			NonOwningPtr<Material> CreateMaterial(Material &&material);
+
+
+			/*
+				Materials
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable material with the given name
+			//Returns nullptr if material could not be found
+			[[nodiscard]] NonOwningPtr<Material> GetMaterial(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable material with the given name
+			//Returns nullptr if material could not be found
+			[[nodiscard]] NonOwningPtr<const Material> GetMaterial(std::string_view name) const noexcept;
+
+
+			/*
+				Materials
+				Removing
+			*/
+
+			//Clear all removable materials from this manager
+			void ClearMaterials() noexcept;
+
+			//Remove a removable material from this manager
+			bool RemoveMaterial(Material &material) noexcept;
+
+			//Remove a removable material with the given name from this manager
+			bool RemoveMaterial(std::string_view name) noexcept;
 	};
 } //ion::graphics::materials
 

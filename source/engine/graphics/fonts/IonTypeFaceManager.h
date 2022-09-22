@@ -28,102 +28,104 @@ namespace ion::graphics::fonts
 
 
 	//A class that manages and stores type faces
-	struct TypeFaceManager final :
-		managed::ObjectManager<TypeFace, TypeFaceManager>
+	class TypeFaceManager final :
+		public managed::ObjectManager<TypeFace, TypeFaceManager>
 	{
-		//Default constructor
-		TypeFaceManager() = default;
+		public:
 
-		//Deleted copy constructor
-		TypeFaceManager(const TypeFaceManager&) = delete;
+			//Default constructor
+			TypeFaceManager() = default;
 
-		//Default move constructor
-		TypeFaceManager(TypeFaceManager&&) = default;
+			//Deleted copy constructor
+			TypeFaceManager(const TypeFaceManager&) = delete;
 
-		//Destructor
-		~TypeFaceManager() = default;
+			//Default move constructor
+			TypeFaceManager(TypeFaceManager&&) = default;
 
-
-		/*
-			Operators
-		*/
-
-		//Deleted copy assignment
-		TypeFaceManager& operator=(const TypeFaceManager&) = delete;
-
-		//Move assignment
-		TypeFaceManager& operator=(TypeFaceManager&&) = default;
+			//Destructor
+			~TypeFaceManager() = default;
 
 
-		/*
-			Ranges
-		*/
+			/*
+				Operators
+			*/
 
-		//Returns a mutable range of all type faces in this manager
-		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline auto TypeFaces() noexcept
-		{
-			return Objects();
-		}
+			//Deleted copy assignment
+			TypeFaceManager& operator=(const TypeFaceManager&) = delete;
 
-		//Returns an immutable range of all type faces in this manager
-		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline auto TypeFaces() const noexcept
-		{
-			return Objects();
-		}
+			//Move assignment
+			TypeFaceManager& operator=(TypeFaceManager&&) = default;
 
 
-		/*
-			Type faces
-			Creating
-		*/
+			/*
+				Ranges
+			*/
 
-		//Create a type face with the given name and a regular font
-		NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular);
+			//Returns a mutable range of all type faces in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto TypeFaces() noexcept
+			{
+				return Objects();
+			}
 
-		//Create a type face with the given name, a regular, bold and italic font
-		NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic);
-
-		//Create a type face with the given name, a regular, bold, italic and bold italic font
-		NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic,
-			NonOwningPtr<Font> bold_italic);
-
-
-		//Create a type face as a copy of the given type face
-		NonOwningPtr<TypeFace> CreateTypeFace(const TypeFace &type_face);
-
-		//Create a type face by moving the given type face
-		NonOwningPtr<TypeFace> CreateTypeFace(TypeFace &&type_face);
+			//Returns an immutable range of all type faces in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto TypeFaces() const noexcept
+			{
+				return Objects();
+			}
 
 
-		/*
-			Type faces
-			Retrieving
-		*/
+			/*
+				Type faces
+				Creating
+			*/
 
-		//Gets a pointer to a mutable type face with the given name
-		//Returns nullptr if type face could not be found
-		[[nodiscard]] NonOwningPtr<TypeFace> GetTypeFace(std::string_view name) noexcept;
+			//Create a type face with the given name and a regular font
+			NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular);
 
-		//Gets a pointer to an immutable type face with the given name
-		//Returns nullptr if type face could not be found
-		[[nodiscard]] NonOwningPtr<const TypeFace> GetTypeFace(std::string_view name) const noexcept;
+			//Create a type face with the given name, a regular, bold and italic font
+			NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic);
+
+			//Create a type face with the given name, a regular, bold, italic and bold italic font
+			NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic,
+				NonOwningPtr<Font> bold_italic);
 
 
-		/*
-			Type faces
-			Removing
-		*/
+			//Create a type face as a copy of the given type face
+			NonOwningPtr<TypeFace> CreateTypeFace(const TypeFace &type_face);
 
-		//Clear all removable type faces from this manager
-		void ClearTypeFaces() noexcept;
+			//Create a type face by moving the given type face
+			NonOwningPtr<TypeFace> CreateTypeFace(TypeFace &&type_face);
 
-		//Remove a removable type face from this manager
-		bool RemoveTypeFace(TypeFace &type_face) noexcept;
 
-		//Remove a removable type face with the given name from this manager
-		bool RemoveTypeFace(std::string_view name) noexcept;
+			/*
+				Type faces
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable type face with the given name
+			//Returns nullptr if type face could not be found
+			[[nodiscard]] NonOwningPtr<TypeFace> GetTypeFace(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable type face with the given name
+			//Returns nullptr if type face could not be found
+			[[nodiscard]] NonOwningPtr<const TypeFace> GetTypeFace(std::string_view name) const noexcept;
+
+
+			/*
+				Type faces
+				Removing
+			*/
+
+			//Clear all removable type faces from this manager
+			void ClearTypeFaces() noexcept;
+
+			//Remove a removable type face from this manager
+			bool RemoveTypeFace(TypeFace &type_face) noexcept;
+
+			//Remove a removable type face with the given name from this manager
+			bool RemoveTypeFace(std::string_view name) noexcept;
 	};
 } //ion::graphics::fonts
 

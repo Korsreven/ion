@@ -31,119 +31,121 @@ namespace ion::graphics::fonts
 
 
 	//A class that manages and stores texts
-	struct TextManager final :
-		managed::ObjectManager<Text, TextManager>
+	class TextManager final :
+		public managed::ObjectManager<Text, TextManager>
 	{
-		//Default constructor
-		TextManager() = default;
+		public:
+		
+			//Default constructor
+			TextManager() = default;
 
-		//Deleted copy constructor
-		TextManager(const TextManager&) = delete;
+			//Deleted copy constructor
+			TextManager(const TextManager&) = delete;
 
-		//Default move constructor
-		TextManager(TextManager&&) = default;
+			//Default move constructor
+			TextManager(TextManager&&) = default;
 
-		//Destructor
-		~TextManager() = default;
-
-
-		/*
-			Operators
-		*/
-
-		//Deleted copy assignment
-		TextManager& operator=(const TextManager&) = delete;
-
-		//Move assignment
-		TextManager& operator=(TextManager&&) = default;
+			//Destructor
+			~TextManager() = default;
 
 
-		/*
-			Ranges
-		*/
+			/*
+				Operators
+			*/
 
-		//Returns a mutable range of all texts in this manager
-		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline auto Texts() noexcept
-		{
-			return Objects();
-		}
+			//Deleted copy assignment
+			TextManager& operator=(const TextManager&) = delete;
 
-		//Returns an immutable range of all texts in this manager
-		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline auto Texts() const noexcept
-		{
-			return Objects();
-		}
+			//Move assignment
+			TextManager& operator=(TextManager&&) = default;
 
 
-		/*
-			Texts
-			Creating
-		*/
+			/*
+				Ranges
+			*/
 
-		//Create a (unbounded) text with the given name, content, alignment and a type face
-		NonOwningPtr<Text> CreateText(std::string name, std::string content, text::TextAlignment alignment,
-			NonOwningPtr<TypeFace> type_face);
+			//Returns a mutable range of all texts in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Texts() noexcept
+			{
+				return Objects();
+			}
 
-		//Create a (unbounded) text with the given name, content and a type face
-		NonOwningPtr<Text> CreateText(std::string name, std::string content, NonOwningPtr<TypeFace> type_face);
-
-		//Create a text (area) with the given name, content, formatting,
-		//horizontal and vertical alignment, area size, padding, line height factor and a type face
-		NonOwningPtr<Text> CreateText(std::string name, std::string content, text::TextFormatting formatting,
-			text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
-			const std::optional<Vector2> &area_size, const Vector2 &padding,
-			std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
-
-		//Create a text (area) with the given name, content,
-		//horizontal and vertical alignment, area size, padding, line height factor and a type face
-		NonOwningPtr<Text> CreateText(std::string name, std::string content,
-			text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
-			const std::optional<Vector2> &area_size, const Vector2 &padding,
-			std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
-
-		//Create a text (area) with the given name, content,
-		//area size, padding, line height factor and a type face
-		NonOwningPtr<Text> CreateText(std::string name, std::string content,
-			const std::optional<Vector2> &area_size, const Vector2 &padding,
-			std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
+			//Returns an immutable range of all texts in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Texts() const noexcept
+			{
+				return Objects();
+			}
 
 
-		//Create a text as a copy of the given text
-		NonOwningPtr<Text> CreateText(const Text &text);
+			/*
+				Texts
+				Creating
+			*/
 
-		//Create a text by moving the given text
-		NonOwningPtr<Text> CreateText(Text &&text);
+			//Create a (unbounded) text with the given name, content, alignment and a type face
+			NonOwningPtr<Text> CreateText(std::string name, std::string content, text::TextAlignment alignment,
+				NonOwningPtr<TypeFace> type_face);
+
+			//Create a (unbounded) text with the given name, content and a type face
+			NonOwningPtr<Text> CreateText(std::string name, std::string content, NonOwningPtr<TypeFace> type_face);
+
+			//Create a text (area) with the given name, content, formatting,
+			//horizontal and vertical alignment, area size, padding, line height factor and a type face
+			NonOwningPtr<Text> CreateText(std::string name, std::string content, text::TextFormatting formatting,
+				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
+				const std::optional<Vector2> &area_size, const Vector2 &padding,
+				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
+
+			//Create a text (area) with the given name, content,
+			//horizontal and vertical alignment, area size, padding, line height factor and a type face
+			NonOwningPtr<Text> CreateText(std::string name, std::string content,
+				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
+				const std::optional<Vector2> &area_size, const Vector2 &padding,
+				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
+
+			//Create a text (area) with the given name, content,
+			//area size, padding, line height factor and a type face
+			NonOwningPtr<Text> CreateText(std::string name, std::string content,
+				const std::optional<Vector2> &area_size, const Vector2 &padding,
+				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
 
-		/*
-			Texts
-			Retrieving
-		*/
+			//Create a text as a copy of the given text
+			NonOwningPtr<Text> CreateText(const Text &text);
 
-		//Gets a pointer to a mutable text with the given name
-		//Returns nullptr if text could not be found
-		[[nodiscard]] NonOwningPtr<Text> GetText(std::string_view name) noexcept;
-
-		//Gets a pointer to an immutable text with the given name
-		//Returns nullptr if text could not be found
-		[[nodiscard]] NonOwningPtr<const Text> GetText(std::string_view name) const noexcept;
+			//Create a text by moving the given text
+			NonOwningPtr<Text> CreateText(Text &&text);
 
 
-		/*
-			Texts
-			Removing
-		*/
+			/*
+				Texts
+				Retrieving
+			*/
 
-		//Clear all removable texts from this manager
-		void ClearTexts() noexcept;
+			//Gets a pointer to a mutable text with the given name
+			//Returns nullptr if text could not be found
+			[[nodiscard]] NonOwningPtr<Text> GetText(std::string_view name) noexcept;
 
-		//Remove a removable text from this manager
-		bool RemoveText(Text &text) noexcept;
+			//Gets a pointer to an immutable text with the given name
+			//Returns nullptr if text could not be found
+			[[nodiscard]] NonOwningPtr<const Text> GetText(std::string_view name) const noexcept;
 
-		//Remove a removable text with the given name from this manager
-		bool RemoveText(std::string_view name) noexcept;
+
+			/*
+				Texts
+				Removing
+			*/
+
+			//Clear all removable texts from this manager
+			void ClearTexts() noexcept;
+
+			//Remove a removable text from this manager
+			bool RemoveText(Text &text) noexcept;
+
+			//Remove a removable text with the given name from this manager
+			bool RemoveText(std::string_view name) noexcept;
 	};
 } //ion::graphics::fonts
 

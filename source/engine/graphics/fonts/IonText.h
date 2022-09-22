@@ -30,7 +30,7 @@ File:	IonText.h
 
 namespace ion::graphics::fonts
 {
-	struct TextManager; //Forward declaration
+	class TextManager; //Forward declaration
 	
 	using utilities::Color;
 	using utilities::Vector2;

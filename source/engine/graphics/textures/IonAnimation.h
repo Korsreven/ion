@@ -26,7 +26,7 @@ File:	IonAnimation.h
 
 namespace ion::graphics::textures
 {
-	struct AnimationManager; //Forward declaration
+	class AnimationManager; //Forward declaration
 
 	using namespace types::type_literals;
 

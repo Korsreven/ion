@@ -29,103 +29,106 @@ namespace ion::timers
 
 	//A manager class that contains timers (usually in sync with the engine)
 	//All timers are updated when elapse is called, with the time provided
-	struct TimerManager : managed::ObjectManager<Timer, TimerManager>
+	class TimerManager :
+		public managed::ObjectManager<Timer, TimerManager>
 	{
-		//Default constructor
-		TimerManager() = default;
+		public:
 
-		//Deleted copy constructor
-		TimerManager(const TimerManager&) = delete;
+			//Default constructor
+			TimerManager() = default;
 
-		//Default move constructor
-		TimerManager(TimerManager&&) = default;
+			//Deleted copy constructor
+			TimerManager(const TimerManager&) = delete;
 
-
-		/*
-			Operators
-		*/
-
-		//Deleted copy assignment
-		TimerManager& operator=(const TimerManager&) = delete;
-
-		//Move assignment
-		TimerManager& operator=(TimerManager&&) = default;
+			//Default move constructor
+			TimerManager(TimerManager&&) = default;
 
 
-		/*
-			Ranges
-		*/
+			/*
+				Operators
+			*/
 
-		//Returns a mutable range of all timers in this manager
-		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline auto Timers() noexcept
-		{
-			return Objects();
-		}
+			//Deleted copy assignment
+			TimerManager& operator=(const TimerManager&) = delete;
 
-		//Returns an immutable range of all timers in this manager
-		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline auto Timers() const noexcept
-		{
-			return Objects();
-		}
+			//Move assignment
+			TimerManager& operator=(TimerManager&&) = default;
 
 
-		/*
-			Timers
-			Creating
-		*/
+			/*
+				Ranges
+			*/
 
-		//Create a timer with the given name and interval
-		NonOwningPtr<Timer> CreateTimer(std::string name, duration interval);
+			//Returns a mutable range of all timers in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Timers() noexcept
+			{
+				return Objects();
+			}
 
-		//Create a timer with the given name, interval and callback
-		NonOwningPtr<Timer> CreateTimer(std::string name, duration interval, events::Callback<void, Timer&> on_tick);
-
-
-		//Create a timer as a copy of the given timer
-		NonOwningPtr<Timer> CreateTimer(const Timer &timer);
-
-		//Create a timer by moving the given timer
-		NonOwningPtr<Timer> CreateTimer(Timer &&timer);
-
-
-		/*
-			Timers
-			Retrieving
-		*/
-
-		//Gets a pointer to a mutable timer with the given name
-		//Returns nullptr if timer could not be found
-		[[nodiscard]] NonOwningPtr<Timer> GetTimer(std::string_view name) noexcept;
-
-		//Gets a pointer to an immutable timer with the given name
-		//Returns nullptr if timer could not be found
-		[[nodiscard]] NonOwningPtr<const Timer> GetTimer(std::string_view name) const noexcept;
+			//Returns an immutable range of all timers in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto Timers() const noexcept
+			{
+				return Objects();
+			}
 
 
-		/*
-			Timers
-			Removing
-		*/
+			/*
+				Timers
+				Creating
+			*/
 
-		//Clear all removable timers from this manager
-		void ClearTimers() noexcept;
+			//Create a timer with the given name and interval
+			NonOwningPtr<Timer> CreateTimer(std::string name, duration interval);
 
-		//Remove a removable timer from this manager
-		bool RemoveTimer(Timer &timer) noexcept;
-
-		//Remove a removable timer with the given name from this manager
-		bool RemoveTimer(std::string_view name) noexcept;
+			//Create a timer with the given name, interval and callback
+			NonOwningPtr<Timer> CreateTimer(std::string name, duration interval, events::Callback<void, Timer&> on_tick);
 
 
-		/*
-			Elapse time
-		*/
+			//Create a timer as a copy of the given timer
+			NonOwningPtr<Timer> CreateTimer(const Timer &timer);
 
-		//Elapse all timers by the given time in seconds
-		//This function is typically called each frame, with the time in seconds since last frame
-		void Elapse(duration time) noexcept;
+			//Create a timer by moving the given timer
+			NonOwningPtr<Timer> CreateTimer(Timer &&timer);
+
+
+			/*
+				Timers
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable timer with the given name
+			//Returns nullptr if timer could not be found
+			[[nodiscard]] NonOwningPtr<Timer> GetTimer(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable timer with the given name
+			//Returns nullptr if timer could not be found
+			[[nodiscard]] NonOwningPtr<const Timer> GetTimer(std::string_view name) const noexcept;
+
+
+			/*
+				Timers
+				Removing
+			*/
+
+			//Clear all removable timers from this manager
+			void ClearTimers() noexcept;
+
+			//Remove a removable timer from this manager
+			bool RemoveTimer(Timer &timer) noexcept;
+
+			//Remove a removable timer with the given name from this manager
+			bool RemoveTimer(std::string_view name) noexcept;
+
+
+			/*
+				Elapse time
+			*/
+
+			//Elapse all timers by the given time in seconds
+			//This function is typically called each frame, with the time in seconds since last frame
+			void Elapse(duration time) noexcept;
 	};
 } //ion::timers
 

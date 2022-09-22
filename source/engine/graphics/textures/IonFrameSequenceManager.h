@@ -29,110 +29,112 @@ namespace ion::graphics::textures
 
 
 	//A class that manages and stores frame sequences
-	struct FrameSequenceManager final :
-		managed::ObjectManager<FrameSequence, FrameSequenceManager>
+	class FrameSequenceManager final :
+		public managed::ObjectManager<FrameSequence, FrameSequenceManager>
 	{
-		//Default constructor
-		FrameSequenceManager() = default;
+		public:
 
-		//Deleted copy constructor
-		FrameSequenceManager(const FrameSequenceManager&) = delete;
+			//Default constructor
+			FrameSequenceManager() = default;
 
-		//Default move constructor
-		FrameSequenceManager(FrameSequenceManager&&) = default;
+			//Deleted copy constructor
+			FrameSequenceManager(const FrameSequenceManager&) = delete;
 
-		//Destructor
-		~FrameSequenceManager() = default;
+			//Default move constructor
+			FrameSequenceManager(FrameSequenceManager&&) = default;
 
-
-		/*
-			Operators
-		*/
-
-		//Deleted copy assignment
-		FrameSequenceManager& operator=(const FrameSequenceManager&) = delete;
-
-		//Move assignment
-		FrameSequenceManager& operator=(FrameSequenceManager&&) = default;
+			//Destructor
+			~FrameSequenceManager() = default;
 
 
-		/*
-			Ranges
-		*/
+			/*
+				Operators
+			*/
 
-		//Returns a mutable range of all frame sequences in this manager
-		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline auto FrameSequences() noexcept
-		{
-			return Objects();
-		}
+			//Deleted copy assignment
+			FrameSequenceManager& operator=(const FrameSequenceManager&) = delete;
 
-		//Returns an immutable range of all frame sequences in this manager
-		//This can be used directly with a range-based for loop
-		[[nodiscard]] inline auto FrameSequences() const noexcept
-		{
-			return Objects();
-		}
+			//Move assignment
+			FrameSequenceManager& operator=(FrameSequenceManager&&) = default;
 
 
-		/*
-			Frame sequences
-			Creating
-		*/
+			/*
+				Ranges
+			*/
 
-		//Create a frame sequence with the given name and frames (textures)
-		NonOwningPtr<FrameSequence> CreateFrameSequence(std::string name, const frame_sequence::detail::container_type &frames);
+			//Returns a mutable range of all frame sequences in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto FrameSequences() noexcept
+			{
+				return Objects();
+			}
 
-		//Create a frame sequence with the given name and frame references (textures)
-		template <typename... Tn, typename = std::enable_if_t<std::conjunction_v<std::is_same<NonOwningPtr<Texture>, Tn>...>>>
-		NonOwningPtr<FrameSequence> CreateFrameSequence(std::string name, NonOwningPtr<Texture> frame, Tn ...rest)
-		{
-			return CreateFrameSequence(std::move(name), {frame, rest...});
-		}
-
-		//Create a frame sequence with the given name, first frame (texture) and total frames
-		//Takes the name of the first frame with a numeric suffix and increases it in range [first, total frames)
-		//The generated names must be actual frames located in the same owner as the first frame
-		//First example: frame_0 and 4, produces the sequence: frame_0, frame_1, frame_2, frame_3
-		//Second example: frame_01 and 4, produces the sequence: frame_01, frame_02, frame_03, frame_04
-		//Third example: frame09 and 3, produces the sequence: frame09, frame10, frame11
-		NonOwningPtr<FrameSequence> CreateFrameSequence(std::string name, NonOwningPtr<Texture> first_frame, int total_frames);
+			//Returns an immutable range of all frame sequences in this manager
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto FrameSequences() const noexcept
+			{
+				return Objects();
+			}
 
 
-		//Create a frame sequence as a copy of the given frame sequence
-		NonOwningPtr<FrameSequence> CreateFrameSequence(const FrameSequence &frame_sequence);
+			/*
+				Frame sequences
+				Creating
+			*/
 
-		//Create a frame sequence by moving the given frame sequence
-		NonOwningPtr<FrameSequence> CreateFrameSequence(FrameSequence &&frame_sequence);
+			//Create a frame sequence with the given name and frames (textures)
+			NonOwningPtr<FrameSequence> CreateFrameSequence(std::string name, const frame_sequence::detail::container_type &frames);
+
+			//Create a frame sequence with the given name and frame references (textures)
+			template <typename... Tn, typename = std::enable_if_t<std::conjunction_v<std::is_same<NonOwningPtr<Texture>, Tn>...>>>
+			NonOwningPtr<FrameSequence> CreateFrameSequence(std::string name, NonOwningPtr<Texture> frame, Tn ...rest)
+			{
+				return CreateFrameSequence(std::move(name), {frame, rest...});
+			}
+
+			//Create a frame sequence with the given name, first frame (texture) and total frames
+			//Takes the name of the first frame with a numeric suffix and increases it in range [first, total frames)
+			//The generated names must be actual frames located in the same owner as the first frame
+			//First example: frame_0 and 4, produces the sequence: frame_0, frame_1, frame_2, frame_3
+			//Second example: frame_01 and 4, produces the sequence: frame_01, frame_02, frame_03, frame_04
+			//Third example: frame09 and 3, produces the sequence: frame09, frame10, frame11
+			NonOwningPtr<FrameSequence> CreateFrameSequence(std::string name, NonOwningPtr<Texture> first_frame, int total_frames);
 
 
-		/*
-			Frame sequences
-			Retrieving
-		*/
+			//Create a frame sequence as a copy of the given frame sequence
+			NonOwningPtr<FrameSequence> CreateFrameSequence(const FrameSequence &frame_sequence);
 
-		//Gets a pointer to a mutable frame sequence with the given name
-		//Returns nullptr if frame sequence could not be found
-		[[nodiscard]] NonOwningPtr<FrameSequence> GetFrameSequence(std::string_view name) noexcept;
-
-		//Gets a pointer to an immutable frame sequence with the given name
-		//Returns nullptr if frame sequence could not be found
-		[[nodiscard]] NonOwningPtr<const FrameSequence> GetFrameSequence(std::string_view name) const noexcept;
+			//Create a frame sequence by moving the given frame sequence
+			NonOwningPtr<FrameSequence> CreateFrameSequence(FrameSequence &&frame_sequence);
 
 
-		/*
-			Frame sequences
-			Removing
-		*/
+			/*
+				Frame sequences
+				Retrieving
+			*/
 
-		//Clear all removable frame sequences from this manager
-		void ClearFrameSequences() noexcept;
+			//Gets a pointer to a mutable frame sequence with the given name
+			//Returns nullptr if frame sequence could not be found
+			[[nodiscard]] NonOwningPtr<FrameSequence> GetFrameSequence(std::string_view name) noexcept;
 
-		//Remove a removable frame sequence from this manager
-		bool RemoveFrameSequence(FrameSequence &frame_sequences) noexcept;
+			//Gets a pointer to an immutable frame sequence with the given name
+			//Returns nullptr if frame sequence could not be found
+			[[nodiscard]] NonOwningPtr<const FrameSequence> GetFrameSequence(std::string_view name) const noexcept;
 
-		//Remove a removable frame sequence with the given name from this manager
-		bool RemoveFrameSequence(std::string_view name) noexcept;
+
+			/*
+				Frame sequences
+				Removing
+			*/
+
+			//Clear all removable frame sequences from this manager
+			void ClearFrameSequences() noexcept;
+
+			//Remove a removable frame sequence from this manager
+			bool RemoveFrameSequence(FrameSequence &frame_sequences) noexcept;
+
+			//Remove a removable frame sequence with the given name from this manager
+			bool RemoveFrameSequence(std::string_view name) noexcept;
 	};
 } //ion::graphics::textures
 

@@ -19,7 +19,7 @@ File:	IonTypeFace.h
 
 namespace ion::graphics::fonts
 {
-	struct TypeFaceManager; //Forward declaration
+	class TypeFaceManager; //Forward declaration
 
 	namespace type_face::detail
 	{

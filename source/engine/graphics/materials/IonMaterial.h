@@ -37,7 +37,7 @@ namespace ion::graphics
 
 namespace ion::graphics::materials
 {
-	struct MaterialManager; //Forward declaration
+	class MaterialManager; //Forward declaration
 
 	using namespace types::type_literals;
 	using namespace utilities;

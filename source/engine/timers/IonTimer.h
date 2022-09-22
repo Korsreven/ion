@@ -21,7 +21,7 @@ File:	IonTimer.h
 
 namespace ion::timers
 {
-	struct TimerManager;
+	class TimerManager; //Forward declaration
 
 	namespace timer::detail
 	{

@@ -22,7 +22,7 @@ File:	IonFrameSequence.h
 
 namespace ion::graphics::textures
 {
-	struct FrameSequenceManager; //Forward declaration
+	class FrameSequenceManager; //Forward declaration
 
 	namespace frame_sequence::detail
 	{
