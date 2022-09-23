@@ -39,7 +39,6 @@ namespace ion::graphics::render
 
 			using render_primitives = std::vector<RenderPrimitive*>;
 
-
 			enum class groupable_status
 			{
 				Yes,
@@ -172,7 +171,7 @@ namespace ion::graphics::render
 				Batches
 			*/
 
-			//
+			//Clears all batches from this renderer
 			void ClearBatches() noexcept;
 
 
@@ -180,17 +179,17 @@ namespace ion::graphics::render
 				Primitives
 			*/
 
-			//
+			//Add a primitive to this renderer
 			bool AddPrimitive(RenderPrimitive &primitive);
 
-			//
+			//Refresh a primitive in this renderer
 			bool RefreshPrimitive(RenderPrimitive &primitive);
 
 
-			//
+			//Remove a primitive from this renderer
 			bool RemovePrimitive(RenderPrimitive &primitive) noexcept;
 
-			//
+			//Clear all primitives from this renderer
 			void ClearPrimitives() noexcept;
 
 
