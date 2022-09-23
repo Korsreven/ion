@@ -103,6 +103,8 @@ namespace ion::graphics::render::vertex
 	} //vertex_batch
 
 
+	//A class representing a batch of vertices that can be drawn in a single call
+	//Vertices are drawn either from a VBO or directly from memory with or without a shader program
 	class VertexBatch final
 	{
 		private:

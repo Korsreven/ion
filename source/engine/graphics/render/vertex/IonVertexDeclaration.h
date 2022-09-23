@@ -114,6 +114,9 @@ namespace ion::graphics::render::vertex
 	} //vertex_declaration
 
 
+	//A class representing a vertex declaration containing multiple vertex elements
+	//A vertex declaration describes the layout of where elements are located in the vertex data
+	//Each vertex elements has an attribute name, type, offset and stride
 	class VertexDeclaration final
 	{
 		private:

@@ -23,6 +23,7 @@ namespace ion::graphics::render::vertex
 	} //vertex_data_view::detail
 
 
+	//A class representing a sub range (view) of some vertex data
 	class VertexDataView
 	{
 		private:

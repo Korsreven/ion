@@ -38,6 +38,7 @@ namespace ion::graphics::render::vertex
 	} //vertex_array_object::detail
 
 
+	//A class representing a vertex array object (VAO)
 	class VertexArrayObject final
 	{
 		private:

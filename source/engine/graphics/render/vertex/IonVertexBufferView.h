@@ -25,6 +25,7 @@ namespace ion::graphics::render::vertex
 	} //vertex_buffer_view::detail
 
 
+	//A class representing a sub range (view) of a vertex buffer object
 	class VertexBufferView final
 	{
 		private:

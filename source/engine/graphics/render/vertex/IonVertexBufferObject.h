@@ -53,6 +53,7 @@ namespace ion::graphics::render::vertex
 	} //vertex_buffer_object
 
 
+	//A class representing a vertex buffer object (VBO)
 	class VertexBufferObject final
 	{
 		private:
