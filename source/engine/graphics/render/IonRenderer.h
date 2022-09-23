@@ -93,6 +93,8 @@ namespace ion::graphics::render
 	} //renderer
 
 
+	//A class representing a renderer that groups render primitives into batches
+	//All batches are sorted and compressed, before the vertex data is uploaded to VRAM and drawn
 	class Renderer
 	{
 		private:
