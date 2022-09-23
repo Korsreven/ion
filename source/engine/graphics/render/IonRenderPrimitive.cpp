@@ -266,13 +266,13 @@ bool all_passes_equal(const render_passes &passes, const render_passes &passes2)
 
 void RenderPrimitive::UpdateWorldVertexData()
 {
-	//Local data or model matrix has changed
-	if (local_data_changed_ || model_matrix_changed_)
+	//Vertex data or model matrix has changed
+	if (data_changed_ || model_matrix_changed_)
 	{
-		world_vertex_data_ = local_vertex_data_;
+		world_vertex_data_ = vertex_data_;
 		detail::transform_positions(vertex_metrics_, model_matrix_, world_vertex_data_);
 
-		local_data_changed_ = false;
+		data_changed_ = false;
 		world_data_changed_ = true;
 		model_matrix_changed_ = false;
 	}
@@ -280,7 +280,7 @@ void RenderPrimitive::UpdateWorldVertexData()
 	//Opacity has changed
 	if (opacity_changed_)
 	{
-		detail::apply_opacity(vertex_metrics_, opacity_, local_vertex_data_, world_vertex_data_);
+		detail::apply_opacity(vertex_metrics_, opacity_, vertex_data_, world_vertex_data_);
 		world_data_changed_ = true;
 		opacity_changed_ = false;
 	}
@@ -288,16 +288,16 @@ void RenderPrimitive::UpdateWorldVertexData()
 
 void RenderPrimitive::UpdateWorldZ() noexcept
 {
-	//Local data or model matrix has changed
-	if (local_data_changed_ || model_matrix_changed_)
+	//Vertex data or model matrix has changed
+	if (data_changed_ || model_matrix_changed_)
 	{
-		auto z = detail::get_position_z(vertex_metrics_, local_vertex_data_);
+		auto z = detail::get_position_z(vertex_metrics_, vertex_data_);
 
 		//Check if position z has changed for first vertex
 		if (z = (model_matrix_ * Vector3{0.0_r, 0.0_r, z}).Z(); world_z_ != z)
 		{
 			world_z_ = z;
-			need_refresh_ |= visible_;
+			need_refresh_ |= world_visible_;
 		}
 	}
 }
@@ -305,11 +305,13 @@ void RenderPrimitive::UpdateWorldZ() noexcept
 
 //Public
 
-RenderPrimitive::RenderPrimitive(vertex::vertex_batch::VertexDrawMode draw_mode, vertex::VertexDeclaration vertex_declaration) noexcept :
+RenderPrimitive::RenderPrimitive(vertex::vertex_batch::VertexDrawMode draw_mode, vertex::VertexDeclaration vertex_declaration,
+	bool visible) noexcept :
 
 	draw_mode_{draw_mode},
 	vertex_declaration_{std::move(vertex_declaration)},
-	vertex_metrics_{detail::get_vertex_metrics(vertex_declaration_)}
+	vertex_metrics_{detail::get_vertex_metrics(vertex_declaration_)},
+	visible_{visible}
 {
 	//Empty
 }
@@ -324,38 +326,22 @@ RenderPrimitive::~RenderPrimitive() noexcept
 	Modifiers
 */
 
-void RenderPrimitive::LocalVertexData(render_primitive::vertex_data data) noexcept
+void RenderPrimitive::VertexData(render_primitive::vertex_data data) noexcept
 {
-	if (std::size(local_vertex_data_) != std::size(data))
-		need_refresh_ |= visible_;
+	if (std::size(vertex_data_) != std::size(data))
+		need_refresh_ |= world_visible_;
 
-	local_vertex_data_ = std::move(data);
-	aabb_ = detail::get_aabb(vertex_metrics_, local_vertex_data_);
+	vertex_data_ = std::move(data);
+	aabb_ = detail::get_aabb(vertex_metrics_, vertex_data_);
 
-	local_data_changed_ = true;
+	data_changed_ = true;
 	world_data_changed_ = false; //Discard world changes
 }
 
-void RenderPrimitive::LocalVertexData(render_primitive::vertex_data data, const Matrix4 &model_matrix) noexcept
+void RenderPrimitive::VertexData(render_primitive::vertex_data data, const Matrix4 &model_matrix) noexcept
 {
-	LocalVertexData(std::move(data));
+	VertexData(std::move(data));
 	ModelMatrix(model_matrix);
-}
-
-void RenderPrimitive::WorldVertexData(render_primitive::vertex_data data, const Matrix4 &applied_model_matrix) noexcept
-{
-	if (std::size(world_vertex_data_) != std::size(data))
-		need_refresh_ |= visible_;
-
-	world_vertex_data_ = std::move(data);
-	local_vertex_data_ = world_vertex_data_;
-	model_matrix_ = applied_model_matrix;
-	world_z_ = render_primitive::detail::get_position_z(vertex_metrics_, world_vertex_data_);
-	aabb_ = detail::get_aabb(vertex_metrics_, world_vertex_data_);
-
-	local_data_changed_ = false; //Discard local changes
-	world_data_changed_ = true;
-	model_matrix_changed_ = false; //Discard matrix changes
 }
 
 void RenderPrimitive::ModelMatrix(const Matrix4 &model_matrix) noexcept
@@ -370,12 +356,12 @@ void RenderPrimitive::ModelMatrix(const Matrix4 &model_matrix) noexcept
 
 void RenderPrimitive::BaseColor(const Color &color) noexcept
 {
-	if (detail::get_color(vertex_metrics_, local_vertex_data_) != color)
+	if (detail::get_color(vertex_metrics_, vertex_data_) != color)
 	{
-		detail::apply_color(vertex_metrics_, color, local_vertex_data_);
+		detail::apply_color(vertex_metrics_, color, vertex_data_);
 
-		//No other local changes, apply directly to world
-		if (!local_data_changed_)
+		//No other data changes, apply directly to world
+		if (!data_changed_)
 		{
 			detail::apply_color(vertex_metrics_, color, world_vertex_data_);
 
@@ -425,10 +411,10 @@ vertex::VertexBatch RenderPrimitive::MakeVertexBatch() const noexcept
 
 	return vertex_batch;
 }
-		
-		
+
+
 /*
-	Preparing
+	Updating
 */
 
 void RenderPrimitive::Refresh()
@@ -439,7 +425,7 @@ void RenderPrimitive::Refresh()
 	if (current_material_.get() != applied_material_)
 	{
 		applied_material_ = current_material_.get();
-		need_refresh_ = visible_;
+		need_refresh_ = world_visible_;
 	}
 
 	if (need_refresh_)
@@ -455,9 +441,9 @@ bool RenderPrimitive::Prepare()
 {
 	UpdateWorldVertexData();
 
-	auto data_changed = world_data_changed_;
+	auto world_data_changed = world_data_changed_;
 	world_data_changed_ = false;
-	return data_changed;
+	return world_data_changed;
 }
 
 } //ion::graphics::render

@@ -651,7 +651,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				ion::graphics::render::vertex::vertex_batch::VertexDrawMode::Triangles,
 				ion::graphics::scene::shapes::mesh::detail::get_vertex_declaration()
 			};
-			primitive.LocalVertexData(
+			primitive.VertexData(
 				{1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, //v1
 				 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, //v2
 				 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, 1.0_r,  1.0_r, 1.0_r, 1.0_r, //v3
@@ -668,7 +668,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				ion::graphics::render::vertex::vertex_batch::VertexDrawMode::Triangles,
 				ion::graphics::scene::shapes::mesh::detail::get_vertex_declaration()
 			};
-			primitive2.LocalVertexData(
+			primitive2.VertexData(
 				{2.0_r, 2.0_r, 1.0_r,  2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, //v1
 				 2.0_r, 2.0_r, 1.0_r,  2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, //v2
 				 2.0_r, 2.0_r, 1.0_r,  2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, 2.0_r,  2.0_r, 2.0_r, 2.0_r, //v3
@@ -685,7 +685,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				ion::graphics::render::vertex::vertex_batch::VertexDrawMode::Triangles,
 				ion::graphics::scene::shapes::mesh::detail::get_vertex_declaration()
 			};
-			primitive3.LocalVertexData(
+			primitive3.VertexData(
 				{3.0_r, 3.0_r, 1.0_r,  3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, //v1
 				 3.0_r, 3.0_r, 1.0_r,  3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, //v2
 				 3.0_r, 3.0_r, 1.0_r,  3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, 3.0_r,  3.0_r, 3.0_r, 3.0_r, //v3
