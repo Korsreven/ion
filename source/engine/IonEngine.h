@@ -321,8 +321,12 @@ namespace ion
 				Creating
 			*/
 
-			//Create a scene graph with the given name
-			NonOwningPtr<graphics::scene::graph::SceneGraph> CreateSceneGraph(std::string name);
+			//Create a scene graph with the given name and whether or not is should be enabled
+			NonOwningPtr<graphics::scene::graph::SceneGraph> CreateSceneGraph(std::string name, bool enabled = true);
+
+			//Create a scene graph with the given name, initial data sizes and whether or not is should be enabled
+			NonOwningPtr<graphics::scene::graph::SceneGraph> CreateSceneGraph(std::string name,
+				int initial_data_size, int initial_batch_data_size, bool enabled = true);
 
 
 			/*

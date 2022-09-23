@@ -15,12 +15,14 @@ File:	IonSceneGraph.h
 
 #include <array>
 #include <optional>
+#include <string>
 #include <vector>
 
 #include "IonSceneNode.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonSceneNodeListener.h"
 #include "graphics/render/IonFog.h"
+#include "graphics/render/IonRenderer.h"
 #include "graphics/textures/IonTexture.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonMatrix4.h"
@@ -134,6 +136,7 @@ namespace ion::graphics::scene::graph
 			bool lighting_enabled_ = true;		
 
 			SceneNode root_node_;
+			render::Renderer renderer_;
 
 
 			scene_graph::detail::light_pointers lights_;
@@ -158,7 +161,11 @@ namespace ion::graphics::scene::graph
 
 		public:
 
-			using managed::ManagedObject<Engine>::ManagedObject;
+			//Construct a scene graph with the given name and whether or not is should be enabled
+			explicit SceneGraph(std::string name, bool enabled = true);
+
+			//Construct a scene graph with the given name, initial data sizes and whether or not is should be enabled
+			SceneGraph(std::string name, int initial_data_size, int initial_batch_data_size, bool enabled = true);
 
 			//Destructor
 			~SceneGraph() noexcept;
@@ -302,6 +309,18 @@ namespace ion::graphics::scene::graph
 			[[nodiscard]] inline auto& RootNode() const noexcept
 			{
 				return root_node_;
+			}
+
+			//Returns a mutable reference to the renderer of this scene graph
+			[[nodiscard]] inline auto& SceneRenderer() noexcept
+			{
+				return renderer_;
+			}
+
+			//Returns an immutable reference to the renderer of this scene graph
+			[[nodiscard]] inline auto& SceneRenderer() const noexcept
+			{
+				return renderer_;
 			}
 
 

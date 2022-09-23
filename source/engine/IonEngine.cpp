@@ -363,9 +363,15 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 	Creating
 */
 
-NonOwningPtr<graphics::scene::graph::SceneGraph> Engine::CreateSceneGraph(std::string name)
+NonOwningPtr<graphics::scene::graph::SceneGraph> Engine::CreateSceneGraph(std::string name, bool enabled)
 {
-	return SceneGraphBase::Create(std::move(name));
+	return SceneGraphBase::Create(std::move(name), enabled);
+}
+
+NonOwningPtr<graphics::scene::graph::SceneGraph> Engine::CreateSceneGraph(std::string name,
+	int initial_data_size, int initial_batch_data_size, bool enabled)
+{
+	return SceneGraphBase::Create(std::move(name), initial_data_size, initial_batch_data_size, enabled);
 }
 
 
