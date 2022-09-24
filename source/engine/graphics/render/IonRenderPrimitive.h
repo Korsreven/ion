@@ -115,6 +115,27 @@ namespace ion::graphics::render
 			void UpdateWorldVertexData();
 			void UpdateWorldZ() noexcept;
 
+
+			/*
+				Events
+			*/
+
+			virtual void VertexDataChanged() noexcept;
+			virtual void ModelMatrixChanged() noexcept;
+
+			virtual void PassesChanged() noexcept;
+			virtual void MaterialChanged() noexcept;
+			virtual void TextureChanged() noexcept;
+
+			virtual void ColorChanged() noexcept;
+			virtual void OpacityChanged() noexcept;
+			virtual void PointSizeChanged() noexcept;
+			virtual void LineThicknessChanged() noexcept;
+			virtual void WireFrameChanged() noexcept;
+			virtual void PointSpriteChanged() noexcept;
+			virtual void VisibleChanged() noexcept;
+			virtual void RendererChanged() noexcept;
+
 		public:
 
 			//Construct a new render primitive with the given draw mode, vertex declaration and visibility
@@ -146,6 +167,7 @@ namespace ion::graphics::render
 				{
 					passes_ = std::move(passes);
 					need_refresh_ |= world_visible_;
+					PassesChanged();
 				}
 			}
 		
@@ -157,6 +179,7 @@ namespace ion::graphics::render
 					current_material_ = material;
 					applied_material_ = material.get();
 					need_refresh_ |= world_visible_;
+					MaterialChanged();
 				}
 			}
 
@@ -167,6 +190,7 @@ namespace ion::graphics::render
 				{
 					texture_handle_ = texture_handle;
 					need_refresh_ |= world_visible_;
+					TextureChanged();
 				}
 			}
 
@@ -181,6 +205,7 @@ namespace ion::graphics::render
 				{
 					opacity_ = opacity;
 					opacity_changed_ = true;
+					OpacityChanged();
 				}
 			}
 
@@ -191,6 +216,7 @@ namespace ion::graphics::render
 				{
 					point_size_ = size;
 					need_refresh_ |= world_visible_;
+					PointSizeChanged();
 				}
 			}
 
@@ -201,6 +227,7 @@ namespace ion::graphics::render
 				{
 					line_thickness_ = thickness;
 					need_refresh_ |= world_visible_;
+					LineThicknessChanged();
 				}
 			}
 
@@ -211,6 +238,7 @@ namespace ion::graphics::render
 				{
 					wire_frame_ = enable;
 					need_refresh_ |= world_visible_;
+					WireFrameChanged();
 				}
 			}
 
@@ -221,13 +249,18 @@ namespace ion::graphics::render
 				{
 					point_sprite_ = enable;
 					need_refresh_ |= world_visible_;
+					PointSpriteChanged();
 				}
 			}
 
 			//Sets whether or not this primitive is visible
 			inline void Visible(bool visible) noexcept
 			{
-				visible_ = visible;
+				if (visible_ != visible)
+				{
+					visible_ = visible;
+					VisibleChanged();
+				}
 			}
 
 			//Sets whether or not this primitive is visible in world space
@@ -243,7 +276,11 @@ namespace ion::graphics::render
 			//Sets the parent renderer of this primitive to the given renderer
 			inline void ParentRenderer(Renderer *parent_renderer) noexcept
 			{
-				parent_renderer_ = parent_renderer;
+				if (parent_renderer_ != parent_renderer)
+				{
+					parent_renderer_ = parent_renderer;
+					RendererChanged();
+				}
 			}
 
 
@@ -404,12 +441,12 @@ namespace ion::graphics::render
 				Updating
 			*/
 
-			//Refresh render primitive, meaning when it has to be regrouped
-			//This is called once regardless of passes
+			//Refresh render primitive, by regrouping it in the renderer
+			//This is typically called once per frame
 			void Refresh();
 
-			//Prepare render primitive
-			//This is called once regardless of passes
+			//Prepare render primitive, by updating world vertex data
+			//This is typically called once per frame
 			[[nodiscard]] bool Prepare();
 	};
 

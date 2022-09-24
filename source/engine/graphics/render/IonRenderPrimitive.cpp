@@ -303,6 +303,78 @@ void RenderPrimitive::UpdateWorldZ() noexcept
 }
 
 
+/*
+	Events
+*/
+
+void RenderPrimitive::VertexDataChanged() noexcept
+{
+	//Optional to override
+}
+
+void RenderPrimitive::ModelMatrixChanged() noexcept
+{
+	//Optional to override
+}
+
+
+void RenderPrimitive::PassesChanged() noexcept
+{
+	//Optional to override
+}
+
+void RenderPrimitive::MaterialChanged() noexcept
+{
+	//Optional to override
+}
+
+void RenderPrimitive::TextureChanged() noexcept
+{
+	//Optional to override
+}
+
+
+void RenderPrimitive::ColorChanged() noexcept
+{
+	//Optional to override
+}
+
+void RenderPrimitive::OpacityChanged() noexcept
+{
+	//Optional to override
+}
+
+void RenderPrimitive::PointSizeChanged() noexcept
+{
+	//Optional to override
+}
+
+void RenderPrimitive::LineThicknessChanged() noexcept
+{
+	//Optional to override
+}
+
+void RenderPrimitive::WireFrameChanged() noexcept
+{
+	//Optional to override
+}
+
+void RenderPrimitive::PointSpriteChanged() noexcept
+{
+	//Optional to override
+}
+
+void RenderPrimitive::VisibleChanged() noexcept
+{
+	//Optional to override
+}
+
+void RenderPrimitive::RendererChanged() noexcept
+{
+	//Optional to override
+}
+
+
 //Public
 
 RenderPrimitive::RenderPrimitive(vertex::vertex_batch::VertexDrawMode draw_mode, vertex::VertexDeclaration vertex_declaration,
@@ -336,6 +408,7 @@ void RenderPrimitive::VertexData(render_primitive::vertex_data data) noexcept
 
 	data_changed_ = true;
 	world_data_changed_ = false; //Discard world changes
+	VertexDataChanged();
 }
 
 void RenderPrimitive::VertexData(render_primitive::vertex_data data, const Matrix4 &model_matrix) noexcept
@@ -350,6 +423,7 @@ void RenderPrimitive::ModelMatrix(const Matrix4 &model_matrix) noexcept
 	{
 		model_matrix_ = model_matrix;
 		model_matrix_changed_ = true;
+		ModelMatrixChanged();
 	}
 }
 
@@ -370,6 +444,7 @@ void RenderPrimitive::BaseColor(const Color &color) noexcept
 				opacity_changed_ = true;
 
 			world_data_changed_ = true;
+			ColorChanged();
 		}
 	}
 }
@@ -427,6 +502,7 @@ void RenderPrimitive::Refresh()
 	{
 		applied_material_ = current_material_.get();
 		need_refresh_ = world_visible_;
+		MaterialChanged();
 	}
 
 	if (need_refresh_)
