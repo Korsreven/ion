@@ -388,6 +388,7 @@ bool RenderPrimitive::IsGroupable(const RenderPrimitive &primitive) const noexce
 		   point_size_ == primitive.point_size_ &&
 		   line_thickness_ == primitive.line_thickness_ &&
 		   wire_frame_ == primitive.wire_frame_ &&
+		   point_sprite_ == primitive.point_sprite_ &&
 
 		   //Check slowest equalities last
 		   vertex_declaration_ == primitive.vertex_declaration_ &&

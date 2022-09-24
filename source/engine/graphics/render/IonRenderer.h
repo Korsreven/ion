@@ -86,9 +86,11 @@ namespace ion::graphics::render
 			void set_point_size(real size) noexcept;
 			void set_line_width(real width) noexcept;
 
-			void enable_wire_frames() noexcept;
-			void disable_wire_frames() noexcept;
+			void enable_wire_frame() noexcept;
+			void disable_wire_frame() noexcept;
 			
+			void enable_point_sprite() noexcept;
+			void disable_point_sprite() noexcept;
 		} //detail
 	} //renderer
 

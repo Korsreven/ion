@@ -99,6 +99,7 @@ namespace ion::graphics::render
 			real point_size_ = 1.0_r;
 			real line_thickness_ = 1.0_r;
 			bool wire_frame_ = false;
+			bool point_sprite_ = false;
 			bool visible_ = false;
 			bool world_visible_ = false;
 			Renderer *parent_renderer_ = nullptr;
@@ -209,6 +210,16 @@ namespace ion::graphics::render
 				if (wire_frame_ != enable)
 				{
 					wire_frame_ = enable;
+					need_refresh_ |= world_visible_;
+				}
+			}
+
+			//Sets whether or not this primitive has point sprite enabled
+			inline void PointSprite(bool enable) noexcept
+			{
+				if (point_sprite_ != enable)
+				{
+					point_sprite_ = enable;
 					need_refresh_ |= world_visible_;
 				}
 			}
@@ -350,6 +361,12 @@ namespace ion::graphics::render
 			[[nodiscard]] inline auto WireFrame() const noexcept
 			{
 				return wire_frame_;
+			}
+
+			//Returns whether or not this primitive has point sprite enabled
+			[[nodiscard]] inline auto PointSprite() const noexcept
+			{
+				return point_sprite_;
 			}
 
 			//Returns whether or not this primitive is visible

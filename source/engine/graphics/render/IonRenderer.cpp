@@ -65,14 +65,55 @@ void set_line_width(real width) noexcept
 }
 
 
-void enable_wire_frames() noexcept
+void enable_wire_frame() noexcept
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
-void disable_wire_frames() noexcept
+void disable_wire_frame() noexcept
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+
+void enable_point_sprite() noexcept
+{
+	switch (gl::PointSprite_Support())
+	{
+		case gl::Extension::Core:
+		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE); //Enable sprite tex coords
+		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT); //Set 0,0 to lower left
+		glEnable(GL_VERTEX_PROGRAM_POINT_SIZE); //Enable varying point size
+		glEnable(GL_POINT_SPRITE); //Enable point sprite
+		break;
+
+		case gl::Extension::ARB:
+		glTexEnvi(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE); //Enable sprite tex coords
+		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT); //Set 0,0 to lower left
+		glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB); //Enable varying point size
+		glEnable(GL_POINT_SPRITE_ARB); //Enable point sprite
+		break;
+	}
+}
+
+void disable_point_sprite() noexcept
+{
+	switch (gl::PointSprite_Support())
+	{
+		case gl::Extension::Core:
+		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT); //Set 0,0 back to upper left
+		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_FALSE); //Disable sprite tex coords
+		glDisable(GL_VERTEX_PROGRAM_POINT_SIZE); //Disable varying point size
+		glDisable(GL_POINT_SPRITE); //Disable point sprite
+		break;
+
+		case gl::Extension::ARB:
+		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT); //Set 0,0 back to upper left
+		glTexEnvi(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE); //Disable sprite tex coords
+		glDisable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB); //Disable varying point size
+		glDisable(GL_POINT_SPRITE_ARB); //Disable point sprite
+		break;
+	}
 }
 
 } //renderer::detail
@@ -687,15 +728,21 @@ void Renderer::Draw() noexcept
 				detail::set_line_width(primitive->LineThickness());
 
 			if (primitive->WireFrame())
-				detail::enable_wire_frames();
+				detail::enable_wire_frame();
+
+			if (primitive->PointSprite())
+				detail::enable_point_sprite();
 
 
 			for (auto iterations = pass.Iterations(); iterations > 0; --iterations)
 				batch->vertex_batch.Draw(shader_program); //Draw batch
 
 
+			if (primitive->PointSprite())
+				detail::disable_point_sprite();
+
 			if (primitive->WireFrame())
-				detail::disable_wire_frames();
+				detail::disable_wire_frame();
 
 			if (primitive->LineThickness() != 1.0_r)
 				detail::set_line_width(1.0_r);
