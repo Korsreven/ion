@@ -133,6 +133,24 @@ void apply_color(const vertex_metrics &metrics, const Color &color, vertex_data 
 	}
 }
 
+void apply_opacity(const vertex_metrics &metrics, real opacity, vertex_data &data) noexcept
+{
+	auto size = std::ssize(data);
+	auto stride = std::max(metrics.color_components, metrics.color_stride);
+
+	switch (metrics.color_components)
+	{
+		//Four-channels (r, g, b, a)
+		case 4: //Need alpha channel
+		{
+			for (auto off = metrics.color_offset; off + 3 < size; off += stride)
+				data[off + 3] = opacity;
+
+			break;
+		}
+	}
+}
+
 void apply_opacity(const vertex_metrics &metrics, real opacity, const vertex_data &source_data, vertex_data &data) noexcept
 {
 	auto size = std::ssize(data);
@@ -200,7 +218,24 @@ Color get_color(const vertex_metrics &metrics, const vertex_data &data) noexcept
 		}
 	}
 
-	return {};
+	return color::Transparent;
+}
+
+real get_opacity(const vertex_metrics &metrics, const vertex_data &data) noexcept
+{
+	switch (metrics.color_components)
+	{
+		//Four-channels (r, g, b, a)
+		case 4: //Need alpha channel
+		{
+			if (metrics.color_offset + 3 < std::ssize(data))
+				return data[metrics.color_offset + 3];
+
+			break;
+		}
+	}
+
+	return 0.0_r;
 }
 
 Aabb get_aabb(const vertex_metrics &metrics, const vertex_data &data) noexcept
@@ -334,7 +369,12 @@ void RenderPrimitive::TextureChanged() noexcept
 }
 
 
-void RenderPrimitive::ColorChanged() noexcept
+void RenderPrimitive::BaseColorChanged() noexcept
+{
+	//Optional to override
+}
+
+void RenderPrimitive::BaseOpacityChanged() noexcept
 {
 	//Optional to override
 }
@@ -343,6 +383,7 @@ void RenderPrimitive::OpacityChanged() noexcept
 {
 	//Optional to override
 }
+
 
 void RenderPrimitive::PointSizeChanged() noexcept
 {
@@ -444,7 +485,28 @@ void RenderPrimitive::BaseColor(const Color &color) noexcept
 				opacity_changed_ = true;
 
 			world_data_changed_ = true;
-			ColorChanged();
+			BaseColorChanged();
+		}
+	}
+}
+
+void RenderPrimitive::BaseOpacity(real opacity) noexcept
+{
+	if (detail::get_opacity(vertex_metrics_, vertex_data_) != opacity)
+	{
+		detail::apply_opacity(vertex_metrics_, opacity, vertex_data_);
+
+		//No other data changes, apply directly to world
+		if (!data_changed_)
+		{
+			detail::apply_opacity(vertex_metrics_, opacity, world_vertex_data_);
+
+			//No other opacity changes, apply opacity again
+			if (!opacity_changed_ && opacity_ != 1.0_r)
+				opacity_changed_ = true;
+
+			world_data_changed_ = true;
+			BaseOpacityChanged();
 		}
 	}
 }

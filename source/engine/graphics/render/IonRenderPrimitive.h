@@ -63,10 +63,12 @@ namespace ion::graphics::render
 
 			void transform_positions(const vertex_metrics &metrics, const Matrix4 &model_matrix, vertex_data &data) noexcept;
 			void apply_color(const vertex_metrics &metrics, const Color &color, vertex_data &data) noexcept;
+			void apply_opacity(const vertex_metrics &metrics, real opacity, vertex_data &data) noexcept;
 			void apply_opacity(const vertex_metrics &metrics, real opacity, const vertex_data &source_data, vertex_data &data) noexcept;
 
 			real get_position_z(const vertex_metrics &metrics, const vertex_data &data) noexcept;
 			Color get_color(const vertex_metrics &metrics, const vertex_data &data) noexcept;
+			real get_opacity(const vertex_metrics &metrics, const vertex_data &data) noexcept;
 			Aabb get_aabb(const vertex_metrics &metrics, const vertex_data &data) noexcept;
 
 			bool all_passes_equal(const render_passes &passes, const render_passes &passes2) noexcept;
@@ -127,8 +129,10 @@ namespace ion::graphics::render
 			virtual void MaterialChanged() noexcept;
 			virtual void TextureChanged() noexcept;
 
-			virtual void ColorChanged() noexcept;
+			virtual void BaseColorChanged() noexcept;
+			virtual void BaseOpacityChanged() noexcept;
 			virtual void OpacityChanged() noexcept;
+
 			virtual void PointSizeChanged() noexcept;
 			virtual void LineThicknessChanged() noexcept;
 			virtual void WireFrameChanged() noexcept;
@@ -198,6 +202,9 @@ namespace ion::graphics::render
 			//Sets the base color of this primitive to the given color
 			void BaseColor(const Color &color) noexcept;
 
+			//Sets the base opacity of this primitive to the given value
+			void BaseOpacity(real opacity) noexcept;
+
 			//Sets the opacity of this primitive to the given opacity
 			inline void Opacity(real opacity) noexcept
 			{
@@ -208,6 +215,7 @@ namespace ion::graphics::render
 					OpacityChanged();
 				}
 			}
+
 
 			//Sets the point size of this primitive to the given value
 			inline void PointSize(real size) noexcept
@@ -376,11 +384,18 @@ namespace ion::graphics::render
 				return render_primitive::detail::get_color(vertex_metrics_, vertex_data_);
 			}
 
+			//Returns the base opacity of this render primitive
+			[[nodiscard]] inline auto BaseOpacity() const noexcept
+			{
+				return render_primitive::detail::get_opacity(vertex_metrics_, vertex_data_);
+			}
+
 			//Returns the opacity of this render primitive
 			[[nodiscard]] inline auto Opacity() const noexcept
 			{
 				return opacity_;
 			}
+
 
 			//Returns the point size of this render primitive
 			[[nodiscard]] inline auto PointSize() const noexcept
@@ -442,11 +457,11 @@ namespace ion::graphics::render
 			*/
 
 			//Refresh render primitive, by regrouping it in the renderer
-			//This is typically called once per frame
+			//This function is typically called each frame
 			void Refresh();
 
 			//Prepare render primitive, by updating world vertex data
-			//This is typically called once per frame
+			//This function is typically called each frame
 			[[nodiscard]] bool Prepare();
 	};
 
