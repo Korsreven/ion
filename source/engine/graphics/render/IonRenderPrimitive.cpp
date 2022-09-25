@@ -297,7 +297,7 @@ bool all_passes_equal(const Passes &passes, const Passes &passes2) noexcept
 } //render_primitive::detail
 
 
-//Protected
+//Private
 
 void RenderPrimitive::UpdateWorldVertexData()
 {
@@ -337,6 +337,8 @@ void RenderPrimitive::UpdateWorldZ() noexcept
 	}
 }
 
+
+//Protected
 
 /*
 	Events
@@ -520,7 +522,7 @@ bool RenderPrimitive::IsGroupable(const RenderPrimitive &primitive) const noexce
 {
 	return draw_mode_ == primitive.draw_mode_ &&
 		   world_z_ == primitive.world_z_ &&
-		   current_material_ == primitive.current_material_ &&
+		   material_ == primitive.material_ &&
 		   texture_handle_ == primitive.texture_handle_ &&
 		   point_size_ == primitive.point_size_ &&
 		   line_thickness_ == primitive.line_thickness_ &&
@@ -541,8 +543,8 @@ vertex::VertexBatch RenderPrimitive::MakeVertexBatch() const noexcept
 {
 	auto vertex_batch = vertex::VertexBatch{draw_mode_, vertex_declaration_};
 
-	if (current_material_)
-		vertex_batch.BatchMaterial(current_material_);
+	if (material_)
+		vertex_batch.BatchMaterial(material_);
 
 	if (texture_handle_)
 		vertex_batch.BatchTexture(*texture_handle_);
@@ -559,10 +561,10 @@ void RenderPrimitive::Refresh()
 {
 	UpdateWorldZ();
 
-	//Check if current material has changed externally
-	if (current_material_.get() != applied_material_)
+	//Check if material has changed externally
+	if (material_.get() != applied_material_)
 	{
-		applied_material_ = current_material_.get();
+		applied_material_ = material_.get();
 		need_refresh_ = world_visible_;
 		MaterialChanged();
 	}

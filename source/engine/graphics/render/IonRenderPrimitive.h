@@ -94,7 +94,7 @@ namespace ion::graphics::render
 			Aabb aabb_;
 
 			render_primitive::Passes passes_;
-			NonOwningPtr<materials::Material> current_material_;
+			NonOwningPtr<materials::Material> material_;
 			materials::Material *applied_material_ = nullptr;
 			std::optional<textures::texture::TextureHandle> texture_handle_;
 
@@ -113,10 +113,17 @@ namespace ion::graphics::render
 			bool opacity_changed_ = false;
 			bool need_refresh_ = false;
 
-		protected:
 
 			void UpdateWorldVertexData();
 			void UpdateWorldZ() noexcept;
+
+		protected:
+
+			//Returns the vertex data of this render primitive
+			[[nodiscard]] inline auto& VertexData() noexcept
+			{
+				return vertex_data_;
+			}
 
 
 			/*
@@ -179,9 +186,9 @@ namespace ion::graphics::render
 			//Sets the material of this primitive to the given material
 			inline void RenderMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
-				if (current_material_ != material)
+				if (material_ != material)
 				{
-					current_material_ = material;
+					material_ = material;
 					applied_material_ = material.get();
 					need_refresh_ |= world_visible_;
 					MaterialChanged();
@@ -369,7 +376,7 @@ namespace ion::graphics::render
 			//Returns the material of this render primitive
 			[[nodiscard]] inline auto RenderMaterial() const noexcept
 			{
-				return current_material_;
+				return material_;
 			}
 
 			//Returns the texture of this render primitive
