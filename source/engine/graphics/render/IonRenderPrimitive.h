@@ -41,8 +41,9 @@ namespace ion::graphics::render
 
 	namespace render_primitive
 	{
-		using vertex_data = std::vector<real>;
-		using render_passes = std::vector<Pass>;
+		using VertexContainer = std::vector<real>;
+		using Passes = std::vector<Pass>;
+
 
 		namespace detail
 		{
@@ -61,17 +62,17 @@ namespace ion::graphics::render
 			int get_vertex_count(const vertex::VertexDeclaration &vertex_declaration, const vertex::VertexDataView &data_view) noexcept;
 			vertex_metrics get_vertex_metrics(const vertex::VertexDeclaration &vertex_declaration) noexcept;
 
-			void transform_positions(const vertex_metrics &metrics, const Matrix4 &model_matrix, vertex_data &data) noexcept;
-			void apply_color(const vertex_metrics &metrics, const Color &color, vertex_data &data) noexcept;
-			void apply_opacity(const vertex_metrics &metrics, real opacity, vertex_data &data) noexcept;
-			void apply_opacity(const vertex_metrics &metrics, real opacity, const vertex_data &source_data, vertex_data &data) noexcept;
+			void transform_positions(const vertex_metrics &metrics, const Matrix4 &model_matrix, VertexContainer &data) noexcept;
+			void apply_color(const vertex_metrics &metrics, const Color &color, VertexContainer &data) noexcept;
+			void apply_opacity(const vertex_metrics &metrics, real opacity, VertexContainer &data) noexcept;
+			void apply_opacity(const vertex_metrics &metrics, real opacity, const VertexContainer &source_data, VertexContainer &data) noexcept;
 
-			real get_position_z(const vertex_metrics &metrics, const vertex_data &data) noexcept;
-			Color get_color(const vertex_metrics &metrics, const vertex_data &data) noexcept;
-			real get_opacity(const vertex_metrics &metrics, const vertex_data &data) noexcept;
-			Aabb get_aabb(const vertex_metrics &metrics, const vertex_data &data) noexcept;
+			real get_position_z(const vertex_metrics &metrics, const VertexContainer &data) noexcept;
+			Color get_color(const vertex_metrics &metrics, const VertexContainer &data) noexcept;
+			real get_opacity(const vertex_metrics &metrics, const VertexContainer &data) noexcept;
+			Aabb get_aabb(const vertex_metrics &metrics, const VertexContainer &data) noexcept;
 
-			bool all_passes_equal(const render_passes &passes, const render_passes &passes2) noexcept;
+			bool all_passes_equal(const Passes &passes, const Passes &passes2) noexcept;
 		} //detail
 	} //render_primitive
 
@@ -86,13 +87,13 @@ namespace ion::graphics::render
 			vertex::VertexDeclaration vertex_declaration_;
 			render_primitive::detail::vertex_metrics vertex_metrics_;
 
-			render_primitive::vertex_data vertex_data_; //Local space
-			render_primitive::vertex_data world_vertex_data_; //World space
+			render_primitive::VertexContainer vertex_data_; //Local space
+			render_primitive::VertexContainer world_vertex_data_; //World space
 			Matrix4 model_matrix_;
 			real world_z_ = 0.0_r;
 			Aabb aabb_;
 
-			render_primitive::render_passes passes_;
+			render_primitive::Passes passes_;
 			NonOwningPtr<materials::Material> current_material_;
 			materials::Material *applied_material_ = nullptr;
 			std::optional<textures::texture::TextureHandle> texture_handle_;
@@ -155,17 +156,17 @@ namespace ion::graphics::render
 			*/
 
 			//Sets the vertex data of this primitive to the given data
-			void VertexData(render_primitive::vertex_data data) noexcept;
+			void VertexData(render_primitive::VertexContainer data) noexcept;
 
 			//Sets the vertex data and model matrix of this primitive to the given data and matrix
-			void VertexData(render_primitive::vertex_data data, const Matrix4 &model_matrix) noexcept;
+			void VertexData(render_primitive::VertexContainer data, const Matrix4 &model_matrix) noexcept;
 		
 			//Sets the model matrix of this primitive to the given matrix
 			void ModelMatrix(const Matrix4 &model_matrix) noexcept;
 
 
 			//Sets the passes of this primitive to the given passes
-			inline void RenderPasses(render_primitive::render_passes passes) noexcept
+			inline void RenderPasses(render_primitive::Passes passes) noexcept
 			{
 				if (!render_primitive::detail::all_passes_equal(passes_, passes))
 				{

@@ -58,7 +58,7 @@ vertex_metrics get_vertex_metrics(const vertex::VertexDeclaration &vertex_declar
 }
 
 
-void transform_positions(const vertex_metrics &metrics, const Matrix4 &model_matrix, vertex_data &data) noexcept
+void transform_positions(const vertex_metrics &metrics, const Matrix4 &model_matrix, VertexContainer &data) noexcept
 {
 	auto size = std::ssize(data);
 	auto stride = std::max(metrics.position_components, metrics.position_stride);
@@ -95,7 +95,7 @@ void transform_positions(const vertex_metrics &metrics, const Matrix4 &model_mat
 	}
 }
 
-void apply_color(const vertex_metrics &metrics, const Color &color, vertex_data &data) noexcept
+void apply_color(const vertex_metrics &metrics, const Color &color, VertexContainer &data) noexcept
 {
 	auto size = std::ssize(data);
 	auto stride = std::max(metrics.color_components, metrics.color_stride);
@@ -133,7 +133,7 @@ void apply_color(const vertex_metrics &metrics, const Color &color, vertex_data 
 	}
 }
 
-void apply_opacity(const vertex_metrics &metrics, real opacity, vertex_data &data) noexcept
+void apply_opacity(const vertex_metrics &metrics, real opacity, VertexContainer &data) noexcept
 {
 	auto size = std::ssize(data);
 	auto stride = std::max(metrics.color_components, metrics.color_stride);
@@ -151,7 +151,7 @@ void apply_opacity(const vertex_metrics &metrics, real opacity, vertex_data &dat
 	}
 }
 
-void apply_opacity(const vertex_metrics &metrics, real opacity, const vertex_data &source_data, vertex_data &data) noexcept
+void apply_opacity(const vertex_metrics &metrics, real opacity, const VertexContainer &source_data, VertexContainer &data) noexcept
 {
 	auto size = std::ssize(data);
 	auto stride = std::max(metrics.color_components, metrics.color_stride);
@@ -170,7 +170,7 @@ void apply_opacity(const vertex_metrics &metrics, real opacity, const vertex_dat
 }
 
 
-real get_position_z(const vertex_metrics &metrics, const vertex_data &data) noexcept
+real get_position_z(const vertex_metrics &metrics, const VertexContainer &data) noexcept
 {
 	switch (metrics.position_components)
 	{
@@ -186,7 +186,7 @@ real get_position_z(const vertex_metrics &metrics, const vertex_data &data) noex
 	return 0.0_r;
 }
 
-Color get_color(const vertex_metrics &metrics, const vertex_data &data) noexcept
+Color get_color(const vertex_metrics &metrics, const VertexContainer &data) noexcept
 {
 	switch (metrics.color_components)
 	{
@@ -221,7 +221,7 @@ Color get_color(const vertex_metrics &metrics, const vertex_data &data) noexcept
 	return color::Transparent;
 }
 
-real get_opacity(const vertex_metrics &metrics, const vertex_data &data) noexcept
+real get_opacity(const vertex_metrics &metrics, const VertexContainer &data) noexcept
 {
 	switch (metrics.color_components)
 	{
@@ -238,7 +238,7 @@ real get_opacity(const vertex_metrics &metrics, const vertex_data &data) noexcep
 	return 0.0_r;
 }
 
-Aabb get_aabb(const vertex_metrics &metrics, const vertex_data &data) noexcept
+Aabb get_aabb(const vertex_metrics &metrics, const VertexContainer &data) noexcept
 {
 	auto size = std::ssize(data);
 	auto stride = std::max(metrics.position_components, metrics.position_stride);
@@ -279,7 +279,7 @@ Aabb get_aabb(const vertex_metrics &metrics, const vertex_data &data) noexcept
 }
 
 
-bool all_passes_equal(const render_passes &passes, const render_passes &passes2) noexcept
+bool all_passes_equal(const Passes &passes, const Passes &passes2) noexcept
 {
 	if (std::size(passes) != std::size(passes2))
 		return false;
@@ -439,7 +439,7 @@ RenderPrimitive::~RenderPrimitive() noexcept
 	Modifiers
 */
 
-void RenderPrimitive::VertexData(render_primitive::vertex_data data) noexcept
+void RenderPrimitive::VertexData(VertexContainer data) noexcept
 {
 	if (std::size(vertex_data_) != std::size(data))
 		need_refresh_ |= world_visible_;
@@ -452,7 +452,7 @@ void RenderPrimitive::VertexData(render_primitive::vertex_data data) noexcept
 	VertexDataChanged();
 }
 
-void RenderPrimitive::VertexData(render_primitive::vertex_data data, const Matrix4 &model_matrix) noexcept
+void RenderPrimitive::VertexData(VertexContainer data, const Matrix4 &model_matrix) noexcept
 {
 	VertexData(std::move(data));
 	ModelMatrix(model_matrix);
@@ -529,7 +529,7 @@ bool RenderPrimitive::IsGroupable(const RenderPrimitive &primitive) const noexce
 
 		   //Check slowest equalities last
 		   vertex_declaration_ == primitive.vertex_declaration_ &&
-		   render_primitive::detail::all_passes_equal(passes_, primitive.passes_);
+		   detail::all_passes_equal(passes_, primitive.passes_);
 }
 
 
