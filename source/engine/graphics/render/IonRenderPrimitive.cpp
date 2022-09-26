@@ -443,15 +443,18 @@ RenderPrimitive::~RenderPrimitive() noexcept
 
 void RenderPrimitive::VertexData(VertexContainer data) noexcept
 {
-	if (std::size(vertex_data_) != std::size(data))
-		need_refresh_ |= world_visible_;
+	if (!std::empty(vertex_data_) || !std::empty(data))
+	{
+		if (std::size(vertex_data_) != std::size(data))
+			need_refresh_ |= world_visible_;
 
-	vertex_data_ = std::move(data);
-	aabb_ = detail::get_aabb(vertex_metrics_, vertex_data_);
+		vertex_data_ = std::move(data);
+		aabb_ = detail::get_aabb(vertex_metrics_, vertex_data_);
 
-	data_changed_ = true;
-	world_data_changed_ = false; //Discard world changes
-	VertexDataChanged();
+		data_changed_ = true;
+		world_data_changed_ = false; //Discard world changes
+		VertexDataChanged();
+	}
 }
 
 void RenderPrimitive::VertexData(VertexContainer data, const Matrix4 &model_matrix) noexcept
@@ -473,7 +476,8 @@ void RenderPrimitive::ModelMatrix(const Matrix4 &model_matrix) noexcept
 
 void RenderPrimitive::BaseColor(const Color &color) noexcept
 {
-	if (detail::get_color(vertex_metrics_, vertex_data_) != color)
+	if (VertexCount() > 0 &&
+		detail::get_color(vertex_metrics_, vertex_data_) != color)
 	{
 		detail::apply_color(vertex_metrics_, color, vertex_data_);
 
@@ -494,7 +498,8 @@ void RenderPrimitive::BaseColor(const Color &color) noexcept
 
 void RenderPrimitive::BaseOpacity(real opacity) noexcept
 {
-	if (detail::get_opacity(vertex_metrics_, vertex_data_) != opacity)
+	if (VertexCount() > 0 &&
+		detail::get_opacity(vertex_metrics_, vertex_data_) != opacity)
 	{
 		detail::apply_opacity(vertex_metrics_, opacity, vertex_data_);
 
