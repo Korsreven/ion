@@ -516,19 +516,10 @@ void SceneGraph::NotifyNodeRenderEnded(SceneNode &node) noexcept
 
 //Public
 
-SceneGraph::SceneGraph(std::string name, bool enabled) :
+SceneGraph::SceneGraph(std::optional<std::string> name, bool enabled) :
 
 	managed::ManagedObject<Engine>::ManagedObject{std::move(name)},
 	enabled_{enabled}
-{
-	//Empty
-}
-
-SceneGraph::SceneGraph(std::string name, int initial_data_size, int initial_batch_data_size, bool enabled) :
-
-	managed::ManagedObject<Engine>::ManagedObject{std::move(name)},
-	enabled_{enabled},
-	renderer_{initial_data_size, initial_batch_data_size}
 {
 	//Empty
 }

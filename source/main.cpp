@@ -857,7 +857,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 			//Scene
-			auto scene_graph = engine.CreateSceneGraph("main");
+			auto scene_graph = engine.CreateSceneGraph();
 			scene_graph->Gamma(1.0_r);
 			scene_graph->AmbientColor(ion::graphics::utilities::Color::RGB(50, 50, 50));
 			scene_graph->FogEffect(ion::graphics::render::Fog::Linear(0.0_r, 2.25_r));

@@ -16,6 +16,7 @@ File:	IonSceneGraph.h
 #include <array>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "IonSceneNode.h"
@@ -166,10 +167,7 @@ namespace ion::graphics::scene::graph
 		public:
 
 			//Construct a scene graph with the given name and whether or not is should be enabled
-			explicit SceneGraph(std::string name, bool enabled = true);
-
-			//Construct a scene graph with the given name, initial data sizes and whether or not is should be enabled
-			SceneGraph(std::string name, int initial_data_size, int initial_batch_data_size, bool enabled = true);
+			explicit SceneGraph(std::optional<std::string> name = {}, bool enabled = true);
 
 			//Deleted copy constructor
 			SceneGraph(const SceneGraph&) = delete;
