@@ -27,6 +27,7 @@ File:	IonSceneManager.h
 #include "adaptors/ranges/IonIterable.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonCameraListener.h"
+#include "managed/IonManagedObject.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
@@ -42,6 +43,11 @@ namespace ion::graphics
 
 namespace ion::graphics::scene
 {
+	namespace graph
+	{
+		class SceneGraph; //Forward declaration
+	}
+
 	using namespace types::type_literals;
 
 	namespace scene_manager
@@ -76,6 +82,7 @@ namespace ion::graphics::scene
 	//A class that manages and stores everything scene related
 	//A scene manager manages cameras, lights, models, particle systems, texts, sounds and sound listeners
 	class SceneManager final :
+		public managed::ManagedObject<graph::SceneGraph>,
 		public managed::ObjectManager<Camera, SceneManager, events::listeners::CameraListener>,
 		public managed::ObjectManager<Light, SceneManager>,
 		public managed::ObjectManager<Model, SceneManager>,
@@ -101,8 +108,8 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Default constructor
-			SceneManager() = default;
+			//Construct a scene manager with the given name
+			explicit SceneManager(std::optional<std::string> name = {});
 
 			//Deleted copy constructor
 			SceneManager(const SceneManager&) = delete;

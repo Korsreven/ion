@@ -675,4 +675,52 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	}
 }
 
+
+/*
+	Scene mangers
+	Creating
+*/
+
+NonOwningPtr<SceneManager> SceneGraph::CreateSceneManager(std::optional<std::string> name) noexcept
+{
+	return Create(std::move(name));
+}
+
+
+/*
+	Scene mangers
+	Retrieving
+*/
+
+NonOwningPtr<SceneManager> SceneGraph::GetSceneManager(std::string_view name) noexcept
+{
+	return Get(name);
+}
+
+NonOwningPtr<const SceneManager> SceneGraph::GetSceneManager(std::string_view name) const noexcept
+{
+	return Get(name);
+}
+
+
+/*
+	Scene mangers
+	Removing
+*/
+
+void SceneGraph::ClearSceneMangers() noexcept
+{
+	Clear();
+}
+
+bool SceneGraph::RemoveSceneManager(SceneManager &scene_manager) noexcept
+{
+	return Remove(scene_manager);
+}
+
+bool SceneGraph::RemoveSceneManager(std::string_view name) noexcept
+{
+	return Remove(name);
+}
+
 } //ion::graphics::scene::graph

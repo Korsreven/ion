@@ -27,6 +27,13 @@ namespace scene_manager::detail
 
 //Public
 
+SceneManager::SceneManager(std::optional<std::string> name) :
+	managed::ManagedObject<graph::SceneGraph>{std::move(name)}
+{
+	//Empty
+}
+
+
 /*
 	Default shader program
 	Adding

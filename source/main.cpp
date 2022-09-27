@@ -864,7 +864,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scene_graph->FogEnabled(false);
 			//scene_graph->LightingEnabled(false);
 
-			auto scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();	
+			auto scene_manager = scene_graph->CreateSceneManager();	
 
 			//Load scripts
 			ion::script::interfaces::SceneScriptInterface scene_script;
@@ -880,7 +880,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				viewport, sounds->GetSoundChannelGroup("gui")};
 			gui_controller.ZOrder(-2.0_r);
 
-			auto gui_scene_manager = ion::make_owning<ion::graphics::scene::SceneManager>();
+			auto gui_scene_manager = scene_graph->CreateSceneManager();
 
 			//Load scripts
 			ion::script::interfaces::GuiThemeScriptInterface gui_theme_script;

@@ -23,17 +23,20 @@ File:	IonSceneGraph.h
 #include "events/listeners/IonSceneNodeListener.h"
 #include "graphics/render/IonFog.h"
 #include "graphics/render/IonRenderer.h"
+#include "graphics/scene/IonSceneManager.h"
 #include "graphics/textures/IonTexture.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector3.h"
 #include "managed/IonManagedObject.h"
+#include "managed/IonObjectManager.h"
+#include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
 //Forward declarations
 namespace ion
 {
-	class Engine;
+	class Engine; //Forward declaration
 
 	namespace graphics
 	{
@@ -122,7 +125,8 @@ namespace ion::graphics::scene::graph
 	//The scene graph is responsible for updating nodes, shader programs, camera, lights and movable objects
 	class SceneGraph final :
 		public managed::ManagedObject<Engine>,
-		protected events::Listenable<events::listeners::SceneNodeListener>
+		public managed::ObjectManager<SceneManager, SceneGraph>,
+		public events::Listenable<events::listeners::SceneNodeListener>
 	{
 		private:
 
@@ -166,6 +170,12 @@ namespace ion::graphics::scene::graph
 
 			//Construct a scene graph with the given name, initial data sizes and whether or not is should be enabled
 			SceneGraph(std::string name, int initial_data_size, int initial_batch_data_size, bool enabled = true);
+
+			//Deleted copy constructor
+			SceneGraph(const SceneGraph&) = delete;
+
+			//Default move constructor
+			SceneGraph(SceneGraph&&) = default;
 
 			//Destructor
 			~SceneGraph() noexcept;
@@ -358,6 +368,64 @@ namespace ion::graphics::scene::graph
 			//Render this entire scene graph to the given viewport
 			//This is called once from the engine, with the time in seconds since last frame
 			void Render(render::Viewport &viewport, duration time) noexcept;
+
+
+			/*
+				Scene managers
+				Ranges
+			*/
+
+			//Returns a mutable range of all scene managers in this render target
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SceneManagers() noexcept
+			{
+				return Objects();
+			}
+
+			//Returns an immutable range of all scene managers in this render target
+			//This can be used directly with a range-based for loop
+			[[nodiscard]] inline auto SceneManagers() const noexcept
+			{
+				return Objects();
+			}
+
+
+			/*
+				Scene mangers
+				Creating
+			*/
+
+			//Create a scene manager with the given name
+			NonOwningPtr<SceneManager> CreateSceneManager(std::optional<std::string> name = {}) noexcept;
+
+
+			/*
+				Scene mangers
+				Retrieving
+			*/
+
+			//Gets a pointer to a mutable scene manager with the given name
+			//Returns nullptr if scene manager could not be found
+			[[nodiscard]] NonOwningPtr<SceneManager> GetSceneManager(std::string_view name) noexcept;
+
+			//Gets a pointer to an immutable scene manager with the given name
+			//Returns nullptr if scene manager could not be found
+			[[nodiscard]] NonOwningPtr<const SceneManager> GetSceneManager(std::string_view name) const noexcept;
+
+
+			/*
+				Scene mangers
+				Removing
+			*/
+
+			//Clear all removable scene managers from this manager
+			void ClearSceneMangers() noexcept;
+
+			//Remove a removable scene manager from this manager
+			bool RemoveSceneManager(SceneManager &scene_manager) noexcept;
+
+			//Remove a removable scene manager with the given name from this manager
+			bool RemoveSceneManager(std::string_view name) noexcept;
 	};
 } //ion::graphics::scene::graph
 
