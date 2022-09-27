@@ -475,22 +475,6 @@ void Renderer::PrepareVertexData()
 
 //Public
 
-Renderer::Renderer() :
-	vertex_data_(initial_data_size_, 0.0_r)
-{
-	//Empty
-}
-
-Renderer::Renderer(int initial_data_size, int initial_batch_data_size) :
-
-	initial_data_size_{initial_data_size > 0 ? initial_data_size : 0},
-	initial_batch_data_size_{initial_batch_data_size > 0 ? initial_batch_data_size : 0},
-
-	vertex_data_(initial_data_size_, 0.0_r)
-{
-	//Empty
-}
-
 Renderer::~Renderer() noexcept
 {
 	ClearBatches();
@@ -670,7 +654,15 @@ void Renderer::ClearPrimitives() noexcept
 */
 
 void Renderer::Prepare()
-{
+
+	//Set initial data size
+	if (vertex_data_.capacity() == 0 &&
+		initial_vertex_data_size_ > 0)
+	{
+		vertex_data_.reserve(initial_vertex_data_size_);
+		vertex_data_.insert(std::end(vertex_data_), initial_vertex_data_size_, 0.0_r);
+	}
+
 	RefreshPrimitives();
 	GroupAddedPrimitives();
 	CompressBatches();

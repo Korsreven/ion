@@ -35,7 +35,7 @@ namespace ion::graphics::render
 			constexpr auto default_vertex_size = 3 + 3 + 4 + 3; //Based on mesh vertex declaration
 			constexpr auto default_primitive_size = default_vertex_size * 6; //Based on a sprite with two triangles
 			constexpr auto default_batch_data_size = default_primitive_size * 32;
-			constexpr auto default_data_size = default_batch_data_size * 32;
+			constexpr auto default_vertex_data_size = default_batch_data_size * 32;
 
 			using render_primitives = std::vector<RenderPrimitive*>;
 
@@ -102,7 +102,7 @@ namespace ion::graphics::render
 		private:
 
 			int used_capacity_ = 0;
-			int initial_data_size_ = renderer::detail::default_data_size;
+			int initial_vertex_data_size_ = renderer::detail::default_vertex_data_size;
 			int initial_batch_data_size_ = renderer::detail::default_batch_data_size;
 
 			renderer::detail::render_batches batches_;
@@ -127,24 +127,38 @@ namespace ion::graphics::render
 
 		public:
 
-			//Construct a new renderer with the default data sizes
-			Renderer();
+			//Default constructor
+			Renderer() = default;
 
-			//Construct a new renderer with the given data sizes
-			Renderer(int initial_data_size, int initial_batch_data_size);
+			//Deleted copy constructor
+			Renderer(const Renderer&) = delete;
+
+			//Default move constructor
+			Renderer(Renderer&&) = default;
 
 			//Destructor
 			~Renderer() noexcept;
 
 
 			/*
+				Operators
+			*/
+
+			//Deleted copy assignment
+			Renderer& operator=(const Renderer&) = delete;
+
+			//Move assignment
+			Renderer& operator=(Renderer&&) = default;
+
+
+			/*
 				Modifiers
 			*/
 
-			//Sets the initial data size to the given size
-			inline void InitialDataSize(int size) noexcept
+			//Sets the initial vertex data size to the given size
+			inline void InitialVertexDataSize(int size) noexcept
 			{
-				initial_data_size_ = size > 0 ? size : 0;
+				initial_vertex_data_size_ = size > 0 ? size : 0;
 			}
 
 			//Sets the initial batch data size to the given size
@@ -158,16 +172,16 @@ namespace ion::graphics::render
 				Observers
 			*/
 
-			//Returns the initial data size used by this renderer
-			[[nodiscard]] inline auto InitialDataSize() const noexcept
+			//Returns the initial vertex data size used by this renderer
+			[[nodiscard]] inline auto InitialVertexDataSize() const noexcept
 			{
-				return initial_data_size_;
+				return initial_vertex_data_size_;
 			}
 
 			//Returns the initial batch data size used by this renderer
 			[[nodiscard]] inline auto InitialBatchDataSize() const noexcept
 			{
-				return initial_data_size_;
+				return initial_batch_data_size_;
 			}
 
 
