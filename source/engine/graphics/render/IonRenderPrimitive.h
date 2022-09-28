@@ -163,17 +163,17 @@ namespace ion::graphics::render
 			*/
 
 			//Sets the vertex data of this primitive to the given data
-			void VertexData(render_primitive::VertexContainer data) noexcept;
+			void VertexData(render_primitive::VertexContainer data);
 
-			//Sets the vertex data and model matrix of this primitive to the given data and matrix
-			void VertexData(render_primitive::VertexContainer data, const Matrix4 &model_matrix) noexcept;
-		
+			//Appends the given vertex data to the vertex data of this primitive
+			void AppendVertexData(const render_primitive::VertexContainer &data);
+
 			//Sets the model matrix of this primitive to the given matrix
 			void ModelMatrix(const Matrix4 &model_matrix) noexcept;
 
 
 			//Sets the passes of this primitive to the given passes
-			inline void RenderPasses(render_primitive::Passes passes) noexcept
+			inline void RenderPasses(render_primitive::Passes passes)
 			{
 				if (!render_primitive::detail::all_passes_equal(passes_, passes))
 				{

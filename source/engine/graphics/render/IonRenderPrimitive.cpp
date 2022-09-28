@@ -441,7 +441,7 @@ RenderPrimitive::~RenderPrimitive() noexcept
 	Modifiers
 */
 
-void RenderPrimitive::VertexData(VertexContainer data) noexcept
+void RenderPrimitive::VertexData(VertexContainer data)
 {
 	if (!std::empty(vertex_data_) || !std::empty(data))
 	{
@@ -457,10 +457,18 @@ void RenderPrimitive::VertexData(VertexContainer data) noexcept
 	}
 }
 
-void RenderPrimitive::VertexData(VertexContainer data, const Matrix4 &model_matrix) noexcept
+void RenderPrimitive::AppendVertexData(const render_primitive::VertexContainer &data)
 {
-	VertexData(std::move(data));
-	ModelMatrix(model_matrix);
+	if (!std::empty(data))
+	{
+		vertex_data_.insert(std::end(vertex_data_), std::begin(data), std::end(data));
+		aabb_.Merge(detail::get_aabb(vertex_metrics_, data));
+
+		data_changed_ = true;
+		world_data_changed_ = false; //Discard world changes
+		need_refresh_ |= world_visible_;
+		VertexDataChanged();
+	}
 }
 
 void RenderPrimitive::ModelMatrix(const Matrix4 &model_matrix) noexcept
