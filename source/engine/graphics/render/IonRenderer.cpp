@@ -213,6 +213,13 @@ void Renderer::RefreshPrimitives()
 
 void Renderer::GroupAddedPrimitives()
 {
+	//Sort added primitives before grouping
+	std::stable_sort(std::begin(added_primitives_), std::end(added_primitives_),
+		[](auto &primitive, auto &primitive2) noexcept
+		{
+			return primitive->WorldZ() < primitive2->WorldZ(); //Desc
+		});
+
 	for (auto &primitive : added_primitives_)
 	{
 		auto z = primitive->WorldZ();
@@ -504,7 +511,8 @@ bool Renderer::AddPrimitive(RenderPrimitive &primitive)
 	{
 		primitive.ParentRenderer(this);
 
-		if (primitive.Visible())
+		//Primitive is visible
+		if (primitive.WorldVisible() && primitive.VertexCount() > 0)
 			added_primitives_.push_back(&primitive);
 		else
 			hidden_primitives_.push_back(&primitive);
@@ -526,7 +534,7 @@ bool Renderer::RefreshPrimitive(RenderPrimitive &primitive)
 		std::end(added_primitives_);
 
 	//Primitive is visible
-	if (primitive.Visible())
+	if (primitive.WorldVisible() && primitive.VertexCount() > 0)
 	{
 		//Primitive has just been added, no-op
 		if (iter_added != std::end(added_primitives_))
