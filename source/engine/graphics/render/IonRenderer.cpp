@@ -224,7 +224,7 @@ void Renderer::GroupAddedPrimitives()
 	std::stable_sort(std::begin(added_primitives_), std::end(added_primitives_),
 		[](auto &primitive, auto &primitive2) noexcept
 		{
-			return primitive->WorldZ() < primitive2->WorldZ(); //Desc
+			return primitive->WorldZ() < primitive2->WorldZ(); //Asc
 		});
 
 	for (auto &primitive : added_primitives_)
