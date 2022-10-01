@@ -141,11 +141,11 @@ namespace ion::graphics::render
 				return shader_program_ == rhs.shader_program_ && //Check first
 					   iterations_ == rhs.iterations_ &&
 					   blend_source_factor_ == rhs.blend_source_factor_ &&
-					   blend_destination_factor_ == rhs.blend_source_factor_ &&
-					   blend_source_factor_alpha_ == rhs.blend_source_factor_ &&
-					   blend_destination_factor_alpha_ == rhs.blend_source_factor_ &&
+					   blend_destination_factor_ == rhs.blend_destination_factor_ &&
+					   blend_source_factor_alpha_ == rhs.blend_source_factor_alpha_ &&
+					   blend_destination_factor_alpha_ == rhs.blend_destination_factor_alpha_ &&
 					   blend_equation_mode_ == rhs.blend_equation_mode_ &&
-					   blend_equation_mode_alpha_ == rhs.blend_equation_mode_;
+					   blend_equation_mode_alpha_ == rhs.blend_equation_mode_alpha_;
 			}
 
 			//Checks if two passes are different (one or more members are different)
