@@ -108,6 +108,7 @@ namespace ion::graphics::render
 			renderer::detail::render_batches batches_;
 			renderer::detail::render_primitives added_primitives_;
 			renderer::detail::render_primitives hidden_primitives_;
+			renderer::detail::render_primitives pending_primitives_;
 
 			render_primitive::VertexContainer vertex_data_; //Data (RAM)
 			std::optional<vertex::VertexBufferObject> vbo_; //Stream buffer (VRAM)
