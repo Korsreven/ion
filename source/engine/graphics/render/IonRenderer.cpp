@@ -662,7 +662,7 @@ void Renderer::ClearPrimitives() noexcept
 */
 
 void Renderer::Prepare()
-
+{
 	//Set initial data size
 	if (vertex_data_.capacity() == 0 &&
 		initial_vertex_data_size_ > 0)
