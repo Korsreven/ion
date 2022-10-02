@@ -382,7 +382,7 @@ void Renderer::UpdateBatches()
 	}
 }
 
-void Renderer::PrepareVertexData()
+void Renderer::PrepareVertexData() noexcept
 {
 	auto out_of_date = false;
 	for (auto &batch : batches_)
@@ -393,7 +393,7 @@ void Renderer::PrepareVertexData()
 		//Prepare all primitives
 		for (auto slot_offset = batch->offset; auto &slot : batch->slots)
 		{
-			slot.need_update |= slot.primitive->Prepare();
+			slot.need_update |= slot.primitive->PrepareVertexData();
 
 			//Copy data from primitive to vertex data
 			if (slot.need_update)

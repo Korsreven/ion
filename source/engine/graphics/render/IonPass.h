@@ -15,6 +15,7 @@ File:	IonPass.h
 
 #include <optional>
 #include <utility>
+#include <vector>
 
 #include "memory/IonNonOwningPtr.h"
 
@@ -28,8 +29,12 @@ namespace ion::graphics
 
 namespace ion::graphics::render
 {
+	class Pass; //Forward declaration
+
 	namespace pass
 	{
+		using Passes = std::vector<Pass>;
+
 		enum class BlendFactor
 		{
 			Zero,

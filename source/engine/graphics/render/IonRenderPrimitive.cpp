@@ -279,7 +279,7 @@ Aabb get_aabb(const vertex_metrics &metrics, const VertexContainer &data) noexce
 }
 
 
-bool all_passes_equal(const Passes &passes, const Passes &passes2) noexcept
+bool all_passes_equal(const pass::Passes &passes, const pass::Passes &passes2) noexcept
 {
 	if (std::size(passes) != std::size(passes2))
 		return false;
@@ -567,7 +567,7 @@ vertex::VertexBatch RenderPrimitive::MakeVertexBatch() const noexcept
 
 
 /*
-	Updating
+	Refreshing
 */
 
 void RenderPrimitive::Refresh()
@@ -578,7 +578,7 @@ void RenderPrimitive::Refresh()
 	if (material_.get() != applied_material_)
 	{
 		applied_material_ = material_.get();
-		need_refresh_ = world_visible_;
+		need_refresh_ |= world_visible_;
 		MaterialChanged();
 	}
 
@@ -591,7 +591,17 @@ void RenderPrimitive::Refresh()
 	}
 }
 
-bool RenderPrimitive::Prepare()
+
+/*
+	Preparing
+*/
+
+void RenderPrimitive::Prepare()
+{
+	//Optional to override
+}
+
+bool RenderPrimitive::PrepareVertexData()
 {
 	UpdateWorldVertexData();
 

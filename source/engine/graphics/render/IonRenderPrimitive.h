@@ -42,8 +42,6 @@ namespace ion::graphics::render
 	namespace render_primitive
 	{
 		using VertexContainer = std::vector<real>;
-		using Passes = std::vector<Pass>;
-
 
 		namespace detail
 		{
@@ -72,7 +70,7 @@ namespace ion::graphics::render
 			real get_opacity(const vertex_metrics &metrics, const VertexContainer &data) noexcept;
 			Aabb get_aabb(const vertex_metrics &metrics, const VertexContainer &data) noexcept;
 
-			bool all_passes_equal(const Passes &passes, const Passes &passes2) noexcept;
+			bool all_passes_equal(const pass::Passes &passes, const pass::Passes &passes2) noexcept;
 		} //detail
 	} //render_primitive
 
@@ -93,7 +91,7 @@ namespace ion::graphics::render
 			real world_z_ = 0.0_r;
 			Aabb aabb_;
 
-			render_primitive::Passes passes_;
+			pass::Passes passes_;
 			NonOwningPtr<materials::Material> material_;
 			materials::Material *applied_material_ = nullptr;
 			std::optional<textures::texture::TextureHandle> texture_handle_;
@@ -173,7 +171,7 @@ namespace ion::graphics::render
 
 
 			//Sets the passes of this primitive to the given passes
-			inline void RenderPasses(render_primitive::Passes passes)
+			inline void RenderPasses(pass::Passes passes)
 			{
 				if (!render_primitive::detail::all_passes_equal(passes_, passes))
 				{
@@ -458,19 +456,29 @@ namespace ion::graphics::render
 
 			//Returns a vertex batch that can render this primitive
 			[[nodiscard]] vertex::VertexBatch MakeVertexBatch() const noexcept;
-		
-		
+
+
 			/*
-				Updating
+				Refreshing
 			*/
 
-			//Refresh render primitive, by regrouping it in the renderer
+			//Refresh render primitive by regrouping it in the renderer
 			//This function is typically called each frame
 			void Refresh();
 
-			//Prepare render primitive, by updating world vertex data
+
+			/*
+				Preparing
+			*/
+
+			//Prepare this render primitive such that it is ready to be drawn
 			//This function is typically called each frame
-			[[nodiscard]] bool Prepare();
+			virtual void Prepare();
+
+			//Prepare vertex data, by updating world vertex data
+			//Returns true if world vertex data has changed
+			//This function is typically called each frame
+			[[nodiscard]] bool PrepareVertexData();
 	};
 
 } //ion::graphics::render

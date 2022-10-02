@@ -124,7 +124,7 @@ namespace ion::graphics::render
 			void GroupWithBatch(RenderPrimitive &primitive, renderer::detail::render_batch &batch);
 			void CompressBatches() noexcept;
 			void UpdateBatches();
-			void PrepareVertexData();
+			void PrepareVertexData() noexcept;
 
 		public:
 
