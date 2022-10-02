@@ -1049,7 +1049,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				auto matrix_struct = particle_program->CreateStruct("matrix");
 				auto scene_struct = particle_program->CreateStruct("scene");
 				auto camera_struct = particle_program->CreateStruct("camera");
-				auto node_struct = particle_program->CreateStruct("node");
 				auto primitive_struct = particle_program->CreateStruct("primitive");
 				auto material_struct = particle_program->CreateStruct("material");
 				auto fog_struct = particle_program->CreateStruct("fog");
@@ -1079,10 +1078,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				//Camera
 				camera_struct->CreateUniform<glsl::vec3>("position");
 				camera_struct->CreateUniform<float>("rotation");
-
-				//Node
-				node_struct->CreateUniform<float>("rotation");
-				node_struct->CreateUniform<glsl::vec2>("scaling");
 
 				//Primitive
 				primitive_struct->CreateUniform<bool>("has_material");
@@ -1203,7 +1198,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				auto matrix_struct = flat_particle_program->CreateStruct("matrix");
 				auto scene_struct = flat_particle_program->CreateStruct("scene");
 				auto camera_struct = flat_particle_program->CreateStruct("camera");
-				auto node_struct = flat_particle_program->CreateStruct("node");
 				auto primitive_struct = flat_particle_program->CreateStruct("primitive");
 				auto material_struct = flat_particle_program->CreateStruct("material");
 
@@ -1223,10 +1217,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 				//Camera
 				camera_struct->CreateUniform<float>("rotation");
-
-				//Node
-				node_struct->CreateUniform<float>("rotation");
-				node_struct->CreateUniform<glsl::vec2>("scaling");
 
 				//Primitive
 				primitive_struct->CreateUniform<bool>("has_material");

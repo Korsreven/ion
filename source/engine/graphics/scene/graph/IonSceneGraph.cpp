@@ -307,23 +307,6 @@ void set_matrix_uniforms(const Matrix4 &projection_mat, const Matrix4 &model_vie
 		#endif
 }
 
-void set_node_uniforms(const SceneNode &node, shaders::ShaderProgram &shader_program) noexcept
-{
-	using namespace shaders::variables;
-
-	if (auto position = shader_program.GetUniform(shaders::shader_layout::UniformName::Node_Position); position)
-		position->Get<glsl::vec3>() = node.DerivedPosition();
-
-	if (auto direction = shader_program.GetUniform(shaders::shader_layout::UniformName::Node_Direction); direction)
-		direction->Get<glsl::vec2>() = node.DerivedDirection();
-
-	if (auto rotation = shader_program.GetUniform(shaders::shader_layout::UniformName::Node_Rotation); rotation)
-		rotation->Get<float>() = static_cast<float>(node.DerivedRotation()); //Using 'real' could make this uniform double
-
-	if (auto scaling = shader_program.GetUniform(shaders::shader_layout::UniformName::Node_Scaling); scaling)
-		scaling->Get<glsl::vec2>() = node.DerivedScaling();
-}
-
 void set_scene_uniforms(real gamma_value, Color ambient_color, shaders::ShaderProgram &shader_program) noexcept
 {
 	using namespace shaders::variables;

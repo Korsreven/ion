@@ -63,8 +63,6 @@ void bind_struct(const script_tree::PropertyNode &property,
 		shader_layout.BindStruct(shader_layout::StructName::Scene, std::move(struct_name));
 	else if (name == "camera")
 		shader_layout.BindStruct(shader_layout::StructName::Camera, std::move(struct_name));
-	else if (name == "node")
-		shader_layout.BindStruct(shader_layout::StructName::Node, std::move(struct_name));
 	else if (name == "primitive")
 		shader_layout.BindStruct(shader_layout::StructName::Primitive, std::move(struct_name));
 	else if (name == "material")
@@ -156,16 +154,6 @@ void bind_uniform(const script_tree::PropertyNode &property,
 		shader_layout.BindUniform(shader_layout::UniformName::Camera_Position, std::move(declaration));
 	else if (name == "camera-rotation")
 		shader_layout.BindUniform(shader_layout::UniformName::Camera_Rotation, std::move(declaration));
-
-	//Node
-	else if (name == "node-position")
-		shader_layout.BindUniform(shader_layout::UniformName::Node_Position, std::move(declaration));
-	else if (name == "node-direction")
-		shader_layout.BindUniform(shader_layout::UniformName::Node_Direction, std::move(declaration));
-	else if (name == "node-rotation")
-		shader_layout.BindUniform(shader_layout::UniformName::Node_Rotation, std::move(declaration));
-	else if (name == "node-scaling")
-		shader_layout.BindUniform(shader_layout::UniformName::Node_Scaling, std::move(declaration));
 
 	//Primitive
 	else if (name == "primitive-texture")

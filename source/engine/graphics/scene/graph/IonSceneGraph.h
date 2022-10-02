@@ -101,7 +101,6 @@ namespace ion::graphics::scene::graph
 				const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_matrix_uniforms(const Matrix4 &projection_mat, shaders::ShaderProgram &shader_program) noexcept;
 			void set_matrix_uniforms(const Matrix4 &projection_mat, const Matrix4 &model_view_mat, shaders::ShaderProgram &shader_program) noexcept;
-			void set_node_uniforms(const SceneNode &node, shaders::ShaderProgram &shader_program) noexcept;
 			void set_scene_uniforms(real gamma_value, Color ambient_color, shaders::ShaderProgram &shader_program) noexcept;
 
 

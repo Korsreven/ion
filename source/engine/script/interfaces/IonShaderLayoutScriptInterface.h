@@ -32,7 +32,6 @@ namespace ion::script::interfaces
 			"matrix",
 			"scene",
 			"camera",
-			"node",
 			"primitive",
 			"material",
 			"fog",
@@ -70,12 +69,6 @@ namespace ion::script::interfaces
 			//Camera
 			"camera-position",
 			"camera-rotation",
-
-			//Node
-			"node-position",
-			"node-direction",
-			"node-rotation",
-			"node-scaling",
 
 			//Primitive
 			"primitive-texture",
