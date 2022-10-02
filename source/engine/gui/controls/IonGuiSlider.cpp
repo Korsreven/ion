@@ -259,7 +259,7 @@ bool GuiSlider::IntersectsHandle(const Vector2 &point) const noexcept
 				if (skin.Handle->AxisAlignedBoundingBox().TransformCopy(
 					Matrix3::Transformation(skin_node_->FullTransformation())).Intersects(point))
 					return skin_node_->AxisAligned() ||
-						skin.Handle->OrientedBoundingBox().TransformCopy(
+						Obb{skin.Handle->AxisAlignedBoundingBox()}.TransformCopy(
 						Matrix3::Transformation(skin_node_->FullTransformation())).Intersects(point);
 			}
 		}

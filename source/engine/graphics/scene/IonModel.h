@@ -14,6 +14,7 @@ File:	IonModel.h
 #define ION_MODEL_H
 
 #include <optional>
+#include <span>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -21,7 +22,6 @@ File:	IonModel.h
 
 #include "IonDrawableObject.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
-#include "graphics/render/vertex/IonVertexBufferObject.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
 #include "shapes/IonMesh.h"
@@ -35,52 +35,25 @@ namespace ion::graphics
 	{
 		class Material;
 	}
-
-	namespace shaders
-	{
-		class ShaderProgram;
-	}
 }
 
 namespace ion::graphics::scene
 {
 	class Light; //Forward declaration
 
-	namespace model::detail
+	namespace model
 	{
-		using mesh_pointers = std::vector<shapes::Mesh*>;
-		using emissive_mesh = std::pair<shapes::Mesh*,Light>;
-		using emissive_meshes = std::vector<emissive_mesh>;
-
-		struct mesh_vertex_stream final
+		namespace detail
 		{
-			shapes::mesh::VertexContainer vertex_data;
-			render::vertex::VertexBatch vertex_batch;
-			mesh_pointers meshes;
-			bool reload_vertex_data = false;
+			using emissive_meshes = std::vector<std::pair<shapes::Mesh*, Light>>;
 
-			mesh_vertex_stream(shapes::mesh::VertexContainer vertex_data, render::vertex::vertex_batch::VertexDrawMode draw_mode,
-				NonOwningPtr<materials::Material> material = nullptr);
-		};
+			void add_emissive_mesh(shapes::Mesh &mesh, emissive_meshes &meshes);
+			bool remove_emissive_mesh(const shapes::Mesh &mesh, emissive_meshes &meshes) noexcept;
+			bool is_mesh_emissive(const shapes::Mesh &mesh) noexcept;
 
-		using mesh_vertex_streams = std::vector<mesh_vertex_stream>;
-
-		struct mesh_group_comparator final
-		{
-			bool operator()(const shapes::Mesh &mesh, const shapes::Mesh &mesh2) const noexcept;
-		};
-
-
-		int get_mesh_vertex_count(const mesh_vertex_streams &mesh_streams) noexcept;
-		mesh_vertex_stream* get_mesh_stream(const shapes::Mesh &mesh, mesh_vertex_streams &mesh_streams) noexcept;
-
-		emissive_mesh* get_emissive_mesh(const shapes::Mesh &mesh, emissive_meshes &meshes) noexcept;
-		Light get_emissive_light(const shapes::Mesh &mesh) noexcept;
-		void add_emissive_mesh(shapes::Mesh &mesh, emissive_meshes &meshes);
-		void remove_emissive_mesh(const shapes::Mesh &mesh, emissive_meshes &meshes) noexcept;
-		void update_emissive_mesh(emissive_mesh &em_mesh) noexcept;
-		bool is_mesh_emissive(const shapes::Mesh &mesh) noexcept;
-	} //model::detail
+			Light get_emissive_light(const shapes::Mesh &mesh) noexcept;	
+		} //detail
+	} //model
 
 
 	//A class representing a model that can be attached to a scene node
@@ -91,20 +64,14 @@ namespace ion::graphics::scene
 	{
 		private:
 
-			model::detail::mesh_vertex_streams mesh_vertex_streams_;
 			model::detail::emissive_meshes emissive_meshes_;
-			std::optional<render::vertex::VertexBufferObject> vbo_;
-
-			bool reload_vertex_streams_ = false;
-			bool reload_vertex_buffer_ = false;
 			bool update_bounding_volumes_ = false;
-			mutable bool update_emissive_lights_ = false;
-
-
-			void ReloadVertexStreams();
-			void PrepareVertexStreams();
+			bool update_emissive_lights_ = false;
 
 		protected:
+
+			mutable drawable_object::Lights emissive_lights_;
+
 
 			/*
 				Events
@@ -116,13 +83,13 @@ namespace ion::graphics::scene
 			//See ObjectManager<T>::removed for more details
 			void Removed(shapes::Mesh &mesh) noexcept override;
 
-
-			void OpacityChanged() noexcept override;
-
 		public:
 
 			//Construct a new model with the given name and visibility
 			explicit Model(std::optional<std::string> name = {}, bool visible = true) noexcept;
+
+			//Virtual destructor
+			virtual ~Model() noexcept;
 
 
 			/*
@@ -147,44 +114,29 @@ namespace ion::graphics::scene
 			/*
 				Observers
 			*/
-
-			//Returns the vertex buffer this model uses
-			[[nodiscard]] inline auto& VertexBuffer() const noexcept
-			{
-				return vbo_;
-			}
+			
+			//Returns all emissive lights in this model
+			[[nodiscard]] virtual std::span<Light*> EmissiveLights(bool derive = true) const override;
 
 
 			/*
 				Notifying
 			*/
 
-			//Called when there are changes to the given mesh that requires a reload of one stream
-			void NotifyMeshReload(const shapes::Mesh &mesh) noexcept;
+			//Called when vertex data has changed on the given mesh
+			void NotifyVertexDataChanged(shapes::Mesh &mesh) noexcept;
 
-			//Called when there are changes to the given mesh that requires a reload of all streams
-			void NotifyMeshReloadAll(const shapes::Mesh &mesh) noexcept;
-
-
-			/*
-				Rendering
-			*/
-
-			//Returns all emissive lights in this model
-			[[nodiscard]] const movable_object::Lights& EmissiveLights(bool derive = true) const;
+			//Called when material has changed on the given mesh
+			void NotifyMaterialChanged(shapes::Mesh &mesh) noexcept;
 
 
 			/*
-				Preparing / drawing
+				Preparing
 			*/
 
 			//Prepare this model such that it is ready to be drawn
-			//This is called once regardless of passes
-			void Prepare() noexcept override;
-
-			//Draw this model with the given shader program (optional)
-			//This can be called multiple times if more than one pass
-			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept override;	
+			//This function is typically called each frame
+			void Prepare() override;
 
 
 			/*
@@ -217,17 +169,17 @@ namespace ion::graphics::scene
 
 
 			//Create a mesh with the given raw vertex data and visibility
-			NonOwningPtr<shapes::Mesh> CreateMesh(shapes::mesh::VertexContainer vertex_data, bool visible = true);
+			NonOwningPtr<shapes::Mesh> CreateMesh(render::render_primitive::VertexContainer vertex_data, bool visible = true);
 
 			//Create a mesh with the given raw vertex data, material, tex coord mode and visibility
-			NonOwningPtr<shapes::Mesh> CreateMesh(shapes::mesh::VertexContainer vertex_data, NonOwningPtr<materials::Material>material,
+			NonOwningPtr<shapes::Mesh> CreateMesh(render::render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material>material,
 				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 			//Create a mesh with the given draw mode, raw vertex data and visibility
-			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, shapes::mesh::VertexContainer vertex_data, bool visible = true);
+			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::render_primitive::VertexContainer vertex_data, bool visible = true);
 
 			//Create a mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
-			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, shapes::mesh::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
+			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
 				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 

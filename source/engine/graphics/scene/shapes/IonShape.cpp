@@ -12,8 +12,6 @@ File:	IonShape.cpp
 
 #include "IonShape.h"
 
-#include "graphics/scene/IonModel.h"
-
 namespace ion::graphics::scene::shapes
 {
 
@@ -66,14 +64,23 @@ Shape::Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertice
 	Events
 */
 
-void Shape::VertexColorChanged() noexcept
+void Shape::BaseColorChanged() noexcept
 {
-	FillColor(VertexColor());
+	if (auto color = BaseColor(); color_ != color)
+	{
+		color_ = color;
+		update_colors_ = false;
+		update_opacity_ = false;
+	}
 }
 
-void Shape::VertexOpacityChanged() noexcept
+void Shape::BaseOpacityChanged() noexcept
 {
-	FillOpacity(VertexOpacity());
+	if (auto opacity = BaseOpacity(); color_.A() != opacity)
+	{
+		color_.A(opacity);
+		update_opacity_ = false;
+	}
 }
 
 
@@ -83,25 +90,27 @@ void Shape::VertexOpacityChanged() noexcept
 	Preparing
 */
 
-mesh::MeshBoundingVolumeStatus Shape::Prepare() noexcept
+void Shape::Prepare()
 {
 	if (update_vertices_)
 	{
-		auto vertices = GetVertices();
-
-		if (auto model = Owner(); model)
-		{
-			//Adjust alpha with model opacity
-			if (auto opacity = model->Opacity(); opacity != 1.0_r)
-			{
-				for (auto &vertex : vertices)
-					vertex.BaseColor.A(vertex.BaseColor.A() * opacity);
-			}
-		}
-
-		Mesh::VertexData(std::move(vertices));
+		VertexData(GetVertices());
 		update_vertices_ = false;
+		update_colors_ = false;
+		update_opacity_ = false;
 	}
+	else if (update_colors_)
+	{
+		BaseColor(color_);
+		update_colors_ = false;
+		update_opacity_ = false;
+	}
+	else if (update_opacity_)
+	{
+		BaseOpacity(color_.A());
+		update_opacity_ = false;
+	}
+
 
 	return Mesh::Prepare();
 }

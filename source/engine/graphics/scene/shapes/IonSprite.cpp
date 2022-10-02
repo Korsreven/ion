@@ -127,10 +127,8 @@ void Sprite::RecalculateTexCoords() noexcept
 	Events
 */
 
-void Sprite::SurfaceMaterialChanged() noexcept
+void Sprite::MaterialChanged() noexcept
 {
-	update_vertices_ = true;
-
 	if (auto_size_)
 		RecalculateSize();
 	if (auto_repeat_)

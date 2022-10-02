@@ -13,14 +13,10 @@ File:	IonMesh.cpp
 #include "IonMesh.h"
 
 #include <algorithm>
-#include <type_traits>
 #include <utility>
 
-#include "graphics/IonGraphicsAPI.h"
 #include "graphics/materials/IonMaterial.h"
 #include "graphics/scene/IonModel.h"
-#include "graphics/shaders/IonShaderProgram.h"
-#include "graphics/shaders/IonShaderProgramManager.h"
 
 namespace ion::graphics::scene::shapes
 {
@@ -60,9 +56,9 @@ Vertex::Vertex(const Vector3 &position, const Vector3 &normal, const Vector2 &te
 namespace detail
 {
 
-VertexContainer vertices_to_vertex_data(const Vertices &vertices)
+render_primitive::VertexContainer vertices_to_vertex_data(const Vertices &vertices)
 {
-	VertexContainer vertex_data;
+	render_primitive::VertexContainer vertex_data;
 	vertex_data.reserve(std::ssize(vertices) * vertex_components);
 
 	for (auto &vertex : vertices)
@@ -77,32 +73,7 @@ VertexContainer vertices_to_vertex_data(const Vertices &vertices)
 }
 
 
-std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const VertexContainer &vertex_data)
-{
-	auto min = std::ssize(vertex_data) > 1 ?
-		Vector2{vertex_data[detail::position_offset], vertex_data[detail::position_offset + 1]} :
-		vector2::Zero;
-	auto max = min;
-
-	//Find min/max for each vertex position (x,y)
-	for (auto i = detail::position_offset + vertex_components; i < std::ssize(vertex_data);
-		i += detail::vertex_components)
-	{
-		auto position = Vector2{vertex_data[i], vertex_data[i + 1]};
-
-		auto [x, y] = position.XY();
-		auto [min_x, min_y] = min.XY();
-		auto [max_x, max_y] = max.XY();
-
-		min = {std::min(min_x, x), std::min(min_y, y)};
-		max = {std::max(max_x, x), std::max(max_y, y)};
-	}
-
-	Aabb aabb{min, max};
-	return {aabb, aabb, {aabb.ToHalfSize().Max(), aabb.Center()}};
-}
-
-void generate_tex_coords(VertexContainer &vertex_data, const Aabb &aabb) noexcept
+void generate_tex_coords(render_primitive::VertexContainer &vertex_data, const Aabb &aabb) noexcept
 {
 	//Generate each vertex tex coords (s,t) from position (x,y) in range [0, 1]
 	for (auto i = detail::position_offset, j = detail::tex_coord_offset; i < std::ssize(vertex_data);
@@ -119,7 +90,7 @@ void generate_tex_coords(VertexContainer &vertex_data, const Aabb &aabb) noexcep
 	}
 }
 
-void normalize_tex_coords(VertexContainer &vertex_data, const materials::Material *material) noexcept
+void normalize_tex_coords(render_primitive::VertexContainer &vertex_data, const materials::Material *material) noexcept
 {
 	auto [s_repeatable, t_repeatable] = material ?
 		material->IsRepeatable() : std::pair{false, false};
@@ -169,27 +140,6 @@ void normalize_tex_coords(VertexContainer &vertex_data, const materials::Materia
 	}
 }
 
-
-/*
-	Graphics API
-*/
-
-void set_line_width(real width) noexcept
-{
-	glLineWidth(static_cast<float>(width));
-}
-
-
-void enable_wire_frames() noexcept
-{
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-}
-
-void disable_wire_frames() noexcept
-{
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-}
-
 } //detail
 } //mesh
 
@@ -200,19 +150,18 @@ void disable_wire_frames() noexcept
 	Events
 */
 
-void Mesh::VertexColorChanged() noexcept
+void Mesh::VertexDataChanged() noexcept
 {
-	//Empty
+	if (auto owner = Owner(); owner)
+		owner->NotifyVertexDataChanged(*this);
 }
 
-void Mesh::VertexOpacityChanged() noexcept
+void Mesh::MaterialChanged() noexcept
 {
-	//Empty
-}
+	update_tex_coords_ = true;
 
-void Mesh::SurfaceMaterialChanged() noexcept
-{
-	//Empty
+	if (auto owner = Owner(); owner)
+		owner->NotifyMaterialChanged(*this);
 }
 
 
@@ -233,38 +182,29 @@ Mesh::Mesh(const Vertices &vertices, NonOwningPtr<materials::Material> material,
 }
 
 Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const Vertices &vertices, bool visible) :
-
-	draw_mode_{draw_mode},
-	vertex_data_{detail::vertices_to_vertex_data(vertices)},
-	visible_{visible},
-
-	reload_all_{visible}
+	RenderPrimitive{draw_mode, detail::get_vertex_declaration(), visible}
 {
-	//Empty
+	VertexData(detail::vertices_to_vertex_data(vertices));
 }
 
 Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const Vertices &vertices, NonOwningPtr<materials::Material> material,
 	MeshTexCoordMode tex_coord_mode, bool visible) :
 	
-	draw_mode_{draw_mode},
-	vertex_data_{detail::vertices_to_vertex_data(vertices)},
-	material_{material},
-	tex_coord_mode_{tex_coord_mode},
-	visible_{visible},
-
-	reload_all_{visible}
+	RenderPrimitive{draw_mode, detail::get_vertex_declaration(), visible},
+	tex_coord_mode_{tex_coord_mode}
 {
-	//Empty
+	VertexData(detail::vertices_to_vertex_data(vertices));
+	RenderMaterial(material);
 }
 
 
-Mesh::Mesh(VertexContainer vertex_data, bool visible) :
+Mesh::Mesh(render_primitive::VertexContainer vertex_data, bool visible) :
 	Mesh{vertex::vertex_batch::VertexDrawMode::Triangles, std::move(vertex_data), visible}
 {
 	//Empty
 }
 
-Mesh::Mesh(VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
+Mesh::Mesh(render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
 	MeshTexCoordMode tex_coord_mode, bool visible) :
 
 	Mesh{vertex::vertex_batch::VertexDrawMode::Triangles, std::move(vertex_data), material, tex_coord_mode, visible}
@@ -272,169 +212,43 @@ Mesh::Mesh(VertexContainer vertex_data, NonOwningPtr<materials::Material> materi
 	//Empty
 }
 
-Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, VertexContainer vertex_data, bool visible) :
-
-	draw_mode_{draw_mode},
-	vertex_data_{std::move(vertex_data)},
-	visible_{visible},
-
-	reload_all_{visible}
+Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, bool visible) :
+	RenderPrimitive{draw_mode, detail::get_vertex_declaration(), visible}
 {
-	//Empty
+	VertexData(std::move(vertex_data));
 }
 
-Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
+Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
 	MeshTexCoordMode tex_coord_mode, bool visible) :
 
-	draw_mode_{draw_mode},
-	vertex_data_{std::move(vertex_data)},
-	material_{material},
-	tex_coord_mode_{tex_coord_mode},
-	visible_{visible},
-
-	reload_all_{visible}
+	RenderPrimitive{draw_mode, detail::get_vertex_declaration(), visible},
+	tex_coord_mode_{tex_coord_mode}
 {
-	//Empty
+	VertexData(std::move(vertex_data));
+	RenderMaterial(material);
 }
 
 
 /*
-	Modifiers
+	Preparing
 */
 
-void Mesh::VertexData(mesh::VertexContainer vertex_data) noexcept
+void Mesh::Prepare()
 {
-	auto size = std::ssize(vertex_data_);
-	auto z_offset = shapes::mesh::detail::position_offset + 2;
-	auto z = size > z_offset ? vertex_data_[z_offset] : 0.0_r;
-
-	vertex_data_ = std::move(vertex_data);
-	update_tex_coords_ = true;
-	update_bounding_volumes_ = true;
-
-	//Size has changed
-	if (size != std::ssize(vertex_data_))
-		reload_all_ |= visible_;
-	else
+	if (update_tex_coords_)
 	{
-		//Z-order has changed
-		if (z != (size > z_offset ? vertex_data_[z_offset] : 0.0_r))
-			reload_all_ |= visible_;
+		//Auto generate tex coords
+		if (tex_coord_mode_ == mesh::MeshTexCoordMode::Auto)
+			detail::generate_tex_coords(VertexData(), AxisAlignedBoundingBox());
+
+		//Normalize tex coords
+		if (tex_coord_mode_ == mesh::MeshTexCoordMode::Manual || RenderMaterial())
+			detail::normalize_tex_coords(VertexData(), RenderMaterial().get());
+
+		update_tex_coords_ = false;
 	}
 
-	reload_ |= !reload_all_ && visible_;
-}
-
-void Mesh::VertexColor(const Color &color) noexcept
-{
-	for (auto i = detail::color_offset; i < std::ssize(vertex_data_); i += detail::vertex_components)
-		std::copy(color.Channels(), color.Channels() + detail::color_components, std::begin(vertex_data_) + i);
-
-	reload_ |= visible_;
-	VertexColorChanged();
-}
-
-void Mesh::VertexOpacity(real percent) noexcept
-{
-	for (auto i = detail::color_offset; i < std::ssize(vertex_data_); i += detail::vertex_components)
-		vertex_data_[i + 3] = percent;
-
-	reload_ |= visible_;
-	VertexOpacityChanged();
-}
-
-
-/*
-	Observers
-*/
-
-Color Mesh::VertexColor() const noexcept
-{
-	if (auto i = detail::color_offset; i < std::ssize(vertex_data_))
-		return Color{vertex_data_[i], vertex_data_[i + 1], vertex_data_[i + 2], vertex_data_[i + 3]};
-	else
-		return color::Transparent;
-}
-
-real Mesh::VertexOpacity() const noexcept
-{
-	if (auto i = detail::color_offset; i < std::ssize(vertex_data_))
-		return vertex_data_[i + 3];
-	else
-		return 0.0_r;
-}
-
-
-/*
-	Preparing / drawing
-*/
-
-MeshBoundingVolumeStatus Mesh::Prepare() noexcept
-{
-	auto bounding_volume_status = MeshBoundingVolumeStatus::Unchanged;
-
-	if (!std::empty(vertex_data_))
-	{
-		if (update_bounding_volumes_)
-		{
-			auto [aabb, obb, sphere] = detail::generate_bounding_volumes(vertex_data_);
-			aabb_ = aabb;
-			obb_ = obb;
-			sphere_ = sphere;
-
-			update_bounding_volumes_ = false;
-			bounding_volume_status = MeshBoundingVolumeStatus::Changed;
-		}
-
-		if (update_tex_coords_)
-		{
-			//Auto generate tex coords
-			if (tex_coord_mode_ == mesh::MeshTexCoordMode::Auto)
-				detail::generate_tex_coords(vertex_data_, aabb_);
-
-			//Normalize tex coords
-			if (tex_coord_mode_ == mesh::MeshTexCoordMode::Manual || material_)
-				detail::normalize_tex_coords(vertex_data_, material_.get());
-
-			update_tex_coords_ = false;
-		}
-
-		if (reload_all_)
-		{
-			if (auto owner = Owner(); owner)
-				owner->NotifyMeshReloadAll(*this);
-
-			reload_ = reload_all_ = false;
-		}
-		else if (reload_)
-		{
-			if (auto owner = Owner(); owner)
-				owner->NotifyMeshReload(*this);
-
-			reload_ = false;
-		}
-	}
-
-	return bounding_volume_status;
-}
-
-
-void Mesh::DrawStarted() noexcept
-{
-	if (line_thickness_ != 1.0_r)
-		detail::set_line_width(line_thickness_);
-
-	if (show_wireframe_)
-		detail::enable_wire_frames();
-}
-
-void Mesh::DrawEnded() noexcept
-{
-	if (show_wireframe_)
-		detail::disable_wire_frames();
-
-	if (line_thickness_ != 1.0_r)
-		detail::set_line_width(1.0_r);
+	RenderPrimitive::Prepare();
 }
 
 

@@ -18,6 +18,7 @@ File:	IonSceneScriptInterface.h
 #include "IonScriptInterface.h"
 #include "graphics/render/IonFrustum.h"
 #include "graphics/render/IonPass.h"
+#include "graphics/render/IonRenderPrimitive.h"
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonDrawableObject.h"
 #include "graphics/scene/IonDrawableParticleSystem.h"
@@ -145,6 +146,7 @@ namespace ion::script::interfaces
 		script_validator::ClassDefinition get_line_class();
 		script_validator::ClassDefinition get_mesh_class();
 		script_validator::ClassDefinition get_rectangle_class();
+		script_validator::ClassDefinition get_render_primitive_class();
 		script_validator::ClassDefinition get_shape_class();
 		script_validator::ClassDefinition get_sprite_class();
 		script_validator::ClassDefinition get_triangle_class();
@@ -188,6 +190,8 @@ namespace ion::script::interfaces
 		void set_mesh_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::Mesh &mesh,
 			const ManagerRegister &managers);
 		void set_rectangle_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::Rectangle &rectangle,
+			const ManagerRegister &managers);
+		void set_render_primitive_properties(const script_tree::ObjectNode &object, graphics::render::RenderPrimitive &primitive,
 			const ManagerRegister &managers);
 		void set_shape_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::Shape &shape,
 			const ManagerRegister &managers);

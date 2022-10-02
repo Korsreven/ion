@@ -981,7 +981,7 @@ void GuiSkin::AddPass(graphics::render::Pass pass)
 	passes_.push_back(std::move(pass));
 }
 
-void GuiSkin::AddPasses(graphics::scene::drawable_object::Passes passes)
+void GuiSkin::AddPasses(graphics::render::pass::Passes passes)
 {
 	if (std::empty(passes_))
 		passes_ = std::move(passes);
@@ -995,7 +995,7 @@ void GuiSkin::AddTextPass(graphics::render::Pass pass)
 	text_passes_.push_back(std::move(pass));
 }
 
-void GuiSkin::AddTextPasses(graphics::scene::drawable_object::Passes passes)
+void GuiSkin::AddTextPasses(graphics::render::pass::Passes passes)
 {
 	if (std::empty(text_passes_))
 		text_passes_ = std::move(passes);

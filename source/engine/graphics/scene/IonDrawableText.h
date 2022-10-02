@@ -23,8 +23,7 @@ File:	IonDrawableText.h
 #include "IonDrawableObject.h"
 #include "adaptors/IonFlatMap.h"
 #include "graphics/fonts/IonText.h"
-#include "graphics/render/vertex/IonVertexBatch.h"
-#include "graphics/render/vertex/IonVertexBufferObject.h"
+#include "graphics/render/IonRenderPrimitive.h"
 #include "graphics/render/vertex/IonVertexDeclaration.h"
 #include "graphics/shaders/IonShaderLayout.h"
 #include "graphics/textures/IonTexture.h"
@@ -39,11 +38,6 @@ namespace ion::graphics
 	namespace fonts
 	{
 		class Font;
-	}
-
-	namespace shaders
-	{
-		class ShaderProgram;
 	}
 }
 
@@ -68,37 +62,30 @@ namespace ion::graphics::scene
 		constexpr auto vertex_components =
 			position_components + color_components + tex_coord_components;
 
-		using fixed_vertex_container = std::array<real, vertex_components * 6>;
-		using vertex_container = std::vector<real>;
 
-
-		struct glyph_vertex_stream final
+		struct text_glyph_primitive final : render::RenderPrimitive
 		{
-			vertex_container vertex_data;
-			render::vertex::VertexBatch vertex_batch;
+			render::render_primitive::VertexContainer vertex_data;
 
-			glyph_vertex_stream(vertex_container vertex_data, textures::texture::TextureHandle texture_handle);
+			text_glyph_primitive(textures::texture::TextureHandle texture_handle);
 		};
 
-		struct decoration_vertex_stream final
+		struct text_decoration_primitive final : render::RenderPrimitive
 		{
-			vertex_container back_vertex_data;
-			vertex_container front_vertex_data;
-			render::vertex::VertexBatch back_vertex_batch;
-			render::vertex::VertexBatch front_vertex_batch;
+			render::render_primitive::VertexContainer vertex_data;
 
-			decoration_vertex_stream();
+			text_decoration_primitive();
 		};
 
-		struct glyph_vertex_stream_key final
+		struct text_glyph_primitive_key final
 		{
 			const fonts::Font *font = nullptr;
 			int glyph_index = 0;
 
-			bool operator<(const glyph_vertex_stream_key &key) const noexcept;
+			bool operator<(const text_glyph_primitive_key &key) const noexcept;
 		};
 
-		using glyph_vertex_streams = adaptors::FlatMap<glyph_vertex_stream_key, glyph_vertex_stream>;
+		using text_glyph_primitives = adaptors::FlatMap<text_glyph_primitive_key, text_glyph_primitive>;
 
 
 		inline auto get_vertex_declaration() noexcept
@@ -130,8 +117,6 @@ namespace ion::graphics::scene
 			Rendering
 		*/
 
-		int get_glyph_vertex_count(const glyph_vertex_streams &glyph_streams) noexcept;
-
 		Color get_foreground_color(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
 		std::optional<Color> get_background_color(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
 		std::optional<fonts::text::TextFontStyle> get_font_style(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
@@ -146,18 +131,20 @@ namespace ion::graphics::scene
 		real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const Vector2 &padding,
 			fonts::text::TextVerticalAlignment vertical_alignment, int font_size, real line_height, int total_lines, const Vector3 &position) noexcept;
 
-		fixed_vertex_container get_glyph_vertex_data(real glyph_index, const fonts::font::GlyphMetric &metric,
+		render::render_primitive::VertexContainer get_glyph_vertex_data(real glyph_index, const fonts::font::GlyphMetric &metric,
 			const Vector3 &position, real rotation, const Vector2 &scaling,
-			const Color &color, real opacity, const Vector3 &origin);
-		fixed_vertex_container get_decoration_vertex_data(
+			const Color &color, const Vector3 &origin);
+		render::render_primitive::VertexContainer get_decoration_vertex_data(
 			const Vector3 &position, real rotation, const Vector2 &size,
-			const Color &color, real opacity, const Vector3 &origin);
+			const Color &color, const Vector3 &origin, real delta_z);
 
-		void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text,
-			int font_size, int &glyph_count, Vector3 &position, real rotation, real opacity, const Vector3 &origin,
-			glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream);
-		void get_text_vertex_streams(const fonts::Text &text, Vector3 position, real rotation, real opacity,
-			glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream);
+		void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts::Text &text,
+			int font_size, int &glyph_count, Vector3 &position, real rotation, const Vector3 &origin,
+			text_glyph_primitives &glyph_primitives, text_decoration_primitive &back_decoration_primitive,
+			text_decoration_primitive &front_decoration_primitive);
+		void get_text_primitives(const fonts::Text &text, Vector3 position, real rotation,
+			text_glyph_primitives &glyph_primitives, text_decoration_primitive &back_decoration_primitive,
+			text_decoration_primitive &front_decoration_primitive);
 	} //drawable_text::detail
 
 
@@ -172,24 +159,15 @@ namespace ion::graphics::scene
 			std::optional<fonts::Text> text_;
 			NonOwningPtr<fonts::Text> initial_text_;
 
-			drawable_text::detail::glyph_vertex_streams glyph_vertex_streams_;
-			drawable_text::detail::decoration_vertex_stream decoration_vertex_stream_;
-			std::optional<render::vertex::VertexBufferObject> vbo_;
+			drawable_text::detail::text_glyph_primitives glyph_primitives_;
+			drawable_text::detail::text_decoration_primitive back_decoration_primitive_;
+			drawable_text::detail::text_decoration_primitive front_decoration_primitive_;
 
-			bool reload_vertex_streams_ = false;
-			bool reload_vertex_buffer_ = false;
+			bool reload_primitives_ = false;
 			bool update_bounding_volumes_ = false;
 
 
-			void ReloadVertexStreams();
-
-		protected:
-
-			/*
-				Events
-			*/
-
-			void OpacityChanged() noexcept override;
+			void ReloadPrimitives();
 
 		public:
 
@@ -216,7 +194,7 @@ namespace ion::graphics::scene
 				if (position_ != position)
 				{
 					position_ = position;
-					reload_vertex_streams_ = true;
+					reload_primitives_ = true;
 				}
 			}
 
@@ -226,7 +204,7 @@ namespace ion::graphics::scene
 				if (rotation_ != angle)
 				{
 					rotation_ = angle;
-					reload_vertex_streams_ = true;
+					reload_primitives_ = true;
 				}
 			}
 
@@ -255,7 +233,7 @@ namespace ion::graphics::scene
 			//Returns a mutable reference to the text
 			[[nodiscard]] auto& Get() noexcept
 			{
-				reload_vertex_streams_ = true; //Text could be changed
+				reload_primitives_ = true; //Text could be changed
 				return text_;
 			}
 
@@ -272,33 +250,13 @@ namespace ion::graphics::scene
 			}
 
 
-			//Return the vertex buffer this text uses
-			[[nodiscard]] inline auto& VertexBuffer() const noexcept
-			{
-				return vbo_;
-			}
-
-
 			/*
-				Preparing / drawing
+				Preparing
 			*/
 
 			//Prepare this text such that it is ready to be drawn
-			//This is called once regardless of passes
-			void Prepare() noexcept override;
-
-			//Draw this text with the given shader program (optional)
-			//This can be called multiple times if more than one pass
-			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept override;
-
-
-			/*
-				Elapse time
-			*/
-
-			//Elapse the total time for this text by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
-			void Elapse(duration time) noexcept override;
+			//This function is typically called each frame
+			void Prepare() override;
 	};
 } //ion::graphics::scene
 

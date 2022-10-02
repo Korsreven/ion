@@ -385,20 +385,10 @@ Light Light::Spot(std::optional<std::string> name,
 
 
 /*
-	Rendering
-*/
-
-void Light::Render() noexcept
-{
-	Prepare();
-}
-
-
-/*
 	Preparing
 */
 
-void Light::Prepare() noexcept
+void Light::Prepare()
 {
 	if (update_bounding_volumes_)
 	{

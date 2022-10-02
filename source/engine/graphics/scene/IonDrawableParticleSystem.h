@@ -16,23 +16,23 @@ File:	IonDrawableParticleSystem.h
 #include <cstddef>
 #include <optional>
 #include <string>
-#include <tuple>
 #include <vector>
 
 #include "IonDrawableObject.h"
 #include "graphics/particles/IonParticleSystem.h"
+#include "graphics/render/IonRenderPrimitive.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
-#include "graphics/render/vertex/IonVertexBufferObject.h"
 #include "graphics/render/vertex/IonVertexDeclaration.h"
 #include "graphics/shaders/IonShaderLayout.h"
+#include "graphics/utilities/IonVector2.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics
 {
-	namespace shaders
+	namespace materials
 	{
-		class ShaderProgram; //Forward declaration
+		class Material; //Forward declaration
 	}
 }
 
@@ -40,14 +40,21 @@ namespace ion::graphics::scene
 {
 	namespace drawable_particle_system::detail
 	{
-		struct emitter_vertex_stream
+		struct vertex_metrics
 		{
-			int particle_quota = 0;
-			NonOwningPtr<particles::Emitter> emitter;
-			render::vertex::VertexBatch vertex_batch;
+			int rotation_offset = 0;
+			int point_size_offset = 0;
 		};
 
-		using emitter_vertex_streams = std::vector<emitter_vertex_stream>;
+
+		struct particle_emitter_primitive : render::RenderPrimitive
+		{
+			render::render_primitive::VertexContainer vertex_data;
+
+			particle_emitter_primitive(NonOwningPtr<materials::Material> particle_material);
+		};
+
+		using particle_emitter_primitives = std::vector<particle_emitter_primitive>;
 
 
 		inline auto get_vertex_declaration() noexcept
@@ -81,17 +88,18 @@ namespace ion::graphics::scene
 				};
 		}
 
-		std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const particles::ParticleSystem &particle_system) noexcept;
+		vertex_metrics get_vertex_metrics(const render::vertex::VertexDeclaration &vertex_declaration) noexcept;
 
 
 		/*
-			Graphics API
+			Rendering
 		*/
 
-		void set_point_size(real size) noexcept;
+		void apply_node_rotation(const vertex_metrics &metrics, real node_rotation, render::render_primitive::VertexContainer &data) noexcept;
+		void apply_node_scaling(const vertex_metrics &metrics, const Vector2 &node_scaling, render::render_primitive::VertexContainer &data) noexcept;
 
-		void enable_point_sprites() noexcept;
-		void disable_point_sprites() noexcept;
+		void get_emitter_primitives(const particles::ParticleSystem &particle_system, const vertex_metrics &metrics,
+			real node_rotation, const Vector2 &node_scaling, particle_emitter_primitives &emitter_primitives);
 	} //drawable_particle_system::detail
 
 
@@ -103,14 +111,14 @@ namespace ion::graphics::scene
 			std::optional<particles::ParticleSystem> particle_system_;
 			NonOwningPtr<particles::ParticleSystem> initial_particle_system_;
 
-			drawable_particle_system::detail::emitter_vertex_streams vertex_streams_;
-			std::optional<render::vertex::VertexBufferObject> vbo_;
+			drawable_particle_system::detail::vertex_metrics vertex_metrics_;
+			drawable_particle_system::detail::particle_emitter_primitives emitter_primitives_;
 
-			bool reload_vertex_buffer_ = false;
+			bool reload_primitives_ = false;
 			bool update_bounding_volumes_ = false;
 
 
-			void ReloadVertexStreams();
+			void ReloadPrimitives();
 
 		public:
 
@@ -134,6 +142,7 @@ namespace ion::graphics::scene
 			//Returns a mutable reference to the particle system
 			[[nodiscard]] auto& Get() noexcept
 			{
+				reload_primitives_ = true; //Particle system could be changed
 				return particle_system_;
 			}
 
@@ -150,24 +159,13 @@ namespace ion::graphics::scene
 			}
 
 
-			//Return the vertex buffer this particle system uses
-			[[nodiscard]] inline auto& VertexBuffer() const noexcept
-			{
-				return vbo_;
-			}
-
-
 			/*
 				Preparing / drawing
 			*/
 
 			//Prepare this particle system such that it is ready to be drawn
-			//This is called once regardless of passes
-			void Prepare() noexcept override;
-
-			//Draw this particle system with the given shader program (optional)
-			//This can be called multiple times if more than one pass
-			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept override;
+			//This function is typically called each frame
+			void Prepare() override;
 
 
 			/*

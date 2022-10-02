@@ -12,9 +12,6 @@ File:	IonDrawableParticleSystem.cpp
 
 #include "IonDrawableParticleSystem.h"
 
-#include "graphics/IonGraphicsAPI.h"
-#include "graphics/shaders/IonShaderProgram.h"
-#include "graphics/shaders/IonShaderProgramManager.h"
 #include "query/IonSceneQuery.h"
 
 namespace ion::graphics::scene
@@ -26,86 +23,83 @@ using namespace types::type_literals;
 namespace drawable_particle_system::detail
 {
 
-std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const particles::ParticleSystem &particle_system) noexcept
+particle_emitter_primitive::particle_emitter_primitive(NonOwningPtr<materials::Material> particle_material) :
+	render::RenderPrimitive{render::vertex::vertex_batch::VertexDrawMode::Points, get_vertex_declaration()}
 {
-	auto aabb = aabb::Zero;
+	RenderMaterial(particle_material);
+	PointSprite(true);
+}
 
-	for (auto &emitter : particle_system.Emitters())
+
+vertex_metrics get_vertex_metrics(const render::vertex::VertexDeclaration &vertex_declaration) noexcept
+{
+	auto metrics = vertex_metrics{};
+
+	for (auto &element : vertex_declaration.Elements())
+	{
+		if (element.Name == shaders::shader_layout::AttributeName::Vertex_Rotation)
+			metrics.rotation_offset = element.Offset / static_cast<int>(sizeof(real));
+		else if (element.Name == shaders::shader_layout::AttributeName::Vertex_PointSize)
+			metrics.point_size_offset = element.Offset / static_cast<int>(sizeof(real));
+	}
+
+	return metrics;
+}
+
+/*
+	Rendering
+*/
+
+void apply_node_rotation(const vertex_metrics &metrics, real node_rotation, render::render_primitive::VertexContainer &data) noexcept
+{
+	auto size = std::ssize(data);
+	auto stride = sizeof(particles::Particle);
+
+	for (auto off = metrics.rotation_offset; off < size; off += stride)
+		data[off] += node_rotation;
+}
+
+void apply_node_scaling(const vertex_metrics &metrics, const Vector2 &node_scaling, render::render_primitive::VertexContainer &data) noexcept
+{
+	auto size = std::ssize(data);
+	auto stride = sizeof(particles::Particle);
+
+	for (auto off = metrics.point_size_offset; off < size; off += stride)
+		data[off] *= (node_scaling.X() + node_scaling.Y()) * 0.5_r; //Average
+}
+
+
+void get_emitter_primitives(const particles::ParticleSystem &particle_system,  const vertex_metrics &metrics,
+	real node_rotation, const Vector2 &node_scaling, particle_emitter_primitives &emitter_primitives)
+{
+	for (auto off = 0; auto &emitter : particle_system.Emitters())
 	{
 		if (!emitter.HasActiveParticles())
 			continue;
 
-		auto first = std::begin(emitter.Particles());
-		auto last = std::end(emitter.Particles());
+		auto &primitive =
+			[&]() noexcept -> detail::particle_emitter_primitive&
+			{
+				if (off < std::ssize(emitter_primitives))
+				{
+					emitter_primitives[off].RenderMaterial(emitter.ParticleMaterial());
+					return emitter_primitives[off];
+				}
+				else
+					return emitter_primitives.emplace_back(emitter.ParticleMaterial());
+			}();
 
-		auto min = Vector2{first->Position()};
-		auto max = min;
+		auto size = std::size(emitter.Particles()) * sizeof(particles::Particle);
+		primitive.vertex_data.resize(size / sizeof(real), 0.0_r);
+		std::memcpy(std::data(primitive.vertex_data), std::data(emitter.Particles()), size);
 
-		while (++first != last)
-		{
-			auto [x, y, z] = first->Position().XYZ();
+		if (node_rotation != 0.0_r)
+			apply_node_rotation(metrics, node_rotation, primitive.vertex_data);
 
-			if (x < min.X()) min.X(x);
-			else if (x > max.X()) max.X(x);
+		if (node_scaling != vector2::UnitScale)
+			apply_node_scaling(metrics, node_scaling, primitive.vertex_data);
 
-			if (y < min.Y()) min.Y(y);
-			else if (y > max.Y()) max.Y(y);
-		}
-
-		aabb.Merge(Aabb{min, max});
-	}
-
-	return {aabb, aabb, {aabb.ToHalfSize().Max(), aabb.Center()}};
-}
-
-
-/*
-	Graphics API
-*/
-
-void set_point_size(real size) noexcept
-{
-	glPointSize(static_cast<float>(size)); //Set fixed point size
-}
-
-
-void enable_point_sprites() noexcept
-{
-	switch (gl::PointSprite_Support())
-	{
-		case gl::Extension::Core:
-		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE); //Enable sprite tex coords
-		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT); //Set 0,0 to lower left
-		glEnable(GL_VERTEX_PROGRAM_POINT_SIZE); //Enable varying point size
-		glEnable(GL_POINT_SPRITE); //Enable point sprite
-		break;
-
-		case gl::Extension::ARB:
-		glTexEnvi(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE); //Enable sprite tex coords
-		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT); //Set 0,0 to lower left
-		glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB); //Enable varying point size
-		glEnable(GL_POINT_SPRITE_ARB); //Enable point sprite
-		break;
-	}
-}
-
-void disable_point_sprites() noexcept
-{
-	switch (gl::PointSprite_Support())
-	{
-		case gl::Extension::Core:
-		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT); //Set 0,0 back to upper left
-		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_FALSE); //Disable sprite tex coords
-		glDisable(GL_VERTEX_PROGRAM_POINT_SIZE); //Disable varying point size
-		glDisable(GL_POINT_SPRITE); //Disable point sprite
-		break;
-
-		case gl::Extension::ARB:
-		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT); //Set 0,0 back to upper left
-		glTexEnvi(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE); //Disable sprite tex coords
-		glDisable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB); //Disable varying point size
-		glDisable(GL_POINT_SPRITE_ARB); //Disable point sprite
-		break;
+		++off;
 	}
 }
 
@@ -114,52 +108,32 @@ void disable_point_sprites() noexcept
 
 //Private
 
-void DrawableParticleSystem::ReloadVertexStreams()
+void DrawableParticleSystem::ReloadPrimitives()
 {
-	if (std::size(particle_system_->Emitters()) > vertex_streams_.capacity())
-		vertex_streams_.reserve(std::size(particle_system_->Emitters()));
+	render_primitives_.clear();
 
-	for (auto off = 0; auto &emitter : particle_system_->Emitters())
+	if (particle_system_)
 	{
-		//Update existing stream
-		if (off < std::ssize(vertex_streams_))
-		{
-			if (vertex_streams_[off].particle_quota != emitter.ParticleQuota())
-			{
-				vertex_streams_[off].particle_quota = emitter.ParticleQuota();
-				reload_vertex_buffer_ = true;
-			}
+		auto parent_node = ParentNode();
+		auto node_rotation = parent_node ? parent_node->Rotation() : 0.0_r;
+		auto node_scaling = parent_node ? parent_node->Scaling() : vector2::UnitScale;
 
-			if (vertex_streams_[off].emitter.get() != &emitter)
-				vertex_streams_[off].emitter = particle_system_->GetEmitter(*emitter.Name());
-
-			vertex_streams_[off].vertex_batch.VertexData({std::data(emitter.Particles()), std::ssize(emitter.Particles())});
-			vertex_streams_[off].vertex_batch.BatchMaterial(emitter.ParticleMaterial());
-		}
-
-		//New stream
-		else
-		{
-			vertex_streams_.emplace_back(
-				emitter.ParticleQuota(),
-				particle_system_->GetEmitter(*emitter.Name()),
-				render::vertex::VertexBatch{
-					render::vertex::vertex_batch::VertexDrawMode::Points,
-					detail::get_vertex_declaration(),
-					{std::data(emitter.Particles()), std::ssize(emitter.Particles())},
-					emitter.ParticleMaterial()
-				}
-			);
-
-			reload_vertex_buffer_ = true;
-		}
-
-		++off;
+		detail::get_emitter_primitives(*particle_system_, vertex_metrics_,
+			node_rotation, node_scaling, emitter_primitives_);
 	}
 
-	//Erase unused vertex streams
-	if (std::size(vertex_streams_) > std::size(particle_system_->Emitters()))
-		vertex_streams_.erase(std::begin(vertex_streams_) + std::size(particle_system_->Emitters()), std::end(vertex_streams_));
+	std::erase_if(emitter_primitives_,
+		[&](auto &primitive) noexcept
+		{
+			if (!std::empty(primitive.vertex_data))
+			{
+				AddPrimitive(primitive);
+				primitive.VertexData(std::move(primitive.vertex_data));
+				return false; //Keep
+			}
+			else
+				return true;
+		});
 }
 
 //Public
@@ -169,7 +143,10 @@ DrawableParticleSystem::DrawableParticleSystem(std::optional<std::string> name,
 	
 	DrawableObject{std::move(name), visible},
 	particle_system_{particle_system ? std::make_optional(particle_system->Clone()) : std::nullopt},
-	initial_particle_system_{particle_system}
+	initial_particle_system_{particle_system},
+
+	vertex_metrics_{detail::get_vertex_metrics(detail::get_vertex_declaration())},
+	reload_primitives_{!!particle_system_}
 {
 	query_type_flags_ |= query::scene_query::QueryType::ParticleSystem;
 }
@@ -182,7 +159,10 @@ DrawableParticleSystem::DrawableParticleSystem(std::optional<std::string> name,
 void DrawableParticleSystem::Revert()
 {
 	if (initial_particle_system_)
+	{
 		particle_system_ = initial_particle_system_->Clone();
+		reload_primitives_ = true;
+	}
 }
 
 
@@ -190,80 +170,34 @@ void DrawableParticleSystem::Revert()
 	Preparing / drawing
 */
 
-void DrawableParticleSystem::Prepare() noexcept
+void DrawableParticleSystem::Prepare()
 {
-	if (!particle_system_)
-		return;
-
-	ReloadVertexStreams();
-	update_bounding_volumes_ = true;
-
-	if (reload_vertex_buffer_)
+	if (reload_primitives_)
 	{
-		if (!vbo_)
-			vbo_.emplace(render::vertex::vertex_buffer_object::VertexBufferUsage::Stream);
-
-		if (vbo_ && *vbo_)
-		{
-			if (!std::empty(vertex_streams_))
-			{
-				auto size = 0;
-				for (auto &stream : vertex_streams_)
-					size += stream.particle_quota;
-
-				vbo_->Reserve(size * sizeof(particles::Particle));
-
-				for (auto offset = 0; auto &stream : vertex_streams_)
-				{
-					size = stream.particle_quota;
-					stream.vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(particles::Particle), size * sizeof(particles::Particle)));
-					offset += size;
-				}
-			}
-		}
-
-		reload_vertex_buffer_ = false;
+		ReloadPrimitives();
+		reload_primitives_ = false;
+		update_bounding_volumes_ = true;
 	}
 
-	for (auto &stream : vertex_streams_)
-		stream.vertex_batch.Prepare();
+	//Prepare primitives
+	for (auto &primitive : emitter_primitives_)
+		primitive.Prepare();
 
 	if (update_bounding_volumes_)
 	{
-		auto [aabb, obb, sphere] =
-			detail::generate_bounding_volumes(*particle_system_);
-		aabb_ = aabb;
-		obb_ = obb;
-		sphere_ = sphere;
+		aabb_ = {};
+
+		//Merge all bounding boxes
+		for (auto &primitive : emitter_primitives_)
+			aabb_.Merge(primitive.AxisAlignedBoundingBox());
+
+		obb_ = aabb_;
+		sphere_ = {aabb_.ToHalfSize().Max(), aabb_.Center()};
 
 		update_bounding_volumes_ = false;
 	}
-}
 
-
-void DrawableParticleSystem::Draw(shaders::ShaderProgram *shader_program) noexcept
-{
-	if (visible_ && particle_system_ && !std::empty(vertex_streams_))
-	{
-		auto use_shader = shader_program && shader_program->Owner() && shader_program->Handle();
-		auto shader_in_use = use_shader && shader_program->Owner()->IsShaderProgramActive(*shader_program);
-
-		if (use_shader && !shader_in_use)
-			shader_program->Owner()->ActivateShaderProgram(*shader_program);
-
-		for (auto &stream : vertex_streams_)
-		{
-			auto &[min_size, max_size] = stream.emitter->ParticleSize();
-			detail::set_point_size((min_size.X() + max_size.X() + min_size.Y() + max_size.Y()) * 0.25_r);
-
-			detail::enable_point_sprites();
-			stream.vertex_batch.Draw(shader_program);
-			detail::disable_point_sprites();
-		}
-
-		if (use_shader && !shader_in_use)
-			shader_program->Owner()->ActivateShaderProgram(*shader_program);
-	}
+	DrawableObject::Prepare();
 }
 
 
@@ -276,9 +210,7 @@ void DrawableParticleSystem::Elapse(duration time) noexcept
 	if (particle_system_)
 	{
 		particle_system_->Elapse(time);
-
-		for (auto &stream : vertex_streams_)
-			stream.vertex_batch.Elapse(time);
+		reload_primitives_ = true;
 	}
 }
 

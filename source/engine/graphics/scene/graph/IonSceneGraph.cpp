@@ -36,84 +36,6 @@ using namespace scene_graph;
 namespace scene_graph::detail
 {
 
-void cache_bounding_boxes(const SceneNode &node) noexcept
-{
-	//For each visible node
-	for (auto &ordered_node : node.OrderedSceneNodes())
-	{
-		if (ordered_node.Visible())
-		{
-			//For each attached object
-			for (auto &attached_object : ordered_node.AttachedObjects())
-			{
-				auto object =
-					std::visit(
-						[=](auto &&object) noexcept -> MovableObject*
-						{
-							return object;
-						}, attached_object);
-					
-					if (object->Visible())
-						[[maybe_unused]] auto &aabb = object->WorldAxisAlignedBoundingBox(true, false);
-							//Cache without any applied extent
-			}
-		}
-	}
-}
-
-
-void get_lights(const SceneNode &node, const Camera &camera, light_pointers &lights)
-{
-	//For each light attached to a node
-	for (auto &light : node.AttachedLights())
-	{
-		//Visible light in view
-		if (light->Visible() && light->ParentNode()->Visible() &&
-			(light->WorldAxisAlignedBoundingBox(false, false).Empty() ||
-			light->WorldAxisAlignedBoundingBox(false, false).Intersects(camera.WorldAxisAlignedBoundingBox(false, false))))
-
-			lights.push_back(light);
-	}
-}
-
-void get_emissive_lights(const SceneNode &node, const Camera &camera, light_pointers &lights)
-{
-	//For each visible node
-	for (auto &ordered_node : node.OrderedSceneNodes())
-	{
-		if (ordered_node.Visible())
-		{
-			//For each attached object
-			for (auto &attached_object : ordered_node.AttachedObjects())
-			{
-				auto object =
-					std::visit(
-						[=](auto &&object) noexcept -> MovableObject*
-						{
-							return object;
-						}, attached_object);
-				
-				//Visible object in view that is not a camera or light
-				if (object->Visible() &&
-					(object->WorldAxisAlignedBoundingBox(false, false).Empty() ||
-					object->WorldAxisAlignedBoundingBox(false, false).Intersects(camera.WorldAxisAlignedBoundingBox(false, false))))
-				{
-					//For each visible emissive light
-					for (auto &light : object->EmissiveLights(false))
-					{
-						//Visible light in view
-						if (light->Visible() &&
-							(light->WorldAxisAlignedBoundingBox(true, false).Empty() || //Derive, emissive lights are not pre-cached!
-							light->WorldAxisAlignedBoundingBox(false, false).Intersects(camera.WorldAxisAlignedBoundingBox(false, false))))
-
-							lights.push_back(light);
-					}
-				}
-			}
-		}
-	}
-}
-
 void get_light_mask(const light_pointers &lights, const MovableObject &object, uvec4 &light_mask) noexcept
 {
 	light_mask.fill(0_ui32);
@@ -543,6 +465,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	if (!enabled_)
 		return;
 
+
 	/*
 		Camera
 	*/
@@ -553,8 +476,13 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	if (camera && camera->ParentNode() &&
 		&camera->ParentNode()->RootNode() == &root_node_ &&
 		camera->Visible() && camera->ParentNode()->Visible())
-
+	{
+		camera->Prepare();
 		camera->CaptureScene(viewport);
+
+		[[maybe_unused]] auto &aabb = camera->WorldAxisAlignedBoundingBox(true, false);
+			//Cache without any applied extent
+	}
 
 	else
 		return;
@@ -564,8 +492,76 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	const auto &view_mat = camera->ViewMatrix();
 	detail::set_gl_model_view_matrix(view_mat);
 
-	detail::cache_bounding_boxes(root_node_);
-		//Cache visible bounding boxes in scene graph
+
+	/*
+		Scene nodes
+	*/
+	
+	visible_objects_.clear();
+	emissive_lights_.clear();
+
+	//For each node
+	for (auto &node : root_node_.OrderedSceneNodes())
+	{
+		node.Elapse(time);
+
+		//The node render started/ended events can be called without any attached objects
+		//The visibility of the node is also used as a flag to enable/disable event notifications
+		auto node_visible = node.Visible();
+
+		if (node_visible)
+			NotifyNodeRenderStarted(node);
+
+		//For each attached object
+		for (auto &attached_object : node.AttachedObjects())
+		{
+			auto object =
+				std::visit(
+					[=](auto &&object) noexcept -> MovableObject*
+					{
+						return object;
+					}, attached_object);
+
+			auto object_visible = node_visible && object->Visible();
+
+			//Elapse and prepare object
+			if (object_visible)
+			{
+				object->Elapse(time);
+				object->Prepare();
+			}
+
+			//Object visible and in view
+			if (object_visible &&
+				(object->WorldAxisAlignedBoundingBox(true, false).Empty() || //Cull based on actual geometry
+				 object->WorldAxisAlignedBoundingBox(false, false).Intersects(camera->WorldAxisAlignedBoundingBox(false, false))))
+			{	
+				visible_objects_.push_back(object);
+
+				if (lighting_enabled_)
+				{
+					//For each emissive light
+					for (auto &light : object->EmissiveLights(false))
+					{
+						//Emissive light visible and in view
+						if (light->Visible() &&
+							(light->WorldAxisAlignedBoundingBox(true, false).Empty() || //Derive, emissive lights are not pre-cached!
+							 light->WorldAxisAlignedBoundingBox(false, false).Intersects(camera->WorldAxisAlignedBoundingBox(false, false))))
+
+							emissive_lights_.push_back(light);
+					}
+				}
+			}
+			else //Not visible or not in view
+			{
+				for (auto &primitive : object->RenderPrimitives())
+					primitive->WorldVisible(false); //Not visible or outside view
+			}
+		}
+
+		if (node_visible)
+			NotifyNodeRenderEnded(node);
+	}
 
 
 	/*
@@ -573,97 +569,61 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	*/
 
 	lights_.clear();
-	emissive_lights_.clear();
 
 	if (lighting_enabled_)
 	{
-		detail::get_lights(root_node_, *camera, lights_);
-		detail::get_emissive_lights(root_node_, *camera, emissive_lights_);
+		//For each light
+		for (auto &light : root_node_.AttachedLights())
+		{
+			//Light visible and in view
+			if (light->Visible() && light->ParentNode()->Visible() &&
+				(light->WorldAxisAlignedBoundingBox(false, false).Empty() ||
+				 light->WorldAxisAlignedBoundingBox(false, false).Intersects(camera->WorldAxisAlignedBoundingBox(false, false))))
+
+				lights_.push_back(light);
+		}
 	}
 
 
 	/*
-		Scene nodes
+		Shader programs
 	*/
 
-	shader_programs_.clear();	
+	shader_programs_.clear();
 
-	//For each visible node
-	for (auto &node : root_node_.OrderedSceneNodes())
+	//Set shader program uniforms
+	for (auto &object : visible_objects_)
 	{
-		shader_programs_node_.clear();
-		node.Elapse(time);
-
-		//The node render started/ended events can be called without any attached objects
-		//The visibility of the node is also used as a flag to enable/disable event notifications
-		if (node.Visible())
+		for (auto &shader_program : object->RenderPrograms())
 		{
-			NotifyNodeRenderStarted(node);
-
-			if (!std::empty(node.AttachedObjects()))
+			//There is not too many shader programs per scene
+			//So std::find with its linear complexity will be the fastest method to make sure each added element is unique
+			if (std::find(std::begin(shader_programs_), std::end(shader_programs_), shader_program) == std::end(shader_programs_))
+				//One time per program per scene
 			{
-				auto model_view_mat = view_mat * node.FullTransformation();
-				detail::push_gl_matrix();
-				detail::set_gl_model_view_matrix(model_view_mat);
-
-				//For each attached object
-				for (auto &attached_object : node.AttachedObjects())
-				{
-					auto object =
-						std::visit(
-							[=](auto &&object) noexcept -> MovableObject*
-							{
-								return object;
-							}, attached_object);
-					object->Elapse(time);
-
-					//Render visible objects in view
-					if (object->Visible() &&
-						(object->WorldAxisAlignedBoundingBox(false, false).Empty() || //Cull based on actual geometry
-						 object->WorldAxisAlignedBoundingBox(false, false).Intersects(camera->WorldAxisAlignedBoundingBox(false, false))))
-					{
-						//For each shader program update uniforms
-						for (auto &shader_program : object->RenderPrograms())
-						{
-							//There is probably <= 10 distinct shader programs per scene
-							//So std::find with its linear complexity will be the fastest method to make sure each added element is unique
-							if (std::find(std::begin(shader_programs_), std::end(shader_programs_), shader_program) == std::end(shader_programs_))
-								//One time per program per scene
-							{
-								detail::set_camera_uniforms(*camera, *shader_program);
-								detail::set_fog_uniforms(fog_enabled_ ? fog_ : std::optional<render::Fog>{}, *shader_program);
-								detail::set_light_uniforms(lights_, light_texture_handle_, *camera, *shader_program);
-								detail::set_emissive_light_uniforms(emissive_lights_, emissive_light_texture_handle_, *camera, *shader_program);
-								detail::set_matrix_uniforms(projection_mat, *shader_program);
-								detail::set_scene_uniforms(gamma_, ambient_color_, *shader_program);
-								shader_programs_.push_back(shader_program); //Only distinct
-							}
-
-							//There is probably <= 5 distinct shader programs per node
-							//So std::find with its linear complexity will be the fastest method to make sure each added element is unique
-							if (std::find(std::begin(shader_programs_node_), std::end(shader_programs_node_), shader_program) == std::end(shader_programs_node_))
-								//One time per program per node
-							{
-								detail::set_matrix_uniforms(projection_mat, model_view_mat, *shader_program);
-								detail::set_node_uniforms(node, *shader_program);
-								shader_programs_node_.push_back(shader_program); //Only distinct
-							}
-
-							//One time per program per object
-							detail::set_light_uniforms(lights_, *object, light_mask_, *shader_program);
-							detail::set_emissive_light_uniforms(emissive_lights_, *object, emissive_light_mask_, *shader_program);
-						}
-
-						object->Render();
-					}
-				}
-
-				detail::pop_gl_matrix();
+				detail::set_camera_uniforms(*camera, *shader_program);
+				detail::set_fog_uniforms(fog_enabled_ ? fog_ : std::optional<render::Fog>{}, *shader_program);
+				detail::set_light_uniforms(lights_, light_texture_handle_, *camera, *shader_program);
+				detail::set_emissive_light_uniforms(emissive_lights_, emissive_light_texture_handle_, *camera, *shader_program);
+				detail::set_matrix_uniforms(projection_mat, view_mat, *shader_program);
+				detail::set_scene_uniforms(gamma_, ambient_color_, *shader_program);
+				shader_programs_.push_back(shader_program); //Only distinct
 			}
-
-			NotifyNodeRenderEnded(node);
 		}
 	}
+
+
+	/*
+		Drawing
+	*/
+
+	renderer_.Elapse(time);
+	renderer_.Prepare();
+	renderer_.Draw();
+
+	//Draw bounding volumes
+	for (auto &object : visible_objects_)
+		object->DrawBounds();
 }
 
 

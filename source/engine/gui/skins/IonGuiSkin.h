@@ -210,8 +210,8 @@ namespace ion::gui::skins
 			gui_skin::SkinTextPartMap text_parts_;
 			gui_skin::SkinSoundPartMap sound_parts_;
 
-			graphics::scene::drawable_object::Passes passes_;
-			graphics::scene::drawable_object::Passes text_passes_;
+			graphics::render::pass::Passes passes_;
+			graphics::render::pass::Passes text_passes_;
 
 			gui_skin::SkinBuilder skin_builder_ = gui_skin::detail::make_control_skin;
 
@@ -301,14 +301,14 @@ namespace ion::gui::skins
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Passes() noexcept
 			{
-				return adaptors::ranges::Iterable<graphics::scene::drawable_object::Passes&>{passes_};
+				return adaptors::ranges::Iterable<graphics::render::pass::Passes&>{passes_};
 			}
 
 			//Returns an immutable range of all passes in this skin
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Passes() const noexcept
 			{
-				return adaptors::ranges::Iterable<const graphics::scene::drawable_object::Passes&>{passes_};
+				return adaptors::ranges::Iterable<const graphics::render::pass::Passes&>{passes_};
 			}
 
 
@@ -316,14 +316,14 @@ namespace ion::gui::skins
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto TextPasses() noexcept
 			{
-				return adaptors::ranges::Iterable<graphics::scene::drawable_object::Passes&>{text_passes_};
+				return adaptors::ranges::Iterable<graphics::render::pass::Passes&>{text_passes_};
 			}
 
 			//Returns an immutable range of all text passes in this skin
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto TextPasses() const noexcept
 			{
-				return adaptors::ranges::Iterable<const graphics::scene::drawable_object::Passes&>{text_passes_};
+				return adaptors::ranges::Iterable<const graphics::render::pass::Passes&>{text_passes_};
 			}
 
 
@@ -403,14 +403,14 @@ namespace ion::gui::skins
 			void AddPass(graphics::render::Pass pass);
 
 			//Adds passes to this skin
-			void AddPasses(graphics::scene::drawable_object::Passes passes);
+			void AddPasses(graphics::render::pass::Passes passes);
 
 
 			//Adds a text pass to this skin
 			void AddTextPass(graphics::render::Pass pass);
 
 			//Adds text passes to this skin
-			void AddTextPasses(graphics::scene::drawable_object::Passes passes);
+			void AddTextPasses(graphics::render::pass::Passes passes);
 
 
 			/*

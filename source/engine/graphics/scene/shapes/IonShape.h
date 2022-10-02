@@ -42,7 +42,10 @@ namespace ion::graphics::scene::shapes
 		protected:
 
 			Color color_;
+
 			bool update_vertices_ = false;
+			bool update_colors_ = false;
+			bool update_opacity_ = false;
 
 
 			//Construct a new shape with the given vertices, color and visibility
@@ -74,8 +77,8 @@ namespace ion::graphics::scene::shapes
 				Events
 			*/
 
-			virtual void VertexColorChanged() noexcept override;
-			virtual void VertexOpacityChanged() noexcept override;
+			virtual void BaseColorChanged() noexcept override;
+			virtual void BaseOpacityChanged() noexcept override;
 
 		public:
 
@@ -89,30 +92,18 @@ namespace ion::graphics::scene::shapes
 				if (color_ != color)
 				{
 					color_ = color;
-					update_vertices_ = true;
+					update_colors_ = true;
 				}
 			}
 
-			//Sets the opacity of this shape to the given percent
-			inline void FillOpacity(real percent) noexcept
+			//Sets the opacity of this shape to the given opacity
+			inline void FillOpacity(real opacity) noexcept
 			{
-				if (color_.A() != percent)
+				if (color_.A() != opacity)
 				{
-					color_.A(percent);
-					update_vertices_ = true;
+					color_.A(opacity);
+					update_opacity_ = true;
 				}
-			}
-
-			//Sets if this shape should be shown in wireframe or not
-			inline void ShowWireframe(bool show) noexcept
-			{
-				Mesh::ShowWireframe(show);
-			}
-
-			//Sets the visibility of this shape to the given value
-			inline void Visible(bool visible) noexcept
-			{
-				Mesh::Visible(visible);
 			}
 
 
@@ -132,37 +123,6 @@ namespace ion::graphics::scene::shapes
 				return color_.A();
 			}
 
-			//Returns true if this shape is shown in wireframe
-			[[nodiscard]] inline auto ShowWireframe() const noexcept
-			{
-				return Mesh::ShowWireframe();
-			}
-
-			//Returns true if this shape is visible
-			[[nodiscard]] inline auto Visible() const noexcept
-			{
-				return Mesh::Visible();
-			}
-
-
-			//Returns the local axis-aligned bounding box (AABB) for this shape
-			[[nodiscard]] inline auto& AxisAlignedBoundingBox() const noexcept
-			{
-				return Mesh::AxisAlignedBoundingBox();
-			}
-
-			//Returns the local oriented bounding box (OBB) for this shape
-			[[nodiscard]] inline auto& OrientedBoundingBox() const noexcept
-			{
-				return Mesh::OrientedBoundingBox();
-			}
-
-			//Returns the local bounding sphere for this shape
-			[[nodiscard]] inline auto& BoundingSphere() const noexcept
-			{
-				return Mesh::BoundingSphere();
-			}
-
 
 			/*
 				Preparing
@@ -176,8 +136,8 @@ namespace ion::graphics::scene::shapes
 
 
 			//Prepare this shape such that it is ready to be drawn
-			//This is called once regardless of passes
-			virtual mesh::MeshBoundingVolumeStatus Prepare() noexcept override;
+			//This function is typically called each frame
+			virtual void Prepare() override;
 	};
 } //ion::graphics::scene::shapes
 

@@ -15,6 +15,7 @@ File:	IonDrawableObject.cpp
 #include <algorithm>
 #include <cassert>
 
+#include "graphics/render/IonRenderPrimitive.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/shaders/IonShaderProgram.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
@@ -32,13 +33,37 @@ namespace drawable_object::detail
 
 //Protected
 
-/*
-	Events
-*/
-
-void DrawableObject::OpacityChanged() noexcept
+void DrawableObject::AddPrimitive(render::RenderPrimitive &primitive)
 {
-	//Empty
+	if (auto renderer = ParentRenderer(); renderer)
+	{
+		if (std::empty(primitive.RenderPasses()))
+			primitive.RenderPasses(passes_);
+
+		primitive.Opacity(opacity_);
+
+		renderer->AddPrimitive(primitive);
+		render_primitives_.push_back(&primitive);
+	}
+}
+
+void DrawableObject::RemovePrimitive(render::RenderPrimitive &primitive) noexcept
+{
+	if (auto iter = std::find(std::begin(render_primitives_), std::end(render_primitives_), &primitive);
+		iter != std::end(render_primitives_))
+		render_primitives_.erase(iter);
+}
+
+void DrawableObject::UpdatePassesOnAllPrimitives(const render::pass::Passes &passes) noexcept
+{
+	for (auto &primitive : render_primitives_)
+		primitive->RenderPasses(passes);
+}
+
+void DrawableObject::UpdateOpacityOnAllPrimitives(real opacity) noexcept
+{
+	for (auto &primitive : render_primitives_)
+		primitive->Opacity(opacity);
 }
 
 
@@ -52,64 +77,29 @@ DrawableObject::DrawableObject(std::optional<std::string> name, bool visible) :
 
 
 /*
-	Rendering
+	Modifiers
 */
 
-void DrawableObject::Render() noexcept
+void DrawableObject::Opacity(real opacity) noexcept
 {
-	Prepare();
-
-	//No passes added, add pass with default shader program (if any)
-	if (std::empty(passes_))
+	if (opacity_ != opacity)
 	{
-		auto default_shader_program =
-			[&]() noexcept -> NonOwningPtr<shaders::ShaderProgram>
-			{
-				if (auto owner = Owner(); owner)
-					return owner->GetDefaultShaderProgram(query_type_flags_);
-				else
-					return nullptr;
-			}();
-
-		AddPass(render::Pass{default_shader_program});
+		opacity_ = opacity;
+		UpdateOpacityOnAllPrimitives(opacity);
 	}
-
-	static NonOwningPtr<shaders::ShaderProgram> active_shader_program = nullptr;
-
-	for (auto &pass : passes_)
-	{
-		pass.Blend();
-
-		auto shader_program = pass.RenderProgram().get();
-		auto active_program = active_shader_program.get();
-		auto use_shader = shader_program && shader_program->Owner() && shader_program->Handle();
-
-		//Switch shader program
-		if (shader_program != active_program)
-		{
-			if (use_shader) //Custom pipeline
-				shader_program->Owner()->ActivateShaderProgram(*shader_program);
-			else if (active_program) //Fixed-function pipeline
-				active_program->Owner()->DeactivateShaderProgram(*active_program);
-
-			active_shader_program = pass.RenderProgram();
-		}
-
-		for (auto iterations = pass.Iterations(); iterations > 0; --iterations)
-			Draw(shader_program);
-	}
-
-	//Optimization
-	//When not deactivating the active shader program below...
-	//a program will always be active until switched with another program
-
-	//if (use_shader)
-	//	shader_program->Owner()->DeactivateShaderProgram(*shader_program);
-
-	MovableObject::Render(); //Render bounding volumes
 }
 
-const movable_object::ShaderPrograms& DrawableObject::RenderPrograms(bool derive) const
+
+/*
+	Observers
+*/
+
+std::span<render::RenderPrimitive*> DrawableObject::RenderPrimitives([[maybe_unused]] bool derive) const
+{
+	return render_primitives_;
+}
+
+std::span<shaders::ShaderProgram*> DrawableObject::RenderPrograms(bool derive) const
 {
 	if (derive)
 	{
@@ -132,6 +122,47 @@ const movable_object::ShaderPrograms& DrawableObject::RenderPrograms(bool derive
 
 
 /*
+	Rendering
+*/
+
+void DrawableObject::Prepare()
+{
+	//No passes added, add pass with default shader program (if any)
+	if (std::empty(passes_))
+	{
+		auto default_shader_program =
+			[&]() noexcept -> NonOwningPtr<shaders::ShaderProgram>
+			{
+				if (auto owner = Owner(); owner)
+					return owner->GetDefaultShaderProgram(query_type_flags_);
+				else
+					return nullptr;
+			}();
+
+		AddPass(render::Pass{default_shader_program});
+	}
+
+	//Set render primitive visibility
+	if (!std::empty(render_primitives_))
+	{
+		auto parent_node = ParentNode();
+		auto node_visible = parent_node && parent_node->Visible();
+
+		for (auto &primitive : render_primitives_)
+		{
+			auto world_visible = node_visible && visible_ && primitive->Visible();
+			primitive->WorldVisible(world_visible);
+
+			if (world_visible)
+				primitive->ModelMatrix(parent_node->FullTransformation());
+		}
+	}
+
+	MovableObject::Prepare();
+}
+
+
+/*
 	Elapse time
 */
 
@@ -149,14 +180,17 @@ void DrawableObject::Elapse([[maybe_unused]] duration time) noexcept
 void DrawableObject::AddPass(render::Pass pass)
 {
 	passes_.push_back(std::move(pass));
+	UpdatePassesOnAllPrimitives(passes_);
 }
 
-void DrawableObject::AddPasses(drawable_object::Passes passes)
+void DrawableObject::AddPasses(render::pass::Passes passes)
 {
 	if (std::empty(passes_))
 		passes_ = std::move(passes);
 	else
 		std::move(std::begin(passes), std::end(passes), std::back_inserter(passes_));
+
+	UpdatePassesOnAllPrimitives(passes_);
 }
 
 
@@ -187,6 +221,7 @@ void DrawableObject::ClearPasses() noexcept
 {
 	passes_.clear();
 	passes_.shrink_to_fit();
+	UpdatePassesOnAllPrimitives(passes_);
 }
 
 bool DrawableObject::RemovePass(int off) noexcept
@@ -194,6 +229,7 @@ bool DrawableObject::RemovePass(int off) noexcept
 	if (off >= 0 && off < std::ssize(passes_))
 	{
 		passes_.erase(std::begin(passes_) + off);
+		UpdatePassesOnAllPrimitives(passes_);
 		return true;
 	}
 	else

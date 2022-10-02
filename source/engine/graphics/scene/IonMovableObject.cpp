@@ -12,6 +12,7 @@ File:	IonMovableObject.cpp
 
 #include "IonMovableObject.h"
 
+#include "IonSceneManager.h"
 #include "graph/IonSceneGraph.h"
 #include "graph/IonSceneNode.h"
 #include "graphics/shaders/IonShaderProgramManager.h"
@@ -31,6 +32,18 @@ namespace movable_object::detail
 
 
 //Protected
+
+render::Renderer* MovableObject::ParentRenderer() const noexcept
+{
+	if (auto scene_manager = Owner(); scene_manager)
+	{
+		if (auto scene_graph = scene_manager->Owner(); scene_graph)
+			return &scene_graph->SceneRenderer();
+	}
+
+	return nullptr;
+}
+
 
 /*
 	Bounding volumes
@@ -107,10 +120,8 @@ void MovableObject::DrawBoundingVolumes(const Aabb &aabb, const Obb &obb, const 
 {
 	if (parent_node_)
 	{
-		graph::scene_graph::detail::pop_gl_matrix(); //Pop world model matrix
-		graph::scene_graph::detail::push_gl_matrix(); //Restore view matrix
-		graph::scene_graph::detail::mult_gl_model_view_matrix(
-			Matrix4::Translation({0.0_r, 0.0_r, parent_node_->DerivedPosition().Z()})); //view * z translation matrix
+		graph::scene_graph::detail::push_gl_matrix(); //Push transformation matrix
+		graph::scene_graph::detail::mult_gl_model_view_matrix(parent_node_->FullTransformation()); //view * model
 	}
 
 
@@ -137,11 +148,7 @@ void MovableObject::DrawBoundingVolumes(const Aabb &aabb, const Obb &obb, const 
 
 
 	if (parent_node_)
-	{
-		graph::scene_graph::detail::pop_gl_matrix(); //Pop z translation matrix
-		graph::scene_graph::detail::push_gl_matrix(); //Restore view matrix
-		graph::scene_graph::detail::mult_gl_model_view_matrix(parent_node_->FullTransformation()); //view * model
-	}
+		graph::scene_graph::detail::pop_gl_matrix(); //Pop transformation matrix
 }
 
 
@@ -187,30 +194,48 @@ MovableObject::~MovableObject() noexcept
 
 
 /*
+	Observers
+*/
+
+std::span<render::RenderPrimitive*> MovableObject::RenderPrimitives([[maybe_unused]] bool derive) const
+{
+	//Optional to override
+	return {};
+}
+
+std::span<shaders::ShaderProgram*> MovableObject::RenderPrograms([[maybe_unused]] bool derive) const
+{
+	//Optional to override
+	return {};
+}
+
+std::span<Light*> MovableObject::EmissiveLights([[maybe_unused]] bool derive) const
+{
+	//Optional to override
+	return {};
+}
+
+
+/*
 	Rendering
 */
 
-void MovableObject::Render() noexcept
+void MovableObject::Prepare()
 {
 	//Optional to override
+}
 
+
+/*
+	Drawing
+*/
+
+void MovableObject::DrawBounds() noexcept
+{
 	if (show_bounding_volumes_)
 		DrawBoundingVolumes(
 			WorldAxisAlignedBoundingBox(), WorldOrientedBoundingBox(), WorldBoundingSphere(),
 			aabb_color_, obb_color_, sphere_color_);
-}
-
-
-const movable_object::Lights& MovableObject::EmissiveLights([[maybe_unused]] bool derive) const
-{
-	//Optional to override
-	return emissive_lights_;
-}
-
-const ShaderPrograms& MovableObject::RenderPrograms([[maybe_unused]] bool derive) const
-{
-	//Optional to override
-	return shader_programs_;
 }
 
 

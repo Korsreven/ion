@@ -381,21 +381,12 @@ ClassDefinition get_mesh_class()
 	auto vertices = ClassDefinition::Create("vertices")
 		.AddRequiredClass(std::move(vertex));
 
-	return ClassDefinition::Create("mesh")
+	return ClassDefinition::Create("mesh", "render-primitive")
 		.AddClass(std::move(vertices))
 
-		.AddProperty("color", ParameterType::Color)
-		.AddProperty("draw-mode", {"points"s, "lines"s, "line-loop"s, "line-strip"s, "triangles"s, "triangle-fan"s, "triangle-strip"s, "quads"s, "polygon"s})
 		.AddProperty("include-bounding-volumes", ParameterType::Boolean)
-		.AddProperty("line-thickness", ParameterType::FloatingPoint)
-		.AddProperty("material", ParameterType::String)
-		.AddProperty("opacity", ParameterType::FloatingPoint)
-		.AddProperty("show-wireframe", ParameterType::Boolean)
 		.AddProperty("surface-material", ParameterType::String)
-		.AddProperty("tex-coord-mode", {"manual"s, "auto"s})
-		.AddProperty("vertex-color", ParameterType::Color)
-		.AddProperty("vertex-opacity", ParameterType::FloatingPoint)
-		.AddProperty("visible", ParameterType::Boolean);
+		.AddProperty("tex-coord-mode", {"manual"s, "auto"s});
 }
 
 ClassDefinition get_rectangle_class()
@@ -408,6 +399,25 @@ ClassDefinition get_rectangle_class()
 		.AddProperty("resize-to-fit", ParameterType::Vector2)
 		.AddProperty("rotation", ParameterType::FloatingPoint)
 		.AddProperty("width", ParameterType::FloatingPoint);
+}
+
+ClassDefinition get_render_primitive_class()
+{
+	return ClassDefinition::Create("render-primitive")
+		.AddClass(get_pass_class())
+
+		.AddProperty("base-color", ParameterType::Color)
+		.AddProperty("base-opacity", ParameterType::FloatingPoint)
+		.AddProperty("color", ParameterType::Color)
+		.AddProperty("draw-mode", {"points"s, "lines"s, "line-loop"s, "line-strip"s, "triangles"s, "triangle-fan"s, "triangle-strip"s, "quads"s, "polygon"s})
+		.AddProperty("line-thickness", ParameterType::FloatingPoint)
+		.AddProperty("material", ParameterType::String)
+		.AddProperty("opacity", ParameterType::FloatingPoint)
+		.AddProperty("point-size", ParameterType::FloatingPoint)
+		.AddProperty("point-sprite", ParameterType::Boolean)
+		.AddProperty("render-material", ParameterType::String)
+		.AddProperty("visible", ParameterType::Boolean)
+		.AddProperty("wire-frame", ParameterType::Boolean);
 }
 
 ClassDefinition get_shape_class()
@@ -564,6 +574,7 @@ ClassDefinition get_light_class()
 ClassDefinition get_model_class()
 {
 	return ClassDefinition::Create("model", "drawable-object")
+		.AddAbstractClass(get_render_primitive_class())
 		.AddAbstractClass(get_shape_class())
 		.AddClass(get_animated_sprite_class())
 		.AddClass(get_border_class())
@@ -796,50 +807,21 @@ void set_line_properties(const script_tree::ObjectNode &object, shapes::Line &li
 void set_mesh_properties(const script_tree::ObjectNode &object, shapes::Mesh &mesh,
 	const ManagerRegister &managers)
 {
+	set_render_primitive_properties(object, mesh, managers);
+
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "color" || property.Name() == "vertex-color")
-			mesh.VertexColor(property[0].Get<ScriptType::Color>()->Get());
-		else if (property.Name() == "draw-mode")
-		{
-			if (property[0].Get<ScriptType::Enumerable>()->Get() == "points")
-				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::Points);
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "lines")
-				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::Lines);
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "line-loop")
-				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::LineLoop);
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "line-strip")
-				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::LineStrip);
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "triangles")
-				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::Triangles);
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "triangle-fan")
-				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::TriangleFan);
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "triangle-strip")
-				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::TriangleStrip);
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "quads")
-				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::Quads);
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "polygon")
-				mesh.DrawMode(graphics::render::vertex::vertex_batch::VertexDrawMode::Polygon);
-		}
-		else if (property.Name() == "include-bounding-volumes")
+		if (property.Name() == "include-bounding-volumes")
 			mesh.IncludeBoundingVolumes(property[0].Get<ScriptType::Boolean>()->Get());
-		else if (property.Name() == "line-thickness")
-			mesh.LineThickness(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-		else if (property.Name() == "material" || property.Name() == "surface-material")
+		else if (property.Name() == "surface-material")
 			mesh.SurfaceMaterial(get_material(property[0].Get<ScriptType::String>()->Get(), managers));
-		else if (property.Name() == "opacity" || property.Name() == "vertex-opacity")
-			mesh.VertexOpacity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-		else if (property.Name() == "show-wireframe")
-			mesh.ShowWireframe(property[0].Get<ScriptType::Boolean>()->Get());
-		else if (property.Name() == "draw-mode")
+		else if (property.Name() == "tex-coord-mode")
 		{
 			if (property[0].Get<ScriptType::Enumerable>()->Get() == "manual")
 				mesh.TexCoordMode(shapes::mesh::MeshTexCoordMode::Manual);
 			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "auto")
 				mesh.TexCoordMode(shapes::mesh::MeshTexCoordMode::Auto);
 		}
-		else if (property.Name() == "visible")
-			mesh.Visible(property[0].Get<ScriptType::Boolean>()->Get());
 	}
 }
 
@@ -864,6 +846,41 @@ void set_rectangle_properties(const script_tree::ObjectNode &object, shapes::Rec
 			rectangle.Size(property[0].Get<ScriptType::Vector2>()->Get());
 		else if (property.Name() == "width")
 			rectangle.Width(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+	}
+}
+
+void set_render_primitive_properties(const script_tree::ObjectNode &object, graphics::render::RenderPrimitive &primitive,
+	const ManagerRegister &managers)
+{
+	graphics::render::pass::Passes passes;
+
+	for (auto &obj : object.Objects())
+	{
+		if (obj.Name() == "pass")
+			passes.push_back(create_pass(obj, managers));
+	}
+
+	if (!std::empty(passes))
+		primitive.RenderPasses(std::move(passes));
+
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "color" || property.Name() == "base-color")
+			primitive.BaseColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "line-thickness")
+			primitive.LineThickness(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "material" || property.Name() == "render-material")
+			primitive.RenderMaterial(get_material(property[0].Get<ScriptType::String>()->Get(), managers));
+		else if (property.Name() == "opacity" || property.Name() == "base-opacity")
+			primitive.BaseOpacity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "point-size")
+			primitive.PointSize(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "point-sprite")
+			primitive.PointSprite(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "wire-frame")
+			primitive.WireFrame(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "visible")
+			primitive.Visible(property[0].Get<ScriptType::Boolean>()->Get());
 	}
 }
 

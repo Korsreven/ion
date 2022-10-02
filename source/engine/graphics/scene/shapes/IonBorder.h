@@ -111,7 +111,7 @@ namespace ion::graphics::scene::shapes
 				if (border_size_ != size)
 				{
 					border_size_ = size;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 
@@ -138,7 +138,7 @@ namespace ion::graphics::scene::shapes
 					bottom_side_color_ = color;
 					left_side_color_ = color;
 					right_side_color_ = color;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 
@@ -156,7 +156,7 @@ namespace ion::graphics::scene::shapes
 					bottom_side_color_ = bottom;
 					left_side_color_ = left;
 					right_side_color_ = right;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 
@@ -173,7 +173,7 @@ namespace ion::graphics::scene::shapes
 					top_right_corner_color_ = color;
 					bottom_left_corner_color_ = color;
 					bottom_right_corner_color_ = color;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 
@@ -191,7 +191,7 @@ namespace ion::graphics::scene::shapes
 					top_right_corner_color_ = top_right;
 					bottom_left_corner_color_ = bottom_left;
 					bottom_right_corner_color_ = bottom_right;
-					Mesh::VertexData(GetVertices());
+					update_vertices_ = true;
 				}
 			}
 

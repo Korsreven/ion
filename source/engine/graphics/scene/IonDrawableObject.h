@@ -13,6 +13,7 @@ File:	IonDrawableObject.h
 #ifndef ION_DRAWABLE_OBJECT_H
 #define ION_DRAWABLE_OBJECT_H
 
+#include <span>
 #include <string>
 #include <vector>
 
@@ -27,7 +28,10 @@ namespace ion::graphics::scene
 
 	namespace drawable_object
 	{
-		using Passes = std::vector<render::Pass>;
+		using RenderPrimitives = std::vector<render::RenderPrimitive*>;
+		using ShaderPrograms = std::vector<shaders::ShaderProgram*>;
+		using Lights = std::vector<Light*>;
+
 
 		namespace detail
 		{
@@ -41,15 +45,19 @@ namespace ion::graphics::scene
 		private:
 
 			real opacity_ = 1.0_r;
-			drawable_object::Passes passes_;
+			render::pass::Passes passes_;
 
 		protected:
 
-			/*
-				Events
-			*/
+			mutable drawable_object::RenderPrimitives render_primitives_;
+			mutable drawable_object::ShaderPrograms shader_programs_;
 
-			virtual void OpacityChanged() noexcept;
+
+			void AddPrimitive(render::RenderPrimitive &primitive);
+			void RemovePrimitive(render::RenderPrimitive &primitive) noexcept;
+
+			void UpdatePassesOnAllPrimitives(const render::pass::Passes &passes) noexcept;
+			void UpdateOpacityOnAllPrimitives(real opacity) noexcept;
 
 		public:
 
@@ -65,14 +73,14 @@ namespace ion::graphics::scene
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Passes() noexcept
 			{
-				return adaptors::ranges::Iterable<drawable_object::Passes&>{passes_};
+				return adaptors::ranges::Iterable<render::pass::Passes&>{passes_};
 			}
 
 			//Returns an immutable range of all passes of this drawable
 			//This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Passes() const noexcept
 			{
-				return adaptors::ranges::Iterable<const drawable_object::Passes&>{passes_};
+				return adaptors::ranges::Iterable<const render::pass::Passes&>{passes_};
 			}
 
 
@@ -80,15 +88,8 @@ namespace ion::graphics::scene
 				Modifiers
 			*/
 
-			//Sets the opacity of this drawable object to the given percent
-			virtual void Opacity(real percent) noexcept
-			{
-				if (opacity_ != percent)
-				{
-					opacity_ = percent;
-					OpacityChanged();
-				}
-			}
+			//Sets the opacity of this drawable object to the given opacity
+			void Opacity(real opacity) noexcept;
 
 
 			/*
@@ -102,30 +103,20 @@ namespace ion::graphics::scene
 			}
 
 
-			/*
-				Rendering
-			*/
-
-			//Render this drawable object based on its defined passes
-			//This is called once from a scene graph render queue
-			//It will call prepare, and then draw one time per pass
-			void Render() noexcept override;
+			//Returns all render primitives in this drawable object
+			[[nodiscard]] virtual std::span<render::RenderPrimitive*> RenderPrimitives(bool derive = true) const override;
 
 			//Returns all (distinct) shader programs used to render this drawable object
-			[[nodiscard]] virtual const movable_object::ShaderPrograms& RenderPrograms(bool derive = true) const;
+			[[nodiscard]] virtual std::span<shaders::ShaderProgram*> RenderPrograms(bool derive = true) const override;
 
 
 			/*
-				Preparing / drawing
+				Preparing
 			*/
 
 			//Prepare this drawable object such that it is ready to be drawn
-			//This is called once regardless of passes
-			virtual void Prepare() noexcept = 0;
-
-			//Draw this drawable object with the given shader program (optional)
-			//This can be called multiple times if more than one pass
-			virtual void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept = 0;
+			//This function is typically called each frame
+			virtual void Prepare() override;
 
 
 			/*
@@ -146,7 +137,7 @@ namespace ion::graphics::scene
 			void AddPass(render::Pass pass);
 
 			//Add the given passes for this drawable object
-			void AddPasses(drawable_object::Passes passes);
+			void AddPasses(render::pass::Passes passes);
 
 
 			/*

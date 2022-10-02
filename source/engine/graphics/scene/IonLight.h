@@ -344,21 +344,12 @@ namespace ion::graphics::scene
 
 
 			/*
-				Rendering
-			*/
-
-			//Render this light
-			//This is called once from a scene graph render queue
-			void Render() noexcept override;
-
-
-			/*
 				Preparing
 			*/
 
 			//Prepare this light
-			//This is called once regardless of passes
-			void Prepare() noexcept;
+			//This function is typically called each frame
+			void Prepare() override;
 	};
 } //ion::graphics::scene
 

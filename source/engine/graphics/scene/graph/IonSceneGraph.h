@@ -78,14 +78,10 @@ namespace ion::graphics::scene::graph
 				//uvec4 has 4 x 32 bit unsigned integers which sums up to a total of 128 bits
 
 			using light_pointers = std::vector<Light*>;
+			using movable_object_pointers = std::vector<MovableObject*>;
 			using shader_program_pointers = std::vector<shaders::ShaderProgram*>;
 			using uvec4 = std::array<uint32, 4>;
 
-
-			void cache_bounding_boxes(const SceneNode &node) noexcept;
-
-			void get_lights(const SceneNode &node, const Camera &camera, light_pointers &lights);
-			void get_emissive_lights(const SceneNode &node, const Camera &camera, light_pointers &lights);
 			void get_light_mask(const light_pointers &lights, const MovableObject &object, uvec4 &light_mask) noexcept;
 
 
@@ -149,8 +145,8 @@ namespace ion::graphics::scene::graph
 			scene_graph::detail::uvec4 light_mask_{};
 			scene_graph::detail::uvec4 emissive_light_mask_{};
 
+			scene_graph::detail::movable_object_pointers visible_objects_;
 			scene_graph::detail::shader_program_pointers shader_programs_;
-			scene_graph::detail::shader_program_pointers shader_programs_node_;
 				//Keep these as members so we don't have to reallocate storage for each render call
 
 			std::optional<textures::texture::TextureHandle> light_texture_handle_;

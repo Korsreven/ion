@@ -22,12 +22,6 @@ struct Camera
     float rotation;
 };
 
-struct Node
-{
-    float rotation;
-    vec2 scaling;
-};
-
 
 layout (location = 0) in vec3 vertex_position;
 layout (location = 1) in float vertex_rotation;
@@ -39,7 +33,6 @@ out mat2 rotation_matrix;
 
 uniform Matrix matrix;
 uniform Camera camera;
-uniform Node node;
 
 
 mat2 angle_to_rotation_mat(float angle)
@@ -54,8 +47,8 @@ mat2 angle_to_rotation_mat(float angle)
 void main()
 {
     vert_color = vertex_color;
-    rotation_matrix = angle_to_rotation_mat(camera.rotation) * angle_to_rotation_mat(vertex_rotation + node.rotation);
+    rotation_matrix = angle_to_rotation_mat(camera.rotation) * angle_to_rotation_mat(vertex_rotation);
     
     gl_Position = matrix.model_view_projection * vec4(vertex_position, 1.0);
-    gl_PointSize = vertex_point_size * ((node.scaling.x + node.scaling.y) * 0.5);
+    gl_PointSize = vertex_point_size;
 }

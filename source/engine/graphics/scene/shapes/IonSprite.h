@@ -61,7 +61,7 @@ namespace ion::graphics::scene::shapes
 				Events
 			*/
 
-			virtual void SurfaceMaterialChanged() noexcept override;
+			virtual void MaterialChanged() noexcept override;
 
 		public:
 		
@@ -151,8 +151,7 @@ namespace ion::graphics::scene::shapes
 			//Sets the surface material used by this sprite to the given material
 			void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
-				if (Mesh::SurfaceMaterial() != material)
-					Mesh::SurfaceMaterial(material);
+				Mesh::SurfaceMaterial(material);
 			}
 
 
@@ -189,7 +188,7 @@ namespace ion::graphics::scene::shapes
 			//Returns nullptr if this sprite does not have a material
 			[[nodiscard]] inline auto SurfaceMaterial() const noexcept
 			{
-				return  Mesh::SurfaceMaterial();
+				return  RenderMaterial();
 			}
 
 

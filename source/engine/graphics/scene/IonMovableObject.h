@@ -15,6 +15,7 @@ File:	IonMovableObject.h
 
 #include <any>
 #include <optional>
+#include <span>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -29,6 +30,12 @@ File:	IonMovableObject.h
 //Forward declarations
 namespace ion::graphics
 {
+	namespace render
+	{
+		class Renderer;
+		class RenderPrimitive;
+	}
+
 	namespace shaders
 	{
 		class ShaderProgram;
@@ -57,9 +64,6 @@ namespace ion::graphics::scene
 			BoundingSphere
 		};
 
-		using Lights = std::vector<Light*>;
-		using ShaderPrograms = std::vector<shaders::ShaderProgram*>;		
-
 
 		namespace detail
 		{
@@ -79,8 +83,8 @@ namespace ion::graphics::scene
 			Obb obb_;
 			Sphere sphere_;
 
-			mutable movable_object::Lights emissive_lights_;
-			mutable movable_object::ShaderPrograms shader_programs_;		
+
+			render::Renderer* ParentRenderer() const noexcept;
 
 
 			/*
@@ -107,7 +111,7 @@ namespace ion::graphics::scene
 			Color obb_color_ = color::White;
 			Color sphere_color_ = color::White;
 
-			graph::SceneNode *parent_node_ = nullptr;		
+			graph::SceneNode *parent_node_ = nullptr;
 			std::any user_data_;
 
 			mutable std::pair<Aabb, Aabb> world_aabb_;
@@ -395,20 +399,31 @@ namespace ion::graphics::scene
 			}
 
 
-			/*
-				Rendering
-			*/
-
-			//Render this movable object
-			//This is called once from a scene graph render queue
-			virtual void Render() noexcept;
-
-
-			//Returns all emissive lights in this movable object
-			[[nodiscard]] virtual const movable_object::Lights& EmissiveLights(bool derive = true) const;
+			//Returns all render primitives in this movable object
+			[[nodiscard]] virtual std::span<render::RenderPrimitive*> RenderPrimitives(bool derive = true) const;
 
 			//Returns all (distinct) shader programs used to render this movable object
-			[[nodiscard]] virtual const movable_object::ShaderPrograms& RenderPrograms(bool derive = true) const;	
+			[[nodiscard]] virtual std::span<shaders::ShaderProgram*> RenderPrograms(bool derive = true) const;
+
+			//Returns all emissive lights in this movable object
+			[[nodiscard]] virtual std::span<Light*> EmissiveLights(bool derive = true) const;
+
+
+			/*
+				Preparing
+			*/
+
+			//Prepare this movable object
+			//This function is typically called each frame
+			virtual void Prepare();
+
+
+			/*
+				Drawing
+			*/
+
+			//Draw the bounding volumes of this movable object
+			virtual void DrawBounds() noexcept;
 
 
 			/*

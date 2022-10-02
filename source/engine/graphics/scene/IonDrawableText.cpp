@@ -17,12 +17,10 @@ File:	IonDrawableText.cpp
 #include <utility>
 
 #include "IonEngine.h"
-#include "graphics/IonGraphicsAPI.h"
 #include "graphics/fonts/IonFont.h"
 #include "graphics/fonts/IonTypeFace.h"
 #include "graphics/fonts/utilities/IonFontUtility.h"
-#include "graphics/shaders/IonShaderProgram.h"
-#include "graphics/shaders/IonShaderProgramManager.h"
+#include "graphics/render/vertex/IonVertexBatch.h"
 #include "query/IonSceneQuery.h"
 
 #undef min
@@ -36,37 +34,19 @@ using namespace graphics::utilities;
 namespace drawable_text::detail
 {
 
-glyph_vertex_stream::glyph_vertex_stream(vertex_container vertex_data, textures::texture::TextureHandle texture_handle) :
+text_glyph_primitive::text_glyph_primitive(textures::texture::TextureHandle texture_handle) :
+	render::RenderPrimitive{render::vertex::vertex_batch::VertexDrawMode::Triangles, get_vertex_declaration()}
+{
+	RenderTexture(texture_handle);
+}
 
-	vertex_data{std::move(vertex_data)},
-	vertex_batch
-	{
-		render::vertex::vertex_batch::VertexDrawMode::Triangles,
-		get_vertex_declaration(),
-		this->vertex_data,
-		texture_handle
-	}
+text_decoration_primitive::text_decoration_primitive() :
+	render::RenderPrimitive{render::vertex::vertex_batch::VertexDrawMode::Triangles, get_vertex_declaration()}
 {
 	//Empty
 }
 
-decoration_vertex_stream::decoration_vertex_stream() :
-
-	back_vertex_batch
-	{
-		render::vertex::vertex_batch::VertexDrawMode::Triangles,
-		get_vertex_declaration()
-	},
-	front_vertex_batch
-	{
-		render::vertex::vertex_batch::VertexDrawMode::Triangles,
-		get_vertex_declaration()
-	}
-{
-	//Empty
-}
-
-bool glyph_vertex_stream_key::operator<(const glyph_vertex_stream_key &key) const noexcept
+bool text_glyph_primitive_key::operator<(const text_glyph_primitive_key &key) const noexcept
 {
 	return std::pair{font, glyph_index} < std::pair{key.font, key.glyph_index};
 }
@@ -142,15 +122,6 @@ std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const fonts::Text &text,
 /*
 	Rendering
 */
-
-int get_glyph_vertex_count(const glyph_vertex_streams &glyph_streams) noexcept
-{
-	auto count = 0;
-	for (auto &stream : glyph_streams)
-		count += std::ssize(stream.second.vertex_data);
-	return count;
-}
-
 
 Color get_foreground_color(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept
 {
@@ -276,13 +247,12 @@ real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const 
 }
 
 
-fixed_vertex_container get_glyph_vertex_data(real glyph_index, const fonts::font::GlyphMetric &metric,
+render::render_primitive::VertexContainer get_glyph_vertex_data(real glyph_index, const fonts::font::GlyphMetric &metric,
 	const Vector3 &position, real rotation, const Vector2 &scaling,
-	const Color &color, real opacity, const Vector3 &origin)
+	const Color &color, const Vector3 &origin)
 {
 	auto [x, y, z] = position.XYZ();
 	auto [r, g, b, a] = color.RGBA();
-	a *= opacity;
 
 	auto s = static_cast<real>(metric.Width) / metric.ActualWidth;
 	auto t = static_cast<real>(metric.Height) / metric.ActualHeight;
@@ -352,18 +322,18 @@ fixed_vertex_container get_glyph_vertex_data(real glyph_index, const fonts::font
 		};
 }
 
-fixed_vertex_container get_decoration_vertex_data(
+render::render_primitive::VertexContainer get_decoration_vertex_data(
 	const Vector3 &position, real rotation, const Vector2 &size,
-	const Color &color, real opacity, const Vector3 &origin)
+	const Color &color, const Vector3 &origin, real delta_z)
 {
 	auto [x, y, z] = position.XYZ();
 	auto [width, height] = size.XY();
 	auto [r, g, b, a] = color.RGBA();
-	a *= opacity;
 
 	//Floor/ceil values (decorations may appear blurry if positioned off-pixel)
 	x = std::floor(x);
 	y = std::floor(y);
+	z += delta_z;
 	width = std::ceil(width);
 	height = std::ceil(height);
 
@@ -418,9 +388,10 @@ fixed_vertex_container get_decoration_vertex_data(
 }
 
 
-void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fonts::Text &text,
-	int font_size, int &glyph_count, Vector3 &position, real rotation, real opacity, const Vector3 &origin,
-	glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream)
+void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts::Text &text,
+	int font_size, int &glyph_count, Vector3 &position, real rotation, const Vector3 &origin,
+	text_glyph_primitives &glyph_primitives, text_decoration_primitive &back_decoration_primitive,
+	text_decoration_primitive &front_decoration_primitive)
 {
 	if (auto font = get_default_font(text_block, text); font)
 	{
@@ -444,8 +415,9 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 
 					auto vertex_data = get_decoration_vertex_data(
 						decoration_position, rotation, decoration_size,
-						*background_color, opacity, origin);
-					decoration_stream.back_vertex_data.insert(std::end(decoration_stream.back_vertex_data), std::begin(vertex_data), std::end(vertex_data));
+						*background_color, origin, std::nextafter(0.0_r, -1.0_r));
+					back_decoration_primitive.vertex_data.insert(std::end(back_decoration_primitive.vertex_data),
+						std::begin(vertex_data), std::end(vertex_data));
 				}
 				
 				//Text decoration
@@ -471,14 +443,24 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 					
 					auto decoration_size = Vector2{text_block.Size->X(), line_thickness};
 					auto decoration_color = get_text_decoration_color(text_block, text).value_or(foreground_color);
-					auto vertex_data = get_decoration_vertex_data(
-						decoration_position, rotation, decoration_size,
-						decoration_color, opacity, origin);
 
+					//Front decoration
 					if (*decoration == fonts::text::TextDecoration::LineThrough)
-						decoration_stream.front_vertex_data.insert(std::end(decoration_stream.front_vertex_data), std::begin(vertex_data), std::end(vertex_data));
-					else
-						decoration_stream.back_vertex_data.insert(std::end(decoration_stream.back_vertex_data), std::begin(vertex_data), std::end(vertex_data));
+					{
+						auto vertex_data = get_decoration_vertex_data(
+							decoration_position, rotation, decoration_size,
+							decoration_color, origin, std::nextafter(0.0_r, 1.0_r));
+						front_decoration_primitive.vertex_data.insert(std::end(front_decoration_primitive.vertex_data),
+							std::begin(vertex_data), std::end(vertex_data));
+					}
+					else //Back decoration
+					{
+						auto vertex_data = get_decoration_vertex_data(
+							decoration_position, rotation, decoration_size,
+							decoration_color, origin, std::nextafter(0.0_r, -1.0_r));
+						back_decoration_primitive.vertex_data.insert(std::end(back_decoration_primitive.vertex_data),
+							std::begin(vertex_data), std::end(vertex_data));
+					}
 				}
 
 				//For each character
@@ -490,31 +472,26 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 						auto vertex_data =
 							get_glyph_vertex_data(glyph_index, (*metrics)[glyph_index],
 								position, rotation, scaling,
-								foreground_color, opacity, origin);
-						auto iter = std::end(glyph_streams);
+								foreground_color, origin);
+						auto iter = std::end(glyph_primitives);
 
 						if (handle->Type == textures::texture::TextureType::ArrayTexture2D)
 						{
-							auto key = glyph_vertex_stream_key{font};
+							auto key = text_glyph_primitive_key{font};
 								//Group on font
 
-							//New stream
-							if (iter = glyph_streams.find(key); iter == std::end(glyph_streams))
-								iter = glyph_streams.emplace(std::make_pair(key, glyph_vertex_stream{vertex_container{}, (*handle)[0]})).first;
+							//New primitive
+							if (iter = glyph_primitives.find(key); iter == std::end(glyph_primitives))
+								iter = glyph_primitives.emplace(std::make_pair(key, text_glyph_primitive{(*handle)[0]})).first;
 						}
 						else
 						{
-							auto key = glyph_vertex_stream_key{font, glyph_index};
+							auto key = text_glyph_primitive_key{font, glyph_index};
 								//Group on font and glyph index
 
-							//New stream
-							if (iter = glyph_streams.find(key); iter == std::end(glyph_streams))
-							{
-								iter = glyph_streams.emplace(std::make_pair(key, glyph_vertex_stream{vertex_container{}, (*handle)[glyph_index]})).first;
-								iter->second.vertex_batch.UseVertexArray(false);
-									//Turn off vertex array object (VAO) for each glyph (when using Texture2D)
-									//There could be a lot of glyphs in a text, so keep hardware VAOs for other geometry
-							}
+							//New primitive
+							if (iter = glyph_primitives.find(key); iter == std::end(glyph_primitives))
+								iter = glyph_primitives.emplace(std::make_pair(key, text_glyph_primitive{(*handle)[glyph_index]})).first;
 						}
 
 						iter->second.vertex_data.insert(std::end(iter->second.vertex_data),
@@ -525,17 +502,15 @@ void get_block_vertex_streams(const fonts::text::TextBlock &text_block, const fo
 					}
 				}
 
-				for (auto &stream : glyph_streams)
-					stream.second.vertex_batch.VertexData(stream.second.vertex_data);
-
 				position.Y(base_y);
 			}
 		}
 	}
 }
 
-void get_text_vertex_streams(const fonts::Text &text, Vector3 position, real rotation, real opacity,
-	glyph_vertex_streams &glyph_streams, decoration_vertex_stream &decoration_stream)
+void get_text_primitives(const fonts::Text &text, Vector3 position, real rotation,
+	text_glyph_primitives &glyph_primitives, text_decoration_primitive &back_decoration_primitive,
+	text_decoration_primitive &front_decoration_primitive)
 {
 	auto line_height = text.LineHeight();
 
@@ -591,9 +566,9 @@ void get_text_vertex_streams(const fonts::Text &text, Vector3 position, real rot
 				));
 
 			for (auto &block : iter->Blocks)
-				get_block_vertex_streams(block, text,
-					font_size, glyph_count, glyph_position, rotation, opacity,
-					origin, glyph_streams, decoration_stream);
+				get_block_primitives(block, text,
+					font_size, glyph_count, glyph_position, rotation, origin,
+					glyph_primitives, back_decoration_primitive, front_decoration_primitive);
 
 			glyph_position.Y(glyph_position.Y() - *line_height); //Next glyph y position
 		}
@@ -605,80 +580,45 @@ void get_text_vertex_streams(const fonts::Text &text, Vector3 position, real rot
 
 //Private
 
-void DrawableText::ReloadVertexStreams()
+void DrawableText::ReloadPrimitives()
 {
-	auto glyph_vertex_count = detail::get_glyph_vertex_count(glyph_vertex_streams_);
-	auto back_decoration_vertex_count = std::ssize(decoration_vertex_stream_.back_vertex_data);
-	auto front_decoration_vertex_count = std::ssize(decoration_vertex_stream_.front_vertex_data);
+	render_primitives_.clear();
+
+	if (text_)
+		detail::get_text_primitives(*text_, position_, rotation_,
+			glyph_primitives_, back_decoration_primitive_, front_decoration_primitive_);
 
 	//Glyphs
-	if (glyph_vertex_count > 0)
-	{
-		for (auto &stream : glyph_vertex_streams_)
-			stream.second.vertex_data.clear();
-	}
-
-	//Front decoration
-	if (front_decoration_vertex_count > 0)
-	{
-		decoration_vertex_stream_.front_vertex_data.clear();
-		decoration_vertex_stream_.front_vertex_batch.VertexData(decoration_vertex_stream_.front_vertex_data);
-	}
-
-	//Back decoration
-	if (back_decoration_vertex_count > 0)
-	{
-		decoration_vertex_stream_.back_vertex_data.clear();
-		decoration_vertex_stream_.back_vertex_batch.VertexData(decoration_vertex_stream_.back_vertex_data);
-	}
-
-
-	detail::get_text_vertex_streams(*text_, position_, rotation_, Opacity(),
-		glyph_vertex_streams_, decoration_vertex_stream_);
-
-
-	//Glyphs
-	if (!std::empty(glyph_vertex_streams_))
-	{
-		glyph_vertex_streams_.erase_if(
-			[](auto &stream) noexcept
+	glyph_primitives_.erase_if(
+		[&](auto &primitive) noexcept
+		{
+			if (!std::empty(primitive.second.vertex_data))
 			{
-				return std::empty(stream.second.vertex_data);
-			});
-
-		if (glyph_vertex_count < detail::get_glyph_vertex_count(glyph_vertex_streams_))
-			reload_vertex_buffer_ = true;
-	}
-
-	//Front decoration
-	if (!std::empty(decoration_vertex_stream_.front_vertex_data))
-	{
-		decoration_vertex_stream_.front_vertex_batch.VertexData(decoration_vertex_stream_.front_vertex_data);
-
-		if (front_decoration_vertex_count < std::ssize(decoration_vertex_stream_.front_vertex_data))
-			reload_vertex_buffer_ = true;
-	}
+				AddPrimitive(primitive.second);
+				primitive.second.VertexData(std::move(primitive.second.vertex_data));
+				return false; //Keep
+			}
+			else
+				return true;
+		});
 
 	//Back decoration
-	if (!std::empty(decoration_vertex_stream_.back_vertex_data))
+	if (!std::empty(back_decoration_primitive_.vertex_data))
 	{
-		decoration_vertex_stream_.back_vertex_batch.VertexData(decoration_vertex_stream_.back_vertex_data);
-
-		if (back_decoration_vertex_count < std::ssize(decoration_vertex_stream_.back_vertex_data))
-			reload_vertex_buffer_ = true;
+		AddPrimitive(back_decoration_primitive_);
+		back_decoration_primitive_.VertexData(std::move(back_decoration_primitive_.vertex_data));
 	}
-}
+	else if (back_decoration_primitive_.vertex_data.capacity() > 0)
+		back_decoration_primitive_ = {};
 
-
-//Protected
-
-/*
-	Events
-*/
-
-void DrawableText::OpacityChanged() noexcept
-{
-	reload_vertex_streams_ = true;
+	//Front decoration
+	if (!std::empty(front_decoration_primitive_.vertex_data))
+	{
+		AddPrimitive(front_decoration_primitive_);
+		front_decoration_primitive_.VertexData(std::move(front_decoration_primitive_.vertex_data));
+	}
+	else if (front_decoration_primitive_.vertex_data.capacity() > 0)
+		front_decoration_primitive_ = {};
 }
 
 
@@ -709,7 +649,7 @@ DrawableText::DrawableText(std::optional<std::string> name, const Vector3 &posit
 	text_{text ? std::make_optional(*text) : std::nullopt},
 	initial_text_{text},
 
-	reload_vertex_streams_{!!text_}
+	reload_primitives_{!!text_}
 {
 	query_type_flags_ |= query::scene_query::QueryType::Text;
 }
@@ -722,68 +662,33 @@ DrawableText::DrawableText(std::optional<std::string> name, const Vector3 &posit
 void DrawableText::Revert()
 {
 	if (initial_text_)
+	{
 		text_ = *initial_text_;
+		reload_primitives_ = true;
+	}
 }
 
 
 /*
-	Preparing / drawing
+	Preparing
 */
 
-void DrawableText::Prepare() noexcept
+void DrawableText::Prepare()
 {
-	if (!text_)
-		return;
-
-	if (reload_vertex_streams_)
+	if (reload_primitives_)
 	{
-		ReloadVertexStreams();
-		reload_vertex_streams_ = false;
+		ReloadPrimitives();
+		reload_primitives_ = false;
 		update_bounding_volumes_ = true;
 	}
 
-	if (reload_vertex_buffer_)
-	{
-		if (!vbo_)
-			vbo_.emplace(render::vertex::vertex_buffer_object::VertexBufferUsage::Dynamic);
+	//Prepare glyph primitives
+	for (auto &primitive : glyph_primitives_)
+		primitive.second.Prepare();
 
-		if (vbo_ && *vbo_)
-		{
-			if (!std::empty(glyph_vertex_streams_))
-			{
-				auto glyph_vertex_count = detail::get_glyph_vertex_count(glyph_vertex_streams_);
-				auto back_decoration_vertex_count = std::ssize(decoration_vertex_stream_.back_vertex_data);
-				auto front_decoration_vertex_count = std::ssize(decoration_vertex_stream_.front_vertex_data);
-
-				vbo_->Reserve((glyph_vertex_count + back_decoration_vertex_count + front_decoration_vertex_count) * sizeof(real));
-
-				{
-					auto offset = 0;
-
-					decoration_vertex_stream_.back_vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), back_decoration_vertex_count * sizeof(real)));
-					offset += back_decoration_vertex_count;
-
-					for (auto &stream : glyph_vertex_streams_)
-					{
-						glyph_vertex_count = std::ssize(stream.second.vertex_data);
-						stream.second.vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), glyph_vertex_count * sizeof(real)));
-						offset += glyph_vertex_count;
-					}
-					
-					decoration_vertex_stream_.front_vertex_batch.VertexBuffer(vbo_->SubBuffer(offset * sizeof(real), front_decoration_vertex_count * sizeof(real)));
-				}
-			}
-		}
-
-		reload_vertex_buffer_ = false;
-	}
-
-	decoration_vertex_stream_.back_vertex_batch.Prepare();
-
-	for (auto &stream : glyph_vertex_streams_)
-		stream.second.vertex_batch.Prepare();
-
-	decoration_vertex_stream_.front_vertex_batch.Prepare();
+	//Prepare decoration primitives
+	back_decoration_primitive_.Prepare();
+	front_decoration_primitive_.Prepare();
 
 	if (update_bounding_volumes_)
 	{
@@ -795,48 +700,8 @@ void DrawableText::Prepare() noexcept
 
 		update_bounding_volumes_ = false;
 	}
-}
 
-void DrawableText::Draw(shaders::ShaderProgram *shader_program) noexcept
-{
-	if (visible_ && text_ && !std::empty(glyph_vertex_streams_))
-	{
-		auto use_shader = shader_program && shader_program->Owner() && shader_program->Handle();
-		auto shader_in_use = use_shader && shader_program->Owner()->IsShaderProgramActive(*shader_program);
-
-		if (use_shader && !shader_in_use)
-			shader_program->Owner()->ActivateShaderProgram(*shader_program);
-
-		decoration_vertex_stream_.back_vertex_batch.Draw(shader_program);
-			//Draw back decorations before character glyphs
-
-		for (auto &stream : glyph_vertex_streams_)
-			stream.second.vertex_batch.Draw(shader_program);
-
-		decoration_vertex_stream_.front_vertex_batch.Draw(shader_program);
-			//Draw front decorations after character glyphs
-
-		if (use_shader && !shader_in_use)
-			shader_program->Owner()->DeactivateShaderProgram(*shader_program);
-	}
-}
-
-
-/*
-	Elapse time
-*/
-
-void DrawableText::Elapse(duration time) noexcept
-{
-	if (text_)
-	{
-		decoration_vertex_stream_.back_vertex_batch.Elapse(time);
-
-		for (auto &stream : glyph_vertex_streams_)
-			stream.second.vertex_batch.Elapse(time);
-
-		decoration_vertex_stream_.front_vertex_batch.Elapse(time);
-	}
+	DrawableObject::Prepare();
 }
 
 } //ion::graphics::scene
