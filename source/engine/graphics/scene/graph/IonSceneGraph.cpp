@@ -460,7 +460,6 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 		&camera->ParentNode()->RootNode() == &root_node_ &&
 		camera->Visible() && camera->ParentNode()->Visible())
 	{
-		camera->Prepare();
 		camera->CaptureScene(viewport);
 
 		[[maybe_unused]] auto &aabb = camera->WorldAxisAlignedBoundingBox(true, false);
