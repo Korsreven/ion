@@ -523,7 +523,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 				if (lighting_enabled_)
 				{
 					//For each emissive light
-					for (auto &light : object->EmissiveLights(false))
+					for (auto &light : object->AllEmissiveLights())
 					{
 						//Emissive light visible and in view
 						if (light->Visible() &&
@@ -536,7 +536,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 			}
 			else //Not visible or not in view
 			{
-				for (auto &primitive : object->RenderPrimitives())
+				for (auto &primitive : object->AllRenderPrimitives())
 					primitive->WorldVisible(false); //Not visible or outside view
 			}
 		}
@@ -576,11 +576,14 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	//Set shader program uniforms
 	for (auto &object : visible_objects_)
 	{
-		for (auto &shader_program : object->RenderPrograms())
+		for (auto &shader_program : object->AllShaderPrograms())
 		{
-			//There is not too many shader programs per scene
+			if (!shader_program)
+				continue;
+
+			//There are not many distinct shader programs per scene
 			//So std::find with its linear complexity will be the fastest method to make sure each added element is unique
-			if (std::find(std::begin(shader_programs_), std::end(shader_programs_), shader_program) == std::end(shader_programs_))
+			if (std::find(std::begin(shader_programs_), std::end(shader_programs_), shader_program.get()) == std::end(shader_programs_))
 				//One time per program per scene
 			{
 				detail::set_camera_uniforms(*camera, *shader_program);
@@ -589,7 +592,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 				detail::set_emissive_light_uniforms(emissive_lights_, emissive_light_texture_handle_, *camera, *shader_program);
 				detail::set_matrix_uniforms(projection_mat, view_mat, *shader_program);
 				detail::set_scene_uniforms(gamma_, ambient_color_, *shader_program);
-				shader_programs_.push_back(shader_program); //Only distinct
+				shader_programs_.push_back(shader_program.get()); //Only distinct
 			}
 		}
 	}

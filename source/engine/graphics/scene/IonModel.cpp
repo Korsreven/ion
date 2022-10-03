@@ -126,7 +126,7 @@ Model::~Model() noexcept
 	Observers
 */
 
-std::span<Light*> Model::EmissiveLights([[maybe_unused]] bool derive) const
+movable_object::LightRange Model::AllEmissiveLights() noexcept
 {
 	return emissive_lights_;
 }
@@ -140,6 +140,12 @@ void Model::NotifyVertexDataChanged(shapes::Mesh &mesh) noexcept
 {
 	if (mesh.Owner() == this)
 		update_bounding_volumes_ = true;
+}
+
+void Model::NotifyPassesChanged(shapes::Mesh &mesh) noexcept
+{
+	if (mesh.Owner() == this)
+		DrawableObject::NotifyPassesChanged(mesh);
 }
 
 void Model::NotifyMaterialChanged(shapes::Mesh &mesh) noexcept

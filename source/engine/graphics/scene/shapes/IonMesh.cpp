@@ -156,6 +156,12 @@ void Mesh::VertexDataChanged() noexcept
 		owner->NotifyVertexDataChanged(*this);
 }
 
+void Mesh::PassesChanged() noexcept
+{
+	if (auto owner = Owner(); owner)
+		owner->NotifyPassesChanged(*this);
+}
+
 void Mesh::MaterialChanged() noexcept
 {
 	update_tex_coords_ = true;

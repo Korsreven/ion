@@ -34,17 +34,49 @@ using namespace graphics::utilities;
 namespace drawable_text::detail
 {
 
+//Protected
+
+/*
+	Events
+*/
+
+void text_glyph_primitive::PassesChanged() noexcept
+{
+	if (owner)
+		owner->NotifyPassesChanged(*this);
+}
+
+
+//Public
+
 text_glyph_primitive::text_glyph_primitive(textures::texture::TextureHandle texture_handle) :
 	render::RenderPrimitive{render::vertex::vertex_batch::VertexDrawMode::Triangles, get_vertex_declaration()}
 {
 	RenderTexture(texture_handle);
 }
 
+
+//Protected
+
+/*
+	Events
+*/
+
+void text_decoration_primitive::PassesChanged() noexcept
+{
+	if (owner)
+		owner->NotifyPassesChanged(*this);
+}
+
+
+//Public
+
 text_decoration_primitive::text_decoration_primitive() :
 	render::RenderPrimitive{render::vertex::vertex_batch::VertexDrawMode::Triangles, get_vertex_declaration()}
 {
 	//Empty
 }
+
 
 bool text_glyph_primitive_key::operator<(const text_glyph_primitive_key &key) const noexcept
 {
@@ -594,8 +626,9 @@ void DrawableText::ReloadPrimitives()
 		{
 			if (!std::empty(primitive.second.vertex_data))
 			{
+				primitive.second.owner = this;
+				primitive.second.VertexData(std::move(primitive.second.vertex_data));	
 				AddPrimitive(primitive.second);
-				primitive.second.VertexData(std::move(primitive.second.vertex_data));
 				return false; //Keep
 			}
 			else
@@ -605,8 +638,9 @@ void DrawableText::ReloadPrimitives()
 	//Back decoration
 	if (!std::empty(back_decoration_primitive_.vertex_data))
 	{
+		back_decoration_primitive_.owner = this;
+		back_decoration_primitive_.VertexData(std::move(back_decoration_primitive_.vertex_data));	
 		AddPrimitive(back_decoration_primitive_);
-		back_decoration_primitive_.VertexData(std::move(back_decoration_primitive_.vertex_data));
 	}
 	else if (back_decoration_primitive_.vertex_data.capacity() > 0)
 		back_decoration_primitive_ = {};
@@ -614,8 +648,9 @@ void DrawableText::ReloadPrimitives()
 	//Front decoration
 	if (!std::empty(front_decoration_primitive_.vertex_data))
 	{
-		AddPrimitive(front_decoration_primitive_);
+		front_decoration_primitive_.owner = this;
 		front_decoration_primitive_.VertexData(std::move(front_decoration_primitive_.vertex_data));
+		AddPrimitive(front_decoration_primitive_);
 	}
 	else if (front_decoration_primitive_.vertex_data.capacity() > 0)
 		front_decoration_primitive_ = {};

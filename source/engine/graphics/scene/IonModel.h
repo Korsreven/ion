@@ -43,6 +43,9 @@ namespace ion::graphics::scene
 
 	namespace model
 	{
+		using Lights = std::vector<Light*>;
+
+
 		namespace detail
 		{
 			using emissive_meshes = std::vector<std::pair<shapes::Mesh*, Light>>;
@@ -70,7 +73,7 @@ namespace ion::graphics::scene
 
 		protected:
 
-			mutable drawable_object::Lights emissive_lights_;
+			model::Lights emissive_lights_;
 
 
 			/*
@@ -116,7 +119,7 @@ namespace ion::graphics::scene
 			*/
 			
 			//Returns all emissive lights in this model
-			[[nodiscard]] virtual std::span<Light*> EmissiveLights(bool derive = true) const override;
+			[[nodiscard]] movable_object::LightRange AllEmissiveLights() noexcept override;
 
 
 			/*
@@ -125,6 +128,9 @@ namespace ion::graphics::scene
 
 			//Called when vertex data has changed on the given mesh
 			void NotifyVertexDataChanged(shapes::Mesh &mesh) noexcept;
+
+			//Called when passes has changed on the given mesh
+			void NotifyPassesChanged(shapes::Mesh &mesh) noexcept;
 
 			//Called when material has changed on the given mesh
 			void NotifyMaterialChanged(shapes::Mesh &mesh) noexcept;

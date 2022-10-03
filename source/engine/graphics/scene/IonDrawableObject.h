@@ -20,6 +20,7 @@ File:	IonDrawableObject.h
 #include "IonMovableObject.h"
 #include "adaptors/ranges/IonIterable.h"
 #include "graphics/render/IonPass.h"
+#include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics::scene
@@ -29,8 +30,7 @@ namespace ion::graphics::scene
 	namespace drawable_object
 	{
 		using RenderPrimitives = std::vector<render::RenderPrimitive*>;
-		using ShaderPrograms = std::vector<shaders::ShaderProgram*>;
-		using Lights = std::vector<Light*>;
+		using ShaderPrograms = std::vector<NonOwningPtr<shaders::ShaderProgram>>;
 
 
 		namespace detail
@@ -47,10 +47,12 @@ namespace ion::graphics::scene
 			real opacity_ = 1.0_r;
 			render::pass::Passes passes_;
 
+			bool update_passes_ = false;
+
 		protected:
 
-			mutable drawable_object::RenderPrimitives render_primitives_;
-			mutable drawable_object::ShaderPrograms shader_programs_;
+			drawable_object::RenderPrimitives render_primitives_;
+			drawable_object::ShaderPrograms shader_programs_;
 
 
 			void AddPrimitive(render::RenderPrimitive &primitive);
@@ -104,10 +106,18 @@ namespace ion::graphics::scene
 
 
 			//Returns all render primitives in this drawable object
-			[[nodiscard]] virtual std::span<render::RenderPrimitive*> RenderPrimitives(bool derive = true) const override;
+			[[nodiscard]] virtual movable_object::RenderPrimitiveRange AllRenderPrimitives() noexcept override;
 
 			//Returns all (distinct) shader programs used to render this drawable object
-			[[nodiscard]] virtual std::span<shaders::ShaderProgram*> RenderPrograms(bool derive = true) const override;
+			[[nodiscard]] virtual movable_object::ShaderProgramRange AllShaderPrograms() noexcept override;
+
+
+			/*
+				Notifying
+			*/
+
+			//Called when passes has changed on the given primitive
+			void NotifyPassesChanged(render::RenderPrimitive &primitive) noexcept;
 
 
 			/*

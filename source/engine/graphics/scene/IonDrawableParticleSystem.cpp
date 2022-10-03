@@ -23,6 +23,21 @@ using namespace types::type_literals;
 namespace drawable_particle_system::detail
 {
 
+//Protected
+
+/*
+	Events
+*/
+
+void particle_emitter_primitive::PassesChanged() noexcept
+{
+	if (owner)
+		owner->NotifyPassesChanged(*this);
+}
+
+
+//Public
+
 particle_emitter_primitive::particle_emitter_primitive(NonOwningPtr<materials::Material> particle_material) :
 	render::RenderPrimitive{render::vertex::vertex_batch::VertexDrawMode::Points, get_vertex_declaration()}
 {
@@ -127,8 +142,9 @@ void DrawableParticleSystem::ReloadPrimitives()
 		{
 			if (!std::empty(primitive.vertex_data))
 			{
-				AddPrimitive(primitive);
+				primitive.owner = this;
 				primitive.VertexData(std::move(primitive.vertex_data));
+				AddPrimitive(primitive);		
 				return false; //Keep
 			}
 			else

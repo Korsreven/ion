@@ -26,6 +26,7 @@ File:	IonMovableObject.h
 #include "graphics/utilities/IonObb.h"
 #include "graphics/utilities/IonSphere.h"
 #include "managed/IonManagedObject.h"
+#include "memory/IonNonOwningPtr.h"
 
 //Forward declarations
 namespace ion::graphics
@@ -63,6 +64,10 @@ namespace ion::graphics::scene
 			BoundingBox,
 			BoundingSphere
 		};
+
+		using RenderPrimitiveRange = std::span<render::RenderPrimitive*>;
+		using ShaderProgramRange = std::span<NonOwningPtr<shaders::ShaderProgram>>;
+		using LightRange = std::span<Light*>;
 
 
 		namespace detail
@@ -400,13 +405,13 @@ namespace ion::graphics::scene
 
 
 			//Returns all render primitives in this movable object
-			[[nodiscard]] virtual std::span<render::RenderPrimitive*> RenderPrimitives(bool derive = true) const;
+			[[nodiscard]] virtual movable_object::RenderPrimitiveRange AllRenderPrimitives() noexcept;
 
 			//Returns all (distinct) shader programs used to render this movable object
-			[[nodiscard]] virtual std::span<shaders::ShaderProgram*> RenderPrograms(bool derive = true) const;
+			[[nodiscard]] virtual movable_object::ShaderProgramRange AllShaderPrograms() noexcept;
 
 			//Returns all emissive lights in this movable object
-			[[nodiscard]] virtual std::span<Light*> EmissiveLights(bool derive = true) const;
+			[[nodiscard]] virtual movable_object::LightRange AllEmissiveLights() noexcept;
 
 
 			/*

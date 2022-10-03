@@ -94,30 +94,24 @@ void DrawableObject::Opacity(real opacity) noexcept
 	Observers
 */
 
-std::span<render::RenderPrimitive*> DrawableObject::RenderPrimitives([[maybe_unused]] bool derive) const
+movable_object::RenderPrimitiveRange DrawableObject::AllRenderPrimitives() noexcept
 {
 	return render_primitives_;
 }
 
-std::span<shaders::ShaderProgram*> DrawableObject::RenderPrograms(bool derive) const
+movable_object::ShaderProgramRange DrawableObject::AllShaderPrograms() noexcept
 {
-	if (derive)
-	{
-		shader_programs_.clear();
-
-		for (auto &pass : passes_)
-		{
-			if (auto shader_program = pass.RenderProgram().get(); shader_program)
-			{
-				//There is probably <= 3 distinct shader programs per drawable object
-				//So std::find with its linear complexity will be the fastest method to make sure each added element is unique
-				if (std::find(std::begin(shader_programs_), std::end(shader_programs_), shader_program) == std::end(shader_programs_))
-					shader_programs_.push_back(shader_program); //Only distinct
-			}
-		}
-	}
-	
 	return shader_programs_;
+}
+
+
+/*
+	Notifying
+*/
+
+void DrawableObject::NotifyPassesChanged([[maybe_unused]] render::RenderPrimitive &primitive) noexcept
+{
+	update_passes_ = true;
 }
 
 
@@ -140,6 +134,28 @@ void DrawableObject::Prepare()
 			}();
 
 		AddPass(render::Pass{default_shader_program});
+	}
+
+	if (update_passes_)
+	{
+		shader_programs_.clear();
+
+		//Update all shader programs
+		for (auto &primitive : render_primitives_)
+		{
+			for (auto &pass : primitive->RenderPasses())
+			{
+				if (auto shader_program = pass.RenderProgram(); shader_program)
+				{
+					//There are not many distinct shader programs per drawable object
+					//So std::find with its linear complexity will be the fastest method to make sure each added element is unique
+					if (std::find(std::begin(shader_programs_), std::end(shader_programs_), shader_program) == std::end(shader_programs_))
+						shader_programs_.push_back(shader_program); //Only distinct
+				}
+			}
+		}
+
+		update_passes_ = false;
 	}
 
 	//Set render primitive visibility

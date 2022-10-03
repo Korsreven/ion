@@ -197,19 +197,19 @@ MovableObject::~MovableObject() noexcept
 	Observers
 */
 
-std::span<render::RenderPrimitive*> MovableObject::RenderPrimitives([[maybe_unused]] bool derive) const
+RenderPrimitiveRange MovableObject::AllRenderPrimitives() noexcept
 {
 	//Optional to override
 	return {};
 }
 
-std::span<shaders::ShaderProgram*> MovableObject::RenderPrograms([[maybe_unused]] bool derive) const
+ShaderProgramRange MovableObject::AllShaderPrograms() noexcept
 {
 	//Optional to override
 	return {};
 }
 
-std::span<Light*> MovableObject::EmissiveLights([[maybe_unused]] bool derive) const
+LightRange MovableObject::AllEmissiveLights() noexcept
 {
 	//Optional to override
 	return {};

@@ -38,20 +38,33 @@ namespace ion::graphics
 
 namespace ion::graphics::scene
 {
+	class DrawableParticleSystem;
+
 	namespace drawable_particle_system::detail
 	{
-		struct vertex_metrics
+		struct vertex_metrics final
 		{
 			int rotation_offset = 0;
 			int point_size_offset = 0;
 		};
 
 
-		struct particle_emitter_primitive : render::RenderPrimitive
+		struct particle_emitter_primitive final : render::RenderPrimitive
 		{
-			render::render_primitive::VertexContainer vertex_data;
+			protected:
 
-			particle_emitter_primitive(NonOwningPtr<materials::Material> particle_material);
+				/*
+					Events
+				*/
+
+				void PassesChanged() noexcept override;
+
+			public:
+
+				DrawableParticleSystem *owner = nullptr;
+				render::render_primitive::VertexContainer vertex_data;
+
+				particle_emitter_primitive(NonOwningPtr<materials::Material> particle_material);
 		};
 
 		using particle_emitter_primitives = std::vector<particle_emitter_primitive>;

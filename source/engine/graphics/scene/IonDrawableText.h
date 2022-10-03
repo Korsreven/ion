@@ -43,6 +43,8 @@ namespace ion::graphics
 
 namespace ion::graphics::scene
 {
+	class DrawableText; //Forward declaration
+
 	using namespace types::type_literals;
 	using utilities::Color;
 	using utilities::Vector2;
@@ -65,16 +67,38 @@ namespace ion::graphics::scene
 
 		struct text_glyph_primitive final : render::RenderPrimitive
 		{
-			render::render_primitive::VertexContainer vertex_data;
+			protected:
 
-			text_glyph_primitive(textures::texture::TextureHandle texture_handle);
+				/*
+					Events
+				*/
+
+				void PassesChanged() noexcept override;
+
+			public:
+
+				DrawableText *owner = nullptr;
+				render::render_primitive::VertexContainer vertex_data;
+
+				text_glyph_primitive(textures::texture::TextureHandle texture_handle);
 		};
 
 		struct text_decoration_primitive final : render::RenderPrimitive
 		{
-			render::render_primitive::VertexContainer vertex_data;
+			protected:
 
-			text_decoration_primitive();
+				/*
+					Events
+				*/
+
+				void PassesChanged() noexcept override;
+
+			public:
+
+				DrawableText *owner = nullptr;
+				render::render_primitive::VertexContainer vertex_data;
+
+				text_decoration_primitive();
 		};
 
 		struct text_glyph_primitive_key final
