@@ -445,9 +445,6 @@ void RenderPrimitive::VertexData(VertexContainer data)
 {
 	if (!std::empty(vertex_data_) || !std::empty(data))
 	{
-		if (std::size(vertex_data_) != std::size(data))
-			need_refresh_ |= world_visible_;
-
 		vertex_data_ = std::move(data);
 		aabb_ = detail::get_aabb(vertex_metrics_, vertex_data_);
 
@@ -466,7 +463,6 @@ void RenderPrimitive::AppendVertexData(const render_primitive::VertexContainer &
 
 		data_changed_ = true;
 		world_data_changed_ = false; //Discard world changes
-		need_refresh_ |= world_visible_;
 		VertexDataChanged();
 	}
 }

@@ -116,12 +116,13 @@ namespace ion::graphics::render
 
 
 			NonOwningPtr<renderer::detail::render_batch> InsertBatch(renderer::detail::render_batches::iterator where, const RenderPrimitive &primitive);
+			void GroupWithBatch(RenderPrimitive &primitive, renderer::detail::render_batch &batch);
 			void GrowBatch(renderer::detail::render_batches::iterator where, int size);
 			renderer::detail::groupable_status IsGroupable(const RenderPrimitive &primitive, const renderer::detail::render_batch &batch) const noexcept;
 
 			void RefreshPrimitives();
 			void GroupAddedPrimitives();
-			void GroupWithBatch(RenderPrimitive &primitive, renderer::detail::render_batch &batch);
+			void UpdateBatchSlots();
 			void CompressBatches() noexcept;
 			void UpdateBatches();
 			void PrepareVertexData() noexcept;

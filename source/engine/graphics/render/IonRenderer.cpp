@@ -138,6 +138,55 @@ NonOwningPtr<renderer::detail::render_batch> Renderer::InsertBatch(renderer::det
 	return *where;
 }
 
+void Renderer::GroupWithBatch(RenderPrimitive &primitive, renderer::detail::render_batch &batch)
+{
+	auto vertex_data_size = primitive.VertexDataSize();
+	auto min_space_left = std::optional<int>();
+	auto where = std::make_optional(std::end(batch.slots));
+
+	for (auto iter = std::begin(batch.slots), end = *where; iter != end; ++iter)
+	{
+		//Check if slot is occupied
+		if (iter->primitive)
+			continue;
+
+		if (auto space_left = iter->capacity - vertex_data_size;
+			space_left >= 0) //Has space to store primitive
+		{
+			if (space_left < min_space_left.value_or(space_left + 1))
+			{
+				min_space_left = space_left;
+				*where = iter; //Record slot that fits the primitive best
+			}
+
+			//No space left, exact fit
+			if (space_left == 0)
+				break;
+		}
+	}
+
+	//Add primitive to slot (has space)
+	if (where != std::end(batch.slots))
+	{
+		(*where)->primitive = &primitive;
+		(*where)->need_update = true;
+
+		//Has space left
+		if (*min_space_left > 0)
+		{
+			(*where)->capacity -= *min_space_left;
+
+			//Add empty slot with the remaining space
+			batch.slots.emplace(*where + 1, *min_space_left, nullptr);
+		}
+	}
+	else //Could not be added to any existing slots (no slots with space available)
+	{
+		batch.slots.emplace_back(vertex_data_size, &primitive);
+		batch.used_capacity += batch.slots.back().capacity;
+	}
+}
+
 void Renderer::GrowBatch(renderer::detail::render_batches::iterator where, int size)
 {
 	//Reallocate if not enough capacity
@@ -281,52 +330,28 @@ void Renderer::GroupAddedPrimitives()
 	added_primitives_.clear();
 }
 
-void Renderer::GroupWithBatch(RenderPrimitive &primitive, renderer::detail::render_batch &batch)
+void Renderer::UpdateBatchSlots()
 {
-	auto vertex_data_size = primitive.VertexDataSize();
-	auto min_space_left = std::optional<int>();
-	auto where = std::make_optional(std::end(batch.slots));
-
-	for (auto iter = std::begin(batch.slots), end = *where; iter != end; ++iter)
+	for (auto &batch : batches_)
 	{
-		//Check if slot is occupied
-		if (iter->primitive)
-			continue;
-
-		if (auto space_left = iter->capacity - vertex_data_size;
-			space_left >= 0) //Has space to store primitive
+		//Find slots that does not fit primitive any longer
+		for (auto iter = std::begin(batch->slots), end = std::end(batch->slots); iter != end; ++iter)
 		{
-			if (space_left < min_space_left.value_or(space_left + 1))
+			if (iter->primitive && //Primitive data size has changed
+				iter->primitive->VertexDataSize() != iter->capacity)
 			{
-				min_space_left = space_left;
-				*where = iter; //Record slot that fits the primitive best
+				auto off = iter - std::begin(batch->slots);
+
+				auto primitive = iter->primitive;
+				iter->primitive = nullptr;
+				iter->need_update = true;
+				GroupWithBatch(*primitive, *batch);
+
+				//Restart from off
+				iter = std::begin(batch->slots) + off;
+				end = std::end(batch->slots);
 			}
-
-			//No space left, exact fit
-			if (space_left == 0)
-				break;
 		}
-	}
-
-	//Add primitive to slot (has space)
-	if (where != std::end(batch.slots))
-	{
-		(*where)->primitive = &primitive;
-		(*where)->need_update = true;
-
-		//Has space left
-		if (*min_space_left > 0)
-		{
-			(*where)->capacity -= *min_space_left;
-
-			//Add empty slot with the remaining space
-			batch.slots.emplace(*where + 1, *min_space_left, nullptr);
-		}
-	}
-	else //Could not be added to any existing slots (no slots with space available)
-	{
-		batch.slots.emplace_back(vertex_data_size, &primitive);
-		batch.used_capacity += batch.slots.back().capacity;
 	}
 }
 
@@ -680,6 +705,7 @@ void Renderer::Prepare()
 
 	RefreshPrimitives();
 	GroupAddedPrimitives();
+	UpdateBatchSlots();
 	CompressBatches();
 	UpdateBatches();
 	PrepareVertexData();
