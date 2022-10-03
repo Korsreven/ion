@@ -45,7 +45,7 @@ namespace ion::graphics::render
 
 		namespace detail
 		{
-			struct vertex_metrics
+			struct vertex_metrics final
 			{
 				int position_components = 0;
 				int position_offset = 0;

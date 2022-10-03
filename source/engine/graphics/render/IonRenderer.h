@@ -47,7 +47,7 @@ namespace ion::graphics::render
 			};
 
 
-			struct render_batch_slot
+			struct render_batch_slot final
 			{
 				int capacity = 0;
 				RenderPrimitive *primitive = nullptr;
@@ -60,7 +60,7 @@ namespace ion::graphics::render
 			using render_batch_slots = std::vector<render_batch_slot>;
 
 
-			struct render_batch
+			struct render_batch final
 			{
 				real z = 0.0_r;
 				int offset = 0;
@@ -97,7 +97,7 @@ namespace ion::graphics::render
 
 	//A class representing a renderer that groups render primitives into batches
 	//All batches are sorted and compressed, before the vertex data is uploaded to VRAM and drawn
-	class Renderer
+	class Renderer final
 	{
 		private:
 
