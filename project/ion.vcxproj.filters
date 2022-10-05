@@ -1409,6 +1409,12 @@
     <ClInclude Include="..\source\engine\graphics\render\IonRenderPrimitive.h">
       <Filter>Header Files\graphics\render</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\engine\types\IonSuppressCopy.h">
+      <Filter>Header Files\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\types\IonSuppressMove.h">
+      <Filter>Header Files\types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\engine\graphics\shaders\glsl\IonFlatTextShader.frag">
