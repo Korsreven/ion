@@ -35,7 +35,7 @@ namespace ion::graphics::render
 			constexpr auto default_vertex_size = 3 + 3 + 4 + 3; //Based on mesh vertex declaration
 			constexpr auto default_primitive_size = default_vertex_size * 6; //Based on a sprite with two triangles
 			constexpr auto default_batch_data_size = default_primitive_size * 32;
-			constexpr auto default_vertex_data_size = default_batch_data_size * 32;
+			constexpr auto default_vertex_data_size = default_batch_data_size * 64;
 
 			using render_primitives = std::vector<RenderPrimitive*>;
 

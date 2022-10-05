@@ -317,6 +317,7 @@ void Renderer::GroupAddedPrimitives()
 			(**where_to_group)->used_capacity = 0;
 			(**where_to_group)->slots.clear();
 			(**where_to_group)->vertex_batch = primitive->MakeVertexBatch();
+			(**where_to_group)->need_update = true;
 			GroupWithBatch(*primitive, ***where_to_group);
 		}
 		//Could not be grouped with any existing batches
@@ -371,7 +372,7 @@ void Renderer::CompressBatches() noexcept
 			continue; //Nothing to compress
 
 		//Find offset of first empty slot
-		auto slot_offset = 0;
+		auto slot_offset = batch->offset;
 		for (auto it = std::begin(batch->slots); it != iter; ++it)
 			slot_offset += it->capacity;
 
@@ -390,8 +391,9 @@ void Renderer::CompressBatches() noexcept
 
 						batch->used_capacity -= slot.capacity;
 					}
+					else
+						slot_offset += slot.capacity;
 
-					slot_offset += slot.capacity;
 					return empty_slot;
 				}), std::end(batch->slots));
 	}
