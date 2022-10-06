@@ -93,15 +93,15 @@ void get_emitter_primitives(const particles::ParticleSystem &particle_system,  c
 			continue;
 
 		auto &primitive =
-			[&]() noexcept -> detail::particle_emitter_primitive&
+			[&]() noexcept -> particle_emitter_primitive&
 			{
 				if (off < std::ssize(emitter_primitives))
 				{
-					emitter_primitives[off].RenderMaterial(emitter.ParticleMaterial());
-					return emitter_primitives[off];
+					emitter_primitives[off]->RenderMaterial(emitter.ParticleMaterial());
+					return *emitter_primitives[off];
 				}
 				else
-					return emitter_primitives.emplace_back(emitter.ParticleMaterial());
+					return *emitter_primitives.emplace_back(make_owning<particle_emitter_primitive>(emitter.ParticleMaterial()));
 			}();
 
 		auto size = std::size(emitter.Particles()) * sizeof(particles::Particle);
@@ -140,11 +140,11 @@ void DrawableParticleSystem::ReloadPrimitives()
 	std::erase_if(emitter_primitives_,
 		[&](auto &primitive) noexcept
 		{
-			if (!std::empty(primitive.vertex_data))
+			if (!std::empty(primitive->vertex_data))
 			{
-				primitive.owner = this;
-				primitive.VertexData(std::move(primitive.vertex_data));
-				AddPrimitive(primitive);		
+				primitive->owner = this;
+				primitive->VertexData(std::move(primitive->vertex_data));
+				AddPrimitive(*primitive);		
 				return false; //Keep
 			}
 			else
@@ -197,7 +197,7 @@ void DrawableParticleSystem::Prepare()
 
 	//Prepare primitives
 	for (auto &primitive : emitter_primitives_)
-		primitive.Prepare();
+		primitive->Prepare();
 
 	if (update_bounding_volumes_)
 	{
@@ -205,7 +205,7 @@ void DrawableParticleSystem::Prepare()
 
 		//Merge all bounding boxes
 		for (auto &primitive : emitter_primitives_)
-			aabb_.Merge(primitive.AxisAlignedBoundingBox());
+			aabb_.Merge(primitive->AxisAlignedBoundingBox());
 
 		obb_ = aabb_;
 		sphere_ = {aabb_.ToHalfSize().Max(), aabb_.Center()};

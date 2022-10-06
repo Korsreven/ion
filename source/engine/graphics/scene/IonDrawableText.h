@@ -30,6 +30,7 @@ File:	IonDrawableText.h
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector3.h"
 #include "memory/IonNonOwningPtr.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
 
 //Forward declarations
@@ -109,7 +110,7 @@ namespace ion::graphics::scene
 			bool operator<(const text_glyph_primitive_key &key) const noexcept;
 		};
 
-		using text_glyph_primitives = adaptors::FlatMap<text_glyph_primitive_key, text_glyph_primitive>;
+		using text_glyph_primitives = adaptors::FlatMap<text_glyph_primitive_key, OwningPtr<text_glyph_primitive>>;
 
 
 		inline auto get_vertex_declaration() noexcept

@@ -26,6 +26,7 @@ File:	IonDrawableParticleSystem.h
 #include "graphics/shaders/IonShaderLayout.h"
 #include "graphics/utilities/IonVector2.h"
 #include "memory/IonNonOwningPtr.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
 
 namespace ion::graphics
@@ -67,7 +68,7 @@ namespace ion::graphics::scene
 				particle_emitter_primitive(NonOwningPtr<materials::Material> particle_material);
 		};
 
-		using particle_emitter_primitives = std::vector<particle_emitter_primitive>;
+		using particle_emitter_primitives = std::vector<OwningPtr<particle_emitter_primitive>>;
 
 
 		inline auto get_vertex_declaration() noexcept

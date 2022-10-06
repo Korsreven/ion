@@ -514,7 +514,7 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 
 							//New primitive
 							if (iter = glyph_primitives.find(key); iter == std::end(glyph_primitives))
-								iter = glyph_primitives.emplace(std::make_pair(key, text_glyph_primitive{(*handle)[0]})).first;
+								iter = glyph_primitives.emplace(std::make_pair(key, make_owning<text_glyph_primitive>((*handle)[0]))).first;
 						}
 						else
 						{
@@ -523,10 +523,10 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 
 							//New primitive
 							if (iter = glyph_primitives.find(key); iter == std::end(glyph_primitives))
-								iter = glyph_primitives.emplace(std::make_pair(key, text_glyph_primitive{(*handle)[glyph_index]})).first;
+								iter = glyph_primitives.emplace(std::make_pair(key, make_owning<text_glyph_primitive>((*handle)[glyph_index]))).first;
 						}
 
-						iter->second.vertex_data.insert(std::end(iter->second.vertex_data),
+						iter->second->vertex_data.insert(std::end(iter->second->vertex_data),
 							std::begin(vertex_data), std::end(vertex_data));
 
 						position.X(position.X() + (*metrics)[glyph_index].Advance * scaling);
@@ -624,11 +624,11 @@ void DrawableText::ReloadPrimitives()
 	glyph_primitives_.erase_if(
 		[&](auto &primitive) noexcept
 		{
-			if (!std::empty(primitive.second.vertex_data))
+			if (!std::empty(primitive.second->vertex_data))
 			{
-				primitive.second.owner = this;
-				primitive.second.VertexData(std::move(primitive.second.vertex_data));	
-				AddPrimitive(primitive.second);
+				primitive.second->owner = this;
+				primitive.second->VertexData(std::move(primitive.second->vertex_data));	
+				AddPrimitive(*primitive.second);
 				return false; //Keep
 			}
 			else
@@ -719,7 +719,7 @@ void DrawableText::Prepare()
 
 	//Prepare glyph primitives
 	for (auto &primitive : glyph_primitives_)
-		primitive.second.Prepare();
+		primitive.second->Prepare();
 
 	//Prepare decoration primitives
 	back_decoration_primitive_.Prepare();
