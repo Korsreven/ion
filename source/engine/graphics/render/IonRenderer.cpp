@@ -220,7 +220,7 @@ void Renderer::GrowBatch(renderer::detail::render_batches::iterator where, int s
 
 	used_capacity_ += size;
 	(*where)->capacity += size;
-	(*where)->need_update = true;
+	(*where)->need_update = detail::update_status::YesSuccessive;
 }
 
 detail::groupable_status Renderer::IsGroupable(const RenderPrimitive &primitive, const renderer::detail::render_batch &batch) const noexcept
@@ -317,7 +317,7 @@ void Renderer::GroupAddedPrimitives()
 			(**where_to_group)->used_capacity = 0;
 			(**where_to_group)->slots.clear();
 			(**where_to_group)->vertex_batch = primitive->MakeVertexBatch();
-			(**where_to_group)->need_update = true;
+			(**where_to_group)->need_update = detail::update_status::Yes;
 			GroupWithBatch(*primitive, ***where_to_group);
 		}
 		//Could not be grouped with any existing batches
@@ -440,16 +440,19 @@ void Renderer::PrepareVertexData() noexcept
 		}
 
 
-		if (batch->need_update)
+		if (batch->need_update == detail::update_status::YesSuccessive)
 			out_of_date = true; //This and all succeeding batches
+
+		auto batch_need_update = out_of_date ||
+			batch->need_update == detail::update_status::Yes;
 		
-		if (out_of_date || batch->used_capacity != batch->last_used_capacity)
+		if (batch_need_update || batch->used_capacity != batch->last_used_capacity)
 		{
 			//Vertex data has not reallocated
 			if (!need_update_)
 			{
 				//Has vertex buffer object
-				if (vbo_ && *vbo_ && out_of_date)
+				if (vbo_ && *vbo_ && batch_need_update)
 					batch->vertex_batch.VertexBuffer( //Update vertex buffer
 						vbo_->SubBuffer(batch->offset * sizeof(real), batch->capacity * sizeof(real))
 					);
@@ -460,7 +463,7 @@ void Renderer::PrepareVertexData() noexcept
 				);
 			}
 
-			batch->need_update = false;
+			batch->need_update = detail::update_status::No;
 		}
 		else if (data_to_upload)
 		{

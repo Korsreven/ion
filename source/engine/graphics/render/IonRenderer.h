@@ -39,6 +39,13 @@ namespace ion::graphics::render
 
 			using render_primitives = std::vector<RenderPrimitive*>;
 
+			enum class update_status
+			{
+				Yes,
+				YesSuccessive,
+				No
+			};
+
 			enum class groupable_status
 			{
 				Yes,
@@ -70,7 +77,7 @@ namespace ion::graphics::render
 
 				render_batch_slots slots;
 				vertex::VertexBatch vertex_batch;
-				bool need_update = true;
+				update_status need_update = update_status::YesSuccessive;
 
 				//Constructor
 				render_batch(real z, int offset, int capacity, vertex::VertexBatch vertex_batch) noexcept;
