@@ -195,7 +195,7 @@ namespace ion::graphics::render
 
 			//Returns the z range of all batches in this renderer
 			[[nodiscard]] inline auto ZRange() const noexcept
-				-> std::optional<std::pair<int, int>>
+				-> std::optional<std::pair<real, real>>
 			{
 				if (!std::empty(batches_))
 					return std::pair{batches_.front()->z, batches_.back()->z};
