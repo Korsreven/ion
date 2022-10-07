@@ -82,6 +82,7 @@ namespace ion
 
 			static inline auto pixels_per_unit_ = 1.0_r;
 			static inline auto units_per_meter_ = 1.0_r;
+			static inline auto z_epsilon_ = 0.001_r;
 
 			static inline graphics::scene::graph::SceneGraph *active_scene_graph_ = nullptr;
 
@@ -196,6 +197,10 @@ namespace ion
 				UnitsPerMeter(units * engine::detail::meters_to_feet_factor);
 			}
 
+			//Sets the expected z limit in range [from, to]
+			//This is used for calculating which z epsilon to use
+			static void ZLimit(real from, real to) noexcept;
+
 
 			/*
 				Observers
@@ -277,6 +282,12 @@ namespace ion
 			[[nodiscard]] static inline auto UnitsPerFoot() noexcept
 			{
 				return units_per_meter_ * engine::detail::feet_to_meters_factor;
+			}
+
+			//Returns the z epsilon the engine should use
+			[[nodiscard]] static inline auto ZEpsilon() noexcept
+			{
+				return z_epsilon_;
 			}
 
 

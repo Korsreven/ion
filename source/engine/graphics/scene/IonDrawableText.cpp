@@ -447,7 +447,7 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 
 					auto vertex_data = get_decoration_vertex_data(
 						decoration_position, rotation, decoration_size,
-						*background_color, origin, std::nextafter(0.0_r, -1.0_r));
+						*background_color, origin, -Engine::ZEpsilon());
 					back_decoration_primitive.vertex_data.insert(std::end(back_decoration_primitive.vertex_data),
 						std::begin(vertex_data), std::end(vertex_data));
 				}
@@ -481,7 +481,7 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 					{
 						auto vertex_data = get_decoration_vertex_data(
 							decoration_position, rotation, decoration_size,
-							decoration_color, origin, std::nextafter(0.0_r, 1.0_r));
+							decoration_color, origin, Engine::ZEpsilon());
 						front_decoration_primitive.vertex_data.insert(std::end(front_decoration_primitive.vertex_data),
 							std::begin(vertex_data), std::end(vertex_data));
 					}
@@ -489,7 +489,7 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 					{
 						auto vertex_data = get_decoration_vertex_data(
 							decoration_position, rotation, decoration_size,
-							decoration_color, origin, std::nextafter(0.0_r, -1.0_r));
+							decoration_color, origin, -Engine::ZEpsilon());
 						back_decoration_primitive.vertex_data.insert(std::end(back_decoration_primitive.vertex_data),
 							std::begin(vertex_data), std::end(vertex_data));
 					}
@@ -727,11 +727,14 @@ void DrawableText::Prepare()
 
 	if (update_bounding_volumes_)
 	{
-		auto [aabb, obb, sphere] =
-			detail::generate_bounding_volumes(*text_, position_, rotation_);
-		aabb_ = aabb;
-		obb_ = obb;
-		sphere_ = sphere;
+		if (text_)
+		{
+			auto [aabb, obb, sphere] =
+				detail::generate_bounding_volumes(*text_, position_, rotation_);
+			aabb_ = aabb;
+			obb_ = obb;
+			sphere_ = sphere;
+		}
 
 		update_bounding_volumes_ = false;
 	}

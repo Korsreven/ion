@@ -619,6 +619,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		ion::Engine engine;
 		engine.PixelsPerUnit(360.0_r);
 		engine.UnitsPerMeter(0.04_r);
+		engine.ZLimit(-100.0_r, -1.0_r);
 
 		auto &window = engine.RenderTo(
 			ion::graphics::render::RenderWindow::Resizable("ION engine", {1280.0_r, 720.0_r}));

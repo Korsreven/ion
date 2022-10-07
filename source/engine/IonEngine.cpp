@@ -13,11 +13,14 @@ File:	IonEngine.cpp
 #include "IonEngine.h"
 
 #include <cmath>
+#include <limits>
 #include <thread>
 
 #include "graphics/IonGraphicsAPI.h"
 #include "system/IonSystemUtility.h"
 #include "utilities/IonFileUtility.h"
+
+#undef max
 
 namespace ion
 {
@@ -206,6 +209,13 @@ void Engine::VerticalSync(VSyncMode mode) noexcept
 		detail::set_swap_interval(-2);
 		break;
 	}
+}
+
+
+void Engine::ZLimit(real from, real to) noexcept
+{
+	auto z = std::max(utilities::math::Abs(from), utilities::math::Abs(to));
+	z_epsilon_ = std::nextafter(z, std::numeric_limits<real>::infinity()) - z;
 }
 
 
