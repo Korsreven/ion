@@ -101,7 +101,7 @@ namespace ion::graphics::scene
 			Sphere DeriveWorldBoundingSphere(Sphere sphere, Aabb aabb, bool apply_extent = true) const noexcept;
 
 			void DrawBoundingVolumes(const Aabb &aabb, const Obb &obb, const Sphere &sphere,
-				const Color &aabb_color, const Color &obb_color, const Color &sphere_color) const noexcept;
+				const Color &aabb_color, const Color &obb_color, const Color &sphere_color, real z) const noexcept;
 
 		private:
 
@@ -428,7 +428,7 @@ namespace ion::graphics::scene
 			*/
 
 			//Draw the bounding volumes of this movable object
-			virtual void DrawBounds() noexcept;
+			virtual void DrawBounds(real z) noexcept;
 
 
 			/*

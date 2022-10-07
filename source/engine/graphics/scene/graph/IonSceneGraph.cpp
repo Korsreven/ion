@@ -606,9 +606,14 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	renderer_.Prepare();
 	renderer_.Draw();
 
-	//Draw bounding volumes
-	for (auto &object : visible_objects_)
-		object->DrawBounds();
+	if (auto z_range = renderer_.ZRange(); z_range)
+	{
+		auto [min_z, max_z] = *z_range;
+
+		//Draw bounding volumes
+		for (auto &object : visible_objects_)
+			object->DrawBounds(max_z);
+	}
 }
 
 

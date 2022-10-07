@@ -116,12 +116,13 @@ Sphere MovableObject::DeriveWorldBoundingSphere(Sphere sphere, Aabb aabb, bool a
 
 
 void MovableObject::DrawBoundingVolumes(const Aabb &aabb, const Obb &obb, const Sphere &sphere,
-	const Color &aabb_color, const Color &obb_color, const Color &sphere_color) const noexcept
+	const Color &aabb_color, const Color &obb_color, const Color &sphere_color, real z) const noexcept
 {
 	if (parent_node_)
 	{
-		graph::scene_graph::detail::push_gl_matrix(); //Push transformation matrix
-		graph::scene_graph::detail::mult_gl_model_view_matrix(parent_node_->FullTransformation()); //view * model
+		graph::scene_graph::detail::push_gl_matrix(); //New view matrix
+		graph::scene_graph::detail::mult_gl_model_view_matrix(
+			Matrix4::Translation({0.0_r, 0.0_r, z})); //view * z translation matrix
 	}
 
 
@@ -148,7 +149,7 @@ void MovableObject::DrawBoundingVolumes(const Aabb &aabb, const Obb &obb, const 
 
 
 	if (parent_node_)
-		graph::scene_graph::detail::pop_gl_matrix(); //Pop transformation matrix
+		graph::scene_graph::detail::pop_gl_matrix(); //Restore
 }
 
 
@@ -230,12 +231,12 @@ void MovableObject::Prepare()
 	Drawing
 */
 
-void MovableObject::DrawBounds() noexcept
+void MovableObject::DrawBounds(real z) noexcept
 {
 	if (show_bounding_volumes_)
 		DrawBoundingVolumes(
 			WorldAxisAlignedBoundingBox(), WorldOrientedBoundingBox(), WorldBoundingSphere(),
-			aabb_color_, obb_color_, sphere_color_);
+			aabb_color_, obb_color_, sphere_color_, z);
 }
 
 
