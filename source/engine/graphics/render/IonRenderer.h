@@ -193,6 +193,29 @@ namespace ion::graphics::render
 				return initial_batch_data_size_;
 			}
 
+			//Returns the z range of all batches in this renderer
+			[[nodiscard]] inline auto ZRange() const noexcept
+				-> std::optional<std::pair<int, int>>
+			{
+				if (!std::empty(batches_))
+					return std::pair{batches_.front()->z, batches_.back()->z};
+				else
+					return {};
+			}
+
+
+			//Returns the total number of batches in this renderer
+			[[nodiscard]] int TotalBatches() const noexcept;
+
+			//Returns the total number of primitives in this renderer
+			[[nodiscard]] int TotalPrimitives() const noexcept;
+
+			//Returns the total number of batches to be drawn in this renderer
+			[[nodiscard]] int TotalBatchesToDraw() const noexcept;
+
+			//Returns the total number of primitives to be drawn in this renderer
+			[[nodiscard]] int TotalPrimitivesToDraw() const noexcept;
+
 
 			/*
 				Batches

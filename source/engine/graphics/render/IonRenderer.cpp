@@ -524,6 +524,47 @@ Renderer::~Renderer() noexcept
 	ClearBatches();
 }
 
+/*
+	Observers
+*/
+
+int Renderer::TotalBatches() const noexcept
+{
+	return std::ssize(batches_);
+}
+
+int Renderer::TotalPrimitives() const noexcept
+{
+	return TotalPrimitivesToDraw() + std::ssize(added_primitives_) + std::ssize(hidden_primitives_);
+}
+
+int Renderer::TotalBatchesToDraw() const noexcept
+{
+	auto count = 0;
+	for (auto &batch : batches_)
+	{
+		if (batch->used_capacity > 0)
+			++count;
+	}
+
+	return count;
+}
+
+int Renderer::TotalPrimitivesToDraw() const noexcept
+{
+	auto count = 0;
+	for (auto &batch : batches_)
+	{
+		for (auto &slot : batch->slots)
+		{
+			if (slot.primitive)
+				++count;
+		}
+	}
+
+	return count;
+}
+
 
 /*
 	Batches
