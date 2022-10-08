@@ -198,7 +198,7 @@ namespace ion
 			}
 
 			//Sets the expected z limit in range [from, to]
-			//This is used for calculating which z epsilon to use
+			//This is used for calculating which z epsilon the engine should use
 			static void ZLimit(real from, real to) noexcept;
 
 
@@ -284,7 +284,8 @@ namespace ion
 				return units_per_meter_ * engine::detail::feet_to_meters_factor;
 			}
 
-			//Returns the z epsilon the engine should use
+			//Returns the z epsilon the engine should use (default is 0.001)
+			//This is mostly used when initializing primitives above or below other primitives
 			[[nodiscard]] static inline auto ZEpsilon() noexcept
 			{
 				return z_epsilon_;
