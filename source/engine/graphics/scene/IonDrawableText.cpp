@@ -422,8 +422,7 @@ render::render_primitive::VertexContainer get_decoration_vertex_data(
 
 void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts::Text &text,
 	int font_size, int &glyph_count, Vector3 &position, real rotation, const Vector3 &origin,
-	text_glyph_primitives &glyph_primitives, text_decoration_primitive &back_decoration_primitive,
-	text_decoration_primitive &front_decoration_primitive)
+	text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives)
 {
 	if (auto font = get_default_font(text_block, text); font)
 	{
@@ -439,7 +438,7 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 				auto line_thickness = std::max(1.0_r, std::floor(font_size / 8.0_r));
 				auto line_margin = std::ceil(font_size / 16.0_r);
 
-				//Background
+				//Background (back decoration)
 				if (auto background_color = get_background_color(text_block, text); background_color)
 				{
 					auto decoration_position = Vector3{position.X(), base_y - (line_margin * 2.0_r + line_thickness * 2.0_r), position.Z()};
@@ -448,7 +447,13 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 					auto vertex_data = get_decoration_vertex_data(
 						decoration_position, rotation, decoration_size,
 						*background_color, origin, -Engine::ZEpsilon());
-					back_decoration_primitive.vertex_data.insert(std::end(back_decoration_primitive.vertex_data),
+
+					//New primitive
+					if (!decoration_primitives.second)
+						decoration_primitives.second = make_owning<text_decoration_primitive>();
+
+					decoration_primitives.second->vertex_data.insert(
+						std::end(decoration_primitives.second->vertex_data),
 						std::begin(vertex_data), std::end(vertex_data));
 				}
 				
@@ -482,7 +487,13 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 						auto vertex_data = get_decoration_vertex_data(
 							decoration_position, rotation, decoration_size,
 							decoration_color, origin, Engine::ZEpsilon());
-						front_decoration_primitive.vertex_data.insert(std::end(front_decoration_primitive.vertex_data),
+
+						//New primitive
+						if (!decoration_primitives.first)
+							decoration_primitives.first = make_owning<text_decoration_primitive>();
+
+						decoration_primitives.first->vertex_data.insert(
+							std::end(decoration_primitives.first->vertex_data),
 							std::begin(vertex_data), std::end(vertex_data));
 					}
 					else //Back decoration
@@ -490,7 +501,13 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 						auto vertex_data = get_decoration_vertex_data(
 							decoration_position, rotation, decoration_size,
 							decoration_color, origin, -Engine::ZEpsilon());
-						back_decoration_primitive.vertex_data.insert(std::end(back_decoration_primitive.vertex_data),
+
+						//New primitive
+						if (!decoration_primitives.second)
+							decoration_primitives.second = make_owning<text_decoration_primitive>();
+
+						decoration_primitives.second->vertex_data.insert(
+							std::end(decoration_primitives.second->vertex_data),
 							std::begin(vertex_data), std::end(vertex_data));
 					}
 				}
@@ -541,8 +558,7 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 }
 
 void get_text_primitives(const fonts::Text &text, Vector3 position, real rotation,
-	text_glyph_primitives &glyph_primitives, text_decoration_primitive &back_decoration_primitive,
-	text_decoration_primitive &front_decoration_primitive)
+	text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives)
 {
 	auto line_height = text.LineHeight();
 
@@ -600,7 +616,7 @@ void get_text_primitives(const fonts::Text &text, Vector3 position, real rotatio
 			for (auto &block : iter->Blocks)
 				get_block_primitives(block, text,
 					font_size, glyph_count, glyph_position, rotation, origin,
-					glyph_primitives, back_decoration_primitive, front_decoration_primitive);
+					glyph_primitives, decoration_primitives);
 
 			glyph_position.Y(glyph_position.Y() - *line_height); //Next glyph y position
 		}
@@ -618,7 +634,7 @@ void DrawableText::ReloadPrimitives()
 
 	if (text_)
 		detail::get_text_primitives(*text_, position_, rotation_,
-			glyph_primitives_, back_decoration_primitive_, front_decoration_primitive_);
+			glyph_primitives_, decoration_primitives_);
 
 	//Glyphs
 	glyph_primitives_.erase_if(
@@ -636,24 +652,30 @@ void DrawableText::ReloadPrimitives()
 		});
 
 	//Back decoration
-	if (!std::empty(back_decoration_primitive_.vertex_data))
+	if (decoration_primitives_.first)
 	{
-		back_decoration_primitive_.owner = this;
-		back_decoration_primitive_.VertexData(std::move(back_decoration_primitive_.vertex_data));	
-		AddPrimitive(back_decoration_primitive_);
+		if (!std::empty(decoration_primitives_.first->vertex_data))
+		{
+			decoration_primitives_.first->owner = this;
+			decoration_primitives_.first->VertexData(std::move(decoration_primitives_.first->vertex_data));	
+			AddPrimitive(*decoration_primitives_.first);
+		}
+		else
+			decoration_primitives_.first.reset();
 	}
-	else if (back_decoration_primitive_.vertex_data.capacity() > 0)
-		back_decoration_primitive_ = {};
 
 	//Front decoration
-	if (!std::empty(front_decoration_primitive_.vertex_data))
+	if (decoration_primitives_.second)
 	{
-		front_decoration_primitive_.owner = this;
-		front_decoration_primitive_.VertexData(std::move(front_decoration_primitive_.vertex_data));
-		AddPrimitive(front_decoration_primitive_);
+		if (!std::empty(decoration_primitives_.second->vertex_data))
+		{
+			decoration_primitives_.second->owner = this;
+			decoration_primitives_.second->VertexData(std::move(decoration_primitives_.second->vertex_data));
+			AddPrimitive(*decoration_primitives_.second);
+		}
+		else
+			decoration_primitives_.second.reset();
 	}
-	else if (front_decoration_primitive_.vertex_data.capacity() > 0)
-		front_decoration_primitive_ = {};
 }
 
 
@@ -722,8 +744,11 @@ void DrawableText::Prepare()
 		primitive.second->Prepare();
 
 	//Prepare decoration primitives
-	back_decoration_primitive_.Prepare();
-	front_decoration_primitive_.Prepare();
+	if (decoration_primitives_.first) //Front
+		decoration_primitives_.first->Prepare();
+	
+	if (decoration_primitives_.second) //Back
+		decoration_primitives_.second->Prepare();
 
 	if (update_bounding_volumes_)
 	{

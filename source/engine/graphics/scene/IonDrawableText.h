@@ -111,6 +111,7 @@ namespace ion::graphics::scene
 		};
 
 		using text_glyph_primitives = adaptors::FlatMap<text_glyph_primitive_key, OwningPtr<text_glyph_primitive>>;
+		using text_decoration_primitives = std::pair<OwningPtr<text_decoration_primitive>, OwningPtr<text_decoration_primitive>>;
 
 
 		inline auto get_vertex_declaration() noexcept
@@ -165,11 +166,9 @@ namespace ion::graphics::scene
 
 		void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts::Text &text,
 			int font_size, int &glyph_count, Vector3 &position, real rotation, const Vector3 &origin,
-			text_glyph_primitives &glyph_primitives, text_decoration_primitive &back_decoration_primitive,
-			text_decoration_primitive &front_decoration_primitive);
+			text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives);
 		void get_text_primitives(const fonts::Text &text, Vector3 position, real rotation,
-			text_glyph_primitives &glyph_primitives, text_decoration_primitive &back_decoration_primitive,
-			text_decoration_primitive &front_decoration_primitive);
+			text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives);
 	} //drawable_text::detail
 
 
@@ -185,8 +184,7 @@ namespace ion::graphics::scene
 			NonOwningPtr<fonts::Text> initial_text_;
 
 			drawable_text::detail::text_glyph_primitives glyph_primitives_;
-			drawable_text::detail::text_decoration_primitive back_decoration_primitive_;
-			drawable_text::detail::text_decoration_primitive front_decoration_primitive_;
+			drawable_text::detail::text_decoration_primitives decoration_primitives_;
 
 			bool reload_primitives_ = false;
 			bool update_bounding_volumes_ = false;
