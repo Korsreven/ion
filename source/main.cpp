@@ -803,7 +803,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			scene_graph->FogEnabled(false);
 			//scene_graph->LightingEnabled(false);
 
-			auto scene_manager = scene_graph->CreateSceneManager();	
+			auto scene_manager = scene_graph->CreateSceneManager();
+			
+			//Default shader programs
+			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
+				shader_programs->GetShaderProgram("default_model_prog"));
+			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
+				shader_programs->GetShaderProgram("default_particle_prog"));
+			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
+				shader_programs->GetShaderProgram("default_flat_text_prog"));
+
 
 			//Load scripts
 			ion::script::interfaces::SceneScriptInterface scene_script;
@@ -821,6 +830,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto gui_scene_manager = scene_graph->CreateSceneManager();
 
+			//Default shader programs
+			//gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
+			//	shader_programs->GetShaderProgram("default_flat_model_prog"));
+			//gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
+			//	shader_programs->GetShaderProgram("default_flat_particle_prog"));
+			gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
+				shader_programs->GetShaderProgram("default_flat_text_prog"));
+
+			
 			//Load scripts
 			ion::script::interfaces::GuiThemeScriptInterface gui_theme_script;
 			gui_theme_script.CreateScriptRepository(script_repository);
@@ -2261,22 +2279,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 			auto timeline = ship_node->CreateTimeline({}, 1.0_r, false);
 			timeline->Attach(idle);*/
-
-
-			//Default shader programs
-			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
-				shader_programs->GetShaderProgram("default_model_prog"));
-			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
-				shader_programs->GetShaderProgram("default_particle_prog"));
-			scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
-				shader_programs->GetShaderProgram("default_flat_text_prog"));
-
-			//gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
-			//	shader_programs->GetShaderProgram("default_flat_model_prog"));
-			//gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
-			//	shader_programs->GetShaderProgram("default_flat_particle_prog"));
-			gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
-				shader_programs->GetShaderProgram("default_flat_text_prog"));
 
 
 			//Pointers

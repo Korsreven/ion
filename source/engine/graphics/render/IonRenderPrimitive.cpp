@@ -310,6 +310,10 @@ void RenderPrimitive::UpdateWorldVertexData()
 		data_changed_ = false;
 		world_data_changed_ = true;
 		model_matrix_changed_ = false;
+
+		//No other opacity changes, apply opacity again
+		if (!opacity_changed_ && opacity_ != 1.0_r)
+			opacity_changed_ = true;
 	}
 
 	//Opacity has changed

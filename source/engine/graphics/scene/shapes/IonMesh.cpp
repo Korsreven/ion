@@ -92,18 +92,19 @@ void generate_tex_coords(render_primitive::VertexContainer &vertex_data, const A
 
 void normalize_tex_coords(render_primitive::VertexContainer &vertex_data, const materials::Material *material) noexcept
 {
-	auto [s_repeatable, t_repeatable] = material ?
-		material->IsRepeatable() : std::pair{false, false};
-
-	//Clamp each vertex tex coords (s,t) to range [0, 1]
-	for (auto i = detail::tex_coord_offset; i < std::ssize(vertex_data);
-		i += detail::vertex_components)
+	if (auto [s_repeatable, t_repeatable] = material ?
+		material->IsRepeatable() : std::pair{false, false}; !s_repeatable || !t_repeatable)
 	{
-		if (!s_repeatable)
-			vertex_data[i] = std::clamp(vertex_data[i], 0.0_r, 1.0_r);
+		//Clamp each vertex tex coords (s,t) to range [0, 1]
+		for (auto i = detail::tex_coord_offset; i < std::ssize(vertex_data);
+			i += detail::vertex_components)
+		{
+			if (!s_repeatable)
+				vertex_data[i] = std::clamp(vertex_data[i], 0.0_r, 1.0_r);
 
-		if (!t_repeatable)
-			vertex_data[i + 1] = std::clamp(vertex_data[i + 1], 0.0_r, 1.0_r);
+			if (!t_repeatable)
+				vertex_data[i + 1] = std::clamp(vertex_data[i + 1], 0.0_r, 1.0_r);
+		}
 	}
 
 
@@ -152,6 +153,8 @@ void normalize_tex_coords(render_primitive::VertexContainer &vertex_data, const 
 
 void Mesh::VertexDataChanged() noexcept
 {
+	update_tex_coords_ = true;
+
 	if (auto owner = Owner(); owner)
 		owner->NotifyVertexDataChanged(*this);
 }
