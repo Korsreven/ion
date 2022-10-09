@@ -42,6 +42,18 @@ using namespace types::type_literals;
 namespace gui_skin::detail
 {
 
+void set_sprite_properties(const SkinPart &part, graphics::scene::shapes::Sprite &sprite) noexcept
+{
+	sprite.Size(sprite.Size() * part.Scaling);
+	sprite.FillColor(part.FillColor);
+
+	if (part.FlipHorizontal)
+		sprite.FlipHorizontal();
+	if (part.FlipVertical)
+		sprite.FlipVertical();
+}
+
+
 controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	controls::gui_control::ControlSkin control_skin;
@@ -79,8 +91,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{center_part->Enabled});
 				sprite->AutoRepeat(true);
-				sprite->Size(sprite->Size() * center_part->Scaling);
-				sprite->FillColor(center_part->FillColor);
+				set_sprite_properties(*center_part, *sprite);
 
 				control_skin.Parts.Center.Object = sprite;
 				control_skin.Parts.Center.Enabled = center_part->Enabled;
@@ -96,8 +107,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{top_part->Enabled});
 				sprite->AutoRepeat(true);
-				sprite->Size(sprite->Size() * top_part->Scaling);
-				sprite->FillColor(top_part->FillColor);
+				set_sprite_properties(*top_part, *sprite);
 
 				control_skin.Parts.Top.Object = sprite;
 				control_skin.Parts.Top.Enabled = top_part->Enabled;
@@ -112,8 +122,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{bottom_part->Enabled});
 				sprite->AutoRepeat(true);
-				sprite->Size(sprite->Size() * bottom_part->Scaling);
-				sprite->FillColor(bottom_part->FillColor);
+				set_sprite_properties(*bottom_part, *sprite);
 
 				control_skin.Parts.Bottom.Object = sprite;
 				control_skin.Parts.Bottom.Enabled = bottom_part->Enabled;
@@ -128,8 +137,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{left_part->Enabled});
 				sprite->AutoRepeat(true);
-				sprite->Size(sprite->Size() * left_part->Scaling);
-				sprite->FillColor(left_part->FillColor);
+				set_sprite_properties(*left_part, *sprite);
 
 				control_skin.Parts.Left.Object = sprite;
 				control_skin.Parts.Left.Enabled = left_part->Enabled;
@@ -144,8 +152,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{right_part->Enabled});
 				sprite->AutoRepeat(true);
-				sprite->Size(sprite->Size() * right_part->Scaling);
-				sprite->FillColor(right_part->FillColor);
+				set_sprite_properties(*right_part, *sprite);
 
 				control_skin.Parts.Right.Object = sprite;
 				control_skin.Parts.Right.Enabled = right_part->Enabled;
@@ -161,8 +168,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{top_left_part->Enabled});
 				sprite->AutoRepeat(true);
-				sprite->Size(sprite->Size() * top_left_part->Scaling);
-				sprite->FillColor(top_left_part->FillColor);
+				set_sprite_properties(*top_left_part, *sprite);
 
 				control_skin.Parts.TopLeft.Object = sprite;
 				control_skin.Parts.TopLeft.Enabled = top_left_part->Enabled;
@@ -177,8 +183,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{top_right_part->Enabled});
 				sprite->AutoRepeat(true);
-				sprite->Size(sprite->Size() * top_right_part->Scaling);
-				sprite->FillColor(top_right_part->FillColor);
+				set_sprite_properties(*top_right_part, *sprite);
 
 				control_skin.Parts.TopRight.Object = sprite;
 				control_skin.Parts.TopRight.Enabled = top_right_part->Enabled;
@@ -193,8 +198,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{bottom_left_part->Enabled});
 				sprite->AutoRepeat(true);
-				sprite->Size(sprite->Size() * bottom_left_part->Scaling);
-				sprite->FillColor(bottom_left_part->FillColor);
+				set_sprite_properties(*bottom_left_part, *sprite);
 
 				control_skin.Parts.BottomLeft.Object = sprite;
 				control_skin.Parts.BottomLeft.Enabled = bottom_left_part->Enabled;
@@ -209,8 +213,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			{
 				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{bottom_right_part->Enabled});
 				sprite->AutoRepeat(true);
-				sprite->Size(sprite->Size() * bottom_right_part->Scaling);
-				sprite->FillColor(bottom_right_part->FillColor);
+				set_sprite_properties(*bottom_right_part, *sprite);
 
 				control_skin.Parts.BottomRight.Object = sprite;
 				control_skin.Parts.BottomRight.Enabled = bottom_right_part->Enabled;
@@ -405,7 +408,6 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 	return control_skin;
 }
 
-
 OwningPtr<controls::gui_control::ControlSkin> make_control_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto control_skin = make_owning<controls::gui_control::ControlSkin>();
@@ -434,8 +436,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const GuiSkin 
 		{
 			auto sprite = check_box_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{check_mark_part->Enabled});
 			sprite->IncludeBoundingVolumes(false);
-			sprite->Size(sprite->Size() * check_mark_part->Scaling);
-			sprite->FillColor(check_mark_part->FillColor);
+			set_sprite_properties(*check_mark_part, *sprite);
 
 			check_box_skin->CheckMark.Object = sprite;
 			check_box_skin->CheckMark.Enabled = check_mark_part->Enabled;
@@ -482,8 +483,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &
 			auto sprite = list_box_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{selection_part->Enabled});
 			sprite->IncludeBoundingVolumes(false);
 			sprite->AutoRepeat(true);
-			sprite->Size(sprite->Size() * selection_part->Scaling);
-			sprite->FillColor(selection_part->FillColor);
+			set_sprite_properties(*selection_part, *sprite);
 
 			list_box_skin->Selection.Object = sprite;
 			list_box_skin->Selection.Enabled = selection_part->Enabled;
@@ -549,8 +549,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSk
 			auto sprite = progress_bar_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{bar_part->Enabled});		
 			sprite->IncludeBoundingVolumes(false);
 			sprite->AutoRepeat(true);
-			sprite->Size(sprite->Size() * bar_part->Scaling);
-			sprite->FillColor(bar_part->FillColor);
+			set_sprite_properties(*bar_part, *sprite);
 
 			progress_bar_skin->Bar.Object = sprite;
 			progress_bar_skin->Bar.Enabled = bar_part->Enabled;
@@ -570,8 +569,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSk
 			auto sprite = progress_bar_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{bar_interpolated_part->Enabled});
 			sprite->IncludeBoundingVolumes(false);
 			sprite->AutoRepeat(true);
-			sprite->Size(sprite->Size() * bar_interpolated_part->Scaling);
-			sprite->FillColor(bar_interpolated_part->FillColor);
+			set_sprite_properties(*bar_interpolated_part, *sprite);
 
 			progress_bar_skin->BarInterpolated.Object = sprite;
 			progress_bar_skin->BarInterpolated.Enabled = bar_interpolated_part->Enabled;
@@ -603,8 +601,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const GuiSk
 		{
 			auto sprite = radio_button_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{check_mark_part->Enabled});
 			sprite->IncludeBoundingVolumes(false);
-			sprite->Size(sprite->Size() * check_mark_part->Scaling);
-			sprite->FillColor(check_mark_part->FillColor);
+			set_sprite_properties(*check_mark_part, *sprite);
 
 			radio_button_skin->CheckMark.Object = sprite;
 			radio_button_skin->CheckMark.Enabled = check_mark_part->Enabled;
@@ -636,8 +633,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const GuiSkin
 		{
 			auto sprite = scroll_bar_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{handle_part->Enabled});
 			sprite->IncludeBoundingVolumes(false);
-			sprite->Size(sprite->Size() * handle_part->Scaling);
-			sprite->FillColor(handle_part->FillColor);
+			set_sprite_properties(*handle_part, *sprite);
 
 			scroll_bar_skin->Handle.Object = sprite;
 			scroll_bar_skin->Handle.Enabled = handle_part->Enabled;
@@ -669,8 +665,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const GuiSkin &sk
 		{
 			auto sprite = slider_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{handle_part->Enabled});
 			sprite->IncludeBoundingVolumes(false);
-			sprite->Size(sprite->Size() * handle_part->Scaling);
-			sprite->FillColor(handle_part->FillColor);
+			set_sprite_properties(*handle_part, *sprite);
 
 			slider_skin->Handle.Object = sprite;
 			slider_skin->Handle.Enabled = handle_part->Enabled;
@@ -702,8 +697,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 		{
 			auto sprite = text_box_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{cursor_part->Enabled});
 			sprite->IncludeBoundingVolumes(false);
-			sprite->FillColor(cursor_part->FillColor);
-			sprite->Size(sprite->Size() * cursor_part->Scaling);
+			set_sprite_properties(*cursor_part, *sprite);
 
 			text_box_skin->Cursor.Object = sprite;
 			text_box_skin->Cursor.Enabled = cursor_part->Enabled;

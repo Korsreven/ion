@@ -119,6 +119,8 @@ ClassDefinition get_gui_skin_class()
 		.AddProperty("disabled", ParameterType::String)
 		.AddProperty("enabled", ParameterType::String)
 		.AddProperty("fill-color", ParameterType::Color)
+		.AddProperty("flip-horizontal", ParameterType::Boolean)
+		.AddProperty("flip-vertical", ParameterType::Boolean)
 		.AddProperty("focused", ParameterType::String)
 		.AddProperty("hovered", ParameterType::String)
 		.AddProperty("pressed", ParameterType::String)
@@ -321,6 +323,10 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 						part.Enabled = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
 					else if (property.Name() == "fill-color")
 						part.FillColor = property[0].Get<ScriptType::Color>()->Get();
+					else if (property.Name() == "flip-horizontal")
+						part.FlipHorizontal = property[0].Get<ScriptType::Boolean>()->Get();
+					else if (property.Name() == "flip-vertical")
+						part.FlipVertical = property[0].Get<ScriptType::Boolean>()->Get();
 					else if (property.Name() == "focused")
 						part.Focused = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
 					else if (property.Name() == "hovered")

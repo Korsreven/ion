@@ -47,6 +47,11 @@ namespace ion
 		namespace scene
 		{
 			class SceneManager;
+
+			namespace shapes
+			{
+				class Sprite;
+			}
 		}
 	}
 
@@ -74,6 +79,8 @@ namespace ion::gui::skins
 
 			graphics::utilities::Vector2 Scaling = graphics::utilities::vector2::UnitScale;
 			graphics::utilities::Color FillColor = graphics::utilities::color::White;
+			bool FlipHorizontal = false;
+			bool FlipVertical = false;
 
 			[[nodiscard]] inline operator bool() const noexcept
 			{
@@ -181,8 +188,9 @@ namespace ion::gui::skins
 
 		namespace detail
 		{
-			controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
+			void set_sprite_properties(const SkinPart &part, graphics::scene::shapes::Sprite &sprite) noexcept;
 
+			controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
 			OwningPtr<controls::gui_control::ControlSkin> make_control_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
 			OwningPtr<controls::gui_control::ControlSkin> make_button_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
 			OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
