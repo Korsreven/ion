@@ -1371,30 +1371,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto tooltip_left_enabled = materials->CreateMaterial("tooltip_left", tooltip_left_diffuse);
 			tooltip_left_enabled->LightingEnabled(false);
 
-			auto tooltip_bottom_enabled = materials->CreateMaterial("tooltip_bottom", tooltip_top_diffuse);
-			tooltip_bottom_enabled->LightingEnabled(false);
-			tooltip_bottom_enabled->FlipVertical();
-
-			auto tooltip_right_enabled = materials->CreateMaterial("tooltip_right", tooltip_left_diffuse);
-			tooltip_right_enabled->LightingEnabled(false);
-			tooltip_right_enabled->FlipHorizontal();
-
 
 			auto tooltip_top_left_enabled = materials->CreateMaterial("tooltip_top_left", tooltip_top_left_diffuse);
 			tooltip_top_left_enabled->LightingEnabled(false);
-
-			auto tooltip_bottom_left_enabled = materials->CreateMaterial("tooltip_bottom_left", tooltip_top_left_diffuse);
-			tooltip_bottom_left_enabled->LightingEnabled(false);
-			tooltip_bottom_left_enabled->FlipVertical();
-
-			auto tooltip_top_right_enabled = materials->CreateMaterial("tooltip_top_right", tooltip_top_left_diffuse);
-			tooltip_top_right_enabled->LightingEnabled(false);
-			tooltip_top_right_enabled->FlipHorizontal();
-
-			auto tooltip_bottom_right_enabled = materials->CreateMaterial("tooltip_bottom_right", tooltip_top_left_diffuse);
-			tooltip_bottom_right_enabled->LightingEnabled(false);
-			tooltip_bottom_right_enabled->FlipHorizontal();
-			tooltip_bottom_right_enabled->FlipVertical();
 
 			//Button materials
 			auto button_center_enabled = materials->CreateMaterial("button_center_enabled", button_center_enabled_diffuse);
@@ -1422,54 +1401,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto button_left_focused = materials->CreateMaterial("button_left_focused", button_left_focused_diffuse);
 			button_left_focused->LightingEnabled(false);
 
-			auto button_bottom_enabled = materials->CreateMaterial("button_bottom_enabled", button_top_enabled_diffuse);
-			button_bottom_enabled->LightingEnabled(false);
-			button_bottom_enabled->FlipVertical();
-
-			auto button_bottom_focused = materials->CreateMaterial("button_bottom_focused", button_top_focused_diffuse);
-			button_bottom_focused->LightingEnabled(false);
-			button_bottom_focused->FlipVertical();
-
-			auto button_right_enabled = materials->CreateMaterial("button_right_enabled", button_left_enabled_diffuse);
-			button_right_enabled->LightingEnabled(false);
-			button_right_enabled->FlipHorizontal();
-
-			auto button_right_focused = materials->CreateMaterial("button_right_focused", button_left_focused_diffuse);
-			button_right_focused->LightingEnabled(false);
-			button_right_focused->FlipHorizontal();
-
 
 			auto button_top_left_enabled = materials->CreateMaterial("button_top_left_enabled", button_top_left_enabled_diffuse);
 			button_top_left_enabled->LightingEnabled(false);
 
 			auto button_top_left_focused = materials->CreateMaterial("button_top_left_focused", button_top_left_focused_diffuse);
 			button_top_left_focused->LightingEnabled(false);
-
-			auto button_bottom_left_enabled = materials->CreateMaterial("button_bottom_left_enabled", button_top_left_enabled_diffuse);
-			button_bottom_left_enabled->LightingEnabled(false);
-			button_bottom_left_enabled->FlipVertical();
-
-			auto button_bottom_left_focused = materials->CreateMaterial("button_bottom_left_focused", button_top_left_focused_diffuse);
-			button_bottom_left_focused->LightingEnabled(false);
-			button_bottom_left_focused->FlipVertical();
-
-			auto button_top_right_enabled = materials->CreateMaterial("button_top_right_enabled", button_top_left_enabled_diffuse);
-			button_top_right_enabled->LightingEnabled(false);
-			button_top_right_enabled->FlipHorizontal();
-
-			auto button_top_right_focused = materials->CreateMaterial("button_top_right_focused", button_top_left_focused_diffuse);
-			button_top_right_focused->LightingEnabled(false);
-			button_top_right_focused->FlipHorizontal();
-
-			auto button_bottom_right_enabled = materials->CreateMaterial("button_bottom_right_enabled", button_top_left_enabled_diffuse);
-			button_bottom_right_enabled->LightingEnabled(false);
-			button_bottom_right_enabled->FlipHorizontal();
-			button_bottom_right_enabled->FlipVertical();
-
-			auto button_bottom_right_focused = materials->CreateMaterial("button_bottom_right_focused", button_top_left_focused_diffuse);
-			button_bottom_right_focused->LightingEnabled(false);
-			button_bottom_right_focused->FlipHorizontal();
-			button_bottom_right_focused->FlipVertical();
 
 			//Check box materials
 			auto check_box_center_enabled = materials->CreateMaterial("check_box_center_enabled", check_box_center_enabled_diffuse);
@@ -1718,13 +1655,19 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			parts.Center.Enabled = tooltip_center_enabled;
 			parts.Center.FillColor.A(0.9_r);
 			parts.Border.Sides.Top.Enabled = tooltip_top_enabled;
-			parts.Border.Sides.Bottom.Enabled = tooltip_bottom_enabled;
+			parts.Border.Sides.Bottom.Enabled = tooltip_top_enabled;
+			parts.Border.Sides.Bottom.FlipVertical = true;
 			parts.Border.Sides.Left.Enabled = tooltip_left_enabled;
-			parts.Border.Sides.Right.Enabled = tooltip_right_enabled;
+			parts.Border.Sides.Right.Enabled = tooltip_left_enabled;
+			parts.Border.Sides.Right.FlipHorizontal = true;
 			parts.Border.Corners.TopLeft.Enabled = tooltip_top_left_enabled;
-			parts.Border.Corners.TopRight.Enabled = tooltip_top_right_enabled;
-			parts.Border.Corners.BottomLeft.Enabled = tooltip_bottom_left_enabled;
-			parts.Border.Corners.BottomRight.Enabled = tooltip_bottom_right_enabled;
+			parts.Border.Corners.TopRight.Enabled = tooltip_top_left_enabled;
+			parts.Border.Corners.TopRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomLeft.Enabled = tooltip_top_left_enabled;
+			parts.Border.Corners.BottomLeft.FlipVertical = true;
+			parts.Border.Corners.BottomRight.Enabled = tooltip_top_left_enabled;
+			parts.Border.Corners.BottomRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomRight.FlipVertical = true;
 			
 			ion::gui::skins::gui_skin::SkinTextPart caption_part;
 			caption_part.Base = caption_text;
@@ -1739,20 +1682,26 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			parts.Center.Hovered = button_center_hovered;
 			parts.Border.Sides.Top.Enabled = button_top_enabled;
 			parts.Border.Sides.Top.Focused = button_top_focused;
-			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
-			parts.Border.Sides.Bottom.Focused = button_bottom_focused;
+			parts.Border.Sides.Bottom.Enabled = button_top_enabled;
+			parts.Border.Sides.Bottom.Focused = button_top_focused;
+			parts.Border.Sides.Bottom.FlipVertical = true;
 			parts.Border.Sides.Left.Enabled = button_left_enabled;
 			parts.Border.Sides.Left.Focused = button_left_focused;
-			parts.Border.Sides.Right.Enabled = button_right_enabled;
-			parts.Border.Sides.Right.Focused = button_right_focused;
+			parts.Border.Sides.Right.Enabled = button_left_enabled;		
+			parts.Border.Sides.Right.Focused = button_left_focused;
+			parts.Border.Sides.Right.FlipHorizontal = true;
 			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
 			parts.Border.Corners.TopLeft.Focused = button_top_left_focused;
-			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
-			parts.Border.Corners.TopRight.Focused = button_top_right_focused;
-			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
-			parts.Border.Corners.BottomLeft.Focused = button_bottom_left_focused;
-			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
-			parts.Border.Corners.BottomRight.Focused = button_bottom_right_focused;
+			parts.Border.Corners.TopRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopRight.Focused = button_top_left_focused;
+			parts.Border.Corners.TopRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomLeft.Focused = button_top_left_focused;
+			parts.Border.Corners.BottomLeft.FlipVertical = true;
+			parts.Border.Corners.BottomRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomRight.Focused = button_top_left_focused;
+			parts.Border.Corners.BottomRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomRight.FlipVertical = true;
 			
 			caption_part = {};
 			caption_part.Base = caption_text;
@@ -1772,20 +1721,26 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			parts.Center.Hovered = check_box_center_hovered;
 			parts.Border.Sides.Top.Enabled = button_top_enabled;
 			parts.Border.Sides.Top.Focused = button_top_focused;
-			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
-			parts.Border.Sides.Bottom.Focused = button_bottom_focused;
+			parts.Border.Sides.Bottom.Enabled = button_top_enabled;
+			parts.Border.Sides.Bottom.Focused = button_top_focused;
+			parts.Border.Sides.Bottom.FlipVertical = true;
 			parts.Border.Sides.Left.Enabled = button_left_enabled;
 			parts.Border.Sides.Left.Focused = button_left_focused;
-			parts.Border.Sides.Right.Enabled = button_right_enabled;
-			parts.Border.Sides.Right.Focused = button_right_focused;
+			parts.Border.Sides.Right.Enabled = button_left_enabled;
+			parts.Border.Sides.Right.Focused = button_left_focused;
+			parts.Border.Sides.Right.FlipHorizontal = true;
 			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
 			parts.Border.Corners.TopLeft.Focused = button_top_left_focused;
-			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
-			parts.Border.Corners.TopRight.Focused = button_top_right_focused;
-			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
-			parts.Border.Corners.BottomLeft.Focused = button_bottom_left_focused;
-			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
-			parts.Border.Corners.BottomRight.Focused = button_bottom_right_focused;
+			parts.Border.Corners.TopRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopRight.Focused = button_top_left_focused;
+			parts.Border.Corners.TopRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomLeft.Focused = button_top_left_focused;
+			parts.Border.Corners.BottomLeft.FlipVertical = true;
+			parts.Border.Corners.BottomRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomRight.Focused = button_top_left_focused;
+			parts.Border.Corners.BottomRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomRight.FlipVertical = true;
 			
 			caption_part = {};
 			caption_part.Base = caption_text;
@@ -1808,13 +1763,19 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Group box skin
 			parts = {};
 			parts.Border.Sides.Top.Enabled = button_top_enabled;
-			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
+			parts.Border.Sides.Bottom.Enabled = button_top_enabled;
+			parts.Border.Sides.Bottom.FlipVertical = true;
 			parts.Border.Sides.Left.Enabled = button_left_enabled;
-			parts.Border.Sides.Right.Enabled = button_right_enabled;
+			parts.Border.Sides.Right.Enabled = button_left_enabled;
+			parts.Border.Sides.Right.FlipHorizontal = true;
 			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
-			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
-			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
-			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
+			parts.Border.Corners.TopRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomLeft.FlipVertical = true;
+			parts.Border.Corners.BottomRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomRight.FlipVertical = true;
 			
 			caption_part = {};
 			caption_part.Base = caption_text;
@@ -1837,20 +1798,26 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			parts.Center.Hovered = check_box_center_hovered;
 			parts.Border.Sides.Top.Enabled = button_top_enabled;
 			parts.Border.Sides.Top.Focused = button_top_focused;
-			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
-			parts.Border.Sides.Bottom.Focused = button_bottom_focused;
+			parts.Border.Sides.Bottom.Enabled = button_top_enabled;
+			parts.Border.Sides.Bottom.Focused = button_top_focused;
+			parts.Border.Sides.Bottom.FlipVertical = true;
 			parts.Border.Sides.Left.Enabled = button_left_enabled;
 			parts.Border.Sides.Left.Focused = button_left_focused;
-			parts.Border.Sides.Right.Enabled = button_right_enabled;
-			parts.Border.Sides.Right.Focused = button_right_focused;
+			parts.Border.Sides.Right.Enabled = button_left_enabled;
+			parts.Border.Sides.Right.Focused = button_left_focused;
+			parts.Border.Sides.Right.FlipHorizontal = true;
 			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
 			parts.Border.Corners.TopLeft.Focused = button_top_left_focused;
-			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
-			parts.Border.Corners.TopRight.Focused = button_top_right_focused;
-			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
-			parts.Border.Corners.BottomLeft.Focused = button_bottom_left_focused;
-			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
-			parts.Border.Corners.BottomRight.Focused = button_bottom_right_focused;
+			parts.Border.Corners.TopRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopRight.Focused = button_top_left_focused;
+			parts.Border.Corners.TopRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomLeft.Focused = button_top_left_focused;
+			parts.Border.Corners.BottomLeft.FlipVertical = true;
+			parts.Border.Corners.BottomRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomRight.Focused = button_top_left_focused;
+			parts.Border.Corners.BottomRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomRight.FlipVertical = true;
 			
 			caption_part = {};
 			caption_part.Base = caption_text;
@@ -1877,13 +1844,19 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			parts = {};
 			parts.Center.Enabled = check_box_center_enabled;
 			parts.Border.Sides.Top.Enabled = button_top_enabled;
-			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
+			parts.Border.Sides.Bottom.Enabled = button_top_enabled;
+			parts.Border.Sides.Bottom.FlipVertical = true;
 			parts.Border.Sides.Left.Enabled = button_left_enabled;
-			parts.Border.Sides.Right.Enabled = button_right_enabled;
+			parts.Border.Sides.Right.Enabled = button_left_enabled;
+			parts.Border.Sides.Right.FlipHorizontal = true;
 			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
-			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
-			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
-			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
+			parts.Border.Corners.TopRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomLeft.FlipVertical = true;
+			parts.Border.Corners.BottomRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomRight.FlipVertical = true;
 			
 			caption_part = {};
 			caption_part.Base = caption_text;
@@ -1909,20 +1882,26 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			parts.Center.Hovered = check_box_center_hovered;
 			parts.Border.Sides.Top.Enabled = button_top_enabled;
 			parts.Border.Sides.Top.Focused = button_top_focused;
-			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
-			parts.Border.Sides.Bottom.Focused = button_bottom_focused;
+			parts.Border.Sides.Bottom.Enabled = button_top_enabled;
+			parts.Border.Sides.Bottom.Focused = button_top_focused;
+			parts.Border.Sides.Bottom.FlipVertical = true;
 			parts.Border.Sides.Left.Enabled = button_left_enabled;
 			parts.Border.Sides.Left.Focused = button_left_focused;
-			parts.Border.Sides.Right.Enabled = button_right_enabled;
-			parts.Border.Sides.Right.Focused = button_right_focused;
+			parts.Border.Sides.Right.Enabled = button_left_enabled;
+			parts.Border.Sides.Right.Focused = button_left_focused;
+			parts.Border.Sides.Right.FlipHorizontal = true;
 			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
 			parts.Border.Corners.TopLeft.Focused = button_top_left_focused;
-			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
-			parts.Border.Corners.TopRight.Focused = button_top_right_focused;
-			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
-			parts.Border.Corners.BottomLeft.Focused = button_bottom_left_focused;
-			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
-			parts.Border.Corners.BottomRight.Focused = button_bottom_right_focused;
+			parts.Border.Corners.TopRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopRight.Focused = button_top_left_focused;
+			parts.Border.Corners.TopRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomLeft.Focused = button_top_left_focused;
+			parts.Border.Corners.BottomLeft.FlipVertical = true;
+			parts.Border.Corners.BottomRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomRight.Focused = button_top_left_focused;
+			parts.Border.Corners.BottomRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomRight.FlipVertical = true;
 			
 			caption_part = {};
 			caption_part.Base = caption_text;
@@ -1950,20 +1929,26 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			parts.Center.Hovered = check_box_center_hovered;
 			parts.Border.Sides.Top.Enabled = button_top_enabled;
 			parts.Border.Sides.Top.Focused = button_top_focused;
-			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
-			parts.Border.Sides.Bottom.Focused = button_bottom_focused;
+			parts.Border.Sides.Bottom.Enabled = button_top_enabled;
+			parts.Border.Sides.Bottom.Focused = button_top_focused;
+			parts.Border.Sides.Bottom.FlipVertical = true;
 			parts.Border.Sides.Left.Enabled = button_left_enabled;
 			parts.Border.Sides.Left.Focused = button_left_focused;
-			parts.Border.Sides.Right.Enabled = button_right_enabled;
-			parts.Border.Sides.Right.Focused = button_right_focused;
+			parts.Border.Sides.Right.Enabled = button_left_enabled;
+			parts.Border.Sides.Right.Focused = button_left_focused;
+			parts.Border.Sides.Right.FlipHorizontal = true;
 			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
 			parts.Border.Corners.TopLeft.Focused = button_top_left_focused;
-			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
-			parts.Border.Corners.TopRight.Focused = button_top_right_focused;
-			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
-			parts.Border.Corners.BottomLeft.Focused = button_bottom_left_focused;
-			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
-			parts.Border.Corners.BottomRight.Focused = button_bottom_right_focused;
+			parts.Border.Corners.TopRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopRight.Focused = button_top_left_focused;
+			parts.Border.Corners.TopRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomLeft.Focused = button_top_left_focused;
+			parts.Border.Corners.BottomLeft.FlipVertical = true;
+			parts.Border.Corners.BottomRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomRight.Focused = button_top_left_focused;
+			parts.Border.Corners.BottomRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomRight.FlipVertical = true;
 			
 			caption_part = {};
 			caption_part.Base = caption_text;
@@ -1991,20 +1976,26 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			parts.Center.Hovered = check_box_center_hovered;
 			parts.Border.Sides.Top.Enabled = button_top_enabled;
 			parts.Border.Sides.Top.Focused = button_top_focused;
-			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
-			parts.Border.Sides.Bottom.Focused = button_bottom_focused;
+			parts.Border.Sides.Bottom.Enabled = button_top_enabled;
+			parts.Border.Sides.Bottom.Focused = button_top_focused;
+			parts.Border.Sides.Bottom.FlipVertical = true;
 			parts.Border.Sides.Left.Enabled = button_left_enabled;
 			parts.Border.Sides.Left.Focused = button_left_focused;
-			parts.Border.Sides.Right.Enabled = button_right_enabled;
-			parts.Border.Sides.Right.Focused = button_right_focused;
+			parts.Border.Sides.Right.Enabled = button_left_enabled;
+			parts.Border.Sides.Right.Focused = button_left_focused;
+			parts.Border.Sides.Right.FlipHorizontal = true;
 			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
 			parts.Border.Corners.TopLeft.Focused = button_top_left_focused;
-			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
-			parts.Border.Corners.TopRight.Focused = button_top_right_focused;
-			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
-			parts.Border.Corners.BottomLeft.Focused = button_bottom_left_focused;
-			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
-			parts.Border.Corners.BottomRight.Focused = button_bottom_right_focused;
+			parts.Border.Corners.TopRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopRight.Focused = button_top_left_focused;
+			parts.Border.Corners.TopRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomLeft.Focused = button_top_left_focused;
+			parts.Border.Corners.BottomLeft.FlipVertical = true;
+			parts.Border.Corners.BottomRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomRight.Focused = button_top_left_focused;
+			parts.Border.Corners.BottomRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomRight.FlipVertical = true;
 			
 			caption_part = {};
 			caption_part.Base = caption_text;
@@ -2027,20 +2018,26 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			parts.Center.Hovered = check_box_center_hovered;
 			parts.Border.Sides.Top.Enabled = button_top_enabled;
 			parts.Border.Sides.Top.Focused = button_top_focused;
-			parts.Border.Sides.Bottom.Enabled = button_bottom_enabled;
-			parts.Border.Sides.Bottom.Focused = button_bottom_focused;
+			parts.Border.Sides.Bottom.Enabled = button_top_enabled;
+			parts.Border.Sides.Bottom.Focused = button_top_focused;
+			parts.Border.Sides.Bottom.FlipVertical = true;
 			parts.Border.Sides.Left.Enabled = button_left_enabled;
 			parts.Border.Sides.Left.Focused = button_left_focused;
-			parts.Border.Sides.Right.Enabled = button_right_enabled;
-			parts.Border.Sides.Right.Focused = button_right_focused;
+			parts.Border.Sides.Right.Enabled = button_left_enabled;
+			parts.Border.Sides.Right.Focused = button_left_focused;
+			parts.Border.Sides.Right.FlipHorizontal = true;
 			parts.Border.Corners.TopLeft.Enabled = button_top_left_enabled;
 			parts.Border.Corners.TopLeft.Focused = button_top_left_focused;
-			parts.Border.Corners.TopRight.Enabled = button_top_right_enabled;
-			parts.Border.Corners.TopRight.Focused = button_top_right_focused;
-			parts.Border.Corners.BottomLeft.Enabled = button_bottom_left_enabled;
-			parts.Border.Corners.BottomLeft.Focused = button_bottom_left_focused;
-			parts.Border.Corners.BottomRight.Enabled = button_bottom_right_enabled;
-			parts.Border.Corners.BottomRight.Focused = button_bottom_right_focused;
+			parts.Border.Corners.TopRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.TopRight.Focused = button_top_left_focused;
+			parts.Border.Corners.TopRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomLeft.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomLeft.Focused = button_top_left_focused;
+			parts.Border.Corners.BottomLeft.FlipVertical = true;
+			parts.Border.Corners.BottomRight.Enabled = button_top_left_enabled;
+			parts.Border.Corners.BottomRight.Focused = button_top_left_focused;
+			parts.Border.Corners.BottomRight.FlipHorizontal = true;
+			parts.Border.Corners.BottomRight.FlipVertical = true;
 			
 			caption_part = {};
 			caption_part.Base = caption_text;
