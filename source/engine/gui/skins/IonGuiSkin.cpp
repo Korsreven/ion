@@ -12,6 +12,7 @@ File:	IonGuiSkin.cpp
 
 #include "IonGuiSkin.h"
 
+#include "IonEngine.h"
 #include "IonGuiTheme.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
@@ -350,6 +351,10 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			control_skin.Caption.Focused = caption_part->Focused;
 			control_skin.Caption.Pressed = caption_part->Pressed;
 			control_skin.Caption.Hovered = caption_part->Hovered;
+
+			//Position
+			auto [x, y, z] = control_skin.Caption->Position().XYZ();
+			control_skin.Caption->Position({x, y, z + Engine::ZEpsilon()});
 		}
 	}
 
@@ -438,6 +443,10 @@ OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const GuiSkin 
 			check_box_skin->CheckMark.Focused = check_mark_part->Focused;
 			check_box_skin->CheckMark.Pressed = check_mark_part->Pressed;
 			check_box_skin->CheckMark.Hovered = check_mark_part->Hovered;
+
+			//Position
+			auto [x, y, z] = check_box_skin->CheckMark->Position().XYZ();
+			check_box_skin->CheckMark->Position({x, y, z + Engine::ZEpsilon()});
 		}
 	}
 
@@ -482,6 +491,10 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &
 			list_box_skin->Selection.Focused = selection_part->Focused;
 			list_box_skin->Selection.Pressed = selection_part->Pressed;
 			list_box_skin->Selection.Hovered = selection_part->Hovered;
+
+			//Position
+			auto [x, y, z] = list_box_skin->Selection->Position().XYZ();
+			list_box_skin->Selection->Position({x, y, z + Engine::ZEpsilon()});
 		}
 	}
 
@@ -503,6 +516,10 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &
 			list_box_skin->Lines.Focused = lines_part->Focused;
 			list_box_skin->Lines.Pressed = lines_part->Pressed;
 			list_box_skin->Lines.Hovered = lines_part->Hovered;
+
+			//Position
+			auto [x, y, z] = list_box_skin->Lines->Position().XYZ();
+			list_box_skin->Lines->Position({x, y, z + Engine::ZEpsilon() * 2.0_r});
 		}
 	}
 
@@ -541,6 +558,10 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSk
 			progress_bar_skin->Bar.Focused = bar_part->Focused;
 			progress_bar_skin->Bar.Pressed = bar_part->Pressed;
 			progress_bar_skin->Bar.Hovered = bar_part->Hovered;
+
+			//Position
+			auto [x, y, z] = progress_bar_skin->Bar->Position().XYZ();
+			progress_bar_skin->Bar->Position({x, y, z + Engine::ZEpsilon()});
 		}
 
 		//Bar interpolated part
@@ -558,6 +579,10 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSk
 			progress_bar_skin->BarInterpolated.Focused = bar_interpolated_part->Focused;
 			progress_bar_skin->BarInterpolated.Pressed = bar_interpolated_part->Pressed;
 			progress_bar_skin->BarInterpolated.Hovered = bar_interpolated_part->Hovered;
+
+			//Position
+			auto [x, y, z] = progress_bar_skin->BarInterpolated->Position().XYZ();
+			progress_bar_skin->BarInterpolated->Position({x, y, z + Engine::ZEpsilon() * 2.0_r});
 		}
 	}
 
@@ -587,6 +612,10 @@ OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const GuiSk
 			radio_button_skin->CheckMark.Focused = check_mark_part->Focused;
 			radio_button_skin->CheckMark.Pressed = check_mark_part->Pressed;
 			radio_button_skin->CheckMark.Hovered = check_mark_part->Hovered;
+
+			//Position
+			auto [x, y, z] = radio_button_skin->CheckMark->Position().XYZ();
+			radio_button_skin->CheckMark->Position({x, y, z + Engine::ZEpsilon()});
 		}
 	}
 
@@ -616,6 +645,10 @@ OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const GuiSkin
 			scroll_bar_skin->Handle.Focused = handle_part->Focused;
 			scroll_bar_skin->Handle.Pressed = handle_part->Pressed;
 			scroll_bar_skin->Handle.Hovered = handle_part->Hovered;
+
+			//Position
+			auto [x, y, z] = scroll_bar_skin->Handle->Position().XYZ();
+			scroll_bar_skin->Handle->Position({x, y, z + Engine::ZEpsilon()});
 		}
 	}
 
@@ -645,6 +678,10 @@ OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const GuiSkin &sk
 			slider_skin->Handle.Focused = handle_part->Focused;
 			slider_skin->Handle.Pressed = handle_part->Pressed;
 			slider_skin->Handle.Hovered = handle_part->Hovered;
+
+			//Position
+			auto [x, y, z] = slider_skin->Handle->Position().XYZ();
+			slider_skin->Handle->Position({x, y, z + Engine::ZEpsilon()});
 		}
 	}
 
@@ -674,6 +711,10 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 			text_box_skin->Cursor.Focused = cursor_part->Focused;
 			text_box_skin->Cursor.Pressed = cursor_part->Pressed;
 			text_box_skin->Cursor.Hovered = cursor_part->Hovered;
+
+			//Position
+			auto [x, y, z] = text_box_skin->Cursor->Position().XYZ();
+			text_box_skin->Cursor->Position({x, y, z + Engine::ZEpsilon()});
 		}
 	}
 
@@ -696,6 +737,10 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 			text_box_skin->Text.Focused = text_part->Focused;
 			text_box_skin->Text.Pressed = text_part->Pressed;
 			text_box_skin->Text.Hovered = text_part->Hovered;
+
+			//Position
+			auto [x, y, z] = text_box_skin->Text->Position().XYZ();
+			text_box_skin->Text->Position({x, y, z + Engine::ZEpsilon()});
 		}
 
 		//Placeholder text part
@@ -712,6 +757,10 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 			text_box_skin->PlaceholderText.Focused = placeholder_text_part->Focused;
 			text_box_skin->PlaceholderText.Pressed = placeholder_text_part->Pressed;
 			text_box_skin->PlaceholderText.Hovered = placeholder_text_part->Hovered;
+
+			//Position
+			auto [x, y, z] = text_box_skin->PlaceholderText->Position().XYZ();
+			text_box_skin->PlaceholderText->Position({x, y, z + Engine::ZEpsilon()});
 		}
 	}
 
