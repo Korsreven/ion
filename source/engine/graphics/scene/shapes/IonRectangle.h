@@ -100,6 +100,12 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
+			//Sets the position of this rectangle to the given position
+			inline void Position(const Vector2 &position) noexcept
+			{
+				Position({position.X(), position.Y(), position_.Z()});
+			}
+
 			//Sets the rotation of this rectangle to the given angle (in radians)
 			inline void Rotation(real angle) noexcept
 			{

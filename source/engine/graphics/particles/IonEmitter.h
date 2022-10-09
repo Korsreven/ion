@@ -247,6 +247,12 @@ namespace ion::graphics::particles
 				position_ = position;
 			}
 
+			//Sets the position of the emitter to the given vector
+			inline void Position(const Vector2 &position) noexcept
+			{
+				Position({position.X(), position.Y(), position_.Z()});
+			}
+
 			//Sets the direction of the emitter to the given vector
 			inline void Direction(const Vector2 &direction) noexcept
 			{

@@ -28,6 +28,7 @@ File:	IonDrawableText.h
 #include "graphics/shaders/IonShaderLayout.h"
 #include "graphics/textures/IonTexture.h"
 #include "graphics/utilities/IonColor.h"
+#include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 #include "memory/IonNonOwningPtr.h"
 #include "memory/IonOwningPtr.h"
@@ -219,6 +220,12 @@ namespace ion::graphics::scene
 					position_ = position;
 					reload_primitives_ = true;
 				}
+			}
+
+			//Sets the position of this text to the given position
+			inline void Position(const Vector2 &position) noexcept
+			{
+				Position({position.X(), position.Y(), position_.Z()});
 			}
 
 			//Sets the rotation of this text to the given angle (in radians)

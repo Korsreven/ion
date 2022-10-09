@@ -68,6 +68,12 @@ namespace ion::graphics::particles
 				position_ = position;
 			}
 
+			//Sets the position of the particle to the given vector
+			inline void Position(const Vector2 &position) noexcept
+			{
+				Position({position.X(), position.Y(), position_.Z()});
+			}
+
 			//Sets the direction of the particle to the given vector
 			//Where the length of the given vector represents velocity
 			inline void Direction(const Vector2 &direction) noexcept

@@ -17,6 +17,7 @@ File:	IonMovableSoundListener.h
 #include <string>
 
 #include "IonMovableObject.h"
+#include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 #include "memory/IonNonOwningPtr.h"
 
@@ -28,6 +29,7 @@ namespace ion::sounds
 
 namespace ion::graphics::scene
 {
+	using utilities::Vector2;
 	using utilities::Vector3;
 
 
@@ -68,6 +70,12 @@ namespace ion::graphics::scene
 			inline void Position(const Vector3 &position) noexcept
 			{
 				position_ = position;
+			}
+
+			//Sets the position of this sound listener to the given position
+			inline void Position(const Vector2 &position) noexcept
+			{
+				Position({position.X(), position.Y(), position_.Z()});
 			}
 
 

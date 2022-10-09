@@ -23,6 +23,7 @@ File:	IonLight.h
 #include "IonMovableObject.h"
 #include "graphics/textures/IonTexture.h"
 #include "graphics/utilities/IonColor.h"
+#include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
@@ -33,6 +34,7 @@ namespace ion::graphics::scene
 	using namespace types::type_literals;
 
 	using utilities::Color;
+	using utilities::Vector2;
 	using utilities::Vector3;
 
 	//Forward declarations
@@ -198,6 +200,13 @@ namespace ion::graphics::scene
 			inline void Position(const Vector3 &position) noexcept
 			{
 				position_ = position;
+			}
+
+			//Sets the position of the light to the given position
+			//This value only applies for lights of type point and spot light
+			inline void Position(const Vector2 &position) noexcept
+			{
+				Position({position.X(), position.Y(), position_.Z()});
 			}
 
 			//Sets the direction of the light to the given direction
