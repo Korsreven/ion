@@ -209,12 +209,13 @@ void Renderer::GrowBatch(renderer::detail::render_batches::iterator where, int s
 	//Batch is not last, copy data to the right
 	if (where + 1 != std::end(batches_))
 	{
-		std::copy_backward(std::begin(vertex_data_) + (*where)->offset,
+		auto iter = where + 1;
+		std::copy_backward(std::begin(vertex_data_) + (*iter)->offset,
 			std::begin(vertex_data_) + used_capacity_,
 			std::begin(vertex_data_) + used_capacity_ + size);
 
 		//Update offset on all succeeding batches
-		for (auto iter = where + 1, end = std::end(batches_); iter != end; ++iter)
+		for (auto end = std::end(batches_); iter != end; ++iter)
 			(*iter)->offset += size;
 	}
 
