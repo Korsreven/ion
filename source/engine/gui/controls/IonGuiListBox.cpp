@@ -524,6 +524,12 @@ NonOwningPtr<graphics::scene::shapes::Sprite> GuiListBox::CreateIcon(NonOwningPt
 	{
 		auto sprite = skin_->Parts->CreateMesh<graphics::scene::shapes::Sprite>(vector2::Zero, material);
 		sprite->IncludeBoundingVolumes(false);
+
+		//Position
+		auto [x, y, z] = sprite->Position().XYZ();
+		sprite->Position({x, y, z + Engine::ZEpsilon() * 2.0_r});
+			//Make sure icons are drawn above selection
+
 		return sprite;
 	}
 	else
