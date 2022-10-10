@@ -89,7 +89,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			//Center part
 			if (center_part && *center_part)
 			{
-				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{center_part->Enabled});
+				auto sprite = model->CreateMesh<graphics::scene::shapes::Sprite>(center_part->Enabled);
 				sprite->AutoRepeat(true);
 				set_sprite_properties(*center_part, *sprite);
 
@@ -105,7 +105,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			//Top part
 			if (top_part && *top_part)
 			{
-				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{top_part->Enabled});
+				auto sprite = model->CreateMesh<graphics::scene::shapes::Sprite>(top_part->Enabled);
 				sprite->AutoRepeat(true);
 				set_sprite_properties(*top_part, *sprite);
 
@@ -120,7 +120,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			//Bottom part
 			if (bottom_part && *bottom_part)
 			{
-				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{bottom_part->Enabled});
+				auto sprite = model->CreateMesh<graphics::scene::shapes::Sprite>(bottom_part->Enabled);
 				sprite->AutoRepeat(true);
 				set_sprite_properties(*bottom_part, *sprite);
 
@@ -135,7 +135,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			//Left part
 			if (left_part && *left_part)
 			{
-				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{left_part->Enabled});
+				auto sprite = model->CreateMesh<graphics::scene::shapes::Sprite>(left_part->Enabled);
 				sprite->AutoRepeat(true);
 				set_sprite_properties(*left_part, *sprite);
 
@@ -150,7 +150,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			//Right part
 			if (right_part && *right_part)
 			{
-				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{right_part->Enabled});
+				auto sprite = model->CreateMesh<graphics::scene::shapes::Sprite>(right_part->Enabled);
 				sprite->AutoRepeat(true);
 				set_sprite_properties(*right_part, *sprite);
 
@@ -166,7 +166,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			//Top-left part
 			if (top_left_part && *top_left_part)
 			{
-				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{top_left_part->Enabled});
+				auto sprite = model->CreateMesh<graphics::scene::shapes::Sprite>(top_left_part->Enabled);
 				sprite->AutoRepeat(true);
 				set_sprite_properties(*top_left_part, *sprite);
 
@@ -181,7 +181,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			//Top-right part
 			if (top_right_part && *top_right_part)
 			{
-				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{top_right_part->Enabled});
+				auto sprite = model->CreateMesh<graphics::scene::shapes::Sprite>(top_right_part->Enabled);
 				sprite->AutoRepeat(true);
 				set_sprite_properties(*top_right_part, *sprite);
 
@@ -196,7 +196,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			//Bottom-left part
 			if (bottom_left_part && *bottom_left_part)
 			{
-				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{bottom_left_part->Enabled});
+				auto sprite = model->CreateMesh<graphics::scene::shapes::Sprite>(bottom_left_part->Enabled);
 				sprite->AutoRepeat(true);
 				set_sprite_properties(*bottom_left_part, *sprite);
 
@@ -211,7 +211,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			//Bottom-right part
 			if (bottom_right_part && *bottom_right_part)
 			{
-				auto sprite = model->CreateMesh(graphics::scene::shapes::Sprite{bottom_right_part->Enabled});
+				auto sprite = model->CreateMesh<graphics::scene::shapes::Sprite>(bottom_right_part->Enabled);
 				sprite->AutoRepeat(true);
 				set_sprite_properties(*bottom_right_part, *sprite);
 
@@ -434,7 +434,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const GuiSkin 
 		//Check mark part
 		if (check_mark_part && *check_mark_part)
 		{
-			auto sprite = check_box_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{check_mark_part->Enabled});
+			auto sprite = check_box_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(check_mark_part->Enabled);
 			sprite->IncludeBoundingVolumes(false);
 			set_sprite_properties(*check_mark_part, *sprite);
 
@@ -480,7 +480,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &
 		//Selection part
 		if (selection_part && *selection_part)
 		{
-			auto sprite = list_box_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{selection_part->Enabled});
+			auto sprite = list_box_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(selection_part->Enabled);
 			sprite->IncludeBoundingVolumes(false);
 			sprite->AutoRepeat(true);
 			set_sprite_properties(*selection_part, *sprite);
@@ -546,7 +546,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSk
 		//Bar part
 		if (bar_part && *bar_part)
 		{
-			auto sprite = progress_bar_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{bar_part->Enabled});		
+			auto sprite = progress_bar_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(bar_part->Enabled);		
 			sprite->IncludeBoundingVolumes(false);
 			sprite->AutoRepeat(true);
 			set_sprite_properties(*bar_part, *sprite);
@@ -566,7 +566,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSk
 		//Bar interpolated part
 		if (bar_interpolated_part && *bar_interpolated_part)
 		{
-			auto sprite = progress_bar_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{bar_interpolated_part->Enabled});
+			auto sprite = progress_bar_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(bar_interpolated_part->Enabled);
 			sprite->IncludeBoundingVolumes(false);
 			sprite->AutoRepeat(true);
 			set_sprite_properties(*bar_interpolated_part, *sprite);
@@ -599,7 +599,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const GuiSk
 		//Check mark part
 		if (check_mark_part && *check_mark_part)
 		{
-			auto sprite = radio_button_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{check_mark_part->Enabled});
+			auto sprite = radio_button_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(check_mark_part->Enabled);
 			sprite->IncludeBoundingVolumes(false);
 			set_sprite_properties(*check_mark_part, *sprite);
 
@@ -631,7 +631,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const GuiSkin
 		//Handle part
 		if (handle_part && *handle_part)
 		{
-			auto sprite = scroll_bar_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{handle_part->Enabled});
+			auto sprite = scroll_bar_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(handle_part->Enabled);
 			sprite->IncludeBoundingVolumes(false);
 			set_sprite_properties(*handle_part, *sprite);
 
@@ -663,7 +663,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const GuiSkin &sk
 		//Handle part
 		if (handle_part && *handle_part)
 		{
-			auto sprite = slider_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{handle_part->Enabled});
+			auto sprite = slider_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(handle_part->Enabled);
 			sprite->IncludeBoundingVolumes(false);
 			set_sprite_properties(*handle_part, *sprite);
 
@@ -695,7 +695,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 		//Cursor part
 		if (cursor_part && *cursor_part)
 		{
-			auto sprite = text_box_skin->Parts->CreateMesh(graphics::scene::shapes::Sprite{cursor_part->Enabled});
+			auto sprite = text_box_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(cursor_part->Enabled);
 			sprite->IncludeBoundingVolumes(false);
 			set_sprite_properties(*cursor_part, *sprite);
 
