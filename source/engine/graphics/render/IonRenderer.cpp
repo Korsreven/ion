@@ -189,11 +189,12 @@ void Renderer::GroupWithBatch(RenderPrimitive &primitive, renderer::detail::rend
 
 void Renderer::GrowBatch(renderer::detail::render_batches::iterator where, int size)
 {
+	auto geometric = (*where)->capacity + (*where)->capacity / 2;
+	auto grow_size = geometric < (*where)->capacity + size ? size : geometric - (*where)->capacity;
+
 	//Reallocate if not enough capacity
-	if (std::ssize(vertex_data_) < used_capacity_ + size)
+	if (std::ssize(vertex_data_) < used_capacity_ + grow_size)
 	{
-		//Grow with minimum required size
-		auto grow_size = used_capacity_ + size - std::ssize(vertex_data_);
 		vertex_data_.insert(std::end(vertex_data_), grow_size, 0.0_r); //Reallocates!
 
 		//Fill up allocated space (using vectors growth strategy)
@@ -212,15 +213,15 @@ void Renderer::GrowBatch(renderer::detail::render_batches::iterator where, int s
 		auto iter = where + 1;
 		std::copy_backward(std::begin(vertex_data_) + (*iter)->offset,
 			std::begin(vertex_data_) + used_capacity_,
-			std::begin(vertex_data_) + used_capacity_ + size);
+			std::begin(vertex_data_) + used_capacity_ + grow_size);
 
 		//Update offset on all succeeding batches
 		for (auto end = std::end(batches_); iter != end; ++iter)
-			(*iter)->offset += size;
+			(*iter)->offset += grow_size;
 	}
 
-	used_capacity_ += size;
-	(*where)->capacity += size;
+	used_capacity_ += grow_size;
+	(*where)->capacity += grow_size;
 	(*where)->need_update = detail::update_status::YesSuccessive;
 }
 
