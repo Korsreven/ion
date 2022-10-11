@@ -200,8 +200,8 @@ void Renderer::GrowBatch(renderer::detail::render_batches::iterator where, int s
 		//Fill up allocated space (using vectors growth strategy)
 		if (std::size(vertex_data_) < vertex_data_.capacity())
 		{
-			grow_size = static_cast<int>(vertex_data_.capacity() - std::size(vertex_data_));
-			vertex_data_.insert(std::end(vertex_data_), grow_size, 0.0_r); //Does not reallocate
+			auto size_left = vertex_data_.capacity() - std::size(vertex_data_);
+			vertex_data_.insert(std::end(vertex_data_), size_left, 0.0_r); //Does not reallocate
 		}
 
 		need_update_ = true; //Vertex data has reallocated
