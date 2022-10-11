@@ -339,5 +339,5 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
-# Allow dlls added to vendored code
-!libraries/**/*.dll
+# Allow all files added to vendored code
+!libraries/**
