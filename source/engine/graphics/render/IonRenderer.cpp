@@ -317,6 +317,7 @@ void Renderer::GroupAddedPrimitives()
 		if (where_to_group)
 		{
 			(**where_to_group)->used_capacity = 0;
+			(**where_to_group)->last_used_capacity = 0;
 			(**where_to_group)->slots.clear();
 			(**where_to_group)->vertex_batch = primitive->MakeVertexBatch();
 			(**where_to_group)->need_update = detail::update_status::Yes;
@@ -388,7 +389,7 @@ void Renderer::CompressBatches() noexcept
 					{
 						//Empty slot, copy data to the left
 						std::copy(std::begin(vertex_data_) + slot_offset + slot.capacity,
-							std::begin(vertex_data_) + batch->offset + batch->used_capacity,
+							std::begin(vertex_data_) + batch->offset + batch->last_used_capacity,
 							std::begin(vertex_data_) + slot_offset);
 
 						batch->used_capacity -= slot.capacity;
