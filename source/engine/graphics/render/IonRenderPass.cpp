@@ -6,23 +6,23 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/render
-File:	IonPass.cpp
+File:	IonRenderPass.cpp
 -------------------------------------------
 */
 
-#include "IonPass.h"
+#include "IonRenderPass.h"
 
 #include "graphics/IonGraphicsAPI.h"
 
 namespace ion::graphics::render
 {
 
-using namespace pass;
+using namespace render_pass;
 
-namespace pass::detail
+namespace render_pass::detail
 {
 
-int pass_blend_factor_to_gl_blend_factor(BlendFactor factor) noexcept
+int render_pass_blend_factor_to_gl_blend_factor(BlendFactor factor) noexcept
 {
 	switch (factor)
 	{
@@ -91,7 +91,7 @@ int pass_blend_factor_to_gl_blend_factor(BlendFactor factor) noexcept
 	}
 }
 
-int pass_blend_equation_mode_to_gl_blend_equation_mode(BlendEquationMode mode) noexcept
+int render_pass_blend_equation_mode_to_gl_blend_equation_mode(BlendEquationMode mode) noexcept
 {
 	switch (mode)
 	{
@@ -120,8 +120,8 @@ int pass_blend_equation_mode_to_gl_blend_equation_mode(BlendEquationMode mode) n
 
 void blend(BlendFactor source_factor, BlendFactor destination_factor, BlendEquationMode equation_mode) noexcept
 {
-	glBlendFunc(pass_blend_factor_to_gl_blend_factor(source_factor), pass_blend_factor_to_gl_blend_factor(destination_factor));
-	glBlendEquation(pass_blend_equation_mode_to_gl_blend_equation_mode(equation_mode));
+	glBlendFunc(render_pass_blend_factor_to_gl_blend_factor(source_factor), render_pass_blend_factor_to_gl_blend_factor(destination_factor));
+	glBlendEquation(render_pass_blend_equation_mode_to_gl_blend_equation_mode(equation_mode));
 	glEnable(GL_BLEND);
 }
 
@@ -132,13 +132,13 @@ void blend_separate(BlendFactor source_factor, BlendFactor destination_factor,
 	switch (gl::BlendFuncSeparate_Support())
 	{
 		case gl::Extension::Core:
-		glBlendFuncSeparate(pass_blend_factor_to_gl_blend_factor(source_factor), pass_blend_factor_to_gl_blend_factor(destination_factor),
-							pass_blend_factor_to_gl_blend_factor(source_factor_alpha), pass_blend_factor_to_gl_blend_factor(destination_factor_alpha));
+		glBlendFuncSeparate(render_pass_blend_factor_to_gl_blend_factor(source_factor), render_pass_blend_factor_to_gl_blend_factor(destination_factor),
+							render_pass_blend_factor_to_gl_blend_factor(source_factor_alpha), render_pass_blend_factor_to_gl_blend_factor(destination_factor_alpha));
 		break;
 
 		case gl::Extension::EXT:
-		glBlendFuncSeparateEXT(pass_blend_factor_to_gl_blend_factor(source_factor), pass_blend_factor_to_gl_blend_factor(destination_factor),
-							   pass_blend_factor_to_gl_blend_factor(source_factor_alpha), pass_blend_factor_to_gl_blend_factor(destination_factor_alpha));
+		glBlendFuncSeparateEXT(render_pass_blend_factor_to_gl_blend_factor(source_factor), render_pass_blend_factor_to_gl_blend_factor(destination_factor),
+							   render_pass_blend_factor_to_gl_blend_factor(source_factor_alpha), render_pass_blend_factor_to_gl_blend_factor(destination_factor_alpha));
 		break;
 
 		default:
@@ -152,23 +152,23 @@ void blend_separate(BlendFactor source_factor, BlendFactor destination_factor,
 	switch (gl::BlendEquationSeparate_Support())
 	{
 		case gl::Extension::Core:
-		glBlendEquationSeparate(pass_blend_equation_mode_to_gl_blend_equation_mode(equation_mode),
-								pass_blend_equation_mode_to_gl_blend_equation_mode(equation_mode_alpha));
+		glBlendEquationSeparate(render_pass_blend_equation_mode_to_gl_blend_equation_mode(equation_mode),
+								render_pass_blend_equation_mode_to_gl_blend_equation_mode(equation_mode_alpha));
 		break;
 
 		case gl::Extension::EXT:
-		glBlendEquationSeparateEXT(pass_blend_equation_mode_to_gl_blend_equation_mode(equation_mode),
-								   pass_blend_equation_mode_to_gl_blend_equation_mode(equation_mode_alpha));
+		glBlendEquationSeparateEXT(render_pass_blend_equation_mode_to_gl_blend_equation_mode(equation_mode),
+								   render_pass_blend_equation_mode_to_gl_blend_equation_mode(equation_mode_alpha));
 		break;
 	}
 
 	glEnable(GL_BLEND);
 }
 
-} //pass::detail
+} //render_pass::detail
 
 
-Pass::Pass(NonOwningPtr<shaders::ShaderProgram> shader_program, int iterations) noexcept :
+RenderPass::RenderPass(NonOwningPtr<shaders::ShaderProgram> shader_program, int iterations) noexcept :
 
 	iterations_{iterations},
 	shader_program_{shader_program}
@@ -177,7 +177,7 @@ Pass::Pass(NonOwningPtr<shaders::ShaderProgram> shader_program, int iterations) 
 }
 
 
-Pass::Pass(pass::BlendFactor blend_source_factor, pass::BlendFactor blend_destination_factor,
+RenderPass::RenderPass(BlendFactor blend_source_factor, BlendFactor blend_destination_factor,
 	NonOwningPtr<shaders::ShaderProgram> shader_program, int iterations) noexcept :
 
 	iterations_{iterations},
@@ -190,8 +190,8 @@ Pass::Pass(pass::BlendFactor blend_source_factor, pass::BlendFactor blend_destin
 	//Empty
 }
 
-Pass::Pass(pass::BlendFactor blend_source_factor, pass::BlendFactor blend_destination_factor,
-	pass::BlendEquationMode blend_equation_mode,
+RenderPass::RenderPass(BlendFactor blend_source_factor, BlendFactor blend_destination_factor,
+	BlendEquationMode blend_equation_mode,
 	NonOwningPtr<shaders::ShaderProgram> shader_program, int iterations) noexcept :
 
 	iterations_{iterations},
@@ -206,8 +206,8 @@ Pass::Pass(pass::BlendFactor blend_source_factor, pass::BlendFactor blend_destin
 }
 
 
-Pass::Pass(pass::BlendFactor blend_source_factor, pass::BlendFactor blend_destination_factor,
-	pass::BlendFactor blend_source_factor_alpha_, pass::BlendFactor blend_destination_factor_alpha,
+RenderPass::RenderPass(BlendFactor blend_source_factor, BlendFactor blend_destination_factor,
+	BlendFactor blend_source_factor_alpha_, BlendFactor blend_destination_factor_alpha,
 	NonOwningPtr<shaders::ShaderProgram> shader_program, int iterations) noexcept :
 
 	iterations_{iterations},
@@ -222,9 +222,9 @@ Pass::Pass(pass::BlendFactor blend_source_factor, pass::BlendFactor blend_destin
 	//Empty
 }
 
-Pass::Pass(pass::BlendFactor blend_source_factor, pass::BlendFactor blend_destination_factor,
-	pass::BlendFactor blend_source_factor_alpha_, pass::BlendFactor blend_destination_factor_alpha,
-	pass::BlendEquationMode blend_equation_mode, pass::BlendEquationMode blend_equation_mode_alpha,
+RenderPass::RenderPass(BlendFactor blend_source_factor, BlendFactor blend_destination_factor,
+	BlendFactor blend_source_factor_alpha_, BlendFactor blend_destination_factor_alpha,
+	BlendEquationMode blend_equation_mode, BlendEquationMode blend_equation_mode_alpha,
 	NonOwningPtr<shaders::ShaderProgram> shader_program, int iterations) noexcept :
 
 	iterations_{iterations},
@@ -247,7 +247,7 @@ Pass::Pass(pass::BlendFactor blend_source_factor, pass::BlendFactor blend_destin
 	Blending
 */
 
-void Pass::Blend() const noexcept
+void RenderPass::Blend() const noexcept
 {
 	if (blend_source_factor_alpha_ && blend_destination_factor_alpha_)
 		detail::blend_separate(blend_source_factor_, blend_destination_factor_,

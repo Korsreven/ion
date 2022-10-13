@@ -159,10 +159,10 @@ void Mesh::VertexDataChanged() noexcept
 		owner->NotifyVertexDataChanged(*this);
 }
 
-void Mesh::PassesChanged() noexcept
+void Mesh::RenderPassesChanged() noexcept
 {
 	if (auto owner = Owner(); owner)
-		owner->NotifyPassesChanged(*this);
+		owner->NotifyRenderPassesChanged(*this);
 }
 
 void Mesh::MaterialChanged() noexcept

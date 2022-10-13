@@ -142,10 +142,10 @@ void Model::NotifyVertexDataChanged(shapes::Mesh &mesh) noexcept
 		update_bounding_volumes_ = true;
 }
 
-void Model::NotifyPassesChanged(shapes::Mesh &mesh) noexcept
+void Model::NotifyRenderPassesChanged(shapes::Mesh &mesh) noexcept
 {
 	if (mesh.Owner() == this)
-		DrawableObject::NotifyPassesChanged(mesh);
+		DrawableObject::NotifyRenderPassesChanged(mesh);
 }
 
 void Model::NotifyMaterialChanged(shapes::Mesh &mesh) noexcept

@@ -159,71 +159,71 @@ graph::animations::node_animation::MotionTechniqueType get_motion_technique_type
 		return graph::animations::node_animation::MotionTechniqueType::Tanh;
 }
 
-graphics::render::pass::BlendFactor get_pass_blend_factor(const script_tree::ArgumentNode &arg)
+graphics::render::render_pass::BlendFactor get_pass_blend_factor(const script_tree::ArgumentNode &arg)
 {
 	auto name = arg
 		.Get<ScriptType::Enumerable>()->Get();
 
 	if (name == "zero")
-		return graphics::render::pass::BlendFactor::Zero;
+		return graphics::render::render_pass::BlendFactor::Zero;
 	else if (name == "one")
-		return graphics::render::pass::BlendFactor::One;
+		return graphics::render::render_pass::BlendFactor::One;
 
 	else if (name == "source-color")
-		return graphics::render::pass::BlendFactor::SourceColor;
+		return graphics::render::render_pass::BlendFactor::SourceColor;
 	else if (name == "one-minus-source-color")
-		return graphics::render::pass::BlendFactor::OneMinus_SourceColor;
+		return graphics::render::render_pass::BlendFactor::OneMinus_SourceColor;
 	else if (name == "destination-color")
-		return graphics::render::pass::BlendFactor::DestinationColor;
+		return graphics::render::render_pass::BlendFactor::DestinationColor;
 	else if (name == "one-minus-destination-color")
-		return graphics::render::pass::BlendFactor::OneMinus_DestinationColor;
+		return graphics::render::render_pass::BlendFactor::OneMinus_DestinationColor;
 
 	else if (name == "source-alpha")
-		return graphics::render::pass::BlendFactor::SourceAlpha;
+		return graphics::render::render_pass::BlendFactor::SourceAlpha;
 	else if (name == "one-minus-source-alpha")
-		return graphics::render::pass::BlendFactor::OneMinus_SourceAlpha;
+		return graphics::render::render_pass::BlendFactor::OneMinus_SourceAlpha;
 	else if (name == "destination-alpha")
-		return graphics::render::pass::BlendFactor::DestinationAlpha;
+		return graphics::render::render_pass::BlendFactor::DestinationAlpha;
 	else if (name == "one-minus-destination-alpha")
-		return graphics::render::pass::BlendFactor::OneMinus_DestinationAlpha;
+		return graphics::render::render_pass::BlendFactor::OneMinus_DestinationAlpha;
 
 	else if (name == "constant-color")
-		return graphics::render::pass::BlendFactor::ConstantColor;
+		return graphics::render::render_pass::BlendFactor::ConstantColor;
 	else if (name == "one-minus-constant-color")
-		return graphics::render::pass::BlendFactor::OneMinus_ConstantColor;
+		return graphics::render::render_pass::BlendFactor::OneMinus_ConstantColor;
 	else if (name == "constant-alpha")
-		return graphics::render::pass::BlendFactor::ConstantAlpha;
+		return graphics::render::render_pass::BlendFactor::ConstantAlpha;
 	else if (name == "one-minus-constant-alpha")
-		return graphics::render::pass::BlendFactor::OneMinus_ConstantAlpha;
+		return graphics::render::render_pass::BlendFactor::OneMinus_ConstantAlpha;
 
 	else if (name == "source-one-color")
-		return graphics::render::pass::BlendFactor::SourceOneColor;
+		return graphics::render::render_pass::BlendFactor::SourceOneColor;
 	else if (name == "one-minus-source-one-color")
-		return graphics::render::pass::BlendFactor::OneMinus_SourceOneColor;
+		return graphics::render::render_pass::BlendFactor::OneMinus_SourceOneColor;
 	else if (name == "source-one-alpha")
-		return graphics::render::pass::BlendFactor::SourceOneAlpha;
+		return graphics::render::render_pass::BlendFactor::SourceOneAlpha;
 	else if (name == "one-minus-source-one-alpha")
-		return graphics::render::pass::BlendFactor::OneMinus_SourceOneAlpha;
+		return graphics::render::render_pass::BlendFactor::OneMinus_SourceOneAlpha;
 
 	else //if (name == "source-alpha-saturate")
-		return graphics::render::pass::BlendFactor::SourceAlphaSaturate;
+		return graphics::render::render_pass::BlendFactor::SourceAlphaSaturate;
 }
 
-graphics::render::pass::BlendEquationMode get_pass_blend_equation_mode(const script_tree::ArgumentNode &arg)
+graphics::render::render_pass::BlendEquationMode get_pass_blend_equation_mode(const script_tree::ArgumentNode &arg)
 {
 	auto name = arg
 		.Get<ScriptType::Enumerable>()->Get();
 
 	if (name == "add")
-		return graphics::render::pass::BlendEquationMode::Add;
+		return graphics::render::render_pass::BlendEquationMode::Add;
 	else if (name == "subtract")
-		return graphics::render::pass::BlendEquationMode::Subtract;
+		return graphics::render::render_pass::BlendEquationMode::Subtract;
 	else if (name == "reverse-subtract")
-		return graphics::render::pass::BlendEquationMode::ReverseSubtract;
+		return graphics::render::render_pass::BlendEquationMode::ReverseSubtract;
 	else if (name == "min")
-		return graphics::render::pass::BlendEquationMode::Min;
+		return graphics::render::render_pass::BlendEquationMode::Min;
 	else //if (name == "max")
-		return graphics::render::pass::BlendEquationMode::Max;
+		return graphics::render::render_pass::BlendEquationMode::Max;
 }
 
 
@@ -287,11 +287,11 @@ ClassDefinition get_frustum_class()
 		.AddProperty("projection", {"orthographic"s, "perspective"s});
 }
 
-ClassDefinition get_pass_class()
+ClassDefinition get_render_pass_class()
 {
-	return ClassDefinition::Create("pass")
-		.AddProperty("blending-factor", {pass_blend_factors, pass_blend_factors, pass_blend_factors, pass_blend_factors}, 2)
-		.AddProperty("blending-equation-mode", {pass_blend_equation_modes, pass_blend_equation_modes}, 1)
+	return ClassDefinition::Create("render-pass")
+		.AddProperty("blending-factor", {render_pass_blend_factors, render_pass_blend_factors, render_pass_blend_factors, render_pass_blend_factors}, 2)
+		.AddProperty("blending-equation-mode", {render_pass_blend_equation_modes, render_pass_blend_equation_modes}, 1)
 		.AddProperty("iterations", ParameterType::Integer)
 		.AddProperty("shader-program", ParameterType::String);
 }
@@ -404,7 +404,7 @@ ClassDefinition get_rectangle_class()
 ClassDefinition get_render_primitive_class()
 {
 	return ClassDefinition::Create("render-primitive")
-		.AddClass(get_pass_class())
+		.AddClass(get_render_pass_class())
 
 		.AddProperty("base-color", ParameterType::Color)
 		.AddProperty("base-opacity", ParameterType::FloatingPoint)
@@ -534,7 +534,7 @@ ClassDefinition get_camera_class()
 ClassDefinition get_drawable_object_class()
 {
 	return ClassDefinition::Create("drawable-object", "movable-object")
-		.AddClass(get_pass_class())
+		.AddClass(get_render_pass_class())
 		.AddProperty("opacity", ParameterType::FloatingPoint);
 }
 
@@ -673,7 +673,7 @@ void set_frustum_properties(const script_tree::ObjectNode &object, graphics::ren
 	}
 }
 
-void set_pass_properties(const script_tree::ObjectNode &object, graphics::render::Pass &pass,
+void set_render_pass_properties(const script_tree::ObjectNode &object, graphics::render::RenderPass &pass,
 	const ManagerRegister &managers)
 {
 	for (auto &property : object.Properties())
@@ -852,12 +852,12 @@ void set_rectangle_properties(const script_tree::ObjectNode &object, shapes::Rec
 void set_render_primitive_properties(const script_tree::ObjectNode &object, graphics::render::RenderPrimitive &primitive,
 	const ManagerRegister &managers)
 {
-	graphics::render::pass::Passes passes;
+	graphics::render::render_pass::Passes passes;
 
 	for (auto &obj : object.Objects())
 	{
-		if (obj.Name() == "pass")
-			passes.push_back(create_pass(obj, managers));
+		if (obj.Name() == "render-pass")
+			passes.push_back(create_render_pass(obj, managers));
 	}
 
 	if (!std::empty(passes))
@@ -1150,8 +1150,8 @@ void set_drawable_object_properties(const script_tree::ObjectNode &object, Drawa
 
 	for (auto &obj : object.Objects())
 	{
-		if (obj.Name() == "pass")
-			drawable_object.AddPass(create_pass(obj, managers));
+		if (obj.Name() == "render-pass")
+			drawable_object.AddRenderPass(create_render_pass(obj, managers));
 	}
 
 	for (auto &property : object.Properties())
@@ -1347,11 +1347,11 @@ graphics::render::Frustum create_frustum(const script_tree::ObjectNode &object)
 	return frustum;
 }
 
-graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
+graphics::render::RenderPass create_render_pass(const script_tree::ObjectNode &object,
 	const ManagerRegister &managers)
 {
-	graphics::render::Pass pass;
-	set_pass_properties(object, pass, managers);
+	graphics::render::RenderPass pass;
+	set_render_pass_properties(object, pass, managers);
 	return pass;
 }
 

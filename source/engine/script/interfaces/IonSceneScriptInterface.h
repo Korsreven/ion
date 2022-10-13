@@ -17,7 +17,7 @@ File:	IonSceneScriptInterface.h
 
 #include "IonScriptInterface.h"
 #include "graphics/render/IonFrustum.h"
-#include "graphics/render/IonPass.h"
+#include "graphics/render/IonRenderPass.h"
 #include "graphics/render/IonRenderPrimitive.h"
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonDrawableObject.h"
@@ -72,7 +72,7 @@ namespace ion::script::interfaces
 			"tanh"
 		};
 
-		static inline const Strings pass_blend_factors
+		static inline const Strings render_pass_blend_factors
 		{
 			"zero",
 			"one",
@@ -100,7 +100,7 @@ namespace ion::script::interfaces
 			"source-alpha-saturate"
 		};
 
-		static inline const Strings pass_blend_equation_modes
+		static inline const Strings render_pass_blend_equation_modes
 		{
 			"add",
 			"subtract",
@@ -119,8 +119,8 @@ namespace ion::script::interfaces
 		NonOwningPtr<graphics::fonts::Text> get_text(std::string_view name, const ManagerRegister &managers) noexcept;
 
 		graphics::scene::graph::animations::node_animation::MotionTechniqueType get_motion_technique_type(const script_tree::ArgumentNode &arg);
-		graphics::render::pass::BlendFactor get_pass_blend_factor(const script_tree::ArgumentNode &arg);
-		graphics::render::pass::BlendEquationMode get_pass_blend_equation_mode(const script_tree::ArgumentNode &arg);
+		graphics::render::render_pass::BlendFactor get_pass_blend_factor(const script_tree::ArgumentNode &arg);
+		graphics::render::render_pass::BlendEquationMode get_pass_blend_equation_mode(const script_tree::ArgumentNode &arg);
 
 		NonOwningPtr<graphics::scene::graph::animations::NodeAnimation> get_node_animation(std::string_view name,
 			graphics::scene::graph::SceneNode &parent_node) noexcept;
@@ -134,7 +134,7 @@ namespace ion::script::interfaces
 
 		script_validator::ClassDefinition get_action_class();
 		script_validator::ClassDefinition get_frustum_class();
-		script_validator::ClassDefinition get_pass_class();
+		script_validator::ClassDefinition get_render_pass_class();
 		script_validator::ClassDefinition get_rotating_class();
 		script_validator::ClassDefinition get_scaling_class();
 		script_validator::ClassDefinition get_translating_class();
@@ -174,7 +174,7 @@ namespace ion::script::interfaces
 		*/
 		
 		void set_frustum_properties(const script_tree::ObjectNode &object, graphics::render::Frustum &frustum);
-		void set_pass_properties(const script_tree::ObjectNode &object, graphics::render::Pass &pass,
+		void set_render_pass_properties(const script_tree::ObjectNode &object, graphics::render::RenderPass &pass,
 			const ManagerRegister &managers);
 
 		void set_animated_sprite_properties(const script_tree::ObjectNode &object, graphics::scene::shapes::AnimatedSprite &aniamted_sprite,
@@ -224,7 +224,7 @@ namespace ion::script::interfaces
 
 		
 		graphics::render::Frustum create_frustum(const script_tree::ObjectNode &object);
-		graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
+		graphics::render::RenderPass create_render_pass(const script_tree::ObjectNode &object,
 			const ManagerRegister &managers);
 
 		void create_action(const script_tree::ObjectNode &object,

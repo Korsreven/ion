@@ -316,11 +316,11 @@ namespace ion::graphics::render::vertex
 
 
 			//Prepare vertex batch by passing vertices to vertex buffer and setting up attribute bindings
-			//This is called once regardless of passes
+			//This function is typically called each frame
 			void Prepare() noexcept;
 
 			//Draw all of the vertices in this vertex batch with the given shader program (optional)
-			//This can be called multiple times if more than one pass
+			//This function is typically called each frame, once for each render pass
 			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept;
 
 

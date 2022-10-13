@@ -144,7 +144,7 @@ namespace ion::graphics::scene::shapes
 			*/
 
 			virtual void VertexDataChanged() noexcept override;
-			virtual void PassesChanged() noexcept override;
+			virtual void RenderPassesChanged() noexcept override;
 			virtual void MaterialChanged() noexcept override;
 
 		public:

@@ -67,7 +67,7 @@ namespace ion::graphics::scene
 			position_components + color_components + tex_coord_components;
 
 
-		struct text_glyph_primitive final : render::RenderPrimitive
+		struct text_primitive : render::RenderPrimitive
 		{
 			protected:
 
@@ -75,33 +75,28 @@ namespace ion::graphics::scene
 					Events
 				*/
 
-				void PassesChanged() noexcept override;
+				void RenderPassesChanged() noexcept override;
 
 			public:
 
 				DrawableText *owner = nullptr;
 				render::render_primitive::VertexContainer vertex_data;
 
-				text_glyph_primitive(textures::texture::TextureHandle texture_handle);
+
+				text_primitive();
+				text_primitive(textures::texture::TextureHandle texture_handle);
 		};
 
-		struct text_decoration_primitive final : render::RenderPrimitive
+		struct text_glyph_primitive final : text_primitive
 		{
-			protected:
-
-				/*
-					Events
-				*/
-
-				void PassesChanged() noexcept override;
-
-			public:
-
-				DrawableText *owner = nullptr;
-				render::render_primitive::VertexContainer vertex_data;
-
-				text_decoration_primitive();
+			text_glyph_primitive(textures::texture::TextureHandle texture_handle);
 		};
+
+		struct text_decoration_primitive final : text_primitive
+		{
+			text_decoration_primitive();
+		};
+
 
 		struct text_glyph_primitive_key final
 		{

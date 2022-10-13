@@ -25,7 +25,7 @@ File:	IonGuiSkin.h
 #include "adaptors/ranges/IonIterable.h"
 #include "events/IonCallback.h"
 #include "graphics/fonts/IonText.h"
-#include "graphics/render/IonPass.h"
+#include "graphics/render/IonRenderPass.h"
 #include "graphics/scene/IonDrawableObject.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
@@ -218,8 +218,8 @@ namespace ion::gui::skins
 			gui_skin::SkinTextPartMap text_parts_;
 			gui_skin::SkinSoundPartMap sound_parts_;
 
-			graphics::render::pass::Passes passes_;
-			graphics::render::pass::Passes text_passes_;
+			graphics::render::render_pass::Passes part_render_passes_;
+			graphics::render::render_pass::Passes text_render_passes_;
 
 			gui_skin::SkinBuilder skin_builder_ = gui_skin::detail::make_control_skin;
 
@@ -305,33 +305,33 @@ namespace ion::gui::skins
 			}
 
 
-			//Returns a mutable range of all passes in this skin
+			//Returns a mutable range of all part render passes in this skin
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto Passes() noexcept
+			[[nodiscard]] inline auto PartRenderPasses() noexcept
 			{
-				return adaptors::ranges::Iterable<graphics::render::pass::Passes&>{passes_};
+				return adaptors::ranges::Iterable<graphics::render::render_pass::Passes&>{part_render_passes_};
 			}
 
-			//Returns an immutable range of all passes in this skin
+			//Returns an immutable range of all part render passes in this skin
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto Passes() const noexcept
+			[[nodiscard]] inline auto PartRenderPasses() const noexcept
 			{
-				return adaptors::ranges::Iterable<const graphics::render::pass::Passes&>{passes_};
+				return adaptors::ranges::Iterable<const graphics::render::render_pass::Passes&>{part_render_passes_};
 			}
 
 
-			//Returns a mutable range of all text passes in this skin
+			//Returns a mutable range of all text render passes in this skin
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto TextPasses() noexcept
+			[[nodiscard]] inline auto TextRenderPasses() noexcept
 			{
-				return adaptors::ranges::Iterable<graphics::render::pass::Passes&>{text_passes_};
+				return adaptors::ranges::Iterable<graphics::render::render_pass::Passes&>{text_render_passes_};
 			}
 
-			//Returns an immutable range of all text passes in this skin
+			//Returns an immutable range of all text render passes in this skin
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto TextPasses() const noexcept
+			[[nodiscard]] inline auto TextRenderPasses() const noexcept
 			{
-				return adaptors::ranges::Iterable<const graphics::render::pass::Passes&>{text_passes_};
+				return adaptors::ranges::Iterable<const graphics::render::render_pass::Passes&>{text_render_passes_};
 			}
 
 
@@ -403,52 +403,52 @@ namespace ion::gui::skins
 
 
 			/*
-				Passes
+				Render passes
 				Adding
 			*/
 
-			//Adds a pass to this skin
-			void AddPass(graphics::render::Pass pass);
+			//Adds a part render pass to this skin
+			void AddPartRenderPass(graphics::render::RenderPass pass);
 
-			//Adds passes to this skin
-			void AddPasses(graphics::render::pass::Passes passes);
+			//Adds part render passes to this skin
+			void AddPartRenderPasses(graphics::render::render_pass::Passes passes);
 
 
-			//Adds a text pass to this skin
-			void AddTextPass(graphics::render::Pass pass);
+			//Adds a text render pass to this skin
+			void AddTextRenderPass(graphics::render::RenderPass pass);
 
-			//Adds text passes to this skin
-			void AddTextPasses(graphics::render::pass::Passes passes);
+			//Adds text render passes to this skin
+			void AddTextRenderPasses(graphics::render::render_pass::Passes passes);
 
 
 			/*
-				Passes
+				Render passes
 				Retrieving
 			*/
 
-			//Gets an immutable reference to all passes in this skin
-			[[nodiscard]] inline auto& GetPasses() const noexcept
+			//Gets an immutable reference to all part render passes in this skin
+			[[nodiscard]] inline auto& GetPartRenderPasses() const noexcept
 			{
-				return passes_;
+				return part_render_passes_;
 			}
 
-			//Gets an immutable reference to all text passes in this skin
-			[[nodiscard]] inline auto& GetTextPasses() const noexcept
+			//Gets an immutable reference to all text render passes in this skin
+			[[nodiscard]] inline auto& GetTextRenderPasses() const noexcept
 			{
-				return text_passes_;
+				return text_render_passes_;
 			}
 
 
 			/*
-				Passes
+				Render passes
 				Removing
 			*/
 
-			//Clear all passes from this skin
-			void ClearPasses() noexcept;
+			//Clear all part render passes from this skin
+			void ClearPartRenderPasses() noexcept;
 
-			//Clear all text passes from this skin
-			void ClearTextPasses() noexcept;
+			//Clear all text render passes from this skin
+			void ClearTextRenderPasses() noexcept;
 
 
 			/*

@@ -40,39 +40,40 @@ namespace drawable_text::detail
 	Events
 */
 
-void text_glyph_primitive::PassesChanged() noexcept
+void text_primitive::RenderPassesChanged() noexcept
 {
 	if (owner)
-		owner->NotifyPassesChanged(*this);
+		owner->NotifyRenderPassesChanged(*this);
 }
 
 
 //Public
 
-text_glyph_primitive::text_glyph_primitive(textures::texture::TextureHandle texture_handle) :
+text_primitive::text_primitive() :
+	render::RenderPrimitive{render::vertex::vertex_batch::VertexDrawMode::Triangles, get_vertex_declaration()}
+{
+	//Empty
+}
+
+text_primitive::text_primitive(textures::texture::TextureHandle texture_handle) :
 	render::RenderPrimitive{render::vertex::vertex_batch::VertexDrawMode::Triangles, get_vertex_declaration()}
 {
 	RenderTexture(texture_handle);
 }
 
 
-//Protected
+//Public
 
-/*
-	Events
-*/
-
-void text_decoration_primitive::PassesChanged() noexcept
+text_glyph_primitive::text_glyph_primitive(textures::texture::TextureHandle texture_handle) :
+	text_primitive{texture_handle}
 {
-	if (owner)
-		owner->NotifyPassesChanged(*this);
+	//Empty
 }
 
 
 //Public
 
-text_decoration_primitive::text_decoration_primitive() :
-	render::RenderPrimitive{render::vertex::vertex_batch::VertexDrawMode::Triangles, get_vertex_declaration()}
+text_decoration_primitive::text_decoration_primitive()
 {
 	//Empty
 }

@@ -19,7 +19,7 @@ File:	IonDrawableObject.h
 
 #include "IonMovableObject.h"
 #include "adaptors/ranges/IonIterable.h"
-#include "graphics/render/IonPass.h"
+#include "graphics/render/IonRenderPass.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
@@ -39,15 +39,15 @@ namespace ion::graphics::scene
 	} //drawable_object
 
 
-	//A class representing a drawable object that can be prepared and drawn with one or more passes
+	//A class representing a drawable object that can be prepared and drawn with one or more render passes
 	class DrawableObject : public MovableObject
 	{
 		private:
 
 			real opacity_ = 1.0_r;
-			render::pass::Passes passes_;
+			render::render_pass::Passes render_passes_;
 
-			bool update_passes_ = false;
+			bool update_render_passes_ = false;
 
 		protected:
 
@@ -58,7 +58,7 @@ namespace ion::graphics::scene
 			void AddPrimitive(render::RenderPrimitive &primitive);
 			void RemovePrimitive(render::RenderPrimitive &primitive) noexcept;
 
-			void UpdatePassesOnAllPrimitives(const render::pass::Passes &passes) noexcept;
+			void UpdateRenderPassesOnAllPrimitives(const render::render_pass::Passes &passes) noexcept;
 			void UpdateOpacityOnAllPrimitives(real opacity) noexcept;
 
 		public:
@@ -71,18 +71,18 @@ namespace ion::graphics::scene
 				Ranges
 			*/
 
-			//Returns a mutable range of all passes of this drawable
+			//Returns a mutable range of all render passes of this drawable
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto Passes() noexcept
+			[[nodiscard]] inline auto RenderPasses() noexcept
 			{
-				return adaptors::ranges::Iterable<render::pass::Passes&>{passes_};
+				return adaptors::ranges::Iterable<render::render_pass::Passes&>{render_passes_};
 			}
 
-			//Returns an immutable range of all passes of this drawable
+			//Returns an immutable range of all render passes of this drawable
 			//This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto Passes() const noexcept
+			[[nodiscard]] inline auto RenderPasses() const noexcept
 			{
-				return adaptors::ranges::Iterable<const render::pass::Passes&>{passes_};
+				return adaptors::ranges::Iterable<const render::render_pass::Passes&>{render_passes_};
 			}
 
 
@@ -116,8 +116,8 @@ namespace ion::graphics::scene
 				Notifying
 			*/
 
-			//Called when passes has changed on the given primitive
-			void NotifyPassesChanged(render::RenderPrimitive &primitive) noexcept;
+			//Called when render passes has changed on the given primitive
+			void NotifyRenderPassesChanged(render::RenderPrimitive &primitive) noexcept;
 
 
 			/*
@@ -139,39 +139,39 @@ namespace ion::graphics::scene
 
 
 			/*
-				Passes
+				Render passes
 				Adding
 			*/
 
-			//Add the given pass for this drawable object
-			void AddPass(render::Pass pass);
+			//Add the given render pass for this drawable object
+			void AddRenderPass(render::RenderPass pass);
 
-			//Add the given passes for this drawable object
-			void AddPasses(render::pass::Passes passes);
+			//Add the given render passes for this drawable object
+			void AddRenderPasses(render::render_pass::Passes passes);
 
 
 			/*
-				Passes
+				Render passes
 				Retrieving
 			*/
 
-			//Returns a mutable reference to the pass at the given offset
-			[[nodiscard]] render::Pass& GetPass(int off) noexcept;
+			//Returns a mutable reference to the render pass at the given offset
+			[[nodiscard]] render::RenderPass& GetRenderPass(int off) noexcept;
 
-			//Returns an immutable reference to the pass at the given offset
-			[[nodiscard]] const render::Pass& GetPass(int off) const noexcept;
+			//Returns an immutable reference to the render pass at the given offset
+			[[nodiscard]] const render::RenderPass& GetRenderPass(int off) const noexcept;
 
 
 			/*
-				Passes
+				Render passes
 				Removing
 			*/
 
-			//Clear all passes for this drawable object
-			void ClearPasses() noexcept;
+			//Clear all render passes for this drawable object
+			void ClearRenderPasses() noexcept;
 
-			//Remove a pass at the given offset from this drawable object
-			bool RemovePass(int off) noexcept;
+			//Remove a render pass at the given offset from this drawable object
+			bool RemoveRenderPass(int off) noexcept;
 	};
 } //ion::graphics::scene
 

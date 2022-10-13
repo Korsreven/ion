@@ -81,8 +81,8 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 		{
 			auto model = scene_manager.CreateModel();
 
-			if (!std::empty(skin.Passes()))
-				model->AddPasses(skin.GetPasses());
+			if (!std::empty(skin.PartRenderPasses()))
+				model->AddRenderPasses(skin.GetPartRenderPasses());
 
 			control_skin.Parts.Object = model;
 
@@ -345,8 +345,8 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 		{
 			auto text = scene_manager.CreateText({}, caption_part->Base);
 
-			if (!std::empty(skin.TextPasses()))
-				text->AddPasses(skin.GetTextPasses());
+			if (!std::empty(skin.TextRenderPasses()))
+				text->AddRenderPasses(skin.GetTextRenderPasses());
 
 			control_skin.Caption.Object = text;
 			control_skin.Caption.Enabled = caption_part->Enabled;
@@ -507,8 +507,8 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &
 		{
 			auto text = scene_manager.CreateText({}, lines_part->Base);
 
-			if (!std::empty(skin.TextPasses()))
-				text->AddPasses(skin.GetTextPasses());
+			if (!std::empty(skin.TextRenderPasses()))
+				text->AddRenderPasses(skin.GetTextRenderPasses());
 
 			list_box_skin->Lines.Object = text;
 			list_box_skin->Lines.Enabled = lines_part->Enabled;
@@ -722,8 +722,8 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 		{
 			auto text = scene_manager.CreateText({}, text_part->Base);
 
-			if (!std::empty(skin.TextPasses()))
-				text->AddPasses(skin.GetTextPasses());
+			if (!std::empty(skin.TextRenderPasses()))
+				text->AddRenderPasses(skin.GetTextRenderPasses());
 
 			text_box_skin->Text.Object = text;
 			text_box_skin->Text.Enabled = text_part->Enabled;
@@ -742,8 +742,8 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 		{
 			auto text = scene_manager.CreateText({}, placeholder_text_part->Base);
 
-			if (!std::empty(skin.TextPasses()))
-				text->AddPasses(skin.GetTextPasses());
+			if (!std::empty(skin.TextRenderPasses()))
+				text->AddRenderPasses(skin.GetTextRenderPasses());
 
 			text_box_skin->PlaceholderText.Object = text;
 			text_box_skin->PlaceholderText.Enabled = placeholder_text_part->Enabled;
@@ -1015,53 +1015,53 @@ bool GuiSkin::RemoveSoundPart(std::string_view name) noexcept
 
 
 /*
-	Passes
+	Render passes
 	Adding
 */
 
-void GuiSkin::AddPass(graphics::render::Pass pass)
+void GuiSkin::AddPartRenderPass(graphics::render::RenderPass pass)
 {
-	passes_.push_back(std::move(pass));
+	part_render_passes_.push_back(std::move(pass));
 }
 
-void GuiSkin::AddPasses(graphics::render::pass::Passes passes)
+void GuiSkin::AddPartRenderPasses(graphics::render::render_pass::Passes passes)
 {
-	if (std::empty(passes_))
-		passes_ = std::move(passes);
+	if (std::empty(part_render_passes_))
+		part_render_passes_ = std::move(passes);
 	else
-		std::move(std::begin(passes), std::end(passes), std::back_inserter(passes_));
+		std::move(std::begin(passes), std::end(passes), std::back_inserter(part_render_passes_));
 }
 
 
-void GuiSkin::AddTextPass(graphics::render::Pass pass)
+void GuiSkin::AddTextRenderPass(graphics::render::RenderPass pass)
 {
-	text_passes_.push_back(std::move(pass));
+	text_render_passes_.push_back(std::move(pass));
 }
 
-void GuiSkin::AddTextPasses(graphics::render::pass::Passes passes)
+void GuiSkin::AddTextRenderPasses(graphics::render::render_pass::Passes passes)
 {
-	if (std::empty(text_passes_))
-		text_passes_ = std::move(passes);
+	if (std::empty(text_render_passes_))
+		text_render_passes_ = std::move(passes);
 	else
-		std::move(std::begin(passes), std::end(passes), std::back_inserter(text_passes_));
+		std::move(std::begin(passes), std::end(passes), std::back_inserter(text_render_passes_));
 }
 
 
 /*
-	Passes
+	Render passes
 	Removing
 */
 
-void GuiSkin::ClearPasses() noexcept
+void GuiSkin::ClearPartRenderPasses() noexcept
 {
-	passes_.clear();
-	passes_.shrink_to_fit();
+	part_render_passes_.clear();
+	part_render_passes_.shrink_to_fit();
 }
 
-void GuiSkin::ClearTextPasses() noexcept
+void GuiSkin::ClearTextRenderPasses() noexcept
 {
-	text_passes_.clear();
-	text_passes_.shrink_to_fit();
+	text_render_passes_.clear();
+	text_render_passes_.shrink_to_fit();
 }
 
 

@@ -58,7 +58,7 @@ namespace ion::graphics::scene
 					Events
 				*/
 
-				void PassesChanged() noexcept override;
+				void RenderPassesChanged() noexcept override;
 
 			public:
 

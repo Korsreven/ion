@@ -543,7 +543,7 @@
     <ClCompile Include="..\source\engine\graphics\render\IonFog.cpp">
       <Filter>Source Files\graphics\render</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\engine\graphics\render\IonPass.cpp">
+    <ClCompile Include="..\source\engine\graphics\render\IonRenderPass.cpp">
       <Filter>Source Files\graphics\render</Filter>
     </ClCompile>
     <ClCompile Include="..\source\engine\graphics\utilities\IonMatrix2.cpp">
@@ -1214,7 +1214,7 @@
     <ClInclude Include="..\source\engine\graphics\render\IonFog.h">
       <Filter>Header Files\graphics\render</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\engine\graphics\render\IonPass.h">
+    <ClInclude Include="..\source\engine\graphics\render\IonRenderPass.h">
       <Filter>Header Files\graphics\render</Filter>
     </ClInclude>
     <ClInclude Include="..\source\engine\graphics\utilities\IonMatrix2.h">

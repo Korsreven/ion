@@ -38,7 +38,7 @@ void DrawableObject::AddPrimitive(render::RenderPrimitive &primitive)
 	if (auto renderer = ParentRenderer(); renderer)
 	{
 		if (std::empty(primitive.RenderPasses()))
-			primitive.RenderPasses(passes_);
+			primitive.RenderPasses(render_passes_);
 
 		primitive.Opacity(opacity_);
 
@@ -54,7 +54,8 @@ void DrawableObject::RemovePrimitive(render::RenderPrimitive &primitive) noexcep
 		render_primitives_.erase(iter);
 }
 
-void DrawableObject::UpdatePassesOnAllPrimitives(const render::pass::Passes &passes) noexcept
+
+void DrawableObject::UpdateRenderPassesOnAllPrimitives(const render::render_pass::Passes &passes) noexcept
 {
 	for (auto &primitive : render_primitives_)
 		primitive->RenderPasses(passes);
@@ -109,9 +110,9 @@ movable_object::ShaderProgramRange DrawableObject::AllShaderPrograms() noexcept
 	Notifying
 */
 
-void DrawableObject::NotifyPassesChanged([[maybe_unused]] render::RenderPrimitive &primitive) noexcept
+void DrawableObject::NotifyRenderPassesChanged([[maybe_unused]] render::RenderPrimitive &primitive) noexcept
 {
-	update_passes_ = true;
+	update_render_passes_ = true;
 }
 
 
@@ -121,8 +122,8 @@ void DrawableObject::NotifyPassesChanged([[maybe_unused]] render::RenderPrimitiv
 
 void DrawableObject::Prepare()
 {
-	//No passes added, add pass with default shader program (if any)
-	if (std::empty(passes_))
+	//No render passes added, add render pass with default shader program (if any)
+	if (std::empty(render_passes_))
 	{
 		auto default_shader_program =
 			[&]() noexcept -> NonOwningPtr<shaders::ShaderProgram>
@@ -133,10 +134,10 @@ void DrawableObject::Prepare()
 					return nullptr;
 			}();
 
-		AddPass(render::Pass{default_shader_program});
+		AddRenderPass(render::RenderPass{default_shader_program});
 	}
 
-	if (update_passes_)
+	if (update_render_passes_)
 	{
 		shader_programs_.clear();
 
@@ -155,7 +156,7 @@ void DrawableObject::Prepare()
 			}
 		}
 
-		update_passes_ = false;
+		update_render_passes_ = false;
 	}
 
 	//Set render primitive visibility
@@ -189,63 +190,63 @@ void DrawableObject::Elapse([[maybe_unused]] duration time) noexcept
 
 
 /*
-	Passes
+	Render passes
 	Adding
 */
 
-void DrawableObject::AddPass(render::Pass pass)
+void DrawableObject::AddRenderPass(render::RenderPass pass)
 {
-	passes_.push_back(std::move(pass));
-	UpdatePassesOnAllPrimitives(passes_);
+	render_passes_.push_back(std::move(pass));
+	UpdateRenderPassesOnAllPrimitives(render_passes_);
 }
 
-void DrawableObject::AddPasses(render::pass::Passes passes)
+void DrawableObject::AddRenderPasses(render::render_pass::Passes passes)
 {
-	if (std::empty(passes_))
-		passes_ = std::move(passes);
+	if (std::empty(render_passes_))
+		render_passes_ = std::move(passes);
 	else
-		std::move(std::begin(passes), std::end(passes), std::back_inserter(passes_));
+		std::move(std::begin(passes), std::end(passes), std::back_inserter(render_passes_));
 
-	UpdatePassesOnAllPrimitives(passes_);
+	UpdateRenderPassesOnAllPrimitives(render_passes_);
 }
 
 
 /*
-	Passes
+	Render passes
 	Retrieving
 */
 
-render::Pass& DrawableObject::GetPass(int off) noexcept
+render::RenderPass& DrawableObject::GetRenderPass(int off) noexcept
 {
-	assert(off >= 0 && off < std::ssize(passes_));
-	return passes_[off];
+	assert(off >= 0 && off < std::ssize(render_passes_));
+	return render_passes_[off];
 }
 
-const render::Pass& DrawableObject::GetPass(int off) const noexcept
+const render::RenderPass& DrawableObject::GetRenderPass(int off) const noexcept
 {
-	assert(off >= 0 && off < std::ssize(passes_));
-	return passes_[off];
+	assert(off >= 0 && off < std::ssize(render_passes_));
+	return render_passes_[off];
 }
 
 
 /*
-	Passes
+	Render passes
 	Removing
 */
 
-void DrawableObject::ClearPasses() noexcept
+void DrawableObject::ClearRenderPasses() noexcept
 {
-	passes_.clear();
-	passes_.shrink_to_fit();
-	UpdatePassesOnAllPrimitives(passes_);
+	render_passes_.clear();
+	render_passes_.shrink_to_fit();
+	UpdateRenderPassesOnAllPrimitives(render_passes_);
 }
 
-bool DrawableObject::RemovePass(int off) noexcept
+bool DrawableObject::RemoveRenderPass(int off) noexcept
 {
-	if (off >= 0 && off < std::ssize(passes_))
+	if (off >= 0 && off < std::ssize(render_passes_))
 	{
-		passes_.erase(std::begin(passes_) + off);
-		UpdatePassesOnAllPrimitives(passes_);
+		render_passes_.erase(std::begin(render_passes_) + off);
+		UpdateRenderPassesOnAllPrimitives(render_passes_);
 		return true;
 	}
 	else

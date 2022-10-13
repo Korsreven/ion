@@ -72,8 +72,8 @@ File:	main.cpp
 #include "graphics/particles/affectors/IonVelocityRandomizer.h"
 #include "graphics/render/IonFog.h"
 #include "graphics/render/IonFrustum.h"
-#include "graphics/render/IonPass.h"
 #include "graphics/render/IonRenderer.h"
+#include "graphics/render/IonRenderPass.h"
 #include "graphics/render/IonRenderPrimitive.h"
 #include "graphics/render/IonRenderTarget.h"
 #include "graphics/render/IonRenderWindow.h"
@@ -1587,7 +1587,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto model_star = scene_manager->CreateModel();
 			model_star->CreateMesh(ion::graphics::scene::shapes::Sprite{
 				{0.0_r, 0.0_r, 0.0_r}, {0.05_r, 0.05_r}, star});
-			model_star->AddPass(ion::graphics::render::Pass{});
+			model_star->AddRenderPass(ion::graphics::render::RenderPass{});
 
 			auto model_aura = scene_manager->CreateModel();
 			auto aura_sprite = model_aura->CreateMesh(ion::graphics::scene::shapes::Sprite{
@@ -1611,7 +1611,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//auto model_spectrum = scene_manager->CreateModel();
 			//model_spectrum->CreateMesh(ion::graphics::scene::shapes::Sprite{
 			//	{0.0_r, 0.0_r, 0.0_r}, {0.71_r, 0.71_r}, color_spectrum});
-			//model_spectrum->AddPass(ion::graphics::render::Pass{});
+			//model_spectrum->AddRenderPass(ion::graphics::render::RenderPass{});
 
 			//auto box = scene_manager->CreateModel();
 			//box->CreateMesh(ion::graphics::scene::shapes::Rectangle{{0.25_r, 0.30_r}, color::DeepPink});

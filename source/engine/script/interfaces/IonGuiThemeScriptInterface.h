@@ -17,7 +17,7 @@ File:	IonGuiThemeScriptInterface.h
 
 #include "IonScriptInterface.h"
 #include "graphics/fonts/IonText.h"
-#include "graphics/render/IonPass.h"
+#include "graphics/render/IonRenderPass.h"
 #include "gui/IonGuiController.h"
 #include "gui/skins/IonGuiSkin.h"
 #include "gui/skins/IonGuiTheme.h"
@@ -61,7 +61,7 @@ namespace ion::script::interfaces
 		*/
 
 		graphics::fonts::text::TextBlockStyle create_text_style(const script_tree::ObjectNode &object);
-		graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
+		graphics::render::RenderPass create_render_pass(const script_tree::ObjectNode &object,
 			const ManagerRegister &managers);
 		
 

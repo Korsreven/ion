@@ -111,7 +111,8 @@ ClassDefinition get_gui_skin_class()
 	auto hovered_style = ClassDefinition::Create("hovered", "text-style");
 	auto pressed_style = ClassDefinition::Create("pressed", "text-style");
 
-	auto text_pass = ClassDefinition::Create("text-pass", "pass");
+	auto part_render_pass = ClassDefinition::Create("part-render-pass", "render-pass");
+	auto text_render_pass = ClassDefinition::Create("text-render-pass", "render-pass");
 
 
 	auto part = ClassDefinition::Create("part")
@@ -142,11 +143,12 @@ ClassDefinition get_gui_skin_class()
 		.AddRequiredProperty("text", ParameterType::String);
 
 	return ClassDefinition::Create("skin")
+		.AddAbstractClass(scene_script_interface::detail::get_render_pass_class())
 		.AddClass(std::move(part))
-		.AddClass(scene_script_interface::detail::get_pass_class())
+		.AddClass(std::move(part_render_pass))
 		.AddClass(std::move(sound_part))
 		.AddClass(std::move(text_part))
-		.AddClass(std::move(text_pass))
+		.AddClass(std::move(text_render_pass))
 
 		.AddRequiredProperty("type",
 			{"button"s, "check-box"s, "group-box"s, "label"s,
@@ -222,11 +224,11 @@ graphics::fonts::text::TextBlockStyle create_text_style(const script_tree::Objec
 	return style;
 }
 
-graphics::render::Pass create_pass(const script_tree::ObjectNode &object,
+graphics::render::RenderPass create_render_pass(const script_tree::ObjectNode &object,
 	const ManagerRegister &managers)
 {
-	graphics::render::Pass pass;
-	scene_script_interface::detail::set_pass_properties(object, pass, managers);
+	graphics::render::RenderPass pass;
+	scene_script_interface::detail::set_render_pass_properties(object, pass, managers);
 	return pass;
 }
 
@@ -339,8 +341,8 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 
 				skin->AddPart(std::move(part_name), part);
 			}
-			else if (obj.Name() == "pass")
-				skin->AddPass(create_pass(obj, managers));
+			else if (obj.Name() == "part-render-pass")
+				skin->AddPartRenderPass(create_render_pass(obj, managers));
 			else if (obj.Name() == "sound-part")
 			{
 				auto part_name = obj
@@ -383,8 +385,8 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 
 				skin->AddTextPart(std::move(part_name), text_part);
 			}
-			else if (obj.Name() == "text-pass")
-				skin->AddTextPass(create_pass(obj, managers));
+			else if (obj.Name() == "text-render-pass")
+				skin->AddTextRenderPass(create_render_pass(obj, managers));
 		}
 	}
 

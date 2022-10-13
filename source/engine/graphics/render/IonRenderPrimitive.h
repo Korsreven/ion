@@ -16,7 +16,7 @@ File:	IonRenderPrimitive.h
 #include <optional>
 #include <vector>
 
-#include "IonPass.h"
+#include "IonRenderPass.h"
 #include "graphics/textures/IonTexture.h"
 #include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
@@ -70,7 +70,7 @@ namespace ion::graphics::render
 			real get_opacity(const vertex_metrics &metrics, const VertexContainer &data) noexcept;
 			Aabb get_aabb(const vertex_metrics &metrics, const VertexContainer &data) noexcept;
 
-			bool all_passes_equal(const pass::Passes &passes, const pass::Passes &passes2) noexcept;
+			bool all_passes_equal(const render_pass::Passes &passes, const render_pass::Passes &passes2) noexcept;
 		} //detail
 	} //render_primitive
 
@@ -91,7 +91,7 @@ namespace ion::graphics::render
 			real world_z_ = 0.0_r;
 			Aabb aabb_;
 
-			pass::Passes passes_;
+			render_pass::Passes passes_;
 			NonOwningPtr<materials::Material> material_;
 			materials::Material *applied_material_ = nullptr;
 			std::optional<textures::texture::TextureHandle> texture_handle_;
@@ -131,7 +131,7 @@ namespace ion::graphics::render
 			virtual void VertexDataChanged() noexcept;
 			virtual void ModelMatrixChanged() noexcept;
 
-			virtual void PassesChanged() noexcept;
+			virtual void RenderPassesChanged() noexcept;
 			virtual void MaterialChanged() noexcept;
 			virtual void TextureChanged() noexcept;
 
@@ -160,28 +160,28 @@ namespace ion::graphics::render
 				Modifiers
 			*/
 
-			//Sets the vertex data of this primitive to the given data
+			//Sets the vertex data of this render primitive to the given data
 			void VertexData(render_primitive::VertexContainer data);
 
-			//Appends the given vertex data to the vertex data of this primitive
+			//Appends the given vertex data to the vertex data of this render primitive
 			void AppendVertexData(const render_primitive::VertexContainer &data);
 
-			//Sets the model matrix of this primitive to the given matrix
+			//Sets the model matrix of this render primitive to the given matrix
 			void ModelMatrix(const Matrix4 &model_matrix) noexcept;
 
 
-			//Sets the passes of this primitive to the given passes
-			inline void RenderPasses(pass::Passes passes)
+			//Sets the render passes of this render primitive to the given passes
+			inline void RenderPasses(render_pass::Passes passes)
 			{
 				if (!render_primitive::detail::all_passes_equal(passes_, passes))
 				{
 					passes_ = std::move(passes);
 					need_refresh_ |= world_visible_;
-					PassesChanged();
+					RenderPassesChanged();
 				}
 			}
 		
-			//Sets the material of this primitive to the given material
+			//Sets the material of this render primitive to the given material
 			inline void RenderMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
 				if (material_ != material)
@@ -193,7 +193,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets the texture of this primitive to the given texture handle
+			//Sets the texture of this render primitive to the given texture handle
 			inline void RenderTexture(std::optional<textures::texture::TextureHandle> texture_handle) noexcept
 			{
 				if (texture_handle_ != texture_handle)
@@ -205,13 +205,13 @@ namespace ion::graphics::render
 			}
 
 
-			//Sets the base color of this primitive to the given color
+			//Sets the base color of this render primitive to the given color
 			void BaseColor(const Color &color) noexcept;
 
-			//Sets the base opacity of this primitive to the given value
+			//Sets the base opacity of this render primitive to the given value
 			void BaseOpacity(real opacity) noexcept;
 
-			//Sets the opacity of this primitive to the given opacity
+			//Sets the opacity of this render primitive to the given opacity
 			inline void Opacity(real opacity) noexcept
 			{
 				if (opacity_ != opacity)
@@ -223,7 +223,7 @@ namespace ion::graphics::render
 			}
 
 
-			//Sets the point size of this primitive to the given value
+			//Sets the point size of this render primitive to the given value
 			inline void PointSize(real size) noexcept
 			{
 				if (point_size_ != size)
@@ -234,7 +234,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets the line thickness of this primitive to the given value
+			//Sets the line thickness of this render primitive to the given value
 			inline void LineThickness(real thickness) noexcept
 			{
 				if (line_thickness_ != thickness)
@@ -245,7 +245,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets whether or not this primitive has wire frame enabled
+			//Sets whether or not this render primitive has wire frame enabled
 			inline void WireFrame(bool enable) noexcept
 			{
 				if (wire_frame_ != enable)
@@ -256,7 +256,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets whether or not this primitive has point sprite enabled
+			//Sets whether or not this render primitive has point sprite enabled
 			inline void PointSprite(bool enable) noexcept
 			{
 				if (point_sprite_ != enable)
@@ -267,7 +267,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets whether or not this primitive is visible
+			//Sets whether or not this render primitive is visible
 			inline void Visible(bool visible) noexcept
 			{
 				if (visible_ != visible)
@@ -277,7 +277,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets whether or not this primitive is visible in world space
+			//Sets whether or not this render primitive is visible in world space
 			inline void WorldVisible(bool visible) noexcept
 			{
 				if (world_visible_ != visible)
@@ -287,7 +287,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets the parent renderer of this primitive to the given renderer
+			//Sets the parent renderer of this render primitive to the given renderer
 			inline void ParentRenderer(Renderer *parent_renderer) noexcept
 			{
 				if (parent_renderer_ != parent_renderer)
@@ -365,7 +365,7 @@ namespace ion::graphics::render
 			}
 
 
-			//Returns the passes of this render primitive
+			//Returns the render passes of this render primitive
 			[[nodiscard]] inline auto& RenderPasses() const noexcept
 			{
 				return passes_;
@@ -415,25 +415,25 @@ namespace ion::graphics::render
 				return line_thickness_;
 			}
 
-			//Returns whether or not this primitive has wire frame enabled
+			//Returns whether or not this render primitive has wire frame enabled
 			[[nodiscard]] inline auto WireFrame() const noexcept
 			{
 				return wire_frame_;
 			}
 
-			//Returns whether or not this primitive has point sprite enabled
+			//Returns whether or not this render primitive has point sprite enabled
 			[[nodiscard]] inline auto PointSprite() const noexcept
 			{
 				return point_sprite_;
 			}
 
-			//Returns whether or not this primitive is visible
+			//Returns whether or not this render primitive is visible
 			[[nodiscard]] inline auto Visible() const noexcept
 			{
 				return visible_;
 			}
 
-			//Returns whether or not this primitive is visible in world space
+			//Returns whether or not this render primitive is visible in world space
 			[[nodiscard]] inline auto WorldVisible() const noexcept
 			{
 				return world_visible_;
@@ -446,7 +446,7 @@ namespace ion::graphics::render
 			}
 
 
-			//Returns whether or not this primitive is groupable with the given primitive
+			//Returns whether or not this render primitive is groupable with the given primitive
 			[[nodiscard]] bool IsGroupable(const RenderPrimitive &primitive) const noexcept;
 
 
@@ -454,7 +454,7 @@ namespace ion::graphics::render
 				Vertex batch
 			*/
 
-			//Returns a vertex batch that can render this primitive
+			//Returns a vertex batch that can render this render primitive
 			[[nodiscard]] vertex::VertexBatch MakeVertexBatch() const noexcept;
 
 

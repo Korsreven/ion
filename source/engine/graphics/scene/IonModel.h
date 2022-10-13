@@ -129,8 +129,8 @@ namespace ion::graphics::scene
 			//Called when vertex data has changed on the given mesh
 			void NotifyVertexDataChanged(shapes::Mesh &mesh) noexcept;
 
-			//Called when passes has changed on the given mesh
-			void NotifyPassesChanged(shapes::Mesh &mesh) noexcept;
+			//Called when render passes has changed on the given mesh
+			void NotifyRenderPassesChanged(shapes::Mesh &mesh) noexcept;
 
 			//Called when material has changed on the given mesh
 			void NotifyMaterialChanged(shapes::Mesh &mesh) noexcept;

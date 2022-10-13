@@ -279,7 +279,7 @@ Aabb get_aabb(const vertex_metrics &metrics, const VertexContainer &data) noexce
 }
 
 
-bool all_passes_equal(const pass::Passes &passes, const pass::Passes &passes2) noexcept
+bool all_passes_equal(const render_pass::Passes &passes, const render_pass::Passes &passes2) noexcept
 {
 	if (std::size(passes) != std::size(passes2))
 		return false;
@@ -359,7 +359,7 @@ void RenderPrimitive::ModelMatrixChanged() noexcept
 }
 
 
-void RenderPrimitive::PassesChanged() noexcept
+void RenderPrimitive::RenderPassesChanged() noexcept
 {
 	//Optional to override
 }

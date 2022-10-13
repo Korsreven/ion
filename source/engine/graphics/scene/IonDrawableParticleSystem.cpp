@@ -29,10 +29,10 @@ namespace drawable_particle_system::detail
 	Events
 */
 
-void particle_emitter_primitive::PassesChanged() noexcept
+void particle_emitter_primitive::RenderPassesChanged() noexcept
 {
 	if (owner)
-		owner->NotifyPassesChanged(*this);
+		owner->NotifyRenderPassesChanged(*this);
 }
 
 
