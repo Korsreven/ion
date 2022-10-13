@@ -30,7 +30,7 @@ namespace model::detail
 
 void add_emissive_mesh(shapes::Mesh &mesh, emissive_meshes &meshes)
 {
-	meshes.emplace_back(&mesh, get_emissive_light(mesh));
+	meshes.emplace_back(&mesh, create_emissive_light(mesh));
 }
 
 bool remove_emissive_mesh(const shapes::Mesh &mesh, emissive_meshes &meshes) noexcept
@@ -58,7 +58,7 @@ bool is_mesh_emissive(const shapes::Mesh &mesh) noexcept
 }
 
 
-Light get_emissive_light(const shapes::Mesh &mesh) noexcept
+OwningPtr<Light> create_emissive_light(const shapes::Mesh &mesh)
 {
 	if (auto material = mesh.RenderMaterial(); material)
 	{
@@ -67,10 +67,10 @@ Light get_emissive_light(const shapes::Mesh &mesh) noexcept
 		auto light_radius = material->EmissiveLightRadius().value_or(sphere_radius * 2.0_r);
 			//Increase default light radius by two times the sphere radius
 
-		return Light::Point({}, aabb.Center(), light_radius, material->EmissiveColor());
+		return make_owning<Light>(Light::Point({}, aabb.Center(), light_radius, material->EmissiveColor()));
 	}
 	else
-		return Light{};
+		return make_owning<Light>();
 }
 
 } //model::detail
@@ -116,8 +116,8 @@ Model::~Model() noexcept
 {
 	for (auto &[mesh, light] : emissive_meshes_)
 	{
-		if (light.ParentNode())
-			light.ParentNode(nullptr);
+		if (light->ParentNode())
+			light->ParentNode(nullptr);
 	}
 }
 
@@ -139,7 +139,16 @@ movable_object::LightRange Model::AllEmissiveLights() noexcept
 void Model::NotifyVertexDataChanged(shapes::Mesh &mesh) noexcept
 {
 	if (mesh.Owner() == this)
+	{
 		update_bounding_volumes_ = true;
+
+		if (detail::is_mesh_emissive(mesh))
+		{
+			detail::remove_emissive_mesh(mesh, emissive_meshes_);
+			detail::add_emissive_mesh(mesh, emissive_meshes_);
+			update_emissive_lights_ = true;
+		}
+	}
 }
 
 void Model::NotifyRenderPassesChanged(shapes::Mesh &mesh) noexcept
@@ -197,12 +206,9 @@ void Model::Prepare()
 		//Update all emissive lights
 		for (auto &[mesh, light] : emissive_meshes_)
 		{
-			light = detail::get_emissive_light(*mesh);
-			light.Prepare();
-
-			auto &mutable_light = const_cast<Light&>(light);
-			mutable_light.ParentNode(ParentNode());
-			emissive_lights_.push_back(&mutable_light);
+			light->ParentNode(ParentNode());
+			light->Prepare();
+			emissive_lights_.push_back(light.get());
 		}
 
 		update_emissive_lights_ = false;

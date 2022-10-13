@@ -24,6 +24,7 @@ File:	IonModel.h
 #include "graphics/render/vertex/IonVertexBatch.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
+#include "memory/IonOwningPtr.h"
 #include "shapes/IonMesh.h"
 #include "shapes/IonShape.h"
 #include "types/IonTypes.h"
@@ -48,13 +49,13 @@ namespace ion::graphics::scene
 
 		namespace detail
 		{
-			using emissive_meshes = std::vector<std::pair<shapes::Mesh*, Light>>;
+			using emissive_meshes = std::vector<std::pair<shapes::Mesh*, OwningPtr<Light>>>;
 
 			void add_emissive_mesh(shapes::Mesh &mesh, emissive_meshes &meshes);
 			bool remove_emissive_mesh(const shapes::Mesh &mesh, emissive_meshes &meshes) noexcept;
 			bool is_mesh_emissive(const shapes::Mesh &mesh) noexcept;
 
-			Light get_emissive_light(const shapes::Mesh &mesh) noexcept;	
+			OwningPtr<Light> create_emissive_light(const shapes::Mesh &mesh);
 		} //detail
 	} //model
 
