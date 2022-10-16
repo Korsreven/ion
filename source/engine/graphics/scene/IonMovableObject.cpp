@@ -180,14 +180,6 @@ MovableObject::MovableObject(std::optional<std::string> name, bool visible) :
 	//Empty
 }
 
-MovableObject::MovableObject(const MovableObject &rhs) noexcept :
-
-	managed::ManagedObject<SceneManager>{rhs},
-	parent_node_{nullptr} //A copy of a movable object has no parent node
-{
-	//Empty
-}
-
 MovableObject::~MovableObject() noexcept
 {
 	Detach();

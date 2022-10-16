@@ -27,6 +27,7 @@ File:	IonMovableObject.h
 #include "graphics/utilities/IonSphere.h"
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
+#include "types/IonSuppressMove.h"
 
 //Forward declarations
 namespace ion::graphics
@@ -116,7 +117,7 @@ namespace ion::graphics::scene
 			Color obb_color_ = color::White;
 			Color sphere_color_ = color::White;
 
-			graph::SceneNode *parent_node_ = nullptr;
+			types::SuppressMove<graph::SceneNode*> parent_node_ = nullptr;
 			std::any user_data_;
 
 			mutable std::pair<Aabb, Aabb> world_aabb_;
@@ -133,10 +134,13 @@ namespace ion::graphics::scene
 		public:
 
 			//Construct a movable object with the given name and visibility
-			explicit MovableObject(std::optional<std::string> name = {}, bool visible = true);
+			explicit MovableObject(std::optional<std::string> name = {}, bool visible = true);		
 
-			//Copy constructor
-			MovableObject(const MovableObject &rhs) noexcept;
+			//Default copy constructor
+			MovableObject(const MovableObject &rhs) = default;
+
+			//Default move constructor
+			MovableObject(MovableObject &&rhs) = default;
 
 			//Virtual destructor
 			virtual ~MovableObject() noexcept;
@@ -146,13 +150,11 @@ namespace ion::graphics::scene
 				Operators
 			*/
 
-			//Copy assignment
-			inline auto& operator=(const MovableObject &rhs) noexcept
-			{
-				managed::ManagedObject<SceneManager>::operator=(rhs);
-				Detach();
-				return *this;
-			}
+			//Default copy assignment
+			inline MovableObject& operator=(const MovableObject &rhs) = default;
+
+			//Default move assignment
+			inline MovableObject& operator=(MovableObject &&rhs) = default;
 
 
 			/*
@@ -341,7 +343,7 @@ namespace ion::graphics::scene
 			//Returns a pointer to the parent node for this movable object
 			[[nodiscard]] inline auto ParentNode() const noexcept
 			{
-				return parent_node_;
+				return parent_node_.Get();
 			}
 
 			//Returns the custom user data for this movable object

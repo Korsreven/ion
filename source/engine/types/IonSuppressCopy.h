@@ -119,8 +119,21 @@ namespace ion::types
 				return *this;
 			}
 
+
 			//Combined comparison operator
 			[[nodiscard]] constexpr auto operator<=>(const SuppressCopy<T>&) const = default;
+
+			//Returns true if the value is equal to the given value
+			[[nodiscard]] constexpr auto operator==(const T &value) const noexcept
+			{
+				return value_ == value;
+			}
+
+			//Returns true if the value is different from the given value
+			[[nodiscard]] constexpr auto operator!=(const T &value) const noexcept
+			{
+				return !(*this == value);
+			}
 
 
 			//Returns a mutable reference to the value

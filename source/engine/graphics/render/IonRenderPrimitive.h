@@ -22,6 +22,7 @@ File:	IonRenderPrimitive.h
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "memory/IonNonOwningPtr.h"
+#include "types/IonSuppressMove.h"
 #include "types/IonTypes.h"
 #include "vertex/IonVertexBatch.h"
 #include "vertex/IonVertexDataView.h"
@@ -103,7 +104,7 @@ namespace ion::graphics::render
 			bool point_sprite_ = false;
 			bool visible_ = false;
 			bool world_visible_ = false;
-			Renderer *parent_renderer_ = nullptr;
+			types::SuppressMove<Renderer*> parent_renderer_ = nullptr;
 
 			bool data_changed_ = false;
 			bool world_data_changed_ = false;
@@ -152,8 +153,25 @@ namespace ion::graphics::render
 			RenderPrimitive(vertex::vertex_batch::VertexDrawMode draw_mode, vertex::VertexDeclaration vertex_declaration,
 				bool visible = true) noexcept;
 
+			//Default copy constructor
+			RenderPrimitive(const RenderPrimitive &rhs) = default;
+
+			//Default move constructor
+			RenderPrimitive(RenderPrimitive &&rhs) = default;
+
 			//Virtual destructor
 			virtual ~RenderPrimitive() noexcept;
+
+
+			/*
+				Operators
+			*/
+
+			//Default copy assignment
+			inline RenderPrimitive& operator=(const RenderPrimitive &rhs) = default;
+
+			//Default move assignment
+			inline RenderPrimitive& operator=(RenderPrimitive &&rhs) = default;
 
 
 			/*
@@ -442,7 +460,7 @@ namespace ion::graphics::render
 			//Returns the parent renderer of this render primitive
 			[[nodiscard]] inline auto ParentRenderer() const noexcept
 			{
-				return parent_renderer_;
+				return parent_renderer_.Get();
 			}
 
 
