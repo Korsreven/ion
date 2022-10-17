@@ -53,7 +53,7 @@ namespace ion::graphics::particles
 			//Deleted copy assignment
 			ParticleSystemManager& operator=(const ParticleSystemManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			ParticleSystemManager& operator=(ParticleSystemManager&&) = default;
 
 

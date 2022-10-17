@@ -156,7 +156,7 @@ namespace ion::graphics::render
 			//Deleted copy assignment
 			Renderer& operator=(const Renderer&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			Renderer& operator=(Renderer&&) = default;
 
 

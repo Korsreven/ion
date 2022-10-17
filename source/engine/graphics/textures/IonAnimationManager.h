@@ -53,7 +53,7 @@ namespace ion::graphics::textures
 			//Deleted copy assignment
 			AnimationManager& operator=(const AnimationManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			AnimationManager& operator=(AnimationManager&&) = default;
 
 

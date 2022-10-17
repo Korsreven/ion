@@ -51,7 +51,7 @@ namespace ion::timers
 			//Deleted copy assignment
 			TimerManager& operator=(const TimerManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			TimerManager& operator=(TimerManager&&) = default;
 
 

@@ -59,7 +59,7 @@ namespace ion::graphics::materials
 			//Deleted copy assignment
 			MaterialManager& operator=(const MaterialManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			MaterialManager& operator=(MaterialManager&&) = default;
 
 

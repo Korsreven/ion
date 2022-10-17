@@ -54,7 +54,7 @@ namespace ion::graphics::textures
 			//Deleted copy assignment
 			FrameSequenceManager& operator=(const FrameSequenceManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			FrameSequenceManager& operator=(FrameSequenceManager&&) = default;
 
 

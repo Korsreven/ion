@@ -120,7 +120,7 @@ namespace ion::graphics::shaders
 			//Deleted copy assignment
 			ShaderProgram& operator=(const ShaderProgram&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			ShaderProgram& operator=(ShaderProgram&&) = default;
 
 

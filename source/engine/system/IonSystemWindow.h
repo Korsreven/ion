@@ -343,7 +343,7 @@ namespace ion::system
 			Window(const Window&) = delete;
 
 			//Default move constructor
-			Window(Window &&rhs) = default;
+			Window(Window&&) = default;
 
 			//Default virtual destructor
 			virtual ~Window() = default;

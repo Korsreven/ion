@@ -78,7 +78,7 @@ namespace ion::timers
 			//Deleted copy assignment
 			AsyncTimerManager& operator=(const AsyncTimerManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			AsyncTimerManager& operator=(AsyncTimerManager&&) = default;
 
 

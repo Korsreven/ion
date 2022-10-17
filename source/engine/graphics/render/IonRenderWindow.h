@@ -162,7 +162,7 @@ namespace ion::graphics::render
 			RenderWindow(const RenderWindow&) = delete;
 
 			//Default move constructor
-			RenderWindow(RenderWindow &&rhs) = default;
+			RenderWindow(RenderWindow&&) = default;
 
 
 			/*

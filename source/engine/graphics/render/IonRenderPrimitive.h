@@ -154,10 +154,10 @@ namespace ion::graphics::render
 				bool visible = true) noexcept;
 
 			//Default copy constructor
-			RenderPrimitive(const RenderPrimitive &rhs) = default;
+			RenderPrimitive(const RenderPrimitive&) = default;
 
 			//Default move constructor
-			RenderPrimitive(RenderPrimitive &&rhs) = default;
+			RenderPrimitive(RenderPrimitive&&) = default;
 
 			//Virtual destructor
 			virtual ~RenderPrimitive() noexcept;
@@ -168,10 +168,10 @@ namespace ion::graphics::render
 			*/
 
 			//Default copy assignment
-			inline RenderPrimitive& operator=(const RenderPrimitive &rhs) = default;
+			inline RenderPrimitive& operator=(const RenderPrimitive&) = default;
 
 			//Default move assignment
-			inline RenderPrimitive& operator=(RenderPrimitive &&rhs) = default;
+			inline RenderPrimitive& operator=(RenderPrimitive&&) = default;
 
 
 			/*

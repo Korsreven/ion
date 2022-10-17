@@ -314,7 +314,7 @@ namespace ion::graphics::shaders
 			//Deleted copy assignment
 			ShaderProgramManager& operator=(const ShaderProgramManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			ShaderProgramManager& operator=(ShaderProgramManager&&) = default;
 
 

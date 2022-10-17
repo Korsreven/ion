@@ -20,6 +20,7 @@ File:	IonGuiComponent.h
 #include "events/IonCallback.h"
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
+#include "types/IonSuppressMove.h"
 #include "types/IonTypes.h"
 
 //Forward declarations
@@ -61,7 +62,7 @@ namespace ion::gui
 			
 			bool enabled_ = true;
 			bool visible_ = true;
-			GuiComponent *parent_ = nullptr;
+			types::SuppressMove<GuiComponent*> parent_ = nullptr;
 			NonOwningPtr<SceneNode> node_;
 
 			std::optional<events::Callback<void, GuiComponent&>> on_enable_;
@@ -98,8 +99,11 @@ namespace ion::gui
 
 			using managed::ManagedObject<GuiContainer>::ManagedObject;
 
-			//Copy constructor
-			GuiComponent(const GuiComponent &rhs);
+			//Default copy constructor
+			GuiComponent(const GuiComponent&) = default;
+
+			//Default move constructor
+			GuiComponent(GuiComponent&&) = default;
 
 			//Virtual destructor
 			virtual ~GuiComponent() noexcept;
@@ -109,16 +113,11 @@ namespace ion::gui
 				Operators
 			*/
 
-			//Copy assignment
-			inline auto& operator=(const GuiComponent &rhs)
-			{
-				managed::ManagedObject<GuiContainer>::operator=(rhs);
+			//Default copy assignment
+			inline GuiComponent& operator=(const GuiComponent&) = default;
 
-				if (this != &rhs)
-					Detach();
-
-				return *this;
-			}
+			//Default move assignment
+			inline GuiComponent& operator=(GuiComponent&&) = default;
 
 
 			/*
@@ -247,7 +246,7 @@ namespace ion::gui
 			//Returns a pointer to the parent of this component
 			[[nodiscard]] inline auto Parent() const noexcept
 			{
-				return parent_;
+				return parent_.Get();
 			}
 
 			//Returns a pointer to the node for this component

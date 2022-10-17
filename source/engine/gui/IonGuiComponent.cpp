@@ -100,14 +100,6 @@ void GuiComponent::Hidden() noexcept
 
 //Public
 
-GuiComponent::GuiComponent(const GuiComponent &rhs) :
-
-	managed::ManagedObject<GuiContainer>{rhs},
-	parent_{nullptr} //A copy constructed component has no parent
-{
-	//Empty
-}
-
 GuiComponent::~GuiComponent() noexcept
 {
 	Detach();

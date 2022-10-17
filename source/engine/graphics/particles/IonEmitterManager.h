@@ -47,7 +47,7 @@ namespace ion::graphics::particles
 			//Deleted copy assignment
 			EmitterManager& operator=(const EmitterManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			EmitterManager& operator=(EmitterManager&&) = default;
 
 

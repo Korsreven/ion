@@ -158,7 +158,7 @@ namespace ion::sounds
 			//Deleted copy assignment
 			Sound& operator=(const Sound&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			Sound& operator=(Sound&&) = default;
 
 

@@ -119,7 +119,7 @@ namespace ion::graphics::scene::graph::animations
 			//Deleted copy assignment
 			NodeAnimationTimeline& operator=(const NodeAnimationTimeline&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			NodeAnimationTimeline& operator=(NodeAnimationTimeline&&) = default;
 
 

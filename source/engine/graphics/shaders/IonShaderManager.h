@@ -83,7 +83,7 @@ namespace ion::graphics::shaders
 			//Deleted copy assignment
 			ShaderManager& operator=(const ShaderManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			ShaderManager& operator=(ShaderManager&&) = default;
 
 

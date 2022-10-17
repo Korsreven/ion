@@ -56,7 +56,7 @@ namespace ion::graphics::fonts
 			//Deleted copy assignment
 			TextManager& operator=(const TextManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			TextManager& operator=(TextManager&&) = default;
 
 

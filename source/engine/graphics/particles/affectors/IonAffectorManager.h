@@ -47,7 +47,7 @@ namespace ion::graphics::particles::affectors
 			//Deleted copy assignment
 			AffectorManager& operator=(const AffectorManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			AffectorManager& operator=(AffectorManager&&) = default;
 
 

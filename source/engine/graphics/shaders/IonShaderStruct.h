@@ -69,7 +69,7 @@ namespace ion::graphics::shaders
 			//Deleted copy assignment
 			ShaderStruct& operator=(const ShaderStruct&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			ShaderStruct& operator=(ShaderStruct&&) = default;
 
 

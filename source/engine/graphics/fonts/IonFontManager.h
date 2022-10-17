@@ -103,7 +103,7 @@ namespace ion::graphics::fonts
 			//Deleted copy assignment
 			FontManager& operator=(const FontManager&) = delete;
 
-			//Move assignment
+			//Defaul move assignment
 			FontManager& operator=(FontManager&&) = default;
 
 

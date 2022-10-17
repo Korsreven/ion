@@ -137,10 +137,10 @@ namespace ion::graphics::scene
 			explicit MovableObject(std::optional<std::string> name = {}, bool visible = true);		
 
 			//Default copy constructor
-			MovableObject(const MovableObject &rhs) = default;
+			MovableObject(const MovableObject&) = default;
 
 			//Default move constructor
-			MovableObject(MovableObject &&rhs) = default;
+			MovableObject(MovableObject&&) = default;
 
 			//Virtual destructor
 			virtual ~MovableObject() noexcept;
@@ -151,10 +151,10 @@ namespace ion::graphics::scene
 			*/
 
 			//Default copy assignment
-			inline MovableObject& operator=(const MovableObject &rhs) = default;
+			inline MovableObject& operator=(const MovableObject&) = default;
 
 			//Default move assignment
-			inline MovableObject& operator=(MovableObject &&rhs) = default;
+			inline MovableObject& operator=(MovableObject&&) = default;
 
 
 			/*

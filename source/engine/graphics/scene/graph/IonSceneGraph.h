@@ -181,7 +181,7 @@ namespace ion::graphics::scene::graph
 			//Deleted copy assignment
 			SceneGraph& operator=(const SceneGraph&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			SceneGraph& operator=(SceneGraph&&) = default;
 
 

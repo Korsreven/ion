@@ -72,7 +72,7 @@ namespace ion::graphics::scene::graph::animations
 			//Deleted copy assignment
 			NodeAnimationManager& operator=(const NodeAnimationManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			NodeAnimationManager& operator=(NodeAnimationManager&&) = default;
 
 

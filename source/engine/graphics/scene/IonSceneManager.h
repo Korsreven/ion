@@ -128,7 +128,7 @@ namespace ion::graphics::scene
 			//Deleted copy assignment
 			SceneManager& operator=(const SceneManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			SceneManager& operator=(SceneManager&&) = default;
 
 

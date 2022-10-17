@@ -171,7 +171,7 @@ namespace ion::sounds
 			//Deleted copy assignment
 			SoundManager& operator=(const SoundManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			SoundManager& operator=(SoundManager&&) = default;
 
 

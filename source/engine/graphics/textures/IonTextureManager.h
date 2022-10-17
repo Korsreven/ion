@@ -300,7 +300,7 @@ namespace ion::graphics::textures
 			//Deleted copy assignment
 			TextureManager& operator=(const TextureManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			TextureManager& operator=(TextureManager&&) = default;
 
 

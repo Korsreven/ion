@@ -122,7 +122,7 @@ namespace ion::resources
 			//Deleted copy assignment
 			FileResourceManager& operator=(const FileResourceManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			FileResourceManager& operator=(FileResourceManager&&) = default;
 
 

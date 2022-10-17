@@ -53,7 +53,7 @@ namespace ion::graphics::fonts
 			//Deleted copy assignment
 			TypeFaceManager& operator=(const TypeFaceManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			TypeFaceManager& operator=(TypeFaceManager&&) = default;
 
 

@@ -347,7 +347,7 @@ namespace ion::resources
 			//Deleted copy assignment
 			ResourceManager& operator=(const ResourceManager&) = delete;
 
-			//Move assignment
+			//Default move assignment
 			ResourceManager& operator=(ResourceManager&&) = default;
 
 

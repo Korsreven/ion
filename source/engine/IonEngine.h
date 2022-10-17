@@ -105,7 +105,7 @@ namespace ion
 			Engine(const Engine&) = delete;
 
 			//Default move constructor
-			Engine(Engine &&rhs) = default;
+			Engine(Engine&&) = default;
 
 
 			/*
