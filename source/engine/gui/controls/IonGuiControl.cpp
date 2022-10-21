@@ -976,13 +976,13 @@ void GuiControl::PlaySound(ControlSkinSoundPart &part)
 
 //Public
 
-GuiControl::GuiControl(std::string name) :
+GuiControl::GuiControl(std::string name) noexcept :
 	GuiComponent{std::move(name)}
 {
 	//Empty
 }
 
-GuiControl::GuiControl(std::string name, const std::optional<Vector2> &size) :
+GuiControl::GuiControl(std::string name, const std::optional<Vector2> &size) noexcept :
 
 	GuiComponent{std::move(name)},
 	size_{size}
@@ -1001,7 +1001,7 @@ GuiControl::GuiControl(std::string name, const skins::GuiSkin &skin, const std::
 
 
 GuiControl::GuiControl(std::string name, const std::optional<Vector2> &size,
-	std::optional<std::string> caption, std::optional<std::string> tooltip, BoundingBoxes hit_boxes) :
+	std::optional<std::string> caption, std::optional<std::string> tooltip, BoundingBoxes hit_boxes) noexcept :
 
 	GuiComponent{std::move(name)},
 	size_{size},

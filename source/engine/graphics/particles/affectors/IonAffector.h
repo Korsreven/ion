@@ -48,7 +48,7 @@ namespace ion::graphics::particles::affectors
 
 			//Construct a new affector with the given name
 			//Can only be instantiated by derived
-			explicit Affector(std::string name);
+			explicit Affector(std::string name) noexcept;
 
 
 			/*

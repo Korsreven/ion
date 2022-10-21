@@ -71,7 +71,7 @@ namespace ion::gui::controls
 		public:
 
 			//Construct a mouse cursor with the given name and size
-			GuiMouseCursor(std::string name, const std::optional<Vector2> &size);
+			GuiMouseCursor(std::string name, const std::optional<Vector2> &size) noexcept;
 
 			//Construct a mouse cursor with the given name, skin and size
 			GuiMouseCursor(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size);

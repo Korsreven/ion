@@ -52,13 +52,13 @@ namespace ion::timers
 		public:
 
 			//Constructs a new timer with the given name
-			explicit Timer(std::string name);
+			explicit Timer(std::string name) noexcept;
 
 			//Constructs a new timer with the given name and interval
-			Timer(std::string name, duration interval);
+			Timer(std::string name, duration interval) noexcept;
 
 			//Constructs a new timer with the given name, interval and callback
-			Timer(std::string name, duration interval, events::Callback<void, Timer&> on_tick);
+			Timer(std::string name, duration interval, events::Callback<void, Timer&> on_tick) noexcept;
 
 
 			/*

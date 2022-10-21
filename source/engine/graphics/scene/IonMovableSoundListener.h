@@ -55,11 +55,11 @@ namespace ion::graphics::scene
 
 			//Construct a new movable sound listener with the given name and sound listener
 			MovableSoundListener(std::optional<std::string> name,
-				NonOwningPtr<sounds::SoundListener> sound_listener);
+				NonOwningPtr<sounds::SoundListener> sound_listener) noexcept;
 
 			//Construct a new movable sound listener with the given name, position and sound listener
 			MovableSoundListener(std::optional<std::string> name, const Vector3 &position,
-				NonOwningPtr<sounds::SoundListener> sound_listener);
+				NonOwningPtr<sounds::SoundListener> sound_listener) noexcept;
 
 
 			/*

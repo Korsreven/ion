@@ -29,7 +29,7 @@ namespace movable_sound_listener::detail
 
 
 MovableSoundListener::MovableSoundListener(std::optional<std::string> name,
-	NonOwningPtr<sounds::SoundListener> sound_listener) :
+	NonOwningPtr<sounds::SoundListener> sound_listener) noexcept :
 
 	MovableObject{std::move(name)},
 	sound_listener_{sound_listener}
@@ -38,7 +38,7 @@ MovableSoundListener::MovableSoundListener(std::optional<std::string> name,
 }
 
 MovableSoundListener::MovableSoundListener(std::optional<std::string> name, const Vector3 &position,
-	NonOwningPtr<sounds::SoundListener> sound_listener) :
+	NonOwningPtr<sounds::SoundListener> sound_listener) noexcept :
 
 	MovableObject{std::move(name)},
 	position_{position},

@@ -23,13 +23,13 @@ namespace particle_system::detail
 } //particle_system::detail
 
 
-ParticleSystem::ParticleSystem(std::string name) :
+ParticleSystem::ParticleSystem(std::string name) noexcept :
 	managed::ManagedObject<ParticleSystemManager>{std::move(name)}
 {
 	//Empty
 }
 
-ParticleSystem::ParticleSystem(std::string name, ParticlePrimitive particle_primitive) :
+ParticleSystem::ParticleSystem(std::string name, ParticlePrimitive particle_primitive) noexcept :
 
 	managed::ManagedObject<ParticleSystemManager>{std::move(name)},
 	particle_primitive_{particle_primitive}

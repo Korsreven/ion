@@ -336,11 +336,11 @@ namespace ion::graphics::shaders
 		public:
 
 			//Construct a new empty shader layout with the given name
-			explicit ShaderLayout(std::string name);
+			explicit ShaderLayout(std::string name) noexcept;
 
 			//Construct a new shader layout with the given name, struct, attribute and uniform bindings
 			ShaderLayout(std::string name, shader_layout::StructBindings struct_bindings,
-				shader_layout::AttributeBindings attribute_bindings, shader_layout::UniformBindings uniform_bindings);
+				shader_layout::AttributeBindings attribute_bindings, shader_layout::UniformBindings uniform_bindings) noexcept;
 
 
 			/*

@@ -169,15 +169,15 @@ namespace ion::graphics::render
 			*/
 
 			//Create a viewport with the given name and connected to a given render target
-			NonOwningPtr<Viewport> CreateViewport(std::string name, RenderTarget &render_target) noexcept;
+			NonOwningPtr<Viewport> CreateViewport(std::string name, RenderTarget &render_target);
 
 			//Create a viewport with the given name, connected to a given render target and with the given bounds (region)
-			NonOwningPtr<Viewport> CreateViewport(std::string name, RenderTarget &render_target, const Aabb &bounds) noexcept;
+			NonOwningPtr<Viewport> CreateViewport(std::string name, RenderTarget &render_target, const Aabb &bounds);
 
 			//Create a viewport with the given name, connected to a given render target and with the given bounds (region) and anchors
 			NonOwningPtr<Viewport> CreateViewport(std::string name, RenderTarget &render_target, const Aabb &bounds,
 				viewport::HorizontalAnchorType left_anchor, viewport::HorizontalAnchorType right_anchor,
-				viewport::VerticalAnchorType top_anchor, viewport::VerticalAnchorType bottom_anchor) noexcept;
+				viewport::VerticalAnchorType top_anchor, viewport::VerticalAnchorType bottom_anchor);
 
 
 			//Create a viewport as a copy of the given viewport

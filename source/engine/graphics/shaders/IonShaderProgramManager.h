@@ -286,7 +286,7 @@ namespace ion::graphics::shaders
 				Events
 			*/
 
-			bool LoadResource(ShaderProgram &shader) noexcept override;
+			bool LoadResource(ShaderProgram &shader) override;
 			bool UnloadResource(ShaderProgram &shader) noexcept override;
 
 			void Created(ShaderProgram &shader_program) noexcept override;

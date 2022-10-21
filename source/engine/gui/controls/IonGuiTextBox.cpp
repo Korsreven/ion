@@ -772,7 +772,7 @@ void GuiTextBox::ClearTextContent() noexcept
 //Public
 
 GuiTextBox::GuiTextBox(std::string name, const std::optional<Vector2> &size,
-	std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes) :
+	std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes) noexcept :
 	GuiScrollable{std::move(name), size, std::move(caption), {}, std::move(hit_boxes)}
 {
 	DefaultSetup();

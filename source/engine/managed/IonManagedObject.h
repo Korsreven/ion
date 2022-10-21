@@ -38,14 +38,14 @@ namespace ion::managed
 			ManagedObject() = default;
 
 			//Construct a new managed object with the given name
-			explicit ManagedObject(std::string name) :
+			explicit ManagedObject(std::string name) noexcept :
 				name_{std::move(name)}
 			{
 				//Empty
 			}
 
 			//Construct a new managed object with the given name
-			explicit ManagedObject(std::optional<std::string> name) :
+			explicit ManagedObject(std::optional<std::string> name) noexcept :
 				name_{std::move(name)}
 			{
 				//Empty

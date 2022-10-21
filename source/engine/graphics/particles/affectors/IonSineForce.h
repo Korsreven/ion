@@ -72,13 +72,13 @@ namespace ion::graphics::particles::affectors
 		public:
 
 			//Construct a new sine force with the given name
-			explicit SineForce(std::string name);
+			explicit SineForce(std::string name) noexcept;
 
 			//Construct a new sine force with the given name, type, force and frequency
-			SineForce(std::string name, sine_force::ForceType type, const Vector2 &force, real frequency);
+			SineForce(std::string name, sine_force::ForceType type, const Vector2 &force, real frequency) noexcept;
 
 			//Construct a new sine force with the given name, type, force, min and max frequency
-			SineForce(std::string name, sine_force::ForceType type, const Vector2 &force, real min_frequency, real max_frequency);
+			SineForce(std::string name, sine_force::ForceType type, const Vector2 &force, real min_frequency, real max_frequency) noexcept;
 
 
 			/*

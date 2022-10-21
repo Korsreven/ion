@@ -850,7 +850,7 @@ bool ShaderProgramManager::IsShaderProgramActive(int handle) noexcept
 	Events
 */
 
-bool ShaderProgramManager::LoadResource(ShaderProgram &shader_program) noexcept
+bool ShaderProgramManager::LoadResource(ShaderProgram &shader_program)
 {
 	auto vertex_shader = shader_program.VertexShader();
 	auto fragment_shader = shader_program.FragmentShader();	

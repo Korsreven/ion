@@ -445,7 +445,7 @@ RenderPrimitive::~RenderPrimitive() noexcept
 	Modifiers
 */
 
-void RenderPrimitive::VertexData(VertexContainer data)
+void RenderPrimitive::VertexData(VertexContainer data) noexcept
 {
 	if (!std::empty(vertex_data_) || !std::empty(data))
 	{

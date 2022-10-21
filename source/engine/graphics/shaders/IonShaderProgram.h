@@ -90,18 +90,18 @@ namespace ion::graphics::shaders
 		public:
 			
 			//Constructs a new shader program with the given name and shader
-			ShaderProgram(std::string name, NonOwningPtr<Shader> shader);
+			ShaderProgram(std::string name, NonOwningPtr<Shader> shader) noexcept;
 
 			//Constructs a new shader program with the given name, shader and a user defined shader layout
 			ShaderProgram(std::string name, NonOwningPtr<Shader> shader,
-				NonOwningPtr<ShaderLayout> shader_layout);
+				NonOwningPtr<ShaderLayout> shader_layout) noexcept;
 
 			//Constructs a new shader program with the given name, vertex and fragment shader
-			ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader);
+			ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader) noexcept;
 
 			//Constructs a new shader program with the given name, vertex and fragment shader and a user defined shader layout
 			ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader,
-				NonOwningPtr<ShaderLayout> shader_layout);
+				NonOwningPtr<ShaderLayout> shader_layout) noexcept;
 
 			//Deleted copy constructor
 			ShaderProgram(const ShaderProgram&) = delete;

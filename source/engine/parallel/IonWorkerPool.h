@@ -157,7 +157,7 @@ namespace ion::parallel
 
 		public:
 
-			//Create a worker pool, either running (default) or not
+			//Construct a worker pool, either running (default) or not
 			WorkerPool(worker_pool::RunningState running_state = worker_pool::RunningState::NonSuspended) noexcept :
 				running_state_{running_state},
 				max_worker_threads_{worker_pool::detail::default_number_of_threads()}
@@ -165,7 +165,7 @@ namespace ion::parallel
 				//Empty
 			}
 
-			//Create a worker pool with the given max number of worker threads, and either running (default) or not
+			//Construct a worker pool with the given max number of worker threads, and either running (default) or not
 			WorkerPool(int max_worker_threads, worker_pool::RunningState running_state = worker_pool::RunningState::NonSuspended) noexcept :
 				running_state_{running_state},
 				max_worker_threads_{max_worker_threads < 1 ? 1 : max_worker_threads}

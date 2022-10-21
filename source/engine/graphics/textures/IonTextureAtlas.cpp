@@ -27,7 +27,7 @@ namespace texture_atlas::detail
 //Public
 
 TextureAtlas::TextureAtlas(std::string name, std::string asset_name,
-	int rows, int columns, int sub_textures, AtlasSubTextureOrder sub_texture_order) :
+	int rows, int columns, int sub_textures, AtlasSubTextureOrder sub_texture_order) noexcept :
 
 	Texture{std::move(name), std::move(asset_name)},
 
@@ -41,7 +41,7 @@ TextureAtlas::TextureAtlas(std::string name, std::string asset_name,
 
 TextureAtlas::TextureAtlas(std::string name, std::string asset_name,
 	texture::TextureFilter min_filter, texture::TextureFilter mag_filter,
-	int rows, int columns, int sub_textures, AtlasSubTextureOrder sub_texture_order) :
+	int rows, int columns, int sub_textures, AtlasSubTextureOrder sub_texture_order) noexcept :
 
 	Texture{std::move(name), std::move(asset_name), min_filter, mag_filter, {},
 			texture::TextureWrapMode::Clamp, texture::TextureWrapMode::Clamp},
@@ -55,7 +55,7 @@ TextureAtlas::TextureAtlas(std::string name, std::string asset_name,
 }
 
 TextureAtlas::TextureAtlas(std::string name, std::string asset_name, texture::TextureFilter filter,
-	int rows, int columns, int sub_textures, AtlasSubTextureOrder sub_texture_order) :
+	int rows, int columns, int sub_textures, AtlasSubTextureOrder sub_texture_order) noexcept :
 
 	TextureAtlas{std::move(name), std::move(asset_name), filter, filter, rows, columns, sub_textures, sub_texture_order}
 {

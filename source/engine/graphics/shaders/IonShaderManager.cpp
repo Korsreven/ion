@@ -168,7 +168,7 @@ std::optional<std::string> print_info_log(int shader_handle)
 	Events
 */
 
-bool ShaderManager::LoadResource(Shader &shader) noexcept
+bool ShaderManager::LoadResource(Shader &shader)
 {
 	auto type = shader.Type();
 	auto &source = shader.FileData();

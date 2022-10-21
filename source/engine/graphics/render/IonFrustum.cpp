@@ -187,7 +187,7 @@ void project_through_frustum(ProjectionType projection, const std::optional<Aabb
 
 
 Frustum::Frustum(const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance,
-	const std::optional<real> &aspect_ratio, AspectRatioFormat aspect_format) :
+	const std::optional<real> &aspect_ratio, AspectRatioFormat aspect_format) noexcept :
 
 	clip_plane_{clip_plane},
 	near_clip_distance_{near_clip_distance},
@@ -200,7 +200,7 @@ Frustum::Frustum(const std::optional<Aabb> &clip_plane, real near_clip_distance,
 }
 
 Frustum::Frustum(ProjectionType projection, const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance,
-	real field_of_view, const std::optional<real> &aspect_ratio, AspectRatioFormat aspect_format) :
+	real field_of_view, const std::optional<real> &aspect_ratio, AspectRatioFormat aspect_format) noexcept :
 
 	projection_{projection},
 

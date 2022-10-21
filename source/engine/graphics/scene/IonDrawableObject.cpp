@@ -70,7 +70,7 @@ void DrawableObject::UpdateOpacityOnAllPrimitives(real opacity) noexcept
 
 //Public
 
-DrawableObject::DrawableObject(std::optional<std::string> name, bool visible) :
+DrawableObject::DrawableObject(std::optional<std::string> name, bool visible) noexcept :
 	MovableObject{std::move(name), visible}
 {
 	query_type_flags_ |= query::scene_query::QueryType::Drawable;

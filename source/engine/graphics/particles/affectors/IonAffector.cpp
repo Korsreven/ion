@@ -15,7 +15,7 @@ File:	IonDirectionRandomizer.cpp
 namespace ion::graphics::particles::affectors
 {
 
-Affector::Affector(std::string name) :
+Affector::Affector(std::string name) noexcept :
 	managed::ManagedObject<AffectorManager>{std::move(name)}
 {
 	//Empty

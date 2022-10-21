@@ -169,7 +169,7 @@ void Animation::Previous() noexcept
 
 Animation::Animation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 	duration cycle_duration, std::optional<int> repeat_count,
-	PlaybackDirection direction, real playback_rate) :
+	PlaybackDirection direction, real playback_rate) noexcept :
 	
 	managed::ManagedObject<AnimationManager>{std::move(name)},
 
@@ -186,7 +186,7 @@ Animation::Animation(std::string name, NonOwningPtr<FrameSequence> frame_sequenc
 }
 
 Animation::Animation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
-	duration cycle_duration, std::optional<int> repeat_count, real playback_rate) :
+	duration cycle_duration, std::optional<int> repeat_count, real playback_rate) noexcept :
 
 	Animation{std::move(name), frame_sequence, cycle_duration, repeat_count, PlaybackDirection::Normal, playback_rate}
 {

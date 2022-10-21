@@ -210,7 +210,7 @@ void ShaderProgram::Removed(variables::UniformVariable &uniform_variable) noexce
 
 //Public
 
-ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> shader) :
+ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> shader) noexcept :
 	resources::Resource<ShaderProgramManager>{std::move(name)}
 {
 	//The given shader can either be a vertex or a fragment shader, try both
@@ -219,7 +219,7 @@ ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> shader) :
 }
 
 ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> shader,
-	NonOwningPtr<ShaderLayout> shader_layout) :
+	NonOwningPtr<ShaderLayout> shader_layout) noexcept :
 
 	resources::Resource<ShaderProgramManager>{std::move(name)},
 	shader_layout_{shader_layout}
@@ -229,7 +229,7 @@ ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> shader,
 	FragmentShader(shader);
 }
 
-ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader) :
+ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader) noexcept :
 	resources::Resource<ShaderProgramManager>{std::move(name)}
 {
 	//The given shaders much match the correct shader type
@@ -238,7 +238,7 @@ ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shade
 }
 
 ShaderProgram::ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader,
-	NonOwningPtr<ShaderLayout> shader_layout) :
+	NonOwningPtr<ShaderLayout> shader_layout) noexcept :
 
 	resources::Resource<ShaderProgramManager>{std::move(name)},
 	shader_layout_{shader_layout}

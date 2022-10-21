@@ -111,7 +111,7 @@ void GuiScrollBar::UpdateHandle() noexcept
 //Public
 
 GuiScrollBar::GuiScrollBar(std::string name, const std::optional<Vector2> &size,
-	std::optional<std::string> caption, gui_slider::SliderType type, gui_control::BoundingBoxes hit_boxes) :
+	std::optional<std::string> caption, gui_slider::SliderType type, gui_control::BoundingBoxes hit_boxes) noexcept :
 	GuiSlider{std::move(name), size, std::move(caption), {}, type, std::move(hit_boxes)}
 {
 	DefaultSetup();

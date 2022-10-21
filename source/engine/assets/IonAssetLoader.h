@@ -81,7 +81,7 @@ namespace ion::assets
 			}
 
 
-			bool load_data_file(const std::filesystem::path &file_path, Strings &file_entries) noexcept;
+			bool load_data_file(const std::filesystem::path &file_path, Strings &file_entries);
 
 			bool save_data_file_header(const std::filesystem::path &file_path) noexcept;
 			bool save_data_file_bytes(const std::filesystem::path &file_path, std::string_view file_bytes) noexcept;

@@ -114,7 +114,7 @@ void InputController::MouseWheelRolled(int delta, Vector2 position) noexcept
 
 //Public
 
-InputController::InputController(graphics::render::RenderWindow &render_window) noexcept :
+InputController::InputController(graphics::render::RenderWindow &render_window) :
 	InputListener{render_window}
 {
 	render_window_.Events().Subscribe(*this);

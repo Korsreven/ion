@@ -119,7 +119,7 @@ namespace ion::graphics::shaders::variables
 		public:
 
 			//Constructor
-			AttributeVariable(std::string name, attribute_variable::VariableType value);
+			AttributeVariable(std::string name, attribute_variable::VariableType value) noexcept;
 
 			//Default virtual destructor
 			virtual ~AttributeVariable() = default;
@@ -184,7 +184,7 @@ namespace ion::graphics::shaders::variables
 		static_assert(glsl::is_basic_type_v<T>);
 
 		//Constructor
-		explicit Attribute(std::string name) :
+		explicit Attribute(std::string name) noexcept :
 			AttributeVariable(std::move(name), glsl::attribute<T>{})
 		{
 			//Empty

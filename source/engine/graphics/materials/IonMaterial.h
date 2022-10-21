@@ -137,41 +137,41 @@ namespace ion::graphics::materials
 		public:
 
 			//Constructs a new material with the given name
-			explicit Material(std::string name);
+			explicit Material(std::string name) noexcept;
 
 			//Constructs a new material with the given name and diffuse color
-			Material(std::string name, const Color &diffuse);
+			Material(std::string name, const Color &diffuse) noexcept;
 
 			//Constructs a new material with the given name, diffuse map and diffuse color
-			Material(std::string name, NonOwningPtr<Animation> diffuse_map, const Color &diffuse = color::White);
+			Material(std::string name, NonOwningPtr<Animation> diffuse_map, const Color &diffuse = color::White) noexcept;
 
 			//Constructs a new material with the given name, diffuse map and diffuse color
-			Material(std::string name, NonOwningPtr<Texture> diffuse_map, const Color &diffuse = color::White);
+			Material(std::string name, NonOwningPtr<Texture> diffuse_map, const Color &diffuse = color::White) noexcept;
 
 
 			//Constructs a new material with the given name, ambient color, diffuse color, specular color, emissive color and shininess
 			Material(std::string name,
 				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive,
-				real shininess = material::detail::default_shininess);
+				real shininess = material::detail::default_shininess) noexcept;
 
 			//Constructs a new material with the given name, diffuse map, normal map, specular map, emissive map,
 			//diffuse color and shininess
 			Material(std::string name, NonOwningPtr<Animation> diffuse_map,
 				NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> emissive_map,
-				const Color &diffuse = color::White, real shininess = material::detail::default_shininess);
+				const Color &diffuse = color::White, real shininess = material::detail::default_shininess) noexcept;
 
 			//Constructs a new material with the given name, diffuse map, normal map, specular map, emissive map,
 			//diffuse color and shininess
 			Material(std::string name, NonOwningPtr<Texture> diffuse_map,
 				NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> emissive_map,
-				const Color &diffuse = color::White, real shininess = material::detail::default_shininess);
+				const Color &diffuse = color::White, real shininess = material::detail::default_shininess) noexcept;
 
 			//Constructs a new material with the given name, diffuse map, normal map, specular map, emissive map,
 			//ambient color, diffuse color, specular color, emissive color and shininess
 			Material(std::string name, NonOwningPtr<Animation> diffuse_map,
 				NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> emissive_map,
 				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive,
-				real shininess = material::detail::default_shininess);
+				real shininess = material::detail::default_shininess) noexcept;
 
 			//Constructs a new material with the given name, diffuse map, normal map, specular map, emissive map,
 			//ambient color, diffuse color, specular color, emissive color and shininess
@@ -179,7 +179,7 @@ namespace ion::graphics::materials
 				NonOwningPtr<Texture> diffuse_map,
 				NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> emissive_map,
 				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive,
-				real shininess = material::detail::default_shininess);
+				real shininess = material::detail::default_shininess) noexcept;
 
 
 			/*

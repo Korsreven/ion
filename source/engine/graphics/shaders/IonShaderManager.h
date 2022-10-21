@@ -58,7 +58,7 @@ namespace ion::graphics::shaders
 				Events
 			*/
 
-			bool LoadResource(Shader &shader) noexcept override;
+			bool LoadResource(Shader &shader) override;
 			bool UnloadResource(Shader &shader) noexcept override;
 
 		public:

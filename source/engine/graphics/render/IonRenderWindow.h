@@ -15,7 +15,6 @@ File:	IonRenderWindow.h
 
 #include <optional>
 #include <string>
-#include <string_view>
 #include <utility>
 
 #include "IonRenderTarget.h"
@@ -152,11 +151,11 @@ namespace ion::graphics::render
 			RenderWindow() = default;
 
 			//Construct a new window with the given arguments
-			RenderWindow(std::string_view title,
+			RenderWindow(std::string title,
 				const Vector2 &size, const std::optional<Vector2> &min_size,
 				const std::optional<Vector2> &full_screen_size, const std::optional<Vector2> &position,
 				render_window::WindowDisplayMode display_mode, render_window::WindowBorderStyle border_style,
-				render_window::WindowCursor cursor, int color_depth = 32);
+				render_window::WindowCursor cursor, int color_depth = 32) noexcept;
 
 			//Deleted copy constructor
 			RenderWindow(const RenderWindow&) = delete;
@@ -170,20 +169,20 @@ namespace ion::graphics::render
 			*/
 
 			//Returns a new borderless window from the given title, size and position
-			[[nodiscard]] static RenderWindow Borderless(std::string_view title, const Vector2 &size,
-				const std::optional<Vector2> &position = std::nullopt);
+			[[nodiscard]] static RenderWindow Borderless(std::string title, const Vector2 &size,
+				const std::optional<Vector2> &position = std::nullopt) noexcept;
 
 			//Returns a new dialog window from the given title, size and position
-			[[nodiscard]] static RenderWindow Dialog(std::string_view title, const Vector2 &size,
-				const std::optional<Vector2> &position = std::nullopt);
+			[[nodiscard]] static RenderWindow Dialog(std::string title, const Vector2 &size,
+				const std::optional<Vector2> &position = std::nullopt) noexcept;
 
 			//Returns a new non resizable window from the given title, size and position
-			[[nodiscard]] static RenderWindow NonResizable(std::string_view title, const Vector2 &size,
-				const std::optional<Vector2> &position = std::nullopt);
+			[[nodiscard]] static RenderWindow NonResizable(std::string title, const Vector2 &size,
+				const std::optional<Vector2> &position = std::nullopt) noexcept;
 
 			//Returns a new resizable window from the given title, size and position
-			[[nodiscard]] static RenderWindow Resizable(std::string_view title, const Vector2 &size,
-				const std::optional<Vector2> &position = std::nullopt);
+			[[nodiscard]] static RenderWindow Resizable(std::string title, const Vector2 &size,
+				const std::optional<Vector2> &position = std::nullopt) noexcept;
 
 
 			/*
@@ -252,12 +251,12 @@ namespace ion::graphics::render
 			*/
 
 			//Sets the window title to the given title
-			inline void Title(std::string_view title) noexcept
+			inline void Title(std::string title) noexcept
 			{
 				if (title_ != title)
 				{
-					title_ = title;
-					system::Window::Title(title);
+					title_ = std::move(title);
+					system::Window::Title(title_);
 				}
 			}
 

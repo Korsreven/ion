@@ -116,7 +116,7 @@ namespace ion::gui::controls
 		public:
 
 			//Construct a tooltip with the given name, size and tooltip text
-			GuiTooltip(std::string name, const std::optional<Vector2> &size, std::optional<std::string> text);
+			GuiTooltip(std::string name, const std::optional<Vector2> &size, std::optional<std::string> text) noexcept;
 
 			//Construct a tooltip with the given name, skin, size and tooltip text
 			GuiTooltip(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size, std::optional<std::string> text);

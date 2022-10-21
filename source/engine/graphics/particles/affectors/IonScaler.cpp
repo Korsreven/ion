@@ -25,7 +25,7 @@ using namespace scaler;
 namespace scaler::detail
 {
 
-std::vector<Step> normalize_steps(std::vector<Step> steps)
+std::vector<Step> normalize_steps(std::vector<Step> steps) noexcept
 {
 	if (!std::empty(steps))
 	{
@@ -142,13 +142,13 @@ void Scaler::DoAffect(affector::detail::particle_range particles, [[maybe_unused
 
 //Public
 
-Scaler::Scaler(std::string name) :
+Scaler::Scaler(std::string name) noexcept :
 	Affector{std::move(name)}
 {
 	//Empty
 }
 
-Scaler::Scaler(std::string name, const std::vector<scaler::Step> &steps) :
+Scaler::Scaler(std::string name, std::vector<scaler::Step> steps) noexcept :
 
 	Affector{std::move(name)},
 	steps_{detail::normalize_steps(std::move(steps))}

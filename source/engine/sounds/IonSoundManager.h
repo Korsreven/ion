@@ -126,8 +126,8 @@ namespace ion::sounds
 				Events
 			*/
 
-			bool PrepareResource(Sound &sound) noexcept override;
-			bool LoadResource(Sound &sound) noexcept override;
+			bool PrepareResource(Sound &sound) override;
+			bool LoadResource(Sound &sound) override;
 			bool UnloadResource(Sound &sound) noexcept override;
 
 

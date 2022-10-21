@@ -77,7 +77,7 @@ namespace ion::gui::controls
 
 			//Construct a group box with the given name, size, caption and hit boxes
 			GuiGroupBox(std::string name, const std::optional<Vector2> &size,
-				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {});
+				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
 			//Construct a group box with the given name, skin, size, caption and hit boxes
 			GuiGroupBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,

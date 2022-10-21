@@ -739,7 +739,7 @@ bool ParameterDefinition::HasValue(std::string_view value) const noexcept
 
 //Property
 
-PropertyDefinition::PropertyDefinition(std::string name, ParameterDefinition parameter) :
+PropertyDefinition::PropertyDefinition(std::string name, ParameterDefinition parameter) noexcept :
 	name_{std::move(name)},
 	parameters_{{std::move(parameter)}}
 {

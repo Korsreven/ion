@@ -50,7 +50,7 @@ namespace ion::graphics::fonts
 				const font::GlyphMetrices &glyph_metrics,
 				const font::GlyphMaxMetric &glyph_max_metrics,
 				font::FontGlyphFilter glyph_min_filter, font::FontGlyphFilter glyph_mag_filter,
-				font_manager::GlyphTextureType glyph_texture_type) noexcept;
+				font_manager::GlyphTextureType glyph_texture_type);
 			void unload_font(const font::GlyphTextureHandle &glyph_handle) noexcept;
 		} //detail
 	} //font_manager
@@ -70,8 +70,8 @@ namespace ion::graphics::fonts
 				Events
 			*/
 
-			bool PrepareResource(Font &font) noexcept override;
-			bool LoadResource(Font &font) noexcept override;
+			bool PrepareResource(Font &font) override;
+			bool LoadResource(Font &font) override;
 			bool UnloadResource(Font &font) noexcept override;
 
 

@@ -245,7 +245,7 @@ namespace ion::graphics::fonts
 			Text(std::string name, std::string content,
 				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
-				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);	
+				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
 			//Construct a new text (area) with the given name, content,
 			//area size, padding, line height factor and a type face

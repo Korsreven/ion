@@ -294,7 +294,7 @@ void PanelGrid::Reposition() noexcept
 } //gui_panel
 
 
-GuiPanel::GuiPanel(std::string name) :
+GuiPanel::GuiPanel(std::string name) noexcept :
 	GuiPanelContainer{std::move(name)}
 {
 	//Empty

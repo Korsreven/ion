@@ -17,7 +17,7 @@ namespace ion::graphics::fonts
 
 using namespace type_face;
 
-TypeFace::TypeFace(std::string name, NonOwningPtr<Font> regular) :
+TypeFace::TypeFace(std::string name, NonOwningPtr<Font> regular) noexcept :
 
 	managed::ManagedObject<TypeFaceManager>{std::move(name)},
 	regular_font_{regular}
@@ -25,7 +25,7 @@ TypeFace::TypeFace(std::string name, NonOwningPtr<Font> regular) :
 	//Empty
 }
 
-TypeFace::TypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic) :
+TypeFace::TypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic) noexcept :
 
 	managed::ManagedObject<TypeFaceManager>{std::move(name)},
 	regular_font_{regular}
@@ -35,7 +35,7 @@ TypeFace::TypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Fo
 }
 
 TypeFace::TypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic,
-	NonOwningPtr<Font> bold_italic) :
+	NonOwningPtr<Font> bold_italic) noexcept :
 
 	managed::ManagedObject<TypeFaceManager>{std::move(name)},
 	regular_font_{regular}

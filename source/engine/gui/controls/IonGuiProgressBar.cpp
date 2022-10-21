@@ -319,7 +319,7 @@ void GuiProgressBar::StartInterpolation(real from_percent) noexcept
 //Public
 
 GuiProgressBar::GuiProgressBar(std::string name, const std::optional<Vector2> &size,
-	std::optional<std::string> caption, ProgressBarType type) :
+	std::optional<std::string> caption, ProgressBarType type) noexcept :
 
 	GuiControl{std::move(name), size, std::move(caption), {}},
 	type_{type}

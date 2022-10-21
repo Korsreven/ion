@@ -64,7 +64,7 @@ namespace ion::resources
 				Events
 			*/
 
-			virtual bool PrepareResource(ResourceT &resource) noexcept override
+			virtual bool PrepareResource(ResourceT &resource) override
 			{
 				if (auto file = file_resource_manager::detail::file_data_from_resource_name(Repositories(), resource.AssetName()); file)
 				{

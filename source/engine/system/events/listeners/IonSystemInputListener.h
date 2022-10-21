@@ -122,7 +122,7 @@ namespace ion::system::events::listeners
 
 		public:
 
-			//Create input listener on top of the given system window
+			//Construct an input listener on top of the given system window
 			explicit InputListener(graphics::render::RenderWindow &render_window) noexcept;
 
 			//Deleted copy constructor

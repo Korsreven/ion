@@ -82,7 +82,7 @@ namespace ion::graphics::particles::affectors
 				}
 			}
 
-			std::vector<Step> normalize_steps(std::vector<Step> steps);
+			std::vector<Step> normalize_steps(std::vector<Step> steps) noexcept;
 			std::vector<Step> uniformly_distribute_steps(const std::vector<Vector2> &sizes, real from_percent, real to_percent);
 
 			void affect_particles(affector::detail::particle_range particles, const size_steps &steps) noexcept;
@@ -110,11 +110,11 @@ namespace ion::graphics::particles::affectors
 		public:
 
 			//Construct a new scaler with the given name
-			explicit Scaler(std::string name);
+			explicit Scaler(std::string name) noexcept;
 
 			//Construct a new scaler with the given name and steps
 			//Percentages are normalized to range [0.0, 1.0]
-			Scaler(std::string name, const std::vector<scaler::Step> &steps);
+			Scaler(std::string name, std::vector<scaler::Step> steps) noexcept;
 
 
 			/*

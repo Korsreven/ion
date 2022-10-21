@@ -148,13 +148,13 @@ std::pair<bool, bool> is_texture_map_repeatable(const Texture &texture,
 
 //Public
 
-Material::Material(std::string name) :
+Material::Material(std::string name) noexcept :
 	managed::ManagedObject<MaterialManager>{std::move(name)}
 {
 	//Empty
 }
 
-Material::Material(std::string name, const Color &diffuse) :
+Material::Material(std::string name, const Color &diffuse) noexcept :
 	
 	managed::ManagedObject<MaterialManager>{std::move(name)},
 	diffuse_color_{diffuse}
@@ -162,7 +162,7 @@ Material::Material(std::string name, const Color &diffuse) :
 	//Empty
 }
 
-Material::Material(std::string name, NonOwningPtr<Animation> diffuse_map, const Color &diffuse) :
+Material::Material(std::string name, NonOwningPtr<Animation> diffuse_map, const Color &diffuse) noexcept :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
 
@@ -173,7 +173,7 @@ Material::Material(std::string name, NonOwningPtr<Animation> diffuse_map, const 
 	//Empty
 }
 
-Material::Material(std::string name, NonOwningPtr<Texture> diffuse_map, const Color &diffuse) :
+Material::Material(std::string name, NonOwningPtr<Texture> diffuse_map, const Color &diffuse) noexcept :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
 
@@ -186,7 +186,7 @@ Material::Material(std::string name, NonOwningPtr<Texture> diffuse_map, const Co
 
 
 Material::Material(std::string name,
-	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess) :
+	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess) noexcept :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
 
@@ -201,7 +201,7 @@ Material::Material(std::string name,
 
 Material::Material(std::string name, NonOwningPtr<Animation> diffuse_map,
 	NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> emissive_map,
-	const Color &diffuse, real shininess) :
+	const Color &diffuse, real shininess) noexcept :
 	
 	managed::ManagedObject<MaterialManager>{std::move(name)},
 
@@ -218,7 +218,7 @@ Material::Material(std::string name, NonOwningPtr<Animation> diffuse_map,
 
 Material::Material(std::string name, NonOwningPtr<Texture> diffuse_map,
 	NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> emissive_map,
-	const Color &diffuse, real shininess) :
+	const Color &diffuse, real shininess) noexcept :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
 
@@ -235,7 +235,7 @@ Material::Material(std::string name, NonOwningPtr<Texture> diffuse_map,
 
 Material::Material(std::string name, NonOwningPtr<Animation> diffuse_map,
 	NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> emissive_map,
-	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess) :
+	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess) noexcept :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
 
@@ -254,7 +254,7 @@ Material::Material(std::string name, NonOwningPtr<Animation> diffuse_map,
 
 Material::Material(std::string name, NonOwningPtr<Texture> diffuse_map,
 	NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> emissive_map,
-	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess) :
+	const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive, real shininess) noexcept :
 
 	managed::ManagedObject<MaterialManager>{std::move(name)},
 

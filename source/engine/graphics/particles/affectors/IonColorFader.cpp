@@ -25,7 +25,7 @@ using namespace color_fader;
 namespace color_fader::detail
 {
 
-std::vector<Step> normalize_steps(std::vector<Step> steps)
+std::vector<Step> normalize_steps(std::vector<Step> steps) noexcept
 {
 	if (!std::empty(steps))
 	{
@@ -142,13 +142,13 @@ void ColorFader::DoAffect(affector::detail::particle_range particles, [[maybe_un
 
 //Public
 
-ColorFader::ColorFader(std::string name) :
+ColorFader::ColorFader(std::string name) noexcept :
 	Affector{std::move(name)}
 {
 	//Empty
 }
 
-ColorFader::ColorFader(std::string name, const std::vector<color_fader::Step> &steps) :
+ColorFader::ColorFader(std::string name, std::vector<color_fader::Step> steps) noexcept :
 
 	Affector{std::move(name)},
 	steps_{detail::normalize_steps(std::move(steps))}

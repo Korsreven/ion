@@ -342,7 +342,7 @@ namespace ion::script
 			public:
 
 				//Construct a new property with the given name and parameter
-				PropertyDefinition(std::string name, ParameterDefinition parameter);
+				PropertyDefinition(std::string name, ParameterDefinition parameter) noexcept;
 
 				//Construct a new property with the given name and parameters
 				PropertyDefinition(std::string name, ParameterDefinitions parameters) noexcept;

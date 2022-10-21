@@ -41,7 +41,7 @@ void evolve_particles(container_type<Particle> &particles, duration time) noexce
 } //emitter::detail
 
 
-Emitter::Emitter(std::string name) :
+Emitter::Emitter(std::string name) noexcept :
 	managed::ManagedObject<EmitterManager>{std::move(name)}
 {
 	//Empty
@@ -49,7 +49,7 @@ Emitter::Emitter(std::string name) :
 
 Emitter::Emitter(std::string name, EmitterType type, const Vector3 &position, const Vector2 &direction,
 	const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
-	std::optional<duration> emission_duration, int particle_quota) :
+	std::optional<duration> emission_duration, int particle_quota) noexcept :
 
 	managed::ManagedObject<EmitterManager>{std::move(name)},
 

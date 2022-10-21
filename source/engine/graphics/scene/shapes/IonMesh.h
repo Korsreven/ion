@@ -165,18 +165,18 @@ namespace ion::graphics::scene::shapes
 
 
 			//Construct a new mesh with the given raw vertex data and visibility
-			explicit Mesh(render_primitive::VertexContainer vertex_data, bool visible = true);
+			explicit Mesh(render_primitive::VertexContainer vertex_data, bool visible = true) noexcept;
 
 			//Construct a new mesh with the given raw vertex data, material, tex coord mode and visibility
 			Mesh(render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
-				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
+				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true) noexcept;
 
 			//Construct a new mesh with the given draw mode, raw vertex data and visibility
-			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, bool visible = true);
+			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, bool visible = true) noexcept;
 
 			//Construct a new mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
 			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
-				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
+				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true) noexcept;
 
 
 			//Default virtual destructor
@@ -190,7 +190,7 @@ namespace ion::graphics::scene::shapes
 			using RenderPrimitive::VertexData; //Mitigate name hiding
 
 			//Sets the vertex data of this mesh to the given vertices
-			inline void VertexData(const mesh::Vertices &vertices) noexcept
+			inline void VertexData(const mesh::Vertices &vertices)
 			{
 				VertexData(mesh::detail::vertices_to_vertex_data(vertices));
 			}

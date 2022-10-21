@@ -101,13 +101,13 @@ void Camera::NotifyCameraMoved(const Vector3 &position) noexcept
 
 //Public
 
-Camera::Camera(std::optional<std::string> name, bool visible) :
+Camera::Camera(std::optional<std::string> name, bool visible) noexcept :
 	MovableObject{std::move(name), visible}
 {
 	query_type_flags_ |= query::scene_query::QueryType::Camera;
 }
 
-Camera::Camera(std::optional<std::string> name, const render::Frustum &frustum, bool visible) :
+Camera::Camera(std::optional<std::string> name, const render::Frustum &frustum, bool visible) noexcept :
 
 	MovableObject{std::move(name), visible},
 	frustum_{frustum}

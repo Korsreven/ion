@@ -82,7 +82,7 @@ namespace ion::graphics::particles::affectors
 				}
 			}
 
-			std::vector<Step> normalize_steps(std::vector<Step> steps);
+			std::vector<Step> normalize_steps(std::vector<Step> steps) noexcept;
 			std::vector<Step> uniformly_distribute_steps(const std::vector<Color> &colors, real from_percent, real to_percent);
 
 			void affect_particles(affector::detail::particle_range particles, const color_steps &steps) noexcept;
@@ -110,11 +110,11 @@ namespace ion::graphics::particles::affectors
 		public:
 
 			//Construct a new color fader with the given name
-			explicit ColorFader(std::string name);
+			explicit ColorFader(std::string name) noexcept;
 
 			//Construct a new color fader with the given name and steps
 			//Percentages are normalized to range [0.0, 1.0]
-			ColorFader(std::string name, const std::vector<color_fader::Step> &steps);
+			ColorFader(std::string name, std::vector<color_fader::Step> steps) noexcept;
 
 
 			/*

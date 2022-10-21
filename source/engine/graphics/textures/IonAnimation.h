@@ -111,11 +111,11 @@ namespace ion::graphics::textures
 			//Constructs a new animation with the given name, frames, cycle duration, repeat count, playback direction and rate
 			Animation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 				duration cycle_duration, std::optional<int> repeat_count = std::nullopt,
-				animation::PlaybackDirection direction = animation::PlaybackDirection::Normal, real playback_rate = 1.0_r);
+				animation::PlaybackDirection direction = animation::PlaybackDirection::Normal, real playback_rate = 1.0_r) noexcept;
 
 			//Constructs a new animation (in normal direction) with the given name, frames, cycle duration, repeat count and playback rate
 			Animation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
-				duration cycle_duration, std::optional<int> repeat_count, real playback_rate);
+				duration cycle_duration, std::optional<int> repeat_count, real playback_rate) noexcept;
 
 
 			/*

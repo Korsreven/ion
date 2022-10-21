@@ -427,7 +427,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 	Events
 */
 
-bool TextureManager::PrepareResource(Texture &texture) noexcept
+bool TextureManager::PrepareResource(Texture &texture)
 {
 	//Texture is a sub texture
 	if (auto &atlas_region = texture.AtlasRegion(); atlas_region)
@@ -452,7 +452,7 @@ bool TextureManager::PrepareResource(Texture &texture) noexcept
 		return false;
 }
 
-bool TextureManager::LoadResource(Texture &texture) noexcept
+bool TextureManager::LoadResource(Texture &texture)
 {
 	//Texture is a sub texture
 	if (auto &atlas_region = texture.AtlasRegion(); atlas_region && atlas_region->Atlas)

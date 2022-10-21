@@ -35,7 +35,7 @@ namespace ion::resources
 
 			//Constructs a new file resource with the given name and asset name
 			//Asset name could be a file name or an entire file path
-			FileResource(std::string name, std::string asset_name) :
+			FileResource(std::string name, std::string asset_name) noexcept :
 
 				Resource<T>{std::move(name)},
 				asset_name_{std::move(asset_name)}
@@ -49,7 +49,7 @@ namespace ion::resources
 			*/
 
 			//Sets the file data of the file resource to the given data with the associated path
-			inline void FileData(std::string data, std::filesystem::path path)
+			inline void FileData(std::string data, std::filesystem::path path) noexcept
 			{
 				file_data_ = std::move(data);
 				file_path_ = std::move(path);

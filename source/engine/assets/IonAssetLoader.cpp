@@ -25,7 +25,7 @@ using namespace utilities;
 namespace asset_loader::detail
 {
 
-bool load_data_file(const std::filesystem::path &file_path, Strings &file_entries) noexcept
+bool load_data_file(const std::filesystem::path &file_path, Strings &file_entries)
 {
 	std::string data;
 

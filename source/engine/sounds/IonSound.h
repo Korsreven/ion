@@ -110,16 +110,16 @@ namespace ion::sounds
 			Sound(std::string name, std::string asset_name,
 				sound::SoundType type, sound::SoundProcessingMode processing_mode,
 				sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
-				std::optional<sound::SoundLoopingMode> looping_mode = {});
+				std::optional<sound::SoundLoopingMode> looping_mode = {}) noexcept;
 
 			//Construct a new sound with the given name, asset name, type, processing and looping mode
 			Sound(std::string name, std::string asset_name,
 				sound::SoundType type, sound::SoundProcessingMode processing_mode,
-				std::optional<sound::SoundLoopingMode> looping_mode = {});
+				std::optional<sound::SoundLoopingMode> looping_mode = {}) noexcept;
 
 			//Construct a new sound with the given name, asset name, type and looping mode
 			Sound(std::string name, std::string asset_name,
-				sound::SoundType type, std::optional<sound::SoundLoopingMode> looping_mode = {});
+				sound::SoundType type, std::optional<sound::SoundLoopingMode> looping_mode = {}) noexcept;
 
 
 			//Deleted copy constructor
@@ -192,7 +192,7 @@ namespace ion::sounds
 			}
 
 			//Sets the stream data of the texture to the given data
-			inline void StreamData(std::string data)
+			inline void StreamData(std::string data) noexcept
 			{
 				stream_data_ = std::move(data);
 			}
@@ -272,13 +272,13 @@ namespace ion::sounds
 			*/
 
 			//Play this sound, by creating a sound channel outputting to the master channel group
-			NonOwningPtr<SoundChannel> Play(bool paused = false) noexcept;
+			NonOwningPtr<SoundChannel> Play(bool paused = false);
 
 			//Play this sound, by creating a sound channel outputting to the given channel group
-			NonOwningPtr<SoundChannel> Play(NonOwningPtr<SoundChannelGroup> sound_channel_group, bool paused = false) noexcept;
+			NonOwningPtr<SoundChannel> Play(NonOwningPtr<SoundChannelGroup> sound_channel_group, bool paused = false);
 
 			//Play this sound, by reusing the given sound channel
-			NonOwningPtr<SoundChannel> Play(NonOwningPtr<SoundChannel> sound_channel, bool paused = false) noexcept;
+			NonOwningPtr<SoundChannel> Play(NonOwningPtr<SoundChannel> sound_channel, bool paused = false);
 
 
 			/*

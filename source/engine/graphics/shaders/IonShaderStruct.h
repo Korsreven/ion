@@ -53,7 +53,7 @@ namespace ion::graphics::shaders
 		public:
 			
 			//Constructs a new shader struct with the given name and size
-			explicit ShaderStruct(std::string name, int size = 1);
+			explicit ShaderStruct(std::string name, int size = 1) noexcept;
 
 			//Deleted copy constructor
 			ShaderStruct(const ShaderStruct&) = delete;

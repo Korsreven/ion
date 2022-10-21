@@ -267,8 +267,8 @@ namespace ion::graphics::textures
 				Events
 			*/
 
-			bool PrepareResource(Texture &texture) noexcept override;
-			bool LoadResource(Texture &texture) noexcept override;
+			bool PrepareResource(Texture &texture) override;
+			bool LoadResource(Texture &texture) override;
 			bool UnloadResource(Texture &texture) noexcept override;
 
 

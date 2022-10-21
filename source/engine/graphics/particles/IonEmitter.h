@@ -195,12 +195,12 @@ namespace ion::graphics::particles
 		public:
 
 			//Construct a new emitter with the given name
-			explicit Emitter(std::string name);
+			explicit Emitter(std::string name) noexcept;
 
 			//Construct a new emitter with the given name and initial values
 			Emitter(std::string name, emitter::EmitterType type, const Vector3 &position, const Vector2 &direction,
 				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
-				std::optional<duration> emission_duration, int particle_quota = 100);
+				std::optional<duration> emission_duration, int particle_quota = 100) noexcept;
 
 
 			/*

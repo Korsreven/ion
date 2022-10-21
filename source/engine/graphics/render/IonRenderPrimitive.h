@@ -179,7 +179,7 @@ namespace ion::graphics::render
 			*/
 
 			//Sets the vertex data of this render primitive to the given data
-			void VertexData(render_primitive::VertexContainer data);
+			void VertexData(render_primitive::VertexContainer data) noexcept;
 
 			//Appends the given vertex data to the vertex data of this render primitive
 			void AppendVertexData(const render_primitive::VertexContainer &data);
@@ -189,7 +189,7 @@ namespace ion::graphics::render
 
 
 			//Sets the render passes of this render primitive to the given passes
-			inline void RenderPasses(render_pass::Passes passes)
+			inline void RenderPasses(render_pass::Passes passes) noexcept
 			{
 				if (!render_primitive::detail::all_passes_equal(passes_, passes))
 				{

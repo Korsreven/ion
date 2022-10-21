@@ -153,7 +153,7 @@ namespace ion::graphics::shaders::variables
 		public:
 
 			//Constructor
-			UniformVariable(std::string name, uniform_variable::VariableType value);
+			UniformVariable(std::string name, uniform_variable::VariableType value) noexcept;
 
 			//Default virtual destructor
 			virtual ~UniformVariable() = default;

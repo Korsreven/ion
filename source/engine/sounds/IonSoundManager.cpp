@@ -381,7 +381,7 @@ std::pair<real, real> get_min_max_distance(FMOD::Channel &channel) noexcept
 	Events
 */
 
-bool SoundManager::PrepareResource(Sound &sound) noexcept
+bool SoundManager::PrepareResource(Sound &sound)
 {
 	if (FileResourceManager::PrepareResource(sound))
 	{
@@ -399,7 +399,7 @@ bool SoundManager::PrepareResource(Sound &sound) noexcept
 		return false;
 }
 
-bool SoundManager::LoadResource(Sound &sound) noexcept
+bool SoundManager::LoadResource(Sound &sound)
 {
 	auto &file_data = sound.FileData();
 	auto &stream_data = sound.StreamData();

@@ -109,7 +109,7 @@ namespace ion::graphics::scene
 		public:
 
 			//Construct a scene manager with the given name
-			explicit SceneManager(std::optional<std::string> name = {});
+			explicit SceneManager(std::optional<std::string> name = {}) noexcept;
 
 			//Deleted copy constructor
 			SceneManager(const SceneManager&) = delete;

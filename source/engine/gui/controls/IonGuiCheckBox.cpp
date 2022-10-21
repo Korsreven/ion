@@ -131,7 +131,7 @@ OwningPtr<gui_control::ControlSkin> GuiCheckBox::AttuneSkin(OwningPtr<gui_contro
 //Public
 
 GuiCheckBox::GuiCheckBox(std::string name, const std::optional<Vector2> &size,
-	std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes) :
+	std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes) noexcept :
 	GuiControl{std::move(name), size, std::move(caption), std::move(tooltip), std::move(hit_boxes)}
 {
 	DefaultSetup();

@@ -50,7 +50,7 @@ int texture_type_to_gl_texture_type(TextureType texture_type) noexcept
 
 Texture::Texture(std::string name, std::string asset_name,
 	TextureFilter min_filter, TextureFilter mag_filter, std::optional<MipmapFilter> mip_filter,
-	TextureWrapMode s_wrap_mode, TextureWrapMode t_wrap_mode) :
+	TextureWrapMode s_wrap_mode, TextureWrapMode t_wrap_mode) noexcept :
 
 	FileResource{std::move(name), std::move(asset_name)},
 
@@ -65,7 +65,7 @@ Texture::Texture(std::string name, std::string asset_name,
 }
 
 Texture::Texture(std::string name, std::string asset_name,
-	TextureFilter filter, MipmapFilter mip_filter, TextureWrapMode wrap_mode) :
+	TextureFilter filter, MipmapFilter mip_filter, TextureWrapMode wrap_mode) noexcept :
 
 	Texture{std::move(name), std::move(asset_name), filter, filter, mip_filter, wrap_mode, wrap_mode}
 {
@@ -73,7 +73,7 @@ Texture::Texture(std::string name, std::string asset_name,
 }
 
 Texture::Texture(std::string name, std::string asset_name,
-	TextureFilter filter, TextureWrapMode wrap_mode) :
+	TextureFilter filter, TextureWrapMode wrap_mode) noexcept :
 
 	Texture{std::move(name), std::move(asset_name), filter, filter, {}, wrap_mode, wrap_mode}
 {
@@ -81,7 +81,7 @@ Texture::Texture(std::string name, std::string asset_name,
 }
 
 
-Texture::Texture(std::string name, std::string asset_name, const TextureAtlasRegion &atlas_region) :
+Texture::Texture(std::string name, std::string asset_name, const TextureAtlasRegion &atlas_region) noexcept :
 
 	FileResource{std::move(name), std::move(asset_name)},
 	atlas_region_{atlas_region}
@@ -91,7 +91,7 @@ Texture::Texture(std::string name, std::string asset_name, const TextureAtlasReg
 
 Texture::Texture(std::string name, std::string asset_name, const TextureAtlasRegion &atlas_region,
 	TextureFilter min_filter, TextureFilter mag_filter, std::optional<MipmapFilter> mip_filter,
-	TextureWrapMode s_wrap_mode, TextureWrapMode t_wrap_mode) :
+	TextureWrapMode s_wrap_mode, TextureWrapMode t_wrap_mode) noexcept :
 
 	FileResource{std::move(name), std::move(asset_name)},
 
@@ -108,7 +108,7 @@ Texture::Texture(std::string name, std::string asset_name, const TextureAtlasReg
 }
 
 Texture::Texture(std::string name, std::string asset_name, const TextureAtlasRegion &atlas_region,
-	TextureFilter filter, MipmapFilter mip_filter, TextureWrapMode wrap_mode) :
+	TextureFilter filter, MipmapFilter mip_filter, TextureWrapMode wrap_mode) noexcept :
 
 	Texture{std::move(name), std::move(asset_name), atlas_region, filter, filter, mip_filter, wrap_mode, wrap_mode}
 {
@@ -116,7 +116,7 @@ Texture::Texture(std::string name, std::string asset_name, const TextureAtlasReg
 }
 
 Texture::Texture(std::string name, std::string asset_name, const TextureAtlasRegion &atlas_region,
-	TextureFilter filter, TextureWrapMode wrap_mode) :
+	TextureFilter filter, TextureWrapMode wrap_mode) noexcept :
 
 	Texture{std::move(name), std::move(asset_name), atlas_region, filter, filter, {}, wrap_mode, wrap_mode}
 {

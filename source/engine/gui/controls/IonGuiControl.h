@@ -546,10 +546,10 @@ namespace ion::gui::controls
 		public:
 
 			//Construct a control with the given name
-			explicit GuiControl(std::string name);
+			explicit GuiControl(std::string name) noexcept;
 
 			//Construct a control with the given name and size
-			GuiControl(std::string name, const std::optional<Vector2> &size);
+			GuiControl(std::string name, const std::optional<Vector2> &size) noexcept;
 
 			//Construct a control with the given name, skin and size
 			GuiControl(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size);
@@ -557,7 +557,7 @@ namespace ion::gui::controls
 
 			//Construct a control with the given name, size, caption, tooltip and hit boxes
 			GuiControl(std::string name, const std::optional<Vector2> &size,
-				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {});
+				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
 			//Construct a control with the given name, skin, size, caption, tooltip and hit boxes
 			GuiControl(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,

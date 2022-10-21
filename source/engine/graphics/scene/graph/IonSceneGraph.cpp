@@ -421,7 +421,7 @@ void SceneGraph::NotifyNodeRenderEnded(SceneNode &node) noexcept
 
 //Public
 
-SceneGraph::SceneGraph(std::optional<std::string> name, bool enabled) :
+SceneGraph::SceneGraph(std::optional<std::string> name, bool enabled) noexcept :
 
 	managed::ManagedObject<Engine>::ManagedObject{std::move(name)},
 	enabled_{enabled}
@@ -622,7 +622,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	Creating
 */
 
-NonOwningPtr<SceneManager> SceneGraph::CreateSceneManager(std::optional<std::string> name) noexcept
+NonOwningPtr<SceneManager> SceneGraph::CreateSceneManager(std::optional<std::string> name)
 {
 	return Create(std::move(name));
 }

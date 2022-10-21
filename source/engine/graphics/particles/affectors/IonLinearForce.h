@@ -62,10 +62,10 @@ namespace ion::graphics::particles::affectors
 		public:
 
 			//Construct a new linear force with the given name
-			explicit LinearForce(std::string name);
+			explicit LinearForce(std::string name) noexcept;
 
 			//Construct a new linear force with the given name, type and force
-			LinearForce(std::string name, linear_force::ForceType type, const Vector2 &force);
+			LinearForce(std::string name, linear_force::ForceType type, const Vector2 &force) noexcept;
 
 
 			/*

@@ -84,10 +84,10 @@ container_type get_frames_from_first_frame(NonOwningPtr<Texture> first_frame, in
 
 //Public
 
-FrameSequence::FrameSequence(std::string name, const detail::container_type &frames) :
+FrameSequence::FrameSequence(std::string name, detail::container_type frames) noexcept :
 
 	managed::ManagedObject<FrameSequenceManager>{std::move(name)},
-	frames_{frames}
+	frames_{std::move(frames)}
 {
 	//Empty
 }

@@ -46,16 +46,16 @@ namespace ion::graphics::textures
 
 			//Construct a new texture atlas with the given name, asset name, number of rows, columns, sub textures and sub texture order
 			TextureAtlas(std::string name, std::string asset_name,
-				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor);
+				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor) noexcept;
 
 			//Construct a new texture atlas with the given name, asset name, texture filter for min/mag, number of rows, columns, sub textures and sub texture order
 			TextureAtlas(std::string name, std::string asset_name,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter,
-				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor);
+				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor) noexcept;
 
 			//Construct a new texture atlas with the given name, asset name, texture filter, number of rows, columns, sub textures and sub texture order
 			TextureAtlas(std::string name, std::string asset_name, texture::TextureFilter filter,
-				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor);
+				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor) noexcept;
 
 
 			/*

@@ -44,14 +44,14 @@ namespace ion::graphics::fonts
 		public:
 
 			//Constructs a new type face with the given name and a regular font
-			TypeFace(std::string name, NonOwningPtr<Font> regular);
+			TypeFace(std::string name, NonOwningPtr<Font> regular) noexcept;
 
 			//Constructs a new type face with the given name, a regular, bold and italic font
-			TypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic);
+			TypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic) noexcept;
 
 			//Constructs a new type face with the given name, a regular, bold, italic and bold italic font
 			TypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic,
-				NonOwningPtr<Font> bold_italic);
+				NonOwningPtr<Font> bold_italic) noexcept;
 
 
 			/*

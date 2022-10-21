@@ -53,19 +53,19 @@ void VelocityRandomizer::DoAffect(affector::detail::particle_range particles, du
 
 //Public
 
-VelocityRandomizer::VelocityRandomizer(std::string name) :
+VelocityRandomizer::VelocityRandomizer(std::string name) noexcept :
 	Affector{std::move(name)}
 {
 	//Empty
 }
 
-VelocityRandomizer::VelocityRandomizer(std::string name, real velocity, real scope) :
+VelocityRandomizer::VelocityRandomizer(std::string name, real velocity, real scope) noexcept :
 	VelocityRandomizer(std::move(name), 0.0_r, velocity, scope)
 {
 	//Empty
 }
 
-VelocityRandomizer::VelocityRandomizer(std::string name, real min_velocity, real max_velocity, real scope) :
+VelocityRandomizer::VelocityRandomizer(std::string name, real min_velocity, real max_velocity, real scope) noexcept :
 
 	Affector{std::move(name)},
 

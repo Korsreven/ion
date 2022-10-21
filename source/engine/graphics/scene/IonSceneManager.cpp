@@ -27,7 +27,7 @@ namespace scene_manager::detail
 
 //Public
 
-SceneManager::SceneManager(std::optional<std::string> name) :
+SceneManager::SceneManager(std::optional<std::string> name) noexcept :
 	managed::ManagedObject<graph::SceneGraph>{std::move(name)}
 {
 	//Empty

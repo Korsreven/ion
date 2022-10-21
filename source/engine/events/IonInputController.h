@@ -88,8 +88,8 @@ namespace ion::events
 
 		public:
 
-			//Create input controller on top of the given system window
-			explicit InputController(graphics::render::RenderWindow &render_window) noexcept;
+			//Construct an input controller on top of the given system window
+			explicit InputController(graphics::render::RenderWindow &render_window);
 
 			//Deleted copy constructor
 			InputController(const InputController&) = delete;

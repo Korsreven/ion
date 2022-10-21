@@ -126,7 +126,7 @@ std::optional<font::GlyphTextureHandle> load_font(
 	const font::GlyphMetrices &glyph_metrics,
 	const font::GlyphMaxMetric &glyph_max_metrics,
 	font::FontGlyphFilter glyph_min_filter, font::FontGlyphFilter glyph_mag_filter,
-	GlyphTextureType glyph_texture_type) noexcept
+	GlyphTextureType glyph_texture_type)
 {
 	if (!textures::texture_manager::detail::has_support_for_array_texture())
 		glyph_texture_type = GlyphTextureType::Texture2D;
@@ -228,7 +228,7 @@ void unload_font(const font::GlyphTextureHandle &glyph_handle) noexcept
 	Events
 */
 
-bool FontManager::PrepareResource(Font &font) noexcept
+bool FontManager::PrepareResource(Font &font)
 {
 	if (FileResourceManager::PrepareResource(font))
 	{
@@ -245,7 +245,7 @@ bool FontManager::PrepareResource(Font &font) noexcept
 		return false;
 }
 
-bool FontManager::LoadResource(Font &font) noexcept
+bool FontManager::LoadResource(Font &font)
 {
 	auto &glyph_data = font.GlyphData();
 	auto &glyph_metrics = font.GlyphMetrics();

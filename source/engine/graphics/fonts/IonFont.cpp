@@ -25,7 +25,7 @@ namespace font::detail
 //Public
 
 Font::Font(std::string name, std::string asset_name, int size, int face_index,
-	int character_spacing, FontCharacterSet character_set, FontGlyphFilter min_filter, FontGlyphFilter mag_filter) :
+	int character_spacing, FontCharacterSet character_set, FontGlyphFilter min_filter, FontGlyphFilter mag_filter) noexcept :
 
 	FileResource{std::move(name), std::move(asset_name)},
 
@@ -41,7 +41,7 @@ Font::Font(std::string name, std::string asset_name, int size, int face_index,
 }
 
 Font::Font(std::string name, std::string asset_name, int size,
-	int character_spacing, FontCharacterSet character_set, FontGlyphFilter min_filter, FontGlyphFilter mag_filter) :
+	int character_spacing, FontCharacterSet character_set, FontGlyphFilter min_filter, FontGlyphFilter mag_filter) noexcept :
 
 	Font{std::move(name), std::move(asset_name), size, 0, character_spacing, character_set, min_filter, mag_filter}
 {
@@ -49,7 +49,7 @@ Font::Font(std::string name, std::string asset_name, int size,
 }
 
 Font::Font(std::string name, std::string asset_name, int size,
-	int character_spacing, FontCharacterSet character_set, FontGlyphFilter filter) :
+	int character_spacing, FontCharacterSet character_set, FontGlyphFilter filter) noexcept :
 
 	Font{std::move(name), std::move(asset_name), size, character_spacing, character_set, filter, filter}
 {
@@ -57,7 +57,7 @@ Font::Font(std::string name, std::string asset_name, int size,
 }
 
 Font::Font(std::string name, std::string asset_name, int size,
-	int character_spacing, FontCharacterSet character_set) :
+	int character_spacing, FontCharacterSet character_set) noexcept :
 
 	FileResource{std::move(name), std::move(asset_name)},
 
@@ -69,7 +69,7 @@ Font::Font(std::string name, std::string asset_name, int size,
 }
 
 Font::Font(std::string name, std::string asset_name, int size,
-	int character_spacing) :
+	int character_spacing) noexcept :
 
 	FileResource{std::move(name), std::move(asset_name)},
 

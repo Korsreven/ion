@@ -56,13 +56,13 @@ namespace ion::graphics::particles::affectors
 		public:
 
 			//Construct a new gravitation with the given name
-			explicit Gravitation(std::string name);
+			explicit Gravitation(std::string name) noexcept;
 
 			//Construct a new gravitation with the given name, position and mass
-			Gravitation(std::string name, const Vector2 &position, real mass);
+			Gravitation(std::string name, const Vector2 &position, real mass) noexcept;
 
 			//Construct a new gravitation with the given name, position, mass and a custom gravity
-			Gravitation(std::string name, const Vector2 &position, real mass, real gravity);
+			Gravitation(std::string name, const Vector2 &position, real mass, real gravity) noexcept;
 
 
 			/*

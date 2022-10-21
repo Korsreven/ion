@@ -43,7 +43,7 @@ namespace ion::graphics::textures
 			
 			//Constructs a new frame sequence with the given name and frames (textures)
 			//Duplicate frames are allowed within a frame sequence
-			FrameSequence(std::string name, const frame_sequence::detail::container_type &frames);
+			FrameSequence(std::string name, frame_sequence::detail::container_type frames) noexcept;
 
 			//Constructs a new frame sequence with the given name and frame references (textures)
 			//Duplicate frames are allowed within a frame sequence

@@ -57,7 +57,7 @@ OwningPtr<gui_control::ControlSkin> GuiGroupBox::AttuneSkin(OwningPtr<gui_contro
 //Public
 
 GuiGroupBox::GuiGroupBox(std::string name, const std::optional<Vector2> &size,
-	std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes) :
+	std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes) noexcept :
 	GuiControl{std::move(name), size, std::move(caption), {}, std::move(hit_boxes)}
 {
 	DefaultSetup();

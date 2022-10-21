@@ -48,10 +48,10 @@ namespace ion::graphics::particles
 		public:
 
 			//Construct a new particle system with the given name
-			explicit ParticleSystem(std::string name);
+			explicit ParticleSystem(std::string name) noexcept;
 
 			//Construct a new particle system with the given name and particle primitive
-			ParticleSystem(std::string name, particle_system::ParticlePrimitive particle_primitive);
+			ParticleSystem(std::string name, particle_system::ParticlePrimitive particle_primitive) noexcept;
 
 
 			/*

@@ -325,7 +325,7 @@ namespace ion::gui
 		public:
 
 			//Construct a panel with the given name
-			explicit GuiPanel(std::string name);
+			explicit GuiPanel(std::string name) noexcept;
 
 
 			/*

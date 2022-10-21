@@ -21,7 +21,7 @@ namespace ion::graphics::shaders::variables
 using namespace uniform_variable;
 
 
-UniformVariable::UniformVariable(std::string name, uniform_variable::VariableType value) :
+UniformVariable::UniformVariable(std::string name, uniform_variable::VariableType value) noexcept :
 	ShaderVariable{std::move(name)},
 	value_{std::move(value)}
 {

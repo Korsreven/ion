@@ -79,14 +79,14 @@ bool is_struct_unique(std::string_view name, const struct_binding_map &struct_bi
 
 } //shader_layout
 
-ShaderLayout::ShaderLayout(std::string name) :
+ShaderLayout::ShaderLayout(std::string name) noexcept :
 	managed::ManagedObject<ShaderProgramManager>{std::move(name)}
 {
 	//Empty
 }
 
 ShaderLayout::ShaderLayout(std::string name, shader_layout::StructBindings struct_bindings,
-	AttributeBindings attribute_bindings, UniformBindings uniform_bindings) :
+	AttributeBindings attribute_bindings, UniformBindings uniform_bindings) noexcept :
 
 	managed::ManagedObject<ShaderProgramManager>{std::move(name)},
 

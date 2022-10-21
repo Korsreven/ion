@@ -117,7 +117,7 @@ void GuiMouseCursor::UpdatePosition(Vector2 position) noexcept
 
 //Public
 
-GuiMouseCursor::GuiMouseCursor(std::string name, const std::optional<Vector2> &size) :
+GuiMouseCursor::GuiMouseCursor(std::string name, const std::optional<Vector2> &size) noexcept :
 	GuiControl{std::move(name), size}
 {
 	DefaultSetup();

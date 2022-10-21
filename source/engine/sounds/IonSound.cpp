@@ -43,7 +43,7 @@ void Sound::Removed(SoundChannel &sound_channel) noexcept
 Sound::Sound(std::string name, std::string asset_name,
 	SoundType type, SoundProcessingMode processing_mode,
 	SoundOrientationMode orientation_mode, SoundRolloffMode rolloff_mode,
-	std::optional<SoundLoopingMode> looping_mode) :
+	std::optional<SoundLoopingMode> looping_mode) noexcept :
 
 	FileResource{std::move(name), std::move(asset_name)},
 
@@ -58,7 +58,7 @@ Sound::Sound(std::string name, std::string asset_name,
 
 Sound::Sound(std::string name, std::string asset_name,
 	SoundType type, SoundProcessingMode processing_mode,
-	std::optional<SoundLoopingMode> looping_mode) :
+	std::optional<SoundLoopingMode> looping_mode) noexcept :
 
 	FileResource{std::move(name), std::move(asset_name)},
 
@@ -70,7 +70,7 @@ Sound::Sound(std::string name, std::string asset_name,
 }
 
 Sound::Sound(std::string name, std::string asset_name,
-	SoundType type, std::optional<SoundLoopingMode> looping_mode) :
+	SoundType type, std::optional<SoundLoopingMode> looping_mode) noexcept :
 
 	FileResource{std::move(name), std::move(asset_name)},
 
@@ -149,17 +149,17 @@ std::optional<std::pair<real, real>> Sound::Distance() const noexcept
 	Creating
 */
 
-NonOwningPtr<SoundChannel> Sound::Play(bool paused) noexcept
+NonOwningPtr<SoundChannel> Sound::Play(bool paused)
 {
 	return Play(Create(), paused);
 }
 
-NonOwningPtr<SoundChannel> Sound::Play(NonOwningPtr<SoundChannelGroup> sound_channel_group, bool paused) noexcept
+NonOwningPtr<SoundChannel> Sound::Play(NonOwningPtr<SoundChannelGroup> sound_channel_group, bool paused)
 {
 	return Play(Create(sound_channel_group), paused);
 }
 
-NonOwningPtr<SoundChannel> Sound::Play(NonOwningPtr<SoundChannel> sound_channel, bool paused) noexcept
+NonOwningPtr<SoundChannel> Sound::Play(NonOwningPtr<SoundChannel> sound_channel, bool paused)
 {
 	if (!sound_channel)
 		return Play(paused);

@@ -141,13 +141,13 @@ std::pair<std::optional<Vector2>, std::optional<Vector2>> RenderWindow::GetSizeC
 
 //Public
 
-RenderWindow::RenderWindow(std::string_view title,
+RenderWindow::RenderWindow(std::string title,
 	const Vector2 &size, const std::optional<Vector2> &min_size,
 	const std::optional<Vector2> &full_screen_size, const std::optional<Vector2> &position,
 	WindowDisplayMode display_mode, WindowBorderStyle border_style,
-	render_window::WindowCursor cursor, int color_depth) :
+	render_window::WindowCursor cursor, int color_depth) noexcept :
 
-	title_{title},
+	title_{std::move(title)},
 	size_{size},
 	min_size_{min_size},
 	full_screen_size_{full_screen_size},
@@ -167,24 +167,24 @@ RenderWindow::RenderWindow(std::string_view title,
 	Static window conversions
 */
 
-RenderWindow RenderWindow::Borderless(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position)
+RenderWindow RenderWindow::Borderless(std::string title, const Vector2 &size, const std::optional<Vector2> &position) noexcept
 {
-	return {title, size, {}, {}, position, WindowDisplayMode::Windowed, WindowBorderStyle::None, WindowCursor::Default};
+	return {std::move(title), size, {}, {}, position, WindowDisplayMode::Windowed, WindowBorderStyle::None, WindowCursor::Default};
 }
 
-RenderWindow RenderWindow::Dialog(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position)
+RenderWindow RenderWindow::Dialog(std::string title, const Vector2 &size, const std::optional<Vector2> &position) noexcept
 {
-	return {title, size, {}, {}, position, WindowDisplayMode::Windowed, WindowBorderStyle::Dialog, WindowCursor::Default};
+	return {std::move(title), size, {}, {}, position, WindowDisplayMode::Windowed, WindowBorderStyle::Dialog, WindowCursor::Default};
 }
 
-RenderWindow RenderWindow::NonResizable(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position)
+RenderWindow RenderWindow::NonResizable(std::string title, const Vector2 &size, const std::optional<Vector2> &position) noexcept
 {
-	return {title, size, {}, {}, position, WindowDisplayMode::Windowed, WindowBorderStyle::Single, WindowCursor::Default};
+	return {std::move(title), size, {}, {}, position, WindowDisplayMode::Windowed, WindowBorderStyle::Single, WindowCursor::Default};
 }
 
-RenderWindow RenderWindow::Resizable(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position)
+RenderWindow RenderWindow::Resizable(std::string title, const Vector2 &size, const std::optional<Vector2> &position) noexcept
 {
-	return {title, size, {}, {}, position, WindowDisplayMode::Windowed, WindowBorderStyle::Sizeable, WindowCursor::Default};
+	return {std::move(title), size, {}, {}, position, WindowDisplayMode::Windowed, WindowBorderStyle::Sizeable, WindowCursor::Default};
 }
 
 

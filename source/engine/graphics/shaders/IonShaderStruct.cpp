@@ -74,7 +74,7 @@ void ShaderStruct::Removed(variables::UniformVariable &uniform_variable) noexcep
 
 //Public
 
-ShaderStruct::ShaderStruct(std::string name, int size) :
+ShaderStruct::ShaderStruct(std::string name, int size) noexcept :
 	
 	managed::ManagedObject<ShaderProgram>{std::move(name)},
 	size_{size > 0 ? size : 1}

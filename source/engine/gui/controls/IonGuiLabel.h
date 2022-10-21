@@ -54,7 +54,7 @@ namespace ion::gui::controls
 
 			//Construct a label with the given name, size, caption and hit boxes
 			GuiLabel(std::string name, const std::optional<Vector2> &size,
-				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {});
+				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
 			//Construct a label with the given name, skin, size, caption and hit boxes
 			GuiLabel(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,

@@ -123,11 +123,11 @@ namespace ion::graphics::render
 
 			//Construct a new frustum with the given clip plane bounds
 			Frustum(const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance,
-				const std::optional<real> &aspect_ratio, frustum::AspectRatioFormat aspect_format);
+				const std::optional<real> &aspect_ratio, frustum::AspectRatioFormat aspect_format) noexcept;
 
 			//Construct a new frustum with the given clip plane bounds, field of view and aspect ratio
 			Frustum(frustum::ProjectionType projection, const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance,
-				real field_of_view, const std::optional<real> &aspect_ratio, frustum::AspectRatioFormat aspect_format);
+				real field_of_view, const std::optional<real> &aspect_ratio, frustum::AspectRatioFormat aspect_format) noexcept;
 
 
 			/*

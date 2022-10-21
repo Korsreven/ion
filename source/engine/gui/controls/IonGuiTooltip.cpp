@@ -335,7 +335,7 @@ void GuiTooltip::UpdatePhaseDuration() noexcept
 
 //Public
 
-GuiTooltip::GuiTooltip(std::string name, const std::optional<Vector2> &size, std::optional<std::string> text) :
+GuiTooltip::GuiTooltip(std::string name, const std::optional<Vector2> &size, std::optional<std::string> text) noexcept :
 
 	GuiLabel{std::move(name), size, std::move(text)},
 	auto_size_{!size}

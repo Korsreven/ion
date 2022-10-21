@@ -50,19 +50,19 @@ void RenderTarget::SwapBuffers() noexcept
 	Creating
 */
 
-NonOwningPtr<Viewport> RenderTarget::CreateViewport(std::string name, RenderTarget &render_target) noexcept
+NonOwningPtr<Viewport> RenderTarget::CreateViewport(std::string name, RenderTarget &render_target)
 {
 	return Create(std::move(name), render_target);
 }
 
-NonOwningPtr<Viewport> RenderTarget::CreateViewport(std::string name, RenderTarget &render_target, const Aabb &bounds) noexcept
+NonOwningPtr<Viewport> RenderTarget::CreateViewport(std::string name, RenderTarget &render_target, const Aabb &bounds)
 {
 	return Create(std::move(name), render_target, bounds);
 }
 
 NonOwningPtr<Viewport> RenderTarget::CreateViewport(std::string name, RenderTarget &render_target, const Aabb &bounds,
 	viewport::HorizontalAnchorType left_anchor, viewport::HorizontalAnchorType right_anchor,
-	viewport::VerticalAnchorType top_anchor, viewport::VerticalAnchorType bottom_anchor) noexcept
+	viewport::VerticalAnchorType top_anchor, viewport::VerticalAnchorType bottom_anchor)
 {
 	return Create(std::move(name), render_target, bounds,
 				  left_anchor, right_anchor, top_anchor, bottom_anchor);

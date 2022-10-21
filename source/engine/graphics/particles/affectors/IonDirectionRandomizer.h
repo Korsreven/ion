@@ -52,10 +52,10 @@ namespace ion::graphics::particles::affectors
 		public:
 
 			//Construct a new direction randomizer with the given name
-			explicit DirectionRandomizer(std::string name);
+			explicit DirectionRandomizer(std::string name) noexcept;
 
 			//Construct a new direction randomizer with the given name, angle and scope
-			DirectionRandomizer(std::string name, real angle, real scope);
+			DirectionRandomizer(std::string name, real angle, real scope) noexcept;
 
 
 			/*

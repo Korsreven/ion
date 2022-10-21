@@ -65,19 +65,19 @@ void SineForce::DoAffect(affector::detail::particle_range particles, duration ti
 
 //Public
 
-SineForce::SineForce(std::string name) :
+SineForce::SineForce(std::string name) noexcept :
 	Affector{std::move(name)}
 {
 	//Empty
 }
 
-SineForce::SineForce(std::string name, ForceType type, const Vector2 &force, real frequency) :
+SineForce::SineForce(std::string name, ForceType type, const Vector2 &force, real frequency) noexcept :
 	SineForce(std::move(name), type, force, frequency, frequency)
 {
 	//Empty
 }
 
-SineForce::SineForce(std::string name, ForceType type, const Vector2 &force, real min_frequency, real max_frequency) :
+SineForce::SineForce(std::string name, ForceType type, const Vector2 &force, real min_frequency, real max_frequency) noexcept :
 
 	Affector{std::move(name)},
 

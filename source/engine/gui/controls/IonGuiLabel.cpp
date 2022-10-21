@@ -53,7 +53,7 @@ OwningPtr<gui_control::ControlSkin> GuiLabel::AttuneSkin(OwningPtr<gui_control::
 //Public
 
 GuiLabel::GuiLabel(std::string name, const std::optional<Vector2> &size,
-	std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes) :
+	std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes) noexcept :
 	GuiControl{std::move(name), size, std::move(caption), {}, std::move(hit_boxes)}
 {
 	DefaultSetup();

@@ -207,28 +207,28 @@ Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const Vertices &verti
 }
 
 
-Mesh::Mesh(render_primitive::VertexContainer vertex_data, bool visible) :
+Mesh::Mesh(render_primitive::VertexContainer vertex_data, bool visible) noexcept :
 	Mesh{vertex::vertex_batch::VertexDrawMode::Triangles, std::move(vertex_data), visible}
 {
 	//Empty
 }
 
 Mesh::Mesh(render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
-	MeshTexCoordMode tex_coord_mode, bool visible) :
+	MeshTexCoordMode tex_coord_mode, bool visible) noexcept :
 
 	Mesh{vertex::vertex_batch::VertexDrawMode::Triangles, std::move(vertex_data), material, tex_coord_mode, visible}
 {
 	//Empty
 }
 
-Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, bool visible) :
+Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, bool visible) noexcept :
 	RenderPrimitive{draw_mode, detail::get_vertex_declaration(), visible}
 {
 	VertexData(std::move(vertex_data));
 }
 
 Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
-	MeshTexCoordMode tex_coord_mode, bool visible) :
+	MeshTexCoordMode tex_coord_mode, bool visible) noexcept :
 
 	RenderPrimitive{draw_mode, detail::get_vertex_declaration(), visible},
 	tex_coord_mode_{tex_coord_mode}

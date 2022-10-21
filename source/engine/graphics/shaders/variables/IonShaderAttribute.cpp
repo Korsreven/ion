@@ -18,7 +18,7 @@ namespace ion::graphics::shaders::variables
 using namespace attribute_variable;
 
 
-AttributeVariable::AttributeVariable(std::string name, attribute_variable::VariableType value) :
+AttributeVariable::AttributeVariable(std::string name, attribute_variable::VariableType value) noexcept :
 	ShaderVariable{std::move(name)},
 	value_{std::move(value)}
 {

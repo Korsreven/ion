@@ -162,7 +162,7 @@ namespace ion::graphics::scene::graph
 		public:
 
 			//Construct a scene graph with the given name and whether or not is should be enabled
-			explicit SceneGraph(std::optional<std::string> name = {}, bool enabled = true);
+			explicit SceneGraph(std::optional<std::string> name = {}, bool enabled = true) noexcept;
 
 			//Deleted copy constructor
 			SceneGraph(const SceneGraph&) = delete;
@@ -389,7 +389,7 @@ namespace ion::graphics::scene::graph
 			*/
 
 			//Create a scene manager with the given name
-			NonOwningPtr<SceneManager> CreateSceneManager(std::optional<std::string> name = {}) noexcept;
+			NonOwningPtr<SceneManager> CreateSceneManager(std::optional<std::string> name = {});
 
 
 			/*
