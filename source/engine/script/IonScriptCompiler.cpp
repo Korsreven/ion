@@ -720,11 +720,11 @@ bool check_operator_syntax(lexical_token &token, syntax_context &context, Compil
 				{
 					//Previous token is always available here
 					if (context.previous_token &&
-						context.previous_token->name == token_name::BinaryOperator ||
+						(context.previous_token->name == token_name::BinaryOperator ||
 						(context.previous_token->name == token_name::Separator &&
 							(context.previous_token->value.front() == ':' ||
 							context.previous_token->value.front() == '(' ||
-							context.previous_token->value.front() == ',')))
+							context.previous_token->value.front() == ','))))
 							
 								return token_name::UnaryOperator;
 			
