@@ -63,20 +63,6 @@ namespace ion::graphics::scene::query
 			//Constructs a new scene query with the given scene graph
 			IntersectionSceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept;
 
-
-			/*
-				Modifiers
-			*/
-
-
-
-
-			/*
-				Observers
-			*/
-
-
-
 			
 			/*
 				Querying

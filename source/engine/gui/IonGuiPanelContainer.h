@@ -166,13 +166,6 @@ namespace ion::gui
 
 
 			/*
-				Modifiers
-			*/
-
-
-
-
-			/*
 				Observers
 			*/
 

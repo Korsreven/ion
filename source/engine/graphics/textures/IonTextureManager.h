@@ -350,7 +350,6 @@ namespace ion::graphics::textures
 				Observers
 			*/
 
-
 			//Returns the texture scale used by this manager when converting from NPOT to POT
 			//Returns nullopt if NPOT textures should not be scaled to POT
 			[[nodiscard]] inline auto& TextureNpotScale() const noexcept

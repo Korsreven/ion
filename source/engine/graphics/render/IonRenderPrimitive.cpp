@@ -441,6 +441,7 @@ RenderPrimitive::~RenderPrimitive() noexcept
 		parent_renderer_->RemovePrimitive(*this);
 }
 
+
 /*
 	Modifiers
 */

@@ -337,6 +337,7 @@ void Animation::Direction(PlaybackDirection direction) noexcept
 	}
 }
 
+
 /*
 	Observers
 */

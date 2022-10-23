@@ -77,20 +77,6 @@ namespace ion::gui
 
 
 			/*
-				Modifiers
-			*/
-
-
-
-
-			/*
-				Observers
-			*/
-
-
-
-
-			/*
 				Components
 				Creating
 			*/

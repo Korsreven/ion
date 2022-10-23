@@ -49,13 +49,6 @@ MovableSoundListener::MovableSoundListener(std::optional<std::string> name, cons
 
 
 /*
-	Modifiers
-*/
-
-
-
-
-/*
 	Elapse time
 */
 

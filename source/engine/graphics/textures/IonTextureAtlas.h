@@ -59,13 +59,6 @@ namespace ion::graphics::textures
 
 
 			/*
-				Modifiers
-			*/
-
-
-
-
-			/*
 				Observers
 			*/
 

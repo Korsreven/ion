@@ -144,13 +144,6 @@ namespace ion::gui::controls
 
 			//Clears all of the added actions on this button
 			void ClearActions() noexcept;
-
-
-			/*
-				Observers
-			*/
-
-
 	};
 
 } //ion::gui::controls
