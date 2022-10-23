@@ -221,64 +221,64 @@ namespace ion::graphics::materials
 			}
 
 
-			//Attach the given animation as a diffuse map for the material
+			//Attaches the given animation as a diffuse map for the material
 			inline void DiffuseMap(NonOwningPtr<Animation> animation) noexcept
 			{
 				diffuse_map_ = animation;
 			}
 
-			//Attach the given texture as a diffuse map for the material
+			//Attaches the given texture as a diffuse map for the material
 			inline void DiffuseMap(NonOwningPtr<Texture> texture) noexcept
 			{
 				diffuse_map_ = texture;
 			}
 
-			//Detach the diffuse map from the material
+			//Detaches the diffuse map from the material
 			inline void DiffuseMap(std::nullptr_t) noexcept
 			{
 				diffuse_map_ = std::monostate{};
 			}
 
 
-			//Attach the given animation as a normal map for the material
+			//Attaches the given animation as a normal map for the material
 			inline void NormalMap(NonOwningPtr<Animation> animation) noexcept
 			{
 				normal_map_ = animation;
 			}
 
-			//Attach the given texture as a normal map for the material
+			//Attaches the given texture as a normal map for the material
 			inline void NormalMap(NonOwningPtr<Texture> texture) noexcept
 			{
 				normal_map_ = texture;
 			}
 
-			//Detach the normal map from the material
+			//Detaches the normal map from the material
 			inline void NormalMap(std::nullptr_t) noexcept
 			{
 				normal_map_ = std::monostate{};
 			}
 
 
-			//Attach the given animation as a specular map for the material
+			//Attaches the given animation as a specular map for the material
 			inline void SpecularMap(NonOwningPtr<Animation> animation) noexcept
 			{
 				specular_map_ = animation;
 			}
 
-			//Attach the given texture as a specular map for the material
+			//Attaches the given texture as a specular map for the material
 			inline void SpecularMap(NonOwningPtr<Texture> texture) noexcept
 			{
 				specular_map_ = texture;
 			}
 
-			//Detach the specular map from the material
+			//Detaches the specular map from the material
 			inline void SpecularMap(std::nullptr_t) noexcept
 			{
 				specular_map_ = std::monostate{};
 			}
 
 
-			//Attach the given animation as a emissive map for the material
+			//Attaches the given animation as a emissive map for the material
 			inline void EmissiveMap(NonOwningPtr<Animation> animation) noexcept
 			{
 				if (emissive_map_.index() == 0 && animation && emissive_color_ == color::Black)
@@ -287,7 +287,7 @@ namespace ion::graphics::materials
 				emissive_map_ = animation;
 			}
 
-			//Attach the given texture as a emissive map for the material
+			//Attaches the given texture as a emissive map for the material
 			inline void EmissiveMap(NonOwningPtr<Texture> texture) noexcept
 			{
 				if (emissive_map_.index() == 0 && texture && emissive_color_ == color::Black)
@@ -296,7 +296,7 @@ namespace ion::graphics::materials
 				emissive_map_ = texture;
 			}
 
-			//Detach the emissive map from the material
+			//Detaches the emissive map from the material
 			inline void EmissiveMap(std::nullptr_t) noexcept
 			{
 				if (emissive_map_.index() > 0 && emissive_color_ == color::White)

@@ -238,11 +238,11 @@ namespace ion::script::interfaces
 				Creating from script
 			*/
 
-			//Create gui from a script (or object file) with the given asset name
+			//Creates gui from a script (or object file) with the given asset name
 			void CreateGui(std::string_view asset_name, gui::GuiController &gui_controller,
 				graphics::scene::SceneManager &scene_manager);
 
-			//Create gui from a script (or object file) with the given asset name
+			//Creates gui from a script (or object file) with the given asset name
 			void CreateGui(std::string_view asset_name, gui::GuiController &gui_controller,
 				graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 	};

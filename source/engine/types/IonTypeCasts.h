@@ -23,7 +23,7 @@ namespace ion::types
 		Safe type cast
 	*/
 
-	//Safely cast from one type to another
+	//Casts (safely) from one type to another
 	//In debug it will assert that the value will remain the same
 	//In release it will just do a static_cast to be efficient
 	template <typename To, typename From>
@@ -73,7 +73,7 @@ namespace ion::types
 		Safe integral signedness cast
 	*/
 
-	//Safely cast from unsigned to signed integral type
+	//Casts (safely) from unsigned to signed integral type
 	//In debug it will assert that the value will remain the same
 	//In release it will just do a static_cast to be efficient
 	template <typename T>
@@ -84,7 +84,7 @@ namespace ion::types
 		return static_cast<std::make_signed_t<T>>(value);
 	}
 
-	//Safely cast from signed to unsigned integral type
+	//Casts (safely) from signed to unsigned integral type
 	//In debug it will assert that the value will remain the same
 	//In release it will just do a static_cast to be efficient
 	template <typename T>

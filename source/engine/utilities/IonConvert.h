@@ -198,7 +198,6 @@ namespace ion::utilities::convert
 
 		//String to number conversions
 		//Tries to convert the entire string
-
 		template <typename T>
 		inline auto entire_string_to_number(std::string_view str) noexcept
 		{
@@ -214,7 +213,6 @@ namespace ion::utilities::convert
 
 		//String to number conversions
 		//Tries to convert the first part of the string
-
 		template <typename T>
 		inline auto first_part_of_string_to_number(std::string_view str) noexcept
 		{
@@ -229,7 +227,6 @@ namespace ion::utilities::convert
 
 		//String to number conversions
 		//Tries to convert the first numeric part of the string
-
 		template <typename T>
 		inline auto first_numeric_part_to_number(std::string_view str) noexcept
 		{
@@ -255,7 +252,6 @@ namespace ion::utilities::convert
 
 
 		//Number to string conversions (general)
-
 		template <typename T>
 		inline auto number_to_string(T x)
 		{
@@ -266,7 +262,6 @@ namespace ion::utilities::convert
 		}
 
 		//Floating point to string conversions (fixed)
-
 		template <typename T>
 		inline auto floating_point_to_string(T x, std::optional<int> precision)
 		{

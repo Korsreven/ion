@@ -81,12 +81,12 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a scroll bar with the given name, size, caption, type and hit boxes
+			//Constructs a scroll bar with the given name, size, caption, type and hit boxes
 			GuiScrollBar(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_slider::SliderType type = gui_slider::SliderType::Vertical,
 				gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Construct a scroll bar with the given name, skin, size, caption, type and hit boxes
+			//Constructs a scroll bar with the given name, skin, size, caption, type and hit boxes
 			GuiScrollBar(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_slider::SliderType type = gui_slider::SliderType::Vertical,
 				gui_control::BoundingBoxes hit_boxes = {});

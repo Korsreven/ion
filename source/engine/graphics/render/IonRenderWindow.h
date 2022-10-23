@@ -150,7 +150,7 @@ namespace ion::graphics::render
 			//Default constructor
 			RenderWindow() = default;
 
-			//Construct a new window with the given arguments
+			//Constructs a new window with the given arguments
 			RenderWindow(std::string title,
 				const Vector2 &size, const std::optional<Vector2> &min_size,
 				const std::optional<Vector2> &full_screen_size, const std::optional<Vector2> &position,
@@ -200,39 +200,39 @@ namespace ion::graphics::render
 				Events
 			*/
 
-			//Return a mutable reference to the window events of this render window
+			//Returns a mutable reference to the window events of this render window
 			[[nodiscard]] inline auto& Events() noexcept
 			{
 				return static_cast<WindowEventsBase&>(*this);
 			}
 
-			//Return an immutable reference to the window events of this render window
+			//Returns an immutable reference to the window events of this render window
 			[[nodiscard]] inline auto& Events() const noexcept
 			{
 				return static_cast<const WindowEventsBase&>(*this);
 			}
 
 
-			//Return a mutable reference to the render target events of this render window
+			//Returns a mutable reference to the render target events of this render window
 			[[nodiscard]] inline auto& RenderTargetEvents() noexcept
 			{
 				return static_cast<RenderTargetEventsBase&>(*this);
 			}
 
-			//Return an immutable reference to the render target events of this render window
+			//Returns an immutable reference to the render target events of this render window
 			[[nodiscard]] inline auto& RenderTargetEvents() const noexcept
 			{
 				return static_cast<const RenderTargetEventsBase&>(*this);
 			}
 
 
-			//Return a mutable reference to the message events of this render window
+			//Returns a mutable reference to the message events of this render window
 			[[nodiscard]] inline auto& MessageEvents() noexcept
 			{
 				return static_cast<MessageEventsBase&>(*this);
 			}
 
-			//Return an immutable reference to the message events of this render window
+			//Returns an immutable reference to the message events of this render window
 			[[nodiscard]] inline auto& MessageEvents() const noexcept
 			{
 				return static_cast<const MessageEventsBase&>(*this);

@@ -120,18 +120,18 @@ namespace ion::graphics::utilities
 				Rotating
 			*/
 
-			//Rotate ray by the given angle (radians)
+			//Rotates ray by the given angle (radians)
 			Ray& Rotate(real angle) noexcept;
 
-			//Rotate ray by the given angle (radians)
+			//Rotates ray by the given angle (radians)
 			//Returns the result as a copy
 			[[nodiscard]] Ray RotateCopy(real angle) const noexcept;
 
 
-			//Rotate ray by the given angle (radians) and origin vector
+			//Rotates ray by the given angle (radians) and origin vector
 			Ray& Rotate(real angle, const Vector2 &origin) noexcept;
 
-			//Rotate ray by the given angle (radians) and origin vector
+			//Rotates ray by the given angle (radians) and origin vector
 			//Returns the result as a copy
 			[[nodiscard]] Ray RotateCopy(real angle, const Vector2 &origin) const noexcept;
 
@@ -140,10 +140,10 @@ namespace ion::graphics::utilities
 				Transforming
 			*/
 
-			//Transform ray based on the given matrix
+			//Transforms ray based on the given matrix
 			Ray& Transform(const Matrix3 &matrix) noexcept;
 
-			//Transform ray based on the given matrix
+			//Transforms ray based on the given matrix
 			//Returns the result as a copy
 			[[nodiscard]] Ray TransformCopy(const Matrix3 &matrix) const noexcept;
 
@@ -152,10 +152,10 @@ namespace ion::graphics::utilities
 				Translating
 			*/
 
-			//Translate ray by the given vector
+			//Translates ray by the given vector
 			Ray& Translate(const Vector2 &vector) noexcept;
 
-			//Translate ray by the given vector
+			//Translates ray by the given vector
 			//Returns the result as a copy
 			[[nodiscard]] Ray TranslateCopy(const Vector2 &vector) const noexcept;
 	};

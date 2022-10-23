@@ -126,7 +126,7 @@ namespace ion::graphics::utilities
 			}
 
 
-			//Negate matrix (negating each number)
+			//Negates matrix (negating each number)
 			[[nodiscard]] inline auto operator-() const noexcept
 			{
 				return Matrix4{-m_[0][0], -m_[0][1], -m_[0][2], -m_[0][3],
@@ -140,7 +140,7 @@ namespace ion::graphics::utilities
 				Adding
 			*/
 
-			//Add two matrices (adding each number)
+			//Adds two matrices (adding each number)
 			[[nodiscard]] inline auto operator+(const Matrix4 &rhs) const noexcept
 			{
 				return Matrix4{m_[0][0] + rhs.m_[0][0], m_[0][1] + rhs.m_[0][1], m_[0][2] + rhs.m_[0][2], m_[0][3] + rhs.m_[0][3],
@@ -149,7 +149,7 @@ namespace ion::graphics::utilities
 							   m_[3][0] + rhs.m_[3][0], m_[3][1] + rhs.m_[3][1], m_[3][2] + rhs.m_[3][2], m_[3][3] + rhs.m_[3][3]};
 			}
 
-			//Add all numbers to the given scalar
+			//Adds all numbers to the given scalar
 			[[nodiscard]] inline auto operator+(real scalar) const noexcept
 			{
 				return Matrix4{m_[0][0] + scalar, m_[0][1] + scalar, m_[0][2] + scalar, m_[0][3] + scalar,
@@ -158,19 +158,19 @@ namespace ion::graphics::utilities
 							   m_[3][0] + scalar, m_[3][1] + scalar, m_[3][2] + scalar, m_[3][3] + scalar};
 			}
 
-			//Add all numbers to the given scalar
+			//Adds all numbers to the given scalar
 			[[nodiscard]] friend inline auto operator+(real scalar, const Matrix4 &rhs) noexcept
 			{
 				return rhs + scalar; //Commutative
 			}
 
-			//Add two matrices (adding each number)
+			//Adds two matrices (adding each number)
 			inline auto& operator+=(const Matrix4 &rhs) noexcept
 			{
 				return *this = *this + rhs;
 			}
 
-			//Add all numbers to the given scalar
+			//Adds all numbers to the given scalar
 			inline auto& operator+=(real scalar) noexcept
 			{
 				return *this = *this + scalar;
@@ -181,7 +181,7 @@ namespace ion::graphics::utilities
 				Subtracting
 			*/
 
-			//Subtract two matrices (subtracting each number)
+			//Subtracts two matrices (subtracting each number)
 			[[nodiscard]] inline auto operator-(const Matrix4 &rhs) const noexcept
 			{
 				return Matrix4{m_[0][0] - rhs.m_[0][0], m_[0][1] - rhs.m_[0][1], m_[0][2] - rhs.m_[0][2], m_[0][3] - rhs.m_[0][3],
@@ -190,7 +190,7 @@ namespace ion::graphics::utilities
 							   m_[3][0] - rhs.m_[3][0], m_[3][1] - rhs.m_[3][1], m_[3][2] - rhs.m_[3][2], m_[3][3] - rhs.m_[3][3]};
 			}
 
-			//Subtract all numbers with the given scalar
+			//Subtracts all numbers with the given scalar
 			[[nodiscard]] inline auto operator-(real scalar) const noexcept
 			{
 				return Matrix4{m_[0][0] - scalar, m_[0][1] - scalar, m_[0][2] - scalar, m_[0][3] - scalar,
@@ -199,7 +199,7 @@ namespace ion::graphics::utilities
 							   m_[3][0] - scalar, m_[3][1] - scalar, m_[3][2] - scalar, m_[3][3] - scalar};
 			}
 
-			//Subtract all numbers with the given scalar
+			//Subtracts all numbers with the given scalar
 			[[nodiscard]] friend inline auto operator-(real scalar, const Matrix4 &rhs) noexcept
 			{
 				return Matrix4{scalar - rhs.m_[0][0], scalar - rhs.m_[0][1], scalar - rhs.m_[0][2], scalar - rhs.m_[0][3],
@@ -208,13 +208,13 @@ namespace ion::graphics::utilities
 							   scalar - rhs.m_[3][0], scalar - rhs.m_[3][1], scalar - rhs.m_[3][2], scalar - rhs.m_[3][3]};
 			}
 
-			//Subtract two matrices (subtracting each number)
+			//Subtracts two matrices (subtracting each number)
 			inline auto& operator-=(const Matrix4 &rhs) noexcept
 			{
 				return *this = *this - rhs;
 			}
 
-			//Subtract all numbers with the given scalar
+			//Subtracts all numbers with the given scalar
 			inline auto& operator-=(real scalar) noexcept
 			{
 				return *this = *this - scalar;
@@ -225,7 +225,7 @@ namespace ion::graphics::utilities
 				Multiplying
 			*/
 
-			//Multiply two matrices (matrix multiplication)
+			//Muliplies two matrices (matrix multiplication)
 			[[nodiscard]] inline auto operator*(const Matrix4 &rhs) const noexcept
 			{
 				#ifdef ION_ROW_MAJOR
@@ -273,7 +273,7 @@ namespace ion::graphics::utilities
 				#endif
 			}
 
-			//Multiply all numbers with the given scalar
+			//Muliplies all numbers with the given scalar
 			[[nodiscard]] inline auto operator*(real scalar) const noexcept
 			{
 				return Matrix4{m_[0][0] * scalar, m_[0][1] * scalar, m_[0][2] * scalar, m_[0][3] * scalar,
@@ -282,7 +282,7 @@ namespace ion::graphics::utilities
 							   m_[3][0] * scalar, m_[3][1] * scalar, m_[3][2] * scalar, m_[3][3] * scalar};
 			}
 
-			//Multiply matrix with the given vector
+			//Muliplies matrix with the given vector
 			//This operation results in a vector
 			[[nodiscard]] inline auto operator*(const Vector3 &vector) const noexcept
 			{
@@ -303,19 +303,19 @@ namespace ion::graphics::utilities
 				#endif
 			}
 
-			//Multiply all numbers with the given scalar
+			//Muliplies all numbers with the given scalar
 			[[nodiscard]] friend inline auto operator*(real scalar, const Matrix4 &rhs) noexcept
 			{
 				return rhs * scalar; //Commutative
 			}
 
-			//Multiply two matrices (matrix multiplication)
+			//Muliplies two matrices (matrix multiplication)
 			inline auto& operator*=(const Matrix4 &rhs) noexcept
 			{
 				return *this = *this * rhs;
 			}
 
-			//Multiply all numbers with the given scalar
+			//Muliplies all numbers with the given scalar
 			inline auto& operator*=(real scalar) noexcept
 			{
 				return *this = *this * scalar;
@@ -582,10 +582,10 @@ namespace ion::graphics::utilities
 				Affine
 			*/
 
-			//Make matrix an affine matrix
+			//Makes matrix an affine matrix
 			Matrix4& Affine() noexcept;
 
-			//Make matrix an affine matrix
+			//Makes matrix an affine matrix
 			//Returns the result as a copy
 			[[nodiscard]] Matrix4 AffineCopy() const noexcept;
 
@@ -597,21 +597,21 @@ namespace ion::graphics::utilities
 				Concatenating
 			*/
 
-			//Concatenate this matrix with the given matrix
+			//Concatenates this matrix with the given matrix
 			//This is the same as matrix multiplication
 			Matrix4& Concatenate(const Matrix4 &matrix) noexcept;
 
-			//Concatenate this matrix with the given matrix
+			//Concatenates this matrix with the given matrix
 			//This is the same as matrix multiplication
 			//Returns the result as a copy
 			[[nodiscard]] Matrix4 ConcatenateCopy(const Matrix4 &matrix) const noexcept;
 
 
-			//Concatenate this affine matrix with the given affine matrix
+			//Concatenates this affine matrix with the given affine matrix
 			//This uses a faster version of matrix multiplication
 			Matrix4& ConcatenateAffine(const Matrix4 &matrix) noexcept;
 
-			//Concatenate this affine matrix with the given affine matrix
+			//Concatenates this affine matrix with the given affine matrix
 			//This uses a faster version of matrix multiplication
 			//Returns the result as a copy
 			[[nodiscard]] Matrix4 ConcatenateAffineCopy(const Matrix4 &matrix) const noexcept;
@@ -621,10 +621,10 @@ namespace ion::graphics::utilities
 				Cofactoring
 			*/
 
-			//Make matrix a cofactor matrix
+			//Makes matrix a cofactor matrix
 			Matrix4& Cofactor() noexcept;
 
-			//Make matrix a cofactor matrix
+			//Makes matrix a cofactor matrix
 			//Returns the result as a copy
 			[[nodiscard]] Matrix4 CofactorCopy() const noexcept;
 
@@ -663,10 +663,10 @@ namespace ion::graphics::utilities
 				Rotating
 			*/
 
-			//Rotate matrix by the given angle (radians)
+			//Rotates matrix by the given angle (radians)
 			Matrix4& Rotate(real angle) noexcept;
 
-			//Rotate matrix by the given angle (radians)
+			//Rotates matrix by the given angle (radians)
 			//Returns the result as a copy
 			[[nodiscard]] Matrix4 RotateCopy(real angle) const noexcept;
 
@@ -675,10 +675,10 @@ namespace ion::graphics::utilities
 				Scaling
 			*/
 
-			//Scale matrix by the given vector
+			//Scales matrix by the given vector
 			Matrix4& Scale(const Vector3 &vector) noexcept;
 
-			//Scale matrix by the given vector
+			//Scales matrix by the given vector
 			//Returns the result as a copy
 			[[nodiscard]] Matrix4 ScaleCopy(const Vector3 &vector) const noexcept;
 
@@ -699,7 +699,7 @@ namespace ion::graphics::utilities
 				Transforming
 			*/
 
-			//Transform the given point based on matrix
+			//Transforms the given point based on matrix
 			[[nodiscard]] Vector3 TransformPoint(const Vector3 &point) const noexcept;
 
 
@@ -707,10 +707,10 @@ namespace ion::graphics::utilities
 				Translating
 			*/
 
-			//Translate matrix by the given vector
+			//Translates matrix by the given vector
 			Matrix4& Translate(const Vector3 &vector) noexcept;
 
-			//Translate matrix by the given vector
+			//Translates matrix by the given vector
 			//Returns the result as a copy
 			[[nodiscard]] Matrix4 TranslateCopy(const Vector3 &vector) const noexcept;
 

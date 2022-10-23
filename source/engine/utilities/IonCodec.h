@@ -367,7 +367,7 @@ namespace ion::utilities::codec
 		Base 2-36 (radix)
 	*/
 
-	//Encode a number (base 10) to a given base in range [2, 36]
+	//Encodes a number (base 10) to a given base in range [2, 36]
 	template <typename T>
 	[[nodiscard]] inline auto EncodeTo(T value, int base)
 	{
@@ -382,7 +382,7 @@ namespace ion::utilities::codec
 		Base 2-36 (radix)
 	*/
 
-	//Decode a string from a given base in range [2, 36] to a number (base 10)
+	//Decodes a string from a given base in range [2, 36] to a number (base 10)
 	template <typename T>
 	[[nodiscard]] inline auto DecodeFrom(std::string_view str, int base)
 	{
@@ -397,36 +397,36 @@ namespace ion::utilities::codec
 		Base 16/32/64
 	*/
 
-	//Encode a string to base16 (hexadecimal)
+	//Encodes a string to base16 (hexadecimal)
 	//Letters a-f, are returned in lower case
 	[[nodiscard]] std::string EncodeToHex(std::string_view str);
 
 
-	//Encode a string to base32
+	//Encodes a string to base32
 	//Letters A-Z, are returned in upper case
 	//Result is not padded
 	[[nodiscard]] std::string EncodeToBase32(std::string_view str);
 
-	//Encode a string to base32
+	//Encodes a string to base32
 	//Letters A-Z, are returned in upper case
 	//Result is padded with the given padding character
 	[[nodiscard]] std::string EncodeToBase32(std::string_view str, char padding_character);
 
 
-	//Encode a string to base64
+	//Encodes a string to base64
 	//Result is not padded
 	[[nodiscard]] std::string EncodeToBase64(std::string_view str);
 
-	//Encode a string to base64
+	//Encodes a string to base64
 	//Result is padded with the given padding character
 	[[nodiscard]] std::string EncodeToBase64(std::string_view str, char padding_character);
 
-	//Encode a string to base64 URL
+	//Encodes a string to base64 URL
 	//Safe variant for URLs and filenames
 	//Result is not padded
 	[[nodiscard]] std::string EncodeToBase64_URL(std::string_view str);
 
-	//Encode a string to base64 URL
+	//Encodes a string to base64 URL
 	//Safe variant for URLs and filenames
 	//Result is padded with the given padding character
 	[[nodiscard]] std::string EncodeToBase64_URL(std::string_view str, char padding_character);
@@ -437,19 +437,19 @@ namespace ion::utilities::codec
 		Base 16/32/64
 	*/
 
-	//Decode a string from base16 (hexadecimal)
+	//Decodes a string from base16 (hexadecimal)
 	//Note that letters are case insensitive
 	[[nodiscard]] std::optional<std::string> DecodeFromHex(std::string_view str);
 
-	//Decode a string from base32
+	//Decodes a string from base32
 	//Note that letters are case insensitive
 	[[nodiscard]] std::optional<std::string> DecodeFromBase32(std::string_view str);
 
-	//Decode a string from base64
+	//Decodes a string from base64
 	//Note that letters are case sensitive
 	[[nodiscard]] std::optional<std::string> DecodeFromBase64(std::string_view str);
 
-	//Decode a string from base64 URL
+	//Decodes a string from base64 URL
 	//Safe variant for URLs and filenames
 	//Note that letters are case sensitive
 	[[nodiscard]] std::optional<std::string> DecodeFromBase64_URL(std::string_view str);

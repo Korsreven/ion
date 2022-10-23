@@ -128,7 +128,7 @@ namespace ion::timers
 				Elapse time
 			*/
 
-			//Elapse timer by the given time in seconds
+			//Elapses timer by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 

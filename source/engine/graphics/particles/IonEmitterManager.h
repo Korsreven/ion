@@ -75,16 +75,16 @@ namespace ion::graphics::particles
 				Creating
 			*/
 
-			//Create an emitter with the given name
+			//Creates an emitter with the given name
 			NonOwningPtr<Emitter> CreateEmitter(std::string name);
 
-			//Create an emitter with the given name and initial values
+			//Creates an emitter with the given name and initial values
 			NonOwningPtr<Emitter> CreateEmitter(std::string name, emitter::EmitterType type, const Vector2 &position, const Vector2 &direction,
 				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 				std::optional<duration> emission_duration, int particle_quota = 100);
 
 
-			//Create an emitter by moving the given emitter
+			//Creates an emitter by moving the given emitter
 			NonOwningPtr<Emitter> CreateEmitter(Emitter &&emitter);
 
 
@@ -107,10 +107,10 @@ namespace ion::graphics::particles
 				Removing
 			*/
 
-			//Clear all emitters from this manager
+			//Clears all emitters from this manager
 			void ClearEmitters() noexcept;
 
-			//Remove an emitter from this manager
+			//Removes an emitter from this manager
 			bool RemoveEmitter(Emitter &Emitter) noexcept;
 	};
 } //ion::graphics::particles

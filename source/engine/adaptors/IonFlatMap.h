@@ -49,7 +49,7 @@ namespace ion::adaptors
 			Element access
 		*/
 
-		//Return a mutable reference to the mapped type for the given key
+		//Returns a mutable reference to the mapped type for the given key
 		//If key does not exist insert it to the map with a default constructed mapped type
 		[[nodiscard]] inline auto& operator[](const typename my_base::key_type &key)
 		{
@@ -57,7 +57,7 @@ namespace ion::adaptors
 			return iter->second;
 		}
 
-		//Return a mutable reference to the mapped type for the given key (by move)
+		//Returns a mutable reference to the mapped type for the given key (by move)
 		//If key does not exist insert it to the map with a default constructed mapped type
 		[[nodiscard]] inline auto& operator[](typename my_base::key_type &&key)
 		{
@@ -66,14 +66,14 @@ namespace ion::adaptors
 		}
 
 
-		//Return a mutable reference to the mapped type for the given key
+		//Returns a mutable reference to the mapped type for the given key
 		//Does bounds checking by throwing out of range if key does not exist
 		[[nodiscard]] inline auto& at(const typename my_base::key_type &key)
 		{
 			return at<typename my_base::key_type>(key);
 		}
 
-		//Return a mutable reference to the mapped type for the given key
+		//Returns a mutable reference to the mapped type for the given key
 		//Does bounds checking by throwing out of range if key does not exist
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, typename my_base::key_type> || types::is_transparent_comparator_v<Compare>>>
@@ -87,14 +87,14 @@ namespace ion::adaptors
 			return iter->second;
 		}
 
-		//Return an immutable reference to the mapped type for the given key
+		//Returns an immutable reference to the mapped type for the given key
 		//Does bounds checking by throwing out of range if key does not exist
 		[[nodiscard]] inline auto& at(const typename my_base::key_type &key) const
 		{
 			return at<typename my_base::key_type>(key);
 		}
 
-		//Return an immutable reference to the mapped type for the given key
+		//Returns an immutable reference to the mapped type for the given key
 		//Does bounds checking by throwing out of range if key does not exist
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, typename my_base::key_type> || types::is_transparent_comparator_v<Compare>>>

@@ -235,11 +235,11 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a list box with the given name, size, caption, tooltip and hit boxes
+			//Constructs a list box with the given name, size, caption, tooltip and hit boxes
 			GuiListBox(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Construct a list box with the given name, skin, size, caption, tooltip and hit boxes
+			//Constructs a list box with the given name, skin, size, caption, tooltip and hit boxes
 			GuiListBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {});
 

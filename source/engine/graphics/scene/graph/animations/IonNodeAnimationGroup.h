@@ -74,7 +74,7 @@ namespace ion::graphics::scene::graph::animations
 				Modifiers
 			*/
 
-			//Reset this node animation group
+			//Resets this node animation group
 			void Reset() noexcept;
 
 
@@ -101,10 +101,10 @@ namespace ion::graphics::scene::graph::animations
 				Node animations
 			*/
 
-			//Add the given node animation to this node animation group
+			//Adds the given node animation to this node animation group
 			void Add(NonOwningPtr<NodeAnimation> node_animation, duration start_time = 0.0_sec, bool enabled = true);
 
-			//Clear all node animations from this node animation group
+			//Clears all node animations from this node animation group
 			void Clear() noexcept;
 	};
 } //ion::graphics::scene::graph::animations

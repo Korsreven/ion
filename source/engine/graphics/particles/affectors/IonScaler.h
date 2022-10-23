@@ -103,16 +103,16 @@ namespace ion::graphics::particles::affectors
 				Affect particles
 			*/
 
-			//Elapse scaler by the given time in seconds
+			//Elapses scaler by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
 
 		public:
 
-			//Construct a new scaler with the given name
+			//Constructs a new scaler with the given name
 			explicit Scaler(std::string name) noexcept;
 
-			//Construct a new scaler with the given name and steps
+			//Constructs a new scaler with the given name and steps
 			//Percentages are normalized to range [0.0, 1.0]
 			Scaler(std::string name, std::vector<scaler::Step> steps) noexcept;
 
@@ -154,20 +154,20 @@ namespace ion::graphics::particles::affectors
 				Steps
 			*/
 
-			//Add (in sorted order) the given percentage and size to this scaler
+			//Adds (in sorted order) the given percentage and size to this scaler
 			//The step is clamped to range [0.0, 1.0]
 			void AddStep(real percent, std::optional<Vector2> size);
 
-			//Add (in sorted order) the given step to this scaler
+			//Adds (in sorted order) the given step to this scaler
 			//The step is clamped to range [0.0, 1.0]
 			void AddStep(scaler::Step step);
 
-			//Add (in sorted order) the given steps to the this scaler
+			//Adds (in sorted order) the given steps to the this scaler
 			//Percentages are normalized to range [0.0, 1.0]
 			void AddSteps(std::vector<scaler::Step> steps);
 			
 
-			//Clear all steps from this scaler
+			//Clears all steps from this scaler
 			void ClearSteps() noexcept;
 	};
 } //ion::graphics::particles::affectors

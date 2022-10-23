@@ -43,7 +43,7 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			//Construct a new triangle with the given points a b c, color and visibility
+			//Constructs a new triangle with the given points a b c, color and visibility
 			Triangle(const Vector3 &a, const Vector3 &b, const Vector3 &c, const Color &color, bool visible = true);
 
 

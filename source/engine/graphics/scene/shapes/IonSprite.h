@@ -65,29 +65,29 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			//Construct a new sprite with the given material and visibility
+			//Constructs a new sprite with the given material and visibility
 			explicit Sprite(NonOwningPtr<materials::Material> material, bool visible = true);
 
-			//Construct a new sprite with the given size, material and visibility
+			//Constructs a new sprite with the given size, material and visibility
 			Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
-			//Construct a new sprite with the given position, size, material and visibility
+			//Constructs a new sprite with the given position, size, material and visibility
 			Sprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
-			//Construct a new sprite with the given position, rotation, size, material and visibility
+			//Constructs a new sprite with the given position, rotation, size, material and visibility
 			Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
 
-			//Construct a new sprite with the given material, color and visibility
+			//Constructs a new sprite with the given material, color and visibility
 			Sprite(NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			//Construct a new sprite with the given size, material, color and visibility
+			//Constructs a new sprite with the given size, material, color and visibility
 			Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			//Construct a new sprite with the given position, size, material, color and visibility
+			//Constructs a new sprite with the given position, size, material, color and visibility
 			Sprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			//Construct a new sprite with the given position, rotation, size, material, color and visibility
+			//Constructs a new sprite with the given position, rotation, size, material, color and visibility
 			Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
 

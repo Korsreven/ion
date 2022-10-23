@@ -46,7 +46,7 @@ namespace ion::graphics::particles::affectors
 
 		protected:
 
-			//Construct a new affector with the given name
+			//Constructs a new affector with the given name
 			//Can only be instantiated by derived
 			explicit Affector(std::string name) noexcept;
 
@@ -55,7 +55,7 @@ namespace ion::graphics::particles::affectors
 				Affect particles
 			*/
 
-			//Elapse affector by the given time in seconds
+			//Elapses affector by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			virtual void DoAffect(affector::detail::particle_range particles, duration time) noexcept = 0;
 
@@ -94,13 +94,13 @@ namespace ion::graphics::particles::affectors
 				Modifiers
 			*/
 
-			//Enable the affector
+			//Enables the affector
 			inline void Enable() noexcept
 			{
 				enabled_ = true;
 			}
 
-			//Disable the affector
+			//Disables the affector
 			inline void Disable() noexcept
 			{
 				enabled_ = false;

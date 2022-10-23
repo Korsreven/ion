@@ -90,26 +90,26 @@ namespace ion::graphics::render
 				Events
 			*/
 
-			//Return a mutable reference to the render target events of this render target
+			//Returns a mutable reference to the render target events of this render target
 			[[nodiscard]] inline auto& Events() noexcept
 			{
 				return static_cast<RenderTargetEventsBase&>(*this);
 			}
 
-			//Return an immutable reference to the render target events of this render target
+			//Returns an immutable reference to the render target events of this render target
 			[[nodiscard]] inline auto& Events() const noexcept
 			{
 				return static_cast<const RenderTargetEventsBase&>(*this);
 			}
 
 
-			//Return a mutable reference to the viewport events of this render target
+			//Returns a mutable reference to the viewport events of this render target
 			[[nodiscard]] inline auto& ViewportEvents() noexcept
 			{
 				return static_cast<ViewportEventsBase&>(*this);
 			}
 
-			//Return an immutable reference to the viewport events of this render target
+			//Returns an immutable reference to the viewport events of this render target
 			[[nodiscard]] inline auto& ViewportEvents() const noexcept
 			{
 				return static_cast<const ViewportEventsBase&>(*this);
@@ -168,22 +168,22 @@ namespace ion::graphics::render
 				Creating
 			*/
 
-			//Create a viewport with the given name and connected to a given render target
+			//Creates a viewport with the given name and connected to a given render target
 			NonOwningPtr<Viewport> CreateViewport(std::string name, RenderTarget &render_target);
 
-			//Create a viewport with the given name, connected to a given render target and with the given bounds (region)
+			//Creates a viewport with the given name, connected to a given render target and with the given bounds (region)
 			NonOwningPtr<Viewport> CreateViewport(std::string name, RenderTarget &render_target, const Aabb &bounds);
 
-			//Create a viewport with the given name, connected to a given render target and with the given bounds (region) and anchors
+			//Creates a viewport with the given name, connected to a given render target and with the given bounds (region) and anchors
 			NonOwningPtr<Viewport> CreateViewport(std::string name, RenderTarget &render_target, const Aabb &bounds,
 				viewport::HorizontalAnchorType left_anchor, viewport::HorizontalAnchorType right_anchor,
 				viewport::VerticalAnchorType top_anchor, viewport::VerticalAnchorType bottom_anchor);
 
 
-			//Create a viewport as a copy of the given viewport
+			//Creates a viewport as a copy of the given viewport
 			NonOwningPtr<Viewport> CreateViewport(const Viewport &viewport);
 
-			//Create a viewport by moving the given viewport
+			//Creates a viewport by moving the given viewport
 			NonOwningPtr<Viewport> CreateViewport(Viewport &&viewport);
 
 
@@ -215,13 +215,13 @@ namespace ion::graphics::render
 				Removing
 			*/
 
-			//Clear all removable viewports from this manager
+			//Clears all removable viewports from this manager
 			void ClearViewports() noexcept;
 
-			//Remove a removable viewport from this manager
+			//Removes a removable viewport from this manager
 			bool RemoveViewport(Viewport &viewport) noexcept;
 
-			//Remove a removable viewport with the given name from this manager
+			//Removes a removable viewport with the given name from this manager
 			bool RemoveViewport(std::string_view name) noexcept;
 	};
 }

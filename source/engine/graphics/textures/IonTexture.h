@@ -126,33 +126,33 @@ namespace ion::graphics::textures
 
 			using resources::FileResource<TextureManager>::FileResource;
 
-			//Construct a new texture with the given name, asset name, texture filter for min/mag, mip filter and texture wrap mode for s/t
+			//Constructs a new texture with the given name, asset name, texture filter for min/mag, mip filter and texture wrap mode for s/t
 			Texture(std::string name, std::string asset_name,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode) noexcept;
 
-			//Construct a new texture with the given name, asset name, texture filter, mip filter and texture wrap mode
+			//Constructs a new texture with the given name, asset name, texture filter, mip filter and texture wrap mode
 			Texture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode) noexcept;
 
-			//Construct a new texture with the given name, asset name, texture filter and texture wrap mode (no mipmap)
+			//Constructs a new texture with the given name, asset name, texture filter and texture wrap mode (no mipmap)
 			Texture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode) noexcept;
 
 
-			//Construct a new sub texture with the given name, asset name and atlas region
+			//Constructs a new sub texture with the given name, asset name and atlas region
 			Texture(std::string name, std::string asset_name, const texture::TextureAtlasRegion &atlas_region) noexcept;
 
-			//Construct a new sub texture with the given name, asset name, atlas region, texture filter for min/mag, mip filter and texture wrap mode for s/t
+			//Constructs a new sub texture with the given name, asset name, atlas region, texture filter for min/mag, mip filter and texture wrap mode for s/t
 			Texture(std::string name, std::string asset_name, const texture::TextureAtlasRegion &atlas_region,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode) noexcept;
 
-			//Construct a new sub texture with the given name, asset name, atlas region, texture filter, mip filter and texture wrap mode
+			//Constructs a new sub texture with the given name, asset name, atlas region, texture filter, mip filter and texture wrap mode
 			Texture(std::string name, std::string asset_name, const texture::TextureAtlasRegion &atlas_region,
 				texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode) noexcept;
 
-			//Construct a new sub texture with the given name, asset name, atlas region, texture filter and texture wrap mode (no mipmap)
+			//Constructs a new sub texture with the given name, asset name, atlas region, texture filter and texture wrap mode (no mipmap)
 			Texture(std::string name, std::string asset_name, const texture::TextureAtlasRegion &atlas_region,
 				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode) noexcept;
 

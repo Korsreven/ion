@@ -37,7 +37,7 @@ namespace ion::graphics::render::vertex
 			//Default constructor
 			VertexDataView() = default;
 
-			//Construct a new vertex data view with the given first vertex pointer and size of vertices
+			//Constructs a new vertex data view with the given first vertex pointer and size of vertices
 			template <typename T>
 			VertexDataView(const T *first_vertex, int size) noexcept :
 
@@ -48,7 +48,7 @@ namespace ion::graphics::render::vertex
 				//Empty
 			}
 
-			//Construct a new vertex data view with the given vertices
+			//Constructs a new vertex data view with the given vertices
 			template <typename T, size_t Size>
 			VertexDataView(const std::array<T, Size> &vertices) noexcept :
 
@@ -59,7 +59,7 @@ namespace ion::graphics::render::vertex
 				//Empty
 			}
 
-			//Construct a new vertex data view with the given vertices
+			//Constructs a new vertex data view with the given vertices
 			template <typename T>
 			VertexDataView(const std::vector<T> &vertices) noexcept :
 

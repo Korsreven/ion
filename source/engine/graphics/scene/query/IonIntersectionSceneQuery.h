@@ -60,7 +60,7 @@ namespace ion::graphics::scene::query
 			//Default constructor
 			IntersectionSceneQuery() = default;
 
-			//Construct a new scene query with the given scene graph
+			//Constructs a new scene query with the given scene graph
 			IntersectionSceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept;
 
 

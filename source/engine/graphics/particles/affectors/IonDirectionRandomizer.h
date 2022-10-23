@@ -45,16 +45,16 @@ namespace ion::graphics::particles::affectors
 				Affect particles
 			*/
 
-			//Elapse direction randomizer by the given time in seconds
+			//Elapses direction randomizer by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
 
 		public:
 
-			//Construct a new direction randomizer with the given name
+			//Constructs a new direction randomizer with the given name
 			explicit DirectionRandomizer(std::string name) noexcept;
 
-			//Construct a new direction randomizer with the given name, angle and scope
+			//Constructs a new direction randomizer with the given name, angle and scope
 			DirectionRandomizer(std::string name, real angle, real scope) noexcept;
 
 

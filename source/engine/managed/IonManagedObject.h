@@ -37,14 +37,14 @@ namespace ion::managed
 			//Default constructor
 			ManagedObject() = default;
 
-			//Construct a new managed object with the given name
+			//Constructs a new managed object with the given name
 			explicit ManagedObject(std::string name) noexcept :
 				name_{std::move(name)}
 			{
 				//Empty
 			}
 
-			//Construct a new managed object with the given name
+			//Constructs a new managed object with the given name
 			explicit ManagedObject(std::optional<std::string> name) noexcept :
 				name_{std::move(name)}
 			{
@@ -80,13 +80,13 @@ namespace ion::managed
 				Modifiers
 			*/
 
-			//Set ownership of this managed object to the given owner
+			//Sets ownership of this managed object to the given owner
 			inline void Owner(T &owner) noexcept
 			{
 				owner_ = &owner;
 			}
 
-			//Release ownership for this managed object
+			//Releases ownership for this managed object
 			inline void Owner(std::nullptr_t) noexcept
 			{
 				owner_ = nullptr;

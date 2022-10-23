@@ -95,7 +95,7 @@ namespace ion::resources
 				Loading
 			*/
 
-			//Signaling that this resource needs to be prepared
+			//Signals that this resource needs to be prepared
 			inline auto Prepare() noexcept
 			{
 				switch (loading_state_)
@@ -111,7 +111,7 @@ namespace ion::resources
 				}			
 			}
 
-			//Signaling that this resource needs to be loaded
+			//Signals that this resource needs to be loaded
 			inline auto Load() noexcept
 			{
 				switch (loading_state_)
@@ -132,7 +132,7 @@ namespace ion::resources
 				}
 			}
 
-			//Signaling that this resource needs to be unloaded
+			//Signals that this resource needs to be unloaded
 			inline auto Unload() noexcept
 			{
 				switch (loading_state_)
@@ -150,7 +150,7 @@ namespace ion::resources
 			}
 
 
-			//Signaling that this resource needs to be reloaded
+			//Signals that this resource needs to be reloaded
 			inline auto Reload() noexcept
 			{
 				switch (loading_state_)
@@ -167,7 +167,7 @@ namespace ion::resources
 				}
 			}
 
-			//Signaling that this resource needs to be repaired if failed
+			//Signals that this resource needs to be repaired if failed
 			inline auto Repair() noexcept
 			{
 				switch (loading_state_)

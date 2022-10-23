@@ -132,14 +132,14 @@ namespace ion::managed
 			//Default constructor
 			ObservedObject() = default;
 
-			//Construct a new empty observed object with the given requirement
+			//Constructs a new empty observed object with the given requirement
 			ObservedObject(observed_object::ObjectRequirement requirement) noexcept :
 				my_base{observed_object::detail::as_subscription_contract(requirement)}
 			{
 				//Empty
 			}
 
-			//Construct a new empty observed object with the given requirement and callback
+			//Constructs a new empty observed object with the given requirement and callback
 			ObservedObject(events::Callback<void, T&> on_removed, observed_object::ObjectRequirement requirement = observed_object::ObjectRequirement::Optional) noexcept :
 				my_base{observed_object::detail::as_subscription_contract(requirement)},
 				on_removed_{on_removed}
@@ -147,7 +147,7 @@ namespace ion::managed
 				//Empty
 			}
 
-			//Construct a new observed object with the given object and requirement
+			//Constructs a new observed object with the given object and requirement
 			ObservedObject(T &object, observed_object::ObjectRequirement requirement = observed_object::ObjectRequirement::Optional) :
 
 				my_base{object.Owner(), observed_object::detail::as_subscription_contract(requirement)},
@@ -156,7 +156,7 @@ namespace ion::managed
 				//Empty
 			}
 
-			//Construct a new observed object with the given object, callback and requirement
+			//Constructs a new observed object with the given object, callback and requirement
 			ObservedObject(T &object, events::Callback<void, T&> on_removed, observed_object::ObjectRequirement requirement = observed_object::ObjectRequirement::Optional) :
 
 				my_base{object.Owner(), observed_object::detail::as_subscription_contract(requirement)},
@@ -306,7 +306,7 @@ namespace ion::managed
 				return !!managed_object_;
 			}
 
-			//Release the object being observed
+			//Releases the object being observed
 			//Returns true if the object has successfully been released, or change requirements
 			inline auto Release() noexcept
 			{

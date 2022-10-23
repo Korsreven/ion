@@ -73,11 +73,11 @@ namespace ion::script::interfaces
 				Creating from script
 			*/
 
-			//Create materials from a script (or object file) with the given asset name
+			//Creates materials from a script (or object file) with the given asset name
 			void CreateMaterials(std::string_view asset_name,
 				graphics::materials::MaterialManager &material_manager);
 
-			//Create materials from a script (or object file) with the given asset name
+			//Creates materials from a script (or object file) with the given asset name
 			void CreateMaterials(std::string_view asset_name,
 				graphics::materials::MaterialManager &material_manager, const ManagerRegister &managers);
 	};

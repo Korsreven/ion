@@ -96,23 +96,23 @@ namespace ion::graphics::fonts
 
 		public:
 
-			//Construct a new font with the given name, asset name, size, face index, character spacing, character set and glyph filter for min/mag
+			//Constructs a new font with the given name, asset name, size, face index, character spacing, character set and glyph filter for min/mag
 			Font(std::string name, std::string asset_name, int size, int face_index,
 				int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter) noexcept;
 
-			//Construct a new font with the given name, asset name, size, character spacing, character set and glyph filter for min/mag
+			//Constructs a new font with the given name, asset name, size, character spacing, character set and glyph filter for min/mag
 			Font(std::string name, std::string asset_name, int size,
 				int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter) noexcept;
 
-			//Construct a new font with the given name, asset name, size, character spacing, character set and glyph filter
+			//Constructs a new font with the given name, asset name, size, character spacing, character set and glyph filter
 			Font(std::string name, std::string asset_name, int size,
 				int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter filter) noexcept;
 
-			//Construct a new font with the given name, asset name, size, character spacing and character set
+			//Constructs a new font with the given name, asset name, size, character spacing and character set
 			Font(std::string name, std::string asset_name, int size,
 				int character_spacing, font::FontCharacterSet character_set) noexcept;
 
-			//Construct a new font with the given name, asset name, size and character spacing
+			//Constructs a new font with the given name, asset name, size and character spacing
 			Font(std::string name, std::string asset_name, int size,
 				int character_spacing = 0) noexcept;
 

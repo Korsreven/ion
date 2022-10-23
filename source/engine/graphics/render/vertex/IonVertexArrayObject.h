@@ -98,13 +98,13 @@ namespace ion::graphics::render::vertex
 				Modifiers
 			*/
 
-			//Bind the given vertex array object
+			//Binds the given vertex array object
 			void Bind() noexcept;
 
-			//Bind vertex attributes declared in the given declaration to the given vertex buffer and store bindings in this vertex array object
+			//Binds vertex attributes declared in the given declaration to the given vertex buffer and store bindings in this vertex array object
 			void Bind(const VertexDeclaration &vertex_declaration, const VertexBufferView &vertex_buffer) noexcept;
 
-			//Unbind the given vertex array object
+			//Unbinds the given vertex array object
 			void Unbind() noexcept;
 
 

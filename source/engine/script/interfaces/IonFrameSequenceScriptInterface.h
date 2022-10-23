@@ -68,11 +68,11 @@ namespace ion::script::interfaces
 				Creating from script
 			*/
 
-			//Create frame sequences from a script (or object file) with the given asset name
+			//Creates frame sequences from a script (or object file) with the given asset name
 			void CreateFrameSequences(std::string_view asset_name,
 				graphics::textures::FrameSequenceManager &frame_sequence_manager);
 
-			//Create frame sequences from a script (or object file) with the given asset name
+			//Creates frame sequences from a script (or object file) with the given asset name
 			void CreateFrameSequences(std::string_view asset_name,
 				graphics::textures::FrameSequenceManager &frame_sequence_manager, const ManagerRegister &managers);
 	};

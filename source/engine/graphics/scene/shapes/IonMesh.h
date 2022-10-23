@@ -62,13 +62,13 @@ namespace ion::graphics::scene::shapes
 			Vector3 TexCoord;
 
 
-			//Construct a new vertex with the given position and base color
+			//Constructs a new vertex with the given position and base color
 			explicit Vertex(const Vector3 &position, const Color &base_color = color::White) noexcept;
 
-			//Construct a new vertex with the given position, normal and base color (default white)
+			//Constructs a new vertex with the given position, normal and base color (default white)
 			Vertex(const Vector3 &position, const Vector3 &normal, const Color &base_color = color::White) noexcept;
 
-			//Construct a new vertex with the given position, normal, tex coord and base color (default white)
+			//Constructs a new vertex with the given position, normal, tex coord and base color (default white)
 			Vertex(const Vector3 &position, const Vector3 &normal, const Vector2 &tex_coord, const Color &base_color = color::White) noexcept;
 		};
 
@@ -149,32 +149,32 @@ namespace ion::graphics::scene::shapes
 
 		public:
 
-			//Construct a new mesh with the given vertices and visibility
+			//Constructs a new mesh with the given vertices and visibility
 			explicit Mesh(const mesh::Vertices &vertices, bool visible = true);
 
-			//Construct a new mesh with the given vertices, material, tex coord mode and visibility
+			//Constructs a new mesh with the given vertices, material, tex coord mode and visibility
 			Mesh(const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
-			//Construct a new mesh with the given draw mode, vertices and visibility
+			//Constructs a new mesh with the given draw mode, vertices and visibility
 			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices, bool visible = true);
 
-			//Construct a new mesh with the given draw mode, vertices, material, tex coord mode and visibility
+			//Constructs a new mesh with the given draw mode, vertices, material, tex coord mode and visibility
 			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
-			//Construct a new mesh with the given raw vertex data and visibility
+			//Constructs a new mesh with the given raw vertex data and visibility
 			explicit Mesh(render_primitive::VertexContainer vertex_data, bool visible = true) noexcept;
 
-			//Construct a new mesh with the given raw vertex data, material, tex coord mode and visibility
+			//Constructs a new mesh with the given raw vertex data, material, tex coord mode and visibility
 			Mesh(render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true) noexcept;
 
-			//Construct a new mesh with the given draw mode, raw vertex data and visibility
+			//Constructs a new mesh with the given draw mode, raw vertex data and visibility
 			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, bool visible = true) noexcept;
 
-			//Construct a new mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
+			//Constructs a new mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
 			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true) noexcept;
 
@@ -244,7 +244,7 @@ namespace ion::graphics::scene::shapes
 				Preparing
 			*/
 
-			//Prepare this mesh such that it is ready to be drawn
+			//Prepares this mesh such that it is ready to be drawn
 			//This function is typically called each frame
 			virtual void Prepare() override;
 
@@ -253,7 +253,7 @@ namespace ion::graphics::scene::shapes
 				Elapse time
 			*/
 
-			//Elapse the total time for this mesh by the given time in seconds
+			//Elapses the total time for this mesh by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			virtual void Elapse(duration time) noexcept;
 	};

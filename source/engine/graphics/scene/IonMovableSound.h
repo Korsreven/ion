@@ -57,20 +57,20 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new movable sound with the given name, sound and pause state
+			//Constructs a new movable sound with the given name, sound and pause state
 			MovableSound(std::optional<std::string> name,
 				NonOwningPtr<sounds::Sound> sound, bool paused = false);
 
-			//Construct a new movable sound with the given name, position, sound and pause state
+			//Constructs a new movable sound with the given name, position, sound and pause state
 			MovableSound(std::optional<std::string> name, const Vector3 &position,
 				NonOwningPtr<sounds::Sound> sound, bool paused = false);
 
 
-			//Construct a new movable sound with the given name, sound, sound channel group and pause state
+			//Constructs a new movable sound with the given name, sound, sound channel group and pause state
 			MovableSound(std::optional<std::string> name,
 				NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
 
-			//Construct a new movable sound with the given name, position, sound, sound channel group and pause state
+			//Constructs a new movable sound with the given name, position, sound, sound channel group and pause state
 			MovableSound(std::optional<std::string> name, const Vector3 &position,
 				NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
 
@@ -92,7 +92,7 @@ namespace ion::graphics::scene
 			}
 
 
-			//Revert to the initial sound
+			//Reverts to the initial sound
 			void Revert();
 
 
@@ -124,7 +124,7 @@ namespace ion::graphics::scene
 				Elapse time
 			*/
 
-			//Elapse the total time for this movable sound by the given time in seconds
+			//Elapses the total time for this movable sound by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept override;
 	};

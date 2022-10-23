@@ -55,13 +55,13 @@ namespace ion::memory
 			//Default constructor
 			NonOwningPtr() = default;
 
-			//Construct a new non-owning ptr with a nullptr
+			//Constructs a new non-owning ptr with a nullptr
 			NonOwningPtr(std::nullptr_t) noexcept
 			{
 				//Empty
 			}
 
-			//Construct a new non-owning ptr with the given owning ptr
+			//Constructs a new non-owning ptr with the given owning ptr
 			NonOwningPtr(const OwningPtr<T> &ptr) noexcept :
 				ptr_{ptr.get()},
 				ctrl_block_{non_owning_ptr::detail::inc_ref_count(ptr.ctrl_block_)}
@@ -69,7 +69,7 @@ namespace ion::memory
 				//Empty
 			}
 
-			//Construct a new non-owning ptr with the given owning ptr of type U
+			//Constructs a new non-owning ptr with the given owning ptr of type U
 			template <typename U, typename = std::enable_if_t<std::is_convertible_v<typename OwningPtr<U>::pointer, pointer>>>
 			NonOwningPtr(const OwningPtr<U> &ptr) noexcept :
 				ptr_{static_cast<pointer>(ptr.get())},

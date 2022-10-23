@@ -62,7 +62,7 @@ namespace ion::unmanaged
 				Creating
 			*/
 
-			//Create an object with the given arguments
+			//Creates an object with the given arguments
 			template <typename T = ObjectT, typename... Args,
 				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(Args &&...args)
@@ -70,7 +70,7 @@ namespace ion::unmanaged
 				return Emplace<std::remove_cvref_t<T>>(std::forward<Args>(args)...);
 			}
 
-			//Create an object by copying/moving the given object
+			//Creates an object by copying/moving the given object
 			template <typename T,
 				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(T &&object)
@@ -118,14 +118,14 @@ namespace ion::unmanaged
 				Removing
 			*/
 
-			//Clear all objects from this factory
+			//Clears all objects from this factory
 			void Clear() noexcept
 			{
 				objects_.clear();
 				objects_.shrink_to_fit();
 			}
 
-			//Remove an object from this factory
+			//Removes an object from this factory
 			auto Remove(ObjectT &object) noexcept
 			{
 				auto iter =

@@ -63,7 +63,7 @@ namespace ion::events::listeners
 			*/
 
 			//Called right before this listener is subscribed, with a reference to the listenable
-			//Return false from this function if the subscription should be canceled
+			//Returns false from this function if the subscription should be canceled
 			virtual bool Subscribable([[maybe_unused]] Listenable<T> &listenable) noexcept
 			{
 				//Optional to override
@@ -78,7 +78,7 @@ namespace ion::events::listeners
 
 
 			//Called right before this listener is unsubscribed, with a reference to the listenable
-			//Return false from this function if the unsubscription should be canceled
+			//Returns false from this function if the unsubscription should be canceled
 			virtual bool Unsubscribable([[maybe_unused]] Listenable<T> &listenable) noexcept
 			{
 				//Optional to override

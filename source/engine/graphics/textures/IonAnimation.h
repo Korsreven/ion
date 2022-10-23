@@ -254,7 +254,7 @@ namespace ion::graphics::textures
 				Elapse time
 			*/
 
-			//Elapse animation by the given time in seconds
+			//Elapses animation by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 
@@ -310,10 +310,10 @@ namespace ion::graphics::textures
 			void Restart() noexcept;
 
 
-			//Jump forward by the given amount of time
+			//Jumps forward by the given amount of time
 			void JumpForward(duration time) noexcept;
 
-			//Jump backward by the given amount of time
+			//Jumps backward by the given amount of time
 			void JumpBackward(duration time) noexcept;
 
 

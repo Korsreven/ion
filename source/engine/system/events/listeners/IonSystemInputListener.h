@@ -122,7 +122,7 @@ namespace ion::system::events::listeners
 
 		public:
 
-			//Construct an input listener on top of the given system window
+			//Constructs an input listener on top of the given system window
 			explicit InputListener(graphics::render::RenderWindow &render_window) noexcept;
 
 			//Deleted copy constructor
@@ -150,26 +150,26 @@ namespace ion::system::events::listeners
 				Observers
 			*/
 
-			//Return a mutable reference to the key base of this input listener
+			//Returns a mutable reference to the key base of this input listener
 			[[nodiscard]] inline auto& KeyEvents() noexcept
 			{
 				return static_cast<KeyEventsBase&>(*this);
 			}
 
-			//Return an immutable reference to the key base of this input listener
+			//Returns an immutable reference to the key base of this input listener
 			[[nodiscard]] inline auto& KeyEvents() const noexcept
 			{
 				return static_cast<const KeyEventsBase&>(*this);
 			}
 
 
-			//Return a mutable reference to the mouse base of this input listener
+			//Returns a mutable reference to the mouse base of this input listener
 			[[nodiscard]] inline auto& MouseEvents() noexcept
 			{
 				return static_cast<MouseEventsBase&>(*this);
 			}
 
-			//Return an immutable reference to the mouse base of this input listener
+			//Returns an immutable reference to the mouse base of this input listener
 			[[nodiscard]] inline auto& MouseEvents() const noexcept
 			{
 				return static_cast<const MouseEventsBase&>(*this);

@@ -54,23 +54,23 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			//Construct a new ellipse with the given size, color and visibility
+			//Constructs a new ellipse with the given size, color and visibility
 			Ellipse(const Vector2 &size, const Color &color, bool visible = true);
 
-			//Construct a new ellipse with the given position, size, color and visibility
+			//Constructs a new ellipse with the given position, size, color and visibility
 			Ellipse(const Vector3 &position, const Vector2 &size, const Color &color, bool visible = true);
 
-			//Construct a new ellipse with the given position, rotation, size, color and visibility
+			//Constructs a new ellipse with the given position, rotation, size, color and visibility
 			Ellipse(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, bool visible = true);
 
 
-			//Construct a new ellipse with the given size, color, sides and visibility
+			//Constructs a new ellipse with the given size, color, sides and visibility
 			Ellipse(const Vector2 &size, const Color &color, int sides, bool visible = true);
 
-			//Construct a new ellipse with the given position, size, color, sides and visibility
+			//Constructs a new ellipse with the given position, size, color, sides and visibility
 			Ellipse(const Vector3 &position, const Vector2 &size, const Color &color, int sides, bool visible = true);
 
-			//Construct a new ellipse with the given position, rotation, size, color, sides and visibility
+			//Constructs a new ellipse with the given position, rotation, size, color, sides and visibility
 			Ellipse(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, int sides, bool visible = true);
 
 

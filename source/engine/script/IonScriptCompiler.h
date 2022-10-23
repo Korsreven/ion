@@ -589,19 +589,19 @@ namespace ion::script
 				Modifiers
 			*/
 
-			//Set the build repository the compiler has access to when compiling
+			//Sets the build repository the compiler has access to when compiling
 			inline void BuildRepository(const assets::repositories::ScriptRepository &repository) noexcept
 			{
 				build_repository_ = &repository;
 			}
 
-			//Set the build repository the compiler has access to when compiling
+			//Sets the build repository the compiler has access to when compiling
 			inline void BuildRepository(std::nullptr_t) noexcept
 			{
 				build_repository_ = nullptr;
 			}
 
-			//Set the max number of build processes the compiler is allowed to use
+			//Sets the max number of build processes the compiler is allowed to use
 			//If nullopt is passed, a default number of build processes will be used (based on your system)
 			inline void MaxBuildProcesses(std::optional<int> max_build_processes) noexcept
 			{
@@ -647,22 +647,22 @@ namespace ion::script
 				Compiling
 			*/
 
-			//Compile a script entry with the given name (from a repository) by lexing, parsing and linking it
+			//Compiles a script entry with the given name (from a repository) by lexing, parsing and linking it
 			//Returns a ScriptTree that contains objects, object properties and property arguments
 			[[nodiscard]] std::optional<ScriptTree> Compile(std::string_view name, CompileError &error);
 
-			//Compile a script file with the given file path by lexing, parsing and linking it
+			//Compiles a script file with the given file path by lexing, parsing and linking it
 			//Returns a ScriptTree that contains objects, object properties and property arguments
 			[[nodiscard]] std::optional<ScriptTree> CompileFile(std::filesystem::path file_path, CompileError &error);
 
-			//Compile a script file with the given file path (and root path) by lexing, parsing and linking it
+			//Compiles a script file with the given file path (and root path) by lexing, parsing and linking it
 			//Returns a ScriptTree that contains objects, object properties and property arguments
 			[[nodiscard]] std::optional<ScriptTree> CompileFile(std::filesystem::path file_path, std::filesystem::path root_path, CompileError &error);
 
-			//Compile the given script string by lexing, parsing and linking it
+			//Compiles the given script string by lexing, parsing and linking it
 			[[nodiscard]] std::optional<ScriptTree> CompileString(std::string str, CompileError &error);
 
-			//Compile the given script string (and root path) by lexing, parsing and linking it
+			//Compiles the given script string (and root path) by lexing, parsing and linking it
 			[[nodiscard]] std::optional<ScriptTree> CompileString(std::string str, std::filesystem::path root_path, CompileError &error);
 
 

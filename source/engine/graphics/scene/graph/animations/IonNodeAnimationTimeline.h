@@ -102,7 +102,7 @@ namespace ion::graphics::scene::graph::animations
 
 			using managed::ManagedObject<NodeAnimationManager>::ManagedObject;
 
-			//Construct a new timeline with the given name, playback rate and whether it is running or not
+			//Constructs a new timeline with the given name, playback rate and whether it is running or not
 			explicit NodeAnimationTimeline(std::optional<std::string> name = {}, real playback_rate = 1.0_r, bool running = true) noexcept;
 
 			//Deleted copy constructor
@@ -358,7 +358,7 @@ namespace ion::graphics::scene::graph::animations
 				Elapse time
 			*/
 
-			//Elapse the total time for this timeline by the given time in seconds
+			//Elapses the total time for this timeline by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 	};

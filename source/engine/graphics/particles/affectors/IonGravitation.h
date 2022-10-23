@@ -49,19 +49,19 @@ namespace ion::graphics::particles::affectors
 				Affect particles
 			*/
 
-			//Elapse gravitation by the given time in seconds
+			//Elapses gravitation by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
 
 		public:
 
-			//Construct a new gravitation with the given name
+			//Constructs a new gravitation with the given name
 			explicit Gravitation(std::string name) noexcept;
 
-			//Construct a new gravitation with the given name, position and mass
+			//Constructs a new gravitation with the given name, position and mass
 			Gravitation(std::string name, const Vector2 &position, real mass) noexcept;
 
-			//Construct a new gravitation with the given name, position, mass and a custom gravity
+			//Constructs a new gravitation with the given name, position, mass and a custom gravity
 			Gravitation(std::string name, const Vector2 &position, real mass, real gravity) noexcept;
 
 

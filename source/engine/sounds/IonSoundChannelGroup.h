@@ -57,7 +57,7 @@ namespace ion::sounds
 			}
 
 
-			//Mute all sounds in this sound channel group
+			//Mutes all sounds in this sound channel group
 			void Mute(bool mute) noexcept;
 			
 			//Sets the relative pitch / playback rate of this sound channel group

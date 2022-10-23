@@ -63,7 +63,7 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a drawable object with the given name and visibility
+			//Constructs a drawable object with the given name and visibility
 			explicit DrawableObject(std::optional<std::string> name = {}, bool visible = true) noexcept;
 
 
@@ -124,7 +124,7 @@ namespace ion::graphics::scene
 				Preparing
 			*/
 
-			//Prepare this drawable object such that it is ready to be drawn
+			//Prepares this drawable object such that it is ready to be drawn
 			//This function is typically called each frame
 			virtual void Prepare() override;
 
@@ -133,7 +133,7 @@ namespace ion::graphics::scene
 				Elapse time
 			*/
 
-			//Elapse the total time for this drawable object by the given time in seconds
+			//Elapses the total time for this drawable object by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			virtual void Elapse(duration time) noexcept;
 
@@ -143,10 +143,10 @@ namespace ion::graphics::scene
 				Adding
 			*/
 
-			//Add the given render pass for this drawable object
+			//Adds the given render pass for this drawable object
 			void AddRenderPass(render::RenderPass pass);
 
-			//Add the given render passes for this drawable object
+			//Adds the given render passes for this drawable object
 			void AddRenderPasses(render::render_pass::Passes passes);
 
 
@@ -167,10 +167,10 @@ namespace ion::graphics::scene
 				Removing
 			*/
 
-			//Clear all render passes for this drawable object
+			//Clears all render passes for this drawable object
 			void ClearRenderPasses() noexcept;
 
-			//Remove a render pass at the given offset from this drawable object
+			//Removes a render pass at the given offset from this drawable object
 			bool RemoveRenderPass(int off) noexcept;
 	};
 } //ion::graphics::scene

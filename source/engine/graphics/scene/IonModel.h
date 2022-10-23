@@ -89,7 +89,7 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new model with the given name and visibility
+			//Constructs a new model with the given name and visibility
 			explicit Model(std::optional<std::string> name = {}, bool visible = true) noexcept;
 
 			//Virtual destructor
@@ -141,7 +141,7 @@ namespace ion::graphics::scene
 				Preparing
 			*/
 
-			//Prepare this model such that it is ready to be drawn
+			//Prepares this model such that it is ready to be drawn
 			//This function is typically called each frame
 			void Prepare() override;
 
@@ -150,7 +150,7 @@ namespace ion::graphics::scene
 				Elapse time
 			*/
 
-			//Elapse the total time for each mesh in this model by the given time in seconds
+			//Elapses the total time for each mesh in this model by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept override;
 
@@ -160,40 +160,40 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a mesh with the given vertices and visibility
+			//Creates a mesh with the given vertices and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(const shapes::mesh::Vertices &vertices, bool visible = true);
 
-			//Create a mesh with the given vertices, material, tex coord mode and visibility
+			//Creates a mesh with the given vertices, material, tex coord mode and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(const shapes::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
-			//Create a mesh with the given draw mode, vertices and visibility
+			//Creates a mesh with the given draw mode, vertices and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices, bool visible = true);
 
-			//Create a mesh with the given draw mode, vertices, material, tex coord mode and visibility
+			//Creates a mesh with the given draw mode, vertices, material, tex coord mode and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
-			//Create a mesh with the given raw vertex data and visibility
+			//Creates a mesh with the given raw vertex data and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(render::render_primitive::VertexContainer vertex_data, bool visible = true);
 
-			//Create a mesh with the given raw vertex data, material, tex coord mode and visibility
+			//Creates a mesh with the given raw vertex data, material, tex coord mode and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(render::render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material>material,
 				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
-			//Create a mesh with the given draw mode, raw vertex data and visibility
+			//Creates a mesh with the given draw mode, raw vertex data and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::render_primitive::VertexContainer vertex_data, bool visible = true);
 
-			//Create a mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
+			//Creates a mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
 				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
-			//Create a mesh as a copy of the given mesh
+			//Creates a mesh as a copy of the given mesh
 			NonOwningPtr<shapes::Mesh> CreateMesh(const shapes::Mesh &mesh);
 
-			//Create a mesh by moving the given mesh
+			//Creates a mesh by moving the given mesh
 			NonOwningPtr<shapes::Mesh> CreateMesh(shapes::Mesh &&mesh);
 
 
@@ -202,7 +202,7 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a mesh of type T with the given arguments
+			//Creates a mesh of type T with the given arguments
 			template <typename T, typename... Args,
 				typename = std::enable_if_t<std::is_base_of_v<shapes::Shape, T>>>
 			auto CreateMesh(Args &&...args)
@@ -214,7 +214,7 @@ namespace ion::graphics::scene
 			}
 
 
-			//Create a mesh of type T as a copy of the given mesh
+			//Creates a mesh of type T as a copy of the given mesh
 			template <typename T,
 				typename = std::enable_if_t<std::is_base_of_v<shapes::Shape, T>>>
 			auto CreateMesh(const T &mesh_t)
@@ -225,7 +225,7 @@ namespace ion::graphics::scene
 				return static_pointer_cast<T>(ptr);
 			}
 
-			//Create a mesh of type T by moving the given mesh
+			//Creates a mesh of type T by moving the given mesh
 			template <typename T,
 				typename = std::enable_if_t<std::is_base_of_v<shapes::Shape, T>>>
 			auto CreateMesh(T &&mesh_t)
@@ -242,10 +242,10 @@ namespace ion::graphics::scene
 				Removing
 			*/
 
-			//Clear all meshes from this model
+			//Clears all meshes from this model
 			void ClearMeshes() noexcept;
 
-			//Remove a mesh from this model
+			//Removes a mesh from this model
 			bool RemoveMesh(shapes::Mesh &mesh) noexcept;
 	};
 } //ion::graphics::scene

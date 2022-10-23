@@ -129,7 +129,7 @@ namespace ion::script::interfaces
 				Managers
 			*/
 
-			//Return a reference to the static manager register for all script interfaces
+			//Returns a reference to the static manager register for all script interfaces
 			[[nodiscard]] static inline auto& Managers() noexcept
 			{
 				return manager_register_;
@@ -140,7 +140,7 @@ namespace ion::script::interfaces
 				Modifiers
 			*/
 
-			//Set the max number of build processes the compiler is allowed to use
+			//Sets the max number of build processes the compiler is allowed to use
 			//If nullopt is passed, a default number of build processes will be used (based on your system)
 			inline void MaxBuildProcesses(std::optional<int> max_build_processes) noexcept
 			{
@@ -193,13 +193,13 @@ namespace ion::script::interfaces
 				Creating
 			*/
 
-			//Create an empty script repository
+			//Creates an empty script repository
 			NonOwningPtr<assets::repositories::ScriptRepository> CreateScriptRepository();
 
-			//Create a script repository by copying the given script repository
+			//Creates a script repository by copying the given script repository
 			NonOwningPtr<assets::repositories::ScriptRepository> CreateScriptRepository(const assets::repositories::ScriptRepository &repository);
 
-			//Create a script repository by moving the given script repository
+			//Creates a script repository by moving the given script repository
 			NonOwningPtr<assets::repositories::ScriptRepository> CreateScriptRepository(assets::repositories::ScriptRepository &&repository);
 
 
@@ -208,10 +208,10 @@ namespace ion::script::interfaces
 				Removing
 			*/
 
-			//Clear all script repositories from this script interface
+			//Clears all script repositories from this script interface
 			void ClearScriptRepositories() noexcept;
 
-			//Remove a script repository from this script interface
+			//Removes a script repository from this script interface
 			bool RemoveScriptRepository(assets::repositories::ScriptRepository &repository) noexcept;
 
 
@@ -220,13 +220,13 @@ namespace ion::script::interfaces
 				Creating
 			*/
 
-			//Create an empty file repository
+			//Creates an empty file repository
 			NonOwningPtr<assets::repositories::FileRepository> CreateFileRepository();
 
-			//Create a file repository by copying the given file repository
+			//Creates a file repository by copying the given file repository
 			NonOwningPtr<assets::repositories::FileRepository> CreateFileRepository(const assets::repositories::FileRepository &repository);
 
-			//Create a file repository by moving the given file repository
+			//Creates a file repository by moving the given file repository
 			NonOwningPtr<assets::repositories::FileRepository> CreateFileRepository(assets::repositories::FileRepository &&repository);
 
 
@@ -235,10 +235,10 @@ namespace ion::script::interfaces
 				Removing
 			*/
 
-			//Clear all file repositories from this script interface
+			//Clears all file repositories from this script interface
 			void ClearFileRepositories() noexcept;
 
-			//Remove a file repository from this script interface
+			//Removes a file repository from this script interface
 			bool RemoveFileRepository(assets::repositories::FileRepository &repository) noexcept;
 	};
 } //ion::script::interfaces

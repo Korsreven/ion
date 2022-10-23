@@ -232,26 +232,26 @@ namespace ion::gui::skins
 
 		public:
 
-			//Construct a skin with the given name and type
+			//Constructs a skin with the given name and type
 			explicit GuiSkin(std::string name, std::type_index type);
 			
-			//Construct a skin with the given name, type, parts, caption part and sound parts
+			//Constructs a skin with the given name, type, parts, caption part and sound parts
 			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinParts &parts,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {});
 
-			//Construct a skin with the given name, type, border parts, caption part and sound parts
+			//Constructs a skin with the given name, type, border parts, caption part and sound parts
 			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinBorderParts &border_parts,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {});
 
-			//Construct a skin with the given name, type, side parts, caption part and sound parts
+			//Constructs a skin with the given name, type, side parts, caption part and sound parts
 			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinSideParts &side_parts,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {});
 
-			//Construct a skin with the given name, type, center part, caption part and sound parts
+			//Constructs a skin with the given name, type, center part, caption part and sound parts
 			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinPart &center_part,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {});
 
-			//Construct a skin with the given name, type, caption part and sound parts
+			//Constructs a skin with the given name, type, caption part and sound parts
 			GuiSkin(std::string name, std::type_index type,
 				const gui_skin::SkinTextPart &caption_part, const gui_skin::SkinSoundParts &sound_parts = {});
 
@@ -381,24 +381,24 @@ namespace ion::gui::skins
 				Removing
 			*/
 
-			//Clear all parts from this skin
+			//Clears all parts from this skin
 			void ClearParts() noexcept;
 
-			//Remove a part with the given name from this skin
+			//Removes a part with the given name from this skin
 			bool RemovePart(std::string_view name) noexcept;
 
 
-			//Clear all text parts from this skin
+			//Clears all text parts from this skin
 			void ClearTextParts() noexcept;
 
-			//Remove a text part with the given name from this skin
+			//Removes a text part with the given name from this skin
 			bool RemoveTextPart(std::string_view name) noexcept;
 
 
-			//Clear all sound parts from this skin
+			//Clears all sound parts from this skin
 			void ClearSoundParts() noexcept;
 
-			//Remove a sound part with the given name from this skin
+			//Removes a sound part with the given name from this skin
 			bool RemoveSoundPart(std::string_view name) noexcept;
 
 
@@ -444,10 +444,10 @@ namespace ion::gui::skins
 				Removing
 			*/
 
-			//Clear all part render passes from this skin
+			//Clears all part render passes from this skin
 			void ClearPartRenderPasses() noexcept;
 
-			//Clear all text render passes from this skin
+			//Clears all text render passes from this skin
 			void ClearTextRenderPasses() noexcept;
 
 
@@ -456,7 +456,7 @@ namespace ion::gui::skins
 				Registering
 			*/
 
-			//Register a gui control of type T, with the given default skin name and skin builder
+			//Registers a gui control of type T, with the given default skin name and skin builder
 			template <typename T>
 			static inline void RegisterControl(std::string default_skin_name, gui_skin::SkinBuilder skin_builder)
 			{

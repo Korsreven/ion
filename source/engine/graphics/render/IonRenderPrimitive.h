@@ -149,7 +149,7 @@ namespace ion::graphics::render
 
 		public:
 
-			//Construct a new render primitive with the given draw mode, vertex declaration and visibility
+			//Constructs a new render primitive with the given draw mode, vertex declaration and visibility
 			RenderPrimitive(vertex::vertex_batch::VertexDrawMode draw_mode, vertex::VertexDeclaration vertex_declaration,
 				bool visible = true) noexcept;
 
@@ -480,7 +480,7 @@ namespace ion::graphics::render
 				Refreshing
 			*/
 
-			//Refresh render primitive by regrouping it in the renderer
+			//Refreshes render primitive by regrouping it in the renderer
 			//This function is typically called each frame
 			void Refresh();
 
@@ -489,11 +489,11 @@ namespace ion::graphics::render
 				Preparing
 			*/
 
-			//Prepare this render primitive such that it is ready to be drawn
+			//Prepares this render primitive such that it is ready to be drawn
 			//This function is typically called each frame
 			virtual void Prepare();
 
-			//Prepare vertex data, by updating world vertex data
+			//Prepares vertex data, by updating world vertex data
 			//Returns true if world vertex data has changed
 			//This function is typically called each frame
 			[[nodiscard]] bool PrepareVertexData();

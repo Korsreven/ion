@@ -49,7 +49,7 @@ namespace ion::graphics::scene::graph::animations
 
 		public:
 
-			//Construct a new attachable node animation with the given node animation, start time and whether it is enabled or not
+			//Constructs a new attachable node animation with the given node animation, start time and whether it is enabled or not
 			explicit AttachableNodeAnimation(NonOwningPtr<NodeAnimation> node_animation,
 				duration start_time = 0.0_sec, bool enabled = true) noexcept;
 
@@ -65,13 +65,13 @@ namespace ion::graphics::scene::graph::animations
 				NotifyUpdate();
 			}
 
-			//Enable the node animation
+			//Enables the node animation
 			inline void Enable() noexcept
 			{
 				enabled_ = true;
 			}
 
-			//Disable the node animation
+			//Disables the node animation
 			inline void Disable() noexcept
 			{
 				enabled_ = false;
@@ -87,10 +87,10 @@ namespace ion::graphics::scene::graph::animations
 			}
 
 
-			//Reset this node animation
+			//Resets this node animation
 			void Reset() noexcept;
 
-			//Revert to the initial node animation
+			//Reverts to the initial node animation
 			void Revert();
 
 
@@ -130,7 +130,7 @@ namespace ion::graphics::scene::graph::animations
 				Elapse time
 			*/
 
-			//Elapse the total time for this node animation by the given time in seconds
+			//Elapses the total time for this node animation by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time, duration current_time, duration start_time = 0.0_sec) noexcept;
 	};

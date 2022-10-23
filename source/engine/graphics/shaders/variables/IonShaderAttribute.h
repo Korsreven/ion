@@ -129,14 +129,14 @@ namespace ion::graphics::shaders::variables
 				Observers
 			*/
 
-			//Get a mutable reference to the contained glsl attribute value
+			//Gets a mutable reference to the contained glsl attribute value
 			template <typename T, typename = std::enable_if_t<std::is_base_of_v<AttributeVariable, Attribute<T>>>>
 			[[nodiscard]] inline auto& Get() noexcept
 			{
 				return static_cast<Attribute<T>&>(*this).Get();
 			}
 
-			//Get an immutable reference to the contained glsl attribute value
+			//Gets an immutable reference to the contained glsl attribute value
 			template <typename T, typename = std::enable_if_t<std::is_base_of_v<AttributeVariable, Attribute<T>>>>
 			[[nodiscard]] inline auto& Get() const noexcept
 			{
@@ -149,7 +149,7 @@ namespace ion::graphics::shaders::variables
 			*/
 
 			//Mutable value visit
-			//Call the correct overload for the given overload set, based on the value of the attribute variable
+			//Calls the correct overload for the given overload set, based on the value of the attribute variable
 			template <typename T, typename ...Ts>
 			inline auto Visit(T &&callable, Ts &&...callables) noexcept
 			{
@@ -157,7 +157,7 @@ namespace ion::graphics::shaders::variables
 			}
 
 			//Immutable value visit
-			//Call the correct overload for the given overload set, based on the value of the attribute variable
+			//Calls the correct overload for the given overload set, based on the value of the attribute variable
 			template <typename T, typename ...Ts>
 			inline auto Visit(T &&callable, Ts &&...callables) const noexcept
 			{
@@ -195,13 +195,13 @@ namespace ion::graphics::shaders::variables
 			Observers
 		*/
 
-		//Get a mutable reference to the contained glsl attribute value
+		//Gets a mutable reference to the contained glsl attribute value
 		[[nodiscard]] inline auto& Get() noexcept
 		{
 			return std::get<glsl::attribute<T>>(value_);
 		}
 
-		//Get an immutable reference to the contained glsl attribute value
+		//Gets an immutable reference to the contained glsl attribute value
 		[[nodiscard]] inline auto& Get() const noexcept
 		{
 			return std::get<glsl::attribute<T>>(value_);

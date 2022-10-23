@@ -124,17 +124,17 @@ namespace ion::gui
 				Modifiers
 			*/
 
-			//Enable this component
+			//Enables this component
 			void Enable() noexcept;
 
-			//Disable this component
+			//Disables this component
 			void Disable() noexcept;
 
 
-			//Show this component
+			//Shows this component
 			void Show() noexcept;
 
-			//Hide this component
+			//Hides this component
 			void Hide() noexcept;
 
 
@@ -157,7 +157,7 @@ namespace ion::gui
 			}
 
 
-			//Set the parent of this component
+			//Sets the parent of this component
 			void Parent(GuiComponent &parent) noexcept;
 
 
@@ -213,10 +213,10 @@ namespace ion::gui
 			}
 
 
-			//Set ownership of this component
+			//Sets ownership of this component
 			void Owner(GuiContainer &owner) noexcept;
 
-			//Release ownership for this component
+			//Releases ownership for this component
 			void Owner(std::nullptr_t) noexcept;
 
 			//Sets the local z-order of this component

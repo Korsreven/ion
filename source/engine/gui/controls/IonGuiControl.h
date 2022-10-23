@@ -545,21 +545,21 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a control with the given name
+			//Constructs a control with the given name
 			explicit GuiControl(std::string name) noexcept;
 
-			//Construct a control with the given name and size
+			//Constructs a control with the given name and size
 			GuiControl(std::string name, const std::optional<Vector2> &size) noexcept;
 
-			//Construct a control with the given name, skin and size
+			//Constructs a control with the given name, skin and size
 			GuiControl(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size);
 
 
-			//Construct a control with the given name, size, caption, tooltip and hit boxes
+			//Constructs a control with the given name, size, caption, tooltip and hit boxes
 			GuiControl(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Construct a control with the given name, skin, size, caption, tooltip and hit boxes
+			//Constructs a control with the given name, skin, size, caption, tooltip and hit boxes
 			GuiControl(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {});
 
@@ -584,35 +584,35 @@ namespace ion::gui::controls
 				Modifiers
 			*/
 
-			//Show this control
+			//Shows this control
 			void Show() noexcept;
 
 
-			//Focus this control
+			//Focuses this control
 			void Focus() noexcept;
 
-			//Defocus this control
+			//Defocuses this control
 			void Defocus() noexcept;
 
 
-			//Press this control
+			//Presses this control
 			void Press() noexcept;
 
-			//Release this control
+			//Releases this control
 			void Release() noexcept;
 
-			//Click this control
+			//Clicks this control
 			void Click() noexcept;
 
 
-			//Enter this control (start hovering)
+			//Enters this control (start hovering)
 			void Enter() noexcept;
 
-			//Exit this control (stop hovering)
+			//Exits this control (stop hovering)
 			void Exit() noexcept;
 
 
-			//Reset this control to its enabled/disabled state
+			//Resets this control to its enabled/disabled state
 			//Namely by executing release, defocus and exit
 			void Reset() noexcept;
 

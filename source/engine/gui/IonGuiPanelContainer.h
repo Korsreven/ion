@@ -201,7 +201,7 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create an control of type T with the given name, skin and arguments
+			//Creates a control of type T with the given name, skin and arguments
 			template <typename T, typename... Args>
 			auto CreateControl(std::string name, const skins::GuiSkin &skin, Args &&...args)
 			{
@@ -211,7 +211,7 @@ namespace ion::gui
 				return static_pointer_cast<T>(ptr);
 			}
 
-			//Create an control of type T with the given name and arguments
+			//Creates a control of type T with the given name and arguments
 			template <typename T, typename... Args>
 			auto CreateControl(std::string name, Args &&...args)
 			{
@@ -228,7 +228,7 @@ namespace ion::gui
 				return static_pointer_cast<T>(ptr);
 			}
 
-			//Create an control of type T with the given name
+			//Creates a control of type T with the given name
 			template <typename T, typename... Args>
 			auto CreateControl(std::string name)
 			{
@@ -239,7 +239,7 @@ namespace ion::gui
 			}
 
 
-			//Create an control of type T as a copy of the given control
+			//Creates a control of type T as a copy of the given control
 			template <typename T>
 			auto CreateControl(const T &control_t)
 			{
@@ -249,7 +249,7 @@ namespace ion::gui
 				return static_pointer_cast<T>(ptr);
 			}
 
-			//Create an control of type T by moving the given control
+			//Creates a control of type T by moving the given control
 			template <typename T>
 			auto CreateControl(T &&control_t)
 			{
@@ -265,15 +265,15 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a button with the given name, size, caption, tooltip and hit boxes
+			//Creates a button with the given name, size, caption, tooltip and hit boxes
 			NonOwningPtr<controls::GuiButton> CreateButton(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a button with the given name, skin, size, caption, tooltip and hit boxes
+			//Creates a button with the given name, skin, size, caption, tooltip and hit boxes
 			NonOwningPtr<controls::GuiButton> CreateButton(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a button by moving the given button
+			//Creates a button by moving the given button
 			NonOwningPtr<controls::GuiButton> CreateButton(controls::GuiButton &&button);
 
 
@@ -282,15 +282,15 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a check box with the given name, size, caption, tooltip and hit boxes
+			//Creates a check box with the given name, size, caption, tooltip and hit boxes
 			NonOwningPtr<controls::GuiCheckBox> CreateCheckBox(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a check box with the given name, skin, size, caption, tooltip and hit boxes
+			//Creates a check box with the given name, skin, size, caption, tooltip and hit boxes
 			NonOwningPtr<controls::GuiCheckBox> CreateCheckBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a check box by moving the given check box
+			//Creates a check box by moving the given check box
 			NonOwningPtr<controls::GuiCheckBox> CreateCheckBox(controls::GuiCheckBox &&check_box);
 
 
@@ -299,15 +299,15 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a group box with the given name, size, caption and hit boxes
+			//Creates a group box with the given name, size, caption and hit boxes
 			NonOwningPtr<controls::GuiGroupBox> CreateGroupBox(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a group box with the given name, skin, size, caption and hit boxes
+			//Creates a group box with the given name, skin, size, caption and hit boxes
 			NonOwningPtr<controls::GuiGroupBox> CreateGroupBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a group box by moving the given group box
+			//Creates a group box by moving the given group box
 			NonOwningPtr<controls::GuiGroupBox> CreateGroupBox(controls::GuiGroupBox &&group_box);
 
 
@@ -316,15 +316,15 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a label with the given name, size, caption and hit boxes
+			//Creates a label with the given name, size, caption and hit boxes
 			NonOwningPtr<controls::GuiLabel> CreateLabel(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a label with the given name, skin, size, caption and hit boxes
+			//Creates a label with the given name, skin, size, caption and hit boxes
 			NonOwningPtr<controls::GuiLabel> CreateLabel(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a label by moving the given label
+			//Creates a label by moving the given label
 			NonOwningPtr<controls::GuiLabel> CreateLabel(controls::GuiLabel &&label);
 
 
@@ -333,15 +333,15 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a list box with the given name, size, caption and hit boxes
+			//Creates a list box with the given name, size, caption and hit boxes
 			NonOwningPtr<controls::GuiListBox> CreateListBox(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a list box with the given name, skin, size, caption and hit boxes
+			//Creates a list box with the given name, skin, size, caption and hit boxes
 			NonOwningPtr<controls::GuiListBox> CreateListBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a list box by moving the given list box
+			//Creates a list box by moving the given list box
 			NonOwningPtr<controls::GuiListBox> CreateListBox(controls::GuiListBox &&list_box);
 
 
@@ -350,15 +350,15 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a progress bar with the given name, size, caption and type
+			//Creates a progress bar with the given name, size, caption and type
 			NonOwningPtr<controls::GuiProgressBar> CreateProgressBar(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, controls::gui_progress_bar::ProgressBarType type = controls::gui_progress_bar::ProgressBarType::Horizontal);
 
-			//Create a progress bar with the given name, skin, size, caption and type
+			//Creates a progress bar with the given name, skin, size, caption and type
 			NonOwningPtr<controls::GuiProgressBar> CreateProgressBar(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, controls::gui_progress_bar::ProgressBarType type = controls::gui_progress_bar::ProgressBarType::Horizontal);
 
-			//Create a progress bar by moving the given progress bar
+			//Creates a progress bar by moving the given progress bar
 			NonOwningPtr<controls::GuiProgressBar> CreateProgressBar(controls::GuiProgressBar &&progress_bar);
 
 
@@ -367,15 +367,15 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a radio button with the given name, size, caption, tooltip and hit boxes
+			//Creates a radio button with the given name, size, caption, tooltip and hit boxes
 			NonOwningPtr<controls::GuiRadioButton> CreateRadioButton(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a radio button with the given name, skin, size, caption, tooltip and hit boxes
+			//Creates a radio button with the given name, skin, size, caption, tooltip and hit boxes
 			NonOwningPtr<controls::GuiRadioButton> CreateRadioButton(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a radio button by moving the given radio button
+			//Creates a radio button by moving the given radio button
 			NonOwningPtr<controls::GuiRadioButton> CreateRadioButton(controls::GuiRadioButton &&radio_button);
 
 
@@ -384,17 +384,17 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a scroll bar with the given name, size, caption, type and hit boxes
+			//Creates a scroll bar with the given name, size, caption, type and hit boxes
 			NonOwningPtr<controls::GuiScrollBar> CreateScrollBar(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, controls::gui_slider::SliderType type = controls::gui_slider::SliderType::Vertical,
 				controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a scroll bar with the given name, skin, size, caption, type and hit boxes
+			//Creates a scroll bar with the given name, skin, size, caption, type and hit boxes
 			NonOwningPtr<controls::GuiScrollBar> CreateScrollBar(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, controls::gui_slider::SliderType type = controls::gui_slider::SliderType::Vertical,
 				controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a scroll bar by moving the given scroll bar
+			//Creates a scroll bar by moving the given scroll bar
 			NonOwningPtr<controls::GuiScrollBar> CreateScrollBar(controls::GuiScrollBar &&scroll_bar);
 
 
@@ -403,19 +403,19 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a slider with the given name, size, caption, tooltip, type and hit boxes
+			//Creates a slider with the given name, size, caption, tooltip, type and hit boxes
 			NonOwningPtr<controls::GuiSlider> CreateSlider(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, 
 				controls::gui_slider::SliderType type = controls::gui_slider::SliderType::Horizontal,
 				controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a slider with the given name, skin, size, caption, tooltip, type and hit boxes
+			//Creates a slider with the given name, skin, size, caption, tooltip, type and hit boxes
 			NonOwningPtr<controls::GuiSlider> CreateSlider(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, 
 				controls::gui_slider::SliderType type = controls::gui_slider::SliderType::Horizontal,
 				controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a slider by moving the given slider
+			//Creates a slider by moving the given slider
 			NonOwningPtr<controls::GuiSlider> CreateSlider(controls::GuiSlider &&slider);
 
 
@@ -424,15 +424,15 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a text box with the given name, size, caption and hit boxes
+			//Creates a text box with the given name, size, caption and hit boxes
 			NonOwningPtr<controls::GuiTextBox> CreateTextBox(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a text box with the given name, skin, size, caption and hit boxes
+			//Creates a text box with the given name, skin, size, caption and hit boxes
 			NonOwningPtr<controls::GuiTextBox> CreateTextBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, controls::gui_control::BoundingBoxes hit_boxes = {});
 
-			//Create a text box by moving the given text box
+			//Creates a text box by moving the given text box
 			NonOwningPtr<controls::GuiTextBox> CreateTextBox(controls::GuiTextBox &&text_box);
 
 
@@ -483,13 +483,13 @@ namespace ion::gui
 				Removing
 			*/
 
-			//Clear all removable controls from this container
+			//Clears all removable controls from this container
 			void ClearControls() noexcept;
 
-			//Remove a removable control from this container
+			//Removes a removable control from this container
 			bool RemoveControl(controls::GuiControl &control) noexcept;
 
-			//Remove a removable control with the given name from this container
+			//Removes a removable control with the given name from this container
 			bool RemoveControl(std::string_view name) noexcept;
 
 
@@ -498,10 +498,10 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a panel with the given name
+			//Creates a panel with the given name
 			NonOwningPtr<GuiPanel> CreatePanel(std::string name);
 
-			//Create a panel by moving the given panel
+			//Creates a panel by moving the given panel
 			NonOwningPtr<GuiPanel> CreatePanel(GuiPanel &&panel);
 
 
@@ -533,13 +533,13 @@ namespace ion::gui
 				Removing
 			*/
 
-			//Clear all removable panels from this container
+			//Clears all removable panels from this container
 			void ClearPanels() noexcept;
 
-			//Remove a removable panel from this container
+			//Removes a removable panel from this container
 			bool RemovePanel(GuiPanel &panel) noexcept;
 
-			//Remove a removable panel with the given name from this container
+			//Removes a removable panel with the given name from this container
 			bool RemovePanel(std::string_view name) noexcept;
 
 
@@ -548,7 +548,7 @@ namespace ion::gui
 				Removing (optimization)
 			*/
 
-			//Clear all removable components from this container
+			//Clears all removable components from this container
 			void ClearComponents() noexcept;
 	};
 } //ion::gui

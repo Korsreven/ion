@@ -33,7 +33,7 @@ namespace ion::assets::repositories
 		//Naming convention is set to file path
 		VideoRepository() noexcept;
 
-		//Construct a video repository with the given naming convention
+		//Constructs a video repository with the given naming convention
 		VideoRepository(file_repository::NamingConvention naming_convention) noexcept;
 	};
 } //ion::assets::repositories

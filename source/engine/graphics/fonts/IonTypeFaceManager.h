@@ -81,21 +81,21 @@ namespace ion::graphics::fonts
 				Creating
 			*/
 
-			//Create a type face with the given name and a regular font
+			//Creates a type face with the given name and a regular font
 			NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular);
 
-			//Create a type face with the given name, a regular, bold and italic font
+			//Creates a type face with the given name, a regular, bold and italic font
 			NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic);
 
-			//Create a type face with the given name, a regular, bold, italic and bold italic font
+			//Creates a type face with the given name, a regular, bold, italic and bold italic font
 			NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic,
 				NonOwningPtr<Font> bold_italic);
 
 
-			//Create a type face as a copy of the given type face
+			//Creates a type face as a copy of the given type face
 			NonOwningPtr<TypeFace> CreateTypeFace(const TypeFace &type_face);
 
-			//Create a type face by moving the given type face
+			//Creates a type face by moving the given type face
 			NonOwningPtr<TypeFace> CreateTypeFace(TypeFace &&type_face);
 
 
@@ -118,13 +118,13 @@ namespace ion::graphics::fonts
 				Removing
 			*/
 
-			//Clear all removable type faces from this manager
+			//Clears all removable type faces from this manager
 			void ClearTypeFaces() noexcept;
 
-			//Remove a removable type face from this manager
+			//Removes a removable type face from this manager
 			bool RemoveTypeFace(TypeFace &type_face) noexcept;
 
-			//Remove a removable type face with the given name from this manager
+			//Removes a removable type face with the given name from this manager
 			bool RemoveTypeFace(std::string_view name) noexcept;
 	};
 } //ion::graphics::fonts

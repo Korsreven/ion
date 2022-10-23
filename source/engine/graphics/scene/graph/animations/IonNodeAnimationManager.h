@@ -52,7 +52,7 @@ namespace ion::graphics::scene::graph::animations
 			using NodeAnimationTimelineBase = managed::ObjectManager<NodeAnimationTimeline, NodeAnimationManager>;
 
 
-			//Construct a new node animation manager with the given scene node
+			//Constructs a new node animation manager with the given scene node
 			NodeAnimationManager(SceneNode &scene_node) noexcept;
 
 			//Deleted copy constructor
@@ -147,14 +147,14 @@ namespace ion::graphics::scene::graph::animations
 				Creating
 			*/
 
-			//Create a node animation with the given name
+			//Creates a node animation with the given name
 			NonOwningPtr<NodeAnimation> CreateAnimation(std::optional<std::string> name = {});
 
 
-			//Create a node animation as a copy of the given node animation
+			//Creates a node animation as a copy of the given node animation
 			NonOwningPtr<NodeAnimation> CreateAnimation(const NodeAnimation &node_animation);
 
-			//Create a node animation by moving the given node animation
+			//Creates a node animation by moving the given node animation
 			NonOwningPtr<NodeAnimation> CreateAnimation(NodeAnimation &&node_animation);
 
 
@@ -177,13 +177,13 @@ namespace ion::graphics::scene::graph::animations
 				Removing
 			*/
 
-			//Clear all removable node animations from this manager
+			//Clears all removable node animations from this manager
 			void ClearAnimations() noexcept;
 
-			//Remove a removable node animation from this manager
+			//Removes a removable node animation from this manager
 			bool RemoveAnimation(NodeAnimation &node_animation) noexcept;
 
-			//Remove a removable node animation with the given name from this manager
+			//Removes a removable node animation with the given name from this manager
 			bool RemoveAnimation(std::string_view name) noexcept;
 
 
@@ -192,14 +192,14 @@ namespace ion::graphics::scene::graph::animations
 				Creating
 			*/
 
-			//Create a node animation group with the given name
+			//Creates a node animation group with the given name
 			NonOwningPtr<NodeAnimationGroup> CreateAnimationGroup(std::optional<std::string> name = {});
 
 
-			//Create a node animation group as a copy of the given node animation group
+			//Creates a node animation group as a copy of the given node animation group
 			NonOwningPtr<NodeAnimationGroup> CreateAnimationGroup(const NodeAnimationGroup &node_animation_group);
 
-			//Create a node animation group by moving the given node animation group
+			//Creates a node animation group by moving the given node animation group
 			NonOwningPtr<NodeAnimationGroup> CreateAnimationGroup(NodeAnimationGroup &&node_animation_group);
 
 
@@ -222,13 +222,13 @@ namespace ion::graphics::scene::graph::animations
 				Removing
 			*/
 
-			//Clear all removable node animation groups from this manager
+			//Clears all removable node animation groups from this manager
 			void ClearAnimationGroups() noexcept;
 
-			//Remove a removable node animation group from this manager
+			//Removes a removable node animation group from this manager
 			bool RemoveAnimationGroup(NodeAnimationGroup &node_animation_group) noexcept;
 
-			//Remove a removable node animation group with the given name from this manager
+			//Removes a removable node animation group with the given name from this manager
 			bool RemoveAnimationGroup(std::string_view name) noexcept;
 
 
@@ -237,7 +237,7 @@ namespace ion::graphics::scene::graph::animations
 				Creating
 			*/
 
-			//Create a node animation timeline with the given name, playback rate and whether it is running or not
+			//Creates a node animation timeline with the given name, playback rate and whether it is running or not
 			NonOwningPtr<NodeAnimationTimeline> CreateTimeline(std::optional<std::string> name = {}, real playback_rate = 1.0_r, bool running = true);
 
 
@@ -260,13 +260,13 @@ namespace ion::graphics::scene::graph::animations
 				Removing
 			*/
 
-			//Clear all removable node animation timelines from this manager
+			//Clears all removable node animation timelines from this manager
 			void ClearTimelines() noexcept;
 
-			//Remove a removable node animation timeline from this manager
+			//Removes a removable node animation timeline from this manager
 			bool RemoveTimeline(NodeAnimationTimeline &node_animation_timeline) noexcept;
 
-			//Remove a removable node animation timeline with the given name from this manager
+			//Removes a removable node animation timeline with the given name from this manager
 			bool RemoveTimeline(std::string_view name) noexcept;
 
 
@@ -274,7 +274,7 @@ namespace ion::graphics::scene::graph::animations
 				Elapse time
 			*/
 
-			//Elapse the total time for this node animation manager by the given time in seconds
+			//Elapses the total time for this node animation manager by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 	};

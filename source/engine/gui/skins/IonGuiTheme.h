@@ -57,7 +57,7 @@ namespace ion::gui::skins
 			NonOwningPtr<graphics::scene::SceneManager> scene_manager_;
 
 
-			//Create a skin with the given name and arguments
+			//Creates a skin with the given name and arguments
 			template <typename T, typename... Args>
 			auto CreateNamedSkin(std::string name, Args &&...args)
 			{
@@ -65,7 +65,7 @@ namespace ion::gui::skins
 				return Create<GuiSkin>(std::move(name), typeid(T), std::forward<Args>(args)...);
 			}
 
-			//Create a default skin with the given arguments
+			//Creates a default skin with the given arguments
 			template <typename T, typename... Args>
 			auto CreateDefaultSkin(Args &&...args)
 			{
@@ -78,7 +78,7 @@ namespace ion::gui::skins
 
 		public:
 
-			//Construct a gui theme with the given scene manager
+			//Constructs a gui theme with the given scene manager
 			GuiTheme(std::string name, NonOwningPtr<graphics::scene::SceneManager> scene_manager) noexcept;
 
 
@@ -128,14 +128,14 @@ namespace ion::gui::skins
 				Creating
 			*/
 
-			//Create a default skin
+			//Creates a default skin
 			template <typename T>
 			NonOwningPtr<GuiSkin> CreateSkin()
 			{
 				return CreateDefaultSkin<T>();
 			}
 
-			//Create a default skin with the given parts, caption part and sound parts
+			//Creates a default skin with the given parts, caption part and sound parts
 			template <typename T>
 			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinParts &parts,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
@@ -143,7 +143,7 @@ namespace ion::gui::skins
 				return CreateDefaultSkin<T>(parts, caption_part, sound_parts);
 			}
 
-			//Create a default skin with the given border parts, caption part and sound parts
+			//Creates a default skin with the given border parts, caption part and sound parts
 			template <typename T>
 			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinBorderParts &border_parts,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
@@ -151,7 +151,7 @@ namespace ion::gui::skins
 				return CreateDefaultSkin<T>(border_parts, caption_part, sound_parts);
 			}
 
-			//Create a default skin with the given side parts, caption part and sound parts
+			//Creates a default skin with the given side parts, caption part and sound parts
 			template <typename T>
 			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinSideParts &side_parts,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
@@ -159,7 +159,7 @@ namespace ion::gui::skins
 				return CreateDefaultSkin<T>(side_parts, caption_part, sound_parts);
 			}
 
-			//Create a default skin with the given center part, caption part and sound parts
+			//Creates a default skin with the given center part, caption part and sound parts
 			template <typename T>
 			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinPart &center_part,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
@@ -167,7 +167,7 @@ namespace ion::gui::skins
 				return CreateDefaultSkin<T>(center_part, caption_part, sound_parts);
 			}
 
-			//Create a default skin with the given caption part and sound parts
+			//Creates a default skin with the given caption part and sound parts
 			template <typename T>
 			NonOwningPtr<GuiSkin> CreateSkin(const gui_skin::SkinTextPart &caption_part, const gui_skin::SkinSoundParts &sound_parts = {})
 			{
@@ -175,14 +175,14 @@ namespace ion::gui::skins
 			}
 
 
-			//Create a skin with the given name
+			//Creates a skin with the given name
 			template <typename T>
 			NonOwningPtr<GuiSkin> CreateSkin(std::string name)
 			{
 				return CreateNamedSkin<T>(std::move(name));
 			}
 
-			//Create a skin with the given name, parts, caption part and sound parts
+			//Creates a skin with the given name, parts, caption part and sound parts
 			template <typename T>
 			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinParts &parts,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
@@ -190,7 +190,7 @@ namespace ion::gui::skins
 				return CreateNamedSkin<T>(std::move(name), parts, caption_part, sound_parts);
 			}
 
-			//Create a skin with the given name, border parts, caption part and sound parts
+			//Creates a skin with the given name, border parts, caption part and sound parts
 			template <typename T>
 			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinBorderParts &border_parts,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
@@ -198,7 +198,7 @@ namespace ion::gui::skins
 				return CreateNamedSkin<T>(std::move(name), border_parts, caption_part, sound_parts);
 			}
 
-			//Create a skin with the given name, side parts, caption part and sound parts
+			//Creates a skin with the given name, side parts, caption part and sound parts
 			template <typename T>
 			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinSideParts &side_parts,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
@@ -206,7 +206,7 @@ namespace ion::gui::skins
 				return CreateNamedSkin<T>(std::move(name), side_parts, caption_part, sound_parts);
 			}
 
-			//Create a skin with the given name, center part, caption part and sound parts
+			//Creates a skin with the given name, center part, caption part and sound parts
 			template <typename T>
 			NonOwningPtr<GuiSkin> CreateSkin(std::string name, const gui_skin::SkinPart &center_part,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {})
@@ -214,7 +214,7 @@ namespace ion::gui::skins
 				return CreateNamedSkin<T>(std::move(name), center_part, caption_part, sound_parts);
 			}
 
-			//Create a skin with the given name, caption part and sound parts
+			//Creates a skin with the given name, caption part and sound parts
 			template <typename T>
 			NonOwningPtr<GuiSkin> CreateSkin(std::string name,
 				const gui_skin::SkinTextPart &caption_part, const gui_skin::SkinSoundParts &sound_parts = {})
@@ -223,10 +223,10 @@ namespace ion::gui::skins
 			}
 
 
-			//Create a skin by copying the given skin
+			//Creates a skin by copying the given skin
 			NonOwningPtr<GuiSkin> CreateSkin(const GuiSkin &skin);
 
-			//Create a skin by moving the given skin
+			//Creates a skin by moving the given skin
 			NonOwningPtr<GuiSkin> CreateSkin(GuiSkin &&skin);
 
 
@@ -249,13 +249,13 @@ namespace ion::gui::skins
 				Removing
 			*/
 
-			//Clear all removable skins from this theme
+			//Clears all removable skins from this theme
 			void ClearSkins() noexcept;
 
-			//Remove a removable skin from this theme
+			//Removes a removable skin from this theme
 			bool RemoveSkin(GuiSkin &skin) noexcept;
 
-			//Remove a removable skin with the given name from this theme
+			//Removes a removable skin with the given name from this theme
 			bool RemoveSkin(std::string_view name) noexcept;
 	};
 } //ion::gui::skins

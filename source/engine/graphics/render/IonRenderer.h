@@ -229,17 +229,17 @@ namespace ion::graphics::render
 				Primitives
 			*/
 
-			//Add a primitive to this renderer
+			//Adds a primitive to this renderer
 			bool AddPrimitive(RenderPrimitive &primitive);
 
-			//Refresh a primitive in this renderer
+			//Refreshes a primitive in this renderer
 			bool RefreshPrimitive(RenderPrimitive &primitive);
 
 
-			//Remove a primitive from this renderer
+			//Removes a primitive from this renderer
 			bool RemovePrimitive(RenderPrimitive &primitive) noexcept;
 
-			//Clear all primitives from this renderer
+			//Clears all primitives from this renderer
 			void ClearPrimitives() noexcept;
 
 
@@ -247,10 +247,10 @@ namespace ion::graphics::render
 				Preparing / drawing
 			*/
 
-			//Prepare this renderer such that it is ready to draw
+			//Prepares this renderer such that it is ready to draw
 			void Prepare();
 
-			//Draw all primitives added to this renderer, in batches
+			//Draws all primitives added to this renderer, in batches
 			void Draw() noexcept;	
 
 
@@ -258,7 +258,7 @@ namespace ion::graphics::render
 				Elapse time
 			*/
 
-			//Elapse the total time for each batch in this renderer by the given time in seconds
+			//Elapses the total time for each batch in this renderer by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 	};

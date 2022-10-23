@@ -34,7 +34,7 @@ namespace ion::events::listeners
 		}
 
 		//Called right before an object is removed or orphaned, with a reference to the object
-		//Return false from this function if the removal should be canceled
+		//Returns false from this function if the removal should be canceled
 		virtual bool ObjectRemovable([[maybe_unused]] ObjectT &object) noexcept
 		{
 			//Optional to override

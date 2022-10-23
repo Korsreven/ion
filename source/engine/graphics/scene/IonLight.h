@@ -115,17 +115,17 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new light with the given name and visibility
+			//Constructs a new light with the given name and visibility
 			explicit Light(std::optional<std::string> name = {}, bool visible = true) noexcept;
 
-			//Construct a new light with the given name and values
+			//Constructs a new light with the given name and values
 			Light(std::optional<std::string> name, light::LightType type,
 				const Vector3 &position, const Vector3 &direction, real radius,
 				const Color &diffuse,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				real cutoff_angle, real outer_cutoff_angle, bool visible = true) noexcept;
 
-			//Construct a new light with the given name and values
+			//Constructs a new light with the given name and values
 			Light(std::optional<std::string> name, light::LightType type,
 				const Vector3 &position, const Vector3 &direction, real radius,
 				const Color &ambient, const Color &diffuse, const Color &specular,
@@ -356,7 +356,7 @@ namespace ion::graphics::scene
 				Preparing
 			*/
 
-			//Prepare this light
+			//Prepares this light
 			//This function is typically called each frame
 			void Prepare() override;
 	};

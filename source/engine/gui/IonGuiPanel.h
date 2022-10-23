@@ -79,7 +79,7 @@ namespace ion::gui
 
 			public:
 			
-				//Construct a grid cell with the given owner
+				//Constructs a grid cell with the given owner
 				explicit GridCell(PanelGrid &owner) noexcept;
 
 				//Destructor
@@ -132,13 +132,13 @@ namespace ion::gui
 				}
 
 
-				//Show this grid cell
+				//Shows this grid cell
 				void Show() noexcept;
 
 				//Realigns all controls attached to this grid cell
 				void Realign() noexcept;
 
-				//Reposition the node for this grid cell
+				//Repositions the node for this grid cell
 				void Reposition() noexcept;
 
 
@@ -205,7 +205,7 @@ namespace ion::gui
 
 			public:
 
-				//Construct a panel grid with the given owner, size, rows and columns
+				//Constructs a panel grid with the given owner, size, rows and columns
 				PanelGrid(GuiPanel &owner, const Vector2 &size, int rows, int columns) noexcept;
 
 
@@ -268,13 +268,13 @@ namespace ion::gui
 				}
 
 
-				//Show this panel grid
+				//Shows this panel grid
 				void Show() noexcept;
 
 				//Realigns all controls attached to this panel grid
 				void Realign() noexcept;
 
-				//Reposition all cells in this panel grid
+				//Repositions all cells in this panel grid
 				void Reposition() noexcept;
 
 
@@ -324,7 +324,7 @@ namespace ion::gui
 
 		public:
 
-			//Construct a panel with the given name
+			//Constructs a panel with the given name
 			explicit GuiPanel(std::string name) noexcept;
 
 
@@ -332,7 +332,7 @@ namespace ion::gui
 				Modifiers
 			*/
 
-			//Show this panel
+			//Shows this panel
 			void Show() noexcept;
 
 

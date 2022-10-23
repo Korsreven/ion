@@ -29,7 +29,7 @@ namespace ion::types
 			return value;
 		}
 
-		//Enable support for chrono::duration
+		//Enables support for chrono::duration
 		constexpr auto underlying_value(duration value) noexcept
 		{
 			return value.count();
@@ -54,7 +54,7 @@ namespace ion::types
 			//Default constructor
 			constexpr Cumulative() = default;
 
-			//Construct a new cumulative with the given limit
+			//Constructs a new cumulative with the given limit
 			constexpr explicit Cumulative(T limit) noexcept :
 				limit_{limit > T{} ? limit : T{}}
 			{
@@ -107,7 +107,7 @@ namespace ion::types
 			}
 
 
-			//Add the given amount to the running total
+			//Adds the given amount to the running total
 			//Resets and carries over the remainder if accumulation is complete
 			constexpr auto& Add(T amount) noexcept
 			{
@@ -118,7 +118,7 @@ namespace ion::types
 				return *this;
 			}
 
-			//Add the given percentage (of the limit) to the running total
+			//Adds the given percentage (of the limit) to the running total
 			constexpr auto& AddPercent(real percent) noexcept
 			{
 				return Add(T(cumulative::detail::underlying_value(limit_) * percent));
@@ -129,7 +129,7 @@ namespace ion::types
 				Clamping
 			*/
 
-			//Clamp running total to range [0, limit]
+			//Clamps running total to range [0, limit]
 			constexpr void Clamp() noexcept
 			{
 				total_ = std::clamp(total_, T{}, limit_);
@@ -208,13 +208,13 @@ namespace ion::types
 			}
 
 
-			//Pre-increment the running total with 1
+			//Pre-increments the running total with 1
 			constexpr auto& operator++() noexcept
 			{
 				return Add(T{1});
 			}
 
-			//Post-increment the running total with 1
+			//Post-increments the running total with 1
 			constexpr auto operator++(int) noexcept
 			{
 				auto temp = *this;
@@ -222,7 +222,7 @@ namespace ion::types
 				return temp;
 			}
 
-			//Increment the running total with the given amount
+			//Increments the running total with the given amount
 			constexpr auto& operator+=(T amount) noexcept
 			{
 				return Add(amount);

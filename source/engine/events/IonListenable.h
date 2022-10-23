@@ -174,7 +174,7 @@ namespace ion::events
 				Subscribing
 			*/
 
-			//Subscribe a subscribable listener to this listenable
+			//Subscribes a subscribable listener to this listenable
 			auto Subscribe(T &listener)
 			{
 				auto iter =
@@ -201,7 +201,7 @@ namespace ion::events
 				Unsubscribing
 			*/
 
-			//Unsubscribe a unsubscribable listener from this listenable
+			//Unsubscribes a unsubscribable listener from this listenable
 			auto Unsubscribe(T &listener) noexcept
 			{
 				auto iter =
@@ -223,7 +223,7 @@ namespace ion::events
 					return false;
 			}
 
-			//Unsubscribe all unsubscribable listeners from this listenable
+			//Unsubscribes all unsubscribable listeners from this listenable
 			void UnsubscribeAll() noexcept
 			{
 				//[listeners to keep, listeners to unsubscribe]

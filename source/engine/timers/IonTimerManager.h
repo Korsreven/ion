@@ -79,17 +79,17 @@ namespace ion::timers
 				Creating
 			*/
 
-			//Create a timer with the given name and interval
+			//Creates a timer with the given name and interval
 			NonOwningPtr<Timer> CreateTimer(std::string name, duration interval);
 
-			//Create a timer with the given name, interval and callback
+			//Creates a timer with the given name, interval and callback
 			NonOwningPtr<Timer> CreateTimer(std::string name, duration interval, events::Callback<void, Timer&> on_tick);
 
 
-			//Create a timer as a copy of the given timer
+			//Creates a timer as a copy of the given timer
 			NonOwningPtr<Timer> CreateTimer(const Timer &timer);
 
-			//Create a timer by moving the given timer
+			//Creates a timer by moving the given timer
 			NonOwningPtr<Timer> CreateTimer(Timer &&timer);
 
 
@@ -112,13 +112,13 @@ namespace ion::timers
 				Removing
 			*/
 
-			//Clear all removable timers from this manager
+			//Clears all removable timers from this manager
 			void ClearTimers() noexcept;
 
-			//Remove a removable timer from this manager
+			//Removes a removable timer from this manager
 			bool RemoveTimer(Timer &timer) noexcept;
 
-			//Remove a removable timer with the given name from this manager
+			//Removes a removable timer with the given name from this manager
 			bool RemoveTimer(std::string_view name) noexcept;
 
 
@@ -126,7 +126,7 @@ namespace ion::timers
 				Elapse time
 			*/
 
-			//Elapse all timers by the given time in seconds
+			//Elapses all timers by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 	};

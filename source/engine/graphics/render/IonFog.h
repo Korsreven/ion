@@ -57,7 +57,7 @@ namespace ion::graphics::render
 			//Default constructor
 			Fog() = default;
 
-			//Construct a new fog with the given values
+			//Constructs a new fog with the given values
 			Fog(fog::FogMode mode, real density, real near_distance, real far_distance,
 				const Color &color = fog::detail::default_color) noexcept;
 

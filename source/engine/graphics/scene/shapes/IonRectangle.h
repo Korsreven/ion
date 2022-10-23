@@ -61,12 +61,12 @@ namespace ion::graphics::scene::shapes
 			Vector2 size_;
 
 
-			//Construct a new rectangle with the given vertices, position, rotation, size, color and visibility
+			//Constructs a new rectangle with the given vertices, position, rotation, size, color and visibility
 			//Can only be instantiated by derived
 			Rectangle(const mesh::Vertices &vertices, const Vector3 &position, real rotation, const Vector2 &size,
 				const Color &color, bool visible = true);
 
-			//Construct a new texturized rectangle with the given vertices, position, rotation, size, material, color and visibility
+			//Constructs a new texturized rectangle with the given vertices, position, rotation, size, material, color and visibility
 			//Can only be instantiated by derived
 			Rectangle(const mesh::Vertices &vertices, const Vector3 &position, real rotation, const Vector2 &size,
 				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
@@ -76,13 +76,13 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			//Construct a new rectangle with the given size, color and visibility
+			//Constructs a new rectangle with the given size, color and visibility
 			Rectangle(const Vector2 &size, const Color &color, bool visible = true);
 
-			//Construct a new rectangle with the given position, size, color and visibility
+			//Constructs a new rectangle with the given position, size, color and visibility
 			Rectangle(const Vector3 &position, const Vector2 &size, const Color &color, bool visible = true);
 
-			//Construct a new rectangle with the given position, rotation, size, color and visibility
+			//Constructs a new rectangle with the given position, rotation, size, color and visibility
 			Rectangle(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, bool visible = true);
 
 

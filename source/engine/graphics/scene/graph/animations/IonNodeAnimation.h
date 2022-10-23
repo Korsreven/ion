@@ -349,7 +349,7 @@ namespace ion::graphics::scene::graph::animations
 			}
 
 
-			//Reset this node animation
+			//Resets this node animation
 			void Reset() noexcept;
 
 
@@ -387,11 +387,11 @@ namespace ion::graphics::scene::graph::animations
 				Elapse time
 			*/
 
-			//Elapse the total time for this node animation group by the given time in seconds
+			//Elapses the total time for this node animation group by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time, duration current_time, duration start_time) noexcept;
 
-			//Elapse the total time for this node animation group by the given time in seconds
+			//Elapses the total time for this node animation group by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(NodeAnimation &animation, duration time, duration current_time, duration start_time) noexcept;
 
@@ -423,7 +423,7 @@ namespace ion::graphics::scene::graph::animations
 				duration time, std::any user_data = {});
 
 
-			//Clear all actions from this node animation
+			//Clears all actions from this node animation
 			void ClearActions() noexcept;
 
 
@@ -463,7 +463,7 @@ namespace ion::graphics::scene::graph::animations
 				node_animation::MotionTechnique technique_z);
 
 
-			//Clear all motions from this node animation
+			//Clears all motions from this node animation
 			void ClearMotions() noexcept;
 
 
@@ -471,7 +471,7 @@ namespace ion::graphics::scene::graph::animations
 				Actions / motions
 			*/
 
-			//Clear all actions and motions from this node animation
+			//Clears all actions and motions from this node animation
 			void Clear() noexcept;
 	};
 } //ion::graphics::scene::graph::animations

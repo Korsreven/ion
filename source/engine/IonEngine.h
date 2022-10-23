@@ -142,13 +142,13 @@ namespace ion
 				Events
 			*/
 
-			//Return a mutable reference to the frame listener
+			//Returns a mutable reference to the frame listener
 			[[nodiscard]] inline auto& FrameEvents() noexcept
 			{
 				return static_cast<FrameEventsBase&>(*this);
 			}
 
-			//Return an immutable reference to the frame listener
+			//Returns an immutable reference to the frame listener
 			[[nodiscard]] inline auto& FrameEvents() const noexcept
 			{
 				return static_cast<const FrameEventsBase&>(*this);
@@ -299,7 +299,7 @@ namespace ion
 			//Returns true if all extensions, internal and external requirements where initialized succesfully
 			[[nodiscard]] bool Initialize() noexcept;
 
-			//Start the rendering loop
+			//Starts the rendering loop
 			//Returns 0 if everything went fine
 			[[nodiscard]] int Start() noexcept;
 
@@ -326,7 +326,7 @@ namespace ion
 				Rendering target
 			*/
 
-			//Render to the given render window, and create a default viewport
+			//Renders to the given render window, and create a default viewport
 			graphics::render::RenderWindow& RenderTo(graphics::render::RenderWindow &&render_window) noexcept;
 
 
@@ -335,7 +335,7 @@ namespace ion
 				Creating
 			*/
 
-			//Create a scene graph with the given name and whether or not is should be enabled
+			//Creates a scene graph with the given name and whether or not is should be enabled
 			NonOwningPtr<graphics::scene::graph::SceneGraph> CreateSceneGraph(std::optional<std::string> name = {}, bool enabled = true);
 
 
@@ -366,13 +366,13 @@ namespace ion
 				Removing
 			*/
 
-			//Clear all removable scene graphs from the engine
+			//Clears all removable scene graphs from the engine
 			void ClearSceneGraphs() noexcept;
 
-			//Remove a removable scene graph from the engine
+			//Removes a removable scene graph from the engine
 			bool RemoveSceneGraph(graphics::scene::graph::SceneGraph &scene_graph) noexcept;
 
-			//Remove a removable scene graph with the given name from the engine
+			//Removes a removable scene graph with the given name from the engine
 			bool RemoveSceneGraph(std::string_view name) noexcept;
 
 

@@ -278,7 +278,7 @@ namespace ion::script::utilities::parse
 	[[nodiscard]] std::optional<std::string> AsString(std::string_view str);
 
 	//Parses the given color value as a color name
-	//Return nullopt of the given color does not have a X11/W3C color name
+	//Returns nullopt of the given color does not have a X11/W3C color name
 	[[nodiscard]] std::optional<std::string_view> AsString(graphics::utilities::Color color);
 
 

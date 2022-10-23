@@ -29,7 +29,7 @@ namespace ion::types
 			return value;
 		}
 
-		//Enable support for duration
+		//Enables support for duration
 		constexpr auto underlying_value(duration value) noexcept
 		{
 			return value.count();
@@ -54,7 +54,7 @@ namespace ion::types
 			//Default constructor
 			constexpr Progress() = default;
 
-			//Construct a new progress with the given min and max
+			//Constructs a new progress with the given min and max
 			constexpr Progress(T min, T max) noexcept :
 				position_{min},
 				min_{min},

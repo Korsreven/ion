@@ -157,7 +157,7 @@ namespace ion::managed
 				Registering
 			*/
 
-			//Register an object to this register
+			//Registers an object to this register
 			auto Register(NonOwningPtr<T> object)
 			{
 				auto iter =
@@ -177,7 +177,7 @@ namespace ion::managed
 					return false;
 			}
 
-			//Register an object with the given name to this register
+			//Registers an object with the given name to this register
 			auto Register(std::string name, NonOwningPtr<T> object)
 			{
 				if (!object_register::detail::get_object_by_name(name, objects_))
@@ -197,7 +197,7 @@ namespace ion::managed
 				Unregistering
 			*/
 
-			//Unregister an object from this register
+			//Unregisters an object from this register
 			auto Unregister(T &object) noexcept
 			{
 				auto iter =
@@ -217,7 +217,7 @@ namespace ion::managed
 					return false;
 			}
 
-			//Unregister an object with the given name from this register
+			//Unregisters an object with the given name from this register
 			auto Unregister(std::string_view name) noexcept
 			{
 				auto iter =
@@ -237,7 +237,7 @@ namespace ion::managed
 					return false;
 			}
 
-			//Unregister all objects from this register
+			//Unregisters all objects from this register
 			void UnregisterAll() noexcept
 			{
 				objects_.clear();

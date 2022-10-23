@@ -122,11 +122,11 @@ namespace ion::script::interfaces
 				Creating from script
 			*/
 
-			//Create particle systems from a script (or object file) with the given asset name
+			//Creates particle systems from a script (or object file) with the given asset name
 			void CreateParticleSystems(std::string_view asset_name,
 				graphics::particles::ParticleSystemManager &particle_system_manager);
 
-			//Create particle systems from a script (or object file) with the given asset name
+			//Creates particle systems from a script (or object file) with the given asset name
 			void CreateParticleSystems(std::string_view asset_name,
 				graphics::particles::ParticleSystemManager &particle_system_manager, const ManagerRegister &managers);
 	};

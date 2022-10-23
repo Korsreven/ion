@@ -276,11 +276,11 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a text box with the given name, size, caption, tooltip and hit boxes
+			//Constructs a text box with the given name, size, caption, tooltip and hit boxes
 			GuiTextBox(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Construct a text box with the given name, skin, size, caption, tooltip and hit boxes
+			//Constructs a text box with the given name, skin, size, caption, tooltip and hit boxes
 			GuiTextBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {});
 
@@ -646,13 +646,13 @@ namespace ion::gui::controls
 			bool CutContent(int first, int last) noexcept;
 
 
-			//Paste text from the clipboard and adds it to this text box
+			//Pastes text from the clipboard and adds it to this text box
 			bool PasteContent();
 
-			//Paste text from the clipboard and inserts it at the given offset in this text box
+			//Pastes text from the clipboard and inserts it at the given offset in this text box
 			bool PasteContent(int off);
 
-			//Paste text from the clipboard and replaces it in range [fist, last) in this text box
+			//Pastes text from the clipboard and replaces it in range [fist, last) in this text box
 			bool PasteContent(int first, int last);
 
 

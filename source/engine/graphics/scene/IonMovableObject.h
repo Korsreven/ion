@@ -133,7 +133,7 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a movable object with the given name and visibility
+			//Constructs a movable object with the given name and visibility
 			explicit MovableObject(std::optional<std::string> name = {}, bool visible = true) noexcept;		
 
 			//Default copy constructor
@@ -420,7 +420,7 @@ namespace ion::graphics::scene
 				Preparing
 			*/
 
-			//Prepare this movable object
+			//Prepares this movable object
 			//This function is typically called each frame
 			virtual void Prepare();
 
@@ -429,7 +429,7 @@ namespace ion::graphics::scene
 				Drawing
 			*/
 
-			//Draw the bounding volumes of this movable object
+			//Draws the bounding volumes of this movable object
 			virtual void DrawBounds(real z) noexcept;
 
 
@@ -437,7 +437,7 @@ namespace ion::graphics::scene
 				Elapse time
 			*/
 
-			//Elapse the total time for this movable object by the given time in seconds
+			//Elapses the total time for this movable object by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			virtual void Elapse(duration time) noexcept;
 	};

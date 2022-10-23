@@ -66,7 +66,7 @@ namespace ion::script::interfaces
 				Creating from script
 			*/
 
-			//Create shaders from a script (or object file) with the given asset name
+			//Creates shaders from a script (or object file) with the given asset name
 			void CreateShaders(std::string_view asset_name,
 				graphics::shaders::ShaderManager &shader_manager);
 	};

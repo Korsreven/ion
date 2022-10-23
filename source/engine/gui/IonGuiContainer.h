@@ -95,7 +95,7 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create an component of type T with the given name and arguments
+			//Creates a component of type T with the given name and arguments
 			template <typename T, typename... Args>
 			auto CreateComponent(std::string name, Args &&...args)
 			{
@@ -106,7 +106,7 @@ namespace ion::gui
 			}
 
 
-			//Create an component of type T as a copy of the given component
+			//Creates a component of type T as a copy of the given component
 			template <typename T>
 			auto CreateComponent(const T &component_t)
 			{
@@ -116,7 +116,7 @@ namespace ion::gui
 				return static_pointer_cast<T>(ptr);
 			}
 
-			//Create an component of type T by moving the given component
+			//Creates a component of type T by moving the given component
 			template <typename T>
 			auto CreateComponent(T &&component_t)
 			{
@@ -165,13 +165,13 @@ namespace ion::gui
 				Removing
 			*/
 
-			//Clear all removable components from this container
+			//Clears all removable components from this container
 			void ClearComponents() noexcept;
 
-			//Remove a removable component from this container
+			//Removes a removable component from this container
 			bool RemoveComponent(GuiComponent &component) noexcept;
 
-			//Remove a removable component with the given name from this container
+			//Removes a removable component with the given name from this container
 			bool RemoveComponent(std::string_view name) noexcept;
 	};
 } //ion::gui

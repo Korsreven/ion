@@ -56,7 +56,7 @@ namespace ion::sounds
 			//Default constructor
 			SoundChannel() = default;
 
-			//Construct a new sound channel with the given sound channel group
+			//Constructs a new sound channel with the given sound channel group
 			explicit SoundChannel(NonOwningPtr<SoundChannelGroup> sound_channel_group) noexcept;
 
 
@@ -74,7 +74,7 @@ namespace ion::sounds
 			void CurrentChannelGroup(NonOwningPtr<SoundChannelGroup> sound_channel_group) noexcept;
 
 
-			//Mute this sound channel
+			//Mutes this sound channel
 			void Mute(bool mute) noexcept;
 			
 			//Sets the relative pitch / playback rate of this sound channel
@@ -138,7 +138,7 @@ namespace ion::sounds
 			//Resumes sound channel playback
 			void Resume() noexcept;
 
-			//Pause sound channel playback
+			//Pauses sound channel playback
 			void Pause() noexcept;
 
 			//Pauses sound channel playback and reset position to zero

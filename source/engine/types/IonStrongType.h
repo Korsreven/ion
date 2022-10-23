@@ -28,14 +28,14 @@ namespace ion::types
 
 			using value_type = T;
 
-			//Construct a StrongType containing a T by copying the value
+			//Constructs a StrongType containing a T by copying the value
 			constexpr explicit StrongType(const T &value) noexcept :
 				value_{value}
 			{
 				//Empty
 			}
 
-			//Construct a StrongType containing a T by moving the value
+			//Constructs a StrongType containing a T by moving the value
 			constexpr explicit StrongType(T &&value) noexcept :
 				value_{std::move(value)}
 			{
@@ -47,13 +47,13 @@ namespace ion::types
 				Observers
 			*/
 			
-			//Get a mutable reference to the contained value
+			//Gets a mutable reference to the contained value
 			[[nodiscard]] constexpr auto& Get() noexcept
 			{
 				return value_;
 			}
 
-			//Get an immutable reference to the contained value
+			//Gets an immutable reference to the contained value
 			[[nodiscard]] constexpr auto& Get() const noexcept
 			{
 				return value_;

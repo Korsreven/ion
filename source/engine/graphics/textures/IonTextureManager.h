@@ -377,27 +377,27 @@ namespace ion::graphics::textures
 				Creating
 			*/
 
-			//Create a texture with the given name and asset name
+			//Creates a texture with the given name and asset name
 			NonOwningPtr<Texture> CreateTexture(std::string name, std::string asset_name);
 
-			//Create a texture with the given name, asset name, texture filter for min/mag, mip filter and texture wrap for s/t
+			//Creates a texture with the given name, asset name, texture filter for min/mag, mip filter and texture wrap for s/t
 			NonOwningPtr<Texture> CreateTexture(std::string name, std::string asset_name,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode);
 
-			//Create a texture with the given name, asset name, texture filter, mip filter and texture wrap
+			//Creates a texture with the given name, asset name, texture filter, mip filter and texture wrap
 			NonOwningPtr<Texture> CreateTexture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode);
 
-			//Create a texture with the given name, asset name, texture filter and texture wrap (no mipmap)
+			//Creates a texture with the given name, asset name, texture filter and texture wrap (no mipmap)
 			NonOwningPtr<Texture> CreateTexture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode);
 
 
-			//Create a texture as a copy of the given texture
+			//Creates a texture as a copy of the given texture
 			NonOwningPtr<Texture> CreateTexture(const Texture &texture);
 
-			//Create a texture by moving the given texture
+			//Creates a texture by moving the given texture
 			NonOwningPtr<Texture> CreateTexture(Texture &&texture);
 
 
@@ -406,12 +406,12 @@ namespace ion::graphics::textures
 				Creating
 			*/
 
-			//Create a texture atlas with the given name, asset name, number of rows, columns, sub textures and sub texture order
+			//Creates a texture atlas with the given name, asset name, number of rows, columns, sub textures and sub texture order
 			//Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
 			NonOwningPtr<TextureAtlas> CreateTextureAtlas(std::string name, std::string asset_name,
 				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor);
 
-			//Create a texture atlas with the given name, asset name, texture filter for min/mag, mip filter, texture wrap for s/t,
+			//Creates a texture atlas with the given name, asset name, texture filter for min/mag, mip filter, texture wrap for s/t,
 			//number of rows, columns, sub textures and sub texture order
 			//Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
 			NonOwningPtr<TextureAtlas> CreateTextureAtlas(std::string name, std::string asset_name,
@@ -419,14 +419,14 @@ namespace ion::graphics::textures
 				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode,
 				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor);
 
-			//Create a texture atlas with the given name, asset name, texture filter, mip filter, texture wrap,
+			//Creates a texture atlas with the given name, asset name, texture filter, mip filter, texture wrap,
 			//number of rows, columns, sub textures and sub texture order
 			//Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
 			NonOwningPtr<TextureAtlas> CreateTextureAtlas(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode,
 				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor);
 
-			//Create a texture atlas with the given name, asset name, texture filter, texture wrap (no mipmap),
+			//Creates a texture atlas with the given name, asset name, texture filter, texture wrap (no mipmap),
 			//number of rows, columns, sub textures and sub texture order
 			//Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
 			NonOwningPtr<TextureAtlas> CreateTextureAtlas(std::string name, std::string asset_name,
@@ -453,13 +453,13 @@ namespace ion::graphics::textures
 				Removing
 			*/
 
-			//Clear all removable textures from this manager
+			//Clears all removable textures from this manager
 			void ClearTextures() noexcept;
 
-			//Remove a removable texture from this manager
+			//Removes a removable texture from this manager
 			bool RemoveTexture(Texture &texture) noexcept;
 
-			//Remove a removable texture with the given name from this manager
+			//Removes a removable texture with the given name from this manager
 			bool RemoveTexture(std::string_view name) noexcept;
 	};
 } //ion::graphics::textures

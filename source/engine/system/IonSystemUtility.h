@@ -98,7 +98,7 @@ namespace ion::system::utilities
 		Clipboard
 	*/
 
-	//Copy the given text, to the system clipboard
+	//Copies the given text, to the system clipboard
 	bool Clipboard(std::string_view text) noexcept;
 
 	//Returns the text currently stored in the system clipboard (if any)

@@ -130,7 +130,7 @@ namespace ion::utilities::file
 		Directory or file
 	*/
 		
-	//Copy directory or file from one path to another
+	//Copies directory or file from one path to another
 	//Destination directory or file can have different name (rename)
 	bool Copy(const std::filesystem::path &path, const std::filesystem::path &new_path) noexcept;
 		
@@ -152,11 +152,11 @@ namespace ion::utilities::file
 		Directory or file
 	*/
 
-	//Rename directory or file to another name
+	//Renames directory or file to another name
 	//Use move instead (for clarity), if you want to move the directory or file
 	bool Rename(const std::filesystem::path &path, const std::filesystem::path &new_path) noexcept;
 
-	//Move directory or file from one path to another
+	//Moves directory or file from one path to another
 	//Destination directory or file can have different name (rename)
 	bool Move(const std::filesystem::path &path, const std::filesystem::path &new_path) noexcept;
 
@@ -165,12 +165,12 @@ namespace ion::utilities::file
 		Load from file
 	*/
 
-	//Open a file at the given file path and load its content to a string
+	//Opens a file at the given file path and load its content to a string
 	//Default file mode is plain
 	bool Load(const std::filesystem::path &file_path, std::string &data,
 		FileLoadMode file_mode = FileLoadMode::Text);
 
-	//Open a file at the given file path and load each line
+	//Opens a file at the given file path and load each line
 	//Each line from the file is stored as a new string
 	//Default file mode is plain
 	bool Load(const std::filesystem::path &file_path, Strings &data,
@@ -181,13 +181,13 @@ namespace ion::utilities::file
 		Load from part of file
 	*/
 
-	//Open part of a file at the given file path and load its content to a string
+	//Opens part of a file at the given file path and load its content to a string
 	//Default file mode is plain
 	bool LoadPartOf(const std::filesystem::path &file_path, std::string &data,
 		std::streamoff position, std::streamsize count,
 		FileLoadMode file_mode = FileLoadMode::Text);
 
-	//Open part of a file at the given file path and load each line
+	//Opens part of a file at the given file path and load each line
 	//Each line from the file is stored as a new string
 	//Default file mode is plain
 	bool LoadPartOf(const std::filesystem::path &file_path, Strings &data,
@@ -199,12 +199,12 @@ namespace ion::utilities::file
 		Save to file
 	*/
 		
-	//Open a file at the given file path and save the given data
+	//Opens a file at the given file path and save the given data
 	//Default file mode is plain
 	bool Save(const std::filesystem::path &file_path, std::string_view data,
 		FileSaveMode file_mode = FileSaveMode::Text) noexcept;
 
-	//Open a file at the given file path and save each string
+	//Opens a file at the given file path and save each string
 	//Each string from the given data is stored as a new line
 	//Default file mode is plain
 	bool Save(const std::filesystem::path &file_path, const Strings &data,

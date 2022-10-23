@@ -152,11 +152,11 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a progress bar with the given name, size, caption and type
+			//Constructs a progress bar with the given name, size, caption and type
 			GuiProgressBar(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_progress_bar::ProgressBarType type = gui_progress_bar::ProgressBarType::Horizontal) noexcept;
 
-			//Construct a progress bar with the given name, skin, size, caption and type
+			//Constructs a progress bar with the given name, skin, size, caption and type
 			GuiProgressBar(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_progress_bar::ProgressBarType type = gui_progress_bar::ProgressBarType::Horizontal);
 

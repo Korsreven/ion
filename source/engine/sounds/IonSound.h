@@ -106,18 +106,18 @@ namespace ion::sounds
 
 			using resources::FileResource<SoundManager>::FileResource;
 
-			//Construct a new sound with the given name, asset name, type, processing, orientation, rolloff and looping mode
+			//Constructs a new sound with the given name, asset name, type, processing, orientation, rolloff and looping mode
 			Sound(std::string name, std::string asset_name,
 				sound::SoundType type, sound::SoundProcessingMode processing_mode,
 				sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
 				std::optional<sound::SoundLoopingMode> looping_mode = {}) noexcept;
 
-			//Construct a new sound with the given name, asset name, type, processing and looping mode
+			//Constructs a new sound with the given name, asset name, type, processing and looping mode
 			Sound(std::string name, std::string asset_name,
 				sound::SoundType type, sound::SoundProcessingMode processing_mode,
 				std::optional<sound::SoundLoopingMode> looping_mode = {}) noexcept;
 
-			//Construct a new sound with the given name, asset name, type and looping mode
+			//Constructs a new sound with the given name, asset name, type and looping mode
 			Sound(std::string name, std::string asset_name,
 				sound::SoundType type, std::optional<sound::SoundLoopingMode> looping_mode = {}) noexcept;
 
@@ -271,13 +271,13 @@ namespace ion::sounds
 				Creating
 			*/
 
-			//Play this sound, by creating a sound channel outputting to the master channel group
+			//Plays this sound, by creating a sound channel outputting to the master channel group
 			NonOwningPtr<SoundChannel> Play(bool paused = false);
 
-			//Play this sound, by creating a sound channel outputting to the given channel group
+			//Plays this sound, by creating a sound channel outputting to the given channel group
 			NonOwningPtr<SoundChannel> Play(NonOwningPtr<SoundChannelGroup> sound_channel_group, bool paused = false);
 
-			//Play this sound, by reusing the given sound channel
+			//Plays this sound, by reusing the given sound channel
 			NonOwningPtr<SoundChannel> Play(NonOwningPtr<SoundChannel> sound_channel, bool paused = false);
 
 
@@ -286,10 +286,10 @@ namespace ion::sounds
 				Removing
 			*/
 
-			//Clear all removable sound channels from this sound
+			//Clears all removable sound channels from this sound
 			void ClearSoundChannels() noexcept;
 
-			//Remove a removable sound channel from this sound
+			//Removes a removable sound channel from this sound
 			bool RemoveSoundChannel(SoundChannel &sound_channel) noexcept;
 	};
 } //ion::sounds

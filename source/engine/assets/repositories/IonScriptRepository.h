@@ -33,7 +33,7 @@ namespace ion::assets::repositories
 		//Naming convention is set to file path
 		ScriptRepository() noexcept;
 
-		//Construct a script repository with the given naming convention
+		//Constructs a script repository with the given naming convention
 		ScriptRepository(file_repository::NamingConvention naming_convention) noexcept;
 	};
 } //ion::assets::repositories

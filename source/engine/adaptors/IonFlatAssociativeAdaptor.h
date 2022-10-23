@@ -193,14 +193,14 @@ namespace ion::adaptors
 		//Default constructor
 		FlatAssociativeAdaptor() = default;
 
-		//Construct a flat associative adaptor by the given container
+		//Constructs a flat associative adaptor by the given container
 		explicit FlatAssociativeAdaptor(typename my_base::container_type container) noexcept :
 			my_base{flat_associative_adaptor::detail::make_ordered_associative(std::move(container), value_compare{})}
 		{
 			//Empty
 		}
 
-		//Construct a flat associative adaptor by the given initializer list
+		//Constructs a flat associative adaptor by the given initializer list
 		explicit FlatAssociativeAdaptor(std::initializer_list<typename my_base::value_type> list) noexcept :
 			my_base{flat_associative_adaptor::detail::make_ordered_associative(typename my_base::container_type{list}, value_compare{})}
 		{
@@ -510,14 +510,14 @@ namespace ion::adaptors
 			Inserting
 		*/
 
-		//Emplace a key-value pair by forwarding the given arguments to its constructor
+		//Emplaces a key-value pair by forwarding the given arguments to its constructor
 		template <typename... Args>
 		inline auto emplace(Args &&...args)
 		{
 			return insert(typename my_base::value_type{std::forward<Args>(args)...});
 		}
 
-		//Emplace with hint, a key-value pair by forwarding the given arguments to its constructor
+		//Emplaces with hint, a key-value pair by forwarding the given arguments to its constructor
 		template <typename... Args>
 		inline auto emplace_hint(typename my_base::iterator hint, Args &&...args)
 		{
@@ -525,7 +525,7 @@ namespace ion::adaptors
 		}
 
 
-		//Insert a key-value pair by copying the given value
+		//Inserts a key-value pair by copying the given value
 		inline auto insert(const typename my_base::value_type &value)
 		{
 			auto [iter, found] =
@@ -540,7 +540,7 @@ namespace ion::adaptors
 			return std::pair{typename my_base::iterator{iter}, !found};
 		}
 
-		//Insert a key-value pair by moving the given value in place
+		//Inserts a key-value pair by moving the given value in place
 		inline auto insert(typename my_base::value_type &&value)
 		{
 			auto [iter, found] =
@@ -555,7 +555,7 @@ namespace ion::adaptors
 			return std::pair{typename my_base::iterator{iter}, !found};
 		}
 
-		//Insert with hint, a key-value pair by copying the given value
+		//Inserts with hint, a key-value pair by copying the given value
 		inline auto insert(typename my_base::iterator hint, const typename my_base::value_type &value)
 		{
 			auto [iter, found] =
@@ -571,7 +571,7 @@ namespace ion::adaptors
 			return std::pair{typename my_base::iterator{iter}, !found};
 		}
 
-		//Insert with hint, a key-value pair by moving the given value in place
+		//Inserts with hint, a key-value pair by moving the given value in place
 		inline auto insert(typename my_base::iterator hint, typename my_base::value_type &&value)
 		{
 			auto [iter, found] =
@@ -588,14 +588,14 @@ namespace ion::adaptors
 		}
 
 
-		//Insert multiple key_value pair at once, by copying, sorting and merging the given values
+		//Inserts multiple key_value pair at once, by copying, sorting and merging the given values
 		//Warning. After all values are added, duplicate values will be removed
 		inline auto insert(const typename my_base::container_type &container)
 		{
 			return insert<typename my_base::container_type>(container);
 		}
 
-		//Insert multiple key_value pair at once, by copying, sorting and merging the given values
+		//Inserts multiple key_value pair at once, by copying, sorting and merging the given values
 		//Warning. After all values are added, duplicate values will be removed
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<typename T::value_type, typename my_base::value_type> &&
@@ -613,7 +613,7 @@ namespace ion::adaptors
 			return size < std::size(this->container_);
 		}
 
-		//Insert multiple key_value pair at once, by moving, sorting and merging the given values
+		//Inserts multiple key_value pair at once, by moving, sorting and merging the given values
 		//Warning. After all values are added, duplicate values will be removed
 		inline auto insert(typename my_base::container_type &&container)
 		{
@@ -634,19 +634,19 @@ namespace ion::adaptors
 			Removing
 		*/
 
-		//Clear all elements in the underlying container
+		//Clears all elements in the underlying container
 		inline void clear() noexcept
 		{
 			this->container_.clear();
 		}
 
-		//Erase the element with the given key
+		//Erases the element with the given key
 		inline auto erase(const key_type &key) noexcept
 		{
 			return erase<key_type>(key);
 		}
 
-		//Erase the element with the given key
+		//Erases the element with the given key
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, key_type> || types::is_transparent_comparator_v<Compare>>>
 		inline auto erase(const T &key) noexcept
@@ -662,20 +662,20 @@ namespace ion::adaptors
 			return found;
 		}
 
-		//Erase the element at the given iterator
+		//Erases the element at the given iterator
 		inline auto erase(typename my_base::iterator where) noexcept
 		{
 			return typename my_base::iterator{this->container_.erase(where)};
 		}
 
-		//Erase all elements in range [first, last)
+		//Erases all elements in range [first, last)
 		inline auto erase(typename my_base::iterator first, typename my_base::iterator last) noexcept
 		{
 			return typename my_base::iterator{this->container_.erase(first, last)};
 		}
 
 
-		//Erase all elements satisfying the given predicate
+		//Erases all elements satisfying the given predicate
 		template <typename Predicate>
 		inline auto erase_if(Predicate predicate) noexcept
 		{
@@ -684,7 +684,7 @@ namespace ion::adaptors
 				std::end(this->container_))};
 		}
 
-		//Erase all elements satisfying the given predicate, in range [first, last)
+		//Erases all elements satisfying the given predicate, in range [first, last)
 		template <typename Predicate>
 		inline auto erase_if(typename my_base::iterator first, typename my_base::iterator last, Predicate predicate) noexcept
 		{

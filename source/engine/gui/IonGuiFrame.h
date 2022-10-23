@@ -227,7 +227,7 @@ namespace ion::gui
 
 		public:
 
-			//Construct a frame with the given name
+			//Constructs a frame with the given name
 			explicit GuiFrame(std::string name);
 
 
@@ -235,54 +235,54 @@ namespace ion::gui
 				Events
 			*/
 
-			//Return a mutable reference to the control events of this frame
+			//Returns a mutable reference to the control events of this frame
 			[[nodiscard]] inline auto& ControlEvents() noexcept
 			{
 				return static_cast<ControlEventsBase&>(*this);
 			}
 
-			//Return an immutable reference to the control events of this frame
+			//Returns an immutable reference to the control events of this frame
 			[[nodiscard]] inline auto& ControlEvents() const noexcept
 			{
 				return static_cast<const ControlEventsBase&>(*this);
 			}
 
 
-			//Return a mutable reference to the managed object events of this frame
+			//Returns a mutable reference to the managed object events of this frame
 			[[nodiscard]] inline auto& ManagedObjectEvents() noexcept
 			{
 				return static_cast<ManagedObjectEventsBase&>(*this);
 			}
 
-			//Return an immutable reference to the managed object events of this frame
+			//Returns an immutable reference to the managed object events of this frame
 			[[nodiscard]] inline auto& ManagedObjectEvents() const noexcept
 			{
 				return static_cast<const ManagedObjectEventsBase&>(*this);
 			}
-
+			 
 
 			/*
 				Modifiers
 			*/
 
-			//Activate this frame with the given mode
+			//Activates this frame with the given mode
 			void Activate(gui_frame::FrameMode mode = gui_frame::FrameMode::Modeless) noexcept;
 
-			//Deactivate this frame
+			//Deactivates this frame
 			void Deactivate() noexcept;
 
 
-			//Show this frame with the given mode (same as calling Activate)
+			//Shows this frame with the given mode (same as calling Activate)
 			void Show(gui_frame::FrameMode mode = gui_frame::FrameMode::Modeless) noexcept;
 
-			//Hide this frame (same as calling Deactivate)
+			//Hides this frame (same as calling Deactivate)
 			void Hide() noexcept;
 
 
-			//Focus this frame
+			//Focuses this frame
 			void Focus() noexcept;
 
-			//Defocus this frame
+			//Defocuses this frame
 			void Defocus() noexcept;
 
 

@@ -154,7 +154,7 @@ namespace ion::graphics::scene::query
 			//Default constructor
 			SceneQuery() = default;
 
-			//Construct a new scene query with the given scene graph
+			//Constructs a new scene query with the given scene graph
 			SceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept :
 				scene_graph_{scene_graph}
 			{

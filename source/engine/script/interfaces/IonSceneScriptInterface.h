@@ -303,11 +303,11 @@ namespace ion::script::interfaces
 				Creating from script
 			*/
 
-			//Create scene from a script (or object file) with the given asset name
+			//Creates scene from a script (or object file) with the given asset name
 			void CreateScene(std::string_view asset_name, graphics::scene::graph::SceneNode &parent_node,
 				graphics::scene::SceneManager &scene_manager);
 
-			//Create scene from a script (or object file) with the given asset name
+			//Creates scene from a script (or object file) with the given asset name
 			void CreateScene(std::string_view asset_name, graphics::scene::graph::SceneNode &parent_node,
 				graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 	};

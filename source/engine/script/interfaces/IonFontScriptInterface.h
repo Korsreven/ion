@@ -66,7 +66,7 @@ namespace ion::script::interfaces
 				Creating from script
 			*/
 
-			//Create fonts from a script (or object file) with the given asset name
+			//Creates fonts from a script (or object file) with the given asset name
 			void CreateFonts(std::string_view asset_name,
 				graphics::fonts::FontManager &font_manager);
 	};

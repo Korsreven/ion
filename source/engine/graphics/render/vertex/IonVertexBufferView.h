@@ -39,13 +39,13 @@ namespace ion::graphics::render::vertex
 			//Default constructor
 			VertexBufferView() = default;
 
-			//Construct a new vertex buffer view with the given vertex_buffer and offset
+			//Constructs a new vertex buffer view with the given vertex_buffer and offset
 			VertexBufferView(const VertexBufferObject &vertex_buffer, int offset = 0) noexcept;
 
-			//Construct a new vertex buffer view with the given vertex_buffer, offset and size
+			//Constructs a new vertex buffer view with the given vertex_buffer, offset and size
 			VertexBufferView(const VertexBufferObject &vertex_buffer, int offset, int size) noexcept;
 
-			//Construct a new vertex buffer view with the given handle, offset and size
+			//Constructs a new vertex buffer view with the given handle, offset and size
 			VertexBufferView(int handle, int offset, int size) noexcept;
 
 
@@ -76,10 +76,10 @@ namespace ion::graphics::render::vertex
 				Modifiers
 			*/
 
-			//Bind the given vertex buffer view
+			//Binds the given vertex buffer view
 			void Bind() noexcept;
 
-			//Unbind the given vertex buffer view
+			//Unbinds the given vertex buffer view
 			void Unbind() noexcept;
 
 

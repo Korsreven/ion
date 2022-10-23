@@ -33,7 +33,7 @@ namespace ion::assets::repositories
 		//Naming convention is set to file path
 		AudioRepository() noexcept;
 
-		//Construct an audio repository with the given naming convention
+		//Constructs an audio repository with the given naming convention
 		AudioRepository(file_repository::NamingConvention naming_convention) noexcept;
 	};
 } //ion::assets::repositories

@@ -224,7 +224,7 @@ namespace ion::graphics::utilities
 				Adding
 			*/
 
-			//Add two colors (adding each channel)
+			//Adds two colors (adding each channel)
 			[[nodiscard]] inline auto operator+(const Color &rhs) const noexcept
 			{
 				return Color{red_ + rhs.red_,
@@ -233,7 +233,7 @@ namespace ion::graphics::utilities
 							 alpha_ + rhs.alpha_};
 			}
 
-			//Add two colors (adding each channel)
+			//Adds two colors (adding each channel)
 			inline auto& operator+=(const Color &rhs) noexcept
 			{
 				return *this = *this + rhs;
@@ -244,7 +244,7 @@ namespace ion::graphics::utilities
 				Subtracting
 			*/
 
-			//Subtract two colors (subtracting each channel)
+			//Subtracts two colors (subtracting each channel)
 			[[nodiscard]] inline auto operator-(const Color &rhs) const noexcept
 			{
 				return Color{red_ - rhs.red_,
@@ -253,7 +253,7 @@ namespace ion::graphics::utilities
 							 alpha_ - rhs.alpha_};
 			}
 
-			//Subtract two colors (subtracting each channel)
+			//Subtracts two colors (subtracting each channel)
 			inline auto& operator-=(const Color &rhs) noexcept
 			{
 				return *this = *this - rhs;
@@ -264,7 +264,7 @@ namespace ion::graphics::utilities
 				Multiplying
 			*/
 
-			//Multiply all channels with the given scalar
+			//Muliplies all channels with the given scalar
 			[[nodiscard]] inline auto operator*(real scalar) const noexcept
 			{
 				return Color{red_ * scalar,
@@ -273,13 +273,13 @@ namespace ion::graphics::utilities
 							 alpha_ * scalar};
 			}
 
-			//Multiply all channels with the given scalar
+			//Muliplies all channels with the given scalar
 			[[nodiscard]] friend inline auto operator*(real scalar, const Color &rhs) noexcept
 			{
 				return rhs * scalar; //Commutative
 			}
 
-			//Multiply all channels with the given scalar
+			//Muliplies all channels with the given scalar
 			inline auto& operator*=(real scalar) noexcept
 			{
 				return *this = *this * scalar;
@@ -290,14 +290,14 @@ namespace ion::graphics::utilities
 				Dividing
 			*/
 
-			//Divide all channels with the given scalar
+			//Divides all channels with the given scalar
 			[[nodiscard]] inline auto operator/(real scalar) const noexcept
 			{
 				assert(scalar != 0.0_r);
 				return *this * (1.0_r / scalar);
 			}
 
-			//Divide all channels with the given scalar
+			//Divides all channels with the given scalar
 			inline auto& operator/=(real scalar) noexcept
 			{
 				return *this = *this / scalar;

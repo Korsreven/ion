@@ -99,11 +99,11 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a check box with the given name, size, caption, tooltip and hit boxes
+			//Constructs a check box with the given name, size, caption, tooltip and hit boxes
 			GuiCheckBox(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Construct a check box with the given name, skin, size, caption, tooltip and hit boxes
+			//Constructs a check box with the given name, skin, size, caption, tooltip and hit boxes
 			GuiCheckBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {});
 
@@ -112,10 +112,10 @@ namespace ion::gui::controls
 				Modifiers
 			*/
 
-			//Check this check box
+			//Checks this check box
 			void Check() noexcept;
 
-			//Uncheck this check box
+			//Unchecks this check box
 			void Uncheck() noexcept;
 
 

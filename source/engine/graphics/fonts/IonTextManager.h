@@ -84,38 +84,38 @@ namespace ion::graphics::fonts
 				Creating
 			*/
 
-			//Create a (unbounded) text with the given name, content, alignment and a type face
+			//Creates a (unbounded) text with the given name, content, alignment and a type face
 			NonOwningPtr<Text> CreateText(std::string name, std::string content, text::TextAlignment alignment,
 				NonOwningPtr<TypeFace> type_face);
 
-			//Create a (unbounded) text with the given name, content and a type face
+			//Creates a (unbounded) text with the given name, content and a type face
 			NonOwningPtr<Text> CreateText(std::string name, std::string content, NonOwningPtr<TypeFace> type_face);
 
-			//Create a text (area) with the given name, content, formatting,
+			//Creates a text (area) with the given name, content, formatting,
 			//horizontal and vertical alignment, area size, padding, line height factor and a type face
 			NonOwningPtr<Text> CreateText(std::string name, std::string content, text::TextFormatting formatting,
 				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
-			//Create a text (area) with the given name, content,
+			//Creates a text (area) with the given name, content,
 			//horizontal and vertical alignment, area size, padding, line height factor and a type face
 			NonOwningPtr<Text> CreateText(std::string name, std::string content,
 				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
-			//Create a text (area) with the given name, content,
+			//Creates a text (area) with the given name, content,
 			//area size, padding, line height factor and a type face
 			NonOwningPtr<Text> CreateText(std::string name, std::string content,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
 
-			//Create a text as a copy of the given text
+			//Creates a text as a copy of the given text
 			NonOwningPtr<Text> CreateText(const Text &text);
 
-			//Create a text by moving the given text
+			//Creates a text by moving the given text
 			NonOwningPtr<Text> CreateText(Text &&text);
 
 
@@ -138,13 +138,13 @@ namespace ion::graphics::fonts
 				Removing
 			*/
 
-			//Clear all removable texts from this manager
+			//Clears all removable texts from this manager
 			void ClearTexts() noexcept;
 
-			//Remove a removable text from this manager
+			//Removes a removable text from this manager
 			bool RemoveText(Text &text) noexcept;
 
-			//Remove a removable text with the given name from this manager
+			//Removes a removable text with the given name from this manager
 			bool RemoveText(std::string_view name) noexcept;
 	};
 } //ion::graphics::fonts

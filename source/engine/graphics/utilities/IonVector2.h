@@ -96,7 +96,7 @@ namespace ion::graphics::utilities
 			}
 
 
-			//Negate vector (negating each component)
+			//Negates vector (negating each component)
 			[[nodiscard]] inline auto operator-() const noexcept
 			{
 				return Vector2{-x_, -y_};
@@ -107,33 +107,33 @@ namespace ion::graphics::utilities
 				Adding
 			*/
 
-			//Add two vectors (adding each component)
+			//Adds two vectors (adding each component)
 			[[nodiscard]] inline auto operator+(const Vector2 &rhs) const noexcept
 			{
 				return Vector2{x_ + rhs.x_,
 							   y_ + rhs.y_};
 			}
 
-			//Add both components to the given scalar
+			//Adds both components to the given scalar
 			[[nodiscard]] inline auto operator+(real scalar) const noexcept
 			{
 				return Vector2{x_ + scalar,
 							   y_ + scalar};
 			}
 
-			//Add both components to the given scalar
+			//Adds both components to the given scalar
 			[[nodiscard]] friend inline auto operator+(real scalar, const Vector2 &rhs) noexcept
 			{
 				return rhs + scalar; //Commutative
 			}
 
-			//Add two vectors (adding each component)
+			//Adds two vectors (adding each component)
 			inline auto& operator+=(const Vector2 &rhs) noexcept
 			{
 				return *this = *this + rhs;
 			}
 
-			//Add both components to the given scalar
+			//Adds both components to the given scalar
 			inline auto& operator+=(real scalar) noexcept
 			{
 				return *this = *this + scalar;
@@ -144,34 +144,34 @@ namespace ion::graphics::utilities
 				Subtracting
 			*/
 
-			//Subtract two vectors (subtracting each component)
+			//Subtracts two vectors (subtracting each component)
 			[[nodiscard]] inline auto operator-(const Vector2 &rhs) const noexcept
 			{
 				return Vector2{x_ - rhs.x_,
 							   y_ - rhs.y_};
 			}
 
-			//Subtract both components with the given scalar
+			//Subtracts both components with the given scalar
 			[[nodiscard]] inline auto operator-(real scalar) const noexcept
 			{
 				return Vector2{x_ - scalar,
 							   y_ - scalar};
 			}
 
-			//Subtract both components with the given scalar
+			//Subtracts both components with the given scalar
 			[[nodiscard]] friend inline auto operator-(real scalar, const Vector2 &rhs) noexcept
 			{
 				return Vector2{scalar - rhs.x_,
 							   scalar - rhs.y_};
 			}
 
-			//Subtract two vectors (subtracting each component)
+			//Subtracts two vectors (subtracting each component)
 			inline auto& operator-=(const Vector2 &rhs) noexcept
 			{
 				return *this = *this - rhs;
 			}
 
-			//Subtract both components with the given scalar
+			//Subtracts both components with the given scalar
 			inline auto& operator-=(real scalar) noexcept
 			{
 				return *this = *this - scalar;
@@ -182,33 +182,33 @@ namespace ion::graphics::utilities
 				Multiplying
 			*/
 
-			//Multiply two vectors (multiplying each component)
+			//Muliplies two vectors (multiplying each component)
 			[[nodiscard]] inline auto operator*(const Vector2 &rhs) const noexcept
 			{
 				return Vector2{x_ * rhs.x_,
 							   y_ * rhs.y_};
 			}
 
-			//Multiply both components with the given scalar
+			//Muliplies both components with the given scalar
 			[[nodiscard]] inline auto operator*(real scalar) const noexcept
 			{
 				return Vector2{x_ * scalar,
 							   y_ * scalar};
 			}
 
-			//Multiply both components with the given scalar
+			//Muliplies both components with the given scalar
 			[[nodiscard]] friend inline auto operator*(real scalar, const Vector2 &rhs) noexcept
 			{
 				return rhs * scalar; //Commutative
 			}
 
-			//Multiply two vectors (multiplying each component)
+			//Muliplies two vectors (multiplying each component)
 			inline auto& operator*=(const Vector2 &rhs) noexcept
 			{
 				return *this = *this * rhs;
 			}
 
-			//Multiply both components with the given scalar
+			//Muliplies both components with the given scalar
 			inline auto& operator*=(real scalar) noexcept
 			{
 				return *this = *this * scalar;
@@ -219,7 +219,7 @@ namespace ion::graphics::utilities
 				Dividing
 			*/
 
-			//Divide two vectors (dividing each component)
+			//Divides two vectors (dividing each component)
 			[[nodiscard]] inline auto operator/(const Vector2 &rhs) const noexcept
 			{
 				assert(rhs.x_ != 0.0_r && rhs.y_ != 0.0_r);
@@ -227,7 +227,7 @@ namespace ion::graphics::utilities
 							   y_ / rhs.y_};
 			}
 
-			//Divide both components with the given scalar
+			//Divides both components with the given scalar
 			[[nodiscard]] inline auto operator/(real scalar) const noexcept
 			{
 				assert(scalar != 0.0_r);
@@ -235,7 +235,7 @@ namespace ion::graphics::utilities
 							   y_ / scalar};
 			}
 
-			//Divide both components with the given scalar
+			//Divides both components with the given scalar
 			[[nodiscard]] friend inline auto operator/(real scalar, const Vector2 &rhs) noexcept
 			{
 				assert(rhs.x_ != 0.0_r && rhs.y_ != 0.0_r);
@@ -243,13 +243,13 @@ namespace ion::graphics::utilities
 							   scalar / rhs.y_};
 			}
 
-			//Divide two vectors (dividing each component)
+			//Divides two vectors (dividing each component)
 			inline auto& operator/=(const Vector2 &rhs) noexcept
 			{
 				return *this = *this / rhs;
 			}
 
-			//Divide both components with the given scalar
+			//Divides both components with the given scalar
 			inline auto& operator/=(real scalar) noexcept
 			{
 				return *this = *this / scalar;
@@ -386,17 +386,17 @@ namespace ion::graphics::utilities
 				Floor and ceiling
 			*/
 
-			//Set x and y components to the maximum of this and the given vector
+			//Sets x and y components to the maximum of this and the given vector
 			Vector2& Ceil(const Vector2 &vector) noexcept;
 
-			//Set x and y components to the maximum of this and the given vector
+			//Sets x and y components to the maximum of this and the given vector
 			//Returns the result as a copy
 			[[nodiscard]] Vector2 CeilCopy(const Vector2 &vector) const noexcept;
 
-			//Set x and y components to the minimum of this and the given vector
+			//Sets x and y components to the minimum of this and the given vector
 			Vector2& Floor(const Vector2 &vector) noexcept;
 
-			//Set x and y components to the minimum of this and the given vector
+			//Sets x and y components to the minimum of this and the given vector
 			//Returns the result as a copy
 			[[nodiscard]] Vector2 FloorCopy(const Vector2 &vector) const noexcept;
 
@@ -405,10 +405,10 @@ namespace ion::graphics::utilities
 				Interpolation
 			*/
 
-			//Return a vector based on linear interpolation between this and the given vector
+			//Returns a vector based on linear interpolation between this and the given vector
 			[[nodiscard]] Vector2 Lerp(const Vector2 &vector, real amount) const noexcept;
 			
-			//Return a vector based on spherical linear interpolation between this and the given vector
+			//Returns a vector based on spherical linear interpolation between this and the given vector
 			[[nodiscard]] Vector2 Slerp(Vector2 vector, real amount) const noexcept;
 
 
@@ -497,10 +497,10 @@ namespace ion::graphics::utilities
 				Rotation
 			*/
 
-			//Rotate point by the given angle (radians) and origin vector
+			//Rotates point by the given angle (radians) and origin vector
 			Vector2& Rotate(real angle, const Vector2 &origin) noexcept;
 
-			//Rotate point by the given angle (radians) and origin vector
+			//Rotates point by the given angle (radians) and origin vector
 			//Returns the result as a copy
 			[[nodiscard]] Vector2 RotateCopy(real angle, const Vector2 &origin) const noexcept;
 
@@ -509,10 +509,10 @@ namespace ion::graphics::utilities
 				Scaling
 			*/
 
-			//Scale point by the given scaling vector and origin vector
+			//Scales point by the given scaling vector and origin vector
 			Vector2& Scale(const Vector2 &scaling, const Vector2 &origin) noexcept;
 
-			//Scale point by the given scaling vector and origin vector
+			//Scales point by the given scaling vector and origin vector
 			//Returns the result as a copy
 			[[nodiscard]] Vector2 ScaleCopy(const Vector2 &scaling, const Vector2 &origin) const noexcept;
 

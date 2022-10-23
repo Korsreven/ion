@@ -103,16 +103,16 @@ namespace ion::graphics::particles::affectors
 				Affect particles
 			*/
 
-			//Elapse color fader by the given time in seconds
+			//Elapses color fader by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
 
 		public:
 
-			//Construct a new color fader with the given name
+			//Constructs a new color fader with the given name
 			explicit ColorFader(std::string name) noexcept;
 
-			//Construct a new color fader with the given name and steps
+			//Constructs a new color fader with the given name and steps
 			//Percentages are normalized to range [0.0, 1.0]
 			ColorFader(std::string name, std::vector<color_fader::Step> steps) noexcept;
 
@@ -154,20 +154,20 @@ namespace ion::graphics::particles::affectors
 				Steps
 			*/
 
-			//Add (in sorted order) the given percentage and color to this color fader
+			//Adds (in sorted order) the given percentage and color to this color fader
 			//The step is clamped to range [0.0, 1.0]
 			void AddStep(real percent, std::optional<Color> color);
 
-			//Add (in sorted order) the given step to this color fader
+			//Adds (in sorted order) the given step to this color fader
 			//The step is clamped to range [0.0, 1.0]
 			void AddStep(color_fader::Step step);
 
-			//Add (in sorted order) the given steps to the this color fader
+			//Adds (in sorted order) the given steps to the this color fader
 			//Percentages are normalized to range [0.0, 1.0]
 			void AddSteps(std::vector<color_fader::Step> steps);
 			
 
-			//Clear all steps from this color fader
+			//Clears all steps from this color fader
 			void ClearSteps() noexcept;
 	};
 } //ion::graphics::particles::affectors

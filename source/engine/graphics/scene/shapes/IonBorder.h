@@ -78,25 +78,25 @@ namespace ion::graphics::scene::shapes
 
 		public:
 
-			//Construct a new border with the given size, border size, color and visibility
+			//Constructs a new border with the given size, border size, color and visibility
 			Border(const Vector2 &size, const Vector2 &border_size, const Color &color, bool visible = true);
 
-			//Construct a new border with the given position, size, border size, color and visibility
+			//Constructs a new border with the given position, size, border size, color and visibility
 			Border(const Vector3 &position, const Vector2 &size, const Vector2 &border_size, const Color &color, bool visible = true);
 
-			//Construct a new border with the given position, rotation, size, border size, color and visibility
+			//Constructs a new border with the given position, rotation, size, border size, color and visibility
 			Border(const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size, const Color &color, bool visible = true);
 
 
-			//Construct a new border with the given size, border size, corner style, color and visibility
+			//Constructs a new border with the given size, border size, corner style, color and visibility
 			Border(const Vector2 &size, const Vector2 &border_size,
 				border::BorderCornerStyle corner_style, const Color &color, bool visible = true);
 
-			//Construct a new border with the given position, size, border size, corner style, color and visibility
+			//Constructs a new border with the given position, size, border size, corner style, color and visibility
 			Border(const Vector3 &position, const Vector2 &size, const Vector2 &border_size,
 				border::BorderCornerStyle corner_style, const Color &color, bool visible = true);
 
-			//Construct a new border with the given position, rotation, size, border size, corner style, color and visibility
+			//Constructs a new border with the given position, rotation, size, border size, corner style, color and visibility
 			Border(const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size,
 				border::BorderCornerStyle corner_style, const Color &color, bool visible = true);
 

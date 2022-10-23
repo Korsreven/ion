@@ -41,14 +41,14 @@ namespace ion::types
 			//Default constructor
 			constexpr SuppressCopy() = default;
 
-			//Construct a new value with the given value
+			//Constructs a new value with the given value
 			constexpr SuppressCopy(const T &value) noexcept :
 				value_{value}
 			{
 				//Empty
 			}
 
-			//Construct a new value with the given value
+			//Constructs a new value with the given value
 			constexpr SuppressCopy(T &&value) noexcept :
 				value_{std::move(value)}
 			{

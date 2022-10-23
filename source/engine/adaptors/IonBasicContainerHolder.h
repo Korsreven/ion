@@ -30,21 +30,21 @@ namespace ion::adaptors
 			//Default constructor
 			BasicHolder() = default;
 
-			//Construct basic holder from the given container by copy
+			//Constructs a basic holder from the given container by copy
 			explicit BasicHolder(const Container &container) :
 				container_{container}
 			{
 				//Empty
 			}
 
-			//Construct basic holder from the given container by move
+			//Constructs a basic holder from the given container by move
 			explicit BasicHolder(Container &&container) noexcept :
 				container_{std::move(container)}
 			{
 				//Empty
 			}
 
-			//Construct basic holder from the given initializer list
+			//Constructs a basic holder from the given initializer list
 			explicit BasicHolder(std::initializer_list<typename Container::value_type> list) :
 				container_{list}
 			{
@@ -66,7 +66,7 @@ namespace ion::adaptors
 			//No default constructor
 			constexpr BasicHolder() = delete;
 
-			//Construct basic holder from the given reference
+			//Constructs a basic holder from the given reference
 			constexpr explicit BasicHolder(Container &container) noexcept :
 				container_{container}
 			{

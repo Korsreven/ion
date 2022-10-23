@@ -65,19 +65,19 @@ namespace ion::graphics::particles::affectors
 				Affect particles
 			*/
 
-			//Elapse sine force by the given time in seconds
+			//Elapses sine force by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
 
 		public:
 
-			//Construct a new sine force with the given name
+			//Constructs a new sine force with the given name
 			explicit SineForce(std::string name) noexcept;
 
-			//Construct a new sine force with the given name, type, force and frequency
+			//Constructs a new sine force with the given name, type, force and frequency
 			SineForce(std::string name, sine_force::ForceType type, const Vector2 &force, real frequency) noexcept;
 
-			//Construct a new sine force with the given name, type, force, min and max frequency
+			//Constructs a new sine force with the given name, type, force, min and max frequency
 			SineForce(std::string name, sine_force::ForceType type, const Vector2 &force, real min_frequency, real max_frequency) noexcept;
 
 

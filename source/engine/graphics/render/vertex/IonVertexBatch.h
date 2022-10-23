@@ -126,22 +126,22 @@ namespace ion::graphics::render::vertex
 
 		public:
 
-			//Construct a new vertex batch with the given draw mode and vertex declaration
+			//Constructs a new vertex batch with the given draw mode and vertex declaration
 			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration) noexcept;
 
-			//Construct a new vertex batch with the given draw mode, vertex declaration, vertex data and material (optional)
+			//Constructs a new vertex batch with the given draw mode, vertex declaration, vertex data and material (optional)
 			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
 				const VertexDataView &vertex_data, NonOwningPtr<materials::Material> material = nullptr) noexcept;
 
-			//Construct a new vertex batch with the given draw mode, vertex declaration, vertex data and animation
+			//Constructs a new vertex batch with the given draw mode, vertex declaration, vertex data and animation
 			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
 				const VertexDataView &vertex_data, NonOwningPtr<textures::Animation> animation) noexcept;
 
-			//Construct a new vertex batch with the given draw mode, vertex declaration, vertex data and texture
+			//Constructs a new vertex batch with the given draw mode, vertex declaration, vertex data and texture
 			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
 				const VertexDataView &vertex_data, NonOwningPtr<textures::Texture> texture) noexcept;
 
-			//Construct a new vertex batch with the given draw mode, vertex declaration, vertex data and a texture handle
+			//Constructs a new vertex batch with the given draw mode, vertex declaration, vertex data and a texture handle
 			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
 				const VertexDataView &vertex_data, textures::texture::TextureHandle texture_handle) noexcept;
 
@@ -200,13 +200,13 @@ namespace ion::graphics::render::vertex
 				texture_ = texture_handle;
 			}
 
-			//Detach the texture used by this vertex batch
+			//Detaches the texture used by this vertex batch
 			inline void BatchTexture(std::nullptr_t) noexcept
 			{
 				texture_ = std::monostate{};
 			}
 
-			//Detach the texture used by this vertex batch
+			//Detaches the texture used by this vertex batch
 			inline void BatchTexture(std::nullopt_t) noexcept
 			{
 				BatchTexture(nullptr);
@@ -315,11 +315,11 @@ namespace ion::graphics::render::vertex
 			}
 
 
-			//Prepare vertex batch by passing vertices to vertex buffer and setting up attribute bindings
+			//Prepares vertex batch by passing vertices to vertex buffer and setting up attribute bindings
 			//This function is typically called each frame
 			void Prepare() noexcept;
 
-			//Draw all of the vertices in this vertex batch with the given shader program (optional)
+			//Draws all of the vertices in this vertex batch with the given shader program (optional)
 			//This function is typically called each frame, once for each render pass
 			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept;
 
@@ -328,7 +328,7 @@ namespace ion::graphics::render::vertex
 				Elapse time
 			*/
 
-			//Elapse the total time for this vertex batch by the given time in seconds
+			//Elapses the total time for this vertex batch by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 	};

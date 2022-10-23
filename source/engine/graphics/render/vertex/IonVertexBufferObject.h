@@ -64,13 +64,13 @@ namespace ion::graphics::render::vertex
 
 		public:
 
-			//Construct a new vertex buffer object
+			//Constructs a new vertex buffer object
 			VertexBufferObject() noexcept;
 
-			//Construct a new vertex buffer object with the given usage
+			//Constructs a new vertex buffer object with the given usage
 			explicit VertexBufferObject(vertex_buffer_object::VertexBufferUsage usage) noexcept;
 
-			//Construct a new vertex buffer object with an already existing handle
+			//Constructs a new vertex buffer object with an already existing handle
 			explicit VertexBufferObject(int handle) noexcept;
 
 			//Copy constructor
@@ -121,10 +121,10 @@ namespace ion::graphics::render::vertex
 				Modifiers
 			*/
 
-			//Bind the given vertex buffer object
+			//Binds the given vertex buffer object
 			void Bind() noexcept;
 
-			//Unbind the given vertex buffer object
+			//Unbinds the given vertex buffer object
 			void Unbind() noexcept;
 
 

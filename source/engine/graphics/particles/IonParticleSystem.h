@@ -47,10 +47,10 @@ namespace ion::graphics::particles
 
 		public:
 
-			//Construct a new particle system with the given name
+			//Constructs a new particle system with the given name
 			explicit ParticleSystem(std::string name) noexcept;
 
-			//Construct a new particle system with the given name and particle primitive
+			//Constructs a new particle system with the given name and particle primitive
 			ParticleSystem(std::string name, particle_system::ParticlePrimitive particle_primitive) noexcept;
 
 
@@ -105,7 +105,7 @@ namespace ion::graphics::particles
 				Elapse time
 			*/
 
-			//Elapse particle system by the given time in seconds
+			//Elapses particle system by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 

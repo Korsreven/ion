@@ -76,10 +76,10 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new camera with the given name and visibility
+			//Constructs a new camera with the given name and visibility
 			explicit Camera(std::optional<std::string> name = {}, bool visible = true) noexcept;
 
-			//Construct a new camera with the given name, a custom frustum and visibility
+			//Constructs a new camera with the given name, a custom frustum and visibility
 			Camera(std::optional<std::string> name, const render::Frustum &frustum, bool visible = true) noexcept;
 
 
@@ -163,7 +163,7 @@ namespace ion::graphics::scene
 				Capturing
 			*/
 
-			//Start capturing the scene from the viewpoint of this camera, with the given viewport
+			//Starts capturing the scene from the viewpoint of this camera, with the given viewport
 			void CaptureScene(const render::Viewport &viewport) noexcept;
 	};
 } //ion::graphics::scene

@@ -75,11 +75,11 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a group box with the given name, size, caption and hit boxes
+			//Constructs a group box with the given name, size, caption and hit boxes
 			GuiGroupBox(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Construct a group box with the given name, skin, size, caption and hit boxes
+			//Constructs a group box with the given name, skin, size, caption and hit boxes
 			GuiGroupBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {});
 
@@ -152,13 +152,13 @@ namespace ion::gui::controls
 				Removing
 			*/
 
-			//Clear all controls from this group box
+			//Clears all controls from this group box
 			void ClearControls() noexcept;
 
-			//Remove a control from this group box
+			//Removes a control from this group box
 			bool RemoveControl(controls::GuiControl &control) noexcept;
 
-			//Remove a control with the given name from this group box
+			//Removes a control with the given name from this group box
 			bool RemoveControl(std::string_view name) noexcept;
 	};
 

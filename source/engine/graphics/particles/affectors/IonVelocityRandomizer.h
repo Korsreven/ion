@@ -45,19 +45,19 @@ namespace ion::graphics::particles::affectors
 				Affect particles
 			*/
 
-			//Elapse velocity randomizer by the given time in seconds
+			//Elapses velocity randomizer by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
 
 		public:
 
-			//Construct a new velocity randomizer with the given name
+			//Constructs a new velocity randomizer with the given name
 			explicit VelocityRandomizer(std::string name) noexcept;
 
-			//Construct a new velocity randomizer with the given name, velocity and scope
+			//Constructs a new velocity randomizer with the given name, velocity and scope
 			VelocityRandomizer(std::string name, real velocity, real scope) noexcept;
 
-			//Construct a new velocity randomizer with the  given name, min/max velocity and scope
+			//Constructs a new velocity randomizer with the  given name, min/max velocity and scope
 			VelocityRandomizer(std::string name, real min_velocity, real max_velocity, real scope) noexcept;
 
 

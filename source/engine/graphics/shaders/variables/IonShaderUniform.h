@@ -208,14 +208,14 @@ namespace ion::graphics::shaders::variables
 			}
 
 
-			//Get a mutable reference to the contained glsl uniform value
+			//Gets a mutable reference to the contained glsl uniform value
 			template <typename T, typename = std::enable_if_t<std::is_base_of_v<UniformVariable, Uniform<T>>>>
 			[[nodiscard]] inline auto& Get() noexcept
 			{
 				return static_cast<Uniform<T>&>(*this).Get();
 			}
 
-			//Get an immutable reference to the contained glsl uniform value
+			//Gets an immutable reference to the contained glsl uniform value
 			template <typename T, typename = std::enable_if_t<std::is_base_of_v<UniformVariable, Uniform<T>>>>
 			[[nodiscard]] inline auto& Get() const noexcept
 			{
@@ -228,7 +228,7 @@ namespace ion::graphics::shaders::variables
 			*/
 
 			//Mutable value visit
-			//Call the correct overload for the given overload set, based on the value of the uniform variable
+			//Calls the correct overload for the given overload set, based on the value of the uniform variable
 			template <typename T, typename ...Ts>
 			inline auto Visit(T &&callable, Ts &&...callables) noexcept
 			{
@@ -236,7 +236,7 @@ namespace ion::graphics::shaders::variables
 			}
 
 			//Immutable value visit
-			//Call the correct overload for the given overload set, based on the value of the uniform variable
+			//Calls the correct overload for the given overload set, based on the value of the uniform variable
 			template <typename T, typename ...Ts>
 			inline auto Visit(T &&callable, Ts &&...callables) const noexcept
 			{
@@ -274,13 +274,13 @@ namespace ion::graphics::shaders::variables
 			Observers
 		*/
 
-		//Get a mutable reference to the contained glsl uniform value
+		//Gets a mutable reference to the contained glsl uniform value
 		[[nodiscard]] inline auto& Get() noexcept
 		{
 			return std::get<glsl::uniform<T>>(value_);
 		}
 
-		//Get an immutable reference to the contained glsl uniform value
+		//Gets an immutable reference to the contained glsl uniform value
 		[[nodiscard]] inline auto& Get() const noexcept
 		{
 			return std::get<glsl::uniform<T>>(value_);

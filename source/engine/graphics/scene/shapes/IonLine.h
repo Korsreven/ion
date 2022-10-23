@@ -44,10 +44,10 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			//Construct a new line with the given points a b, color and visibility
+			//Constructs a new line with the given points a b, color and visibility
 			Line(const Vector3 &a, const Vector3 &b, const Color &color, bool visible = true);
 
-			//Construct a new line with the given points a b, color, thickness and visibility
+			//Constructs a new line with the given points a b, color, thickness and visibility
 			Line(const Vector3 &a, const Vector3 &b, const Color &color, real thickness, bool visible = true);
 
 

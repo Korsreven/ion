@@ -110,7 +110,7 @@ namespace ion::graphics::shaders
 				Creating
 			*/
 			
-			//Create a uniform variable with the given name and size
+			//Creates a uniform variable with the given name and size
 			template <typename T>
 			auto CreateUniform(std::string name, int size = 1)
 			{
@@ -152,13 +152,13 @@ namespace ion::graphics::shaders
 				Removing
 			*/
 
-			//Clear all removable uniform variables from this shader struct
+			//Clears all removable uniform variables from this shader struct
 			void ClearUniforms() noexcept;
 
-			//Remove a removable uniform variable from this shader struct
+			//Removes a removable uniform variable from this shader struct
 			bool RemoveUniform(variables::UniformVariable &uniform_variable) noexcept;
 
-			//Remove a removable uniform variable with the given name from this manager
+			//Removes a removable uniform variable with the given name from this manager
 			bool RemoveUniform(std::string_view name, std::optional<int> off = {}) noexcept;
 	};
 } //ion::graphics::shaders

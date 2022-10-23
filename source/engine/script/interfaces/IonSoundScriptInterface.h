@@ -83,7 +83,7 @@ namespace ion::script::interfaces
 				Creating from script
 			*/
 
-			//Create sounds from a script (or object file) with the given asset name
+			//Creates sounds from a script (or object file) with the given asset name
 			void CreateSounds(std::string_view asset_name,
 				sounds::SoundManager &sound_manager);
 	};

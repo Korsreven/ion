@@ -64,7 +64,7 @@ namespace ion::memory
 			//Default constructor
 			OwningPtr() = default;
 
-			//Construct a new owning ptr with the given raw ptr
+			//Constructs a new owning ptr with the given raw ptr
 			explicit OwningPtr(pointer ptr) noexcept :
 				ptr_{ptr},
 				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock{} : nullptr}
@@ -72,14 +72,14 @@ namespace ion::memory
 				//Empty
 			}
 
-			//Construct a new owning ptr with a nullptr
+			//Constructs a new owning ptr with a nullptr
 			OwningPtr(std::nullptr_t) noexcept :
 				ptr_{nullptr}
 			{
 				//Empty
 			}
 
-			//Construct a new owning ptr with the given unique ptr
+			//Constructs a new owning ptr with the given unique ptr
 			OwningPtr(std::unique_ptr<T> &&ptr) noexcept :
 				ptr_{std::move(ptr)},
 				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock{} : nullptr}
@@ -87,7 +87,7 @@ namespace ion::memory
 				//Empty
 			}
 
-			//Construct a new owning ptr with the given unique ptr of type U
+			//Constructs a new owning ptr with the given unique ptr of type U
 			template <typename U, typename = std::enable_if_t<std::is_convertible_v<typename std::unique_ptr<U>::pointer, pointer>>>
 			OwningPtr(std::unique_ptr<U> &&ptr) noexcept :
 				ptr_{std::move(ptr)},

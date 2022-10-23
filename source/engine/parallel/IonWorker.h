@@ -37,7 +37,7 @@ namespace ion::parallel
 
 		public:
 
-			//Construct a worker by passing it a function (or something that is invocable) and its arguments
+			//Constructs a worker by passing it a function (or something that is invocable) and its arguments
 			template <typename Function, typename... Args>
 			Worker(Function &&function, Args &&...args) :
 				task_{std::async(std::launch::async, std::forward<Function>(function), std::forward<Args>(args)...)}

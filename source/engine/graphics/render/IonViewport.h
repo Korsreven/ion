@@ -131,13 +131,13 @@ namespace ion::graphics::render
 
 		public:
 
-			//Construct a new viewport with the given name and connected to a given render target
+			//Constructs a new viewport with the given name and connected to a given render target
 			Viewport(std::string name, RenderTarget &render_target) noexcept;
 
-			//Construct a new viewport with the given name, connected to a given render target and with the given bounds (region)
+			//Constructs a new viewport with the given name, connected to a given render target and with the given bounds (region)
 			Viewport(std::string name, RenderTarget &render_target, const Aabb &bounds) noexcept;
 
-			//Construct a new viewport with the given name, connected to a given render target and with the given bounds (region) and anchors
+			//Constructs a new viewport with the given name, connected to a given render target and with the given bounds (region) and anchors
 			Viewport(std::string name, RenderTarget &render_target, const Aabb &bounds,
 				viewport::HorizontalAnchorType left_anchor, viewport::HorizontalAnchorType right_anchor,
 				viewport::VerticalAnchorType top_anchor, viewport::VerticalAnchorType bottom_anchor) noexcept;
@@ -327,7 +327,7 @@ namespace ion::graphics::render
 				Rendering
 			*/
 
-			//Start rendering to this viewport
+			//Starts rendering to this viewport
 			void RenderTo() noexcept;
 	};
 } //ion::graphics

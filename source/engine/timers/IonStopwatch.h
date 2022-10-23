@@ -45,7 +45,7 @@ namespace ion::timers
 			//Returns a new stopwatch and starts measuring elapsed time
 			[[nodiscard]] static Stopwatch StartNew() noexcept;
 
-			//Get a timestamp in the most precision unit available from the underlying system
+			//Gets a timestamp in the most precision unit available from the underlying system
 			[[nodiscard]] static long long GetTimestamp() noexcept;
 
 

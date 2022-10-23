@@ -410,7 +410,7 @@ namespace ion::system
 			}
 
 
-			//Enter full screen with the given size. If no size is given, it uses the desktop size
+			//Enters full screen with the given size. If no size is given, it uses the desktop size
 			//Returns true if the window successfully entered full screen
 			inline auto EnterFullScreen(const std::optional<Vector2> &full_screen_size) noexcept
 			{
@@ -427,7 +427,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Exit out of full screen
+			//Exits out of full screen
 			//Returns true if the window successfully exited out of full screen
 			inline auto ExitFullScreen() noexcept
 			{
@@ -445,7 +445,7 @@ namespace ion::system
 			}
 
 
-			//Switch to a borderless window style
+			//Switches to a borderless window style
 			inline void BorderlessStyle() noexcept
 			{
 				#ifdef ION_WIN32
@@ -454,7 +454,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Switch to a dialog window style
+			//Switches to a dialog window style
 			inline void DialogStyle() noexcept
 			{
 				#ifdef ION_WIN32
@@ -463,7 +463,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Switch to a single border window style
+			//Switches to a single border window style
 			inline void SingleBorderStyle() noexcept
 			{
 				#ifdef ION_WIN32
@@ -472,7 +472,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Switch to a sizeable border window style
+			//Switches to a sizeable border window style
 			inline void SizeableBorderStyle() noexcept
 			{
 				#ifdef ION_WIN32

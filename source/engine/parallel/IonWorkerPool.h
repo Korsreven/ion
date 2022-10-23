@@ -157,7 +157,7 @@ namespace ion::parallel
 
 		public:
 
-			//Construct a worker pool, either running (default) or not
+			//Constructs a worker pool, either running (default) or not
 			WorkerPool(worker_pool::RunningState running_state = worker_pool::RunningState::NonSuspended) noexcept :
 				running_state_{running_state},
 				max_worker_threads_{worker_pool::detail::default_number_of_threads()}
@@ -165,7 +165,7 @@ namespace ion::parallel
 				//Empty
 			}
 
-			//Construct a worker pool with the given max number of worker threads, and either running (default) or not
+			//Constructs a worker pool with the given max number of worker threads, and either running (default) or not
 			WorkerPool(int max_worker_threads, worker_pool::RunningState running_state = worker_pool::RunningState::NonSuspended) noexcept :
 				running_state_{running_state},
 				max_worker_threads_{max_worker_threads < 1 ? 1 : max_worker_threads}
@@ -351,7 +351,7 @@ namespace ion::parallel
 				Removing
 			*/
 
-			//Clear all workers and all queued work
+			//Clears all workers and all queued work
 			void Clear() noexcept
 			{
 				std::lock_guard lock{m_};
@@ -359,7 +359,7 @@ namespace ion::parallel
 				queue_.clear(); //Non-blocking
 			}
 
-			//Clear all queued work
+			//Clears all queued work
 			void ClearQueue() noexcept
 			{
 				std::lock_guard lock{m_};
@@ -424,7 +424,7 @@ namespace ion::parallel
 					return false;
 			}
 
-			//Resume all queued work
+			//Resumes all queued work
 			void Resume() noexcept
 			{
 				if (!IsRunning())
@@ -435,7 +435,7 @@ namespace ion::parallel
 				}
 			}
 
-			//Suspend all queued work
+			//Suspends all queued work
 			void Suspend() noexcept
 			{
 				if (IsRunning())

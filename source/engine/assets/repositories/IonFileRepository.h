@@ -123,14 +123,14 @@ namespace ion::assets::repositories
 			//Naming convention is set to file path
 			FileRepository() = default;
 
-			//Construct a repository with the given naming convention
+			//Constructs a repository with the given naming convention
 			FileRepository(file_repository::NamingConvention naming_convention) noexcept;
 
-			//Construct a repository with the given file extensions
+			//Constructs a repository with the given file extensions
 			//Naming convention is set to file path
 			FileRepository(Strings file_extensions) noexcept;
 
-			//Construct a repository with the given naming convention and file extensions
+			//Constructs a repository with the given naming convention and file extensions
 			FileRepository(file_repository::NamingConvention naming_convention, Strings file_extensions) noexcept;
 
 
@@ -193,13 +193,13 @@ namespace ion::assets::repositories
 				Adding directories
 			*/
 
-			//Add all files from the given directory path
+			//Adds all files from the given directory path
 			//Files are added either recursively or non-recursively from the path
 			//Files are filtered against added file extensions
 			bool AddDirectory(const std::filesystem::path &directory_path,
 				utilities::file::DirectoryIteration directory_iteration = utilities::file::DirectoryIteration::NonRecursive);
 
-			//Add all files from each given directory paths
+			//Adds all files from each given directory paths
 			//Files are added either recursively or non-recursively from each path
 			//Files are filtered against added file extensions
 			bool AddDirectories(const utilities::file::Paths &directory_paths,
@@ -210,19 +210,19 @@ namespace ion::assets::repositories
 				Adding files
 			*/
 			
-			//Add a file from the given file path
+			//Adds a file from the given file path
 			//File is not filtered against added file extensions
 			bool AddFile(std::filesystem::path file_path);
 
-			//Add a file from the given file entry
+			//Adds a file from the given file entry
 			//File is not filtered against added file extensions
 			bool AddFile(file_repository::FileEntry file);
 
-			//Add a file from each of the given file paths
+			//Adds a file from each of the given file paths
 			//Files are not filtered against added file extensions
 			bool AddFiles(utilities::file::Paths file_paths);
 
-			//Add a file from each of the given file entries
+			//Adds a file from each of the given file entries
 			//Files are not filtered against added file extensions
 			bool AddFiles(std::vector<file_repository::FileEntry> files);
 
@@ -230,12 +230,12 @@ namespace ion::assets::repositories
 			/*
 				Adding file extensions
 			*/
-
-			//Add the given file extension
+			
+			//Adds the given file extension
 			//Remember that all file extensions should be prefixed with a dot
 			bool AddFileExtension(std::string file_extension);
 
-			//Add all given file extensions
+			//Adds all given file extensions
 			//Remember that all file extensions should be prefixed with a dot
 			bool AddFileExtensions(Strings file_extensions);
 
@@ -244,13 +244,13 @@ namespace ion::assets::repositories
 				Clearing
 			*/
 
-			//Remove all files and file extensions
+			//Removes all files and file extensions
 			void Clear() noexcept;
 
-			//Remove all files
+			//Removes all files
 			void ClearFiles() noexcept;
 
-			//Remove all file extensions
+			//Removes all file extensions
 			void ClearFileExtensions() noexcept;
 
 
@@ -258,12 +258,12 @@ namespace ion::assets::repositories
 				Removing directories
 			*/
 
-			//Remove all files that are contained inside the given directory path
+			//Removes all files that are contained inside the given directory path
 			//Files are removed either recursively or non-recursively from the path
 			bool RemoveDirectory(const std::filesystem::path &directory_path,
 				utilities::file::DirectoryIteration directory_iteration = utilities::file::DirectoryIteration::NonRecursive) noexcept;
 
-			//Remove all files that are contained inside each given directory paths
+			//Removes all files that are contained inside each given directory paths
 			//Files are removed either recursively or non-recursively from the path
 			bool RemoveDirectories(const utilities::file::Paths &directory_paths,
 				utilities::file::DirectoryIteration directory_iteration = utilities::file::DirectoryIteration::NonRecursive) noexcept;
@@ -273,10 +273,10 @@ namespace ion::assets::repositories
 				Removing files
 			*/
 
-			//Remove a file from the given file path
+			//Removes a file from the given file path
 			bool RemoveFile(const std::filesystem::path &file_path) noexcept;
 
-			//Remove a file from each of the given file paths
+			//Removes a file from each of the given file paths
 			bool RemoveFiles(const utilities::file::Paths &file_paths) noexcept;
 
 
@@ -284,10 +284,10 @@ namespace ion::assets::repositories
 				Removing extensions
 			*/
 
-			//Remove the given file extension
+			//Removes the given file extension
 			bool RemoveFileExtension(std::string_view file_extension) noexcept;
 
-			//Remove all given file extensions
+			//Removes all given file extensions
 			bool RemoveFileExtensions(const std::vector<std::string_view> &file_extensions) noexcept;
 	};
 } //ion::assets::repositories

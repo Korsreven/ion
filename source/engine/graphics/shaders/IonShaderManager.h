@@ -135,14 +135,14 @@ namespace ion::graphics::shaders
 				Creating
 			*/
 
-			//Create a shader with the given name and asset name
+			//Creates a shader with the given name and asset name
 			NonOwningPtr<Shader> CreateShader(std::string name, std::string asset_name);
 
 
-			//Create a shader as a copy of the given shader
+			//Creates a shader as a copy of the given shader
 			NonOwningPtr<Shader> CreateShader(const Shader &shader);
 
-			//Create a shader by moving the given shader
+			//Creates a shader by moving the given shader
 			NonOwningPtr<Shader> CreateShader(Shader &&shader);
 
 
@@ -165,13 +165,13 @@ namespace ion::graphics::shaders
 				Removing
 			*/
 
-			//Clear all removable shaders from this manager
+			//Clears all removable shaders from this manager
 			void ClearShaders() noexcept;
 
-			//Remove a removable shader from this manager
+			//Removes a removable shader from this manager
 			bool RemoveShader(Shader &shader) noexcept;
 
-			//Remove a removable shader with the given name from this manager
+			//Removes a removable shader with the given name from this manager
 			bool RemoveShader(std::string_view name) noexcept;
 
 

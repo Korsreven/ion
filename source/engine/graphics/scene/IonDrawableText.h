@@ -190,15 +190,15 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new drawable text with the given name, text and visibility
+			//Constructs a new drawable text with the given name, text and visibility
 			DrawableText(std::optional<std::string> name,
 				NonOwningPtr<fonts::Text> text, bool visible = true);
 
-			//Construct a new drawable text with the given name, position, text and visibility
+			//Constructs a new drawable text with the given name, position, text and visibility
 			DrawableText(std::optional<std::string> name, const Vector3 &position,
 				NonOwningPtr<fonts::Text> text, bool visible = true);
 
-			//Construct a new drawable text with the given name, position, rotation, text and visibility
+			//Constructs a new drawable text with the given name, position, rotation, text and visibility
 			DrawableText(std::optional<std::string> name, const Vector3 &position, real rotation,
 				NonOwningPtr<fonts::Text> text, bool visible = true);
 
@@ -234,7 +234,7 @@ namespace ion::graphics::scene
 			}
 
 
-			//Revert to the initial text
+			//Reverts to the initial text
 			void Revert();
 
 
@@ -279,7 +279,7 @@ namespace ion::graphics::scene
 				Preparing
 			*/
 
-			//Prepare this text such that it is ready to be drawn
+			//Prepares this text such that it is ready to be drawn
 			//This function is typically called each frame
 			void Prepare() override;
 	};

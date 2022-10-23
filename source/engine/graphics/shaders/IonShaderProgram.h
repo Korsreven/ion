@@ -128,39 +128,39 @@ namespace ion::graphics::shaders
 				Managers
 			*/
 
-			//Return a mutable reference to the struct manager of this shader program
+			//Returns a mutable reference to the struct manager of this shader program
 			[[nodiscard]] inline auto& StructManager() noexcept
 			{
 				return static_cast<ShaderStructBase&>(*this);
 			}
 
-			//Return an immutable reference to the struct manager of this shader program
+			//Returns an immutable reference to the struct manager of this shader program
 			[[nodiscard]] inline auto& StructManager() const noexcept
 			{
 				return static_cast<const ShaderStructBase&>(*this);
 			}
 
 
-			//Return a mutable reference to the attribute variable manager of this shader program
+			//Returns a mutable reference to the attribute variable manager of this shader program
 			[[nodiscard]] inline auto& AttributeVariableManager() noexcept
 			{
 				return static_cast<AttributeVariablesBase&>(*this);
 			}
 
-			//Return an immutable reference to the attribute variable manager of this shader program
+			//Returns an immutable reference to the attribute variable manager of this shader program
 			[[nodiscard]] inline auto& AttributeVariableManager() const noexcept
 			{
 				return static_cast<const AttributeVariablesBase&>(*this);
 			}
 
 
-			//Return a mutable reference to the uniform variable manager of this shader program
+			//Returns a mutable reference to the uniform variable manager of this shader program
 			[[nodiscard]] inline auto& UniformVariableManager() noexcept
 			{
 				return static_cast<UniformVariablesBase&>(*this);
 			}
 
-			//Return an immutable reference to the uniform variable manager of this shader program
+			//Returns an immutable reference to the uniform variable manager of this shader program
 			[[nodiscard]] inline auto& UniformVariableManager() const noexcept
 			{
 				return static_cast<const UniformVariablesBase&>(*this);
@@ -227,13 +227,13 @@ namespace ion::graphics::shaders
 			}
 
 
-			//Attach the given vertex shader to the shader program
+			//Attaches the given vertex shader to the shader program
 			void VertexShader(NonOwningPtr<Shader> shader) noexcept;
 
-			//Attach the given fragment shader to the shader program
+			//Attaches the given fragment shader to the shader program
 			void FragmentShader(NonOwningPtr<Shader> shader) noexcept;
 
-			//Use the given shader layout for mapping variables in this shader program
+			//Uses the given shader layout for mapping variables in this shader program
 			void Layout(NonOwningPtr<ShaderLayout> shader_layout) noexcept;
 
 
@@ -276,7 +276,7 @@ namespace ion::graphics::shaders
 				Creating
 			*/
 
-			//Create a struct with the given name and size
+			//Creates a struct with the given name and size
 			NonOwningPtr<ShaderStruct> CreateStruct(std::string name, int size = 1);
 
 
@@ -308,13 +308,13 @@ namespace ion::graphics::shaders
 				Removing
 			*/
 
-			//Clear all removable structs from this shader program
+			//Clears all removable structs from this shader program
 			void ClearStructs() noexcept;
 
-			//Remove a removable struct from this shader program
+			//Removes a removable struct from this shader program
 			bool RemoveStruct(ShaderStruct &shader_struct) noexcept;
 
-			//Remove a removable structs with the given name from this manager
+			//Removes a removable structs with the given name from this manager
 			bool RemoveStruct(std::string_view name) noexcept;
 
 
@@ -323,7 +323,7 @@ namespace ion::graphics::shaders
 				Creating
 			*/
 
-			//Create an attribute variable with the given name
+			//Creates an attribute variable with the given name
 			template <typename T>
 			auto CreateAttribute(std::string name)
 			{
@@ -332,7 +332,7 @@ namespace ion::graphics::shaders
 			}
 
 
-			//Create an attribute variable as a copy of the given attribute
+			//Creates an attribute variable as a copy of the given attribute
 			template <typename T>
 			auto CreateAttribute(const variables::Attribute<T> &attribute)
 			{
@@ -340,7 +340,7 @@ namespace ion::graphics::shaders
 				return static_pointer_cast<variables::Attribute<T>>(ptr);
 			}
 
-			//Create an attribute variable by moving the given attribute
+			//Creates an attribute variable by moving the given attribute
 			template <typename T>
 			auto CreateAttribute(variables::Attribute<T> &&attribute)
 			{
@@ -377,13 +377,13 @@ namespace ion::graphics::shaders
 				Removing
 			*/
 
-			//Clear all removable attribute variables from this shader program
+			//Clears all removable attribute variables from this shader program
 			void ClearAttributes() noexcept;
 
-			//Remove a removable attribute variable from this shader program
+			//Removes a removable attribute variable from this shader program
 			bool RemoveAttribute(variables::AttributeVariable &attribute_variable) noexcept;
 
-			//Remove a removable attribute variable with the given name from this manager
+			//Removes a removable attribute variable with the given name from this manager
 			bool RemoveAttribute(std::string_view name) noexcept;
 
 
@@ -392,7 +392,7 @@ namespace ion::graphics::shaders
 				Creating
 			*/
 
-			//Create a uniform variable with the given name and size
+			//Creates a uniform variable with the given name and size
 			template <typename T>
 			auto CreateUniform(std::string name, int size = 1)
 			{
@@ -401,7 +401,7 @@ namespace ion::graphics::shaders
 			}
 
 
-			//Create an uniform variable as a copy of the given uniform
+			//Creates a uniform variable as a copy of the given uniform
 			template <typename T>
 			auto CreateUniform(const variables::Uniform<T> &uniform)
 			{
@@ -409,7 +409,7 @@ namespace ion::graphics::shaders
 				return static_pointer_cast<variables::Uniform<T>>(ptr);
 			}
 
-			//Create an uniform variable by moving the given uniform
+			//Creates a uniform variable by moving the given uniform
 			template <typename T>
 			auto CreateUniform(variables::Uniform<T> &&uniform)
 			{
@@ -446,13 +446,13 @@ namespace ion::graphics::shaders
 				Removing
 			*/
 
-			//Clear all removable uniform variables from this shader program
+			//Clears all removable uniform variables from this shader program
 			void ClearUniforms() noexcept;
 
-			//Remove a removable uniform variable from this shader program
+			//Removes a removable uniform variable from this shader program
 			bool RemoveUniform(variables::UniformVariable &uniform_variable) noexcept;
 
-			//Remove a removable uniform variable with the given name from this manager
+			//Removes a removable uniform variable with the given name from this manager
 			bool RemoveUniform(std::string_view name) noexcept;
 
 
@@ -461,7 +461,7 @@ namespace ion::graphics::shaders
 				Removing
 			*/
 
-			//Clear all removable attributes and uniform variables from this shader program
+			//Clears all removable attributes and uniform variables from this shader program
 			void ClearVariables() noexcept;
 
 
@@ -470,7 +470,7 @@ namespace ion::graphics::shaders
 				Removing
 			*/
 
-			//Clear all removable structs, attributes and uniform variables from this shader program
+			//Clears all removable structs, attributes and uniform variables from this shader program
 			void Clear() noexcept;
 	};
 } //ion::graphics::shaders

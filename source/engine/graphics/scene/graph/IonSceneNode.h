@@ -389,33 +389,33 @@ namespace ion::graphics::scene::graph
 
 		public:
 
-			//Construct a scene node as the root with the given name and visibility
+			//Constructs a scene node as the root with the given name and visibility
 			explicit SceneNode(std::optional<std::string> name = {}, bool visible = true) noexcept;
 
-			//Construct a scene node as the root with the given name, initial direction and visibility
+			//Constructs a scene node as the root with the given name, initial direction and visibility
 			SceneNode(std::optional<std::string> name, const Vector2 &initial_direction, bool visible = true) noexcept;
 
-			//Construct a scene node as the root with the given name, position, initial direction and visibility
+			//Constructs a scene node as the root with the given name, position, initial direction and visibility
 			SceneNode(std::optional<std::string> name, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true) noexcept;
 
 
-			//Construct a scene node as a child with the given name and parent
+			//Constructs a scene node as a child with the given name and parent
 			SceneNode(std::optional<std::string> name, SceneNode &parent_node) noexcept;
 
-			//Construct a scene node as a child with the given name, parent and initial direction
+			//Constructs a scene node as a child with the given name, parent and initial direction
 			SceneNode(std::optional<std::string> name, SceneNode &parent_node, const Vector2 &initial_direction) noexcept;
 
-			//Construct a scene node as a child with the given name, parent, position and initial direction
+			//Constructs a scene node as a child with the given name, parent, position and initial direction
 			SceneNode(std::optional<std::string> name, SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY) noexcept;
 
 
-			//Construct a scene node as a child with the given name, parent and visibility
+			//Constructs a scene node as a child with the given name, parent and visibility
 			SceneNode(std::optional<std::string> name, SceneNode &parent_node, bool visible) noexcept;
 
-			//Construct a scene node as a child with the given name, parent, initial direction and visibility
+			//Constructs a scene node as a child with the given name, parent, initial direction and visibility
 			SceneNode(std::optional<std::string> name, SceneNode &parent_node, const Vector2 &initial_direction, bool visible) noexcept;
 
-			//Construct a scene node as a child with the given name, parent, position, initial direction and visibility
+			//Constructs a scene node as a child with the given name, parent, position, initial direction and visibility
 			SceneNode(std::optional<std::string> name, SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept;
 
 
@@ -867,16 +867,16 @@ namespace ion::graphics::scene::graph
 				Relative
 			*/
 
-			//Translate this node by the given unit
+			//Translates this node by the given unit
 			void Translate(const Vector3 &unit) noexcept;
 
-			//Translate this node by the given unit
+			//Translates this node by the given unit
 			void Translate(real unit) noexcept;
 
-			//Rotate this node by the given angle in radians
+			//Rotates this node by the given angle in radians
 			void Rotate(real angle) noexcept;
 
-			//Scale this node by the given unit
+			//Scales this node by the given unit
 			void Scale(const Vector2 &unit) noexcept;
 
 
@@ -885,7 +885,7 @@ namespace ion::graphics::scene::graph
 				Absolute
 			*/
 
-			//Turn this node such that it faces the given position
+			//Turns this node such that it faces the given position
 			void LookAt(const Vector3 &position) noexcept;
 
 
@@ -909,7 +909,7 @@ namespace ion::graphics::scene::graph
 				Elapse time
 			*/
 
-			//Elapse the total time for this node by the given time in seconds
+			//Elapses the total time for this node by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 
@@ -919,23 +919,23 @@ namespace ion::graphics::scene::graph
 				Creating
 			*/
 
-			//Create a new scene node as a child of this node with the given name
+			//Creates a new scene node as a child of this node with the given name
 			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name = {});
 
-			//Create a new scene node as a child of this node with the given name and initial direction
+			//Creates a new scene node as a child of this node with the given name and initial direction
 			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name, const Vector2 &initial_direction);
 
-			//Create a new scene node as a child of this node with the given name, position and initial direction
+			//Creates a new scene node as a child of this node with the given name, position and initial direction
 			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY);
 
 
-			//Create a new scene node as a child of this node with the given name and visibility
+			//Creates a new scene node as a child of this node with the given name and visibility
 			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name, bool visible);
 
-			//Create a new scene node as a child of this node with the given name, initial direction and visibility
+			//Creates a new scene node as a child of this node with the given name, initial direction and visibility
 			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name, const Vector2 &initial_direction, bool visible);
 
-			//Create a new scene node as a child of this node with the given name, position, initial direction and visibility
+			//Creates a new scene node as a child of this node with the given name, position, initial direction and visibility
 			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name, const Vector3 &position, const Vector2 &initial_direction, bool visible);
 
 
@@ -944,29 +944,29 @@ namespace ion::graphics::scene::graph
 				Take / release ownership
 			*/
 
-			//Adopt (take ownership of) the given scene node and returns a pointer to the adopted node
+			//Adopts (take ownership of) the given scene node and returns a pointer to the adopted node
 			//Returns nullptr if the scene node could not be adopted and scene node will remain untouched
 			NonOwningPtr<SceneNode> Adopt(OwningPtr<SceneNode> &root_node);
 
-			//Adopt (take ownership of) the given scene node and returns a pointer to the adopted node
+			//Adopts (take ownership of) the given scene node and returns a pointer to the adopted node
 			//Returns nullptr if the scene node could not be adopted and scene node will be released
 			NonOwningPtr<SceneNode> Adopt(OwningPtr<SceneNode> &&root_node);
 
 
-			//Adopt (take ownership of) all the given scene nodes
+			//Adopts (take ownership of) all the given scene nodes
 			//If one or more scene nodes could not be adopted, they will remain untouched in the given container
 			void AdoptAll(scene_node::SceneNodes &nodes);
 
-			//Adopt (take ownership of) all the given scene nodes
+			//Adopts (take ownership of) all the given scene nodes
 			//If one or more scene nodes could not be adopted, they will be released
 			void AdoptAll(scene_node::SceneNodes &&nodes);
 
 
-			//Orphan (release ownership of) the given child node
+			//Orphans (release ownership of) the given child node
 			//Returns a pointer to the scene node released
 			[[nodiscard]] OwningPtr<SceneNode> Orphan(SceneNode &child_node) noexcept;
 
-			//Orphan (release ownership of) all child nodes in this scene node
+			//Orphans (release ownership of) all child nodes in this scene node
 			//Returns pointers to the scene nodes released
 			[[nodiscard]] scene_node::SceneNodes OrphanAll() noexcept;
 
@@ -999,14 +999,14 @@ namespace ion::graphics::scene::graph
 				Removing
 			*/
 
-			//Clear all child nodes from this scene node
+			//Clears all child nodes from this scene node
 			void ClearChildNodes() noexcept;
 
-			//Remove the given child node from this scene node
+			//Removes the given child node from this scene node
 			//Returns true if the given child node was removed
 			bool RemoveChildNode(SceneNode &child_node) noexcept;
 
-			//Remove a child node with the given name from this scene node
+			//Removes a child node with the given name from this scene node
 			//Returns true if a child node with the given name was removed
 			bool RemoveChildNode(std::string_view name) noexcept;
 
@@ -1015,33 +1015,33 @@ namespace ion::graphics::scene::graph
 				Attachable objects
 			*/
 
-			//Attach the given object to this node if not already attached
-			//Return true if the given object was attached
+			//Attaches the given object to this node if not already attached
+			//Returns true if the given object was attached
 			bool AttachObject(MovableObject &object);
 
-			//Attach the given camera to this node if not already attached
-			//Return true if the given camera was attached
+			//Attaches the given camera to this node if not already attached
+			//Returns true if the given camera was attached
 			bool AttachObject(Camera &camera);
 
-			//Attach the given light to this node if not already attached
-			//Return true if the given light was attached
+			//Attaches the given light to this node if not already attached
+			//Returns true if the given light was attached
 			bool AttachObject(Light &light);
 
 
-			//Detach the given object if attached to this node
+			//Detaches the given object if attached to this node
 			//Returns true if the given object was detached
 			bool DetachObject(MovableObject &object) noexcept;
 
-			//Detach the given camera if attached to this node
+			//Detaches the given camera if attached to this node
 			//Returns true if the given camera was detached
 			bool DetachObject(Camera &camera) noexcept;
 
-			//Detach the given light if attached to this node
+			//Detaches the given light if attached to this node
 			//Returns true if the given light was detached
 			bool DetachObject(Light &light) noexcept;
 
 
-			//Detach all objects attached to this node
+			//Detaches all objects attached to this node
 			void DetachAllObjects() noexcept;		
 	};
 } //ion::graphics::scene::graph

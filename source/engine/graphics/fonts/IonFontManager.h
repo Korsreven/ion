@@ -153,31 +153,31 @@ namespace ion::graphics::fonts
 				Creating
 			*/
 
-			//Create a font with the given name, asset name, size, face index, character spacing, character set and glyph min/mag filter
+			//Creates a font with the given name, asset name, size, face index, character spacing, character set and glyph min/mag filter
 			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size, int face_index,
 				int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter);
 
-			//Create a font with the given name, asset name, size, character spacing, character set and glyph min/mag filter
+			//Creates a font with the given name, asset name, size, character spacing, character set and glyph min/mag filter
 			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size,
 				int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter min_filter, font::FontGlyphFilter mag_filter);
 
-			//Create a font with the given name, asset name, size, character spacing, character set and glyph filter
+			//Creates a font with the given name, asset name, size, character spacing, character set and glyph filter
 			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size,
 				int character_spacing, font::FontCharacterSet character_set, font::FontGlyphFilter filter);
 
-			//Create a font with the given name, asset name, size, character spacing and character set
+			//Creates a font with the given name, asset name, size, character spacing and character set
 			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size,
 				int character_spacing, font::FontCharacterSet character_set);
 
-			//Create a font with the given name, asset name, size and character spacing
+			//Creates a font with the given name, asset name, size and character spacing
 			NonOwningPtr<Font> CreateFont(std::string name, std::string asset_name, int size,
 				int character_spacing = 0);
 
 
-			//Create a font as a copy of the given font
+			//Creates a font as a copy of the given font
 			NonOwningPtr<Font> CreateFont(const Font &font);
 
-			//Create a font by moving the given font
+			//Creates a font by moving the given font
 			NonOwningPtr<Font> CreateFont(Font &&font);
 
 
@@ -200,13 +200,13 @@ namespace ion::graphics::fonts
 				Removing
 			*/
 
-			//Clear all removable fonts from this manager
+			//Clears all removable fonts from this manager
 			void ClearFonts() noexcept;
 
-			//Remove a removable font from this manager
+			//Removes a removable font from this manager
 			bool RemoveFont(Font &font) noexcept;
 
-			//Remove a removable font with the given name from this manager
+			//Removes a removable font with the given name from this manager
 			bool RemoveFont(std::string_view name) noexcept;
 	};
 } //ion::graphics::fonts

@@ -108,14 +108,14 @@ namespace ion::managed
 			//Default constructor
 			ObjectObserver() = default;
 
-			//Construct a new empty observed object with the given requirement
+			//Constructs a new empty observed object with the given requirement
 			ObjectObserver(observed_object::ObjectRequirement requirement) noexcept :
 				my_base{observed_object::detail::as_subscription_contract(requirement)}
 			{
 				//Empty
 			}
 
-			//Construct a new empty observed object with the given requirement and callback
+			//Constructs a new empty observed object with the given requirement and callback
 			ObjectObserver(events::Callback<void, T&> on_removed, events::Callback<> on_removed_all,
 				observed_object::ObjectRequirement requirement = observed_object::ObjectRequirement::Optional) noexcept :
 
@@ -293,7 +293,7 @@ namespace ion::managed
 				Releasing
 			*/
 
-			//Release all objects being observed
+			//Releases all objects being observed
 			//Returns true if all object has successfully been released, or change requirements
 			inline auto ReleaseAll() noexcept
 			{
@@ -303,7 +303,7 @@ namespace ion::managed
 				return std::empty(managed_objects_);
 			}
 
-			//Release the given object being observed
+			//Releases the given object being observed
 			//Returns true if the object has successfully been released, or change requirements
 			inline auto Release(T &object) noexcept
 			{

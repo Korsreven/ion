@@ -40,7 +40,7 @@ namespace ion::types
 			//Default constructor
 			constexpr UniqueVal() = default;
 
-			//Construct a new unique value with the given value
+			//Constructs a new unique value with the given value
 			constexpr explicit UniqueVal(T value) noexcept :
 				value_{std::move(value)}
 			{

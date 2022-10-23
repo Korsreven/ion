@@ -62,17 +62,17 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			//Construct a new curve with the given control points, color and visibility
+			//Constructs a new curve with the given control points, color and visibility
 			Curve(curve::ControlPoints control_points, const Color &color, bool visible = true);
 
-			//Construct a new curve with the given control points, color, thickness and visibility
+			//Constructs a new curve with the given control points, color, thickness and visibility
 			Curve(curve::ControlPoints control_points, const Color &color, real thickness, bool visible = true);
 
 
-			//Construct a new curve with the given control points, color, smoothness and visibility
+			//Constructs a new curve with the given control points, color, smoothness and visibility
 			Curve(curve::ControlPoints control_points, const Color &color, int smoothness, bool visible = true);
 
-			//Construct a new curve with the given control points, color, thickness, smoothness and visibility
+			//Constructs a new curve with the given control points, color, thickness, smoothness and visibility
 			Curve(curve::ControlPoints control_points, const Color &color, real thickness, int smoothness, bool visible = true);
 
 

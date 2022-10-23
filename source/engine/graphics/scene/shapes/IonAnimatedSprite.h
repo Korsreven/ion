@@ -43,29 +43,29 @@ namespace ion::graphics::scene::shapes
 
 		public:
 
-			//Construct a new animated sprite with the given material and visibility
+			//Constructs a new animated sprite with the given material and visibility
 			explicit AnimatedSprite(NonOwningPtr<materials::Material> material, bool visible = true);
 
-			//Construct a new animated sprite with the given size, material and visibility
+			//Constructs a new animated sprite with the given size, material and visibility
 			AnimatedSprite(const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
-			//Construct a new animated sprite with the given position, size, material and visibility
+			//Constructs a new animated sprite with the given position, size, material and visibility
 			AnimatedSprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
-			//Construct a new animated sprite with the given position, rotation, size, material and visibility
+			//Constructs a new animated sprite with the given position, rotation, size, material and visibility
 			AnimatedSprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
 
-			//Construct a new animated sprite with the given material, color and visibility
+			//Constructs a new animated sprite with the given material, color and visibility
 			AnimatedSprite(NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			//Construct a new animated sprite with the given size, material, color and visibility
+			//Constructs a new animated sprite with the given size, material, color and visibility
 			AnimatedSprite(const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			//Construct a new animated sprite with the given position, size, material, color and visibility
+			//Constructs a new animated sprite with the given position, size, material, color and visibility
 			AnimatedSprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			//Construct a new animated sprite with the given position, rotation, size, material, color and visibility
+			//Constructs a new animated sprite with the given position, rotation, size, material, color and visibility
 			AnimatedSprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
 
@@ -73,7 +73,7 @@ namespace ion::graphics::scene::shapes
 				Modifiers
 			*/
 
-			//Revert to the initial animated material
+			//Reverts to the initial animated material
 			void Revert();
 
 
@@ -94,10 +94,10 @@ namespace ion::graphics::scene::shapes
 			void Restart() noexcept;
 
 
-			//Jump forward by the given amount of time
+			//Jumps forward by the given amount of time
 			void JumpForward(duration time) noexcept;
 
-			//Jump backward by the given amount of time
+			//Jumps backward by the given amount of time
 			void JumpBackward(duration time) noexcept;
 
 
@@ -105,7 +105,7 @@ namespace ion::graphics::scene::shapes
 				Elapse time
 			*/
 
-			//Elapse the total time for this animation by the given time in seconds
+			//Elapses the total time for this animation by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			virtual void Elapse(duration time) noexcept override;
 	};

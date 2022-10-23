@@ -178,7 +178,7 @@ namespace ion::graphics::particles
 				Evolving
 			*/
 
-			//Evolve particle by the given time in seconds
+			//Evolves particle by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			inline auto Evolve(duration time) noexcept
 			{

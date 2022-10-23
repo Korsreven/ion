@@ -108,7 +108,7 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a scene manager with the given name
+			//Constructs a scene manager with the given name
 			explicit SceneManager(std::optional<std::string> name = {}) noexcept;
 
 			//Deleted copy constructor
@@ -136,13 +136,13 @@ namespace ion::graphics::scene
 				Events
 			*/
 
-			//Return a mutable reference to the camera events of this scene manager
+			//Returns a mutable reference to the camera events of this scene manager
 			[[nodiscard]] inline auto& CameraEvents() noexcept
 			{
 				return static_cast<CameraEventsBase&>(*this);
 			}
 
-			//Return an immutable reference to the camera events of this scene manager
+			//Returns an immutable reference to the camera events of this scene manager
 			[[nodiscard]] inline auto& CameraEvents() const noexcept
 			{
 				return static_cast<const CameraEventsBase&>(*this);
@@ -329,17 +329,17 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a camera with the given name
+			//Creates a camera with the given name
 			NonOwningPtr<Camera> CreateCamera(std::optional<std::string> name = {}, bool visible = true);
 
-			//Create a camera with the given name and a custom frustum
+			//Creates a camera with the given name and a custom frustum
 			NonOwningPtr<Camera> CreateCamera(std::optional<std::string> name, const render::Frustum &frustum, bool visible = true);
 
 
-			//Create a camera as a copy of the given camera
+			//Creates a camera as a copy of the given camera
 			NonOwningPtr<Camera> CreateCamera(const Camera &camera);
 
-			//Create a camera by moving the given camera
+			//Creates a camera by moving the given camera
 			NonOwningPtr<Camera> CreateCamera(Camera &&camera);
 
 
@@ -362,13 +362,13 @@ namespace ion::graphics::scene
 				Removing
 			*/
 
-			//Clear all removable cameras from this manager
+			//Clears all removable cameras from this manager
 			void ClearCameras() noexcept;
 
-			//Remove a removable camera from this manager
+			//Removes a removable camera from this manager
 			bool RemoveCamera(Camera &camera) noexcept;
 
-			//Remove a removable camera with the given name from this manager
+			//Removes a removable camera with the given name from this manager
 			bool RemoveCamera(std::string_view name) noexcept;
 
 
@@ -377,17 +377,17 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a light with the given name and visibility
+			//Creates a light with the given name and visibility
 			NonOwningPtr<Light> CreateLight(std::optional<std::string> name = {}, bool visible = true);
 
-			//Create a light with the given name and values
+			//Creates a light with the given name and values
 			NonOwningPtr<Light> CreateLight(std::optional<std::string> name, light::LightType type,
 				const Vector3 &position, const Vector3 &direction, real radius,
 				const Color &diffuse,
 				real attenuation_constant, real attenuation_linear, real attenuation_quadratic,
 				real cutoff_angle, real outer_cutoff_angle, bool visible = true);
 
-			//Create a light with the given name and values
+			//Creates a light with the given name and values
 			NonOwningPtr<Light> CreateLight(std::optional<std::string> name, light::LightType type,
 				const Vector3 &position, const Vector3 &direction, real radius,
 				const Color &ambient, const Color &diffuse, const Color &specular,
@@ -395,10 +395,10 @@ namespace ion::graphics::scene
 				real cutoff_angle, real outer_cutoff_angle, bool visible = true);
 
 
-			//Create a light as a copy of the given light
+			//Creates a light as a copy of the given light
 			NonOwningPtr<Light> CreateLight(const Light &light);
 
-			//Create a light by moving the given light
+			//Creates a light by moving the given light
 			NonOwningPtr<Light> CreateLight(Light &&light);
 
 
@@ -421,13 +421,13 @@ namespace ion::graphics::scene
 				Removing
 			*/
 
-			//Clear all removable lights from this manager
+			//Clears all removable lights from this manager
 			void ClearLights() noexcept;
 
-			//Remove a removable light from this manager
+			//Removes a removable light from this manager
 			bool RemoveLight(Light &light) noexcept;
 
-			//Remove a removable light with the given name from this manager
+			//Removes a removable light with the given name from this manager
 			bool RemoveLight(std::string_view name) noexcept;
 
 
@@ -436,7 +436,7 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a model with the given name and visibility
+			//Creates a model with the given name and visibility
 			NonOwningPtr<Model> CreateModel(std::optional<std::string> name = {}, bool visible = true);
 
 
@@ -459,13 +459,13 @@ namespace ion::graphics::scene
 				Removing
 			*/
 
-			//Clear all removable models from this manager
+			//Clears all removable models from this manager
 			void ClearModels() noexcept;
 
-			//Remove a removable model from this manager
+			//Removes a removable model from this manager
 			bool RemoveModel(Model &model) noexcept;
 
-			//Remove a removable model with the given name from this manager
+			//Removes a removable model with the given name from this manager
 			bool RemoveModel(std::string_view name) noexcept;
 
 
@@ -474,7 +474,7 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a drawable particle system with the given name, particle system and visibility
+			//Creates a drawable particle system with the given name, particle system and visibility
 			NonOwningPtr<DrawableParticleSystem> CreateParticleSystem(std::optional<std::string> name,
 				NonOwningPtr<particles::ParticleSystem> particle_system, bool visible = true);
 
@@ -498,13 +498,13 @@ namespace ion::graphics::scene
 				Removing
 			*/
 
-			//Clear all removable particle systems from this manager
+			//Clears all removable particle systems from this manager
 			void ClearParticleSystems() noexcept;
 
-			//Remove a removable particle system from this manager
+			//Removes a removable particle system from this manager
 			bool RemoveParticleSystem(DrawableParticleSystem &particle_system) noexcept;
 
-			//Remove a removable particle system with the given name from this manager
+			//Removes a removable particle system with the given name from this manager
 			bool RemoveParticleSystem(std::string_view name) noexcept;
 
 
@@ -513,15 +513,15 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a drawable text with the given name, text and visibility
+			//Creates a drawable text with the given name, text and visibility
 			NonOwningPtr<DrawableText> CreateText(std::optional<std::string> name,
 				NonOwningPtr<fonts::Text> text, bool visible = true);
 
-			//Create a drawable text with the given name, position, text and visibility
+			//Creates a drawable text with the given name, position, text and visibility
 			NonOwningPtr<DrawableText> CreateText(std::optional<std::string> name, const Vector3 &position,
 				NonOwningPtr<fonts::Text> text, bool visible = true);
 
-			//Create a drawable text with the given name, position, rotation, text and visibility
+			//Creates a drawable text with the given name, position, rotation, text and visibility
 			NonOwningPtr<DrawableText> CreateText(std::optional<std::string> name, const Vector3 &position, real rotation,
 				NonOwningPtr<fonts::Text> text, bool visible = true);
 
@@ -545,13 +545,13 @@ namespace ion::graphics::scene
 				Removing
 			*/
 
-			//Clear all removable texts from this manager
+			//Clears all removable texts from this manager
 			void ClearTexts() noexcept;
 
-			//Remove a removable text from this manager
+			//Removes a removable text from this manager
 			bool RemoveText(DrawableText &text) noexcept;
 
-			//Remove a removable text with the given name from this manager
+			//Removes a removable text with the given name from this manager
 			bool RemoveText(std::string_view name) noexcept;
 
 
@@ -560,20 +560,20 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a movable sound with the given name, sound and pause state
+			//Creates a movable sound with the given name, sound and pause state
 			NonOwningPtr<MovableSound> CreateSound(std::optional<std::string> name,
 				NonOwningPtr<sounds::Sound> sound, bool paused = false);
 
-			//Create a movable sound with the given name, podition, sound and pause state
+			//Creates a movable sound with the given name, podition, sound and pause state
 			NonOwningPtr<MovableSound> CreateSound(std::optional<std::string> name, const Vector3 &position,
 				NonOwningPtr<sounds::Sound> sound, bool paused = false);
 
 
-			//Create a movable sound with the given name, sound, sound channel group and pause state
+			//Creates a movable sound with the given name, sound, sound channel group and pause state
 			NonOwningPtr<MovableSound> CreateSound(std::optional<std::string> name,
 				NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
 
-			//Create a movable sound with the given name, position, sound, sound channel group and pause state
+			//Creates a movable sound with the given name, position, sound, sound channel group and pause state
 			NonOwningPtr<MovableSound> CreateSound(std::optional<std::string> name, const Vector3 &position,
 				NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
 
@@ -597,13 +597,13 @@ namespace ion::graphics::scene
 				Removing
 			*/
 
-			//Clear all removable sounds from this manager
+			//Clears all removable sounds from this manager
 			void ClearSounds() noexcept;
 
-			//Remove a removable sound from this manager
+			//Removes a removable sound from this manager
 			bool RemoveSound(MovableSound &sound) noexcept;
 
-			//Remove a removable sound with the given name from this manager
+			//Removes a removable sound with the given name from this manager
 			bool RemoveSound(std::string_view name) noexcept;
 
 
@@ -612,11 +612,11 @@ namespace ion::graphics::scene
 				Creating
 			*/
 
-			//Create a movable sound listener with the given name and sound listener
+			//Creates a movable sound listener with the given name and sound listener
 			NonOwningPtr<MovableSoundListener> CreateSoundListener(std::optional<std::string> name,
 				NonOwningPtr<sounds::SoundListener> sound_listener);
 
-			//Create a movable sound listener with the given name, position and sound listener
+			//Creates a movable sound listener with the given name, position and sound listener
 			NonOwningPtr<MovableSoundListener> CreateSoundListener(std::optional<std::string> name, const Vector3 &position,
 				NonOwningPtr<sounds::SoundListener> sound_listener);
 
@@ -640,13 +640,13 @@ namespace ion::graphics::scene
 				Removing
 			*/
 
-			//Clear all removable sound listeners from this manager
+			//Clears all removable sound listeners from this manager
 			void ClearSoundListeners() noexcept;
 
-			//Remove a removable sound listener from this manager
+			//Removes a removable sound listener from this manager
 			bool RemoveSoundListener(MovableSoundListener &sound_listener) noexcept;
 
-			//Remove a removable sound listener with the given name from this manager
+			//Removes a removable sound listener with the given name from this manager
 			bool RemoveSoundListener(std::string_view name) noexcept;
 	};
 } //ion::graphics::scene

@@ -66,7 +66,7 @@ namespace ion::adaptors::iterators
 
 		constexpr ConstDereferenceIterator() = default;
 
-		//Construct const dereference iterator from underlying iterator type
+		//Constructs a const dereference iterator from underlying iterator type
 		constexpr ConstDereferenceIterator(const Iterator &iterator) noexcept :
 			Iterator{iterator}
 		{
@@ -79,7 +79,7 @@ namespace ion::adaptors::iterators
 			Modifiers
 		*/
 
-		//Post increment iterator
+		//Post-increments iterator
 		[[nodiscard]] constexpr ConstDereferenceIterator operator++(int) noexcept
 		{
 			auto iter = *this;
@@ -87,14 +87,14 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Pre increment iterator
+		//Pre-increments iterator
 		constexpr ConstDereferenceIterator &operator++() noexcept
 		{
 			Iterator::operator++();
 			return *this;
 		}
 
-		//Post decrement iterator
+		//Post-decrements iterator
 		[[nodiscard]] constexpr ConstDereferenceIterator operator--(int) noexcept
 		{
 			auto iter = *this;
@@ -102,7 +102,7 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Pre decrement iterator
+		//Pre-decrements iterator
 		constexpr ConstDereferenceIterator &operator--() noexcept
 		{
 			Iterator::operator--();
@@ -110,7 +110,7 @@ namespace ion::adaptors::iterators
 		}
 
 
-		//Increment iterator by the given offset
+		//Increments iterator by the given offset
 		//Returns the result as a copy
 		[[nodiscard]] constexpr ConstDereferenceIterator operator+(int off) const noexcept
 		{
@@ -119,7 +119,7 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Decrement iterator by the given offset
+		//Decrements iterator by the given offset
 		//Returns the result as a copy
 		[[nodiscard]] constexpr ConstDereferenceIterator operator-(int off) const noexcept
 		{
@@ -128,14 +128,14 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Increment iterator by the given offset
+		//Increments iterator by the given offset
 		constexpr ConstDereferenceIterator &operator+=(int off) noexcept
 		{
 			Iterator::operator+=(off);
 			return *this;
 		}
 
-		//Decrement iterator by the given offset
+		//Decrements iterator by the given offset
 		constexpr ConstDereferenceIterator &operator-=(int off) noexcept
 		{
 			Iterator::operator-=(off);
@@ -188,7 +188,7 @@ namespace ion::adaptors::iterators
 
 		constexpr DereferenceIterator() = default;
 
-		//Construct dereference iterator from underlying iterator type
+		//Constructs a dereference iterator from underlying iterator type
 		constexpr DereferenceIterator(const Iterator &iterator) noexcept :
 			ConstDereferenceIterator<Iterator>{iterator}
 		{
@@ -201,7 +201,7 @@ namespace ion::adaptors::iterators
 			Modifiers
 		*/
 
-		//Post increment iterator
+		//Post-increments iterator
 		[[nodiscard]] constexpr DereferenceIterator operator++(int) noexcept
 		{
 			auto iter = *this;
@@ -209,14 +209,14 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Pre increment iterator
+		//Pre-increments iterator
 		constexpr DereferenceIterator &operator++() noexcept
 		{
 			Iterator::operator++();
 			return *this;
 		}
 
-		//Post decrement iterator
+		//Post-decrements iterator
 		[[nodiscard]] constexpr DereferenceIterator operator--(int) noexcept
 		{
 			auto iter = *this;
@@ -224,7 +224,7 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Pre decrement iterator
+		//Pre-decrements iterator
 		constexpr DereferenceIterator &operator--() noexcept
 		{
 			Iterator::operator--();
@@ -232,7 +232,7 @@ namespace ion::adaptors::iterators
 		}
 
 
-		//Increment iterator by the given offset
+		//Increments iterator by the given offset
 		//Returns the result as a copy
 		[[nodiscard]] constexpr DereferenceIterator operator+(int off) const noexcept
 		{
@@ -241,7 +241,7 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Decrement iterator by the given offset
+		//Decrements iterator by the given offset
 		//Returns the result as a copy
 		[[nodiscard]] constexpr DereferenceIterator operator-(int off) const noexcept
 		{
@@ -250,14 +250,14 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Increment iterator by the given offset
+		//Increments iterator by the given offset
 		constexpr DereferenceIterator &operator+=(int off) noexcept
 		{
 			Iterator::operator+=(off);
 			return *this;
 		}
 
-		//Decrement iterator by the given offset
+		//Decrements iterator by the given offset
 		constexpr DereferenceIterator &operator-=(int off) noexcept
 		{
 			Iterator::operator-=(off);

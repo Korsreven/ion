@@ -438,7 +438,7 @@ namespace ion::resources
 				return count;
 			}
 
-			//Update all resources that is in a pending state (non-blocking)
+			//Updates all resources that is in a pending state (non-blocking)
 			//Returns true when completed
 			[[nodiscard]] auto Updated() noexcept
 			{
@@ -446,7 +446,7 @@ namespace ion::resources
 				return ResourcesToUpdate() == 0;
 			}
 
-			//Update all resources that is in a pending state (non-blocking)
+			//Updates all resources that is in a pending state (non-blocking)
 			//Updates the given progress and returns true when completed
 			[[nodiscard]] auto Updated(types::Progress<int> &progress) noexcept
 			{
@@ -530,7 +530,7 @@ namespace ion::resources
 				return ResourcesToPrepare() == 0;
 			}
 
-			//Prepare all resources that is in a pending state (non-blocking)
+			//Prepares all resources that is in a pending state (non-blocking)
 			//Updates the given progress and returns true when completed
 			[[nodiscard]] auto Prepared(types::Progress<int> &progress)
 			{
@@ -611,7 +611,7 @@ namespace ion::resources
 				return count;
 			}
 
-			//Load all resources that is in a pending state (non-blocking)
+			//Loads all resources that is in a pending state (non-blocking)
 			//Returns true when completed
 			[[nodiscard]] auto Loaded()
 			{
@@ -620,7 +620,7 @@ namespace ion::resources
 				return ResourcesToLoad() == 0;
 			}
 
-			//Load all resources that is in a pending state (non-blocking)
+			//Loads all resources that is in a pending state (non-blocking)
 			//Updates the given progress and returns true when completed
 			[[nodiscard]] auto Loaded(types::Progress<int> &progress)
 			{
@@ -686,7 +686,7 @@ namespace ion::resources
 				return count;
 			}
 
-			//Unload all resources that is in a pending state (non-blocking)
+			//Unloads all resources that is in a pending state (non-blocking)
 			//Returns true when completed
 			[[nodiscard]] auto Unloaded() noexcept
 			{
@@ -694,7 +694,7 @@ namespace ion::resources
 				return ResourcesToUnload() == 0;
 			}
 
-			//Unload all resources that is in a pending state (non-blocking)
+			//Unloads all resources that is in a pending state (non-blocking)
 			//Updates the given progress and returns true when completed
 			[[nodiscard]] auto Unloaded(types::Progress<int> &progress) noexcept
 			{
@@ -806,14 +806,14 @@ namespace ion::resources
 				Creating
 			*/
 
-			//Create a resource with the given arguments
+			//Creates a resource with the given arguments
 			template <typename... Args>
 			auto CreateResource(Args &&...args)
 			{
 				return this->Create(std::forward<Args>(args)...);
 			}
 
-			//Create a resource of type T with the given arguments
+			//Creates a resource of type T with the given arguments
 			template <typename T, typename... Args>
 			auto CreateResource(Args &&...args)
 			{
@@ -849,19 +849,19 @@ namespace ion::resources
 				Removing
 			*/
 
-			//Clear all removable resources from this manager
+			//Clears all removable resources from this manager
 			void ClearResources() noexcept
 			{
 				this->Clear();
 			}
 
-			//Remove a removable resource from this manager
+			//Removes a removable resource from this manager
 			auto RemoveResource(ResourceT &resource) noexcept
 			{
 				return this->Remove(resource);
 			}
 
-			//Remove a removable resource with the given name from this manager
+			//Removes a removable resource with the given name from this manager
 			auto RemoveResource(std::string_view name) noexcept
 			{
 				return this->Remove(name);

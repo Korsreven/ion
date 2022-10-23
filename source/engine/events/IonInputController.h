@@ -88,7 +88,7 @@ namespace ion::events
 
 		public:
 
-			//Construct an input controller on top of the given system window
+			//Constructs an input controller on top of the given system window
 			explicit InputController(graphics::render::RenderWindow &render_window);
 
 			//Deleted copy constructor
@@ -138,13 +138,13 @@ namespace ion::events
 				Release pressed buttons
 			*/
 
-			//Release all pressed buttons
+			//Releases all pressed buttons
 			void ReleaseButtons() noexcept;
 
-			//Release all pressed key buttons
+			//Releases all pressed key buttons
 			void ReleaseKeyButtons() noexcept;
 
-			//Release all pressed mouse buttons
+			//Releases all pressed mouse buttons
 			void ReleaseMouseButtons() noexcept;
 	};
 } //ion::events

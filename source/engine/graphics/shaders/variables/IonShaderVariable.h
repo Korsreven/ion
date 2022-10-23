@@ -40,7 +40,7 @@ namespace ion::graphics::shaders::variables
 
 		public:
 
-			//Construct a new shader variable with the given name
+			//Constructs a new shader variable with the given name
 			//Name should be equal to the identifier name in the shader source
 			explicit ShaderVariable(std::string name) noexcept :
 				managed::ManagedObject<ShaderProgram>{std::move(name)}

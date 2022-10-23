@@ -75,7 +75,7 @@ namespace ion::graphics::particles::affectors
 				Creating
 			*/
 
-			//Create an affector of type T with the given name and arguments
+			//Creates an affector of type T with the given name and arguments
 			template <typename T, typename... Args>
 			auto CreateAffector(std::string name, Args &&...args)
 			{
@@ -86,7 +86,7 @@ namespace ion::graphics::particles::affectors
 			}
 
 
-			//Create an affector of type T as a copy of the given affector
+			//Creates an affector of type T as a copy of the given affector
 			template <typename T>
 			auto CreateAffector(const T &affector_t)
 			{
@@ -96,7 +96,7 @@ namespace ion::graphics::particles::affectors
 				return static_pointer_cast<T>(ptr);
 			}
 
-			//Create an affector of type T by moving the given affector
+			//Creates an affector of type T by moving the given affector
 			template <typename T>
 			auto CreateAffector(T &&affector_t)
 			{
@@ -132,13 +132,13 @@ namespace ion::graphics::particles::affectors
 				Removing
 			*/
 
-			//Clear all affectors from this manager
+			//Clears all affectors from this manager
 			void ClearAffectors() noexcept
 			{
 				Clear();
 			}
 
-			//Remove an affector from this manager
+			//Removes an affector from this manager
 			auto RemoveAffector(Affector &affector) noexcept
 			{
 				return Remove(affector);

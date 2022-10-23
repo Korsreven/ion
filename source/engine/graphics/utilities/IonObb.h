@@ -220,10 +220,10 @@ namespace ion::graphics::utilities
 				Rotating
 			*/
 
-			//Rotate obb by the given angle (radians)
+			//Rotates obb by the given angle (radians)
 			Obb& Rotate(real angle) noexcept;
 
-			//Rotate obb by the given angle (radians)
+			//Rotates obb by the given angle (radians)
 			//Returns the result as a copy
 			[[nodiscard]] Obb RotateCopy(real angle) const noexcept;
 
@@ -232,10 +232,10 @@ namespace ion::graphics::utilities
 				Scaling
 			*/
 
-			//Scale obb by the given vector
+			//Scales obb by the given vector
 			Obb& Scale(const Vector2 &vector) noexcept;
 
-			//Scale obb by the given vector
+			//Scales obb by the given vector
 			//Returns the result as a copy
 			[[nodiscard]] Obb ScaleCopy(const Vector2 &vector) const noexcept;
 
@@ -244,10 +244,10 @@ namespace ion::graphics::utilities
 				Transforming
 			*/
 
-			//Transform obb based on the given matrix
+			//Transforms obb based on the given matrix
 			Obb& Transform(const Matrix3 &matrix) noexcept;
 
-			//Transform obb based on the given matrix
+			//Transforms obb based on the given matrix
 			//Returns the result as a copy
 			[[nodiscard]] Obb TransformCopy(const Matrix3 &matrix) const noexcept;
 
@@ -256,10 +256,10 @@ namespace ion::graphics::utilities
 				Translating
 			*/
 
-			//Translate obb by the given vector
+			//Translates obb by the given vector
 			Obb& Translate(const Vector2 &vector) noexcept;
 
-			//Translate obb by the given vector
+			//Translates obb by the given vector
 			//Returns the result as a copy
 			[[nodiscard]] Obb TranslateCopy(const Vector2 &vector) const noexcept;
 
@@ -268,7 +268,7 @@ namespace ion::graphics::utilities
 				Drawing
 			*/
 
-			//Draw the bounds of this obb with the given color
+			//Draws the bounds of this obb with the given color
 			void Draw(const Color &color) const noexcept;
 	};
 

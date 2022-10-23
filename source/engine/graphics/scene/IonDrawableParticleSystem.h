@@ -136,7 +136,7 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new drawable particle system with the given name, particle system and visibility
+			//Constructs a new drawable particle system with the given name, particle system and visibility
 			DrawableParticleSystem(std::optional<std::string> name,
 				NonOwningPtr<particles::ParticleSystem> particle_system, bool visible = true);
 
@@ -145,7 +145,7 @@ namespace ion::graphics::scene
 				Modifiers
 			*/
 
-			//Revert to the initial particle system
+			//Reverts to the initial particle system
 			void Revert();
 
 
@@ -177,7 +177,7 @@ namespace ion::graphics::scene
 				Preparing / drawing
 			*/
 
-			//Prepare this particle system such that it is ready to be drawn
+			//Prepares this particle system such that it is ready to be drawn
 			//This function is typically called each frame
 			void Prepare() override;
 
@@ -186,7 +186,7 @@ namespace ion::graphics::scene
 				Elapse time
 			*/
 
-			//Elapse the total time for this particle system by the given time in seconds
+			//Elapses the total time for this particle system by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept override;
 	};

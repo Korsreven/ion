@@ -55,16 +55,16 @@ namespace ion::graphics::particles::affectors
 				Affect particles
 			*/
 
-			//Elapse linear force by the given time in seconds
+			//Elapses linear force by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
 
 		public:
 
-			//Construct a new linear force with the given name
+			//Constructs a new linear force with the given name
 			explicit LinearForce(std::string name) noexcept;
 
-			//Construct a new linear force with the given name, type and force
+			//Constructs a new linear force with the given name, type and force
 			LinearForce(std::string name, linear_force::ForceType type, const Vector2 &force) noexcept;
 
 

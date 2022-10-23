@@ -332,7 +332,7 @@ namespace ion::utilities::string
 		Case sensitive/insensitive
 	*/
 
-	//Comparing two strings by the given string case sensitivity
+	//Compares two strings by the given string case sensitivity
 	//Default case sensitivity is sensitive
 	[[nodiscard]] bool Compare(std::string_view str1, std::string_view str2,
 		StringCase string_case = StringCase::Sensitive) noexcept;
@@ -347,7 +347,7 @@ namespace ion::utilities::string
 	[[nodiscard]] bool EndsWith(std::string_view str1, std::string_view str2,
 		StringCase string_case = StringCase::Sensitive) noexcept;
 
-	//Matching two strings by the given pattern and string case sensitivity
+	//Matches two strings by the given pattern and string case sensitivity
 	//Default case sensitivity is sensitive
 	//Pattern can include the following wildcards:
 	//	* or % to match 0 or more characters
@@ -361,7 +361,7 @@ namespace ion::utilities::string
 		Strings and numbers
 	*/
 
-	//Concatenate strings and numbers to form a single string
+	//Concatenates strings and numbers to form a single string
 	template <typename T, typename = std::enable_if_t<types::is_string_v<T> || types::is_number_v<T>>,
 		typename T2, typename... Tn>
 	[[nodiscard]] inline auto Concat(T &&first, T2 &&second, Tn &&...rest)
@@ -371,13 +371,13 @@ namespace ion::utilities::string
 		return str;
 	}
 
-	//Concatenate all parts to form a single string
+	//Concatenates all parts to form a single string
 	[[nodiscard]] std::string Concat(const Strings &parts);
 
-	//Concatenate all parts (up to count) to form a single string
+	//Concatenates all parts (up to count) to form a single string
 	[[nodiscard]] std::string Concat(const Strings &parts, int count);
 
-	//Concatenate all parts (from start up to count) to form a single string
+	//Concatenates all parts (from start up to count) to form a single string
 	[[nodiscard]] std::string Concat(const Strings &parts, int start, int count);
 
 
@@ -386,13 +386,13 @@ namespace ion::utilities::string
 		Using current StringSplitOptions
 	*/
 
-	//Split a string into multiple parts at each delimiters location
+	//Splits a string into multiple parts at each delimiters location
 	//Use StringSplitOptions to control how the string is splitted
 	//When no options is specified, it removes empty entries
 	[[nodiscard]] Strings Split(std::string_view str, std::string_view delimiters,
 		StringSplitOptions split_options = StringSplitOptions::RemoveEmptyEntries);
 
-	//Split a string into multiple parts (until max_splits has been reached) at each delimiters location
+	//Splits a string into multiple parts (until max_splits has been reached) at each delimiters location
 	//Use StringSplitOptions to control how the string is splitted
 	//When no options is specified, it removes empty entries
 	[[nodiscard]] Strings Split(std::string_view str, std::string_view delimiters,
@@ -404,7 +404,7 @@ namespace ion::utilities::string
 		Strings and numbers
 	*/
 
-	//Join together strings and numbers to form a single delimited string
+	//Joins together strings and numbers to form a single delimited string
 	//The string is delimited by the given delimiter
 	template <typename T, typename = std::enable_if_t<types::is_string_v<T> || types::is_number_v<T>>,
 				typename T2, typename... Tn>
@@ -415,15 +415,15 @@ namespace ion::utilities::string
 		return str;
 	}
 
-	//Join together all parts to form a single delimited string
+	//Joins together all parts to form a single delimited string
 	//The string is delimited by the given delimiter
 	[[nodiscard]] std::string Join(std::string_view delimiter, const Strings &parts);
 
-	//Join together all parts (up to count) to form a single delimited string
+	//Joins together all parts (up to count) to form a single delimited string
 	//The string is delimited by the given delimiter
 	[[nodiscard]] std::string Join(std::string_view delimiter, const Strings &parts, int count);
 
-	//Join together all parts (from start up to count) to form a single delimited string
+	//Joins together all parts (from start up to count) to form a single delimited string
 	//The string is delimited by the given delimiter
 	[[nodiscard]] std::string Join(std::string_view delimiter, const Strings &parts, int start, int count);
 
@@ -444,7 +444,7 @@ namespace ion::utilities::string
 		return detail::substitute_curly_braces(str, std::forward_as_tuple(first, rest...));
 	}
 
-	//Format the given number with the given specifiers
+	//Formats the given number with the given specifiers
 	//Default specifiers returns a thousands separated number with up to two decimals if needed
 	//	0 for zero placeholder
 	//	# for digit placeholder
@@ -458,22 +458,20 @@ namespace ion::utilities::string
 		Inplace or by copying
 	*/
 
-	//Pad string left/right with the given characters
-
-	//Pad to the left of the string by length with the given characters
+	//Pads to the left of the string by length with the given characters
 	//Default padding character is space
 	std::string& PadLeft(std::string &str, int length, std::string_view characters = " ");
 
-	//Pad to the right of the string by length with the given characters
+	//Pads to the right of the string by length with the given characters
 	//Default padding character is space
 	std::string& PadRight(std::string &str, int length, std::string_view characters = " ");
 
-	//Pad to the left of the string by length with the given characters
+	//Pads to the left of the string by length with the given characters
 	//Default padding character is space
 	//Returns the result as a copy
 	[[nodiscard]] std::string PadLeftCopy(std::string str, int length, std::string_view characters = " ");
 
-	//Pad to the right of the string by length with the given characters
+	//Pads to the right of the string by length with the given characters
 	//Default padding character is space
 	//Returns the result as a copy
 	[[nodiscard]] std::string PadRightCopy(std::string str, int length, std::string_view characters = " ");
@@ -485,38 +483,38 @@ namespace ion::utilities::string
 		Non-printable
 	*/
 
-	//Remove all non-ascii characters from str
+	//Removes all non-ascii characters from str
 	std::string& RemoveNonAscii(std::string &str) noexcept;
 
-	//Remove all non-alpha characters from str
+	//Removes all non-alpha characters from str
 	std::string& RemoveNonAlpha(std::string &str) noexcept;
 
-	//Remove all non-numeric characters from str
+	//Removes all non-numeric characters from str
 	std::string& RemoveNonNumeric(std::string &str) noexcept;
 
-	//Remove all non- alpha numeric characters from str
+	//Removes all non- alpha numeric characters from str
 	std::string& RemoveNonAlphaNumeric(std::string &str) noexcept;
 
-	//Remove all non-printable characters from str
+	//Removes all non-printable characters from str
 	std::string& RemoveNonPrintable(std::string &str) noexcept;
 
-	//Remove all non-ascii characters from str
+	//Removes all non-ascii characters from str
 	//Returns the result as a copy
 	[[nodiscard]] std::string RemoveNonAsciiCopy(std::string str) noexcept;
 
-	//Remove all non-alpha characters from str
+	//Removes all non-alpha characters from str
 	//Returns the result as a copy
 	[[nodiscard]] std::string RemoveNonAlphaCopy(std::string str) noexcept;
 
-	//Remove all non-numeric characters from str
+	//Removes all non-numeric characters from str
 	//Returns the result as a copy
 	[[nodiscard]] std::string RemoveNonNumericCopy(std::string str) noexcept;
 
-	//Remove all non- alpha numeric characters from str
+	//Removes all non- alpha numeric characters from str
 	//Returns the result as a copy
 	[[nodiscard]] std::string RemoveNonAlphaNumericCopy(std::string str) noexcept;
 
-	//Remove all non-printable characters from str
+	//Removes all non-printable characters from str
 	//Returns the result as a copy
 	[[nodiscard]] std::string RemoveNonPrintableCopy(std::string str) noexcept;
 
@@ -527,12 +525,12 @@ namespace ion::utilities::string
 		Inplace or by copying
 	*/
 
-	//Replace all occurrences of 'what' with 'with_what'
+	//Replaces all occurrences of 'what' with 'with_what'
 	//Default case sensitivity is sensitive
 	std::string& ReplaceAll(std::string &str, std::string_view what, std::string_view with_what,
 		StringCase string_case = StringCase::Sensitive);
 
-	//Replace all occurrences of 'what' with 'with_what'
+	//Replaces all occurrences of 'what' with 'with_what'
 	//Default case sensitivity is sensitive
 	//Returns the result as a copy
 	[[nodiscard]] std::string ReplaceAllCopy(std::string str, std::string_view what, std::string_view with_what,
@@ -543,7 +541,7 @@ namespace ion::utilities::string
 		Serializing
 	*/
 
-	//Serialize a given object (that is trivially copyable) to a byte array
+	//Serializes a given object (that is trivially copyable) to a byte array
 	template <typename T>
 	[[nodiscard]] inline auto Serialize(const T &object) noexcept
 	{
@@ -557,7 +555,7 @@ namespace ion::utilities::string
 		return bytes;
 	}
 
-	//Deserialize a given byte array to a given object (that is trivially copyable)
+	//Deserializes a given byte array to a given object (that is trivially copyable)
 	template <typename T>
 	inline auto& Deserialize(const std::array<std::byte, sizeof(T)> &bytes, T &object) noexcept
 	{
@@ -569,7 +567,7 @@ namespace ion::utilities::string
 		return object;
 	}
 
-	//Deserialize a given byte array to an object of type T (that is trivially copyable)
+	//Deserializes a given byte array to an object of type T (that is trivially copyable)
 	template <typename T>
 	[[nodiscard]] inline auto Deserialize(const std::array<std::byte, sizeof(T)> &bytes) noexcept(T{})
 	{
@@ -583,17 +581,17 @@ namespace ion::utilities::string
 		Inplace or by copying
 	*/
 
-	//Transform all characters of the string to lower case
+	//Transforms all characters of the string to lower case
 	std::string& ToLowerCase(std::string &str) noexcept;
 
-	//Transform all characters of the string to UPPER CASE
+	//Transforms all characters of the string to UPPER CASE
 	std::string& ToUpperCase(std::string &str) noexcept;
 
-	//Transform all characters of the string to lower case
+	//Transforms all characters of the string to lower case
 	//Returns the result as a copy
 	[[nodiscard]] std::string ToLowerCaseCopy(std::string str);
 
-	//Transform all characters of the string to UPPER CASE
+	//Transforms all characters of the string to UPPER CASE
 	//Returns the result as a copy
 	[[nodiscard]] std::string ToUpperCaseCopy(std::string str);
 
@@ -603,29 +601,29 @@ namespace ion::utilities::string
 		Inplace or by copying
 	*/
 
-	//Trim string, removes characters from left side
+	//Trims string, removes characters from left side
 	//Removes whitespaces (space, tab and new line) as default
 	std::string& TrimLeft(std::string &str, std::string_view characters = " \t\n") noexcept;
 
-	//Trim string, removes characters from right side
+	//Trims string, removes characters from right side
 	//Removes whitespaces (space, tab and new line) as default
 	std::string& TrimRight(std::string &str, std::string_view characters = " \t\n") noexcept;
 
-	//Trim string, removes characters from both sides
+	//Trims string, removes characters from both sides
 	//Removes whitespaces (space, tab and new line) as default
 	std::string& Trim(std::string &str, std::string_view characters = " \t\n") noexcept;
 
-	//Trim string, removes characters from left side
+	//Trims string, removes characters from left side
 	//Removes whitespaces (space, tab and new line) as default
 	//Returns the result as a copy
 	[[nodiscard]] std::string TrimLeftCopy(std::string str, std::string_view characters = " \t\n");
 
-	//Trim string, removes characters from right side
+	//Trims string, removes characters from right side
 	//Removes whitespaces (space, tab and new line) as default
 	//Returns the result as a copy
 	[[nodiscard]] std::string TrimRightCopy(std::string str, std::string_view characters = " \t\n");
 
-	//Trim string, removes characters from both sides
+	//Trims string, removes characters from both sides
 	//Removes whitespaces (space, tab and new line) as default
 	//Returns the result as a copy
 	[[nodiscard]] std::string TrimCopy(std::string str, std::string_view characters = " \t\n");

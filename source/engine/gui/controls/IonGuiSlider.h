@@ -151,12 +151,12 @@ namespace ion::gui::controls
 
 		public:
 
-			//Construct a slider with the given name, size, caption, tooltip, type and hit boxes
+			//Constructs a slider with the given name, size, caption, tooltip, type and hit boxes
 			GuiSlider(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_slider::SliderType type = gui_slider::SliderType::Horizontal,
 				gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Construct a slider with the given name, skin, size, caption, tooltip, type and hit boxes
+			//Constructs a slider with the given name, skin, size, caption, tooltip, type and hit boxes
 			GuiSlider(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_slider::SliderType type = gui_slider::SliderType::Horizontal,
 				gui_control::BoundingBoxes hit_boxes = {});

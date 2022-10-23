@@ -71,11 +71,11 @@ namespace ion::script::interfaces
 				Creating from script
 			*/
 
-			//Create animations from a script (or object file) with the given asset name
+			//Creates animations from a script (or object file) with the given asset name
 			void CreateAnimations(std::string_view asset_name,
 				graphics::textures::AnimationManager &animation_manager);
 
-			//Create animations from a script (or object file) with the given asset name
+			//Creates animations from a script (or object file) with the given asset name
 			void CreateAnimations(std::string_view asset_name,
 				graphics::textures::AnimationManager &animation_manager, const ManagerRegister &managers);
 	};

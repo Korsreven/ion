@@ -53,11 +53,11 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Construct a new movable sound listener with the given name and sound listener
+			//Constructs a new movable sound listener with the given name and sound listener
 			MovableSoundListener(std::optional<std::string> name,
 				NonOwningPtr<sounds::SoundListener> sound_listener) noexcept;
 
-			//Construct a new movable sound listener with the given name, position and sound listener
+			//Constructs a new movable sound listener with the given name, position and sound listener
 			MovableSoundListener(std::optional<std::string> name, const Vector3 &position,
 				NonOwningPtr<sounds::SoundListener> sound_listener) noexcept;
 
@@ -107,7 +107,7 @@ namespace ion::graphics::scene
 				Elapse time
 			*/
 
-			//Elapse the total time for this movable sound listener by the given time in seconds
+			//Elapses the total time for this movable sound listener by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept override;
 	};

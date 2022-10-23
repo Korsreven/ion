@@ -150,13 +150,13 @@ namespace ion::resources
 				Creating
 			*/
 
-			//Create an empty repository
+			//Creates an empty repository
 			auto CreateRepository()
 			{
 				return RepositoryBase::Create();
 			}
 
-			//Create a repository by copying/moving the given repository
+			//Creates a repository by copying/moving the given repository
 			template <typename T, typename = std::enable_if_t<std::is_same_v<std::remove_cvref_t<T>, RepositoryT>>>
 			auto CreateRepository(T &&repository)
 			{
@@ -169,13 +169,13 @@ namespace ion::resources
 				Removing
 			*/
 
-			//Clear all repositories from this factory
+			//Clears all repositories from this factory
 			void ClearRepositories() noexcept
 			{
 				RepositoryBase::Clear();
 			}
 
-			//Remove a repository from this factory
+			//Removes a repository from this factory
 			auto RemoveRepository(RepositoryT &repository) noexcept
 			{
 				return RepositoryBase::Remove(repository);

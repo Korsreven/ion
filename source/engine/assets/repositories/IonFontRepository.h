@@ -33,7 +33,7 @@ namespace ion::assets::repositories
 		//Naming convention is set to file path
 		FontRepository() noexcept;
 
-		//Construct a font repository with the given naming convention
+		//Constructs a font repository with the given naming convention
 		FontRepository(file_repository::NamingConvention naming_convention) noexcept;
 	};
 } //ion::assets::repositories

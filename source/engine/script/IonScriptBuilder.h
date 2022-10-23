@@ -215,23 +215,23 @@ namespace ion::script
 				Building
 			*/
 
-			//Build a script entry with the given name (from a repository) by compiling and validating it
+			//Builds a script entry with the given name (from a repository) by compiling and validating it
 			//Returns true if the script is built successfully
 			bool Build(std::string_view name);
 
-			//Build a script file with the given file path by compiling and validating it
+			//Builds a script file with the given file path by compiling and validating it
 			//Returns true if the script is built successfully
 			bool BuildFile(std::filesystem::path file_path);
 
-			//Build a script file with the given file path (and root path) by compiling and validating it
+			//Builds a script file with the given file path (and root path) by compiling and validating it
 			//Returns true if the script is built successfully
 			bool BuildFile(std::filesystem::path file_path, std::filesystem::path root_path);
 
-			//Build the given script string by compiling and validating it
+			//Builds the given script string by compiling and validating it
 			//Returns true if the script is built successfully
 			bool BuildString(std::string str);
 
-			//Build the given script string (and root path) by compiling and validating it
+			//Builds the given script string (and root path) by compiling and validating it
 			//Returns true if the script is built successfully
 			bool BuildString(std::string str, std::filesystem::path root_path);
 

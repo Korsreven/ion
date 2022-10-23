@@ -335,10 +335,10 @@ namespace ion::graphics::shaders
 
 		public:
 
-			//Construct a new empty shader layout with the given name
+			//Constructs a new empty shader layout with the given name
 			explicit ShaderLayout(std::string name) noexcept;
 
-			//Construct a new shader layout with the given name, struct, attribute and uniform bindings
+			//Constructs a new shader layout with the given name, struct, attribute and uniform bindings
 			ShaderLayout(std::string name, shader_layout::StructBindings struct_bindings,
 				shader_layout::AttributeBindings attribute_bindings, shader_layout::UniformBindings uniform_bindings) noexcept;
 
@@ -396,15 +396,15 @@ namespace ion::graphics::shaders
 				Modifiers
 			*/
 
-			//Bind the given name to the given struct name
+			//Binds the given name to the given struct name
 			//Returns true if the struct binding suceeded
 			bool BindStruct(shader_layout::StructName name, std::string str_name);
 
-			//Bind the given name to the given attribute declaration
+			//Binds the given name to the given attribute declaration
 			//Returns true if the attribute binding suceeded
 			bool BindAttribute(shader_layout::AttributeName name, shader_layout::VariableDeclaration declaration);
 
-			//Bind the given name to the given uniform declaration
+			//Binds the given name to the given uniform declaration
 			//Returns true if the uniform binding suceeded
 			bool BindUniform(shader_layout::UniformName name, shader_layout::VariableDeclaration declaration);
 

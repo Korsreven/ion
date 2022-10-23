@@ -110,26 +110,26 @@ namespace ion::graphics::render
 
 		public:
 
-			//Construct a new render pass with the given values
+			//Constructs a new render pass with the given values
 			explicit RenderPass(NonOwningPtr<shaders::ShaderProgram> shader_program = nullptr, int iterations = 1) noexcept;
 
 
-			//Construct a new render pass with non-separated blending with the given values
+			//Constructs a new render pass with non-separated blending with the given values
 			RenderPass(render_pass::BlendFactor blend_source_factor, render_pass::BlendFactor blend_destination_factor,
 				NonOwningPtr<shaders::ShaderProgram> shader_program = nullptr, int iterations = 1) noexcept;
 
-			//Construct a new render pass with non-separated blending with the given values
+			//Constructs a new render pass with non-separated blending with the given values
 			RenderPass(render_pass::BlendFactor blend_source_factor, render_pass::BlendFactor blend_destination_factor,
 				render_pass::BlendEquationMode blend_equation_mode,
 				NonOwningPtr<shaders::ShaderProgram> shader_program = nullptr, int iterations = 1) noexcept;
 
 
-			//Construct a new render pass with separated blending with the given values
+			//Constructs a new render pass with separated blending with the given values
 			RenderPass(render_pass::BlendFactor blend_source_factor, render_pass::BlendFactor blend_destination_factor,
 				render_pass::BlendFactor blend_source_factor_alpha_, render_pass::BlendFactor blend_destination_factor_alpha,
 				NonOwningPtr<shaders::ShaderProgram> shader_program = nullptr, int iterations = 1) noexcept;
 
-			//Construct a new render pass with separated blending with the given values
+			//Constructs a new render pass with separated blending with the given values
 			RenderPass(render_pass::BlendFactor blend_source_factor, render_pass::BlendFactor blend_destination_factor,
 				render_pass::BlendFactor blend_source_factor_alpha_, render_pass::BlendFactor blend_destination_factor_alpha,
 				render_pass::BlendEquationMode blend_equation_mode, render_pass::BlendEquationMode blend_equation_mode_alpha,

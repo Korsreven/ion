@@ -74,7 +74,7 @@ namespace ion::adaptors::iterators
 
 		constexpr ConstFlatMapIterator() = default;
 
-		//Construct const flat map iterator from underlying iterator type
+		//Constructs a const flat map iterator from underlying iterator type
 		constexpr ConstFlatMapIterator(const Iterator &iterator) noexcept :
 			Iterator{iterator}
 		{
@@ -87,7 +87,7 @@ namespace ion::adaptors::iterators
 			Modifiers
 		*/
 
-		//Post increment iterator
+		//Post-increments iterator
 		[[nodiscard]] constexpr ConstFlatMapIterator operator++(int) noexcept
 		{
 			auto iter = *this;
@@ -95,14 +95,14 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Pre increment iterator
+		//Pre-increments iterator
 		constexpr ConstFlatMapIterator &operator++() noexcept
 		{
 			Iterator::operator++();
 			return *this;
 		}
 
-		//Post decrement iterator
+		//Post-decrements iterator
 		[[nodiscard]] constexpr ConstFlatMapIterator operator--(int) noexcept
 		{
 			auto iter = *this;
@@ -110,7 +110,7 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Pre decrement iterator
+		//Pre-decrements iterator
 		constexpr ConstFlatMapIterator &operator--() noexcept
 		{
 			Iterator::operator--();
@@ -118,7 +118,7 @@ namespace ion::adaptors::iterators
 		}
 
 
-		//Increment iterator by the given offset
+		//Increments iterator by the given offset
 		//Returns the result as a copy
 		[[nodiscard]] constexpr ConstFlatMapIterator operator+(int off) const noexcept
 		{
@@ -127,7 +127,7 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Decrement iterator by the given offset
+		//Decrements iterator by the given offset
 		//Returns the result as a copy
 		[[nodiscard]] constexpr ConstFlatMapIterator operator-(int off) const noexcept
 		{
@@ -136,14 +136,14 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Increment iterator by the given offset
+		//Increments iterator by the given offset
 		constexpr ConstFlatMapIterator &operator+=(int off) noexcept
 		{
 			Iterator::operator+=(off);
 			return *this;
 		}
 
-		//Decrement iterator by the given offset
+		//Decrements iterator by the given offset
 		constexpr ConstFlatMapIterator &operator-=(int off) noexcept
 		{
 			Iterator::operator-=(off);
@@ -196,7 +196,7 @@ namespace ion::adaptors::iterators
 
 		constexpr FlatMapIterator() = default;
 
-		//Construct flat map iterator from underlying iterator type
+		//Constructs a flat map iterator from underlying iterator type
 		constexpr FlatMapIterator(const Iterator &iterator) noexcept :
 			ConstFlatMapIterator<Iterator>{iterator}
 		{
@@ -209,7 +209,7 @@ namespace ion::adaptors::iterators
 			Modifiers
 		*/
 
-		//Post increment iterator
+		//Post-increments iterator
 		[[nodiscard]] constexpr FlatMapIterator operator++(int) noexcept
 		{
 			auto iter = *this;
@@ -217,14 +217,14 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Pre increment iterator
+		//Pre-increments iterator
 		constexpr FlatMapIterator &operator++() noexcept
 		{
 			Iterator::operator++();
 			return *this;
 		}
 
-		//Post decrement iterator
+		//Post-decrements iterator
 		[[nodiscard]] constexpr FlatMapIterator operator--(int) noexcept
 		{
 			auto iter = *this;
@@ -232,7 +232,7 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Pre decrement iterator
+		//Pre-decrements iterator
 		constexpr FlatMapIterator &operator--() noexcept
 		{
 			Iterator::operator--();
@@ -240,7 +240,7 @@ namespace ion::adaptors::iterators
 		}
 
 
-		//Increment iterator by the given offset
+		//Increments iterator by the given offset
 		//Returns the result as a copy
 		[[nodiscard]] constexpr FlatMapIterator operator+(int off) const noexcept
 		{
@@ -249,7 +249,7 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Decrement iterator by the given offset
+		//Decrements iterator by the given offset
 		//Returns the result as a copy
 		[[nodiscard]] constexpr FlatMapIterator operator-(int off) const noexcept
 		{
@@ -258,14 +258,14 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Increment iterator by the given offset
+		//Increments iterator by the given offset
 		constexpr FlatMapIterator &operator+=(int off) noexcept
 		{
 			Iterator::operator+=(off);
 			return *this;
 		}
 
-		//Decrement iterator by the given offset
+		//Decrements iterator by the given offset
 		constexpr FlatMapIterator &operator-=(int off) noexcept
 		{
 			Iterator::operator-=(off);

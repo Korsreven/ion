@@ -54,10 +54,10 @@ namespace ion::graphics::scene::query
 			//Default constructor
 			RaySceneQuery() = default;
 
-			//Construct a new scene query with the given scene graph
+			//Constructs a new scene query with the given scene graph
 			RaySceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept;
 
-			//Construct a new scene query with the given scene graph and ray
+			//Constructs a new scene query with the given scene graph and ray
 			RaySceneQuery(NonOwningPtr<SceneGraph> scene_graph, const Ray &ray) noexcept;
 
 

@@ -243,10 +243,10 @@ namespace ion::graphics::utilities
 				Rotating
 			*/
 
-			//Rotate aabb by the given angle (radians)
+			//Rotates aabb by the given angle (radians)
 			Aabb& Rotate(real angle) noexcept;
 
-			//Rotate aabb by the given angle (radians)
+			//Rotates aabb by the given angle (radians)
 			//Returns the result as a copy
 			[[nodiscard]] Aabb RotateCopy(real angle) const noexcept;
 
@@ -255,10 +255,10 @@ namespace ion::graphics::utilities
 				Scaling
 			*/
 
-			//Scale aabb by the given vector
+			//Scales aabb by the given vector
 			Aabb& Scale(const Vector2 &vector) noexcept;
 
-			//Scale aabb by the given vector
+			//Scales aabb by the given vector
 			//Returns the result as a copy
 			[[nodiscard]] Aabb ScaleCopy(const Vector2 &vector) const noexcept;
 
@@ -267,10 +267,10 @@ namespace ion::graphics::utilities
 				Transforming
 			*/
 
-			//Transform aabb based on the given matrix
+			//Transforms aabb based on the given matrix
 			Aabb& Transform(const Matrix3 &matrix) noexcept;
 
-			//Transform aabb based on the given matrix
+			//Transforms aabb based on the given matrix
 			//Returns the result as a copy
 			[[nodiscard]] Aabb TransformCopy(const Matrix3 &matrix) const noexcept;
 
@@ -279,10 +279,10 @@ namespace ion::graphics::utilities
 				Translating
 			*/
 
-			//Translate aabb by the given vector
+			//Translates aabb by the given vector
 			Aabb& Translate(const Vector2 &vector) noexcept;
 
-			//Translate aabb by the given vector
+			//Translates aabb by the given vector
 			//Returns the result as a copy
 			[[nodiscard]] Aabb TranslateCopy(const Vector2 &vector) const noexcept;
 
@@ -291,7 +291,7 @@ namespace ion::graphics::utilities
 				Drawing
 			*/
 
-			//Draw the bounds of this aabb with the given color
+			//Draws the bounds of this aabb with the given color
 			void Draw(const Color &color) const noexcept;
 	};
 

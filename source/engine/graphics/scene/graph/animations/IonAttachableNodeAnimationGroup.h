@@ -49,7 +49,7 @@ namespace ion::graphics::scene::graph::animations
 
 		public:
 
-			//Construct a new attachable node animation group with the given node animation group, start time and whether it is enabled or not
+			//Constructs a new attachable node animation group with the given node animation group, start time and whether it is enabled or not
 			explicit AttachableNodeAnimationGroup(NonOwningPtr<NodeAnimationGroup> node_animation_group,
 				duration start_time = 0.0_sec, bool enabled = true) noexcept;
 
@@ -65,13 +65,13 @@ namespace ion::graphics::scene::graph::animations
 				NotifyUpdate();
 			}
 
-			//Enable the node animation group
+			//Enables the node animation group
 			inline void Enable() noexcept
 			{
 				enabled_ = true;
 			}
 
-			//Disable the node animation group
+			//Disables the node animation group
 			inline void Disable() noexcept
 			{
 				enabled_ = false;
@@ -87,10 +87,10 @@ namespace ion::graphics::scene::graph::animations
 			}
 
 
-			//Reset this node animation group
+			//Resets this node animation group
 			void Reset() noexcept;
 
-			//Revert to the initial node animation group
+			//Reverts to the initial node animation group
 			void Revert();
 
 

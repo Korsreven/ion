@@ -33,7 +33,7 @@ namespace ion::assets::repositories
 		//Naming convention is set to file path
 		ShaderRepository() noexcept;
 
-		//Construct a shader repository with the given naming convention
+		//Constructs a shader repository with the given naming convention
 		ShaderRepository(file_repository::NamingConvention naming_convention) noexcept;
 	};
 } //ion::assets::repositories

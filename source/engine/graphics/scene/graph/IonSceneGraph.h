@@ -161,7 +161,7 @@ namespace ion::graphics::scene::graph
 
 		public:
 
-			//Construct a scene graph with the given name and whether or not is should be enabled
+			//Constructs a scene graph with the given name and whether or not is should be enabled
 			explicit SceneGraph(std::optional<std::string> name = {}, bool enabled = true) noexcept;
 
 			//Deleted copy constructor
@@ -189,13 +189,13 @@ namespace ion::graphics::scene::graph
 				Events
 			*/
 
-			//Return a mutable reference to the node events of this scene graph
+			//Returns a mutable reference to the node events of this scene graph
 			[[nodiscard]] inline auto& NodeEvents() noexcept
 			{
 				return static_cast<NodeEventsBase&>(*this);
 			}
 
-			//Return an immutable reference to the node events of this scene graph
+			//Returns an immutable reference to the node events of this scene graph
 			[[nodiscard]] inline auto& NodeEvents() const noexcept
 			{
 				return static_cast<const NodeEventsBase&>(*this);
@@ -206,13 +206,13 @@ namespace ion::graphics::scene::graph
 				Modifiers
 			*/
 
-			//Enable the scene graph rendering
+			//Enables the scene graph rendering
 			inline void Enable() noexcept
 			{
 				enabled_ = true;
 			}
 
-			//Disable the scene graph rendering
+			//Disables the scene graph rendering
 			inline void Disable() noexcept
 			{
 				enabled_ = false;
@@ -358,7 +358,7 @@ namespace ion::graphics::scene::graph
 				Rendering
 			*/
 
-			//Render this entire scene graph to the given viewport
+			//Renders this entire scene graph to the given viewport
 			//This is called once from the engine, with the time in seconds since last frame
 			void Render(render::Viewport &viewport, duration time) noexcept;
 
@@ -388,7 +388,7 @@ namespace ion::graphics::scene::graph
 				Creating
 			*/
 
-			//Create a scene manager with the given name
+			//Creates a scene manager with the given name
 			NonOwningPtr<SceneManager> CreateSceneManager(std::optional<std::string> name = {});
 
 
@@ -411,13 +411,13 @@ namespace ion::graphics::scene::graph
 				Removing
 			*/
 
-			//Clear all removable scene managers from this manager
+			//Clears all removable scene managers from this manager
 			void ClearSceneMangers() noexcept;
 
-			//Remove a removable scene manager from this manager
+			//Removes a removable scene manager from this manager
 			bool RemoveSceneManager(SceneManager &scene_manager) noexcept;
 
-			//Remove a removable scene manager with the given name from this manager
+			//Removes a removable scene manager with the given name from this manager
 			bool RemoveSceneManager(std::string_view name) noexcept;
 	};
 } //ion::graphics::scene::graph

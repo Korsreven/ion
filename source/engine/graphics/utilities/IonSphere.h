@@ -268,10 +268,10 @@ namespace ion::graphics::utilities
 				Scaling
 			*/
 
-			//Scale sphere by the given factor
+			//Scales sphere by the given factor
 			Sphere& Scale(real factor) noexcept;
 
-			//Scale sphere by the given factor
+			//Scales sphere by the given factor
 			//Returns the result as a copy
 			[[nodiscard]] Sphere ScaleCopy(real factor) const noexcept;
 
@@ -280,10 +280,10 @@ namespace ion::graphics::utilities
 				Transforming
 			*/
 
-			//Transform sphere based on the given matrix
+			//Transforms sphere based on the given matrix
 			Sphere& Transform(const Matrix3 &matrix) noexcept;
 
-			//Transform sphere based on the given matrix
+			//Transforms sphere based on the given matrix
 			//Returns the result as a copy
 			[[nodiscard]] Sphere TransformCopy(const Matrix3 &matrix) const noexcept;
 
@@ -292,10 +292,10 @@ namespace ion::graphics::utilities
 				Translating
 			*/
 
-			//Translate sphere by the given vector
+			//Translates sphere by the given vector
 			Sphere& Translate(const Vector2 &vector) noexcept;
 
-			//Translate sphere by the given vector
+			//Translates sphere by the given vector
 			//Returns the result as a copy
 			[[nodiscard]] Sphere TranslateCopy(const Vector2 &vector) const noexcept;
 
@@ -304,7 +304,7 @@ namespace ion::graphics::utilities
 				Drawing
 			*/
 
-			//Draw the bounds of this sphere with the given color and steps
+			//Draws the bounds of this sphere with the given color and steps
 			void Draw(const Color &color, int steps = 32) const noexcept;
 	};
 

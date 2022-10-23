@@ -81,20 +81,20 @@ namespace ion::graphics::textures
 				Creating
 			*/
 
-			//Create an animation with the given name, frames, cycle duration, repeat count, playback direction and rate
+			//Creates an animation with the given name, frames, cycle duration, repeat count, playback direction and rate
 			NonOwningPtr<Animation> CreateAnimation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 				duration cycle_duration, std::optional<int> repeat_count = std::nullopt,
 				animation::PlaybackDirection direction = animation::PlaybackDirection::Normal, real playback_rate = 1.0_r);
 
-			//Create an animation (in normal direction) with the given name, frames, cycle duration, repeat count and playback rate
+			//Creates an animation (in normal direction) with the given name, frames, cycle duration, repeat count and playback rate
 			NonOwningPtr<Animation> CreateAnimation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 				duration cycle_duration, std::optional<int> repeat_count, real playback_rate);
 
 
-			//Create an animation as a copy of the given animation
+			//Creates an animation as a copy of the given animation
 			NonOwningPtr<Animation> CreateAnimation(const Animation &animation);
 
-			//Create an animation by moving the given animation
+			//Creates an animation by moving the given animation
 			NonOwningPtr<Animation> CreateAnimation(Animation &&animation);
 
 
@@ -117,13 +117,13 @@ namespace ion::graphics::textures
 				Removing
 			*/
 
-			//Clear all removable animations from this manager
+			//Clears all removable animations from this manager
 			void ClearAnimations() noexcept;
 
-			//Remove a removable animation from this manager
+			//Removes a removable animation from this manager
 			bool RemoveAnimation(Animation &animation) noexcept;
 
-			//Remove a removable animation with the given name from this manager
+			//Removes a removable animation with the given name from this manager
 			bool RemoveAnimation(std::string_view name) noexcept;
 	};
 } //ion::graphics::textures

@@ -71,11 +71,11 @@ namespace ion::script::interfaces
 				Creating from script
 			*/
 
-			//Create texts from a script (or object file) with the given asset name
+			//Creates texts from a script (or object file) with the given asset name
 			void CreateTexts(std::string_view asset_name,
 				graphics::fonts::TextManager &text_manager);
 
-			//Create texts from a script (or object file) with the given asset name
+			//Creates texts from a script (or object file) with the given asset name
 			void CreateTexts(std::string_view asset_name,
 				graphics::fonts::TextManager &text_manager, const ManagerRegister &managers);
 	};

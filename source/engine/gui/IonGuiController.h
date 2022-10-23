@@ -203,7 +203,7 @@ namespace ion::gui
 
 		public:
 
-			//Construct a gui controller with the given parent node, default viewport and default sound channel group
+			//Constructs a gui controller with the given parent node, default viewport and default sound channel group
 			GuiController(SceneNode &parent_node, NonOwningPtr<graphics::render::Viewport> default_viewport = nullptr,
 				NonOwningPtr<sounds::SoundChannelGroup> default_sound_channel_group = nullptr);
 
@@ -212,26 +212,26 @@ namespace ion::gui
 				Events
 			*/
 
-			//Return a mutable reference to the frame events of this controller
+			//Returns a mutable reference to the frame events of this controller
 			[[nodiscard]] inline auto& FrameEvents() noexcept
 			{
 				return static_cast<FrameEventsBase&>(*this);
 			}
 
-			//Return an immutable reference to the frame events of this controller
+			//Returns an immutable reference to the frame events of this controller
 			[[nodiscard]] inline auto& FrameEvents() const noexcept
 			{
 				return static_cast<const FrameEventsBase&>(*this);
 			}
 
 
-			//Return a mutable reference to the managed object events of this controller
+			//Returns a mutable reference to the managed object events of this controller
 			[[nodiscard]] inline auto& ManagedObjectEvents() noexcept
 			{
 				return static_cast<ManagedObjectEventsBase&>(*this);
 			}
 
-			//Return an immutable reference to the managed object events of this controller
+			//Returns an immutable reference to the managed object events of this controller
 			[[nodiscard]] inline auto& ManagedObjectEvents() const noexcept
 			{
 				return static_cast<const ManagedObjectEventsBase&>(*this);
@@ -462,10 +462,10 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a frame with the given name
+			//Creates a frame with the given name
 			NonOwningPtr<GuiFrame> CreateFrame(std::string name);
 
-			//Create a frame by moving the given frame
+			//Creates a frame by moving the given frame
 			NonOwningPtr<GuiFrame> CreateFrame(GuiFrame &&frame);
 
 
@@ -488,13 +488,13 @@ namespace ion::gui
 				Removing
 			*/
 
-			//Clear all removable frames from this controller
+			//Clears all removable frames from this controller
 			void ClearFrames() noexcept;
 
-			//Remove a removable frame from this controller
+			//Removes a removable frame from this controller
 			bool RemoveFrame(GuiFrame &frame) noexcept;
 
-			//Remove a removable frame with the given name from this controller
+			//Removes a removable frame with the given name from this controller
 			bool RemoveFrame(std::string_view name) noexcept;
 
 
@@ -503,13 +503,13 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a mouse cursor with the given name and size
+			//Creates a mouse cursor with the given name and size
 			NonOwningPtr<controls::GuiMouseCursor> CreateMouseCursor(std::string name, const std::optional<Vector2> &size);
 
-			//Create a mouse cursor with the given name, skin and size
+			//Creates a mouse cursor with the given name, skin and size
 			NonOwningPtr<controls::GuiMouseCursor> CreateMouseCursor(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size);
 
-			//Create a mouse cursor by moving the given mouse cursor
+			//Creates a mouse cursor by moving the given mouse cursor
 			NonOwningPtr<controls::GuiMouseCursor> CreateMouseCursor(controls::GuiMouseCursor &&mouse_cursor);
 
 
@@ -532,13 +532,13 @@ namespace ion::gui
 				Removing
 			*/
 
-			//Clear all removable mouse cursors from this controller
+			//Clears all removable mouse cursors from this controller
 			void ClearMouseCursors() noexcept;
 
-			//Remove a removable mouse cursor from this controller
+			//Removes a removable mouse cursor from this controller
 			bool RemoveMouseCursor(controls::GuiMouseCursor &mouse_cursor) noexcept;
 
-			//Remove a removable mouse cursor with the given name from this controller
+			//Removes a removable mouse cursor with the given name from this controller
 			bool RemoveMouseCursor(std::string_view name) noexcept;
 
 
@@ -547,13 +547,13 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a tooltip with the given name and size
+			//Creates a tooltip with the given name and size
 			NonOwningPtr<controls::GuiTooltip> CreateTooltip(std::string name, const std::optional<Vector2> &size);
 
-			//Create a tooltip with the given name, skin and size
+			//Creates a tooltip with the given name, skin and size
 			NonOwningPtr<controls::GuiTooltip> CreateTooltip(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size);
 
-			//Create a tooltip by moving the given tooltip
+			//Creates a tooltip by moving the given tooltip
 			NonOwningPtr<controls::GuiTooltip> CreateTooltip(controls::GuiTooltip &&tooltip);
 
 
@@ -576,13 +576,13 @@ namespace ion::gui
 				Removing
 			*/
 
-			//Clear all removable tooltips from this controller
+			//Clears all removable tooltips from this controller
 			void ClearTooltips() noexcept;
 
-			//Remove a removable tooltip from this controller
+			//Removes a removable tooltip from this controller
 			bool RemoveTooltip(controls::GuiTooltip &tooltip) noexcept;
 
-			//Remove a removable tooltip with the given name from this controller
+			//Removes a removable tooltip with the given name from this controller
 			bool RemoveTooltip(std::string_view name) noexcept;
 
 
@@ -591,7 +591,7 @@ namespace ion::gui
 				Removing (optimization)
 			*/
 
-			//Clear all removable components from this container
+			//Clears all removable components from this container
 			void ClearComponents() noexcept;
 
 
@@ -600,10 +600,10 @@ namespace ion::gui
 				Creating
 			*/
 
-			//Create a theme with the given name
+			//Creates a theme with the given name
 			NonOwningPtr<skins::GuiTheme> CreateTheme(std::string name, NonOwningPtr<graphics::scene::SceneManager> scene_manager);
 
-			//Create a theme by moving the given theme
+			//Creates a theme by moving the given theme
 			NonOwningPtr<skins::GuiTheme> CreateTheme(skins::GuiTheme &&theme);
 
 
@@ -626,13 +626,13 @@ namespace ion::gui
 				Removing
 			*/
 
-			//Clear all removable themes from this theme
+			//Clears all removable themes from this theme
 			void ClearThemes() noexcept;
 
-			//Remove a removable theme from this theme
+			//Removes a removable theme from this theme
 			bool RemoveTheme(skins::GuiTheme &theme) noexcept;
 
-			//Remove a removable theme with the given name from this theme
+			//Removes a removable theme with the given name from this theme
 			bool RemoveTheme(std::string_view name) noexcept;
 	};
 } //ion::gui

@@ -110,31 +110,31 @@ namespace ion::gui::controls
 				Scrolling
 			*/
 
-			//Scroll with the given rate
+			//Scrolls with the given rate
 			inline void Scroll(int rate) noexcept
 			{
 				Scrolled(rate);
 			}
 
-			//Scroll up with the current scroll rate
+			//Scrolls up with the current scroll rate
 			inline void ScrollUp() noexcept
 			{
 				Scroll(-scroll_rate_);
 			}
 
-			//Scroll down with the current scroll rate
+			//Scrolls down with the current scroll rate
 			inline void ScrollDown() noexcept
 			{
 				Scroll(scroll_rate_);
 			}
 
-			//Scroll to the top element
+			//Scrolls to the top element
 			inline void ScrollToTop() noexcept
 			{
 				Scroll(std::numeric_limits<int>::min());
 			}
 
-			//Scroll to the bottom element
+			//Scrolls to the bottom element
 			inline void ScrollToBottom() noexcept
 			{
 				Scroll(std::numeric_limits<int>::max());

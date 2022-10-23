@@ -203,13 +203,13 @@ namespace ion::utilities::math
 				0.0_r;
 	}
 
-	//Check if two real numbers are equal within the given epsilon margin
+	//Checks if two real numbers are equal within the given epsilon margin
 	[[nodiscard]] constexpr auto Equal(real x, real y, real epsilon = Epsilon) noexcept
 	{
 		return Abs(x - y) < epsilon;
 	}
 
-	//Return the binary (base-2) logarithm of x for any integral type
+	//Returns the binary (base-2) logarithm of x for any integral type
 	template <typename T>
 	[[nodiscard]] constexpr auto Log2(T x) noexcept
 	{
@@ -222,7 +222,7 @@ namespace ion::utilities::math
 		return result;
 	}
 
-	//Return the common (base-10) logarithm of x for any integral type
+	//Returns the common (base-10) logarithm of x for any integral type
 	template <typename T>
 	[[nodiscard]] constexpr auto Log10(T x) noexcept
 	{
@@ -249,7 +249,7 @@ namespace ion::utilities::math
 		return Normalize(x, min, max) * (new_max - new_min) + new_min;
 	}
 
-	//Return x raised to the y-th power for any integral type
+	//Returns x raised to the y-th power for any integral type
 	template <typename T>
 	[[nodiscard]] constexpr auto Power(T x, T y) noexcept
 	{
@@ -291,18 +291,18 @@ namespace ion::utilities::math
 	//x - ceil x	(for x < 0)
 	[[nodiscard]] real Fraction(real x) noexcept;
 
-	//Return x rounded to the nearest whole number
+	//Returns x rounded to the nearest whole number
 	//Half rounds away from zero
 	[[nodiscard]] real Round(real x) noexcept;
 
-	//Return x rounded to the nearest number with the given precision
+	//Returns x rounded to the nearest number with the given precision
 	//Half rounds away from zero
 	[[nodiscard]] real Round(real x, int precision) noexcept;
 
-	//Return x truncated toward zero
+	//Returns x truncated toward zero
 	[[nodiscard]] real Truncate(real x) noexcept;
 
-	//Return x truncated toward zero with the given precision
+	//Returns x truncated toward zero with the given precision
 	[[nodiscard]] real Truncate(real x, int precision) noexcept;
 
 
@@ -326,7 +326,7 @@ namespace ion::utilities::math
 		Probability and statistics
 	*/
 
-	//Calculate n! for any integral type
+	//Calculates n! for any integral type
 	template <typename T>
 	[[nodiscard]] constexpr auto Factorial(T n) noexcept
 	{
@@ -339,7 +339,7 @@ namespace ion::utilities::math
 		return result;
 	}
 
-	//Calculate nCr for any integral type
+	//Calculates nCr for any integral type
 	template <typename T>
 	[[nodiscard]] constexpr auto Choose(T n, T r) noexcept
 	{
@@ -351,7 +351,7 @@ namespace ion::utilities::math
 		return Factorial(n) / (Factorial(r) * Factorial(n - r));
 	}
 
-	//Calculate nPr for any integral type
+	//Calculates nPr for any integral type
 	template <typename T>
 	[[nodiscard]] constexpr auto Permute(T n, T r) noexcept
 	{

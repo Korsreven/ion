@@ -84,7 +84,7 @@ Sound::Sound(std::string name, std::string asset_name,
 Sound::~Sound() noexcept
 {
 	ClearSoundChannels();
-		//Clear all sound channels before sound is destroyed
+		//Clears all sound channels before sound is destroyed
 		//Virtual functions cannot be called post destruction
 }
 

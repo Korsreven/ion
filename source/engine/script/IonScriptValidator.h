@@ -94,7 +94,7 @@ namespace ion::script
 
 				public:
 
-					//Construct an incomplete declaration (no definition)
+					//Constructs an incomplete declaration (no definition)
 					declaration(std::string name, Ordinality ordinality) noexcept :
 						entity_{std::move(name)},
 						ordinality_{ordinality}
@@ -102,7 +102,7 @@ namespace ion::script
 						//Empty
 					}
 
-					//Construct a complete declaration (full definition)
+					//Constructs a complete declaration (full definition)
 					declaration(T definition, Ordinality ordinality) noexcept :
 						entity_{std::move(definition)},
 						ordinality_{ordinality}
@@ -287,13 +287,13 @@ namespace ion::script
 
 			public:
 
-				//Construct a new parameter with the given type
+				//Constructs a new parameter with the given type
 				ParameterDefinition(ParameterType type) noexcept;
 
-				//Construct a new enumerable parameter with the given values
+				//Constructs a new enumerable parameter with the given values
 				ParameterDefinition(Strings values) noexcept;
 
-				//Construct a new enumerable parameter with the given values
+				//Constructs a new enumerable parameter with the given values
 				ParameterDefinition(std::initializer_list<std::string> values);
 
 
@@ -341,13 +341,13 @@ namespace ion::script
 
 			public:
 
-				//Construct a new property with the given name and parameter
+				//Constructs a new property with the given name and parameter
 				PropertyDefinition(std::string name, ParameterDefinition parameter) noexcept;
 
-				//Construct a new property with the given name and parameters
+				//Constructs a new property with the given name and parameters
 				PropertyDefinition(std::string name, ParameterDefinitions parameters) noexcept;
 
-				//Construct a new property with the given name, parameters and required parameters
+				//Constructs a new property with the given name, parameters and required parameters
 				PropertyDefinition(std::string name, ParameterDefinitions parameters, int required_parameters) noexcept;
 
 
@@ -393,16 +393,16 @@ namespace ion::script
 
 			public:
 
-				//Construct a new class definition with the given name
+				//Constructs a new class definition with the given name
 				ClassDefinition(std::string name) noexcept;
 
-				//Construct a new class definition with the given name and base class name
+				//Constructs a new class definition with the given name and base class name
 				ClassDefinition(std::string name, std::string base_class);
 
-				//Construct a new class definition with the given name and base class definition
+				//Constructs a new class definition with the given name and base class definition
 				ClassDefinition(std::string name, ClassDefinition base_class);
 
-				//Construct a new class with the given name and base classes
+				//Constructs a new class with the given name and base classes
 				ClassDefinition(std::string name, std::initializer_list<EntityType<ClassDefinition>> base_classes);
 
 
@@ -442,27 +442,27 @@ namespace ion::script
 					Classes
 				*/
 
-				//Add an inner class with the given name
+				//Adds an inner class with the given name
 				//Could be a class with no definition or an existing class defined in an outer scope
 				ClassDefinition& AddClass(std::string name);
 
-				//Add an inner class with the given definition
+				//Adds an inner class with the given definition
 				ClassDefinition& AddClass(ClassDefinition class_def);
 
 
-				//Add an abstract inner class with the given name
+				//Adds an abstract inner class with the given name
 				//Could be a class with no definition or an existing class defined in an outer scope
 				ClassDefinition& AddAbstractClass(std::string name);
 
-				//Add an abstract inner class with the given definition
+				//Adds an abstract inner class with the given definition
 				ClassDefinition& AddAbstractClass(ClassDefinition class_def);
 
 
-				//Add a required inner class with the given name
+				//Adds a required inner class with the given name
 				//Could be a class with no definition or an existing class defined in an outer scope
 				ClassDefinition& AddRequiredClass(std::string name);
 
-				//Add a required inner class with the given definition
+				//Adds a required inner class with the given definition
 				ClassDefinition& AddRequiredClass(ClassDefinition class_def);
 
 
@@ -470,35 +470,35 @@ namespace ion::script
 					Properties
 				*/
 
-				//Add a property with the given name
+				//Adds a property with the given name
 				ClassDefinition& AddProperty(std::string name);
 
-				//Add a property with the given name and parameter
+				//Adds a property with the given name and parameter
 				ClassDefinition& AddProperty(std::string name, ParameterDefinition parameter);
 				
-				//Add a property with the given name and parameters
+				//Adds a property with the given name and parameters
 				ClassDefinition& AddProperty(std::string name, ParameterDefinitions parameters);
 				
-				//Add a property with the given name, parameters and the required number of parameters in range [1, |parameters|]
+				//Adds a property with the given name, parameters and the required number of parameters in range [1, |parameters|]
 				ClassDefinition& AddProperty(std::string name, ParameterDefinitions parameters, int required_parameters);
 
-				//Add a property with the given property definition
+				//Adds a property with the given property definition
 				ClassDefinition& AddProperty(PropertyDefinition property);
 
 
-				//Add a required property with the given name
+				//Adds a required property with the given name
 				ClassDefinition& AddRequiredProperty(std::string name);
 
-				//Add a required property with the given name and parameter
+				//Adds a required property with the given name and parameter
 				ClassDefinition& AddRequiredProperty(std::string name, ParameterDefinition parameter);
 				
-				//Add a required property with the given name and parameters
+				//Adds a required property with the given name and parameters
 				ClassDefinition& AddRequiredProperty(std::string name, ParameterDefinitions parameters);
 				
-				//Add a required property with the given name, parameters and the required number of parameters in range [1, |parameters|]
+				//Adds a required property with the given name, parameters and the required number of parameters in range [1, |parameters|]
 				ClassDefinition& AddRequiredProperty(std::string name, ParameterDefinitions parameters, int required_parameters);
 
-				//Add a required property with the given property definition
+				//Adds a required property with the given property definition
 				ClassDefinition& AddRequiredProperty(PropertyDefinition property);
 
 
@@ -563,10 +563,10 @@ namespace ion::script
 
 			public:
 
-				//Construct an incomplete declaration (no definition)
+				//Constructs an incomplete declaration (no definition)
 				ClassDeclaration(std::string name, Ordinality ordinality, ClassType class_type) noexcept;
 
-				//Construct a complete declaration (full definition)
+				//Constructs a complete declaration (full definition)
 				ClassDeclaration(ClassDefinition definition, Ordinality ordinality, ClassType class_type) noexcept;
 
 
@@ -632,21 +632,21 @@ namespace ion::script
 				Classes
 			*/
 
-			//Add a class with the given name (no definition)
+			//Adds a class with the given name (no definition)
 			ScriptValidator& AddClass(std::string name);
 
-			//Add a class with the given definition
+			//Adds a class with the given definition
 			ScriptValidator& AddClass(script_validator::ClassDefinition class_def);
 
 
-			//Add an abstract class with the given definition
+			//Adds an abstract class with the given definition
 			ScriptValidator& AddAbstractClass(script_validator::ClassDefinition class_def);
 
 
-			//Add a required class with the given name (no definition)
+			//Adds a required class with the given name (no definition)
 			ScriptValidator& AddRequiredClass(std::string name);
 
-			//Add a required class with the given definition
+			//Adds a required class with the given definition
 			ScriptValidator& AddRequiredClass(script_validator::ClassDefinition class_def);
 
 

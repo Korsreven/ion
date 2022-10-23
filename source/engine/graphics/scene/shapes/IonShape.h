@@ -48,22 +48,22 @@ namespace ion::graphics::scene::shapes
 			bool update_opacity_ = false;
 
 
-			//Construct a new shape with the given vertices, color and visibility
+			//Constructs a new shape with the given vertices, color and visibility
 			//Can only be instantiated by derived
 			Shape(const mesh::Vertices &vertices, const Color &color, bool visible = true);
 
-			//Construct a new shape with the given draw mode, vertices, color and visibility
+			//Constructs a new shape with the given draw mode, vertices, color and visibility
 			//Can only be instantiated by derived
 			Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
 				const Color &color, bool visible = true);
 
 
-			//Construct a new texturized shape with the given vertices, material, color and visibility
+			//Constructs a new texturized shape with the given vertices, material, color and visibility
 			//Can only be instantiated by derived
 			Shape(const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				const Color &color, bool visible = true);
 
-			//Construct a new texturized shape with the given draw mode, vertices, material, color and visibility
+			//Constructs a new texturized shape with the given draw mode, vertices, material, color and visibility
 			//Can only be instantiated by derived
 			Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
 				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
@@ -128,14 +128,14 @@ namespace ion::graphics::scene::shapes
 				Preparing
 			*/
 
-			//Refresh this shape by generating new vertices
+			//Refreshes this shape by generating new vertices
 			inline void Refresh() noexcept
 			{
 				update_vertices_ = true;
 			}
 
 
-			//Prepare this shape such that it is ready to be drawn
+			//Prepares this shape such that it is ready to be drawn
 			//This function is typically called each frame
 			virtual void Prepare() override;
 	};

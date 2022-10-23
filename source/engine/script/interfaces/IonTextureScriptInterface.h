@@ -71,7 +71,7 @@ namespace ion::script::interfaces
 				Creating from script
 			*/
 
-			//Create textures from a script (or object file) with the given asset name
+			//Creates textures from a script (or object file) with the given asset name
 			void CreateTextures(std::string_view asset_name,
 				graphics::textures::TextureManager &texture_manager);
 	};

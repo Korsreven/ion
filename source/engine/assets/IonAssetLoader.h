@@ -172,7 +172,7 @@ namespace ion::assets
 				Attaching
 			*/
 
-			//Attach a repository to this loader
+			//Attaches a repository to this loader
 			bool Attach(repositories::FileRepository &file_repository);
 
 
@@ -180,7 +180,7 @@ namespace ion::assets
 				Clearing
 			*/
 
-			//Detach all repositories from this loader
+			//Detaches all repositories from this loader
 			void Clear() noexcept;
 
 
@@ -188,7 +188,7 @@ namespace ion::assets
 				Compiling
 			*/
 
-			//Pull files from each attached repository and compile them together as a data file
+			//Pulls files from each attached repository and compile them together as a data file
 			//If the total size of the compilation exceeds the file split size, the compilation is split into multiple data files
 			//When multiple data files are created, a numerical suffix is added to the file name
 			bool CompileDataFile(std::filesystem::path data_file_path,
@@ -199,7 +199,7 @@ namespace ion::assets
 				Detaching
 			*/
 
-			//Detach a repository from this loader
+			//Detaches a repository from this loader
 			bool Detach(repositories::FileRepository &file_repository) noexcept;
 
 
@@ -207,13 +207,13 @@ namespace ion::assets
 				Loading directories
 			*/
 
-			//Load all files from the given directory path into the attached repositories
+			//Loads all files from the given directory path into the attached repositories
 			//Files are added either recursively or non-recursively from the path
 			//Files are added to one or more repositories with the supported file extension
 			bool LoadDirectory(const std::filesystem::path &directory_path,
 				utilities::file::DirectoryIteration directory_iteration = utilities::file::DirectoryIteration::NonRecursive);
 
-			//Load all files from each given directory paths into the attached repositories
+			//Loads all files from each given directory paths into the attached repositories
 			//Files are added either recursively or non-recursively from each path
 			//Files are added to one or more repositories with the supported file extension
 			bool LoadDirectories(const utilities::file::Paths &directory_paths,
@@ -224,19 +224,19 @@ namespace ion::assets
 				Loading files
 			*/
 
-			//Load a file with the given file path into the attached repositories
+			//Loads a file with the given file path into the attached repositories
 			//File is added to one or more repositories with the supported file extension
 			bool LoadFile(const std::filesystem::path &file_path);
 
-			//Load a file with the given file entry into the attached repositories
+			//Loads a file with the given file entry into the attached repositories
 			//File is added to one or more repositories with the supported file extension
 			bool LoadFile(repositories::file_repository::FileEntry file);
 
-			//Load a file from each of the given file paths into the attached repositories
+			//Loads a file from each of the given file paths into the attached repositories
 			//Each file is added to one or more repositories with the supported file extension
 			bool LoadFiles(const utilities::file::Paths &file_paths);
 
-			//Load a file from each of the given file entries into the attached repositories
+			//Loads a file from each of the given file entries into the attached repositories
 			//Each file is added to one or more repositories with the supported file extension
 			bool LoadFiles(const std::vector<repositories::file_repository::FileEntry> &files);
 	};

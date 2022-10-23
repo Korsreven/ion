@@ -194,10 +194,10 @@ namespace ion::graphics::particles
 
 		public:
 
-			//Construct a new emitter with the given name
+			//Constructs a new emitter with the given name
 			explicit Emitter(std::string name) noexcept;
 
-			//Construct a new emitter with the given name and initial values
+			//Constructs a new emitter with the given name and initial values
 			Emitter(std::string name, emitter::EmitterType type, const Vector3 &position, const Vector2 &direction,
 				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 				std::optional<duration> emission_duration, int particle_quota = 100) noexcept;
@@ -526,7 +526,7 @@ namespace ion::graphics::particles
 				Elapse time
 			*/
 
-			//Elapse emitter by the given time in seconds
+			//Elapses emitter by the given time in seconds
 			//This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 
@@ -535,7 +535,7 @@ namespace ion::graphics::particles
 				Emitting
 			*/
 
-			//Emit the given particle count with the current emission rate
+			//Emits the given particle count with the current emission rate
 			void Emit(int particle_count) noexcept;
 
 

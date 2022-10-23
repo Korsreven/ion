@@ -40,7 +40,7 @@ namespace ion::graphics::render::vertex
 			int Offset = 0;
 			int Stride = 0;
 
-			//Construct a new vertex element with the given attribute name (semantic), type, offset and stride
+			//Constructs a new vertex element with the given attribute name (semantic), type, offset and stride
 			VertexElement(shaders::shader_layout::AttributeName name, VertexElementType type, int offset = 0, int stride = 0) noexcept;
 
 
@@ -129,7 +129,7 @@ namespace ion::graphics::render::vertex
 			//Default constructor
 			VertexDeclaration() = default;
 
-			//Construct a new vertex declaration with the given vertex elements and vertex size (optional)
+			//Constructs a new vertex declaration with the given vertex elements and vertex size (optional)
 			explicit VertexDeclaration(vertex_declaration::VertexElements vertex_elements, std::optional<int> vertex_size = std::nullopt);
 
 
@@ -194,10 +194,10 @@ namespace ion::graphics::render::vertex
 				Adding
 			*/
 
-			//Create a vertex element with the given attribute name (semantic), type, offset and stride
+			//Creates a vertex element with the given attribute name (semantic), type, offset and stride
 			void AddElement(shaders::shader_layout::AttributeName name, vertex_declaration::VertexElementType type, int offset = 0, int stride = 0);
 
-			//Create a vertex element as a copy of the given vertex element
+			//Creates a vertex element as a copy of the given vertex element
 			void AddElement(const vertex_declaration::VertexElement &vertex_element);
 
 
@@ -206,7 +206,7 @@ namespace ion::graphics::render::vertex
 				Removing
 			*/
 
-			//Clear all vertex elements from this vertex declaration
+			//Clears all vertex elements from this vertex declaration
 			void ClearElements() noexcept;
 	};
 } //ion::graphics::render::vertex

@@ -81,14 +81,14 @@ namespace ion::graphics::particles
 				Creating
 			*/
 
-			//Create a particle system with the given name
+			//Creates a particle system with the given name
 			NonOwningPtr<ParticleSystem> CreateParticleSystem(std::string name);
 
-			//Create a particle system with the given name and particle primitive
+			//Creates a particle system with the given name and particle primitive
 			NonOwningPtr<ParticleSystem> CreateParticleSystem(std::string name, particle_system::ParticlePrimitive particle_primitive);
 
 
-			//Create a particle system by moving the given particle system
+			//Creates a particle system by moving the given particle system
 			NonOwningPtr<ParticleSystem> CreateParticleSystem(ParticleSystem &&particle_system);
 
 
@@ -111,13 +111,13 @@ namespace ion::graphics::particles
 				Removing
 			*/
 
-			//Clear all removable particle systems from this manager
+			//Clears all removable particle systems from this manager
 			void ClearParticleSystems() noexcept;
 
-			//Remove a removable particle system from this manager
+			//Removes a removable particle system from this manager
 			bool RemoveParticleSystem(ParticleSystem &particle_system) noexcept;
 
-			//Remove a removable particle system with the given name from this manager
+			//Removes a removable particle system with the given name from this manager
 			bool RemoveParticleSystem(std::string_view name) noexcept;
 	};
 } //ion::graphics::particles

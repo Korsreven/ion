@@ -26,11 +26,11 @@ namespace ion::events::listeners
 		*/
 
 		//Called when a frame is about to begin rendering, with elapsed time in seconds since the last frame
-		//Return true to continue rendering, or false to drop out of the rendering loop
+		//Returns true to continue rendering, or false to drop out of the rendering loop
 		virtual bool FrameStarted(duration time) noexcept = 0;
 		
 		//Called just after a frame has been rendered, with elapsed time in seconds since the last frame
-		//Return true to continue rendering, or false to drop out of the rendering loop
+		//Returns true to continue rendering, or false to drop out of the rendering loop
 		virtual bool FrameEnded(duration time) noexcept = 0;
 	};
 } //ion::events::listeners

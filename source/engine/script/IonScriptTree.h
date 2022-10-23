@@ -366,23 +366,23 @@ namespace ion::script
 					Appending
 				*/
 
-				//Append all of the given objects that satisfy the given append condition
+				//Appends all of the given objects that satisfy the given append condition
 				void Append(const ObjectNodes &objects, AppendCondition append_condition = AppendCondition::Unconditionally);
 
-				//Append all of the given mutable iterable objects that satisfy the given append condition
+				//Appends all of the given mutable iterable objects that satisfy the given append condition
 				void Append(const adaptors::ranges::Iterable<ObjectNodes&> &objects, AppendCondition append_condition = AppendCondition::Unconditionally);
 
-				//Append all of the given immutable iterable objects that satisfy the given append condition
+				//Appends all of the given immutable iterable objects that satisfy the given append condition
 				void Append(const adaptors::ranges::Iterable<const ObjectNodes&> &objects, AppendCondition append_condition = AppendCondition::Unconditionally);
 
 
-				//Append all of the given properties that satisfy the given append condition
+				//Appends all of the given properties that satisfy the given append condition
 				void Append(const PropertyNodes &properties, AppendCondition append_condition = AppendCondition::Unconditionally);
 
-				//Append all of the given mutable iterable properties that satisfy the given append condition
+				//Appends all of the given mutable iterable properties that satisfy the given append condition
 				void Append(const adaptors::ranges::Iterable<PropertyNodes&> &properties, AppendCondition append_condition = AppendCondition::Unconditionally);
 
-				//Append all of the given immutable iterable properties that satisfy the given append condition
+				//Appends all of the given immutable iterable properties that satisfy the given append condition
 				void Append(const adaptors::ranges::Iterable<const PropertyNodes&> &properties, AppendCondition append_condition = AppendCondition::Unconditionally);
 
 
@@ -390,29 +390,29 @@ namespace ion::script
 					Finding / searching
 				*/
 
-				//Find an object (top-level child object) by the given name, and return a mutable reference to it
+				//Finds an object (top-level child object) by the given name, and return a mutable reference to it
 				//Returns InvalidObjectNode if the given object is not found
 				[[nodiscard]] ObjectNode& Find(std::string_view name) noexcept;
 
-				//Find an object (top-level child object) by the given name, and return an immutable reference to it
+				//Finds an object (top-level child object) by the given name, and return an immutable reference to it
 				//Returns InvalidObjectNode if the given object is not found
 				[[nodiscard]] const ObjectNode& Find(std::string_view name) const noexcept;
 
 
-				//Search for an object (all child objects) by the given name and search strategy and return a mutable reference to it
+				//Searches for an object (all child objects) by the given name and search strategy and return a mutable reference to it
 				//Returns InvalidObjectNode if the given object is not found
 				[[nodiscard]] ObjectNode& Search(std::string_view name, SearchStrategy strategy = SearchStrategy::BreadthFirst) noexcept;
 
-				//Search for an object (all child objects) by the given name and search strategy and return an immutable reference to it
+				//Searches for an object (all child objects) by the given name and search strategy and return an immutable reference to it
 				//Returns InvalidObjectNode if the given object is not found
 				[[nodiscard]] const ObjectNode& Search(std::string_view name, SearchStrategy strategy = SearchStrategy::BreadthFirst) const noexcept;
 
 
-				//Find a property by the given name and return a mutable reference to it
+				//Finds a property by the given name and return a mutable reference to it
 				//Returns InvalidPropertyNode if the given property is not found
 				[[nodiscard]] PropertyNode& Property(std::string_view name) noexcept;
 
-				//Find a property by the given name and return an immutable reference to it
+				//Finds a property by the given name and return an immutable reference to it
 				//Returns InvalidPropertyNode if the given property is not found
 				[[nodiscard]] const PropertyNode& Property(std::string_view name) const noexcept;
 
@@ -540,7 +540,7 @@ namespace ion::script
 				}
 
 
-				//Return the number of arguments in this property
+				//Returns the number of arguments in this property
 				[[nodiscard]] inline auto NumberOfArguments() const noexcept
 				{
 					return std::ssize(arguments_);
@@ -583,7 +583,7 @@ namespace ion::script
 				//Constructs a new argument node with the given argument and unit
 				ArgumentNode(ArgumentType argument, std::string unit) noexcept;
 
-				//Construct an invalid argument node
+				//Constructs an invalid argument node
 				explicit ArgumentNode(std::nullopt_t) noexcept;
 
 
@@ -622,7 +622,7 @@ namespace ion::script
 					return value ? std::make_optional(*value) : std::nullopt;
 				}
 
-				//Call the correct overload for the given overload set, based on the value of the argument
+				//Calls the correct overload for the given overload set, based on the value of the argument
 				template <typename T, typename ...Ts>
 				inline auto Visit(T &&callable, Ts &&...callables) const noexcept
 				{
@@ -661,13 +661,13 @@ namespace ion::script
 				Appending
 			*/
 
-			//Append all of the given objects that satisfy the given append condition
+			//Appends all of the given objects that satisfy the given append condition
 			void Append(const script_tree::ObjectNodes &objects, script_tree::AppendCondition append_condition = script_tree::AppendCondition::Unconditionally);
 
-			//Append all of the given mutable iterable objects that satisfy the given append condition
+			//Appends all of the given mutable iterable objects that satisfy the given append condition
 			void Append(const adaptors::ranges::Iterable<script_tree::ObjectNodes&> &objects, script_tree::AppendCondition append_condition = script_tree::AppendCondition::Unconditionally);
 
-			//Append all of the given immutable iterable objects that satisfy the given append condition
+			//Appends all of the given immutable iterable objects that satisfy the given append condition
 			void Append(const adaptors::ranges::Iterable<const script_tree::ObjectNodes&> &objects, script_tree::AppendCondition append_condition = script_tree::AppendCondition::Unconditionally);
 
 
@@ -675,20 +675,20 @@ namespace ion::script
 				Finding / searching
 			*/
 
-			//Find an object (top-level object) by the given name, and return a mutable reference to it
+			//Finds an object (top-level object) by the given name, and return a mutable reference to it
 			//Returns InvalidObjectNode if the given object is not found
 			[[nodiscard]] script_tree::ObjectNode& Find(std::string_view name) noexcept;
 
-			//Find an object (top-level object) by the given name, and return an immutable reference to it
+			//Finds an object (top-level object) by the given name, and return an immutable reference to it
 			//Returns InvalidObjectNode if the given object is not found
 			[[nodiscard]] const script_tree::ObjectNode& Find(std::string_view name) const noexcept;
 
 
-			//Search for an object (all objects) by the given name and search strategy and return a mutable reference to it
+			//Searches for an object (all objects) by the given name and search strategy and return a mutable reference to it
 			//Returns InvalidObjectNode if the given object is not found
 			[[nodiscard]] script_tree::ObjectNode& Search(std::string_view name, script_tree::SearchStrategy strategy = script_tree::SearchStrategy::BreadthFirst) noexcept;
 
-			//Search for an object (all objects) by the given name and search strategy and return an immutable reference to it
+			//Searches for an object (all objects) by the given name and search strategy and return an immutable reference to it
 			//Returns InvalidObjectNode if the given object is not found
 			[[nodiscard]] const script_tree::ObjectNode& Search(std::string_view name, script_tree::SearchStrategy strategy = script_tree::SearchStrategy::BreadthFirst) const noexcept;
 
@@ -710,7 +710,7 @@ namespace ion::script
 				Printing
 			*/
 
-			//Print out this script tree as an hierarchical list with objects, properties and arguments.
+			//Prints out this script tree as an hierarchical list with objects, properties and arguments.
 			//Choose what to print based on the given print options (optionally)
 			[[nodiscard]] std::string Print(script_tree::PrintOptions print_options = script_tree::PrintOptions::Arguments) const;
 
@@ -767,10 +767,10 @@ namespace ion::script
 				Serializing
 			*/
 
-			//Deserialize a given byte array to a script tree
+			//Deserializes a given byte array to a script tree
 			[[nodiscard]] static std::optional<ScriptTree> Deserialize(std::string_view bytes);
 
-			//Serialize this script tree to a byte array
+			//Serializes this script tree to a byte array
 			[[nodiscard]] std::vector<std::byte> Serialize() const;
 	};
 

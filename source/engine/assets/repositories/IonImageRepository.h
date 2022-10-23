@@ -34,7 +34,7 @@ namespace ion::assets::repositories
 		//Naming convention is set to file path
 		ImageRepository() noexcept;
 
-		//Construct an image repository with the given naming convention
+		//Constructs an image repository with the given naming convention
 		ImageRepository(file_repository::NamingConvention naming_convention) noexcept;
 	};
 } //ion::assets::repositories

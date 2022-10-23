@@ -58,16 +58,16 @@ namespace ion::graphics::fonts
 				Modifiers
 			*/
 
-			//Attach the given regular font to the type face
+			//Attaches the given regular font to the type face
 			void RegularFont(NonOwningPtr<Font> font) noexcept;
 
-			//Attach the given bold font to the type face
+			//Attaches the given bold font to the type face
 			void BoldFont(NonOwningPtr<Font> font) noexcept;
 
-			//Attach the given italic font to the type face
+			//Attaches the given italic font to the type face
 			void ItalicFont(NonOwningPtr<Font> font) noexcept;
 
-			//Attach the given bold italic font to the type face
+			//Attaches the given bold italic font to the type face
 			void BoldItalicFont(NonOwningPtr<Font> font) noexcept;
 
 

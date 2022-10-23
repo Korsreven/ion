@@ -94,10 +94,10 @@ namespace ion::timers
 				Suspending / continuing
 			*/
 
-			//Continue the elapsing of time
+			//Continues the elapsing of time
 			void ContinueTimeElapse() noexcept;
 
-			//Suspend the elapsing of time
+			//Suspends the elapsing of time
 			void SuspendTimeElapse() noexcept;
 	};
 } //ion::timers

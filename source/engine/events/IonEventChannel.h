@@ -145,14 +145,14 @@ namespace ion::events
 			//Default constructor
 			EventChannel() = default;
 
-			//Construct a new event channel with the given subscription contract
+			//Constructs a new event channel with the given subscription contract
 			EventChannel(event_channel::SubscriptionContract contract) noexcept :
 				contract_{contract}
 			{
 				//Empty
 			}
 
-			//Construct a new event channel with the given publisher and subscription contract
+			//Constructs a new event channel with the given publisher and subscription contract
 			EventChannel(ListenableT &publisher, event_channel::SubscriptionContract contract = event_channel::SubscriptionContract::Cancelable) :
 
 				publisher_{event_channel::detail::subscribe_to_publisher(publisher, *this)},
@@ -161,7 +161,7 @@ namespace ion::events
 				//Empty
 			}
 
-			//Construct a new event channel with the given publisher and subscription contract
+			//Constructs a new event channel with the given publisher and subscription contract
 			EventChannel(ListenableT *publisher, event_channel::SubscriptionContract contract = event_channel::SubscriptionContract::Cancelable) :
 
 				publisher_{publisher ? event_channel::detail::subscribe_to_publisher(*publisher, *this) : nullptr},
@@ -240,7 +240,7 @@ namespace ion::events
 				Modifiers
 			*/
 
-			//Subscribe to the given publisher
+			//Subscribes to the given publisher
 			//If another publisher is being subscribed to, that publisher is unsubscribed automatically (if possible by the contract)
 			//Returns true if the publisher has successfully been subscribed to, or change contract
 			inline auto Subscribe(ListenableT &publisher)
@@ -254,7 +254,7 @@ namespace ion::events
 				return !!publisher_;
 			}
 
-			//Unsubscribe from the given publisher
+			//Unsubscribes from the given publisher
 			//Returns true if the publisher has successfully been unsubscribed from, or change contract
 			inline auto Unsubscribe() noexcept
 			{

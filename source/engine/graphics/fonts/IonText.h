@@ -226,28 +226,28 @@ namespace ion::graphics::fonts
 
 		public:
 
-			//Construct a new (unbounded) text with the given name, content, alignment and a type face
+			//Constructs a new (unbounded) text with the given name, content, alignment and a type face
 			Text(std::string name, std::string content, text::TextAlignment alignment,
 				NonOwningPtr<TypeFace> type_face);
 
-			//Construct a new (unbounded) text with the given name, content and a type face
+			//Constructs a new (unbounded) text with the given name, content and a type face
 			Text(std::string name, std::string content, NonOwningPtr<TypeFace> type_face);
 
-			//Construct a new text (area) with the given name, content, formatting,
+			//Constructs a new text (area) with the given name, content, formatting,
 			//horizontal and vertical alignment, area size, padding, line height factor and a type face
 			Text(std::string name, std::string content, text::TextFormatting formatting,
 				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
-			//Construct a new text (area) with the given name, content,
+			//Constructs a new text (area) with the given name, content,
 			//horizontal and vertical alignment, area size, padding, line height factor and a type face
 			Text(std::string name, std::string content,
 				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
-			//Construct a new text (area) with the given name, content,
+			//Constructs a new text (area) with the given name, content,
 			//area size, padding, line height factor and a type face
 			Text(std::string name, std::string content,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
@@ -353,7 +353,7 @@ namespace ion::graphics::fonts
 			}
 
 
-			//Attach the given type face to the text (used for lettering)
+			//Attaches the given type face to the text (used for lettering)
 			void Lettering(NonOwningPtr<TypeFace> type_face) noexcept;
 
 
@@ -479,13 +479,13 @@ namespace ion::graphics::fonts
 			}
 
 
-			//Return the number of lines in this text
+			//Returns the number of lines in this text
 			int LineCount() const noexcept;
 
-			//Return the number of lines that are being displayed in this text
+			//Returns the number of lines that are being displayed in this text
 			int DisplayedLineCount() const noexcept;
 
-			//Return the number of line that can be displayed in this text
+			//Returns the number of line that can be displayed in this text
 			//Returns nullopt if no area size or maximum lines has been specified
 			std::optional<int> DisplayedLineCapacity() const noexcept;
 
@@ -497,42 +497,42 @@ namespace ion::graphics::fonts
 				Content
 			*/
 
-			//Insert the given content to the back of the (raw) content
+			//Inserts the given content to the back of the (raw) content
 			//This will only parse and format the added content (unlike Text::Content)
 			void AppendContent(std::string_view content);
 
-			//Insert the given content to the front of the (raw) content
+			//Inserts the given content to the front of the (raw) content
 			//This will only parse and format the added content (unlike Text::Content)
 			void PrependContent(std::string_view content);
 
 
-			//Insert the given content as a new line to the back of the (raw) content
+			//Inserts the given content as a new line to the back of the (raw) content
 			//This is an optimization of Text::AppendContent (no changes to existing lines or blocks)
 			void AppendLine(std::string_view content);
 
-			//Insert the given content as a new line to the front of the (raw) content
+			//Inserts the given content as a new line to the front of the (raw) content
 			//This is an optimization of Text::PrependContent (no changes to existing lines or blocks)
 			void PrependLine(std::string_view content);
 
-			//Insert the given content as a new line at the given line offset of the (raw) content
+			//Inserts the given content as a new line at the given line offset of the (raw) content
 			//This is an optimization of Text::Content (no changes to existing lines or blocks)
 			void InsertLine(int line_off, std::string_view content);
 
 
-			//Replace the line at the given line offset of the (raw) content, with the given content
+			//Replaces the line at the given line offset of the (raw) content, with the given content
 			//This is an optimization of Text::Content (no changes to other lines or blocks)
 			void ReplaceLine(int line_off, std::string_view content);
 
-			//Replace all lines in range [first, last) of the (raw) content, with the given content
+			//Replaces all lines in range [first, last) of the (raw) content, with the given content
 			//This is an optimization of Text::Content (no changes to other lines or blocks)
 			void ReplaceLines(int first_line, int last_line, std::string_view content);
 
 
-			//Remove the line at the given line offset from the (raw) content
+			//Removes the line at the given line offset from the (raw) content
 			//This is an optimization of Text::Content (no changes to other lines or blocks)
 			void RemoveLine(int line_off);
 
-			//Removs all lines in range [first, last) from the (raw) content
+			//Removes all lines in range [first, last) from the (raw) content
 			//This is an optimization of Text::Content (no changes to other lines or blocks)
 			void RemoveLines(int first_line, int last_line);
 

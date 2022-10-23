@@ -228,7 +228,7 @@ namespace ion::sounds
 				Modifiers
 			*/
 
-			//Mute all sounds in this sound manager
+			//Mutes all sounds in this sound manager
 			void Mute(bool mute) noexcept;
 			
 			//Sets the relative pitch / playback rate of this sound manager
@@ -279,26 +279,26 @@ namespace ion::sounds
 				Creating
 			*/
 
-			//Create a sound with the given name and asset name
+			//Creates a sound with the given name and asset name
 			NonOwningPtr<Sound> CreateSound(std::string name, std::string asset_name);
 
-			//Create a sound with the given name, asset name, type, processing, orientation, rolloff and looping mode
+			//Creates a sound with the given name, asset name, type, processing, orientation, rolloff and looping mode
 			NonOwningPtr<Sound> CreateSound(std::string name, std::string asset_name,
 				sound::SoundType type, sound::SoundProcessingMode processing_mode,
 				sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
 				std::optional<sound::SoundLoopingMode> looping_mode = {});
 
-			//Create a sound with the given name, asset name, type, processing and looping mode
+			//Creates a sound with the given name, asset name, type, processing and looping mode
 			NonOwningPtr<Sound> CreateSound(std::string name, std::string asset_name,
 				sound::SoundType type, sound::SoundProcessingMode processing_mode,
 				std::optional<sound::SoundLoopingMode> looping_mode = {});
 
-			//Create a sound with the given name, asset name, type and looping mode
+			//Creates a sound with the given name, asset name, type and looping mode
 			NonOwningPtr<Sound> CreateSound(std::string name, std::string asset_name, sound::SoundType type,
 				std::optional<sound::SoundLoopingMode> looping_mode = {});
 
 
-			//Create a sound by moving the given sound
+			//Creates a sound by moving the given sound
 			NonOwningPtr<Sound> CreateSound(Sound &&sound);
 
 
@@ -321,13 +321,13 @@ namespace ion::sounds
 				Removing
 			*/
 
-			//Clear all removable sounds from this manager
+			//Clears all removable sounds from this manager
 			void ClearSounds() noexcept;
 
-			//Remove a removable sound from this manager
+			//Removes a removable sound from this manager
 			bool RemoveSound(Sound &sound) noexcept;
 
-			//Remove a removable sound with the given name from this manager
+			//Removes a removable sound with the given name from this manager
 			bool RemoveSound(std::string_view name) noexcept;
 
 
@@ -336,14 +336,14 @@ namespace ion::sounds
 				Creating
 			*/
 
-			//Create a sound channel group with the given name
+			//Creates a sound channel group with the given name
 			NonOwningPtr<SoundChannelGroup> CreateSoundChannelGroup(std::string name);
 
 
-			//Create a sound channel group as a copy of the given sound channel group
+			//Creates a sound channel group as a copy of the given sound channel group
 			NonOwningPtr<SoundChannelGroup> CreateSoundChannelGroup(const SoundChannelGroup &sound_channel_group);
 
-			//Create a sound channel group by moving the given sound channel group
+			//Creates a sound channel group by moving the given sound channel group
 			NonOwningPtr<SoundChannelGroup> CreateSoundChannelGroup(SoundChannelGroup &&sound_channel_group);
 
 
@@ -366,13 +366,13 @@ namespace ion::sounds
 				Removing
 			*/
 
-			//Clear all removable sound channel groups from this manager
+			//Clears all removable sound channel groups from this manager
 			void ClearSoundChannelGroups() noexcept;
 
-			//Remove a removable sound channel group from this manager
+			//Removes a removable sound channel group from this manager
 			bool RemoveSoundChannelGroup(SoundChannelGroup &sound_channel_group) noexcept;
 
-			//Remove a removable sound channel group with the given name from this manager
+			//Removes a removable sound channel group with the given name from this manager
 			bool RemoveSoundChannelGroup(std::string_view name) noexcept;
 
 
@@ -381,7 +381,7 @@ namespace ion::sounds
 				Creating
 			*/
 
-			//Create a sound listener with the given name
+			//Creates a sound listener with the given name
 			NonOwningPtr<SoundListener> CreateSoundListener(std::string name);
 
 
@@ -404,13 +404,13 @@ namespace ion::sounds
 				Removing
 			*/
 
-			//Clear all removable sound listeners from this manager
+			//Clears all removable sound listeners from this manager
 			void ClearSoundListeners() noexcept;
 
-			//Remove a removable sound listener from this manager
+			//Removes a removable sound listener from this manager
 			bool RemoveSoundListener(SoundListener &sound_listener) noexcept;
 
-			//Remove a removable sound listener with the given name from this manager
+			//Removes a removable sound listener with the given name from this manager
 			bool RemoveSoundListener(std::string_view name) noexcept;
 	};
 } //ion::sounds

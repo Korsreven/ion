@@ -218,7 +218,7 @@ namespace ion::managed
 				Creating
 			*/
 
-			//Create an object with the given arguments
+			//Creates an object with the given arguments
 			template <typename T = ObjectT, typename... Args,
 				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(Args &&...args)
@@ -226,7 +226,7 @@ namespace ion::managed
 				return Emplace<std::remove_cvref_t<T>>(std::forward<Args>(args)...);
 			}
 
-			//Create an object with the given name and arguments
+			//Creates an object with the given name and arguments
 			template <typename T = ObjectT, typename... Args,
 				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(std::string name, Args &&...args)
@@ -238,7 +238,7 @@ namespace ion::managed
 					return Emplace<std::remove_cvref_t<T>>(std::move(name), std::forward<Args>(args)...);
 			}
 
-			//Create an object with the given name and arguments
+			//Creates an object with the given name and arguments
 			template <typename T = ObjectT, typename... Args,
 				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(std::optional<std::string> name, Args &&...args)
@@ -254,7 +254,7 @@ namespace ion::managed
 				return Emplace<std::remove_cvref_t<T>>(std::move(name), std::forward<Args>(args)...);
 			}
 
-			//Create an object by copying/moving the given object
+			//Creates an object by copying/moving the given object
 			template <typename T,
 				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(T &&object)
@@ -413,7 +413,7 @@ namespace ion::managed
 				Take / release ownership
 			*/
 
-			//Adopt (take ownership of) the given object and returns a pointer to the adopted object
+			//Adopts (take ownership of) the given object and returns a pointer to the adopted object
 			//Returns nullptr if the object could not be adopted and object_ptr will remain untouched
 			auto Adopt(typename decltype(objects_)::value_type &object_ptr) noexcept
 			{
@@ -436,14 +436,14 @@ namespace ion::managed
 				return NonOwningPtr<ObjectT>{ptr};
 			}
 
-			//Adopt (take ownership of) the given object and returns a pointer to the adopted object
+			//Adopts (take ownership of) the given object and returns a pointer to the adopted object
 			//Returns nullptr if the object could not be adopted and object_ptr will be released
 			auto Adopt(typename decltype(objects_)::value_type &&object_ptr) noexcept
 			{	
 				return Adopt(object_ptr);
 			}
 
-			//Adopt (take ownership of) all the given objects
+			//Adopts (take ownership of) all the given objects
 			//If one or more objects could not be adopted, they will remain untouched in the given container
 			void AdoptAll(typename decltype(objects_) &objects) noexcept
 			{
@@ -480,7 +480,7 @@ namespace ion::managed
 				}
 			}
 
-			//Adopt (take ownership of) all the given objects
+			//Adopts (take ownership of) all the given objects
 			//If one or more objects could not be adopted, they will be released
 			void AdoptAll(typename decltype(objects_) &&objects) noexcept
 			{
@@ -488,7 +488,7 @@ namespace ion::managed
 			}
 
 
-			//Orphan (release ownership of) the given object
+			//Orphans (release ownership of) the given object
 			//Returns a pointer to the object released
 			[[nodiscard]] auto Orphan(ObjectT &object) noexcept
 			{
@@ -501,7 +501,7 @@ namespace ion::managed
 				return object_ptr;
 			}
 
-			//Orphan (release ownership of) all objects in this manager
+			//Orphans (release ownership of) all objects in this manager
 			//Returns a pointer to the object released
 			[[nodiscard]] auto OrphanAll() noexcept
 			{
@@ -539,20 +539,20 @@ namespace ion::managed
 				Removing
 			*/
 
-			//Clear all removable objects from this manager
+			//Clears all removable objects from this manager
 			void Clear() noexcept
 			{
 				ExtractAll();
 			}
 
-			//Remove a removable object from this manager
+			//Removes a removable object from this manager
 			auto Remove(ObjectT &object) noexcept
 			{
 				auto ptr = Extract(object);
 				return !!ptr;
 			}
 
-			//Remove a removable object with the given name from this manager
+			//Removes a removable object with the given name from this manager
 			auto Remove(std::string_view name) noexcept
 			{
 				if (auto ptr = Get(name); ptr)

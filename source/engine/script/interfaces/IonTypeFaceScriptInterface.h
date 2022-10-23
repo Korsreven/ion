@@ -69,11 +69,11 @@ namespace ion::script::interfaces
 				Creating from script
 			*/
 
-			//Create type faces from a script (or object file) with the given asset name
+			//Creates type faces from a script (or object file) with the given asset name
 			void CreateTypeFaces(std::string_view asset_name,
 				graphics::fonts::TypeFaceManager &type_face_manager);
 
-			//Create type faces from a script (or object file) with the given asset name
+			//Creates type faces from a script (or object file) with the given asset name
 			void CreateTypeFaces(std::string_view asset_name,
 				graphics::fonts::TypeFaceManager &type_face_manager, const ManagerRegister &managers);
 	};
