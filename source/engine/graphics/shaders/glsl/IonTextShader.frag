@@ -89,6 +89,7 @@ const float log2e = 1.442695;
 
 float fog_frag_coord = abs(vert_position.z);
 float fog_scale = 1.0 / (fog.far - fog.near);
+bool render_lights = scene.light_count + scene.emissive_light_count > 0;
 
 
 float linear_fog()
@@ -162,16 +163,14 @@ vec3 calc_point_light(Light light, vec3 normal, vec3 view_dir, vec4 ambient_colo
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), shininess);
 
     //Attenuation
-	if (light.radius > 0.0)
-		light.position.z = vert_position.z; //Discard z
+	light.position.z = light.radius > 0.0 ?
+		vert_position.z : //Discard z
+		light.position.z; //Keep z
 	
 	float dist = length(light.position - vert_position);
 	float attenuation = light.radius > 0.0 ?
-		1.0 - (dist / light.radius) :
+		max(1.0 - (dist / light.radius), 0.0) :
 		1.0 / (light.constant + light.linear * dist + light.quadratic * (dist * dist));
-	
-	if (light.radius > 0.0 && attenuation < 0.0)
-		attenuation = 0.0;
 
 	//Combine ambient, diffuse and specular color
 	ambient_color *= light.ambient;
@@ -250,10 +249,7 @@ vec3 calc_emissive_light(EmissiveLight emissive_light, vec3 normal, vec3 view_di
     //Attenuation
 	emissive_light.position.z = vert_position.z; //Discard z
     float dist = length(emissive_light.position - vert_position);
-    float attenuation = 1.0 - (dist / emissive_light.radius);
-
-	if (attenuation < 0.0)
-		attenuation = 0.0;
+    float attenuation = max(1.0 - (dist / emissive_light.radius), 0.0);
 
 	//Combine ambient, diffuse and specular color
 	ambient_color *= emissive_light.color;
@@ -311,7 +307,7 @@ void main()
 
 	
 	//Lighting
-	if (scene.light_count + scene.emissive_light_count > 0)
+	if (render_lights)
 	{
 		vec3 light_color = black.rgb;
 		vec3 view_dir = normalize(camera.position - vert_position);
