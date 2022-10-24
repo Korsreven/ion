@@ -31,8 +31,6 @@ struct Camera
 struct Primitive
 {
 	bool has_material;
-	uvec4 light_mask;
-	uvec4 emissive_light_mask;
 };
 
 struct Material
@@ -129,21 +127,6 @@ float exp2_fog()
 	return exp2(-fog.density * fog.density * fog_frag_coord * fog_frag_coord * log2e);
 }
 
-
-bool include_light(int i, uvec4 light_mask)
-{
-	int mask_off = i / 32;
-	uint light_bit = uint(i) % 32u + 1u;
-
-	switch (mask_off)
-	{
-		case 0: return (light_mask.x & light_bit) != 0u;
-		case 1: return (light_mask.y & light_bit) != 0u;
-		case 2: return (light_mask.z & light_bit) != 0u;
-		case 3: return (light_mask.w & light_bit) != 0u;
-		default: return false;
-	}
-}
 
 Light fetch_light(int i)
 {
@@ -387,34 +370,26 @@ void main()
 		//Accumulate each light
 		for (int i = 0; i < scene.light_count; ++i)
 		{
-			//Light illuminates fragments
-			if (include_light(i, primitive.light_mask))
-			{
-				Light light = fetch_light(i);
+			Light light = fetch_light(i);
 
-				//Point light
-				if (light.type == 0)
-					light_color += calc_point_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+			//Point light
+			if (light.type == 0)
+				light_color += calc_point_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 			
-				//Directional light
-				else if (light.type == 1)
-					light_color += calc_directional_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
+			//Directional light
+			else if (light.type == 1)
+				light_color += calc_directional_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 			
-				//Spot light
-				else if (light.type == 2)
-					light_color += calc_spot_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
-			}
+			//Spot light
+			else if (light.type == 2)
+				light_color += calc_spot_light(light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 		}
 
 		//Accumulate each emissive light
 		for (int i = 0; i < scene.emissive_light_count; ++i)
 		{
-			//Emissive light illuminates fragments
-			if (include_light(i, primitive.emissive_light_mask))
-			{
-				EmissiveLight emissive_light = fetch_emissive_light(i);
-				light_color += calc_emissive_light(emissive_light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
-			}
+			EmissiveLight emissive_light = fetch_emissive_light(i);
+			light_color += calc_emissive_light(emissive_light, normal, view_dir, ambient_color, diffuse_color, specular_color, shininess);
 		}
 
 		color.rgb += light_color;

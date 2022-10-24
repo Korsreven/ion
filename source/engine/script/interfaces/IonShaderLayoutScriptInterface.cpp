@@ -162,10 +162,6 @@ void bind_uniform(const script_tree::PropertyNode &property,
 		shader_layout.BindUniform(shader_layout::UniformName::Primitive_HasTexture, std::move(declaration));
 	else if (name == "primitive-has-material")
 		shader_layout.BindUniform(shader_layout::UniformName::Primitive_HasMaterial, std::move(declaration));
-	else if (name == "primitive-light-mask")
-		shader_layout.BindUniform(shader_layout::UniformName::Primitive_LightMask, std::move(declaration));
-	else if (name == "primitive-emissive-light-mask")
-		shader_layout.BindUniform(shader_layout::UniformName::Primitive_EmissiveLightMask, std::move(declaration));
 
 	//Material
 	else if (name == "material-ambient")

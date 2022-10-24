@@ -1035,8 +1035,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 				//Primitive
 				primitive_struct->CreateUniform<bool>("has_material");
-				primitive_struct->CreateUniform<glsl::uvec4>("light_mask");
-				primitive_struct->CreateUniform<glsl::uvec4>("emissive_light_mask");
 
 				//Material
 				material_struct->CreateUniform<glsl::vec4>("ambient");
@@ -1102,8 +1100,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 				//Primitive
 				primitive_struct->CreateUniform<bool>("has_material");
-				primitive_struct->CreateUniform<glsl::uvec4>("light_mask");
-				primitive_struct->CreateUniform<glsl::uvec4>("emissive_light_mask");
 
 				//Material
 				material_struct->CreateUniform<glsl::vec4>("ambient");
@@ -1166,8 +1162,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				//Primitive
 				primitive_struct->CreateUniform<glsl::sampler2DArray>("texture");
 				primitive_struct->CreateUniform<bool>("has_texture");
-				primitive_struct->CreateUniform<glsl::uvec4>("light_mask");
-				primitive_struct->CreateUniform<glsl::uvec4>("emissive_light_mask");
 
 				//Fog
 				fog_struct->CreateUniform<int>("mode");

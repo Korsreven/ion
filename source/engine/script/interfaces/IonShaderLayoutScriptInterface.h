@@ -74,8 +74,6 @@ namespace ion::script::interfaces
 			"primitive-texture",
 			"primitive-has-texture",
 			"primitive-has-material",
-			"primitive-light-mask",
-			"primitive-emissive-light-mask",
 
 			//Material
 			"material-ambient",

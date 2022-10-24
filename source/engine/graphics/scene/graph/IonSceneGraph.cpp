@@ -36,31 +36,6 @@ using namespace scene_graph;
 namespace scene_graph::detail
 {
 
-void get_light_mask(const light_pointers &lights, const MovableObject &object, uvec4 &light_mask) noexcept
-{
-	light_mask.fill(0_ui32);
-
-	if ((object.QueryTypeFlags() & query::scene_query::QueryType::Drawable) == 0)
-		return; //Nothing more to set
-
-
-	//Add only lights to the mask that illuminates the given object
-	for (auto i = 0_ui32; auto &light : lights)
-	{
-		if (i == max_lights_in_mask)
-			break;
-
-		if (object.WorldAxisAlignedBoundingBox(false, false).Empty() ||
-			light->WorldAxisAlignedBoundingBox(false, false).Empty() ||
-			light->WorldAxisAlignedBoundingBox(false, false).Intersects(object.WorldAxisAlignedBoundingBox(false, false)))
-			
-			light_mask[i / 32_ui32] |= i + 1_ui32; //Add light to mask
-
-		++i;
-	}
-}
-
-
 /*
 	Uniforms
 */
@@ -101,30 +76,6 @@ void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &sh
 
 	if (auto color = shader_program.GetUniform(shaders::shader_layout::UniformName::Fog_Color); color)
 		color->Get<glsl::vec4>() = fog->Tint();
-}
-
-void set_light_uniforms(const light_pointers &lights, const MovableObject &object, uvec4 &light_mask,
-	shaders::ShaderProgram &shader_program) noexcept
-{
-	using namespace shaders::variables;
-
-	if (auto mask = shader_program.GetUniform(shaders::shader_layout::UniformName::Primitive_LightMask); mask)
-	{
-		get_light_mask(lights, object, light_mask);
-		mask->Get<glsl::uvec4>().XYZW(light_mask[0], light_mask[1], light_mask[2], light_mask[3]);
-	}
-}
-
-void set_emissive_light_uniforms(const light_pointers &lights, const MovableObject &object, uvec4 &light_mask,
-	shaders::ShaderProgram &shader_program) noexcept
-{
-	using namespace shaders::variables;
-
-	if (auto mask = shader_program.GetUniform(shaders::shader_layout::UniformName::Primitive_EmissiveLightMask); mask)
-	{
-		get_light_mask(lights, object, light_mask);
-		mask->Get<glsl::uvec4>().XYZW(light_mask[0], light_mask[1], light_mask[2], light_mask[3]);
-	}
 }
 
 void set_light_uniforms(const light_pointers &lights, std::optional<textures::texture::TextureHandle> &texture_handle,

@@ -13,7 +13,6 @@ File:	IonSceneGraph.h
 #ifndef ION_SCENE_GRAPH_H
 #define ION_SCENE_GRAPH_H
 
-#include <array>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -73,16 +72,9 @@ namespace ion::graphics::scene::graph
 				//If scene graph contains more visible lights, then only the lights nearest to the geometry should be rendered
 				//NOT IN USE when light data textures are used instead of plain arrays
 
-			constexpr auto max_lights_in_mask = 128;
-				//Warning: This value must be less or equal to the total bits used for the light (visibility) mask
-				//uvec4 has 4 x 32 bit unsigned integers which sums up to a total of 128 bits
-
 			using light_pointers = std::vector<Light*>;
 			using movable_object_pointers = std::vector<MovableObject*>;
 			using shader_program_pointers = std::vector<shaders::ShaderProgram*>;
-			using uvec4 = std::array<uint32, 4>;
-
-			void get_light_mask(const light_pointers &lights, const MovableObject &object, uvec4 &light_mask) noexcept;
 
 
 			/*
@@ -91,10 +83,6 @@ namespace ion::graphics::scene::graph
 
 			void set_camera_uniforms(const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &shader_program) noexcept;
-			void set_light_uniforms(const light_pointers &lights, const MovableObject &object, uvec4 &light_mask,
-				shaders::ShaderProgram &shader_program) noexcept;
-			void set_emissive_light_uniforms(const light_pointers &lights, const MovableObject &object, uvec4 &light_mask,
-				shaders::ShaderProgram &shader_program) noexcept;
 			void set_light_uniforms(const light_pointers &lights, std::optional<textures::texture::TextureHandle> &texture_handle,
 				const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_emissive_light_uniforms(const light_pointers &lights, std::optional<textures::texture::TextureHandle> &texture_handle,
@@ -141,8 +129,6 @@ namespace ion::graphics::scene::graph
 
 			scene_graph::detail::light_pointers lights_;
 			scene_graph::detail::light_pointers emissive_lights_;
-			scene_graph::detail::uvec4 light_mask_{};
-			scene_graph::detail::uvec4 emissive_light_mask_{};
 
 			scene_graph::detail::movable_object_pointers visible_objects_;
 			scene_graph::detail::shader_program_pointers shader_programs_;
