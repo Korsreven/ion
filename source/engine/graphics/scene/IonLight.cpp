@@ -12,12 +12,13 @@ File:	IonLight.cpp
 
 #include "IonLight.h"
 
-#include <array>
+#include <cstring>
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/graph/IonSceneNode.h"
-#include "graphics/textures/IonTextureManager.h"
 #include "query/IonSceneQuery.h"
+
+#undef max
 
 namespace ion::graphics::scene
 {
@@ -27,12 +28,6 @@ using namespace utilities;
 
 namespace light::detail
 {
-
-constexpr auto light_texture_width =
-	std::max(static_cast<int>(textures::texture_manager::detail::upper_power_of_two(light_float_components)), 4) / 4;
-constexpr auto emissive_light_texture_width =
-	std::max(static_cast<int>(textures::texture_manager::detail::upper_power_of_two(emissive_light_float_components)), 4) / 4;
-
 
 std::optional<textures::texture::TextureHandle> create_texture(int width, int depth) noexcept
 {
@@ -99,7 +94,7 @@ std::optional<textures::texture::TextureHandle> upload_light_data(std::optional<
 	
 	if (texture_handle)
 	{
-		std::array<float, light_texture_width * 4> light_data{};
+		light_texture_data light_data{};
 		glBindTexture(GL_TEXTURE_1D_ARRAY, texture_handle->Id);
 
 		for (auto i = 0; auto &light : lights)
@@ -159,10 +154,15 @@ std::optional<textures::texture::TextureHandle> upload_light_data(std::optional<
 			light_data[24] = static_cast<float>(math::Cos(cutoff_angle));
 			light_data[25] = static_cast<float>(math::Cos(outer_cutoff_angle));
 
-			//Upload light data to gl
-			glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
-				0, i++, light_texture_width, 1,
-				GL_RGBA, GL_FLOAT, std::data(light_data));
+			//Light data has changed
+			if (std::memcmp(std::data(light->TextureData()), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
+			{
+				//Upload light data to gl
+				glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
+					0, i++, light_texture_width, 1,
+					GL_RGBA, GL_FLOAT, std::data(light_data));
+				light->TextureData(light_data);
+			}
 		}
 
 		glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
@@ -194,7 +194,7 @@ std::optional<textures::texture::TextureHandle> upload_emissive_light_data(std::
 	
 	if (texture_handle)
 	{
-		std::array<float, emissive_light_texture_width * 4> light_data{};
+		emissive_light_texture_data light_data{};
 		glBindTexture(GL_TEXTURE_1D_ARRAY, texture_handle->Id);
 
 		for (auto i = 0; auto &light : lights)
@@ -214,10 +214,15 @@ std::optional<textures::texture::TextureHandle> upload_emissive_light_data(std::
 			light_data[6] = static_cast<float>(b);
 			light_data[7] = static_cast<float>(a);	
 
-			//Upload light data to gl
-			glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
-				0, i++, emissive_light_texture_width, 1,
-				GL_RGBA, GL_FLOAT, std::data(light_data));
+			//Light data has changed
+			if (std::memcmp(std::data(light->TextureData()), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
+			{
+				//Upload light data to gl
+				glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
+					0, i++, emissive_light_texture_width, 1,
+					GL_RGBA, GL_FLOAT, std::data(light_data));
+				light->TextureData(light_data);
+			}
 		}
 
 		glBindTexture(GL_TEXTURE_1D_ARRAY, 0);

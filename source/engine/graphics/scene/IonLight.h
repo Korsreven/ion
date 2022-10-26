@@ -13,6 +13,8 @@ File:	IonLight.h
 #ifndef ION_LIGHT_H
 #define ION_LIGHT_H
 
+#include <algorithm>
+#include <array>
 #include <cmath>
 #include <optional>
 #include <string>
@@ -22,6 +24,7 @@ File:	IonLight.h
 
 #include "IonMovableObject.h"
 #include "graphics/textures/IonTexture.h"
+#include "graphics/textures/IonTextureManager.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
@@ -52,7 +55,7 @@ namespace ion::graphics::scene
 
 		namespace detail
 		{
-			using light_pointers = std::vector<Light*>;
+			using light_pointers = std::vector<Light*>;	
 
 			constexpr auto light_float_components = 25;
 			constexpr auto emissive_light_float_components = 8;
@@ -60,6 +63,14 @@ namespace ion::graphics::scene
 
 			constexpr auto default_cutoff_angle = math::ToRadians(45.0_r);
 			constexpr auto default_outer_cutoff_angle = math::ToRadians(55.0_r);
+
+			constexpr auto light_texture_width =
+				std::max(static_cast<int>(textures::texture_manager::detail::upper_power_of_two(light_float_components)), 4) / 4;
+			constexpr auto emissive_light_texture_width =
+				std::max(static_cast<int>(textures::texture_manager::detail::upper_power_of_two(emissive_light_float_components)), 4) / 4;
+
+			using light_texture_data = std::array<float, light_texture_width * 4>; //RGBA
+			using emissive_light_texture_data = std::array<float, emissive_light_texture_width * 4>; //RGBA
 
 
 			inline auto angle_to_cutoff(real angle) noexcept
@@ -105,10 +116,13 @@ namespace ion::graphics::scene
 			real attenuation_quadratic_ = 0.0_r;
 			
 			real cutoff_ = light::detail::angle_to_cutoff(light::detail::default_cutoff_angle);
-			real outer_cutoff_ = light::detail::angle_to_cutoff(light::detail::default_outer_cutoff_angle);	
+			real outer_cutoff_ = light::detail::angle_to_cutoff(light::detail::default_outer_cutoff_angle);
 
 			bool cast_shadows_ = true;
 			bool update_bounding_volumes_ = true;
+
+			light::detail::light_texture_data light_data_{};
+				//Enough space to store light or emissive light data
 
 
 			void PrepareBoundingVolumes() noexcept;
@@ -277,6 +291,19 @@ namespace ion::graphics::scene
 			}
 
 
+			//Sets the texture data of this light to the given data
+			inline void TextureData(const light::detail::light_texture_data &data) noexcept
+			{
+				std::copy(std::begin(data), std::end(data), std::begin(light_data_));
+			}
+
+			//Sets the emissive texture data of this light to the given data
+			inline void TextureData(const light::detail::emissive_light_texture_data &data) noexcept
+			{
+				std::copy(std::begin(data), std::end(data), std::begin(light_data_));
+			}
+
+
 			/*
 				Observers
 			*/
@@ -349,6 +376,13 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto CastShadows() const noexcept
 			{
 				return cast_shadows_;
+			}
+
+
+			//Returns the texture data of this light
+			[[nodiscard]] inline auto& TextureData() const noexcept
+			{
+				return light_data_;
 			}
 
 

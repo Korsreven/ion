@@ -28,6 +28,8 @@ File:	IonSceneGraph.cpp
 #include "graphics/textures/IonTextureManager.h"
 #include "utilities/IonMath.h"
 
+#undef max
+
 namespace ion::graphics::scene::graph
 {
 
