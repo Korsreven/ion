@@ -244,7 +244,7 @@ Matrix4& Matrix4::operator=(const Matrix3 &matrix) noexcept
 	//Row-major layout (Direct3D)
 	m_[0][0] = matrix.M00();		m_[0][1] = matrix.M01();		m_[0][2] = matrix.M()[0][2];	m_[0][3] = 0.0_r;
 	m_[1][0] = matrix.M10();		m_[1][1] = matrix.M11();		m_[1][2] = matrix.M()[1][2];	m_[1][3] = 0.0_r;
-	m_[2][0] = matrix.M20()			m_[2][1] = matrix.M21();		m_[2][2] = matrix.M()[2][2];	m_[2][3] = 0.0_r;
+	m_[2][0] = matrix.M20();		m_[2][1] = matrix.M21();		m_[2][2] = matrix.M()[2][2];	m_[2][3] = 0.0_r;
 	m_[3][0] = 0.0_r;				m_[3][1] = 0.0_r;				m_[3][2] = 0.0_r;				m_[3][3] = 1.0_r;
 	#else
 	//Column-major layout (OpenGL)
