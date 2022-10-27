@@ -13,9 +13,11 @@ File:	IonLight.cpp
 #include "IonLight.h"
 
 #include <cstring>
+#include <type_traits>
+
+#include "IonCamera.h"
+#include "graph/IonSceneNode.h"
 #include "graphics/IonGraphicsAPI.h"
-#include "graphics/scene/IonCamera.h"
-#include "graphics/scene/graph/IonSceneNode.h"
 #include "query/IonSceneQuery.h"
 
 #undef max
@@ -33,6 +35,8 @@ std::optional<textures::texture::TextureHandle> create_texture(int width, int de
 {
 	if (!textures::texture_manager::detail::has_support_for_array_texture())
 		return {};
+
+	constexpr auto type = std::is_same_v<real, float> ? GL_FLOAT : GL_DOUBLE;
 
 	if (auto max_lights = textures::texture_manager::detail::max_array_texture_layers(); depth > max_lights)
 		depth = max_lights;
@@ -52,7 +56,7 @@ std::optional<textures::texture::TextureHandle> create_texture(int width, int de
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexImage2D(GL_TEXTURE_1D_ARRAY, 0,
 		GL_RGBA32F, width, depth,
-		0, GL_RGBA, GL_FLOAT, nullptr);
+		0, GL_RGBA, type, nullptr);
 
 	glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
 	return texture_handle;
@@ -94,75 +98,80 @@ std::optional<textures::texture::TextureHandle> upload_light_data(std::optional<
 	
 	if (texture_handle)
 	{
+		constexpr auto type = std::is_same_v<real, float> ? GL_FLOAT : GL_DOUBLE;
+
 		light_texture_data light_data{};
 		glBindTexture(GL_TEXTURE_1D_ARRAY, texture_handle->Id);
 
 		for (auto i = 0; auto &light : lights)
 		{
-			light_data[0] = static_cast<float>(light->Type());
+			light_data[0] = static_cast<real>(light->Type());
 
 			{
 				auto [x, y, z] =
 					(camera.ViewMatrix() * (light->Position() + light->ParentNode()->DerivedPosition())).XYZ(); //View adjusted
-				light_data[1] = static_cast<float>(x);
-				light_data[2] = static_cast<float>(y);
-				light_data[3] = static_cast<float>(z);
+				light_data[1] = x;
+				light_data[2] = y;
+				light_data[3] = z;
 			}
 
 			{
 				auto [x, y, z] =
 					(light->Direction().Deviant(light->ParentNode()->DerivedRotation() -
 					(camera.Rotation() + camera.ParentNode()->DerivedRotation()))).XYZ(); //View adjusted
-				light_data[4] = static_cast<float>(x);
-				light_data[5] = static_cast<float>(y);
-				light_data[6] = static_cast<float>(z);
+				light_data[4] = x;
+				light_data[5] = y;
+				light_data[6] = z;
 			}
 
 			auto [sx, sy] = light->ParentNode()->DerivedScaling().XY();
-			light_data[7] = static_cast<float>(light->Radius() * std::max(sx, sy));
+			light_data[7] = light->Radius() * std::max(sx, sy);
 
 			{
 				auto [r, g, b, a] = light->AmbientColor().RGBA();
-				light_data[8] = static_cast<float>(r);
-				light_data[9] = static_cast<float>(g);
-				light_data[10] = static_cast<float>(b);
-				light_data[11] = static_cast<float>(a);
+				light_data[8] = r;
+				light_data[9] = g;
+				light_data[10] = b;
+				light_data[11] = a;
 			}
 
 			{
 				auto [r, g, b, a] = light->DiffuseColor().RGBA();
-				light_data[12] = static_cast<float>(r);
-				light_data[13] = static_cast<float>(g);
-				light_data[14] = static_cast<float>(b);
-				light_data[15] = static_cast<float>(a);
+				light_data[12] = r;
+				light_data[13] = g;
+				light_data[14] = b;
+				light_data[15] = a;
 			}
 
 			{
 				auto [r, g, b, a] = light->SpecularColor().RGBA();
-				light_data[16] = static_cast<float>(r);
-				light_data[17] = static_cast<float>(g);
-				light_data[18] = static_cast<float>(b);
-				light_data[19] = static_cast<float>(a);
+				light_data[16] = r;
+				light_data[17] = g;
+				light_data[18] = b;
+				light_data[19] = a;
 			}
 
 			auto [constant, linear, quadratic] = light->Attenuation();
-			light_data[20] = static_cast<float>(constant);
-			light_data[21] = static_cast<float>(linear);
-			light_data[22] = static_cast<float>(quadratic);
+			light_data[20] = constant;
+			light_data[21] = linear;
+			light_data[22] = quadratic;
 
 			auto [cutoff_angle, outer_cutoff_angle] = light->Cutoff();
-			light_data[24] = static_cast<float>(math::Cos(cutoff_angle));
-			light_data[25] = static_cast<float>(math::Cos(outer_cutoff_angle));
+			light_data[24] = math::Cos(cutoff_angle);
+			light_data[25] = math::Cos(outer_cutoff_angle);
 
 			//Light data has changed
-			if (std::memcmp(std::data(light->TextureData()), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
+			if (light->TextureLayer() != i ||
+				std::memcmp(std::data(light->TextureData()), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
 			{
 				//Upload light data to gl
 				glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
-					0, i++, light_texture_width, 1,
-					GL_RGBA, GL_FLOAT, std::data(light_data));
-				light->TextureData(light_data);
+					0, i, light_texture_width, 1,
+					GL_RGBA, type, std::data(light_data));
+				light->TextureData(i, light_data);
 			}
+
+			++i;
 		}
 
 		glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
@@ -194,6 +203,8 @@ std::optional<textures::texture::TextureHandle> upload_emissive_light_data(std::
 	
 	if (texture_handle)
 	{
+		constexpr auto type = std::is_same_v<real, float> ? GL_FLOAT : GL_DOUBLE;
+
 		emissive_light_texture_data light_data{};
 		glBindTexture(GL_TEXTURE_1D_ARRAY, texture_handle->Id);
 
@@ -201,28 +212,31 @@ std::optional<textures::texture::TextureHandle> upload_emissive_light_data(std::
 		{
 			auto [x, y, z] =
 				(camera.ViewMatrix() * (light->Position() + light->ParentNode()->DerivedPosition())).XYZ(); //View adjusted
-			light_data[0] = static_cast<float>(x);
-			light_data[1] = static_cast<float>(y);
-			light_data[2] = static_cast<float>(z);
+			light_data[0] = x;
+			light_data[1] = y;
+			light_data[2] = z;
 
 			auto [sx, sy] = light->ParentNode()->DerivedScaling().XY();
-			light_data[3] = static_cast<float>(light->Radius() * std::max(sx, sy));
+			light_data[3] = light->Radius() * std::max(sx, sy);
 
 			auto [r, g, b, a] = light->DiffuseColor().RGBA();
-			light_data[4] = static_cast<float>(r);
-			light_data[5] = static_cast<float>(g);
-			light_data[6] = static_cast<float>(b);
-			light_data[7] = static_cast<float>(a);	
+			light_data[4] = r;
+			light_data[5] = g;
+			light_data[6] = b;
+			light_data[7] = a;
 
 			//Light data has changed
-			if (std::memcmp(std::data(light->TextureData()), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
+			if (light->TextureLayer() != i ||
+				std::memcmp(std::data(light->TextureData()), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
 			{
 				//Upload light data to gl
 				glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
-					0, i++, emissive_light_texture_width, 1,
-					GL_RGBA, GL_FLOAT, std::data(light_data));
-				light->TextureData(light_data);
+					0, i, emissive_light_texture_width, 1,
+					GL_RGBA, type, std::data(light_data));
+				light->TextureData(i, light_data);
 			}
+
+			++i;
 		}
 
 		glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
