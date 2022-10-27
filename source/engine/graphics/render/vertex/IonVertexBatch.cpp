@@ -13,6 +13,7 @@ File:	IonVertexBatch.cpp
 #include "IonVertexBatch.h"
 
 #include <cstddef>
+#include <type_traits>
 
 #include "IonEngine.h"
 #include "graphics/IonGraphicsAPI.h"
