@@ -31,7 +31,26 @@ using namespace utilities;
 namespace light::detail
 {
 
-std::optional<textures::texture::TextureHandle> create_texture(int width, int depth) noexcept
+light_data::light_data(NonOwningPtr<light_texture> texture, std::optional<int> texture_layer,
+	const light_texture_data &data) noexcept :
+
+	texture{texture},
+	texture_layer{texture_layer}
+{
+	std::copy(std::begin(data), std::end(data), std::begin(uploaded_data));
+}
+
+light_data::light_data(NonOwningPtr<light_texture> texture, std::optional<int> texture_layer,
+	const emissive_light_texture_data &data) noexcept :
+
+	texture{texture},
+	texture_layer{texture_layer}
+{
+	std::copy(std::begin(data), std::end(data), std::begin(uploaded_data));
+}
+
+
+std::optional<light_texture> create_texture(int width, int depth) noexcept
 {
 	if (!textures::texture_manager::detail::has_support_for_array_texture())
 		return {};
@@ -44,7 +63,7 @@ std::optional<textures::texture::TextureHandle> create_texture(int width, int de
 	auto texture_handle =
 		textures::texture::TextureHandle{0, textures::texture::TextureType::ArrayTexture1D};
 
-	glGenTextures(1, reinterpret_cast<unsigned int*>(&texture_handle));
+	glGenTextures(1, reinterpret_cast<unsigned int*>(&texture_handle.Id));
 	glBindTexture(GL_TEXTURE_1D_ARRAY, texture_handle.Id);
 
 	glTexParameteri(GL_TEXTURE_1D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -59,49 +78,41 @@ std::optional<textures::texture::TextureHandle> create_texture(int width, int de
 		0, GL_RGBA, type, nullptr);
 
 	glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
-	return texture_handle;
+	return light_texture{texture_handle, width, depth};
 }
 
-std::optional<textures::texture::TextureHandle> create_light_texture(const light_pointers &lights) noexcept
+std::optional<light_texture> create_light_texture(const light_pointers &lights) noexcept
 {
 	auto depth = static_cast<int>(textures::texture_manager::detail::upper_power_of_two(std::size(lights)));
 	return create_texture(light_texture_width, std::max(depth, min_texture_depth));
 }
 
-std::optional<textures::texture::TextureHandle> create_emissive_light_texture(const light_pointers &lights) noexcept
+std::optional<light_texture> create_emissive_light_texture(const light_pointers &lights) noexcept
 {
 	auto depth = static_cast<int>(textures::texture_manager::detail::upper_power_of_two(std::size(lights)));
 	return create_texture(emissive_light_texture_width, std::max(depth, min_texture_depth));
 }
 
 
-std::optional<textures::texture::TextureHandle> upload_light_data(std::optional<textures::texture::TextureHandle> texture_handle,
+void upload_light_data(OwningPtr<light_texture> &texture,
 	const light_pointers &lights, const Camera &camera) noexcept
 {
-	auto depth = 0;
-
-	if (texture_handle)
-	{
-		glBindTexture(GL_TEXTURE_1D_ARRAY, texture_handle->Id);
-		glGetTexLevelParameteriv(GL_TEXTURE_1D_ARRAY, 0, GL_TEXTURE_HEIGHT, &depth);
-		glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
-	}
-
 	//Too many lights to fit inside texture, create new texture (next POT)
-	if (depth < std::ssize(lights))
+	if ((texture ? texture->depth : 0) < std::ssize(lights))
 	{
-		if (texture_handle)
-			textures::texture_manager::detail::unload_texture(*texture_handle);
+		if (texture && texture->handle)
+			textures::texture_manager::detail::unload_texture(*texture->handle);
 		
-		texture_handle = create_light_texture(lights);
+		if (auto new_texture = create_light_texture(lights); new_texture)
+			texture = make_owning<light_texture>(*new_texture);
 	}
 	
-	if (texture_handle)
+	if (texture && texture->handle)
 	{
 		constexpr auto type = std::is_same_v<real, float> ? GL_FLOAT : GL_DOUBLE;
 
 		light_texture_data light_data{};
-		glBindTexture(GL_TEXTURE_1D_ARRAY, texture_handle->Id);
+		glBindTexture(GL_TEXTURE_1D_ARRAY, texture->handle->Id);
 
 		for (auto i = 0; auto &light : lights)
 		{
@@ -161,14 +172,15 @@ std::optional<textures::texture::TextureHandle> upload_light_data(std::optional<
 			light_data[25] = math::Cos(outer_cutoff_angle);
 
 			//Light data has changed
-			if (light->TextureLayer() != i ||
-				std::memcmp(std::data(light->TextureData()), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
+			if (auto &data = light->Data();
+				!data.texture || data.texture_layer != i ||
+				std::memcmp(std::data(data.uploaded_data), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
 			{
 				//Upload light data to gl
 				glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
-					0, i, light_texture_width, 1,
+					0, i, texture->width, 1,
 					GL_RGBA, type, std::data(light_data));
-				light->TextureData(i, light_data);
+				light->Data({texture, i, light_data});
 			}
 
 			++i;
@@ -176,37 +188,27 @@ std::optional<textures::texture::TextureHandle> upload_light_data(std::optional<
 
 		glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
 	}
-
-	return texture_handle;
 }
 
-std::optional<textures::texture::TextureHandle> upload_emissive_light_data(std::optional<textures::texture::TextureHandle> texture_handle,
+void upload_emissive_light_data(OwningPtr<light_texture> &texture,
 	const light_pointers &lights, const Camera &camera) noexcept
 {
-	auto depth = 0;
-
-	if (texture_handle)
-	{
-		glBindTexture(GL_TEXTURE_1D_ARRAY, texture_handle->Id);
-		glGetTexLevelParameteriv(GL_TEXTURE_1D_ARRAY, 0, GL_TEXTURE_HEIGHT, &depth);
-		glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
-	}
-
 	//Too many lights to fit inside texture, create new texture (next POT)
-	if (depth < std::ssize(lights))
+	if ((texture ? texture->depth : 0) < std::ssize(lights))
 	{
-		if (texture_handle)
-			textures::texture_manager::detail::unload_texture(*texture_handle);
+		if (texture && texture->handle)
+			textures::texture_manager::detail::unload_texture(*texture->handle);
 
-		texture_handle = create_emissive_light_texture(lights);
+		if (auto new_texture = create_emissive_light_texture(lights); new_texture)
+			texture = make_owning<light_texture>(*new_texture);
 	}
 	
-	if (texture_handle)
+	if (texture && texture->handle)
 	{
 		constexpr auto type = std::is_same_v<real, float> ? GL_FLOAT : GL_DOUBLE;
 
 		emissive_light_texture_data light_data{};
-		glBindTexture(GL_TEXTURE_1D_ARRAY, texture_handle->Id);
+		glBindTexture(GL_TEXTURE_1D_ARRAY, texture->handle->Id);
 
 		for (auto i = 0; auto &light : lights)
 		{
@@ -226,14 +228,15 @@ std::optional<textures::texture::TextureHandle> upload_emissive_light_data(std::
 			light_data[7] = a;
 
 			//Light data has changed
-			if (light->TextureLayer() != i ||
-				std::memcmp(std::data(light->TextureData()), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
+			if (auto &data = light->Data();
+				!data.texture || data.texture_layer != i ||
+				std::memcmp(std::data(data.uploaded_data), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
 			{
 				//Upload light data to gl
 				glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
-					0, i, emissive_light_texture_width, 1,
+					0, i, texture->width, 1,
 					GL_RGBA, type, std::data(light_data));
-				light->TextureData(i, light_data);
+				light->Data({texture, i, light_data});
 			}
 
 			++i;
@@ -241,8 +244,6 @@ std::optional<textures::texture::TextureHandle> upload_emissive_light_data(std::
 
 		glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
 	}
-
-	return texture_handle;
 }
 
 } //light::detail

@@ -80,7 +80,7 @@ void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &sh
 		color->Get<glsl::vec4>() = fog->Tint();
 }
 
-void set_light_uniforms(const light_pointers &lights, std::optional<textures::texture::TextureHandle> &texture_handle,
+void set_light_uniforms(const light_pointers &lights, OwningPtr<light::detail::light_texture> &texture,
 	const Camera &camera, shaders::ShaderProgram &shader_program) noexcept
 {
 	using namespace shaders::variables;
@@ -94,7 +94,7 @@ void set_light_uniforms(const light_pointers &lights, std::optional<textures::te
 
 
 	if (auto scene_lights = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_Lights); scene_lights)
-		texture_handle = light::detail::upload_light_data(texture_handle, lights, camera);
+		light::detail::upload_light_data(texture, lights, camera);
 	else
 	{
 		auto type = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Type);
@@ -175,7 +175,7 @@ void set_light_uniforms(const light_pointers &lights, std::optional<textures::te
 	}
 }
 
-void set_emissive_light_uniforms(const light_pointers &lights, std::optional<textures::texture::TextureHandle> &texture_handle,
+void set_emissive_light_uniforms(const light_pointers &lights, OwningPtr<light::detail::light_texture> &texture,
 	const Camera &camera, shaders::ShaderProgram &shader_program) noexcept
 {
 	using namespace shaders::variables;
@@ -189,7 +189,7 @@ void set_emissive_light_uniforms(const light_pointers &lights, std::optional<tex
 
 
 	if (auto scene_lights = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_EmissiveLights); scene_lights)
-		texture_handle = light::detail::upload_emissive_light_data(texture_handle, lights, camera);
+		light::detail::upload_emissive_light_data(texture, lights, camera);
 	else
 	{
 		auto position = shader_program.GetUniform(shaders::shader_layout::UniformName::EmissiveLight_Position);
@@ -384,11 +384,11 @@ SceneGraph::SceneGraph(std::optional<std::string> name, bool enabled) noexcept :
 
 SceneGraph::~SceneGraph() noexcept
 {
-	if (light_texture_handle_)
-		textures::texture_manager::detail::unload_texture(*light_texture_handle_);
+	if (light_texture_ && light_texture_->handle)
+		textures::texture_manager::detail::unload_texture(*light_texture_->handle);
 
-	if (emissive_light_texture_handle_)
-		textures::texture_manager::detail::unload_texture(*emissive_light_texture_handle_);
+	if (emissive_light_texture_ && emissive_light_texture_->handle)
+		textures::texture_manager::detail::unload_texture(*emissive_light_texture_->handle);
 }
 
 
@@ -541,8 +541,8 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 			{
 				detail::set_camera_uniforms(*camera, *shader_program);
 				detail::set_fog_uniforms(fog_enabled_ ? fog_ : std::optional<render::Fog>{}, *shader_program);
-				detail::set_light_uniforms(lights_, light_texture_handle_, *camera, *shader_program);
-				detail::set_emissive_light_uniforms(emissive_lights_, emissive_light_texture_handle_, *camera, *shader_program);
+				detail::set_light_uniforms(lights_, light_texture_, *camera, *shader_program);
+				detail::set_emissive_light_uniforms(emissive_lights_, emissive_light_texture_, *camera, *shader_program);
 				detail::set_matrix_uniforms(projection_mat, view_mat, *shader_program);
 				detail::set_scene_uniforms(gamma_, ambient_color_, *shader_program);
 				shader_programs_.push_back(shader_program.get()); //Only distinct

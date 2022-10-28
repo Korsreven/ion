@@ -13,7 +13,6 @@ File:	IonLight.h
 #ifndef ION_LIGHT_H
 #define ION_LIGHT_H
 
-#include <algorithm>
 #include <array>
 #include <cmath>
 #include <optional>
@@ -28,6 +27,8 @@ File:	IonLight.h
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
+#include "memory/IonNonOwningPtr.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
 
@@ -69,8 +70,30 @@ namespace ion::graphics::scene
 			constexpr auto emissive_light_texture_width =
 				std::max(static_cast<int>(textures::texture_manager::detail::upper_power_of_two(emissive_light_float_components)), 4) / 4;
 
+			
+			struct light_texture
+			{
+				std::optional<textures::texture::TextureHandle> handle;
+				int width = 0;
+				int depth = 0;
+			};
+
 			using light_texture_data = std::array<real, light_texture_width * 4>; //RGBA
 			using emissive_light_texture_data = std::array<real, emissive_light_texture_width * 4>; //RGBA
+
+			struct light_data
+			{
+				NonOwningPtr<light_texture> texture;
+				std::optional<int> texture_layer;
+				light_texture_data uploaded_data{};
+					//Enough space to store uploaded light or emissive light data
+
+				light_data() = default;
+				light_data(NonOwningPtr<light_texture> texture, std::optional<int> texture_layer,
+					const light_texture_data &data) noexcept;
+				light_data(NonOwningPtr<light_texture> texture, std::optional<int> texture_layer,
+					const emissive_light_texture_data &data) noexcept;
+			};
 
 
 			inline auto angle_to_cutoff(real angle) noexcept
@@ -84,13 +107,13 @@ namespace ion::graphics::scene
 			}
 
 
-			std::optional<textures::texture::TextureHandle> create_texture(int width, int depth) noexcept;
-			std::optional<textures::texture::TextureHandle> create_light_texture(const light_pointers &lights) noexcept;
-			std::optional<textures::texture::TextureHandle> create_emissive_light_texture(const light_pointers &lights) noexcept;
+			std::optional<light_texture> create_texture(int width, int depth) noexcept;
+			std::optional<light_texture> create_light_texture(const light_pointers &lights) noexcept;
+			std::optional<light_texture> create_emissive_light_texture(const light_pointers &lights) noexcept;
 
-			std::optional<textures::texture::TextureHandle> upload_light_data(std::optional<textures::texture::TextureHandle> texture_handle,
+			void upload_light_data(OwningPtr<light_texture> &texture,
 				const light_pointers &lights, const Camera &camera) noexcept;
-			std::optional<textures::texture::TextureHandle> upload_emissive_light_data(std::optional<textures::texture::TextureHandle> texture_handle,
+			void upload_emissive_light_data(OwningPtr<light_texture> &texture,
 				const light_pointers &lights, const Camera &camera) noexcept;
 		} //detail
 	} //light
@@ -120,10 +143,7 @@ namespace ion::graphics::scene
 
 			bool cast_shadows_ = true;
 			bool update_bounding_volumes_ = true;
-
-			std::optional<int> texture_layer_;
-			light::detail::light_texture_data texture_data_{};
-				//Enough space to store light or emissive light data
+			light::detail::light_data data_;
 
 
 			void PrepareBoundingVolumes() noexcept;
@@ -291,26 +311,10 @@ namespace ion::graphics::scene
 				cast_shadows_ = enabled;
 			}
 
-
-			//Sets the texture data of this light to the given data
-			inline void TextureData(int layer, const light::detail::light_texture_data &data) noexcept
+			//Sets the data of this light to the given data
+			inline void Data(const light::detail::light_data &data) noexcept
 			{
-				texture_layer_ = layer;
-				std::copy(std::begin(data), std::end(data), std::begin(texture_data_));
-			}
-
-			//Sets the emissive texture data of this light to the given data
-			inline void TextureData(int layer, const light::detail::emissive_light_texture_data &data) noexcept
-			{
-				texture_layer_ = layer;
-				std::copy(std::begin(data), std::end(data), std::begin(texture_data_));
-			}
-
-			//Reset the texture data of this light
-			inline void ResetTextureData() noexcept
-			{
-				texture_layer_ = {};
-				texture_data_.fill(0.0_r);
+				data_ = data;
 			}
 
 
@@ -388,17 +392,10 @@ namespace ion::graphics::scene
 				return cast_shadows_;
 			}
 
-
-			//Returns the texture layer of this light
-			[[nodiscard]] inline auto TextureLayer() const noexcept
+			//Returns the data of this light
+			[[nodiscard]] inline auto& Data() const noexcept
 			{
-				return texture_layer_;
-			}
-
-			//Returns the texture data of this light
-			[[nodiscard]] inline auto& TextureData() const noexcept
-			{
-				return texture_data_;
+				return data_;
 			}
 
 

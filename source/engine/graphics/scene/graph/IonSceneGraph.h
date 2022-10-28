@@ -24,13 +24,13 @@ File:	IonSceneGraph.h
 #include "graphics/render/IonFog.h"
 #include "graphics/render/IonRenderer.h"
 #include "graphics/scene/IonSceneManager.h"
-#include "graphics/textures/IonTexture.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector3.h"
 #include "managed/IonManagedObject.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
 
 //Forward declarations
@@ -83,9 +83,9 @@ namespace ion::graphics::scene::graph
 
 			void set_camera_uniforms(const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &shader_program) noexcept;
-			void set_light_uniforms(const light_pointers &lights, std::optional<textures::texture::TextureHandle> &texture_handle,
+			void set_light_uniforms(const light_pointers &lights, OwningPtr<light::detail::light_texture> &texture,
 				const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
-			void set_emissive_light_uniforms(const light_pointers &lights, std::optional<textures::texture::TextureHandle> &texture_handle,
+			void set_emissive_light_uniforms(const light_pointers &lights, OwningPtr<light::detail::light_texture> &texture,
 				const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_matrix_uniforms(const Matrix4 &projection_mat, shaders::ShaderProgram &shader_program) noexcept;
 			void set_matrix_uniforms(const Matrix4 &projection_mat, const Matrix4 &model_view_mat, shaders::ShaderProgram &shader_program) noexcept;
@@ -134,8 +134,8 @@ namespace ion::graphics::scene::graph
 			scene_graph::detail::shader_program_pointers shader_programs_;
 				//Keep these as members so we don't have to reallocate storage for each render call
 
-			std::optional<textures::texture::TextureHandle> light_texture_handle_;
-			std::optional<textures::texture::TextureHandle> emissive_light_texture_handle_;
+			OwningPtr<light::detail::light_texture> light_texture_;
+			OwningPtr<light::detail::light_texture> emissive_light_texture_;
 
 
 			/*
@@ -329,14 +329,14 @@ namespace ion::graphics::scene::graph
 			//Returns nullopt if this scene does not use a texture for the lights
 			[[nodiscard]] inline auto LightTextureHandle() const noexcept
 			{
-				return light_texture_handle_;
+				return light_texture_ ? light_texture_->handle : std::nullopt;
 			}
 
 			//Returns a texture handle to the emissive lights in this scene
 			//Returns nullopt if this scene does not use a texture for the emissive lights
 			[[nodiscard]] inline auto EmissiveLightTextureHandle() const noexcept
 			{
-				return emissive_light_texture_handle_;
+				return emissive_light_texture_ ? emissive_light_texture_->handle : std::nullopt;
 			}
 
 
