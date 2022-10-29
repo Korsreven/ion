@@ -81,19 +81,18 @@ namespace ion::graphics::scene
 			using light_texture_data = std::array<real, light_texture_width * 4>; //RGBA
 			using emissive_light_texture_data = std::array<real, emissive_light_texture_width * 4>; //RGBA
 
-			struct light_data
+			struct light_texture_storage
 			{
-				NonOwningPtr<light_texture> texture;
-				std::optional<int> texture_layer;
-				light_texture_data uploaded_data{};
-					//Enough space to store uploaded light or emissive light data
+				int layer = 0;
+				light_texture_data data{};
+					//Enough space to store light or emissive light data
 
-				light_data() = default;
-				light_data(NonOwningPtr<light_texture> texture, std::optional<int> texture_layer,
-					const light_texture_data &data) noexcept;
-				light_data(NonOwningPtr<light_texture> texture, std::optional<int> texture_layer,
-					const emissive_light_texture_data &data) noexcept;
+				light_texture_storage() = default;
+				light_texture_storage(int texture_layer, const light_texture_data &texture_data) noexcept;
+				light_texture_storage(int texture_layer, const emissive_light_texture_data &texture_data) noexcept;
 			};
+
+			using light_texture_with_storage = std::pair<NonOwningPtr<light_texture>, light_texture_storage>;
 
 
 			inline auto angle_to_cutoff(real angle) noexcept
@@ -143,7 +142,7 @@ namespace ion::graphics::scene
 
 			bool cast_shadows_ = true;
 			bool update_bounding_volumes_ = true;
-			light::detail::light_data data_;
+			light::detail::light_texture_with_storage texture_data_;
 
 
 			void PrepareBoundingVolumes() noexcept;
@@ -311,10 +310,10 @@ namespace ion::graphics::scene
 				cast_shadows_ = enabled;
 			}
 
-			//Sets the data of this light to the given data
-			inline void Data(const light::detail::light_data &data) noexcept
+			//Sets the texture data of this light to the given texture data
+			inline void TextureData(const light::detail::light_texture_with_storage &texture_data) noexcept
 			{
-				data_ = data;
+				texture_data_ = texture_data;
 			}
 
 
@@ -392,10 +391,10 @@ namespace ion::graphics::scene
 				return cast_shadows_;
 			}
 
-			//Returns the data of this light
-			[[nodiscard]] inline auto& Data() const noexcept
+			//Returns the texture data of this light
+			[[nodiscard]] inline auto& TextureData() const noexcept
 			{
-				return data_;
+				return texture_data_;
 			}
 
 

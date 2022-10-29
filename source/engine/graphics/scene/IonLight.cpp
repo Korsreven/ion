@@ -31,22 +31,16 @@ using namespace utilities;
 namespace light::detail
 {
 
-light_data::light_data(NonOwningPtr<light_texture> texture, std::optional<int> texture_layer,
-	const light_texture_data &data) noexcept :
-
-	texture{texture},
-	texture_layer{texture_layer}
+light_texture_storage::light_texture_storage(int texture_layer, const light_texture_data &texture_data) noexcept :
+	layer{texture_layer}
 {
-	std::copy(std::begin(data), std::end(data), std::begin(uploaded_data));
+	std::copy(std::begin(texture_data), std::end(texture_data), std::begin(data));
 }
 
-light_data::light_data(NonOwningPtr<light_texture> texture, std::optional<int> texture_layer,
-	const emissive_light_texture_data &data) noexcept :
-
-	texture{texture},
-	texture_layer{texture_layer}
+light_texture_storage::light_texture_storage(int texture_layer, const emissive_light_texture_data &texture_data) noexcept :
+	layer{texture_layer}
 {
-	std::copy(std::begin(data), std::end(data), std::begin(uploaded_data));
+	std::copy(std::begin(texture_data), std::end(texture_data), std::begin(data));
 }
 
 
@@ -171,16 +165,17 @@ void upload_light_data(OwningPtr<light_texture> &texture,
 			light_data[24] = math::Cos(cutoff_angle);
 			light_data[25] = math::Cos(outer_cutoff_angle);
 
+
 			//Light data has changed
-			if (auto &data = light->Data();
-				!data.texture || data.texture_layer != i ||
-				std::memcmp(std::data(data.uploaded_data), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
+			if (auto &texture_data = light->TextureData();
+				!texture_data.first || texture_data.second.layer != i ||
+				std::memcmp(std::data(texture_data.second.data), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
 			{
-				//Upload light data to gl
+				//Upload light data to gl texture
 				glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
 					0, i, texture->width, 1,
 					GL_RGBA, type, std::data(light_data));
-				light->Data({texture, i, light_data});
+				light->TextureData({texture, light_texture_storage{i, light_data}});
 			}
 
 			++i;
@@ -227,16 +222,17 @@ void upload_emissive_light_data(OwningPtr<light_texture> &texture,
 			light_data[6] = b;
 			light_data[7] = a;
 
+
 			//Light data has changed
-			if (auto &data = light->Data();
-				!data.texture || data.texture_layer != i ||
-				std::memcmp(std::data(data.uploaded_data), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
+			if (auto &texture_data = light->TextureData();
+				!texture_data.first || texture_data.second.layer != i ||
+				std::memcmp(std::data(texture_data.second.data), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
 			{
-				//Upload light data to gl
+				//Upload light data to gl texture
 				glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
 					0, i, texture->width, 1,
 					GL_RGBA, type, std::data(light_data));
-				light->Data({texture, i, light_data});
+				light->TextureData({texture, light_texture_storage{i, light_data}});
 			}
 
 			++i;
