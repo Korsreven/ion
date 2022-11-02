@@ -63,6 +63,7 @@
 #*.RTF   diff=astextplain
 
 ###############################################################################
-# Vendored code.
+# Linguist overrides.
 ###############################################################################
+docs/**/* linguist-documentation
 libraries/**/* linguist-vendored
