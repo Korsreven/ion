@@ -31,7 +31,7 @@ namespace ion::adaptors
 	} //flat_map::detail
 
 
-	//An adaptor class that provides flat map functionality to any flat container
+	///@brief An adaptor class that provides flat map functionality to any flat container
 	template <typename Key, typename T, typename Compare = std::less<>, //Transparent as default
 		template <typename...> typename Container = std::vector, typename... Types>
 	struct FlatMap final :
@@ -45,36 +45,43 @@ namespace ion::adaptors
 		using mapped_type = T;
 
 
-		/*
-			Element access
+		/**
+			@name Operators
+			@{
 		*/
 
-		//Returns a mutable reference to the mapped type for the given key
-		//If key does not exist insert it to the map with a default constructed mapped type
+		///@brief Returns a mutable reference to the mapped type for the given key
+		///@details If key does not exist insert it to the map with a default constructed mapped type
 		[[nodiscard]] inline auto& operator[](const typename my_base::key_type &key)
 		{
 			auto [iter, found] = this->insert({key, mapped_type{}});
 			return iter->second;
 		}
 
-		//Returns a mutable reference to the mapped type for the given key (by move)
-		//If key does not exist insert it to the map with a default constructed mapped type
+		///@brief Returns a mutable reference to the mapped type for the given key (by move)
+		///@details If key does not exist insert it to the map with a default constructed mapped type
 		[[nodiscard]] inline auto& operator[](typename my_base::key_type &&key)
 		{
 			auto [iter, found] = this->insert({std::move(key), mapped_type{}});
 			return iter->second;
 		}
 
+		///@}
 
-		//Returns a mutable reference to the mapped type for the given key
-		//Does bounds checking by throwing out of range if key does not exist
+		/**
+			@name Element access
+			@{
+		*/
+
+		///@brief Returns a mutable reference to the mapped type for the given key
+		///@details Does bounds checking by throwing out of range if key does not exist
 		[[nodiscard]] inline auto& at(const typename my_base::key_type &key)
 		{
 			return at<typename my_base::key_type>(key);
 		}
 
-		//Returns a mutable reference to the mapped type for the given key
-		//Does bounds checking by throwing out of range if key does not exist
+		///@brief Returns a mutable reference to the mapped type for the given key
+		///@details Does bounds checking by throwing out of range if key does not exist
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, typename my_base::key_type> || types::is_transparent_comparator_v<Compare>>>
 		[[nodiscard]] inline auto& at(const T &key)
@@ -87,15 +94,15 @@ namespace ion::adaptors
 			return iter->second;
 		}
 
-		//Returns an immutable reference to the mapped type for the given key
-		//Does bounds checking by throwing out of range if key does not exist
+		///@brief Returns an immutable reference to the mapped type for the given key
+		///@details Does bounds checking by throwing out of range if key does not exist
 		[[nodiscard]] inline auto& at(const typename my_base::key_type &key) const
 		{
 			return at<typename my_base::key_type>(key);
 		}
 
-		//Returns an immutable reference to the mapped type for the given key
-		//Does bounds checking by throwing out of range if key does not exist
+		///@brief Returns an immutable reference to the mapped type for the given key
+		///@details Does bounds checking by throwing out of range if key does not exist
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, typename my_base::key_type> || types::is_transparent_comparator_v<Compare>>>
 		[[nodiscard]] inline auto& at(const T &key) const
@@ -107,6 +114,8 @@ namespace ion::adaptors
 
 			return iter->second;
 		}
+
+		///@}
 	};
 } //ion::adaptors
 

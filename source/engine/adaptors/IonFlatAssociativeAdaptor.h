@@ -175,7 +175,7 @@ namespace ion::adaptors
 	} //flat_associative_adaptor::detail
 
 
-	//An adaptor class that provides associative functionality to any flat container
+	///@brief An adaptor class that provides associative functionality to any flat container
 	template <typename Container, typename Key, typename Compare,
 		template <typename...> typename IteratorAdaptor = types::identity>
 	struct FlatAssociativeAdaptor : ranges::BasicIterable<Container, IteratorAdaptor>
@@ -190,17 +190,17 @@ namespace ion::adaptors
 		using value_compare = flat_associative_adaptor::detail::value_compare<Key, typename my_base::value_type, Compare>;
 
 
-		//Default constructor
+		///@brief Default constructor
 		FlatAssociativeAdaptor() = default;
 
-		//Constructs a flat associative adaptor by the given container
+		///@brief Constructs a flat associative adaptor by the given container
 		explicit FlatAssociativeAdaptor(typename my_base::container_type container) noexcept :
 			my_base{flat_associative_adaptor::detail::make_ordered_associative(std::move(container), value_compare{})}
 		{
 			//Empty
 		}
 
-		//Constructs a flat associative adaptor by the given initializer list
+		///@brief Constructs a flat associative adaptor by the given initializer list
 		explicit FlatAssociativeAdaptor(std::initializer_list<typename my_base::value_type> list) noexcept :
 			my_base{flat_associative_adaptor::detail::make_ordered_associative(typename my_base::container_type{list}, value_compare{})}
 		{
@@ -208,84 +208,91 @@ namespace ion::adaptors
 		}
 
 
-		/*
-			Ranges
+		/**
+			@name Ranges
+			@{
 		*/
 
-		//Returns a mutable range of all elements in the underlying container
-		//This can be used directly with a range-based for loop
+		///@brief Returns a mutable range of all elements in the underlying container
+		///@details This can be used directly with a range-based for loop
 		[[nodiscard]] inline auto Elements() noexcept
 		{
 			return ranges::BasicIterable<typename my_base::container_type&, IteratorAdaptor>{this->container_};
 		}
 
-		//Returns an immutable range of all elements in the underlying container
-		//This can be used directly with a range-based for loop
+		///@brief Returns an immutable range of all elements in the underlying container
+		///@details This can be used directly with a range-based for loop
 		[[nodiscard]] inline auto Elements() const noexcept
 		{
 			return ranges::BasicIterable<const typename my_base::container_type&, IteratorAdaptor>{this->container_};
 		}
 
+		///@}
 
-		/*
-			Modifiers
+		/**
+			@name Modifiers
+			@{
 		*/
 
-		//Reserves more capacity by calling reserve on the underlying container
-		//Reserve does not exist for std::deque
+		///@brief Reserves more capacity by calling reserve on the underlying container
+		///@details Reserve does not exist for std::deque
 		inline void reserve(size_t new_capacity)
 		{
 			return this->container_.reserve(new_capacity);
 		}
 
-		//Skrinks the capacity of the underlying container to fit
+		///@brief Skrinks the capacity of the underlying container to fit
 		inline void shrink_to_fit()
 		{
 			return this->container_.shrink_to_fit();
 		}
 
-		//Swap this underlying container with the given adaptors underlying container
+		///@brief Swap this underlying container with the given adaptors underlying container
 		inline void swap(FlatAssociativeAdaptor &flat_associative_adaptor)
 		{
 			return this->container_.swap(flat_associative_adaptor.container_);
 		}
 
+		///@}
 
-		/*
-			Observers
+		/**
+			@name Observers
+			@{
 		*/
 
-		//Returns the capacity of the underlying container
-		//Capacity does not exist for std::deque
+		///@brief Returns the capacity of the underlying container
+		///@details Capacity does not exist for std::deque
 		[[nodiscard]] inline auto capacity() const noexcept
 		{
 			return this->container_.capacity();
 		}
 
-		//Returns the function object that compares the keys
+		///@brief Returns the function object that compares the keys
 		[[nodiscard]] inline auto key_comp() const noexcept
 		{
 			return key_compare{};
 		}
 
-		//Returns the function object that compares objects of type value_type
+		///@brief Returns the function object that compares objects of type value_type
 		[[nodiscard]] inline auto value_comp() const noexcept
 		{
 			return value_compare{};
 		}
 
+		///@}
 
-		/*
-			Lookup
+		/**
+			@name Lookup
+			@{
 		*/
 
-		//Returns true if the given key exists
+		///@brief Returns true if the given key exists
 		[[nodiscard]] inline auto contains(const key_type &key) const noexcept
 		{
 			return contains<key_type>(key);
 		}
 
-		//Returns true if the given key exists
+		///@brief Returns true if the given key exists
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, key_type> || types::is_transparent_comparator_v<Compare>>>
 		[[nodiscard]] inline auto contains(const T &key) const noexcept
@@ -294,15 +301,15 @@ namespace ion::adaptors
 		}
 
 
-		//Returns the count of all keys that compare equal with the given key
-		//Since keys are unique, this function returns values in range [0, 1]
+		///@brief Returns the count of all keys that compare equal with the given key
+		///@details Since keys are unique, this function returns values in range [0, 1]
 		[[nodiscard]] inline auto count(const key_type &key) const noexcept
 		{
 			return count<key_type>(key);
 		}
 
-		//Returns the count of all keys that compare equal with the given key
-		//Since keys are unique, this function returns values in range [0, 1]
+		///@brief Returns the count of all keys that compare equal with the given key
+		///@details Since keys are unique, this function returns values in range [0, 1]
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, key_type> || types::is_transparent_comparator_v<Compare>>>
 		[[nodiscard]] inline auto count(const T &key) const noexcept
@@ -330,15 +337,15 @@ namespace ion::adaptors
 		}
 
 
-		//Returns an iterator to the element with the given key
-		//If key does not exist, the end iterator is returned
+		///@brief Returns an iterator to the element with the given key
+		///@details If key does not exist, the end iterator is returned
 		[[nodiscard]] inline auto find(const key_type &key) noexcept
 		{
 			return find<key_type>(key);
 		}
 
-		//Returns an iterator to the element with the given key
-		//If key does not exist, the end iterator is returned
+		///@brief Returns an iterator to the element with the given key
+		///@details If key does not exist, the end iterator is returned
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, key_type> || types::is_transparent_comparator_v<Compare>>>
 		[[nodiscard]] inline auto find(const T &key) noexcept
@@ -353,15 +360,15 @@ namespace ion::adaptors
 				this->end();
 		}
 
-		//Returns an const iterator to the element with the given key
-		//If key does not exist, the end iterator is returned
+		///@brief Returns an const iterator to the element with the given key
+		///@details If key does not exist, the end iterator is returned
 		[[nodiscard]] inline auto find(const key_type &key) const noexcept
 		{
 			return find<key_type>(key);
 		}
 
-		//Returns an const iterator to the element with the given key
-		//If key does not exist, the end iterator is returned
+		///@brief Returns an const iterator to the element with the given key
+		///@details If key does not exist, the end iterator is returned
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, key_type> || types::is_transparent_comparator_v<Compare>>>
 		[[nodiscard]] inline auto find(const T &key) const noexcept
@@ -376,18 +383,20 @@ namespace ion::adaptors
 				this->end();
 		}
 
+		///@}
 
-		/*
-			Lower/upper bound
+		/**
+			@name Lower/upper bound
+			@{
 		*/
 
-		//Returns a pair of iterators [first, last), of all elements that compare equal to the given key
+		///@brief Returns a pair of iterators [first, last), of all elements that compare equal to the given key
 		[[nodiscard]] inline auto equal_range(const key_type &key) noexcept
 		{
 			return equal_range<key_type>(key);
 		}
 
-		//Returns a pair of iterators [first, last), of all elements that compare equal to the given key
+		///@brief Returns a pair of iterators [first, last), of all elements that compare equal to the given key
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, key_type> || types::is_transparent_comparator_v<Compare>>>
 		[[nodiscard]] inline auto equal_range(const T &key) noexcept
@@ -404,13 +413,13 @@ namespace ion::adaptors
 					typename my_base::iterator{std::end(this->container_)}};
 		}
 
-		//Returns a pair of const iterators [first, last), of all elements that compare equal to the given key
+		///@brief Returns a pair of const iterators [first, last), of all elements that compare equal to the given key
 		[[nodiscard]] inline auto equal_range(const key_type &key) const noexcept
 		{
 			return equal_range<key_type>(key);
 		}
 
-		//Returns a pair of const iterators [first, last), of all elements that compare equal to the given key
+		///@brief Returns a pair of const iterators [first, last), of all elements that compare equal to the given key
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, key_type> || types::is_transparent_comparator_v<Compare>>>
 		[[nodiscard]] inline auto equal_range(const T &key) const noexcept
@@ -428,15 +437,15 @@ namespace ion::adaptors
 		}
 
 
-		//Returns the lower bound of the given key
-		//An iterator to the first element that is greater or equal
+		///@brief Returns the lower bound of the given key
+		///@details An iterator to the first element that is greater or equal
 		[[nodiscard]] inline auto lower_bound(const key_type &key) noexcept
 		{
 			return lower_bound<key_type>(key);
 		}
 
-		//Returns the lower bound of the given key
-		//An iterator to the first element that is greater or equal
+		///@brief Returns the lower bound of the given key
+		///@details An iterator to the first element that is greater or equal
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, key_type> || types::is_transparent_comparator_v<Compare>>>
 		[[nodiscard]] inline auto lower_bound(const T &key) noexcept
@@ -447,15 +456,15 @@ namespace ion::adaptors
 					key, value_compare{})};
 		}
 
-		//Returns the lower bound of the given key
-		//A const iterator to the first element that is greater or equal
+		///@brief Returns the lower bound of the given key
+		///@details A const iterator to the first element that is greater or equal
 		[[nodiscard]] inline auto lower_bound(const key_type &key) const noexcept
 		{
 			return lower_bound<key_type>(key);
 		}
 
-		//Returns the lower bound of the given key
-		//A const iterator to the first element that is greater or equal
+		///@brief Returns the lower bound of the given key
+		///@details A const iterator to the first element that is greater or equal
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, key_type> || types::is_transparent_comparator_v<Compare>>>
 		[[nodiscard]] inline auto lower_bound(const T &key) const noexcept
@@ -467,15 +476,15 @@ namespace ion::adaptors
 		}
 
 
-		//Returns the upper bound of the given key
-		//An iterator to the first element that is greater
+		///@brief Returns the upper bound of the given key
+		///@details An iterator to the first element that is greater
 		[[nodiscard]] inline auto upper_bound(const key_type &key) noexcept
 		{
 			return upper_bound<key_type>(key);
 		}
 
-		//Returns the upper bound of the given key
-		//An iterator to the first element that is greater
+		///@brief Returns the upper bound of the given key
+		///@details An iterator to the first element that is greater
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, key_type> || types::is_transparent_comparator_v<Compare>>>
 		[[nodiscard]] inline auto upper_bound(const T &key) noexcept
@@ -486,15 +495,15 @@ namespace ion::adaptors
 					key, value_compare{})};
 		}
 
-		//Returns the upper bound of the given key
-		//A const iterator to the first element that is greater
+		///@brief Returns the upper bound of the given key
+		///@details A const iterator to the first element that is greater
 		[[nodiscard]] inline auto upper_bound(const key_type &key) const noexcept
 		{
 			return upper_bound<key_type>(key);
 		}
 
-		//Returns the upper bound of the given key
-		//A const iterator to the first element that is greater
+		///@brief Returns the upper bound of the given key
+		///@details A const iterator to the first element that is greater
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, key_type> || types::is_transparent_comparator_v<Compare>>>
 		[[nodiscard]] inline auto upper_bound(const T &key) const noexcept
@@ -505,19 +514,21 @@ namespace ion::adaptors
 					key, value_compare{})};
 		}
 
+		///@}
 
-		/*
-			Inserting
+		/**
+			@name Inserting
+			@{
 		*/
 
-		//Emplaces a key-value pair by forwarding the given arguments to its constructor
+		///@brief Emplaces a key-value pair by forwarding the given arguments to its constructor
 		template <typename... Args>
 		inline auto emplace(Args &&...args)
 		{
 			return insert(typename my_base::value_type{std::forward<Args>(args)...});
 		}
 
-		//Emplaces with hint, a key-value pair by forwarding the given arguments to its constructor
+		///@brief Emplaces with hint, a key-value pair by forwarding the given arguments to its constructor
 		template <typename... Args>
 		inline auto emplace_hint(typename my_base::iterator hint, Args &&...args)
 		{
@@ -525,7 +536,7 @@ namespace ion::adaptors
 		}
 
 
-		//Inserts a key-value pair by copying the given value
+		///@brief Inserts a key-value pair by copying the given value
 		inline auto insert(const typename my_base::value_type &value)
 		{
 			auto [iter, found] =
@@ -540,7 +551,7 @@ namespace ion::adaptors
 			return std::pair{typename my_base::iterator{iter}, !found};
 		}
 
-		//Inserts a key-value pair by moving the given value in place
+		///@brief Inserts a key-value pair by moving the given value in place
 		inline auto insert(typename my_base::value_type &&value)
 		{
 			auto [iter, found] =
@@ -555,7 +566,7 @@ namespace ion::adaptors
 			return std::pair{typename my_base::iterator{iter}, !found};
 		}
 
-		//Inserts with hint, a key-value pair by copying the given value
+		///@brief Inserts with hint, a key-value pair by copying the given value
 		inline auto insert(typename my_base::iterator hint, const typename my_base::value_type &value)
 		{
 			auto [iter, found] =
@@ -571,7 +582,7 @@ namespace ion::adaptors
 			return std::pair{typename my_base::iterator{iter}, !found};
 		}
 
-		//Inserts with hint, a key-value pair by moving the given value in place
+		///@brief Inserts with hint, a key-value pair by moving the given value in place
 		inline auto insert(typename my_base::iterator hint, typename my_base::value_type &&value)
 		{
 			auto [iter, found] =
@@ -588,15 +599,15 @@ namespace ion::adaptors
 		}
 
 
-		//Inserts multiple key_value pair at once, by copying, sorting and merging the given values
-		//Warning. After all values are added, duplicate values will be removed
+		///@brief Inserts multiple key_value pair at once, by copying, sorting and merging the given values
+		///@details Warning. After all values are added, duplicate values will be removed
 		inline auto insert(const typename my_base::container_type &container)
 		{
 			return insert<typename my_base::container_type>(container);
 		}
 
-		//Inserts multiple key_value pair at once, by copying, sorting and merging the given values
-		//Warning. After all values are added, duplicate values will be removed
+		///@brief Inserts multiple key_value pair at once, by copying, sorting and merging the given values
+		///@details Warning. After all values are added, duplicate values will be removed
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<typename T::value_type, typename my_base::value_type> &&
 								std::is_base_of_v<std::input_iterator_tag, typename std::iterator_traits<typename T::iterator>::iterator_category>>>
@@ -613,8 +624,8 @@ namespace ion::adaptors
 			return size < std::size(this->container_);
 		}
 
-		//Inserts multiple key_value pair at once, by moving, sorting and merging the given values
-		//Warning. After all values are added, duplicate values will be removed
+		///@brief Inserts multiple key_value pair at once, by moving, sorting and merging the given values
+		///@details Warning. After all values are added, duplicate values will be removed
 		inline auto insert(typename my_base::container_type &&container)
 		{
 			auto size = std::size(this->container_);
@@ -629,24 +640,26 @@ namespace ion::adaptors
 			return size < std::size(this->container_);
 		}
 
+		///@}
 
-		/*
-			Removing
+		/**
+			@name Removing
+			@{
 		*/
 
-		//Clears all elements in the underlying container
+		///@brief Clears all elements in the underlying container
 		inline void clear() noexcept
 		{
 			this->container_.clear();
 		}
 
-		//Erases the element with the given key
+		///@brief Erases the element with the given key
 		inline auto erase(const key_type &key) noexcept
 		{
 			return erase<key_type>(key);
 		}
 
-		//Erases the element with the given key
+		///@brief Erases the element with the given key
 		template <typename T,
 			typename = std::enable_if_t<std::is_same_v<T, key_type> || types::is_transparent_comparator_v<Compare>>>
 		inline auto erase(const T &key) noexcept
@@ -662,20 +675,20 @@ namespace ion::adaptors
 			return found;
 		}
 
-		//Erases the element at the given iterator
+		///@brief Erases the element at the given iterator
 		inline auto erase(typename my_base::iterator where) noexcept
 		{
 			return typename my_base::iterator{this->container_.erase(where)};
 		}
 
-		//Erases all elements in range [first, last)
+		///@brief Erases all elements in range [first, last)
 		inline auto erase(typename my_base::iterator first, typename my_base::iterator last) noexcept
 		{
 			return typename my_base::iterator{this->container_.erase(first, last)};
 		}
 
 
-		//Erases all elements satisfying the given predicate
+		///@brief Erases all elements satisfying the given predicate
 		template <typename Predicate>
 		inline auto erase_if(Predicate predicate) noexcept
 		{
@@ -684,7 +697,7 @@ namespace ion::adaptors
 				std::end(this->container_))};
 		}
 
-		//Erases all elements satisfying the given predicate, in range [first, last)
+		///@brief Erases all elements satisfying the given predicate, in range [first, last)
 		template <typename Predicate>
 		inline auto erase_if(typename my_base::iterator first, typename my_base::iterator last, Predicate predicate) noexcept
 		{
@@ -692,6 +705,8 @@ namespace ion::adaptors
 				std::remove_if(first, last, predicate),
 				last)};
 		}
+
+		///@}
 	};
 } //ion::adaptors
 

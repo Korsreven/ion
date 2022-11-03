@@ -17,7 +17,7 @@ File:	IonBasicContainerHolder.h
 
 namespace ion::adaptors
 {
-	//A class that can hold any container by value
+	///@brief A class that can hold any container by value
 	template <typename Container>
 	class BasicHolder
 	{
@@ -27,24 +27,24 @@ namespace ion::adaptors
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			BasicHolder() = default;
 
-			//Constructs a basic holder from the given container by copy
+			///@brief Constructs a basic holder from the given container by copy
 			explicit BasicHolder(const Container &container) :
 				container_{container}
 			{
 				//Empty
 			}
 
-			//Constructs a basic holder from the given container by move
+			///@brief Constructs a basic holder from the given container by move
 			explicit BasicHolder(Container &&container) noexcept :
 				container_{std::move(container)}
 			{
 				//Empty
 			}
 
-			//Constructs a basic holder from the given initializer list
+			///@brief Constructs a basic holder from the given initializer list
 			explicit BasicHolder(std::initializer_list<typename Container::value_type> list) :
 				container_{list}
 			{
@@ -53,7 +53,7 @@ namespace ion::adaptors
 	};
 
 
-	//A class that can hold any container by reference
+	///@brief A class that can hold any container by reference
 	template <typename Container>
 	class BasicHolder<Container&>
 	{
@@ -63,10 +63,10 @@ namespace ion::adaptors
 
 		public:
 
-			//No default constructor
+			///@brief No default constructor
 			constexpr BasicHolder() = delete;
 
-			//Constructs a basic holder from the given reference
+			///@brief Constructs a basic holder from the given reference
 			constexpr explicit BasicHolder(Container &container) noexcept :
 				container_{container}
 			{

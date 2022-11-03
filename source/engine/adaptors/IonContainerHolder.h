@@ -20,7 +20,7 @@ File:	IonContainerHolder.h
 
 namespace ion::adaptors
 {
-	//A class that provides a basic interface on top of a wrapped container
+	///@brief A class that provides a basic interface on top of a wrapped container
 	template <typename Container>
 	struct Holder : BasicHolder<Container>
 	{
@@ -42,33 +42,36 @@ namespace ion::adaptors
 		using const_pointer = typename container_type::const_pointer;
 
 
-		/*
-			Observers
+		/**
+			@name Observers
+			@{
 		*/
 
-		//Returns a pointer to the data of this holder
+		///@brief Returns a pointer to the data of this holder
 		[[nodiscard]] constexpr auto data() const noexcept
 		{
 			return std::data(this->container_);
 		}
 
-		//Returns true if this holders holds an empty container
+		///@brief Returns true if this holders holds an empty container
 		[[nodiscard]] constexpr auto empty() const noexcept
 		{
 			return std::empty(this->container_);
 		}
 
-		//Returns the size of the container this holder holds
+		///@brief Returns the size of the container this holder holds
 		[[nodiscard]] constexpr auto size() const noexcept
 		{
 			return std::size(this->container_);
 		}
 
-		//Returns the max size of the container this holder holds
+		///@brief Returns the max size of the container this holder holds
 		[[nodiscard]] constexpr auto max_size() const noexcept
 		{
 			return this->container_.max_size();
 		}
+
+		///@}
 	};
 } //ion::adaptors
 

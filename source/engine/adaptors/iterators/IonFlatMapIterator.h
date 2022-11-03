@@ -57,7 +57,7 @@ namespace ion::adaptors::iterators
 	} //flat_map_iterator::detail
 
 
-	//A const iterator adaptor class for flat map, that makes the dereferenced first value of the pair const
+	///@brief A const iterator adaptor class for flat map, that makes the dereferenced first value of the pair const
 	template <typename Iterator>
 	struct ConstFlatMapIterator : Iterator
 	{
@@ -71,10 +71,11 @@ namespace ion::adaptors::iterators
 		static_assert(types::is_pair_v<value_type> &&
 					  offsetof(value_type, second) == offsetof(flat_map_iterator::detail::add_const_to_first_t<value_type>, second));
 
-
+		
+		///@brief Default constructor
 		constexpr ConstFlatMapIterator() = default;
 
-		//Constructs a const flat map iterator from underlying iterator type
+		///@brief Constructs a const flat map iterator from underlying iterator type
 		constexpr ConstFlatMapIterator(const Iterator &iterator) noexcept :
 			Iterator{iterator}
 		{
@@ -82,12 +83,12 @@ namespace ion::adaptors::iterators
 		}
 
 
-		/*
-			Operators
-			Modifiers
+		/**
+			@name Operators
+			@{
 		*/
 
-		//Post-increments iterator
+		///@brief Post-increments iterator
 		[[nodiscard]] constexpr ConstFlatMapIterator operator++(int) noexcept
 		{
 			auto iter = *this;
@@ -95,14 +96,14 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Pre-increments iterator
+		///@brief Pre-increments iterator
 		constexpr ConstFlatMapIterator &operator++() noexcept
 		{
 			Iterator::operator++();
 			return *this;
 		}
 
-		//Post-decrements iterator
+		///@brief Post-decrements iterator
 		[[nodiscard]] constexpr ConstFlatMapIterator operator--(int) noexcept
 		{
 			auto iter = *this;
@@ -110,7 +111,7 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Pre-decrements iterator
+		///@brief Pre-decrements iterator
 		constexpr ConstFlatMapIterator &operator--() noexcept
 		{
 			Iterator::operator--();
@@ -118,8 +119,8 @@ namespace ion::adaptors::iterators
 		}
 
 
-		//Increments iterator by the given offset
-		//Returns the result as a copy
+		///@brief Increments iterator by the given offset
+		///@details Returns the result as a copy
 		[[nodiscard]] constexpr ConstFlatMapIterator operator+(int off) const noexcept
 		{
 			auto iter = *this;
@@ -127,8 +128,8 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Decrements iterator by the given offset
-		//Returns the result as a copy
+		///@brief Decrements iterator by the given offset
+		///@details Returns the result as a copy
 		[[nodiscard]] constexpr ConstFlatMapIterator operator-(int off) const noexcept
 		{
 			auto iter = *this;
@@ -136,14 +137,14 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Increments iterator by the given offset
+		///@brief Increments iterator by the given offset
 		constexpr ConstFlatMapIterator &operator+=(int off) noexcept
 		{
 			Iterator::operator+=(off);
 			return *this;
 		}
 
-		//Decrements iterator by the given offset
+		///@brief Decrements iterator by the given offset
 		constexpr ConstFlatMapIterator &operator-=(int off) noexcept
 		{
 			Iterator::operator-=(off);
@@ -151,38 +152,42 @@ namespace ion::adaptors::iterators
 		}
 
 
-		//Returns the difference (distance) between this and the given iterator
+		///@brief Returns the difference (distance) between this and the given iterator
 		[[nodiscard]] constexpr difference_type operator-(const ConstFlatMapIterator &rhs) const noexcept
 		{
 			return Iterator::operator-(rhs);
 		}
 
+		///@}
 
-		/*
-			Observers
+		/**
+			@name Observers
+			@{
 		*/
 
-		//Returns the dereferenced underlying value
+		///@brief Returns the dereferenced underlying value
 		[[nodiscard]] constexpr reference operator*() const noexcept
 		{
 			return reinterpret_cast<reference>(Iterator::operator*());
 		}
 
-		//Returns a pointer to the dereferenced underlying value
+		///@brief Returns a pointer to the dereferenced underlying value
 		[[nodiscard]] constexpr pointer operator->() const noexcept
 		{
 			return &**this;
 		}
 
-		//Returns the dereferenced underlying value at the given offset
+		///@brief Returns the dereferenced underlying value at the given offset
 		[[nodiscard]] constexpr reference operator[](difference_type off) const noexcept
 		{
 			return reinterpret_cast<reference>(Iterator::operator[](off));
 		}
+
+		///@}
 	};
 
 
-	//An iterator adaptor class for flat map, that makes the dereferenced first value of the pair const
+	///@brief An iterator adaptor class for flat map, that makes the dereferenced first value of the pair const
 	template <typename Iterator>
 	struct FlatMapIterator final : ConstFlatMapIterator<Iterator>
 	{
@@ -194,9 +199,10 @@ namespace ion::adaptors::iterators
 		using reference = flat_map_iterator::detail::add_const_to_first_t<value_type>&;
 
 
+		///@brief Default constructor
 		constexpr FlatMapIterator() = default;
 
-		//Constructs a flat map iterator from underlying iterator type
+		///@brief Constructs a flat map iterator from underlying iterator type
 		constexpr FlatMapIterator(const Iterator &iterator) noexcept :
 			ConstFlatMapIterator<Iterator>{iterator}
 		{
@@ -204,12 +210,12 @@ namespace ion::adaptors::iterators
 		}
 
 
-		/*
-			Operators
-			Modifiers
+		/**
+			@name Operators
+			@{
 		*/
 
-		//Post-increments iterator
+		///@brief Post-increments iterator
 		[[nodiscard]] constexpr FlatMapIterator operator++(int) noexcept
 		{
 			auto iter = *this;
@@ -217,14 +223,14 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Pre-increments iterator
+		///@brief Pre-increments iterator
 		constexpr FlatMapIterator &operator++() noexcept
 		{
 			Iterator::operator++();
 			return *this;
 		}
 
-		//Post-decrements iterator
+		///@brief Post-decrements iterator
 		[[nodiscard]] constexpr FlatMapIterator operator--(int) noexcept
 		{
 			auto iter = *this;
@@ -232,7 +238,7 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Pre-decrements iterator
+		///@brief Pre-decrements iterator
 		constexpr FlatMapIterator &operator--() noexcept
 		{
 			Iterator::operator--();
@@ -240,8 +246,8 @@ namespace ion::adaptors::iterators
 		}
 
 
-		//Increments iterator by the given offset
-		//Returns the result as a copy
+		///@brief Increments iterator by the given offset
+		///@details Returns the result as a copy
 		[[nodiscard]] constexpr FlatMapIterator operator+(int off) const noexcept
 		{
 			auto iter = *this;
@@ -249,8 +255,8 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Decrements iterator by the given offset
-		//Returns the result as a copy
+		///@brief Decrements iterator by the given offset
+		///@details Returns the result as a copy
 		[[nodiscard]] constexpr FlatMapIterator operator-(int off) const noexcept
 		{
 			auto iter = *this;
@@ -258,14 +264,14 @@ namespace ion::adaptors::iterators
 			return iter;
 		}
 
-		//Increments iterator by the given offset
+		///@brief Increments iterator by the given offset
 		constexpr FlatMapIterator &operator+=(int off) noexcept
 		{
 			Iterator::operator+=(off);
 			return *this;
 		}
 
-		//Decrements iterator by the given offset
+		///@brief Decrements iterator by the given offset
 		constexpr FlatMapIterator &operator-=(int off) noexcept
 		{
 			Iterator::operator-=(off);
@@ -273,34 +279,38 @@ namespace ion::adaptors::iterators
 		}
 
 
-		//Returns the difference (distance) between this and the given iterator
+		///@brief Returns the difference (distance) between this and the given iterator
 		[[nodiscard]] constexpr difference_type operator-(const FlatMapIterator &rhs) const noexcept
 		{
 			return Iterator::operator-(rhs);
 		}
 
+		///@}
 
-		/*
-			Observers
+		/**
+			@name Observers
+			@{
 		*/
 
-		//Returns the dereferenced underlying value
+		///@brief Returns the dereferenced underlying value
 		[[nodiscard]] constexpr reference operator*() const noexcept
 		{
 			return reinterpret_cast<reference>(Iterator::operator*());
 		}
 
-		//Returns a pointer to the dereferenced underlying value
+		///@brief Returns a pointer to the dereferenced underlying value
 		[[nodiscard]] constexpr pointer operator->() const noexcept
 		{
 			return &**this;
 		}
 
-		//Returns the dereferenced underlying value at the given offset
+		///@brief Returns the dereferenced underlying value at the given offset
 		[[nodiscard]] constexpr reference operator[](difference_type off) const noexcept
 		{
 			return reinterpret_cast<reference>(Iterator::operator[](off));
 		}
+
+		///@}
 	};
 } //ion::adaptors::iterators
 
