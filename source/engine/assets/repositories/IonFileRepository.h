@@ -107,7 +107,7 @@ namespace ion::assets::repositories
 	} //file_repository
 
 
-	//A repository base class for storing physical files, files within a data file and supported file extensions
+	///@brief A repository base class for storing physical files, files within a data file and supported file extensions
 	class FileRepository
 	{
 		private:
@@ -119,176 +119,197 @@ namespace ion::assets::repositories
 
 		public:
 
-			//Default construct a repository
-			//Naming convention is set to file path
+			///@brief Default construct a repository
+			///@details Naming convention is set to file path
 			FileRepository() = default;
 
-			//Constructs a repository with the given naming convention
+			///@brief Constructs a repository with the given naming convention
 			FileRepository(file_repository::NamingConvention naming_convention) noexcept;
 
-			//Constructs a repository with the given file extensions
-			//Naming convention is set to file path
+			///@brief Constructs a repository with the given file extensions
+			///@details Naming convention is set to file path
 			FileRepository(Strings file_extensions) noexcept;
 
-			//Constructs a repository with the given naming convention and file extensions
+			///@brief Constructs a repository with the given naming convention and file extensions
 			FileRepository(file_repository::NamingConvention naming_convention, Strings file_extensions) noexcept;
 
 
-			/*
-				Files
+			/**
+				@name Files
+				@{
 			*/
 
-			//Returns the file entry that is stored in this repository with the given name
+			///@brief Returns the file entry that is stored in this repository with the given name
 			[[nodiscard]] std::optional<file_repository::FileEntry> File(std::string_view name) const noexcept;
 
-			//Returns the file data that is stored in this repository with the given name
+			///@brief Returns the file data that is stored in this repository with the given name
 			[[nodiscard]] std::optional<std::string> FileData(std::string_view name) const noexcept;
 
-			//Returns the file path that is stored in this repository with the given name
+			///@brief Returns the file path that is stored in this repository with the given name
 			[[nodiscard]] std::optional<std::filesystem::path> FilePath(std::string_view name) const noexcept;
 
+			///@}
 
-			/*
-				File extensions
+			/**
+				@name File extensions
+				@{
 			*/
 
-			//Returns whether the given file extension was found in this repository
+			///@brief Returns whether the given file extension was found in this repository
 			[[nodiscard]] bool HasFileExtension(std::string_view file_extension) const noexcept;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all files in this repository
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all files in this repository
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Files() noexcept
 			{
 				return files_.Elements();
 			}
 
-			//Returns an immutable range of all files in this repository
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all files in this repository
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Files() const noexcept
 			{
 				return files_.Elements();
 			}
 
-			//Returns a mutable range of all files in this repository
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all files in this repository
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto FileExtensions() noexcept
 			{
 				return file_extensions_.Elements();
 			}
 
-			//Returns an immutable range of all files in this repository
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all files in this repository
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto FileExtensions() const noexcept
 			{
 				return file_extensions_.Elements();
 			}
 
+			///@}
 
-			/*
-				Adding directories
+			/**
+				@name Adding directories
+				@{
 			*/
 
-			//Adds all files from the given directory path
-			//Files are added either recursively or non-recursively from the path
-			//Files are filtered against added file extensions
+			///@brief Adds all files from the given directory path
+			///@details Files are added either recursively or non-recursively from the path.
+			///Files are filtered against added file extensions
 			bool AddDirectory(const std::filesystem::path &directory_path,
 				utilities::file::DirectoryIteration directory_iteration = utilities::file::DirectoryIteration::NonRecursive);
 
-			//Adds all files from each given directory paths
-			//Files are added either recursively or non-recursively from each path
-			//Files are filtered against added file extensions
+			///@brief Adds all files from each given directory paths
+			///@details Files are added either recursively or non-recursively from each path.
+			///Files are filtered against added file extensions
 			bool AddDirectories(const utilities::file::Paths &directory_paths,
 				utilities::file::DirectoryIteration directory_iteration = utilities::file::DirectoryIteration::NonRecursive);
 
+			///@}
 			
-			/*
-				Adding files
+			/**
+				@name Adding files
+				@{
 			*/
 			
-			//Adds a file from the given file path
-			//File is not filtered against added file extensions
+			///@brief Adds a file from the given file path
+			///@details File is not filtered against added file extensions
 			bool AddFile(std::filesystem::path file_path);
 
-			//Adds a file from the given file entry
-			//File is not filtered against added file extensions
+			///@brief Adds a file from the given file entry
+			///@details File is not filtered against added file extensions
 			bool AddFile(file_repository::FileEntry file);
 
-			//Adds a file from each of the given file paths
-			//Files are not filtered against added file extensions
+			///@brief Adds a file from each of the given file paths
+			///@details Files are not filtered against added file extensions
 			bool AddFiles(utilities::file::Paths file_paths);
 
-			//Adds a file from each of the given file entries
-			//Files are not filtered against added file extensions
+			///@brief Adds a file from each of the given file entries
+			///@details Files are not filtered against added file extensions
 			bool AddFiles(std::vector<file_repository::FileEntry> files);
 
+			///@}
 
-			/*
-				Adding file extensions
+			/**
+				@name Adding file extensions
+				@{
 			*/
 			
-			//Adds the given file extension
-			//Remember that all file extensions should be prefixed with a dot
+			///@brief Adds the given file extension
+			///@details Remember that all file extensions should be prefixed with a dot
 			bool AddFileExtension(std::string file_extension);
 
-			//Adds all given file extensions
-			//Remember that all file extensions should be prefixed with a dot
+			///@brief Adds all given file extensions
+			///@details Remember that all file extensions should be prefixed with a dot
 			bool AddFileExtensions(Strings file_extensions);
 
+			///@}
 
-			/*
-				Clearing
+			/**
+				@name Clearing
+				@{
 			*/
 
-			//Removes all files and file extensions
+			///@brief Removes all files and file extensions
 			void Clear() noexcept;
 
-			//Removes all files
+			///@brief Removes all files
 			void ClearFiles() noexcept;
 
-			//Removes all file extensions
+			///@brief Removes all file extensions
 			void ClearFileExtensions() noexcept;
 
+			///@}
 
-			/*
-				Removing directories
+			/**
+				@name Removing directories
+				@{
 			*/
 
-			//Removes all files that are contained inside the given directory path
-			//Files are removed either recursively or non-recursively from the path
+			///@brief Removes all files that are contained inside the given directory path
+			///@details Files are removed either recursively or non-recursively from the path
 			bool RemoveDirectory(const std::filesystem::path &directory_path,
 				utilities::file::DirectoryIteration directory_iteration = utilities::file::DirectoryIteration::NonRecursive) noexcept;
 
-			//Removes all files that are contained inside each given directory paths
-			//Files are removed either recursively or non-recursively from the path
+			///@brief Removes all files that are contained inside each given directory paths
+			///@details Files are removed either recursively or non-recursively from the path
 			bool RemoveDirectories(const utilities::file::Paths &directory_paths,
 				utilities::file::DirectoryIteration directory_iteration = utilities::file::DirectoryIteration::NonRecursive) noexcept;
 
+			///@}
 
-			/*
-				Removing files
+			/**
+				@name Removing files
+				@{
 			*/
 
-			//Removes a file from the given file path
+			///@brief Removes a file from the given file path
 			bool RemoveFile(const std::filesystem::path &file_path) noexcept;
 
-			//Removes a file from each of the given file paths
+			///@brief Removes a file from each of the given file paths
 			bool RemoveFiles(const utilities::file::Paths &file_paths) noexcept;
 
+			///@}
 
-			/*
-				Removing extensions
+			/**
+				@name Removing extensions
+				@{
 			*/
 
-			//Removes the given file extension
+			///@brief Removes the given file extension
 			bool RemoveFileExtension(std::string_view file_extension) noexcept;
 
-			//Removes all given file extensions
+			///@brief Removes all given file extensions
 			bool RemoveFileExtensions(const std::vector<std::string_view> &file_extensions) noexcept;
+
+			///@}
 	};
 } //ion::assets::repositories
 

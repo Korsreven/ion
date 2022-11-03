@@ -90,9 +90,9 @@ namespace ion::assets
 	} //asset_loader
 
 
-	//A class that loads and categorizes assets into all attached repositories
-	//Files are automatically stored in the repositories that supports the given file extension
-	//All files stored in the attached repositories can also be compiled into a single data file
+	///@brief A class that loads and categorizes assets into all attached repositories
+	///@details Files are automatically stored in the repositories that supports the given file extension.
+	///All files stored in the attached repositories can also be compiled into a single data file
 	class AssetLoader final
 	{
 		private:
@@ -106,139 +106,160 @@ namespace ion::assets
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			AssetLoader() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			AssetLoader(const AssetLoader&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			AssetLoader(AssetLoader&&) = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			AssetLoader& operator=(const AssetLoader&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			AssetLoader& operator=(AssetLoader&&) = default;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the data file extension to the given extension
+			///@brief Sets the data file extension to the given extension
 			inline void DataFileExtension(std::string data_file_extension) noexcept
 			{
 				data_file_extension_ = std::move(data_file_extension);
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the data file extension for this loader
+			///@brief Returns the data file extension for this loader
 			[[nodiscard]] inline auto& DataFileExtension() const noexcept
 			{
 				return data_file_extension_;
 			}
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all repositories attached to this loader
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all repositories attached to this loader
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Repositories() noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<asset_loader::detail::container_type&>{repositories_};
 			}
 
-			//Returns an immutable range of all repositories attached to this loader
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all repositories attached to this loader
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Repositories() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const asset_loader::detail::container_type&>{repositories_};
 			}
 
+			///@}
 
-			/*
-				Attaching
+			/**
+				@name Attaching
+				@{
 			*/
 
-			//Attaches a repository to this loader
+			///@brief Attaches a repository to this loader
 			bool Attach(repositories::FileRepository &file_repository);
 
+			///@}
 
-			/*
-				Clearing
+			/**
+				@name Clearing
+				@{
 			*/
 
-			//Detaches all repositories from this loader
+			///@brief Detaches all repositories from this loader
 			void Clear() noexcept;
 
+			///@}
 
-			/*
-				Compiling
+			/**
+				@name Compiling
+				@{
 			*/
 
-			//Pulls files from each attached repository and compile them together as a data file
-			//If the total size of the compilation exceeds the file split size, the compilation is split into multiple data files
-			//When multiple data files are created, a numerical suffix is added to the file name
+			///@brief Pulls files from each attached repository and compile them together as a data file
+			///@details If the total size of the compilation exceeds the file split size, the compilation is split into multiple data files.
+			///When multiple data files are created, a numerical suffix is added to the file name
 			bool CompileDataFile(std::filesystem::path data_file_path,
 				asset_loader::FileSplitSize file_split_size = asset_loader::FileSplitSize::Max4GB) const noexcept;
 
+			///@}
 
-			/*
-				Detaching
+			/**
+				@name Detaching
+				@{
 			*/
 
-			//Detaches a repository from this loader
+			///@brief Detaches a repository from this loader
 			bool Detach(repositories::FileRepository &file_repository) noexcept;
 
+			///@}
 
-			/*
-				Loading directories
+			/**
+				@name Loading directories
+				@{
 			*/
 
-			//Loads all files from the given directory path into the attached repositories
-			//Files are added either recursively or non-recursively from the path
-			//Files are added to one or more repositories with the supported file extension
+			///@brief Loads all files from the given directory path into the attached repositories
+			///@details Files are added either recursively or non-recursively from the path.
+			///Files are added to one or more repositories with the supported file extension
 			bool LoadDirectory(const std::filesystem::path &directory_path,
 				utilities::file::DirectoryIteration directory_iteration = utilities::file::DirectoryIteration::NonRecursive);
 
-			//Loads all files from each given directory paths into the attached repositories
-			//Files are added either recursively or non-recursively from each path
-			//Files are added to one or more repositories with the supported file extension
+			///@brief Loads all files from each given directory paths into the attached repositories
+			///@details Files are added either recursively or non-recursively from each path.
+			///Files are added to one or more repositories with the supported file extension
 			bool LoadDirectories(const utilities::file::Paths &directory_paths,
 				utilities::file::DirectoryIteration directory_iteration = utilities::file::DirectoryIteration::NonRecursive);
 
+			///@}
 
-			/*
-				Loading files
+			/**
+				@name Loading files
+				@{
 			*/
 
-			//Loads a file with the given file path into the attached repositories
-			//File is added to one or more repositories with the supported file extension
+			///@brief Loads a file with the given file path into the attached repositories
+			///@details File is added to one or more repositories with the supported file extension
 			bool LoadFile(const std::filesystem::path &file_path);
 
-			//Loads a file with the given file entry into the attached repositories
-			//File is added to one or more repositories with the supported file extension
+			///@brief Loads a file with the given file entry into the attached repositories
+			///@details File is added to one or more repositories with the supported file extension
 			bool LoadFile(repositories::file_repository::FileEntry file);
 
-			//Loads a file from each of the given file paths into the attached repositories
-			//Each file is added to one or more repositories with the supported file extension
+			///@brief Loads a file from each of the given file paths into the attached repositories
+			///@details Each file is added to one or more repositories with the supported file extension
 			bool LoadFiles(const utilities::file::Paths &file_paths);
 
-			//Loads a file from each of the given file entries into the attached repositories
-			//Each file is added to one or more repositories with the supported file extension
+			///@brief Loads a file from each of the given file entries into the attached repositories
+			///@details Each file is added to one or more repositories with the supported file extension
 			bool LoadFiles(const std::vector<repositories::file_repository::FileEntry> &files);
+
+			///@}
 	};
 } //ion::assets
 

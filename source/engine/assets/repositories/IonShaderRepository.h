@@ -26,14 +26,14 @@ namespace ion::assets::repositories
 	} //shader_repository::detail
 
 
-	//A repository class for categorizing and storing all supported shader files
+	///@brief A repository class for categorizing and storing all supported shader files
 	struct ShaderRepository : FileRepository
 	{
-		//Default construct a shader repository
-		//Naming convention is set to file path
+		///@brief Default construct a shader repository
+		///@details Naming convention is set to file path
 		ShaderRepository() noexcept;
 
-		//Constructs a shader repository with the given naming convention
+		///@brief Constructs a shader repository with the given naming convention
 		ShaderRepository(file_repository::NamingConvention naming_convention) noexcept;
 	};
 } //ion::assets::repositories

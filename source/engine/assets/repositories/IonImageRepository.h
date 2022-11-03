@@ -27,14 +27,14 @@ namespace ion::assets::repositories
 	} //image_repository::detail
 
 
-	//A repository class for categorizing and storing all supported image files
+	///@brief A repository class for categorizing and storing all supported image files
 	struct ImageRepository : FileRepository
 	{
-		//Default construct an image repository
-		//Naming convention is set to file path
+		///@brief Default construct an image repository
+		///@details Naming convention is set to file path
 		ImageRepository() noexcept;
 
-		//Constructs an image repository with the given naming convention
+		///@brief Constructs an image repository with the given naming convention
 		ImageRepository(file_repository::NamingConvention naming_convention) noexcept;
 	};
 } //ion::assets::repositories

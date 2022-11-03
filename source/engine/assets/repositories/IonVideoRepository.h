@@ -26,14 +26,14 @@ namespace ion::assets::repositories
 	} //video_repository::detail
 
 
-	//A repository class for categorizing and storing all supported video files
+	///@brief A repository class for categorizing and storing all supported video files
 	struct VideoRepository : FileRepository
 	{
-		//Default construct a video repository
-		//Naming convention is set to file path
+		///@brief Default construct a video repository
+		///@details Naming convention is set to file path
 		VideoRepository() noexcept;
 
-		//Constructs a video repository with the given naming convention
+		///@brief Constructs a video repository with the given naming convention
 		VideoRepository(file_repository::NamingConvention naming_convention) noexcept;
 	};
 } //ion::assets::repositories
