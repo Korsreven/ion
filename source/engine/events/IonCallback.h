@@ -32,8 +32,8 @@ namespace ion::events
 	} //callback::detail
 
 
-	//A class representing a callback that matches the given signature
-	//A callback is anything invocable, like a free function, member function, lambda or an object with a call operator
+	///@brief A class representing a callback that matches the given signature
+	///@details A callback is anything invocable, like a free function, member function, lambda or an object with a call operator
 	template <typename Ret = void, typename... Args>
 	class Callback
 	{
@@ -47,14 +47,17 @@ namespace ion::events
 
 		public:
 
+			///@brief Default constructor
 			Callback() = default;
 
+			///@brief Default constructor
 			Callback(functor_type functor) noexcept :
 				functor_(std::move(functor))
 			{
 				//Empty
 			}
 
+			///@brief Constructs a callback with the given callable
 			template <typename Callable>
 			Callback(Callable callable) noexcept :
 				functor_(callable)
@@ -62,6 +65,7 @@ namespace ion::events
 				static_assert(std::is_invocable_v<Callable, Args...>);
 			}
 			
+			///@brief Constructs a callback with the given callable and caller
 			template <typename Callable, typename Caller>
 			Callback(Callable callable, Caller *const caller) noexcept :
 				functor_(callback::detail::bind(callable, caller))
@@ -70,6 +74,7 @@ namespace ion::events
 				assert(caller != nullptr);
 			}
 
+			///@brief Constructs a callback with the given callable and caller
 			template <typename Callable, typename Caller>
 			Callback(Callable callable, Caller &caller) noexcept :
 				functor_(callback::detail::bind(callable, &caller))
@@ -78,15 +83,18 @@ namespace ion::events
 			}
 
 
-			/*
-				Function call operator
+			/**
+				@name Function call operator
+				@{
 			*/
 
-			//Calls the callback with the given arguments
+			///@brief Calls the callback with the given arguments
 			inline auto operator()(Args ...args) const noexcept
 			{
 				return functor_(std::forward<Args>(args)...);
 			}
+
+			///@}
 	};
 } //ion::events
 

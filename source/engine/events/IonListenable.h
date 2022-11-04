@@ -30,7 +30,7 @@ namespace ion::events
 	} //listenable::detail
 
 
-	//A base class representing something that can be listened to by a listener
+	///@brief A base class representing something that can be listened to by a listener
 	//Listenables can be subscribed to by listeners, to send events
 	template <typename T>
 	class Listenable : protected EventGenerator<T>
@@ -47,8 +47,9 @@ namespace ion::events
 
 		protected:
 
-			/*
-				Notifying
+			/**
+				@name Notifying
+				@{
 			*/
 
 			auto NotifySubscribable(T &listener) noexcept
@@ -95,9 +96,11 @@ namespace ion::events
 					NotifySubscriberMoved(*listener);
 			}
 
+			///@}
 
-			/*
-				Clearing
+			/**
+				@name Clearing
+				@{
 			*/
 
 			void Tidy() noexcept
@@ -108,36 +111,39 @@ namespace ion::events
 				NotifyUnsubscribedAll(listeners);
 			}
 
+			///@}
+
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			Listenable() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			Listenable(const Listenable&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			Listenable(Listenable &&rhs) noexcept :
 				listeners_{std::move(rhs.listeners_)}
 			{
 				NotifySubscriberMovedAll(listeners_);
 			}
 
-			//Destructor
+			///@brief Destructor
 			~Listenable() noexcept
 			{
 				Tidy();
 			}
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			Listenable& operator=(const Listenable&) = delete;
 
-			//Move assignment
+			///@brief Move assignment
 			inline auto& operator=(Listenable &&rhs) noexcept
 			{
 				if (this != &rhs)
@@ -150,31 +156,35 @@ namespace ion::events
 				return *this;
 			}
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all listeners subscribed to this listener listenable
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all listeners subscribed to this listener listenable
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Listeners() noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<listenable::detail::container_type<T>&>{listeners_};
 			}
 
-			//Returns an immutable range of all listeners subscribed to this listener listenable
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all listeners subscribed to this listener listenable
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Listeners() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const listenable::detail::container_type<T>&>{listeners_};
 			}
 
+			///@}
 
-			/*
-				Subscribing
+			/**
+				@name Subscribing
+				@{
 			*/
 
-			//Subscribes a subscribable listener to this listenable
+			///@brief Subscribes a subscribable listener to this listenable
 			auto Subscribe(T &listener)
 			{
 				auto iter =
@@ -196,12 +206,14 @@ namespace ion::events
 					return false;
 			}
 
+			///@}
 
-			/*
-				Unsubscribing
+			/**
+				@name Unsubscribing
+				@{
 			*/
 
-			//Unsubscribes a unsubscribable listener from this listenable
+			///@brief Unsubscribes a unsubscribable listener from this listenable
 			auto Unsubscribe(T &listener) noexcept
 			{
 				auto iter =
@@ -223,7 +235,7 @@ namespace ion::events
 					return false;
 			}
 
-			//Unsubscribes all unsubscribable listeners from this listenable
+			///@brief Unsubscribes all unsubscribable listeners from this listenable
 			void UnsubscribeAll() noexcept
 			{
 				//[listeners to keep, listeners to unsubscribe]
@@ -240,6 +252,8 @@ namespace ion::events
 				listeners_.shrink_to_fit();
 				NotifyUnsubscribedAll(listeners);
 			}
+
+			///@}
 	};
 } //ion::events
 

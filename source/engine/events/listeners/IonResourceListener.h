@@ -18,45 +18,48 @@ File:	IonResourceListener.h
 
 namespace ion::events::listeners
 {
-	//A class representing a listener that listens to resource events
+	///@brief A class representing a listener that listens to resource events
 	template <typename ResourceT, typename OwnerT, typename ListenerT = void>
 	struct ResourceListener :
 		ManagedObjectListener<ResourceT, OwnerT, std::conditional_t<std::is_same_v<ListenerT, void>, ResourceListener<ResourceT, OwnerT>, ListenerT>>
 	{
-		/*
-			Events
+		/**
+			@name Events
+			@{
 		*/
 
-		//Called right after a resource has been prepared, with a reference to the resource
+		///@brief Called right after a resource has been prepared, with a reference to the resource
 		virtual void ResourcePrepared([[maybe_unused]] ResourceT &resource) noexcept
 		{
 			//Optional to override
 		}
 
-		//Called right after a resource has been loaded, with a reference to the resource
+		///@brief Called right after a resource has been loaded, with a reference to the resource
 		virtual void ResourceLoaded([[maybe_unused]] ResourceT &resource) noexcept
 		{
 			//Optional to override
 		}
 
-		//Called right after a resource has been unloaded, with a reference to the resource
+		///@brief Called right after a resource has been unloaded, with a reference to the resource
 		virtual void ResourceUnloaded([[maybe_unused]] ResourceT &resource) noexcept
 		{
 			//Optional to override
 		}
 
-		//Called right after a resource has failed preparing/loading, with a reference to the resource
+		///@brief Called right after a resource has failed preparing/loading, with a reference to the resource
 		virtual void ResourceFailed([[maybe_unused]] ResourceT &resource) noexcept
 		{
 			//Optional to override
 		}
 
 
-		//Called right after a resource has its loading state changed, with a reference to the resource
+		///@brief Called right after a resource has its loading state changed, with a reference to the resource
 		virtual void ResourceLoadingStateChanged([[maybe_unused]] ResourceT &resource) noexcept
 		{
 			//Optional to override
 		}
+
+		///@}
 	};
 } //ion::events::listeners
 

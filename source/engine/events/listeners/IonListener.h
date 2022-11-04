@@ -23,9 +23,9 @@ namespace ion::events
 
 namespace ion::events::listeners
 {
-	//A base class representing something that can listen to a listenable
-	//Listeners can be subscribe to listenables, to receive events
-	//When not listening, no events will be received
+	///@brief A base class representing something that can listen to a listenable
+	///@details Listeners can be subscribe to listenables, to receive events.
+	///When not listening, no events will be received
 	template <typename T>
 	class Listener
 	{
@@ -36,68 +36,75 @@ namespace ion::events::listeners
 		public:
 
 			/*
-				Modifiers
+				@name Modifiers
+				@{
 			*/
 
-			//Sets if this listener is listening or not
+			///@brief Sets if this listener is listening or not
 			inline void Listening(bool listening) noexcept
 			{
 				listening_ = listening;
 			}
 
+			///@}
 
 			/*
-				Observers
+				@name Observers
+				@{
 			*/
 
-			//Returns if this listener is listening or not
-			//If not listening, this listener will not receive any events
+			///@brief Returns if this listener is listening or not
+			///@details If not listening, this listener will not receive any events
 			[[nodiscard]] inline auto Listening() const noexcept
 			{
 				return listening_;
 			}
 
+			///@}
 
 			/*
-				Events
+				@name Events
+				@{
 			*/
 
-			//Called right before this listener is subscribed, with a reference to the listenable
-			//Returns false from this function if the subscription should be canceled
+			///@brief Called right before this listener is subscribed, with a reference to the listenable
+			///@details Returns false from this function if the subscription should be canceled
 			virtual bool Subscribable([[maybe_unused]] Listenable<T> &listenable) noexcept
 			{
 				//Optional to override
 				return true;
 			}
 
-			//Called right after this listener has been subscribed, with a reference to the listenable
+			///@brief Called right after this listener has been subscribed, with a reference to the listenable
 			virtual void Subscribed([[maybe_unused]] Listenable<T> &listenable) noexcept
 			{
 				//Optional to override
 			}
 
 
-			//Called right before this listener is unsubscribed, with a reference to the listenable
-			//Returns false from this function if the unsubscription should be canceled
+			///@brief Called right before this listener is unsubscribed, with a reference to the listenable
+			///@details Returns false from this function if the unsubscription should be canceled
 			virtual bool Unsubscribable([[maybe_unused]] Listenable<T> &listenable) noexcept
 			{
 				//Optional to override
 				return true;
 			}
 
-			//Called right after this listener has been unsubscribed, with a reference to the listenable
+			///@brief Called right after this listener has been unsubscribed, with a reference to the listenable
 			virtual void Unsubscribed([[maybe_unused]] Listenable<T> &listenable) noexcept
 			{
 				//Optional to override
 			}
 
 
-			//Called right after this subscriber has been moved, with a reference to the new listenable
-			//A subscriber is a listener that has an active subscription
+			///@brief Called right after this subscriber has been moved, with a reference to the new listenable
+			///@details A subscriber is a listener that has an active subscription
 			virtual void SubscriberMoved([[maybe_unused]] Listenable<T> &listenable) noexcept
 			{
 				//Optional to override
 			}
+
+			///@}
 	};
 } //ion::events::listeners
 

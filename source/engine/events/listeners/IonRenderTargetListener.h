@@ -18,18 +18,21 @@ File:	IonRenderTargetListener.h
 
 namespace ion::events::listeners
 {
-	//A class representing a listener that listens to render target events
+	///@brief A class representing a listener that listens to render target events
 	struct RenderTargetListener : Listener<RenderTargetListener>
 	{
-		/*
-			Events
+		/**
+			@name Events
+			@{
 		*/
 
-		//Called when a render target has been resized, with the new size
+		///@brief Called when a render target has been resized, with the new size
 		virtual void RenderTargetResized([[maybe_unused]] graphics::utilities::Vector2 size) noexcept
 		{
 			//Optional to override
 		}
+
+		///@}
 	};
 } //ion::events::listeners
 

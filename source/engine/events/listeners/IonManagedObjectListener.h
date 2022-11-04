@@ -18,42 +18,45 @@ File:	IonManagedObjectListener.h
 
 namespace ion::events::listeners
 {
-	//A class representing a listener that listens to managed object events
+	///@brief A class representing a listener that listens to managed object events
 	template <typename ObjectT, typename OwnerT, typename ListenerT = void>
 	struct ManagedObjectListener :
 		Listener<std::conditional_t<std::is_same_v<ListenerT, void>, ManagedObjectListener<ObjectT, OwnerT>, ListenerT>>
 	{
-		/*
-			Events
+		/**
+			@name Events
+			@{
 		*/
 
-		//Called right after an object has been created or adopted, with a reference to the object
+		///@brief Called right after an object has been created or adopted, with a reference to the object
 		virtual void ObjectCreated([[maybe_unused]] ObjectT &object) noexcept
 		{
 			//Optional to override
 		}
 
-		//Called right before an object is removed or orphaned, with a reference to the object
-		//Returns false from this function if the removal should be canceled
+		///@brief Called right before an object is removed or orphaned, with a reference to the object
+		///@details Returns false from this function if the removal should be canceled
 		virtual bool ObjectRemovable([[maybe_unused]] ObjectT &object) noexcept
 		{
 			//Optional to override
 			return true;
 		}
 
-		//Called right after an object has been removed or orphaned, with a reference to the object
+		///@brief Called right after an object has been removed or orphaned, with a reference to the object
 		virtual void ObjectRemoved([[maybe_unused]] ObjectT &object) noexcept
 		{
 			//Optional to override
 		}
 
 
-		//Called right after a held object has been moved, with a reference to the new owner
-		//A held object is an object that is currently being managed by an owner
+		///@brief Called right after a held object has been moved, with a reference to the new owner
+		///@details A held object is an object that is currently being managed by an owner
 		virtual void ObjectMoved([[maybe_unused]] OwnerT &owner) noexcept
 		{
 			//Optional to override
 		}
+
+		///@}
 	};
 } //ion::events::listeners
 

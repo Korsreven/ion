@@ -26,8 +26,8 @@ namespace ion::events
 	} //recurring_callback::detail
 
 
-	//A class representing a recurring callback, meaning it's called repeatedly when running
-	//A callback is anything invocable, like a free function, member function, lambda or an object with a call operator
+	///@brief A class representing a recurring callback, meaning it's called repeatedly when running
+	///@details A callback is anything invocable, like a free function, member function, lambda or an object with a call operator
 	class RecurringCallback : public Callback<bool>
 		//Restrict recurring callbacks to no parameters and bool return type
 	{
@@ -52,65 +52,74 @@ namespace ion::events
 
 			using Callback<bool>::Callback;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			RecurringCallback(const RecurringCallback&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			RecurringCallback(RecurringCallback&&) = default;
 
-			//Destructor
+			///@brief Destructor
 			~RecurringCallback() noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			RecurringCallback& operator=(const RecurringCallback&) = delete;
 
-			//Move assignment
+			///@brief Move assignment
 			RecurringCallback& operator=(RecurringCallback&&) = default;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns true if this recurring callback is running
-			//The recurring callback could be running even if suspended
+			///@brief Returns true if this recurring callback is running
+			///@details The recurring callback could be running even if suspended
 			[[nodiscard]] inline auto IsRunning() const noexcept
 			{
 				return running_ || thread_.joinable();
 			}
 
-			//Returns true if this recurring callback is suspended
+			///@brief Returns true if this recurring callback is suspended
 			[[nodiscard]] inline auto IsSuspended() const noexcept
 			{
 				return suspend_ == SuspendState::Suspended;
 			}
 
+			///@}
 
-			/*
-				Starting / stopping
+			/**
+				@name Starting / stopping
+				@{
 			*/
 
-			//Starts the recurring callback
+			///@brief Starts the recurring callback
 			void Start() noexcept;
 
-			//Stops the recurring callback
+			///@brief Stops the recurring callback
 			void Stop() noexcept;
 
+			///@}
 
-			/*
-				Suspending / continuing
+			/**
+				@name Suspending / continuing
+				@{
 			*/
 
-			//Continues the recurring callback
+			///@brief Continues the recurring callback
 			void Continue() noexcept;
 
-			//Suspends the recurring callback
+			///@brief Suspends the recurring callback
 			void Suspend() noexcept;
+
+			///@}
 	};
 } //ion::events
 

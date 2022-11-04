@@ -148,26 +148,29 @@ namespace ion::events::listeners
 	};
 
 
-	//A class representing a listener that listens to key events
+	///@brief A class representing a listener that listens to key events
 	struct KeyListener : Listener<KeyListener>
 	{
-		/*
-			Events
+		/**
+			@name Events
+			@{
 		*/
 
-		//Called when a key button is pressed, with the button that was pressed
+		///@brief Called when a key button is pressed, with the button that was pressed
 		virtual void KeyPressed(KeyButton button) noexcept = 0;
 
-		//Called when a key is released, with the button that was released
+		///@brief Called when a key is released, with the button that was released
 		virtual void KeyReleased(KeyButton button) noexcept = 0;
 
 
-		//Called when a character is pressed, with the character that was pressed
-		//This function is called repeatedly if the button is held down
+		///@brief Called when a character is pressed, with the character that was pressed
+		///@details This function is called repeatedly if the button is held down
 		virtual void CharacterPressed([[maybe_unused]] char character) noexcept
 		{
 			//Optional to override
 		}
+
+		///@}
 	};
 } //ion::events::listeners
 

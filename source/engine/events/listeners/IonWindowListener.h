@@ -35,27 +35,30 @@ namespace ion::events::listeners
 	};
 
 
-	//A class representing a listener that listens to window events
+	///@brief A class representing a listener that listens to window events
 	struct WindowListener : Listener<WindowListener>
 	{
-		/*
-			Events
+		/**
+			@name Events
+			@{
 		*/
 
-		//Called when a window action has been received, with the action that was sent
+		///@brief Called when a window action has been received, with the action that was sent
 		virtual void WindowActionReceived(WindowAction action) noexcept = 0;
 
-		//Called when a window has been resized, with the new size
+		///@brief Called when a window has been resized, with the new size
 		virtual void WindowResized([[maybe_unused]] graphics::utilities::Vector2 size) noexcept
 		{
 			//Optional to override
 		}
 
-		//Called when a window has been moved, with the new position
+		///@brief Called when a window has been moved, with the new position
 		virtual void WindowMoved([[maybe_unused]] graphics::utilities::Vector2 position) noexcept
 		{
 			//Optional to override
 		}
+
+		///@}
 	};
 } //ion::events::listeners
 

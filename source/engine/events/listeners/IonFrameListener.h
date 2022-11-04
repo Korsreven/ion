@@ -18,20 +18,23 @@ File:	IonFrameListener.h
 
 namespace ion::events::listeners
 {
-	//A class representing a listener that listens to frame events
+	///@brief A class representing a listener that listens to frame events
 	struct FrameListener : Listener<FrameListener>
 	{
-		/*
+		/**
 			Events
+			@{
 		*/
 
-		//Called when a frame is about to begin rendering, with elapsed time in seconds since the last frame
-		//Returns true to continue rendering, or false to drop out of the rendering loop
+		///@brief Called when a frame is about to begin rendering, with elapsed time in seconds since the last frame
+		///@details Returns true to continue rendering, or false to drop out of the rendering loop
 		virtual bool FrameStarted(duration time) noexcept = 0;
 		
-		//Called just after a frame has been rendered, with elapsed time in seconds since the last frame
-		//Returns true to continue rendering, or false to drop out of the rendering loop
+		///@brief Called just after a frame has been rendered, with elapsed time in seconds since the last frame
+		///@details Returns true to continue rendering, or false to drop out of the rendering loop
 		virtual bool FrameEnded(duration time) noexcept = 0;
+
+		///@}
 	};
 } //ion::events::listeners
 

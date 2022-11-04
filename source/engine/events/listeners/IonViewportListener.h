@@ -24,24 +24,27 @@ namespace ion::graphics::render
 
 namespace ion::events::listeners
 {
-	//A class representing a listener that listens to viewport events
+	///@brief A class representing a listener that listens to viewport events
 	struct ViewportListener : ManagedObjectListener<graphics::render::Viewport, graphics::render::RenderTarget, ViewportListener>
 	{
-		/*
-			Events
+		/**
+			@name Events
+			@{
 		*/
 
-		//Called when a viewport has been resized, with the new size
+		///@brief Called when a viewport has been resized, with the new size
 		virtual void ViewportResized([[maybe_unused]] graphics::utilities::Vector2 size) noexcept
 		{
 			//Optional to override
 		}
 
-		//Called when a viewport has been moved, with the new position
+		///@brief Called when a viewport has been moved, with the new position
 		virtual void ViewportMoved([[maybe_unused]] graphics::utilities::Vector2 position) noexcept
 		{
 			//Optional to override
 		}
+
+		///@}
 	};
 } //ion::events::listeners
 

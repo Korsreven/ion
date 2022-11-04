@@ -23,18 +23,21 @@ namespace ion::graphics::scene::graph
 
 namespace ion::events::listeners
 {
-	//A class representing a listener that listens to scene node events
+	///@brief A class representing a listener that listens to scene node events
 	struct SceneNodeListener : Listener<SceneNodeListener>
 	{
-		/*
-			Events
+		/**
+			@name Events
+			@{
 		*/
 
-		//Called when a scene node is about to begin rendering, with a reference to the scene node
+		///@brief Called when a scene node is about to begin rendering, with a reference to the scene node
 		virtual void NodeRenderStarted(graphics::scene::graph::SceneNode &node) noexcept = 0;
 		
-		//Called just after a scene node has been rendered, with a reference to the scene node
+		///@brief Called just after a scene node has been rendered, with a reference to the scene node
 		virtual void NodeRenderEnded(graphics::scene::graph::SceneNode &node) noexcept = 0;
+
+		///@}
 	};
 } //ion::events::listeners
 

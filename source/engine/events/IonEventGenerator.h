@@ -74,12 +74,13 @@ namespace ion::events
 	} //event_generator::detail
 
 
-	//A class representing a generator that can notify one or more listeners about events
+	///@brief A class representing a generator that can notify one or more listeners about events
 	template <typename T>
 	struct EventGenerator
 	{
 		static_assert(std::is_base_of_v<listeners::Listener<T>, T>);
 
+		///@brief Notify listener by calling the given event with the given args
 		template <typename Event, typename... Args>
 		inline auto Notify(Event &&event, T &listener, Args &&...args) noexcept
 		{
@@ -87,6 +88,7 @@ namespace ion::events
 			return event_generator::detail::notify(std::forward<Event>(event), listener, std::forward<Args>(args)...);
 		}
 
+		///@brief Notify all listeners by calling the given event with the given args
 		template <typename Range, typename Event, typename... Args>
 		inline auto NotifyAll(Range &&listeners, Event &&event, Args &&...args) noexcept
 		{

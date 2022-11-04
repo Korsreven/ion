@@ -22,50 +22,53 @@ namespace ion::gui
 
 namespace ion::events::listeners
 {
-	//A class representing a listener that listens to events from a GUI frame
+	///@brief A class representing a listener that listens to events from a GUI frame
 	struct GuiFrameListener : Listener<GuiFrameListener>
 	{
-		/*
-			Events
+		/**
+			@name Events
+			@{
 		*/
 
-		//Called right after a gui frame has been enabled, with a mutable reference to the frame that was enabled
+		///@brief Called right after a gui frame has been enabled, with a mutable reference to the frame that was enabled
 		virtual void Enabled([[maybe_unused]] gui::GuiFrame &frame) noexcept
 		{
 			//Optional to override
 		}
 
-		//Called right after a gui frame has been disabled, with a mutable reference to the frame that was disabled
+		///@brief Called right after a gui frame has been disabled, with a mutable reference to the frame that was disabled
 		virtual void Disabled([[maybe_unused]] gui::GuiFrame &frame) noexcept
 		{
 			//Optional to override
 		}
 
 
-		//Called right after a gui frame has been activated, with a mutable reference to the frame that was activated
+		///@brief Called right after a gui frame has been activated, with a mutable reference to the frame that was activated
 		virtual void Activated([[maybe_unused]] gui::GuiFrame &frame) noexcept
 		{
 			//Optional to override
 		}
 
-		//Called right after a gui frame has been deactivated, with a mutable reference to the frame that was deactivated
+		///@brief Called right after a gui frame has been deactivated, with a mutable reference to the frame that was deactivated
 		virtual void Deactivated([[maybe_unused]] gui::GuiFrame &frame) noexcept
 		{
 			//Optional to override
 		}
 
 
-		//Called right after a gui frame has been focused, with a mutable reference to the frame that was focused
+		///@brief Called right after a gui frame has been focused, with a mutable reference to the frame that was focused
 		virtual void Focused([[maybe_unused]] gui::GuiFrame &frame) noexcept
 		{
 			//Optional to override
 		}
 
-		//Called right after a gui frame has been defocused, with a mutable reference to the frame that was defocused
+		///@brief Called right after a gui frame has been defocused, with a mutable reference to the frame that was defocused
 		virtual void Defocused([[maybe_unused]] gui::GuiFrame &frame) noexcept
 		{
 			//Optional to override
 		}
+
+		///@}
 	};
 } //ion::events::listeners
 

@@ -25,24 +25,27 @@ namespace ion::graphics::scene
 
 namespace ion::events::listeners
 {
-	//A class representing a listener that listens to camera events
+	///@brief A class representing a listener that listens to camera events
 	struct CameraListener : ManagedObjectListener<graphics::scene::Camera, graphics::scene::SceneManager, CameraListener>
 	{
-		/*
-			Events
+		/**
+			@name Events
+			@{
 		*/
 
-		//Called when a camera frustum has been changed, with the new frustum
+		///@brief Called when a camera frustum has been changed, with the new frustum
 		virtual void CameraFrustumChanged([[maybe_unused]] graphics::render::Frustum frustum) noexcept
 		{
 			//Optional to override
 		}
 
-		//Called when a camera has been repositioned, with the new position
+		///@brief Called when a camera has been repositioned, with the new position
 		virtual void CameraMoved([[maybe_unused]] graphics::utilities::Vector3 position) noexcept
 		{
 			//Optional to override
 		}
+
+		///@}
 	};
 } //ion::events::listeners
 
