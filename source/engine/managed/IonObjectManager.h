@@ -55,8 +55,8 @@ namespace ion::managed
 	} //object_manager::detail
 
 
-	//A non-templated base class for all object managers
-	//This class is needed to store different types of object managers in a single object register
+	///@brief A non-templated base class for all object managers
+	///@details This class is needed to store different types of object managers in a single object register
 	struct ObjectManagerBase
 	{
 		//Default virtual destructor
@@ -64,9 +64,9 @@ namespace ion::managed
 	};
 
 
-	//A class representing an owning manager that can create and store multiple objects of a single type
-	//The created objects can be of any type, but must be derived from managed object
-	//This class must be derived from to be able to create objects
+	///@brief A class representing an owning manager that can create and store multiple objects of a single type
+	///@details The created objects can be of any type, but must be derived from managed object.
+	///This class must be derived from to be able to create objects
 	template <typename ObjectT, typename OwnerT, typename ListenerT = events::listeners::ManagedObjectListener<ObjectT, OwnerT>>
 	class ObjectManager : virtual public ObjectManagerBase, public events::Listenable<ListenerT>
 	{
@@ -82,8 +82,9 @@ namespace ion::managed
 			object_manager::detail::container_type<ObjectT> objects_;
 
 
-			/*
-				Notifying
+			/**
+				@name Notifying
+				@{
 			*/
 
 			void NotifyCreated(ObjectT &object) noexcept
@@ -137,9 +138,11 @@ namespace ion::managed
 				}
 			}
 
+			///@}
 
-			/*
-				Creating
+			/**
+				@name Creating
+				@{
 			*/
 
 			template <typename T, typename... Args>
@@ -156,69 +159,74 @@ namespace ion::managed
 				return NonOwningPtr<ObjectT>{ptr};
 			}
 
+			///@}
+
 		protected:
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See ManagedObjectListener::ObjectCreated for more details
+			///@brief See ManagedObjectListener::ObjectCreated for more details
 			virtual void Created([[maybe_unused]] ObjectT &object) noexcept
 			{
 				//Optional to override
 			}
 
-			//See ManagedObjectListener::ObjectRemovable for more details
+			///@brief See ManagedObjectListener::ObjectRemovable for more details
 			virtual bool Removable([[maybe_unused]] ObjectT &object) noexcept
 			{
 				//Optional to override
 				return true;
 			}
 
-			//See ManagedObjectListener::ObjectRemoved for more details
+			///@brief See ManagedObjectListener::ObjectRemoved for more details
 			virtual void Removed([[maybe_unused]] ObjectT &object) noexcept
 			{
 				//Optional to override
 			}
 
-			//See ManagedObjectListener::ObjectMoved for more details
+			///@brief See ManagedObjectListener::ObjectMoved for more details
 			virtual void Moved([[maybe_unused]] ObjectT &object) noexcept
 			{
 				//Optional to override
 			}
 
 
-			//Called right before starting to create or adopt objects
+			///@brief Called right before starting to create or adopt objects
 			virtual void AdditionStarted() noexcept
 			{
 				//Optional to override
 			}
 
-			//Called right after objects has been created or adopted
+			///@brief Called right after objects has been created or adopted
 			virtual void AdditionEnded() noexcept
 			{
 				//Optional to override
 			}
 
 
-			//Called right before starting to remove or orphan objects
+			///@brief Called right before starting to remove or orphan objects
 			virtual void RemovalStarted() noexcept
 			{
 				//Optional to override
 			}
 
-			//Called right after objects has been removed or orphaned
+			///@brief Called right after objects has been removed or orphaned
 			virtual void RemovalEnded() noexcept
 			{
 				//Optional to override
 			}
 
+			///@}
 
-			/*
-				Creating
+			/**
+				@name Creating
+				@{
 			*/
 
-			//Creates an object with the given arguments
+			///@brief Creates an object with the given arguments
 			template <typename T = ObjectT, typename... Args,
 				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(Args &&...args)
@@ -226,7 +234,7 @@ namespace ion::managed
 				return Emplace<std::remove_cvref_t<T>>(std::forward<Args>(args)...);
 			}
 
-			//Creates an object with the given name and arguments
+			///@brief Creates an object with the given name and arguments
 			template <typename T = ObjectT, typename... Args,
 				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(std::string name, Args &&...args)
@@ -238,7 +246,7 @@ namespace ion::managed
 					return Emplace<std::remove_cvref_t<T>>(std::move(name), std::forward<Args>(args)...);
 			}
 
-			//Creates an object with the given name and arguments
+			///@brief Creates an object with the given name and arguments
 			template <typename T = ObjectT, typename... Args,
 				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(std::optional<std::string> name, Args &&...args)
@@ -254,7 +262,7 @@ namespace ion::managed
 				return Emplace<std::remove_cvref_t<T>>(std::move(name), std::forward<Args>(args)...);
 			}
 
-			//Creates an object by copying/moving the given object
+			///@brief Creates an object by copying/moving the given object
 			template <typename T,
 				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(T &&object)
@@ -270,9 +278,11 @@ namespace ion::managed
 				return Emplace<std::remove_cvref_t<T>>(std::forward<T>(object));
 			}
 
+			///@}
 
-			/*
-				Removing
+			/**
+				@name Removing
+				@{
 			*/
 
 			auto Extract(ObjectT &object) noexcept
@@ -344,15 +354,17 @@ namespace ion::managed
 				}
 			}
 
+			///@}
+
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			ObjectManager() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			ObjectManager(const ObjectManager&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			ObjectManager(ObjectManager &&rhs) noexcept :
 				events::Listenable<ListenerT>{std::move(rhs)},
 				objects_{std::move(rhs.objects_)}
@@ -360,21 +372,22 @@ namespace ion::managed
 				NotifyMovedAll(objects_);
 			}
 
-			//Virtual destructor
+			///@brief Virtual destructor
 			virtual ~ObjectManager() noexcept
 			{
 				Tidy();
 			}
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			ObjectManager& operator=(const ObjectManager&) = delete;
 
-			//Move assignment
+			///@brief Move assignment
 			inline auto& operator=(ObjectManager &&rhs) noexcept
 			{
 				events::Listenable<ListenerT>::operator=(std::move(rhs));
@@ -389,32 +402,36 @@ namespace ion::managed
 				return *this;
 			}
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all objects in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all objects in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Objects() noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<object_manager::detail::container_type<ObjectT>&>{objects_};
 			}
 
-			//Returns an immutable range of all objects in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all objects in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Objects() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const object_manager::detail::container_type<ObjectT>&>{objects_};
 			}
 
+			///@}
 
-			/*
-				Take / release ownership
+			/**
+				@name Take / release ownership
+				@{
 			*/
 
-			//Adopts (take ownership of) the given object and returns a pointer to the adopted object
-			//Returns nullptr if the object could not be adopted and object_ptr will remain untouched
+			///@brief Adopts (take ownership of) the given object and returns a pointer to the adopted object
+			///@details Returns nullptr if the object could not be adopted and object_ptr will remain untouched
 			auto Adopt(typename decltype(objects_)::value_type &object_ptr) noexcept
 			{
 				assert(object_ptr);
@@ -436,15 +453,15 @@ namespace ion::managed
 				return NonOwningPtr<ObjectT>{ptr};
 			}
 
-			//Adopts (take ownership of) the given object and returns a pointer to the adopted object
-			//Returns nullptr if the object could not be adopted and object_ptr will be released
+			///@brief Adopts (take ownership of) the given object and returns a pointer to the adopted object
+			///@details Returns nullptr if the object could not be adopted and object_ptr will be released
 			auto Adopt(typename decltype(objects_)::value_type &&object_ptr) noexcept
 			{	
 				return Adopt(object_ptr);
 			}
 
-			//Adopts (take ownership of) all the given objects
-			//If one or more objects could not be adopted, they will remain untouched in the given container
+			///@brief Adopts (take ownership of) all the given objects
+			///@details If one or more objects could not be adopted, they will remain untouched in the given container
 			void AdoptAll(typename decltype(objects_) &objects) noexcept
 			{
 				decltype(objects_) adoptable_objects;
@@ -480,16 +497,16 @@ namespace ion::managed
 				}
 			}
 
-			//Adopts (take ownership of) all the given objects
-			//If one or more objects could not be adopted, they will be released
+			///@brief Adopts (take ownership of) all the given objects
+			///@details If one or more objects could not be adopted, they will be released
 			void AdoptAll(typename decltype(objects_) &&objects) noexcept
 			{
 				AdoptAll(objects);
 			}
 
 
-			//Orphans (release ownership of) the given object
-			//Returns a pointer to the object released
+			///@brief Orphans (release ownership of) the given object
+			///@details Returns a pointer to the object released
 			[[nodiscard]] auto Orphan(ObjectT &object) noexcept
 			{
 				auto object_ptr = Extract(object);
@@ -501,8 +518,8 @@ namespace ion::managed
 				return object_ptr;
 			}
 
-			//Orphans (release ownership of) all objects in this manager
-			//Returns a pointer to the object released
+			///@brief Orphans (release ownership of) all objects in this manager
+			///@details Returns a pointer to the object released
 			[[nodiscard]] auto OrphanAll() noexcept
 			{
 				auto objects = ExtractAll();
@@ -514,45 +531,49 @@ namespace ion::managed
 				return objects;
 			}
 
+			///@}
 
-			/*
-				Retrieving
+			/**
+				@name Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable object with the given name
-			//Returns nullptr if object could not be found
+			///@brief Gets a pointer to a mutable object with the given name
+			///@details Returns nullptr if object could not be found
 			[[nodiscard]] auto Get(std::string_view name) noexcept
 			{
 				return object_manager::detail::get_object_by_name(name, objects_);
 			}
 
-			//Gets a pointer to an immutable object with the given name
-			//Returns nullptr if object could not be found
+			///@brief Gets a pointer to an immutable object with the given name
+			///@details Returns nullptr if object could not be found
 			[[nodiscard]] auto Get(std::string_view name) const noexcept
 				-> NonOwningPtr<const ObjectT>
 			{
 				return object_manager::detail::get_object_by_name(name, objects_);
 			}
 
+			///@}
 
-			/*
-				Removing
+			/**
+				@name Removing
+				@{
 			*/
 
-			//Clears all removable objects from this manager
+			///@brief Clears all removable objects from this manager
 			void Clear() noexcept
 			{
 				ExtractAll();
 			}
 
-			//Removes a removable object from this manager
+			///@brief Removes a removable object from this manager
 			auto Remove(ObjectT &object) noexcept
 			{
 				auto ptr = Extract(object);
 				return !!ptr;
 			}
 
-			//Removes a removable object with the given name from this manager
+			///@brief Removes a removable object with the given name from this manager
 			auto Remove(std::string_view name) noexcept
 			{
 				if (auto ptr = Get(name); ptr)
@@ -560,6 +581,8 @@ namespace ion::managed
 				else
 					return false;
 			}
+
+			///@}
 	};
 } //ion::managed
 

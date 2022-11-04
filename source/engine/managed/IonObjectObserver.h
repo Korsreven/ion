@@ -34,9 +34,9 @@ namespace ion::managed
 	} //object_observer::detail
 
 
-	//A class representing multiple observed (managed) objects
-	//An object observer can be optional or mandatory, meaning if the observed objects are removable or not
-	//When an observed object is removed, or all are removed at once, it will notify the user by the given callback
+	///@brief A class representing multiple observed (managed) objects
+	///@details An object observer can be optional or mandatory, meaning if the observed objects are removable or not.
+	///When an observed object is removed, or all are removed at once, it will notify the user by the given callback
 	template <typename T,
 		typename = std::enable_if_t<observed_object::detail::has_owner_type_v<T>>>
 	class ObjectObserver final :
@@ -59,11 +59,12 @@ namespace ion::managed
 
 		protected:
 			
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See ManagedObjectListener::ObjectRemoved for more details
+			///@brief See ManagedObjectListener::ObjectRemoved for more details
 			void ObjectRemoved(T &object) noexcept override
 			{
 				if (auto iter = managed_objects_.find(&object); iter != std::end(managed_objects_))
@@ -85,14 +86,15 @@ namespace ion::managed
 				}
 			}
 
-			//See ManagedObjectListener::ObjectRemovable for more details
+			///@brief See ManagedObjectListener::ObjectRemovable for more details
 			bool ObjectRemovable(T&) noexcept override
 			{
 				return this->Contract() == events::event_channel::SubscriptionContract::Cancelable;
 			}
 
+			///@}
 
-			//See EventChannel::Unsubscribed for more details
+			///@brief See EventChannel::Unsubscribed for more details
 			void Unsubscribed() noexcept override
 			{
 				//Execute callback before all objects are erased
@@ -105,17 +107,17 @@ namespace ion::managed
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			ObjectObserver() = default;
 
-			//Constructs a new empty observed object with the given requirement
+			///@brief Constructs a new empty observed object with the given requirement
 			ObjectObserver(observed_object::ObjectRequirement requirement) noexcept :
 				my_base{observed_object::detail::as_subscription_contract(requirement)}
 			{
 				//Empty
 			}
 
-			//Constructs a new empty observed object with the given requirement and callback
+			///@brief Constructs a new empty observed object with the given requirement and callback
 			ObjectObserver(events::Callback<void, T&> on_removed, events::Callback<> on_removed_all,
 				observed_object::ObjectRequirement requirement = observed_object::ObjectRequirement::Optional) noexcept :
 
@@ -126,7 +128,7 @@ namespace ion::managed
 				//Empty
 			}
 
-			//Copy constructor
+			///@brief Copy constructor
 			ObjectObserver(const ObjectObserver &rhs) :
 
 				my_base{rhs},
@@ -137,7 +139,7 @@ namespace ion::managed
 				//Empty
 			}
 
-			//Move constructor
+			///@brief Move constructor
 			ObjectObserver(ObjectObserver &&rhs) :
 
 				my_base{std::move(rhs)},
@@ -149,11 +151,12 @@ namespace ion::managed
 			}
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Copy assignment
+			///@brief Copy assignment
 			inline auto& operator=(const ObjectObserver &rhs)
 			{
 				my_base::operator=(rhs);
@@ -168,7 +171,7 @@ namespace ion::managed
 				return *this;
 			}
 
-			//Move assignment
+			///@brief Move assignment
 			inline auto& operator=(ObjectObserver &&rhs)
 			{
 				my_base::operator=(std::move(rhs));
@@ -184,96 +187,104 @@ namespace ion::managed
 			}
 
 
-			//Returns true if this object observer is observing one or more object
+			///@brief Returns true if this object observer is observing one or more object
 			inline operator bool() const noexcept
 			{
 				return !std::empty(managed_objects_);
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the object requirement for this observed object
+			///@brief Sets the object requirement for this observed object
 			inline void Requirement(observed_object::ObjectRequirement requirement)
 			{
 				this->Contract(observed_object::detail::as_subscription_contract(requirement));
 			}
 
-			//Sets the on removed callback
+			///@brief Sets the on removed callback
 			inline void OnRemoved(events::Callback<void, T&> on_removed) noexcept
 			{
 				on_removed_ = on_removed;
 			}
 
-			//Sets the on removed callback
+			///@brief Sets the on removed callback
 			inline void OnRemoved(std::nullopt_t) noexcept
 			{
 				on_removed_ = {};
 			}
 
-			//Sets the on removed all callback
+			///@brief Sets the on removed all callback
 			inline void OnRemovedAll(events::Callback<> on_removed_all) noexcept
 			{
 				on_removed_all_ = on_removed_all;
 			}
 
-			//Sets the on removed all callback
+			///@brief Sets the on removed all callback
 			inline void OnRemovedAll(std::nullopt_t) noexcept
 			{
 				on_removed_all_ = {};
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the object requirement for this observed object
+			///@brief Returns the object requirement for this observed object
 			[[nodiscard]] inline auto Requirement() const noexcept
 			{
 				return as_object_requirement(this->Contract());
 			}
 
-			//Returns the on removed callback
+			///@brief Returns the on removed callback
 			[[nodiscard]] inline auto OnRemoved() const noexcept
 			{
 				return on_removed_;
 			}
 
-			//Returns the on removed all callback
+			///@brief Returns the on removed all callback
 			[[nodiscard]] inline auto OnRemovedAll() const noexcept
 			{
 				return on_removed_all_;
 			}
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all objects this object observer are observing
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all objects this object observer are observing
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Objects() noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<object_observer::detail::container_type<T>&>{managed_objects_};
 			}
 
-			//Returns an immutable range of all objects this object observer are observing
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all objects this object observer are observing
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Objects() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const object_observer::detail::container_type<T>&>{managed_objects_};
 			}
 
+			///@}
 
-			/*
-				Observing
+			/**
+				@name Observing
+				@{
 			*/
 
-			//Observe the given object
-			//Returns true if the object has successfully been observed, or change requirements
+			///@brief Observe the given object
+			///@details Returns true if the object has successfully been observed, or change requirements
 			inline auto Observe(T &object)
 			{
 				//Is object observable
@@ -288,13 +299,15 @@ namespace ion::managed
 					return false;
 			}
 
+			///@}
 
-			/*
-				Releasing
+			/**
+				@name Releasing
+				@{
 			*/
 
-			//Releases all objects being observed
-			//Returns true if all object has successfully been released, or change requirements
+			///@brief Releases all objects being observed
+			///@details Returns true if all object has successfully been released, or change requirements
 			inline auto ReleaseAll() noexcept
 			{
 				if (this->Unsubscribe())
@@ -303,8 +316,8 @@ namespace ion::managed
 				return std::empty(managed_objects_);
 			}
 
-			//Releases the given object being observed
-			//Returns true if the object has successfully been released, or change requirements
+			///@brief Releases the given object being observed
+			///@details Returns true if the object has successfully been released, or change requirements
 			inline auto Release(T &object) noexcept
 			{
 				if (ObjectRemovable(object) && ObjectRemoved(object))
@@ -319,6 +332,8 @@ namespace ion::managed
 				else
 					return false;
 			}
+
+			///@}
 	};
 } //ion::managed
 

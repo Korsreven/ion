@@ -29,9 +29,9 @@ namespace ion::unmanaged
 	} //object_factory::detail
 
 
-	//A class representing an owning factory that can create and store multiple objects of a single type
-	//The created objects can be of any type, and does not need to have any knowledge about the factory
-	//This class must be derived from to be able to create objects
+	///@brief A class representing an owning factory that can create and store multiple objects of a single type
+	///@details The created objects can be of any type, and does not need to have any knowledge about the factory.
+	///This class must be derived from to be able to create objects
 	template <typename ObjectT>
 	class ObjectFactory
 	{
@@ -44,8 +44,9 @@ namespace ion::unmanaged
 			object_factory::detail::container_type<ObjectT> objects_;
 
 
-			/*
-				Creating
+			/**
+				@name Creating
+				@{
 			*/
 
 			template <typename T, typename... Args>
@@ -56,13 +57,16 @@ namespace ion::unmanaged
 				return NonOwningPtr<ObjectT>{ptr};
 			}
 
+			///@}
+
 		protected:
 
-			/*
-				Creating
+			/**
+				@name Creating
+				@{
 			*/
 
-			//Creates an object with the given arguments
+			///@brief Creates an object with the given arguments
 			template <typename T = ObjectT, typename... Args,
 				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(Args &&...args)
@@ -70,7 +74,7 @@ namespace ion::unmanaged
 				return Emplace<std::remove_cvref_t<T>>(std::forward<Args>(args)...);
 			}
 
-			//Creates an object by copying/moving the given object
+			///@brief Creates an object by copying/moving the given object
 			template <typename T,
 				typename = std::enable_if_t<std::is_base_of_v<ObjectT, std::remove_cvref_t<T>>>>
 			auto Create(T &&object)
@@ -78,54 +82,61 @@ namespace ion::unmanaged
 				return Emplace<std::remove_cvref_t<T>>(std::forward<T>(object));
 			}
 
+			///@}
+
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			ObjectFactory() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			ObjectFactory(const ObjectFactory&) = delete;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			ObjectFactory& operator=(const ObjectFactory&) = delete;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all objects in this factory
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all objects in this factory
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Objects() noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<object_factory::detail::container_type<ObjectT>&>{objects_};
 			}
 
-			//Returns an immutable range of all objects in this factory
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all objects in this factory
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Objects() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const object_factory::detail::container_type<ObjectT>&>{objects_};
 			}
 
+			///@}
 
-			/*
-				Removing
+			/**
+				@name Removing
+				@{
 			*/
 
-			//Clears all objects from this factory
+			///@brief Clears all objects from this factory
 			void Clear() noexcept
 			{
 				objects_.clear();
 				objects_.shrink_to_fit();
 			}
 
-			//Removes an object from this factory
+			///@brief Removes an object from this factory
 			auto Remove(ObjectT &object) noexcept
 			{
 				auto iter =
@@ -144,6 +155,8 @@ namespace ion::unmanaged
 				else
 					return false;
 			}
+
+			///@}
 	};
 } //ion::unmanaged
 

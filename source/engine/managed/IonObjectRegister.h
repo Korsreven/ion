@@ -97,9 +97,9 @@ namespace ion::managed
 	} //object_register::detail
 
 
-	//A class representing a non-owning register of objects that all shares a single common type
-	//When registering an object, it can be given a name (optional) to make it easier to be retrieved later on
-	//An object register of type foo can register foo objects but also objects that derives from foo
+	///@brief A class representing a non-owning register of objects that all shares a single common type
+	///@details When registering an object, it can be given a name (optional) to make it easier to be retrieved later on.
+	///An object register of type foo can register foo objects but also objects that derives from foo
 	template <typename T>
 	class ObjectRegister
 	{
@@ -109,31 +109,32 @@ namespace ion::managed
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			ObjectRegister() = default;
 
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all registered objects in this register
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all registered objects in this register
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Objects() noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<object_register::detail::registered_objects<T>&>{objects_};
 			}
 
-			//Returns an immutable range of all registered objects in this register
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all registered objects in this register
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Objects() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const object_register::detail::registered_objects<T>&>{objects_};
 			}
 
 
-			//Returns a mutable range of all registered objects of type U in this register
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all registered objects of type U in this register
+			///@details This can be used directly with a range-based for loop
 			template <typename U>
 			[[nodiscard]] inline auto ObjectsOf() noexcept
 			{
@@ -142,8 +143,8 @@ namespace ion::managed
 					object_register::detail::get_objects_as<T, U>(objects_)};
 			}
 
-			//Returns an immutable range of all registered objects of type U in this register
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all registered objects of type U in this register
+			///@details This can be used directly with a range-based for loop
 			template <typename U>
 			[[nodiscard]] inline auto ObjectsOf() const noexcept
 			{
@@ -152,12 +153,14 @@ namespace ion::managed
 					object_register::detail::get_objects_as<T, U>(objects_)};
 			}
 
+			///@}
 
-			/*
-				Registering
+			/**
+				@name Registering
+				@{
 			*/
 
-			//Registers an object to this register
+			///@brief Registers an object to this register
 			auto Register(NonOwningPtr<T> object)
 			{
 				auto iter =
@@ -177,7 +180,7 @@ namespace ion::managed
 					return false;
 			}
 
-			//Registers an object with the given name to this register
+			///@brief Registers an object with the given name to this register
 			auto Register(std::string name, NonOwningPtr<T> object)
 			{
 				if (!object_register::detail::get_object_by_name(name, objects_))
@@ -192,12 +195,14 @@ namespace ion::managed
 				return false;
 			}
 
+			///@}
 
-			/*
-				Unregistering
+			/**
+				@name Unregistering
+				@{
 			*/
 
-			//Unregisters an object from this register
+			///@brief Unregisters an object from this register
 			auto Unregister(T &object) noexcept
 			{
 				auto iter =
@@ -217,7 +222,7 @@ namespace ion::managed
 					return false;
 			}
 
-			//Unregisters an object with the given name from this register
+			///@brief Unregisters an object with the given name from this register
 			auto Unregister(std::string_view name) noexcept
 			{
 				auto iter =
@@ -237,27 +242,29 @@ namespace ion::managed
 					return false;
 			}
 
-			//Unregisters all objects from this register
+			///@brief Unregisters all objects from this register
 			void UnregisterAll() noexcept
 			{
 				objects_.clear();
 				objects_.shrink_to_fit();
 			}
 
+			///@}
 
-			/*
-				Retrieving
+			/**
+				@name Retrieving
+				@{
 			*/
 
-			//Gets a pointer to an object with the given name
-			//Returns nullptr if object could not be found
+			///@brief Gets a pointer to an object with the given name
+			///@details Returns nullptr if object could not be found
 			[[nodiscard]] auto Get(std::string_view name) const noexcept
 			{
 				return object_register::detail::get_object_by_name(name, objects_);
 			}
 
-			//Gets a pointer to an object of type U with the given name
-			//Returns nullptr if object of type U could not be found
+			///@brief Gets a pointer to an object of type U with the given name
+			///@details Returns nullptr if object of type U could not be found
 			template <typename U>
 			[[nodiscard]] auto GetAs(std::string_view name) const noexcept
 			{
@@ -265,14 +272,16 @@ namespace ion::managed
 				return dynamic_pointer_cast<U>(Get(name));
 			}
 
-			//Gets a pointer to the first object of type U
-			//Returns nullptr if object of type U could not be found
+			///@brief Gets a pointer to the first object of type U
+			///@details Returns nullptr if object of type U could not be found
 			template <typename U>
 			[[nodiscard]] auto GetFirstOf() const noexcept
 			{
 				static_assert(std::is_base_of_v<T, U>);
 				return object_register::detail::get_object_as<T, U>(objects_);
 			}
+
+			///@}
 	};
 } //ion::managed
 
