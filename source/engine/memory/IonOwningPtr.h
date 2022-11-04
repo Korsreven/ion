@@ -35,10 +35,10 @@ namespace ion::memory
 	} //owning_ptr::detail
 
 
-	//A class representing a pointer that has ownership to some data
-	//Internally this class uses std::unique_ptr + a control block
-	//Semantically this class is a faster, non-thread safe version of std::shared_ptr
-	//Use std::shared_ptr in environments where thread safety is important!
+	///@brief A class representing a pointer that has ownership to some data
+	///@details Internally this class uses std::unique_ptr + a control block.
+	///Semantically this class is a faster, non-thread safe version of std::shared_ptr.
+	///Use std::shared_ptr in environments where thread safety is important!
 	template <typename T>
 	class OwningPtr final
 	{
@@ -61,10 +61,10 @@ namespace ion::memory
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			OwningPtr() = default;
 
-			//Constructs a new owning ptr with the given raw ptr
+			///@brief Constructs a new owning ptr with the given raw ptr
 			explicit OwningPtr(pointer ptr) noexcept :
 				ptr_{ptr},
 				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock{} : nullptr}
@@ -72,14 +72,14 @@ namespace ion::memory
 				//Empty
 			}
 
-			//Constructs a new owning ptr with a nullptr
+			///@brief Constructs a new owning ptr with a nullptr
 			OwningPtr(std::nullptr_t) noexcept :
 				ptr_{nullptr}
 			{
 				//Empty
 			}
 
-			//Constructs a new owning ptr with the given unique ptr
+			///@brief Constructs a new owning ptr with the given unique ptr
 			OwningPtr(std::unique_ptr<T> &&ptr) noexcept :
 				ptr_{std::move(ptr)},
 				ctrl_block_{ptr_ ? new owning_ptr::detail::ControlBlock{} : nullptr}
@@ -87,7 +87,7 @@ namespace ion::memory
 				//Empty
 			}
 
-			//Constructs a new owning ptr with the given unique ptr of type U
+			///@brief Constructs a new owning ptr with the given unique ptr of type U
 			template <typename U, typename = std::enable_if_t<std::is_convertible_v<typename std::unique_ptr<U>::pointer, pointer>>>
 			OwningPtr(std::unique_ptr<U> &&ptr) noexcept :
 				ptr_{std::move(ptr)},
@@ -96,10 +96,10 @@ namespace ion::memory
 				//Empty
 			}
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			OwningPtr(const OwningPtr<T>&) = delete;
 
-			//Move constructor
+			///@brief Move constructor
 			OwningPtr(OwningPtr<T> &&rhs) noexcept :	
 				ptr_{std::move(rhs.ptr_)},
 				ctrl_block_{std::exchange(rhs.ctrl_block_, nullptr)}
@@ -107,7 +107,7 @@ namespace ion::memory
 				//Empty
 			}
 
-			//Move construct a new owning ptr with the given owning ptr of type U
+			///@brief Move construct a new owning ptr with the given owning ptr of type U
 			template <typename U, typename = std::enable_if_t<std::is_convertible_v<typename OwningPtr<U>::pointer, pointer>>>
 			OwningPtr(OwningPtr<U> &&rhs) noexcept :
 				ptr_{std::move(rhs.ptr_)},
@@ -116,7 +116,7 @@ namespace ion::memory
 				//Empty
 			}
 
-			//Destructor
+			///@brief Destructor
 			~OwningPtr() noexcept
 			{
 				if (ctrl_block_)
@@ -129,21 +129,22 @@ namespace ion::memory
 			}
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			auto& operator=(const OwningPtr<T>&) = delete;
 
-			//Move assignment
+			///@brief Move assignment
 			auto& operator=(OwningPtr<T> &&rhs) noexcept
 			{
 				OwningPtr{std::move(rhs)}.swap(*this);
 				return *this;
 			}
 
-			//Move assign with the given owning ptr of type U
+			///@brief Move assign with the given owning ptr of type U
 			template <typename U>
 			auto& operator=(OwningPtr<U> &&rhs) noexcept
 			{
@@ -152,67 +153,69 @@ namespace ion::memory
 			}
 
 
-			//Compares this equal to rhs
+			///@brief Compares this equal to rhs
 			[[nodiscard]] auto operator==(const OwningPtr<T> &rhs) const noexcept
 			{
 				return ptr_ == rhs.ptr_;
 			}
 
-			//Compares this different from rhs
+			///@brief Compares this different from rhs
 			[[nodiscard]] auto operator!=(const OwningPtr<T> &rhs) const noexcept
 			{
 				return ptr_ != rhs.ptr_;
 			}
 
-			//Compares this less than rhs
+			///@brief Compares this less than rhs
 			[[nodiscard]] auto operator<(const OwningPtr<T> &rhs) const noexcept
 			{
 				return ptr_ < rhs.ptr_;
 			}
 
-			//Compares this less or equal to rhs
+			///@brief Compares this less or equal to rhs
 			[[nodiscard]] auto operator<=(const OwningPtr<T> &rhs) const noexcept
 			{
 				return ptr_ <= rhs.ptr_;
 			}
 
-			//Compares this greater than rhs
+			///@brief Compares this greater than rhs
 			[[nodiscard]] auto operator>(const OwningPtr<T> &rhs) const noexcept
 			{
 				return ptr_ > rhs.ptr_;
 			}
 
-			//Compares this greater or equal to rhs
+			///@brief Compares this greater or equal to rhs
 			[[nodiscard]] auto operator>=(const OwningPtr<T> &rhs) const noexcept
 			{
 				return ptr_ >= rhs.ptr_;
 			}
 
 
-			//Checks if there is an associated owned object
+			///@brief Checks if there is an associated owned object
 			[[nodiscard]] explicit operator bool() const noexcept
 			{
 				return static_cast<bool>(ptr_);
 			}
 
-			//Returns a pointer to the owned object
+			///@brief Returns a pointer to the owned object
 			[[nodiscard]] auto operator->() const noexcept
 			{
 				return ptr_.get();
 			}
 
-			//Dereferences pointer to the owned object
+			///@brief Dereferences pointer to the owned object
 			[[nodiscard]] auto& operator*() const noexcept
 			{
 				return *ptr_;
 			}
-		
 
-			/*
-				Modifiers
+			///@}
+
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Releases the ownership of the owned object if any
+			///@brief Releases the ownership of the owned object if any
 			[[nodiscard]] auto release() noexcept
 			{
 				auto ptr = ptr_.release();
@@ -220,117 +223,119 @@ namespace ion::memory
 				return ptr;
 			}
 
-			//Replaces the owned object
+			///@brief Replaces the owned object
 			void reset(pointer ptr = pointer{}) noexcept
 			{
 				OwningPtr{ptr}.swap(*this);
 			}
 
-			//Swaps the owned objects
+			///@brief Swaps the owned objects
 			void swap(OwningPtr<T> &rhs) noexcept
 			{
 				ptr_.swap(rhs.ptr_);
 				std::swap(ctrl_block_, rhs.ctrl_block_);
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns a pointer to the owned object
+			///@brief Returns a pointer to the owned object
 			[[nodiscard]] auto get() const noexcept
 			{
 				return ptr_.get();
 			}
+
+			///@}
 	};
 
 
-	/*
-		Operators
-
-		OwningPtr<T> <=> nullptr
-		nullptr <=> OwningPtr<T>
+	/**
+		@name Operators
+		@{
 	*/
 
-	//Compares ptr equal to nullptr
+	///@brief Compares ptr equal to nullptr
 	template <typename T>
 	[[nodiscard]] auto operator==(const OwningPtr<T> &ptr, std::nullptr_t) noexcept
 	{
 		return ptr.get() == nullptr;
 	}
 
-	//Compares nullptr equal to ptr
+	///@brief Compares nullptr equal to ptr
 	template <typename T>
 	[[nodiscard]] auto operator==(std::nullptr_t, const OwningPtr<T> &ptr) noexcept
 	{
 		return nullptr == ptr.get();
 	}
 
-	//Compares ptr different from nullptr
+	///@brief Compares ptr different from nullptr
 	template <typename T>
 	[[nodiscard]] auto operator!=(const OwningPtr<T> &ptr, std::nullptr_t) noexcept
 	{
 		return ptr.get() != nullptr;
 	}
 
-	//Compares nullptr different from ptr
+	///@brief Compares nullptr different from ptr
 	template <typename T>
 	[[nodiscard]] auto operator!=(std::nullptr_t, const OwningPtr<T> &ptr) noexcept
 	{
 		return nullptr != ptr.get();
 	}
 
-	//Compares ptr less than nullptr
+	///@brief Compares ptr less than nullptr
 	template <typename T>
 	[[nodiscard]] auto operator<(const OwningPtr<T> &ptr, std::nullptr_t) noexcept
 	{
 		return ptr.get() < nullptr;
 	}
 
-	//Compares nullptr less than ptr
+	///@brief Compares nullptr less than ptr
 	template <typename T>
 	[[nodiscard]] auto operator<(std::nullptr_t, const OwningPtr<T> &ptr) noexcept
 	{
 		return nullptr < ptr.get();
 	}
 
-	//Compares ptr less or equal to nullptr
+	///@brief Compares ptr less or equal to nullptr
 	template <typename T>
 	[[nodiscard]] auto operator<=(const OwningPtr<T> &ptr, std::nullptr_t) noexcept
 	{
 		return ptr.get() <= nullptr;
 	}
 
-	//Compares nullptr less or equal to ptr
+	///@brief Compares nullptr less or equal to ptr
 	template <typename T>
 	[[nodiscard]] auto operator<=(std::nullptr_t, const OwningPtr<T> &ptr) noexcept
 	{
 		return nullptr <= ptr.get();
 	}
 
-	//Compares ptr greater than nullptr
+	///@brief Compares ptr greater than nullptr
 	template <typename T>
 	[[nodiscard]] auto operator>(const OwningPtr<T> &ptr, std::nullptr_t) noexcept
 	{
 		return ptr.get() > nullptr;
 	}
 
-	//Compares nullptr greater than ptr
+	///@brief Compares nullptr greater than ptr
 	template <typename T>
 	[[nodiscard]] auto operator>(std::nullptr_t, const OwningPtr<T> &ptr) noexcept
 	{
 		return nullptr > ptr.get();
 	}
 
-	//Compares ptr greater or equal to nullptr
+	///@brief Compares ptr greater or equal to nullptr
 	template <typename T>
 	[[nodiscard]] auto operator>=(const OwningPtr<T> &ptr, std::nullptr_t) noexcept
 	{
 		return ptr.get() >= nullptr;
 	}
 
-	//Compares nullptr greater or equal to ptr
+	///@brief Compares nullptr greater or equal to ptr
 	template <typename T>
 	[[nodiscard]] auto operator>=(std::nullptr_t, const OwningPtr<T> &ptr) noexcept
 	{
@@ -338,22 +343,27 @@ namespace ion::memory
 	}
 
 
-	//Helper function for creating a owning ptr
+	///@brief Helper function for creating a owning ptr
 	template <typename T, typename... Args>
 	[[nodiscard]] auto make_owning(Args &&...args)
 	{
 		return OwningPtr<T>{std::make_unique<T>(std::forward<Args>(args)...)};
 	}
+
+	///@}
 } //ion::memory
 
 namespace ion
 {
-	/*
-		Pull common stuff out of the memory namespace
+	/**
+		@name Pull common stuff out of the memory namespace
+		@{
 	*/
 
 	using memory::OwningPtr;
 	using memory::make_owning;
+
+	///@}
 } //ion
 
 #endif
