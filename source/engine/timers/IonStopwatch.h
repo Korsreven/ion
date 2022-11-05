@@ -18,7 +18,7 @@ File:	IonStopwatch.h
 
 namespace ion::timers
 {
-	//A class representing a stopwatch that can be used to measure elapsed time
+	///@brief A class representing a stopwatch that can be used to measure elapsed time
 	class Stopwatch final
 	{
 		private:
@@ -38,62 +38,69 @@ namespace ion::timers
 			Stopwatch() = default;
 
 
-			/*
-				Static functions
+			/**
+				@name Static functions
+				@{
 			*/
 
-			//Returns a new stopwatch and starts measuring elapsed time
+			///@brief Returns a new stopwatch and starts measuring elapsed time
 			[[nodiscard]] static Stopwatch StartNew() noexcept;
 
-			//Gets a timestamp in the most precision unit available from the underlying system
+			///@brief Gets a timestamp in the most precision unit available from the underlying system
 			[[nodiscard]] static long long GetTimestamp() noexcept;
 
+			///@}
 
-			/*
-				Common functions for controlling the stopwatch
+			/**
+				@name Common functions for controlling the stopwatch
+				@{
 			*/
 
-			//Starts or resumes, measuring elapsed time
+			///@brief Starts or resumes, measuring elapsed time
 			void Start() noexcept;
 
-			//Stops measuring elapsed time
+			///@brief Stops measuring elapsed time
 			void Stop() noexcept;
 
-			//Stops measuring and reset elapsed time to zero
+			///@brief Stops measuring and reset elapsed time to zero
 			void Reset() noexcept;
 
-			//Stops, resets and starts measuring elapsed time
-			//Returns previous elapsed time
+			///@brief Stops, resets and starts measuring elapsed time
+			///@details Returns previous elapsed time
 			duration Restart() noexcept;
 
-			//Returns true if the stopwatch is running
+			///@brief Returns true if the stopwatch is running
 			[[nodiscard]] bool IsRunning() const noexcept;
 
+			///@}
 
-			/*
-				Get total elapsed time in different units
+			/**
+				@name Get total elapsed time in different units
+				@{
 			*/
 
-			//Returns elapsed time in seconds (as real)
+			///@brief Returns elapsed time in seconds (as real)
 			[[nodiscard]] duration Elapsed() const noexcept;
 
-			//Returns elapsed time in hours (1 hour = 60 min)
+			///@brief Returns elapsed time in hours (1 hour = 60 min)
 			[[nodiscard]] std::chrono::hours ElapsedHours() const noexcept;
 
-			//Returns elapsed time in minutes (1 min = 60 sec)
+			///@brief Returns elapsed time in minutes (1 min = 60 sec)
 			[[nodiscard]] std::chrono::minutes ElapsedMinutes() const noexcept;
 
-			//Returns elapsed time in seconds (1 sec = 1000 ms)
+			///@brief Returns elapsed time in seconds (1 sec = 1000 ms)
 			[[nodiscard]] std::chrono::seconds ElapsedSeconds() const noexcept;
 
-			//Returns elapsed time in milliseconds (1 ms = 1000 mu)
+			///@brief Returns elapsed time in milliseconds (1 ms = 1000 mu)
 			[[nodiscard]] std::chrono::milliseconds ElapsedMilliseconds() const noexcept;
 
-			//Returns elapsed time in microseconds (1 mu = 1000 ns)
+			///@brief Returns elapsed time in microseconds (1 mu = 1000 ns)
 			[[nodiscard]] std::chrono::microseconds ElapsedMicroseconds() const noexcept;
 
-			//Returns elapsed time in nanoseconds (highest precision supported)
+			///@brief Returns elapsed time in nanoseconds (highest precision supported)
 			[[nodiscard]] std::chrono::nanoseconds ElapsedNanoseconds() const noexcept;
+
+			///@}
 	};
 } //ion::timers
 

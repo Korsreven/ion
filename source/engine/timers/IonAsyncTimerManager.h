@@ -28,8 +28,8 @@ namespace ion::timers
 	} //async_timer_manager::detail
 
 
-	//A manager class that contains async timers (not in sync with the engine)
-	//All timers are updated using a recurring callback with a minimum time resolution
+	///@brief A manager class that contains async timers (not in sync with the engine)
+	///@details All timers are updated using a recurring callback with a minimum time resolution
 	class AsyncTimerManager final : public TimerManager
 	{
 		private:
@@ -38,67 +38,76 @@ namespace ion::timers
 			events::RecurringCallback callback_{&AsyncTimerManager::Elapse, this};
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See ResourceManager<T, R>::AdditionStarted for more details
+			///@brief See ResourceManager<T, R>::AdditionStarted for more details
 			void AdditionStarted() noexcept override final;
 
-			//See ResourceManager<T, R>::AdditionEnded for more details
+			///@brief See ResourceManager<T, R>::AdditionEnded for more details
 			void AdditionEnded() noexcept override final;
 
 
-			//See ResourceManager<T, R>::RemovalStarted for more details
+			///@brief See ResourceManager<T, R>::RemovalStarted for more details
 			void RemovalStarted() noexcept override final;
 
-			//See ResourceManager<T, R>::RemovalEnded for more details
+			///@brief See ResourceManager<T, R>::RemovalEnded for more details
 			void RemovalEnded() noexcept override final;
 
+			///@}
 
 			bool Elapse() noexcept;
 			void SuspendAndWait() noexcept;
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			AsyncTimerManager() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			AsyncTimerManager(const AsyncTimerManager&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			AsyncTimerManager(AsyncTimerManager&&) = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			AsyncTimerManager& operator=(const AsyncTimerManager&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			AsyncTimerManager& operator=(AsyncTimerManager&&) = default;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns true if time is elapsing
+			///@brief Returns true if time is elapsing
 			[[nodiscard]] bool IsTimeElapsing() const noexcept;
 
+			///@}
 
-			/*
-				Suspending / continuing
+			/**
+				@name Suspending/continuing
+				@{
 			*/
 
-			//Continues the elapsing of time
+			///@brief Continues the elapsing of time
 			void ContinueTimeElapse() noexcept;
 
-			//Suspends the elapsing of time
+			///@brief Suspends the elapsing of time
 			void SuspendTimeElapse() noexcept;
+
+			///@}
 	};
 } //ion::timers
 

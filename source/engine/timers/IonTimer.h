@@ -36,8 +36,8 @@ namespace ion::timers
 	} //timer::detail
 
 
-	//A class representing a controllable timer with an interval
-	//The timer can be queried manually or by providing a callback
+	///@brief A class representing a controllable timer with an interval
+	///@details The timer can be queried manually or by providing a callback
 	class Timer final : public managed::ManagedObject<TimerManager>
 	{
 		private:
@@ -51,95 +51,106 @@ namespace ion::timers
 
 		public:
 
-			//Constructs a new timer with the given name
+			///@brief Constructs a new timer with the given name
 			explicit Timer(std::string name) noexcept;
 
-			//Constructs a new timer with the given name and interval
+			///@brief Constructs a new timer with the given name and interval
 			Timer(std::string name, duration interval) noexcept;
 
-			//Constructs a new timer with the given name, interval and callback
+			///@brief Constructs a new timer with the given name, interval and callback
 			Timer(std::string name, duration interval, events::Callback<void, Timer&> on_tick) noexcept;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the interval in seconds (as real)
+			///@brief Sets the interval in seconds (as real)
 			inline void Interval(duration interval) noexcept
 			{
 				interval_ = timer::detail::valid_interval(interval);
 			}
 
-			//Sets the on tick callback
+			///@brief Sets the on tick callback
 			inline void OnTick(events::Callback<void, Timer&> on_tick) noexcept
 			{
 				on_tick_ = on_tick;
 			}
 
-			//Sets the on tick callback
+			///@brief Sets the on tick callback
 			inline void OnTick(std::nullopt_t) noexcept
 			{
 				on_tick_ = {};
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns true if the timer is running
+			///@brief Returns true if the timer is running
 			[[nodiscard]] inline auto IsRunning() const noexcept
 			{
 				return running_;
 			}
 
-			//Returns the interval in seconds (as real)
+			///@brief Returns the interval in seconds (as real)
 			[[nodiscard]] inline auto Interval() const noexcept
 			{
 				return interval_;
 			}
 
-			//Returns the on tick callback
+			///@brief Returns the on tick callback
 			[[nodiscard]] inline auto OnTick() const noexcept
 			{
 				return on_tick_;
 			}
 
+			///@}
 
-			/*
-				Common functions for controlling the timer
+			/**
+				@name Common functions for controlling the timer
+				@{
 			*/
 
-			//Starts or resumes timer
+			///@brief Starts or resumes timer
 			void Start() noexcept;
 
-			//Stops timer
+			///@brief Stops timer
 			void Stop() noexcept;
 
-			//Stops and reset time to zero
+			///@brief Stops and reset time to zero
 			void Reset() noexcept;
 
-			//Stops, resets and starts timer
+			///@brief Stops, resets and starts timer
 			void Restart() noexcept;
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses timer by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses timer by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 
+			///@}
 
-			/*
-				Ticked
+			/**
+				@name Ticked
+				@{
 			*/
 
-			//Returns true if timer has ticked one or more time
-			//If timer has ticked, ticked is set to false
+			///@brief Returns true if timer has ticked one or more time
+			///@details If timer has ticked, ticked is set to false
 			[[nodiscard]] bool HasTicked() noexcept;
+
+			///@}
 	};
 } //ion::timers
 

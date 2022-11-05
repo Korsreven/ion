@@ -27,108 +27,118 @@ namespace ion::timers
 	} //timer_manager::detail
 
 
-	//A manager class that contains timers (usually in sync with the engine)
-	//All timers are updated when elapse is called, with the time provided
+	///@brief A manager class that contains timers (usually in sync with the engine)
+	///@details All timers are updated when elapse is called, with the time provided
 	class TimerManager :
 		public managed::ObjectManager<Timer, TimerManager>
 	{
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			TimerManager() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			TimerManager(const TimerManager&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			TimerManager(TimerManager&&) = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			TimerManager& operator=(const TimerManager&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			TimerManager& operator=(TimerManager&&) = default;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all timers in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all timers in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Timers() noexcept
 			{
 				return Objects();
 			}
 
-			//Returns an immutable range of all timers in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all timers in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Timers() const noexcept
 			{
 				return Objects();
 			}
 
+			///@}
 
-			/*
-				Timers
-				Creating
+			/**
+				@name Timers - Creating
+				@{
 			*/
 
-			//Creates a timer with the given name and interval
+			///@brief Creates a timer with the given name and interval
 			NonOwningPtr<Timer> CreateTimer(std::string name, duration interval);
 
-			//Creates a timer with the given name, interval and callback
+			///@brief Creates a timer with the given name, interval and callback
 			NonOwningPtr<Timer> CreateTimer(std::string name, duration interval, events::Callback<void, Timer&> on_tick);
 
 
-			//Creates a timer as a copy of the given timer
+			///@brief Creates a timer as a copy of the given timer
 			NonOwningPtr<Timer> CreateTimer(const Timer &timer);
 
-			//Creates a timer by moving the given timer
+			///@brief Creates a timer by moving the given timer
 			NonOwningPtr<Timer> CreateTimer(Timer &&timer);
 
+			///@}
 
-			/*
-				Timers
-				Retrieving
+			/**
+				@name Timers - Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable timer with the given name
-			//Returns nullptr if timer could not be found
+			///@brief Gets a pointer to a mutable timer with the given name
+			///@details Returns nullptr if timer could not be found
 			[[nodiscard]] NonOwningPtr<Timer> GetTimer(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable timer with the given name
-			//Returns nullptr if timer could not be found
+			///@brief Gets a pointer to an immutable timer with the given name
+			///@details Returns nullptr if timer could not be found
 			[[nodiscard]] NonOwningPtr<const Timer> GetTimer(std::string_view name) const noexcept;
 
+			///@}
 
-			/*
-				Timers
-				Removing
+			/**
+				@name Timers - Removing
+				@{
 			*/
 
-			//Clears all removable timers from this manager
+			///@brief Clears all removable timers from this manager
 			void ClearTimers() noexcept;
 
-			//Removes a removable timer from this manager
+			///@brief Removes a removable timer from this manager
 			bool RemoveTimer(Timer &timer) noexcept;
 
-			//Removes a removable timer with the given name from this manager
+			///@brief Removes a removable timer with the given name from this manager
 			bool RemoveTimer(std::string_view name) noexcept;
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses all timers by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses all timers by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
+
+			///@}
 	};
 } //ion::timers
 
