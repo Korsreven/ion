@@ -21,7 +21,7 @@ File:	IonFileResource.h
 
 namespace ion::resources
 {
-	//A class representing a file resource (usually a physical file asset)
+	///@brief A class representing a file resource (usually a physical file asset)
 	template <typename T>
 	class FileResource : public Resource<T>
 	{
@@ -33,8 +33,8 @@ namespace ion::resources
 
 		public:
 
-			//Constructs a new file resource with the given name and asset name
-			//Asset name could be a file name or an entire file path
+			///@brief Constructs a new file resource with the given name and asset name
+			///@details Asset name could be a file name or an entire file path
 			FileResource(std::string name, std::string asset_name) noexcept :
 
 				Resource<T>{std::move(name)},
@@ -44,48 +44,53 @@ namespace ion::resources
 			}
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the file data of the file resource to the given data with the associated path
+			///@brief Sets the file data of the file resource to the given data with the associated path
 			inline void FileData(std::string data, std::filesystem::path path) noexcept
 			{
 				file_data_ = std::move(data);
 				file_path_ = std::move(path);
 			}
 
-			//Resets the file data to save some memory (if not needed anymore)
+			///@brief Resets the file data to save some memory (if not needed anymore)
 			inline void ResetFileData() noexcept
 			{
 				file_data_.reset();
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the asset name of the file resource
-			//Asset name could be a file name or an entire file path
+			///@brief Returns the asset name of the file resource
+			///@details Asset name could be a file name or an entire file path
 			[[nodiscard]] inline auto& AssetName() const noexcept
 			{
 				return asset_name_;
 			}
 
-			//Returns the file data of the file resource
-			//Returns nullopt if the file resource has not been prepared yet, or is no longer needed (fully loaded or has failed)
+			///@brief Returns the file data of the file resource
+			///@details Returns nullopt if the file resource has not been prepared yet, or is no longer needed (fully loaded or has failed)
 			[[nodiscard]] inline auto& FileData() const noexcept
 			{
 				return file_data_;
 			}
 
-			//Returns the file path of the file resource
-			//Returns nullopt if the file resource has not been prepared yet
+			///@brief Returns the file path of the file resource
+			///@details Returns nullopt if the file resource has not been prepared yet
 			[[nodiscard]] inline auto& FilePath() const noexcept
 			{
 				return file_path_;
 			}
+
+			///@}
 	};
 } //ion::resources
 

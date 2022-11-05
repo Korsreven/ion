@@ -45,7 +45,7 @@ namespace ion::resources
 	} //resource_manager
 
 
-	//A class that manages, prepares, loads and unloads resources
+	///@brief A class that manages, prepares, loads and unloads resources
 	template <typename ResourceT, typename OwnerT>
 	class ResourceManager : public managed::ObjectManager<ResourceT, OwnerT, events::listeners::ResourceListener<ResourceT, OwnerT>>
 	{
@@ -59,11 +59,11 @@ namespace ion::resources
 
 		protected:
 
-			/*
-				Events
+			/**
+				@name Events
 			*/
 
-			//See ObjectManager::Removed for more details
+			///@brief See ObjectManager::Removed for more details
 			void Removed(ResourceT &resource) noexcept override
 			{
 				//Wait for resource (could be in an async process)
@@ -84,33 +84,34 @@ namespace ion::resources
 			virtual bool UnloadResource(ResourceT&) noexcept = 0;
 
 
-			//See ResourceListener::ResourcePrepared for more details
+			///@brief See ResourceListener::ResourcePrepared for more details
 			virtual void ResourcePrepared(ResourceT&) noexcept
 			{
 				//Optional to override
 			}
 
-			//See ResourceListener::ResourceLoaded for more details
+			///@brief See ResourceListener::ResourceLoaded for more details
 			virtual void ResourceLoaded(ResourceT&) noexcept
 			{
 				//Optional to override
 			}
 
-			//See ResourceListener::ResourceUnloaded for more details
+			///@brief See ResourceListener::ResourceUnloaded for more details
 			virtual void ResourceUnloaded(ResourceT&) noexcept
 			{
 				//Optional to override
 			}
 
-			//See ResourceListener::ResourceFailed for more details
+			///@brief See ResourceListener::ResourceFailed for more details
 			virtual void ResourceFailed(ResourceT&) noexcept
 			{
 				//Optional to override
 			}
 
+			///@}
 
-			/*
-				Notifying
+			/**
+				@name Notifying
 			*/
 
 			void NotifyResourcePrepared(ResourceT &resource) noexcept
@@ -161,6 +162,8 @@ namespace ion::resources
 
 				this->NotifyAll(this->Listeners(), &ResourceManager::listener_type::ResourceLoadingStateChanged, resource);
 			}
+
+			///@}
 
 		private:
 
@@ -330,39 +333,40 @@ namespace ion::resources
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			ResourceManager() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			ResourceManager(const ResourceManager&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			ResourceManager(ResourceManager&&) = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			ResourceManager& operator=(const ResourceManager&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			ResourceManager& operator=(ResourceManager&&) = default;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
 			*/
 
-			//Sets the process execution model the resource manager is allowed to use
+			///@brief Sets the process execution model the resource manager is allowed to use
 			inline void ProcessExecutionModel(resource_manager::ExecutionModel execution_model) noexcept
 			{
 				process_execution_model_ = execution_model;
 			}
 
-			//Sets the max number of load processes the resource manager is allowed to use
-			//If nullopt is passed, a default number of load processes will be used (based on your system)
+			///@brief Sets the max number of load processes the resource manager is allowed to use
+			///@details If nullopt is passed, a default number of load processes will be used (based on your system)
 			inline void MaxLoadProcesses(std::optional<int> max_load_processes) noexcept
 			{
 				max_load_processes_ = max_load_processes;
@@ -373,49 +377,52 @@ namespace ion::resources
 					processes_.MaxWorkerThreads(parallel::worker_pool::detail::default_number_of_threads());
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
 			*/
 
-			//Returns the process execution model the resource manager is allowed to use
+			///@brief Returns the process execution model the resource manager is allowed to use
 			[[nodiscard]] inline auto ProcessExecutionModel() const noexcept
 			{
 				return process_execution_model_;
 			}
 
-			//Returns the max number of load processes the resource manager is allowed to use
-			//If nullopt is returned, a default number of load processes is being used (based on your system)
+			///@brief Returns the max number of load processes the resource manager is allowed to use
+			///@details If nullopt is returned, a default number of load processes is being used (based on your system)
 			[[nodiscard]] inline auto MaxLoadProcesses() const noexcept
 			{
 				return max_load_processes_;
 			}
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
 			*/
 
-			//Returns a mutable range of all resources in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all resources in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Resources() noexcept
 			{
 				return this->Objects();
 			}
 
-			//Returns an immutable range of all resources in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all resources in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Resources() const noexcept
 			{
 				return this->Objects();
 			}
 
+			///@}
 
-			/*
-				Updating
+			/**
+				@name Updating
 			*/
 
-			//Returns the number of resources that are waiting to be updated
+			///@brief Returns the number of resources that are waiting to be updated
 			[[nodiscard]] auto ResourcesToUpdate() const noexcept
 			{
 				auto count = 0;
@@ -438,16 +445,16 @@ namespace ion::resources
 				return count;
 			}
 
-			//Updates all resources that is in a pending state (non-blocking)
-			//Returns true when completed
+			///@brief Updates all resources that is in a pending state (non-blocking)
+			///@details Returns true when completed
 			[[nodiscard]] auto Updated() noexcept
 			{
 				UpdatePendingResources(process_execution_model_);
 				return ResourcesToUpdate() == 0;
 			}
 
-			//Updates all resources that is in a pending state (non-blocking)
-			//Updates the given progress and returns true when completed
+			///@brief Updates all resources that is in a pending state (non-blocking)
+			///@details Updates the given progress and returns true when completed
 			[[nodiscard]] auto Updated(types::Progress<int> &progress) noexcept
 			{
 				if (auto count = ResourcesToUpdate(); count > progress.Max())
@@ -459,13 +466,14 @@ namespace ion::resources
 				return progress.IsComplete();
 			}
 
+			///@}
 
-			/*
-				Preparing
+			/**
+				@name Preparing
 			*/
 
-			//Prepares the given resource before returning (eager)
-			//Marks the given resource ready to be prepared (lazy)
+			///@brief Prepares the given resource before returning (eager)
+			///@details Marks the given resource ready to be prepared (lazy)
 			auto Prepare(ResourceT &resource, resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager)
 			{
 				if (resource.Owner() != this)
@@ -491,8 +499,8 @@ namespace ion::resources
 					return prepare;
 			}
 
-			//Prepares all resources before returning (eager)
-			//Marks all resources ready to be prepared (lazy)
+			///@brief Prepares all resources before returning (eager)
+			///@details Marks all resources ready to be prepared (lazy)
 			void PrepareAll(resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager)
 			{
 				if (strategy == resource_manager::EvaluationStrategy::Eager)
@@ -503,7 +511,7 @@ namespace ion::resources
 			}
 
 
-			//Returns the number of resources that are waiting to be prepared
+			///@brief Returns the number of resources that are waiting to be prepared
 			[[nodiscard]] auto ResourcesToPrepare() const noexcept
 			{
 				auto count = 0;
@@ -522,16 +530,16 @@ namespace ion::resources
 				return count;
 			}
 
-			//Prepares all resources that is in a pending state (non-blocking)
-			//Returns true when completed
+			///@brief Prepares all resources that is in a pending state (non-blocking)
+			///@details Returns true when completed
 			[[nodiscard]] auto Prepared()
 			{
 				PreparePendingResources(process_execution_model_);
 				return ResourcesToPrepare() == 0;
 			}
 
-			//Prepares all resources that is in a pending state (non-blocking)
-			//Updates the given progress and returns true when completed
+			///@brief Prepares all resources that is in a pending state (non-blocking)
+			///@details Updates the given progress and returns true when completed
 			[[nodiscard]] auto Prepared(types::Progress<int> &progress)
 			{
 				if (auto count = ResourcesToPrepare(); count > progress.Max())
@@ -543,13 +551,14 @@ namespace ion::resources
 				return progress.IsComplete();
 			}
 
+			///@}
 
-			/*
-				Loading
+			/**
+				@name Loading
 			*/
 
-			//Loads the given resource before returning (eager)
-			//Marks the given resource ready to be loaded (lazy)
+			///@brief Loads the given resource before returning (eager)
+			///@details Marks the given resource ready to be loaded (lazy)
 			auto Load(ResourceT &resource, resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager)
 			{
 				if (resource.Owner() != this)
@@ -578,8 +587,8 @@ namespace ion::resources
 					return load;				
 			}
 
-			//Loads all resources before returning (eager)
-			//Marks all resources ready to be loaded (lazy)
+			///@brief Loads all resources before returning (eager)
+			///@details Marks all resources ready to be loaded (lazy)
 			void LoadAll(resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager)
 			{
 				if (strategy == resource_manager::EvaluationStrategy::Eager)
@@ -590,7 +599,7 @@ namespace ion::resources
 			}
 
 
-			//Returns the number of resources that are waiting to be loaded
+			///@brief Returns the number of resources that are waiting to be loaded
 			[[nodiscard]] auto ResourcesToLoad() const noexcept
 			{
 				auto count = 0;
@@ -611,8 +620,8 @@ namespace ion::resources
 				return count;
 			}
 
-			//Loads all resources that is in a pending state (non-blocking)
-			//Returns true when completed
+			///@brief Loads all resources that is in a pending state (non-blocking)
+			///@details Returns true when completed
 			[[nodiscard]] auto Loaded()
 			{
 				PreparePendingResources(process_execution_model_);
@@ -620,8 +629,8 @@ namespace ion::resources
 				return ResourcesToLoad() == 0;
 			}
 
-			//Loads all resources that is in a pending state (non-blocking)
-			//Updates the given progress and returns true when completed
+			///@brief Loads all resources that is in a pending state (non-blocking)
+			///@details Updates the given progress and returns true when completed
 			[[nodiscard]] auto Loaded(types::Progress<int> &progress)
 			{
 				if (auto count = ResourcesToLoad(); count > progress.Max())
@@ -634,13 +643,14 @@ namespace ion::resources
 				return progress.IsComplete();
 			}
 
+			///@}
 
-			/*
-				Unloading
+			/**
+				@name Unloading
 			*/
 
-			//Unloads the given resource before returning (eager)
-			//Marks the given resource ready to be unloaded (lazy)
+			///@brief Unloads the given resource before returning (eager)
+			///@details Marks the given resource ready to be unloaded (lazy)
 			auto Unload(ResourceT &resource, resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
 				if (resource.Owner() != this)
@@ -658,8 +668,8 @@ namespace ion::resources
 					return unload;
 			}
 
-			//Unloads all resources before returning (eager)
-			//Marks all resources ready to be unloaded (lazy)
+			///@brief Unloads all resources before returning (eager)
+			///@details Marks all resources ready to be unloaded (lazy)
 			void UnloadAll(resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager) noexcept
 			{
 				for (auto &resource : Resources())
@@ -667,7 +677,7 @@ namespace ion::resources
 			}
 
 
-			//Returns the number of resources that are waiting to be unloaded
+			///@brief Returns the number of resources that are waiting to be unloaded
 			[[nodiscard]] auto ResourcesToUnload() const noexcept
 			{
 				auto count = 0;
@@ -686,16 +696,16 @@ namespace ion::resources
 				return count;
 			}
 
-			//Unloads all resources that is in a pending state (non-blocking)
-			//Returns true when completed
+			///@brief Unloads all resources that is in a pending state (non-blocking)
+			///@details Returns true when completed
 			[[nodiscard]] auto Unloaded() noexcept
 			{
 				UnloadPendingResources();
 				return ResourcesToUnload() == 0;
 			}
 
-			//Unloads all resources that is in a pending state (non-blocking)
-			//Updates the given progress and returns true when completed
+			///@brief Unloads all resources that is in a pending state (non-blocking)
+			///@details Updates the given progress and returns true when completed
 			[[nodiscard]] auto Unloaded(types::Progress<int> &progress) noexcept
 			{
 				if (auto count = ResourcesToUnload(); count > progress.Max())
@@ -707,13 +717,14 @@ namespace ion::resources
 				return progress.IsComplete();
 			}
 
+			///@}
 
-			/*
-				Reloading
+			/**
+				@name Reloading
 			*/
 
-			//Reloads the given resource before returning (eager)
-			//Marks the given resource ready to be reloaded (lazy)
+			///@brief Reloads the given resource before returning (eager)
+			///@details Marks the given resource ready to be reloaded (lazy)
 			auto Reload(ResourceT &resource, resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager)
 			{
 				if (resource.Owner() != this)
@@ -738,21 +749,22 @@ namespace ion::resources
 					return reload;
 			}
 
-			//Reloads all resources before returning (eager)
-			//Marks all resources ready to be reloaded (lazy)
+			///@brief Reloads all resources before returning (eager)
+			///@details Marks all resources ready to be reloaded (lazy)
 			void ReloadAll(resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager)
 			{
 				for (auto &resource : Resources())
 					Reload(resource, strategy);
 			}
 
+			///@}
 
-			/*
-				Repairing
+			/**
+				@name Repairing
 			*/
 
-			//Repairs the given resource before returning (eager)
-			//Marks the given resource ready to be repaired (lazy)
+			///@brief Repairs the given resource before returning (eager)
+			///@details Marks the given resource ready to be repaired (lazy)
 			auto Repair(ResourceT &resource, resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager)
 			{
 				if (resource.Owner() != this)
@@ -777,8 +789,8 @@ namespace ion::resources
 					return repair;
 			}
 
-			//Repairs all resources before returning (eager)
-			//Marks all resources ready to be repaired (lazy)
+			///@brief Repairs all resources before returning (eager)
+			///@details Marks all resources ready to be repaired (lazy)
 			void RepairAll(resource_manager::EvaluationStrategy strategy = resource_manager::EvaluationStrategy::Eager)
 			{
 				for (auto &resource : Resources())
@@ -786,7 +798,7 @@ namespace ion::resources
 			}
 
 
-			//Returns the number of resources that has failed
+			///@brief Returns the number of resources that has failed
 			[[nodiscard]] auto ResourcesToRepair() const noexcept
 			{
 				auto count = 0;
@@ -800,20 +812,20 @@ namespace ion::resources
 				return count;
 			}
 
+			///@}
 
-			/*
-				Resources
-				Creating
+			/**
+				@name Resources - Creating
 			*/
 
-			//Creates a resource with the given arguments
+			///@brief Creates a resource with the given arguments
 			template <typename... Args>
 			auto CreateResource(Args &&...args)
 			{
 				return this->Create(std::forward<Args>(args)...);
 			}
 
-			//Creates a resource of type T with the given arguments
+			///@brief Creates a resource of type T with the given arguments
 			template <typename T, typename... Args>
 			auto CreateResource(Args &&...args)
 			{
@@ -823,49 +835,51 @@ namespace ion::resources
 				return static_pointer_cast<T>(ptr);
 			}
 
+			///@}
 
-			/*
-				Resources
-				Retrieving
+			/**
+				@name Resources - Retrieving
 			*/
 
-			//Gets a pointer to a mutable resource with the given name
-			//Returns nullptr if resource could not be found
+			///@brief Gets a pointer to a mutable resource with the given name
+			///@details Returns nullptr if resource could not be found
 			[[nodiscard]] auto GetResource(std::string_view name) noexcept
 			{
 				return this->Get(name);
 			}
 
-			//Gets a pointer to an immutable resource with the given name
-			//Returns nullptr if resource could not be found
+			///@brief Gets a pointer to an immutable resource with the given name
+			///@details Returns nullptr if resource could not be found
 			[[nodiscard]] auto GetResource(std::string_view name) const noexcept
 			{
 				return this->Get(name);
 			}
 
+			///@}
 
-			/*
-				Resources
-				Removing
+			/**
+				@name Resources - Removing
 			*/
 
-			//Clears all removable resources from this manager
+			///@brief Clears all removable resources from this manager
 			void ClearResources() noexcept
 			{
 				this->Clear();
 			}
 
-			//Removes a removable resource from this manager
+			///@brief Removes a removable resource from this manager
 			auto RemoveResource(ResourceT &resource) noexcept
 			{
 				return this->Remove(resource);
 			}
 
-			//Removes a removable resource with the given name from this manager
+			///@brief Removes a removable resource with the given name from this manager
 			auto RemoveResource(std::string_view name) noexcept
 			{
 				return this->Remove(name);
 			}
+
+			///@}
 	};
 } //ion::resources
 

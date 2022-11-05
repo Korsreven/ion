@@ -49,7 +49,7 @@ namespace ion::resources
 	} //resource
 
 
-	//A class representing a general resource that can be prepared, loaded and unloaded
+	///@brief A class representing a general resource that can be prepared, loaded and unloaded
 	template <typename T>
 	class Resource : public managed::ManagedObject<T>
 	{
@@ -63,39 +63,44 @@ namespace ion::resources
 			using managed::ManagedObject<T>::ManagedObject;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the resource to the given loading state
+			///@brief Sets the resource to the given loading state
 			inline void LoadingState(resource::LoadingState loading_state) noexcept
 			{
 				loading_state_ = loading_state;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the loading state of the resource
+			///@brief Returns the loading state of the resource
 			[[nodiscard]] inline auto LoadingState() const noexcept
 			{
 				return loading_state_;
 			}
 
-			//Returns the loading action of the resource
+			///@brief Returns the loading action of the resource
 			[[nodiscard]] inline auto LoadingAction() const noexcept
 			{
 				return loading_action_;
 			}
 
+			///@}
 
-			/*
-				Loading
+			/**
+				@name Loading
+				@{
 			*/
 
-			//Signals that this resource needs to be prepared
+			///@brief Signals that this resource needs to be prepared
 			inline auto Prepare() noexcept
 			{
 				switch (loading_state_)
@@ -111,7 +116,7 @@ namespace ion::resources
 				}			
 			}
 
-			//Signals that this resource needs to be loaded
+			///@brief Signals that this resource needs to be loaded
 			inline auto Load() noexcept
 			{
 				switch (loading_state_)
@@ -132,7 +137,7 @@ namespace ion::resources
 				}
 			}
 
-			//Signals that this resource needs to be unloaded
+			///@brief Signals that this resource needs to be unloaded
 			inline auto Unload() noexcept
 			{
 				switch (loading_state_)
@@ -150,7 +155,7 @@ namespace ion::resources
 			}
 
 
-			//Signals that this resource needs to be reloaded
+			///@brief Signals that this resource needs to be reloaded
 			inline auto Reload() noexcept
 			{
 				switch (loading_state_)
@@ -167,7 +172,7 @@ namespace ion::resources
 				}
 			}
 
-			//Signals that this resource needs to be repaired if failed
+			///@brief Signals that this resource needs to be repaired if failed
 			inline auto Repair() noexcept
 			{
 				switch (loading_state_)
@@ -181,7 +186,7 @@ namespace ion::resources
 			}
 
 
-			//Returns true if this resource is preparing
+			///@brief Returns true if this resource is preparing
 			[[nodiscard]] inline auto IsPreparing() const noexcept
 			{
 				switch (loading_state_)
@@ -195,13 +200,13 @@ namespace ion::resources
 				}
 			}
 
-			//Returns true if this resource is prepared
+			///@brief Returns true if this resource is prepared
 			[[nodiscard]] inline auto IsPrepared() const noexcept
 			{
 				return loading_state_ == resource::LoadingState::Prepared;
 			}
 
-			//Returns true if this resource is loading
+			///@brief Returns true if this resource is loading
 			[[nodiscard]] inline auto IsLoading() const noexcept
 			{
 				switch (loading_state_)
@@ -215,13 +220,13 @@ namespace ion::resources
 				}
 			}
 
-			//Returns true if this resource is loaded
+			///@brief Returns true if this resource is loaded
 			[[nodiscard]] inline auto IsLoaded() const noexcept
 			{
 				return loading_state_ == resource::LoadingState::Loaded;
 			}
 
-			//Returns true if this resource is unloading
+			///@brief Returns true if this resource is unloading
 			[[nodiscard]] inline auto IsUnloading() const noexcept
 			{
 				switch (loading_state_)
@@ -235,26 +240,26 @@ namespace ion::resources
 				}
 			}
 
-			//Returns true if this resource is unloaded
+			///@brief Returns true if this resource is unloaded
 			[[nodiscard]] inline auto IsUnloaded() const noexcept
 			{
 				return loading_state_ == resource::LoadingState::Unloaded;
 			}
 
-			//Returns true if this resource has failed
+			///@brief Returns true if this resource has failed
 			[[nodiscard]] inline auto HasFailed() const noexcept
 			{
 				return loading_state_ == resource::LoadingState::Failed;
 			}
 
 
-			//Returns true if this resource is busy preparing, loading or unloading
+			///@brief Returns true if this resource is busy preparing, loading or unloading
 			[[nodiscard]] inline auto IsBusy() const noexcept
 			{
 				return IsPreparing() || IsLoading() || IsUnloading();
 			}
 
-			
+			///@}
 	};
 } //ion::resources
 

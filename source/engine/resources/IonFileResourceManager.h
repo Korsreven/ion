@@ -45,7 +45,7 @@ namespace ion::resources
 	} //file_resource_manager::detail
 
 
-	//A class that manages and prepares file resources from its own repositories
+	///@brief A class that manages and prepares file resources from its own repositories
 	template <typename ResourceT, typename OwnerT, typename RepositoryT>
 	class FileResourceManager :
 		public ResourceManager<ResourceT, OwnerT>,
@@ -60,8 +60,9 @@ namespace ion::resources
 			using RepositoryBase = unmanaged::ObjectFactory<RepositoryT>;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
 			virtual bool PrepareResource(ResourceT &resource) override
@@ -77,41 +78,43 @@ namespace ion::resources
 			}
 
 
-			//See ResourceManager::ResourcePrepared for more details
+			///@brief See ResourceManager::ResourcePrepared for more details
 			virtual void ResourcePrepared(ResourceT&) noexcept override
 			{
 				//Optional to override
 			}
 
-			//See ResourceManager::ResourceLoaded for more details
+			///@brief See ResourceManager::ResourceLoaded for more details
 			virtual void ResourceLoaded(ResourceT &resource) noexcept override
 			{
 				resource.ResetFileData();
 					//File data not required after resource has been loaded (save memory)
 			}
 
-			//See ResourceManager::ResourceUnloaded for more details
+			///@brief See ResourceManager::ResourceUnloaded for more details
 			virtual void ResourceUnloaded(ResourceT&) noexcept override
 			{
 				//Optional to override
 			}
 
-			//See ResourceManager::ResourceFailed for more details
+			///@brief See ResourceManager::ResourceFailed for more details
 			virtual void ResourceFailed(ResourceT &resource) noexcept override
 			{
 				resource.ResetFileData();
 					//File data not required after resource has failed (save memory)
 			}
 
+			///@}
+
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			FileResourceManager() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			FileResourceManager(const FileResourceManager&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			FileResourceManager(FileResourceManager&&) = default;
 
 
@@ -119,67 +122,70 @@ namespace ion::resources
 				Operators
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			FileResourceManager& operator=(const FileResourceManager&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			FileResourceManager& operator=(FileResourceManager&&) = default;
 
 
-			/*
+			/**
 				Ranges
 			*/
 
-			//Returns a mutable range of all repositories in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all repositories in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Repositories() noexcept
 			{
 				return RepositoryBase::Objects();
 			}
 
-			//Returns an immutable range of all repositories in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all repositories in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Repositories() const noexcept
 			{
 				return RepositoryBase::Objects();
 			}
 
 
-			/*
-				Repositories
-				Creating
+			/**
+				@name Repositories - Creating
+				@{
 			*/
 
-			//Creates an empty repository
+			///@brief Creates an empty repository
 			auto CreateRepository()
 			{
 				return RepositoryBase::Create();
 			}
 
-			//Creates a repository by copying/moving the given repository
+			///@brief Creates a repository by copying/moving the given repository
 			template <typename T, typename = std::enable_if_t<std::is_same_v<std::remove_cvref_t<T>, RepositoryT>>>
 			auto CreateRepository(T &&repository)
 			{
 				return RepositoryBase::Create(std::forward<T>(repository));
 			}
 
+			///@}
 
-			/*
-				Repositories
-				Removing
+			/**
+				@name Repositories - Removing
+				@{
 			*/
 
-			//Clears all repositories from this factory
+			///@brief Clears all repositories from this factory
 			void ClearRepositories() noexcept
 			{
 				RepositoryBase::Clear();
 			}
 
-			//Removes a repository from this factory
+			///@brief Removes a repository from this factory
 			auto RemoveRepository(RepositoryT &repository) noexcept
 			{
 				return RepositoryBase::Remove(repository);
 			}
+
+			///@}
 	};
 } //ion::resources
 
