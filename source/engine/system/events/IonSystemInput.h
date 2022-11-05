@@ -31,9 +31,9 @@ File:	IonSystemInput.h
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
 
-//Namespace containing key and mouse input mappings that are system specific
-//Functions, classes and class members may need different implementation based on the underlying OS
-//System specific code should have its own define directive
+///@brief Namespace containing key and mouse input mappings that are system specific
+///@details Functions, classes and class members may need different implementation based on the underlying OS.
+///System specific code should have its own define directive
 namespace ion::system::events
 {
 	using ion::events::listeners::KeyButton;
@@ -248,22 +248,24 @@ namespace ion::system::events
 	} //detail
 
 
-	/*
-		Get key/mouse button
+	/**
+		@name Get key/mouse button
+		@{
 	*/
 
-	//Returns the key button corresponding to the system specific input code
+	///@brief Returns the key button corresponding to the system specific input code
 	[[nodiscard]] inline auto GetMappedKeyButton(CodeType code) noexcept
 	{
 		return detail::get_mapped_code(detail::key_button_map, code);
 	}
 
-	//Returns the mouse button corresponding to the system specific input code
+	///@brief Returns the mouse button corresponding to the system specific input code
 	[[nodiscard]] inline auto GetMappedMouseButton(CodeType code) noexcept
 	{
 		return detail::get_mapped_code(detail::mouse_button_map, code);
 	}
 
+	///@}
 } //ion::system::events
 
 #endif

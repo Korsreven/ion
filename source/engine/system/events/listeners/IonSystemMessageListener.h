@@ -25,21 +25,23 @@ namespace ion::system::events::listeners
 	#endif
 
 
-	//A class representing a listener that listens to system specific messages
-	//Functions, classes and class members may need different implementation based on the underlying OS
-	//System specific code should have its own define directive
+	///@brief A class representing a listener that listens to system specific messages
+	///@details Functions, classes and class members may need different implementation based on the underlying OS.
+	///System specific code should have its own define directive
 	struct MessageListener : ion::events::listeners::Listener<MessageListener>
 	{
-		/*
-			Events
+		/**
+			@name Events
+			@{
 		*/
-
-		//Called when a system message is received, with the message that was sent
 		
 		#ifdef ION_WIN32
-		//Function signature for windows 32/64 bit
+		///@brief Called when a system message is received, with the message that was sent
+		///@details Function signature for windows 32/64 bit
 		virtual bool MessageReceived(HWND window_handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept = 0;
 		#endif
+
+		///@}
 	};
 } //ion::events::listeners
 

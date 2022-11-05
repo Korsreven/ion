@@ -23,9 +23,9 @@ File:	IonSystemUtility.h
 #include "IonSystemAPI.h"
 #include "types/IonTypes.h"
 
-//Namespace containing commonly used utilities that are system specific
-//Functions, classes and class members may need different implementation based on the underlying OS
-//System specific code should have its own define directive
+///@brief Namespace containing commonly used utilities that are system specific
+///@details Functions, classes and class members may need different implementation based on the underlying OS.
+///System specific code should have its own define directive
 namespace ion::system::utilities
 {
 	enum class ProcessWindowCommand
@@ -94,53 +94,62 @@ namespace ion::system::utilities
 	} //detail
 
 
-	/*
-		Clipboard
+	/**
+		@name Clipboard
+		@{
 	*/
 
-	//Copies the given text, to the system clipboard
+	///@brief Copies the given text, to the system clipboard
 	bool Clipboard(std::string_view text) noexcept;
 
-	//Returns the text currently stored in the system clipboard (if any)
+	///@brief Returns the text currently stored in the system clipboard (if any)
 	[[nodiscard]] std::optional<std::string> Clipboard();
 
+	///@}
 
-	/*
-		Command line
+	/**
+		@name Command line
+		@{
 	*/
 
-	//Returns the full application path, including the executable name
+	///@brief Returns the full application path, including the executable name
 	[[nodiscard]] std::optional<std::filesystem::path> ApplicationPath();
 
-	//Returns the command line given to the executable at start
+	///@brief Returns the command line given to the executable at start
 	[[nodiscard]] std::string_view CommandLine() noexcept;
 
-	//Returns all the command line arguments given to the executable at start
-	//Splitting arguments by using space as the delimiter, unless double quoted
+	///@brief Returns all the command line arguments given to the executable at start
+	///@details Splitting arguments by using space as the delimiter, unless double quoted
 	[[nodiscard]] std::vector<std::string> CommandLineArguments();
 
+	///@}
 
-	/*
-		Execution
+	/**
+		@name Execution
+		@{
 	*/
 
-	//Ask the underlying system to execute a program or open a file/directory
+	///@brief Ask the underlying system to execute a program or open a file/directory
 	bool Execute(const std::filesystem::path &path,
 		ProcessWindowCommand window_command = ProcessWindowCommand::Normal) noexcept;
 
-	//Ask the underlying system to execute a program or open a file/directory
-	//Send in one or more parameters, or another current path to be used for the execution
+	///@brief Ask the underlying system to execute a program or open a file/directory
+	///@details Send in one or more parameters, or another current path to be used for the execution
 	bool Execute(const std::filesystem::path &path,
 		std::optional<std::string> parameters, std::optional<std::filesystem::path> current_path,
 		ProcessWindowCommand window_command = ProcessWindowCommand::Normal) noexcept;
 
+	///@}
 
-	/*
-		Power
+	/**
+		@name Power
+		@{
 	*/
 
-	//Returns the system power status, such as battery information
+	///@brief Returns the system power status, such as battery information
 	[[nodiscard]] std::optional<const PowerStatus> Power() noexcept;
+
+	///@}
 } //ion::system::utilities
 
 #endif

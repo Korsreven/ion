@@ -247,9 +247,9 @@ namespace ion::system
 	} //window
 
 
-	//A class representing a system specific window (window for messages, inputs and OpenGL rendering)
-	//Functions, classes and class members may need different implementation based on the underlying OS
-	//System specific code should have its own define directive
+	///@brief A class representing a system specific window (window for messages, inputs and OpenGL rendering)
+	///@details Functions, classes and class members may need different implementation based on the underlying OS.
+	///System specific code should have its own define directive
 	class Window :
 		public ion::events::Listenable<events::listeners::MessageListener>
 	{
@@ -265,22 +265,25 @@ namespace ion::system
 
 
 			#ifdef ION_WIN32
-			//Processes a message that is sent to the window
+			///@brief Processes a message that is sent to the window
 			bool ProcessMessage(HWND handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept;
 			#endif
 
 
-			/*
-				Notifying
+			/**
+				@name Notifying
+				@{
 			*/
 
 			#ifdef ION_WIN32
 			bool NotifyMessageReceived(HWND handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept;
 			#endif
 
+			///@}
 
-			/*
-				Creating / destroying
+			/**
+				@name Creating/destroying
+				@{
 			*/
 
 			bool DoCreate(std::string_view title, const Vector2 &size,
@@ -289,82 +292,89 @@ namespace ion::system
 
 			void DoDestroy() noexcept;
 
+			///@}
 
-			/*
-				Window events
+			/**
+				@name Window events
+				@{
 			*/
 
-			//Called right after a window has been created/opened
+			///@brief Called right after a window has been created/opened
 			virtual void Opened() noexcept;
 
-			//Called right after a window has been closed/destroyed
+			///@brief Called right after a window has been closed/destroyed
 			virtual void Closed() noexcept;
 
 
-			//Called right after a window has been activated
+			///@brief Called right after a window has been activated
 			virtual void Activated() noexcept;
 
-			//Called right after a window has been deactivated
+			///@brief Called right after a window has been deactivated
 			virtual void Deactivated() noexcept;
 
 
-			//Called right after a window has been maximized
+			///@brief Called right after a window has been maximized
 			virtual void Maximized() noexcept;
 
-			//Called right after a window has been minimized
+			///@brief Called right after a window has been minimized
 			virtual void Minimized() noexcept;
 
-			//Called right after a window has been restored
+			///@brief Called right after a window has been restored
 			virtual void Restored() noexcept;
 
 
-			//Called right after a window has been moved, with the new position
+			///@brief Called right after a window has been moved, with the new position
 			virtual void Moved(const Vector2 &position) noexcept;
 
-			//Called right after a window has been resized, with the new size
+			///@brief Called right after a window has been resized, with the new size
 			virtual void Resized(const Vector2 &size) noexcept;
 
-			//Called right after a window display mode has been changed
+			///@brief Called right after a window display mode has been changed
 			virtual void DisplayModeChanged() noexcept;
 
 
-			//Called to retrieve the full screen size, if any
+			///@brief Called to retrieve the full screen size, if any
 			virtual std::optional<Vector2> GetFullScreenSize() const noexcept;
 
-			//Called to retrieve the min and max size constraints, if any
+			///@brief Called to retrieve the min and max size constraints, if any
 			virtual std::pair<std::optional<Vector2>, std::optional<Vector2>> GetSizeConstraints() const noexcept;
+
+			///@}
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			Window() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			Window(const Window&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			Window(Window&&) = default;
 
-			//Default virtual destructor
+			///@brief Default virtual destructor
 			virtual ~Window() = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			Window& operator=(const Window&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			Window& operator=(Window&&) = default;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the window title to the given title
+			///@brief Sets the window title to the given title
 			inline void Title(std::string_view title) noexcept
 			{
 				#ifdef ION_WIN32
@@ -373,7 +383,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Sets the window inner size to the given size
+			///@brief Sets the window inner size to the given size
 			inline void InnerSize(const Vector2 &size) noexcept
 			{
 				#ifdef ION_WIN32
@@ -382,7 +392,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Sets the window outer size to the given size
+			///@brief Sets the window outer size to the given size
 			inline void OuterSize(const Vector2 &size) noexcept
 			{
 				#ifdef ION_WIN32
@@ -391,7 +401,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Sets the window inner position to the given position
+			///@brief Sets the window inner position to the given position
 			inline void InnerPosition(const Vector2 &position) noexcept
 			{
 				#ifdef ION_WIN32
@@ -400,7 +410,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Sets the window outer position to the given position
+			///@brief Sets the window outer position to the given position
 			inline void OuterPosition(const Vector2 &position) noexcept
 			{
 				#ifdef ION_WIN32
@@ -410,8 +420,8 @@ namespace ion::system
 			}
 
 
-			//Enters full screen with the given size. If no size is given, it uses the desktop size
-			//Returns true if the window successfully entered full screen
+			///@brief Enters full screen with the given size. If no size is given, it uses the desktop size
+			///@details Returns true if the window successfully entered full screen
 			inline auto EnterFullScreen(const std::optional<Vector2> &full_screen_size) noexcept
 			{
 				#ifdef ION_WIN32
@@ -427,8 +437,8 @@ namespace ion::system
 				#endif
 			}
 
-			//Exits out of full screen
-			//Returns true if the window successfully exited out of full screen
+			///@brief Exits out of full screen
+			///@details Returns true if the window successfully exited out of full screen
 			inline auto ExitFullScreen() noexcept
 			{
 				#ifdef ION_WIN32
@@ -445,7 +455,7 @@ namespace ion::system
 			}
 
 
-			//Switches to a borderless window style
+			///@brief Switches to a borderless window style
 			inline void BorderlessStyle() noexcept
 			{
 				#ifdef ION_WIN32
@@ -454,7 +464,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Switches to a dialog window style
+			///@brief Switches to a dialog window style
 			inline void DialogStyle() noexcept
 			{
 				#ifdef ION_WIN32
@@ -463,7 +473,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Switches to a single border window style
+			///@brief Switches to a single border window style
 			inline void SingleBorderStyle() noexcept
 			{
 				#ifdef ION_WIN32
@@ -472,7 +482,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Switches to a sizeable border window style
+			///@brief Switches to a sizeable border window style
 			inline void SizeableBorderStyle() noexcept
 			{
 				#ifdef ION_WIN32
@@ -482,7 +492,7 @@ namespace ion::system
 			}
 
 
-			//Shows the window cursor
+			///@brief Shows the window cursor
 			inline void ShowCursor() noexcept
 			{
 				#ifdef ION_WIN32
@@ -490,7 +500,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Hides the window cursor
+			///@brief Hides the window cursor
 			inline void HideCursor() noexcept
 			{
 				#ifdef ION_WIN32
@@ -499,7 +509,7 @@ namespace ion::system
 			}
 
 
-			//Focuses the window by bringing it to the front
+			///@brief Focuses the window by bringing it to the front
 			inline void Focus() noexcept
 			{
 				#ifdef ION_WIN32
@@ -508,7 +518,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Sets the window position to the center of the main desktop
+			///@brief Sets the window position to the center of the main desktop
 			inline void Center() noexcept
 			{
 				#ifdef ION_WIN32
@@ -517,13 +527,15 @@ namespace ion::system
 				#endif
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the inner (client/screen) size of the window
-			//Returns nullopt if no window has been created
+			///@brief Returns the inner (client/screen) size of the window
+			///@details Returns nullopt if no window has been created
 			[[nodiscard]] inline auto InnerSize() const noexcept
 			{
 				#ifdef ION_WIN32
@@ -534,8 +546,8 @@ namespace ion::system
 				return std::optional<Vector2>{};
 			}
 
-			//Returns the outer size of the window
-			//Returns nullopt if no window has been created
+			///@brief Returns the outer size of the window
+			///@details Returns nullopt if no window has been created
 			[[nodiscard]] inline auto OuterSize() const noexcept
 			{
 				#ifdef ION_WIN32
@@ -546,8 +558,8 @@ namespace ion::system
 				return std::optional<Vector2>{};
 			}
 
-			//Returns the desktop size of the system
-			//Returns nullopt if system does not have a desktop
+			///@brief Returns the desktop size of the system
+			///@details Returns nullopt if system does not have a desktop
 			[[nodiscard]] inline auto DesktopSize() const noexcept
 			{
 				#ifdef ION_WIN32
@@ -557,8 +569,8 @@ namespace ion::system
 				#endif
 			}
 
-			//Returns the inner (client/screen) position of the window
-			//Returns nullopt if no window has been created
+			///@brief Returns the inner (client/screen) position of the window
+			///@details Returns nullopt if no window has been created
 			[[nodiscard]] inline auto InnerPosition() const noexcept
 			{
 				#ifdef ION_WIN32
@@ -569,8 +581,8 @@ namespace ion::system
 				return std::optional<Vector2>{};
 			}
 
-			//Returns the outer position of the window
-			//Returns nullopt if no window has been created
+			///@brief Returns the outer position of the window
+			///@details Returns nullopt if no window has been created
 			[[nodiscard]] inline auto OuterPosition() const noexcept
 			{
 				#ifdef ION_WIN32
@@ -582,7 +594,7 @@ namespace ion::system
 			}
 
 
-			//Returns true if the window is created
+			///@brief Returns true if the window is created
 			[[nodiscard]] inline auto Created() const noexcept
 			{
 				#ifdef ION_WIN32
@@ -592,7 +604,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Returns true if the window is active (in focus)
+			///@brief Returns true if the window is active (in focus)
 			[[nodiscard]] inline auto IsActive() const noexcept
 			{
 				#ifdef ION_WIN32
@@ -602,7 +614,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Returns true if the window is centered
+			///@brief Returns true if the window is centered
 			[[nodiscard]] inline auto IsCentered() const noexcept
 			{
 				#ifdef ION_WIN32
@@ -612,7 +624,7 @@ namespace ion::system
 				#endif
 			}
 
-			//Returns true if the window is in full screen mode
+			///@brief Returns true if the window is in full screen mode
 			[[nodiscard]] inline auto InFullScreen() const noexcept
 			{
 				#ifdef ION_WIN32
@@ -624,8 +636,8 @@ namespace ion::system
 
 
 			#ifdef ION_WIN32
-			//Returns the window handle
-			//Returns nullptr if no window has been created
+			///@brief Returns the window handle
+			///@details Returns nullptr if no window has been created
 			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return *handle_;
@@ -637,65 +649,75 @@ namespace ion::system
 			}
 			#endif
 
+			///@}
 
-			/*
-				Buffers
+			/**
+				@name Buffers
+				@{
 			*/
 
-			//Exchanges the front and back buffers
+			///@brief Exchanges the front and back buffers
 			void SwapBuffers() const noexcept;
 
+			///@}
 
-			/*
-				Create/destroy
+			/**
+				@name Create/destroy
+				@{
 			*/
 
-			//Creates a borderless system window
+			///@brief Creates a borderless system window
 			bool CreateBorderless(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position, int color_depth = 32) noexcept;
 
-			//Creates a dialog system window
+			///@brief Creates a dialog system window
 			bool CreateDialog(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position, int color_depth = 32) noexcept;
 
-			//Creates a single border system window
+			///@brief Creates a single border system window
 			bool CreateNonResizable(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position, int color_depth = 32) noexcept;
 
-			//Creates a sizeable border system window
+			///@brief Creates a sizeable border system window
 			bool CreateResizable(std::string_view title, const Vector2 &size, const std::optional<Vector2> &position, int color_depth = 32) noexcept;
 
 
-			//Destroyes a system window (if existing)
+			///@brief Destroyes a system window (if existing)
 			void Destroy() noexcept;
 
+			///@}
 
-			/*
-				Show/hide
+			/**
+				@name Show/hide
+				@{
 			*/
 
-			//Shows and focus the system window
-			//Makes the window visible
+			///@brief Shows and focus the system window
+			///@details Makes the window visible
 			bool Show() noexcept;
 
-			//Hides the system window
-			//Makes the window not visible
+			///@brief Hides the system window
+			///@details Makes the window not visible
 			bool Hide() noexcept;
 
+			///@}
 
-			/*
-				Messages
+			/**
+				@name Messages
+				@{
 			*/
 
-			//Process all messages in the message queue
-			//Returns false if a quit message has been received
+			///@brief Process all messages in the message queue
+			///@details Returns false if a quit message has been received
 			bool ProcessMessages() noexcept;
 
-			//Process the next message in the message queue
-			//Returns false if no message remains in queue
+			///@brief Process the next message in the message queue
+			///@details Returns false if no message remains in queue
 			bool ProcessNextMessage(bool &quit) noexcept;
 
 			#ifdef ION_WIN32
-			//An application-defined function that processes each dispatched message from the 
+			///@brief An application-defined function that processes each dispatched message from the 
 			LRESULT CALLBACK Procedure(HWND handle, UINT message, WPARAM w_param, LPARAM l_param) noexcept;
 			#endif
+
+			///@}
 	};
 
 } //ion::system
