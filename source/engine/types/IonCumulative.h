@@ -29,7 +29,7 @@ namespace ion::types
 			return value;
 		}
 
-		//Enables support for chrono::duration
+		///@brief Enables support for chrono::duration
 		constexpr auto underlying_value(duration value) noexcept
 		{
 			return value.count();
@@ -37,8 +37,8 @@ namespace ion::types
 	} //cumulative::detail
 	
 
-	//A class representing a cumulative sum (running total) in range [0, limit]
-	//Total is allowed to accumulate higher than the limit (before resetting)
+	///@brief A class representing a cumulative sum (running total) in range [0, limit]
+	///@details Total is allowed to accumulate higher than the limit (before resetting)
 	template <typename T>
 	class Cumulative
 	{
@@ -51,10 +51,10 @@ namespace ion::types
 		
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			constexpr Cumulative() = default;
 
-			//Constructs a new cumulative with the given limit
+			///@brief Constructs a new cumulative with the given limit
 			constexpr explicit Cumulative(T limit) noexcept :
 				limit_{limit > T{} ? limit : T{}}
 			{
@@ -62,53 +62,58 @@ namespace ion::types
 			}
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the running total to the given amount
+			///@brief Sets the running total to the given amount
 			constexpr void Total(T amount) noexcept
 			{
 				total_ = amount;
 			}
 
-			//Sets the limit to the given amount
+			///@brief Sets the limit to the given amount
 			constexpr void Limit(T amount) noexcept
 			{
 				limit_ = amount > T{} ? amount : T{};
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the running total
+			///@brief Returns the running total
 			[[nodiscard]] constexpr auto Total() const noexcept
 			{
 				return total_;
 			}
 
-			//Returns the limit
+			///@brief Returns the limit
 			[[nodiscard]] constexpr auto Limit() const noexcept
 			{
 				return limit_;
 			}
 
+			///@}
 
-			/*
-				Accumulating
+			/**
+				@name Accumulating
+				@{
 			*/
 
-			//Returns true if running total has reached the limit
+			///@brief Returns true if running total has reached the limit
 			[[nodiscard]] constexpr auto IsComplete() const noexcept
 			{
 				return total_ >= limit_;
 			}
 
 
-			//Adds the given amount to the running total
-			//Resets and carries over the remainder if accumulation is complete
+			///@brief Adds the given amount to the running total
+			///@details Resets and carries over the remainder if accumulation is complete
 			constexpr auto& Add(T amount) noexcept
 			{
 				if (IsComplete())
@@ -118,35 +123,39 @@ namespace ion::types
 				return *this;
 			}
 
-			//Adds the given percentage (of the limit) to the running total
+			///@brief Adds the given percentage (of the limit) to the running total
 			constexpr auto& AddPercent(real percent) noexcept
 			{
 				return Add(T(cumulative::detail::underlying_value(limit_) * percent));
 			}
 
+			///@}
 
-			/*
-				Clamping
+			/**
+				@name Clamping
+				@{
 			*/
 
-			//Clamps running total to range [0, limit]
+			///@brief Clamps running total to range [0, limit]
 			constexpr void Clamp() noexcept
 			{
 				total_ = std::clamp(total_, T{}, limit_);
 			}
 
+			///@}
 
-			/*
-				Percentage
+			/**
+				@name Percentage
+				@{
 			*/
 
-			//Sets the total to the given percentage (of the limit)
+			///@brief Sets the total to the given percentage (of the limit)
 			constexpr void Percent(real percent) noexcept
 			{
 				total_ = T(cumulative::detail::underlying_value(limit_) * percent);
 			}
 
-			//Returns the total as a percentage (of the limit)
+			///@brief Returns the total as a percentage (of the limit)
 			[[nodiscard]] constexpr auto Percent() const noexcept
 			{
 				return limit_ > T{} ?
@@ -155,66 +164,71 @@ namespace ion::types
 					1.0_r;
 			}
 
+			///@}
 
-			/*
-				Remaining
+			/**
+				@name Remaining
+				@{
 			*/
 
-			//Sets the remaining total to the given amount
+			///@brief Sets the remaining total to the given amount
 			constexpr void Remaining(T amount) noexcept
 			{
 				total_ = limit_ - amount;
 			}
 
-			//Returns the remaining total
+			///@brief Returns the remaining total
 			[[nodiscard]] constexpr T Remaining() const noexcept
 			{
 				return limit_ - total_;
 			}
 
+			///@}
 
-			/*
-				Resetting
+			/**
+				@name Resetting
+				@{
 			*/
 
-			//Returns the amount that has gone above the limit
+			///@brief Returns the amount that has gone above the limit
 			[[nodiscard]] constexpr T Remainder() const noexcept
 			{
 				return total_ > limit_ ? total_ - limit_ : T{};
 			}
 
-			//Resets the running total to 0
+			///@brief Resets the running total to 0
 			constexpr void Reset() noexcept
 			{
 				total_ = T{};
 			}
 
-			//Resets the running total to 0, but carries over the amount that has gone above the limit (remainder)
+			///@brief Resets the running total to 0, but carries over the amount that has gone above the limit (remainder)
 			constexpr void ResetWithCarry() noexcept
 			{
 				total_ = Remainder();
 			}
 
+			///@}
 
-			/*
-				Operators
-				For convenience
+			/**
+				@name Operators - For convenience
+				@{
 			*/
 
-			//Returns true if running total has reached the limit
+			///@brief Returns true if running total has reached the limit
 			constexpr operator bool() noexcept
 			{
 				return IsComplete();
 			}
 
 
-			//Pre-increments the running total with 1
+			///@brief Pre-increments the running total with 1
 			constexpr auto& operator++() noexcept
 			{
 				return Add(T{1});
 			}
 
-			//Post-increments the running total with 1
+			///@brief Post-increments the running total with 1
 			constexpr auto operator++(int) noexcept
 			{
 				auto temp = *this;
@@ -222,11 +236,13 @@ namespace ion::types
 				return temp;
 			}
 
-			//Increments the running total with the given amount
+			///@brief Increments the running total with the given amount
 			constexpr auto& operator+=(T amount) noexcept
 			{
 				return Add(amount);
 			}
+
+			///@}
 	};
 } //ion::types
 

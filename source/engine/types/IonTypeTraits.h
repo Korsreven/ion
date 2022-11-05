@@ -160,9 +160,10 @@ namespace ion::types
 	} //detail
 
 
-	/*
-		Identity
+	/**
+		@name Identity
 		Type trait that does not modify T
+		@{
 	*/
 
 	template <typename T>
@@ -174,10 +175,12 @@ namespace ion::types
 	template <typename T>
 	using identity_t = typename identity<T>::type;
 	
+	///@}
 
-	/*
-		Is number
+	/**
+		@name Is number
 		Type trait that checks if the type is a number
+		@{
 	*/
 
 	template <typename T>
@@ -189,10 +192,12 @@ namespace ion::types
 	template <typename T>
 	constexpr auto is_number_v = is_number<T>::value;
 
+	///@}
 
-	/*
-		Is pair
+	/**
+		@name Is pair
 		Type trait that checks if the type is a pair
+		@{
 	*/
 
 	template <typename T>
@@ -204,10 +209,12 @@ namespace ion::types
 	template <typename T>
 	constexpr auto is_pair_v = is_pair<T>::value;
 
+	///@}
 
-	/*
-		Is char
+	/**
+		@name Is char
 		Type trait that checks if the type is char
+		@{
 	*/
 
 	template <typename T>
@@ -219,10 +226,12 @@ namespace ion::types
 	template <typename T>
 	constexpr auto is_char_v = is_char<T>::value;
 
+	///@}
 
-	/*
-		Is string
+	/**
+		@name Is string
 		Type trait that checks if the type is string like
+		@{
 	*/
 
 	template <typename T>
@@ -234,10 +243,12 @@ namespace ion::types
 	template <typename T>
 	constexpr auto is_string_v = is_string<T>::value;
 
+	///@}
 
-	/*
-		Is const iterator
+	/**
+		@name Is const iterator
 		Type trait that checks if an iterator is const iterator
+		@{
 	*/
 
 	template <typename T>
@@ -249,10 +260,12 @@ namespace ion::types
 	template <typename T>
 	constexpr auto is_const_iterator_v = is_const_iterator<T>::value;
 
+	///@}
 
-	/*
-		Is transparent comparator
+	/**
+		@name Is transparent comparator
 		Type trait that checks if an comparator is transparent
+		@{
 	*/
 
 	template <typename T>
@@ -264,10 +277,12 @@ namespace ion::types
 	template <typename T>
 	constexpr auto is_transparent_comparator_v = is_transparent_comparator<T>::value;
 
+	///@}
 
-	/*
-		Floating point max integer
+	/**
+		@name Floating point max integer
 		Type trait that checks the max integer value that a floating point can hold
+		@{
 	*/
 
 	template <typename T>
@@ -282,19 +297,23 @@ namespace ion::types
 	template <typename T>
 	constexpr auto max_whole_number_v = max_whole_number<T>::value;
 
+	///@}
 
-	/*
-		Overloaded
+	/**
+		@name Overloaded
 		Type trait for making an overload set to std::visit
+		@{
 	*/
 
 	template <typename... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 	template <typename... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
+	///@}
 
-	/*
-		Underlying representation
+	/**
+		@name Underlying representation
 		Type trait that checks the underlying type
+		@{
 	*/
 
 	template <typename T>
@@ -305,6 +324,8 @@ namespace ion::types
 
 	template <typename T>
 	using representation_t = typename representation<T>::type;
+
+	///@}
 } //ion::types
 
 #endif

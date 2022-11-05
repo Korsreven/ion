@@ -29,7 +29,7 @@ namespace ion::types
 			return value;
 		}
 
-		//Enables support for duration
+		///@brief Enables support for duration
 		constexpr auto underlying_value(duration value) noexcept
 		{
 			return value.count();
@@ -37,7 +37,7 @@ namespace ion::types
 	} //progress::detail
 	
 
-	//A class representing a progress in range [min, max]
+	///@brief A class representing a progress in range [min, max]
 	template <typename T>
 	class Progress
 	{
@@ -51,10 +51,10 @@ namespace ion::types
 		
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			constexpr Progress() = default;
 
-			//Constructs a new progress with the given min and max
+			///@brief Constructs a new progress with the given min and max
 			constexpr Progress(T min, T max) noexcept :
 				position_{min},
 				min_{min},
@@ -64,32 +64,33 @@ namespace ion::types
 			}
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the current position to the given value
+			///@brief Sets the current position to the given value
 			constexpr void Position(T position) noexcept
 			{
 				position_ = std::clamp(position, min_, max_);
 			}
 
-			//Sets the min progress to the given value
+			///@brief Sets the min progress to the given value
 			constexpr void Min(T min) noexcept
 			{
 				min_ = min > max_ ? max_ : min;
 				position_ = std::clamp(position_, min_, max_);
 			}
 
-			//Sets the max progress to the given value
+			///@brief Sets the max progress to the given value
 			constexpr void Max(T max) noexcept
 			{
 				max_ = max < min_ ? min_ : max;
 				position_ = std::clamp(position_, min_, max_);
 			}
 
-			//Sets the extents to the given min and max values
-			//This is faster than modify via min and then max
+			///@brief Sets the extents to the given min and max values
+			///@details This is faster than modify via min and then max
 			constexpr void Extents(T min, T max) noexcept
 			{
 				min_ = min;
@@ -97,47 +98,51 @@ namespace ion::types
 				position_ = std::clamp(position_, min_, max_);
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the current position in range [min, max]
+			///@brief Returns the current position in range [min, max]
 			[[nodiscard]] constexpr auto Position() const noexcept
 			{
 				return position_;
 			}
 
-			//Returns the min progress
+			///@brief Returns the min progress
 			[[nodiscard]] constexpr auto Min() const noexcept
 			{
 				return min_;
 			}
 
-			//Returns the max progress
+			///@brief Returns the max progress
 			[[nodiscard]] constexpr auto Max() const noexcept
 			{
 				return max_;
 			}
 
-			//Returns the min and max progress
+			///@brief Returns the min and max progress
 			[[nodiscard]] constexpr auto MinMax() const noexcept
 			{
 				return std::pair{min_, max_};
 			}
 
+			///@}
 
-			/*
-				Percentage
+			/**
+				@name Percentage
+				@{
 			*/
 
-			//Sets the current progress to the given percentage in range [0.0, 1.0]
+			///@brief Sets the current progress to the given percentage in range [0.0, 1.0]
 			constexpr void Percent(real percent) noexcept
 			{
 				position_ = std::clamp(min_ + T(progress::detail::underlying_value(max_ - min_) * percent), min_, max_);
 			}
 
-			//Returns the current progress as a percentage in range [0.0, 1.0]
+			///@brief Returns the current progress as a percentage in range [0.0, 1.0]
 			[[nodiscard]] constexpr auto Percent() const noexcept
 			{
 				return max_ - min_ > T{} ?
@@ -146,47 +151,53 @@ namespace ion::types
 					1.0_r;
 			}
 
+			///@}
 
-			/*
-				Remaining
+			/**
+				@name Remaining
+				@{
 			*/
 
-			//Sets the current remaining progress to the given value
+			///@brief Sets the current remaining progress to the given value
 			constexpr void Remaining(T amount) noexcept
 			{
 				position_ = std::clamp(max_ - amount, min_, max_);
 			}
 
-			//Returns the current remaining progress
+			///@brief Returns the current remaining progress
 			[[nodiscard]] constexpr T Remaining() const noexcept
 			{
 				return max_ - position_;
 			}
 
+			///@}
 
-			/*
-				Resetting
+			/**
+				@name Resetting
+				@{
 			*/
 
-			//Resets the current position to the min progress
+			///@brief Resets the current position to the min progress
 			constexpr void Reset() noexcept
 			{
 				position_ = min_;
 			}
 
+			///@}
 
-			/*
-				Stepping
+			/**
+				@name Stepping
+				@{
 			*/
 
-			//Returns true if the current position has reached max progress
+			///@brief Returns true if the current position has reached max progress
 			[[nodiscard]] constexpr auto IsComplete() const noexcept
 			{
 				return position_ == max_;
 			}
 
 
-			//Increase the current position by the given amount
+			///@brief Increase the current position by the given amount
 			constexpr auto& StepBy(T amount) noexcept
 			{
 				if (!IsComplete())
@@ -195,11 +206,13 @@ namespace ion::types
 				return *this;
 			}
 
-			//Increase the current position by the given percentage (of max)
+			///@brief Increase the current position by the given percentage (of max)
 			constexpr auto& StepByPercent(real percent) noexcept
 			{
 				return StepBy(T(progress::detail::underlying_value(max_ - min_) * percent));
 			}
+
+			///@}
 	};
 } //ion::types
 

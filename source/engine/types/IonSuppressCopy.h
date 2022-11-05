@@ -19,10 +19,10 @@ File:	IonSuppressCopy.h
 
 namespace ion::types
 {
-	//A class representing a member value that has suppressed copies
-	//Tag class members as SuppressCopy to disable copying of its value
-	//An object containing one or more tagged members can still be copied normally
-	//A member tagged as SuppressCopy will be default constructed when the copy constructor is called
+	///@brief A class representing a member value that has suppressed copies
+	///@details Tag class members as SuppressCopy to disable copying of its value.
+	///An object containing one or more tagged members can still be copied normally.
+	///A member tagged as SuppressCopy will be default constructed when the copy constructor is called
 	template <typename T>
 	class SuppressCopy
 	{
@@ -38,30 +38,30 @@ namespace ion::types
 		
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			constexpr SuppressCopy() = default;
 
-			//Constructs a new value with the given value
+			///@brief Constructs a new value with the given value
 			constexpr SuppressCopy(const T &value) noexcept :
 				value_{value}
 			{
 				//Empty
 			}
 
-			//Constructs a new value with the given value
+			///@brief Constructs a new value with the given value
 			constexpr SuppressCopy(T &&value) noexcept :
 				value_{std::move(value)}
 			{
 				//Empty
 			}		
 
-			//Copy constructor
+			///@brief Copy constructor
 			constexpr SuppressCopy(const SuppressCopy<T>&) noexcept
 			{
 				//Suppress
 			}
 
-			//Move constructor (trivially)
+			///@brief Move constructor (trivially)
 			constexpr SuppressCopy(SuppressCopy<T> &&rhs) noexcept
 				requires std::is_trivially_move_constructible_v<T> :
 				value_{std::exchange(rhs.value_, T{})}
@@ -69,7 +69,7 @@ namespace ion::types
 				//Empty
 			}
 
-			//Move constructor (not trivially)
+			///@brief Move constructor (not trivially)
 			constexpr SuppressCopy(SuppressCopy<T> &&rhs) noexcept
 				requires !std::is_trivially_move_constructible_v<T> :
 				value_{std::move(rhs.value_)}
@@ -78,18 +78,19 @@ namespace ion::types
 			}
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Copy assignment
+			///@brief Copy assignment
 			constexpr auto& operator=(const SuppressCopy<T>&) noexcept
 			{
 				//Suppress
 				return *this;
 			}
 
-			//Move assignment (trivially)
+			///@brief Move assignment (trivially)
 			constexpr auto& operator=(SuppressCopy<T> &&rhs) noexcept
 				requires std::is_trivially_move_constructible_v<T>
 			{
@@ -97,7 +98,7 @@ namespace ion::types
 				return *this;
 			}
 
-			//Move assignment (not trivially)
+			///@brief Move assignment (not trivially)
 			constexpr auto& operator=(SuppressCopy<T> &&rhs) noexcept
 				requires !std::is_trivially_move_constructible_v<T>
 			{
@@ -105,14 +106,14 @@ namespace ion::types
 				return *this;
 			}
 
-			//Value copy assignment
+			///@brief Value copy assignment
 			constexpr auto& operator=(const T &value) noexcept
 			{
 				value_ = value;
 				return *this;
 			}
 
-			//Value move assignment
+			///@brief Value move assignment
 			constexpr auto& operator=(T &&value) noexcept
 			{
 				value_ = std::move(value);
@@ -120,77 +121,82 @@ namespace ion::types
 			}
 
 
-			//Combined comparison operator
+			///@brief Combined comparison operator
 			[[nodiscard]] constexpr auto operator<=>(const SuppressCopy<T>&) const = default;
 
-			//Returns true if the value is equal to the given value
+			///@brief Returns true if the value is equal to the given value
 			[[nodiscard]] constexpr auto operator==(const T &value) const noexcept
 			{
 				return value_ == value;
 			}
 
-			//Returns true if the value is different from the given value
+			///@brief Returns true if the value is different from the given value
 			[[nodiscard]] constexpr auto operator!=(const T &value) const noexcept
 			{
 				return !(*this == value);
 			}
 
 
-			//Returns a mutable reference to the value
+			///@brief Returns a mutable reference to the value
 			[[nodiscard]] constexpr operator auto&() noexcept
 			{
 				return value_;
 			}
 
-			//Returns an immutable reference to the value
+			///@brief Returns an immutable reference to the value
 			[[nodiscard]] constexpr operator auto&() const noexcept
 			{
 				return value_;
 			}
 
+			///@}
 
-			/*
-				Operators
-				For pointer types only
+			/**
+				@name Operators (for pointer types only)
+				@{
 			*/
 
-			//Returns true if the pointer points to something
+			///@brief Returns true if the pointer points to something
 			[[nodiscard]] explicit constexpr operator bool() const noexcept
 				requires std::is_pointer_v<T>
 			{
 				return value_;
 			}
 
-			//Returns a pointer to the value
+			///@brief Returns a pointer to the value
 			[[nodiscard]] constexpr auto operator->() const noexcept
 				requires std::is_pointer_v<T>
 			{
 				return value_;
 			}
 
-			//Dereferences pointer to the value
+			///@brief Dereferences pointer to the value
 			[[nodiscard]] constexpr auto& operator*() const noexcept
 				requires std::is_pointer_v<T>
 			{
 				return *value_;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns a mutable reference to the value
+			///@brief Returns a mutable reference to the value
 			[[nodiscard]] constexpr auto& Get() noexcept
 			{
 				return value_;
 			}
 
-			//Returns an immutable reference to the value
+			///@brief Returns an immutable reference to the value
 			[[nodiscard]] constexpr auto& Get() const noexcept
 			{
 				return value_;
 			}
+
+			///@}
 	};
 } //ion::types
 

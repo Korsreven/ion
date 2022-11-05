@@ -20,8 +20,8 @@ File:	IonUniqueVal.h
 
 namespace ion::types
 {
-	//A class representing a unique value
-	//UniqueVal is similar to unique_ptr in that a value can only be moved not copied
+	///@brief A class representing a unique value
+	///@details UniqueVal is similar to unique_ptr in that a value can only be moved not copied
 	template <typename T>
 	class UniqueVal
 	{
@@ -37,23 +37,23 @@ namespace ion::types
 		
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			constexpr UniqueVal() = default;
 
-			//Constructs a new unique value with the given value
+			///@brief Constructs a new unique value with the given value
 			constexpr explicit UniqueVal(T value) noexcept :
 				value_{std::move(value)}
 			{
 				//Empty
 			}
 
-			//Copy constructor
+			///@brief Copy constructor
 			constexpr UniqueVal(const UniqueVal<T>&) noexcept
 			{
 				//Empty
 			}
 
-			//Move constructor
+			///@brief Move constructor
 			constexpr UniqueVal(UniqueVal<T> &&rhs) noexcept :
 				value_{std::exchange(rhs.value_, T{})}
 			{
@@ -61,33 +61,36 @@ namespace ion::types
 			}
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Copy assignment
+			///@brief Copy assignment
 			constexpr auto& operator=(const UniqueVal<T>&) noexcept
 			{
 				//Do nothing
 				return *this;
 			}
 
-			//Move assignment
+			///@brief Move assignment
 			constexpr auto& operator=(UniqueVal<T> &&rhs) noexcept
 			{
 				value_ = std::exchange(rhs.value_, T{});
 				return *this;
 			}
 
-			//Combined comparison operator
+			///@brief Combined comparison operator
 			[[nodiscard]] constexpr auto operator<=>(const UniqueVal<T>&) const = default;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Releases the unique value
+			///@brief Releases the unique value
 			[[nodiscard]] constexpr auto Release() noexcept
 			{
 				auto value = std::move(value_);
@@ -95,28 +98,32 @@ namespace ion::types
 				return value;
 			}
 
-			//Replaces the unique value
+			///@brief Replaces the unique value
 			constexpr void Reset(T value = T{}) noexcept
 			{
 				value_ = std::move(value);
 			}
 
-			//Swaps the unique values
+			///@brief Swaps the unique values
 			constexpr void Swap(UniqueVal<T> &rhs) noexcept
 			{
 				std::swap(value_, rhs.value_);
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns an immutable reference to the unique value
+			///@brief Returns an immutable reference to the unique value
 			[[nodiscard]] constexpr auto& Get() const noexcept
 			{
 				return value_;
 			}
+
+			///@}
 	};
 } //ion::types
 

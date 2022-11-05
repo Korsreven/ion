@@ -19,10 +19,10 @@ File:	IonSuppressMove.h
 
 namespace ion::types
 {
-	//A class representing a member value that has suppressed copies and moves
-	//Tag class members as SuppressMove to disable copying and moving of its value
-	//An object containing one or more tagged members can still be copied and moved normally
-	//A member tagged as SuppressMove will be default constructed when the copy or move constructor is called
+	///@brief A class representing a member value that has suppressed copies and moves
+	///@details Tag class members as SuppressMove to disable copying and moving of its value.
+	///An object containing one or more tagged members can still be copied and moved normally.
+	///A member tagged as SuppressMove will be default constructed when the copy or move constructor is called
 	template <typename T>
 	class SuppressMove
 	{
@@ -38,49 +38,50 @@ namespace ion::types
 		
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			constexpr SuppressMove() = default;
 
-			//Constructs a new value with the given value
+			///@brief Constructs a new value with the given value
 			constexpr SuppressMove(const T &value) noexcept :
 				value_{value}
 			{
 				//Empty
 			}
 
-			//Constructs a new value with the given value
+			///@brief Constructs a new value with the given value
 			constexpr SuppressMove(T &&value) noexcept :
 				value_{std::move(value)}
 			{
 				//Empty
 			}		
 
-			//Copy constructor
+			///@brief Copy constructor
 			constexpr SuppressMove(const SuppressMove<T>&) noexcept
 			{
 				//Suppress
 			}
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Copy assignment
+			///@brief Copy assignment
 			constexpr auto& operator=(const SuppressMove<T>&) noexcept
 			{
 				//Suppress
 				return *this;
 			}
 
-			//Value copy assignment
+			///@brief Value copy assignment
 			constexpr auto& operator=(const T &value) noexcept
 			{
 				value_ = value;
 				return *this;
 			}
 
-			//Value move assignment
+			///@brief Value move assignment
 			constexpr auto& operator=(T &&value) noexcept
 			{
 				value_ = std::move(value);
@@ -88,77 +89,82 @@ namespace ion::types
 			}
 
 
-			//Combined comparison operator
+			///@brief Combined comparison operator
 			[[nodiscard]] constexpr auto operator<=>(const SuppressMove<T>&) const = default;
 
-			//Returns true if the value is equal to the given value
+			///@brief Returns true if the value is equal to the given value
 			[[nodiscard]] constexpr auto operator==(const T &value) const noexcept
 			{
 				return value_ == value;
 			}
 
-			//Returns true if the value is different from the given value
+			///@brief Returns true if the value is different from the given value
 			[[nodiscard]] constexpr auto operator!=(const T &value) const noexcept
 			{
 				return !(*this == value);
 			}
 
 
-			//Returns a mutable reference to the value
+			///@brief Returns a mutable reference to the value
 			[[nodiscard]] constexpr operator auto&() noexcept
 			{
 				return value_;
 			}
 
-			//Returns an immutable reference to the value
+			///@brief Returns an immutable reference to the value
 			[[nodiscard]] constexpr operator auto&() const noexcept
 			{
 				return value_;
 			}
 
+			///@}
 
-			/*
-				Operators
-				For pointer types only
+			/**
+				@name Operators (for pointer types only)
+				@{
 			*/
 
-			//Returns true if the pointer points to something
+			///@brief Returns true if the pointer points to something
 			[[nodiscard]] explicit constexpr operator bool() const noexcept
 				requires std::is_pointer_v<T>
 			{
 				return value_;
 			}
 
-			//Returns a pointer to the value
+			///@brief Returns a pointer to the value
 			[[nodiscard]] constexpr auto operator->() const noexcept
 				requires std::is_pointer_v<T>
 			{
 				return value_;
 			}
 
-			//Dereferences pointer to the value
+			///@brief Dereferences pointer to the value
 			[[nodiscard]] constexpr auto& operator*() const noexcept
 				requires std::is_pointer_v<T>
 			{
 				return *value_;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns a mutable reference to the value
+			///@brief Returns a mutable reference to the value
 			[[nodiscard]] constexpr auto& Get() noexcept
 			{
 				return value_;
 			}
 
-			//Returns an immutable reference to the value
+			///@brief Returns an immutable reference to the value
 			[[nodiscard]] constexpr auto& Get() const noexcept
 			{
 				return value_;
 			}
+
+			///@}
 	};
 } //ion::types
 

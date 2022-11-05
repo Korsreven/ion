@@ -19,13 +19,14 @@ File:	IonTypeCasts.h
 
 namespace ion::types
 {
-	/*
-		Safe type cast
+	/**
+		@name Safe type cast
+		@{
 	*/
 
-	//Casts (safely) from one type to another
-	//In debug it will assert that the value will remain the same
-	//In release it will just do a static_cast to be efficient
+	///@brief Casts (safely) from one type to another
+	///@details In debug it will assert that the value will remain the same.
+	///In release it will just do a static_cast to be efficient
 	template <typename To, typename From>
 	[[nodiscard]] inline To safe_cast(From value) noexcept
 	{
@@ -68,14 +69,16 @@ namespace ion::types
 		return static_cast<To>(value);
 	}
 
+	///@}
 
-	/*
-		Safe integral signedness cast
+	/**
+		@name Safe integral signedness cast
+		@{
 	*/
 
-	//Casts (safely) from unsigned to signed integral type
-	//In debug it will assert that the value will remain the same
-	//In release it will just do a static_cast to be efficient
+	///@brief Casts (safely) from unsigned to signed integral type
+	///@details In debug it will assert that the value will remain the same.
+	///In release it will just do a static_cast to be efficient
 	template <typename T>
 	[[nodiscard]] inline auto signed_cast(T value) noexcept
 	{
@@ -84,9 +87,9 @@ namespace ion::types
 		return static_cast<std::make_signed_t<T>>(value);
 	}
 
-	//Casts (safely) from signed to unsigned integral type
-	//In debug it will assert that the value will remain the same
-	//In release it will just do a static_cast to be efficient
+	///@brief Casts (safely) from signed to unsigned integral type
+	///@details In debug it will assert that the value will remain the same.
+	///In release it will just do a static_cast to be efficient
 	template <typename T>
 	[[nodiscard]] inline auto unsigned_cast(T value) noexcept
 	{
@@ -94,6 +97,8 @@ namespace ion::types
 		assert(value >= T{});
 		return static_cast<std::make_unsigned_t<T>>(value);
 	}
+
+	///@}
 } //ion::types
 
 

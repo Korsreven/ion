@@ -15,8 +15,8 @@ File:	IonStrongType.h
 
 namespace ion::types
 {
-	//A class representing a strong type of any native type T
-	//Different strong types can not be mixed, even if their native types are the same
+	///@brief A class representing a strong type of any native type T
+	///@details Different strong types can not be mixed, even if their native types are the same
 	template <typename T, typename Tag>
 	class StrongType
 	{
@@ -28,14 +28,14 @@ namespace ion::types
 
 			using value_type = T;
 
-			//Constructs a StrongType containing a T by copying the value
+			///@brief Constructs a StrongType containing a T by copying the value
 			constexpr explicit StrongType(const T &value) noexcept :
 				value_{value}
 			{
 				//Empty
 			}
 
-			//Constructs a StrongType containing a T by moving the value
+			///@brief Constructs a StrongType containing a T by moving the value
 			constexpr explicit StrongType(T &&value) noexcept :
 				value_{std::move(value)}
 			{
@@ -43,21 +43,24 @@ namespace ion::types
 			}
 
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 			
-			//Gets a mutable reference to the contained value
+			///@brief Gets a mutable reference to the contained value
 			[[nodiscard]] constexpr auto& Get() noexcept
 			{
 				return value_;
 			}
 
-			//Gets an immutable reference to the contained value
+			///@brief Gets an immutable reference to the contained value
 			[[nodiscard]] constexpr auto& Get() const noexcept
 			{
 				return value_;
 			}
+
+			///@}
 	};
 } //ion::types
 

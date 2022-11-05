@@ -27,8 +27,9 @@ File:	IonTypes.h
 
 namespace ion::types
 {
-	/*
-		Fixed width integer types
+	/**
+		@name Fixed width integer types
+		@{
 	*/
 
 	using int8 = std::int8_t;
@@ -40,19 +41,23 @@ namespace ion::types
 	using int64 = std::int64_t;
 	using uint64 = std::uint64_t;
 
+	///@}
 
-	/*
-		Fixed width floating point types
+	/**
+		@name Fixed width floating point types
+		@{
 	*/
 
 	using float32 = float;
 	using float64 = double;
 	using float80 = long double;
 
+	///@}
 
-	/*
-		Real (variable width)
+	/**
+		@name Real (variable width)
 		Engine default floating point type
+		@{
 	*/
 
 	#ifdef ION_EXTENDED_PRECISION
@@ -63,37 +68,45 @@ namespace ion::types
 	using real = float32;
 	#endif
 
+	///@}
 
-	/*
-		Duration (variable width)
+	/**
+		@name Duration (variable width)
 		Engine default floating point duration in seconds
+		@{
 	*/
 
 	using duration = std::chrono::duration<real>;
 
+	///@}
 
-	/*
-		Index type (signed integer)
+	/**
+		@name Index type (signed integer)
 		Engine default signed index type for use with the STL
 		The type is the signed version of std::size_t
+		@{
 	*/
 
 	using index_t = std::make_signed_t<std::size_t>;
 
+	///@}
 
-	/*
-		Strings (multiple std::string)
+	/**
+		@name Strings (multiple std::string)
 		Engine default
+		@{
 	*/
 
 	using Strings = std::vector<std::string>;
 
+	///@}
 
 	inline namespace type_literals
 	{
-		/*
-			User defined literals (UDLs)
+		/**
+			@name User defined literals (UDLs)
 			For fixed width integer types
+			@{
 		*/
 
 		constexpr auto operator""_i8(unsigned long long value) noexcept
@@ -136,10 +149,12 @@ namespace ion::types
 			return static_cast<uint64>(value);
 		}
 
+		///@}
 
-		/*
-			User defined literals (UDLs)
+		/**
+			@name User defined literals (UDLs)
 			For fixed width floating point types
+			@{
 		*/
 
 		constexpr auto operator""_f32(long double value) noexcept
@@ -157,10 +172,12 @@ namespace ion::types
 			return static_cast<float80>(value);
 		}
 
+		///@}
 
-		/*
-			User defined literals (UDLs)
+		/**
+			@name User defined literals (UDLs)
 			For real type
+			@{
 		*/
 
 		constexpr auto operator""_r(long double value) noexcept
@@ -168,10 +185,12 @@ namespace ion::types
 			return static_cast<real>(value);
 		}
 
+		///@}
 
-		/*
-			User defined literals (UDLs)
+		/**
+			@name User defined literals (UDLs)
 			For duration type
+			@{
 		*/
 
 		constexpr auto operator""_sec(long double value) noexcept
@@ -179,16 +198,20 @@ namespace ion::types
 			return duration{static_cast<real>(value)};
 		}
 
+		///@}
 		
-		/*
-			User defined literals (UDLs)
+		/**
+			@name User defined literals (UDLs)
 			For index type
+			@{
 		*/
 
 		constexpr auto operator""_idx(unsigned long long value) noexcept
 		{
 			return static_cast<index_t>(value);
 		}
+
+		///@}
 	} //type_literals
 } //ion::types
 
