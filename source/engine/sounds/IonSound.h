@@ -76,8 +76,8 @@ namespace ion::sounds
 	} //sound
 
 
-	//A class representing a sound resource (usually from a physical file)
-	//A sound can be a sample or stream, two or three-dimensional, as well as other properties
+	///@brief A class representing a sound resource (usually from a physical file)
+	///@details A sound can be a sample or stream, two or three-dimensional, as well as other properties
 	class Sound final :
 		public resources::FileResource<SoundManager>,
 		public managed::ObjectManager<SoundChannel, Sound>
@@ -95,202 +95,218 @@ namespace ion::sounds
 
 		protected:
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See ObjectManager::Removed for more details
+			///@brief See ObjectManager::Removed for more details
 			void Removed(SoundChannel &sound_channel) noexcept override;
+
+			///@}
 
 		public:
 
 			using resources::FileResource<SoundManager>::FileResource;
 
-			//Constructs a new sound with the given name, asset name, type, processing, orientation, rolloff and looping mode
+			///@brief Constructs a new sound with the given name, asset name, type, processing, orientation, rolloff and looping mode
 			Sound(std::string name, std::string asset_name,
 				sound::SoundType type, sound::SoundProcessingMode processing_mode,
 				sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
 				std::optional<sound::SoundLoopingMode> looping_mode = {}) noexcept;
 
-			//Constructs a new sound with the given name, asset name, type, processing and looping mode
+			///@brief Constructs a new sound with the given name, asset name, type, processing and looping mode
 			Sound(std::string name, std::string asset_name,
 				sound::SoundType type, sound::SoundProcessingMode processing_mode,
 				std::optional<sound::SoundLoopingMode> looping_mode = {}) noexcept;
 
-			//Constructs a new sound with the given name, asset name, type and looping mode
+			///@brief Constructs a new sound with the given name, asset name, type and looping mode
 			Sound(std::string name, std::string asset_name,
 				sound::SoundType type, std::optional<sound::SoundLoopingMode> looping_mode = {}) noexcept;
 
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			Sound(const Sound&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			Sound(Sound&&) = default;
 
-			//Destructor
+			///@brief Destructor
 			~Sound() noexcept;
 
 
-			/*
-				Static sound conversions
+			/**
+				@name Static sound conversions
+				@{
 			*/
 
-			//Returns a non-positional (2D) sound with the given name, asset name, type and looping mode
+			///@brief Returns a non-positional (2D) sound with the given name, asset name, type and looping mode
 			[[nodiscard]] static Sound NonPositional(std::string name, std::string asset_name,
 				sound::SoundType type, std::optional<sound::SoundLoopingMode> looping_mode = {});
 
 
-			//Returns a positional (3D) sound with the given name, asset name, type, orientation, rolloff and looping mode
+			///@brief Returns a positional (3D) sound with the given name, asset name, type, orientation, rolloff and looping mode
 			[[nodiscard]] static Sound Positional(std::string name, std::string asset_name,
 				sound::SoundType type, sound::SoundOrientationMode orientation_mode, sound::SoundRolloffMode rolloff_mode,
 				std::optional<sound::SoundLoopingMode> looping_mode = {});
 
-			//Returns a positional (3D) sound with the given name, asset name, type and looping mode
+			///@brief Returns a positional (3D) sound with the given name, asset name, type and looping mode
 			[[nodiscard]] static Sound Positional(std::string name, std::string asset_name,
 				sound::SoundType type, std::optional<sound::SoundLoopingMode> looping_mode = {});
 
+			///@}
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			Sound& operator=(const Sound&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			Sound& operator=(Sound&&) = default;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all sound channels playing this sound
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all sound channels playing this sound
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto SoundChannels() noexcept
 			{
 				return Objects();
 			}
 
-			//Returns an immutable range of all sound channels playing this sound
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all sound channels playing this sound
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto SoundChannels() const noexcept
 			{
 				return Objects();
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the handle for the sound to the given value
+			///@brief Sets the handle for the sound to the given value
 			inline void Handle(FMOD::Sound *handle) noexcept
 			{
 				handle_ = handle;
 			}
 
-			//Sets the stream data of the texture to the given data
+			///@brief Sets the stream data of the texture to the given data
 			inline void StreamData(std::string data) noexcept
 			{
 				stream_data_ = std::move(data);
 			}
 
-			//Resets the stream data to save some memory (if not needed anymore)
+			///@brief Resets the stream data to save some memory (if not needed anymore)
 			inline void ResetStreamData() noexcept
 			{
 				stream_data_.reset();
 			}
 
 
-			//Sets the min and max audible distance for the sound to the given min and max values
-			//Increase the min distance to make the sound louder
-			//Decrease the min distance to make the sound quieter
-			//Max distance is obsolete unless you need the sound to stop fading out at a certain point
+			///@brief Sets the min and max audible distance for the sound to the given min and max values
+			///@details Increase the min distance to make the sound louder.
+			///Decrease the min distance to make the sound quieter.
+			///Max distance is obsolete unless you need the sound to stop fading out at a certain point
 			void Distance(real min_distance, real max_distance = 10'000.0_r) noexcept;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the handle for the sound
-			//Returns nullptr if the sound is not loaded
+			///@brief Returns the handle for the sound
+			///@details Returns nullptr if the sound is not loaded
 			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return handle_;
 			}
 
-			//Returns the stream data of the sound
-			//Returns nullopt if the sound has not been prepared yet, or is not streamed
+			///@brief Returns the stream data of the sound
+			///@details Returns nullopt if the sound has not been prepared yet, or is not streamed
 			[[nodiscard]] inline auto& StreamData() const noexcept
 			{
 				return stream_data_;
 			}
 
 
-			//Returns the sound type
+			///@brief Returns the sound type
 			[[nodiscard]] inline auto Type() const noexcept
 			{
 				return type_;
 			}
 
-			//Returns the processing mode of the sound
+			///@brief Returns the processing mode of the sound
 			[[nodiscard]] inline auto ProcessingMode() const noexcept
 			{
 				return processing_mode_;
 			}
 
-			//Returns the orientation mode of the sound
+			///@brief Returns the orientation mode of the sound
 			[[nodiscard]] inline auto OrientationMode() const noexcept
 			{
 				return orientation_mode_;
 			}
 
-			//Returns the rolloff mode of the sound
+			///@brief Returns the rolloff mode of the sound
 			[[nodiscard]] inline auto RolloffMode() const noexcept
 			{
 				return rolloff_mode_;
 			}
 
-			//Returns the looping mode of the sound
-			//Returns nullopt if the sound has no looping
+			///@brief Returns the looping mode of the sound
+			///@details Returns nullopt if the sound has no looping
 			[[nodiscard]] inline auto& LoopingMode() const noexcept
 			{
 				return looping_mode_;
 			}
 
 
-			//Returns the min and max audible distance for the sound
+			///@brief Returns the min and max audible distance for the sound
 			[[nodiscard]] std::optional<std::pair<real, real>> Distance() const noexcept;
 			
+			///@}
 
-			/*
-				Sound channels
-				Creating
+			/**
+				@name Sound channels - Creating
+				@{
 			*/
 
-			//Plays this sound, by creating a sound channel outputting to the master channel group
+			///@brief Plays this sound, by creating a sound channel outputting to the master channel group
 			NonOwningPtr<SoundChannel> Play(bool paused = false);
 
-			//Plays this sound, by creating a sound channel outputting to the given channel group
+			///@brief Plays this sound, by creating a sound channel outputting to the given channel group
 			NonOwningPtr<SoundChannel> Play(NonOwningPtr<SoundChannelGroup> sound_channel_group, bool paused = false);
 
-			//Plays this sound, by reusing the given sound channel
+			///@brief Plays this sound, by reusing the given sound channel
 			NonOwningPtr<SoundChannel> Play(NonOwningPtr<SoundChannel> sound_channel, bool paused = false);
 
+			///@}
 
-			/*
-				Sound channels
-				Removing
+			/**
+				@name Sound channels - Removing
+				@{
 			*/
 
-			//Clears all removable sound channels from this sound
+			///@brief Clears all removable sound channels from this sound
 			void ClearSoundChannels() noexcept;
 
-			//Removes a removable sound channel from this sound
+			///@brief Removes a removable sound channel from this sound
 			bool RemoveSoundChannel(SoundChannel &sound_channel) noexcept;
+
+			///@}
 	};
 } //ion::sounds
 

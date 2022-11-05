@@ -37,10 +37,10 @@ namespace ion::sounds
 	} //sound_listener
 
 
-	//A class representing a sound listener (not to be confused with events::listeners)
-	//A sound listener represent the ears in a scene, with a position and velocity (doppler effect)
-	//Sounds that are three-dimensional will be heared from the sound listeners location
-	//A scene will typically only have one active sound listener at once
+	///@brief A class representing a sound listener (not to be confused with events::listeners)
+	///@details A sound listener represent the ears in a scene, with a position and velocity (doppler effect).
+	///Sounds that are three-dimensional will be heared from the sound listeners location.
+	///A scene will typically only have one active sound listener at once
 	class SoundListener final : public managed::ManagedObject<SoundManager>
 	{
 		private:
@@ -52,34 +52,39 @@ namespace ion::sounds
 			using managed::ManagedObject<SoundManager>::ManagedObject;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the handle for the sound listener to the given value
+			///@brief Sets the handle for the sound listener to the given value
 			inline void Handle(FMOD::System *handle) noexcept
 			{
 				handle_ = handle;
 			}
 
-			//Sets the position and velocity attributes in use by the sound listener to the given position and velocity
-			//This is automatically set when a sound listener is attached to a movable sound listener
+			///@brief Sets the position and velocity attributes in use by the sound listener to the given position and velocity
+			///@details This is automatically set when a sound listener is attached to a movable sound listener
 			void Attributes(const graphics::utilities::Vector3 &position, const graphics::utilities::Vector3 &velocity) noexcept;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the handle for the sound listener
-			//Returns nullptr if the sound listener is not valid
+			///@brief Returns the handle for the sound listener
+			///@details Returns nullptr if the sound listener is not valid
 			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return handle_;
 			}
 
-			//Returns the position and velocity attributes in use by the sound listener
+			///@brief Returns the position and velocity attributes in use by the sound listener
 			[[nodiscard]] std::optional<std::pair<graphics::utilities::Vector3, graphics::utilities::Vector3>> Attributes() const noexcept;
+
+			///@}
 	};
 } //ion::sounds
 
