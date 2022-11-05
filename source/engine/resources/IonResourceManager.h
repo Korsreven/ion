@@ -61,6 +61,7 @@ namespace ion::resources
 
 			/**
 				@name Events
+				@{
 			*/
 
 			///@brief See ObjectManager::Removed for more details
@@ -112,6 +113,7 @@ namespace ion::resources
 
 			/**
 				@name Notifying
+				@{
 			*/
 
 			void NotifyResourcePrepared(ResourceT &resource) noexcept
@@ -345,6 +347,7 @@ namespace ion::resources
 
 			/**
 				@name Operators
+				@{
 			*/
 
 			///@brief Deleted copy assignment
@@ -357,6 +360,7 @@ namespace ion::resources
 
 			/**
 				@name Modifiers
+				@{
 			*/
 
 			///@brief Sets the process execution model the resource manager is allowed to use
@@ -381,6 +385,7 @@ namespace ion::resources
 
 			/**
 				@name Observers
+				@{
 			*/
 
 			///@brief Returns the process execution model the resource manager is allowed to use
@@ -400,6 +405,7 @@ namespace ion::resources
 
 			/**
 				@name Ranges
+				@{
 			*/
 
 			///@brief Returns a mutable range of all resources in this manager
@@ -420,6 +426,7 @@ namespace ion::resources
 
 			/**
 				@name Updating
+				@{
 			*/
 
 			///@brief Returns the number of resources that are waiting to be updated
@@ -470,6 +477,7 @@ namespace ion::resources
 
 			/**
 				@name Preparing
+				@{
 			*/
 
 			///@brief Prepares the given resource before returning (eager)
@@ -555,6 +563,7 @@ namespace ion::resources
 
 			/**
 				@name Loading
+				@{
 			*/
 
 			///@brief Loads the given resource before returning (eager)
@@ -647,6 +656,7 @@ namespace ion::resources
 
 			/**
 				@name Unloading
+				@{
 			*/
 
 			///@brief Unloads the given resource before returning (eager)
@@ -721,6 +731,7 @@ namespace ion::resources
 
 			/**
 				@name Reloading
+				@{
 			*/
 
 			///@brief Reloads the given resource before returning (eager)
@@ -761,6 +772,7 @@ namespace ion::resources
 
 			/**
 				@name Repairing
+				@{
 			*/
 
 			///@brief Repairs the given resource before returning (eager)
@@ -816,6 +828,7 @@ namespace ion::resources
 
 			/**
 				@name Resources - Creating
+				@{
 			*/
 
 			///@brief Creates a resource with the given arguments
@@ -839,6 +852,7 @@ namespace ion::resources
 
 			/**
 				@name Resources - Retrieving
+				@{
 			*/
 
 			///@brief Gets a pointer to a mutable resource with the given name
@@ -859,6 +873,7 @@ namespace ion::resources
 
 			/**
 				@name Resources - Removing
+				@{
 			*/
 
 			///@brief Clears all removable resources from this manager

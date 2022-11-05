@@ -118,8 +118,9 @@ namespace ion::resources
 			FileResourceManager(FileResourceManager&&) = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
 			///@brief Deleted copy assignment
@@ -128,9 +129,11 @@ namespace ion::resources
 			///@brief Default move assignment
 			FileResourceManager& operator=(FileResourceManager&&) = default;
 
+			///@}
 
 			/**
-				Ranges
+				@name Ranges
+				@{
 			*/
 
 			///@brief Returns a mutable range of all repositories in this manager
@@ -147,6 +150,7 @@ namespace ion::resources
 				return RepositoryBase::Objects();
 			}
 
+			///@}
 
 			/**
 				@name Repositories - Creating
