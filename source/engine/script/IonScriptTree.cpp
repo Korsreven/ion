@@ -545,7 +545,7 @@ void ObjectNode::Append(const adaptors::ranges::Iterable<const PropertyNodes&> &
 
 
 /*
-	Finding / searching
+	Finding/searching
 */
 
 ObjectNode& ObjectNode::Find(std::string_view name) noexcept
@@ -720,7 +720,7 @@ void ScriptTree::Append(const adaptors::ranges::Iterable<const ObjectNodes&> &ob
 
 
 /*
-	Finding / searching
+	Finding/searching
 */
 
 ObjectNode& ScriptTree::Find(std::string_view name) noexcept

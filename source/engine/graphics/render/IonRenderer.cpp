@@ -739,7 +739,7 @@ void Renderer::ClearPrimitives() noexcept
 
 
 /*
-	Preparing / drawing
+	Preparing/drawing
 */
 
 void Renderer::Prepare()

@@ -941,7 +941,7 @@ namespace ion::graphics::scene::graph
 
 			/*
 				Child nodes
-				Take / release ownership
+				Take/release ownership
 			*/
 
 			//Adopts (take ownership of) the given scene node and returns a pointer to the adopted node

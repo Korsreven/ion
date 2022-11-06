@@ -244,7 +244,7 @@ namespace ion::graphics::render
 
 
 			/*
-				Preparing / drawing
+				Preparing/drawing
 			*/
 
 			//Prepares this renderer such that it is ready to draw

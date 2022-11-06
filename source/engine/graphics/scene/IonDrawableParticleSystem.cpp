@@ -183,7 +183,7 @@ void DrawableParticleSystem::Revert()
 
 
 /*
-	Preparing / drawing
+	Preparing/drawing
 */
 
 void DrawableParticleSystem::Prepare()

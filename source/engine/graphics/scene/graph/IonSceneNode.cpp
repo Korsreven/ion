@@ -718,7 +718,7 @@ NonOwningPtr<SceneNode> SceneNode::CreateChildNode(std::optional<std::string> na
 
 /*
 	Child nodes
-	Take / release ownership
+	Take/release ownership
 */
 
 NonOwningPtr<SceneNode> SceneNode::Adopt(OwningPtr<SceneNode> &root_node)

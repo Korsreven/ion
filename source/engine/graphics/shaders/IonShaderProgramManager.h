@@ -448,7 +448,7 @@ namespace ion::graphics::shaders
 
 			/*
 				Shader programs
-				Activate / deactivate
+				Activate/deactivate
 			*/
 
 			//Activates (use) the given shader progam (if not already active)
@@ -463,7 +463,7 @@ namespace ion::graphics::shaders
 
 			/*
 				Shader variables
-				Load / send
+				Load/send
 			*/
 
 			//Loads all shader variable locations attached to the given shader program

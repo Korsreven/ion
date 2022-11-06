@@ -61,7 +61,7 @@ namespace ion::sounds
 			///@brief Mutes all sounds in this sound channel group
 			void Mute(bool mute) noexcept;
 			
-			///@brief Sets the relative pitch / playback rate of this sound channel group
+			///@brief Sets the relative pitch/playback rate of this sound channel group
 			void Pitch(real pitch) noexcept;
 
 			///@brief Sets the volume of this sound channel group to the given volume in range [0.0, 1.0]
@@ -85,7 +85,7 @@ namespace ion::sounds
 			///@brief Returns true if this sound channel group has muted all sounds
 			[[nodiscard]] bool IsMuted() const noexcept;
 
-			///@brief Returns the relative pitch / playback rate of this sound channel group
+			///@brief Returns the relative pitch/playback rate of this sound channel group
 			[[nodiscard]] real Pitch() const noexcept;
 
 			///@brief Returns the volume of this sound channel group

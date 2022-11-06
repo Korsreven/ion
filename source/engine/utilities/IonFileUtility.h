@@ -148,7 +148,7 @@ namespace ion::utilities::file
 
 
 	/*
-		Renaming / moving
+		Renaming/moving
 		Directory or file
 	*/
 

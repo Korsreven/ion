@@ -1013,7 +1013,7 @@ bool ShaderProgramManager::RemoveShaderProgram(std::string_view name) noexcept
 
 /*
 	Shader programs
-	Activate / deactivate
+	Activate/deactivate
 */
 
 void ShaderProgramManager::ActivateShaderProgram(const ShaderProgram &shader_program) noexcept
@@ -1045,7 +1045,7 @@ bool ShaderProgramManager::IsShaderProgramActive(const ShaderProgram &shader_pro
 
 /*
 	Shader variables
-	Load / send
+	Load/send
 */
 
 void ShaderProgramManager::LoadShaderVariableLocations(ShaderProgram &shader_program) noexcept

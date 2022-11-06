@@ -387,7 +387,7 @@ namespace ion::script
 
 
 				/*
-					Finding / searching
+					Finding/searching
 				*/
 
 				//Finds an object (top-level child object) by the given name, and return a mutable reference to it
@@ -672,7 +672,7 @@ namespace ion::script
 
 
 			/*
-				Finding / searching
+				Finding/searching
 			*/
 
 			//Finds an object (top-level object) by the given name, and return a mutable reference to it

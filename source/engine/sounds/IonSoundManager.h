@@ -242,7 +242,7 @@ namespace ion::sounds
 			///@brief Mutes all sounds in this sound manager
 			void Mute(bool mute) noexcept;
 			
-			///@brief Sets the relative pitch / playback rate of this sound manager
+			///@brief Sets the relative pitch/playback rate of this sound manager
 			void Pitch(real pitch) noexcept;
 
 			///@brief Sets the master volume of this sound manager to the given volume in range [0.0, 1.0]
@@ -266,7 +266,7 @@ namespace ion::sounds
 			///@brief Returns true if this sound manager has muted all sounds
 			[[nodiscard]] bool IsMuted() const noexcept;
 
-			///@brief Returns the relative pitch / playback rate of this sound manager
+			///@brief Returns the relative pitch/playback rate of this sound manager
 			[[nodiscard]] real Pitch() const noexcept;
 
 			///@brief Returns the master volume of this sound manager

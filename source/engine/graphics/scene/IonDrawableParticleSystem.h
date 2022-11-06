@@ -174,7 +174,7 @@ namespace ion::graphics::scene
 
 
 			/*
-				Preparing / drawing
+				Preparing/drawing
 			*/
 
 			//Prepares this particle system such that it is ready to be drawn

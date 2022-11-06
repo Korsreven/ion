@@ -468,7 +468,7 @@ namespace ion::graphics::scene::graph::animations
 
 
 			/*
-				Actions / motions
+				Actions/motions
 			*/
 
 			//Clears all actions and motions from this node animation

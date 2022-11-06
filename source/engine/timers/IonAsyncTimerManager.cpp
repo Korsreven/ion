@@ -93,7 +93,7 @@ bool AsyncTimerManager::IsTimeElapsing() const noexcept
 
 
 /*
-	Suspending / continuing
+	Suspending/continuing
 */
 
 void AsyncTimerManager::ContinueTimeElapse() noexcept

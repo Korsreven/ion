@@ -96,7 +96,7 @@ namespace ion::events
 			///@}
 
 			/**
-				@name Starting / stopping
+				@name Starting/stopping
 				@{
 			*/
 
@@ -109,7 +109,7 @@ namespace ion::events
 			///@}
 
 			/**
-				@name Suspending / continuing
+				@name Suspending/continuing
 				@{
 			*/
 

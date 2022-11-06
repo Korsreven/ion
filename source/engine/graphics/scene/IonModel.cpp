@@ -173,7 +173,7 @@ void Model::NotifyMaterialChanged(shapes::Mesh &mesh) noexcept
 
 
 /*
-	Preparing / drawing
+	Preparing/drawing
 */
 
 void Model::Prepare()

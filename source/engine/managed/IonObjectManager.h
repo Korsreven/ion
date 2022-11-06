@@ -426,7 +426,7 @@ namespace ion::managed
 			///@}
 
 			/**
-				@name Take / release ownership
+				@name Take/release ownership
 				@{
 			*/
 

@@ -298,7 +298,7 @@ namespace ion::managed
 			///@}
 
 			/**
-				@name Observing / releasing
+				@name Observing/releasing
 				@{
 			*/
 

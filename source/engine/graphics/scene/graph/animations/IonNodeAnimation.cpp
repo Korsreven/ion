@@ -560,7 +560,7 @@ void NodeAnimation::ClearMotions() noexcept
 
 
 /*
-	Actions / motions
+	Actions/motions
 */
 
 void NodeAnimation::Clear() noexcept

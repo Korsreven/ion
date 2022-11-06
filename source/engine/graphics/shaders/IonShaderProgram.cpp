@@ -485,7 +485,7 @@ void ShaderProgram::ClearVariables() noexcept
 
 
 /*
-	Struct / variables
+	Struct/variables
 	Removing
 */
 

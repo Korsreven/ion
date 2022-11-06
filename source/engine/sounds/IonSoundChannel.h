@@ -78,7 +78,7 @@ namespace ion::sounds
 			///@brief Mutes this sound channel
 			void Mute(bool mute) noexcept;
 			
-			///@brief Sets the relative pitch / playback rate of this sound channel
+			///@brief Sets the relative pitch/playback rate of this sound channel
 			void Pitch(real pitch) noexcept;
 
 			///@brief Sets the volume of this sound channel to the given volume in range [0.0, 1.0]
@@ -120,7 +120,7 @@ namespace ion::sounds
 			///@brief Returns true if this sound channel is muted
 			[[nodiscard]] bool IsMuted() const noexcept;
 
-			///@brief Returns the relative pitch / playback rate of this sound channel
+			///@brief Returns the relative pitch/playback rate of this sound channel
 			[[nodiscard]] real Pitch() const noexcept;
 
 			///@brief Returns the volume of this sound channel

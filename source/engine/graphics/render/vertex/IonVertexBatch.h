@@ -305,7 +305,7 @@ namespace ion::graphics::render::vertex
 
 
 			/*
-				Preparing / drawing
+				Preparing/drawing
 			*/
 
 			//Force reloading of vertex data by sending data from RAM to VRAM

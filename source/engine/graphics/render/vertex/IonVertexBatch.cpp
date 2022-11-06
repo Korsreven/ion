@@ -538,7 +538,7 @@ VertexBatch::VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclarati
 
 
 /*
-	Preparing / drawing
+	Preparing/drawing
 */
 
 void VertexBatch::Prepare() noexcept

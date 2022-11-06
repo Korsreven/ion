@@ -466,7 +466,7 @@ namespace ion::graphics::shaders
 
 
 			/*
-				Struct / variables
+				Struct/variables
 				Removing
 			*/
 

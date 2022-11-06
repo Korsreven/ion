@@ -45,7 +45,7 @@ RecurringCallback::~RecurringCallback() noexcept
 
 
 /*
-	Starting / stopping
+	Starting/stopping
 */
 
 void RecurringCallback::Start() noexcept
@@ -69,7 +69,7 @@ void RecurringCallback::Stop() noexcept
 
 
 /*
-	Suspending / continuing
+	Suspending/continuing
 */
 
 void RecurringCallback::Continue() noexcept
