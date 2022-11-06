@@ -153,7 +153,8 @@ namespace ion::resources
 			///@}
 
 			/**
-				@name Repositories - Creating
+				@name Repositories
+				Creating
 				@{
 			*/
 
@@ -173,7 +174,8 @@ namespace ion::resources
 			///@}
 
 			/**
-				@name Repositories - Removing
+				@name Repositories
+				Removing
 				@{
 			*/
 

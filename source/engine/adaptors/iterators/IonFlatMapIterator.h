@@ -30,9 +30,10 @@ namespace ion::adaptors::iterators
 
 	namespace flat_map_iterator::detail
 	{
-		/*
-			Get flat map iterator type trait
+		/**
+			@name Get flat map iterator type trait
 			Type is either FlatMapIterator or ConstFlatMapIterator based on Iterator
+			@{
 		*/
 
 		template <typename Iterator, typename = void>
@@ -54,6 +55,8 @@ namespace ion::adaptors::iterators
 
 		template <typename T>
 		using add_const_to_first_t = std::pair<const typename T::first_type, typename T::second_type>;
+
+		///@}
 	} //flat_map_iterator::detail
 
 

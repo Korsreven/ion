@@ -280,7 +280,8 @@ namespace ion::sounds
 			///@}
 
 			/**
-				@name Sound channels - Creating
+				@name Sound channels
+				Creating
 				@{
 			*/
 
@@ -296,7 +297,8 @@ namespace ion::sounds
 			///@}
 
 			/**
-				@name Sound channels - Removing
+				@name Sound channels
+				Removing
 				@{
 			*/
 

@@ -211,7 +211,8 @@ namespace ion::types
 			///@}
 
 			/**
-				@name Operators - For convenience
+				@name Operators
+				For convenience
 				@{
 			*/
 

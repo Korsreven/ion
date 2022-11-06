@@ -27,9 +27,10 @@ namespace ion::adaptors::iterators
 
 	namespace flat_set_iterator::detail
 	{
-		/*
-			Get flat set iterator type trait
+		/**
+			@name Get flat set iterator type trait
 			Type is either FlatSetIterator or ConstFlatSetIterator based on Iterator
+			@{
 		*/
 
 		template <typename Iterator, typename = void>
@@ -47,6 +48,8 @@ namespace ion::adaptors::iterators
 
 		template <typename Iterator>
 		using get_flat_set_iterator_t = typename get_flat_set_iterator<Iterator>::type;
+
+		///@}
 	} //flat_set_iterator::detail
 
 	

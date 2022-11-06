@@ -29,9 +29,10 @@ namespace ion::adaptors::iterators
 
 	namespace dereference_iterator::detail
 	{
-		/*
-			Get dereference iterator type trait
+		/**
+			@name Get dereference iterator type trait
 			Type is either DereferenceIterator or ConstDereferenceIterator based on Iterator
+			@{
 		*/
 
 		template <typename Iterator, typename = void>
@@ -49,6 +50,8 @@ namespace ion::adaptors::iterators
 
 		template <typename Iterator>
 		using get_dereference_iterator_t = typename get_dereference_iterator<Iterator>::type;
+
+		///@}
 	} //dereference_iterator::detail
 
 
