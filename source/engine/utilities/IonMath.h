@@ -26,7 +26,7 @@ File:	IonMath.h
 #include "adaptors/IonFlatMap.h"
 #include "types/IonTypes.h"
 
-//Namespace containing commonly used (optimized) mathematical functions for games and graphics
+///@brief Namespace containing commonly used (optimized) mathematical functions for games and graphics
 namespace ion::utilities::math
 {
 	using namespace types::type_literals;
@@ -157,45 +157,50 @@ namespace ion::utilities::math
 	} //detail
 
 
-	/*
-		Floating point limits
+	/**
+		@name Floating point limits
+		@{
 	*/
 
-	//Gives an upper bound on the relative error due to rounding in floating point arithmetic
+	///@brief Gives an upper bound on the relative error due to rounding in floating point arithmetic
 	constexpr auto Epsilon = std::numeric_limits<real>::epsilon();
 
+	///@}
 
-	/*
-		Mathematical constants
+	/**
+		@name Mathematical constants
+		@{
 	*/
 
-	//Archimedes' constant pi, 3.14...
-	//With the highest precision supported
+	///@brief Archimedes' constant pi, 3.14...
+	///@details With the highest precision supported
 	constexpr auto Pi = detail::pi;
 
-	//Two pi, 6.28...
-	//With the highest precision supported
+	///@brief Two pi, 6.28...
+	///@details With the highest precision supported
 	constexpr auto TwoPi = detail::two_pi;
 
-	//Half pi, 1.57...
-	//With the highest precision supported
+	///@brief Half pi, 1.57...
+	///@details With the highest precision supported
 	constexpr auto HalfPi = detail::half_pi;
 
-	//Quarter pi, 0.78...
-	//With the highest precision supported
+	///@brief Quarter pi, 0.78...
+	///@details With the highest precision supported
 	constexpr auto QuarterPi = detail::quarter_pi;
 
-	//Euler's number e, 2.71...
-	//With the highest precision supported
+	///@brief Euler's number e, 2.71...
+	///@details With the highest precision supported
 	constexpr auto E = detail::e;
 
+	///@}
 
-	/*
-		Common functions implemented as constexpr
+	/**
+		@name Common functions implemented as constexpr
+		@{
 	*/
 
-	//Returns the absolute value of a real number
-	//Handles -0.0 properly
+	///@brief Returns the absolute value of a real number
+	///@details Handles -0.0 properly
 	[[nodiscard]] constexpr auto Abs(real x) noexcept
 	{
 		return x < 0.0_r ? -x :
@@ -203,13 +208,13 @@ namespace ion::utilities::math
 				0.0_r;
 	}
 
-	//Checks if two real numbers are equal within the given epsilon margin
+	///@brief Checks if two real numbers are equal within the given epsilon margin
 	[[nodiscard]] constexpr auto Equal(real x, real y, real epsilon = Epsilon) noexcept
 	{
 		return Abs(x - y) < epsilon;
 	}
 
-	//Returns the binary (base-2) logarithm of x for any integral type
+	///@brief Returns the binary (base-2) logarithm of x for any integral type
 	template <typename T>
 	[[nodiscard]] constexpr auto Log2(T x) noexcept
 	{
@@ -222,7 +227,7 @@ namespace ion::utilities::math
 		return result;
 	}
 
-	//Returns the common (base-10) logarithm of x for any integral type
+	///@brief Returns the common (base-10) logarithm of x for any integral type
 	template <typename T>
 	[[nodiscard]] constexpr auto Log10(T x) noexcept
 	{
@@ -235,7 +240,7 @@ namespace ion::utilities::math
 		return result;
 	}
 
-	//Returns x normalized to range [0.0, 1.0]
+	///@brief Returns x normalized to range [0.0, 1.0]
 	[[nodiscard]] constexpr auto Normalize(real x, real min, real max) noexcept
 	{
 		return min != max ?
@@ -243,13 +248,13 @@ namespace ion::utilities::math
 			0.0_r;
 	}
 
-	//Returns x normalized to range [new min, new max]
+	///@brief Returns x normalized to range [new min, new max]
 	[[nodiscard]] constexpr auto Normalize(real x, real min, real max, real new_min, real new_max) noexcept
 	{
 		return Normalize(x, min, max) * (new_max - new_min) + new_min;
 	}
 
-	//Returns x raised to the y-th power for any integral type
+	///@brief Returns x raised to the y-th power for any integral type
 	template <typename T>
 	[[nodiscard]] constexpr auto Power(T x, T y) noexcept
 	{
@@ -268,65 +273,71 @@ namespace ion::utilities::math
 		return result;
 	}
 
-	//Returns x clamped inside range [0.0, 1.0]
+	///@brief Returns x clamped inside range [0.0, 1.0]
 	[[nodiscard]] constexpr auto Saturate(real x) noexcept
 	{
 		return std::clamp(x, 0.0_r, 1.0_r);
 	}
 
-	//Returns the sign of x
-	//-1 if negative, 1 if positive else 0
+	///@brief Returns the sign of x
+	///@details -1 if negative, 1 if positive else 0
 	[[nodiscard]] constexpr auto Sign(real x) noexcept
 	{
 		return (0.0_r < x) - (x < 0.0_r);
 	}
 
+	///@}
 
-	/*
-		Fractions and rounding
+	/**
+		@name Fractions and rounding
+		@{
 	*/
 
-	//Returns the fractional part of x
-	//x - floor x	(for x >= 0)
-	//x - ceil x	(for x < 0)
+	///@brief Returns the fractional part of x
+	///@details x - floor x	(for x >= 0).
+	///x - ceil x	(for x < 0)
 	[[nodiscard]] real Fraction(real x) noexcept;
 
-	//Returns x rounded to the nearest whole number
-	//Half rounds away from zero
+	///@brief Returns x rounded to the nearest whole number
+	///@details Half rounds away from zero
 	[[nodiscard]] real Round(real x) noexcept;
 
-	//Returns x rounded to the nearest number with the given precision
-	//Half rounds away from zero
+	///@brief Returns x rounded to the nearest number with the given precision
+	///@details Half rounds away from zero
 	[[nodiscard]] real Round(real x, int precision) noexcept;
 
-	//Returns x truncated toward zero
+	///@brief Returns x truncated toward zero
 	[[nodiscard]] real Truncate(real x) noexcept;
 
-	//Returns x truncated toward zero with the given precision
+	///@brief Returns x truncated toward zero with the given precision
 	[[nodiscard]] real Truncate(real x, int precision) noexcept;
 
+	///@}
 
-	/*
-		Interpolation
+	/**
+		@name Interpolation
+		@{
 	*/
 
-	//Linear interpolation
-	//Interpolate between x and y with the given amount
+	///@brief Linear interpolation
+	///@details Interpolate between x and y with the given amount
 	[[nodiscard]] constexpr auto Lerp(real x, real y, real amount) noexcept
 	{
 		return x + (y - x) * amount;
 	}
 
-	//Spherical linear interpolation
-	//Interpolate between x and y with the given omega and amount
+	///@brief Spherical linear interpolation
+	///@details Interpolate between x and y with the given omega and amount
 	[[nodiscard]] real Slerp(real x, real y, real omega, real amount) noexcept;
 
+	///@}
 
-	/*
-		Probability and statistics
+	/**
+		@name Probability and statistics
+		@{
 	*/
 
-	//Calculates n! for any integral type
+	///@brief Calculates n! for any integral type
 	template <typename T>
 	[[nodiscard]] constexpr auto Factorial(T n) noexcept
 	{
@@ -339,7 +350,7 @@ namespace ion::utilities::math
 		return result;
 	}
 
-	//Calculates nCr for any integral type
+	///@brief Calculates nCr for any integral type
 	template <typename T>
 	[[nodiscard]] constexpr auto Choose(T n, T r) noexcept
 	{
@@ -351,7 +362,7 @@ namespace ion::utilities::math
 		return Factorial(n) / (Factorial(r) * Factorial(n - r));
 	}
 
-	//Calculates nPr for any integral type
+	///@brief Calculates nPr for any integral type
 	template <typename T>
 	[[nodiscard]] constexpr auto Permute(T n, T r) noexcept
 	{
@@ -363,13 +374,15 @@ namespace ion::utilities::math
 		return Factorial(n) / Factorial(n - r);
 	}
 
+	///@}
 
-	/*
-		Sum and averages
+	/**
+		@name Sum and averages
+		@{
 	*/
 
-	//Returns the sum of all numbers in the given range [first, last)
-	//If range is empty, it returns nullopt
+	///@brief Returns the sum of all numbers in the given range [first, last)
+	///@details If range is empty, it returns nullopt
 	template <typename Iterator>
 	[[nodiscard]] constexpr auto Sum(Iterator first, Iterator last) noexcept
 		-> std::optional<decltype(detail::sum(first, last))>
@@ -383,8 +396,8 @@ namespace ion::utilities::math
 			return {};
 	}
 
-	//Returns the sum of all numbers in the given container
-	//If container is empty, it returns nullopt
+	///@brief Returns the sum of all numbers in the given container
+	///@details If container is empty, it returns nullopt
 	template <typename Container>
 	[[nodiscard]] constexpr auto Sum(const Container &container) noexcept
 	{
@@ -392,8 +405,8 @@ namespace ion::utilities::math
 	}
 
 
-	//Returns the mean of all numbers in the given range [first, last)
-	//If range is empty, it returns nullopt
+	///@brief Returns the mean of all numbers in the given range [first, last)
+	///@details If range is empty, it returns nullopt
 	template <typename Iterator>
 	[[nodiscard]] constexpr auto Mean(Iterator first, Iterator last) noexcept
 		-> std::optional<decltype(detail::mean(first, last))>
@@ -407,8 +420,8 @@ namespace ion::utilities::math
 			return {};
 	}
 
-	//Returns the mean of all numbers in the given container
-	//If container is empty, it returns nullopt
+	///@brief Returns the mean of all numbers in the given container
+	///@details If container is empty, it returns nullopt
 	template <typename Container>
 	[[nodiscard]] constexpr auto Mean(const Container &container) noexcept
 	{
@@ -416,8 +429,8 @@ namespace ion::utilities::math
 	}
 
 
-	//Returns the median of all numbers in the given range [first, last)
-	//If range is empty, it returns nullopt
+	///@brief Returns the median of all numbers in the given range [first, last)
+	///@details If range is empty, it returns nullopt
 	template <typename Iterator>
 	[[nodiscard]] /*constexpr*/ auto Median(Iterator first, Iterator last) noexcept
 		-> std::optional<decltype(detail::median(first, last))>
@@ -431,8 +444,8 @@ namespace ion::utilities::math
 			return {};
 	}
 
-	//Returns the median of all numbers in the given container
-	//If container is empty, it returns nullopt
+	///@brief Returns the median of all numbers in the given container
+	///@details If container is empty, it returns nullopt
 	template <typename Container>
 	[[nodiscard]] /*constexpr*/ auto Median(Container &container) noexcept
 	{
@@ -440,8 +453,8 @@ namespace ion::utilities::math
 	}
 
 
-	//Returns the mode (multimodal) of all numbers in the given range [first, last)
-	//If range is empty, it returns nullopt
+	///@brief Returns the mode (multimodal) of all numbers in the given range [first, last)
+	///@details If range is empty, it returns nullopt
 	template <typename Iterator>
 	[[nodiscard]] /*constexpr*/ auto Mode(Iterator first, Iterator last)
 		-> std::optional<decltype(detail::mode(first, last))>
@@ -455,8 +468,8 @@ namespace ion::utilities::math
 			return {};
 	}
 
-	//Returns the mode (multimodal) of all numbers in the given container
-	//If container is empty, it returns nullopt
+	///@brief Returns the mode (multimodal) of all numbers in the given container
+	///@details If container is empty, it returns nullopt
 	template <typename Container>
 	[[nodiscard]] /*constexpr*/ auto Mode(const Container &container)
 	{
@@ -464,8 +477,8 @@ namespace ion::utilities::math
 	}
 
 
-	//Returns the range of all numbers in the given range [first, last)
-	//If range is empty, it returns nullopt
+	///@brief Returns the range of all numbers in the given range [first, last)
+	///@details If range is empty, it returns nullopt
 	template <typename Iterator>
 	[[nodiscard]] constexpr auto Range(Iterator first, Iterator last) noexcept
 		-> std::optional<decltype(detail::range(first, last))>
@@ -479,48 +492,53 @@ namespace ion::utilities::math
 			return {};
 	}
 
-	//Returns the range of all numbers in the given container
-	//If container is empty, it returns nullopt
+	///@brief Returns the range of all numbers in the given container
+	///@details If container is empty, it returns nullopt
 	template <typename Container>
 	[[nodiscard]] constexpr auto Range(const Container &container) noexcept
 	{
 		return Range(std::begin(container), std::end(container));
 	}
 
+	///@}
 
-	/*
-		Trigonometry
+	/**
+		@name Trigonometry
+		@{
 	*/
 
-	//Returns the sine in radians
-	//This function uses a look-up table and is not as precise as std::sin
+	///@brief Returns the sine in radians
+	///@details This function uses a look-up table and is not as precise as std::sin
 	[[nodiscard]] real Sin(real radian) noexcept;
 
-	//Returns the cosine in radians
-	//This function uses a look-up table and is not as precise as std::cos
+	///@brief Returns the cosine in radians
+	///@details This function uses a look-up table and is not as precise as std::cos
 	[[nodiscard]] real Cos(real radian) noexcept;
 
-	//Returns the tangent in radians
-	//This function uses a look-up table and is not as precise as std::tan
+	///@brief Returns the tangent in radians
+	///@details This function uses a look-up table and is not as precise as std::tan
 	[[nodiscard]] real Tan(real radian) noexcept;
 
-	//Converts angle value in degrees to radians
+	///@brief Converts angle value in degrees to radians
 	[[nodiscard]] constexpr auto ToRadians(real degree) noexcept
 	{
 		return degree * detail::degree_to_radian_factor;
 	}
 
-	//Converts angle value in radians to degrees
+	///@brief Converts angle value in radians to degrees
 	[[nodiscard]] constexpr auto ToDegrees(real radian) noexcept
 	{
 		return radian * detail::radian_to_degree_factor;
 	}
 
+	///@}
+
 	inline namespace literals
 	{
-		/*
-			User defined literals (UDLs)
-			For trigonometric conversions 
+		/**
+			@name User defined literals (UDLs)
+			For trigonometric conversions
+			@{
 		*/
 
 		constexpr auto operator""_deg(long double degree) noexcept
@@ -532,6 +550,8 @@ namespace ion::utilities::math
 		{
 			return ToDegrees(static_cast<real>(radian));
 		}
+
+		///@}
 	} //literals
 } //ion::utilities::math
 

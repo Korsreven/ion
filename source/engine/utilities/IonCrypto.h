@@ -19,7 +19,7 @@ File:	IonCrypto.h
 
 #include "types/IonTypes.h"
 
-//Namespace containing safe cryptographic hashing functions like SHA3, SHAKE and Keccac variants
+///@brief Namespace containing safe cryptographic hashing functions like SHA3, SHAKE and Keccac variants
 namespace ion::utilities::crypto
 {
 	namespace detail
@@ -56,62 +56,67 @@ namespace ion::utilities::crypto
 					reinterpret_cast<uint64*>(std::data(state_))[I(x, y)] ^= lane;
 				}
 
-				//Function that computes the linear feedback shift register (LFSR) used to
-				//define the round constants (see [Keccak Reference, Section 1.2]).
+				///@brief Function that computes the linear feedback shift register (LFSR) used to
+				///define the round constants (see [Keccak Reference, Section 1.2]).
 				static bool LFSR86540(uint8 &lfsr) noexcept;
 				
-				//Function that computes the Keccak-f[1600] permutation on the given state.
+				///@brief Function that computes the Keccak-f[1600] permutation on the given state.
 				void F1600_StatePermute() noexcept;
 
 			public:
 
-				//A readable and compact implementation of the Keccak sponge functions
-				//that use the Keccak-f[1600] permutation.
+				///@brief A readable and compact implementation of the Keccak sponge functions
+				///that use the Keccak-f[1600] permutation.
 				std::string operator()(int rate, int capacity, std::string_view input, char delimited_suffix, int output_length);
 		};
 	} //detail
 
 
-	/*
-		Hashing
+	/**
+		@name Hashing
 		Keccak variants (non-standard)
+		@{
 	*/
 
-	//Function to compute Keccak-224 on the input message. The output length is fixed to 28 bytes
+	///@brief Function to compute Keccak-224 on the input message. The output length is fixed to 28 bytes
 	[[nodiscard]] std::string Keccak_224(std::string_view input);
 
-	//Function to compute Keccak-256 on the input message. The output length is fixed to 32 bytes
+	///@brief Function to compute Keccak-256 on the input message. The output length is fixed to 32 bytes
 	[[nodiscard]] std::string Keccak_256(std::string_view input);
 
-	//Function to compute Keccak-384 on the input message. The output length is fixed to 48 bytes
+	///@brief Function to compute Keccak-384 on the input message. The output length is fixed to 48 bytes
 	[[nodiscard]] std::string Keccak_384(std::string_view input);
 
-	//Function to compute Keccak-512 on the input message. The output length is fixed to 64 bytes
+	///@brief Function to compute Keccak-512 on the input message. The output length is fixed to 64 bytes
 	[[nodiscard]] std::string Keccak_512(std::string_view input);
 
+	///@}
 
-	/*
-		Hashing
+	/**
+		@name Hashing
 		FIPS 202 (standard)
+		@{
 	*/
 
-	//Function to compute SHA3-224 on the input message. The output length is fixed to 28 bytes
+	///@brief Function to compute SHA3-224 on the input message. The output length is fixed to 28 bytes
 	[[nodiscard]] std::string SHA3_224(std::string_view input);
 
-	//Function to compute SHA3-256 on the input message. The output length is fixed to 32 bytes
+	///@brief Function to compute SHA3-256 on the input message. The output length is fixed to 32 bytes
 	[[nodiscard]] std::string SHA3_256(std::string_view input);
 
-	//Function to compute SHA3-384 on the input message. The output length is fixed to 48 bytes
+	///@brief Function to compute SHA3-384 on the input message. The output length is fixed to 48 bytes
 	[[nodiscard]] std::string SHA3_384(std::string_view input);
 
-	//Function to compute SHA3-512 on the input message. The output length is fixed to 64 bytes
+	///@brief Function to compute SHA3-512 on the input message. The output length is fixed to 64 bytes
 	[[nodiscard]] std::string SHA3_512(std::string_view input);
 
-	//Function to compute SHAKE128 on the input message with any output length
+	///@brief Function to compute SHAKE128 on the input message with any output length
 	[[nodiscard]] std::string SHAKE_128(std::string_view input, int output_length);
 
-	//Function to compute SHAKE256 on the input message with any output length
+	///@brief Function to compute SHAKE256 on the input message with any output length
 	[[nodiscard]] std::string SHAKE_256(std::string_view input, int output_length);
+
+	///@}
 } //ion::utilities::crypto
 
 #endif

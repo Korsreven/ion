@@ -25,7 +25,7 @@ File:	IonCodec.h
 #include "IonMath.h"
 #include "IonStringUtility.h"
 
-//Namespace containing functions for encoding and decoding different bases
+///@brief Namespace containing functions for encoding and decoding different bases
 namespace ion::utilities::codec
 {
 	namespace detail
@@ -362,12 +362,13 @@ namespace ion::utilities::codec
 	} //detail
 
 	
-	/*
-		Encoding
+	/**
+		@name Encoding
 		Base 2-36 (radix)
+		@{
 	*/
 
-	//Encodes a number (base 10) to a given base in range [2, 36]
+	///@brief Encodes a number (base 10) to a given base in range [2, 36]
 	template <typename T>
 	[[nodiscard]] inline auto EncodeTo(T value, int base)
 	{
@@ -376,13 +377,15 @@ namespace ion::utilities::codec
 		return detail::number_to_base(value, base);
 	}
 
+	///@}
 
-	/*
-		Decoding
+	/**
+		@name Decoding
 		Base 2-36 (radix)
+		@{
 	*/
 
-	//Decodes a string from a given base in range [2, 36] to a number (base 10)
+	///@brief Decodes a string from a given base in range [2, 36] to a number (base 10)
 	template <typename T>
 	[[nodiscard]] inline auto DecodeFrom(std::string_view str, int base)
 	{
@@ -391,68 +394,74 @@ namespace ion::utilities::codec
 		return detail::base_to_number<T>(str, base);
 	}
 
+	///@}
 
-	/*
-		Encoding (RFC 4648)
+	/**
+		@name Encoding (RFC 4648)
 		Base 16/32/64
+		@{
 	*/
 
-	//Encodes a string to base16 (hexadecimal)
-	//Letters a-f, are returned in lower case
+	///@brief Encodes a string to base16 (hexadecimal)
+	///@details Letters a-f, are returned in lower case
 	[[nodiscard]] std::string EncodeToHex(std::string_view str);
 
 
-	//Encodes a string to base32
-	//Letters A-Z, are returned in upper case
-	//Result is not padded
+	///@brief Encodes a string to base32
+	///@details Letters A-Z, are returned in upper case.
+	///Result is not padded
 	[[nodiscard]] std::string EncodeToBase32(std::string_view str);
 
-	//Encodes a string to base32
-	//Letters A-Z, are returned in upper case
-	//Result is padded with the given padding character
+	///@brief Encodes a string to base32
+	///@details Letters A-Z, are returned in upper case.
+	///Result is padded with the given padding character
 	[[nodiscard]] std::string EncodeToBase32(std::string_view str, char padding_character);
 
 
-	//Encodes a string to base64
-	//Result is not padded
+	///@brief Encodes a string to base64
+	///@details Result is not padded
 	[[nodiscard]] std::string EncodeToBase64(std::string_view str);
 
-	//Encodes a string to base64
-	//Result is padded with the given padding character
+	///@brief Encodes a string to base64
+	///@details Result is padded with the given padding character
 	[[nodiscard]] std::string EncodeToBase64(std::string_view str, char padding_character);
 
-	//Encodes a string to base64 URL
-	//Safe variant for URLs and filenames
-	//Result is not padded
+	///@brief Encodes a string to base64 URL
+	///@details Safe variant for URLs and filenames.
+	///Result is not padded
 	[[nodiscard]] std::string EncodeToBase64_URL(std::string_view str);
 
-	//Encodes a string to base64 URL
-	//Safe variant for URLs and filenames
-	//Result is padded with the given padding character
+	///@brief Encodes a string to base64 URL
+	///@details Safe variant for URLs and filenames.
+	///Result is padded with the given padding character
 	[[nodiscard]] std::string EncodeToBase64_URL(std::string_view str, char padding_character);
 
+	///@}
 
-	/*
-		Decoding (RFC 4648)
+	/**
+		@name Decoding (RFC 4648)
 		Base 16/32/64
+		@{
 	*/
 
-	//Decodes a string from base16 (hexadecimal)
-	//Note that letters are case insensitive
+	///@brief Decodes a string from base16 (hexadecimal)
+	///@details Note that letters are case insensitive
 	[[nodiscard]] std::optional<std::string> DecodeFromHex(std::string_view str);
 
-	//Decodes a string from base32
-	//Note that letters are case insensitive
+	///@brief Decodes a string from base32
+	///@details Note that letters are case insensitive
 	[[nodiscard]] std::optional<std::string> DecodeFromBase32(std::string_view str);
 
-	//Decodes a string from base64
-	//Note that letters are case sensitive
+	///@brief Decodes a string from base64
+	///@details Note that letters are case sensitive
 	[[nodiscard]] std::optional<std::string> DecodeFromBase64(std::string_view str);
 
-	//Decodes a string from base64 URL
-	//Safe variant for URLs and filenames
-	//Note that letters are case sensitive
+	///@brief Decodes a string from base64 URL
+	///@details Safe variant for URLs and filenames.
+	///Note that letters are case sensitive
 	[[nodiscard]] std::optional<std::string> DecodeFromBase64_URL(std::string_view str);
+
+	///@}
 } //ion::utilities::codec
 
 #endif

@@ -20,7 +20,7 @@ File:	IonRandom.h
 
 #include "types/IonTypes.h"
 
-//Namespace containing commonly used functions for generating random numbers in different ranges
+///@brief Namespace containing commonly used functions for generating random numbers in different ranges
 namespace ion::utilities::random
 {
 	namespace detail
@@ -61,7 +61,7 @@ namespace ion::utilities::random
 		using random_distribution_t = typename random_distribution<T>::type;
 
 
-		//Random generator class for seeding a 32 and 64 bit mersenne twister engine
+		///@brief Random generator class for seeding a 32 and 64 bit mersenne twister engine
 		class random_generator final
 		{
 			private:
@@ -131,11 +131,12 @@ namespace ion::utilities::random
 	} //detail
 
 
-	/*
-		Random integer or floating point in specified range
+	/**
+		@name Random integer or floating point in specified range
+		@{
 	*/
 
-	//Returns a random number in range [min, max]
+	///@brief Returns a random number in range [min, max]
 	template <typename T>
 	[[nodiscard]] inline auto Number(T min, T max) noexcept
 	{
@@ -149,19 +150,21 @@ namespace ion::utilities::random
 			return detail::random_generator::Number64(min, max);
 	}
 
-	//Returns a random number in range [0, max]
+	///@brief Returns a random number in range [0, max]
 	template <typename T>
 	[[nodiscard]] inline auto Number(T max) noexcept
 	{
 		return Number(T{0}, max);
 	}
 
+	///@}
 
-	/*
-		Random floating point between 0.0 and 1.0
+	/**
+		@name Random floating point between 0.0 and 1.0
+		@{
 	*/
 
-	//Returns a random floating point number in range [0.0, 1.0]
+	///@brief Returns a random floating point number in range [0.0, 1.0]
 	template <typename T>
 	[[nodiscard]] inline auto Number() noexcept
 	{
@@ -169,11 +172,13 @@ namespace ion::utilities::random
 		return Number(T{1});
 	}
 
-	//Returns a random real number in range [0.0, 1.0]
+	///@brief Returns a random real number in range [0.0, 1.0]
 	[[nodiscard]] inline auto Number() noexcept
 	{
 		return Number<real>();
 	}
+
+	///@}
 } //ion::utilities::random
 
 #endif

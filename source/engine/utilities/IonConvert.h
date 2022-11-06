@@ -24,7 +24,7 @@ File:	IonConvert.h
 #undef min
 #undef max
 
-//Namespace containing functions for converting a string to a number and vice versa
+///@brief Namespace containing functions for converting a string to a number and vice versa
 namespace ion::utilities::convert
 {
 	namespace detail
@@ -196,8 +196,8 @@ namespace ion::utilities::convert
 		}
 
 
-		//String to number conversions
-		//Tries to convert the entire string
+		///@brief String to number conversions
+		///@details Tries to convert the entire string
 		template <typename T>
 		inline auto entire_string_to_number(std::string_view str) noexcept
 		{
@@ -211,8 +211,8 @@ namespace ion::utilities::convert
 		}
 
 
-		//String to number conversions
-		//Tries to convert the first part of the string
+		///@brief String to number conversions
+		///@details Tries to convert the first part of the string
 		template <typename T>
 		inline auto first_part_of_string_to_number(std::string_view str) noexcept
 		{
@@ -225,8 +225,8 @@ namespace ion::utilities::convert
 		}
 
 
-		//String to number conversions
-		//Tries to convert the first numeric part of the string
+		///@brief String to number conversions
+		///@details Tries to convert the first numeric part of the string
 		template <typename T>
 		inline auto first_numeric_part_to_number(std::string_view str) noexcept
 		{
@@ -251,7 +251,7 @@ namespace ion::utilities::convert
 		}
 
 
-		//Number to string conversions (general)
+		///@brief Number to string conversions (general)
 		template <typename T>
 		inline auto number_to_string(T x)
 		{
@@ -261,7 +261,7 @@ namespace ion::utilities::convert
 			return std::string(std::data(chars), ptr);
 		}
 
-		//Floating point to string conversions (fixed)
+		///@brief Floating point to string conversions (fixed)
 		template <typename T>
 		inline auto floating_point_to_string(T x, std::optional<int> precision)
 		{
@@ -275,13 +275,14 @@ namespace ion::utilities::convert
 	} //detail
 
 
-	/*
-		String to number
+	/**
+		@name String to number
 		Entire string must be numeric
+		@{
 	*/
 
-	//Converts the entire given string to a number
-	//Returns an empty optional if the conversion fails
+	///@brief Converts the entire given string to a number
+	///@details Returns an empty optional if the conversion fails
 	template <typename T>
 	[[nodiscard]] inline auto To(std::string_view str) noexcept
 	{
@@ -289,14 +290,16 @@ namespace ion::utilities::convert
 		return detail::entire_string_to_number<T>(str);
 	}
 
+	///@}
 
-	/*
-		String to number
+	/**
+		@name String to number
 		First part of the string must be numeric
+		@{
 	*/
 
-	//Converts the first part of the given string to a number
-	//Returns an empty optional if the conversion fails
+	///@brief Converts the first part of the given string to a number
+	///@details Returns an empty optional if the conversion fails
 	template <typename T>
 	[[nodiscard]] inline auto FirstPartTo(std::string_view str) noexcept
 	{
@@ -304,14 +307,16 @@ namespace ion::utilities::convert
 		return detail::first_part_of_string_to_number<T>(str);
 	}
 
+	///@}
 
-	/*
-		String to number
+	/**
+		@name String to number
 		Some part of the string must be numeric
+		@{
 	*/
 
-	//Converts the first numeric part of the given string to a number
-	//Returns an empty optional if no numeric part is found
+	///@brief Converts the first numeric part of the given string to a number
+	///@details Returns an empty optional if no numeric part is found
 	template <typename T>
 	[[nodiscard]] inline auto FirstNumericPartTo(std::string_view str) noexcept
 	{
@@ -319,13 +324,15 @@ namespace ion::utilities::convert
 		return detail::first_numeric_part_to_number<T>(str);
 	}
 
+	///@}
 
-	/*
-		Number to string
+	/**
+		@name Number to string
 		Integers and floating points
+		@{
 	*/
 
-	//Converts the given number to a string
+	///@brief Converts the given number to a string
 	template <typename T>
 	[[nodiscard]] inline auto ToString(T value)
 	{
@@ -333,7 +340,7 @@ namespace ion::utilities::convert
 		return detail::number_to_string(value);
 	}
 
-	//Converts the given floating point number, with custom precision, to a string
+	///@brief Converts the given floating point number, with custom precision, to a string
 	template <typename T>
 	[[nodiscard]] inline auto ToString(T value, std::optional<int> precision)
 	{
@@ -341,6 +348,8 @@ namespace ion::utilities::convert
 		assert(precision.value_or(0) >= 0 && precision.value_or(0) <= std::numeric_limits<T>::digits10);
 		return detail::floating_point_to_string(value, precision);
 	}
+
+	///@}
 } //ion::utilities::convert
 
 #endif
