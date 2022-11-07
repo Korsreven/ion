@@ -28,60 +28,66 @@ namespace ion::gui
 	} //gui_container::detail
 
 
-	//A class representing an owning GUI container that can create and store multiple GUI components
-	//A container is itself a component, and is therefore both the owner and the parent of a newly create component
+	///@brief A class representing an owning GUI container that can create and store multiple GUI components
+	///@details A container is itself a component, and is therefore both the owner and the parent of a newly create component
 	class GuiContainer :
 		public GuiComponent,
 		public managed::ObjectManager<GuiComponent, GuiContainer>
 	{
 		protected:
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See ObjectManager::Created for more details
+			///@brief See ObjectManager::Created for more details
 			virtual void Created(GuiComponent &component) noexcept override;
 
-			//See ObjectManager::Removed for more details
+			///@brief See ObjectManager::Removed for more details
 			virtual void Removed(GuiComponent &component) noexcept override;
+
+			///@}
 
 		public:
 
 			using GuiComponent::GuiComponent;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			GuiContainer(const GuiContainer&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			GuiContainer(GuiContainer&&) = default;
 
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all components in this container
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all components in this container
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Components() noexcept
 			{
 				return Objects();
 			}
 
-			//Returns an immutable range of all components in this container
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all components in this container
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Components() const noexcept
 			{
 				return Objects();
 			}
 
+			///@}
 
-			/*
-				Components
+			/**
+				@name Components
 				Creating
+				@{
 			*/
 
-			//Creates a component of type T with the given name and arguments
+			///@brief Creates a component of type T with the given name and arguments
 			template <typename T, typename... Args>
 			auto CreateComponent(std::string name, Args &&...args)
 			{
@@ -92,7 +98,7 @@ namespace ion::gui
 			}
 
 
-			//Creates a component of type T as a copy of the given component
+			///@brief Creates a component of type T as a copy of the given component
 			template <typename T>
 			auto CreateComponent(const T &component_t)
 			{
@@ -102,7 +108,7 @@ namespace ion::gui
 				return static_pointer_cast<T>(ptr);
 			}
 
-			//Creates a component of type T by moving the given component
+			///@brief Creates a component of type T by moving the given component
 			template <typename T>
 			auto CreateComponent(T &&component_t)
 			{
@@ -112,23 +118,25 @@ namespace ion::gui
 				return static_pointer_cast<T>(ptr);
 			}
 
+			///@}
 
-			/*
-				Components
+			/**
+				@name Components
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable component with the given name
-			//Returns nullptr if component could not be found
+			///@brief Gets a pointer to a mutable component with the given name
+			///@details Returns nullptr if component could not be found
 			[[nodiscard]] NonOwningPtr<GuiComponent> GetComponent(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable component with the given name
-			//Returns nullptr if component could not be found
+			///@brief Gets a pointer to an immutable component with the given name
+			///@details Returns nullptr if component could not be found
 			[[nodiscard]] NonOwningPtr<const GuiComponent> GetComponent(std::string_view name) const noexcept;
 
 
-			//Gets a pointer to a mutable component of type T with the given name
-			//Returns nullptr if a component of type T could not be found
+			///@brief Gets a pointer to a mutable component of type T with the given name
+			///@details Returns nullptr if a component of type T could not be found
 			template <typename T>
 			[[nodiscard]] auto GetComponentAs(std::string_view name) noexcept
 			{
@@ -136,8 +144,8 @@ namespace ion::gui
 				return dynamic_pointer_cast<T>(GetComponent(name));
 			}
 
-			//Gets a pointer to an immutable component of type T with the given name
-			//Returns nullptr if a component of type T could not be found
+			///@brief Gets a pointer to an immutable component of type T with the given name
+			///@details Returns nullptr if a component of type T could not be found
 			template <typename T>
 			[[nodiscard]] auto GetComponentAs(std::string_view name) const noexcept
 			{
@@ -145,20 +153,24 @@ namespace ion::gui
 				return dynamic_pointer_cast<const T>(GetComponent(name));
 			}
 
+			///@}
 
-			/*
-				Components
+			/**
+				@name Components
 				Removing
+				@{
 			*/
 
-			//Clears all removable components from this container
+			///@brief Clears all removable components from this container
 			void ClearComponents() noexcept;
 
-			//Removes a removable component from this container
+			///@brief Removes a removable component from this container
 			bool RemoveComponent(GuiComponent &component) noexcept;
 
-			//Removes a removable component with the given name from this container
+			///@brief Removes a removable component with the given name from this container
 			bool RemoveComponent(std::string_view name) noexcept;
+
+			///@}
 	};
 } //ion::gui
 

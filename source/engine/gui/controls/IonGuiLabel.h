@@ -35,7 +35,7 @@ namespace ion::gui::controls
 	} //gui_label
 
 
-	//A class representing a GUI label with a caption
+	///@brief A class representing a GUI label with a caption
 	class GuiLabel : public GuiControl
 	{
 		private:
@@ -44,19 +44,22 @@ namespace ion::gui::controls
 
 		protected:
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
 
+			///@}
+
 		public:
 
-			//Constructs a label with the given name, size, caption and hit boxes
+			///@brief Constructs a label with the given name, size, caption and hit boxes
 			GuiLabel(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Constructs a label with the given name, skin, size, caption and hit boxes
+			///@brief Constructs a label with the given name, skin, size, caption and hit boxes
 			GuiLabel(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {});
 	};

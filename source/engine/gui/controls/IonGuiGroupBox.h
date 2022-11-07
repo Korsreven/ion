@@ -53,9 +53,9 @@ namespace ion::gui::controls
 	} //gui_group_box
 
 
-	//A class representing a GUI group box that can contain other GUI controls
-	//When a control has been added (adopted) it will be positioned relative to the group box
-	//When a control has been removed (orphaned) it will automatically be adopted by its owner
+	///@brief A class representing a GUI group box that can contain other GUI controls
+	///@details When a control has been added (adopted) it will be positioned relative to the group box.
+	///When a control has been removed (orphaned) it will automatically be adopted by its owner
 	class GuiGroupBox : public GuiControl
 	{
 		private:
@@ -67,99 +67,113 @@ namespace ion::gui::controls
 			gui_group_box::detail::control_pointers controls_;
 
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
 
+			///@}
+
 		public:
 
-			//Constructs a group box with the given name, size, caption and hit boxes
+			///@brief Constructs a group box with the given name, size, caption and hit boxes
 			GuiGroupBox(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Constructs a group box with the given name, skin, size, caption and hit boxes
+			///@brief Constructs a group box with the given name, skin, size, caption and hit boxes
 			GuiGroupBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {});
 
 
-			//Default move constructor
+			///@brief Default move constructor
 			GuiGroupBox(GuiGroupBox&&) = default;
 
 
-			//Virtual destructor
+			///@brief Virtual destructor
 			virtual ~GuiGroupBox() noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Default move assignment
+			///@brief Default move assignment
 			GuiGroupBox& operator=(GuiGroupBox&&) = default;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all controls in this group box
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all controls in this group box
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Controls() noexcept
 			{
 				return adaptors::ranges::Iterable<gui_group_box::detail::control_pointers&>{controls_};
 			}
 
-			//Returns an immutable range of all controls in this group box
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all controls in this group box
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Controls() const noexcept
 			{
 				return adaptors::ranges::Iterable<const gui_group_box::detail::control_pointers&>{controls_};
 			}
 
+			///@}
 
-			/*
-				Controls
+			/**
+				@name Controls
 				Adding
+				@{
 			*/
 
-			//Adds the given control to this group box
-			//Can only add a control with the same owner as this group box
+			///@brief Adds the given control to this group box
+			///@details Can only add a control with the same owner as this group box
 			bool AddControl(NonOwningPtr<controls::GuiControl> control);
 
-			//Adds a control with the given name to this group box
-			//Can only add a control with the same owner as this group box
+			///@brief Adds a control with the given name to this group box
+			///@details Can only add a control with the same owner as this group box
 			bool AddControl(std::string_view name);
 
+			///@}
 
-			/*
-				Controls
+			/**
+				@name Controls
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable control with the given name
-			//Returns nullptr if control could not be found
+			///@brief Gets a pointer to a mutable control with the given name
+			///@details Returns nullptr if control could not be found
 			[[nodiscard]] NonOwningPtr<controls::GuiControl> GetControl(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable control with the given name
-			//Returns nullptr if control could not be found
+			///@brief Gets a pointer to an immutable control with the given name
+			///@details Returns nullptr if control could not be found
 			[[nodiscard]] NonOwningPtr<const controls::GuiControl> GetControl(std::string_view name) const noexcept;
 
+			///@}
 
-			/*
-				Controls
+			/**
+				@name Controls
 				Removing
+				@{
 			*/
 
-			//Clears all controls from this group box
+			///@brief Clears all controls from this group box
 			void ClearControls() noexcept;
 
-			//Removes a control from this group box
+			///@brief Removes a control from this group box
 			bool RemoveControl(controls::GuiControl &control) noexcept;
 
-			//Removes a control with the given name from this group box
+			///@brief Removes a control with the given name from this group box
 			bool RemoveControl(std::string_view name) noexcept;
+
+			///@}
 	};
 
 } //ion::gui::controls

@@ -91,18 +91,21 @@ namespace ion::gui::controls
 			}
 
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			void resize_handle(SliderSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 			void resize_skin(SliderSkin &skin, SliderType type, const Vector2 &from_size, const Vector2 &to_size) noexcept;
+
+			///@}
 		} //detail
 	} //gui_slider
 
 
-	//A class representing a GUI slider that can be horizontal or vertical, flipped or not
-	//The slider handle can be dragged with the mouse cursor to change position
+	///@brief A class representing a GUI slider that can be horizontal or vertical, flipped or not
+	///@details The slider handle can be dragged with the mouse cursor to change position
 	class GuiSlider : public GuiControl
 	{
 		private:
@@ -119,27 +122,32 @@ namespace ion::gui::controls
 			bool dragged_ = false;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See GuiControl::Resized for more details
+			///@brief See GuiControl::Resized for more details
 			virtual void Resized(Vector2 from_size, Vector2 to_size) noexcept override;
 
-			//Called right after a slider has slid
+			///@brief Called right after a slider has slid
 			virtual void Slid(int delta) noexcept;
 
+			///@}
 
-			/*
-				States
+			/**
+				@name States
+				@{
 			*/
 
 			void SetSkinState(gui_control::ControlState state, gui_slider::SliderSkin &skin) noexcept;
 			virtual void SetState(gui_control::ControlState state) noexcept override;
 
+			///@}
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
@@ -149,26 +157,29 @@ namespace ion::gui::controls
 
 			virtual void UpdateHandle() noexcept;
 
+			///@}
+
 		public:
 
-			//Constructs a slider with the given name, size, caption, tooltip, type and hit boxes
+			///@brief Constructs a slider with the given name, size, caption, tooltip, type and hit boxes
 			GuiSlider(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_slider::SliderType type = gui_slider::SliderType::Horizontal,
 				gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Constructs a slider with the given name, skin, size, caption, tooltip, type and hit boxes
+			///@brief Constructs a slider with the given name, skin, size, caption, tooltip, type and hit boxes
 			GuiSlider(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_slider::SliderType type = gui_slider::SliderType::Horizontal,
 				gui_control::BoundingBoxes hit_boxes = {});
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the slider type to the given type
-			//Horizontal type goes left to right
-			//Vertical type goes bottom to top
+			///@brief Sets the slider type to the given type
+			///@details Horizontal type goes left to right.
+			///Vertical type goes bottom to top
 			inline void Type(gui_slider::SliderType type) noexcept
 			{
 				if (type_ != type)
@@ -180,9 +191,9 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets whether or not this slider is flipped or not
-			//Horizontal flipped goes right to left
-			//Vertical flipped goes top to bottom
+			///@brief Sets whether or not this slider is flipped or not
+			///@details Horizontal flipped goes right to left.
+			///Vertical flipped goes top to bottom
 			inline void Flipped(bool flipped) noexcept
 			{
 				if (flipped_ != flipped)
@@ -193,10 +204,10 @@ namespace ion::gui::controls
 			}
 
 
-			//Sets the position to the given percentage in range [0.0, 1.0]
+			///@brief Sets the position to the given percentage in range [0.0, 1.0]
 			void Percent(real percent) noexcept;
 
-			//Sets the position of this slider to the given value
+			///@brief Sets the position of this slider to the given value
 			inline void Position(int position) noexcept
 			{
 				if (progress_.Position() != position)
@@ -208,7 +219,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the range of this slider to the given range
+			///@brief Sets the range of this slider to the given range
 			inline void Range(int min, int max) noexcept
 			{
 				if (progress_.Min() != min || progress_.Max() != max)
@@ -226,95 +237,105 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the step by amount for this slider to the given amount
+			///@brief Sets the step by amount for this slider to the given amount
 			inline void StepByAmount(int amount) noexcept
 			{
 				step_by_amount_ = amount > 0 ? amount : 1;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the slider type
-			//Horizontal type goes left to right
-			//Vertical type goes bottom to top
+			///@brief Returns the slider type
+			///@details Horizontal type goes left to right.
+			///Vertical type goes bottom to top
 			[[nodiscard]] inline auto Type() const noexcept
 			{
 				return type_;
 			}
 
-			//Returns true if this slider is flipped
-			//Horizontal flipped goes right to left
-			//Vertical flipped goes top to bottom
+			///@brief Returns true if this slider is flipped
+			///@details Horizontal flipped goes right to left.
+			///Vertical flipped goes top to bottom
 			[[nodiscard]] inline auto Flipped() const noexcept
 			{
 				return flipped_;
 			}
 
 
-			//Returns the position as a percentage in range [0.0, 1.0]
+			///@brief Returns the position as a percentage in range [0.0, 1.0]
 			[[nodiscard]] inline auto Percent() const noexcept
 			{
 				return progress_.Percent();
 			}
 
-			//Returns the position of this slider
+			///@brief Returns the position of this slider
 			[[nodiscard]] inline auto Position() const noexcept
 			{
 				return progress_.Position();
 			}		
 
-			//Returns the range of this slider
+			///@brief Returns the range of this slider
 			[[nodiscard]] inline auto Range() const noexcept
 			{
 				return progress_.MinMax();
 			}
 
-			//Returns the step by amount for this slider
+			///@brief Returns the step by amount for this slider
 			[[nodiscard]] inline auto StepByAmount() const noexcept
 			{
 				return step_by_amount_;
 			}
 
+			///@}
 
-			/*
-				Intersecting
+			/**
+				@name Intersecting
+				@{
 			*/
 
-			//Returns true if the given point intersects with the slider handle
+			///@brief Returns true if the given point intersects with the slider handle
 			[[nodiscard]] bool IntersectsHandle(const Vector2 &point) const noexcept;
 
+			///@}
 
-			/*
-				Key events
+			/**
+				@name Key events
+				@{
 			*/
 
-			//Called from gui control when a key button has been released
-			//Returns true if the key release event has been consumed by the control
+			///@brief Called from gui control when a key button has been released
+			///@details Returns true if the key release event has been consumed by the control
 			virtual bool KeyReleased(KeyButton button) noexcept override;
 
+			///@}
 
-			/*
-				Mouse events
+			/**
+				@name Mouse events
+				@{
 			*/
 
-			//Called from gui control when the mouse button has been pressed
-			//Returns true if the mouse press event has been consumed by the control
+			///@brief Called from gui control when the mouse button has been pressed
+			///@details Returns true if the mouse press event has been consumed by the control
 			virtual bool MousePressed(MouseButton button, Vector2 position) noexcept override;
 
-			//Called from gui control when the mouse button has been released
-			//Returns true if the mouse release event has been consumed by the control
+			///@brief Called from gui control when the mouse button has been released
+			///@details Returns true if the mouse release event has been consumed by the control
 			virtual bool MouseReleased(MouseButton button, Vector2 position) noexcept override;
 
-			//Called from gui control when the mouse has been moved
-			//Returns true if the mouse move event has been consumed by the control
+			///@brief Called from gui control when the mouse has been moved
+			///@details Returns true if the mouse move event has been consumed by the control
 			virtual bool MouseMoved(Vector2 position) noexcept override;
 
-			//Called from gui control when the mouse wheel has been rolled
-			//Returns true if the mouse wheel roll event has been consumed by the control
+			///@brief Called from gui control when the mouse wheel has been rolled
+			///@details Returns true if the mouse wheel roll event has been consumed by the control
 			virtual bool MouseWheelRolled(int delta, Vector2 position) noexcept override;
+
+			///@}
 	};
 
 } //ion::gui::controls

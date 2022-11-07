@@ -38,9 +38,9 @@ namespace ion::gui::controls
 	} //gui_radio_button
 
 
-	//A class representing a GUI radio button
-	//A radio button can only be selected (checked) never directly unselected (unchecked)
-	//When selected, all other radio buttons in the same group (same tag value) gets unselected
+	///@brief A class representing a GUI radio button
+	///@details A radio button can only be selected (checked) never directly unselected (unchecked).
+	///When selected, all other radio buttons in the same group (same tag value) gets unselected
 	class GuiRadioButton : public GuiCheckBox
 	{
 		protected:
@@ -48,69 +48,81 @@ namespace ion::gui::controls
 			int tag_ = 0;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See GuiCheckBox::Checked for more details
+			///@brief See GuiCheckBox::Checked for more details
 			virtual void Checked() noexcept override;
 
-			//See GuiCheckBox::Unchecked for more details
+			///@brief See GuiCheckBox::Unchecked for more details
 			virtual void Unchecked() noexcept override;
 
+			///@}
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
 
+			///@}
 
-			/*
-				Tags
+			/**
+				@name Tags
+				@{
 			*/
 
 			void Unselect() noexcept;
 			void UnselectEqualTag(int tag) noexcept;
 			bool UniqueTag(int tag) const noexcept;
 
+			///@}
+
 		public:
 
-			//Constructs a radio button with the given name, size, caption, tooltip and hit boxes
+			///@brief Constructs a radio button with the given name, size, caption, tooltip and hit boxes
 			GuiRadioButton(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Constructs a radio button with the given name, skin, size, caption, tooltip and hit boxes
+			///@brief Constructs a radio button with the given name, skin, size, caption, tooltip and hit boxes
 			GuiRadioButton(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {});
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Selects this radio button
+			///@brief Selects this radio button
 			void Select() noexcept;
 
-			//Sets the tag used for this radio button to the given tag
+			///@brief Sets the tag used for this radio button to the given tag
 			void Tag(int tag) noexcept;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns true if this radio button is selected
+			///@brief Returns true if this radio button is selected
 			[[nodiscard]] inline auto IsSelected() const noexcept
 			{
 				return IsChecked();
 			}
 
-			//Returns the tag used for this radio button
+			///@brief Returns the tag used for this radio button
 			[[nodiscard]] inline auto Tag() const noexcept
 			{
 				return tag_;
 			}
+
+			///@}
 	};
 
 } //ion::gui::controls

@@ -76,9 +76,9 @@ namespace ion::gui
 	} //gui_frame
 
 
-	//A class representing a GUI frame that can create and store multiple GUI controls and GUI panels
-	//A frame without an active theme will automatically use the active theme from its parent controller
-	//A frame can be modeless/modal, activated/deactivated and focused/defocused
+	///@brief A class representing a GUI frame that can create and store multiple GUI controls and GUI panels
+	///@details A frame without an active theme will automatically use the active theme from its parent controller.
+	///A frame can be modeless/modal, activated/deactivated and focused/defocused
 	class GuiFrame :
 		public GuiPanelContainer,
 		public events::Listenable<events::listeners::GuiControlListener>,
@@ -118,95 +118,98 @@ namespace ion::gui
 			NonOwningPtr<skins::GuiTheme> active_theme_;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See GuiPanelContainer::Created for more details
+			///@brief See GuiPanelContainer::Created for more details
 			virtual void Created(GuiComponent &component) noexcept override;
 			virtual void Created(controls::GuiControl &control) noexcept override;
 
-			//See GuiPanelContainer::Removed for more details
+			///@brief See GuiPanelContainer::Removed for more details
 			virtual void Removed(GuiComponent &component) noexcept override;
 			virtual void Removed(controls::GuiControl &control) noexcept override;
 
-			//See GuiPanelContainer::TabOrderChanged for more details
+			///@brief See GuiPanelContainer::TabOrderChanged for more details
 			virtual void TabOrderChanged() noexcept override;
 
 
-			//See Listener<T>::Unsubscribable for more details
-			//Make sure that if this gui control listener is about to unsubscribe from the gui frame, cancel it
+			///@brief See Listener<T>::Unsubscribable for more details
+			///@details Make sure that if this gui control listener is about to unsubscribe from the gui frame, cancel it
 			bool Unsubscribable(Listenable<events::listeners::GuiControlListener>&) noexcept override final;
 
 
-			//See GuiControlListener::Enabled for more details
+			///@brief See GuiControlListener::Enabled for more details
 			virtual void Enabled(controls::GuiControl &control) noexcept override;
 
-			//See GuiControlListener::Disabled for more details
+			///@brief See GuiControlListener::Disabled for more details
 			virtual void Disabled(controls::GuiControl &control) noexcept override;
 
 
-			//See GuiControlListener::Enabled for more details
+			///@brief See GuiControlListener::Enabled for more details
 			virtual void Shown(controls::GuiControl &control) noexcept override;
 
-			//See GuiControlListener::Disabled for more details
+			///@brief See GuiControlListener::Disabled for more details
 			virtual void Hidden(controls::GuiControl &control) noexcept override;
 
 
-			//See GuiControlListener::Focused for more details
+			///@brief See GuiControlListener::Focused for more details
 			virtual void Focused(controls::GuiControl &control) noexcept override;
 
-			//See GuiControlListener::Defocused for more details
+			///@brief See GuiControlListener::Defocused for more details
 			virtual void Defocused(controls::GuiControl &control) noexcept override;
 
 
-			//See GuiControlListener::Pressed for more details
+			///@brief See GuiControlListener::Pressed for more details
 			virtual void Pressed(controls::GuiControl &control) noexcept override;
 
-			//See GuiControlListener::Released for more details
+			///@brief See GuiControlListener::Released for more details
 			virtual void Released(controls::GuiControl &control) noexcept override;
 
-			//See GuiControlListener::Clicked for more details
+			///@brief See GuiControlListener::Clicked for more details
 			virtual void Clicked(controls::GuiControl &control) noexcept override;
 
 
-			//See GuiControlListener::Entered for more details
+			///@brief See GuiControlListener::Entered for more details
 			virtual void Entered(controls::GuiControl &control) noexcept override;
 
-			//See GuiControlListener::Exited for more details
+			///@brief See GuiControlListener::Exited for more details
 			virtual void Exited(controls::GuiControl &control) noexcept override;
 
 
-			//See GuiComponent::Enabled for more details
+			///@brief See GuiComponent::Enabled for more details
 			virtual void Enabled() noexcept override;
 
-			//See GuiComponent::Disabled for more details
+			///@brief See GuiComponent::Disabled for more details
 			virtual void Disabled() noexcept override;
 
 
-			//See GuiComponent::Shown for more details
+			///@brief See GuiComponent::Shown for more details
 			virtual void Shown() noexcept override;
 
-			//See GuiComponent::Hidden for more details
+			///@brief See GuiComponent::Hidden for more details
 			virtual void Hidden() noexcept override;
 
 
-			//Called right after a frame has been activated
+			///@brief Called right after a frame has been activated
 			virtual void Activated() noexcept;
 
-			//Called right after a frame has been deactivated
+			///@brief Called right after a frame has been deactivated
 			virtual void Deactivated() noexcept;
 
 
-			//Called right after a frame has been focused
+			///@brief Called right after a frame has been focused
 			virtual void Focused() noexcept;
 
-			//Called right after a frame has been defocused
+			///@brief Called right after a frame has been defocused
 			virtual void Defocused() noexcept;
 
+			///@}
 
-			/*
-				Notifying
+			/**
+				@name Notifying
+				@{
 			*/
 
 			void NotifyFrameEnabled() noexcept;
@@ -218,75 +221,82 @@ namespace ion::gui
 			void NotifyFrameFocused() noexcept;
 			void NotifyFrameDefocused() noexcept;
 
+			///@}
 
-			/*
-				Intersection
+			/**
+				@name Intersection
+				@{
 			*/
 
 			controls::GuiControl* IntersectedControl(const Vector2 &position) noexcept;
 
+			///@}
+
 		public:
 
-			//Constructs a frame with the given name
+			///@brief Constructs a frame with the given name
 			explicit GuiFrame(std::string name);
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//Returns a mutable reference to the control events of this frame
+			///@brief Returns a mutable reference to the control events of this frame
 			[[nodiscard]] inline auto& ControlEvents() noexcept
 			{
 				return static_cast<ControlEventsBase&>(*this);
 			}
 
-			//Returns an immutable reference to the control events of this frame
+			///@brief Returns an immutable reference to the control events of this frame
 			[[nodiscard]] inline auto& ControlEvents() const noexcept
 			{
 				return static_cast<const ControlEventsBase&>(*this);
 			}
 
 
-			//Returns a mutable reference to the managed object events of this frame
+			///@brief Returns a mutable reference to the managed object events of this frame
 			[[nodiscard]] inline auto& ManagedObjectEvents() noexcept
 			{
 				return static_cast<ManagedObjectEventsBase&>(*this);
 			}
 
-			//Returns an immutable reference to the managed object events of this frame
+			///@brief Returns an immutable reference to the managed object events of this frame
 			[[nodiscard]] inline auto& ManagedObjectEvents() const noexcept
 			{
 				return static_cast<const ManagedObjectEventsBase&>(*this);
 			}
-			 
+			
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Activates this frame with the given mode
+			///@brief Activates this frame with the given mode
 			void Activate(gui_frame::FrameMode mode = gui_frame::FrameMode::Modeless) noexcept;
 
-			//Deactivates this frame
+			///@brief Deactivates this frame
 			void Deactivate() noexcept;
 
 
-			//Shows this frame with the given mode (same as calling Activate)
+			///@brief Shows this frame with the given mode (same as calling Activate)
 			void Show(gui_frame::FrameMode mode = gui_frame::FrameMode::Modeless) noexcept;
 
-			//Hides this frame (same as calling Deactivate)
+			///@brief Hides this frame (same as calling Deactivate)
 			void Hide() noexcept;
 
 
-			//Focuses this frame
+			///@brief Focuses this frame
 			void Focus() noexcept;
 
-			//Defocuses this frame
+			///@brief Defocuses this frame
 			void Defocus() noexcept;
 
 
-			//Sets whether or not this frame is activated
+			///@brief Sets whether or not this frame is activated
 			inline void Activated(bool activated) noexcept
 			{
 				if (activated)
@@ -295,7 +305,7 @@ namespace ion::gui
 					Deactivate();
 			}
 
-			//Sets whether or not this frame is focused
+			///@brief Sets whether or not this frame is focused
 			inline void Focused(bool focused) noexcept
 			{
 				if (focused)
@@ -305,215 +315,227 @@ namespace ion::gui
 			}
 
 
-			//Sets the on activate callback
+			///@brief Sets the on activate callback
 			inline void OnActivate(events::Callback<void, GuiFrame&> on_activate) noexcept
 			{
 				on_activate_ = on_activate;
 			}
 
-			//Sets the on activate callback
+			///@brief Sets the on activate callback
 			inline void OnActivate(std::nullopt_t) noexcept
 			{
 				on_activate_ = {};
 			}
 
 
-			//Sets the on deactivate callback
+			///@brief Sets the on deactivate callback
 			inline void OnDeactivate(events::Callback<void, GuiFrame&> on_deactivate) noexcept
 			{
 				on_deactivate_ = on_deactivate;
 			}
 
-			//Sets the on deactivate callback
+			///@brief Sets the on deactivate callback
 			inline void OnDeactivate(std::nullopt_t) noexcept
 			{
 				on_deactivate_ = {};
 			}
 
 
-			//Sets the on focus callback
+			///@brief Sets the on focus callback
 			inline void OnFocus(events::Callback<void, GuiFrame&> on_focus) noexcept
 			{
 				on_focus_ = on_focus;
 			}
 
-			//Sets the on focus callback
+			///@brief Sets the on focus callback
 			inline void OnFocus(std::nullopt_t) noexcept
 			{
 				on_focus_ = {};
 			}
 
 
-			//Sets the on defocus callback
+			///@brief Sets the on defocus callback
 			inline void OnDefocus(events::Callback<void, GuiFrame&> on_defocus) noexcept
 			{
 				on_defocus_ = on_defocus;
 			}
 
-			//Sets the on defocus callback
+			///@brief Sets the on defocus callback
 			inline void OnDefocus(std::nullopt_t) noexcept
 			{
 				on_defocus_ = {};
 			}
 
 
-			//Sets the theme used by this frame to the theme with the given name
+			///@brief Sets the theme used by this frame to the theme with the given name
 			void ActiveTheme(std::string_view name) noexcept;
 
-			//Sets whether or not this frame is enabled
+			///@brief Sets whether or not this frame is enabled
 			inline void Enabled(bool enabled) noexcept
 			{
 				return GuiComponent::Enabled(enabled);
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns true if this frame is activated
+			///@brief Returns true if this frame is activated
 			[[nodiscard]] inline auto IsActivated() const noexcept
 			{
 				return activated_;
 			}
 
-			//Returns true if this frame is focused
+			///@brief Returns true if this frame is focused
 			[[nodiscard]] inline auto IsFocused() const noexcept
 			{
 				return focused_;
 			}
 
-			//Returns the mode of this frame
-			//Returns nullopt if this frame is not activated
+			///@brief Returns the mode of this frame
+			///@details Returns nullopt if this frame is not activated
 			[[nodiscard]] inline auto Mode() const noexcept
 			{
 				return mode_;
 			}
 
-			//Returns true if this frame is focusable
+			///@brief Returns true if this frame is focusable
 			[[nodiscard]] bool IsFocusable() const noexcept;
 
-			//Returns true if this frame is on top
+			///@brief Returns true if this frame is on top
 			[[nodiscard]] bool IsOnTop() const noexcept;
 
 
-			//Returns a pointer to the current focused control in this frame
-			//Returns nullptr if there is no currently focused control
+			///@brief Returns a pointer to the current focused control in this frame
+			///@details Returns nullptr if there is no currently focused control
 			[[nodiscard]] inline auto FocusedControl() const noexcept
 			{
 				return focused_control_;
 			}
 
-			//Returns a pointer to the current pressed control in this frame
-			//Returns nullptr if there is no currently pressed control
+			///@brief Returns a pointer to the current pressed control in this frame
+			///@details Returns nullptr if there is no currently pressed control
 			[[nodiscard]] inline auto PressedControl() const noexcept
 			{
 				return pressed_control_;
 			}
 
-			//Returns a pointer to the current hovered control in this frame
-			//Returns nullptr if there is no currently hovered control
+			///@brief Returns a pointer to the current hovered control in this frame
+			///@details Returns nullptr if there is no currently hovered control
 			[[nodiscard]] inline auto HoveredControl() const noexcept
 			{
 				return hovered_control_;
 			}
 
 
-			//Returns the on activate callback
+			///@brief Returns the on activate callback
 			[[nodiscard]] inline auto OnActivate() const noexcept
 			{
 				return on_activate_;
 			}
 
-			//Returns the on deactivate callback
+			///@brief Returns the on deactivate callback
 			[[nodiscard]] inline auto OnDeactivate() const noexcept
 			{
 				return on_deactivate_;
 			}
 
 
-			//Returns the on focus callback
+			///@brief Returns the on focus callback
 			[[nodiscard]] inline auto OnFocus() const noexcept
 			{
 				return on_focus_;
 			}
 
-			//Returns the on defocus callback
+			///@brief Returns the on defocus callback
 			[[nodiscard]] inline auto OnDefocus() const noexcept
 			{
 				return on_defocus_;
 			}
 
 
-			//Returns a pointer to the theme used by this frame
-			//Returns nullptr if there is no theme in use
+			///@brief Returns a pointer to the theme used by this frame
+			///@details Returns nullptr if there is no theme in use
 			[[nodiscard]] inline auto ActiveTheme() const noexcept
 			{
 				return active_theme_.get();
 			}
 
-			//Returns a pointer to the owner of this frame
+			///@brief Returns a pointer to the owner of this frame
 			[[nodiscard]] GuiController* Owner() const noexcept;
 
+			///@}
 
-			/*
-				Tabulating
+			/**
+				@name Tabulating
+				@{
 			*/
 
-			//Focuses the next focusable control in this frame
+			///@brief Focuses the next focusable control in this frame
 			void TabForward() noexcept;
 
-			//Focuses the previous focusable control in this frame
+			///@brief Focuses the previous focusable control in this frame
 			void TabBackward() noexcept;
 
+			///@}
 
-			/*
-				Frame events
+			/**
+				@name Frame events
+				@{
 			*/
 
-			//Called from gui controller when a frame has started
+			///@brief Called from gui controller when a frame has started
 			virtual void FrameStarted(duration time) noexcept;
 
-			//Called from gui controller when a frame has ended
+			///@brief Called from gui controller when a frame has ended
 			virtual void FrameEnded(duration time) noexcept;
 
+			///@}
 
-			/*
-				Key events
+			/**
+				@name Key events
+				@{
 			*/
 
-			//Called from gui controller when a key button has been pressed
-			//Returns true if the key press event has been consumed by the frame
+			///@brief Called from gui controller when a key button has been pressed
+			///@details Returns true if the key press event has been consumed by the frame
 			virtual bool KeyPressed(KeyButton button) noexcept;
 
-			//Called from gui controller when a key button has been released
-			//Returns true if the key release event has been consumed by the frame
+			///@brief Called from gui controller when a key button has been released
+			///@details Returns true if the key release event has been consumed by the frame
 			virtual bool KeyReleased(KeyButton button) noexcept;
 
-			//Called from gui controller when a character has been pressed
-			//Returns true if the character press event has been consumed by the frame
+			///@brief Called from gui controller when a character has been pressed
+			///@details Returns true if the character press event has been consumed by the frame
 			virtual bool CharacterPressed(char character) noexcept;
 
+			///@}
 
-			/*
-				Mouse events
+			/**
+				@name Mouse events
+				@{
 			*/
 
-			//Called from gui controller when the mouse button has been pressed
-			//Returns true if the mouse press event has been consumed by the frame
+			///@brief Called from gui controller when the mouse button has been pressed
+			///@details Returns true if the mouse press event has been consumed by the frame
 			virtual bool MousePressed(MouseButton button, Vector2 position) noexcept;
 
-			//Called from gui controller when the mouse button has been released
-			//Returns true if the mouse release event has been consumed by the frame
+			///@brief Called from gui controller when the mouse button has been released
+			///@details Returns true if the mouse release event has been consumed by the frame
 			virtual bool MouseReleased(MouseButton button, Vector2 position) noexcept;
 
-			//Called from gui controller when the mouse has been moved
-			//Returns true if the mouse move event has been consumed by the frame
+			///@brief Called from gui controller when the mouse has been moved
+			///@details Returns true if the mouse move event has been consumed by the frame
 			virtual bool MouseMoved(Vector2 position) noexcept;
 
-			//Called from gui controller when the mouse wheel has been rolled
-			//Returns true if the mouse wheel roll event has been consumed by the frame
+			///@brief Called from gui controller when the mouse wheel has been rolled
+			///@details Returns true if the mouse wheel roll event has been consumed by the frame
 			virtual bool MouseWheelRolled(int delta, Vector2 position) noexcept;
+
+			///@}
 	};
 } //ion::gui
 

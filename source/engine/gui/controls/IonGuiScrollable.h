@@ -40,7 +40,7 @@ namespace ion::gui::controls
 	} //gui_scrollable
 
 
-	//A class representing a GUI scrollable that can be attached to a GUI scroll bar and vice versa
+	///@brief A class representing a GUI scrollable that can be attached to a GUI scroll bar and vice versa
 	class GuiScrollable : public GuiControl
 	{
 		protected:
@@ -49,139 +49,159 @@ namespace ion::gui::controls
 			NonOwningPtr<GuiScrollBar> scroll_bar_;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//Called right after this scrollable or attached scroll bar has scrolled
-			//This function must be overridden by a derived class
+			///@brief Called right after this scrollable or attached scroll bar has scrolled
+			///@details This function must be overridden by a derived class
 			virtual void Scrolled(int delta) noexcept = 0;
 
+			///@}
 
-			/*
-				Scroll bar
+			/**
+				@name Scroll bar
+				@{
 			*/
 
 			void UpdateScrollBar() noexcept;
+
+			///@}
 
 		public:
 
 			using GuiControl::GuiControl;
 
-			//Default move constructor
+			///@brief Default move constructor
 			GuiScrollable(GuiScrollable&&) = default;
 
 
-			//Virtual destructor
+			///@brief Virtual destructor
 			virtual ~GuiScrollable() noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Default move assignment
+			///@brief Default move assignment
 			GuiScrollable& operator=(GuiScrollable&&) = default;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the scroll rate of this scrollable to the given rate
+			///@brief Sets the scroll rate of this scrollable to the given rate
 			inline void ScrollRate(int rate) noexcept
 			{
 				scroll_rate_ = rate > 0 ? rate : 1;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the scroll rate of this scrollable
+			///@brief Returns the scroll rate of this scrollable
 			[[nodiscard]] inline auto ScrollRate() const noexcept
 			{
 				return scroll_rate_;
 			}
 
+			///@}
 
-			/*
-				Scrolling
+			/**
+				@name Scrolling
+				@{
 			*/
 
-			//Scrolls with the given rate
+			///@brief Scrolls with the given rate
 			inline void Scroll(int rate) noexcept
 			{
 				Scrolled(rate);
 			}
 
-			//Scrolls up with the current scroll rate
+			///@brief Scrolls up with the current scroll rate
 			inline void ScrollUp() noexcept
 			{
 				Scroll(-scroll_rate_);
 			}
 
-			//Scrolls down with the current scroll rate
+			///@brief Scrolls down with the current scroll rate
 			inline void ScrollDown() noexcept
 			{
 				Scroll(scroll_rate_);
 			}
 
-			//Scrolls to the top element
+			///@brief Scrolls to the top element
 			inline void ScrollToTop() noexcept
 			{
 				Scroll(std::numeric_limits<int>::min());
 			}
 
-			//Scrolls to the bottom element
+			///@brief Scrolls to the bottom element
 			inline void ScrollToBottom() noexcept
 			{
 				Scroll(std::numeric_limits<int>::max());
 			}
 
+			///@}
 
-			/*
-				Scroll bar
+			/**
+				@name Scroll bar
+				@{
 			*/
 
-			//Sets the scroll bar attached to this scrollable to the given scroll bar
+			///@brief Sets the scroll bar attached to this scrollable to the given scroll bar
 			void AttachedScrollBar(NonOwningPtr<GuiScrollBar> scroll_bar) noexcept;
 
-			//Returns a pointer to the scroll bar attached to this scrollable
-			//Returns nullptr if this scrollable does not have a scroll bar attached
+			///@brief Returns a pointer to the scroll bar attached to this scrollable
+			///@details Returns nullptr if this scrollable does not have a scroll bar attached
 			[[nodiscard]] inline auto AttachedScrollBar() const noexcept
 			{
 				return scroll_bar_;
 			}
 
 
-			//Returns the total number of elements
+			///@brief Returns the total number of elements
 			virtual int TotalElements() noexcept;
 
-			//Returns the number of elements that is in view
+			///@brief Returns the number of elements that is in view
 			virtual int ElementsInView() noexcept;
 
-			//Returns the current scroll position
+			///@brief Returns the current scroll position
 			virtual int ScrollPosition() noexcept;
 
+			///@}
 
-			/*
-				Key events
+			/**
+				@name Key events
+				@{
 			*/
 
-			//Called from gui control when a key button has been released
-			//Returns true if the key release event has been consumed by the control
+			///@brief Called from gui control when a key button has been released
+			///@details Returns true if the key release event has been consumed by the control
 			virtual bool KeyReleased(KeyButton button) noexcept override;
 
+			///@}
 
-			/*
-				Mouse events
+			/**
+				@name Mouse events
+				@{
 			*/
 
-			//Called from gui control when the mouse wheel has been rolled
-			//Returns true if the mouse wheel roll event has been consumed by the control
+			///@brief Called from gui control when the mouse wheel has been rolled
+			///@details Returns true if the mouse wheel roll event has been consumed by the control
 			virtual bool MouseWheelRolled(int delta, Vector2 position) noexcept override;
+
+			///@}
 	};
 
 } //ion::gui::controls

@@ -208,8 +208,8 @@ namespace ion::gui::skins
 	} //gui_skin
 
 
-	//A class representing a skin for a particular GUI control
-	//A skin consists of (sprite) parts, text parts and sound parts
+	///@brief A class representing a skin for a particular GUI control
+	///@details A skin consists of (sprite) parts, text parts and sound parts
 	class GuiSkin final : public managed::ManagedObject<GuiTheme>
 	{
 		private:
@@ -232,231 +232,249 @@ namespace ion::gui::skins
 
 		public:
 
-			//Constructs a skin with the given name and type
+			///@brief Constructs a skin with the given name and type
 			explicit GuiSkin(std::string name, std::type_index type);
 			
-			//Constructs a skin with the given name, type, parts, caption part and sound parts
+			///@brief Constructs a skin with the given name, type, parts, caption part and sound parts
 			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinParts &parts,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {});
 
-			//Constructs a skin with the given name, type, border parts, caption part and sound parts
+			///@brief Constructs a skin with the given name, type, border parts, caption part and sound parts
 			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinBorderParts &border_parts,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {});
 
-			//Constructs a skin with the given name, type, side parts, caption part and sound parts
+			///@brief Constructs a skin with the given name, type, side parts, caption part and sound parts
 			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinSideParts &side_parts,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {});
 
-			//Constructs a skin with the given name, type, center part, caption part and sound parts
+			///@brief Constructs a skin with the given name, type, center part, caption part and sound parts
 			GuiSkin(std::string name, std::type_index type, const gui_skin::SkinPart &center_part,
 				const gui_skin::SkinTextPart &caption_part = {}, const gui_skin::SkinSoundParts &sound_parts = {});
 
-			//Constructs a skin with the given name, type, caption part and sound parts
+			///@brief Constructs a skin with the given name, type, caption part and sound parts
 			GuiSkin(std::string name, std::type_index type,
 				const gui_skin::SkinTextPart &caption_part, const gui_skin::SkinSoundParts &sound_parts = {});
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all parts in this skin
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all parts in this skin
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Parts() noexcept
 			{
 				return parts_.Elements();
 			}
 
-			//Returns an immutable range of all parts in this skin
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all parts in this skin
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Parts() const noexcept
 			{
 				return parts_.Elements();
 			}
 
 
-			//Returns a mutable range of all text parts in this skin
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all text parts in this skin
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto TextParts() noexcept
 			{
 				return text_parts_.Elements();
 			}
 
-			//Returns an immutable range of all text parts in this skin
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all text parts in this skin
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto TextParts() const noexcept
 			{
 				return text_parts_.Elements();
 			}
 
 
-			//Returns a mutable range of all sound parts in this skin
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all sound parts in this skin
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto SoundParts() noexcept
 			{
 				return sound_parts_.Elements();
 			}
 
-			//Returns an immutable range of all sound parts in this skin
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all sound parts in this skin
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto SoundParts() const noexcept
 			{
 				return sound_parts_.Elements();
 			}
 
 
-			//Returns a mutable range of all part render passes in this skin
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all part render passes in this skin
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto PartRenderPasses() noexcept
 			{
 				return adaptors::ranges::Iterable<graphics::render::render_pass::Passes&>{part_render_passes_};
 			}
 
-			//Returns an immutable range of all part render passes in this skin
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all part render passes in this skin
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto PartRenderPasses() const noexcept
 			{
 				return adaptors::ranges::Iterable<const graphics::render::render_pass::Passes&>{part_render_passes_};
 			}
 
 
-			//Returns a mutable range of all text render passes in this skin
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all text render passes in this skin
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto TextRenderPasses() noexcept
 			{
 				return adaptors::ranges::Iterable<graphics::render::render_pass::Passes&>{text_render_passes_};
 			}
 
-			//Returns an immutable range of all text render passes in this skin
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all text render passes in this skin
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto TextRenderPasses() const noexcept
 			{
 				return adaptors::ranges::Iterable<const graphics::render::render_pass::Passes&>{text_render_passes_};
 			}
 
+			///@}
 
-			/*
-				Instantiating
+			/**
+				@name Instantiating
+				@{
 			*/
 
-			//Returns an instantiation of this skin
+			///@brief Returns an instantiation of this skin
 			[[nodiscard]] OwningPtr<controls::gui_control::ControlSkin> Instantiate() const;
 
+			///@}
 
-			/*
-				Parts
+			/**
+				@name Parts
 				Adding
+				@{
 			*/
 
-			//Adds a part to this skin with the given name
+			///@brief Adds a part to this skin with the given name
 			void AddPart(std::string name, const gui_skin::SkinPart &part);
 
-			//Adds a text part to this skin with the given name
+			///@brief Adds a text part to this skin with the given name
 			void AddTextPart(std::string name, const gui_skin::SkinTextPart &text_part);
 
-			//Adds a sound part to this skin with the given name
+			///@brief Adds a sound part to this skin with the given name
 			void AddSoundPart(std::string name, const gui_skin::SkinSoundPart &sound_part);
 
+			///@}
 
-			/*
-				Parts
+			/**
+				@name Parts
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to the part with the given name
-			//Returns nullptr if no part is found with the given name
+			///@brief Gets a pointer to the part with the given name
+			///@details Returns nullptr if no part is found with the given name
 			[[nodiscard]] const gui_skin::SkinPart* GetPart(std::string_view name) const noexcept;
 
-			//Gets a pointer to the text part with the given name
-			//Returns nullptr if no text part is found with the given name
+			///@brief Gets a pointer to the text part with the given name
+			///@details Returns nullptr if no text part is found with the given name
 			[[nodiscard]] const gui_skin::SkinTextPart* GetTextPart(std::string_view name) const noexcept;
 
-			//Gets a pointer to the sound part with the given name
-			//Returns nullptr if no sound part is found with the given name
+			///@brief Gets a pointer to the sound part with the given name
+			///@details Returns nullptr if no sound part is found with the given name
 			[[nodiscard]] const gui_skin::SkinSoundPart* GetSoundPart(std::string_view name) const noexcept;
 
+			///@}
 
-			/*
-				Parts
+			/**
+				@name Parts
 				Removing
+				@{
 			*/
 
-			//Clears all parts from this skin
+			///@brief Clears all parts from this skin
 			void ClearParts() noexcept;
 
-			//Removes a part with the given name from this skin
+			///@brief Removes a part with the given name from this skin
 			bool RemovePart(std::string_view name) noexcept;
 
 
-			//Clears all text parts from this skin
+			///@brief Clears all text parts from this skin
 			void ClearTextParts() noexcept;
 
-			//Removes a text part with the given name from this skin
+			///@brief Removes a text part with the given name from this skin
 			bool RemoveTextPart(std::string_view name) noexcept;
 
 
-			//Clears all sound parts from this skin
+			///@brief Clears all sound parts from this skin
 			void ClearSoundParts() noexcept;
 
-			//Removes a sound part with the given name from this skin
+			///@brief Removes a sound part with the given name from this skin
 			bool RemoveSoundPart(std::string_view name) noexcept;
 
+			///@}
 
-			/*
-				Render passes
+			/**
+				@name Render passes
 				Adding
+				@{
 			*/
 
-			//Adds a part render pass to this skin
+			///@brief Adds a part render pass to this skin
 			void AddPartRenderPass(graphics::render::RenderPass pass);
 
-			//Adds part render passes to this skin
+			///@brief Adds part render passes to this skin
 			void AddPartRenderPasses(graphics::render::render_pass::Passes passes);
 
 
-			//Adds a text render pass to this skin
+			///@brief Adds a text render pass to this skin
 			void AddTextRenderPass(graphics::render::RenderPass pass);
 
-			//Adds text render passes to this skin
+			///@brief Adds text render passes to this skin
 			void AddTextRenderPasses(graphics::render::render_pass::Passes passes);
 
+			///@}
 
-			/*
-				Render passes
+			/**
+				@name Render passes
 				Retrieving
+				@{
 			*/
 
-			//Gets an immutable reference to all part render passes in this skin
+			///@brief Gets an immutable reference to all part render passes in this skin
 			[[nodiscard]] inline auto& GetPartRenderPasses() const noexcept
 			{
 				return part_render_passes_;
 			}
 
-			//Gets an immutable reference to all text render passes in this skin
+			///@brief Gets an immutable reference to all text render passes in this skin
 			[[nodiscard]] inline auto& GetTextRenderPasses() const noexcept
 			{
 				return text_render_passes_;
 			}
 
+			///@}
 
-			/*
-				Render passes
+			/**
+				@name Render passes
 				Removing
+				@{
 			*/
 
-			//Clears all part render passes from this skin
+			///@brief Clears all part render passes from this skin
 			void ClearPartRenderPasses() noexcept;
 
-			//Clears all text render passes from this skin
+			///@brief Clears all text render passes from this skin
 			void ClearTextRenderPasses() noexcept;
 
+			///@}
 
-			/*
-				Static
+			/**
+				@name Static
 				Registering
+				@{
 			*/
 
-			//Registers a gui control of type T, with the given default skin name and skin builder
+			///@brief Registers a gui control of type T, with the given default skin name and skin builder
 			template <typename T>
 			static inline void RegisterControl(std::string default_skin_name, gui_skin::SkinBuilder skin_builder)
 			{
@@ -464,16 +482,18 @@ namespace ion::gui::skins
 				registered_controls_[typeid(T)] = std::pair{std::move(default_skin_name), skin_builder};
 			}
 
+			///@}
 
-			/*
-				Static
+			/**
+				@name Static
 				Retrieving
+				@{
 			*/
 
-			//Returns the default skin name registered with the given type
+			///@brief Returns the default skin name registered with the given type
 			[[nodiscard]] static std::optional<std::string_view> GetDefaultSkinName(std::type_index type) noexcept;
 
-			//Returns the default skin name registered with the given gui control of type T
+			///@brief Returns the default skin name registered with the given gui control of type T
 			template <typename T>
 			[[nodiscard]] static inline auto GetDefaultSkinName() noexcept
 			{
@@ -481,15 +501,17 @@ namespace ion::gui::skins
 			}
 
 
-			//Returns the skin builder registered with the given type
+			///@brief Returns the skin builder registered with the given type
 			[[nodiscard]] static std::optional<gui_skin::SkinBuilder> GetSkinBuilder(std::type_index type) noexcept;
 
-			//Returns the skin builder registered with the given gui control of type T
+			///@brief Returns the skin builder registered with the given gui control of type T
 			template <typename T>
 			[[nodiscard]] static inline auto GetSkinBuilder() noexcept
 			{
 				return GetSkinBuilder(typeid(T));
 			}
+
+			///@}
 	};
 } //ion::gui::skins
 

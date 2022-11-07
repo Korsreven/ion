@@ -64,8 +64,8 @@ namespace ion::gui::controls
 	} //gui_tooltip
 
 
-	//A class representing a GUI tooltip that will automatically show the tooltip caption of an hovered GUI control
-	//A tooltip can be of a fixed sized, or auto sized based on the length of the current tooltip caption shown
+	///@brief A class representing a GUI tooltip that will automatically show the tooltip caption of an hovered GUI control
+	///@details A tooltip can be of a fixed sized, or auto sized based on the length of the current tooltip caption shown
 	class GuiTooltip : public GuiLabel
 	{
 		private:
@@ -93,8 +93,9 @@ namespace ion::gui::controls
 			GuiController* GetController() const noexcept;
 
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
@@ -105,41 +106,46 @@ namespace ion::gui::controls
 
 			void SetOpacity(real percent) noexcept;
 
+			///@}
 
-			/*
-				Phase
+			/**
+				@name Phase
+				@{
 			*/
 
 			void SetPhase(gui_tooltip::detail::tooltip_phase phase) noexcept;
 			void UpdatePhaseDuration() noexcept;
 
+			///@}
+
 		public:
 
-			//Constructs a tooltip with the given name, size and tooltip text
+			///@brief Constructs a tooltip with the given name, size and tooltip text
 			GuiTooltip(std::string name, const std::optional<Vector2> &size, std::optional<std::string> text) noexcept;
 
-			//Constructs a tooltip with the given name, skin, size and tooltip text
+			///@brief Constructs a tooltip with the given name, skin, size and tooltip text
 			GuiTooltip(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size, std::optional<std::string> text);
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets whether or not this tooltip should automatically adjust its size
+			///@brief Sets whether or not this tooltip should automatically adjust its size
 			inline void AutoSize(bool auto_size) noexcept
 			{
 				auto_size_ = auto_size;
 			}
 
-			//Sets whether or not this tooltip should automatically follow the mouse cursor
+			///@brief Sets whether or not this tooltip should automatically follow the mouse cursor
 			inline void FollowMouseCursor(bool follow_mouse_cursor) noexcept
 			{
 				follow_mouse_cursor_ = follow_mouse_cursor;
 			}
 
 
-			//Sets the hold time for this tooltip to the given time
+			///@brief Sets the hold time for this tooltip to the given time
 			inline void HoldTime(duration time) noexcept
 			{
 				if (hold_time_ != time && time >= 0.0_sec)
@@ -149,7 +155,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the fade in delay for this tooltip to the given time
+			///@brief Sets the fade in delay for this tooltip to the given time
 			inline void FadeInDelay(duration time) noexcept
 			{
 				if (fade_in_delay_ != time && time >= 0.0_sec)
@@ -159,7 +165,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the fade out delay for this tooltip to the given time
+			///@brief Sets the fade out delay for this tooltip to the given time
 			inline void FadeOutDelay(duration time) noexcept
 			{
 				if (fade_out_delay_ != time && time >= 0.0_sec)
@@ -169,7 +175,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the fade in time for this tooltip to the given time
+			///@brief Sets the fade in time for this tooltip to the given time
 			inline void FadeInTime(duration time) noexcept
 			{
 				if (fade_in_time_ != time && time >= 0.0_sec)
@@ -179,7 +185,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the fade out time for this tooltip to the given time
+			///@brief Sets the fade out time for this tooltip to the given time
 			inline void FadeOutTime(duration time) noexcept
 			{
 				if (fade_out_time_ != time && time >= 0.0_sec)
@@ -189,84 +195,94 @@ namespace ion::gui::controls
 				}
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns whether or not this tooltip should automatically adjust its size
+			///@brief Returns whether or not this tooltip should automatically adjust its size
 			[[nodiscard]] inline auto AutoSize() const noexcept
 			{
 				return auto_size_;
 			}
 
-			//Returns whether or not this tooltip should automatically follow the mouse cursor
+			///@brief Returns whether or not this tooltip should automatically follow the mouse cursor
 			[[nodiscard]] inline auto FollowMouseCursor() const noexcept
 			{
 				return follow_mouse_cursor_;
 			}
 
 
-			//Returns the hold time for this tooltip
+			///@brief Returns the hold time for this tooltip
 			[[nodiscard]] inline auto HoldTime() const noexcept
 			{
 				return hold_time_;
 			}
 
-			//Returns the fade in delay for this tooltip
+			///@brief Returns the fade in delay for this tooltip
 			[[nodiscard]] inline auto FadeInDelay() const noexcept
 			{
 				return fade_in_delay_;
 			}
 
-			//Returns the fade out delay for this tooltip
+			///@brief Returns the fade out delay for this tooltip
 			[[nodiscard]] inline auto FadeOutDelay() const noexcept
 			{
 				return fade_out_delay_;
 			}
 
-			//Returns the fade in time for this tooltip
+			///@brief Returns the fade in time for this tooltip
 			[[nodiscard]] inline auto FadeInTime() const noexcept
 			{
 				return fade_in_time_;
 			}
 
-			//Returns the fade out time for this tooltip
+			///@brief Returns the fade out time for this tooltip
 			[[nodiscard]] inline auto FadeOutTime() const noexcept
 			{
 				return fade_out_time_;
 			}
 
+			///@}
 
-			/*
-				Tooltip
+			/**
+				@name Tooltip
+				@{
 			*/
 
-			//Shows this tooltip with the given tooltip text
+			///@brief Shows this tooltip with the given tooltip text
 			void Show(std::string text) noexcept;
 
-			//Shows this tooltip
+			///@brief Shows this tooltip
 			void Show() noexcept;
 
-			//Hides this tooltip
+			///@brief Hides this tooltip
 			void Hide() noexcept;
 
+			///@}
 
-			/*
-				Frame events
+			/**
+				@name Frame events
+				@{
 			*/
 
-			//Called from gui control when a frame has started
+			///@brief Called from gui control when a frame has started
 			virtual void FrameStarted(duration time) noexcept override;
 
+			///@}
 
-			/*
-				Mouse events
+			/**
+				@name Mouse events
+				@{
 			*/
 
-			//Called from gui control when the mouse has been moved
-			//Returns true if the mouse move event has been consumed by the tooltip
+			///@brief Called from gui control when the mouse has been moved
+			///@details Returns true if the mouse move event has been consumed by the tooltip
 			virtual bool MouseMoved(Vector2 position) noexcept override;
+
+			///@}
 	};
 
 } //ion::gui::controls

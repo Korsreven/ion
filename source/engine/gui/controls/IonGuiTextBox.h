@@ -82,7 +82,7 @@ namespace ion::gui::controls
 			gui_control::ControlSkinTextPart PlaceholderText;
 			gui_control::ControlSkinPart Cursor;
 
-			//Copy from most derived
+			///@brief Copy from most derived
 			virtual void Assign(const ControlSkin &control_skin) noexcept
 			{
 				if (auto skin = dynamic_cast<const TextBoxSkin*>(&control_skin); skin)
@@ -136,8 +136,9 @@ namespace ion::gui::controls
 			Vector2 cursor_offset(real width, real line_width, real line_padding, real cursor_distance, TextBoxTextLayout text_layout) noexcept;
 
 
-			/*
-				Content
+			/**
+				@name Content
+				@{
 			*/
 
 			std::string trim_content(std::string content, TextBoxTextMode text_mode, TextBoxCharacterSet character_set) noexcept;
@@ -156,12 +157,14 @@ namespace ion::gui::controls
 			std::string get_viewed_content(const std::string &content, std::pair<int, int> content_view, std::optional<char> mask);
 
 			int get_cursor_position(const Vector2 &position, const Vector2 &scaling, std::string_view str, graphics::fonts::Font &font) noexcept;
+
+			///@}
 		} //detail
 	} //gui_text_box
 
 
-	//A class representing a GUI text box that can be left, center or right aligned
-	//Text box content can be character filtered/limited and masked for use with passwords
+	///@brief A class representing a GUI text box that can be left, center or right aligned
+	///@details Text box content can be character filtered/limited and masked for use with passwords
 	class GuiTextBox : public GuiScrollable
 	{
 		private:
@@ -200,47 +203,52 @@ namespace ion::gui::controls
 			bool ctrl_pressed_ = false;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See GuiControl::Focused for more details
+			///@brief See GuiControl::Focused for more details
 			virtual void Focused() noexcept override;
 
-			//See GuiControl::Defocused for more details
+			///@brief See GuiControl::Defocused for more details
 			virtual void Defocused() noexcept override;
 
-			//See GuiControl::Resized for more details
+			///@brief See GuiControl::Resized for more details
 			virtual void Resized(Vector2 from_size, Vector2 to_size) noexcept override;
 
 
-			//See GuiScrollable::Scrolled for more details
+			///@brief See GuiScrollable::Scrolled for more details
 			virtual void Scrolled(int delta) noexcept override;
 
-			//See GuiScrollable::TotalElements for more details
+			///@brief See GuiScrollable::TotalElements for more details
 			virtual int TotalElements() noexcept override;
 
-			//See GuiScrollable::ElementsInView for more details
+			///@brief See GuiScrollable::ElementsInView for more details
 			virtual int ElementsInView() noexcept override;
 
-			//See GuiScrollable::ScrollPosition for more details
+			///@brief See GuiScrollable::ScrollPosition for more details
 			virtual int ScrollPosition() noexcept override;
 
 
-			//Called right after cursor has been moved
+			///@brief Called right after cursor has been moved
 			virtual void CursorMoved() noexcept;
 
+			///@}
 
-			/*
-				States
+			/**
+				@name States
+				@{
 			*/
 
 			void SetSkinState(gui_control::ControlState state, gui_text_box::TextBoxSkin &skin) noexcept;
 			virtual void SetState(gui_control::ControlState state) noexcept override;
 
+			///@}
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
@@ -254,9 +262,11 @@ namespace ion::gui::controls
 
 			void SetCursorOpacity(real percent) noexcept;
 
+			///@}
 
-			/*
-				Phase
+			/**
+				@name Phase
+				@{
 			*/
 
 			void SetBlinkPhase(gui_text_box::detail::cursor_blink_phase phase) noexcept;
@@ -264,9 +274,11 @@ namespace ion::gui::controls
 			void UpdateBlinkPhaseDuration() noexcept;
 			void UpdateRepeatPhaseDuration() noexcept;
 
+			///@}
 
-			/*
-				Content
+			/**
+				@name Content
+				@{
 			*/
 
 			void InsertTextContent(int off, std::string content);
@@ -274,22 +286,25 @@ namespace ion::gui::controls
 			void RemoveTextContent(int first, int last) noexcept;
 			void ClearTextContent() noexcept;
 
+			///@}
+
 		public:
 
-			//Constructs a text box with the given name, size, caption, tooltip and hit boxes
+			///@brief Constructs a text box with the given name, size, caption, tooltip and hit boxes
 			GuiTextBox(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Constructs a text box with the given name, skin, size, caption, tooltip and hit boxes
+			///@brief Constructs a text box with the given name, skin, size, caption, tooltip and hit boxes
 			GuiTextBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {});
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the content for this text box to the given content
+			///@brief Sets the content for this text box to the given content
 			inline void Content(std::string content) noexcept
 			{
 				content = gui_text_box::detail::trim_content(std::move(content), text_mode_, character_set_);
@@ -306,7 +321,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the placeholder content for this text box to the given content
+			///@brief Sets the placeholder content for this text box to the given content
 			inline void PlaceholderContent(std::optional<std::string> content) noexcept
 			{
 				if (content)
@@ -321,7 +336,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the max characters for this text box to the given max
+			///@brief Sets the max characters for this text box to the given max
 			inline void MaxCharacters(std::optional<int> max) noexcept
 			{
 				if (max && *max < 0)
@@ -341,8 +356,8 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the mask for this text box to the given character
-			//The character given must be a graphical character
+			///@brief Sets the mask for this text box to the given character
+			///@details The character given must be a graphical character
 			inline void Mask(std::optional<char> character) noexcept
 			{
 				if (!character || std::isgraph(static_cast<unsigned char>(*character)))
@@ -356,7 +371,7 @@ namespace ion::gui::controls
 			}
 
 
-			//Sets the text padding for this text box to the given padding
+			///@brief Sets the text padding for this text box to the given padding
 			inline void TextPadding(const std::optional<Vector2> &padding) noexcept
 			{
 				if (text_padding_ != padding)
@@ -366,7 +381,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the text layout for this text box to the given layout
+			///@brief Sets the text layout for this text box to the given layout
 			inline void TextLayout(gui_text_box::TextBoxTextLayout layout) noexcept
 			{
 				if (text_layout_ != layout)
@@ -376,7 +391,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the text mode for this text box to the given mode
+			///@brief Sets the text mode for this text box to the given mode
 			inline void TextMode(gui_text_box::TextBoxTextMode mode) noexcept
 			{
 				if (text_mode_ != mode)
@@ -398,7 +413,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the allowed character set for this text box to the given set
+			///@brief Sets the allowed character set for this text box to the given set
 			inline void CharacterSet(gui_text_box::TextBoxCharacterSet set) noexcept
 			{
 				if (character_set_ != set)
@@ -421,7 +436,7 @@ namespace ion::gui::controls
 			}
 
 
-			//Sets the cursor position for this text box to the given position
+			///@brief Sets the cursor position for this text box to the given position
 			inline void CursorPosition(int position) noexcept
 			{
 				position = std::clamp(position, 0, std::ssize(content_));
@@ -441,14 +456,14 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the reveal count for this text box to the given count
+			///@brief Sets the reveal count for this text box to the given count
 			inline void RevealCount(std::optional<int> count) noexcept
 			{
 				reveal_count_ = count;
 			}
 
 
-			//Sets the cursor blink rate for this text box to the given time
+			///@brief Sets the cursor blink rate for this text box to the given time
 			inline void CursorBlinkRate(duration time) noexcept
 			{
 				if (cursor_blink_rate_ != time && time >= 0.0_sec)
@@ -458,7 +473,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the cursor hold percent for this text box to the given percentage
+			///@brief Sets the cursor hold percent for this text box to the given percentage
 			inline void CursorHoldPercent(real percent) noexcept
 			{
 				percent = std::clamp(percent, 0.0_r, 1.0_r);
@@ -470,7 +485,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the key repeat rate for this text box to the given time
+			///@brief Sets the key repeat rate for this text box to the given time
 			inline void KeyRepeatRate(duration time) noexcept
 			{
 				if (key_repeat_rate_ != time && time >= 0.0_sec)
@@ -480,7 +495,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the key repeat delay for this text box to the given time
+			///@brief Sets the key repeat delay for this text box to the given time
 			inline void KeyRepeatDelay(duration time) noexcept
 			{
 				if (key_repeat_delay_ != time && time >= 0.0_sec)
@@ -490,204 +505,222 @@ namespace ion::gui::controls
 				}
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the content for this text box
+			///@brief Returns the content for this text box
 			[[nodiscard]] inline auto Content() const noexcept
 			{
 				return content_;
 			}
 
-			//Returns the placeholder content for this text box
-			//Returns nullopt if no custom placeholder content has been set
+			///@brief Returns the placeholder content for this text box
+			///@details Returns nullopt if no custom placeholder content has been set
 			[[nodiscard]] inline auto PlaceholderContent() const noexcept
 			{
 				return placeholder_content_;
 			}
 
-			//Returns the max characters for this text box
-			//Returns nullopt if there is no character limit
+			///@brief Returns the max characters for this text box
+			///@details Returns nullopt if there is no character limit
 			[[nodiscard]] inline auto MaxCharacters() const noexcept
 			{
 				return max_characters_;
 			}
 
-			//Returns the mask for this text box
-			//Returns nullopt if there is no mask
+			///@brief Returns the mask for this text box
+			///@details Returns nullopt if there is no mask
 			[[nodiscard]] inline auto Mask() const noexcept
 			{
 				return mask_;
 			}
 
 
-			//Returns the text padding for this text box
-			//Returns nullopt if no custom text padding has been set
+			///@brief Returns the text padding for this text box
+			///@details Returns nullopt if no custom text padding has been set
 			[[nodiscard]] inline auto TextPadding() const noexcept
 			{
 				return text_padding_;
 			}
 
-			//Returns the text layout for this text box
+			///@brief Returns the text layout for this text box
 			[[nodiscard]] inline auto TextLayout() const noexcept
 			{
 				return text_layout_;
 			}
 
-			//Returns the text mode for this text box
+			///@brief Returns the text mode for this text box
 			[[nodiscard]] inline auto TextMode() const noexcept
 			{
 				return text_mode_;
 			}
 
-			//Returns the allowed character set for this text box
+			///@brief Returns the allowed character set for this text box
 			[[nodiscard]] inline auto CharacterSet() const noexcept
 			{
 				return character_set_;
 			}
 
 
-			//Returns the cursor position for this text box
+			///@brief Returns the cursor position for this text box
 			[[nodiscard]] inline auto CursorPosition() const noexcept
 			{
 				return cursor_position_;
 			}
 
-			//Returns the reveal count for this text box
-			//Returns nullopt if no custom reveal count has been set
+			///@brief Returns the reveal count for this text box
+			///@details Returns nullopt if no custom reveal count has been set
 			[[nodiscard]] inline auto RevealCount() const noexcept
 			{
 				return reveal_count_;
 			}
 
 
-			//Returns the cursor blink rate for this text box
+			///@brief Returns the cursor blink rate for this text box
 			[[nodiscard]] inline auto CursorBlinkRate() const noexcept
 			{
 				return cursor_blink_rate_;
 			}
 
-			//Returns the cursor hold percent for this text box
+			///@brief Returns the cursor hold percent for this text box
 			[[nodiscard]] inline auto CursorHoldPercent() const noexcept
 			{
 				return cursor_hold_percent_;
 			}
 
-			//Returns the key repeat rate for this text box
+			///@brief Returns the key repeat rate for this text box
 			[[nodiscard]] inline auto KeyRepeatRate() const noexcept
 			{
 				return key_repeat_rate_;
 			}
 
-			//Returns the key repeat delay for this text box
+			///@brief Returns the key repeat delay for this text box
 			[[nodiscard]] inline auto KeyRepeatDelay() const noexcept
 			{
 				return key_repeat_delay_;
 			}
 
+			///@}
 
-			/*
-				Content
+			/**
+				@name Content
 				Adding/inserting
+				@{
 			*/
 
-			//Adds the given content in the text box
+			///@brief Adds the given content in the text box
 			void AddContent(std::string content);
 
-			//Inserts the given content, at the given offset in the text box
+			///@brief Inserts the given content, at the given offset in the text box
 			void InsertContent(int off, std::string content);
 
+			///@}
 
-			/*
-				Content
+			/**
+				@name Content
 				Replacing
+				@{
 			*/
 
-			//Replaces the content at the given offset, with the given content
+			///@brief Replaces the content at the given offset, with the given content
 			void ReplaceContent(int off, std::string content);
 
-			//Replaces the content in range [first, last), with the given content
+			///@brief Replaces the content in range [first, last), with the given content
 			void ReplaceContent(int first, int last, std::string content);
 
+			///@}
 
-			/*
-				Content
+			/**
+				@name Content
 				Removing
+				@{
 			*/
 
-			//Clears all content in this text box
+			///@brief Clears all content in this text box
 			void ClearContent() noexcept;
 
-			//Removes content at the given offset in this text box
+			///@brief Removes content at the given offset in this text box
 			void RemoveContent(int off) noexcept;
 
-			//Removes all content in range [first, last) in this text box
+			///@brief Removes all content in range [first, last) in this text box
 			void RemoveContent(int first, int last) noexcept;
 
+			///@}
 
-			/*
-				Content
+			/**
+				@name Content
 				Clipboard
+				@{
 			*/
 
-			//Copies all content from this text box to the clipboard
+			///@brief Copies all content from this text box to the clipboard
 			bool CopyContent() noexcept;
 
-			//Copies all content in range [first, last) from this text box to the clipboard
+			///@brief Copies all content in range [first, last) from this text box to the clipboard
 			bool CopyContent(int first, int last) noexcept;
 
 
-			//Cuts all content from this text box to the clipboard
+			///@brief Cuts all content from this text box to the clipboard
 			bool CutContent() noexcept;
 
-			//Cuts all content in range [first, last) from this text box to the clipboard
+			///@brief Cuts all content in range [first, last) from this text box to the clipboard
 			bool CutContent(int first, int last) noexcept;
 
 
-			//Pastes text from the clipboard and adds it to this text box
+			///@brief Pastes text from the clipboard and adds it to this text box
 			bool PasteContent();
 
-			//Pastes text from the clipboard and inserts it at the given offset in this text box
+			///@brief Pastes text from the clipboard and inserts it at the given offset in this text box
 			bool PasteContent(int off);
 
-			//Pastes text from the clipboard and replaces it in range [fist, last) in this text box
+			///@brief Pastes text from the clipboard and replaces it in range [fist, last) in this text box
 			bool PasteContent(int first, int last);
 
+			///@}
 
-			/*
-				Frame events
+			/**
+				@name Frame events
+				@{
 			*/
 
-			//Called from gui control when a frame has started
+			///@brief Called from gui control when a frame has started
 			virtual void FrameStarted(duration time) noexcept override;
 
+			///@}
 
-			/*
-				Key events
+			/**
+				@name Key events
+				@{
 			*/
 
-			//Called from gui control when a key button has been pressed
-			//Returns true if the key press event has been consumed by the control
+			///@brief Called from gui control when a key button has been pressed
+			///@details Returns true if the key press event has been consumed by the control
 			virtual bool KeyPressed(KeyButton button) noexcept override;
 
-			//Called from gui control when a key button has been released
-			//Returns true if the key release event has been consumed by the control
+			///@brief Called from gui control when a key button has been released
+			///@details Returns true if the key release event has been consumed by the control
 			virtual bool KeyReleased(KeyButton button) noexcept override;
 
-			//Called from gui control when a character has been pressed
-			//Returns true if the character press event has been consumed by the control
+			///@brief Called from gui control when a character has been pressed
+			///@details Returns true if the character press event has been consumed by the control
 			virtual bool CharacterPressed(char character) noexcept override;
 
+			///@}
 
-			/*
-				Mouse events
+			/**
+				@name Mouse events
+				@{
 			*/
 
-			//Called from gui control when the mouse button has been released
-			//Returns true if the mouse release event has been consumed by the control
+			///@brief Called from gui control when the mouse button has been released
+			///@details Returns true if the mouse release event has been consumed by the control
 			virtual bool MouseReleased(MouseButton button, Vector2 position) noexcept override;
+
+			///@}
 	};
 
 } //ion::gui::controls

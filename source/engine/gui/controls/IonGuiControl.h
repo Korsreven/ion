@@ -232,8 +232,9 @@ namespace ion::gui::controls
 			constexpr auto default_caption_padding_size = 2.0_r;
 
 
-			/*
-				States
+			/**
+				@name States
+				@{
 			*/
 
 			inline auto control_state_to_material(ControlState state, ControlSkinPart &part) noexcept
@@ -280,9 +281,11 @@ namespace ion::gui::controls
 				}
 			}
 
+			///@}
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			void resize_part(graphics::scene::shapes::Sprite &sprite, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept;
@@ -302,6 +305,7 @@ namespace ion::gui::controls
 			std::optional<Vector2> get_inner_size(const ControlSkin &skin, bool include_caption) noexcept;
 			std::optional<Vector2> get_border_size(const ControlSkin &skin, bool include_caption) noexcept;
 
+			///@}
 
 			inline auto is_caption_outside(ControlCaptionLayout caption_layout) noexcept
 			{
@@ -387,8 +391,8 @@ namespace ion::gui::controls
 	} //gui_control
 
 
-	//A class representing a general GUI control, the base class of all GUI controls
-	//A control can be focused/defocused, clicked/pressed/released, entered/exited and resized
+	///@brief A class representing a general GUI control, the base class of all GUI controls
+	///@details A control can be focused/defocused, clicked/pressed/released, entered/exited and resized
 	class GuiControl :
 		public GuiComponent,
 		protected events::EventGenerator<events::listeners::GuiControlListener>
@@ -426,71 +430,74 @@ namespace ion::gui::controls
 			std::optional<events::Callback<void, GuiControl&>> on_resize_;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See GuiComponent::Created for more details
+			///@brief See GuiComponent::Created for more details
 			virtual void Created() noexcept override;
 
-			//See GuiComponent::Removed for more details
+			///@brief See GuiComponent::Removed for more details
 			virtual void Removed() noexcept override;
 
 
-			//See GuiComponent::Enabled for more details
+			///@brief See GuiComponent::Enabled for more details
 			virtual void Enabled() noexcept override;
 
-			//See GuiComponent::Disabled for more details
+			///@brief See GuiComponent::Disabled for more details
 			virtual void Disabled() noexcept override;
 
 
-			//See GuiComponent::Shown for more details
+			///@brief See GuiComponent::Shown for more details
 			virtual void Shown() noexcept override;
 
-			//See GuiComponent::Hidden for more details
+			///@brief See GuiComponent::Hidden for more details
 			virtual void Hidden() noexcept override;
 
 
-			//Called right after a control has been focused
+			///@brief Called right after a control has been focused
 			virtual void Focused() noexcept;
 
-			//Called right after a control has been defocused
+			///@brief Called right after a control has been defocused
 			virtual void Defocused() noexcept;
 
 
-			//Called right after a control has been pressed
+			///@brief Called right after a control has been pressed
 			virtual void Pressed() noexcept;
 
-			//Called right after a control has been released
+			///@brief Called right after a control has been released
 			virtual void Released() noexcept;
 
-			//Called right after a control has been clicked
-			//Namely after a complete press and release
+			///@brief Called right after a control has been clicked
+			///@details Namely after a complete press and release
 			virtual void Clicked() noexcept;
 
 
-			//Called right after a control has been entered
-			//Namely when the mouse cursor has entered the control
+			///@brief Called right after a control has been entered
+			///@details Namely when the mouse cursor has entered the control
 			virtual void Entered() noexcept;
 
-			//Called right after a control has been exited
-			//Namely when the mouse cursor has exited the control
+			///@brief Called right after a control has been exited
+			///@details Namely when the mouse cursor has exited the control
 			virtual void Exited() noexcept;
 
 
-			//Called right after a control has been changed
+			///@brief Called right after a control has been changed
 			virtual void Changed() noexcept;
 
-			//Called right after a control has changed state
+			///@brief Called right after a control has changed state
 			virtual void StateChanged() noexcept;
 
 
-			//Called right after a control has been resized with the from and to size
+			///@brief Called right after a control has been resized with the from and to size
 			virtual void Resized(Vector2 from_size, Vector2 to_size) noexcept;
 
+			///@}
 
-			/*
-				Notifying
+			/**
+				@name Notifying
+				@{
 			*/
 
 			void NotifyControlEnabled() noexcept;
@@ -514,9 +521,11 @@ namespace ion::gui::controls
 
 			void NotifyControlResized() noexcept;
 
+			///@}
 
-			/*
-				States
+			/**
+				@name States
+				@{
 			*/
 			
 			NonOwningPtr<graphics::materials::Material> GetStateMaterial(gui_control::ControlState state, gui_control::ControlSkinPart &part) noexcept;
@@ -528,9 +537,11 @@ namespace ion::gui::controls
 
 			virtual void SetState(gui_control::ControlState state) noexcept;
 
+			///@}
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const;
@@ -543,87 +554,92 @@ namespace ion::gui::controls
 
 			void PlaySound(gui_control::ControlSkinSoundPart &part);
 
+			///@}
+
 		public:
 
-			//Constructs a control with the given name
+			///@brief Constructs a control with the given name
 			explicit GuiControl(std::string name) noexcept;
 
-			//Constructs a control with the given name and size
+			///@brief Constructs a control with the given name and size
 			GuiControl(std::string name, const std::optional<Vector2> &size) noexcept;
 
-			//Constructs a control with the given name, skin and size
+			///@brief Constructs a control with the given name, skin and size
 			GuiControl(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size);
 
 
-			//Constructs a control with the given name, size, caption, tooltip and hit boxes
+			///@brief Constructs a control with the given name, size, caption, tooltip and hit boxes
 			GuiControl(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Constructs a control with the given name, skin, size, caption, tooltip and hit boxes
+			///@brief Constructs a control with the given name, skin, size, caption, tooltip and hit boxes
 			GuiControl(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {});
 
 			
-			//Default move constructor
+			///@brief Default move constructor
 			GuiControl(GuiControl&&) = default;
 
 
-			//Virtual destructor
+			///@brief Virtual destructor
 			virtual ~GuiControl() noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Default move assignment
+			///@brief Default move assignment
 			GuiControl& operator=(GuiControl&&) = default;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Shows this control
+			///@brief Shows this control
 			void Show() noexcept;
 
 
-			//Focuses this control
+			///@brief Focuses this control
 			void Focus() noexcept;
 
-			//Defocuses this control
+			///@brief Defocuses this control
 			void Defocus() noexcept;
 
 
-			//Presses this control
+			///@brief Presses this control
 			void Press() noexcept;
 
-			//Releases this control
+			///@brief Releases this control
 			void Release() noexcept;
 
-			//Clicks this control
+			///@brief Clicks this control
 			void Click() noexcept;
 
 
-			//Enters this control (start hovering)
+			///@brief Enters this control (start hovering)
 			void Enter() noexcept;
 
-			//Exits this control (stop hovering)
+			///@brief Exits this control (stop hovering)
 			void Exit() noexcept;
 
 
-			//Resets this control to its enabled/disabled state
-			//Namely by executing release, defocus and exit
+			///@brief Resets this control to its enabled/disabled state
+			///@details Namely by executing release, defocus and exit
 			void Reset() noexcept;
 
 
-			//Sets whether or not this control is enabled
+			///@brief Sets whether or not this control is enabled
 			inline void Enabled(bool enabled) noexcept
 			{
 				return GuiComponent::Enabled(enabled);
 			}
 
-			//Sets whether or not this control is focused
+			///@brief Sets whether or not this control is focused
 			inline void Focused(bool focused) noexcept
 			{
 				if (focused)
@@ -632,7 +648,7 @@ namespace ion::gui::controls
 					Defocus();
 			}
 
-			//Sets whether or not this control is focusable
+			///@brief Sets whether or not this control is focusable
 			inline void Focusable(bool focusable) noexcept
 			{
 				if (focusable_ != focusable)
@@ -645,14 +661,14 @@ namespace ion::gui::controls
 			}
 
 
-			//Sets the skin for this control to the given skin
+			///@brief Sets the skin for this control to the given skin
 			void Skin(const skins::GuiSkin &skin) noexcept;
 
-			//Sets the size of this control to the given size
+			///@brief Sets the size of this control to the given size
 			void Size(const Vector2 &size) noexcept;
 
 
-			//Sets the caption text for this control to the given text
+			///@brief Sets the caption text for this control to the given text
 			inline void Caption(std::optional<std::string> text) noexcept
 			{
 				if (caption_ != text)
@@ -662,14 +678,14 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the tooltip text (hint) for this control to the given text
+			///@brief Sets the tooltip text (hint) for this control to the given text
 			inline void Tooltip(std::optional<std::string> text) noexcept
 			{
 				tooltip_ = std::move(text);
 			}
 
 
-			//Sets the caption size for this control to the given size
+			///@brief Sets the caption size for this control to the given size
 			inline void CaptionSize(const std::optional<Vector2> &size) noexcept
 			{
 				if (caption_size_ != size)
@@ -679,7 +695,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the caption margin for this control to the given margin
+			///@brief Sets the caption margin for this control to the given margin
 			inline void CaptionMargin(const std::optional<Vector2> &margin) noexcept
 			{
 				if (caption_margin_ != margin)
@@ -689,7 +705,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the caption padding for this control to the given padding
+			///@brief Sets the caption padding for this control to the given padding
 			inline void CaptionPadding(const std::optional<Vector2> &padding) noexcept
 			{
 				if (caption_padding_ != padding)
@@ -699,7 +715,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the caption layout for this control to the given layout
+			///@brief Sets the caption layout for this control to the given layout
 			inline void CaptionLayout(gui_control::ControlCaptionLayout layout) noexcept
 			{
 				if (caption_layout_ != layout)
@@ -710,13 +726,13 @@ namespace ion::gui::controls
 			}
 
 
-			//Sets the hit boxes for this control to the given hit boxes
+			///@brief Sets the hit boxes for this control to the given hit boxes
 			inline void HitBoxes(gui_control::BoundingBoxes hit_boxes) noexcept
 			{
 				hit_boxes_ = std::move(hit_boxes);
 			}
 
-			//Sets the hit box for this control to the given hit box
+			///@brief Sets the hit box for this control to the given hit box
 			inline void HitBox(const Aabb &hit_box) noexcept
 			{
 				hit_boxes_.clear();
@@ -724,397 +740,411 @@ namespace ion::gui::controls
 			}
 
 
-			//Sets the on focus callback
+			///@brief Sets the on focus callback
 			inline void OnFocus(events::Callback<void, GuiControl&> on_focus) noexcept
 			{
 				on_focus_ = on_focus;
 			}
 
-			//Sets the on focus callback
+			///@brief Sets the on focus callback
 			inline void OnFocus(std::nullopt_t) noexcept
 			{
 				on_focus_ = {};
 			}
 
 
-			//Sets the on defocus callback
+			///@brief Sets the on defocus callback
 			inline void OnDefocus(events::Callback<void, GuiControl&> on_defocus) noexcept
 			{
 				on_defocus_ = on_defocus;
 			}
 
-			//Sets the on defocus callback
+			///@brief Sets the on defocus callback
 			inline void OnDefocus(std::nullopt_t) noexcept
 			{
 				on_defocus_ = {};
 			}
 
 
-			//Sets the on press callback
+			///@brief Sets the on press callback
 			inline void OnPress(events::Callback<void, GuiControl&> on_press) noexcept
 			{
 				on_press_ = on_press;
 			}
 
-			//Sets the on press callback
+			///@brief Sets the on press callback
 			inline void OnPress(std::nullopt_t) noexcept
 			{
 				on_press_ = {};
 			}
 
 
-			//Sets the on release callback
+			///@brief Sets the on release callback
 			inline void OnRelease(events::Callback<void, GuiControl&> on_release) noexcept
 			{
 				on_release_ = on_release;
 			}
 
-			//Sets the on release callback
+			///@brief Sets the on release callback
 			inline void OnRelease(std::nullopt_t) noexcept
 			{
 				on_release_ = {};
 			}
 
 
-			//Sets the on click callback
+			///@brief Sets the on click callback
 			inline void OnClick(events::Callback<void, GuiControl&> on_click) noexcept
 			{
 				on_click_ = on_click;
 			}
 
-			//Sets the on click callback
+			///@brief Sets the on click callback
 			inline void OnClick(std::nullopt_t) noexcept
 			{
 				on_click_ = {};
 			}
 
 
-			//Sets the on enter callback
+			///@brief Sets the on enter callback
 			inline void OnEnter(events::Callback<void, GuiControl&> on_enter) noexcept
 			{
 				on_enter_ = on_enter;
 			}
 
-			//Sets the on enter callback
+			///@brief Sets the on enter callback
 			inline void OnEnter(std::nullopt_t) noexcept
 			{
 				on_enter_ = {};
 			}
 
 
-			//Sets the on exit callback
+			///@brief Sets the on exit callback
 			inline void OnExit(events::Callback<void, GuiControl&> on_exit) noexcept
 			{
 				on_exit_ = on_exit;
 			}
 
-			//Sets the on exit callback
+			///@brief Sets the on exit callback
 			inline void OnExit(std::nullopt_t) noexcept
 			{
 				on_exit_ = {};
 			}
 
 
-			//Sets the on change callback
+			///@brief Sets the on change callback
 			inline void OnChange(events::Callback<void, GuiControl&> on_change) noexcept
 			{
 				on_change_ = on_change;
 			}
 
-			//Sets the on change callback
+			///@brief Sets the on change callback
 			inline void OnChange(std::nullopt_t) noexcept
 			{
 				on_change_ = {};
 			}
 
 
-			//Sets the on state change callback
+			///@brief Sets the on state change callback
 			inline void OnStateChange(events::Callback<void, GuiControl&> on_state_change) noexcept
 			{
 				on_state_change_ = on_state_change;
 			}
 
-			//Sets the on state change callback
+			///@brief Sets the on state change callback
 			inline void OnStateChange(std::nullopt_t) noexcept
 			{
 				on_state_change_ = {};
 			}
 
 
-			//Sets the on resize callback
+			///@brief Sets the on resize callback
 			inline void OnResize(events::Callback<void, GuiControl&> on_resize) noexcept
 			{
 				on_resize_ = on_resize;
 			}
 
-			//Sets the on resize callback
+			///@brief Sets the on resize callback
 			inline void OnResize(std::nullopt_t) noexcept
 			{
 				on_resize_ = {};
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns true if this control is focused
+			///@brief Returns true if this control is focused
 			[[nodiscard]] inline auto IsFocused() const noexcept
 			{
 				return focused_;
 			}
 
-			//Returns true if this control is focusable
+			///@brief Returns true if this control is focusable
 			[[nodiscard]] inline auto IsFocusable() const noexcept
 			{
 				return focusable_;
 			}
 
-			//Returns true if this control is pressed
+			///@brief Returns true if this control is pressed
 			[[nodiscard]] inline auto IsPressed() const noexcept
 			{
 				return pressed_;
 			}
 
-			//Returns true if this control is hovered
+			///@brief Returns true if this control is hovered
 			[[nodiscard]] inline auto IsHovered() const noexcept
 			{
 				return hovered_;
 			}
 
 
-			//Returns the skin attached to this control
-			//Returns nullptr if no skin is attached
+			///@brief Returns the skin attached to this control
+			///@details Returns nullptr if no skin is attached
 			[[nodiscard]] inline auto Skin() const noexcept
 			{
 				return NonOwningPtr<gui_control::ControlSkin>{skin_};
 			}
 
-			//Returns the size of this control
-			//The returned size includes all parts or caption (if no parts)
-			//Returns nullopt if this control has no size
+			///@brief Returns the size of this control
+			///@details The returned size includes all parts or caption (if no parts).
+			///Returns nullopt if this control has no size
 			[[nodiscard]] inline auto& Size() const noexcept
 			{
 				return size_;
 			}
 
-			//Returns the center size of this control
-			//The returned size includes center part or caption (if no center)
-			//Returns nullopt if this control has no center size
+			///@brief Returns the center size of this control
+			///@details The returned size includes center part or caption (if no center).
+			///Returns nullopt if this control has no center size
 			[[nodiscard]] std::optional<Vector2> CenterSize() const noexcept;
 
-			//Returns the inner size of this control
-			//The returned size includes center area or area (if no center)
-			//Returns nullopt if this control has no inner size
+			///@brief Returns the inner size of this control
+			///@details The returned size includes center area or area (if no center).
+			///Returns nullopt if this control has no inner size
 			[[nodiscard]] std::optional<Vector2> InnerSize() const noexcept;
 
-			//Returns the border size of this control
-			//Returns nullopt if this control has no border size
+			///@brief Returns the border size of this control
+			///@details Returns nullopt if this control has no border size
 			[[nodiscard]] std::optional<Vector2> BorderSize() const noexcept;
 
 
-			//Returns the caption text for this control
-			//Returns nullopt if this control has no caption
+			///@brief Returns the caption text for this control
+			///@details Returns nullopt if this control has no caption
 			[[nodiscard]] inline auto& Caption() const noexcept
 			{
 				return caption_;
 			}
 
-			//Returns the tooltip text (hint) for this control
-			//Returns nullopt if this control has no tooltip
+			///@brief Returns the tooltip text (hint) for this control
+			///@details Returns nullopt if this control has no tooltip
 			[[nodiscard]] inline auto& Tooltip() const noexcept
 			{
 				return tooltip_;
 			}
 
 
-			//Returns the caption size for this control
-			//Returns nullopt if no custom caption size has been set
+			///@brief Returns the caption size for this control
+			///@details Returns nullopt if no custom caption size has been set
 			[[nodiscard]] inline auto& CaptionSize() const noexcept
 			{
 				return caption_size_;
 			}
 
-			//Returns the caption margin for this control
-			//Returns nullopt if no custom caption margin has been set
+			///@brief Returns the caption margin for this control
+			///@details Returns nullopt if no custom caption margin has been set
 			[[nodiscard]] inline auto& CaptionMargin() const noexcept
 			{
 				return caption_margin_;
 			}
 
-			//Returns the caption padding for this control
-			//Returns nullopt if no custom caption padding has been set
+			///@brief Returns the caption padding for this control
+			///@details Returns nullopt if no custom caption padding has been set
 			[[nodiscard]] inline auto& CaptionPadding() const noexcept
 			{
 				return caption_padding_;
 			}
 
-			//Returns the caption layout for this control
+			///@brief Returns the caption layout for this control
 			[[nodiscard]] inline auto& CaptionLayout() const noexcept
 			{
 				return caption_layout_;
 			}
 
 
-			//Returns the current state of this control
+			///@brief Returns the current state of this control
 			[[nodiscard]] inline auto State() const noexcept
 			{
 				return state_;
 			}
 
-			//Returns the hit boxes for this control
+			///@brief Returns the hit boxes for this control
 			[[nodiscard]] inline auto& HitBoxes() const noexcept
 			{
 				return hit_boxes_;
 			}
 
 
-			//Returns the area of this control
-			//The returned area includes all parts or caption (if no parts)
-			//Returns nullopt of this control has no area
+			///@brief Returns the area of this control
+			///@details The returned area includes all parts or caption (if no parts).
+			///Returns nullopt of this control has no area
 			[[nodiscard]] std::optional<Aabb> Area() const noexcept;
 
-			//Returns the inne area of this control
-			//The returned area includes center part or caption (if no center)
-			//Returns nullopt of this control has no center area
+			///@brief Returns the inne area of this control
+			///@details The returned area includes center part or caption (if no center).
+			///Returns nullopt of this control has no center area
 			[[nodiscard]] std::optional<Aabb> CenterArea() const noexcept;
 
-			//Returns the inne area of this control
-			//The returned area includes center area or area (if no center)
-			//Returns nullopt of this control has no inner area
+			///@brief Returns the inne area of this control
+			///@details The returned area includes center area or area (if no center).
+			///Returns nullopt of this control has no inner area
 			[[nodiscard]] std::optional<Aabb> InnerArea() const noexcept;
 
-			//Returns the hit area of this control
-			//Returns nullopt of this control has no hit area
+			///@brief Returns the hit area of this control
+			///@details Returns nullopt of this control has no hit area
 			[[nodiscard]] std::optional<Aabb> HitArea() const noexcept;
 
 
-			//Returns the on focus callback
+			///@brief Returns the on focus callback
 			[[nodiscard]] inline auto OnFocus() const noexcept
 			{
 				return on_focus_;
 			}
 
-			//Returns the on defocus callback
+			///@brief Returns the on defocus callback
 			[[nodiscard]] inline auto OnDefocus() const noexcept
 			{
 				return on_defocus_;
 			}
 
-			//Returns the on press callback
+			///@brief Returns the on press callback
 			[[nodiscard]] inline auto OnPress() const noexcept
 			{
 				return on_press_;
 			}
 
-			//Returns the on release callback
+			///@brief Returns the on release callback
 			[[nodiscard]] inline auto OnRelease() const noexcept
 			{
 				return on_release_;
 			}
 
-			//Returns the on enter callback
+			///@brief Returns the on enter callback
 			[[nodiscard]] inline auto OnEnter() const noexcept
 			{
 				return on_enter_;
 			}
 
-			//Returns the on exit callback
+			///@brief Returns the on exit callback
 			[[nodiscard]] inline auto OnExit() const noexcept
 			{
 				return on_exit_;
 			}
 
-			//Returns the on change callback
+			///@brief Returns the on change callback
 			[[nodiscard]] inline auto OnChange() const noexcept
 			{
 				return on_change_;
 			}
 
-			//Returns the on state change callback
+			///@brief Returns the on state change callback
 			[[nodiscard]] inline auto OnStateChange() const noexcept
 			{
 				return on_state_change_;
 			}
 
-			//Returns the on resize callback
+			///@brief Returns the on resize callback
 			[[nodiscard]] inline auto OnResize() const noexcept
 			{
 				return on_resize_;
 			}
 
 
-			//Returns a pointer to the owner of this control
+			///@brief Returns a pointer to the owner of this control
 			[[nodiscard]] GuiPanelContainer* Owner() const noexcept;
 
+			///@}
 
-			/*
-				Intersecting
+			/**
+				@name Intersecting
+				@{
 			*/
 
-			//Returns true if the given point intersects with this control
+			///@brief Returns true if the given point intersects with this control
 			[[nodiscard]] bool Intersects(const Vector2 &point) const noexcept;
 
+			///@}
 
-			/*
-				Tabulating
+			/**
+				@name Tabulating
+				@{
 			*/
 
-			//Sets the tab order of this control to the given order
+			///@brief Sets the tab order of this control to the given order
 			void TabOrder(int order) noexcept;
 
-			//Returns the tab order of this control
-			//Returns nullopt if this control has no owner
+			///@brief Returns the tab order of this control
+			///@details Returns nullopt if this control has no owner
 			[[nodiscard]] std::optional<int> TabOrder() const noexcept;
 
+			///@}
 
-			/*
-				Frame events
+			/**
+				@name Frame events
+				@{
 			*/
 
-			//Called from gui frame when a frame has started
+			///@brief Called from gui frame when a frame has started
 			virtual void FrameStarted(duration time) noexcept;
 
-			//Called from gui frame when a frame has ended
+			///@brief Called from gui frame when a frame has ended
 			virtual void FrameEnded(duration time) noexcept;
 
+			///@}
 
-			/*
-				Key events
+			/**
+				@name Key events
+				@{
 			*/
 
-			//Called from gui frame when a key button has been pressed
-			//Returns true if the key press event has been consumed by the control
+			///@brief Called from gui frame when a key button has been pressed
+			///@details Returns true if the key press event has been consumed by the control
 			virtual bool KeyPressed(KeyButton button) noexcept;
 
-			//Called from gui frame when a key button has been released
-			//Returns true if the key release event has been consumed by the control
+			///@brief Called from gui frame when a key button has been released
+			///@details Returns true if the key release event has been consumed by the control
 			virtual bool KeyReleased(KeyButton button) noexcept;
 
-			//Called from gui frame when a character has been pressed
-			//Returns true if the character press event has been consumed by the control
+			///@brief Called from gui frame when a character has been pressed
+			///@details Returns true if the character press event has been consumed by the control
 			virtual bool CharacterPressed(char character) noexcept;
 
+			///@}
 
-			/*
-				Mouse events
+			/**
+				@name Mouse events
+				@{
 			*/
 
-			//Called from gui frame when the mouse button has been pressed
-			//Returns true if the mouse press event has been consumed by the control
+			///@brief Called from gui frame when the mouse button has been pressed
+			///@details Returns true if the mouse press event has been consumed by the control
 			virtual bool MousePressed(MouseButton button, Vector2 position) noexcept;
 
-			//Called from gui frame when the mouse button has been released
-			//Returns true if the mouse release event has been consumed by the control
+			///@brief Called from gui frame when the mouse button has been released
+			///@details Returns true if the mouse release event has been consumed by the control
 			virtual bool MouseReleased(MouseButton button, Vector2 position) noexcept;
 
-			//Called from gui frame when the mouse has been moved
-			//Returns true if the mouse move event has been consumed by the control
+			///@brief Called from gui frame when the mouse has been moved
+			///@details Returns true if the mouse move event has been consumed by the control
 			virtual bool MouseMoved(Vector2 position) noexcept;
 
-			//Called from gui frame when the mouse wheel has been rolled
-			//Returns true if the mouse wheel roll event has been consumed by the control
+			///@brief Called from gui frame when the mouse wheel has been rolled
+			///@details Returns true if the mouse wheel roll event has been consumed by the control
 			virtual bool MouseWheelRolled(int delta, Vector2 position) noexcept;
+
+			///@}
 	};
 } //ion::gui::controls
 

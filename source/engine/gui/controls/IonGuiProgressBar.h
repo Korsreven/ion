@@ -72,8 +72,9 @@ namespace ion::gui::controls
 			constexpr auto default_interpolation_delay = 0.5_sec;
 
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			void resize_bar(gui_control::ControlSkinPart &bar, const Vector2 &delta_size) noexcept;
@@ -81,12 +82,14 @@ namespace ion::gui::controls
 			void update_bar(gui_control::ControlSkinPart &bar, ProgressBarType type, bool flipped, real percent, const Aabb &area) noexcept;
 
 			void resize_skin(ProgressBarSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
+
+			///@}
 		} //detail
 	} //gui_progress_bar
 
 
-	//A class representing a GUI progress bar that can be horizontal or vertical, flipped or not
-	//A progress bar can contain two bars, the normal bar, and a bar which can be interpolated forward, backward or bidirectional
+	///@brief A class representing a GUI progress bar that can be horizontal or vertical, flipped or not
+	///@details A progress bar can contain two bars, the normal bar, and a bar which can be interpolated forward, backward or bidirectional
 	class GuiProgressBar : public GuiControl
 	{
 		private:
@@ -108,27 +111,32 @@ namespace ion::gui::controls
 			std::optional<real> interpolated_percent_;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See GuiControl::Resized for more details
+			///@brief See GuiControl::Resized for more details
 			virtual void Resized(Vector2 from_size, Vector2 to_size) noexcept override;
 
-			//Called right after a progress bar has progressed
+			///@brief Called right after a progress bar has progressed
 			virtual void Progressed(real delta) noexcept;
 
+			///@}
 
-			/*
-				States
+			/**
+				@name States
+				@{
 			*/
 
 			void SetSkinState(gui_control::ControlState state, gui_progress_bar::ProgressBarSkin &skin) noexcept;
 			virtual void SetState(gui_control::ControlState state) noexcept override;
 
+			///@}
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
@@ -140,9 +148,11 @@ namespace ion::gui::controls
 			void UpdateBarInterpolated() noexcept;
 			void UpdateBars() noexcept;
 
+			///@}
 
-			/*
-				Phase
+			/**
+				@name Phase
+				@{
 			*/
 
 			void SetPhase(gui_progress_bar::detail::interpolation_phase phase) noexcept;
@@ -150,24 +160,27 @@ namespace ion::gui::controls
 
 			void StartInterpolation(real from_percent) noexcept;
 
+			///@}
+
 		public:
 
-			//Constructs a progress bar with the given name, size, caption and type
+			///@brief Constructs a progress bar with the given name, size, caption and type
 			GuiProgressBar(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_progress_bar::ProgressBarType type = gui_progress_bar::ProgressBarType::Horizontal) noexcept;
 
-			//Constructs a progress bar with the given name, skin, size, caption and type
+			///@brief Constructs a progress bar with the given name, skin, size, caption and type
 			GuiProgressBar(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_progress_bar::ProgressBarType type = gui_progress_bar::ProgressBarType::Horizontal);
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the progress bar type to the given type
-			//Horizontal type goes left to right
-			//Vertical type goes bottom to top
+			///@brief Sets the progress bar type to the given type
+			///@details Horizontal type goes left to right.
+			///Vertical type goes bottom to top
 			inline void Type(gui_progress_bar::ProgressBarType type) noexcept
 			{
 				if (type_ != type)
@@ -179,9 +192,9 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets whether or not this progress bar is flipped or not
-			//Horizontal flipped goes right to left
-			//Vertical flipped goes top to bottom
+			///@brief Sets whether or not this progress bar is flipped or not
+			///@details Horizontal flipped goes right to left.
+			///Vertical flipped goes top to bottom
 			inline void Flipped(bool flipped) noexcept
 			{
 				if (flipped_ != flipped)
@@ -192,10 +205,10 @@ namespace ion::gui::controls
 			}
 
 
-			//Sets the position to the given percentage in range [0.0, 1.0]
+			///@brief Sets the position to the given percentage in range [0.0, 1.0]
 			void Percent(real percent) noexcept;
 
-			//Sets the position of this progress bar to the given value
+			///@brief Sets the position of this progress bar to the given value
 			inline void Position(real position) noexcept
 			{
 				if (progress_.Position() != position)
@@ -209,7 +222,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the range of this progress bar to the given range
+			///@brief Sets the range of this progress bar to the given range
 			inline void Range(real min, real max) noexcept
 			{
 				if (progress_.Min() != min || progress_.Max() != max)
@@ -228,7 +241,7 @@ namespace ion::gui::controls
 			}
 
 
-			//Sets the interpolation type for this progress bar to the given type
+			///@brief Sets the interpolation type for this progress bar to the given type
 			inline void InterpolationType(gui_progress_bar::BarInterpolationType type) noexcept
 			{
 				if (interpolation_type_ != type)
@@ -240,7 +253,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the interpolation time for this progress bar to the given time
+			///@brief Sets the interpolation time for this progress bar to the given time
 			inline void InterpolationTime(duration time) noexcept
 			{
 				if (interpolation_time_ != time && time >= 0.0_sec)
@@ -250,7 +263,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the interpolation delay for this progress bar to the given time
+			///@brief Sets the interpolation delay for this progress bar to the given time
 			inline void InterpolationDelay(duration time) noexcept
 			{
 				if (interpolation_delay_ != time && time >= 0.0_sec)
@@ -260,79 +273,85 @@ namespace ion::gui::controls
 				}
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the progress bar type
-			//Horizontal type goes left to right
-			//Vertical type goes bottom to top
+			///@brief Returns the progress bar type
+			///@details Horizontal type goes left to right.
+			///Vertical type goes bottom to top
 			[[nodiscard]] inline auto Type() const noexcept
 			{
 				return type_;
 			}
 
-			//Returns true if this progress bar is flipped
-			//Horizontal flipped goes right to left
-			//Vertical flipped goes top to bottom
+			///@brief Returns true if this progress bar is flipped
+			///@details Horizontal flipped goes right to left.
+			///Vertical flipped goes top to bottom
 			[[nodiscard]] inline auto Flipped() const noexcept
 			{
 				return flipped_;
 			}
 
 
-			//Returns the position as a percentage in range [0.0, 1.0]
+			///@brief Returns the position as a percentage in range [0.0, 1.0]
 			[[nodiscard]] inline auto Percent() const noexcept
 			{
 				return progress_.Percent();
 			}
 
-			//Returns the position of this progress bar
+			///@brief Returns the position of this progress bar
 			[[nodiscard]] inline auto Position() const noexcept
 			{
 				return progress_.Position();
 			}		
 
-			//Returns the range of this progress bar
+			///@brief Returns the range of this progress bar
 			[[nodiscard]] inline auto Range() const noexcept
 			{
 				return progress_.MinMax();
 			}
 
 
-			//Returns the interpolation type for this progress bar
+			///@brief Returns the interpolation type for this progress bar
 			[[nodiscard]] inline auto InterpolationType() const noexcept
 			{
 				return interpolation_type_;
 			}
 
-			//Returns the interpolation time for this progress bar to the given time
+			///@brief Returns the interpolation time for this progress bar to the given time
 			[[nodiscard]] inline auto InterpolationTime() const noexcept
 			{
 				return interpolation_time_;
 			}
 
-			//Returns the interpolation delay for this progress bar to the given time
+			///@brief Returns the interpolation delay for this progress bar to the given time
 			[[nodiscard]] inline auto InterpolationDelay() const noexcept
 			{
 				return interpolation_delay_;
 			}
 
 
-			//Returns the interpolated position as a percentage in range [0.0, 1.0]
+			///@brief Returns the interpolated position as a percentage in range [0.0, 1.0]
 			[[nodiscard]] real InterpolatedPercent() const noexcept;
 
-			//Returns the interpolated position of this progress bar
+			///@brief Returns the interpolated position of this progress bar
 			[[nodiscard]] real InterpolatedPosition() const noexcept;
 
+			///@}
 
-			/*
-				Frame events
+			/**
+				@name Frame events
+				@{
 			*/
 
-			//Called from gui control when a frame has started
+			///@brief Called from gui control when a frame has started
 			virtual void FrameStarted(duration time) noexcept override;
+
+			///@}
 	};
 
 } //ion::gui::controls

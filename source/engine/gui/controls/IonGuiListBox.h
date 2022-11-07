@@ -120,15 +120,18 @@ namespace ion::gui::controls
 			}
 
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			void resize_skin(ListBoxSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 
+			///@}
 
-			/*
-				Items/lines
+			/**
+				@name Items/lines
+				@{
 			*/
 
 			void trim_item(gui_list_box::ListBoxItem &item) noexcept;
@@ -136,12 +139,14 @@ namespace ion::gui::controls
 			std::string items_to_text_content(const gui_list_box::ListBoxItems &items);
 
 			Vector2 lines_area_offset(ListBoxIconLayout icon_layout, const Vector2 &icon_column_size) noexcept;
+
+			///@}
 		} //detail
 	} //gui_list_box
 
 
-	//A class representing a GUI list box with items that can be left, center or right aligned
-	//List box items can have associated icons shown, that are either left or right aligned
+	///@brief A class representing a GUI list box with items that can be left, center or right aligned
+	///@details List box items can have associated icons shown, that are either left or right aligned
 	class GuiListBox : public GuiScrollable
 	{
 		private:
@@ -165,44 +170,49 @@ namespace ion::gui::controls
 			gui_list_box::ListBoxItems items_;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See GuiControl::Resized for more details
+			///@brief See GuiControl::Resized for more details
 			virtual void Resized(Vector2 from_size, Vector2 to_size) noexcept override;
 
 
-			//See GuiScrollable::Scrolled for more details
+			///@brief See GuiScrollable::Scrolled for more details
 			virtual void Scrolled(int delta) noexcept override;
 
-			//See GuiScrollable::TotalElements for more details
+			///@brief See GuiScrollable::TotalElements for more details
 			virtual int TotalElements() noexcept override;
 
-			//See GuiScrollable::ElementsInView for more details
+			///@brief See GuiScrollable::ElementsInView for more details
 			virtual int ElementsInView() noexcept override;
 
-			//See GuiScrollable::ScrollPosition for more details
+			///@brief See GuiScrollable::ScrollPosition for more details
 			virtual int ScrollPosition() noexcept override;
 			
 
-			//Called right after an item has been selected
+			///@brief Called right after an item has been selected
 			virtual void ItemSelected() noexcept;
 
-			//Called right after an item has been deselected
+			///@brief Called right after an item has been deselected
 			virtual void ItemDeselected() noexcept;
 
+			///@}
 
-			/*
-				States
+			/**
+				@name States
+				@{
 			*/
 
 			void SetSkinState(gui_control::ControlState state, gui_list_box::ListBoxSkin &skin) noexcept;
 			virtual void SetState(gui_control::ControlState state) noexcept override;
 
+			///@}
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
@@ -215,9 +225,11 @@ namespace ion::gui::controls
 			virtual void UpdateIcons() noexcept;
 			virtual void UpdateSelection() noexcept;
 
+			///@}
 
-			/*
-				Lines
+			/**
+				@name Lines
+				@{
 			*/
 
 			void InsertLines(int off, const gui_list_box::ListBoxItems &items);
@@ -225,52 +237,59 @@ namespace ion::gui::controls
 			void RemoveLines(int first, int last) noexcept;
 			void ClearLines() noexcept;
 
+			///@}
 
-			/*
-				Icons
+			/**
+				@name Icons
+				@{
 			*/
 
 			NonOwningPtr<graphics::scene::shapes::Sprite> CreateIcon(NonOwningPtr<graphics::materials::Material> material);
 			void RemoveIcons() noexcept;
 
+			///@}
+
 		public:
 
-			//Constructs a list box with the given name, size, caption, tooltip and hit boxes
+			///@brief Constructs a list box with the given name, size, caption, tooltip and hit boxes
 			GuiListBox(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Constructs a list box with the given name, skin, size, caption, tooltip and hit boxes
+			///@brief Constructs a list box with the given name, skin, size, caption, tooltip and hit boxes
 			GuiListBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {});
 
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all items in this list box
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all items in this list box
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Items() noexcept
 			{
 				return adaptors::ranges::Iterable<gui_list_box::ListBoxItems&>{items_};
 			}
 
-			//Returns an immutable range of all items in this list box
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all items in this list box
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Items() const noexcept
 			{
 				return adaptors::ranges::Iterable<const gui_list_box::ListBoxItems&>{items_};
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the item index of this list box to the given index
+			///@brief Sets the item index of this list box to the given index
 			void ItemIndex(std::optional<int> index) noexcept;
 
-			//Sets the item height factor for this list box to the given factor
+			///@brief Sets the item height factor for this list box to the given factor
 			inline void ItemHeightFactor(std::optional<real> factor) noexcept
 			{
 				if (item_height_factor_ != factor)
@@ -280,7 +299,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the item padding for this list box to the given padding
+			///@brief Sets the item padding for this list box to the given padding
 			inline void ItemPadding(const std::optional<Vector2> &padding) noexcept
 			{
 				if (item_padding_ != padding)
@@ -290,7 +309,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the item layout for this list box to the given layout
+			///@brief Sets the item layout for this list box to the given layout
 			inline void ItemLayout(gui_list_box::ListBoxItemLayout layout) noexcept
 			{
 				if (item_layout_ != layout)
@@ -300,7 +319,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the selection padding for this list box to the given padding
+			///@brief Sets the selection padding for this list box to the given padding
 			inline void SelectionPadding(const std::optional<Vector2> &padding) noexcept
 			{
 				if (selection_padding_ != padding)
@@ -311,7 +330,7 @@ namespace ion::gui::controls
 			}
 
 
-			//Sets the icon column width for this list box to the given width (in percentages)
+			///@brief Sets the icon column width for this list box to the given width (in percentages)
 			inline void IconColumnWidth(std::optional<real> percent) noexcept
 			{
 				if (icon_column_width_ != percent)
@@ -323,7 +342,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the icon max size for this list box to the given size
+			///@brief Sets the icon max size for this list box to the given size
 			inline void IconMaxSize(const std::optional<Vector2> &size) noexcept
 			{
 				if (icon_max_size_ != size)
@@ -335,7 +354,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the icon padding for this list box to the given padding
+			///@brief Sets the icon padding for this list box to the given padding
 			inline void IconPadding(const std::optional<Vector2> &padding) noexcept
 			{
 				if (icon_padding_ != padding)
@@ -347,7 +366,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets the icon layout for this list box to the given layout
+			///@brief Sets the icon layout for this list box to the given layout
 			inline void IconLayout(gui_list_box::ListBoxIconLayout layout) noexcept
 			{
 				if (icon_layout_ != layout)
@@ -359,7 +378,7 @@ namespace ion::gui::controls
 				}
 			}
 
-			//Sets whether or not this list box is showing icons
+			///@brief Sets whether or not this list box is showing icons
 			inline void ShowIcons(bool show) noexcept
 			{
 				if (show_icons_ != show)
@@ -369,161 +388,175 @@ namespace ion::gui::controls
 				}
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the item index of this list box
-			//Returns nullopt if no items are selected
+			///@brief Returns the item index of this list box
+			///@details Returns nullopt if no items are selected
 			[[nodiscard]] inline auto ItemIndex() const noexcept
 			{
 				return item_index_;
 			}
 
-			//Returns the item height factor for this list box
-			//Returns nullopt if no custom item height factor has been set
+			///@brief Returns the item height factor for this list box
+			///@details Returns nullopt if no custom item height factor has been set
 			[[nodiscard]] inline auto ItemHeightFactor() const noexcept
 			{
 				return item_height_factor_;
 			}
 
-			//Returns the item padding for this list box
-			//Returns nullopt if no custom item padding has been set
+			///@brief Returns the item padding for this list box
+			///@details Returns nullopt if no custom item padding has been set
 			[[nodiscard]] inline auto ItemPadding() const noexcept
 			{
 				return item_padding_;
 			}
 
-			//Returns the item layout for this list box
+			///@brief Returns the item layout for this list box
 			[[nodiscard]] inline auto ItemLayout() const noexcept
 			{
 				return item_layout_;
 			}
 
-			//Returns the selection padding for this list box
-			//Returns nullopt if no custom selection padding has been set
+			///@brief Returns the selection padding for this list box
+			///@details Returns nullopt if no custom selection padding has been set
 			[[nodiscard]] inline auto SelectionPadding() const noexcept
 			{
 				return selection_padding_;
 			}
 
 
-			//Returns the icon column width for this list box (in percentages)
-			//Returns nullopt if no custom icon column width has been set
+			///@brief Returns the icon column width for this list box (in percentages)
+			///@details Returns nullopt if no custom icon column width has been set
 			[[nodiscard]] inline auto IconColumnWidth() const noexcept
 			{
 				return icon_column_width_;
 			}
 
-			//Returns the icon max size for this list box
-			//Returns nullopt if no icon max size has been set
+			///@brief Returns the icon max size for this list box
+			///@details Returns nullopt if no icon max size has been set
 			[[nodiscard]] inline auto IconMaxSize() const noexcept
 			{
 				return icon_max_size_;
 			}
 
-			//Returns the icon padding for this list box
-			//Returns nullopt if no custom icon padding has been set
+			///@brief Returns the icon padding for this list box
+			///@details Returns nullopt if no custom icon padding has been set
 			[[nodiscard]] inline auto IconPadding() const noexcept
 			{
 				return icon_padding_;
 			}
 
-			//Returns the icon layout for this list box
+			///@brief Returns the icon layout for this list box
 			[[nodiscard]] inline auto IconLayout() const noexcept
 			{
 				return icon_layout_;
 			}
 
-			//Returns true if this list box is showing icons
+			///@brief Returns true if this list box is showing icons
 			[[nodiscard]] inline auto ShowIcons() const noexcept
 			{
 				return show_icons_;
 			}
 
+			///@}
 
-			/*
-				Items
+			/**
+				@name Items
 				Adding/inserting
+				@{
 			*/
 
-			//Adds an item to the list box with the given content and icon
+			///@brief Adds an item to the list box with the given content and icon
 			void AddItem(std::string content, NonOwningPtr<graphics::materials::Material> icon = nullptr);
 
-			//Adds the given item to the list box
+			///@brief Adds the given item to the list box
 			void AddItem(gui_list_box::ListBoxItem item);
 
-			//Adds the given items to the list box
+			///@brief Adds the given items to the list box
 			void AddItems(gui_list_box::ListBoxItems items);
 
 
-			//Inserts an item to the list box with the given content and icon, at the given offset
+			///@brief Inserts an item to the list box with the given content and icon, at the given offset
 			void InsertItem(int off, std::string content, NonOwningPtr<graphics::materials::Material> icon = nullptr);
 
-			//Inserts the given item to the list box, at the given offset
+			///@brief Inserts the given item to the list box, at the given offset
 			void InsertItem(int off, gui_list_box::ListBoxItem item);
 
-			//Inserts the given items to the list box, at the given offset
+			///@brief Inserts the given items to the list box, at the given offset
 			void InsertItems(int off, gui_list_box::ListBoxItems items);
 
+			///@}
 
-			/*
-				Items
+			/**
+				@name Items
 				Replacing
+				@{
 			*/
 
-			//Replaces the item at the given offset, with the given content and icon
+			///@brief Replaces the item at the given offset, with the given content and icon
 			void ReplaceItem(int off, std::string content, NonOwningPtr<graphics::materials::Material> icon = nullptr);
 
-			//Replaces the item at the given offset, with the given item
+			///@brief Replaces the item at the given offset, with the given item
 			void ReplaceItem(int off, gui_list_box::ListBoxItem item);
 
-			//Replaces the item at the given offset, with the given items
+			///@brief Replaces the item at the given offset, with the given items
 			void ReplaceItem(int off, gui_list_box::ListBoxItems items);
 
 
-			//Replaces the items in range [first, last), with the given content and icon
+			///@brief Replaces the items in range [first, last), with the given content and icon
 			void ReplaceItems(int first, int last, std::string content, NonOwningPtr<graphics::materials::Material> icon = nullptr);
 
-			//Replaces the items in range [first, last), with the given item
+			///@brief Replaces the items in range [first, last), with the given item
 			void ReplaceItems(int first, int last, gui_list_box::ListBoxItem item);
 
-			//Replaces the items in range [first, last), with the given items
+			///@brief Replaces the items in range [first, last), with the given items
 			void ReplaceItems(int first, int last, gui_list_box::ListBoxItems items);
 
+			///@}
 
-			/*
-				Items
+			/**
+				@name Items
 				Removing
+				@{
 			*/
 
-			//Clears all items from this list box
+			///@brief Clears all items from this list box
 			void ClearItems() noexcept;
 
-			//Removes the item at the given offset from this list box
+			///@brief Removes the item at the given offset from this list box
 			void RemoveItem(int off) noexcept;
 
-			//Removes all items in range [first, last) from this list box
+			///@brief Removes all items in range [first, last) from this list box
 			void RemoveItems(int first, int last) noexcept;
 
+			///@}
 
-			/*
-				Key events
+			/**
+				@name Key events
+				@{
 			*/
 
-			//Called from gui control when a key button has been released
-			//Returns true if the key release event has been consumed by the control
+			///@brief Called from gui control when a key button has been released
+			///@details Returns true if the key release event has been consumed by the control
 			virtual bool KeyReleased(KeyButton button) noexcept override;
 
+			///@}
 
-			/*
-				Mouse events
+			/**
+				@name Mouse events
+				@{
 			*/
 
-			//Called from gui control when the mouse button has been released
-			//Returns true if the mouse release event has been consumed by the control
+			///@brief Called from gui control when the mouse button has been released
+			///@details Returns true if the mouse release event has been consumed by the control
 			virtual bool MouseReleased(MouseButton button, Vector2 position) noexcept override;
+
+			///@}
 	};
 
 } //ion::gui::controls

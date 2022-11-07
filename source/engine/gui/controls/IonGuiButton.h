@@ -74,8 +74,8 @@ namespace ion::gui::controls
 	} //gui_button
 
 
-	//A class representing a GUI button
-	//A button can have predefined actions executed when clicked as well as custom callbacks
+	///@brief A class representing a GUI button
+	///@details A button can have predefined actions executed when clicked as well as custom callbacks
 	class GuiButton : public GuiControl
 	{
 		private:
@@ -87,63 +87,73 @@ namespace ion::gui::controls
 			gui_button::ButtonActions actions_;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See GuiControl::Clicked for more details
+			///@brief See GuiControl::Clicked for more details
 			virtual void Clicked() noexcept override;
 
+			///@}
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
 
+			///@}
+
 		public:
 
-			//Constructs a button with the given name, size, caption, tooltip and hit boxes
+			///@brief Constructs a button with the given name, size, caption, tooltip and hit boxes
 			GuiButton(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Constructs a button with the given name, skin, size, caption, tooltip and hit boxes
+			///@brief Constructs a button with the given name, skin, size, caption, tooltip and hit boxes
 			GuiButton(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {});
 
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all actions that are executed when clicking on this button
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all actions that are executed when clicking on this button
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Actions() noexcept
 			{
 				return adaptors::ranges::Iterable<gui_button::ButtonActions&>{actions_};
 			}
 
-			//Returns an immutable range of all actions that are executed when clicking on this button
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all actions that are executed when clicking on this button
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Actions() const noexcept
 			{
 				return adaptors::ranges::Iterable<const gui_button::ButtonActions&>{actions_};
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Adds the given action to this button
+			///@brief Adds the given action to this button
 			void AddAction(gui_button::ButtonAction action);
 
-			//Adds the given actions to this button
+			///@brief Adds the given actions to this button
 			void AddActions(gui_button::ButtonActions actions);
 
 
-			//Clears all of the added actions on this button
+			///@brief Clears all of the added actions on this button
 			void ClearActions() noexcept;
+
+			///@}
 	};
 
 } //ion::gui::controls

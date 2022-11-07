@@ -31,7 +31,7 @@ namespace ion::gui::controls
 		{
 			gui_control::ControlSkinPart CheckMark;
 
-			//Copy from most derived
+			///@brief Copy from most derived
 			virtual void Assign(const ControlSkin &control_skin) noexcept
 			{
 				if (auto skin = dynamic_cast<const CheckBoxSkin*>(&control_skin); skin)
@@ -49,8 +49,8 @@ namespace ion::gui::controls
 	} //gui_check_box
 
 
-	//A class representing a GUI check box
-	//A check box can be checked/unchecked
+	///@brief A class representing a GUI check box
+	///@details A check box can be checked/unchecked
 	class GuiCheckBox : public GuiControl
 	{
 		private:
@@ -65,61 +65,69 @@ namespace ion::gui::controls
 			std::optional<events::Callback<void, GuiCheckBox&>> on_uncheck_;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See GuiControl::Clicked for more details
+			///@brief See GuiControl::Clicked for more details
 			virtual void Clicked() noexcept override;
 
-			//See GuiControl::Resized for more details
+			///@brief See GuiControl::Resized for more details
 			virtual void Resized(Vector2 from_size, Vector2 to_size) noexcept override;
 
 
-			//Called right after a check box has been checked
+			///@brief Called right after a check box has been checked
 			virtual void Checked() noexcept;
 
-			//Called right after a check box has been unchecked
+			///@brief Called right after a check box has been unchecked
 			virtual void Unchecked() noexcept;
 
+			///@}
 
-			/*
-				States
+			/**
+				@name States
+				@{
 			*/
 
 			void SetSkinState(gui_control::ControlState state, gui_check_box::CheckBoxSkin &skin) noexcept;
 			virtual void SetState(gui_control::ControlState state) noexcept override;
 
+			///@}
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
 
+			///@}
+
 		public:
 
-			//Constructs a check box with the given name, size, caption, tooltip and hit boxes
+			///@brief Constructs a check box with the given name, size, caption, tooltip and hit boxes
 			GuiCheckBox(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Constructs a check box with the given name, skin, size, caption, tooltip and hit boxes
+			///@brief Constructs a check box with the given name, skin, size, caption, tooltip and hit boxes
 			GuiCheckBox(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, std::optional<std::string> tooltip, gui_control::BoundingBoxes hit_boxes = {});
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Checks this check box
+			///@brief Checks this check box
 			void Check() noexcept;
 
-			//Unchecks this check box
+			///@brief Unchecks this check box
 			void Uncheck() noexcept;
 
 
-			//Sets whether or not this check box is checked
+			///@brief Sets whether or not this check box is checked
 			inline void Checked(bool checked) noexcept
 			{
 				if (checked)
@@ -129,54 +137,58 @@ namespace ion::gui::controls
 			}
 
 
-			//Sets the on check callback
+			///@brief Sets the on check callback
 			inline void OnCheck(events::Callback<void, GuiCheckBox&> on_check) noexcept
 			{
 				on_check_ = on_check;
 			}
 
-			//Sets the on check callback
+			///@brief Sets the on check callback
 			inline void OnCheck(std::nullopt_t) noexcept
 			{
 				on_check_ = {};
 			}
 
 
-			//Sets the on uncheck callback
+			///@brief Sets the on uncheck callback
 			inline void OnUncheck(events::Callback<void, GuiCheckBox&> on_uncheck) noexcept
 			{
 				on_uncheck_ = on_uncheck;
 			}
 
-			//Sets the on uncheck callback
+			///@brief Sets the on uncheck callback
 			inline void OnUncheck(std::nullopt_t) noexcept
 			{
 				on_uncheck_ = {};
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns true if this check box is checked
+			///@brief Returns true if this check box is checked
 			[[nodiscard]] inline auto IsChecked() const noexcept
 			{
 				return checked_;
 			}
 
 
-			//Returns the on check callback
+			///@brief Returns the on check callback
 			[[nodiscard]] inline auto OnCheck() const noexcept
 			{
 				return on_check_;
 			}
 
-			//Returns the on uncheck callback
+			///@brief Returns the on uncheck callback
 			[[nodiscard]] inline auto OnUncheck() const noexcept
 			{
 				return on_uncheck_;
 			}
+
+			///@}
 	};
 
 } //ion::gui::controls

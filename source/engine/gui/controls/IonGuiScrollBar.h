@@ -47,9 +47,9 @@ namespace ion::gui::controls
 	} //gui_scroll_bar
 
 
-	//A class representing a GUI scroll bar that can be horizontal or vertical, flipped or not
-	//A scroll bar can be attached to a GUI scrollable and vice versa (usually to scroll up and down)
-	//The scroll bar handle can be dragged with the mouse cursor to change position
+	///@brief A class representing a GUI scroll bar that can be horizontal or vertical, flipped or not
+	///@details A scroll bar can be attached to a GUI scrollable and vice versa (usually to scroll up and down).
+	///The scroll bar handle can be dragged with the mouse cursor to change position
 	class GuiScrollBar : public GuiSlider
 	{
 		private:
@@ -64,55 +64,63 @@ namespace ion::gui::controls
 			NonOwningPtr<GuiScrollable> scrollable_;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
 			//See GuiSlider::Slid for more details
 			virtual void Slid(int delta) noexcept override;
 
+			///@}
 
-			/*
-				Skins
+			/**
+				@name Skins
+				@{
 			*/
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
 			virtual void UpdateHandle() noexcept override;
 
+			///@}
+
 		public:
 
-			//Constructs a scroll bar with the given name, size, caption, type and hit boxes
+			///@brief Constructs a scroll bar with the given name, size, caption, type and hit boxes
 			GuiScrollBar(std::string name, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_slider::SliderType type = gui_slider::SliderType::Vertical,
 				gui_control::BoundingBoxes hit_boxes = {}) noexcept;
 
-			//Constructs a scroll bar with the given name, skin, size, caption, type and hit boxes
+			///@brief Constructs a scroll bar with the given name, skin, size, caption, type and hit boxes
 			GuiScrollBar(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_slider::SliderType type = gui_slider::SliderType::Vertical,
 				gui_control::BoundingBoxes hit_boxes = {});
 
 
-			//Default move constructor
+			///@brief Default move constructor
 			GuiScrollBar(GuiScrollBar&&) = default;
 
 
-			//Virtual destructor
+			///@brief Virtual destructor
 			virtual ~GuiScrollBar() noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Default move assignment
+			///@brief Default move assignment
 			GuiScrollBar& operator=(GuiScrollBar&&) = default;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the min/max handle size of this scroll bar to the given range (in percentages)
+			///@brief Sets the min/max handle size of this scroll bar to the given range (in percentages)
 			inline void HandleSize(real min_percent, real max_percent) noexcept
 			{
 				auto min = min_percent;
@@ -125,40 +133,48 @@ namespace ion::gui::controls
 				}
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the min/max handle size of this scroll bar (in percentages)
+			///@brief Returns the min/max handle size of this scroll bar (in percentages)
 			[[nodiscard]] inline auto& HandleSize() const noexcept
 			{
 				return handle_size_;
 			}
 
+			///@}
 
-			/*
-				Scrollable
+			/**
+				@name Scrollable
+				@{
 			*/
 
-			//Sets the scrollable attached to this scroll bar to the given scrollable
+			///@brief Sets the scrollable attached to this scroll bar to the given scrollable
 			void AttachedScrollable(NonOwningPtr<GuiScrollable> scrollable) noexcept;
 
-			//Returns a pointer to the scrollable attached to this scroll bar
-			//Returns nullptr if this scroll bar does not have a scrollable attached
+			///@brief Returns a pointer to the scrollable attached to this scroll bar
+			///@details Returns nullptr if this scroll bar does not have a scrollable attached
 			[[nodiscard]] inline auto AttachedScrollable() const noexcept
 			{
 				return scrollable_;
 			}
 
+			///@}
 
-			/*
-				Mouse events
+			/**
+				@name Mouse events
+				@{
 			*/
 
-			//Called from gui slider when the mouse button has been released
-			//Returns true if the mouse release event has been consumed by the control
+			///@brief Called from gui slider when the mouse button has been released
+			///@details Returns true if the mouse release event has been consumed by the control
 			virtual bool MouseReleased(MouseButton button, Vector2 position) noexcept override;
+
+			///@}
 	};
 
 } //ion::gui::controls
