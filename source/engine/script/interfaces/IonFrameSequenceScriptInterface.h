@@ -29,16 +29,19 @@ namespace ion::script::interfaces
 		NonOwningPtr<graphics::textures::Texture> get_texture(std::string_view name, const ManagerRegister &managers) noexcept;
 
 
-		/*
-			Validator classes
+		/**
+			@name Validator classes
+			@{
 		*/
 
 		script_validator::ClassDefinition get_frame_sequence_class();
 		ScriptValidator get_frame_sequence_validator();
 
+		///@}
 
-		/*
-			Tree parsing
+		/**
+			@name Tree parsing
+			@{
 		*/
 
 		NonOwningPtr<graphics::textures::FrameSequence> create_frame_sequence(const script_tree::ObjectNode &object,
@@ -46,11 +49,13 @@ namespace ion::script::interfaces
 
 		void create_frame_sequences(const ScriptTree &tree,
 			graphics::textures::FrameSequenceManager &frame_sequence_manager, const ManagerRegister &managers);
+
+		///@}
 	} //frame_sequence_script_interface::detail
 
 
-	//A class representing an interface to a frame sequence script with a complete validation scheme
-	//A frame sequence script can load frame sequences from a script file into a frame sequence manager
+	///@brief A class representing an interface to a frame sequence script with a complete validation scheme
+	///@details A frame sequence script can load frame sequences from a script file into a frame sequence manager
 	class FrameSequenceScriptInterface final : public ScriptInterface
 	{
 		private:
@@ -59,22 +64,25 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			FrameSequenceScriptInterface() = default;
 
 
-			/*
-				Frame sequences
+			/**
+				@name Frame sequences
 				Creating from script
+				@{
 			*/
 
-			//Creates frame sequences from a script (or object file) with the given asset name
+			///@brief Creates frame sequences from a script (or object file) with the given asset name
 			void CreateFrameSequences(std::string_view asset_name,
 				graphics::textures::FrameSequenceManager &frame_sequence_manager);
 
-			//Creates frame sequences from a script (or object file) with the given asset name
+			///@brief Creates frame sequences from a script (or object file) with the given asset name
 			void CreateFrameSequences(std::string_view asset_name,
 				graphics::textures::FrameSequenceManager &frame_sequence_manager, const ManagerRegister &managers);
+
+			///@}
 	};
 } //ion::script::interfaces
 

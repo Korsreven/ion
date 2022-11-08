@@ -29,16 +29,19 @@ namespace ion::script::interfaces
 		NonOwningPtr<graphics::fonts::TypeFace> get_type_face(std::string_view name, const ManagerRegister &managers) noexcept;
 
 
-		/*
-			Validator classes
+		/**
+			@name Validator classes
+			@{
 		*/
 
 		script_validator::ClassDefinition get_text_class();
 		ScriptValidator get_text_validator();
 
+		///@}
 
-		/*
-			Tree parsing
+		/**
+			@name Tree parsing
+			@{
 		*/
 
 		void set_text_properties(const script_tree::ObjectNode &object, graphics::fonts::Text &text);
@@ -49,11 +52,13 @@ namespace ion::script::interfaces
 
 		void create_texts(const ScriptTree &tree,
 			graphics::fonts::TextManager &text_manager, const ManagerRegister &managers);
+
+		///@}
 	} //text_script_interface::detail
 
 
-	//A class representing an interface to a text script with a complete validation scheme
-	//A text script can load texts from a script file into a text manager
+	///@brief A class representing an interface to a text script with a complete validation scheme
+	///@details A text script can load texts from a script file into a text manager
 	class TextScriptInterface final : public ScriptInterface
 	{
 		private:
@@ -62,22 +67,25 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			TextScriptInterface() = default;
 
 
-			/*
-				Texts
+			/**
+				@name Texts
 				Creating from script
+				@{
 			*/
 
-			//Creates texts from a script (or object file) with the given asset name
+			///@brief Creates texts from a script (or object file) with the given asset name
 			void CreateTexts(std::string_view asset_name,
 				graphics::fonts::TextManager &text_manager);
 
-			//Creates texts from a script (or object file) with the given asset name
+			///@brief Creates texts from a script (or object file) with the given asset name
 			void CreateTexts(std::string_view asset_name,
 				graphics::fonts::TextManager &text_manager, const ManagerRegister &managers);
+
+			///@}
 	};
 } //ion::script::interfaces
 

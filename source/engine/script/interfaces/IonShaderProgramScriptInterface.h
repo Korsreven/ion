@@ -82,8 +82,9 @@ namespace ion::script::interfaces
 		NonOwningPtr<graphics::shaders::Shader> get_shader(std::string_view name, const ManagerRegister &managers) noexcept;
 
 
-		/*
-			Validator classes
+		/**
+			@name Validator classes
+			@{
 		*/
 
 		script_validator::ClassDefinition get_shader_program_class();
@@ -91,9 +92,11 @@ namespace ion::script::interfaces
 
 		ScriptValidator get_shader_program_validator();
 
+		///@}
 
-		/*
-			Tree parsing
+		/**
+			@name Tree parsing
+			@{
 		*/
 
 		void create_attribute(const script_tree::PropertyNode &property,
@@ -115,11 +118,13 @@ namespace ion::script::interfaces
 
 		void create_shader_programs(const ScriptTree &tree,
 			graphics::shaders::ShaderProgramManager &shader_program_manager, const ManagerRegister &managers);
+
+		///@}
 	} //shader_program_script_interface::detail
 
 
-	//A class representing an interface to a shader program script with a complete validation scheme
-	//A shader program script can load shader programs from a script file into a shader program manager
+	///@brief A class representing an interface to a shader program script with a complete validation scheme
+	///@details A shader program script can load shader programs from a script file into a shader program manager
 	class ShaderProgramScriptInterface final : public ScriptInterface
 	{
 		private:
@@ -128,22 +133,25 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			ShaderProgramScriptInterface() = default;
 
 
-			/*
-				Shader programs
+			/**
+				@name Shader programs
 				Creating from script
+				@{
 			*/
 
-			//Creates shader programs from a script (or object file) with the given asset name
+			///@brief Creates shader programs from a script (or object file) with the given asset name
 			void CreateShaderPrograms(std::string_view asset_name,
 				graphics::shaders::ShaderProgramManager &shader_program_manager);
 
-			//Creates shader programs from a script (or object file) with the given asset name
+			///@brief Creates shader programs from a script (or object file) with the given asset name
 			void CreateShaderPrograms(std::string_view asset_name,
 				graphics::shaders::ShaderProgramManager &shader_program_manager, const ManagerRegister &managers);
+
+			///@}
 	};
 } //ion::script::interfaces
 

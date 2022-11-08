@@ -94,7 +94,7 @@ namespace ion::script
 
 				public:
 
-					//Constructs an incomplete declaration (no definition)
+					///@brief Constructs an incomplete declaration (no definition)
 					declaration(std::string name, Ordinality ordinality) noexcept :
 						entity_{std::move(name)},
 						ordinality_{ordinality}
@@ -102,7 +102,7 @@ namespace ion::script
 						//Empty
 					}
 
-					//Constructs a complete declaration (full definition)
+					///@brief Constructs a complete declaration (full definition)
 					declaration(T definition, Ordinality ordinality) noexcept :
 						entity_{std::move(definition)},
 						ordinality_{ordinality}
@@ -115,14 +115,14 @@ namespace ion::script
 						Observers
 					*/
 
-					//Returns true if this declaration has a definition
+					///@brief Returns true if this declaration has a definition
 					inline auto HasDefinition() const noexcept
 					{
 						return std::holds_alternative<T>(entity_);
 					}
 
-					//Returns the name from this declaration
-					//Could be just a name or the name of the actual definition
+					///@brief Returns the name from this declaration
+					///@details Could be just a name or the name of the actual definition
 					inline auto& Name() const noexcept
 					{
 						return HasDefinition() ?
@@ -130,14 +130,14 @@ namespace ion::script
 							std::get<std::string>(entity_);
 					}
 
-					//Returns an immutable reference to the definition
+					///@brief Returns an immutable reference to the definition
 					inline auto& Definition() const noexcept
 					{
 						assert(HasDefinition());
 						return std::get<T>(entity_);
 					}
 
-					//Returns true if this declaration is required
+					///@brief Returns true if this declaration is required
 					inline auto Required() const noexcept
 					{
 						return ordinality_ == Ordinality::Mandatory;
@@ -148,22 +148,22 @@ namespace ion::script
 						Comparators
 					*/
 
-					//Returns true if this declaration should be sorted before the given declaration
+					///@brief Returns true if this declaration should be sorted before the given declaration
 					inline auto operator<(const declaration &rhs) const noexcept
 					{
 						return Name() < rhs.Name();
 					}
 
-					//Returns true if this declaration should be sorted before the given name
-					//This operator is only enabled for string types
+					///@brief Returns true if this declaration should be sorted before the given name
+					///@details This operator is only enabled for string types
 					template <typename T, typename = std::enable_if_t<types::is_string_v<T>>>
 					inline auto operator<(const T &rhs) const noexcept
 					{
 						return Name() < rhs;
 					}
 
-					//Returns true if the given name should be sorted before the given declaration
-					//This operator is only enabled for string types
+					///@brief Returns true if the given name should be sorted before the given declaration
+					///@details This operator is only enabled for string types
 					template <typename T, typename = std::enable_if_t<types::is_string_v<T>>>
 					inline friend auto operator<(const T &lhs, const declaration &rhs) noexcept
 					{
@@ -276,8 +276,8 @@ namespace ion::script
 		} //detail
 
 
-		//A class representing a parameter definition in the validation scheme
-		//The parameter (data) type, defines the rules for validating a particular parameter
+		///@brief A class representing a parameter definition in the validation scheme
+		///@details The parameter (data) type, defines the rules for validating a particular parameter
 		class ParameterDefinition final
 		{
 			private:
@@ -287,13 +287,13 @@ namespace ion::script
 
 			public:
 
-				//Constructs a new parameter with the given type
+				///@brief Constructs a new parameter with the given type
 				ParameterDefinition(ParameterType type) noexcept;
 
-				//Constructs a new enumerable parameter with the given values
+				///@brief Constructs a new enumerable parameter with the given values
 				ParameterDefinition(Strings values) noexcept;
 
-				//Constructs a new enumerable parameter with the given values
+				///@brief Constructs a new enumerable parameter with the given values
 				ParameterDefinition(std::initializer_list<std::string> values);
 
 
@@ -301,7 +301,7 @@ namespace ion::script
 					Observers
 				*/
 
-				//Returns the parameter type
+				///@brief Returns the parameter type
 				[[nodiscard]] inline auto Type() const noexcept
 				{
 					return type_;
@@ -312,7 +312,7 @@ namespace ion::script
 					Lookup
 				*/
 
-				//Returns true if an enumerable has support for the given value
+				///@brief Returns true if an enumerable has support for the given value
 				[[nodiscard]] bool HasValue(std::string_view value) const noexcept;
 
 
@@ -320,8 +320,8 @@ namespace ion::script
 					Ranges
 				*/
 
-				//Returns an immutable range of all values for this enumerable parameter
-				//This can be used directly with a range-based for loop
+				///@brief Returns an immutable range of all values for this enumerable parameter
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto Values() const noexcept
 				{
 					assert(type_ == ParameterType::Enumerable && values_);
@@ -329,8 +329,8 @@ namespace ion::script
 				}
 		};
 
-		//A class representing a property definition in the validation scheme
-		//The name, parameters and required parameter combined, defines the rules for validating a particular property
+		///@brief A class representing a property definition in the validation scheme
+		///@details The name, parameters and required parameter combined, defines the rules for validating a particular property
 		class PropertyDefinition final
 		{
 			private:
@@ -341,13 +341,13 @@ namespace ion::script
 
 			public:
 
-				//Constructs a new property with the given name and parameter
+				///@brief Constructs a new property with the given name and parameter
 				PropertyDefinition(std::string name, ParameterDefinition parameter) noexcept;
 
-				//Constructs a new property with the given name and parameters
+				///@brief Constructs a new property with the given name and parameters
 				PropertyDefinition(std::string name, ParameterDefinitions parameters) noexcept;
 
-				//Constructs a new property with the given name, parameters and required parameters
+				///@brief Constructs a new property with the given name, parameters and required parameters
 				PropertyDefinition(std::string name, ParameterDefinitions parameters, int required_parameters) noexcept;
 
 
@@ -355,13 +355,13 @@ namespace ion::script
 					Observers
 				*/
 
-				//Returns the name of this property
+				///@brief Returns the name of this property
 				[[nodiscard]] inline auto& Name() const noexcept
 				{
 					return name_;
 				}
 
-				//Returns the max required parameters of this property
+				///@brief Returns the max required parameters of this property
 				[[nodiscard]] inline auto& RequiredParameters() const noexcept
 				{
 					return required_parameters_;
@@ -372,16 +372,16 @@ namespace ion::script
 					Ranges
 				*/
 
-				//Returns an immutable range of all parameters for this property
-				//This can be used directly with a range-based for loop
+				///@brief Returns an immutable range of all parameters for this property
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto Parameters() const noexcept
 				{
 					return adaptors::ranges::Iterable<const ParameterDefinitions&>{parameters_};
 				}
 		};
 
-		//A class representing a class definition in the validation scheme
-		//The name, properties, base and inner classes combined, defines the rules for validating a particular class
+		///@brief A class representing a class definition in the validation scheme
+		///@details The name, properties, base and inner classes combined, defines the rules for validating a particular class
 		class ClassDefinition final
 		{
 			private:
@@ -393,16 +393,16 @@ namespace ion::script
 
 			public:
 
-				//Constructs a new class definition with the given name
+				///@brief Constructs a new class definition with the given name
 				ClassDefinition(std::string name) noexcept;
 
-				//Constructs a new class definition with the given name and base class name
+				///@brief Constructs a new class definition with the given name and base class name
 				ClassDefinition(std::string name, std::string base_class);
 
-				//Constructs a new class definition with the given name and base class definition
+				///@brief Constructs a new class definition with the given name and base class definition
 				ClassDefinition(std::string name, ClassDefinition base_class);
 
-				//Constructs a new class with the given name and base classes
+				///@brief Constructs a new class with the given name and base classes
 				ClassDefinition(std::string name, std::initializer_list<EntityType<ClassDefinition>> base_classes);
 
 
@@ -410,20 +410,20 @@ namespace ion::script
 					Static functions
 				*/
 
-				//Returns a newly created class definition with the given name
-				//Designed for fluent interface by using function chaining (named parameter idiom)
+				///@brief Returns a newly created class definition with the given name
+				///@details Designed for fluent interface by using function chaining (named parameter idiom)
 				[[nodiscard]] static ClassDefinition Create(std::string name) noexcept;
 
-				//Returns a newly created class definition with the given name and base class name
-				//Designed for fluent interface by using function chaining (named parameter idiom)
+				///@brief Returns a newly created class definition with the given name and base class name
+				///@details Designed for fluent interface by using function chaining (named parameter idiom)
 				[[nodiscard]] static ClassDefinition Create(std::string name, std::string base_class);
 
-				//Returns a newly created class definition with the given name and base class definition
-				//Designed for fluent interface by using function chaining (named parameter idiom)
+				///@brief Returns a newly created class definition with the given name and base class definition
+				///@details Designed for fluent interface by using function chaining (named parameter idiom)
 				[[nodiscard]] static ClassDefinition Create(std::string name, ClassDefinition base_class);
 
-				//Returns a newly created class definition with the given name and base classes
-				//Designed for fluent interface by using function chaining (named parameter idiom)
+				///@brief Returns a newly created class definition with the given name and base classes
+				///@details Designed for fluent interface by using function chaining (named parameter idiom)
 				[[nodiscard]] static ClassDefinition Create(std::string name, std::initializer_list<EntityType<ClassDefinition>> base_classes);
 
 
@@ -431,7 +431,7 @@ namespace ion::script
 					Observers
 				*/
 
-				//Returns the name of this class
+				///@brief Returns the name of this class
 				[[nodiscard]] inline auto& Name() const noexcept
 				{
 					return name_;
@@ -442,27 +442,27 @@ namespace ion::script
 					Classes
 				*/
 
-				//Adds an inner class with the given name
-				//Could be a class with no definition or an existing class defined in an outer scope
+				///@brief Adds an inner class with the given name
+				///@details Could be a class with no definition or an existing class defined in an outer scope
 				ClassDefinition& AddClass(std::string name);
 
-				//Adds an inner class with the given definition
+				///@brief Adds an inner class with the given definition
 				ClassDefinition& AddClass(ClassDefinition class_def);
 
 
-				//Adds an abstract inner class with the given name
-				//Could be a class with no definition or an existing class defined in an outer scope
+				///@brief Adds an abstract inner class with the given name
+				///@details Could be a class with no definition or an existing class defined in an outer scope
 				ClassDefinition& AddAbstractClass(std::string name);
 
-				//Adds an abstract inner class with the given definition
+				///@brief Adds an abstract inner class with the given definition
 				ClassDefinition& AddAbstractClass(ClassDefinition class_def);
 
 
-				//Adds a required inner class with the given name
-				//Could be a class with no definition or an existing class defined in an outer scope
+				///@brief Adds a required inner class with the given name
+				///@details Could be a class with no definition or an existing class defined in an outer scope
 				ClassDefinition& AddRequiredClass(std::string name);
 
-				//Adds a required inner class with the given definition
+				///@brief Adds a required inner class with the given definition
 				ClassDefinition& AddRequiredClass(ClassDefinition class_def);
 
 
@@ -470,35 +470,35 @@ namespace ion::script
 					Properties
 				*/
 
-				//Adds a property with the given name
+				///@brief Adds a property with the given name
 				ClassDefinition& AddProperty(std::string name);
 
-				//Adds a property with the given name and parameter
+				///@brief Adds a property with the given name and parameter
 				ClassDefinition& AddProperty(std::string name, ParameterDefinition parameter);
 				
-				//Adds a property with the given name and parameters
+				///@brief Adds a property with the given name and parameters
 				ClassDefinition& AddProperty(std::string name, ParameterDefinitions parameters);
 				
-				//Adds a property with the given name, parameters and the required number of parameters in range [1, |parameters|]
+				///@brief Adds a property with the given name, parameters and the required number of parameters in range [1, |parameters|]
 				ClassDefinition& AddProperty(std::string name, ParameterDefinitions parameters, int required_parameters);
 
-				//Adds a property with the given property definition
+				///@brief Adds a property with the given property definition
 				ClassDefinition& AddProperty(PropertyDefinition property);
 
 
-				//Adds a required property with the given name
+				///@brief Adds a required property with the given name
 				ClassDefinition& AddRequiredProperty(std::string name);
 
-				//Adds a required property with the given name and parameter
+				///@brief Adds a required property with the given name and parameter
 				ClassDefinition& AddRequiredProperty(std::string name, ParameterDefinition parameter);
 				
-				//Adds a required property with the given name and parameters
+				///@brief Adds a required property with the given name and parameters
 				ClassDefinition& AddRequiredProperty(std::string name, ParameterDefinitions parameters);
 				
-				//Adds a required property with the given name, parameters and the required number of parameters in range [1, |parameters|]
+				///@brief Adds a required property with the given name, parameters and the required number of parameters in range [1, |parameters|]
 				ClassDefinition& AddRequiredProperty(std::string name, ParameterDefinitions parameters, int required_parameters);
 
-				//Adds a required property with the given property definition
+				///@brief Adds a required property with the given property definition
 				ClassDefinition& AddRequiredProperty(PropertyDefinition property);
 
 
@@ -506,16 +506,16 @@ namespace ion::script
 					Lookup
 				*/
 
-				//Returns a pointer to an immutable ClassDeclaration with the given name
-				//If no base class with the given name is found, it returns nullptr
+				///@brief Returns a pointer to an immutable ClassDeclaration with the given name
+				///@details If no base class with the given name is found, it returns nullptr
 				[[nodiscard]] const ClassDeclaration* GetBaseClass(std::string_view name) const noexcept;
 
-				//Returns a pointer to an immutable ClassDeclaration with the given name
-				//If no inner class with the given name is found, it returns nullptr
+				///@brief Returns a pointer to an immutable ClassDeclaration with the given name
+				///@details If no inner class with the given name is found, it returns nullptr
 				[[nodiscard]] const ClassDeclaration* GetInnerClass(std::string_view name) const noexcept;
 
-				//Returns a pointer to an immutable PropertyDeclaration with the given name
-				//If no property with the given name is found, it returns nullptr
+				///@brief Returns a pointer to an immutable PropertyDeclaration with the given name
+				///@details If no property with the given name is found, it returns nullptr
 				[[nodiscard]] const PropertyDeclaration* GetProperty(std::string_view name) const noexcept;
 
 
@@ -523,22 +523,22 @@ namespace ion::script
 					Ranges
 				*/
 
-				//Returns an immutable range of all base classes of this class
-				//This can be used directly with a range-based for loop
+				///@brief Returns an immutable range of all base classes of this class
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto BaseClasses() const noexcept
 				{
 					return base_classes_.Elements();
 				}
 
-				//Returns an immutable range of all inner classes of this class
-				//This can be used directly with a range-based for loop
+				///@brief Returns an immutable range of all inner classes of this class
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto InnerClasses() const noexcept
 				{
 					return inner_classes_.Elements();
 				}
 
-				//Returns an immutable range of all properties of this class
-				//This can be used directly with a range-based for loop
+				///@brief Returns an immutable range of all properties of this class
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto Properties() const noexcept
 				{
 					return properties_.Elements();
@@ -546,15 +546,15 @@ namespace ion::script
 		};
 
 
-		//A class representing a property declaration of a particular property definition
-		//Definition and ordinality combined, defines the rules for validating a particular declaration
+		///@brief A class representing a property declaration of a particular property definition
+		///@details Definition and ordinality combined, defines the rules for validating a particular declaration
 		struct PropertyDeclaration final : detail::declaration<PropertyDefinition>
 		{
 			using detail::declaration<PropertyDefinition>::declaration;
 		};
 
-		//A class representing a class declaration of a particular class definition
-		//Definition, ordinality and class type combined, defines the rules for validating a particular declaration
+		///@brief A class representing a class declaration of a particular class definition
+		///@details Definition, ordinality and class type combined, defines the rules for validating a particular declaration
 		class ClassDeclaration final : public detail::declaration<ClassDefinition>
 		{
 			private:
@@ -563,10 +563,10 @@ namespace ion::script
 
 			public:
 
-				//Constructs an incomplete declaration (no definition)
+				///@brief Constructs an incomplete declaration (no definition)
 				ClassDeclaration(std::string name, Ordinality ordinality, ClassType class_type) noexcept;
 
-				//Constructs a complete declaration (full definition)
+				///@brief Constructs a complete declaration (full definition)
 				ClassDeclaration(ClassDefinition definition, Ordinality ordinality, ClassType class_type) noexcept;
 
 
@@ -574,7 +574,7 @@ namespace ion::script
 					Observers
 				*/
 
-				//Returns true if this class declaration is instantiatable
+				///@brief Returns true if this class declaration is instantiatable
 				[[nodiscard]] inline auto Instantiatable() const noexcept
 				{
 					return class_type_ == ClassType::Concrete;
@@ -583,9 +583,9 @@ namespace ion::script
 	} //script_validator
 
 
-	//A class that validates a compiled tree structure against a defined validation scheme
-	//The validation scheme is defined by adding classes (with inheritance) and properties (with arguments)
-	//The classes and properties combined, defines the rules for validating a particular script
+	///@brief A class that validates a compiled tree structure against a defined validation scheme
+	///@details The validation scheme is defined by adding classes (with inheritance) and properties (with arguments).
+	///The classes and properties combined, defines the rules for validating a particular script
 	class ScriptValidator final
 	{
 		private:
@@ -604,8 +604,8 @@ namespace ion::script
 				Static functions
 			*/
 
-			//Returns a newly created script validator
-			//Designed for fluent interface by using function chaining (named parameter idiom)
+			///@brief Returns a newly created script validator
+			///@details Designed for fluent interface by using function chaining (named parameter idiom)
 			[[nodiscard]] static ScriptValidator Create() noexcept;
 
 
@@ -613,15 +613,15 @@ namespace ion::script
 				Observers
 			*/
 
-			//Returns all validate errors from the previous validation
-			//The errors returned are all validation errors found
-			//The validation is okay if no errors returned
+			///@brief Returns all validate errors from the previous validation
+			///@details The errors returned are all validation errors found.
+			///The validation is okay if no errors returned
 			[[nodiscard]] inline auto& ValidateErrors() const noexcept
 			{
 				return validate_errors_;
 			}
 
-			//Returns the validate time of the previous validation
+			///@brief Returns the validate time of the previous validation
 			[[nodiscard]] inline auto ValidateTime() const noexcept
 			{
 				return validate_time_;
@@ -632,21 +632,21 @@ namespace ion::script
 				Classes
 			*/
 
-			//Adds a class with the given name (no definition)
+			///@brief Adds a class with the given name (no definition)
 			ScriptValidator& AddClass(std::string name);
 
-			//Adds a class with the given definition
+			///@brief Adds a class with the given definition
 			ScriptValidator& AddClass(script_validator::ClassDefinition class_def);
 
 
-			//Adds an abstract class with the given definition
+			///@brief Adds an abstract class with the given definition
 			ScriptValidator& AddAbstractClass(script_validator::ClassDefinition class_def);
 
 
-			//Adds a required class with the given name (no definition)
+			///@brief Adds a required class with the given name (no definition)
 			ScriptValidator& AddRequiredClass(std::string name);
 
-			//Adds a required class with the given definition
+			///@brief Adds a required class with the given definition
 			ScriptValidator& AddRequiredClass(script_validator::ClassDefinition class_def);
 
 
@@ -654,8 +654,8 @@ namespace ion::script
 				Lookup
 			*/
 
-			//Returns a pointer to an immutable ClassDeclaration with the given name
-			//If no class with the given name is found, it returns nullptr
+			///@brief Returns a pointer to an immutable ClassDeclaration with the given name
+			///@details If no class with the given name is found, it returns nullptr
 			[[nodiscard]] const script_validator::ClassDeclaration* GetClass(std::string_view name) const noexcept;
 
 
@@ -663,8 +663,8 @@ namespace ion::script
 				Outputting
 			*/
 
-			//Prints the output from the previous compilation
-			//Whats printed is based on the given compiler output options
+			///@brief Prints the output from the previous compilation
+			///@details Whats printed is based on the given compiler output options
 			[[nodiscard]] std::string PrintOutput(script_validator::OutputOptions output_options = script_validator::OutputOptions::SummaryAndErrors) const;
 
 
@@ -672,7 +672,7 @@ namespace ion::script
 				Validating
 			*/
 
-			//Returns true if this validator validates the given script tree
+			///@brief Returns true if this validator validates the given script tree
 			[[nodiscard]] bool Validate(const ScriptTree &tree, ValidateError &error);
 
 
@@ -680,8 +680,8 @@ namespace ion::script
 				Ranges
 			*/
 
-			//Returns an immutable range of all classes in this validator
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all classes in this validator
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Classes() const noexcept
 			{
 				return root_.InnerClasses();

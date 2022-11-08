@@ -128,8 +128,9 @@ namespace ion::script::interfaces
 			graphics::scene::graph::SceneNode &parent_node) noexcept;
 
 
-		/*
-			Validator classes
+		/**
+			@name Validator classes
+			@{
 		*/
 
 		script_validator::ClassDefinition get_action_class();
@@ -168,9 +169,11 @@ namespace ion::script::interfaces
 
 		ScriptValidator get_scene_validator();
 
+		///@}
 
-		/*
-			Tree parsing
+		/**
+			@name Tree parsing
+			@{
 		*/
 		
 		void set_frustum_properties(const script_tree::ObjectNode &object, graphics::render::Frustum &frustum);
@@ -281,11 +284,13 @@ namespace ion::script::interfaces
 
 		void create_scene(const ScriptTree &tree, graphics::scene::graph::SceneNode &parent_node,
 			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+
+		///@}
 	} //scene_script_interface::detail
 
 
-	//A class representing an interface to a scene script with a complete validation scheme
-	//A scene script can load scene nodes (with attached objects) from a script file into a scene graph (and associated scene manager)
+	///@brief A class representing an interface to a scene script with a complete validation scheme
+	///@details A scene script can load scene nodes (with attached objects) from a script file into a scene graph (and associated scene manager)
 	class SceneScriptInterface final : public ScriptInterface
 	{
 		private:
@@ -294,22 +299,25 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			SceneScriptInterface() = default;
 
 
-			/*
-				Scene
+			/**
+				@name Scene
 				Creating from script
+				@{
 			*/
 
-			//Creates scene from a script (or object file) with the given asset name
+			///@brief Creates scene from a script (or object file) with the given asset name
 			void CreateScene(std::string_view asset_name, graphics::scene::graph::SceneNode &parent_node,
 				graphics::scene::SceneManager &scene_manager);
 
-			//Creates scene from a script (or object file) with the given asset name
+			///@brief Creates scene from a script (or object file) with the given asset name
 			void CreateScene(std::string_view asset_name, graphics::scene::graph::SceneNode &parent_node,
 				graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+
+			///@}
 	};
 } //ion::script::interfaces
 

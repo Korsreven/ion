@@ -30,16 +30,19 @@ namespace ion::script::interfaces
 		NonOwningPtr<graphics::textures::Texture> get_texture(std::string_view name, const ManagerRegister &managers) noexcept;
 
 
-		/*
-			Validator classes
+		/**
+			@name Validator classes
+			@{
 		*/
 
 		script_validator::ClassDefinition get_material_class();
 		ScriptValidator get_material_validator();
 
+		///@}
 
-		/*
-			Tree parsing
+		/**
+			@name Tree parsing
+			@{
 		*/
 
 		void set_material_properties(const script_tree::ObjectNode &object, graphics::materials::Material &material,
@@ -51,11 +54,13 @@ namespace ion::script::interfaces
 
 		void create_materials(const ScriptTree &tree,
 			graphics::materials::MaterialManager &material_manager, const ManagerRegister &managers);
+
+		///@}
 	} //material_script_interface::detail
 
 
-	//A class representing an interface to a material script with a complete validation scheme
-	//A material script can load materials from a script file into a material manager
+	///@brief A class representing an interface to a material script with a complete validation scheme
+	///@details A material script can load materials from a script file into a material manager
 	class MaterialScriptInterface final : public ScriptInterface
 	{
 		private:
@@ -64,22 +69,25 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			MaterialScriptInterface() = default;
 
 
-			/*
-				Materials
+			/**
+				@name Materials
 				Creating from script
+				@{
 			*/
 
-			//Creates materials from a script (or object file) with the given asset name
+			///@brief Creates materials from a script (or object file) with the given asset name
 			void CreateMaterials(std::string_view asset_name,
 				graphics::materials::MaterialManager &material_manager);
 
-			//Creates materials from a script (or object file) with the given asset name
+			///@brief Creates materials from a script (or object file) with the given asset name
 			void CreateMaterials(std::string_view asset_name,
 				graphics::materials::MaterialManager &material_manager, const ManagerRegister &managers);
+
+			///@}
 	};
 } //ion::script::interfaces
 

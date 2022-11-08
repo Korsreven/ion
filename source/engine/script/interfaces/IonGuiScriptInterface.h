@@ -111,8 +111,9 @@ namespace ion::script::interfaces
 		const gui::skins::GuiSkin* get_skin(gui::GuiPanelContainer &container, std::string_view name) noexcept;
 
 
-		/*
-			Validator classes
+		/**
+			@name Validator classes
+			@{
 		*/
 
 		script_validator::ClassDefinition get_gui_class();
@@ -138,9 +139,11 @@ namespace ion::script::interfaces
 
 		ScriptValidator get_gui_validator();
 
+		///@}
 
-		/*
-			Tree parsing
+		/**
+			@name Tree parsing
+			@{
 		*/
 
 		void set_gui_properties(const script_tree::ObjectNode &object, gui::GuiController &gui_controller,
@@ -216,11 +219,13 @@ namespace ion::script::interfaces
 
 		void create_gui(const ScriptTree &tree, gui::GuiController &gui_controller,
 			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+
+		///@}
 	} //gui_script_interface::detail
 
 
-	//A class representing an interface to a GUI script with a complete validation scheme
-	//A GUI script can load GUI components from a script file into a GUI controller
+	///@brief A class representing an interface to a GUI script with a complete validation scheme
+	///@details A GUI script can load GUI components from a script file into a GUI controller
 	class GuiScriptInterface final : public ScriptInterface
 	{
 		private:
@@ -229,22 +234,25 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			GuiScriptInterface() = default;
 
 
-			/*
-				Gui
+			/**
+				@name Gui
 				Creating from script
+				@{
 			*/
 
-			//Creates gui from a script (or object file) with the given asset name
+			///@brief Creates gui from a script (or object file) with the given asset name
 			void CreateGui(std::string_view asset_name, gui::GuiController &gui_controller,
 				graphics::scene::SceneManager &scene_manager);
 
-			//Creates gui from a script (or object file) with the given asset name
+			///@brief Creates gui from a script (or object file) with the given asset name
 			void CreateGui(std::string_view asset_name, gui::GuiController &gui_controller,
 				graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+
+			///@}
 	};
 } //ion::script::interfaces
 

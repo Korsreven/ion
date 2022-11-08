@@ -29,16 +29,19 @@ namespace ion::script::interfaces
 		NonOwningPtr<graphics::textures::FrameSequence> get_frame_sequence(std::string_view name, const ManagerRegister &managers) noexcept;
 
 
-		/*
-			Validator classes
+		/**
+			@name Validator classes
+			@{
 		*/
 
 		script_validator::ClassDefinition get_animation_class();
 		ScriptValidator get_animation_validator();
 
+		///@}
 
-		/*
-			Tree parsing
+		/**
+			@name Tree parsing
+			@{
 		*/
 
 		void set_animation_properties(const script_tree::ObjectNode &object, graphics::textures::Animation &animation);
@@ -49,11 +52,13 @@ namespace ion::script::interfaces
 
 		void create_animations(const ScriptTree &tree,
 			graphics::textures::AnimationManager &animation_manager, const ManagerRegister &managers);
+
+		///@}
 	} //animation_script_interface::detail
 
 
-	//A class representing an interface to an animation script with a complete validation scheme
-	//An animation script can load animations from a script file into an animation manager
+	///@brief A class representing an interface to an animation script with a complete validation scheme
+	///@details An animation script can load animations from a script file into an animation manager
 	class AnimationScriptInterface final : public ScriptInterface
 	{
 		private:
@@ -62,22 +67,25 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			AnimationScriptInterface() = default;
 
 
-			/*
-				Animations
+			/**
+				@name Animations
 				Creating from script
+				@{
 			*/
 
-			//Creates animations from a script (or object file) with the given asset name
+			///@brief Creates animations from a script (or object file) with the given asset name
 			void CreateAnimations(std::string_view asset_name,
 				graphics::textures::AnimationManager &animation_manager);
 
-			//Creates animations from a script (or object file) with the given asset name
+			///@brief Creates animations from a script (or object file) with the given asset name
 			void CreateAnimations(std::string_view asset_name,
 				graphics::textures::AnimationManager &animation_manager, const ManagerRegister &managers);
+
+			///@}
 	};
 } //ion::script::interfaces
 

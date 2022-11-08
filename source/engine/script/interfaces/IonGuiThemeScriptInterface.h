@@ -44,8 +44,9 @@ namespace ion::script::interfaces
 		NonOwningPtr<graphics::fonts::Text> get_text(std::string_view name, const ManagerRegister &managers) noexcept;
 
 
-		/*
-			Validator classes
+		/**
+			@name Validator classes
+			@{
 		*/
 
 		script_validator::ClassDefinition get_text_style_class();
@@ -55,9 +56,11 @@ namespace ion::script::interfaces
 
 		ScriptValidator get_gui_theme_validator();
 
+		///@}
 
-		/*
-			Tree parsing
+		/**
+			@name Tree parsing
+			@{
 		*/
 
 		graphics::fonts::text::TextBlockStyle create_text_style(const script_tree::ObjectNode &object);
@@ -72,11 +75,13 @@ namespace ion::script::interfaces
 
 		void create_gui_themes(const ScriptTree &tree, gui::GuiController &gui_controller,
 			NonOwningPtr<graphics::scene::SceneManager> scene_manager, const ManagerRegister &managers);
+
+		///@}
 	} //gui_theme_script_interface::detail
 
 
-	//A class representing an interface to a GUI theme script with a complete validation scheme
-	//A GUI theme script can load GUI themes from a script file into a GUI controller
+	///@brief A class representing an interface to a GUI theme script with a complete validation scheme
+	///@details A GUI theme script can load GUI themes from a script file into a GUI controller
 	class GuiThemeScriptInterface final : public ScriptInterface
 	{
 		private:
@@ -85,22 +90,25 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			GuiThemeScriptInterface() = default;
 
 
-			/*
-				Gui themes
+			/**
+				@name Gui themes
 				Creating from script
+				@{
 			*/
 
-			//Creates gui themes from a script (or object file) with the given asset name
+			///@brief Creates gui themes from a script (or object file) with the given asset name
 			void CreateGuiThemes(std::string_view asset_name, gui::GuiController &gui_controller,
 				NonOwningPtr<graphics::scene::SceneManager> scene_manager);
 
-			//Creates gui themes from a script (or object file) with the given asset name
+			///@brief Creates gui themes from a script (or object file) with the given asset name
 			void CreateGuiThemes(std::string_view asset_name, gui::GuiController &gui_controller,
 				NonOwningPtr<graphics::scene::SceneManager> scene_manager, const ManagerRegister &managers);
+
+			///@}
 	};
 } //ion::script::interfaces
 

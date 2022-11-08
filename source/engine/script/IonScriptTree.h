@@ -110,8 +110,9 @@ namespace ion::script
 			using lineage_search_result = std::vector<generations>;
 
 
-			/*
-				Serializing
+			/**
+				@name Serializing
+				@{
 			*/
 
 			template <typename VariantT, typename T, size_t Index = 0>
@@ -215,9 +216,11 @@ namespace ion::script
 			int deserialize_object(std::string_view bytes, std::vector<ObjectNodes> &object_stack, PropertyNodes &properties);
 			std::optional<ObjectNodes> deserialize(std::string_view bytes);
 
+			///@}
 
-			/*
-				Appending
+			/**
+				@name Appending
+				@{
 			*/
 
 			template <typename DestNodes, typename SrcNodes>
@@ -270,16 +273,20 @@ namespace ion::script
 				}
 			}
 
+			///@}
 
-			/*
-				Printing
+			/**
+				@name Printing
+				@{
 			*/
 
 			std::string print(const ObjectNodes &objects, PrintOptions print_options);
 
+			///@}
 
-			/*
-				Searching
+			/**
+				@name Searching
+				@{
 			*/
 
 			void breadth_first_search_impl(search_result &result, size_t off);
@@ -293,29 +300,31 @@ namespace ion::script
 
 			void lineage_depth_first_search_impl(lineage_search_result &result, generations &descendants, ObjectNode &object);
 			lineage_search_result lineage_depth_first_search(ObjectNodes &objects);
+
+			///@}
 		} //detail
 
 
 		/*
 			Node types
-		*/	
+		*/
 
-		//A base class representing a tree node
+		///@brief A base class representing a tree node
 		struct TreeNode final
 		{
 			const ObjectNode &Object;
 			const ObjectNode *const Parent = nullptr;
 			const int Depth = 0;
 
-			//Constructs a new tree node containing the given root object
+			///@brief Constructs a new tree node containing the given root object
 			TreeNode(const ObjectNode &object) noexcept;
 
-			//Constructs a new tree node containing the given child object, parent object and depth
+			///@brief Constructs a new tree node containing the given child object, parent object and depth
 			TreeNode(const ObjectNode &object, const ObjectNode &parent, int depth) noexcept;
 		};
 
-		//A class representing an object node in the tree
-		//An object node is child of another object node and the parent of property nodes and other object nodes
+		///@brief A class representing an object node in the tree
+		///@details An object node is child of another object node and the parent of property nodes and other object nodes
 		class ObjectNode final
 		{
 			private:
@@ -327,160 +336,171 @@ namespace ion::script
 
 			public:
 
-				//Constructs a new object node with the given name and properties
+				///@brief Constructs a new object node with the given name and properties
 				ObjectNode(std::string name, std::string classes, PropertyNodes properties) noexcept;
 
-				//Constructs a new object node with the given name, properties and child objects
+				///@brief Constructs a new object node with the given name, properties and child objects
 				ObjectNode(std::string name, std::string classes, PropertyNodes properties, ObjectNodes objects) noexcept;
 
 
-				/*
-					Operators
+				/**
+					@name Operators
+					@{
 				*/
 
-				//Returns true if this object is valid
+				///@brief Returns true if this object is valid
 				[[nodiscard]] inline operator bool() const noexcept
 				{
 					return !std::empty(name_);
 				}
 
+				///@}
 
-				/*
-					Observers
+				/**
+					@name Observers
+					@{
 				*/
 
-				//Returns the name of this object
+				///@brief Returns the name of this object
 				[[nodiscard]] inline auto& Name() const noexcept
 				{
 					return name_;
 				}
 
-				//Returns the classes of this object
+				///@brief Returns the classes of this object
 				[[nodiscard]] inline auto& Classes() const noexcept
 				{
 					return classes_;
 				}
 
+				///@}
 
-				/*
-					Appending
+				/**
+					@name Appending
+					@{
 				*/
 
-				//Appends all of the given objects that satisfy the given append condition
+				///@brief Appends all of the given objects that satisfy the given append condition
 				void Append(const ObjectNodes &objects, AppendCondition append_condition = AppendCondition::Unconditionally);
 
-				//Appends all of the given mutable iterable objects that satisfy the given append condition
+				///@brief Appends all of the given mutable iterable objects that satisfy the given append condition
 				void Append(const adaptors::ranges::Iterable<ObjectNodes&> &objects, AppendCondition append_condition = AppendCondition::Unconditionally);
 
-				//Appends all of the given immutable iterable objects that satisfy the given append condition
+				///@brief Appends all of the given immutable iterable objects that satisfy the given append condition
 				void Append(const adaptors::ranges::Iterable<const ObjectNodes&> &objects, AppendCondition append_condition = AppendCondition::Unconditionally);
 
 
-				//Appends all of the given properties that satisfy the given append condition
+				///@brief Appends all of the given properties that satisfy the given append condition
 				void Append(const PropertyNodes &properties, AppendCondition append_condition = AppendCondition::Unconditionally);
 
-				//Appends all of the given mutable iterable properties that satisfy the given append condition
+				///@brief Appends all of the given mutable iterable properties that satisfy the given append condition
 				void Append(const adaptors::ranges::Iterable<PropertyNodes&> &properties, AppendCondition append_condition = AppendCondition::Unconditionally);
 
-				//Appends all of the given immutable iterable properties that satisfy the given append condition
+				///@brief Appends all of the given immutable iterable properties that satisfy the given append condition
 				void Append(const adaptors::ranges::Iterable<const PropertyNodes&> &properties, AppendCondition append_condition = AppendCondition::Unconditionally);
 
+				///@}
 
-				/*
-					Finding/searching
+				/**
+					@name Finding/searching
+					@{
 				*/
 
-				//Finds an object (top-level child object) by the given name, and return a mutable reference to it
-				//Returns InvalidObjectNode if the given object is not found
+				///@brief Finds an object (top-level child object) by the given name, and return a mutable reference to it
+				///@details Returns InvalidObjectNode if the given object is not found
 				[[nodiscard]] ObjectNode& Find(std::string_view name) noexcept;
 
-				//Finds an object (top-level child object) by the given name, and return an immutable reference to it
-				//Returns InvalidObjectNode if the given object is not found
+				///@brief Finds an object (top-level child object) by the given name, and return an immutable reference to it
+				///@details Returns InvalidObjectNode if the given object is not found
 				[[nodiscard]] const ObjectNode& Find(std::string_view name) const noexcept;
 
 
-				//Searches for an object (all child objects) by the given name and search strategy and return a mutable reference to it
-				//Returns InvalidObjectNode if the given object is not found
+				///@brief Searches for an object (all child objects) by the given name and search strategy and return a mutable reference to it
+				///@details Returns InvalidObjectNode if the given object is not found
 				[[nodiscard]] ObjectNode& Search(std::string_view name, SearchStrategy strategy = SearchStrategy::BreadthFirst) noexcept;
 
-				//Searches for an object (all child objects) by the given name and search strategy and return an immutable reference to it
-				//Returns InvalidObjectNode if the given object is not found
+				///@brief Searches for an object (all child objects) by the given name and search strategy and return an immutable reference to it
+				///@details Returns InvalidObjectNode if the given object is not found
 				[[nodiscard]] const ObjectNode& Search(std::string_view name, SearchStrategy strategy = SearchStrategy::BreadthFirst) const noexcept;
 
 
-				//Finds a property by the given name and return a mutable reference to it
-				//Returns InvalidPropertyNode if the given property is not found
+				///@brief Finds a property by the given name and return a mutable reference to it
+				///@details Returns InvalidPropertyNode if the given property is not found
 				[[nodiscard]] PropertyNode& Property(std::string_view name) noexcept;
 
-				//Finds a property by the given name and return an immutable reference to it
-				//Returns InvalidPropertyNode if the given property is not found
+				///@brief Finds a property by the given name and return an immutable reference to it
+				///@details Returns InvalidPropertyNode if the given property is not found
 				[[nodiscard]] const PropertyNode& Property(std::string_view name) const noexcept;
 
+				///@}
 
-				/*
-					Ranges
+				/**
+					@name Ranges
+					@{
 				*/
 
-				//Returns a mutable range of all top-level child objects in this object
-				//This can be used directly with a range-based for loop
+				///@brief Returns a mutable range of all top-level child objects in this object
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto Objects() noexcept
 				{
 					return adaptors::ranges::Iterable<ObjectNodes&>{objects_};
 				}
 
-				//Returns an immutable range of all top-level child objects in this object
-				//This can be used directly with a range-based for loop
+				///@brief Returns an immutable range of all top-level child objects in this object
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto Objects() const noexcept
 				{
 					return adaptors::ranges::Iterable<const ObjectNodes&>{objects_};
 				}
 
-				//Returns a mutable range of all properties in this object
-				//This can be used directly with a range-based for loop
+				///@brief Returns a mutable range of all properties in this object
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto Properties() noexcept
 				{
 					return adaptors::ranges::Iterable<PropertyNodes&>{properties_};
 				}
 
-				//Returns an immutable range of all properties in this object
-				//This can be used directly with a range-based for loop
+				///@brief Returns an immutable range of all properties in this object
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto Properties() const noexcept
 				{
 					return adaptors::ranges::Iterable<const PropertyNodes&>{properties_};
 				}
 
 
-				//Returns a mutable (BFS) range of all child objects in this object
-				//This can be used directly with a range-based for loop
+				///@brief Returns a mutable (BFS) range of all child objects in this object
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto BreadthFirstSearch()
 				{
 					return adaptors::ranges::Iterable<detail::search_result>{detail::breadth_first_search(objects_)};
 				}
 
-				//Returns an immutable (BFS) range of all child objects in this object
-				//This can be used directly with a range-based for loop
+				///@brief Returns an immutable (BFS) range of all child objects in this object
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto BreadthFirstSearch() const
 				{
 					return adaptors::ranges::Iterable<const detail::search_result>{detail::breadth_first_search(objects_)};
 				}
 
-				//Returns a mutable (DFS) range of all child objects in this object
-				//This can be used directly with a range-based for loop
+				///@brief Returns a mutable (DFS) range of all child objects in this object
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto DepthFirstSearch(DepthFirstTraversal traversal = DepthFirstTraversal::PreOrder)
 				{
 					return adaptors::ranges::Iterable<detail::search_result>{detail::depth_first_search(objects_, traversal)};
 				}
 
-				//Returns an immutable (DFS) range of all child objects in this object
-				//This can be used directly with a range-based for loop
+				///@brief Returns an immutable (DFS) range of all child objects in this object
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto DepthFirstSearch(DepthFirstTraversal traversal = DepthFirstTraversal::PreOrder) const
 				{
 					return adaptors::ranges::Iterable<const detail::search_result>{detail::depth_first_search(objects_, traversal)};
 				}
+
+				///@}
 		};
 
-		//A class representing a property node in the tree
-		//A property node is child of an object node and the parent of argument nodes
+		///@brief A class representing a property node in the tree
+		///@details A property node is child of an object node and the parent of argument nodes
 		class PropertyNode final
 		{
 			private:
@@ -490,84 +510,93 @@ namespace ion::script
 
 			public:
 
-				//Constructs a new property node with the given name and arguments
+				///@brief Constructs a new property node with the given name and arguments
 				PropertyNode(std::string name, ArgumentNodes arguments) noexcept;
 
 
-				/*
-					Operators
+				/**
+					@name Operators
+					@{
 				*/
 
-				//Returns true if this property is valid
+				///@brief Returns true if this property is valid
 				[[nodiscard]] inline operator bool() const noexcept
 				{
 					return !std::empty(name_);
 				}
 
+				///@}
 
-				/*
-					Observers
+				/**
+					@name Observers
+					@{
 				*/
 
-				//Returns the name of the property
+				///@brief Returns the name of the property
 				[[nodiscard]] inline auto& Name() const noexcept
 				{
 					return name_;
 				}
 
+				///@}
 
-				/*
-					Arguments
+				/**
+					@name Arguments
+					@{
 				*/
 
-				//Returns a mutable argument at the given argument number
+				///@brief Returns a mutable argument at the given argument number
 				[[nodiscard]] ArgumentNode& Argument(int number) noexcept;
 
-				//Returns an immutable argument at the given argument number
+				///@brief Returns an immutable argument at the given argument number
 				[[nodiscard]] const ArgumentNode& Argument(int number) const noexcept;
 
 
-				//Returns a mutable argument at the given argument number
+				///@brief Returns a mutable argument at the given argument number
 				[[nodiscard]] inline auto& operator[](int number) noexcept
 				{
 					return Argument(number);
 				}
 
-				//Returns an immutable argument at the given argument number
+				///@brief Returns an immutable argument at the given argument number
 				[[nodiscard]] inline auto& operator[](int number) const noexcept
 				{
 					return Argument(number);
 				}
 
 
-				//Returns the number of arguments in this property
+				///@brief Returns the number of arguments in this property
 				[[nodiscard]] inline auto NumberOfArguments() const noexcept
 				{
 					return std::ssize(arguments_);
 				}
 
+				///@}
 
-				/*
-					Ranges
+				/**
+					@name Ranges
+					@{
 				*/
 
-				//Returns a mutable range of all arguments in this property
-				//This can be used directly with a range-based for loop
+				///@brief Returns a mutable range of all arguments in this property
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto Arguments() noexcept
 				{
 					return adaptors::ranges::Iterable<ArgumentNodes&>{arguments_};
 				}
 
-				//Returns an immutable range of all arguments in this property
-				//This can be used directly with a range-based for loop
+				///@brief Returns an immutable range of all arguments in this property
+				///@details This can be used directly with a range-based for loop
 				[[nodiscard]] inline auto Arguments() const noexcept
 				{
 					return adaptors::ranges::Iterable<const ArgumentNodes&>{arguments_};
 				}
+
+				///@}
 		};
 
-		//A class representing an argument node in the tree
-		//An argument node is child of a property node and contains a value with an associated unit
+		///@brief A class representing an argument node in the tree
+		///@details An argument node is child of a property node and contains a value with an associated unit
 		class ArgumentNode final
 		{
 			private:
@@ -577,32 +606,35 @@ namespace ion::script
 			
 			public:
 
-				//Constructs a new argument node with the given argument
+				///@brief Constructs a new argument node with the given argument
 				ArgumentNode(ArgumentType argument) noexcept;
 
-				//Constructs a new argument node with the given argument and unit
+				///@brief Constructs a new argument node with the given argument and unit
 				ArgumentNode(ArgumentType argument, std::string unit) noexcept;
 
-				//Constructs an invalid argument node
+				///@brief Constructs an invalid argument node
 				explicit ArgumentNode(std::nullopt_t) noexcept;
 
 
-				/*
-					Operators
+				/**
+					@name Operators
+					@{
 				*/
 
-				//Returns true if this argument is valid
+				///@brief Returns true if this argument is valid
 				[[nodiscard]] inline operator bool() const noexcept
 				{
 					return argument_.has_value();
 				}
 
+				///@}
 
-				/*
-					Observers
+				/**
+					@name Observers
+					@{
 				*/
 
-				//Returns the value of the argument with the given argument type
+				///@brief Returns the value of the argument with the given argument type
 				template <typename T>
 				[[nodiscard]] inline auto Get() const noexcept
 				{
@@ -622,7 +654,7 @@ namespace ion::script
 					return value ? std::make_optional(*value) : std::nullopt;
 				}
 
-				//Calls the correct overload for the given overload set, based on the value of the argument
+				///@brief Calls the correct overload for the given overload set, based on the value of the argument
 				template <typename T, typename ...Ts>
 				inline auto Visit(T &&callable, Ts &&...callables) const noexcept
 				{
@@ -630,19 +662,21 @@ namespace ion::script
 					return std::visit(types::overloaded{std::forward<T>(callable), std::forward<Ts>(callables)...}, *argument_);
 				}
 
-				//Returns the unit of this argument
+				///@brief Returns the unit of this argument
 				[[nodiscard]] inline auto& Unit() const noexcept
 				{
 					return unit_;
 				}
+
+				///@}
 		};
 	} //script_tree
 
 
-	//A class representing a tree structure with object, property and argument nodes
-	//The tree and nodes are created during compilation of one or more translation units
-	//A script tree needs to be validated against a validation scheme for it to be considered correct
-	//A script tree can be validated then serialized, to later be deserialized without the need to be validated again
+	///@brief A class representing a tree structure with object, property and argument nodes
+	///@details The tree and nodes are created during compilation of one or more translation units.
+	///A script tree needs to be validated against a validation scheme for it to be considered correct.
+	///A script tree can be validated then serialized, to later be deserialized without the need to be validated again
 	class ScriptTree final
 	{
 		private:
@@ -653,137 +687,153 @@ namespace ion::script
 
 			ScriptTree() = default;
 
-			//Constructs a new script tree with the given objects
+			///@brief Constructs a new script tree with the given objects
 			explicit ScriptTree(script_tree::ObjectNodes objects) noexcept;
 
 
-			/*
-				Appending
+			/**
+				@name Appending
+				@{
 			*/
 
-			//Appends all of the given objects that satisfy the given append condition
+			///@brief Appends all of the given objects that satisfy the given append condition
 			void Append(const script_tree::ObjectNodes &objects, script_tree::AppendCondition append_condition = script_tree::AppendCondition::Unconditionally);
 
-			//Appends all of the given mutable iterable objects that satisfy the given append condition
+			///@brief Appends all of the given mutable iterable objects that satisfy the given append condition
 			void Append(const adaptors::ranges::Iterable<script_tree::ObjectNodes&> &objects, script_tree::AppendCondition append_condition = script_tree::AppendCondition::Unconditionally);
 
-			//Appends all of the given immutable iterable objects that satisfy the given append condition
+			///@brief Appends all of the given immutable iterable objects that satisfy the given append condition
 			void Append(const adaptors::ranges::Iterable<const script_tree::ObjectNodes&> &objects, script_tree::AppendCondition append_condition = script_tree::AppendCondition::Unconditionally);
 
+			///@}
 
-			/*
-				Finding/searching
+			/**
+				@name Finding/searching
+				@{
 			*/
 
-			//Finds an object (top-level object) by the given name, and return a mutable reference to it
-			//Returns InvalidObjectNode if the given object is not found
+			///@brief Finds an object (top-level object) by the given name, and return a mutable reference to it
+			///@details Returns InvalidObjectNode if the given object is not found
 			[[nodiscard]] script_tree::ObjectNode& Find(std::string_view name) noexcept;
 
-			//Finds an object (top-level object) by the given name, and return an immutable reference to it
-			//Returns InvalidObjectNode if the given object is not found
+			///@brief Finds an object (top-level object) by the given name, and return an immutable reference to it
+			///@details Returns InvalidObjectNode if the given object is not found
 			[[nodiscard]] const script_tree::ObjectNode& Find(std::string_view name) const noexcept;
 
 
-			//Searches for an object (all objects) by the given name and search strategy and return a mutable reference to it
-			//Returns InvalidObjectNode if the given object is not found
+			///@brief Searches for an object (all objects) by the given name and search strategy and return a mutable reference to it
+			///@details Returns InvalidObjectNode if the given object is not found
 			[[nodiscard]] script_tree::ObjectNode& Search(std::string_view name, script_tree::SearchStrategy strategy = script_tree::SearchStrategy::BreadthFirst) noexcept;
 
-			//Searches for an object (all objects) by the given name and search strategy and return an immutable reference to it
-			//Returns InvalidObjectNode if the given object is not found
+			///@brief Searches for an object (all objects) by the given name and search strategy and return an immutable reference to it
+			///@details Returns InvalidObjectNode if the given object is not found
 			[[nodiscard]] const script_tree::ObjectNode& Search(std::string_view name, script_tree::SearchStrategy strategy = script_tree::SearchStrategy::BreadthFirst) const noexcept;
 
+			///@}
 
-			/*
-				Fully qualified names
+			/**
+				@name Fully qualified names
+				@{
 			*/
 
-			//Returns the fully qualified name to the given object
-			//Returns nullopt if the given object is not found in this tree
+			///@brief Returns the fully qualified name to the given object
+			///@details Returns nullopt if the given object is not found in this tree
 			[[nodiscard]] std::optional<std::string> GetFullyQualifiedName(const script_tree::ObjectNode &object) const;
 
-			//Returns the fully qualified name to the given property
-			//Returns nullopt if the given object or property is not found in this tree
+			///@brief Returns the fully qualified name to the given property
+			///@details Returns nullopt if the given object or property is not found in this tree
 			[[nodiscard]] std::optional<std::string> GetFullyQualifiedName(const script_tree::ObjectNode &object, const script_tree::PropertyNode &property) const;
 
+			///@}
 
-			/*
-				Printing
+			/**
+				@name Printing
+				@{
 			*/
 
-			//Prints out this script tree as an hierarchical list with objects, properties and arguments.
-			//Choose what to print based on the given print options (optionally)
+			///@brief Prints out this script tree as an hierarchical list with objects, properties and arguments.
+			///@details Choose what to print based on the given print options (optionally)
 			[[nodiscard]] std::string Print(script_tree::PrintOptions print_options = script_tree::PrintOptions::Arguments) const;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all top-level objects in this script tree
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all top-level objects in this script tree
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Objects() noexcept
 			{
 				return adaptors::ranges::Iterable<script_tree::ObjectNodes&>{objects_};
 			}
 
-			//Returns an immutable range of all top-level objects in this script tree
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all top-level objects in this script tree
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Objects() const noexcept
 			{
 				return adaptors::ranges::Iterable<const script_tree::ObjectNodes&>{objects_};
 			}
 
 
-			//Returns a mutable (BFS) range of all objects in this script tree
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable (BFS) range of all objects in this script tree
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto BreadthFirstSearch()
 			{
 				return adaptors::ranges::Iterable<script_tree::detail::search_result>{script_tree::detail::breadth_first_search(objects_)};
 			}
 
-			//Returns an immutable (BFS) range of all objects in this script tree
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable (BFS) range of all objects in this script tree
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto BreadthFirstSearch() const
 			{
 				return adaptors::ranges::Iterable<const script_tree::detail::search_result>{script_tree::detail::breadth_first_search(objects_)};
 			}
 
-			//Returns a mutable (DFS) range of all objects in this script tree
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable (DFS) range of all objects in this script tree
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto DepthFirstSearch(script_tree::DepthFirstTraversal traversal = script_tree::DepthFirstTraversal::PreOrder)
 			{
 				return adaptors::ranges::Iterable<script_tree::detail::search_result>{script_tree::detail::depth_first_search(objects_, traversal)};
 			}
 
-			//Returns an immutable (DFS) range of all objects in this script tree
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable (DFS) range of all objects in this script tree
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto DepthFirstSearch(script_tree::DepthFirstTraversal traversal = script_tree::DepthFirstTraversal::PreOrder) const
 			{
 				return adaptors::ranges::Iterable<const script_tree::detail::search_result>{script_tree::detail::depth_first_search(objects_, traversal)};
 			}
 
+			///@}
 
-			/*
-				Serializing
+			/**
+				@name Serializing
+				@{
 			*/
 
-			//Deserializes a given byte array to a script tree
+			///@brief Deserializes a given byte array to a script tree
 			[[nodiscard]] static std::optional<ScriptTree> Deserialize(std::string_view bytes);
 
-			//Serializes this script tree to a byte array
+			///@brief Serializes this script tree to a byte array
 			[[nodiscard]] std::vector<std::byte> Serialize() const;
+
+			///@}
 	};
 
 	namespace script_tree
 	{
-		/*
-			Predefined node constants
+		/**
+			@name Predefined node constants
 			For fluent interface design
+			@{
 		*/
 
 		inline const auto InvalidObjectNode = ObjectNode{"", "", {}};
 		inline const auto InvalidPropertyNode = PropertyNode{"", {}};
 		inline const auto InvalidArgumentNode = ArgumentNode{std::nullopt};
+
+		///@}
 	} //script_tree
 
 } //ion::script

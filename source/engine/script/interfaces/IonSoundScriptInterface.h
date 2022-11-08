@@ -30,8 +30,9 @@ namespace ion::script::interfaces
 {
 	namespace sound_script_interface::detail
 	{
-		/*
-			Validator classes
+		/**
+			@name Validator classes
+			@{
 		*/
 
 		script_validator::ClassDefinition get_sound_class();
@@ -41,9 +42,11 @@ namespace ion::script::interfaces
 
 		ScriptValidator get_sound_validator();
 
+		///@}
 
-		/*
-			Tree parsing
+		/**
+			@name Tree parsing
+			@{
 		*/
 
 		void set_sound_properties(const script_tree::ObjectNode &object, sounds::Sound &sound);
@@ -61,11 +64,13 @@ namespace ion::script::interfaces
 
 		void create_sounds(const ScriptTree &tree,
 			sounds::SoundManager &sound_manager);
+
+		///@}
 	} //sound_script_interface::detail
 
 
-	//A class representing an interface to a sound script with a complete validation scheme
-	//A sound script can load sounds from a script file into a sound manager
+	///@brief A class representing an interface to a sound script with a complete validation scheme
+	///@details A sound script can load sounds from a script file into a sound manager
 	class SoundScriptInterface final : public ScriptInterface
 	{
 		private:
@@ -74,18 +79,21 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			SoundScriptInterface() = default;
 
 
-			/*
-				Sounds
+			/**
+				@name Sounds
 				Creating from script
+				@{
 			*/
 
-			//Creates sounds from a script (or object file) with the given asset name
+			///@brief Creates sounds from a script (or object file) with the given asset name
 			void CreateSounds(std::string_view asset_name,
 				sounds::SoundManager &sound_manager);
+
+			///@}
 	};
 } //ion::script::interfaces
 

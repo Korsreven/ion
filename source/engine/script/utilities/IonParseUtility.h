@@ -24,7 +24,7 @@ File:	IonParseUtility.h
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 
-//Namespace containing functions for parsing script data types
+///@brief Namespace containing functions for parsing script data types
 namespace ion::script::utilities::parse
 {
 	namespace detail
@@ -247,53 +247,61 @@ namespace ion::script::utilities::parse
 	} //detail
 
 
-	/*
-		String as boolean
+	/**
+		@name String as boolean
+		@{
 	*/
 
-	//Parses the given string as a boolean value
-	//Supports 1 or 0, true or false, yes or no and on or off
+	///@brief Parses the given string as a boolean value
+	///@details Supports 1 or 0, true or false, yes or no and on or off
 	[[nodiscard]] std::optional<bool> AsBoolean(std::string_view str) noexcept;
 
+	///@}
 
-	/*
-		String as color
+	/**
+		@name String as color
+		@{
 	*/
 
-	//Parses the given string as a color value
-	//Supports r,g,b,(a) values in range [0, 255] or percentages in range [0.0, 1.0]
-	//Supports hexadecimal values (with alpha) prefixed with # or 0x (both short and long notation)
-	//Supports X11 color names such as AliceBlue, Crimson etc.
+	///@brief Parses the given string as a color value
+	///@details Supports r,g,b,(a) values in range [0, 255] or percentages in range [0.0, 1.0].
+	///Supports hexadecimal values (with alpha) prefixed with # or 0x (both short and long notation).
+	///Supports X11 color names such as AliceBlue, Crimson etc.
 	[[nodiscard]] std::optional<graphics::utilities::Color> AsColor(std::string_view str) noexcept;
 
+	///@}
 
-	/*
-		String literal as string
+	/**
+		@name String literal as string
 		Color value as string
+		@{
 	*/
 
-	//Parses the given string literal as a string value
-	//Supports double " and single ' quoted literals
-	//Supports escape characters
+	///@brief Parses the given string literal as a string value
+	///@details Supports double " and single ' quoted literals.
+	///Supports escape characters
 	[[nodiscard]] std::optional<std::string> AsString(std::string_view str);
 
-	//Parses the given color value as a color name
-	//Returns nullopt of the given color does not have a X11/W3C color name
+	///@brief Parses the given color value as a color name
+	///@details Returns nullopt of the given color does not have a X11/W3C color name
 	[[nodiscard]] std::optional<std::string_view> AsString(graphics::utilities::Color color);
 
-
-	/*
-		String as vector
+	///@}
+	
+	/**
+		@name String as vector
+		@{
 	*/
 
-	//Parses the given string as a vector2 value
-	//Supports both scalar and x,y values
+	///@brief Parses the given string as a vector2 value
+	///@details Supports both scalar and x,y values
 	[[nodiscard]] std::optional<graphics::utilities::Vector2> AsVector2(std::string_view str) noexcept;
 
-	//Parses the given string as a vector3 value
-	//Supports both scalar and x,y values
+	///@brief Parses the given string as a vector3 value
+	///@details Supports both scalar and x,y values
 	[[nodiscard]] std::optional<graphics::utilities::Vector3> AsVector3(std::string_view str) noexcept;
 
+	///@}
 } //ion::script::utilities::parse
 
 #endif

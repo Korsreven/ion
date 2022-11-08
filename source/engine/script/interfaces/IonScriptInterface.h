@@ -63,8 +63,8 @@ namespace ion::script::interfaces
 	} //script_interface::detail
 
 
-	//A base class representing a complete script interface for loading, building and validating a particular script setup
-	//All script interfaces shares a register of managers needed to fully load scriptet objects into managers or other game objects
+	///@brief A base class representing a complete script interface for loading, building and validating a particular script setup
+	///@details All script interfaces shares a register of managers needed to fully load scriptet objects into managers or other game objects
 	class ScriptInterface :
 		protected unmanaged::ObjectFactory<assets::repositories::ScriptRepository>,
 		protected unmanaged::ObjectFactory<assets::repositories::FileRepository>
@@ -87,159 +87,176 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			ScriptInterface() = default;
 
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all script repositories in this script interface
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all script repositories in this script interface
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto ScriptRepositories() noexcept
 			{
 				return ScriptRepositoryBase::Objects();
 			}
 
-			//Returns an immutable range of all script repositories in this script interface
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all script repositories in this script interface
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto ScriptRepositories() const noexcept
 			{
 				return ScriptRepositoryBase::Objects();
 			}
 
 
-			//Returns a mutable range of all file repositories in this script interface
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all file repositories in this script interface
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto FileRepositories() noexcept
 			{
 				return FileRepositoryBase::Objects();
 			}
 
-			//Returns an immutable range of all file repositories in this script interface
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all file repositories in this script interface
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto FileRepositories() const noexcept
 			{
 				return FileRepositoryBase::Objects();
 			}
 
+			///@}
 
-			/*
-				Managers
+			/**
+				@name Managers
+				@{
 			*/
 
-			//Returns a reference to the static manager register for all script interfaces
+			///@brief Returns a reference to the static manager register for all script interfaces
 			[[nodiscard]] static inline auto& Managers() noexcept
 			{
 				return manager_register_;
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the max number of build processes the compiler is allowed to use
-			//If nullopt is passed, a default number of build processes will be used (based on your system)
+			///@brief Sets the max number of build processes the compiler is allowed to use
+			///@details If nullopt is passed, a default number of build processes will be used (based on your system)
 			inline void MaxBuildProcesses(std::optional<int> max_build_processes) noexcept
 			{
 				builder_.Compiler().MaxBuildProcesses(max_build_processes);
 			}
 
 
-			//Sets output options for the builder
-			//Pass nullopt or {} to turn off any builder output
+			///@brief Sets output options for the builder
+			///@details Pass nullopt or {} to turn off any builder output
 			inline void Output(std::optional<script_builder::OutputOptions> output_options) noexcept
 			{
 				builder_.Output(output_options);
 			}
 
-			//Sets output options for the compiler
-			//Pass nullopt or {} to turn off any compiler output
+			///@brief Sets output options for the compiler
+			///@details Pass nullopt or {} to turn off any compiler output
 			inline void CompilerOutput(std::optional<script_compiler::OutputOptions> output_options) noexcept
 			{
 				builder_.CompilerOutput(output_options);
 			}
 
-			//Sets output options for the validator
-			//Pass nullopt or {} to turn off any validator output
+			///@brief Sets output options for the validator
+			///@details Pass nullopt or {} to turn off any validator output
 			inline void ValidatorOutput(std::optional<script_validator::OutputOptions> output_options) noexcept
 			{
 				builder_.ValidatorOutput(output_options);
 			}
 
-			//Sets output options for the tree
-			//Pass nullopt or {} to turn off any tree output
+			///@brief Sets output options for the tree
+			///@details Pass nullopt or {} to turn off any tree output
 			inline void TreeOutput(std::optional<script_tree::PrintOptions> print_options) noexcept
 			{
 				builder_.TreeOutput(print_options);
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns an immutable reference to the script interface builder
+			///@brief Returns an immutable reference to the script interface builder
 			[[nodiscard]] inline auto& Builder() const noexcept
 			{
 				return builder_;
 			}
 
+			///@}
 
-			/*
-				Script repositories
+			/**
+				@name Script repositories
 				Creating
+				@{
 			*/
 
-			//Creates an empty script repository
+			///@brief Creates an empty script repository
 			NonOwningPtr<assets::repositories::ScriptRepository> CreateScriptRepository();
 
-			//Creates a script repository by copying the given script repository
+			///@brief Creates a script repository by copying the given script repository
 			NonOwningPtr<assets::repositories::ScriptRepository> CreateScriptRepository(const assets::repositories::ScriptRepository &repository);
 
-			//Creates a script repository by moving the given script repository
+			///@brief Creates a script repository by moving the given script repository
 			NonOwningPtr<assets::repositories::ScriptRepository> CreateScriptRepository(assets::repositories::ScriptRepository &&repository);
 
+			///@}
 
-			/*
-				Script repositories
+			/**
+				@name Script repositories
 				Removing
+				@{
 			*/
 
-			//Clears all script repositories from this script interface
+			///@brief Clears all script repositories from this script interface
 			void ClearScriptRepositories() noexcept;
 
-			//Removes a script repository from this script interface
+			///@brief Removes a script repository from this script interface
 			bool RemoveScriptRepository(assets::repositories::ScriptRepository &repository) noexcept;
 
+			///@}
 
-			/*
-				File repositories
+			/**
+				@name File repositories
 				Creating
+				@{
 			*/
 
-			//Creates an empty file repository
+			///@brief Creates an empty file repository
 			NonOwningPtr<assets::repositories::FileRepository> CreateFileRepository();
 
-			//Creates a file repository by copying the given file repository
+			///@brief Creates a file repository by copying the given file repository
 			NonOwningPtr<assets::repositories::FileRepository> CreateFileRepository(const assets::repositories::FileRepository &repository);
 
-			//Creates a file repository by moving the given file repository
+			///@brief Creates a file repository by moving the given file repository
 			NonOwningPtr<assets::repositories::FileRepository> CreateFileRepository(assets::repositories::FileRepository &&repository);
 
+			///@}
 
-			/*
-				File repositories
+			/**
+				@name File repositories
 				Removing
+				@{
 			*/
 
-			//Clears all file repositories from this script interface
+			///@brief Clears all file repositories from this script interface
 			void ClearFileRepositories() noexcept;
 
-			//Removes a file repository from this script interface
+			///@brief Removes a file repository from this script interface
 			bool RemoveFileRepository(assets::repositories::FileRepository &repository) noexcept;
+
+			///@}
 	};
 } //ion::script::interfaces
 

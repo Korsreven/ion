@@ -119,16 +119,19 @@ namespace ion::script::interfaces
 		};
 
 
-		/*
-			Validator classes
+		/**
+			@name Validator classes
+			@{
 		*/
 
 		script_validator::ClassDefinition get_shader_layout_class();
 		ScriptValidator get_shader_layout_validator();
 
+		///@}
 
-		/*
-			Tree parsing
+		/**
+			@name Tree parsing
+			@{
 		*/
 
 		void bind_struct(const script_tree::PropertyNode &property,
@@ -147,11 +150,13 @@ namespace ion::script::interfaces
 
 		void create_shader_layouts(const ScriptTree &tree,
 			graphics::shaders::ShaderProgramManager &shader_program_manager);
+
+		///@}
 	} //shader_layout_script_interface::detail
 
 
-	//A class representing an interface to a shader layout script with a complete validation scheme
-	//A shader layout script can load shader layouts from a script file into a shader program manager
+	///@brief A class representing an interface to a shader layout script with a complete validation scheme
+	///@details A shader layout script can load shader layouts from a script file into a shader program manager
 	class ShaderLayoutScriptInterface final : public ScriptInterface
 	{
 		private:
@@ -160,18 +165,21 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			ShaderLayoutScriptInterface() = default;
 
 
-			/*
-				Shader layouts
+			/**
+				@name Shader layouts
 				Creating from script
+				@{
 			*/
 
-			//Creates shader layouts from a script (or object file) with the given asset name
+			///@brief Creates shader layouts from a script (or object file) with the given asset name
 			void CreateShaderLayouts(std::string_view asset_name,
 				graphics::shaders::ShaderProgramManager &shader_program_manager);
+
+			///@}
 	};
 } //ion::script::interfaces
 

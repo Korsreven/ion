@@ -27,16 +27,19 @@ namespace ion::script::interfaces
 {
 	namespace shader_script_interface::detail
 	{
-		/*
-			Validator classes
+		/**
+			@name Validator classes
+			@{
 		*/
 
 		script_validator::ClassDefinition get_shader_class();
 		ScriptValidator get_shader_validator();
 
+		///@}
 
-		/*
-			Tree parsing
+		/**
+			@name Tree parsing
+			@{
 		*/
 
 		NonOwningPtr<graphics::shaders::Shader> create_shader(const script_tree::ObjectNode &object,
@@ -44,11 +47,13 @@ namespace ion::script::interfaces
 
 		void create_shaders(const ScriptTree &tree,
 			graphics::shaders::ShaderManager &shader_manager);
+
+		///@}
 	} //shader_script_interface::detail
 
 
-	//A class representing an interface to a shader script with a complete validation scheme
-	//A shader script can load shaders from a script file into a shader manager
+	///@brief A class representing an interface to a shader script with a complete validation scheme
+	///@details A shader script can load shaders from a script file into a shader manager
 	class ShaderScriptInterface final : public ScriptInterface
 	{
 		private:
@@ -57,18 +62,21 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			ShaderScriptInterface() = default;
 
 
-			/*
-				Shaders
+			/**
+				@name Shaders
 				Creating from script
+				@{
 			*/
 
-			//Creates shaders from a script (or object file) with the given asset name
+			///@brief Creates shaders from a script (or object file) with the given asset name
 			void CreateShaders(std::string_view asset_name,
 				graphics::shaders::ShaderManager &shader_manager);
+
+			///@}
 	};
 } //ion::script::interfaces
 

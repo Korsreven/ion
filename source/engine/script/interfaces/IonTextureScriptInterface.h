@@ -28,8 +28,9 @@ namespace ion::script::interfaces
 {
 	namespace texture_script_interface::detail
 	{
-		/*
-			Validator classes
+		/**
+			@name Validator classes
+			@{
 		*/
 
 		script_validator::ClassDefinition get_texture_class();
@@ -37,9 +38,11 @@ namespace ion::script::interfaces
 
 		ScriptValidator get_texture_validator();
 
+		///@}
 
-		/*
-			Tree parsing
+		/**
+			@name Tree parsing
+			@{
 		*/
 
 		NonOwningPtr<graphics::textures::Texture> create_texture(const script_tree::ObjectNode &object,
@@ -49,11 +52,13 @@ namespace ion::script::interfaces
 
 		void create_textures(const ScriptTree &tree,
 			graphics::textures::TextureManager &texture_manager);
+
+		///@}
 	} //texture_script_interface::detail
 
 
-	//A class representing an interface to a texture script with a complete validation scheme
-	//A texture script can load textures from a script file into a texture manager
+	///@brief A class representing an interface to a texture script with a complete validation scheme
+	///@details A texture script can load textures from a script file into a texture manager
 	class TextureScriptInterface final : public ScriptInterface
 	{
 		private:
@@ -62,18 +67,21 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			TextureScriptInterface() = default;
 
 
-			/*
-				Textures
+			/**
+				@name Textures
 				Creating from script
+				@{
 			*/
 
-			//Creates textures from a script (or object file) with the given asset name
+			///@brief Creates textures from a script (or object file) with the given asset name
 			void CreateTextures(std::string_view asset_name,
 				graphics::textures::TextureManager &texture_manager);
+
+			///@}
 	};
 } //ion::script::interfaces
 

@@ -27,16 +27,19 @@ namespace ion::script::interfaces
 {
 	namespace font_script_interface::detail
 	{
-		/*
-			Validator classes
+		/**
+			@name Validator classes
+			@{
 		*/
 
 		script_validator::ClassDefinition get_font_class();
 		ScriptValidator get_font_validator();
 
+		///@}
 
-		/*
-			Tree parsing
+		/**
+			@name Tree parsing
+			@{
 		*/
 
 		NonOwningPtr<graphics::fonts::Font> create_font(const script_tree::ObjectNode &object,
@@ -44,11 +47,13 @@ namespace ion::script::interfaces
 
 		void create_fonts(const ScriptTree &tree,
 			graphics::fonts::FontManager &font_manager);
+
+		///@}
 	} //font_script_interface::detail
 
 
-	//A class representing an interface to a font script with a complete validation scheme
-	//A font script can load fonts from a script file into a font manager
+	///@brief A class representing an interface to a font script with a complete validation scheme
+	///@details A font script can load fonts from a script file into a font manager
 	class FontScriptInterface final : public ScriptInterface
 	{
 		private:
@@ -57,18 +62,21 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			FontScriptInterface() = default;
 
 
-			/*
-				Fonts
+			/**
+				@name Fonts
 				Creating from script
+				@{
 			*/
 
-			//Creates fonts from a script (or object file) with the given asset name
+			///@brief Creates fonts from a script (or object file) with the given asset name
 			void CreateFonts(std::string_view asset_name,
 				graphics::fonts::FontManager &font_manager);
+
+			///@}
 	};
 } //ion::script::interfaces
 

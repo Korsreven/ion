@@ -40,8 +40,9 @@ namespace ion::script::interfaces
 		NonOwningPtr<graphics::materials::Material> get_material(std::string_view name, const ManagerRegister &managers) noexcept;
 
 
-		/*
-			Validator classes
+		/**
+			@name Validator classes
+			@{
 		*/
 
 		script_validator::ClassDefinition get_affector_class();
@@ -58,9 +59,11 @@ namespace ion::script::interfaces
 
 		ScriptValidator get_particle_system_validator();
 
+		///@}
 
-		/*
-			Tree parsing
+		/**
+			@name Tree parsing
+			@{
 		*/
 
 		void set_emitter_properties(const script_tree::ObjectNode &object, graphics::particles::Emitter &emitter,
@@ -100,11 +103,13 @@ namespace ion::script::interfaces
 
 		void create_particle_systems(const ScriptTree &tree,
 			graphics::particles::ParticleSystemManager &particle_system_manager, const ManagerRegister &managers);
+
+		///@}
 	} //particle_system_script_interface::detail
 
 
-	//A class representing an interface to a particle system script with a complete validation scheme
-	//A particle system script can load particle systems from a script file into a particle system manager
+	///@brief A class representing an interface to a particle system script with a complete validation scheme
+	///@details A particle system script can load particle systems from a script file into a particle system manager
 	class ParticleSystemScriptInterface final : public ScriptInterface
 	{
 		private:
@@ -113,22 +118,25 @@ namespace ion::script::interfaces
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			ParticleSystemScriptInterface() = default;
 
 
-			/*
-				Particle systems
+			/**
+				@name Particle systems
 				Creating from script
+				@{
 			*/
 
-			//Creates particle systems from a script (or object file) with the given asset name
+			///@brief Creates particle systems from a script (or object file) with the given asset name
 			void CreateParticleSystems(std::string_view asset_name,
 				graphics::particles::ParticleSystemManager &particle_system_manager);
 
-			//Creates particle systems from a script (or object file) with the given asset name
+			///@brief Creates particle systems from a script (or object file) with the given asset name
 			void CreateParticleSystems(std::string_view asset_name,
 				graphics::particles::ParticleSystemManager &particle_system_manager, const ManagerRegister &managers);
+
+			///@}
 	};
 } //ion::script::interfaces
 

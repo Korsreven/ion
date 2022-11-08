@@ -112,8 +112,9 @@ namespace ion::script
 					//Contains unique files (direct-line inclusion)
 					//front() returns the entry file path, and back() returns the current file path
 
-				/*
-					Observers
+				/**
+					@name Observers
+					@{
 				*/
 
 				inline auto& current_file_path() const noexcept
@@ -126,13 +127,17 @@ namespace ion::script
 					return stack.front();
 				}
 
+				///@}
 			
-				/*
-					Files
+				/**
+					@name Files
+					@{
 				*/
 
 				bool push_file(std::filesystem::path file_path);
 				void pop_file();
+
+				///@}
 			};
 
 			struct build_system
@@ -476,8 +481,9 @@ namespace ion::script
 				file_trace &trace, std::string &str, CompileError &error);
 
 
-			/*
-				Lexing
+			/**
+				@name Lexing
+				@{
 			*/
 
 			std::pair<std::string_view, int> get_comment_lexeme(std::string_view str) noexcept;
@@ -489,9 +495,11 @@ namespace ion::script
 
 			std::optional<lexical_tokens> lex(translation_unit &unit, file_trace trace, build_system &system);
 
+			///@}
 		
-			/*
-				Parsing
+			/**
+				@name Parsing
+				@{
 			*/
 
 			//Syntax checking
@@ -549,26 +557,32 @@ namespace ion::script
 
 			void inherit(script_tree::ObjectNodes &objects, template_rules &templates);
 
+			///@}
 
-			/*
-				Compiling
+			/**
+				@name Compiling
+				@{
 			*/
 
 			std::optional<ScriptTree> compile(file_trace trace, build_system &system, CompileError &error, std::vector<CompileError> &errors);
 			std::optional<ScriptTree> compile_unit(translation_unit &unit, file_trace trace, build_system &system);
 			std::optional<lexical_tokens> partial_compile_unit(translation_unit &unit, file_trace trace, build_system &system);
 			
+			///@}
 
-			/*
-				Outputting
+			/**
+				@name Outputting
+				@{
 			*/
 
 			std::string print_output(duration compile_time, const std::vector<CompileError> &errors, OutputOptions output_options);
+
+			///@}
 		} //detail
 	} //script_compiler
 
 
-	//A class that lexes, parses, links and compiles ION script code (.ion files) to a tree structure
+	///@brief A class that lexes, parses, links and compiles ION script code (.ion files) to a tree structure
 	class ScriptCompiler final
 	{
 		private:
@@ -581,98 +595,107 @@ namespace ion::script
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			ScriptCompiler() = default;
 
-
-			/*
-				Modifiers
+			
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the build repository the compiler has access to when compiling
+			///@brief Sets the build repository the compiler has access to when compiling
 			inline void BuildRepository(const assets::repositories::ScriptRepository &repository) noexcept
 			{
 				build_repository_ = &repository;
 			}
 
-			//Sets the build repository the compiler has access to when compiling
+			///@brief Sets the build repository the compiler has access to when compiling
 			inline void BuildRepository(std::nullptr_t) noexcept
 			{
 				build_repository_ = nullptr;
 			}
 
-			//Sets the max number of build processes the compiler is allowed to use
-			//If nullopt is passed, a default number of build processes will be used (based on your system)
+			///@brief Sets the max number of build processes the compiler is allowed to use
+			///@details If nullopt is passed, a default number of build processes will be used (based on your system)
 			inline void MaxBuildProcesses(std::optional<int> max_build_processes) noexcept
 			{
 				max_build_processes_ = max_build_processes;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns all compile errors from the previous compilation (per unit)
-			//The errors returned are per compiled unit (file)
-			//The compilation is successful if all errors returned indicates a success
+			///@brief Returns all compile errors from the previous compilation (per unit)
+			///@details The errors returned are per compiled unit (file).
+			///The compilation is successful if all errors returned indicates a success
 			[[nodiscard]] inline auto& CompileErrors() const noexcept
 			{
 				return compile_errors_;
 			}
 
-			//Returns the compile time of the previous compilation
+			///@brief Returns the compile time of the previous compilation
 			[[nodiscard]] inline auto CompileTime() const noexcept
 			{
 				return compile_time_;
 			}
 
 
-			//Returns the build repository the compiler has access to when compiling
-			//Returns nullptr if the compiler has no build repository
+			///@brief Returns the build repository the compiler has access to when compiling
+			///@details Returns nullptr if the compiler has no build repository
 			[[nodiscard]] inline auto BuildRepository() const noexcept
 			{
 				return build_repository_;
 			}
 
-			//Returns the max number of build processes the compiler is allowed to use
-			//If nullopt is returned, a default number of build processes is being used (based on your system)
+			///@brief Returns the max number of build processes the compiler is allowed to use
+			///@details If nullopt is returned, a default number of build processes is being used (based on your system)
 			[[nodiscard]] inline auto MaxBuildProcesses() const noexcept
 			{
 				return max_build_processes_;
 			}
 
+			///@}
 
-			/*
-				Compiling
+			/**
+				@name Compiling
+				@{
 			*/
 
-			//Compiles a script entry with the given name (from a repository) by lexing, parsing and linking it
-			//Returns a ScriptTree that contains objects, object properties and property arguments
+			///@brief Compiles a script entry with the given name (from a repository) by lexing, parsing and linking it
+			///@details Returns a ScriptTree that contains objects, object properties and property arguments
 			[[nodiscard]] std::optional<ScriptTree> Compile(std::string_view name, CompileError &error);
 
-			//Compiles a script file with the given file path by lexing, parsing and linking it
-			//Returns a ScriptTree that contains objects, object properties and property arguments
+			///@brief Compiles a script file with the given file path by lexing, parsing and linking it
+			///@details Returns a ScriptTree that contains objects, object properties and property arguments
 			[[nodiscard]] std::optional<ScriptTree> CompileFile(std::filesystem::path file_path, CompileError &error);
 
-			//Compiles a script file with the given file path (and root path) by lexing, parsing and linking it
-			//Returns a ScriptTree that contains objects, object properties and property arguments
+			///@brief Compiles a script file with the given file path (and root path) by lexing, parsing and linking it
+			///@details Returns a ScriptTree that contains objects, object properties and property arguments
 			[[nodiscard]] std::optional<ScriptTree> CompileFile(std::filesystem::path file_path, std::filesystem::path root_path, CompileError &error);
 
-			//Compiles the given script string by lexing, parsing and linking it
+			///@brief Compiles the given script string by lexing, parsing and linking it
 			[[nodiscard]] std::optional<ScriptTree> CompileString(std::string str, CompileError &error);
 
-			//Compiles the given script string (and root path) by lexing, parsing and linking it
+			///@brief Compiles the given script string (and root path) by lexing, parsing and linking it
 			[[nodiscard]] std::optional<ScriptTree> CompileString(std::string str, std::filesystem::path root_path, CompileError &error);
 
+			///@}
 
-			/*
-				Outputting
+			/**
+				@name Outputting
+				@{
 			*/
 
-			//Prints the output from the previous compilation
-			//Whats printed is based on the given compiler output options
+			///@brief Prints the output from the previous compilation
+			///@details Whats printed is based on the given compiler output options
 			[[nodiscard]] std::string PrintOutput(script_compiler::OutputOptions output_options = script_compiler::OutputOptions::SummaryAndUnits) const;
+
+			///@}
 	};
 } //ion::script
 

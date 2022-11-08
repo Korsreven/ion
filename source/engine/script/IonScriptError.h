@@ -129,7 +129,7 @@ namespace ion::script
 	} //script_error
 
 
-	//A base class representing a general scripting error with the error condition
+	///@brief A base class representing a general scripting error with the error condition
 	struct ScriptError
 	{
 		std::error_condition Condition;
@@ -140,14 +140,14 @@ namespace ion::script
 		}
 	};
 	
-	//A class representing a script compilation error with the file path and line number
+	///@brief A class representing a script compilation error with the file path and line number
 	struct CompileError final : ScriptError
 	{
 		std::filesystem::path FilePath;
 		int LineNumber = 0;
 	};
 
-	//A class representing a script validation error with the fully qualified name
+	///@brief A class representing a script validation error with the fully qualified name
 	struct ValidateError final : ScriptError
 	{
 		std::string FullyQualifiedName;
@@ -155,7 +155,7 @@ namespace ion::script
 } //ion::script
 
 
-//Registers custom error conditions to namespace std
+///@brief Registers custom error conditions to namespace std
 namespace std
 {
 	template<> struct is_error_condition_enum<ion::script::script_error::CompileErrorCode> : std::true_type
