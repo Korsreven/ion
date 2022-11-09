@@ -33,139 +33,149 @@ namespace ion::graphics::materials
 	} //material_manager::detail
 
 
-	//A class that manages and stores materials
+	///@brief A class that manages and stores materials
 	class MaterialManager final :
 		public managed::ObjectManager<Material, MaterialManager>
 	{
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			MaterialManager() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			MaterialManager(const MaterialManager&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			MaterialManager(MaterialManager&&) = default;
 
-			//Destructor
+			///@brief Destructor
 			~MaterialManager() = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			MaterialManager& operator=(const MaterialManager&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			MaterialManager& operator=(MaterialManager&&) = default;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
 			*/
 
-			//Returns a mutable range of all materials in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all materials in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Materials() noexcept
 			{
 				return Objects();
 			}
 
-			//Returns an immutable range of all materials in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all materials in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Materials() const noexcept
 			{
 				return Objects();
 			}
 
+			///@}
 
-			/*
-				Materials
+			/**
+				@name Materials
 				Creating
+				@{
 			*/
 
-			//Creates a material with the given name
+			///@brief Creates a material with the given name
 			NonOwningPtr<Material> CreateMaterial(std::string name);
 
-			//Creates a material with the given name and diffuse color
+			///@brief Creates a material with the given name and diffuse color
 			NonOwningPtr<Material> CreateMaterial(std::string name, const Color &diffuse);
 
-			//Creates a material with the given name, diffuse map and diffuse color
+			///@brief Creates a material with the given name, diffuse map and diffuse color
 			NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Animation> diffuse_map, const Color &diffuse = color::White);
 
-			//Creates a material with the given name, diffuse map and diffuse color
+			///@brief Creates a material with the given name, diffuse map and diffuse color
 			NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Texture> diffuse_map, const Color &diffuse = color::White);
 
 
-			//Creates a material with the given name, ambient color, diffuse color, specular color, emissive color and shininess
+			///@brief Creates a material with the given name, ambient color, diffuse color, specular color, emissive color and shininess
 			NonOwningPtr<Material> CreateMaterial(std::string name,
 				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive,
 				real shininess = material::detail::default_shininess);
 
-			//Creates a material with the given name, diffuse map, normal map, specular map, emissive map,
-			//diffuse color and shininess
+			///@brief Creates a material with the given name, diffuse map, normal map, specular map, emissive map,
+			///diffuse color and shininess
 			NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Animation> diffuse_map,
 				NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> emissive_map,
 				const Color &diffuse = color::White, real shininess = material::detail::default_shininess);
 
-			//Creates a material with the given name, diffuse map, normal map, specular map, emissive map,
-			//diffuse color and shininess
+			///@brief Creates a material with the given name, diffuse map, normal map, specular map, emissive map,
+			///diffuse color and shininess
 			NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Texture> diffuse_map,
 				NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> emissive_map,
 				const Color &diffuse = color::White, real shininess = material::detail::default_shininess);
 
-			//Creates a material with the given name, diffuse map, normal map, specular map, emissive map,
-			//ambient color, diffuse color, specular color, emissive color and shininess
+			///@brief Creates a material with the given name, diffuse map, normal map, specular map, emissive map,
+			///ambient color, diffuse color, specular color, emissive color and shininess
 			NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Animation> diffuse_map,
 				NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> emissive_map,
 				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive,
 				real shininess = material::detail::default_shininess);
 
-			//Creates a material with the given name, diffuse map, normal map, specular map, emissive map,
-			//ambient color, diffuse color, specular color, emissive color and shininess
+			///@brief Creates a material with the given name, diffuse map, normal map, specular map, emissive map,
+			///ambient color, diffuse color, specular color, emissive color and shininess
 			NonOwningPtr<Material> CreateMaterial(std::string name, NonOwningPtr<Texture> diffuse_map,
 				NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> emissive_map,
 				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive,
 				real shininess = material::detail::default_shininess);
 
 
-			//Creates a material as a copy of the given material
+			///@brief Creates a material as a copy of the given material
 			NonOwningPtr<Material> CreateMaterial(const Material &material);
 
-			//Creates a material by moving the given material
+			///@brief Creates a material by moving the given material
 			NonOwningPtr<Material> CreateMaterial(Material &&material);
 
+			///@}
 
-			/*
-				Materials
+			/**
+				@name Materials
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable material with the given name
-			//Returns nullptr if material could not be found
+			///@brief Gets a pointer to a mutable material with the given name
+			///@details Returns nullptr if material could not be found
 			[[nodiscard]] NonOwningPtr<Material> GetMaterial(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable material with the given name
-			//Returns nullptr if material could not be found
+			///@brief Gets a pointer to an immutable material with the given name
+			///@details Returns nullptr if material could not be found
 			[[nodiscard]] NonOwningPtr<const Material> GetMaterial(std::string_view name) const noexcept;
 
+			///@}
 
-			/*
-				Materials
+			/**
+				@name Materials
 				Removing
+				@{
 			*/
 
-			//Clears all removable materials from this manager
+			///@brief Clears all removable materials from this manager
 			void ClearMaterials() noexcept;
 
-			//Removes a removable material from this manager
+			///@brief Removes a removable material from this manager
 			bool RemoveMaterial(Material &material) noexcept;
 
-			//Removes a removable material with the given name from this manager
+			///@brief Removes a removable material with the given name from this manager
 			bool RemoveMaterial(std::string_view name) noexcept;
+
+			///@}
 	};
 } //ion::graphics::materials
 

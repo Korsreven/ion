@@ -55,8 +55,9 @@ namespace ion::graphics::materials
 		constexpr auto default_shininess = 32.0_r;
 
 
-		/*
-			Texure coordinates
+		/**
+			@name Texure coordinates
+			@{
 		*/
 
 		inline auto is_cropped(const Vector2 &lower_left, const Vector2 &upper_right) noexcept
@@ -96,9 +97,11 @@ namespace ion::graphics::materials
 		std::pair<Vector2, Vector2> get_normalized_tex_coords(const Vector2 &lower_left, const Vector2 &upper_right,
 			const Vector2 &min, const Vector2 &max) noexcept;
 
+		///@}
 
-		/*
-			Texture map
+		/**
+			@name Texture map
+			@{
 		*/
 
 		std::pair<NonOwningPtr<Animation>, NonOwningPtr<Texture>> get_texture_maps(const texture_map_type &texture_map) noexcept;
@@ -108,10 +111,12 @@ namespace ion::graphics::materials
 
 		std::pair<bool, bool> is_texture_map_repeatable(const Texture &texture,
 			const Vector2 &lower_left, const Vector2 &upper_right) noexcept;
+
+		///@}
 	} //material::detail
 
 
-	//A class representing a material with ambient, diffuse, specular, emissive and shininess properties
+	///@brief A class representing a material with ambient, diffuse, specular, emissive and shininess properties
 	class Material final : public managed::ManagedObject<MaterialManager>
 	{
 		private:
@@ -136,45 +141,45 @@ namespace ion::graphics::materials
 
 		public:
 
-			//Constructs a new material with the given name
+			///@brief Constructs a new material with the given name
 			explicit Material(std::string name) noexcept;
 
-			//Constructs a new material with the given name and diffuse color
+			///@brief Constructs a new material with the given name and diffuse color
 			Material(std::string name, const Color &diffuse) noexcept;
 
-			//Constructs a new material with the given name, diffuse map and diffuse color
+			///@brief Constructs a new material with the given name, diffuse map and diffuse color
 			Material(std::string name, NonOwningPtr<Animation> diffuse_map, const Color &diffuse = color::White) noexcept;
 
-			//Constructs a new material with the given name, diffuse map and diffuse color
+			///@brief Constructs a new material with the given name, diffuse map and diffuse color
 			Material(std::string name, NonOwningPtr<Texture> diffuse_map, const Color &diffuse = color::White) noexcept;
 
 
-			//Constructs a new material with the given name, ambient color, diffuse color, specular color, emissive color and shininess
+			///@brief Constructs a new material with the given name, ambient color, diffuse color, specular color, emissive color and shininess
 			Material(std::string name,
 				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive,
 				real shininess = material::detail::default_shininess) noexcept;
 
-			//Constructs a new material with the given name, diffuse map, normal map, specular map, emissive map,
-			//diffuse color and shininess
+			///@brief Constructs a new material with the given name, diffuse map, normal map, specular map, emissive map,
+			///diffuse color and shininess
 			Material(std::string name, NonOwningPtr<Animation> diffuse_map,
 				NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> emissive_map,
 				const Color &diffuse = color::White, real shininess = material::detail::default_shininess) noexcept;
 
-			//Constructs a new material with the given name, diffuse map, normal map, specular map, emissive map,
-			//diffuse color and shininess
+			///@brief Constructs a new material with the given name, diffuse map, normal map, specular map, emissive map,
+			///diffuse color and shininess
 			Material(std::string name, NonOwningPtr<Texture> diffuse_map,
 				NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> emissive_map,
 				const Color &diffuse = color::White, real shininess = material::detail::default_shininess) noexcept;
 
-			//Constructs a new material with the given name, diffuse map, normal map, specular map, emissive map,
-			//ambient color, diffuse color, specular color, emissive color and shininess
+			///@brief Constructs a new material with the given name, diffuse map, normal map, specular map, emissive map,
+			///ambient color, diffuse color, specular color, emissive color and shininess
 			Material(std::string name, NonOwningPtr<Animation> diffuse_map,
 				NonOwningPtr<Animation> normal_map, NonOwningPtr<Animation> specular_map, NonOwningPtr<Animation> emissive_map,
 				const Color &ambient, const Color &diffuse, const Color &specular, const Color &emissive,
 				real shininess = material::detail::default_shininess) noexcept;
 
-			//Constructs a new material with the given name, diffuse map, normal map, specular map, emissive map,
-			//ambient color, diffuse color, specular color, emissive color and shininess
+			///@brief Constructs a new material with the given name, diffuse map, normal map, specular map, emissive map,
+			///ambient color, diffuse color, specular color, emissive color and shininess
 			Material(std::string name,
 				NonOwningPtr<Texture> diffuse_map,
 				NonOwningPtr<Texture> normal_map, NonOwningPtr<Texture> specular_map, NonOwningPtr<Texture> emissive_map,
@@ -182,18 +187,19 @@ namespace ion::graphics::materials
 				real shininess = material::detail::default_shininess) noexcept;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the ambient color of this material to the given color
+			///@brief Sets the ambient color of this material to the given color
 			inline void AmbientColor(const Color &ambient) noexcept
 			{
 				ambient_color_ = ambient;
 			}
 			
-			//Sets the diffuse color of this material to the given color
-			//Also sets the ambient color if equal to the diffuse color
+			///@brief Sets the diffuse color of this material to the given color
+			///@details Also sets the ambient color if equal to the diffuse color
 			inline void DiffuseColor(const Color &diffuse) noexcept
 			{
 				if (diffuse_color_ == ambient_color_)
@@ -202,83 +208,83 @@ namespace ion::graphics::materials
 				diffuse_color_ = diffuse;
 			}
 			
-			//Sets the specular color of this material to the given color
+			///@brief Sets the specular color of this material to the given color
 			inline void SpecularColor(const Color &specular) noexcept
 			{
 				specular_color_ = specular;
 			}
 
-			//Sets the emissive (self-illumination) color of this material to the given color
+			///@brief Sets the emissive (self-illumination) color of this material to the given color
 			inline void EmissiveColor(const Color &emissive) noexcept
 			{
 				emissive_color_ = emissive;
 			}
 
-			//Sets the shininess of the material to the given value
+			///@brief Sets the shininess of the material to the given value
 			inline void Shininess(real shininess) noexcept
 			{
 				shininess_ = shininess;
 			}
 
 
-			//Attaches the given animation as a diffuse map for the material
+			///@brief Attaches the given animation as a diffuse map for the material
 			inline void DiffuseMap(NonOwningPtr<Animation> animation) noexcept
 			{
 				diffuse_map_ = animation;
 			}
 
-			//Attaches the given texture as a diffuse map for the material
+			///@brief Attaches the given texture as a diffuse map for the material
 			inline void DiffuseMap(NonOwningPtr<Texture> texture) noexcept
 			{
 				diffuse_map_ = texture;
 			}
 
-			//Detaches the diffuse map from the material
+			///@brief Detaches the diffuse map from the material
 			inline void DiffuseMap(std::nullptr_t) noexcept
 			{
 				diffuse_map_ = std::monostate{};
 			}
 
 
-			//Attaches the given animation as a normal map for the material
+			///@brief Attaches the given animation as a normal map for the material
 			inline void NormalMap(NonOwningPtr<Animation> animation) noexcept
 			{
 				normal_map_ = animation;
 			}
 
-			//Attaches the given texture as a normal map for the material
+			///@brief Attaches the given texture as a normal map for the material
 			inline void NormalMap(NonOwningPtr<Texture> texture) noexcept
 			{
 				normal_map_ = texture;
 			}
 
-			//Detaches the normal map from the material
+			///@brief Detaches the normal map from the material
 			inline void NormalMap(std::nullptr_t) noexcept
 			{
 				normal_map_ = std::monostate{};
 			}
 
 
-			//Attaches the given animation as a specular map for the material
+			///@brief Attaches the given animation as a specular map for the material
 			inline void SpecularMap(NonOwningPtr<Animation> animation) noexcept
 			{
 				specular_map_ = animation;
 			}
 
-			//Attaches the given texture as a specular map for the material
+			///@brief Attaches the given texture as a specular map for the material
 			inline void SpecularMap(NonOwningPtr<Texture> texture) noexcept
 			{
 				specular_map_ = texture;
 			}
 
-			//Detaches the specular map from the material
+			///@brief Detaches the specular map from the material
 			inline void SpecularMap(std::nullptr_t) noexcept
 			{
 				specular_map_ = std::monostate{};
 			}
 
 
-			//Attaches the given animation as a emissive map for the material
+			///@brief Attaches the given animation as a emissive map for the material
 			inline void EmissiveMap(NonOwningPtr<Animation> animation) noexcept
 			{
 				if (emissive_map_.index() == 0 && animation && emissive_color_ == color::Black)
@@ -287,7 +293,7 @@ namespace ion::graphics::materials
 				emissive_map_ = animation;
 			}
 
-			//Attaches the given texture as a emissive map for the material
+			///@brief Attaches the given texture as a emissive map for the material
 			inline void EmissiveMap(NonOwningPtr<Texture> texture) noexcept
 			{
 				if (emissive_map_.index() == 0 && texture && emissive_color_ == color::Black)
@@ -296,7 +302,7 @@ namespace ion::graphics::materials
 				emissive_map_ = texture;
 			}
 
-			//Detaches the emissive map from the material
+			///@brief Detaches the emissive map from the material
 			inline void EmissiveMap(std::nullptr_t) noexcept
 			{
 				if (emissive_map_.index() > 0 && emissive_color_ == color::White)
@@ -306,7 +312,7 @@ namespace ion::graphics::materials
 			}
 
 
-			//Sets the lower left and upper right texture coordinates for this material to the given coordinates
+			///@brief Sets the lower left and upper right texture coordinates for this material to the given coordinates
 			inline void TexCoords(const Vector2 &lower_left, const Vector2 &upper_right) noexcept
 			{
 				lower_left_tex_coord_ = lower_left;
@@ -314,175 +320,181 @@ namespace ion::graphics::materials
 			}
 
 
-			//Sets the emissive light radius of the material to the given value
+			///@brief Sets the emissive light radius of the material to the given value
 			inline void EmissiveLightRadius(std::optional<real> radius) noexcept
 			{
 				emissive_light_radius_ = radius;
 			}
 
-			//Sets if this material has lighting enabled or not
+			///@brief Sets if this material has lighting enabled or not
 			inline void LightingEnabled(bool enabled) noexcept
 			{
 				lighting_enabled_ = enabled;
 			}
 
-			//Sets if this material receives shadows or not
+			///@brief Sets if this material receives shadows or not
 			inline void ReceiveShadows(bool enabled) noexcept
 			{
 				receive_shadows_ = enabled;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the ambient color of the material
+			///@brief Returns the ambient color of the material
 			[[nodiscard]] inline auto& AmbientColor() const noexcept
 			{
 				return ambient_color_;
 			}
 			
-			//Returns the diffuse color of the material
+			///@brief Returns the diffuse color of the material
 			[[nodiscard]] inline auto& DiffuseColor() const noexcept
 			{
 				return diffuse_color_;
 			}
 			
-			//Returns the specular color of the material
+			///@brief Returns the specular color of the material
 			[[nodiscard]] inline auto& SpecularColor() const noexcept
 			{
 				return specular_color_;
 			}
 
-			//Returns the emissive (self-illumination) color of the material
+			///@brief Returns the emissive (self-illumination) color of the material
 			[[nodiscard]] inline auto& EmissiveColor() const noexcept
 			{
 				return emissive_color_;
 			}
 
-			//Returns the shininess of this material
+			///@brief Returns the shininess of this material
 			[[nodiscard]] inline auto Shininess() const noexcept
 			{
 				return shininess_;
 			}
 
 
-			//Returns the attached diffuse map as a pair of either animation or texture
-			//Returns nullptr on both components if no diffuse map is in use
+			///@brief Returns the attached diffuse map as a pair of either animation or texture
+			///@details Returns nullptr on both components if no diffuse map is in use
 			[[nodiscard]] inline auto DiffuseMap() const noexcept
 			{
 				return material::detail::get_texture_maps(diffuse_map_);
 			}
 
-			//Returns the attached normal map as a pair of either animation or texture
-			//Returns nullptr on both components if no normal map is in use
+			///@brief Returns the attached normal map as a pair of either animation or texture
+			///@details Returns nullptr on both components if no normal map is in use
 			[[nodiscard]] inline auto NormalMap() const noexcept
 			{
 				return material::detail::get_texture_maps(normal_map_);
 			}
 
-			//Returns the attached specular map as a pair of either animation or texture
-			//Returns nullptr on both components if no specular map is in use
+			///@brief Returns the attached specular map as a pair of either animation or texture
+			///@details Returns nullptr on both components if no specular map is in use
 			[[nodiscard]] inline auto SpecularMap() const noexcept
 			{
 				return material::detail::get_texture_maps(specular_map_);
 			}
 
-			//Returns the attached emissive map as a pair of either animation or texture
-			//Returns nullptr on both components if no emissive map is in use
+			///@brief Returns the attached emissive map as a pair of either animation or texture
+			///@details Returns nullptr on both components if no emissive map is in use
 			[[nodiscard]] inline auto EmissiveMap() const noexcept
 			{
 				return material::detail::get_texture_maps(emissive_map_);
 			}
 
 
-			//Returns the attached diffuse map texture at the given time
-			//Returns nullptr if no diffuse map is in use
+			///@brief Returns the attached diffuse map texture at the given time
+			///@details Returns nullptr if no diffuse map is in use
 			[[nodiscard]] NonOwningPtr<Texture> DiffuseMap(duration time) const noexcept;
 
-			//Returns the attached normal map texture at the given time
-			//Returns nullptr if no normal map is in use
+			///@brief Returns the attached normal map texture at the given time
+			///@details Returns nullptr if no normal map is in use
 			[[nodiscard]] NonOwningPtr<Texture> NormalMap(duration time) const noexcept;
 
-			//Returns the attached specular map texture at the given time
-			//Returns nullptr if no specular map is in use
+			///@brief Returns the attached specular map texture at the given time
+			///@details Returns nullptr if no specular map is in use
 			[[nodiscard]] NonOwningPtr<Texture> SpecularMap(duration time) const noexcept;
 
-			//Returns the attached emissive map texture at the given time
-			//Returns nullptr if no emissive map is in use
+			///@brief Returns the attached emissive map texture at the given time
+			///@details Returns nullptr if no emissive map is in use
 			[[nodiscard]] NonOwningPtr<Texture> EmissiveMap(duration time) const noexcept;
 
 
-			//Returns the lower left and upper right texture coordinates for this material
+			///@brief Returns the lower left and upper right texture coordinates for this material
 			[[nodiscard]] inline auto TexCoords() const noexcept
 			{
 				return std::pair{lower_left_tex_coord_, upper_right_tex_coord_};
 			}
 
 
-			//Returns the emissive light radius of the material
-			//Returns nullopt if light radius is automatic
+			///@brief Returns the emissive light radius of the material
+			///@details Returns nullopt if light radius is automatic
 			[[nodiscard]] inline auto EmissiveLightRadius() const noexcept
 			{
 				return emissive_light_radius_;
 			}
 
-			//Returns true if this material has lighting enabled
+			///@brief Returns true if this material has lighting enabled
 			[[nodiscard]] inline auto LightingEnabled() const noexcept
 			{
 				return lighting_enabled_;
 			}
 
-			//Returns true if this material receives shadows
+			///@brief Returns true if this material receives shadows
 			[[nodiscard]] inline auto ReceiveShadows() const noexcept
 			{
 				return receive_shadows_;
 			}
 
+			///@}
 
-			/*
-				Texture coordinates
+			/**
+				@name Texture coordinates
+				@{
 			*/
 
-			//Crop material texture maps by the given area, where values are in range [0.0, 1.0]
-			//This operation will discard any repeating previously applied
+			///@brief Crop material texture maps by the given area, where values are in range [0.0, 1.0]
+			///@details This operation will discard any repeating previously applied
 			void Crop(const std::optional<Aabb> &area) noexcept;
 
-			//Repeat material texture maps by the given amount, where values are in range [0.0, oo)
-			//This operation will discard any cropping previously applied
+			///@brief Repeat material texture maps by the given amount, where values are in range [0.0, oo)
+			///@details This operation will discard any cropping previously applied
 			void Repeat(const std::optional<Vector2> &amount) noexcept;
 
 
-			//Flip material texture maps horizontally (mirror)
+			///@brief Flip material texture maps horizontally (mirror)
 			void FlipHorizontal() noexcept;
 
-			//Flip material texture maps vertically (up-down)
+			///@brief Flip material texture maps vertically (up-down)
 			void FlipVertical() noexcept;
 
 
-			//Returns true if this materials texture maps are cropped
+			///@brief Returns true if this materials texture maps are cropped
 			[[nodiscard]] bool IsCropped() const noexcept;
 
-			//Returns true if this materials texture maps are repeated
+			///@brief Returns true if this materials texture maps are repeated
 			[[nodiscard]] bool IsRepeated() const noexcept;
 
-			//Returns a pair of true/false to indicate which texture maps axis for this material is repeatable
-			//For animations, repeatability is only retrieved from the first frame
+			///@brief Returns a pair of true/false to indicate which texture maps axis for this material is repeatable
+			///@details For animations, repeatability is only retrieved from the first frame
 			[[nodiscard]] std::pair<bool, bool> IsRepeatable() const noexcept;
 
 
-			//Returns true if this materials texture maps are flipped horizontally
+			///@brief Returns true if this materials texture maps are flipped horizontally
 			[[nodiscard]] bool IsFlippedHorizontally() const noexcept;
 
-			//Returns true if this materials texture maps are flipped vertically
+			///@brief Returns true if this materials texture maps are flipped vertically
 			[[nodiscard]] bool IsFlippedVertically() const noexcept;
 
 
-			//Returns the lower left and upper right texture coordinates for this material
-			//Combines the relative tex coords for the material, to that of the actual texture
-			//For animations, tex coords are only retrieved from the first frame
+			///@brief Returns the lower left and upper right texture coordinates for this material
+			///@details Combines the relative tex coords for the material, to that of the actual texture.
+			///For animations, tex coords are only retrieved from the first frame
 			[[nodiscard]] std::pair<Vector2, Vector2> WorldTexCoords() const noexcept;
+
+			///@}
 	};
 } //ion::graphics::materials
 
