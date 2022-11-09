@@ -24,58 +24,63 @@ namespace ion::graphics::particles::affectors
 	} //affector_manager::detail
 
 
-	//A class that manages and stores affectors
+	///@brief A class that manages and stores affectors
 	class AffectorManager : public managed::ObjectManager<Affector, AffectorManager>
 	{
 		protected:
 
-			//Can only be instantiated by derived
+			///@brief Can only be instantiated by derived
 			AffectorManager() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			AffectorManager(const AffectorManager&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			AffectorManager(AffectorManager&&) = default;
 
 		public:
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			AffectorManager& operator=(const AffectorManager&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			AffectorManager& operator=(AffectorManager&&) = default;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all affectors in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all affectors in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Affectors() noexcept
 			{
 				return Objects();
 			}
 
-			//Returns an immutable range of all affectors in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all affectors in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Affectors() const noexcept
 			{
 				return Objects();
 			}
 
+			///@}
 
-			/*
-				Affectors
+			/**
+				@name Affectors
 				Creating
+				@{
 			*/
 
-			//Creates an affector of type T with the given name and arguments
+			///@brief Creates an affector of type T with the given name and arguments
 			template <typename T, typename... Args>
 			auto CreateAffector(std::string name, Args &&...args)
 			{
@@ -86,7 +91,7 @@ namespace ion::graphics::particles::affectors
 			}
 
 
-			//Creates an affector of type T as a copy of the given affector
+			///@brief Creates an affector of type T as a copy of the given affector
 			template <typename T>
 			auto CreateAffector(const T &affector_t)
 			{
@@ -96,7 +101,7 @@ namespace ion::graphics::particles::affectors
 				return static_pointer_cast<T>(ptr);
 			}
 
-			//Creates an affector of type T by moving the given affector
+			///@brief Creates an affector of type T by moving the given affector
 			template <typename T>
 			auto CreateAffector(T &&affector_t)
 			{
@@ -106,43 +111,49 @@ namespace ion::graphics::particles::affectors
 				return static_pointer_cast<T>(ptr);
 			}
 
+			///@}
 
-			/*
-				Affectors
+			/**
+				@name Affectors
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable affector with the given name
-			//Returns nullptr if affector could not be found
+			///@brief Gets a pointer to a mutable affector with the given name
+			///@details Returns nullptr if affector could not be found
 			[[nodiscard]] auto GetAffector(std::string_view name) noexcept
 			{
 				return Get(name);
 			}
 
-			//Gets a pointer to an immutable affector with the given name
-			//Returns nullptr if affector could not be found
+			///@brief Gets a pointer to an immutable affector with the given name
+			///@details Returns nullptr if affector could not be found
 			[[nodiscard]] auto GetAffector(std::string_view name) const noexcept
 			{
 				return Get(name);
 			}
 
+			///@}
 
-			/*
-				Affectors
+			/**
+				@name Affectors
 				Removing
+				@{
 			*/
 
-			//Clears all affectors from this manager
+			///@brief Clears all affectors from this manager
 			void ClearAffectors() noexcept
 			{
 				Clear();
 			}
 
-			//Removes an affector from this manager
+			///@brief Removes an affector from this manager
 			auto RemoveAffector(Affector &affector) noexcept
 			{
 				return Remove(affector);
 			}
+
+			///@}
 	};
 } //ion::graphics::particles::affectors
 

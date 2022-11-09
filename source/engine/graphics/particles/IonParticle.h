@@ -31,15 +31,15 @@ namespace ion::graphics::particles
 	using utilities::Vector3;
 
 
-	//Particle class that can be represented by...
-	//1. A single point (1 vertex)
-	//2. A rectangle (4 vertices)
+	///@brief Particle class that can be represented by...
+	///@details 1. A single point (1 vertex).
+	///2. A rectangle (4 vertices)
 	class Particle final
 	{
 		private:
 
 			Vector3 position_;
-			Vector2 direction_; //Length represents velocity		
+			Vector2 direction_; ///<Length represents velocity		
 			real rotation_ = 0.0_r;
 			Vector2 size_;
 			real mass_ = 0.0_r;
@@ -50,136 +50,142 @@ namespace ion::graphics::particles
 
 		public:
 
+			///@brief Default constructor
 			Particle() = default;
 
-			//Constructs a new particle from the given initial values
+			///@brief Constructs a new particle from the given initial values
 			Particle(const Vector3 &position, const Vector2 &direction,
 					 const Vector2 &size, real mass, const Color &color,
 					 duration lifetime, const Vector2 &initial_direction) noexcept;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the position of the particle to the given vector
+			///@brief Sets the position of the particle to the given vector
 			inline void Position(const Vector3 &position) noexcept
 			{
 				position_ = position;
 			}
 
-			//Sets the position of the particle to the given vector
+			///@brief Sets the position of the particle to the given vector
 			inline void Position(const Vector2 &position) noexcept
 			{
 				Position({position.X(), position.Y(), position_.Z()});
 			}
 
-			//Sets the direction of the particle to the given vector
-			//Where the length of the given vector represents velocity
+			///@brief Sets the direction of the particle to the given vector
+			///@details Where the length of the given vector represents velocity
 			inline void Direction(const Vector2 &direction) noexcept
 			{
 				direction_ = direction;
 				rotation_ = direction.SignedAngleBetween(initial_direction_); //Update rotation
 			}
 
-			//Sets the velocity (direction length) of the particle to the given value
+			///@brief Sets the velocity (direction length) of the particle to the given value
 			inline void Velocity(real velocity) noexcept
 			{
 				direction_.Normalize();
 				direction_ *= velocity;
 			}
 
-			//Sets the size of the particle to the given vector
+			///@brief Sets the size of the particle to the given vector
 			inline void Size(const Vector2 &size) noexcept
 			{
 				size_ = size;
 			}
 
-			//Sets the mass of the particle to the given value
+			///@brief Sets the mass of the particle to the given value
 			inline void Mass(real mass) noexcept
 			{
 				mass_ = mass;
 			}
 
-			//Sets the color of the particle to the given color
+			///@brief Sets the color of the particle to the given color
 			inline void FillColor(const Color &color) noexcept
 			{
 				color_ = color;
 			}
 
-			//Sets the lifetime of the particle to the given duration
+			///@brief Sets the lifetime of the particle to the given duration
 			inline void Lifetime(duration lifetime) noexcept
 			{
 				lifetime_.Limit(lifetime);
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the position of the particle
+			///@brief Returns the position of the particle
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}
 
-			//Returns the direction of the particle
-			//Where the length of the vector represents velocity
+			///@brief Returns the direction of the particle
+			///@details Where the length of the vector represents velocity
 			[[nodiscard]] inline auto& Direction() const noexcept
 			{
 				return direction_;
 			}
 
-			//Returns the velocity (direction length) of the particle
+			///@brief Returns the velocity (direction length) of the particle
 			[[nodiscard]] inline auto Velocity() const noexcept
 			{
 				return direction_.Length();
 			}
 
-			//Returns the angle of rotation (in radians) of the particle
+			///@brief Returns the angle of rotation (in radians) of the particle
 			[[nodiscard]] inline auto& Rotation() const noexcept
 			{
 				return rotation_;
 			}
 
-			//Returns the size of the particle
+			///@brief Returns the size of the particle
 			[[nodiscard]] inline auto& Size() const noexcept
 			{
 				return size_;
 			}
 
-			//Returns the mass of the particle
+			///@brief Returns the mass of the particle
 			[[nodiscard]] inline auto Mass() const noexcept
 			{
 				return mass_;
 			}
 
-			//Returns the color of the particle
+			///@brief Returns the color of the particle
 			[[nodiscard]] inline auto& FillColor() const noexcept
 			{
 				return color_;
 			}
 
-			//Returns the lifetime of the particle
+			///@brief Returns the lifetime of the particle
 			[[nodiscard]] inline auto Lifetime() const noexcept
 			{
 				return lifetime_.Limit();
 			}
 
-			//Returns the lifetime percent of the particle in range [0.0, 1.0]
+			///@brief Returns the lifetime percent of the particle in range [0.0, 1.0]
 			[[nodiscard]] inline auto LifetimePercent() const noexcept
 			{
 				return lifetime_.Percent();
 			}
 
+			///@}
 
-			/*
-				Evolving
+			/**
+				@name Evolving
+				@{
 			*/
 
-			//Evolves particle by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Evolves particle by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			inline auto Evolve(duration time) noexcept
 			{
 				if (lifetime_ += time)
@@ -190,6 +196,8 @@ namespace ion::graphics::particles
 					return true;
 				}
 			}
+
+			///@}
 	};
 } //ion::graphics::particles
 

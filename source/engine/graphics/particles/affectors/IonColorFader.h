@@ -37,27 +37,30 @@ namespace ion::graphics::particles::affectors
 			std::optional<Color> ToColor;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Returns true if this percent is less than the given step percent
+			///@brief Returns true if this percent is less than the given step percent
 			[[nodiscard]] inline auto operator<(const Step &rhs) const noexcept
 			{
 				return Percent < rhs.Percent;
 			}
 
-			//Returns true if this percent is less than the given percent
+			///@brief Returns true if this percent is less than the given percent
 			[[nodiscard]] inline auto operator<(real percent) const noexcept
 			{
 				return Percent < percent;
 			}
+
+			///@}
 		};
 
 
 		namespace detail
 		{
-			//Colors are sorted by percentages in range [0.0, 1.0]
+			///@brief Colors are sorted by percentages in range [0.0, 1.0]
 			using color_steps = adaptors::FlatSet<Step>;
 
 
@@ -90,7 +93,7 @@ namespace ion::graphics::particles::affectors
 	} //color_fader
 
 
-	//A class representing an affector that can color fade single particles
+	///@brief A class representing an affector that can color fade single particles
 	class ColorFader final : public Affector
 	{
 		private:
@@ -99,76 +102,88 @@ namespace ion::graphics::particles::affectors
 
 		protected:
 
-			/*
-				Affect particles
+			/**
+				@name Affect particles
+				@{
 			*/
 
-			//Elapses color fader by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses color fader by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
+
+			///@}
 
 		public:
 
-			//Constructs a new color fader with the given name
+			///@brief Constructs a new color fader with the given name
 			explicit ColorFader(std::string name) noexcept;
 
-			//Constructs a new color fader with the given name and steps
-			//Percentages are normalized to range [0.0, 1.0]
+			///@brief Constructs a new color fader with the given name and steps
+			///@details Percentages are normalized to range [0.0, 1.0]
 			ColorFader(std::string name, std::vector<color_fader::Step> steps) noexcept;
 
 
-			/*
-				Static color fader conversions
+			/**
+				@name Static color fader conversions
+				@{
 			*/
 
-			//Returns a new color fader from the given name and colors
-			//Percentages are uniformly distributed in range [0.0, 1.0]
+			///@brief Returns a new color fader from the given name and colors
+			///@details Percentages are uniformly distributed in range [0.0, 1.0]
 			[[nodiscard]] static ColorFader UniformSteps(std::string name, const std::vector<Color> &colors);
 
-			//Returns a new color fader from the given name, colors, from percent and to percent
-			//Percentages are uniformly distributed in range [from, to]
+			///@brief Returns a new color fader from the given name, colors, from percent and to percent
+			///@details Percentages are uniformly distributed in range [from, to]
 			[[nodiscard]] static ColorFader UniformSteps(std::string name, const std::vector<Color> &colors, real from_percent, real to_percent);
 
+			///@}
 
-			/*
-				Cloning
+			/**
+				@name Cloning
+				@{
 			*/
 
-			//Returns an owning ptr to a clone of this affector
+			///@brief Returns an owning ptr to a clone of this affector
 			[[nodiscard]] OwningPtr<Affector> Clone() const override;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns an immutable range of all fading steps in this color fader
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all fading steps in this color fader
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Steps() const noexcept
 			{
 				return adaptors::ranges::Iterable<const color_fader::detail::color_steps&>{steps_};
 			}
 
+			///@}
 
-			/*
-				Steps
+			/**
+				@name Steps
+				@{
 			*/
 
-			//Adds (in sorted order) the given percentage and color to this color fader
-			//The step is clamped to range [0.0, 1.0]
+			///@brief Adds (in sorted order) the given percentage and color to this color fader
+			///@details The step is clamped to range [0.0, 1.0]
 			void AddStep(real percent, std::optional<Color> color);
 
-			//Adds (in sorted order) the given step to this color fader
+			///@brief Adds (in sorted order) the given step to this color fader
 			//The step is clamped to range [0.0, 1.0]
 			void AddStep(color_fader::Step step);
 
-			//Adds (in sorted order) the given steps to the this color fader
+			///@brief Adds (in sorted order) the given steps to the this color fader
 			//Percentages are normalized to range [0.0, 1.0]
 			void AddSteps(std::vector<color_fader::Step> steps);
 			
 
-			//Clears all steps from this color fader
+			///@brief Clears all steps from this color fader
 			void ClearSteps() noexcept;
+
+			///@}
 	};
 } //ion::graphics::particles::affectors
 

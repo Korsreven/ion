@@ -36,8 +36,8 @@ namespace ion::graphics::particles::affectors
 	} //affector::detail
 
 
-	//A class representing a generic affector that can affect single particles
-	//This base class must support inheritance (open set of affectors)
+	///@brief A class representing a generic affector that can affect single particles
+	///@details This base class must support inheritance (open set of affectors)
 	class Affector : public managed::ManagedObject<AffectorManager>
 	{
 		private:
@@ -46,67 +46,75 @@ namespace ion::graphics::particles::affectors
 
 		protected:
 
-			//Constructs a new affector with the given name
-			//Can only be instantiated by derived
+			///@brief Constructs a new affector with the given name
+			///@details Can only be instantiated by derived
 			explicit Affector(std::string name) noexcept;
 
 
-			/*
-				Affect particles
+			/**
+				@name Affect particles
+				@{
 			*/
 
-			//Elapses affector by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses affector by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			virtual void DoAffect(affector::detail::particle_range particles, duration time) noexcept = 0;
+
+			///@}
 
 		public:
 
-			//Default copy constructor
+			///@brief Default copy constructor
 			Affector(const Affector&) = default;
 
-			//Default move constructor
+			///@brief Default move constructor
 			Affector(Affector&&) = default;
 
-			//Default virtual destructor
+			///@brief Default virtual destructor
 			virtual ~Affector() = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Default copy assignment
+			///@brief Default copy assignment
 			Affector& operator=(const Affector&) = default;
 
-			//Default move assignment
+			///@brief Default move assignment
 			Affector& operator=(Affector&&) = default;
 
+			///@}
 
-			/*
-				Cloning
+			/**
+				@name Cloning
+				@{
 			*/
 
-			//Returns an owning ptr to a clone of this affector
+			///@brief Returns an owning ptr to a clone of this affector
 			[[nodiscard]] virtual OwningPtr<Affector> Clone() const = 0;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Enables the affector
+			///@brief Enables the affector
 			inline void Enable() noexcept
 			{
 				enabled_ = true;
 			}
 
-			//Disables the affector
+			///@brief Disables the affector
 			inline void Disable() noexcept
 			{
 				enabled_ = false;
 			}
 
-			//Sets whether or not the affector is enabled
+			///@brief Sets whether or not the affector is enabled
 			inline void Enabled(bool enabled) noexcept
 			{
 				if (enabled)
@@ -115,25 +123,31 @@ namespace ion::graphics::particles::affectors
 					Disable();
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns true if the affector is enabled
+			///@brief Returns true if the affector is enabled
 			[[nodiscard]] inline auto IsEnabled() const noexcept
 			{
 				return enabled_;
 			}
 
+			///@}
 
-			/*
-				Affect particles
+			/**
+				@name Affect particles
+				@{
 			*/
 
-			//Calls virtual function DoAffect if this affector is enabled
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Calls virtual function DoAffect if this affector is enabled
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Affect(affector::detail::particle_range particles, duration time) noexcept;
+
+			///@}
 	};
 } //ion::graphics::particles::affectors
 

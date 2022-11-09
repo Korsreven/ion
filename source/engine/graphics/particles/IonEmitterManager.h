@@ -24,94 +24,105 @@ namespace ion::graphics::particles
 	} //emitter_manager::detail
 
 
-	//A class that manages and stores emitters
+	///@brief A class that manages and stores emitters
 	class EmitterManager : public managed::ObjectManager<Emitter, EmitterManager>
 	{
 		protected:
 
-			//Can only be instantiated by derived
+			///@brief Can only be instantiated by derived
 			EmitterManager() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			EmitterManager(const EmitterManager&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			EmitterManager(EmitterManager&&) = default;
 
 		public:
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			EmitterManager& operator=(const EmitterManager&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			EmitterManager& operator=(EmitterManager&&) = default;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all emitters in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all emitters in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Emitters() noexcept
 			{
 				return Objects();
 			}
 
-			//Returns an immutable range of all emitters in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all emitters in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Emitters() const noexcept
 			{
 				return Objects();
 			}
 
+			///@}
 
-			/*
-				Emitters
+			/**
+				@name Emitters
 				Creating
+				@{
 			*/
 
-			//Creates an emitter with the given name
+			///@brief Creates an emitter with the given name
 			NonOwningPtr<Emitter> CreateEmitter(std::string name);
 
-			//Creates an emitter with the given name and initial values
+			///@brief Creates an emitter with the given name and initial values
 			NonOwningPtr<Emitter> CreateEmitter(std::string name, emitter::EmitterType type, const Vector2 &position, const Vector2 &direction,
 				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 				std::optional<duration> emission_duration, int particle_quota = 100);
 
 
-			//Creates an emitter by moving the given emitter
+			///@brief Creates an emitter by moving the given emitter
 			NonOwningPtr<Emitter> CreateEmitter(Emitter &&emitter);
 
+			///@}
 
-			/*
-				Emitters
+			/**
+				@name Emitters
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable emitter with the given name
-			//Returns nullptr if emitter could not be found
+			///@brief Gets a pointer to a mutable emitter with the given name
+			///@details Returns nullptr if emitter could not be found
 			[[nodiscard]] NonOwningPtr<Emitter> GetEmitter(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable emitter with the given name
-			//Returns nullptr if emitter could not be found
+			///@brief Gets a pointer to an immutable emitter with the given name
+			///@details Returns nullptr if emitter could not be found
 			[[nodiscard]] NonOwningPtr<const Emitter> GetEmitter(std::string_view name) const noexcept;
 
+			///@}
 
-			/*
-				Emitters
+			/**
+				@name Emitters
 				Removing
+				@{
 			*/
 
-			//Clears all emitters from this manager
+			///@brief Clears all emitters from this manager
 			void ClearEmitters() noexcept;
 
-			//Removes an emitter from this manager
+			///@brief Removes an emitter from this manager
 			bool RemoveEmitter(Emitter &Emitter) noexcept;
+
+			///@}
 	};
 } //ion::graphics::particles
 

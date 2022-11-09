@@ -35,7 +35,7 @@ namespace ion::graphics::particles
 	} //particle_system
 
 
-	//A class representing a particle system that can contain multiple emitters and affectors
+	///@brief A class representing a particle system that can contain multiple emitters and affectors
 	class ParticleSystem final :
 		public managed::ManagedObject<ParticleSystemManager>,
 		public EmitterManager,
@@ -47,75 +47,88 @@ namespace ion::graphics::particles
 
 		public:
 
-			//Constructs a new particle system with the given name
+			///@brief Constructs a new particle system with the given name
 			explicit ParticleSystem(std::string name) noexcept;
 
-			//Constructs a new particle system with the given name and particle primitive
+			///@brief Constructs a new particle system with the given name and particle primitive
 			ParticleSystem(std::string name, particle_system::ParticlePrimitive particle_primitive) noexcept;
 
 
-			/*
-				Cloning
+			/**
+				@name Cloning
+				@{
 			*/
 
-			//Returns a clone of this particle system
+			///@brief Returns a clone of this particle system
 			[[nodiscard]] ParticleSystem Clone() const;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the render primitive used by this particle system to the given value
+			///@brief Sets the render primitive used by this particle system to the given value
 			inline void RenderPrimitive(particle_system::ParticlePrimitive particle_primitive) noexcept
 			{
 				particle_primitive_ = particle_primitive;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the render primitive used by this particle system
+			///@brief Returns the render primitive used by this particle system
 			[[nodiscard]] inline auto RenderPrimitive() const noexcept
 			{
 				return particle_primitive_;
 			}
 
+			///@}
 
-			/*
-				Common functions for controlling the particle system
+			/**
+				@name Common functions for controlling the particle system
+				@{
 			*/
 
-			//Starts or resumes all emitters
+			///@brief Starts or resumes all emitters
 			void StartAll() noexcept;
 
-			//Stops all emitters
+			///@brief Stops all emitters
 			void StopAll() noexcept;
 
-			//Stops and reset all emitters
+			///@brief Stops and reset all emitters
 			void ResetAll() noexcept;
 
-			//Stops, resets and starts all emitters
+			///@brief Stops, resets and starts all emitters
 			void RestartAll() noexcept;
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses particle system by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses particle system by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 
+			///@}
 
-			/*
-				Particles
+			/**
+				@name Particles
+				@{
 			*/
 
-			//Returns true if this emitter has any active particles
+			///@brief Returns true if this emitter has any active particles
 			[[nodiscard]] bool HasActiveParticles() const noexcept;
+
+			///@}
 	};
 } //ion::graphics::particles
 

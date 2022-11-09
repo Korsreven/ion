@@ -34,7 +34,7 @@ namespace ion::graphics::particles::affectors
 	} //gravitation::detail
 
 
-	//A class representing an affector that can act as graviation on single particles
+	///@brief A class representing an affector that can act as graviation on single particles
 	class Gravitation final : public Affector
 	{
 		private:
@@ -45,78 +45,88 @@ namespace ion::graphics::particles::affectors
 
 		protected:
 
-			/*
-				Affect particles
+			/**
+				@name Affect particles
+				@{
 			*/
 
-			//Elapses gravitation by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses gravitation by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
+
+			///@}
 
 		public:
 
-			//Constructs a new gravitation with the given name
+			///@brief Constructs a new gravitation with the given name
 			explicit Gravitation(std::string name) noexcept;
 
-			//Constructs a new gravitation with the given name, position and mass
+			///@brief Constructs a new gravitation with the given name, position and mass
 			Gravitation(std::string name, const Vector2 &position, real mass) noexcept;
 
-			//Constructs a new gravitation with the given name, position, mass and a custom gravity
+			///@brief Constructs a new gravitation with the given name, position, mass and a custom gravity
 			Gravitation(std::string name, const Vector2 &position, real mass, real gravity) noexcept;
 
 
-			/*
-				Cloning
+			/**
+				@name Cloning
+				@{
 			*/
 
-			//Returns an owning ptr to a clone of this affector
+			///@brief Returns an owning ptr to a clone of this affector
 			[[nodiscard]] OwningPtr<Affector> Clone() const override;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the position of the gravitation
+			///@brief Sets the position of the gravitation
 			inline void Position(const Vector2 &position) noexcept
 			{
 				position_ = position;
 			}
 
-			//Sets the mass of the gravitation
+			///@brief Sets the mass of the gravitation
 			inline void Mass(real mass) noexcept
 			{
 				mass_ = mass;
 			}
 
-			//Sets the gravity of the gravitation
+			///@brief Sets the gravity of the gravitation
 			inline void Gravity(real gravity) noexcept
 			{
 				gravity_ = gravity;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the position of the gravitation
+			///@brief Returns the position of the gravitation
 			[[nodiscard]] inline auto Position() const noexcept
 			{
 				return position_;
 			}
 
-			//Returns the mass of the gravitation
+			///@brief Returns the mass of the gravitation
 			[[nodiscard]] inline auto Mass() const noexcept
 			{
 				return mass_;
 			}
 
-			//Returns the gravity of the gravitation
+			///@brief Returns the gravity of the gravitation
 			[[nodiscard]] inline auto Gravity() const noexcept
 			{
 				return gravity_;
 			}
+
+			///@}
 	};
 } //ion::graphics::particles::affectors
 

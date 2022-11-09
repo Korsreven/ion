@@ -159,7 +159,7 @@ namespace ion::graphics::particles
 	} //emitter
 
 
-	//A class representing an emitter that can emit multiple particles and contain multiple affectors
+	///@brief A class representing an emitter that can emit multiple particles and contain multiple affectors
 	class Emitter final :
 		public managed::ManagedObject<EmitterManager>,
 		public affectors::AffectorManager
@@ -194,99 +194,104 @@ namespace ion::graphics::particles
 
 		public:
 
-			//Constructs a new emitter with the given name
+			///@brief Constructs a new emitter with the given name
 			explicit Emitter(std::string name) noexcept;
 
-			//Constructs a new emitter with the given name and initial values
+			///@brief Constructs a new emitter with the given name and initial values
 			Emitter(std::string name, emitter::EmitterType type, const Vector3 &position, const Vector2 &direction,
 				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 				std::optional<duration> emission_duration, int particle_quota = 100) noexcept;
 
 
-			/*
-				Static emitter conversions
+			/**
+				@name Static emitter conversions
+				@{
 			*/
 
-			//Returns a new point emitter from the given name and initial values
+			///@brief Returns a new point emitter from the given name and initial values
 			[[nodiscard]] static Emitter Point(std::string name, const Vector3 &position, const Vector2 &direction,
 				real emission_rate, real emission_angle, std::optional<duration> emission_duration,
 				int particle_quota = 100);
 
-			//Returns a new box emitter from the given name and initial values
+			///@brief Returns a new box emitter from the given name and initial values
 			[[nodiscard]] static Emitter Box(std::string name, const Vector3 &position, const Vector2 &direction,
 				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 				std::optional<duration> emission_duration, int particle_quota = 100);
 
-			//Returns a new ring emitter from the given name and initial values
+			///@brief Returns a new ring emitter from the given name and initial values
 			[[nodiscard]] static Emitter Ring(std::string name, const Vector3 &position, const Vector2 &direction,
 				const Vector2 &size, const Vector2 &inner_size, real emission_rate, real emission_angle,
 				std::optional<duration> emission_duration, int particle_quota = 100);
 
+			///@}
 
-			/*
-				Cloning
+			/**
+				@name Cloning
+				@{
 			*/
 
-			//Returns an owning ptr to a clone of this emitter
+			///@brief Returns an owning ptr to a clone of this emitter
 			[[nodiscard]] OwningPtr<Emitter> Clone() const;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the type of the emitter to the given value
+			///@brief Sets the type of the emitter to the given value
 			inline void Type(emitter::EmitterType type) noexcept
 			{
 				type_ = type;
 			}
 
-			//Sets the position of the emitter to the given vector
+			///@brief Sets the position of the emitter to the given vector
 			inline void Position(const Vector3 &position) noexcept
 			{
 				position_ = position;
 			}
 
-			//Sets the position of the emitter to the given vector
+			///@brief Sets the position of the emitter to the given vector
 			inline void Position(const Vector2 &position) noexcept
 			{
 				Position({position.X(), position.Y(), position_.Z()});
 			}
 
-			//Sets the direction of the emitter to the given vector
+			///@brief Sets the direction of the emitter to the given vector
 			inline void Direction(const Vector2 &direction) noexcept
 			{
 				direction_ = direction;
 			}
 
-			//Sets the size of the emitter to the given vector
-			//Only in use if the emitter type is either a box or a ring
+			///@brief Sets the size of the emitter to the given vector
+			///@details Only in use if the emitter type is either a box or a ring
 			inline void Size(const Vector2 &size) noexcept
 			{
 				size_ = size;
 			}
 
-			//Sets the inner size of the emitter to the given vector
-			//Only in use if the emitter type is either a box or a ring
+			///@brief Sets the inner size of the emitter to the given vector
+			///@details Only in use if the emitter type is either a box or a ring
 			inline void InnerSize(const Vector2 &inner_size) noexcept
 			{
 				inner_size_ = inner_size;
 			}
 
 
-			//Sets the emission rate of the emitter to the given value
+			///@brief Sets the emission rate of the emitter to the given value
 			inline void EmissionRate(real rate) noexcept
 			{
 				emission_rate_ = rate;
 			}
 
-			//Sets the emission angle of the emitter to the given value in range [0.0, pi]
+			///@brief Sets the emission angle of the emitter to the given value in range [0.0, pi]
 			inline void EmissionAngle(real angle) noexcept
 			{
 				emission_angle_ = std::clamp(angle, 0.0_r, ion::utilities::math::Pi);
 			}
 
-			//Sets the emission duration of the emitter to the given amount
+			///@brief Sets the emission duration of the emitter to the given amount
 			inline void EmissionDuration(std::optional<duration> amount) noexcept
 			{
 				if (amount)
@@ -301,8 +306,8 @@ namespace ion::graphics::particles
 			}
 
 
-			//Sets the particle quota to the given value
-			//Particle quota is the max number of particles that can simultaneously be active 
+			///@brief Sets the particle quota to the given value
+			///@details Particle quota is the max number of particles that can simultaneously be active 
 			inline void ParticleQuota(int quota)
 			{
 				particle_quota_ = quota > 0 ? quota : 0;
@@ -312,45 +317,47 @@ namespace ion::graphics::particles
 					particles_.erase(std::begin(particles_) + particle_quota_, std::end(particles_));
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the type of the emitter
+			///@brief Returns the type of the emitter
 			[[nodiscard]] inline auto Type() const noexcept
 			{
 				return type_;
 			}
 
-			//Returns the position of the emission
+			///@brief Returns the position of the emission
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}
 
-			//Returns the direction of the emission
+			///@brief Returns the direction of the emission
 			[[nodiscard]] inline auto& Direction() const noexcept
 			{
 				return direction_;
 			}
 
-			//Returns the size of the emitter
-			//Only in use if the emitter type is either a box or a ring
+			///@brief Returns the size of the emitter
+			///@details Only in use if the emitter type is either a box or a ring
 			[[nodiscard]] inline auto& Size() const noexcept
 			{
 				return size_;
 			}
 
-			//Returns the inner size of the emitter
-			//Only in use if the emitter type is either a box or a ring
+			///@brief Returns the inner size of the emitter
+			///@details Only in use if the emitter type is either a box or a ring
 			[[nodiscard]] inline auto& InnerSize() const noexcept
 			{
 				return inner_size_;
 			}
 
 
-			//Returns the emission rate of the emitter
+			///@brief Returns the emission rate of the emitter
 			[[nodiscard]] inline auto EmissionRate() const noexcept
 			{
 				return emission_rate_;
@@ -362,14 +369,14 @@ namespace ion::graphics::particles
 				return emission_angle_;
 			}
 
-			//Returns the emission duration of the emitter
-			//Returns nullopt if no duration is set
+			///@brief Returns the emission duration of the emitter
+			///@details Returns nullopt if no duration is set
 			[[nodiscard]] inline auto EmissionDuration() const noexcept
 			{
 				return emission_duration_;
 			}
 
-			//Returns the emission duration percent of the emitter in range [0.0, 1.0]
+			///@brief Returns the emission duration percent of the emitter in range [0.0, 1.0]
 			[[nodiscard]] inline auto EmissionDurationPercent() const noexcept
 			{
 				return emission_duration_ ?
@@ -378,198 +385,214 @@ namespace ion::graphics::particles
 			}
 
 
-			//Returns the particle quota of the emitter
-			//The max number of simultaneous particles allowed
+			///@brief Returns the particle quota of the emitter
+			///@details The max number of simultaneous particles allowed
 			[[nodiscard]] inline auto ParticleQuota() const noexcept
 			{
 				return particle_quota_;
 			}
 
-			//Returns true if the emitter is emitting particles
+			///@brief Returns true if the emitter is emitting particles
 			[[nodiscard]] inline auto IsEmitting() const noexcept
 			{
 				return emitting_;
 			}
 
+			///@}
 
-			/*
-				Spawn modifiers
+			/**
+				@name Spawn modifiers
+				@{
 			*/
 
-			//Sets the velocity of each new particle to the given value
+			///@brief Sets the velocity of each new particle to the given value
 			inline void ParticleVelocity(real velocity) noexcept
 			{
 				particle_velocity_ = std::pair{velocity, velocity};
 			}
 
-			//Sets the velocity range of each new particle to the given range
+			///@brief Sets the velocity range of each new particle to the given range
 			inline void ParticleVelocity(real min_velocity, real max_velocity) noexcept
 			{
 				particle_velocity_ = std::minmax(min_velocity, max_velocity);
 			}
 
-			//Sets the size of each new particle to the given value
+			///@brief Sets the size of each new particle to the given value
 			inline void ParticleSize(const Vector2 &size) noexcept
 			{
 				particle_size_ = std::pair{size, size};
 			}
 
-			//Sets the size range of each new particle to the given range
+			///@brief Sets the size range of each new particle to the given range
 			inline void ParticleSize(const Vector2 &min_size, const Vector2 &max_size) noexcept
 			{
 				particle_size_ = std::minmax(min_size, max_size);
 			}
 
-			//Sets the mass of each new particle to the given value
+			///@brief Sets the mass of each new particle to the given value
 			inline void ParticleMass(real mass) noexcept
 			{
 				particle_mass_ = std::pair{mass, mass};
 			}
 
-			//Sets the mass range of each new particle to the given range
+			///@brief Sets the mass range of each new particle to the given range
 			inline void ParticleMass(real min_mass, real max_mass) noexcept
 			{
 				particle_mass_ = std::minmax(min_mass, max_mass);
 			}
 
-			//Sets the color of each new particle to the given value
+			///@brief Sets the color of each new particle to the given value
 			inline void ParticleColor(const Color &color) noexcept
 			{
 				particle_color_ = std::pair(color, color);
 			}
 
-			//Sets the color range of each new particle to the given range
-			//The final color of the new particle is determined by mixing both colors with a random percentage
+			///@brief Sets the color range of each new particle to the given range
+			///@details The final color of the new particle is determined by mixing both colors with a random percentage
 			inline void ParticleColor(const Color &from_color, const Color &to_color) noexcept
 			{
 				particle_color_ = std::pair(from_color, to_color); //minmax not needed
 			}
 
-			//Sets the lifetime of each new particle to the given value
+			///@brief Sets the lifetime of each new particle to the given value
 			inline void ParticleLifetime(duration lifetime) noexcept
 			{
 				particle_lifetime_ = std::pair(lifetime, lifetime);
 			}
 
-			//Sets the lifetime range of each new particle to the given range
+			///@brief Sets the lifetime range of each new particle to the given range
 			inline void ParticleLifetime(duration min_lifetime, duration max_lifetime) noexcept
 			{
 				particle_lifetime_ = std::minmax(min_lifetime, max_lifetime);
 			}
 
-			//Sets the material of each new particle to the given material
+			///@brief Sets the material of each new particle to the given material
 			inline void ParticleMaterial(NonOwningPtr<materials::Material> particle_material) noexcept
 			{
 				particle_material_ = particle_material;
 			}
 
+			///@}
 
-			/*
-				Spawn observers
+			/**
+				@name Spawn observers
+				@{
 			*/
 
-			//Returns the velocity of each new particle in range [min, max]
+			///@brief Returns the velocity of each new particle in range [min, max]
 			[[nodiscard]] inline auto& ParticleVelocity() const noexcept
 			{
 				return particle_velocity_;
 			}
 
-			//Returns the size of each new particle in range [min, max]
+			///@brief Returns the size of each new particle in range [min, max]
 			[[nodiscard]] inline auto& ParticleSize() const noexcept
 			{
 				return particle_size_;
 			}
 
-			//Returns the mass of each new particle in range [min, max]
+			///@brief Returns the mass of each new particle in range [min, max]
 			[[nodiscard]] inline auto& ParticleMass() const noexcept
 			{
 				return particle_mass_;
 			}
 
-			//Returns the color of each new particle in range [from, to]
+			///@brief Returns the color of each new particle in range [from, to]
 			[[nodiscard]] inline auto& ParticleColor() const noexcept
 			{
 				return particle_color_;
 			}
 
-			//Returns the lifetime of each new particle in range [min, max]
+			///@brief Returns the lifetime of each new particle in range [min, max]
 			[[nodiscard]] inline auto& ParticleLifetime() const noexcept
 			{
 				return particle_lifetime_;
 			}
 
-			//Returns the material of each new particle
+			///@brief Returns the material of each new particle
 			[[nodiscard]] inline auto ParticleMaterial() const noexcept
 			{
 				return particle_material_;
 			}
 
+			///@}
 
-			/*
-				Common functions for controlling the emitter
+			/**
+				@name Common functions for controlling the emitter
+				@{
 			*/
 
-			//Starts or resumes emitter
+			///@brief Starts or resumes emitter
 			void Start() noexcept;
 
-			//Stops emitter
+			///@brief Stops emitter
 			void Stop() noexcept;
 
-			//Stops and reset emission duration to zero
+			///@brief Stops and reset emission duration to zero
 			void Reset() noexcept;
 
-			//Stops, resets and starts emitter
+			///@brief Stops, resets and starts emitter
 			void Restart() noexcept;
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses emitter by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses emitter by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 
+			///@}
 
-			/*
-				Emitting
+			/**
+				@name Emitting
+				@{
 			*/
 
-			//Emits the given particle count with the current emission rate
+			///@brief Emits the given particle count with the current emission rate
 			void Emit(int particle_count) noexcept;
 
+			///@}
 
-			/*
-				Particles
+			/**
+				@name Particles
+				@{
 			*/
 
-			//Clears all particles emitted by this emitter
+			///@brief Clears all particles emitted by this emitter
 			void ClearParticles() noexcept;
 
-			//Returns true if this emitter has any active particles
+			///@brief Returns true if this emitter has any active particles
 			[[nodiscard]] inline auto HasActiveParticles() const noexcept
 			{
 				return !std::empty(particles_);
 			}
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all particles in this emitter
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all particles in this emitter
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Particles() noexcept
 			{
 				return adaptors::ranges::Iterable<emitter::detail::container_type<Particle>&>{particles_};
 			}
 
-			//Returns an immutable range of all particles in this emitter
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all particles in this emitter
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Particles() const noexcept
 			{
 				return adaptors::ranges::Iterable<const emitter::detail::container_type<Particle>&>{particles_};
 			}
+
+			///@}
 	};
 } //ion::graphics::particles
 

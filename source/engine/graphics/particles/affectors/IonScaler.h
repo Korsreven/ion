@@ -37,27 +37,30 @@ namespace ion::graphics::particles::affectors
 			std::optional<Vector2> Size;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Returns true if this percent is less than the given step percent
+			///@brief Returns true if this percent is less than the given step percent
 			[[nodiscard]] inline auto operator<(const Step &rhs) const noexcept
 			{
 				return Percent < rhs.Percent;
 			}
 
-			//Returns true if this percent is less than the given percent
+			///@brief Returns true if this percent is less than the given percent
 			[[nodiscard]] inline auto operator<(real percent) const noexcept
 			{
 				return Percent < percent;
 			}
+
+			///@}
 		};
 
 
 		namespace detail
 		{
-			//Sizes are sorted by percentages in range [0.0, 1.0]
+			///@brief Sizes are sorted by percentages in range [0.0, 1.0]
 			using size_steps = adaptors::FlatSet<Step>;
 
 
@@ -90,7 +93,7 @@ namespace ion::graphics::particles::affectors
 	} //scaler
 
 
-	//A class representing an affector that can scale single particles
+	///@brief A class representing an affector that can scale single particles
 	class Scaler final : public Affector
 	{
 		private:
@@ -99,76 +102,88 @@ namespace ion::graphics::particles::affectors
 
 		protected:
 
-			/*
-				Affect particles
+			/**
+				@name Affect particles
+				@{
 			*/
 
-			//Elapses scaler by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses scaler by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
+
+			///@}
 
 		public:
 
-			//Constructs a new scaler with the given name
+			///@brief Constructs a new scaler with the given name
 			explicit Scaler(std::string name) noexcept;
 
-			//Constructs a new scaler with the given name and steps
-			//Percentages are normalized to range [0.0, 1.0]
+			///@brief Constructs a new scaler with the given name and steps
+			///@details Percentages are normalized to range [0.0, 1.0]
 			Scaler(std::string name, std::vector<scaler::Step> steps) noexcept;
 
 
-			/*
-				Static scaler conversions
+			/**
+				@name Static scaler conversions
+				@{
 			*/
 
-			//Returns a new scaler from the given name and sizes
-			//Percentages are uniformly distributed in range [0.0, 1.0]
+			///@brief Returns a new scaler from the given name and sizes
+			///@details Percentages are uniformly distributed in range [0.0, 1.0]
 			[[nodiscard]] static Scaler UniformSteps(std::string name, const std::vector<Vector2> &sizes);
 
-			//Returns a new scaler from the given name, sizes, from percent and to percent
-			//Percentages are uniformly distributed in range [from, to]
+			///@brief Returns a new scaler from the given name, sizes, from percent and to percent
+			///@details Percentages are uniformly distributed in range [from, to]
 			[[nodiscard]] static Scaler UniformSteps(std::string name, const std::vector<Vector2> &sizes, real from_percent, real to_percent);
 
+			///@}
 
-			/*
-				Cloning
+			/**
+				@name Cloning
+				@{
 			*/
 
-			//Returns an owning ptr to a clone of this affector
+			///@brief Returns an owning ptr to a clone of this affector
 			[[nodiscard]] OwningPtr<Affector> Clone() const override;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns an immutable range of all size steps in this scaler
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all size steps in this scaler
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Steps() const noexcept
 			{
 				return adaptors::ranges::Iterable<const scaler::detail::size_steps&>{steps_};
 			}
 
+			///@}
 
-			/*
-				Steps
+			/**
+				@name Steps
+				@{
 			*/
 
-			//Adds (in sorted order) the given percentage and size to this scaler
-			//The step is clamped to range [0.0, 1.0]
+			///@brief Adds (in sorted order) the given percentage and size to this scaler
+			///@details The step is clamped to range [0.0, 1.0]
 			void AddStep(real percent, std::optional<Vector2> size);
 
-			//Adds (in sorted order) the given step to this scaler
-			//The step is clamped to range [0.0, 1.0]
+			///@brief Adds (in sorted order) the given step to this scaler
+			///@details The step is clamped to range [0.0, 1.0]
 			void AddStep(scaler::Step step);
 
-			//Adds (in sorted order) the given steps to the this scaler
-			//Percentages are normalized to range [0.0, 1.0]
+			///@brief Adds (in sorted order) the given steps to the this scaler
+			///@details Percentages are normalized to range [0.0, 1.0]
 			void AddSteps(std::vector<scaler::Step> steps);
 			
 
-			//Clears all steps from this scaler
+			///@brief Clears all steps from this scaler
 			void ClearSteps() noexcept;
+
+			///@}
 	};
 } //ion::graphics::particles::affectors
 

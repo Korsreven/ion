@@ -31,7 +31,7 @@ namespace ion::graphics::particles::affectors
 	} //direction_randomizer::detail
 
 
-	//A class representing an affector that can add random direction to single particles
+	///@brief A class representing an affector that can add random direction to single particles
 	class DirectionRandomizer final : public Affector
 	{
 		private:
@@ -41,63 +41,73 @@ namespace ion::graphics::particles::affectors
 
 		protected:
 
-			/*
-				Affect particles
+			/**
+				@name Affect particles
+				@{
 			*/
 
-			//Elapses direction randomizer by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses direction randomizer by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
+
+			///@}
 
 		public:
 
-			//Constructs a new direction randomizer with the given name
+			///@brief Constructs a new direction randomizer with the given name
 			explicit DirectionRandomizer(std::string name) noexcept;
 
-			//Constructs a new direction randomizer with the given name, angle and scope
+			///@brief Constructs a new direction randomizer with the given name, angle and scope
 			DirectionRandomizer(std::string name, real angle, real scope) noexcept;
 
 
-			/*
-				Cloning
+			/**
+				@name Cloning
+				@{
 			*/
 
-			//Returns an owning ptr to a clone of this affector
+			///@brief Returns an owning ptr to a clone of this affector
 			[[nodiscard]] OwningPtr<Affector> Clone() const override;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the angle of the direction randomizer to the given value in range [0.0, pi]
+			///@brief Sets the angle of the direction randomizer to the given value in range [0.0, pi]
 			inline void Angle(real angle) noexcept
 			{
 				angle_ = std::clamp(angle, 0.0_r, ion::utilities::math::Pi);
 			}
 
-			//Sets the scope of the direction randomizer to the given value in range [0.0, 1.0]
+			///@brief Sets the scope of the direction randomizer to the given value in range [0.0, 1.0]
 			inline void Scope(real scope) noexcept
 			{
 				scope_ = std::clamp(scope, 0.0_r, 1.0_r);
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the angle of the direction randomizer in range [0.0, pi]
+			///@brief Returns the angle of the direction randomizer in range [0.0, pi]
 			[[nodiscard]] inline auto Angle() const noexcept
 			{
 				return angle_;
 			}
 
-			//Returns the scope of the direction randomizer in range [0.0, 1.0]
+			///@brief Returns the scope of the direction randomizer in range [0.0, 1.0]
 			[[nodiscard]] inline auto Scope() const noexcept
 			{
 				return scope_;
 			}
+
+			///@}
 	};
 } //ion::graphics::particles::affectors
 

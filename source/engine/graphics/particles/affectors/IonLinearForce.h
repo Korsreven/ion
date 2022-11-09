@@ -41,7 +41,7 @@ namespace ion::graphics::particles::affectors
 	} //linear_force
 
 
-	//A class representing an affector that can add a linear force to single particles
+	///@brief A class representing an affector that can add a linear force to single particles
 	class LinearForce final : public Affector
 	{
 		private:
@@ -51,63 +51,73 @@ namespace ion::graphics::particles::affectors
 
 		protected:
 
-			/*
-				Affect particles
+			/**
+				@name Affect particles
+				@{
 			*/
 
-			//Elapses linear force by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses linear force by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
+
+			///@}
 
 		public:
 
-			//Constructs a new linear force with the given name
+			///@brief Constructs a new linear force with the given name
 			explicit LinearForce(std::string name) noexcept;
 
-			//Constructs a new linear force with the given name, type and force
+			///@brief Constructs a new linear force with the given name, type and force
 			LinearForce(std::string name, linear_force::ForceType type, const Vector2 &force) noexcept;
 
 
-			/*
-				Cloning
+			/**
+				@name Cloning
+				@{
 			*/
 
-			//Returns an owning ptr to a clone of this affector
+			///@brief Returns an owning ptr to a clone of this affector
 			[[nodiscard]] OwningPtr<Affector> Clone() const override;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the force type of the linear force
+			///@brief Sets the force type of the linear force
 			inline void Type(linear_force::ForceType type) noexcept
 			{
 				type_ = type;
 			}
 
-			//Sets the force of the linear force
+			///@brief Sets the force of the linear force
 			inline void Force(const Vector2 &force) noexcept
 			{
 				force_ = force;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the force type of the linear force
+			///@brief Returns the force type of the linear force
 			[[nodiscard]] inline auto Type() const noexcept
 			{
 				return type_;
 			}
 
-			//Returns the force of the linear force
+			///@brief Returns the force of the linear force
 			[[nodiscard]] inline auto Force() const noexcept
 			{
 				return force_;
 			}
+
+			///@}
 	};
 } //ion::graphics::particles::affectors
 
