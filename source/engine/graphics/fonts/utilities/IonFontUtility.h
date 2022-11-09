@@ -28,7 +28,7 @@ File:	IonFontUtility.h
 
 #undef max
 
-//Namespace containing functions for measuring, truncating, word wrapping and parsing HTML formatted texts
+///@brief Namespace containing functions for measuring, truncating, word wrapping and parsing HTML formatted texts
 namespace ion::graphics::fonts::utilities
 {
 	using graphics::utilities::Color;
@@ -44,8 +44,9 @@ namespace ion::graphics::fonts::utilities
 		constexpr auto superscript_translate_factor = 0.5_r; //50%
 
 
-		/*
-			Glyph rope
+		/**
+			@name Glyph rope
+			@{
 		*/
 
 		struct glyph_string final
@@ -89,9 +90,11 @@ namespace ion::graphics::fonts::utilities
 			const font::GlyphMetrices *italic_metrics,
 			const font::GlyphMetrices *bold_italic_metrics);
 
+		///@}
 
-		/*
-			Formatting
+		/**
+			@name Formatting
+			@{
 		*/
 
 		struct html_attribute final
@@ -218,9 +221,11 @@ namespace ion::graphics::fonts::utilities
 		text::TextLines text_blocks_to_text_lines(text::TextBlocks text_blocks);
 		std::string text_blocks_to_string(const text::TextBlocks &text_blocks);
 
+		///@}
 
-		/*
-			Measuring
+		/**
+			@name Measuring
+			@{
 		*/
 
 		Font* get_font(const TypeFace &type_face, const std::optional<text::TextFontStyle> &font_style) noexcept;
@@ -341,9 +346,11 @@ namespace ion::graphics::fonts::utilities
 			const font::GlyphMetrices *italic_metrics,
 			const font::GlyphMetrices *bold_italic_metrics) noexcept;
 
+		///@}
 
-		/*
-			Truncating
+		/**
+			@name Truncating
+			@{
 		*/
 
 		std::string truncate_string(std::string str, int max_width, std::string_view suffix,
@@ -354,8 +361,11 @@ namespace ion::graphics::fonts::utilities
 			const font::GlyphMetrices *italic_metrics,
 			const font::GlyphMetrices *bold_italic_metrics);
 
-		/*
-			Wrapping
+		///@}
+
+		/**
+			@name Wrapping
+			@{
 		*/
 
 		std::string wrap(std::string str, int max_width,
@@ -367,9 +377,11 @@ namespace ion::graphics::fonts::utilities
 			const font::GlyphMetrices *bold_italic_metrics);
 		void wrap(glyph_rope str, int max_width);
 
+		///@}
 
-		/*
-			Word truncating
+		/**
+			@name Word truncating
+			@{
 		*/
 
 		std::string word_truncate(std::string str, int max_width,
@@ -380,9 +392,11 @@ namespace ion::graphics::fonts::utilities
 			const font::GlyphMetrices *italic_metrics,
 			const font::GlyphMetrices *bold_italic_metrics);
 
+		///@}
 
-		/*
-			Word wrapping
+		/**
+			@name Word wrapping
+			@{
 		*/
 
 		std::string word_wrap(std::string str, int max_width,
@@ -393,115 +407,130 @@ namespace ion::graphics::fonts::utilities
 			const font::GlyphMetrices *italic_metrics,
 			const font::GlyphMetrices *bold_italic_metrics);
 		void word_wrap(glyph_rope str, int max_width);
+
+		///@}
 	} //detail
 
 
-	/*
-		Formatting
+	/**
+		@name Formatting
+		@{
 	*/
 
-	//Returns text blocks, by parsing all HTML elements found in the given string
+	///@brief Returns text blocks, by parsing all HTML elements found in the given string
 	[[nodiscard]] text::TextBlocks HTMLToTextBlocks(std::string_view str);
 
-	//Returns a plain string, by parsing and removing all HTML tags found in the given string
+	///@brief Returns a plain string, by parsing and removing all HTML tags found in the given string
 	[[nodiscard]] std::string HTMLToString(std::string_view str);
 
 
-	//Returns text lines, by splitting up text blocks into lines when a '\n' character is found
+	///@brief Returns text lines, by splitting up text blocks into lines when a '\n' character is found
 	[[nodiscard]] text::TextLines SplitTextBlocks(text::TextBlocks text_blocks);
 
+	///@}
 
-	/*
-		Measuring
+	/**
+		@name Measuring
+		@{
 	*/
 
-	//Returns the size, in pixels, of the given character when rendered with the given font
-	//Returns nullopt if font could not be loaded properly
+	///@brief Returns the size, in pixels, of the given character when rendered with the given font
+	///@details Returns nullopt if font could not be loaded properly
 	[[nodiscard]] std::optional<Vector2> MeasureCharacter(char c, Font &font) noexcept;
 
-	//Returns the size, in pixels, of the given string when rendered with the given font
-	//Returns nullopt if font could not be loaded properly
+	///@brief Returns the size, in pixels, of the given string when rendered with the given font
+	///@details Returns nullopt if font could not be loaded properly
 	[[nodiscard]] std::optional<Vector2> MeasureString(std::string_view str, Font &font) noexcept;
 
-	//Returns the size, in pixels, of the given text block when rendered with the given type face
-	//Returns nullopt if type face fonts could not be loaded properly
+	///@brief Returns the size, in pixels, of the given text block when rendered with the given type face
+	///@details Returns nullopt if type face fonts could not be loaded properly
 	[[nodiscard]] std::optional<Vector2> MeasureTextBlock(const text::TextBlock &text_block, TypeFace &type_face) noexcept;
 
-	//Returns the size, in pixels, of the given text blocks when rendered with the given type face
-	//Returns nullopt if type face fonts could not be loaded properly
+	///@brief Returns the size, in pixels, of the given text blocks when rendered with the given type face
+	///@details Returns nullopt if type face fonts could not be loaded properly
 	[[nodiscard]] std::optional<Vector2> MeasureTextBlocks(const text::TextBlocks &text_blocks, TypeFace &type_face) noexcept;
 
+	///@}
 
-	/*
-		Truncating
+	/**
+		@name Truncating
+		@{
 	*/
 
-	//Truncates the given string if wider than max width, in pixels, when rendered with the given font
-	//If string has been truncated, then ... is appended to the result
-	//Returns nullopt if font could not be loaded properly
+	///@brief Truncates the given string if wider than max width, in pixels, when rendered with the given font
+	///@details If string has been truncated, then ... is appended to the result.
+	///Returns nullopt if font could not be loaded properly
 	[[nodiscard]] std::optional<std::string> TruncateString(std::string str, int max_width, Font &font);
 
-	//Truncates the given string if wider than max width, in pixels, when rendered with the given font
-	//If string has been truncated, then the given suffix is appended to the result
-	//Returns nullopt if font could not be loaded properly
+	///@brief Truncates the given string if wider than max width, in pixels, when rendered with the given font
+	///@details If string has been truncated, then the given suffix is appended to the result.
+	///Returns nullopt if font could not be loaded properly
 	[[nodiscard]] std::optional<std::string> TruncateString(std::string str, int max_width, std::string_view suffix, Font &font);
 
-	//Truncates the given text blocks if wider than max width, in pixels, when rendered with the given type face
-	//If string has been truncated, then ... is appended to the result
-	//Returns nullopt if type face fonts could not be loaded properly
+	///@brief Truncates the given text blocks if wider than max width, in pixels, when rendered with the given type face
+	///@details If string has been truncated, then ... is appended to the result.
+	///Returns nullopt if type face fonts could not be loaded properly
 	[[nodiscard]] std::optional<text::TextBlocks> TruncateTextBlocks(text::TextBlocks text_blocks, int max_width, TypeFace &type_face);
 
-	//Truncates the given text blocks if wider than max width, in pixels, when rendered with the given type face
-	//If string has been truncated, then the given suffix is appended to the result
-	//Returns nullopt if type face fonts could not be loaded properly
+	///@brief Truncates the given text blocks if wider than max width, in pixels, when rendered with the given type face
+	///@details If string has been truncated, then the given suffix is appended to the result.
+	///Returns nullopt if type face fonts could not be loaded properly
 	[[nodiscard]] std::optional<text::TextBlocks> TruncateTextBlocks(text::TextBlocks text_blocks, int max_width, std::string_view suffix, TypeFace &type_face);
 
+	///@}
 
-	/*
-		Wrapping
+	/**
+		@name Wrapping
+		@{
 	*/
 
-	//Wraps the given string if wider than max width, in pixels, when rendered with the given font
-	//Cuts exactly where the text is wider than max width, then a '\n' character is inserted
-	//Returns nullopt if font could not be loaded properly
+	///@brief Wraps the given string if wider than max width, in pixels, when rendered with the given font
+	///@details Cuts exactly where the text is wider than max width, then a '\n' character is inserted.
+	///Returns nullopt if font could not be loaded properly
 	[[nodiscard]] std::optional<std::string> Wrap(std::string str, int max_width, Font &font);
 
-	//Wraps the given text blocks if wider than max width, in pixels, when rendered with the given type face
-	//Cuts exactly where the text is wider than max width, then a '\n' character is inserted
-	//Returns nullopt if type face fonts could not be loaded properly
+	///@brief Wraps the given text blocks if wider than max width, in pixels, when rendered with the given type face
+	///@details Cuts exactly where the text is wider than max width, then a '\n' character is inserted.
+	///Returns nullopt if type face fonts could not be loaded properly
 	[[nodiscard]] std::optional<text::TextBlocks> Wrap(text::TextBlocks text_blocks, int max_width, TypeFace &type_face);
 
+	///@}
 
-	/*
-		Word truncating
+	/**
+		@name Word truncating
+		@{
 	*/
 
-	//Word truncates the given string if wider than max width, in pixels, when rendered with the given font
-	//Does only cut words if one word is wider than max width
-	//Returns nullopt if font could not be loaded properly
+	///@brief Word truncates the given string if wider than max width, in pixels, when rendered with the given font
+	///@details Does only cut words if one word is wider than max width.
+	///Returns nullopt if font could not be loaded properly
 	[[nodiscard]] std::optional<std::string> WordTruncate(std::string str, int max_width, Font &font);
 
-	//Word truncates the given text blocks if wider than max width, in pixels, when rendered with the given type face
-	//Does only cut words if one word is wider than max width
-	//Returns nullopt if type face fonts could not be loaded properly
+	///@brief Word truncates the given text blocks if wider than max width, in pixels, when rendered with the given type face
+	///@details Does only cut words if one word is wider than max width.
+	///Returns nullopt if type face fonts could not be loaded properly
 	[[nodiscard]] std::optional<text::TextBlocks> WordTruncate(text::TextBlocks text_blocks, int max_width, TypeFace &type_face);
 
+	///@}
 
-	/*
-		Word wrapping
+	/**
+		@name Word wrapping
+		@{
 	*/
 
-	//Word wraps the given string if wider than max width, in pixels, when rendered with the given font
-	//Replaces a ' ' character in between words, with a '\n' character where the line needs to be broken
-	//Does only cut words if one word is wider than max width, then a '\n' character is inserted
-	//Returns nullopt if font could not be loaded properly
+	///@brief Word wraps the given string if wider than max width, in pixels, when rendered with the given font
+	///@details Replaces a ' ' character in between words, with a '\n' character where the line needs to be broken.
+	///Does only cut words if one word is wider than max width, then a '\n' character is inserted.
+	///Returns nullopt if font could not be loaded properly
 	[[nodiscard]] std::optional<std::string> WordWrap(std::string str, int max_width, Font &font);
 
-	//Word wraps the given text blocks if wider than max width, in pixels, when rendered with the given type face
-	//Replaces a ' ' character in between words, with a '\n' character where the line needs to be broken
-	//Does only cut words if one word is wider than max width, then a '\n' character is inserted
-	//Returns nullopt if type face fonts could not be loaded properly
+	///@brief Word wraps the given text blocks if wider than max width, in pixels, when rendered with the given type face
+	///@details Replaces a ' ' character in between words, with a '\n' character where the line needs to be broken.
+	///Does only cut words if one word is wider than max width, then a '\n' character is inserted.
+	///Returns nullopt if type face fonts could not be loaded properly
 	[[nodiscard]] std::optional<text::TextBlocks> WordWrap(text::TextBlocks text_blocks, int max_width, TypeFace &type_face);
+
+	///@}
 } //ion::graphics::fonts::utilities
 
 #endif

@@ -108,7 +108,7 @@ namespace ion::graphics::fonts
 			std::optional<TextBlockVerticalAlign> VerticalAlign;
 
 
-			//Returns true if all styles is equal to the given text block style
+			///@brief Returns true if all styles is equal to the given text block style
 			[[nodiscard]] inline auto operator==(const TextBlockStyle &rhs) const noexcept
 			{
 				return ForegroundColor == rhs.ForegroundColor &&
@@ -120,7 +120,7 @@ namespace ion::graphics::fonts
 					   VerticalAlign == rhs.VerticalAlign;
 			}
 
-			//Returns true if this text block style has no styles
+			///@brief Returns true if this text block style has no styles
 			[[nodiscard]] inline auto IsPlain() const noexcept
 			{
 				return !ForegroundColor &&
@@ -190,7 +190,7 @@ namespace ion::graphics::fonts
 	} //text
 
 
-	//A class representing a text that contains a typeface and some content that can be HTML formatted
+	///@brief A class representing a text that contains a typeface and some content that can be HTML formatted
 	class Text final : public managed::ManagedObject<TextManager>
 	{
 		private:
@@ -226,90 +226,91 @@ namespace ion::graphics::fonts
 
 		public:
 
-			//Constructs a new (unbounded) text with the given name, content, alignment and a type face
+			///@brief Constructs a new (unbounded) text with the given name, content, alignment and a type face
 			Text(std::string name, std::string content, text::TextAlignment alignment,
 				NonOwningPtr<TypeFace> type_face);
 
-			//Constructs a new (unbounded) text with the given name, content and a type face
+			///@brief Constructs a new (unbounded) text with the given name, content and a type face
 			Text(std::string name, std::string content, NonOwningPtr<TypeFace> type_face);
 
-			//Constructs a new text (area) with the given name, content, formatting,
-			//horizontal and vertical alignment, area size, padding, line height factor and a type face
+			///@brief Constructs a new text (area) with the given name, content, formatting,
+			///horizontal and vertical alignment, area size, padding, line height factor and a type face
 			Text(std::string name, std::string content, text::TextFormatting formatting,
 				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
-			//Constructs a new text (area) with the given name, content,
-			//horizontal and vertical alignment, area size, padding, line height factor and a type face
+			///@brief Constructs a new text (area) with the given name, content,
+			///horizontal and vertical alignment, area size, padding, line height factor and a type face
 			Text(std::string name, std::string content,
 				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
-			//Constructs a new text (area) with the given name, content,
-			//area size, padding, line height factor and a type face
+			///@brief Constructs a new text (area) with the given name, content,
+			///area size, padding, line height factor and a type face
 			Text(std::string name, std::string content,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the (raw) content to the given content
-			//Content can contain HTML tags and CSS code
+			///@brief Sets the (raw) content to the given content
+			///@details Content can contain HTML tags and CSS code
 			void Content(std::string content);
 
-			//Sets the formatting of the text to the given format
+			///@brief Sets the formatting of the text to the given format
 			void Formatting(text::TextFormatting formatting);
 
-			//Sets the horizontal alignment of the text to the given alignment
+			///@brief Sets the horizontal alignment of the text to the given alignment
 			inline void Alignment(text::TextAlignment alignment) noexcept
 			{
 				alignment_ = alignment;
 			}
 
-			//Sets the vertical alignment of the text to the given alignment
+			///@brief Sets the vertical alignment of the text to the given alignment
 			inline void VerticalAlignment(text::TextVerticalAlignment vertical_alignment) noexcept
 			{
 				vertical_alignment_ = vertical_alignment;
 			}
 
-			//Sets the overflow property of the text to the given overflow
+			///@brief Sets the overflow property of the text to the given overflow
 			void Overflow(text::TextOverflow overflow) noexcept;
 
 
-			//Sets the area size of the text to the given size
-			//If nullopt is passed, no area size will be used
+			///@brief Sets the area size of the text to the given size
+			///@details If nullopt is passed, no area size will be used
 			void AreaSize(const std::optional<Vector2> &area_size);
 
-			//Sets the padding size of the text area to the given padding (in pixels)
-			//Padding size is the space between the area border and the displayed text
+			///@brief Sets the padding size of the text area to the given padding (in pixels)
+			///@details Padding size is the space between the area border and the displayed text
 			void Padding(const Vector2 &padding);
 
-			//Sets the line height in pixels
-			//Line height is the amount of space between lines of text
+			///@brief Sets the line height in pixels
+			///@details Line height is the amount of space between lines of text
 			void LineHeight(real height) noexcept;
 
-			//Sets the line height factor to the given factor (of the font size)
-			//Line height is the amount of space between lines of text
-			//If nullopt is passed, default line height factor is used
+			///@brief Sets the line height factor to the given factor (of the font size)
+			///@details Line height is the amount of space between lines of text.
+			///If nullopt is passed, default line height factor is used
 			inline void LineHeightFactor(std::optional<real> factor) noexcept
 			{
 				line_height_factor_ = factor.value_or(text::detail::default_line_height_factor);
 			}
 
 
-			//Sets which line (from the displayed text) to start rendering from to the given value
+			///@brief Sets which line (from the displayed text) to start rendering from to the given value
 			inline void FromLine(int from_line) noexcept
 			{
 				from_line_ = from_line >= 0 ? from_line : 0;
 			}
 
-			//Sets the maximum allowed lines to display at once to the given value
-			//If nullopt is passed, no maximum lines will be used
+			///@brief Sets the maximum allowed lines to display at once to the given value
+			///@details If nullopt is passed, no maximum lines will be used
 			inline void MaxLines(std::optional<int> max_lines) noexcept
 			{
 				if (max_lines && *max_lines < 0)
@@ -319,273 +320,283 @@ namespace ion::graphics::fonts
 			}
 
 
-			//Sets the default foreground color for the displayed text to the given color
+			///@brief Sets the default foreground color for the displayed text to the given color
 			inline void DefaultForegroundColor(const Color &color) noexcept
 			{
 				default_foreground_color_ = color;
 			}
 
-			//Sets the default background color behind the displayed text to the given color
+			///@brief Sets the default background color behind the displayed text to the given color
 			inline void DefaultBackgroundColor(const Color &color) noexcept
 			{
 				default_background_color_ = color;
 			}
 
-			//Sets the default font style for the displayed text to the given style
-			//If nullopt is passed, no default font style will be used
+			///@brief Sets the default font style for the displayed text to the given style
+			///@details If nullopt is passed, no default font style will be used
 			inline void DefaultFontStyle(std::optional<text::TextFontStyle> font_style) noexcept
 			{
 				default_font_style_ = font_style;
 			}
 
-			//Sets the default decoration for the displayed text to the given decoration
-			//If nullopt is passed, no default decoration will be used
+			///@brief Sets the default decoration for the displayed text to the given decoration
+			///@details If nullopt is passed, no default decoration will be used
 			inline void DefaultDecoration(std::optional<text::TextDecoration> decoration) noexcept
 			{
 				default_decoration_ = decoration;
 			}
 
-			//Sets the default decoration color for the displayed text decoration to the given color
-			//If nullopt is passed, no default decoration color will be used
+			///@brief Sets the default decoration color for the displayed text decoration to the given color
+			///@details If nullopt is passed, no default decoration color will be used
 			inline void DefaultDecorationColor(const std::optional<Color> &color) noexcept
 			{
 				default_decoration_color_ = color;
 			}
 
 
-			//Attaches the given type face to the text (used for lettering)
+			///@brief Attaches the given type face to the text (used for lettering)
 			void Lettering(NonOwningPtr<TypeFace> type_face) noexcept;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the (raw) content
-			//Content can contain HTML tags and CSS code
+			///@brief Returns the (raw) content
+			///@details Content can contain HTML tags and CSS code
 			[[nodiscard]] inline auto& Content() const noexcept
 			{
 				return content_;
 			}
 
-			//Returns the formatting of the text
+			///@brief Returns the formatting of the text
 			[[nodiscard]] inline auto Formatting() const noexcept
 			{
 				return formatting_;
 			}
 
-			//Returns the horizontal alignment of the text
+			///@brief Returns the horizontal alignment of the text
 			[[nodiscard]] inline auto Alignment() const noexcept
 			{
 				return alignment_;
 			}
 
-			//Returns the vertical alignment of the text
+			///@brief Returns the vertical alignment of the text
 			[[nodiscard]] inline auto VerticalAlignment() const noexcept
 			{
 				return vertical_alignment_;
 			}
 
-			//Returns the overflow property of the text
+			///@brief Returns the overflow property of the text
 			[[nodiscard]] inline auto Overflow() const noexcept
 			{
 				return overflow_;
 			}
 
 
-			//Returns the area size of the text
-			//Returns nullopt if no area size has been specified
+			///@brief Returns the area size of the text
+			///@details Returns nullopt if no area size has been specified
 			[[nodiscard]] inline auto& AreaSize() const noexcept
 			{
 				return area_size_;
 			}
 
-			//Returns the minimum area size needed to display the content in this text
+			///@brief Returns the minimum area size needed to display the content in this text
 			[[nodiscard]] Vector2 MinimumAreaSize() const noexcept;
 
-			//Returns the padding size of the text area in pixels
-			//Padding size is the space between the area border and the displayed text
+			///@brief Returns the padding size of the text area in pixels
+			///@details Padding size is the space between the area border and the displayed text
 			[[nodiscard]] inline auto& Padding() const noexcept
 			{
 				return padding_;
 			}
 
-			//Returns the line height in pixels
-			//Line height is the amount of space between lines of text
-			//Returns nullopt if the text does not have a type face or regular font
+			///@brief Returns the line height in pixels
+			///@details Line height is the amount of space between lines of text.
+			///Returns nullopt if the text does not have a type face or regular font
 			[[nodiscard]] std::optional<real> LineHeight() const noexcept;
 
-			//Returns the line height factor (of the font size)
-			//Line height is the amount of space between lines of text
+			///@brief Returns the line height factor (of the font size)
+			///@details Line height is the amount of space between lines of text
 			[[nodiscard]] inline auto LineHeightFactor() const noexcept
 			{
 				return line_height_factor_;
 			}
 
 
-			//Returns which line (from the displayed text) to start rendering from
+			///@brief Returns which line (from the displayed text) to start rendering from
 			[[nodiscard]] inline auto FromLine() const noexcept
 			{
 				return from_line_;
 			}
 
-			//Returns the maximum allowed lines to display at once
-			//Returns nullopt if no maximum lines has been specified
+			///@brief Returns the maximum allowed lines to display at once
+			///@details Returns nullopt if no maximum lines has been specified
 			[[nodiscard]] inline auto MaxLines() const noexcept
 			{
 				return max_lines_;
 			}
 
 
-			//Returns the default foreground color for the displayed text
+			///@brief Returns the default foreground color for the displayed text
 			[[nodiscard]] inline auto& DefaultForegroundColor() const noexcept
 			{
 				return default_foreground_color_;
 			}
 
-			//Returns the default background color behind the displayed text
+			///@brief Returns the default background color behind the displayed text
 			[[nodiscard]] inline auto& DefaultBackgroundColor() const noexcept
 			{
 				return default_background_color_;
 			}
 
-			//Returns the default font style for the displayed text
-			//Returns nullopt if no default font style has been specified
+			///@brief Returns the default font style for the displayed text
+			///@details Returns nullopt if no default font style has been specified
 			[[nodiscard]] inline auto DefaultFontStyle() const noexcept
 			{
 				return default_font_style_;
 			}
 
-			//Returns the default decoration for the displayed text
-			//Returns nullopt if no default decoration has been specified
+			///@brief Returns the default decoration for the displayed text
+			///@details Returns nullopt if no default decoration has been specified
 			[[nodiscard]] inline auto DefaultDecoration() const noexcept
 			{
 				return default_decoration_;
 			}
 
-			//Returns the default decoration color for the displayed text decoration
-			//Returns nullopt if no default decoration color has been specified
+			///@brief Returns the default decoration color for the displayed text decoration
+			///@details Returns nullopt if no default decoration color has been specified
 			[[nodiscard]] inline auto DefaultDecorationColor() const noexcept
 			{
 				return default_decoration_color_;
 			}
 
 
-			//Returns a pointer to the type face in this text (used for lettering)
-			//Returns nullptr if this text does not have a type face
+			///@brief Returns a pointer to the type face in this text (used for lettering)
+			///@details Returns nullptr if this text does not have a type face
 			[[nodiscard]] inline auto Lettering() const noexcept
 			{
 				return type_face_;
 			}
 
 
-			//Returns the number of lines in this text
+			///@brief Returns the number of lines in this text
 			int LineCount() const noexcept;
 
-			//Returns the number of lines that are being displayed in this text
+			///@brief Returns the number of lines that are being displayed in this text
 			int DisplayedLineCount() const noexcept;
 
-			//Returns the number of line that can be displayed in this text
-			//Returns nullopt if no area size or maximum lines has been specified
+			///@brief Returns the number of line that can be displayed in this text
+			///@details Returns nullopt if no area size or maximum lines has been specified
 			std::optional<int> DisplayedLineCapacity() const noexcept;
 
-			//Returns the line offset at the given offset
+			///@brief Returns the line offset at the given offset
 			int LineOffsetAt(int off) const noexcept;
 
+			///@}
 
-			/*
-				Content
+			/**
+				@name Content
+				@{
 			*/
 
-			//Inserts the given content to the back of the (raw) content
-			//This will only parse and format the added content (unlike Text::Content)
+			///@brief Inserts the given content to the back of the (raw) content
+			///@details This will only parse and format the added content (unlike Text::Content)
 			void AppendContent(std::string_view content);
 
-			//Inserts the given content to the front of the (raw) content
-			//This will only parse and format the added content (unlike Text::Content)
+			///@brief Inserts the given content to the front of the (raw) content
+			///@details This will only parse and format the added content (unlike Text::Content)
 			void PrependContent(std::string_view content);
 
 
-			//Inserts the given content as a new line to the back of the (raw) content
-			//This is an optimization of Text::AppendContent (no changes to existing lines or blocks)
+			///@brief Inserts the given content as a new line to the back of the (raw) content
+			///@details This is an optimization of Text::AppendContent (no changes to existing lines or blocks)
 			void AppendLine(std::string_view content);
 
-			//Inserts the given content as a new line to the front of the (raw) content
-			//This is an optimization of Text::PrependContent (no changes to existing lines or blocks)
+			///@brief Inserts the given content as a new line to the front of the (raw) content
+			///@details This is an optimization of Text::PrependContent (no changes to existing lines or blocks)
 			void PrependLine(std::string_view content);
 
-			//Inserts the given content as a new line at the given line offset of the (raw) content
-			//This is an optimization of Text::Content (no changes to existing lines or blocks)
+			///@brief Inserts the given content as a new line at the given line offset of the (raw) content
+			///@details This is an optimization of Text::Content (no changes to existing lines or blocks)
 			void InsertLine(int line_off, std::string_view content);
 
 
-			//Replaces the line at the given line offset of the (raw) content, with the given content
-			//This is an optimization of Text::Content (no changes to other lines or blocks)
+			///@brief Replaces the line at the given line offset of the (raw) content, with the given content
+			///@details This is an optimization of Text::Content (no changes to other lines or blocks)
 			void ReplaceLine(int line_off, std::string_view content);
 
-			//Replaces all lines in range [first, last) of the (raw) content, with the given content
-			//This is an optimization of Text::Content (no changes to other lines or blocks)
+			///@brief Replaces all lines in range [first, last) of the (raw) content, with the given content
+			///@details This is an optimization of Text::Content (no changes to other lines or blocks)
 			void ReplaceLines(int first_line, int last_line, std::string_view content);
 
 
-			//Removes the line at the given line offset from the (raw) content
-			//This is an optimization of Text::Content (no changes to other lines or blocks)
+			///@brief Removes the line at the given line offset from the (raw) content
+			///@details This is an optimization of Text::Content (no changes to other lines or blocks)
 			void RemoveLine(int line_off);
 
-			//Removes all lines in range [first, last) from the (raw) content
-			//This is an optimization of Text::Content (no changes to other lines or blocks)
+			///@brief Removes all lines in range [first, last) from the (raw) content
+			///@details This is an optimization of Text::Content (no changes to other lines or blocks)
 			void RemoveLines(int first_line, int last_line);
 
 
-			//Clears all content in this text
+			///@brief Clears all content in this text
 			void Clear() noexcept;
 
+			///@}
 
-			/*
-				Formatted
+			/**
+				@name Formatted
+				@{
 			*/
 
-			//Returns all of the formatted blocks in this text, with associated styles
-			//Text styles has been parsed from HTML tags and CSS code
+			///@brief Returns all of the formatted blocks in this text, with associated styles
+			///@details Text styles has been parsed from HTML tags and CSS code
 			[[nodiscard]] inline auto& FormattedBlocks() const noexcept
 			{
 				return formatted_blocks_;
 			}
 
-			//Returns an immutable range of all formatted lines in this text
-			//Each line contains formatted blocks of text, with associated styles
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all formatted lines in this text
+			///@details Each line contains formatted blocks of text, with associated styles.
+			///This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto FormattedLines() const noexcept
 			{
 				return adaptors::ranges::Iterable<const text::TextLines&>{formatted_lines_};
 			}
 
+			///@}
 
-			/*
-				Unformatted
+			/**
+				@name Unformatted
+				@{
 			*/
 
-			//Returns the (plain) unformatted content
-			//All valid HTML tags are removed if TextFormatting is HTML
+			///@brief Returns the (plain) unformatted content
+			///@details All valid HTML tags are removed if TextFormatting is HTML
 			[[nodiscard]] std::string UnformattedContent() const;
 
-			//Returns the (plain) unformatted word-wrapped content
-			//All valid HTML tags are removed if TextFormatting is HTML
+			///@brief Returns the (plain) unformatted word-wrapped content
+			///@details All valid HTML tags are removed if TextFormatting is HTML
 			[[nodiscard]] std::string UnformattedWrappedContent() const;
 
-			//Returns the (plain) unformatted content as displayed
-			//All valid HTML tags are removed if TextFormatting is HTML
-			//If area size has been specified, content may be word wrapped
+			///@brief Returns the (plain) unformatted content as displayed
+			///@details All valid HTML tags are removed if TextFormatting is HTML.
+			///If area size has been specified, content may be word wrapped
 			[[nodiscard]] std::string UnformattedDisplayedContent() const;
 
 
-			//Returns the number of characters in the (plain) unformatted content
-			//All valid HTML tags are removed if TextFormatting is HTML
+			///@brief Returns the number of characters in the (plain) unformatted content
+			///@details All valid HTML tags are removed if TextFormatting is HTML
 			[[nodiscard]] int UnformattedCharacterCount() const;
 
-			//Returns the number of characters in the (plain) unformatted content as displayed
-			//All valid HTML tags are removed if TextFormatting is HTML
+			///@brief Returns the number of characters in the (plain) unformatted content as displayed
+			///@details All valid HTML tags are removed if TextFormatting is HTML
 			[[nodiscard]] int UnformattedDisplayedCharacterCount() const;
+
+			///@}
 	};
 } //ion::graphics::fonts
 

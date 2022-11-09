@@ -27,105 +27,116 @@ namespace ion::graphics::fonts
 	} //type_face_manager::detail
 
 
-	//A class that manages and stores type faces
+	///@brief A class that manages and stores type faces
 	class TypeFaceManager final :
 		public managed::ObjectManager<TypeFace, TypeFaceManager>
 	{
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			TypeFaceManager() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			TypeFaceManager(const TypeFaceManager&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			TypeFaceManager(TypeFaceManager&&) = default;
 
-			//Destructor
+			///@brief Destructor
 			~TypeFaceManager() = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			TypeFaceManager& operator=(const TypeFaceManager&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			TypeFaceManager& operator=(TypeFaceManager&&) = default;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all type faces in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all type faces in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto TypeFaces() noexcept
 			{
 				return Objects();
 			}
 
-			//Returns an immutable range of all type faces in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all type faces in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto TypeFaces() const noexcept
 			{
 				return Objects();
 			}
 
+			///@}
 
-			/*
-				Type faces
+			/**
+				@name Type faces
 				Creating
+				@{
 			*/
 
-			//Creates a type face with the given name and a regular font
+			///@brief Creates a type face with the given name and a regular font
 			NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular);
 
-			//Creates a type face with the given name, a regular, bold and italic font
+			///@brief Creates a type face with the given name, a regular, bold and italic font
 			NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic);
 
-			//Creates a type face with the given name, a regular, bold, italic and bold italic font
+			///@brief Creates a type face with the given name, a regular, bold, italic and bold italic font
 			NonOwningPtr<TypeFace> CreateTypeFace(std::string name, NonOwningPtr<Font> regular, NonOwningPtr<Font> bold, NonOwningPtr<Font> italic,
 				NonOwningPtr<Font> bold_italic);
 
 
-			//Creates a type face as a copy of the given type face
+			///@brief Creates a type face as a copy of the given type face
 			NonOwningPtr<TypeFace> CreateTypeFace(const TypeFace &type_face);
 
-			//Creates a type face by moving the given type face
+			///@brief Creates a type face by moving the given type face
 			NonOwningPtr<TypeFace> CreateTypeFace(TypeFace &&type_face);
 
+			///@}
 
-			/*
-				Type faces
+			/**
+				@name Type faces
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable type face with the given name
-			//Returns nullptr if type face could not be found
+			///@brief Gets a pointer to a mutable type face with the given name
+			///@details Returns nullptr if type face could not be found
 			[[nodiscard]] NonOwningPtr<TypeFace> GetTypeFace(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable type face with the given name
-			//Returns nullptr if type face could not be found
+			///@brief Gets a pointer to an immutable type face with the given name
+			///@details Returns nullptr if type face could not be found
 			[[nodiscard]] NonOwningPtr<const TypeFace> GetTypeFace(std::string_view name) const noexcept;
 
+			///@}
 
-			/*
-				Type faces
+			/**
+				@name Type faces
 				Removing
+				@{
 			*/
 
-			//Clears all removable type faces from this manager
+			///@brief Clears all removable type faces from this manager
 			void ClearTypeFaces() noexcept;
 
-			//Removes a removable type face from this manager
+			///@brief Removes a removable type face from this manager
 			bool RemoveTypeFace(TypeFace &type_face) noexcept;
 
-			//Removes a removable type face with the given name from this manager
+			///@brief Removes a removable type face with the given name from this manager
 			bool RemoveTypeFace(std::string_view name) noexcept;
+
+			///@}
 	};
 } //ion::graphics::fonts
 

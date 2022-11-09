@@ -30,122 +30,133 @@ namespace ion::graphics::fonts
 	} //text_manager::detail
 
 
-	//A class that manages and stores texts
+	///@brief A class that manages and stores texts
 	class TextManager final :
 		public managed::ObjectManager<Text, TextManager>
 	{
 		public:
 		
-			//Default constructor
+			///@brief Default constructor
 			TextManager() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			TextManager(const TextManager&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			TextManager(TextManager&&) = default;
 
-			//Destructor
+			///@brief Destructor
 			~TextManager() = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			TextManager& operator=(const TextManager&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			TextManager& operator=(TextManager&&) = default;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all texts in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all texts in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Texts() noexcept
 			{
 				return Objects();
 			}
 
-			//Returns an immutable range of all texts in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all texts in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Texts() const noexcept
 			{
 				return Objects();
 			}
 
+			///@}
 
-			/*
-				Texts
+			/**
+				@name Texts
 				Creating
+				@{
 			*/
 
-			//Creates a (unbounded) text with the given name, content, alignment and a type face
+			///@brief Creates a (unbounded) text with the given name, content, alignment and a type face
 			NonOwningPtr<Text> CreateText(std::string name, std::string content, text::TextAlignment alignment,
 				NonOwningPtr<TypeFace> type_face);
 
-			//Creates a (unbounded) text with the given name, content and a type face
+			///@brief Creates a (unbounded) text with the given name, content and a type face
 			NonOwningPtr<Text> CreateText(std::string name, std::string content, NonOwningPtr<TypeFace> type_face);
 
-			//Creates a text (area) with the given name, content, formatting,
-			//horizontal and vertical alignment, area size, padding, line height factor and a type face
+			///@brief Creates a text (area) with the given name, content, formatting,
+			///horizontal and vertical alignment, area size, padding, line height factor and a type face
 			NonOwningPtr<Text> CreateText(std::string name, std::string content, text::TextFormatting formatting,
 				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
-			//Creates a text (area) with the given name, content,
-			//horizontal and vertical alignment, area size, padding, line height factor and a type face
+			///@brief Creates a text (area) with the given name, content,
+			///horizontal and vertical alignment, area size, padding, line height factor and a type face
 			NonOwningPtr<Text> CreateText(std::string name, std::string content,
 				text::TextAlignment alignment, text::TextVerticalAlignment vertical_alignment,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
-			//Creates a text (area) with the given name, content,
-			//area size, padding, line height factor and a type face
+			///@brief Creates a text (area) with the given name, content,
+			///area size, padding, line height factor and a type face
 			NonOwningPtr<Text> CreateText(std::string name, std::string content,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				std::optional<real> line_height_factor, NonOwningPtr<TypeFace> type_face);
 
 
-			//Creates a text as a copy of the given text
+			///@brief Creates a text as a copy of the given text
 			NonOwningPtr<Text> CreateText(const Text &text);
 
-			//Creates a text by moving the given text
+			///@brief Creates a text by moving the given text
 			NonOwningPtr<Text> CreateText(Text &&text);
 
+			///@}
 
-			/*
-				Texts
+			/**
+				@name Texts
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable text with the given name
-			//Returns nullptr if text could not be found
+			///@brief Gets a pointer to a mutable text with the given name
+			///@details Returns nullptr if text could not be found
 			[[nodiscard]] NonOwningPtr<Text> GetText(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable text with the given name
-			//Returns nullptr if text could not be found
+			///@brief Gets a pointer to an immutable text with the given name
+			///@details Returns nullptr if text could not be found
 			[[nodiscard]] NonOwningPtr<const Text> GetText(std::string_view name) const noexcept;
 
+			///@}
 
-			/*
-				Texts
+			/**
+				@name Texts
 				Removing
+				@{
 			*/
 
-			//Clears all removable texts from this manager
+			///@brief Clears all removable texts from this manager
 			void ClearTexts() noexcept;
 
-			//Removes a removable text from this manager
+			///@brief Removes a removable text from this manager
 			bool RemoveText(Text &text) noexcept;
 
-			//Removes a removable text with the given name from this manager
+			///@brief Removes a removable text with the given name from this manager
 			bool RemoveText(std::string_view name) noexcept;
+
+			///@}
 	};
 } //ion::graphics::fonts
 
