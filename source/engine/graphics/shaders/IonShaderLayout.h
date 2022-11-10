@@ -318,9 +318,9 @@ namespace ion::graphics::shaders
 	} //shader_layout
 
 
-	//A class representing an attribute and uniform binding layout for a shader program to follow
-	//By using the same pre-defined attribute/uniform names, the engine will automatically send those values to the associated variabels
-	//If no shader layout is specified for a shader program, a default layout will be used
+	///@brief A class representing an attribute and uniform binding layout for a shader program to follow
+	///@details By using the same pre-defined attribute/uniform names, the engine will automatically send those values to the associated variabels.
+	///If no shader layout is specified for a shader program, a default layout will be used
 	class ShaderLayout final : public managed::ManagedObject<ShaderProgramManager>
 	{
 		private:
@@ -331,128 +331,138 @@ namespace ion::graphics::shaders
 
 		public:
 
-			//Constructs a new empty shader layout with the given name
+			///@brief Constructs a new empty shader layout with the given name
 			explicit ShaderLayout(std::string name) noexcept;
 
-			//Constructs a new shader layout with the given name, struct, attribute and uniform bindings
+			///@brief Constructs a new shader layout with the given name, struct, attribute and uniform bindings
 			ShaderLayout(std::string name, shader_layout::StructBindings struct_bindings,
 				shader_layout::AttributeBindings attribute_bindings, shader_layout::UniformBindings uniform_bindings) noexcept;
 
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all structs in this shader layout
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all structs in this shader layout
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Structs() noexcept
 			{
 				return struct_bindings_.Elements();
 			}
 
-			//Returns an immutable range of all structs in this shader layout
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all structs in this shader layout
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Structs() const noexcept
 			{
 				return struct_bindings_.Elements();
 			}
 
 
-			//Returns a mutable range of all attributes in this shader layout
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all attributes in this shader layout
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Attributes() noexcept
 			{
 				return attribute_bindings_.Elements();
 			}
 
-			//Returns an immutable range of all attributes in this shader layout
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all attributes in this shader layout
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Attributes() const noexcept
 			{
 				return attribute_bindings_.Elements();
 			}
 
 
-			//Returns a mutable range of all uniforms in this shader layout
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all uniforms in this shader layout
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Uniforms() noexcept
 			{
 				return uniform_bindings_.Elements();
 			}
 
-			//Returns an immutable range of all uniforms in this shader layout
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all uniforms in this shader layout
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Uniforms() const noexcept
 			{
 				return uniform_bindings_.Elements();
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Binds the given name to the given struct name
-			//Returns true if the struct binding suceeded
+			///@brief Binds the given name to the given struct name
+			///@details Returns true if the struct binding suceeded
 			bool BindStruct(shader_layout::StructName name, std::string str_name);
 
-			//Binds the given name to the given attribute declaration
-			//Returns true if the attribute binding suceeded
+			///@brief Binds the given name to the given attribute declaration
+			///@details Returns true if the attribute binding suceeded
 			bool BindAttribute(shader_layout::AttributeName name, shader_layout::VariableDeclaration declaration);
 
-			//Binds the given name to the given uniform declaration
-			//Returns true if the uniform binding suceeded
+			///@brief Binds the given name to the given uniform declaration
+			///@details Returns true if the uniform binding suceeded
 			bool BindUniform(shader_layout::UniformName name, shader_layout::VariableDeclaration declaration);
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the struct name bound to the given standardized struct name
-			//Returns nullopt if no struct binding could be found
+			///@brief Returns the struct name bound to the given standardized struct name
+			///@details Returns nullopt if no struct binding could be found
 			[[nodiscard]] std::optional<std::string> BoundStruct(shader_layout::StructName name) const noexcept;
 
-			//Returns the attribute declaration bound to the given standardized attribute name
-			//Returns nullopt if no attribute binding could be found
+			///@brief Returns the attribute declaration bound to the given standardized attribute name
+			///@details Returns nullopt if no attribute binding could be found
 			[[nodiscard]] std::optional<shader_layout::VariableDeclaration> BoundAttribute(shader_layout::AttributeName name) const noexcept;
 
-			//Returns the uniform declaration bound to the given standardized uniform name
-			//Returns nullopt if no uniform binding could be found
+			///@brief Returns the uniform declaration bound to the given standardized uniform name
+			///@details Returns nullopt if no uniform binding could be found
 			[[nodiscard]] std::optional<shader_layout::VariableDeclaration> BoundUniform(shader_layout::UniformName name) const noexcept;
 
 
-			//Returns the standardized struct name that is bound to the given struct name
-			//Returns nullopt if no struct binding could be found
+			///@brief Returns the standardized struct name that is bound to the given struct name
+			///@details Returns nullopt if no struct binding could be found
 			[[nodiscard]] std::optional<shader_layout::StructName> GetStructName(std::string_view name) const noexcept;
 
-			//Returns the standardized attribute name that is bound to the given attribute name
-			//Returns nullopt if no attribute binding could be found
+			///@brief Returns the standardized attribute name that is bound to the given attribute name
+			///@details Returns nullopt if no attribute binding could be found
 			[[nodiscard]] std::optional<shader_layout::AttributeName> GetAttributeName(std::string_view name) const noexcept;
 
-			//Returns the standardized uniform name that is bound to the given uniform name
-			//Returns nullopt if no uniform binding could be found
+			///@brief Returns the standardized uniform name that is bound to the given uniform name
+			///@details Returns nullopt if no uniform binding could be found
 			[[nodiscard]] std::optional<shader_layout::UniformName> GetUniformName(std::string_view name) const noexcept;
 
 
-			//Returns the standardized attribute name that is bound to the given attribute location
-			//Returns nullopt if no attribute binding could be found
+			///@brief Returns the standardized attribute name that is bound to the given attribute location
+			///@details Returns nullopt if no attribute binding could be found
 			[[nodiscard]] std::optional<shader_layout::AttributeName> GetAttributeName(int location) const noexcept;
 
-			//Returns the standardized uniform name that is bound to the given uniform location
-			//Returns nullopt if no uniform binding could be found
+			///@brief Returns the standardized uniform name that is bound to the given uniform location
+			///@details Returns nullopt if no uniform binding could be found
 			[[nodiscard]] std::optional<shader_layout::UniformName> GetUniformName(int location) const noexcept;
+
+			///@}
 	};
 
 
 	namespace shader_layout
 	{
-		/*
-			Predefined shader layouts
+		/**
+			@name Predefined shader layouts
+			@{
 		*/
 
 		inline const auto DefaultShaderLayout =
 			ShaderLayout{"", DefaultStructBindings, DefaultAttributeBindings, DefaultUniformBindings};
+
+		///@}
 	} //shader_layout
 } //ion::graphics::shaders
 

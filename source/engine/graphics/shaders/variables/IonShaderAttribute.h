@@ -108,7 +108,7 @@ namespace ion::graphics::shaders::variables
 	} //attribute_variable
 
 
-	//A class representing an attribute variable
+	///@brief A class representing an attribute variable
 	class AttributeVariable : public ShaderVariable
 	{
 		protected:
@@ -118,72 +118,79 @@ namespace ion::graphics::shaders::variables
 
 		public:
 
-			//Constructor
+			///@brief Constructor
 			AttributeVariable(std::string name, attribute_variable::VariableType value) noexcept;
 
-			//Default virtual destructor
+			///@brief Default virtual destructor
 			virtual ~AttributeVariable() = default;
 
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Gets a mutable reference to the contained glsl attribute value
+			///@brief Gets a mutable reference to the contained glsl attribute value
 			template <typename T, typename = std::enable_if_t<std::is_base_of_v<AttributeVariable, Attribute<T>>>>
 			[[nodiscard]] inline auto& Get() noexcept
 			{
 				return static_cast<Attribute<T>&>(*this).Get();
 			}
 
-			//Gets an immutable reference to the contained glsl attribute value
+			///@brief Gets an immutable reference to the contained glsl attribute value
 			template <typename T, typename = std::enable_if_t<std::is_base_of_v<AttributeVariable, Attribute<T>>>>
 			[[nodiscard]] inline auto& Get() const noexcept
 			{
 				return static_cast<const Attribute<T>&>(*this).Get();
 			}
 
+			///@}
 
-			/*
-				Visit
+			/**
+				@name Visit
+				@{
 			*/
 
-			//Mutable value visit
-			//Calls the correct overload for the given overload set, based on the value of the attribute variable
+			///@brief Mutable value visit
+			///@details Calls the correct overload for the given overload set, based on the value of the attribute variable
 			template <typename T, typename ...Ts>
 			inline auto Visit(T &&callable, Ts &&...callables) noexcept
 			{
 				return std::visit(types::overloaded{std::forward<T>(callable), std::forward<Ts>(callables)...}, value_);
 			}
 
-			//Immutable value visit
-			//Calls the correct overload for the given overload set, based on the value of the attribute variable
+			///@brief Immutable value visit
+			///@details Calls the correct overload for the given overload set, based on the value of the attribute variable
 			template <typename T, typename ...Ts>
 			inline auto Visit(T &&callable, Ts &&...callables) const noexcept
 			{
 				return std::visit(types::overloaded{std::forward<T>(callable), std::forward<Ts>(callables)...}, value_);
 			}
 
+			///@}
 
-			/*
-				Values
+			/**
+				@name Values
+				@{
 			*/
 
-			//Returns true if the attribute variable value has changed
+			///@brief Returns true if the attribute variable value has changed
 			[[nodiscard]] bool HasNewValue() noexcept;
 
-			//Force the attribute value to be refreshed next time it is processed
+			///@brief Force the attribute value to be refreshed next time it is processed
 			void Refresh() noexcept;
+
+			///@}
 	};
 
 
-	//Class provides a more naturally way of initialize an attribute variable
+	///@brief Class provides a more naturally way of initialize an attribute variable
 	template <typename T>
 	struct Attribute final : AttributeVariable
 	{
 		static_assert(glsl::is_basic_type_v<T>);
 
-		//Constructor
+		///@brief Constructor
 		explicit Attribute(std::string name) noexcept :
 			AttributeVariable(std::move(name), glsl::attribute<T>{})
 		{
@@ -191,21 +198,24 @@ namespace ion::graphics::shaders::variables
 		}
 
 
-		/*
-			Observers
+		/**
+			@name Observers
+			@{
 		*/
 
-		//Gets a mutable reference to the contained glsl attribute value
+		///@brief Gets a mutable reference to the contained glsl attribute value
 		[[nodiscard]] inline auto& Get() noexcept
 		{
 			return std::get<glsl::attribute<T>>(value_);
 		}
 
-		//Gets an immutable reference to the contained glsl attribute value
+		///@brief Gets an immutable reference to the contained glsl attribute value
 		[[nodiscard]] inline auto& Get() const noexcept
 		{
 			return std::get<glsl::attribute<T>>(value_);
 		}
+
+		///@}
 	};
 } //ion::graphics::shaders::variables
 

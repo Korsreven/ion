@@ -56,7 +56,7 @@ namespace ion::graphics::shaders
 	} //shader
 
 
-	//A class representing a vertex or fragment shader
+	///@brief A class representing a vertex or fragment shader
 	class Shader final : public resources::FileResource<ShaderManager>
 	{
 		private:
@@ -68,34 +68,39 @@ namespace ion::graphics::shaders
 			using resources::FileResource<ShaderManager>::FileResource;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the handle for the shader to the given value
+			///@brief Sets the handle for the shader to the given value
 			inline void Handle(std::optional<int> handle) noexcept
 			{
 				handle_ = handle;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the type of the shader
-			//Returns nullopt if the shader is not loaded
+			///@brief Returns the type of the shader
+			///@details Returns nullopt if the shader is not loaded
 			[[nodiscard]] inline auto Type() const noexcept
 			{
 				return shader::detail::shader_type(AssetName());
 			}
 
-			//Returns the handle to the shader
-			//Returns nullopt if the shader is not loaded
+			///@brief Returns the handle to the shader
+			///@details Returns nullopt if the shader is not loaded
 			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return handle_;
-			}	
+			}
+
+			///@}
 	};
 } //ion::graphics::shaders
 

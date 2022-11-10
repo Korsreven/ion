@@ -35,7 +35,7 @@ namespace ion::graphics::shaders
 	} //shader_struct::detail
 
 
-	//A class representing a shader struct that can contain multiple uniform variables (members)
+	///@brief A class representing a shader struct that can contain multiple uniform variables (members)
 	class ShaderStruct final :
 		public managed::ManagedObject<ShaderProgram>,
 		public managed::ObjectManager<variables::UniformVariable, ShaderProgram>
@@ -52,65 +52,72 @@ namespace ion::graphics::shaders
 
 		public:
 			
-			//Constructs a new shader struct with the given name and size
+			///@brief Constructs a new shader struct with the given name and size
 			explicit ShaderStruct(std::string name, int size = 1) noexcept;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			ShaderStruct(const ShaderStruct&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			ShaderStruct(ShaderStruct&&) = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			ShaderStruct& operator=(const ShaderStruct&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			ShaderStruct& operator=(ShaderStruct&&) = default;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all uniform variables in this shader struct
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all uniform variables in this shader struct
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto UniformVariables() noexcept
 			{
 				return Objects();
 			}
 
-			//Returns an immutable range of all uniform variables in this shader struct
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all uniform variables in this shader struct
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto UniformVariables() const noexcept
 			{
 				return Objects();
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the number of instances of this struct
-			//For a single instance, the size returned will be 1
-			//For multiple instances, the size returned will be the size of the array
+			///@brief Returns the number of instances of this struct
+			///@details For a single instance, the size returned will be 1.
+			///For multiple instances, the size returned will be the size of the array
 			[[nodiscard]] inline auto Size() const noexcept
 			{
 				return size_;
 			}
 
+			///@}
 
-			/*
-				Uniform variables
+			/**
+				@name Uniform variables
 				Creating
+				@{
 			*/
 			
-			//Creates a uniform variable with the given name and size
+			///@brief Creates a uniform variable with the given name and size
 			template <typename T>
 			auto CreateUniform(std::string name, int size = 1)
 			{
@@ -132,34 +139,40 @@ namespace ion::graphics::shaders
 				return static_pointer_cast<variables::Uniform<T>>(ptr);
 			}
 
+			///@}
 
-			/*
-				Uniform variables
+			/**
+				@name Uniform variables
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable uniform variable with the given name
-			//Returns nullptr if uniform variable could not be found
+			///@brief Gets a pointer to a mutable uniform variable with the given name
+			///@details Returns nullptr if uniform variable could not be found
 			[[nodiscard]] NonOwningPtr<variables::UniformVariable> GetUniform(std::string_view name, std::optional<int> off = {}) noexcept;
 
-			//Gets a pointer to an immutable uniform variable with the given name
-			//Returns nullptr if uniform variable could not be found
+			///@brief Gets a pointer to an immutable uniform variable with the given name
+			///@details Returns nullptr if uniform variable could not be found
 			[[nodiscard]] NonOwningPtr<const variables::UniformVariable> GetUniform(std::string_view name, std::optional<int> off = {}) const noexcept;
 
+			///@}
 
-			/*
-				Uniform variables
+			/**
+				@name Uniform variables
 				Removing
+				@{
 			*/
 
-			//Clears all removable uniform variables from this shader struct
+			///@brief Clears all removable uniform variables from this shader struct
 			void ClearUniforms() noexcept;
 
-			//Removes a removable uniform variable from this shader struct
+			///@brief Removes a removable uniform variable from this shader struct
 			bool RemoveUniform(variables::UniformVariable &uniform_variable) noexcept;
 
-			//Removes a removable uniform variable with the given name from this manager
+			///@brief Removes a removable uniform variable with the given name from this manager
 			bool RemoveUniform(std::string_view name, std::optional<int> off = {}) noexcept;
+
+			///@}
 	};
 } //ion::graphics::shaders
 

@@ -137,7 +137,7 @@ namespace ion::graphics::shaders::variables
 	} //uniform_variable
 
 
-	//A class representing a uniform variable
+	///@brief A class representing a uniform variable
 	class UniformVariable : public ShaderVariable
 	{
 		private:
@@ -152,117 +152,128 @@ namespace ion::graphics::shaders::variables
 
 		public:
 
-			//Constructor
+			///@brief Constructor
 			UniformVariable(std::string name, uniform_variable::VariableType value) noexcept;
 
-			//Default virtual destructor
+			///@brief Default virtual destructor
 			virtual ~UniformVariable() = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Returns a mutable member uniform variable at the given offset
+			///@brief Returns a mutable member uniform variable at the given offset
 			[[nodiscard]] UniformVariable& operator[](int off) noexcept;
 
-			//Returns an immutable member uniform variable at the given offset
+			///@brief Returns an immutable member uniform variable at the given offset
 			[[nodiscard]] const UniformVariable& operator[](int off) const noexcept;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the parent struct of this member uniform variable
+			///@brief Sets the parent struct of this member uniform variable
 			inline void ParentStruct(ShaderStruct &shader_struct, int member_off) noexcept
 			{
 				parent_struct_ = &shader_struct;
 				member_offset_ = member_off;
 			}
 
-			//Releases the parent struct of this member uniform variable
+			///@brief Releases the parent struct of this member uniform variable
 			inline void ParentStruct(std::nullptr_t) noexcept
 			{
 				parent_struct_ = nullptr;
 				member_offset_ = {};
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the parent struct of this member uniform variable
-			//Returns nullptr if this uniform variable is not a struct member
+			///@brief Returns the parent struct of this member uniform variable
+			///@details Returns nullptr if this uniform variable is not a struct member
 			[[nodiscard]] inline auto ParentStruct() const noexcept
 			{
 				return parent_struct_;
 			}
 
-			//Returns the member offset of this member uniform variable
-			//Returns nullopt if this uniform variable is not a struct member
+			///@brief Returns the member offset of this member uniform variable
+			///@details Returns nullopt if this uniform variable is not a struct member
 			[[nodiscard]] inline auto& MemberOffset() const noexcept
 			{
 				return member_offset_;
 			}
 
 
-			//Gets a mutable reference to the contained glsl uniform value
+			///@brief Gets a mutable reference to the contained glsl uniform value
 			template <typename T, typename = std::enable_if_t<std::is_base_of_v<UniformVariable, Uniform<T>>>>
 			[[nodiscard]] inline auto& Get() noexcept
 			{
 				return static_cast<Uniform<T>&>(*this).Get();
 			}
 
-			//Gets an immutable reference to the contained glsl uniform value
+			///@brief Gets an immutable reference to the contained glsl uniform value
 			template <typename T, typename = std::enable_if_t<std::is_base_of_v<UniformVariable, Uniform<T>>>>
 			[[nodiscard]] inline auto& Get() const noexcept
 			{
 				return static_cast<const Uniform<T>&>(*this).Get();
 			}
 
+			///@}
 
-			/*
-				Visit
+			/**
+				@name Visit
+				@{
 			*/
 
-			//Mutable value visit
-			//Calls the correct overload for the given overload set, based on the value of the uniform variable
+			///@brief Mutable value visit
+			///@details Calls the correct overload for the given overload set, based on the value of the uniform variable
 			template <typename T, typename ...Ts>
 			inline auto Visit(T &&callable, Ts &&...callables) noexcept
 			{
 				return std::visit(types::overloaded{std::forward<T>(callable), std::forward<Ts>(callables)...}, value_);
 			}
 
-			//Immutable value visit
-			//Calls the correct overload for the given overload set, based on the value of the uniform variable
+			///@brief Immutable value visit
+			///@details Calls the correct overload for the given overload set, based on the value of the uniform variable
 			template <typename T, typename ...Ts>
 			inline auto Visit(T &&callable, Ts &&...callables) const noexcept
 			{
 				return std::visit(types::overloaded{std::forward<T>(callable), std::forward<Ts>(callables)...}, value_);
 			}
 
+			///@}
 
-			/*
-				Values
+			/**
+				@name Values
+				@{
 			*/
 
-			//Returns true if the uniform variable value has changed
+			///@brief Returns true if the uniform variable value has changed
 			[[nodiscard]] bool HasNewValue() noexcept;
 
-			//Force the uniform value to be refreshed next time it is processed
+			///@brief Force the uniform value to be refreshed next time it is processed
 			void Refresh() noexcept;
+
+			///@}
 	};
 
 
-	//Class provides a more naturally way of initialize a uniform variable
+	///@brief Class provides a more naturally way of initialize a uniform variable
 	template <typename T>
 	struct Uniform final : UniformVariable
 	{
 		static_assert(glsl::is_basic_type_v<T>);
 
-		//Constructor
+		///@brief Constructor
 		explicit Uniform(std::string name, int size = 1) :
 			UniformVariable(std::move(name), glsl::uniform<T>{size})
 		{
@@ -270,21 +281,24 @@ namespace ion::graphics::shaders::variables
 		}
 
 
-		/*
-			Observers
+		/**
+			@name Observers
+			@{
 		*/
 
-		//Gets a mutable reference to the contained glsl uniform value
+		///@brief Gets a mutable reference to the contained glsl uniform value
 		[[nodiscard]] inline auto& Get() noexcept
 		{
 			return std::get<glsl::uniform<T>>(value_);
 		}
 
-		//Gets an immutable reference to the contained glsl uniform value
+		///@brief Gets an immutable reference to the contained glsl uniform value
 		[[nodiscard]] inline auto& Get() const noexcept
 		{
 			return std::get<glsl::uniform<T>>(value_);
 		}
+
+		///@}
 	};
 	
 } //ion::graphics::shaders::variables

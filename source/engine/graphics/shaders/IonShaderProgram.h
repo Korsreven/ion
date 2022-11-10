@@ -46,8 +46,8 @@ namespace ion::graphics::shaders
 	} //shader_program::detail
 
 
-	//A class representing a shader program that contains a vertex and fragment shader
-	//A shader program also contains attribute and uniform variables, as well as a shader layout
+	///@brief A class representing a shader program that contains a vertex and fragment shader
+	///@details A shader program also contains attribute and uniform variables, as well as a shader layout
 	class ShaderProgram final :
 		public resources::Resource<ShaderProgramManager>,
 		public managed::ObjectManager<ShaderStruct, ShaderProgram>,
@@ -75,8 +75,9 @@ namespace ion::graphics::shaders
 
 		protected:
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
 			void Created(ShaderStruct &shader_struct) noexcept override;
@@ -87,243 +88,262 @@ namespace ion::graphics::shaders
 			void Removed(variables::AttributeVariable &attribute_variable) noexcept override;
 			void Removed(variables::UniformVariable &uniform_variable) noexcept override;
 
+			///@}
+
 		public:
 			
-			//Constructs a new shader program with the given name and shader
+			///@brief Constructs a new shader program with the given name and shader
 			ShaderProgram(std::string name, NonOwningPtr<Shader> shader) noexcept;
 
-			//Constructs a new shader program with the given name, shader and a user defined shader layout
+			///@brief Constructs a new shader program with the given name, shader and a user defined shader layout
 			ShaderProgram(std::string name, NonOwningPtr<Shader> shader,
 				NonOwningPtr<ShaderLayout> shader_layout) noexcept;
 
-			//Constructs a new shader program with the given name, vertex and fragment shader
+			///@brief Constructs a new shader program with the given name, vertex and fragment shader
 			ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader) noexcept;
 
-			//Constructs a new shader program with the given name, vertex and fragment shader and a user defined shader layout
+			///@brief Constructs a new shader program with the given name, vertex and fragment shader and a user defined shader layout
 			ShaderProgram(std::string name, NonOwningPtr<Shader> vertex_shader, NonOwningPtr<Shader> fragment_shader,
 				NonOwningPtr<ShaderLayout> shader_layout) noexcept;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			ShaderProgram(const ShaderProgram&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			ShaderProgram(ShaderProgram&&) = default;
 
-			//Destructor
+			///@brief Destructor
 			~ShaderProgram() noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			ShaderProgram& operator=(const ShaderProgram&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			ShaderProgram& operator=(ShaderProgram&&) = default;
 
+			///@}
 
-			/*
-				Managers
+			/**
+				@name Managers
+				@{
 			*/
 
-			//Returns a mutable reference to the struct manager of this shader program
+			///@brief Returns a mutable reference to the struct manager of this shader program
 			[[nodiscard]] inline auto& StructManager() noexcept
 			{
 				return static_cast<ShaderStructBase&>(*this);
 			}
 
-			//Returns an immutable reference to the struct manager of this shader program
+			///@brief Returns an immutable reference to the struct manager of this shader program
 			[[nodiscard]] inline auto& StructManager() const noexcept
 			{
 				return static_cast<const ShaderStructBase&>(*this);
 			}
 
 
-			//Returns a mutable reference to the attribute variable manager of this shader program
+			///@brief Returns a mutable reference to the attribute variable manager of this shader program
 			[[nodiscard]] inline auto& AttributeVariableManager() noexcept
 			{
 				return static_cast<AttributeVariablesBase&>(*this);
 			}
 
-			//Returns an immutable reference to the attribute variable manager of this shader program
+			///@brief Returns an immutable reference to the attribute variable manager of this shader program
 			[[nodiscard]] inline auto& AttributeVariableManager() const noexcept
 			{
 				return static_cast<const AttributeVariablesBase&>(*this);
 			}
 
 
-			//Returns a mutable reference to the uniform variable manager of this shader program
+			///@brief Returns a mutable reference to the uniform variable manager of this shader program
 			[[nodiscard]] inline auto& UniformVariableManager() noexcept
 			{
 				return static_cast<UniformVariablesBase&>(*this);
 			}
 
-			//Returns an immutable reference to the uniform variable manager of this shader program
+			///@brief Returns an immutable reference to the uniform variable manager of this shader program
 			[[nodiscard]] inline auto& UniformVariableManager() const noexcept
 			{
 				return static_cast<const UniformVariablesBase&>(*this);
 			}
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all structs in this shader program
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all structs in this shader program
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Structs() noexcept
 			{
 				return ShaderStructBase::Objects();
 			}
 
-			//Returns an immutable range of all structs in this shader program
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all structs in this shader program
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Structs() const noexcept
 			{
 				return ShaderStructBase::Objects();
 			}
 
 
-			//Returns a mutable range of all attribute variables in this shader program
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all attribute variables in this shader program
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttributeVariables() noexcept
 			{
 				return AttributeVariablesBase::Objects();
 			}
 
-			//Returns an immutable range of all attribute variables in this shader program
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all attribute variables in this shader program
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttributeVariables() const noexcept
 			{
 				return AttributeVariablesBase::Objects();
 			}
 
 
-			//Returns a mutable range of all uniform variables in this shader program
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all uniform variables in this shader program
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto UniformVariables() noexcept
 			{
 				return UniformVariablesBase::Objects();
 			}
 
-			//Returns an immutable range of all uniform variables in this shader program
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all uniform variables in this shader program
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto UniformVariables() const noexcept
 			{
 				return UniformVariablesBase::Objects();
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the handle for the shader program to the given value
+			///@brief Sets the handle for the shader program to the given value
 			inline void Handle(std::optional<int> handle) noexcept
 			{
 				handle_ = handle;
 			}
 
 
-			//Attaches the given vertex shader to the shader program
+			///@brief Attaches the given vertex shader to the shader program
 			void VertexShader(NonOwningPtr<Shader> shader) noexcept;
 
-			//Attaches the given fragment shader to the shader program
+			///@brief Attaches the given fragment shader to the shader program
 			void FragmentShader(NonOwningPtr<Shader> shader) noexcept;
 
-			//Uses the given shader layout for mapping variables in this shader program
+			///@brief Uses the given shader layout for mapping variables in this shader program
 			void Layout(NonOwningPtr<ShaderLayout> shader_layout) noexcept;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the handle to the shader program
-			//Returns nullopt if the shader program is not loaded
+			///@brief Returns the handle to the shader program
+			///@details Returns nullopt if the shader program is not loaded
 			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return handle_;
 			}
 
 
-			//Returns the attached vertex shader
-			//Returns nullptr if no vertex shader is attached
+			///@brief Returns the attached vertex shader
+			///@details Returns nullptr if no vertex shader is attached
 			[[nodiscard]] inline auto VertexShader() const noexcept
 			{
 				return vertex_shader_;
 			}
 
-			//Returns the attached fragment shader
-			//Returns nullptr if no fragment shader is attached
+			///@brief Returns the attached fragment shader
+			///@details Returns nullptr if no fragment shader is attached
 			[[nodiscard]] inline auto FragmentShader() const noexcept
 			{
 				return fragment_shader_;
 			}
 
-			//Returns the shader layout used by this shader program
-			//Returns nullptr if no shader layout is used
+			///@brief Returns the shader layout used by this shader program
+			///@details Returns nullptr if no shader layout is used
 			[[nodiscard]] inline auto Layout() const noexcept
 			{
 				return shader_layout_;
 			}
 
+			///@}
 
-			/*
-				Shader structs
+			/**
+				@name Shader structs
 				Creating
+				@{
 			*/
 
-			//Creates a struct with the given name and size
+			///@brief Creates a struct with the given name and size
 			NonOwningPtr<ShaderStruct> CreateStruct(std::string name, int size = 1);
 
+			///@}
 
-			/*
-				Shader structs
+			/**
+				@name Shader structs
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable struct with the given name
-			//Returns nullptr if struct could not be found
+			///@brief Gets a pointer to a mutable struct with the given name
+			///@details Returns nullptr if struct could not be found
 			[[nodiscard]] NonOwningPtr<ShaderStruct> GetStruct(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable struct with the given name
-			//Returns nullptr if struct could not be found
+			///@brief Gets a pointer to an immutable struct with the given name
+			///@details Returns nullptr if struct could not be found
 			[[nodiscard]] NonOwningPtr<const ShaderStruct> GetStruct(std::string_view name) const noexcept;
 
 
-			//Gets a pointer to a mutable struct that is mapped to the given standardized name
-			//Returns nullptr if that standardized name has no mapped struct
+			///@brief Gets a pointer to a mutable struct that is mapped to the given standardized name
+			///@details Returns nullptr if that standardized name has no mapped struct
 			[[nodiscard]] NonOwningPtr<ShaderStruct> GetStruct(shader_layout::StructName name) noexcept;
 
-			//Gets a pointer to an immutable struct that is mapped to the given standardized name
-			//Returns nullptr if that standardized name has no mapped struct
+			///@brief Gets a pointer to an immutable struct that is mapped to the given standardized name
+			///@details Returns nullptr if that standardized name has no mapped struct
 			[[nodiscard]] NonOwningPtr<const ShaderStruct> GetStruct(shader_layout::StructName name) const noexcept;
 
+			///@}
 
-			/*
-				Shader structs
+			/**
+				@name Shader structs
 				Removing
+				@{
 			*/
 
-			//Clears all removable structs from this shader program
+			///@brief Clears all removable structs from this shader program
 			void ClearStructs() noexcept;
 
-			//Removes a removable struct from this shader program
+			///@brief Removes a removable struct from this shader program
 			bool RemoveStruct(ShaderStruct &shader_struct) noexcept;
 
-			//Removes a removable structs with the given name from this manager
+			///@brief Removes a removable structs with the given name from this manager
 			bool RemoveStruct(std::string_view name) noexcept;
 
+			///@}
 
-			/*
-				Attribute variables
+			/**
+				@name Attribute variables
 				Creating
+				@{
 			*/
 
-			//Creates an attribute variable with the given name
+			///@brief Creates an attribute variable with the given name
 			template <typename T>
 			auto CreateAttribute(std::string name)
 			{
@@ -332,7 +352,7 @@ namespace ion::graphics::shaders
 			}
 
 
-			//Creates an attribute variable as a copy of the given attribute
+			///@brief Creates an attribute variable as a copy of the given attribute
 			template <typename T>
 			auto CreateAttribute(const variables::Attribute<T> &attribute)
 			{
@@ -340,7 +360,7 @@ namespace ion::graphics::shaders
 				return static_pointer_cast<variables::Attribute<T>>(ptr);
 			}
 
-			//Creates an attribute variable by moving the given attribute
+			///@brief Creates an attribute variable by moving the given attribute
 			template <typename T>
 			auto CreateAttribute(variables::Attribute<T> &&attribute)
 			{
@@ -348,51 +368,57 @@ namespace ion::graphics::shaders
 				return static_pointer_cast<variables::Attribute<T>>(ptr);
 			}
 
+			///@}
 
-			/*
-				Attribute variables
+			/**
+				@name Attribute variables
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable attribute variable with the given name
-			//Returns nullptr if attribute variable could not be found
+			///@brief Gets a pointer to a mutable attribute variable with the given name
+			///@details Returns nullptr if attribute variable could not be found
 			[[nodiscard]] NonOwningPtr<variables::AttributeVariable> GetAttribute(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable attribute variable with the given name
-			//Returns nullptr if attribute variable could not be found
+			///@brief Gets a pointer to an immutable attribute variable with the given name
+			///@details Returns nullptr if attribute variable could not be found
 			[[nodiscard]] NonOwningPtr<const variables::AttributeVariable> GetAttribute(std::string_view name) const noexcept;
 
 
-			//Gets a pointer to a mutable attribute variable that is mapped to the given standardized name
-			//Returns nullptr if that standardized name has no mapped attribute variable
+			///@brief Gets a pointer to a mutable attribute variable that is mapped to the given standardized name
+			///@details Returns nullptr if that standardized name has no mapped attribute variable
 			[[nodiscard]] NonOwningPtr<variables::AttributeVariable> GetAttribute(shader_layout::AttributeName name) noexcept;
 
-			//Gets a pointer to an immutable attribute variable that is mapped to the given standardized name
-			//Returns nullptr if that standardized name has no mapped attribute variable
+			///@brief Gets a pointer to an immutable attribute variable that is mapped to the given standardized name
+			///@details Returns nullptr if that standardized name has no mapped attribute variable
 			[[nodiscard]] NonOwningPtr<const variables::AttributeVariable> GetAttribute(shader_layout::AttributeName name) const noexcept;
 
+			///@}
 
-			/*
-				Attribute variables
+			/**
+				@name Attribute variables
 				Removing
+				@{
 			*/
 
-			//Clears all removable attribute variables from this shader program
+			///@brief Clears all removable attribute variables from this shader program
 			void ClearAttributes() noexcept;
 
-			//Removes a removable attribute variable from this shader program
+			///@brief Removes a removable attribute variable from this shader program
 			bool RemoveAttribute(variables::AttributeVariable &attribute_variable) noexcept;
 
-			//Removes a removable attribute variable with the given name from this manager
+			///@brief Removes a removable attribute variable with the given name from this manager
 			bool RemoveAttribute(std::string_view name) noexcept;
 
+			///@}
 
-			/*
-				Uniform variables
+			/**
+				@name Uniform variables
 				Creating
+				@{
 			*/
 
-			//Creates a uniform variable with the given name and size
+			///@brief Creates a uniform variable with the given name and size
 			template <typename T>
 			auto CreateUniform(std::string name, int size = 1)
 			{
@@ -401,7 +427,7 @@ namespace ion::graphics::shaders
 			}
 
 
-			//Creates a uniform variable as a copy of the given uniform
+			///@brief Creates a uniform variable as a copy of the given uniform
 			template <typename T>
 			auto CreateUniform(const variables::Uniform<T> &uniform)
 			{
@@ -409,7 +435,7 @@ namespace ion::graphics::shaders
 				return static_pointer_cast<variables::Uniform<T>>(ptr);
 			}
 
-			//Creates a uniform variable by moving the given uniform
+			///@brief Creates a uniform variable by moving the given uniform
 			template <typename T>
 			auto CreateUniform(variables::Uniform<T> &&uniform)
 			{
@@ -417,61 +443,71 @@ namespace ion::graphics::shaders
 				return static_pointer_cast<variables::Uniform<T>>(ptr);
 			}
 
+			///@}
 
-			/*
-				Uniform variables
+			/**
+				@name Uniform variables
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable uniform variable with the given name
-			//Returns nullptr if uniform variable could not be found
+			///@brief Gets a pointer to a mutable uniform variable with the given name
+			///@details Returns nullptr if uniform variable could not be found
 			[[nodiscard]] NonOwningPtr<variables::UniformVariable> GetUniform(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable uniform variable with the given name
-			//Returns nullptr if uniform variable could not be found
+			///@brief Gets a pointer to an immutable uniform variable with the given name
+			///@details Returns nullptr if uniform variable could not be found
 			[[nodiscard]] NonOwningPtr<const variables::UniformVariable> GetUniform(std::string_view name) const noexcept;
 
 
-			//Gets a pointer to a mutable uniform variable that is mapped to the given standardized name
-			//Returns nullptr if that standardized name has no mapped uniform variable
+			///@brief Gets a pointer to a mutable uniform variable that is mapped to the given standardized name
+			///@details Returns nullptr if that standardized name has no mapped uniform variable
 			[[nodiscard]] NonOwningPtr<variables::UniformVariable> GetUniform(shader_layout::UniformName name) noexcept;
 
-			//Gets a pointer to an immutable uniform variable that is mapped to the given standardized name
-			//Returns nullptr if that standardized name has no mapped uniform variable
+			///@brief Gets a pointer to an immutable uniform variable that is mapped to the given standardized name
+			///@details Returns nullptr if that standardized name has no mapped uniform variable
 			[[nodiscard]] NonOwningPtr<const variables::UniformVariable> GetUniform(shader_layout::UniformName name) const noexcept;
 
+			///@}
 
-			/*
-				Uniform variables
+			/**
+				@name Uniform variables
 				Removing
+				@{
 			*/
 
-			//Clears all removable uniform variables from this shader program
+			///@brief Clears all removable uniform variables from this shader program
 			void ClearUniforms() noexcept;
 
-			//Removes a removable uniform variable from this shader program
+			///@brief Removes a removable uniform variable from this shader program
 			bool RemoveUniform(variables::UniformVariable &uniform_variable) noexcept;
 
-			//Removes a removable uniform variable with the given name from this manager
+			///@brief Removes a removable uniform variable with the given name from this manager
 			bool RemoveUniform(std::string_view name) noexcept;
 
+			///@}
 
-			/*
-				Variables
+			/**
+				@name Variables
 				Removing
+				@{
 			*/
 
-			//Clears all removable attributes and uniform variables from this shader program
+			///@brief Clears all removable attributes and uniform variables from this shader program
 			void ClearVariables() noexcept;
 
+			///@}
 
-			/*
-				Struct/variables
+			/**
+				@name Struct/variables
 				Removing
+				@{
 			*/
 
-			//Clears all removable structs, attributes and uniform variables from this shader program
+			///@brief Clears all removable structs, attributes and uniform variables from this shader program
 			void Clear() noexcept;
+
+			///@}
 	};
 } //ion::graphics::shaders
 

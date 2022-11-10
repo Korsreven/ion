@@ -31,7 +31,7 @@ namespace ion::graphics::shaders::variables
 	} //shader_variable::detail
 	
 
-	//A base class representing a shader variable with a specific location
+	///@brief A base class representing a shader variable with a specific location
 	class ShaderVariable : public managed::ManagedObject<ShaderProgram>
 	{
 		private:
@@ -40,39 +40,44 @@ namespace ion::graphics::shaders::variables
 
 		public:
 
-			//Constructs a new shader variable with the given name
-			//Name should be equal to the identifier name in the shader source
+			///@brief Constructs a new shader variable with the given name
+			///@details Name should be equal to the identifier name in the shader source
 			explicit ShaderVariable(std::string name) noexcept :
 				managed::ManagedObject<ShaderProgram>{std::move(name)}
 			{
 				//Empty
 			}
 
-			//Default virtual destructor
+			///@brief Default virtual destructor
 			virtual ~ShaderVariable() = default;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets where the shader variable is located to the given location
+			///@brief Sets where the shader variable is located to the given location
 			inline void Location(std::optional<int> location) noexcept
 			{
 				location_ = location;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the location of the shader variable
-			//Returns nullopt if the variable could not be located in the shader source
+			///@brief Returns the location of the shader variable
+			///@details Returns nullopt if the variable could not be located in the shader source
 			[[nodiscard]] inline auto Location() const noexcept
 			{
 				return location_;
 			}
+
+			///@}
 	};
 } //ion::graphics::shaders::variables
 

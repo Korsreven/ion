@@ -28,7 +28,7 @@ File:	IonShaderTypes.h
 #include "graphics/utilities/IonVector3.h"
 #include "types/IonTypes.h"
 
-//Namespace containing all supported GLSL types, from basic types, to vector, matrix and sampler types
+///@brief Namespace containing all supported GLSL types, from basic types, to vector, matrix and sampler types
 namespace ion::graphics::shaders::variables::glsl
 {
 	using utilities::Color;
@@ -38,10 +38,11 @@ namespace ion::graphics::shaders::variables::glsl
 	using utilities::Vector2;
 	using utilities::Vector3;
 
-	/*
-		Basic vector type for:
+	/**
+		@name Basic vector type for:
 
 		Vec<2, T>, Vec<3, T>, Vec<4, T>
+		@{
 	*/
 
 	template <int N, typename T = float32>
@@ -50,13 +51,15 @@ namespace ion::graphics::shaders::variables::glsl
 		static_assert(N >= 2 && N <= 4); //Components
 	};
 
+	///@}
 
-	/*
-		Basic matrix type for:
+	/**
+		@name Basic matrix type for:
 
 		Mat<2, 2, T>, Mat<2, 3, T>, Mat<2, 4, T>
 		Mat<3, 2, T>, Mat<3, 3, T>, Mat<3, 4, T>
 		Mat<4, 2, T>, Mat<4, 3, T>, Mat<4, 4, T>
+		@{
 	*/
 
 	template <int N, int M, typename T = float32>
@@ -66,9 +69,11 @@ namespace ion::graphics::shaders::variables::glsl
 		static_assert(M >= 2 && M <= 4); //Rows
 	};
 
+	///@}
 
-	/*
-		Basic sampler types
+	/**
+		@name Basic sampler types
+		@{
 	*/
 
 	template <typename T = float32>
@@ -91,11 +96,13 @@ namespace ion::graphics::shaders::variables::glsl
 	{
 	};
 
+	///@}
 
 	namespace detail
 	{
-		/*
-			Basic scalar types
+		/**
+			@name Basic scalar types
+			@{
 		*/
 
 		template <typename T>
@@ -134,9 +141,11 @@ namespace ion::graphics::shaders::variables::glsl
 			using type = float64;
 		};
 
+		///@}
 
-		/*
-			Basic types
+		/**
+			@name Basic types
+			@{
 		*/
 
 		template <typename T>
@@ -176,9 +185,11 @@ namespace ion::graphics::shaders::variables::glsl
 		{
 		};
 
+		///@}
 
-		/*
-			Type components
+		/**
+			@name Type components
+			@{
 		*/
 
 		template <typename T, int N = 1, int M = 1>
@@ -199,9 +210,11 @@ namespace ion::graphics::shaders::variables::glsl
 		{
 		};
 
+		///@}
 
-		/*
-			Uniform value
+		/**
+			@name Uniform value
+			@{
 		*/
 
 		template <typename T, size_t Size>
@@ -209,11 +222,14 @@ namespace ion::graphics::shaders::variables::glsl
 
 		template <typename T>
 		using container_type = std::vector<T>;
+
+		///@}
 	} //detail
 
 
-	/*
-		Basic type
+	/**
+		@name Basic type
+		@{
 	*/
 
 	template <typename T>
@@ -224,9 +240,11 @@ namespace ion::graphics::shaders::variables::glsl
 	template <typename T>
 	using basic_type_t = typename basic_type<T>::type;
 
+	///@}
 
-	/*
-		Is basic type
+	/**
+		@name Is basic type
+		@{
 	*/
 
 	template <typename T>
@@ -238,9 +256,11 @@ namespace ion::graphics::shaders::variables::glsl
 	template <typename T>
 	constexpr auto is_basic_type_v = is_basic_type<T>::value;
 
+	///@}
 
-	/*
-		Type components
+	/**
+		@name Type components
+		@{
 	*/
 
 	template <typename T>
@@ -252,6 +272,7 @@ namespace ion::graphics::shaders::variables::glsl
 	template <typename T>
 	constexpr auto type_components_v = type_components<T>::value;
 
+	///@}
 
 	/*
 		Value accessors
@@ -269,7 +290,7 @@ namespace ion::graphics::shaders::variables::glsl
 
 			ValueAccessorBase() = default;
 
-			//Constructor
+			///@brief Constructor
 			explicit ValueAccessorBase(basic_type_t<T> *values, int off = 0) noexcept :
 				values_{values},
 				off_{off}
@@ -278,11 +299,12 @@ namespace ion::graphics::shaders::variables::glsl
 			}
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Sets all components to the given value
+			///@brief Sets all components to the given value
 			inline auto& operator=(basic_type_t<T> value) noexcept
 			{
 				for (auto i = 0; i < type_components_v<T>; ++i)
@@ -291,22 +313,26 @@ namespace ion::graphics::shaders::variables::glsl
 				return *this;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns a pointer to all values (mutable) from off
+			///@brief Returns a pointer to all values (mutable) from off
 			[[nodiscard]] inline auto Values() noexcept
 			{
 				return &values_[type_components_v<T> * off_];
 			}
 
-			//Returns a pointer to all values (immutable) from off
+			///@brief Returns a pointer to all values (immutable) from off
 			[[nodiscard]] inline auto Values() const noexcept
 			{
 				return &values_[type_components_v<T> * off_];
 			}
+
+			///@}
 	};
 
 
@@ -320,28 +346,31 @@ namespace ion::graphics::shaders::variables::glsl
 		using ValueAccessorBase<T>::ValueAccessorBase;
 
 
-		/*
-			Operators
+		/**
+			@name Operators
+			@{
 		*/
 
-		//Sets all components to the given value
+		///@brief Sets all components to the given value
 		inline auto& operator=(basic_type_t<T> value) noexcept
 		{
 			ValueAccessorBase<T>::operator=(value);
 			return *this;
 		}
 
-		//Returns a modifiable reference to the value stored
+		///@brief Returns a modifiable reference to the value stored
 		inline operator basic_type_t<T>&() noexcept
 		{
 			return this->Values()[0];
 		}
 
-		//Returns the value stored
+		///@brief Returns the value stored
 		inline operator basic_type_t<T>() const noexcept
 		{
 			return this->Values()[0];
 		}
+
+		///@}
 	};
 
 
@@ -355,28 +384,31 @@ namespace ion::graphics::shaders::variables::glsl
 		using ValueAccessorBase<bool>::ValueAccessorBase;
 
 
-		/*
-			Operators
+		/**
+			@name Operators
+			@{
 		*/
 
-		//Sets all components to the given value
+		///@brief Sets all components to the given value
 		inline auto& operator=(bool value) noexcept
 		{
 			ValueAccessorBase<bool>::operator=(value ? 1 : 0);
 			return *this;
 		}
 
-		//Returns a modifiable reference to the value stored
+		///@brief Returns a modifiable reference to the value stored
 		inline operator basic_type_t<bool>&() noexcept
 		{
 			return this->Values()[0];
 		}
 
-		//Returns the value stored
+		///@brief Returns the value stored
 		inline operator bool() const noexcept
 		{
 			return this->Values()[0] != 0;
 		}
+
+		///@}
 	};
 
 
@@ -390,90 +422,99 @@ namespace ion::graphics::shaders::variables::glsl
 		using ValueAccessorBase<Vec<2, T>>::ValueAccessorBase;
 
 
-		/*
-			Operators
+		/**
+			@name Operators
+			@{
 		*/
 
-		//Sets all components to the given value
+		///@brief Sets all components to the given value
 		inline auto& operator=(T value) noexcept
 		{
 			ValueAccessorBase<Vec<2, T>>::operator=(value);
 			return *this;
 		}
 
-		//Returns a modifiable reference to the component at the given offset
+		///@brief Returns a modifiable reference to the component at the given offset
 		[[nodiscard]] inline auto& operator[](int off) noexcept
 		{
 			assert(off >= 0 && off < 2);
 			return this->Values()[off];
 		}
 
-		//Returns the component at the given offset
+		///@brief Returns the component at the given offset
 		[[nodiscard]] inline auto operator[](int off) const noexcept
 		{
 			assert(off >= 0 && off < 2);
 			return this->Values()[off];
 		}
 
+		///@}
 
-		/*
-			Modifiers
+		/**
+			@name Modifiers
+			@{
 		*/
 
-		//Sets the x component to the given value
+		///@brief Sets the x component to the given value
 		inline void X(T x) noexcept
 		{
 			this->Values()[0] = x;
 		}
 
-		//Sets the y component to the given value
+		///@brief Sets the y component to the given value
 		inline void Y(T y) noexcept
 		{
 			this->Values()[1] = y;
 		}
 
-		//Sets the x and y components to the given values
+		///@brief Sets the x and y components to the given values
 		inline void XY(T x, T y) noexcept
 		{
 			X(x);
 			Y(y);
 		}
 
+		///@}
 
-		/*
-			Observers
+		/**
+			@name Observers
+			@{
 		*/
 
-		//Returns the x component
+		///@brief Returns the x component
 		[[nodiscard]] inline auto X() const noexcept
 		{
 			return this->Values()[0];
 		}
 
-		//Returns the y component
+		///@brief Returns the y component
 		[[nodiscard]] inline auto Y() const noexcept
 		{
 			return this->Values()[1];
 		}
 
-		//Returns both the x and y components
+		///@brief Returns both the x and y components
 		[[nodiscard]] inline auto XY() const noexcept
 		{
 			return std::pair{X(), Y()};
 		}
 
+		///@}
 
-		/*
-			Operators
+		/**
+			@name Operators
+			@{
 		*/
 
-		//Sets vec2 components to the given vector
+		///@brief Sets vec2 components to the given vector
 		inline auto& operator=(const Vector2 &vector) noexcept
 		{
 			auto [x, y] = vector.XY();
 			XY(static_cast<T>(x), static_cast<T>(y));
 			return *this;
 		}
+
+		///@}
 	};
 
 	template <typename T>
@@ -482,55 +523,58 @@ namespace ion::graphics::shaders::variables::glsl
 		using ValueAccessorBase<Vec<3, T>>::ValueAccessorBase;
 
 
-		/*
-			Operators
+		/**
+			@name Operators
+			@{
 		*/
 
-		//Sets all components to the given value
+		///@brief Sets all components to the given value
 		inline auto& operator=(T value) noexcept
 		{
 			ValueAccessorBase<Vec<3, T>>::operator=(value);
 			return *this;
 		}
 
-		//Returns a modifiable reference to the component at the given offset
+		///@brief Returns a modifiable reference to the component at the given offset
 		[[nodiscard]] inline auto& operator[](int off) noexcept
 		{
 			assert(off >= 0 && off < 3);
 			return this->Values()[off];
 		}
 
-		//Returns the component at the given offset
+		///@brief Returns the component at the given offset
 		[[nodiscard]] inline auto operator[](int off) const noexcept
 		{
 			assert(off >= 0 && off < 3);
 			return this->Values()[off];
 		}
 
+		///@}
 
-		/*
-			Modifiers
+		/**
+			@name Modifiers
+			@{
 		*/
 
-		//Sets the x component to the given value
+		///@brief Sets the x component to the given value
 		inline void X(T x) noexcept
 		{
 			this->Values()[0] = x;
 		}
 
-		//Sets the y component to the given value
+		///@brief Sets the y component to the given value
 		inline void Y(T y) noexcept
 		{
 			this->Values()[1] = y;
 		}
 
-		//Sets the z component to the given value
+		///@brief Sets the z component to the given value
 		inline void Z(T z) noexcept
 		{
 			this->Values()[2] = z;
 		}
 
-		//Sets the x, y and z components to the given values
+		///@brief Sets the x, y and z components to the given values
 		inline void XYZ(T x, T y, T z) noexcept
 		{
 			X(x);
@@ -538,47 +582,53 @@ namespace ion::graphics::shaders::variables::glsl
 			Z(z);
 		}
 
+		///@}
 
-		/*
-			Observers
+		/**
+			@name Observers
+			@{
 		*/
 
-		//Returns the x component
+		///@brief Returns the x component
 		[[nodiscard]] inline auto X() const noexcept
 		{
 			return this->Values()[0];
 		}
 
-		//Returns the y component
+		///@brief Returns the y component
 		[[nodiscard]] inline auto Y() const noexcept
 		{
 			return this->Values()[1];
 		}
 
-		//Returns the z component
+		///@brief Returns the z component
 		[[nodiscard]] inline auto Z() const noexcept
 		{
 			return this->Values()[2];
 		}
 
-		//Returns the x, y and z components
+		///@brief Returns the x, y and z components
 		[[nodiscard]] inline auto XYZ() const noexcept
 		{
 			return std::tuple{X(), Y(), Z()};
 		}
 
+		///@}
 
-		/*
-			Operators
+		/**
+			@name Operators
+			@{
 		*/
 
-		//Sets vec3 components to the given vector
+		///@brief Sets vec3 components to the given vector
 		inline auto& operator=(const Vector3 &vector) noexcept
 		{
 			auto [x, y, z] = vector.XYZ();
 			XYZ(static_cast<T>(x), static_cast<T>(y), static_cast<T>(z));
 			return *this;
 		}
+
+		///@}
 	};
 
 	template <typename T>
@@ -587,61 +637,64 @@ namespace ion::graphics::shaders::variables::glsl
 		using ValueAccessorBase<Vec<4, T>>::ValueAccessorBase;
 
 
-		/*
-			Operators
+		/**
+			@name Operators
+			@{
 		*/
 
-		//Sets all components to the given value
+		///@brief Sets all components to the given value
 		inline auto& operator=(T value) noexcept
 		{
 			ValueAccessorBase<Vec<4, T>>::operator=(value);
 			return *this;
 		}
 
-		//Returns a modifiable reference to the component at the given offset
+		///@brief Returns a modifiable reference to the component at the given offset
 		[[nodiscard]] inline auto& operator[](int off) noexcept
 		{
 			assert(off >= 0 && off < 4);
 			return this->Values()[off];
 		}
 
-		//Returns the component at the given offset
+		///@brief Returns the component at the given offset
 		[[nodiscard]] inline auto operator[](int off) const noexcept
 		{
 			assert(off >= 0 && off < 4);
 			return this->Values()[off];
 		}
 
+		///@}
 
-		/*
-			Modifiers
+		/**
+			@name Modifiers
+			@{
 		*/
 
-		//Sets the x component to the given value
+		///@brief Sets the x component to the given value
 		inline void X(T x) noexcept
 		{
 			this->Values()[0] = x;
 		}
 
-		//Sets the y component to the given value
+		///@brief Sets the y component to the given value
 		inline void Y(T y) noexcept
 		{
 			this->Values()[1] = y;
 		}
 
-		//Sets the z component to the given value
+		///@brief Sets the z component to the given value
 		inline void Z(T z) noexcept
 		{
 			this->Values()[2] = z;
 		}
 
-		//Sets the w component to the given value
+		///@brief Sets the w component to the given value
 		inline void W(T w) noexcept
 		{
 			this->Values()[3] = w;
 		}
 
-		//Sets the x, y, z and w components to the given values
+		///@brief Sets the x, y, z and w components to the given values
 		inline void XYZW(T x, T y, T z, T w) noexcept
 		{
 			X(x);
@@ -650,54 +703,60 @@ namespace ion::graphics::shaders::variables::glsl
 			W(w);
 		}
 
+		///@}
 
-		/*
-			Observers
+		/**
+			@name Observers
+			@{
 		*/
 
-		//Returns the x component
+		///@brief Returns the x component
 		[[nodiscard]] inline auto X() const noexcept
 		{
 			return this->Values()[0];
 		}
 
-		//Returns the y component
+		///@brief Returns the y component
 		[[nodiscard]] inline auto Y() const noexcept
 		{
 			return this->Values()[1];
 		}
 
-		//Returns the z component
+		///@brief Returns the z component
 		[[nodiscard]] inline auto Z() const noexcept
 		{
 			return this->Values()[2];
 		}
 
-		//Returns the w component
+		///@brief Returns the w component
 		[[nodiscard]] inline auto W() const noexcept
 		{
 			return this->Values()[3];
 		}
 
 
-		//Returns the x, y, z and w components
+		///@brief Returns the x, y, z and w components
 		[[nodiscard]] inline auto XYZW() const noexcept
 		{
 			return std::tuple{X(), Y(), Z(), W()};
 		}
 
+		///@}
 
-		/*
-			Operators
+		/**
+			@name Operators
+			@{
 		*/
 
-		//Sets vec4 components to the given color
+		///@brief Sets vec4 components to the given color
 		inline auto& operator=(const Color &color) noexcept
 		{
 			auto [r, g, b, a] = color.RGBA();
 			XYZW(static_cast<T>(r), static_cast<T>(g), static_cast<T>(b), static_cast<T>(a));
 			return *this;
 		}
+
+		///@}
 	};
 
 
@@ -711,18 +770,19 @@ namespace ion::graphics::shaders::variables::glsl
 		using ValueAccessorBase<Mat<N, M, T>>::ValueAccessorBase;
 
 
-		/*
-			Operators
+		/**
+			@name Operators
+			@{
 		*/
 
-		//Sets all components to the given value
+		///@brief Sets all components to the given value
 		inline auto& operator=(T value) noexcept
 		{
 			ValueAccessorBase<Mat<N, M, T>>::operator=(value);
 			return *this;
 		}
 
-		//Sets matNxM elements to the given matrix
+		///@brief Sets matNxM elements to the given matrix
 		template <typename Matrix,
 			typename = std::enable_if_t<(N == 2 && M == 2 && std::is_same_v<Matrix, Matrix2>) ||
 										(N == 3 && M == 3 && std::is_same_v<Matrix, Matrix3>) ||
@@ -738,12 +798,14 @@ namespace ion::graphics::shaders::variables::glsl
 			return *this;
 		}
 
-		//Returns the column values as vecM at the given column offset
+		///@brief Returns the column values as vecM at the given column offset
 		[[nodiscard]] inline auto operator[](int column_off) noexcept
 		{
 			assert(column_off >= 0 && column_off < N);
 			return ValueAccessor<Vec<M, T>>{this->Values() + M * column_off};
 		}
+
+		///@}
 	};
 
 
@@ -757,15 +819,18 @@ namespace ion::graphics::shaders::variables::glsl
 		using basic_type = basic_type_t<T>;
 
 
-		/*
-			Observers
+		/**
+			@name Observers
+			@{
 		*/
 
-		//Returns the number of components in the values stored
+		///@brief Returns the number of components in the values stored
 		[[nodiscard]] constexpr auto Components() const noexcept
 		{
 			return type_components_v<T>;
 		}
+
+		///@}
 	};
 
 
@@ -784,15 +849,16 @@ namespace ion::graphics::shaders::variables::glsl
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			AttributeValue() = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Returns the vertex attribute at the given offset
+			///@brief Returns the vertex attribute at the given offset
 			[[nodiscard]] inline auto operator[](int vertex_off) noexcept
 			{
 				auto stride =
@@ -808,12 +874,14 @@ namespace ion::graphics::shaders::variables::glsl
 					), 0};
 			}
 
-		
-			/*
-				Modifiers
+			///@}
+
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the vertex pointer, stride between consecutive vertex attributes and whether or not data values should be normalized
+			///@brief Sets the vertex pointer, stride between consecutive vertex attributes and whether or not data values should be normalized
 			inline void Pointer(void *pointer, int stride = 0, bool normalized = false) noexcept
 			{
 				assert(stride >= 0);
@@ -822,30 +890,34 @@ namespace ion::graphics::shaders::variables::glsl
 				normalized_ = normalized;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns a pointer to the first vertex attribute
+			///@brief Returns a pointer to the first vertex attribute
 			[[nodiscard]] inline auto Pointer() const noexcept
 			{
 				return pointer_;
 			}
 
 
-			//Returns the stride (byte offset) between consecutive vertex attributes
+			///@brief Returns the stride (byte offset) between consecutive vertex attributes
 			[[nodiscard]] inline auto Stride() const noexcept
 			{
 				return stride_;
 			}
 
 		
-			//Returns true if vertex attribute data values should be normalized
+			///@brief Returns true if vertex attribute data values should be normalized
 			[[nodiscard]] inline auto Normalized() const noexcept
 			{
 				return normalized_;
 			}
+
+			///@}
 	};
 
 
@@ -873,7 +945,7 @@ namespace ion::graphics::shaders::variables::glsl
 
 		public:
 
-			//Constructor
+			///@brief Constructor
 			explicit UniformValue(int size = 1) :
 
 				size_{size > 0 ? size : 1},
@@ -884,7 +956,7 @@ namespace ion::graphics::shaders::variables::glsl
 				ValueAccessor<T>::values_ = Data();
 			}
 
-			//Copy constructor
+			///@brief Copy constructor
 			UniformValue(const UniformValue &rhs) :
 
 				size_{rhs.size_},
@@ -895,7 +967,7 @@ namespace ion::graphics::shaders::variables::glsl
 				ValueAccessor<T>::values_ = Data();
 			}
 
-			//Move constructor
+			///@brief Move constructor
 			UniformValue(UniformValue &&rhs) noexcept :
 
 				size_{rhs.size_},
@@ -907,11 +979,12 @@ namespace ion::graphics::shaders::variables::glsl
 			}
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Copy assignment
+			///@brief Copy assignment
 			inline auto& operator=(const UniformValue &rhs) noexcept
 			{
 				if (size_ == rhs.size_)
@@ -924,14 +997,14 @@ namespace ion::graphics::shaders::variables::glsl
 				return *this;
 			}
 
-			//Sets all components to the given value
+			///@brief Sets all components to the given value
 			inline auto& operator=(basic_type_t<T> value) noexcept
 			{
 				ValueAccessor<T>::operator=(value);
 				return *this;
 			}
 
-			//Sets all components to the given value
+			///@brief Sets all components to the given value
 			template <typename U>
 			inline auto& operator=(const U &value) noexcept
 			{
@@ -939,28 +1012,33 @@ namespace ion::graphics::shaders::variables::glsl
 				return *this;
 			}
 
-			//Returns the uniform value at the given (array) offset
+			///@brief Returns the uniform value at the given (array) offset
 			[[nodiscard]] inline auto At(int off) noexcept
 			{
 				assert(off < size_);
 				return ValueAccessor<T>{Data(), off};
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the (array) size of the uniform
+			///@brief Returns the (array) size of the uniform
 			[[nodiscard]] inline auto Size() const noexcept
 			{
 				return size_;
 			}
+
+			///@}
 	};
 
 
-	/*
-		Type aliases
+	/**
+		@name Type aliases
+		@{
 	*/
 
 	using bvec2 = Vec<2, bool>;
@@ -1024,9 +1102,11 @@ namespace ion::graphics::shaders::variables::glsl
 	using usampler2DArray = Sampler2DArray<uint32>;
 	using sampler2DArray = Sampler2DArray<>;
 
+	///@}
 
-	/*
-		Shorthand matrix type aliases
+	/**
+		@name Shorthand matrix type aliases
+		@{
 	*/
 
 	using mat2 = mat2x2;
@@ -1038,9 +1118,11 @@ namespace ion::graphics::shaders::variables::glsl
 	using mat4 = mat4x4;
 	using dmat4 = dmat4x4;
 
+	///@}
 
-	/*
-		Storage qualifier type aliases
+	/**
+		@name Storage qualifier type aliases
+		@{
 	*/
 
 	template <typename T>
@@ -1048,6 +1130,8 @@ namespace ion::graphics::shaders::variables::glsl
 
 	template <typename T>
 	using attribute = AttributeValue<T>;
+
+	///@}
 } //ion::graphics::shaders::variables::glsl
 
 #endif

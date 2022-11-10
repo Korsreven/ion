@@ -44,7 +44,7 @@ namespace ion::graphics::shaders
 	} //shader_manager
 
 
-	//A class that manages and stores shaders
+	///@brief A class that manages and stores shaders
 	class ShaderManager final :
 		public resources::FileResourceManager<Shader, ShaderManager, assets::repositories::ShaderRepository>
 	{
@@ -54,134 +54,154 @@ namespace ion::graphics::shaders
 
 		protected:
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
 			bool LoadResource(Shader &shader) override;
 			bool UnloadResource(Shader &shader) noexcept override;
 
+			///@}
+
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			ShaderManager() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			ShaderManager(const ShaderManager&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			ShaderManager(ShaderManager&&) = default;
 
-			//Destructor
+			///@brief Destructor
 			~ShaderManager() noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			ShaderManager& operator=(const ShaderManager&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			ShaderManager& operator=(ShaderManager&&) = default;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all shaders in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all shaders in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Shaders() noexcept
 			{
 				return Resources();
 			}
 
-			//Returns an immutable range of all shaders in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all shaders in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Shaders() const noexcept
 			{
 				return Resources();
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets info log level for the shader manager
-			//Pass nullopt or {} to turn off any shader info log
+			///@brief Sets info log level for the shader manager
+			///@details Pass nullopt or {} to turn off any shader info log
 			inline void LogLevel(std::optional<shader_manager::InfoLogLevel> log_level) noexcept
 			{
 				log_level_ = log_level;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns info log level for the shader manager
-			//Returns nullopt if shader info log is turned off
+			///@brief Returns info log level for the shader manager
+			///@details Returns nullopt if shader info log is turned off
 			[[nodiscard]] inline auto LogLevel() const noexcept
 			{
 				return log_level_;
 			}
 
+			///@}
 
-			/*
-				Shaders
+			/**
+				@name Shaders
 				Creating
+				@{
 			*/
 
-			//Creates a shader with the given name and asset name
+			///@brief Creates a shader with the given name and asset name
 			NonOwningPtr<Shader> CreateShader(std::string name, std::string asset_name);
 
 
-			//Creates a shader as a copy of the given shader
+			///@brief Creates a shader as a copy of the given shader
 			NonOwningPtr<Shader> CreateShader(const Shader &shader);
 
-			//Creates a shader by moving the given shader
+			///@brief Creates a shader by moving the given shader
 			NonOwningPtr<Shader> CreateShader(Shader &&shader);
 
+			///@}
 
-			/*
-				Shaders
+			/**
+				@name Shaders
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable shader with the given name
-			//Returns nullptr if shader could not be found
+			///@brief Gets a pointer to a mutable shader with the given name
+			///@details Returns nullptr if shader could not be found
 			[[nodiscard]] NonOwningPtr<Shader> GetShader(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable shader with the given name
-			//Returns nullptr if shader could not be found
+			///@brief Gets a pointer to an immutable shader with the given name
+			///@details Returns nullptr if shader could not be found
 			[[nodiscard]] NonOwningPtr<const Shader> GetShader(std::string_view name) const noexcept;
 
+			///@}
 
-			/*
-				Shaders
+			/**
+				@name Shaders
 				Removing
+				@{
 			*/
 
-			//Clears all removable shaders from this manager
+			///@brief Clears all removable shaders from this manager
 			void ClearShaders() noexcept;
 
-			//Removes a removable shader from this manager
+			///@brief Removes a removable shader from this manager
 			bool RemoveShader(Shader &shader) noexcept;
 
-			//Removes a removable shader with the given name from this manager
+			///@brief Removes a removable shader with the given name from this manager
 			bool RemoveShader(std::string_view name) noexcept;
 
+			///@}
 
-			/*
-				Outputting
+			/**
+				@name Outputting
+				@{
 			*/
 
-			//Prints the info log (if any) from the given shader
-			//Returns nullopt if shader is not valid or loaded
+			///@brief Prints the info log (if any) from the given shader
+			///@details Returns nullopt if shader is not valid or loaded
 			[[nodiscard]] std::optional<std::string> PrintInfoLog(const Shader &shader) const;
+
+			///@}
 	};
 } //ion::graphics::shaders
 
