@@ -40,15 +40,16 @@ namespace ion::graphics::render::vertex
 			int Offset = 0;
 			int Stride = 0;
 
-			//Constructs a new vertex element with the given attribute name (semantic), type, offset and stride
+			///@brief Constructs a new vertex element with the given attribute name (semantic), type, offset and stride
 			VertexElement(shaders::shader_layout::AttributeName name, VertexElementType type, int offset = 0, int stride = 0) noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Checks if two vertex elements are equal (all members are equal)
+			///@brief Checks if two vertex elements are equal (all members are equal)
 			[[nodiscard]] inline auto operator==(const VertexElement &rhs) const noexcept
 			{
 				return Name == rhs.Name &&
@@ -57,19 +58,23 @@ namespace ion::graphics::render::vertex
 					   Stride == rhs.Stride;
 			}
 
-			//Checks if two vertex elements are different (one or more members are different)
+			///@brief Checks if two vertex elements are different (one or more members are different)
 			[[nodiscard]] inline auto operator!=(const VertexElement &rhs) const noexcept
 			{
 				return !(*this == rhs);
 			}
 
+			///@}
 
-			/*
-				Observer
+			/**
+				@name Observer
+				@{
 			*/
 
-			//Returns the total number of components for this vertex element
+			///@brief Returns the total number of components for this vertex element
 			[[nodiscard]] int Components() const noexcept;
+
+			///@}
 		};
 
 		using VertexElements = std::vector<VertexElement>;
@@ -114,9 +119,9 @@ namespace ion::graphics::render::vertex
 	} //vertex_declaration
 
 
-	//A class representing a vertex declaration containing multiple vertex elements
-	//A vertex declaration describes the layout of where elements are located in the vertex data
-	//Each vertex elements has an attribute name, type, offset and stride
+	///@brief A class representing a vertex declaration containing multiple vertex elements
+	///@details A vertex declaration describes the layout of where elements are located in the vertex data.
+	///Each vertex elements has an attribute name, type, offset and stride
 	class VertexDeclaration final
 	{
 		private:
@@ -126,88 +131,101 @@ namespace ion::graphics::render::vertex
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			VertexDeclaration() = default;
 
-			//Constructs a new vertex declaration with the given vertex elements and vertex size (optional)
+			///@brief Constructs a new vertex declaration with the given vertex elements and vertex size (optional)
 			explicit VertexDeclaration(vertex_declaration::VertexElements vertex_elements, std::optional<int> vertex_size = std::nullopt);
 
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all vertex elements in this vertex declaration
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all vertex elements in this vertex declaration
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Elements() noexcept
 			{
 				return adaptors::ranges::Iterable<vertex_declaration::VertexElements&>{vertex_elements_};
 			}
 
-			//Returns an immutable range of all vertex elements in this vertex declaration
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all vertex elements in this vertex declaration
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Elements() const noexcept
 			{
 				return adaptors::ranges::Iterable<const vertex_declaration::VertexElements&>{vertex_elements_};
 			}
 
+			///@}
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Checks if two vertex declarations are equal (all elements are equal)
+			///@brief Checks if two vertex declarations are equal (all elements are equal)
 			[[nodiscard]] bool operator==(const VertexDeclaration &rhs) const noexcept;
 
-			//Checks if two vertex declarations are different (one or more elements are different)
+			///@brief Checks if two vertex declarations are different (one or more elements are different)
 			[[nodiscard]] bool operator!=(const VertexDeclaration &rhs) const noexcept;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the size of one vertex for this vertex declaration to the given size
-			//If nullopt is passed the vertex size would be automatically calculated
+			///@brief Sets the size of one vertex for this vertex declaration to the given size
+			///@details If nullopt is passed the vertex size would be automatically calculated
 			inline void VertexSize(std::optional<int> size) noexcept
 			{
 				vertex_size_ = size;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the total number of components for this vertex declaration
+			///@brief Returns the total number of components for this vertex declaration
 			[[nodiscard]] int Components() const noexcept;
 
-			//Returns the size of one vertex for this vertex declaration
+			///@brief Returns the size of one vertex for this vertex declaration
 			[[nodiscard]] inline auto VertexSize() const noexcept
 			{
 				return vertex_size_ ? *vertex_size_ : Components() * static_cast<int>(sizeof(real));
 			}
 
+			///@}
 
-			/*
-				Vertex elements
+			/**
+				@name Vertex elements
 				Adding
+				@{
 			*/
 
-			//Creates a vertex element with the given attribute name (semantic), type, offset and stride
+			///@brief Creates a vertex element with the given attribute name (semantic), type, offset and stride
 			void AddElement(shaders::shader_layout::AttributeName name, vertex_declaration::VertexElementType type, int offset = 0, int stride = 0);
 
-			//Creates a vertex element as a copy of the given vertex element
+			///@brief Creates a vertex element as a copy of the given vertex element
 			void AddElement(const vertex_declaration::VertexElement &vertex_element);
 
+			///@}
 
-			/*
-				Vertex elements
+			/**
+				@name Vertex elements
 				Removing
+				@{
 			*/
 
-			//Clears all vertex elements from this vertex declaration
+			///@brief Clears all vertex elements from this vertex declaration
 			void ClearElements() noexcept;
+
+			///@}
 	};
 } //ion::graphics::render::vertex
 

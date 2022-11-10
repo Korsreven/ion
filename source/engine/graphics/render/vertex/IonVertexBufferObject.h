@@ -36,8 +36,9 @@ namespace ion::graphics::render::vertex
 			VertexBufferUsage gl_buffer_usage_to_vertex_buffer_usage(int buffer_usage) noexcept;
 
 
-			/*
-				Graphics API
+			/**
+				@name Graphics API
+				@{
 			*/
 
 			std::optional<int> create_vertex_buffer_object() noexcept;
@@ -49,11 +50,13 @@ namespace ion::graphics::render::vertex
 
 			int get_vertex_buffer_size(int vbo_handle) noexcept;
 			VertexBufferUsage get_vertex_buffer_usage(int vbo_handle) noexcept;
+
+			///@}
 		} //detail
 	} //vertex_buffer_object
 
 
-	//A class representing a vertex buffer object (VBO)
+	///@brief A class representing a vertex buffer object (VBO)
 	class VertexBufferObject final
 	{
 		private:
@@ -64,117 +67,126 @@ namespace ion::graphics::render::vertex
 
 		public:
 
-			//Constructs a new vertex buffer object
+			///@brief Constructs a new vertex buffer object
 			VertexBufferObject() noexcept;
 
-			//Constructs a new vertex buffer object with the given usage
+			///@brief Constructs a new vertex buffer object with the given usage
 			explicit VertexBufferObject(vertex_buffer_object::VertexBufferUsage usage) noexcept;
 
-			//Constructs a new vertex buffer object with an already existing handle
+			///@brief Constructs a new vertex buffer object with an already existing handle
 			explicit VertexBufferObject(int handle) noexcept;
 
-			//Copy constructor
+			///@brief Copy constructor
 			VertexBufferObject(const VertexBufferObject &rhs);
 
-			//Default move constructor
+			///@brief Default move constructor
 			VertexBufferObject(VertexBufferObject&&) = default;
 
-			//Destructor
+			///@brief Destructor
 			~VertexBufferObject() noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Copy assignment
+			///@brief Copy assignment
 			inline auto& operator=(const VertexBufferObject &rhs)
 			{
 				usage_ = rhs.usage_;
 				return *this;
 			}
 
-			//Default move assignment
+			///@brief Default move assignment
 			VertexBufferObject& operator=(VertexBufferObject&&) = default;
 
 
-			//Checks if two vertex buffer objects are equal (handles are equal)
+			///@brief Checks if two vertex buffer objects are equal (handles are equal)
 			[[nodiscard]] inline auto operator==(const VertexBufferObject &rhs) const noexcept
 			{
 				return handle_ == rhs.handle_;
 			}
 
-			//Checks if two vertex buffer objects are different (handles are different)
+			///@brief Checks if two vertex buffer objects are different (handles are different)
 			[[nodiscard]] inline auto operator!=(const VertexBufferObject &rhs) const noexcept
 			{
 				return !(*this == rhs);
 			}
 
-			//Returns true if vertex buffer object handle is valid
+			///@brief Returns true if vertex buffer object handle is valid
 			[[nodiscard]] inline operator bool() const noexcept
 			{
 				return handle_.has_value();
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Binds the given vertex buffer object
+			///@brief Binds the given vertex buffer object
 			void Bind() noexcept;
 
-			//Unbinds the given vertex buffer object
+			///@brief Unbinds the given vertex buffer object
 			void Unbind() noexcept;
 
 
-			//Sets the buffer data for this vertex buffer object to the given vertex data
+			///@brief Sets the buffer data for this vertex buffer object to the given vertex data
 			void Data(const VertexDataView &vertex_data) noexcept;
 
-			//Sets the buffer data for this vertex buffer object to the given vertex data with a new usage pattern
+			///@brief Sets the buffer data for this vertex buffer object to the given vertex data with a new usage pattern
 			void Data(const VertexDataView &vertex_data, vertex_buffer_object::VertexBufferUsage usage) noexcept;
 
-			//Sets the buffer data for this vertex buffer object to the given vertex data with offset
+			///@brief Sets the buffer data for this vertex buffer object to the given vertex data with offset
 			void Data(const VertexDataView &vertex_data, int offset) noexcept;
 
 
-			//Reserves the buffer data for this vertex buffer object to the size
+			///@brief Reserves the buffer data for this vertex buffer object to the size
 			void Reserve(int size) noexcept;
 
-			//Reserves the buffer data for this vertex buffer object to the given size with a new usage pattern
+			///@brief Reserves the buffer data for this vertex buffer object to the given size with a new usage pattern
 			void Reserve(int size, vertex_buffer_object::VertexBufferUsage usage) noexcept;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the handle to this vertex buffer object
-			//Returns nullopt if this vertex buffer has no handle
+			///@brief Returns the handle to this vertex buffer object
+			///@details Returns nullopt if this vertex buffer has no handle
 			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return handle_;
 			}
 
-			//Returns the usage pattern of this vertex buffer object
+			///@brief Returns the usage pattern of this vertex buffer object
 			[[nodiscard]] inline auto Usage() const noexcept
 			{
 				return usage_;
 			}
 
-			//Returns the size of this vertex buffer object
+			///@brief Returns the size of this vertex buffer object
 			[[nodiscard]] inline auto Size() const noexcept
 			{
 				return size_;
 			}
 
+			///@}
 
-			/*
-				Vertex buffer view
+			/**
+				@name Vertex buffer view
+				@{
 			*/
 
-			//Returns a vertex buffer view of this vertex buffer object in range [offset, offset + size]
+			///@brief Returns a vertex buffer view of this vertex buffer object in range [offset, offset + size]
 			VertexBufferView SubBuffer(int offset, int size) const noexcept;
+
+			///@}
 	};
 } //ion::graphics::render::vertex
 

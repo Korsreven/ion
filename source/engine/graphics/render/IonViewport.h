@@ -83,8 +83,8 @@ namespace ion::graphics::render
 	} //viewport
 
 
-	//A class representing a viewport that can be aligned and anchored to a specific location
-	//A viewport is connected to a camera, and displays everything being rendered through the camera
+	///@brief A class representing a viewport that can be aligned and anchored to a specific location
+	///@details A viewport is connected to a camera, and displays everything being rendered through the camera
 	class Viewport final :
 		public managed::ManagedObject<RenderTarget>,
 		protected events::EventGenerator<events::listeners::ViewportListener>,
@@ -106,102 +106,112 @@ namespace ion::graphics::render
 			NonOwningPtr<scene::Camera> camera_;
 
 
-			/*
-				Notifying
+			/**
+				@name Notifying
+				@{
 			*/
 
 			void NotifyViewportResized(const Vector2 &size) noexcept;
 			void NotifyViewportMoved(const Vector2 &position) noexcept;
 
+			///@}
 
-			/*
-				Bounds
+			/**
+				@name Bounds
+				@{
 			*/
 
 			Aabb ResizedBounds(const Vector2 &size, const Vector2 &new_size) noexcept;
 			void UpdateBounds(const Aabb &bounds) noexcept;
 
+			///@}
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See RenderTarget::RenderTargetResized for more details
+			///@brief See RenderTarget::RenderTargetResized for more details
 			void RenderTargetResized(Vector2 size) noexcept override;
+
+			///@}
 
 		public:
 
-			//Constructs a new viewport with the given name and connected to a given render target
+			///@brief Constructs a new viewport with the given name and connected to a given render target
 			Viewport(std::string name, RenderTarget &render_target) noexcept;
 
-			//Constructs a new viewport with the given name, connected to a given render target and with the given bounds (region)
+			///@brief Constructs a new viewport with the given name, connected to a given render target and with the given bounds (region)
 			Viewport(std::string name, RenderTarget &render_target, const Aabb &bounds) noexcept;
 
-			//Constructs a new viewport with the given name, connected to a given render target and with the given bounds (region) and anchors
+			///@brief Constructs a new viewport with the given name, connected to a given render target and with the given bounds (region) and anchors
 			Viewport(std::string name, RenderTarget &render_target, const Aabb &bounds,
 				viewport::HorizontalAnchorType left_anchor, viewport::HorizontalAnchorType right_anchor,
 				viewport::VerticalAnchorType top_anchor, viewport::VerticalAnchorType bottom_anchor) noexcept;
 
 
-			/*
-				Static viewport conversions
+			/**
+				@name Static viewport conversions
+				@{
 			*/
 
-			//Returns a new aligned viewport with the given name, render target, alignment and size
+			///@brief Returns a new aligned viewport with the given name, render target, alignment and size
 			[[nodiscard]] static Viewport Aligned(std::string name, RenderTarget &render_target, viewport::AlignmentType alignment, const Vector2 &size) noexcept;
 
-			//Returns a new aligned viewport with the given name, render target, alignment and width/height percent
-			//Width and height should be in range [0.0, 1.0]
+			///@brief Returns a new aligned viewport with the given name, render target, alignment and width/height percent
+			///@details Width and height should be in range [0.0, 1.0]
 			[[nodiscard]] static Viewport Aligned(std::string name, RenderTarget &render_target, viewport::AlignmentType alignment, real width_percent, real height_percent) noexcept;
 
 
-			//Returns a new left aligned viewport with the given name, render target and width percent
+			///@brief Returns a new left aligned viewport with the given name, render target and width percent
 			[[nodiscard]] static Viewport LeftAligned(std::string name, RenderTarget &render_target, real width_percent) noexcept;
 
-			//Returns a new right aligned viewport with the given name, render target and width percent
+			///@brief Returns a new right aligned viewport with the given name, render target and width percent
 			[[nodiscard]] static Viewport RightAligned(std::string name, RenderTarget &render_target, real width_percent) noexcept;
 
-			//Returns a new top aligned viewport with the given name, render target and height percent
+			///@brief Returns a new top aligned viewport with the given name, render target and height percent
 			[[nodiscard]] static Viewport TopAligned(std::string name, RenderTarget &render_target, real height_percent) noexcept;
 
-			//Returns a new bottom aligned viewport with the given name, render target and height percent
+			///@brief Returns a new bottom aligned viewport with the given name, render target and height percent
 			[[nodiscard]] static Viewport BottomAligned(std::string name, RenderTarget &render_target, real height_percent) noexcept;
 
 
-			//Returns a new top left aligned viewport with the given name, render target and size
+			///@brief Returns a new top left aligned viewport with the given name, render target and size
 			[[nodiscard]] static Viewport TopLeftAligned(std::string name, RenderTarget &render_target, const Vector2 &size) noexcept;
 
-			//Returns a new top left aligned viewport with the given name, render target and width/height percent
-			//Width and height should be in range [0.0, 1.0]
+			///@brief Returns a new top left aligned viewport with the given name, render target and width/height percent
+			///@details Width and height should be in range [0.0, 1.0]
 			[[nodiscard]] static Viewport TopLeftAligned(std::string name, RenderTarget &render_target, real width_percent, real height_percent) noexcept;
 
-			//Returns a new top right aligned viewport with the given name, render target and size
+			///@brief Returns a new top right aligned viewport with the given name, render target and size
 			[[nodiscard]] static Viewport TopRightAligned(std::string name, RenderTarget &render_target, const Vector2 &size) noexcept;
 
-			//Returns a new top right aligned viewport with the given name, render target and width/height percent
-			//Width and height should be in range [0.0, 1.0]
+			///@brief Returns a new top right aligned viewport with the given name, render target and width/height percent
+			///@details Width and height should be in range [0.0, 1.0]
 			[[nodiscard]] static Viewport TopRightAligned(std::string name, RenderTarget &render_target, real width_percent, real height_percent) noexcept;
 
-			//Returns a new bottom left aligned viewport with the given name, render target and size
+			///@brief Returns a new bottom left aligned viewport with the given name, render target and size
 			[[nodiscard]] static Viewport BottomLeftAligned(std::string name, RenderTarget &render_target, const Vector2 &size) noexcept;
 
-			//Returns a new bottom left aligned viewport with the given name, render target and width/height percent
-			//Width and height should be in range [0.0, 1.0]
+			///@brief Returns a new bottom left aligned viewport with the given name, render target and width/height percent
+			///@details Width and height should be in range [0.0, 1.0]
 			[[nodiscard]] static Viewport BottomLeftAligned(std::string name, RenderTarget &render_target, real width_percent, real height_percent) noexcept;
 
-			//Returns a new bottom right aligned viewport with the given name, render target and size
+			///@brief Returns a new bottom right aligned viewport with the given name, render target and size
 			[[nodiscard]] static Viewport BottomRightAligned(std::string name, RenderTarget &render_target, const Vector2 &size) noexcept;
 
-			//Returns a new bottom right aligned viewport with the given name, render target and width/height percent
-			//Width and height should be in range [0.0, 1.0]
+			///@brief Returns a new bottom right aligned viewport with the given name, render target and width/height percent
+			///@details Width and height should be in range [0.0, 1.0]
 			[[nodiscard]] static Viewport BottomRightAligned(std::string name, RenderTarget &render_target, real width_percent, real height_percent) noexcept;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the viewport bounds (region)
+			///@brief Sets the viewport bounds (region)
 			inline void Bounds(const Aabb &bounds) noexcept
 			{
 				if (bounds_ != bounds)
@@ -209,126 +219,136 @@ namespace ion::graphics::render
 			}
 
 
-			//Sets the left anchor of the viewport to the given horizontal anchor type
+			///@brief Sets the left anchor of the viewport to the given horizontal anchor type
 			inline void LeftAnchor(viewport::HorizontalAnchorType anchor_type) noexcept
 			{
 				left_anchor_ = anchor_type;
 			}
 
-			//Sets the right anchor of the viewport to the given horizontal anchor type
+			///@brief Sets the right anchor of the viewport to the given horizontal anchor type
 			inline void RightAnchor(viewport::HorizontalAnchorType anchor_type) noexcept
 			{
 				right_anchor_  = anchor_type;
 			}
 
-			//Sets the top anchor of the viewport to the given vertical anchor type
+			///@brief Sets the top anchor of the viewport to the given vertical anchor type
 			inline void TopAnchor(viewport::VerticalAnchorType anchor_type) noexcept
 			{
 				top_anchor_  = anchor_type;
 			}
 
-			//Sets the bottom anchor of the viewport to the given vertical anchor type
+			///@brief Sets the bottom anchor of the viewport to the given vertical anchor type
 			inline void BottomAnchor(viewport::VerticalAnchorType anchor_type) noexcept
 			{
 				bottom_anchor_  = anchor_type;
 			}
 
 
-			//Sets the background (clear) color of the viewport to the given color
+			///@brief Sets the background (clear) color of the viewport to the given color
 			inline void BackgroundColor(const Color &color) noexcept
 			{
 				background_color_ = color;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the viewport bounds (region)
+			///@brief Returns the viewport bounds (region)
 			[[nodiscard]] inline auto& Bounds() const noexcept
 			{
 				return bounds_;
 			}
 
-			//Returns the viewport base bounds (region)
+			///@brief Returns the viewport base bounds (region)
 			[[nodiscard]] inline auto& BaseBounds() const noexcept
 			{
 				return base_bounds_;
 			}
 
 
-			//Returns the left anchor of the viewport
+			///@brief Returns the left anchor of the viewport
 			[[nodiscard]] inline auto LeftAnchor() const noexcept
 			{
 				return left_anchor_;
 			}
 
-			//Returns the right anchor of the viewport
+			///@brief Returns the right anchor of the viewport
 			[[nodiscard]] inline auto RightAnchor() const noexcept
 			{
 				return right_anchor_;
 			}
 
-			//Returns the top anchor of the viewport
+			///@brief Returns the top anchor of the viewport
 			[[nodiscard]] inline auto TopAnchor() const noexcept
 			{
 				return top_anchor_;
 			}
 
-			//Returns the bottom anchor of the viewport
+			///@brief Returns the bottom anchor of the viewport
 			[[nodiscard]] inline auto BottomAnchor() const noexcept
 			{
 				return bottom_anchor_;
 			}
 
 
-			//Returns the background (clear) color of the viewport
+			///@brief Returns the background (clear) color of the viewport
 			[[nodiscard]] inline auto& BackgroundColor() const noexcept
 			{
 				return background_color_;
 			}
 
+			///@}
 
-			/*
-				Camera
+			/**
+				@name Camera
+				@{
 			*/
 
-			//Sets the camera connected to this viewport to the given camera
+			///@brief Sets the camera connected to this viewport to the given camera
 			void ConnectedCamera(NonOwningPtr<scene::Camera> camera) noexcept;
 
-			//Returns a pointer to the camera connected to this viewport
-			//Returns nullptr if this viewport does not have a camera connected
+			///@brief Returns a pointer to the camera connected to this viewport
+			///@details Returns nullptr if this viewport does not have a camera connected
 			[[nodiscard]] inline auto ConnectedCamera() const noexcept
 			{
 				return camera_;
 			}
 
-			
-			/*
-				Conversions
+			///@}
+
+			/**
+				@name Conversions
+				@{
 			*/
 
-			//Returns the ratio (scale factor) between this viewport and the connected cameras ortho
+			///@brief Returns the ratio (scale factor) between this viewport and the connected cameras ortho
 			[[nodiscard]] Vector2 ViewportToOrthoRatio() const noexcept;
 			
-			//Returns the ratio (scale factor) between the connected cameras ortho and this viewport
+			///@brief Returns the ratio (scale factor) between the connected cameras ortho and this viewport
 			[[nodiscard]] Vector2 OrthoToViewportRatio() const noexcept;
 
 
-			//Returns a new point in camera space from the given point in viewport space
+			///@brief Returns a new point in camera space from the given point in viewport space
 			[[nodiscard]] Vector2 ViewportToCameraPoint(const Vector2 &point) const noexcept;
 			
-			//Returns a new point in viewport space from the given point in camera space
+			///@brief Returns a new point in viewport space from the given point in camera space
 			[[nodiscard]] Vector2 CameraToViewportPoint(const Vector2 &point) const noexcept;
 
+			///@}
 
-			/*
-				Rendering
+			/**
+				@name Rendering
+				@{
 			*/
 
-			//Starts rendering to this viewport
+			///@brief Starts rendering to this viewport
 			void RenderTo() noexcept;
+
+			///@}
 	};
 } //ion::graphics
 

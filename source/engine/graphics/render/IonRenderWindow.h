@@ -62,8 +62,8 @@ namespace ion::graphics::render
 	} //render_window
 
 
-	//A class representing a general render window (OS independent), which derives from a system specific window (OS dependant)
-	//A render window is also a render target containing viewports
+	///@brief A class representing a general render window (OS independent), which derives from a system specific window (OS dependant)
+	///@details A render window is also a render target containing viewports
 	class RenderWindow final :	
 		public RenderTarget,
 		public events::Listenable<events::listeners::WindowListener>,
@@ -89,168 +89,177 @@ namespace ion::graphics::render
 			render_window::WindowCursor cursor_ = render_window::WindowCursor::Default;		
 
 
-			/*
-				Notifying
+			/**
+				@name Notifying
+				@{
 			*/
 
 			void NotifyWindowActionReceived(events::listeners::WindowAction action) noexcept;
 			void NotifyWindowMoved(const Vector2 &position) noexcept;
 			void NotifyWindowResized(const Vector2 &size) noexcept;
 
+			///@}
 
-			/*
-				Window events
+			/**
+				@name Window events
+				@{
 			*/
 
-			//See Window::Opened for more details
+			///@brief See Window::Opened for more details
 			void Opened() noexcept override final;
 
-			//See Window::Closed for more details
+			///@brief See Window::Closed for more details
 			void Closed() noexcept override final;
 
 
-			//See Window::Activated for more details
+			///@brief See Window::Activated for more details
 			void Activated() noexcept override final;
 
-			//See Window::Deactivated for more details
+			///@brief See Window::Deactivated for more details
 			void Deactivated() noexcept override final;
 
 
-			//See Window::Maximized for more details
+			///@brief See Window::Maximized for more details
 			void Maximized() noexcept override final;
 
-			//See Window::Minimized for more details
+			///@brief See Window::Minimized for more details
 			void Minimized() noexcept override final;
 
-			//See Window::Restored for more details
+			///@brief See Window::Restored for more details
 			void Restored() noexcept override final;
 
 
-			//See Window::Moved for more details
+			///@brief See Window::Moved for more details
 			void Moved(const Vector2 &position) noexcept override final;
 
-			//See Window::Resized for more details
+			///@brief See Window::Resized for more details
 			void Resized(const Vector2 &size) noexcept override final;
 
-			//See Window::DisplayModeChanged for more details
+			///@brief See Window::DisplayModeChanged for more details
 			void DisplayModeChanged() noexcept override final;
 
 
-			//See Window::GetFullScreenSize for more details
+			///@brief See Window::GetFullScreenSize for more details
 			std::optional<Vector2> GetFullScreenSize() const noexcept override final;
 
-			//See Window::GetSizeConstraints for more details
+			///@brief See Window::GetSizeConstraints for more details
 			std::pair<std::optional<Vector2>, std::optional<Vector2>> GetSizeConstraints() const noexcept override final;
 
-
-			
+			///@}
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			RenderWindow() = default;
 
-			//Constructs a new window with the given arguments
+			///@brief Constructs a new window with the given arguments
 			RenderWindow(std::string title,
 				const Vector2 &size, const std::optional<Vector2> &min_size,
 				const std::optional<Vector2> &full_screen_size, const std::optional<Vector2> &position,
 				render_window::WindowDisplayMode display_mode, render_window::WindowBorderStyle border_style,
 				render_window::WindowCursor cursor, int color_depth = 32) noexcept;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			RenderWindow(const RenderWindow&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			RenderWindow(RenderWindow&&) = default;
 
 
-			/*
-				Static window conversions
+			/**
+				@name Static window conversions
+				@{
 			*/
 
-			//Returns a new borderless window from the given title, size and position
+			///@brief Returns a new borderless window from the given title, size and position
 			[[nodiscard]] static RenderWindow Borderless(std::string title, const Vector2 &size,
 				const std::optional<Vector2> &position = std::nullopt) noexcept;
 
-			//Returns a new dialog window from the given title, size and position
+			///@brief Returns a new dialog window from the given title, size and position
 			[[nodiscard]] static RenderWindow Dialog(std::string title, const Vector2 &size,
 				const std::optional<Vector2> &position = std::nullopt) noexcept;
 
-			//Returns a new non resizable window from the given title, size and position
+			///@brief Returns a new non resizable window from the given title, size and position
 			[[nodiscard]] static RenderWindow NonResizable(std::string title, const Vector2 &size,
 				const std::optional<Vector2> &position = std::nullopt) noexcept;
 
-			//Returns a new resizable window from the given title, size and position
+			///@brief Returns a new resizable window from the given title, size and position
 			[[nodiscard]] static RenderWindow Resizable(std::string title, const Vector2 &size,
 				const std::optional<Vector2> &position = std::nullopt) noexcept;
 
+			///@}
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			RenderWindow& operator=(const RenderWindow&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			RenderWindow& operator=(RenderWindow&&) = default;
 
+			///@}
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//Returns a mutable reference to the window events of this render window
+			///@brief Returns a mutable reference to the window events of this render window
 			[[nodiscard]] inline auto& Events() noexcept
 			{
 				return static_cast<WindowEventsBase&>(*this);
 			}
 
-			//Returns an immutable reference to the window events of this render window
+			///@brief Returns an immutable reference to the window events of this render window
 			[[nodiscard]] inline auto& Events() const noexcept
 			{
 				return static_cast<const WindowEventsBase&>(*this);
 			}
 
 
-			//Returns a mutable reference to the render target events of this render window
+			///@brief Returns a mutable reference to the render target events of this render window
 			[[nodiscard]] inline auto& RenderTargetEvents() noexcept
 			{
 				return static_cast<RenderTargetEventsBase&>(*this);
 			}
 
-			//Returns an immutable reference to the render target events of this render window
+			///@brief Returns an immutable reference to the render target events of this render window
 			[[nodiscard]] inline auto& RenderTargetEvents() const noexcept
 			{
 				return static_cast<const RenderTargetEventsBase&>(*this);
 			}
 
 
-			//Returns a mutable reference to the message events of this render window
+			///@brief Returns a mutable reference to the message events of this render window
 			[[nodiscard]] inline auto& MessageEvents() noexcept
 			{
 				return static_cast<MessageEventsBase&>(*this);
 			}
 
-			//Returns an immutable reference to the message events of this render window
+			///@brief Returns an immutable reference to the message events of this render window
 			[[nodiscard]] inline auto& MessageEvents() const noexcept
 			{
 				return static_cast<const MessageEventsBase&>(*this);
 			}
 			
 
-			//See RenderTarget::DoSwapBuffers for more details
+			///@brief See RenderTarget::DoSwapBuffers for more details
 			void DoSwapBuffers() noexcept override final;
 
-			//See RenderTarget::GetRenderTargetSize for more details
+			///@brief See RenderTarget::GetRenderTargetSize for more details
 			Vector2 GetRenderTargetSize() const noexcept override final;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the window title to the given title
+			///@brief Sets the window title to the given title
 			inline void Title(std::string title) noexcept
 			{
 				if (title_ != title)
@@ -260,7 +269,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets the window size to the given size
+			///@brief Sets the window size to the given size
 			inline void Size(const Vector2 &size) noexcept
 			{
 				if (size_ != size)
@@ -273,7 +282,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets the window min size constraint to the given min size
+			///@brief Sets the window min size constraint to the given min size
 			inline void MinSize(const std::optional<Vector2> &min_size) noexcept
 			{
 				if (min_size_ != min_size)
@@ -292,14 +301,14 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets a custom full screen size to the given size
+			///@brief Sets a custom full screen size to the given size
 			inline void FullScreenSize(const std::optional<Vector2> &full_screen_size) noexcept
 			{
 				if (full_screen_size_ != full_screen_size)
 					full_screen_size_ = full_screen_size;
 			}
 
-			//Sets a custom window position to the given size
+			///@brief Sets a custom window position to the given size
 			inline void Position(const std::optional<Vector2> &position) noexcept
 			{
 				if (position_ != position)
@@ -311,15 +320,15 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets the window color depth to the given value
-			//Changes will apply the next time the window is recreated
+			///@brief Sets the window color depth to the given value
+			///@details Changes will apply the next time the window is recreated
 			inline void ColorDepth(int color_depth) noexcept
 			{
 				color_depth_ = color_depth;
 			}
 
 
-			//Sets the window display mode to the given mode
+			///@brief Sets the window display mode to the given mode
 			inline void DisplayMode(render_window::WindowDisplayMode display_mode) noexcept
 			{
 				if (display_mode_ != display_mode)
@@ -340,7 +349,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets the window border style to the given style
+			///@brief Sets the window border style to the given style
 			inline void BorderStyle(render_window::WindowBorderStyle border_style) noexcept
 			{
 				if (border_style_ != border_style)
@@ -369,7 +378,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets the window cursor to the given cursor
+			///@brief Sets the window cursor to the given cursor
 			inline void Cursor(render_window::WindowCursor cursor) noexcept
 			{
 				if (cursor_ != cursor)
@@ -390,183 +399,199 @@ namespace ion::graphics::render
 				}
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the window title
+			///@brief Returns the window title
 			[[nodiscard]] inline auto& Title() const noexcept
 			{
 				return title_;
 			}
 
-			//Returns the size of the window
+			///@brief Returns the size of the window
 			[[nodiscard]] inline auto& Size() const noexcept
 			{
 				return size_;
 			}
 
-			//Returns the min allowed client size of the window
-			//Returns nullopt if there is not a constraint on min size
+			///@brief Returns the min allowed client size of the window
+			///@details Returns nullopt if there is not a constraint on min size
 			[[nodiscard]] inline auto& MinSize() const noexcept
 			{
 				return min_size_;
 			}
 
-			//Returns the full screen size of the window
-			//Returns nullopt if no custom full screen size specified
+			///@brief Returns the full screen size of the window
+			///@details Returns nullopt if no custom full screen size specified
 			[[nodiscard]] inline auto& FullScreenSize() const noexcept
 			{
 				return full_screen_size_;
 			}
 
-			//Returns the position of the window
-			//Returns nullopt if the window does not have a custom position (centered)
+			///@brief Returns the position of the window
+			///@details Returns nullopt if the window does not have a custom position (centered)
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}
 
-			//Returns the window color depth
+			///@brief Returns the window color depth
 			[[nodiscard]] inline auto ColorDepth() const noexcept
 			{
 				return color_depth_;
 			}
 
 
-			//Returns the window display mode
+			///@brief Returns the window display mode
 			[[nodiscard]] inline auto DisplayMode() const noexcept
 			{
 				return display_mode_;
 			}
 
-			//Returns the window border style
+			///@brief Returns the window border style
 			[[nodiscard]] inline auto BorderStyle() const noexcept
 			{
 				return border_style_;
 			}
 
-			//Returns the window cursor
+			///@brief Returns the window cursor
 			[[nodiscard]] inline auto Cursor() const noexcept
 			{
 				return cursor_;
 			}
 
+			///@}
 
-			/*
-				Buffers
+			/**
+				@name Buffers
+				@{
 			*/
 
-			//Exchanges the front and back buffers
+			///@brief Exchanges the front and back buffers
 			void SwapBuffers() noexcept;
 
+			///@}
 
-			/*
-				Create/destroy
+			/**
+				@name Create/destroy
+				@{
 			*/
 
-			//Creates a window
+			///@brief Creates a window
 			bool Create() noexcept;
 
-			//Destroyes a window (if existing)
+			///@brief Destroyes a window (if existing)
 			void Destroy() noexcept;
 
+			///@}
 
-			/*
-				Show/hide
+			/**
+				@name Show/hide
+				@{
 			*/
 
-			//Shows and focus the window
-			//Makes the window visible
+			///@brief Shows and focus the window
+			///@details Makes the window visible
 			bool Show() noexcept;
 
-			//Hides the window
-			//Makes the window not visible
+			///@brief Hides the window
+			///@details Makes the window not visible
 			bool Hide() noexcept;
 
+			///@}
 
-			/*
-				Messages
+			/**
+				@name Messages
+				@{
 			*/
 
-			//Process all messages in the message queue
-			//Returns false if a quit message has been received
+			///@brief Process all messages in the message queue
+			///@details Returns false if a quit message has been received
 			bool ProcessMessages() noexcept;
 
+			///@}
 
-			/*
-				System window (shadowing)
+			/**
+				@name System window (shadowing)
 				Modifiers
+				@{
 			*/
 
-			//Focuses the window by bringing it to the front
+			///@brief Focuses the window by bringing it to the front
 			inline void Focus() noexcept
 			{
 				system::Window::Focus();
 			}
 
-			//Sets the window position to the center of the main desktop
+			///@brief Sets the window position to the center of the main desktop
 			inline void Center() noexcept
 			{
 				position_.reset();
 				system::Window::Center();
 			}
 
+			///@}
 
-			/*
-				System window (shadowing)
+			/**
+				@name System window (shadowing)
 				Observers
+				@{
 			*/
 
-			//Returns the inner (client/screen) size of the window
-			//Returns nullopt if no window has been created
+			///@brief Returns the inner (client/screen) size of the window
+			///@details Returns nullopt if no window has been created
 			[[nodiscard]] inline auto InnerSize() const noexcept
 			{
 				return system::Window::InnerSize();
 			}
 
-			//Returns the outer size of the window
-			//Returns nullopt if no window has been created
+			///@brief Returns the outer size of the window
+			///@details Returns nullopt if no window has been created
 			[[nodiscard]] inline auto OuterSize() const noexcept
 			{
 				return system::Window::OuterSize();
 			}
 
-			//Returns the inner (client/screen) position of the window
-			//Returns nullopt if no window has been created
+			///@brief Returns the inner (client/screen) position of the window
+			///@details Returns nullopt if no window has been created
 			[[nodiscard]] inline auto InnerPosition() const noexcept
 			{
 				return system::Window::InnerPosition();
 			}
 
-			//Returns the outer position of the window
-			//Returns nullopt if no window has been created
+			///@brief Returns the outer position of the window
+			///@details Returns nullopt if no window has been created
 			[[nodiscard]] inline auto OuterPosition() const noexcept
 			{
 				return system::Window::OuterPosition();
 			}
 
 
-			//Returns true if the window is created
+			///@brief Returns true if the window is created
 			[[nodiscard]] inline auto Created() const noexcept
 			{
 				return system::Window::Created();
 			}
 
-			//Returns true if the window is active (in focus)
+			///@brief Returns true if the window is active (in focus)
 			[[nodiscard]] inline auto IsActive() const noexcept
 			{
 				return system::Window::IsActive();
 			}
 
 
-			//Returns the native window handle
-			//Returns nullptr if no window has been created
+			///@brief Returns the native window handle
+			///@details Returns nullptr if no window has been created
 			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return system::Window::Handle();
 			}
+
+			///@}
 	};
 } //ion::graphics::render
 

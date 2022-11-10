@@ -76,8 +76,8 @@ namespace ion::graphics::render
 	} //render_primitive
 
 
-	//A class representing a primitive with some vertex data and different render properties
-	//The properties determines what other primitives it can be grouped with and how it is drawn
+	///@brief A class representing a primitive with some vertex data and different render properties
+	///@details The properties determines what other primitives it can be grouped with and how it is drawn
 	class RenderPrimitive
 	{
 		private:
@@ -118,15 +118,16 @@ namespace ion::graphics::render
 
 		protected:
 
-			//Returns the vertex data of this render primitive
+			///@brief Returns the vertex data of this render primitive
 			[[nodiscard]] inline auto& VertexData() noexcept
 			{
 				return vertex_data_;
 			}
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
 			virtual void VertexDataChanged() noexcept;
@@ -147,48 +148,53 @@ namespace ion::graphics::render
 			virtual void VisibleChanged() noexcept;
 			virtual void RendererChanged() noexcept;
 
+			///@}
+
 		public:
 
-			//Constructs a new render primitive with the given draw mode, vertex declaration and visibility
+			///@brief Constructs a new render primitive with the given draw mode, vertex declaration and visibility
 			RenderPrimitive(vertex::vertex_batch::VertexDrawMode draw_mode, vertex::VertexDeclaration vertex_declaration,
 				bool visible = true) noexcept;
 
-			//Default copy constructor
+			///@brief Default copy constructor
 			RenderPrimitive(const RenderPrimitive&) = default;
 
-			//Default move constructor
+			///@brief Default move constructor
 			RenderPrimitive(RenderPrimitive&&) = default;
 
-			//Virtual destructor
+			///@brief Virtual destructor
 			virtual ~RenderPrimitive() noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Default copy assignment
+			///@brief Default copy assignment
 			inline RenderPrimitive& operator=(const RenderPrimitive&) = default;
 
-			//Default move assignment
+			///@brief Default move assignment
 			inline RenderPrimitive& operator=(RenderPrimitive&&) = default;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the vertex data of this render primitive to the given data
+			///@brief Sets the vertex data of this render primitive to the given data
 			void VertexData(render_primitive::VertexContainer data) noexcept;
 
-			//Appends the given vertex data to the vertex data of this render primitive
+			///@brief Appends the given vertex data to the vertex data of this render primitive
 			void AppendVertexData(const render_primitive::VertexContainer &data);
 
-			//Sets the model matrix of this render primitive to the given matrix
+			///@brief Sets the model matrix of this render primitive to the given matrix
 			void ModelMatrix(const Matrix4 &model_matrix) noexcept;
 
 
-			//Sets the render passes of this render primitive to the given passes
+			///@brief Sets the render passes of this render primitive to the given passes
 			inline void RenderPasses(render_pass::Passes passes) noexcept
 			{
 				if (!render_primitive::detail::all_passes_equal(passes_, passes))
@@ -199,7 +205,7 @@ namespace ion::graphics::render
 				}
 			}
 		
-			//Sets the material of this render primitive to the given material
+			///@brief Sets the material of this render primitive to the given material
 			inline void RenderMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
 				if (material_ != material)
@@ -211,7 +217,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets the texture of this render primitive to the given texture handle
+			///@brief Sets the texture of this render primitive to the given texture handle
 			inline void RenderTexture(std::optional<textures::texture::TextureHandle> texture_handle) noexcept
 			{
 				if (texture_handle_ != texture_handle)
@@ -223,13 +229,13 @@ namespace ion::graphics::render
 			}
 
 
-			//Sets the base color of this render primitive to the given color
+			///@brief Sets the base color of this render primitive to the given color
 			void BaseColor(const Color &color) noexcept;
 
-			//Sets the base opacity of this render primitive to the given value
+			///@brief Sets the base opacity of this render primitive to the given value
 			void BaseOpacity(real opacity) noexcept;
 
-			//Sets the opacity of this render primitive to the given opacity
+			///@brief Sets the opacity of this render primitive to the given opacity
 			inline void Opacity(real opacity) noexcept
 			{
 				if (opacity_ != opacity)
@@ -241,7 +247,7 @@ namespace ion::graphics::render
 			}
 
 
-			//Sets the point size of this render primitive to the given value
+			///@brief Sets the point size of this render primitive to the given value
 			inline void PointSize(real size) noexcept
 			{
 				if (point_size_ != size)
@@ -252,7 +258,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets the line thickness of this render primitive to the given value
+			///@brief Sets the line thickness of this render primitive to the given value
 			inline void LineThickness(real thickness) noexcept
 			{
 				if (line_thickness_ != thickness)
@@ -263,7 +269,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets whether or not this render primitive has wire frame enabled
+			///@brief Sets whether or not this render primitive has wire frame enabled
 			inline void WireFrame(bool enable) noexcept
 			{
 				if (wire_frame_ != enable)
@@ -274,7 +280,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets whether or not this render primitive has point sprite enabled
+			///@brief Sets whether or not this render primitive has point sprite enabled
 			inline void PointSprite(bool enable) noexcept
 			{
 				if (point_sprite_ != enable)
@@ -285,7 +291,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets whether or not this render primitive is visible
+			///@brief Sets whether or not this render primitive is visible
 			inline void Visible(bool visible) noexcept
 			{
 				if (visible_ != visible)
@@ -295,7 +301,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets whether or not this render primitive is visible in world space
+			///@brief Sets whether or not this render primitive is visible in world space
 			inline void WorldVisible(bool visible) noexcept
 			{
 				if (world_visible_ != visible)
@@ -305,7 +311,7 @@ namespace ion::graphics::render
 				}
 			}
 
-			//Sets the parent renderer of this render primitive to the given renderer
+			///@brief Sets the parent renderer of this render primitive to the given renderer
 			inline void ParentRenderer(Renderer *parent_renderer) noexcept
 			{
 				if (parent_renderer_ != parent_renderer)
@@ -315,188 +321,198 @@ namespace ion::graphics::render
 				}
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the draw mode of this render primitive
+			///@brief Returns the draw mode of this render primitive
 			[[nodiscard]] inline auto& DrawMode() const noexcept
 			{
 				return draw_mode_;
 			}
 
-			//Returns the vertex declaration of this render primitive
+			///@brief Returns the vertex declaration of this render primitive
 			[[nodiscard]] inline auto& VertexDataDeclaration() const noexcept
 			{
 				return vertex_declaration_;
 			}
 
 
-			//Returns the vertex data of this render primitive
+			///@brief Returns the vertex data of this render primitive
 			[[nodiscard]] inline auto& VertexData() const noexcept
 			{
 				return vertex_data_;
 			}
 
-			//Returns the vertex data of this render primitive in world space
+			///@brief Returns the vertex data of this render primitive in world space
 			[[nodiscard]] inline auto& WorldVertexData() const noexcept
 			{
 				return world_vertex_data_;
 			}
 
-			//Returns the model matrix of this render primitive
+			///@brief Returns the model matrix of this render primitive
 			[[nodiscard]] inline auto& ModelMatrix() const noexcept
 			{
 				return model_matrix_;
 			}
 
 
-			//Returns the vertex count of this render primitive
+			///@brief Returns the vertex count of this render primitive
 			[[nodiscard]] inline auto VertexCount() const noexcept
 			{
 				return render_primitive::detail::get_vertex_count(vertex_declaration_, vertex_data_);
 			}
 
-			//Returns the vertex data size of this render primitive
+			///@brief Returns the vertex data size of this render primitive
 			[[nodiscard]] inline auto VertexDataSize() const noexcept
 			{
 				return std::ssize(vertex_data_);
 			}
 
-			//Returns the z of this render primitive
+			///@brief Returns the z of this render primitive
 			[[nodiscard]] inline auto Z() const noexcept
 			{
 				return render_primitive::detail::get_position_z(vertex_metrics_, vertex_data_);
 			}
 
-			//Returns the z of this render primitive in world space
+			///@brief Returns the z of this render primitive in world space
 			[[nodiscard]] inline auto WorldZ() const noexcept
 			{
 				return world_z_;
 			}
 
-			//Returns the axis aligned bounding box of this render primitive
+			///@brief Returns the axis aligned bounding box of this render primitive
 			[[nodiscard]] inline auto& AxisAlignedBoundingBox() const noexcept
 			{
 				return aabb_;
 			}
 
 
-			//Returns the render passes of this render primitive
+			///@brief Returns the render passes of this render primitive
 			[[nodiscard]] inline auto& RenderPasses() const noexcept
 			{
 				return passes_;
 			}
 
-			//Returns the material of this render primitive
+			///@brief Returns the material of this render primitive
 			[[nodiscard]] inline auto RenderMaterial() const noexcept
 			{
 				return material_;
 			}
 
-			//Returns the texture of this render primitive
+			///@brief Returns the texture of this render primitive
 			[[nodiscard]] inline auto RenderTexture() const noexcept
 			{
 				return texture_handle_;
 			}
 
 
-			//Returns the base color of this render primitive
+			///@brief Returns the base color of this render primitive
 			[[nodiscard]] inline auto BaseColor() const noexcept
 			{
 				return render_primitive::detail::get_color(vertex_metrics_, vertex_data_);
 			}
 
-			//Returns the base opacity of this render primitive
+			///@brief Returns the base opacity of this render primitive
 			[[nodiscard]] inline auto BaseOpacity() const noexcept
 			{
 				return render_primitive::detail::get_opacity(vertex_metrics_, vertex_data_);
 			}
 
-			//Returns the opacity of this render primitive
+			///@brief Returns the opacity of this render primitive
 			[[nodiscard]] inline auto Opacity() const noexcept
 			{
 				return opacity_;
 			}
 
 
-			//Returns the point size of this render primitive
+			///@brief Returns the point size of this render primitive
 			[[nodiscard]] inline auto PointSize() const noexcept
 			{
 				return point_size_;
 			}
 
-			//Returns the line thickness of this render primitive
+			///@brief Returns the line thickness of this render primitive
 			[[nodiscard]] inline auto LineThickness() const noexcept
 			{
 				return line_thickness_;
 			}
 
-			//Returns whether or not this render primitive has wire frame enabled
+			///@brief Returns whether or not this render primitive has wire frame enabled
 			[[nodiscard]] inline auto WireFrame() const noexcept
 			{
 				return wire_frame_;
 			}
 
-			//Returns whether or not this render primitive has point sprite enabled
+			///@brief Returns whether or not this render primitive has point sprite enabled
 			[[nodiscard]] inline auto PointSprite() const noexcept
 			{
 				return point_sprite_;
 			}
 
-			//Returns whether or not this render primitive is visible
+			///@brief Returns whether or not this render primitive is visible
 			[[nodiscard]] inline auto Visible() const noexcept
 			{
 				return visible_;
 			}
 
-			//Returns whether or not this render primitive is visible in world space
+			///@brief Returns whether or not this render primitive is visible in world space
 			[[nodiscard]] inline auto WorldVisible() const noexcept
 			{
 				return world_visible_;
 			}
 
-			//Returns the parent renderer of this render primitive
+			///@brief Returns the parent renderer of this render primitive
 			[[nodiscard]] inline auto ParentRenderer() const noexcept
 			{
 				return parent_renderer_.Get();
 			}
 
 
-			//Returns whether or not this render primitive is groupable with the given primitive
+			///@brief Returns whether or not this render primitive is groupable with the given primitive
 			[[nodiscard]] bool IsGroupable(const RenderPrimitive &primitive) const noexcept;
 
+			///@}
 
-			/*
-				Vertex batch
+			/**
+				@name Vertex batch
+				@{
 			*/
 
-			//Returns a vertex batch that can render this render primitive
+			///@brief Returns a vertex batch that can render this render primitive
 			[[nodiscard]] vertex::VertexBatch MakeVertexBatch() const noexcept;
 
+			///@}
 
-			/*
-				Refreshing
+			/**
+				@name Refreshing
+				@{
 			*/
 
-			//Refreshes render primitive by regrouping it in the renderer
-			//This function is typically called each frame
+			///@brief Refreshes render primitive by regrouping it in the renderer
+			///@details This function is typically called each frame
 			void Refresh();
 
+			///@}
 
-			/*
-				Preparing
+			/**
+				@name Preparing
+				@{
 			*/
 
-			//Prepares this render primitive such that it is ready to be drawn
-			//This function is typically called each frame
+			///@brief Prepares this render primitive such that it is ready to be drawn
+			///@details This function is typically called each frame
 			virtual void Prepare();
 
-			//Prepares vertex data, by updating world vertex data
-			//Returns true if world vertex data has changed
-			//This function is typically called each frame
+			///@brief Prepares vertex data, by updating world vertex data
+			///@details Returns true if world vertex data has changed.
+			///This function is typically called each frame
 			[[nodiscard]] bool PrepareVertexData();
+
+			///@}
 	};
 
 } //ion::graphics::render

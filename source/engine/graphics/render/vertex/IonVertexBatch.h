@@ -81,11 +81,12 @@ namespace ion::graphics::render::vertex
 			std::optional<textures::texture::TextureHandle> get_texture_handle(const texture_type &some_texture, duration time) noexcept;
 
 
-			/*
-				Graphics API
+			/**
+				@name Graphics API
+				@{
 			*/
 
-			void set_vertex_attribute_pointers(const VertexDeclaration &vertex_declaration, int vbo_offset, shaders::ShaderProgram &shader_program) noexcept;			
+			void set_vertex_attribute_pointers(const VertexDeclaration &vertex_declaration, int vbo_offset, shaders::ShaderProgram &shader_program) noexcept;
 			void set_vertex_attribute_pointers(const VertexDeclaration &vertex_declaration, const void *data, shaders::ShaderProgram &shader_program) noexcept;
 			void disable_vertex_attribute_pointers(const VertexDeclaration &vertex_declaration, const shaders::ShaderProgram &shader_program) noexcept;
 
@@ -98,13 +99,15 @@ namespace ion::graphics::render::vertex
 			
 			void set_light_uniforms(shaders::ShaderProgram &shader_program) noexcept;
 			void set_material_uniforms(materials::Material *material, duration time, shaders::ShaderProgram &shader_program) noexcept;
-			void set_texture_uniforms(texture_type &some_texture, duration time, shaders::ShaderProgram &shader_program) noexcept;		
+			void set_texture_uniforms(texture_type &some_texture, duration time, shaders::ShaderProgram &shader_program) noexcept;
+
+			///@}
 		} //detail
 	} //vertex_batch
 
 
-	//A class representing a batch of vertices that can be drawn in a single call
-	//Vertices are drawn either from a VBO or directly from memory with or without a shader program
+	///@brief A class representing a batch of vertices that can be drawn in a single call
+	///@details Vertices are drawn either from a VBO or directly from memory with or without a shader program
 	class VertexBatch final
 	{
 		private:
@@ -126,37 +129,38 @@ namespace ion::graphics::render::vertex
 
 		public:
 
-			//Constructs a new vertex batch with the given draw mode and vertex declaration
+			///@brief Constructs a new vertex batch with the given draw mode and vertex declaration
 			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration) noexcept;
 
-			//Constructs a new vertex batch with the given draw mode, vertex declaration, vertex data and material (optional)
+			///@brief Constructs a new vertex batch with the given draw mode, vertex declaration, vertex data and material (optional)
 			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
 				const VertexDataView &vertex_data, NonOwningPtr<materials::Material> material = nullptr) noexcept;
 
-			//Constructs a new vertex batch with the given draw mode, vertex declaration, vertex data and animation
+			///@brief Constructs a new vertex batch with the given draw mode, vertex declaration, vertex data and animation
 			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
 				const VertexDataView &vertex_data, NonOwningPtr<textures::Animation> animation) noexcept;
 
-			//Constructs a new vertex batch with the given draw mode, vertex declaration, vertex data and texture
+			///@brief Constructs a new vertex batch with the given draw mode, vertex declaration, vertex data and texture
 			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
 				const VertexDataView &vertex_data, NonOwningPtr<textures::Texture> texture) noexcept;
 
-			//Constructs a new vertex batch with the given draw mode, vertex declaration, vertex data and a texture handle
+			///@brief Constructs a new vertex batch with the given draw mode, vertex declaration, vertex data and a texture handle
 			VertexBatch(vertex_batch::VertexDrawMode draw_mode, VertexDeclaration vertex_declaration,
 				const VertexDataView &vertex_data, textures::texture::TextureHandle texture_handle) noexcept;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the draw mode of this vertex batch to the given mode
+			///@brief Sets the draw mode of this vertex batch to the given mode
 			inline void DrawMode(vertex_batch::VertexDrawMode draw_mode) noexcept
 			{
 				draw_mode_ = draw_mode;
 			}
 
-			//Sets the vertex declaration of this vertex batch to the given declaration
+			///@brief Sets the vertex declaration of this vertex batch to the given declaration
 			inline void Declaration(VertexDeclaration vertex_declaration) noexcept
 			{
 				vertex_declaration_ = std::move(vertex_declaration);
@@ -164,7 +168,7 @@ namespace ion::graphics::render::vertex
 				rebind_vertex_attributes_ = use_vao_;
 			}
 
-			//Sets the vertex data of this vertex batch to the given data
+			///@brief Sets the vertex data of this vertex batch to the given data
 			inline void VertexData(const VertexDataView &vertex_data, bool reload_data = true) noexcept
 			{
 				if (vertex_data_ != vertex_data)
@@ -176,44 +180,44 @@ namespace ion::graphics::render::vertex
 				reload_vertex_data_ |= reload_data;
 			}
 
-			//Sets the material used by this vertex batch to the given material
+			///@brief Sets the material used by this vertex batch to the given material
 			inline void BatchMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
 				material_ = material;
 			}
 
-			//Sets the texture used by this vertex batch to the given animation
+			///@brief Sets the texture used by this vertex batch to the given animation
 			inline void BatchTexture(NonOwningPtr<textures::Animation> animation) noexcept
 			{
 				texture_ = animation;
 			}
 
-			//Sets the texture used by this vertex batch to the given texture
+			///@brief Sets the texture used by this vertex batch to the given texture
 			inline void BatchTexture(NonOwningPtr<textures::Texture> texture) noexcept
 			{
 				texture_ = texture;
 			}
 
-			//Sets the texture used by this vertex batch to the given texture handle
+			///@brief Sets the texture used by this vertex batch to the given texture handle
 			inline void BatchTexture(textures::texture::TextureHandle texture_handle) noexcept
 			{
 				texture_ = texture_handle;
 			}
 
-			//Detaches the texture used by this vertex batch
+			///@brief Detaches the texture used by this vertex batch
 			inline void BatchTexture(std::nullptr_t) noexcept
 			{
 				texture_ = std::monostate{};
 			}
 
-			//Detaches the texture used by this vertex batch
+			///@brief Detaches the texture used by this vertex batch
 			inline void BatchTexture(std::nullopt_t) noexcept
 			{
 				BatchTexture(nullptr);
 			}
 
 
-			//Sets if this vertex batch should use vertex array or not for vertex buffer and attribute bindings
+			///@brief Sets if this vertex batch should use vertex array or not for vertex buffer and attribute bindings
 			inline void UseVertexArray(bool use) noexcept
 			{
 				if (use_vao_ != use)
@@ -226,7 +230,7 @@ namespace ion::graphics::render::vertex
 				}
 			}
 
-			//Sets the vertex buffer of this vertex batch to the given vertex buffer
+			///@brief Sets the vertex buffer of this vertex batch to the given vertex buffer
 			inline void VertexBuffer(std::optional<VertexBufferView> vertex_buffer, bool reload_data = true) noexcept
 			{
 				if (vbo_ != vertex_buffer)
@@ -238,99 +242,107 @@ namespace ion::graphics::render::vertex
 				reload_vertex_data_ |= reload_data;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the draw mode for this vertex batch
+			///@brief Returns the draw mode for this vertex batch
 			[[nodiscard]] inline auto DrawMode() const noexcept
 			{
 				return draw_mode_;
 			}
 
-			//Returns the vertex declaration for this vertex batch
-			//Returns nullptr if no vertex data is available
+			///@brief Returns the vertex declaration for this vertex batch
+			///@details Returns nullptr if no vertex data is available
 			[[nodiscard]] inline auto& Declaration() const noexcept
 			{
 				return vertex_declaration_;
 			}
 
-			//Returns the vertex data for this vertex batch
+			///@brief Returns the vertex data for this vertex batch
 			[[nodiscard]] inline auto VertexData() const noexcept
 			{
 				return vertex_data_;
 			}
 
-			//Returns the material that this vertex batch is using
-			//Returns nullptr if no material is available
+			///@brief Returns the material that this vertex batch is using
+			///@details Returns nullptr if no material is available
 			[[nodiscard]] inline auto BatchMaterial() const noexcept
 			{
 				return material_;
 			}
 
-			//Returns the attached texture as a tuple of either animation, texture or a texture handle that this vertex batch is using
-			//Returns {nullptr, nullptr, nullopt} if no texture is available
+			///@brief Returns the attached texture as a tuple of either animation, texture or a texture handle that this vertex batch is using
+			///@details Returns {nullptr, nullptr, nullopt} if no texture is available
 			[[nodiscard]] inline auto BatchTexture() const noexcept
 			{
 				return vertex_batch::detail::get_textures(texture_);
 			}
 
-			//Returns the vertex count of this vertex batch
+			///@brief Returns the vertex count of this vertex batch
 			[[nodiscard]] inline auto VertexCount() const noexcept
 			{
 				return vertex_count_;
 			}
 
 
-			//Returns true if this vertex batch is using vertex array for vertex buffer and attribute bindings
+			///@brief Returns true if this vertex batch is using vertex array for vertex buffer and attribute bindings
 			[[nodiscard]] inline auto UseVertexArray() const noexcept
 			{
 				return use_vao_;
 			}
 
-			//Returns the vertex array that this vertex batch is using for buffer and attribute bindings
-			//Returns nullopt if no vertex array is available
+			///@brief Returns the vertex array that this vertex batch is using for buffer and attribute bindings
+			///@details Returns nullopt if no vertex array is available
 			[[nodiscard]] inline auto& VertexArray() const noexcept
 			{
 				return vao_;
 			}
 
-			//Returns the vertex buffer that this vertex batch is using
-			//Returns nullopt if no vertex buffer is available
+			///@brief Returns the vertex buffer that this vertex batch is using
+			///@details Returns nullopt if no vertex buffer is available
 			[[nodiscard]] inline auto VertexBuffer() const noexcept
 			{
 				return vbo_;
 			}
 
+			///@}
 
-			/*
-				Preparing/drawing
+			/**
+				@name Preparing/drawing
+				@{
 			*/
 
-			//Force reloading of vertex data by sending data from RAM to VRAM
+			///@brief Force reloading of vertex data by sending data from RAM to VRAM
 			inline void ReloadData() noexcept
 			{
 				reload_vertex_data_ = true;
 			}
 
 
-			//Prepares vertex batch by passing vertices to vertex buffer and setting up attribute bindings
-			//This function is typically called each frame
+			///@brief Prepares vertex batch by passing vertices to vertex buffer and setting up attribute bindings
+			///@details This function is typically called each frame
 			void Prepare() noexcept;
 
-			//Draws all of the vertices in this vertex batch with the given shader program (optional)
-			//This function is typically called each frame, once for each render pass
+			///@brief Draws all of the vertices in this vertex batch with the given shader program (optional)
+			///@details This function is typically called each frame, once for each render pass
 			void Draw(shaders::ShaderProgram *shader_program = nullptr) noexcept;
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses the total time for this vertex batch by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for this vertex batch by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
+
+			///@}
 	};
 } //ion::graphics::render::vertex
 

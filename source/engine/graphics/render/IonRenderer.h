@@ -60,7 +60,7 @@ namespace ion::graphics::render
 				RenderPrimitive *primitive = nullptr;
 				bool need_update = true;
 
-				//Constructor
+				///@brief Constructor
 				render_batch_slot(int capacity, RenderPrimitive *primitive) noexcept;
 			};
 
@@ -79,15 +79,16 @@ namespace ion::graphics::render
 				vertex::VertexBatch vertex_batch;
 				update_status need_update = update_status::YesSuccessive;
 
-				//Constructor
+				///@brief Constructor
 				render_batch(real z, int offset, int capacity, vertex::VertexBatch vertex_batch) noexcept;
 			};
 			
 			using render_batches = std::vector<OwningPtr<render_batch>>;
 
 
-			/*
-				Graphics API
+			/**
+				@name Graphics API
+				@{
 			*/
 
 			void set_point_size(real size) noexcept;
@@ -98,12 +99,14 @@ namespace ion::graphics::render
 			
 			void enable_point_sprite() noexcept;
 			void disable_point_sprite() noexcept;
+
+			///@}
 		} //detail
 	} //renderer
 
 
-	//A class representing a renderer that groups render primitives into batches
-	//All batches are sorted and compressed, before the vertex data is uploaded to VRAM and drawn
+	///@brief A class representing a renderer that groups render primitives into batches
+	///@details All batches are sorted and compressed, before the vertex data is uploaded to VRAM and drawn
 	class Renderer final
 	{
 		private:
@@ -136,64 +139,69 @@ namespace ion::graphics::render
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			Renderer() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			Renderer(const Renderer&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			Renderer(Renderer&&) = default;
 
-			//Destructor
+			///@brief Destructor
 			~Renderer() noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			Renderer& operator=(const Renderer&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			Renderer& operator=(Renderer&&) = default;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the initial vertex data size to the given size
+			///@brief Sets the initial vertex data size to the given size
 			inline void InitialVertexDataSize(int size) noexcept
 			{
 				initial_vertex_data_size_ = size > 0 ? size : 0;
 			}
 
-			//Sets the initial batch data size to the given size
+			///@brief Sets the initial batch data size to the given size
 			inline void InitialBatchDataSize(int size) noexcept
 			{
 				initial_batch_data_size_ = size > 0 ? size : 0;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the initial vertex data size used by this renderer
+			///@brief Returns the initial vertex data size used by this renderer
 			[[nodiscard]] inline auto InitialVertexDataSize() const noexcept
 			{
 				return initial_vertex_data_size_;
 			}
 
-			//Returns the initial batch data size used by this renderer
+			///@brief Returns the initial batch data size used by this renderer
 			[[nodiscard]] inline auto InitialBatchDataSize() const noexcept
 			{
 				return initial_batch_data_size_;
 			}
 
-			//Returns the z range of all batches in this renderer
+			///@brief Returns the z range of all batches in this renderer
 			[[nodiscard]] inline auto ZRange() const noexcept
 				-> std::optional<std::pair<real, real>>
 			{
@@ -204,63 +212,73 @@ namespace ion::graphics::render
 			}
 
 
-			//Returns the total number of batches in this renderer
+			///@brief Returns the total number of batches in this renderer
 			[[nodiscard]] int TotalBatches() const noexcept;
 
-			//Returns the total number of primitives in this renderer
+			///@brief Returns the total number of primitives in this renderer
 			[[nodiscard]] int TotalPrimitives() const noexcept;
 
-			//Returns the total number of batches to be drawn in this renderer
+			///@brief Returns the total number of batches to be drawn in this renderer
 			[[nodiscard]] int TotalBatchesToDraw() const noexcept;
 
-			//Returns the total number of primitives to be drawn in this renderer
+			///@brief Returns the total number of primitives to be drawn in this renderer
 			[[nodiscard]] int TotalPrimitivesToDraw() const noexcept;
 
+			///@}
 
-			/*
-				Batches
+			/**
+				@name Batches
+				@{
 			*/
 
-			//Clears all batches from this renderer
+			///@brief Clears all batches from this renderer
 			void ClearBatches() noexcept;
 
+			///@}
 
-			/*
-				Primitives
+			/**
+				@name Primitives
+				@{
 			*/
 
-			//Adds a primitive to this renderer
+			///@brief Adds a primitive to this renderer
 			bool AddPrimitive(RenderPrimitive &primitive);
 
-			//Refreshes a primitive in this renderer
+			///@brief Refreshes a primitive in this renderer
 			bool RefreshPrimitive(RenderPrimitive &primitive);
 
 
-			//Removes a primitive from this renderer
+			///@brief Removes a primitive from this renderer
 			bool RemovePrimitive(RenderPrimitive &primitive) noexcept;
 
-			//Clears all primitives from this renderer
+			///@brief Clears all primitives from this renderer
 			void ClearPrimitives() noexcept;
 
+			///@}
 
-			/*
-				Preparing/drawing
+			/**
+				@name Preparing/drawing
+				@{
 			*/
 
-			//Prepares this renderer such that it is ready to draw
+			///@brief Prepares this renderer such that it is ready to draw
 			void Prepare();
 
-			//Draws all primitives added to this renderer, in batches
+			///@brief Draws all primitives added to this renderer, in batches
 			void Draw() noexcept;	
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses the total time for each batch in this renderer by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for each batch in this renderer by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
+
+			///@}
 	};
 } //ion::graphics::render
 

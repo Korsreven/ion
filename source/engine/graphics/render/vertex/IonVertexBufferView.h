@@ -25,7 +25,7 @@ namespace ion::graphics::render::vertex
 	} //vertex_buffer_view::detail
 
 
-	//A class representing a sub range (view) of a vertex buffer object
+	///@brief A class representing a sub range (view) of a vertex buffer object
 	class VertexBufferView final
 	{
 		private:
@@ -36,79 +36,86 @@ namespace ion::graphics::render::vertex
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			VertexBufferView() = default;
 
-			//Constructs a new vertex buffer view with the given vertex_buffer and offset
+			///@brief Constructs a new vertex buffer view with the given vertex_buffer and offset
 			VertexBufferView(const VertexBufferObject &vertex_buffer, int offset = 0) noexcept;
 
-			//Constructs a new vertex buffer view with the given vertex_buffer, offset and size
+			///@brief Constructs a new vertex buffer view with the given vertex_buffer, offset and size
 			VertexBufferView(const VertexBufferObject &vertex_buffer, int offset, int size) noexcept;
 
-			//Constructs a new vertex buffer view with the given handle, offset and size
+			///@brief Constructs a new vertex buffer view with the given handle, offset and size
 			VertexBufferView(int handle, int offset, int size) noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Checks if two vertex buffer views are equal (handles, offsets and sizes are equal)
+			///@brief Checks if two vertex buffer views are equal (handles, offsets and sizes are equal)
 			[[nodiscard]] inline auto operator==(const VertexBufferView &rhs) const noexcept
 			{
 				return handle_ == rhs.handle_ && offset_ == rhs.offset_ && size_ == rhs.size_;
 			}
 
-			//Checks if two vertex buffer objects are different (handles, offsets and sizes are different)
+			///@brief Checks if two vertex buffer objects are different (handles, offsets and sizes are different)
 			[[nodiscard]] inline auto operator!=(const VertexBufferView &rhs) const noexcept
 			{
 				return !(*this == rhs);
 			}
 
-			//Returns true if vertex buffer view handle is valid
+			///@brief Returns true if vertex buffer view handle is valid
 			[[nodiscard]] inline operator bool() const noexcept
 			{
 				return handle_.has_value();
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Binds the given vertex buffer view
+			///@brief Binds the given vertex buffer view
 			void Bind() noexcept;
 
-			//Unbinds the given vertex buffer view
+			///@brief Unbinds the given vertex buffer view
 			void Unbind() noexcept;
 
 
-			//Sets the buffer data for this vertex buffer view to the given vertex data with offset
+			///@brief Sets the buffer data for this vertex buffer view to the given vertex data with offset
 			void Data(const VertexDataView &vertex_data, int offset = 0) noexcept;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the handle to this vertex buffer view
-			//Returns nullopt if this vertex buffer view has no handle
+			///@brief Returns the handle to this vertex buffer view
+			///@details Returns nullopt if this vertex buffer view has no handle
 			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return handle_;
 			}
 
-			//Returns the offset of this vertex buffer view
+			///@brief Returns the offset of this vertex buffer view
 			[[nodiscard]] inline auto Offset() const noexcept
 			{
 				return offset_;
 			}
 
-			//Returns the size of this vertex buffer view
+			///@brief Returns the size of this vertex buffer view
 			[[nodiscard]] inline auto Size() const noexcept
 			{
 				return size_;
-			}		
+			}
+
+			///@}
 	};
 } //ion::graphics::render::vertex
 

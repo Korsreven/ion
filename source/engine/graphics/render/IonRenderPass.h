@@ -78,20 +78,23 @@ namespace ion::graphics::render
 			int render_pass_blend_equation_mode_to_gl_blend_equation_mode(BlendEquationMode mode) noexcept;
 
 
-			/*
-				Graphics API
+			/**
+				@name Graphics API
+				@{
 			*/
 
 			void blend(BlendFactor source_factor, BlendFactor destination_factor, BlendEquationMode equation_mode) noexcept;
 			void blend_separate(BlendFactor source_factor, BlendFactor destination_factor,
 								BlendFactor source_factor_alpha, BlendFactor destination_factor_alpha,
 								BlendEquationMode equation_mode, BlendEquationMode equation_mode_alpha) noexcept;
+
+			///@}
 		} //detail
 	} //render_pass
 
 
-	//A class representing a render pass which contains a shader program and blending factors
-	//If a render pass has not specified a shader program, the render pass will be rendered using the fixed-function pipeline
+	///@brief A class representing a render pass which contains a shader program and blending factors
+	///@details If a render pass has not specified a shader program, the render pass will be rendered using the fixed-function pipeline
 	class RenderPass final
 	{
 		private:
@@ -110,37 +113,38 @@ namespace ion::graphics::render
 
 		public:
 
-			//Constructs a new render pass with the given values
+			///@brief Constructs a new render pass with the given values
 			explicit RenderPass(NonOwningPtr<shaders::ShaderProgram> shader_program = nullptr, int iterations = 1) noexcept;
 
 
-			//Constructs a new render pass with non-separated blending with the given values
+			///@brief Constructs a new render pass with non-separated blending with the given values
 			RenderPass(render_pass::BlendFactor blend_source_factor, render_pass::BlendFactor blend_destination_factor,
 				NonOwningPtr<shaders::ShaderProgram> shader_program = nullptr, int iterations = 1) noexcept;
 
-			//Constructs a new render pass with non-separated blending with the given values
+			///@brief Constructs a new render pass with non-separated blending with the given values
 			RenderPass(render_pass::BlendFactor blend_source_factor, render_pass::BlendFactor blend_destination_factor,
 				render_pass::BlendEquationMode blend_equation_mode,
 				NonOwningPtr<shaders::ShaderProgram> shader_program = nullptr, int iterations = 1) noexcept;
 
 
-			//Constructs a new render pass with separated blending with the given values
+			///@brief Constructs a new render pass with separated blending with the given values
 			RenderPass(render_pass::BlendFactor blend_source_factor, render_pass::BlendFactor blend_destination_factor,
 				render_pass::BlendFactor blend_source_factor_alpha_, render_pass::BlendFactor blend_destination_factor_alpha,
 				NonOwningPtr<shaders::ShaderProgram> shader_program = nullptr, int iterations = 1) noexcept;
 
-			//Constructs a new render pass with separated blending with the given values
+			///@brief Constructs a new render pass with separated blending with the given values
 			RenderPass(render_pass::BlendFactor blend_source_factor, render_pass::BlendFactor blend_destination_factor,
 				render_pass::BlendFactor blend_source_factor_alpha_, render_pass::BlendFactor blend_destination_factor_alpha,
 				render_pass::BlendEquationMode blend_equation_mode, render_pass::BlendEquationMode blend_equation_mode_alpha,
 				NonOwningPtr<shaders::ShaderProgram> shader_program = nullptr, int iterations = 1) noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Checks if two render passes are equal (all members are equal)
+			///@brief Checks if two render passes are equal (all members are equal)
 			[[nodiscard]] inline auto operator==(const RenderPass &rhs) const noexcept
 			{
 				return shader_program_ == rhs.shader_program_ && //Check first
@@ -153,26 +157,28 @@ namespace ion::graphics::render
 					   blend_equation_mode_alpha_ == rhs.blend_equation_mode_alpha_;
 			}
 
-			//Checks if two render passes are different (one or more members are different)
+			///@brief Checks if two render passes are different (one or more members are different)
 			[[nodiscard]] inline auto operator!=(const RenderPass &rhs) const noexcept
 			{
 				return !(*this == rhs);
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the iteration count for this render pass
-			//Pass 0 to disable this render pass
+			///@brief Sets the iteration count for this render pass
+			///@details Pass 0 to disable this render pass
 			inline void Iterations(int count) noexcept
 			{
 				iterations_ = count;
 			}
 
 
-			//Sets the blending factor this render pass uses to the given factors
+			///@brief Sets the blending factor this render pass uses to the given factors
 			inline void BlendingFactor(render_pass::BlendFactor source, render_pass::BlendFactor destination) noexcept
 			{
 				blend_source_factor_ = source;
@@ -182,7 +188,7 @@ namespace ion::graphics::render
 				blend_destination_factor_alpha_ = {};
 			}
 
-			//Sets the blending factor this render pass uses to the given factors
+			///@brief Sets the blending factor this render pass uses to the given factors
 			inline void BlendingFactor(render_pass::BlendFactor source, render_pass::BlendFactor destination,
 									   render_pass::BlendFactor source_alpha, render_pass::BlendFactor destination_alpha) noexcept
 			{
@@ -193,14 +199,14 @@ namespace ion::graphics::render
 				blend_destination_factor_alpha_ = destination_alpha;
 			}
 
-			//Sets the blending equation mode this render pass uses to the given mode
+			///@brief Sets the blending equation mode this render pass uses to the given mode
 			inline void BlendingEquationMode(render_pass::BlendEquationMode mode) noexcept
 			{
 				blend_equation_mode_ = mode;
 				blend_equation_mode_alpha_ = {};
 			}
 
-			//Sets the blending equation mode this render pass uses to the given modes
+			///@brief Sets the blending equation mode this render pass uses to the given modes
 			inline void BlendingEquationMode(render_pass::BlendEquationMode mode, render_pass::BlendEquationMode mode_alpha) noexcept
 			{
 				blend_equation_mode_ = mode;
@@ -208,34 +214,36 @@ namespace ion::graphics::render
 			}
 
 
-			//Sets the shader program this render pass uses to the given shader
-			//Pass nullptr to use the fixed-functionality pipeline
+			///@brief Sets the shader program this render pass uses to the given shader
+			///@details Pass nullptr to use the fixed-functionality pipeline
 			inline void RenderProgram(NonOwningPtr<shaders::ShaderProgram> shader_program) noexcept
 			{
 				shader_program_ = shader_program;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the iteration count for this render pass
-			//Returns 0 if this render pass is disabled
+			///@brief Returns the iteration count for this render pass
+			///@details Returns 0 if this render pass is disabled
 			[[nodiscard]] inline auto Iterations() const noexcept
 			{
 				return iterations_;
 			}
 
 
-			//Returns the blending factors this render pass uses
+			///@brief Returns the blending factors this render pass uses
 			[[nodiscard]] inline auto BlendingFactor() const noexcept
 			{
 				return std::pair{blend_source_factor_, blend_destination_factor_};
 			}
 
-			//Returns the blending factors this render pass uses
-			//Returns nullopt if no separate alpha blending factors are in use
+			///@brief Returns the blending factors this render pass uses
+			///@details Returns nullopt if no separate alpha blending factors are in use
 			[[nodiscard]] inline auto BlendingFactorAlpha() const noexcept ->
 				std::optional<std::pair<render_pass::BlendFactor, render_pass::BlendFactor>>
 			{
@@ -245,34 +253,38 @@ namespace ion::graphics::render
 					return {};
 			}
 
-			//Returns the blending equation mode this render pass uses
+			///@brief Returns the blending equation mode this render pass uses
 			[[nodiscard]] inline auto BlendingEquationMode() const noexcept
 			{
 				return blend_equation_mode_;
 			}
 
-			//Returns the blending equation mode this render pass uses
-			//Returns nullopt if no separate alpha blending equation mode is in use
+			///@brief Returns the blending equation mode this render pass uses
+			///@details Returns nullopt if no separate alpha blending equation mode is in use
 			[[nodiscard]] inline auto BlendingEquationModeAlpha() const noexcept
 			{
 				return blend_equation_mode_alpha_;
 			}
 
 
-			//Returns the shader program this render pass uses to render
-			//Returns nullptr if this render pass uses the fixed-functionality pipeline
+			///@brief Returns the shader program this render pass uses to render
+			///@details Returns nullptr if this render pass uses the fixed-functionality pipeline
 			[[nodiscard]] inline auto RenderProgram() const noexcept
 			{
 				return shader_program_;
 			}
 
+			///@}
 
-			/*
-				Blending
+			/**
+				@name Blending
+				@{
 			*/
 
-			//Set up and enable blending before this render pass
+			///@brief Set up and enable blending before this render pass
 			void Blend() const noexcept;
+
+			///@}
 	};
 } //ion::graphics::render
 

@@ -34,7 +34,7 @@ namespace ion::graphics::render
 	} //render_target::detail
 
 
-	//A class representing a render target that manages viewports
+	///@brief A class representing a render target that manages viewports
 	class RenderTarget :
 		public events::Listenable<events::listeners::RenderTargetListener>,
 		public managed::ObjectManager<Viewport, RenderTarget, events::listeners::ViewportListener>
@@ -46,183 +46,205 @@ namespace ion::graphics::render
 
 		protected:
 
-			/*
-				Notifying
+			/**
+				@name Notifying
+				@{
 			*/
 
 			void NotifyRenderTargetResized(const Vector2 &size) noexcept;
 
+			///@}
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
 			virtual void DoSwapBuffers() noexcept = 0;
 			virtual Vector2 GetRenderTargetSize() const noexcept = 0;
 
+			///@}
+
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			RenderTarget() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			RenderTarget(const RenderTarget&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			RenderTarget(RenderTarget&&) = default;
 
-			//Default virtual destructor
+			///@brief Default virtual destructor
 			virtual ~RenderTarget() = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			RenderTarget& operator=(const RenderTarget&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			RenderTarget& operator=(RenderTarget&&) = default;
 
+			///@}
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//Returns a mutable reference to the render target events of this render target
+			///@brief Returns a mutable reference to the render target events of this render target
 			[[nodiscard]] inline auto& Events() noexcept
 			{
 				return static_cast<RenderTargetEventsBase&>(*this);
 			}
 
-			//Returns an immutable reference to the render target events of this render target
+			///@brief Returns an immutable reference to the render target events of this render target
 			[[nodiscard]] inline auto& Events() const noexcept
 			{
 				return static_cast<const RenderTargetEventsBase&>(*this);
 			}
 
 
-			//Returns a mutable reference to the viewport events of this render target
+			///@brief Returns a mutable reference to the viewport events of this render target
 			[[nodiscard]] inline auto& ViewportEvents() noexcept
 			{
 				return static_cast<ViewportEventsBase&>(*this);
 			}
 
-			//Returns an immutable reference to the viewport events of this render target
+			///@brief Returns an immutable reference to the viewport events of this render target
 			[[nodiscard]] inline auto& ViewportEvents() const noexcept
 			{
 				return static_cast<const ViewportEventsBase&>(*this);
 			}
 
+			///@}
 
-			/*
-				Buffers
+			/**
+				@name Buffers
+				@{
 			*/
 
-			//Exchanges the front and back buffers of the render target
+			///@brief Exchanges the front and back buffers of the render target
 			void SwapBuffers() noexcept;
 
+			///@}
 
-			/*
-				Extents
+			/**
+				@name Extents
+				@{
 			*/
 
-			//Returns the size of the render target
+			///@brief Returns the size of the render target
 			[[nodiscard]] inline auto Size() const noexcept
 			{
 				return GetRenderTargetSize();
 			}
 
-			//Returns the aspect ratio of the render target
-			//Returns nullopt if no window has been created
+			///@brief Returns the aspect ratio of the render target
+			///@details Returns nullopt if no window has been created
 			[[nodiscard]] inline auto AspectRatio() const noexcept
 			{
 				auto [width, height] = Size().XY();
 				return width / height;
 			}
 
+			///@}
 
-			/*
-				Viewports
+			/**
+				@name Viewports
 				Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all viewports in this render target
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all viewports in this render target
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Viewports() noexcept
 			{
 				return Objects();
 			}
 
-			//Returns an immutable range of all viewports in this render target
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all viewports in this render target
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Viewports() const noexcept
 			{
 				return Objects();
 			}
 
+			///@}
 
-			/*
-				Viewports
+			/**
+				@name Viewports
 				Creating
+				@{
 			*/
 
-			//Creates a viewport with the given name and connected to a given render target
+			///@brief Creates a viewport with the given name and connected to a given render target
 			NonOwningPtr<Viewport> CreateViewport(std::string name, RenderTarget &render_target);
 
-			//Creates a viewport with the given name, connected to a given render target and with the given bounds (region)
+			///@brief Creates a viewport with the given name, connected to a given render target and with the given bounds (region)
 			NonOwningPtr<Viewport> CreateViewport(std::string name, RenderTarget &render_target, const Aabb &bounds);
 
-			//Creates a viewport with the given name, connected to a given render target and with the given bounds (region) and anchors
+			///@brief Creates a viewport with the given name, connected to a given render target and with the given bounds (region) and anchors
 			NonOwningPtr<Viewport> CreateViewport(std::string name, RenderTarget &render_target, const Aabb &bounds,
 				viewport::HorizontalAnchorType left_anchor, viewport::HorizontalAnchorType right_anchor,
 				viewport::VerticalAnchorType top_anchor, viewport::VerticalAnchorType bottom_anchor);
 
 
-			//Creates a viewport as a copy of the given viewport
+			///@brief Creates a viewport as a copy of the given viewport
 			NonOwningPtr<Viewport> CreateViewport(const Viewport &viewport);
 
-			//Creates a viewport by moving the given viewport
+			///@brief Creates a viewport by moving the given viewport
 			NonOwningPtr<Viewport> CreateViewport(Viewport &&viewport);
 
+			///@}
 
-			/*
-				Viewports
+			/**
+				@name Viewports
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable viewport with the given name
-			//Returns nullptr if viewport could not be found
+			///@brief Gets a pointer to a mutable viewport with the given name
+			///@details Returns nullptr if viewport could not be found
 			[[nodiscard]] NonOwningPtr<Viewport> GetViewport(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable viewport with the given name
-			//Returns nullptr if viewport could not be found
+			///@brief Gets a pointer to an immutable viewport with the given name
+			///@details Returns nullptr if viewport could not be found
 			[[nodiscard]] NonOwningPtr<const Viewport> GetViewport(std::string_view name) const noexcept;
 			
 
-			//Gets a pointer to a mutable viewport at a given position
-			//Returns nullptr if viewport could not be found
+			///@brief Gets a pointer to a mutable viewport at a given position
+			///@details Returns nullptr if viewport could not be found
 			[[nodiscard]] NonOwningPtr<Viewport> GetViewport(const Vector2 &position) noexcept;
 
-			//Gets a pointer to an immutable viewport at a given position
-			//Returns nullptr if viewport could not be found
+			///@brief Gets a pointer to an immutable viewport at a given position
+			///@details Returns nullptr if viewport could not be found
 			[[nodiscard]] NonOwningPtr<const Viewport> GetViewport(const Vector2 &position) const noexcept;
 
+			///@}
 
-			/*
-				Viewports
+			/**
+				@name Viewports
 				Removing
+				@{
 			*/
 
-			//Clears all removable viewports from this manager
+			///@brief Clears all removable viewports from this manager
 			void ClearViewports() noexcept;
 
-			//Removes a removable viewport from this manager
+			///@brief Removes a removable viewport from this manager
 			bool RemoveViewport(Viewport &viewport) noexcept;
 
-			//Removes a removable viewport with the given name from this manager
+			///@brief Removes a removable viewport with the given name from this manager
 			bool RemoveViewport(std::string_view name) noexcept;
+
+			///@}
 	};
 }
 

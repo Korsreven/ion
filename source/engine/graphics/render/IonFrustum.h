@@ -70,7 +70,7 @@ namespace ion::graphics::render
 
 		namespace detail
 		{
-			//Same function signature and result as gluPerspective provides
+			///@brief Same function signature and result as gluPerspective provides
 			inline auto perspective_to_frustum(real fov, real aspect_ratio, real z_near, real z_far) noexcept
 			{
 				using namespace ion::utilities;
@@ -97,8 +97,8 @@ namespace ion::graphics::render
 	} //frustum
 
 
-	//A class representing a viewing frustum which can either be an orthographic or perspective view
-	//The scene is viewed through the camera's frustum, and the perspective matrix is calculated from it
+	///@brief A class representing a viewing frustum which can either be an orthographic or perspective view
+	///@details The scene is viewed through the camera's frustum, and the perspective matrix is calculated from it
 	class Frustum final
 	{
 		private:
@@ -118,178 +118,189 @@ namespace ion::graphics::render
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			Frustum() = default;
 
-			//Constructs a new frustum with the given clip plane bounds
+			///@brief Constructs a new frustum with the given clip plane bounds
 			Frustum(const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance,
 				const std::optional<real> &aspect_ratio, frustum::AspectRatioFormat aspect_format) noexcept;
 
-			//Constructs a new frustum with the given clip plane bounds, field of view and aspect ratio
+			///@brief Constructs a new frustum with the given clip plane bounds, field of view and aspect ratio
 			Frustum(frustum::ProjectionType projection, const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance,
 				real field_of_view, const std::optional<real> &aspect_ratio, frustum::AspectRatioFormat aspect_format) noexcept;
 
 
-			/*
-				Static frustum conversions
+			/**
+				@name Static frustum conversions
+				@{
 			*/
 
-			//Returns a new orthographic frustum from the given clip plane bounds and aspect ratio
-			//If a fixed aspect ratio is not given (nullopt), it will dynamically follow the viewport size
+			///@brief Returns a new orthographic frustum from the given clip plane bounds and aspect ratio
+			///@details If a fixed aspect ratio is not given (nullopt), it will dynamically follow the viewport size
 			[[nodiscard]] static Frustum Orthographic(const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance,
 				const std::optional<real> &aspect_ratio, frustum::AspectRatioFormat aspect_format = frustum::AspectRatioFormat::PanAndScan) noexcept;
 
-			//Returns a new perspective frustum from the given clip plane bounds
-			//If a fixed aspect ratio is not given (nullopt), it will dynamically follow the viewport size
+			///@brief Returns a new perspective frustum from the given clip plane bounds
+			///@details If a fixed aspect ratio is not given (nullopt), it will dynamically follow the viewport size
 			[[nodiscard]] static Frustum Perspective(const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance,
 				real field_of_view, const std::optional<real> &aspect_ratio, frustum::AspectRatioFormat aspect_format = frustum::AspectRatioFormat::PanAndScan) noexcept;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the projection of the frustum to the given projection
+			///@brief Sets the projection of the frustum to the given projection
 			inline void Projection(frustum::ProjectionType projection) noexcept
 			{
 				projection_ = projection;
 			}
 
 
-			//Sets the clip plane of the frustum to the given aabb
+			///@brief Sets the clip plane of the frustum to the given aabb
 			inline void ClipPlane(const std::optional<Aabb> &clip_plane) noexcept
 			{
 				clip_plane_ = clip_plane;
 			}
 
-			//Sets the near clip distance (z near) to the given value
+			///@brief Sets the near clip distance (z near) to the given value
 			inline void NearClipDistance(real near_clip_distance) noexcept
 			{
 				near_clip_distance_ = near_clip_distance;
 			}
 
-			//Sets the far clip distance (z far) to the given value
+			///@brief Sets the far clip distance (z far) to the given value
 			inline void FarClipDistance(real far_clip_distance) noexcept
 			{
 				far_clip_distance_ = far_clip_distance;
 			}
 
-			//Sets the field of view (fov y) to the given value
+			///@brief Sets the field of view (fov y) to the given value
 			inline void FieldOfView(real field_of_view) noexcept
 			{
 				field_of_view_ = field_of_view;
 			}
 
 
-			//Sets a fixed aspect ratio to the given ratio (width/height)
+			///@brief Sets a fixed aspect ratio to the given ratio (width/height)
 			inline void AspectRatio(const std::optional<real> &aspect_ratio) noexcept
 			{
 				aspect_ratio_ = aspect_ratio;
 			}
 
-			//Sets a fixed aspect ratio from the given width and height (width/height)
+			///@brief Sets a fixed aspect ratio from the given width and height (width/height)
 			inline void AspectRatio(real width, real height) noexcept
 			{
 				AspectRatio(width / height);
 			}
 			
-			//Sets the aspect ratio format to the given format
+			///@brief Sets the aspect ratio format to the given format
 			inline void AspectFormat(frustum::AspectRatioFormat aspect_format) noexcept
 			{
 				aspect_format_ = aspect_format;
 			}
 
-			//Sets the base viewport height to the given value
-			//This is exclusively used for AspectRatioFormat::Windowbox
+			///@brief Sets the base viewport height to the given value
+			///@details This is exclusively used for AspectRatioFormat::Windowbox
 			inline void BaseViewportHeight(real height) noexcept
 			{
 				base_viewport_height_ = height;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the projection of the frustum
+			///@brief Returns the projection of the frustum
 			[[nodiscard]] inline auto Projection() const noexcept
 			{
 				return projection_;
 			}
 
 
-			//Returns the clip plane of the frustum
+			///@brief Returns the clip plane of the frustum
 			[[nodiscard]] inline auto& ClipPlane() const noexcept
 			{
 				return clip_plane_;
 			}
 
-			//Returns the near clip distance (z near) of the frustum
+			///@brief Returns the near clip distance (z near) of the frustum
 			[[nodiscard]] inline auto NearClipDistance() const noexcept
 			{
 				return near_clip_distance_;
 			}
 
-			//Returns the far clip distance (z far) of the frustum
+			///@brief Returns the far clip distance (z far) of the frustum
 			[[nodiscard]] inline auto FarClipDistance() const noexcept
 			{
 				return far_clip_distance_;
 			}
 
-			//Returns the field of view of the frustum
+			///@brief Returns the field of view of the frustum
 			[[nodiscard]] inline auto FieldOfView() const noexcept
 			{
 				return field_of_view_;
 			}
 
 
-			//Returns the fixed aspect ratio of the frustum
-			//Returns nullopt if no fixed ratio is in use
+			///@brief Returns the fixed aspect ratio of the frustum
+			///@details Returns nullopt if no fixed ratio is in use
 			[[nodiscard]] inline auto& AspectRatio() const noexcept
 			{
 				return aspect_ratio_;
 			}
 
-			//Returns the aspect ratio format of the frustum
+			///@brief Returns the aspect ratio format of the frustum
 			[[nodiscard]] inline auto AspectFormat() const noexcept
 			{
 				return aspect_format_;
 			}
 
-			//Returns the base viewport height
-			//This is exclusively used for AspectRatioFormat::Windowbox
+			///@brief Returns the base viewport height
+			///@details This is exclusively used for AspectRatioFormat::Windowbox
 			[[nodiscard]] inline auto BaseViewportHeight() const noexcept
 			{
 				return base_viewport_height_;
 			}
 
 
-			//Returns the projection matrix for this frustum
+			///@brief Returns the projection matrix for this frustum
 			[[nodiscard]] inline auto& ProjectionMatrix() const noexcept
 			{
 				return projection_matrix_;
 			}
 
+			///@}
 
-			/*
-				Projecting
+			/**
+				@name Projecting
+				@{
 			*/
 
-			//Starts projecting the scene through this frustum, with the given viewport size
+			///@brief Starts projecting the scene through this frustum, with the given viewport size
 			void ProjectScene(const Vector2 &viewport_size) noexcept;
 
+			///@}
 
-			/*
-				Frustum conversions
+			/**
+				@name Frustum conversions
+				@{
 			*/
 
-			//Returns the ortho bounds (left, right, bottom, top, z_near, z_far) from this frustum with the given viewport size
-			//This returns all the values needed by glOrtho
+			///@brief Returns the ortho bounds (left, right, bottom, top, z_near, z_far) from this frustum with the given viewport size
+			///@details This returns all the values needed by glOrtho
 			[[nodiscard]] std::tuple<real, real, real, real, real, real> ToOrthoBounds(const Vector2 &viewport_size) const noexcept;
 
-			//Returns the frustum bounds (left, right, bottom, top, z_near, z_far) from this frustum with the given viewport size
-			//This returns all the values needed by glFrustum
+			///@brief Returns the frustum bounds (left, right, bottom, top, z_near, z_far) from this frustum with the given viewport size
+			///@details This returns all the values needed by glFrustum
 			[[nodiscard]] std::tuple<real, real, real, real, real, real> ToFrustumBounds(const Vector2 &viewport_size) const noexcept;
+
+			///@}
 	};
 } //ion::graphics::render
 

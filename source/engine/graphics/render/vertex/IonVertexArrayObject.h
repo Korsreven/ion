@@ -23,8 +23,9 @@ namespace ion::graphics::render::vertex
 {
 	namespace vertex_array_object::detail
 	{
-		/*
-			Graphics API
+		/**
+			@name Graphics API
+			@{
 		*/
 
 		std::optional<int> create_vertex_array_object() noexcept;
@@ -35,10 +36,12 @@ namespace ion::graphics::render::vertex
 
 		void set_vertex_attribute_pointers(const VertexDeclaration &vertex_declaration, int vbo_offset) noexcept;
 		void set_vertex_attribute_pointers(const VertexDeclaration &vertex_declaration, const void *data) noexcept;
+
+		///@}
 	} //vertex_array_object::detail
 
 
-	//A class representing a vertex array object (VAO)
+	///@brief A class representing a vertex array object (VAO)
 	class VertexArrayObject final
 	{
 		private:
@@ -47,76 +50,83 @@ namespace ion::graphics::render::vertex
 
 		public:
 
-			//Constructor
+			///@brief Constructor
 			VertexArrayObject() noexcept;
 
-			//Copy constructor
+			///@brief Copy constructor
 			VertexArrayObject(const VertexArrayObject&) noexcept;
 
-			//Default move constructor
+			///@brief Default move constructor
 			VertexArrayObject(VertexArrayObject&&) = default;
 
-			//Destructor
+			///@brief Destructor
 			~VertexArrayObject() noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Copy assignment
+			///@brief Copy assignment
 			inline auto& operator=(const VertexArrayObject&)
 			{
 				//Do nothing
 				return *this;
 			}
 
-			//Default move assignment
+			///@brief Default move assignment
 			VertexArrayObject& operator=(VertexArrayObject&&) = default;
 
 
-			//Checks if two vertex array objects are equal (handles are equal)
+			///@brief Checks if two vertex array objects are equal (handles are equal)
 			[[nodiscard]] inline auto operator==(const VertexArrayObject &rhs) const noexcept
 			{
 				return handle_ == rhs.handle_;
 			}
 
-			//Checks if two vertex array objects are different (handles are different)
+			///@brief Checks if two vertex array objects are different (handles are different)
 			[[nodiscard]] inline auto operator!=(const VertexArrayObject &rhs) const noexcept
 			{
 				return !(*this == rhs);
 			}
 
-			//Returns true if vertex array object handle is valid
+			///@brief Returns true if vertex array object handle is valid
 			[[nodiscard]] inline operator bool() const noexcept
 			{
 				return handle_.has_value();
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Binds the given vertex array object
+			///@brief Binds the given vertex array object
 			void Bind() noexcept;
 
-			//Binds vertex attributes declared in the given declaration to the given vertex buffer and store bindings in this vertex array object
+			///@brief Binds vertex attributes declared in the given declaration to the given vertex buffer and store bindings in this vertex array object
 			void Bind(const VertexDeclaration &vertex_declaration, const VertexBufferView &vertex_buffer) noexcept;
 
-			//Unbinds the given vertex array object
+			///@brief Unbinds the given vertex array object
 			void Unbind() noexcept;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the handle to this vertex array object
+			///@brief Returns the handle to this vertex array object
 			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return handle_;
 			}
+
+			///@}
 	};
 } //ion::graphics::render::vertex
 
