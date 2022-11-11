@@ -30,7 +30,7 @@ namespace ion::graphics::utilities
 	} //vector3::detail
 
 
-	//A class representing a three-component vector (x,y,z)
+	///@brief A class representing a three-component vector (x,y,z)
 	class Vector3 final
 	{
 		private:
@@ -49,34 +49,36 @@ namespace ion::graphics::utilities
 
 		public:
 
+			///@brief Default constructor
 			Vector3() = default;
 
-			//Constructs a new vector from the given x, y and z components
+			///@brief Constructs a new vector from the given x, y and z components
 			Vector3(real x, real y, real z) noexcept;
 
-			//Constructs a new vector from the given scalar value
+			///@brief Constructs a new vector from the given scalar value
 			Vector3(real scalar) noexcept;
 
-			//Constructs a new vector from the given two component vector
+			///@brief Constructs a new vector from the given two component vector
 			Vector3(const Vector2 &vector) noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Sets this vector equal to the given scalar value
+			///@brief Sets this vector equal to the given scalar value
 			inline auto& operator=(real scalar) noexcept
 			{
 				x_ = y_ = z_ = scalar;
 				return *this;
 			}
 
-			//Sets this vector equal to the given two component vector
+			///@brief Sets this vector equal to the given two component vector
 			Vector3& operator=(const Vector2 &vector) noexcept;
 
 
-			//Checks if two vectors are equal (all components are equal)
+			///@brief Checks if two vectors are equal (all components are equal)
 			[[nodiscard]] inline auto operator==(const Vector3 &rhs) const noexcept
 			{
 				return x_ == rhs.x_ &&
@@ -84,32 +86,34 @@ namespace ion::graphics::utilities
 					   z_ == rhs.z_;
 			}
 
-			//Checks if two vectors are different (one or more components are different)
+			///@brief Checks if two vectors are different (one or more components are different)
 			[[nodiscard]] inline auto operator!=(const Vector3 &rhs) const noexcept
 			{
 				return !(*this == rhs);
 			}
 
-			//Checks if one vector is less than another one (component wise)
-			//Needed for sorting two vectors (strict weak ordering)
+			///@brief Checks if one vector is less than another one (component wise)
+			///@details Needed for sorting two vectors (strict weak ordering)
 			[[nodiscard]] inline auto operator<(const Vector3 &rhs) const noexcept
 			{
 				return std::tuple{x_, y_, z_} < std::tuple{rhs.x_, rhs.y_, rhs.z_};
 			}
 
 
-			//Negates vector (negating each component)
+			///@brief Negates vector (negating each component)
 			[[nodiscard]] inline auto operator-() const noexcept
 			{
 				return Vector3{-x_, -y_, -z_};
 			}
 
+			///@}
 
-			/*
-				Adding
+			/**
+				@name Adding
+				@{
 			*/
 
-			//Adds two vectors (adding each component)
+			///@brief Adds two vectors (adding each component)
 			[[nodiscard]] inline auto operator+(const Vector3 &rhs) const noexcept
 			{
 				return Vector3{x_ + rhs.x_,
@@ -117,7 +121,7 @@ namespace ion::graphics::utilities
 							   z_ + rhs.z_};
 			}
 
-			//Adds all components to the given scalar
+			///@brief Adds all components to the given scalar
 			[[nodiscard]] inline auto operator+(real scalar) const noexcept
 			{
 				return Vector3{x_ + scalar,
@@ -125,30 +129,32 @@ namespace ion::graphics::utilities
 							   z_ + scalar};
 			}
 
-			//Adds all components to the given scalar
+			///@brief Adds all components to the given scalar
 			[[nodiscard]] friend inline auto operator+(real scalar, const Vector3 &rhs) noexcept
 			{
 				return rhs + scalar; //Commutative
 			}
 
-			//Adds two vectors (adding each component)
+			///@brief Adds two vectors (adding each component)
 			inline auto& operator+=(const Vector3 &rhs) noexcept
 			{
 				return *this = *this + rhs;
 			}
 
-			//Adds all components to the given scalar
+			///@brief Adds all components to the given scalar
 			inline auto& operator+=(real scalar) noexcept
 			{
 				return *this = *this + scalar;
 			}
 
+			///@}
 
-			/*
-				Subtracting
+			/**
+				@name Subtracting
+				@{
 			*/
 
-			//Subtracts two vectors (subtracting each component)
+			///@brief Subtracts two vectors (subtracting each component)
 			[[nodiscard]] inline auto operator-(const Vector3 &rhs) const noexcept
 			{
 				return Vector3{x_ - rhs.x_,
@@ -156,7 +162,7 @@ namespace ion::graphics::utilities
 							   z_ - rhs.z_};
 			}
 
-			//Subtracts all components with the given scalar
+			///@brief Subtracts all components with the given scalar
 			[[nodiscard]] inline auto operator-(real scalar) const noexcept
 			{
 				return Vector3{x_ - scalar,
@@ -164,7 +170,7 @@ namespace ion::graphics::utilities
 							   z_ - scalar};
 			}
 
-			//Subtracts all components with the given scalar
+			///@brief Subtracts all components with the given scalar
 			[[nodiscard]] friend inline auto operator-(real scalar, const Vector3 &rhs) noexcept
 			{
 				return Vector3{scalar - rhs.x_,
@@ -172,24 +178,26 @@ namespace ion::graphics::utilities
 							   scalar - rhs.z_};
 			}
 
-			//Subtracts two vectors (subtracting each component)
+			///@brief Subtracts two vectors (subtracting each component)
 			inline auto& operator-=(const Vector3 &rhs) noexcept
 			{
 				return *this = *this - rhs;
 			}
 
-			//Subtracts all components with the given scalar
+			///@brief Subtracts all components with the given scalar
 			inline auto& operator-=(real scalar) noexcept
 			{
 				return *this = *this - scalar;
 			}
 
+			///@}
 
-			/*
-				Multiplying
+			/**
+				@name Multiplying
+				@{
 			*/
 
-			//Muliplies two vectors (multiplying each component)
+			///@brief Muliplies two vectors (multiplying each component)
 			[[nodiscard]] inline auto operator*(const Vector3 &rhs) const noexcept
 			{
 				return Vector3{x_ * rhs.x_,
@@ -197,7 +205,7 @@ namespace ion::graphics::utilities
 							   z_ * rhs.z_};
 			}
 
-			//Muliplies all components with the given scalar
+			///@brief Muliplies all components with the given scalar
 			[[nodiscard]] inline auto operator*(real scalar) const noexcept
 			{
 				return Vector3{x_ * scalar,
@@ -205,30 +213,32 @@ namespace ion::graphics::utilities
 							   z_ * scalar};
 			}
 
-			//Muliplies all components with the given scalar
+			///@brief Muliplies all components with the given scalar
 			[[nodiscard]] friend inline auto operator*(real scalar, const Vector3 &rhs) noexcept
 			{
 				return rhs * scalar; //Commutative
 			}
 
-			//Muliplies two vectors (multiplying each component)
+			///@brief Muliplies two vectors (multiplying each component)
 			inline auto& operator*=(const Vector3 &rhs) noexcept
 			{
 				return *this = *this * rhs;
 			}
 
-			//Muliplies all components with the given scalar
+			///@brief Muliplies all components with the given scalar
 			inline auto& operator*=(real scalar) noexcept
 			{
 				return *this = *this * scalar;
 			}
 
+			///@}
 
-			/*
-				Dividing
+			/**
+				@name Dividing
+				@{
 			*/
 
-			//Divides two vectors (dividing each component)
+			///@brief Divides two vectors (dividing each component)
 			[[nodiscard]] inline auto operator/(const Vector3 &rhs) const noexcept
 			{
 				assert(rhs.x_ != 0.0_r && rhs.y_ != 0.0_r && rhs.z_ != 0.0_r);
@@ -237,7 +247,7 @@ namespace ion::graphics::utilities
 							   z_ / rhs.z_};
 			}
 
-			//Divides all components with the given scalar
+			///@brief Divides all components with the given scalar
 			[[nodiscard]] inline auto operator/(real scalar) const noexcept
 			{
 				assert(scalar != 0.0_r);
@@ -246,7 +256,7 @@ namespace ion::graphics::utilities
 							   z_ / scalar};
 			}
 
-			//Divides all components with the given scalar
+			///@brief Divides all components with the given scalar
 			[[nodiscard]] friend inline auto operator/(real scalar, const Vector3 &rhs) noexcept
 			{
 				assert(rhs.x_ != 0.0_r && rhs.y_ != 0.0_r && rhs.z_ != 0.0_r);
@@ -255,316 +265,352 @@ namespace ion::graphics::utilities
 							   scalar / rhs.z_};
 			}
 
-			//Divides two vectors (dividing each component)
+			///@brief Divides two vectors (dividing each component)
 			inline auto& operator/=(const Vector3 &rhs) noexcept
 			{
 				return *this = *this / rhs;
 			}
 
-			//Divides all components with the given scalar
+			///@brief Divides all components with the given scalar
 			inline auto& operator/=(real scalar) noexcept
 			{
 				return *this = *this / scalar;
 			}
 
+			///@}
 
-			/*
-				Subscripting
+			/**
+				@name Subscripting
+				@{
 			*/
 
-			//Returns a modifiable reference to the component at the given offset
+			///@brief Returns a modifiable reference to the component at the given offset
 			[[nodiscard]] inline auto& operator[](int off) noexcept
 			{
 				assert(off >= 0 && off < 3);
 				return components_[off];
 			}
 
-			//Returns the component at the given offset
+			///@brief Returns the component at the given offset
 			[[nodiscard]] inline auto operator[](int off) const noexcept
 			{
 				assert(off >= 0 && off < 3);
 				return components_[off];
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the x component to the given value
+			///@brief Sets the x component to the given value
 			inline void X(real x) noexcept
 			{
 				x_ = x;
 			}
 
-			//Sets the y component to the given value
+			///@brief Sets the y component to the given value
 			inline void Y(real y) noexcept
 			{
 				y_ = y;
 			}
 
-			//Sets the z component to the given value
+			///@brief Sets the z component to the given value
 			inline void Z(real z) noexcept
 			{
 				z_ = z;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the x component
+			///@brief Returns the x component
 			[[nodiscard]] inline auto X() const noexcept
 			{
 				return x_;
 			}
 
-			//Returns the y component
+			///@brief Returns the y component
 			[[nodiscard]] inline auto Y() const noexcept
 			{
 				return y_;
 			}
 
-			//Returns the z component
+			///@brief Returns the z component
 			[[nodiscard]] inline auto Z() const noexcept
 			{
 				return z_;
 			}
 
-			//Returns the x, y and z components
+			///@brief Returns the x, y and z components
 			[[nodiscard]] inline auto XYZ() const noexcept
 			{
 				return std::tuple{x_, y_, z_};
 			}
 
-			//Returns direct access to all vector components
+			///@brief Returns direct access to all vector components
 			[[nodiscard]] inline auto Components() const noexcept
 			{
 				return components_;
 			}
 
+			///@}
 
-			/*
-				Angle
+			/**
+				@name Angle
+				@{
 			*/
 
-			//Returns the directional angle of the vector
-			//Angle is returned as radians in range [0.0, 2pi]
+			///@brief Returns the directional angle of the vector
+			///@details Angle is returned as radians in range [0.0, 2pi]
 			[[nodiscard]] real Angle() const noexcept;
 
-			//Returns the directional angle of the vector
-			//Angle is returned as radians in range [-pi, pi]
+			///@brief Returns the directional angle of the vector
+			///@details Angle is returned as radians in range [-pi, pi]
 			[[nodiscard]] real SignedAngle() const noexcept;
 
-			//Returns the angle between this and the given vector
-			//Angle is returned as radians in range [0, pi]
+			///@brief Returns the angle between this and the given vector
+			///@details Angle is returned as radians in range [0, pi]
 			[[nodiscard]] real AngleBetween(const Vector3 &vector) const noexcept;
 
-			//Returns the angle between this and the given vector
-			//Angle is returned as radians in range [-pi, pi]
+			///@brief Returns the angle between this and the given vector
+			///@details Angle is returned as radians in range [-pi, pi]
 			[[nodiscard]] real SignedAngleBetween(const Vector3 &vector) const noexcept;
 
-			//Returns the oriented angle between this and the given vector
-			//Angle is returned as radians in range [0.0, 2pi]
+			///@brief Returns the oriented angle between this and the given vector
+			///@details Angle is returned as radians in range [0.0, 2pi]
 			[[nodiscard]] real AngleTo(const Vector3 &vector) const noexcept;
 
+			///@}
 
-			/*
-				Cross and dot product
+			/**
+				@name Cross and dot product
+				@{
 			*/
 
-			//Returns the cross product between this and the given vector
+			///@brief Returns the cross product between this and the given vector
 			[[nodiscard]] Vector3 CrossProduct(const Vector3 &vector) const noexcept;
 
-			//Returns the dot product between this and the given vector
+			///@brief Returns the dot product between this and the given vector
 			[[nodiscard]] real DotProduct(const Vector3 &vector) const noexcept;
 
+			///@}
 
-			/*
-				Deviant
+			/**
+				@name Deviant
+				@{
 			*/
 
-			//Returns a vector that deviates from this vector by a given angle (radians)
+			///@brief Returns a vector that deviates from this vector by a given angle (radians)
 			[[nodiscard]] Vector3 Deviant(real angle) const noexcept;
 
-			//Returns a vector that deviates from this vector by a given angle (radians) in a random direction
+			///@brief Returns a vector that deviates from this vector by a given angle (radians) in a random direction
 			[[nodiscard]] Vector3 RandomDeviant(real angle) const noexcept;
 
+			///@}
 
-			/*
-				Distance
+			/**
+				@name Distance
+				@{
 			*/
 
-			//Returns the distance to the given vector (expensive square root)
+			///@brief Returns the distance to the given vector (expensive square root)
 			[[nodiscard]] real Distance(const Vector3 &vector) const noexcept;
 
-			//Returns the squared distance to the given vector (for distance comparison)
+			///@brief Returns the squared distance to the given vector (for distance comparison)
 			[[nodiscard]] real SquaredDistance(const Vector3 &vector) const noexcept;
 
-			//Returns true if this vector is approximately zero in distance to the given vector
+			///@brief Returns true if this vector is approximately zero in distance to the given vector
 			[[nodiscard]] bool ZeroDistance(const Vector3 &vector) const noexcept;
 
+			///@}
 
-			/*
-				Floor and ceiling
+			/**
+				@name Floor and ceiling
+				@{
 			*/
 
-			//Sets x, y and z components to the maximum of this and the given vector
+			///@brief Sets x, y and z components to the maximum of this and the given vector
 			Vector3& Ceil(const Vector3 &vector) noexcept;
 
-			//Sets x, y and z components to the maximum of this and the given vector
-			//Returns the result as a copy
+			///@brief Sets x, y and z components to the maximum of this and the given vector
+			///@details Returns the result as a copy
 			[[nodiscard]] Vector3 CeilCopy(const Vector3 &vector) const noexcept;
 
-			//Sets x, y and z components to the minimum of this and the given vector
+			///@brief Sets x, y and z components to the minimum of this and the given vector
 			Vector3& Floor(const Vector3 &vector) noexcept;
 
-			//Sets x, y and z components to the minimum of this and the given vector
-			//Returns the result as a copy
+			///@brief Sets x, y and z components to the minimum of this and the given vector
+			///@details Returns the result as a copy
 			[[nodiscard]] Vector3 FloorCopy(const Vector3 &vector) const noexcept;
 
+			///@}
 
-			/*
-				Interpolation
+			/**
+				@name Interpolation
+				@{
 			*/
 
-			//Returns a vector based on linear interpolation between this and the given vector
+			///@brief Returns a vector based on linear interpolation between this and the given vector
 			[[nodiscard]] Vector3 Lerp(const Vector3 &vector, real amount) const noexcept;
 			
-			//Returns a vector based on spherical linear interpolation between this and the given vector
+			///@brief Returns a vector based on spherical linear interpolation between this and the given vector
 			[[nodiscard]] Vector3 Slerp(Vector3 vector, real amount) const noexcept;
 
+			///@}
 
-			/*
-				Length
+			/**
+				@name Length
+				@{
 			*/
 
-			//Returns the length/magnitude of the vector (expensive square root)
+			///@brief Returns the length/magnitude of the vector (expensive square root)
 			[[nodiscard]] real Length() const noexcept;
 	
-			//Returns the squared length/magnitude of the vector (for length comparison)
+			///@brief Returns the squared length/magnitude of the vector (for length comparison)
 			[[nodiscard]] real SquaredLength() const noexcept;
 
-			//Returns true if this vector is approximately zero in length/magnitude
+			///@brief Returns true if this vector is approximately zero in length/magnitude
 			[[nodiscard]] bool ZeroLength() const noexcept;
 
+			///@}
 
-			/*
-				Minimum and maximum
+			/**
+				@name Minimum and maximum
+				@{
 			*/
 
-			//Returns a modifiable reference to the largest component
-			//If equal, z component is returned
+			///@brief Returns a modifiable reference to the largest component
+			///@details If equal, z component is returned
 			[[nodiscard]] real& Max() noexcept;
 
-			//Returns the largest component
+			///@brief Returns the largest component
 			[[nodiscard]] real Max() const noexcept;
 
-			//Returns a modifiable reference to the smallest component
-			//If equal, x component is returned
+			///@brief Returns a modifiable reference to the smallest component
+			///@details If equal, x component is returned
 			[[nodiscard]] real& Min() noexcept;
 
-			//Returns the smallest component
+			///@brief Returns the smallest component
 			[[nodiscard]] real Min() const noexcept;
 
+			///@}
 
-			/*
-				Normalizing
+			/**
+				@name Normalizing
+				@{
 			*/
 
-			//Normalize and return the length of the vector
-			//The vector is converted to a unit vector, meaning that the length is 1.0
+			///@brief Normalize and return the length of the vector
+			///@details The vector is converted to a unit vector, meaning that the length is 1.0
 			real Normalize() noexcept;
 
-			//Normalize the vector
-			//The vector is converted to a unit vector, meaning that the length is 1.0
-			//Returns the result as a copy
+			///@brief Normalize the vector
+			///@details The vector is converted to a unit vector, meaning that the length is 1.0.
+			///Returns the result as a copy
 			[[nodiscard]] Vector3 NormalizeCopy() const noexcept;
 
+			///@}
 
-			/*
-				Point arithmetic
+			/**
+				@name Point arithmetic
 				The vectors are points rather than directions
+				@{
 			*/
 
-			//Returns the middle point from this and the given point
+			///@brief Returns the middle point from this and the given point
 			[[nodiscard]] Vector3 Midpoint(const Vector3 &point) const noexcept;
 
 
-			//Returns the left most point from this and the given point
+			///@brief Returns the left most point from this and the given point
 			[[nodiscard]] Vector3 LeftMostPoint(const Vector3 &point) const noexcept;
 
-			//Returns the right most point from this and the given point
+			///@brief Returns the right most point from this and the given point
 			[[nodiscard]] Vector3 RightMostPoint(const Vector3 &point) const noexcept;
 
 
-			//Returns the top most point from this and the given point
+			///@brief Returns the top most point from this and the given point
 			[[nodiscard]] Vector3 TopMostPoint(const Vector3 &point) const noexcept;
 
-			//Returns the bottom most point from this and the given point
+			///@brief Returns the bottom most point from this and the given point
 			[[nodiscard]] Vector3 BottomMostPoint(const Vector3 &point) const noexcept;
 
 
-			//Returns the nearest point from this and the given point
+			///@brief Returns the nearest point from this and the given point
 			[[nodiscard]] Vector3 NearestPoint(const Vector3 &point) const noexcept;
 
-			//Returns the farthest point from this and the given point
+			///@brief Returns the farthest point from this and the given point
 			[[nodiscard]] Vector3 FarthestPoint(const Vector3 &point) const noexcept;
 			
+			///@}
 
-			/*
-				Reflection
+			/**
+				@name Reflection
+				@{
 			*/
 
-			//Returns an orthogonal vector with congruent adjacent angles
+			///@brief Returns an orthogonal vector with congruent adjacent angles
 			[[nodiscard]] Vector3 Perpendicular() const noexcept;
 			
-			//Returns a reflection vector to the plane with the given normal
+			///@brief Returns a reflection vector to the plane with the given normal
 			[[nodiscard]] Vector3 Reflect(const Vector3 &normal) const noexcept;
 
+			///@}
 
-			/*
-				Rotation
+			/**
+				@name Rotation
+				@{
 			*/
 
-			//Rotates point by the given angle (radians) and origin vector
+			///@brief Rotates point by the given angle (radians) and origin vector
 			Vector3& Rotate(real angle, const Vector3 &origin) noexcept;
 
-			//Rotates point by the given angle (radians) and origin vector
-			//Returns the result as a copy
+			///@brief Rotates point by the given angle (radians) and origin vector
+			///@details Returns the result as a copy
 			[[nodiscard]] Vector3 RotateCopy(real angle, const Vector3 &origin) const noexcept;
 
+			///@}
 
-			/*
-				Scaling
+			/**
+				@name Scaling
+				@{
 			*/
 
-			//Scales point by the given scaling vector and origin vector
+			///@brief Scales point by the given scaling vector and origin vector
 			Vector3& Scale(const Vector3 &scaling, const Vector3 &origin) noexcept;
 
-			//Scales point by the given scaling vector and origin vector
-			//Returns the result as a copy
+			///@brief Scales point by the given scaling vector and origin vector
+			///@details Returns the result as a copy
 			[[nodiscard]] Vector3 ScaleCopy(const Vector3 &scaling, const Vector3 &origin) const noexcept;
 
 
-			/*
-				Sign
+			/**
+				@name Sign
+				@{
 			*/
 
-			//Sets each component to one, negative one or zero, depending on the signs of the components
+			///@brief Sets each component to one, negative one or zero, depending on the signs of the components
 			Vector3& Sign() noexcept;
 
-			//Sets each component to one, negative one or zero, depending on the signs of the components
-			//Returns the result as a copy
+			///@brief Sets each component to one, negative one or zero, depending on the signs of the components
+			///@details Returns the result as a copy
 			[[nodiscard]] Vector3 SignCopy() const noexcept;
+
+			///@}
 	};
 
 
 	namespace vector3
 	{
-		/*
-			Predefined constant vectors
+		/**
+			@name Predefined constant vectors
+			@{
 		*/
 
 		inline const auto Zero = Vector3{0.0_r, 0.0_r, 0.0_r};
@@ -576,18 +622,22 @@ namespace ion::graphics::utilities
 		inline const auto NegativeUnitZ = Vector3{0.0_r, 0.0_r, -1.0_r};
 		inline const auto UnitScale = Vector3{1.0_r, 1.0_r, 1.0_r};
 
+		///@}
 
 		inline namespace literals
 		{
-			/*
-				User defined literals (UDLs)
+			/**
+				@name User defined literals (UDLs)
 				For scalar value to Vector3
+				@{
 			*/
 
 			inline auto operator""_vec3(long double scalar) noexcept
 			{
 				return Vector3{static_cast<real>(scalar)};
 			}
+
+			///@}
 		} //literals
 	} //vector3
 } //ion::graphics::utilities

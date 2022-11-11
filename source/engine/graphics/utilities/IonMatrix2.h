@@ -26,9 +26,9 @@ namespace ion::graphics::utilities
 	} //matrix2::detail
 
 
-	//A class representing a 2x2 column-major matrix with right hand rotation
-	//Follows the OpenGL matrix convention by default
-	//Define ION_ROW_MAJOR and ION_LEFT_HANDED to use this class with Direct3D
+	///@brief A class representing a 2x2 column-major matrix with right hand rotation
+	///@details Follows the OpenGL matrix convention by default.
+	///Define ION_ROW_MAJOR and ION_LEFT_HANDED to use this class with Direct3D
 	class Matrix2 final
 	{
 		private:
@@ -42,146 +42,156 @@ namespace ion::graphics::utilities
 
 		public:
 
+			///@brief Default constructor
 			Matrix2() = default;
 
-			//Constructs a new matrix from the given numbers
+			///@brief Constructs a new matrix from the given numbers
 			Matrix2(real m00, real m01,
 					real m10, real m11) noexcept;
 
-			//Constructs a new matrix from the given 3x3 matrix
+			///@brief Constructs a new matrix from the given 3x3 matrix
 			Matrix2(const Matrix3 &matrix) noexcept;
 			
 
-			/*
-				Static matrix conversions
+			/**
+				@name Static matrix conversions
+				@{
 			*/
 
-			//Returns a new reflection matrix from the given angle (radians)
+			///@brief Returns a new reflection matrix from the given angle (radians)
 			[[nodiscard]] static Matrix2 Reflection(real angle) noexcept;
 
-			//Returns a new rotation matrix from the given angle (radians)
+			///@brief Returns a new rotation matrix from the given angle (radians)
 			[[nodiscard]] static Matrix2 Rotation(real angle) noexcept;
 
-			//Returns a new scaling matrix from the given vector
+			///@brief Returns a new scaling matrix from the given vector
 			[[nodiscard]] static Matrix2 Scaling(const Vector2 &vector) noexcept;
 
-			//Returns a new shearing matrix from the given vector
+			///@brief Returns a new shearing matrix from the given vector
 			[[nodiscard]] static Matrix2 Shearing(const Vector2 &vector) noexcept;
 
-			//Returns a new transformation matrix from the given rotation angle (radians) and scaling
+			///@brief Returns a new transformation matrix from the given rotation angle (radians) and scaling
 			[[nodiscard]] static Matrix2 Transformation(real rotation, const Vector2 &scaling) noexcept;
 
+			///@}
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Sets this matrix equal to the given 3x3 matrix
+			///@brief Sets this matrix equal to the given 3x3 matrix
 			Matrix2& operator=(const Matrix3 &matrix) noexcept;
 
 
-			//Checks if two matrices are equal (all numbers are equal)
+			///@brief Checks if two matrices are equal (all numbers are equal)
 			[[nodiscard]] inline auto operator==(const Matrix2 &rhs) const noexcept
 			{
 				return m_[0][0] == rhs.m_[0][0] && m_[0][1] == rhs.m_[0][1] &&
 					   m_[1][0] == rhs.m_[1][0] && m_[1][1] == rhs.m_[1][1];
 			}
 
-			//Checks if two matrices are different (one or more numbers are different)
+			///@brief Checks if two matrices are different (one or more numbers are different)
 			[[nodiscard]] inline auto operator!=(const Matrix2 &rhs) const noexcept
 			{
 				return !(*this == rhs);
 			}
 
 
-			//Negates matrix (negating each number)
+			///@brief Negates matrix (negating each number)
 			[[nodiscard]] inline auto operator-() const noexcept
 			{
 				return Matrix2{-m_[0][0], -m_[0][1],
 							   -m_[1][0], -m_[1][1]};
 			}
 
+			///@}
 
-			/*
-				Adding
+			/**
+				@name Adding
+				@{
 			*/
 
-			//Adds two matrices (adding each number)
+			///@brief Adds two matrices (adding each number)
 			[[nodiscard]] inline auto operator+(const Matrix2 &rhs) const noexcept
 			{
 				return Matrix2{m_[0][0] + rhs.m_[0][0], m_[0][1] + rhs.m_[0][1],
 							   m_[1][0] + rhs.m_[1][0], m_[1][1] + rhs.m_[1][1]};
 			}
 
-			//Adds all numbers to the given scalar
+			///@brief Adds all numbers to the given scalar
 			[[nodiscard]] inline auto operator+(real scalar) const noexcept
 			{
 				return Matrix2{m_[0][0] + scalar, m_[0][1] + scalar,
 							   m_[1][0] + scalar, m_[1][1] + scalar};
 			}
 
-			//Adds all numbers to the given scalar
+			///@brief Adds all numbers to the given scalar
 			[[nodiscard]] friend inline auto operator+(real scalar, const Matrix2 &rhs) noexcept
 			{
 				return rhs + scalar; //Commutative
 			}
 
-			//Adds two matrices (adding each number)
+			///@brief Adds two matrices (adding each number)
 			inline auto& operator+=(const Matrix2 &rhs) noexcept
 			{
 				return *this = *this + rhs;
 			}
 
-			//Adds all numbers to the given scalar
+			///@brief Adds all numbers to the given scalar
 			inline auto& operator+=(real scalar) noexcept
 			{
 				return *this = *this + scalar;
 			}
 
+			///@}
 
-			/*
-				Subtracting
+			/**
+				@name Subtracting
+				@{
 			*/
 
-			//Subtracts two matrices (subtracting each number)
+			///@brief Subtracts two matrices (subtracting each number)
 			[[nodiscard]] inline auto operator-(const Matrix2 &rhs) const noexcept
 			{
 				return Matrix2{m_[0][0] - rhs.m_[0][0], m_[0][1] - rhs.m_[0][1],
 							   m_[1][0] - rhs.m_[1][0], m_[1][1] - rhs.m_[1][1]};
 			}
 
-			//Subtracts all numbers with the given scalar
+			///@brief Subtracts all numbers with the given scalar
 			[[nodiscard]] inline auto operator-(real scalar) const noexcept
 			{
 				return Matrix2{m_[0][0] - scalar, m_[0][1] - scalar,
 							   m_[1][0] - scalar, m_[1][1] - scalar};
 			}
 
-			//Subtracts all numbers with the given scalar
+			///@brief Subtracts all numbers with the given scalar
 			[[nodiscard]] friend inline auto operator-(real scalar, const Matrix2 &rhs) noexcept
 			{
 				return Matrix2{scalar - rhs.m_[0][0], scalar - rhs.m_[0][1],
 							   scalar - rhs.m_[1][0], scalar - rhs.m_[1][1]};
 			}
 
-			//Subtracts two matrices (subtracting each number)
+			///@brief Subtracts two matrices (subtracting each number)
 			inline auto& operator-=(const Matrix2 &rhs) noexcept
 			{
 				return *this = *this - rhs;
 			}
 
-			//Subtracts all numbers with the given scalar
+			///@brief Subtracts all numbers with the given scalar
 			inline auto& operator-=(real scalar) noexcept
 			{
 				return *this = *this - scalar;
 			}
 
+			///@}
 
-			/*
-				Multiplying
+			/**
+				@name Multiplying
+				@{
 			*/
 
-			//Muliplies two matrices (matrix multiplication)
+			///@brief Muliplies two matrices (matrix multiplication)
 			[[nodiscard]] inline auto operator*(const Matrix2 &rhs) const noexcept
 			{
 				#ifdef ION_ROW_MAJOR
@@ -201,15 +211,15 @@ namespace ion::graphics::utilities
 				#endif
 			}
 
-			//Muliplies all numbers with the given scalar
+			///@brief Muliplies all numbers with the given scalar
 			[[nodiscard]] inline auto operator*(real scalar) const noexcept
 			{
 				return Matrix2{m_[0][0] * scalar, m_[0][1] * scalar,
 							   m_[1][0] * scalar, m_[1][1] * scalar};
 			}
 
-			//Muliplies matrix with the given vector
-			//This operation results in a vector
+			///@brief Muliplies matrix with the given vector
+			///@details This operation results in a vector
 			[[nodiscard]] inline auto operator*(const Vector2 &vector) const noexcept
 			{
 				auto [x, y] = vector.XY();
@@ -225,259 +235,290 @@ namespace ion::graphics::utilities
 				#endif
 			}
 
-			//Muliplies all numbers with the given scalar
+			///@brief Muliplies all numbers with the given scalar
 			[[nodiscard]] friend inline auto operator*(real scalar, const Matrix2 &rhs) noexcept
 			{
 				return rhs * scalar; //Commutative
 			}
 
-			//Muliplies two matrices (matrix multiplication)
+			///@brief Muliplies two matrices (matrix multiplication)
 			inline auto& operator*=(const Matrix2 &rhs) noexcept
 			{
 				return *this = *this * rhs;
 			}
 
-			//Muliplies all numbers with the given scalar
+			///@brief Muliplies all numbers with the given scalar
 			inline auto& operator*=(real scalar) noexcept
 			{
 				return *this = *this * scalar;
 			}
 
+			///@}
 
-			/*
-				Subscripting
+			/**
+				@name Subscripting
+				@{
 			*/
 
-			//Returns a modifiable reference to the number at the given offset
-			//Accesses matrix linearly in order {m00, m01, m02, m10}
+			///@brief Returns a modifiable reference to the number at the given offset
+			///@details Accesses matrix linearly in order {m00, m01, m02, m10}
 			[[nodiscard]] inline auto& operator[](int off) noexcept
 			{
 				assert(off >= 0 && off < 4);
 				return numbers_[off];
 			}
 
-			//Returns the number at the given offset
-			//Accesses matrix linearly in order {m00, m01, m02, m10}
+			///@brief Returns the number at the given offset
+			///@details Accesses matrix linearly in order {m00, m01, m02, m10}
 			[[nodiscard]] inline auto operator[](int off) const noexcept
 			{
 				assert(off >= 0 && off < 4);
 				return numbers_[off];
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the m00 number to the given value
+			///@brief Sets the m00 number to the given value
 			inline void M00(real m00) noexcept
 			{
 				m_[0][0] = m00;
 			}
 			
-			//Sets the m01 number to the given value
+			///@brief Sets the m01 number to the given value
 			inline void M01(real m01) noexcept
 			{
 				m_[0][1] = m01;
 			}
 
-			//Sets the m10 number to the given value
+			///@brief Sets the m10 number to the given value
 			inline void M10(real m10) noexcept
 			{
 				m_[1][0] = m10;
 			}
 
-			//Sets the m11 number to the given value
+			///@brief Sets the m11 number to the given value
 			inline void M11(real m11) noexcept
 			{
 				m_[1][1] = m11;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the m00 number
+			///@brief Returns the m00 number
 			[[nodiscard]] inline auto M00() const noexcept
 			{
 				return m_[0][0];
 			}
 
-			//Returns the m01 number
+			///@brief Returns the m01 number
 			[[nodiscard]] inline auto M01() const noexcept
 			{
 				return m_[0][1];
 			}
 
-			//Returns the m10 number
+			///@brief Returns the m10 number
 			[[nodiscard]] inline auto M10() const noexcept
 			{
 				return m_[1][0];
 			}
 
-			//Returns the m11 number
+			///@brief Returns the m11 number
 			[[nodiscard]] inline auto M11() const noexcept
 			{
 				return m_[1][1];
 			}
 
 
-			//Returns direct access to the matrix
+			///@brief Returns direct access to the matrix
 			[[nodiscard]] inline auto M() const noexcept
 			{
 				return m_;
 			}
 
+			///@}
 
-			/*
-				Matrix conversions
+			/**
+				@name Matrix conversions
+				@{
 			*/
 
-			//Returns angle (radians) of the matrix reflection
+			///@brief Returns angle (radians) of the matrix reflection
 			[[nodiscard]] real ToReflection() const noexcept;
 
-			//Returns angle (radians) of the matrix rotation
+			///@brief Returns angle (radians) of the matrix rotation
 			[[nodiscard]] real ToRotation() const noexcept;
 
-			//Returns vector of the matrix scaling
+			///@brief Returns vector of the matrix scaling
 			[[nodiscard]] Vector2 ToScaling() const noexcept;
 
-			//Returns vector of the matrix shearing
+			///@brief Returns vector of the matrix shearing
 			[[nodiscard]] Vector2 ToShearing() const noexcept;
 
-			
-			/*
-				Adjoint/adjugate
+			///@}
+
+			/**
+				@name Adjoint/adjugate
+				@{
 			*/
 
-			//Adjoint/adjugate of the matrix
-			//It is the transpose of its cofactor matrix
+			///@brief Adjoint/adjugate of the matrix
+			///@details It is the transpose of its cofactor matrix
 			Matrix2& Adjoint() noexcept;
 
-			//Adjoint/adjugate of the matrix
-			//It is the transpose of its cofactor matrix
-			//Returns the result as a copy
+			///@brief Adjoint/adjugate of the matrix
+			///@details It is the transpose of its cofactor matrix.
+			///Returns the result as a copy
 			[[nodiscard]] Matrix2 AdjointCopy() const noexcept;
 
+			///@}
 
-			/*
-				Concatenating
+			/**
+				@name Concatenating
+				@{
 			*/
 
-			//Concatenates this matrix with the given matrix
-			//This is the same as matrix multiplication
+			///@brief Concatenates this matrix with the given matrix
+			///@details This is the same as matrix multiplication
 			Matrix2& Concatenate(const Matrix2 &matrix) noexcept;
 
-			//Concatenates this matrix with the given matrix
-			//This is the same as matrix multiplication
-			//Returns the result as a copy
+			///@brief Concatenates this matrix with the given matrix
+			///@details This is the same as matrix multiplication.
+			///Returns the result as a copy
 			[[nodiscard]] Matrix2 ConcatenateCopy(const Matrix2 &matrix) const noexcept;
 
+			///@}
 
-			/*
-				Cofactoring
+			/**
+				@name Cofactoring
+				@{
 			*/
 
-			//Makes matrix a cofactor matrix
+			///@brief Makes matrix a cofactor matrix
 			Matrix2& Cofactor() noexcept;
 
-			//Makes matrix a cofactor matrix
-			//Returns the result as a copy
+			///@brief Makes matrix a cofactor matrix
+			///@details Returns the result as a copy
 			[[nodiscard]] Matrix2 CofactorCopy() const noexcept;
 
+			///@}
 
-			/*
-				Determinant and inversing
+			/**
+				@name Determinant and inversing
+				@{
 			*/
 
-			//Returns the determinant of the matrix
+			///@brief Returns the determinant of the matrix
 			[[nodiscard]] real Determinant() const noexcept;
 			
 
-			//Inverse matrix
-			//It is the inverse of its determinant multiplied with its adjoint matrix
+			///@brief Inverse matrix
+			///@details It is the inverse of its determinant multiplied with its adjoint matrix
 			Matrix2& Inverse() noexcept;
 
-			//Inverse matrix
-			//It is the inverse of its determinant multiplied with its adjoint matrix
-			//Returns the result as a copy
+			///@brief Inverse matrix
+			///@details It is the inverse of its determinant multiplied with its adjoint matrix.
+			///Returns the result as a copy
 			[[nodiscard]] Matrix2 InverseCopy() const noexcept;
 
+			///@}
 
-			/*
-				Reflecting
+			/**
+				@name Reflecting
+				@{
 			*/
 
-			//Reflect matrix by the given angle (radians)
+			///@brief Reflect matrix by the given angle (radians)
 			Matrix2& Reflect(real angle) noexcept;
 
-			//Reflect matrix by the given angle (radians)
-			//Returns the result as a copy
+			///@brief Reflect matrix by the given angle (radians)
+			///@details Returns the result as a copy
 			[[nodiscard]] Matrix2 ReflectCopy(real angle) const noexcept;
 
+			///@}
 
-			/*
-				Rotating
+			/**
+				@name Rotating
+				@{
 			*/
 
-			//Rotates matrix by the given angle (radians)
+			///@brief Rotates matrix by the given angle (radians)
 			Matrix2& Rotate(real angle) noexcept;
 
-			//Rotates matrix by the given angle (radians)
-			//Returns the result as a copy
+			///@brief Rotates matrix by the given angle (radians)
+			///@details Returns the result as a copy
 			[[nodiscard]] Matrix2 RotateCopy(real angle) const noexcept;
 
+			///@}
 
-			/*
-				Scaling
+			/**
+				@name Scaling
+				@{
 			*/
 
-			//Scales matrix by the given vector
+			///@brief Scales matrix by the given vector
 			Matrix2& Scale(const Vector2 &vector) noexcept;
 
-			//Scales matrix by the given vector
-			//Returns the result as a copy
+			///@brief Scales matrix by the given vector
+			///@details Returns the result as a copy
 			[[nodiscard]] Matrix2 ScaleCopy(const Vector2 &vector) const noexcept;
 
+			///@}
 
-			/*
-				Shearing
+			/**
+				@name Shearing
+				@{
 			*/
 
-			//Shear matrix by the given vector
+			///@brief Shear matrix by the given vector
 			Matrix2& Shear(const Vector2 &vector) noexcept;
 
-			//Shear matrix by the given vector
-			//Returns the result as a copy
+			///@brief Shear matrix by the given vector
+			///@details Returns the result as a copy
 			[[nodiscard]] Matrix2 ShearCopy(const Vector2 &vector) const noexcept;
 
+			///@}
 
-			/*
-				Transforming
+			/**
+				@name Transforming
+				@{
 			*/
 
-			//Transforms the given point based on matrix
+			///@brief Transforms the given point based on matrix
 			[[nodiscard]] Vector2 TransformPoint(const Vector2 &point) const noexcept;
 
+			///@}
 
-			/*
-				Transposition
+			/**
+				@name Transposition
+				@{
 			*/
 
-			//Transpose the matrix
+			///@brief Transpose the matrix
 			Matrix2& Transpose() noexcept;
 
-			//Transpose the matrix
-			//Returns the result as a copy
+			///@brief Transpose the matrix
+			///@details Returns the result as a copy
 			[[nodiscard]] Matrix2 TransposeCopy() const noexcept;
+
+			///@}
 	};
 
 
 	namespace matrix2
 	{
-		/*
-			Predefined constant matrices
+		/**
+			@name Predefined constant matrices
+			@{
 		*/
 
 		inline const auto Zero = Matrix2{0.0_r, 0.0_r,
@@ -485,6 +526,8 @@ namespace ion::graphics::utilities
 
 		inline const auto Identity = Matrix2{1.0_r, 0.0_r,
 											 0.0_r, 1.0_r};
+
+		///@}
 	}
 } //ion::graphics::utilities
 

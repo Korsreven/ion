@@ -28,7 +28,7 @@ namespace ion::graphics::utilities
 	} //ray::detail
 
 
-	//A class representing a two-dimensional ray
+	///@brief A class representing a two-dimensional ray
 	class Ray final
 	{
 		private:
@@ -38,136 +38,155 @@ namespace ion::graphics::utilities
 
 		public:
 
+			///@brief Default constructor
 			Ray() = default;
 
-			//Constructs a new ray from the given origin and direction
+			///@brief Constructs a new ray from the given origin and direction
 			Ray(const Vector2 &origin, const Vector2 &direction) noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Checks if two rays are equal (both directions are equal)
+			///@brief Checks if two rays are equal (both directions are equal)
 			[[nodiscard]] inline auto operator==(const Ray &rhs) const noexcept
 			{
 				return direction_ == rhs.direction_;
 			}
 
-			//Checks if two rays are different (both directions are different)
+			///@brief Checks if two rays are different (both directions are different)
 			[[nodiscard]] inline auto operator!=(const Ray &rhs) const noexcept
 			{
 				return !(*this == rhs);
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the origin of the ray to the given value
+			///@brief Sets the origin of the ray to the given value
 			inline void Origin(const Vector2 &origin) noexcept
 			{
 				origin_ = origin;
 			}
 
-			//Sets the direction of the ray to the given value
+			///@brief Sets the direction of the ray to the given value
 			inline void Direction(const Vector2 &direction) noexcept
 			{
 				direction_ = direction;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the origin of the ray
+			///@brief Returns the origin of the ray
 			[[nodiscard]] inline auto& Origin() const noexcept
 			{
 				return origin_;
 			}
 
-			//Returns the direction of the ray
+			///@brief Returns the direction of the ray
 			[[nodiscard]] inline auto& Direction() const noexcept
 			{
 				return direction_;
 			}
 
 
-			//Returns the position of a point at the given unit along the ray
+			///@brief Returns the position of a point at the given unit along the ray
 			Vector2 Point(real unit) noexcept;
 
+			///@}
 
-			/*
-				Intersecting
+			/**
+				@name Intersecting
+				@{
 			*/
 
-			//Returns true if this ray intersects the given aabb
+			///@brief Returns true if this ray intersects the given aabb
 			[[nodiscard]] std::pair<bool, real> Intersects(const Aabb &aabb) const noexcept;
 
-			//Returns true if this ray intersects the given obb
+			///@brief Returns true if this ray intersects the given obb
 			[[nodiscard]] std::pair<bool, real> Intersects(const Obb &obb) const noexcept;
 
-			//Returns true if this ray intersects the given sphere
+			///@brief Returns true if this ray intersects the given sphere
 			[[nodiscard]] std::pair<bool, real> Intersects(const Sphere &sphere) const noexcept;
 
-			//Returns true if this ray intersects the given point
+			///@brief Returns true if this ray intersects the given point
 			[[nodiscard]] std::pair<bool, real> Intersects(const Vector2 &point) const noexcept;
 
+			///@}
 
-			/*
-				Rotating
+			/**
+				@name Rotating
+				@{
 			*/
 
-			//Rotates ray by the given angle (radians)
+			///@brief Rotates ray by the given angle (radians)
 			Ray& Rotate(real angle) noexcept;
 
-			//Rotates ray by the given angle (radians)
-			//Returns the result as a copy
+			///@brief Rotates ray by the given angle (radians)
+			///@details Returns the result as a copy
 			[[nodiscard]] Ray RotateCopy(real angle) const noexcept;
 
 
-			//Rotates ray by the given angle (radians) and origin vector
+			///@brief Rotates ray by the given angle (radians) and origin vector
 			Ray& Rotate(real angle, const Vector2 &origin) noexcept;
 
-			//Rotates ray by the given angle (radians) and origin vector
-			//Returns the result as a copy
+			///@brief Rotates ray by the given angle (radians) and origin vector
+			///@details Returns the result as a copy
 			[[nodiscard]] Ray RotateCopy(real angle, const Vector2 &origin) const noexcept;
 
+			///@}
 
-			/*
-				Transforming
+			/**
+				@name Transforming
+				@{
 			*/
 
-			//Transforms ray based on the given matrix
+			///@brief Transforms ray based on the given matrix
 			Ray& Transform(const Matrix3 &matrix) noexcept;
 
-			//Transforms ray based on the given matrix
-			//Returns the result as a copy
+			///@brief Transforms ray based on the given matrix
+			///@details Returns the result as a copy
 			[[nodiscard]] Ray TransformCopy(const Matrix3 &matrix) const noexcept;
 
+			///@}
 
-			/*
-				Translating
+			/**
+				@name Translating
+				@{
 			*/
 
-			//Translates ray by the given vector
+			///@brief Translates ray by the given vector
 			Ray& Translate(const Vector2 &vector) noexcept;
 
-			//Translates ray by the given vector
-			//Returns the result as a copy
+			///@brief Translates ray by the given vector
+			///@details Returns the result as a copy
 			[[nodiscard]] Ray TranslateCopy(const Vector2 &vector) const noexcept;
+
+			///@}
 	};
 
 
 	namespace ray
 	{
-		/*
-			Predefined constant rays
+		/**
+			@name Predefined constant rays
+			@{
 		*/
 
 		inline const auto Zero = Ray{0.0_r, vector2::Zero};
+
+		///@}
 	} //ray
 } //ion::graphics::utilities
 

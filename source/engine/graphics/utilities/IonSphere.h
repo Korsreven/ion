@@ -95,15 +95,18 @@ namespace ion::graphics::utilities
 		}
 
 
-		/*
-			Graphics API
+		/**
+			@name Graphics API
+			@{
 		*/
 
 		void draw_bounds(real radius, const Vector2 &center, const Color &color, int steps) noexcept;
+
+		///@}
 	} //sphere::detail
 
 
-	//A class representing a two-dimensional bounding sphere
+	///@brief A class representing a two-dimensional bounding sphere
 	class Sphere final
 	{
 		private:
@@ -113,209 +116,238 @@ namespace ion::graphics::utilities
 
 		public:
 
+			///@brief Default constructor
 			Sphere() = default;
 
-			//Constructs a new sphere from the given radius and center
+			///@brief Constructs a new sphere from the given radius and center
 			Sphere(real radius, const Vector2 &center = vector2::Zero) noexcept;
 
 
-			/*
-				Static sphere conversions
+			/**
+				@name Static sphere conversions
+				@{
 			*/
 
-			//Returns a new sphere from the given (circle) area and center
+			///@brief Returns a new sphere from the given (circle) area and center
 			[[nodiscard]] static Sphere Area(real area, const Vector2 &center = vector2::Zero) noexcept;
 
-			//Returns a new sphere from the given circumference/perimeter and center
+			///@brief Returns a new sphere from the given circumference/perimeter and center
 			[[nodiscard]] static Sphere Circumference(real circumference, const Vector2 &center = vector2::Zero) noexcept;
 
-			//Returns a new sphere from the given diameter and center
+			///@brief Returns a new sphere from the given diameter and center
 			[[nodiscard]] static Sphere Diameter(real diameter, const Vector2 &center = vector2::Zero) noexcept;
 
-			//Returns a new sphere from the given surface area and center
+			///@brief Returns a new sphere from the given surface area and center
 			[[nodiscard]] static Sphere SurfaceArea(real surface_area, const Vector2 &center = vector2::Zero) noexcept;
 
-			//Returns a new sphere from the given volume and center
+			///@brief Returns a new sphere from the given volume and center
 			[[nodiscard]] static Sphere Volume(real volume, const Vector2 &center = vector2::Zero) noexcept;
 
+			///@}
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Checks if two spheres are equal (both radii are equal)
+			///@brief Checks if two spheres are equal (both radii are equal)
 			[[nodiscard]] inline auto operator==(const Sphere &rhs) const noexcept
 			{
 				return radius_ == rhs.radius_;
 			}
 
-			//Checks if two spheres are different (both radii are different)
+			///@brief Checks if two spheres are different (both radii are different)
 			[[nodiscard]] inline auto operator!=(const Sphere &rhs) const noexcept
 			{
 				return !(*this == rhs);
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the center of the sphere to the given value
+			///@brief Sets the center of the sphere to the given value
 			inline void Center(const Vector2 &center) noexcept
 			{
 				center_ = center;
 			}
 
-			//Sets the radius of the sphere to the given value
+			///@brief Sets the radius of the sphere to the given value
 			inline void Radius(real radius) noexcept
 			{
 				radius_ = radius;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the radius of the sphere
+			///@brief Returns the radius of the sphere
 			[[nodiscard]] inline auto& Center() const noexcept
 			{
 				return center_;
 			}
 
-			//Returns the center of the sphere
+			///@brief Returns the center of the sphere
 			[[nodiscard]] inline auto Radius() const noexcept
 			{
 				return radius_;
 			}
 
 
-			//Returns true if this sphere is empty
-			//Meaning that the radius is less or equal to zero
+			///@brief Returns true if this sphere is empty
+			///@details Meaning that the radius is less or equal to zero
 			[[nodiscard]] bool Empty() const noexcept;
 
+			///@}
 
-			/*
-				Sphere conversions
+			/**
+				@name Sphere conversions
+				@{
 			*/
 
-			//Returns the (circle) area of the sphere
+			///@brief Returns the (circle) area of the sphere
 			[[nodiscard]] real ToArea() const noexcept;
 
-			//Returns the circumference/perimeter of the sphere
+			///@brief Returns the circumference/perimeter of the sphere
 			[[nodiscard]] real ToCircumference() const noexcept;
 
-			//Returns the diameter of the sphere
+			///@brief Returns the diameter of the sphere
 			[[nodiscard]] real ToDiameter() const noexcept;
 
-			//Returns the surface area of the sphere
+			///@brief Returns the surface area of the sphere
 			[[nodiscard]] real ToSurfaceArea() const noexcept;
 
-			//Returns the volume of the sphere
+			///@brief Returns the volume of the sphere
 			[[nodiscard]] real ToVolume() const noexcept;
 
+			///@}
 
-			/*
-				Containing
+			/**
+				@name Containing
+				@{
 			*/
 
-			//Returns true if this sphere contains the given sphere
+			///@brief Returns true if this sphere contains the given sphere
 			[[nodiscard]] bool Contains(const Sphere &sphere) const noexcept;
 
-			//Returns true if this sphere contains the given point
+			///@brief Returns true if this sphere contains the given point
 			[[nodiscard]] bool Contains(const Vector2 &point) const noexcept;
 
+			///@}
 
-			/*
-				Intersecting
+			/**
+				@name Intersecting
+				@{
 			*/
 
-			//Returns true if this sphere intersects the given sphere
+			///@brief Returns true if this sphere intersects the given sphere
 			[[nodiscard]] bool Intersects(const Sphere &sphere) const noexcept;
 
-			//Returns true if this sphere intersects the given point
+			///@brief Returns true if this sphere intersects the given point
 			[[nodiscard]] bool Intersects(const Vector2 &point) const noexcept;
 
 
-			//Returns true if this sphere intersects the given aabb
+			///@brief Returns true if this sphere intersects the given aabb
 			[[nodiscard]] bool Intersects(const Aabb &aabb) const noexcept;
 
-			//Returns true if this sphere intersects the given obb
+			///@brief Returns true if this sphere intersects the given obb
 			[[nodiscard]] bool Intersects(const Obb &obb) const noexcept;
 
+			///@}
 
-			/*
-				Merging
+			/**
+				@name Merging
+				@{
 			*/
 
-			//Merge this sphere with the given sphere
+			///@brief Merge this sphere with the given sphere
 			Sphere& Merge(const Sphere &sphere) noexcept;
 
-			//Merge this sphere with the given point
+			///@brief Merge this sphere with the given point
 			Sphere& Merge(const Vector2 &point) noexcept;
 
 
-			//Merge this sphere with the given sphere
-			//Returns the result as a copy
+			///@brief Merge this sphere with the given sphere
+			///@details Returns the result as a copy
 			[[nodiscard]] Sphere MergeCopy(const Sphere &sphere) const noexcept;
 
-			//Merge this sphere with the given point
-			//Returns the result as a copy
+			///@brief Merge this sphere with the given point
+			///@details Returns the result as a copy
 			[[nodiscard]] Sphere MergeCopy(const Vector2 &point) const noexcept;
 
+			///@}
 
-			/*
-				Scaling
+			/**
+				@name Scaling
+				@{
 			*/
 
-			//Scales sphere by the given factor
+			///@brief Scales sphere by the given factor
 			Sphere& Scale(real factor) noexcept;
 
-			//Scales sphere by the given factor
-			//Returns the result as a copy
+			///@brief Scales sphere by the given factor
+			///@details Returns the result as a copy
 			[[nodiscard]] Sphere ScaleCopy(real factor) const noexcept;
 
+			///@}
 
-			/*
-				Transforming
+			/**
+				@name Transforming
+				@{
 			*/
 
-			//Transforms sphere based on the given matrix
+			///@brief Transforms sphere based on the given matrix
 			Sphere& Transform(const Matrix3 &matrix) noexcept;
 
-			//Transforms sphere based on the given matrix
-			//Returns the result as a copy
+			///@brief Transforms sphere based on the given matrix
+			///@details Returns the result as a copy
 			[[nodiscard]] Sphere TransformCopy(const Matrix3 &matrix) const noexcept;
 
+			///@}
 
-			/*
-				Translating
+			/**
+				@name Translating
+				@{
 			*/
 
-			//Translates sphere by the given vector
+			///@brief Translates sphere by the given vector
 			Sphere& Translate(const Vector2 &vector) noexcept;
 
-			//Translates sphere by the given vector
-			//Returns the result as a copy
+			///@brief Translates sphere by the given vector
+			///@details Returns the result as a copy
 			[[nodiscard]] Sphere TranslateCopy(const Vector2 &vector) const noexcept;
 
+			///@}
 
-			/*
-				Drawing
+			/**
+				@name Drawing
+				@{
 			*/
 
-			//Draws the bounds of this sphere with the given color and steps
+			///@brief Draws the bounds of this sphere with the given color and steps
 			void Draw(const Color &color, int steps = 32) const noexcept;
+
+			///@}
 	};
 
 
 	namespace sphere
 	{
-		/*
-			Predefined constant spheres
+		/**
+			@name Predefined constant spheres
+			@{
 		*/
 
 		inline const auto Unit = Sphere{1.0_r};
+
+		///@}
 	} //sphere
 } //ion::graphics::utilities
 

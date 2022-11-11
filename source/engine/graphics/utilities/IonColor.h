@@ -122,7 +122,7 @@ namespace ion::graphics::utilities
 	} //color::detail
 
 
-	//A class representing a four-channel RGBA32 color model
+	///@brief A class representing a four-channel RGBA32 color model
 	class Color final
 	{
 		private:
@@ -142,62 +142,66 @@ namespace ion::graphics::utilities
 
 		public:
 
+			///@brief Default constructor
 			Color() = default;
 
-			//Constructs a new color from the given RGBA percentages in range [0.0, 1.0]
+			///@brief Constructs a new color from the given RGBA percentages in range [0.0, 1.0]
 			Color(real red, real green, real blue, real alpha = 1.0_r) noexcept;
 
 
-			/*
-				Static color conversions
+			/**
+				@name Static color conversions
+				@{
 			*/
 
-			//Returns a new color from the given CMYK values
-			//The given values should be in range [0.0, 1.0]
+			///@brief Returns a new color from the given CMYK values
+			///@details The given values should be in range [0.0, 1.0]
 			[[nodiscard]] static Color CMYK(real cyan, real magenta, real yellow, real black, real alpha = 1.0_r) noexcept;
 
-			//Returns a new color from the given hex value
-			//A hex triplet value contains only the RGB channels (the alpha channel is set to 1.0)
-			//A hex quartet value contains all channels in order RGBA
-			//A shorthand hex value contains three or four-digit, one for each channel (0xff0 -> 0xffff00)
+			///@brief Returns a new color from the given hex value
+			///@details A hex triplet value contains only the RGB channels (the alpha channel is set to 1.0).
+			///A hex quartet value contains all channels in order RGBA.
+			///A shorthand hex value contains three or four-digit, one for each channel (0xff0 -> 0xffff00)
 			[[nodiscard]] static Color Hex(uint32 value) noexcept;
 
-			//Returns a new color from the given hex and alpha values
-			//Take only the RGB channels from the given hex value (triplet, quartet or shorthand)
-			//The alpha channel is set to the given alpha instead
+			///@brief Returns a new color from the given hex and alpha values
+			///@details Take only the RGB channels from the given hex value (triplet, quartet or shorthand).
+			///The alpha channel is set to the given alpha instead
 			[[nodiscard]] static Color Hex(uint32 value, real alpha) noexcept;
 
-			//Returns a new color from the given HSL values
-			//Hue should be degrees in range [0.0, 360.0)
-			//Saturation, lightness and alpha should be in range [0.0, 1.0]
+			///@brief Returns a new color from the given HSL values
+			///@details Hue should be degrees in range [0.0, 360.0).
+			///Saturation, lightness and alpha should be in range [0.0, 1.0]
 			[[nodiscard]] static Color HSL(real hue, real saturation, real lightness, real alpha = 1.0_r) noexcept;
 
-			//Returns a new color from the given HSV/HSB values
-			//Hue should be degrees in range [0.0, 360.0)
-			//Saturation, value and alpha should be in range [0.0, 1.0]
+			///@brief Returns a new color from the given HSV/HSB values
+			///@details Hue should be degrees in range [0.0, 360.0).
+			///Saturation, value and alpha should be in range [0.0, 1.0]
 			[[nodiscard]] static Color HSV(real hue, real saturation, real value, real alpha = 1.0_r) noexcept;
 
-			//Returns a new color from the given HWB values
-			//Hue should be degrees in range [0.0, 360.0)
-			//Whiteness, blackness and alpha should be in range [0.0, 1.0]
+			///@brief Returns a new color from the given HWB values
+			///@details Hue should be degrees in range [0.0, 360.0).
+			///Whiteness, blackness and alpha should be in range [0.0, 1.0]
 			[[nodiscard]] static Color HWB(real hue, real whiteness, real blackness, real alpha = 1.0_r) noexcept;
 
-			//Returns a new color from the given RGB values
-			//Red, green and blue should be in range [0, 255]
-			//Alpha should be in range [0.0, 1.0]
+			///@brief Returns a new color from the given RGB values
+			///@details Red, green and blue should be in range [0, 255].
+			///Alpha should be in range [0.0, 1.0]
 			[[nodiscard]] static Color RGB(uint8 red, uint8 green, uint8 blue, real alpha = 1.0_r) noexcept;
 
-			//Returns a new color from the given YCbCr values
-			//Luma, blue difference and red difference should be in range [0, 255]
-			//Alpha should be in range [0.0, 1.0]
+			///@brief Returns a new color from the given YCbCr values
+			///@details Luma, blue difference and red difference should be in range [0, 255].
+			///Alpha should be in range [0.0, 1.0]
 			[[nodiscard]] static Color YCbCr(uint8 luma, uint8 blue_difference, uint8 red_difference, real alpha = 1.0_r) noexcept;
 
+			///@}
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Checks if two colors are equal (all channels are equal)
+			///@brief Checks if two colors are equal (all channels are equal)
 			[[nodiscard]] inline auto operator==(const Color &rhs) const noexcept
 			{
 				return red_ == rhs.red_ &&
@@ -206,25 +210,27 @@ namespace ion::graphics::utilities
 					   alpha_ == rhs.alpha_;
 			}
 
-			//Checks if two colors are different (one or more channels are different)
+			///@brief Checks if two colors are different (one or more channels are different)
 			[[nodiscard]] inline auto operator!=(const Color &rhs) const noexcept
 			{
 				return !(*this == rhs);
 			}
 
-			//Checks if one color is less than another one (channel wise)
-			//Needed for sorting two colors (strict weak ordering)
+			///@brief Checks if one color is less than another one (channel wise)
+			///@details Needed for sorting two colors (strict weak ordering)
 			[[nodiscard]] inline auto operator<(const Color &rhs) const noexcept
 			{
 				return std::tuple{red_, green_, blue_, alpha_} < std::tuple{rhs.red_, rhs.green_, rhs.blue_, rhs.alpha_};
 			}
 
+			///@}
 
-			/*
-				Adding
+			/**
+				@name Adding
+				@{
 			*/
 
-			//Adds two colors (adding each channel)
+			///@brief Adds two colors (adding each channel)
 			[[nodiscard]] inline auto operator+(const Color &rhs) const noexcept
 			{
 				return Color{red_ + rhs.red_,
@@ -233,18 +239,20 @@ namespace ion::graphics::utilities
 							 alpha_ + rhs.alpha_};
 			}
 
-			//Adds two colors (adding each channel)
+			///@brief Adds two colors (adding each channel)
 			inline auto& operator+=(const Color &rhs) noexcept
 			{
 				return *this = *this + rhs;
 			}
 
+			///@}
 
-			/*
-				Subtracting
+			/**
+				@name Subtracting
+				@{
 			*/
 
-			//Subtracts two colors (subtracting each channel)
+			///@brief Subtracts two colors (subtracting each channel)
 			[[nodiscard]] inline auto operator-(const Color &rhs) const noexcept
 			{
 				return Color{red_ - rhs.red_,
@@ -253,18 +261,20 @@ namespace ion::graphics::utilities
 							 alpha_ - rhs.alpha_};
 			}
 
-			//Subtracts two colors (subtracting each channel)
+			///@brief Subtracts two colors (subtracting each channel)
 			inline auto& operator-=(const Color &rhs) noexcept
 			{
 				return *this = *this - rhs;
 			}
 
+			///@}
 
-			/*
-				Multiplying
+			/**
+				@name Multiplying
+				@{
 			*/
 
-			//Muliplies all channels with the given scalar
+			///@brief Muliplies all channels with the given scalar
 			[[nodiscard]] inline auto operator*(real scalar) const noexcept
 			{
 				return Color{red_ * scalar,
@@ -273,211 +283,230 @@ namespace ion::graphics::utilities
 							 alpha_ * scalar};
 			}
 
-			//Muliplies all channels with the given scalar
+			///@brief Muliplies all channels with the given scalar
 			[[nodiscard]] friend inline auto operator*(real scalar, const Color &rhs) noexcept
 			{
-				return rhs * scalar; //Commutative
+				return rhs * scalar; ///@brief Commutative
 			}
 
-			//Muliplies all channels with the given scalar
+			///@brief Muliplies all channels with the given scalar
 			inline auto& operator*=(real scalar) noexcept
 			{
 				return *this = *this * scalar;
 			}
 
+			///@}
 
-			/*
-				Dividing
+			/**
+				@name Dividing
+				@{
 			*/
 
-			//Divides all channels with the given scalar
+			///@brief Divides all channels with the given scalar
 			[[nodiscard]] inline auto operator/(real scalar) const noexcept
 			{
 				assert(scalar != 0.0_r);
 				return *this * (1.0_r / scalar);
 			}
 
-			//Divides all channels with the given scalar
+			///@brief Divides all channels with the given scalar
 			inline auto& operator/=(real scalar) noexcept
 			{
 				return *this = *this / scalar;
 			}
 
+			///@}
 
-			/*
-				Subscripting
+			/**
+				@name Subscripting
+				@{
 			*/
 
-			//Returns the channel at the given offset as percentage in range [0.0, 1.0]
+			///@brief Returns the channel at the given offset as percentage in range [0.0, 1.0]
 			[[nodiscard]] inline auto operator[](int off) const noexcept
 			{
 				assert(off >= 0 && off < 4);
 				return channels_[off];
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 			
-			//Sets the red channel to the given percentage in range [0.0, 1.0]
+			///@brief Sets the red channel to the given percentage in range [0.0, 1.0]
 			inline void R(real red) noexcept
 			{
 				red_ = ion::utilities::math::Saturate(red);
 			}
 
-			//Sets the green channel to the given percentage in range [0.0, 1.0]
+			///@brief Sets the green channel to the given percentage in range [0.0, 1.0]
 			inline void G(real green) noexcept
 			{
 				green_ = ion::utilities::math::Saturate(green);
 			}
 
-			//Sets the blue channel to the given percentage in range [0.0, 1.0]
+			///@brief Sets the blue channel to the given percentage in range [0.0, 1.0]
 			inline void B(real blue) noexcept
 			{
 				blue_ = ion::utilities::math::Saturate(blue);
 			}
 
-			//Sets the alpha channel to the given percentage in range [0.0, 1.0]
+			///@brief Sets the alpha channel to the given percentage in range [0.0, 1.0]
 			inline void A(real alpha) noexcept
 			{
 				alpha_ = ion::utilities::math::Saturate(alpha);
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the red channel as percentage in range [0.0, 1.0]
+			///@brief Returns the red channel as percentage in range [0.0, 1.0]
 			[[nodiscard]] inline auto R() const noexcept
 			{
 				return red_;
 			}
 
-			//Returns the green channel as percentage in range [0.0, 1.0]
+			///@brief Returns the green channel as percentage in range [0.0, 1.0]
 			[[nodiscard]] inline auto G() const noexcept
 			{
 				return green_;
 			}
 
-			//Returns the blue channel as percentage in range [0.0, 1.0]
+			///@brief Returns the blue channel as percentage in range [0.0, 1.0]
 			[[nodiscard]] inline auto B() const noexcept
 			{
 				return blue_;
 			}
 
-			//Returns the alpha channel as percentage in range [0.0, 1.0]
+			///@brief Returns the alpha channel as percentage in range [0.0, 1.0]
 			[[nodiscard]] inline auto A() const noexcept
 			{
 				return alpha_;
 			}	
 
-			//Returns the red, green and blue channels as percentages in range [0.0, 1.0]
+			///@brief Returns the red, green and blue channels as percentages in range [0.0, 1.0]
 			[[nodiscard]] inline auto RGB() const noexcept
 			{
 				return std::tuple{red_, green_, blue_};
 			}
 
-			//Returns the red, green, blue and alpha channels as percentages in range [0.0, 1.0]
+			///@brief Returns the red, green, blue and alpha channels as percentages in range [0.0, 1.0]
 			[[nodiscard]] inline auto RGBA() const noexcept
 			{
 				return std::tuple{red_, green_, blue_, alpha_};
 			}
 
-			//Returns direct access to all color channels as percentages in range [0.0, 1.0]
+			///@brief Returns direct access to all color channels as percentages in range [0.0, 1.0]
 			[[nodiscard]] inline auto Channels() const noexcept
 			{
 				return channels_;
 			}
 
+			///@}
 
-			/*
-				Color conversions
+			/**
+				@name Color conversions
+				@{
 			*/
 
-			//Returns color converted to CMYK values
-			//All values returned are in range [0.0, 1.0]
+			///@brief Returns color converted to CMYK values
+			///@details All values returned are in range [0.0, 1.0]
 			[[nodiscard]] std::tuple<real, real, real, real> ToCMYK() const noexcept;
 
-			//Returns color converted to a 24 bit hex value (triplet)
-			//The returned hex value contains only the RGB channels
+			///@brief Returns color converted to a 24 bit hex value (triplet)
+			///@details The returned hex value contains only the RGB channels
 			[[nodiscard]] uint32 ToHex24() const noexcept;
 
-			//Returns color converted to a 32 bit hex value (quartet)
-			//The returned hex value contains all channels in order RGBA
+			///@brief Returns color converted to a 32 bit hex value (quartet)
+			///@details The returned hex value contains all channels in order RGBA
 			[[nodiscard]] uint32 ToHex32() const noexcept;
 
-			//Returns color converted to HSL values
+			///@brief Returns color converted to HSL values
 			//Returns hue in range [0.0, 360.0)
-			//Returns saturation and lightness in range [0.0, 1.0]
+			///@details Returns saturation and lightness in range [0.0, 1.0]
 			[[nodiscard]] std::tuple<real, real, real> ToHSL() const noexcept;
 
-			//Returns color converted to HSV/HSB values
-			//Returns hue in range [0.0, 360.0)
-			//Returns saturation and value in range [0.0, 1.0]
+			///@brief Returns color converted to HSV/HSB values
+			///@details Returns hue in range [0.0, 360.0).
+			///Returns saturation and value in range [0.0, 1.0]
 			[[nodiscard]] std::tuple<real, real, real> ToHSV() const noexcept;
 
-			//Returns color converted to HWB values
-			//Returns hue in range [0.0, 360.0)
-			//Returns whiteness and blackness in range [0.0, 1.0]
+			///@brief Returns color converted to HWB values
+			///@details Returns hue in range [0.0, 360.0).
+			///Returns whiteness and blackness in range [0.0, 1.0]
 			[[nodiscard]] std::tuple<real, real, real> ToHWB() const noexcept;
 
-			//Returns color converted to RGB values
-			//All values returned are in range [0, 255]
+			///@brief Returns color converted to RGB values
+			///@details All values returned are in range [0, 255]
 			[[nodiscard]] std::tuple<int, int, int> ToRGB() const noexcept;
 
-			//Returns color converted to YCbCr values
-			//All values returned are in range [0, 255]
+			///@brief Returns color converted to YCbCr values
+			///@details All values returned are in range [0, 255]
 			[[nodiscard]] std::tuple<int, int, int> ToYCbCr() const noexcept;
 
+			///@}
 
-			/*
-				Inversing
+			/**
+				@name Inversing
+				@{
 			*/
 			
-			//Inverse the color by inversing the RGB channels
-			//The alpha channel is not inversed
+			///@brief Inverse the color by inversing the RGB channels
+			///@details The alpha channel is not inversed
 			Color& Inverse() noexcept;
 
-			//Inverse the color by inversing the RGB channels
-			//The alpha channel is not inversed
-			//Returns the result as a copy
+			///@brief Inverse the color by inversing the RGB channels
+			///@details The alpha channel is not inversed.
+			///Returns the result as a copy
 			[[nodiscard]] Color InverseCopy() const noexcept;
 
+			///@}
 
-			/*
-				Mixing
+			/**
+				@name Mixing
+				@{
 			*/
 
-			//Mix the color with another color by the given amount in range [0.0, 1.0]
-			//Default amount is 0.5 (50%)
+			///@brief Mix the color with another color by the given amount in range [0.0, 1.0]
+			///@details Default amount is 0.5 (50%)
 			Color& Mix(const Color &with_color, real amount = 0.5_r) noexcept;
 
-			//Mix the color with another color by the given amount in range [0.0, 1.0]
-			//Default amount is 0.5 (50%)
-			//Returns the result as a copy
+			///@brief Mix the color with another color by the given amount in range [0.0, 1.0]
+			///@details Default amount is 0.5 (50%).
+			///Returns the result as a copy
 			[[nodiscard]] Color MixCopy(const Color &with_color, real amount = 0.5_r) const noexcept;
+
+			///@}
 	};
 
 
 	namespace color
 	{
-		/*
-			Predefined constant colors
+		/**
+			@name Predefined constant colors
+			@{
 		*/
 
 		inline const auto Transparent = Color::RGB(0, 0, 0, 0.0_r);
 
+		///@}
 
-		/*
-			X11 color names standardized by SVG 1.1 (second edition)
+		/**
+			@name X11 color names standardized by SVG 1.1 (second edition)
 			Names are also supported in CSS by all major browsers (W3C colors)
 
 			Note: Gray, green, maroon and purple have clashing definitions with W3C
 			Therefore the clashing W3C colors are prefixed with web
 
 			Note: RebeccaPurple was added 21st of June, 2014
+			@{
 		*/
 
 		inline const auto AliceBlue = Color::RGB(240, 248, 255);
@@ -622,27 +651,32 @@ namespace ion::graphics::utilities
 		inline const auto Yellow = Color::RGB(255, 255, 0);
 		inline const auto YellowGreen = Color::RGB(154, 205, 50);
 
+		///@}
 
 		namespace web
 		{
-			/*
-				W3C color names
+			/**
+				@name W3C color names
 				Clashing definitions with X11 color names
+				@{
 			*/
 
 			inline const auto Gray = Color::RGB(128, 128, 128);
 			inline const auto Green = Color::RGB(0, 128, 0);
 			inline const auto Maroon = Color::RGB(128, 0, 0);
 			inline const auto Purple = Color::RGB(128, 0, 128);
+
+			///@}
 		} //web
 
 
 		inline namespace literals
 		{
-			/*
-				User defined literals (UDLs)
+			/**
+				@name User defined literals (UDLs)
 				For hex triplet (rgb) and quartet (rgba) value to color
 				For shorthand hex three-digit (rgb) and four-digit (rgba) value to color
+				@{
 			*/
 
 			inline auto operator""_rgb(unsigned long long value) noexcept
@@ -658,6 +692,8 @@ namespace ion::graphics::utilities
 					   (value > detail::max_hex_three_digit && value <= detail::max_hex_four_digit)); //Shorthand
 				return Color::Hex(static_cast<uint32>(value));
 			}
+
+			///@}
 		} //literals
 	} //color
 } //ion::graphics::utilities
