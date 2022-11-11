@@ -64,22 +64,25 @@ namespace ion::graphics::textures
 			TextureType Type = TextureType::Texture2D;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Checks if two texture handles are equal (all members are equal)
+			///@brief Checks if two texture handles are equal (all members are equal)
 			[[nodiscard]] inline auto operator==(const TextureHandle &rhs) const noexcept
 			{
 				return Id == rhs.Id &&
 					   Type == rhs.Type;
 			}
 
-			//Checks if two texture handles are different (one or more members are different)
+			///@brief Checks if two texture handles are different (one or more members are different)
 			[[nodiscard]] inline auto operator!=(const TextureHandle &rhs) const noexcept
 			{
 				return !(*this == rhs);
 			}
+
+			///@}
 		};
 
 		struct TextureExtents final
@@ -103,8 +106,8 @@ namespace ion::graphics::textures
 	} //texture
 
 
-	//A class representing a texture with min, mag and mip filters that can be clamped or repeated
-	//A texture can be a single file, or part of an texture atlas
+	///@brief A class representing a texture with min, mag and mip filters that can be clamped or repeated
+	///@details A texture can be a single file, or part of an texture atlas
 	class Texture : public resources::FileResource<TextureManager>
 	{
 		private:
@@ -126,172 +129,182 @@ namespace ion::graphics::textures
 
 			using resources::FileResource<TextureManager>::FileResource;
 
-			//Constructs a new texture with the given name, asset name, texture filter for min/mag, mip filter and texture wrap mode for s/t
+			///@brief Constructs a new texture with the given name, asset name, texture filter for min/mag, mip filter and texture wrap mode for s/t
 			Texture(std::string name, std::string asset_name,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode) noexcept;
 
-			//Constructs a new texture with the given name, asset name, texture filter, mip filter and texture wrap mode
+			///@brief Constructs a new texture with the given name, asset name, texture filter, mip filter and texture wrap mode
 			Texture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode) noexcept;
 
-			//Constructs a new texture with the given name, asset name, texture filter and texture wrap mode (no mipmap)
+			///@brief Constructs a new texture with the given name, asset name, texture filter and texture wrap mode (no mipmap)
 			Texture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode) noexcept;
 
 
-			//Constructs a new sub texture with the given name, asset name and atlas region
+			///@brief Constructs a new sub texture with the given name, asset name and atlas region
 			Texture(std::string name, std::string asset_name, const texture::TextureAtlasRegion &atlas_region) noexcept;
 
-			//Constructs a new sub texture with the given name, asset name, atlas region, texture filter for min/mag, mip filter and texture wrap mode for s/t
+			///@brief Constructs a new sub texture with the given name, asset name, atlas region, texture filter for min/mag, mip filter and texture wrap mode for s/t
 			Texture(std::string name, std::string asset_name, const texture::TextureAtlasRegion &atlas_region,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode) noexcept;
 
-			//Constructs a new sub texture with the given name, asset name, atlas region, texture filter, mip filter and texture wrap mode
+			///@brief Constructs a new sub texture with the given name, asset name, atlas region, texture filter, mip filter and texture wrap mode
 			Texture(std::string name, std::string asset_name, const texture::TextureAtlasRegion &atlas_region,
 				texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode) noexcept;
 
-			//Constructs a new sub texture with the given name, asset name, atlas region, texture filter and texture wrap mode (no mipmap)
+			///@brief Constructs a new sub texture with the given name, asset name, atlas region, texture filter and texture wrap mode (no mipmap)
 			Texture(std::string name, std::string asset_name, const texture::TextureAtlasRegion &atlas_region,
 				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode) noexcept;
 
 
-			//Default copy constructor
+			///@brief Default copy constructor
 			Texture(const Texture&) = default;
 
-			//Default move constructor
+			///@brief Default move constructor
 			Texture(Texture&&) = default;
 
-			//Virtual destructor
+			///@brief Virtual destructor
 			virtual ~Texture() = default;
 
+			///@}
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Default copy assignment
+			///@brief Default copy assignment
 			Texture& operator=(const Texture&) = default;
 
-			//Default move assignment
+			///@brief Default move assignment
 			Texture& operator=(Texture&&) = default;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the handle for the texture to the given handle
+			///@brief Sets the handle for the texture to the given handle
 			inline void Handle(std::optional<texture::TextureHandle> handle) noexcept
 			{
 				handle_ = handle;
 			}
 
-			//Sets the pixel data of the texture to the given data
+			///@brief Sets the pixel data of the texture to the given data
 			inline void PixelData(std::string data, const texture::TextureExtents &extents) noexcept
 			{
 				pixel_data_ = std::move(data);
 				extents_ = extents;
 			}
 
-			//Resets the pixel data to save some memory (if not needed anymore)
+			///@brief Resets the pixel data to save some memory (if not needed anymore)
 			inline void ResetPixelData() noexcept
 			{
 				pixel_data_.reset();
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the handle for the texture
-			//Returns nullopt if the texture is not loaded
+			///@brief Returns the handle for the texture
+			///@details Returns nullopt if the texture is not loaded
 			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return handle_;
 			}
 
-			//Returns the pixel data of the texture
-			//Returns nullopt if the texture has not been prepared yet, or is no longer needed (fully loaded or has failed)
+			///@brief Returns the pixel data of the texture
+			///@details Returns nullopt if the texture has not been prepared yet, or is no longer needed (fully loaded or has failed)
 			[[nodiscard]] inline auto& PixelData() const noexcept
 			{
 				return pixel_data_;
 			}
 
-			//Returns the extents of the texture
-			//Returns nullopt if the texture has not been prepared yet
+			///@brief Returns the extents of the texture
+			///@details Returns nullopt if the texture has not been prepared yet
 			[[nodiscard]] inline auto& Extents() const noexcept
 			{
 				return extents_;
 			}
 
-			//Returns the atlas region of the texture
-			//Returns nullopt if the texture is not a sub texture
+			///@brief Returns the atlas region of the texture
+			///@details Returns nullopt if the texture is not a sub texture
 			[[nodiscard]] inline auto& AtlasRegion() const noexcept
 			{
 				return atlas_region_;
 			}
 
 
-			//Returns the min, mag and mip texture filters
+			///@brief Returns the min, mag and mip texture filters
 			[[nodiscard]] inline auto Filter() const noexcept
 			{
 				return std::tuple{min_filter_, mag_filter_, mip_filter_};
 			}
 
-			//Returns the min (minifying) texture filter
+			///@brief Returns the min (minifying) texture filter
 			[[nodiscard]] inline auto MinFilter() const noexcept
 			{
 				return min_filter_;
 			}
 
-			//Returns the mag (magnifying) texture filter
+			///@brief Returns the mag (magnifying) texture filter
 			[[nodiscard]] inline auto MagFilter() const noexcept
 			{
 				return mag_filter_;
 			}
 
-			//Returns the mip (mipmap) filter
-			//Returns nullopt if mipmapping is turned off
+			///@brief Returns the mip (mipmap) filter
+			///@details Returns nullopt if mipmapping is turned off
 			[[nodiscard]] inline auto MipFilter() const noexcept
 			{
 				return mip_filter_;
 			}
 
 
-			//Returns both the s and t texture wrap mode
+			///@brief Returns both the s and t texture wrap mode
 			[[nodiscard]] inline auto WrapMode() const noexcept
 			{
 				return std::pair{s_wrap_mode_, t_wrap_mode_};
 			}
 
-			//Returns the s texture wrap mode
+			///@brief Returns the s texture wrap mode
 			[[nodiscard]] inline auto SWrapMode() const noexcept
 			{
 				return s_wrap_mode_;
 			}
 
-			//Returns the t texture wrap mode
+			///@brief Returns the t texture wrap mode
 			[[nodiscard]] inline auto TWrapMode() const noexcept
 			{
 				return t_wrap_mode_;
 			}
 
+			///@}
 
-			/*
-				Texture coordinates
+			/**
+				@name Texture coordinates
+				@{
 			*/
 
-			//Returns the lower left and upper right texture coordinates for the texture
-			//This is important if one or both of the texture sides are NPOT
-			//Returns nullopt if the texture is missing extents (not loaded)
+			///@brief Returns the lower left and upper right texture coordinates for the texture
+			///@details This is important if one or both of the texture sides are NPOT.
+			///Returns nullopt if the texture is missing extents (not loaded)
 			[[nodiscard]] std::optional<std::pair<Vector2, Vector2>> TexCoords() const noexcept;
 
-			//Returns a pair of true/false to indicate which texture axis is repeatable
-			//Returns nullopt if the texture is missing extents (not loaded)
+			///@brief Returns a pair of true/false to indicate which texture axis is repeatable
+			///@details Returns nullopt if the texture is missing extents (not loaded)
 			[[nodiscard]] std::optional<std::pair<bool, bool>> IsRepeatable() const noexcept;
+
+			///@}
 	};
 } //ion::graphics::textures
 

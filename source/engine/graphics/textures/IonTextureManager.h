@@ -213,8 +213,9 @@ namespace ion::graphics::textures
 			void unload_texture(texture::TextureHandle texture_handle) noexcept;
 
 
-			/*
-				Sub textures
+			/**
+				@name Sub textures
+				@{
 			*/
 
 			void next_sub_texture_position(std::pair<int, int> &position, int rows, int columns,
@@ -223,11 +224,13 @@ namespace ion::graphics::textures
 			std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_texture(
 				const TextureAtlas &texture_atlas, const std::pair<int, int> &position,
 				std::optional<NpotScale> npot_scale) noexcept;
+
+			///@}
 		} //detail
 	} //texture_manager
 
 
-	//A class that manages and stores textures and texture atlases
+	///@brief A class that manages and stores textures and texture atlases
 	class TextureManager final :
 		public resources::FileResourceManager<Texture, TextureManager, assets::repositories::ImageRepository>
 	{
@@ -263,8 +266,9 @@ namespace ion::graphics::textures
 
 		protected:
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
 			bool PrepareResource(Texture &texture) override;
@@ -272,194 +276,213 @@ namespace ion::graphics::textures
 			bool UnloadResource(Texture &texture) noexcept override;
 
 
-			//See FileResourceManager::ResourceLoaded for more details
+			///@brief See FileResourceManager::ResourceLoaded for more details
 			void ResourceLoaded(Texture &texture) noexcept override;
 
-			//See FileResourceManager::ResourceFailed for more details
+			///@brief See FileResourceManager::ResourceFailed for more details
 			void ResourceFailed(Texture &texture) noexcept override;
+
+			///@}
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			TextureManager() noexcept;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			TextureManager(const TextureManager&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			TextureManager(TextureManager&&) = default;
 
-			//Destructor
+			///@brief Destructor
 			~TextureManager() noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			TextureManager& operator=(const TextureManager&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			TextureManager& operator=(TextureManager&&) = default;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all textures in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all textures in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Textures() noexcept
 			{
 				return Resources();
 			}
 
-			//Returns an immutable range of all textures in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all textures in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Textures() const noexcept
 			{
 				return Resources();
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the texture scale used by this manager to the given value
+			///@brief Sets the texture scale used by this manager to the given value
 			inline void TextureNpotScale(std::optional<texture_manager::NpotScale> npot_scale) noexcept
 			{
 				texture_npot_scale_ = npot_scale;
 			}	
 
-			//Sets the texture scale fit used by this manager to the given value
+			///@brief Sets the texture scale fit used by this manager to the given value
 			inline void TextureNpotScaleFit(std::optional<texture_manager::NpotScaleFit> npot_scale_fit) noexcept
 			{
 				texture_npot_scale_fit_ = npot_scale_fit;
 			}
 
-			//Sets the texture scale resampling used by this manager to the given value
+			///@brief Sets the texture scale resampling used by this manager to the given value
 			inline void TextureNpotScaleResampling(texture_manager::NpotScaleResampling npot_scale_resampling) noexcept
 			{
 				texture_npot_scale_resampling_ = npot_scale_resampling;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the texture scale used by this manager when converting from NPOT to POT
-			//Returns nullopt if NPOT textures should not be scaled to POT
+			///@brief Returns the texture scale used by this manager when converting from NPOT to POT
+			///@details Returns nullopt if NPOT textures should not be scaled to POT
 			[[nodiscard]] inline auto& TextureNpotScale() const noexcept
 			{
 				return texture_npot_scale_;
 			}
 
-			//Returns the texture scale fit used by this manager when converting from NPOT to POT
-			//Returns nullopt if best fit is automatically calculated
+			///@brief Returns the texture scale fit used by this manager when converting from NPOT to POT
+			///@details Returns nullopt if best fit is automatically calculated
 			[[nodiscard]] inline auto& TextureNpotScaleFit() const noexcept
 			{
 				return texture_npot_scale_fit_;
 			}
 
-			//Returns the texture scale resampling used by this manager when converting from NPOT to POT
+			///@brief Returns the texture scale resampling used by this manager when converting from NPOT to POT
 			[[nodiscard]] inline auto TextureNpotScaleResampling() const noexcept
 			{
 				return texture_npot_scale_resampling_;
 			}		
 
+			///@}
 
-			/*
-				Textures
+			/**
+				@name Textures
 				Creating
+				@{
 			*/
 
-			//Creates a texture with the given name and asset name
+			///@brief Creates a texture with the given name and asset name
 			NonOwningPtr<Texture> CreateTexture(std::string name, std::string asset_name);
 
-			//Creates a texture with the given name, asset name, texture filter for min/mag, mip filter and texture wrap for s/t
+			///@brief Creates a texture with the given name, asset name, texture filter for min/mag, mip filter and texture wrap for s/t
 			NonOwningPtr<Texture> CreateTexture(std::string name, std::string asset_name,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode);
 
-			//Creates a texture with the given name, asset name, texture filter, mip filter and texture wrap
+			///@brief Creates a texture with the given name, asset name, texture filter, mip filter and texture wrap
 			NonOwningPtr<Texture> CreateTexture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode);
 
-			//Creates a texture with the given name, asset name, texture filter and texture wrap (no mipmap)
+			///@brief Creates a texture with the given name, asset name, texture filter and texture wrap (no mipmap)
 			NonOwningPtr<Texture> CreateTexture(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode);
 
 
-			//Creates a texture as a copy of the given texture
+			///@brief Creates a texture as a copy of the given texture
 			NonOwningPtr<Texture> CreateTexture(const Texture &texture);
 
-			//Creates a texture by moving the given texture
+			///@brief Creates a texture by moving the given texture
 			NonOwningPtr<Texture> CreateTexture(Texture &&texture);
 
+			///@}
 
-			/*
-				Texture atlases
+			/**
+				@name Texture atlases
 				Creating
+				@{
 			*/
 
-			//Creates a texture atlas with the given name, asset name, number of rows, columns, sub textures and sub texture order
-			//Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
+			///@brief Creates a texture atlas with the given name, asset name, number of rows, columns, sub textures and sub texture order
+			///@details Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
 			NonOwningPtr<TextureAtlas> CreateTextureAtlas(std::string name, std::string asset_name,
 				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor);
 
-			//Creates a texture atlas with the given name, asset name, texture filter for min/mag, mip filter, texture wrap for s/t,
-			//number of rows, columns, sub textures and sub texture order
-			//Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
+			///@brief Creates a texture atlas with the given name, asset name, texture filter for min/mag, mip filter, texture wrap for s/t,
+			///number of rows, columns, sub textures and sub texture order
+			///@details Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
 			NonOwningPtr<TextureAtlas> CreateTextureAtlas(std::string name, std::string asset_name,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 				texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode,
 				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor);
 
-			//Creates a texture atlas with the given name, asset name, texture filter, mip filter, texture wrap,
-			//number of rows, columns, sub textures and sub texture order
-			//Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
+			///@brief Creates a texture atlas with the given name, asset name, texture filter, mip filter, texture wrap,
+			///number of rows, columns, sub textures and sub texture order
+			///@details Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
 			NonOwningPtr<TextureAtlas> CreateTextureAtlas(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode,
 				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor);
 
-			//Creates a texture atlas with the given name, asset name, texture filter, texture wrap (no mipmap),
-			//number of rows, columns, sub textures and sub texture order
-			//Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
+			///@brief Creates a texture atlas with the given name, asset name, texture filter, texture wrap (no mipmap),
+			///number of rows, columns, sub textures and sub texture order
+			///@details Creates textures with names <name>_1 to <name>_N, where N is the number of sub textures in the atlas
 			NonOwningPtr<TextureAtlas> CreateTextureAtlas(std::string name, std::string asset_name,
 				texture::TextureFilter filter, texture::TextureWrapMode wrap_mode,
 				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor);
 
+			///@}
 
-			/*
-				Textures
+			/**
+				@name Textures
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable texture with the given name
-			//Returns nullptr if texture could not be found
+			///@brief Gets a pointer to a mutable texture with the given name
+			///@details Returns nullptr if texture could not be found
 			[[nodiscard]] NonOwningPtr<Texture> GetTexture(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable texture with the given name
-			//Returns nullptr if texture could not be found
+			///@brief Gets a pointer to an immutable texture with the given name
+			///@details Returns nullptr if texture could not be found
 			[[nodiscard]] NonOwningPtr<const Texture> GetTexture(std::string_view name) const noexcept;
 
+			///@}
 
-			/*
-				Textures
+			/**
+				@name Textures
 				Removing
+				@{
 			*/
 
-			//Clears all removable textures from this manager
+			///@brief Clears all removable textures from this manager
 			void ClearTextures() noexcept;
 
-			//Removes a removable texture from this manager
+			///@brief Removes a removable texture from this manager
 			bool RemoveTexture(Texture &texture) noexcept;
 
-			//Removes a removable texture with the given name from this manager
+			///@brief Removes a removable texture with the given name from this manager
 			bool RemoveTexture(std::string_view name) noexcept;
+
+			///@}
 	};
 } //ion::graphics::textures
 

@@ -32,7 +32,7 @@ namespace ion::graphics::textures
 	} //frame_sequence::detail
 
 
-	//A class representing a frame sequence that contains one or more frames (textures)
+	///@brief A class representing a frame sequence that contains one or more frames (textures)
 	class FrameSequence final : public managed::ManagedObject<FrameSequenceManager>
 	{
 		private:
@@ -41,12 +41,12 @@ namespace ion::graphics::textures
 
 		public:
 			
-			//Constructs a new frame sequence with the given name and frames (textures)
-			//Duplicate frames are allowed within a frame sequence
+			///@brief Constructs a new frame sequence with the given name and frames (textures)
+			///@details Duplicate frames are allowed within a frame sequence
 			FrameSequence(std::string name, frame_sequence::detail::container_type frames) noexcept;
 
-			//Constructs a new frame sequence with the given name and frame references (textures)
-			//Duplicate frames are allowed within a frame sequence
+			///@brief Constructs a new frame sequence with the given name and frame references (textures)
+			///@details Duplicate frames are allowed within a frame sequence
 			template <typename... Tn, typename = std::enable_if_t<std::conjunction_v<std::is_same<NonOwningPtr<Texture>, Tn>...>>>
 			FrameSequence(std::string name, NonOwningPtr<Texture> frame, Tn ...rest) :
 				FrameSequence{std::move(name), {frame, rest...}}
@@ -54,80 +54,89 @@ namespace ion::graphics::textures
 				//Empty
 			}
 
-			//Constructs a new frame sequence with the given name, first frame (texture) and total frames
-			//Takes the name of the first frame with a numeric suffix and increases it in range [first, total frames)
-			//The generated names must be actual frames located in the same owner as the first frame
-			//First example: frame_0 and 4, produces the sequence: frame_0, frame_1, frame_2, frame_3
-			//Second example: frame_01 and 4, produces the sequence: frame_01, frame_02, frame_03, frame_04
-			//Third example: frame09 and 3, produces the sequence: frame09, frame10, frame11
+			///@brief Constructs a new frame sequence with the given name, first frame (texture) and total frames
+			///@details Takes the name of the first frame with a numeric suffix and increases it in range [first, total frames).
+			///The generated names must be actual frames located in the same owner as the first frame.
+			///First example: frame_0 and 4, produces the sequence: frame_0, frame_1, frame_2, frame_3.
+			///Second example: frame_01 and 4, produces the sequence: frame_01, frame_02, frame_03, frame_04.
+			///Third example: frame09 and 3, produces the sequence: frame09, frame10, frame11
 			FrameSequence(std::string name, NonOwningPtr<Texture> first_frame, int total_frames);
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Returns a pointer to the frame at the given offset
+			///@brief Returns a pointer to the frame at the given offset
 			[[nodiscard]] inline auto operator[](int off) const noexcept
 			{
 				assert(off >= 0 && off < std::ssize(frames_));
 				return frames_[off];
 			}
 
-			
-			/*
-				Ranges
+			///@}
+
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all frames (textures) in this frame sequence
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all frames (textures) in this frame sequence
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Frames() noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<frame_sequence::detail::container_type&>{frames_};
 			}
 
-			//Returns an immutable range of all frames (textures) in this frame sequence
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all frames (textures) in this frame sequence
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Frames() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const frame_sequence::detail::container_type&>{frames_};
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the count of all frames in this frame sequence
+			///@brief Returns the count of all frames in this frame sequence
 			[[nodiscard]] inline auto FrameCount() const noexcept
 			{
 				return std::ssize(frames_);
 			}
 
-			//Returns true if this frame sequence is empty (has no frames)
+			///@brief Returns true if this frame sequence is empty (has no frames)
 			[[nodiscard]] inline auto IsEmpty() const noexcept
 			{
 				return std::empty(frames_);
 			}
 
+			///@}
 
-			/*
-				Frames
+			/**
+				@name Frames
+				@{
 			*/
 
-			//Returns a pointer to the first frame in this frame sequence
-			//Returns nullptr if frame sequence has no frames
+			///@brief Returns a pointer to the first frame in this frame sequence
+			///@details Returns nullptr if frame sequence has no frames
 			[[nodiscard]] inline auto FirstFrame() const noexcept
 			{
 				return !std::empty(frames_) ? frames_.front() : nullptr;
 			}
 
-			//Returns a pointer to the last frame in this frame sequence
-			//Returns nullptr if frame sequence has no frames
+			///@brief Returns a pointer to the last frame in this frame sequence
+			///@details Returns nullptr if frame sequence has no frames
 			[[nodiscard]] inline auto LastFrame() const noexcept
 			{
 				return !std::empty(frames_) ? frames_.back() : nullptr;
 			}
+
+			///@}
 	};
 } //ion::graphics::textures
 

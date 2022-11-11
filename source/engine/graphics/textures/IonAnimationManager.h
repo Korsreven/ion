@@ -27,104 +27,115 @@ namespace ion::graphics::textures
 	} //animation_manager::detail
 
 
-	//A class that manages and stores animations
+	///@brief A class that manages and stores animations
 	class AnimationManager final :
 		public managed::ObjectManager<Animation, AnimationManager>
 	{
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			AnimationManager() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			AnimationManager(const AnimationManager&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			AnimationManager(AnimationManager&&) = default;
 
-			//Destructor
+			///@brief Destructor
 			~AnimationManager() = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			AnimationManager& operator=(const AnimationManager&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			AnimationManager& operator=(AnimationManager&&) = default;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all animations in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all animations in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Animations() noexcept
 			{
 				return Objects();
 			}
 
-			//Returns an immutable range of all animations in this manager
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all animations in this manager
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Animations() const noexcept
 			{
 				return Objects();
 			}
 
+			///@}
 
-			/*
-				Animations
+			/**
+				@name Animations
 				Creating
+				@{
 			*/
 
-			//Creates an animation with the given name, frames, cycle duration, repeat count, playback direction and rate
+			///@brief Creates an animation with the given name, frames, cycle duration, repeat count, playback direction and rate
 			NonOwningPtr<Animation> CreateAnimation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 				duration cycle_duration, std::optional<int> repeat_count = std::nullopt,
 				animation::PlaybackDirection direction = animation::PlaybackDirection::Normal, real playback_rate = 1.0_r);
 
-			//Creates an animation (in normal direction) with the given name, frames, cycle duration, repeat count and playback rate
+			///@brief Creates an animation (in normal direction) with the given name, frames, cycle duration, repeat count and playback rate
 			NonOwningPtr<Animation> CreateAnimation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
 				duration cycle_duration, std::optional<int> repeat_count, real playback_rate);
 
 
-			//Creates an animation as a copy of the given animation
+			///@brief Creates an animation as a copy of the given animation
 			NonOwningPtr<Animation> CreateAnimation(const Animation &animation);
 
-			//Creates an animation by moving the given animation
+			///@brief Creates an animation by moving the given animation
 			NonOwningPtr<Animation> CreateAnimation(Animation &&animation);
 
+			///@}
 
-			/*
-				Animations
+			/**
+				@name Animations
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable animation with the given name
-			//Returns nullptr if animation could not be found
+			///@brief Gets a pointer to a mutable animation with the given name
+			///@details Returns nullptr if animation could not be found
 			[[nodiscard]] NonOwningPtr<Animation> GetAnimation(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable animation with the given name
-			//Returns nullptr if animation could not be found
+			///@brief Gets a pointer to an immutable animation with the given name
+			///@details Returns nullptr if animation could not be found
 			[[nodiscard]] NonOwningPtr<const Animation> GetAnimation(std::string_view name) const noexcept;
 
+			///@}
 
-			/*
-				Animations
+			/**
+				@name Animations
 				Removing
+				@{
 			*/
 
-			//Clears all removable animations from this manager
+			///@brief Clears all removable animations from this manager
 			void ClearAnimations() noexcept;
 
-			//Removes a removable animation from this manager
+			///@brief Removes a removable animation from this manager
 			bool RemoveAnimation(Animation &animation) noexcept;
 
-			//Removes a removable animation with the given name from this manager
+			///@brief Removes a removable animation with the given name from this manager
 			bool RemoveAnimation(std::string_view name) noexcept;
+
+			///@}
 	};
 } //ion::graphics::textures
 
