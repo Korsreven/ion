@@ -46,9 +46,9 @@ namespace ion::graphics::scene::query
 	} //intersection_scene_query
 
 
-	//A class representing an intersection scene query that queries object in a scene or inside a specific region
-	//Queries objects only if a bitwise AND operation between the query mask and the object query flags is non-zero
-	//Unique pairs of intersected objects are returned in the result type
+	///@brief A class representing an intersection scene query that queries object in a scene or inside a specific region
+	///@details Queries objects only if a bitwise AND operation between the query mask and the object query flags is non-zero.
+	///Unique pairs of intersected objects are returned in the result type
 	class IntersectionSceneQuery final : public SceneQuery<intersection_scene_query::ResultType>
 	{
 		private:
@@ -57,19 +57,22 @@ namespace ion::graphics::scene::query
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			IntersectionSceneQuery() = default;
 
-			//Constructs a new scene query with the given scene graph
+			///@brief Constructs a new scene query with the given scene graph
 			IntersectionSceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept;
 
 			
-			/*
-				Querying
+			/**
+				@name Querying
+				@{
 			*/
 
-			//Returns the result of the intersection scene query
+			///@brief Returns the result of the intersection scene query
 			[[nodiscard]] intersection_scene_query::ResultType Execute() const noexcept override;
+
+			///@}
 	};
 } //ion::graphics::scene::query
 

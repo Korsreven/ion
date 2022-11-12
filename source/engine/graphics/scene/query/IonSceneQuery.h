@@ -136,8 +136,8 @@ namespace ion::graphics::scene::query
 	} //scene_query
 
 
-	//A class representing a generic scene query that queries object in a scene or inside a specific region
-	//Queries objects only if a bitwise AND operation between the query mask and the object query flags is non-zero
+	///@brief A class representing a generic scene query that queries object in a scene or inside a specific region
+	///@details Queries objects only if a bitwise AND operation between the query mask and the object query flags is non-zero
 	template <typename ResultT>
 	class SceneQuery
 	{
@@ -151,10 +151,10 @@ namespace ion::graphics::scene::query
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			SceneQuery() = default;
 
-			//Constructs a new scene query with the given scene graph
+			///@brief Constructs a new scene query with the given scene graph
 			SceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept :
 				scene_graph_{scene_graph}
 			{
@@ -162,21 +162,22 @@ namespace ion::graphics::scene::query
 			}
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the query mask for this scene query to the given mask
-			//This scene query will only query objects if a bitwise AND operation between the query mask and the object query flags is non-zero
-			//The meaning of the bits is user-specific
+			///@brief Sets the query mask for this scene query to the given mask
+			///@details This scene query will only query objects if a bitwise AND operation between the query mask and the object query flags is non-zero.
+			///The meaning of the bits is user-specific
 			inline void QueryMask(std::optional<uint32> mask) noexcept
 			{
 				query_mask_ = mask;
 			}
 
-			//Adds the given mask to the already existing query mask for this scene query
-			//This scene query will only query objects if a bitwise AND operation between the query mask and the object query flags is non-zero
-			//The meaning of the bits is user-specific
+			///@brief Adds the given mask to the already existing query mask for this scene query
+			///@details This scene query will only query objects if a bitwise AND operation between the query mask and the object query flags is non-zero.
+			///The meaning of the bits is user-specific
 			inline void AddQueryMask(uint32 mask) noexcept
 			{
 				if (query_mask_)
@@ -185,9 +186,9 @@ namespace ion::graphics::scene::query
 					query_mask_ = mask;
 			}
 
-			//Removes the given mask to the already existing query mask for this scene query
-			//This scene query will only query objects if a bitwise AND operation between the query mask and the object query flags is non-zero
-			//The meaning of the bits is user-specific
+			///@brief Removes the given mask to the already existing query mask for this scene query
+			///@details This scene query will only query objects if a bitwise AND operation between the query mask and the object query flags is non-zero.
+			///The meaning of the bits is user-specific
 			inline void RemoveQueryMask(uint32 mask) noexcept
 			{
 				if (query_mask_)
@@ -195,15 +196,15 @@ namespace ion::graphics::scene::query
 			}
 
 
-			//Sets the query type mask for this scene query to the given mask
-			//This scene query will only query objects if a bitwise AND operation between the query type mask and the object type is non-zero
+			///@brief Sets the query type mask for this scene query to the given mask
+			///@details This scene query will only query objects if a bitwise AND operation between the query type mask and the object type is non-zero
 			inline void QueryTypeMask(std::optional<uint32> mask) noexcept
 			{
 				query_type_mask_ = mask;
 			}
 
-			//Adds the given mask to the already existing query type mask for this scene query
-			//This scene query will only query objects if a bitwise AND operation between the query type mask and the object type is non-zero
+			///@brief Adds the given mask to the already existing query type mask for this scene query
+			///@details This scene query will only query objects if a bitwise AND operation between the query type mask and the object type is non-zero
 			inline void AddQueryTypeMask(uint32 mask) noexcept
 			{
 				if (query_type_mask_)
@@ -212,8 +213,8 @@ namespace ion::graphics::scene::query
 					query_type_mask_ = mask;
 			}
 
-			//Removes the given mask to the already existing query type mask for this scene query
-			//This scene query will only query objects if a bitwise AND operation between the query type mask and the object type is non-zero
+			///@brief Removes the given mask to the already existing query type mask for this scene query
+			///@details This scene query will only query objects if a bitwise AND operation between the query type mask and the object type is non-zero
 			inline void RemoveQueryTypeMask(uint32 mask) noexcept
 			{
 				if (query_type_mask_)
@@ -221,72 +222,78 @@ namespace ion::graphics::scene::query
 			}
 
 
-			//Sets the query region for this scene query to the given region
-			//Pass nullopt to query the entire scene
+			///@brief Sets the query region for this scene query to the given region
+			///@details Pass nullopt to query the entire scene
 			inline void QueryRegion(const Aabb &region) noexcept
 			{
 				query_region_ = region;
 			}
 
-			//Sets whether or not this scene query is only querying visible objects
+			///@brief Sets whether or not this scene query is only querying visible objects
 			inline void OnlyVisibleObjects(bool only_visible) noexcept
 			{
 				only_visible_objects_ = only_visible;
 			}
 
-			//Sets the scene graph this scene query is querying
+			///@brief Sets the scene graph this scene query is querying
 			inline void Scene(NonOwningPtr<SceneGraph> scene_graph) noexcept
 			{
 				scene_graph_ = scene_graph;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the query mask for this scene query
-			//This scene query will only query objects if a bitwise AND operation between the query mask and the query flags is non-zero
-			//The meaning of the bits is user-specific
+			///@brief Returns the query mask for this scene query
+			///@details This scene query will only query objects if a bitwise AND operation between the query mask and the query flags is non-zero.
+			///The meaning of the bits is user-specific
 			[[nodiscard]] inline auto QueryMask() const noexcept
 			{
 				return query_mask_;
 			}
 
-			//Returns the query type mask for this scene query
-			//This scene query will only query objects if a bitwise AND operation between the query type mask and the object type is non-zero
+			///@brief Returns the query type mask for this scene query
+			///@details This scene query will only query objects if a bitwise AND operation between the query type mask and the object type is non-zero
 			[[nodiscard]] inline auto QueryTypeMask() const noexcept
 			{
 				return query_type_mask_;
 			}
 
 
-			//Returns the query region for this scene query
-			//Returns nullopt this scene query is querying the entire scene
+			///@brief Returns the query region for this scene query
+			///@details Returns nullopt this scene query is querying the entire scene
 			[[nodiscard]] inline auto& QueryRegion() const noexcept
 			{
 				return query_region_;
 			}
 
-			//Returns whether or not this scene query is only querying visible objects
+			///@brief Returns whether or not this scene query is only querying visible objects
 			[[nodiscard]] inline auto OnlyVisibleObjects() const noexcept
 			{
 				return only_visible_objects_;
 			}
 
-			//Returns the scene graph this scene query is querying
+			///@brief Returns the scene graph this scene query is querying
 			[[nodiscard]] inline auto Scene() const noexcept
 			{
 				return scene_graph_;
 			}
 
+			///@}
 
-			/*
-				Querying
+			/**
+				@name Querying
+				@{
 			*/
 
-			//Returns the result of the scene query
+			///@brief Returns the result of the scene query
 			[[nodiscard]] virtual ResultT Execute() const noexcept = 0;
+
+			///@}
 	};
 } //ion::graphics::scene::query
 

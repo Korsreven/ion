@@ -38,9 +38,9 @@ namespace ion::graphics::scene::query
 	} //ray_scene_query
 
 
-	//A class representing an intersection scene query that queries object in a scene or inside a specific region
-	//Queries objects only if a bitwise AND operation between the query mask and the object query flags is non-zero
-	//A vector of intersected objects, with distance, are returned in the result type
+	///@brief A class representing an intersection scene query that queries object in a scene or inside a specific region
+	///@details Queries objects only if a bitwise AND operation between the query mask and the object query flags is non-zero.
+	///A vector of intersected objects, with distance, are returned in the result type
 	class RaySceneQuery final : public SceneQuery<ray_scene_query::ResultType>
 	{
 		private:
@@ -51,67 +51,74 @@ namespace ion::graphics::scene::query
 
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			RaySceneQuery() = default;
 
-			//Constructs a new scene query with the given scene graph
+			///@brief Constructs a new scene query with the given scene graph
 			RaySceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept;
 
-			//Constructs a new scene query with the given scene graph and ray
+			///@brief Constructs a new scene query with the given scene graph and ray
 			RaySceneQuery(NonOwningPtr<SceneGraph> scene_graph, const Ray &ray) noexcept;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the ray this ray scene query is using when querying
-			//This ray scene query will only query objects if a bitwise AND operation between the ray query flags and the object query mask is non-zero
-			//The meaning of the bits is user-specific
+			///@brief Sets the ray this ray scene query is using when querying
+			///@details This ray scene query will only query objects if a bitwise AND operation between the ray query flags and the object query mask is non-zero.
+			///The meaning of the bits is user-specific
 			inline void RayQuerier(const Ray &ray, const std::optional<uint32> &query_flags = std::nullopt) noexcept
 			{
 				ray_ = ray;
 				ray_query_flags_ = query_flags;
 			}
 
-			//Sets whether or not to this ray scene query is sorting query results by distance
+			///@brief Sets whether or not to this ray scene query is sorting query results by distance
 			inline void SortByDistance(bool sort) noexcept
 			{
 				sort_by_distance_ = sort;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the ray this ray scene query is using when querying
+			///@brief Returns the ray this ray scene query is using when querying
 			[[nodiscard]] inline auto RayQuerier() const noexcept
 			{
 				return ray_;
 			}
 
-			//Returns the ray query flags this ray scene query is using when querying
-			//This ray scene query will only query objects if a bitwise AND operation between the ray query flags and the object query mask is non-zero
-			//The meaning of the bits is user-specific
+			///@brief Returns the ray query flags this ray scene query is using when querying
+			///@details This ray scene query will only query objects if a bitwise AND operation between the ray query flags and the object query mask is non-zero.
+			///The meaning of the bits is user-specific
 			[[nodiscard]] inline auto RayQueryFlags() const noexcept
 			{
 				return ray_;
 			}
 
-			//Returns whether or not to this ray scene query is sorting query results by distance
+			///@brief Returns whether or not to this ray scene query is sorting query results by distance
 			[[nodiscard]] inline auto SortByDistance() const noexcept
 			{
 				return sort_by_distance_;
 			}
 
+			///@}
 
-			/*
-				Querying
+			/**
+				@name Querying
+				@{
 			*/
 
-			//Returns the result of the ray scene query
+			///@brief Returns the result of the ray scene query
 			[[nodiscard]] ray_scene_query::ResultType Execute() const noexcept override;
+
+			///@}
 	};
 } //ion::graphics::scene::query
 
