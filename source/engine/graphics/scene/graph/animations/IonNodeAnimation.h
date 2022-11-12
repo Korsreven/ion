@@ -90,8 +90,9 @@ namespace ion::graphics::scene::graph::animations
 			};
 
 
-			/*
-				Curves
+			/**
+				@name Curves
+				@{
 			*/
 
 			inline auto cubic(real percent, real min, real max) noexcept
@@ -142,9 +143,11 @@ namespace ion::graphics::scene::graph::animations
 				return math::Normalize(std::tanh(x), std::tanh(min), std::tanh(max));
 			}
 
+			///@}
 
-			/*
-				Actions
+			/**
+				@name Actions
+				@{
 			*/
 
 			struct action
@@ -182,9 +185,11 @@ namespace ion::graphics::scene::graph::animations
 				}
 			};
 
+			///@}
 
-			/*
-				Motions
+			/**
+				@name Motions
+				@{
 			*/
 
 			struct motion
@@ -258,9 +263,11 @@ namespace ion::graphics::scene::graph::animations
 				}
 			};
 
+			///@}
 
-			/*
-				Actions
+			/**
+				@name Actions
+				@{
 			*/
 
 			bool execute_action(action &a, duration time, duration current_time, duration start_time) noexcept;
@@ -268,9 +275,11 @@ namespace ion::graphics::scene::graph::animations
 			void elapse_action(NodeAnimation &animation, node_action &a, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_action(NodeAnimation &animation, user_action &a, duration time, duration current_time, duration start_time) noexcept;
 
+			///@}
 
-			/*
-				Motions
+			/**
+				@name Motions
+				@{
 			*/
 
 			real move_amount(moving_amount &value, real percent) noexcept;
@@ -280,12 +289,14 @@ namespace ion::graphics::scene::graph::animations
 			void elapse_motion(NodeAnimation &animation, scaling_motion &m, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_motion(NodeAnimation &animation, translating_motion &m, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_motion(NodeAnimation &animation, user_motion &m, duration time, duration current_time, duration start_time) noexcept;
+
+			///@}
 		} //detail
 	} //node_animation
 
 
-	//A class representing a node animation that can contain both actions and motions
-	//A node animation can be seen as a timeline where the total duration is calculated from all of the added action/motions
+	///@brief A class representing a node animation that can contain both actions and motions
+	///@details A node animation can be seen as a timeline where the total duration is calculated from all of the added action/motions
 	class NodeAnimation final : public managed::ManagedObject<NodeAnimationManager>
 	{
 		private:
@@ -306,173 +317,188 @@ namespace ion::graphics::scene::graph::animations
 			using managed::ManagedObject<NodeAnimationManager>::ManagedObject;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the on start callback
+			///@brief Sets the on start callback
 			inline void OnStart(events::Callback<void, NodeAnimation&> on_start) noexcept
 			{
 				on_start_ = on_start;
 			}
 
-			//Sets the on start callback
+			///@brief Sets the on start callback
 			inline void OnStart(std::nullopt_t) noexcept
 			{
 				on_start_ = {};
 			}
 
 
-			//Sets the on finish callback
+			///@brief Sets the on finish callback
 			inline void OnFinish(events::Callback<void, NodeAnimation&> on_finish) noexcept
 			{
 				on_finish_ = on_finish;
 			}
 
-			//Sets the on finish callback
+			///@brief Sets the on finish callback
 			inline void OnFinish(std::nullopt_t) noexcept
 			{
 				on_finish_ = {};
 			}
 
 
-			//Sets the on finish revert callback
+			///@brief Sets the on finish revert callback
 			inline void OnFinishRevert(events::Callback<void, NodeAnimation&> on_finish_revert) noexcept
 			{
 				on_finish_revert_ = on_finish_revert;
 			}
 
-			//Sets the on finish revert callback
+			///@brief Sets the on finish revert callback
 			inline void OnFinishRevert(std::nullopt_t) noexcept
 			{
 				on_finish_revert_ = {};
 			}
 
 
-			//Resets this node animation
+			///@brief Resets this node animation
 			void Reset() noexcept;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the total duration of this node animation
+			///@brief Returns the total duration of this node animation
 			[[nodiscard]] inline auto TotalDuration() const noexcept
 			{
 				return total_duration_;
 			}
 
 
-			//Returns the on start callback
+			///@brief Returns the on start callback
 			[[nodiscard]] inline auto OnStart() const noexcept
 			{
 				return on_start_;
 			}
 
-			//Returns the on finish callback
+			///@brief Returns the on finish callback
 			[[nodiscard]] inline auto OnFinish() const noexcept
 			{
 				return on_finish_;
 			}
 
-			//Returns the on finish revert callback
+			///@brief Returns the on finish revert callback
 			[[nodiscard]] inline auto OnFinishRevert() const noexcept
 			{
 				return on_finish_revert_;
 			}
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses the total time for this node animation group by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for this node animation group by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time, duration current_time, duration start_time) noexcept;
 
-			//Elapses the total time for this node animation group by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for this node animation group by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(NodeAnimation &animation, duration time, duration current_time, duration start_time) noexcept;
 
+			///@}
 
-			/*
-				Playback
+			/**
+				@name Playback
+				@{
 			*/
 
-			//Returns a newly created timeline with this animation attached to it
+			///@brief Returns a newly created timeline with this animation attached to it
 			NonOwningPtr<NodeAnimationTimeline> Start(real playback_rate = 1.0_r, bool running = true);
 
+			///@}
 
-			/*
-				Actions
+			/**
+				@name Actions
+				@{
 			*/
 
-			//Adds an action to this node animation with the given type and execution time
+			///@brief Adds an action to this node animation with the given type and execution time
 			void AddAction(node_animation::NodeActionType type, duration time);
 
 
-			//Adds a user defined action to this node animation with the given callback and execution time
+			///@brief Adds a user defined action to this node animation with the given callback and execution time
 			void AddAction(events::Callback<void, NodeAnimation&, std::any&> on_execute,
 				duration time, std::any user_data = {});
 
-			//Adds a user defined action to this node animation with the given callback, opposite callback and execution time
-			//The opposite callback is called instead of the regular callback when an animation is in reverse
+			///@brief Adds a user defined action to this node animation with the given callback, opposite callback and execution time
+			///@details The opposite callback is called instead of the regular callback when an animation is in reverse
 			void AddAction(events::Callback<void, NodeAnimation&, std::any&> on_execute,
 				events::Callback<void, NodeAnimation&, std::any&> on_execute_opposite,
 				duration time, std::any user_data = {});
 
 
-			//Clears all actions from this node animation
+			///@brief Clears all actions from this node animation
 			void ClearActions() noexcept;
 
+			///@}
 
-			/*
-				Motions
+			/**
+				@name Motions
+				@{
 			*/
 
-			//Adds a user defined motion to this node animation with the given target amount, total duration and callback
+			///@brief Adds a user defined motion to this node animation with the given target amount, total duration and callback
 			void AddMotion(real target_amount, duration total_duration,
 				events::Callback<void, NodeAnimation&, real> on_elapse, duration start_time = 0.0_sec,
 				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
 
 
-			//Adds a rotation motion to this node animation with the given angle (in radians) and total duration
+			///@brief Adds a rotation motion to this node animation with the given angle (in radians) and total duration
 			void AddRotation(real angle, duration total_duration, duration start_time = 0.0_sec,
 				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
 
 
-			//Adds a scaling motion to this node animation with the given unit and total duration
+			///@brief Adds a scaling motion to this node animation with the given unit and total duration
 			void AddScaling(const Vector2 &unit, duration total_duration, duration start_time = 0.0_sec,
 				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
 
-			//Adds a scaling motion to this node animation with the given unit and total duration
+			///@brief Adds a scaling motion to this node animation with the given unit and total duration
 			void AddScaling(const Vector2 &unit, duration total_duration, duration start_time,
 				node_animation::MotionTechnique technique_x,
 				node_animation::MotionTechnique technique_y);
 
 
-			//Adds a translation motion to this node animation with the given unit and total duration
+			///@brief Adds a translation motion to this node animation with the given unit and total duration
 			void AddTranslation(const Vector3 &unit, duration total_duration, duration start_time = 0.0_sec,
 				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
 
-			//Adds a translation motion to this node animation with the given unit and total duration
+			///@brief Adds a translation motion to this node animation with the given unit and total duration
 			void AddTranslation(const Vector3 &unit, duration total_duration, duration start_time,
 				node_animation::MotionTechnique technique_x,
 				node_animation::MotionTechnique technique_y,
 				node_animation::MotionTechnique technique_z);
 
 
-			//Clears all motions from this node animation
+			///@brief Clears all motions from this node animation
 			void ClearMotions() noexcept;
 
+			///@}
 
-			/*
-				Actions/motions
+			/**
+				@name Actions/motions
+				@{
 			*/
 
-			//Clears all actions and motions from this node animation
+			///@brief Clears all actions and motions from this node animation
 			void Clear() noexcept;
+
+			///@}
 	};
 } //ion::graphics::scene::graph::animations
 

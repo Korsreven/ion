@@ -37,8 +37,8 @@ namespace ion::graphics::scene::graph::animations
 	} //node_animation_group
 
 
-	//A class representing a node animation group that can contain multiple node animations
-	//A node animation group can be seen as a timeline where the total duration is calculated from all of the added node animations
+	///@brief A class representing a node animation group that can contain multiple node animations
+	///@details A node animation group can be seen as a timeline where the total duration is calculated from all of the added node animations
 	class NodeAnimationGroup final : public managed::ManagedObject<NodeAnimationManager>
 	{
 		private:
@@ -51,61 +51,72 @@ namespace ion::graphics::scene::graph::animations
 			using managed::ManagedObject<NodeAnimationManager>::ManagedObject;
 
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all node animations in this node animation group
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all node animations in this node animation group
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Animations() noexcept
 			{
 				return adaptors::ranges::Iterable<node_animation_group::detail::animation_container&>{animations_};
 			}
 
-			//Returns an immutable range of all node animations in this node animation group
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all node animations in this node animation group
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Animations() const noexcept
 			{
 				return adaptors::ranges::Iterable<const node_animation_group::detail::animation_container&>{animations_};
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Resets this node animation group
+			///@brief Resets this node animation group
 			void Reset() noexcept;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the total duration of this node animation group
+			///@brief Returns the total duration of this node animation group
 			[[nodiscard]] inline auto TotalDuration() const noexcept
 			{
 				return total_duration_;
 			}
 
+			///@}
 
-			/*
-				Playback
+			/**
+				@name Playback
+				@{
 			*/
 
-			//Returns a newly created timeline with this animation group attached to it
+			///@brief Returns a newly created timeline with this animation group attached to it
 			NonOwningPtr<NodeAnimationTimeline> Start(real playback_rate = 1.0_r, bool running = true) noexcept;
 
+			///@}
 
-			/*
-				Node animations
+			/**
+				@name Node animations
+				@{
 			*/
 
-			//Adds the given node animation to this node animation group
+			///@brief Adds the given node animation to this node animation group
 			void Add(NonOwningPtr<NodeAnimation> node_animation, duration start_time = 0.0_sec, bool enabled = true);
 
-			//Clears all node animations from this node animation group
+			///@brief Clears all node animations from this node animation group
 			void Clear() noexcept;
+
+			///@}
 	};
 } //ion::graphics::scene::graph::animations
 

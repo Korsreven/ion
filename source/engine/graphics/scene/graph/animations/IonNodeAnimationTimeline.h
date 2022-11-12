@@ -48,8 +48,8 @@ namespace ion::graphics::scene::graph::animations
 	} //node_animation_timeline::detail
 
 
-	//A class representing a node animation timeline that can contain both node animations and animation groups
-	//The total duration of a timeline is calculated from all of the added animations and animation groups
+	///@brief A class representing a node animation timeline that can contain both node animations and animation groups
+	///@details The total duration of a timeline is calculated from all of the added animations and animation groups
 	class NodeAnimationTimeline final :
 		public managed::ManagedObject<NodeAnimationManager>,
 		public managed::ObjectManager<AttachableNodeAnimation, NodeAnimationTimeline>,
@@ -81,17 +81,17 @@ namespace ion::graphics::scene::graph::animations
 				Events
 			*/
 
-			//See ObjectManager::Created for more details
+			///@brief See ObjectManager::Created for more details
 			void Created(AttachableNodeAnimation &animation) noexcept override final;
 
-			//See ObjectManager::Created for more details
+			///@brief See ObjectManager::Created for more details
 			void Created(AttachableNodeAnimationGroup &animation_group) noexcept override final;
 
 
-			//See ObjectManager::Removed for more details
+			///@brief See ObjectManager::Removed for more details
 			void Removed(AttachableNodeAnimation &animation) noexcept override final;
 
-			//See ObjectManager::Removed for more details
+			///@brief See ObjectManager::Removed for more details
 			void Removed(AttachableNodeAnimationGroup &animation_group) noexcept override final;
 
 		public:
@@ -102,13 +102,13 @@ namespace ion::graphics::scene::graph::animations
 
 			using managed::ManagedObject<NodeAnimationManager>::ManagedObject;
 
-			//Constructs a new timeline with the given name, playback rate and whether it is running or not
+			///@brief Constructs a new timeline with the given name, playback rate and whether it is running or not
 			explicit NodeAnimationTimeline(std::optional<std::string> name = {}, real playback_rate = 1.0_r, bool running = true) noexcept;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			NodeAnimationTimeline(const NodeAnimationTimeline&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			NodeAnimationTimeline(NodeAnimationTimeline&&) = default;
 
 
@@ -116,10 +116,10 @@ namespace ion::graphics::scene::graph::animations
 				Operators
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			NodeAnimationTimeline& operator=(const NodeAnimationTimeline&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			NodeAnimationTimeline& operator=(NodeAnimationTimeline&&) = default;
 
 
@@ -127,30 +127,30 @@ namespace ion::graphics::scene::graph::animations
 				Ranges
 			*/
 
-			//Returns a mutable range of all attached node animations in this timeline
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all attached node animations in this timeline
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedAnimations() noexcept
 			{
 				return NodeAnimationBase::Objects();
 			}
 
-			//Returns an immutable range of all attached node animations in this timeline
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all attached node animations in this timeline
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedAnimations() const noexcept
 			{
 				return NodeAnimationBase::Objects();
 			}
 
 
-			//Returns a mutable range of all attached node animation groups in this timeline
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all attached node animation groups in this timeline
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedAnimationGroups() noexcept
 			{
 				return NodeAnimationGroupBase::Objects();
 			}
 
-			//Returns an immutable range of all attached node animation groups in this timeline
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all attached node animation groups in this timeline
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedAnimationGroups() const noexcept
 			{
 				return NodeAnimationGroupBase::Objects();
@@ -161,12 +161,12 @@ namespace ion::graphics::scene::graph::animations
 				Modifiers
 			*/
 
-			//Sets the given repeat count to the given value
-			//A repeat count of 0 means that the timeline will not loop
-			//If repeat count is nullopt, the timeline will loop indefinitely
+			///@brief Sets the given repeat count to the given value
+			///@details A repeat count of 0 means that the timeline will not loop.
+			///If repeat count is nullopt, the timeline will loop indefinitely
 			void RepeatCount(std::optional<int> repeat_count) noexcept;
 
-			//Sets the given playback rate to the given rate in range (0.0, oo)
+			///@brief Sets the given playback rate to the given rate in range (0.0, oo)
 			inline void PlaybackRate(real rate) noexcept
 			{
 				if (rate > 0.0_r)
@@ -174,47 +174,47 @@ namespace ion::graphics::scene::graph::animations
 			}
 
 
-			//Sets the on finish callback
+			///@brief Sets the on finish callback
 			inline void OnFinish(events::Callback<void, NodeAnimationTimeline&> on_finish) noexcept
 			{
 				on_finish_ = on_finish;
 			}
 
-			//Sets the on finish callback
+			///@brief Sets the on finish callback
 			inline void OnFinish(std::nullopt_t) noexcept
 			{
 				on_finish_ = {};
 			}
 
 
-			//Sets the on finish cycle callback
+			///@brief Sets the on finish cycle callback
 			inline void OnFinishCycle(events::Callback<void, NodeAnimationTimeline&> on_finish_cycle) noexcept
 			{
 				on_finish_cycle_ = on_finish_cycle;
 			}
 
-			//Sets the on finish cycle callback
+			///@brief Sets the on finish cycle callback
 			inline void OnFinishCycle(std::nullopt_t) noexcept
 			{
 				on_finish_cycle_ = {};
 			}
 
 
-			//Sets the on finish revert callback
+			///@brief Sets the on finish revert callback
 			inline void OnFinishRevert(events::Callback<void, NodeAnimationTimeline&> on_finish_revert) noexcept
 			{
 				on_finish_revert_ = on_finish_revert;
 			}
 
-			//Sets the on finish revert callback
+			///@brief Sets the on finish revert callback
 			inline void OnFinishRevert(std::nullopt_t) noexcept
 			{
 				on_finish_revert_ = {};
 			}
 
 
-			//Refreshes the current time and total duration of this timeline
-			//This function is typically called by an attached animation or animation group
+			///@brief Refreshes the current time and total duration of this timeline
+			///@details This function is typically called by an attached animation or animation group
 			void Refresh() noexcept;
 
 
@@ -222,57 +222,57 @@ namespace ion::graphics::scene::graph::animations
 				Observers
 			*/
 
-			//Returns the current time of this timeline
+			///@brief Returns the current time of this timeline
 			[[nodiscard]] inline auto CurrentTime() const noexcept
 			{
 				return current_time_;
 			}
 
-			//Returns the total duration of this timeline
+			///@brief Returns the total duration of this timeline
 			[[nodiscard]] inline auto TotalDuration() const noexcept
 			{
 				return total_duration_;
 			}
 
-			//Returns the total percent of this timeline
+			///@brief Returns the total percent of this timeline
 			[[nodiscard]] inline auto TotalPercent() const noexcept
 			{
 				return current_time_ / total_duration_;
 			}
 
-			//Returns the playback rate of this timeline
+			///@brief Returns the playback rate of this timeline
 			[[nodiscard]] inline auto PlaybackRate() const noexcept
 			{
 				return playback_rate_;
 			}
 
 
-			//Returns true if this timeline is running
+			///@brief Returns true if this timeline is running
 			[[nodiscard]] inline auto IsRunning() const noexcept
 			{
 				return running_;
 			}
 
-			//Returns true if this timeline is currently in reverse
+			///@brief Returns true if this timeline is currently in reverse
 			[[nodiscard]] inline auto InReverse() const noexcept
 			{
 				return reverse_;
 			}
 
 
-			//Returns the on finish callback
+			///@brief Returns the on finish callback
 			[[nodiscard]] inline auto OnFinish() const noexcept
 			{
 				return on_finish_;
 			}
 
-			//Returns the on finish cycle callback
+			///@brief Returns the on finish cycle callback
 			[[nodiscard]] inline auto OnFinishCycle() const noexcept
 			{
 				return on_finish_cycle_;
 			}
 
-			//Returns the on finish revert callback
+			///@brief Returns the on finish revert callback
 			[[nodiscard]] inline auto OnFinishRevert() const noexcept
 			{
 				return on_finish_revert_;
@@ -283,22 +283,22 @@ namespace ion::graphics::scene::graph::animations
 				Playback
 			*/
 
-			//Starts or resumes, timeline playback
+			///@brief Starts or resumes, timeline playback
 			void Start() noexcept;
 
-			//Stops timeline playback
+			///@brief Stops timeline playback
 			void Stop() noexcept;
 
-			//Stops timeline playback and reset elapsed time to zero
+			///@brief Stops timeline playback and reset elapsed time to zero
 			void Reset() noexcept;
 
-			//Stops, resets and starts timeline playback
+			///@brief Stops, resets and starts timeline playback
 			void Restart() noexcept;
 
 
-			//Reverts this timeline back to start by the given duration
-			//The timeline is reverted by reversing the timeline playback
-			//A total duration of 0 seconds is instantaneous
+			///@brief Reverts this timeline back to start by the given duration
+			///@details The timeline is reverted by reversing the timeline playback.
+			///A total duration of 0 seconds is instantaneous
 			void Revert(duration total_duration = 0.0_sec);
 
 
@@ -307,7 +307,7 @@ namespace ion::graphics::scene::graph::animations
 				Attaching
 			*/
 
-			//Attaches the given node animation, to this timeline
+			///@brief Attaches the given node animation, to this timeline
 			NonOwningPtr<AttachableNodeAnimation> Attach(NonOwningPtr<NodeAnimation> node_animation,
 				duration start_time = 0.0_sec, bool enabled = true);
 
@@ -317,10 +317,10 @@ namespace ion::graphics::scene::graph::animations
 				Detaching
 			*/
 
-			//Detaches all removable node animations from this timeline
+			///@brief Detaches all removable node animations from this timeline
 			void DetachAllAnimations() noexcept;
 
-			//Detaches a removable node animation from this timeline
+			///@brief Detaches a removable node animation from this timeline
 			bool DetachAnimation(AttachableNodeAnimation &node_animation) noexcept;
 
 
@@ -329,7 +329,7 @@ namespace ion::graphics::scene::graph::animations
 				Attaching
 			*/
 
-			//Attaches the given node animation group, to this timeline
+			///@brief Attaches the given node animation group, to this timeline
 			NonOwningPtr<AttachableNodeAnimationGroup> Attach(NonOwningPtr<NodeAnimationGroup> node_animation_group,
 				duration start_time = 0.0_sec, bool enabled = true);
 
@@ -339,10 +339,10 @@ namespace ion::graphics::scene::graph::animations
 				Detaching
 			*/
 
-			//Detaches all removable node animation groups from this timeline
+			///@brief Detaches all removable node animation groups from this timeline
 			void DetachAllAnimationGroups() noexcept;
 
-			//Detaches a removable node animation group from this timeline
+			///@brief Detaches a removable node animation group from this timeline
 			bool DetachAnimationGroup(AttachableNodeAnimationGroup &node_animation_group) noexcept;
 
 
@@ -350,7 +350,7 @@ namespace ion::graphics::scene::graph::animations
 				Detaching
 			*/
 
-			//Detaches all removable node animations and animation groups from this timeline
+			///@brief Detaches all removable node animations and animation groups from this timeline
 			void DetachAll() noexcept;
 
 
@@ -358,8 +358,8 @@ namespace ion::graphics::scene::graph::animations
 				Elapse time
 			*/
 
-			//Elapses the total time for this timeline by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for this timeline by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 	};
 } //ion::graphics::scene::graph::animations

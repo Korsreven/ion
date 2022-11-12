@@ -33,7 +33,7 @@ namespace ion::graphics::scene::graph::animations
 	} //attachable_node_animation
 
 
-	//A class representing an instantiation of a node animation, meaning an animation that is attached to a timeline
+	///@brief A class representing an instantiation of a node animation, meaning an animation that is attached to a timeline
 	class AttachableNodeAnimation final : public managed::ManagedObject<NodeAnimationTimeline>
 	{
 		private:
@@ -49,35 +49,36 @@ namespace ion::graphics::scene::graph::animations
 
 		public:
 
-			//Constructs a new attachable node animation with the given node animation, start time and whether it is enabled or not
+			///@brief Constructs a new attachable node animation with the given node animation, start time and whether it is enabled or not
 			explicit AttachableNodeAnimation(NonOwningPtr<NodeAnimation> node_animation,
 				duration start_time = 0.0_sec, bool enabled = true) noexcept;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the start time of this node animation to the given time
+			///@brief Sets the start time of this node animation to the given time
 			inline void StartTime(duration time) noexcept
 			{
 				start_time_ = time;
 				NotifyUpdate();
 			}
 
-			//Enables the node animation
+			///@brief Enables the node animation
 			inline void Enable() noexcept
 			{
 				enabled_ = true;
 			}
 
-			//Disables the node animation
+			///@brief Disables the node animation
 			inline void Disable() noexcept
 			{
 				enabled_ = false;
 			}
 
-			//Sets whether or not the node animation is enabled
+			///@brief Sets whether or not the node animation is enabled
 			inline void Enabled(bool enabled) noexcept
 			{
 				if (enabled)
@@ -87,24 +88,26 @@ namespace ion::graphics::scene::graph::animations
 			}
 
 
-			//Resets this node animation
+			///@brief Resets this node animation
 			void Reset() noexcept;
 
-			//Reverts to the initial node animation
+			///@brief Reverts to the initial node animation
 			void Revert();
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the start time of this node animation
+			///@brief Returns the start time of this node animation
 			[[nodiscard]] inline auto StartTime() const noexcept
 			{
 				return start_time_;
 			}
 
-			//Returns the total duration of this node animation
+			///@brief Returns the total duration of this node animation
 			[[nodiscard]] inline auto TotalDuration() const noexcept
 			{
 				return node_animation_ ?
@@ -112,27 +115,31 @@ namespace ion::graphics::scene::graph::animations
 					0.0_sec;
 			}
 
-			//Returns true if the node animation is enabled
+			///@brief Returns true if the node animation is enabled
 			[[nodiscard]] inline auto IsEnabled() const noexcept
 			{
 				return enabled_;
 			}
 
 
-			//Returns an immutable reference to the node animation
+			///@brief Returns an immutable reference to the node animation
 			[[nodiscard]] auto& Get() const noexcept
 			{
 				return node_animation_;
 			}
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses the total time for this node animation by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for this node animation by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time, duration current_time, duration start_time = 0.0_sec) noexcept;
+
+			///@}
 	};
 } //ion::graphics::scene::graph::animations
 

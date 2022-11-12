@@ -80,8 +80,9 @@ namespace ion::graphics::scene::graph
 			using light_container = std::vector<Light*>;
 
 
-			/*
-				Nodes
+			/**
+				@name Nodes
+				@{
 			*/
 
 			struct node_comparator
@@ -177,9 +178,11 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
+			///@}
 
-			/*
-				Objects
+			/**
+				@name Objects
+				@{
 			*/
 
 			template <typename Container, typename Compare = std::less<>>
@@ -260,9 +263,11 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
+			///@}
 
-			/*
-				Searching
+			/**
+				@name Searching
+				@{
 			*/
 
 			void breadth_first_search_impl(node_container &result, size_t off);
@@ -272,9 +277,11 @@ namespace ion::graphics::scene::graph
 			node_container breadth_first_search(const SceneNode &node);
 			node_container depth_first_search(const SceneNode &node, DepthFirstTraversal traversal);
 
+			///@}
 
-			/*
-				Transformation
+			/**
+				@name Transformation
+				@{
 			*/
 
 			inline auto to_scaling3(const Vector2 &scaling) noexcept
@@ -284,13 +291,15 @@ namespace ion::graphics::scene::graph
 			}
 
 			Matrix4 make_transformation(const Vector3 &position, real rotation, const Vector2 &scaling) noexcept;
+
+			///@}
 		} //detail
 	} //scene_node
 
 
-	//A class representing a transformable scene node in a scene graph
-	//A scene node can contain multiple attached movable objects, as well as node animations
-	//All transformations are relative to the parent node
+	///@brief A class representing a transformable scene node in a scene graph
+	///@details A scene node can contain multiple attached movable objects, as well as node animations.
+	///All transformations are relative to the parent node
 	class SceneNode final : public animations::NodeAnimationManager
 	{
 		private:
@@ -335,8 +344,9 @@ namespace ion::graphics::scene::graph
 			mutable bool transformation_out_of_date_ = true;
 
 
-			/*
-				Notifying
+			/**
+				@name Notifying
+				@{
 			*/
 
 			void NotifyRemoved() noexcept;
@@ -344,17 +354,21 @@ namespace ion::graphics::scene::graph
 			void NotifyUpdate() noexcept;
 			void NotifyUpdateZ() noexcept;		
 
+			///@}
 
-			/*
-				Updating
+			/**
+				@name Updating
+				@{
 			*/
 
 			void Update() const noexcept;
 			void UpdateZ() const noexcept;
 
+			///@}
 
-			/*
-				Helper functions
+			/**
+				@name Helper functions
+				@{
 			*/
 
 			void AddNode(scene_node::detail::node_container &dest_nodes, SceneNode *node);
@@ -387,48 +401,51 @@ namespace ion::graphics::scene::graph
 
 			void Tidy();
 
+			///@}
+
 		public:
 
-			//Constructs a scene node as the root with the given name and visibility
+			///@brief Constructs a scene node as the root with the given name and visibility
 			explicit SceneNode(std::optional<std::string> name = {}, bool visible = true) noexcept;
 
-			//Constructs a scene node as the root with the given name, initial direction and visibility
+			///@brief Constructs a scene node as the root with the given name, initial direction and visibility
 			SceneNode(std::optional<std::string> name, const Vector2 &initial_direction, bool visible = true) noexcept;
 
-			//Constructs a scene node as the root with the given name, position, initial direction and visibility
+			///@brief Constructs a scene node as the root with the given name, position, initial direction and visibility
 			SceneNode(std::optional<std::string> name, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY, bool visible = true) noexcept;
 
 
-			//Constructs a scene node as a child with the given name and parent
+			///@brief Constructs a scene node as a child with the given name and parent
 			SceneNode(std::optional<std::string> name, SceneNode &parent_node) noexcept;
 
-			//Constructs a scene node as a child with the given name, parent and initial direction
+			///@brief Constructs a scene node as a child with the given name, parent and initial direction
 			SceneNode(std::optional<std::string> name, SceneNode &parent_node, const Vector2 &initial_direction) noexcept;
 
-			//Constructs a scene node as a child with the given name, parent, position and initial direction
+			///@brief Constructs a scene node as a child with the given name, parent, position and initial direction
 			SceneNode(std::optional<std::string> name, SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY) noexcept;
 
 
-			//Constructs a scene node as a child with the given name, parent and visibility
+			///@brief Constructs a scene node as a child with the given name, parent and visibility
 			SceneNode(std::optional<std::string> name, SceneNode &parent_node, bool visible) noexcept;
 
-			//Constructs a scene node as a child with the given name, parent, initial direction and visibility
+			///@brief Constructs a scene node as a child with the given name, parent, initial direction and visibility
 			SceneNode(std::optional<std::string> name, SceneNode &parent_node, const Vector2 &initial_direction, bool visible) noexcept;
 
-			//Constructs a scene node as a child with the given name, parent, position, initial direction and visibility
+			///@brief Constructs a scene node as a child with the given name, parent, position, initial direction and visibility
 			SceneNode(std::optional<std::string> name, SceneNode &parent_node, const Vector3 &position, const Vector2 &initial_direction, bool visible) noexcept;
 
 
-			//Virtual destructor
+			///@brief Virtual destructor
 			virtual ~SceneNode() noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Checks if one node is less than another one (z-order wise)
-			//Needed for sorting two nodes (strict weak ordering)
+			///@brief Checks if one node is less than another one (z-order wise)
+			///@details Needed for sorting two nodes (strict weak ordering)
 			[[nodiscard]] inline auto operator<(const SceneNode &rhs) const noexcept
 			{
 				if (need_z_update_)
@@ -440,125 +457,131 @@ namespace ion::graphics::scene::graph
 				return derived_position_.Z() < rhs.derived_position_.Z();
 			}
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all child nodes
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all child nodes
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto ChildNodes() noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<scene_node::SceneNodes&>{child_nodes_};
 			}
 
-			//Returns an immutable range of all child nodes
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all child nodes
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto ChildNodes() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const scene_node::SceneNodes&>{child_nodes_};
 			}
 
 
-			//Returns a mutable range of all objects attached to this node
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all objects attached to this node
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedObjects() noexcept
 			{
 				return adaptors::ranges::Iterable<scene_node::detail::object_container&>{attached_objects_};
 			}
 
-			//Returns an immutable range of all objects attached to this node
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all objects attached to this node
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedObjects() const noexcept
 			{
 				return adaptors::ranges::Iterable<const scene_node::detail::object_container&>{attached_objects_};
 			}
 
 
-			//Returns a mutable (BFS) range of all descendant nodes of this node
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable (BFS) range of all descendant nodes of this node
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto BreadthFirstSearch()
 			{
 				return adaptors::ranges::DereferenceIterable<scene_node::detail::node_container>{scene_node::detail::breadth_first_search(*this)};
 			}
 
-			//Returns an immutable (BFS) range of all descendant nodes of this node
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable (BFS) range of all descendant nodes of this node
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto BreadthFirstSearch() const
 			{
 				return adaptors::ranges::DereferenceIterable<const scene_node::detail::node_container>{scene_node::detail::breadth_first_search(*this)};
 			}
 
-			//Returns a mutable (DFS) range of all descendant nodes of this node
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable (DFS) range of all descendant nodes of this node
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto DepthFirstSearch(scene_node::DepthFirstTraversal traversal = scene_node::DepthFirstTraversal::PreOrder)
 			{
 				return adaptors::ranges::DereferenceIterable<scene_node::detail::node_container>{scene_node::detail::depth_first_search(*this, traversal)};
 			}
 
-			//Returns an immutable (DFS) range of all descendant nodes of this node
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable (DFS) range of all descendant nodes of this node
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto DepthFirstSearch(scene_node::DepthFirstTraversal traversal = scene_node::DepthFirstTraversal::PreOrder) const
 			{
 				return adaptors::ranges::DereferenceIterable<const scene_node::detail::node_container>{scene_node::detail::depth_first_search(*this, traversal)};
 			}
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
 				Root node only
+				@{
 			*/
 
-			//Returns a mutable range of this and all descendant nodes ordered for rendering
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of this and all descendant nodes ordered for rendering
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto OrderedSceneNodes() noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<scene_node::detail::node_container&>{ordered_nodes_};
 			}
 
-			//Returns an immutable range of this and all descendant nodes ordered for rendering
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of this and all descendant nodes ordered for rendering
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto OrderedSceneNodes() const noexcept
 			{
 				return adaptors::ranges::DereferenceIterable<const scene_node::detail::node_container&>{ordered_nodes_};
 			}
 
 
-			//Returns a mutable range of all cameras attached to this and all descendant nodes
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all cameras attached to this and all descendant nodes
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedCameras() noexcept
 			{
 				return adaptors::ranges::Iterable<scene_node::detail::camera_container&>{attached_cameras_};
 			}
 
-			//Returns an immutable range of all cameras attached to this and all descendant nodes
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all cameras attached to this and all descendant nodes
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedCameras() const noexcept
 			{
 				return adaptors::ranges::Iterable<const scene_node::detail::camera_container&>{attached_cameras_};
 			}
 
 
-			//Returns a mutable range of all lights attached to this and all descendant nodes
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all lights attached to this and all descendant nodes
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedLights() noexcept
 			{
 				return adaptors::ranges::Iterable<scene_node::detail::light_container&>{attached_lights_};
 			}
 
-			//Returns an immutable range of all lights attached to this and all descendant nodes
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all lights attached to this and all descendant nodes
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto AttachedLights() const noexcept
 			{
 				return adaptors::ranges::Iterable<const scene_node::detail::light_container&>{attached_lights_};
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the local position of this node to the given position
+			///@brief Sets the local position of this node to the given position
 			inline void Position(const Vector2 &position) noexcept
 			{
 				auto position3 =
@@ -571,7 +594,7 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
-			//Sets the local position of this node to the given position
+			///@brief Sets the local position of this node to the given position
 			inline void Position(const Vector3 &position) noexcept
 			{
 				if (position_ != position)
@@ -597,7 +620,7 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
-			//Sets the local direction of this node to the given direction
+			///@brief Sets the local direction of this node to the given direction
 			inline void Direction(const Vector2 &direction) noexcept
 			{
 				if (direction_ != direction)
@@ -608,7 +631,7 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
-			//Sets the local rotation of this node to the given angle in radians
+			///@brief Sets the local rotation of this node to the given angle in radians
 			inline void Rotation(real angle) noexcept
 			{
 				if (rotation_ != angle)
@@ -619,7 +642,7 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
-			//Sets the local scaling of this node to the given scaling
+			///@brief Sets the local scaling of this node to the given scaling
 			inline void Scaling(const Vector2 &scaling) noexcept
 			{
 				if (scaling_ != scaling)
@@ -630,7 +653,7 @@ namespace ion::graphics::scene::graph
 			}
 
 
-			//Sets the rotation origin of this node to the given origin
+			///@brief Sets the rotation origin of this node to the given origin
 			inline void RotationOrigin(scene_node::NodeRotationOrigin origin) noexcept
 			{
 				if (rotation_origin_ != origin)
@@ -640,7 +663,7 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
-			//Sets whether or not this node should inherit rotation
+			///@brief Sets whether or not this node should inherit rotation
 			inline void InheritRotation(bool inherit) noexcept
 			{
 				if (inherit_rotation_ != inherit)
@@ -650,7 +673,7 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
-			//Sets whether or not this node should inherit scaling
+			///@brief Sets whether or not this node should inherit scaling
 			inline void InheritScaling(bool inherit) noexcept
 			{
 				if (inherit_scaling_ != inherit)
@@ -660,8 +683,8 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
-			//Sets whether or not this and all descendant nodes should be visible
-			//If cascade is set to false, only this node is set
+			///@brief Sets whether or not this and all descendant nodes should be visible
+			///@details If cascade is set to false, only this node is set
 			inline void Visible(bool visible, bool cascade = true) noexcept
 			{
 				visible_ = visible;
@@ -673,8 +696,8 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
-			//Flips the visibility of this and all descendant nodes
-			//If cascade is set to false, only this node is flipped
+			///@brief Flips the visibility of this and all descendant nodes
+			///@details If cascade is set to false, only this node is flipped
 			inline void FlipVisibility(bool cascade = true) noexcept
 			{
 				visible_ = !visible_;
@@ -687,90 +710,92 @@ namespace ion::graphics::scene::graph
 			}
 
 
-			//Sets the custom user data for this node to the given data
+			///@brief Sets the custom user data for this node to the given data
 			inline void UserData(std::any data) noexcept
 			{
 				user_data_ = data;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the name of this node
-			//A name must be unique among named nodes with the same parent
-			//Returns nullopt if this node has no name
+			///@brief Returns the name of this node
+			///@details A name must be unique among named nodes with the same parent.
+			///Returns nullopt if this node has no name
 			[[nodiscard]] inline auto& Name() const noexcept
 			{
 				return name_;
 			}
 
 
-			//Returns the local position of this node
+			///@brief Returns the local position of this node
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}
 
-			//Returns the local direction of this node
+			///@brief Returns the local direction of this node
 			[[nodiscard]] inline auto& Direction() const noexcept
 			{
 				return direction_;
 			}
 
-			//Returns the local rotation of this node in radians
+			///@brief Returns the local rotation of this node in radians
 			[[nodiscard]] inline auto Rotation() const noexcept
 			{
 				return rotation_;
 			}
 
-			//Returns the local scaling of this node
+			///@brief Returns the local scaling of this node
 			[[nodiscard]] inline auto& Scaling() const noexcept
 			{
 				return scaling_;
 			}
 
 
-			//Returns the initial direction of this node
+			///@brief Returns the initial direction of this node
 			[[nodiscard]] inline auto& InitialDirection() const noexcept
 			{
 				return initial_direction_;
 			}
 
-			//Returns the rotation origin of this node
+			///@brief Returns the rotation origin of this node
 			[[nodiscard]] inline auto RotationOrigin() const noexcept
 			{
 				return rotation_origin_;
 			}
 
-			//Returns whether or not this node inherit rotation
+			///@brief Returns whether or not this node inherit rotation
 			[[nodiscard]] inline auto InheritRotation() const noexcept
 			{
 				return inherit_rotation_;
 			}
 
-			//Returns whether or not this node inherit scaling
+			///@brief Returns whether or not this node inherit scaling
 			[[nodiscard]] inline auto InheritScaling() const noexcept
 			{
 				return inherit_scaling_;
 			}
 
-			//Returns whether or not this node is visible
+			///@brief Returns whether or not this node is visible
 			[[nodiscard]] inline auto Visible() const noexcept
 			{
 				return visible_;
 			}
 
 
-			//Returns the parent node of this node
-			//Returns nullptr if this node is the root
+			///@brief Returns the parent node of this node
+			///@details Returns nullptr if this node is the root
 			[[nodiscard]] inline auto ParentNode() const noexcept
 			{
 				return parent_node_;
 			}
 
-			//Returns a mutable reference to the root node of this node
+			///@brief Returns a mutable reference to the root node of this node
 			[[nodiscard]] inline auto RootNode() noexcept -> SceneNode&
 			{
 				if (parent_node_)
@@ -779,7 +804,7 @@ namespace ion::graphics::scene::graph
 					return *this;
 			}
 
-			//Returns an immutable reference to the root node of this node
+			///@brief Returns an immutable reference to the root node of this node
 			[[nodiscard]] inline auto RootNode() const noexcept -> const SceneNode&
 			{
 				if (parent_node_)
@@ -788,14 +813,14 @@ namespace ion::graphics::scene::graph
 					return *this;
 			}
 
-			//Returns the custom user data for this node
+			///@brief Returns the custom user data for this node
 			[[nodiscard]] inline auto& UserData() const noexcept
 			{
 				return user_data_;
 			}
 
 
-			//Returns the derived position of this node
+			///@brief Returns the derived position of this node
 			[[nodiscard]] inline auto& DerivedPosition() const noexcept
 			{
 				if (need_update_)
@@ -804,7 +829,7 @@ namespace ion::graphics::scene::graph
 				return derived_position_;
 			}
 
-			//Returns the derived direction of this node
+			///@brief Returns the derived direction of this node
 			[[nodiscard]] inline auto& DerivedDirection() const noexcept
 			{
 				if (need_update_)
@@ -813,7 +838,7 @@ namespace ion::graphics::scene::graph
 				return derived_direction_;
 			}
 
-			//Returns the derived rotation of this node in radians
+			///@brief Returns the derived rotation of this node in radians
 			[[nodiscard]] inline auto DerivedRotation() const noexcept
 			{
 				if (need_update_)
@@ -822,7 +847,7 @@ namespace ion::graphics::scene::graph
 				return derived_rotation_;
 			}
 
-			//Returns the derived scaling of this node
+			///@brief Returns the derived scaling of this node
 			[[nodiscard]] inline auto& DerivedScaling() const noexcept
 			{
 				if (need_update_)
@@ -831,7 +856,7 @@ namespace ion::graphics::scene::graph
 				return derived_scaling_;
 			}
 
-			//Returns the full transformation matrix for this node
+			///@brief Returns the full transformation matrix for this node
 			[[nodiscard]] inline auto& FullTransformation() const noexcept
 			{
 				if (need_update_)
@@ -848,201 +873,219 @@ namespace ion::graphics::scene::graph
 			}
 
 
-			//Returns true if this node is axis aligned
+			///@brief Returns true if this node is axis aligned
 			[[nodiscard]] bool AxisAligned() const noexcept;
 
 
-			//Returns the world axis-aligned bounding box (AABB) for objects attached to this and all descendant nodes
+			///@brief Returns the world axis-aligned bounding box (AABB) for objects attached to this and all descendant nodes
 			[[nodiscard]] const Aabb& WorldAxisAlignedBoundingBox(bool derive = true) const noexcept;
 
-			//Returns the world oriented bounding box (OBB) for objects attached to this and all descendant nodes
+			///@brief Returns the world oriented bounding box (OBB) for objects attached to this and all descendant nodes
 			[[nodiscard]] const Obb& WorldOrientedBoundingBox(bool derive = true) const noexcept;
 
-			//Returns the world bounding sphere for objects attached to this and all descendant nodes
+			///@brief Returns the world bounding sphere for objects attached to this and all descendant nodes
 			[[nodiscard]] const Sphere& WorldBoundingSphere(bool derive = true) const noexcept;
 
+			///@}
 
-			/*
-				Transformations
+			/**
+				@name Transformations
 				Relative
+				@{
 			*/
 
-			//Translates this node by the given unit
+			///@brief Translates this node by the given unit
 			void Translate(const Vector3 &unit) noexcept;
 
-			//Translates this node by the given unit
+			///@brief Translates this node by the given unit
 			void Translate(real unit) noexcept;
 
-			//Rotates this node by the given angle in radians
+			///@brief Rotates this node by the given angle in radians
 			void Rotate(real angle) noexcept;
 
-			//Scales this node by the given unit
+			///@brief Scales this node by the given unit
 			void Scale(const Vector2 &unit) noexcept;
 
+			///@}
 
-			/*
-				Transformations
+			/**
+				@name Transformations
 				Absolute
+				@{
 			*/
 
-			//Turns this node such that it faces the given position
+			///@brief Turns this node such that it faces the given position
 			void LookAt(const Vector3 &position) noexcept;
 
 
-			//Sets the derived position of this node to the given position
+			///@brief Sets the derived position of this node to the given position
 			void DerivedPosition(const Vector2 &position) noexcept;
 
-			//Sets the derived position of this node to the given position
+			///@brief Sets the derived position of this node to the given position
 			void DerivedPosition(const Vector3 &position) noexcept;
 
-			//Sets the derived direction of this node to the given direction
+			///@brief Sets the derived direction of this node to the given direction
 			void DerivedDirection(const Vector2 &direction) noexcept;
 
-			//Sets the derived rotation of this node to the given angle in radians
+			///@brief Sets the derived rotation of this node to the given angle in radians
 			void DerivedRotation(real angle) noexcept;
 
-			//Sets the derived scaling of this node to the given scaling
+			///@brief Sets the derived scaling of this node to the given scaling
 			void DerivedScaling(const Vector2 &scaling) noexcept;
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses the total time for this node by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for this node by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
 
+			///@}
 
-			/*
-				Child nodes
+			/**
+				@name Child nodes
 				Creating
+				@{
 			*/
 
-			//Creates a new scene node as a child of this node with the given name
+			///@brief Creates a new scene node as a child of this node with the given name
 			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name = {});
 
-			//Creates a new scene node as a child of this node with the given name and initial direction
+			///@brief Creates a new scene node as a child of this node with the given name and initial direction
 			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name, const Vector2 &initial_direction);
 
-			//Creates a new scene node as a child of this node with the given name, position and initial direction
+			///@brief Creates a new scene node as a child of this node with the given name, position and initial direction
 			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name, const Vector3 &position, const Vector2 &initial_direction = vector2::UnitY);
 
 
-			//Creates a new scene node as a child of this node with the given name and visibility
+			///@brief Creates a new scene node as a child of this node with the given name and visibility
 			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name, bool visible);
 
-			//Creates a new scene node as a child of this node with the given name, initial direction and visibility
+			///@brief Creates a new scene node as a child of this node with the given name, initial direction and visibility
 			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name, const Vector2 &initial_direction, bool visible);
 
-			//Creates a new scene node as a child of this node with the given name, position, initial direction and visibility
+			///@brief Creates a new scene node as a child of this node with the given name, position, initial direction and visibility
 			NonOwningPtr<SceneNode> CreateChildNode(std::optional<std::string> name, const Vector3 &position, const Vector2 &initial_direction, bool visible);
 
+			///@}
 
-			/*
-				Child nodes
+			/**
+				@name Child nodes
 				Take/release ownership
+				@{
 			*/
 
-			//Adopts (take ownership of) the given scene node and returns a pointer to the adopted node
-			//Returns nullptr if the scene node could not be adopted and scene node will remain untouched
+			///@brief Adopts (take ownership of) the given scene node and returns a pointer to the adopted node
+			///@details Returns nullptr if the scene node could not be adopted and scene node will remain untouched
 			NonOwningPtr<SceneNode> Adopt(OwningPtr<SceneNode> &root_node);
 
-			//Adopts (take ownership of) the given scene node and returns a pointer to the adopted node
-			//Returns nullptr if the scene node could not be adopted and scene node will be released
+			///@brief Adopts (take ownership of) the given scene node and returns a pointer to the adopted node
+			///@details Returns nullptr if the scene node could not be adopted and scene node will be released
 			NonOwningPtr<SceneNode> Adopt(OwningPtr<SceneNode> &&root_node);
 
 
-			//Adopts (take ownership of) all the given scene nodes
-			//If one or more scene nodes could not be adopted, they will remain untouched in the given container
+			///@brief Adopts (take ownership of) all the given scene nodes
+			///@details If one or more scene nodes could not be adopted, they will remain untouched in the given container
 			void AdoptAll(scene_node::SceneNodes &nodes);
 
-			//Adopts (take ownership of) all the given scene nodes
-			//If one or more scene nodes could not be adopted, they will be released
+			///@brief Adopts (take ownership of) all the given scene nodes
+			///@details If one or more scene nodes could not be adopted, they will be released
 			void AdoptAll(scene_node::SceneNodes &&nodes);
 
 
-			//Orphans (release ownership of) the given child node
-			//Returns a pointer to the scene node released
+			///@brief Orphans (release ownership of) the given child node
+			///@details Returns a pointer to the scene node released
 			[[nodiscard]] OwningPtr<SceneNode> Orphan(SceneNode &child_node) noexcept;
 
-			//Orphans (release ownership of) all child nodes in this scene node
-			//Returns pointers to the scene nodes released
+			///@brief Orphans (release ownership of) all child nodes in this scene node
+			///@details Returns pointers to the scene nodes released
 			[[nodiscard]] scene_node::SceneNodes OrphanAll() noexcept;
 
+			///@}
 
-			/*
-				Child nodes
+			/**
+				@name Child nodes
 				Retrieving
+				@{
 			*/
 			
-			//Gets a pointer to a mutable child node with the given name
-			//Returns nullptr if child node could not be found
+			///@brief Gets a pointer to a mutable child node with the given name
+			///@details Returns nullptr if child node could not be found
 			[[nodiscard]] NonOwningPtr<SceneNode> GetChildNode(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable child node with the given name
-			//Returns nullptr if child node could not be found
+			///@brief Gets a pointer to an immutable child node with the given name
+			///@details Returns nullptr if child node could not be found
 			[[nodiscard]] NonOwningPtr<const SceneNode> GetChildNode(std::string_view name) const noexcept;
 
 
-			//Gets a pointer to a mutable descendant node with the given name using the given search strategy
-			//Returns nullptr if a descendant node could not be found
+			///@brief Gets a pointer to a mutable descendant node with the given name using the given search strategy
+			///@details Returns nullptr if a descendant node could not be found
 			[[nodiscard]] NonOwningPtr<SceneNode> GetDescendantNode(std::string_view name, scene_node::SearchStrategy strategy = scene_node::SearchStrategy::BreadthFirst) noexcept;
 
-			//Gets a pointer to an immutable descendant node with the given name using the given search strategy
-			//Returns nullptr if a descendant node could not be found
+			///@brief Gets a pointer to an immutable descendant node with the given name using the given search strategy
+			///@details Returns nullptr if a descendant node could not be found
 			[[nodiscard]] NonOwningPtr<const SceneNode> GetDescendantNode(std::string_view name, scene_node::SearchStrategy strategy = scene_node::SearchStrategy::BreadthFirst) const noexcept;
 
+			///@}
 
-			/*
-				Child nodes
+			/**
+				@name Child nodes
 				Removing
+				@{
 			*/
 
-			//Clears all child nodes from this scene node
+			///@brief Clears all child nodes from this scene node
 			void ClearChildNodes() noexcept;
 
-			//Removes the given child node from this scene node
-			//Returns true if the given child node was removed
+			///@brief Removes the given child node from this scene node
+			///@details Returns true if the given child node was removed
 			bool RemoveChildNode(SceneNode &child_node) noexcept;
 
-			//Removes a child node with the given name from this scene node
-			//Returns true if a child node with the given name was removed
+			///@brief Removes a child node with the given name from this scene node
+			///@details Returns true if a child node with the given name was removed
 			bool RemoveChildNode(std::string_view name) noexcept;
 
+			///@}
 
-			/*
-				Attachable objects
+			/**
+				@name Attachable objects
+				@{
 			*/
 
-			//Attaches the given object to this node if not already attached
-			//Returns true if the given object was attached
+			///@brief Attaches the given object to this node if not already attached
+			///@details Returns true if the given object was attached
 			bool AttachObject(MovableObject &object);
 
-			//Attaches the given camera to this node if not already attached
-			//Returns true if the given camera was attached
+			///@brief Attaches the given camera to this node if not already attached
+			///@details Returns true if the given camera was attached
 			bool AttachObject(Camera &camera);
 
-			//Attaches the given light to this node if not already attached
-			//Returns true if the given light was attached
+			///@brief Attaches the given light to this node if not already attached
+			///@details Returns true if the given light was attached
 			bool AttachObject(Light &light);
 
 
-			//Detaches the given object if attached to this node
-			//Returns true if the given object was detached
+			///@brief Detaches the given object if attached to this node
+			///@details Returns true if the given object was detached
 			bool DetachObject(MovableObject &object) noexcept;
 
-			//Detaches the given camera if attached to this node
-			//Returns true if the given camera was detached
+			///@brief Detaches the given camera if attached to this node
+			///@details Returns true if the given camera was detached
 			bool DetachObject(Camera &camera) noexcept;
 
-			//Detaches the given light if attached to this node
-			//Returns true if the given light was detached
+			///@brief Detaches the given light if attached to this node
+			///@details Returns true if the given light was detached
 			bool DetachObject(Light &light) noexcept;
 
 
-			//Detaches all objects attached to this node
-			void DetachAllObjects() noexcept;		
+			///@brief Detaches all objects attached to this node
+			void DetachAllObjects() noexcept;
+
+			///@}
 	};
 } //ion::graphics::scene::graph
 

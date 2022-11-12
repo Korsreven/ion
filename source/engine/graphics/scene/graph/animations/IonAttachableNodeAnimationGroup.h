@@ -33,7 +33,7 @@ namespace ion::graphics::scene::graph::animations
 	} //attachable_node_animation_group
 
 
-	//A class representing an instantiation of a node animation group, meaning an animation group that is attached to a timeline
+	///@brief A class representing an instantiation of a node animation group, meaning an animation group that is attached to a timeline
 	class AttachableNodeAnimationGroup final : public managed::ManagedObject<NodeAnimationTimeline>
 	{
 		private:
@@ -49,35 +49,36 @@ namespace ion::graphics::scene::graph::animations
 
 		public:
 
-			//Constructs a new attachable node animation group with the given node animation group, start time and whether it is enabled or not
+			///@brief Constructs a new attachable node animation group with the given node animation group, start time and whether it is enabled or not
 			explicit AttachableNodeAnimationGroup(NonOwningPtr<NodeAnimationGroup> node_animation_group,
 				duration start_time = 0.0_sec, bool enabled = true) noexcept;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the start time of this node animation group to the given time
+			///@brief Sets the start time of this node animation group to the given time
 			inline void StartTime(duration time) noexcept
 			{
 				start_time_ = time;
 				NotifyUpdate();
 			}
 
-			//Enables the node animation group
+			///@brief Enables the node animation group
 			inline void Enable() noexcept
 			{
 				enabled_ = true;
 			}
 
-			//Disables the node animation group
+			///@brief Disables the node animation group
 			inline void Disable() noexcept
 			{
 				enabled_ = false;
 			}
 
-			//Sets whether or not the node animation group is enabled
+			///@brief Sets whether or not the node animation group is enabled
 			inline void Enabled(bool enabled) noexcept
 			{
 				if (enabled)
@@ -87,24 +88,26 @@ namespace ion::graphics::scene::graph::animations
 			}
 
 
-			//Resets this node animation group
+			///@brief Resets this node animation group
 			void Reset() noexcept;
 
-			//Reverts to the initial node animation group
+			///@brief Reverts to the initial node animation group
 			void Revert();
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the start time of this node animation group
+			///@brief Returns the start time of this node animation group
 			[[nodiscard]] inline auto StartTime() const noexcept
 			{
 				return start_time_;
 			}
 
-			//Returns the total duration of this node animation group
+			///@brief Returns the total duration of this node animation group
 			[[nodiscard]] inline auto TotalDuration() const noexcept
 			{
 				return node_animation_group_ ?
@@ -112,18 +115,20 @@ namespace ion::graphics::scene::graph::animations
 					0.0_sec;
 			}
 
-			//Returns true if the node animation group is enabled
+			///@brief Returns true if the node animation group is enabled
 			[[nodiscard]] inline auto IsEnabled() const noexcept
 			{
 				return enabled_;
 			}
 
 
-			//Returns an immutable reference to the node animation group
+			///@brief Returns an immutable reference to the node animation group
 			[[nodiscard]] auto& Get() const noexcept
 			{
 				return node_animation_group_;
 			}
+
+			///@}
 	};
 } //ion::graphics::scene::graph::animations
 
