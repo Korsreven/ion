@@ -39,7 +39,7 @@ namespace ion::graphics::scene::shapes
 	} //ellipse::detail
 
 
-	//A class representing an ellipse shape (or circle)
+	///@brief A class representing an ellipse shape (or circle)
 	class Ellipse : public Shape
 	{
 		protected:
@@ -54,31 +54,32 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			//Constructs a new ellipse with the given size, color and visibility
+			///@brief Constructs a new ellipse with the given size, color and visibility
 			Ellipse(const Vector2 &size, const Color &color, bool visible = true);
 
-			//Constructs a new ellipse with the given position, size, color and visibility
+			///@brief Constructs a new ellipse with the given position, size, color and visibility
 			Ellipse(const Vector3 &position, const Vector2 &size, const Color &color, bool visible = true);
 
-			//Constructs a new ellipse with the given position, rotation, size, color and visibility
+			///@brief Constructs a new ellipse with the given position, rotation, size, color and visibility
 			Ellipse(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, bool visible = true);
 
 
-			//Constructs a new ellipse with the given size, color, sides and visibility
+			///@brief Constructs a new ellipse with the given size, color, sides and visibility
 			Ellipse(const Vector2 &size, const Color &color, int sides, bool visible = true);
 
-			//Constructs a new ellipse with the given position, size, color, sides and visibility
+			///@brief Constructs a new ellipse with the given position, size, color, sides and visibility
 			Ellipse(const Vector3 &position, const Vector2 &size, const Color &color, int sides, bool visible = true);
 
-			//Constructs a new ellipse with the given position, rotation, size, color, sides and visibility
+			///@brief Constructs a new ellipse with the given position, rotation, size, color, sides and visibility
 			Ellipse(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, int sides, bool visible = true);
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the position of this ellipse to the given position
+			///@brief Sets the position of this ellipse to the given position
 			inline void Position(const Vector3 &position) noexcept
 			{
 				if (position_ != position)
@@ -88,13 +89,13 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the position of this ellipse to the given position
+			///@brief Sets the position of this ellipse to the given position
 			inline void Position(const Vector2 &position) noexcept
 			{
 				Position({position.X(), position.Y(), position_.Z()});
 			}
 
-			//Sets the rotation of this ellipse to the given angle (in radians)
+			///@brief Sets the rotation of this ellipse to the given angle (in radians)
 			inline void Rotation(real angle) noexcept
 			{
 				if (rotation_ != angle)
@@ -104,7 +105,7 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the size of this ellipse to the given size
+			///@brief Sets the size of this ellipse to the given size
 			inline void Size(const Vector2 &size) noexcept
 			{
 				if (size_ != size)
@@ -115,46 +116,50 @@ namespace ion::graphics::scene::shapes
 			}
 
 
-			//Sets the diameter of this ellipse to the given value
+			///@brief Sets the diameter of this ellipse to the given value
 			inline void Diameter(real diameter) noexcept
 			{
 				Size({diameter});
 			}
 
-			//Sets the radius of this ellipse to the given value
+			///@brief Sets the radius of this ellipse to the given value
 			inline void Radius(real radius) noexcept
 			{
 				Size({radius * 2.0_r});
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the position of this ellipse
+			///@brief Returns the position of this ellipse
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}
 
-			//Returns the angle of rotation (in radians) for this ellipse
+			///@brief Returns the angle of rotation (in radians) for this ellipse
 			[[nodiscard]] inline auto Rotation() const noexcept
 			{
 				return rotation_;
 			}
 
-			//Returns the size of this ellipse
+			///@brief Returns the size of this ellipse
 			[[nodiscard]] inline auto& Size() const noexcept
 			{
 				return size_;
 			}
 
-			//Returns the number of sides used to render this ellipse
+			///@brief Returns the number of sides used to render this ellipse
 			[[nodiscard]] inline auto Sides() const noexcept
 			{
 				return sides_;
 			}
+
+			///@}
 	};
 } //ion::graphics::scene::shapes
 

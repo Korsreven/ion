@@ -62,13 +62,13 @@ namespace ion::graphics::scene::shapes
 			Vector3 TexCoord;
 
 
-			//Constructs a new vertex with the given position and base color
+			///@brief Constructs a new vertex with the given position and base color
 			explicit Vertex(const Vector3 &position, const Color &base_color = color::White) noexcept;
 
-			//Constructs a new vertex with the given position, normal and base color (default white)
+			///@brief Constructs a new vertex with the given position, normal and base color (default white)
 			Vertex(const Vector3 &position, const Vector3 &normal, const Color &base_color = color::White) noexcept;
 
-			//Constructs a new vertex with the given position, normal, tex coord and base color (default white)
+			///@brief Constructs a new vertex with the given position, normal, tex coord and base color (default white)
 			Vertex(const Vector3 &position, const Vector3 &normal, const Vector2 &tex_coord, const Color &base_color = color::White) noexcept;
 		};
 
@@ -125,8 +125,8 @@ namespace ion::graphics::scene::shapes
 	} //mesh
 
 
-	//A class representing a mesh that supports any complex shape
-	//This base class must support inheritance (open set of shapes)
+	///@brief A class representing a mesh that supports any complex shape
+	///@details This base class must support inheritance (open set of shapes)
 	class Mesh :
 		public managed::ManagedObject<scene::Model>,
 		public render::RenderPrimitive
@@ -139,8 +139,9 @@ namespace ion::graphics::scene::shapes
 
 		protected:
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
 			virtual void VertexDataChanged() noexcept override;
@@ -149,60 +150,61 @@ namespace ion::graphics::scene::shapes
 
 		public:
 
-			//Constructs a new mesh with the given vertices and visibility
+			///@brief Constructs a new mesh with the given vertices and visibility
 			explicit Mesh(const mesh::Vertices &vertices, bool visible = true);
 
-			//Constructs a new mesh with the given vertices, material, tex coord mode and visibility
+			///@brief Constructs a new mesh with the given vertices, material, tex coord mode and visibility
 			Mesh(const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
-			//Constructs a new mesh with the given draw mode, vertices and visibility
+			///@brief Constructs a new mesh with the given draw mode, vertices and visibility
 			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices, bool visible = true);
 
-			//Constructs a new mesh with the given draw mode, vertices, material, tex coord mode and visibility
+			///@brief Constructs a new mesh with the given draw mode, vertices, material, tex coord mode and visibility
 			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
-			//Constructs a new mesh with the given raw vertex data and visibility
+			///@brief Constructs a new mesh with the given raw vertex data and visibility
 			explicit Mesh(render_primitive::VertexContainer vertex_data, bool visible = true) noexcept;
 
-			//Constructs a new mesh with the given raw vertex data, material, tex coord mode and visibility
+			///@brief Constructs a new mesh with the given raw vertex data, material, tex coord mode and visibility
 			Mesh(render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true) noexcept;
 
-			//Constructs a new mesh with the given draw mode, raw vertex data and visibility
+			///@brief Constructs a new mesh with the given draw mode, raw vertex data and visibility
 			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, bool visible = true) noexcept;
 
-			//Constructs a new mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
+			///@brief Constructs a new mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
 			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
 				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true) noexcept;
 
 
-			//Default virtual destructor
+			///@brief Default virtual destructor
 			virtual ~Mesh() = default;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
 			using RenderPrimitive::VertexData; //Mitigate name hiding
 
-			//Sets the vertex data of this mesh to the given vertices
+			///@brief Sets the vertex data of this mesh to the given vertices
 			inline void VertexData(const mesh::Vertices &vertices)
 			{
 				VertexData(mesh::detail::vertices_to_vertex_data(vertices));
 			}
 
 
-			//Sets the surface material used by this mesh to the given material
+			///@brief Sets the surface material used by this mesh to the given material
 			inline void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
 				RenderMaterial(material);
 			}
 
-			//Sets the tex coord mode of this mesh to the given mode
+			///@brief Sets the tex coord mode of this mesh to the given mode
 			inline void TexCoordMode(mesh::MeshTexCoordMode tex_coord_mode) noexcept
 			{
 				if (tex_coord_mode_ != tex_coord_mode)
@@ -212,7 +214,7 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets if the bounding volumes from this mesh should be included in the model or not
+			///@brief Sets if the bounding volumes from this mesh should be included in the model or not
 			inline void IncludeBoundingVolumes(bool include) noexcept
 			{
 				if (include_bounding_volumes_ != include)
@@ -222,40 +224,48 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the tex coord mode of this mesh
+			///@brief Returns the tex coord mode of this mesh
 			[[nodiscard]] inline auto TexCoordMode() const noexcept
 			{
 				return tex_coord_mode_;
 			}
 
-			//Returns true if the bounding volumes from this mesh should be included in the model
+			///@brief Returns true if the bounding volumes from this mesh should be included in the model
 			[[nodiscard]] inline auto IncludeBoundingVolumes() const noexcept
 			{
 				return include_bounding_volumes_;
 			}
 
+			///@}
 
-			/*
-				Preparing
+			/**
+				@name Preparing
+				@{
 			*/
 
-			//Prepares this mesh such that it is ready to be drawn
-			//This function is typically called each frame
+			///@brief Prepares this mesh such that it is ready to be drawn
+			///@details This function is typically called each frame
 			virtual void Prepare() override;
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses the total time for this mesh by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for this mesh by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			virtual void Elapse(duration time) noexcept;
+
+			///@}
 	};
 } //ion::graphics::scene::shapes
 

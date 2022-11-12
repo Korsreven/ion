@@ -38,7 +38,7 @@ namespace ion::graphics::scene::shapes
 	} //sprite::detail
 
 
-	//A class representing a texturized rectangle
+	///@brief A class representing a texturized rectangle
 	class Sprite : public Rectangle
 	{
 		protected:
@@ -57,45 +57,49 @@ namespace ion::graphics::scene::shapes
 			void RecalculateTexCoords() noexcept;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
 			virtual void MaterialChanged() noexcept override;
 
+			///@}
+
 		public:
 		
-			//Constructs a new sprite with the given material and visibility
+			///@brief Constructs a new sprite with the given material and visibility
 			explicit Sprite(NonOwningPtr<materials::Material> material, bool visible = true);
 
-			//Constructs a new sprite with the given size, material and visibility
+			///@brief Constructs a new sprite with the given size, material and visibility
 			Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
-			//Constructs a new sprite with the given position, size, material and visibility
+			///@brief Constructs a new sprite with the given position, size, material and visibility
 			Sprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
-			//Constructs a new sprite with the given position, rotation, size, material and visibility
+			///@brief Constructs a new sprite with the given position, rotation, size, material and visibility
 			Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
 
-			//Constructs a new sprite with the given material, color and visibility
+			///@brief Constructs a new sprite with the given material, color and visibility
 			Sprite(NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			//Constructs a new sprite with the given size, material, color and visibility
+			///@brief Constructs a new sprite with the given size, material, color and visibility
 			Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			//Constructs a new sprite with the given position, size, material, color and visibility
+			///@brief Constructs a new sprite with the given position, size, material, color and visibility
 			Sprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			//Constructs a new sprite with the given position, rotation, size, material, color and visibility
+			///@brief Constructs a new sprite with the given position, rotation, size, material, color and visibility
 			Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets whether or not this sprite should be auto sized
+			///@brief Sets whether or not this sprite should be auto sized
 			inline void AutoSize(bool auto_size) noexcept
 			{
 				if (auto_size_ != auto_size)
@@ -109,7 +113,7 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets whether or not this sprite should be auto repeated
+			///@brief Sets whether or not this sprite should be auto repeated
 			inline void AutoRepeat(bool auto_repeat) noexcept
 			{
 				if (auto_repeat_ != auto_repeat)
@@ -121,7 +125,7 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the lower left and upper right texture coordinates for this sprite to the given coordinates
+			///@brief Sets the lower left and upper right texture coordinates for this sprite to the given coordinates
 			inline void TexCoords(const Vector2 &lower_left, const Vector2 &upper_right) noexcept
 			{
 				if (lower_left_tex_coord_ != lower_left || upper_right_tex_coord_ != upper_right)
@@ -135,7 +139,7 @@ namespace ion::graphics::scene::shapes
 			}
 
 
-			//Sets the size of this sprite to the given size
+			///@brief Sets the size of this sprite to the given size
 			inline void Size(const Vector2 &size) noexcept override
 			{
 				if (size_ != size)
@@ -148,82 +152,88 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the surface material used by this sprite to the given material
+			///@brief Sets the surface material used by this sprite to the given material
 			void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
 				Mesh::SurfaceMaterial(material);
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns whether or not this sprite is auto sized
+			///@brief Returns whether or not this sprite is auto sized
 			[[nodiscard]] inline auto AutoSize() const noexcept
 			{
 				return auto_size_;
 			}
 
-			//Returns whether or not this sprite is auto repeated
+			///@brief Returns whether or not this sprite is auto repeated
 			[[nodiscard]] inline auto AutoRepeat() const noexcept
 			{
 				return auto_repeat_;
 			}
 
-			//Returns the lower left and upper right texture coordinates for this sprite
+			///@brief Returns the lower left and upper right texture coordinates for this sprite
 			[[nodiscard]] inline auto TexCoords() const noexcept
 			{
 				return std::pair{lower_left_tex_coord_, upper_right_tex_coord_};
 			}
 
 
-			//Returns the size of this sprite
+			///@brief Returns the size of this sprite
 			[[nodiscard]] inline auto& Size() const noexcept
 			{
 				return Rectangle::Size();
 			}
 
-			//Returns a pointer to the material used by this sprite
+			///@brief Returns a pointer to the material used by this sprite
 			//Returns nullptr if this sprite does not have a material
 			[[nodiscard]] inline auto SurfaceMaterial() const noexcept
 			{
 				return  RenderMaterial();
 			}
 
+			///@}
 
-			/*
-				Texture coordinates
+			/**
+				@name Texture coordinates
+				@{
 			*/
 
-			//Crop sprite by the given area, where values are in range [0.0, 1.0]
+			///@brief Crop sprite by the given area, where values are in range [0.0, 1.0]
 			//This operation will discard any repeating previously applied
 			void Crop(const std::optional<Aabb> &area) noexcept;
 
-			//Repeat sprite by the given amount, where values are in range [0.0, oo)
+			///@brief Repeat sprite by the given amount, where values are in range [0.0, oo)
 			//This operation will discard any cropping previously applied
 			void Repeat(const std::optional<Vector2> &amount) noexcept;
 
 
-			//Flip sprite horizontally (mirror)
+			///@brief Flip sprite horizontally (mirror)
 			void FlipHorizontal() noexcept;
 
-			//Flip sprite vertically (up-down)
+			///@brief Flip sprite vertically (up-down)
 			void FlipVertical() noexcept;
 
 
-			//Returns true if this sprite is cropped
+			///@brief Returns true if this sprite is cropped
 			[[nodiscard]] bool IsCropped() const noexcept;
 
-			//Returns true if this sprite is repeated
+			///@brief Returns true if this sprite is repeated
 			[[nodiscard]] bool IsRepeated() const noexcept;
 
 
-			//Returns true if this sprite is flipped horizontally
+			///@brief Returns true if this sprite is flipped horizontally
 			[[nodiscard]] bool IsFlippedHorizontally() const noexcept;
 
-			//Returns true if this sprite is flipped vertically
+			///@brief Returns true if this sprite is flipped vertically
 			[[nodiscard]] bool IsFlippedVertically() const noexcept;
+
+			///@}
 	};
 } //ion::graphics::scene::shapes
 

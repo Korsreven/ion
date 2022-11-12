@@ -29,7 +29,7 @@ namespace ion::graphics::scene::shapes
 	} //animated_sprite::detail
 
 
-	//A class representing a texturized rectangle that can animate
+	///@brief A class representing a texturized rectangle that can animate
 	class AnimatedSprite final : public Sprite
 	{
 		protected:
@@ -43,71 +43,78 @@ namespace ion::graphics::scene::shapes
 
 		public:
 
-			//Constructs a new animated sprite with the given material and visibility
+			///@brief Constructs a new animated sprite with the given material and visibility
 			explicit AnimatedSprite(NonOwningPtr<materials::Material> material, bool visible = true);
 
-			//Constructs a new animated sprite with the given size, material and visibility
+			///@brief Constructs a new animated sprite with the given size, material and visibility
 			AnimatedSprite(const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
-			//Constructs a new animated sprite with the given position, size, material and visibility
+			///@brief Constructs a new animated sprite with the given position, size, material and visibility
 			AnimatedSprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
-			//Constructs a new animated sprite with the given position, rotation, size, material and visibility
+			///@brief Constructs a new animated sprite with the given position, rotation, size, material and visibility
 			AnimatedSprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
 
 
-			//Constructs a new animated sprite with the given material, color and visibility
+			///@brief Constructs a new animated sprite with the given material, color and visibility
 			AnimatedSprite(NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			//Constructs a new animated sprite with the given size, material, color and visibility
+			///@brief Constructs a new animated sprite with the given size, material, color and visibility
 			AnimatedSprite(const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			//Constructs a new animated sprite with the given position, size, material, color and visibility
+			///@brief Constructs a new animated sprite with the given position, size, material, color and visibility
 			AnimatedSprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			//Constructs a new animated sprite with the given position, rotation, size, material, color and visibility
+			///@brief Constructs a new animated sprite with the given position, rotation, size, material, color and visibility
 			AnimatedSprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Reverts to the initial animated material
+			///@brief Reverts to the initial animated material
 			void Revert();
 
+			///@}
 
-			/*
-				Playback
+			/**
+				@name Playback
+				@{
 			*/
 
-			//Starts or resumes, animated sprite playback
+			///@brief Starts or resumes, animated sprite playback
 			void Start() noexcept;
 
-			//Stops animated sprite playback
+			///@brief Stops animated sprite playback
 			void Stop() noexcept;
 
-			//Stops animated sprite playback and reset elapsed time to zero
+			///@brief Stops animated sprite playback and reset elapsed time to zero
 			void Reset() noexcept;
 
-			//Stops, resets and starts animated sprite playback
+			///@brief Stops, resets and starts animated sprite playback
 			void Restart() noexcept;
 
 
-			//Jumps forward by the given amount of time
+			///@brief Jumps forward by the given amount of time
 			void JumpForward(duration time) noexcept;
 
-			//Jumps backward by the given amount of time
+			///@brief Jumps backward by the given amount of time
 			void JumpBackward(duration time) noexcept;
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses the total time for this animation by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for this animation by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			virtual void Elapse(duration time) noexcept override;
+
+			///@}
 	};
 } //ion::graphics::scene::shapes
 

@@ -31,7 +31,7 @@ namespace ion::graphics::scene::shapes
 	} //line::detail
 
 
-	//A class representing a line shape
+	///@brief A class representing a line shape
 	class Line : public Shape
 	{
 		protected:
@@ -44,18 +44,19 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			//Constructs a new line with the given points a b, color and visibility
+			///@brief Constructs a new line with the given points a b, color and visibility
 			Line(const Vector3 &a, const Vector3 &b, const Color &color, bool visible = true);
 
-			//Constructs a new line with the given points a b, color, thickness and visibility
+			///@brief Constructs a new line with the given points a b, color, thickness and visibility
 			Line(const Vector3 &a, const Vector3 &b, const Color &color, real thickness, bool visible = true);
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the point a of this line to the given point
+			///@brief Sets the point a of this line to the given point
 			inline void A(const Vector3 &a) noexcept
 			{
 				if (a_ != a)
@@ -65,7 +66,7 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the point b of this line to the given point
+			///@brief Sets the point b of this line to the given point
 			inline void B(const Vector3 &b) noexcept
 			{
 				if (b_ != b)
@@ -75,7 +76,7 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the points a b of this line to the given points
+			///@brief Sets the points a b of this line to the given points
 			inline void AB(const Vector3 &a, const Vector3 &b) noexcept
 			{
 				if (a_ != a || b_ != b)
@@ -86,40 +87,44 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the thickness of this line
+			///@brief Sets the thickness of this line
 			inline void Thickness(real thickness) noexcept
 			{
 				LineThickness(thickness);
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the point a of this line
+			///@brief Returns the point a of this line
 			[[nodiscard]] inline auto& A() const noexcept
 			{
 				return a_;
 			}
 
-			//Returns the point b of this line
+			///@brief Returns the point b of this line
 			[[nodiscard]] inline auto& B() const noexcept
 			{
 				return b_;
 			}
 
-			//Returns the points a b of this line
+			///@brief Returns the points a b of this line
 			[[nodiscard]] inline auto AB() const noexcept
 			{
 				return std::pair{a_, b_};
 			}
 
-			//Returns the thickness of this line
+			///@brief Returns the thickness of this line
 			[[nodiscard]] inline auto Thickness() const noexcept
 			{
 				return LineThickness();
 			}
+
+			///@}
 	};
 } //ion::graphics::scene::shapes
 

@@ -49,7 +49,7 @@ namespace ion::graphics::scene::shapes
 	} //curve
 
 
-	//A class representing a bezier curve that supports up to 35 control points
+	///@brief A class representing a bezier curve that supports up to 35 control points
 	class Curve : public Shape
 	{
 		protected:
@@ -62,25 +62,26 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			//Constructs a new curve with the given control points, color and visibility
+			///@brief Constructs a new curve with the given control points, color and visibility
 			Curve(curve::ControlPoints control_points, const Color &color, bool visible = true);
 
-			//Constructs a new curve with the given control points, color, thickness and visibility
+			///@brief Constructs a new curve with the given control points, color, thickness and visibility
 			Curve(curve::ControlPoints control_points, const Color &color, real thickness, bool visible = true);
 
 
-			//Constructs a new curve with the given control points, color, smoothness and visibility
+			///@brief Constructs a new curve with the given control points, color, smoothness and visibility
 			Curve(curve::ControlPoints control_points, const Color &color, int smoothness, bool visible = true);
 
-			//Constructs a new curve with the given control points, color, thickness, smoothness and visibility
+			///@brief Constructs a new curve with the given control points, color, thickness, smoothness and visibility
 			Curve(curve::ControlPoints control_points, const Color &color, real thickness, int smoothness, bool visible = true);
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets Pn (nth point) of this curve to the given point
+			///@brief Sets Pn (nth point) of this curve to the given point
 			inline void P(int n, const Vector3 &p) noexcept
 			{
 				assert(n < std::ssize(control_points_));
@@ -92,35 +93,39 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the thickness of this curve
+			///@brief Sets the thickness of this curve
 			inline void Thickness(real thickness) noexcept
 			{
 				LineThickness(thickness);
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns Pn (nth point) of this curve
+			///@brief Returns Pn (nth point) of this curve
 			[[nodiscard]] inline auto& P(int n) const noexcept
 			{
 				assert(n < std::ssize(control_points_));
 				return control_points_[n];
 			}
 
-			//Returns the thickness of this curve
+			///@brief Returns the thickness of this curve
 			[[nodiscard]] inline auto Thickness() const noexcept
 			{
 				return LineThickness();
 			}
 
-			//Returns the smoothness of this curve
+			///@brief Returns the smoothness of this curve
 			[[nodiscard]] inline auto Smoothness() const noexcept
 			{
 				return smoothness_;
 			}
+
+			///@}
 	};
 } //ion::graphics::scene::shapes
 

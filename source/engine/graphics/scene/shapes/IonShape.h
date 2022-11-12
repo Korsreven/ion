@@ -35,8 +35,8 @@ namespace ion::graphics::scene::shapes
 	} //shape::detail
 
 
-	//A class representing any kind of predefined shape
-	//This base class must support inheritance (open set of shapes)
+	///@brief A class representing any kind of predefined shape
+	///@details This base class must support inheritance (open set of shapes)
 	class Shape : public Mesh
 	{
 		protected:
@@ -48,45 +48,49 @@ namespace ion::graphics::scene::shapes
 			bool update_opacity_ = false;
 
 
-			//Constructs a new shape with the given vertices, color and visibility
-			//Can only be instantiated by derived
+			///@brief Constructs a new shape with the given vertices, color and visibility
+			///@details Can only be instantiated by derived
 			Shape(const mesh::Vertices &vertices, const Color &color, bool visible = true);
 
-			//Constructs a new shape with the given draw mode, vertices, color and visibility
-			//Can only be instantiated by derived
+			///@brief Constructs a new shape with the given draw mode, vertices, color and visibility
+			///@details Can only be instantiated by derived
 			Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
 				const Color &color, bool visible = true);
 
 
-			//Constructs a new texturized shape with the given vertices, material, color and visibility
-			//Can only be instantiated by derived
+			///@brief Constructs a new texturized shape with the given vertices, material, color and visibility
+			///@details Can only be instantiated by derived
 			Shape(const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				const Color &color, bool visible = true);
 
-			//Constructs a new texturized shape with the given draw mode, vertices, material, color and visibility
-			//Can only be instantiated by derived
+			///@brief Constructs a new texturized shape with the given draw mode, vertices, material, color and visibility
+			///@details Can only be instantiated by derived
 			Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
 				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
 
-			//Must be overridden to return the vertices of the derived shape
+			///@brief Must be overridden to return the vertices of the derived shape
 			virtual mesh::Vertices GetVertices() const noexcept = 0;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
 			virtual void BaseColorChanged() noexcept override;
 			virtual void BaseOpacityChanged() noexcept override;
 
+			///@}
+
 		public:
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the color of this shape to the given color
+			///@brief Sets the color of this shape to the given color
 			inline void FillColor(const Color &color) noexcept
 			{
 				if (color_ != color)
@@ -96,7 +100,7 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the opacity of this shape to the given opacity
+			///@brief Sets the opacity of this shape to the given opacity
 			inline void FillOpacity(real opacity) noexcept
 			{
 				if (color_.A() != opacity)
@@ -106,38 +110,44 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the color of this shape
+			///@brief Returns the color of this shape
 			[[nodiscard]] inline auto& FillColor() const noexcept
 			{
 				return color_;
 			}
 
-			//Returns the opacity of this shape
+			///@brief Returns the opacity of this shape
 			[[nodiscard]] inline auto FillOpacity() const noexcept
 			{
 				return color_.A();
 			}
 
+			///@}
 
-			/*
-				Preparing
+			/**
+				@name Preparing
+				@{
 			*/
 
-			//Refreshes this shape by generating new vertices
+			///@brief Refreshes this shape by generating new vertices
 			inline void Refresh() noexcept
 			{
 				update_vertices_ = true;
 			}
 
 
-			//Prepares this shape such that it is ready to be drawn
-			//This function is typically called each frame
+			///@brief Prepares this shape such that it is ready to be drawn
+			///@details This function is typically called each frame
 			virtual void Prepare() override;
+
+			///@}
 	};
 } //ion::graphics::scene::shapes
 

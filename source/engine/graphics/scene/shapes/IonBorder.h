@@ -54,8 +54,8 @@ namespace ion::graphics::scene::shapes
 	} //border
 
 
-	//A class representing a border where the width and height is the exclusive size without the borders
-	//A border can have square corners, oblique corners or no corners at all (just sides)
+	///@brief A class representing a border where the width and height is the exclusive size without the borders
+	///@details A border can have square corners, oblique corners or no corners at all (just sides)
 	class Border : public Rectangle
 	{
 		protected:
@@ -78,34 +78,35 @@ namespace ion::graphics::scene::shapes
 
 		public:
 
-			//Constructs a new border with the given size, border size, color and visibility
+			///@brief Constructs a new border with the given size, border size, color and visibility
 			Border(const Vector2 &size, const Vector2 &border_size, const Color &color, bool visible = true);
 
-			//Constructs a new border with the given position, size, border size, color and visibility
+			///@brief Constructs a new border with the given position, size, border size, color and visibility
 			Border(const Vector3 &position, const Vector2 &size, const Vector2 &border_size, const Color &color, bool visible = true);
 
-			//Constructs a new border with the given position, rotation, size, border size, color and visibility
+			///@brief Constructs a new border with the given position, rotation, size, border size, color and visibility
 			Border(const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size, const Color &color, bool visible = true);
 
 
-			//Constructs a new border with the given size, border size, corner style, color and visibility
+			///@brief Constructs a new border with the given size, border size, corner style, color and visibility
 			Border(const Vector2 &size, const Vector2 &border_size,
 				border::BorderCornerStyle corner_style, const Color &color, bool visible = true);
 
-			//Constructs a new border with the given position, size, border size, corner style, color and visibility
+			///@brief Constructs a new border with the given position, size, border size, corner style, color and visibility
 			Border(const Vector3 &position, const Vector2 &size, const Vector2 &border_size,
 				border::BorderCornerStyle corner_style, const Color &color, bool visible = true);
 
-			//Constructs a new border with the given position, rotation, size, border size, corner style, color and visibility
+			///@brief Constructs a new border with the given position, rotation, size, border size, corner style, color and visibility
 			Border(const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size,
 				border::BorderCornerStyle corner_style, const Color &color, bool visible = true);
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the border size of this border to the given size
+			///@brief Sets the border size of this border to the given size
 			inline void BorderSize(const Vector2 &size) noexcept
 			{
 				if (border_size_ != size)
@@ -116,8 +117,8 @@ namespace ion::graphics::scene::shapes
 			}
 
 
-			//Sets the color of this border to the given color
-			//Resets custom side and corner colors
+			///@brief Sets the color of this border to the given color
+			///@details Resets custom side and corner colors
 			inline void BorderColor(const Color &color) noexcept
 			{
 				SideColor({});
@@ -125,8 +126,8 @@ namespace ion::graphics::scene::shapes
 				FillColor(color);
 			}
 
-			//Sets the color of all of the border sides (without the corners) to the given color
-			//Resets custom side colors by passing nullopt
+			///@brief Sets the color of all of the border sides (without the corners) to the given color
+			///@details Resets custom side colors by passing nullopt
 			inline void SideColor(const std::optional<Color> &color) noexcept
 			{
 				if (top_side_color_ != color ||
@@ -142,8 +143,8 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the color of each of the border sides (without the corners) to the given colors
-			//Resets custom side colors by passing nullopt
+			///@brief Sets the color of each of the border sides (without the corners) to the given colors
+			///@details Resets custom side colors by passing nullopt
 			inline void SideColor(const std::optional<Color> &top, const std::optional<Color> &bottom,
 								  const std::optional<Color> &left, const std::optional<Color> &right) noexcept
 			{
@@ -160,8 +161,8 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the color of all of the border corners (without the sides) to the given color
-			//Resets custom corner colors by passing nullopt
+			///@brief Sets the color of all of the border corners (without the sides) to the given color
+			///@details Resets custom corner colors by passing nullopt
 			inline void CornerColor(const std::optional<Color> &color) noexcept
 			{
 				if (top_left_corner_color_ != color ||
@@ -177,8 +178,8 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
-			//Sets the color of each of the border corners (without the sides) to the given colors
-			//Resets custom corner colors by passing nullopt
+			///@brief Sets the color of each of the border corners (without the sides) to the given colors
+			///@details Resets custom corner colors by passing nullopt
 			inline void CornerColor(const std::optional<Color> &top_left, const std::optional<Color> &top_right,
 									const std::optional<Color> &bottom_left, const std::optional<Color> &bottom_right) noexcept
 			{
@@ -195,45 +196,49 @@ namespace ion::graphics::scene::shapes
 				}
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the border size of this border
+			///@brief Returns the border size of this border
 			[[nodiscard]] inline auto& BorderSize() const noexcept
 			{
 				return size_;
 			}
 
-			//Returns the corner style of this border
+			///@brief Returns the corner style of this border
 			[[nodiscard]] inline auto CornerStyle() const noexcept
 			{
 				return corner_style_;
 			}
 
 
-			//Returns the (base) color of this border
+			///@brief Returns the (base) color of this border
 			[[nodiscard]] inline auto& BorderColor() const noexcept
 			{
 				return FillColor();
 			}
 
-			//Returns the color of each of the sides of this border
-			//Returns nullopt if the side does not have a custom color
+			///@brief Returns the color of each of the sides of this border
+			///@details Returns nullopt if the side does not have a custom color
 			[[nodiscard]] inline auto SideColors() const noexcept
 			{
 				return std::tuple{top_side_color_, bottom_side_color_,
 								  left_side_color_, right_side_color_};
 			}
 
-			//Returns the color of each of the corners of this border
-			//Returns nullopt if the corner does not have a custom color
+			///@brief Returns the color of each of the corners of this border
+			///@details Returns nullopt if the corner does not have a custom color
 			[[nodiscard]] inline auto CornerColor() const noexcept
 			{
 				return std::tuple{top_left_corner_color_, top_right_corner_color_,
 								  bottom_left_corner_color_, bottom_right_corner_color_};
 			}
+
+			///@}
 	};
 } //ion::graphics::scene::shapes
 
