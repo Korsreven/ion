@@ -120,8 +120,6 @@ InputController::InputController(graphics::render::RenderWindow &render_window) 
 	render_window_.Events().Subscribe(*this);
 }
 
-//Public
-
 InputController::~InputController()
 {
 	ReleaseButtons();
