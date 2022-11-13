@@ -15,6 +15,7 @@ File:	IonOwningPtr.h
 
 #include <memory>
 #include <type_traits>
+#include <utility>
 
 namespace ion::memory
 {

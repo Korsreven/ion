@@ -14,6 +14,8 @@ File:	IonNonOwningPtr.h
 #define ION_NON_OWNING_PTR_H
 
 #include <type_traits>
+#include <utility>
+
 #include "IonOwningPtr.h"
 
 namespace ion::memory
