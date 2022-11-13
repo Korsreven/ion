@@ -60,7 +60,7 @@ namespace ion
 	} //engine
 
 
-	//The class that creates the render window with a default viewport and starts the rendering loop
+	///@brief The class that creates the render window with a default viewport and starts the rendering loop
 	class Engine final :
 		protected events::Listenable<events::listeners::FrameListener>,	
 		public managed::ObjectManager<graphics::scene::graph::SceneGraph, Engine>
@@ -87,8 +87,9 @@ namespace ion
 			static inline graphics::scene::graph::SceneGraph *active_scene_graph_ = nullptr;
 
 
-			/*
-				Notifying
+			/**
+				@name Notifying
+				@{
 			*/
 
 			bool NotifyFrameStarted(duration time) noexcept;
@@ -96,70 +97,79 @@ namespace ion
 
 			bool UpdateFrame(duration time) noexcept;
 
+			///@}
+
 		public:
 
-			//Default constructor
+			///@brief Default constructor
 			Engine() = default;
 
-			//Deleted copy constructor
+			///@brief Deleted copy constructor
 			Engine(const Engine&) = delete;
 
-			//Default move constructor
+			///@brief Default move constructor
 			Engine(Engine&&) = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Deleted copy assignment
+			///@brief Deleted copy assignment
 			Engine& operator=(const Engine&) = delete;
 
-			//Default move assignment
+			///@brief Default move assignment
 			Engine& operator=(Engine&&) = default;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all scene graphs in the engine
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all scene graphs in the engine
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto SceneGraphs() noexcept
 			{
 				return SceneGraphBase::Objects();
 			}
 
-			//Returns an immutable range of all scene graphs in the engine
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all scene graphs in the engine
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto SceneGraphs() const noexcept
 			{
 				return SceneGraphBase::Objects();
 			}
 
+			///@}
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//Returns a mutable reference to the frame listener
+			///@brief Returns a mutable reference to the frame listener
 			[[nodiscard]] inline auto& FrameEvents() noexcept
 			{
 				return static_cast<FrameEventsBase&>(*this);
 			}
 
-			//Returns an immutable reference to the frame listener
+			///@brief Returns an immutable reference to the frame listener
 			[[nodiscard]] inline auto& FrameEvents() const noexcept
 			{
 				return static_cast<const FrameEventsBase&>(*this);
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the target FPS (frames per second) the engine should use
+			///@brief Sets the target FPS (frames per second) the engine should use
 			inline void TargetFPS(std::optional<int> fps) noexcept
 			{
 				if (fps && *fps > 0)
@@ -168,46 +178,48 @@ namespace ion
 					target_frame_time_ = {};
 			}
 
-			//Sets if the engine should use vertical sync or not by the given value
+			///@brief Sets if the engine should use vertical sync or not by the given value
 			void VerticalSync(bool vsync) noexcept;
 
-			//Sets the kind of vertical sync the engine should use to the given mode
+			///@brief Sets the kind of vertical sync the engine should use to the given mode
 			void VerticalSync(engine::VSyncMode mode) noexcept;
 
 
-			//Sets the pixels per unit (PPU) the engine should use (default is 1.0)
+			///@brief Sets the pixels per unit (PPU) the engine should use (default is 1.0)
 			static inline void PixelsPerUnit(real pixels) noexcept
 			{
 				if (pixels > 0.0_r)
 					pixels_per_unit_ = pixels;
 			}
 
-			//Sets the units per meter the engine should use for distance measurements (default is 1.0)
-			//This is mostly used when initializing the sound system (to set distance factor)
+			///@brief Sets the units per meter the engine should use for distance measurements (default is 1.0)
+			///@details This is mostly used when initializing the sound system (to set distance factor)
 			static inline void UnitsPerMeter(real units) noexcept
 			{
 				if (units > 0.0_r)
 					units_per_meter_ = units;
 			}
 
-			//Sets the units per foot the engine should use for distance measurements (default is 0.3048)
-			//This is mostly used when initializing the sound system (to set distance factor)
+			///@brief Sets the units per foot the engine should use for distance measurements (default is 0.3048)
+			///@details This is mostly used when initializing the sound system (to set distance factor)
 			static inline void UnitsPerFoot(real units) noexcept
 			{
 				UnitsPerMeter(units * engine::detail::meters_to_feet_factor);
 			}
 
-			//Sets the expected z limit in range [from, to]
-			//This is used for calculating which z epsilon the engine should use
+			///@brief Sets the expected z limit in range [from, to]
+			///@details This is used for calculating which z epsilon the engine should use
 			static void ZLimit(real from, real to) noexcept;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the target FPS (frames per second) the engine is using
-			//Returns nullopt if no target FPS has been set
+			///@brief Returns the target FPS (frames per second) the engine is using
+			///@details Returns nullopt if no target FPS has been set
 			[[nodiscard]] inline auto TargetFPS() const noexcept -> std::optional<int>
 			{
 				if (target_frame_time_)
@@ -216,178 +228,194 @@ namespace ion
 					return {};
 			}
 
-			//Returns the kind of vertical sync the engine is using
-			//Returns nullopt if vertical sync mode is unknown
+			///@brief Returns the kind of vertical sync the engine is using
+			///@details Returns nullopt if vertical sync mode is unknown
 			[[nodiscard]] std::optional<engine::VSyncMode> VerticalSync() const noexcept;
 
 
-			//Returns a pointer to a mutable render window
-			//Returns nullptr if the engine is not rendering to a target
+			///@brief Returns a pointer to a mutable render window
+			///@details Returns nullptr if the engine is not rendering to a target
 			[[nodiscard]] inline auto Target() noexcept
 			{
 				return render_window_ ? &*render_window_ : nullptr;
 			}
 
-			//Returns a pointer to an immutable render window
-			//Returns nullptr if the engine is not rendering to a target
+			///@brief Returns a pointer to an immutable render window
+			///@details Returns nullptr if the engine is not rendering to a target
 			[[nodiscard]] inline auto Target() const noexcept
 			{
 				return render_window_ ? &*render_window_ : nullptr;
 			}
 
 
-			//Returns a pointer to a mutable input controller
-			//Returns nullptr if the engine has no input controller (missing rendering target)
+			///@brief Returns a pointer to a mutable input controller
+			///@details Returns nullptr if the engine has no input controller (missing rendering target)
 			[[nodiscard]] inline auto Input() noexcept
 			{
 				return input_controller_ ? &*input_controller_ : nullptr;
 			}
 
-			//Returns a pointer to an immutable input controller
-			//Returns nullptr if the engine has no input controller (missing rendering target)
+			///@brief Returns a pointer to an immutable input controller
+			///@details Returns nullptr if the engine has no input controller (missing rendering target)
 			[[nodiscard]] inline auto Input() const noexcept
 			{
 				return input_controller_ ? &*input_controller_ : nullptr;
 			}
 
 
-			//Returns a mutable reference to a timer manager containing syncronized timers
+			///@brief Returns a mutable reference to a timer manager containing syncronized timers
 			[[nodiscard]] inline auto& SyncedTimers() noexcept
 			{
 				return timer_manager_;
 			}
 
-			//Returns an immutable reference to a timer manager containing syncronized timers
+			///@brief Returns an immutable reference to a timer manager containing syncronized timers
 			[[nodiscard]] inline auto& SyncedTimers() const noexcept
 			{
 				return timer_manager_;
 			}
 
 
-			//Returns the pixels per unit (PPU) the engine should use (default is 1.0)
+			///@brief Returns the pixels per unit (PPU) the engine should use (default is 1.0)
 			[[nodiscard]] static inline auto PixelsPerUnit() noexcept
 			{
 				return pixels_per_unit_;
 			}
 
-			//Returns the units per meter the engine should use for distance measurements (default is 1.0)
-			//This is mostly used when initializing the sound system (to set distance factor)
+			///@brief Returns the units per meter the engine should use for distance measurements (default is 1.0)
+			///@details This is mostly used when initializing the sound system (to set distance factor)
 			[[nodiscard]] static inline auto UnitsPerMeter() noexcept
 			{
 				return units_per_meter_;
 			}
 
-			//Returns the units per foot the engine should use for distance measurements (default is 0.3048)
-			//This is mostly used when initializing the sound system (to set distance factor)
+			///@brief Returns the units per foot the engine should use for distance measurements (default is 0.3048)
+			///@details This is mostly used when initializing the sound system (to set distance factor)
 			[[nodiscard]] static inline auto UnitsPerFoot() noexcept
 			{
 				return units_per_meter_ * engine::detail::feet_to_meters_factor;
 			}
 
-			//Returns the z epsilon the engine should use (default is 0.001)
-			//This is mostly used when initializing primitives above or below other primitives
+			///@brief Returns the z epsilon the engine should use (default is 0.001)
+			///@details This is mostly used when initializing primitives above or below other primitives
 			[[nodiscard]] static inline auto ZEpsilon() noexcept
 			{
 				return z_epsilon_;
 			}
 
+			///@}
 
-			/*
-				Engine
+			/**
+				@name Engine
+				@{
 			*/
 
-			//Returns true if all extensions, internal and external requirements where initialized succesfully
+			///@brief Returns true if all extensions, internal and external requirements where initialized succesfully
 			[[nodiscard]] bool Initialize() noexcept;
 
-			//Starts the rendering loop
-			//Returns 0 if everything went fine
+			///@brief Starts the rendering loop
+			///@details Returns 0 if everything went fine
 			[[nodiscard]] int Start() noexcept;
 
+			///@}
 
-			/*
-				Timing
+			/**
+				@name Timing
+				@{
 			*/
 
-			//Returns the last frame time
+			///@brief Returns the last frame time
 			[[nodiscard]] duration FrameTime() const noexcept;
 
-			//Returns the total running time
+			///@brief Returns the total running time
 			[[nodiscard]] duration TotalTime() const noexcept;
 
-			//Returns the FPS
+			///@brief Returns the FPS
 			[[nodiscard]] real FPS() const noexcept;
 
 
-			//Returns true if the engine is running
+			///@brief Returns true if the engine is running
 			[[nodiscard]] bool Running() const noexcept;
 
+			///@}
 
-			/*
-				Rendering target
+			/**
+				@name Rendering target
+				@{
 			*/
 
-			//Renders to the given render window, and create a default viewport
+			///@brief Renders to the given render window, and create a default viewport
 			graphics::render::RenderWindow& RenderTo(graphics::render::RenderWindow &&render_window) noexcept;
 
+			///@}
 
-			/*
-				Scene graphs
+			/**
+				@name Scene graphs
 				Creating
+				@{
 			*/
 
-			//Creates a scene graph with the given name and whether or not is should be enabled
+			///@brief Creates a scene graph with the given name and whether or not is should be enabled
 			NonOwningPtr<graphics::scene::graph::SceneGraph> CreateSceneGraph(std::optional<std::string> name = {}, bool enabled = true);
 
+			///@}
 
-			/*
-				Scene graphs
+			/**
+				@name Scene graphs
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to a mutable scene graph with the given name
-			//Returns nullptr if scene graph could not be found
+			///@brief Gets a pointer to a mutable scene graph with the given name
+			///@details Returns nullptr if scene graph could not be found
 			[[nodiscard]] NonOwningPtr<graphics::scene::graph::SceneGraph> GetSceneGraph(std::string_view name) noexcept;
 
-			//Gets a pointer to an immutable scene graph with the given name
-			//Returns nullptr if scene graph could not be found
+			///@brief Gets a pointer to an immutable scene graph with the given name
+			///@details Returns nullptr if scene graph could not be found
 			[[nodiscard]] NonOwningPtr<const graphics::scene::graph::SceneGraph> GetSceneGraph(std::string_view name) const noexcept;
 
 
-			//Gets a pointer to the currently active scene graph
-			//Returns nullptr if there is no currently active scene graph
+			///@brief Gets a pointer to the currently active scene graph
+			///@details Returns nullptr if there is no currently active scene graph
 			[[nodiscard]] static inline auto GetActiveSceneGraph() noexcept
 			{
 				return active_scene_graph_;
 			}
 
+			///@}
 
-			/*
-				Scene graphs
+			/**
+				@name Scene graphs
 				Removing
+				@{
 			*/
 
-			//Clears all removable scene graphs from the engine
+			///@brief Clears all removable scene graphs from the engine
 			void ClearSceneGraphs() noexcept;
 
-			//Removes a removable scene graph from the engine
+			///@brief Removes a removable scene graph from the engine
 			bool RemoveSceneGraph(graphics::scene::graph::SceneGraph &scene_graph) noexcept;
 
-			//Removes a removable scene graph with the given name from the engine
+			///@brief Removes a removable scene graph with the given name from the engine
 			bool RemoveSceneGraph(std::string_view name) noexcept;
 
+			///@}
 
-			/*
-				Viewport
+			/**
+				@name Viewport
 				Retrieving
+				@{
 			*/
 
-			//Gets a pointer to the default viewport used by the engine
-			//Returns nullptr if no default viewport could be found
+			///@brief Gets a pointer to the default viewport used by the engine
+			///@details Returns nullptr if no default viewport could be found
 			[[nodiscard]] NonOwningPtr<graphics::render::Viewport> GetDefaultViewport() noexcept;
 
-			//Gets a pointer to the default viewport used by the engine
-			//Returns nullptr if no default viewport could be found
+			///@brief Gets a pointer to the default viewport used by the engine
+			///@details Returns nullptr if no default viewport could be found
 			[[nodiscard]] NonOwningPtr<const graphics::render::Viewport> GetDefaultViewport() const noexcept;
+
+			///@}
 	};
 } //ion
 #endif
