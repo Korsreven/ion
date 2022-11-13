@@ -54,11 +54,14 @@ namespace ion::graphics::scene
 		{
 			protected:
 
-				/*
-					Events
+				/**
+					@name Events
+					@{
 				*/
 
 				void RenderPassesChanged() noexcept override;
+
+				///@}
 
 			public:
 
@@ -105,8 +108,9 @@ namespace ion::graphics::scene
 		vertex_metrics get_vertex_metrics(const render::vertex::VertexDeclaration &vertex_declaration) noexcept;
 
 
-		/*
-			Rendering
+		/**
+			@name Rendering
+			@{
 		*/
 
 		void apply_node_rotation(const vertex_metrics &metrics, real node_rotation, render::render_primitive::VertexContainer &data) noexcept;
@@ -114,10 +118,12 @@ namespace ion::graphics::scene
 
 		void get_emitter_primitives(const particles::ParticleSystem &particle_system, const vertex_metrics &metrics,
 			real node_rotation, const Vector2 &node_scaling, particle_emitter_primitives &emitter_primitives);
+
+		///@}
 	} //drawable_particle_system::detail
 
 
-	//A class representing a drawable particle system that can be attached to a scene node
+	///@brief A class representing a drawable particle system that can be attached to a scene node
 	class DrawableParticleSystem final : public DrawableObject
 	{
 		private:
@@ -136,59 +142,68 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Constructs a new drawable particle system with the given name, particle system and visibility
+			///@brief Constructs a new drawable particle system with the given name, particle system and visibility
 			DrawableParticleSystem(std::optional<std::string> name,
 				NonOwningPtr<particles::ParticleSystem> particle_system, bool visible = true);
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Reverts to the initial particle system
+			///@brief Reverts to the initial particle system
 			void Revert();
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns a mutable reference to the particle system
+			///@brief Returns a mutable reference to the particle system
 			[[nodiscard]] auto& Get() noexcept
 			{
 				reload_primitives_ = true; //Particle system could be changed
 				return particle_system_;
 			}
 
-			//Returns an immutable reference to the particle system
+			///@brief Returns an immutable reference to the particle system
 			[[nodiscard]] auto& Get() const noexcept
 			{
 				return particle_system_;
 			}
 
-			//Returns an immutable reference to the particle system
+			///@brief Returns an immutable reference to the particle system
 			[[nodiscard]] auto& GetImmutable() const noexcept
 			{
 				return particle_system_;
 			}
 
+			///@}
 
-			/*
-				Preparing/drawing
+			/**
+				@name Preparing/drawing
+				@{
 			*/
 
-			//Prepares this particle system such that it is ready to be drawn
-			//This function is typically called each frame
+			///@brief Prepares this particle system such that it is ready to be drawn
+			///@details This function is typically called each frame
 			void Prepare() override;
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses the total time for this particle system by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for this particle system by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept override;
+
+			///@}
 	};
 } //ion::graphics::scene
 

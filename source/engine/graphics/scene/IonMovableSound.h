@@ -44,7 +44,7 @@ namespace ion::graphics::scene
 	} //movable_sound
 
 
-	//A class representing a movable (positional 3D) sound that can be attached to a scene node
+	///@brief A class representing a movable (positional 3D) sound that can be attached to a scene node
 	class MovableSound final : public MovableObject
 	{
 		private:
@@ -57,76 +57,83 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Constructs a new movable sound with the given name, sound and pause state
+			///@brief Constructs a new movable sound with the given name, sound and pause state
 			MovableSound(std::optional<std::string> name,
 				NonOwningPtr<sounds::Sound> sound, bool paused = false);
 
-			//Constructs a new movable sound with the given name, position, sound and pause state
+			///@brief Constructs a new movable sound with the given name, position, sound and pause state
 			MovableSound(std::optional<std::string> name, const Vector3 &position,
 				NonOwningPtr<sounds::Sound> sound, bool paused = false);
 
 
-			//Constructs a new movable sound with the given name, sound, sound channel group and pause state
+			///@brief Constructs a new movable sound with the given name, sound, sound channel group and pause state
 			MovableSound(std::optional<std::string> name,
 				NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
 
-			//Constructs a new movable sound with the given name, position, sound, sound channel group and pause state
+			///@brief Constructs a new movable sound with the given name, position, sound, sound channel group and pause state
 			MovableSound(std::optional<std::string> name, const Vector3 &position,
 				NonOwningPtr<sounds::Sound> sound, NonOwningPtr<sounds::SoundChannelGroup> sound_channel_group, bool paused = false);
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the position of this sound to the given position
+			///@brief Sets the position of this sound to the given position
 			inline void Position(const Vector3 &position) noexcept
 			{
 				position_ = position;
 			}
 
-			//Sets the position of this sound to the given position
+			///@brief Sets the position of this sound to the given position
 			inline void Position(const Vector2 &position) noexcept
 			{
 				Position({position.X(), position.Y(), position_.Z()});
 			}
 
 
-			//Reverts to the initial sound
+			///@brief Reverts to the initial sound
 			void Revert();
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the position of this sound
+			///@brief Returns the position of this sound
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}
 
 
-			//Returns a mutable reference to the sound channel
+			///@brief Returns a mutable reference to the sound channel
 			[[nodiscard]] auto& Get() noexcept
 			{
 				return sound_channel_;
 			}
 
-			//Returns an immutable reference to the sound channel
+			///@brief Returns an immutable reference to the sound channel
 			[[nodiscard]] auto& Get() const noexcept
 			{
 				return sound_channel_;
 			}
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses the total time for this movable sound by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for this movable sound by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept override;
+
+			///@}
 	};
 } //ion::graphics::scene
 

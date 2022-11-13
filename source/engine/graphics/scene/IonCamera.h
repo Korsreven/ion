@@ -48,7 +48,7 @@ namespace ion::graphics::scene
 	} //camera
 
 
-	//A class representing a camera that can be attached to a scene node
+	///@brief A class representing a camera that can be attached to a scene node
 	class Camera final :
 		public MovableObject,
 		protected events::EventGenerator<events::listeners::CameraListener>
@@ -67,27 +67,31 @@ namespace ion::graphics::scene
 			void PrepareBoundingVolumes() noexcept;
 
 
-			/*
-				Notifying
+			/**
+				@name Notifying
+				@{
 			*/
 
 			void NotifyCameraFrustumChanged(const render::Frustum &frustum) noexcept;
 			void NotifyCameraMoved(const Vector3 &position) noexcept;
 
+			///@}
+
 		public:
 
-			//Constructs a new camera with the given name and visibility
+			///@brief Constructs a new camera with the given name and visibility
 			explicit Camera(std::optional<std::string> name = {}, bool visible = true) noexcept;
 
-			//Constructs a new camera with the given name, a custom frustum and visibility
+			///@brief Constructs a new camera with the given name, a custom frustum and visibility
 			Camera(std::optional<std::string> name, const render::Frustum &frustum, bool visible = true) noexcept;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the position of this camera to the given position
+			///@brief Sets the position of this camera to the given position
 			inline void Position(const Vector3 &position) noexcept
 			{
 				if (position_ != position)
@@ -98,13 +102,13 @@ namespace ion::graphics::scene
 				}
 			}
 
-			//Sets the position of this camera to the given position
+			///@brief Sets the position of this camera to the given position
 			inline void Position(const Vector2 &position) noexcept
 			{
 				Position({position.X(), position.Y(), position_.Z()});
 			}
 
-			//Sets the rotation of this camera to the given angle (in radians)
+			///@brief Sets the rotation of this camera to the given angle (in radians)
 			inline void Rotation(real angle) noexcept
 			{
 				if (rotation_ != angle)
@@ -114,7 +118,7 @@ namespace ion::graphics::scene
 				}
 			}
 
-			//Sets the view frustum of the camera to the given frustum
+			///@brief Sets the view frustum of the camera to the given frustum
 			inline void ViewFrustum(const render::Frustum &frustum) noexcept
 			{
 				frustum_ = frustum;
@@ -123,48 +127,54 @@ namespace ion::graphics::scene
 			}
 
 
-			//See Frustum::BaseViewportHeight for more details
+			///@brief See Frustum::BaseViewportHeight for more details
 			inline void BaseViewportHeight(real height) noexcept
 			{
 				frustum_.BaseViewportHeight(height);
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the position of the camera
+			///@brief Returns the position of the camera
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}
 
-			//Returns the angle of rotation (in radians) for this camera
+			///@brief Returns the angle of rotation (in radians) for this camera
 			[[nodiscard]] inline auto Rotation() const noexcept
 			{
 				return rotation_;
 			}
 
-			//Returns the view frustum of the camera
+			///@brief Returns the view frustum of the camera
 			[[nodiscard]] inline auto& ViewFrustum() const noexcept
 			{
 				return frustum_;
 			}
 
-			//Returns the view matrix for this camera
+			///@brief Returns the view matrix for this camera
 			[[nodiscard]] inline auto& ViewMatrix() const noexcept
 			{
 				return view_matrix_;
 			}
 
+			///@}
 
-			/*
-				Capturing
+			/**
+				@name Capturing
+				@{
 			*/
 
-			//Starts capturing the scene from the viewpoint of this camera, with the given viewport
+			///@brief Starts capturing the scene from the viewpoint of this camera, with the given viewport
 			void CaptureScene(const render::Viewport &viewport) noexcept;
+
+			///@}
 	};
 } //ion::graphics::scene
 

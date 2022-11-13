@@ -77,7 +77,7 @@ namespace ion::graphics::scene
 	} //movable_object
 
 
-	//A class representing a movable object with bounding volumes, that can be attached to a scene node
+	///@brief A class representing a movable object with bounding volumes, that can be attached to a scene node
 	class MovableObject : public managed::ManagedObject<SceneManager>
 	{
 		protected:
@@ -93,8 +93,9 @@ namespace ion::graphics::scene
 			render::Renderer* ParentRenderer() const noexcept;
 
 
-			/*
-				Bounding volumes
+			/**
+				@name Bounding volumes
+				@{
 			*/
 
 			Aabb DeriveWorldAxisAlignedBoundingBox(Aabb aabb, bool apply_extent = true) const noexcept;
@@ -103,6 +104,8 @@ namespace ion::graphics::scene
 
 			void DrawBoundingVolumes(const Aabb &aabb, const Obb &obb, const Sphere &sphere,
 				const Color &aabb_color, const Color &obb_color, const Color &sphere_color, real z) const noexcept;
+
+			///@}
 
 		private:
 
@@ -125,69 +128,75 @@ namespace ion::graphics::scene
 			mutable std::pair<Sphere, Sphere> world_sphere_;
 
 
-			/*
-				Helper functions
+			/**
+				@name Helper functions
+				@{
 			*/
 
 			void Detach() noexcept;
 
+			///@}
+
 		public:
 
-			//Constructs a movable object with the given name and visibility
+			///@brief Constructs a movable object with the given name and visibility
 			explicit MovableObject(std::optional<std::string> name = {}, bool visible = true) noexcept;		
 
-			//Default copy constructor
+			///@brief Default copy constructor
 			MovableObject(const MovableObject&) = default;
 
-			//Default move constructor
+			///@brief Default move constructor
 			MovableObject(MovableObject&&) = default;
 
-			//Virtual destructor
+			///@brief Virtual destructor
 			virtual ~MovableObject() noexcept;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
-			//Default copy assignment
+			///@brief Default copy assignment
 			inline MovableObject& operator=(const MovableObject&) = default;
 
-			//Default move assignment
+			///@brief Default move assignment
 			inline MovableObject& operator=(MovableObject&&) = default;
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the relative bounding volume extent to the given extent
-			//Aabb::Min represents the bottom-left corner (default: vector2::Zero)
-			//Aabb::Max represents the top-left corner (default: vector2::UnitScale)
+			///@brief Sets the relative bounding volume extent to the given extent
+			///@details Aabb::Min represents the bottom-left corner (default: vector2::Zero).
+			///Aabb::Max represents the top-left corner (default: vector2::UnitScale)
 			inline void BoundingVolumeExtent(const Aabb &extent) noexcept
 			{
 				bounding_volume_extent_ = extent;
 			}
 
-			//Sets the preferred bounding volume for this movable object to the given type
-			//Is used for choosing bounding volume when querying
+			///@brief Sets the preferred bounding volume for this movable object to the given type
+			///@details Is used for choosing bounding volume when querying
 			inline void PreferredBoundingVolume(movable_object::PreferredBoundingVolumeType type) noexcept
 			{
 				preferred_bounding_volume_ = type;
 			}
 
 
-			//Sets the query flags for this movable object to the given flags
-			//This object will only be queried if a bitwise AND operation between the query flags and the scene query mask is non-zero
-			//The meaning of the bits is user-specific
+			///@brief Sets the query flags for this movable object to the given flags
+			///@details This object will only be queried if a bitwise AND operation between the query flags and the scene query mask is non-zero.
+			///The meaning of the bits is user-specific
 			inline void QueryFlags(std::optional<uint32> flags) noexcept
 			{
 				query_flags_ = flags;
 			}
 
-			//Adds the given flags to the already existing query flags for this movable object
-			//This object will only be queried if a bitwise AND operation between the query flags and the scene query mask is non-zero
-			//The meaning of the bits is user-specific
+			///@brief Adds the given flags to the already existing query flags for this movable object
+			///@details This object will only be queried if a bitwise AND operation between the query flags and the scene query mask is non-zero.
+			///The meaning of the bits is user-specific
 			inline void AddQueryFlags(uint32 flags) noexcept
 			{
 				if (query_flags_)
@@ -196,9 +205,9 @@ namespace ion::graphics::scene
 					query_flags_ = flags;
 			}
 
-			//Removes the given flags to the already existing query flags for this movable object
-			//This object will only be queried if a bitwise AND operation between the query flags and the scene query mask is non-zero
-			//The meaning of the bits is user-specific
+			///@brief Removes the given flags to the already existing query flags for this movable object
+			///@details This object will only be queried if a bitwise AND operation between the query flags and the scene query mask is non-zero.
+			///The meaning of the bits is user-specific
 			inline void RemoveQueryFlags(uint32 flags) noexcept
 			{
 				if (query_flags_)
@@ -206,17 +215,17 @@ namespace ion::graphics::scene
 			}
 
 
-			//Sets the query mask for this movable object to the given mask
-			//This object can only intersect another object if a bitwise AND operation between the query flags and the other objects query mask is non-zero
-			//The meaning of the bits is user-specific
+			///@brief Sets the query mask for this movable object to the given mask
+			///@details This object can only intersect another object if a bitwise AND operation between the query flags and the other objects query mask is non-zero.
+			///The meaning of the bits is user-specific
 			inline void QueryMask(std::optional<uint32> mask) noexcept
 			{
 				query_mask_ = mask;
 			}
 
-			//Adds the given mask to the already existing query mask for this movable object
-			//This object can only intersect another object if a bitwise AND operation between the query flags and the other objects query mask is non-zero
-			//The meaning of the bits is user-specific
+			///@brief Adds the given mask to the already existing query mask for this movable object
+			///@details This object can only intersect another object if a bitwise AND operation between the query flags and the other objects query mask is non-zero.
+			///The meaning of the bits is user-specific
 			inline void AddQueryMask(uint32 mask) noexcept
 			{
 				if (query_mask_)
@@ -225,9 +234,9 @@ namespace ion::graphics::scene
 					query_mask_ = mask;
 			}
 
-			//Removes the given mask to the already existing query mask for this movable object
-			//This object can only intersect another object if a bitwise AND operation between the query flags and the other objects query mask is non-zero
-			//The meaning of the bits is user-specific
+			///@brief Removes the given mask to the already existing query mask for this movable object
+			///@details This object can only intersect another object if a bitwise AND operation between the query flags and the other objects query mask is non-zero.
+			///The meaning of the bits is user-specific
 			inline void RemoveQueryMask(uint32 mask) noexcept
 			{
 				if (query_mask_)
@@ -235,19 +244,19 @@ namespace ion::graphics::scene
 			}
 
 
-			//Sets the visibility of this movable object to the given value
+			///@brief Sets the visibility of this movable object to the given value
 			inline void Visible(bool visible) noexcept
 			{
 				visible_ = visible;
 			}
 
-			//Sets whether or not to show this movable objects bounding volumes
+			///@brief Sets whether or not to show this movable objects bounding volumes
 			inline void ShowBoundingVolumes(bool show) noexcept
 			{
 				show_bounding_volumes_ = show;
 			}
 
-			//Sets the colors of the bounding volumes to the given colors
+			///@brief Sets the colors of the bounding volumes to the given colors
 			inline void BoundingVolumeColors(const Color &color) noexcept
 			{
 				aabb_color_ = color;
@@ -255,8 +264,8 @@ namespace ion::graphics::scene
 				sphere_color_ = color;
 			}
 
-			//Sets the colors of each of the bounding volumes to the given colors
-			//Use color::Transparent to hide certain bounding volumes from showing
+			///@brief Sets the colors of each of the bounding volumes to the given colors
+			///@details Use color::Transparent to hide certain bounding volumes from showing
 			inline void BoundingVolumeColors(const Color &aabb_color, const Color &obb_color, const Color &sphere_color) noexcept
 			{
 				aabb_color_ = aabb_color;
@@ -265,114 +274,116 @@ namespace ion::graphics::scene
 			}
 
 
-			//Sets parent node of this movable object to the given node
+			///@brief Sets parent node of this movable object to the given node
 			inline void ParentNode(graph::SceneNode *scene_node) noexcept
 			{
 				parent_node_ = scene_node;
 			}
 
-			//Sets the custom user data for this movable object to the given data
+			///@brief Sets the custom user data for this movable object to the given data
 			inline void UserData(std::any data) noexcept
 			{
 				user_data_ = data;
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the relative bounding volume extent of this movable object
-			//Aabb::Min represents the bottom-left corner (default: vector2::Zero)
-			//Aabb::Max represents the top-left corner (default: vector2::UnitScale)
+			///@brief Returns the relative bounding volume extent of this movable object
+			///@details Aabb::Min represents the bottom-left corner (default: vector2::Zero).
+			///Aabb::Max represents the top-left corner (default: vector2::UnitScale)
 			[[nodiscard]] inline auto BoundingVolumeExtent() const noexcept
 			{
 				return bounding_volume_extent_;
 			}
 
-			//Returns the preferred bounding volume for this movable object
-			//Is used for choosing bounding volume when querying
+			///@brief Returns the preferred bounding volume for this movable object
+			///@details Is used for choosing bounding volume when querying
 			[[nodiscard]] inline auto PreferredBoundingVolume() const noexcept
 			{
 				return preferred_bounding_volume_;
 			}
 
-			//Returns the query flags for this movable object
-			//This object will only be queried if a bitwise AND operation between the query flags and the scene query mask is non-zero
-			//The meaning of the bits is user-specific
+			///@brief Returns the query flags for this movable object
+			///@details This object will only be queried if a bitwise AND operation between the query flags and the scene query mask is non-zero.
+			///The meaning of the bits is user-specific
 			[[nodiscard]] inline auto QueryFlags() const noexcept
 			{
 				return query_flags_;
 			}
 
-			//Returns the query mask for this movable object
-			//This object can only intersect another object if a bitwise AND operation between the query flags and the other objects query mask is non-zero
-			//The meaning of the bits is user-specific
+			///@brief Returns the query mask for this movable object
+			///@details This object can only intersect another object if a bitwise AND operation between the query flags and the other objects query mask is non-zero.
+			///The meaning of the bits is user-specific
 			[[nodiscard]] inline auto QueryMask() const noexcept
 			{
 				return query_mask_;
 			}
 
-			//Returns the query type flags for this movable object
-			//This object will only be queried if a bitwise AND operation between the query type flags and the scene query type mask is non-zero
+			///@brief Returns the query type flags for this movable object
+			///@details This object will only be queried if a bitwise AND operation between the query type flags and the scene query type mask is non-zero
 			[[nodiscard]] inline auto QueryTypeFlags() const noexcept
 			{
 				return query_type_flags_;
 			}
 
 
-			//Returns true if this movable object is visible
+			///@brief Returns true if this movable object is visible
 			[[nodiscard]] inline auto Visible() const noexcept
 			{
 				return visible_;
 			}
 
-			//Returns true if this movable objects bounding volumes are shown
+			///@brief Returns true if this movable objects bounding volumes are shown
 			[[nodiscard]] inline auto ShowBoundingVolumes() const noexcept
 			{
 				return show_bounding_volumes_;
 			}
 
-			//Returns the bounding volume colors for this movable object
+			///@brief Returns the bounding volume colors for this movable object
 			[[nodiscard]] inline auto BoundingVolumeColors() const noexcept
 			{
 				return std::tuple{aabb_color_, obb_color_, sphere_color_};
 			}
 
 
-			//Returns a pointer to the parent node for this movable object
+			///@brief Returns a pointer to the parent node for this movable object
 			[[nodiscard]] inline auto ParentNode() const noexcept
 			{
 				return parent_node_.Get();
 			}
 
-			//Returns the custom user data for this movable object
+			///@brief Returns the custom user data for this movable object
 			[[nodiscard]] inline auto& UserData() const noexcept
 			{
 				return user_data_;
 			}
 
 
-			//Returns the local axis-aligned bounding box (AABB) for this movable object
+			///@brief Returns the local axis-aligned bounding box (AABB) for this movable object
 			[[nodiscard]] inline auto& AxisAlignedBoundingBox() const noexcept
 			{
 				return aabb_;
 			}
 
-			//Returns the local oriented bounding box (OBB) for this movable object
+			///@brief Returns the local oriented bounding box (OBB) for this movable object
 			[[nodiscard]] inline auto& OrientedBoundingBox() const noexcept
 			{
 				return obb_;
 			}
 
-			//Returns the local bounding sphere for this movable object
+			///@brief Returns the local bounding sphere for this movable object
 			[[nodiscard]] inline auto& BoundingSphere() const noexcept
 			{
 				return sphere_;
 			}
 
 
-			//Returns the world axis-aligned bounding box (AABB) for this movable object
+			///@brief Returns the world axis-aligned bounding box (AABB) for this movable object
 			[[nodiscard]] inline auto& WorldAxisAlignedBoundingBox(bool derive = true, bool apply_extent = true) const noexcept
 			{
 				if (derive)
@@ -383,7 +394,7 @@ namespace ion::graphics::scene
 				return apply_extent ? world_aabb_.first : world_aabb_.second;
 			}
 
-			//Returns the world oriented bounding box (OBB) for this movable object
+			///@brief Returns the world oriented bounding box (OBB) for this movable object
 			[[nodiscard]] inline auto& WorldOrientedBoundingBox(bool derive = true, bool apply_extent = true) const noexcept
 			{
 				if (derive)
@@ -394,7 +405,7 @@ namespace ion::graphics::scene
 				return apply_extent ? world_obb_.first : world_obb_.second;
 			}
 
-			//Returns the world bounding sphere for this movable object
+			///@brief Returns the world bounding sphere for this movable object
 			[[nodiscard]] inline auto& WorldBoundingSphere(bool derive = true, bool apply_extent = true) const noexcept
 			{
 				if (derive)
@@ -406,40 +417,48 @@ namespace ion::graphics::scene
 			}
 
 
-			//Returns all render primitives in this movable object
+			///@brief Returns all render primitives in this movable object
 			[[nodiscard]] virtual movable_object::RenderPrimitiveRange AllRenderPrimitives() noexcept;
 
-			//Returns all (distinct) shader programs used to render this movable object
+			///@brief Returns all (distinct) shader programs used to render this movable object
 			[[nodiscard]] virtual movable_object::ShaderProgramRange AllShaderPrograms() noexcept;
 
-			//Returns all emissive lights in this movable object
+			///@brief Returns all emissive lights in this movable object
 			[[nodiscard]] virtual movable_object::LightRange AllEmissiveLights() noexcept;
 
+			///@}
 
-			/*
-				Preparing
+			/**
+				@name Preparing
+				@{
 			*/
 
-			//Prepares this movable object
-			//This function is typically called each frame
+			///@brief Prepares this movable object
+			///@details This function is typically called each frame
 			virtual void Prepare();
 
+			///@}
 
-			/*
-				Drawing
+			/**
+				@name Drawing
+				@{
 			*/
 
-			//Draws the bounding volumes of this movable object
+			///@brief Draws the bounding volumes of this movable object
 			virtual void DrawBounds(real z) noexcept;
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses the total time for this movable object by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for this movable object by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			virtual void Elapse(duration time) noexcept;
+
+			///@}
 	};
 } //ion::graphics::scene
 

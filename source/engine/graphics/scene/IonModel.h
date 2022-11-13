@@ -60,8 +60,8 @@ namespace ion::graphics::scene
 	} //model
 
 
-	//A class representing a model that can be attached to a scene node
-	//A model can contain multiple meshes where each mesh is relative to the parent model
+	///@brief A class representing a model that can be attached to a scene node
+	///@details A model can contain multiple meshes where each mesh is relative to the parent model
 	class Model final :
 		public DrawableObject,
 		public managed::ObjectManager<shapes::Mesh, Model>
@@ -77,132 +77,148 @@ namespace ion::graphics::scene
 			model::Lights emissive_lights_;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
-			//See ObjectManager<T>::Created for more details
+			///@brief See ObjectManager<T>::Created for more details
 			void Created(shapes::Mesh &mesh) noexcept override;
 
-			//See ObjectManager<T>::removed for more details
+			///@brief See ObjectManager<T>::removed for more details
 			void Removed(shapes::Mesh &mesh) noexcept override;
+
+			///@}
 
 		public:
 
-			//Constructs a new model with the given name and visibility
+			///@brief Constructs a new model with the given name and visibility
 			explicit Model(std::optional<std::string> name = {}, bool visible = true) noexcept;
 
-			//Virtual destructor
+			///@brief Virtual destructor
 			virtual ~Model() noexcept;
 
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all meshes in this model
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all meshes in this model
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Meshes() noexcept
 			{
 				return Objects();
 			}
 
-			//Returns an immutable range of all meshes in this model
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all meshes in this model
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto Meshes() const noexcept
 			{
 				return Objects();
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 			
-			//Returns all emissive lights in this model
+			///@brief Returns all emissive lights in this model
 			[[nodiscard]] movable_object::LightRange AllEmissiveLights() noexcept override;
 
+			///@}
 
-			/*
-				Notifying
+			/**
+				@name Notifying
+				@{
 			*/
 
-			//Called when vertex data has changed on the given mesh
+			///@brief Called when vertex data has changed on the given mesh
 			void NotifyVertexDataChanged(shapes::Mesh &mesh) noexcept;
 
-			//Called when render passes has changed on the given mesh
+			///@brief Called when render passes has changed on the given mesh
 			void NotifyRenderPassesChanged(shapes::Mesh &mesh) noexcept;
 
-			//Called when material has changed on the given mesh
+			///@brief Called when material has changed on the given mesh
 			void NotifyMaterialChanged(shapes::Mesh &mesh) noexcept;
 
+			///@}
 
-			/*
-				Preparing
+			/**
+				@name Preparing
+				@{
 			*/
 
-			//Prepares this model such that it is ready to be drawn
-			//This function is typically called each frame
+			///@brief Prepares this model such that it is ready to be drawn
+			///@details This function is typically called each frame
 			void Prepare() override;
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses the total time for each mesh in this model by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for each mesh in this model by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept override;
 
+			///@}
 
-			/*
-				Meshes
+			/**
+				@name Meshes
 				Creating
+				@{
 			*/
 
-			//Creates a mesh with the given vertices and visibility
+			///@brief Creates a mesh with the given vertices and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(const shapes::mesh::Vertices &vertices, bool visible = true);
 
-			//Creates a mesh with the given vertices, material, tex coord mode and visibility
+			///@brief Creates a mesh with the given vertices, material, tex coord mode and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(const shapes::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
-			//Creates a mesh with the given draw mode, vertices and visibility
+			///@brief Creates a mesh with the given draw mode, vertices and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices, bool visible = true);
 
-			//Creates a mesh with the given draw mode, vertices, material, tex coord mode and visibility
+			///@brief Creates a mesh with the given draw mode, vertices, material, tex coord mode and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
 				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
-			//Creates a mesh with the given raw vertex data and visibility
+			///@brief Creates a mesh with the given raw vertex data and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(render::render_primitive::VertexContainer vertex_data, bool visible = true);
 
-			//Creates a mesh with the given raw vertex data, material, tex coord mode and visibility
+			///@brief Creates a mesh with the given raw vertex data, material, tex coord mode and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(render::render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material>material,
 				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
-			//Creates a mesh with the given draw mode, raw vertex data and visibility
+			///@brief Creates a mesh with the given draw mode, raw vertex data and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::render_primitive::VertexContainer vertex_data, bool visible = true);
 
-			//Creates a mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
+			///@brief Creates a mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
 			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
 				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
-			//Creates a mesh as a copy of the given mesh
+			///@brief Creates a mesh as a copy of the given mesh
 			NonOwningPtr<shapes::Mesh> CreateMesh(const shapes::Mesh &mesh);
 
-			//Creates a mesh by moving the given mesh
+			///@brief Creates a mesh by moving the given mesh
 			NonOwningPtr<shapes::Mesh> CreateMesh(shapes::Mesh &&mesh);
 
+			///@}
 
-			/*
-				Meshes (derived)
+			/**
+				@name Meshes (derived)
 				Creating
+				@{
 			*/
 
-			//Creates a mesh of type T with the given arguments
+			///@brief Creates a mesh of type T with the given arguments
 			template <typename T, typename... Args,
 				typename = std::enable_if_t<std::is_base_of_v<shapes::Shape, T>>>
 			auto CreateMesh(Args &&...args)
@@ -214,7 +230,7 @@ namespace ion::graphics::scene
 			}
 
 
-			//Creates a mesh of type T as a copy of the given mesh
+			///@brief Creates a mesh of type T as a copy of the given mesh
 			template <typename T,
 				typename = std::enable_if_t<std::is_base_of_v<shapes::Shape, T>>>
 			auto CreateMesh(const T &mesh_t)
@@ -225,7 +241,7 @@ namespace ion::graphics::scene
 				return static_pointer_cast<T>(ptr);
 			}
 
-			//Creates a mesh of type T by moving the given mesh
+			///@brief Creates a mesh of type T by moving the given mesh
 			template <typename T,
 				typename = std::enable_if_t<std::is_base_of_v<shapes::Shape, T>>>
 			auto CreateMesh(T &&mesh_t)
@@ -236,17 +252,21 @@ namespace ion::graphics::scene
 				return static_pointer_cast<T>(ptr);
 			}
 
+			///@}
 
-			/*
-				Meshes
+			/**
+				@name Meshes
 				Removing
+				@{
 			*/
 
-			//Clears all meshes from this model
+			///@brief Clears all meshes from this model
 			void ClearMeshes() noexcept;
 
-			//Removes a mesh from this model
+			///@brief Removes a mesh from this model
 			bool RemoveMesh(shapes::Mesh &mesh) noexcept;
+
+			///@}
 	};
 } //ion::graphics::scene
 

@@ -41,7 +41,7 @@ namespace ion::graphics::scene
 	} //movable_sound_listener
 
 
-	//A class representing a movable sound listener that can be attached to a scene node
+	///@brief A class representing a movable sound listener that can be attached to a scene node
 	class MovableSoundListener final : public MovableObject
 	{
 		private:
@@ -53,63 +53,70 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Constructs a new movable sound listener with the given name and sound listener
+			///@brief Constructs a new movable sound listener with the given name and sound listener
 			MovableSoundListener(std::optional<std::string> name,
 				NonOwningPtr<sounds::SoundListener> sound_listener) noexcept;
 
-			//Constructs a new movable sound listener with the given name, position and sound listener
+			///@brief Constructs a new movable sound listener with the given name, position and sound listener
 			MovableSoundListener(std::optional<std::string> name, const Vector3 &position,
 				NonOwningPtr<sounds::SoundListener> sound_listener) noexcept;
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the position of this sound listener to the given position
+			///@brief Sets the position of this sound listener to the given position
 			inline void Position(const Vector3 &position) noexcept
 			{
 				position_ = position;
 			}
 
-			//Sets the position of this sound listener to the given position
+			///@brief Sets the position of this sound listener to the given position
 			inline void Position(const Vector2 &position) noexcept
 			{
 				Position({position.X(), position.Y(), position_.Z()});
 			}
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the position of this sound listener
+			///@brief Returns the position of this sound listener
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}
 
 
-			//Returns a mutable reference to the sound listener
+			///@brief Returns a mutable reference to the sound listener
 			[[nodiscard]] auto& Get() noexcept
 			{
 				return sound_listener_;
 			}
 
-			//Returns an immutable reference to the sound listener
+			///@brief Returns an immutable reference to the sound listener
 			[[nodiscard]] auto& Get() const noexcept
 			{
 				return sound_listener_;
 			}
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses the total time for this movable sound listener by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for this movable sound listener by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept override;
+
+			///@}
 	};
 } //ion::graphics::scene
 

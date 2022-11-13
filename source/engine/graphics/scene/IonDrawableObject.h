@@ -39,7 +39,7 @@ namespace ion::graphics::scene
 	} //drawable_object
 
 
-	//A class representing a drawable object that can be prepared and drawn with one or more render passes
+	///@brief A class representing a drawable object that can be prepared and drawn with one or more render passes
 	class DrawableObject : public MovableObject
 	{
 		private:
@@ -63,115 +63,134 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Constructs a drawable object with the given name and visibility
+			///@brief Constructs a drawable object with the given name and visibility
 			explicit DrawableObject(std::optional<std::string> name = {}, bool visible = true) noexcept;
 
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
-			//Returns a mutable range of all render passes of this drawable
-			//This can be used directly with a range-based for loop
+			///@brief Returns a mutable range of all render passes of this drawable
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto RenderPasses() noexcept
 			{
 				return adaptors::ranges::Iterable<render::render_pass::Passes&>{render_passes_};
 			}
 
-			//Returns an immutable range of all render passes of this drawable
-			//This can be used directly with a range-based for loop
+			///@brief Returns an immutable range of all render passes of this drawable
+			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto RenderPasses() const noexcept
 			{
 				return adaptors::ranges::Iterable<const render::render_pass::Passes&>{render_passes_};
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the opacity of this drawable object to the given opacity
+			///@brief Sets the opacity of this drawable object to the given opacity
 			void Opacity(real opacity) noexcept;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the opacity of this drawable object
+			///@brief Returns the opacity of this drawable object
 			[[nodiscard]] inline auto Opacity() const noexcept
 			{
 				return opacity_;
 			}
 
 
-			//Returns all render primitives in this drawable object
+			///@brief Returns all render primitives in this drawable object
 			[[nodiscard]] virtual movable_object::RenderPrimitiveRange AllRenderPrimitives() noexcept override;
 
-			//Returns all (distinct) shader programs used to render this drawable object
+			///@brief Returns all (distinct) shader programs used to render this drawable object
 			[[nodiscard]] virtual movable_object::ShaderProgramRange AllShaderPrograms() noexcept override;
 
+			///@}
 
-			/*
-				Notifying
+			/**
+				@name Notifying
+				@{
 			*/
 
-			//Called when render passes has changed on the given primitive
+			///@brief Called when render passes has changed on the given primitive
 			void NotifyRenderPassesChanged(render::RenderPrimitive &primitive) noexcept;
 
+			///@}
 
-			/*
-				Preparing
+			/**
+				@name Preparing
+				@{
 			*/
 
-			//Prepares this drawable object such that it is ready to be drawn
-			//This function is typically called each frame
+			///@brief Prepares this drawable object such that it is ready to be drawn
+			///@details This function is typically called each frame
 			virtual void Prepare() override;
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
-			//Elapses the total time for this drawable object by the given time in seconds
-			//This function is typically called each frame, with the time in seconds since last frame
+			///@brief Elapses the total time for this drawable object by the given time in seconds
+			///@details This function is typically called each frame, with the time in seconds since last frame
 			virtual void Elapse(duration time) noexcept;
 
+			///@}
 
-			/*
-				Render passes
+			/**
+				@name Render passes
 				Adding
+				@{
 			*/
 
-			//Adds the given render pass for this drawable object
+			///@brief Adds the given render pass for this drawable object
 			void AddRenderPass(render::RenderPass pass);
 
-			//Adds the given render passes for this drawable object
+			///@brief Adds the given render passes for this drawable object
 			void AddRenderPasses(render::render_pass::Passes passes);
 
+			///@}
 
-			/*
-				Render passes
+			/**
+				@name Render passes
 				Retrieving
+				@{
 			*/
 
-			//Returns a mutable reference to the render pass at the given offset
+			///@brief Returns a mutable reference to the render pass at the given offset
 			[[nodiscard]] render::RenderPass& GetRenderPass(int off) noexcept;
 
-			//Returns an immutable reference to the render pass at the given offset
+			///@brief Returns an immutable reference to the render pass at the given offset
 			[[nodiscard]] const render::RenderPass& GetRenderPass(int off) const noexcept;
 
+			///@}
 
-			/*
-				Render passes
+			/**
+				@name Render passes
 				Removing
+				@{
 			*/
 
-			//Clears all render passes for this drawable object
+			///@brief Clears all render passes for this drawable object
 			void ClearRenderPasses() noexcept;
 
-			//Removes a render pass at the given offset from this drawable object
+			///@brief Removes a render pass at the given offset from this drawable object
 			bool RemoveRenderPass(int off) noexcept;
+
+			///@}
 	};
 } //ion::graphics::scene
 

@@ -71,11 +71,14 @@ namespace ion::graphics::scene
 		{
 			protected:
 
-				/*
-					Events
+				/**
+					@name Events
+					@{
 				*/
 
 				void RenderPassesChanged() noexcept override;
+
+				///@}
 
 			public:
 
@@ -135,8 +138,9 @@ namespace ion::graphics::scene
 			const Vector2 &position, real rotation) noexcept;
 
 
-		/*
-			Rendering
+		/**
+			@name Rendering
+			@{
 		*/
 
 		Color get_foreground_color(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
@@ -165,10 +169,12 @@ namespace ion::graphics::scene
 			text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives);
 		void get_text_primitives(const fonts::Text &text, Vector3 position, real rotation,
 			text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives);
+
+		///@}
 	} //drawable_text::detail
 
 
-	//A class representing a drawable text that can be attached to a scene node
+	///@brief A class representing a drawable text that can be attached to a scene node
 	class DrawableText final : public DrawableObject
 	{
 		private:
@@ -190,24 +196,25 @@ namespace ion::graphics::scene
 
 		public:
 
-			//Constructs a new drawable text with the given name, text and visibility
+			///@brief Constructs a new drawable text with the given name, text and visibility
 			DrawableText(std::optional<std::string> name,
 				NonOwningPtr<fonts::Text> text, bool visible = true);
 
-			//Constructs a new drawable text with the given name, position, text and visibility
+			///@brief Constructs a new drawable text with the given name, position, text and visibility
 			DrawableText(std::optional<std::string> name, const Vector3 &position,
 				NonOwningPtr<fonts::Text> text, bool visible = true);
 
-			//Constructs a new drawable text with the given name, position, rotation, text and visibility
+			///@brief Constructs a new drawable text with the given name, position, rotation, text and visibility
 			DrawableText(std::optional<std::string> name, const Vector3 &position, real rotation,
 				NonOwningPtr<fonts::Text> text, bool visible = true);
 
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
-			//Sets the position of this text to the given position
+			///@brief Sets the position of this text to the given position
 			inline void Position(const Vector3 &position) noexcept
 			{
 				if (position_ != position)
@@ -217,13 +224,13 @@ namespace ion::graphics::scene
 				}
 			}
 
-			//Sets the position of this text to the given position
+			///@brief Sets the position of this text to the given position
 			inline void Position(const Vector2 &position) noexcept
 			{
 				Position({position.X(), position.Y(), position_.Z()});
 			}
 
-			//Sets the rotation of this text to the given angle (in radians)
+			///@brief Sets the rotation of this text to the given angle (in radians)
 			inline void Rotation(real angle) noexcept
 			{
 				if (rotation_ != angle)
@@ -234,54 +241,60 @@ namespace ion::graphics::scene
 			}
 
 
-			//Reverts to the initial text
+			///@brief Reverts to the initial text
 			void Revert();
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
-			//Returns the position of this text
+			///@brief Returns the position of this text
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}
 
-			//Returns the angle of rotation (in radians) for this text
+			///@brief Returns the angle of rotation (in radians) for this text
 			[[nodiscard]] inline auto Rotation() const noexcept
 			{
 				return rotation_;
 			}
 
 
-			//Returns a mutable reference to the text
+			///@brief Returns a mutable reference to the text
 			[[nodiscard]] auto& Get() noexcept
 			{
 				reload_primitives_ = true; //Text could be changed
 				return text_;
 			}
 
-			//Returns an immutable reference to the text
+			///@brief Returns an immutable reference to the text
 			[[nodiscard]] auto& Get() const noexcept
 			{
 				return text_;
 			}
 
-			//Returns an immutable reference to the text
+			///@brief Returns an immutable reference to the text
 			[[nodiscard]] auto& GetImmutable() const noexcept
 			{
 				return text_;
 			}
 
+			///@}
 
-			/*
-				Preparing
+			/**
+				@name Preparing
+				@{
 			*/
 
-			//Prepares this text such that it is ready to be drawn
-			//This function is typically called each frame
+			///@brief Prepares this text such that it is ready to be drawn
+			///@details This function is typically called each frame
 			void Prepare() override;
+
+			///@}
 	};
 } //ion::graphics::scene
 
