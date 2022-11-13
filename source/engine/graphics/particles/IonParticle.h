@@ -39,7 +39,7 @@ namespace ion::graphics::particles
 		private:
 
 			Vector3 position_;
-			Vector2 direction_; ///<Length represents velocity		
+			Vector2 direction_; //Length represents velocity		
 			real rotation_ = 0.0_r;
 			Vector2 size_;
 			real mass_ = 0.0_r;

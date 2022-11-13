@@ -31,7 +31,7 @@ namespace ion::events
 
 
 	///@brief A base class representing something that can be listened to by a listener
-	//Listenables can be subscribed to by listeners, to send events
+	///@details Listenables can be subscribed to by listeners, to send events
 	template <typename T>
 	class Listenable : protected EventGenerator<T>
 	{
