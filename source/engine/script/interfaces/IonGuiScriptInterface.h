@@ -46,7 +46,7 @@ namespace ion::graphics
 }
 
 //Forward declarations
-namespace gui::skins
+namespace ion::gui::skins
 {
 	class GuiSkin;
 	class GuiTheme;
