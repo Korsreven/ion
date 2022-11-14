@@ -155,7 +155,7 @@ namespace ion::script
 } //ion::script
 
 
-///@brief Registers custom error conditions to namespace std
+//Registers custom error conditions to namespace std
 namespace std
 {
 	template<> struct is_error_condition_enum<ion::script::script_error::CompileErrorCode> : std::true_type
