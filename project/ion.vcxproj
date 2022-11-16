@@ -482,6 +482,7 @@
     <ClInclude Include="..\source\engine\gui\IonGuiPanelContainer.h" />
     <ClInclude Include="..\source\engine\gui\skins\IonGuiSkin.h" />
     <ClInclude Include="..\source\engine\gui\skins\IonGuiTheme.h" />
+    <ClInclude Include="..\source\engine\Ion.h" />
     <ClInclude Include="..\source\engine\IonEngine.h" />
     <ClInclude Include="..\source\engine\managed\IonManagedObject.h" />
     <ClInclude Include="..\source\engine\managed\IonObjectManager.h" />

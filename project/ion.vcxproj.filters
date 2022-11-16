@@ -1415,6 +1415,9 @@
     <ClInclude Include="..\source\engine\types\IonSuppressMove.h">
       <Filter>Header Files\types</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\engine\Ion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\engine\graphics\shaders\glsl\IonFlatTextShader.frag">
