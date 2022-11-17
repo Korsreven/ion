@@ -248,6 +248,47 @@ File:	Ion.h
 
 
 /*
+	Main page (for doxygen)
+*/
+
+/**
+	@mainpage API Reference
+
+	@section intro Introduction
+	<a href="https://github.com/Korsreven/ion">ION engine</a> is a fast, lightweight and fully functional 2D game engine using OpenGL.<br>
+	The engine should be easy to use, also for developers with a limited experience with C++.
+	No prior knowledge of OpenGL should be needed.
+
+	@subsection source Source Code
+	ION engine is written in modern C++ (with some GLSL) and consists of around 115K lines of code.
+	The development has been done exlusively using Visual Studio on a Microsoft Windows PC.
+	The source code itself is platform independent and should be portable (with some coding effort).
+
+	@subsection project Project Status
+	ION engine has been actively under development for a period of 5 years (2017 to 2022).
+	Now that the engine is stable and on version 1.0, development will begin to slow down a bit while I start working on some games.
+	The source code will be maintained from time to time, when new bugs are found or new features are needed.
+	Tutorials and code examples will become available at a later date.
+
+	@section dependencies Dependencies
+	One of the things I enjoy the most when writing code, is actually writing most of the code myself.
+	But there is no rule without exception... ION engine is using four different third party libraries.
+	<ul>
+		<li>FMOD v2.1.10 (<a href="https://www.fmod.com/">https://www.fmod.com/</a>)</li>
+		<li>FreeImage v3.18.0 (<a href="https://freeimage.sourceforge.io/">https://freeimage.sourceforge.io/</a>)</li>
+		<li>FreeType v2.10.4 (<a href="https://www.freetype.org/">https://www.freetype.org/</a>)</li>
+		<li>GLEW v2.1.0 (<a href="http://glew.sourceforge.net/">http://glew.sourceforge.net/</a>)</li>
+	</ul>
+
+	@section author Author
+	The ION game engine is written by Jan Ivar Goli.
+
+	@section license License
+	The ION game engine is licensed under the <a href="https://opensource.org/licenses/MIT/">MIT license</a>.
+*/
+
+
+/*
 	Namespace hierarchy (for doxygen)
 */
 
