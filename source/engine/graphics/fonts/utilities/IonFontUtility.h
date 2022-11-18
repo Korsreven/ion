@@ -424,7 +424,7 @@ namespace ion::graphics::fonts::utilities
 	[[nodiscard]] std::string HTMLToString(std::string_view str);
 
 
-	///@brief Returns text lines, by splitting up text blocks into lines when a '\n' character is found
+	///@brief Returns text lines, by splitting up text blocks into lines when a '\\n' character is found
 	[[nodiscard]] text::TextLines SplitTextBlocks(text::TextBlocks text_blocks);
 
 	///@}
@@ -485,12 +485,12 @@ namespace ion::graphics::fonts::utilities
 	*/
 
 	///@brief Wraps the given string if wider than max width, in pixels, when rendered with the given font
-	///@details Cuts exactly where the text is wider than max width, then a '\n' character is inserted.
+	///@details Cuts exactly where the text is wider than max width, then a '\\n' character is inserted.
 	///Returns nullopt if font could not be loaded properly
 	[[nodiscard]] std::optional<std::string> Wrap(std::string str, int max_width, Font &font);
 
 	///@brief Wraps the given text blocks if wider than max width, in pixels, when rendered with the given type face
-	///@details Cuts exactly where the text is wider than max width, then a '\n' character is inserted.
+	///@details Cuts exactly where the text is wider than max width, then a '\\n' character is inserted.
 	///Returns nullopt if type face fonts could not be loaded properly
 	[[nodiscard]] std::optional<text::TextBlocks> Wrap(text::TextBlocks text_blocks, int max_width, TypeFace &type_face);
 
@@ -519,14 +519,14 @@ namespace ion::graphics::fonts::utilities
 	*/
 
 	///@brief Word wraps the given string if wider than max width, in pixels, when rendered with the given font
-	///@details Replaces a ' ' character in between words, with a '\n' character where the line needs to be broken.
-	///Does only cut words if one word is wider than max width, then a '\n' character is inserted.
+	///@details Replaces a ' ' character in between words, with a '\\n' character where the line needs to be broken.
+	///Does only cut words if one word is wider than max width, then a '\\n' character is inserted.
 	///Returns nullopt if font could not be loaded properly
 	[[nodiscard]] std::optional<std::string> WordWrap(std::string str, int max_width, Font &font);
 
 	///@brief Word wraps the given text blocks if wider than max width, in pixels, when rendered with the given type face
-	///@details Replaces a ' ' character in between words, with a '\n' character where the line needs to be broken.
-	///Does only cut words if one word is wider than max width, then a '\n' character is inserted.
+	///@details Replaces a ' ' character in between words, with a '\\n' character where the line needs to be broken.
+	///Does only cut words if one word is wider than max width, then a '\\n' character is inserted.
 	///Returns nullopt if type face fonts could not be loaded properly
 	[[nodiscard]] std::optional<text::TextBlocks> WordWrap(text::TextBlocks text_blocks, int max_width, TypeFace &type_face);
 
