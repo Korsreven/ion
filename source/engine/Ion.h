@@ -259,12 +259,12 @@ File:	Ion.h
 	The engine should be easy to use, also for developers with a limited experience with C++.
 	No prior knowledge of OpenGL should be needed.
 
-	@subsection source Source Code
+	@section source Source Code
 	ION engine is written in modern C++ (with some GLSL) and consists of around 115K lines of code.
 	The development has been done exlusively using Visual Studio on a Microsoft Windows PC.
 	The source code itself is platform independent and should be portable (with some coding effort).
 
-	@subsection project Project Status
+	@section project Project Status
 	ION engine has been actively under development for a period of 5 years (2017 to 2022).
 	Now that the engine is stable and on version 1.0, development will begin to slow down a bit while I start working on some games.
 	The source code will be maintained from time to time, when new bugs are found or new features are needed.
