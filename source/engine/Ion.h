@@ -255,9 +255,10 @@ File:	Ion.h
 	@mainpage API Reference
 
 	@section intro Introduction
-	<a href="https://github.com/Korsreven/ion">ION engine</a> is a fast, lightweight and fully functional 2D game engine using OpenGL.<br>
+	<a href="https://github.com/Korsreven/ion">ION engine</a> is a fast, lightweight and fully functional 2D game engine using OpenGL.
 	The engine should be easy to use, also for developers with a limited experience with C++.
 	No prior knowledge of OpenGL should be needed.
+	The API reference for the latest version can be found online <a href="https://korsreven.github.io/">here</a>.
 
 	@section source Source Code
 	ION engine is written in modern C++ (with some GLSL) and consists of around 115K lines of code.
@@ -266,7 +267,7 @@ File:	Ion.h
 
 	@section project Project Status
 	ION engine has been actively under development for a period of 5 years (2017 to 2022).
-	Now that the engine is stable and on version 1.0, development will begin to slow down a bit while I start working on some games.
+	Now that the engine is stable and feature complete, development will begin to slow down a bit while I start working on some games.
 	The source code will be maintained from time to time, when new bugs are found or new features are needed.
 	Tutorials and code examples will become available at a later date.
 
