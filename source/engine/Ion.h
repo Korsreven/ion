@@ -262,7 +262,7 @@ File:	Ion.h
 
 	@section source Source Code
 	ION engine is written in modern C++ (with some GLSL) and consists of around 115K lines of code.
-	The development has been done exlusively using Visual Studio on a Microsoft Windows PC.
+	The development has been done exclusively using Visual Studio on a Microsoft Windows PC.
 	The source code itself is platform independent and should be portable (with some coding effort).
 
 	@section project Project Status
