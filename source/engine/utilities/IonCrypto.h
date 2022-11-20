@@ -73,8 +73,7 @@ namespace ion::utilities::crypto
 
 
 	/**
-		@name Hashing
-		Keccak variants (non-standard)
+		@name Hashing - Keccak variants (non-standard)
 		@{
 	*/
 
@@ -93,8 +92,7 @@ namespace ion::utilities::crypto
 	///@}
 
 	/**
-		@name Hashing
-		FIPS 202 (standard)
+		@name Hashing - FIPS 202 (standard)
 		@{
 	*/
 

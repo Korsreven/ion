@@ -177,8 +177,7 @@ std::string keccak::operator()(int rate, int capacity, std::string_view input, c
 
 
 /*
-	Hashing
-	Keccak variants (non-standard)
+	Hashing - Keccak variants (non-standard)
 */
 
 std::string Keccak_224(std::string_view input)
@@ -203,8 +202,7 @@ std::string Keccak_512(std::string_view input)
 
 
 /*
-	Hashing
-	FIPS 202 (standard)
+	Hashing - FIPS 202 (standard)
 */
 
 std::string SHA3_224(std::string_view input)
