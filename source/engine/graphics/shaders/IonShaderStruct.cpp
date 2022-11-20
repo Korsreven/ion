@@ -84,8 +84,7 @@ ShaderStruct::ShaderStruct(std::string name, int size) noexcept :
 
 
 /*
-	Uniform variables
-	Retrieving
+	Uniform variables - Retrieving
 */
 
 NonOwningPtr<variables::UniformVariable> ShaderStruct::GetUniform(std::string_view name, std::optional<int> off) noexcept
@@ -100,8 +99,7 @@ NonOwningPtr<const variables::UniformVariable> ShaderStruct::GetUniform(std::str
 
 
 /*
-	Uniform variables
-	Removing
+	Uniform variables - Removing
 */
 
 void ShaderStruct::ClearUniforms() noexcept

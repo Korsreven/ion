@@ -941,8 +941,7 @@ ShaderProgramManager::~ShaderProgramManager() noexcept
 
 
 /*
-	Shader programs
-	Creating
+	Shader programs - Creating
 */
 
 NonOwningPtr<ShaderProgram> ShaderProgramManager::CreateShaderProgram(std::string name, NonOwningPtr<Shader> shader)
@@ -975,8 +974,7 @@ NonOwningPtr<ShaderProgram> ShaderProgramManager::CreateShaderProgram(ShaderProg
 
 
 /*
-	Shader programs
-	Retrieving
+	Shader programs - Retrieving
 */
 
 NonOwningPtr<ShaderProgram> ShaderProgramManager::GetShaderProgram(std::string_view name) noexcept
@@ -991,8 +989,7 @@ NonOwningPtr<const ShaderProgram> ShaderProgramManager::GetShaderProgram(std::st
 
 
 /*
-	Shader programs
-	Removing
+	Shader programs - Removing
 */
 
 void ShaderProgramManager::ClearShaderPrograms() noexcept
@@ -1012,8 +1009,7 @@ bool ShaderProgramManager::RemoveShaderProgram(std::string_view name) noexcept
 
 
 /*
-	Shader programs
-	Activate/deactivate
+	Shader programs - Activate/deactivate
 */
 
 void ShaderProgramManager::ActivateShaderProgram(const ShaderProgram &shader_program) noexcept
@@ -1044,8 +1040,7 @@ bool ShaderProgramManager::IsShaderProgramActive(const ShaderProgram &shader_pro
 
 
 /*
-	Shader variables
-	Load/send
+	Shader variables - Load/send
 */
 
 void ShaderProgramManager::LoadShaderVariableLocations(ShaderProgram &shader_program) noexcept
@@ -1220,8 +1215,7 @@ void ShaderProgramManager::SendUniformValues(ShaderStruct &shader_struct) noexce
 
 
 /*
-	Shader layouts
-	Creating
+	Shader layouts - Creating
 */
 
 NonOwningPtr<ShaderLayout> ShaderProgramManager::CreateShaderLayout(std::string name)
@@ -1249,8 +1243,7 @@ NonOwningPtr<ShaderLayout> ShaderProgramManager::CreateShaderLayout(ShaderLayout
 
 
 /*
-	Shader layouts
-	Retrieving
+	Shader layouts - Retrieving
 */
 
 NonOwningPtr<ShaderLayout> ShaderProgramManager::GetShaderLayout(std::string_view name) noexcept
@@ -1265,8 +1258,7 @@ NonOwningPtr<const ShaderLayout> ShaderProgramManager::GetShaderLayout(std::stri
 
 
 /*
-	Shader layouts
-	Removing
+	Shader layouts - Removing
 */
 
 void ShaderProgramManager::ClearShaderLayouts() noexcept

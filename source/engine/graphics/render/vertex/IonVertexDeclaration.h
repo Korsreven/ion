@@ -203,8 +203,7 @@ namespace ion::graphics::render::vertex
 			///@}
 
 			/**
-				@name Vertex elements
-				Adding
+				@name Vertex elements - Adding
 				@{
 			*/
 
@@ -217,8 +216,7 @@ namespace ion::graphics::render::vertex
 			///@}
 
 			/**
-				@name Vertex elements
-				Removing
+				@name Vertex elements - Removing
 				@{
 			*/
 

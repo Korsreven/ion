@@ -701,8 +701,7 @@ void GuiController::WindowActionReceived([[maybe_unused]] WindowAction action) n
 
 
 /*
-	Frames
-	Creating
+	Frames - Creating
 */
 
 NonOwningPtr<GuiFrame> GuiController::CreateFrame(std::string name)
@@ -717,8 +716,7 @@ NonOwningPtr<GuiFrame> GuiController::CreateFrame(GuiFrame &&frame)
 
 
 /*
-	Frames
-	Retrieving
+	Frames - Retrieving
 */
 
 NonOwningPtr<GuiFrame> GuiController::GetFrame(std::string_view name) noexcept
@@ -733,8 +731,7 @@ NonOwningPtr<const GuiFrame> GuiController::GetFrame(std::string_view name) cons
 
 
 /*
-	Frames
-	Removing
+	Frames - Removing
 */
 
 void GuiController::ClearFrames() noexcept
@@ -770,8 +767,7 @@ bool GuiController::RemoveFrame(std::string_view name) noexcept
 
 
 /*
-	Mouse cursors
-	Creating
+	Mouse cursors - Creating
 */
 
 NonOwningPtr<controls::GuiMouseCursor> GuiController::CreateMouseCursor(std::string name, const std::optional<Vector2> &size)
@@ -798,8 +794,7 @@ NonOwningPtr<controls::GuiMouseCursor> GuiController::CreateMouseCursor(controls
 
 
 /*
-	Mouse cursors
-	Retrieving
+	Mouse cursors - Retrieving
 */
 
 [[nodiscard]] NonOwningPtr<controls::GuiMouseCursor> GuiController::GetMouseCursor(std::string_view name) noexcept
@@ -814,8 +809,7 @@ NonOwningPtr<controls::GuiMouseCursor> GuiController::CreateMouseCursor(controls
 
 
 /*
-	Mouse cursors
-	Removing
+	Mouse cursors - Removing
 */
 
 void GuiController::ClearMouseCursors() noexcept
@@ -848,8 +842,7 @@ bool GuiController::RemoveMouseCursor(std::string_view name) noexcept
 
 
 /*
-	Tooltips
-	Creating
+	Tooltips - Creating
 */
 
 NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(std::string name, const std::optional<Vector2> &size)
@@ -876,8 +869,7 @@ NonOwningPtr<controls::GuiTooltip> GuiController::CreateTooltip(controls::GuiToo
 
 
 /*
-	Tooltips
-	Retrieving
+	Tooltips - Retrieving
 */
 
 NonOwningPtr<controls::GuiTooltip> GuiController::GetTooltip(std::string_view name) noexcept
@@ -892,8 +884,7 @@ NonOwningPtr<const controls::GuiTooltip> GuiController::GetTooltip(std::string_v
 
 
 /*
-	Tooltips
-	Removing
+	Tooltips - Removing
 */
 
 void GuiController::ClearTooltips() noexcept
@@ -926,8 +917,7 @@ bool GuiController::RemoveTooltip(std::string_view name) noexcept
 
 
 /*
-	Components
-	Removing (optimization)
+	Components - Removing (optimization)
 */
 
 void GuiController::ClearComponents() noexcept
@@ -953,8 +943,7 @@ void GuiController::ClearComponents() noexcept
 
 
 /*
-	Themes
-	Creating
+	Themes - Creating
 */
 
 NonOwningPtr<skins::GuiTheme> GuiController::CreateTheme(std::string name, NonOwningPtr<graphics::scene::SceneManager> scene_manager)
@@ -969,8 +958,7 @@ NonOwningPtr<skins::GuiTheme> GuiController::CreateTheme(skins::GuiTheme &&theme
 
 
 /*
-	Themes
-	Retrieving
+	Themes - Retrieving
 */
 
 NonOwningPtr<skins::GuiTheme> GuiController::GetTheme(std::string_view name) noexcept
@@ -985,8 +973,7 @@ NonOwningPtr<const skins::GuiTheme> GuiController::GetTheme(std::string_view nam
 
 
 /*
-	Themes
-	Removing
+	Themes - Removing
 */
 
 void GuiController::ClearThemes() noexcept

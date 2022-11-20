@@ -81,8 +81,7 @@ namespace ion::graphics::textures
 			///@}
 
 			/**
-				@name Animations
-				Creating
+				@name Animations - Creating
 				@{
 			*/
 
@@ -105,8 +104,7 @@ namespace ion::graphics::textures
 			///@}
 
 			/**
-				@name Animations
-				Retrieving
+				@name Animations - Retrieving
 				@{
 			*/
 
@@ -121,8 +119,7 @@ namespace ion::graphics::textures
 			///@}
 
 			/**
-				@name Animations
-				Removing
+				@name Animations - Removing
 				@{
 			*/
 

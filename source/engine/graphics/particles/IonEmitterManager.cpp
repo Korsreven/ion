@@ -26,8 +26,7 @@ namespace emitter_manager::detail
 //Public
 
 /*
-	Emitters
-	Creating
+	Emitters - Creating
 */
 
 NonOwningPtr<Emitter> EmitterManager::CreateEmitter(std::string name)
@@ -52,8 +51,7 @@ NonOwningPtr<Emitter> EmitterManager::CreateEmitter(Emitter &&emitter)
 
 
 /*
-	Emitters
-	Retrieving
+	Emitters - Retrieving
 */
 
 NonOwningPtr<Emitter> EmitterManager::GetEmitter(std::string_view name) noexcept
@@ -68,8 +66,7 @@ NonOwningPtr<const Emitter> EmitterManager::GetEmitter(std::string_view name) co
 
 
 /*
-	Emitters
-	Removing
+	Emitters - Removing
 */
 
 void EmitterManager::ClearEmitters() noexcept

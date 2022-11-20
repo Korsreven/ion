@@ -597,8 +597,7 @@ void SoundManager::Update() noexcept
 
 
 /*
-	Sounds
-	Creating
+	Sounds - Creating
 */
 
 NonOwningPtr<Sound> SoundManager::CreateSound(std::string name, std::string asset_name)
@@ -639,8 +638,7 @@ NonOwningPtr<Sound> SoundManager::CreateSound(Sound &&sound)
 
 
 /*
-	Sounds
-	Retrieving
+	Sounds - Retrieving
 */
 
 NonOwningPtr<Sound> SoundManager::GetSound(std::string_view name) noexcept
@@ -655,8 +653,7 @@ NonOwningPtr<const Sound> SoundManager::GetSound(std::string_view name) const no
 
 
 /*
-	Sounds
-	Removing
+	Sounds - Removing
 */
 
 void SoundManager::ClearSounds() noexcept
@@ -676,8 +673,7 @@ bool SoundManager::RemoveSound(std::string_view name) noexcept
 
 
 /*
-	Sound channel groups
-	Creating
+	Sound channel groups - Creating
 */
 
 NonOwningPtr<SoundChannelGroup> SoundManager::CreateSoundChannelGroup(std::string name)
@@ -698,8 +694,7 @@ NonOwningPtr<SoundChannelGroup> SoundManager::CreateSoundChannelGroup(SoundChann
 
 
 /*
-	Sound channel groups
-	Retrieving
+	Sound channel groups - Retrieving
 */
 
 NonOwningPtr<SoundChannelGroup> SoundManager::GetSoundChannelGroup(std::string_view name) noexcept
@@ -714,8 +709,7 @@ NonOwningPtr<const SoundChannelGroup> SoundManager::GetSoundChannelGroup(std::st
 
 
 /*
-	Sound channel groups
-	Removing
+	Sound channel groups - Removing
 */
 
 void SoundManager::ClearSoundChannelGroups() noexcept
@@ -735,8 +729,7 @@ bool SoundManager::RemoveSoundChannelGroup(std::string_view name) noexcept
 
 
 /*
-	Sound listeners
-	Creating
+	Sound listeners - Creating
 */
 
 NonOwningPtr<SoundListener> SoundManager::CreateSoundListener(std::string name)
@@ -746,8 +739,7 @@ NonOwningPtr<SoundListener> SoundManager::CreateSoundListener(std::string name)
 
 
 /*
-	Sound listeners
-	Retrieving
+	Sound listeners - Retrieving
 */
 
 NonOwningPtr<SoundListener> SoundManager::GetSoundListener(std::string_view name) noexcept
@@ -762,8 +754,7 @@ NonOwningPtr<const SoundListener> SoundManager::GetSoundListener(std::string_vie
 
 
 /*
-	Sound listeners
-	Removing
+	Sound listeners - Removing
 */
 
 void SoundManager::ClearSoundListeners() noexcept

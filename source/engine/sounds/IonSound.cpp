@@ -145,8 +145,7 @@ std::optional<std::pair<real, real>> Sound::Distance() const noexcept
 
 
 /*
-	Sound channels
-	Creating
+	Sound channels - Creating
 */
 
 NonOwningPtr<SoundChannel> Sound::Play(bool paused)
@@ -181,8 +180,7 @@ NonOwningPtr<SoundChannel> Sound::Play(NonOwningPtr<SoundChannel> sound_channel,
 
 
 /*
-	Sound channels
-	Removing
+	Sound channels - Removing
 */
 
 void Sound::ClearSoundChannels() noexcept

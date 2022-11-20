@@ -231,8 +231,7 @@ void Model::Elapse(duration time) noexcept
 
 
 /*
-	Meshes
-	Creating
+	Meshes - Creating
 */
 
 NonOwningPtr<shapes::Mesh> Model::CreateMesh(const shapes::mesh::Vertices &vertices, bool visible)
@@ -293,8 +292,7 @@ NonOwningPtr<shapes::Mesh> Model::CreateMesh(shapes::Mesh &&mesh)
 
 
 /*
-	Meshes
-	Removing
+	Meshes - Removing
 */
 
 void Model::ClearMeshes() noexcept

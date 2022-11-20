@@ -151,8 +151,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Render passes
-				Adding
+				@name Render passes - Adding
 				@{
 			*/
 
@@ -165,8 +164,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Render passes
-				Retrieving
+				@name Render passes - Retrieving
 				@{
 			*/
 
@@ -179,8 +177,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Render passes
-				Removing
+				@name Render passes - Removing
 				@{
 			*/
 

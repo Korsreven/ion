@@ -923,8 +923,7 @@ OwningPtr<controls::gui_control::ControlSkin> GuiSkin::Instantiate() const
 
 
 /*
-	Parts
-	Adding
+	Parts - Adding
 */
 
 void GuiSkin::AddPart(std::string name, const SkinPart &part)
@@ -944,8 +943,7 @@ void GuiSkin::AddSoundPart(std::string name, const SkinSoundPart &sound_part)
 
 
 /*
-	Parts
-	Retrieving
+	Parts - Retrieving
 */
 
 const SkinPart* GuiSkin::GetPart(std::string_view name) const noexcept
@@ -974,8 +972,7 @@ const SkinSoundPart* GuiSkin::GetSoundPart(std::string_view name) const noexcept
 
 
 /*
-	Parts
-	Removing
+	Parts - Removing
 */
 
 void GuiSkin::ClearParts() noexcept
@@ -1015,8 +1012,7 @@ bool GuiSkin::RemoveSoundPart(std::string_view name) noexcept
 
 
 /*
-	Render passes
-	Adding
+	Render passes - Adding
 */
 
 void GuiSkin::AddPartRenderPass(graphics::render::RenderPass pass)
@@ -1048,8 +1044,7 @@ void GuiSkin::AddTextRenderPasses(graphics::render::render_pass::Passes passes)
 
 
 /*
-	Render passes
-	Removing
+	Render passes - Removing
 */
 
 void GuiSkin::ClearPartRenderPasses() noexcept
@@ -1066,8 +1061,7 @@ void GuiSkin::ClearTextRenderPasses() noexcept
 
 
 /*
-	Static
-	Retrieving
+	Static - Retrieving
 */
 
 std::optional<std::string_view> GuiSkin::GetDefaultSkinName(std::type_index type) noexcept

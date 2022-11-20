@@ -16,8 +16,7 @@ namespace ion::timers
 {
 
 /*
-	Timers
-	Creating
+	Timers - Creating
 */
 
 NonOwningPtr<Timer> TimerManager::CreateTimer(std::string name, duration interval)
@@ -42,8 +41,7 @@ NonOwningPtr<Timer> TimerManager::CreateTimer(Timer &&timer)
 
 
 /*
-	Timers
-	Retrieving
+	Timers - Retrieving
 */
 
 NonOwningPtr<Timer> TimerManager::GetTimer(std::string_view name) noexcept
@@ -58,8 +56,7 @@ NonOwningPtr<const Timer> TimerManager::GetTimer(std::string_view name) const no
 
 
 /*
-	Timers
-	Removing
+	Timers - Removing
 */
 
 void TimerManager::ClearTimers() noexcept

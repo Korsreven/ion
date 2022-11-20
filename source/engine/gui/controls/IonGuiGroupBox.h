@@ -127,8 +127,7 @@ namespace ion::gui::controls
 			///@}
 
 			/**
-				@name Controls
-				Adding
+				@name Controls - Adding
 				@{
 			*/
 
@@ -143,8 +142,7 @@ namespace ion::gui::controls
 			///@}
 
 			/**
-				@name Controls
-				Retrieving
+				@name Controls - Retrieving
 				@{
 			*/
 
@@ -159,8 +157,7 @@ namespace ion::gui::controls
 			///@}
 
 			/**
-				@name Controls
-				Removing
+				@name Controls - Removing
 				@{
 			*/
 

@@ -41,8 +41,7 @@ void GuiContainer::Removed(GuiComponent &component) noexcept
 //Public
 
 /*
-	Components
-	Retrieving
+	Components - Retrieving
 */
 
 NonOwningPtr<GuiComponent> GuiContainer::GetComponent(std::string_view name) noexcept
@@ -57,8 +56,7 @@ NonOwningPtr<const GuiComponent> GuiContainer::GetComponent(std::string_view nam
 
 
 /*
-	Components
-	Removing
+	Components - Removing
 */
 
 void GuiContainer::ClearComponents() noexcept

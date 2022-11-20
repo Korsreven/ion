@@ -538,8 +538,7 @@ TextureManager::~TextureManager() noexcept
 
 
 /*
-	Textures
-	Creating
+	Textures - Creating
 */
 
 NonOwningPtr<Texture> TextureManager::CreateTexture(std::string name, std::string asset_name)
@@ -579,8 +578,7 @@ NonOwningPtr<Texture> TextureManager::CreateTexture(Texture &&texture)
 
 
 /*
-	Texture atlases
-	Creating
+	Texture atlases - Creating
 */
 
 NonOwningPtr<TextureAtlas> TextureManager::CreateTextureAtlas(std::string name, std::string asset_name,
@@ -625,8 +623,7 @@ NonOwningPtr<TextureAtlas> TextureManager::CreateTextureAtlas(std::string name, 
 
 
 /*
-	Textures
-	Retrieving
+	Textures - Retrieving
 */
 
 NonOwningPtr<Texture> TextureManager::GetTexture(std::string_view name) noexcept
@@ -641,8 +638,7 @@ NonOwningPtr<const Texture> TextureManager::GetTexture(std::string_view name) co
 
 
 /*
-	Textures
-	Removing
+	Textures - Removing
 */
 
 void TextureManager::ClearTextures() noexcept

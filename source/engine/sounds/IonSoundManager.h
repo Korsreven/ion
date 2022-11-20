@@ -291,8 +291,7 @@ namespace ion::sounds
 			///@}
 
 			/**
-				@name Sounds
-				Creating
+				@name Sounds - Creating
 				@{
 			*/
 
@@ -321,8 +320,7 @@ namespace ion::sounds
 			///@}
 
 			/**
-				@name Sounds
-				Retrieving
+				@name Sounds - Retrieving
 				@{
 			*/
 
@@ -337,8 +335,7 @@ namespace ion::sounds
 			///@}
 
 			/**
-				@name Sounds
-				Removing
+				@name Sounds - Removing
 				@{
 			*/
 
@@ -354,8 +351,7 @@ namespace ion::sounds
 			///@}
 
 			/**
-				@name Sound channel groups
-				Creating
+				@name Sound channel groups - Creating
 				@{
 			*/
 
@@ -372,8 +368,7 @@ namespace ion::sounds
 			///@}
 
 			/**
-				@name Sound channel groups
-				Retrieving
+				@name Sound channel groups - Retrieving
 				@{
 			*/
 
@@ -388,8 +383,7 @@ namespace ion::sounds
 			///@}
 
 			/**
-				@name Sound channel groups
-				Removing
+				@name Sound channel groups - Removing
 				@{
 			*/
 
@@ -405,8 +399,7 @@ namespace ion::sounds
 			///@}
 
 			/**
-				@name Sound listeners
-				Creating
+				@name Sound listeners - Creating
 				@{
 			*/
 
@@ -416,8 +409,7 @@ namespace ion::sounds
 			///@}
 
 			/**
-				@name Sound listeners
-				Retrieving
+				@name Sound listeners - Retrieving
 				@{
 			*/
 
@@ -432,8 +424,7 @@ namespace ion::sounds
 			///@}
 
 			/**
-				@name Sound listeners
-				Removing
+				@name Sound listeners - Removing
 				@{
 			*/
 

@@ -190,8 +190,7 @@ void DrawableObject::Elapse([[maybe_unused]] duration time) noexcept
 
 
 /*
-	Render passes
-	Adding
+	Render passes - Adding
 */
 
 void DrawableObject::AddRenderPass(render::RenderPass pass)
@@ -212,8 +211,7 @@ void DrawableObject::AddRenderPasses(render::render_pass::Passes passes)
 
 
 /*
-	Render passes
-	Retrieving
+	Render passes - Retrieving
 */
 
 render::RenderPass& DrawableObject::GetRenderPass(int off) noexcept
@@ -230,8 +228,7 @@ const render::RenderPass& DrawableObject::GetRenderPass(int off) const noexcept
 
 
 /*
-	Render passes
-	Removing
+	Render passes - Removing
 */
 
 void DrawableObject::ClearRenderPasses() noexcept

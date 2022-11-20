@@ -86,8 +86,7 @@ namespace ion::graphics::materials
 			///@}
 
 			/**
-				@name Materials
-				Creating
+				@name Materials - Creating
 				@{
 			*/
 
@@ -145,8 +144,7 @@ namespace ion::graphics::materials
 			///@}
 
 			/**
-				@name Materials
-				Retrieving
+				@name Materials - Retrieving
 				@{
 			*/
 
@@ -161,8 +159,7 @@ namespace ion::graphics::materials
 			///@}
 
 			/**
-				@name Materials
-				Removing
+				@name Materials - Removing
 				@{
 			*/
 

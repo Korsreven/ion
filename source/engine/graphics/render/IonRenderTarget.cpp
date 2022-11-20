@@ -46,8 +46,7 @@ void RenderTarget::SwapBuffers() noexcept
 
 
 /*
-	Viewports
-	Creating
+	Viewports - Creating
 */
 
 NonOwningPtr<Viewport> RenderTarget::CreateViewport(std::string name, RenderTarget &render_target)
@@ -81,8 +80,7 @@ NonOwningPtr<Viewport> RenderTarget::CreateViewport(Viewport &&viewport)
 
 
 /*
-	Viewports
-	Retrieving
+	Viewports - Retrieving
 */
 
 NonOwningPtr<Viewport> RenderTarget::GetViewport(std::string_view name) noexcept
@@ -114,8 +112,7 @@ NonOwningPtr<const Viewport> RenderTarget::GetViewport(const Vector2 &position) 
 
 
 /*
-	Viewports
-	Removing
+	Viewports - Removing
 */
 
 void RenderTarget::ClearViewports() noexcept

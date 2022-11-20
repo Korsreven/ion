@@ -207,8 +207,7 @@ ShaderManager::~ShaderManager() noexcept
 
 
 /*
-	Shaders
-	Creating
+	Shaders - Creating
 */
 
 NonOwningPtr<Shader> ShaderManager::CreateShader(std::string name, std::string asset_name)
@@ -229,8 +228,7 @@ NonOwningPtr<Shader> ShaderManager::CreateShader(Shader &&shader)
 
 
 /*
-	Shaders
-	Retrieving
+	Shaders - Retrieving
 */
 
 NonOwningPtr<Shader> ShaderManager::GetShader(std::string_view name) noexcept
@@ -245,8 +243,7 @@ NonOwningPtr<const Shader> ShaderManager::GetShader(std::string_view name) const
 
 
 /*
-	Shaders
-	Removing
+	Shaders - Removing
 */
 
 void ShaderManager::ClearShaders() noexcept

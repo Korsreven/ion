@@ -75,8 +75,7 @@ namespace ion::graphics::particles
 			///@}
 
 			/**
-				@name Emitters
-				Creating
+				@name Emitters - Creating
 				@{
 			*/
 
@@ -95,8 +94,7 @@ namespace ion::graphics::particles
 			///@}
 
 			/**
-				@name Emitters
-				Retrieving
+				@name Emitters - Retrieving
 				@{
 			*/
 
@@ -111,8 +109,7 @@ namespace ion::graphics::particles
 			///@}
 
 			/**
-				@name Emitters
-				Removing
+				@name Emitters - Removing
 				@{
 			*/
 

@@ -28,8 +28,7 @@ namespace type_face_manager::detail
 
 
 /*
-	Type faces
-	Creating
+	Type faces - Creating
 */
 
 NonOwningPtr<TypeFace> TypeFaceManager::CreateTypeFace(std::string name, NonOwningPtr<Font> regular)
@@ -61,8 +60,7 @@ NonOwningPtr<TypeFace> TypeFaceManager::CreateTypeFace(TypeFace &&type_face)
 
 
 /*
-	Type faces
-	Retrieving
+	Type faces - Retrieving
 */
 
 NonOwningPtr<TypeFace> TypeFaceManager::GetTypeFace(std::string_view name) noexcept
@@ -77,8 +75,7 @@ NonOwningPtr<const TypeFace> TypeFaceManager::GetTypeFace(std::string_view name)
 
 
 /*
-	Type faces
-	Removing
+	Type faces - Removing
 */
 
 void TypeFaceManager::ClearTypeFaces() noexcept

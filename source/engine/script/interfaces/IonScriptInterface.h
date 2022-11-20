@@ -197,8 +197,7 @@ namespace ion::script::interfaces
 			///@}
 
 			/**
-				@name Script repositories
-				Creating
+				@name Script repositories - Creating
 				@{
 			*/
 
@@ -214,8 +213,7 @@ namespace ion::script::interfaces
 			///@}
 
 			/**
-				@name Script repositories
-				Removing
+				@name Script repositories - Removing
 				@{
 			*/
 
@@ -228,8 +226,7 @@ namespace ion::script::interfaces
 			///@}
 
 			/**
-				@name File repositories
-				Creating
+				@name File repositories - Creating
 				@{
 			*/
 
@@ -245,8 +242,7 @@ namespace ion::script::interfaces
 			///@}
 
 			/**
-				@name File repositories
-				Removing
+				@name File repositories - Removing
 				@{
 			*/
 

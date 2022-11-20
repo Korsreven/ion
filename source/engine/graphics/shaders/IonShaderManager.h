@@ -142,8 +142,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Shaders
-				Creating
+				@name Shaders - Creating
 				@{
 			*/
 
@@ -160,8 +159,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Shaders
-				Retrieving
+				@name Shaders - Retrieving
 				@{
 			*/
 
@@ -176,8 +174,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Shaders
-				Removing
+				@name Shaders - Removing
 				@{
 			*/
 

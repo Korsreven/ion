@@ -516,8 +516,7 @@ namespace ion::graphics::render
 			///@}
 
 			/**
-				@name System window (shadowing)
-				Modifiers
+				@name Modifiers - System window (shadowing)
 				@{
 			*/
 
@@ -537,8 +536,7 @@ namespace ion::graphics::render
 			///@}
 
 			/**
-				@name System window (shadowing)
-				Observers
+				@name Observers - System window (shadowing)
 				@{
 			*/
 

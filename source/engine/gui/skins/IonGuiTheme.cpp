@@ -33,8 +33,7 @@ GuiTheme::GuiTheme(std::string name, NonOwningPtr<graphics::scene::SceneManager>
 
 
 /*
-	Skins
-	Creating
+	Skins - Creating
 */
 
 NonOwningPtr<GuiSkin> GuiTheme::CreateSkin(const GuiSkin &skin)
@@ -49,8 +48,7 @@ NonOwningPtr<GuiSkin> GuiTheme::CreateSkin(GuiSkin &&skin)
 
 
 /*
-	Skins
-	Retrieving
+	Skins - Retrieving
 */
 
 NonOwningPtr<GuiSkin> GuiTheme::GetSkin(std::string_view name) noexcept
@@ -65,8 +63,7 @@ NonOwningPtr<const GuiSkin> GuiTheme::GetSkin(std::string_view name) const noexc
 
 
 /*
-	Skins
-	Removing
+	Skins - Removing
 */
 
 void GuiTheme::ClearSkins() noexcept

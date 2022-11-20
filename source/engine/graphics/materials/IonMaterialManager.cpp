@@ -26,8 +26,7 @@ namespace material_manager::detail
 //Public
 
 /*
-	Materials
-	Creating
+	Materials - Creating
 */
 
 NonOwningPtr<Material> MaterialManager::CreateMaterial(std::string name)
@@ -107,8 +106,7 @@ NonOwningPtr<Material> MaterialManager::CreateMaterial(Material &&material)
 
 
 /*
-	Materials
-	Retrieving
+	Materials - Retrieving
 */
 
 NonOwningPtr<Material> MaterialManager::GetMaterial(std::string_view name) noexcept
@@ -123,8 +121,7 @@ NonOwningPtr<const Material> MaterialManager::GetMaterial(std::string_view name)
 
 
 /*
-	Materials
-	Removing
+	Materials - Removing
 */
 
 void MaterialManager::ClearMaterials() noexcept

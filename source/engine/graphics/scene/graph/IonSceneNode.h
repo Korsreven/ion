@@ -525,8 +525,7 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Ranges
-				Root node only
+				@name Ranges (root node only)
 				@{
 			*/
 
@@ -889,8 +888,7 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Transformations
-				Relative
+				@name Transformations - Relative
 				@{
 			*/
 
@@ -909,8 +907,7 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Transformations
-				Absolute
+				@name Transformations - Absolute
 				@{
 			*/
 
@@ -947,8 +944,7 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Child nodes
-				Creating
+				@name Child nodes - Creating
 				@{
 			*/
 
@@ -974,8 +970,7 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Child nodes
-				Take/release ownership
+				@name Child nodes - Take/release ownership
 				@{
 			*/
 
@@ -1008,8 +1003,7 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Child nodes
-				Retrieving
+				@name Child nodes - Retrieving
 				@{
 			*/
 			
@@ -1033,8 +1027,7 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Child nodes
-				Removing
+				@name Child nodes - Removing
 				@{
 			*/
 

@@ -237,8 +237,7 @@ std::optional<int> GuiPanelContainer::TabOrder(const GuiComponent &component) co
 
 
 /*
-	Buttons
-	Creating
+	Buttons - Creating
 */
 
 NonOwningPtr<controls::GuiButton> GuiPanelContainer::CreateButton(std::string name, const std::optional<Vector2> &size,
@@ -260,8 +259,7 @@ NonOwningPtr<controls::GuiButton> GuiPanelContainer::CreateButton(controls::GuiB
 
 
 /*
-	Check boxes
-	Creating
+	Check boxes - Creating
 */
 
 NonOwningPtr<controls::GuiCheckBox> GuiPanelContainer::CreateCheckBox(std::string name, const std::optional<Vector2> &size,
@@ -283,8 +281,7 @@ NonOwningPtr<controls::GuiCheckBox> GuiPanelContainer::CreateCheckBox(controls::
 
 
 /*
-	Group boxes
-	Creating
+	Group boxes - Creating
 */
 
 NonOwningPtr<controls::GuiGroupBox> GuiPanelContainer::CreateGroupBox(std::string name, const std::optional<Vector2> &size,
@@ -306,8 +303,7 @@ NonOwningPtr<controls::GuiGroupBox> GuiPanelContainer::CreateGroupBox(controls::
 
 
 /*
-	Labels
-	Creating
+	Labels - Creating
 */
 
 NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(std::string name, const std::optional<Vector2> &size,
@@ -329,8 +325,7 @@ NonOwningPtr<controls::GuiLabel> GuiPanelContainer::CreateLabel(controls::GuiLab
 
 
 /*
-	List boxes
-	Creating
+	List boxes - Creating
 */
 
 NonOwningPtr<controls::GuiListBox> GuiPanelContainer::CreateListBox(std::string name, const std::optional<Vector2> &size,
@@ -352,8 +347,7 @@ NonOwningPtr<controls::GuiListBox> GuiPanelContainer::CreateListBox(controls::Gu
 
 
 /*
-	Progress bars
-	Creating
+	Progress bars - Creating
 */
 
 NonOwningPtr<controls::GuiProgressBar> GuiPanelContainer::CreateProgressBar(std::string name, const std::optional<Vector2> &size,
@@ -375,8 +369,7 @@ NonOwningPtr<controls::GuiProgressBar> GuiPanelContainer::CreateProgressBar(cont
 
 
 /*
-	Radio buttons
-	Creating
+	Radio buttons - Creating
 */
 
 NonOwningPtr<controls::GuiRadioButton> GuiPanelContainer::CreateRadioButton(std::string name, const std::optional<Vector2> &size,
@@ -398,8 +391,7 @@ NonOwningPtr<controls::GuiRadioButton> GuiPanelContainer::CreateRadioButton(cont
 
 
 /*
-	Scroll bars
-	Creating
+	Scroll bars - Creating
 */
 
 NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(std::string name, const std::optional<Vector2> &size,
@@ -421,8 +413,7 @@ NonOwningPtr<controls::GuiScrollBar> GuiPanelContainer::CreateScrollBar(controls
 
 
 /*
-	Sliders
-	Creating
+	Sliders - Creating
 */
 
 NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(std::string name, const std::optional<Vector2> &size,
@@ -446,8 +437,7 @@ NonOwningPtr<controls::GuiSlider> GuiPanelContainer::CreateSlider(controls::GuiS
 
 
 /*
-	Text boxes
-	Creating
+	Text boxes - Creating
 */
 
 NonOwningPtr<controls::GuiTextBox> GuiPanelContainer::CreateTextBox(std::string name, const std::optional<Vector2> &size,
@@ -469,8 +459,7 @@ NonOwningPtr<controls::GuiTextBox> GuiPanelContainer::CreateTextBox(controls::Gu
 
 
 /*
-	Controls
-	Retrieving
+	Controls - Retrieving
 */
 
 NonOwningPtr<controls::GuiControl> GuiPanelContainer::GetControl(std::string_view name) noexcept
@@ -514,8 +503,7 @@ NonOwningPtr<const controls::GuiControl> GuiPanelContainer::SearchControl(std::s
 
 
 /*
-	Controls
-	Removing
+	Controls - Removing
 */
 
 void GuiPanelContainer::ClearControls() noexcept
@@ -548,8 +536,7 @@ bool GuiPanelContainer::RemoveControl(std::string_view name) noexcept
 
 
 /*
-	Panels
-	Creating
+	Panels - Creating
 */
 
 NonOwningPtr<GuiPanel> GuiPanelContainer::CreatePanel(std::string name)
@@ -564,8 +551,7 @@ NonOwningPtr<GuiPanel> GuiPanelContainer::CreatePanel(GuiPanel &&panel)
 
 
 /*
-	Panels
-	Retrieving
+	Panels - Retrieving
 */
 
 NonOwningPtr<GuiPanel> GuiPanelContainer::GetPanel(std::string_view name) noexcept
@@ -609,8 +595,7 @@ NonOwningPtr<const GuiPanel> GuiPanelContainer::SearchPanel(std::string_view nam
 
 
 /*
-	Panels
-	Removing
+	Panels - Removing
 */
 
 void GuiPanelContainer::ClearPanels() noexcept
@@ -643,8 +628,7 @@ bool GuiPanelContainer::RemovePanel(std::string_view name) noexcept
 
 
 /*
-	Components
-	Removing (optimization)
+	Components - Removing (optimization)
 */
 
 void GuiPanelContainer::ClearComponents() noexcept

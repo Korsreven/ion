@@ -32,8 +32,7 @@ NodeAnimationManager::NodeAnimationManager(SceneNode &scene_node) noexcept :
 
 
 /*
-	Node animations
-	Creating
+	Node animations - Creating
 */
 
 NonOwningPtr<NodeAnimation> NodeAnimationManager::CreateAnimation(std::optional<std::string> name)
@@ -54,8 +53,7 @@ NonOwningPtr<NodeAnimation> NodeAnimationManager::CreateAnimation(NodeAnimation 
 
 
 /*
-	Node animations
-	Retrieving
+	Node animations - Retrieving
 */
 
 NonOwningPtr<NodeAnimation> NodeAnimationManager::GetAnimation(std::string_view name) noexcept
@@ -70,8 +68,7 @@ NonOwningPtr<const NodeAnimation> NodeAnimationManager::GetAnimation(std::string
 
 
 /*
-	Node animations
-	Removing
+	Node animations - Removing
 */
 
 void NodeAnimationManager::ClearAnimations() noexcept
@@ -91,8 +88,7 @@ bool NodeAnimationManager::RemoveAnimation(std::string_view name) noexcept
 
 
 /*
-	Node animation groups
-	Creating
+	Node animation groups - Creating
 */
 
 NonOwningPtr<NodeAnimationGroup> NodeAnimationManager::CreateAnimationGroup(std::optional<std::string> name)
@@ -113,8 +109,7 @@ NonOwningPtr<NodeAnimationGroup> NodeAnimationManager::CreateAnimationGroup(Node
 
 
 /*
-	Node animation groups
-	Retrieving
+	Node animation groups - Retrieving
 */
 
 NonOwningPtr<NodeAnimationGroup> NodeAnimationManager::GetAnimationGroup(std::string_view name) noexcept
@@ -129,8 +124,7 @@ NonOwningPtr<NodeAnimationGroup> NodeAnimationManager::GetAnimationGroup(std::st
 
 
 /*
-	Node animation groups
-	Removing
+	Node animation groups - Removing
 */
 
 void NodeAnimationManager::ClearAnimationGroups() noexcept
@@ -150,8 +144,7 @@ bool NodeAnimationManager::RemoveAnimationGroup(std::string_view name) noexcept
 
 
 /*
-	Node animation timelines
-	Creating
+	Node animation timelines - Creating
 */
 
 NonOwningPtr<NodeAnimationTimeline> NodeAnimationManager::CreateTimeline(std::optional<std::string> name, real playback_rate, bool running)
@@ -161,8 +154,7 @@ NonOwningPtr<NodeAnimationTimeline> NodeAnimationManager::CreateTimeline(std::op
 
 
 /*
-	Node animation timelines
-	Retrieving
+	Node animation timelines - Retrieving
 */
 
 NonOwningPtr<NodeAnimationTimeline> NodeAnimationManager::GetTimeline(std::string_view name) noexcept
@@ -177,8 +169,7 @@ NonOwningPtr<const NodeAnimationTimeline> NodeAnimationManager::GetTimeline(std:
 
 
 /*
-	Node animation timelines
-	Removing
+	Node animation timelines - Removing
 */
 
 void NodeAnimationManager::ClearTimelines() noexcept

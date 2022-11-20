@@ -27,8 +27,7 @@ namespace frame_sequence_manager::detail
 //Public
 
 /*
-	Frame sequences
-	Creating
+	Frame sequences - Creating
 */
 
 NonOwningPtr<FrameSequence> FrameSequenceManager::CreateFrameSequence(std::string name, const frame_sequence::detail::container_type &frames)
@@ -54,8 +53,7 @@ NonOwningPtr<FrameSequence> FrameSequenceManager::CreateFrameSequence(FrameSeque
 
 
 /*
-	Frame sequences
-	Retrieving
+	Frame sequences - Retrieving
 */
 
 NonOwningPtr<FrameSequence> FrameSequenceManager::GetFrameSequence(std::string_view name) noexcept
@@ -70,8 +68,7 @@ NonOwningPtr<const FrameSequence> FrameSequenceManager::GetFrameSequence(std::st
 
 
 /*
-	Frame sequences
-	Removing
+	Frame sequences - Removing
 */
 
 void FrameSequenceManager::ClearFrameSequences() noexcept

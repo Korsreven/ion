@@ -197,8 +197,7 @@ void NodeAnimationTimeline::Revert(duration total_duration)
 
 
 /*
-	Node animations
-	Attaching
+	Node animations - Attaching
 */
 
 NonOwningPtr<AttachableNodeAnimation> NodeAnimationTimeline::Attach(NonOwningPtr<NodeAnimation> node_animation,
@@ -212,8 +211,7 @@ NonOwningPtr<AttachableNodeAnimation> NodeAnimationTimeline::Attach(NonOwningPtr
 
 
 /*
-	Node animations
-	Detaching
+	Node animations - Detaching
 */
 
 void NodeAnimationTimeline::DetachAllAnimations() noexcept
@@ -246,8 +244,7 @@ bool NodeAnimationTimeline::DetachAnimation(AttachableNodeAnimation &node_animat
 
 
 /*
-	Animation groups
-	Attaching
+	Animation groups - Attaching
 */
 
 NonOwningPtr<AttachableNodeAnimationGroup> NodeAnimationTimeline::Attach(NonOwningPtr<NodeAnimationGroup> node_animation_group,
@@ -261,8 +258,7 @@ NonOwningPtr<AttachableNodeAnimationGroup> NodeAnimationTimeline::Attach(NonOwni
 
 
 /*
-	Node animation groups
-	Detaching
+	Node animation groups - Detaching
 */
 
 void NodeAnimationTimeline::DetachAllAnimationGroups() noexcept

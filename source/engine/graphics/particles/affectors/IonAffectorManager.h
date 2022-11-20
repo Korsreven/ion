@@ -75,8 +75,7 @@ namespace ion::graphics::particles::affectors
 			///@}
 
 			/**
-				@name Affectors
-				Creating
+				@name Affectors - Creating
 				@{
 			*/
 
@@ -114,8 +113,7 @@ namespace ion::graphics::particles::affectors
 			///@}
 
 			/**
-				@name Affectors
-				Retrieving
+				@name Affectors - Retrieving
 				@{
 			*/
 
@@ -136,8 +134,7 @@ namespace ion::graphics::particles::affectors
 			///@}
 
 			/**
-				@name Affectors
-				Removing
+				@name Affectors - Removing
 				@{
 			*/
 

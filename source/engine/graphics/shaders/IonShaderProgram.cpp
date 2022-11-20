@@ -310,8 +310,7 @@ void ShaderProgram::Layout(NonOwningPtr<ShaderLayout> shader_layout) noexcept
 
 
 /*
-	Shader structs
-	Creating
+	Shader structs - Creating
 */
 
 NonOwningPtr<ShaderStruct> ShaderProgram::CreateStruct(std::string name, int size)
@@ -321,8 +320,7 @@ NonOwningPtr<ShaderStruct> ShaderProgram::CreateStruct(std::string name, int siz
 
 
 /*
-	Shader structs
-	Retrieving
+	Shader structs - Retrieving
 */
 
 NonOwningPtr<ShaderStruct> ShaderProgram::GetStruct(std::string_view name) noexcept
@@ -348,8 +346,7 @@ NonOwningPtr<const ShaderStruct> ShaderProgram::GetStruct(shader_layout::StructN
 
 
 /*
-	Shader structs
-	Removing
+	Shader structs - Removing
 */
 
 void ShaderProgram::ClearStructs() noexcept
@@ -370,8 +367,7 @@ bool ShaderProgram::RemoveStruct(std::string_view name) noexcept
 
 
 /*
-	Attribute variables
-	Retrieving
+	Attribute variables - Retrieving
 */
 
 NonOwningPtr<variables::AttributeVariable> ShaderProgram::GetAttribute(std::string_view name) noexcept
@@ -397,8 +393,7 @@ NonOwningPtr<const variables::AttributeVariable> ShaderProgram::GetAttribute(sha
 
 
 /*
-	Attribute variables
-	Removing
+	Attribute variables - Removing
 */
 
 void ShaderProgram::ClearAttributes() noexcept
@@ -419,8 +414,7 @@ bool ShaderProgram::RemoveAttribute(std::string_view name) noexcept
 
 
 /*
-	Uniform variables
-	Retrieving
+	Uniform variables - Retrieving
 */
 
 NonOwningPtr<variables::UniformVariable> ShaderProgram::GetUniform(std::string_view name) noexcept
@@ -446,8 +440,7 @@ NonOwningPtr<const variables::UniformVariable> ShaderProgram::GetUniform(shader_
 
 
 /*
-	Uniform variables
-	Removing
+	Uniform variables - Removing
 */
 
 void ShaderProgram::ClearUniforms() noexcept
@@ -473,8 +466,7 @@ bool ShaderProgram::RemoveUniform(std::string_view name) noexcept
 
 
 /*
-	Variables
-	Removing
+	Variables - Removing
 */
 
 void ShaderProgram::ClearVariables() noexcept
@@ -485,8 +477,7 @@ void ShaderProgram::ClearVariables() noexcept
 
 
 /*
-	Struct/variables
-	Removing
+	Struct/variables - Removing
 */
 
 void ShaderProgram::Clear() noexcept

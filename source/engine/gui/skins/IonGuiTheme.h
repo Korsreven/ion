@@ -130,8 +130,7 @@ namespace ion::gui::skins
 			///@}
 
 			/**
-				@name Skins
-				Creating
+				@name Skins - Creating
 				@{
 			*/
 
@@ -239,8 +238,7 @@ namespace ion::gui::skins
 			///@}
 
 			/**
-				@name Skins
-				Retrieving
+				@name Skins - Retrieving
 				@{
 			*/
 
@@ -255,8 +253,7 @@ namespace ion::gui::skins
 			///@}
 
 			/**
-				@name Skins
-				Removing
+				@name Skins - Removing
 				@{
 			*/
 

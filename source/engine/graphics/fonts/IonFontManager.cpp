@@ -319,8 +319,7 @@ FontManager::~FontManager() noexcept
 
 
 /*
-	Fonts
-	Creating
+	Fonts - Creating
 */
 
 NonOwningPtr<Font> FontManager::CreateFont(std::string name, std::string asset_name, int size, int face_index,
@@ -371,8 +370,7 @@ NonOwningPtr<Font> FontManager::CreateFont(Font &&font)
 
 
 /*
-	Fonts
-	Retrieving
+	Fonts - Retrieving
 */
 
 NonOwningPtr<Font> FontManager::GetFont(std::string_view name) noexcept
@@ -387,8 +385,7 @@ NonOwningPtr<const Font> FontManager::GetFont(std::string_view name) const noexc
 
 
 /*
-	Fonts
-	Removing
+	Fonts - Removing
 */
 
 void FontManager::ClearFonts() noexcept

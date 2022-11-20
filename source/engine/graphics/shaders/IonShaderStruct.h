@@ -112,8 +112,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Uniform variables
-				Creating
+				@name Uniform variables - Creating
 				@{
 			*/
 			
@@ -142,8 +141,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Uniform variables
-				Retrieving
+				@name Uniform variables - Retrieving
 				@{
 			*/
 
@@ -158,8 +156,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Uniform variables
-				Removing
+				@name Uniform variables - Removing
 				@{
 			*/
 

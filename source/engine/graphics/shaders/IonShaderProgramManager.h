@@ -412,8 +412,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Shader programs
-				Creating
+				@name Shader programs - Creating
 				@{
 			*/
 
@@ -438,8 +437,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Shader programs
-				Retrieving
+				@name Shader programs - Retrieving
 				@{
 			*/
 
@@ -454,8 +452,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Shader programs
-				Removing
+				@name Shader programs - Removing
 				@{
 			*/
 
@@ -471,8 +468,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Shader programs
-				Activate/deactivate
+				@name Shader programs - Activate/deactivate
 				@{
 			*/
 
@@ -488,8 +484,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Shader variables
-				Load/send
+				@name Shader variables - Load/send
 				@{
 			*/
 
@@ -518,8 +513,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Shader layouts
-				Creating
+				@name Shader layouts - Creating
 				@{
 			*/
 
@@ -540,8 +534,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Shader layouts
-				Retrieving
+				@name Shader layouts - Retrieving
 				@{
 			*/
 
@@ -556,8 +549,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Shader layouts
-				Removing
+				@name Shader layouts - Removing
 				@{
 			*/
 

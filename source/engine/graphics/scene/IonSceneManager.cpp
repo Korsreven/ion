@@ -35,8 +35,7 @@ SceneManager::SceneManager(std::optional<std::string> name) noexcept :
 
 
 /*
-	Default shader program
-	Adding
+	Default shader program - Adding
 */
 
 void SceneManager::AddDefaultShaderProgram(uint32 type_mask, NonOwningPtr<shaders::ShaderProgram> shader_program)
@@ -52,8 +51,7 @@ void SceneManager::AddDefaultShaderProgram(uint32 type_mask, NonOwningPtr<shader
 
 
 /*
-	Default shader program
-	Retrieving
+	Default shader program - Retrieving
 */
 
 NonOwningPtr<shaders::ShaderProgram> SceneManager::GetDefaultShaderProgram(uint32 type_flags) const noexcept
@@ -72,8 +70,7 @@ NonOwningPtr<shaders::ShaderProgram> SceneManager::GetDefaultShaderProgram(uint3
 
 
 /*
-	Default shader program
-	Removing
+	Default shader program - Removing
 */
 
 void SceneManager::ClearDefaultShaderPrograms() noexcept
@@ -104,8 +101,7 @@ void SceneManager::RemoveAllDefaultShaderPrograms(uint32 type_flags) noexcept
 
 
 /*
-	Cameras
-	Creating
+	Cameras - Creating
 */
 
 NonOwningPtr<Camera> SceneManager::CreateCamera(std::optional<std::string> name, bool visible)
@@ -131,8 +127,7 @@ NonOwningPtr<Camera> SceneManager::CreateCamera(Camera &&camera)
 
 
 /*
-	Cameras
-	Retrieving
+	Cameras - Retrieving
 */
 
 NonOwningPtr<Camera> SceneManager::GetCamera(std::string_view name) noexcept
@@ -147,8 +142,7 @@ NonOwningPtr<const Camera> SceneManager::GetCamera(std::string_view name) const 
 
 
 /*
-	Cameras
-	Removing
+	Cameras - Removing
 */
 
 void SceneManager::ClearCameras() noexcept
@@ -168,8 +162,7 @@ bool SceneManager::RemoveCamera(std::string_view name) noexcept
 
 
 /*
-	Lights
-	Creating
+	Lights - Creating
 */
 
 NonOwningPtr<Light> SceneManager::CreateLight(std::optional<std::string> name, bool visible)
@@ -216,8 +209,7 @@ NonOwningPtr<Light> SceneManager::CreateLight(Light &&light)
 
 
 /*
-	Lights
-	Retrieving
+	Lights - Retrieving
 */
 
 NonOwningPtr<Light> SceneManager::GetLight(std::string_view name) noexcept
@@ -232,8 +224,7 @@ NonOwningPtr<const Light> SceneManager::GetLight(std::string_view name) const no
 
 
 /*
-	Lights
-	Removing
+	Lights - Removing
 */
 
 void SceneManager::ClearLights() noexcept
@@ -253,8 +244,7 @@ bool SceneManager::RemoveLight(std::string_view name) noexcept
 
 
 /*
-	Models
-	Creating
+	Models - Creating
 */
 
 NonOwningPtr<Model> SceneManager::CreateModel(std::optional<std::string> name, bool visible)
@@ -264,8 +254,7 @@ NonOwningPtr<Model> SceneManager::CreateModel(std::optional<std::string> name, b
 
 
 /*
-	Models
-	Retrieving
+	Models - Retrieving
 */
 
 NonOwningPtr<Model> SceneManager::GetModel(std::string_view name) noexcept
@@ -280,8 +269,7 @@ NonOwningPtr<const Model> SceneManager::GetModel(std::string_view name) const no
 
 
 /*
-	Models
-	Removing
+	Models - Removing
 */
 
 void SceneManager::ClearModels() noexcept
@@ -301,8 +289,7 @@ bool SceneManager::RemoveModel(std::string_view name) noexcept
 
 
 /*
-	Particle systems
-	Creating
+	Particle systems - Creating
 */
 
 NonOwningPtr<DrawableParticleSystem> SceneManager::CreateParticleSystem(std::optional<std::string> name,
@@ -313,8 +300,7 @@ NonOwningPtr<DrawableParticleSystem> SceneManager::CreateParticleSystem(std::opt
 
 
 /*
-	Particle systems
-	Retrieving
+	Particle systems - Retrieving
 */
 
 NonOwningPtr<DrawableParticleSystem> SceneManager::GetParticleSystem(std::string_view name) noexcept
@@ -329,8 +315,7 @@ NonOwningPtr<const DrawableParticleSystem> SceneManager::GetParticleSystem(std::
 
 
 /*
-	Particle systems
-	Removing
+	Particle systems - Removing
 */
 
 void SceneManager::ClearParticleSystems() noexcept
@@ -350,8 +335,7 @@ bool SceneManager::RemoveParticleSystem(std::string_view name) noexcept
 
 
 /*
-	Texts
-	Creating
+	Texts - Creating
 */
 
 NonOwningPtr<DrawableText> SceneManager::CreateText(std::optional<std::string> name,
@@ -374,8 +358,7 @@ NonOwningPtr<DrawableText> SceneManager::CreateText(std::optional<std::string> n
 
 
 /*
-	Texts
-	Retrieving
+	Texts - Retrieving
 */
 
 NonOwningPtr<DrawableText> SceneManager::GetText(std::string_view name) noexcept
@@ -390,8 +373,7 @@ NonOwningPtr<const DrawableText> SceneManager::GetText(std::string_view name) co
 
 
 /*
-	Texts
-	Removing
+	Texts - Removing
 */
 
 void SceneManager::ClearTexts() noexcept
@@ -411,8 +393,7 @@ bool SceneManager::RemoveText(std::string_view name) noexcept
 
 
 /*
-	Sounds
-	Creating
+	Sounds - Creating
 */
 
 NonOwningPtr<MovableSound> SceneManager::CreateSound(std::optional<std::string> name,
@@ -442,8 +423,7 @@ NonOwningPtr<MovableSound> SceneManager::CreateSound(std::optional<std::string> 
 
 
 /*
-	Sounds
-	Retrieving
+	Sounds - Retrieving
 */
 
 NonOwningPtr<MovableSound> SceneManager::GetSound(std::string_view name) noexcept
@@ -458,8 +438,7 @@ NonOwningPtr<const MovableSound> SceneManager::GetSound(std::string_view name) c
 
 
 /*
-	Sounds
-	Removing
+	Sounds - Removing
 */
 
 void SceneManager::ClearSounds() noexcept
@@ -479,8 +458,7 @@ bool SceneManager::RemoveSound(std::string_view name) noexcept
 
 
 /*
-	Sound listeners
-	Creating
+	Sound listeners - Creating
 */
 
 NonOwningPtr<MovableSoundListener> SceneManager::CreateSoundListener(std::optional<std::string> name,
@@ -497,8 +475,7 @@ NonOwningPtr<MovableSoundListener> SceneManager::CreateSoundListener(std::option
 
 
 /*
-	Sound listeners
-	Retrieving
+	Sound listeners - Retrieving
 */
 
 NonOwningPtr<MovableSoundListener> SceneManager::GetSoundListener(std::string_view name) noexcept
@@ -513,8 +490,7 @@ NonOwningPtr<const MovableSoundListener> SceneManager::GetSoundListener(std::str
 
 
 /*
-	Sound listeners
-	Removing
+	Sound listeners - Removing
 */
 
 void SceneManager::ClearSoundListeners() noexcept

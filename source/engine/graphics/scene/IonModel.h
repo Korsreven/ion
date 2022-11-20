@@ -169,8 +169,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Meshes
-				Creating
+				@name Meshes - Creating
 				@{
 			*/
 
@@ -213,8 +212,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Meshes (derived)
-				Creating
+				@name Meshes (derived) - Creating
 				@{
 			*/
 
@@ -255,8 +253,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Meshes
-				Removing
+				@name Meshes - Removing
 				@{
 			*/
 

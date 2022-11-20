@@ -82,8 +82,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Components
-				Creating
+				@name Components - Creating
 				@{
 			*/
 
@@ -121,8 +120,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Components
-				Retrieving
+				@name Components - Retrieving
 				@{
 			*/
 
@@ -156,8 +154,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Components
-				Removing
+				@name Components - Removing
 				@{
 			*/
 

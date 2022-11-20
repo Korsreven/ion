@@ -607,8 +607,7 @@ namespace ion::gui::controls
 			///@}
 
 			/**
-				@name Content
-				Adding/inserting
+				@name Content - Adding/inserting
 				@{
 			*/
 
@@ -621,8 +620,7 @@ namespace ion::gui::controls
 			///@}
 
 			/**
-				@name Content
-				Replacing
+				@name Content - Replacing
 				@{
 			*/
 
@@ -635,8 +633,7 @@ namespace ion::gui::controls
 			///@}
 
 			/**
-				@name Content
-				Removing
+				@name Content - Removing
 				@{
 			*/
 
@@ -652,8 +649,7 @@ namespace ion::gui::controls
 			///@}
 
 			/**
-				@name Content
-				Clipboard
+				@name Content - Clipboard
 				@{
 			*/
 

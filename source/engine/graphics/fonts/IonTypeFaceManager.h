@@ -81,8 +81,7 @@ namespace ion::graphics::fonts
 			///@}
 
 			/**
-				@name Type faces
-				Creating
+				@name Type faces - Creating
 				@{
 			*/
 
@@ -106,8 +105,7 @@ namespace ion::graphics::fonts
 			///@}
 
 			/**
-				@name Type faces
-				Retrieving
+				@name Type faces - Retrieving
 				@{
 			*/
 
@@ -122,8 +120,7 @@ namespace ion::graphics::fonts
 			///@}
 
 			/**
-				@name Type faces
-				Removing
+				@name Type faces - Removing
 				@{
 			*/
 

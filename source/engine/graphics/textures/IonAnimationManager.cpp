@@ -28,8 +28,7 @@ namespace animation_manager::detail
 
 
 /*
-	Animations
-	Creating
+	Animations - Creating
 */
 
 NonOwningPtr<Animation> AnimationManager::CreateAnimation(std::string name, NonOwningPtr<FrameSequence> frame_sequence,
@@ -58,8 +57,7 @@ NonOwningPtr<Animation> AnimationManager::CreateAnimation(Animation &&animation)
 
 
 /*
-	Animations
-	Retrieving
+	Animations - Retrieving
 */
 
 NonOwningPtr<Animation> AnimationManager::GetAnimation(std::string_view name) noexcept
@@ -74,8 +72,7 @@ NonOwningPtr<const Animation> AnimationManager::GetAnimation(std::string_view na
 
 
 /*
-	Animations
-	Removing
+	Animations - Removing
 */
 
 void AnimationManager::ClearAnimations() noexcept

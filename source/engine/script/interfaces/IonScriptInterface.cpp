@@ -65,8 +65,7 @@ bool ScriptInterface::Load(std::string_view asset_name)
 //Public
 
 /*
-	Script repositories
-	Creating
+	Script repositories - Creating
 */
 
 NonOwningPtr<assets::repositories::ScriptRepository> ScriptInterface::CreateScriptRepository()
@@ -86,8 +85,7 @@ NonOwningPtr<assets::repositories::ScriptRepository> ScriptInterface::CreateScri
 
 
 /*
-	Script repositories
-	Removing
+	Script repositories - Removing
 */
 
 void ScriptInterface::ClearScriptRepositories() noexcept
@@ -102,8 +100,7 @@ bool ScriptInterface::RemoveScriptRepository(assets::repositories::ScriptReposit
 
 
 /*
-	File repositories
-	Creating
+	File repositories - Creating
 */
 
 NonOwningPtr<assets::repositories::FileRepository> ScriptInterface::CreateFileRepository()
@@ -123,8 +120,7 @@ NonOwningPtr<assets::repositories::FileRepository> ScriptInterface::CreateFileRe
 
 
 /*
-	File repositories
-	Removing
+	File repositories - Removing
 */
 
 void ScriptInterface::ClearFileRepositories() noexcept

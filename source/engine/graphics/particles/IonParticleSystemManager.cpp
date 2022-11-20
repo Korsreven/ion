@@ -27,8 +27,7 @@ namespace particle_system_manager::detail
 
 
 /*
-	Particle systems
-	Creating
+	Particle systems - Creating
 */
 
 NonOwningPtr<ParticleSystem> ParticleSystemManager::CreateParticleSystem(std::string name)
@@ -49,8 +48,7 @@ NonOwningPtr<ParticleSystem> ParticleSystemManager::CreateParticleSystem(Particl
 
 
 /*
-	Particle systems
-	Retrieving
+	Particle systems - Retrieving
 */
 
 NonOwningPtr<ParticleSystem> ParticleSystemManager::GetParticleSystem(std::string_view name) noexcept
@@ -65,8 +63,7 @@ NonOwningPtr<const ParticleSystem> ParticleSystemManager::GetParticleSystem(std:
 
 
 /*
-	Particle systems
-	Removing
+	Particle systems - Removing
 */
 
 void ParticleSystemManager::ClearParticleSystems() noexcept

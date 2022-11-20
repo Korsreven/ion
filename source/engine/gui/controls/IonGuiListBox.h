@@ -466,8 +466,7 @@ namespace ion::gui::controls
 			///@}
 
 			/**
-				@name Items
-				Adding/inserting
+				@name Items - Adding/inserting
 				@{
 			*/
 
@@ -493,8 +492,7 @@ namespace ion::gui::controls
 			///@}
 
 			/**
-				@name Items
-				Replacing
+				@name Items - Replacing
 				@{
 			*/
 
@@ -520,8 +518,7 @@ namespace ion::gui::controls
 			///@}
 
 			/**
-				@name Items
-				Removing
+				@name Items - Removing
 				@{
 			*/
 

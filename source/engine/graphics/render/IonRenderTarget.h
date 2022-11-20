@@ -157,8 +157,7 @@ namespace ion::graphics::render
 			///@}
 
 			/**
-				@name Viewports
-				Ranges
+				@name Viewports - Ranges
 				@{
 			*/
 
@@ -179,8 +178,7 @@ namespace ion::graphics::render
 			///@}
 
 			/**
-				@name Viewports
-				Creating
+				@name Viewports - Creating
 				@{
 			*/
 
@@ -205,8 +203,7 @@ namespace ion::graphics::render
 			///@}
 
 			/**
-				@name Viewports
-				Retrieving
+				@name Viewports - Retrieving
 				@{
 			*/
 
@@ -230,8 +227,7 @@ namespace ion::graphics::render
 			///@}
 
 			/**
-				@name Viewports
-				Removing
+				@name Viewports - Removing
 				@{
 			*/
 

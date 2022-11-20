@@ -285,8 +285,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Shader structs
-				Creating
+				@name Shader structs - Creating
 				@{
 			*/
 
@@ -296,8 +295,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Shader structs
-				Retrieving
+				@name Shader structs - Retrieving
 				@{
 			*/
 
@@ -321,8 +319,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Shader structs
-				Removing
+				@name Shader structs - Removing
 				@{
 			*/
 
@@ -338,8 +335,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Attribute variables
-				Creating
+				@name Attribute variables - Creating
 				@{
 			*/
 
@@ -371,8 +367,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Attribute variables
-				Retrieving
+				@name Attribute variables - Retrieving
 				@{
 			*/
 
@@ -396,8 +391,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Attribute variables
-				Removing
+				@name Attribute variables - Removing
 				@{
 			*/
 
@@ -413,8 +407,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Uniform variables
-				Creating
+				@name Uniform variables - Creating
 				@{
 			*/
 
@@ -446,8 +439,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Uniform variables
-				Retrieving
+				@name Uniform variables - Retrieving
 				@{
 			*/
 
@@ -471,8 +463,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Uniform variables
-				Removing
+				@name Uniform variables - Removing
 				@{
 			*/
 
@@ -488,8 +479,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Variables
-				Removing
+				@name Variables - Removing
 				@{
 			*/
 
@@ -499,8 +489,7 @@ namespace ion::graphics::shaders
 			///@}
 
 			/**
-				@name Struct/variables
-				Removing
+				@name Struct/variables - Removing
 				@{
 			*/
 

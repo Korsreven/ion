@@ -160,8 +160,7 @@ namespace ion::graphics::fonts
 			///@}
 
 			/**
-				@name Fonts
-				Creating
+				@name Fonts - Creating
 				@{
 			*/
 
@@ -195,8 +194,7 @@ namespace ion::graphics::fonts
 			///@}
 
 			/**
-				@name Fonts
-				Retrieving
+				@name Fonts - Retrieving
 				@{
 			*/
 
@@ -211,8 +209,7 @@ namespace ion::graphics::fonts
 			///@}
 
 			/**
-				@name Fonts
-				Removing
+				@name Fonts - Removing
 				@{
 			*/
 

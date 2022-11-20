@@ -368,8 +368,7 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Scene managers
-				Ranges
+				@name Scene managers - Ranges
 				@{
 			*/
 
@@ -390,8 +389,7 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Scene mangers
-				Creating
+				@name Scene mangers - Creating
 				@{
 			*/
 
@@ -401,8 +399,7 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Scene mangers
-				Retrieving
+				@name Scene mangers - Retrieving
 				@{
 			*/
 
@@ -417,8 +414,7 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Scene mangers
-				Removing
+				@name Scene mangers - Removing
 				@{
 			*/
 

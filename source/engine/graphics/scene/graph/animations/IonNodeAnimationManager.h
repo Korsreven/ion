@@ -149,8 +149,7 @@ namespace ion::graphics::scene::graph::animations
 			///@}
 
 			/**
-				@name Node animations
-				Creating
+				@name Node animations - Creating
 				@{
 			*/
 
@@ -167,8 +166,7 @@ namespace ion::graphics::scene::graph::animations
 			///@}
 
 			/**
-				@name Node animations
-				Retrieving
+				@name Node animations - Retrieving
 				@{
 			*/
 
@@ -183,8 +181,7 @@ namespace ion::graphics::scene::graph::animations
 			///@}
 
 			/**
-				@name Node animations
-				Removing
+				@name Node animations - Removing
 				@{
 			*/
 
@@ -200,8 +197,7 @@ namespace ion::graphics::scene::graph::animations
 			///@}
 
 			/**
-				@name Node animation groups
-				Creating
+				@name Node animation groups - Creating
 				@{
 			*/
 
@@ -218,8 +214,7 @@ namespace ion::graphics::scene::graph::animations
 			///@}
 
 			/**
-				@name Node animation groups
-				Retrieving
+				@name Node animation groups - Retrieving
 				@{
 			*/
 
@@ -234,8 +229,7 @@ namespace ion::graphics::scene::graph::animations
 			///@}
 
 			/**
-				@name Node animation groups
-				Removing
+				@name Node animation groups - Removing
 				@{
 			*/
 
@@ -251,8 +245,7 @@ namespace ion::graphics::scene::graph::animations
 			///@}
 
 			/**
-				@name Node animation timelines
-				Creating
+				@name Node animation timelines - Creating
 				@{
 			*/
 
@@ -262,8 +255,7 @@ namespace ion::graphics::scene::graph::animations
 			///@}
 
 			/**
-				@name Node animation timelines
-				Retrieving
+				@name Node animation timelines - Retrieving
 				@{
 			*/
 
@@ -278,8 +270,7 @@ namespace ion::graphics::scene::graph::animations
 			///@}
 
 			/**
-				@name Node animation timelines
-				Removing
+				@name Node animation timelines - Removing
 				@{
 			*/
 

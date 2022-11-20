@@ -349,8 +349,7 @@ namespace ion::gui::skins
 			///@}
 
 			/**
-				@name Parts
-				Adding
+				@name Parts - Adding
 				@{
 			*/
 
@@ -366,8 +365,7 @@ namespace ion::gui::skins
 			///@}
 
 			/**
-				@name Parts
-				Retrieving
+				@name Parts - Retrieving
 				@{
 			*/
 
@@ -386,8 +384,7 @@ namespace ion::gui::skins
 			///@}
 
 			/**
-				@name Parts
-				Removing
+				@name Parts - Removing
 				@{
 			*/
 
@@ -414,8 +411,7 @@ namespace ion::gui::skins
 			///@}
 
 			/**
-				@name Render passes
-				Adding
+				@name Render passes - Adding
 				@{
 			*/
 
@@ -435,8 +431,7 @@ namespace ion::gui::skins
 			///@}
 
 			/**
-				@name Render passes
-				Retrieving
+				@name Render passes - Retrieving
 				@{
 			*/
 
@@ -455,8 +450,7 @@ namespace ion::gui::skins
 			///@}
 
 			/**
-				@name Render passes
-				Removing
+				@name Render passes - Removing
 				@{
 			*/
 
@@ -469,8 +463,7 @@ namespace ion::gui::skins
 			///@}
 
 			/**
-				@name Static
-				Registering
+				@name Static - Registering
 				@{
 			*/
 
@@ -485,8 +478,7 @@ namespace ion::gui::skins
 			///@}
 
 			/**
-				@name Static
-				Retrieving
+				@name Static - Retrieving
 				@{
 			*/
 

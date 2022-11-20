@@ -297,8 +297,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Default shader program
-				Adding
+				@name Default shader program - Adding
 				@{
 			*/
 
@@ -308,8 +307,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Default shader program
-				Retrieving
+				@name Default shader program - Retrieving
 				@{
 			*/
 
@@ -320,8 +318,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Default shader program
-				Removing
+				@name Default shader program - Removing
 				@{
 			*/
 
@@ -337,8 +334,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Cameras
-				Creating
+				@name Cameras - Creating
 				@{
 			*/
 
@@ -358,8 +354,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Cameras
-				Retrieving
+				@name Cameras - Retrieving
 				@{
 			*/
 
@@ -374,8 +369,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Cameras
-				Removing
+				@name Cameras - Removing
 				@{
 			*/
 
@@ -391,8 +385,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Lights
-				Creating
+				@name Lights - Creating
 				@{
 			*/
 
@@ -423,8 +416,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Lights
-				Retrieving
+				@name Lights - Retrieving
 				@{
 			*/
 
@@ -439,8 +431,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Lights
-				Removing
+				@name Lights - Removing
 				@{
 			*/
 
@@ -456,8 +447,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Models
-				Creating
+				@name Models - Creating
 				@{
 			*/
 
@@ -467,8 +457,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Models
-				Retrieving
+				@name Models - Retrieving
 				@{
 			*/
 			
@@ -483,8 +472,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Models
-				Removing
+				@name Models - Removing
 				@{
 			*/
 
@@ -500,8 +488,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Particle systems
-				Creating
+				@name Particle systems - Creating
 				@{
 			*/
 
@@ -512,8 +499,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Particle systems
-				Retrieving
+				@name Particle systems - Retrieving
 				@{
 			*/
 			
@@ -528,8 +514,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Particle systems
-				Removing
+				@name Particle systems - Removing
 				@{
 			*/
 
@@ -545,8 +530,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Texts
-				Creating
+				@name Texts - Creating
 				@{
 			*/
 
@@ -565,8 +549,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Texts
-				Retrieving
+				@name Texts - Retrieving
 				@{
 			*/
 			
@@ -581,8 +564,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Texts
-				Removing
+				@name Texts - Removing
 				@{
 			*/
 
@@ -598,8 +580,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Sounds
-				Creating
+				@name Sounds - Creating
 				@{
 			*/
 
@@ -623,8 +604,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Sounds
-				Retrieving
+				@name Sounds - Retrieving
 				@{
 			*/
 			
@@ -639,8 +619,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Sounds
-				Removing
+				@name Sounds - Removing
 				@{
 			*/
 
@@ -656,8 +635,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Sound listeners
-				Creating
+				@name Sound listeners - Creating
 				@{
 			*/
 
@@ -672,8 +650,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Sound listeners
-				Retrieving
+				@name Sound listeners - Retrieving
 				@{
 			*/
 			
@@ -688,8 +665,7 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
-				@name Sound listeners
-				Removing
+				@name Sound listeners - Removing
 				@{
 			*/
 

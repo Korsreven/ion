@@ -369,8 +369,7 @@ graphics::render::RenderWindow& Engine::RenderTo(graphics::render::RenderWindow 
 
 
 /*
-	Scene graphs
-	Creating
+	Scene graphs - Creating
 */
 
 NonOwningPtr<graphics::scene::graph::SceneGraph> Engine::CreateSceneGraph(std::optional<std::string> name, bool enabled)
@@ -380,8 +379,7 @@ NonOwningPtr<graphics::scene::graph::SceneGraph> Engine::CreateSceneGraph(std::o
 
 
 /*
-	Scene graphs
-	Retrieving
+	Scene graphs - Retrieving
 */
 
 NonOwningPtr<graphics::scene::graph::SceneGraph> Engine::GetSceneGraph(std::string_view name) noexcept
@@ -396,8 +394,7 @@ NonOwningPtr<const graphics::scene::graph::SceneGraph> Engine::GetSceneGraph(std
 
 
 /*
-	Scene graphs
-	Removing
+	Scene graphs - Removing
 */
 
 void Engine::ClearSceneGraphs() noexcept
@@ -417,8 +414,7 @@ bool Engine::RemoveSceneGraph(std::string_view name) noexcept
 
 
 /*
-	Viewport
-	Retrieving
+	Viewport - Retrieving
 */
 
 NonOwningPtr<graphics::render::Viewport> Engine::GetDefaultViewport() noexcept

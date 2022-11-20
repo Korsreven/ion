@@ -199,8 +199,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Controls
-				Creating
+				@name Controls - Creating
 				@{
 			*/
 
@@ -265,8 +264,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Buttons
-				Creating
+				@name Buttons - Creating
 				@{
 			*/
 
@@ -284,8 +282,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Check boxes
-				Creating
+				@name Check boxes - Creating
 				@{
 			*/
 
@@ -303,8 +300,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Group boxes
-				Creating
+				@name Group boxes - Creating
 				@{
 			*/
 
@@ -322,8 +318,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Labels
-				Creating
+				@name Labels - Creating
 				@{
 			*/
 
@@ -341,8 +336,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name List boxes
-				Creating
+				@name List boxes - Creating
 				@{
 			*/
 
@@ -360,8 +354,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Progress bars
-				Creating
+				@name Progress bars - Creating
 				@{
 			*/
 
@@ -379,8 +372,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Radio buttons
-				Creating
+				@name Radio buttons - Creating
 				@{
 			*/
 
@@ -398,8 +390,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Scroll bars
-				Creating
+				@name Scroll bars - Creating
 				@{
 			*/
 
@@ -419,8 +410,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Sliders
-				Creating
+				@name Sliders - Creating
 				@{
 			*/
 
@@ -442,8 +432,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Text boxes
-				Creating
+				@name Text boxes - Creating
 				@{
 			*/
 
@@ -461,8 +450,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Controls
-				Retrieving
+				@name Controls - Retrieving
 				@{
 			*/
 
@@ -505,8 +493,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Controls
-				Removing
+				@name Controls - Removing
 				@{
 			*/
 
@@ -522,8 +509,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Panels
-				Creating
+				@name Panels - Creating
 				@{
 			*/
 
@@ -536,8 +522,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Panels
-				Retrieving
+				@name Panels - Retrieving
 				@{
 			*/
 
@@ -561,8 +546,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Panels
-				Removing
+				@name Panels - Removing
 				@{
 			*/
 
@@ -578,8 +562,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Components
-				Removing (optimization)
+				@name Components - Removing (optimization)
 				@{
 			*/
 

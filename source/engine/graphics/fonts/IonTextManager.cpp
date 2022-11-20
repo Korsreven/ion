@@ -26,8 +26,7 @@ namespace text_manager::detail
 
 
 /*
-	Texts
-	Creating
+	Texts - Creating
 */
 
 NonOwningPtr<Text> TextManager::CreateText(std::string name, std::string content, text::TextAlignment alignment,
@@ -82,8 +81,7 @@ NonOwningPtr<Text> TextManager::CreateText(Text &&text)
 
 
 /*
-	Texts
-	Retrieving
+	Texts - Retrieving
 */
 
 NonOwningPtr<Text> TextManager::GetText(std::string_view name) noexcept
@@ -98,8 +96,7 @@ NonOwningPtr<const Text> TextManager::GetText(std::string_view name) const noexc
 
 
 /*
-	Texts
-	Removing
+	Texts - Removing
 */
 
 void TextManager::ClearTexts() noexcept

@@ -581,8 +581,7 @@ const Sphere& SceneNode::WorldBoundingSphere(bool derive) const noexcept
 
 
 /*
-	Transformations
-	Relative
+	Transformations - Relative
 */
 
 void SceneNode::Translate(const Vector3 &unit) noexcept
@@ -611,8 +610,7 @@ void SceneNode::Scale(const Vector2 &unit) noexcept
 
 
 /*
-	Transformations
-	Absolute
+	Transformations - Absolute
 */
 
 void SceneNode::LookAt(const Vector3 &position) noexcept
@@ -680,8 +678,7 @@ void SceneNode::Elapse(duration time) noexcept
 
 
 /*
-	Child nodes
-	Creating
+	Child nodes - Creating
 */
 
 NonOwningPtr<SceneNode> SceneNode::CreateChildNode(std::optional<std::string> name)
@@ -717,8 +714,7 @@ NonOwningPtr<SceneNode> SceneNode::CreateChildNode(std::optional<std::string> na
 
 
 /*
-	Child nodes
-	Take/release ownership
+	Child nodes - Take/release ownership
 */
 
 NonOwningPtr<SceneNode> SceneNode::Adopt(OwningPtr<SceneNode> &root_node)
@@ -797,8 +793,7 @@ SceneNodes SceneNode::OrphanAll() noexcept
 
 
 /*
-	Child nodes
-	Retrieving
+	Child nodes - Retrieving
 */
 			
 NonOwningPtr<SceneNode> SceneNode::GetChildNode(std::string_view name) noexcept
@@ -855,8 +850,7 @@ NonOwningPtr<const SceneNode> SceneNode::GetDescendantNode(std::string_view name
 
 
 /*
-	Child nodes
-	Removing
+	Child nodes - Removing
 */
 
 void SceneNode::ClearChildNodes() noexcept

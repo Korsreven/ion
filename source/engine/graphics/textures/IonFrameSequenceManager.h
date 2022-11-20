@@ -82,8 +82,7 @@ namespace ion::graphics::textures
 			///@}
 
 			/**
-				@name Frame sequences
-				Creating
+				@name Frame sequences - Creating
 				@{
 			*/
 
@@ -115,8 +114,7 @@ namespace ion::graphics::textures
 			///@}
 
 			/**
-				@name Frame sequences
-				Retrieving
+				@name Frame sequences - Retrieving
 				@{
 			*/
 
@@ -131,8 +129,7 @@ namespace ion::graphics::textures
 			///@}
 
 			/**
-				@name Frame sequences
-				Removing
+				@name Frame sequences - Removing
 				@{
 			*/
 

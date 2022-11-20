@@ -605,8 +605,7 @@ void GuiListBox::ItemIndex(std::optional<int> index) noexcept
 
 
 /*
-	Items
-	Adding/inserting
+	Items - Adding/inserting
 */
 
 void GuiListBox::AddItem(std::string content, NonOwningPtr<graphics::materials::Material> icon)
@@ -658,8 +657,7 @@ void GuiListBox::InsertItems(int off, ListBoxItems items)
 
 
 /*
-	Items
-	Replacing
+	Items - Replacing
 */
 
 void GuiListBox::ReplaceItem(int off, std::string content, NonOwningPtr<graphics::materials::Material> icon)
@@ -715,8 +713,7 @@ void GuiListBox::ReplaceItems(int first, int last, ListBoxItems items)
 
 
 /*
-	Items
-	Removing
+	Items - Removing
 */
 
 void GuiListBox::ClearItems() noexcept

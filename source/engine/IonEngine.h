@@ -350,8 +350,7 @@ namespace ion
 			///@}
 
 			/**
-				@name Scene graphs
-				Creating
+				@name Scene graphs - Creating
 				@{
 			*/
 
@@ -361,8 +360,7 @@ namespace ion
 			///@}
 
 			/**
-				@name Scene graphs
-				Retrieving
+				@name Scene graphs - Retrieving
 				@{
 			*/
 
@@ -385,8 +383,7 @@ namespace ion
 			///@}
 
 			/**
-				@name Scene graphs
-				Removing
+				@name Scene graphs - Removing
 				@{
 			*/
 
@@ -402,8 +399,7 @@ namespace ion
 			///@}
 
 			/**
-				@name Viewport
-				Retrieving
+				@name Viewport - Retrieving
 				@{
 			*/
 

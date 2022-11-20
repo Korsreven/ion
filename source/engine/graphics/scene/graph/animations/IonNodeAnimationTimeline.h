@@ -77,8 +77,9 @@ namespace ion::graphics::scene::graph::animations
 			duration RetrieveTotalDuration() const noexcept;
 
 
-			/*
-				Events
+			/**
+				@name Events
+				@{
 			*/
 
 			///@brief See ObjectManager::Created for more details
@@ -93,6 +94,8 @@ namespace ion::graphics::scene::graph::animations
 
 			///@brief See ObjectManager::Removed for more details
 			void Removed(AttachableNodeAnimationGroup &animation_group) noexcept override final;
+
+			///@}
 
 		public:
 
@@ -112,8 +115,9 @@ namespace ion::graphics::scene::graph::animations
 			NodeAnimationTimeline(NodeAnimationTimeline&&) = default;
 
 
-			/*
-				Operators
+			/**
+				@name Operators
+				@{
 			*/
 
 			///@brief Deleted copy assignment
@@ -122,9 +126,11 @@ namespace ion::graphics::scene::graph::animations
 			///@brief Default move assignment
 			NodeAnimationTimeline& operator=(NodeAnimationTimeline&&) = default;
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
 			///@brief Returns a mutable range of all attached node animations in this timeline
@@ -156,9 +162,11 @@ namespace ion::graphics::scene::graph::animations
 				return NodeAnimationGroupBase::Objects();
 			}
 
+			///@}
 
-			/*
-				Modifiers
+			/**
+				@name Modifiers
+				@{
 			*/
 
 			///@brief Sets the given repeat count to the given value
@@ -217,9 +225,11 @@ namespace ion::graphics::scene::graph::animations
 			///@details This function is typically called by an attached animation or animation group
 			void Refresh() noexcept;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
 			///@brief Returns the current time of this timeline
@@ -278,9 +288,11 @@ namespace ion::graphics::scene::graph::animations
 				return on_finish_revert_;
 			}
 
+			///@}
 
-			/*
-				Playback
+			/**
+				@name Playback
+				@{
 			*/
 
 			///@brief Starts or resumes, timeline playback
@@ -301,20 +313,22 @@ namespace ion::graphics::scene::graph::animations
 			///A total duration of 0 seconds is instantaneous
 			void Revert(duration total_duration = 0.0_sec);
 
+			///@}
 
-			/*
-				Animations
-				Attaching
+			/**
+				@name Animations - Attaching
+				@{
 			*/
 
 			///@brief Attaches the given node animation, to this timeline
 			NonOwningPtr<AttachableNodeAnimation> Attach(NonOwningPtr<NodeAnimation> node_animation,
 				duration start_time = 0.0_sec, bool enabled = true);
 
+			///@}
 
-			/*
-				Node animations
-				Detaching
+			/**
+				@name Node animations - Detaching
+				@{
 			*/
 
 			///@brief Detaches all removable node animations from this timeline
@@ -323,20 +337,22 @@ namespace ion::graphics::scene::graph::animations
 			///@brief Detaches a removable node animation from this timeline
 			bool DetachAnimation(AttachableNodeAnimation &node_animation) noexcept;
 
+			///@}
 
-			/*
-				Animation groups
-				Attaching
+			/**
+				@name Animation groups - Attaching
+				@{
 			*/
 
 			///@brief Attaches the given node animation group, to this timeline
 			NonOwningPtr<AttachableNodeAnimationGroup> Attach(NonOwningPtr<NodeAnimationGroup> node_animation_group,
 				duration start_time = 0.0_sec, bool enabled = true);
 
+			///@}
 
-			/*
-				Node animation groups
-				Detaching
+			/**
+				@name Node animation groups - Detaching
+				@{
 			*/
 
 			///@brief Detaches all removable node animation groups from this timeline
@@ -345,22 +361,28 @@ namespace ion::graphics::scene::graph::animations
 			///@brief Detaches a removable node animation group from this timeline
 			bool DetachAnimationGroup(AttachableNodeAnimationGroup &node_animation_group) noexcept;
 
+			///@}
 
-			/*
-				Detaching
+			/**
+				@name Detaching
+				@{
 			*/
 
 			///@brief Detaches all removable node animations and animation groups from this timeline
 			void DetachAll() noexcept;
 
+			///@}
 
-			/*
-				Elapse time
+			/**
+				@name Elapse time
+				@{
 			*/
 
 			///@brief Elapses the total time for this timeline by the given time in seconds
 			///@details This function is typically called each frame, with the time in seconds since last frame
 			void Elapse(duration time) noexcept;
+
+			///@}
 	};
 } //ion::graphics::scene::graph::animations
 

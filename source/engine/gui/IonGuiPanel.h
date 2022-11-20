@@ -182,8 +182,7 @@ namespace ion::gui
 				///@}
 
 				/**
-					@name Controls
-					Attaching/detaching
+					@name Controls - Attaching/detaching
 					@{
 				*/
 

@@ -386,8 +386,7 @@ namespace ion::graphics::textures
 			///@}
 
 			/**
-				@name Textures
-				Creating
+				@name Textures - Creating
 				@{
 			*/
 
@@ -417,8 +416,7 @@ namespace ion::graphics::textures
 			///@}
 
 			/**
-				@name Texture atlases
-				Creating
+				@name Texture atlases - Creating
 				@{
 			*/
 
@@ -452,8 +450,7 @@ namespace ion::graphics::textures
 			///@}
 
 			/**
-				@name Textures
-				Retrieving
+				@name Textures - Retrieving
 				@{
 			*/
 
@@ -468,8 +465,7 @@ namespace ion::graphics::textures
 			///@}
 
 			/**
-				@name Textures
-				Removing
+				@name Textures - Removing
 				@{
 			*/
 

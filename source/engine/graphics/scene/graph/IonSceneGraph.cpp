@@ -571,8 +571,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 
 
 /*
-	Scene mangers
-	Creating
+	Scene mangers - Creating
 */
 
 NonOwningPtr<SceneManager> SceneGraph::CreateSceneManager(std::optional<std::string> name)
@@ -582,8 +581,7 @@ NonOwningPtr<SceneManager> SceneGraph::CreateSceneManager(std::optional<std::str
 
 
 /*
-	Scene mangers
-	Retrieving
+	Scene mangers - Retrieving
 */
 
 NonOwningPtr<SceneManager> SceneGraph::GetSceneManager(std::string_view name) noexcept
@@ -598,8 +596,7 @@ NonOwningPtr<const SceneManager> SceneGraph::GetSceneManager(std::string_view na
 
 
 /*
-	Scene mangers
-	Removing
+	Scene mangers - Removing
 */
 
 void SceneGraph::ClearSceneMangers() noexcept

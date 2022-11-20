@@ -202,8 +202,7 @@ std::pair<int, int> GridCell::Offset() const noexcept
 
 
 /*
-	Controls
-	Attaching/detaching
+	Controls - Attaching/detaching
 */
 
 bool GridCell::AttachControl(NonOwningPtr<controls::GuiControl> control)

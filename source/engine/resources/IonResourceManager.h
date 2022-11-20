@@ -827,8 +827,7 @@ namespace ion::resources
 			///@}
 
 			/**
-				@name Resources
-				Creating
+				@name Resources - Creating
 				@{
 			*/
 
@@ -852,8 +851,7 @@ namespace ion::resources
 			///@}
 
 			/**
-				@name Resources
-				Retrieving
+				@name Resources - Retrieving
 				@{
 			*/
 
@@ -874,8 +872,7 @@ namespace ion::resources
 			///@}
 
 			/**
-				@name Resources
-				Removing
+				@name Resources - Removing
 				@{
 			*/
 

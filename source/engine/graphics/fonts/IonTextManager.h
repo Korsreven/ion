@@ -84,8 +84,7 @@ namespace ion::graphics::fonts
 			///@}
 
 			/**
-				@name Texts
-				Creating
+				@name Texts - Creating
 				@{
 			*/
 
@@ -126,8 +125,7 @@ namespace ion::graphics::fonts
 			///@}
 
 			/**
-				@name Texts
-				Retrieving
+				@name Texts - Retrieving
 				@{
 			*/
 
@@ -142,8 +140,7 @@ namespace ion::graphics::fonts
 			///@}
 
 			/**
-				@name Texts
-				Removing
+				@name Texts - Removing
 				@{
 			*/
 

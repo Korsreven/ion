@@ -787,8 +787,7 @@ GuiTextBox::GuiTextBox(std::string name, const skins::GuiSkin &skin, const std::
 
 
 /*
-	Content
-	Adding/inserting
+	Content - Adding/inserting
 */
 
 void GuiTextBox::AddContent(std::string content)
@@ -824,8 +823,7 @@ void GuiTextBox::InsertContent(int off, std::string content)
 
 
 /*
-	Content
-	Replacing
+	Content - Replacing
 */
 
 void GuiTextBox::ReplaceContent(int off, std::string content)
@@ -861,8 +859,7 @@ void GuiTextBox::ReplaceContent(int first, int last, std::string content)
 
 
 /*
-	Content
-	Removing
+	Content - Removing
 */
 
 void GuiTextBox::ClearContent() noexcept
@@ -906,8 +903,7 @@ void GuiTextBox::RemoveContent(int first, int last) noexcept
 
 
 /*
-	Content
-	Clipboard
+	Content - Clipboard
 */
 
 bool GuiTextBox::CopyContent() noexcept

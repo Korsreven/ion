@@ -479,8 +479,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Frames
-				Creating
+				@name Frames - Creating
 				@{
 			*/
 
@@ -493,8 +492,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Frames
-				Retrieving
+				@name Frames - Retrieving
 				@{
 			*/
 
@@ -509,8 +507,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Frames
-				Removing
+				@name Frames - Removing
 				@{
 			*/
 
@@ -526,8 +523,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Mouse cursors
-				Creating
+				@name Mouse cursors - Creating
 				@{
 			*/
 
@@ -543,8 +539,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Mouse cursors
-				Retrieving
+				@name Mouse cursors - Retrieving
 				@{
 			*/
 
@@ -559,8 +554,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Mouse cursors
-				Removing
+				@name Mouse cursors - Removing
 				@{
 			*/
 
@@ -576,8 +570,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Tooltips
-				Creating
+				@name Tooltips - Creating
 				@{
 			*/
 
@@ -593,8 +586,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Tooltips
-				Retrieving
+				@name Tooltips - Retrieving
 				@{
 			*/
 
@@ -609,8 +601,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Tooltips
-				Removing
+				@name Tooltips - Removing
 				@{
 			*/
 
@@ -626,8 +617,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Components
-				Removing (optimization)
+				@name Components - Removing (optimization)
 				@{
 			*/
 
@@ -637,8 +627,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Themes
-				Creating
+				@name Themes - Creating
 				@{
 			*/
 
@@ -651,8 +640,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Themes
-				Retrieving
+				@name Themes - Retrieving
 				@{
 			*/
 
@@ -667,8 +655,7 @@ namespace ion::gui
 			///@}
 
 			/**
-				@name Themes
-				Removing
+				@name Themes - Removing
 				@{
 			*/
 

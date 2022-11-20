@@ -81,8 +81,7 @@ namespace ion::graphics::particles
 			///@}
 
 			/**
-				@name Particle systems
-				Creating
+				@name Particle systems - Creating
 				@{
 			*/
 
@@ -99,8 +98,7 @@ namespace ion::graphics::particles
 			///@}
 
 			/**
-				@name Particle systems
-				Retrieving
+				@name Particle systems - Retrieving
 				@{
 			*/
 
@@ -115,8 +113,7 @@ namespace ion::graphics::particles
 			///@}
 
 			/**
-				@name Particle systems
-				Removing
+				@name Particle systems - Removing
 				@{
 			*/
 

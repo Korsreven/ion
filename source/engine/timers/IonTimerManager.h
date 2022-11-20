@@ -79,8 +79,7 @@ namespace ion::timers
 			///@}
 
 			/**
-				@name Timers
-				Creating
+				@name Timers - Creating
 				@{
 			*/
 
@@ -100,8 +99,7 @@ namespace ion::timers
 			///@}
 
 			/**
-				@name Timers
-				Retrieving
+				@name Timers - Retrieving
 				@{
 			*/
 
@@ -116,8 +114,7 @@ namespace ion::timers
 			///@}
 
 			/**
-				@name Timers
-				Removing
+				@name Timers - Removing
 				@{
 			*/
 

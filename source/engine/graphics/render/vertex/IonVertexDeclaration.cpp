@@ -91,8 +91,7 @@ int VertexDeclaration::Components() const noexcept
 
 
 /*
-	Vertex elements
-	Adding
+	Vertex elements - Adding
 */
 
 void VertexDeclaration::AddElement(shaders::shader_layout::AttributeName name, vertex_declaration::VertexElementType type, int offset, int stride)
@@ -107,8 +106,7 @@ void VertexDeclaration::AddElement(const vertex_declaration::VertexElement &elem
 
 
 /*
-	Vertex elements
-	Removing
+	Vertex elements - Removing
 */
 
 void VertexDeclaration::ClearElements() noexcept

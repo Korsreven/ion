@@ -78,8 +78,7 @@ GuiGroupBox::~GuiGroupBox() noexcept
 
 
 /*
-	Controls
-	Adding
+	Controls - Adding
 */
 
 bool GuiGroupBox::AddControl(NonOwningPtr<controls::GuiControl> control)
@@ -113,8 +112,7 @@ bool GuiGroupBox::AddControl(std::string_view name)
 
 
 /*
-	Controls
-	Retrieving
+	Controls - Retrieving
 */
 
 NonOwningPtr<controls::GuiControl> GuiGroupBox::GetControl(std::string_view name) noexcept
@@ -129,8 +127,7 @@ NonOwningPtr<const controls::GuiControl> GuiGroupBox::GetControl(std::string_vie
 
 
 /*
-	Controls
-	Removing
+	Controls - Removing
 */
 
 void GuiGroupBox::ClearControls() noexcept
