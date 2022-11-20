@@ -111,8 +111,9 @@ namespace ion::script
 					}
 
 
-					/*
-						Observers
+					/**
+						@name Observers
+						@{
 					*/
 
 					///@brief Returns true if this declaration has a definition
@@ -143,9 +144,11 @@ namespace ion::script
 						return ordinality_ == Ordinality::Mandatory;
 					}
 
+					///@}
 
-					/*
-						Comparators
+					/**
+						@name Comparators
+						@{
 					*/
 
 					///@brief Returns true if this declaration should be sorted before the given declaration
@@ -169,6 +172,8 @@ namespace ion::script
 					{
 						return lhs < rhs.Name();
 					}
+
+					///@}
 			};
 
 			struct class_reference final
@@ -181,8 +186,9 @@ namespace ion::script
 			};
 
 
-			/*
-				Searching
+			/**
+				@name Searching
+				@{
 			*/
 
 			template <typename T>
@@ -250,9 +256,11 @@ namespace ion::script
 					const declarations_result& Get(const ClassDefinition &class_def);
 			};
 
+			///@}
 
-			/*
-				Validating
+			/**
+				@name Validating
+				@{
 			*/
 
 			adaptors::FlatSet<std::string_view> get_required_properties(const properties_map &properties);
@@ -267,12 +275,16 @@ namespace ion::script
 			bool validate(const ScriptTree &tree, const ClassDefinition &root, ValidateError &error, std::vector<ValidateError> &errors);
 			bool validate_tree(const ScriptTree &tree, const ClassDefinition &root, std::vector<ValidateError> &errors);
 
+			///@}
 
-			/*
-				Outputting
+			/**
+				@name Outputting
+				@{
 			*/
 
 			std::string print_output(duration validate_time, const std::vector<ValidateError> &errors, OutputOptions output_options);
+
+			///@}
 		} //detail
 
 
@@ -297,8 +309,9 @@ namespace ion::script
 				ParameterDefinition(std::initializer_list<std::string> values);
 
 
-				/*
-					Observers
+				/**
+					@name Observers
+					@{
 				*/
 
 				///@brief Returns the parameter type
@@ -307,17 +320,21 @@ namespace ion::script
 					return type_;
 				}
 
+				///@}
 
-				/*
-					Lookup
+				/**
+					@name Lookup
+					@{
 				*/
 
 				///@brief Returns true if an enumerable has support for the given value
 				[[nodiscard]] bool HasValue(std::string_view value) const noexcept;
 
+				///@}
 
-				/*
-					Ranges
+				/**
+					@name Ranges
+					@{
 				*/
 
 				///@brief Returns an immutable range of all values for this enumerable parameter
@@ -327,6 +344,8 @@ namespace ion::script
 					assert(type_ == ParameterType::Enumerable && values_);
 					return values_->Elements();
 				}
+
+				///@}
 		};
 
 		///@brief A class representing a property definition in the validation scheme
@@ -351,8 +370,9 @@ namespace ion::script
 				PropertyDefinition(std::string name, ParameterDefinitions parameters, int required_parameters) noexcept;
 
 
-				/*
-					Observers
+				/**
+					@name Observers
+					@{
 				*/
 
 				///@brief Returns the name of this property
@@ -367,9 +387,11 @@ namespace ion::script
 					return required_parameters_;
 				}
 
+				///@}
 
-				/*
-					Ranges
+				/**
+					@name Ranges
+					@{
 				*/
 
 				///@brief Returns an immutable range of all parameters for this property
@@ -378,6 +400,8 @@ namespace ion::script
 				{
 					return adaptors::ranges::Iterable<const ParameterDefinitions&>{parameters_};
 				}
+
+				///@}
 		};
 
 		///@brief A class representing a class definition in the validation scheme
@@ -406,8 +430,9 @@ namespace ion::script
 				ClassDefinition(std::string name, std::initializer_list<EntityType<ClassDefinition>> base_classes);
 
 
-				/*
-					Static functions
+				/**
+					@name Static functions
+					@{
 				*/
 
 				///@brief Returns a newly created class definition with the given name
@@ -426,9 +451,11 @@ namespace ion::script
 				///@details Designed for fluent interface by using function chaining (named parameter idiom)
 				[[nodiscard]] static ClassDefinition Create(std::string name, std::initializer_list<EntityType<ClassDefinition>> base_classes);
 
+				///@}
 
-				/*
-					Observers
+				/**
+					@name Observers
+					@{
 				*/
 
 				///@brief Returns the name of this class
@@ -437,9 +464,11 @@ namespace ion::script
 					return name_;
 				}
 
+				///@}
 
-				/*
-					Classes
+				/**
+					@name Classes
+					@{
 				*/
 
 				///@brief Adds an inner class with the given name
@@ -465,9 +494,11 @@ namespace ion::script
 				///@brief Adds a required inner class with the given definition
 				ClassDefinition& AddRequiredClass(ClassDefinition class_def);
 
+				///@}
 
-				/*
-					Properties
+				/**
+					@name Properties
+					@{
 				*/
 
 				///@brief Adds a property with the given name
@@ -501,9 +532,11 @@ namespace ion::script
 				///@brief Adds a required property with the given property definition
 				ClassDefinition& AddRequiredProperty(PropertyDefinition property);
 
+				///@}
 
-				/*
-					Lookup
+				/**
+					@name Lookup
+					@{
 				*/
 
 				///@brief Returns a pointer to an immutable ClassDeclaration with the given name
@@ -518,9 +551,11 @@ namespace ion::script
 				///@details If no property with the given name is found, it returns nullptr
 				[[nodiscard]] const PropertyDeclaration* GetProperty(std::string_view name) const noexcept;
 
+				///@}
 
-				/*
-					Ranges
+				/**
+					@name Ranges
+					@{
 				*/
 
 				///@brief Returns an immutable range of all base classes of this class
@@ -543,6 +578,8 @@ namespace ion::script
 				{
 					return properties_.Elements();
 				}
+
+				///@}
 		};
 
 
@@ -570,8 +607,9 @@ namespace ion::script
 				ClassDeclaration(ClassDefinition definition, Ordinality ordinality, ClassType class_type) noexcept;
 
 
-				/*
-					Observers
+				/**
+					@name Observers
+					@{
 				*/
 
 				///@brief Returns true if this class declaration is instantiatable
@@ -579,6 +617,8 @@ namespace ion::script
 				{
 					return class_type_ == ClassType::Concrete;
 				}
+
+				///@}
 		};
 	} //script_validator
 
@@ -600,17 +640,20 @@ namespace ion::script
 			ScriptValidator() = default;
 
 
-			/*
-				Static functions
+			/**
+				@name Static functions
+				@{
 			*/
 
 			///@brief Returns a newly created script validator
 			///@details Designed for fluent interface by using function chaining (named parameter idiom)
 			[[nodiscard]] static ScriptValidator Create() noexcept;
 
+			///@}
 
-			/*
-				Observers
+			/**
+				@name Observers
+				@{
 			*/
 
 			///@brief Returns all validate errors from the previous validation
@@ -627,9 +670,11 @@ namespace ion::script
 				return validate_time_;
 			}
 
+			///@}
 
-			/*
-				Classes
+			/**
+				@name Classes
+				@{
 			*/
 
 			///@brief Adds a class with the given name (no definition)
@@ -649,35 +694,43 @@ namespace ion::script
 			///@brief Adds a required class with the given definition
 			ScriptValidator& AddRequiredClass(script_validator::ClassDefinition class_def);
 
+			///@}
 
-			/*
-				Lookup
+			/**
+				@name Lookup
+				@{
 			*/
 
 			///@brief Returns a pointer to an immutable ClassDeclaration with the given name
 			///@details If no class with the given name is found, it returns nullptr
 			[[nodiscard]] const script_validator::ClassDeclaration* GetClass(std::string_view name) const noexcept;
 
+			///@}
 
-			/*
-				Outputting
+			/**
+				@name Outputting
+				@{
 			*/
 
 			///@brief Prints the output from the previous compilation
 			///@details Whats printed is based on the given compiler output options
 			[[nodiscard]] std::string PrintOutput(script_validator::OutputOptions output_options = script_validator::OutputOptions::SummaryAndErrors) const;
 
+			///@}
 
-			/*
-				Validating
+			/**
+				@name Validating
+				@{
 			*/
 
 			///@brief Returns true if this validator validates the given script tree
 			[[nodiscard]] bool Validate(const ScriptTree &tree, ValidateError &error);
 
+			///@}
 
-			/*
-				Ranges
+			/**
+				@name Ranges
+				@{
 			*/
 
 			///@brief Returns an immutable range of all classes in this validator
@@ -686,6 +739,8 @@ namespace ion::script
 			{
 				return root_.InnerClasses();
 			}
+
+			///@}
 	};
 
 } //ion::script

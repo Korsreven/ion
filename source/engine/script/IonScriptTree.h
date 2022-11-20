@@ -110,9 +110,8 @@ namespace ion::script
 			using lineage_search_result = std::vector<generations>;
 
 
-			/**
-				@name Serializing
-				@{
+			/*
+				Serializing
 			*/
 
 			template <typename VariantT, typename T, size_t Index = 0>
@@ -216,11 +215,9 @@ namespace ion::script
 			int deserialize_object(std::string_view bytes, std::vector<ObjectNodes> &object_stack, PropertyNodes &properties);
 			std::optional<ObjectNodes> deserialize(std::string_view bytes);
 
-			///@}
 
-			/**
-				@name Appending
-				@{
+			/*
+				Appending
 			*/
 
 			template <typename DestNodes, typename SrcNodes>
@@ -273,20 +270,16 @@ namespace ion::script
 				}
 			}
 
-			///@}
 
-			/**
-				@name Printing
-				@{
+			/*
+				Printing
 			*/
 
 			std::string print(const ObjectNodes &objects, PrintOptions print_options);
 
-			///@}
 
-			/**
-				@name Searching
-				@{
+			/*
+				Searching
 			*/
 
 			void breadth_first_search_impl(search_result &result, size_t off);
@@ -300,8 +293,6 @@ namespace ion::script
 
 			void lineage_depth_first_search_impl(lineage_search_result &result, generations &descendants, ObjectNode &object);
 			lineage_search_result lineage_depth_first_search(ObjectNodes &objects);
-
-			///@}
 		} //detail
 
 

@@ -286,7 +286,7 @@ namespace ion::graphics::utilities
 			///@brief Muliplies all channels with the given scalar
 			[[nodiscard]] friend inline auto operator*(real scalar, const Color &rhs) noexcept
 			{
-				return rhs * scalar; ///@brief Commutative
+				return rhs * scalar; //Commutative
 			}
 
 			///@brief Muliplies all channels with the given scalar

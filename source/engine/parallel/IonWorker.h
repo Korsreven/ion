@@ -56,7 +56,7 @@ namespace ion::parallel
 
 
 			/**
-				Operators
+				@name Operators
 				@{
 			*/
 
@@ -66,7 +66,7 @@ namespace ion::parallel
 			///@}
 
 			/**
-				Modifiers
+				@name Modifiers
 				@{
 			*/
 
@@ -92,7 +92,7 @@ namespace ion::parallel
 			///@}
 
 			/**
-				Observers
+				@name Observers
 				@{
 			*/
 

@@ -59,7 +59,7 @@ namespace ion::managed
 			}
 
 
-			/*
+			/**
 				@name Operators
 				@{
 			*/
@@ -78,7 +78,7 @@ namespace ion::managed
 
 			///@}
 
-			/*
+			/**
 				@name Modifiers
 				@{
 			*/
@@ -97,7 +97,7 @@ namespace ion::managed
 
 			///@}
 
-			/*
+			/**
 				@name Observers
 				@{
 			*/

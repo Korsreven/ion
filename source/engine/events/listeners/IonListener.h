@@ -35,7 +35,7 @@ namespace ion::events::listeners
 
 		public:
 
-			/*
+			/**
 				@name Modifiers
 				@{
 			*/
@@ -48,7 +48,7 @@ namespace ion::events::listeners
 
 			///@}
 
-			/*
+			/**
 				@name Observers
 				@{
 			*/
@@ -62,7 +62,7 @@ namespace ion::events::listeners
 
 			///@}
 
-			/*
+			/**
 				@name Events
 				@{
 			*/

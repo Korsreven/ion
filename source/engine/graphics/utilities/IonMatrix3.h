@@ -166,7 +166,7 @@ namespace ion::graphics::utilities
 			///@brief Adds all numbers to the given scalar
 			[[nodiscard]] friend inline auto operator+(real scalar, const Matrix3 &rhs) noexcept
 			{
-				return rhs + scalar; ///@brief Commutative
+				return rhs + scalar; //Commutative
 			}
 
 			///@brief Adds two matrices (adding each number)
