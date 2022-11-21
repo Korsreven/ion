@@ -32,6 +32,8 @@ namespace ion::memory
 		{
 			int ref_count = 1;
 			bool expired = false;
+
+			ControlBlock() = default;
 		};
 	} //owning_ptr::detail
 
