@@ -211,7 +211,8 @@ Material::Material(std::string name, NonOwningPtr<Animation> diffuse_map,
 
 	diffuse_map_{diffuse_map},
 	normal_map_{normal_map},
-	specular_map_{specular_map}
+	specular_map_{specular_map},
+	emissive_map_{emissive_map}
 {
 	//Empty
 }
@@ -228,7 +229,8 @@ Material::Material(std::string name, NonOwningPtr<Texture> diffuse_map,
 
 	diffuse_map_{diffuse_map},
 	normal_map_{normal_map},
-	specular_map_{specular_map}
+	specular_map_{specular_map},
+	emissive_map_{emissive_map}
 {
 	//Empty
 }
@@ -247,7 +249,8 @@ Material::Material(std::string name, NonOwningPtr<Animation> diffuse_map,
 
 	diffuse_map_{diffuse_map},
 	normal_map_{normal_map},
-	specular_map_{specular_map}
+	specular_map_{specular_map},
+	emissive_map_{emissive_map}
 {
 	//Empty
 }
@@ -266,7 +269,8 @@ Material::Material(std::string name, NonOwningPtr<Texture> diffuse_map,
 
 	diffuse_map_{diffuse_map},
 	normal_map_{normal_map},
-	specular_map_{specular_map}
+	specular_map_{specular_map},
+	emissive_map_{emissive_map}
 {
 	//Empty
 }
