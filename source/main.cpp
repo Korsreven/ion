@@ -51,7 +51,7 @@ struct Game :
 	bool rotate_camera_right = false;
 	ion::types::Cumulative<duration> idle_time{2.0_sec};
 
-	ion::NonOwningPtr<ion::graphics::scene::graph::animations::NodeAnimationTimeline> idle;
+	ion::NonOwningPtr<ion::graphics::scene::graph::animations::NodeAnimationTimeline> ship_idle_timeline;
 
 
 	/*
@@ -69,10 +69,10 @@ struct Game :
 				fps->Get()->Content(ion::utilities::convert::ToString(1.0_sec / time, 0));
 		}
 
-		if (idle)
+		if (ship_idle_timeline)
 		{
 			if (idle_time += time)
-				idle->Start();
+				ship_idle_timeline->Start();
 		}
 
 
@@ -89,10 +89,10 @@ struct Game :
 				if (rotate_model_right)
 					player_node->Rotate(math::ToRadians(-180.0_r) * time.count());
 
-				if (idle)
+				if (ship_idle_timeline)
 				{
 					idle_time.Reset();
-					idle->Revert();
+					ship_idle_timeline->Revert();
 				}
 			}	
 		}
@@ -469,8 +469,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 	//GUI
-	ion::gui::GuiController gui_controller{ scene_graph->RootNode(),
-		viewport, sounds->GetSoundChannelGroup("gui") };
+	ion::gui::GuiController gui_controller{scene_graph->RootNode(),
+		viewport, sounds->GetSoundChannelGroup("gui")};
 	gui_controller.ZOrder(-2.0_r);
 	auto gui_scene_manager = scene_graph->CreateSceneManager();
 	
@@ -577,19 +577,19 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			
 		//Default shader programs
 		scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
-			shader_programs->GetShaderProgram("default_model_prog"));
+			shader_programs->GetShaderProgram("model_prog"));
 		scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
-			shader_programs->GetShaderProgram("default_particle_prog"));
+			shader_programs->GetShaderProgram("particle_prog"));
 		scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
-			shader_programs->GetShaderProgram("default_flat_text_prog"));
+			shader_programs->GetShaderProgram("flat_text_prog"));
 
 		//Default shader programs (for GUI)
 		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
-			shader_programs->GetShaderProgram("default_flat_model_prog"));
+			shader_programs->GetShaderProgram("flat_model_prog"));
 		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
-			shader_programs->GetShaderProgram("default_flat_particle_prog"));
+			shader_programs->GetShaderProgram("flat_particle_prog"));
 		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
-			shader_programs->GetShaderProgram("default_flat_text_prog"));
+			shader_programs->GetShaderProgram("flat_text_prog"));
 
 
 		//Load scripts
@@ -618,168 +618,180 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	}
 	else //Init programmatically
 	{
-		//Textures
-		auto ground = textures->CreateTextureAtlas("ground", "atlas_pot.jpg", 2, 2, 4,
-			ion::graphics::textures::texture_atlas::AtlasSubTextureOrder::RowMajor);
+		/*
+			Textures
+		*/
 
-		auto asteroid_diffuse = textures->CreateTexture("asteroid_diffuse", "asteroid_diffuse.png");
-		auto asteroid_normal = textures->CreateTexture("asteroid_normal", "asteroid_normal.png");
-		auto asteroid_specular = textures->CreateTexture("asteroid_specular", "asteroid_specular.png");
-			
+		//Aura
+		auto aura_diffuse = textures->CreateTexture("aura_diffuse", "aura_diffuse.png");
+		auto aura_emissive = textures->CreateTexture("aura_emissive", "aura_emissive.png");
+
+		//Brick wall
 		auto brick_wall_diffuse = textures->CreateTexture("brick_wall_diffuse", "brick_wall_diffuse.jpg");
 		auto brick_wall_normal = textures->CreateTexture("brick_wall_normal", "brick_wall_normal.jpg");
 		auto brick_wall_specular = textures->CreateTexture("brick_wall_specular", "brick_wall_specular.jpg");
-			
-		auto pebbles_diffuse = textures->CreateTexture("pebbles_diffuse", "pebbles_diffuse.jpg");
-		auto pebbles_normal = textures->CreateTexture("pebbles_normal", "pebbles_normal.jpg");
-		auto pebbles_specular = textures->CreateTexture("pebbles_specular", "pebbles_specular.jpg");
+		
+		//Cloud
+		auto cloud_diffuse = textures->CreateTexture("cloud_diffuse", "cloud.png");
 
-		auto tifa_diffuse = textures->CreateTexture("tifa", "tifa.png");
-		auto cloud_diffuse = textures->CreateTexture("cloud", "cloud.png");
-		auto star_diffuse = textures->CreateTexture("star", "star.png");
-		auto ship_diffuse = textures->CreateTexture("ship_diffuse", "ship_alpha_diffuse.png");
-		auto ship_normal = textures->CreateTexture("ship_normal", "ship_alpha_normal.png");
-		auto ship_specular = textures->CreateTexture("ship_specular", "ship_alpha_specular.png");
-		auto aura_diffuse = textures->CreateTexture("aura_diffuse", "aura_diffuse.png");
-		auto aura_emissive = textures->CreateTexture("aura_emissive", "aura_emissive.png");
-		auto raindrop_diffuse = textures->CreateTexture("raindrop", "raindrop.png");
-		auto color_spectrum_diffuse = textures->CreateTexture("color_spectrum", "color_spectrum.png");
+		//Pyramid (egyptian)
+		auto pyramid_egyptian_diffuse = textures->CreateTexture("pyramid_egyptian_diffuse", "pyramid_egyptian_diffuse.png");
+		auto pyramid_egyptian_normal = textures->CreateTexture("pyramid_egyptian_normal", "pyramid_egyptian_normal.png");
+		auto pyramid_egyptian_specular = textures->CreateTexture("pyramid_egyptian_specular", "pyramid_egyptian_specular.png");
 
-		//GUI
-		//Mouse cursor
-		auto mouse_cursor_diffuse = textures->CreateTexture("mouse_cursor_diffuse", "mouse_cursor.png");
+		//Pyramid (mayan)
+		auto pyramid_mayan_diffuse = textures->CreateTexture("pyramid_mayan_diffuse", "pyramid_mayan_diffuse.png");
+		auto pyramid_mayan_normal = textures->CreateTexture("pyramid_mayan_normal", "pyramid_mayan_normal.png");
+		auto pyramid_mayan_specular = textures->CreateTexture("pyramid_mayan_specular", "pyramid_mayan_specular.png");
 
-		//Tooltip
-		auto tooltip_center_diffuse = textures->CreateTexture("tooltip_center", "tooltip_center.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto tooltip_top_diffuse = textures->CreateTexture("tooltip_top", "tooltip_top.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto tooltip_left_diffuse = textures->CreateTexture("tooltip_left", "tooltip_left.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto tooltip_top_left_diffuse = textures->CreateTexture("tooltip_top_left", "tooltip_top_left.png");
+		//Raindrop
+		auto raindrop_diffuse = textures->CreateTexture("raindrop_diffuse", "raindrop.png");
+
+		//Ship
+		auto ship_diffuse = textures->CreateTexture("ship_diffuse", "ship_diffuse.png");
+		auto ship_normal = textures->CreateTexture("ship_normal", "ship_normal.png");
+		auto ship_specular = textures->CreateTexture("ship_specular", "ship_specular.png");
+
+		//Star
+		auto star_diffuse = textures->CreateTexture("star_diffuse", "star.png");
+
+
+		/*
+			Textures (GUI)
+		*/
 
 		//Button
-		auto button_center_enabled_diffuse = textures->CreateTexture("button_center_enabled", "button_center_enabled.png",
+		auto button_center_enabled_diffuse = textures->CreateTexture("button_center_enabled_diffuse", "button_center_enabled.png",
 			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto button_center_disabled_diffuse = textures->CreateTexture("button_center_disabled", "button_center_disabled.png",
+		auto button_center_disabled_diffuse = textures->CreateTexture("button_center_disabled_diffuse", "button_center_disabled.png",
 			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto button_center_pressed_diffuse = textures->CreateTexture("button_center_pressed", "button_center_pressed.png",
+		auto button_center_pressed_diffuse = textures->CreateTexture("button_center_pressed_diffuse", "button_center_pressed.png",
 			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto button_center_hovered_diffuse = textures->CreateTexture("button_center_hovered", "button_center_hovered.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-
-		auto button_top_enabled_diffuse = textures->CreateTexture("button_top_enabled", "button_top_enabled.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto button_top_focused_diffuse = textures->CreateTexture("button_top_focused", "button_top_focused.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto button_left_enabled_diffuse = textures->CreateTexture("button_left_enabled", "button_left_enabled.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto button_left_focused_diffuse = textures->CreateTexture("button_left_focused", "button_left_focused.png",
+		auto button_center_hovered_diffuse = textures->CreateTexture("button_center_hovered_diffuse", "button_center_hovered.png",
 			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 
-		auto button_top_left_enabled_diffuse = textures->CreateTexture("button_top_left_enabled", "button_top_left_enabled.png");
-		auto button_top_left_focused_diffuse = textures->CreateTexture("button_top_left_focused", "button_top_left_focused.png");
+		auto button_top_enabled_diffuse = textures->CreateTexture("button_top_enabled_diffuse", "button_top_enabled.png",
+			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+		auto button_top_focused_diffuse = textures->CreateTexture("button_top_focused_diffuse", "button_top_focused.png",
+			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+		auto button_left_enabled_diffuse = textures->CreateTexture("button_left_enabled_diffuse", "button_left_enabled.png",
+			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+		auto button_left_focused_diffuse = textures->CreateTexture("button_left_focused_diffuse", "button_left_focused.png",
+			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+
+		auto button_top_left_enabled_diffuse = textures->CreateTexture("button_top_left_enabled_diffuse", "button_top_left_enabled.png");
+		auto button_top_left_focused_diffuse = textures->CreateTexture("button_top_left_focused_diffuse", "button_top_left_focused.png");
 
 		//Check box
-		auto check_box_center_enabled_diffuse = textures->CreateTexture("check_box_center_enabled", "check_box_center_enabled.png",
+		auto check_box_center_enabled_diffuse = textures->CreateTexture("check_box_center_enabled_diffuse", "check_box_center_enabled.png",
 			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto check_box_center_hovered_diffuse = textures->CreateTexture("check_box_center_hovered", "check_box_center_hovered.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-
-		auto check_box_mark_enabled_diffuse = textures->CreateTexture("check_box_mark_enabled", "check_box_mark_enabled.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto check_box_mark_disabled_diffuse = textures->CreateTexture("check_box_mark_disabled", "check_box_mark_disabled.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);		
-		auto check_box_mark_pressed_diffuse = textures->CreateTexture("check_box_mark_pressed", "check_box_mark_pressed.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto check_box_mark_hovered_diffuse = textures->CreateTexture("check_box_mark_hovered", "check_box_mark_hovered.png",
+		auto check_box_center_hovered_diffuse = textures->CreateTexture("check_box_center_hovered_diffuse", "check_box_center_hovered.png",
 			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
 
+		auto check_box_mark_enabled_diffuse = textures->CreateTexture("check_box_mark_enabled_diffuse", "check_box_mark_enabled.png");
+		auto check_box_mark_disabled_diffuse = textures->CreateTexture("check_box_mark_disabled_diffuse", "check_box_mark_disabled.png");		
+		auto check_box_mark_pressed_diffuse = textures->CreateTexture("check_box_mark_pressed_diffuse", "check_box_mark_pressed.png");
+		auto check_box_mark_hovered_diffuse = textures->CreateTexture("check_box_mark_hovered_diffuse", "check_box_mark_hovered.png");
+
+		//Mouse cursor
+		auto mouse_cursor_diffuse = textures->CreateTexture("mouse_cursor_diffuse", "mouse_cursor.png");
+		
 		//Progress bar
-		auto progress_bar_bar_enabled_diffuse = textures->CreateTexture("progress_bar_bar_enabled", "progress_bar_bar_enabled.png");
+		auto progress_bar_bar_enabled_diffuse = textures->CreateTexture("progress_bar_bar_enabled_diffuse", "progress_bar_bar_enabled.png");
 
 		//Radio button
-		auto radio_button_select_enabled_diffuse = textures->CreateTexture("radio_button_select_enabled", "radio_button_select_enabled.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto radio_button_select_disabled_diffuse = textures->CreateTexture("radio_button_select_disabled", "radio_button_select_disabled.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto radio_button_select_pressed_diffuse = textures->CreateTexture("radio_button_select_pressed", "radio_button_select_pressed.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto radio_button_select_hovered_diffuse = textures->CreateTexture("radio_button_select_hovered", "radio_button_select_hovered.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+		auto radio_button_select_enabled_diffuse = textures->CreateTexture("radio_button_select_enabled_diffuse", "radio_button_select_enabled.png");
+		auto radio_button_select_disabled_diffuse = textures->CreateTexture("radio_button_select_disabled_diffuse", "radio_button_select_disabled.png");
+		auto radio_button_select_pressed_diffuse = textures->CreateTexture("radio_button_select_pressed_diffuse", "radio_button_select_pressed.png");
+		auto radio_button_select_hovered_diffuse = textures->CreateTexture("radio_button_select_hovered_diffuse", "radio_button_select_hovered.png");
 
 		//Text box
-		auto text_box_cursor_enabled_diffuse = textures->CreateTexture("text_box_cursor_enabled", "text_box_cursor_enabled.png");
+		auto text_box_cursor_enabled_diffuse = textures->CreateTexture("text_box_cursor_enabled_diffuse", "text_box_cursor_enabled.png");
 
+		//Tooltip
+		auto tooltip_center_diffuse = textures->CreateTexture("tooltip_center_diffuse", "tooltip_center.png",
+			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+		auto tooltip_top_diffuse = textures->CreateTexture("tooltip_top_diffuse", "tooltip_top.png",
+			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+		auto tooltip_left_diffuse = textures->CreateTexture("tooltip_left_diffuse", "tooltip_left.png",
+			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+		auto tooltip_top_left_diffuse = textures->CreateTexture("tooltip_top_left_diffuse", "tooltip_top_left.png");	
 
-		auto cat_first_frame = textures->CreateTexture("cat01", "cat01.png");
-		textures->CreateTexture("cat02", "cat02.png");
-		textures->CreateTexture("cat03", "cat03.png");
-		textures->CreateTexture("cat04", "cat04.png");
-		textures->CreateTexture("cat05", "cat05.png");
-		textures->CreateTexture("cat06", "cat06.png");
-		textures->CreateTexture("cat07", "cat07.png");
-		textures->CreateTexture("cat08", "cat08.png");
 
 		textures->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 		//while (!textures->Loaded());
 
-		//Frame sequences
-		auto cat_sequence = frame_sequences->CreateFrameSequence("cat_sequence", cat_first_frame, 8);
 
-		//Animation
-		auto cat_running = animations->CreateAnimation(
-			ion::graphics::textures::Animation::Looping("cat_running", cat_sequence, 0.8_sec));
+		/*
+			Shaders
+		*/
 
-		//Shaders
-		auto model_vert_shader = shaders->CreateShader("default_model_vert", "default_model.vert");
-		auto model_frag_shader = shaders->CreateShader("default_model_frag", "default_model.frag");
-		auto particle_vert_shader = shaders->CreateShader("default_particle_vert", "default_particle.vert");
-		auto particle_frag_shader = shaders->CreateShader("default_particle_frag", "default_particle.frag");
-		auto text_vert_shader = shaders->CreateShader("default_text_vert", "default_text.vert");
-		auto text_frag_shader = shaders->CreateShader("default_text_frag", "default_text.frag");
+		//Model
+		auto model_vert = shaders->CreateShader("model_vert", "IonModelShader.vert");
+		auto model_frag = shaders->CreateShader("model_frag", "IonModelShader.frag");
 
-		auto flat_model_vert_shader = shaders->CreateShader("default_flat_model_vert", "default_flat_model.vert");
-		auto flat_model_frag_shader = shaders->CreateShader("default_flat_model_frag", "default_flat_model.frag");
-		auto flat_particle_vert_shader = shaders->CreateShader("default_flat_particle_vert", "default_flat_particle.vert");
-		auto flat_particle_frag_shader = shaders->CreateShader("default_flat_particle_frag", "default_flat_particle.frag");
-		auto flat_text_vert_shader = shaders->CreateShader("default_flat_text_vert", "default_flat_text.vert");
-		auto flat_text_frag_shader = shaders->CreateShader("default_flat_text_frag", "default_flat_text.frag");
-			
+		//Particle
+		auto particle_vert = shaders->CreateShader("particle_vert", "IonParticleShader.vert");
+		auto particle_frag = shaders->CreateShader("particle_frag", "IonParticleShader.frag");
+
+		//Text
+		auto text_vert = shaders->CreateShader("text_vert", "IonTextShader.vert");
+		auto text_frag = shaders->CreateShader("text_frag", "IonTextShader.frag");
+
+
+		//Flat model
+		auto flat_model_vert = shaders->CreateShader("flat_model_vert", "IonFlatModelShader.vert");
+		auto flat_model_frag = shaders->CreateShader("flat_model_frag", "IonFlatModelShader.frag");
+		
+		//Flat particle
+		auto flat_particle_vert = shaders->CreateShader("flat_particle_vert", "IonFlatParticleShader.vert");
+		auto flat_particle_frag = shaders->CreateShader("flat_particle_frag", "IonFlatParticleShader.frag");
+		
+		//Flat text
+		auto flat_text_vert = shaders->CreateShader("flat_text_vert", "IonFlatTextShader.vert");
+		auto flat_text_frag = shaders->CreateShader("flat_text_frag", "IonFlatTextShader.frag");
+		
+
 		shaders->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 		//while (!shaders->Loaded());
 
-		//Shader programs
-		auto model_program = shader_programs->CreateShaderProgram("default_model_prog", model_vert_shader, model_frag_shader);
-		auto particle_program = shader_programs->CreateShaderProgram("default_particle_prog", particle_vert_shader, particle_frag_shader);
-		auto text_program = shader_programs->CreateShaderProgram("default_text_prog", text_vert_shader, text_frag_shader);
 
-		auto flat_model_program = shader_programs->CreateShaderProgram("default_flat_model_prog", flat_model_vert_shader, flat_model_frag_shader);
-		auto flat_particle_program = shader_programs->CreateShaderProgram("default_flat_particle_prog", flat_particle_vert_shader, flat_particle_frag_shader);
-		auto flat_text_program = shader_programs->CreateShaderProgram("default_flat_text_prog", flat_text_vert_shader, flat_text_frag_shader);
+		/*
+			Shader programs
+		*/
+
+		auto model_prog = shader_programs->CreateShaderProgram("model_prog", model_vert, model_frag);
+		auto particle_prog = shader_programs->CreateShaderProgram("particle_prog", particle_vert, particle_frag);
+		auto text_prog = shader_programs->CreateShaderProgram("text_prog", text_vert, text_frag);
+
+		auto flat_model_prog = shader_programs->CreateShaderProgram("flat_model_prog", flat_model_vert, flat_model_frag);
+		auto flat_particle_prog = shader_programs->CreateShaderProgram("flat_particle_prog", flat_particle_vert, flat_particle_frag);
+		auto flat_text_prog = shader_programs->CreateShaderProgram("flat_text_prog", flat_text_vert, flat_text_frag);
+
 
 		shader_programs->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 		//while (!shader_programs.Loaded());
 
+
 		using namespace ion::graphics::shaders::variables;
 
-		//Model program
+		//Model
 		{
 			//Shader structs
-			auto matrix_struct = model_program->CreateStruct("matrix");
-			auto scene_struct = model_program->CreateStruct("scene");
-			auto camera_struct = model_program->CreateStruct("camera");
-			auto primitive_struct = model_program->CreateStruct("primitive");
-			auto material_struct = model_program->CreateStruct("material");
-			auto fog_struct = model_program->CreateStruct("fog");
+			auto matrix_struct = model_prog->CreateStruct("matrix");
+			auto scene_struct = model_prog->CreateStruct("scene");
+			auto camera_struct = model_prog->CreateStruct("camera");
+			auto primitive_struct = model_prog->CreateStruct("primitive");
+			auto material_struct = model_prog->CreateStruct("material");
+			auto fog_struct = model_prog->CreateStruct("fog");
 
 
 			//Shader variables
 			//Vertex
-			model_program->CreateAttribute<glsl::vec3>("vertex_position");
-			model_program->CreateAttribute<glsl::vec3>("vertex_normal");
-			model_program->CreateAttribute<glsl::vec4>("vertex_color");
-			model_program->CreateAttribute<glsl::vec3>("vertex_tex_coord");
+			model_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			model_prog->CreateAttribute<glsl::vec3>("vertex_normal");
+			model_prog->CreateAttribute<glsl::vec4>("vertex_color");
+			model_prog->CreateAttribute<glsl::vec3>("vertex_tex_coord");
 
 			//Matrices			
 			matrix_struct->CreateUniform<glsl::mat4>("model_view");
@@ -824,26 +836,26 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			fog_struct->CreateUniform<float>("far");
 			fog_struct->CreateUniform<glsl::vec4>("color");
 
-			shader_programs->LoadShaderVariableLocations(*model_program);
+			shader_programs->LoadShaderVariableLocations(*model_prog);
 		}
 
-		//Particle program
+		//Particle
 		{
 			//Shader structs
-			auto matrix_struct = particle_program->CreateStruct("matrix");
-			auto scene_struct = particle_program->CreateStruct("scene");
-			auto camera_struct = particle_program->CreateStruct("camera");
-			auto primitive_struct = particle_program->CreateStruct("primitive");
-			auto material_struct = particle_program->CreateStruct("material");
-			auto fog_struct = particle_program->CreateStruct("fog");
+			auto matrix_struct = particle_prog->CreateStruct("matrix");
+			auto scene_struct = particle_prog->CreateStruct("scene");
+			auto camera_struct = particle_prog->CreateStruct("camera");
+			auto primitive_struct = particle_prog->CreateStruct("primitive");
+			auto material_struct = particle_prog->CreateStruct("material");
+			auto fog_struct = particle_prog->CreateStruct("fog");
 
 
 			//Shader variables
 			//Vertex
-			particle_program->CreateAttribute<glsl::vec3>("vertex_position");
-			particle_program->CreateAttribute<float>("vertex_rotation");
-			particle_program->CreateAttribute<float>("vertex_point_size");
-			particle_program->CreateAttribute<glsl::vec4>("vertex_color");
+			particle_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			particle_prog->CreateAttribute<float>("vertex_rotation");
+			particle_prog->CreateAttribute<float>("vertex_point_size");
+			particle_prog->CreateAttribute<glsl::vec4>("vertex_color");
 
 			//Matrices
 			matrix_struct->CreateUniform<glsl::mat4>("model_view");
@@ -889,24 +901,24 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			fog_struct->CreateUniform<float>("far");
 			fog_struct->CreateUniform<glsl::vec4>("color");
 
-			shader_programs->LoadShaderVariableLocations(*particle_program);
+			shader_programs->LoadShaderVariableLocations(*particle_prog);
 		}
 
-		//Text program
+		//Text
 		{
 			//Shader structs
-			auto matrix_struct = text_program->CreateStruct("matrix");
-			auto scene_struct = text_program->CreateStruct("scene");
-			auto camera_struct = text_program->CreateStruct("camera");
-			auto primitive_struct = text_program->CreateStruct("primitive");
-			auto fog_struct = text_program->CreateStruct("fog");
+			auto matrix_struct = text_prog->CreateStruct("matrix");
+			auto scene_struct = text_prog->CreateStruct("scene");
+			auto camera_struct = text_prog->CreateStruct("camera");
+			auto primitive_struct = text_prog->CreateStruct("primitive");
+			auto fog_struct = text_prog->CreateStruct("fog");
 
 
 			//Shader variables
 			//Vertex
-			text_program->CreateAttribute<glsl::vec3>("vertex_position");
-			text_program->CreateAttribute<glsl::vec4>("vertex_color");
-			text_program->CreateAttribute<glsl::vec3>("vertex_tex_coord");
+			text_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			text_prog->CreateAttribute<glsl::vec4>("vertex_color");
+			text_prog->CreateAttribute<glsl::vec3>("vertex_tex_coord");
 
 			//Matrices
 			matrix_struct->CreateUniform<glsl::mat4>("model_view");
@@ -935,25 +947,25 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			fog_struct->CreateUniform<float>("far");
 			fog_struct->CreateUniform<glsl::vec4>("color");
 
-			shader_programs->LoadShaderVariableLocations(*text_program);
+			shader_programs->LoadShaderVariableLocations(*text_prog);
 		}
 
 
-		//Flat model program
+		//Flat model
 		{
 			//Shader structs
-			auto matrix_struct = flat_model_program->CreateStruct("matrix");
-			auto scene_struct = flat_model_program->CreateStruct("scene");
-			auto primitive_struct = flat_model_program->CreateStruct("primitive");
-			auto material_struct = flat_model_program->CreateStruct("material");
+			auto matrix_struct = flat_model_prog->CreateStruct("matrix");
+			auto scene_struct = flat_model_prog->CreateStruct("scene");
+			auto primitive_struct = flat_model_prog->CreateStruct("primitive");
+			auto material_struct = flat_model_prog->CreateStruct("material");
 
 
 			//Shader variables
 			//Vertex
-			flat_model_program->CreateAttribute<glsl::vec3>("vertex_position");
-			flat_model_program->CreateAttribute<glsl::vec3>("vertex_normal");
-			flat_model_program->CreateAttribute<glsl::vec4>("vertex_color");
-			flat_model_program->CreateAttribute<glsl::vec3>("vertex_tex_coord");
+			flat_model_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			flat_model_prog->CreateAttribute<glsl::vec3>("vertex_normal");
+			flat_model_prog->CreateAttribute<glsl::vec4>("vertex_color");
+			flat_model_prog->CreateAttribute<glsl::vec3>("vertex_tex_coord");
 
 			//Matrices
 			matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
@@ -969,25 +981,25 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");
 			material_struct->CreateUniform<bool>("has_diffuse_map");
 
-			shader_programs->LoadShaderVariableLocations(*flat_model_program);
+			shader_programs->LoadShaderVariableLocations(*flat_model_prog);
 		}
 
-		//Flat particle program
+		//Flat particle
 		{
 			//Shader structs
-			auto matrix_struct = flat_particle_program->CreateStruct("matrix");
-			auto scene_struct = flat_particle_program->CreateStruct("scene");
-			auto camera_struct = flat_particle_program->CreateStruct("camera");
-			auto primitive_struct = flat_particle_program->CreateStruct("primitive");
-			auto material_struct = flat_particle_program->CreateStruct("material");
+			auto matrix_struct = flat_particle_prog->CreateStruct("matrix");
+			auto scene_struct = flat_particle_prog->CreateStruct("scene");
+			auto camera_struct = flat_particle_prog->CreateStruct("camera");
+			auto primitive_struct = flat_particle_prog->CreateStruct("primitive");
+			auto material_struct = flat_particle_prog->CreateStruct("material");
 
 
 			//Shader variables
 			//Vertex
-			flat_particle_program->CreateAttribute<glsl::vec3>("vertex_position");
-			flat_particle_program->CreateAttribute<float>("vertex_rotation");
-			flat_particle_program->CreateAttribute<float>("vertex_point_size");
-			flat_particle_program->CreateAttribute<glsl::vec4>("vertex_color");
+			flat_particle_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			flat_particle_prog->CreateAttribute<float>("vertex_rotation");
+			flat_particle_prog->CreateAttribute<float>("vertex_point_size");
+			flat_particle_prog->CreateAttribute<glsl::vec4>("vertex_color");
 
 			//Matrices
 			matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
@@ -1006,22 +1018,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");
 			material_struct->CreateUniform<bool>("has_diffuse_map");
 
-			shader_programs->LoadShaderVariableLocations(*flat_particle_program);
+			shader_programs->LoadShaderVariableLocations(*flat_particle_prog);
 		}
 
-		//Flat text program
+		//Flat text
 		{
 			//Shader structs
-			auto matrix_struct = flat_text_program->CreateStruct("matrix");
-			auto scene_struct = flat_text_program->CreateStruct("scene");
-			auto primitive_struct = flat_text_program->CreateStruct("primitive");
+			auto matrix_struct = flat_text_prog->CreateStruct("matrix");
+			auto scene_struct = flat_text_prog->CreateStruct("scene");
+			auto primitive_struct = flat_text_prog->CreateStruct("primitive");
 
 
 			//Shader variables
 			//Vertex
-			flat_text_program->CreateAttribute<glsl::vec3>("vertex_position");
-			flat_text_program->CreateAttribute<glsl::vec4>("vertex_color");
-			flat_text_program->CreateAttribute<glsl::vec3>("vertex_tex_coord");
+			flat_text_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			flat_text_prog->CreateAttribute<glsl::vec4>("vertex_color");
+			flat_text_prog->CreateAttribute<glsl::vec3>("vertex_tex_coord");
 
 			//Matrices
 			matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
@@ -1033,32 +1045,41 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			primitive_struct->CreateUniform<glsl::sampler2DArray>("texture");
 			primitive_struct->CreateUniform<bool>("has_texture");
 
-			shader_programs->LoadShaderVariableLocations(*flat_text_program);
+			shader_programs->LoadShaderVariableLocations(*flat_text_prog);
 		}
 
 
-		//Font
-		auto verdana_regular_12 = fonts->CreateFont("verdana_regular_12", "verdana.ttf", 12);
-		auto verdana_bold_12 = fonts->CreateFont("verdana_bold_12", "verdanab.ttf", 12);
-		auto verdana_italic_12 = fonts->CreateFont("verdana_italic_12", "verdanai.ttf", 12);
-		auto verdana_bold_italic_12 = fonts->CreateFont("verdana_bold_italic_12", "verdanaz.ttf", 12);
+		/*
+			Fonts
+		*/
+		
+		//Verdana 36px
 		auto verdana_regular_36 = fonts->CreateFont("verdana_regular_36", "verdana.ttf", 36);
 		auto verdana_bold_36 = fonts->CreateFont("verdana_bold_36", "verdanab.ttf", 36);
 		auto verdana_italic_36 = fonts->CreateFont("verdana_italic_36", "verdanai.ttf", 36);
 		auto verdana_bold_italic_36 = fonts->CreateFont("verdana_bold_italic_36", "verdanaz.ttf", 36);
 
+
+		/*
+			Fonts (GUI)
+		*/
+
+		//Verdana 12px
+		auto verdana_regular_12 = fonts->CreateFont("verdana_regular_12", "verdana.ttf", 12);
+		auto verdana_bold_12 = fonts->CreateFont("verdana_bold_12", "verdanab.ttf", 12);
+		auto verdana_italic_12 = fonts->CreateFont("verdana_italic_12", "verdanai.ttf", 12);
+		auto verdana_bold_italic_12 = fonts->CreateFont("verdana_bold_italic_12", "verdanaz.ttf", 12);
+
+
 		fonts->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 		//while (!fonts.Loaded());
 
-		//Type face
-		auto verdana_12 = 
-			type_faces->CreateTypeFace(
-				"verdana_12",
-				verdana_regular_12,
-				verdana_bold_12,
-				verdana_italic_12,
-				verdana_bold_italic_12);
 
+		/*
+			Type faces
+		*/
+
+		//Verdana 36px
 		auto verdana_36 = 
 			type_faces->CreateTypeFace(
 				"verdana_36",
@@ -1067,75 +1088,94 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				verdana_italic_36,
 				verdana_bold_italic_36);
 
-		//Sound
-		auto sound_listener = sounds->CreateSoundListener("listener");
-		auto gui_sound_channel_group = sounds->CreateSoundChannelGroup("gui");
-		gui_sound_channel_group->Volume(0.2_r);
+
+		/*
+			Type faces (GUI)
+		*/
+
+		//Verdana 12px
+		auto verdana_12 =
+			type_faces->CreateTypeFace(
+				"verdana_12",
+				verdana_regular_12,
+				verdana_bold_12,
+				verdana_italic_12,
+				verdana_bold_italic_12);
+
+		
+		/*
+			Sounds
+		*/
 
 		auto flicker = sounds->CreateSound(ion::sounds::Sound::Positional("flicker", "flicker.wav",
 			ion::sounds::sound::SoundType::Sample, ion::sounds::sound::SoundLoopingMode::Forward));
 		flicker->Distance(0.4_r); //Min distance of 10 meters
+
 		auto night_runner = sounds->CreateSound("night_runner", "night_runner.mp3",
 			ion::sounds::sound::SoundType::Stream, ion::sounds::sound::SoundLoopingMode::Forward);
+
+		
+		auto gui_sound_channel_group = sounds->CreateSoundChannelGroup("gui");
+		gui_sound_channel_group->Volume(0.2_r);
+
+		auto sound_listener = sounds->CreateSoundListener("listener");
+
+
+		/*
+			Sounds (GUI)
+		*/
+
 		auto click = sounds->CreateSound("click", "click.wav", ion::sounds::sound::SoundType::Sample);	
-			
+		
+
 		sounds->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 		//while (!sounds->Loaded());
 
-		//night_runner->Play()->Volume(0.2_r);
+		night_runner->Play()->Volume(0.2_r);
 
 
-		//Material
-		auto asteroid = materials->CreateMaterial("asteroid",
-			asteroid_diffuse, asteroid_normal, asteroid_specular, nullptr);
+		/*
+			Material
+		*/
 
-		auto brick = materials->CreateMaterial("brick",
-			brick_wall_diffuse, brick_wall_normal, brick_wall_specular, nullptr);
-
-		auto pebbles = materials->CreateMaterial("pebbles",
-			pebbles_diffuse, pebbles_normal, pebbles_specular, nullptr);
-			
-		auto ruby = materials->CreateMaterial("ruby", {1.0_r, 0.0_r, 0.0_r});
-		auto emerald = materials->CreateMaterial("emerald", {0.0_r, 1.0_r, 0.0_r});
-		auto sapphire = materials->CreateMaterial("sapphire", {0.0_r, 0.0_r, 1.0_r});
-
-		auto tifa = materials->CreateMaterial("tifa", tifa_diffuse);
-		auto cloud = materials->CreateMaterial("cloud", cloud_diffuse);
-		auto ship = materials->CreateMaterial("ship",
-			ship_diffuse, ship_normal, ship_specular, nullptr);
+		//Aura
 		auto aura = materials->CreateMaterial("aura",
 			aura_diffuse, nullptr, nullptr, aura_emissive);
 		aura->EmissiveColor(ion::graphics::utilities::color::Pink);
-		auto raindrop = materials->CreateMaterial("raindrop", raindrop_diffuse);
 
+		//Brick wall
+		auto brick_wall = materials->CreateMaterial("brick_wall",
+			brick_wall_diffuse, brick_wall_normal, brick_wall_specular, nullptr);
+		aura->DiffuseColor(ion::graphics::utilities::color::BurlyWood);
+
+		//Cloud
+		auto cloud = materials->CreateMaterial("cloud", cloud_diffuse);
+
+		//Pyramid (egyptian)
+		auto pyramid_egyptian = materials->CreateMaterial("pyramid_egyptian",
+			pyramid_egyptian_diffuse, pyramid_egyptian_normal, pyramid_egyptian_specular, nullptr);
+
+		//Pyramid (mayan)
+		auto pyramid_mayan = materials->CreateMaterial("pyramid_mayan",
+			pyramid_mayan_diffuse, pyramid_mayan_normal, pyramid_mayan_specular, nullptr);
+
+		//Raindrop
+		auto raindrop = materials->CreateMaterial("raindrop", raindrop_diffuse);
+		
+		//Ship
+		auto ship = materials->CreateMaterial("ship",
+			ship_diffuse, ship_normal, ship_specular, nullptr);
+		
+		//Star
 		auto star = materials->CreateMaterial("star", star_diffuse);
 		star->LightingEnabled(false);
-		auto color_spectrum = materials->CreateMaterial("color_spectrum", color_spectrum_diffuse);
-		color_spectrum->LightingEnabled(false);
-
-		auto cat = materials->CreateMaterial("cat", cat_running);
-
-		//GUI
-		//Mouse cursor materials
-		auto mouse_cursor_enabled = materials->CreateMaterial("mouse_cursor", mouse_cursor_diffuse);
-		mouse_cursor_enabled->LightingEnabled(false);
-
-		//Tooltip materials
-		auto tooltip_center_enabled = materials->CreateMaterial("tooltip_center", tooltip_center_diffuse);
-		tooltip_center_enabled->LightingEnabled(false);
 
 
-		auto tooltip_top_enabled = materials->CreateMaterial("tooltip_top", tooltip_top_diffuse);
-		tooltip_top_enabled->LightingEnabled(false);
+		/*
+			Material (GUI)
+		*/
 
-		auto tooltip_left_enabled = materials->CreateMaterial("tooltip_left", tooltip_left_diffuse);
-		tooltip_left_enabled->LightingEnabled(false);
-
-
-		auto tooltip_top_left_enabled = materials->CreateMaterial("tooltip_top_left", tooltip_top_left_diffuse);
-		tooltip_top_left_enabled->LightingEnabled(false);
-
-		//Button materials
+		//Button
 		auto button_center_enabled = materials->CreateMaterial("button_center_enabled", button_center_enabled_diffuse);
 		button_center_enabled->LightingEnabled(false);
 
@@ -1147,7 +1187,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 		auto button_center_hovered = materials->CreateMaterial("button_center_hovered", button_center_hovered_diffuse);
 		button_center_hovered->LightingEnabled(false);
-			
+		
 
 		auto button_top_enabled = materials->CreateMaterial("button_top_enabled", button_top_enabled_diffuse);
 		button_top_enabled->LightingEnabled(false);
@@ -1168,7 +1208,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		auto button_top_left_focused = materials->CreateMaterial("button_top_left_focused", button_top_left_focused_diffuse);
 		button_top_left_focused->LightingEnabled(false);
 
-		//Check box materials
+		//Check box
 		auto check_box_center_enabled = materials->CreateMaterial("check_box_center_enabled", check_box_center_enabled_diffuse);
 		check_box_center_enabled->LightingEnabled(false);
 
@@ -1187,6 +1227,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 		auto check_box_mark_hovered = materials->CreateMaterial("check_box_mark_hovered", check_box_mark_hovered_diffuse);
 		check_box_mark_hovered->LightingEnabled(false);
+
+		//Mouse cursor
+		auto mouse_cursor_enabled = materials->CreateMaterial("mouse_cursor", mouse_cursor_diffuse);
+		mouse_cursor_enabled->LightingEnabled(false);
 
 		//Progress bar
 		auto progress_bar_bar_enabled = materials->CreateMaterial("progress_bar_bar_enabled", progress_bar_bar_enabled_diffuse);
@@ -1209,15 +1253,35 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		auto text_box_cursor_enabled = materials->CreateMaterial("text_box_cursor_enabled", text_box_cursor_enabled_diffuse);
 		text_box_cursor_enabled->LightingEnabled(false);
 
+		//Tooltip
+		auto tooltip_center_enabled = materials->CreateMaterial("tooltip_center", tooltip_center_diffuse);
+		tooltip_center_enabled->LightingEnabled(false);
+
+
+		auto tooltip_top_enabled = materials->CreateMaterial("tooltip_top", tooltip_top_diffuse);
+		tooltip_top_enabled->LightingEnabled(false);
+
+		auto tooltip_left_enabled = materials->CreateMaterial("tooltip_left", tooltip_left_diffuse);
+		tooltip_left_enabled->LightingEnabled(false);
+
+
+		auto tooltip_top_left_enabled = materials->CreateMaterial("tooltip_top_left", tooltip_top_left_diffuse);
+		tooltip_top_left_enabled->LightingEnabled(false);
+
+
+		/*
+			Particle system
+		*/
 
 		using namespace ion::graphics::utilities;
 
-		//Particle system
+
+		//Rain
 		auto rain = particle_systems->CreateParticleSystem("rain");
 
 		auto emitter = rain->CreateEmitter(
 			ion::graphics::particles::Emitter::Box(
-				"spawner", {0.0_r, 0.0_r, 0.0_r}, vector2::NegativeUnitY, {3.56_r, 0.1_r}, {}, 50.0_r, 0.0_r, {}, 100
+				"spawner", vector3::Zero, vector2::NegativeUnitY, {3.56_r, 0.1_r}, {}, 50.0_r, 0.0_r, {}, 100
 			));
 
 		emitter->ParticleVelocity(1.5_r, 2.0_r);
@@ -1228,15 +1292,26 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		emitter->ParticleMaterial(raindrop);
 
 
-		auto fps =
+		/*
+			Text
+		*/
+
+		//FPS
+		auto fps_text =
 			texts->CreateText(
 				"fps",
 				"",
 				verdana_36);
 
-		fps->Formatting(ion::graphics::fonts::text::TextFormatting::None);
-		fps->DefaultForegroundColor(color::White);
+		fps_text->Formatting(ion::graphics::fonts::text::TextFormatting::None);
+		fps_text->DefaultForegroundColor(color::White);
 
+
+		/*
+			Text (GUI)
+		*/
+
+		//Caption
 		auto caption_text =
 			texts->CreateText(
 				"caption",
@@ -1245,8 +1320,241 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 		caption_text->DefaultForegroundColor(color::White);
 
-		//GUI styles
 
+		using namespace ion::utilities;
+
+		//Default shader programs
+		scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
+			shader_programs->GetShaderProgram("model_prog"));
+		scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
+			shader_programs->GetShaderProgram("particle_prog"));
+		scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
+			shader_programs->GetShaderProgram("flat_text_prog"));
+
+		//Default shader programs (GUI)
+		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
+			shader_programs->GetShaderProgram("flat_model_prog"));
+		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
+			shader_programs->GetShaderProgram("flat_particle_prog"));
+		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
+			shader_programs->GetShaderProgram("flat_text_prog"));
+
+		
+		/*
+			Scene
+		*/
+
+		//Aura
+		auto aura_model = scene_manager->CreateModel("ship_aura_model");
+		auto aura_sprite = aura_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			vector3::Zero, {0.432_r, 0.45_r}, aura});
+		aura_sprite->FillOpacity(0.65_r);
+
+		//Brick wall
+		auto background_model = scene_manager->CreateModel("background_model");
+		background_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			vector3::Zero, {1.75_r, 1.75_r}, brick_wall}); //Center
+		background_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			{-1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick_wall}); //Left
+		background_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			{1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick_wall}); //Right
+
+		//Camera
+		auto frustum = ion::graphics::render::Frustum::Orthographic(
+			Aabb{-1.0_r, 1.0_r}, 1.0_r, 100.0_r, 16.0_r / 9.0_r);
+		auto main_camera = scene_manager->CreateCamera("main_camera", frustum);
+		auto player_camera = scene_manager->CreateCamera("player_camera", frustum);
+		viewport->ConnectedCamera(main_camera);
+
+		//Cloud
+		auto cloud_model = scene_manager->CreateModel("cloud_model");
+		cloud_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			{-1.0_r, 0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Left
+		cloud_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			{1.0_r, -0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Right
+
+		//FPS
+		auto fps = scene_manager->CreateText("fps", fps_text);
+
+		//Light (red)
+		auto red_light = scene_manager->CreateLight("red_light");
+		red_light->Type(ion::graphics::scene::light::LightType::Point);
+		red_light->DiffuseColor(color::Red);
+		red_light->AmbientColor(color::DarkRed);
+		//red_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
+		red_light->Radius(1.5_r);
+
+		//Lamp flicker
+		auto red_lamp_flicker = scene_manager->CreateSound({}, flicker);
+		auto green_lamp_flicker = scene_manager->CreateSound({}, flicker);
+
+		//Light (green)
+		auto green_light = scene_manager->CreateLight("green_light");
+		green_light->Type(ion::graphics::scene::light::LightType::Point);
+		green_light->DiffuseColor(color::Green);
+		green_light->AmbientColor(color::DarkGreen);
+		//green_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
+		green_light->Radius(1.5_r);
+
+		//Light (ship)
+		auto ship_light = scene_manager->CreateLight("ship_light");
+		ship_light->Type(ion::graphics::scene::light::LightType::Spot);
+		ship_light->Direction(Vector3{0.0_r, 0.83_r, -0.55_r});
+		ship_light->DiffuseColor(color::White);
+		ship_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
+		ship_light->Cutoff(math::ToRadians(20.0_r), math::ToRadians(30.0_r));
+
+		//Player ear
+		auto player_ear = scene_manager->CreateSoundListener({}, sound_listener);
+
+		//Pyramid (egyptian)
+		auto pyramid_egyptian_model = scene_manager->CreateModel();
+		pyramid_egyptian_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			vector3::Zero, {0.5_r, 0.5_r}, pyramid_egyptian});
+
+		//Pyramid (mayan)
+		auto pyramid_mayan_model = scene_manager->CreateModel();
+		pyramid_mayan_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			vector3::Zero, {0.5_r, 0.5_r}, pyramid_mayan});
+
+		//Rain
+		auto rain_particles = scene_manager->CreateParticleSystem("rain", rain);
+		rain_particles->Get()->StartAll();
+
+		//Ship
+		auto ship_model = scene_manager->CreateModel("ship_model");
+		ship_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			vector3::Zero, {0.4_r, 0.4_r}, ship});
+		ship_model->BoundingVolumeExtent({{0.3_r, 0.2_r}, {0.7_r, 0.8_r}});
+		ship_model->QueryFlags(1);
+		ship_model->QueryMask(2 | 4);
+		//ship_model->ShowBoundingVolumes(true);
+
+		//Star
+		auto star_model = scene_manager->CreateModel("ship_star_model");
+		star_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			vector3::Zero, {0.05_r, 0.05_r}, star});
+		star_model->AddRenderPass(ion::graphics::render::RenderPass{});
+
+
+		/*
+			Scene nodes
+		*/
+
+		//Brick wall
+		auto background_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 0.0_r, -2.25_r});
+		background_node->AttachObject(*background_model);
+
+		//Cloud
+		auto cloud_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 0.0_r, -1.6_r});
+		cloud_node->AttachObject(*cloud_model);
+
+		//FPS
+		auto fps_node = scene_graph->RootNode().CreateChildNode({}, {-1.75_r, 0.98_r, -1.5_r});
+		fps_node->Scale({-0.5_r,-0.5_r});
+		fps_node->AttachObject(*fps);
+
+		//Light (red)
+		auto red_light_node = scene_graph->RootNode().CreateChildNode({}, {-1.5_r, -0.75_r, -1.0_r});
+		red_light_node->AttachObject(*red_light);
+
+		//Lamp (red)
+		auto red_lamp_node = red_light_node->CreateChildNode({}, {0.0_r, 0.0_r, -0.8_r});
+		red_lamp_node->AttachObject(*red_lamp_flicker);
+
+		//Light (green)
+		auto green_light_node = scene_graph->RootNode().CreateChildNode({}, {1.5_r, 0.75_r, -1.0_r});
+		green_light_node->AttachObject(*green_light);
+
+		//Lamp (green)
+		auto green_lamp_node = green_light_node->CreateChildNode({}, {0.0_r, 0.0_r, -0.8_r});
+		green_lamp_node->AttachObject(*green_lamp_flicker);
+
+		//Main camera
+		auto main_camera_node = scene_graph->RootNode().CreateChildNode("main_camera_node", {0.0_r, 0.0_r, 0.0_r});
+		main_camera_node->AttachObject(*main_camera);
+
+		//Pyramid (egyptian)
+		auto pyramid_egyptian_node = scene_graph->RootNode().CreateChildNode({}, {1.0_r, 0.5_r, -2.0_r});
+		pyramid_egyptian_node->AttachObject(*pyramid_egyptian_model);
+
+		//Pyramid (mayan)
+		auto pyramid_mayan_node = scene_graph->RootNode().CreateChildNode({}, {-1.0_r, -0.5_r, -2.0_r});
+		pyramid_mayan_node->AttachObject(*pyramid_mayan_model);
+
+		//Rain
+		auto particle_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 1.0_r, -1.75_r}, vector2::NegativeUnitY);
+		particle_node->AttachObject(*rain_particles);
+
+
+		//Player
+		auto player_node = scene_graph->RootNode().CreateChildNode("player_node", {0.0_r, -0.65_r, -1.8_r});
+
+		//Player camera
+		auto player_cam_node = player_node->CreateChildNode({}, {0.0_r, 0.0_r, 1.8_r});
+		player_cam_node->AttachObject(*player_camera);
+
+		//Ship
+		auto ship_node = player_node->CreateChildNode("ship_node", {0.0_r, 0.0_r, 0.0_r});
+		ship_node->AttachObject(*ship_model);
+		ship_node->AttachObject(*player_ear);
+
+		//Aura
+		auto aura_node = ship_node->CreateChildNode({}, {0.0_r, -0.05_r, -0.1_r});
+		aura_node->InheritRotation(false);
+		aura_node->AttachObject(*aura_model);
+
+		//Ship light
+		auto light_node = ship_node->CreateChildNode("ship_light_node", {0.0_r, -0.15_r, -0.05_r}, vector2::UnitY, false);
+		light_node->AttachObject(*ship_light);
+
+		//Star
+		auto star_node = ship_node->CreateChildNode({}, {0.15_r, 0.2_r, 0.1_r});
+		star_node->AttachObject(*star_model);
+
+
+		/*
+			Node animations
+		*/
+
+		using namespace ion::graphics::scene::graph::animations;
+
+		auto aura_rotator = aura_node->CreateAnimation("aura_rotator");
+		aura_rotator->AddRotation(math::ToRadians(-90.0_r), 1.0_sec);
+		aura_rotator->Start();
+
+		auto cloud_scaler = cloud_node->CreateAnimation("cloud_scaler");
+		cloud_scaler->AddScaling(0.25_r, 10.0_sec, 0.0_sec, node_animation::MotionTechniqueType::Sigmoid);
+		cloud_scaler->AddScaling(-0.25_r, 10.0_sec, 10.0_sec, node_animation::MotionTechniqueType::Sigmoid);
+		cloud_scaler->Start();
+
+		auto ship_idle_mover = ship_node->CreateAnimation("ship_idle_mover");
+		ship_idle_mover->AddTranslation({0.0_r, 0.02_r, 0.0_r}, 2.0_sec);
+		ship_idle_mover->AddTranslation({0.02_r, -0.02_r, 0.0_r}, 2.0_sec, 2.0_sec);
+		ship_idle_mover->AddTranslation({-0.02_r, -0.02_r, 0.0_r}, 2.0_sec, 4.0_sec);
+		ship_idle_mover->AddTranslation({-0.02_r, 0.02_r, 0.0_r}, 2.0_sec, 6.0_sec);
+		ship_idle_mover->AddTranslation({0.02_r, 0.02_r, 0.0_r}, 2.0_sec, 8.0_sec);
+		ship_idle_mover->AddTranslation({0.0_r, -0.02_r, 0.0_r}, 2.0_sec, 10.0_sec);
+
+		auto ship_idle_rotator = ship_node->CreateAnimation("ship_idle_rotator");
+		ship_idle_rotator->AddRotation(math::ToRadians(-2.5_r), 2.0_sec, 2.0_sec);
+		ship_idle_rotator->AddRotation(math::ToRadians(2.5_r), 2.0_sec, 4.0_sec);
+		ship_idle_rotator->AddRotation(math::ToRadians(2.5_r), 2.0_sec, 6.0_sec);
+		ship_idle_rotator->AddRotation(math::ToRadians(-2.5_r), 2.0_sec, 8.0_sec);
+
+		auto ship_idle = ship_node->CreateAnimationGroup("ship_idle");
+		ship_idle->Add(ship_idle_mover);
+		ship_idle->Add(ship_idle_rotator);
+
+		auto ship_idle_timeline = ship_node->CreateTimeline("ship_idle_timeline", 1.0_r, false);
+		ship_idle_timeline->Attach(ship_idle);
+
+
+		/*
+			GUI themes
+		*/
+
+		//Caption styles
 		ion::graphics::fonts::text::TextBlockStyle caption_style_enabled;
 		caption_style_enabled.ForegroundColor = caption_text->DefaultForegroundColor();
 
@@ -1257,6 +1565,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		caption_style_hovered.ForegroundColor = caption_text->DefaultForegroundColor();
 		caption_style_hovered.Decoration = ion::graphics::fonts::text::TextDecoration::Underline;
 
+		//Placeholder text styles
 		ion::graphics::fonts::text::TextBlockStyle placeholder_text_style_enabled;
 		placeholder_text_style_enabled.ForegroundColor = color::Gray;
 		placeholder_text_style_enabled.FontStyle = ion::graphics::fonts::text::TextFontStyle::Italic;
@@ -1266,114 +1575,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		placeholder_text_style_disabled.FontStyle = ion::graphics::fonts::text::TextFontStyle::Italic;
 
 
-		using namespace ion::utilities;
-
-		//Default shader programs
-		scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
-			shader_programs->GetShaderProgram("default_model_prog"));
-		scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
-			shader_programs->GetShaderProgram("default_particle_prog"));
-		scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
-			shader_programs->GetShaderProgram("default_flat_text_prog"));
-
-		//Default shader programs (for GUI)
-		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
-			shader_programs->GetShaderProgram("default_flat_model_prog"));
-		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
-			shader_programs->GetShaderProgram("default_flat_particle_prog"));
-		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
-			shader_programs->GetShaderProgram("default_flat_text_prog"));
-
-
-		//Frustum
-		auto frustum = ion::graphics::render::Frustum::Orthographic(
-			Aabb{-1.0_r, 1.0_r}, 1.0_r, 100.0_r, 16.0_r / 9.0_r);
-		//auto frustum = ion::graphics::render::Frustum::Perspective(
-		//	Aabb{-1.0_r, 1.0_r}, 1.0_r, 100.0_r, 90.0, 16.0_r / 9.0_r);
-
-		//Camera
-		auto camera = scene_manager->CreateCamera("main_camera", frustum);
-		viewport->ConnectedCamera(camera);
-
-		auto player_camera = scene_manager->CreateCamera("player_camera", frustum);
-
-		//Lights
-		auto head_light = scene_manager->CreateLight();
-		head_light->Type(ion::graphics::scene::light::LightType::Spot);
-		head_light->Direction(Vector3{0.0_r, 0.6_r, -0.4_r});
-		head_light->AmbientColor(color::Black);
-		head_light->DiffuseColor(color::White);
-		head_light->SpecularColor(color::White);
-		head_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
-		head_light->Cutoff(math::ToRadians(20.0_r), math::ToRadians(30.0_r));
-
-		auto red_light = scene_manager->CreateLight();
-		red_light->Type(ion::graphics::scene::light::LightType::Point);
-		red_light->Direction({0.0_r, 0.0_r, -1.0_r});
-		red_light->AmbientColor(color::Black);
-		red_light->DiffuseColor(color::Red);
-		red_light->SpecularColor(color::Red);
-		red_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
-		red_light->Cutoff(math::ToRadians(45.0_r), math::ToRadians(55.0_r));
-
-		auto green_light = scene_manager->CreateLight();
-		green_light->Type(ion::graphics::scene::light::LightType::Point);
-		green_light->Direction({0.0_r, 0.0_r, -1.0_r});
-		green_light->AmbientColor(color::Black);
-		green_light->DiffuseColor(color::Green);
-		green_light->SpecularColor(color::Green);
-		green_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
-		green_light->Cutoff(math::ToRadians(45.0_r), math::ToRadians(55.0_r));
-
-
-		//Text
-		auto text = scene_manager->CreateText("fps", fps);
-
-		//Particle system
-		auto particle_system = scene_manager->CreateParticleSystem({}, rain);
-		particle_system->Get()->StartAll();
-
-		//Sound
-		auto player_sound_listener = scene_manager->CreateSoundListener({}, sound_listener);
-		auto red_lamp_flicker = scene_manager->CreateSound({}, flicker);
-		auto green_lamp_flicker = scene_manager->CreateSound({}, flicker);
-
-
-		//Model
-		auto model = scene_manager->CreateModel();
-		model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{0.0_r, 0.0_r, 0.0_r}, {0.3671875_r, 0.5_r}, ship});
-		model->BoundingVolumeExtent({{0.3_r, 0.2_r}, {0.7_r, 0.8_r}});
-		model->QueryFlags(1);
-		model->QueryMask(2 | 4);
-		//model->ShowBoundingVolumes(true);
-
-		auto model_star = scene_manager->CreateModel();
-		model_star->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{0.0_r, 0.0_r, 0.0_r}, {0.05_r, 0.05_r}, star});
-		model_star->AddRenderPass(ion::graphics::render::RenderPass{});
-
-		auto model_aura = scene_manager->CreateModel();
-		auto aura_sprite = model_aura->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{0.0_r, 0.0_r, 0.0_r}, {0.432_r, 0.45_r}, aura});
-		aura_sprite->FillColor(Color{255, 255, 255, 0.75_r});
-
-		auto background = scene_manager->CreateModel();
-		background->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{0.0_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Center
-		background->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{-1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Left
-		background->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick}); //Right
-
-		auto clouds = scene_manager->CreateModel();
-		clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{-1.0_r, 0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Left
-		clouds->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{1.0_r, -0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Right
-
-
-		//GUI
 		//Theme
 		auto theme = gui_controller.CreateTheme("default", gui_scene_manager);
 
@@ -1796,7 +1997,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		text_box_skin->AddTextPart("placeholder-text", placeholder_text_part); //Additional
 
 
-		//Controls
+		/*
+			GUI
+		*/
+
 		auto mouse_cursor = gui_controller.CreateMouseCursor("mouse_cursor", {});
 		mouse_cursor->ZOrder(1.0_r);
 
@@ -1850,16 +2054,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		list_box->IconLayout(ion::gui::controls::gui_list_box::ListBoxIconLayout::Left);
 		list_box->ShowIcons(true);
 		list_box->AddItems({
-			{"My <b>1st</b> <font color='purple'>item</font>"s, asteroid},
-			{"My <b>2nd</b> <font color='purple'>item</font>"s, ship},
-			{"My <b>3rd</b> <font color='purple'>item</font>"s, asteroid},
-			{"My <b>4th</b> <font color='purple'>item</font>"s, star},
-			{"My <b>5th</b> <font color='purple'>item</font>"s, asteroid},
+			{"My <b>1st</b> <font color='purple'>item</font>"s, star},
+			{"My <b>2nd</b> <font color='purple'>item</font>"s, aura},
+			{"My <b>3rd</b> <font color='purple'>item</font>"s, star},
+			{"My <b>4th</b> <font color='purple'>item</font>"s, aura},
+			{"My <b>5th</b> <font color='purple'>item</font>"s, star},
 			{"My <b>6th</b> <font color='purple'>item</font>"s, aura},
-			{"My <b>7th</b> <font color='purple'>item</font>"s, asteroid},
-			{"My <b>8th</b> <font color='purple'>item</font>"s, star},
-			{"My <b>9th</b> <font color='purple'>item</font>"s, asteroid},
-			{"My <b>10th</b> <font color='purple'>item</font>"s, ship}
+			{"My <b>7th</b> <font color='purple'>item</font>"s, star},
+			{"My <b>8th</b> <font color='purple'>item</font>"s, aura},
+			{"My <b>9th</b> <font color='purple'>item</font>"s, star},
+			{"My <b>10th</b> <font color='purple'>item</font>"s, aura}
 		});
 
 		auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", Vector2{0.077_r, 0.5_r}, "My scroll bar");
@@ -1898,96 +2102,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 		main_frame->Activate();
 		main_frame->Focus();
-
-
-		//Camera
-		auto cam_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 0.0_r, 0.0_r});
-		cam_node->AttachObject(*camera);
-
-		//Lights
-		auto red_light_node = scene_graph->RootNode().CreateChildNode({}, {-1.5_r, -0.75_r, -1.0_r});
-		red_light_node->AttachObject(*red_light);
-
-		auto red_lamp_node = red_light_node->CreateChildNode({}, {0.0_r, 0.0_r, -0.8_r});
-		red_lamp_node->AttachObject(*red_lamp_flicker);
-
-		auto green_light_node = scene_graph->RootNode().CreateChildNode({}, {1.5_r, 0.75_r, -1.0_r});
-		green_light_node->AttachObject(*green_light);
-
-		auto green_lamp_node = green_light_node->CreateChildNode({}, {0.0_r, 0.0_r, -0.8_r});
-		green_lamp_node->AttachObject(*green_lamp_flicker);
-
-		//Text
-		auto fps_node = scene_graph->RootNode().CreateChildNode({}, {-1.75_r, 0.98_r, -1.5_r});
-		fps_node->Scale({-0.5_r, -0.5_r});
-		fps_node->AttachObject(*text);
-
-		//Particles
-		auto particle_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 1.0_r, -1.75_r}, vector2::NegativeUnitY);
-		particle_node->AttachObject(*particle_system);
-
-		//Models
-		auto player_node = scene_graph->RootNode().CreateChildNode("player_node", {0.0_r, -0.65_r, -1.8_r});
-
-		auto ship_node = player_node->CreateChildNode("ship_node", {0.0_r, 0.0_r, 0.0_r});
-		ship_node->AttachObject(*model);
-		ship_node->AttachObject(*player_sound_listener);
-
-		auto star_node = ship_node->CreateChildNode({}, {0.15_r, 0.2_r, 0.1_r});
-		star_node->AttachObject(*model_star);
-
-		auto aura_node = ship_node->CreateChildNode({}, {0.0_r, -0.05_r, -0.1_r});
-		aura_node->InheritRotation(false);
-		aura_node->AttachObject(*model_aura);
-
-		auto background_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 0.0_r, -2.25_r});
-		background_node->AttachObject(*background);
-
-		auto cloud_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 0.0_r, -1.6_r});
-		cloud_node->AttachObject(*clouds);
-
-
-		//Head light
-		auto light_node = ship_node->CreateChildNode("ship_light_node", {0.0_r, -0.15_r, -0.05_r}, vector2::UnitY, false);
-		light_node->AttachObject(*head_light);
-
-		//Player camera
-		auto player_cam_node = player_node->CreateChildNode({}, {0.0_r, 0.0_r, 1.8_r});
-		player_cam_node->AttachObject(*player_camera);
-
-
-		//Node animations
-		using namespace ion::graphics::scene::graph::animations;
-
-		auto aura_rotator = aura_node->CreateAnimation("aura_rotator");
-		aura_rotator->AddRotation(math::ToRadians(-90.0_r), 1.0_sec);
-		aura_rotator->Start();
-
-		auto cloud_scaler = cloud_node->CreateAnimation("cloud_scaler");
-		cloud_scaler->AddScaling(0.25_r, 10.0_sec, 0.0_sec, node_animation::MotionTechniqueType::Sigmoid);
-		cloud_scaler->AddScaling(-0.25_r, 10.0_sec, 10.0_sec, node_animation::MotionTechniqueType::Sigmoid);
-		cloud_scaler->Start();
-
-		auto idle_mover = ship_node->CreateAnimation("idle_mover");
-		idle_mover->AddTranslation({0.0_r, 0.02_r, 0.0_r}, 2.0_sec);
-		idle_mover->AddTranslation({0.02_r, -0.02_r, 0.0_r}, 2.0_sec, 2.0_sec);
-		idle_mover->AddTranslation({-0.02_r, -0.02_r, 0.0_r}, 2.0_sec, 4.0_sec);
-		idle_mover->AddTranslation({-0.02_r, 0.02_r, 0.0_r}, 2.0_sec, 6.0_sec);
-		idle_mover->AddTranslation({0.02_r, 0.02_r, 0.0_r}, 2.0_sec, 8.0_sec);
-		idle_mover->AddTranslation({0.0_r, -0.02_r, 0.0_r}, 2.0_sec, 10.0_sec);
-
-		auto idle_rotator = ship_node->CreateAnimation("idle_rotator");
-		idle_rotator->AddRotation(math::ToRadians(-2.5_r), 2.0_sec, 2.0_sec);
-		idle_rotator->AddRotation(math::ToRadians(2.5_r), 2.0_sec, 4.0_sec);
-		idle_rotator->AddRotation(math::ToRadians(2.5_r), 2.0_sec, 6.0_sec);
-		idle_rotator->AddRotation(math::ToRadians(-2.5_r), 2.0_sec, 8.0_sec);
-
-		auto idle = ship_node->CreateAnimationGroup("idle");
-		idle->Add(idle_mover);
-		idle->Add(idle_rotator);
-
-		auto timeline = ship_node->CreateTimeline("ship_idle_timeline", 1.0_r, false);
-		timeline->Attach(idle);
 	}
 
 	gui_controller.Visible(false);
@@ -2000,11 +2114,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	if (viewport && camera)
 		viewport->ConnectedCamera(camera);
 
-	auto text = scene_manager->GetText("fps");
+	auto fps = scene_manager->GetText("fps");
 	auto player_node = scene_graph->RootNode().GetDescendantNode("player_node");
 	auto ship_node = player_node ? player_node->GetChildNode("ship_node") : nullptr;
 	auto light_node = ship_node ? ship_node->GetChildNode("ship_light_node") : nullptr;
-	auto timeline = ship_node ? ship_node->GetTimeline("ship_idle_timeline") : nullptr;
+	auto ship_idle_timeline = ship_node ? ship_node->GetTimeline("ship_idle_timeline") : nullptr;
 
 
 	//Initialize game
@@ -2012,12 +2126,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	game.viewport = viewport;
 	game.gui_controller = &gui_controller;
 	game.sound_manager = sounds.get();
-	game.fps = text;
+	game.fps = fps;
 	game.player_node = player_node;
 	game.light_node = light_node;
 	game.camera = camera;
 	game.player_camera = player_camera;
-	game.idle = timeline;
+	game.ship_idle_timeline = ship_idle_timeline;
 
 	return engine.Start();
 }
