@@ -623,34 +623,39 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		*/
 
 		//Aura
-		auto aura_diffuse = textures->CreateTexture("aura_diffuse", "aura_diffuse.png");
-		auto aura_emissive = textures->CreateTexture("aura_emissive", "aura_emissive.png");
+		auto aura_atlas = textures->CreateTextureAtlas("aura", "aura.png", 1, 2, 2);
+		auto aura_diffuse = textures->GetTexture("aura_1");
+		auto aura_emissive = textures->GetTexture("aura_2");
 
 		//Brick wall
-		auto brick_wall_diffuse = textures->CreateTexture("brick_wall_diffuse", "brick_wall_diffuse.jpg");
-		auto brick_wall_normal = textures->CreateTexture("brick_wall_normal", "brick_wall_normal.jpg");
-		auto brick_wall_specular = textures->CreateTexture("brick_wall_specular", "brick_wall_specular.jpg");
+		auto brick_wall_atlas = textures->CreateTextureAtlas("brick_wall", "brick_wall.jpg", 2, 2, 3);
+		auto brick_wall_diffuse = textures->GetTexture("brick_wall_1");
+		auto brick_wall_normal = textures->GetTexture("brick_wall_2");
+		auto brick_wall_specular = textures->GetTexture("brick_wall_3");
 		
 		//Cloud
 		auto cloud_diffuse = textures->CreateTexture("cloud_diffuse", "cloud.png");
 
 		//Pyramid (egyptian)
-		auto pyramid_egyptian_diffuse = textures->CreateTexture("pyramid_egyptian_diffuse", "pyramid_egyptian_diffuse.png");
-		auto pyramid_egyptian_normal = textures->CreateTexture("pyramid_egyptian_normal", "pyramid_egyptian_normal.png");
-		auto pyramid_egyptian_specular = textures->CreateTexture("pyramid_egyptian_specular", "pyramid_egyptian_specular.png");
+		auto pyramid_egyptian_atlas = textures->CreateTextureAtlas("pyramid_egyptian", "pyramid_egyptian.png", 2, 2, 3);
+		auto pyramid_egyptian_diffuse = textures->GetTexture("pyramid_egyptian_1");
+		auto pyramid_egyptian_normal = textures->GetTexture("pyramid_egyptian_2");
+		auto pyramid_egyptian_specular = textures->GetTexture("pyramid_egyptian_3");
 
 		//Pyramid (mayan)
-		auto pyramid_mayan_diffuse = textures->CreateTexture("pyramid_mayan_diffuse", "pyramid_mayan_diffuse.png");
-		auto pyramid_mayan_normal = textures->CreateTexture("pyramid_mayan_normal", "pyramid_mayan_normal.png");
-		auto pyramid_mayan_specular = textures->CreateTexture("pyramid_mayan_specular", "pyramid_mayan_specular.png");
+		auto pyramid_mayan_atlas = textures->CreateTextureAtlas("pyramid_mayan", "pyramid_mayan.png", 2, 2, 3);
+		auto pyramid_mayan_diffuse = textures->GetTexture("pyramid_mayan_1");
+		auto pyramid_mayan_normal = textures->GetTexture("pyramid_mayan_2");
+		auto pyramid_mayan_specular = textures->GetTexture("pyramid_mayan_3");
 
 		//Raindrop
 		auto raindrop_diffuse = textures->CreateTexture("raindrop_diffuse", "raindrop.png");
 
 		//Ship
-		auto ship_diffuse = textures->CreateTexture("ship_diffuse", "ship_diffuse.png");
-		auto ship_normal = textures->CreateTexture("ship_normal", "ship_normal.png");
-		auto ship_specular = textures->CreateTexture("ship_specular", "ship_specular.png");
+		auto ship_atlas = textures->CreateTextureAtlas("ship", "ship.png", 2, 2, 3);
+		auto ship_diffuse = textures->GetTexture("ship_1");
+		auto ship_normal = textures->GetTexture("ship_2");
+		auto ship_specular = textures->GetTexture("ship_3");
 
 		//Star
 		auto star_diffuse = textures->CreateTexture("star_diffuse", "star.png");
@@ -1146,7 +1151,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		//Brick wall
 		auto brick_wall = materials->CreateMaterial("brick_wall",
 			brick_wall_diffuse, brick_wall_normal, brick_wall_specular, nullptr);
-		aura->DiffuseColor(ion::graphics::utilities::color::BurlyWood);
+		brick_wall->DiffuseColor(ion::graphics::utilities::color::BurlyWood);
 
 		//Cloud
 		auto cloud = materials->CreateMaterial("cloud", cloud_diffuse);
