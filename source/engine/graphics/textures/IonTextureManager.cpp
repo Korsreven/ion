@@ -374,7 +374,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 		//Pack image from gl to memory
 		glPixelStorei(GL_PACK_ALIGNMENT, 1); //May increase transfer speed for NPOT
 		glGetTextureSubImage(texture_atlas.Handle()->Id, 0,
-			x, y, 0, sub_extents.ActualWidth, sub_extents.ActualHeight, 1,
+			x, y, 0, sub_extents.Width, sub_extents.Height, 1,
 				[&]() noexcept
 				{
 					if (FreeImage_IsLittleEndian())
