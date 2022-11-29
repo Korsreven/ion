@@ -51,6 +51,26 @@ int max_array_texture_layers() noexcept
 }
 
 
+void enlarge_canvas(std::string &pixel_data, int left, int bottom, const texture::TextureExtents &extents) noexcept
+{
+	auto color_bytes = extents.BitDepth / 8;
+
+	std::string pixels(std::begin(pixel_data), std::begin(pixel_data) + extents.Width * extents.Height * color_bytes);
+	pixel_data.assign(std::size(pixel_data), '\0');
+
+	for (auto from = 0,
+		to = extents.ActualWidth * bottom * color_bytes + left * color_bytes,
+		size = std::ssize(pixels); from < size;
+		from += extents.Width * color_bytes,
+		to += extents.ActualWidth * color_bytes)
+
+		std::copy(
+			std::begin(pixels) + from,
+			std::begin(pixels) + from + extents.Width * color_bytes,
+			std::begin(pixel_data) + to
+		);
+}
+
 std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 	const std::string &file_data, const std::filesystem::path &file_path,
 	texture::TextureFilter min_filter, texture::TextureFilter mag_filter,
@@ -383,6 +403,11 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 						return atlas_extents.BitDepth == 32 ? GL_RGBA : GL_RGB;
 				}(),
 			GL_UNSIGNED_BYTE, std::size(sub_pixel_data), std::data(sub_pixel_data));
+
+		if (sub_extents.Width * sub_extents.Height <
+			sub_extents.ActualWidth * sub_extents.ActualHeight)
+
+			enlarge_canvas(sub_pixel_data, left, bottom, sub_extents);
 	}
 	else
 	{
@@ -404,15 +429,22 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		//Copy sub texture bytes from texture atlas at the given position
-		for (auto ai = x * color_bytes + y * color_bytes * atlas_extents.ActualWidth,
-			si = 0, size = std::ssize(sub_pixel_data); si < size;
-			ai += atlas_extents.ActualWidth * color_bytes, si += sub_extents.ActualWidth * color_bytes)
+		for (auto from = atlas_extents.ActualWidth * y * color_bytes + x * color_bytes,
+			to = 0,
+			size = sub_extents.Width * sub_extents.Height * color_bytes; to < size;
+			from += atlas_extents.ActualWidth * color_bytes,
+			to += sub_extents.Width * color_bytes)
 
 			std::copy(
-				std::begin(atlas_pixel_data) + ai,
-				std::begin(atlas_pixel_data) + ai + sub_extents.ActualWidth * color_bytes,
-				std::begin(sub_pixel_data) + si
+				std::begin(atlas_pixel_data) + from,
+				std::begin(atlas_pixel_data) + from + sub_extents.Width * color_bytes,
+				std::begin(sub_pixel_data) + to
 			);
+
+		if (sub_extents.Width * sub_extents.Height <
+			sub_extents.ActualWidth * sub_extents.ActualHeight)
+
+			enlarge_canvas(sub_pixel_data, left, bottom, sub_extents);
 	}
 
 	return std::pair{std::move(sub_pixel_data), sub_extents};

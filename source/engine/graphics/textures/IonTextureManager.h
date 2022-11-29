@@ -201,6 +201,8 @@ namespace ion::graphics::textures
 			}
 
 
+			void enlarge_canvas(std::string &pixel_data, int left, int bottom, const texture::TextureExtents &extents) noexcept;
+
 			std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 				const std::string &file_data, const std::filesystem::path &file_path,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter,
