@@ -87,7 +87,10 @@ bool ScriptBuilder::ValidateTree()
 
 void ScriptBuilder::SaveOutput() noexcept
 {
-	if (output_options_)
+	if (output_options_ &&
+		(output_save_options_ == OutputSaveOptions::Always ||
+		compile_error_ || validate_error_)) //ErrorsOnly
+
 		ion::utilities::file::Save(
 			compile_error_.FilePath.string() + ".output.txt", PrintOutput(*output_options_));
 }

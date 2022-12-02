@@ -34,6 +34,12 @@ namespace ion::script
 			HeaderAndSummary
 		};
 
+		enum class OutputSaveOptions : bool
+		{
+			Always,
+			ErrorsOnly
+		};
+
 
 		namespace detail
 		{
@@ -54,11 +60,13 @@ namespace ion::script
 
 			CompileError compile_error_;
 			ValidateError validate_error_;
-
+			
 			std::optional<script_builder::OutputOptions> output_options_;
 			std::optional<script_compiler::OutputOptions> compiler_output_options_;
 			std::optional<script_validator::OutputOptions> validator_output_options_;
 			std::optional<script_tree::PrintOptions> tree_print_options_;
+
+			script_builder::OutputSaveOptions output_save_options_ = script_builder::OutputSaveOptions::ErrorsOnly;
 
 
 			/**
@@ -122,6 +130,13 @@ namespace ion::script
 			inline void TreeOutput(std::optional<script_tree::PrintOptions> print_options) noexcept
 			{
 				tree_print_options_ = print_options;
+			}
+
+
+			///@brief Sets output save options for the builder
+			inline void SaveOutput(script_builder::OutputSaveOptions output_save_options) noexcept
+			{
+				output_save_options_ = output_save_options;
 			}
 
 			///@}
@@ -213,6 +228,13 @@ namespace ion::script
 			[[nodiscard]] inline auto TreeOutput() const noexcept
 			{
 				return tree_print_options_;
+			}
+
+
+			///@brief Returns output save options for the builder
+			[[nodiscard]] inline auto SaveOutput() const noexcept
+			{
+				return output_save_options_;
 			}
 
 			///@}
