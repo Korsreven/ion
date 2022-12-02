@@ -614,7 +614,7 @@ NonOwningPtr<Texture> TextureManager::CreateTexture(Texture &&texture)
 */
 
 NonOwningPtr<TextureAtlas> TextureManager::CreateTextureAtlas(std::string name, std::string asset_name,
-	int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order)
+	int rows, int columns, std::optional<int> sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order)
 {
 	auto ptr = CreateResource<TextureAtlas>(std::move(name), std::move(asset_name),
 		rows, columns, sub_textures, sub_texture_order);
@@ -625,7 +625,7 @@ NonOwningPtr<TextureAtlas> TextureManager::CreateTextureAtlas(std::string name, 
 NonOwningPtr<TextureAtlas> TextureManager::CreateTextureAtlas(std::string name, std::string asset_name,
 	texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 	texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode,
-	int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order)
+	int rows, int columns, std::optional<int> sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order)
 {
 	auto ptr = CreateResource<TextureAtlas>(std::move(name), std::move(asset_name),
 		min_filter, mag_filter, rows, columns, sub_textures, sub_texture_order);
@@ -635,7 +635,7 @@ NonOwningPtr<TextureAtlas> TextureManager::CreateTextureAtlas(std::string name, 
 
 NonOwningPtr<TextureAtlas> TextureManager::CreateTextureAtlas(std::string name, std::string asset_name,
 	texture::TextureFilter filter, texture::MipmapFilter mip_filter, texture::TextureWrapMode wrap_mode,
-	int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order)
+	int rows, int columns, std::optional<int> sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order)
 {
 	auto ptr = CreateResource<TextureAtlas>(std::move(name), std::move(asset_name),
 		filter, rows, columns, sub_textures, sub_texture_order);
@@ -645,7 +645,7 @@ NonOwningPtr<TextureAtlas> TextureManager::CreateTextureAtlas(std::string name, 
 
 NonOwningPtr<TextureAtlas> TextureManager::CreateTextureAtlas(std::string name, std::string asset_name,
 	texture::TextureFilter filter, texture::TextureWrapMode wrap_mode,
-	int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order)
+	int rows, int columns, std::optional<int> sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order)
 {
 	auto ptr = CreateResource<TextureAtlas>(std::move(name), std::move(asset_name),
 		filter, rows, columns, sub_textures, sub_texture_order);

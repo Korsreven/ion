@@ -623,7 +623,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		*/
 
 		//Aura
-		auto aura_atlas = textures->CreateTextureAtlas("aura", "aura.png", 1, 2, 2);
+		auto aura_atlas = textures->CreateTextureAtlas("aura", "aura.png", 1, 2);
 		auto aura_diffuse = textures->GetTexture("aura_1");
 		auto aura_emissive = textures->GetTexture("aura_2");
 

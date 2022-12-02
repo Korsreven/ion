@@ -13,6 +13,7 @@ File:	IonTextureAtlas.h
 #ifndef ION_TEXTURE_ATLAS_H
 #define ION_TEXTURE_ATLAS_H
 
+#include <optional>
 #include "IonTexture.h"
 
 namespace ion::graphics::textures
@@ -46,16 +47,16 @@ namespace ion::graphics::textures
 
 			///@brief Constructs a new texture atlas with the given name, asset name, number of rows, columns, sub textures and sub texture order
 			TextureAtlas(std::string name, std::string asset_name,
-				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor) noexcept;
+				int rows, int columns, std::optional<int> sub_textures = {}, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor) noexcept;
 
 			///@brief Constructs a new texture atlas with the given name, asset name, texture filter for min/mag, number of rows, columns, sub textures and sub texture order
 			TextureAtlas(std::string name, std::string asset_name,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter,
-				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor) noexcept;
+				int rows, int columns, std::optional<int> sub_textures = {}, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor) noexcept;
 
 			///@brief Constructs a new texture atlas with the given name, asset name, texture filter, number of rows, columns, sub textures and sub texture order
 			TextureAtlas(std::string name, std::string asset_name, texture::TextureFilter filter,
-				int rows, int columns, int sub_textures, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor) noexcept;
+				int rows, int columns, std::optional<int> sub_textures = {}, texture_atlas::AtlasSubTextureOrder sub_texture_order = texture_atlas::AtlasSubTextureOrder::RowMajor) noexcept;
 
 
 			/**
