@@ -21,7 +21,17 @@ using namespace ion::types::type_literals;
 using namespace ion::utilities::file::literals;
 using namespace ion::utilities::math::literals;
 
-constexpr auto init_from_script = true;
+
+/*
+	Initialize
+	----------
+	Set to true to init demo from script files
+	Set to false to init demo programmatically
+*/
+
+constexpr auto init_from_script = false;
+
+//--------------------------------------------
 
 
 struct Game :
@@ -35,9 +45,15 @@ struct Game :
 	ion::gui::GuiController *gui_controller = nullptr;
 	ion::sounds::SoundManager *sound_manager = nullptr;
 
+	ion::NonOwningPtr<ion::sounds::Sound> night_runner;
+	ion::NonOwningPtr<ion::graphics::scene::MovableSound> red_lamp_flicker;
+	ion::NonOwningPtr<ion::graphics::scene::MovableSound> green_lamp_flicker;
+
 	ion::NonOwningPtr<ion::graphics::scene::DrawableText> fps;
 	ion::types::Cumulative<duration> fps_update_rate{1.0_sec};
 
+	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> intro_node;
+	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> level_node;
 	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> player_node;
 	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> light_node;
 	ion::graphics::utilities::Vector2 move_model;
@@ -69,55 +85,59 @@ struct Game :
 				fps->Get()->Content(ion::utilities::convert::ToString(1.0_sec / time, 0));
 		}
 
-		if (ship_idle_timeline)
+		//Level
+		if (level_node && level_node->Visible())
 		{
-			if (idle_time += time)
-				ship_idle_timeline->Start();
-		}
-
-
-		if (player_node)
-		{
-			if (move_model != vector2::Zero ||
-				rotate_model_left || rotate_model_right)
+			if (ship_idle_timeline)
 			{
-				if (move_model != vector2::Zero)
-					player_node->Translate(move_model.NormalizeCopy() * time.count());
+				if (idle_time += time)
+					ship_idle_timeline->Start();
+			}
 
-				if (rotate_model_left)
-					player_node->Rotate(math::ToRadians(180.0_r) * time.count());
-				if (rotate_model_right)
-					player_node->Rotate(math::ToRadians(-180.0_r) * time.count());
-
-				if (ship_idle_timeline)
+			if (player_node)
+			{
+				if (move_model != vector2::Zero ||
+					rotate_model_left || rotate_model_right)
 				{
-					idle_time.Reset();
-					ship_idle_timeline->Revert();
-				}
-			}	
-		}
+					if (move_model != vector2::Zero)
+						player_node->Translate(move_model.NormalizeCopy() * time.count());
 
-		if (camera && viewport &&
-			viewport->ConnectedCamera() == camera)
-		{
-			if (move_camera != vector2::Zero)
-				camera->ParentNode()->Translate(move_camera.NormalizeCopy() * time.count());
+					if (rotate_model_left)
+						player_node->Rotate(math::ToRadians(180.0_r) * time.count());
+					if (rotate_model_right)
+						player_node->Rotate(math::ToRadians(-180.0_r) * time.count());
 
-			if (rotate_camera_left)
-				camera->ParentNode()->Rotate(math::ToRadians(180.0_r) * time.count());
-			if (rotate_camera_right)
-				camera->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
-		}
+					if (ship_idle_timeline)
+					{
+						idle_time.Reset();
+						ship_idle_timeline->Revert();
+					}
+				}	
+			}
+
+			if (camera && viewport &&
+				viewport->ConnectedCamera() == camera)
+			{
+				if (move_camera != vector2::Zero)
+					camera->ParentNode()->Translate(move_camera.NormalizeCopy() * time.count());
+
+				if (rotate_camera_left)
+					camera->ParentNode()->Rotate(math::ToRadians(180.0_r) * time.count());
+				if (rotate_camera_right)
+					camera->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
+			}
 		
-		if (player_camera && viewport &&
-			viewport->ConnectedCamera() == player_camera)
-		{
-			if (rotate_camera_left)
-				player_camera->ParentNode()->Rotate(math::ToRadians(180.0_r) * time.count());
-			if (rotate_camera_right)
-				player_camera->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
+			if (player_camera && viewport &&
+				viewport->ConnectedCamera() == player_camera)
+			{
+				if (rotate_camera_left)
+					player_camera->ParentNode()->Rotate(math::ToRadians(180.0_r) * time.count());
+				if (rotate_camera_right)
+					player_camera->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
+			}
 		}
 
+		//GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->FrameStarted(time);
 
@@ -129,6 +149,7 @@ struct Game :
 		if (sound_manager)
 			sound_manager->Update();
 
+		//GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->FrameEnded(time);
 
@@ -142,6 +163,7 @@ struct Game :
 
 	void WindowActionReceived(ion::events::listeners::WindowAction action) noexcept override
 	{
+		//GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->WindowActionReceived(action);
 	}
@@ -155,7 +177,9 @@ struct Game :
 	{
 		using namespace ion::graphics::utilities;
 
-		if (!gui_controller || !gui_controller->IsVisible())
+		//Level
+		if (level_node && level_node->Visible() &&
+			(!gui_controller || !gui_controller->IsVisible()))
 		{
 			switch (button)
 			{
@@ -210,6 +234,7 @@ struct Game :
 			}
 		}
 
+		//GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->KeyPressed(button);
 	}
@@ -218,7 +243,21 @@ struct Game :
 	{
 		using namespace ion::graphics::utilities;
 
-		if (!gui_controller || !gui_controller->IsVisible())
+		//Intro
+		if (intro_node && intro_node->Visible())
+		{
+			//Press any key to continue
+			intro_node->Visible(false);
+			level_node->Visible(true);
+			night_runner->Play()->Volume(0.2_r);
+			red_lamp_flicker->Get()->Resume();
+			green_lamp_flicker->Get()->Resume();
+			return;
+		}
+
+		//Level
+		if (level_node && level_node->Visible() &&
+			(!gui_controller || !gui_controller->IsVisible()))
 		{
 			switch (button)
 			{
@@ -317,6 +356,7 @@ struct Game :
 			}
 		}
 
+		//GUI
 		if (gui_controller)
 		{
 			switch (button)
@@ -333,6 +373,7 @@ struct Game :
 
 	void CharacterPressed(char character) noexcept override
 	{
+		//GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->CharacterPressed(character);
 	}
@@ -344,28 +385,33 @@ struct Game :
 
 	void MousePressed(ion::events::listeners::MouseButton button, ion::graphics::utilities::Vector2 position) noexcept override
 	{
+		//GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->MousePressed(button, position);
 	}
 
 	void MouseReleased(ion::events::listeners::MouseButton button, ion::graphics::utilities::Vector2 position) noexcept override
 	{
+		//GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->MouseReleased(button, position);
 	}
 
 	void MouseMoved(ion::graphics::utilities::Vector2 position) noexcept override
 	{
+		//GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->MouseMoved(position);
 	}
 
 	void MouseWheelRolled(int delta, ion::graphics::utilities::Vector2 position) noexcept override
 	{
+		//GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->MouseWheelRolled(delta, position);
 	}
 };
+
 
 #ifdef ION_WIN32
 //Entry point for windows 32/64 bit
@@ -475,6 +521,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	auto gui_scene_manager = scene_graph->CreateSceneManager();
 	
 
+	//Initialize from script files
 	if (init_from_script)
 	{
 		auto &script_managers = ion::script::interfaces::ScriptInterface::Managers();
@@ -616,7 +663,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		gui_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
 		gui_script.CreateGui("gui.ion", gui_controller, *gui_scene_manager);
 	}
-	else //Init programmatically
+	else //Initialize programmatically
 	{
 		/*
 			Textures
@@ -635,6 +682,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		
 		//Cloud
 		auto cloud_diffuse = textures->CreateTexture("cloud_diffuse", "cloud.png");
+
+		//Logo frames
+		auto logo_frames_atlas = textures->CreateTextureAtlas("logo_frames", "logo_frames.png", 4, 4);
+		auto logo_first_frame = textures->GetTexture("logo_frames_1");
 
 		//Pyramid (egyptian)
 		auto pyramid_egyptian_atlas = textures->CreateTextureAtlas("pyramid_egyptian", "pyramid_egyptian.png", 2, 2, 3);
@@ -725,6 +776,23 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 		textures->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 		//while (!textures->Loaded());
+
+
+		/*
+			Frame sequences
+		*/
+
+		//Logo sequence
+		auto logo_sequence = frame_sequences->CreateFrameSequence("logo_sequence", logo_first_frame, 16);
+
+
+		/*
+			Animations
+		*/
+
+		//Logo animation
+		auto logo_animation = animations->CreateAnimation("logo_animation", logo_sequence, 2.0_sec);
+		logo_animation->Direction(ion::graphics::textures::animation::PlaybackDirection::Alternate);
 
 
 		/*
@@ -1064,6 +1132,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		auto verdana_italic_36 = fonts->CreateFont("verdana_italic_36", "verdanai.ttf", 36);
 		auto verdana_bold_italic_36 = fonts->CreateFont("verdana_bold_italic_36", "verdanaz.ttf", 36);
 
+		//Verdana 24px
+		auto verdana_regular_24 = fonts->CreateFont("verdana_regular_24", "verdana.ttf", 24);
+		auto verdana_bold_24 = fonts->CreateFont("verdana_bold_24", "verdanab.ttf", 24);
+		auto verdana_italic_24 = fonts->CreateFont("verdana_italic_24", "verdanai.ttf", 24);
+		auto verdana_bold_italic_24 = fonts->CreateFont("verdana_bold_italic_24", "verdanaz.ttf", 24);
+
 
 		/*
 			Fonts (GUI)
@@ -1092,6 +1166,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				verdana_bold_36,
 				verdana_italic_36,
 				verdana_bold_italic_36);
+
+		//Verdana 24px
+		auto verdana_24 =
+			type_faces->CreateTypeFace(
+				"verdana_24",
+				verdana_regular_24,
+				verdana_bold_24,
+				verdana_italic_24,
+				verdana_bold_italic_24);
 
 
 		/*
@@ -1136,8 +1219,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		sounds->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 		//while (!sounds->Loaded());
 
-		night_runner->Play()->Volume(0.2_r);
-
 
 		/*
 			Material
@@ -1155,6 +1236,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 		//Cloud
 		auto cloud = materials->CreateMaterial("cloud", cloud_diffuse);
+
+		//Logo
+		auto logo = materials->CreateMaterial("logo", logo_animation);
+		logo->LightingEnabled(false);
 
 		//Pyramid (egyptian)
 		auto pyramid_egyptian = materials->CreateMaterial("pyramid_egyptian",
@@ -1175,6 +1260,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		auto star = materials->CreateMaterial("star", star_diffuse);
 		star->LightingEnabled(false);
 
+		auto star_red = materials->CreateMaterial("star_red", star_diffuse, ion::graphics::utilities::color::Red);
+		star_red->LightingEnabled(false);
+
+		auto star_green = materials->CreateMaterial("star_green", star_diffuse, ion::graphics::utilities::color::Green);
+		star_green->LightingEnabled(false);
+
+		auto star_blue = materials->CreateMaterial("star_blue", star_diffuse, ion::graphics::utilities::color::Blue);
+		star_blue->LightingEnabled(false);
 
 		/*
 			Material (GUI)
@@ -1307,9 +1400,26 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 				"fps",
 				"",
 				verdana_36);
-
 		fps_text->Formatting(ion::graphics::fonts::text::TextFormatting::None);
 		fps_text->DefaultForegroundColor(color::White);
+
+		//Header
+		auto header_text =
+			texts->CreateText(
+				"header",
+				"Powered by <b>the ION game engine</b>",
+				verdana_36);
+		header_text->Alignment(ion::graphics::fonts::text::TextAlignment::Center);
+		header_text->DefaultForegroundColor(color::White);
+
+		//Sub header
+		auto sub_header_text =
+			texts->CreateText(
+				"sub_header",
+				"Press any key to continue...",
+				verdana_24);
+		sub_header_text->Alignment(ion::graphics::fonts::text::TextAlignment::Center);
+		sub_header_text->DefaultForegroundColor(color::DimGray);
 
 
 		/*
@@ -1381,6 +1491,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		//FPS
 		auto fps = scene_manager->CreateText("fps", fps_text);
 
+		//Header
+		auto header = scene_manager->CreateText("header", header_text);
+
+		//Sub header
+		auto sub_header = scene_manager->CreateText("sub_header", sub_header_text);
+
 		//Light (red)
 		auto red_light = scene_manager->CreateLight("red_light");
 		red_light->Type(ion::graphics::scene::light::LightType::Point);
@@ -1390,8 +1506,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		red_light->Radius(1.5_r);
 
 		//Lamp flicker
-		auto red_lamp_flicker = scene_manager->CreateSound({}, flicker);
-		auto green_lamp_flicker = scene_manager->CreateSound({}, flicker);
+		auto red_lamp_flicker = scene_manager->CreateSound("red_lamp_flicker", flicker);
+		auto green_lamp_flicker = scene_manager->CreateSound("green_lamp_flicker", flicker);
 
 		//Light (green)
 		auto green_light = scene_manager->CreateLight("green_light");
@@ -1408,6 +1524,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		ship_light->DiffuseColor(color::White);
 		ship_light->Attenuation(1.0_r, 0.09_r, 0.032_r);
 		ship_light->Cutoff(math::ToRadians(20.0_r), math::ToRadians(30.0_r));
+
+		//Logo
+		auto logo_model = scene_manager->CreateModel("logo_model");
+		logo_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
+			vector3::Zero, {1.0_r, 0.5_r}, logo});
+		logo_model->AddRenderPass(ion::graphics::render::RenderPass{});
 
 		//Player ear
 		auto player_ear = scene_manager->CreateSoundListener({}, sound_listener);
@@ -1446,21 +1568,46 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			Scene nodes
 		*/
 
+		//FPS
+		auto fps_node = scene_graph->RootNode().CreateChildNode({}, {-1.75_r, 0.98_r, -1.5_r});
+		fps_node->Scaling({0.5_r, 0.5_r});
+		fps_node->AttachObject(*fps);
+
+		//Main camera
+		auto main_camera_node = scene_graph->RootNode().CreateChildNode("main_camera_node");
+		main_camera_node->AttachObject(*main_camera);
+
+
+		//Intro node
+		auto intro_node = scene_graph->RootNode().CreateChildNode("intro_node");
+
+		//Logo
+		auto logo_node = intro_node->CreateChildNode({}, {0.0_r, 0.25_r, -2.0_r});
+		logo_node->AttachObject(*logo_model);
+
+		//Header
+		auto header_node = intro_node->CreateChildNode({}, {0.0_r, -0.1_r, -2.0_r});
+		header_node->Scaling({0.75_r, 0.75_r});
+		header_node->AttachObject(*header);
+
+		//Header
+		auto sub_header_node = header_node->CreateChildNode({}, {0.0_r, -0.25_r, 0.0_r});
+		sub_header_node->AttachObject(*sub_header);
+
+
+		//Level node
+		auto level_node = scene_graph->RootNode().CreateChildNode("level_node");
+
 		//Brick wall
-		auto background_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 0.0_r, -2.25_r});
+		auto background_node = level_node->CreateChildNode({}, {0.0_r, 0.0_r, -2.25_r});
 		background_node->AttachObject(*background_model);
 
 		//Cloud
-		auto cloud_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 0.0_r, -1.6_r});
-		cloud_node->AttachObject(*cloud_model);
-
-		//FPS
-		auto fps_node = scene_graph->RootNode().CreateChildNode({}, {-1.75_r, 0.98_r, -1.5_r});
-		fps_node->Scale({-0.5_r,-0.5_r});
-		fps_node->AttachObject(*fps);
+		auto cloud_node = level_node->CreateChildNode({}, {0.0_r, 0.0_r, -1.6_r});
+		cloud_node->AttachObject(*cloud_model);	
 
 		//Light (red)
-		auto red_light_node = scene_graph->RootNode().CreateChildNode({}, {-1.5_r, -0.75_r, -1.0_r});
+		auto red_light_node = level_node->CreateChildNode({}, {-1.5_r, -0.75_r, -1.0_r});
 		red_light_node->AttachObject(*red_light);
 
 		//Lamp (red)
@@ -1468,39 +1615,35 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		red_lamp_node->AttachObject(*red_lamp_flicker);
 
 		//Light (green)
-		auto green_light_node = scene_graph->RootNode().CreateChildNode({}, {1.5_r, 0.75_r, -1.0_r});
+		auto green_light_node = level_node->CreateChildNode({}, {1.5_r, 0.75_r, -1.0_r});
 		green_light_node->AttachObject(*green_light);
 
 		//Lamp (green)
 		auto green_lamp_node = green_light_node->CreateChildNode({}, {0.0_r, 0.0_r, -0.8_r});
 		green_lamp_node->AttachObject(*green_lamp_flicker);
 
-		//Main camera
-		auto main_camera_node = scene_graph->RootNode().CreateChildNode("main_camera_node", {0.0_r, 0.0_r, 0.0_r});
-		main_camera_node->AttachObject(*main_camera);
-
 		//Pyramid (egyptian)
-		auto pyramid_egyptian_node = scene_graph->RootNode().CreateChildNode({}, {1.0_r, 0.5_r, -2.0_r});
+		auto pyramid_egyptian_node = level_node->CreateChildNode({}, {1.0_r, 0.5_r, -2.0_r});
 		pyramid_egyptian_node->AttachObject(*pyramid_egyptian_model);
 
 		//Pyramid (mayan)
-		auto pyramid_mayan_node = scene_graph->RootNode().CreateChildNode({}, {-1.0_r, -0.5_r, -2.0_r});
+		auto pyramid_mayan_node = level_node->CreateChildNode({}, {-1.0_r, -0.5_r, -2.0_r});
 		pyramid_mayan_node->AttachObject(*pyramid_mayan_model);
 
 		//Rain
-		auto particle_node = scene_graph->RootNode().CreateChildNode({}, {0.0_r, 1.0_r, -1.75_r}, vector2::NegativeUnitY);
+		auto particle_node = level_node->CreateChildNode({}, {0.0_r, 1.0_r, -1.75_r}, vector2::NegativeUnitY);
 		particle_node->AttachObject(*rain_particles);
 
 
 		//Player
-		auto player_node = scene_graph->RootNode().CreateChildNode("player_node", {0.0_r, -0.65_r, -1.8_r});
+		auto player_node = level_node->CreateChildNode("player_node", {0.0_r, -0.65_r, -1.8_r});
 
 		//Player camera
 		auto player_cam_node = player_node->CreateChildNode({}, {0.0_r, 0.0_r, 1.8_r});
 		player_cam_node->AttachObject(*player_camera);
 
 		//Ship
-		auto ship_node = player_node->CreateChildNode("ship_node", {0.0_r, 0.0_r, 0.0_r});
+		auto ship_node = player_node->CreateChildNode("ship_node");
 		ship_node->AttachObject(*ship_model);
 		ship_node->AttachObject(*player_ear);
 
@@ -2055,20 +2198,20 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		list_box->Node()->Position({0.8_r, 0.25_r});
 		list_box->Tooltip("My list box tooltip");
 		list_box->ItemHeightFactor(3.5_r);
+		list_box->IconPadding(10.0_r);
 		list_box->ItemLayout(ion::gui::controls::gui_list_box::ListBoxItemLayout::Left);
 		list_box->IconLayout(ion::gui::controls::gui_list_box::ListBoxIconLayout::Left);
 		list_box->ShowIcons(true);
 		list_box->AddItems({
 			{"My <b>1st</b> <font color='purple'>item</font>"s, star},
-			{"My <b>2nd</b> <font color='purple'>item</font>"s, aura},
-			{"My <b>3rd</b> <font color='purple'>item</font>"s, star},
-			{"My <b>4th</b> <font color='purple'>item</font>"s, aura},
+			{"My <b>2nd</b> <font color='purple'>item</font>"s, star_red},
+			{"My <b>3rd</b> <font color='purple'>item</font>"s, star_green},
+			{"My <b>4th</b> <font color='purple'>item</font>"s, star_blue},
 			{"My <b>5th</b> <font color='purple'>item</font>"s, star},
-			{"My <b>6th</b> <font color='purple'>item</font>"s, aura},
-			{"My <b>7th</b> <font color='purple'>item</font>"s, star},
-			{"My <b>8th</b> <font color='purple'>item</font>"s, aura},
-			{"My <b>9th</b> <font color='purple'>item</font>"s, star},
-			{"My <b>10th</b> <font color='purple'>item</font>"s, aura}
+			{"My <b>6th</b> <font color='purple'>item</font>"s, star_blue},
+			{"My <b>7th</b> <font color='purple'>item</font>"s, star_green},
+			{"My <b>8th</b> <font color='purple'>item</font>"s, star_red},
+			{"My <b>9th</b> <font color='purple'>item</font>"s, star}
 		});
 
 		auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", Vector2{0.077_r, 0.5_r}, "My scroll bar");
@@ -2119,11 +2262,20 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	if (viewport && camera)
 		viewport->ConnectedCamera(camera);
 
+	auto night_runner = sounds->GetSound("night_runner");
+	auto red_lamp_flicker = scene_manager->GetSound("red_lamp_flicker");
+	auto green_lamp_flicker = scene_manager->GetSound("green_lamp_flicker");
 	auto fps = scene_manager->GetText("fps");
-	auto player_node = scene_graph->RootNode().GetDescendantNode("player_node");
+	auto intro_node = scene_graph->RootNode().GetChildNode("intro_node");
+	auto level_node = scene_graph->RootNode().GetChildNode("level_node");
+	auto player_node = level_node ? level_node->GetDescendantNode("player_node") : nullptr;
 	auto ship_node = player_node ? player_node->GetChildNode("ship_node") : nullptr;
 	auto light_node = ship_node ? ship_node->GetChildNode("ship_light_node") : nullptr;
 	auto ship_idle_timeline = ship_node ? ship_node->GetTimeline("ship_idle_timeline") : nullptr;
+
+	red_lamp_flicker->Get()->Pause();
+	green_lamp_flicker->Get()->Pause();
+	level_node->Visible(false);
 
 
 	//Initialize game
@@ -2131,7 +2283,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	game.viewport = viewport;
 	game.gui_controller = &gui_controller;
 	game.sound_manager = sounds.get();
+	game.night_runner = night_runner;
+	game.red_lamp_flicker = red_lamp_flicker;
+	game.green_lamp_flicker = green_lamp_flicker;
 	game.fps = fps;
+	game.intro_node = intro_node;
+	game.level_node = level_node;
 	game.player_node = player_node;
 	game.light_node = light_node;
 	game.camera = camera;
