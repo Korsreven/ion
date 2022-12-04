@@ -29,7 +29,7 @@ using namespace ion::utilities::math::literals;
 	Set to false to init demo programmatically
 */
 
-constexpr auto init_from_script = true;
+constexpr auto init_from_script = false;
 
 
 /*
