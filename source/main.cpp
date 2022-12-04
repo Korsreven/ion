@@ -23,15 +23,25 @@ using namespace ion::utilities::math::literals;
 
 
 /*
-	Initialize
-	----------
+	Initialize mode
+	---------------
 	Set to true to init demo from script files
 	Set to false to init demo programmatically
 */
 
-constexpr auto init_from_script = false;
+constexpr auto init_from_script = true;
 
-//--------------------------------------------
+
+/*
+	Data path
+	---------
+	Set the path to where all data files are stored
+	The path should be relative to the exe file
+*/
+
+const std::filesystem::path data_path = "data";
+
+//-------------------------------------------------
 
 
 struct Game :
@@ -82,7 +92,10 @@ struct Game :
 		if (fps)
 		{
 			if (fps_update_rate += time)
-				fps->Get()->Content(ion::utilities::convert::ToString(1.0_sec / time, 0));
+			{
+				if (auto &text = fps->Get(); text)
+					text->Content(ion::utilities::convert::ToString(1.0_sec / time, 0));
+			}
 		}
 
 		//Level
@@ -243,15 +256,23 @@ struct Game :
 	{
 		using namespace ion::graphics::utilities;
 
-		//Splash
+		//Splash - Press any key to continue
 		if (splash_node && splash_node->Visible())
-		{
-			//Press any key to continue
+		{	
 			splash_node->Visible(false);
-			level_node->Visible(true);
-			night_runner->Play()->Volume(0.2_r);
-			red_lamp_flicker->Get()->Resume();
-			green_lamp_flicker->Get()->Resume();
+
+			if (level_node)
+				level_node->Visible(true);
+
+			if (night_runner)
+				night_runner->Play()->Volume(0.2_r);
+
+			if (auto &channel = red_lamp_flicker->Get(); channel)
+				channel->Resume();
+
+			if (auto &channel = green_lamp_flicker->Get(); channel)
+				channel->Resume();
+
 			return;
 		}
 
@@ -474,8 +495,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	asset_loader.Attach(shader_repository);
 	asset_loader.Attach(video_repository);
 
-	asset_loader.LoadDirectory("bin", ion::utilities::file::DirectoryIteration::Recursive);
-	//asset_loader.CompileDataFile("bin/resources.dat");
+	asset_loader.LoadDirectory(data_path, ion::utilities::file::DirectoryIteration::Recursive);
+	//asset_loader.CompileDataFile(data_path / "resources.dat");
 
 
 	//Managers
@@ -2266,11 +2287,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		main_frame->Activate();
 		main_frame->Focus();
 	}
-
-	gui_controller.Visible(false);
-
 	
-	//Pointers
+
+	/*
+		Demo setup
+	*/
+
 	auto camera = scene_manager->GetCamera("main_camera");
 	auto player_camera = scene_manager->GetCamera("player_camera");
 
@@ -2288,12 +2310,20 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	auto light_node = ship_node ? ship_node->GetChildNode("ship_light_node") : nullptr;
 	auto ship_idle_timeline = ship_node ? ship_node->GetTimeline("ship_idle_timeline") : nullptr;
 
-	red_lamp_flicker->Get()->Pause();
-	green_lamp_flicker->Get()->Pause();
-	level_node->Visible(false);
+
+	if (auto &channel = red_lamp_flicker->Get(); channel)
+		channel->Pause();
+
+	if (auto &channel = green_lamp_flicker->Get(); channel)
+		channel->Pause();
+
+	if (level_node)
+		level_node->Visible(false);
+
+	gui_controller.Visible(false);
 
 
-	//Initialize game
+	//Initialize game struct
 	game.scene_graph = scene_graph;
 	game.viewport = viewport;
 	game.gui_controller = &gui_controller;
@@ -2310,5 +2340,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	game.player_camera = player_camera;
 	game.ship_idle_timeline = ship_idle_timeline;
 
+
+	//Start rendering
 	return engine.Start();
 }
