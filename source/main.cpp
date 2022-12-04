@@ -665,6 +665,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	}
 	else //Initialize programmatically
 	{
+		using namespace ion::utilities;
+		using namespace ion::graphics::utilities;
+		using namespace ion::graphics::shaders::variables;
+		using namespace ion::graphics::scene::graph::animations;
+
+
 		/*
 			Textures
 		*/
@@ -796,6 +802,292 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 		/*
+			Materials
+		*/
+
+		//Aura
+		auto aura = materials->CreateMaterial("aura",
+			aura_diffuse, nullptr, nullptr, aura_emissive);
+		aura->EmissiveColor(color::Pink);
+
+		//Brick wall
+		auto brick_wall = materials->CreateMaterial("brick_wall",
+			brick_wall_diffuse, brick_wall_normal, brick_wall_specular, nullptr);
+		brick_wall->DiffuseColor(color::BurlyWood);
+
+		//Cloud
+		auto cloud = materials->CreateMaterial("cloud", cloud_diffuse);
+
+		//Logo
+		auto logo = materials->CreateMaterial("logo", logo_animation);
+		logo->LightingEnabled(false);
+
+		//Pyramid (egyptian)
+		auto pyramid_egyptian = materials->CreateMaterial("pyramid_egyptian",
+			pyramid_egyptian_diffuse, pyramid_egyptian_normal, pyramid_egyptian_specular, nullptr);
+
+		//Pyramid (mayan)
+		auto pyramid_mayan = materials->CreateMaterial("pyramid_mayan",
+			pyramid_mayan_diffuse, pyramid_mayan_normal, pyramid_mayan_specular, nullptr);
+
+		//Raindrop
+		auto raindrop = materials->CreateMaterial("raindrop", raindrop_diffuse);
+
+		//Ship
+		auto ship = materials->CreateMaterial("ship",
+			ship_diffuse, ship_normal, ship_specular, nullptr);
+
+		//Star
+		auto star = materials->CreateMaterial("star", star_diffuse);
+		star->LightingEnabled(false);
+
+		//Star (red)
+		auto star_red = materials->CreateMaterial("star_red", star_diffuse, color::Red);
+		star_red->LightingEnabled(false);
+
+		//Star (green)
+		auto star_green = materials->CreateMaterial("star_green", star_diffuse, color::Green);
+		star_green->LightingEnabled(false);
+
+		//Star (blue)
+		auto star_blue = materials->CreateMaterial("star_blue", star_diffuse, color::Blue);
+		star_blue->LightingEnabled(false);
+
+
+		/*
+			Materials (GUI)
+		*/
+
+		//Button
+		auto button_center_enabled = materials->CreateMaterial("button_center_enabled", button_center_enabled_diffuse);
+		button_center_enabled->LightingEnabled(false);
+
+		auto button_center_disabled = materials->CreateMaterial("button_center_disabled", button_center_disabled_diffuse);
+		button_center_disabled->LightingEnabled(false);
+
+		auto button_center_pressed = materials->CreateMaterial("button_center_pressed", button_center_pressed_diffuse);
+		button_center_pressed->LightingEnabled(false);
+
+		auto button_center_hovered = materials->CreateMaterial("button_center_hovered", button_center_hovered_diffuse);
+		button_center_hovered->LightingEnabled(false);
+
+
+		auto button_top_enabled = materials->CreateMaterial("button_top_enabled", button_top_enabled_diffuse);
+		button_top_enabled->LightingEnabled(false);
+
+		auto button_top_focused = materials->CreateMaterial("button_top_focused", button_top_focused_diffuse);
+		button_top_focused->LightingEnabled(false);
+
+		auto button_left_enabled = materials->CreateMaterial("button_left_enabled", button_left_enabled_diffuse);
+		button_left_enabled->LightingEnabled(false);
+
+		auto button_left_focused = materials->CreateMaterial("button_left_focused", button_left_focused_diffuse);
+		button_left_focused->LightingEnabled(false);
+
+
+		auto button_top_left_enabled = materials->CreateMaterial("button_top_left_enabled", button_top_left_enabled_diffuse);
+		button_top_left_enabled->LightingEnabled(false);
+
+		auto button_top_left_focused = materials->CreateMaterial("button_top_left_focused", button_top_left_focused_diffuse);
+		button_top_left_focused->LightingEnabled(false);
+
+		//Check box
+		auto check_box_center_enabled = materials->CreateMaterial("check_box_center_enabled", check_box_center_enabled_diffuse);
+		check_box_center_enabled->LightingEnabled(false);
+
+		auto check_box_center_hovered = materials->CreateMaterial("check_box_center_hovered", check_box_center_hovered_diffuse);
+		check_box_center_hovered->LightingEnabled(false);
+
+
+		auto check_box_mark_enabled = materials->CreateMaterial("check_box_mark_enabled", check_box_mark_enabled_diffuse);
+		check_box_mark_enabled->LightingEnabled(false);
+
+		auto check_box_mark_disabled = materials->CreateMaterial("check_box_mark_disabled", check_box_mark_disabled_diffuse);
+		check_box_mark_disabled->LightingEnabled(false);
+
+		auto check_box_mark_pressed = materials->CreateMaterial("check_box_mark_pressed", check_box_mark_pressed_diffuse);
+		check_box_mark_pressed->LightingEnabled(false);
+
+		auto check_box_mark_hovered = materials->CreateMaterial("check_box_mark_hovered", check_box_mark_hovered_diffuse);
+		check_box_mark_hovered->LightingEnabled(false);
+
+		//Mouse cursor
+		auto mouse_cursor_enabled = materials->CreateMaterial("mouse_cursor", mouse_cursor_diffuse);
+		mouse_cursor_enabled->LightingEnabled(false);
+
+		//Progress bar
+		auto progress_bar_bar_enabled = materials->CreateMaterial("progress_bar_bar_enabled", progress_bar_bar_enabled_diffuse);
+		progress_bar_bar_enabled->LightingEnabled(false);
+
+		//Radio buttons
+		auto radio_button_select_enabled = materials->CreateMaterial("radio_button_select_enabled", radio_button_select_enabled_diffuse);
+		radio_button_select_enabled->LightingEnabled(false);
+
+		auto radio_button_select_disabled = materials->CreateMaterial("radio_button_select_disabled", radio_button_select_disabled_diffuse);
+		radio_button_select_disabled->LightingEnabled(false);
+
+		auto radio_button_select_pressed = materials->CreateMaterial("radio_button_select_pressed", radio_button_select_pressed_diffuse);
+		radio_button_select_pressed->LightingEnabled(false);
+
+		auto radio_button_select_hovered = materials->CreateMaterial("radio_button_select_hovered", radio_button_select_hovered_diffuse);
+		radio_button_select_hovered->LightingEnabled(false);
+
+		//Text box
+		auto text_box_cursor_enabled = materials->CreateMaterial("text_box_cursor_enabled", text_box_cursor_enabled_diffuse);
+		text_box_cursor_enabled->LightingEnabled(false);
+
+		//Tooltip
+		auto tooltip_center_enabled = materials->CreateMaterial("tooltip_center", tooltip_center_diffuse);
+		tooltip_center_enabled->LightingEnabled(false);
+
+
+		auto tooltip_top_enabled = materials->CreateMaterial("tooltip_top", tooltip_top_diffuse);
+		tooltip_top_enabled->LightingEnabled(false);
+
+		auto tooltip_left_enabled = materials->CreateMaterial("tooltip_left", tooltip_left_diffuse);
+		tooltip_left_enabled->LightingEnabled(false);
+
+
+		auto tooltip_top_left_enabled = materials->CreateMaterial("tooltip_top_left", tooltip_top_left_diffuse);
+		tooltip_top_left_enabled->LightingEnabled(false);
+
+
+		/*
+			Fonts
+		*/
+
+		//Verdana 36px
+		auto verdana_regular_36 = fonts->CreateFont("verdana_regular_36", "verdana.ttf", 36);
+		auto verdana_bold_36 = fonts->CreateFont("verdana_bold_36", "verdanab.ttf", 36);
+		auto verdana_italic_36 = fonts->CreateFont("verdana_italic_36", "verdanai.ttf", 36);
+		auto verdana_bold_italic_36 = fonts->CreateFont("verdana_bold_italic_36", "verdanaz.ttf", 36);
+
+		//Verdana 24px
+		auto verdana_regular_24 = fonts->CreateFont("verdana_regular_24", "verdana.ttf", 24);
+		auto verdana_bold_24 = fonts->CreateFont("verdana_bold_24", "verdanab.ttf", 24);
+		auto verdana_italic_24 = fonts->CreateFont("verdana_italic_24", "verdanai.ttf", 24);
+		auto verdana_bold_italic_24 = fonts->CreateFont("verdana_bold_italic_24", "verdanaz.ttf", 24);
+
+
+		/*
+			Fonts (GUI)
+		*/
+
+		//Verdana 12px
+		auto verdana_regular_12 = fonts->CreateFont("verdana_regular_12", "verdana.ttf", 12);
+		auto verdana_bold_12 = fonts->CreateFont("verdana_bold_12", "verdanab.ttf", 12);
+		auto verdana_italic_12 = fonts->CreateFont("verdana_italic_12", "verdanai.ttf", 12);
+		auto verdana_bold_italic_12 = fonts->CreateFont("verdana_bold_italic_12", "verdanaz.ttf", 12);
+
+
+		fonts->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
+		//while (!fonts.Loaded());
+
+
+		/*
+			Type faces
+		*/
+
+		//Verdana 36px
+		auto verdana_36 = 
+			type_faces->CreateTypeFace(
+				"verdana_36",
+				verdana_regular_36,
+				verdana_bold_36,
+				verdana_italic_36,
+				verdana_bold_italic_36);
+
+		//Verdana 24px
+		auto verdana_24 =
+			type_faces->CreateTypeFace(
+				"verdana_24",
+				verdana_regular_24,
+				verdana_bold_24,
+				verdana_italic_24,
+				verdana_bold_italic_24);
+
+
+		/*
+			Type faces (GUI)
+		*/
+
+		//Verdana 12px
+		auto verdana_12 =
+			type_faces->CreateTypeFace(
+				"verdana_12",
+				verdana_regular_12,
+				verdana_bold_12,
+				verdana_italic_12,
+				verdana_bold_italic_12);
+
+
+		/*
+			Text
+		*/
+
+		//FPS
+		auto fps_text =
+			texts->CreateText(
+				"fps",
+				"",
+				verdana_36);
+		fps_text->Formatting(ion::graphics::fonts::text::TextFormatting::None);
+		fps_text->DefaultForegroundColor(color::White);
+
+		//Header
+		auto header_text =
+			texts->CreateText(
+				"header",
+				"<font color='silver'>Powered by</font> <b>ION engine</b>",
+				verdana_36);
+		header_text->Alignment(ion::graphics::fonts::text::TextAlignment::Center);
+		header_text->DefaultForegroundColor(color::White);
+
+		//Sub header
+		auto sub_header_text =
+			texts->CreateText(
+				"sub_header",
+				"Press any key to continue...",
+				verdana_24);
+		sub_header_text->Alignment(ion::graphics::fonts::text::TextAlignment::Center);
+		sub_header_text->DefaultForegroundColor(color::DimGray);
+
+
+		/*
+			Text (GUI)
+		*/
+
+		//Caption
+		auto caption_text =
+			texts->CreateText(
+				"caption",
+				"",
+				verdana_12);
+
+		caption_text->DefaultForegroundColor(color::White);
+
+
+		/*
+			Particle system
+		*/
+
+		//Rain
+		auto rain = particle_systems->CreateParticleSystem("rain");
+
+		auto emitter = rain->CreateEmitter(
+			ion::graphics::particles::Emitter::Box(
+				"spawner", vector3::Zero, vector2::NegativeUnitY, {3.56_r, 0.1_r}, {}, 50.0_r, 0.0_r, {}, 100
+			));
+
+		emitter->ParticleVelocity(1.5_r, 2.0_r);
+		emitter->ParticleSize(8.0_r, 24.0_r);
+		emitter->ParticleMass(1.0_r, 1.0_r);
+		emitter->ParticleColor(Color{255, 255, 255, 0.75_r}, color::White);
+		emitter->ParticleLifetime(1.4_sec, 1.4_sec);
+		emitter->ParticleMaterial(raindrop);
+
+
+		/*
 			Shaders
 		*/
 
@@ -844,9 +1136,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 		shader_programs->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 		//while (!shader_programs.Loaded());
-
-
-		using namespace ion::graphics::shaders::variables;
+		
 
 		//Model
 		{
@@ -1121,75 +1411,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			shader_programs->LoadShaderVariableLocations(*flat_text_prog);
 		}
 
-
-		/*
-			Fonts
-		*/
-		
-		//Verdana 36px
-		auto verdana_regular_36 = fonts->CreateFont("verdana_regular_36", "verdana.ttf", 36);
-		auto verdana_bold_36 = fonts->CreateFont("verdana_bold_36", "verdanab.ttf", 36);
-		auto verdana_italic_36 = fonts->CreateFont("verdana_italic_36", "verdanai.ttf", 36);
-		auto verdana_bold_italic_36 = fonts->CreateFont("verdana_bold_italic_36", "verdanaz.ttf", 36);
-
-		//Verdana 24px
-		auto verdana_regular_24 = fonts->CreateFont("verdana_regular_24", "verdana.ttf", 24);
-		auto verdana_bold_24 = fonts->CreateFont("verdana_bold_24", "verdanab.ttf", 24);
-		auto verdana_italic_24 = fonts->CreateFont("verdana_italic_24", "verdanai.ttf", 24);
-		auto verdana_bold_italic_24 = fonts->CreateFont("verdana_bold_italic_24", "verdanaz.ttf", 24);
-
-
-		/*
-			Fonts (GUI)
-		*/
-
-		//Verdana 12px
-		auto verdana_regular_12 = fonts->CreateFont("verdana_regular_12", "verdana.ttf", 12);
-		auto verdana_bold_12 = fonts->CreateFont("verdana_bold_12", "verdanab.ttf", 12);
-		auto verdana_italic_12 = fonts->CreateFont("verdana_italic_12", "verdanai.ttf", 12);
-		auto verdana_bold_italic_12 = fonts->CreateFont("verdana_bold_italic_12", "verdanaz.ttf", 12);
-
-
-		fonts->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
-		//while (!fonts.Loaded());
-
-
-		/*
-			Type faces
-		*/
-
-		//Verdana 36px
-		auto verdana_36 = 
-			type_faces->CreateTypeFace(
-				"verdana_36",
-				verdana_regular_36,
-				verdana_bold_36,
-				verdana_italic_36,
-				verdana_bold_italic_36);
-
-		//Verdana 24px
-		auto verdana_24 =
-			type_faces->CreateTypeFace(
-				"verdana_24",
-				verdana_regular_24,
-				verdana_bold_24,
-				verdana_italic_24,
-				verdana_bold_italic_24);
-
-
-		/*
-			Type faces (GUI)
-		*/
-
-		//Verdana 12px
-		auto verdana_12 =
-			type_faces->CreateTypeFace(
-				"verdana_12",
-				verdana_regular_12,
-				verdana_bold_12,
-				verdana_italic_12,
-				verdana_bold_italic_12);
-
 		
 		/*
 			Sounds
@@ -1219,224 +1440,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		sounds->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
 		//while (!sounds->Loaded());
 
-
-		/*
-			Material
-		*/
-
-		//Aura
-		auto aura = materials->CreateMaterial("aura",
-			aura_diffuse, nullptr, nullptr, aura_emissive);
-		aura->EmissiveColor(ion::graphics::utilities::color::Pink);
-
-		//Brick wall
-		auto brick_wall = materials->CreateMaterial("brick_wall",
-			brick_wall_diffuse, brick_wall_normal, brick_wall_specular, nullptr);
-		brick_wall->DiffuseColor(ion::graphics::utilities::color::BurlyWood);
-
-		//Cloud
-		auto cloud = materials->CreateMaterial("cloud", cloud_diffuse);
-
-		//Logo
-		auto logo = materials->CreateMaterial("logo", logo_animation);
-		logo->LightingEnabled(false);
-
-		//Pyramid (egyptian)
-		auto pyramid_egyptian = materials->CreateMaterial("pyramid_egyptian",
-			pyramid_egyptian_diffuse, pyramid_egyptian_normal, pyramid_egyptian_specular, nullptr);
-
-		//Pyramid (mayan)
-		auto pyramid_mayan = materials->CreateMaterial("pyramid_mayan",
-			pyramid_mayan_diffuse, pyramid_mayan_normal, pyramid_mayan_specular, nullptr);
-
-		//Raindrop
-		auto raindrop = materials->CreateMaterial("raindrop", raindrop_diffuse);
 		
-		//Ship
-		auto ship = materials->CreateMaterial("ship",
-			ship_diffuse, ship_normal, ship_specular, nullptr);
-		
-		//Star
-		auto star = materials->CreateMaterial("star", star_diffuse);
-		star->LightingEnabled(false);
-
-		auto star_red = materials->CreateMaterial("star_red", star_diffuse, ion::graphics::utilities::color::Red);
-		star_red->LightingEnabled(false);
-
-		auto star_green = materials->CreateMaterial("star_green", star_diffuse, ion::graphics::utilities::color::Green);
-		star_green->LightingEnabled(false);
-
-		auto star_blue = materials->CreateMaterial("star_blue", star_diffuse, ion::graphics::utilities::color::Blue);
-		star_blue->LightingEnabled(false);
-
 		/*
-			Material (GUI)
+			Scene
 		*/
-
-		//Button
-		auto button_center_enabled = materials->CreateMaterial("button_center_enabled", button_center_enabled_diffuse);
-		button_center_enabled->LightingEnabled(false);
-
-		auto button_center_disabled = materials->CreateMaterial("button_center_disabled", button_center_disabled_diffuse);
-		button_center_disabled->LightingEnabled(false);
-
-		auto button_center_pressed = materials->CreateMaterial("button_center_pressed", button_center_pressed_diffuse);
-		button_center_pressed->LightingEnabled(false);
-
-		auto button_center_hovered = materials->CreateMaterial("button_center_hovered", button_center_hovered_diffuse);
-		button_center_hovered->LightingEnabled(false);
-		
-
-		auto button_top_enabled = materials->CreateMaterial("button_top_enabled", button_top_enabled_diffuse);
-		button_top_enabled->LightingEnabled(false);
-
-		auto button_top_focused = materials->CreateMaterial("button_top_focused", button_top_focused_diffuse);
-		button_top_focused->LightingEnabled(false);
-
-		auto button_left_enabled = materials->CreateMaterial("button_left_enabled", button_left_enabled_diffuse);
-		button_left_enabled->LightingEnabled(false);
-
-		auto button_left_focused = materials->CreateMaterial("button_left_focused", button_left_focused_diffuse);
-		button_left_focused->LightingEnabled(false);
-
-
-		auto button_top_left_enabled = materials->CreateMaterial("button_top_left_enabled", button_top_left_enabled_diffuse);
-		button_top_left_enabled->LightingEnabled(false);
-
-		auto button_top_left_focused = materials->CreateMaterial("button_top_left_focused", button_top_left_focused_diffuse);
-		button_top_left_focused->LightingEnabled(false);
-
-		//Check box
-		auto check_box_center_enabled = materials->CreateMaterial("check_box_center_enabled", check_box_center_enabled_diffuse);
-		check_box_center_enabled->LightingEnabled(false);
-
-		auto check_box_center_hovered = materials->CreateMaterial("check_box_center_hovered", check_box_center_hovered_diffuse);
-		check_box_center_hovered->LightingEnabled(false);
-
-
-		auto check_box_mark_enabled = materials->CreateMaterial("check_box_mark_enabled", check_box_mark_enabled_diffuse);
-		check_box_mark_enabled->LightingEnabled(false);
-
-		auto check_box_mark_disabled = materials->CreateMaterial("check_box_mark_disabled", check_box_mark_disabled_diffuse);
-		check_box_mark_disabled->LightingEnabled(false);
-
-		auto check_box_mark_pressed = materials->CreateMaterial("check_box_mark_pressed", check_box_mark_pressed_diffuse);
-		check_box_mark_pressed->LightingEnabled(false);
-
-		auto check_box_mark_hovered = materials->CreateMaterial("check_box_mark_hovered", check_box_mark_hovered_diffuse);
-		check_box_mark_hovered->LightingEnabled(false);
-
-		//Mouse cursor
-		auto mouse_cursor_enabled = materials->CreateMaterial("mouse_cursor", mouse_cursor_diffuse);
-		mouse_cursor_enabled->LightingEnabled(false);
-
-		//Progress bar
-		auto progress_bar_bar_enabled = materials->CreateMaterial("progress_bar_bar_enabled", progress_bar_bar_enabled_diffuse);
-		progress_bar_bar_enabled->LightingEnabled(false);
-
-		//Radio buttons
-		auto radio_button_select_enabled = materials->CreateMaterial("radio_button_select_enabled", radio_button_select_enabled_diffuse);
-		radio_button_select_enabled->LightingEnabled(false);
-
-		auto radio_button_select_disabled = materials->CreateMaterial("radio_button_select_disabled", radio_button_select_disabled_diffuse);
-		radio_button_select_disabled->LightingEnabled(false);
-
-		auto radio_button_select_pressed = materials->CreateMaterial("radio_button_select_pressed", radio_button_select_pressed_diffuse);
-		radio_button_select_pressed->LightingEnabled(false);
-
-		auto radio_button_select_hovered = materials->CreateMaterial("radio_button_select_hovered", radio_button_select_hovered_diffuse);
-		radio_button_select_hovered->LightingEnabled(false);
-
-		//Text box
-		auto text_box_cursor_enabled = materials->CreateMaterial("text_box_cursor_enabled", text_box_cursor_enabled_diffuse);
-		text_box_cursor_enabled->LightingEnabled(false);
-
-		//Tooltip
-		auto tooltip_center_enabled = materials->CreateMaterial("tooltip_center", tooltip_center_diffuse);
-		tooltip_center_enabled->LightingEnabled(false);
-
-
-		auto tooltip_top_enabled = materials->CreateMaterial("tooltip_top", tooltip_top_diffuse);
-		tooltip_top_enabled->LightingEnabled(false);
-
-		auto tooltip_left_enabled = materials->CreateMaterial("tooltip_left", tooltip_left_diffuse);
-		tooltip_left_enabled->LightingEnabled(false);
-
-
-		auto tooltip_top_left_enabled = materials->CreateMaterial("tooltip_top_left", tooltip_top_left_diffuse);
-		tooltip_top_left_enabled->LightingEnabled(false);
-
-
-		/*
-			Particle system
-		*/
-
-		using namespace ion::graphics::utilities;
-
-
-		//Rain
-		auto rain = particle_systems->CreateParticleSystem("rain");
-
-		auto emitter = rain->CreateEmitter(
-			ion::graphics::particles::Emitter::Box(
-				"spawner", vector3::Zero, vector2::NegativeUnitY, {3.56_r, 0.1_r}, {}, 50.0_r, 0.0_r, {}, 100
-			));
-
-		emitter->ParticleVelocity(1.5_r, 2.0_r);
-		emitter->ParticleSize(8.0_r, 24.0_r);
-		emitter->ParticleMass(1.0_r, 1.0_r);
-		emitter->ParticleColor(Color{255, 255, 255, 0.75_r}, color::White);
-		emitter->ParticleLifetime(1.4_sec, 1.4_sec);
-		emitter->ParticleMaterial(raindrop);
-
-
-		/*
-			Text
-		*/
-
-		//FPS
-		auto fps_text =
-			texts->CreateText(
-				"fps",
-				"",
-				verdana_36);
-		fps_text->Formatting(ion::graphics::fonts::text::TextFormatting::None);
-		fps_text->DefaultForegroundColor(color::White);
-
-		//Header
-		auto header_text =
-			texts->CreateText(
-				"header",
-				"<font color='silver'>Powered by</font> <b>the ION game engine</b>",
-				verdana_36);
-		header_text->Alignment(ion::graphics::fonts::text::TextAlignment::Center);
-		header_text->DefaultForegroundColor(color::White);
-
-		//Sub header
-		auto sub_header_text =
-			texts->CreateText(
-				"sub_header",
-				"Press any key to continue...",
-				verdana_24);
-		sub_header_text->Alignment(ion::graphics::fonts::text::TextAlignment::Center);
-		sub_header_text->DefaultForegroundColor(color::DimGray);
-
-
-		/*
-			Text (GUI)
-		*/
-
-		//Caption
-		auto caption_text =
-			texts->CreateText(
-				"caption",
-				"",
-				verdana_12);
-
-		caption_text->DefaultForegroundColor(color::White);
-
-
-		using namespace ion::utilities;
 
 		//Default shader programs
 		scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
@@ -1454,10 +1461,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
 			shader_programs->GetShaderProgram("flat_text_prog"));
 
-		
-		/*
-			Scene
-		*/
 
 		//Aura
 		auto aura_model = scene_manager->CreateModel("ship_aura_model");
@@ -1568,17 +1571,17 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			Scene nodes
 		*/
 
+		//Main camera
+		auto main_camera_node = scene_graph->RootNode().CreateChildNode("main_camera_node");
+		main_camera_node->AttachObject(*main_camera);
+
 		//FPS
 		auto fps_node = scene_graph->RootNode().CreateChildNode({}, {-1.75_r, 0.98_r, -1.5_r});
 		fps_node->Scaling({0.5_r, 0.5_r});
 		fps_node->AttachObject(*fps);
 
-		//Main camera
-		auto main_camera_node = scene_graph->RootNode().CreateChildNode("main_camera_node");
-		main_camera_node->AttachObject(*main_camera);
 
-
-		//Intro node
+		//Intro
 		auto intro_node = scene_graph->RootNode().CreateChildNode("intro_node", {0.0_r, 0.0_r, -2.0_r});
 
 		//Logo
@@ -1595,7 +1598,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		sub_header_node->AttachObject(*sub_header);
 
 
-		//Level node
+		//Level
 		auto level_node = scene_graph->RootNode().CreateChildNode("level_node", {0.0_r, 0.0_r, -5.0_r});
 
 		//Brick wall
@@ -1665,17 +1668,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			Node animations
 		*/
 
-		using namespace ion::graphics::scene::graph::animations;
-
+		//Aura (rotator)
 		auto aura_rotator = aura_node->CreateAnimation("aura_rotator");
 		aura_rotator->AddRotation(math::ToRadians(-90.0_r), 1.0_sec);
 		aura_rotator->Start();
 
+		//Cloud (scaler)
 		auto cloud_scaler = cloud_node->CreateAnimation("cloud_scaler");
 		cloud_scaler->AddScaling(0.25_r, 10.0_sec, 0.0_sec, node_animation::MotionTechniqueType::Sigmoid);
 		cloud_scaler->AddScaling(-0.25_r, 10.0_sec, 10.0_sec, node_animation::MotionTechniqueType::Sigmoid);
 		cloud_scaler->Start();
 
+		//Ship idle (mover)
 		auto ship_idle_mover = ship_node->CreateAnimation("ship_idle_mover");
 		ship_idle_mover->AddTranslation({0.0_r, 0.02_r, 0.0_r}, 2.0_sec);
 		ship_idle_mover->AddTranslation({0.02_r, -0.02_r, 0.0_r}, 2.0_sec, 2.0_sec);
@@ -1684,16 +1688,19 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		ship_idle_mover->AddTranslation({0.02_r, 0.02_r, 0.0_r}, 2.0_sec, 8.0_sec);
 		ship_idle_mover->AddTranslation({0.0_r, -0.02_r, 0.0_r}, 2.0_sec, 10.0_sec);
 
+		//Ship idle (rotator)
 		auto ship_idle_rotator = ship_node->CreateAnimation("ship_idle_rotator");
 		ship_idle_rotator->AddRotation(math::ToRadians(-2.5_r), 2.0_sec, 2.0_sec);
 		ship_idle_rotator->AddRotation(math::ToRadians(2.5_r), 2.0_sec, 4.0_sec);
 		ship_idle_rotator->AddRotation(math::ToRadians(2.5_r), 2.0_sec, 6.0_sec);
 		ship_idle_rotator->AddRotation(math::ToRadians(-2.5_r), 2.0_sec, 8.0_sec);
 
+		//Ship idle
 		auto ship_idle = ship_node->CreateAnimationGroup("ship_idle");
 		ship_idle->Add(ship_idle_mover);
 		ship_idle->Add(ship_idle_rotator);
 
+		//Shop idle (timeline)
 		auto ship_idle_timeline = ship_node->CreateTimeline("ship_idle_timeline", 1.0_r, false);
 		ship_idle_timeline->Attach(ship_idle);
 
