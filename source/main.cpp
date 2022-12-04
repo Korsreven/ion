@@ -1407,7 +1407,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		auto header_text =
 			texts->CreateText(
 				"header",
-				"Powered by <b>the ION game engine</b>",
+				"<font color='silver'>Powered by</font> <b>the ION game engine</b>",
 				verdana_36);
 		header_text->Alignment(ion::graphics::fonts::text::TextAlignment::Center);
 		header_text->DefaultForegroundColor(color::White);
@@ -1462,13 +1462,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		//Aura
 		auto aura_model = scene_manager->CreateModel("ship_aura_model");
 		auto aura_sprite = aura_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			vector3::Zero, {0.432_r, 0.45_r}, aura});
+			{0.432_r, 0.45_r}, aura});
 		aura_sprite->FillOpacity(0.65_r);
 
 		//Brick wall
 		auto background_model = scene_manager->CreateModel("background_model");
 		background_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			vector3::Zero, {1.75_r, 1.75_r}, brick_wall}); //Center
+			{1.75_r, 1.75_r}, brick_wall}); //Center
 		background_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 			{-1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick_wall}); //Left
 		background_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
@@ -1528,7 +1528,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		//Logo
 		auto logo_model = scene_manager->CreateModel("logo_model");
 		logo_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			vector3::Zero, {1.0_r, 0.5_r}, logo});
+			{1.0_r, 0.5_r}, logo});
 		logo_model->AddRenderPass(ion::graphics::render::RenderPass{});
 
 		//Player ear
@@ -1537,12 +1537,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		//Pyramid (egyptian)
 		auto pyramid_egyptian_model = scene_manager->CreateModel();
 		pyramid_egyptian_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			vector3::Zero, {0.5_r, 0.5_r}, pyramid_egyptian});
+			{0.5_r, 0.5_r}, pyramid_egyptian});
 
 		//Pyramid (mayan)
 		auto pyramid_mayan_model = scene_manager->CreateModel();
 		pyramid_mayan_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			vector3::Zero, {0.5_r, 0.5_r}, pyramid_mayan});
+			{0.5_r, 0.5_r}, pyramid_mayan});
 
 		//Rain
 		auto rain_particles = scene_manager->CreateParticleSystem("rain", rain);
@@ -1551,7 +1551,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		//Ship
 		auto ship_model = scene_manager->CreateModel("ship_model");
 		ship_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			vector3::Zero, {0.4_r, 0.4_r}, ship});
+			{0.4_r, 0.4_r}, ship});
 		ship_model->BoundingVolumeExtent({{0.3_r, 0.2_r}, {0.7_r, 0.8_r}});
 		ship_model->QueryFlags(1);
 		ship_model->QueryMask(2 | 4);
@@ -1560,7 +1560,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		//Star
 		auto star_model = scene_manager->CreateModel("ship_star_model");
 		star_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			vector3::Zero, {0.05_r, 0.05_r}, star});
+			{0.05_r, 0.05_r}, star});
 		star_model->AddRenderPass(ion::graphics::render::RenderPass{});
 
 
@@ -1579,35 +1579,35 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 		//Intro node
-		auto intro_node = scene_graph->RootNode().CreateChildNode("intro_node");
+		auto intro_node = scene_graph->RootNode().CreateChildNode("intro_node", {0.0_r, 0.0_r, -2.0_r});
 
 		//Logo
-		auto logo_node = intro_node->CreateChildNode({}, {0.0_r, 0.25_r, -2.0_r});
+		auto logo_node = intro_node->CreateChildNode({}, {0.0_r, 0.25_r, 0.0_r});
 		logo_node->AttachObject(*logo_model);
 
 		//Header
-		auto header_node = intro_node->CreateChildNode({}, {0.0_r, -0.1_r, -2.0_r});
+		auto header_node = intro_node->CreateChildNode({}, {0.0_r, -0.1_r, 0.0_r});
 		header_node->Scaling({0.75_r, 0.75_r});
 		header_node->AttachObject(*header);
 
-		//Header
+		//Sub header
 		auto sub_header_node = header_node->CreateChildNode({}, {0.0_r, -0.25_r, 0.0_r});
 		sub_header_node->AttachObject(*sub_header);
 
 
 		//Level node
-		auto level_node = scene_graph->RootNode().CreateChildNode("level_node");
+		auto level_node = scene_graph->RootNode().CreateChildNode("level_node", {0.0_r, 0.0_r, -5.0_r});
 
 		//Brick wall
-		auto background_node = level_node->CreateChildNode({}, {0.0_r, 0.0_r, -2.25_r});
+		auto background_node = level_node->CreateChildNode({});
 		background_node->AttachObject(*background_model);
 
 		//Cloud
-		auto cloud_node = level_node->CreateChildNode({}, {0.0_r, 0.0_r, -1.6_r});
+		auto cloud_node = level_node->CreateChildNode({}, {0.0_r, 0.0_r, 0.65_r});
 		cloud_node->AttachObject(*cloud_model);	
 
 		//Light (red)
-		auto red_light_node = level_node->CreateChildNode({}, {-1.5_r, -0.75_r, -1.0_r});
+		auto red_light_node = level_node->CreateChildNode({}, {-1.5_r, -0.75_r, 1.25_r});
 		red_light_node->AttachObject(*red_light);
 
 		//Lamp (red)
@@ -1615,7 +1615,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		red_lamp_node->AttachObject(*red_lamp_flicker);
 
 		//Light (green)
-		auto green_light_node = level_node->CreateChildNode({}, {1.5_r, 0.75_r, -1.0_r});
+		auto green_light_node = level_node->CreateChildNode({}, {1.5_r, 0.75_r, 1.25_r});
 		green_light_node->AttachObject(*green_light);
 
 		//Lamp (green)
@@ -1623,20 +1623,20 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		green_lamp_node->AttachObject(*green_lamp_flicker);
 
 		//Pyramid (egyptian)
-		auto pyramid_egyptian_node = level_node->CreateChildNode({}, {1.0_r, 0.5_r, -2.0_r});
+		auto pyramid_egyptian_node = level_node->CreateChildNode({}, {1.0_r, 0.5_r, 0.25_r});
 		pyramid_egyptian_node->AttachObject(*pyramid_egyptian_model);
 
 		//Pyramid (mayan)
-		auto pyramid_mayan_node = level_node->CreateChildNode({}, {-1.0_r, -0.5_r, -2.0_r});
+		auto pyramid_mayan_node = level_node->CreateChildNode({}, {-1.0_r, -0.5_r, 0.25_r});
 		pyramid_mayan_node->AttachObject(*pyramid_mayan_model);
 
 		//Rain
-		auto particle_node = level_node->CreateChildNode({}, {0.0_r, 1.0_r, -1.75_r}, vector2::NegativeUnitY);
+		auto particle_node = level_node->CreateChildNode({}, {0.0_r, 1.0_r, 0.5_r}, vector2::NegativeUnitY);
 		particle_node->AttachObject(*rain_particles);
 
 
 		//Player
-		auto player_node = level_node->CreateChildNode("player_node", {0.0_r, -0.65_r, -1.8_r});
+		auto player_node = level_node->CreateChildNode("player_node", {0.0_r, -0.65_r, 0.45_r});
 
 		//Player camera
 		auto player_cam_node = player_node->CreateChildNode({}, {0.0_r, 0.0_r, 1.8_r});
@@ -2149,6 +2149,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			GUI
 		*/
 
+		auto gui_background = scene_manager->CreateModel();
+		gui_background->CreateMesh(ion::graphics::scene::shapes::Rectangle{
+			{5.25_r, 2.0_r}, Color{0.0_r, 0.0_r, 0.0_r, 0.75_r}});
+		gui_background->AddRenderPass(ion::graphics::render::RenderPass{});
+
+
 		auto mouse_cursor = gui_controller.CreateMouseCursor("mouse_cursor", {});
 		mouse_cursor->ZOrder(1.0_r);
 
@@ -2156,8 +2162,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		tooltip->ZOrder(0.9_r);
 
 		auto main_frame = gui_controller.CreateFrame("main");
+		main_frame->Node()->AttachObject(*gui_background);
+
 		auto base_panel = main_frame->CreatePanel("base");
-		base_panel->ZOrder(0.1_r);
+		base_panel->ZOrder(0.1_r);	
 
 		auto slider = base_panel->CreateSlider("slider", Vector2{1.0_r, 0.077_r}, "My slider", "My slider tooltip");
 		slider->Node()->Position({0.0_r, 0.6_r});
