@@ -52,7 +52,7 @@ struct Game :
 	ion::NonOwningPtr<ion::graphics::scene::DrawableText> fps;
 	ion::types::Cumulative<duration> fps_update_rate{1.0_sec};
 
-	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> intro_node;
+	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> splash_node;
 	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> level_node;
 	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> player_node;
 	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> light_node;
@@ -243,11 +243,11 @@ struct Game :
 	{
 		using namespace ion::graphics::utilities;
 
-		//Intro
-		if (intro_node && intro_node->Visible())
+		//Splash
+		if (splash_node && splash_node->Visible())
 		{
 			//Press any key to continue
-			intro_node->Visible(false);
+			splash_node->Visible(false);
 			level_node->Visible(true);
 			night_runner->Play()->Volume(0.2_r);
 			red_lamp_flicker->Get()->Resume();
@@ -1581,15 +1581,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		fps_node->AttachObject(*fps);
 
 
-		//Intro
-		auto intro_node = scene_graph->RootNode().CreateChildNode("intro_node", {0.0_r, 0.0_r, -2.0_r});
+		//Splash
+		auto splash_node = scene_graph->RootNode().CreateChildNode("splash_node", {0.0_r, 0.0_r, -2.0_r});
 
 		//Logo
-		auto logo_node = intro_node->CreateChildNode({}, {0.0_r, 0.25_r, 0.0_r});
+		auto logo_node = splash_node->CreateChildNode({}, {0.0_r, 0.25_r, 0.0_r});
 		logo_node->AttachObject(*logo_model);
 
 		//Header
-		auto header_node = intro_node->CreateChildNode({}, {0.0_r, -0.1_r, 0.0_r});
+		auto header_node = splash_node->CreateChildNode({}, {0.0_r, -0.1_r, 0.0_r});
 		header_node->Scaling({0.75_r, 0.75_r});
 		header_node->AttachObject(*header);
 
@@ -2281,7 +2281,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	auto red_lamp_flicker = scene_manager->GetSound("red_lamp_flicker");
 	auto green_lamp_flicker = scene_manager->GetSound("green_lamp_flicker");
 	auto fps = scene_manager->GetText("fps");
-	auto intro_node = scene_graph->RootNode().GetChildNode("intro_node");
+	auto splash_node = scene_graph->RootNode().GetChildNode("splash_node");
 	auto level_node = scene_graph->RootNode().GetChildNode("level_node");
 	auto player_node = level_node ? level_node->GetDescendantNode("player_node") : nullptr;
 	auto ship_node = player_node ? player_node->GetChildNode("ship_node") : nullptr;
@@ -2302,7 +2302,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	game.red_lamp_flicker = red_lamp_flicker;
 	game.green_lamp_flicker = green_lamp_flicker;
 	game.fps = fps;
-	game.intro_node = intro_node;
+	game.splash_node = splash_node;
 	game.level_node = level_node;
 	game.player_node = player_node;
 	game.light_node = light_node;
