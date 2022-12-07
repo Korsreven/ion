@@ -743,62 +743,68 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			Textures (GUI)
 		*/
 
+		//Button center
+		auto button_center_atlas = textures->CreateTextureAtlas("button_center", "button_center.png",
+			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat, 2, 2);
+
+		//Check box mark
+		auto check_box_mark_atlas = textures->CreateTextureAtlas("check_box_mark", "check_box_mark.png", 2, 2);
+
+		//Control parts
+		auto control_parts_atlas = textures->CreateTextureAtlas("control_parts", "control_parts.png",
+			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat, 4, 2);
+
+		//Radio button select
+		auto radio_button_select_atlas = textures->CreateTextureAtlas("radio_button_select", "radio_button_select.png", 2, 2);
+
+		//Tooltip parts
+		auto tooltip_parts_atlas = textures->CreateTextureAtlas("tooltip_parts", "tooltip_parts.png",
+			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat, 2, 2);
+
+
 		//Button
-		auto button_center_enabled_diffuse = textures->CreateTexture("button_center_enabled_diffuse", "button_center_enabled.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto button_center_disabled_diffuse = textures->CreateTexture("button_center_disabled_diffuse", "button_center_disabled.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto button_center_pressed_diffuse = textures->CreateTexture("button_center_pressed_diffuse", "button_center_pressed.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto button_center_hovered_diffuse = textures->CreateTexture("button_center_hovered_diffuse", "button_center_hovered.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+		auto button_center_enabled_diffuse = textures->GetTexture("button_center_1");
+		auto button_center_disabled_diffuse = textures->GetTexture("button_center_2");
+		auto button_center_pressed_diffuse = textures->GetTexture("button_center_3");
+		auto button_center_hovered_diffuse = textures->GetTexture("button_center_4");
 
-		auto button_top_enabled_diffuse = textures->CreateTexture("button_top_enabled_diffuse", "button_top_enabled.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto button_top_focused_diffuse = textures->CreateTexture("button_top_focused_diffuse", "button_top_focused.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto button_left_enabled_diffuse = textures->CreateTexture("button_left_enabled_diffuse", "button_left_enabled.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto button_left_focused_diffuse = textures->CreateTexture("button_left_focused_diffuse", "button_left_focused.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+		auto button_top_enabled_diffuse = textures->GetTexture("control_parts_3");
+		auto button_top_focused_diffuse = textures->GetTexture("control_parts_4");
+		auto button_left_enabled_diffuse = textures->GetTexture("control_parts_5");
+		auto button_left_focused_diffuse = textures->GetTexture("control_parts_6");
 
-		auto button_top_left_enabled_diffuse = textures->CreateTexture("button_top_left_enabled_diffuse", "button_top_left_enabled.png");
-		auto button_top_left_focused_diffuse = textures->CreateTexture("button_top_left_focused_diffuse", "button_top_left_focused.png");
+		auto button_top_left_enabled_diffuse = textures->GetTexture("control_parts_7");
+		auto button_top_left_focused_diffuse = textures->GetTexture("control_parts_8");
 
 		//Check box
-		auto check_box_center_enabled_diffuse = textures->CreateTexture("check_box_center_enabled_diffuse", "check_box_center_enabled.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto check_box_center_hovered_diffuse = textures->CreateTexture("check_box_center_hovered_diffuse", "check_box_center_hovered.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
+		auto check_box_center_enabled_diffuse = textures->GetTexture("control_parts_1");
+		auto check_box_center_hovered_diffuse = textures->GetTexture("control_parts_2");
 
-		auto check_box_mark_enabled_diffuse = textures->CreateTexture("check_box_mark_enabled_diffuse", "check_box_mark_enabled.png");
-		auto check_box_mark_disabled_diffuse = textures->CreateTexture("check_box_mark_disabled_diffuse", "check_box_mark_disabled.png");		
-		auto check_box_mark_pressed_diffuse = textures->CreateTexture("check_box_mark_pressed_diffuse", "check_box_mark_pressed.png");
-		auto check_box_mark_hovered_diffuse = textures->CreateTexture("check_box_mark_hovered_diffuse", "check_box_mark_hovered.png");
+		auto check_box_mark_enabled_diffuse = textures->GetTexture("check_box_mark_1");
+		auto check_box_mark_disabled_diffuse = textures->GetTexture("check_box_mark_2");		
+		auto check_box_mark_pressed_diffuse = textures->GetTexture("check_box_mark_3");
+		auto check_box_mark_hovered_diffuse = textures->GetTexture("check_box_mark_4");
 
 		//Mouse cursor
-		auto mouse_cursor_diffuse = textures->CreateTexture("mouse_cursor_diffuse", "mouse_cursor.png");
+		auto mouse_cursor_diffuse = textures->CreateTexture("mouse_cursor", "mouse_cursor.png");
 		
 		//Progress bar
-		auto progress_bar_bar_enabled_diffuse = textures->CreateTexture("progress_bar_bar_enabled_diffuse", "progress_bar_bar_enabled.png");
+		auto progress_bar_diffuse = textures->CreateTexture("progress_bar", "progress_bar.png");
 
 		//Radio button
-		auto radio_button_select_enabled_diffuse = textures->CreateTexture("radio_button_select_enabled_diffuse", "radio_button_select_enabled.png");
-		auto radio_button_select_disabled_diffuse = textures->CreateTexture("radio_button_select_disabled_diffuse", "radio_button_select_disabled.png");
-		auto radio_button_select_pressed_diffuse = textures->CreateTexture("radio_button_select_pressed_diffuse", "radio_button_select_pressed.png");
-		auto radio_button_select_hovered_diffuse = textures->CreateTexture("radio_button_select_hovered_diffuse", "radio_button_select_hovered.png");
+		auto radio_button_select_enabled_diffuse = textures->GetTexture("radio_button_select_1");
+		auto radio_button_select_disabled_diffuse = textures->GetTexture("radio_button_select_2");
+		auto radio_button_select_pressed_diffuse = textures->GetTexture("radio_button_select_3");
+		auto radio_button_select_hovered_diffuse = textures->GetTexture("radio_button_select_4");
 
 		//Text box
-		auto text_box_cursor_enabled_diffuse = textures->CreateTexture("text_box_cursor_enabled_diffuse", "text_box_cursor_enabled.png");
+		auto text_box_cursor_diffuse = textures->CreateTexture("text_box_cursor", "text_box_cursor.png");
 
 		//Tooltip
-		auto tooltip_center_diffuse = textures->CreateTexture("tooltip_center_diffuse", "tooltip_center.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto tooltip_top_diffuse = textures->CreateTexture("tooltip_top_diffuse", "tooltip_top.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto tooltip_left_diffuse = textures->CreateTexture("tooltip_left_diffuse", "tooltip_left.png",
-			ion::graphics::textures::texture::TextureFilter::Bilinear, ion::graphics::textures::texture::TextureWrapMode::Repeat);
-		auto tooltip_top_left_diffuse = textures->CreateTexture("tooltip_top_left_diffuse", "tooltip_top_left.png");	
+		auto tooltip_center_diffuse = textures->GetTexture("tooltip_parts_1");
+		auto tooltip_top_diffuse = textures->GetTexture("tooltip_parts_2");
+		auto tooltip_left_diffuse = textures->GetTexture("tooltip_parts_3");
+		auto tooltip_top_left_diffuse = textures->GetTexture("tooltip_parts_4");	
 
 
 		textures->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
@@ -933,12 +939,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		check_box_mark_hovered->LightingEnabled(false);
 
 		//Mouse cursor
-		auto mouse_cursor_enabled = materials->CreateMaterial("mouse_cursor", mouse_cursor_diffuse);
+		auto mouse_cursor_enabled = materials->CreateMaterial("mouse_cursor_enabled", mouse_cursor_diffuse);
 		mouse_cursor_enabled->LightingEnabled(false);
 
 		//Progress bar
-		auto progress_bar_bar_enabled = materials->CreateMaterial("progress_bar_bar_enabled", progress_bar_bar_enabled_diffuse);
-		progress_bar_bar_enabled->LightingEnabled(false);
+		auto progress_bar_enabled = materials->CreateMaterial("progress_bar_enabled", progress_bar_diffuse);
+		progress_bar_enabled->LightingEnabled(false);
 
 		//Radio buttons
 		auto radio_button_select_enabled = materials->CreateMaterial("radio_button_select_enabled", radio_button_select_enabled_diffuse);
@@ -954,7 +960,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		radio_button_select_hovered->LightingEnabled(false);
 
 		//Text box
-		auto text_box_cursor_enabled = materials->CreateMaterial("text_box_cursor_enabled", text_box_cursor_enabled_diffuse);
+		auto text_box_cursor_enabled = materials->CreateMaterial("text_box_cursor_enabled", text_box_cursor_diffuse);
 		text_box_cursor_enabled->LightingEnabled(false);
 
 		//Tooltip
@@ -1865,7 +1871,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		check_mark_part.Disabled = check_box_mark_disabled;
 		check_mark_part.Pressed = check_box_mark_pressed;
 		check_mark_part.Hovered = check_box_mark_hovered;
-		check_mark_part.Scaling = 0.6_r;
+		check_mark_part.Scaling = 0.5_r;
 
 		auto check_box_skin = theme->CreateSkin<ion::gui::controls::GuiCheckBox>(parts, caption_part, sound_parts);
 		check_box_skin->AddPart("check-mark", check_mark_part); //Additional
@@ -1974,11 +1980,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		caption_part.Disabled = caption_style_disabled;
 
 		ion::gui::skins::gui_skin::SkinPart bar_part;
-		bar_part.Enabled = progress_bar_bar_enabled;
+		bar_part.Enabled = progress_bar_enabled;
 		bar_part.FillColor.A(0.35_r);
 
 		ion::gui::skins::gui_skin::SkinPart bar_interpolated_part;
-		bar_interpolated_part.Enabled = progress_bar_bar_enabled;
+		bar_interpolated_part.Enabled = progress_bar_enabled;
 		bar_interpolated_part.FillColor.A(0.65_r);
 
 		auto progress_bar_skin = theme->CreateSkin<ion::gui::controls::GuiProgressBar>(parts, caption_part);
@@ -2026,7 +2032,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		check_mark_part.Disabled = radio_button_select_disabled;
 		check_mark_part.Pressed = radio_button_select_pressed;
 		check_mark_part.Hovered = radio_button_select_hovered;
-		check_mark_part.Scaling = 0.6_r;
+		check_mark_part.Scaling = 0.3_r;
 
 		auto radio_button_skin = theme->CreateSkin<ion::gui::controls::GuiRadioButton>(parts, caption_part, sound_parts);
 		radio_button_skin->AddPart("check-mark", check_mark_part); //Additional
@@ -2073,7 +2079,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		handle_part.Disabled = radio_button_select_disabled;
 		handle_part.Pressed = radio_button_select_pressed;
 		handle_part.Hovered = radio_button_select_hovered;
-		handle_part.Scaling = {0.75_r, 1.5_r};
+		handle_part.Scaling = {0.4_r, 0.8_r};
 
 		auto slider_skin = theme->CreateSkin<ion::gui::controls::GuiSlider>(parts, caption_part, sound_parts);
 		slider_skin->AddPart("handle", handle_part); //Additional
