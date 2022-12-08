@@ -13,7 +13,6 @@ File:	IonTextureManager.cpp
 #include "IonTextureManager.h"
 
 #include <algorithm>
-#include <tuple>
 
 #include "graphics/IonGraphicsAPI.h"
 #include "FreeImage/FreeImage.h"
@@ -51,6 +50,80 @@ int max_array_texture_layers() noexcept
 }
 
 
+std::pair<int, int> power_of_two_adjusted_size(int width, int height,
+	NpotSampling npot_sampling, std::optional<NpotResampleFit> npot_resample_fit) noexcept
+{
+	auto aspect_ratio = static_cast<real>(width) / height;
+
+	//Clamp texture size
+	if (width > max_texture_size() || height > max_texture_size())
+	{
+		if (width > height)
+		{
+			width = max_texture_size();
+			height = static_cast<int>(width / aspect_ratio);
+		}
+		else
+		{
+			height = max_texture_size();
+			width = static_cast<int>(height * aspect_ratio);
+		}
+	}
+	else
+	{
+		auto pot_width = static_cast<int>(make_power_of_two(width, npot_sampling));
+		auto pot_height = static_cast<int>(make_power_of_two(height, npot_sampling));
+
+		if (!npot_resample_fit)
+			npot_resample_fit =
+				[&]() noexcept
+				{
+					//Choose minimum npot->pot difference
+					if (std::abs(width - pot_width) < std::abs(height - pot_height))
+						return NpotResampleFit::Horizontally;
+					else
+						return NpotResampleFit::Vertically;
+				}();
+
+		switch (*npot_resample_fit)
+		{
+			case NpotResampleFit::Horizontally:
+			{
+				width = pot_width;
+				height = static_cast<int>(width / aspect_ratio);
+				break;
+			}
+
+			case NpotResampleFit::Vertically:
+			{
+				height = pot_height;
+				width = static_cast<int>(height * aspect_ratio);
+				break;
+			}
+		}
+	}
+
+	return std::pair{width, height};
+}
+
+std::tuple<int, int, int, int> power_of_two_padding(int width, int height) noexcept
+{
+	if (auto padding_width = upper_power_of_two(width) - width,
+			 padding_height = upper_power_of_two(height) - height; padding_width > 0 || padding_height > 0)
+	{
+		//Pad left and right
+		auto padding_half_width = padding_width > 0 ? padding_width / 2 : 0;
+
+		//Pad top and bottom
+		auto padding_half_height = padding_height > 0 ? padding_height / 2 : 0;
+
+		return std::tuple{padding_half_width, padding_half_height,
+			padding_half_width + padding_width % 2, padding_half_height + padding_height % 2};
+	}
+	else
+		return std::tuple{0, 0, 0, 0};
+}
+
 void enlarge_canvas(std::string &pixel_data, int left, int bottom, const texture::TextureExtents &extents) noexcept
 {
 	auto color_bytes = extents.BitDepth / 8;
@@ -71,11 +144,12 @@ void enlarge_canvas(std::string &pixel_data, int left, int bottom, const texture
 		);
 }
 
+
 std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 	const std::string &file_data, const std::filesystem::path &file_path,
 	texture::TextureFilter min_filter, texture::TextureFilter mag_filter,
-	std::optional<NpotScale> npot_scale, std::optional<NpotScaleFit> npot_scale_fit,
-	NpotScaleResampling npot_scale_resampling)
+	std::optional<NpotResizing> npot_resizing, NpotSampling npot_sampling,
+	std::optional<NpotResampleFit> npot_resample_fit, NpotResampleFilter npot_resample_filter)
 {
 	auto stream = FreeImage_OpenMemory(
 		reinterpret_cast<BYTE*>(const_cast<char*>(std::data(file_data))),
@@ -110,15 +184,16 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 	extents.BitDepth = bit_depth;
 
 	//Make sure texture is power of two
-	if (npot_scale || !has_support_for_non_power_of_two_textures())
+	if (npot_resizing || !has_support_for_non_power_of_two_textures())
 	{
 		auto width = extents.Width;
 		auto height = extents.Height;
-		auto [new_width , new_height] =
-			power_of_two_adjusted_size(width, height,
-				npot_scale.value_or(NpotScale::ToNearest), npot_scale_fit);
+		auto [new_width, new_height] =
+			npot_resizing == NpotResizing::ResampleImage ?
+			power_of_two_adjusted_size(width, height, npot_sampling, npot_resample_fit) :
+			std::pair{width, height};
 
-		//Rescale is needed (new size is different)
+		//Resample is needed (new size is different)
 		if (new_width != width || new_height != height)
 		{
 			auto resampling_filter =
@@ -132,15 +207,24 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 						case texture::TextureFilter::Bilinear:
 						default:
 						{
-							switch (npot_scale_resampling)
+							switch (npot_resample_filter)
 							{
-								case NpotScaleResampling::Bicubic:
+								case NpotResampleFilter::Box:
+								return FILTER_BOX;
+
+								case NpotResampleFilter::Bicubic:
 								return FILTER_BICUBIC;
 
-								case NpotScaleResampling::Lanczos3:
+								case NpotResampleFilter::BSpline:
+								return FILTER_BSPLINE;
+
+								case NpotResampleFilter::CatmullRom:
+								return FILTER_CATMULLROM;
+
+								case NpotResampleFilter::Lanczos3:
 								return FILTER_LANCZOS3;
 
-								case NpotScaleResampling::Bilinear:
+								case NpotResampleFilter::Bilinear:
 								default:
 								return FILTER_BILINEAR;
 							}
@@ -160,7 +244,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 						return resampling_filter(mag_filter);
 				}();
 
-			//Rescale
+			//Resample
 			{
 				auto dst_bitmap = FreeImage_Rescale(bitmap, new_width, new_height, image_filter);
 				FreeImage_Unload(bitmap);
@@ -171,7 +255,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 				return {};
 		}
 
-		//Enlarge canvas is needed (one dimension is npot)
+		//Enlarge canvas if one or both dimensions are npot
 		if (auto [left, top, right, bottom] = detail::power_of_two_padding(new_width, new_height);
 			left + top + right + bottom > 0)
 		{
@@ -206,6 +290,10 @@ std::optional<texture::TextureHandle> load_texture(const std::string &pixel_data
 	texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
 	texture::TextureWrapMode s_wrap_mode, texture::TextureWrapMode t_wrap_mode) noexcept
 {
+	if (extents.ActualWidth > max_texture_size() ||
+		extents.ActualHeight > max_texture_size())
+		return {}; //Max texture limit reached
+
 	texture::TextureHandle texture_handle;
 	glGenTextures(1, reinterpret_cast<unsigned int*>(&texture_handle.Id));
 	glBindTexture(GL_TEXTURE_2D, texture_handle.Id);
@@ -352,7 +440,7 @@ void next_sub_texture_position(std::pair<int, int> &position, int rows, int colu
 
 std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_texture(
 	const TextureAtlas &texture_atlas, const std::pair<int, int> &position,
-	std::optional<NpotScale> npot_scale) noexcept
+	std::optional<NpotResizing> npot_resizing) noexcept
 {
 	auto &atlas_extents = *texture_atlas.Extents();
 	auto color_bytes = atlas_extents.BitDepth / 8;
@@ -366,7 +454,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 		return {};
 
 	//Make sure sub texture is power of two
-	if (npot_scale || !has_support_for_non_power_of_two_textures())
+	if (npot_resizing || !has_support_for_non_power_of_two_textures())
 	{
 		sub_extents.ActualWidth = upper_power_of_two(sub_extents.Width);
 		sub_extents.ActualHeight = upper_power_of_two(sub_extents.Height);
@@ -383,7 +471,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 	std::string sub_pixel_data(sub_extents.ActualWidth * sub_extents.ActualHeight * color_bytes, '\0');
 	
 	auto [left, top, right, bottom] =
-		npot_scale || !has_support_for_non_power_of_two_textures() ?
+		npot_resizing || !has_support_for_non_power_of_two_textures() ?
 		detail::power_of_two_padding(sub_extents.Width, sub_extents.Height) :
 		std::tuple{0, 0, 0, 0};
 	auto x = sub_extents.Width * (position.second - 1) + left;
@@ -471,8 +559,8 @@ bool TextureManager::PrepareResource(Texture &texture)
 			detail::prepare_texture(
 				*texture.FileData(), *texture.FilePath(),
 				texture.MinFilter(), texture.MagFilter(),
-				texture_npot_scale_, texture_npot_scale_fit_,
-				texture_npot_scale_resampling_); texture_data)
+				texture_npot_resizing_, texture_npot_sampling_,
+				texture_npot_resample_fit_, texture_npot_resample_filter_); texture_data)
 		{
 			auto &[pixel_data, extents] = *texture_data;
 			texture.PixelData(std::move(pixel_data), extents);
@@ -495,7 +583,7 @@ bool TextureManager::LoadResource(Texture &texture)
 			if (auto texture_data =
 				detail::prepare_sub_texture(
 					*atlas_region->Atlas, atlas_region->Position,
-					texture_npot_scale_); texture_data)
+					texture_npot_resizing_); texture_data)
 			{
 				auto &[pixel_data, extents] = *texture_data;
 				texture.PixelData(std::move(pixel_data), extents);

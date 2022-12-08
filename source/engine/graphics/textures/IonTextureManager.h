@@ -19,6 +19,7 @@ File:	IonTextureManager.h
 #include <optional>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <utility>
 
 #include "IonTexture.h"
@@ -35,23 +36,32 @@ namespace ion::graphics::textures
 {
 	namespace texture_manager
 	{
-		enum class NpotScale
+		enum class NpotResizing : bool
 		{
-			ToNearest,
-			ToLarger,
-			ToSmaller
+			ResizeCanvas,
+			ResampleImage
 		};
 
-		enum class NpotScaleFit : bool
+		enum class NpotSampling
+		{
+			Nearest,
+			Up,
+			Down
+		};
+
+		enum class NpotResampleFit : bool
 		{
 			Horizontally,
 			Vertically
 		};
 
-		enum class NpotScaleResampling
+		enum class NpotResampleFilter
 		{
-			Bilinear,
+			Box,
 			Bicubic,
+			Bilinear,
+			BSpline,
+			CatmullRom,
 			Lanczos3
 		};
 
@@ -98,17 +108,17 @@ namespace ion::graphics::textures
 				return x - lower < upper - x ? lower : upper;
 			}
 
-			constexpr auto make_power_of_two(uint32 x, NpotScale npot_scale) noexcept
+			constexpr auto make_power_of_two(uint32 x, NpotSampling npot_sampling) noexcept
 			{
-				switch (npot_scale)
+				switch (npot_sampling)
 				{
-					case NpotScale::ToLarger:
+					case NpotSampling::Up:
 					return upper_power_of_two(x);
 
-					case NpotScale::ToSmaller:
+					case NpotSampling::Down:
 					return lower_power_of_two(x);
 
-					case NpotScale::ToNearest:
+					case NpotSampling::Nearest:
 					default:
 					return nearest_power_of_two(x);
 				}
@@ -120,94 +130,18 @@ namespace ion::graphics::textures
 			}
 
 
-			inline auto power_of_two_adjusted_size(int width, int height,
-				NpotScale npot_scale, std::optional<NpotScaleFit> npot_scale_fit) noexcept
-			{
-				auto aspect_ratio = static_cast<real>(width) / height;
-
-				//Max texture limit reached
-				if (width > max_texture_size() || height > max_texture_size())
-				{
-					if (width > height)
-					{
-						width = max_texture_size();
-						height = static_cast<int>(width / aspect_ratio);
-					}
-					else
-					{
-						height = max_texture_size();
-						width = static_cast<int>(height * aspect_ratio);
-					}
-				}
-				else
-				{
-					auto pot_width = static_cast<int>(make_power_of_two(width, npot_scale));
-					auto pot_height = static_cast<int>(make_power_of_two(height, npot_scale));
-
-					if (!npot_scale_fit)
-						npot_scale_fit =
-							[&]() noexcept
-							{
-								//Choose minimum npot->pot difference
-								if (std::abs(width - pot_width) < std::abs(height - pot_height))
-									return NpotScaleFit::Horizontally;
-								else
-									return NpotScaleFit::Vertically;
-							}();
-
-					switch (*npot_scale_fit)
-					{
-						case NpotScaleFit::Horizontally:
-						{
-							width = pot_width;
-							height = static_cast<int>(width / aspect_ratio);
-							break;
-						}
-
-						case NpotScaleFit::Vertically:
-						{
-							height = pot_height;
-							width = static_cast<int>(height * aspect_ratio);
-							break;
-						}
-					}
-				}
-
-				return std::pair{width, height};
-			}
-
-			inline auto power_of_two_padding(int width, int height) noexcept
-			{
-				if (auto is_width_pot = is_power_of_two(width),
-						 is_height_pot = is_power_of_two(height); !is_width_pot || !is_height_pot)
-				{
-					//Pad left and right
-					if (!is_width_pot)
-					{
-						auto padding_width = static_cast<int>(upper_power_of_two(width)) - width;
-						auto padding_half_width = padding_width / 2;
-						return std::tuple{padding_half_width, 0, padding_half_width + padding_width % 2, 0};
-					}
-					//Pad top and bottom
-					else
-					{
-						auto padding_height = static_cast<int>(upper_power_of_two(height)) - height;
-						auto padding_half_height = padding_height / 2;
-						return std::tuple{0, padding_half_height, 0, padding_half_height + padding_height % 2};
-					}
-				}
-				else
-					return std::tuple{0, 0, 0, 0};
-			}
-
+			std::pair<int, int> power_of_two_adjusted_size(int width, int height,
+				NpotSampling npot_sampling, std::optional<NpotResampleFit> npot_resample_fit) noexcept;
+			std::tuple<int, int, int, int> power_of_two_padding(int width, int height) noexcept;
 
 			void enlarge_canvas(std::string &pixel_data, int left, int bottom, const texture::TextureExtents &extents) noexcept;
+
 
 			std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 				const std::string &file_data, const std::filesystem::path &file_path,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter,
-				std::optional<NpotScale> npot_scale, std::optional<NpotScaleFit> npot_scale_fit,
-				NpotScaleResampling npot_scale_resampling);
+				std::optional<NpotResizing> npot_resizing, NpotSampling npot_sampling,
+				std::optional<NpotResampleFit> npot_resample_fit, NpotResampleFilter npot_resample_filter);
 
 			std::optional<texture::TextureHandle> load_texture(const std::string &pixel_data, const texture::TextureExtents &extents,
 				texture::TextureFilter min_filter, texture::TextureFilter mag_filter, std::optional<texture::MipmapFilter> mip_filter,
@@ -225,7 +159,7 @@ namespace ion::graphics::textures
 
 			std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_texture(
 				const TextureAtlas &texture_atlas, const std::pair<int, int> &position,
-				std::optional<NpotScale> npot_scale) noexcept;
+				std::optional<NpotResizing> npot_resizing) noexcept;
 
 			///@}
 		} //detail
@@ -238,9 +172,10 @@ namespace ion::graphics::textures
 	{
 		private:
 
-			std::optional<texture_manager::NpotScale> texture_npot_scale_ = texture_manager::NpotScale::ToNearest;
-			std::optional<texture_manager::NpotScaleFit> texture_npot_scale_fit_;
-			texture_manager::NpotScaleResampling texture_npot_scale_resampling_ = texture_manager::NpotScaleResampling::Bilinear;
+			std::optional<texture_manager::NpotResizing> texture_npot_resizing_ = texture_manager::NpotResizing::ResizeCanvas;
+			texture_manager::NpotSampling texture_npot_sampling_ = texture_manager::NpotSampling::Nearest;
+			std::optional<texture_manager::NpotResampleFit> texture_npot_resample_fit_;
+			texture_manager::NpotResampleFilter texture_npot_resample_filter_ = texture_manager::NpotResampleFilter::Bilinear;
 
 
 			template <typename... Args>
@@ -340,22 +275,28 @@ namespace ion::graphics::textures
 				@{
 			*/
 
-			///@brief Sets the texture scale used by this manager to the given value
-			inline void TextureNpotScale(std::optional<texture_manager::NpotScale> npot_scale) noexcept
+			///@brief Sets the texture resizing used by this manager to the given value
+			inline void TextureNpotResizing(std::optional<texture_manager::NpotResizing> npot_resizing) noexcept
 			{
-				texture_npot_scale_ = npot_scale;
+				texture_npot_resizing_ = npot_resizing;
 			}	
 
-			///@brief Sets the texture scale fit used by this manager to the given value
-			inline void TextureNpotScaleFit(std::optional<texture_manager::NpotScaleFit> npot_scale_fit) noexcept
+			///@brief Sets the texture sampling used by this manager to the given value
+			inline void TextureNpotSampling(texture_manager::NpotSampling npot_sampling) noexcept
 			{
-				texture_npot_scale_fit_ = npot_scale_fit;
+				texture_npot_sampling_ = npot_sampling;
+			}	
+
+			///@brief Sets the texture resample fit used by this manager to the given value
+			inline void TextureNpotResampleFit(std::optional<texture_manager::NpotResampleFit> npot_resample_fit) noexcept
+			{
+				texture_npot_resample_fit_ = npot_resample_fit;
 			}
 
-			///@brief Sets the texture scale resampling used by this manager to the given value
-			inline void TextureNpotScaleResampling(texture_manager::NpotScaleResampling npot_scale_resampling) noexcept
+			///@brief Sets the texture resample filter used by this manager to the given value
+			inline void TextureNpotResampleFilter(texture_manager::NpotResampleFilter npot_resample_filter) noexcept
 			{
-				texture_npot_scale_resampling_ = npot_scale_resampling;
+				texture_npot_resample_filter_ = npot_resample_filter;
 			}
 
 			///@}
@@ -365,24 +306,30 @@ namespace ion::graphics::textures
 				@{
 			*/
 
-			///@brief Returns the texture scale used by this manager when converting from NPOT to POT
-			///@details Returns nullopt if NPOT textures should not be scaled to POT
-			[[nodiscard]] inline auto& TextureNpotScale() const noexcept
+			///@brief Returns the texture resizing used by this manager when resizing from NPOT to POT
+			///@details Returns nullopt if NPOT textures should not be resized to POT
+			[[nodiscard]] inline auto& TextureNpotResizing() const noexcept
 			{
-				return texture_npot_scale_;
+				return texture_npot_resizing_;
 			}
 
-			///@brief Returns the texture scale fit used by this manager when converting from NPOT to POT
+			///@brief Returns the texture sampling used by this manager when resampling from NPOT to POT
+			[[nodiscard]] inline auto& TextureNpotSampling() const noexcept
+			{
+				return texture_npot_sampling_;
+			}
+
+			///@brief Returns the texture resample fit used by this manager when resampling from NPOT to POT
 			///@details Returns nullopt if best fit is automatically calculated
-			[[nodiscard]] inline auto& TextureNpotScaleFit() const noexcept
+			[[nodiscard]] inline auto& TextureNpotResampleFit() const noexcept
 			{
-				return texture_npot_scale_fit_;
+				return texture_npot_resample_fit_;
 			}
 
-			///@brief Returns the texture scale resampling used by this manager when converting from NPOT to POT
-			[[nodiscard]] inline auto TextureNpotScaleResampling() const noexcept
+			///@brief Returns the texture resample filter used by this manager when resampling from NPOT to POT
+			[[nodiscard]] inline auto TextureNpotResampleFilter() const noexcept
 			{
-				return texture_npot_scale_resampling_;
+				return texture_npot_resample_filter_;
 			}		
 
 			///@}
