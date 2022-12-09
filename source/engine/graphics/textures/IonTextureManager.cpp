@@ -124,7 +124,7 @@ std::tuple<int, int, int, int> power_of_two_padding(int width, int height) noexc
 		return std::tuple{0, 0, 0, 0};
 }
 
-void enlarge_canvas(std::string &pixel_data, int left, int bottom, const texture::TextureExtents &extents) noexcept
+void enlarge_canvas(std::string &pixel_data, int left, int top, const texture::TextureExtents &extents) noexcept
 {
 	auto color_bytes = extents.BitDepth / 8;
 
@@ -132,7 +132,7 @@ void enlarge_canvas(std::string &pixel_data, int left, int bottom, const texture
 	pixel_data.assign(std::size(pixel_data), '\0');
 
 	for (auto from = 0,
-		to = extents.ActualWidth * bottom * color_bytes + left * color_bytes,
+		to = extents.ActualWidth * top * color_bytes + left * color_bytes,
 		size = std::ssize(pixels); from < size;
 		from += extents.Width * color_bytes,
 		to += extents.ActualWidth * color_bytes)
@@ -469,13 +469,19 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 
 	//Allocate required bytes for the sub texture
 	std::string sub_pixel_data(sub_extents.ActualWidth * sub_extents.ActualHeight * color_bytes, '\0');
-	
-	auto [left, top, right, bottom] =
+
+	auto [atlas_left, atlas_top, atlas_right, atlas_bottom] =
+		npot_resizing || !has_support_for_non_power_of_two_textures() ?
+		detail::power_of_two_padding(atlas_extents.Width, atlas_extents.Height) :
+		std::tuple{0, 0, 0, 0};
+	auto [sub_left, sub_top, sub_right, sub_bottom] =
 		npot_resizing || !has_support_for_non_power_of_two_textures() ?
 		detail::power_of_two_padding(sub_extents.Width, sub_extents.Height) :
 		std::tuple{0, 0, 0, 0};
-	auto x = sub_extents.Width * (position.second - 1) + left;
-	auto y = sub_extents.Height * (texture_atlas.Rows() - position.first) + bottom;
+
+	auto x = sub_extents.Width * (position.second - 1) + atlas_left;
+	auto y = sub_extents.Height * (texture_atlas.Rows() - position.first) + atlas_bottom +
+		(atlas_extents.Height - (sub_extents.Height * texture_atlas.Rows()));
 
 	if (gl::HasGL(gl::Version::v4_5))
 	{
@@ -495,7 +501,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 		if (sub_extents.Width * sub_extents.Height <
 			sub_extents.ActualWidth * sub_extents.ActualHeight)
 
-			enlarge_canvas(sub_pixel_data, left, bottom, sub_extents);
+			enlarge_canvas(sub_pixel_data, sub_left, sub_top, sub_extents);
 	}
 	else
 	{
@@ -532,7 +538,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 		if (sub_extents.Width * sub_extents.Height <
 			sub_extents.ActualWidth * sub_extents.ActualHeight)
 
-			enlarge_canvas(sub_pixel_data, left, bottom, sub_extents);
+			enlarge_canvas(sub_pixel_data, sub_left, sub_top, sub_extents);
 	}
 
 	return std::pair{std::move(sub_pixel_data), sub_extents};
