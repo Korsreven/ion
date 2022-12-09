@@ -323,6 +323,19 @@ namespace ion::gui
 			///@brief Sets the theme used by this controller to the theme with the given name
 			void ActiveTheme(std::string_view name) noexcept;
 
+
+			///@brief Sets the default viewport for this controller to the given viewport
+			inline void DefaultViewport(NonOwningPtr<graphics::render::Viewport> default_viewport) noexcept
+			{
+				default_viewport_ = default_viewport;
+			}
+
+			///@brief Sets the default sound channel group for this controller to the given sound channel group
+			inline void DefaultSoundChannelGroup(NonOwningPtr<sounds::SoundChannelGroup> default_sound_channel_group) noexcept
+			{
+				default_sound_channel_group_ = default_sound_channel_group;
+			}
+
 			///@}
 
 			/**
@@ -364,7 +377,7 @@ namespace ion::gui
 			}
 
 
-			///@brief Returns the default viewport for this controller
+			///@brief Returns a pointer to the default viewport for this controller
 			///@details Returns nullptr if this controller does not have a default viewport
 			[[nodiscard]] inline auto DefaultViewport() const noexcept
 			{
