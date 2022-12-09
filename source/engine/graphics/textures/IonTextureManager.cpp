@@ -106,10 +106,10 @@ std::pair<int, int> power_of_two_adjusted_size(int width, int height,
 	return std::pair{width, height};
 }
 
-std::tuple<int, int, int, int> power_of_two_padding(int width, int height) noexcept
+std::tuple<int, int, int, int> padding(int width, int height, int actual_width, int actual_height) noexcept
 {
-	if (auto padding_width = upper_power_of_two(width) - width,
-			 padding_height = upper_power_of_two(height) - height; padding_width > 0 || padding_height > 0)
+	if (auto padding_width = actual_width - width,
+			 padding_height = actual_height - height; padding_width > 0 || padding_height > 0)
 	{
 		//Pad left and right
 		auto padding_half_width = padding_width > 0 ? padding_width / 2 : 0;
@@ -124,7 +124,12 @@ std::tuple<int, int, int, int> power_of_two_padding(int width, int height) noexc
 		return std::tuple{0, 0, 0, 0};
 }
 
-void enlarge_canvas(std::string &pixel_data, int left, int top, const texture::TextureExtents &extents) noexcept
+std::tuple<int, int, int, int> power_of_two_padding(int width, int height) noexcept
+{
+	return padding(width, height, upper_power_of_two(width), upper_power_of_two(height));
+}
+
+void enlarge_canvas(std::string &pixel_data, int left, int bottom, const texture::TextureExtents &extents) noexcept
 {
 	auto color_bytes = extents.BitDepth / 8;
 
@@ -132,7 +137,7 @@ void enlarge_canvas(std::string &pixel_data, int left, int top, const texture::T
 	pixel_data.assign(std::size(pixel_data), '\0');
 
 	for (auto from = 0,
-		to = extents.ActualWidth * top * color_bytes + left * color_bytes,
+		to = extents.ActualWidth * bottom * color_bytes + left * color_bytes,
 		size = std::ssize(pixels); from < size;
 		from += extents.Width * color_bytes,
 		to += extents.ActualWidth * color_bytes)
@@ -261,7 +266,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
 		{
 			//Enlarge canvas
 			{
-				auto color = RGBQUAD{0xFF, 0xFF, 0xFF, 0x00};
+				auto color = RGBQUAD{0xFF, 0xFF, 0xFF, 0x00}; //BGRA
 				auto dst_bitmap = FreeImage_EnlargeCanvas(bitmap, left, top, right, bottom, &color,
 					bit_depth == 32 ? FI_COLOR_IS_RGBA_COLOR : FI_COLOR_IS_RGB_COLOR);
 				FreeImage_Unload(bitmap);
@@ -501,7 +506,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 		if (sub_extents.Width * sub_extents.Height <
 			sub_extents.ActualWidth * sub_extents.ActualHeight)
 
-			enlarge_canvas(sub_pixel_data, sub_left, sub_top, sub_extents);
+			enlarge_canvas(sub_pixel_data, sub_left, sub_bottom, sub_extents);
 	}
 	else
 	{
@@ -538,7 +543,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 		if (sub_extents.Width * sub_extents.Height <
 			sub_extents.ActualWidth * sub_extents.ActualHeight)
 
-			enlarge_canvas(sub_pixel_data, sub_left, sub_top, sub_extents);
+			enlarge_canvas(sub_pixel_data, sub_left, sub_bottom, sub_extents);
 	}
 
 	return std::pair{std::move(sub_pixel_data), sub_extents};

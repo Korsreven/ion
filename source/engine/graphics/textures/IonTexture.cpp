@@ -12,6 +12,7 @@ File:	IonTexture.cpp
 
 #include "IonTexture.h"
 
+#include "IonTextureManager.h"
 #include "graphics/IonGraphicsAPI.h"
 #include "types/IonTypes.h"
 
@@ -132,9 +133,12 @@ std::optional<std::pair<Vector2, Vector2>> Texture::TexCoords() const noexcept
 {
 	if (extents_)
 	{
-		auto delta_x = (1.0_r - static_cast<real>(extents_->Width) / extents_->ActualWidth) * 0.5_r;
-		auto delta_y = (1.0_r - static_cast<real>(extents_->Height) / extents_->ActualHeight) * 0.5_r;
-		return std::pair{Vector2{delta_x, delta_y}, Vector2{1.0_r - delta_x, 1.0_r - delta_y}};
+		auto [left, top, right, bottom] =
+			texture_manager::detail::padding(extents_->Width, extents_->Height, extents_->ActualWidth, extents_->ActualHeight);
+
+		auto w = static_cast<real>(extents_->ActualWidth);
+		auto h = static_cast<real>(extents_->ActualHeight);
+		return std::pair{Vector2{left / w, bottom / h}, Vector2{1.0_r - right / w, 1.0_r - top / h}};
 	}
 	else
 		return {};

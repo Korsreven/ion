@@ -132,9 +132,11 @@ namespace ion::graphics::textures
 
 			std::pair<int, int> power_of_two_adjusted_size(int width, int height,
 				NpotSampling npot_sampling, std::optional<NpotResampleFit> npot_resample_fit) noexcept;
+			
+			std::tuple<int, int, int, int> padding(int width, int height, int actual_width, int actual_height) noexcept;
 			std::tuple<int, int, int, int> power_of_two_padding(int width, int height) noexcept;
 
-			void enlarge_canvas(std::string &pixel_data, int left, int top, const texture::TextureExtents &extents) noexcept;
+			void enlarge_canvas(std::string &pixel_data, int left, int bottom, const texture::TextureExtents &extents) noexcept;
 
 
 			std::optional<std::pair<std::string, texture::TextureExtents>> prepare_texture(
