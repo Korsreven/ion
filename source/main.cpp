@@ -55,7 +55,7 @@ struct Game :
 	ion::gui::GuiController *gui_controller = nullptr;
 	ion::sounds::SoundManager *sound_manager = nullptr;
 
-	ion::NonOwningPtr<ion::sounds::Sound> night_runner;
+	ion::NonOwningPtr<ion::sounds::Sound> sound_track;
 	ion::NonOwningPtr<ion::graphics::scene::MovableSound> red_lamp_flicker;
 	ion::NonOwningPtr<ion::graphics::scene::MovableSound> green_lamp_flicker;
 
@@ -264,8 +264,8 @@ struct Game :
 			if (level_node)
 				level_node->Visible(true);
 
-			if (night_runner)
-				night_runner->Play()->Volume(0.2_r);
+			if (sound_track)
+				sound_track->Play()->Volume(0.1_r);
 
 			if (auto &channel = red_lamp_flicker->Get(); channel)
 				channel->Resume();
@@ -536,11 +536,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 
 	//GUI
-	ion::gui::GuiController gui_controller{scene_graph->RootNode(),
-		viewport, sounds->GetSoundChannelGroup("gui")};
+	ion::gui::GuiController gui_controller{scene_graph->RootNode(), viewport};
 	gui_controller.ZOrder(-2.0_r);
 	auto gui_scene_manager = scene_graph->CreateSceneManager();
-	
 
 	//Initialize from script files
 	if (init_from_script)
@@ -1113,6 +1111,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		emitter->ParticleLifetime(1.4_sec, 1.4_sec);
 		emitter->ParticleMaterial(raindrop);
 
+		rain->CreateAffector<ion::graphics::particles::affectors::LinearForce>(
+			"wind", ion::graphics::particles::affectors::linear_force::ForceType::Add, Vector2{0.5_r, 0.0_r});
+
 
 		/*
 			Shaders
@@ -1447,7 +1448,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			ion::sounds::sound::SoundType::Sample, ion::sounds::sound::SoundLoopingMode::Forward));
 		flicker->Distance(0.4_r); //Min distance of 10 meters
 
-		auto night_runner = sounds->CreateSound("night_runner", "night_runner.mp3",
+		auto sound_track = sounds->CreateSound("sound_track", "sound_track.mp3",
 			ion::sounds::sound::SoundType::Stream, ion::sounds::sound::SoundLoopingMode::Forward);
 
 		
@@ -2305,7 +2306,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	if (viewport && camera)
 		viewport->ConnectedCamera(camera);
 
-	auto night_runner = sounds->GetSound("night_runner");
+	auto sound_track = sounds->GetSound("sound_track");
 	auto red_lamp_flicker = scene_manager->GetSound("red_lamp_flicker");
 	auto green_lamp_flicker = scene_manager->GetSound("green_lamp_flicker");
 	auto fps = scene_manager->GetText("fps");
@@ -2326,6 +2327,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	if (level_node)
 		level_node->Visible(false);
 
+	gui_controller.DefaultSoundChannelGroup(sounds->GetSoundChannelGroup("gui"));
 	gui_controller.Visible(false);
 
 
@@ -2334,7 +2336,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	game.viewport = viewport;
 	game.gui_controller = &gui_controller;
 	game.sound_manager = sounds.get();
-	game.night_runner = night_runner;
+	game.sound_track = sound_track;
 	game.red_lamp_flicker = red_lamp_flicker;
 	game.green_lamp_flicker = green_lamp_flicker;
 	game.fps = fps;
