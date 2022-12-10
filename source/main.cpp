@@ -15,9 +15,11 @@ File:	main.cpp
 using namespace std::string_literals;
 using namespace std::string_view_literals;
 
+using namespace ion::graphics::utilities;
 using namespace ion::graphics::utilities::color::literals;
 using namespace ion::graphics::utilities::vector2::literals;
 using namespace ion::types::type_literals;
+using namespace ion::utilities;
 using namespace ion::utilities::file::literals;
 using namespace ion::utilities::math::literals;
 
@@ -66,16 +68,19 @@ struct Game :
 	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> level_node;
 	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> player_node;
 	ion::NonOwningPtr<ion::graphics::scene::graph::SceneNode> light_node;
-	ion::graphics::utilities::Vector2 move_model;
+	ion::NonOwningPtr<ion::graphics::scene::Model> pyramid_egyptian_model;
+	ion::NonOwningPtr<ion::graphics::scene::Model> pyramid_mayan_model;
+	Vector2 move_model;
 	bool rotate_model_left = false;
 	bool rotate_model_right = false;
 
 	ion::NonOwningPtr<ion::graphics::scene::Camera> camera;
 	ion::NonOwningPtr<ion::graphics::scene::Camera> player_camera;
-	ion::graphics::utilities::Vector2 move_camera;
+	Vector2 move_camera;
 	bool rotate_camera_left = false;
 	bool rotate_camera_right = false;
 	ion::types::Cumulative<duration> idle_time{2.0_sec};
+	ion::types::Cumulative<duration> query_time{0.1_sec};
 
 	ion::NonOwningPtr<ion::graphics::scene::graph::animations::NodeAnimationTimeline> ship_idle_timeline;
 
@@ -86,9 +91,6 @@ struct Game :
 
 	bool FrameStarted(duration time) noexcept override
 	{
-		using namespace ion::utilities;
-		using namespace ion::graphics::utilities;
-
 		if (fps)
 		{
 			if (fps_update_rate += time)
@@ -166,6 +168,46 @@ struct Game :
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->FrameEnded(time);
 
+		//Intersection scene query
+		if (query_time += time)
+		{
+			ion::graphics::scene::query::IntersectionSceneQuery scene_query{scene_graph};
+			scene_query.QueryMask(1 | 2 | 4); //Query ship, egyptian pyramid and mayan pyramid
+			auto result = scene_query.Execute();
+
+			//Collision detected!
+			if (!std::empty(result))
+			{
+				for (auto [a, b] : result)
+				{
+					if (a == pyramid_egyptian_model.get() || b == pyramid_egyptian_model.get())
+					{
+						for (auto &mesh : pyramid_egyptian_model->Meshes())
+							mesh.BaseColor(color::Orange); //Turn orange
+					}
+					else if (a == pyramid_mayan_model.get() || b == pyramid_mayan_model.get())
+					{
+						for (auto &mesh : pyramid_mayan_model->Meshes())
+							mesh.BaseColor(color::Red); //Turn red
+					}
+				}
+			}
+			else //No collision
+			{
+				if (pyramid_egyptian_model)
+				{
+					for (auto &mesh : pyramid_egyptian_model->Meshes())
+						mesh.BaseColor(color::White); //Reset color
+				}
+
+				if (pyramid_mayan_model)
+				{
+					for (auto &mesh : pyramid_mayan_model->Meshes())
+						mesh.BaseColor(color::White); //Reset color
+				}
+			}
+		}
+
 		return true;
 	}
 
@@ -188,8 +230,6 @@ struct Game :
 
 	void KeyPressed(ion::events::listeners::KeyButton button) noexcept override
 	{
-		using namespace ion::graphics::utilities;
-
 		//Level
 		if (level_node && level_node->Visible() &&
 			(!gui_controller || !gui_controller->IsVisible()))
@@ -254,8 +294,6 @@ struct Game :
 
 	void KeyReleased(ion::events::listeners::KeyButton button) noexcept override
 	{
-		using namespace ion::graphics::utilities;
-
 		//Splash - Press any key to continue
 		if (splash_node && splash_node->Visible())
 		{	
@@ -282,6 +320,10 @@ struct Game :
 		{
 			switch (button)
 			{
+				/*
+					Move ship
+				*/
+
 				case ion::events::listeners::KeyButton::W:
 				move_model.Y(move_model.Y() - 1.0_r);
 				break;
@@ -306,6 +348,10 @@ struct Game :
 				rotate_model_right = false;
 				break;
 
+
+				/*
+					Move scene camera
+				*/
 
 				case ion::events::listeners::KeyButton::UpArrow:
 				move_camera.Y(move_camera.Y() - 1.0_r);
@@ -332,6 +378,11 @@ struct Game :
 				break;
 
 
+				/*
+					Other
+				*/
+
+				//Change between scene camera and player attached camera
 				case ion::events::listeners::KeyButton::C:
 				{
 					if (viewport && camera && player_camera)
@@ -345,6 +396,7 @@ struct Game :
 					break;
 				}
 
+				//Toggle on/off fog
 				case ion::events::listeners::KeyButton::F:
 				{
 					if (scene_graph)
@@ -352,27 +404,12 @@ struct Game :
 					break;
 				}
 
+				//Toggle on/off ship light
 				case ion::events::listeners::KeyButton::L:
 				{
 					if (light_node)
 						light_node->Visible(!light_node->Visible());
 					break;
-				}
-
-				case ion::events::listeners::KeyButton::Space:
-				{
-					//Intersection scene query
-					ion::graphics::scene::query::IntersectionSceneQuery scene_query{scene_graph};
-					scene_query.QueryMask(1 | 2 | 4);
-					[[maybe_unused]] auto result = scene_query.Execute();
-
-					//Ray scene query
-					ion::graphics::scene::query::RaySceneQuery ray_scene_query{scene_graph,
-						{player_node->DerivedPosition(), player_node->DerivedDirection()}};
-					ray_scene_query.QueryMask(2 | 4);
-					[[maybe_unused]] auto ray_result = ray_scene_query.Execute();
-
- 					break;
 				}
 			}
 		}
@@ -404,28 +441,28 @@ struct Game :
 		Mouse listener
 	*/
 
-	void MousePressed(ion::events::listeners::MouseButton button, ion::graphics::utilities::Vector2 position) noexcept override
+	void MousePressed(ion::events::listeners::MouseButton button, Vector2 position) noexcept override
 	{
 		//GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->MousePressed(button, position);
 	}
 
-	void MouseReleased(ion::events::listeners::MouseButton button, ion::graphics::utilities::Vector2 position) noexcept override
+	void MouseReleased(ion::events::listeners::MouseButton button, Vector2 position) noexcept override
 	{
 		//GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->MouseReleased(button, position);
 	}
 
-	void MouseMoved(ion::graphics::utilities::Vector2 position) noexcept override
+	void MouseMoved(Vector2 position) noexcept override
 	{
 		//GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->MouseMoved(position);
 	}
 
-	void MouseWheelRolled(int delta, ion::graphics::utilities::Vector2 position) noexcept override
+	void MouseWheelRolled(int delta, Vector2 position) noexcept override
 	{
 		//GUI
 		if (gui_controller && gui_controller->IsVisible())
@@ -453,7 +490,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 	auto &window = engine.RenderTo(
 		ion::graphics::render::RenderWindow::Resizable("ION engine", {1280.0_r, 720.0_r}));
-	window.MinSize(ion::graphics::utilities::Vector2{640.0_r, 360.0_r});
+	window.MinSize(Vector2{640.0_r, 360.0_r});
 	window.Cursor(ion::graphics::render::render_window::WindowCursor::None);
 
 	if (!engine.Initialize())
@@ -528,7 +565,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	//Scene
 	auto scene_graph = engine.CreateSceneGraph();
 	scene_graph->Gamma(1.0_r);
-	scene_graph->AmbientColor(ion::graphics::utilities::Color::RGB(50, 50, 50));
+	scene_graph->AmbientColor(Color::RGB(50, 50, 50));
 	scene_graph->FogEffect(ion::graphics::render::Fog::Linear(0.0_r, 2.25_r));
 	scene_graph->FogEnabled(false);
 	//scene_graph->LightingEnabled(false);
@@ -684,8 +721,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	}
 	else //Initialize programmatically
 	{
-		using namespace ion::utilities;
-		using namespace ion::graphics::utilities;
 		using namespace ion::graphics::shaders::variables;
 		using namespace ion::graphics::scene::graph::animations;
 
@@ -1566,14 +1601,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		auto player_ear = scene_manager->CreateSoundListener({}, sound_listener);
 
 		//Pyramid (egyptian)
-		auto pyramid_egyptian_model = scene_manager->CreateModel();
+		auto pyramid_egyptian_model = scene_manager->CreateModel("pyramid_egyptian");
 		pyramid_egyptian_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 			{0.5_r, 0.5_r}, pyramid_egyptian});
+		pyramid_egyptian_model->QueryFlags(2); //Tag egyptian pyramid as 2
+		//pyramid_egyptian_model->ShowBoundingVolumes(true);
 
 		//Pyramid (mayan)
-		auto pyramid_mayan_model = scene_manager->CreateModel();
+		auto pyramid_mayan_model = scene_manager->CreateModel("pyramid_mayan");
 		pyramid_mayan_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 			{0.5_r, 0.5_r}, pyramid_mayan});
+		pyramid_mayan_model->QueryFlags(4); //Tag mayan pyramid as 4
+		//pyramid_mayan_model->ShowBoundingVolumes(true);
 
 		//Rain
 		auto rain_particles = scene_manager->CreateParticleSystem("rain", rain);
@@ -1584,8 +1623,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		ship_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
 			{0.4_r, 0.4_r}, ship});
 		ship_model->BoundingVolumeExtent({{0.3_r, 0.2_r}, {0.7_r, 0.8_r}});
-		ship_model->QueryFlags(1);
-		ship_model->QueryMask(2 | 4);
+		ship_model->QueryFlags(1); //Tag ship as 1
+		ship_model->QueryMask(2 | 4); //Ship can colide with both pyramids
 		//ship_model->ShowBoundingVolumes(true);
 
 		//Star
@@ -2315,6 +2354,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	auto player_node = level_node ? level_node->GetDescendantNode("player_node") : nullptr;
 	auto ship_node = player_node ? player_node->GetChildNode("ship_node") : nullptr;
 	auto light_node = ship_node ? ship_node->GetChildNode("ship_light_node") : nullptr;
+	auto pyramid_egyptian_model = scene_manager->GetModel("pyramid_egyptian");
+	auto pyramid_mayan_model = scene_manager->GetModel("pyramid_mayan");
 	auto ship_idle_timeline = ship_node ? ship_node->GetTimeline("ship_idle_timeline") : nullptr;
 
 
@@ -2344,6 +2385,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	game.level_node = level_node;
 	game.player_node = player_node;
 	game.light_node = light_node;
+	game.pyramid_egyptian_model = pyramid_egyptian_model;
+	game.pyramid_mayan_model = pyramid_mayan_model;
 	game.camera = camera;
 	game.player_camera = player_camera;
 	game.ship_idle_timeline = ship_idle_timeline;
