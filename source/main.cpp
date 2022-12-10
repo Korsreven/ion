@@ -57,7 +57,7 @@ struct Game :
 	ion::gui::GuiController *gui_controller = nullptr;
 	ion::sounds::SoundManager *sound_manager = nullptr;
 
-	ion::NonOwningPtr<ion::sounds::Sound> sound_track;
+	ion::NonOwningPtr<ion::sounds::Sound> ambient_rain;
 	ion::NonOwningPtr<ion::graphics::scene::MovableSound> red_lamp_flicker;
 	ion::NonOwningPtr<ion::graphics::scene::MovableSound> green_lamp_flicker;
 
@@ -302,8 +302,8 @@ struct Game :
 			if (level_node)
 				level_node->Visible(true);
 
-			if (sound_track)
-				sound_track->Play()->Volume(0.1_r);
+			if (ambient_rain)
+				ambient_rain->Play()->Volume(0.2_r);
 
 			if (auto &channel = red_lamp_flicker->Get(); channel)
 				channel->Resume();
@@ -1479,11 +1479,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			Sounds
 		*/
 
-		auto flicker = sounds->CreateSound(ion::sounds::Sound::Positional("flicker", "flicker.wav",
+		auto lamp_flicker = sounds->CreateSound(ion::sounds::Sound::Positional("lamp_flicker", "lamp_flicker.wav",
 			ion::sounds::sound::SoundType::Sample, ion::sounds::sound::SoundLoopingMode::Forward));
-		flicker->Distance(0.4_r); //Min distance of 10 meters
+		lamp_flicker->Distance(0.4_r); //Min distance of 10 meters
 
-		auto sound_track = sounds->CreateSound("sound_track", "sound_track.mp3",
+		auto ambient_rain = sounds->CreateSound("ambient_rain", "ambient_rain.mp3",
 			ion::sounds::sound::SoundType::Stream, ion::sounds::sound::SoundLoopingMode::Forward);
 
 		
@@ -1572,8 +1572,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		red_light->Radius(1.5_r);
 
 		//Lamp flicker
-		auto red_lamp_flicker = scene_manager->CreateSound("red_lamp_flicker", flicker);
-		auto green_lamp_flicker = scene_manager->CreateSound("green_lamp_flicker", flicker);
+		auto red_lamp_flicker = scene_manager->CreateSound("red_lamp_flicker", lamp_flicker);
+		auto green_lamp_flicker = scene_manager->CreateSound("green_lamp_flicker", lamp_flicker);
 
 		//Light (green)
 		auto green_light = scene_manager->CreateLight("green_light");
@@ -2345,7 +2345,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	if (viewport && camera)
 		viewport->ConnectedCamera(camera);
 
-	auto sound_track = sounds->GetSound("sound_track");
+	auto ambient_rain = sounds->GetSound("ambient_rain");
 	auto red_lamp_flicker = scene_manager->GetSound("red_lamp_flicker");
 	auto green_lamp_flicker = scene_manager->GetSound("green_lamp_flicker");
 	auto fps = scene_manager->GetText("fps");
@@ -2377,7 +2377,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	game.viewport = viewport;
 	game.gui_controller = &gui_controller;
 	game.sound_manager = sounds.get();
-	game.sound_track = sound_track;
+	game.ambient_rain = ambient_rain;
 	game.red_lamp_flicker = red_lamp_flicker;
 	game.green_lamp_flicker = green_lamp_flicker;
 	game.fps = fps;
