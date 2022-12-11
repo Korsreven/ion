@@ -555,12 +555,12 @@
     <ClInclude Include="..\source\engine\utilities\IonStringUtility.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatModelShader.frag" />
-    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatModelShader.vert" />
-    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatParticleShader.frag" />
-    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatParticleShader.vert" />
-    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatTextShader.frag" />
-    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatTextShader.vert" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonSimpleModelShader.frag" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonSimpleModelShader.vert" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonSimpleParticleShader.frag" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonSimpleParticleShader.vert" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonSimpleTextShader.frag" />
+    <None Include="..\source\engine\graphics\shaders\glsl\IonSimpleTextShader.vert" />
     <None Include="..\source\engine\graphics\shaders\glsl\IonModelShader.frag" />
     <None Include="..\source\engine\graphics\shaders\glsl\IonModelShader.vert" />
     <None Include="..\source\engine\graphics\shaders\glsl\IonParticleShader.frag" />

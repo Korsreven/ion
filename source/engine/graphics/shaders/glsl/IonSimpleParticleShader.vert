@@ -6,7 +6,7 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/shaders/glsl
-File:	IonFlatParticleShader.vert
+File:	IonSimpleParticleShader.vert
 -------------------------------------------
 */
 

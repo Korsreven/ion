@@ -6,7 +6,7 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/shaders/glsl
-File:	IonFlatTextShader.vert
+File:	IonSimpleTextShader.vert
 -------------------------------------------
 */
 

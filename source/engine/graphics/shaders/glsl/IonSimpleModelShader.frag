@@ -6,7 +6,7 @@ This source file is part of Ion Engine
 
 Author:	Jan Ivar Goli
 Area:	graphics/shaders/glsl
-File:	IonFlatTextShader.frag
+File:	IonSimpleModelShader.frag
 -------------------------------------------
 */
 
@@ -19,19 +19,25 @@ struct Scene
 
 struct Primitive
 {
-	sampler2DArray texture;
-	bool has_texture;
+	bool has_material;
+};
+
+struct Material
+{
+	vec4 diffuse;
+	sampler2D diffuse_map;
+	bool has_diffuse_map;
 };
 
 
 in vec4 vert_color;
 in vec2 vert_tex_coord;
-flat in int vert_tex_layer;
 
 out vec4 frag_color;
 
 uniform Scene scene;
 uniform Primitive primitive;
+uniform Material material;
 
 
 void main()
@@ -39,8 +45,13 @@ void main()
 	//Color
 	vec4 color = vert_color;
 
-	if (primitive.has_texture)
-		color *= texture(primitive.texture, vec3(vert_tex_coord, vert_tex_layer));
+	if (primitive.has_material)
+	{
+		color *= material.diffuse;
+
+		if (material.has_diffuse_map)
+			color *= texture(material.diffuse_map, vert_tex_coord);
+	}
 	
 	
 	//Gamma correction

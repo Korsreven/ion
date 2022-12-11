@@ -1420,10 +1420,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatTextShader.frag">
+    <None Include="..\source\engine\graphics\shaders\glsl\IonSimpleTextShader.frag">
       <Filter>Header Files\graphics\shaders\glsl</Filter>
     </None>
-    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatTextShader.vert">
+    <None Include="..\source\engine\graphics\shaders\glsl\IonSimpleTextShader.vert">
       <Filter>Header Files\graphics\shaders\glsl</Filter>
     </None>
     <None Include="..\source\engine\graphics\shaders\glsl\IonModelShader.frag">
@@ -1444,16 +1444,16 @@
     <None Include="..\source\engine\graphics\shaders\glsl\IonTextShader.vert">
       <Filter>Header Files\graphics\shaders\glsl</Filter>
     </None>
-    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatModelShader.frag">
+    <None Include="..\source\engine\graphics\shaders\glsl\IonSimpleModelShader.frag">
       <Filter>Header Files\graphics\shaders\glsl</Filter>
     </None>
-    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatModelShader.vert">
+    <None Include="..\source\engine\graphics\shaders\glsl\IonSimpleModelShader.vert">
       <Filter>Header Files\graphics\shaders\glsl</Filter>
     </None>
-    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatParticleShader.frag">
+    <None Include="..\source\engine\graphics\shaders\glsl\IonSimpleParticleShader.frag">
       <Filter>Header Files\graphics\shaders\glsl</Filter>
     </None>
-    <None Include="..\source\engine\graphics\shaders\glsl\IonFlatParticleShader.vert">
+    <None Include="..\source\engine\graphics\shaders\glsl\IonSimpleParticleShader.vert">
       <Filter>Header Files\graphics\shaders\glsl</Filter>
     </None>
   </ItemGroup>

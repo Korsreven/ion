@@ -719,15 +719,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
 			shader_programs->GetShaderProgram("particle_prog"));
 		scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
-			shader_programs->GetShaderProgram("flat_text_prog"));
+			shader_programs->GetShaderProgram("simple_text_prog"));
 
 		//Default shader programs (for GUI)
 		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
-			shader_programs->GetShaderProgram("flat_model_prog"));
+			shader_programs->GetShaderProgram("simple_model_prog"));
 		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
-			shader_programs->GetShaderProgram("flat_particle_prog"));
+			shader_programs->GetShaderProgram("simple_particle_prog"));
 		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
-			shader_programs->GetShaderProgram("flat_text_prog"));
+			shader_programs->GetShaderProgram("simple_text_prog"));
 
 
 		//Load scripts
@@ -1202,17 +1202,17 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		auto text_frag = shaders->CreateShader("text_frag", "IonTextShader.frag");
 
 
-		//Flat model
-		auto flat_model_vert = shaders->CreateShader("flat_model_vert", "IonFlatModelShader.vert");
-		auto flat_model_frag = shaders->CreateShader("flat_model_frag", "IonFlatModelShader.frag");
+		//Simple model
+		auto simple_model_vert = shaders->CreateShader("simple_model_vert", "IonSimpleModelShader.vert");
+		auto simple_model_frag = shaders->CreateShader("simple_model_frag", "IonSimpleModelShader.frag");
 		
-		//Flat particle
-		auto flat_particle_vert = shaders->CreateShader("flat_particle_vert", "IonFlatParticleShader.vert");
-		auto flat_particle_frag = shaders->CreateShader("flat_particle_frag", "IonFlatParticleShader.frag");
+		//Simple particle
+		auto simple_particle_vert = shaders->CreateShader("simple_particle_vert", "IonSimpleParticleShader.vert");
+		auto simple_particle_frag = shaders->CreateShader("simple_particle_frag", "IonSimpleParticleShader.frag");
 		
-		//Flat text
-		auto flat_text_vert = shaders->CreateShader("flat_text_vert", "IonFlatTextShader.vert");
-		auto flat_text_frag = shaders->CreateShader("flat_text_frag", "IonFlatTextShader.frag");
+		//Simple text
+		auto simple_text_vert = shaders->CreateShader("simple_text_vert", "IonSimpleTextShader.vert");
+		auto simple_text_frag = shaders->CreateShader("simple_text_frag", "IonSimpleTextShader.frag");
 		
 
 		shaders->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
@@ -1227,9 +1227,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		auto particle_prog = shader_programs->CreateShaderProgram("particle_prog", particle_vert, particle_frag);
 		auto text_prog = shader_programs->CreateShaderProgram("text_prog", text_vert, text_frag);
 
-		auto flat_model_prog = shader_programs->CreateShaderProgram("flat_model_prog", flat_model_vert, flat_model_frag);
-		auto flat_particle_prog = shader_programs->CreateShaderProgram("flat_particle_prog", flat_particle_vert, flat_particle_frag);
-		auto flat_text_prog = shader_programs->CreateShaderProgram("flat_text_prog", flat_text_vert, flat_text_frag);
+		auto simple_model_prog = shader_programs->CreateShaderProgram("simple_model_prog", simple_model_vert, simple_model_frag);
+		auto simple_particle_prog = shader_programs->CreateShaderProgram("simple_particle_prog", simple_particle_vert, simple_particle_frag);
+		auto simple_text_prog = shader_programs->CreateShaderProgram("simple_text_prog", simple_text_vert, simple_text_frag);
 
 
 		shader_programs->LoadAll(ion::resources::resource_manager::EvaluationStrategy::Eager);
@@ -1412,21 +1412,21 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		}
 
 
-		//Flat model
+		//Simple model
 		{
 			//Shader structs
-			auto matrix_struct = flat_model_prog->CreateStruct("matrix");
-			auto scene_struct = flat_model_prog->CreateStruct("scene");
-			auto primitive_struct = flat_model_prog->CreateStruct("primitive");
-			auto material_struct = flat_model_prog->CreateStruct("material");
+			auto matrix_struct = simple_model_prog->CreateStruct("matrix");
+			auto scene_struct = simple_model_prog->CreateStruct("scene");
+			auto primitive_struct = simple_model_prog->CreateStruct("primitive");
+			auto material_struct = simple_model_prog->CreateStruct("material");
 
 
 			//Shader variables
 			//Vertex
-			flat_model_prog->CreateAttribute<glsl::vec3>("vertex_position");
-			flat_model_prog->CreateAttribute<glsl::vec3>("vertex_normal");
-			flat_model_prog->CreateAttribute<glsl::vec4>("vertex_color");
-			flat_model_prog->CreateAttribute<glsl::vec3>("vertex_tex_coord");
+			simple_model_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			simple_model_prog->CreateAttribute<glsl::vec3>("vertex_normal");
+			simple_model_prog->CreateAttribute<glsl::vec4>("vertex_color");
+			simple_model_prog->CreateAttribute<glsl::vec3>("vertex_tex_coord");
 
 			//Matrices
 			matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
@@ -1442,25 +1442,25 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");
 			material_struct->CreateUniform<bool>("has_diffuse_map");
 
-			shader_programs->LoadShaderVariableLocations(*flat_model_prog);
+			shader_programs->LoadShaderVariableLocations(*simple_model_prog);
 		}
 
-		//Flat particle
+		//Simple particle
 		{
 			//Shader structs
-			auto matrix_struct = flat_particle_prog->CreateStruct("matrix");
-			auto scene_struct = flat_particle_prog->CreateStruct("scene");
-			auto camera_struct = flat_particle_prog->CreateStruct("camera");
-			auto primitive_struct = flat_particle_prog->CreateStruct("primitive");
-			auto material_struct = flat_particle_prog->CreateStruct("material");
+			auto matrix_struct = simple_particle_prog->CreateStruct("matrix");
+			auto scene_struct = simple_particle_prog->CreateStruct("scene");
+			auto camera_struct = simple_particle_prog->CreateStruct("camera");
+			auto primitive_struct = simple_particle_prog->CreateStruct("primitive");
+			auto material_struct = simple_particle_prog->CreateStruct("material");
 
 
 			//Shader variables
 			//Vertex
-			flat_particle_prog->CreateAttribute<glsl::vec3>("vertex_position");
-			flat_particle_prog->CreateAttribute<float>("vertex_rotation");
-			flat_particle_prog->CreateAttribute<float>("vertex_point_size");
-			flat_particle_prog->CreateAttribute<glsl::vec4>("vertex_color");
+			simple_particle_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			simple_particle_prog->CreateAttribute<float>("vertex_rotation");
+			simple_particle_prog->CreateAttribute<float>("vertex_point_size");
+			simple_particle_prog->CreateAttribute<glsl::vec4>("vertex_color");
 
 			//Matrices
 			matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
@@ -1479,22 +1479,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");
 			material_struct->CreateUniform<bool>("has_diffuse_map");
 
-			shader_programs->LoadShaderVariableLocations(*flat_particle_prog);
+			shader_programs->LoadShaderVariableLocations(*simple_particle_prog);
 		}
 
-		//Flat text
+		//Simple text
 		{
 			//Shader structs
-			auto matrix_struct = flat_text_prog->CreateStruct("matrix");
-			auto scene_struct = flat_text_prog->CreateStruct("scene");
-			auto primitive_struct = flat_text_prog->CreateStruct("primitive");
+			auto matrix_struct = simple_text_prog->CreateStruct("matrix");
+			auto scene_struct = simple_text_prog->CreateStruct("scene");
+			auto primitive_struct = simple_text_prog->CreateStruct("primitive");
 
 
 			//Shader variables
 			//Vertex
-			flat_text_prog->CreateAttribute<glsl::vec3>("vertex_position");
-			flat_text_prog->CreateAttribute<glsl::vec4>("vertex_color");
-			flat_text_prog->CreateAttribute<glsl::vec3>("vertex_tex_coord");
+			simple_text_prog->CreateAttribute<glsl::vec3>("vertex_position");
+			simple_text_prog->CreateAttribute<glsl::vec4>("vertex_color");
+			simple_text_prog->CreateAttribute<glsl::vec3>("vertex_tex_coord");
 
 			//Matrices
 			matrix_struct->CreateUniform<glsl::mat4>("model_view_projection");
@@ -1506,7 +1506,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			primitive_struct->CreateUniform<glsl::sampler2DArray>("texture");
 			primitive_struct->CreateUniform<bool>("has_texture");
 
-			shader_programs->LoadShaderVariableLocations(*flat_text_prog);
+			shader_programs->LoadShaderVariableLocations(*simple_text_prog);
 		}
 
 		
@@ -1549,15 +1549,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
 			shader_programs->GetShaderProgram("particle_prog"));
 		scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
-			shader_programs->GetShaderProgram("flat_text_prog"));
+			shader_programs->GetShaderProgram("simple_text_prog"));
 
 		//Default shader programs (GUI)
 		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Model,
-			shader_programs->GetShaderProgram("flat_model_prog"));
+			shader_programs->GetShaderProgram("simple_model_prog"));
 		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::ParticleSystem,
-			shader_programs->GetShaderProgram("flat_particle_prog"));
+			shader_programs->GetShaderProgram("simple_particle_prog"));
 		gui_scene_manager->AddDefaultShaderProgram(ion::graphics::scene::query::scene_query::QueryType::Text,
-			shader_programs->GetShaderProgram("flat_text_prog"));
+			shader_programs->GetShaderProgram("simple_text_prog"));
 
 
 		//Aura
