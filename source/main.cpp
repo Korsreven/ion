@@ -52,6 +52,10 @@ struct Game :
 	ion::events::listeners::KeyListener,
 	ion::events::listeners::MouseListener
 {
+	/*
+		Demo variables
+	*/
+
 	ion::NonOwningPtr<ion::graphics::scene::graph::SceneGraph> scene_graph;
 	ion::NonOwningPtr<ion::graphics::render::Viewport> viewport;
 	ion::gui::GuiController *gui_controller = nullptr;
@@ -91,6 +95,7 @@ struct Game :
 
 	bool FrameStarted(duration time) noexcept override
 	{
+		//Update FPS
 		if (fps)
 		{
 			if (fps_update_rate += time)
@@ -100,7 +105,7 @@ struct Game :
 			}
 		}
 
-		//Level
+		//Level - Idle animation, rotate and translate
 		if (level_node && level_node->Visible())
 		{
 			if (ship_idle_timeline)
@@ -152,7 +157,7 @@ struct Game :
 			}
 		}
 
-		//GUI
+		//Call frame started in GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->FrameStarted(time);
 
@@ -161,52 +166,56 @@ struct Game :
 
 	bool FrameEnded(duration time) noexcept override
 	{
-		if (sound_manager)
-			sound_manager->Update();
-
-		//GUI
-		if (gui_controller && gui_controller->IsVisible())
-			gui_controller->FrameEnded(time);
-
-		//Intersection scene query
-		if (query_time += time)
+		//Level - Intersection scene query
+		if (level_node && level_node->Visible())
 		{
-			ion::graphics::scene::query::IntersectionSceneQuery scene_query{scene_graph};
-			scene_query.QueryMask(1 | 2 | 4); //Query ship, egyptian pyramid and mayan pyramid
-			auto result = scene_query.Execute();
-
-			//Collision detected!
-			if (!std::empty(result))
+			if (query_time += time)
 			{
-				for (auto [a, b] : result)
+				ion::graphics::scene::query::IntersectionSceneQuery scene_query{scene_graph};
+				scene_query.QueryMask(1 | 2 | 4); //Query ship, egyptian pyramid and mayan pyramid
+				auto result = scene_query.Execute();
+
+				//Collision detected!
+				if (!std::empty(result))
 				{
-					if (a == pyramid_egyptian_model.get() || b == pyramid_egyptian_model.get())
+					for (auto [a, b] : result)
+					{
+						if (a == pyramid_egyptian_model.get() || b == pyramid_egyptian_model.get())
+						{
+							for (auto &mesh : pyramid_egyptian_model->Meshes())
+								mesh.BaseColor(color::Orange); //Turn orange
+						}
+						else if (a == pyramid_mayan_model.get() || b == pyramid_mayan_model.get())
+						{
+							for (auto &mesh : pyramid_mayan_model->Meshes())
+								mesh.BaseColor(color::Red); //Turn red
+						}
+					}
+				}
+				else //No collision
+				{
+					if (pyramid_egyptian_model)
 					{
 						for (auto &mesh : pyramid_egyptian_model->Meshes())
-							mesh.BaseColor(color::Orange); //Turn orange
+							mesh.BaseColor(color::White); //Reset color
 					}
-					else if (a == pyramid_mayan_model.get() || b == pyramid_mayan_model.get())
+
+					if (pyramid_mayan_model)
 					{
 						for (auto &mesh : pyramid_mayan_model->Meshes())
-							mesh.BaseColor(color::Red); //Turn red
+							mesh.BaseColor(color::White); //Reset color
 					}
-				}
-			}
-			else //No collision
-			{
-				if (pyramid_egyptian_model)
-				{
-					for (auto &mesh : pyramid_egyptian_model->Meshes())
-						mesh.BaseColor(color::White); //Reset color
-				}
-
-				if (pyramid_mayan_model)
-				{
-					for (auto &mesh : pyramid_mayan_model->Meshes())
-						mesh.BaseColor(color::White); //Reset color
 				}
 			}
 		}
+
+		//Call frame ended in GUI
+		if (gui_controller && gui_controller->IsVisible())
+			gui_controller->FrameEnded(time);
+
+		//Update sounds (should be done each frame)
+		if (sound_manager)
+			sound_manager->Update();
 
 		return true;
 	}
@@ -218,7 +227,7 @@ struct Game :
 
 	void WindowActionReceived(ion::events::listeners::WindowAction action) noexcept override
 	{
-		//GUI
+		//Send window actions to GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->WindowActionReceived(action);
 	}
@@ -236,58 +245,70 @@ struct Game :
 		{
 			switch (button)
 			{
+				//Start moving ship forward
 				case ion::events::listeners::KeyButton::W:
 				move_model.Y(move_model.Y() + 1.0_r);
 				break;
 
+				//Start moving ship left
 				case ion::events::listeners::KeyButton::A:
 				move_model.X(move_model.X() - 1.0_r);
 				break;
 
+				//Start moving ship backward
 				case ion::events::listeners::KeyButton::S:
 				move_model.Y(move_model.Y() - 1.0_r);
 				break;
 
+				//Start moving ship right
 				case ion::events::listeners::KeyButton::D:
 				move_model.X(move_model.X() + 1.0_r);
 				break;
 
+				//Start rotating ship CCW
 				case ion::events::listeners::KeyButton::Q:
 				rotate_model_left = true;
 				break;
 
+				//Start rotating ship CW
 				case ion::events::listeners::KeyButton::E:
 				rotate_model_right = true;
 				break;
 
 
+				//Start moving camera forward
 				case ion::events::listeners::KeyButton::UpArrow:
 				move_camera.Y(move_camera.Y() + 1.0_r);
 				break;
 
+				//Start moving camera left
 				case ion::events::listeners::KeyButton::LeftArrow:
 				move_camera.X(move_camera.X() - 1.0_r);
 				break;
 
+				//Start moving camera backward
 				case ion::events::listeners::KeyButton::DownArrow:
 				move_camera.Y(move_camera.Y() - 1.0_r);
 				break;
 
+				//Start moving camera right
 				case ion::events::listeners::KeyButton::RightArrow:
 				move_camera.X(move_camera.X() + 1.0_r);
 				break;
 
+				//Start rotating camera CCW
 				case ion::events::listeners::KeyButton::Subtract:
 				rotate_camera_left = true;
 				break;
 
+				//Start rotating camera CW
 				case ion::events::listeners::KeyButton::Add:
 				rotate_camera_right = true;
 				break;
 			}
 		}
 
-		//GUI
+		//Send key pressed to GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->KeyPressed(button);
 	}
@@ -324,26 +345,32 @@ struct Game :
 					Move ship
 				*/
 
+				//Stop moving ship forward
 				case ion::events::listeners::KeyButton::W:
 				move_model.Y(move_model.Y() - 1.0_r);
 				break;
 
+				//Stop moving ship left
 				case ion::events::listeners::KeyButton::A:
 				move_model.X(move_model.X() + 1.0_r);
 				break;
 
+				//Stop moving ship backward
 				case ion::events::listeners::KeyButton::S:
 				move_model.Y(move_model.Y() + 1.0_r);
 				break;
 
+				//Stop moving ship right
 				case ion::events::listeners::KeyButton::D:
 				move_model.X(move_model.X() - 1.0_r);
 				break;
 
+				//Stop rotating ship CCW
 				case ion::events::listeners::KeyButton::Q:
 				rotate_model_left = false;
 				break;
 
+				//Stop rotating ship CW
 				case ion::events::listeners::KeyButton::E:
 				rotate_model_right = false;
 				break;
@@ -353,26 +380,32 @@ struct Game :
 					Move scene camera
 				*/
 
+				//Stop moving camera forward
 				case ion::events::listeners::KeyButton::UpArrow:
 				move_camera.Y(move_camera.Y() - 1.0_r);
 				break;
 
+				//Stop moving camera left
 				case ion::events::listeners::KeyButton::LeftArrow:
 				move_camera.X(move_camera.X() + 1.0_r);
 				break;
 
+				//Stop moving camera backward
 				case ion::events::listeners::KeyButton::DownArrow:
 				move_camera.Y(move_camera.Y() + 1.0_r);
 				break;
 
+				//Stop moving camera right
 				case ion::events::listeners::KeyButton::RightArrow:
 				move_camera.X(move_camera.X() - 1.0_r);
 				break;
 
+				//Stop rotating camera CCW
 				case ion::events::listeners::KeyButton::Subtract:
 				rotate_camera_left = false;
 				break;
 
+				//Stop rotating camera CW
 				case ion::events::listeners::KeyButton::Add:
 				rotate_camera_right = false;
 				break;
@@ -419,11 +452,13 @@ struct Game :
 		{
 			switch (button)
 			{
+				//Show/hide GUI
 				case ion::events::listeners::KeyButton::Escape:
 				gui_controller->Visible(!gui_controller->IsVisible());
 				break;
 			}
 
+			//Send key released to GUI
 			if (gui_controller->IsVisible())
 				gui_controller->KeyReleased(button);
 		}
@@ -431,7 +466,7 @@ struct Game :
 
 	void CharacterPressed(char character) noexcept override
 	{
-		//GUI
+		//Send character pressed to GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->CharacterPressed(character);
 	}
@@ -443,28 +478,28 @@ struct Game :
 
 	void MousePressed(ion::events::listeners::MouseButton button, Vector2 position) noexcept override
 	{
-		//GUI
+		//Send mouse pressed to GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->MousePressed(button, position);
 	}
 
 	void MouseReleased(ion::events::listeners::MouseButton button, Vector2 position) noexcept override
 	{
-		//GUI
+		//Send mouse released to GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->MouseReleased(button, position);
 	}
 
 	void MouseMoved(Vector2 position) noexcept override
 	{
-		//GUI
+		//Send mouse moved to GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->MouseMoved(position);
 	}
 
 	void MouseWheelRolled(int delta, Vector2 position) noexcept override
 	{
-		//GUI
+		//Send mouse wheel rolled to GUI
 		if (gui_controller && gui_controller->IsVisible())
 			gui_controller->MouseWheelRolled(delta, position);
 	}
