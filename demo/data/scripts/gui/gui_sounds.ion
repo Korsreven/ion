@@ -1,0 +1,16 @@
+/*
+	IonScript
+	gui_sounds.ion
+*/
+
+sound
+{
+    name: "click";
+    asset-name: "click.wav";
+}
+
+sound-channel-group
+{
+    name: "gui";
+    volume: 0.2;
+}

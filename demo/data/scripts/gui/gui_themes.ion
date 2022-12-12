@@ -1,0 +1,1166 @@
+/*
+	IonScript
+	gui_themes.ion
+*/
+
+theme
+{
+    name: "default";
+
+
+    /*
+        Mouse cursor
+    */
+
+    skin
+    {
+        type: mouse-cursor;
+
+        part
+        {
+            name: "center";
+            enabled: "mouse_cursor_enabled";
+        }
+    }
+
+
+    /*
+        Tooltip
+    */
+
+    skin
+    {
+        type: tooltip;
+
+        part
+        {
+            name: "center";
+            enabled: "tooltip_center";
+            fill-color: rgba(255,255,255,0.9);
+        }
+
+
+        part
+        {
+            name: "top";
+            enabled: "tooltip_top";
+        }
+
+        part
+        {
+            name: "bottom";
+            enabled: "tooltip_top";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "left";
+            enabled: "tooltip_left";
+        }
+
+        part
+        {
+            name: "right";
+            enabled: "tooltip_left";
+            flip-horizontal: true;
+        }
+
+
+        part
+        {
+            name: "top-left";
+            enabled: "tooltip_top_left";
+        }
+
+        part
+        {
+            name: "top-right";
+            enabled: "tooltip_top_left";
+            flip-horizontal: true;
+        }
+
+        part
+        {
+            name: "bottom-left";
+            enabled: "tooltip_top_left";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "bottom-right";
+            enabled: "tooltip_top_left";
+            flip-horizontal: true;
+            flip-vertical: true;
+        }
+
+
+        text-part
+        {
+            name: "caption";
+            text: "caption";
+        }
+    }
+
+
+    /*
+        Button
+    */
+
+    skin
+    {
+        type: button;
+
+        part
+        {
+            name: "center";
+            enabled: "button_center_enabled";
+            disabled: "button_center_disabled";
+            pressed: "button_center_pressed";
+            hovered: "button_center_hovered";
+        }
+
+
+        part
+        {
+            name: "top";
+            enabled: "button_top_enabled";
+            focused: "button_top_focused";
+        }
+
+        part
+        {
+            name: "bottom";
+            enabled: "button_top_enabled";
+            focused: "button_top_focused";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "left";
+            enabled: "button_left_enabled";
+            focused: "button_left_focused";
+        }
+
+        part
+        {
+            name: "right";
+            enabled: "button_left_enabled";
+            focused: "button_left_focused";
+            flip-horizontal: true;
+        }
+
+
+        part
+        {
+            name: "top-left";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+        }
+
+        part
+        {
+            name: "top-right";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-horizontal: true;
+        }
+
+        part
+        {
+            name: "bottom-left";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "bottom-right";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-horizontal: true;
+            flip-vertical: true;
+        }
+
+
+        text-part
+        {
+            name: "caption";
+            text: "caption";
+
+            enabled
+            {
+                foreground-color: white;
+            }
+
+            disabled
+            {
+                foreground-color: darkgray;
+            }
+        }
+
+
+        sound-part
+        {
+            name: "clicked";
+            sound: "click";
+        }
+    }
+
+
+    /*
+        Check box
+    */
+
+    skin
+    {
+        type: check-box;
+
+
+        part
+        {
+            name: "center";
+            enabled: "check_box_center_enabled";
+            disabled: "check_box_center_enabled";
+            pressed: "check_box_center_enabled";
+            hovered: "check_box_center_hovered";
+        }
+
+
+        part
+        {
+            name: "top";
+            enabled: "button_top_enabled";
+            focused: "button_top_focused";
+        }
+
+        part
+        {
+            name: "bottom";
+            enabled: "button_top_enabled";
+            focused: "button_top_focused";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "left";
+            enabled: "button_left_enabled";
+            focused: "button_left_focused";
+        }
+
+        part
+        {
+            name: "right";
+            enabled: "button_left_enabled";
+            focused: "button_left_focused";
+            flip-horizontal: true;
+        }
+
+
+        part
+        {
+            name: "top-left";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+        }
+
+        part
+        {
+            name: "top-right";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-horizontal: true;
+        }
+
+        part
+        {
+            name: "bottom-left";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "bottom-right";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-horizontal: true;
+            flip-vertical: true;
+        }
+
+
+        part
+        {
+            name: "check-mark";
+            enabled: "check_box_mark_enabled";
+            disabled: "check_box_mark_disabled";
+            pressed: "check_box_mark_pressed";
+            hovered: "check_box_mark_hovered";
+            scaling: vec2(0.5);
+        }
+
+
+        text-part
+        {
+            name: "caption";
+            text: "caption";
+
+            enabled
+            {
+                foreground-color: white;
+            }
+
+            disabled
+            {
+                foreground-color: darkgray;
+            }
+        }
+
+
+        sound-part
+        {
+            name: "clicked";
+            sound: "click";
+        }
+    }
+
+    
+    /*
+        Group box
+    */
+
+    skin
+    {
+        type: group-box;
+
+
+        part
+        {
+            name: "top";
+            enabled: "button_top_enabled";
+        }
+
+        part
+        {
+            name: "bottom";
+            enabled: "button_top_enabled";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "left";
+            enabled: "button_left_enabled";
+        }
+
+        part
+        {
+            name: "right";
+            enabled: "button_left_enabled";
+            flip-horizontal: true;
+        }
+
+
+        part
+        {
+            name: "top-left";
+            enabled: "button_top_left_enabled";
+        }
+
+        part
+        {
+            name: "top-right";
+            enabled: "button_top_left_enabled";
+            flip-horizontal: true;
+        }
+
+        part
+        {
+            name: "bottom-left";
+            enabled: "button_top_left_enabled";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "bottom-right";
+            enabled: "button_top_left_enabled";
+            flip-horizontal: true;
+            flip-vertical: true;
+        }
+
+
+        text-part
+        {
+            name: "caption";
+            text: "caption";
+
+            enabled
+            {
+                foreground-color: white;
+            }
+
+            disabled
+            {
+                foreground-color: darkgray;
+            }
+        }
+    }
+
+
+    /*
+        Label
+    */
+
+    skin
+    {
+        type: label;
+
+
+        text-part
+        {
+            name: "caption";
+            text: "caption";
+
+            enabled
+            {
+                foreground-color: white;
+            }
+
+            hovered
+            {
+                foreground-color: white;
+                decoration: underline;
+            }
+        }
+    }
+
+
+    /*
+        List box
+    */
+
+    skin
+    {
+        type: list-box;
+
+
+        part
+        {
+            name: "center";
+            enabled: "check_box_center_enabled";
+            hovered: "check_box_center_hovered";
+        }
+
+
+        part
+        {
+            name: "top";
+            enabled: "button_top_enabled";
+            focused: "button_top_focused";
+        }
+
+        part
+        {
+            name: "bottom";
+            enabled: "button_top_enabled";
+            focused: "button_top_focused";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "left";
+            enabled: "button_left_enabled";
+            focused: "button_left_focused";
+        }
+
+        part
+        {
+            name: "right";
+            enabled: "button_left_enabled";
+            focused: "button_left_focused";
+            flip-horizontal: true;
+        }
+
+
+        part
+        {
+            name: "top-left";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+        }
+
+        part
+        {
+            name: "top-right";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-horizontal: true;
+        }
+
+        part
+        {
+            name: "bottom-left";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "bottom-right";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-horizontal: true;
+            flip-vertical: true;
+        }
+
+
+        part
+        {
+            name: "selection";
+            enabled: "button_center_hovered";
+            fill-color: rgba(255,255,255,0.5);
+        }
+
+
+        text-part
+        {
+            name: "caption";
+            text: "caption";
+
+            enabled
+            {
+                foreground-color: white;
+            }
+
+            disabled
+            {
+                foreground-color: darkgray;
+            }
+        }
+
+        text-part
+        {
+            name: "lines";
+            text: "caption";
+
+            enabled
+            {
+                foreground-color: white;
+            }
+
+            disabled
+            {
+                foreground-color: darkgray;
+            }
+        }
+
+
+        sound-part
+        {
+            name: "changed";
+            sound: "click";
+        }
+    }
+
+
+    /*
+        Progress bar
+    */
+
+    skin
+    {
+        type: progress-bar;
+
+
+        part
+        {
+            name: "center";
+            enabled: "check_box_center_enabled";
+        }
+
+
+        part
+        {
+            name: "top";
+            enabled: "button_top_enabled";
+        }
+
+        part
+        {
+            name: "bottom";
+            enabled: "button_top_enabled";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "left";
+            enabled: "button_left_enabled";
+        }
+
+        part
+        {
+            name: "right";
+            enabled: "button_left_enabled";
+            flip-horizontal: true;
+        }
+
+
+        part
+        {
+            name: "top-left";
+            enabled: "button_top_left_enabled";
+        }
+
+        part
+        {
+            name: "top-right";
+            enabled: "button_top_left_enabled";
+            flip-horizontal: true;
+        }
+
+        part
+        {
+            name: "bottom-left";
+            enabled: "button_top_left_enabled";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "bottom-right";
+            enabled: "button_top_left_enabled";
+            flip-horizontal: true;
+            flip-vertical: true;
+        }
+
+
+        part
+        {
+            name: "bar";
+            enabled: "progress_bar_enabled";
+            fill-color: rgba(255,255,255,0.35);
+        }
+
+        part
+        {
+            name: "bar-interpolated";
+            enabled: "progress_bar_enabled";
+            fill-color: rgba(255,255,255,0.65);
+        }
+
+
+        text-part
+        {
+            name: "caption";
+            text: "caption";
+
+            enabled
+            {
+                foreground-color: white;
+            }
+
+            disabled
+            {
+                foreground-color: darkgray;
+            }
+        }
+    }
+
+
+    /*
+        Radio button
+    */
+
+    skin
+    {
+        type: radio-button;
+
+
+        part
+        {
+            name: "center";
+            enabled: "check_box_center_enabled";
+            pressed: "check_box_center_enabled";
+            hovered: "check_box_center_hovered";
+        }
+
+
+        part
+        {
+            name: "top";
+            enabled: "button_top_enabled";
+            focused: "button_top_focused";
+        }
+
+        part
+        {
+            name: "bottom";
+            enabled: "button_top_enabled";
+            focused: "button_top_focused";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "left";
+            enabled: "button_left_enabled";
+            focused: "button_left_focused";
+        }
+
+        part
+        {
+            name: "right";
+            enabled: "button_left_enabled";
+            focused: "button_left_focused";
+            flip-horizontal: true;
+        }
+
+
+        part
+        {
+            name: "top-left";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+        }
+
+        part
+        {
+            name: "top-right";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-horizontal: true;
+        }
+
+        part
+        {
+            name: "bottom-left";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "bottom-right";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-horizontal: true;
+            flip-vertical: true;
+        }
+
+
+        part
+        {
+            name: "check-mark";
+            enabled: "radio_button_select_enabled";
+            disabled: "radio_button_select_disabled";
+            pressed: "radio_button_select_pressed";
+            hovered: "radio_button_select_hovered";
+            scaling: vec2(0.3);
+        }
+
+
+        text-part
+        {
+            name: "caption";
+            text: "caption";
+
+            enabled
+            {
+                foreground-color: white;
+            }
+
+            disabled
+            {
+                foreground-color: darkgray;
+            }
+        }
+
+
+        sound-part
+        {
+            name: "clicked";
+            sound: "click";
+        }
+    }
+
+
+    /*
+        Slider
+    */
+
+    skin
+    {
+        type: slider;
+
+
+        part
+        {
+            name: "center";
+            enabled: "check_box_center_enabled";
+            disabled: "check_box_center_enabled";
+            pressed: "check_box_center_enabled";
+            hovered: "check_box_center_hovered";
+        }
+
+
+        part
+        {
+            name: "top";
+            enabled: "button_top_enabled";
+            focused: "button_top_focused";
+        }
+
+        part
+        {
+            name: "bottom";
+            enabled: "button_top_enabled";
+            focused: "button_top_focused";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "left";
+            enabled: "button_left_enabled";
+            focused: "button_left_focused";
+        }
+
+        part
+        {
+            name: "right";
+            enabled: "button_left_enabled";
+            focused: "button_left_focused";
+            flip-horizontal: true;
+        }
+
+
+        part
+        {
+            name: "top-left";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+        }
+
+        part
+        {
+            name: "top-right";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-horizontal: true;
+        }
+
+        part
+        {
+            name: "bottom-left";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "bottom-right";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-horizontal: true;
+            flip-vertical: true;
+        }
+
+
+        part
+        {
+            name: "handle";
+            enabled: "radio_button_select_enabled";
+            disabled: "radio_button_select_disabled";
+            pressed: "radio_button_select_pressed";
+            hovered: "radio_button_select_hovered";
+            scaling: vec2(0.4,0.8);
+        }
+
+
+        text-part
+        {
+            name: "caption";
+            text: "caption";
+
+            enabled
+            {
+                foreground-color: white;
+            }
+
+            disabled
+            {
+                foreground-color: darkgray;
+            }
+        }
+
+
+        sound-part
+        {
+            name: "changed";
+            sound: "click";
+        }
+    }
+
+
+    /*
+        Scroll bar
+    */
+
+    skin
+    {
+        type: scroll-bar;
+
+
+        part
+        {
+            name: "center";
+            enabled: "check_box_center_enabled";
+            disabled: "check_box_center_enabled";
+            pressed: "check_box_center_enabled";
+            hovered: "check_box_center_hovered";
+        }
+
+
+        part
+        {
+            name: "top";
+            enabled: "button_top_enabled";
+            focused: "button_top_focused";
+        }
+
+        part
+        {
+            name: "bottom";
+            enabled: "button_top_enabled";
+            focused: "button_top_focused";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "left";
+            enabled: "button_left_enabled";
+            focused: "button_left_focused";
+        }
+
+        part
+        {
+            name: "right";
+            enabled: "button_left_enabled";
+            focused: "button_left_focused";
+            flip-horizontal: true;
+        }
+
+
+        part
+        {
+            name: "top-left";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+        }
+
+        part
+        {
+            name: "top-right";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-horizontal: true;
+        }
+
+        part
+        {
+            name: "bottom-left";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "bottom-right";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-horizontal: true;
+            flip-vertical: true;
+        }
+
+
+        part
+        {
+            name: "handle";
+            enabled: "button_center_enabled";
+            disabled: "button_center_disabled";
+            pressed: "button_center_pressed";
+            hovered: "button_center_hovered";
+        }
+
+
+        text-part
+        {
+            name: "caption";
+            text: "caption";
+
+            enabled
+            {
+                foreground-color: white;
+            }
+
+            disabled
+            {
+                foreground-color: darkgray;
+            }
+        }
+    }
+
+
+    /*
+        Text box
+    */
+
+    skin
+    {
+        type: text-box;
+
+
+        part
+        {
+            name: "center";
+            enabled: "check_box_center_enabled";
+            disabled: "check_box_center_enabled";
+            hovered: "check_box_center_hovered";
+        }
+
+
+        part
+        {
+            name: "top";
+            enabled: "button_top_enabled";
+            focused: "button_top_focused";
+        }
+
+        part
+        {
+            name: "bottom";
+            enabled: "button_top_enabled";
+            focused: "button_top_focused";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "left";
+            enabled: "button_left_enabled";
+            focused: "button_left_focused";
+        }
+
+        part
+        {
+            name: "right";
+            enabled: "button_left_enabled";
+            focused: "button_left_focused";
+            flip-horizontal: true;
+        }
+
+
+        part
+        {
+            name: "top-left";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+        }
+
+        part
+        {
+            name: "top-right";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-horizontal: true;
+        }
+
+        part
+        {
+            name: "bottom-left";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-vertical: true;
+        }
+
+        part
+        {
+            name: "bottom-right";
+            enabled: "button_top_left_enabled";
+            focused: "button_top_left_focused";
+            flip-horizontal: true;
+            flip-vertical: true;
+        }
+
+
+        part
+        {
+            name: "cursor";
+            enabled: "text_box_cursor_enabled";
+        }
+
+
+        text-part
+        {
+            name: "caption";
+            text: "caption";
+
+            enabled
+            {
+                foreground-color: white;
+            }
+
+            disabled
+            {
+                foreground-color: darkgray;
+            }
+        }
+
+        text-part
+        {
+            name: "text";
+            text: "caption";
+
+            enabled
+            {
+                foreground-color: white;
+            }
+
+            disabled
+            {
+                foreground-color: darkgray;
+            }
+        }
+
+        text-part
+        {
+            name: "placeholder-text";
+            text: "caption";
+
+            enabled
+            {
+                foreground-color: gray;
+                font-style: italic;
+            }
+
+            disabled
+            {
+                foreground-color: darkgray;
+                font-style: italic;
+            }
+        }
+    }
+}

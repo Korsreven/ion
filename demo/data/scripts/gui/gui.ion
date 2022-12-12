@@ -1,0 +1,212 @@
+/*
+	IonScript
+	gui.ion
+*/
+
+gui
+{
+    mouse-cursor
+	{
+		name: "mouse_cursor";
+		z-order: 1.0;
+	}
+
+	tooltip
+	{
+		name: "tooltip";
+		z-order: 0.9;
+	}
+
+
+	frame
+	{
+		name: "main";
+		activated: true;
+		focused: true;
+
+		scene-node
+		{
+			model
+			{
+				rectangle
+				{
+					size: vec2(5.25, 2.0);
+					color: rgba(0.0, 0.0, 0.0, 0.75);
+				}
+
+				render-pass { }
+			}
+		}
+
+		panel
+		{
+			name: "base";
+			z-order: 0.1;
+
+			slider
+			{
+				name: "slider";
+				size: vec2(1.0, 0.077);
+				caption: "My slider";
+				tooltip: "My slider tooltip";
+				range: 0 20;
+				step-by-amount: 5;
+
+				scene-node { position: vec3(0.0, 0.6, 0.0); }
+			}
+
+			label
+			{
+				name: "label";
+				caption: "My label";
+				tooltip: "My label tooltip";
+
+				scene-node { position: vec3(0.0, 0.5, 0.0); }
+			}
+
+			button
+			{
+				name: "button";
+				size: vec2(0.5, 0.11);
+				caption: "My button";
+				tooltip: "My button tooltip";
+
+				scene-node { position: vec3(0.0, 0.4, 0.0); }
+			}
+
+			check-box
+			{
+				name: "check_box";
+				size: vec2(0.077);
+				caption: "My check box";
+				tooltip: "My check box tooltip";
+
+				scene-node { position: vec3(0.0, 0.3, 0.0); }
+			}
+
+			radio-button
+			{
+				name: "radio_button";
+				size: vec2(0.077);
+				caption: "My radio button";
+				tooltip: "My radio button tooltip";
+				caption-layout: outside-left-center;
+
+				scene-node { position: vec3(-0.05, 0.0, 0.1); }
+			}
+
+			radio-button
+			{
+				name: "radio_button2";
+				size: vec2(0.077);
+				caption: "My radio button";
+				tooltip: "My radio button tooltip";
+
+				scene-node { position: vec3(0.05, 0.0, 0.1); }
+			}
+
+			group-box
+			{
+				name: "group_box";
+				size: vec2(1.0, 0.15);
+				caption: "My group box";
+				tooltip: "My group box tooltip";
+
+				attach: "radio_button";
+				attach: "radio_button2";
+
+				scene-node { position: vec3(0.0, 0.1, 0.0); }
+			}
+
+			progress-bar
+			{
+				name: "progress_bar";
+				size: vec2(1.0, 0.077);
+				caption: "My progress bar";
+				tooltip: "My progress bar tooltip";
+				range: 0.0 100.0;
+				position: 75.0;
+
+				scene-node { position: vec3(0.0, -0.1, 0.0); }
+			}
+
+			list-box
+			{
+				name: "list_box";
+				size: vec2(0.5);
+				caption: "My list box";
+				tooltip: "My list box tooltip";
+				item-height-factor: 3.5;
+				item-layout: left;
+				icon-layout: left;
+				icon-padding: vec2(10.0);
+				show-icons: true;
+
+				item: "My <b>1st</b> <font color='purple'>item</font>" "star";
+				item: "My <b>2nd</b> <font color='purple'>item</font>" "star_red";
+				item: "My <b>3rd</b> <font color='purple'>item</font>" "star_green";
+				item: "My <b>4th</b> <font color='purple'>item</font>" "star_blue";
+				item: "My <b>5th</b> <font color='purple'>item</font>" "star";
+				item: "My <b>6th</b> <font color='purple'>item</font>" "star_blue";
+				item: "My <b>7th</b> <font color='purple'>item</font>" "star_green";
+				item: "My <b>8th</b> <font color='purple'>item</font>" "star_red";
+				item: "My <b>9th</b> <font color='purple'>item</font>" "star";
+
+				scene-node { position: vec3(0.8, 0.25, 0.0); }
+			}
+
+			scroll-bar
+			{
+				name: "scroll_bar";
+				size: vec2(0.077, 0.5);
+				caption: "My scroll bar";
+				tooltip: "My scroll bar tooltip";
+				range: 0 50;
+				step-by-amount: 3;
+
+				attach: "list_box";
+
+				scene-node { position: vec3(1.1, 0.25, 0.0); }
+			}
+
+			text-box
+			{
+				name: "text_box";
+				size: vec2(0.5, 0.11);
+				caption: "My text box";
+				tooltip: "My text box tooltip";
+				placeholder-content: "<i><b>Type</b></i> something...";
+				text-layout: left;
+				text-mode: printable;
+				character-set: ascii;
+
+				scene-node { position: vec3(0.0, -0.3, 0.0); }
+			}
+
+
+			panel
+			{
+				name: "sub";
+				z-order: 0.1;
+				grid-layout: vec2(3.54, 2.0) 3 3;
+
+				label
+				{
+					name: "label";
+					caption: "My label";
+					tooltip: "My label tooltip";
+				}
+
+				grid-cell
+				{
+					row: 2;
+					column: 0;
+					alignment: left;
+					vertical-alignment: bottom;
+
+					attach: "label";
+				}
+			}
+		}
+	}
+}

@@ -13,10 +13,41 @@ ION engine has been actively under development for a period of 5 years (2017 to 
 
 ## Dependencies
 One of the things I enjoy the most when writing code, is actually writing most of the code myself. But there is no rule without exception... ION engine is using four different third party libraries.
-* FMOD v2.1.10 (https://www.fmod.com/)
+* FMOD v2.01.20 (https://www.fmod.com/)
 * FreeImage v3.18.0 (https://freeimage.sourceforge.io/)
-* FreeType v2.10.4 (https://www.freetype.org/)
+* FreeType v2.12.1 (https://www.freetype.org/)
 * GLEW v2.1.0 (http://glew.sourceforge.net/)
+
+## How to get started
+* Download and install [Microsoft Visual Studio 2022](https://visualstudio.microsoft.com/vs/community/)
+    * Remember to include ***Desktop development with C++*** before installing
+* Clone the [Korsreven/ion](https://github.com/Korsreven/ion) repository
+* Create directories `ion/binaries/Debug` and `ion/binaries/Release`
+* Copy the following files to the `Debug` and `Release` directories
+    * `fmod.dll` from [ion/libraries/Fmod/bin](libraries/Fmod/bin)
+    * `FreeImage.dll` from [ion/libraries/FreeImage/bin](libraries/FreeImage/bin)
+    * `freetype.dll` from [ion/libraries/FreeType/bin](libraries/FreeType/bin)
+    * `glew32.dll` from [ion/libraries/GLEW/bin](libraries/GLEW/bin)
+* Copy `glew.h` and `wglew.h` from [ion/libraries/GLEW](libraries/GLEW) to `C:/Program Files (x86)/Windows Kits/10/Include/<latest>/um/gl`
+* Copy `glew32.lib` from [ion/libraries/GLEW/lib](libraries/GLEW/lib) to `C:/Program Files (x86)/Windows Kits/10/Lib/<latest>/um/x86`
+* Open the project file `ion.sln` and rebuild solution
+
+## How to run the demo
+* Do all of the steps in ***How to get started***
+* Copy the [ion/demo/data](demo/data) directory to the `Debug` and `Release` directories
+* Copy all files in [ion/source/engine/graphics/shaders/glsl](source/engine/graphics/shaders/glsl) to the `Debug\data\shaders` and `Release\data\shaders` directories
+* Copy `main.cpp` from [ion/demo](demo) to [ion/source](source) and overwrite the existing file
+
+## How to setup shaders
+ION engine comes with some [default shaders](source/engine/graphics/shaders/glsl).
+* `IonModelShader` is needed for rendering models (meshes, shapes, sprites etc.) as designed
+* `IonParticleShader` is needed for rendering particle systems as designed
+* `IonTextShader` is needed for rendering text as designed
+* `IonSimple*` are mostly for rendering GUI/HUD objects without any lighting or fog
+
+The *fixed function pipeline* is used when rendering without shaders (***not recommended***). To render text properly without shaders, use `FontManager::FontGlyphTextureType(GlyphTextureType::Texture2D)`.
+* Copy the shaders you need from [ion/source/engine/graphics/shaders/glsl](../../source/engine/graphics/shaders/glsl) to your project directory
+* Check out `main.cpp` from [ion/demo](../) to see how to setup and use shaders correctly in your own project
 
 ## Author
 The ION game engine is written by Jan Ivar Goli.

@@ -1,0 +1,74 @@
+/*
+	IonScript
+	gui_textures.ion
+*/
+
+
+//Button center
+texture-atlas
+{
+    name: "button_center";
+    asset-name: "button_center.png";
+    wrap: repeat;
+    rows: 2;
+    columns: 2;
+}
+
+//Check box mark
+texture-atlas
+{
+    name: "check_box_mark";
+    asset-name: "check_box_mark.png";
+    rows: 2;
+    columns: 2;
+}
+
+//Control parts
+texture-atlas
+{
+    name: "control_parts";
+    asset-name: "control_parts.png";
+    wrap: repeat;
+    rows: 4;
+    columns: 2;
+}
+
+//Radio button select
+texture-atlas
+{
+    name: "radio_button_select";
+    asset-name: "radio_button_select.png";
+    rows: 2;
+    columns: 2;
+}
+
+//Tooltip parts
+texture-atlas
+{
+    name: "tooltip_parts";
+    asset-name: "tooltip_parts.png";
+    wrap: repeat;
+    rows: 2;
+    columns: 2;
+}
+
+//Mouse cursor
+texture
+{
+    name: "mouse_cursor";
+    asset-name: "mouse_cursor.png";
+}
+
+//Progress bar
+texture
+{
+    name: "progress_bar";
+    asset-name: "progress_bar.png";
+}
+
+//Text box
+texture
+{
+    name: "text_box_cursor";
+    asset-name: "text_box_cursor.png";
+}

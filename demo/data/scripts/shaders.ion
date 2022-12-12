@@ -1,0 +1,94 @@
+/*
+	IonScript
+	shaders.ion
+*/
+
+
+//Model
+
+shader
+{
+    name: "model_vert";
+    asset-name: "IonModelShader.vert";
+}
+
+shader
+{
+    name: "model_frag";
+    asset-name: "IonModelShader.frag";
+}
+
+
+//Particle
+
+shader
+{
+    name: "particle_vert";
+    asset-name: "IonParticleShader.vert";
+}
+
+shader
+{
+    name: "particle_frag";
+    asset-name: "IonParticleShader.frag";
+}
+
+
+//Text
+
+shader
+{
+    name: "text_vert";
+    asset-name: "IonTextShader.vert";
+}
+
+shader
+{
+    name: "text_frag";
+    asset-name: "IonTextShader.frag";
+}
+
+
+//Simple model
+
+shader
+{
+    name: "simple_model_vert";
+    asset-name: "IonSimpleModelShader.vert";
+}
+
+shader
+{
+    name: "simple_model_frag";
+    asset-name: "IonSimpleModelShader.frag";
+}
+
+
+//Simple particle
+
+shader
+{
+    name: "simple_particle_vert";
+    asset-name: "IonSimpleParticleShader.vert";
+}
+
+shader
+{
+    name: "simple_particle_frag";
+    asset-name: "IonSimpleParticleShader.frag";
+}
+
+
+//Simple text
+
+shader
+{
+    name: "simple_text_vert";
+    asset-name: "IonSimpleTextShader.vert";
+}
+
+shader
+{
+    name: "simple_text_frag";
+    asset-name: "IonSimpleTextShader.frag";
+}

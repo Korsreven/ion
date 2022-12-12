@@ -1,0 +1,11 @@
+/*
+	IonScript
+	frame_sequences.ion
+*/
+
+//Logo sequence
+frame-sequence
+{
+    name: "logo_sequence";
+    frames: "logo_frames_1" 16;
+}

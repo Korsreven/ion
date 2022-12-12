@@ -1,0 +1,86 @@
+/*
+	IonScript
+	textures.ion
+*/
+
+@import 'gui_textures.ion';
+
+
+//Aura
+texture-atlas
+{
+    name: "aura";
+    asset-name: "aura.png";
+    rows: 1;
+    columns: 2;
+}
+
+//Brick wall
+texture-atlas
+{
+    name: "brick_wall";
+    asset-name: "brick_wall.jpg";
+    rows: 2;
+    columns: 2;
+    sub-textures: 3;
+}
+
+//Cloud
+texture
+{
+    name: "cloud_diffuse";
+    asset-name: "cloud.png";
+}
+
+//Logo frames
+texture-atlas
+{
+    name: "logo_frames";
+    asset-name: "logo_frames.png";
+    rows: 4;
+    columns: 4;
+}
+
+//Pyramid (egyptian)
+texture-atlas
+{
+    name: "pyramid_egyptian";
+    asset-name: "pyramid_egyptian.png";
+    rows: 2;
+    columns: 2;
+    sub-textures: 3;
+}
+
+//Pyramid (mayan)
+texture-atlas
+{
+    name: "pyramid_mayan";
+    asset-name: "pyramid_mayan.png";
+    rows: 2;
+    columns: 2;
+    sub-textures: 3;
+}
+
+//Raindrop
+texture
+{
+    name: "raindrop_diffuse";
+    asset-name: "raindrop.png";
+}
+
+//Ship
+texture-atlas
+{
+    name: "ship";
+    asset-name: "ship.png";
+    rows: 2;
+    columns: 2;
+    sub-textures: 3;
+}
+
+//Star
+texture
+{
+    name: "star_diffuse";
+    asset-name: "star.png";
+}

@@ -1,0 +1,246 @@
+/*
+	IonScript
+	gui_materials.ion
+*/
+
+
+// Button
+
+material
+{
+    name: "button_center_enabled";
+
+    diffuse-map: "button_center_1";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "button_center_disabled";
+
+    diffuse-map: "button_center_2";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "button_center_pressed";
+
+    diffuse-map: "button_center_3";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "button_center_hovered";
+
+    diffuse-map: "button_center_4";
+    lighting-enabled: false;
+}
+
+
+material
+{
+    name: "button_top_enabled";
+
+    diffuse-map: "control_parts_3";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "button_top_focused";
+
+    diffuse-map: "control_parts_4";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "button_left_enabled";
+
+    diffuse-map: "control_parts_5";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "button_left_focused";
+
+    diffuse-map: "control_parts_6";
+    lighting-enabled: false;
+}
+
+
+material
+{
+    name: "button_top_left_enabled";
+
+    diffuse-map: "control_parts_7";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "button_top_left_focused";
+
+    diffuse-map: "control_parts_8";
+    lighting-enabled: false;
+}
+
+
+//Check box
+
+material
+{
+    name: "check_box_center_enabled";
+
+    diffuse-map: "control_parts_1";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "check_box_center_hovered";
+
+    diffuse-map: "control_parts_2";
+    lighting-enabled: false;
+}
+
+
+material
+{
+    name: "check_box_mark_enabled";
+
+    diffuse-map: "check_box_mark_1";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "check_box_mark_disabled";
+
+    diffuse-map: "check_box_mark_2";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "check_box_mark_pressed";
+
+    diffuse-map: "check_box_mark_3";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "check_box_mark_hovered";
+
+    diffuse-map: "check_box_mark_4";
+    lighting-enabled: false;
+}
+
+
+//Mouse cursor
+
+material
+{
+    name: "mouse_cursor_enabled";
+
+    diffuse-map: "mouse_cursor";
+    lighting-enabled: false;
+}
+
+
+//Progress bar
+
+material
+{
+    name: "progress_bar_enabled";
+
+    diffuse-map: "progress_bar";
+    lighting-enabled: false;
+}
+
+
+//Radio button
+
+material
+{
+    name: "radio_button_select_enabled";
+
+    diffuse-map: "radio_button_select_1";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "radio_button_select_disabled";
+
+    diffuse-map: "radio_button_select_2";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "radio_button_select_pressed";
+
+    diffuse-map: "radio_button_select_3";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "radio_button_select_hovered";
+
+    diffuse-map: "radio_button_select_4";
+    lighting-enabled: false;
+}
+
+
+//Text box
+
+material
+{
+    name: "text_box_cursor_enabled";
+    
+    diffuse-map: "text_box_cursor";
+    lighting-enabled: false;
+}
+
+
+//Tooltip
+
+material
+{
+    name: "tooltip_center";
+
+    diffuse-map: "tooltip_parts_1";
+    lighting-enabled: false;
+}
+
+
+material
+{
+    name: "tooltip_top";
+
+    diffuse-map: "tooltip_parts_2";
+    lighting-enabled: false;
+}
+
+material
+{
+    name: "tooltip_left";
+
+    diffuse-map: "tooltip_parts_3";
+    lighting-enabled: false;
+}
+
+
+material
+{
+    name: "tooltip_top_left";
+
+    diffuse-map: "tooltip_parts_4";
+    lighting-enabled: false;
+}

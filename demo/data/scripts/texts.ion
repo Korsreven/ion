@@ -1,0 +1,36 @@
+/*
+	IonScript
+	texts.ion
+*/
+
+@import 'gui_texts.ion';
+
+
+//FPS
+text
+{
+    name: "fps";
+    type-face: "verdana_36";
+    formatting: none;
+    default-foreground-color: white;
+}
+
+//Header
+text
+{
+    name: "header";
+    content: "<font color='silver'>Powered by</font> <b>ION engine</b>";
+    type-face: "verdana_36";
+    alignment: center;
+    default-foreground-color: white;
+}
+
+//Sub header
+text
+{
+    name: "sub_header";
+    content: "Press any key to continue...";
+    type-face: "verdana_24";
+    alignment: center;
+    default-foreground-color: dimgray;
+}

@@ -1,0 +1,13 @@
+/*
+	IonScript
+	animations.ion
+*/
+
+//Logo animation
+animation
+{
+    name: "logo_animation";
+    frame-sequence: "logo_sequence";
+    cycle-duration: 2.0;
+    direction: alternate;
+}

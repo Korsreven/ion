@@ -1,0 +1,29 @@
+/*
+	IonScript
+	type_faces.ion
+*/
+
+@import 'gui_type_faces.ion';
+
+
+//Verdana 36px
+type-face
+{
+    name: "verdana_36";
+
+    regular: "verdana_regular_36";
+    bold: "verdana_bold_36";
+    italic: "verdana_italic_36";
+    bold-italic: "verdana_bold_italic_36";
+}
+
+//Verdana 24px
+type-face
+{
+    name: "verdana_24";
+
+    regular: "verdana_regular_24";
+    bold: "verdana_bold_24";
+    italic: "verdana_italic_24";
+    bold-italic: "verdana_bold_italic_24";
+}

@@ -1,0 +1,32 @@
+/*
+	IonScript
+	sounds.ion
+*/
+
+@import 'gui_sounds.ion';
+
+
+sound
+{
+    name: "lamp_flicker";
+    asset-name: "lamp_flicker.wav";
+    
+    type: sample;
+    processing-mode: three-dimensional;
+    looping-mode: forward;
+    distance: 0.4;
+}
+
+sound
+{
+    name: "ambient_rain";
+    asset-name: "ambient_rain.mp3";
+
+    type: stream;
+    looping-mode: forward;
+}
+
+sound-listener
+{
+    name: "listener";
+}

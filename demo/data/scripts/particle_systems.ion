@@ -1,0 +1,36 @@
+/*
+	IonScript
+	particle_systems.ion
+*/
+
+
+//Rain
+particle-system
+{
+    name: "rain";
+
+    emitter
+    {
+        name: "spawner";
+
+        type: box;
+        direction: vec2(0, -1);
+        size: vec2(3.56, 0.1);
+        emission-rate: 50.0;
+        particle-quota: 100;
+
+        particle-velocity: 1.5 2.0;
+        particle-size: vec2(8.0) vec2(24.0);
+        particle-mass: 1.0;
+        particle-color: rgba(255, 255, 255, 0.75) white;
+        particle-lifetime: 1.4;
+        particle-material: "raindrop";
+    }
+
+    linear-force
+    {
+        name: "wind";
+        type: add;
+        force: vec2(0.5, 0.0);
+    }
+}

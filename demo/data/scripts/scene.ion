@@ -1,0 +1,532 @@
+/*
+	IonScript
+	scene.ion
+*/
+
+
+//Main camera
+scene-node
+{
+    camera
+    {
+        name: "main_camera";
+
+        frustum
+        {
+            projection: orthographic;
+            clip-plane: vec2(-1.0) vec2(1.0);
+            near-clip-distance: 1.0;
+            far-clip-distance: 100.0;
+            aspect-ratio: 1.77777777778; //16:9
+            aspect-format: pan-and-scan;
+        }
+    }
+}
+
+//FPS
+scene-node
+{
+    position: vec3(-1.75, 0.98, -1.5);
+    scaling: vec2(0.5, 0.5);
+
+    drawable-text
+    {
+        name: "fps";
+
+        text
+        {
+            name: "fps";
+        }
+    }
+}
+
+
+//Splash
+scene-node
+{
+    name: "splash_node";
+    position: vec3(0.0, 0.0, -2.0);
+
+    //Logo
+    scene-node
+    {
+        position: vec3(0.0, 0.25, 0.0);
+
+        model
+        {
+            name: "logo_model";
+            
+            sprite
+            {
+                position: vec3(0.0);
+                size: vec2(1.0, 0.5);
+                material: "logo";
+            }
+
+            render-pass { }
+        }
+    }
+
+    //Header
+    scene-node
+    {
+        position: vec3(0.0, -0.1, 0.0);
+        scaling: vec2(0.75, 0.75);
+
+        drawable-text
+        {
+            text
+            {
+                name: "header";
+            }
+        }
+
+        //Sub header
+        scene-node
+        {
+            position: vec3(0.0, -0.25, 0.0);
+
+            drawable-text
+            {
+                text
+                {
+                    name: "sub_header";
+                }
+            }
+        }
+    }
+}
+
+
+//Level
+scene-node
+{
+    name: "level_node";
+    position: vec3(0.0, 0.0, -5.0);
+
+    //Brick wall
+    scene-node
+    {
+        model
+        {
+            name: "background_model";
+            
+            sprite
+            {
+                position: vec3(0.0);
+                size: vec2(1.75);
+                material: "brick_wall";
+            }
+
+            sprite
+            {
+                position: vec3(-1.75, 0.0, 0.0);
+                size: vec2(1.75);
+                material: "brick_wall";
+            }
+
+            sprite
+            {
+                position: vec3(1.75, 0.0, 0.0);
+                size: vec2(1.75);
+                material: "brick_wall";
+            }
+        }
+    }
+
+    //Cloud
+    scene-node
+    {
+        position: vec3(0.0, 0.0, 0.65);
+
+        model
+        {
+            name: "cloud_model";
+
+            sprite
+            {
+                position: vec3(-1.0, 0.4, 0.0);
+                size: vec2(1.162718, 1.25);
+                material: "cloud";
+            }
+
+            sprite
+            {
+                position: vec3(1.0, -0.4, 0.0);
+                size: vec2(1.162718, 1.25);
+                material: "cloud";
+            }
+        }
+
+
+        //Cloud (scaler)
+        animation
+        {
+            name: "cloud_scaler";
+            start: 1.0;
+
+            scaling
+            {
+                unit: vec2(0.25);
+                total-duration: 10.0;
+                motion-technique: sigmoid;
+            }
+
+            scaling
+            {
+                unit: vec2(-0.25);
+                total-duration: 10.0;
+                start-time: 10.0;
+                motion-technique: sigmoid;
+            }
+        }
+    }
+
+    //Light (red)
+    scene-node
+    {
+        position: vec3(-1.5, -0.75, 1.25);
+
+        light
+        {
+            name: "red_light";
+            type: point;
+            diffuse-color: red;
+            ambient-color: darkred;
+            //attenuation: 1.0 0.09 0.032;
+            radius: 1.5;
+        }
+
+        //Lamp (red)
+        scene-node
+        {
+            position: vec3(0.0, 0.0, -0.8);
+
+            movable-sound
+            {
+                name: "red_lamp_flicker";
+                paused: true;
+
+                sound
+                {
+                    name: "lamp_flicker";
+                }
+            }
+        }
+    }
+
+    //Light (green)
+    scene-node
+    {
+        position: vec3(1.5, 0.75, 1.25);
+
+        light
+        {
+            name: "green_light";
+            type: point;
+            diffuse-color: green;
+            ambient-color: darkgreen;
+            //attenuation: 1.0 0.09 0.032;
+            radius: 1.5;
+        }
+
+        //Lamp (green)
+        scene-node
+        {
+            position: vec3(0.0, 0.0, -0.8);
+
+            movable-sound
+            {
+                name: "green_lamp_flicker";
+                paused: true;
+
+                sound
+                {
+                    name: "lamp_flicker";
+                }
+            }
+        }
+    }
+
+    //Pyramid (egyptian)
+    scene-node
+    {
+        position: vec3(1.0, 0.5, 0.25);
+
+        model
+        {
+            name: "pyramid_egyptian";
+            query-flags: 2;
+            //show-bounding-volumes: true;
+            
+            sprite
+            {
+                size: vec2(0.5, 0.5);
+                material: "pyramid_egyptian";
+            }
+        }
+    }
+
+    //Pyramid (mayan)
+    scene-node
+    {
+        position: vec3(-1.0, -0.5, 0.25);
+
+        model
+        {
+            name: "pyramid_mayan";
+            query-flags: 4;
+            //show-bounding-volumes: true;
+
+            sprite
+            {
+                size: vec2(0.5, 0.5);
+                material: "pyramid_mayan";
+            }
+        }
+    }
+
+    //Rain
+    scene-node
+    {
+        position: vec3(0.0, 1.0, 0.5);
+        initial-direction: vec2(0.0, -1.0);
+
+        drawable-particle-system
+        {
+            name: "rain";
+
+            particle-system
+            {
+                name: "rain";
+                emitting: true;
+            }
+        }
+    }
+
+
+    //Player
+    scene-node
+    {
+        name: "player_node";
+        position: vec3(0.0, -0.65, 0.45);
+        
+        //Player camera
+        scene-node
+        {
+            position: vec3(0.0, 0.0, 4.55);
+
+            camera
+            {
+                name: "player_camera";
+
+                frustum
+                {
+                    projection: orthographic;
+                    clip-plane: vec2(-1.0) vec2(1.0);
+                    near-clip-distance: 1.0;
+                    far-clip-distance: 100.0;
+                    aspect-ratio: 1.77777777778; //16:9
+                }
+            }
+        }
+
+        //Ship
+        scene-node
+        {
+            name: "ship_node";
+
+            model
+            {
+                name: "ship_model";
+                bounding-volume-extent: vec2(0.3, 0.2) vec2(0.7, 0.8);
+                query-flags: 1;
+                query-mask: 6; //2 | 4
+                //show-bounding-volumes: true;
+
+                sprite
+                {
+                    size: vec2(0.4, 0.4);
+                    material: "ship";
+                }
+            }
+
+            movable-sound-listener
+            {
+                sound-listener
+                {
+                    name: "listener";
+                }
+            }
+
+
+            //Aura
+            scene-node
+            {
+                position: vec3(0.0, -0.05, -0.1);
+                inherit-rotation: false;
+
+                model
+                {
+                    name: "ship_aura_model";
+
+                    sprite
+                    {
+                        size: vec2(0.432, 0.45);
+                        material: "aura";
+                        fill-opacity: 0.65;
+                    }
+                }
+
+
+                //Aura (rotator)
+                animation
+                {
+                    name: "aura_rotator";
+                    start: 1.0;
+
+                    rotation
+                    {
+                        angle: -90.0;
+                        total-duration: 1.0;
+                    }
+                }            
+            }
+
+            //Ship light
+            scene-node
+            {
+                name: "ship_light_node";
+                position: vec3(0.0, -0.15, -0.05);
+                visible: false;
+
+                light
+                {
+                    name: "ship_light";
+                    type: spot;
+                    direction: vec3(0.0, 0.83, -0.55);
+                    diffuse-color: white;
+                    attenuation: 1.0 0.09 0.032;
+                    cutoff: 20 30;
+                }
+            }   
+
+            //Star
+            scene-node
+            {
+                position: vec3(0.15, 0.2, 0.1);
+
+                model
+                {
+                    name: "ship_star_model";
+
+                    sprite
+                    {
+                        size: vec2(0.05, 0.05);
+                        material: "star";
+                    }
+
+                    render-pass { }
+                }
+            }
+
+
+            //Ship idle (mover)
+            animation
+            {
+                name: "ship_idle_mover";
+
+                translation
+                {
+                    unit: vec3(0.0, 0.02, 0.0);
+                    total-duration: 2.0;
+                }
+
+                translation
+                {
+                    unit: vec3(0.02, -0.02, 0.0);
+                    total-duration: 2.0;
+                    start-time: 2.0;
+                }
+
+                translation
+                {
+                    unit: vec3(-0.02, -0.02, 0.0);
+                    total-duration: 2.0;
+                    start-time: 4.0;
+                }
+
+                translation
+                {
+                    unit: vec3(-0.02, 0.02, 0.0);
+                    total-duration: 2.0;
+                    start-time: 6.0;
+                }
+
+                translation
+                {
+                    unit: vec3(0.02, 0.02, 0.0);
+                    total-duration: 2.0;
+                    start-time: 8.0;
+                }
+
+                translation
+                {
+                    unit: vec3(0.0, -0.02, 0.0);
+                    total-duration: 2.0;
+                    start-time: 10.0;
+                }
+            }
+
+            //Ship idle (rotator)
+            animation
+            {
+                name: "ship_idle_rotator";
+
+                rotation
+                {
+                    angle: -2.5;
+                    total-duration: 2.0;
+                    start-time: 2.0;
+                }
+
+                rotation
+                {
+                    angle: 2.5;
+                    total-duration: 2.0;
+                    start-time: 4.0;
+                }
+
+                rotation
+                {
+                    angle: 2.5;
+                    total-duration: 2.0;
+                    start-time: 6.0;
+                }
+
+                rotation
+                {
+                    angle: -2.5;
+                    total-duration: 2.0;
+                    start-time: 8.0;
+                }
+            }
+
+            //Ship idle
+            animation-group
+            {
+                name: "ship_idle_group";
+                add: "ship_idle_mover";
+                add: "ship_idle_rotator";
+            }
+
+            //Ship idle (timeline)
+            animation-timeline
+            {
+                name: "ship_idle";
+                running: false;
+                attach-animation-group: "ship_idle";
+            }
+        }
+    }
+}

@@ -1,0 +1,117 @@
+/*
+	IonScript
+	materials.ion
+*/
+
+@import 'gui_materials.ion';
+
+
+//Aura
+material
+{
+    name: "aura";
+
+    diffuse-map: "aura_1";
+    emissive-map: "aura_2";
+    emissive-color: pink;
+}
+
+//Brick wall
+material
+{
+    name: "brick_wall";
+
+    diffuse-map: "brick_wall_1";
+    normal-map: "brick_wall_2";
+    specular-map: "brick_wall_3";
+
+    diffuse-color: burlywood;
+}
+
+//Cloud
+material
+{
+    name: "cloud";
+    diffuse-map: "cloud_diffuse";
+}
+
+//Logo
+material
+{
+    name: "logo";
+    diffuse-map: "logo_animation";
+    lighting-enabled: false;
+}
+
+//Pyramid (egyptian)
+material
+{
+    name: "pyramid_egyptian";
+    diffuse-map: "pyramid_egyptian_1";
+    normal-map: "pyramid_egyptian_2";
+    specular-map: "pyramid_egyptian_3";
+}
+
+//Pyramid (mayan)
+material
+{
+    name: "pyramid_mayan";
+    diffuse-map: "pyramid_mayan_1";
+    normal-map: "pyramid_mayan_2";
+    specular-map: "pyramid_mayan_3";
+}
+
+//Raindrop
+material
+{
+    name: "raindrop";
+    diffuse-map: "raindrop_diffuse";
+}
+
+//Ship
+material
+{
+    name: "ship";
+    diffuse-map: "ship_1";
+    normal-map: "ship_2";
+    specular-map: "ship_3";
+}
+
+//Star
+material
+{
+    name: "star";
+
+    diffuse-map: "star_diffuse";
+    lighting-enabled: false;
+}
+
+//Star (red)
+material
+{
+    name: "star_red";
+
+    diffuse-map: "star_diffuse";
+    diffuse-color: red;
+    lighting-enabled: false;
+}
+
+//Star (green)
+material
+{
+    name: "star_green";
+
+    diffuse-map: "star_diffuse";
+    diffuse-color: green;
+    lighting-enabled: false;
+}
+
+//Star (blue)
+material
+{
+    name: "star_blue";
+
+    diffuse-map: "star_diffuse";
+    diffuse-color: blue;
+    lighting-enabled: false;
+}

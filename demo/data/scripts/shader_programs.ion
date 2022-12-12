@@ -1,0 +1,350 @@
+/*
+	IonScript
+	shader_programs.ion
+*/
+
+
+//Model
+
+shader-program
+{
+    name: "model_prog";
+    vertex-shader: "model_vert";
+    fragment-shader: "model_frag";
+
+    attribute: vec3 "vertex_position";
+    attribute: vec3 "vertex_normal";
+    attribute: vec4 "vertex_color";
+    attribute: vec3 "vertex_tex_coord";
+
+    struct
+    {
+        name: "matrix";
+
+        uniform: mat4 "model_view";
+        uniform: mat4 "model_view_projection";
+        uniform: mat3 "normal";
+    }
+
+    struct
+    {
+        name: "scene";
+        
+        uniform: vec4 "ambient";
+        uniform: float "gamma";
+        uniform: bool "has_fog";
+        uniform: sampler1DArray "lights";
+        uniform: sampler1DArray "emissive_lights";
+        uniform: int "light_count";
+        uniform: int "emissive_light_count";
+    }
+
+    struct
+    {
+        name: "camera";
+        uniform: vec3 "position";
+    }
+
+    struct
+    {
+        name: "primitive";
+        uniform: bool "has_material";
+    }
+
+    struct
+    {
+        name: "material";
+        
+        uniform: vec4 "ambient";
+        uniform: vec4 "diffuse";
+        uniform: vec4 "specular";
+        uniform: vec4 "emissive";
+        uniform: float "shininess";
+        uniform: sampler2D "diffuse_map";
+        uniform: sampler2D "normal_map";
+        uniform: sampler2D "specular_map";
+        uniform: sampler2D "emissive_map";
+        uniform: bool "has_diffuse_map";
+        uniform: bool "has_normal_map";
+        uniform: bool "has_specular_map";
+        uniform: bool "has_emissive_map";
+        uniform: bool "lighting_enabled";
+    }
+
+    struct
+    {
+        name: "fog";
+        
+        uniform: int "mode";
+        uniform: float "density";
+        uniform: float "near";
+        uniform: float "far";
+        uniform: vec4 "color";
+    }
+}
+
+
+//Particle
+
+shader-program
+{
+    name: "particle_prog";
+    vertex-shader: "particle_vert";
+    fragment-shader: "particle_frag";
+
+    attribute: vec3 "vertex_position";
+    attribute: float "vertex_rotation";
+    attribute: float "vertex_point_size";
+    attribute: vec4 "vertex_color";
+
+    struct
+    {
+        name: "matrix";
+
+        uniform: mat4 "model_view";
+        uniform: mat4 "model_view_projection";
+        uniform: mat3 "normal";
+    }
+
+    struct
+    {
+        name: "scene";
+        
+        uniform: vec4 "ambient";
+        uniform: float "gamma";
+        uniform: bool "has_fog";
+        uniform: sampler1DArray "lights";
+        uniform: sampler1DArray "emissive_lights";
+        uniform: int "light_count";
+        uniform: int "emissive_light_count";
+    }
+
+    struct
+    {
+        name: "camera";
+
+        uniform: vec3 "position";
+        uniform: float "rotation";
+    }
+
+    struct
+    {
+        name: "primitive";
+        uniform: bool "has_material";
+    }
+
+    struct
+    {
+        name: "material";
+        
+        uniform: vec4 "ambient";
+        uniform: vec4 "diffuse";
+        uniform: vec4 "specular";
+        uniform: vec4 "emissive";
+        uniform: float "shininess";
+        uniform: sampler2D "diffuse_map";
+        uniform: sampler2D "normal_map";
+        uniform: sampler2D "specular_map";
+        uniform: sampler2D "emissive_map";
+        uniform: bool "has_diffuse_map";
+        uniform: bool "has_normal_map";
+        uniform: bool "has_specular_map";
+        uniform: bool "has_emissive_map";
+        uniform: bool "lighting_enabled";
+    }
+
+    struct
+    {
+        name: "fog";
+        
+        uniform: int "mode";
+        uniform: float "density";
+        uniform: float "near";
+        uniform: float "far";
+        uniform: vec4 "color";
+    }
+}
+
+
+//Text
+
+shader-program
+{
+    name: "text_prog";
+    vertex-shader: "text_vert";
+    fragment-shader: "text_frag";
+
+    attribute: vec3 "vertex_position";
+    attribute: vec4 "vertex_color";
+    attribute: vec3 "vertex_tex_coord";
+
+    struct
+    {
+        name: "matrix";
+
+        uniform: mat4 "model_view";
+        uniform: mat4 "model_view_projection";
+    }
+
+    struct
+    {
+        name: "scene";
+        
+        uniform: vec4 "ambient";
+        uniform: float "gamma";
+        uniform: bool "has_fog";
+        uniform: sampler1DArray "lights";
+        uniform: sampler1DArray "emissive_lights";
+        uniform: int "light_count";
+        uniform: int "emissive_light_count";
+    }
+
+    struct
+    {
+        name: "camera";
+        uniform: vec3 "position";
+    }
+
+    struct
+    {
+        name: "primitive";
+
+        uniform: sampler2DArray "texture";
+        uniform: bool "has_texture";
+    }
+
+    struct
+    {
+        name: "fog";
+        
+        uniform: int "mode";
+        uniform: float "density";
+        uniform: float "near";
+        uniform: float "far";
+        uniform: vec4 "color";
+    }
+}
+
+
+//Simple model
+
+shader-program
+{
+    name: "simple_model_prog";
+    vertex-shader: "simple_model_vert";
+    fragment-shader: "simple_model_frag";
+
+    attribute: vec3 "vertex_position";
+    attribute: vec3 "vertex_normal";
+    attribute: vec4 "vertex_color";
+    attribute: vec3 "vertex_tex_coord";
+
+    struct
+    {
+        name: "matrix";
+        uniform: mat4 "model_view_projection";
+    }
+
+    struct
+    {
+        name: "scene";
+        uniform: float "gamma";
+    }
+
+    struct
+    {
+        name: "primitive";
+        uniform: bool "has_material";
+    }
+    
+    struct
+    {
+        name: "material";
+
+        uniform: vec4 "diffuse";
+        uniform: sampler2D "diffuse_map";
+        uniform: bool "has_diffuse_map";
+    }
+}
+
+
+//Simple particle
+
+shader-program
+{
+    name: "simple_particle_prog";
+    vertex-shader: "simple_particle_vert";
+    fragment-shader: "simple_particle_frag";
+
+    attribute: vec3 "vertex_position";
+    attribute: float "vertex_rotation";
+    attribute: float "vertex_point_size";
+    attribute: vec4 "vertex_color";
+
+    struct
+    {
+        name: "matrix";
+        uniform: mat4 "model_view_projection";
+    }
+
+    struct
+    {
+        name: "scene";
+        uniform: float "gamma";
+    }
+
+    struct
+    {
+        name: "camera";
+        uniform: float "rotation";
+    }
+
+    struct
+    {
+        name: "primitive";
+        uniform: bool "has_material";
+    }
+    
+    struct
+    {
+        name: "material";
+
+        uniform: vec4 "diffuse";
+        uniform: sampler2D "diffuse_map";
+        uniform: bool "has_diffuse_map";
+    }
+}
+
+
+//Simple text
+
+shader-program
+{
+    name: "simple_text_prog";
+    vertex-shader: "simple_text_vert";
+    fragment-shader: "simple_text_frag";
+
+    attribute: vec3 "vertex_position";
+    attribute: vec4 "vertex_color";
+    attribute: vec3 "vertex_tex_coord";
+
+    struct
+    {
+        name: "matrix";
+        uniform: mat4 "model_view_projection";
+    }
+
+    struct
+    {
+        name: "scene";
+        uniform: float "gamma";
+    }
+
+    struct
+    {
+        name: "primitive";
+
+        uniform: sampler2DArray "texture";
+        uniform: bool "has_texture";
+    }
+}

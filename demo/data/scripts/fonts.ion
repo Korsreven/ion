@@ -1,0 +1,68 @@
+/*
+	IonScript
+	fonts.ion
+*/
+
+@import 'gui_fonts.ion';
+
+
+//Verdana 36px
+
+font
+{
+    name: "verdana_regular_36";
+    asset-name: "verdana.ttf";
+    size: 36px;
+}
+
+font
+{
+    name: "verdana_bold_36";
+    asset-name: "verdanab.ttf";
+    size: 36px;
+}
+
+font
+{
+    name: "verdana_italic_36";
+    asset-name: "verdanai.ttf";
+    size: 36px;
+}
+
+font
+{
+    name: "verdana_bold_italic_36";
+    asset-name: "verdanaz.ttf";
+    size: 36px;
+}
+
+
+//Verdana 24px
+
+font
+{
+    name: "verdana_regular_24";
+    asset-name: "verdana.ttf";
+    size: 24px;
+}
+
+font
+{
+    name: "verdana_bold_24";
+    asset-name: "verdanab.ttf";
+    size: 24px;
+}
+
+font
+{
+    name: "verdana_italic_24";
+    asset-name: "verdanai.ttf";
+    size: 24px;
+}
+
+font
+{
+    name: "verdana_bold_italic_24";
+    asset-name: "verdanaz.ttf";
+    size: 24px;
+}

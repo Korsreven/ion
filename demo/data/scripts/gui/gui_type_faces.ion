@@ -1,0 +1,16 @@
+/*
+	IonScript
+	type_faces.ion
+*/
+
+
+//Verdana 12px
+type-face
+{
+    name: "verdana_12";
+
+    regular: "verdana_regular_12";
+    bold: "verdana_bold_12";
+    italic: "verdana_italic_12";
+    bold-italic: "verdana_bold_italic_12";
+}

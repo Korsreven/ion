@@ -1,0 +1,14 @@
+/*
+	IonScript
+	gui_texts.ion
+*/
+
+
+//Caption
+
+text
+{
+    name: "caption";
+    type-face: "verdana_12";
+    default-foreground-color: white;
+}

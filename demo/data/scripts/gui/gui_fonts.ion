@@ -1,0 +1,35 @@
+/*
+	IonScript
+	gui_fonts.ion
+*/
+
+
+//Verdana 12px
+
+font
+{
+    name: "verdana_regular_12";
+    asset-name: "verdana.ttf";
+    size: 12px;
+}
+
+font
+{
+    name: "verdana_bold_12";
+    asset-name: "verdanab.ttf";
+    size: 12px;
+}
+
+font
+{
+    name: "verdana_italic_12";
+    asset-name: "verdanai.ttf";
+    size: 12px;
+}
+
+font
+{
+    name: "verdana_bold_italic_12";
+    asset-name: "verdanaz.ttf";
+    size: 12px;
+}
