@@ -46,8 +46,8 @@ ION engine comes with some [default shaders](source/engine/graphics/shaders/glsl
 * `IonSimple*` are mostly for rendering GUI/HUD objects without any lighting or fog
 
 The *fixed function pipeline* is used when rendering without shaders (***not recommended***). To render text properly without shaders, use `FontManager::FontGlyphTextureType(GlyphTextureType::Texture2D)`.
-* Copy the shaders you need from [ion/source/engine/graphics/shaders/glsl](../../source/engine/graphics/shaders/glsl) to your project directory
-* Check out `main.cpp` from [ion/demo](../) to see how to setup and use shaders correctly in your own project
+* Copy the shaders you need from [ion/source/engine/graphics/shaders/glsl](source/engine/graphics/shaders/glsl) to your project directory
+* Check out `main.cpp` from [ion/demo](demo) to see how to setup and use shaders correctly in your own project
 
 ## Author
 The ION game engine is written by Jan Ivar Goli.
