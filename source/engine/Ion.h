@@ -275,9 +275,9 @@ File:	Ion.h
 	One of the things I enjoy the most when writing code, is actually writing most of the code myself.
 	But there is no rule without exception... ION engine is using four different third party libraries.
 	<ul>
-		<li>FMOD v2.1.10 (<a href="https://www.fmod.com/">https://www.fmod.com/</a>)</li>
+		<li>FMOD v2.01.20 (<a href="https://www.fmod.com/">https://www.fmod.com/</a>)</li>
 		<li>FreeImage v3.18.0 (<a href="https://freeimage.sourceforge.io/">https://freeimage.sourceforge.io/</a>)</li>
-		<li>FreeType v2.10.4 (<a href="https://www.freetype.org/">https://www.freetype.org/</a>)</li>
+		<li>FreeType v2.12.1 (<a href="https://www.freetype.org/">https://www.freetype.org/</a>)</li>
 		<li>GLEW v2.1.0 (<a href="http://glew.sourceforge.net/">http://glew.sourceforge.net/</a>)</li>
 	</ul>
 
