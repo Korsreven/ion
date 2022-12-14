@@ -38,6 +38,14 @@ One of the things I enjoy the most when writing code, is actually writing most o
 * Copy all files in [ion/source/engine/graphics/shaders/glsl](source/engine/graphics/shaders/glsl) to the `Debug\data\shaders` and `Release\data\shaders` directories
 * Copy `main.cpp` from [ion/demo](demo) to [ion/source](source) and overwrite the existing file
 
+### Demo screenshots
+<p float="left">
+    <a href="demo/screenshots/splash_screen.jpg"><img src="demo/screenshots/splash_screen.jpg" width="256" /></a>
+    <a href="demo/screenshots/demo_screen.jpg"><img src="demo/screenshots/demo_screen.jpg" width="256" /></a>
+    <a href="demo/screenshots/demo_screen_bounds.jpg"><img src="demo/screenshots/demo_screen_bounds.jpg" width="256" /></a>
+    <a href="demo/screenshots/gui_screen.jpg"><img src="demo/screenshots/gui_screen.jpg" width="256" /></a>
+</p>
+
 ## How to setup shaders
 ION engine comes with some [default shaders](source/engine/graphics/shaders/glsl).
 * `IonModelShader` is needed for rendering models (meshes, shapes, sprites etc.) as designed
