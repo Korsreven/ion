@@ -40,10 +40,10 @@ One of the things I enjoy the most when writing code, is actually writing most o
 
 ### Demo screenshots
 <p float="left">
-    <a href="demo/screenshots/splash_screen.jpg"><img src="demo/screenshots/splash_screen.jpg" width="384px" /></a>
-    <a href="demo/screenshots/demo_screen.jpg"><img src="demo/screenshots/demo_screen.jpg" width="384px" /></a>
-    <a href="demo/screenshots/demo_screen_bounds.jpg"><img src="demo/screenshots/demo_screen_bounds.jpg" width="384px" /></a>
-    <a href="demo/screenshots/gui_screen.jpg"><img src="demo/screenshots/gui_screen.jpg" width="384px" /></a>
+    <img src="demo/screenshots/splash_screen.jpg?raw=true" width="384px" />
+    <img src="demo/screenshots/demo_screen.jpg?raw=true" width="384px" />
+    <img src="demo/screenshots/demo_screen_bounds.jpg?raw=true" width="384px" />
+    <img src="demo/screenshots/gui_screen.jpg?raw=true" width="384px" />
 </p>
 
 ## How to setup shaders
