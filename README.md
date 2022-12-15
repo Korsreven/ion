@@ -3,7 +3,9 @@
 # ION Engine 1.0
 
 ## Introduction
-[ION engine](https://github.com/Korsreven/ion) is a fast, lightweight and fully functional 2D game engine using OpenGL. With the combination of an easy to use high-level scene graph, a blazingly fast low-level batch renderer, fully functional GUI, integrated scripting and powerful utilities, ION Engine has ***everything you need*** to create games right out of the box. To learn some more about the engine, please check out the list of [main features](FEATURES.md) and the latest online version of the [API reference](https://korsreven.github.io/). No prior knowledge of OpenGL is required to get started.
+[ION engine](https://github.com/Korsreven/ion) is a fast, lightweight and fully functional 2D game engine using OpenGL.  
+
+With the combination of an easy to use high-level scene graph, a blazingly fast low-level batch renderer, fully functional GUI, integrated scripting and powerful utilities, ION Engine has ***everything you need*** to create games right out of the box. To learn some more about the engine, please check out the list of [main features](FEATURES.md) and the latest online version of the [API reference](https://korsreven.github.io/). No prior knowledge of OpenGL is required to get started.
 
 ## Source Code
 ION engine is written in modern C++ (with some GLSL) and consists of around 115K lines of code. The development has been done exclusively using Visual Studio on a Microsoft Windows PC. The source code itself is platform independent and should be portable (with some coding effort).
