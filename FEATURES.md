@@ -3,26 +3,39 @@
 # ION Engine 1.0
 
 ## Main features
-* Animations
+Here is an updated list of all the main features of ION engine.
+
+### Animations
 	* Frame animations
 		* Looping and non-looping
 		* Different directions
-			* Normal, reverse, alternate and alternate reverse
+			* Normal
+			* Reverse
+			* Alternate
+			* Alternate reverse
 		* Adjustable playback speeds
 		* Frame-by-frame controllable
 	* Node animations
 		* Animating translation, rotation and scaling
 		* Different motion techniques
-			* Cubic, exponential, linear, logarithmic, sigmoid, sinh and tanh
+			* Cubic
+			* Exponential
+			* Linear
+			* Logarithmic
+			* Sigmoid
+			* Sinh
+			* Tanh
 		* User definable motion techniques
 		* Animation groups and timelines
 		* Triggerable actions
-* Asset management
+
+### Asset management
 	* Loading assets from individual files (perfect for modding)
 	* Loading assets from single large data files
 	* Categorizing assets into repositories
 	* Saving repositories to single large data files
-* Cameras
+
+### Cameras
 	* Interchangeable frustums
 	* Orthographic and perspective projections
 	* Adjustable FOV
@@ -30,7 +43,8 @@
 		* Pan and scan
 		* Letterbox
 		* Windowbox
-* Collision detection
+
+### Collision detection
 	* Intersection scene queries
 	* Ray scene queries
 	* Different built-in primitives
@@ -38,13 +52,20 @@
 		* Oriented bounding boxes
 		* Bounding spheres
 		* Rays
-* Colors
+
+### Colors
 	* 32-bit colors with alpha channel
 	* Hex and shorthand hex notations
 	* X11 colors provided as constants
 	* Different color spaces
-		* RGB, CMYK, HSL, HSV, HWB and YCbCr
-* GUI (fully functional)
+		* RGB
+		* CMYK
+		* HSL
+		* HSV
+		* HWB
+		* YCbCr
+
+### GUI (fully functional)
 	* Mouse and keyboard comptable
 	* Frames and panels
 		* Grid layouts
@@ -63,13 +84,18 @@
 		* Scroll bars
 		* Sliders
 		* Text boxes
-* Lighting
-	* Directional, point and spot lights
+
+### Lighting
+	* Different light types
+		* Directional
+		* Point
+		* Spot
 	* Ambient, diffuse and specular colors
 	* Emissive lighting using point lights
 	* Ambient scene lighting
 	* Phong shading
-* Materials
+
+### Materials
 	* Ambient, diffuse, specular and emissive colors
 	* Tex-coord cropping and flipping
 	* Different texture maps
@@ -78,10 +104,12 @@
 		* Specular maps
 		* Emissive maps
 	* Animatable texture maps
-* Models
+
+### Models
 	* Sprites and animated sprites
 		* Auto sizing and repeating
 		* Keep proportions when resizing
+		* Tex-coord cropping and flipping
 	* Different built-in shapes
 		* Borders
 		* Curves
@@ -91,7 +119,8 @@
 		* Triangles
 	* User derivable shapes
 	* Custom meshes
-* OpenGL and GLSL
+
+### OpenGL and GLSL
 	* Hardware adaptation
 	* OpenGL 4.6 and GLSL 4.60 (460) compatable
 	* OpenGL 2.0 and GLSL 1.10 (110) backward compatable
@@ -101,7 +130,8 @@
 		* mat2, mat3 and mat4
 		* sampler1D and sampler2D
 		* sampler1DArray and sampler2DArray
-* Particle systems
+
+### Particle systems
 	* Box, point and ring emitters
 	* Different built-in affectors
 		* Color faders
@@ -112,14 +142,16 @@
 		* Sine forces
 		* Velocity randomizers
 	* User derivable affectors
-* Render window (Win32)
+
+### Render window (Win32)
 	* Movable and resizable
 	* Windowed and fullscreen (Alt+Enter)
 	* Different fullscreen resolutions
 	* Mouse, key and window events
 	* Multiple viewports (alignable and anchorable)
 	* Replaceable system window base class (OS portable)
-* Rendering
+
+### Rendering
 	* Multi-passes
 	* Pass blending
 	* Unit scaling
@@ -133,15 +165,18 @@
 		* Frame limited
 	* Programmable pipeline
 	* Fixed function pipeline compatable
-* Resource management
+
+### Resource management
 	* Preparing resources (blocking/non-blocking)
 	* Loading, unloading, reloading and repairing resources
 	* Loading progress reporting
-* Scene
+
+### Scene
 	* Multiple scene graphs
 	* Animatable and transformable scene nodes
 	* Multiple objects per scene node
-* Scripting (fully integrated)
+
+### Scripting (fully integrated)
 	* CSS like syntax
 	* Classes and selectors
 	* SCSS like variables
@@ -149,7 +184,8 @@
 	* Tree serialization/deserialization
 	* Class, properties and rules validator
 	* Error reporting
-* Shading
+
+### Shading
 	* Vertex and fragment shaders
 	* Fully customizable shader layouts
 	* 6 default shaders included
@@ -157,20 +193,25 @@
 	* 50 integrated uniforms (plug and play)
 	* Adjustable gamma
 	* Different fog modes
-		* Exponential, exponential squared and linear
-* Sounds
+		* Exponential
+		* Exponential squared
+		* Linear
+
+### Sounds
 	* Non-positional sounds
 	* Positional (3D) sounds
 	* Sampling and streaming
 	* Sound channels and sound channel groups
-* Text
+
+### Text
 	* HTML and inline CSS formatting
 	* Regular, bold, italic and bold-italic fonts
 	* Horizontal and vertical alignment
 	* Area size, padding and line height
 	* Word wrapping and truncating
 	* ASCII and extended ASCII character sets
-* Textures
+
+### Textures
 	* Clampable and repeatable
 	* Mipmapping (LOD)
 	* 24-bit and 32-bit textures
@@ -178,18 +219,24 @@
 		* POT canvas resizing
 		* POT image resampling
 		* Different resample filters
-			* Box, bicubic, bilinear, B-spline, Catmull-rom and Lanczos3
+			* Box
+			* Bicubic
+			* Bilinear
+			* B-spline
+			* Catmull-rom
+			* Lanczos3
 	* Texture atlases
 		* Row-major
 		* Column-major
-* Utilities
+
+### Utilities
 	* Conversions
 	* Cryptography
 	* Encoding/decoding
 	* File system
-	* Math
-	* Matrices
+	* Math functions
+	* Matrix primitives
 	* Random numbers
-	* String
-	* System
-	* Vectors
+	* String functions
+	* System functions
+	* Vector primitives
