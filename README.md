@@ -32,7 +32,9 @@ One of the things I enjoy the most when writing code, is actually writing most o
     * `glew32.dll` from [ion/libraries/GLEW/bin](libraries/GLEW/bin)
 * Copy `glew.h` and `wglew.h` from [ion/libraries/GLEW](libraries/GLEW) to `C:/Program Files (x86)/Windows Kits/10/Include/<latest>/um/gl`
 * Copy `glew32.lib` from [ion/libraries/GLEW/lib](libraries/GLEW/lib) to `C:/Program Files (x86)/Windows Kits/10/Lib/<latest>/um/x86`
-* Open the project file `ion.sln` and rebuild solution
+* Open the project file `ion.sln`
+* Go to *Build > Configuration Manager...* and make sure `Active solution platform` is set to `x86`
+* Go to *Build > Rebuild Solution*
 
 ## How to run the demo
 * Do all of the steps in ***How to get started***
