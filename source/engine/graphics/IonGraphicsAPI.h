@@ -241,6 +241,21 @@ namespace ion::graphics::gl
 			return Extension::None;
 	}
 
+	[[nodiscard]] inline auto GetTextureSubImage_Support() noexcept
+	{
+		#ifdef ION_GLEW
+		if (HasGL(gl::Version::v4_5) && GLEW_ARB_get_texture_sub_image)
+			return Extension::Core;
+		else if (GLEW_ARB_get_texture_sub_image)
+			return Extension::ARB;
+		#else
+		if (HasGL(gl::Version::v4_5))
+			return Extension::Core;
+		#endif
+		else
+			return Extension::None;
+	}
+
 	[[nodiscard]] inline auto MultiTexture_Support() noexcept
 	{
 		if (HasGL(Version::v2_0))

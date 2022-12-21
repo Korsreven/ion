@@ -488,7 +488,7 @@ std::optional<std::pair<std::string, texture::TextureExtents>> prepare_sub_textu
 	auto y = sub_extents.Height * (texture_atlas.Rows() - position.first) + atlas_bottom +
 		(atlas_extents.Height - (sub_extents.Height * texture_atlas.Rows()));
 
-	if (gl::HasGL(gl::Version::v4_5))
+	if (gl::GetTextureSubImage_Support() != gl::Extension::None)
 	{
 		//Pack image from gl to memory
 		glPixelStorei(GL_PACK_ALIGNMENT, 1); //May increase transfer speed for NPOT
