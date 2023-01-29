@@ -298,11 +298,12 @@ std::string_view get_numeric_literal_lexeme(std::string_view str) noexcept
 std::pair<std::string_view, int> get_string_literal_lexeme(std::string_view str) noexcept
 {
 	auto line_breaks = 0;
+	auto backtick = str.front() == '`';
 
 	if (auto iter = std::find_if(std::begin(str) + 1, std::end(str),
 		[&, escaped = false, escaped_cr = false](auto c) mutable noexcept
 		{
-			//Double or single quote
+			//Double-quote, single-quote or backtick
 			if (c == str.front())
 			{
 				if (!escaped)
@@ -322,7 +323,7 @@ std::pair<std::string_view, int> get_string_literal_lexeme(std::string_view str)
 
 					case '\n': //Line feed
 					{
-						if (!escaped && !escaped_cr)
+						if (!escaped && !escaped_cr && !backtick)
 							return true;
 						else
 							++line_breaks;
@@ -643,7 +644,7 @@ bool check_literal_syntax(lexical_token &token, syntax_context &context, Compile
 {
 	if (token.name == token_name::StringLiteral)
 	{
-		//"" or ''
+		//"", '' or ``
 		//A full string correctness check is done later in parse_literal
 		if (token.value.back() != token.value.front())
 		{

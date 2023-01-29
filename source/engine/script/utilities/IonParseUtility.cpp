@@ -233,12 +233,13 @@ std::optional<Vector3> string_as_vector3(std::string_view str) noexcept
 
 std::optional<std::string> string_literal_as_string(std::string_view str)
 {
-	//Double or single quoted
+	//Double, single or backtick-quoted
 	if (std::size(str) > 1 &&
-		(str.front() == '"' || str.front() == '\'') &&
+		(str.front() == '"' || str.front() == '\'' || str.front() == '`') &&
 		str.front() == str.back()) //Matching front/back
 	{
 		std::string result;
+		auto backtick = str.front() == '`';
 
 		for (auto iter = std::begin(str) + 1,
 			end = std::end(str); iter != end; ++iter)
@@ -246,20 +247,14 @@ std::optional<std::string> string_literal_as_string(std::string_view str)
 			auto c = *iter;
 			auto next_c = iter + 1 != end ? *(iter + 1) : '\0';
 
-			//Skip all control characters
-			if (is_control_character(c))
-			{
-				//Line feed must be escaped
-				if (c == '\n')
-					break;
-				else
-					continue;
-			}
+			//Line feed must be escaped (except when backtick-quoted)
+			if (c == '\n' && !backtick)
+				break;
 
 			//Character escape sequences
 			else if (c == '\\' && next_c)
 			{
-				//Double or single quote (escaped)
+				//Double-quote, single-quote or backtick (escaped)
 				if (next_c == str.front())
 					result += next_c;
 				else
@@ -320,7 +315,7 @@ std::optional<std::string> string_literal_as_string(std::string_view str)
 				++iter; //Skip next character
 			}
 
-			//Double or single quote (not escaped)
+			//Double-quote, single-quote or backtick (not escaped)
 			else if (c == str.front())
 			{
 				if (iter + 1 == end)

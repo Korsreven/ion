@@ -462,6 +462,7 @@ namespace ion::script
 				{
 					case '"':
 					case '\'':
+					case '`':
 					return true;
 
 					default:

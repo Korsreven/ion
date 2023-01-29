@@ -278,7 +278,7 @@ namespace ion::script::utilities::parse
 	*/
 
 	///@brief Parses the given string literal as a string value
-	///@details Supports double " and single ' quoted literals.
+	///@details Supports double-quoted "", single-quoted '' and backtick-quoted `` literals.
 	///Supports escape characters
 	[[nodiscard]] std::optional<std::string> AsString(std::string_view str);
 
