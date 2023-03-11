@@ -740,8 +740,15 @@ bool Window::ProcessMessage(HWND handle, UINT message, WPARAM w_param, LPARAM l_
 			//Don't register repeated key down
 			if ((l_param & 0x40000000) == 0)
 			{
+				//Alt + F4 (close)
+				if (w_param == VK_F4)
+				{
+					PostQuitMessage(0);
+					Closed();
+				}
+
 				//Alt + Enter (change display mode)
-				if (w_param == VK_RETURN)
+				else if (w_param == VK_RETURN)
 				{
 					if (InFullScreen())
 						ExitFullScreen();
