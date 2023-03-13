@@ -20,6 +20,7 @@ File:	IonObjectRegister.h
 #include <utility>
 #include <vector>
 
+#include "adaptors/ranges/IonIterable.h"
 #include "adaptors/ranges/IonDereferenceIterable.h"
 #include "memory/IonNonOwningPtr.h"
 
