@@ -32,6 +32,8 @@ File:	IonLight.h
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
 
+#undef max
+
 namespace ion::graphics::scene
 {
 	using namespace ion::utilities;
