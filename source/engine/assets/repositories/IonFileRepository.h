@@ -112,7 +112,7 @@ namespace ion::assets::repositories
 	{
 		private:
 
-			file_repository::NamingConvention naming_convention_ = file_repository::NamingConvention::FilePath;
+			file_repository::NamingConvention naming_convention_ = file_repository::NamingConvention::FileName;
 
 			adaptors::FlatMap<std::string, file_repository::FileEntry> files_;
 			adaptors::FlatSet<std::string> file_extensions_;
