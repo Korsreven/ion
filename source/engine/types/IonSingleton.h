@@ -16,9 +16,9 @@ File:	IonSingleton.h
 namespace ion::types
 {
 	///@brief A class providing a singleton instance of the derived type
-	///@details Allowed:		struct Foo : Singleton<Foo> {};
-	///Not allowed:	struct Foo : Singleton<Bar> {};
-	///Not allowed:	Singleton<int> foobar;
+	///@details Allowed: struct Foo : Singleton&lt;Foo&gt; {};
+	///Not allowed: struct Foo : Singleton&lt;Bar&gt; {};
+	///Not allowed:	Singleton&lt;int&gt; foobar;
 	template <typename T>
 	class Singleton
 	{
