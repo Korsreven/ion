@@ -490,6 +490,25 @@ namespace ion::gui
 				return GetComponentAs<T>(name);
 			}
 
+
+			///@brief Searches for a pointer to a mutable control (all child controls) of type T with the given name
+			///@details Returns nullptr if a control of type T could not be found
+			template <typename T>
+			[[nodiscard]] auto SearchControlAs(std::string_view name) noexcept
+			{
+				static_assert(std::is_base_of_v<controls::GuiControl, T>);
+				return dynamic_pointer_cast<T>(SearchControl(name));
+			}
+
+			///@brief Searches for a pointer to an immutable control (all child controls) of type T with the given name
+			///@details Returns nullptr if a control of type T could not be found
+			template <typename T>
+			[[nodiscard]] auto SearchControlAs(std::string_view name) const noexcept
+			{
+				static_assert(std::is_base_of_v<controls::GuiControl, T>);
+				return dynamic_pointer_cast<T>(SearchControl(name));
+			}
+
 			///@}
 
 			/**
