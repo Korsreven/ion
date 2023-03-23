@@ -713,6 +713,27 @@ void GuiListBox::ReplaceItems(int first, int last, ListBoxItems items)
 
 
 /*
+	Items - Retrieving
+*/
+
+std::optional<ListBoxItem> GuiListBox::GetItem(int item_index) const noexcept
+{
+	if (item_index >= 0 && item_index <= std::ssize(items_))
+		return items_[item_index];
+	else
+		return {};
+}
+
+std::optional<ListBoxItem> GuiListBox::GetSelectedItem() const noexcept
+{
+	if (item_index_)
+		return items_[*item_index_];
+	else
+		return {};
+}
+
+
+/*
 	Items - Removing
 */
 

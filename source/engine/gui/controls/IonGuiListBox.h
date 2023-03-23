@@ -518,6 +518,21 @@ namespace ion::gui::controls
 			///@}
 
 			/**
+				@name Items - Retrieving
+				@{
+			*/
+
+			///@brief Gets the item with the given item index
+			///@details Returns nullopt if item could not be found
+			[[nodiscard]] std::optional<gui_list_box::ListBoxItem> GetItem(int item_index) const noexcept;
+
+			///@brief Gets the selected item
+			///@details Returns nullopt if no items are selected
+			[[nodiscard]] std::optional<gui_list_box::ListBoxItem> GetSelectedItem() const noexcept;
+
+			///@}
+
+			/**
 				@name Items - Removing
 				@{
 			*/
