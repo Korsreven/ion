@@ -80,9 +80,9 @@ namespace ion::parallel
 			inline auto deferred_call(Function &&function, Args &&...args)
 			{
 				return
-					[&function, &args...]()
+					[function = std::forward<Function>(function), ...args = std::forward<Args>(args)]()
 					{
-						return std::invoke(std::forward<Function>(function), std::forward<Args>(args)...);
+						return std::invoke(function, std::move(args)...);
 					};
 			}
 		} //detail
