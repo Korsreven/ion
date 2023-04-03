@@ -344,7 +344,7 @@ GuiProgressBar::GuiProgressBar(std::string name, const skins::GuiSkin &skin, con
 void GuiProgressBar::Percent(real percent) noexcept
 {
 	using namespace utilities;
-	Position(math::Round(math::Lerp(progress_.Min(), progress_.Max(), percent)));
+	Position(math::Lerp(progress_.Min(), progress_.Max(), percent));
 }
 
 
