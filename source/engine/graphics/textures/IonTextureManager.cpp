@@ -583,13 +583,26 @@ bool TextureManager::PrepareResource(Texture &texture)
 		return false;
 }
 
+Texture* TextureManager::DependentResource(Texture &texture) noexcept
+{
+	//Texture is a sub texture
+	if (auto &atlas_region = texture.AtlasRegion(); atlas_region && atlas_region->Atlas)
+	{
+		//Make sure texture atlas has been loaded first (and not failed in doing so)
+		if (!atlas_region->Atlas->IsLoaded() && !atlas_region->Atlas->HasFailed())
+			return atlas_region->Atlas.get();
+	}
+
+	return nullptr;
+}
+
 bool TextureManager::LoadResource(Texture &texture)
 {
 	//Texture is a sub texture
 	if (auto &atlas_region = texture.AtlasRegion(); atlas_region && atlas_region->Atlas)
 	{
 		//Make sure texture atlas has been loaded first
-		if (atlas_region->Atlas->IsLoaded() || Load(*atlas_region->Atlas))
+		if (atlas_region->Atlas->IsLoaded())
 		{
 			if (auto texture_data =
 				detail::prepare_sub_texture(

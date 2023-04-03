@@ -211,6 +211,7 @@ namespace ion::graphics::textures
 			*/
 
 			bool PrepareResource(Texture &texture) override;
+			Texture* DependentResource(Texture &texture) noexcept override;
 			bool LoadResource(Texture &texture) override;
 			bool UnloadResource(Texture &texture) noexcept override;
 

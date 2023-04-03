@@ -81,6 +81,12 @@ namespace ion::resources
 				return true;
 			}
 
+			virtual ResourceT* DependentResource(ResourceT&) noexcept
+			{
+				//Optional to override
+				return nullptr;
+			}
+
 			virtual bool LoadResource(ResourceT&) = 0;
 			virtual bool UnloadResource(ResourceT&) noexcept = 0;
 
@@ -241,8 +247,17 @@ namespace ion::resources
 					ProcessPreparedResource(resource, PrepareResource(resource));
 			}
 
-			void ExecuteLoadResource(ResourceT &resource)
+			void ExecuteLoadResource(ResourceT &resource, resource_manager::EvaluationStrategy strategy)
 			{
+				//Check if there is a dependency
+				if (auto dependent_resource = DependentResource(resource); dependent_resource)
+				{
+					if (strategy == resource_manager::EvaluationStrategy::Eager)
+						Load(*dependent_resource);
+					else //Lazy
+						return; //Wait for the dependency to be resolved
+				}
+
 				ChangeResourceLoadingState(resource, resource::LoadingState::Loading);
 
 				if (LoadResource(resource))
@@ -304,7 +319,7 @@ namespace ion::resources
 					{
 						NotifyResourceLoadingStateChanged(resource);
 							//Make sure to notify the pending state (in case someone is listening)
-						ExecuteLoadResource(resource);
+						ExecuteLoadResource(resource, resource_manager::EvaluationStrategy::Lazy);
 						break; //One at a time
 					}
 				}
@@ -588,7 +603,7 @@ namespace ion::resources
 						ExecutePrepareResource(resource);
 					
 					if (resource.LoadingState() == resource::LoadingState::LoadPending)
-						ExecuteLoadResource(resource);
+						ExecuteLoadResource(resource, strategy);
 
 					return resource.IsLoaded();
 				}
@@ -752,7 +767,7 @@ namespace ion::resources
 						ExecutePrepareResource(resource);
 					
 					if (resource.LoadingState() == resource::LoadingState::LoadPending)
-						ExecuteLoadResource(resource);
+						ExecuteLoadResource(resource, strategy);
 
 					return resource.IsLoaded();
 				}
@@ -793,7 +808,7 @@ namespace ion::resources
 						ExecutePrepareResource(resource);
 					
 					if (resource.LoadingState() == resource::LoadingState::LoadPending)
-						ExecuteLoadResource(resource);
+						ExecuteLoadResource(resource, strategy);
 
 					return resource.IsLoaded();
 				}
