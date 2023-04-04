@@ -73,7 +73,7 @@ OwningPtr<gui_control::ControlSkin> GuiScrollBar::AttuneSkin(OwningPtr<gui_contr
 
 void GuiScrollBar::UpdateHandle() noexcept
 {
-	if (auto [min, max] = Range(); min != max)
+	if (auto [min, max] = Range(); min != max && skin_)
 	{
 		if (auto &skin = static_cast<ScrollBarSkin&>(*skin_); skin.Handle)
 		{
