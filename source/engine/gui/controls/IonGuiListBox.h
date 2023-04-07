@@ -19,12 +19,14 @@ File:	IonGuiListBox.h
 
 #include "IonGuiScrollable.h"
 #include "adaptors/ranges/IonIterable.h"
+#include "events/IonCallback.h"
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
 #include "graphics/fonts/IonText.h"
 #include "graphics/utilities/IonVector2.h"
 #include "memory/IonNonOwningPtr.h"
 #include "memory/IonOwningPtr.h"
+#include "timers/IonStopwatch.h"
 #include "types/IonTypes.h"
 
 //Forward declarations
@@ -103,6 +105,8 @@ namespace ion::gui::controls
 			constexpr auto default_icon_column_width_percent = 0.25_r;
 			constexpr auto default_icon_padding_size = 2.0_r;
 
+			constexpr auto default_double_click_time = 0.5_sec;
+
 
 			inline auto item_layout_to_text_alignment(ListBoxItemLayout item_alignment) noexcept
 			{
@@ -168,6 +172,10 @@ namespace ion::gui::controls
 			bool show_icons_ = false;
 
 			gui_list_box::ListBoxItems items_;
+			std::optional<int> previous_item_index_;
+			timers::Stopwatch item_click_time_;
+
+			std::optional<events::Callback<void, GuiListBox&>> on_item_double_click_;
 
 
 			/**
@@ -197,6 +205,10 @@ namespace ion::gui::controls
 
 			///@brief Called right after an item has been deselected
 			virtual void ItemDeselected() noexcept;
+
+
+			///@brief Called right after an item has been double clicked
+			virtual void ItemDoubleClicked() noexcept;
 
 			///@}
 
@@ -388,6 +400,19 @@ namespace ion::gui::controls
 				}
 			}
 
+
+			///@brief Sets the on item double click callback
+			inline void OnItemDoubleClick(events::Callback<void, GuiListBox&> on_item_double_click) noexcept
+			{
+				on_item_double_click_ = on_item_double_click;
+			}
+
+			///@brief Sets the on item double click callback
+			inline void OnItemDoubleClick(std::nullopt_t) noexcept
+			{
+				on_item_double_click_ = {};
+			}
+
 			///@}
 
 			/**
@@ -461,6 +486,13 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto ShowIcons() const noexcept
 			{
 				return show_icons_;
+			}
+
+
+			///@brief Returns the on item double click callback
+			[[nodiscard]] inline auto OnItemDoubleClick() const noexcept
+			{
+				return on_item_double_click_;
 			}
 
 			///@}

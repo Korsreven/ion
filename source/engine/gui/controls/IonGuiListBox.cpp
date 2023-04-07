@@ -210,6 +210,14 @@ void GuiListBox::ItemDeselected() noexcept
 }
 
 
+void GuiListBox::ItemDoubleClicked() noexcept
+{
+	//User callback
+	if (on_item_double_click_)
+		(*on_item_double_click_)(*this);
+}
+
+
 /*
 	States
 */
@@ -902,8 +910,24 @@ bool GuiListBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 					//Clicked item is in view
 					if (auto item_off = clicked_item_off - text->FromLine();
 						item_off >= 0 && item_off < text->DisplayedLineCount())
-
+					{
 						ItemIndex(clicked_item_off); //Select item
+
+						//Start click timer
+						if (!item_click_time_.IsRunning())
+							item_click_time_.Start();
+						else 
+						{
+							//Check if item has been double clicked
+							if (item_click_time_.Elapsed() <= detail::default_double_click_time &&
+								item_index_ == previous_item_index_) //Same item
+								ItemDoubleClicked();
+
+							item_click_time_.Restart();
+						}
+
+						previous_item_index_ = item_index_;
+					}
 				}
 			}
 		}
