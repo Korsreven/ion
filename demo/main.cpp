@@ -2004,6 +2004,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 		auto group_box_skin = theme->CreateSkin<ion::gui::controls::GuiGroupBox>(parts, caption_part);
 
+		//Image skin
+		parts = {};
+		
+		caption_part = {};
+		caption_part.Base = caption_text;
+		caption_part.Enabled = caption_style_enabled;
+		caption_part.Disabled = caption_style_disabled;
+
+		auto image_skin = theme->CreateSkin<ion::gui::controls::GuiImage>(parts, caption_part);
+
 		//Label skin
 		caption_part = {};
 		caption_part.Base = caption_text;
@@ -2309,6 +2319,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		slider->Node()->Position({0.0_r, 0.6_r});
 		slider->Range(0, 20);
 		slider->StepByAmount(5);
+
+		auto image = base_panel->CreateImage("image", Vector2{0.7_r, 0.35_r}, {});
+		image->Mode(ion::gui::controls::gui_image::ImageMode::Fit);
+		image->Source(ship);
+		image->Node()->Position({-1.0_r, 0.25_r});
 
 		auto label = base_panel->CreateLabel("label", {}, "My label");
 		label->Node()->Position({0.0_r, 0.5_r});

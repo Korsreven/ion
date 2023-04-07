@@ -20,6 +20,7 @@ File:	IonGuiThemeScriptInterface.cpp
 #include "gui/controls/IonGuiButton.h"
 #include "gui/controls/IonGuiCheckBox.h"
 #include "gui/controls/IonGuiGroupBox.h"
+#include "gui/controls/IonGuiImage.h"
 #include "gui/controls/IonGuiLabel.h"
 #include "gui/controls/IonGuiListBox.h"
 #include "gui/controls/IonGuiMouseCursor.h"
@@ -151,7 +152,7 @@ ClassDefinition get_gui_skin_class()
 		.AddClass(std::move(text_render_pass))
 
 		.AddRequiredProperty("type",
-			{"button"s, "check-box"s, "group-box"s, "label"s,
+			{"button"s, "check-box"s, "group-box"s, "image"s, "label"s,
 			 "list-box"s, "mouse-cursor"s, "progress-bar"s, "radio-button"s,
 			 "scroll-bar"s, "slider"s, "text-box"s, "tooltip"s})
 		.AddProperty("name", ParameterType::String);
@@ -255,6 +256,8 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 					return theme.CreateSkin<controls::GuiCheckBox>();
 				else if (type_name == "group-box")
 					return theme.CreateSkin<controls::GuiGroupBox>();
+				else if (type_name == "image")
+					return theme.CreateSkin<controls::GuiImage>();
 				else if (type_name == "label")
 					return theme.CreateSkin<controls::GuiLabel>();
 				else if (type_name == "list-box")
@@ -282,6 +285,8 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 					return theme.CreateSkin<controls::GuiCheckBox>(std::move(name));
 				else if (type_name == "group-box")
 					return theme.CreateSkin<controls::GuiGroupBox>(std::move(name));
+				else if (type_name == "image")
+					return theme.CreateSkin<controls::GuiImage>(std::move(name));
 				else if (type_name == "label")
 					return theme.CreateSkin<controls::GuiLabel>(std::move(name));
 				else if (type_name == "list-box")

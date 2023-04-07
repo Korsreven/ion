@@ -155,6 +155,7 @@ File:	Ion.h
 #include "gui/controls/IonGuiCheckBox.h"
 #include "gui/controls/IonGuiControl.h"
 #include "gui/controls/IonGuiGroupBox.h"
+#include "gui/controls/IonGuiImage.h"
 #include "gui/controls/IonGuiLabel.h"
 #include "gui/controls/IonGuiListBox.h"
 #include "gui/controls/IonGuiMouseCursor.h"

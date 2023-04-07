@@ -21,6 +21,7 @@ File:	IonGuiSkin.cpp
 #include "gui/controls/IonGuiButton.h"
 #include "gui/controls/IonGuiCheckBox.h"
 #include "gui/controls/IonGuiGroupBox.h"
+#include "gui/controls/IonGuiImage.h"
 #include "gui/controls/IonGuiLabel.h"
 #include "gui/controls/IonGuiListBox.h"
 #include "gui/controls/IonGuiMouseCursor.h"
@@ -461,6 +462,48 @@ OwningPtr<controls::gui_control::ControlSkin> make_group_box_skin(const GuiSkin 
 	return group_box_skin;
 }
 
+OwningPtr<controls::gui_control::ControlSkin> make_image_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
+{
+	auto image_skin = make_owning<controls::gui_image::ImageSkin>();
+	image_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
+
+	//No parts required for image skin (create model anyway)
+	if (!image_skin->Parts)
+	{
+		auto model = scene_manager.CreateModel();
+
+		if (!std::empty(skin.PartRenderPasses()))
+			model->AddRenderPasses(skin.GetPartRenderPasses());
+
+		image_skin->Parts.Object = model;
+	}
+
+	if (!std::empty(skin.Parts()))
+	{
+		auto image_part = skin.GetPart("image");
+
+		//Image part
+		if (image_part && *image_part)
+		{
+			auto sprite = image_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(image_part->Enabled);
+			set_sprite_properties(*image_part, *sprite);
+
+			image_skin->Image.Object = sprite;
+			image_skin->Image.Enabled = image_part->Enabled;
+			image_skin->Image.Disabled = image_part->Disabled;
+			image_skin->Image.Focused = image_part->Focused;
+			image_skin->Image.Pressed = image_part->Pressed;
+			image_skin->Image.Hovered = image_part->Hovered;
+
+			//Position
+			auto [x, y, z] = image_skin->Image->Position().XYZ();
+			image_skin->Image->Position({x, y, z + Engine::ZEpsilon()});
+		}
+	}
+
+	return image_skin;
+}
+
 OwningPtr<controls::gui_control::ControlSkin> make_label_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager)
 {
 	auto label_skin = make_owning<controls::gui_label::LabelSkin>();
@@ -546,7 +589,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSk
 		//Bar part
 		if (bar_part && *bar_part)
 		{
-			auto sprite = progress_bar_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(bar_part->Enabled);		
+			auto sprite = progress_bar_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(bar_part->Enabled);
 			sprite->IncludeBoundingVolumes(false);
 			sprite->AutoRepeat(true);
 			set_sprite_properties(*bar_part, *sprite);
@@ -781,6 +824,7 @@ void GuiSkin::RegisterBuiltInControls()
 		RegisterControl<controls::GuiButton>("GuiButton", detail::make_button_skin);
 		RegisterControl<controls::GuiCheckBox>("GuiCheckBox", detail::make_check_box_skin);
 		RegisterControl<controls::GuiGroupBox>("GuiGroupBox", detail::make_group_box_skin);
+		RegisterControl<controls::GuiImage>("GuiImage", detail::make_image_skin);
 		RegisterControl<controls::GuiLabel>("GuiLabel", detail::make_label_skin);
 		RegisterControl<controls::GuiListBox>("GuiListBox", detail::make_list_box_skin);
 		RegisterControl<controls::GuiMouseCursor>("GuiMouseCursor", detail::make_mouse_cursor_skin);

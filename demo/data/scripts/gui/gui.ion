@@ -55,6 +55,16 @@ gui
 				scene-node { position: vec3(0.0, 0.6, 0.0); }
 			}
 
+			image
+			{
+				name: "image";
+				size: vec2(0.7, 0.35);
+				mode: fit;
+				source: "ship";
+
+				scene-node { position: vec3(-1.0, 0.25, 0.0); }
+			}
+
 			label
 			{
 				name: "label";

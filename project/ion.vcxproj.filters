@@ -729,6 +729,9 @@
     <ClCompile Include="..\source\engine\graphics\render\IonRenderPrimitive.cpp">
       <Filter>Source Files\graphics\render</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\engine\gui\controls\IonGuiImage.cpp">
+      <Filter>Source Files\gui\controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\engine\adaptors\iterators\IonDereferenceIterator.h">
@@ -1417,6 +1420,9 @@
     </ClInclude>
     <ClInclude Include="..\source\engine\Ion.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\engine\gui\controls\IonGuiImage.h">
+      <Filter>Header Files\gui\controls</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

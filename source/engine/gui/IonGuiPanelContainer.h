@@ -24,6 +24,7 @@ File:	IonGuiPanelContainer.h
 #include "controls/IonGuiButton.h"
 #include "controls/IonGuiCheckBox.h"
 #include "controls/IonGuiGroupBox.h"
+#include "controls/IonGuiImage.h"
 #include "controls/IonGuiLabel.h"
 #include "controls/IonGuiListBox.h"
 #include "controls/IonGuiProgressBar.h"
@@ -182,6 +183,13 @@ namespace ion::gui
 			///@brief Returns a pointer to the parent frame of this container
 			[[nodiscard]] GuiFrame* ParentFrame() const noexcept;
 
+			///@brief Returns a pointer to the theme used by this container
+			///@details Returns nullptr if there is no theme in use
+			[[nodiscard]] inline auto CurrentTheme() const noexcept
+			{
+				return const_cast<skins::GuiTheme*>(GetTheme());
+			}
+
 			///@}
 
 			/**
@@ -314,6 +322,24 @@ namespace ion::gui
 
 			///@brief Creates a group box by moving the given group box
 			NonOwningPtr<controls::GuiGroupBox> CreateGroupBox(controls::GuiGroupBox &&group_box);
+
+			///@}
+
+			/**
+				@name Images - Creating
+				@{
+			*/
+
+			///@brief Creates an image with the given name, size, caption and hit boxes
+			NonOwningPtr<controls::GuiImage> CreateImage(std::string name, const std::optional<Vector2> &size,
+				std::optional<std::string> caption, controls::gui_control::BoundingBoxes hit_boxes = {});
+
+			///@brief Creates an image with the given name, skin, size, caption and hit boxes
+			NonOwningPtr<controls::GuiImage> CreateImage(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
+				std::optional<std::string> caption, controls::gui_control::BoundingBoxes hit_boxes = {});
+
+			///@brief Creates an image by moving the given image
+			NonOwningPtr<controls::GuiImage> CreateImage(controls::GuiImage &&image);
 
 			///@}
 

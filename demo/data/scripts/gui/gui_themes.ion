@@ -414,6 +414,33 @@ theme
 
 
     /*
+        Image
+    */
+    
+    skin
+    {
+        type: image;
+
+
+        text-part
+        {
+            name: "caption";
+            text: "caption";
+
+            enabled
+            {
+                foreground-color: white;
+            }
+
+            disabled
+            {
+                foreground-color: darkgray;
+            }
+        }
+    }
+
+
+    /*
         Label
     */
 

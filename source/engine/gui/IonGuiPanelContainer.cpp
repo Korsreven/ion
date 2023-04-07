@@ -303,6 +303,28 @@ NonOwningPtr<controls::GuiGroupBox> GuiPanelContainer::CreateGroupBox(controls::
 
 
 /*
+	Images - Creating
+*/
+
+NonOwningPtr<controls::GuiImage> GuiPanelContainer::CreateImage(std::string name, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, controls::gui_control::BoundingBoxes hit_boxes)
+{
+	return CreateControl<controls::GuiImage>(std::move(name), size, std::move(caption), std::move(hit_boxes));
+}
+
+NonOwningPtr<controls::GuiImage> GuiPanelContainer::CreateImage(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
+	std::optional<std::string> caption, controls::gui_control::BoundingBoxes hit_boxes)
+{
+	return CreateControl<controls::GuiImage>(std::move(name), skin, size, std::move(caption), std::move(hit_boxes));
+}
+
+NonOwningPtr<controls::GuiImage> GuiPanelContainer::CreateImage(controls::GuiImage &&image)
+{
+	return CreateControl<controls::GuiImage>(std::move(image));
+}
+
+
+/*
 	Labels - Creating
 */
 

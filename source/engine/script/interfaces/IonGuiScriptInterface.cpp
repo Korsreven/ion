@@ -16,6 +16,7 @@ File:	IonGuiScriptInterface.cpp
 #include <string>
 
 #include "IonSceneScriptInterface.h"
+#include "graphics/materials/IonMaterial.h"
 #include "graphics/materials/IonMaterialManager.h"
 #include "gui/skins/IonGuiSkin.h"
 #include "gui/skins/IonGuiTheme.h"
@@ -161,6 +162,7 @@ ClassDefinition get_gui_panel_container_class()
 		.AddClass(get_gui_button_class())
 		.AddClass(get_gui_check_box_class())
 		.AddClass(get_gui_group_box_class())
+		.AddClass(get_gui_image_class())
 		.AddClass(get_gui_label_class())
 		.AddClass(get_gui_list_box_class())
 		.AddClass(get_gui_progress_bar_class())
@@ -205,6 +207,13 @@ ClassDefinition get_gui_group_box_class()
 {
 	return ClassDefinition::Create("group-box", "control")
 		.AddProperty("attach");
+}
+
+ClassDefinition get_gui_image_class()
+{
+	return ClassDefinition::Create("image", "control")
+		.AddProperty("mode", {"fill"s, "fit"s})
+		.AddProperty("source", {ParameterType::String, ParameterType::String, ParameterType::String, ParameterType::String, ParameterType::String}, 1);
 }
 
 ClassDefinition get_gui_label_class()
@@ -477,6 +486,8 @@ void set_panel_container_properties(const script_tree::ObjectNode &object, GuiPa
 			create_gui_check_box(obj, container, scene_manager, managers);
 		else if (obj.Name() == "group-box")
 			create_gui_group_box(obj, container, scene_manager, managers);
+		else if (obj.Name() == "image")
+			create_gui_image(obj, container, scene_manager, managers);
 		else if (obj.Name() == "label")
 			create_gui_label(obj, container, scene_manager, managers);
 		else if (obj.Name() == "list-box")
@@ -678,6 +689,44 @@ void set_group_box_properties(const script_tree::ObjectNode &object, controls::G
 	{
 		if (property.Name() == "attach")
 			group_box.AddControl(property[0].Get<ScriptType::String>()->Get());
+	}
+}
+
+void set_image_properties(const script_tree::ObjectNode &object, controls::GuiImage &image,
+	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
+{
+	set_control_properties(object, image, scene_manager, managers);
+	
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "mode")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "fill")
+				image.Mode(controls::gui_image::ImageMode::Fill);	
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "fit")
+				image.Mode(controls::gui_image::ImageMode::Fit);
+		}
+		else if (property.Name() == "source")
+		{
+			NonOwningPtr<graphics::materials::Material> enabled;
+			NonOwningPtr<graphics::materials::Material> disabled;
+			NonOwningPtr<graphics::materials::Material> focused;
+			NonOwningPtr<graphics::materials::Material> pressed;
+			NonOwningPtr<graphics::materials::Material> hovered;
+
+			if (property.NumberOfArguments() >= 1)
+				enabled = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
+			if (property.NumberOfArguments() >= 2)
+				disabled = get_material(property[1].Get<ScriptType::String>()->Get(), managers);
+			if (property.NumberOfArguments() >= 3)
+				focused = get_material(property[2].Get<ScriptType::String>()->Get(), managers);
+			if (property.NumberOfArguments() >= 4)
+				pressed = get_material(property[3].Get<ScriptType::String>()->Get(), managers);
+			if (property.NumberOfArguments() >= 5)
+				hovered = get_material(property[4].Get<ScriptType::String>()->Get(), managers);
+
+			image.Source(enabled, disabled, focused, pressed, hovered);
+		}
 	}
 }
 
@@ -1165,6 +1214,53 @@ NonOwningPtr<controls::GuiGroupBox> create_gui_group_box(const script_tree::Obje
 		set_group_box_properties(object, *group_box, scene_manager, managers);
 
 	return group_box;
+}
+
+NonOwningPtr<controls::GuiImage> create_gui_image(const script_tree::ObjectNode &object,
+	GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
+{
+	auto name = object
+		.Property("name")[0]
+		.Get<ScriptType::String>()->Get();
+	auto skin_name = object
+		.Property("skin")[0]
+		.Get<ScriptType::String>().value_or(""s).Get();
+
+	auto size = std::optional<graphics::utilities::Vector2>{};
+	if (auto property = object
+		.Property("size")[0]
+		.Get<ScriptType::Vector2>(); property)
+		size = property->Get();
+
+	auto caption = std::optional<std::string>{};
+	if (auto property = object
+		.Property("caption")[0]
+		.Get<ScriptType::String>(); property)
+		caption = property->Get();
+
+	auto hit_boxes = controls::gui_control::BoundingBoxes{};
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "hit-box")
+			hit_boxes.push_back({
+				property[0].Get<ScriptType::Vector2>()->Get(),
+				property[1].Get<ScriptType::Vector2>()->Get()});
+	}
+
+	auto image =
+		[&]() noexcept -> NonOwningPtr<controls::GuiImage>
+		{
+			//Specific skin (from active theme)
+			if (auto skin = get_skin(container, skin_name); skin)
+				return container.CreateImage(std::move(name), *skin, std::move(size), std::move(caption), std::move(hit_boxes));
+			else //Default skin
+				return container.CreateImage(std::move(name), std::move(size), std::move(caption), std::move(hit_boxes));
+		}();
+
+	if (image)
+		set_image_properties(object, *image, scene_manager, managers);
+
+	return image;
 }
 
 NonOwningPtr<controls::GuiLabel> create_gui_label(const script_tree::ObjectNode &object,

@@ -22,6 +22,7 @@ File:	IonGuiScriptInterface.h
 #include "gui/controls/IonGuiButton.h"
 #include "gui/controls/IonGuiCheckBox.h"
 #include "gui/controls/IonGuiGroupBox.h"
+#include "gui/controls/IonGuiImage.h"
 #include "gui/controls/IonGuiLabel.h"
 #include "gui/controls/IonGuiListBox.h"
 #include "gui/controls/IonGuiMouseCursor.h"
@@ -126,6 +127,7 @@ namespace ion::script::interfaces
 		script_validator::ClassDefinition get_gui_check_box_class();
 		script_validator::ClassDefinition get_gui_control_class();
 		script_validator::ClassDefinition get_gui_group_box_class();
+		script_validator::ClassDefinition get_gui_image_class();
 		script_validator::ClassDefinition get_gui_label_class();
 		script_validator::ClassDefinition get_gui_list_box_class();
 		script_validator::ClassDefinition get_gui_mouse_cursor_class();
@@ -165,6 +167,8 @@ namespace ion::script::interfaces
 			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		void set_group_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiGroupBox &group_box,
 			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		void set_image_properties(const script_tree::ObjectNode &object, gui::controls::GuiImage &image,
+			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		void set_label_properties(const script_tree::ObjectNode &object, gui::controls::GuiLabel &label,
 			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		void set_list_box_properties(const script_tree::ObjectNode &object, gui::controls::GuiListBox &list_box,
@@ -197,6 +201,8 @@ namespace ion::script::interfaces
 		NonOwningPtr<gui::controls::GuiCheckBox> create_gui_check_box(const script_tree::ObjectNode &object,
 			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<gui::controls::GuiGroupBox> create_gui_group_box(const script_tree::ObjectNode &object,
+			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
+		NonOwningPtr<gui::controls::GuiImage> create_gui_image(const script_tree::ObjectNode &object,
 			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		NonOwningPtr<gui::controls::GuiLabel> create_gui_label(const script_tree::ObjectNode &object,
 			gui::GuiPanelContainer &container, graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
