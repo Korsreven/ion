@@ -668,7 +668,10 @@ bool GuiFrame::KeyReleased(KeyButton button) noexcept
 				if (pressed_control_)
 				{
 					pressed_control_->Click();
-					pressed_control_->Release();
+
+					if (pressed_control_)
+						pressed_control_->Release();
+
 					return true; //Consumed
 				}
 
@@ -744,7 +747,9 @@ bool GuiFrame::MouseReleased(MouseButton button, Vector2 position) noexcept
 					if (pressed_control_ == hovered_control_)
 						pressed_control_->Click();
 
-					pressed_control_->Release();
+					if (pressed_control_)
+						pressed_control_->Release();
+
 					return true; //Consumed
 				}
 
