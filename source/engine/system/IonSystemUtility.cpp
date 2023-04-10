@@ -257,7 +257,8 @@ bool open_or_execute(const std::filesystem::path &path,
 	#endif
 }
 
-std::optional<const PowerStatus> power_status() noexcept
+
+std::optional<PowerStatus> power_status() noexcept
 {
 	#ifdef ION_WIN32
 	SYSTEM_POWER_STATUS system_power_status;
@@ -288,6 +289,37 @@ std::optional<const PowerStatus> power_status() noexcept
 			status.BatteryCharging = (system_power_status.BatteryFlag & 8); //Charging
 		
 		return status;
+	}
+	#else
+
+	#endif
+
+	return {};
+}
+
+std::optional<std::string> local_time(TimeFormat format) noexcept
+{
+	#ifdef ION_WIN32
+	SYSTEMTIME system_time;
+	GetLocalTime(&system_time);
+
+	auto flags = 0;		
+	switch (format)
+	{
+		case TimeFormat::HHMM:
+		flags = TIME_NOSECONDS;
+		break;
+
+		case TimeFormat::HH:
+		flags = TIME_NOMINUTESORSECONDS;
+		break;
+	}
+
+	if (auto size = GetTimeFormat(LOCALE_SYSTEM_DEFAULT, flags, &system_time, nullptr, nullptr, 0); size > 1)
+	{
+		if (std::string result(size - 1, '\0');
+			GetTimeFormat(LOCALE_SYSTEM_DEFAULT, flags, &system_time, nullptr, &result[0], size) != 0)
+			return result;
 	}
 	#else
 
@@ -376,9 +408,19 @@ bool Execute(const std::filesystem::path &path,
 	Power
 */
 
-std::optional<const PowerStatus> Power() noexcept
+std::optional<PowerStatus> Power() noexcept
 {
 	return detail::power_status();
+}
+
+
+/*
+	Time
+*/
+
+std::optional<std::string> Time(TimeFormat format) noexcept
+{
+	return detail::local_time(format);
 }
 
 } //ion::system::utilities

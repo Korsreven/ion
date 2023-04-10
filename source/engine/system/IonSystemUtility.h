@@ -36,6 +36,13 @@ namespace ion::system::utilities
 		Normal
 	};
 
+	enum class TimeFormat
+	{
+		HHMMSS,
+		HHMM,
+		HH
+	};
+
 	struct PowerStatus final
 	{
 		std::optional<bool> BatteryRunning;
@@ -90,7 +97,8 @@ namespace ion::system::utilities
 			std::optional<std::string> parameters, std::optional<std::filesystem::path> current_path,
 			ProcessWindowCommand window_command) noexcept;
 
-		std::optional<const PowerStatus> power_status() noexcept;
+		std::optional<PowerStatus> power_status() noexcept;
+		std::optional<std::string> local_time(TimeFormat format) noexcept;
 	} //detail
 
 
@@ -147,7 +155,17 @@ namespace ion::system::utilities
 	*/
 
 	///@brief Returns the system power status, such as battery information
-	[[nodiscard]] std::optional<const PowerStatus> Power() noexcept;
+	[[nodiscard]] std::optional<PowerStatus> Power() noexcept;
+
+	///@}
+
+	/**
+		@name Time
+		@{
+	*/
+
+	///@brief Returns the system time, formatted using the default locale
+	[[nodiscard]] std::optional<std::string> Time(TimeFormat format = TimeFormat::HHMMSS) noexcept;
 
 	///@}
 } //ion::system::utilities
