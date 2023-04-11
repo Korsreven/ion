@@ -333,6 +333,7 @@ void GuiListBox::UpdateLines() noexcept
 
 	UpdateIcons();
 	UpdateSelection();
+	UpdateScrollBar();
 }
 
 void GuiListBox::UpdateIcons() noexcept
