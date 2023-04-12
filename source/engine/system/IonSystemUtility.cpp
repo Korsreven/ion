@@ -13,10 +13,13 @@ File:	IonSystemUtility.cpp
 #include "IonSystemUtility.h"
 
 #include <algorithm>
+#include <array>
 
 #ifdef ION_WIN32
 	#include <shellapi.h> //Windows shell API
 #endif
+
+#include "events/IonSystemInput.h"
 
 namespace ion::system::utilities
 {
@@ -328,6 +331,39 @@ std::optional<std::string> local_time(TimeFormat format) noexcept
 	return {};
 }
 
+std::optional<std::string> key_button_name(KeyButton button) noexcept
+{
+	if (auto code = events::GetMappedInputCode(button); code)
+	{
+		#ifdef ION_WIN32
+		if (auto scan_code = MapVirtualKey(*code, MAPVK_VK_TO_VSC); scan_code != 0)
+		{
+			switch (*code)
+			{
+				case VK_LEFT: case VK_UP: case VK_RIGHT: case VK_DOWN: //Arrow keys
+				case VK_PRIOR: case VK_NEXT: //Page up and page down
+				case VK_END: case VK_HOME:
+				case VK_INSERT: case VK_DELETE:
+				case VK_DIVIDE: //Numpad slash
+				case VK_NUMLOCK:
+				{
+					scan_code |= 0x100; //Set extended bit
+					break;
+				}
+			}
+
+			std::array<char, 256> result{};
+			if (auto size = GetKeyNameText(scan_code << 16, &result[0], std::size(result)); size > 0)
+				return std::string(std::data(result), size);
+		}
+		#else
+		
+		#endif
+	}
+
+	return {};
+}
+
 } //detail
 
 
@@ -401,6 +437,16 @@ bool Execute(const std::filesystem::path &path,
 	ProcessWindowCommand window_command) noexcept
 {
 	return detail::open_or_execute(path, parameters, current_path, window_command);
+}
+
+
+/*
+	Key button
+*/
+
+std::optional<std::string> KeyButtonName(KeyButton button) noexcept
+{
+	return detail::key_button_name(button);
 }
 
 

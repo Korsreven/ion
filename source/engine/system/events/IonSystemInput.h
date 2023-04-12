@@ -46,6 +46,28 @@ namespace ion::system::events
 
 	namespace detail
 	{
+		template <typename T, size_t Size>
+		constexpr auto make_reverse_map(const std::array<T, Size> &code_map) noexcept
+		{
+			using U = std::pair<typename T::second_type, typename T::first_type>;
+			std::array<U, Size> reverse_code_map;
+
+			for (auto i = 0; auto &[key, value] : code_map)
+			{
+				reverse_code_map[i] = {value, key};
+				++i;
+			}
+
+			std::sort(std::begin(reverse_code_map), std::end(reverse_code_map),
+				[](const U &x, const U &y) noexcept
+				{
+					return x.first < y.first;
+				});
+
+			return reverse_code_map;
+		}
+
+
 		using key_pair_type = std::pair<CodeType, KeyButton>;
 		using mouse_pair_type = std::pair<CodeType, MouseButton>;
 
@@ -228,13 +250,16 @@ namespace ion::system::events
 			mouse_pair_type{MK_XBUTTON2,			MouseButton::X2}
 		};
 		#endif
+		
+		constexpr std::array reverse_key_button_map = make_reverse_map(key_button_map);
+		constexpr std::array reverse_mouse_button_map = make_reverse_map(mouse_button_map);
 
 
-		template <typename T>
-		inline auto get_mapped_code(const T &code_map, CodeType code) noexcept
+		template <typename T, typename U>
+		inline auto get_mapped_code(const T &code_map, const U &code) noexcept
 		{
 			auto iter = std::lower_bound(std::begin(code_map), std::end(code_map), code,
-				[](const typename T::value_type &x, CodeType y) noexcept
+				[](const typename T::value_type &x, const U &y) noexcept
 				{
 					return x.first < y;
 				});
@@ -263,6 +288,25 @@ namespace ion::system::events
 	[[nodiscard]] inline auto GetMappedMouseButton(CodeType code) noexcept
 	{
 		return detail::get_mapped_code(detail::mouse_button_map, code);
+	}
+
+	///@}
+
+	/**
+		@name Get input code
+		@{
+	*/
+
+	///@brief Returns the system specific input code corresponding to the key button
+	[[nodiscard]] inline auto GetMappedInputCode(KeyButton button) noexcept
+	{
+		return detail::get_mapped_code(detail::reverse_key_button_map, button);
+	}
+
+	///@brief Returns the system specific input code corresponding to the mouse button
+	[[nodiscard]] inline auto GetMappedInputCode(MouseButton button) noexcept
+	{
+		return detail::get_mapped_code(detail::reverse_mouse_button_map, button);
 	}
 
 	///@}

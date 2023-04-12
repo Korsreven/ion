@@ -21,7 +21,10 @@ File:	IonSystemUtility.h
 #include <utility>
 
 #include "IonSystemAPI.h"
+#include "events/listeners/IonKeyListener.h"
 #include "types/IonTypes.h"
+
+using ion::events::listeners::KeyButton;
 
 ///@brief Namespace containing commonly used utilities that are system specific
 ///@details Functions, classes and class members may need different implementation based on the underlying OS.
@@ -99,6 +102,7 @@ namespace ion::system::utilities
 
 		std::optional<PowerStatus> power_status() noexcept;
 		std::optional<std::string> local_time(TimeFormat format) noexcept;
+		std::optional<std::string> key_button_name(KeyButton button) noexcept;
 	} //detail
 
 
@@ -146,6 +150,16 @@ namespace ion::system::utilities
 	bool Execute(const std::filesystem::path &path,
 		std::optional<std::string> parameters, std::optional<std::filesystem::path> current_path,
 		ProcessWindowCommand window_command = ProcessWindowCommand::Normal) noexcept;
+
+	///@}
+
+	/**
+		@name Key button
+		@{
+	*/
+
+	///@brief Returns the key button name, in the system language
+	[[nodiscard]] std::optional<std::string> KeyButtonName(KeyButton button) noexcept;
 
 	///@}
 
