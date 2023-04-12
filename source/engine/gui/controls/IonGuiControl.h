@@ -94,6 +94,13 @@ namespace ion::gui::controls
 								OutsideBottomLeft,	OutsideBottomCenter,	OutsideBottomRight
 		};
 
+		enum class ControlCaptionOverflow
+		{
+			NoWrap,
+			NoWrapEllipsis,
+			Wrap
+		};
+
 		using BoundingBoxes = std::vector<Aabb>;
 
 
@@ -385,6 +392,21 @@ namespace ion::gui::controls
 				}
 			}
 
+			inline auto caption_overflow_to_text_overflow(ControlCaptionOverflow caption_overflow) noexcept
+			{
+				switch (caption_overflow)
+				{
+					case ControlCaptionOverflow::NoWrap:
+					return graphics::fonts::text::TextOverflow::WordTruncate;
+
+					case ControlCaptionOverflow::NoWrapEllipsis:
+					return graphics::fonts::text::TextOverflow::TruncateEllipsis;
+
+					default:
+					return graphics::fonts::text::TextOverflow::WordWrap;
+				}
+			}
+
 			Vector2 caption_offset(ControlCaptionLayout caption_layout, const Vector2 &size, const Vector2 &border_size, const Vector2 &margin_size) noexcept;
 			Vector2 caption_area_offset(ControlCaptionLayout caption_layout, const Vector2 &size, const Vector2 &border_size) noexcept;
 		} //detail
@@ -413,6 +435,7 @@ namespace ion::gui::controls
 			std::optional<Vector2> caption_margin_;
 			std::optional<Vector2> caption_padding_;
 			gui_control::ControlCaptionLayout caption_layout_ = gui_control::ControlCaptionLayout::Center;
+			gui_control::ControlCaptionOverflow caption_overflow_ = gui_control::ControlCaptionOverflow::Wrap;
 
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
 			gui_control::BoundingBoxes hit_boxes_;		
@@ -721,6 +744,16 @@ namespace ion::gui::controls
 				if (caption_layout_ != layout)
 				{
 					caption_layout_ = layout;
+					UpdateCaption();
+				}
+			}
+
+			///@brief Sets the caption overflow for this control to the given overflow
+			inline void CaptionOverflow(gui_control::ControlCaptionOverflow overflow) noexcept
+			{
+				if (caption_overflow_ != overflow)
+				{
+					caption_overflow_ = overflow;
 					UpdateCaption();
 				}
 			}

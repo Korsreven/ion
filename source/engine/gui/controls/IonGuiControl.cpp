@@ -919,6 +919,7 @@ void GuiControl::UpdateCaption() noexcept
 				value_or(detail::is_caption_outside(caption_layout_) ? vector2::Zero : area_size);
 				size != vector2::Zero)
 			{
+				text->Overflow(detail::caption_overflow_to_text_overflow(caption_overflow_));
 				text->AreaSize(size * ppu);
 				skin_->Caption->Position(center + detail::caption_area_offset(caption_layout_, size, border_size));
 			}

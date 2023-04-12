@@ -191,6 +191,7 @@ ClassDefinition get_gui_control_class()
 		.AddProperty("caption", ParameterType::String)
 		.AddProperty("caption-layout", control_caption_layouts)
 		.AddProperty("caption-margin", ParameterType::Vector2)
+		.AddProperty("caption-overflow", {"no-wrap"s, "no-wrap-ellipsis"s, "wrap"s})
 		.AddProperty("caption-padding", ParameterType::Vector2)
 		.AddProperty("caption-size", ParameterType::Vector2)
 		.AddProperty("enabled", ParameterType::Boolean)
@@ -643,6 +644,18 @@ void set_control_properties(const script_tree::ObjectNode &object, controls::Gui
 		}
 		else if (property.Name() == "caption-margin")
 			control.CaptionMargin(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "caption-overflow")
+		{
+			auto overflow = property[0]
+				.Get<ScriptType::Enumerable>()->Get();
+
+			if (overflow == "no-wrap")
+				control.CaptionOverflow(controls::gui_control::ControlCaptionOverflow::NoWrap);
+			else if (overflow == "no-wrap-ellipsis")
+				control.CaptionOverflow(controls::gui_control::ControlCaptionOverflow::NoWrapEllipsis);
+			else if (overflow == "wrap")
+				control.CaptionOverflow(controls::gui_control::ControlCaptionOverflow::Wrap);
+		}
 		else if (property.Name() == "caption-padding")
 			control.CaptionPadding(property[0].Get<ScriptType::Vector2>()->Get());
 		else if (property.Name() == "caption-size")
