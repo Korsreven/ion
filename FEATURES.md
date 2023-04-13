@@ -66,7 +66,7 @@ Here is an updated list with most of the main features of ION engine.
 	* YCbCr
 
 ### GUI (fully functional)
-* Mouse and keyboard comptable
+* Mouse and keyboard compatable
 * Frames and panels
 	* Grid layouts
 	* Horizontally and vertically aligned grid cells
@@ -77,6 +77,7 @@ Here is an updated list with most of the main features of ION engine.
 	* Buttons
 	* Check boxes
 	* Group boxes
+	* Images
 	* Labels
 	* List boxes
 	* Progress bars
