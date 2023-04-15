@@ -318,10 +318,10 @@ std::optional<std::string> local_time(TimeFormat format) noexcept
 		break;
 	}
 
-	if (auto size = GetTimeFormat(LOCALE_SYSTEM_DEFAULT, flags, &system_time, nullptr, nullptr, 0); size > 1)
+	if (auto size = GetTimeFormat(LOCALE_USER_DEFAULT, flags, &system_time, nullptr, nullptr, 0); size > 1)
 	{
 		if (std::string result(size - 1, '\0');
-			GetTimeFormat(LOCALE_SYSTEM_DEFAULT, flags, &system_time, nullptr, &result[0], size) != 0)
+			GetTimeFormat(LOCALE_USER_DEFAULT, flags, &system_time, nullptr, &result[0], size) != 0)
 			return result;
 	}
 	#else
