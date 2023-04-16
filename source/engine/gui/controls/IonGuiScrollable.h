@@ -176,8 +176,8 @@ namespace ion::gui::controls
 			///@brief Returns the number of elements that is in view
 			virtual int ElementsInView() noexcept;
 
-			///@brief Returns the current scroll position
-			virtual int ScrollPosition() noexcept;
+			///@brief Returns the current scroll value
+			virtual int ScrollValue() noexcept;
 
 			///@}
 

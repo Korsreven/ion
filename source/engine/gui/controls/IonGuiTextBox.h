@@ -227,8 +227,8 @@ namespace ion::gui::controls
 			///@brief See GuiScrollable::ElementsInView for more details
 			virtual int ElementsInView() noexcept override;
 
-			///@brief See GuiScrollable::ScrollPosition for more details
-			virtual int ScrollPosition() noexcept override;
+			///@brief See GuiScrollable::ScrollValue for more details
+			virtual int ScrollValue() noexcept override;
 
 
 			///@brief Called right after cursor has been moved

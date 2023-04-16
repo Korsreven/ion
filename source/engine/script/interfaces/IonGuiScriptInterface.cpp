@@ -124,7 +124,9 @@ ClassDefinition get_gui_component_class()
 
 		.AddRequiredProperty("name", ParameterType::String)
 		.AddProperty("enabled", ParameterType::Boolean)
+		.AddProperty("global-position", ParameterType::Vector2)
 		.AddProperty("global-z-order", ParameterType::FloatingPoint)
+		.AddProperty("position", ParameterType::Vector2)
 		.AddProperty("visible", ParameterType::Boolean)
 		.AddProperty("z-order", ParameterType::FloatingPoint);
 }
@@ -252,9 +254,9 @@ ClassDefinition get_gui_progress_bar_class()
 		.AddProperty("interpolation-time", ParameterType::FloatingPoint)
 		.AddProperty("interpolation-type", {"forward"s, "backward"s, "bidirectional"s})
 		.AddProperty("percent", ParameterType::FloatingPoint)
-		.AddProperty("position", ParameterType::FloatingPoint)
 		.AddProperty("range", {ParameterType::FloatingPoint, ParameterType::FloatingPoint})
-		.AddProperty("type", {"horizontal"s, "vertical"s});
+		.AddProperty("type", {"horizontal"s, "vertical"s})
+		.AddProperty("value", ParameterType::FloatingPoint);
 }
 
 ClassDefinition get_gui_radio_button_class()
@@ -283,10 +285,10 @@ ClassDefinition get_gui_slider_class()
 	return ClassDefinition::Create("slider", "control")
 		.AddProperty("flipped", ParameterType::Boolean)
 		.AddProperty("percent", ParameterType::FloatingPoint)
-		.AddProperty("position", ParameterType::Integer)
 		.AddProperty("range", {ParameterType::Integer, ParameterType::Integer})
 		.AddProperty("step-by-amount", ParameterType::Integer)
-		.AddProperty("type", {"horizontal"s, "vertical"s});
+		.AddProperty("type", {"horizontal"s, "vertical"s})
+		.AddProperty("value", ParameterType::Integer);
 }
 
 ClassDefinition get_gui_text_box_class()
@@ -371,8 +373,12 @@ void set_component_properties(const script_tree::ObjectNode &object, GuiComponen
 	{
 		if (property.Name() == "enabled")
 			component.Enabled(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "global-position")
+			component.GlobalPosition(property[0].Get<ScriptType::Vector2>()->Get());
 		else if (property.Name() == "global-z-order")
 			component.GlobalZOrder(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "position")
+			component.Position(property[0].Get<ScriptType::Vector2>()->Get());
 		else if (property.Name() == "visible")
 			component.Visible(property[0].Get<ScriptType::Boolean>()->Get());
 		else if (property.Name() == "z-order")
@@ -863,8 +869,6 @@ void set_progress_bar_properties(const script_tree::ObjectNode &object, controls
 		}
 		else if (property.Name() == "percent")
 			progress_bar.Percent(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-		else if (property.Name() == "position")
-			progress_bar.Position(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "range")
 			progress_bar.Range(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
 							   property[1].Get<ScriptType::FloatingPoint>()->As<real>());
@@ -875,6 +879,8 @@ void set_progress_bar_properties(const script_tree::ObjectNode &object, controls
 			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "vertical")
 				progress_bar.Type(controls::gui_progress_bar::ProgressBarType::Vertical);
 		}
+		else if (property.Name() == "value")
+			progress_bar.Value(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 	}
 }
 
@@ -939,8 +945,6 @@ void set_slider_properties(const script_tree::ObjectNode &object, controls::GuiS
 			slider.Flipped(property[0].Get<ScriptType::Boolean>()->Get());
 		else if (property.Name() == "percent")
 			slider.Percent(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-		else if (property.Name() == "position")
-			slider.Position(property[0].Get<ScriptType::Integer>()->As<int>());
 		else if (property.Name() == "range")
 			slider.Range(property[0].Get<ScriptType::Integer>()->As<int>(),
 						 property[1].Get<ScriptType::Integer>()->As<int>());
@@ -953,6 +957,8 @@ void set_slider_properties(const script_tree::ObjectNode &object, controls::GuiS
 			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "vertical")
 				slider.Type(controls::gui_slider::SliderType::Vertical);
 		}
+		else if (property.Name() == "value")
+			slider.Value(property[0].Get<ScriptType::Integer>()->As<int>());
 	}
 }
 

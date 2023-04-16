@@ -205,18 +205,18 @@ namespace ion::gui::controls
 			}
 
 
-			///@brief Sets the position to the given percentage in range [0.0, 1.0]
+			///@brief Sets the value to the given percentage in range [0.0, 1.0]
 			void Percent(real percent) noexcept;
 
-			///@brief Sets the position of this progress bar to the given value
-			inline void Position(real position) noexcept
+			///@brief Sets the value of this progress bar to the given value
+			inline void Value(real value) noexcept
 			{
-				if (progress_.Position() != position)
+				if (progress_.Value() != value)
 				{
-					auto pos = progress_.Position();
+					auto val = progress_.Value();
 					auto percent = progress_.Percent();
-					progress_.Position(position);
-					Progressed(position - pos);
+					progress_.Value(value);
+					Progressed(value - val);
 					UpdateBar();
 					StartInterpolation(percent);
 				}
@@ -297,16 +297,16 @@ namespace ion::gui::controls
 			}
 
 
-			///@brief Returns the position as a percentage in range [0.0, 1.0]
+			///@brief Returns the value as a percentage in range [0.0, 1.0]
 			[[nodiscard]] inline auto Percent() const noexcept
 			{
 				return progress_.Percent();
 			}
 
-			///@brief Returns the position of this progress bar
-			[[nodiscard]] inline auto Position() const noexcept
+			///@brief Returns the value of this progress bar
+			[[nodiscard]] inline auto Value() const noexcept
 			{
-				return progress_.Position();
+				return progress_.Value();
 			}		
 
 			///@brief Returns the range of this progress bar
@@ -335,11 +335,11 @@ namespace ion::gui::controls
 			}
 
 
-			///@brief Returns the interpolated position as a percentage in range [0.0, 1.0]
+			///@brief Returns the interpolated value as a percentage in range [0.0, 1.0]
 			[[nodiscard]] real InterpolatedPercent() const noexcept;
 
-			///@brief Returns the interpolated position of this progress bar
-			[[nodiscard]] real InterpolatedPosition() const noexcept;
+			///@brief Returns the interpolated value of this progress bar
+			[[nodiscard]] real InterpolatedValue() const noexcept;
 
 			///@}
 

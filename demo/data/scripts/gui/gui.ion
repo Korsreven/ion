@@ -47,103 +47,97 @@ gui
 			{
 				name: "slider";
 				size: vec2(1.0, 0.077);
+				position: vec2(0.0, 0.6);
 				caption: "My slider";
 				tooltip: "My slider tooltip";
 				range: 0 20;
 				step-by-amount: 5;
-
-				scene-node { position: vec3(0.0, 0.6, 0.0); }
 			}
 
 			image
 			{
 				name: "image";
 				size: vec2(0.7, 0.35);
+				position: vec2(-1.0, 0.25);
 				mode: fit;
 				source: "ship";
-
-				scene-node { position: vec3(-1.0, 0.25, 0.0); }
 			}
 
 			label
 			{
 				name: "label";
+				position: vec2(0.0, 0.5);
 				caption: "My label";
 				tooltip: "My label tooltip";
-
-				scene-node { position: vec3(0.0, 0.5, 0.0); }
 			}
 
 			button
 			{
 				name: "button";
 				size: vec2(0.5, 0.11);
+				position: vec2(0.0, 0.4);
 				caption: "My button";
 				tooltip: "My button tooltip";
-
-				scene-node { position: vec3(0.0, 0.4, 0.0); }
 			}
 
 			check-box
 			{
 				name: "check_box";
 				size: vec2(0.077);
+				position: vec2(0.0, 0.3);
 				caption: "My check box";
 				tooltip: "My check box tooltip";
-
-				scene-node { position: vec3(0.0, 0.3, 0.0); }
 			}
 
 			radio-button
 			{
 				name: "radio_button";
 				size: vec2(0.077);
+				position: vec2(-0.05, 0.0);
+				z-order: 0.1;
 				caption: "My radio button";
 				tooltip: "My radio button tooltip";
 				caption-layout: outside-left-center;
-
-				scene-node { position: vec3(-0.05, 0.0, 0.1); }
 			}
 
 			radio-button
 			{
 				name: "radio_button2";
 				size: vec2(0.077);
+				position: vec2(0.05, 0.0);
+				z-order: 0.1;
 				caption: "My radio button";
 				tooltip: "My radio button tooltip";
-
-				scene-node { position: vec3(0.05, 0.0, 0.1); }
 			}
 
 			group-box
 			{
 				name: "group_box";
 				size: vec2(1.0, 0.15);
+				position: vec2(0.0, 0.1);
 				caption: "My group box";
 				tooltip: "My group box tooltip";
 
 				attach: "radio_button";
 				attach: "radio_button2";
-
-				scene-node { position: vec3(0.0, 0.1, 0.0); }
 			}
 
 			progress-bar
 			{
 				name: "progress_bar";
 				size: vec2(1.0, 0.077);
+				position: vec2(0.0, -0.1);
 				caption: "My progress bar";
 				tooltip: "My progress bar tooltip";
 				range: 0.0 100.0;
-				position: 75.0;
-
-				scene-node { position: vec3(0.0, -0.1, 0.0); }
+				value: 75.0;
 			}
 
 			list-box
 			{
 				name: "list_box";
 				size: vec2(0.5);
+				position: vec2(0.8, 0.25);
 				caption: "My list box";
 				tooltip: "My list box tooltip";
 				item-height-factor: 3.5;
@@ -161,36 +155,32 @@ gui
 				item: "My <b>7th</b> <font color='purple'>item</font>" "star_green";
 				item: "My <b>8th</b> <font color='purple'>item</font>" "star_red";
 				item: "My <b>9th</b> <font color='purple'>item</font>" "star";
-
-				scene-node { position: vec3(0.8, 0.25, 0.0); }
 			}
 
 			scroll-bar
 			{
 				name: "scroll_bar";
 				size: vec2(0.077, 0.5);
+				position: vec2(1.1, 0.25);
 				caption: "My scroll bar";
 				tooltip: "My scroll bar tooltip";
 				range: 0 50;
 				step-by-amount: 3;
 
 				attach: "list_box";
-
-				scene-node { position: vec3(1.1, 0.25, 0.0); }
 			}
 
 			text-box
 			{
 				name: "text_box";
 				size: vec2(0.5, 0.11);
+				position: vec2(0.0, -0.3);
 				caption: "My text box";
 				tooltip: "My text box tooltip";
 				placeholder-content: "<i><b>Type</b></i> something...";
 				text-layout: left;
 				text-mode: printable;
 				character-set: ascii;
-
-				scene-node { position: vec3(0.0, -0.3, 0.0); }
 			}
 
 

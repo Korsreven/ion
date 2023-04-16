@@ -182,6 +182,18 @@ void GuiComponent::Owner(std::nullptr_t) noexcept
 	Detach();
 }
 
+void GuiComponent::Position(const Vector2 &position) noexcept
+{
+	if (node_)
+		node_->Position(position);
+}
+
+void GuiComponent::GlobalPosition(const Vector2 &position) noexcept
+{
+	if (node_)
+		node_->DerivedPosition(position);
+}
+
 void GuiComponent::ZOrder(real z) noexcept
 {
 	if (node_)
@@ -207,6 +219,16 @@ void GuiComponent::GlobalZOrder(real z) noexcept
 /*
 	Observers
 */
+
+Vector2 GuiComponent::Position() const noexcept
+{
+	return node_ ? Vector2{node_->Position()} : Vector2{};
+}
+
+Vector2 GuiComponent::GlobalPosition() const noexcept
+{
+	return node_ ? Vector2{node_->DerivedPosition()} : Vector2{};
+}
 
 real GuiComponent::ZOrder() const noexcept
 {

@@ -344,7 +344,7 @@ GuiProgressBar::GuiProgressBar(std::string name, const skins::GuiSkin &skin, con
 void GuiProgressBar::Percent(real percent) noexcept
 {
 	using namespace utilities;
-	Position(math::Lerp(progress_.Min(), progress_.Max(), percent));
+	Value(math::Lerp(progress_.Min(), progress_.Max(), percent));
 }
 
 
@@ -357,14 +357,14 @@ real GuiProgressBar::InterpolatedPercent() const noexcept
 	return interpolated_percent_.value_or(Percent());
 }
 
-real GuiProgressBar::InterpolatedPosition() const noexcept
+real GuiProgressBar::InterpolatedValue() const noexcept
 {
 	using namespace utilities;
 
 	if (interpolated_percent_)
 		return math::Lerp(progress_.Min(), progress_.Max(), *interpolated_percent_);
 	else
-		return Position();
+		return Value();
 }
 
 

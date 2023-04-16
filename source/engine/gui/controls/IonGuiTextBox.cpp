@@ -417,7 +417,7 @@ int GuiTextBox::ElementsInView() noexcept
 		return 0;
 }
 
-int GuiTextBox::ScrollPosition() noexcept
+int GuiTextBox::ScrollValue() noexcept
 {
 	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
 		skin && skin->Text && skin->Text->GetImmutable())

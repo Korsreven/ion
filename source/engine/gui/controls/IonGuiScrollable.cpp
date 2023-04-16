@@ -42,7 +42,7 @@ void GuiScrollable::UpdateScrollBar() noexcept
 			element_count - elements_in_view : 0;
 
 		scroll_bar_->Range(0, max);
-		scroll_bar_->Position(ScrollPosition());
+		scroll_bar_->Value(ScrollValue());
 		scroll_bar_->StepByAmount(scroll_rate_);
 	}
 }
@@ -99,7 +99,7 @@ int GuiScrollable::ElementsInView() noexcept
 	return 0; //Optional to override
 }
 
-int GuiScrollable::ScrollPosition() noexcept
+int GuiScrollable::ScrollValue() noexcept
 {
 	return 0; //Optional to override
 }

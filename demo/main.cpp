@@ -2316,47 +2316,49 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		base_panel->ZOrder(0.1_r);	
 
 		auto slider = base_panel->CreateSlider("slider", Vector2{1.0_r, 0.077_r}, "My slider", "My slider tooltip");
-		slider->Node()->Position({0.0_r, 0.6_r});
+		slider->Position({0.0_r, 0.6_r});
 		slider->Range(0, 20);
 		slider->StepByAmount(5);
 
 		auto image = base_panel->CreateImage("image", Vector2{0.7_r, 0.35_r}, {});
 		image->Mode(ion::gui::controls::gui_image::ImageMode::Fit);
 		image->Source(ship);
-		image->Node()->Position({-1.0_r, 0.25_r});
+		image->Position({-1.0_r, 0.25_r});
 
 		auto label = base_panel->CreateLabel("label", {}, "My label");
-		label->Node()->Position({0.0_r, 0.5_r});
+		label->Position({0.0_r, 0.5_r});
 		label->Tooltip("My label tooltip");
 
 		auto button = base_panel->CreateButton("button", Vector2{0.5_r, 0.11_r}, "My button", "My button tooltip");
-		button->Node()->Position({0.0_r, 0.4_r});
+		button->Position({0.0_r, 0.4_r});
 
 		auto check_box = base_panel->CreateCheckBox("check_box", Vector2{0.077_r, 0.077_r}, "My check box", "My check box tooltip");
-		check_box->Node()->Position({0.0_r, 0.3_r});
+		check_box->Position({0.0_r, 0.3_r});
 
 		auto group_box = base_panel->CreateGroupBox("group_box", Vector2{1.0_r, 0.15_r}, "My group box");
-		group_box->Node()->Position({0.0_r, 0.1_r});
+		group_box->Position({0.0_r, 0.1_r});
 		group_box->Tooltip("My group box tooltip");
 
 		auto radio_button = base_panel->CreateRadioButton("radio_button", Vector2{0.077_r, 0.077_r}, "My radio button", "My radio button tooltip");
-		radio_button->Node()->Position({-0.05_r, 0.0_r});
+		radio_button->Position({-0.05_r, 0.0_r});
+		radio_button->ZOrder(0.1_r);
 		radio_button->CaptionLayout(ion::gui::controls::gui_control::ControlCaptionLayout::OutsideLeftCenter);
 
 		auto radio_button2 = base_panel->CreateRadioButton("radio_button2", Vector2{0.077_r, 0.077_r}, "My radio button", "My radio button tooltip");
-		radio_button2->Node()->Position({0.05_r, 0.0_r});
+		radio_button2->Position({0.05_r, 0.0_r});
+		radio_button2->ZOrder(0.1_r);
 
 		group_box->AddControl(radio_button);
 		group_box->AddControl(radio_button2);
 
 		auto progress_bar = base_panel->CreateProgressBar("progress_bar", Vector2{1.0_r, 0.077_r}, "My progress bar");
-		progress_bar->Node()->Position({0.0_r, -0.1_r});
+		progress_bar->Position({0.0_r, -0.1_r});
 		progress_bar->Tooltip("My progress bar tooltip");
 		progress_bar->Range(0.0_r, 100.0_r);
-		progress_bar->Position(75.0_r);
+		progress_bar->Value(75.0_r);
 
 		auto list_box = base_panel->CreateListBox("list_box", Vector2{0.5_r, 0.5_r}, "My list box");
-		list_box->Node()->Position({0.8_r, 0.25_r});
+		list_box->Position({0.8_r, 0.25_r});
 		list_box->Tooltip("My list box tooltip");
 		list_box->ItemHeightFactor(3.5_r);
 		list_box->IconPadding(10.0_r);
@@ -2376,14 +2378,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		});
 
 		auto scroll_bar = base_panel->CreateScrollBar("scroll_bar", Vector2{0.077_r, 0.5_r}, "My scroll bar");
-		scroll_bar->Node()->Position({1.1_r, 0.25_r});
+		scroll_bar->Position({1.1_r, 0.25_r});
 		scroll_bar->Tooltip("My scroll bar tooltip");
 		scroll_bar->Range(0, 50);
 		scroll_bar->StepByAmount(3);
 		scroll_bar->AttachedScrollable(list_box);
 
 		auto text_box = base_panel->CreateTextBox("text_box", Vector2{0.5_r, 0.11_r}, "My text box");		
-		text_box->Node()->Position({0.0_r, -0.3_r});
+		text_box->Position({0.0_r, -0.3_r});
 		text_box->Tooltip("My text box tooltip");
 		text_box->PlaceholderContent("<i><b>Type</b></i> something...");	
 		text_box->TextLayout(ion::gui::controls::gui_text_box::TextBoxTextLayout::Left);

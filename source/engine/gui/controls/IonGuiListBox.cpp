@@ -189,7 +189,7 @@ int GuiListBox::ElementsInView() noexcept
 		return 0;
 }
 
-int GuiListBox::ScrollPosition() noexcept
+int GuiListBox::ScrollValue() noexcept
 {
 	if (auto skin = static_cast<ListBoxSkin*>(skin_.get());
 		skin && skin->Lines && skin->Lines->GetImmutable())
@@ -852,7 +852,7 @@ bool GuiListBox::KeyReleased(KeyButton button) noexcept
 	{
 		if (item_index_)
 		{
-			auto first = ScrollPosition();
+			auto first = ScrollValue();
 			auto view_count = ElementsInView();
 
 			if (*item_index_ < first)

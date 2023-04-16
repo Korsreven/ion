@@ -232,7 +232,7 @@ GuiSlider::GuiSlider(std::string name, const skins::GuiSkin &skin, const std::op
 void GuiSlider::Percent(real percent) noexcept
 {
 	using namespace utilities;
-	Position(static_cast<int>(
+	Value(static_cast<int>(
 		math::Round(math::Lerp(
 			static_cast<real>(progress_.Min()),
 			static_cast<real>(progress_.Max()),
@@ -309,8 +309,8 @@ bool GuiSlider::KeyReleased(KeyButton button) noexcept
 			case KeyButton::UpArrow:
 			case KeyButton::RightArrow:
 			{
-				if (Position() < max)
-					Position(Position() + step_by_amount_);
+				if (Value() < max)
+					Value(Value() + step_by_amount_);
 
 				return true;
 			}
@@ -319,8 +319,8 @@ bool GuiSlider::KeyReleased(KeyButton button) noexcept
 			case KeyButton::DownArrow:
 			case KeyButton::LeftArrow:
 			{
-				if (Position() > min)
-					Position(Position() - step_by_amount_);
+				if (Value() > min)
+					Value(Value() - step_by_amount_);
 
 				return true;
 			}
@@ -364,15 +364,15 @@ bool GuiSlider::MouseReleased(MouseButton button, Vector2 position) noexcept
 					handle_position *= skin_node_->DerivedScaling();
 				}
 
-				auto delta_position =
+				auto delta_value =
 					(type_ == SliderType::Horizontal && position.X() < handle_position.X()) ||
 					(type_ == SliderType::Vertical && position.Y() < handle_position.Y()) ?
 					-step_by_amount_ : step_by_amount_;
 
 				if (flipped_)
-					Position(Position() - delta_position);
+					Value(Value() - delta_value);
 				else
-					Position(Position() + delta_position);
+					Value(Value() + delta_value);
 			}
 		}
 	}

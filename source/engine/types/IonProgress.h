@@ -45,7 +45,7 @@ namespace ion::types
 
 		private:
 
-			T position_{};
+			T value_{};
 			T min_{};		
 			T max_{};
 		
@@ -56,7 +56,7 @@ namespace ion::types
 
 			///@brief Constructs a new progress with the given min and max
 			constexpr Progress(T min, T max) noexcept :
-				position_{min},
+				value_{min},
 				min_{min},
 				max_{min > max ? min : max}
 			{
@@ -69,24 +69,24 @@ namespace ion::types
 				@{
 			*/
 
-			///@brief Sets the current position to the given value
-			constexpr void Position(T position) noexcept
+			///@brief Sets the current value to the given value
+			constexpr void Value(T value) noexcept
 			{
-				position_ = std::clamp(position, min_, max_);
+				value_ = std::clamp(value, min_, max_);
 			}
 
 			///@brief Sets the min progress to the given value
 			constexpr void Min(T min) noexcept
 			{
 				min_ = min > max_ ? max_ : min;
-				position_ = std::clamp(position_, min_, max_);
+				value_ = std::clamp(value_, min_, max_);
 			}
 
 			///@brief Sets the max progress to the given value
 			constexpr void Max(T max) noexcept
 			{
 				max_ = max < min_ ? min_ : max;
-				position_ = std::clamp(position_, min_, max_);
+				value_ = std::clamp(value_, min_, max_);
 			}
 
 			///@brief Sets the extents to the given min and max values
@@ -95,7 +95,7 @@ namespace ion::types
 			{
 				min_ = min;
 				max_ = min > max ? min : max;
-				position_ = std::clamp(position_, min_, max_);
+				value_ = std::clamp(value_, min_, max_);
 			}
 
 			///@}
@@ -105,10 +105,10 @@ namespace ion::types
 				@{
 			*/
 
-			///@brief Returns the current position in range [min, max]
-			[[nodiscard]] constexpr auto Position() const noexcept
+			///@brief Returns the current value in range [min, max]
+			[[nodiscard]] constexpr auto Value() const noexcept
 			{
-				return position_;
+				return value_;
 			}
 
 			///@brief Returns the min progress
@@ -139,14 +139,14 @@ namespace ion::types
 			///@brief Sets the current progress to the given percentage in range [0.0, 1.0]
 			constexpr void Percent(real percent) noexcept
 			{
-				position_ = std::clamp(min_ + T(progress::detail::underlying_value(max_ - min_) * percent), min_, max_);
+				value_ = std::clamp(min_ + T(progress::detail::underlying_value(max_ - min_) * percent), min_, max_);
 			}
 
 			///@brief Returns the current progress as a percentage in range [0.0, 1.0]
 			[[nodiscard]] constexpr auto Percent() const noexcept
 			{
 				return max_ - min_ > T{} ?
-					progress::detail::underlying_value(position_ - min_) /
+					progress::detail::underlying_value(value_ - min_) /
 					static_cast<real>(progress::detail::underlying_value(max_ - min_)) :
 					1.0_r;
 			}
@@ -161,13 +161,13 @@ namespace ion::types
 			///@brief Sets the current remaining progress to the given value
 			constexpr void Remaining(T amount) noexcept
 			{
-				position_ = std::clamp(max_ - amount, min_, max_);
+				value_ = std::clamp(max_ - amount, min_, max_);
 			}
 
 			///@brief Returns the current remaining progress
 			[[nodiscard]] constexpr T Remaining() const noexcept
 			{
-				return max_ - position_;
+				return max_ - value_;
 			}
 
 			///@}
@@ -177,10 +177,10 @@ namespace ion::types
 				@{
 			*/
 
-			///@brief Resets the current position to the min progress
+			///@brief Resets the current value to the min progress
 			constexpr void Reset() noexcept
 			{
-				position_ = min_;
+				value_ = min_;
 			}
 
 			///@}
@@ -190,23 +190,23 @@ namespace ion::types
 				@{
 			*/
 
-			///@brief Returns true if the current position has reached max progress
+			///@brief Returns true if the current value has reached max progress
 			[[nodiscard]] constexpr auto IsComplete() const noexcept
 			{
-				return position_ == max_;
+				return value_ == max_;
 			}
 
 
-			///@brief Increase the current position by the given amount
+			///@brief Increase the current value by the given amount
 			constexpr auto& StepBy(T amount) noexcept
 			{
 				if (!IsComplete())
-					position_ = std::clamp(position_ + amount, min_, max_);
+					value_ = std::clamp(value_ + amount, min_, max_);
 
 				return *this;
 			}
 
-			///@brief Increase the current position by the given percentage (of max)
+			///@brief Increase the current value by the given percentage (of max)
 			constexpr auto& StepByPercent(real percent) noexcept
 			{
 				return StepBy(T(progress::detail::underlying_value(max_ - min_) * percent));

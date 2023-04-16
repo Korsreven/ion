@@ -18,6 +18,7 @@ File:	IonGuiComponent.h
 #include <utility>
 
 #include "events/IonCallback.h"
+#include "graphics/utilities/IonVector2.h"
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonSuppressMove.h"
@@ -36,6 +37,7 @@ namespace ion::gui
 	class GuiContainer;
 
 	using namespace graphics::scene::graph;
+	using namespace graphics::utilities;
 
 	namespace gui_component::detail
 	{
@@ -228,6 +230,12 @@ namespace ion::gui
 			///@brief Releases ownership for this component
 			void Owner(std::nullptr_t) noexcept;
 
+			///@brief Sets the local position of this component
+			void Position(const Vector2 &position) noexcept;
+
+			///@brief Sets the global position of this component
+			void GlobalPosition(const Vector2 &position) noexcept;
+
 			///@brief Sets the local z-order of this component
 			void ZOrder(real z) noexcept;
 
@@ -298,6 +306,12 @@ namespace ion::gui
 			{
 				return owner_;
 			}
+
+			///@brief Returns the local position of this component
+			[[nodiscard]] Vector2 Position() const noexcept;
+
+			///@brief Returns the global position of this component
+			[[nodiscard]] Vector2 GlobalPosition() const noexcept;
 
 			///@brief Returns the local z-order of this component
 			[[nodiscard]] real ZOrder() const noexcept;

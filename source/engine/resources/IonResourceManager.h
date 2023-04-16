@@ -484,7 +484,7 @@ namespace ion::resources
 
 				UpdatePendingResources(process_execution_model_);
 
-				progress.Position(progress.Max() - ResourcesToUpdate());
+				progress.Value(progress.Max() - ResourcesToUpdate());
 				return progress.IsComplete();
 			}
 
@@ -570,7 +570,7 @@ namespace ion::resources
 
 				PreparePendingResources(process_execution_model_);
 
-				progress.Position(progress.Max() - ResourcesToPrepare());
+				progress.Value(progress.Max() - ResourcesToPrepare());
 				return progress.IsComplete();
 			}
 
@@ -663,7 +663,7 @@ namespace ion::resources
 				PreparePendingResources(process_execution_model_);
 				LoadPendingResources();
 
-				progress.Position(progress.Max() - ResourcesToLoad());
+				progress.Value(progress.Max() - ResourcesToLoad());
 				return progress.IsComplete();
 			}
 
@@ -738,7 +738,7 @@ namespace ion::resources
 
 				UnloadPendingResources();
 
-				progress.Position(progress.Max() - ResourcesToUnload());
+				progress.Value(progress.Max() - ResourcesToUnload());
 				return progress.IsComplete();
 			}
 

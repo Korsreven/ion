@@ -49,7 +49,7 @@ namespace ion::gui::controls
 
 	///@brief A class representing a GUI scroll bar that can be horizontal or vertical, flipped or not
 	///@details A scroll bar can be attached to a GUI scrollable and vice versa (usually to scroll up and down).
-	///The scroll bar handle can be dragged with the mouse cursor to change position
+	///The scroll bar handle can be dragged with the mouse cursor to change value
 	class GuiScrollBar : public GuiSlider
 	{
 		private:
