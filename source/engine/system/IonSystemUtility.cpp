@@ -14,6 +14,7 @@ File:	IonSystemUtility.cpp
 
 #include <algorithm>
 #include <array>
+#include <tuple>
 
 #ifdef ION_WIN32
 	#include <shellapi.h> //Windows shell API
@@ -261,41 +262,120 @@ bool open_or_execute(const std::filesystem::path &path,
 }
 
 
-std::optional<PowerStatus> power_status() noexcept
+DisplaySettings display_settings(DisplaySettingMode mode) noexcept
 {
+	DisplaySettings settings;
+
 	#ifdef ION_WIN32
-	SYSTEM_POWER_STATUS system_power_status;
+	DISPLAY_DEVICE device = {};
+	device.cb = sizeof(DISPLAY_DEVICE);
 
-	//Power status available
-	if (GetSystemPowerStatus(&system_power_status) != 0)
+	for (auto i = 0;; ++i)
 	{
-		PowerStatus status;
+		//Enumerate display devices
+		if (!EnumDisplayDevices(NULL, i, &device, EDD_GET_DEVICE_INTERFACE_NAME))
+			break;
 
-		//AC line status available
-		if (system_power_status.ACLineStatus != 255)
-			status.BatteryRunning = (system_power_status.ACLineStatus == 0);
+		//Skip display devices not attached to desktop
+		if (device.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)
+		{
+			DEVMODE devmode = {};
+			devmode.dmSize = sizeof(DEVMODE);
 
-		//Battery life percent is known
-		if (system_power_status.BatteryLifePercent != 255)
-			status.BatteryPercent = system_power_status.BatteryLifePercent / 100.0_r;
+			for (auto j = 0;; ++j)
+			{
+				//Enumerate display settings for each display device
+				if (!EnumDisplaySettings(device.DeviceName, j, &devmode))
+					break;
 
-		//Battery lifetime is known
-		if (system_power_status.BatteryLifeTime != static_cast<DWORD>(-1))
-			status.BatteryLifetime = std::chrono::seconds{system_power_status.BatteryLifeTime}; //Seconds
-
-		//Battery full lifetime is known
-		if (system_power_status.BatteryFullLifeTime != static_cast<DWORD>(-1))
-			status.BatteryFullLifetime = std::chrono::seconds{system_power_status.BatteryFullLifeTime}; //Seconds
-
-		//Battery flag is known
-		if (system_power_status.BatteryFlag != 255)
-			status.BatteryCharging = (system_power_status.BatteryFlag & 8); //Charging
-		
-		return status;
+				settings.emplace_back(
+					static_cast<int>(devmode.dmPelsWidth),
+					static_cast<int>(devmode.dmPelsHeight),
+					static_cast<int>(devmode.dmDisplayFrequency));
+			}
+		}
 	}
 	#else
 
 	#endif
+
+	//Sort ASC
+	std::sort(std::begin(settings), std::end(settings),
+		[](const auto &x, const auto &y) noexcept
+		{
+			return std::tuple{x.Width, x.Height, x.Frequency} > std::tuple{y.Width, y.Height, y.Frequency};
+		});
+
+	//Remove duplicates
+	settings.erase(
+		std::unique(std::begin(settings), std::end(settings),
+			[](const auto &x, const auto &y) noexcept
+			{
+				return x.Width == y.Width && x.Height == y.Height && x.Frequency == y.Frequency;
+			}), std::end(settings));
+
+	//Filter on mode
+	if (mode != DisplaySettingMode::AllFrequencies)
+	{
+		DisplaySettings custom_settings;
+
+		for (auto &setting : settings)
+		{
+			//Equal size
+			if (!std::empty(custom_settings) &&
+				custom_settings.back().Width == setting.Width &&
+				custom_settings.back().Height == setting.Height)
+			{
+				switch (mode)
+				{
+					case DisplaySettingMode::LowestFrequency:
+					custom_settings.back().Frequency = std::min(custom_settings.back().Frequency, setting.Frequency);
+					break;
+
+					case DisplaySettingMode::HighestFrequency:
+					custom_settings.back().Frequency = std::max(custom_settings.back().Frequency, setting.Frequency);
+					break;
+				}
+			}
+			else
+				custom_settings.push_back(setting);
+		}
+
+		settings = std::move(custom_settings);
+	}
+
+	return settings;
+}
+
+std::optional<std::string> key_button_name(KeyButton button) noexcept
+{
+	if (auto code = events::GetMappedInputCode(button); code)
+	{
+		#ifdef ION_WIN32
+		if (auto scan_code = MapVirtualKey(*code, MAPVK_VK_TO_VSC); scan_code != 0)
+		{
+			switch (*code)
+			{
+				case VK_LEFT: case VK_UP: case VK_RIGHT: case VK_DOWN: //Arrow keys
+				case VK_PRIOR: case VK_NEXT: //Page up and page down
+				case VK_END: case VK_HOME:
+				case VK_INSERT: case VK_DELETE:
+				case VK_DIVIDE: //Numpad slash
+				case VK_NUMLOCK:
+				{
+					scan_code |= 0x100; //Set extended bit
+					break;
+				}
+			}
+
+			std::array<char, 256> result{};
+			if (auto size = GetKeyNameText(scan_code << 16, &result[0], std::size(result)); size > 0)
+				return std::string(std::data(result), size);
+		}
+		#else
+		
+		#endif
+	}
 
 	return {};
 }
@@ -331,35 +411,41 @@ std::optional<std::string> local_time(TimeFormat format) noexcept
 	return {};
 }
 
-std::optional<std::string> key_button_name(KeyButton button) noexcept
+std::optional<PowerStatus> power_status() noexcept
 {
-	if (auto code = events::GetMappedInputCode(button); code)
-	{
-		#ifdef ION_WIN32
-		if (auto scan_code = MapVirtualKey(*code, MAPVK_VK_TO_VSC); scan_code != 0)
-		{
-			switch (*code)
-			{
-				case VK_LEFT: case VK_UP: case VK_RIGHT: case VK_DOWN: //Arrow keys
-				case VK_PRIOR: case VK_NEXT: //Page up and page down
-				case VK_END: case VK_HOME:
-				case VK_INSERT: case VK_DELETE:
-				case VK_DIVIDE: //Numpad slash
-				case VK_NUMLOCK:
-				{
-					scan_code |= 0x100; //Set extended bit
-					break;
-				}
-			}
+	#ifdef ION_WIN32
+	SYSTEM_POWER_STATUS system_power_status;
 
-			std::array<char, 256> result{};
-			if (auto size = GetKeyNameText(scan_code << 16, &result[0], std::size(result)); size > 0)
-				return std::string(std::data(result), size);
-		}
-		#else
+	//Power status available
+	if (GetSystemPowerStatus(&system_power_status) != 0)
+	{
+		PowerStatus status;
+
+		//AC line status available
+		if (system_power_status.ACLineStatus != 255)
+			status.BatteryRunning = (system_power_status.ACLineStatus == 0);
+
+		//Battery life percent is known
+		if (system_power_status.BatteryLifePercent != 255)
+			status.BatteryPercent = system_power_status.BatteryLifePercent / 100.0_r;
+
+		//Battery lifetime is known
+		if (system_power_status.BatteryLifeTime != static_cast<DWORD>(-1))
+			status.BatteryLifetime = std::chrono::seconds{system_power_status.BatteryLifeTime}; //Seconds
+
+		//Battery full lifetime is known
+		if (system_power_status.BatteryFullLifeTime != static_cast<DWORD>(-1))
+			status.BatteryFullLifetime = std::chrono::seconds{system_power_status.BatteryFullLifeTime}; //Seconds
+
+		//Battery flag is known
+		if (system_power_status.BatteryFlag != 255)
+			status.BatteryCharging = (system_power_status.BatteryFlag & 8); //Charging
 		
-		#endif
+		return status;
 	}
+	#else
+
+	#endif
 
 	return {};
 }
@@ -437,6 +523,16 @@ bool Execute(const std::filesystem::path &path,
 	ProcessWindowCommand window_command) noexcept
 {
 	return detail::open_or_execute(path, parameters, current_path, window_command);
+}
+
+
+/*
+	Display resolutions
+*/
+
+DisplaySettings DisplayResolutions(DisplaySettingMode mode) noexcept
+{
+	return detail::display_settings(mode);
 }
 
 

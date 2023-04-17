@@ -19,6 +19,7 @@ File:	IonSystemUtility.h
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include "IonSystemAPI.h"
 #include "events/listeners/IonKeyListener.h"
@@ -31,6 +32,13 @@ using ion::events::listeners::KeyButton;
 ///System specific code should have its own define directive
 namespace ion::system::utilities
 {
+	enum class DisplaySettingMode
+	{
+		AllFrequencies,
+		LowestFrequency,
+		HighestFrequency
+	};
+
 	enum class ProcessWindowCommand
 	{
 		Hidden,
@@ -46,6 +54,14 @@ namespace ion::system::utilities
 		HH
 	};
 
+
+	struct DisplaySetting final
+	{
+		int Width = 0;
+		int Height = 0;
+		int Frequency = 0;
+	};
+
 	struct PowerStatus final
 	{
 		std::optional<bool> BatteryRunning;
@@ -54,6 +70,8 @@ namespace ion::system::utilities
 		std::optional<std::chrono::seconds> BatteryLifetime;
 		std::optional<std::chrono::seconds> BatteryFullLifetime;
 	};
+
+	using DisplaySettings = std::vector<DisplaySetting>;
 
 	namespace detail
 	{
@@ -99,10 +117,12 @@ namespace ion::system::utilities
 		bool open_or_execute(const std::filesystem::path &path,
 			std::optional<std::string> parameters, std::optional<std::filesystem::path> current_path,
 			ProcessWindowCommand window_command) noexcept;
-
-		std::optional<PowerStatus> power_status() noexcept;
-		std::optional<std::string> local_time(TimeFormat format) noexcept;
+		
+		
+		DisplaySettings display_settings(DisplaySettingMode mode) noexcept;
 		std::optional<std::string> key_button_name(KeyButton button) noexcept;
+		std::optional<std::string> local_time(TimeFormat format) noexcept;
+		std::optional<PowerStatus> power_status() noexcept;
 	} //detail
 
 
@@ -150,6 +170,16 @@ namespace ion::system::utilities
 	bool Execute(const std::filesystem::path &path,
 		std::optional<std::string> parameters, std::optional<std::filesystem::path> current_path,
 		ProcessWindowCommand window_command = ProcessWindowCommand::Normal) noexcept;
+
+	///@}
+
+	/**
+		@name Display resolutions
+		@{
+	*/
+
+	///@brief Returns the display resolutions supported by the connected displays
+	[[nodiscard]] DisplaySettings DisplayResolutions(DisplaySettingMode mode = DisplaySettingMode::HighestFrequency) noexcept;
 
 	///@}
 
