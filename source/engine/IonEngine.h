@@ -37,8 +37,8 @@ namespace ion
 	{
 		enum class VSyncMode
 		{
-			On,
 			Off,
+			On,
 			Adaptive,
 			AdaptiveHalfRate
 		};

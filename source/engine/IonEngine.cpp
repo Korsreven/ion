@@ -193,12 +193,12 @@ void Engine::VerticalSync(VSyncMode mode) noexcept
 {
 	switch (mode)
 	{
-		case VSyncMode::On:
-		detail::set_swap_interval(1);
-		break;
-
 		case VSyncMode::Off:
 		detail::set_swap_interval(0);
+		break;
+
+		case VSyncMode::On:
+		detail::set_swap_interval(1);
 		break;
 
 		case VSyncMode::Adaptive:
@@ -229,11 +229,11 @@ std::optional<engine::VSyncMode> Engine::VerticalSync() const noexcept
 	{
 		switch (*interval)
 		{
-			case 1:
-			return VSyncMode::On;
-
 			case 0:
 			return VSyncMode::Off;
+
+			case 1:
+			return VSyncMode::On;
 
 			case -1:
 			return VSyncMode::Adaptive;
