@@ -286,7 +286,9 @@ ClassDefinition get_gui_slider_class()
 		.AddProperty("flipped", ParameterType::Boolean)
 		.AddProperty("percent", ParameterType::FloatingPoint)
 		.AddProperty("range", {ParameterType::Integer, ParameterType::Integer})
-		.AddProperty("step-by-amount", ParameterType::Integer)
+		.AddProperty("large-step", ParameterType::Integer)
+		.AddProperty("small-step", ParameterType::Integer)
+		.AddProperty("step", ParameterType::Integer)
 		.AddProperty("type", {"horizontal"s, "vertical"s})
 		.AddProperty("value", ParameterType::Integer);
 }
@@ -948,8 +950,12 @@ void set_slider_properties(const script_tree::ObjectNode &object, controls::GuiS
 		else if (property.Name() == "range")
 			slider.Range(property[0].Get<ScriptType::Integer>()->As<int>(),
 						 property[1].Get<ScriptType::Integer>()->As<int>());
-		else if (property.Name() == "step-by-amount")
-			slider.StepByAmount(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "large-step")
+			slider.LargeStep(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "small-step")
+			slider.SmallStep(property[0].Get<ScriptType::Integer>()->As<int>());
+		else if (property.Name() == "step")
+			slider.Step(property[0].Get<ScriptType::Integer>()->As<int>());
 		else if (property.Name() == "type")
 		{
 			if (property[0].Get<ScriptType::Enumerable>()->Get() == "horizontal")

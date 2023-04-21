@@ -117,7 +117,8 @@ namespace ion::gui::controls
 			gui_slider::SliderType type_ = gui_slider::SliderType::Horizontal;
 			bool flipped_ = false;
 			types::Progress<int> progress_;
-			int step_by_amount_ = 1;
+			int small_step_ = 1;
+			int large_step_ = 1;
 
 			bool dragged_ = false;
 
@@ -210,7 +211,10 @@ namespace ion::gui::controls
 			///@brief Sets the value of this slider to the given value
 			inline void Value(int value) noexcept
 			{
-				if (progress_.Value() != value)
+				if (auto [min, max] = progress_.MinMax();
+					progress_.Value() != value &&
+					(value >= min || progress_.Value() > min) &&
+					(value <= max || progress_.Value() < max))
 				{
 					auto val = progress_.Value();
 					progress_.Value(value);
@@ -235,12 +239,31 @@ namespace ion::gui::controls
 
 					UpdateHandle();
 				}
+			}	
+
+			///@brief Sets the step amount for this slider to the given amount
+			inline void Step(int amount) noexcept
+			{
+				small_step_ = amount > 0 ? amount : 1;
+				large_step_ = small_step_;
 			}
 
-			///@brief Sets the step by amount for this slider to the given amount
-			inline void StepByAmount(int amount) noexcept
+			///@brief Sets the small step amount for this slider to the given amount
+			inline void SmallStep(int amount) noexcept
 			{
-				step_by_amount_ = amount > 0 ? amount : 1;
+				small_step_ = amount > 0 ? amount : 1;
+				
+				if (small_step_ > large_step_)
+					large_step_ = small_step_;
+			}
+
+			///@brief Sets the large step amount for this slider to the given amount
+			inline void LargeStep(int amount) noexcept
+			{
+				large_step_ = amount > 0 ? amount : 1;
+
+				if (large_step_ < small_step_)
+					small_step_ = large_step_;
 			}
 
 			///@}
@@ -285,10 +308,16 @@ namespace ion::gui::controls
 				return progress_.MinMax();
 			}
 
-			///@brief Returns the step by amount for this slider
-			[[nodiscard]] inline auto StepByAmount() const noexcept
+			///@brief Returns the small step amount for this slider
+			[[nodiscard]] inline auto SmallStep() const noexcept
 			{
-				return step_by_amount_;
+				return small_step_;
+			}
+
+			///@brief Returns the large step amount for this slider
+			[[nodiscard]] inline auto LargeStep() const noexcept
+			{
+				return large_step_;
 			}
 
 			///@}

@@ -2318,7 +2318,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		auto slider = base_panel->CreateSlider("slider", Vector2{1.0_r, 0.077_r}, "My slider", "My slider tooltip");
 		slider->Position({0.0_r, 0.6_r});
 		slider->Range(0, 20);
-		slider->StepByAmount(5);
+		slider->LargeStep(5);
 
 		auto image = base_panel->CreateImage("image", Vector2{0.7_r, 0.35_r}, {});
 		image->Mode(ion::gui::controls::gui_image::ImageMode::Fit);
@@ -2381,7 +2381,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		scroll_bar->Position({1.1_r, 0.25_r});
 		scroll_bar->Tooltip("My scroll bar tooltip");
 		scroll_bar->Range(0, 50);
-		scroll_bar->StepByAmount(3);
+		scroll_bar->LargeStep(3);
 		scroll_bar->AttachedScrollable(list_box);
 
 		auto text_box = base_panel->CreateTextBox("text_box", Vector2{0.5_r, 0.11_r}, "My text box");		

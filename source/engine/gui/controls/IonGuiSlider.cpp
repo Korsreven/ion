@@ -310,7 +310,7 @@ bool GuiSlider::KeyReleased(KeyButton button) noexcept
 			case KeyButton::RightArrow:
 			{
 				if (Value() < max)
-					Value(Value() + step_by_amount_);
+					Value(Value() + large_step_);
 
 				return true;
 			}
@@ -320,7 +320,7 @@ bool GuiSlider::KeyReleased(KeyButton button) noexcept
 			case KeyButton::LeftArrow:
 			{
 				if (Value() > min)
-					Value(Value() - step_by_amount_);
+					Value(Value() - large_step_);
 
 				return true;
 			}
@@ -367,7 +367,7 @@ bool GuiSlider::MouseReleased(MouseButton button, Vector2 position) noexcept
 				auto delta_value =
 					(type_ == SliderType::Horizontal && position.X() < handle_position.X()) ||
 					(type_ == SliderType::Vertical && position.Y() < handle_position.Y()) ?
-					-step_by_amount_ : step_by_amount_;
+					-large_step_ : large_step_;
 
 				if (flipped_)
 					Value(Value() - delta_value);
@@ -402,9 +402,28 @@ bool GuiSlider::MouseMoved(Vector2 position) noexcept
 					(position.X() + size->X() * 0.5_r) / size->X();
 
 				if (flipped_)
-					Percent(1.0_r - percent);
-				else
-					Percent(percent);
+					percent = 1.0_r - percent;
+
+				using namespace utilities;
+				auto point = math::Lerp(
+					static_cast<real>(progress_.Min()),
+					static_cast<real>(progress_.Max()),
+					percent);
+
+				auto value = progress_.Value();
+				auto new_value = static_cast<int>(math::Round(point));
+				
+				if (auto step = std::abs(new_value - value); step >= small_step_)
+					Value(new_value);
+				else if (step > 0) //Clamp to small step
+				{
+					auto lower = point < static_cast<real>(value);
+					auto delta_value = lower ? -small_step_ : small_step_;
+
+					if (auto midpoint = value + delta_value * 0.5_r;
+						lower ? point < midpoint : point >= midpoint)
+						Value(value + delta_value);
+				}
 			}
 		}
 	}

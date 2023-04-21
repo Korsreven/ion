@@ -211,7 +211,10 @@ namespace ion::gui::controls
 			///@brief Sets the value of this progress bar to the given value
 			inline void Value(real value) noexcept
 			{
-				if (progress_.Value() != value)
+				if (auto [min, max] = progress_.MinMax();
+					progress_.Value() != value &&
+					(value >= min || progress_.Value() > min) &&
+					(value <= max || progress_.Value() < max))
 				{
 					auto val = progress_.Value();
 					auto percent = progress_.Percent();

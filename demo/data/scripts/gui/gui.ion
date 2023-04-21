@@ -51,7 +51,7 @@ gui
 				caption: "My slider";
 				tooltip: "My slider tooltip";
 				range: 0 20;
-				step-by-amount: 5;
+				large-step: 5;
 			}
 
 			image
@@ -165,7 +165,7 @@ gui
 				caption: "My scroll bar";
 				tooltip: "My scroll bar tooltip";
 				range: 0 50;
-				step-by-amount: 3;
+				large-step: 3;
 
 				attach: "list_box";
 			}
