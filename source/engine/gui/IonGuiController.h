@@ -133,7 +133,8 @@ namespace ion::gui
 			gui_controller::detail::tooltip_pointers tooltips_;
 
 			NonOwningPtr<graphics::render::Viewport> default_viewport_;
-			NonOwningPtr<sounds::SoundChannelGroup> default_sound_channel_group_;	
+			NonOwningPtr<sounds::SoundChannelGroup> default_sound_channel_group_;
+			bool sounds_enabled_ = true;
 			bool shift_pressed_ = false;
 
 
@@ -336,6 +337,12 @@ namespace ion::gui
 				default_sound_channel_group_ = default_sound_channel_group;
 			}
 
+			///@brief Sets whether or not sounds are enabled for this controller
+			inline void SoundsEnabled(bool enabled) noexcept
+			{
+				sounds_enabled_ = enabled;
+			}
+
 			///@}
 
 			/**
@@ -389,6 +396,12 @@ namespace ion::gui
 			[[nodiscard]] inline auto DefaultSoundChannelGroup() const noexcept
 			{
 				return default_sound_channel_group_;
+			}
+
+			///@brief Returns true if sounds are enabled for this controller
+			[[nodiscard]] inline auto SoundsEnabled() const noexcept
+			{
+				return sounds_enabled_;
 			}
 
 			///@}

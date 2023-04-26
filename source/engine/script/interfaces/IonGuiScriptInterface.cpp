@@ -114,7 +114,8 @@ ClassDefinition get_gui_class()
 		.AddProperty("name", ParameterType::String) //Not required
 		.AddProperty("active-mouse-cursor", ParameterType::String)
 		.AddProperty("active-theme", ParameterType::String)
-		.AddProperty("active-tooltip", ParameterType::String);
+		.AddProperty("active-tooltip", ParameterType::String)
+		.AddProperty("sounds-enabled", ParameterType::Boolean);
 }
 
 ClassDefinition get_gui_component_class()
@@ -365,6 +366,8 @@ void set_gui_properties(const script_tree::ObjectNode &object, GuiController &gu
 			gui_controller.ActiveTheme(property[0].Get<ScriptType::String>()->Get());
 		else if (property.Name() == "active-tooltip")
 			gui_controller.ActiveTooltip(property[0].Get<ScriptType::String>()->Get());
+		else if (property.Name() == "sounds-enabled")
+			gui_controller.SoundsEnabled(property[0].Get<ScriptType::Boolean>()->Get());
 	}
 }
 
