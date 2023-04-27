@@ -77,6 +77,7 @@ PIXELFORMATDESCRIPTOR make_pixel_format_descriptor(int color_depth) noexcept
 DEVMODE make_device_mode(const Vector2 &full_screen_size, int color_depth) noexcept
 {
 	auto dev_mode = DEVMODE{};
+	dev_mode.dmSize = sizeof(dev_mode);
 	dev_mode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 	dev_mode.dmBitsPerPel = color_depth;
 
