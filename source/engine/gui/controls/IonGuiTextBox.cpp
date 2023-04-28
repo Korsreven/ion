@@ -319,7 +319,7 @@ void GuiTextBox::Focused() noexcept
 		UpdateText();
 
 	if (auto skin = static_cast<TextBoxSkin*>(skin_.get()); skin && skin->Cursor)
-		skin->Cursor->Visible(true);
+		skin->Cursor->Visible(!read_only_);
 
 	GuiControl::Focused(); //Use base functionality
 }
@@ -448,7 +448,7 @@ void GuiTextBox::SetSkinState(gui_control::ControlState state, TextBoxSkin &skin
 	if (skin.Cursor)
 	{
 		SetPartState(state, skin.Cursor);
-		skin.Cursor->Visible(focused_);
+		skin.Cursor->Visible(focused_ && !read_only_);
 	}
 }
 
@@ -570,8 +570,8 @@ void GuiTextBox::UpdateText() noexcept
 					content_view_ = {};
 					text->Clear();
 
-					if (skin->PlaceholderText &&
-						!focused_ && placeholder_content_)
+					if (skin->PlaceholderText && placeholder_content_ &&
+						(!focused_ || read_only_))
 					{
 						//Placeholder text
 						if (auto &placeholder_text = skin->PlaceholderText->Get(); placeholder_text)
@@ -599,6 +599,9 @@ void GuiTextBox::UpdateText() noexcept
 
 void GuiTextBox::UpdateCursor() noexcept
 {
+	if (read_only_)
+		return;
+
 	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
 		skin && skin->Cursor && skin->Text)
 	{
@@ -1084,30 +1087,50 @@ bool GuiTextBox::KeyPressed(KeyButton button) noexcept
 		//Move cursor left	
 		case KeyButton::LeftArrow:
 		case KeyButton::DownArrow:
-		CursorPosition(cursor_position_ - 1);
-		repeat_char_ = {};
-		repeat_key_ = button;
-		return true;
+		{
+			if (read_only_)
+				break;
+
+			CursorPosition(cursor_position_ - 1);
+			repeat_char_ = {};
+			repeat_key_ = button;
+			return true;
+		}
 
 		//Move cursor right
 		case KeyButton::RightArrow:
 		case KeyButton::UpArrow:
-		CursorPosition(cursor_position_ + 1);
-		repeat_char_ = {};
-		repeat_key_ = button;
-		return true;
+		{
+			if (read_only_)
+				break;
+
+			CursorPosition(cursor_position_ + 1);
+			repeat_char_ = {};
+			repeat_key_ = button;
+			return true;
+		}
 
 		case KeyButton::Backspace:
-		RemoveContent(cursor_position_ - 1);
-		repeat_char_ = {};
-		repeat_key_ = button;
-		return true;
+		{
+			if (read_only_)
+				break;
+
+			RemoveContent(cursor_position_ - 1);
+			repeat_char_ = {};
+			repeat_key_ = button;
+			return true;
+		}
 
 		case KeyButton::Delete:
-		RemoveContent(cursor_position_);
-		repeat_char_ = {};
-		repeat_key_ = button;
-		return true;
+		{
+			if (read_only_)
+				break;
+
+			RemoveContent(cursor_position_);
+			repeat_char_ = {};
+			repeat_key_ = button;
+			return true;
+		}
 
 
 		case KeyButton::Ctrl:
@@ -1128,6 +1151,9 @@ bool GuiTextBox::KeyPressed(KeyButton button) noexcept
 
 		case KeyButton::X:
 		{
+			if (read_only_)
+				break;
+
 			if (ctrl_pressed_)
 				CutContent();
 
@@ -1136,6 +1162,9 @@ bool GuiTextBox::KeyPressed(KeyButton button) noexcept
 
 		case KeyButton::V:
 		{
+			if (read_only_)
+				break;
+
 			if (ctrl_pressed_)
 				PasteContent(cursor_position_);
 
@@ -1159,12 +1188,22 @@ bool GuiTextBox::KeyReleased(KeyButton button) noexcept
 	switch (button)
 	{
 		case KeyButton::Home:
-		CursorPosition(0);
-		return true;
+		{
+			if (read_only_)
+				break;
+
+			CursorPosition(0);
+			return true;
+		}
 
 		case KeyButton::End:
-		CursorPosition(std::ssize(content_));
-		return true;
+		{
+			if (read_only_)
+				break;
+
+			CursorPosition(std::ssize(content_));
+			return true;
+		}
 
 		case KeyButton::LeftArrow:
 		case KeyButton::DownArrow:
@@ -1172,7 +1211,12 @@ bool GuiTextBox::KeyReleased(KeyButton button) noexcept
 		case KeyButton::UpArrow:
 		case KeyButton::Backspace:
 		case KeyButton::Delete:
-		return true;
+		{
+			if (read_only_)
+				break;
+
+			return true;
+		}
 
 		case KeyButton::Ctrl:
 		ctrl_pressed_ = false;
@@ -1184,7 +1228,7 @@ bool GuiTextBox::KeyReleased(KeyButton button) noexcept
 
 bool GuiTextBox::CharacterPressed(char character) noexcept
 {
-	if (character != '\b' && character != '\x7f')
+	if (!read_only_ && character != '\b' && character != '\x7f')
 	{
 		if (!repeat_char_ || *repeat_char_ != character)
 		{
@@ -1208,7 +1252,7 @@ bool GuiTextBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 {
 	using namespace utilities;
 
-	if (button == MouseButton::Left)
+	if (!read_only_ && button == MouseButton::Left)
 	{
 		if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
 			skin && skin->Cursor && skin->Text)

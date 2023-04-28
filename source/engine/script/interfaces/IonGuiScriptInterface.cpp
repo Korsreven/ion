@@ -307,6 +307,7 @@ ClassDefinition get_gui_text_box_class()
 		.AddProperty("mask", ParameterType::String)
 		.AddProperty("max-characters", ParameterType::Integer)
 		.AddProperty("placeholder-content", ParameterType::String)
+		.AddProperty("read-only", ParameterType::Boolean)
 		.AddProperty("reveal-count", ParameterType::Integer)
 		.AddProperty("text-layout", {"left"s, "center"s, "right"s})
 		.AddProperty("text-mode", {"printable"s, "alpha-numeric"s, "alpha"s, "numeric"s})
@@ -1006,6 +1007,8 @@ void set_text_box_properties(const script_tree::ObjectNode &object, controls::Gu
 			text_box.MaxCharacters(property[0].Get<ScriptType::Integer>()->As<int>());
 		else if (property.Name() == "placeholder-content")
 			text_box.PlaceholderContent(property[0].Get<ScriptType::String>()->Get());
+		else if (property.Name() == "read-only")
+			text_box.ReadOnly(property[0].Get<ScriptType::Boolean>()->Get());
 		else if (property.Name() == "reveal-count")
 			text_box.RevealCount(property[0].Get<ScriptType::Integer>()->As<int>());
 		else if (property.Name() == "text-layout")

@@ -177,6 +177,7 @@ namespace ion::gui::controls
 			std::optional<std::string> placeholder_content_;
 			std::optional<int> max_characters_;
 			std::optional<char> mask_;
+			bool read_only_ = false;
 
 			std::optional<Vector2> text_padding_;
 			gui_text_box::TextBoxTextLayout text_layout_ = gui_text_box::TextBoxTextLayout::Left;
@@ -370,6 +371,23 @@ namespace ion::gui::controls
 				}
 			}
 
+			///@brief Sets whether or not this text box is read only
+			inline void ReadOnly(bool read_only) noexcept
+			{
+				if (read_only_ != read_only)
+				{
+					if (read_only)
+						CursorPosition(0);
+
+					read_only_ = read_only;
+
+					if (focused_)
+						SetState(state_);
+
+					UpdateText();
+				}
+			}
+
 
 			///@brief Sets the text padding for this text box to the given padding
 			inline void TextPadding(const std::optional<Vector2> &padding) noexcept
@@ -439,6 +457,9 @@ namespace ion::gui::controls
 			///@brief Sets the cursor position for this text box to the given position
 			inline void CursorPosition(int position) noexcept
 			{
+				if (read_only_)
+					return;
+
 				position = std::clamp(position, 0, std::ssize(content_));
 
 				if (cursor_position_ != position)
@@ -537,6 +558,12 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto Mask() const noexcept
 			{
 				return mask_;
+			}
+
+			///@brief Returns true if this text box is read only
+			[[nodiscard]] inline auto ReadOnly() const noexcept
+			{
+				return read_only_;
 			}
 
 
