@@ -443,7 +443,7 @@ namespace ion::system
 			{
 				#ifdef ION_WIN32
 				if (handle_ && full_screen_)
-				{		
+				{
 					full_screen_.reset({});
 					DisplayModeChanged();
 				}

@@ -31,7 +31,7 @@ namespace ion::graphics::render
 	{
 		enum class WindowDisplayMode : bool
 		{
-			FullScreen,
+			Fullscreen,
 			Windowed
 		};
 
@@ -337,7 +337,7 @@ namespace ion::graphics::render
 
 					switch (display_mode)
 					{
-						case render_window::WindowDisplayMode::FullScreen:
+						case render_window::WindowDisplayMode::Fullscreen:
 						EnterFullScreen(full_screen_size_);
 						break;
 

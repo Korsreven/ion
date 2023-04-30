@@ -868,9 +868,8 @@ bool Window::DoCreate(std::string_view title, const Vector2 &size,
 
 void Window::DoDestroy() noexcept
 {
-	ExitFullScreen();
-
 	#ifdef ION_WIN32
+	full_screen_.reset({});
 	gl_context_.reset({});
 	dev_context_.reset({});
 	handle_.reset({});
@@ -1032,10 +1031,7 @@ bool Window::Hide() noexcept
 {
 	#ifdef ION_WIN32
 	if (handle_)
-	{
-		ExitFullScreen();
 		return detail::hide_window(*handle_);
-	}
 	#endif
 	return false;
 }

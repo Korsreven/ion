@@ -117,14 +117,16 @@ void RenderWindow::DisplayModeChanged() noexcept
 	switch (display_mode_)
 	{
 		case WindowDisplayMode::Windowed:
-		display_mode_ = pending_display_mode_ = WindowDisplayMode::FullScreen;
+		display_mode_ = pending_display_mode_ = WindowDisplayMode::Fullscreen;
 		break;
 
-		case WindowDisplayMode::FullScreen:
+		case WindowDisplayMode::Fullscreen:
 		default:
 		display_mode_ = pending_display_mode_ = WindowDisplayMode::Windowed;
 		break;
 	}
+
+	NotifyWindowActionReceived(events::listeners::WindowAction::DisplayModeChange);
 }
 
 
@@ -254,7 +256,7 @@ bool RenderWindow::Show() noexcept
 {
 	auto visible = system::Window::Show();
 
-	if (visible && pending_display_mode_ == WindowDisplayMode::FullScreen)
+	if (visible && pending_display_mode_ == WindowDisplayMode::Fullscreen)
 		EnterFullScreen(full_screen_size_);
 
 	return visible;
