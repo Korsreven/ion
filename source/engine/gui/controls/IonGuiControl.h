@@ -662,6 +662,15 @@ namespace ion::gui::controls
 				return GuiComponent::Enabled(enabled);
 			}
 
+			///@brief Sets whether or not this control is visible
+			inline void Visible(bool visible) noexcept
+			{
+				if (visible)
+					Show();
+				else
+					Hide();
+			}
+
 			///@brief Sets whether or not this control is focused
 			inline void Focused(bool focused) noexcept
 			{
