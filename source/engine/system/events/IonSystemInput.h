@@ -144,7 +144,7 @@ namespace ion::system::events
 			key_pair_type{0x57,						KeyButton::W},
 			key_pair_type{0x58,						KeyButton::X},
 			key_pair_type{0x59,						KeyButton::Y},
-			key_pair_type{0x60,						KeyButton::Z},
+			key_pair_type{0x5A,						KeyButton::Z},
 			key_pair_type{VK_LWIN,					KeyButton::LeftWin},
 			key_pair_type{VK_RWIN,					KeyButton::RightWin},
 			key_pair_type{VK_APPS,					KeyButton::Apps},
