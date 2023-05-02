@@ -45,6 +45,11 @@ namespace gui_skin::detail
 
 void set_sprite_properties(const SkinPart &part, graphics::scene::shapes::Sprite &sprite) noexcept
 {
+	if (part.IncludeBoundingVolumes)
+		sprite.IncludeBoundingVolumes(*part.IncludeBoundingVolumes);
+	if (part.AutoRepeat)
+		sprite.AutoRepeat(*part.AutoRepeat);
+
 	sprite.Size(sprite.Size() * part.Scaling);
 	sprite.FillColor(part.FillColor);
 
@@ -358,7 +363,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 
 			//Position
 			auto [x, y, z] = control_skin.Caption->Position().XYZ();
-			control_skin.Caption->Position({x, y, z + Engine::ZEpsilon()});
+			control_skin.Caption->Position({x, y, z + Engine::ZEpsilon() * 3.0_r});
 		}
 	}
 
@@ -523,7 +528,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &
 		//Selection part
 		if (selection_part && *selection_part)
 		{
-			auto sprite = list_box_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(selection_part->Enabled);
+			auto sprite = list_box_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(selection_part->Enabled);		
 			sprite->IncludeBoundingVolumes(false);
 			sprite->AutoRepeat(true);
 			set_sprite_properties(*selection_part, *sprite);
@@ -589,7 +594,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSk
 		//Bar part
 		if (bar_part && *bar_part)
 		{
-			auto sprite = progress_bar_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(bar_part->Enabled);
+			auto sprite = progress_bar_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(bar_part->Enabled);	
 			sprite->IncludeBoundingVolumes(false);
 			sprite->AutoRepeat(true);
 			set_sprite_properties(*bar_part, *sprite);
@@ -609,7 +614,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSk
 		//Bar interpolated part
 		if (bar_interpolated_part && *bar_interpolated_part)
 		{
-			auto sprite = progress_bar_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(bar_interpolated_part->Enabled);
+			auto sprite = progress_bar_skin->Parts->CreateMesh<graphics::scene::shapes::Sprite>(bar_interpolated_part->Enabled);	
 			sprite->IncludeBoundingVolumes(false);
 			sprite->AutoRepeat(true);
 			set_sprite_properties(*bar_interpolated_part, *sprite);

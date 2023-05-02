@@ -76,6 +76,9 @@ namespace ion::gui::skins
 			NonOwningPtr<graphics::materials::Material> Focused;
 			NonOwningPtr<graphics::materials::Material> Pressed;
 			NonOwningPtr<graphics::materials::Material> Hovered;
+			
+			std::optional<bool> IncludeBoundingVolumes;
+			std::optional<bool> AutoRepeat;
 
 			graphics::utilities::Vector2 Scaling = graphics::utilities::vector2::UnitScale;
 			graphics::utilities::Color FillColor = graphics::utilities::color::White;

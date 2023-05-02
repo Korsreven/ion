@@ -1139,13 +1139,18 @@ void GuiControl::Skin(const skins::GuiSkin &skin) noexcept
 	//Re-skin
 	if (new_skin)
 	{
+		auto from_size = detail::get_size(*new_skin, true);
+
 		//Resize new skin
-		if (auto from_size = detail::get_size(*new_skin, true); from_size && size_)
+		if (from_size && size_)
 			detail::resize_skin(*new_skin, *from_size, *size_);
 		else
 			size_ = from_size;
 
 		skin_ = AttuneSkin(std::move(new_skin));
+
+		if (size_)
+			Resized(from_size.value_or(*size_), *size_);
 	}
 
 	AttachSkin();

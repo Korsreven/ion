@@ -118,6 +118,7 @@ ClassDefinition get_gui_skin_class()
 
 	auto part = ClassDefinition::Create("part")
 		.AddRequiredProperty("name", ParameterType::String)	
+		.AddProperty("auto-repeat", ParameterType::Boolean)
 		.AddProperty("disabled", ParameterType::String)
 		.AddProperty("enabled", ParameterType::String)
 		.AddProperty("fill-color", ParameterType::Color)
@@ -125,6 +126,7 @@ ClassDefinition get_gui_skin_class()
 		.AddProperty("flip-vertical", ParameterType::Boolean)
 		.AddProperty("focused", ParameterType::String)
 		.AddProperty("hovered", ParameterType::String)
+		.AddProperty("include-bounding-volumes", ParameterType::Boolean)
 		.AddProperty("pressed", ParameterType::String)
 		.AddProperty("scaling", ParameterType::Vector2);
 
@@ -324,7 +326,9 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 
 				for (auto &property : obj.Properties())
 				{
-					if (property.Name() == "disabled")
+					if (property.Name() == "auto-repeat")
+						part.AutoRepeat = property[0].Get<ScriptType::Boolean>()->Get();
+					else if (property.Name() == "disabled")
 						part.Disabled = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
 					else if (property.Name() == "enabled")
 						part.Enabled = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
@@ -338,6 +342,8 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 						part.Focused = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
 					else if (property.Name() == "hovered")
 						part.Hovered = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
+					else if (property.Name() == "include-bounding-volumes")
+						part.IncludeBoundingVolumes = property[0].Get<ScriptType::Boolean>()->Get();
 					else if (property.Name() == "pressed")
 						part.Pressed = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
 					else if (property.Name() == "scaling")

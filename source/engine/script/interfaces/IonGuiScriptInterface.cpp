@@ -687,14 +687,17 @@ void set_control_properties(const script_tree::ObjectNode &object, controls::Gui
 		}
 		else if (property.Name() == "size")
 			control.Size(property[0].Get<ScriptType::Vector2>()->Get());
-		else if (property.Name() == "skin")
+
+		//Already set in GuiControl constructor
+		/*else if (property.Name() == "skin")
 		{
 			if (auto owner = control.Owner(); owner)
 			{
 				if (auto skin = get_skin(*owner, property[0].Get<ScriptType::String>()->Get()); skin)
 					control.Skin(*skin);
 			}
-		}
+		}*/
+
 		else if (property.Name() == "tab-order")
 			control.TabOrder(property[0].Get<ScriptType::Integer>()->As<int>());
 		else if (property.Name() == "tooltip")
