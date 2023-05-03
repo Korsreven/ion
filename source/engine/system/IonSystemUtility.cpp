@@ -262,7 +262,7 @@ bool open_or_execute(const std::filesystem::path &path,
 }
 
 
-DisplaySettings display_settings(DisplaySettingMode mode) noexcept
+DisplaySettings display_settings(DisplaySettingOutputs outputs, DisplaySettingFrequencies frequencies) noexcept
 {
 	DisplaySettings settings;
 
@@ -288,10 +288,16 @@ DisplaySettings display_settings(DisplaySettingMode mode) noexcept
 				if (!EnumDisplaySettings(device.DeviceName, j, &devmode))
 					break;
 
-				settings.emplace_back(
-					static_cast<int>(devmode.dmPelsWidth),
-					static_cast<int>(devmode.dmPelsHeight),
-					static_cast<int>(devmode.dmDisplayFrequency));
+				if (outputs == DisplaySettingOutputs::All ||
+					((devmode.dmFields & DM_DISPLAYFIXEDOUTPUT) &&
+						outputs == DisplaySettingOutputs::CenterAndStretch ||
+						(outputs == DisplaySettingOutputs::Center && devmode.dmDisplayFixedOutput == DMDFO_CENTER) ||
+						(outputs == DisplaySettingOutputs::Stretch && devmode.dmDisplayFixedOutput == DMDFO_STRETCH)))
+
+					settings.emplace_back(
+						static_cast<int>(devmode.dmPelsWidth),
+						static_cast<int>(devmode.dmPelsHeight),
+						static_cast<int>(devmode.dmDisplayFrequency));
 			}
 		}
 	}
@@ -314,8 +320,8 @@ DisplaySettings display_settings(DisplaySettingMode mode) noexcept
 				return x.Width == y.Width && x.Height == y.Height && x.Frequency == y.Frequency;
 			}), std::end(settings));
 
-	//Filter on mode
-	if (mode != DisplaySettingMode::AllFrequencies)
+	//Filter on frequencies
+	if (frequencies != DisplaySettingFrequencies::All)
 	{
 		DisplaySettings custom_settings;
 
@@ -326,13 +332,13 @@ DisplaySettings display_settings(DisplaySettingMode mode) noexcept
 				custom_settings.back().Width == setting.Width &&
 				custom_settings.back().Height == setting.Height)
 			{
-				switch (mode)
+				switch (frequencies)
 				{
-					case DisplaySettingMode::LowestFrequency:
+					case DisplaySettingFrequencies::Lowest:
 					custom_settings.back().Frequency = std::min(custom_settings.back().Frequency, setting.Frequency);
 					break;
 
-					case DisplaySettingMode::HighestFrequency:
+					case DisplaySettingFrequencies::Highest:
 					custom_settings.back().Frequency = std::max(custom_settings.back().Frequency, setting.Frequency);
 					break;
 				}
@@ -530,9 +536,9 @@ bool Execute(const std::filesystem::path &path,
 	Display resolutions
 */
 
-DisplaySettings DisplayResolutions(DisplaySettingMode mode) noexcept
+DisplaySettings DisplayResolutions(DisplaySettingOutputs outputs, DisplaySettingFrequencies frequencies) noexcept
 {
-	return detail::display_settings(mode);
+	return detail::display_settings(outputs, frequencies);
 }
 
 
