@@ -262,13 +262,18 @@ bool open_or_execute(const std::filesystem::path &path,
 }
 
 
-DisplaySettings display_settings(DisplaySettingOutputs outputs, DisplaySettingFrequencies frequencies) noexcept
+DisplaySettings display_settings(DisplayDeviceState devices, DisplaySettingModes modes,
+	DisplaySettingFrequencies frequencies) noexcept
 {
 	DisplaySettings settings;
 
 	#ifdef ION_WIN32
 	DISPLAY_DEVICE device = {};
 	device.cb = sizeof(DISPLAY_DEVICE);
+
+	auto state = devices == DisplayDeviceState::Primary ?
+		DISPLAY_DEVICE_PRIMARY_DEVICE :
+		DISPLAY_DEVICE_ATTACHED_TO_DESKTOP;
 
 	for (auto i = 0;; ++i)
 	{
@@ -277,34 +282,39 @@ DisplaySettings display_settings(DisplaySettingOutputs outputs, DisplaySettingFr
 			break;
 
 		//Skip display devices not attached to desktop
-		if (device.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)
+		if (device.StateFlags & state)
 		{
 			DEVMODE devmode = {};
 			devmode.dmSize = sizeof(DEVMODE);
 
-			for (auto j = 0;; ++j)
+			if (modes == DisplaySettingModes::Current)
 			{
-				//Enumerate display settings for each display device
-				if (!EnumDisplaySettings(device.DeviceName, j, &devmode))
-					break;
-
-				if (outputs == DisplaySettingOutputs::All ||
-					((devmode.dmFields & DM_DISPLAYFIXEDOUTPUT) &&
-						outputs == DisplaySettingOutputs::CenterAndStretch ||
-						(outputs == DisplaySettingOutputs::Center && devmode.dmDisplayFixedOutput == DMDFO_CENTER) ||
-						(outputs == DisplaySettingOutputs::Stretch && devmode.dmDisplayFixedOutput == DMDFO_STRETCH)))
+				if (EnumDisplaySettings(device.DeviceName, ENUM_CURRENT_SETTINGS, &devmode))
+					settings.emplace_back(
+						static_cast<int>(devmode.dmPelsWidth),
+						static_cast<int>(devmode.dmPelsHeight),
+						static_cast<int>(devmode.dmDisplayFrequency));
+			}
+			else //All
+			{
+				for (auto j = 0;; ++j)
+				{
+					//Enumerate display settings for each display device
+					if (!EnumDisplaySettings(device.DeviceName, j, &devmode))
+						break;
 
 					settings.emplace_back(
 						static_cast<int>(devmode.dmPelsWidth),
 						static_cast<int>(devmode.dmPelsHeight),
 						static_cast<int>(devmode.dmDisplayFrequency));
+				}
 			}
 		}
 	}
 	#else
 
 	#endif
-
+	
 	//Sort ASC
 	std::sort(std::begin(settings), std::end(settings),
 		[](const auto &x, const auto &y) noexcept
@@ -536,9 +546,14 @@ bool Execute(const std::filesystem::path &path,
 	Display resolutions
 */
 
-DisplaySettings DisplayResolutions(DisplaySettingOutputs outputs, DisplaySettingFrequencies frequencies) noexcept
+DisplaySettings AllDisplayResolutions(DisplayDeviceState devices, DisplaySettingFrequencies frequencies) noexcept
 {
-	return detail::display_settings(outputs, frequencies);
+	return detail::display_settings(devices, DisplaySettingModes::All, frequencies);
+}
+
+DisplaySettings CurrentDisplayResolutions(DisplayDeviceState devices) noexcept
+{
+	return detail::display_settings(devices, DisplaySettingModes::Current, DisplaySettingFrequencies::Highest);
 }
 
 

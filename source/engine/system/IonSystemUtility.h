@@ -32,12 +32,16 @@ using ion::events::listeners::KeyButton;
 ///System specific code should have its own define directive
 namespace ion::system::utilities
 {
-	enum class DisplaySettingOutputs
+	enum class DisplayDeviceState : bool
+	{
+		Active,
+		Primary
+	};
+
+	enum class DisplaySettingModes : bool
 	{
 		All,
-		Center,
-		Stretch,
-		CenterAndStretch
+		Current
 	};
 
 	enum class DisplaySettingFrequencies
@@ -127,7 +131,8 @@ namespace ion::system::utilities
 			ProcessWindowCommand window_command) noexcept;
 		
 		
-		DisplaySettings display_settings(DisplaySettingOutputs outputs, DisplaySettingFrequencies frequencies) noexcept;
+		DisplaySettings display_settings(DisplayDeviceState devices, DisplaySettingModes modes,
+			DisplaySettingFrequencies frequencies) noexcept;
 		std::optional<std::string> key_button_name(KeyButton button) noexcept;
 		std::optional<std::string> local_time(TimeFormat format) noexcept;
 		std::optional<PowerStatus> power_status() noexcept;
@@ -186,9 +191,12 @@ namespace ion::system::utilities
 		@{
 	*/
 
-	///@brief Returns the display resolutions supported by the connected displays
-	[[nodiscard]] DisplaySettings DisplayResolutions(DisplaySettingOutputs outputs = DisplaySettingOutputs::All,
+	///@brief Returns all of the display resolutions supported by the connected displays
+	[[nodiscard]] DisplaySettings AllDisplayResolutions(DisplayDeviceState devices = DisplayDeviceState::Active,
 		DisplaySettingFrequencies frequencies = DisplaySettingFrequencies::Highest) noexcept;
+
+	///@brief Returns the current display resolutions of the connected displays
+	[[nodiscard]] DisplaySettings CurrentDisplayResolutions(DisplayDeviceState devices = DisplayDeviceState::Primary) noexcept;
 
 	///@}
 
