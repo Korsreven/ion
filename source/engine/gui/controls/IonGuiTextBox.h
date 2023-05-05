@@ -534,14 +534,14 @@ namespace ion::gui::controls
 			*/
 
 			///@brief Returns the content for this text box
-			[[nodiscard]] inline auto Content() const noexcept
+			[[nodiscard]] inline auto& Content() const noexcept
 			{
 				return content_;
 			}
 
 			///@brief Returns the placeholder content for this text box
 			///@details Returns nullopt if no custom placeholder content has been set
-			[[nodiscard]] inline auto PlaceholderContent() const noexcept
+			[[nodiscard]] inline auto& PlaceholderContent() const noexcept
 			{
 				return placeholder_content_;
 			}
