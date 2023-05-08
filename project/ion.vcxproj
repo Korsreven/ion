@@ -543,6 +543,7 @@
     <ClInclude Include="..\source\engine\types\IonStrongType.h" />
     <ClInclude Include="..\source\engine\types\IonSuppressCopy.h" />
     <ClInclude Include="..\source\engine\types\IonSuppressMove.h" />
+    <ClInclude Include="..\source\engine\types\IonTrace.h" />
     <ClInclude Include="..\source\engine\types\IonTypeCasts.h" />
     <ClInclude Include="..\source\engine\types\IonTypes.h" />
     <ClInclude Include="..\source\engine\types\IonTypeTraits.h" />

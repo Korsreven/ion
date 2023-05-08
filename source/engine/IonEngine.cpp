@@ -248,7 +248,7 @@ std::optional<engine::VSyncMode> Engine::VerticalSync() const noexcept
 
 
 /*
-	Engine
+	Initializing / Rendering
 */
 
 bool Engine::Initialize() noexcept
@@ -280,6 +280,11 @@ int Engine::Start() noexcept
 	if (Running())
 		return 1;
 
+	//An instance is already active
+	if (active_instance_)
+		return 1;
+
+	active_instance_ = this;
 
 	//Show window
 	if (render_window_)
@@ -312,6 +317,9 @@ int Engine::Start() noexcept
 	//Hide window
 	if (render_window_)
 		render_window_->Hide();
+
+	if (active_instance_ == this)
+		active_instance_ = nullptr;
 
 	return 0;
 }

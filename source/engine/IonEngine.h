@@ -26,6 +26,7 @@ File:	IonEngine.h
 #include "memory/IonNonOwningPtr.h"
 #include "timers/IonStopwatch.h"
 #include "timers/IonTimerManager.h"
+#include "types/IonTrace.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
 
@@ -63,7 +64,8 @@ namespace ion
 	///@brief The class that creates the render window with a default viewport and starts the rendering loop
 	class Engine final :
 		protected events::Listenable<events::listeners::FrameListener>,	
-		public managed::ObjectManager<graphics::scene::graph::SceneGraph, Engine>
+		public managed::ObjectManager<graphics::scene::graph::SceneGraph, Engine>,
+		public types::Trace<Engine>
 	{
 		private:
 
@@ -84,6 +86,7 @@ namespace ion
 			static inline auto units_per_meter_ = 1.0_r;
 			static inline auto z_epsilon_ = 0.001_r;
 
+			static inline Engine *active_instance_ = nullptr;
 			static inline graphics::scene::graph::SceneGraph *active_scene_graph_ = nullptr;
 
 
@@ -306,7 +309,7 @@ namespace ion
 			///@}
 
 			/**
-				@name Engine
+				@name Initializing / Rendering
 				@{
 			*/
 
@@ -372,6 +375,13 @@ namespace ion
 			///@details Returns nullptr if scene graph could not be found
 			[[nodiscard]] NonOwningPtr<const graphics::scene::graph::SceneGraph> GetSceneGraph(std::string_view name) const noexcept;
 
+
+			///@brief Gets a pointer to the currently active instance
+			///@details Returns nullptr if there is no currently active instance
+			[[nodiscard]] static inline auto GetActiveInstance() noexcept
+			{
+				return active_instance_;
+			}
 
 			///@brief Gets a pointer to the currently active scene graph
 			///@details Returns nullptr if there is no currently active scene graph

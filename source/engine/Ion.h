@@ -232,6 +232,7 @@ File:	Ion.h
 #include "types/IonStrongType.h"
 #include "types/IonSuppressCopy.h"
 #include "types/IonSuppressMove.h"
+#include "types/IonTrace.h"
 #include "types/IonTypes.h"
 #include "types/IonTypeCasts.h"
 #include "types/IonTypeTraits.h"

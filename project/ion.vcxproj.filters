@@ -1424,6 +1424,9 @@
     <ClInclude Include="..\source\engine\gui\controls\IonGuiImage.h">
       <Filter>Header Files\gui\controls</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\engine\types\IonTrace.h">
+      <Filter>Header Files\types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\engine\graphics\shaders\glsl\IonSimpleTextShader.frag">
