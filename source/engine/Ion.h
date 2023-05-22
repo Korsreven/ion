@@ -228,6 +228,7 @@ File:	Ion.h
 
 #include "types/IonCumulative.h"
 #include "types/IonProgress.h"
+#include "types/IonMultiton.h"
 #include "types/IonSingleton.h"
 #include "types/IonStrongType.h"
 #include "types/IonSuppressCopy.h"
