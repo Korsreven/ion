@@ -54,7 +54,7 @@ namespace ion::types
 
 			///@brief Returns a mutable range of all instances of T
 			///@details This can be used directly with a range-based for loop
-			[[nodiscard]] inline static auto Instances() noexcept
+			[[nodiscard]] static inline auto Instances() noexcept
 			{
 				return instances_.Elements();
 			}
