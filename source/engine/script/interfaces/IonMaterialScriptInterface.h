@@ -46,7 +46,7 @@ namespace ion::script::interfaces
 		*/
 
 		void set_material_properties(const script_tree::ObjectNode &object, graphics::materials::Material &material,
-			const ManagerRegister &managersr);
+			const ManagerRegister &managers);
 
 
 		NonOwningPtr<graphics::materials::Material> create_material(const script_tree::ObjectNode &object,

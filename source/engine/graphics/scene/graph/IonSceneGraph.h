@@ -389,7 +389,7 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Scene mangers - Creating
+				@name Scene managers - Creating
 				@{
 			*/
 
@@ -399,7 +399,7 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Scene mangers - Retrieving
+				@name Scene managers - Retrieving
 				@{
 			*/
 
@@ -414,12 +414,12 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Scene mangers - Removing
+				@name Scene managers - Removing
 				@{
 			*/
 
 			///@brief Clears all removable scene managers from this manager
-			void ClearSceneMangers() noexcept;
+			void ClearSceneManagers() noexcept;
 
 			///@brief Removes a removable scene manager from this manager
 			bool RemoveSceneManager(SceneManager &scene_manager) noexcept;
