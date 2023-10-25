@@ -291,7 +291,7 @@ adaptors::FlatSet<std::string_view> get_required_classes(const inner_classes_map
 }
 
 
-bool validate_property(const script_tree::PropertyNode &property, const property_declarations &overload_set)
+bool validate_property(const script_tree::PropertyNode &property, const property_declarations &overload_set, bool required)
 {
 	auto match = false;
 	auto visible_depth = !std::empty(overload_set) ?
@@ -299,7 +299,7 @@ bool validate_property(const script_tree::PropertyNode &property, const property
 
 	for (auto &candidate : overload_set)
 	{
-		if (candidate.Depth > visible_depth)
+		if (required && candidate.Depth > visible_depth)
 			break; //Hide names deeper than visible depth
 
 		//Candidate has no definition
@@ -470,7 +470,7 @@ bool validate_properties(const ScriptTree &tree, const script_tree::ObjectNode &
 		if (auto iter = properties.find(property.Name());
 			iter != std::end(properties))
 		{
-			if (!validate_property(property, iter->second))
+			if (!validate_property(property, iter->second, required_properties.contains(property.Name())))
 			{
 				error = {ValidateErrorCode::InvalidPropertyArguments, *tree.GetFullyQualifiedName(object, property)};
 				errors.push_back(error);

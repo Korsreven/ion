@@ -266,7 +266,7 @@ namespace ion::script
 			adaptors::FlatSet<std::string_view> get_required_properties(const properties_map &properties);
 			adaptors::FlatSet<std::string_view> get_required_classes(const inner_classes_map &inner_classes);
 
-			bool validate_property(const script_tree::PropertyNode &property, const property_declarations &overload_set);
+			bool validate_property(const script_tree::PropertyNode &property, const property_declarations &overload_set, bool required);
 			bool validate_properties(const ScriptTree &tree, const script_tree::ObjectNode &object, const ClassDefinition &class_def,
 				class_declarations_cacher &declarations_cacher, std::vector<ValidateError> &errors);
 			const ClassDefinition* validate_class(const ScriptTree &tree, const script_tree::ObjectNode &object, const ClassDefinition &class_owner,
