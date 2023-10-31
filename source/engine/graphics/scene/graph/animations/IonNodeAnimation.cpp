@@ -14,6 +14,7 @@ File:	IonNodeAnimation.cpp
 
 #include <algorithm>
 #include <cassert>
+#include <functional>
 #include <utility>
 
 #include "IonNodeAnimationManager.h"
@@ -119,10 +120,10 @@ void elapse_action(NodeAnimation &animation, user_action &a, duration time, dura
 			//Execute the opposite action if in reverse
 		{
 			if (a.on_execute_opposite)
-				(*a.on_execute_opposite)(animation, a.user_data);
+				(*a.on_execute_opposite)(std::ref(animation), std::ref(a.user_data));
 		}
 		else
-			a.on_execute(animation, a.user_data);
+			a.on_execute(std::ref(animation), std::ref(a.user_data));
 	}
 }
 
@@ -234,7 +235,25 @@ void elapse_motion(NodeAnimation &animation, user_motion &m, duration time, dura
 	if (auto amount = move_amount(m.amount, percent);
 		amount != 0.0_r)
 
-		m.on_elapse(animation, amount);
+		m.on_elapse(std::ref(animation), amount, std::ref(m.user_data));
+}
+
+void elapse_motion(NodeAnimation &animation, user_multi_motion &m, duration time, duration current_time, duration start_time) noexcept
+{
+	auto percent = elapse_motion(m, time, current_time, start_time);
+
+	std::vector<real> amounts;
+	amounts.reserve(std::size(m.amounts));
+
+	auto non_zero = false;
+	for (auto &amount : m.amounts)
+	{
+		amounts.push_back(move_amount(amount, percent));
+		non_zero |= amounts.back() != 0.0_r;
+	}
+
+	if (non_zero)
+		m.on_elapse(std::ref(animation), std::move(amounts), std::ref(m.user_data));
 }
 
 } //node_animation::detail
@@ -356,7 +375,7 @@ NonOwningPtr<NodeAnimationTimeline> NodeAnimation::Start(real playback_rate, boo
 	Actions
 */
 
-void NodeAnimation::AddAction(node_animation::NodeActionType type, duration time)
+void NodeAnimation::AddAction(NodeActionType type, duration time)
 {
 	assert(time >= 0.0_sec);
 
@@ -426,8 +445,8 @@ void NodeAnimation::ClearActions() noexcept
 */
 
 void NodeAnimation::AddMotion(real target_amount, duration total_duration,
-	events::Callback<void, NodeAnimation&, real> on_elapse, duration start_time,
-	node_animation::MotionTechnique technique)
+	events::Callback<void, NodeAnimation&, real, std::any&> on_elapse, duration start_time,
+	MotionTechnique technique, std::any user_data)
 {
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
@@ -435,6 +454,40 @@ void NodeAnimation::AddMotion(real target_amount, duration total_duration,
 	auto m = detail::user_motion{
 		{start_time, total_duration},
 		{0.0_r, target_amount, technique.type, technique.method},
+		std::move(user_data),
+		on_elapse};
+
+	//Insert sorted
+	motions_.insert(
+		std::upper_bound(std::begin(motions_), std::end(motions_), m,
+			detail::motion_types_comparator{}),
+		m);
+
+	total_duration_ = std::max(total_duration_, start_time + total_duration);
+}
+
+void NodeAnimation::AddMotion(std::vector<real> target_amounts, duration total_duration,
+	events::Callback<void, NodeAnimation&, std::vector<real>, std::any&> on_elapse, duration start_time,
+	MotionTechniques techniques, std::any user_data)
+{
+	assert(!std::empty(target_amounts));
+	assert(total_duration > 0.0_sec);
+	assert(start_time >= 0.0_sec);
+
+	if (auto count = std::ssize(target_amounts) - std::ssize(techniques); count > 0)
+		techniques.insert(std::end(techniques), count, MotionTechniqueType::Linear);
+
+	detail::moving_amounts amounts;
+	for (auto i = 0; auto &target_amount : target_amounts)
+	{
+		auto &technique = techniques[i++];
+		amounts.emplace_back(0.0_r, target_amount, technique.type, technique.method);
+	}
+
+	auto m = detail::user_multi_motion{
+		{start_time, total_duration},	
+		std::move(amounts),
+		std::move(user_data),
 		on_elapse};
 
 	//Insert sorted

@@ -76,6 +76,8 @@ namespace ion::graphics::scene::graph::animations
 			MotionTechnique(events::Callback<real, real, real> method) noexcept :
 				method{method} {}
 		};
+
+		using MotionTechniques = std::vector<MotionTechnique>;
 		
 
 		namespace detail
@@ -88,6 +90,8 @@ namespace ion::graphics::scene::graph::animations
 				MotionTechniqueType technique = MotionTechniqueType::Linear;
 				std::optional<events::Callback<real, real, real>> user_technique;
 			};
+
+			using moving_amounts = std::vector<moving_amount>;
 
 
 			/**
@@ -242,7 +246,8 @@ namespace ion::graphics::scene::graph::animations
 			struct user_motion : motion
 			{
 				moving_amount amount;
-				events::Callback<void, NodeAnimation&, real> on_elapse;
+				std::any user_data;
+				events::Callback<void, NodeAnimation&, real, std::any&> on_elapse;
 
 				inline void Reset() noexcept
 				{
@@ -250,8 +255,21 @@ namespace ion::graphics::scene::graph::animations
 				}
 			};
 
+			struct user_multi_motion : motion
+			{
+				moving_amounts amounts;
+				std::any user_data;
+				events::Callback<void, NodeAnimation&, std::vector<real>, std::any&> on_elapse;
 
-			using motion_types = std::variant<rotating_motion, scaling_motion, translating_motion, user_motion>;
+				inline void Reset() noexcept
+				{
+					for (auto &amount : amounts)
+						amount.current = 0.0_r;
+				}
+			};
+
+
+			using motion_types = std::variant<rotating_motion, scaling_motion, translating_motion, user_motion, user_multi_motion>;
 			using motion_container = std::vector<motion_types>;
 
 			struct motion_types_comparator
@@ -289,6 +307,7 @@ namespace ion::graphics::scene::graph::animations
 			void elapse_motion(NodeAnimation &animation, scaling_motion &m, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_motion(NodeAnimation &animation, translating_motion &m, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_motion(NodeAnimation &animation, user_motion &m, duration time, duration current_time, duration start_time) noexcept;
+			void elapse_motion(NodeAnimation &animation, user_multi_motion &m, duration time, duration current_time, duration start_time) noexcept;
 
 			///@}
 		} //detail
@@ -455,8 +474,13 @@ namespace ion::graphics::scene::graph::animations
 
 			///@brief Adds a user defined motion to this node animation with the given target amount, total duration and callback
 			void AddMotion(real target_amount, duration total_duration,
-				events::Callback<void, NodeAnimation&, real> on_elapse, duration start_time = 0.0_sec,
-				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
+				events::Callback<void, NodeAnimation&, real, std::any&> on_elapse, duration start_time = 0.0_sec,
+				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear, std::any user_data = {});
+
+			///@brief Adds a user defined motion to this node animation with the given target amounts, total duration and callback
+			void AddMotion(std::vector<real> target_amounts, duration total_duration,
+				events::Callback<void, NodeAnimation&, std::vector<real>, std::any&> on_elapse, duration start_time = 0.0_sec,
+				node_animation::MotionTechniques techniques = {}, std::any user_data = {});
 
 
 			///@brief Adds a rotation motion to this node animation with the given angle (in radians) and total duration
