@@ -327,7 +327,8 @@ namespace ion::graphics::fonts
 			}
 
 			///@brief Sets the default background color behind the displayed text to the given color
-			inline void DefaultBackgroundColor(const Color &color) noexcept
+			///@details If nullopt is passed, no default background color will be used
+			inline void DefaultBackgroundColor(const std::optional<Color> &color) noexcept
 			{
 				default_background_color_ = color;
 			}
@@ -447,6 +448,7 @@ namespace ion::graphics::fonts
 			}
 
 			///@brief Returns the default background color behind the displayed text
+			///@details Returns nullopt if no default background color has been specified
 			[[nodiscard]] inline auto& DefaultBackgroundColor() const noexcept
 			{
 				return default_background_color_;
