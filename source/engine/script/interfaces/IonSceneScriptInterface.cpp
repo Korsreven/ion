@@ -565,6 +565,7 @@ ClassDefinition get_light_class()
 		.AddProperty("cutoff", {ParameterType::FloatingPoint, ParameterType::FloatingPoint})
 		.AddProperty("diffuse-color", ParameterType::Color)
 		.AddProperty("direction", ParameterType::Vector3)
+		.AddProperty("intensity", ParameterType::FloatingPoint)
 		.AddProperty("position", ParameterType::Vector3)
 		.AddProperty("radius", ParameterType::FloatingPoint)
 		.AddProperty("specular-color", ParameterType::Color)
@@ -1220,6 +1221,8 @@ void set_light_properties(const script_tree::ObjectNode &object, Light &light)
 			light.DiffuseColor(property[0].Get<ScriptType::Color>()->Get());
 		else if (property.Name() == "direction")
 			light.Direction(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "intensity")
+			light.Intensity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "position")
 			light.Position(property[0].Get<ScriptType::Vector3>()->Get());
 		else if (property.Name() == "radius")

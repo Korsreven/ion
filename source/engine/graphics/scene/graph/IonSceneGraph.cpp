@@ -140,13 +140,22 @@ void set_light_uniforms(const light_pointers &lights, OwningPtr<light::detail::l
 
 
 			if (ambient)
-				(*ambient)[i].Get<glsl::vec4>() = light->AmbientColor();
+			{
+				auto [r, g, b, a] = light->AmbientColor().RGBA();
+				(*ambient)[i].Get<glsl::vec4>() = Color{r, g, b, a * light->Intensity()};
+			}
 
 			if (diffuse)
-				(*diffuse)[i].Get<glsl::vec4>() = light->DiffuseColor();
+			{
+				auto [r, g, b, a] = light->DiffuseColor().RGBA();
+				(*diffuse)[i].Get<glsl::vec4>() = Color{r, g, b, a * light->Intensity()};
+			}
 
 			if (specular)
-				(*specular)[i].Get<glsl::vec4>() = light->SpecularColor();
+			{
+				auto [r, g, b, a] = light->SpecularColor().RGBA();
+				(*specular)[i].Get<glsl::vec4>() = Color{r, g, b, a * light->Intensity()};
+			}
 
 
 			auto [constant_attenuation, linear_attenuation, quadratic_attenuation] = light->Attenuation();

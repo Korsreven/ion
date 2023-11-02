@@ -134,6 +134,7 @@ namespace ion::graphics::scene
 			Color ambient_color_ = color::White;
 			Color diffuse_color_ = color::White;
 			Color specular_color_ = color::DarkGray;
+			real intensity_ = 1.0_r;
 
 			real attenuation_constant_ = 1.0_r;
 			real attenuation_linear_ = 0.0_r;
@@ -290,6 +291,12 @@ namespace ion::graphics::scene
 				specular_color_ = specular;
 			}
 
+			///@brief Sets the intensity of the light given off by this light source to the given value
+			inline void Intensity(real intensity) noexcept
+			{
+				intensity_ = intensity;
+			}
+
 
 			///@brief Sets the attenuation to the given values
 			///@details These values only applies for lights of type point and spot light
@@ -373,6 +380,12 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto& SpecularColor() const noexcept
 			{
 				return specular_color_;
+			}
+
+			///@brief Returns the intensity of the light given off by this light source
+			[[nodiscard]] inline auto Intensity() const noexcept
+			{
+				return intensity_;
 			}
 
 
