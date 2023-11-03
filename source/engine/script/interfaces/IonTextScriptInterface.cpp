@@ -54,6 +54,7 @@ ClassDefinition get_text_class()
 		.AddProperty("area-size", ParameterType::Vector2)
 		.AddProperty("content", ParameterType::String)
 		.AddProperty("default-background-color", ParameterType::Color)
+		.AddProperty("default-base-opacity", ParameterType::FloatingPoint)
 		.AddProperty("default-decoration", {"underline"s, "line-through"s, "overline"s})
 		.AddProperty("default-decoration-color", ParameterType::Color)
 		.AddProperty("default-font-style", {"bold"s, "italic"s, "bold-italic"s})
@@ -96,6 +97,8 @@ void set_text_properties(const script_tree::ObjectNode &object, Text &text)
 			text.AreaSize(property[0].Get<ScriptType::Vector2>()->Get());
 		else if (property.Name() == "default-background-color")
 			text.DefaultBackgroundColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "default-base-opacity")
+			text.DefaultBaseOpacity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "default-decoration")
 		{
 			if (property[0].Get<ScriptType::Enumerable>()->Get() == "overline")
