@@ -16,7 +16,7 @@ Here is an updated list with most of the main features of ION engine.
 	* Adjustable playback speeds
 	* Frame-by-frame controllable
 * Node animations
-	* Animating translation, rotation and scaling
+	* Animating translation, rotation, scaling and fading
 	* Different motion techniques
 		* Cubic
 		* Exponential
