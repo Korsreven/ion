@@ -354,6 +354,18 @@ namespace ion::graphics::fonts
 				default_decoration_color_ = color;
 			}
 
+			///@brief Sets the default base opacity for the displayed text to the given opacity
+			inline void DefaultBaseOpacity(real opacity) noexcept
+			{
+				default_foreground_color_.A(opacity);
+
+				if (default_background_color_)
+					default_background_color_->A(opacity);
+
+				if (default_decoration_color_)
+					default_decoration_color_->A(opacity);
+			}
+
 
 			///@brief Attaches the given type face to the text (used for lettering)
 			void Lettering(NonOwningPtr<TypeFace> type_face) noexcept;
@@ -473,6 +485,12 @@ namespace ion::graphics::fonts
 			[[nodiscard]] inline auto DefaultDecorationColor() const noexcept
 			{
 				return default_decoration_color_;
+			}
+
+			///@brief Returns the default base opacity for the displayed text
+			[[nodiscard]] inline auto DefaultBaseOpacity() const noexcept
+			{
+				return default_foreground_color_.A();
 			}
 
 
