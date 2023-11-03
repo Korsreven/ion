@@ -270,8 +270,32 @@ ClassDefinition get_action_class()
 {
 	return ClassDefinition::Create("action")
 		.AddRequiredProperty("time", ParameterType::FloatingPoint)
-		.AddRequiredProperty("type", {"flip-visibility"s, "flip-visibility-cascading"s, "show"s, "show-cascading"s, "hide"s, "hide-cascading"s,
-							  "inherit-rotation"s, "inherit-scaling"s, "disinherit-rotation"s, "disinherit-scaling"s});
+		.AddRequiredProperty("type", {"show"s, "show-cascading"s, "hide"s, "hide-cascading"s, "flip-visibility"s, "flip-visibility-cascading"s,
+									  "inherit-rotation"s, "inherit-scaling"s, "disinherit-rotation"s, "disinherit-scaling"s});
+}
+
+ClassDefinition get_color_fading_class()
+{
+	return ClassDefinition::Create("color-fading")
+		.AddRequiredProperty("color", ParameterType::Color)
+		.AddRequiredProperty("total-duration", ParameterType::FloatingPoint)	
+		.AddRequiredProperty("type", {"light-ambient"s, "light-diffuse"s, "light-specular"s, "model-base-color"s,
+									  "text-foreground-color"s, "text-background-color"s, "text-decoration-color"s})
+		.AddProperty("motion-technique", {motion_technique_types, motion_technique_types, motion_technique_types, motion_technique_types}, 1)
+		.AddProperty("start-time", ParameterType::FloatingPoint);
+}
+
+ClassDefinition get_fading_class()
+{
+	return ClassDefinition::Create("fading")
+		.AddRequiredProperty("amount", ParameterType::FloatingPoint)
+		.AddRequiredProperty("total-duration", ParameterType::FloatingPoint)
+		.AddRequiredProperty("type", {"opacity"s, "light-intensity"s, "light-radius"s,
+									  "light-constant-attenuation"s, "light-linear-attenuation"s, "light-quadratic-attenuation"s,
+									  "light-cutoff-inner-angle"s, "light-cutoff-outer-angle"s, "model-base-opacity"s,
+									  "sound-pitch"s, "sound-volume"s, "text-base-opacity"s})
+		.AddProperty("motion-technique", motion_technique_types)
+		.AddProperty("start-time", ParameterType::FloatingPoint);
 }
 
 ClassDefinition get_frustum_class()
@@ -285,6 +309,22 @@ ClassDefinition get_frustum_class()
 		.AddProperty("field-of-view", ParameterType::FloatingPoint)
 		.AddProperty("near-clip-distance", ParameterType::FloatingPoint)
 		.AddProperty("projection", {"orthographic"s, "perspective"s});
+}
+
+ClassDefinition get_object_action_class()
+{
+	return ClassDefinition::Create("object-action")
+		.AddRequiredProperty("target-name", ParameterType::String)
+		.AddRequiredProperty("time", ParameterType::FloatingPoint)
+		.AddRequiredProperty("type", {"show"s, "hide"s, "flip-visibility"s});
+}
+
+ClassDefinition get_particle_system_action_class()
+{
+	return ClassDefinition::Create("particle-system-action")
+		.AddRequiredProperty("target-name", ParameterType::String)
+		.AddRequiredProperty("time", ParameterType::FloatingPoint)
+		.AddRequiredProperty("type", {"start"s, "stop"s, "pause"s});
 }
 
 ClassDefinition get_render_pass_class()
@@ -312,6 +352,22 @@ ClassDefinition get_scaling_class()
 		.AddRequiredProperty("unit", ParameterType::Vector2)
 		.AddProperty("motion-technique", {motion_technique_types, motion_technique_types}, 1)
 		.AddProperty("start-time", ParameterType::FloatingPoint);
+}
+
+ClassDefinition get_sound_action_class()
+{
+	return ClassDefinition::Create("sound-action")
+		.AddRequiredProperty("target-name", ParameterType::String)
+		.AddRequiredProperty("time", ParameterType::FloatingPoint)
+		.AddRequiredProperty("type", {"start"s, "stop"s, "pause"s, "mute"s, "unmute"s});
+}
+
+ClassDefinition get_timeline_action_class()
+{
+	return ClassDefinition::Create("timeline-action")
+		.AddRequiredProperty("target-name", ParameterType::String)
+		.AddRequiredProperty("time", ParameterType::FloatingPoint)
+		.AddRequiredProperty("type", {"start"s, "stop"s, "pause"s});
 }
 
 ClassDefinition get_translating_class()
@@ -456,8 +512,14 @@ ClassDefinition get_node_animation_class()
 {
 	return ClassDefinition::Create("animation")
 		.AddClass(get_action_class())
+		.AddClass(get_color_fading_class())
+		.AddClass(get_fading_class())
+		.AddClass(get_object_action_class())
+		.AddClass(get_particle_system_action_class())
 		.AddClass(get_rotating_class())
 		.AddClass(get_scaling_class())
+		.AddClass(get_sound_action_class())
+		.AddClass(get_timeline_action_class())
 		.AddClass(get_translating_class())
 
 		.AddProperty("name", ParameterType::String)
@@ -952,10 +1014,22 @@ void set_node_animation_properties(const script_tree::ObjectNode &object, graph:
 	{
 		if (obj.Name() == "action")
 			create_action(obj, animation);
+		else if (obj.Name() == "color-fading")
+			create_color_fading_motion(obj, animation);
+		else if (obj.Name() == "fading")
+			create_fading_motion(obj, animation);
+		else if (obj.Name() == "object-action")
+			create_object_action(obj, animation);
+		else if (obj.Name() == "particle-system-action")
+			create_particle_system_action(obj, animation);
 		else if (obj.Name() == "rotation")
 			create_rotating_motion(obj, animation);
 		else if (obj.Name() == "scaling")
 			create_scaling_motion(obj, animation);
+		else if (obj.Name() == "sound-action")
+			create_sound_action(obj, animation);
+		else if (obj.Name() == "timeline-action")
+			create_timeline_action(obj, animation);
 		else if (obj.Name() == "translation")
 			create_translating_motion(obj, animation);
 	}
@@ -1372,11 +1446,7 @@ void create_action(const script_tree::ObjectNode &object,
 	auto type =
 		[&]() noexcept
 		{
-			if (type_name == "flip-visibility")
-				return graph::animations::node_animation::NodeActionType::FlipVisibility;
-			else if (type_name == "flip-visibility-cascading")
-				return graph::animations::node_animation::NodeActionType::FlipVisibilityCascading;
-			else if (type_name == "show")
+			if (type_name == "show")
 				return graph::animations::node_animation::NodeActionType::Show;
 			else if (type_name == "show-cascading")
 				return graph::animations::node_animation::NodeActionType::ShowCascading;
@@ -1384,6 +1454,10 @@ void create_action(const script_tree::ObjectNode &object,
 				return graph::animations::node_animation::NodeActionType::Hide;
 			else if (type_name == "hide-cascading")
 				return graph::animations::node_animation::NodeActionType::HideCascading;
+			else if (type_name == "flip-visibility")
+				return graph::animations::node_animation::NodeActionType::FlipVisibility;
+			else if (type_name == "flip-visibility-cascading")
+				return graph::animations::node_animation::NodeActionType::FlipVisibilityCascading;
 
 			else if (type_name == "inherit-rotation")
 				return graph::animations::node_animation::NodeActionType::InheritRotation;
@@ -1396,6 +1470,192 @@ void create_action(const script_tree::ObjectNode &object,
 		}();
 
 	animation.AddAction(type, time);
+}
+
+void create_color_fading_motion(const script_tree::ObjectNode &object,
+	graph::animations::NodeAnimation &animation)
+{
+	auto type_name = object
+		.Property("type")[0]
+		.Get<ScriptType::Enumerable>()->Get();
+	auto target_name = object
+		.Property("target-name")[0]
+		.Get<ScriptType::String>()->Get();
+	auto color = object
+		.Property("color")[0]
+		.Get<ScriptType::Color>()->Get();
+	auto total_duration = duration{object
+		.Property("total-duration")[0]
+		.Get<ScriptType::FloatingPoint>()->As<real>()};
+	auto start_time = duration{object
+		.Property("start-time")[0]
+		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>()};
+	auto technique_name_r = object
+		.Property("motion-technique")[0];
+	auto technique_name_g = object
+		.Property("motion-technique")[1];
+	auto technique_name_b = object
+		.Property("motion-technique")[2];
+	auto technique_name_a = object
+		.Property("motion-technique")[3];
+
+	auto type =
+		[&]() noexcept
+		{
+			//Light
+			if (type_name == "light-ambient")
+				return graph::animations::node_animation::ColorFadingMotionType::LightAmbient;
+			else if (type_name == "light-diffuse")
+				return graph::animations::node_animation::ColorFadingMotionType::LightDiffuse;
+			else if (type_name == "light-specular")
+				return graph::animations::node_animation::ColorFadingMotionType::LightSpecular;
+
+			//Model
+			else if (type_name == "model-base-color")
+				return graph::animations::node_animation::ColorFadingMotionType::ModelBaseColor;
+
+			//Text
+			else if (type_name == "text-foreground-color")
+				return graph::animations::node_animation::ColorFadingMotionType::TextForegroundColor;
+			else if (type_name == "text-background-color")
+				return graph::animations::node_animation::ColorFadingMotionType::TextBackgroundColor;
+			else //if (type_name == "text-decoration-color")
+				return graph::animations::node_animation::ColorFadingMotionType::TextDecorationColor;
+		}();
+
+	auto technique_r = technique_name_r ?
+		get_motion_technique_type(technique_name_r) :
+		graph::animations::node_animation::MotionTechniqueType::Linear;
+	auto technique_g = technique_name_g ?
+		get_motion_technique_type(technique_name_g) :
+		technique_r;
+	auto technique_b = technique_name_b ?
+		get_motion_technique_type(technique_name_b) :
+		technique_r;
+	auto technique_a = technique_name_a ?
+		get_motion_technique_type(technique_name_a) :
+		technique_r;
+
+	animation.AddColorFading(type, std::move(target_name), color, total_duration, start_time, technique_r, technique_g, technique_b, technique_a);
+}
+
+void create_fading_motion(const script_tree::ObjectNode &object,
+	graph::animations::NodeAnimation &animation)
+{
+	auto type_name = object
+		.Property("type")[0]
+		.Get<ScriptType::Enumerable>()->Get();
+	auto target_name = object
+		.Property("target-name")[0]
+		.Get<ScriptType::String>()->Get();
+	auto amount = object
+		.Property("amount")[0]
+		.Get<ScriptType::FloatingPoint>()->As<real>();
+	auto total_duration = duration{object
+		.Property("total-duration")[0]
+		.Get<ScriptType::FloatingPoint>()->As<real>()};
+	auto start_time = duration{object
+		.Property("start-time")[0]
+		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>()};
+	auto technique_name = object
+		.Property("motion-technique")[0];
+
+	auto type =
+		[&]() noexcept
+		{
+			if (type_name == "opacity")
+				return graph::animations::node_animation::FadingMotionType::Opacity;
+
+			//Light
+			else if (type_name == "light-intensity")
+				return graph::animations::node_animation::FadingMotionType::LightIntensity;
+			else if (type_name == "light-radius")
+				return graph::animations::node_animation::FadingMotionType::LightRadius;
+			else if (type_name == "light-constant-attenuation")
+				return graph::animations::node_animation::FadingMotionType::LightConstantAttenuation;
+			else if (type_name == "light-linear-attenuation")
+				return graph::animations::node_animation::FadingMotionType::LightLinearAttenuation;
+			else if (type_name == "light-quadratic-attenuation")
+				return graph::animations::node_animation::FadingMotionType::LightQuadraticAttenuation;
+			else if (type_name == "light-cutoff-inner-angle")
+				return graph::animations::node_animation::FadingMotionType::LightCutoffInnerAngle;
+			else if (type_name == "light-cutoff-outer-angle")
+				return graph::animations::node_animation::FadingMotionType::LightCutoffOuterAngle;
+
+			//Model
+			else if (type_name == "model-base-opacity")
+				return graph::animations::node_animation::FadingMotionType::ModelBaseOpacity;
+
+			//Sound
+			else if (type_name == "sound-pitch")
+				return graph::animations::node_animation::FadingMotionType::SoundPitch;
+			else if (type_name == "sound-volume")
+				return graph::animations::node_animation::FadingMotionType::SoundVolume;
+
+			//Text
+			else //if (type_name == "text-base-opacity")
+				return graph::animations::node_animation::FadingMotionType::TextBaseOpacity;
+		}();
+
+	auto technique = technique_name ?
+		get_motion_technique_type(technique_name) :
+		graph::animations::node_animation::MotionTechniqueType::Linear;
+
+	animation.AddFading(type, std::move(target_name), amount, total_duration, start_time, technique);
+}
+
+void create_object_action(const script_tree::ObjectNode &object,
+	graph::animations::NodeAnimation &animation)
+{
+	auto type_name = object
+		.Property("type")[0]
+		.Get<ScriptType::Enumerable>()->Get();
+	auto target_name = object
+		.Property("target-name")[0]
+		.Get<ScriptType::String>()->Get();
+	auto time = duration{object
+		.Property("time")[0]
+		.Get<ScriptType::FloatingPoint>()->As<real>()};
+
+	auto type =
+		[&]() noexcept
+		{
+			if (type_name == "show")
+				return graph::animations::node_animation::ObjectActionType::Show;
+			else if (type_name == "hide")
+				return graph::animations::node_animation::ObjectActionType::Hide;
+			else //if (type_name == "flip-visibility")
+				return graph::animations::node_animation::ObjectActionType::FlipVisibility;
+		}();
+
+	animation.AddAction(type, std::move(target_name), time);
+}
+
+void create_particle_system_action(const script_tree::ObjectNode &object,
+	graph::animations::NodeAnimation &animation)
+{
+	auto type_name = object
+		.Property("type")[0]
+		.Get<ScriptType::Enumerable>()->Get();
+	auto target_name = object
+		.Property("target-name")[0]
+		.Get<ScriptType::String>()->Get();
+	auto time = duration{object
+		.Property("time")[0]
+		.Get<ScriptType::FloatingPoint>()->As<real>()};
+
+	auto type =
+		[&]() noexcept
+		{
+			if (type_name == "start")
+				return graph::animations::node_animation::ParticleSystemActionType::Start;
+			else if (type_name == "stop")
+				return graph::animations::node_animation::ParticleSystemActionType::Stop;
+			else //if (type_name == "pause")
+				return graph::animations::node_animation::ParticleSystemActionType::Pause;
+		}();
+
+	animation.AddAction(type, std::move(target_name), time);
 }
 
 void create_rotating_motion(const script_tree::ObjectNode &object,
@@ -1445,6 +1705,64 @@ void create_scaling_motion(const script_tree::ObjectNode &object,
 		technique_x;
 
 	animation.AddScaling(unit, total_duration, start_time, technique_x, technique_y);
+}
+
+void create_sound_action(const script_tree::ObjectNode &object,
+	graph::animations::NodeAnimation &animation)
+{
+	auto type_name = object
+		.Property("type")[0]
+		.Get<ScriptType::Enumerable>()->Get();
+	auto target_name = object
+		.Property("target-name")[0]
+		.Get<ScriptType::String>()->Get();
+	auto time = duration{object
+		.Property("time")[0]
+		.Get<ScriptType::FloatingPoint>()->As<real>()};
+
+	auto type =
+		[&]() noexcept
+		{
+			if (type_name == "start")
+				return graph::animations::node_animation::SoundActionType::Start;
+			else if (type_name == "stop")
+				return graph::animations::node_animation::SoundActionType::Stop;
+			else if (type_name == "pause")
+				return graph::animations::node_animation::SoundActionType::Pause;
+			else if (type_name == "mute")
+				return graph::animations::node_animation::SoundActionType::Mute;
+			else //if (type_name == "unmute")
+				return graph::animations::node_animation::SoundActionType::Unmute;
+		}();
+
+	animation.AddAction(type, std::move(target_name), time);
+}
+
+void create_timeline_action(const script_tree::ObjectNode &object,
+	graph::animations::NodeAnimation &animation)
+{
+	auto type_name = object
+		.Property("type")[0]
+		.Get<ScriptType::Enumerable>()->Get();
+	auto target_name = object
+		.Property("target-name")[0]
+		.Get<ScriptType::String>()->Get();
+	auto time = duration{object
+		.Property("time")[0]
+		.Get<ScriptType::FloatingPoint>()->As<real>()};
+
+	auto type =
+		[&]() noexcept
+		{
+			if (type_name == "start")
+				return graph::animations::node_animation::NodeTimelineActionType::Start;
+			else if (type_name == "stop")
+				return graph::animations::node_animation::NodeTimelineActionType::Stop;
+			else //if (type_name == "pause")
+				return graph::animations::node_animation::NodeTimelineActionType::Pause;
+		}();
+
+	animation.AddAction(type, std::move(target_name), time);
 }
 
 void create_translating_motion(const script_tree::ObjectNode &object,

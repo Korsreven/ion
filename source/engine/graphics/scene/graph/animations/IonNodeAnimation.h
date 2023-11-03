@@ -16,16 +16,30 @@ File:	IonNodeAnimation.h
 #include <any>
 #include <cmath>
 #include <optional>
+#include <string>
+#include <string_view>
+#include <type_traits>
 #include <variant>
 #include <vector>
 
 #include "events/IonCallback.h"
+#include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 #include "utilities/IonMath.h"
+
+namespace ion::graphics::scene
+{
+	class MovableObject; //Forward declaration
+
+	namespace graph
+	{
+		class SceneNode; //Forward declaration
+	}
+}
 
 namespace ion::graphics::scene::graph::animations
 {
@@ -41,12 +55,12 @@ namespace ion::graphics::scene::graph::animations
 		enum class NodeActionType
 		{
 			//Visibility
-			FlipVisibility,
-			FlipVisibilityCascading,
 			Show,
 			ShowCascading,
 			Hide,
-			HideCascading,	
+			HideCascading,
+			FlipVisibility,
+			FlipVisibilityCascading,
 
 			//Transformation
 			InheritRotation,
@@ -54,6 +68,78 @@ namespace ion::graphics::scene::graph::animations
 			DisinheritRotation,
 			DisinheritScaling
 		};
+
+		enum class NodeTimelineActionType
+		{
+			Start,
+			Stop,
+			Pause
+		};
+
+		enum class ObjectActionType
+		{
+			Show,
+			Hide,
+			FlipVisibility
+		};
+
+		enum class ParticleSystemActionType
+		{
+			Start,
+			Stop,
+			Pause
+		};
+
+		enum class SoundActionType
+		{
+			Start,
+			Stop,
+			Pause,
+			Mute,
+			Unmute
+		};
+
+
+		enum class FadingMotionType
+		{
+			Opacity,
+
+			//Light
+			LightIntensity,
+			LightRadius,
+			LightConstantAttenuation,
+			LightLinearAttenuation,
+			LightQuadraticAttenuation,
+			LightCutoffInnerAngle,
+			LightCutoffOuterAngle,
+
+			//Model
+			ModelBaseOpacity,
+
+			//Sound
+			SoundPitch,
+			SoundVolume,
+
+			//Text
+			TextBaseOpacity
+		};
+
+		enum class ColorFadingMotionType
+		{
+			//Light
+			LightAmbient,
+			LightDiffuse,
+			LightSpecular,
+
+			//Model
+			ModelBaseColor,
+
+			//Text
+			TextForegroundColor,
+			TextBackgroundColor,
+			TextDecorationColor
+		};
+
 
 		enum class MotionTechniqueType
 		{
@@ -166,7 +252,31 @@ namespace ion::graphics::scene::graph::animations
 
 			struct node_action : action
 			{
-				NodeActionType type = NodeActionType::FlipVisibilityCascading;
+				NodeActionType type = NodeActionType::Show;
+			};
+
+			struct node_timeline_action : action
+			{
+				NodeTimelineActionType type = NodeTimelineActionType::Start;
+				std::string target_name;
+			};
+
+			struct object_action : action
+			{	
+				ObjectActionType type = ObjectActionType::Show;
+				std::string target_name;
+			};
+
+			struct particle_system_action : action
+			{
+				ParticleSystemActionType type = ParticleSystemActionType::Start;
+				std::string target_name;
+			};
+
+			struct sound_action : action
+			{
+				SoundActionType type = SoundActionType::Start;
+				std::string target_name;
 			};
 
 			struct user_action : action
@@ -177,7 +287,8 @@ namespace ion::graphics::scene::graph::animations
 			};
 
 
-			using action_types = std::variant<node_action, user_action>;
+			using action_types = std::variant<node_action, node_timeline_action,
+				object_action, particle_system_action, sound_action, user_action>;
 			using action_container = std::vector<action_types>;
 
 			struct action_types_comparator
@@ -243,6 +354,38 @@ namespace ion::graphics::scene::graph::animations
 				}
 			};
 
+			struct fading_motion : motion
+			{
+				FadingMotionType type = FadingMotionType::Opacity;
+				std::string target_name;
+
+				moving_amount amount;
+
+				inline void Reset() noexcept
+				{
+					amount.current = {};
+				}
+			};
+
+			struct color_fading_motion : motion
+			{
+				ColorFadingMotionType type = ColorFadingMotionType::ModelBaseColor;
+				std::string target_name;
+
+				moving_amount r;
+				moving_amount g;
+				moving_amount b;
+				moving_amount a;
+
+				inline void Reset() noexcept
+				{
+					r.current = {};
+					g.current = {};
+					b.current = {};
+					a.current = {};
+				}
+			};
+
 			struct user_motion : motion
 			{
 				moving_amount amount;
@@ -269,7 +412,8 @@ namespace ion::graphics::scene::graph::animations
 			};
 
 
-			using motion_types = std::variant<rotating_motion, scaling_motion, translating_motion, user_motion, user_multi_motion>;
+			using motion_types = std::variant<rotating_motion, scaling_motion, translating_motion,
+				fading_motion, color_fading_motion, user_motion, user_multi_motion>;
 			using motion_container = std::vector<motion_types>;
 
 			struct motion_types_comparator
@@ -291,6 +435,10 @@ namespace ion::graphics::scene::graph::animations
 			bool execute_action(action &a, duration time, duration current_time, duration start_time) noexcept;
 
 			void elapse_action(NodeAnimation &animation, node_action &a, duration time, duration current_time, duration start_time) noexcept;
+			void elapse_action(NodeAnimation &animation, node_timeline_action &a, duration time, duration current_time, duration start_time) noexcept;
+			void elapse_action(NodeAnimation &animation, object_action &a, duration time, duration current_time, duration start_time) noexcept;
+			void elapse_action(NodeAnimation &animation, particle_system_action &a, duration time, duration current_time, duration start_time) noexcept;
+			void elapse_action(NodeAnimation &animation, sound_action &a, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_action(NodeAnimation &animation, user_action &a, duration time, duration current_time, duration start_time) noexcept;
 
 			///@}
@@ -306,8 +454,39 @@ namespace ion::graphics::scene::graph::animations
 			void elapse_motion(NodeAnimation &animation, rotating_motion &m, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_motion(NodeAnimation &animation, scaling_motion &m, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_motion(NodeAnimation &animation, translating_motion &m, duration time, duration current_time, duration start_time) noexcept;
+			void elapse_motion(NodeAnimation &animation, fading_motion &m, duration time, duration current_time, duration start_time) noexcept;
+			void elapse_motion(NodeAnimation &animation, color_fading_motion &m, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_motion(NodeAnimation &animation, user_motion &m, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_motion(NodeAnimation &animation, user_multi_motion &m, duration time, duration current_time, duration start_time) noexcept;
+
+			///@}
+
+			/**
+				@name Targets
+				@{
+			*/
+
+			std::vector<NodeAnimationTimeline*> get_timelines(std::string_view name, SceneNode &node);
+			std::vector<MovableObject*> get_movable_objects(std::string_view name, SceneNode &node);
+
+			template <typename T>
+			std::vector<T*> get_targets(std::string_view name, SceneNode &node)
+			{
+				static_assert(std::is_base_of_v<MovableObject, T>);
+
+				std::vector<T*> targets;
+
+				if (auto objects = get_movable_objects(name, node); !std::empty(objects))
+				{
+					for (auto &object : objects)
+					{
+						if (auto target = dynamic_cast<T*>(object); target)
+							targets.push_back(target);
+					}
+				}
+
+				return targets;
+			}
 
 			///@}
 		} //detail
@@ -450,6 +629,18 @@ namespace ion::graphics::scene::graph::animations
 			///@brief Adds an action to this node animation with the given type and execution time
 			void AddAction(node_animation::NodeActionType type, duration time);
 
+			///@brief Adds an action to this node animation with the given type, target name and execution time
+			void AddAction(node_animation::NodeTimelineActionType type, std::string target_name, duration time);
+
+			///@brief Adds an action to this node animation with the given type, target name and execution time
+			void AddAction(node_animation::ObjectActionType type, std::string target_name, duration time);
+
+			///@brief Adds an action to this node animation with the given type, target name and execution time
+			void AddAction(node_animation::ParticleSystemActionType type, std::string target_name, duration time);
+
+			///@brief Adds an action to this node animation with the given type, target name and execution time
+			void AddAction(node_animation::SoundActionType type, std::string target_name, duration time);
+
 
 			///@brief Adds a user defined action to this node animation with the given callback and execution time
 			void AddAction(events::Callback<void, NodeAnimation&, std::any&> on_execute,
@@ -507,6 +698,26 @@ namespace ion::graphics::scene::graph::animations
 				node_animation::MotionTechnique technique_x,
 				node_animation::MotionTechnique technique_y,
 				node_animation::MotionTechnique technique_z);
+
+
+			///@brief Adds a fading motion to this node animation with the given type, target name, amount and total duration
+			void AddFading(node_animation::FadingMotionType type, std::string target_name,
+				real amount, duration total_duration, duration start_time = 0.0_sec,
+				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
+
+
+			///@brief Adds a color fading motion to this node animation with the given type, target name, color and total duration
+			void AddColorFading(node_animation::ColorFadingMotionType type, std::string target_name,
+				const Color &color, duration total_duration, duration start_time = 0.0_sec,
+				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
+
+			///@brief Adds a color fading motion to this node animation with the given type, target name, color and total duration
+			void AddColorFading(node_animation::ColorFadingMotionType type, std::string target_name,
+				const Color &color, duration total_duration, duration start_time,
+				node_animation::MotionTechnique technique_r,
+				node_animation::MotionTechnique technique_g,
+				node_animation::MotionTechnique technique_b,
+				node_animation::MotionTechnique technique_a);
 
 
 			///@brief Clears all motions from this node animation

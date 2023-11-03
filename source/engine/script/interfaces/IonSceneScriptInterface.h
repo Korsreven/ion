@@ -134,10 +134,16 @@ namespace ion::script::interfaces
 		*/
 
 		script_validator::ClassDefinition get_action_class();
+		script_validator::ClassDefinition get_color_fading_class();
+		script_validator::ClassDefinition get_fading_class();
 		script_validator::ClassDefinition get_frustum_class();
+		script_validator::ClassDefinition get_object_action_class();
+		script_validator::ClassDefinition get_particle_system_action_class();
 		script_validator::ClassDefinition get_render_pass_class();
 		script_validator::ClassDefinition get_rotating_class();
 		script_validator::ClassDefinition get_scaling_class();
+		script_validator::ClassDefinition get_sound_action_class();
+		script_validator::ClassDefinition get_timeline_action_class();
 		script_validator::ClassDefinition get_translating_class();
 
 		script_validator::ClassDefinition get_animated_sprite_class();
@@ -232,9 +238,21 @@ namespace ion::script::interfaces
 
 		void create_action(const script_tree::ObjectNode &object,
 			graphics::scene::graph::animations::NodeAnimation &animation);
+		void create_color_fading_motion(const script_tree::ObjectNode &object,
+			graphics::scene::graph::animations::NodeAnimation &animation);
+		void create_fading_motion(const script_tree::ObjectNode &object,
+			graphics::scene::graph::animations::NodeAnimation &animation);
+		void create_object_action(const script_tree::ObjectNode &object,
+			graphics::scene::graph::animations::NodeAnimation &animation);
+		void create_particle_system_action(const script_tree::ObjectNode &object,
+			graphics::scene::graph::animations::NodeAnimation &animation);
 		void create_rotating_motion(const script_tree::ObjectNode &object,
 			graphics::scene::graph::animations::NodeAnimation &animation);
 		void create_scaling_motion(const script_tree::ObjectNode &object,
+			graphics::scene::graph::animations::NodeAnimation &animation);
+		void create_sound_action(const script_tree::ObjectNode &object,
+			graphics::scene::graph::animations::NodeAnimation &animation);
+		void create_timeline_action(const script_tree::ObjectNode &object,
 			graphics::scene::graph::animations::NodeAnimation &animation);
 		void create_translating_motion(const script_tree::ObjectNode &object,
 			graphics::scene::graph::animations::NodeAnimation &animation);
