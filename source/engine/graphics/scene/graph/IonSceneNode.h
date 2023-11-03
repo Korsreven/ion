@@ -72,6 +72,9 @@ namespace ion::graphics::scene::graph
 		using SceneNodes = std::vector<OwningPtr<SceneNode>>;
 		using AttachableObject = std::variant<MovableObject*, Camera*, Light*>;
 
+		using SceneNodePointers = std::vector<NonOwningPtr<SceneNode>>;
+		using SceneNodeConstPointers = std::vector<NonOwningPtr<const SceneNode>>;
+
 		namespace detail
 		{
 			using node_container = std::vector<SceneNode*>;
@@ -1023,6 +1026,13 @@ namespace ion::graphics::scene::graph
 			///@brief Gets a pointer to an immutable descendant node with the given name using the given search strategy
 			///@details Returns nullptr if a descendant node could not be found
 			[[nodiscard]] NonOwningPtr<const SceneNode> GetDescendantNode(std::string_view name, scene_node::SearchStrategy strategy = scene_node::SearchStrategy::BreadthFirst) const noexcept;
+
+
+			///@brief Returns mutable pointers to all child nodes
+			[[nodiscard]] scene_node::SceneNodePointers GetChildNodes() noexcept;
+
+			///@brief Returns immutable pointers to all child nodes
+			[[nodiscard]] scene_node::SceneNodeConstPointers GetChildNodes() const noexcept;
 
 			///@}
 

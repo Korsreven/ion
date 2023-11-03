@@ -849,6 +849,29 @@ NonOwningPtr<const SceneNode> SceneNode::GetDescendantNode(std::string_view name
 }
 
 
+SceneNodePointers SceneNode::GetChildNodes() noexcept
+{
+	SceneNodePointers pointers;
+	pointers.reserve(std::size(child_nodes_));
+
+	for (auto &node : child_nodes_)
+		pointers.push_back(node);
+
+	return pointers;
+}
+
+SceneNodeConstPointers SceneNode::GetChildNodes() const noexcept
+{
+	SceneNodeConstPointers pointers;
+	pointers.reserve(std::size(child_nodes_));
+
+	for (auto &node : child_nodes_)
+		pointers.push_back(node);
+
+	return pointers;
+}
+
+
 /*
 	Child nodes - Removing
 */
