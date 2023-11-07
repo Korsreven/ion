@@ -207,6 +207,51 @@ void elapse_action(NodeAnimation &animation, object_action &a, duration time, du
 	}
 }
 
+void elapse_action(NodeAnimation &animation, model_action &a, duration time, duration current_time, duration start_time) noexcept
+{
+	if (execute_action(a, time, current_time, start_time))
+	{
+		auto reverse = time < 0.0_sec;
+			//Execute the opposite action if in reverse
+
+		if (auto owner = animation.Owner(); owner)
+		{
+			auto &node = owner->ParentNode();
+
+			auto [outer_target_name, inner_target_name] = split_target_name(a.target_name);
+			auto targets = get_targets<Model>(outer_target_name, node);
+
+			for (auto &model : targets)
+			{
+				for (auto &mesh : model->Meshes())
+				{
+					if (std::empty(inner_target_name) || //All
+						mesh.Name() == inner_target_name) //Specific
+					{
+						switch (a.type)
+						{
+							case ModelActionType::Show:
+							mesh.Visible(reverse ? false : true);
+							break;
+
+							case ModelActionType::Hide:
+							mesh.Visible(reverse ? true : false);
+							break;
+
+							case ModelActionType::FlipVisibility:
+							mesh.Visible(!mesh.Visible());
+							break;
+						}
+
+						if (!std::empty(inner_target_name))
+							break;
+					}
+				}
+			}
+		}
+	}
+}
+
 void elapse_action(NodeAnimation &animation, particle_system_action &a, duration time, duration current_time, duration start_time) noexcept
 {
 	if (execute_action(a, time, current_time, start_time))
@@ -217,7 +262,9 @@ void elapse_action(NodeAnimation &animation, particle_system_action &a, duration
 		if (auto owner = animation.Owner(); owner)
 		{
 			auto &node = owner->ParentNode();
-			auto targets = get_targets<DrawableParticleSystem>(a.target_name, node);
+
+			auto [outer_target_name, inner_target_name] = split_target_name(a.target_name);
+			auto targets = get_targets<DrawableParticleSystem>(outer_target_name, node);
 
 			for (auto &target : targets)
 			{
@@ -227,30 +274,60 @@ void elapse_action(NodeAnimation &animation, particle_system_action &a, duration
 					{
 						case ParticleSystemActionType::Start:
 						{
-							if (reverse)
-								particle_system->ResetAll();
-							else
-								particle_system->StartAll();
+							if (std::empty(inner_target_name)) //All
+							{
+								if (reverse)
+									particle_system->ResetAll();
+								else
+									particle_system->StartAll();
+							}
+							else if (auto emitter = particle_system->GetEmitter(inner_target_name); emitter) //Specific
+							{
+								if (reverse)
+									emitter->Reset();
+								else
+									emitter->Start();
+							}
 
 							break;
 						}
 
 						case ParticleSystemActionType::Stop:
 						{
-							if (reverse)
-								particle_system->StartAll();
-							else
-								particle_system->ResetAll();
+							if (std::empty(inner_target_name)) //All
+							{
+								if (reverse)
+									particle_system->StartAll();
+								else
+									particle_system->ResetAll();
+							}
+							else if (auto emitter = particle_system->GetEmitter(inner_target_name); emitter) //Specific
+							{
+								if (reverse)
+									emitter->Start();
+								else
+									emitter->Reset();
+							}
 
 							break;
 						}
 
 						case ParticleSystemActionType::Pause:
 						{
-							if (reverse)
-								particle_system->StartAll();
-							else
-								particle_system->StopAll();
+							if (std::empty(inner_target_name)) //All
+							{
+								if (reverse)
+									particle_system->StartAll();
+								else
+									particle_system->StopAll();
+							}
+							else if (auto emitter = particle_system->GetEmitter(inner_target_name); emitter) //Specific
+							{
+								if (reverse)
+									emitter->Start();
+								else
+									emitter->Stop();
+							}
 
 							break;
 						}
@@ -553,16 +630,24 @@ void elapse_motion(NodeAnimation &animation, fading_motion &m, duration time, du
 				//Model
 				case FadingMotionType::ModelBaseOpacity:
 				{
-					auto targets = get_targets<Model>(m.target_name, node);
+					auto [outer_target_name, inner_target_name] = split_target_name(m.target_name);
+					auto targets = get_targets<Model>(outer_target_name, node);
 
 					for (auto &model : targets)
 					{
 						for (auto &mesh : model->Meshes())
 						{
-							if (auto shape = dynamic_cast<shapes::Shape*>(&mesh); shape)
-								shape->FillOpacity(shape->FillOpacity() + delta);
-							else
-								mesh.BaseOpacity(mesh.BaseOpacity() + delta);
+							if (std::empty(inner_target_name) || //All
+								mesh.Name() == inner_target_name) //Specific
+							{
+								if (auto shape = dynamic_cast<shapes::Shape*>(&mesh); shape)
+									shape->FillOpacity(shape->FillOpacity() + delta);
+								else
+									mesh.BaseOpacity(mesh.BaseOpacity() + delta);
+
+								if (!std::empty(inner_target_name))
+									break;
+							}
 						}
 					}
 
@@ -668,21 +753,29 @@ void elapse_motion(NodeAnimation &animation, color_fading_motion &m, duration ti
 				//Model
 				case ColorFadingMotionType::ModelBaseColor:
 				{
-					auto targets = get_targets<Model>(m.target_name, node);
+					auto [outer_target_name, inner_target_name] = split_target_name(m.target_name);
+					auto targets = get_targets<Model>(outer_target_name, node);
 
 					for (auto &model : targets)
 					{
 						for (auto &mesh : model->Meshes())
 						{
-							if (auto shape = dynamic_cast<shapes::Shape*>(&mesh); shape)
+							if (std::empty(inner_target_name) || //All
+								mesh.Name() == inner_target_name) //Specific
 							{
-								auto [r, g, b, a] = shape->FillColor().RGBA();
-								shape->FillColor(Color{r + delta_r, g + delta_g, b + delta_b, a + delta_a});
-							}
-							else
-							{
-								auto [r, g, b, a] = mesh.BaseColor().RGBA();
-								mesh.BaseColor(Color{r + delta_r, g + delta_g, b + delta_b, a + delta_a});
+								if (auto shape = dynamic_cast<shapes::Shape*>(&mesh); shape)
+								{
+									auto [r, g, b, a] = shape->FillColor().RGBA();
+									shape->FillColor(Color{r + delta_r, g + delta_g, b + delta_b, a + delta_a});
+								}
+								else
+								{
+									auto [r, g, b, a] = mesh.BaseColor().RGBA();
+									mesh.BaseColor(Color{r + delta_r, g + delta_g, b + delta_b, a + delta_a});
+								}
+
+								if (!std::empty(inner_target_name))
+									break;
 							}
 						}
 					}
@@ -774,6 +867,15 @@ void elapse_motion(NodeAnimation &animation, user_multi_motion &m, duration time
 /*
 	Targets
 */
+
+std::pair<std::string_view, std::string_view> split_target_name(std::string_view name) noexcept
+{
+	if (auto off = name.find('.'); off != std::string_view::npos)
+		return {name.substr(0, off), name.substr(off + 1)};
+	else
+		return {name, std::string_view{}};
+}
+
 
 std::vector<NodeAnimationTimeline*> get_timelines(std::string_view name, SceneNode &node)
 {
@@ -959,12 +1061,12 @@ void NodeAnimation::AddAction(NodeActionType type, duration time)
 	actions_.insert(
 		std::upper_bound(std::begin(actions_), std::end(actions_), a,
 			detail::action_types_comparator{}),
-		a);		
+		a);
 
 	total_duration_ = std::max(total_duration_, time);
 }
 
-void NodeAnimation::AddAction(node_animation::NodeTimelineActionType type, std::string target_name, duration time)
+void NodeAnimation::AddAction(NodeTimelineActionType type, std::string target_name, duration time)
 {
 	assert(time >= 0.0_sec);
 
@@ -975,12 +1077,12 @@ void NodeAnimation::AddAction(node_animation::NodeTimelineActionType type, std::
 	actions_.insert(
 		std::upper_bound(std::begin(actions_), std::end(actions_), a,
 			detail::action_types_comparator{}),
-		a);		
+		a);
 
 	total_duration_ = std::max(total_duration_, time);
 }
 
-void NodeAnimation::AddAction(node_animation::ObjectActionType type, std::string target_name, duration time)
+void NodeAnimation::AddAction(ObjectActionType type, std::string target_name, duration time)
 {
 	assert(time >= 0.0_sec);
 
@@ -991,12 +1093,28 @@ void NodeAnimation::AddAction(node_animation::ObjectActionType type, std::string
 	actions_.insert(
 		std::upper_bound(std::begin(actions_), std::end(actions_), a,
 			detail::action_types_comparator{}),
-		a);		
+		a);
 
 	total_duration_ = std::max(total_duration_, time);
 }
 
-void NodeAnimation::AddAction(node_animation::ParticleSystemActionType type, std::string target_name, duration time)
+void NodeAnimation::AddAction(ModelActionType type, std::string target_name, duration time)
+{
+	assert(time >= 0.0_sec);
+
+	auto a = detail::model_action{
+		{time}, type, std::move(target_name)};
+
+	//Insert sorted
+	actions_.insert(
+		std::upper_bound(std::begin(actions_), std::end(actions_), a,
+			detail::action_types_comparator{}),
+		a);
+
+	total_duration_ = std::max(total_duration_, time);
+}
+
+void NodeAnimation::AddAction(ParticleSystemActionType type, std::string target_name, duration time)
 {
 	assert(time >= 0.0_sec);
 
@@ -1007,12 +1125,12 @@ void NodeAnimation::AddAction(node_animation::ParticleSystemActionType type, std
 	actions_.insert(
 		std::upper_bound(std::begin(actions_), std::end(actions_), a,
 			detail::action_types_comparator{}),
-		a);		
+		a);
 
 	total_duration_ = std::max(total_duration_, time);
 }
 
-void NodeAnimation::AddAction(node_animation::SoundActionType type, std::string target_name, duration time)
+void NodeAnimation::AddAction(SoundActionType type, std::string target_name, duration time)
 {
 	assert(time >= 0.0_sec);
 
@@ -1023,7 +1141,7 @@ void NodeAnimation::AddAction(node_animation::SoundActionType type, std::string 
 	actions_.insert(
 		std::upper_bound(std::begin(actions_), std::end(actions_), a,
 			detail::action_types_comparator{}),
-		a);		
+		a);
 
 	total_duration_ = std::max(total_duration_, time);
 }

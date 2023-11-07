@@ -311,6 +311,14 @@ ClassDefinition get_frustum_class()
 		.AddProperty("projection", {"orthographic"s, "perspective"s});
 }
 
+ClassDefinition get_model_action_class()
+{
+	return ClassDefinition::Create("model-action")
+		.AddRequiredProperty("target-name", ParameterType::String)
+		.AddRequiredProperty("time", ParameterType::FloatingPoint)
+		.AddRequiredProperty("type", {"show"s, "hide"s, "flip-visibility"s});
+}
+
 ClassDefinition get_object_action_class()
 {
 	return ClassDefinition::Create("object-action")
@@ -514,6 +522,7 @@ ClassDefinition get_node_animation_class()
 		.AddClass(get_action_class())
 		.AddClass(get_color_fading_class())
 		.AddClass(get_fading_class())
+		.AddClass(get_model_action_class())
 		.AddClass(get_object_action_class())
 		.AddClass(get_particle_system_action_class())
 		.AddClass(get_rotating_class())
@@ -1018,6 +1027,8 @@ void set_node_animation_properties(const script_tree::ObjectNode &object, graph:
 			create_color_fading_motion(obj, animation);
 		else if (obj.Name() == "fading")
 			create_fading_motion(obj, animation);
+		else if (obj.Name() == "model-action")
+			create_model_action(obj, animation);
 		else if (obj.Name() == "object-action")
 			create_object_action(obj, animation);
 		else if (obj.Name() == "particle-system-action")
@@ -1602,6 +1613,33 @@ void create_fading_motion(const script_tree::ObjectNode &object,
 		graph::animations::node_animation::MotionTechniqueType::Linear;
 
 	animation.AddFading(type, std::move(target_name), amount, total_duration, start_time, technique);
+}
+
+void create_model_action(const script_tree::ObjectNode &object,
+	graph::animations::NodeAnimation &animation)
+{
+	auto type_name = object
+		.Property("type")[0]
+		.Get<ScriptType::Enumerable>()->Get();
+	auto target_name = object
+		.Property("target-name")[0]
+		.Get<ScriptType::String>()->Get();
+	auto time = duration{object
+		.Property("time")[0]
+		.Get<ScriptType::FloatingPoint>()->As<real>()};
+
+	auto type =
+		[&]() noexcept
+		{
+			if (type_name == "show")
+				return graph::animations::node_animation::ModelActionType::Show;
+			else if (type_name == "hide")
+				return graph::animations::node_animation::ModelActionType::Hide;
+			else //if (type_name == "flip-visibility")
+				return graph::animations::node_animation::ModelActionType::FlipVisibility;
+		}();
+
+	animation.AddAction(type, std::move(target_name), time);
 }
 
 void create_object_action(const script_tree::ObjectNode &object,

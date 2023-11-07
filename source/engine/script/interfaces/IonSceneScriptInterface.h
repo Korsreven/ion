@@ -137,6 +137,7 @@ namespace ion::script::interfaces
 		script_validator::ClassDefinition get_color_fading_class();
 		script_validator::ClassDefinition get_fading_class();
 		script_validator::ClassDefinition get_frustum_class();
+		script_validator::ClassDefinition get_model_action_class();
 		script_validator::ClassDefinition get_object_action_class();
 		script_validator::ClassDefinition get_particle_system_action_class();
 		script_validator::ClassDefinition get_render_pass_class();
@@ -241,6 +242,8 @@ namespace ion::script::interfaces
 		void create_color_fading_motion(const script_tree::ObjectNode &object,
 			graphics::scene::graph::animations::NodeAnimation &animation);
 		void create_fading_motion(const script_tree::ObjectNode &object,
+			graphics::scene::graph::animations::NodeAnimation &animation);
+		void create_model_action(const script_tree::ObjectNode &object,
 			graphics::scene::graph::animations::NodeAnimation &animation);
 		void create_object_action(const script_tree::ObjectNode &object,
 			graphics::scene::graph::animations::NodeAnimation &animation);

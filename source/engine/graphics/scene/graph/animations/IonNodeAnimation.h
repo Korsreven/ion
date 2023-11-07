@@ -83,6 +83,13 @@ namespace ion::graphics::scene::graph::animations
 			FlipVisibility
 		};
 
+		enum class ModelActionType
+		{
+			Show,
+			Hide,
+			FlipVisibility
+		};
+
 		enum class ParticleSystemActionType
 		{
 			Start,
@@ -267,6 +274,12 @@ namespace ion::graphics::scene::graph::animations
 				std::string target_name;
 			};
 
+			struct model_action : action
+			{	
+				ModelActionType type = ModelActionType::Show;
+				std::string target_name;
+			};
+
 			struct particle_system_action : action
 			{
 				ParticleSystemActionType type = ParticleSystemActionType::Start;
@@ -288,7 +301,7 @@ namespace ion::graphics::scene::graph::animations
 
 
 			using action_types = std::variant<node_action, node_timeline_action,
-				object_action, particle_system_action, sound_action, user_action>;
+				object_action, model_action, particle_system_action, sound_action, user_action>;
 			using action_container = std::vector<action_types>;
 
 			struct action_types_comparator
@@ -437,6 +450,7 @@ namespace ion::graphics::scene::graph::animations
 			void elapse_action(NodeAnimation &animation, node_action &a, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_action(NodeAnimation &animation, node_timeline_action &a, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_action(NodeAnimation &animation, object_action &a, duration time, duration current_time, duration start_time) noexcept;
+			void elapse_action(NodeAnimation &animation, model_action &a, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_action(NodeAnimation &animation, particle_system_action &a, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_action(NodeAnimation &animation, sound_action &a, duration time, duration current_time, duration start_time) noexcept;
 			void elapse_action(NodeAnimation &animation, user_action &a, duration time, duration current_time, duration start_time) noexcept;
@@ -465,6 +479,8 @@ namespace ion::graphics::scene::graph::animations
 				@name Targets
 				@{
 			*/
+
+			std::pair<std::string_view, std::string_view> split_target_name(std::string_view name) noexcept;
 
 			std::vector<NodeAnimationTimeline*> get_timelines(std::string_view name, SceneNode &node);
 			std::vector<MovableObject*> get_movable_objects(std::string_view name, SceneNode &node);
@@ -634,6 +650,9 @@ namespace ion::graphics::scene::graph::animations
 
 			///@brief Adds an action to this node animation with the given type, target name and execution time
 			void AddAction(node_animation::ObjectActionType type, std::string target_name, duration time);
+
+			///@brief Adds an action to this node animation with the given type, target name and execution time
+			void AddAction(node_animation::ModelActionType type, std::string target_name, duration time);
 
 			///@brief Adds an action to this node animation with the given type, target name and execution time
 			void AddAction(node_animation::ParticleSystemActionType type, std::string target_name, duration time);
