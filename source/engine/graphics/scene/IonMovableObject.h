@@ -109,6 +109,8 @@ namespace ion::graphics::scene
 
 		private:
 
+			std::optional<std::string> alias_;
+
 			Aabb bounding_volume_extent_ = {vector2::Zero, vector2::UnitScale};
 			movable_object::PreferredBoundingVolumeType preferred_bounding_volume_ =
 				movable_object::PreferredBoundingVolumeType::BoundingBox;
@@ -169,6 +171,15 @@ namespace ion::graphics::scene
 				@name Modifiers
 				@{
 			*/
+
+			///@brief Sets the alias of this movable object to the given alias
+			///@details An alias does not need to be unique like a name.
+			///Alias could be used to query multiple objects or objects without a name
+			inline void Alias(std::optional<std::string> alias) noexcept
+			{
+				alias_ = std::move(alias);
+			}
+
 
 			///@brief Sets the relative bounding volume extent to the given extent
 			///@details Aabb::Min represents the bottom-left corner (default: vector2::Zero).
@@ -292,6 +303,14 @@ namespace ion::graphics::scene
 				@name Observers
 				@{
 			*/
+
+			///@brief Returns the alias of this movable object
+			///@details Returns nullopt if this object has no alias
+			[[nodiscard]] inline auto& Alias() const noexcept
+			{
+				return alias_;
+			}
+
 
 			///@brief Returns the relative bounding volume extent of this movable object
 			///@details Aabb::Min represents the bottom-left corner (default: vector2::Zero).

@@ -662,6 +662,7 @@ ClassDefinition get_model_class()
 ClassDefinition get_movable_object_class()
 {
 	return ClassDefinition::Create("movable-object")
+		.AddProperty("alias", ParameterType::String)
 		.AddProperty("bounding-volume-colors", {ParameterType::Color, ParameterType::Color, ParameterType::Color}, 1)
 		.AddProperty("bounding-volume-extent", {ParameterType::Vector2, ParameterType::Vector2})
 		.AddProperty("name", ParameterType::String)
@@ -1358,7 +1359,9 @@ void set_movable_object_properties(const script_tree::ObjectNode &object, Movabl
 {
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "bounding-volume-colors")
+		if (property.Name() == "alias")
+			movable_object.Alias(property[0].Get<ScriptType::String>()->Get());
+		else if (property.Name() == "bounding-volume-colors")
 		{
 			if (property.NumberOfArguments() == 3)
 				movable_object.BoundingVolumeColors(property[0].Get<ScriptType::Color>()->Get(),

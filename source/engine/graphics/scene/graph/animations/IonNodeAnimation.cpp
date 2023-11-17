@@ -910,7 +910,7 @@ std::vector<MovableObject*> get_movable_objects(std::string_view name, SceneNode
 	{
 		if (auto target =
 			std::visit([](auto &&object) noexcept -> MovableObject* { return object; }, object);
-			target && target->Name() == name)
+			target && (target->Name() == name || target->Alias() == name))
 				
 			targets.push_back(target);
 	}
@@ -922,7 +922,7 @@ std::vector<MovableObject*> get_movable_objects(std::string_view name, SceneNode
 		{
 			if (auto target =
 				std::visit([](auto &&object) noexcept -> MovableObject* { return object; }, object);
-				target && target->Name() == name)
+				target && (target->Name() == name || target->Alias() == name))
 				
 				targets.push_back(target);
 		}
