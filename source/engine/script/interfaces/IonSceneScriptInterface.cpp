@@ -670,6 +670,7 @@ ClassDefinition get_movable_object_class()
 		.AddProperty("query-flags", ParameterType::Integer)
 		.AddProperty("query-mask", ParameterType::Integer)
 		.AddProperty("show-bounding-volumes", ParameterType::Boolean)
+		.AddProperty("tag", ParameterType::String)
 		.AddProperty("visible", ParameterType::Boolean);
 }
 
@@ -1385,6 +1386,8 @@ void set_movable_object_properties(const script_tree::ObjectNode &object, Movabl
 			movable_object.AddQueryMask(property[0].Get<ScriptType::Integer>()->As<uint32>());
 		else if (property.Name() == "show-bounding-volumes")
 			movable_object.ShowBoundingVolumes(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "tag")
+			movable_object.Tag(property[0].Get<ScriptType::String>()->Get());
 		else if (property.Name() == "visible")
 			movable_object.Visible(property[0].Get<ScriptType::Boolean>()->Get());
 	}

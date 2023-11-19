@@ -110,6 +110,7 @@ namespace ion::graphics::scene
 		private:
 
 			std::optional<std::string> alias_;
+			std::optional<std::string> tag_;
 
 			Aabb bounding_volume_extent_ = {vector2::Zero, vector2::UnitScale};
 			movable_object::PreferredBoundingVolumeType preferred_bounding_volume_ =
@@ -178,6 +179,13 @@ namespace ion::graphics::scene
 			inline void Alias(std::optional<std::string> alias) noexcept
 			{
 				alias_ = std::move(alias);
+			}
+
+			///@brief Sets the tag of this movable object to the given tag
+			///@details Tag could be used to categorize objects
+			inline void Tag(std::optional<std::string> tag) noexcept
+			{
+				tag_ = std::move(tag);
 			}
 
 
@@ -309,6 +317,13 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto& Alias() const noexcept
 			{
 				return alias_;
+			}
+
+			///@brief Returns the tag of this movable object
+			///@details Returns nullopt if this object has no tag
+			[[nodiscard]] inline auto& Tag() const noexcept
+			{
+				return tag_;
 			}
 
 
