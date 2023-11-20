@@ -391,7 +391,13 @@ namespace ion::graphics::scene
 				return parent_node_.Get();
 			}
 
-			///@brief Returns the custom user data for this movable object
+			///@brief Returns a mutable reference to the custom user data for this movable object
+			[[nodiscard]] inline auto& UserData() noexcept
+			{
+				return user_data_;
+			}
+
+			///@brief Returns an immutable reference to the custom user data for this movable object
 			[[nodiscard]] inline auto& UserData() const noexcept
 			{
 				return user_data_;
