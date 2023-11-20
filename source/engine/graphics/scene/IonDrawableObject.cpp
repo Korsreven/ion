@@ -15,6 +15,7 @@ File:	IonDrawableObject.cpp
 #include <algorithm>
 #include <cassert>
 
+#include "graphics/render/IonRenderer.h"
 #include "graphics/render/IonRenderPrimitive.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/shaders/IonShaderProgram.h"

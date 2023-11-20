@@ -134,31 +134,44 @@ ResultType intersects(scene_query::detail::query_objects &objects) noexcept
 } //intersection_scene_query::detail
 
 
-IntersectionSceneQuery::IntersectionSceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept :
-	SceneQuery<ResultType>{scene_graph}
-{
-	//Empty
-}
-
+//Private
 
 /*
 	Querying
 */
 
-ResultType IntersectionSceneQuery::Execute() const noexcept
+ResultType IntersectionSceneQuery::Execute(scene_query::detail::query_objects &objects) const noexcept
 {
-	if (!scene_graph_)
-		return {};
-
-	auto objects =
-		scene_query::detail::get_eligible_objects(
-			scene_graph_->RootNode(), query_mask_.value_or(~0_ui32), query_type_mask_.value_or(~0_ui32), only_visible_objects_);
 	scene_query::detail::derive_bounding_volumes(objects);
 
 	if (query_region_)
 		scene_query::detail::remove_objects_outside_region(objects, *query_region_);
 
 	return detail::intersects(objects);
+}
+
+//Public
+
+/*
+	Querying
+*/
+
+ResultType IntersectionSceneQuery::Execute(SceneNode &node) const noexcept
+{
+	auto objects =
+		scene_query::detail::get_eligible_objects(
+			node, query_mask_.value_or(~0_ui32), query_type_mask_.value_or(~0_ui32), only_visible_objects_);
+
+	return Execute(objects);
+}
+
+ResultType IntersectionSceneQuery::Execute(scene_query::MovableObjects &movable_objects) const noexcept
+{
+	auto objects =
+		scene_query::detail::get_eligible_objects(
+			movable_objects, query_mask_.value_or(~0_ui32), query_type_mask_.value_or(~0_ui32), only_visible_objects_);
+
+	return Execute(objects);
 }
 
 } //ion::graphics::scene::query

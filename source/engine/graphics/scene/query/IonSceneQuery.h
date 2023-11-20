@@ -22,7 +22,6 @@ File:	IonSceneQuery.h
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonLight.h"
 #include "graphics/scene/IonMovableObject.h"
-#include "graphics/scene/graph/IonSceneGraph.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/utilities/IonAabb.h"
 #include "memory/IonNonOwningPtr.h"
@@ -52,6 +51,8 @@ namespace ion::graphics::scene::query
 				//First (pot) value not in use by the engine
 		};
 
+		using MovableObjects = std::vector<MovableObject*>;
+
 
 		namespace detail
 		{
@@ -59,11 +60,18 @@ namespace ion::graphics::scene::query
 			using query_objects = std::vector<query_object>;
 
 
-			inline void get_eligible_objects(SceneNode &node, uint32 mask, uint32 type_mask, bool only_visible,
-				query_objects &objects) noexcept
+			inline bool is_object_eligible(MovableObject &object, uint32 mask, uint32 type_mask, bool only_visible)
 			{
 				const auto default_flags = (mask == ~0_ui32 ? mask : 0_ui32);
 
+				return (!only_visible || object.Visible()) &&
+					object.QueryTypeFlags() & type_mask &&
+					object.QueryFlags().value_or(default_flags) & mask;
+			}
+
+			inline void get_eligible_objects(SceneNode &node, uint32 mask, uint32 type_mask, bool only_visible,
+				query_objects &objects) noexcept
+			{
 				//Check if node is eligible
 				if (!only_visible || node.Visible())
 				{
@@ -73,10 +81,7 @@ namespace ion::graphics::scene::query
 							std::visit([](auto &&x) noexcept -> MovableObject* { return x; }, attached_object);
 
 						//Check if object is eligible
-						if ((!only_visible || object->Visible()) &&
-							object->QueryTypeFlags() & type_mask &&
-							object->QueryFlags().value_or(default_flags) & mask)
-
+						if (is_object_eligible(*object, mask, type_mask, only_visible))
 							objects.emplace_back(object, true); //Eligible for querying
 					}
 				}
@@ -85,10 +90,33 @@ namespace ion::graphics::scene::query
 					get_eligible_objects(child_node, mask, type_mask, only_visible, objects); //Recursive
 			}
 
+			inline void get_eligible_objects(MovableObjects &movable_objects, uint32 mask, uint32 type_mask, bool only_visible,
+				query_objects &objects)
+			{
+				for (auto &object : movable_objects)
+				{
+					//Check if node is eligible
+					if (auto node = object->ParentNode(); node &&
+						(!only_visible || node->Visible()))
+					{
+						//Check if object is eligible
+						if (is_object_eligible(*object, mask, type_mask, only_visible))
+							objects.emplace_back(object, true); //Eligible for querying
+					}
+				}
+			}
+
 			inline auto get_eligible_objects(SceneNode &node, uint32 mask, uint32 type_mask, bool only_visible) noexcept
 			{
 				query_objects objects;
 				get_eligible_objects(node, mask, type_mask, only_visible, objects);
+				return objects;
+			}
+
+			inline auto get_eligible_objects(MovableObjects &movable_objects, uint32 mask, uint32 type_mask, bool only_visible) noexcept
+			{
+				query_objects objects;
+				get_eligible_objects(movable_objects, mask, type_mask, only_visible, objects);
 				return objects;
 			}
 
@@ -147,19 +175,11 @@ namespace ion::graphics::scene::query
 			std::optional<uint32> query_type_mask_ = scene_query::QueryType::Model;
 			std::optional<Aabb> query_region_;
 			bool only_visible_objects_ = true;
-			NonOwningPtr<SceneGraph> scene_graph_;
 
 		public:
 
 			///@brief Default constructor
 			SceneQuery() = default;
-
-			///@brief Constructs a new scene query with the given scene graph
-			SceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept :
-				scene_graph_{scene_graph}
-			{
-				//Empty
-			}
 
 
 			/**
@@ -235,12 +255,6 @@ namespace ion::graphics::scene::query
 				only_visible_objects_ = only_visible;
 			}
 
-			///@brief Sets the scene graph this scene query is querying
-			inline void Scene(NonOwningPtr<SceneGraph> scene_graph) noexcept
-			{
-				scene_graph_ = scene_graph;
-			}
-
 			///@}
 
 			/**
@@ -277,12 +291,6 @@ namespace ion::graphics::scene::query
 				return only_visible_objects_;
 			}
 
-			///@brief Returns the scene graph this scene query is querying
-			[[nodiscard]] inline auto Scene() const noexcept
-			{
-				return scene_graph_;
-			}
-
 			///@}
 
 			/**
@@ -290,8 +298,11 @@ namespace ion::graphics::scene::query
 				@{
 			*/
 
-			///@brief Returns the result of the scene query
-			[[nodiscard]] virtual ResultT Execute() const noexcept = 0;
+			///@brief Returns the result of the scene query from the given node
+			[[nodiscard]] virtual ResultT Execute(SceneNode &node) const noexcept = 0;
+
+			///@brief Returns the result of the scene query amongst the given movable objects
+			[[nodiscard]] virtual ResultT Execute(scene_query::MovableObjects &movable_objects) const noexcept = 0;
 
 			///@}
 	};

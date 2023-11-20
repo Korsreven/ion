@@ -211,9 +211,9 @@ class Game :
 			{
 				if (query_time_ += time)
 				{
-					ion::graphics::scene::query::IntersectionSceneQuery scene_query{scene_graph_};
+					ion::graphics::scene::query::IntersectionSceneQuery scene_query;
 					scene_query.QueryMask(1 | 2 | 4); //Query ship, egyptian pyramid and mayan pyramid
-					auto result = scene_query.Execute();
+					auto result = scene_query.Execute(scene_graph_->RootNode());
 
 					//Collision detected!
 					if (!std::empty(result))

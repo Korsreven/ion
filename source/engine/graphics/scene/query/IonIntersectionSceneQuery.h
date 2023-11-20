@@ -17,7 +17,6 @@ File:	IonIntersectionSceneQuery.h
 #include <vector>
 
 #include "IonSceneQuery.h"
-#include "graphics/scene/graph/IonSceneGraph.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
@@ -52,16 +51,20 @@ namespace ion::graphics::scene::query
 	class IntersectionSceneQuery final : public SceneQuery<intersection_scene_query::ResultType>
 	{
 		private:
+			
+			/**
+				@name Querying
+				@{
+			*/
 
+			intersection_scene_query::ResultType Execute(scene_query::detail::query_objects &objects) const noexcept;
 
+			///@}
 
 		public:
 
 			///@brief Default constructor
 			IntersectionSceneQuery() = default;
-
-			///@brief Constructs a new scene query with the given scene graph
-			IntersectionSceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept;
 
 			
 			/**
@@ -69,8 +72,11 @@ namespace ion::graphics::scene::query
 				@{
 			*/
 
-			///@brief Returns the result of the intersection scene query
-			[[nodiscard]] intersection_scene_query::ResultType Execute() const noexcept override;
+			///@brief Returns the result of the intersection scene query from the given node
+			[[nodiscard]] intersection_scene_query::ResultType Execute(SceneNode &node) const noexcept override;
+
+			///@brief Returns the result of the intersection scene query amongst the given movable objects
+			[[nodiscard]] intersection_scene_query::ResultType Execute(scene_query::MovableObjects &movable_objects) const noexcept override;
 
 			///@}
 	};

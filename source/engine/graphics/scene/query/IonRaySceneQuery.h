@@ -18,7 +18,6 @@ File:	IonRaySceneQuery.h
 #include <vector>
 
 #include "IonSceneQuery.h"
-#include "graphics/scene/graph/IonSceneGraph.h"
 #include "graphics/utilities/IonRay.h"
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
@@ -49,16 +48,23 @@ namespace ion::graphics::scene::query
 			std::optional<uint32> ray_query_flags_;
 			bool sort_by_distance_ = true;
 
+
+			/**
+				@name Querying
+				@{
+			*/
+
+			ray_scene_query::ResultType Execute(scene_query::detail::query_objects &objects) const noexcept;
+
+			///@}
+
 		public:
 
 			///@brief Default constructor
 			RaySceneQuery() = default;
 
-			///@brief Constructs a new scene query with the given scene graph
-			RaySceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept;
-
-			///@brief Constructs a new scene query with the given scene graph and ray
-			RaySceneQuery(NonOwningPtr<SceneGraph> scene_graph, const Ray &ray) noexcept;
+			///@brief Constructs a new ray scene query with the given ray
+			RaySceneQuery(const Ray &ray) noexcept;
 
 
 			/**
@@ -115,8 +121,11 @@ namespace ion::graphics::scene::query
 				@{
 			*/
 
-			///@brief Returns the result of the ray scene query
-			[[nodiscard]] ray_scene_query::ResultType Execute() const noexcept override;
+			///@brief Returns the result of the ray scene query from the given node
+			[[nodiscard]] ray_scene_query::ResultType Execute(SceneNode &node) const noexcept override;
+
+			///@brief Returns the result of the ray scene query amongst the given movable objects
+			[[nodiscard]] ray_scene_query::ResultType Execute(scene_query::MovableObjects &movable_objects) const noexcept override;
 
 			///@}
 	};

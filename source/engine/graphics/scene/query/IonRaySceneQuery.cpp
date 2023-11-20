@@ -65,33 +65,21 @@ ResultType intersects(scene_query::detail::query_objects &objects, const Ray &ra
 } //ray_scene_query::detail
 
 
-RaySceneQuery::RaySceneQuery(NonOwningPtr<SceneGraph> scene_graph) noexcept :
-	SceneQuery<ResultType>{scene_graph}
-{
-	//Empty
-}
-
-RaySceneQuery::RaySceneQuery(NonOwningPtr<SceneGraph> scene_graph, const Ray &ray) noexcept :
-	
-	SceneQuery<ResultType>{scene_graph},
+RaySceneQuery::RaySceneQuery(const Ray &ray) noexcept :
 	ray_{ray}
 {
 	//Empty
 }
 
 
+//Private
+
 /*
 	Querying
 */
 
-ResultType RaySceneQuery::Execute() const noexcept
+ResultType RaySceneQuery::Execute(scene_query::detail::query_objects &objects) const noexcept
 {
-	if (!scene_graph_)
-		return {};
-
-	auto objects =
-		scene_query::detail::get_eligible_objects(
-			scene_graph_->RootNode(), query_mask_.value_or(~0_ui32), query_type_mask_.value_or(~0_ui32), only_visible_objects_);
 	scene_query::detail::derive_bounding_volumes(objects);
 
 	if (query_region_)
@@ -107,6 +95,31 @@ ResultType RaySceneQuery::Execute() const noexcept
 			});
 
 	return result;
+}
+
+
+//Public
+
+/*
+	Querying
+*/
+
+ResultType RaySceneQuery::Execute(SceneNode &node) const noexcept
+{
+	auto objects =
+		scene_query::detail::get_eligible_objects(
+			node, query_mask_.value_or(~0_ui32), query_type_mask_.value_or(~0_ui32), only_visible_objects_);
+
+	return Execute(objects);
+}
+
+ResultType RaySceneQuery::Execute(scene_query::MovableObjects &movable_objects) const noexcept
+{
+	auto objects =
+		scene_query::detail::get_eligible_objects(
+			movable_objects, query_mask_.value_or(~0_ui32), query_type_mask_.value_or(~0_ui32), only_visible_objects_);
+
+	return Execute(objects);
 }
 
 } //ion::graphics::scene::query
