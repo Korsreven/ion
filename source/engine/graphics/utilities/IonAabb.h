@@ -40,6 +40,18 @@ namespace ion::graphics::utilities
 			return size.X() * size.Y();
 		}
 
+		inline auto minmax_to_diameter(const Vector2 &min, const Vector2 &max) noexcept
+		{
+			auto size = max - min;
+			return size.Length();
+		}
+
+		inline auto minmax_to_perimeter(const Vector2 &min, const Vector2 &max) noexcept
+		{
+			auto size = max - min;
+			return size.X() * 2.0_r + size.Y() * 2.0_r;
+		}
+
 		inline auto valid_extents(const Vector2 &min, const Vector2 &max) noexcept
 		{
 			return min.X() <= max.X() && min.Y() <= max.Y();
@@ -198,6 +210,12 @@ namespace ion::graphics::utilities
 
 			///@brief Returns the area of the aabb
 			[[nodiscard]] real ToArea() const noexcept;
+
+			///@brief Returns the diameter of the aabb
+			[[nodiscard]] real ToDiameter() const noexcept;
+
+			///@brief Returns the perimeter of the aabb
+			[[nodiscard]] real ToPerimeter() const noexcept;
 
 			///@brief Returns the half-size of the aabb
 			[[nodiscard]] Vector2 ToHalfSize() const noexcept;

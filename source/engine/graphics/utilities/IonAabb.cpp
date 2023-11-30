@@ -213,6 +213,16 @@ real Aabb::ToArea() const noexcept
 	return detail::minmax_to_area(min_, max_);
 }
 
+real Aabb::ToDiameter() const noexcept
+{
+	return detail::minmax_to_diameter(min_, max_);
+}
+
+real Aabb::ToPerimeter() const noexcept
+{
+	return detail::minmax_to_perimeter(min_, max_);
+}
+
 Vector2 Aabb::ToHalfSize() const noexcept
 {
 	return ToSize() * 0.5_r;
