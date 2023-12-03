@@ -18,7 +18,7 @@ scene-node
             near-clip-distance: 1.0;
             far-clip-distance: 100.0;
             aspect-ratio: 1.77777777778; //16:9
-            aspect-format: pan-and-scan;
+            aspect-format: fill;
         }
     }
 }

@@ -40,7 +40,7 @@ namespace ion::graphics::render
 
 		enum class AspectRatioFormat
 		{
-			PanAndScan, //Zoom and crop
+			Fill, //Fill height/width (crop)
 				/*
 					 ____________
 					| 2  3  4  5 |
@@ -49,7 +49,25 @@ namespace ion::graphics::render
 					|____________|
 				*/
 
-			Letterbox, //Fill without cropping
+			FillHeight, //Fill height (crop width)
+				/*
+					 ____________
+					| |12 34 56| |
+					| |        | |
+					| |        | |
+					|_|________|_|
+				*/
+
+			FillWidth, //Fill width (crop height)
+				/*
+					 ____________ 
+					|____________|
+					|1 2 3  4 5 6|
+					|____________|
+					|____________|
+				*/
+
+			Letterbox, //Fill (no crop)
 				/*
 					 ____________    ____________
 					|____________|  | |12 34 56| |
@@ -111,7 +129,7 @@ namespace ion::graphics::render
 			real field_of_view_ = 90.0_r;
 
 			std::optional<real> aspect_ratio_;
-			frustum::AspectRatioFormat aspect_format_ = frustum::AspectRatioFormat::PanAndScan;
+			frustum::AspectRatioFormat aspect_format_ = frustum::AspectRatioFormat::Fill;
 			real base_viewport_height_ = 0.0_r;
 
 			Matrix4 projection_matrix_;
@@ -138,12 +156,12 @@ namespace ion::graphics::render
 			///@brief Returns a new orthographic frustum from the given clip plane bounds and aspect ratio
 			///@details If a fixed aspect ratio is not given (nullopt), it will dynamically follow the viewport size
 			[[nodiscard]] static Frustum Orthographic(const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance,
-				const std::optional<real> &aspect_ratio, frustum::AspectRatioFormat aspect_format = frustum::AspectRatioFormat::PanAndScan) noexcept;
+				const std::optional<real> &aspect_ratio, frustum::AspectRatioFormat aspect_format = frustum::AspectRatioFormat::Fill) noexcept;
 
 			///@brief Returns a new perspective frustum from the given clip plane bounds
 			///@details If a fixed aspect ratio is not given (nullopt), it will dynamically follow the viewport size
 			[[nodiscard]] static Frustum Perspective(const std::optional<Aabb> &clip_plane, real near_clip_distance, real far_clip_distance,
-				real field_of_view, const std::optional<real> &aspect_ratio, frustum::AspectRatioFormat aspect_format = frustum::AspectRatioFormat::PanAndScan) noexcept;
+				real field_of_view, const std::optional<real> &aspect_ratio, frustum::AspectRatioFormat aspect_format = frustum::AspectRatioFormat::Fill) noexcept;
 
 			///@}
 

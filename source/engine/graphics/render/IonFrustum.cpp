@@ -35,7 +35,7 @@ Aabb keep_proportion(const Aabb &clip_plane, real aspect_ratio, AspectRatioForma
 
 	switch (aspect_format)
 	{
-		case AspectRatioFormat::PanAndScan:
+		case AspectRatioFormat::Fill:
 		{
 			//Crop left/right
 			if (aspect_ratio > viewport_aspect_ratio)
@@ -44,6 +44,20 @@ Aabb keep_proportion(const Aabb &clip_plane, real aspect_ratio, AspectRatioForma
 			else if (aspect_ratio < viewport_aspect_ratio)
 				height *= viewport_height / (viewport_width / aspect_ratio);
 
+			break;
+		}
+
+		case AspectRatioFormat::FillHeight:
+		{
+			//Crop left/right
+			width *= (viewport_width / (viewport_height * aspect_ratio));
+			break;
+		}
+
+		case AspectRatioFormat::FillWidth:
+		{
+			//Crop top/bottom
+			height *= viewport_height / (viewport_width / aspect_ratio);
 			break;
 		}
 

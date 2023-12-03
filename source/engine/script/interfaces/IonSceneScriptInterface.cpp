@@ -301,7 +301,7 @@ ClassDefinition get_fading_class()
 ClassDefinition get_frustum_class()
 {
 	return ClassDefinition::Create("frustum")
-		.AddProperty("aspect-format", {"pan-and-scan"s, "letterbox"s, "windowbox"s})
+		.AddProperty("aspect-format", {"fill"s, "fill-height"s, "fill-width"s, "letterbox"s, "windowbox"s})
 		.AddProperty("aspect-ratio", {ParameterType::FloatingPoint, ParameterType::FloatingPoint}, 1)
 		.AddProperty("base-viewport-height", ParameterType::FloatingPoint)
 		.AddProperty("clip-plane", {ParameterType::Vector2, ParameterType::Vector2})
@@ -712,8 +712,12 @@ void set_frustum_properties(const script_tree::ObjectNode &object, graphics::ren
 	{
 		if (property.Name() == "aspect-format")
 		{
-			if (property[0].Get<ScriptType::Enumerable>()->Get() == "pan-and-scan")
-				frustum.AspectFormat(graphics::render::frustum::AspectRatioFormat::PanAndScan);
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "fill")
+				frustum.AspectFormat(graphics::render::frustum::AspectRatioFormat::Fill);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "fill-height")
+				frustum.AspectFormat(graphics::render::frustum::AspectRatioFormat::FillHeight);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "fill-width")
+				frustum.AspectFormat(graphics::render::frustum::AspectRatioFormat::FillWidth);
 			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "letterbox")
 				frustum.AspectFormat(graphics::render::frustum::AspectRatioFormat::Letterbox);
 			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "windowbox")
