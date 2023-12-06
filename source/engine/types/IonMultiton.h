@@ -77,6 +77,31 @@ namespace ion::types
 					return *instances_.emplace_hint(iter, std::string{name}, ion::make_owning<T>())->second;
 			}
 
+			///@brief Returns true if an instance of T with the given name exists
+			[[nodiscard]] static auto HasInstance(std::string_view name) noexcept
+			{
+				return instances_.contains(name);
+			}
+
+			///@brief Clears all instances of T
+			static void ClearInstances() noexcept
+			{
+				instances_.clear();
+				instances_.shrink_to_fit();
+			}
+
+			///@brief Removes an instance of T with the given name
+			static auto RemoveInstance(std::string_view name) noexcept
+			{
+				if (auto iter = instances_.find(name); iter != std::end(instances_))
+				{
+					instances_.erase(iter);
+					return true;
+				}
+				else
+					return false;
+			}
+
 			///@}
 	};
 } //ion::types
