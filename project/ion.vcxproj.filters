@@ -1430,6 +1430,9 @@
     <ClInclude Include="..\source\engine\types\IonMultiton.h">
       <Filter>Header Files\types</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\engine\events\listeners\IonSceneGraphListener.h">
+      <Filter>Header Files\events\listeners</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\engine\graphics\shaders\glsl\IonSimpleTextShader.frag">

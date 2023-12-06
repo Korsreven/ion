@@ -20,6 +20,7 @@ File:	IonSceneGraph.h
 
 #include "IonSceneNode.h"
 #include "events/IonListenable.h"
+#include "events/listeners/IonSceneGraphListener.h"
 #include "events/listeners/IonSceneNodeListener.h"
 #include "graphics/render/IonFog.h"
 #include "graphics/render/IonRenderer.h"
@@ -115,10 +116,12 @@ namespace ion::graphics::scene::graph
 	class SceneGraph final :
 		public managed::ManagedObject<Engine>,
 		public managed::ObjectManager<SceneManager, SceneGraph>,
+		public events::Listenable<events::listeners::SceneGraphListener>,
 		public events::Listenable<events::listeners::SceneNodeListener>
 	{
 		private:
 
+			using GraphEventsBase = events::Listenable<events::listeners::SceneGraphListener>;
 			using NodeEventsBase = events::Listenable<events::listeners::SceneNodeListener>;
 
 			bool enabled_ = true;
@@ -147,6 +150,9 @@ namespace ion::graphics::scene::graph
 				@name Notifying
 				@{
 			*/
+
+			void NotifyGraphRenderStarted(SceneGraph &graph) noexcept;
+			void NotifyGraphRenderEnded(SceneGraph &graph) noexcept;
 
 			void NotifyNodeRenderStarted(SceneNode &node) noexcept;
 			void NotifyNodeRenderEnded(SceneNode &node) noexcept;
@@ -185,6 +191,19 @@ namespace ion::graphics::scene::graph
 				@name Events
 				@{
 			*/
+
+			///@brief Returns a mutable reference to the graph events of this scene graph
+			[[nodiscard]] inline auto& GraphEvents() noexcept
+			{
+				return static_cast<GraphEventsBase&>(*this);
+			}
+
+			///@brief Returns an immutable reference to the graph events of this scene graph
+			[[nodiscard]] inline auto& GraphEvents() const noexcept
+			{
+				return static_cast<const GraphEventsBase&>(*this);
+			}
+
 
 			///@brief Returns a mutable reference to the node events of this scene graph
 			[[nodiscard]] inline auto& NodeEvents() noexcept

@@ -370,6 +370,17 @@ void pop_gl_matrix() noexcept
 	Notifying
 */
 
+void SceneGraph::NotifyGraphRenderStarted(SceneGraph &graph) noexcept
+{
+	GraphEventsBase::NotifyAll(GraphEvents().Listeners(), &events::listeners::SceneGraphListener::GraphRenderStarted, std::ref(graph));
+}
+
+void SceneGraph::NotifyGraphRenderEnded(SceneGraph &graph) noexcept
+{
+	GraphEventsBase::NotifyAll(GraphEvents().Listeners(), &events::listeners::SceneGraphListener::GraphRenderEnded, std::ref(graph));
+}
+
+
 void SceneGraph::NotifyNodeRenderStarted(SceneNode &node) noexcept
 {
 	NodeEventsBase::NotifyAll(NodeEvents().Listeners(), &events::listeners::SceneNodeListener::NodeRenderStarted, std::ref(node));
@@ -409,6 +420,8 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 {
 	if (!enabled_)
 		return;
+
+	NotifyGraphRenderStarted(*this);
 
 
 	/*
@@ -576,6 +589,8 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 		for (auto &object : visible_objects_)
 			object->DrawBounds(max_z);
 	}
+
+	NotifyGraphRenderEnded(*this);
 }
 
 
