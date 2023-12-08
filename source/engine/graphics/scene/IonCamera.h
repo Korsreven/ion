@@ -174,7 +174,7 @@ namespace ion::graphics::scene
 			}
 
 			///@brief Returns the derived position of this camera
-			[[nodiscard]] Vector2 DerivedPosition() const noexcept;
+			[[nodiscard]] Vector3 DerivedPosition() const noexcept;
 
 			///@brief Returns the derived rotation of this camera in radians
 			[[nodiscard]] real DerivedRotation() const noexcept;

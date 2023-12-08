@@ -127,7 +127,7 @@ Camera::Camera(std::optional<std::string> name, const render::Frustum &frustum, 
 	Observers
 */
 
-Vector2 Camera::DerivedPosition() const noexcept
+Vector3 Camera::DerivedPosition() const noexcept
 {
 	if (auto parent_node = ParentNode(); parent_node)
 		return position_ + parent_node->DerivedPosition();
