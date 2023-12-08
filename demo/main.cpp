@@ -88,6 +88,8 @@ class Game :
 		Vector2 move_camera_;
 		bool rotate_camera_left_ = false;
 		bool rotate_camera_right_ = false;
+		bool scale_camera_up_ = false;
+		bool scale_camera_down_ = false;
 
 		ion::types::Cumulative<duration> fps_time_{1.0_sec};
 		ion::types::Cumulative<duration> idle_time_{2.0_sec};
@@ -185,6 +187,11 @@ class Game :
 						camera_->ParentNode()->Rotate(math::ToRadians(180.0_r) * time.count());
 					if (rotate_camera_right_)
 						camera_->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
+
+					if (scale_camera_up_)
+						camera_->ParentNode()->Scale(0.2_r * time.count());
+					if (scale_camera_down_)
+						camera_->ParentNode()->Scale(-0.2_r * time.count());
 				}
 		
 				if (player_camera_ && viewport_ &&
@@ -194,6 +201,11 @@ class Game :
 						player_camera_->ParentNode()->Rotate(math::ToRadians(180.0_r) * time.count());
 					if (rotate_camera_right_)
 						player_camera_->ParentNode()->Rotate(math::ToRadians(-180.0_r) * time.count());
+
+					if (scale_camera_up_)
+						player_camera_->ParentNode()->Scale(0.2_r * time.count());
+					if (scale_camera_down_)
+						player_camera_->ParentNode()->Scale(-0.2_r * time.count());
 				}
 			}
 
@@ -345,6 +357,16 @@ class Game :
 					case ion::events::listeners::KeyButton::Add:
 					rotate_camera_right_ = true;
 					break;
+
+					//Start scaling camera up
+					case ion::events::listeners::KeyButton::Multiply:
+					scale_camera_up_ = true;
+					break;
+
+					//Start scaling camera down
+					case ion::events::listeners::KeyButton::Divide:
+					scale_camera_down_ = true;
+					break;
 				}
 			}
 
@@ -448,6 +470,16 @@ class Game :
 					//Stop rotating camera CW
 					case ion::events::listeners::KeyButton::Add:
 					rotate_camera_right_ = false;
+					break;
+
+					//Stop scaling camera up
+					case ion::events::listeners::KeyButton::Multiply:
+					scale_camera_up_ = false;
+					break;
+
+					//Stop scaling camera down
+					case ion::events::listeners::KeyButton::Divide:
+					scale_camera_down_ = false;
 					break;
 
 

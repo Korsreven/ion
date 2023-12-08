@@ -19,6 +19,7 @@ File:	IonCamera.h
 #include "events/IonEventGenerator.h"
 #include "events/listeners/IonCameraListener.h"
 #include "graphics/render/IonFrustum.h"
+#include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonMatrix4.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
@@ -31,10 +32,8 @@ namespace ion::graphics::render
 
 namespace ion::graphics::scene
 {
+	using namespace graphics::utilities;
 	using namespace types::type_literals;
-	using utilities::Matrix4;
-	using utilities::Vector2;
-	using utilities::Vector3;
 
 	namespace camera
 	{
@@ -57,13 +56,16 @@ namespace ion::graphics::scene
 
 			Vector3 position_;
 			real rotation_ = 0.0_r;
+			Vector2 scaling_ = vector2::UnitScale;
 			render::Frustum frustum_;
 			Matrix4 view_matrix_;
 
 			Vector2 viewport_size_;
+			std::optional<Aabb> frustum_clip_plane_;
 			bool update_bounding_volumes_ = true;
 
 
+			void ScaleFrustum() noexcept;
 			void PrepareBoundingVolumes() noexcept;
 
 
@@ -108,7 +110,7 @@ namespace ion::graphics::scene
 				Position({position.X(), position.Y(), position_.Z()});
 			}
 
-			///@brief Sets the rotation of this camera to the given angle (in radians)
+			///@brief Sets the rotation of this camera to the given angle in radians
 			inline void Rotation(real angle) noexcept
 			{
 				if (rotation_ != angle)
@@ -118,10 +120,23 @@ namespace ion::graphics::scene
 				}
 			}
 
-			///@brief Sets the view frustum of the camera to the given frustum
+			///@brief Sets the scaling of this camera to the given scaling
+			inline void Scaling(const Vector2 &scaling) noexcept
+			{
+				if (scaling_ != scaling)
+				{
+					scaling_ = scaling;
+					ScaleFrustum();
+					update_bounding_volumes_ = true;
+				}
+			}
+
+			///@brief Sets the view frustum of this camera to the given frustum
 			inline void ViewFrustum(const render::Frustum &frustum) noexcept
 			{
 				frustum_ = frustum;
+				frustum_clip_plane_ = frustum.ClipPlane();
+				ScaleFrustum();
 				update_bounding_volumes_ = true;
 				NotifyCameraFrustumChanged(frustum);
 			}
@@ -140,19 +155,35 @@ namespace ion::graphics::scene
 				@{
 			*/
 
-			///@brief Returns the position of the camera
+			///@brief Returns the position of this camera
 			[[nodiscard]] inline auto& Position() const noexcept
 			{
 				return position_;
 			}
 
-			///@brief Returns the angle of rotation (in radians) for this camera
+			///@brief Returns the rotation of this camera in radians
 			[[nodiscard]] inline auto Rotation() const noexcept
 			{
 				return rotation_;
 			}
 
-			///@brief Returns the view frustum of the camera
+			///@brief Returns the scaling of this camera
+			[[nodiscard]] inline auto& Scaling() const noexcept
+			{
+				return scaling_;
+			}
+
+			///@brief Returns the derived position of this camera
+			[[nodiscard]] Vector2 DerivedPosition() const noexcept;
+
+			///@brief Returns the derived rotation of this camera in radians
+			[[nodiscard]] real DerivedRotation() const noexcept;
+
+			///@brief Returns the derived scaling of this camera
+			[[nodiscard]] Vector2 DerivedScaling() const noexcept;
+
+
+			///@brief Returns the view frustum of this camera
 			[[nodiscard]] inline auto& ViewFrustum() const noexcept
 			{
 				return frustum_;

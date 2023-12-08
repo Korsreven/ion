@@ -599,7 +599,8 @@ ClassDefinition get_camera_class()
 
 		.AddProperty("base-viewport-height", ParameterType::FloatingPoint)
 		.AddProperty("position", ParameterType::Vector3)
-		.AddProperty("rotation", ParameterType::FloatingPoint);
+		.AddProperty("rotation", ParameterType::FloatingPoint)
+		.AddProperty("scaling", ParameterType::Vector2);
 }
 
 ClassDefinition get_drawable_object_class()
@@ -1232,6 +1233,8 @@ void set_camera_properties(const script_tree::ObjectNode &object, Camera &camera
 			camera.Position(property[0].Get<ScriptType::Vector3>()->Get());
 		else if (property.Name() == "rotation")
 			camera.Rotation(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
+		else if (property.Name() == "scaling")
+			camera.Scaling(property[0].Get<ScriptType::Vector2>()->Get());
 	}
 }
 

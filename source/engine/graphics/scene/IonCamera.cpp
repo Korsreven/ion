@@ -71,6 +71,12 @@ Matrix4 get_view_matrix(const Vector3 &position, real angle) noexcept
 
 //Private
 
+void Camera::ScaleFrustum() noexcept
+{
+	if (frustum_clip_plane_)
+		frustum_.ClipPlane(frustum_clip_plane_->ScaleCopy(DerivedScaling()));
+}
+
 void Camera::PrepareBoundingVolumes() noexcept
 {
 	auto [left, right, bottom, top, z_near, z_far] =
@@ -110,9 +116,39 @@ Camera::Camera(std::optional<std::string> name, bool visible) noexcept :
 Camera::Camera(std::optional<std::string> name, const render::Frustum &frustum, bool visible) noexcept :
 
 	MovableObject{std::move(name), visible},
-	frustum_{frustum}
+	frustum_{frustum},
+	frustum_clip_plane_{frustum.ClipPlane()}
 {
 	query_type_flags_ |= query::scene_query::QueryType::Camera;
+}
+
+
+/*
+	Observers
+*/
+
+Vector2 Camera::DerivedPosition() const noexcept
+{
+	if (auto parent_node = ParentNode(); parent_node)
+		return position_ + parent_node->DerivedPosition();
+	else
+		return position_;
+}
+
+real Camera::DerivedRotation() const noexcept
+{
+	if (auto parent_node = ParentNode(); parent_node)
+		return rotation_ + parent_node->DerivedRotation();
+	else
+		return rotation_;
+}
+
+Vector2 Camera::DerivedScaling() const noexcept
+{
+	if (auto parent_node = ParentNode(); parent_node)
+		return scaling_ * parent_node->DerivedScaling();
+	else
+		return scaling_;
 }
 
 
@@ -128,17 +164,12 @@ void Camera::CaptureScene(const render::Viewport &viewport) noexcept
 		viewport_size_ = viewport_size;
 		update_bounding_volumes_ = true;
 	}
-	
+
+	ScaleFrustum();
 	frustum_.ProjectScene(viewport_size_);
 
-	auto position = position_;
-	auto rotation = rotation_;
-
-	if (auto parent_node = ParentNode(); parent_node)
-	{		
-		position += parent_node->DerivedPosition();
-		rotation += parent_node->DerivedRotation();
-	}
+	auto position = DerivedPosition();
+	auto rotation = DerivedRotation();
 
 	detail::rotate_by(rotation);
 	detail::move_to(position);
