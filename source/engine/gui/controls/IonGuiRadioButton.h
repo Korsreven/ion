@@ -74,8 +74,7 @@ namespace ion::gui::controls
 				@name Tags
 				@{
 			*/
-
-			void Unselect() noexcept;
+			
 			void UnselectEqualTag(int tag) noexcept;
 			bool UniqueTag(int tag) const noexcept;
 
@@ -99,6 +98,9 @@ namespace ion::gui::controls
 
 			///@brief Selects this radio button
 			void Select() noexcept;
+
+			///@brief Unselects this radio button
+			void Unselect() noexcept;
 
 			///@brief Sets the tag used for this radio button to the given tag
 			void Tag(int tag) noexcept;

@@ -65,12 +65,6 @@ OwningPtr<gui_control::ControlSkin> GuiRadioButton::AttuneSkin(OwningPtr<gui_con
 	Tags
 */
 
-void GuiRadioButton::Unselect() noexcept
-{
-	checked_ = false;
-	GuiCheckBox::Unchecked(); //Use base functionality
-}
-
 void GuiRadioButton::UnselectEqualTag(int tag) noexcept
 {
 	if (auto owner = Owner(); owner)
@@ -131,6 +125,12 @@ GuiRadioButton::GuiRadioButton(std::string name, const skins::GuiSkin &skin, con
 void GuiRadioButton::Select() noexcept
 {
 	Check();
+}
+
+void GuiRadioButton::Unselect() noexcept
+{
+	checked_ = false;
+	GuiCheckBox::Unchecked(); //Use base functionality
 }
 
 void GuiRadioButton::Tag(int tag) noexcept
