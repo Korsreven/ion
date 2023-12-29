@@ -111,8 +111,8 @@ namespace ion::graphics::render
 				@{
 			*/
 
-			void NotifyViewportResized(const Vector2 &size) noexcept;
-			void NotifyViewportMoved(const Vector2 &position) noexcept;
+			void NotifyViewportResized() noexcept;
+			void NotifyViewportMoved() noexcept;
 
 			///@}
 

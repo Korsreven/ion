@@ -64,8 +64,12 @@ namespace ion::graphics::scene
 			std::optional<Aabb> frustum_clip_plane_;
 			bool update_bounding_volumes_ = true;
 
+			Vector3 derived_position_;
+			real derived_rotation_ = 0.0_r;
+			Vector2 derived_scaling_ = vector2::UnitScale;
 
-			void ScaleFrustum() noexcept;
+
+			void ScaleFrustum(const Vector2 &scaling) noexcept;
 			void PrepareBoundingVolumes() noexcept;
 
 
@@ -74,8 +78,10 @@ namespace ion::graphics::scene
 				@{
 			*/
 
-			void NotifyCameraFrustumChanged(const render::Frustum &frustum) noexcept;
-			void NotifyCameraMoved(const Vector3 &position) noexcept;
+			void NotifyCameraFrustumChanged() noexcept;
+			void NotifyCameraMoved() noexcept;
+			void NotifyCameraRotated() noexcept;
+			void NotifyCameraScaled() noexcept;
 
 			///@}
 
@@ -100,7 +106,6 @@ namespace ion::graphics::scene
 				{
 					position_ = position;
 					update_bounding_volumes_ = true;
-					NotifyCameraMoved(position);
 				}
 			}
 
@@ -126,7 +131,7 @@ namespace ion::graphics::scene
 				if (scaling_ != scaling)
 				{
 					scaling_ = scaling;
-					ScaleFrustum();
+					ScaleFrustum(DerivedScaling());
 					update_bounding_volumes_ = true;
 				}
 			}
@@ -136,9 +141,9 @@ namespace ion::graphics::scene
 			{
 				frustum_ = frustum;
 				frustum_clip_plane_ = frustum.ClipPlane();
-				ScaleFrustum();
+				ScaleFrustum(DerivedScaling());
 				update_bounding_volumes_ = true;
-				NotifyCameraFrustumChanged(frustum);
+				NotifyCameraFrustumChanged();
 			}
 
 
@@ -187,6 +192,19 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto& ViewFrustum() const noexcept
 			{
 				return frustum_;
+			}
+
+			///@brief Returns the view frustum of this camera with the given scaling applied
+			[[nodiscard]] inline auto ViewFrustum(const Vector2 &scaling) const noexcept
+			{
+				auto frustum = frustum_;
+
+				if (frustum_clip_plane_)
+					frustum.ClipPlane(frustum_clip_plane_->ScaleCopy(scaling));
+				else if (auto &clip_plane = frustum.ClipPlane(); clip_plane)
+					frustum.ClipPlane(clip_plane->ScaleCopy(scaling));
+
+				return frustum;
 			}
 
 			///@brief Returns the view matrix for this camera

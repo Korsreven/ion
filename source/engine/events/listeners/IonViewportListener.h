@@ -14,7 +14,6 @@ File:	IonViewportListener.h
 #define ION_VIEWPORT_LISTENER_H
 
 #include "IonManagedObjectListener.h"
-#include "graphics/utilities/IonVector2.h"
 
 namespace ion::graphics::render
 {
@@ -32,14 +31,14 @@ namespace ion::events::listeners
 			@{
 		*/
 
-		///@brief Called when a viewport has been resized, with the new size
-		virtual void ViewportResized([[maybe_unused]] graphics::utilities::Vector2 size) noexcept
+		///@brief Called when a viewport has been resized, with a reference to the viewport
+		virtual void ViewportResized([[maybe_unused]] graphics::render::Viewport &viewport) noexcept
 		{
 			//Optional to override
 		}
 
-		///@brief Called when a viewport has been moved, with the new position
-		virtual void ViewportMoved([[maybe_unused]] graphics::utilities::Vector2 position) noexcept
+		///@brief Called when a viewport has been moved, with a reference to the viewport
+		virtual void ViewportMoved([[maybe_unused]] graphics::render::Viewport &viewport) noexcept
 		{
 			//Optional to override
 		}

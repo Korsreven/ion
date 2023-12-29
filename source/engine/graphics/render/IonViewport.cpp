@@ -216,16 +216,16 @@ void render_to_viewport(const Vector2 &position, const Vector2 &size, const Colo
 	Notifying
 */
 
-void Viewport::NotifyViewportResized(const Vector2 &size) noexcept
+void Viewport::NotifyViewportResized() noexcept
 {
 	if (auto owner = Owner(); owner)
-		NotifyAll(owner->ViewportEvents().Listeners(), &events::listeners::ViewportListener::ViewportResized, size);
+		NotifyAll(owner->ViewportEvents().Listeners(), &events::listeners::ViewportListener::ViewportResized, std::ref(*this));
 }
 
-void Viewport::NotifyViewportMoved(const Vector2 &position) noexcept
+void Viewport::NotifyViewportMoved() noexcept
 {
 	if (auto owner = Owner(); owner)
-		NotifyAll(owner->ViewportEvents().Listeners(), &events::listeners::ViewportListener::ViewportMoved, position);
+		NotifyAll(owner->ViewportEvents().Listeners(), &events::listeners::ViewportListener::ViewportMoved, std::ref(*this));
 }
 
 
@@ -248,9 +248,9 @@ void Viewport::UpdateBounds(const Aabb &bounds) noexcept
 	bounds_ = bounds;
 
 	if (resized)
-		NotifyViewportResized(bounds_.ToSize());
+		NotifyViewportResized();
 	if (moved)
-		NotifyViewportMoved(bounds_.Min());
+		NotifyViewportMoved();
 }
 
 

@@ -14,8 +14,6 @@ File:	IonCameraListener.h
 #define ION_CAMERA_LISTENER_H
 
 #include "IonManagedObjectListener.h"
-#include "graphics/render/IonFrustum.h"
-#include "graphics/utilities/IonVector3.h"
 
 namespace ion::graphics::scene
 {
@@ -33,14 +31,26 @@ namespace ion::events::listeners
 			@{
 		*/
 
-		///@brief Called when a camera frustum has been changed, with the new frustum
-		virtual void CameraFrustumChanged([[maybe_unused]] graphics::render::Frustum frustum) noexcept
+		///@brief Called when a camera frustum has been changed, with a reference to the camera
+		virtual void CameraFrustumChanged([[maybe_unused]] graphics::scene::Camera &camera) noexcept
 		{
 			//Optional to override
 		}
 
-		///@brief Called when a camera has been repositioned, with the new position
-		virtual void CameraMoved([[maybe_unused]] graphics::utilities::Vector3 position) noexcept
+		///@brief Called when a camera has been repositioned, with a reference to the camera
+		virtual void CameraMoved([[maybe_unused]] graphics::scene::Camera &camera) noexcept
+		{
+			//Optional to override
+		}
+
+		///@brief Called when a camera has been rotated, with a reference to the camera
+		virtual void CameraRotated([[maybe_unused]] graphics::scene::Camera &camera) noexcept
+		{
+			//Optional to override
+		}
+
+		///@brief Called when a camera has been scaled, with a reference to the camera
+		virtual void CameraScaled([[maybe_unused]] graphics::scene::Camera &camera) noexcept
 		{
 			//Optional to override
 		}

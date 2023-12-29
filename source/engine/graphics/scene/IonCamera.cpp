@@ -71,10 +71,10 @@ Matrix4 get_view_matrix(const Vector3 &position, real angle) noexcept
 
 //Private
 
-void Camera::ScaleFrustum() noexcept
+void Camera::ScaleFrustum(const Vector2 &scaling) noexcept
 {
 	if (frustum_clip_plane_)
-		frustum_.ClipPlane(frustum_clip_plane_->ScaleCopy(DerivedScaling()));
+		frustum_.ClipPlane(frustum_clip_plane_->ScaleCopy(scaling));
 }
 
 void Camera::PrepareBoundingVolumes() noexcept
@@ -92,16 +92,28 @@ void Camera::PrepareBoundingVolumes() noexcept
 	Notifying
 */
 
-void Camera::NotifyCameraFrustumChanged(const Frustum &frustum) noexcept
+void Camera::NotifyCameraFrustumChanged() noexcept
 {
 	if (auto owner = Owner(); owner)
-		NotifyAll(owner->CameraEvents().Listeners(), &events::listeners::CameraListener::CameraFrustumChanged, frustum);
+		NotifyAll(owner->CameraEvents().Listeners(), &events::listeners::CameraListener::CameraFrustumChanged, std::ref(*this));
 }
 
-void Camera::NotifyCameraMoved(const Vector3 &position) noexcept
+void Camera::NotifyCameraMoved() noexcept
 {
 	if (auto owner = Owner(); owner)
-		NotifyAll(owner->CameraEvents().Listeners(), &events::listeners::CameraListener::CameraMoved, position);
+		NotifyAll(owner->CameraEvents().Listeners(), &events::listeners::CameraListener::CameraMoved, std::ref(*this));
+}
+
+void Camera::NotifyCameraRotated() noexcept
+{
+	if (auto owner = Owner(); owner)
+		NotifyAll(owner->CameraEvents().Listeners(), &events::listeners::CameraListener::CameraRotated, std::ref(*this));
+}
+
+void Camera::NotifyCameraScaled() noexcept
+{
+	if (auto owner = Owner(); owner)
+		NotifyAll(owner->CameraEvents().Listeners(), &events::listeners::CameraListener::CameraScaled, std::ref(*this));
 }
 
 
@@ -165,11 +177,12 @@ void Camera::CaptureScene(const render::Viewport &viewport) noexcept
 		update_bounding_volumes_ = true;
 	}
 
-	ScaleFrustum();
-	frustum_.ProjectScene(viewport_size_);
-
 	auto position = DerivedPosition();
 	auto rotation = DerivedRotation();
+	auto scaling = DerivedScaling();
+
+	ScaleFrustum(scaling);
+	frustum_.ProjectScene(viewport_size_);
 
 	detail::rotate_by(rotation);
 	detail::move_to(position);
@@ -179,6 +192,27 @@ void Camera::CaptureScene(const render::Viewport &viewport) noexcept
 	{
 		PrepareBoundingVolumes();
 		update_bounding_volumes_ = false;
+	}
+
+	//Moved
+	if (derived_position_ != position)
+	{
+		derived_position_ = position;
+		NotifyCameraMoved();
+	}
+
+	//Rotated
+	if (derived_rotation_ != rotation)
+	{
+		derived_rotation_ = rotation;
+		NotifyCameraRotated();
+	}
+
+	//Scaled
+	if (derived_scaling_ != scaling)
+	{
+		derived_scaling_ = scaling;
+		NotifyCameraScaled();
 	}
 }
 
