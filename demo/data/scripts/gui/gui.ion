@@ -188,7 +188,6 @@ gui
 			{
 				name: "sub";
 				z-order: 0.1;
-				grid-layout: vec2(3.54, 2.0) 3 3;
 
 				label
 				{
@@ -197,14 +196,21 @@ gui
 					tooltip: "My label tooltip";
 				}
 
-				grid-cell
+				grid
 				{
-					row: 2;
-					column: 0;
-					alignment: left;
-					vertical-alignment: bottom;
+					rows: 3;
+					columns: 3;
+					size: vec2(3.54, 2.0);
 
-					attach: "label";
+					cell
+					{
+						row: 2;
+						column: 0;
+						alignment: left;
+						vertical-alignment: bottom;
+
+						attach: "label";
+					}
 				}
 			}
 		}

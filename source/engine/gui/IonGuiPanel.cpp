@@ -12,7 +12,11 @@ File:	IonGuiPanel.cpp
 
 #include "IonGuiPanel.h"
 
+#include "graphics/render/IonViewport.h"
+#include "graphics/scene/IonCamera.h"
 #include "graphics/scene/graph/IonSceneNode.h"
+#include "gui/IonGuiController.h"
+#include "gui/IonGuiFrame.h"
 
 namespace ion::gui
 {
@@ -256,12 +260,56 @@ void GridCell::DetachAllControls() noexcept
 
 
 //Panel grid
+//Private
 
-PanelGrid::PanelGrid(GuiPanel &owner, const Vector2 &size, int rows, int columns) noexcept :
+GuiController* PanelGrid::GetController() const noexcept
+{
+	if (auto owner = Owner(); owner)
+	{
+		if (auto frame = Owner()->ParentFrame(); frame)
+			return frame->Owner();
+	}
+	
+	return nullptr;
+}
 
-	size_{size},
+Vector2 PanelGrid::ViewSize() const noexcept
+{
+	//Get ortho size from the default viewport camera
+	if (auto controller = GetController(); controller)
+	{
+		if (auto viewport = controller->DefaultViewport(); viewport)
+		{
+			if (auto camera = viewport->ConnectedCamera(); camera)
+			{
+				auto frustum = camera->ViewFrustum(vector2::UnitScale); //No scaling
+				auto [left, right, bottom, top, z_near, z_far] = frustum.ToOrthoBounds(viewport->Bounds().ToSize());
+				return {right - left, top - bottom};
+			}
+		}
+	}
+
+	return vector2::Zero;
+}
+
+
+//Public
+
+PanelGrid::PanelGrid(GuiPanel &owner, int rows, int columns) noexcept :
+
 	rows_{rows},
 	columns_{columns},
+	size_percentage_{vector2::UnitScale},
+	owner_{&owner}
+{
+	size_ = ViewSize();
+}
+
+PanelGrid::PanelGrid(GuiPanel &owner, int rows, int columns, const Vector2 &size) noexcept :
+
+	rows_{rows},
+	columns_{columns},
+	size_{size},
 	owner_{&owner}
 {
 	//Empty
@@ -288,6 +336,15 @@ void PanelGrid::Reposition() noexcept
 {
 	for (auto &[off, cell] : Cells())
 		cell.Reposition();
+}
+
+void PanelGrid::Resize() noexcept
+{
+	if (size_percentage_)
+	{
+		size_ = ViewSize() * *size_percentage_;
+		Reposition();
+	}
 }
 
 } //gui_panel
@@ -327,17 +384,21 @@ void GuiPanel::Show() noexcept
 }
 
 
-PanelGrid& GuiPanel::GridLayout(const Vector2 &size, int rows, int columns)
+gui_panel::PanelGrid& GuiPanel::GridLayout(int rows, int columns)
 {
-	if (rows < 1)
-		rows = 1;
-	if (columns < 1)
-		columns = 1;
-
 	if (grid_)
 		GridLayout(std::nullopt);
 
-	grid_.emplace(*this, size, rows, columns);
+	grid_.emplace(*this, rows < 1 ? 1 : rows, columns < 1 ? 1 : columns);
+	return *grid_;
+}
+
+PanelGrid& GuiPanel::GridLayout(int rows, int columns, const Vector2 &size)
+{
+	if (grid_)
+		GridLayout(std::nullopt);
+
+	grid_.emplace(*this, rows < 1 ? 1 : rows, columns < 1 ? 1 : columns, size);
 	return *grid_;
 }
 
@@ -386,6 +447,20 @@ void GuiPanel::FrameEnded(duration time) noexcept
 
 	for (auto &panel : Panels())
 		panel.FrameEnded(time);
+}
+
+
+/*
+	Viewport events
+*/
+
+void GuiPanel::ViewportResized(graphics::render::Viewport &viewport) noexcept
+{
+	for (auto &panel : Panels())
+		panel.ViewportResized(viewport);
+
+	if (grid_)
+		grid_->Resize();
 }
 
 } //ion::gui

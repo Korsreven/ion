@@ -148,6 +148,11 @@ namespace ion::script::interfaces
 			@{
 		*/
 
+		void set_panel_grid_properties(const script_tree::ObjectNode &object, gui::gui_panel::PanelGrid &grid,
+			gui::GuiPanel &panel);
+		void set_panel_grid_cell_properties(const script_tree::ObjectNode &object, gui::gui_panel::GridCell &cell,
+			gui::GuiPanel &panel);
+
 		void set_gui_properties(const script_tree::ObjectNode &object, gui::GuiController &gui_controller,
 			graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers);
 		void set_component_properties(const script_tree::ObjectNode &object, gui::GuiComponent &component,

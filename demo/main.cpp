@@ -797,8 +797,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		scene_script.Output(ion::script::script_builder::OutputOptions::HeaderAndSummary);
 		scene_script.CompilerOutput(ion::script::script_compiler::OutputOptions::SummaryAndUnits);
 		scene_script.ValidatorOutput(ion::script::script_validator::OutputOptions::SummaryAndErrors);
-		scene_script.CreateScene("scene.ion", scene_graph->RootNode(), *scene_manager);
-			
+		scene_script.CreateScene("scene.ion", scene_graph->RootNode(), *scene_manager);		
+
+		if (auto main_camera = scene_manager->GetCamera("main_camera"); main_camera)
+			viewport->ConnectedCamera(main_camera);
 
 		//Load scripts
 		ion::script::interfaces::GuiThemeScriptInterface gui_theme_script;
@@ -2426,7 +2428,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 		auto sub_panel = base_panel->CreatePanel("sub");
 		sub_panel->ZOrder(0.1_r);
-		auto &grid = sub_panel->GridLayout({3.54_r, 2.0_r}, 3, 3);
+		auto &grid = sub_panel->GridLayout(3, 3, {3.54_r, 2.0_r});
 		auto &cell = grid[{2, 0}];
 		cell.Alignment(ion::gui::gui_panel::GridCellAlignment::Left);
 		cell.VerticalAlignment(ion::gui::gui_panel::GridCellVerticalAlignment::Bottom);
@@ -2447,11 +2449,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		main_frame->Focus();
 	}
 
-
-	auto camera = scene_manager->GetCamera("main_camera");
-
-	if (viewport && camera)
-		viewport->ConnectedCamera(camera);
 
 	auto level_node = scene_graph->RootNode().GetChildNode("level_node");
 

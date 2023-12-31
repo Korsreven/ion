@@ -802,4 +802,15 @@ bool GuiFrame::MouseWheelRolled(int delta, Vector2 position) noexcept
 		false;
 }
 
+
+/*
+	Viewport events
+*/
+
+void GuiFrame::ViewportResized(graphics::render::Viewport &viewport) noexcept
+{
+	for (auto &panel : Panels())
+		panel.ViewportResized(viewport);
+}
+
 } //ion::gui

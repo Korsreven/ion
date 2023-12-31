@@ -27,6 +27,22 @@ File:	IonGuiPanel.h
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
+namespace ion
+{
+	namespace graphics
+	{
+		namespace render
+		{
+			class Viewport; //Forward declaration
+		}
+	}
+
+	namespace gui
+	{
+		class GuiController; //Forward declaration
+	}
+}
+
 namespace ion::gui
 {
 	using namespace events::listeners;
@@ -203,18 +219,27 @@ namespace ion::gui
 		class PanelGrid final
 		{
 			private:
-
-				Vector2 size_;
+			
 				int rows_ = 0;
 				int columns_ = 0;
+				Vector2 size_;
+				std::optional<Vector2> size_percentage_;
 				GuiPanel *owner_ = nullptr;
 
 				adaptors::FlatMap<std::pair<int, int>, GridCell> cells_;
 
+
+				GuiController* GetController() const noexcept;
+				Vector2 ViewSize() const noexcept;
+
+
 			public:
 
-				///@brief Constructs a panel grid with the given owner, size, rows and columns
-				PanelGrid(GuiPanel &owner, const Vector2 &size, int rows, int columns) noexcept;
+				///@brief Constructs a panel grid with the given owner, rows and columns
+				PanelGrid(GuiPanel &owner, int rows, int columns) noexcept;
+
+				///@brief Constructs a panel grid with the given owner, rows, columns and size
+				PanelGrid(GuiPanel &owner, int rows, int columns, const Vector2 &size) noexcept;
 
 
 				/**
@@ -278,6 +303,18 @@ namespace ion::gui
 						size_ = size;
 						Reposition();
 					}
+
+					size_percentage_ = {};
+				}
+
+				///@brief Sets the size percentage (for auto sizing) of this panel grid to the given percent
+				inline void SizePercentage(const Vector2 &size_percentage) noexcept
+				{
+					if (size_percentage_ != size_percentage)
+					{
+						size_percentage_ = size_percentage;
+						Resize();
+					}
 				}
 
 
@@ -290,18 +327,15 @@ namespace ion::gui
 				///@brief Repositions all cells in this panel grid
 				void Reposition() noexcept;
 
+				///@brief Resize this panel grid
+				void Resize() noexcept;
+
 				///@}
 
 				/**
 					@name Observers
 					@{
 				*/
-
-				///@brief Returns the size of this panel grid
-				[[nodiscard]] inline auto& Size() const noexcept
-				{
-					return size_;
-				}
 
 				///@brief Returns the number of rows in this panel grid
 				[[nodiscard]] inline auto Rows() const noexcept
@@ -313,6 +347,19 @@ namespace ion::gui
 				[[nodiscard]] inline auto Columns() const noexcept
 				{
 					return columns_;
+				}
+
+				///@brief Returns the size of this panel grid
+				[[nodiscard]] inline auto& Size() const noexcept
+				{
+					return size_;
+				}
+
+				///@brief Returns the size percentage of this panel grid
+				///@details Returns nullopt if this panel grid has no auto sizing
+				[[nodiscard]] inline auto& SizePercentage() const noexcept
+				{
+					return size_percentage_;
 				}
 
 				///@brief Returns a pointer to the owner of this panel grid
@@ -354,8 +401,11 @@ namespace ion::gui
 			void Show() noexcept;
 
 
-			///@brief Sets the grid layout for this gui panel to the given size, rows and columns
-			gui_panel::PanelGrid& GridLayout(const Vector2 &size, int rows, int columns);
+			///@brief Sets the grid layout for this gui panel to the given rows and columns
+			gui_panel::PanelGrid& GridLayout(int rows, int columns);
+
+			///@brief Sets the grid layout for this gui panel to the given rows, columns and size
+			gui_panel::PanelGrid& GridLayout(int rows, int columns, const Vector2 &size);
 
 			///@brief Clears the grid layout for this gui panel
 			void GridLayout(std::nullopt_t) noexcept;
@@ -414,6 +464,16 @@ namespace ion::gui
 
 			///@brief Called from gui frame when a frame has ended
 			virtual void FrameEnded(duration time) noexcept;
+
+			///@}
+
+			/**
+				@name Viewport events
+				@{
+			*/
+
+			///@brief Called from gui frame when the viewport has been resized
+			virtual void ViewportResized(graphics::render::Viewport &viewport) noexcept;
 
 			///@}
 	};

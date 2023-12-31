@@ -27,6 +27,7 @@ File:	IonGuiController.h
 #include "events/listeners/IonGuiFrameListener.h"
 #include "events/listeners/IonKeyListener.h"
 #include "events/listeners/IonMouseListener.h"
+#include "events/listeners/IonViewportListener.h"
 #include "events/listeners/IonWindowListener.h"
 #include "graphics/utilities/IonVector2.h"
 #include "managed/IonObjectManager.h"
@@ -113,12 +114,12 @@ namespace ion::gui
 		public GuiContainer,
 		public events::Listenable<events::listeners::GuiFrameListener>,
 		public events::listeners::GuiFrameListener,
+		public events::listeners::ViewportListener,
 		public managed::ObjectManager<skins::GuiTheme, GuiController>
 	{
 		private:
 
 			using FrameEventsBase = events::Listenable<events::listeners::GuiFrameListener>;
-			using ManagedObjectEventsBase = events::Listenable<events::listeners::ManagedObjectListener<GuiComponent, GuiContainer>>;
 			using ThemeBase = managed::ObjectManager<skins::GuiTheme, GuiController>;
 
 			
@@ -168,6 +169,10 @@ namespace ion::gui
 			///@details Make sure that if this gui frame listener is about to unsubscribe from the gui controller, cancel it
 			bool Unsubscribable(Listenable<events::listeners::GuiFrameListener>&) noexcept override final;
 
+			///@brief See Listener<T>::Unsubscribable for more details
+			///@details Make sure that if this viewport listener is about to unsubscribe from the render target, cancel it
+			bool Unsubscribable(Listenable<events::listeners::ViewportListener>&) noexcept override final;
+
 
 			///@brief See GuiFrameListener::Enabled for more details
 			void Enabled(GuiFrame &frame) noexcept override final;
@@ -188,6 +193,10 @@ namespace ion::gui
 
 			///@brief See GuiFrameListener::Defocused for more details
 			void Defocused(GuiFrame &frame) noexcept override final;
+
+
+			///@brief See ViewportListener::Resized for more details
+			void ViewportResized(graphics::render::Viewport &viewport) noexcept override final;
 
 
 			///@brief See GuiComponent::Enabled for more details
@@ -211,6 +220,15 @@ namespace ion::gui
 			GuiController(SceneNode &parent_node, NonOwningPtr<graphics::render::Viewport> default_viewport = nullptr,
 				NonOwningPtr<sounds::SoundChannelGroup> default_sound_channel_group = nullptr);
 
+			///@brief Deleted copy constructor
+			GuiController(const GuiController&) = delete;
+
+			///@brief Deleted move constructor
+			GuiController(GuiController&&) = delete;
+
+			///@brief Destructor
+			~GuiController();
+
 
 			/**
 				@name Events
@@ -227,19 +245,6 @@ namespace ion::gui
 			[[nodiscard]] inline auto& FrameEvents() const noexcept
 			{
 				return static_cast<const FrameEventsBase&>(*this);
-			}
-
-
-			///@brief Returns a mutable reference to the managed object events of this controller
-			[[nodiscard]] inline auto& ManagedObjectEvents() noexcept
-			{
-				return static_cast<ManagedObjectEventsBase&>(*this);
-			}
-
-			///@brief Returns an immutable reference to the managed object events of this controller
-			[[nodiscard]] inline auto& ManagedObjectEvents() const noexcept
-			{
-				return static_cast<const ManagedObjectEventsBase&>(*this);
 			}
 
 			///@}
@@ -311,6 +316,19 @@ namespace ion::gui
 			///@}
 
 			/**
+				@name Operators
+				@{
+			*/
+
+			///@brief Deleted copy assignment
+			GuiController& operator=(const GuiController&) = delete;
+
+			///@brief Deleted move assignment
+			GuiController& operator=(GuiController&&) = delete;
+
+			///@}
+
+			/**
 				@name Modifiers
 				@{
 			*/
@@ -326,10 +344,7 @@ namespace ion::gui
 
 
 			///@brief Sets the default viewport for this controller to the given viewport
-			inline void DefaultViewport(NonOwningPtr<graphics::render::Viewport> default_viewport) noexcept
-			{
-				default_viewport_ = default_viewport;
-			}
+			void DefaultViewport(NonOwningPtr<graphics::render::Viewport> default_viewport) noexcept;
 
 			///@brief Sets the default sound channel group for this controller to the given sound channel group
 			inline void DefaultSoundChannelGroup(NonOwningPtr<sounds::SoundChannelGroup> default_sound_channel_group) noexcept

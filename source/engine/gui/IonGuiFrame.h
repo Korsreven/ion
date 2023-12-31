@@ -31,6 +31,17 @@ File:	IonGuiFrame.h
 #include "memory/IonNonOwningPtr.h"
 #include "types/IonTypes.h"
 
+namespace ion
+{
+	namespace graphics
+	{
+		namespace render
+		{
+			class Viewport; //Forward declaration
+		}
+	}
+}
+
 namespace ion::gui
 {
 	using namespace events::listeners;
@@ -88,7 +99,6 @@ namespace ion::gui
 		private:
 
 			using ControlEventsBase = events::Listenable<events::listeners::GuiControlListener>;
-			using ManagedObjectEventsBase = events::Listenable<events::listeners::ManagedObjectListener<GuiComponent, GuiContainer>>;
 			using FrameEventsGeneratorBase = events::EventGenerator<events::listeners::GuiFrameListener>;
 
 			gui_frame::detail::control_pointers ordered_controls_;
@@ -253,19 +263,6 @@ namespace ion::gui
 			[[nodiscard]] inline auto& ControlEvents() const noexcept
 			{
 				return static_cast<const ControlEventsBase&>(*this);
-			}
-
-
-			///@brief Returns a mutable reference to the managed object events of this frame
-			[[nodiscard]] inline auto& ManagedObjectEvents() noexcept
-			{
-				return static_cast<ManagedObjectEventsBase&>(*this);
-			}
-
-			///@brief Returns an immutable reference to the managed object events of this frame
-			[[nodiscard]] inline auto& ManagedObjectEvents() const noexcept
-			{
-				return static_cast<const ManagedObjectEventsBase&>(*this);
 			}
 			
 			///@}
@@ -534,6 +531,16 @@ namespace ion::gui
 			///@brief Called from gui controller when the mouse wheel has been rolled
 			///@details Returns true if the mouse wheel roll event has been consumed by the frame
 			virtual bool MouseWheelRolled(int delta, Vector2 position) noexcept;
+
+			///@}
+
+			/**
+				@name Viewport events
+				@{
+			*/
+
+			///@brief Called from gui controller when the viewport has been resized
+			virtual void ViewportResized(graphics::render::Viewport &viewport) noexcept;
 
 			///@}
 	};

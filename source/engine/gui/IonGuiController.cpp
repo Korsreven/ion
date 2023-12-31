@@ -15,6 +15,8 @@ File:	IonGuiController.cpp
 #include <algorithm>
 #include <utility>
 
+#include "graphics/render/IonRenderTarget.h"
+#include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonModel.h"
 #include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneNode.h"
@@ -294,6 +296,12 @@ bool GuiController::Unsubscribable(Listenable<events::listeners::GuiFrameListene
 	return false;
 }
 
+bool GuiController::Unsubscribable(Listenable<events::listeners::ViewportListener>&) noexcept
+{
+	//Cancel all unsubscribe attempts
+	return false;
+}
+
 
 void GuiController::Enabled([[maybe_unused]] GuiFrame &frame) noexcept
 {
@@ -352,6 +360,13 @@ void GuiController::Defocused(GuiFrame &frame) noexcept
 }
 
 
+void GuiController::ViewportResized(graphics::render::Viewport &viewport) noexcept
+{
+	for (auto &frame : Frames())
+		frame.ViewportResized(viewport);
+}
+
+
 void GuiController::Enabled() noexcept
 {
 	GuiContainer::Enabled(); //Use base functionality
@@ -395,13 +410,18 @@ void GuiController::Hidden() noexcept
 //Public
 
 GuiController::GuiController(SceneNode &parent_node, NonOwningPtr<graphics::render::Viewport> default_viewport,
-	NonOwningPtr<sounds::SoundChannelGroup> default_sound_channel_group) :
-
-	default_viewport_{default_viewport},
-	default_sound_channel_group_{default_sound_channel_group}
+	NonOwningPtr<sounds::SoundChannelGroup> default_sound_channel_group)
 {
 	node_ = parent_node.CreateChildNode();
 	FrameEvents().Subscribe(*this);
+
+	DefaultViewport(default_viewport);
+	DefaultSoundChannelGroup(default_sound_channel_group);
+}
+
+GuiController::~GuiController()
+{
+	DefaultViewport(nullptr);
 }
 
 
@@ -428,6 +448,25 @@ void GuiController::ActiveTooltip(std::string_view name) noexcept
 void GuiController::ActiveTheme(std::string_view name) noexcept
 {
 	active_theme_ = GetTheme(name).get();
+}
+
+
+void GuiController::DefaultViewport(NonOwningPtr<graphics::render::Viewport> default_viewport) noexcept
+{
+	if (default_viewport_ != default_viewport)
+	{
+		if (default_viewport_)
+		{
+			ViewportListener::Listening(false);
+			default_viewport_->Owner()->ViewportEvents().Unsubscribe(*this);
+			ViewportListener::Listening(true);
+		}
+
+		default_viewport_ = default_viewport;
+
+		if (default_viewport_)
+			default_viewport_->Owner()->ViewportEvents().Subscribe(*this);
+	}
 }
 
 
