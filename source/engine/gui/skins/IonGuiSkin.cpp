@@ -310,7 +310,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 						control_skin.Parts.Center->Size().Y() * 0.5_r + control_skin.Parts.TopRight->Size().Y() * 0.5_r, 0.0_r});
 				else if (control_skin.Parts.Top && control_skin.Parts.Right)
 					control_skin.Parts.TopRight->Position(
-						{control_skin.Parts.Top->Size().X() * 0.5_r - control_skin.Parts.TopRight->Size().X() * 0.5_r,
+						{control_skin.Parts.Top->Size().X() * 0.5_r + control_skin.Parts.TopRight->Size().X() * 0.5_r,
 						control_skin.Parts.Right->Size().Y() * 0.5_r + control_skin.Parts.TopRight->Size().Y() * 0.5_r, 0.0_r});
 			}
 
