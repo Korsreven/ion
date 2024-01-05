@@ -66,6 +66,9 @@ namespace ion::script::interfaces
 		graphics::fonts::text::TextBlockStyle create_text_style(const script_tree::ObjectNode &object);
 		graphics::render::RenderPass create_render_pass(const script_tree::ObjectNode &object,
 			const ManagerRegister &managers);
+
+
+		void set_gui_skin_properties(const script_tree::ObjectNode &object, gui::skins::GuiSkin &skin);
 		
 
 		NonOwningPtr<gui::skins::GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,

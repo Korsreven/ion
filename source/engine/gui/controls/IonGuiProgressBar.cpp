@@ -233,7 +233,7 @@ void GuiProgressBar::UpdateBar() noexcept
 	{
 		if (auto &skin = static_cast<ProgressBarSkin&>(*skin_); skin.Bar)
 		{
-			if (auto area = InnerArea(); area)
+			if (auto area = ContentArea(); area)
 				detail::update_bar(skin.Bar, type_, flipped_, Percent(), *area);
 		}
 	}
@@ -245,7 +245,7 @@ void GuiProgressBar::UpdateBarInterpolated() noexcept
 	{
 		if (auto &skin = static_cast<ProgressBarSkin&>(*skin_); skin.BarInterpolated)
 		{
-			if (auto area = InnerArea(); area)
+			if (auto area = ContentArea(); area)
 				detail::update_bar(skin.BarInterpolated, type_, flipped_, InterpolatedPercent(), *area);
 		}
 	}

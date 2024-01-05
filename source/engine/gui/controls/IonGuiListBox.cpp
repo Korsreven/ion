@@ -308,9 +308,9 @@ void GuiListBox::UpdateLines() noexcept
 		//Lines text
 		if (auto &text = skin->Lines->Get(); text)
 		{
-			if (auto size = InnerSize(); size)
+			if (auto size = ContentSize(); size)
 			{
-				auto center = CenterArea().value_or(aabb::Zero).Center();
+				auto center = ContentArea().value_or(aabb::Zero).Center();
 				auto icon_column_size = show_icons_ ?
 					*size * Vector2{icon_column_width_.value_or(detail::default_icon_column_width_percent), 0.0_r} :
 					vector2::Zero;
@@ -345,10 +345,10 @@ void GuiListBox::UpdateIcons() noexcept
 		if (auto &text = skin->Lines->GetImmutable();
 			text && text->LineHeight())
 		{
-			if (auto size = InnerSize(); size)
+			if (auto size = ContentSize(); size)
 			{
 				auto [width, height] = size->XY();
-				auto center = CenterArea().value_or(aabb::Zero).Center();
+				auto center = ContentArea().value_or(aabb::Zero).Center();
 
 				auto ppu = Engine::PixelsPerUnit();
 				auto item_height = *text->LineHeight() / ppu;
@@ -421,10 +421,10 @@ void GuiListBox::UpdateSelection() noexcept
 				if (auto item_off = *item_index_ - text->FromLine();
 					item_off >= 0 && item_off < text->DisplayedLineCount())
 				{
-					if (auto size = InnerSize(); size)
+					if (auto size = ContentSize(); size)
 					{
 						auto [width, height] = size->XY();
-						auto center = CenterArea().value_or(aabb::Zero).Center();
+						auto center = ContentArea().value_or(aabb::Zero).Center();
 
 						auto ppu = Engine::PixelsPerUnit();
 						auto item_height = *text->LineHeight() / ppu;
@@ -885,10 +885,10 @@ bool GuiListBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 			if (auto &text = skin->Lines->GetImmutable();
 				text && text->LineHeight())
 			{
-				if (auto size = InnerSize(); size)
+				if (auto size = ContentSize(); size)
 				{
 					auto [width, height] = size->XY();
-					auto center = CenterArea().value_or(aabb::Zero).Center();
+					auto center = ContentArea().value_or(aabb::Zero).Center();
 
 					auto ppu = Engine::PixelsPerUnit();
 					auto item_height = *text->LineHeight() / ppu;

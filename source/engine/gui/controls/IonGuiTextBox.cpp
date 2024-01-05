@@ -537,9 +537,9 @@ void GuiTextBox::UpdateText() noexcept
 		//Text
 		if (auto &text = skin->Text->Get(); text)
 		{
-			if (auto size = InnerSize(); size)
+			if (auto size = ContentSize(); size)
 			{
-				auto center = CenterArea().value_or(aabb::Zero).Center();
+				auto center = ContentArea().value_or(aabb::Zero).Center();
 
 				auto ppu = Engine::PixelsPerUnit();
 				text->Formatting(graphics::fonts::text::TextFormatting::None);
@@ -611,10 +611,10 @@ void GuiTextBox::UpdateCursor() noexcept
 		{
 			auto font = detail::get_font(*text);
 
-			if (auto size = InnerSize(); size && font)
+			if (auto size = ContentSize(); size && font)
 			{
 				auto [width, height] = size->XY();
-				auto center = CenterArea().value_or(aabb::Zero).Center();
+				auto center = ContentArea().value_or(aabb::Zero).Center();
 
 				auto ppu = Engine::PixelsPerUnit();
 				auto line_height = *text->LineHeight() / ppu;
@@ -1262,10 +1262,10 @@ bool GuiTextBox::MouseReleased(MouseButton button, Vector2 position) noexcept
 			{
 				auto font = detail::get_font(*text);
 
-				if (auto size = InnerSize(); size && font)
+				if (auto size = ContentSize(); size && font)
 				{
 					auto [width, height] = size->XY();
-					auto center = CenterArea().value_or(aabb::Zero).Center();
+					auto center = ContentArea().value_or(aabb::Zero).Center();
 
 					auto ppu = Engine::PixelsPerUnit();
 					auto line_width = detail::string_width(

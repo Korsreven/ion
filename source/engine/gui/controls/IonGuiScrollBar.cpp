@@ -78,7 +78,7 @@ void GuiScrollBar::UpdateHandle() noexcept
 		if (auto &skin = static_cast<ScrollBarSkin&>(*skin_); skin.Handle)
 		{
 			//Set handle size
-			if (auto size = InnerSize(); size)
+			if (auto size = ContentSize(); size)
 			{
 				auto [width, height] = size->XY();
 				auto [handle_width, handle_height] = skin.Handle->Size().XY();
@@ -182,7 +182,7 @@ bool GuiScrollBar::MouseReleased(MouseButton button, Vector2 position) noexcept
 		{
 			if (auto &skin = static_cast<ScrollBarSkin&>(*skin_); skin.Handle)
 			{
-				if (auto size = InnerSize(); size)
+				if (auto size = ContentSize(); size)
 				{
 					auto handle_size = skin.Handle->Size();
 					auto handle_position = skin.Handle->Position();

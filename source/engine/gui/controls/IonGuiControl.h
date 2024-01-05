@@ -222,6 +222,8 @@ namespace ion::gui::controls
 			ControlSkinTextPart Caption;
 			ControlSkinSoundParts Sounds;
 
+			Vector2 BorderOffsetSize = vector2::Zero;
+
 			//Default virtual destructor
 			virtual ~ControlSkin() = default;
 
@@ -295,20 +297,23 @@ namespace ion::gui::controls
 				@{
 			*/
 
-			void resize_part(graphics::scene::shapes::Sprite &sprite, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept;
-			void resize_part(ControlSkinPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept;		
+			void resize_part(graphics::scene::shapes::Sprite &sprite, const Vector2 &delta_size, const Vector2 &delta_position,
+				const Vector2 &center, const std::optional<Vector2> &direction = {}) noexcept;
+			void resize_part(ControlSkinPart &part, const Vector2 &delta_size, const Vector2 &delta_position,
+				const Vector2 &center, const std::optional<Vector2> &direction = {}) noexcept;		
 			void resize_skin(ControlSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 
 			void resize_hit_box(Aabb &hit_box, const Vector2 &scaling) noexcept;
 			void resize_hit_boxes(BoundingBoxes &hit_boxes, const Vector2 &from_size, const Vector2 &to_size) noexcept;
 
+			std::optional<Aabb> get_area_inside_border(const ControlSkin &skin) noexcept;
 
 			std::optional<Aabb> get_area(const ControlSkin &skin, bool include_caption) noexcept;
-			std::optional<Aabb> get_center_area(const ControlSkin &skin, bool include_caption) noexcept;
+			std::optional<Aabb> get_content_area(const ControlSkin &skin, bool include_caption) noexcept;
 			std::optional<Aabb> get_inner_area(const ControlSkin &skin, bool include_caption) noexcept;
 
 			std::optional<Vector2> get_size(const ControlSkin &skin, bool include_caption) noexcept;
-			std::optional<Vector2> get_center_size(const ControlSkin &skin, bool include_caption) noexcept;
+			std::optional<Vector2> get_content_size(const ControlSkin &skin, bool include_caption) noexcept;
 			std::optional<Vector2> get_inner_size(const ControlSkin &skin, bool include_caption) noexcept;
 			std::optional<Vector2> get_border_size(const ControlSkin &skin, bool include_caption) noexcept;
 
@@ -958,10 +963,10 @@ namespace ion::gui::controls
 				return size_;
 			}
 
-			///@brief Returns the center size of this control
+			///@brief Returns the content size of this control
 			///@details The returned size includes center part or caption (if no center).
-			///Returns nullopt if this control has no center size
-			[[nodiscard]] std::optional<Vector2> CenterSize() const noexcept;
+			///Returns nullopt if this control has no content size
+			[[nodiscard]] std::optional<Vector2> ContentSize() const noexcept;
 
 			///@brief Returns the inner size of this control
 			///@details The returned size includes center area or area (if no center).
@@ -1034,12 +1039,12 @@ namespace ion::gui::controls
 			///Returns nullopt of this control has no area
 			[[nodiscard]] std::optional<Aabb> Area() const noexcept;
 
-			///@brief Returns the inne area of this control
+			///@brief Returns the content area of this control
 			///@details The returned area includes center part or caption (if no center).
-			///Returns nullopt of this control has no center area
-			[[nodiscard]] std::optional<Aabb> CenterArea() const noexcept;
+			///Returns nullopt of this control has no content area
+			[[nodiscard]] std::optional<Aabb> ContentArea() const noexcept;
 
-			///@brief Returns the inne area of this control
+			///@brief Returns the inner area of this control
 			///@details The returned area includes center area or area (if no center).
 			///Returns nullopt of this control has no inner area
 			[[nodiscard]] std::optional<Aabb> InnerArea() const noexcept;

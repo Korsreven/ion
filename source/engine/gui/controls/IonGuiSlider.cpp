@@ -176,7 +176,7 @@ void GuiSlider::UpdateHandle() noexcept
 		if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
 		{
 			//Set handle position
-			if (auto area = InnerArea(); area)
+			if (auto area = ContentArea(); area)
 			{
 				auto [min, max] =
 					type_ == SliderType::Vertical ?
@@ -386,7 +386,7 @@ bool GuiSlider::MouseMoved(Vector2 position) noexcept
 	{
 		if (auto &skin = static_cast<SliderSkin&>(*skin_); skin.Handle)
 		{
-			if (auto size = InnerSize(); size)
+			if (auto size = ContentSize(); size)
 			{
 				if (skin_node_)
 				{

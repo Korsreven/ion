@@ -31,14 +31,12 @@ File:	IonGuiSkin.cpp
 #include "gui/controls/IonGuiSlider.h"
 #include "gui/controls/IonGuiTextBox.h"
 #include "gui/controls/IonGuiTooltip.h"
-#include "types/IonTypes.h"
 
 namespace ion::gui::skins
 {
 
 using namespace gui_skin;
 using namespace graphics::utilities;
-using namespace types::type_literals;
 
 namespace gui_skin::detail
 {
@@ -50,13 +48,49 @@ void set_sprite_properties(const SkinPart &part, graphics::scene::shapes::Sprite
 	if (part.AutoRepeat)
 		sprite.AutoRepeat(*part.AutoRepeat);
 
+	sprite.Position(sprite.Position() + part.Position);
+	sprite.Rotation(sprite.Rotation() + part.Rotation);
 	sprite.Size(sprite.Size() * part.Scaling);
+
 	sprite.FillColor(part.FillColor);
 
 	if (part.FlipHorizontal)
 		sprite.FlipHorizontal();
 	if (part.FlipVertical)
 		sprite.FlipVertical();
+}
+
+Vector2 get_sprite_offset(SkinPartsAlignment alignment, const graphics::scene::shapes::Sprite &sprite) noexcept
+{
+	switch (alignment)
+	{
+		case SkinPartsAlignment::Center:
+		return sprite.Size() * 0.5_r;
+
+		case SkinPartsAlignment::Inside:
+		return sprite.Size();
+
+		case SkinPartsAlignment::Outside:
+		default:
+		return vector2::Zero;
+	}
+}
+
+Vector2 get_border_offset(SkinPartsAlignment alignment, const graphics::scene::shapes::Sprite &vertical_side,
+	const graphics::scene::shapes::Sprite &horizontal_side) noexcept
+{
+	switch (alignment)
+	{
+		case SkinPartsAlignment::Center:
+		return {vertical_side.Size().X() * 0.5_r, horizontal_side.Size().Y() * 0.5_r};
+
+		case SkinPartsAlignment::Inside:
+		return {vertical_side.Size().X(), horizontal_side.Size().Y()};
+
+		case SkinPartsAlignment::Outside:
+		default:
+		return vector2::Zero;
+	}
 }
 
 
@@ -230,114 +264,185 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			}
 
 
+			static auto z_epsilon_sides = Engine::ZEpsilon() * 3.0_r;
+			static auto z_epsilon_corners = Engine::ZEpsilon() * 4.0_r;
+
 			//Sides
 			//Top part (position)
 			if (control_skin.Parts.Top)
 			{
+				auto [x, y, z] = control_skin.Parts.Top->Position().XYZ();
+				y -= get_sprite_offset(skin.BorderAlignment(), *control_skin.Parts.Top.Object).Y();		
+
 				if (control_skin.Parts.Center)
 					control_skin.Parts.Top->Position(
-						{0.0_r, control_skin.Parts.Center->Size().Y() * 0.5_r + control_skin.Parts.Top->Size().Y() * 0.5_r, 0.0_r});
+						{x, y + control_skin.Parts.Center->Size().Y() * 0.5_r + control_skin.Parts.Top->Size().Y() * 0.5_r, z + z_epsilon_sides});
 				else if (control_skin.Parts.Left)
 					control_skin.Parts.Top->Position(
-						{0.0_r, control_skin.Parts.Left->Size().Y() * 0.5_r + control_skin.Parts.Top->Size().Y() * 0.5_r, 0.0_r});
+						{x, y + control_skin.Parts.Left->Size().Y() * 0.5_r + control_skin.Parts.Top->Size().Y() * 0.5_r, z + z_epsilon_sides});
 				else if (control_skin.Parts.Right)
 					control_skin.Parts.Top->Position(
-						{0.0_r, control_skin.Parts.Right->Size().Y() * 0.5_r + control_skin.Parts.Top->Size().Y() * 0.5_r, 0.0_r});
+						{x, y + control_skin.Parts.Right->Size().Y() * 0.5_r + control_skin.Parts.Top->Size().Y() * 0.5_r, z + z_epsilon_sides});
 			}
 
 			//Bottom part (position)
 			if (control_skin.Parts.Bottom)
 			{
+				auto [x, y, z] = control_skin.Parts.Bottom->Position().XYZ();
+				y += get_sprite_offset(skin.BorderAlignment(), *control_skin.Parts.Bottom.Object).Y();
+
 				if (control_skin.Parts.Center)
 					control_skin.Parts.Bottom->Position(
-						{0.0_r, -control_skin.Parts.Center->Size().Y() * 0.5_r - control_skin.Parts.Bottom->Size().Y() * 0.5_r, 0.0_r});
+						{x, y + -control_skin.Parts.Center->Size().Y() * 0.5_r - control_skin.Parts.Bottom->Size().Y() * 0.5_r, z + z_epsilon_sides});
 				else if (control_skin.Parts.Left)
 					control_skin.Parts.Bottom->Position(
-						{0.0_r, -control_skin.Parts.Left->Size().Y() * 0.5_r - control_skin.Parts.Bottom->Size().Y() * 0.5_r, 0.0_r});
+						{x, y + -control_skin.Parts.Left->Size().Y() * 0.5_r - control_skin.Parts.Bottom->Size().Y() * 0.5_r, z + z_epsilon_sides});
 				else if (control_skin.Parts.Right)
 					control_skin.Parts.Bottom->Position(
-						{0.0_r, -control_skin.Parts.Right->Size().Y() * 0.5_r - control_skin.Parts.Bottom->Size().Y() * 0.5_r, 0.0_r});
+						{x, y + -control_skin.Parts.Right->Size().Y() * 0.5_r - control_skin.Parts.Bottom->Size().Y() * 0.5_r, z + z_epsilon_sides});
 			}
 
 			//Left part (position)
 			if (control_skin.Parts.Left)
 			{
+				auto [x, y, z] = control_skin.Parts.Left->Position().XYZ();
+				x += get_sprite_offset(skin.BorderAlignment(), *control_skin.Parts.Left.Object).X();
+
 				if (control_skin.Parts.Center)
 					control_skin.Parts.Left->Position(
-						{-control_skin.Parts.Center->Size().X() * 0.5_r - control_skin.Parts.Left->Size().X() * 0.5_r, 0.0_r, 0.0_r});
+						{x + -control_skin.Parts.Center->Size().X() * 0.5_r - control_skin.Parts.Left->Size().X() * 0.5_r, y, z + z_epsilon_sides});
 				else if (control_skin.Parts.Top)
 					control_skin.Parts.Left->Position(
-						{-control_skin.Parts.Top->Size().X() * 0.5_r - control_skin.Parts.Left->Size().X() * 0.5_r, 0.0_r, 0.0_r});
+						{x + -control_skin.Parts.Top->Size().X() * 0.5_r - control_skin.Parts.Left->Size().X() * 0.5_r, y, z + z_epsilon_sides});
 				else if (control_skin.Parts.Bottom)
 					control_skin.Parts.Left->Position(
-						{-control_skin.Parts.Bottom->Size().X() * 0.5_r - control_skin.Parts.Left->Size().X() * 0.5_r, 0.0_r, 0.0_r});
+						{x + -control_skin.Parts.Bottom->Size().X() * 0.5_r - control_skin.Parts.Left->Size().X() * 0.5_r, y, z + z_epsilon_sides});
 			}
 
 			//Right part (position)
 			if (control_skin.Parts.Right)
 			{
+				auto [x, y, z] = control_skin.Parts.Right->Position().XYZ();
+				x -= get_sprite_offset(skin.BorderAlignment(), *control_skin.Parts.Right.Object).X();
+
 				if (control_skin.Parts.Center)
 					control_skin.Parts.Right->Position(
-						{control_skin.Parts.Center->Size().X() * 0.5_r + control_skin.Parts.Right->Size().X() * 0.5_r, 0.0_r, 0.0_r});
+						{x + control_skin.Parts.Center->Size().X() * 0.5_r + control_skin.Parts.Right->Size().X() * 0.5_r, y, z + z_epsilon_sides});
 				else if (control_skin.Parts.Top)
 					control_skin.Parts.Right->Position(
-						{control_skin.Parts.Top->Size().X() * 0.5_r + control_skin.Parts.Right->Size().X() * 0.5_r, 0.0_r, 0.0_r});
+						{x + control_skin.Parts.Top->Size().X() * 0.5_r + control_skin.Parts.Right->Size().X() * 0.5_r, y, z + z_epsilon_sides});
 				else if (control_skin.Parts.Bottom)
 					control_skin.Parts.Right->Position(
-						{control_skin.Parts.Bottom->Size().X() * 0.5_r + control_skin.Parts.Right->Size().X() * 0.5_r, 0.0_r, 0.0_r});
+						{x + control_skin.Parts.Bottom->Size().X() * 0.5_r + control_skin.Parts.Right->Size().X() * 0.5_r, y, z + z_epsilon_sides});
 			}
 
 			//Corners
 			//Top-left part (position)
 			if (control_skin.Parts.TopLeft)
 			{
-				if (control_skin.Parts.Center)
+				auto [x, y, z] = control_skin.Parts.TopLeft->Position().XYZ();
+				auto offset = get_sprite_offset(skin.CornerAlignment(), *control_skin.Parts.TopLeft.Object);
+				x += offset.X();
+				y -= offset.Y();
+
+				if (control_skin.Parts.Top && control_skin.Parts.Left)
+				{
+					offset = get_border_offset(skin.BorderAlignment(),
+						*control_skin.Parts.Left.Object, *control_skin.Parts.Top.Object);
+					x += offset.X();
+					y -= offset.Y();
+
 					control_skin.Parts.TopLeft->Position(
-						{-control_skin.Parts.Center->Size().X() * 0.5_r - control_skin.Parts.TopLeft->Size().X() * 0.5_r,
-						control_skin.Parts.Center->Size().Y() * 0.5_r + control_skin.Parts.TopLeft->Size().Y() * 0.5_r, 0.0_r});
-				else if (control_skin.Parts.Top && control_skin.Parts.Left)
+						{x + -control_skin.Parts.Top->Size().X() * 0.5_r - control_skin.Parts.TopLeft->Size().X() * 0.5_r,
+						 y + control_skin.Parts.Left->Size().Y() * 0.5_r + control_skin.Parts.TopLeft->Size().Y() * 0.5_r,
+						 z + z_epsilon_corners});
+				}
+				else if (control_skin.Parts.Center)
 					control_skin.Parts.TopLeft->Position(
-						{-control_skin.Parts.Top->Size().X() * 0.5_r - control_skin.Parts.TopLeft->Size().X() * 0.5_r,
-						control_skin.Parts.Left->Size().Y() * 0.5_r + control_skin.Parts.TopLeft->Size().Y() * 0.5_r, 0.0_r});
+						{x + -control_skin.Parts.Center->Size().X() * 0.5_r - control_skin.Parts.TopLeft->Size().X() * 0.5_r,
+						 y + control_skin.Parts.Center->Size().Y() * 0.5_r + control_skin.Parts.TopLeft->Size().Y() * 0.5_r,
+						 z + z_epsilon_corners});
 			}
 
 			//Top-right part (position)
 			if (control_skin.Parts.TopRight)
 			{
-				if (control_skin.Parts.Center)
+				auto [x, y, z] = control_skin.Parts.TopRight->Position().XYZ();
+				auto offset = get_sprite_offset(skin.CornerAlignment(), *control_skin.Parts.TopRight.Object);
+				x -= offset.X();
+				y -= offset.Y();
+
+				if (control_skin.Parts.Top && control_skin.Parts.Right)
+				{
+					offset = get_border_offset(skin.BorderAlignment(),
+						*control_skin.Parts.Right.Object, *control_skin.Parts.Top.Object);
+					x -= offset.X();
+					y -= offset.Y();
+
 					control_skin.Parts.TopRight->Position(
-						{control_skin.Parts.Center->Size().X() * 0.5_r + control_skin.Parts.TopRight->Size().X() * 0.5_r,
-						control_skin.Parts.Center->Size().Y() * 0.5_r + control_skin.Parts.TopRight->Size().Y() * 0.5_r, 0.0_r});
-				else if (control_skin.Parts.Top && control_skin.Parts.Right)
+						{x + control_skin.Parts.Top->Size().X() * 0.5_r + control_skin.Parts.TopRight->Size().X() * 0.5_r,
+						 y + control_skin.Parts.Right->Size().Y() * 0.5_r + control_skin.Parts.TopRight->Size().Y() * 0.5_r,
+						 z + z_epsilon_corners});
+				}
+				else if (control_skin.Parts.Center)
 					control_skin.Parts.TopRight->Position(
-						{control_skin.Parts.Top->Size().X() * 0.5_r + control_skin.Parts.TopRight->Size().X() * 0.5_r,
-						control_skin.Parts.Right->Size().Y() * 0.5_r + control_skin.Parts.TopRight->Size().Y() * 0.5_r, 0.0_r});
+						{x + control_skin.Parts.Center->Size().X() * 0.5_r + control_skin.Parts.TopRight->Size().X() * 0.5_r,
+						 y + control_skin.Parts.Center->Size().Y() * 0.5_r + control_skin.Parts.TopRight->Size().Y() * 0.5_r,
+						 z + z_epsilon_corners});
 			}
 
 			//Bottom-left part (position)
 			if (control_skin.Parts.BottomLeft)
 			{
-				if (control_skin.Parts.Center)
+				auto [x, y, z] = control_skin.Parts.BottomLeft->Position().XYZ();
+				auto offset = get_sprite_offset(skin.CornerAlignment(), *control_skin.Parts.BottomLeft.Object);
+				x += offset.X();
+				y += offset.Y();
+				
+				if (control_skin.Parts.Bottom && control_skin.Parts.Left)
+				{
+					offset = get_border_offset(skin.BorderAlignment(),
+						*control_skin.Parts.Left.Object, *control_skin.Parts.Bottom.Object);
+					x += offset.X();
+					y += offset.Y();
+					
 					control_skin.Parts.BottomLeft->Position(
-						{-control_skin.Parts.Center->Size().X() * 0.5_r - control_skin.Parts.BottomLeft->Size().X() * 0.5_r,
-						-control_skin.Parts.Center->Size().Y() * 0.5_r - control_skin.Parts.BottomLeft->Size().Y() * 0.5_r, 0.0_r});
-				else if (control_skin.Parts.Bottom && control_skin.Parts.Left)
+						{x + -control_skin.Parts.Bottom->Size().X() * 0.5_r - control_skin.Parts.BottomLeft->Size().X() * 0.5_r,
+						 y + -control_skin.Parts.Left->Size().Y() * 0.5_r - control_skin.Parts.BottomLeft->Size().Y() * 0.5_r,
+						 z + z_epsilon_corners});
+				}
+				else if (control_skin.Parts.Center)
 					control_skin.Parts.BottomLeft->Position(
-						{-control_skin.Parts.Bottom->Size().X() * 0.5_r - control_skin.Parts.BottomLeft->Size().X() * 0.5_r,
-						-control_skin.Parts.Left->Size().Y() * 0.5_r - control_skin.Parts.BottomLeft->Size().Y() * 0.5_r, 0.0_r});
+						{x + -control_skin.Parts.Center->Size().X() * 0.5_r - control_skin.Parts.BottomLeft->Size().X() * 0.5_r,
+						 y + -control_skin.Parts.Center->Size().Y() * 0.5_r - control_skin.Parts.BottomLeft->Size().Y() * 0.5_r,
+						 z + z_epsilon_corners});
 			}
 
 			//Bottom-right part (position)
 			if (control_skin.Parts.BottomRight)
 			{
-				if (control_skin.Parts.Center)
+				auto [x, y, z] = control_skin.Parts.BottomRight->Position().XYZ();
+				auto offset = get_sprite_offset(skin.CornerAlignment(), *control_skin.Parts.BottomRight.Object);
+				x -= offset.X();
+				y += offset.Y();
+
+				if (control_skin.Parts.Bottom && control_skin.Parts.Right)
+				{
+					offset = get_border_offset(skin.BorderAlignment(),
+						*control_skin.Parts.Right.Object, *control_skin.Parts.Bottom.Object);
+					x -= offset.X();
+					y += offset.Y();
+
 					control_skin.Parts.BottomRight->Position(
-						{control_skin.Parts.Center->Size().X() * 0.5_r + control_skin.Parts.BottomRight->Size().X() * 0.5_r,
-						-control_skin.Parts.Center->Size().Y() * 0.5_r - control_skin.Parts.BottomRight->Size().Y() * 0.5_r, 0.0_r});
-				else if (control_skin.Parts.Bottom && control_skin.Parts.Right)
+						{x + control_skin.Parts.Bottom->Size().X() * 0.5_r + control_skin.Parts.BottomRight->Size().X() * 0.5_r,
+						 y + -control_skin.Parts.Right->Size().Y() * 0.5_r - control_skin.Parts.BottomRight->Size().Y() * 0.5_r,
+						 z + z_epsilon_corners});
+				}
+				else if (control_skin.Parts.Center)
 					control_skin.Parts.BottomRight->Position(
-						{control_skin.Parts.Bottom->Size().X() * 0.5_r + control_skin.Parts.BottomRight->Size().X() * 0.5_r,
-						-control_skin.Parts.Right->Size().Y() * 0.5_r - control_skin.Parts.BottomRight->Size().Y() * 0.5_r, 0.0_r});
+						{x + control_skin.Parts.Center->Size().X() * 0.5_r + control_skin.Parts.BottomRight->Size().X() * 0.5_r,
+						 y + -control_skin.Parts.Center->Size().Y() * 0.5_r - control_skin.Parts.BottomRight->Size().Y() * 0.5_r,
+						 z + z_epsilon_corners});
 			}
 		}
 	}
@@ -363,7 +468,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 
 			//Position
 			auto [x, y, z] = control_skin.Caption->Position().XYZ();
-			control_skin.Caption->Position({x, y, z + Engine::ZEpsilon() * 3.0_r});
+			control_skin.Caption->Position({x, y, z + Engine::ZEpsilon() * 6.0_r});
 		}
 	}
 
@@ -411,6 +516,29 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 			control_skin.Sounds.Changed.Object = changed_part->Base;
 	}
 
+	//Adjust border size diff for non-outside alignment
+	if (auto alignment = skin.BorderAlignment(); alignment != SkinPartsAlignment::Outside)
+	{
+		auto &vertical_side = control_skin.Parts.Left ? control_skin.Parts.Left : control_skin.Parts.Right;
+		auto &horizontal_side = control_skin.Parts.Top ? control_skin.Parts.Top : control_skin.Parts.Bottom;
+
+		auto border_size = Vector2{
+			vertical_side ? vertical_side->Size().X() : 0.0_r,
+			horizontal_side ? horizontal_side->Size().Y() : 0.0_r
+		};
+
+		switch (alignment)
+		{
+			case SkinPartsAlignment::Center:
+			control_skin.BorderOffsetSize = -border_size;
+			break;
+
+			case SkinPartsAlignment::Inside:
+			control_skin.BorderOffsetSize = -border_size * 2.0_r;
+			break;
+		}
+	}
+
 	return control_skin;
 }
 
@@ -453,7 +581,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const GuiSkin 
 
 			//Position
 			auto [x, y, z] = check_box_skin->CheckMark->Position().XYZ();
-			check_box_skin->CheckMark->Position({x, y, z + Engine::ZEpsilon()});
+			check_box_skin->CheckMark->Position({x, y, z + Engine::ZEpsilon() * 5.0_r});
 		}
 	}
 
@@ -660,7 +788,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const GuiSk
 
 			//Position
 			auto [x, y, z] = radio_button_skin->CheckMark->Position().XYZ();
-			radio_button_skin->CheckMark->Position({x, y, z + Engine::ZEpsilon()});
+			radio_button_skin->CheckMark->Position({x, y, z + Engine::ZEpsilon() * 5.0_r});
 		}
 	}
 
@@ -724,7 +852,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const GuiSkin &sk
 
 			//Position
 			auto [x, y, z] = slider_skin->Handle->Position().XYZ();
-			slider_skin->Handle->Position({x, y, z + Engine::ZEpsilon()});
+			slider_skin->Handle->Position({x, y, z + Engine::ZEpsilon() * 5.0_r});
 		}
 	}
 
@@ -952,6 +1080,36 @@ GuiSkin::GuiSkin(std::string name, std::type_index type,
 	GuiSkin{std::move(name), type, SkinParts{}, caption_part, sound_parts}
 {
 	//Empty
+}
+
+
+/*
+	Modifiers
+*/
+
+void GuiSkin::BorderAlignment(SkinPartsAlignment alignment) noexcept
+{
+	border_alignment_ = alignment;
+}
+
+void GuiSkin::CornerAlignment(SkinPartsAlignment alignment) noexcept
+{
+	corner_alignment_ = alignment;
+}
+
+
+/*
+	Observers
+*/
+
+SkinPartsAlignment GuiSkin::BorderAlignment() const noexcept
+{
+	return border_alignment_;
+}
+
+SkinPartsAlignment GuiSkin::CornerAlignment() const noexcept
+{
+	return corner_alignment_;
 }
 
 

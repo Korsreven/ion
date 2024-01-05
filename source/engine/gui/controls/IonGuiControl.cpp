@@ -42,25 +42,27 @@ namespace gui_control::detail
 	Skins
 */
 
-void resize_part(graphics::scene::shapes::Sprite &sprite, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept
+void resize_part(graphics::scene::shapes::Sprite &sprite, const Vector2 &delta_size, const Vector2 &delta_position,
+	const Vector2 &center, const std::optional<Vector2> &direction) noexcept
 {
 	auto position = Vector2{sprite.Position()};
-	auto sign = (position - center).SignCopy();
+	auto sign = (direction ? *direction : position - center).SignCopy();
 	sprite.Position(sprite.Position() + sign * delta_position);
 	sprite.Size(sprite.Size() + delta_size);
 }
 
-void resize_part(ControlSkinPart &part, const Vector2 &delta_size, const Vector2 &delta_position, const Vector2 &center) noexcept
+void resize_part(ControlSkinPart &part, const Vector2 &delta_size, const Vector2 &delta_position,
+	const Vector2 &center, const std::optional<Vector2> &direction) noexcept
 {
 	if (part)
-		resize_part(*part.Object, delta_size, delta_position, center);
+		resize_part(*part.Object, delta_size, delta_position, center, direction);
 }
 
 void resize_skin(ControlSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept
 {
 	auto delta_size = to_size - from_size;
 	auto delta_position = delta_size * 0.5_r;
-	auto [delta_width, delta_height] = delta_size.XY();
+	auto [delta_width, delta_height] = (delta_size + skin.BorderOffsetSize).XY();
 
 	if (skin.Parts)
 	{
@@ -72,16 +74,16 @@ void resize_skin(ControlSkin &skin, const Vector2 &from_size, const Vector2 &to_
 		resize_part(skin.Parts.Center, delta_size, vector2::Zero, center);
 
 		//Sides
-		resize_part(skin.Parts.Top, {delta_width, 0.0_r}, delta_position, center);
-		resize_part(skin.Parts.Left, {0.0_r, delta_height}, delta_position, center);
-		resize_part(skin.Parts.Bottom, {delta_width, 0.0_r}, delta_position, center);
-		resize_part(skin.Parts.Right, {0.0_r, delta_height}, delta_position, center);
+		resize_part(skin.Parts.Top, {delta_width, 0.0_r}, delta_position, center, vector2::UnitY);
+		resize_part(skin.Parts.Left, {0.0_r, delta_height}, delta_position, center, vector2::NegativeUnitX);
+		resize_part(skin.Parts.Bottom, {delta_width, 0.0_r}, delta_position, center, vector2::NegativeUnitY);
+		resize_part(skin.Parts.Right, {0.0_r, delta_height}, delta_position, center, vector2::UnitX);
 
 		//Corners
-		resize_part(skin.Parts.TopLeft, vector2::Zero, delta_position, center);
-		resize_part(skin.Parts.TopRight, vector2::Zero, delta_position, center);
-		resize_part(skin.Parts.BottomLeft, vector2::Zero, delta_position, center);
-		resize_part(skin.Parts.BottomRight, vector2::Zero, delta_position, center);
+		resize_part(skin.Parts.TopLeft, vector2::Zero, delta_position, center, Vector2{-1.0_r, 1.0_r});
+		resize_part(skin.Parts.TopRight, vector2::Zero, delta_position, center, Vector2{1.0_r, 1.0_r});
+		resize_part(skin.Parts.BottomLeft, vector2::Zero, delta_position, center, Vector2{-1.0_r, -1.0_r});
+		resize_part(skin.Parts.BottomRight, vector2::Zero, delta_position, center, Vector2{1.0_r, -1.0_r});
 	}
 }
 
@@ -100,34 +102,14 @@ void resize_hit_boxes(BoundingBoxes &hit_boxes, const Vector2 &from_size, const 
 }
 
 
-std::optional<Aabb> get_area(const ControlSkin &skin, bool include_caption) noexcept
+std::optional<Aabb> get_area_inside_border(const ControlSkin &skin) noexcept
 {
 	if (skin.Parts)
 	{
 		skin.Parts->Prepare();
-		return skin.Parts->AxisAlignedBoundingBox();
-	}
-	else if (skin.Caption && include_caption)
-	{
-		skin.Caption->Prepare();
-		return skin.Caption->AxisAlignedBoundingBox();
-	}
-	else
-		return {};
-}
-
-std::optional<Aabb> get_center_area(const ControlSkin &skin, bool include_caption) noexcept
-{
-	if (skin.Parts)
-	{
-		skin.Parts->Prepare();
-
-		//Has center
-		if (skin.Parts.Center)
-			return skin.Parts.Center->AxisAlignedBoundingBox();
 
 		//Use sides to find center
-		else if (skin.Parts.Top && skin.Parts.Bottom)
+		if (skin.Parts.Top && skin.Parts.Bottom)
 		{
 			auto [t_min, t_max] = skin.Parts.Top->AxisAlignedBoundingBox().MinMax();
 			auto [b_min, b_max] = skin.Parts.Bottom->AxisAlignedBoundingBox().MinMax();
@@ -151,7 +133,42 @@ std::optional<Aabb> get_center_area(const ControlSkin &skin, bool include_captio
 			return Aabb{skin.Parts.BottomLeft->AxisAlignedBoundingBox().Max(),
 						skin.Parts.TopRight->AxisAlignedBoundingBox().Min()};
 	}
-	//Use caption as center
+
+	return {};
+}
+
+
+std::optional<Aabb> get_area(const ControlSkin &skin, bool include_caption) noexcept
+{
+	if (skin.Parts)
+	{
+		skin.Parts->Prepare();
+		return skin.Parts->AxisAlignedBoundingBox();
+	}
+	else if (skin.Caption && include_caption)
+	{
+		skin.Caption->Prepare();
+		return skin.Caption->AxisAlignedBoundingBox();
+	}
+	else
+		return {};
+}
+
+std::optional<Aabb> get_content_area(const ControlSkin &skin, bool include_caption) noexcept
+{
+	if (skin.Parts)
+	{
+		skin.Parts->Prepare();
+
+		//Has center
+		if (skin.Parts.Center)
+			return skin.Parts.Center->AxisAlignedBoundingBox();
+
+		//Use border to find center
+		else if (auto area = get_area_inside_border(skin); area)
+			return Aabb{area->Min() + skin.BorderOffsetSize * 0.5_r, area->Max() - skin.BorderOffsetSize * 0.5_r};
+	}
+	//Use caption as content
 	else if (skin.Caption && include_caption)
 	{
 		skin.Caption->Prepare();
@@ -163,10 +180,13 @@ std::optional<Aabb> get_center_area(const ControlSkin &skin, bool include_captio
 
 std::optional<Aabb> get_inner_area(const ControlSkin &skin, bool include_caption) noexcept
 {
-	if (auto center_area = get_center_area(skin, include_caption); center_area)
-		return center_area;
-	else if (auto area = get_area(skin, include_caption); area)
-		return area;
+	if (auto content_area = get_content_area(skin, include_caption); content_area)
+	{
+		if (skin.Parts)
+			return Aabb{content_area->Min() - skin.BorderOffsetSize * 0.5_r, content_area->Max() + skin.BorderOffsetSize * 0.5_r};
+		else
+			return content_area;
+	}
 	else
 		return {};
 }
@@ -180,9 +200,9 @@ std::optional<Vector2> get_size(const ControlSkin &skin, bool include_caption) n
 		return {};
 }
 
-std::optional<Vector2> get_center_size(const ControlSkin &skin, bool include_caption) noexcept
+std::optional<Vector2> get_content_size(const ControlSkin &skin, bool include_caption) noexcept
 {
-	if (auto area = get_center_area(skin, include_caption); area)
+	if (auto area = get_content_area(skin, include_caption); area)
 		return area->ToSize();
 	else
 		return {};
@@ -200,8 +220,8 @@ std::optional<Vector2> get_border_size(const ControlSkin &skin, bool include_cap
 {
 	if (auto size = get_size(skin, include_caption); size)
 	{
-		if (auto center_size = get_center_size(skin, include_caption); center_size)
-			return *size - *center_size;
+		if (auto inner_size = get_inner_size(skin, include_caption); inner_size)
+			return *size - *inner_size;
 	}
 
 	return {};
@@ -910,7 +930,7 @@ void GuiControl::UpdateCaption() noexcept
 		{
 			auto area_size = detail::get_inner_size(*skin_, false).value_or(vector2::Zero);
 			auto border_size = detail::get_border_size(*skin_, false).value_or(vector2::Zero);
-			auto center = detail::get_center_area(*skin_, false).value_or(aabb::Zero).Center();
+			auto center = detail::get_content_area(*skin_, false).value_or(aabb::Zero).Center();
 
 			auto ppu = Engine::PixelsPerUnit();
 
@@ -1184,21 +1204,23 @@ void GuiControl::Size(const Vector2 &size) noexcept
 	Observers
 */
 
-std::optional<Vector2> GuiControl::CenterSize() const noexcept
+std::optional<Vector2> GuiControl::ContentSize() const noexcept
 {
 	if (size_ && skin_)
-		return detail::get_center_size(*skin_, true);
-	else
-		return {};
+	{
+		if (auto content_size = detail::get_content_size(*skin_, true); content_size)
+			return content_size;
+	}
+	
+	return size_;
 }
 
 std::optional<Vector2> GuiControl::InnerSize() const noexcept
 {
 	if (size_ && skin_)
 	{
-		//Faster than calling get_inner_size (because we know the size)
-		if (auto center_size = CenterSize(); center_size)
-			return center_size;
+		if (auto inner_size = detail::get_inner_size(*skin_, true); inner_size)
+			return inner_size;
 	}
 	
 	return size_;
@@ -1208,9 +1230,8 @@ std::optional<Vector2> GuiControl::BorderSize() const noexcept
 {
 	if (size_)
 	{
-		//Faster than calling get_border_size (because we know the size)
-		if (auto inner_size = InnerSize(); inner_size)
-			return (*size_ - *inner_size) * 0.5_r;
+		if (auto border_size = detail::get_border_size(*skin_, true); border_size)
+			return *border_size * 0.5_r;
 	}
 
 	return {};
@@ -1224,10 +1245,10 @@ std::optional<Aabb> GuiControl::Area() const noexcept
 		std::nullopt;
 }
 
-std::optional<Aabb> GuiControl::CenterArea() const noexcept
+std::optional<Aabb> GuiControl::ContentArea() const noexcept
 {
 	return skin_ ?
-		detail::get_center_area(*skin_, true) :
+		detail::get_content_area(*skin_, true) :
 		std::nullopt;
 }
 

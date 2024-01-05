@@ -31,6 +31,7 @@ File:	IonGuiThemeScriptInterface.cpp
 #include "gui/controls/IonGuiTextBox.h"
 #include "gui/controls/IonGuiTooltip.h"
 #include "sounds/IonSoundManager.h"
+#include "utilities/IonMath.h"
 
 namespace ion::script::interfaces
 {
@@ -127,7 +128,9 @@ ClassDefinition get_gui_skin_class()
 		.AddProperty("focused", ParameterType::String)
 		.AddProperty("hovered", ParameterType::String)
 		.AddProperty("include-bounding-volumes", ParameterType::Boolean)
+		.AddProperty("position", ParameterType::Vector3)
 		.AddProperty("pressed", ParameterType::String)
+		.AddProperty("rotation", ParameterType::FloatingPoint)
 		.AddProperty("scaling", ParameterType::Vector2);
 
 	auto sound_part = ClassDefinition::Create("sound-part")
@@ -157,6 +160,8 @@ ClassDefinition get_gui_skin_class()
 			{"button"s, "check-box"s, "group-box"s, "image"s, "label"s,
 			 "list-box"s, "mouse-cursor"s, "progress-bar"s, "radio-button"s,
 			 "scroll-bar"s, "slider"s, "text-box"s, "tooltip"s})
+		.AddProperty("border-alignment", {"outside"s, "center"s, "inside"s})
+		.AddProperty("corner-alignment", {"outside"s, "center"s, "inside"s})
 		.AddProperty("name", ParameterType::String);
 }
 
@@ -233,6 +238,32 @@ graphics::render::RenderPass create_render_pass(const script_tree::ObjectNode &o
 	graphics::render::RenderPass pass;
 	scene_script_interface::detail::set_render_pass_properties(object, pass, managers);
 	return pass;
+}
+
+
+void set_gui_skin_properties(const script_tree::ObjectNode &object, GuiSkin &skin)
+{
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "border-alignment")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "outside")
+				skin.BorderAlignment(gui_skin::SkinPartsAlignment::Outside);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "center")
+				skin.BorderAlignment(gui_skin::SkinPartsAlignment::Center);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "inside")
+				skin.BorderAlignment(gui_skin::SkinPartsAlignment::Inside);
+		}
+		else if (property.Name() == "corner-alignment")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "outside")
+				skin.CornerAlignment(gui_skin::SkinPartsAlignment::Outside);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "center")
+				skin.CornerAlignment(gui_skin::SkinPartsAlignment::Center);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "inside")
+				skin.CornerAlignment(gui_skin::SkinPartsAlignment::Inside);
+		}
+	}
 }
 
 
@@ -344,8 +375,12 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 						part.Hovered = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
 					else if (property.Name() == "include-bounding-volumes")
 						part.IncludeBoundingVolumes = property[0].Get<ScriptType::Boolean>()->Get();
+					else if (property.Name() == "position")
+						part.Position = property[0].Get<ScriptType::Vector3>()->Get();
 					else if (property.Name() == "pressed")
 						part.Pressed = get_material(property[0].Get<ScriptType::String>()->Get(), managers);
+					else if (property.Name() == "rotation")
+						part.Rotation = utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 					else if (property.Name() == "scaling")
 						part.Scaling = property[0].Get<ScriptType::Vector2>()->Get();
 				}
@@ -399,6 +434,8 @@ NonOwningPtr<GuiSkin> create_gui_skin(const script_tree::ObjectNode &object,
 			else if (obj.Name() == "text-render-pass")
 				skin->AddTextRenderPass(create_render_pass(obj, managers));
 		}
+
+		set_gui_skin_properties(object, *skin);
 	}
 
 	return skin;

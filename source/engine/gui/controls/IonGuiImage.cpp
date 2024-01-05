@@ -135,7 +135,7 @@ void GuiImage::UpdateImage() noexcept
 	{
 		if (auto &skin = static_cast<ImageSkin&>(*skin_); skin.Image)
 		{
-			if (auto size = InnerSize(); size)
+			if (auto size = ContentSize(); size)
 				detail::resize_skin(skin, skin.Image->Size(), *size, mode_);
 		}
 	}
@@ -156,7 +156,7 @@ NonOwningPtr<graphics::scene::shapes::Sprite> GuiImage::CreateImage(NonOwningPtr
 		auto [x, y, z] = sprite->Position().XYZ();
 		sprite->Position({x, y, z + Engine::ZEpsilon()});
 
-		if (auto size = InnerSize(); size)
+		if (auto size = ContentSize(); size)
 		{
 			switch (mode_)
 			{
@@ -256,7 +256,7 @@ void GuiImage::Mode(ImageMode mode) noexcept
 	{
 		mode_ = mode;
 
-		if (auto size = InnerSize(); size && skin_)
+		if (auto size = ContentSize(); size && skin_)
 		{
 			if (auto &skin = static_cast<ImageSkin&>(*skin_); skin.Image)
 			{

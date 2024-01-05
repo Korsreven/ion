@@ -29,10 +29,12 @@ File:	IonGuiSkin.h
 #include "graphics/scene/IonDrawableObject.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
+#include "graphics/utilities/IonVector3.h"
 #include "gui/controls/IonGuiControl.h"
 #include "managed/IonManagedObject.h"
 #include "memory/IonNonOwningPtr.h"
 #include "memory/IonOwningPtr.h"
+#include "types/IonTypes.h"
 
 //Forward declarations
 namespace ion
@@ -63,12 +65,22 @@ namespace ion
 
 namespace ion::gui::skins
 {
+	using namespace types::type_literals;
+
 	//Forward declarations
 	class GuiSkin;
 	class GuiTheme;
 
 	namespace gui_skin
 	{
+		enum class SkinPartsAlignment
+		{
+			Outside,
+			Center,
+			Inside
+		};
+
+
 		struct SkinPart final
 		{
 			NonOwningPtr<graphics::materials::Material> Enabled;
@@ -80,7 +92,10 @@ namespace ion::gui::skins
 			std::optional<bool> IncludeBoundingVolumes;
 			std::optional<bool> AutoRepeat;
 
+			graphics::utilities::Vector3 Position = graphics::utilities::vector3::Zero;
+			real Rotation = 0.0_r;
 			graphics::utilities::Vector2 Scaling = graphics::utilities::vector2::UnitScale;
+
 			graphics::utilities::Color FillColor = graphics::utilities::color::White;
 			bool FlipHorizontal = false;
 			bool FlipVertical = false;
@@ -192,6 +207,9 @@ namespace ion::gui::skins
 		namespace detail
 		{
 			void set_sprite_properties(const SkinPart &part, graphics::scene::shapes::Sprite &sprite) noexcept;
+			Vector2 get_sprite_offset(SkinPartsAlignment alignment, const graphics::scene::shapes::Sprite &sprite) noexcept;
+			Vector2 get_border_offset(SkinPartsAlignment alignment, const graphics::scene::shapes::Sprite &vertical_side,
+				const graphics::scene::shapes::Sprite &horizontal_side) noexcept;
 
 			controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
 			OwningPtr<controls::gui_control::ControlSkin> make_control_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
@@ -221,6 +239,9 @@ namespace ion::gui::skins
 			gui_skin::SkinPartMap parts_;
 			gui_skin::SkinTextPartMap text_parts_;
 			gui_skin::SkinSoundPartMap sound_parts_;
+
+			gui_skin::SkinPartsAlignment border_alignment_ = gui_skin::SkinPartsAlignment::Outside;
+			gui_skin::SkinPartsAlignment corner_alignment_ = gui_skin::SkinPartsAlignment::Outside;
 
 			graphics::render::render_pass::Passes part_render_passes_;
 			graphics::render::render_pass::Passes text_render_passes_;
@@ -339,6 +360,32 @@ namespace ion::gui::skins
 			{
 				return adaptors::ranges::Iterable<const graphics::render::render_pass::Passes&>{text_render_passes_};
 			}
+
+			///@}
+
+			/**
+				@name Modifiers
+				@{
+			*/
+
+			///@brief Sets the border alignment of this skin to the given alignment
+			void BorderAlignment(gui_skin::SkinPartsAlignment alignment) noexcept;
+
+			///@brief Sets the corner alignment of this skin to the given alignment
+			void CornerAlignment(gui_skin::SkinPartsAlignment alignment) noexcept;
+
+			///@}
+
+			/**
+				@name Observers
+				@{
+			*/
+
+			///@brief Returns the border alignment of this skin
+			[[nodiscard]] gui_skin::SkinPartsAlignment BorderAlignment() const noexcept;
+
+			///@brief Returns the corner alignment of this skin
+			[[nodiscard]] gui_skin::SkinPartsAlignment CornerAlignment() const noexcept;
 
 			///@}
 
