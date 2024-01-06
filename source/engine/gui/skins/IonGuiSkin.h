@@ -208,8 +208,10 @@ namespace ion::gui::skins
 		{
 			void set_sprite_properties(const SkinPart &part, graphics::scene::shapes::Sprite &sprite) noexcept;
 			Vector2 get_sprite_offset(SkinPartsAlignment alignment, const graphics::scene::shapes::Sprite &sprite) noexcept;
-			Vector2 get_border_offset(SkinPartsAlignment alignment, const graphics::scene::shapes::Sprite &vertical_side,
+			Vector2 get_sprite_offset(SkinPartsAlignment alignment, const graphics::scene::shapes::Sprite &vertical_side,
 				const graphics::scene::shapes::Sprite &horizontal_side) noexcept;
+			Vector2 get_corner_offset(SkinPartsAlignment corner_alignment, SkinPartsAlignment border_alignment,
+				const graphics::scene::shapes::Sprite &vertical_side, const graphics::scene::shapes::Sprite &horizontal_side) noexcept;
 
 			controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);
 			OwningPtr<controls::gui_control::ControlSkin> make_control_skin(const GuiSkin &skin, graphics::scene::SceneManager &scene_manager);

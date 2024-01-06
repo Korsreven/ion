@@ -76,7 +76,7 @@ Vector2 get_sprite_offset(SkinPartsAlignment alignment, const graphics::scene::s
 	}
 }
 
-Vector2 get_border_offset(SkinPartsAlignment alignment, const graphics::scene::shapes::Sprite &vertical_side,
+Vector2 get_sprite_offset(SkinPartsAlignment alignment, const graphics::scene::shapes::Sprite &vertical_side,
 	const graphics::scene::shapes::Sprite &horizontal_side) noexcept
 {
 	switch (alignment)
@@ -91,6 +91,13 @@ Vector2 get_border_offset(SkinPartsAlignment alignment, const graphics::scene::s
 		default:
 		return vector2::Zero;
 	}
+}
+
+Vector2 get_corner_offset(SkinPartsAlignment corner_alignment, SkinPartsAlignment border_alignment,
+	const graphics::scene::shapes::Sprite &vertical_side, const graphics::scene::shapes::Sprite &horizontal_side) noexcept
+{
+	return -get_sprite_offset(corner_alignment, vertical_side, horizontal_side) +
+		get_sprite_offset(border_alignment, vertical_side, horizontal_side);
 }
 
 
@@ -347,7 +354,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 
 				if (control_skin.Parts.Top && control_skin.Parts.Left)
 				{
-					offset = get_border_offset(skin.BorderAlignment(),
+					offset = get_corner_offset(skin.CornerAlignment(), skin.BorderAlignment(),
 						*control_skin.Parts.Left.Object, *control_skin.Parts.Top.Object);
 					x += offset.X();
 					y -= offset.Y();
@@ -374,7 +381,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 
 				if (control_skin.Parts.Top && control_skin.Parts.Right)
 				{
-					offset = get_border_offset(skin.BorderAlignment(),
+					offset = get_corner_offset(skin.CornerAlignment(), skin.BorderAlignment(),
 						*control_skin.Parts.Right.Object, *control_skin.Parts.Top.Object);
 					x -= offset.X();
 					y -= offset.Y();
@@ -401,7 +408,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 				
 				if (control_skin.Parts.Bottom && control_skin.Parts.Left)
 				{
-					offset = get_border_offset(skin.BorderAlignment(),
+					offset = get_corner_offset(skin.CornerAlignment(), skin.BorderAlignment(),
 						*control_skin.Parts.Left.Object, *control_skin.Parts.Bottom.Object);
 					x += offset.X();
 					y += offset.Y();
@@ -428,7 +435,7 @@ controls::gui_control::ControlSkin make_skin_base(const GuiSkin &skin, graphics:
 
 				if (control_skin.Parts.Bottom && control_skin.Parts.Right)
 				{
-					offset = get_border_offset(skin.BorderAlignment(),
+					offset = get_corner_offset(skin.CornerAlignment(), skin.BorderAlignment(),
 						*control_skin.Parts.Right.Object, *control_skin.Parts.Bottom.Object);
 					x -= offset.X();
 					y += offset.Y();
