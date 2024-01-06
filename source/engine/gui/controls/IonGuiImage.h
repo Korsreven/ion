@@ -19,8 +19,10 @@ File:	IonGuiImage.h
 
 #include "IonGuiControl.h"
 #include "graphics/materials/IonMaterial.h"
+#include "graphics/utilities/IonColor.h"
 #include "memory/IonNonOwningPtr.h"
 #include "memory/IonOwningPtr.h"
+#include "types/IonTypes.h"
 
 namespace ion::gui::controls
 {
@@ -73,6 +75,8 @@ namespace ion::gui::controls
 
 		protected:
 
+			std::optional<graphics::utilities::Color> color_;
+			graphics::utilities::Color skin_color_;
 			gui_image::ImageMode mode_ = gui_image::ImageMode::Fill;
 
 
@@ -141,7 +145,13 @@ namespace ion::gui::controls
 						NonOwningPtr<graphics::materials::Material> image_focused,
 						NonOwningPtr<graphics::materials::Material> image_pressed,
 						NonOwningPtr<graphics::materials::Material> image_hovered);
+			
 
+			///@brief Sets the image color to the given color
+			void FillColor(const std::optional<Color> &color) noexcept;
+
+			///@brief Sets the image opacity to the given opacity
+			void FillOpacity(real opacity) noexcept;
 
 			///@brief Sets the image mode to the given mode
 			void Mode(gui_image::ImageMode mode) noexcept;
@@ -176,6 +186,18 @@ namespace ion::gui::controls
 					std::tuple{nullptr, nullptr, nullptr, nullptr, nullptr};
 			}
 
+
+			///@brief Returns the image color
+			[[nodiscard]] inline auto FillColor() const noexcept
+			{
+				return color_.value_or(skin_color_);
+			}
+
+			///@brief Returns the image opacity
+			[[nodiscard]] inline auto FillOpacity() const noexcept
+			{
+				return color_.value_or(skin_color_).A();
+			}
 
 			///@brief Returns the image mode
 			[[nodiscard]] inline auto Mode() const noexcept

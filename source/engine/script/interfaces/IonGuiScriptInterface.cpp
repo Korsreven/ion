@@ -223,6 +223,8 @@ ClassDefinition get_gui_group_box_class()
 ClassDefinition get_gui_image_class()
 {
 	return ClassDefinition::Create("image", "control")
+		.AddProperty("fill-color", ParameterType::Color)
+		.AddProperty("fill-opacity", ParameterType::FloatingPoint)
 		.AddProperty("mode", {"fill"s, "fit"s})
 		.AddProperty("source", {ParameterType::String, ParameterType::String, ParameterType::String, ParameterType::String, ParameterType::String}, 1);
 }
@@ -763,7 +765,11 @@ void set_image_properties(const script_tree::ObjectNode &object, controls::GuiIm
 	
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "mode")
+		if (property.Name() == "fill-color")
+			image.FillColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "fill-opacity")
+			image.FillOpacity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "mode")
 		{
 			if (property[0].Get<ScriptType::Enumerable>()->Get() == "fill")
 				image.Mode(controls::gui_image::ImageMode::Fill);	

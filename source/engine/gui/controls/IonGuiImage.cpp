@@ -137,6 +137,8 @@ void GuiImage::UpdateImage() noexcept
 		{
 			if (auto size = ContentSize(); size)
 				detail::resize_skin(skin, skin.Image->Size(), *size, mode_);
+
+			skin_color_ = skin.Image->FillColor();
 		}
 	}
 }
@@ -171,6 +173,11 @@ NonOwningPtr<graphics::scene::shapes::Sprite> GuiImage::CreateImage(NonOwningPtr
 		}
 		else
 			Size(sprite->Size());
+
+		skin_color_ = sprite->FillColor();
+
+		if (color_)
+			sprite->FillColor(*color_);
 
 		return sprite;
 	}
@@ -247,6 +254,27 @@ void GuiImage::Source(NonOwningPtr<graphics::materials::Material> image_enabled,
 	//Update caption based on image
 	if (!detail::has_center_area(skin))
 		UpdateCaption();
+}
+
+
+void GuiImage::FillColor(const std::optional<Color> &color) noexcept
+{
+	if (color_ != color)
+	{
+		color_ = color;
+
+		if (skin_)
+		{
+			if (auto &skin = static_cast<ImageSkin&>(*skin_); skin.Image)
+				skin.Image->FillColor(color_.value_or(skin_color_));
+		}
+	}
+}
+
+void GuiImage::FillOpacity(real opacity) noexcept
+{
+	auto [r, g, b, a] = color_.value_or(skin_color_).RGBA();
+	FillColor(Color{r, g, b, opacity});
 }
 
 
