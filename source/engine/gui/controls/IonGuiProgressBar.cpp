@@ -24,7 +24,28 @@ namespace ion::gui::controls
 
 using namespace gui_progress_bar;
 
-namespace gui_progress_bar::detail
+namespace gui_progress_bar
+{
+
+/*
+	ProgressBarSkin
+*/
+
+void ProgressBarSkin::GetParts(gui_control::SkinPartPointers &parts, std::string_view name) const
+{
+	ControlSkin::GetParts(parts, name);
+
+	auto all = name == "";
+	auto bars = name == "bars";
+
+	//Bars
+	if (all || bars || name == "bar")
+		parts.push_back(&Bar);
+	if (all || bars || name == "bar-interpolated")
+		parts.push_back(&BarInterpolated);
+}
+
+namespace detail
 {
 
 /*
@@ -127,7 +148,8 @@ void resize_skin(ProgressBarSkin &skin, const Vector2 &from_size, const Vector2 
 	resize_bar(skin.BarInterpolated, delta_size);
 }
 
-} //gui_progress_bar::detail
+} //detail
+} //gui_progress_bar
 
 
 //Private

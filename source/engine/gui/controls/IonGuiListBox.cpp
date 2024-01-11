@@ -28,7 +28,24 @@ namespace ion::gui::controls
 
 using namespace gui_list_box;
 
-namespace gui_list_box::detail
+namespace gui_list_box
+{
+
+/*
+	ListBoxSkin
+*/
+
+void ListBoxSkin::GetParts(gui_control::SkinPartPointers &parts, std::string_view name) const
+{
+	ControlSkin::GetParts(parts, name);
+	auto all = name == "";
+
+	//Selection
+	if (all || name == "selection")
+		parts.push_back(&Selection);
+}
+
+namespace detail
 {
 
 /*
@@ -99,7 +116,8 @@ Vector2 lines_area_offset(ListBoxIconLayout icon_layout, const Vector2 &icon_col
 	}
 }
 
-} //gui_list_box::detail
+} //detail
+} //gui_list_box
 
 
 //Private

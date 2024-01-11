@@ -26,7 +26,24 @@ namespace ion::gui::controls
 
 using namespace gui_image;
 
-namespace gui_image::detail
+namespace gui_image
+{
+
+/*
+	ImageSkin
+*/
+
+void ImageSkin::GetParts(gui_control::SkinPartPointers &parts, std::string_view name) const
+{
+	ControlSkin::GetParts(parts, name);
+	auto all = name == "";
+
+	//Image
+	if (all || name == "image")
+		parts.push_back(&Image);
+}
+
+namespace detail
 {
 
 /*
@@ -66,7 +83,8 @@ bool has_center_area(const gui_control::ControlSkin &skin) noexcept
 		(skin.Parts.BottomLeft && skin.Parts.TopRight));
 }
 
-} //gui_image::detail
+} //detail
+} //gui_image
 
 
 //Private

@@ -30,7 +30,24 @@ namespace ion::gui::controls
 
 using namespace gui_text_box;
 
-namespace gui_text_box::detail
+namespace gui_text_box
+{
+
+/*
+	TextBoxSkin
+*/
+
+void TextBoxSkin::GetParts(gui_control::SkinPartPointers &parts, std::string_view name) const
+{
+	ControlSkin::GetParts(parts, name);
+	auto all = name == "";
+
+	//Cursor
+	if (all || name == "cursor")
+		parts.push_back(&Cursor);
+}
+
+namespace detail
 {
 
 Vector2 cursor_offset(real width, real line_width, real line_padding, real cursor_distance, TextBoxTextLayout text_layout) noexcept
@@ -296,7 +313,8 @@ int get_cursor_position(const Vector2 &position, const Vector2 &scaling, std::st
 	return cursor_position;
 }
 
-} //gui_text_box::detail
+} //detail
+} //gui_text_box
 
 
 //Private

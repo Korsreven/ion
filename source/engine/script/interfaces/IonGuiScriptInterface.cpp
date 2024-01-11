@@ -210,6 +210,8 @@ ClassDefinition get_gui_control_class()
 		.AddProperty("hit-box", {ParameterType::Vector2, ParameterType::Vector2})
 		.AddProperty("size", ParameterType::Vector2)
 		.AddProperty("skin", ParameterType::String)
+		.AddProperty("skin-part-color", {ParameterType::Color, ParameterType::String}, 1)
+		.AddProperty("skin-part-opacity", {ParameterType::FloatingPoint, ParameterType::String}, 1)
 		.AddProperty("tab-order", ParameterType::Integer)
 		.AddProperty("tooltip", ParameterType::String);
 }
@@ -735,6 +737,21 @@ void set_control_properties(const script_tree::ObjectNode &object, controls::Gui
 					control.Skin(*skin);
 			}
 		}*/
+
+		else if (property.Name() == "skin-part-color")
+		{
+			if (property.NumberOfArguments() == 2)
+				control.SkinPartColor(property[0].Get<ScriptType::Color>()->Get(), property[1].Get<ScriptType::String>()->Get());
+			else
+				control.SkinPartColor(property[0].Get<ScriptType::Color>()->Get());
+		}
+		else if (property.Name() == "skin-part-opacity")
+		{
+			if (property.NumberOfArguments() == 2)
+				control.SkinPartOpacity(property[0].Get<ScriptType::FloatingPoint>()->As<real>(), property[1].Get<ScriptType::String>()->Get());
+			else
+				control.SkinPartOpacity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		}
 
 		else if (property.Name() == "tab-order")
 			control.TabOrder(property[0].Get<ScriptType::Integer>()->As<int>());

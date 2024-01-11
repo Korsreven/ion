@@ -15,6 +15,7 @@ File:	IonGuiControl.h
 
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "events/IonCallback.h"
@@ -124,6 +125,9 @@ namespace ion::gui::controls
 			}
 		};
 
+		using SkinPartPointers = std::vector<const ControlSkinPart*>;
+
+
 		struct ControlSkinTextPart final
 		{
 			NonOwningPtr<graphics::scene::DrawableText> Object;
@@ -232,6 +236,8 @@ namespace ion::gui::controls
 			{
 				*this = control_skin;
 			}
+
+			virtual void GetParts(SkinPartPointers &parts, std::string_view name) const;
 		};
 
 
@@ -915,6 +921,13 @@ namespace ion::gui::controls
 			{
 				on_resize_ = {};
 			}
+
+
+			///@brief Sets the skin part(s), that matches the name, to the given color
+			void SkinPartColor(const Color &color, std::string_view name = "") noexcept;
+
+			///@brief Sets the skin part(s), that matches the name, to the given opacity
+			void SkinPartOpacity(real opacity, std::string_view name = "") noexcept;
 
 			///@}
 

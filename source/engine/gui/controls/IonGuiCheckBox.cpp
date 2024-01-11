@@ -19,7 +19,24 @@ namespace ion::gui::controls
 
 using namespace gui_check_box;
 
-namespace gui_check_box::detail
+namespace gui_check_box
+{
+
+/*
+	CheckBoxSkin
+*/
+
+void CheckBoxSkin::GetParts(gui_control::SkinPartPointers &parts, std::string_view name) const
+{
+	ControlSkin::GetParts(parts, name);
+	auto all = name == "";
+
+	//Check mark
+	if (all || name == "check-mark")
+		parts.push_back(&CheckMark);
+}
+
+namespace detail
 {
 
 void resize_skin(CheckBoxSkin &skin, const Vector2 &from_size, const Vector2 &to_size) noexcept
@@ -33,7 +50,8 @@ void resize_skin(CheckBoxSkin &skin, const Vector2 &from_size, const Vector2 &to
 	}
 }
 
-} //gui_check_box::detail
+} //detail
+} //gui_check_box
 
 
 //Private

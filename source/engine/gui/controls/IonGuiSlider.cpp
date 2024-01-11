@@ -25,7 +25,24 @@ namespace ion::gui::controls
 using namespace gui_slider;
 using namespace types::type_literals;
 
-namespace gui_slider::detail
+namespace gui_slider
+{
+
+/*
+	SliderSkin
+*/
+
+void SliderSkin::GetParts(gui_control::SkinPartPointers &parts, std::string_view name) const
+{
+	ControlSkin::GetParts(parts, name);
+	auto all = name == "";
+
+	//Handle
+	if (all || name == "handle")
+		parts.push_back(&Handle);
+}
+
+namespace detail
 {
 
 /*
@@ -67,7 +84,8 @@ void resize_skin(SliderSkin &skin, SliderType type, const Vector2 &from_size, co
 	}
 }
 
-} //gui_slider::detail
+} //detail
+} //gui_slider
 
 
 //Private

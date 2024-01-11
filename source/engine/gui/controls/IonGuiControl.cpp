@@ -35,7 +35,46 @@ namespace ion::gui::controls
 
 using namespace gui_control;
 
-namespace gui_control::detail
+namespace gui_control
+{
+
+/*
+	ControlSkin
+*/
+
+void ControlSkin::GetParts(SkinPartPointers &parts, std::string_view name) const
+{
+	auto all = name == "";
+	auto border = name == "border";
+	auto sides = name == "sides";
+	auto corners = name == "corners";
+
+	//Center
+	if (all || name == "center")
+		parts.push_back(&Parts.Center);
+
+	//Sides
+	if (all || border || sides || name == "top")
+		parts.push_back(&Parts.Top);
+	if (all || border || sides || name == "left")
+		parts.push_back(&Parts.Left);
+	if (all || border || sides || name == "bottom")
+		parts.push_back(&Parts.Bottom);
+	if (all || border || sides || name == "right")
+		parts.push_back(&Parts.Right);
+
+	//Corners
+	if (all || border || corners || name == "top-left")
+		parts.push_back(&Parts.TopLeft);
+	if (all || border || corners || name == "bottom-left")
+		parts.push_back(&Parts.BottomLeft);
+	if (all || border || corners || name == "top-right")
+		parts.push_back(&Parts.TopRight);
+	if (all || border || corners || name == "bottom-right")
+		parts.push_back(&Parts.BottomRight);
+}
+
+namespace detail
 {
 
 /*
@@ -320,7 +359,8 @@ Vector2 caption_area_offset(ControlCaptionLayout caption_layout, const Vector2 &
 	}
 }
 
-} //gui_control::detail
+} //detail
+} //gui_control
 
 //Protected
 
@@ -1196,6 +1236,37 @@ void GuiControl::Size(const Vector2 &size) noexcept
 
 		UpdateCaption();
 		Resized(from_size.value_or(size), size);
+	}
+}
+
+
+void GuiControl::SkinPartColor(const Color &color, std::string_view name) noexcept
+{
+	if (skin_)
+	{
+		SkinPartPointers parts;
+		skin_->GetParts(parts, name);
+
+		for (auto &part : parts)
+		{
+			if (part)
+				(*part)->FillColor(color);
+		}
+	}
+}
+
+void GuiControl::SkinPartOpacity(real opacity, std::string_view name) noexcept
+{
+	if (skin_)
+	{
+		SkinPartPointers parts;
+		skin_->GetParts(parts, name);
+
+		for (auto &part : parts)
+		{
+			if (part)
+				(*part)->FillOpacity(opacity);
+		}
 	}
 }
 

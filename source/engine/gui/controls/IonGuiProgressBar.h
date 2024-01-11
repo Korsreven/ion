@@ -57,6 +57,8 @@ namespace ion::gui::controls
 				else //Try less derived
 					return ControlSkin::Assign(control_skin);
 			}
+
+			virtual void GetParts(gui_control::SkinPartPointers &parts, std::string_view name) const override;
 		};
 
 
