@@ -25,6 +25,7 @@ File:	IonGuiPanel.h
 #include "controls/IonGuiControl.h"
 #include "graphics/utilities/IonVector2.h"
 #include "memory/IonNonOwningPtr.h"
+#include "memory/IonOwningPtr.h"
 #include "types/IonTypes.h"
 
 namespace ion
@@ -91,8 +92,6 @@ namespace ion::gui
 				void Adopt(SceneNode &node);
 				void Orphan(SceneNode &node);
 
-				void Align(controls::GuiControl &control) noexcept;
-
 			public:
 			
 				///@brief Constructs a grid cell with the given owner
@@ -135,7 +134,6 @@ namespace ion::gui
 					{
 						alignment_ = alignment;
 						Reposition();
-						Realign();
 					}
 				}
 
@@ -146,16 +144,12 @@ namespace ion::gui
 					{
 						vertical_alignment_ = vertical_alignment;
 						Reposition();
-						Realign();
 					}
 				}
 
 
 				///@brief Shows this grid cell
 				void Show() noexcept;
-
-				///@brief Realigns all controls attached to this grid cell
-				void Realign() noexcept;
 
 				///@brief Repositions the node for this grid cell
 				void Reposition() noexcept;
@@ -214,6 +208,9 @@ namespace ion::gui
 				///@}
 		};
 
+		using GridCells = adaptors::FlatMap<std::pair<int, int>, OwningPtr<GridCell>>;
+
+
 		///@brief A class representing a panel grid with size, rows and columns
 		///@details A panel grid can contain multiple (rows * columns) grid cells
 		class PanelGrid final
@@ -226,7 +223,7 @@ namespace ion::gui
 				std::optional<Vector2> size_percentage_;
 				GuiPanel *owner_ = nullptr;
 
-				adaptors::FlatMap<std::pair<int, int>, GridCell> cells_;
+				GridCells cells_;
 
 
 				GuiController* GetController() const noexcept;
@@ -275,9 +272,9 @@ namespace ion::gui
 						   off.second >= 0 && off.second < columns_);
 
 					if (auto iter = cells_.find(off); iter != std::end(cells_))
-						return iter->second;
+						return *iter->second;
 					else
-						return cells_.emplace(off, *this).first->second;
+						return *cells_.emplace(off, make_owning<GridCell>(*this)).first->second;
 				}
 				
 				///@brief Returns an immutable reference to the grid cell at the given offset
@@ -285,7 +282,7 @@ namespace ion::gui
 				{
 					assert(off.first >= 0 && off.first < rows_ &&
 						   off.second >= 0 && off.second < columns_);
-					return cells_.at(off);
+					return *cells_.at(off);
 				}
 
 				///@}
@@ -320,9 +317,6 @@ namespace ion::gui
 
 				///@brief Shows this panel grid
 				void Show() noexcept;
-
-				///@brief Realigns all controls attached to this panel grid
-				void Realign() noexcept;
 
 				///@brief Repositions all cells in this panel grid
 				void Reposition() noexcept;

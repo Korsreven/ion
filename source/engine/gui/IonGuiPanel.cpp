@@ -61,39 +61,6 @@ void GridCell::Orphan(SceneNode &node)
 }
 
 
-void GridCell::Align(controls::GuiControl &control) noexcept
-{
-	if (auto size = control.Size(); size && node_)
-	{	
-		auto position = vector2::Zero;
-
-		switch (alignment_)
-		{
-			case GridCellAlignment::Left:
-			position.X(size->X() * 0.5_r);
-			break;
-
-			case GridCellAlignment::Right:
-			position.X(-size->X() * 0.5_r);
-			break;
-		}
-
-		switch (vertical_alignment_)
-		{
-			case GridCellVerticalAlignment::Top:
-			position.Y(-size->Y() * 0.5_r);
-			break;
-
-			case GridCellVerticalAlignment::Bottom:
-			position.Y(size->Y() * 0.5_r);
-			break;
-		}
-
-		control.Node()->Position(position);
-	}
-}
-
-
 //Public
 
 GridCell::GridCell(PanelGrid &owner) noexcept :
@@ -116,15 +83,6 @@ void GridCell::Show() noexcept
 {
 	if (node_ && node_->ParentNode())
 		node_->Visible(node_->ParentNode()->Visible(), false);
-}
-
-void GridCell::Realign() noexcept
-{
-	for (auto &control : Controls())
-	{
-		if (control)
-			Align(*control);
-	}
 }
 
 void GridCell::Reposition() noexcept
@@ -196,7 +154,7 @@ std::pair<int, int> GridCell::Offset() const noexcept
 	{
 		for (auto &[off, cell] : grid->Cells())
 		{
-			if (this == &cell)
+			if (this == cell.get())
 				return off;
 		}
 	}
@@ -218,7 +176,6 @@ bool GridCell::AttachControl(NonOwningPtr<controls::GuiControl> control)
 			//Parent node of the control is the node of the owner of the grid
 	{
 		Adopt(*control->Node()); //Adopt
-		Align(*control);
 		controls_.push_back(control);
 		return true;
 	}
@@ -323,19 +280,13 @@ PanelGrid::PanelGrid(GuiPanel &owner, int rows, int columns, const Vector2 &size
 void PanelGrid::Show() noexcept
 {
 	for (auto &[off, cell] : Cells())
-		cell.Show();
-}
-
-void PanelGrid::Realign() noexcept
-{
-	for (auto &[off, cell] : Cells())
-		cell.Realign();
+		cell->Show();
 }
 
 void PanelGrid::Reposition() noexcept
 {
 	for (auto &[off, cell] : Cells())
-		cell.Reposition();
+		cell->Reposition();
 }
 
 void PanelGrid::Resize() noexcept
