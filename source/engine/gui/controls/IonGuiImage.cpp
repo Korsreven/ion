@@ -168,7 +168,7 @@ void GuiImage::UpdateImage() noexcept
 
 NonOwningPtr<graphics::scene::shapes::Sprite> GuiImage::CreateImage(NonOwningPtr<graphics::materials::Material> material)
 {
-	if (skin_)
+	if (skin_ && skin_->Parts)
 	{
 		auto sprite = skin_->Parts->CreateMesh<graphics::scene::shapes::Sprite>(material);
 

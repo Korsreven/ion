@@ -104,8 +104,11 @@ void GuiMouseCursor::UpdatePosition(Vector2 position) noexcept
 {
 	if (node_ && skin_)
 	{
-		auto cursor_size =
-			skin_->Parts->AxisAlignedBoundingBox().ToSize() * node_->DerivedScaling();
+		auto cursor_size = vector2::Zero;
+
+		if (skin_->Parts)
+			cursor_size =
+				skin_->Parts->AxisAlignedBoundingBox().ToSize() * node_->DerivedScaling();
 
 		//Adjust from center to hot spot
 		auto hot_spot_off =

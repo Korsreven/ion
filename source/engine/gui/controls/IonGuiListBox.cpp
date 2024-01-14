@@ -547,7 +547,7 @@ void GuiListBox::ClearLines() noexcept
 
 NonOwningPtr<graphics::scene::shapes::Sprite> GuiListBox::CreateIcon(NonOwningPtr<graphics::materials::Material> material)
 {
-	if (skin_)
+	if (skin_ && skin_->Parts)
 	{
 		auto sprite = skin_->Parts->CreateMesh<graphics::scene::shapes::Sprite>(vector2::Zero, material);
 		sprite->IncludeBoundingVolumes(false);
