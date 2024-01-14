@@ -1249,7 +1249,7 @@ void GuiControl::SkinPartColor(const Color &color, std::string_view name) noexce
 
 		for (auto &part : parts)
 		{
-			if (part)
+			if (part && *part)
 				(*part)->FillColor(color);
 		}
 	}
@@ -1264,7 +1264,7 @@ void GuiControl::SkinPartOpacity(real opacity, std::string_view name) noexcept
 
 		for (auto &part : parts)
 		{
-			if (part)
+			if (part && *part)
 				(*part)->FillOpacity(opacity);
 		}
 	}

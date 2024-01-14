@@ -568,7 +568,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_check_box_skin(const GuiSkin 
 	auto check_box_skin = make_owning<controls::gui_check_box::CheckBoxSkin>();
 	check_box_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 
-	if (!std::empty(skin.Parts()))
+	if (!std::empty(skin.Parts()) && check_box_skin->Parts)
 	{
 		auto check_mark_part = skin.GetPart("check-mark");
 
@@ -618,7 +618,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_image_skin(const GuiSkin &ski
 		image_skin->Parts.Object = model;
 	}
 
-	if (!std::empty(skin.Parts()))
+	if (!std::empty(skin.Parts()) && image_skin->Parts)
 	{
 		auto image_part = skin.GetPart("image");
 
@@ -656,7 +656,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_list_box_skin(const GuiSkin &
 	auto list_box_skin = make_owning<controls::gui_list_box::ListBoxSkin>();
 	list_box_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 
-	if (!std::empty(skin.Parts()))
+	if (!std::empty(skin.Parts()) && list_box_skin->Parts)
 	{
 		auto selection_part = skin.GetPart("selection");
 
@@ -721,7 +721,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_progress_bar_skin(const GuiSk
 	auto progress_bar_skin = make_owning<controls::gui_progress_bar::ProgressBarSkin>();
 	progress_bar_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 
-	if (!std::empty(skin.Parts()))
+	if (!std::empty(skin.Parts()) && progress_bar_skin->Parts)
 	{
 		auto bar_part = skin.GetPart("bar");
 		auto bar_interpolated_part = skin.GetPart("bar-interpolated");
@@ -775,7 +775,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_radio_button_skin(const GuiSk
 	auto radio_button_skin = make_owning<controls::gui_radio_button::RadioButtonSkin>();
 	radio_button_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 
-	if (!std::empty(skin.Parts()))
+	if (!std::empty(skin.Parts()) && radio_button_skin->Parts)
 	{
 		auto check_mark_part = skin.GetPart("check-mark");
 
@@ -807,7 +807,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_scroll_bar_skin(const GuiSkin
 	auto scroll_bar_skin = make_owning<controls::gui_scroll_bar::ScrollBarSkin>();
 	scroll_bar_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 
-	if (!std::empty(skin.Parts()))
+	if (!std::empty(skin.Parts()) && scroll_bar_skin->Parts)
 	{
 		auto handle_part = skin.GetPart("handle");
 
@@ -839,7 +839,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_slider_skin(const GuiSkin &sk
 	auto slider_skin = make_owning<controls::gui_slider::SliderSkin>();
 	slider_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 
-	if (!std::empty(skin.Parts()))
+	if (!std::empty(skin.Parts()) && slider_skin->Parts)
 	{
 		auto handle_part = skin.GetPart("handle");
 
@@ -871,7 +871,7 @@ OwningPtr<controls::gui_control::ControlSkin> make_text_box_skin(const GuiSkin &
 	auto text_box_skin = make_owning<controls::gui_text_box::TextBoxSkin>();
 	text_box_skin->controls::gui_control::ControlSkin::Assign(make_skin_base(skin, scene_manager));
 
-	if (!std::empty(skin.Parts()))
+	if (!std::empty(skin.Parts()) && text_box_skin->Parts)
 	{
 		auto cursor_part = skin.GetPart("cursor");
 
