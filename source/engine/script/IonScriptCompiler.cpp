@@ -2315,6 +2315,9 @@ void inherit(script_tree::ObjectNodes &objects, template_rules &templates)
 				templates[available_templates].object = object;
 		}
 
+		for (auto &object : objects)
+			object.CommitAppends();
+
 		//Erase all templates
 		objects.erase(
 			std::remove_if(std::begin(objects), std::end(objects),

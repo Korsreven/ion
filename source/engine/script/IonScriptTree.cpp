@@ -509,38 +509,72 @@ ObjectNode::ObjectNode(std::string name, std::string classes, PropertyNodes prop
 void ObjectNode::Append(const ObjectNodes &objects, AppendCondition append_condition)
 {
 	if (*this) //Not allowed to modify if not valid
-		detail::append_nodes(objects_, objects, append_condition);
+		detail::append_nodes(pending_objects_, objects, append_condition);
 }
 
 void ObjectNode::Append(const adaptors::ranges::Iterable<ObjectNodes&> &objects, AppendCondition append_condition)
 {
 	if (*this) //Not allowed to modify if not valid
-		detail::append_nodes(objects_, objects, append_condition);
+		detail::append_nodes(pending_objects_, objects, append_condition);
 }
 
 void ObjectNode::Append(const adaptors::ranges::Iterable<const ObjectNodes&> &objects, AppendCondition append_condition)
 {
 	if (*this) //Not allowed to modify if not valid
-		detail::append_nodes(objects_, objects, append_condition);
+		detail::append_nodes(pending_objects_, objects, append_condition);
 }
 
 
 void ObjectNode::Append(const PropertyNodes &properties, AppendCondition append_condition)
 {
 	if (*this) //Not allowed to modify if not valid
-		detail::append_nodes(properties_, properties, append_condition);
+		detail::append_nodes(pending_properties_, properties, append_condition);
 }
 
 void ObjectNode::Append(const adaptors::ranges::Iterable<PropertyNodes&> &properties, AppendCondition append_condition)
 {
 	if (*this) //Not allowed to modify if not valid
-		detail::append_nodes(properties_, properties, append_condition);
+		detail::append_nodes(pending_properties_, properties, append_condition);
 }
 
 void ObjectNode::Append(const adaptors::ranges::Iterable<const PropertyNodes&> &properties, AppendCondition append_condition)
 {
 	if (*this) //Not allowed to modify if not valid
-		detail::append_nodes(properties_, properties, append_condition);
+		detail::append_nodes(pending_properties_, properties, append_condition);
+}
+
+
+void ObjectNode::CommitAppends(bool cascade)
+{
+	if (cascade)
+	{
+		for (auto &object : objects_)
+			object.CommitAppends();
+	}
+
+	properties_.insert(std::end(properties_),
+		std::make_move_iterator(std::begin(pending_properties_)),
+		std::make_move_iterator(std::end(pending_properties_)));
+	objects_.insert(std::end(objects_),
+		std::make_move_iterator(std::begin(pending_objects_)),
+		std::make_move_iterator(std::end(pending_objects_)));
+
+	RollbackAppends(false);
+}
+
+void ObjectNode::RollbackAppends(bool cascade)
+{
+	if (cascade)
+	{
+		for (auto &object : objects_)
+			object.RollbackAppends();
+	}
+
+	pending_properties_.clear();
+	pending_properties_.shrink_to_fit();
+
+	pending_objects_.clear();
+	pending_objects_.shrink_to_fit();
 }
 
 
@@ -705,17 +739,45 @@ ScriptTree::ScriptTree(ObjectNodes objects) noexcept :
 
 void ScriptTree::Append(const ObjectNodes &objects, AppendCondition append_condition)
 {
-	detail::append_nodes(objects_, objects, append_condition);
+	detail::append_nodes(pending_objects_, objects, append_condition);
 }
 
 void ScriptTree::Append(const adaptors::ranges::Iterable<ObjectNodes&> &objects, AppendCondition append_condition)
 {
-	detail::append_nodes(objects_, objects, append_condition);
+	detail::append_nodes(pending_objects_, objects, append_condition);
 }
 
 void ScriptTree::Append(const adaptors::ranges::Iterable<const ObjectNodes&> &objects, AppendCondition append_condition)
 {
-	detail::append_nodes(objects_, objects, append_condition);
+	detail::append_nodes(pending_objects_, objects, append_condition);
+}
+
+
+void ScriptTree::CommitAppends(bool cascade)
+{
+	if (cascade)
+	{
+		for (auto &object : objects_)
+			object.CommitAppends();
+	}
+
+	objects_.insert(std::end(objects_),
+		std::make_move_iterator(std::begin(pending_objects_)),
+		std::make_move_iterator(std::end(pending_objects_)));
+
+	RollbackAppends(false);
+}
+
+void ScriptTree::RollbackAppends(bool cascade)
+{
+	if (cascade)
+	{
+		for (auto &object : objects_)
+			object.RollbackAppends();
+	}
+
+	pending_objects_.clear();
+	pending_objects_.shrink_to_fit();
 }
 
 

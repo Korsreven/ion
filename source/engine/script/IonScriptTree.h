@@ -325,6 +325,9 @@ namespace ion::script
 				PropertyNodes properties_;
 				ObjectNodes objects_;
 
+				PropertyNodes pending_properties_;
+				ObjectNodes pending_objects_;
+
 			public:
 
 				///@brief Constructs a new object node with the given name and properties
@@ -389,6 +392,13 @@ namespace ion::script
 
 				///@brief Appends all of the given immutable iterable properties that satisfy the given append condition
 				void Append(const adaptors::ranges::Iterable<const PropertyNodes&> &properties, AppendCondition append_condition = AppendCondition::Unconditionally);
+
+
+				///@brief Commits pending appends
+				void CommitAppends(bool cascade = true);
+
+				///@brief Rollbacks pending appends
+				void RollbackAppends(bool cascade = true);
 
 				///@}
 
@@ -673,6 +683,7 @@ namespace ion::script
 		private:
 
 			script_tree::ObjectNodes objects_;
+			script_tree::ObjectNodes pending_objects_;
 
 		public:
 
@@ -695,6 +706,13 @@ namespace ion::script
 
 			///@brief Appends all of the given immutable iterable objects that satisfy the given append condition
 			void Append(const adaptors::ranges::Iterable<const script_tree::ObjectNodes&> &objects, script_tree::AppendCondition append_condition = script_tree::AppendCondition::Unconditionally);
+
+
+			///@brief Commits pending appends
+			void CommitAppends(bool cascade = true);
+
+			///@brief Rollbacks pending appends
+			void RollbackAppends(bool cascade = true);
 
 			///@}
 
