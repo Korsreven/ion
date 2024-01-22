@@ -229,7 +229,7 @@ detail::groupable_status Renderer::IsGroupable(const RenderPrimitive &primitive,
 {
 	if (auto iter =
 		std::find_if(std::begin(batch.slots), std::end(batch.slots),
-			[&](auto &slot) noexcept
+			[](auto &slot) noexcept
 			{
 				return !!slot.primitive;
 			}); iter != std::end(batch.slots))
@@ -366,7 +366,7 @@ void Renderer::CompressBatches() noexcept
 		//Find first empty slot
 		auto iter =
 			std::find_if(std::begin(batch->slots), std::end(batch->slots),
-				[&](auto &slot) noexcept
+				[](auto &slot) noexcept
 				{
 					return !slot.primitive;
 				});
@@ -374,30 +374,17 @@ void Renderer::CompressBatches() noexcept
 		if (iter == std::end(batch->slots))
 			continue; //Nothing to compress
 
-		//Find offset of first empty slot
-		auto slot_offset = batch->offset;
-		for (auto it = std::begin(batch->slots); it != iter; ++it)
-			slot_offset += it->capacity;
-
 		//Erase all empty slots
 		batch->slots.erase(
 			std::remove_if(iter, std::end(batch->slots),
 				[&](auto &slot) noexcept
 				{
-					auto empty_slot = !slot.primitive;
-					if (empty_slot)
-					{
-						//Empty slot, copy data to the left
-						std::copy(std::begin(vertex_data_) + slot_offset + slot.capacity,
-							std::begin(vertex_data_) + batch->offset + batch->last_used_capacity,
-							std::begin(vertex_data_) + slot_offset);
-
+					if (!slot.primitive)
 						batch->used_capacity -= slot.capacity;
-					}
 					else
-						slot_offset += slot.capacity;
+						slot.need_update = true;
 
-					return empty_slot;
+					return !slot.primitive;
 				}), std::end(batch->slots));
 	}
 }
