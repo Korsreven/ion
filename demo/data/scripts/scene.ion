@@ -525,7 +525,7 @@ scene-node
             {
                 name: "ship_idle";
                 running: false;
-                attach-animation-group: "ship_idle";
+                attach-animation-group: "ship_idle_group";
             }
         }
     }
