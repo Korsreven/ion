@@ -278,6 +278,7 @@ ClassDefinition get_color_fading_class()
 {
 	return ClassDefinition::Create("color-fading")
 		.AddRequiredProperty("color", ParameterType::Color)
+		.AddRequiredProperty("target-name", ParameterType::String)
 		.AddRequiredProperty("total-duration", ParameterType::FloatingPoint)	
 		.AddRequiredProperty("type", {"light-ambient"s, "light-diffuse"s, "light-specular"s, "model-base-color"s,
 									  "text-foreground-color"s, "text-background-color"s, "text-decoration-color"s})
@@ -289,6 +290,7 @@ ClassDefinition get_fading_class()
 {
 	return ClassDefinition::Create("fading")
 		.AddRequiredProperty("amount", ParameterType::FloatingPoint)
+		.AddRequiredProperty("target-name", ParameterType::String)
 		.AddRequiredProperty("total-duration", ParameterType::FloatingPoint)
 		.AddRequiredProperty("type", {"opacity"s, "light-intensity"s, "light-radius"s,
 									  "light-constant-attenuation"s, "light-linear-attenuation"s, "light-quadratic-attenuation"s,
