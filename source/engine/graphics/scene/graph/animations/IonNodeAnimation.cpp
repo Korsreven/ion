@@ -51,8 +51,8 @@ bool execute_action(action &a, duration time, duration current_time, duration st
 
 	//Execute action?
 	if (auto reverse = time < 0.0_sec; reverse ?
-		local_time <= 0.0_sec && local_time - time > 0.0_sec :
-		local_time >= 0.0_sec && local_time - time < 0.0_sec)
+		local_time <= 0.0_sec && local_time - time >= 0.0_sec :
+		local_time >= 0.0_sec && local_time - time <= 0.0_sec)
 	
 		return true;
 
@@ -988,9 +988,6 @@ void NodeAnimation::Elapse(NodeAnimation &animation, duration time, duration cur
 		local_time <= total_duration_ && local_time - time > 0.0_sec :
 		local_time >= 0.0_sec && local_time - time < total_duration_)
 	{
-		auto percent = local_time / total_duration_;
-		percent = std::clamp(percent, 0.0_r, 1.0_r);
-		
 		//Start
 		if (on_start_ &&
 			local_time >= 0.0_sec && local_time - time < 0.0_sec)
