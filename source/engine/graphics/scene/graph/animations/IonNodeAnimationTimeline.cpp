@@ -152,7 +152,13 @@ void NodeAnimationTimeline::Refresh() noexcept
 
 void NodeAnimationTimeline::Start() noexcept
 {
-	running_ = true;
+	if (current_time_ == total_duration_ && !reverse_)
+		Restart();
+	else
+	{
+		running_ = true;
+		reverse_ = false;
+	}
 }
 
 void NodeAnimationTimeline::Stop() noexcept
@@ -182,6 +188,7 @@ void NodeAnimationTimeline::Revert(duration total_duration)
 	//Something to revert
 	if (current_time_ > 0.0_sec)
 	{
+		running_ = true;
 		reverse_ = true;
 
 		//Over time
@@ -362,6 +369,8 @@ void NodeAnimationTimeline::Elapse(duration time) noexcept
 					if (on_finish_revert_ &&
 						current_time_ <= 0.0_sec && current_time_ - time > 0.0_sec)
 						(*on_finish_revert_)(*this);
+
+					Reset();
 				}
 				else
 				{
@@ -369,9 +378,10 @@ void NodeAnimationTimeline::Elapse(duration time) noexcept
 					if (on_finish_ &&
 						current_time_ >= total_duration_ && current_time_ - time < total_duration_)
 						(*on_finish_)(*this);
+					
+					running_ = false;
+					current_time_ = total_duration_;
 				}
-
-				Reset();
 			}
 		}
 	}
