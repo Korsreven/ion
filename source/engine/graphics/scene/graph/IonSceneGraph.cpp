@@ -223,7 +223,10 @@ void set_emissive_light_uniforms(const light_pointers &lights, OwningPtr<light::
 			}
 
 			if (color)
-				(*color)[i].Get<glsl::vec4>() = light->DiffuseColor();
+			{
+				auto [r, g, b, a] = light->DiffuseColor().RGBA();
+				(*color)[i].Get<glsl::vec4>() = Color{r, g, b, a * light->Intensity()};
+			}
 
 
 			++i; //Increase light index

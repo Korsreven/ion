@@ -137,7 +137,7 @@ void upload_light_data(OwningPtr<light_texture> &texture,
 				light_data[8] = r;
 				light_data[9] = g;
 				light_data[10] = b;
-				light_data[11] = a;
+				light_data[11] = a * light->Intensity();
 			}
 
 			{
@@ -145,7 +145,7 @@ void upload_light_data(OwningPtr<light_texture> &texture,
 				light_data[12] = r;
 				light_data[13] = g;
 				light_data[14] = b;
-				light_data[15] = a;
+				light_data[15] = a * light->Intensity();
 			}
 
 			{
@@ -153,7 +153,7 @@ void upload_light_data(OwningPtr<light_texture> &texture,
 				light_data[16] = r;
 				light_data[17] = g;
 				light_data[18] = b;
-				light_data[19] = a;
+				light_data[19] = a * light->Intensity();
 			}
 
 			auto [constant, linear, quadratic] = light->Attenuation();
@@ -220,7 +220,7 @@ void upload_emissive_light_data(OwningPtr<light_texture> &texture,
 			light_data[4] = r;
 			light_data[5] = g;
 			light_data[6] = b;
-			light_data[7] = a;
+			light_data[7] = a * light->Intensity();
 
 
 			//Light data has changed
