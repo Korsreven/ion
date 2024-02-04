@@ -463,7 +463,8 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 	//For each node
 	for (auto &node : root_node_.OrderedSceneNodes())
 	{
-		node.Elapse(time);
+		if (!paused_)
+			node.Elapse(time);
 
 		//The node render started/ended events can be called without any attached objects
 		//The visibility of the node is also used as a flag to enable/disable event notifications
@@ -487,7 +488,9 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 			//Elapse and prepare object
 			if (object_visible)
 			{
-				object->Elapse(time);
+				if (!paused_)
+					object->Elapse(time);
+
 				object->Prepare();
 			}
 
@@ -580,7 +583,9 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 		Drawing
 	*/
 
-	renderer_.Elapse(time);
+	if (!paused_)
+		renderer_.Elapse(time);
+
 	renderer_.Prepare();
 	renderer_.Draw();
 

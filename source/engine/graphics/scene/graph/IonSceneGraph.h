@@ -125,6 +125,7 @@ namespace ion::graphics::scene::graph
 			using NodeEventsBase = events::Listenable<events::listeners::SceneNodeListener>;
 
 			bool enabled_ = true;
+			bool paused_ = false;
 			real gamma_ = 1.0_r; //100% gamma
 			Color ambient_color_ = color::White; //No ambient
 			std::optional<render::Fog> fog_; //No fog
@@ -236,6 +237,22 @@ namespace ion::graphics::scene::graph
 				enabled_ = false;
 			}
 
+
+			///@brief Pauses the scene graph
+			///@details Stop time while continue rendering
+			inline void Pause() noexcept
+			{
+				paused_ = true;
+			}
+
+			///@brief Resumes the scene graph
+			///@details Start time while continue rendering
+			inline void Resume() noexcept
+			{
+				paused_ = false;
+			}
+
+
 			///@brief Sets whether or not the scene graph rendering is enabled
 			inline void Enabled(bool enabled) noexcept
 			{
@@ -243,6 +260,16 @@ namespace ion::graphics::scene::graph
 					Enable();
 				else
 					Disable();
+			}	
+
+			///@brief Sets whether or not the scene graph is paused
+			///@details Start/stop time while continue rendering
+			inline void Paused(bool paused) noexcept
+			{
+				if (paused)
+					Pause();
+				else
+					Resume();
 			}
 
 
@@ -288,6 +315,12 @@ namespace ion::graphics::scene::graph
 			[[nodiscard]] inline auto IsEnabled() const noexcept
 			{
 				return enabled_;
+			}
+
+			///@brief Returns true if the scene graph is paused
+			[[nodiscard]] inline auto IsPaused() const noexcept
+			{
+				return paused_;
 			}
 
 			///@brief Returns the gamma of this scene
