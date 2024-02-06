@@ -311,14 +311,17 @@ namespace ion::managed
 					return typename decltype(objects_)::value_type{};
 			}
 
-			auto ExtractAll() noexcept
+			template <typename UnaryPredicate>
+			auto ExtractIf(UnaryPredicate p) noexcept
 			{
+				static_assert(std::is_invocable_r_v<bool, UnaryPredicate, ObjectT&>);
+
 				//[objects to keep, objects to remove]
 				auto iter =
 					std::stable_partition(std::begin(objects_), std::end(objects_),
 						[&](auto &object) noexcept
 						{
-							return !NotifyRemovable(*object);
+							return !NotifyRemovable(*object) || !p(*object);
 						});
 
 				//Something to remove
@@ -337,6 +340,11 @@ namespace ion::managed
 				}
 				else
 					return decltype(objects_){};
+			}
+
+			auto ExtractAll() noexcept
+			{
+				return ExtractIf([](ObjectT&) { return true; });
 			}
 
 			void Tidy() noexcept
@@ -580,6 +588,12 @@ namespace ion::managed
 					return Remove(*ptr);
 				else
 					return false;
+			}
+
+			template <typename UnaryPredicate>
+			void RemoveIf(UnaryPredicate p) noexcept
+			{
+				ExtractIf(std::move(p));
 			}
 
 			///@}
