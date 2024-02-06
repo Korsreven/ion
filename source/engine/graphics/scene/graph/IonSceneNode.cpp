@@ -817,6 +817,17 @@ NonOwningPtr<const SceneNode> SceneNode::GetChildNode(std::string_view name) con
 }
 
 
+NonOwningPtr<SceneNode> SceneNode::GetChildNode(int index) noexcept
+{
+	return index < std::ssize(child_nodes_) ? child_nodes_[index] : NonOwningPtr<SceneNode>{};
+}
+
+NonOwningPtr<const SceneNode> SceneNode::GetChildNode(int index) const noexcept
+{
+	return const_cast<SceneNode&>(*this).GetChildNode(index);
+}
+
+
 NonOwningPtr<SceneNode> SceneNode::GetDescendantNode(std::string_view name, SearchStrategy strategy) noexcept
 {
 	auto nodes =

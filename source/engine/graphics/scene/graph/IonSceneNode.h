@@ -1019,6 +1019,15 @@ namespace ion::graphics::scene::graph
 			[[nodiscard]] NonOwningPtr<const SceneNode> GetChildNode(std::string_view name) const noexcept;
 
 
+			///@brief Gets a pointer to a mutable child node with the given index
+			///@details Returns nullptr if child node could not be found
+			[[nodiscard]] NonOwningPtr<SceneNode> GetChildNode(int index) noexcept;
+
+			///@brief Gets a pointer to an immutable child node with the given index
+			///@details Returns nullptr if child node could not be found
+			[[nodiscard]] NonOwningPtr<const SceneNode> GetChildNode(int index) const noexcept;
+
+
 			///@brief Gets a pointer to a mutable descendant node with the given name using the given search strategy
 			///@details Returns nullptr if a descendant node could not be found
 			[[nodiscard]] NonOwningPtr<SceneNode> GetDescendantNode(std::string_view name, scene_node::SearchStrategy strategy = scene_node::SearchStrategy::BreadthFirst) noexcept;
