@@ -508,4 +508,33 @@ bool SceneManager::RemoveSoundListener(std::string_view name) noexcept
 	return SoundListenerBase::Remove(name);
 }
 
+
+/*
+	Objects - Removing
+*/
+
+void SceneManager::Clear() noexcept
+{
+	CameraBase::Clear();
+	LightBase::Clear();
+	ModelBase::Clear();
+	ParticleSystemBase::Clear();
+	TextBase::Clear();
+	SoundBase::Clear();
+	SoundListenerBase::Clear();
+}
+
+void SceneManager::ClearOrphaned() noexcept
+{
+	auto is_orphan = [](MovableObject &object) { return !object.ParentNode(); };
+
+	CameraBase::RemoveIf(is_orphan);
+	LightBase::RemoveIf(is_orphan);
+	ModelBase::RemoveIf(is_orphan);
+	ParticleSystemBase::RemoveIf(is_orphan);
+	TextBase::RemoveIf(is_orphan);
+	SoundBase::RemoveIf(is_orphan);
+	SoundListenerBase::RemoveIf(is_orphan);
+}
+
 } //ion::graphics::scene

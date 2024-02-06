@@ -679,6 +679,20 @@ namespace ion::graphics::scene
 			bool RemoveSoundListener(std::string_view name) noexcept;
 
 			///@}
+
+			/**
+				@name Objects - Removing
+				@{
+			*/
+
+			///@brief Clears all objects from this manager
+			void Clear() noexcept;
+
+			///@brief Clears all orphaned objects from this manager
+			///@details An orphan object is not attached to a scene node
+			void ClearOrphaned() noexcept;
+
+			///@}
 	};
 } //ion::graphics::scene
 
