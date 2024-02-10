@@ -725,14 +725,14 @@ namespace ion::graphics::scene::graph::animations
 				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
 
 
-			///@brief Adds a color fading motion to this node animation with the given type, target name, color and total duration
+			///@brief Adds a color fading motion to this node animation with the given type, target name, from color, to color and total duration
 			void AddColorFading(node_animation::ColorFadingMotionType type, std::string target_name,
-				const Color &color, duration total_duration, duration start_time = 0.0_sec,
+				const Color &from_color, const Color &to_color, duration total_duration, duration start_time = 0.0_sec,
 				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
 
-			///@brief Adds a color fading motion to this node animation with the given type, target name, color and total duration
+			///@brief Adds a color fading motion to this node animation with the given type, target name, from color, to color and total duration
 			void AddColorFading(node_animation::ColorFadingMotionType type, std::string target_name,
-				const Color &color, duration total_duration, duration start_time,
+				const Color &from_color, const Color &to_color, duration total_duration, duration start_time,
 				node_animation::MotionTechnique technique_r,
 				node_animation::MotionTechnique technique_g,
 				node_animation::MotionTechnique technique_b,

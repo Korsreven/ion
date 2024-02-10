@@ -277,9 +277,10 @@ ClassDefinition get_action_class()
 ClassDefinition get_color_fading_class()
 {
 	return ClassDefinition::Create("color-fading")
-		.AddRequiredProperty("color", ParameterType::Color)
+		.AddRequiredProperty("from-color", ParameterType::Color)
 		.AddRequiredProperty("target-name", ParameterType::String)
-		.AddRequiredProperty("total-duration", ParameterType::FloatingPoint)	
+		.AddRequiredProperty("to-color", ParameterType::Color)
+		.AddRequiredProperty("total-duration", ParameterType::FloatingPoint)
 		.AddRequiredProperty("type", {"light-ambient"s, "light-diffuse"s, "light-specular"s, "model-base-color"s,
 									  "text-foreground-color"s, "text-background-color"s, "text-decoration-color"s})
 		.AddProperty("motion-technique", {motion_technique_types, motion_technique_types, motion_technique_types, motion_technique_types}, 1)
@@ -1507,8 +1508,11 @@ void create_color_fading_motion(const script_tree::ObjectNode &object,
 	auto target_name = object
 		.Property("target-name")[0]
 		.Get<ScriptType::String>()->Get();
-	auto color = object
-		.Property("color")[0]
+	auto from_color = object
+		.Property("from-color")[0]
+		.Get<ScriptType::Color>()->Get();
+	auto to_color = object
+		.Property("to-color")[0]
 		.Get<ScriptType::Color>()->Get();
 	auto total_duration = duration{object
 		.Property("total-duration")[0]
@@ -1562,7 +1566,7 @@ void create_color_fading_motion(const script_tree::ObjectNode &object,
 		get_motion_technique_type(technique_name_a) :
 		technique_r;
 
-	animation.AddColorFading(type, std::move(target_name), color, total_duration, start_time, technique_r, technique_g, technique_b, technique_a);
+	animation.AddColorFading(type, std::move(target_name), from_color, to_color, total_duration, start_time, technique_r, technique_g, technique_b, technique_a);
 }
 
 void create_fading_motion(const script_tree::ObjectNode &object,

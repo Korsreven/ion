@@ -1379,7 +1379,7 @@ void NodeAnimation::AddFading(FadingMotionType type, std::string target_name,
 
 
 void NodeAnimation::AddColorFading(ColorFadingMotionType type, std::string target_name,
-	const Color &color, duration total_duration, duration start_time,
+	const Color &from_color, const Color &to_color, duration total_duration, duration start_time,
 	MotionTechnique technique)
 {
 	assert(total_duration > 0.0_sec);
@@ -1388,10 +1388,10 @@ void NodeAnimation::AddColorFading(ColorFadingMotionType type, std::string targe
 	auto m = detail::color_fading_motion{
 		{start_time, total_duration},
 		type, std::move(target_name),
-		{0.0_r, color.R(), technique.type, technique.method},
-		{0.0_r, color.G(), technique.type, technique.method},
-		{0.0_r, color.B(), technique.type, technique.method},
-		{0.0_r, color.A(), technique.type, technique.method}};
+		{0.0_r, to_color.R() - from_color.R(), technique.type, technique.method},
+		{0.0_r, to_color.G() - from_color.G(), technique.type, technique.method},
+		{0.0_r, to_color.B() - from_color.B(), technique.type, technique.method},
+		{0.0_r, to_color.A() - from_color.A(), technique.type, technique.method}};
 
 	//Insert sorted
 	motions_.insert(
@@ -1403,7 +1403,7 @@ void NodeAnimation::AddColorFading(ColorFadingMotionType type, std::string targe
 }
 
 void NodeAnimation::AddColorFading(ColorFadingMotionType type, std::string target_name,
-	const Color &color, duration total_duration, duration start_time,
+	const Color &from_color, const Color &to_color, duration total_duration, duration start_time,
 	MotionTechnique technique_r,
 	MotionTechnique technique_g,
 	MotionTechnique technique_b,
@@ -1415,10 +1415,10 @@ void NodeAnimation::AddColorFading(ColorFadingMotionType type, std::string targe
 	auto m = detail::color_fading_motion{
 		{start_time, total_duration},
 		type, std::move(target_name),
-		{0.0_r, color.R(), technique_r.type, technique_r.method},
-		{0.0_r, color.G(), technique_g.type, technique_g.method},
-		{0.0_r, color.B(), technique_b.type, technique_b.method},
-		{0.0_r, color.A(), technique_a.type, technique_a.method}};
+		{0.0_r, to_color.R() - from_color.R(), technique_r.type, technique_r.method},
+		{0.0_r, to_color.G() - from_color.G(), technique_g.type, technique_g.method},
+		{0.0_r, to_color.B() - from_color.B(), technique_b.type, technique_b.method},
+		{0.0_r, to_color.A() - from_color.A(), technique_a.type, technique_a.method}};
 
 	//Insert sorted
 	motions_.insert(
